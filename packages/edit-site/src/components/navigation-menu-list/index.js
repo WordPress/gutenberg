@@ -22,13 +22,32 @@ import { useEvent } from '@wordpress/compose';
  */
 import {
 	OPERATOR_IS_ANY,
+	OPERATOR_IS,
 	LAYOUT_LIST,
 	NAVIGATION_POST_TYPE,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import AddNewPostModal from '../add-new-post';
+import useMenuIdsWithActiveLocations from '../../hooks/use-menu-ids-with-active-locations';
 
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+
+const ACTIVE_FILTER_ELEMENTS = [
+	{ value: 'active', label: __( 'Active' ) },
+	{ value: 'inactive', label: __( 'Inactive' ) },
+];
+
+const activeField = {
+	id: 'active',
+	label: __( 'Active' ),
+	getValue: () => '',
+	filterBy: {
+		operators: [ OPERATOR_IS ],
+		isPrimary: true,
+	},
+	elements: ACTIVE_FILTER_ELEMENTS,
+	enableSorting: false,
+};
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const EMPTY_ARRAY = [];
@@ -52,21 +71,39 @@ const SLUG_TO_STATUS = {
 	trash: 'trash',
 };
 
+const SLUG_TO_ACTIVE_FILTER = {
+	active: 'active',
+	inactive: 'inactive',
+};
+
 function getActiveViewOverridesForTab( activeView ) {
 	const status = SLUG_TO_STATUS[ activeView ];
-	if ( ! status ) {
-		return {};
+	if ( status ) {
+		return {
+			filters: [
+				{
+					field: 'status',
+					operator: OPERATOR_IS_ANY,
+					value: status,
+					isLocked: true,
+				},
+			],
+		};
 	}
-	return {
-		filters: [
-			{
-				field: 'status',
-				operator: OPERATOR_IS_ANY,
-				value: status,
-				isLocked: true,
-			},
-		],
-	};
+	const activeValue = SLUG_TO_ACTIVE_FILTER[ activeView ];
+	if ( activeValue ) {
+		return {
+			filters: [
+				{
+					field: 'active',
+					operator: OPERATOR_IS,
+					value: activeValue,
+					isLocked: true,
+				},
+			],
+		};
+	}
+	return {};
 }
 
 function getItemId( item ) {
@@ -128,7 +165,19 @@ export default function NavigationMenuList() {
 		setSelection( postId ? [ postId ] : [] );
 	}, [ postId ] );
 
-	const fields = usePostFields( { postType: NAVIGATION_POST_TYPE } );
+	const baseFields = usePostFields( { postType: NAVIGATION_POST_TYPE } );
+	const fields = useMemo(
+		() => ( baseFields ? [ activeField, ...baseFields ] : null ),
+		[ baseFields ]
+	);
+
+	const { activeMenuIds, isResolving: isLoadingActiveIds } =
+		useMenuIdsWithActiveLocations();
+
+	const activeFilter = view.filters?.find(
+		( f ) => f.field === 'active' && f.operator === OPERATOR_IS
+	);
+	const hasActiveFilter = !! activeFilter?.value;
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -146,31 +195,71 @@ export default function NavigationMenuList() {
 		}
 
 		return {
-			per_page: view.perPage,
-			page: view.page,
+			per_page: hasActiveFilter ? -1 : view.perPage,
+			page: hasActiveFilter ? 1 : view.page,
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
 			search: view.search,
 			...filters,
 		};
-	}, [ view ] );
+	}, [ view, hasActiveFilter ] );
 
 	const {
 		records,
 		isResolving: isLoadingData,
-		totalItems,
-		totalPages,
+		totalItems: apiTotalItems,
+		totalPages: apiTotalPages,
 	} = useEntityRecordsWithPermissions(
 		'postType',
 		NAVIGATION_POST_TYPE,
 		queryArgs
 	);
 
-	const data = records ?? EMPTY_ARRAY;
-	const paginationInfo = useMemo(
-		() => ( { totalItems: totalItems ?? 0, totalPages: totalPages ?? 0 } ),
-		[ totalItems, totalPages ]
-	);
+	const { data, paginationInfo } = useMemo( () => {
+		let filtered = records ?? EMPTY_ARRAY;
+
+		if ( hasActiveFilter ) {
+			const isActive = activeFilter.value === 'active';
+			filtered = filtered.filter( ( menu ) =>
+				isActive
+					? activeMenuIds.has( menu.id )
+					: ! activeMenuIds.has( menu.id )
+			);
+		}
+
+		if ( ! hasActiveFilter ) {
+			return {
+				data: filtered,
+				paginationInfo: {
+					totalItems: apiTotalItems ?? 0,
+					totalPages: apiTotalPages ?? 0,
+				},
+			};
+		}
+
+		const totalItems = filtered.length;
+		const totalPages = Math.max(
+			1,
+			Math.ceil( totalItems / view.perPage )
+		);
+		const page = Math.min( view.page, totalPages );
+		const start = ( page - 1 ) * view.perPage;
+		const paginatedData = filtered.slice( start, start + view.perPage );
+
+		return {
+			data: paginatedData,
+			paginationInfo: { totalItems, totalPages },
+		};
+	}, [
+		records,
+		hasActiveFilter,
+		activeFilter?.value,
+		activeMenuIds,
+		apiTotalItems,
+		apiTotalPages,
+		view.perPage,
+		view.page,
+	] );
 
 	const { labels, canCreateRecord } = useSelect( ( select ) => {
 		const { getPostType, canUser } = select( coreStore );
@@ -247,7 +336,11 @@ export default function NavigationMenuList() {
 				fields={ fields }
 				actions={ actions }
 				data={ data }
-				isLoading={ isLoadingData || ! fields }
+				isLoading={
+					isLoadingData ||
+					( hasActiveFilter && isLoadingActiveIds ) ||
+					! fields
+				}
 				view={ view }
 				onChangeView={ onChangeView }
 				selection={ selection }

@@ -11,12 +11,18 @@ import {
 	scheduled,
 	pending,
 	notAllowed,
+	pin,
+	archive,
 } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { OPERATOR_IS_ANY } from '../../utils/constants';
+import {
+	OPERATOR_IS_ANY,
+	OPERATOR_IS,
+	NAVIGATION_POST_TYPE,
+} from '../../utils/constants';
 
 export const defaultLayouts = {
 	table: {},
@@ -40,6 +46,44 @@ export const DEFAULT_VIEW = {
 };
 
 export function getDefaultViews( postType ) {
+	const isNavigation = postType?.name === NAVIGATION_POST_TYPE;
+	const navigationActiveViews = isNavigation
+		? [
+				{
+					title: __( 'Active' ),
+					slug: 'active',
+					icon: pin,
+					view: {
+						...DEFAULT_VIEW,
+						filters: [
+							{
+								field: 'active',
+								operator: OPERATOR_IS,
+								value: 'active',
+								isLocked: true,
+							},
+						],
+					},
+				},
+				{
+					title: __( 'Inactive' ),
+					slug: 'inactive',
+					icon: archive,
+					view: {
+						...DEFAULT_VIEW,
+						filters: [
+							{
+								field: 'active',
+								operator: OPERATOR_IS,
+								value: 'inactive',
+								isLocked: true,
+							},
+						],
+					},
+				},
+		  ]
+		: [];
+
 	return [
 		{
 			title: postType?.labels?.all_items || __( 'All items' ),
@@ -47,6 +91,7 @@ export function getDefaultViews( postType ) {
 			icon: pages,
 			view: DEFAULT_VIEW,
 		},
+		...navigationActiveViews,
 		{
 			title: __( 'Published' ),
 			slug: 'published',
