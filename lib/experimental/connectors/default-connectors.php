@@ -56,13 +56,14 @@ function gutenberg_get_real_api_key( $option_name ) {
 }
 
 /**
- * Registers a connector API key setting and adds a masking filter.
+ * Registers a connector API key setting and adds masking and validation filters.
  *
  * Base function that can be used by any provider.
  *
  * @param string $option_name The option name for the API key.
+ * @param string $provider_id Optional. The WP AI client provider ID for validation.
  */
-function gutenberg_register_connector_api_key_setting( $option_name ) {
+function gutenberg_register_connector_api_key_setting( $option_name, $provider_id = '' ) {
 	register_setting(
 		'connectors',
 		$option_name,
@@ -75,6 +76,57 @@ function gutenberg_register_connector_api_key_setting( $option_name ) {
 	);
 
 	gutenberg_add_api_key_mask_filter( $option_name );
+
+	if ( $provider_id ) {
+		gutenberg_add_api_key_validation_filter( $option_name, $provider_id );
+	}
+}
+
+/**
+ * Adds a pre_update_option filter that validates an API key against the WP AI Client
+ * before allowing it to be persisted.
+ *
+ * If the key is invalid (the provider cannot be configured with it), the filter
+ * returns the old value, effectively rejecting the update. The client detects
+ * the unchanged response and surfaces an error.
+ *
+ * @param string $option_name The option name for the API key.
+ * @param string $provider_id The WP AI client provider ID.
+ */
+function gutenberg_add_api_key_validation_filter( $option_name, $provider_id ) {
+	add_filter(
+		"pre_update_option_{$option_name}",
+		function ( $value, $old_value ) use ( $provider_id ) {
+			// Always allow clearing the key.
+			if ( empty( $value ) ) {
+				return $value;
+			}
+
+			try {
+				$registry = \WordPress\AiClient\AiClient::defaultRegistry();
+
+				if ( ! $registry->hasProvider( $provider_id ) ) {
+					return $old_value;
+				}
+
+				$registry->setProviderRequestAuthentication(
+					$provider_id,
+					new \WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication( $value )
+				);
+
+				if ( ! $registry->isProviderConfigured( $provider_id ) ) {
+					return $old_value;
+				}
+			} catch ( \Error $e ) {
+				// WP AI Client not available — allow update.
+				return $value;
+			}
+
+			return $value;
+		},
+		10,
+		2
+	);
 }
 
 /**
@@ -113,9 +165,9 @@ function gutenberg_pass_connector_key_to_ai_client( $option_name, $provider_id )
  * Registers the default connector settings.
  */
 function gutenberg_register_default_connector_settings() {
-	gutenberg_register_connector_api_key_setting( 'connectors_gemini_api_key' );
-	gutenberg_register_connector_api_key_setting( 'connectors_openai_api_key' );
-	gutenberg_register_connector_api_key_setting( 'connectors_anthropic_api_key' );
+	gutenberg_register_connector_api_key_setting( 'connectors_gemini_api_key', 'google' );
+	gutenberg_register_connector_api_key_setting( 'connectors_openai_api_key', 'openai' );
+	gutenberg_register_connector_api_key_setting( 'connectors_anthropic_api_key', 'anthropic' );
 }
 add_action( 'init', 'gutenberg_register_default_connector_settings' );
 

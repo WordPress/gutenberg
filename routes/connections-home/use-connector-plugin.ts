@@ -149,14 +149,23 @@ export function useConnectorPlugin( {
 
 	const saveApiKey = async ( apiKey: string ) => {
 		try {
-			await apiFetch( {
+			const result = await apiFetch< Record< string, string > >( {
 				method: 'POST',
 				path: '/wp/v2/settings',
 				data: {
 					[ settingName ]: apiKey,
 				},
 			} );
-			setCurrentApiKey( apiKey );
+
+			// If we sent a non-empty key but the returned value didn't
+			// change, the server rejected the update (validation failed).
+			if ( apiKey && result[ settingName ] === currentApiKey ) {
+				throw new Error(
+					'The API key could not be saved. The key may be invalid.'
+				);
+			}
+
+			setCurrentApiKey( result[ settingName ] || '' );
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'Failed to save API key:', error );

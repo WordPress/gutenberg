@@ -54,7 +54,7 @@ export function ConnectorItem( {
 }
 
 export interface DefaultConnectorSettingsProps {
-	onSave?: ( apiKey: string ) => void;
+	onSave?: ( apiKey: string ) => void | Promise< void >;
 	onRemove?: () => void;
 	initialValue?: string;
 	helpUrl?: string;
@@ -77,6 +77,8 @@ export function DefaultConnectorSettings( {
 }: DefaultConnectorSettingsProps ) {
 	const [ apiKey, setApiKey ] = useState( initialValue );
 	const [ hasBlurred, setHasBlurred ] = useState( false );
+	const [ isSaving, setIsSaving ] = useState( false );
+	const [ saveError, setSaveError ] = useState< string | null >( null );
 
 	const validationError =
 		! readOnly && hasBlurred && apiKey ? validate?.( apiKey ) : undefined;
@@ -104,6 +106,13 @@ export function DefaultConnectorSettings( {
 				</>
 			);
 		}
+		if ( saveError ) {
+			return (
+				<span style={ { color: '#cc1818' } }>
+					{ saveError }
+				</span>
+			);
+		}
 		if ( validationError ) {
 			return (
 				<span style={ { color: '#cc1818' } }>
@@ -112,6 +121,22 @@ export function DefaultConnectorSettings( {
 			);
 		}
 		return helpLink;
+	};
+
+	const handleSave = async () => {
+		setSaveError( null );
+		setIsSaving( true );
+		try {
+			await onSave?.( apiKey );
+		} catch ( error ) {
+			setSaveError(
+				error instanceof Error
+					? error.message
+					: __( 'Failed to save API key. Please try again.' )
+			);
+		} finally {
+			setIsSaving( false );
+		}
 	};
 
 	return (
@@ -124,10 +149,13 @@ export function DefaultConnectorSettings( {
 				__nextHasNoMarginBottom
 				label={ __( 'API Key' ) }
 				value={ apiKey }
-				onChange={ readOnly ? undefined : setApiKey }
+				onChange={ readOnly ? undefined : ( value ) => {
+					setSaveError( null );
+					setApiKey( value );
+				} }
 				onBlur={ () => setHasBlurred( true ) }
 				placeholder="YOUR_API_KEY"
-				disabled={ readOnly }
+				disabled={ readOnly || isSaving }
 				help={ getHelp() }
 			/>
 			{ readOnly ? (
@@ -142,8 +170,9 @@ export function DefaultConnectorSettings( {
 				<HStack justify="flex-start">
 					<Button
 						variant="primary"
-						disabled={ ! apiKey || !! validationError }
-						onClick={ () => onSave?.( apiKey ) }
+						disabled={ ! apiKey || !! validationError || isSaving }
+						isBusy={ isSaving }
+						onClick={ handleSave }
 					>
 						{ __( 'Save' ) }
 					</Button>
