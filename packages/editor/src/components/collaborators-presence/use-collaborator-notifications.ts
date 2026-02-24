@@ -1,0 +1,278 @@
+/**
+ * WordPress dependencies
+ */
+import { usePrevious } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect, useMemo } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
+import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
+import {
+	privateApis,
+	type PostEditorAwarenessState,
+} from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+import { store as editorStore } from '../../store';
+
+const { useActiveCollaborators, useBroadcastSaveEvent } = unlock( privateApis );
+
+/**
+ * Notice IDs for each notification type. Using stable IDs prevents duplicate
+ * notices if the same event is processed more than once.
+ */
+const NOTIFICATION_TYPE = {
+	POST_UPDATED: 'collab-post-updated',
+	USER_ENTERED: 'collab-user-entered',
+	USER_EXITED: 'collab-user-exited',
+} as const;
+
+interface CollaborationNotificationsConfig {
+	userEntered: boolean;
+	userExited: boolean;
+	postUpdated: boolean;
+}
+
+const DEFAULT_NOTIFICATIONS_CONFIG: CollaborationNotificationsConfig = {
+	userEntered: true,
+	userExited: true,
+	postUpdated: true,
+};
+
+/**
+ * Returns the snackbar message for a post updated notification based on post status.
+ *
+ * @param name   Display name of the collaborator who saved.
+ * @param status WordPress post status at the time of save.
+ */
+function getPostUpdatedMessage( name: string, status: string ): string {
+	const isPublished = [ 'publish', 'private', 'future' ].includes( status );
+	if ( isPublished ) {
+		/* translators: %s: collaborator display name */
+		return sprintf( __( 'Post updated by %s.' ), name );
+	}
+	/* translators: %s: collaborator display name */
+	return sprintf( __( 'Draft saved by %s.' ), name );
+}
+
+/**
+ * Hook that watches for collaborator join/leave events and remote save events,
+ * dispatching snackbar notices accordingly.
+ *
+ * Notification types can be enabled/disabled via the
+ * `editor.collaborationNotifications` WordPress filter.
+ *
+ * @param postId   The ID of the post being edited.
+ * @param postType The post type of the post being edited.
+ */
+export function useCollaboratorNotifications(
+	postId: number | null,
+	postType: string | null
+): void {
+	const activeCollaborators = useActiveCollaborators(
+		postId,
+		postType
+	) as PostEditorAwarenessState[];
+
+	const broadcastSaveEvent = useBroadcastSaveEvent( postId, postType );
+
+	const {
+		isSaving,
+		isAutosaving,
+		didSaveSucceed,
+		postStatus,
+		isCollaborationEnabled,
+	} = useSelect( ( select ) => {
+		const editorSel = select( editorStore );
+		return {
+			isSaving: editorSel.isSavingPost(),
+			isAutosaving: editorSel.isAutosavingPost(),
+			didSaveSucceed: editorSel.didPostSaveRequestSucceed(),
+			postStatus: editorSel.getCurrentPostAttribute( 'status' ) as
+				| string
+				| undefined,
+			isCollaborationEnabled:
+				editorSel.isCollaborationEnabledForCurrentPost(),
+		};
+	}, [] );
+
+	const { createNotice } = useDispatch( noticesStore );
+
+	const notificationsConfig = useMemo(
+		() =>
+			applyFilters(
+				'editor.collaborationNotifications',
+				DEFAULT_NOTIFICATIONS_CONFIG
+			) as CollaborationNotificationsConfig,
+		[]
+	);
+
+	const prevCollaborators = usePrevious( activeCollaborators );
+	const prevIsSaving = usePrevious( isSaving );
+	const prevIsAutosaving = usePrevious( isAutosaving );
+
+	// Broadcast our own saves to collaborators via awareness.
+	useEffect( () => {
+		if (
+			prevIsSaving &&
+			! isSaving &&
+			! prevIsAutosaving &&
+			didSaveSucceed &&
+			isCollaborationEnabled &&
+			postStatus
+		) {
+			broadcastSaveEvent( postStatus );
+		}
+	}, [
+		isSaving,
+		prevIsSaving,
+		prevIsAutosaving,
+		didSaveSucceed,
+		postStatus,
+		isCollaborationEnabled,
+		broadcastSaveEvent,
+	] );
+
+	/*
+	 * Detect collaborator joins, leaves, and remote saves.
+	 */
+	useEffect( () => {
+		if ( ! isCollaborationEnabled ) {
+			return;
+		}
+
+		/*
+		 * On first render usePrevious returns undefined. On subsequent renders
+		 * the list may still be empty while the store hydrates. In both cases,
+		 * skip to avoid spurious "X joined" toasts for users already present.
+		 */
+		if ( ! prevCollaborators || prevCollaborators.length === 0 ) {
+			return;
+		}
+
+		/*
+		 * Convenience wrapper to keep notice calls concise.
+		 */
+		function notify( noticeId: string, message: string ) {
+			void createNotice( 'info', message, {
+				id: noticeId,
+				type: 'snackbar',
+				isDismissible: false,
+			} );
+		}
+
+		const prevMap = new Map< number, PostEditorAwarenessState >(
+			prevCollaborators.map( ( c ) => [ c.clientId, c ] )
+		);
+		const newMap = new Map< number, PostEditorAwarenessState >(
+			activeCollaborators.map( ( c ) => [ c.clientId, c ] )
+		);
+
+		/*
+		 * Detect joins: new clientIds that weren't in the previous state.
+		 */
+		if ( notificationsConfig.userEntered ) {
+			const me = activeCollaborators.find( ( c ) => c.isMe );
+
+			for ( const [ clientId, collaborator ] of newMap ) {
+				if ( prevMap.has( clientId ) || collaborator.isMe ) {
+					continue;
+				}
+
+				/*
+				 * Skip collaborators who were present before the current user
+				 * joined. Their enteredAt is earlier than ours, meaning we're
+				 * the newcomer.
+				 */
+				if (
+					me &&
+					collaborator.collaboratorInfo.enteredAt <
+						me.collaboratorInfo.enteredAt
+				) {
+					continue;
+				}
+
+				notify(
+					`${ NOTIFICATION_TYPE.USER_ENTERED }-${ collaborator.collaboratorInfo.id }`,
+					sprintf(
+						/* translators: %s: collaborator display name */
+						__( '%s has joined the post.' ),
+						collaborator.collaboratorInfo.name
+					)
+				);
+			}
+		}
+
+		/*
+		 * Detect leaves by iterating the previous collaborator list. A leave
+		 * notification fires when a previously-connected collaborator either:
+		 *   - transitions to isConnected=false (greyed-out in the UI), or
+		 *   - disappears from the list entirely while still connected.
+		 * Already-disconnected collaborators that are later removed from the
+		 * list (after the 5 s delay) are silently ignored.
+		 */
+		if ( notificationsConfig.userExited ) {
+			for ( const [ clientId, prevCollab ] of prevMap ) {
+				if ( prevCollab.isMe || ! prevCollab.isConnected ) {
+					continue;
+				}
+
+				const newCollab = newMap.get( clientId );
+				if ( newCollab?.isConnected ) {
+					continue;
+				}
+
+				notify(
+					`${ NOTIFICATION_TYPE.USER_EXITED }-${ prevCollab.collaboratorInfo.id }`,
+					sprintf(
+						/* translators: %s: collaborator display name */
+						__( '%s has left the post.' ),
+						prevCollab.collaboratorInfo.name
+					)
+				);
+			}
+		}
+
+		// Detect remote save events from other collaborators.
+		if ( notificationsConfig.postUpdated ) {
+			for ( const [ clientId, collaborator ] of newMap ) {
+				if ( collaborator.isMe || ! collaborator.lastSaveEvent ) {
+					continue;
+				}
+
+				const prevCollab = prevMap.get( clientId );
+
+				/*
+				 * Only notify for save events from collaborators we already
+				 * knew about. A newly appeared collaborator may carry a
+				 * historical save event that predates our session.
+				 */
+				if ( ! prevCollab ) {
+					continue;
+				}
+
+				const prevSavedAt = prevCollab.lastSaveEvent?.savedAt;
+				const { savedAt, status } = collaborator.lastSaveEvent;
+
+				if ( savedAt > ( prevSavedAt ?? 0 ) ) {
+					notify(
+						`${ NOTIFICATION_TYPE.POST_UPDATED }-${ collaborator.collaboratorInfo.id }`,
+						getPostUpdatedMessage(
+							collaborator.collaboratorInfo.name,
+							status
+						)
+					);
+				}
+			}
+		}
+	}, [
+		activeCollaborators,
+		prevCollaborators,
+		isCollaborationEnabled,
+		notificationsConfig,
+		createNotice,
+	] );
+}
