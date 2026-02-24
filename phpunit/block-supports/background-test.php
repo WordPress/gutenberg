@@ -203,6 +203,58 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'expected_wrapper'    => '<div class="wp-block-test has-background" style="color: red;font-size: 15px;background-image:url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover;">Content</div>',
 				'wrapper'             => '<div class="wp-block-test" style="color: red;font-size: 15px;">Content</div>',
 			),
+			'background gradient style is applied'             => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-gradient-rules-are-output',
+				'background_settings' => array(
+					'gradient' => true,
+				),
+				'background_style'    => array(
+					'gradient' => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+				),
+				'expected_wrapper'    => '<div class="has-background" style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%);">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
+			'background gradient style is not applied if the block does not support it' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-gradient-rules-are-not-output',
+				'background_settings' => array(
+					'gradient' => false,
+				),
+				'background_style'    => array(
+					'gradient' => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+				),
+				'expected_wrapper'    => '<div>Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
+			'background gradient style with preset slug is applied' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-gradient-preset-slug',
+				'background_settings' => array(
+					'gradient' => true,
+				),
+				'background_style'    => array(
+					'gradient' => 'var:preset|gradient|vivid-cyan-blue',
+				),
+				'expected_wrapper'    => '<div class="has-background" style="background-image:var(--wp--preset--gradient--vivid-cyan-blue);">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
+			'background gradient and image combined'       => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-gradient-and-image-combined',
+				'background_settings' => array(
+					'backgroundImage' => true,
+					'gradient'        => true,
+				),
+				'background_style'    => array(
+					'backgroundImage' => array(
+						'url' => 'https://example.com/image.jpg',
+					),
+					'gradient'        => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+				),
+				'expected_wrapper'    => '<div class="has-background" style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%), url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover;">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
 			'background image style is not applied if the block does not support background image' => array(
 				'theme_name'          => 'block-theme-child-with-fluid-typography',
 				'block_name'          => 'test/background-rules-are-not-output',
