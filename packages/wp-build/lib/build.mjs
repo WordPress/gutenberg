@@ -1434,12 +1434,13 @@ async function compileStyles( packageName ) {
 						embedded: true,
 						...getSassOptions( packageDir ),
 						async transform( source ) {
-							// Process with autoprefixer for LTR version
-							const ltrResult = await postcss( [
-								autoprefixer( { grid: true } ),
-							] ).process( source, { from: undefined } );
+							const ltrResult = await postcss(
+								[
+									dsTokenFallbacks,
+									autoprefixer( { grid: true } ),
+								].filter( Boolean )
+							).process( source, { from: undefined } );
 
-							// Process with rtlcss for RTL version
 							const rtlResult = await postcss( [
 								rtlcss(),
 							] ).process( ltrResult.css, { from: undefined } );
