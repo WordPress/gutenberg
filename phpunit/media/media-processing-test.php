@@ -202,22 +202,18 @@ HTML;
 	}
 
 	/**
-	 * Tests that client-side media processing is disabled by default in the Gutenberg plugin.
-	 *
-	 * The core compat layer defaults to true, but the Gutenberg plugin
-	 * adds a filter to disable it by default (lib/compat/plugin/media.php)
-	 * until known issues are resolved.
+	 * Tests that client-side media processing is enabled by default in the Gutenberg plugin.
 	 *
 	 * @covers ::gutenberg_is_client_side_media_processing_enabled
 	 */
-	public function test_client_side_media_processing_disabled_by_default_in_plugin() {
+	public function test_client_side_media_processing_enabled_by_default_in_plugin() {
 		// Remove the test bootstrap override to check the plugin's actual default.
 		remove_filter( 'wp_client_side_media_processing_enabled', '__return_true', 20 );
 		$enabled = gutenberg_is_client_side_media_processing_enabled();
 		// Restore the test bootstrap override.
 		add_filter( 'wp_client_side_media_processing_enabled', '__return_true', 20 );
 
-		$this->assertFalse( $enabled );
+		$this->assertTrue( $enabled );
 	}
 
 	/**
