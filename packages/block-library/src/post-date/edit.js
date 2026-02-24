@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
@@ -14,7 +9,6 @@ import {
 	getSettings as getDateSettings,
 } from '@wordpress/date';
 import {
-	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	store as blockEditorStore,
@@ -41,19 +35,18 @@ import { store as blocksStore } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
-export default function PostDateEdit( {
-	attributes,
-	context: { postType: postTypeSlug, queryId },
-	setAttributes,
-	name,
-} ) {
-	const { datetime, textAlign, format, isLink } = attributes;
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+export default function PostDateEdit( props ) {
+	const {
+		attributes,
+		context: { postType: postTypeSlug, queryId },
+		setAttributes,
+		name,
+	} = props;
+	useDeprecatedTextAlign( props );
+	const { datetime, format, isLink } = attributes;
+	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// Use internal state instead of a ref to make sure that the component
@@ -129,13 +122,6 @@ export default function PostDateEdit( {
 			{ ( blockEditingMode === 'default' ||
 				! isDescendentOfQueryLoop ) && (
 				<BlockControls group="block">
-					<AlignmentControl
-						value={ textAlign }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { textAlign: nextAlign } );
-						} }
-					/>
-
 					{ activeBlockVariationName !== 'post-date-modified' &&
 						( ! isDescendentOfQueryLoop ||
 							! activeBlockVariationName ) && (
