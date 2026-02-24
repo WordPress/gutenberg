@@ -271,11 +271,17 @@ const { state, actions, callbacks } = store(
 						// Traps focus within the overlay.
 						const focusableElements = Array.from(
 							document.querySelectorAll( focusableSelectors )
-						);
+						).filter( ( element ) => ! element.hidden );
 						const firstFocusableElement = focusableElements[ 0 ];
 						const lastFocusableElement =
 							focusableElements[ focusableElements.length - 1 ];
-						if (
+						// If focus is not on any of the known focusable
+						// elements (e.g. on the overlay div itself),
+						// move it to the first focusable element.
+						if ( ! focusableElements.includes( event.target ) ) {
+							event.preventDefault();
+							firstFocusableElement.focus();
+						} else if (
 							event.shiftKey &&
 							event.target === firstFocusableElement
 						) {
