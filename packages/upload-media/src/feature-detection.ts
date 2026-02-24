@@ -28,7 +28,7 @@ let cachedResult: FeatureDetectionResult | null = null;
  *    break third-party embeds). Browsers that lack `credentialless` iframe support
  *    (currently Firefox and Safari) will have client-side media processing disabled
  *    by default. Developers can re-enable the feature via the server-side
- *    `client_side_media_processing_enabled` filter if it works for their site.
+ *    `wp_client_side_media_processing_enabled` filter if it works for their site.
  * 5. Device memory (disables on devices with ≤2 GB RAM)
  * 6. Network conditions (disables when data saver / reduced data mode is on or connection is 2g/slow-2g)
  * 7. Web Worker support (baseline requirement)
@@ -75,6 +75,7 @@ export function detectClientSideMediaSupport(): FeatureDetectionResult {
 	// without breaking third-party embeds.
 	if (
 		typeof window !== 'undefined' &&
+		window.HTMLIFrameElement &&
 		! ( 'credentialless' in window.HTMLIFrameElement.prototype )
 	) {
 		cachedResult = {
