@@ -152,9 +152,6 @@ export function SidebarNavigationScreenWrapper( {
 
 const NavMenuItem = ( { postId, ...props } ) => {
 	return (
-		<SidebarNavigationItem
-			to={ `/wp_navigation/${ postId }` }
-			{ ...props }
-		/>
+		<SidebarNavigationItem to={ `/navigation/${ postId }` } { ...props } />
 	);
 };

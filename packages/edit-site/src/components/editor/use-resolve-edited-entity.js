@@ -33,7 +33,7 @@ const authorizedPostTypes = [ 'page', 'post' ];
 
 function getPostType( name ) {
 	let postType;
-	if ( name === 'navigation-item' ) {
+	if ( name === 'navigation' || name === 'navigation-item' ) {
 		postType = NAVIGATION_POST_TYPE;
 	} else if ( name === 'pattern-item' ) {
 		postType = PATTERN_TYPES.user;
