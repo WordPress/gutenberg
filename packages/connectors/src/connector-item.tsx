@@ -95,7 +95,7 @@ export function DefaultConnectorSettings( {
 					readOnly ? (
 						<>
 							{ __(
-								'Your API key is a secret, and we only show the full key for now. You can reset your API key at'
+								'Your API key is stored securely. You can reset it at'
 							) }{ ' ' }
 							{ helpUrl ? (
 								<ExternalLink href={ helpUrl }>
