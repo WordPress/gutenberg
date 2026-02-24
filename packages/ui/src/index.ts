@@ -9,5 +9,6 @@ export * from './icon-button';
 export * as Notice from './notice';
 export * from './stack';
 export * as Tabs from './tabs';
+export * from './text';
 export * as Tooltip from './tooltip';
 export * from './visually-hidden';
