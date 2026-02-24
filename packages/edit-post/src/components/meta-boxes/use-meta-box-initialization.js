@@ -18,12 +18,19 @@ import { unlock } from '../../lock-unlock';
  * @param { boolean } enabled
  */
 export const useMetaBoxInitialization = ( enabled ) => {
-	const { isEnabledAndEditorReady, isCollaborationEnabled } = useSelect(
+	const {
+		isEnabledAndEditorReady,
+		isCollaborationEnabled,
+		currentPostType,
+		currentPostId,
+	} = useSelect(
 		( select ) => ( {
 			isEnabledAndEditorReady:
 				enabled && select( editorStore ).__unstableIsEditorReady(),
 			isCollaborationEnabled:
 				select( editorStore ).isCollaborationEnabledForCurrentPost(),
+			currentPostType: select( editorStore ).getCurrentPostType(),
+			currentPostId: select( editorStore ).getCurrentPostId(),
 		} ),
 		[ enabled ]
 	);
@@ -46,5 +53,7 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		initializeMetaBoxes,
 		isCollaborationEnabled,
 		disableCollaboration,
+		currentPostType,
+		currentPostId,
 	] );
 };
