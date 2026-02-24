@@ -61,10 +61,70 @@ export function detectClientSideMediaSupport(): FeatureDetectionResult {
 		return cachedResult;
 	}
 
+	// Check Web Worker support.
+	if ( typeof Worker === 'undefined' ) {
+		cachedResult = {
+			supported: false,
+			reason: 'Web Workers are not supported in this browser.',
+		};
+		return cachedResult;
+	}
+
+	// Check credentialless iframe support.
+	// Browsers without this (Firefox, Safari) cannot use cross-origin isolation
+	// without breaking third-party embeds.
+	if (
+		typeof window !== 'undefined' &&
+		! ( 'credentialless' in window.HTMLIFrameElement.prototype )
+	) {
+		cachedResult = {
+			supported: false,
+			reason: 'Browser does not support credentialless iframes. Cross-origin isolation would break third-party embeds. Developers can re-enable via the wp_client_side_media_processing_enabled filter.',
+		};
+		return cachedResult;
+	}
+
+	// Check device memory.
+	if (
+		typeof navigator !== 'undefined' &&
+		'deviceMemory' in navigator &&
+		( navigator as any ).deviceMemory <= 2
+	) {
+		cachedResult = {
+			supported: false,
+			reason: 'Device has insufficient memory for client-side media processing.',
+		};
+		return cachedResult;
+	}
+
+	// Check network conditions.
+	if ( typeof navigator !== 'undefined' ) {
+		const connection = ( navigator as any ).connection;
+		if ( connection ) {
+			if ( connection.saveData ) {
+				cachedResult = {
+					supported: false,
+					reason: 'Data saver mode is enabled.',
+				};
+				return cachedResult;
+			}
+			if (
+				connection.effectiveType === '2g' ||
+				connection.effectiveType === 'slow-2g'
+			) {
+				cachedResult = {
+					supported: false,
+					reason: 'Network connection is too slow for client-side media processing.',
+				};
+				return cachedResult;
+			}
+		}
+	}
+
 	// Check that blob URL workers are allowed by CSP.
 	// Security plugins often set a strict worker-src directive that blocks blob: URLs,
 	// which would prevent creating the WASM processing worker at runtime.
-	if ( typeof window !== 'undefined' && typeof Worker !== 'undefined' ) {
+	if ( typeof window !== 'undefined' ) {
 		try {
 			const testBlob = new Blob( [ '' ], {
 				type: 'application/javascript',

@@ -14,6 +14,16 @@ describe( 'feature-detection', () => {
 	const originalCreateObjectURL = global.URL.createObjectURL;
 	const originalRevokeObjectURL = global.URL.revokeObjectURL;
 
+	// Store original property descriptors for navigator properties.
+	const originalDeviceMemoryDescriptor = Object.getOwnPropertyDescriptor(
+		navigator,
+		'deviceMemory'
+	);
+	const originalConnectionDescriptor = Object.getOwnPropertyDescriptor(
+		navigator,
+		'connection'
+	);
+
 	beforeEach( () => {
 		// Clear the cache before each test.
 		clearFeatureDetectionCache();
@@ -28,6 +38,30 @@ describe( 'feature-detection', () => {
 			() => 'blob:http://localhost/test'
 		);
 		global.URL.revokeObjectURL = jest.fn();
+
+		// Mock credentialless iframe support so the check passes by default.
+		if ( ! ( 'credentialless' in window.HTMLIFrameElement.prototype ) ) {
+			Object.defineProperty(
+				window.HTMLIFrameElement.prototype,
+				'credentialless',
+				{
+					value: false,
+					writable: true,
+					configurable: true,
+				}
+			);
+		}
+
+		// Remove navigator.deviceMemory and navigator.connection by default
+		// so they don't interfere with unrelated tests.
+		if ( 'deviceMemory' in navigator ) {
+			// @ts-ignore
+			delete navigator.deviceMemory;
+		}
+		if ( 'connection' in navigator ) {
+			// @ts-ignore
+			delete navigator.connection;
+		}
 	} );
 
 	afterEach( () => {
@@ -37,6 +71,35 @@ describe( 'feature-detection', () => {
 		global.Worker = originalWorker;
 		global.URL.createObjectURL = originalCreateObjectURL;
 		global.URL.revokeObjectURL = originalRevokeObjectURL;
+
+		// Restore credentialless property.
+		if ( 'credentialless' in window.HTMLIFrameElement.prototype ) {
+			delete ( window.HTMLIFrameElement.prototype as any ).credentialless;
+		}
+
+		// Restore navigator.deviceMemory.
+		if ( originalDeviceMemoryDescriptor ) {
+			Object.defineProperty(
+				navigator,
+				'deviceMemory',
+				originalDeviceMemoryDescriptor
+			);
+		} else if ( 'deviceMemory' in navigator ) {
+			// @ts-ignore
+			delete navigator.deviceMemory;
+		}
+
+		// Restore navigator.connection.
+		if ( originalConnectionDescriptor ) {
+			Object.defineProperty(
+				navigator,
+				'connection',
+				originalConnectionDescriptor
+			);
+		} else if ( 'connection' in navigator ) {
+			// @ts-ignore
+			delete navigator.connection;
+		}
 	} );
 
 	describe( 'detectClientSideMediaSupport', () => {
@@ -72,6 +135,120 @@ describe( 'feature-detection', () => {
 
 			expect( result.supported ).toBe( false );
 			expect( result.reason ).toContain( 'SharedArrayBuffer' );
+		} );
+
+		it( 'returns not supported when Worker is unavailable', () => {
+			global.WebAssembly = originalWebAssembly;
+			global.SharedArrayBuffer = originalSharedArrayBuffer;
+			// @ts-ignore - Intentionally setting Worker to undefined for testing.
+			global.Worker = undefined;
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( false );
+			expect( result.reason ).toBe(
+				'Web Workers are not supported in this browser.'
+			);
+		} );
+
+		it( 'returns not supported when credentialless iframes are not supported', () => {
+			global.WebAssembly = originalWebAssembly;
+			global.SharedArrayBuffer = originalSharedArrayBuffer;
+
+			// Remove credentialless from the prototype.
+			delete ( window.HTMLIFrameElement.prototype as any ).credentialless;
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( false );
+			expect( result.reason ).toContain( 'credentialless iframes' );
+		} );
+
+		it( 'returns supported when credentialless iframes are supported', () => {
+			global.WebAssembly = originalWebAssembly;
+			global.SharedArrayBuffer = originalSharedArrayBuffer;
+
+			// credentialless is already mocked in beforeEach.
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( true );
+		} );
+
+		it( 'returns not supported when device memory is 2 GB or less', () => {
+			global.WebAssembly = originalWebAssembly;
+			global.SharedArrayBuffer = originalSharedArrayBuffer;
+
+			Object.defineProperty( navigator, 'deviceMemory', {
+				value: 2,
+				configurable: true,
+			} );
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( false );
+			expect( result.reason ).toContain( 'insufficient memory' );
+		} );
+
+		it( 'returns supported when device memory is greater than 2 GB', () => {
+			global.WebAssembly = originalWebAssembly;
+			global.SharedArrayBuffer = originalSharedArrayBuffer;
+
+			Object.defineProperty( navigator, 'deviceMemory', {
+				value: 4,
+				configurable: true,
+			} );
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( true );
+		} );
+
+		it( 'returns not supported when data saver is enabled', () => {
+			global.WebAssembly = originalWebAssembly;
+			global.SharedArrayBuffer = originalSharedArrayBuffer;
+
+			Object.defineProperty( navigator, 'connection', {
+				value: { saveData: true, effectiveType: '4g' },
+				configurable: true,
+			} );
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( false );
+			expect( result.reason ).toBe( 'Data saver mode is enabled.' );
+		} );
+
+		it( 'returns not supported when connection is 2g', () => {
+			global.WebAssembly = originalWebAssembly;
+			global.SharedArrayBuffer = originalSharedArrayBuffer;
+
+			Object.defineProperty( navigator, 'connection', {
+				value: { saveData: false, effectiveType: '2g' },
+				configurable: true,
+			} );
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( false );
+			expect( result.reason ).toContain( 'too slow' );
+		} );
+
+		it( 'returns not supported when connection is slow-2g', () => {
+			global.WebAssembly = originalWebAssembly;
+			global.SharedArrayBuffer = originalSharedArrayBuffer;
+
+			Object.defineProperty( navigator, 'connection', {
+				value: {
+					saveData: false,
+					effectiveType: 'slow-2g',
+				},
+				configurable: true,
+			} );
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( false );
+			expect( result.reason ).toContain( 'too slow' );
 		} );
 
 		it( 'returns not supported when CSP blocks blob workers', () => {
