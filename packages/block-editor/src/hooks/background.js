@@ -15,6 +15,7 @@ import {
 	default as StylesBackgroundPanel,
 	useHasBackgroundPanel,
 	hasBackgroundImageValue,
+	hasBackgroundGradientValue,
 } from '../components/global-styles/background-panel';
 import { globalStylesDataKey } from '../store/private-keys';
 
@@ -45,7 +46,8 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 		return (
 			!! support?.backgroundImage ||
 			!! support?.backgroundSize ||
-			!! support?.backgroundRepeat
+			!! support?.backgroundRepeat ||
+			!! support?.gradient
 		);
 	}
 
@@ -107,7 +109,10 @@ function useBlockProps( { name, style } ) {
  * @return {string} CSS class name.
  */
 export function getBackgroundImageClasses( style ) {
-	return hasBackgroundImageValue( style ) ? 'has-background' : '';
+	return hasBackgroundImageValue( style ) ||
+		hasBackgroundGradientValue( style )
+		? 'has-background'
+		: '';
 }
 
 function BackgroundInspectorControl( { children } ) {
@@ -156,7 +161,7 @@ export function BackgroundImagePanel( {
 
 	if (
 		! useHasBackgroundPanel( settings ) ||
-		! hasBackgroundSupport( name, 'backgroundImage' )
+		! hasBackgroundSupport( name )
 	) {
 		return null;
 	}
@@ -179,7 +184,7 @@ export function BackgroundImagePanel( {
 
 	const defaultControls = getBlockSupport( name, [
 		BACKGROUND_SUPPORT_KEY,
-		'defaultControls',
+		'__experimentalDefaultControls',
 	] );
 
 	return (

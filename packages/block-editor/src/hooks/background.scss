@@ -1,0 +1,21 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.background-block-support-panel {
+	/* Increased specificity required to remove the slot wrapper's row gap */
+	&#{&} {
+		.background-block-support-panel__inner-wrapper {
+			row-gap: 0;
+		}
+	}
+
+	/**
+	 * In the color panel, the first color-gradient-settings item gets a
+	 * margin-top and border-top to separate it from the panel header. In the
+	 * background panel, the gradient control sits below the image control
+	 * and should not have this extra spacing or double border.
+	 */
+	.block-editor-tools-panel-color-gradient-settings__item:nth-child(1 of .block-editor-tools-panel-color-gradient-settings__item) {
+		margin-top: 0;
+		border-top: none;
+	}
+}
