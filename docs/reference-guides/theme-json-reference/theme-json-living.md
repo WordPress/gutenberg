@@ -61,6 +61,7 @@ Settings related to background.
 | -------- | ----------- | ---- | ------- |
 | backgroundImage | Allow users to set a background image. | `boolean` | `false` |
 | backgroundSize | Allow users to set values related to the size of a background image, including size, position, and repeat controls. | `boolean` | `false` |
+| gradient | Allow users to set a gradient background. | `boolean` | `false` |
 
 ---
 
