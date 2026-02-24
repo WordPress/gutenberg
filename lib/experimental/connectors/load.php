@@ -47,3 +47,5 @@ function gutenberg_enqueue_connectors_extension( $hook_suffix ) {
 	wp_enqueue_script_module( 'gutenberg/connectors-extension' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_connectors_extension' );
+
+require __DIR__ . '/gemini-connector.php';

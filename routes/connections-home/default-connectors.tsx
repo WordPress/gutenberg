@@ -151,6 +151,21 @@ function GeminiConnector( { label, description }: ConnectorRenderProps ) {
 		useState< PluginStatus >( 'checking' );
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ isBusy, setIsBusy ] = useState( false );
+	const [ currentApiKey, setCurrentApiKey ] = useState( '' );
+
+	// Fetch the current API key
+	const fetchApiKey = async () => {
+		try {
+			const settings = await apiFetch< {
+				connectors_gemini_api_key?: string;
+			} >( {
+				path: '/wp/v2/settings',
+			} );
+			setCurrentApiKey( settings.connectors_gemini_api_key || '' );
+		} catch {
+			// Ignore errors
+		}
+	};
 
 	// Check plugin status on mount
 	useEffect( () => {
@@ -170,6 +185,8 @@ function GeminiConnector( { label, description }: ConnectorRenderProps ) {
 					setPluginStatus( 'not-installed' );
 				} else if ( googleAiPlugin.status === 'active' ) {
 					setPluginStatus( 'active' );
+					// Fetch API key when plugin is active
+					fetchApiKey();
 				} else {
 					setPluginStatus( 'inactive' );
 				}
@@ -273,9 +290,22 @@ function GeminiConnector( { label, description }: ConnectorRenderProps ) {
 		>
 			{ isExpanded && pluginStatus === 'active' && (
 				<DefaultConnectorSettings
-					onSave={ ( apiKey: string ) => {
-						// eslint-disable-next-line no-console
-						console.log( 'Saving Gemini API key:', apiKey );
+					initialValue={ currentApiKey }
+					onSave={ async ( apiKey: string ) => {
+						try {
+							await apiFetch( {
+								method: 'POST',
+								path: '/wp/v2/settings',
+								data: {
+									connectors_gemini_api_key: apiKey,
+								},
+							} );
+							setCurrentApiKey( apiKey );
+							setIsExpanded( false );
+						} catch ( error ) {
+							// eslint-disable-next-line no-console
+							console.error( 'Failed to save API key:', error );
+						}
 					} }
 					onCancel={ () => setIsExpanded( false ) }
 				/>

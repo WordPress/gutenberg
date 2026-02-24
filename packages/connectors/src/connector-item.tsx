@@ -58,11 +58,13 @@ export function ConnectorItem( {
 export function DefaultConnectorSettings( {
 	onSave,
 	onCancel,
+	initialValue = '',
 }: {
 	onSave?: ( apiKey: string ) => void;
 	onCancel?: () => void;
+	initialValue?: string;
 } ) {
-	const [ apiKey, setApiKey ] = useState( '' );
+	const [ apiKey, setApiKey ] = useState( initialValue );
 
 	return (
 		<VStack spacing={ 4 } className="connector-settings">
@@ -72,7 +74,6 @@ export function DefaultConnectorSettings( {
 				value={ apiKey }
 				onChange={ setApiKey }
 				placeholder={ __( 'Enter your API key' ) }
-				type="password"
 			/>
 			<HStack justify="flex-end">
 				<Button variant="secondary" onClick={ onCancel }>
