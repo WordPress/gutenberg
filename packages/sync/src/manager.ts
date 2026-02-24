@@ -145,10 +145,6 @@ export function createSyncManager( debug = false ): SyncManager {
 			return; // No provider creators, so syncing is effectively disabled.
 		}
 
-		if ( isDisabled ) {
-			return; // Syncing has been disabled.
-		}
-
 		const entityId = getEntityId( objectType, objectId );
 
 		if ( entityStates.has( entityId ) ) {
@@ -169,16 +165,6 @@ export function createSyncManager( debug = false ): SyncManager {
 		const recordMap = ydoc.getMap( RECORD_KEY );
 		const recordMetaMap = ydoc.getMap( RECORD_METADATA_KEY );
 		const now = Date.now();
-
-		// Clean up providers and in-memory state when the entity is unloaded.
-		const unload = (): void => {
-			providerResults.forEach( ( result ) => result.destroy() );
-			handlers.onStatusChange( null );
-			recordMap.unobserveDeep( onRecordUpdate );
-			recordMetaMap.unobserve( onRecordMetaUpdate );
-			ydoc.destroy();
-			entityStates.delete( entityId );
-		};
 
 		// If the sync config supports awareness, create it.
 		const awareness = syncConfig.createAwareness?.( ydoc, objectId );
@@ -232,17 +218,11 @@ export function createSyncManager( debug = false ): SyncManager {
 			restoreUndoMeta,
 		} );
 
-		const entityState: EntityState = {
-			awareness,
-			handlers,
-			objectId,
-			objectType,
-			syncConfig,
-			unload,
-			ydoc,
-		};
-
-		entityStates.set( entityId, entityState );
+		// Due to a potential race condition, we need to check for
+		// syncing being disabled right before creating providers.
+		if ( isDisabled ) {
+			return; // Syncing has been disabled.
+		}
 
 		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
@@ -264,6 +244,28 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Attach observers.
 		recordMap.observeDeep( onRecordUpdate );
 		recordMetaMap.observe( onRecordMetaUpdate );
+
+		// Clean up providers and in-memory state when the entity is unloaded.
+		const unload = (): void => {
+			providerResults.forEach( ( result ) => result.destroy() );
+			handlers.onStatusChange( null );
+			recordMap.unobserveDeep( onRecordUpdate );
+			recordMetaMap.unobserve( onRecordMetaUpdate );
+			ydoc.destroy();
+			entityStates.delete( entityId );
+		};
+
+		const entityState: EntityState = {
+			awareness,
+			handlers,
+			objectId,
+			objectType,
+			syncConfig,
+			unload,
+			ydoc,
+		};
+
+		entityStates.set( entityId, entityState );
 
 		// Get and apply the persisted CRDT document, if it exists.
 		internal.applyPersistedCrdtDoc( objectType, objectId, record );
@@ -287,10 +289,6 @@ export function createSyncManager( debug = false ): SyncManager {
 			return; // No provider creators, so syncing is effectively disabled.
 		}
 
-		if ( isDisabled ) {
-			return; // Syncing has been disabled.
-		}
-
 		if ( collectionStates.has( objectType ) ) {
 			return; // Already loaded.
 		}
@@ -298,15 +296,6 @@ export function createSyncManager( debug = false ): SyncManager {
 		const ydoc = createYjsDoc( { collection: true, objectType } );
 		const recordMetaMap = ydoc.getMap( RECORD_METADATA_KEY );
 		const now = Date.now();
-
-		// Clean up providers and in-memory state when the entity is unloaded.
-		const unload = (): void => {
-			providerResults.forEach( ( result ) => result.destroy() );
-			handlers.onStatusChange( null );
-			recordMetaMap.unobserve( onRecordMetaUpdate );
-			ydoc.destroy();
-			collectionStates.delete( objectType );
-		};
 
 		const onRecordMetaUpdate = (
 			event: Y.YMapEvent< unknown >,
@@ -333,15 +322,11 @@ export function createSyncManager( debug = false ): SyncManager {
 		// If the sync config supports awareness, create it.
 		const awareness = syncConfig.createAwareness?.( ydoc );
 
-		const collectionState: CollectionState = {
-			awareness,
-			handlers,
-			syncConfig,
-			unload,
-			ydoc,
-		};
-
-		collectionStates.set( objectType, collectionState );
+		// Due to a potential race condition, we need to check for
+		// syncing being disabled right before creating providers.
+		if ( isDisabled ) {
+			return; // Syncing has been disabled.
+		}
 
 		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
@@ -362,6 +347,25 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Attach observers.
 		recordMetaMap.observe( onRecordMetaUpdate );
+
+		// Clean up providers and in-memory state when the entity is unloaded.
+		const unload = (): void => {
+			providerResults.forEach( ( result ) => result.destroy() );
+			handlers.onStatusChange( null );
+			recordMetaMap.unobserve( onRecordMetaUpdate );
+			ydoc.destroy();
+			collectionStates.delete( objectType );
+		};
+
+		const collectionState: CollectionState = {
+			awareness,
+			handlers,
+			syncConfig,
+			unload,
+			ydoc,
+		};
+
+		collectionStates.set( objectType, collectionState );
 	}
 
 	/**
