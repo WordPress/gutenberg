@@ -453,7 +453,6 @@ export const { state, actions } = store< Store >( 'core/router', {
 			} = options;
 
 			navigatingTo = href;
-			actions.prefetch( pagePath, options );
 
 			// Creates a promise that resolves when the specified timeout ends.
 			// The timeout value is 10 seconds by default.
