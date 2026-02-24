@@ -151,6 +151,12 @@ module.exports = function cli() {
 				choices: getAvailableRuntimes(),
 				default: 'docker',
 			} );
+			args.option( 'auto-port', {
+				type: 'boolean',
+				describe:
+					'Automatically find available ports when configured ports are busy.',
+				default: false,
+			} );
 		},
 		withSpinner( env.start )
 	);

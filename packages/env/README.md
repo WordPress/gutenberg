@@ -363,7 +363,10 @@ Options:
              with a built-in web UI. See
              https://github.com/NoiseByNorthwest/php-spx for more information.
                                                                         [string]
-  --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
+  --scripts    Execute any configured lifecycle scripts.
+                                                      [boolean] [default: true]
+  --auto-port  Automatically find available ports when configured ports are
+               busy.                                  [boolean] [default: false]
 ```
 
 ### `wp-env stop`
@@ -591,9 +594,9 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"phpVersion"`       | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress. |
 | `"plugins"`          | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
 | `"themes"`           | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
-| `"port"`             | `integer\|null` | `null`                                 | The port number to use for the installation. If `null`, `wp-env` will try port 8888 (8889 for tests) and fall back to an available port. An explicit integer disables automatic fallback. |
-| `"testsPort"`        | `integer\|null` | `null`                                 | The port number for the test site. If `null`, `wp-env` will try port 8889 and fall back to an available port. An explicit integer disables automatic fallback. |
+| `"port"`             | `integer\|null` | `8888`                                 | The port number to use for the installation. Set to `null` and use `--auto-port` to automatically find an available port. |
 | `"testsEnvironment"` | `boolean`      | `false`                                | _Deprecated._ Whether to create a separate test environment with its own database and containers. Use `--config` with a separate config file instead. |
+| `"testsPort"`        | `integer\|null` | `8889`                                 | The port number for the test site. Set to `null` and use `--auto-port` to automatically find an available port. |
 | `"config"`           | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`         | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
 | `"mysqlPort"`        | `integer`      | `null` (randomly assigned)             | The MySQL port number to expose.                                                                                                 |
@@ -606,9 +609,15 @@ _Note: the port number environment variable (`WP_ENV_PORT`) takes precedence ove
 
 ### Automatic Port Selection
 
-When `port` or `testsPort` is `null` (the default), `wp-env` will try ports 8888 and 8889 respectively. If the preferred port is busy, it automatically finds an available port in the ephemeral range (49152-65535) and displays a message indicating the new port.
+By default, `wp-env` uses fixed ports (`8888` for development, `8889` for tests). If a port is busy, Docker will report an error at start time.
 
-When you set an explicit port number (e.g. `"port": 9000`), `wp-env` uses that exact port and fails with an error if it is busy. This is useful in CI environments where predictable ports are required.
+To opt in to automatic port selection, pass the `--auto-port` flag:
+
+```sh
+wp-env start --auto-port
+```
+
+When `--auto-port` is enabled and a configured port is busy, `wp-env` automatically finds an available port in the ephemeral range (49152-65535) and displays a message indicating the new port. You can also set `"port": null` in `.wp-env.json` to let `wp-env` try the default port first and fall back to an available one.
 
 Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields.
 

@@ -14,6 +14,10 @@
 -   Add MySQL healthcheck to prevent race condition where WordPress containers start before MySQL is fully initialized. Uses MariaDB's official `healthcheck.sh` script with `MARIADB_AUTO_UPGRADE` to support both new and existing installations.
 -   Remove non-functional `WP_ENV_MULTISITE` config.
 
+### New Features
+
+-   Added `--auto-port` flag to the `start` command. When passed, `wp-env` automatically finds available ports if the configured ports are busy. Without this flag, ports default to `8888`/`8889` and Docker reports an error if they are busy (matching pre-existing behavior).
+
 ### Breaking Changes
 
 -   Pretty permalinks (`/%year%/%monthnum%/%day%/%postname%/`) are now enabled by default, matching WordPress core behavior on fresh installs. Previously, plain permalinks were used because the loopback test that WordPress runs during installation fails inside Docker.
