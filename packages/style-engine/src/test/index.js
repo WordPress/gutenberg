@@ -456,4 +456,72 @@ describe( 'getCSSRules', () => {
 			},
 		] );
 	} );
+
+	it( 'should comma-separate background gradient and background image into a single background-image value', () => {
+		expect(
+			getCSSRules(
+				{
+					background: {
+						backgroundImage: {
+							url: 'https://example.com/image.jpg',
+						},
+						gradient:
+							'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%)',
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [
+			{
+				selector: '.some-selector',
+				key: 'backgroundImage',
+				value: "linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%), url( 'https://example.com/image.jpg' )",
+			},
+		] );
+	} );
+
+	it( 'should output only gradient as background-image when no background image is set', () => {
+		expect(
+			getCSSRules(
+				{
+					background: {
+						gradient:
+							'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%)',
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [
+			{
+				selector: '.some-selector',
+				key: 'backgroundImage',
+				value: 'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%)',
+			},
+		] );
+	} );
+
+	it( 'should resolve background gradient preset slug to CSS custom property', () => {
+		expect(
+			getCSSRules(
+				{
+					background: {
+						gradient: 'var:preset|gradient|vivid-cyan-blue',
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [
+			{
+				selector: '.some-selector',
+				key: 'backgroundImage',
+				value: 'var(--wp--preset--gradient--vivid-cyan-blue)',
+			},
+		] );
+	} );
 } );
