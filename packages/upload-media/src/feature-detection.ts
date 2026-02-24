@@ -24,6 +24,16 @@ let cachedResult: FeatureDetectionResult | null = null;
  * 1. WebAssembly support (required for wasm-vips)
  * 2. SharedArrayBuffer support (required for WASM threading)
  * 3. CSP compatibility for blob URL workers (required for inline worker creation)
+ * 4. Credentialless iframe support (required so cross-origin isolation does not
+ *    break third-party embeds). Browsers that lack `credentialless` iframe support
+ *    (currently Firefox and Safari) will have client-side media processing disabled
+ *    by default. Developers can re-enable the feature via the server-side
+ *    `client_side_media_processing_enabled` filter if it works for their site.
+ * 5. Device memory (disables on devices with ≤2 GB RAM)
+ * 6. Network conditions (disables when data saver is on or connection is 2g/slow-2g)
+ * 7. Web Worker support (baseline requirement)
+ *
+ * Results are cached after the first call. Use `clearFeatureDetectionCache()` to reset.
  *
  * @return Feature detection result with supported status and reason if not supported.
  */
