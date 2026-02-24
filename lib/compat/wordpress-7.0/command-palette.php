@@ -14,7 +14,7 @@ function gutenberg_admin_bar_command_palette_menu( $wp_admin_bar ) {
 		? _x( '⌘K', 'keyboard shortcut to open the command palette', 'gutenberg' )
 		: _x( 'Ctrl+K', 'keyboard shortcut to open the command palette', 'gutenberg' );
 	$title          = sprintf(
-		'<span class="ab-label">%s<span class="screen-reader-text"> %s</span></span>',
+		'<span class="ab-label"><kbd>%s</kbd><span class="screen-reader-text"> %s</span></span>',
 		$shortcut_label,
 		/* translators: Hidden accessibility text. */
 		__( 'Open command palette', 'gutenberg' ),
