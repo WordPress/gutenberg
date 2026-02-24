@@ -49,3 +49,4 @@ function gutenberg_enqueue_connectors_extension( $hook_suffix ) {
 add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_connectors_extension' );
 
 require __DIR__ . '/gemini-connector.php';
+require __DIR__ . '/debug-test.php';
