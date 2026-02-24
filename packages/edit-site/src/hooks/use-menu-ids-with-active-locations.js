@@ -29,9 +29,10 @@ function extractNavigationRefs( content ) {
 }
 
 /**
- * Hook that returns the set of navigation menu IDs that are used in at least one template part.
+ * Hook that returns the set of navigation menu IDs that are used in at least one template part,
+ * and a map of menu ID to location count.
  *
- * @return {Object} { activeMenuIds: Set<number>, isResolving: boolean }
+ * @return {Object} { activeMenuIds: Set<number>, menuLocationCounts: Map<number, number>, isResolving: boolean }
  */
 export default function useMenuIdsWithActiveLocations() {
 	const { records } = useEntityRecords( 'postType', TEMPLATE_PART_POST_TYPE, {
@@ -39,20 +40,26 @@ export default function useMenuIdsWithActiveLocations() {
 		status: [ 'publish', 'draft' ],
 	} );
 
-	const activeMenuIds = useMemo( () => {
+	const { activeMenuIds, menuLocationCounts } = useMemo( () => {
 		const set = new Set();
+		const counts = new Map();
 		if ( ! records ) {
-			return set;
+			return { activeMenuIds: set, menuLocationCounts: counts };
 		}
 		for ( const tp of records ) {
 			const refs = extractNavigationRefs( tp.content?.raw );
-			refs.forEach( ( id ) => set.add( id ) );
+			const uniqueRefs = [ ...new Set( refs ) ];
+			uniqueRefs.forEach( ( id ) => {
+				set.add( id );
+				counts.set( id, ( counts.get( id ) ?? 0 ) + 1 );
+			} );
 		}
-		return set;
+		return { activeMenuIds: set, menuLocationCounts: counts };
 	}, [ records ] );
 
 	return {
 		activeMenuIds,
+		menuLocationCounts,
 		isResolving: ! records,
 	};
 }

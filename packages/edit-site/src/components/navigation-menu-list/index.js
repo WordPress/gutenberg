@@ -2,13 +2,16 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
@@ -31,23 +34,38 @@ import AddNewPostModal from '../add-new-post';
 import useMenuIdsWithActiveLocations from '../../hooks/use-menu-ids-with-active-locations';
 
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { Badge } = unlock( componentsPrivateApis );
 
 const ACTIVE_FILTER_ELEMENTS = [
 	{ value: 'active', label: __( 'Active' ) },
 	{ value: 'inactive', label: __( 'Inactive' ) },
 ];
 
-const activeField = {
-	id: 'active',
-	label: __( 'Active' ),
-	getValue: () => '',
-	filterBy: {
-		operators: [ OPERATOR_IS ],
-		isPrimary: true,
-	},
-	elements: ACTIVE_FILTER_ELEMENTS,
-	enableSorting: false,
-};
+function createActiveField( menuLocationCounts ) {
+	return {
+		id: 'active',
+		label: __( 'Active' ),
+		getValue: () => '',
+		filterBy: {
+			operators: [ OPERATOR_IS ],
+			isPrimary: true,
+		},
+		elements: ACTIVE_FILTER_ELEMENTS,
+		enableSorting: false,
+		render: ( { item } ) => {
+			const count = menuLocationCounts.get( item.id ) ?? 0;
+			const label =
+				count > 0
+					? sprintf(
+							/* translators: %d: number of locations where the menu is used */
+							__( 'Active - %d locations' ),
+							count
+					  )
+					: __( 'Inactive - unused' );
+			return <Badge>{ label }</Badge>;
+		},
+	};
+}
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const EMPTY_ARRAY = [];
@@ -60,7 +78,7 @@ const DEFAULT_VIEW = {
 	sort: { field: 'date', direction: 'desc' },
 	titleField: 'title',
 	perPage: 100,
-	fields: [ 'status' ],
+	fields: [ 'active', 'status' ],
 };
 
 const defaultLayouts = { list: {} };
@@ -142,6 +160,15 @@ export default function NavigationMenuList() {
 		},
 	} );
 
+	// Ensure the Active field is always shown (e.g. in case of persisted view without it).
+	const viewWithActiveField = useMemo( () => {
+		const fields = view.fields ?? [];
+		if ( ! fields.includes( 'active' ) ) {
+			return { ...view, fields: [ 'active', ...fields ] };
+		}
+		return view;
+	}, [ view ] );
+
 	const onChangeView = useEvent( ( newView ) => {
 		updateView( newView );
 		if ( newView.type !== view.type ) {
@@ -165,14 +192,20 @@ export default function NavigationMenuList() {
 		setSelection( postId ? [ postId ] : [] );
 	}, [ postId ] );
 
+	const {
+		activeMenuIds,
+		menuLocationCounts,
+		isResolving: isLoadingActiveIds,
+	} = useMenuIdsWithActiveLocations();
+
 	const baseFields = usePostFields( { postType: NAVIGATION_POST_TYPE } );
 	const fields = useMemo(
-		() => ( baseFields ? [ activeField, ...baseFields ] : null ),
-		[ baseFields ]
+		() =>
+			baseFields
+				? [ createActiveField( menuLocationCounts ), ...baseFields ]
+				: null,
+		[ baseFields, menuLocationCounts ]
 	);
-
-	const { activeMenuIds, isResolving: isLoadingActiveIds } =
-		useMenuIdsWithActiveLocations();
 
 	const activeFilter = view.filters?.find(
 		( f ) => f.field === 'active' && f.operator === OPERATOR_IS
@@ -307,6 +340,9 @@ export default function NavigationMenuList() {
 	return (
 		<Page
 			title={ labels?.name }
+			subTitle={ __(
+				'Navigation menus are used to create the menus for your site.'
+			) }
 			actions={
 				<>
 					{ labels?.add_new_item && canCreateRecord && (
@@ -341,7 +377,7 @@ export default function NavigationMenuList() {
 					( hasActiveFilter && isLoadingActiveIds ) ||
 					! fields
 				}
-				view={ view }
+				view={ viewWithActiveField }
 				onChangeView={ onChangeView }
 				selection={ selection }
 				onChangeSelection={ onChangeSelection }
