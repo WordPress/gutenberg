@@ -66,6 +66,13 @@ export default class CollaborationUtils {
 		const html = await response.text();
 		const nonce = html.match( /name="_wpnonce" value="([^"]+)"/ )![ 1 ];
 
+		// Detect which option name the current environment registers (old or new option name)
+		const optionName = html.includes(
+			'name="wp_enable_real_time_collaboration"'
+		)
+			? 'wp_enable_real_time_collaboration'
+			: 'enable_real_time_collaboration';
+
 		const formData: Record< string, string | number > = {
 			option_page: 'writing',
 			action: 'update',
@@ -77,7 +84,7 @@ export default class CollaborationUtils {
 		};
 
 		if ( enabled ) {
-			formData.wp_enable_real_time_collaboration = 1;
+			formData[ optionName ] = 1;
 		}
 
 		await this.requestUtils.request.post( '/wp-admin/options.php', {
