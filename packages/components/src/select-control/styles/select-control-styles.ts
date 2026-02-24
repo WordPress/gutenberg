@@ -68,24 +68,28 @@ const sizeStyles = ( {
 		default: {
 			height: 40,
 			minHeight: 40,
+			lineHeight: 'normal',
 			paddingTop: 0,
 			paddingBottom: 0,
 		},
 		small: {
 			height: 24,
 			minHeight: 24,
+			lineHeight: 'normal',
 			paddingTop: 0,
 			paddingBottom: 0,
 		},
 		compact: {
 			height: 32,
 			minHeight: 32,
+			lineHeight: 'normal',
 			paddingTop: 0,
 			paddingBottom: 0,
 		},
 		'__unstable-large': {
 			height: 40,
 			minHeight: 40,
+			lineHeight: 'normal',
 			paddingTop: 0,
 			paddingBottom: 0,
 		},
