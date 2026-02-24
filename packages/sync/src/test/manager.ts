@@ -98,7 +98,7 @@ describe( 'SyncManager', () => {
 			onStatusChange: jest.fn(),
 			refetchRecord: jest.fn( async () => Promise.resolve() ),
 			restoreUndoMeta: jest.fn(),
-			saveRecord: jest.fn( async () => Promise.resolve() ),
+			saveRecord: jest.fn(),
 		};
 	} );
 
