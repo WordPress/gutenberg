@@ -893,7 +893,9 @@ return (
 
 Object that determines the validation status of each field. There's a `useFormValidity` hook that can be used to create the validity object — see the utility below. This section documents the `validity` object in case you want to create it via other means.
 
-The top-level props of the `validity` object are the field IDs. Fields declare their validity status for each of the validation rules supported: `required`, `elements`, `custom`. If a rule is valid, it should not be present in the object; if a field is valid for all the rules, it should not be present in the object either.
+The top-level props of the `validity` object are the field IDs. Fields declare their validity status for each of the validation rules supported: `required`, `elements`, `pattern`, `minLength`, `maxLength`, `min`, `max`, `custom`. If a rule is valid, it should not be present in the object; if a field is valid for all the rules, it should not be present in the object either.
+
+A field's validity can also contain a `children` property (`Record<string, FieldValidity>`) for nested field validity when using combined fields.
 
 For example:
 
@@ -908,6 +910,32 @@ For example:
 		"elements": {
 			"type": "invalid",
 			"message": "Value must be one of the elements."
+		}
+	},
+	"slug": {
+		"pattern": {
+			"type": "invalid",
+			"message": "Must match the required pattern."
+		}
+	},
+	"description": {
+		"minLength": {
+			"type": "invalid",
+			"message": "Must be at least 10 characters."
+		},
+		"maxLength": {
+			"type": "invalid",
+			"message": "Must be at most 200 characters."
+		}
+	},
+	"price": {
+		"min": {
+			"type": "invalid",
+			"message": "Must be at least 0."
+		},
+		"max": {
+			"type": "invalid",
+			"message": "Must be at most 9999."
 		}
 	},
 	"publisher": {
@@ -981,6 +1009,26 @@ Returns an object containing:
 		elements: {
 			type: 'invalid',
 			message: 'Value must be one of the elements.' // Optional
+		},
+		pattern: {
+			type: 'invalid',
+			message: 'Must match the required pattern.'
+		},
+		minLength: {
+			type: 'invalid',
+			message: 'Must be at least 10 characters.'
+		},
+		maxLength: {
+			type: 'invalid',
+			message: 'Must be at most 200 characters.'
+		},
+		min: {
+			type: 'invalid',
+			message: 'Must be at least 0.'
+		},
+		max: {
+			type: 'invalid',
+			message: 'Must be at most 9999.'
 		},
 		custom: {
 			type: 'validating',
