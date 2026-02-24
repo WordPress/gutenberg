@@ -39,7 +39,7 @@ export interface Block {
 }
 
 // A block as represented in the CRDT document (Y.Map).
-interface YBlockRecord extends YMapRecord {
+export interface YBlockRecord extends YMapRecord {
 	attributes: YBlockAttributes;
 	clientId: string;
 	innerBlocks: YBlocks;

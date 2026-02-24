@@ -31,6 +31,7 @@ export interface WPBlockSelection {
 export interface WPSelection {
 	selectionEnd: WPBlockSelection;
 	selectionStart: WPBlockSelection;
+	initialPosition?: number | null;
 }
 
 /**
