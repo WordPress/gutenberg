@@ -48,10 +48,12 @@ export default function NavigationMenuDetail() {
 				'Navigation Menus are a curated collection of blocks that allow visitors to get around your site.'
 			) }
 		>
-			<NavigationMenuEditor
-				navigationMenuId={ parseInt( postId ) }
-				hasDarkBackground={ false }
-			/>
+			<div style={ { paddingTop: '24px' } }>
+				<NavigationMenuEditor
+					navigationMenuId={ parseInt( postId ) }
+					hasDarkBackground={ false }
+				/>
+			</div>
 		</Page>
 	);
 }
