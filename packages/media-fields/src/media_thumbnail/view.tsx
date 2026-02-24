@@ -31,7 +31,7 @@ import type { MediaItem } from '../types';
  * @param featuredMedia The media item with size details.
  * @param configSizes   The target display size string (e.g. '900px').
  */
-function getBestImageUrl(
+export function getBestImageUrl(
 	featuredMedia: Attachment | MediaItem,
 	configSizes?: string
 ): string {
@@ -50,8 +50,19 @@ function getBestImageUrl(
 	const targetWidth = configSizes ? parseInt( configSizes, 10 ) : NaN;
 
 	if ( ! Number.isNaN( targetWidth ) ) {
+		// Filter to entries that have a valid numeric width.
+		const validEntries = sizeEntries.filter(
+			( s ) => typeof s.width === 'number' && ! Number.isNaN( s.width )
+		);
+
+		if ( ! validEntries.length ) {
+			return featuredMedia.source_url;
+		}
+
 		// Sort ascending by width.
-		const sorted = [ ...sizeEntries ].sort( ( a, b ) => a.width - b.width );
+		const sorted = [ ...validEntries ].sort(
+			( a, b ) => a.width - b.width
+		);
 		// Pick the smallest size that is >= target width.
 		const match = sorted.find( ( s ) => s.width >= targetWidth );
 		if ( match ) {
