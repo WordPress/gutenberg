@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	Button,
+} from '@wordpress/components';
 import {
 	registerConnector,
 	ConnectorItem,
@@ -14,6 +17,22 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useConnectorPlugin } from './use-connector-plugin';
+
+const ConnectedBadge = () => (
+	<span
+		style={ {
+			color: '#2e7d32',
+			backgroundColor: '#e8f5e9',
+			padding: '4px 12px',
+			borderRadius: '4px',
+			fontSize: '13px',
+			fontWeight: 500,
+			whiteSpace: 'nowrap',
+		} }
+	>
+		{ __( 'Connected' ) }
+	</span>
+);
 
 // OpenAI logo as inline SVG
 const OpenAILogo = () => (
@@ -113,45 +132,77 @@ const GeminiLogo = () => (
 	</svg>
 );
 
-// OpenAI connector render component
-function OpenAIConnector( { label, description }: ConnectorRenderProps ) {
+interface ConnectorConfig {
+	pluginSlug: string;
+	settingName: string;
+	helpUrl: string;
+	helpLabel: string;
+	Logo: React.ComponentType;
+}
+
+function ProviderConnector( {
+	label,
+	description,
+	pluginSlug,
+	settingName,
+	helpUrl,
+	helpLabel,
+	Logo,
+}: ConnectorRenderProps & ConnectorConfig ) {
 	const {
 		pluginStatus,
 		isExpanded,
 		setIsExpanded,
 		isBusy,
+		isConnected,
 		currentApiKey,
 		handleButtonClick,
 		getButtonLabel,
 		saveApiKey,
+		removeApiKey,
 	} = useConnectorPlugin( {
-		pluginSlug: 'ai-provider-for-openai',
-		settingName: 'connectors_openai_api_key',
+		pluginSlug,
+		settingName,
 	} );
 
 	return (
 		<ConnectorItem
-			icon={ <OpenAILogo /> }
+			icon={ <Logo /> }
 			name={ label }
 			description={ description }
 			actionArea={
-				<Button
-					variant={ isExpanded ? 'tertiary' : 'secondary' }
-					size={ isExpanded ? undefined : 'compact' }
-					onClick={ handleButtonClick }
-					disabled={ pluginStatus === 'checking' || isBusy }
-					isBusy={ isBusy }
-					aria-expanded={ isExpanded }
-				>
-					{ getButtonLabel() }
-				</Button>
+				<HStack spacing={ 3 } expanded={ false }>
+					{ isConnected && ! isExpanded && <ConnectedBadge /> }
+					<Button
+						variant={
+							isExpanded
+								? 'tertiary'
+								: isConnected
+									? 'tertiary'
+									: 'secondary'
+						}
+						size={
+							isExpanded || isConnected ? undefined : 'compact'
+						}
+						onClick={ handleButtonClick }
+						disabled={
+							pluginStatus === 'checking' || isBusy
+						}
+						isBusy={ isBusy }
+						aria-expanded={ isExpanded }
+					>
+						{ getButtonLabel() }
+					</Button>
+				</HStack>
 			}
 		>
 			{ isExpanded && pluginStatus === 'active' && (
 				<DefaultConnectorSettings
 					initialValue={ currentApiKey }
-					helpUrl="https://platform.openai.com"
-					helpLabel="platform.openai.com"
+					helpUrl={ helpUrl }
+					helpLabel={ helpLabel }
+					readOnly={ isConnected }
+					onRemove={ removeApiKey }
 					onSave={ async ( apiKey: string ) => {
 						await saveApiKey( apiKey );
 						setIsExpanded( false );
@@ -159,104 +210,48 @@ function OpenAIConnector( { label, description }: ConnectorRenderProps ) {
 				/>
 			) }
 		</ConnectorItem>
+	);
+}
+
+// OpenAI connector render component
+function OpenAIConnector( props: ConnectorRenderProps ) {
+	return (
+		<ProviderConnector
+			{ ...props }
+			pluginSlug="ai-provider-for-openai"
+			settingName="connectors_openai_api_key"
+			helpUrl="https://platform.openai.com"
+			helpLabel="platform.openai.com"
+			Logo={ OpenAILogo }
+		/>
 	);
 }
 
 // Claude connector render component
-function ClaudeConnector( { label, description }: ConnectorRenderProps ) {
-	const {
-		pluginStatus,
-		isExpanded,
-		setIsExpanded,
-		isBusy,
-		currentApiKey,
-		handleButtonClick,
-		getButtonLabel,
-		saveApiKey,
-	} = useConnectorPlugin( {
-		pluginSlug: 'ai-provider-for-anthropic',
-		settingName: 'connectors_anthropic_api_key',
-	} );
-
+function ClaudeConnector( props: ConnectorRenderProps ) {
 	return (
-		<ConnectorItem
-			icon={ <ClaudeLogo /> }
-			name={ label }
-			description={ description }
-			actionArea={
-				<Button
-					variant={ isExpanded ? 'tertiary' : 'secondary' }
-					size={ isExpanded ? undefined : 'compact' }
-					onClick={ handleButtonClick }
-					disabled={ pluginStatus === 'checking' || isBusy }
-					isBusy={ isBusy }
-					aria-expanded={ isExpanded }
-				>
-					{ getButtonLabel() }
-				</Button>
-			}
-		>
-			{ isExpanded && pluginStatus === 'active' && (
-				<DefaultConnectorSettings
-					initialValue={ currentApiKey }
-					helpUrl="https://console.anthropic.com"
-					helpLabel="console.anthropic.com"
-					onSave={ async ( apiKey: string ) => {
-						await saveApiKey( apiKey );
-						setIsExpanded( false );
-					} }
-				/>
-			) }
-		</ConnectorItem>
+		<ProviderConnector
+			{ ...props }
+			pluginSlug="ai-provider-for-anthropic"
+			settingName="connectors_anthropic_api_key"
+			helpUrl="https://console.anthropic.com"
+			helpLabel="console.anthropic.com"
+			Logo={ ClaudeLogo }
+		/>
 	);
 }
 
 // Gemini connector render component
-function GeminiConnector( { label, description }: ConnectorRenderProps ) {
-	const {
-		pluginStatus,
-		isExpanded,
-		setIsExpanded,
-		isBusy,
-		currentApiKey,
-		handleButtonClick,
-		getButtonLabel,
-		saveApiKey,
-	} = useConnectorPlugin( {
-		pluginSlug: 'ai-provider-for-google',
-		settingName: 'connectors_gemini_api_key',
-	} );
-
+function GeminiConnector( props: ConnectorRenderProps ) {
 	return (
-		<ConnectorItem
-			icon={ <GeminiLogo /> }
-			name={ label }
-			description={ description }
-			actionArea={
-				<Button
-					variant={ isExpanded ? 'tertiary' : 'secondary' }
-					size={ isExpanded ? undefined : 'compact' }
-					onClick={ handleButtonClick }
-					disabled={ pluginStatus === 'checking' || isBusy }
-					isBusy={ isBusy }
-					aria-expanded={ isExpanded }
-				>
-					{ getButtonLabel() }
-				</Button>
-			}
-		>
-			{ isExpanded && pluginStatus === 'active' && (
-				<DefaultConnectorSettings
-					initialValue={ currentApiKey }
-					helpUrl="https://aistudio.google.com"
-					helpLabel="aistudio.google.com"
-					onSave={ async ( apiKey: string ) => {
-						await saveApiKey( apiKey );
-						setIsExpanded( false );
-					} }
-				/>
-			) }
-		</ConnectorItem>
+		<ProviderConnector
+			{ ...props }
+			pluginSlug="ai-provider-for-google"
+			settingName="connectors_gemini_api_key"
+			helpUrl="https://aistudio.google.com"
+			helpLabel="aistudio.google.com"
+			Logo={ GeminiLogo }
+		/>
 	);
 }
 

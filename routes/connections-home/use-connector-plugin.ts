@@ -17,10 +17,12 @@ interface UseConnectorPluginReturn {
 	isExpanded: boolean;
 	setIsExpanded: ( expanded: boolean ) => void;
 	isBusy: boolean;
+	isConnected: boolean;
 	currentApiKey: string;
 	handleButtonClick: () => void;
 	getButtonLabel: () => string;
 	saveApiKey: ( apiKey: string ) => Promise< void >;
+	removeApiKey: () => Promise< void >;
 }
 
 export function useConnectorPlugin( {
@@ -32,6 +34,8 @@ export function useConnectorPlugin( {
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ isBusy, setIsBusy ] = useState( false );
 	const [ currentApiKey, setCurrentApiKey ] = useState( '' );
+
+	const isConnected = pluginStatus === 'active' && currentApiKey !== '';
 
 	// Fetch the current API key
 	const fetchApiKey = useCallback( async () => {
@@ -128,6 +132,9 @@ export function useConnectorPlugin( {
 		if ( isExpanded ) {
 			return __( 'Cancel' );
 		}
+		if ( isConnected ) {
+			return __( 'Edit' );
+		}
 		switch ( pluginStatus ) {
 			case 'checking':
 				return __( 'Checking…' );
@@ -157,14 +164,34 @@ export function useConnectorPlugin( {
 		}
 	};
 
+	const removeApiKey = async () => {
+		try {
+			await apiFetch( {
+				method: 'POST',
+				path: '/wp/v2/settings',
+				data: {
+					[ settingName ]: '',
+				},
+			} );
+			setCurrentApiKey( '' );
+			setIsExpanded( false );
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( 'Failed to remove API key:', error );
+			throw error;
+		}
+	};
+
 	return {
 		pluginStatus,
 		isExpanded,
 		setIsExpanded,
 		isBusy,
+		isConnected,
 		currentApiKey,
 		handleButtonClick,
 		getButtonLabel,
 		saveApiKey,
+		removeApiKey,
 	};
 }
