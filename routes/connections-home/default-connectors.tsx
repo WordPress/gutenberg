@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalHStack as HStack,
-	Button,
-} from '@wordpress/components';
+import { __experimentalHStack as HStack, Button } from '@wordpress/components';
 import {
 	registerConnector,
 	ConnectorItem,
@@ -175,17 +172,13 @@ function ProviderConnector( {
 					{ isConnected && <ConnectedBadge /> }
 					<Button
 						variant={
-							isExpanded || isConnected
-								? 'tertiary'
-								: 'secondary'
+							isExpanded || isConnected ? 'tertiary' : 'secondary'
 						}
 						size={
 							isExpanded || isConnected ? undefined : 'compact'
 						}
 						onClick={ handleButtonClick }
-						disabled={
-							pluginStatus === 'checking' || isBusy
-						}
+						disabled={ pluginStatus === 'checking' || isBusy }
 						isBusy={ isBusy }
 						aria-expanded={ isExpanded }
 					>
