@@ -1272,6 +1272,10 @@ async function transpilePackage( packageName ) {
 		},
 	};
 	const plugins = [
+		// Note: dsTokenFallbacksJs and emotionPlugin both use esbuild's onLoad
+		// hook, which is non-composable — the first to return contents wins. If a
+		// file contains --wpds-* tokens, the Emotion transform will be skipped.
+		// Avoid using design tokens in Emotion styles until Emotion is removed.
 		dsTokenFallbacksJs,
 		needsEmotionPlugin && emotionPlugin,
 		wasmInlinePlugin,

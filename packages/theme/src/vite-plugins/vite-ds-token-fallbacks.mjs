@@ -19,6 +19,8 @@ const plugin = () => ( {
 		if ( ! code.includes( '--wpds-' ) ) {
 			return null;
 		}
+		// Sourcemap omitted: replacements are small, inline substitutions
+		// that preserve line structure, so the debugging impact is negligible.
 		return { code: addFallbackToVar( code ), map: null };
 	},
 } );
