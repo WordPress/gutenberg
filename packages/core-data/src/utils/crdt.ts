@@ -8,6 +8,7 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
  */
 // @ts-expect-error No exported types.
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
+import { applyFilters } from '@wordpress/hooks';
 import {
 	type CRDTDoc,
 	type ObjectData,
@@ -75,7 +76,7 @@ export interface YPostRecord extends YMapRecord {
 }
 
 // Properties that are allowed to be synced for a post.
-const allowedPostProperties = new Set< string >( [
+const defaultAllowedPostProperties = [
 	'author',
 	'blocks',
 	'content',
@@ -93,6 +94,19 @@ const allowedPostProperties = new Set< string >( [
 	'tags',
 	'template',
 	'title',
+];
+
+/**
+ * Filter to register additional post properties for CRDT sync.
+ *
+ * Plugins can use this filter to add custom taxonomy rest_base values
+ * or other post properties for real-time collaboration sync.
+ *
+ * @param {string[]} properties Additional properties to sync (empty by default).
+ */
+const allowedPostProperties = new Set< string >( [
+	...defaultAllowedPostProperties,
+	...( applyFilters( 'crdt.additionalPostProperties', [] ) as string[] ),
 ] );
 
 // Post meta keys that should *not* be synced.
