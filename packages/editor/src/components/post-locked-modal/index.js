@@ -228,7 +228,7 @@ function PostLockedModal() {
 							{ hasCollaborationBeenDisabled && (
 								<p>
 									{ __(
-										'Real-time collaboration is not available for this post because it uses meta boxes that are not compatible with collaborative editing.'
+										'Because this post uses plugins that aren’t compatible with real-time collaboration, only one person can edit at a time.'
 									) }
 								</p>
 							) }
@@ -259,18 +259,18 @@ function PostLockedModal() {
 									}
 								) }
 							</p>
+							{ hasCollaborationBeenDisabled && (
+								<p>
+									{ __(
+										'Because this post uses plugins that aren’t compatible with real-time collaboration, only one person can edit at a time.'
+									) }
+								</p>
+							) }
 							<p>
 								{ __(
 									'If you take over, the other user will lose editing control to the post, but their changes will be saved.'
 								) }
 							</p>
-							{ hasCollaborationBeenDisabled && (
-								<p>
-									{ __(
-										'Real-time collaboration is not available for this post because it uses meta boxes that are not compatible with collaborative editing.'
-									) }
-								</p>
-							) }
 						</>
 					) }
 
