@@ -2560,12 +2560,21 @@ class WP_Theme_JSON_Gutenberg {
 			 * For an uploaded image (images with a database ID), apply size and position
 			 * defaults equal to those applied in block supports in lib/background.php.
 			 */
-			if ( 'background-image' === $css_property && ! empty( $value ) ) {
-				$background_styles = gutenberg_style_engine_get_styles(
-					array( 'background' => array( 'backgroundImage' => $value ) )
-				);
-
-				$value = $background_styles['declarations'][ $css_property ];
+			if ( 'background-image' === $css_property ) {
+				$background_image_input = array();
+				if ( ! empty( $value ) ) {
+					$background_image_input['backgroundImage'] = $value;
+				}
+				$gradient_value = $styles['background']['gradient'] ?? null;
+				if ( ! empty( $gradient_value ) ) {
+					$background_image_input['gradient'] = $gradient_value;
+				}
+				if ( ! empty( $background_image_input ) ) {
+					$background_styles = gutenberg_style_engine_get_styles(
+						array( 'background' => $background_image_input )
+					);
+					$value = $background_styles['declarations'][ $css_property ] ?? null;
+				}
 			}
 			if ( empty( $value ) && static::ROOT_BLOCK_SELECTOR !== $selector && ! empty( $styles['background']['backgroundImage']['id'] ) ) {
 				if ( 'background-size' === $css_property ) {
