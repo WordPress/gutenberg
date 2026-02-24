@@ -230,7 +230,9 @@ Properties:
 
     -   `field`: the field used for grouping the dataset.
     -   `direction`: the direction to use for sorting the groups, one of `asc` or `desc`. Default `asc`.
+    -   `showLabel`: whether to show the field label in the group header. `true` by default.
 
+-   `infiniteScrollEnabled`: whether infinite scroll is enabled. `false` by default.
 -   `fields`: a list of remaining field `id` that are visible in the UI and the specific order in which they are displayed.
 -   `layout`: config that is specific to a particular layout type.
 
