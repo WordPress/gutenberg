@@ -1621,6 +1621,11 @@ Object that contains the validation rules for the field. If a rule is not met, t
 
 -   `required`: boolean indicating whether the field is required or not. Disabled by default.
 -   `elements`: boolean restricting selection to the provided list of elements only. Enabled by default. The `array` Edit control uses it to restrict the input values.
+-   `pattern`: a regex pattern string that the field value must match.
+-   `minLength`: minimum string length for the field value.
+-   `maxLength`: maximum string length for the field value.
+-   `min`: minimum numeric value for the field.
+-   `max`: maximum numeric value for the field.
 -   `custom`: a function that validates a field's value. If the value is invalid, the function should return a string explaining why the value is invalid. Otherwise, the function must return null.
 
 Fields that define a type come with default validation for the type. For example, the `integer` type ensures that the value is a valid integer:
