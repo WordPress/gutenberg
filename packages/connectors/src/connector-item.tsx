@@ -60,6 +60,7 @@ export interface DefaultConnectorSettingsProps {
 	helpUrl?: string;
 	helpLabel?: string;
 	readOnly?: boolean;
+	validate?: ( value: string ) => string | undefined;
 }
 
 /**
@@ -72,11 +73,46 @@ export function DefaultConnectorSettings( {
 	helpUrl,
 	helpLabel,
 	readOnly = false,
+	validate,
 }: DefaultConnectorSettingsProps ) {
 	const [ apiKey, setApiKey ] = useState( initialValue );
+	const [ hasBlurred, setHasBlurred ] = useState( false );
+
+	const validationError =
+		! readOnly && hasBlurred && apiKey ? validate?.( apiKey ) : undefined;
 
 	const helpLinkLabel =
 		helpLabel || helpUrl?.replace( /^https?:\/\//, '' );
+
+	const helpLink = helpUrl ? (
+		<>
+			{ __( 'Get your API key at' ) }{ ' ' }
+			<ExternalLink href={ helpUrl }>{ helpLinkLabel }</ExternalLink>
+		</>
+	) : undefined;
+
+	const getHelp = () => {
+		if ( readOnly ) {
+			return (
+				<>
+					{ __( 'Your API key is stored securely. You can reset it at' ) }{ ' ' }
+					{ helpUrl ? (
+						<ExternalLink href={ helpUrl }>
+							{ helpLinkLabel }
+						</ExternalLink>
+					) : undefined }
+				</>
+			);
+		}
+		if ( validationError ) {
+			return (
+				<span style={ { color: '#cc1818' } }>
+					{ validationError }
+				</span>
+			);
+		}
+		return helpLink;
+	};
 
 	return (
 		<VStack
@@ -89,29 +125,10 @@ export function DefaultConnectorSettings( {
 				label={ __( 'API Key' ) }
 				value={ apiKey }
 				onChange={ readOnly ? undefined : setApiKey }
+				onBlur={ () => setHasBlurred( true ) }
 				placeholder="YOUR_API_KEY"
 				disabled={ readOnly }
-				help={
-					readOnly ? (
-						<>
-							{ __(
-								'Your API key is stored securely. You can reset it at'
-							) }{ ' ' }
-							{ helpUrl ? (
-								<ExternalLink href={ helpUrl }>
-									{ helpLinkLabel }
-								</ExternalLink>
-							) : undefined }
-						</>
-					) : helpUrl ? (
-						<>
-							{ __( 'Get your API key at' ) }{ ' ' }
-							<ExternalLink href={ helpUrl }>
-								{ helpLinkLabel }
-							</ExternalLink>
-						</>
-					) : undefined
-				}
+				help={ getHelp() }
 			/>
 			{ readOnly ? (
 				<Button
@@ -125,6 +142,7 @@ export function DefaultConnectorSettings( {
 				<HStack justify="flex-start">
 					<Button
 						variant="primary"
+						disabled={ ! apiKey || !! validationError }
 						onClick={ () => onSave?.( apiKey ) }
 					>
 						{ __( 'Save' ) }
