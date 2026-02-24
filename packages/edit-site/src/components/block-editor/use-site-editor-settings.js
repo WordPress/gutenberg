@@ -27,13 +27,20 @@ function useNavigateToPreviousEntityRecord() {
 	const previousCanvas = usePrevious( location.query.canvas );
 	const history = useHistory();
 	const goBack = useMemo( () => {
+		const { parentPath } = location.query;
 		const isFocusMode =
 			location.query.focusMode ||
 			( location?.params?.postId &&
 				FOCUSABLE_ENTITIES.includes( location?.params?.postType ) );
 		const didComeFromEditorCanvas = previousCanvas === 'edit';
-		const showBackButton = isFocusMode && didComeFromEditorCanvas;
-		return showBackButton ? () => history.back() : undefined;
+		const showBackButton =
+			isFocusMode && ( didComeFromEditorCanvas || parentPath );
+		if ( ! showBackButton ) {
+			return undefined;
+		}
+		return parentPath
+			? () => history.navigate( parentPath )
+			: () => history.back();
 	}, [ location, history, previousCanvas ] );
 	return goBack;
 }

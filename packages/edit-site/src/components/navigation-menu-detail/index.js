@@ -11,22 +11,21 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_PART_POST_TYPE, LAYOUT_LIST } from '../../utils/constants';
+import { TEMPLATE_PART_POST_TYPE, LAYOUT_GRID } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import useMenuUsedInTemplateParts from '../../hooks/use-menu-used-in-template-parts';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 const EMPTY_ARRAY = [];
 
-const defaultLayouts = { list: {} };
+const defaultLayouts = { grid: {} };
 
 const DEFAULT_VIEW = {
-	type: LAYOUT_LIST,
+	type: LAYOUT_GRID,
 	sort: { field: 'title', direction: 'asc' },
 	titleField: 'title',
 };
 
-// Minimal fields for template part display
 const TEMPLATE_PART_FIELDS = [
 	{
 		id: 'title',
@@ -48,9 +47,25 @@ function getItemId( item ) {
 	return String( item.id );
 }
 
-export default function NavigationMenuDetail( { menuId } ) {
+function useNavigateToTemplatePart( menuId ) {
 	const history = useHistory();
+	const { path } = useLocation();
+
+	return ( templatePartId ) => {
+		history.navigate(
+			addQueryArgs( `/${ TEMPLATE_PART_POST_TYPE }/${ templatePartId }`, {
+				canvas: 'edit',
+				focusMode: true,
+				navigationRef: menuId,
+				parentPath: path,
+			} )
+		);
+	};
+}
+
+export default function NavigationMenuDetail( { menuId } ) {
 	const { templateParts, isResolving } = useMenuUsedInTemplateParts( menuId );
+	const navigateToTemplatePart = useNavigateToTemplatePart( menuId );
 
 	const view = useMemo( () => DEFAULT_VIEW, [] );
 
@@ -60,21 +75,16 @@ export default function NavigationMenuDetail( { menuId } ) {
 			label: __( 'Edit in context' ),
 			isPrimary: true,
 			callback( items ) {
-				const tp = items[ 0 ];
-				history.navigate(
-					addQueryArgs( `/${ TEMPLATE_PART_POST_TYPE }/${ tp.id }`, {
-						canvas: 'edit',
-					} )
-				);
+				navigateToTemplatePart( items[ 0 ].id );
 			},
 		} ),
-		[ history ]
+		[ navigateToTemplatePart ]
 	);
 
 	const data = templateParts ?? EMPTY_ARRAY;
 
 	return (
-		<Page title={ __( 'Used in' ) }>
+		<Page title={ __( 'Active Menu locations' ) }>
 			<DataViews
 				data={ data }
 				fields={ TEMPLATE_PART_FIELDS }
@@ -87,12 +97,7 @@ export default function NavigationMenuDetail( { menuId } ) {
 				defaultLayouts={ defaultLayouts }
 				isItemClickable={ () => true }
 				onClickItem={ ( item ) => {
-					history.navigate(
-						addQueryArgs(
-							`/${ TEMPLATE_PART_POST_TYPE }/${ item.id }`,
-							{ canvas: 'edit' }
-						)
-					);
+					navigateToTemplatePart( item.id );
 				} }
 			/>
 		</Page>

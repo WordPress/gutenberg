@@ -48,6 +48,7 @@ import {
 	useSyncDeprecatedEntityIntoState,
 } from './use-resolve-edited-entity';
 import SitePreview from './site-preview';
+import useAutoSelectNavigationBlock from '../../hooks/use-auto-select-navigation-block';
 
 const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
@@ -119,6 +120,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 	const { canvas = 'view' } = location.query;
 	const isLoading = useIsSiteEditorLoading();
 	useAdaptEditorToCanvas( canvas );
+	useAutoSelectNavigationBlock();
 	const entity = useResolveEditedEntity();
 	// deprecated sync state with url
 	useSyncDeprecatedEntityIntoState( entity );
