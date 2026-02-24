@@ -7,16 +7,35 @@ import {
 } from '@wordpress/components';
 import { useCallback, Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
+
 /**
  * Internal dependencies
  */
 import BackgroundImageControl from '../background-image-control';
+import { ColorPanelDropdown } from './color-panel';
+import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
+	gradient: true,
 };
+
+/**
+ * Checks site settings to see if the requested feature's control may be used.
+ *
+ * @param {Object} settings Site settings.
+ * @param {string} feature  Background feature to check.
+ * @return {boolean}        Whether site settings has activated background panel.
+ */
+export function useHasBackgroundControl(
+	settings,
+	feature = 'backgroundImage'
+) {
+	return Platform.OS === 'web' && settings?.background?.[ feature ];
+}
 
 /**
  * Checks site settings to see if the background panel may be used.
@@ -27,7 +46,8 @@ const DEFAULT_CONTROLS = {
  * @return {boolean}        Whether site settings has activated background panel.
  */
 export function useHasBackgroundPanel( settings ) {
-	return Platform.OS === 'web' && settings?.background?.backgroundImage;
+	const { backgroundImage, gradient } = settings?.background || {};
+	return Platform.OS === 'web' && ( backgroundImage || gradient );
 }
 
 /**
@@ -61,6 +81,20 @@ export function hasBackgroundImageValue( style ) {
 	);
 }
 
+/**
+ * Checks if there is a current value in the background gradient block support
+ * attributes.
+ *
+ * @param {Object} style Style attribute.
+ * @return {boolean}     Whether the block has a background gradient value set.
+ */
+export function hasBackgroundGradientValue( style ) {
+	return (
+		'string' === typeof style?.background?.gradient &&
+		style?.background?.gradient !== ''
+	);
+}
+
 function BackgroundToolsPanel( {
 	resetAllFilter,
 	onChange,
@@ -80,9 +114,15 @@ function BackgroundToolsPanel( {
 			label={ headerLabel }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			hasInnerWrapper
+			className="background-block-support-panel"
+			__experimentalFirstVisibleItemClass="first"
+			__experimentalLastVisibleItemClass="last"
 			dropdownMenuProps={ dropdownMenuProps }
 		>
-			{ children }
+			<div className="background-block-support-panel__inner-wrapper">
+				{ children }
+			</div>
 		</ToolsPanel>
 	);
 }
@@ -98,15 +138,75 @@ export default function BackgroundImagePanel( {
 	defaultValues = {},
 	headerLabel = __( 'Background' ),
 } ) {
-	const showBackgroundImageControl = useHasBackgroundPanel( settings );
-	const resetBackground = () =>
-		onChange( setImmutably( value, [ 'background' ], {} ) );
+	const colors = useColorsPerOrigin( settings );
+	const gradients = useGradientsPerOrigin( settings );
+	const areCustomSolidsEnabled = settings?.color?.custom;
+	const areCustomGradientsEnabled = settings?.color?.customGradient;
+	const hasGradientColors = gradients.length > 0 || areCustomGradientsEnabled;
+
+	const hasBackgroundGradientControl = useHasBackgroundControl(
+		settings,
+		'gradient'
+	);
+	const showBackgroundGradientControl =
+		hasGradientColors && hasBackgroundGradientControl;
+	const showBackgroundImageControl = useHasBackgroundControl( settings );
+
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
 			...previousValue,
 			background: {},
 		};
 	}, [] );
+
+	if ( ! showBackgroundGradientControl && ! showBackgroundImageControl ) {
+		return null;
+	}
+
+	const decodeValue = ( rawValue ) =>
+		getValueFromVariable( { settings }, '', rawValue );
+	const encodeGradientValue = ( gradientValue ) => {
+		const allGradients = gradients.flatMap(
+			( { gradients: originGradients } ) => originGradients
+		);
+		const gradientObject = allGradients.find(
+			( { gradient } ) => gradient === gradientValue
+		);
+		return gradientObject
+			? 'var:preset|gradient|' + gradientObject.slug
+			: gradientValue;
+	};
+
+	const resetBackground = () =>
+		onChange(
+			setImmutably(
+				value,
+				[ 'background', 'backgroundImage' ],
+				undefined
+			)
+		);
+
+	const resetGradient = () =>
+		onChange(
+			setImmutably( value, [ 'background', 'gradient' ], undefined )
+		);
+
+	// Get current gradient value, decoding preset slug references.
+	const currentGradient = decodeValue( value?.background?.gradient );
+	const inheritedGradient = decodeValue(
+		inheritedValue?.background?.gradient
+	);
+
+	// Set gradient value, encoding preset matches as slug references.
+	const setGradient = ( newGradient ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'background', 'gradient' ],
+				encodeGradientValue( newGradient )
+			)
+		);
+	};
 
 	return (
 		<Wrapper
@@ -118,7 +218,7 @@ export default function BackgroundImagePanel( {
 		>
 			{ showBackgroundImageControl && (
 				<ToolsPanelItem
-					hasValue={ () => !! value?.background }
+					hasValue={ () => hasBackgroundImageValue( value ) }
 					label={ __( 'Image' ) }
 					onDeselect={ resetBackground }
 					isShownByDefault={ defaultControls.backgroundImage }
@@ -133,6 +233,33 @@ export default function BackgroundImagePanel( {
 						defaultValues={ defaultValues }
 					/>
 				</ToolsPanelItem>
+			) }
+			{ showBackgroundGradientControl && (
+				<ColorPanelDropdown
+					label={ __( 'Gradient' ) }
+					hasValue={ () => hasBackgroundGradientValue( value ) }
+					resetValue={ resetGradient }
+					isShownByDefault={ defaultControls.gradient }
+					indicators={ [ currentGradient ] }
+					tabs={ [
+						{
+							key: 'gradient',
+							label: __( 'Gradient' ),
+							inheritedValue:
+								currentGradient ?? inheritedGradient,
+							setValue: setGradient,
+							userValue: currentGradient,
+							isGradient: true,
+						},
+					] }
+					colorGradientControlSettings={ {
+						colors,
+						disableCustomColors: ! areCustomSolidsEnabled,
+						gradients,
+						disableCustomGradients: ! areCustomGradientsEnabled,
+					} }
+					panelId={ panelId }
+				/>
 			) }
 		</Wrapper>
 	);

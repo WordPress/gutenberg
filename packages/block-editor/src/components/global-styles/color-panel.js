@@ -22,6 +22,7 @@ import {
 import { useCallback, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
+import { reset as resetIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -31,7 +32,6 @@ import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
-import { reset as resetIcon } from '@wordpress/icons';
 
 export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
@@ -199,7 +199,7 @@ function ColorPanelTab( {
 	);
 }
 
-function ColorPanelDropdown( {
+export function ColorPanelDropdown( {
 	label,
 	hasValue,
 	resetValue,
@@ -334,6 +334,12 @@ export default function ColorPanel( {
 	const areCustomGradientsEnabled = settings?.color?.customGradient;
 	const hasSolidColors = colors.length > 0 || areCustomSolidsEnabled;
 	const hasGradientColors = gradients.length > 0 || areCustomGradientsEnabled;
+	// When a block opts into background.gradient support, the gradient
+	// picker moves to the Background panel. Hide it here to avoid
+	// showing duplicate gradient controls.
+	const hasBackgroundGradientSupport = !! settings?.background?.gradient;
+	const showGradientColors =
+		hasGradientColors && ! hasBackgroundGradientSupport;
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
 	const encodeColorValue = ( colorValue ) => {
@@ -573,7 +579,7 @@ export default function ColorPanel( {
 					setValue: setBackgroundColor,
 					userValue: userBackgroundColor,
 				},
-				hasGradientColors && {
+				showGradientColors && {
 					key: 'gradient',
 					label: __( 'Gradient' ),
 					inheritedValue: gradient,
