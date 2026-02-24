@@ -4,7 +4,7 @@ on:
     pull_request:
     push:
         branches:
-            - trunk
+            - 'trunk'
             - 'release/**'
             - 'wp/**'
     workflow_dispatch:
@@ -240,6 +240,48 @@ jobs:
               with:
                   name: release-notes
                   path: ./release-notes.txt
+
+    # Publishes the built plugin zip file to the GitHub Container registry.
+    publish-to-container-registry:
+        name: Publish to GitHub Container Registry
+        runs-on: 'ubuntu-24.04'
+        needs: ['bump-version', 'build']
+        permissions:
+            contents: read
+            packages: write
+        if: |
+            needs.build.outputs.job_status == 'success'
+
+        steps:
+            - name: Download build artifact
+              uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+              with:
+                  name: gutenberg-plugin
+
+            # Noting the hash helps keep track of the commit the zip was built from.
+            - name: Add a file for tracking the SHA value used.
+              run: echo "${{ github.sha }}" > .gutenberg-hash
+
+            - name: Include the new file in the zip
+              run: zip gutenberg.zip .gutenberg-hash
+
+            - name: Login to GitHub Container Registry
+              uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Setup ORAS
+              uses: oras-project/setup-oras@22ce207df3b08e061f537244349aac6ae1d214f6 # v1.2.4
+
+            - name: Push built plugin ZIP file to GitHub Container Registry
+              run: |
+                  oras push "ghcr.io/${{ github.repository }}/gutenberg-build:${{ github.sha }}" \
+                  "gutenberg.zip:application/zip" \
+                  --annotation "org.opencontainers.image.description=Gutenberg plugin build for commit ${{ github.sha }}" \
+                  --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+                  --annotation "org.opencontainers.image.revision=${{ github.sha }}"
 
     revert-version-bump:
         name: Revert version bump if build failed
