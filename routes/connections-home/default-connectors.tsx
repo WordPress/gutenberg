@@ -30,7 +30,7 @@ const ConnectedBadge = () => (
 			whiteSpace: 'nowrap',
 		} }
 	>
-		{ __( 'Connected' ) }
+		{ __( 'API key provided' ) }
 	</span>
 );
 
@@ -172,14 +172,12 @@ function ProviderConnector( {
 			description={ description }
 			actionArea={
 				<HStack spacing={ 3 } expanded={ false }>
-					{ isConnected && ! isExpanded && <ConnectedBadge /> }
+					{ isConnected && <ConnectedBadge /> }
 					<Button
 						variant={
-							isExpanded
+							isExpanded || isConnected
 								? 'tertiary'
-								: isConnected
-									? 'tertiary'
-									: 'secondary'
+								: 'secondary'
 						}
 						size={
 							isExpanded || isConnected ? undefined : 'compact'
@@ -198,6 +196,7 @@ function ProviderConnector( {
 		>
 			{ isExpanded && pluginStatus === 'active' && (
 				<DefaultConnectorSettings
+					key={ isConnected ? 'connected' : 'setup' }
 					initialValue={ currentApiKey }
 					helpUrl={ helpUrl }
 					helpLabel={ helpLabel }

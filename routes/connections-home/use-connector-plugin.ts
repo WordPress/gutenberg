@@ -174,7 +174,6 @@ export function useConnectorPlugin( {
 				},
 			} );
 			setCurrentApiKey( '' );
-			setIsExpanded( false );
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'Failed to remove API key:', error );
