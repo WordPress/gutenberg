@@ -494,9 +494,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getItemNextRetryTimestamp( state, '1' ) ).toBe(
-				timestamp
-			);
+			expect( getItemNextRetryTimestamp( state, '1' ) ).toBe( timestamp );
 		} );
 
 		it( 'should return undefined for an item without a scheduled retry', () => {
@@ -514,9 +512,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect(
-				getItemNextRetryTimestamp( state, '1' )
-			).toBeUndefined();
+			expect( getItemNextRetryTimestamp( state, '1' ) ).toBeUndefined();
 		} );
 
 		it( 'should return undefined for a non-existent item', () => {

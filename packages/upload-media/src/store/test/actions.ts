@@ -529,11 +529,7 @@ describe( 'actions', () => {
 			// Cancel silently with a retryable error.
 			await registry
 				.dispatch( uploadStore )
-				.cancelItem(
-					item.id,
-					new Error( 'Network error' ),
-					true
-				);
+				.cancelItem( item.id, new Error( 'Network error' ), true );
 
 			// Item should be removed (not retried).
 			expect(
@@ -552,10 +548,7 @@ describe( 'actions', () => {
 			// Cancel with a non-retryable error.
 			await registry
 				.dispatch( uploadStore )
-				.cancelItem(
-					item.id,
-					new Error( 'File validation failed' )
-				);
+				.cancelItem( item.id, new Error( 'File validation failed' ) );
 
 			// Item should be removed (not retried).
 			expect(
