@@ -1,5 +1,38 @@
 == Changelog ==
 
+= 22.6.0-rc.3 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Editor
+- Fix error when undoing newly added pattern. ([75850](https://github.com/WordPress/gutenberg/pull/75850))
+- Pattern editing: Fix block editing modes when switching back and forth from isolated editing. ([75821](https://github.com/WordPress/gutenberg/pull/75821))
+- Synced patterns: Fix block editing mode of synced pattern content when nested in an unsynced pattern. ([75818](https://github.com/WordPress/gutenberg/pull/75818))
+
+#### Block Library
+- Plugin: Include Icons assets in ZIP. ([75866](https://github.com/WordPress/gutenberg/pull/75866))
+
+#### Collaboration
+- RTC: Fix entity save call / initial persistence. ([75841](https://github.com/WordPress/gutenberg/pull/75841))
+
+#### Client Side Media
+- Fix client-side media file naming. ([75817](https://github.com/WordPress/gutenberg/pull/75817))
+- Re-enable client-side media processing. ([75848](https://github.com/WordPress/gutenberg/pull/75848))
+
+#### Post Editor
+- Real-time collaboration: Remove block client IDs from Awareness, fix "Show Template" view. ([75590](https://github.com/WordPress/gutenberg/pull/75590))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@adamsilverstein @alecgeatches @chriszarate @mcsf @talldan @tellthemachines
+
+
 = 22.6.0-rc.2 =
 
 ## Changelog
