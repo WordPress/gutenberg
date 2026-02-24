@@ -56,7 +56,7 @@ type DataViewsContextType< Item > = {
 	setIsShowingFilter: ( value: boolean ) => void;
 	config: { perPageSizes: number[] };
 	empty?: ReactNode;
-	hasInitiallyLoaded: boolean;
+	hasInitiallyLoaded?: boolean;
 	hasInfiniteScrollHandler: boolean;
 	itemListLabel?: string;
 	onReset?: ( () => void ) | false;

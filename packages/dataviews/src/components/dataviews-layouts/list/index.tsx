@@ -33,6 +33,7 @@ import { Stack } from '@wordpress/ui';
 import { unlock } from '../../../lock-unlock';
 import { ActionsMenuGroup, ActionModal } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
+import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 import type {
 	Action,
 	NormalizedField,
@@ -390,6 +391,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		hasInitiallyLoaded,
 	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list' );
+	const isDelayedLoading = useDelayedLoading( !! isLoading );
 
 	const selectedItem = data?.findLast( ( item ) =>
 		selection.includes( getItemId( item ) )
@@ -522,7 +524,15 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	const noResults = ! hasData && hasInitiallyLoaded;
 
 	if ( noResults ) {
-		return <div className="dataviews-no-results">{ empty }</div>;
+		return (
+			<div
+				className={ clsx( 'dataviews-no-results', {
+					'is-refreshing': isDelayedLoading,
+				} ) }
+			>
+				{ empty }
+			</div>
+		);
 	}
 	if ( ! hasData && ! isInfiniteScroll ) {
 		return null;
@@ -605,13 +615,15 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 						[ 'compact', 'comfortable' ].includes(
 							view.layout.density
 						),
-					'is-refreshing': ! isInfiniteScroll && isLoading,
+					'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 				} ) }
 				role={ view.infiniteScrollEnabled ? 'feed' : 'grid' }
 				activeId={ activeCompositeId }
 				setActiveId={ setActiveCompositeId }
 				// @ts-ignore
-				inert={ ! isInfiniteScroll && isLoading ? 'true' : undefined }
+				inert={
+					! isInfiniteScroll && !! isLoading ? 'true' : undefined
+				}
 			>
 				{ data.map( ( item, index ) => {
 					const id = generateCompositeItemIdPrefix( item );

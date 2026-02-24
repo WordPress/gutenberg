@@ -8,7 +8,6 @@ import type { ReactNode, ComponentProps, ReactElement } from 'react';
  */
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { useResizeObserver, throttle } from '@wordpress/compose';
-import { ProgressBar } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 
 /**
@@ -119,26 +118,6 @@ function DefaultUI( {
 			<DataViewsFooter />
 		</>
 	);
-}
-
-function useDelayedLoading(
-	isLoading: boolean,
-	options: { delay: number } = { delay: 400 }
-): boolean {
-	const [ showLoader, setShowLoader ] = useState( false );
-	useEffect( () => {
-		if ( ! isLoading ) {
-			return;
-		}
-		const timeout = setTimeout( () => {
-			setShowLoader( true );
-		}, options.delay );
-		return () => {
-			clearTimeout( timeout );
-			setShowLoader( false );
-		};
-	}, [ isLoading, options.delay ] );
-	return showLoader;
 }
 
 function DataViews< Item >( {
@@ -263,10 +242,6 @@ function DataViews< Item >( {
 		isLoading
 	);
 
-	const isDelayedLoading = useDelayedLoading( isLoading );
-	const showLoader =
-		isDelayedLoading && ( ! infiniteScrollHandler || ! hasInitiallyLoaded );
-
 	if ( ! defaultLayouts[ view.type ] ) {
 		return null;
 	}
@@ -305,9 +280,6 @@ function DataViews< Item >( {
 			} }
 		>
 			<div className="dataviews-wrapper" ref={ containerRef }>
-				{ showLoader && (
-					<ProgressBar className="dataviews-wrapper__loading-progress" />
-				) }
 				{ children ?? (
 					<DefaultUI
 						header={ header }

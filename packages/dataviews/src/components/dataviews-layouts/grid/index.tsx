@@ -16,6 +16,7 @@ import { Stack } from '@wordpress/ui';
 import type { ViewGridProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
 import CompositeGrid from './composite-grid';
+import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
 function ViewGrid< Item >( {
 	actions,
@@ -33,6 +34,7 @@ function ViewGrid< Item >( {
 	empty,
 	hasInitiallyLoaded,
 }: ViewGridProps< Item > ) {
+	const isDelayedLoading = useDelayedLoading( !! isLoading );
 	const hasData = !! data?.length;
 	const groupField = view.groupBy?.field
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
@@ -42,16 +44,24 @@ function ViewGrid< Item >( {
 	const noResults = ! hasData && hasInitiallyLoaded;
 
 	if ( noResults ) {
-		return <div className="dataviews-no-results">{ empty }</div>;
+		return (
+			<div
+				className={ clsx( 'dataviews-no-results', {
+					'is-refreshing': isDelayedLoading,
+				} ) }
+			>
+				{ empty }
+			</div>
+		);
 	}
 	if ( ! hasData && ! isInfiniteScroll ) {
 		return null;
 	}
 	const gridProps = {
 		className: clsx( className, {
-			'is-refreshing': ! isInfiniteScroll && isLoading,
+			'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 		} ),
-		inert: ! isInfiniteScroll && isLoading ? 'true' : undefined,
+		inert: ! isInfiniteScroll && !! isLoading ? 'true' : undefined,
 		isLoading,
 		view,
 		fields,

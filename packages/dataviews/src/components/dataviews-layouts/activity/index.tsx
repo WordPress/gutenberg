@@ -16,6 +16,7 @@ import type { ViewActivityProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
 import ActivityGroup from './activity-group';
 import ActivityItems from './activity-items';
+import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
 export default function ViewActivity< Item >(
 	props: ViewActivityProps< Item >
@@ -30,6 +31,7 @@ export default function ViewActivity< Item >(
 		className,
 	} = props;
 
+	const isDelayedLoading = useDelayedLoading( !! isLoading );
 	const hasData = !! data?.length;
 
 	// Check if data should be grouped
@@ -43,13 +45,22 @@ export default function ViewActivity< Item >(
 	const noResults = ! hasData && hasInitiallyLoaded;
 
 	if ( noResults ) {
-		return <div className="dataviews-no-results">{ empty }</div>;
+		return (
+			<div
+				className={ clsx( 'dataviews-no-results', {
+					'is-refreshing': isDelayedLoading,
+				} ) }
+			>
+				{ empty }
+			</div>
+		);
 	}
 	if ( ! hasData && ! isInfiniteScroll ) {
 		return null;
 	}
 
-	const isRefreshing = ! isInfiniteScroll && isLoading;
+	const isRefreshing = ! isInfiniteScroll && isDelayedLoading;
+	const isInert = ! isInfiniteScroll && !! isLoading;
 	const wrapperClassName = clsx( 'dataviews-view-activity', className, {
 		'is-refreshing': isRefreshing,
 	} );
@@ -67,7 +78,7 @@ export default function ViewActivity< Item >(
 				gap="sm"
 				className={ wrapperClassName }
 				// @ts-ignore
-				inert={ isRefreshing ? 'true' : undefined }
+				inert={ isInert ? 'true' : undefined }
 			>
 				{ groupedEntries.map(
 					( [ groupName, groupData ]: [ string, Item[] ] ) => (
@@ -96,7 +107,7 @@ export default function ViewActivity< Item >(
 				className={ wrapperClassName }
 				role={ view.infiniteScrollEnabled ? 'feed' : undefined }
 				// @ts-ignore
-				inert={ isRefreshing ? 'true' : undefined }
+				inert={ isInert ? 'true' : undefined }
 			>
 				<ActivityItems< Item > { ...props } />
 			</div>

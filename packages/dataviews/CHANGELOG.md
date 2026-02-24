@@ -5,7 +5,7 @@
 ### Bug Fixes
 
 - DataForm: Fix focus loss when collapsing in Card view. [#75689](https://github.com/WordPress/gutenberg/pull/75689)
-- DataViews: Move loading UI outside of layouts to avoid flickering while refreshing. [#74572](https://github.com/WordPress/gutenberg/pull/74572)
+- DataViews: Avoid flickering while refreshing. [#74572](https://github.com/WordPress/gutenberg/pull/74572)
 - DataViews: Fix spacing in first column. [#75693](https://github.com/WordPress/gutenberg/pull/75693)
 - DataViews: Fix search input losing characters during debounce when externally synced. [#75810](https://github.com/WordPress/gutenberg/pull/75810)
 - DataForm: Fix vertical alignment of summary fields in card layout. [#75864](https://github.com/WordPress/gutenberg/pull/75864)

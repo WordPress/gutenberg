@@ -32,7 +32,6 @@ import DataViewsViewConfig, {
 import normalizeFields from '../field-types';
 import type { ActionButton, Field, View, SupportedLayouts } from '../types';
 import type { SelectionOrUpdater } from '../types/private';
-import useData from '../hooks/use-data';
 type ItemWithId = { id: string };
 
 const isItemClickable = () => false;
@@ -147,7 +146,6 @@ function DataViewsPicker< Item >( {
 			onChangeSelection( newValue );
 		}
 	}
-	const { hasInitiallyLoaded } = useData( data, isLoading );
 	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
 	const filters = useFilters( _fields, view );
 	const hasPrimaryOrLockedFilters = useMemo(
@@ -222,7 +220,6 @@ function DataViewsPicker< Item >( {
 				actions,
 				data,
 				isLoading,
-				hasInitiallyLoaded,
 				paginationInfo,
 				isItemClickable,
 				selection,

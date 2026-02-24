@@ -42,6 +42,7 @@ import ColumnPrimary from './column-primary';
 import { useIsHorizontalScrollEnd } from './use-is-horizontal-scroll-end';
 import getDataByGroup from '../utils/get-data-by-group';
 import { PropertiesSection } from '../../dataviews-view-config/properties-section';
+import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
 interface TableColumnFieldProps< Item > {
 	fields: NormalizedField< Item >[];
@@ -288,6 +289,7 @@ function ViewTable< Item >( {
 	hasInitiallyLoaded,
 }: ViewTableProps< Item > ) {
 	const { containerRef } = useContext( DataViewsContext );
+	const isDelayedLoading = useDelayedLoading( isLoading );
 	const headerMenuRefs = useRef<
 		Map< string, { node: HTMLButtonElement; fallback: string } >
 	>( new Map() );
@@ -388,7 +390,12 @@ function ViewTable< Item >( {
 
 	if ( noResults ) {
 		return (
-			<div className="dataviews-no-results" id={ tableNoticeId }>
+			<div
+				className={ clsx( 'dataviews-no-results', {
+					'is-refreshing': isDelayedLoading,
+				} ) }
+				id={ tableNoticeId }
+			>
 				{ empty }
 			</div>
 		);
@@ -407,7 +414,7 @@ function ViewTable< Item >( {
 							view.layout.density
 						),
 					'has-bulk-actions': hasBulkActions,
-					'is-refreshing': ! isInfiniteScroll && isLoading,
+					'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 				} ) }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
