@@ -198,7 +198,12 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 				}
 
 				if ( retryCount >= maxRetries ) {
-					logMaxRetriesExceeded( id, item.file.name, retryCount );
+					logMaxRetriesExceeded(
+						id,
+						item.file.name,
+						maxRetries,
+						error
+					);
 				}
 			}
 		}
@@ -212,7 +217,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 				console.error( 'Upload cancelled', error );
 			}
 		} else {
-			logCancel( id, item.file.name );
+			logCancel( id, item.file.name, error );
 		}
 
 		dispatch< CancelAction >( {

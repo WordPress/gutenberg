@@ -20,6 +20,8 @@ export interface QueueItem {
 	operations?: Operation[];
 	error?: Error;
 	retryCount?: number;
+	nextRetryTimestamp?: number;
+	retryTimerId?: ReturnType< typeof setTimeout >;
 	progress?: number;
 	batchId?: string;
 	sourceUrl?: string;
@@ -317,3 +319,19 @@ export interface SideloadAdditionalData extends AdditionalData {
 }
 
 export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif';
+
+/**
+ * Configuration for automatic retry behavior on upload failures.
+ */
+export interface RetrySettings {
+	/** Maximum number of retry attempts before giving up. */
+	maxRetryAttempts: number;
+	/** Initial delay in milliseconds before the first retry. */
+	initialRetryDelayMs: number;
+	/** Maximum delay in milliseconds (cap for exponential growth). */
+	maxRetryDelayMs: number;
+	/** Multiplier for exponential backoff (e.g., 2 means double each time). */
+	backoffMultiplier: number;
+	/** Jitter factor (0-1) to add randomness and prevent thundering herd. */
+	retryJitter: number;
+}
