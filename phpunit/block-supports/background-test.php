@@ -132,7 +132,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 		$apos = $this->get_apostrophe_entity();
 
 		return array(
-			'background image style is applied' => array(
+			'background image style is applied'      => array(
 				'theme_name'          => 'block-theme-child-with-fluid-typography',
 				'block_name'          => 'test/background-rules-are-output',
 				'background_settings' => array(
@@ -203,7 +203,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'expected_wrapper'    => '<div class="wp-block-test has-background" style="color: red;font-size: 15px;background-image:url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover;">Content</div>',
 				'wrapper'             => '<div class="wp-block-test" style="color: red;font-size: 15px;">Content</div>',
 			),
-			'background gradient style is applied'             => array(
+			'background gradient style is applied'   => array(
 				'theme_name'          => 'block-theme-child-with-fluid-typography',
 				'block_name'          => 'test/background-gradient-rules-are-output',
 				'background_settings' => array(
@@ -239,7 +239,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'expected_wrapper'    => '<div class="has-background" style="background-image:var(--wp--preset--gradient--vivid-cyan-blue);">Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
-			'background gradient and image combined'       => array(
+			'background gradient and image combined' => array(
 				'theme_name'          => 'block-theme-child-with-fluid-typography',
 				'block_name'          => 'test/background-gradient-and-image-combined',
 				'background_settings' => array(

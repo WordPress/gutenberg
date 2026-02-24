@@ -503,7 +503,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'inline_background_gradient_only'                   => array(
+			'inline_background_gradient_only'              => array(
 				'block_styles'    => array(
 					'background' => array(
 						'gradient' => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
