@@ -25,7 +25,7 @@ import {
 	createSyncUpdate,
 	createUpdateQueue,
 	postSyncUpdate,
-	sendDisconnect,
+	postSyncUpdateNonBlocking,
 } from './utils';
 
 const POLLING_INTERVAL_IN_MS = 1000; // 1 second or 1000 milliseconds
@@ -250,12 +250,15 @@ let pageHideListenerRegistered = false;
 function handlePageHide(): void {
 	const rooms = Array.from( roomStates.entries() ).map(
 		( [ room, state ] ) => ( {
+			after: 0,
+			awareness: null,
+			client_id: state.clientId,
 			room,
-			clientId: state.clientId,
+			updates: [],
 		} )
 	);
 
-	sendDisconnect( rooms );
+	postSyncUpdateNonBlocking( { rooms } );
 }
 
 function poll(): void {
@@ -452,7 +455,17 @@ function unregisterRoom( room: string ): void {
 	if ( state ) {
 		// Send a disconnect signal so the server removes this client's
 		// awareness entry immediately instead of waiting for the timeout.
-		sendDisconnect( [ { room, clientId: state.clientId } ] );
+		const rooms = [
+			{
+				after: 0,
+				awareness: null,
+				client_id: state.clientId,
+				room,
+				updates: [],
+			},
+		];
+
+		postSyncUpdateNonBlocking( { rooms } );
 		state.unregister();
 		roomStates.delete( room );
 	}

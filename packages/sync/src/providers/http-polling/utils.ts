@@ -127,38 +127,17 @@ export async function postSyncUpdate(
 	return await response.json();
 }
 
-interface DisconnectRoom {
-	room: string;
-	clientId: number;
-}
-
 /**
- * Send a fire-and-forget disconnect signal for the given rooms so the
- * server can immediately remove the client's awareness entries.
+ * Fire-and-forget variant of postSyncUpdate. Uses `keepalive` so the
+ * request survives page unload, and errors are silently ignored.
  *
- * @param rooms Rooms to disconnect from, with their client IDs.
+ * @param payload The sync payload to send.
  */
-export function sendDisconnect( rooms: DisconnectRoom[] ): void {
-	if ( rooms.length === 0 ) {
+export function postSyncUpdateNonBlocking( payload: SyncPayload ): void {
+	if ( payload.rooms.length === 0 ) {
 		return;
 	}
 
-	const payload: SyncPayload = {
-		rooms: rooms.map( ( { room, clientId } ) => ( {
-			after: 0,
-			awareness: null,
-			client_id: clientId,
-			room,
-			updates: [],
-		} ) ),
-	};
-
-	// Fire-and-forget: keepalive: true ensures the request completes even
-	// during pagehide. We intentionally ignore the response and any
-	// errors (e.g. expired nonce on a stale tab).
-	//
-	// In the worst case, the server will clean up the awareness entries after
-	// a timeout anyway.
 	apiFetch( {
 		body: JSON.stringify( payload ),
 		headers: { 'Content-Type': 'application/json' },
