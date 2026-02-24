@@ -135,7 +135,7 @@ export interface RecordHandlers {
 	onStatusChange: OnStatusChangeCallback;
 	refetchRecord: () => Promise< void >;
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
-	saveRecord: () => Promise< void >;
+	saveRecord: () => void;
 }
 
 export interface SyncConfig {
