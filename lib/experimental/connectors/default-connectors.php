@@ -15,7 +15,7 @@ function gutenberg_mask_api_key( $key ) {
 	if ( strlen( $key ) <= 4 ) {
 		return $key;
 	}
-	return str_repeat( "\u{2022}", strlen( $key ) - 4 ) . substr( $key, -4 );
+	return str_repeat( "\u{2022}", min( strlen( $key ) - 4, 16 ) ) . substr( $key, -4 );
 }
 
 /**
