@@ -17,7 +17,10 @@ import useNavigateToEntityRecord from '../block-editor/use-navigate-to-entity-re
 
 const noop = () => {};
 
-export default function NavigationMenuEditor( { navigationMenuId } ) {
+export default function NavigationMenuEditor( {
+	navigationMenuId,
+	hasDarkBackground = true,
+} ) {
 	const { storedSettings } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
 
@@ -56,7 +59,13 @@ export default function NavigationMenuEditor( { navigationMenuId } ) {
 			onChange={ noop }
 			onInput={ noop }
 		>
-			<div className="edit-site-sidebar-navigation-screen-navigation-menus__content">
+			<div
+				className={
+					hasDarkBackground
+						? 'edit-site-sidebar-navigation-screen-navigation-menus__content'
+						: undefined
+				}
+			>
 				<NavigationMenuContent rootClientId={ blocks[ 0 ].clientId } />
 			</div>
 		</BlockEditorProvider>
