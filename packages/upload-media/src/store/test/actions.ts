@@ -412,6 +412,182 @@ describe( 'actions', () => {
 		} );
 	} );
 
+	describe( 'retryItem', () => {
+		it( 'does nothing for non-existent item', async () => {
+			await registry
+				.dispatch( uploadStore )
+				.retryItem( 'non-existent-id' );
+
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+		} );
+
+		it( 'does nothing for item without error', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Item has no error, so retryItem should do nothing.
+			await registry.dispatch( uploadStore ).retryItem( item.id );
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+			expect( updatedItem.status ).toBe( ItemStatus.Processing );
+			expect( updatedItem.retryCount ).toBeUndefined();
+		} );
+
+		it( 'sets status to Processing and clears error', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Schedule retry to put item in PendingRetry status with error.
+			await registry
+				.dispatch( uploadStore )
+				.scheduleRetry( item.id, new Error( 'Network error' ) );
+
+			// Retry the item.
+			await registry.dispatch( uploadStore ).retryItem( item.id );
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+			expect( updatedItem.status ).toBe( ItemStatus.Processing );
+			expect( updatedItem.error ).toBeUndefined();
+		} );
+
+		it( 'increments retryCount', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Schedule retry to put item in error state.
+			await registry
+				.dispatch( uploadStore )
+				.scheduleRetry( item.id, new Error( 'Network error' ) );
+
+			// Retry the item.
+			await registry.dispatch( uploadStore ).retryItem( item.id );
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+			expect( updatedItem.retryCount ).toBe( 1 );
+		} );
+	} );
+
+	describe( 'cancelItem retry integration', () => {
+		beforeEach( () => {
+			jest.useFakeTimers();
+			( vipsCancelOperations as jest.Mock ).mockClear();
+		} );
+
+		afterEach( () => {
+			jest.useRealTimers();
+		} );
+
+		it( 'schedules retry for retryable errors', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Cancel with a retryable error (network error pattern).
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'Network error' ) );
+
+			// Item should still be in the queue with PendingRetry status.
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+			expect( updatedItem ).toBeDefined();
+			expect( updatedItem.status ).toBe( ItemStatus.PendingRetry );
+		} );
+
+		it( 'does NOT schedule retry when silent=true', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Cancel silently with a retryable error.
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem(
+					item.id,
+					new Error( 'Network error' ),
+					true
+				);
+
+			// Item should be removed (not retried).
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+		} );
+
+		it( 'does NOT schedule retry for non-retryable errors', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Cancel with a non-retryable error.
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem(
+					item.id,
+					new Error( 'File validation failed' )
+				);
+
+			// Item should be removed (not retried).
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+		} );
+
+		it( 'does NOT schedule retry when retry settings are undefined', async () => {
+			// Disable retry settings.
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				retry: undefined,
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Cancel with a retryable error.
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'Network error' ) );
+
+			// Item should be removed (retry not available without settings).
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+		} );
+	} );
+
 	describe( 'scheduleRetry', () => {
 		beforeEach( () => {
 			jest.useFakeTimers();
@@ -490,6 +666,35 @@ describe( 'actions', () => {
 			expect(
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
+		} );
+
+		it( 'executes retry after timer fires', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.scheduleRetry( item.id, new Error( 'Network error' ) );
+
+			// Item should be in PendingRetry status.
+			let updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+			expect( updatedItem.status ).toBe( ItemStatus.PendingRetry );
+
+			// Fire all timers to trigger executeRetry.
+			await jest.runAllTimersAsync();
+
+			// Item should now be back in Processing status with incremented retryCount.
+			updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+			expect( updatedItem.status ).toBe( ItemStatus.Processing );
+			expect( updatedItem.retryCount ).toBe( 1 );
 		} );
 	} );
 
