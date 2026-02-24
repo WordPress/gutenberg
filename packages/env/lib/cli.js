@@ -32,17 +32,23 @@ const wpYellow = boldWhite.bgHex( '#f0b849' );
 const withSpinner =
 	( command ) =>
 	( ...args ) => {
-		const spinner = ora().start();
+		const isJSON = args[ 0 ].json;
+		const spinner = ora();
+		if ( ! isJSON ) {
+			spinner.start();
+		}
 		args[ 0 ].spinner = spinner;
 		let time = process.hrtime();
 		return command( ...args ).then(
 			( message ) => {
 				time = process.hrtime( time );
-				spinner.succeed(
-					`${ message || spinner.text } (in ${ time[ 0 ] }s ${ (
-						time[ 1 ] / 1e6
-					).toFixed( 0 ) }ms)`
-				);
+				if ( ! isJSON ) {
+					spinner.succeed(
+						`${ message || spinner.text } (in ${ time[ 0 ] }s ${ (
+							time[ 1 ] / 1e6
+						).toFixed( 0 ) }ms)`
+					);
+				}
 				process.exit( 0 );
 			},
 			( error ) => {
