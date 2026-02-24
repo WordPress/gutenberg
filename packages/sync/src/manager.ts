@@ -151,6 +151,10 @@ export function createSyncManager( debug = false ): SyncManager {
 			return; // Already bootstrapped.
 		}
 
+		if ( isDisabled ) {
+			return; // Syncing has been disabled.
+		}
+
 		handlers = {
 			addUndoMeta: debugWrap( handlers.addUndoMeta ),
 			editRecord: debugWrap( handlers.editRecord ),
@@ -217,12 +221,6 @@ export function createSyncManager( debug = false ): SyncManager {
 			addUndoMeta,
 			restoreUndoMeta,
 		} );
-
-		// Due to a potential race condition, we need to check for
-		// syncing being disabled right before creating providers.
-		if ( isDisabled ) {
-			return; // Syncing has been disabled.
-		}
 
 		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
@@ -293,6 +291,10 @@ export function createSyncManager( debug = false ): SyncManager {
 			return; // Already loaded.
 		}
 
+		if ( isDisabled ) {
+			return; // Syncing has been disabled.
+		}
+
 		const ydoc = createYjsDoc( { collection: true, objectType } );
 		const recordMetaMap = ydoc.getMap( RECORD_METADATA_KEY );
 		const now = Date.now();
@@ -321,12 +323,6 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// If the sync config supports awareness, create it.
 		const awareness = syncConfig.createAwareness?.( ydoc );
-
-		// Due to a potential race condition, we need to check for
-		// syncing being disabled right before creating providers.
-		if ( isDisabled ) {
-			return; // Syncing has been disabled.
-		}
 
 		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
