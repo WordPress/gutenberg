@@ -76,6 +76,10 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.0/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.0/global-styles.php';
 
+	// WordPress 7.1 compat.
+	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-icons-registry-7-1.php';
+	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-icons-controller-7-1.php';
+
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
