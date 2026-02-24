@@ -71,4 +71,4 @@ add_action( 'init', 'gutenberg_register_gemini_connector_setting' );
 function gutenberg_pass_gemini_key_to_ai_client() {
 	gutenberg_pass_connector_key_to_ai_client( 'connectors_gemini_api_key', 'google' );
 }
-add_action( 'wp_loaded', 'gutenberg_pass_gemini_key_to_ai_client' );
+add_action( 'init', 'gutenberg_pass_gemini_key_to_ai_client' );
