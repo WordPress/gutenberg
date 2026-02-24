@@ -25,10 +25,10 @@ import {
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	getDimensionsClassesAndStyles as useDimensionsProps,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import { store as coreDataStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
 import { SVG, Rect, Path } from '@wordpress/primitives';
+import { useSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -36,7 +36,6 @@ import { SVG, Rect, Path } from '@wordpress/primitives';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
-import { unlock } from '../lock-unlock';
 
 const IconPlaceholder = ( { className, style } ) => (
 	<SVG
@@ -70,14 +69,25 @@ export function Edit( { attributes, setAttributes } ) {
 	const borderProps = useBorderProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
 
-	const allIcons = useSelect( ( select ) => {
-		return unlock( select( coreDataStore ) ).getIcons();
-	}, [] );
+	const { selectedIcon, allIcons = [] } = useSelect(
+		( select ) => {
+			const { getEntityRecord, getEntityRecords } =
+				select( coreDataStore );
+			return {
+				selectedIcon: icon
+					? getEntityRecord( 'root', 'icon', icon )
+					: null,
+				allIcons: isInserterOpen
+					? getEntityRecords( 'root', 'icon', {
+							per_page: -1,
+					  } )
+					: undefined,
+			};
+		},
+		[ isInserterOpen, icon ]
+	);
 
-	const iconToDisplay =
-		allIcons?.length > 0
-			? allIcons?.find( ( { name } ) => name === icon )?.content
-			: '';
+	const iconToDisplay = selectedIcon?.content || '';
 
 	const blockControls = (
 		<>

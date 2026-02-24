@@ -191,22 +191,6 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		}
 	}
 
-	// Scrim overlay.
-	&.has-warning::after {
-		content: "";
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		background-color: rgba($white, 0.4);
-	}
-
-	// Avoid conflict with the multi-selection highlight color.
-	&.has-warning.is-multi-selected::after {
-		background-color: transparent;
-	}
-
 	// Clear floats.
 	&[data-clear="true"] {
 		float: none;
@@ -412,25 +396,6 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 
 	&:focus {
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-	}
-}
-
-
-/**
- * Warnings.
- */
-
-.block-editor-block-list__block .block-editor-warning {
-	z-index: z-index(".block-editor-warning");
-	position: relative;
-
-	&.block-editor-block-list__block-crash-warning {
-		// The block crash warning has no block preview underneath it.
-		// The lack of a preview combined with the negative margin that
-		// the warning normally has results in crashed blocks overlapping
-		// any blocks that come after them. Resetting the margin to `auto`
-		// solves this.
-		margin-bottom: auto;
 	}
 }
 

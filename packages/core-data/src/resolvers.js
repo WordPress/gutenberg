@@ -229,9 +229,18 @@ export const getEntityRecord =
 								query
 							);
 						},
-						// Save the current entity record's unsaved edits.
+						// Save the current entity record, whether or not it has unsaved
+						// edits. This is used to trigger a persisted CRDT document.
 						saveRecord: () => {
-							dispatch.saveEditedEntityRecord( kind, name, key );
+							resolveSelect
+								.getEditedEntityRecord( kind, name, key )
+								.then( ( editedRecord ) => {
+									dispatch.saveEntityRecord(
+										kind,
+										name,
+										editedRecord
+									);
+								} );
 						},
 						addUndoMeta: ( ydoc, meta ) => {
 							const selectionHistory =
@@ -1254,16 +1263,4 @@ export const getEditorAssets =
 			path: '/wp-block-editor/v1/assets',
 		} );
 		dispatch.receiveEditorAssets( assets );
-	};
-
-/**
- * Requests icons from the REST API.
- */
-export const getIcons =
-	() =>
-	async ( { dispatch } ) => {
-		const icons = await apiFetch( {
-			path: '/wp/v2/icons',
-		} );
-		dispatch.receiveIcons( icons );
 	};

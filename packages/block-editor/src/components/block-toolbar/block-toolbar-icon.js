@@ -13,6 +13,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import BlockSwitcher from '../block-switcher';
 import BlockIcon from '../block-icon';
+import BlockStylesDropdown from './block-styles-dropdown';
 import PatternOverridesDropdown from './pattern-overrides-dropdown';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { store as blockEditorStore } from '../../store';
@@ -55,8 +56,9 @@ function getBlockIconVariant( { select, clientIds } ) {
 	);
 	const canRemove = canRemoveBlocks( clientIds );
 	const canEdit = clientIds.every( ( clientId ) => canEditBlock( clientId ) );
-	const isDefaultEditingMode =
-		getBlockEditingMode( clientIds[ 0 ] ) === 'default';
+	const editingMode = getBlockEditingMode( clientIds[ 0 ] );
+	const isDefaultEditingMode = editingMode === 'default';
+	const isContentOnlyMode = editingMode === 'contentOnly';
 	const _hideTransformsForSections = hasPatternNameInSelection;
 	const _showBlockSwitcher =
 		! _hideTransformsForSections &&
@@ -69,6 +71,8 @@ function getBlockIconVariant( { select, clientIds } ) {
 
 	if ( _showBlockSwitcher ) {
 		return 'switcher';
+	} else if ( isContentOnlyMode && hasBlockStyles && ! hasPatternOverrides ) {
+		return 'styles-only';
 	} else if ( _showPatternOverrides ) {
 		return 'pattern-overrides';
 	}
@@ -147,6 +151,18 @@ export default function BlockToolbarIcon( { clientIds, isSynced } ) {
 			>
 				{ BlockIconElement }
 			</BlockSwitcher>
+		);
+	}
+
+	if ( variant === 'styles-only' ) {
+		return (
+			<BlockStylesDropdown
+				clientIds={ clientIds }
+				label={ label }
+				text={ text }
+			>
+				{ BlockIconElement }
+			</BlockStylesDropdown>
 		);
 	}
 

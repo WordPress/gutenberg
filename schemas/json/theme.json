@@ -1026,6 +1026,9 @@
 				"core/html": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/icon": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/image": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -2094,6 +2097,9 @@
 				"core/html": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/icon": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/image": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -2539,6 +2545,9 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/html": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/icon": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/image": {
