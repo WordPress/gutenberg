@@ -179,6 +179,114 @@ describe( 'getEntityRecord', () => {
 		);
 	} );
 
+	it( 'saveRecord fetches edited record and saves full entity record', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post' };
+		const EDITED_RECORD = { id: 1, title: 'Edited Post' };
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+
+		dispatch.saveEntityRecord = jest.fn();
+
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+			getEditedEntityRecord: jest.fn( () =>
+				Promise.resolve( EDITED_RECORD )
+			),
+		};
+
+		triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		// Extract the handlers passed to syncManager.load.
+		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
+
+		// Call saveRecord and wait for the internal promise chain.
+		handlers.saveRecord();
+		await resolveSelectWithSync.getEditedEntityRecord();
+
+		// Should have fetched the full edited entity record.
+		expect(
+			resolveSelectWithSync.getEditedEntityRecord
+		).toHaveBeenCalledWith( 'postType', 'post', 1 );
+
+		// Should have called saveEntityRecord (not saveEditedEntityRecord).
+		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			EDITED_RECORD
+		);
+	} );
+
+	it( 'saveRecord saves even when there are no unsaved edits', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post' };
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+
+		dispatch.saveEntityRecord = jest.fn();
+
+		// Return the same record (no edits) from getEditedEntityRecord.
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+			getEditedEntityRecord: jest.fn( () =>
+				Promise.resolve( POST_RECORD )
+			),
+		};
+
+		triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
+
+		// Call saveRecord and wait for the internal promise chain.
+		handlers.saveRecord();
+		await resolveSelectWithSync.getEditedEntityRecord();
+
+		// Should save the record even with no edits (the whole point of the fix).
+		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			POST_RECORD
+		);
+	} );
+
 	it( 'provides transient properties when read/write config is supplied', async () => {
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const POST_RESPONSE = {
