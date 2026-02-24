@@ -3061,15 +3061,19 @@ export function withDerivedBlockEditingModes( reducer ) {
 				break;
 			}
 			case 'UPDATE_SETTINGS': {
-				// Recompute the entire tree if the section root or
-				// the effective disableContentOnlyForUnsyncedPatterns value changes.
+				// Recompute the entire tree if the section root,
+				// the effective disableContentOnlyForUnsyncedPatterns value,
+				// or the isIsolatedEditor value changes.
+				// These are all values that affect the computation.
 				if (
 					state?.settings?.[ sectionRootClientIdKey ] !==
 						nextState?.settings?.[ sectionRootClientIdKey ] ||
 					!! state?.settings
 						?.disableContentOnlyForUnsyncedPatterns !==
 						!! nextState?.settings
-							?.disableContentOnlyForUnsyncedPatterns
+							?.disableContentOnlyForUnsyncedPatterns ||
+					!! state?.settings?.[ isIsolatedEditorKey ] !==
+						!! nextState?.settings?.[ isIsolatedEditorKey ]
 				) {
 					return {
 						...nextState,
