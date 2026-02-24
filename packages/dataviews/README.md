@@ -2190,6 +2190,7 @@ For example:
 
 -   `type`: `row`. Required.
 -   `alignment`: one of `start`, `center`, or `end`. Optional. `center` by default.
+-   `styles`: an object mapping field IDs to style objects. Each style object supports a `flex` property (any valid CSS `flex` value) to control how the field sizes within the row. Optional.
 
 The Row layout displays fields horizontally in a single row. It's particularly useful for grouping related fields that should be displayed side by side. This layout can be used both as a top-level form layout and for individual field groups.
 
@@ -2200,7 +2201,11 @@ For example:
 	id: 'field_id',
 	layout: {
 		type: 'row',
-		alignment: 'start'
+		alignment: 'start',
+		styles: {
+			field1: { flex: '1 1 auto' },
+			field2: { flex: '0 0 200px' },
+		},
 	},
 }
 ```
@@ -2237,6 +2242,24 @@ Example:
 	id: 'field_id',
 	label: 'Combined Field',
 	children: [ 'field1', 'field2' ]
+}
+```
+
+### `description`
+
+A string describing the form field's purpose or usage. Used to provide additional context.
+
+-   Type: `string`.
+-   Optional.
+
+Example:
+
+```js
+{
+	id: 'field_id',
+	label: 'Status & Visibility',
+	description: 'Control the publish status and visibility of the post.',
+	children: [ 'status', 'password' ],
 }
 ```
 
