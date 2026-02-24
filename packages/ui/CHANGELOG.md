@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.7.1-next.0 (2026-02-24)
+
 ### Bug Fixes
 
 -   `IconButton`: Hide tooltip when the button is truly disabled ([#75754](https://github.com/WordPress/gutenberg/pull/75754)).

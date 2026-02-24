@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 32.3.0-next.0 (2026-02-24)
+
 ### Bug Fixes
 
 -   `ColorPicker`: Preserve hue and saturation when the selected color becomes achromatic ([#75493](https://github.com/WordPress/gutenberg/pull/75493)).
