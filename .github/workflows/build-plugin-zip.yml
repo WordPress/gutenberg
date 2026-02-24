@@ -251,7 +251,8 @@ jobs:
             packages: write
         if: |
             always() &&
-            needs.build.outputs.job_status == 'success'
+            needs.build.outputs.job_status == 'success' &&
+            github.repository == 'WordPress/gutenberg'
 
         steps:
             - name: Download build artifact
