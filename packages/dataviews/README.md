@@ -2005,10 +2005,29 @@ Valid operators per field type:
 
 ### `format`
 
-Display format configuration for fields. Supported for date, number, and integer fields. This configuration affects how the field is displayed in the `render` method, the `Edit` control, and filter controls.
+Display format configuration for fields. Supported for `datetime`, `date`, `number`, and `integer` fields. This configuration affects how the field is displayed in the `render` method, the `Edit` control, and filter controls.
 
 -   Type: `object`.
 -   Optional.
+
+For `datetime` fields:
+-   Properties:
+    -   `datetime`: The format string using PHP date format (e.g., `'M j, Y g:i a'` for `'Jan 1, 2021 2:30 pm'`). Optional, defaults to WordPress date format settings.
+    -   `weekStartsOn`: Specifies the first day of the week for calendar controls. One of 0, 1, 2, 3, 4, 5, 6. Optional, defaults to WordPress "Week Starts On" setting, whose value is 0 (Sunday).
+
+Example:
+
+```js
+{
+	id: 'createdAt',
+	type: 'datetime',
+	label: 'Created At',
+	format: {
+		datetime: 'M j, Y g:i a',
+		weekStartsOn: 1,
+	},
+}
+```
 
 For `date` fields:
 -   Properties:
