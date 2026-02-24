@@ -7,7 +7,7 @@ import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
-import { useState, useMemo, useCallback } from '@wordpress/element';
+import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect } from '@wordpress/data';
@@ -75,9 +75,9 @@ function getItemId( item ) {
 
 export default function NavigationMenuList() {
 	const { path, query } = useLocation();
-	const { activeView = 'all' } = query;
+	const { activeView = 'all', postId } = query;
 	const history = useHistory();
-	const [ selection, setSelection ] = useState( [] );
+	const [ selection, setSelection ] = useState( postId ? [ postId ] : [] );
 
 	const activeViewOverrides = useMemo(
 		() => getActiveViewOverridesForTab( activeView ),
@@ -112,9 +112,21 @@ export default function NavigationMenuList() {
 		}
 	} );
 
-	const onChangeSelection = useCallback( ( items ) => {
-		setSelection( items );
-	}, [] );
+	const onChangeSelection = useCallback(
+		( items ) => {
+			setSelection( items );
+			history.navigate(
+				addQueryArgs( path, {
+					postId: items[ 0 ] || undefined,
+				} )
+			);
+		},
+		[ path, history ]
+	);
+
+	useEffect( () => {
+		setSelection( postId ? [ postId ] : [] );
+	}, [ postId ] );
 
 	const fields = usePostFields( { postType: NAVIGATION_POST_TYPE } );
 
@@ -190,10 +202,10 @@ export default function NavigationMenuList() {
 		} ),
 		[ historyForActions ]
 	);
-
-	const actions = useMemo( () => {
-		return [ editAction, ...postTypeActions ];
-	}, [ editAction, postTypeActions ] );
+	const actions = useMemo(
+		() => [ editAction, ...postTypeActions ],
+		[ editAction, postTypeActions ]
+	);
 
 	const [ showAddModal, setShowAddModal ] = useState( false );
 	const openModal = () => setShowAddModal( true );
@@ -242,7 +254,7 @@ export default function NavigationMenuList() {
 				onChangeSelection={ onChangeSelection }
 				isItemClickable={ ( item ) => item.status !== 'trash' }
 				onClickItem={ ( { id } ) => {
-					history.navigate( `/navigation/${ id }` );
+					onChangeSelection( [ id.toString() ] );
 				} }
 				getItemId={ getItemId }
 				defaultLayouts={ defaultLayouts }
