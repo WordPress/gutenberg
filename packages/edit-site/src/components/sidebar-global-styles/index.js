@@ -7,6 +7,7 @@ import { useMemo, useState } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useViewportMatch } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 import { seen } from '@wordpress/icons';
@@ -14,6 +15,7 @@ import { seen } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
@@ -82,6 +84,10 @@ export default function SidebarGlobalStyles() {
 	);
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ section, onChangeSection ] = useSection();
+	const settings = useSelect(
+		( select ) => select( editSiteStore ).getSettings(),
+		[]
+	);
 
 	return (
 		<Page
@@ -101,6 +107,7 @@ export default function SidebarGlobalStyles() {
 			<GlobalStylesUIWrapper
 				path={ section }
 				onPathChange={ onChangeSection }
+				editorSettings={ settings }
 			/>
 		</Page>
 	);

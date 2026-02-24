@@ -29,6 +29,7 @@ export default function GlobalStylesSidebar() {
 		showListViewByDefault,
 		hasRevisions,
 		activeComplementaryArea,
+		editorSettings,
 	} = useSelect( ( select ) => {
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getStylesPath, getShowStylebook } = unlock(
@@ -60,6 +61,7 @@ export default function GlobalStylesSidebar() {
 				!! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count,
 			activeComplementaryArea:
 				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
+			editorSettings: select( editorStore ).getEditorSettings(),
 		};
 	}, [] );
 	const { setStylesPath, setShowStylebook, resetStylesNavigation } = unlock(
@@ -169,6 +171,7 @@ export default function GlobalStylesSidebar() {
 				<GlobalStylesUI
 					path={ stylesPath }
 					onPathChange={ setStylesPath }
+					editorSettings={ editorSettings }
 				/>
 			</DefaultSidebar>
 			<WelcomeGuideStyles />

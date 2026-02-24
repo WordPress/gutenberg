@@ -16,36 +16,32 @@ import { useGlobalStyles } from './hooks';
 
 /**
  * Hook to fetch server CSS and settings for BlockEditorProvider that are not Global Styles.
+ *
+ * @param {Object} editorSettings The editor settings object. Falls back to the
+ *                                editor store settings if not provided.
  */
-function useServerData() {
-	const {
-		styles,
-		__unstableResolvedAssets,
-		colors,
-		gradients,
-		__experimentalDiscussionSettings,
-		mediaUploadHandler,
-		fontLibraryEnabled,
-	} = useSelect( ( select ) => {
-		const { getEditorSettings } = select( editorStore );
-		const { canUser } = select( coreStore );
-		const editorSettings = getEditorSettings();
+function useServerData( editorSettings ) {
+	const editorStoreSettings = useSelect(
+		( select ) => select( editorStore ).getEditorSettings(),
+		[]
+	);
+	const settings = editorSettings || editorStoreSettings;
 
+	const styles = settings?.styles;
+	const __unstableResolvedAssets = settings?.__unstableResolvedAssets;
+	const colors = settings?.colors;
+	const gradients = settings?.gradients;
+	const __experimentalDiscussionSettings =
+		settings?.__experimentalDiscussionSettings;
+	const fontLibraryEnabled = settings?.fontLibraryEnabled ?? true;
+
+	const mediaUploadHandler = useSelect( ( select ) => {
+		const { canUser } = select( coreStore );
 		const canUserUploadMedia = canUser( 'create', {
 			kind: 'postType',
 			name: 'attachment',
 		} );
-
-		return {
-			styles: editorSettings?.styles,
-			__unstableResolvedAssets: editorSettings?.__unstableResolvedAssets,
-			colors: editorSettings?.colors,
-			gradients: editorSettings?.gradients,
-			__experimentalDiscussionSettings:
-				editorSettings?.__experimentalDiscussionSettings,
-			mediaUploadHandler: canUserUploadMedia ? uploadMedia : undefined,
-			fontLibraryEnabled: editorSettings?.fontLibraryEnabled ?? true,
-		};
+		return canUserUploadMedia ? uploadMedia : undefined;
 	}, [] );
 
 	// Filter out global styles to get only server-provided styles
@@ -87,14 +83,19 @@ function useServerData() {
 	return { serverCSS, serverSettings, fontLibraryEnabled };
 }
 
-export default function GlobalStylesUIWrapper( { path, onPathChange } ) {
+export default function GlobalStylesUIWrapper( {
+	path,
+	onPathChange,
+	editorSettings,
+} ) {
 	const {
 		user: userConfig,
 		base: baseConfig,
 		setUser: setUserConfig,
 		isReady,
 	} = useGlobalStyles();
-	const { serverCSS, serverSettings, fontLibraryEnabled } = useServerData();
+	const { serverCSS, serverSettings, fontLibraryEnabled } =
+		useServerData( editorSettings );
 
 	// Show loading state while data is being fetched
 	if ( ! isReady ) {
