@@ -163,7 +163,7 @@ function GeminiConnector( { label, description }: ConnectorRenderProps ) {
 				} );
 
 				const googleAiPlugin = plugins.find(
-					( p ) => p.plugin === 'google-ai-provider/plugin'
+					( p ) => p.plugin === 'ai-provider-for-google/plugin'
 				);
 
 				if ( ! googleAiPlugin ) {
@@ -188,7 +188,7 @@ function GeminiConnector( { label, description }: ConnectorRenderProps ) {
 			await apiFetch( {
 				method: 'POST',
 				path: '/wp/v2/plugins',
-				data: { slug: 'google-ai-provider', status: 'active' },
+				data: { slug: 'ai-provider-for-google', status: 'active' },
 			} );
 			setPluginStatus( 'active' );
 			setIsExpanded( true );
@@ -204,7 +204,7 @@ function GeminiConnector( { label, description }: ConnectorRenderProps ) {
 		try {
 			await apiFetch( {
 				method: 'PUT',
-				path: '/wp/v2/plugins/google-ai-provider/plugin',
+				path: '/wp/v2/plugins/ai-provider-for-google/plugin',
 				data: { status: 'active' },
 			} );
 			setPluginStatus( 'active' );
