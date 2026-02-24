@@ -17,7 +17,8 @@ function gutenberg_connectors_add_settings_menu_item() {
 		__( 'Connectors', 'gutenberg' ),
 		'manage_options',
 		'connections-wp-admin',
-		'gutenberg_connections_wp_admin_render_page'
+		'gutenberg_connections_wp_admin_render_page',
+		1
 	);
 }
 
