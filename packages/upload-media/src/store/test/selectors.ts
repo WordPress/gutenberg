@@ -17,6 +17,7 @@ import {
 	getPendingRetryItems,
 	getPendingUploads,
 	getPendingImageProcessing,
+	hasExceededMaxRetries,
 	hasPendingItemsByParentId,
 } from '../private-selectors';
 import {

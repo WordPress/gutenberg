@@ -180,14 +180,39 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		// Cancel any ongoing vips operations for this item.
 		await vipsCancelOperations( id );
 
+		// Check if we should automatically retry instead of cancelling.
+		if ( ! silent && error ) {
+			const settings = select.getSettings();
+			const retrySettings = settings.retry;
+
+			if ( retrySettings ) {
+				const retryCount = item.retryCount ?? 0;
+				const maxRetries = retrySettings.maxRetryAttempts;
+
+				if ( shouldRetryError( error, retryCount, maxRetries ) ) {
+					logInfo(
+						`Scheduling retry for item ${ id } (${ item.file.name })`
+					);
+					dispatch.scheduleRetry( id, error );
+					return;
+				}
+
+				if ( retryCount >= maxRetries ) {
+					logMaxRetriesExceeded( id, item.file.name, retryCount );
+				}
+			}
+		}
+
 		if ( ! silent ) {
 			const { onError } = item;
 			onError?.( error ?? new Error( 'Upload cancelled' ) );
 			if ( ! onError && error ) {
-				// TODO: Find better way to surface errors with sideloads etc.
+				logError( `Upload cancelled for item ${ id }`, error );
 				// eslint-disable-next-line no-console -- Deliberately log errors here.
 				console.error( 'Upload cancelled', error );
 			}
+		} else {
+			logCancel( id, item.file.name );
 		}
 
 		dispatch< CancelAction >( {
@@ -200,6 +225,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 
 		// All items of this batch were cancelled or finished.
 		if ( item.batchId && select.isBatchUploaded( item.batchId ) ) {
+			logBatchComplete( item.batchId );
 			item.onBatchSuccess?.();
 		}
 	};

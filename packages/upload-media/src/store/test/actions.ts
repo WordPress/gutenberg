@@ -413,6 +413,18 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'retryItem', () => {
+		beforeEach( () => {
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				retry: {
+					maxRetryAttempts: 3,
+					initialRetryDelayMs: 1000,
+					maxRetryDelayMs: 30000,
+					backoffMultiplier: 2,
+					retryJitter: 0.1,
+				},
+			} );
+		} );
+
 		it( 'does nothing for non-existent item', async () => {
 			await registry
 				.dispatch( uploadStore )
@@ -491,6 +503,15 @@ describe( 'actions', () => {
 		beforeEach( () => {
 			jest.useFakeTimers();
 			( vipsCancelOperations as jest.Mock ).mockClear();
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				retry: {
+					maxRetryAttempts: 3,
+					initialRetryDelayMs: 1000,
+					maxRetryDelayMs: 30000,
+					backoffMultiplier: 2,
+					retryJitter: 0.1,
+				},
+			} );
 		} );
 
 		afterEach( () => {
@@ -584,6 +605,15 @@ describe( 'actions', () => {
 	describe( 'scheduleRetry', () => {
 		beforeEach( () => {
 			jest.useFakeTimers();
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				retry: {
+					maxRetryAttempts: 3,
+					initialRetryDelayMs: 1000,
+					maxRetryDelayMs: 30000,
+					backoffMultiplier: 2,
+					retryJitter: 0.1,
+				},
+			} );
 		} );
 
 		afterEach( () => {
@@ -694,6 +724,15 @@ describe( 'actions', () => {
 	describe( 'executeRetry', () => {
 		beforeEach( () => {
 			jest.useFakeTimers();
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				retry: {
+					maxRetryAttempts: 3,
+					initialRetryDelayMs: 1000,
+					maxRetryDelayMs: 30000,
+					backoffMultiplier: 2,
+					retryJitter: 0.1,
+				},
+			} );
 		} );
 
 		afterEach( () => {
