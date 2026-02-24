@@ -238,7 +238,7 @@ Properties:
 
 | Props / Layout | `table` | `pickerTable` | `grid` | `pickerGrid` | `list` | `activity` |
 | -------------- | ------- | ------------- | ------ | ------------ | ------ | ---------- |
-| `density`      | ✓       | ✓             |        |              |        | ✓          |
+| `density`      | ✓       | ✓             |        |              | ✓      | ✓          |
 | `enableMoving` | ✓       | ✓             |        |              |        |            |
 | `styles`       | ✓       | ✓             |        |              |        |            |
 | `badgeFields`  |         |               | ✓      | ✓            |        |            |
@@ -260,7 +260,7 @@ Right-align whenever the cell value is fundamentally quantitative—numbers, dec
 
 `list` layout:
 
--   None
+-   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 
 `activity` layout:
 
