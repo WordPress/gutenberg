@@ -7,7 +7,7 @@ import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
-import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
+import { useState, useMemo, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect } from '@wordpress/data';
@@ -15,28 +15,59 @@ import { DataViews } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { addQueryArgs } from '@wordpress/url';
 import { useView } from '@wordpress/views';
+import { useEvent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { LAYOUT_LIST, NAVIGATION_POST_TYPE } from '../../utils/constants';
+import {
+	OPERATOR_IS_ANY,
+	LAYOUT_LIST,
+	NAVIGATION_POST_TYPE,
+} from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
-import { PRELOADED_NAVIGATION_MENUS_QUERY } from '../sidebar-navigation-screen-navigation-menus/constants';
 import AddNewPostModal from '../add-new-post';
 
-const { usePostFields } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const EMPTY_ARRAY = [];
 
+const DEFAULT_STATUSES = 'draft,future,pending,private,publish';
+
 const DEFAULT_VIEW = {
 	type: LAYOUT_LIST,
+	filters: [],
 	sort: { field: 'date', direction: 'desc' },
 	titleField: 'title',
 	perPage: 100,
+	fields: [ 'status' ],
 };
 
 const defaultLayouts = { list: {} };
+
+const SLUG_TO_STATUS = {
+	published: 'publish',
+	drafts: 'draft',
+	trash: 'trash',
+};
+
+function getActiveViewOverridesForTab( activeView ) {
+	const status = SLUG_TO_STATUS[ activeView ];
+	if ( ! status ) {
+		return {};
+	}
+	return {
+		filters: [
+			{
+				field: 'status',
+				operator: OPERATOR_IS_ANY,
+				value: status,
+				isLocked: true,
+			},
+		],
+	};
+}
 
 function getItemId( item ) {
 	return item.id.toString();
@@ -44,15 +75,21 @@ function getItemId( item ) {
 
 export default function NavigationMenuList() {
 	const { path, query } = useLocation();
-	const postId = query?.postId;
+	const { activeView = 'all' } = query;
 	const history = useHistory();
-	const [ selection, setSelection ] = useState( postId ? [ postId ] : [] );
+	const [ selection, setSelection ] = useState( [] );
+
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverridesForTab( activeView ),
+		[ activeView ]
+	);
 
 	const { view, updateView } = useView( {
 		kind: 'postType',
 		name: NAVIGATION_POST_TYPE,
 		slug: 'navigation-menus',
 		defaultView: DEFAULT_VIEW,
+		activeViewOverrides,
 		queryParams: {
 			page: query?.pageNumber,
 			search: query?.search,
@@ -68,24 +105,43 @@ export default function NavigationMenuList() {
 		},
 	} );
 
-	const onChangeSelection = useCallback(
-		( items ) => {
-			setSelection( items );
-			history.navigate(
-				addQueryArgs( path, {
-					...query,
-					postId: items[ 0 ] || undefined,
-				} )
-			);
-		},
-		[ path, query, history ]
-	);
+	const onChangeView = useEvent( ( newView ) => {
+		updateView( newView );
+		if ( newView.type !== view.type ) {
+			history.invalidate();
+		}
+	} );
 
-	useEffect( () => {
-		setSelection( postId ? [ postId ] : [] );
-	}, [ postId ] );
+	const onChangeSelection = useCallback( ( items ) => {
+		setSelection( items );
+	}, [] );
 
 	const fields = usePostFields( { postType: NAVIGATION_POST_TYPE } );
+
+	const queryArgs = useMemo( () => {
+		const filters = {};
+		view.filters?.forEach( ( filter ) => {
+			if (
+				filter.field === 'status' &&
+				filter.operator === OPERATOR_IS_ANY
+			) {
+				filters.status = filter.value;
+			}
+		} );
+
+		if ( ! filters.status || filters.status === '' ) {
+			filters.status = DEFAULT_STATUSES;
+		}
+
+		return {
+			per_page: view.perPage,
+			page: view.page,
+			order: view.sort?.direction,
+			orderby: view.sort?.field,
+			search: view.search,
+			...filters,
+		};
+	}, [ view ] );
 
 	const {
 		records,
@@ -95,17 +151,7 @@ export default function NavigationMenuList() {
 	} = useEntityRecordsWithPermissions(
 		'postType',
 		NAVIGATION_POST_TYPE,
-		useMemo(
-			() => ( {
-				...PRELOADED_NAVIGATION_MENUS_QUERY,
-				per_page: view.perPage,
-				page: view.page,
-				search: view.search,
-				order: view.sort?.direction,
-				orderby: view.sort?.field,
-			} ),
-			[ view.perPage, view.page, view.search, view.sort ]
-		)
+		queryArgs
 	);
 
 	const data = records ?? EMPTY_ARRAY;
@@ -125,18 +171,30 @@ export default function NavigationMenuList() {
 		};
 	}, [] );
 
+	const postTypeActions = usePostActions( {
+		postType: NAVIGATION_POST_TYPE,
+		context: 'list',
+	} );
 	const historyForActions = useHistory();
 	const editAction = useMemo(
 		() => ( {
 			id: 'edit-post',
 			label: __( 'Edit' ),
 			isPrimary: true,
+			isEligible( post ) {
+				return post.status !== 'trash';
+			},
 			callback( items ) {
 				historyForActions.navigate( `/navigation/${ items[ 0 ].id }` );
 			},
 		} ),
 		[ historyForActions ]
 	);
+
+	const actions = useMemo( () => {
+		return [ editAction, ...postTypeActions ];
+	}, [ editAction, postTypeActions ] );
+
 	const [ showAddModal, setShowAddModal ] = useState( false );
 	const openModal = () => setShowAddModal( true );
 	const closeModal = () => setShowAddModal( false );
@@ -144,16 +202,6 @@ export default function NavigationMenuList() {
 		history.navigate( `/navigation/${ newMenu.id }` );
 		closeModal();
 	};
-
-	// Default selection to first menu when none selected and we have data.
-	const firstItemId = data[ 0 ]?.id;
-	useEffect( () => {
-		if ( selection.length === 0 && firstItemId && ! postId ) {
-			history.navigate(
-				addQueryArgs( path, { ...query, postId: firstItemId } )
-			);
-		}
-	}, [ firstItemId, postId, selection.length, history, path, query ] );
 
 	return (
 		<Page
@@ -182,16 +230,17 @@ export default function NavigationMenuList() {
 			}
 		>
 			<DataViews
+				key={ activeView }
 				paginationInfo={ paginationInfo }
 				fields={ fields }
-				actions={ [ { ...editAction, isPrimary: true } ] }
+				actions={ actions }
 				data={ data }
 				isLoading={ isLoadingData || ! fields }
 				view={ view }
-				onChangeView={ updateView }
+				onChangeView={ onChangeView }
 				selection={ selection }
 				onChangeSelection={ onChangeSelection }
-				isItemClickable={ () => true }
+				isItemClickable={ ( item ) => item.status !== 'trash' }
 				onClickItem={ ( { id } ) => {
 					history.navigate( `/navigation/${ id }` );
 				} }
