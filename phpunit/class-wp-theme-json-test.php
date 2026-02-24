@@ -5744,8 +5744,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	public function test_get_background_gradient_preset_slug_styles() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
-				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'   => array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
 					'background' => array(
 						'gradient' => 'var:preset|gradient|vivid-cyan-blue',
 					),

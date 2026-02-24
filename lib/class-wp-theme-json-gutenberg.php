@@ -2573,7 +2573,7 @@ class WP_Theme_JSON_Gutenberg {
 					$background_styles = gutenberg_style_engine_get_styles(
 						array( 'background' => $background_image_input )
 					);
-					$value = $background_styles['declarations'][ $css_property ] ?? null;
+					$value             = $background_styles['declarations'][ $css_property ] ?? null;
 				}
 			}
 			if ( empty( $value ) && static::ROOT_BLOCK_SELECTOR !== $selector && ! empty( $styles['background']['backgroundImage']['id'] ) ) {
