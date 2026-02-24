@@ -10,25 +10,33 @@
 /**
  * Tests a single AI provider.
  *
+ * @param object $registry The provider registry.
  * @param string $provider_id The provider ID.
  * @return array Test result.
  */
-function gutenberg_test_ai_provider( $provider_id ) {
+function gutenberg_test_ai_provider( $registry, $provider_id ) {
+	$result = array(
+		'is_registered' => $registry->hasProvider( $provider_id ),
+		'is_configured' => $registry->isProviderConfigured( $provider_id ),
+	);
+
 	try {
-		$result = wp_ai_client_prompt( 'Say the word I will pass' )
+		$response = wp_ai_client_prompt( 'Say the word I will pass' )
 			->with_text( 'hello' )
 			->using_provider( $provider_id )
 			->generate_text();
-		return array(
+		$result['prompt_test'] = array(
 			'status'   => 'success',
-			'response' => $result,
+			'response' => $response,
 		);
 	} catch ( Exception $e ) {
-		return array(
+		$result['prompt_test'] = array(
 			'status'  => 'error',
 			'message' => $e->getMessage(),
 		);
 	}
+
+	return $result;
 }
 
 /**
@@ -40,10 +48,18 @@ function gutenberg_test_ai_providers() {
 		return;
 	}
 
+	try {
+		$registry = \WordPress\AiClient\AiClient::defaultRegistry();
+	} catch ( \Error $e ) {
+		header( 'Content-Type: application/json' );
+		echo wp_json_encode( array( 'error' => 'WP AI Client not available: ' . $e->getMessage() ) );
+		exit;
+	}
+
 	$results = array(
-		'gemini' => gutenberg_test_ai_provider( 'google' ),
-		'openai' => gutenberg_test_ai_provider( 'openai' ),
-		'claude' => gutenberg_test_ai_provider( 'anthropic' ),
+		'gemini' => gutenberg_test_ai_provider( $registry, 'google' ),
+		'openai' => gutenberg_test_ai_provider( $registry, 'openai' ),
+		'claude' => gutenberg_test_ai_provider( $registry, 'anthropic' ),
 	);
 
 	header( 'Content-Type: application/json' );
