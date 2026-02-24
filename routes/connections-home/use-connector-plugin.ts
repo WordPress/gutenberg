@@ -35,7 +35,10 @@ export function useConnectorPlugin( {
 	const [ isBusy, setIsBusy ] = useState( false );
 	const [ currentApiKey, setCurrentApiKey ] = useState( '' );
 
-	const isConnected = pluginStatus === 'active' && currentApiKey !== '';
+	const isConnected =
+		pluginStatus === 'active' &&
+		currentApiKey !== '' &&
+		currentApiKey !== 'invalid_key';
 
 	// Fetch the current API key
 	const fetchApiKey = useCallback( async () => {
@@ -43,7 +46,8 @@ export function useConnectorPlugin( {
 			const settings = await apiFetch< Record< string, string > >( {
 				path: '/wp/v2/settings',
 			} );
-			setCurrentApiKey( settings[ settingName ] || '' );
+			const key = settings[ settingName ] || '';
+			setCurrentApiKey( key === 'invalid_key' ? '' : key );
 		} catch {
 			// Ignore errors
 		}

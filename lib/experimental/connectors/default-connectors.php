@@ -35,17 +35,15 @@ function gutenberg_add_api_key_mask_filter( $option_name, $provider_id = '' ) {
 				try {
 					$registry = \WordPress\AiClient\AiClient::defaultRegistry();
 
-					if ( ! $registry->hasProvider( $provider_id ) ) {
-						return '';
-					}
+					if ( $registry->hasProvider( $provider_id ) ) {
+						$registry->setProviderRequestAuthentication(
+							$provider_id,
+							new \WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication( $value )
+						);
 
-					$registry->setProviderRequestAuthentication(
-						$provider_id,
-						new \WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication( $value )
-					);
-
-					if ( ! $registry->isProviderConfigured( $provider_id ) ) {
-						return '';
+						if ( ! $registry->isProviderConfigured( $provider_id ) ) {
+							return 'invalid_key';
+						}
 					}
 				} catch ( \Error $e ) {
 					// WP AI Client not available — skip validation, return masked.

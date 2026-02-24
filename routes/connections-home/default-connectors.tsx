@@ -27,7 +27,7 @@ const ConnectedBadge = () => (
 			whiteSpace: 'nowrap',
 		} }
 	>
-		{ __( 'API key provided' ) }
+		{ __( 'Connected' ) }
 	</span>
 );
 
