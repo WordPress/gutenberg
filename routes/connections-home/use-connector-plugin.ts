@@ -126,7 +126,7 @@ export function useConnectorPlugin( {
 				: __( 'Activating…' );
 		}
 		if ( isExpanded ) {
-			return __( 'Close' );
+			return __( 'Cancel' );
 		}
 		switch ( pluginStatus ) {
 			case 'checking':

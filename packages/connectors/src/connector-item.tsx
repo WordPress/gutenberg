@@ -6,6 +6,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalItem as Item,
 	__experimentalText as Text,
+	ExternalLink,
 	FlexBlock,
 	Button,
 	TextControl,
@@ -52,18 +53,22 @@ export function ConnectorItem( {
 	);
 }
 
+export interface DefaultConnectorSettingsProps {
+	onSave?: ( apiKey: string ) => void;
+	initialValue?: string;
+	helpUrl?: string;
+	helpLabel?: string;
+}
+
 /**
  * Default settings form for connectors.
  */
 export function DefaultConnectorSettings( {
 	onSave,
-	onCancel,
 	initialValue = '',
-}: {
-	onSave?: ( apiKey: string ) => void;
-	onCancel?: () => void;
-	initialValue?: string;
-} ) {
+	helpUrl,
+	helpLabel,
+}: DefaultConnectorSettingsProps ) {
 	const [ apiKey, setApiKey ] = useState( initialValue );
 
 	return (
@@ -73,12 +78,19 @@ export function DefaultConnectorSettings( {
 				label={ __( 'API Key' ) }
 				value={ apiKey }
 				onChange={ setApiKey }
-				placeholder={ __( 'Enter your API key' ) }
+				placeholder="YOUR_API_KEY"
+				help={
+					helpUrl ? (
+						<>
+							{ __( 'Get your API key at' ) }{ ' ' }
+							<ExternalLink href={ helpUrl }>
+								{ helpLabel || helpUrl.replace( /^https?:\/\//, '' ) }
+							</ExternalLink>
+						</>
+					) : undefined
+				}
 			/>
-			<HStack justify="flex-end">
-				<Button variant="secondary" onClick={ onCancel }>
-					{ __( 'Cancel' ) }
-				</Button>
+			<HStack justify="flex-start">
 				<Button
 					variant="primary"
 					onClick={ () => onSave?.( apiKey ) }

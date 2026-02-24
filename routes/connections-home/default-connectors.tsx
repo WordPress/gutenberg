@@ -8,7 +8,6 @@ import {
 	DefaultConnectorSettings,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
-import { chevronUp } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -99,14 +98,8 @@ function OpenAIConnector( { label, description }: ConnectorRenderProps ) {
 			description={ description }
 			actionArea={
 				<Button
-					variant="secondary"
-					size="compact"
-					icon={
-						pluginStatus === 'active' && isExpanded
-							? chevronUp
-							: undefined
-					}
-					iconPosition="right"
+					variant={ isExpanded ? 'tertiary' : 'secondary' }
+					size={ isExpanded ? undefined : 'compact' }
 					onClick={ handleButtonClick }
 					disabled={ pluginStatus === 'checking' || isBusy }
 					isBusy={ isBusy }
@@ -119,11 +112,12 @@ function OpenAIConnector( { label, description }: ConnectorRenderProps ) {
 			{ isExpanded && pluginStatus === 'active' && (
 				<DefaultConnectorSettings
 					initialValue={ currentApiKey }
+					helpUrl="https://platform.openai.com"
+					helpLabel="platform.openai.com"
 					onSave={ async ( apiKey: string ) => {
 						await saveApiKey( apiKey );
 						setIsExpanded( false );
 					} }
-					onCancel={ () => setIsExpanded( false ) }
 				/>
 			) }
 		</ConnectorItem>
@@ -153,14 +147,8 @@ function ClaudeConnector( { label, description }: ConnectorRenderProps ) {
 			description={ description }
 			actionArea={
 				<Button
-					variant="secondary"
-					size="compact"
-					icon={
-						pluginStatus === 'active' && isExpanded
-							? chevronUp
-							: undefined
-					}
-					iconPosition="right"
+					variant={ isExpanded ? 'tertiary' : 'secondary' }
+					size={ isExpanded ? undefined : 'compact' }
 					onClick={ handleButtonClick }
 					disabled={ pluginStatus === 'checking' || isBusy }
 					isBusy={ isBusy }
@@ -173,11 +161,12 @@ function ClaudeConnector( { label, description }: ConnectorRenderProps ) {
 			{ isExpanded && pluginStatus === 'active' && (
 				<DefaultConnectorSettings
 					initialValue={ currentApiKey }
+					helpUrl="https://console.anthropic.com"
+					helpLabel="console.anthropic.com"
 					onSave={ async ( apiKey: string ) => {
 						await saveApiKey( apiKey );
 						setIsExpanded( false );
 					} }
-					onCancel={ () => setIsExpanded( false ) }
 				/>
 			) }
 		</ConnectorItem>
@@ -207,14 +196,8 @@ function GeminiConnector( { label, description }: ConnectorRenderProps ) {
 			description={ description }
 			actionArea={
 				<Button
-					variant="secondary"
-					size="compact"
-					icon={
-						pluginStatus === 'active' && isExpanded
-							? chevronUp
-							: undefined
-					}
-					iconPosition="right"
+					variant={ isExpanded ? 'tertiary' : 'secondary' }
+					size={ isExpanded ? undefined : 'compact' }
 					onClick={ handleButtonClick }
 					disabled={ pluginStatus === 'checking' || isBusy }
 					isBusy={ isBusy }
@@ -227,11 +210,12 @@ function GeminiConnector( { label, description }: ConnectorRenderProps ) {
 			{ isExpanded && pluginStatus === 'active' && (
 				<DefaultConnectorSettings
 					initialValue={ currentApiKey }
+					helpUrl="https://aistudio.google.com"
+					helpLabel="aistudio.google.com"
 					onSave={ async ( apiKey: string ) => {
 						await saveApiKey( apiKey );
 						setIsExpanded( false );
 					} }
-					onCancel={ () => setIsExpanded( false ) }
 				/>
 			) }
 		</ConnectorItem>
