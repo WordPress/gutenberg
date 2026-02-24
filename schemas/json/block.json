@@ -376,6 +376,11 @@
 							"description": "Allow blocks to define values related to the size of a background image, including size, position, and repeat controls",
 							"type": "boolean",
 							"default": false
+						},
+						"gradient": {
+							"description": "Allow blocks to define gradient values.",
+							"type": "boolean",
+							"default": false
 						}
 					}
 				},
