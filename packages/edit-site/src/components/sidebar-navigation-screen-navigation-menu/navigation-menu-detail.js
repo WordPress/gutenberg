@@ -44,9 +44,7 @@ export default function NavigationMenuDetail() {
 	return (
 		<Page
 			title={ title || __( 'Navigation Menu' ) }
-			subTitle={ __(
-				'Navigation Menus are a curated collection of blocks that allow visitors to get around your site.'
-			) }
+			subTitle={ __( 'Edit this navigation.' ) }
 		>
 			<div style={ { paddingTop: '24px' } }>
 				<NavigationMenuEditor
