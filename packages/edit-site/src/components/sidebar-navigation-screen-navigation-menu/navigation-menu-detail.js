@@ -46,7 +46,7 @@ export default function NavigationMenuDetail() {
 			title={ title || __( 'Navigation Menu' ) }
 			subTitle={ __( 'Edit this navigation.' ) }
 		>
-			<div style={ { paddingTop: '24px' } }>
+			<div style={ { paddingTop: '18px' } }>
 				<NavigationMenuEditor
 					navigationMenuId={ parseInt( postId ) }
 					hasDarkBackground={ false }

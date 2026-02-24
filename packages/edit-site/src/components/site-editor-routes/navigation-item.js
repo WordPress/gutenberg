@@ -61,6 +61,6 @@ export const navigationItemRoute = {
 		},
 	},
 	widths: {
-		content: 280,
+		content: 320,
 	},
 };
