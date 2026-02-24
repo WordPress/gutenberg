@@ -2109,7 +2109,7 @@ Example:
 
 ### `layout`
 
-Represents the type of layout used to render the field. It'll be one of Regular, Panel, Card, or Row. This prop is the same as the `form.layout` prop.
+Represents the type of layout used to render the field. It'll be one of Regular, Panel, Card, Row, or Details. This prop is the same as the `form.layout` prop.
 
 #### Regular
 
@@ -2201,6 +2201,25 @@ For example:
 	layout: {
 		type: 'row',
 		alignment: 'start'
+	},
+}
+```
+
+#### Details
+
+-   `type`: `details`. Required.
+-   `summary`: Summary field configuration. Optional. Specifies which field to display in the details summary. A string (single field ID)
+
+The Details layout renders the field inside a collapsible `<details>` HTML element. The `summary` property controls the text shown in the disclosure summary.
+
+For example:
+
+```js
+{
+	id: 'field_id',
+	layout: {
+		type: 'details',
+		summary: 'summaryFieldId'
 	},
 }
 ```
