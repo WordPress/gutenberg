@@ -92,7 +92,12 @@ export default function NavigationMenuDetail( { menuId } ) {
 
 	return (
 		<ExperimentalBlockEditorProvider settings={ settings }>
-			<Page title={ __( 'Active Menu locations' ) }>
+			<Page
+				title={ __( 'Active Menu locations' ) }
+				subTitle={ __(
+					'Template parts where this menu is displayed on your site.'
+				) }
+			>
 				<DataViews
 					data={ data }
 					fields={ TEMPLATE_PART_FIELDS }
