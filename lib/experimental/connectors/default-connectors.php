@@ -23,13 +23,35 @@ function gutenberg_mask_api_key( $key ) {
  *
  * @param string $option_name The option name to mask.
  */
-function gutenberg_add_api_key_mask_filter( $option_name ) {
+function gutenberg_add_api_key_mask_filter( $option_name, $provider_id = '' ) {
 	add_filter(
 		"option_{$option_name}",
-		function ( $value ) {
+		function ( $value ) use ( $provider_id ) {
 			if ( empty( $value ) ) {
 				return $value;
 			}
+
+			if ( $provider_id ) {
+				try {
+					$registry = \WordPress\AiClient\AiClient::defaultRegistry();
+
+					if ( ! $registry->hasProvider( $provider_id ) ) {
+						return '';
+					}
+
+					$registry->setProviderRequestAuthentication(
+						$provider_id,
+						new \WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication( $value )
+					);
+
+					if ( ! $registry->isProviderConfigured( $provider_id ) ) {
+						return '';
+					}
+				} catch ( \Error $e ) {
+					// WP AI Client not available — skip validation, return masked.
+				}
+			}
+
 			return gutenberg_mask_api_key( $value );
 		}
 	);
@@ -43,14 +65,14 @@ function gutenberg_add_api_key_mask_filter( $option_name ) {
  * @param string $option_name The option name for the API key.
  * @return string The real API key value.
  */
-function gutenberg_get_real_api_key( $option_name ) {
+function gutenberg_get_real_api_key( $option_name, $provider_id = '' ) {
 	// Remove all masking filters on this option.
 	remove_all_filters( "option_{$option_name}" );
 
 	$value = get_option( $option_name, '' );
 
 	// Re-add the masking filter.
-	gutenberg_add_api_key_mask_filter( $option_name );
+	gutenberg_add_api_key_mask_filter( $option_name, $provider_id );
 
 	return $value;
 }
@@ -75,7 +97,7 @@ function gutenberg_register_connector_api_key_setting( $option_name, $provider_i
 		)
 	);
 
-	gutenberg_add_api_key_mask_filter( $option_name );
+	gutenberg_add_api_key_mask_filter( $option_name, $provider_id );
 
 	if ( $provider_id ) {
 		gutenberg_add_api_key_validation_filter( $option_name, $provider_id );
@@ -138,7 +160,7 @@ function gutenberg_add_api_key_validation_filter( $option_name, $provider_id ) {
  * @param string $provider_id The WP AI client provider ID.
  */
 function gutenberg_pass_connector_key_to_ai_client( $option_name, $provider_id ) {
-	$api_key = gutenberg_get_real_api_key( $option_name );
+	$api_key = gutenberg_get_real_api_key( $option_name, $provider_id );
 
 	if ( empty( $api_key ) ) {
 		return;
