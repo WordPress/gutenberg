@@ -81,6 +81,72 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		$background_styles['gradient'] = $block_attributes['style']['background']['gradient'] ?? null;
 	}
 
+	/*
+	 * Use an <img> element for media library images with cover/contain sizing and no repeat,
+	 * so the browser can benefit from srcset, sizes, loading="lazy", and decoding="async".
+	 */
+	$attachment_id = is_array( $background_styles['backgroundImage'] )
+		? (int) ( $background_styles['backgroundImage']['id'] ?? 0 )
+		: 0;
+
+	$use_img_element = (
+		$attachment_id > 0 &&
+		in_array( $background_styles['backgroundSize'], array( 'cover', 'contain' ), true ) &&
+		empty( $background_styles['backgroundRepeat'] ) &&
+		empty( $background_styles['backgroundAttachment'] )
+	);
+
+	if ( $use_img_element ) {
+		$object_fit      = $background_styles['backgroundSize'];
+		$object_position = $background_styles['backgroundPosition'] ?? null;
+
+		$img_style = 'position:absolute;top:0;left:0;right:0;bottom:0;margin:0;padding:0;width:100%;height:100%;max-width:none;max-height:none;pointer-events:none;object-fit:' . esc_attr( $object_fit ) . ';';
+		if ( $object_position ) {
+			$img_style .= 'object-position:' . esc_attr( $object_position ) . ';';
+		}
+
+		$img_attrs = array(
+			'class'           => 'wp-block__background-image alignfull',
+			'style'           => $img_style,
+			'alt'             => '',
+			'aria-hidden'     => 'true',
+			'data-object-fit' => $object_fit,
+		);
+		if ( $object_position ) {
+			$img_attrs['data-object-position'] = $object_position;
+		}
+
+		$img_html = wp_get_attachment_image( $attachment_id, 'full', false, $img_attrs );
+
+		if ( $img_html ) {
+			$tags = new WP_HTML_Tag_Processor( $block_content );
+			if ( $tags->next_tag() ) {
+				$tag_name       = strtolower( $tags->get_tag() );
+				$existing_style = $tags->get_attribute( 'style' );
+
+				if ( is_string( $existing_style ) && '' !== $existing_style ) {
+					$separator     = str_ends_with( $existing_style, ';' ) ? '' : ';';
+					$wrapper_style = $existing_style . $separator . 'position:relative;';
+				} else {
+					$wrapper_style = 'position:relative;';
+				}
+
+				$tags->set_attribute( 'style', $wrapper_style );
+				$tags->add_class( 'has-background' );
+			}
+			$modified_content = $tags->get_updated_html();
+
+			// Insert the img as the first child of the wrapper element.
+			$open_tag_pattern = sprintf( '/^(\s*<%s\b[^>]*>)/i', preg_quote( $tag_name, '/' ) );
+			if ( 1 === preg_match( $open_tag_pattern, $modified_content, $matches, PREG_OFFSET_CAPTURE ) ) {
+				$insert_at        = $matches[0][1] + strlen( $matches[0][0] );
+				$modified_content = substr( $modified_content, 0, $insert_at ) . $img_html . substr( $modified_content, $insert_at );
+			}
+
+			return $modified_content;
+		}
+	}
+
 	$styles = gutenberg_style_engine_get_styles( array( 'background' => $background_styles ) );
 
 	if ( ! empty( $styles['css'] ) ) {
