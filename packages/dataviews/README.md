@@ -207,7 +207,7 @@ const view = {
 
 Properties:
 
--   `type`: view type, one of `table`, `grid`, `list`. See "Layout types".
+-   `type`: view type, one of `table`, `grid`, `list`, `activity`, `pickerTable`, `pickerGrid`. See "Layout types".
 -   `search`: the text search applied to the dataset.
 -   `filters`: the filters applied to the dataset. Each item describes:
     -   `field`: which field this filter is bound to.
@@ -250,10 +250,10 @@ Properties:
 
 -   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 -   `enableMoving`: whether the table columns should display moving controls.
--   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column.
+-   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column. The `align` property accepts `'start'`, `'center'`, or `'end'`.
 
 **For column alignment (`align` property), follow these guidelines:**
-Right-align whenever the cell value is fundamentally quantitative—numbers, decimals, currency, percentages—so that digits and decimal points line up, aiding comparison and calculation. Otherwise, default to left-alignment for all other types (text, codes, labels, dates).
+Right-align (`'end'`) whenever the cell value is fundamentally quantitative—numbers, decimals, currency, percentages—so that digits and decimal points line up, aiding comparison and calculation. Otherwise, default to left-alignment (`'start'`) for all other types (text, codes, labels, dates).
 
 `grid` and `pickerGrid` layout:
 
@@ -402,7 +402,7 @@ What text to show in the search input. "Search" by default.
 
 Whether the data is loading. `false` by default.
 
-#### `defaultLayouts`: `Record< string, view >`
+#### `defaultLayouts`: `Object`
 
 This property limits the available layout and provides layout information about active view types. If empty, this enables all layout types (see "Layout Types") with empty layout data.
 
@@ -419,7 +419,7 @@ const defaultLayouts = {
 };
 ```
 
-The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, `list`, and `activity`. These properties are applied to the view object each time the user switches to the corresponding layout.
+The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, `list`, `activity`, `pickerTable`, and `pickerGrid`. These properties are applied to the view object each time the user switches to the corresponding layout.
 
 #### `selection`: `string[]`
 
@@ -825,7 +825,7 @@ const fields = [
 ];
 ```
 
-#### `form`: `Object[]`
+#### `form`: `Object`
 
 -   `layout`: an object describing the layout used to render the top-level fields present in `fields`. See `layout` prop in "Form Field API".
 -   `fields`: a list of fields ids that should be rendered. Field ids can also be defined as an object and allow you to define a `layout`, `labelPosition` or `children` if displaying combined fields. See "Form Field API" for a description of every property.
@@ -1134,7 +1134,7 @@ Function that performs the required action.
 
 ```js
 {
-	callback: ( items, { onActionPerformed } ) => {
+	callback: ( items, { registry, onActionPerformed } ) => {
 		// Perform action.
 		onActionPerformed?.( items );
 	};
@@ -1281,7 +1281,7 @@ Example:
 
 React element used by some layouts (table, grid) to display the field name — useful to add icons, etc.
 
--   Type: React element.
+-   Type: `string` | React element.
 -   Optional.
 -   Defaults to the `label` value.
 
