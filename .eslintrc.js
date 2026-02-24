@@ -437,6 +437,13 @@ module.exports = {
 			extends: [ 'plugin:ssr-friendly/recommended' ],
 		},
 		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
+			rules: {
+				'@wordpress/no-ds-tokens': 'error',
+			},
+		},
+		{
 			files: [
 				'packages/block-editor/src/**',
 				'packages/components/src/**',
