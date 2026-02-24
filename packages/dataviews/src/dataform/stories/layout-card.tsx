@@ -152,7 +152,9 @@ const LayoutCardComponent = ( {
 		isCollapsible: collapsible,
 		isOpened: opened,
 	}: {
-		summary?: string | { id: string; visibility: 'always' }[];
+		summary?:
+			| string
+			| { id: string; visibility?: 'always' | 'when-collapsed' }[];
 		withSummary?: boolean;
 		withHeader?: boolean;
 		isCollapsible?: boolean;
@@ -178,7 +180,13 @@ const LayoutCardComponent = ( {
 				{
 					id: 'customerCard',
 					layout: getCardLayoutFromStoryArgs( {
-						summary: 'plan-summary',
+						summary: [
+							{ id: 'name', visibility: 'when-collapsed' },
+							{
+								id: 'plan-summary',
+								visibility: 'when-collapsed',
+							},
+						],
 						withHeader: withHeader ?? true,
 						withSummary,
 						isCollapsible,
