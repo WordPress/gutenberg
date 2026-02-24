@@ -39,9 +39,7 @@ export default function SingleNavigationMenu( {
 				navigationMenu?.id,
 				navigationMenu?.status
 			) }
-			description={ __(
-				'Navigation Menus are a curated collection of blocks that allow visitors to get around your site.'
-			) }
+			description={ __( 'Edit this navigation.' ) }
 		>
 			<NavigationMenuEditor navigationMenuId={ navigationMenu?.id } />
 		</SidebarNavigationScreenWrapper>
