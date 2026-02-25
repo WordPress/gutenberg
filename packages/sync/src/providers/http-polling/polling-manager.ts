@@ -30,6 +30,7 @@ import {
 
 const POLLING_INTERVAL_IN_MS = 1000; // 1 second or 1000 milliseconds
 const POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS = 250; // 250 milliseconds
+const POLLING_INTERVAL_BACKGROUND_TAB_IN_MS = 30 * 1000; // 30 seconds
 const MAX_ERROR_BACKOFF_IN_MS = 30 * 1000; // 30 seconds
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
 
@@ -241,8 +242,10 @@ function processDocUpdate(
 
 let isPolling = false;
 let isUnloadPending = false;
+let isActiveBrowser = document.visibilityState !== 'hidden';
 let pollInterval = POLLING_INTERVAL_IN_MS;
 let pageHideListenerRegistered = false;
+let pollingTimeoutId: ReturnType< typeof setTimeout > | null = null;
 
 /**
  * Mark that a page unload has been requested. This fires on
@@ -315,7 +318,9 @@ function poll(): void {
 			const { rooms } = await postSyncUpdate( payload );
 
 			// Reset poll interval on success.
-			pollInterval = POLLING_INTERVAL_IN_MS;
+			pollInterval = isActiveBrowser
+				? POLLING_INTERVAL_IN_MS
+				: POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
 
 			// Emit 'connected' status.
 			roomStates.forEach( ( state ) => {
@@ -336,7 +341,9 @@ function poll(): void {
 				// If there is another collaborator, resume the queue for the next poll
 				// and increase polling frequency.
 				if ( Object.keys( room.awareness ).length > 1 ) {
-					pollInterval = POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS;
+					pollInterval = isActiveBrowser
+						? POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS
+						: POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
 					roomState.updateQueue.resume();
 				}
 
@@ -401,12 +408,40 @@ function poll(): void {
 			}
 		}
 
-		setTimeout( poll, pollInterval );
+		pollingTimeoutId = setTimeout( poll, pollInterval );
 	}
 
 	// Start polling.
 	void start();
 }
+
+/**
+ * Toggle visibility state of browser tab.
+ *
+ * Used to trigger a slow down of the collaboration syncs when the
+ * browser tab becomes inactive (either the user swtiches tabs or the
+ * screen saveer comes on).
+ *
+ * Fires on the document's visibilitychange event.
+ */
+function toggleVisbilityChange() {
+	const wasActive = isActiveBrowser;
+	isActiveBrowser = document.visibilityState !== 'hidden';
+	if ( isActiveBrowser && ! wasActive ) {
+		// Remove scheduled polling and repoll immediately when reactivated.
+		//
+		// This ensures that any updates by collaborators are immediately reflectecd
+		// in the document once the browser tab becomes active. Otherwise there would
+		// be a delay of 30 seconds before the updates came through.
+		if ( pollingTimeoutId ) {
+			clearTimeout( pollingTimeoutId );
+			pollingTimeoutId = null;
+		}
+		poll();
+	}
+}
+
+document.addEventListener( 'visibilitychange', toggleVisbilityChange );
 
 function registerRoom( {
 	room,
