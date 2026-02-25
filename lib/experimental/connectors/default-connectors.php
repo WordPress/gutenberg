@@ -122,7 +122,7 @@ function _gutenberg_validate_gemini_api_key_on_save( string $value, string $old_
 		return $value;
 	}
 	$valid = _gutenberg_is_api_key_valid( $value, 'google' );
-	return false === $valid ? $old_value : $value;
+	return true === $valid ? $value : $old_value;
 }
 
 // --- OpenAI ---
