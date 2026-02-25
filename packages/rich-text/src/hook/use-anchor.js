@@ -88,10 +88,10 @@ function createVirtualAnchorElement( range, editableContentElement ) {
 		contextElement: editableContentElement,
 		getBoundingClientRect() {
 			if ( editableContentElement.contains( range.startContainer ) ) {
-				const rect = getRectangleFromRange( range );
-				if ( rect ) {
-					return rect;
-				}
+				return (
+					getRectangleFromRange( range ) ??
+					range.getBoundingClientRect()
+				);
 			}
 
 			return editableContentElement.getBoundingClientRect();
