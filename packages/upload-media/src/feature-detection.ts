@@ -48,7 +48,7 @@ export function detectClientSideMediaSupport(): FeatureDetectionResult {
 	if ( typeof WebAssembly === 'undefined' ) {
 		cachedResult = {
 			supported: false,
-			reason: 'WebAssembly is not supported in this browser',
+			reason: 'WebAssembly is not supported in this browser.',
 		};
 		return cachedResult;
 	}
