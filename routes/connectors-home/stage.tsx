@@ -55,7 +55,7 @@ function ConnectorsPage() {
 				<p>
 					{ createInterpolateElement(
 						__(
-							'If the provider you need is not listed, <a>search the plugin directory</a> to see if a connector is available.'
+							'Find more connectors in <a>the plugin directory</a>'
 						),
 						{
 							a: (
