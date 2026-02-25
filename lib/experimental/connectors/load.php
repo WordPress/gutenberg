@@ -12,7 +12,7 @@ add_action( 'admin_menu', '_gutenberg_connectors_add_settings_menu_item' );
  *
  * @access private
  */
-function _gutenberg_connectors_add_settings_menu_item() {
+function _gutenberg_connectors_add_settings_menu_item(): void {
 	add_submenu_page(
 		'options-general.php',
 		__( 'Connectors', 'gutenberg' ),
