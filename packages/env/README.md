@@ -366,7 +366,7 @@ Options:
   --scripts    Execute any configured lifecycle scripts.
                                                       [boolean] [default: true]
   --auto-port  Automatically find available ports when configured ports are
-               busy.                                  [boolean] [default: false]
+               busy.                                  [boolean]
 ```
 
 ### `wp-env stop`
@@ -594,9 +594,10 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"phpVersion"`       | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress. |
 | `"plugins"`          | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
 | `"themes"`           | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
-| `"port"`             | `integer\|null` | `8888`                                 | The port number to use for the installation. Set to `null` and use `--auto-port` to automatically find an available port. |
+| `"port"`             | `integer`      | `8888`                                 | The port number to use for the installation. |
 | `"testsEnvironment"` | `boolean`      | `false`                                | _Deprecated._ Whether to create a separate test environment with its own database and containers. Use `--config` with a separate config file instead. |
-| `"testsPort"`        | `integer\|null` | `8889`                                 | The port number for the test site. Set to `null` and use `--auto-port` to automatically find an available port. |
+| `"testsPort"`        | `integer`      | `8889`                                 | The port number for the test site. |
+| `"autoPort"`         | `boolean`      | `false`                                | Whether to automatically find available HTTP ports when configured ports are busy. |
 | `"config"`           | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`         | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
 | `"mysqlPort"`        | `integer`      | `null` (randomly assigned)             | The MySQL port number to expose.                                                                                                 |
@@ -617,7 +618,7 @@ To opt in to automatic port selection, pass the `--auto-port` flag:
 wp-env start --auto-port
 ```
 
-When `--auto-port` is enabled and a configured port is busy, `wp-env` automatically finds an available port in the ephemeral range (49152-65535) and displays a message indicating the new port. You can also set `"port": null` in `.wp-env.json` to let `wp-env` try the default port first and fall back to an available one.
+When `--auto-port` (or `"autoPort": true`) is enabled and a configured port is busy, `wp-env` scans upward from the configured port to find the next available one (for example: `8888`, `8889`, `8890`, ...). Automatic port selection is disabled when `CI` is set.
 
 Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields.
 

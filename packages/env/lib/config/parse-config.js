@@ -35,6 +35,7 @@ const mergeConfigs = require( './merge-configs' );
  * @typedef WPRootConfigOptions
  * @property {number}                               port                          The port to use in the development environment.
  * @property {number}                               testsPort                     The port to use in the tests environment.
+ * @property {boolean}                              autoPort                      Whether to automatically select a nearby available HTTP port.
  * @property {Object.<string, string|null>}         lifecycleScripts              The scripts to run at certain points in the command lifecycle.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterStart   The script to run after the "start" command has completed.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterClean   The script to run after the "clean" command has completed.
@@ -89,6 +90,7 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	themes: [],
 	port: 8888,
 	testsPort: 8889,
+	autoPort: false,
 	mysqlPort: null,
 	phpmyadmin: false,
 	phpmyadminPort: null,
@@ -382,10 +384,16 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 
 	// Parse any root-only options.
 	if ( rawConfig.testsPort !== undefined ) {
-		if ( rawConfig.testsPort !== null ) {
-			checkPort( configFile, `testsPort`, rawConfig.testsPort );
-		}
+		checkPort( configFile, `testsPort`, rawConfig.testsPort );
 		parsedConfig.testsPort = rawConfig.testsPort;
+	}
+	if ( rawConfig.autoPort !== undefined ) {
+		if ( typeof rawConfig.autoPort !== 'boolean' ) {
+			throw new ValidationError(
+				`Invalid ${ configFile }: "autoPort" must be a boolean.`
+			);
+		}
+		parsedConfig.autoPort = rawConfig.autoPort;
 	}
 	if ( rawConfig.testsEnvironment !== undefined ) {
 		if ( typeof rawConfig.testsEnvironment !== 'boolean' ) {
@@ -472,6 +480,7 @@ async function parseEnvironmentConfig(
 		// configuration options that we will parse.
 		switch ( key ) {
 			case 'testsPort':
+			case 'autoPort':
 			case 'testsEnvironment':
 			case 'lifecycleScripts':
 			case 'env': {
@@ -493,9 +502,7 @@ async function parseEnvironmentConfig(
 	const parsedConfig = {};
 
 	if ( config.port !== undefined ) {
-		if ( config.port !== null ) {
-			checkPort( configFile, `${ environmentPrefix }port`, config.port );
-		}
+		checkPort( configFile, `${ environmentPrefix }port`, config.port );
 		parsedConfig.port = config.port;
 	}
 

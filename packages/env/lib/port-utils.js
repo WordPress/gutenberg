@@ -4,9 +4,6 @@
  */
 const net = require( 'net' );
 
-/**
- * Default port range bounds.
- */
 const DEFAULT_MIN_PORT = 49152;
 const DEFAULT_MAX_PORT = 65535;
 
@@ -41,15 +38,22 @@ async function isPortAvailable( port ) {
 
 /**
  * Finds an available port, starting with the preferred port.
- * Falls back to scanning the ephemeral port range (49152-65535).
+ * Falls back to scanning upward from the preferred port.
  *
  * @param {Object}   options               Options for finding a port.
  * @param {number}   options.preferredPort The preferred port to try first.
+ * @param {number}   options.minPort       Minimum port for fallback scanning.
+ * @param {number}   options.maxPort       Maximum port for fallback scanning.
  * @param {number[]} options.exclude       Ports to exclude from selection.
  * @return {Promise<number>} An available port number.
  * @throws {Error} If no available port is found within the range.
  */
-async function findAvailablePort( { preferredPort, exclude = [] } ) {
+async function findAvailablePort( {
+	preferredPort,
+	minPort = preferredPort,
+	maxPort = DEFAULT_MAX_PORT,
+	exclude = [],
+} ) {
 	// Try the preferred port first if it's not excluded
 	if ( ! exclude.includes( preferredPort ) ) {
 		const isAvailable = await isPortAvailable( preferredPort );
@@ -58,8 +62,9 @@ async function findAvailablePort( { preferredPort, exclude = [] } ) {
 		}
 	}
 
-	// If preferred port is not available, search the ephemeral range
-	for ( let port = DEFAULT_MIN_PORT; port <= DEFAULT_MAX_PORT; port++ ) {
+	// If preferred port is not available, scan upward from the selected minimum.
+	const startPort = Math.max( minPort, preferredPort + 1 );
+	for ( let port = startPort; port <= maxPort; port++ ) {
 		if ( exclude.includes( port ) ) {
 			continue;
 		}
@@ -70,7 +75,7 @@ async function findAvailablePort( { preferredPort, exclude = [] } ) {
 	}
 
 	throw new Error(
-		`No available port found in range ${ DEFAULT_MIN_PORT }-${ DEFAULT_MAX_PORT }.`
+		`No available port found in range ${ startPort }-${ maxPort }.`
 	);
 }
 

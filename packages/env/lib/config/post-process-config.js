@@ -79,6 +79,10 @@ function mergeRootToEnvironments( config ) {
 			delete config.testsPort;
 		}
 	}
+	if ( config.autoPort !== undefined ) {
+		removedRootOptions.autoPort = config.autoPort;
+		delete config.autoPort;
+	}
 	if ( config.lifecycleScripts !== undefined ) {
 		removedRootOptions.lifecycleScripts = config.lifecycleScripts;
 		delete config.lifecycleScripts;

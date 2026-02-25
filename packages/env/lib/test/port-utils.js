@@ -103,7 +103,7 @@ describe( 'port-utils', () => {
 			const result = await findAvailablePort( {
 				preferredPort: 8888,
 			} );
-			expect( result ).toBe( DEFAULT_MIN_PORT );
+			expect( result ).toBe( 8889 );
 		} );
 
 		it( 'excludes specified ports', async () => {
@@ -112,16 +112,25 @@ describe( 'port-utils', () => {
 				preferredPort: 8888,
 				exclude: [ 8888 ],
 			} );
-			expect( result ).toBe( DEFAULT_MIN_PORT );
+			expect( result ).toBe( 8889 );
 		} );
 
-		it( 'returns a port within the ephemeral range', async () => {
-			mockPortAvailability( ( port ) => port !== 8888 );
+		it( 'returns a port higher than the preferred port when fallback is needed', async () => {
+			mockPortAvailability( ( port ) => port !== 8888 && port !== 8889 );
 			const result = await findAvailablePort( {
 				preferredPort: 8888,
 			} );
-			expect( result ).toBeGreaterThanOrEqual( DEFAULT_MIN_PORT );
+			expect( result ).toBeGreaterThan( 8888 );
 			expect( result ).toBeLessThanOrEqual( DEFAULT_MAX_PORT );
+		} );
+
+		it( 'supports overriding fallback range', async () => {
+			mockPortAvailability( ( port ) => port === DEFAULT_MIN_PORT + 1 );
+			const result = await findAvailablePort( {
+				preferredPort: 8888,
+				minPort: DEFAULT_MIN_PORT,
+			} );
+			expect( result ).toBe( DEFAULT_MIN_PORT + 1 );
 		} );
 	} );
 } );

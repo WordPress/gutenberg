@@ -13,6 +13,7 @@ const md5 = require( '../md5' );
 const { parseConfig, getConfigFilePath } = require( './parse-config' );
 const { ValidationError } = require( './validate-config' );
 const postProcessConfig = require( './post-process-config' );
+const { createPortResolver } = require( '../resolve-available-ports' );
 
 /**
  * @typedef {import('./parse-config').WPRootConfig} WPRootConfig
@@ -39,14 +40,16 @@ const postProcessConfig = require( './post-process-config' );
  * @param {string}      configDirectoryPath  The directory we want to load the config from.
  * @param {string|null} customConfigPath     Optional custom config file path.
  * @param {Object}      options              Options for loading the config.
- * @param {Object}      options.portResolver An optional port resolver for automatic port selection.
+ * @param {boolean}     options.resolvePorts Whether HTTP ports should be resolved for this command.
+ * @param {boolean}     options.autoPort     CLI override for automatic port selection.
+ * @param {Object}      options.spinner      A CLI spinner used by the port resolver.
  *
  * @return {Promise<WPConfig>} The config object we've loaded.
  */
 module.exports = async function loadConfig(
 	configDirectoryPath,
 	customConfigPath = null,
-	{ portResolver } = {}
+	{ resolvePorts = false, autoPort, spinner } = {}
 ) {
 	const configFilePath = getConfigFilePath(
 		configDirectoryPath,
@@ -77,6 +80,21 @@ module.exports = async function loadConfig(
 		cacheDirectoryPath,
 		customConfigPath
 	);
+
+	let portResolver;
+	if ( resolvePorts ) {
+		let shouldAutoPort =
+			autoPort !== undefined ? autoPort : config.autoPort;
+
+		// Automatic port selection is undesirable in CI where determinism matters.
+		if ( process.env.CI ) {
+			shouldAutoPort = false;
+		}
+
+		if ( shouldAutoPort ) {
+			portResolver = createPortResolver( spinner );
+		}
+	}
 
 	// Make sure to perform any additional post-processing that
 	// may be needed before the config object is ready for

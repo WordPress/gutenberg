@@ -154,8 +154,7 @@ module.exports = function cli() {
 			args.option( 'auto-port', {
 				type: 'boolean',
 				describe:
-					'Automatically find available ports when configured ports are busy.',
-				default: false,
+					'Automatically find available ports when configured ports are busy. Overrides the .wp-env.json "autoPort" setting.',
 			} );
 		},
 		withSpinner( env.start )

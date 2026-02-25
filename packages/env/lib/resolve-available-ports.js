@@ -17,9 +17,8 @@ const PORT_DEFINITIONS = [
 ];
 
 /**
- * Well-known preferred ports for auto-resolved (null) port properties.
- * When a port defaults to null, the resolver tries these first before
- * falling back to an ephemeral port.
+ * Well-known preferred ports for auto-resolved HTTP port properties.
+ * Auto-port tries these first and then scans upward to find a free port.
  */
 const PREFERRED_PORTS = {
 	'development.port': 8888,
@@ -58,14 +57,14 @@ function createPortResolver( spinner ) {
 				if ( usedPorts.includes( preferredPort ) ) {
 					throw new Error(
 						`Port ${ preferredPort } (${ configPath }) conflicts with another wp-env service. ` +
-							`Set a different port or use null for automatic port selection.`
+							`Set a different port or enable automatic port selection with --auto-port or "autoPort": true.`
 					);
 				}
 				const available = await isPortAvailable( preferredPort );
 				if ( ! available ) {
 					throw new Error(
 						`Port ${ preferredPort } (${ configPath }) is busy. ` +
-							`Free the port, set a different one, or use null for automatic port selection.`
+							`Free the port, set a different one, or enable automatic port selection with --auto-port or "autoPort": true.`
 					);
 				}
 				usedPorts.push( preferredPort );
@@ -108,8 +107,8 @@ async function resolveConfigPorts( config, portResolver ) {
 			continue;
 		}
 
-		// For null ports (auto-resolve), use a well-known preferred port.
-		// For explicit ports, use the configured value in strict mode.
+		// Use a well-known preferred port when one isn't explicitly set.
+		// For explicit ports, use the configured value.
 		const key = `${ env }.${ property }`;
 		const preferredPort = currentValue ?? PREFERRED_PORTS[ key ];
 

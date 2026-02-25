@@ -11,7 +11,6 @@ const { rimraf } = require( 'rimraf' );
  * Internal dependencies
  */
 const { loadConfig } = require( '../config' );
-const { createPortResolver } = require( '../resolve-available-ports' );
 const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
 const { getRuntime, getSavedRuntime, saveRuntime } = require( '../runtime' );
 
@@ -53,9 +52,10 @@ module.exports = async function start( {
 		await checkForLegacyInstall( spinner );
 	}
 
-	const portResolver = autoPort ? createPortResolver( spinner ) : null;
 	const config = await loadConfig( path.resolve( '.' ), customConfigPath, {
-		portResolver,
+		resolvePorts: true,
+		autoPort,
+		spinner,
 	} );
 	config.debug = debug;
 	config.xdebug = xdebug;
