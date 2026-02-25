@@ -6,14 +6,44 @@ const internalsKey = '_reactInternals';
 const HostComponent = 5;
 const HostText = 6;
 
+function findCurrentFiber( fiber: any ): any {
+	if ( ! fiber.alternate ) {
+		// First mount — only one version exists, and it's current.
+		return fiber;
+	}
+
+	// Walk up to the HostRoot to figure out which tree this fiber is on.
+	let node = fiber;
+	while ( node.return ) {
+		node = node.return;
+	}
+
+	// The root's stateNode.current points to the current tree's root fiber.
+	if ( node.stateNode.current === node ) {
+		// We walked up the current tree, so `fiber` is already current.
+		return fiber;
+	}
+
+	// We walked up the alternate tree — switch to the current version.
+	return fiber.alternate;
+}
+
 function findHostFiber( fiber: any ): any {
+	const current = findCurrentFiber( fiber );
+	if ( ! current ) {
+		return null;
+	}
+	return findHostFiberImpl( current );
+}
+
+function findHostFiberImpl( fiber: any ): any {
 	if ( fiber.tag === HostComponent || fiber.tag === HostText ) {
 		return fiber;
 	}
 
 	let child = fiber.child;
 	while ( child ) {
-		const hostFiber = findHostFiber( child );
+		const hostFiber = findHostFiberImpl( child );
 		if ( hostFiber ) {
 			return hostFiber;
 		}
@@ -26,24 +56,37 @@ function findHostFiber( fiber: any ): any {
 /**
  * Finds the DOM node of a React component instance.
  *
- * @deprecated since WordPress 6.2.0. Use DOM refs instead.
+ * @deprecated since WordPress 7.1.0. Use DOM refs instead.
  * @see https://react.dev/reference/react-dom/findDOMNode
  *
  * @param      instance Component's instance.
  */
-export default function findDOMNode(
-	instance: React.ReactInstance
-): Element | Text | null {
+export default function findDOMNode( instance: any ): Element | Text | null {
 	deprecated( 'wp.element.findDOMNode', {
-		since: '6.2',
+		since: '7.1',
 		alternative: 'DOM refs',
 		link: 'https://react.dev/reference/react-dom/findDOMNode',
 	} );
 
-	const fiber = instance?.[ internalsKey ];
-	if ( ! fiber ) {
+	if ( instance === null || instance === undefined ) {
 		return null;
 	}
+
+	if ( instance.nodeType !== undefined ) {
+		return instance as Element | Text;
+	}
+
+	const fiber = instance[ internalsKey ];
+	if ( fiber === undefined ) {
+		if ( typeof instance.render === 'function' ) {
+			throw new Error( 'Unable to find node on an unmounted component.' );
+		}
+		const keys = Object.keys( instance ).join( ',' );
+		throw new Error(
+			`Argument appears to not be a ReactComponent. Keys: ${ keys }`
+		);
+	}
+
 	const hostFiber = findHostFiber( fiber );
 	return hostFiber?.stateNode ?? null;
 }

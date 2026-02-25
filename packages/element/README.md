@@ -151,7 +151,7 @@ _Changelog_
 
 ### findDOMNode
 
-> **Deprecated** since WordPress 6.2.0. Use DOM refs instead.
+> **Deprecated** since WordPress 7.1.0. Use DOM refs instead.
 
 Finds the DOM node of a React component instance.
 
@@ -161,7 +161,7 @@ _Related_
 
 _Parameters_
 
--   _instance_ `React.ReactInstance`: Component's instance.
+-   _instance_ `any`: Component's instance.
 
 ### flushSync
 
