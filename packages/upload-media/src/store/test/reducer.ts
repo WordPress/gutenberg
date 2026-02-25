@@ -381,8 +381,9 @@ describe( 'reducer', () => {
 			expect( state.queue[ 0 ].retryCount ).toBe( 3 );
 		} );
 
-		it( 'clears retryTimerId when retrying', () => {
-			const timerId = setTimeout( () => {}, 1000 );
+		it( 'creates a fresh AbortController when retrying', () => {
+			const oldController = new AbortController();
+			oldController.abort();
 			const initialState: State = {
 				queueStatus: 'active',
 				blobUrls: {},
@@ -395,7 +396,7 @@ describe( 'reducer', () => {
 						status: ItemStatus.PendingRetry,
 						error: new Error( 'Upload failed' ),
 						retryCount: 1,
-						retryTimerId: timerId,
+						abortController: oldController,
 					} as QueueItem,
 				],
 			};
@@ -404,8 +405,15 @@ describe( 'reducer', () => {
 				id: '1',
 			} );
 
-			expect( state.queue[ 0 ].retryTimerId ).toBeUndefined();
-			clearTimeout( timerId );
+			expect( state.queue[ 0 ].abortController ).toBeInstanceOf(
+				AbortController
+			);
+			expect( state.queue[ 0 ].abortController ).not.toBe(
+				oldController
+			);
+			expect( state.queue[ 0 ].abortController?.signal.aborted ).toBe(
+				false
+			);
 		} );
 	} );
 
@@ -424,18 +432,15 @@ describe( 'reducer', () => {
 					} as QueueItem,
 				],
 			};
-			const timerId = setTimeout( () => {}, 1000 );
 			const state = reducer( initialState, {
 				type: Type.ScheduleRetry,
 				id: '1',
 				error: new Error( 'Network error' ),
 				retryCount: 0,
 				nextRetryTimestamp: Date.now() + 1000,
-				retryTimerId: timerId,
 			} );
 
 			expect( state.queue[ 0 ].status ).toBe( ItemStatus.PendingRetry );
-			clearTimeout( timerId );
 		} );
 
 		it( 'sets error from action', () => {
@@ -453,18 +458,15 @@ describe( 'reducer', () => {
 				],
 			};
 			const error = new Error( 'Network error' );
-			const timerId = setTimeout( () => {}, 1000 );
 			const state = reducer( initialState, {
 				type: Type.ScheduleRetry,
 				id: '1',
 				error,
 				retryCount: 0,
 				nextRetryTimestamp: Date.now() + 1000,
-				retryTimerId: timerId,
 			} );
 
 			expect( state.queue[ 0 ].error ).toBe( error );
-			clearTimeout( timerId );
 		} );
 
 		it( 'sets retryCount from action', () => {
@@ -482,18 +484,15 @@ describe( 'reducer', () => {
 					} as QueueItem,
 				],
 			};
-			const timerId = setTimeout( () => {}, 1000 );
 			const state = reducer( initialState, {
 				type: Type.ScheduleRetry,
 				id: '1',
 				error: new Error( 'Network error' ),
 				retryCount: 2,
 				nextRetryTimestamp: Date.now() + 1000,
-				retryTimerId: timerId,
 			} );
 
 			expect( state.queue[ 0 ].retryCount ).toBe( 2 );
-			clearTimeout( timerId );
 		} );
 
 		it( 'sets nextRetryTimestamp from action', () => {
@@ -511,46 +510,15 @@ describe( 'reducer', () => {
 				],
 			};
 			const timestamp = Date.now() + 5000;
-			const timerId = setTimeout( () => {}, 1000 );
 			const state = reducer( initialState, {
 				type: Type.ScheduleRetry,
 				id: '1',
 				error: new Error( 'Network error' ),
 				retryCount: 0,
 				nextRetryTimestamp: timestamp,
-				retryTimerId: timerId,
 			} );
 
 			expect( state.queue[ 0 ].nextRetryTimestamp ).toBe( timestamp );
-			clearTimeout( timerId );
-		} );
-
-		it( 'sets retryTimerId from action', () => {
-			const initialState: State = {
-				queueStatus: 'active',
-				blobUrls: {},
-				settings: {
-					mediaUpload: jest.fn(),
-				},
-				queue: [
-					{
-						id: '1',
-						status: ItemStatus.Processing,
-					} as QueueItem,
-				],
-			};
-			const timerId = setTimeout( () => {}, 1000 );
-			const state = reducer( initialState, {
-				type: Type.ScheduleRetry,
-				id: '1',
-				error: new Error( 'Network error' ),
-				retryCount: 0,
-				nextRetryTimestamp: Date.now() + 1000,
-				retryTimerId: timerId,
-			} );
-
-			expect( state.queue[ 0 ].retryTimerId ).toBe( timerId );
-			clearTimeout( timerId );
 		} );
 
 		it( 'does not modify other items in queue', () => {
@@ -571,20 +539,17 @@ describe( 'reducer', () => {
 					} as QueueItem,
 				],
 			};
-			const timerId = setTimeout( () => {}, 1000 );
 			const state = reducer( initialState, {
 				type: Type.ScheduleRetry,
 				id: '1',
 				error: new Error( 'Network error' ),
 				retryCount: 0,
 				nextRetryTimestamp: Date.now() + 1000,
-				retryTimerId: timerId,
 			} );
 
 			expect( state.queue[ 0 ].status ).toBe( ItemStatus.PendingRetry );
 			expect( state.queue[ 1 ].status ).toBe( ItemStatus.Queued );
 			expect( state.queue[ 1 ].error ).toBeUndefined();
-			clearTimeout( timerId );
 		} );
 	} );
 
