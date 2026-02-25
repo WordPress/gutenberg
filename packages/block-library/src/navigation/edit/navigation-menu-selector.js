@@ -11,7 +11,6 @@ import { moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { useEntityProp } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -56,6 +55,7 @@ function NavigationMenuSelector( {
 	const { menus: classicMenus } = useNavigationEntities();
 
 	const {
+		navigationMenu,
 		navigationMenus,
 		isResolvingNavigationMenus,
 		hasResolvedNavigationMenus,
@@ -64,11 +64,9 @@ function NavigationMenuSelector( {
 		isNavigationMenuMissing,
 	} = useNavigationMenu( currentMenuId );
 
-	const [ currentTitle ] = useEntityProp(
-		'postType',
-		'wp_navigation',
-		'title'
-	);
+	const currentTitle = navigationMenu?.title?.rendered
+		? decodeEntities( navigationMenu.title.rendered )
+		: navigationMenu?.title;
 
 	const menuChoices = useMemo( () => {
 		return (
