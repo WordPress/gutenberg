@@ -1,7 +1,7 @@
 // @ts-expect-error No exported types
 import { useStyleOverride } from '@wordpress/block-editor';
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 
 import Avatar from '../collaborators-presence/avatar';
 import { AVATAR_IFRAME_STYLES } from './avatar-iframe-styles';
@@ -53,17 +53,14 @@ export function Overlay( {
 	);
 
 	// Combine both delayed rerenders so layout changes recompute everything.
-	const rerenderAfterDelay = useMemo(
-		() => () => {
-			const cleanupCursors = rerenderCursorsAfterDelay();
-			const cleanupHighlights = rerenderHighlightsAfterDelay();
-			return () => {
-				cleanupCursors();
-				cleanupHighlights();
-			};
-		},
-		[ rerenderCursorsAfterDelay, rerenderHighlightsAfterDelay ]
-	);
+	const rerenderAfterDelay = useCallback( () => {
+		const cleanupCursors = rerenderCursorsAfterDelay();
+		const cleanupHighlights = rerenderHighlightsAfterDelay();
+		return () => {
+			cleanupCursors();
+			cleanupHighlights();
+		};
+	}, [ rerenderCursorsAfterDelay, rerenderHighlightsAfterDelay ] );
 
 	// Detect layout changes on overlay (e.g. turning on "Show Template") and window
 	// resizes, and re-render the cursors and block highlights.
