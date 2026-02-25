@@ -118,7 +118,7 @@ function _gutenberg_mask_gemini_api_key( string $value ): string {
  * @return string The value to persist.
  */
 function _gutenberg_validate_gemini_api_key_on_save( string $value, string $old_value ): string {
-	if ( empty( $value ) ) {
+	if ( '' === $value ) {
 		return $value;
 	}
 	$valid = _gutenberg_is_api_key_valid( $value, 'google' );
