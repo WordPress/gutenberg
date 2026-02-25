@@ -111,7 +111,6 @@ export default {
 	'--wpds-color-stroke-surface-success-strong': '#007f30',
 	'--wpds-color-stroke-surface-warning': '#d0b381',
 	'--wpds-color-stroke-surface-warning-strong': '#926300',
-	'--wpds-cursor-control': 'default',
 	'--wpds-dimension-base': '4px',
 	'--wpds-dimension-gap-2xl': '32px',
 	'--wpds-dimension-gap-3xl': '40px',
