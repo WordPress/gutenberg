@@ -36,7 +36,7 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		if ( isEnabledAndEditorReady ) {
 			initializeMetaBoxes();
 
-			// Disable real-time collaboration when non-compatible meta boxes are detected.
+			// Disable real-time collaboration when legacy meta boxes are detected.
 			if ( isCollaborationEnabled ) {
 				disableCollaboration();
 			}
