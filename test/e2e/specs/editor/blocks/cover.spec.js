@@ -604,13 +604,13 @@ test.describe( 'Cover', () => {
 			await expect( overlay ).toBeVisible();
 
 			// The overlay color should be auto-detected from the
-			// bound image (average of ~50% black, ~50% white = gray).
-			// Without the fix, the CSS default for .has-background-dim
-			// (black) would apply instead.
+			// bound image (average of ~50% black, ~50% white = gray),
+			// and the opacity should be set to 0.5.
 			await expect( overlay ).toHaveCSS(
 				'background-color',
 				'rgb(179, 179, 179)'
 			);
+			await expect( overlay ).toHaveCSS( 'opacity', '0.5' );
 		} );
 	} );
 } );
