@@ -1,4 +1,7 @@
-export { registerConnector } from './api';
-export { ConnectorItem, DefaultConnectorSettings } from './connector-item';
-export { store, STORE_NAME } from './store';
+export { registerConnector as __experimentalRegisterConnector } from './api';
+export {
+	ConnectorItem as __experimentalConnectorItem,
+	DefaultConnectorSettings as __experimentalDefaultConnectorSettings,
+} from './connector-item';
 export type { ConnectorConfig, ConnectorRenderProps } from './types';
+export { privateApis } from './private-apis';

@@ -6,11 +6,9 @@ import { dispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { store, STORE_NAME } from './store';
-import { ConnectorItem, DefaultConnectorSettings } from './connector-item';
-import type { ConnectorConfig, ConnectorRenderProps } from './types';
-
-export type { ConnectorConfig, ConnectorRenderProps };
+import { store } from './store';
+import { unlock } from './lock-unlock';
+import type { ConnectorConfig } from './types';
 
 /**
  * Register a connector that will appear in the Connectors settings page.
@@ -20,7 +18,7 @@ export type { ConnectorConfig, ConnectorRenderProps };
  *
  * @example
  * ```js
- * import { registerConnector, ConnectorItem } from '@wordpress/connectors';
+ * import { __experimentalRegisterConnector as registerConnector, __experimentalConnectorItem as ConnectorItem } from '@wordpress/connectors';
  *
  * registerConnector( 'my-plugin/openai', {
  *     label: 'OpenAI',
@@ -42,7 +40,5 @@ export function registerConnector(
 	slug: string,
 	config: Omit< ConnectorConfig, 'slug' >
 ): void {
-	dispatch( store ).registerConnector( slug, config );
+	unlock( dispatch( store ) ).registerConnector( slug, config );
 }
-
-export { ConnectorItem, DefaultConnectorSettings, store, STORE_NAME };

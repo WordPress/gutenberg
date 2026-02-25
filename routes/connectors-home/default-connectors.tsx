@@ -3,9 +3,9 @@
  */
 import { __experimentalHStack as HStack, Button } from '@wordpress/components';
 import {
-	registerConnector,
-	ConnectorItem,
-	DefaultConnectorSettings,
+	__experimentalRegisterConnector as registerConnector,
+	__experimentalConnectorItem as ConnectorItem,
+	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
 import { __, sprintf } from '@wordpress/i18n';

@@ -3,7 +3,7 @@
  */
 import { Page } from '@wordpress/admin-ui';
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { store, type ConnectorConfig } from '@wordpress/connectors';
+import { type ConnectorConfig, privateApis as connectorsPrivateApis } from '@wordpress/connectors';
 import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -13,13 +13,16 @@ import { __ } from '@wordpress/i18n';
  */
 import './style.scss';
 import { registerDefaultConnectors } from './default-connectors';
+import { unlock } from '../lock-unlock';
+
+const { store } = unlock( connectorsPrivateApis );
 
 // Register built-in connectors
 registerDefaultConnectors();
 
 function ConnectorsPage() {
 	const connectors = useSelect(
-		( select ) => select( store ).getConnectors(),
+		( select ) => unlock( select( store ) ).getConnectors(),
 		[]
 	);
 

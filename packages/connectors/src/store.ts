@@ -7,6 +7,7 @@ import { createReduxStore, register } from '@wordpress/data';
  * Internal dependencies
  */
 import type { ConnectorConfig, ConnectorsState } from './types';
+import { unlock } from './lock-unlock';
 
 const STORE_NAME = 'core/connectors';
 
@@ -61,10 +62,10 @@ const selectors = {
 
 export const store = createReduxStore( STORE_NAME, {
 	reducer,
-	actions,
-	selectors,
 } );
 
 register( store );
+unlock( store ).registerPrivateActions( actions );
+unlock( store ).registerPrivateSelectors( selectors );
 
 export { STORE_NAME };
