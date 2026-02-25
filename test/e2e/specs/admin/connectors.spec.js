@@ -92,12 +92,9 @@ test.describe( 'Connectors', () => {
 			// Verify the plugin directory search link is present.
 			await expect(
 				page.getByRole( 'link', {
-					name: 'search the plugin directory',
+					name: 'the plugin directory',
 				} )
-			).toHaveAttribute(
-				'href',
-				'plugin-install.php?s=connector&tab=search&type=tag'
-			);
+			).toHaveAttribute( 'href', 'plugin-install.php' );
 		} );
 	} );
 } );
