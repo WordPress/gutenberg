@@ -193,6 +193,35 @@ function _gutenberg_validate_anthropic_api_key_on_save( string $value, string $o
 	return false === $valid ? $old_value : $value;
 }
 
+// --- Connector definitions ---
+
+/**
+ * Gets the provider connectors.
+ *
+ * @access private
+ *
+ * @return array<string, array{ provider: string, mask: callable, validate: callable }> Connectors.
+ */
+function _gutenberg_get_connectors(): array {
+	return array(
+		'connectors_gemini_api_key'    => array(
+			'provider' => 'google',
+			'mask'     => '_gutenberg_mask_gemini_api_key',
+			'validate' => '_gutenberg_validate_gemini_api_key_on_save',
+		),
+		'connectors_openai_api_key'    => array(
+			'provider' => 'openai',
+			'mask'     => '_gutenberg_mask_openai_api_key',
+			'validate' => '_gutenberg_validate_openai_api_key_on_save',
+		),
+		'connectors_anthropic_api_key' => array(
+			'provider' => 'anthropic',
+			'mask'     => '_gutenberg_mask_anthropic_api_key',
+			'validate' => '_gutenberg_validate_anthropic_api_key_on_save',
+		),
+	);
+}
+
 // --- REST API filtering ---
 
 /**
@@ -222,21 +251,17 @@ function _gutenberg_validate_connector_keys_in_rest( WP_REST_Response $response,
 
 	$requested  = array_map( 'trim', explode( ',', $fields ) );
 	$data       = $response->get_data();
-	$connectors = array(
-		'connectors_gemini_api_key'    => array( 'google', '_gutenberg_mask_gemini_api_key' ),
-		'connectors_openai_api_key'    => array( 'openai', '_gutenberg_mask_openai_api_key' ),
-		'connectors_anthropic_api_key' => array( 'anthropic', '_gutenberg_mask_anthropic_api_key' ),
-	);
+	$connectors = _gutenberg_get_connectors();
 
 	foreach ( $connectors as $option_name => $config ) {
 		if ( ! in_array( $option_name, $requested, true ) ) {
 			continue;
 		}
-		$real_key = _gutenberg_get_real_api_key( $option_name, $config[1] );
+		$real_key = _gutenberg_get_real_api_key( $option_name, $config['mask'] );
 		if ( '' === $real_key ) {
 			continue;
 		}
-		if ( true !== _gutenberg_is_api_key_valid( $real_key, $config[0] ) ) {
+		if ( true !== _gutenberg_is_api_key_valid( $real_key, $config['provider'] ) ) {
 			$data[ $option_name ] = 'invalid_key';
 		}
 	}
@@ -258,22 +283,9 @@ function _gutenberg_register_default_connector_settings(): void {
 		return;
 	}
 
-	$connectors = array(
-		'connectors_gemini_api_key'    => array(
-			'mask'     => '_gutenberg_mask_gemini_api_key',
-			'validate' => '_gutenberg_validate_gemini_api_key_on_save',
-		),
-		'connectors_openai_api_key'    => array(
-			'mask'     => '_gutenberg_mask_openai_api_key',
-			'validate' => '_gutenberg_validate_openai_api_key_on_save',
-		),
-		'connectors_anthropic_api_key' => array(
-			'mask'     => '_gutenberg_mask_anthropic_api_key',
-			'validate' => '_gutenberg_validate_anthropic_api_key_on_save',
-		),
-	);
+	$connectors = _gutenberg_get_connectors();
 
-	foreach ( $connectors as $option_name => $callbacks ) {
+	foreach ( $connectors as $option_name => $config ) {
 		register_setting(
 			'connectors',
 			$option_name,
@@ -284,8 +296,8 @@ function _gutenberg_register_default_connector_settings(): void {
 				'sanitize_callback' => 'sanitize_text_field',
 			)
 		);
-		add_filter( "option_{$option_name}", $callbacks['mask'] );
-		add_filter( "pre_update_option_{$option_name}", $callbacks['validate'], 10, 2 );
+		add_filter( "option_{$option_name}", $config['mask'] );
+		add_filter( "pre_update_option_{$option_name}", $config['validate'], 10, 2 );
 	}
 }
 add_action( 'init', '_gutenberg_register_default_connector_settings' );
@@ -300,16 +312,12 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 		return;
 	}
 
-	$connectors = array(
-		'connectors_gemini_api_key'    => array( 'google', '_gutenberg_mask_gemini_api_key' ),
-		'connectors_openai_api_key'    => array( 'openai', '_gutenberg_mask_openai_api_key' ),
-		'connectors_anthropic_api_key' => array( 'anthropic', '_gutenberg_mask_anthropic_api_key' ),
-	);
+	$connectors = _gutenberg_get_connectors();
 
-	foreach ( $connectors as $option_name => list( $provider, $callback ) ) {
-		$api_key = _gutenberg_get_real_api_key( $option_name, $callback );
+	foreach ( $connectors as $option_name => $config ) {
+		$api_key = _gutenberg_get_real_api_key( $option_name, $config['mask'] );
 		if ( ! empty( $api_key ) ) {
-			_gutenberg_set_provider_api_key( $api_key, $provider );
+			_gutenberg_set_provider_api_key( $api_key, $config['provider'] );
 		}
 	}
 }
