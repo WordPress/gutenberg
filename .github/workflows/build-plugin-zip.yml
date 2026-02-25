@@ -179,7 +179,7 @@ jobs:
                   fi
 
     build:
-        name: Build Release Artifact
+        name: ${{ matrix.IS_WORDPRESS_CORE && 'Build assets for wordpress-develop' || 'Build Release Artifact' }}
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
@@ -193,11 +193,11 @@ jobs:
         strategy:
             matrix:
                 IS_GUTENBERG_PLUGIN: [true]
-                IS_WORDPREESS_CORE: [false]
+                IS_WORDPRESS_CORE: [false]
 
                 include:
-                    - IS_GUTENBERG_PLUGIN: [false]
-                      IS_WORDPRESS_CORE: [true]
+                    - IS_GUTENBERG_PLUGIN: false
+                      IS_WORDPRESS_CORE: true
 
         outputs:
             job_status: ${{ job.status }}
@@ -226,7 +226,7 @@ jobs:
             - name: Upload artifact
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               with:
-                  name: gutenberg-${{ matrix.IS_WORDPREESS_CORE && 'wordpress-develop' || 'plugin' }}
+                  name: gutenberg-${{ matrix.IS_WORDPRESS_CORE && 'wordpress-develop' || 'plugin' }}
                   path: ./gutenberg.zip
 
             - name: Build release notes draft
