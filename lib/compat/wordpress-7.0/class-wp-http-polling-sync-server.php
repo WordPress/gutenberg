@@ -226,7 +226,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			);
 
 			foreach ( $rooms as $room_request ) {
-				$awareness = $room_request['awareness'];
+				$awareness = (object) $room_request['awareness'];
 				$client_id = $room_request['client_id'];
 				$cursor    = $room_request['after'];
 				$room      = $room_request['room'];
@@ -250,7 +250,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 
 				// Get updates for this client.
 				$room_response              = $this->get_updates( $room, $client_id, $cursor, $is_compactor );
-				$room_response['awareness'] = $merged_awareness;
+				$room_response['awareness'] = (object) $merged_awareness;
 
 				$response['rooms'][] = $room_response;
 			}
@@ -320,15 +320,20 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 *
 		 * @param string                    $room             Room identifier.
 		 * @param int                       $client_id        Client identifier.
-		 * @param array<string, mixed>|null $awareness_update Awareness state sent by the client.
+		 * @param object|null               $awareness_update Awareness state sent by the client.
 		 * @return array<int, array<string, mixed>> Map of client ID to awareness state.
 		 */
-		private function process_awareness_update( string $room, int $client_id, ?array $awareness_update ): array {
+		private function process_awareness_update( string $room, int $client_id, ?object $awareness_update ): array {
 			$existing_awareness = $this->storage->get_awareness_state( $room );
 			$updated_awareness  = array();
 			$current_time       = time();
 
 			foreach ( $existing_awareness as $entry ) {
+				// Skip entries with unexpected structure.
+				if ( ! is_array( $entry ) || ! isset( $entry['client_id'], $entry['state'], $entry['updated_at'] ) ) {
+					continue;
+				}
+
 				// Remove this client's entry (it will be updated below).
 				if ( $client_id === $entry['client_id'] ) {
 					continue;
@@ -357,7 +362,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			// Convert to client_id => state map for response.
 			$response = array();
 			foreach ( $updated_awareness as $entry ) {
-				$response[ $entry['client_id'] ] = $entry['state'];
+				$response[ $entry['client_id'] ] = (object) $entry['state'];
 			}
 
 			return $response;
