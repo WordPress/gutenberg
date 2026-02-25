@@ -233,7 +233,7 @@ function _gutenberg_validate_connector_keys_in_rest( WP_REST_Response $response,
 			continue;
 		}
 		$real_key = _gutenberg_get_real_api_key( $option_name, $config[1] );
-		if ( empty( $real_key ) ) {
+		if ( '' === $real_key ) {
 			continue;
 		}
 		if ( true !== _gutenberg_is_api_key_valid( $real_key, $config[0] ) ) {
