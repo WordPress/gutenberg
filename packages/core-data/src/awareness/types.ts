@@ -34,21 +34,11 @@ export interface EditorState {
 }
 
 /**
- * Represents a save event broadcast via the awareness system.
- * `status` is the WordPress post status at the time of the save.
- */
-export interface SaveEvent {
-	savedAt: number;
-	status: string;
-}
-
-/**
  * The post editor state extends the base state with information used to render
  * presence indicators in the post editor.
  */
 export interface PostEditorState extends BaseState {
 	editorState?: EditorState;
-	lastSaveEvent?: SaveEvent;
 }
 
 /**

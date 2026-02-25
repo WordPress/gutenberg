@@ -17,12 +17,10 @@ import { useCollaboratorNotifications } from '../use-collaborator-notifications'
 // --- Mocks ---
 
 const mockCreateNotice = jest.fn();
-const mockBroadcastSaveEvent = jest.fn();
 let mockActiveCollaborators: any[] = [];
+let mockLastPostSave: { savedAt: number; savedByClientId: number } | null =
+	null;
 let mockEditorState = {
-	isSaving: false,
-	isAutosaving: false,
-	didSaveSucceed: true,
 	postStatus: 'draft',
 	isCollaborationEnabled: true,
 };
@@ -55,7 +53,7 @@ jest.mock( '@wordpress/core-data', () => ( {
 jest.mock( '../../../lock-unlock', () => ( {
 	unlock: jest.fn( () => ( {
 		useActiveCollaborators: jest.fn( () => mockActiveCollaborators ),
-		useBroadcastSaveEvent: jest.fn( () => mockBroadcastSaveEvent ),
+		useLastPostSave: jest.fn( () => mockLastPostSave ),
 	} ) ),
 } ) );
 
@@ -100,9 +98,6 @@ function makeMe( overrides: Record< string, unknown > = {} ) {
 
 function buildMockSelect() {
 	return () => ( {
-		isSavingPost: () => mockEditorState.isSaving,
-		isAutosavingPost: () => mockEditorState.isAutosaving,
-		didPostSaveRequestSucceed: () => mockEditorState.didSaveSucceed,
 		getCurrentPostAttribute: ( attr: string ) =>
 			attr === 'status' ? mockEditorState.postStatus : undefined,
 		isCollaborationEnabledForCurrentPost: () =>
@@ -112,15 +107,12 @@ function buildMockSelect() {
 
 beforeEach( () => {
 	mockActiveCollaborators = [];
+	mockLastPostSave = null;
 	mockEditorState = {
-		isSaving: false,
-		isAutosaving: false,
-		didSaveSucceed: true,
 		postStatus: 'draft',
 		isCollaborationEnabled: true,
 	};
 	mockCreateNotice.mockClear();
-	mockBroadcastSaveEvent.mockClear();
 	( applyFilters as jest.Mock ).mockImplementation(
 		( _hook: string, defaultValue: unknown ) => defaultValue
 	);
@@ -339,14 +331,11 @@ describe( 'useCollaboratorNotifications', () => {
 				useCollaboratorNotifications( 123, 'post' )
 			);
 
-			// Alice saves the post (draft status)
-			mockActiveCollaborators = [
-				makeMe(),
-				{
-					...alice,
-					lastSaveEvent: { savedAt: Date.now(), status: 'draft' },
-				},
-			];
+			// State map reports Alice saved
+			mockLastPostSave = {
+				savedAt: Date.now(),
+				savedByClientId: alice.clientId,
+			};
 			rerender();
 
 			expect( mockCreateNotice ).toHaveBeenCalledWith(
@@ -361,22 +350,20 @@ describe( 'useCollaboratorNotifications', () => {
 		} );
 
 		it( 'fires a post updated notification with "Post updated" for published status', () => {
+			mockEditorState = {
+				...mockEditorState,
+				postStatus: 'publish',
+			};
 			const alice = makeCollaborator();
 			mockActiveCollaborators = [ makeMe(), alice ];
 			const { rerender } = renderHook( () =>
 				useCollaboratorNotifications( 123, 'post' )
 			);
 
-			mockActiveCollaborators = [
-				makeMe(),
-				{
-					...alice,
-					lastSaveEvent: {
-						savedAt: Date.now(),
-						status: 'publish',
-					},
-				},
-			];
+			mockLastPostSave = {
+				savedAt: Date.now(),
+				savedByClientId: alice.clientId,
+			};
 			rerender();
 
 			expect( mockCreateNotice ).toHaveBeenCalledWith(
@@ -388,76 +375,89 @@ describe( 'useCollaboratorNotifications', () => {
 			);
 		} );
 
-		it( 'does not fire a post updated notification on the initial mount even with a saveEvent', () => {
-			mockActiveCollaborators = [
-				makeMe(),
-				{
-					...makeCollaborator(),
-					lastSaveEvent: { savedAt: Date.now(), status: 'draft' },
-				},
-			];
-
-			renderHook( () => useCollaboratorNotifications( 123, 'post' ) );
-
-			expect( mockCreateNotice ).not.toHaveBeenCalled();
-		} );
-
-		it( 'does not fire a post updated notification for a newly appeared collaborator with a historical save event', () => {
+		it( 'does not fire a notification when the current user saves', () => {
 			const me = makeMe();
-			mockActiveCollaborators = [ me ];
+			mockActiveCollaborators = [ me, makeCollaborator() ];
 			const { rerender } = renderHook( () =>
 				useCollaboratorNotifications( 123, 'post' )
 			);
 
-			// Alice appears for the first time carrying a save event from
-			// before our session — should not trigger a notification.
-			mockActiveCollaborators = [
-				me,
-				{
-					...makeCollaborator( {
-						collaboratorInfo: {
-							id: 100,
-							name: 'Alice',
-							slug: 'alice',
-							avatar_urls: {},
-							browserType: 'Chrome',
-							enteredAt: BASE_ENTERED_AT + 10000,
-						},
-					} ),
-					lastSaveEvent: { savedAt: Date.now(), status: 'draft' },
-				},
-			];
+			// State map reports "me" saved
+			mockLastPostSave = {
+				savedAt: Date.now(),
+				savedByClientId: me.clientId,
+			};
 			rerender();
 
-			// The join notification fires, but no save notification.
-			expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
-			expect( mockCreateNotice ).toHaveBeenCalledWith(
-				'info',
-				'Alice has joined the post.',
-				expect.objectContaining( {
-					id: 'collab-user-entered-100',
-				} )
-			);
+			expect( mockCreateNotice ).not.toHaveBeenCalled();
 		} );
 
 		it( 'does not fire duplicate notifications for the same savedAt timestamp', () => {
+			const alice = makeCollaborator();
+			mockActiveCollaborators = [ makeMe(), alice ];
 			const savedAt = Date.now();
-			const alice = {
-				...makeCollaborator(),
-				lastSaveEvent: { savedAt, status: 'draft' },
-			};
 
+			const { rerender } = renderHook( () =>
+				useCollaboratorNotifications( 123, 'post' )
+			);
+
+			// First save event
+			mockLastPostSave = {
+				savedAt,
+				savedByClientId: alice.clientId,
+			};
+			rerender();
+			mockCreateNotice.mockClear();
+
+			// Rerender with same savedAt — should not notify again
+			rerender();
+
+			expect( mockCreateNotice ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does not fire a notification when a peer reconnects without a new save', () => {
+			const alice = makeCollaborator();
 			mockActiveCollaborators = [ makeMe(), alice ];
 			const { rerender } = renderHook( () =>
 				useCollaboratorNotifications( 123, 'post' )
 			);
 
-			// Simulate a re-render with the same saveEvent
-			mockActiveCollaborators = [ makeMe(), { ...alice } ];
+			// Alice disconnects and reconnects — useLastPostSave filters
+			// pre-existing state map values via its baseline check, so
+			// lastPostSave stays null.
+			mockActiveCollaborators = [
+				makeMe(),
+				{ ...alice, isConnected: false },
+			];
+			rerender();
+			mockCreateNotice.mockClear();
+
+			mockActiveCollaborators = [
+				makeMe(),
+				{ ...alice, clientId: 50, isConnected: true },
+			];
 			rerender();
 
-			// The initial mount should record it, not notify.
-			// A subsequent rerender with the same savedAt should not notify either.
+			// Only the leave/join notices should have fired, no save notice.
+			const saveNotice = mockCreateNotice.mock.calls.find(
+				( [ , msg ] ) => ( msg as string ).includes( 'saved' )
+			);
+			expect( saveNotice ).toBeUndefined();
+		} );
+
+		it( 'does not fire a notification when the saver is not in the collaborator list', () => {
+			mockActiveCollaborators = [ makeMe(), makeCollaborator() ];
+			const { rerender } = renderHook( () =>
+				useCollaboratorNotifications( 123, 'post' )
+			);
+
+			// State map reports a save by unknown clientId
+			mockLastPostSave = {
+				savedAt: Date.now(),
+				savedByClientId: 12345,
+			};
+			rerender();
+
 			expect( mockCreateNotice ).not.toHaveBeenCalled();
 		} );
 	} );
@@ -525,96 +525,13 @@ describe( 'useCollaboratorNotifications', () => {
 				useCollaboratorNotifications( 123, 'post' )
 			);
 
-			mockActiveCollaborators = [
-				makeMe(),
-				{
-					...alice,
-					lastSaveEvent: { savedAt: Date.now(), status: 'draft' },
-				},
-			];
+			mockLastPostSave = {
+				savedAt: Date.now(),
+				savedByClientId: alice.clientId,
+			};
 			rerender();
 
 			expect( mockCreateNotice ).not.toHaveBeenCalled();
-		} );
-	} );
-
-	describe( 'save event broadcasting', () => {
-		it( 'broadcasts save event when save transitions from in-progress to complete', () => {
-			mockActiveCollaborators = [];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
-
-			// Save starts
-			mockEditorState = {
-				...mockEditorState,
-				isSaving: true,
-				isAutosaving: false,
-			};
-			rerender();
-
-			// Save completes
-			mockEditorState = {
-				...mockEditorState,
-				isSaving: false,
-				isAutosaving: false,
-				didSaveSucceed: true,
-				postStatus: 'draft',
-			};
-			rerender();
-
-			expect( mockBroadcastSaveEvent ).toHaveBeenCalledWith( 'draft' );
-		} );
-
-		it( 'does not broadcast save event for autosaves', () => {
-			mockActiveCollaborators = [];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
-
-			// Autosave starts
-			mockEditorState = {
-				...mockEditorState,
-				isSaving: true,
-				isAutosaving: true,
-			};
-			rerender();
-
-			// Autosave completes
-			mockEditorState = {
-				...mockEditorState,
-				isSaving: false,
-				isAutosaving: false,
-			};
-			rerender();
-
-			expect( mockBroadcastSaveEvent ).not.toHaveBeenCalled();
-		} );
-
-		it( 'does not broadcast when collaboration is not enabled', () => {
-			mockEditorState = {
-				...mockEditorState,
-				isCollaborationEnabled: false,
-			};
-			mockActiveCollaborators = [];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
-
-			mockEditorState = {
-				...mockEditorState,
-				isSaving: true,
-				isCollaborationEnabled: false,
-			};
-			rerender();
-
-			mockEditorState = {
-				...mockEditorState,
-				isSaving: false,
-			};
-			rerender();
-
-			expect( mockBroadcastSaveEvent ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

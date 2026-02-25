@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
+import type { Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -157,35 +158,69 @@ export function useIsDisconnected(
 		.isCurrentCollaboratorDisconnected;
 }
 
+export interface PostSaveEvent {
+	savedAt: number;
+	savedByClientId: number;
+}
+
 /**
- * Hook that returns a callback to broadcast a save event to all collaborators
- * via the awareness system. When called, it sets the `lastSaveEvent` field on
- * the local awareness state so that other collaborators can display a notification.
+ * Hook that subscribes to the CRDT state map and returns the most recent
+ * save event (timestamp + client ID). The state map is updated by
+ * `markEntityAsSaved` in `@wordpress/sync`
  *
  * @param postId   The ID of the post.
  * @param postType The type of the post.
  */
-export function useBroadcastSaveEvent(
+export function useLastPostSave(
 	postId: number | null,
 	postType: string | null
-): ( status: string ) => void {
-	return useCallback(
-		( status: string ) => {
-			if ( null === postId || null === postType ) {
-				return;
+): PostSaveEvent | null {
+	const [ lastSave, setLastSave ] = useState< PostSaveEvent | null >( null );
+
+	useEffect( () => {
+		if ( null === postId || null === postType ) {
+			setLastSave( null );
+			return;
+		}
+
+		const awareness = getSyncManager()?.getAwareness< PostEditorAwareness >(
+			`postType/${ postType }`,
+			postId.toString()
+		);
+
+		if ( ! awareness ) {
+			setLastSave( null );
+			return;
+		}
+
+		const stateMap = awareness.doc.getMap( 'state' );
+
+		// Only notify for saves that occur after the observer is
+		// set up. This prevents false notifications when the Y.Doc
+		// syncs historical state on page load or peer reconnect.
+		const setupTime = Date.now();
+
+		const observer = ( event: Y.YMapEvent< unknown > ) => {
+			if ( event.keysChanged.has( 'savedAt' ) ) {
+				const savedAt = stateMap.get( 'savedAt' ) as number;
+				const savedByClientId = stateMap.get( 'savedBy' ) as number;
+
+				if (
+					typeof savedAt === 'number' &&
+					typeof savedByClientId === 'number' &&
+					savedAt > setupTime
+				) {
+					setLastSave( { savedAt, savedByClientId } );
+				}
 			}
+		};
 
-			const awareness =
-				getSyncManager()?.getAwareness< PostEditorAwareness >(
-					`postType/${ postType }`,
-					postId.toString()
-				);
+		stateMap.observe( observer );
 
-			awareness?.setLocalStateField( 'lastSaveEvent', {
-				savedAt: Date.now(),
-				status,
-			} );
-		},
-		[ postId, postType ]
-	);
+		return () => {
+			stateMap.unobserve( observer );
+		};
+	}, [ postId, postType ] );
+
+	return lastSave;
 }
