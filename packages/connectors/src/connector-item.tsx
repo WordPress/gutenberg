@@ -71,13 +71,13 @@ export interface DefaultConnectorSettingsProps {
 /**
  * Default settings form for connectors.
  *
- * @param props               - Component props.
- * @param props.onSave        - Callback invoked with the API key when the user saves.
- * @param props.onRemove      - Callback invoked when the user removes the connector.
- * @param props.initialValue  - Initial value for the API key field.
- * @param props.helpUrl       - URL to documentation for obtaining an API key.
- * @param props.helpLabel     - Custom label for the help link. Defaults to the URL without protocol.
- * @param props.readOnly      - Whether the form is in read-only mode.
+ * @param props              - Component props.
+ * @param props.onSave       - Callback invoked with the API key when the user saves.
+ * @param props.onRemove     - Callback invoked when the user removes the connector.
+ * @param props.initialValue - Initial value for the API key field.
+ * @param props.helpUrl      - URL to documentation for obtaining an API key.
+ * @param props.helpLabel    - Custom label for the help link. Defaults to the URL without protocol.
+ * @param props.readOnly     - Whether the form is in read-only mode.
  */
 export function DefaultConnectorSettings( {
 	onSave,
