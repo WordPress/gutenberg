@@ -139,7 +139,7 @@ function reducer(
 									status: ItemStatus.Processing,
 									error: undefined,
 									retryCount: ( item.retryCount ?? 0 ) + 1,
-									retryTimerId: undefined,
+									abortController: new AbortController(),
 							  }
 							: item
 				),

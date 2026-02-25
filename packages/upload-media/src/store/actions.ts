@@ -175,11 +175,6 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 			return;
 		}
 
-		item.abortController?.abort();
-
-		// Cancel any ongoing vips operations for this item.
-		await vipsCancelOperations( id );
-
 		// Check if we should automatically retry instead of cancelling.
 		if ( ! silent && error ) {
 			const settings = select.getSettings();
@@ -207,6 +202,11 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 				}
 			}
 		}
+
+		item.abortController?.abort();
+
+		// Cancel any ongoing vips operations for this item.
+		await vipsCancelOperations( id );
 
 		if ( ! silent ) {
 			const { onError } = item;
