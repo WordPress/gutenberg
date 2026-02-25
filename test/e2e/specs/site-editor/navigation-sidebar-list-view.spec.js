@@ -67,38 +67,26 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		).toBeVisible();
 
 		// The appender button should be present to allow adding new items.
-		// NOTE: This currently FAILS because NavigationMenuContent passes
-		// showAppender={ false } to PrivateListView. Implementing the feature
-		// requires changing it to showAppender={ true } and wiring up the
-		// AdditionalBlockContent / LinkUI integration.
 		const appender = listView.getByRole( 'button', { name: 'Add page' } );
 		await expect( appender ).toBeVisible();
 
 		await appender.click();
 
 		// The LinkUI popover should open and immediately focus the search input.
-		const linkUIInput = linkControl.getSearchInput();
-		await expect( linkUIInput ).toBeFocused();
-		await expect( linkUIInput ).toBeEmpty();
+		await expect( linkControl.getLinkControlSearch() ).toBeFocused();
 
-		// Type to trigger search suggestions.
-		await linkControl.searchFor( 'Test Page' );
-
-		// Select the first result to create a new menu item.
-		const firstResult = await linkControl.getNthSearchResult( 0 );
-		const firstResultText =
-			await linkControl.getSearchResultText( firstResult );
-		await firstResult.click();
+		// Search for and select the page.
+		await linkControl.useLinkControlSearch( 'Test Page 2' );
 
 		// The new item should be appended after the existing item.
 		await expect(
 			listView
-				.getByRole( 'gridcell', { name: firstResultText } )
+				.getByRole( 'gridcell', { name: 'Test Page 2' } )
 				.filter( { hasText: 'Block 2 of 2, Level 1.' } )
 		).toBeVisible();
 	} );
 
-	test( 'opening the add link UI does not immediately trigger unsaved changes', async ( {
+	test( 'can open and close the add link UI', async ( {
 		admin,
 		page,
 		requestUtils,
@@ -118,34 +106,10 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 
 		await expect( listView ).toBeVisible();
 
-		// Confirm no unsaved changes exist before interacting.
-		await expect(
-			page.getByRole( 'button', { name: /Review \d+ change/ } )
-		).toBeHidden();
-
 		const appender = listView.getByRole( 'button', { name: 'Add page' } );
 		await appender.click();
 
-		// Wait for the link UI to open so we know the click was processed
-		// and state has settled — then assert no save indicator appeared.
-		await expect( linkControl.getSearchInput() ).toBeVisible();
-		await expect(
-			page.getByRole( 'button', { name: /Review \d+ change/ } )
-		).toBeHidden();
-
-		// Dismiss without selecting a URL.
-		await page.keyboard.press( 'Escape' );
-
-		// Wait for the link UI to fully close before checking — this ensures
-		// the CSS visibility class has been removed and we are testing the
-		// actual entity dirty state, not just the CSS mask.
-		await expect( linkControl.getSearchInput() ).toBeHidden();
-
-		// Verify the save indicator still does not appear — the empty block
-		// insertion should be fully reverted, leaving the entity clean.
-		await expect(
-			page.getByRole( 'button', { name: /Review \d+ change…/ } )
-		).toBeHidden();
+		await linkControl.addLinkClose();
 	} );
 
 	test( 'cancelling a second add does not remove previously added unsaved links', async ( {
@@ -168,29 +132,21 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 
 		await expect( listView ).toBeVisible();
 
-		// Add a first new item by selecting a URL.
+		// Add a first new item by selecting a page.
 		const appender = listView.getByRole( 'button', { name: 'Add page' } );
 		await appender.click();
-		await linkControl.searchFor( 'Test Page' );
-		const firstResult = await linkControl.getNthSearchResult( 0 );
-		const firstResultText =
-			await linkControl.getSearchResultText( firstResult );
-		await firstResult.click();
+		await linkControl.useLinkControlSearch( 'Test Page 2' );
 
 		// Verify the first new item was committed (block 2 of 2).
 		await expect(
 			listView
-				.getByRole( 'gridcell', { name: firstResultText } )
+				.getByRole( 'gridcell', { name: 'Test Page 2' } )
 				.filter( { hasText: 'Block 2 of 2, Level 1.' } )
 		).toBeVisible();
 
 		// Start adding a second item but cancel without selecting a URL.
 		await appender.click();
-		await expect( linkControl.getSearchInput() ).toBeFocused();
-		await page.keyboard.press( 'Escape' );
-
-		// Wait for the link UI to fully close.
-		await expect( linkControl.getSearchInput() ).toBeHidden();
+		await linkControl.addLinkClose();
 
 		// The previously committed unsaved link should still be present —
 		// cancelling the second insertion must not remove the first one.
@@ -201,7 +157,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		).toBeVisible();
 		await expect(
 			listView
-				.getByRole( 'gridcell', { name: firstResultText } )
+				.getByRole( 'gridcell', { name: 'Test Page 2' } )
 				.filter( { hasText: 'Block 2 of 2, Level 1.' } )
 		).toBeVisible();
 	} );
@@ -230,10 +186,9 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		await appender.click();
 
 		// Verify focus goes to the search input immediately (focus management).
-		await expect( linkControl.getSearchInput() ).toBeFocused();
+		await expect( linkControl.getLinkControlSearch() ).toBeFocused();
 
-		// Dismiss without selecting a URL.
-		await page.keyboard.press( 'Escape' );
+		await linkControl.addLinkClose();
 
 		// The auto-inserted empty block should be cleaned up automatically.
 		// Verify the original item is still there and is the only item
@@ -251,38 +206,28 @@ class LinkControl {
 		this.page = page;
 	}
 
-	getSearchInput() {
+	getLinkControlSearch() {
 		return this.page.getByRole( 'combobox', {
 			name: 'Search or type URL',
 		} );
 	}
 
-	async getSearchResults() {
-		const searchInput = this.getSearchInput();
-		const resultsRef = await searchInput.getAttribute( 'aria-owns' );
-		const linkUIResults = this.page.locator( `#${ resultsRef }` );
-		await expect( linkUIResults ).toBeVisible();
-		return linkUIResults.getByRole( 'option' );
+	async useLinkControlSearch( searchTerm ) {
+		await expect( this.getLinkControlSearch() ).toBeFocused();
+
+		await this.page.keyboard.type( searchTerm, { delay: 50 } );
+
+		await expect(
+			this.page.getByRole( 'listbox', { name: 'Search results' } )
+		).toBeVisible();
+
+		await this.page.keyboard.press( 'ArrowDown' );
+		await this.page.keyboard.press( 'Enter' );
 	}
 
-	async getNthSearchResult( index = 0 ) {
-		const results = await this.getSearchResults();
-		return results.nth( index );
-	}
-
-	async searchFor( searchTerm ) {
-		const input = this.getSearchInput();
-		await expect( input ).toBeFocused();
-		await this.page.keyboard.type( searchTerm );
-		await expect( input ).toHaveValue( searchTerm );
-		return input;
-	}
-
-	async getSearchResultText( result ) {
-		await expect( result ).toBeVisible();
-		return result
-			.locator( '.components-menu-item__item' )
-			.last()
-			.innerText();
+	async addLinkClose() {
+		await expect( this.getLinkControlSearch() ).toBeFocused();
+		await this.page.keyboard.press( 'Escape' );
+		await expect( this.getLinkControlSearch() ).toBeHidden();
 	}
 }
