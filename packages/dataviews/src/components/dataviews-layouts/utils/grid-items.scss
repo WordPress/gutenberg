@@ -12,4 +12,12 @@
 	@media not (prefers-reduced-motion) {
 		transition: padding ease-out 0.1s;
 	}
+
+	&.has-compact-density {
+		gap: $grid-unit-20;
+	}
+
+	&.has-comfortable-density {
+		gap: $grid-unit-50;
+	}
 }

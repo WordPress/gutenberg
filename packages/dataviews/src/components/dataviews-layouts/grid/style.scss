@@ -17,6 +17,22 @@
 		transition: padding ease-out 0.1s;
 	}
 
+	&.has-compact-density {
+		gap: $grid-unit-20;
+
+		.dataviews-view-grid__row {
+			gap: $grid-unit-20;
+		}
+	}
+
+	&.has-comfortable-density {
+		gap: $grid-unit-50;
+
+		.dataviews-view-grid__row {
+			gap: $grid-unit-50;
+		}
+	}
+
 	.dataviews-view-grid__row {
 		display: grid;
 		gap: $grid-unit-40;

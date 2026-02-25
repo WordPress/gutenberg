@@ -190,6 +190,7 @@ export function MediaUploadModal( {
 		filters: [],
 		layout: {
 			previewSize: 170,
+			density: 'compact',
 		},
 	} ) );
 
