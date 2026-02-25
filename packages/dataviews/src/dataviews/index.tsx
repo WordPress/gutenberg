@@ -237,10 +237,11 @@ function DataViews< Item >( {
 		[ defaultLayoutsProperty ]
 	);
 
-	const { data: displayData, hasInitiallyLoaded } = useData(
-		data,
-		isLoading
-	);
+	const {
+		data: displayData,
+		paginationInfo: displayPaginationInfo,
+		hasInitiallyLoaded,
+	} = useData( data, isLoading, paginationInfo );
 
 	if ( ! defaultLayouts[ view.type ] ) {
 		return null;
@@ -255,7 +256,7 @@ function DataViews< Item >( {
 				actions,
 				data: displayData,
 				isLoading,
-				paginationInfo,
+				paginationInfo: displayPaginationInfo,
 				selection: _selection,
 				onChangeSelection: setSelectionWithChange,
 				openedFilter,
