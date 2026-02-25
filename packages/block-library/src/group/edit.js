@@ -82,22 +82,24 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
 
-	// Background image — mirrors PHP $use_img_element logic.
+	// Background image — read attributes used for editor <img> rendering.
 	const bgData = attributes.style?.background ?? {};
 	const bgImageId = bgData.backgroundImage?.id;
 	const bgSize = bgData.backgroundSize ?? 'cover';
 	const bgRepeat = bgData.backgroundRepeat;
 	const bgPosition = bgData.backgroundPosition;
 	const bgUrl = bgData.backgroundImage?.url;
-	const bgAttachment = bgData.backgroundAttachment;
 
-	// background-attachment:fixed requires CSS background properties, not <img>.
-	// 'no-repeat' is allowed: contain always sets it, and it's compatible with <img> object-fit.
+	// Render the background as <img> in the editor for all cover/contain images without
+	// tiling. This includes background-attachment:fixed: the editor canvas runs inside an
+	// iframe where fixed-attachment CSS positions the background relative to the iframe
+	// viewport (often rendering it off-screen), so <img> is a better editor preview.
+	// The PHP renderer handles background-attachment:fixed correctly on the frontend via
+	// CSS (see lib/block-supports/background.php $use_img_element logic).
 	const useImgElement =
 		!! bgImageId &&
 		[ 'cover', 'contain' ].includes( bgSize ) &&
-		( ! bgRepeat || bgRepeat === 'no-repeat' ) &&
-		bgAttachment !== 'fixed';
+		( ! bgRepeat || bgRepeat === 'no-repeat' );
 
 	// When using <img>, strip background-* CSS from wrapper and add position:relative.
 	const resolvedBlockProps = useImgElement
