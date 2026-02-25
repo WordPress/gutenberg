@@ -54,9 +54,13 @@ jobs:
 
             - name: Playground diagnostics
               if: ${{ matrix.part == 1 }}
+              continue-on-error: true
               run: |
+                  # Use ?rest_route= format (works regardless of permalink structure)
+                  REST_BASE="http://localhost:8889/?rest_route"
+
                   echo "=== WordPress REST API root ==="
-                  curl -s http://localhost:8889/wp-json/ | python3 -c "
+                  curl -s "${REST_BASE}=/" | python3 -c "
                   import sys, json
                   d = json.load(sys.stdin)
                   print(f'Site: {d.get(\"name\", \"?\")}')
@@ -73,63 +77,70 @@ jobs:
                   " 2>/dev/null || echo "Failed to query REST API"
 
                   echo ""
-                  echo "=== WordPress version (from wp-includes/version.php) ==="
-                  WP_ENV_DIR=$(find ~/.wp-env -maxdepth 1 -mindepth 1 -type d 2>/dev/null | head -1)
-                  if [ -n "$WP_ENV_DIR" ]; then
-                      find "$WP_ENV_DIR" -name "version.php" -path "*/wp-includes/*" 2>/dev/null | head -3 | while read -r f; do
-                          echo "File: $f"
-                          grep -E "wp_version\s*=" "$f" | head -1
-                      done
-                  fi
+                  echo "=== Link header (REST API discovery) ==="
+                  curl -sI http://localhost:8889/ 2>/dev/null | grep -i "^link:" || echo "No Link header found"
+
+                  echo ""
+                  echo "=== WordPress version ==="
+                  curl -s "${REST_BASE}=/wp/v2/settings" \
+                      -H "Authorization: Basic $(echo -n admin:password | base64)" 2>/dev/null | \
+                      python3 -c "import sys,json;d=json.load(sys.stdin);print(f'Title: {d.get(\"title\",\"?\")}')" 2>/dev/null || echo "Failed"
 
                   echo ""
                   echo "=== Test: Create a post and note comment ==="
-                  # Get nonce by logging in
                   COOKIE_JAR=$(mktemp)
-                  # Login to get auth cookie
                   curl -s -c "$COOKIE_JAR" -d "log=admin&pwd=password&wp-submit=Log+In&redirect_to=%2Fwp-admin%2F&testcookie=1" \
                       "http://localhost:8889/wp-login.php" -o /dev/null
-                  # Get REST nonce
                   NONCE=$(curl -s -b "$COOKIE_JAR" "http://localhost:8889/wp-admin/admin-ajax.php?action=rest-nonce" 2>/dev/null)
                   echo "REST nonce: ${NONCE:0:5}..."
-                  # Create a test post
+
                   POST_RESPONSE=$(curl -s -b "$COOKIE_JAR" -H "X-WP-Nonce: $NONCE" \
                       -H "Content-Type: application/json" \
                       -d '{"title":"Diagnostic Test","content":"Test content","status":"draft"}' \
-                      "http://localhost:8889/wp-json/wp/v2/posts")
+                      "${REST_BASE}=/wp/v2/posts")
                   POST_ID=$(echo "$POST_RESPONSE" | python3 -c "import sys,json;print(json.load(sys.stdin).get('id','ERROR'))" 2>/dev/null)
                   echo "Created post ID: $POST_ID"
-                  # Try creating a note comment
-                  NOTE_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -b "$COOKIE_JAR" -H "X-WP-Nonce: $NONCE" \
-                      -H "Content-Type: application/json" \
-                      -d "{\"post\":$POST_ID,\"content\":\"Test note\",\"type\":\"note\",\"status\":\"approve\"}" \
-                      "http://localhost:8889/wp-json/wp/v2/comments")
-                  HTTP_STATUS=$(echo "$NOTE_RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)
-                  BODY=$(echo "$NOTE_RESPONSE" | grep -v "HTTP_STATUS:")
-                  echo "Note creation HTTP status: $HTTP_STATUS"
-                  echo "Note creation response: $(echo "$BODY" | python3 -c "
-                  import sys, json
-                  try:
-                      d = json.load(sys.stdin)
-                      if 'id' in d: print(f'SUCCESS - Note ID: {d[\"id\"]}, Type: {d.get(\"type\",\"?\")}, Status: {d.get(\"status\",\"?\")}')
-                      elif 'code' in d: print(f'ERROR - Code: {d[\"code\"]}, Message: {d[\"message\"]}')
-                      else: print(json.dumps(d, indent=2)[:500])
-                  except: print(sys.stdin.read()[:500])
-                  " 2>/dev/null)"
-                  # Try SSR block rendering
-                  echo ""
-                  echo "=== Test: Server-side block rendering ==="
-                  SSR_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -b "$COOKIE_JAR" -H "X-WP-Nonce: $NONCE" \
-                      "http://localhost:8889/wp-json/wp/v2/block-renderer/core/archives?context=edit&post_id=$POST_ID")
-                  SSR_STATUS=$(echo "$SSR_RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)
-                  SSR_BODY=$(echo "$SSR_RESPONSE" | grep -v "HTTP_STATUS:")
-                  echo "Block renderer HTTP status: $SSR_STATUS"
-                  echo "Block renderer response: $(echo "$SSR_BODY" | head -c 500)"
+
+                  if [ "$POST_ID" != "ERROR" ] && [ -n "$POST_ID" ]; then
+                      NOTE_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -b "$COOKIE_JAR" -H "X-WP-Nonce: $NONCE" \
+                          -H "Content-Type: application/json" \
+                          -d "{\"post\":$POST_ID,\"content\":\"Test note\",\"type\":\"note\",\"status\":\"approve\"}" \
+                          "${REST_BASE}=/wp/v2/comments")
+                      HTTP_STATUS=$(echo "$NOTE_RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)
+                      BODY=$(echo "$NOTE_RESPONSE" | grep -v "HTTP_STATUS:")
+                      echo "Note creation HTTP status: $HTTP_STATUS"
+                      echo "Note creation response: $(echo "$BODY" | python3 -c "
+                      import sys, json
+                      try:
+                          d = json.load(sys.stdin)
+                          if 'id' in d: print(f'SUCCESS - Note ID: {d[\"id\"]}, Type: {d.get(\"type\",\"?\")}, Status: {d.get(\"status\",\"?\")}')
+                          elif 'code' in d: print(f'ERROR - Code: {d[\"code\"]}, Message: {d[\"message\"]}')
+                          else: print(json.dumps(d, indent=2)[:500])
+                      except: print(sys.stdin.read()[:500])
+                      " 2>/dev/null)"
+
+                      echo ""
+                      echo "=== Test: Server-side block rendering ==="
+                      SSR_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -b "$COOKIE_JAR" -H "X-WP-Nonce: $NONCE" \
+                          "${REST_BASE}=/wp/v2/block-renderer/core/archives&context=edit&post_id=$POST_ID")
+                      SSR_STATUS=$(echo "$SSR_RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)
+                      SSR_BODY=$(echo "$SSR_RESPONSE" | grep -v "HTTP_STATUS:")
+                      echo "Block renderer HTTP status: $SSR_STATUS"
+                      echo "Block renderer response: $(echo "$SSR_BODY" | head -c 500)"
+                  else
+                      echo "Skipping note/SSR tests (post creation failed)"
+                      echo "Post creation response: $(echo "$POST_RESPONSE" | head -c 500)"
+                  fi
                   rm -f "$COOKIE_JAR"
 
                   echo ""
+                  echo "=== wp-env work directory ==="
+                  find "$HOME/.wp-env" -maxdepth 2 -type f -name "*.log" 2>/dev/null || echo "No log files found in $HOME/.wp-env"
+                  ls -la "$HOME/.wp-env/" 2>/dev/null || echo "$HOME/.wp-env does not exist"
+
+                  echo ""
                   echo "=== Playground log (last 100 lines) ==="
-                  cat ~/.wp-env/*/playground.log 2>/dev/null | tail -100 || echo "No playground log found"
+                  find "$HOME/.wp-env" -name "playground.log" -exec tail -100 {} \; 2>/dev/null || echo "No playground log found"
 
             - name: Run the tests
               env:
@@ -155,12 +166,18 @@ jobs:
                   path: flaky-tests
                   if-no-files-found: ignore
 
+            - name: Collect Playground logs
+              if: ${{ !cancelled() }}
+              run: |
+                  mkdir -p playground-logs
+                  find "$HOME/.wp-env" -name "playground.log" -exec cp {} playground-logs/ \; 2>/dev/null || true
+
             - name: Archive Playground logs
               uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
               if: ${{ !cancelled() }}
               with:
                   name: playground-logs--${{ matrix.part }}
-                  path: ~/.wp-env/*/playground.log
+                  path: playground-logs
                   if-no-files-found: ignore
 
     merge-artifacts:

@@ -71,12 +71,20 @@ function buildBlueprint( config ) {
 	// Match Docker runtime defaults:
 	// - Set the site title to the project name (Docker uses --title in wp core install)
 	// - Enable pretty permalinks (Docker uses: wp rewrite structure '/%year%/%monthnum%/%day%/%postname%/' --hard)
+	//
+	// NOTE: We must use $wp_rewrite->set_permalink_structure() rather than
+	// update_option('permalink_structure', ...) because the WP_Rewrite object
+	// was already loaded with the default (empty) permalink structure during
+	// wp-load.php. update_option() only updates the DB; flush_rewrite_rules()
+	// reads from the in-memory $wp_rewrite->permalink_structure which would
+	// still be empty, so no rewrite rules (including /wp-json/) would be generated.
 	blueprint.steps.push( {
 		step: 'runPHP',
 		code: `<?php
 			require '/wordpress/wp-load.php';
 			update_option( 'blogname', '${ config.name }' );
-			update_option( 'permalink_structure', '/%year%/%monthnum%/%day%/%postname%/' );
+			global $wp_rewrite;
+			$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 			flush_rewrite_rules();
 		`,
 	} );
