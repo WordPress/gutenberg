@@ -92,6 +92,7 @@ export function useConnectorPlugin( {
 				data: { slug: pluginSlug, status: 'active' },
 			} );
 			setPluginStatus( 'active' );
+			await fetchApiKey();
 			setIsExpanded( true );
 		} catch {
 			// Handle error
@@ -109,6 +110,7 @@ export function useConnectorPlugin( {
 				data: { status: 'active' },
 			} );
 			setPluginStatus( 'active' );
+			await fetchApiKey();
 			setIsExpanded( true );
 		} catch {
 			// Handle error
