@@ -136,7 +136,7 @@ function _gutenberg_validate_gemini_api_key_on_save( string $value, string $old_
  * @return string Masked key or empty string.
  */
 function _gutenberg_mask_openai_api_key( string $value ): string {
-	if ( empty( $value ) ) {
+	if ( '' === $value ) {
 		return $value;
 	}
 	return _gutenberg_mask_api_key( $value );
