@@ -174,6 +174,18 @@ describe( 'computeBadges', () => {
 			} );
 		} );
 
+		it( 'should show "Homepage" badge for root path', () => {
+			const badges = computeBadges( {
+				url: '/',
+				isExternal: false,
+			} );
+
+			expect( badges ).toContainEqual( {
+				label: 'Homepage',
+				intent: 'default',
+			} );
+		} );
+
 		it( 'should show page badge for relative paths', () => {
 			const badges = computeBadges( {
 				url: '/relative-path',
@@ -251,6 +263,25 @@ it( 'should show "Internal link" badge for hash links even when type is present'
 	// Should prioritize hash link detection over type
 	expect( badges ).toContainEqual( {
 		label: 'Internal link',
+		intent: 'default',
+	} );
+	// Should NOT show Page badge
+	expect( badges ).not.toContainEqual( {
+		label: 'Page',
+		intent: 'default',
+	} );
+} );
+
+it( 'should show "Homepage" badge for root path even when type is present', () => {
+	const badges = computeBadges( {
+		url: '/',
+		type: 'page',
+		isExternal: false,
+	} );
+
+	// Should prioritize homepage detection over type
+	expect( badges ).toContainEqual( {
+		label: 'Homepage',
 		intent: 'default',
 	} );
 	// Should NOT show Page badge
