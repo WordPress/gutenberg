@@ -13,7 +13,7 @@
  * @param string $key The API key to mask.
  * @return string The masked key, e.g. "••••••••••••fj39".
  */
-function _gutenberg_mask_api_key( $key ) {
+function _gutenberg_mask_api_key( string $key ): string {
 	if ( strlen( $key ) <= 4 ) {
 		return $key;
 	}
@@ -29,7 +29,7 @@ function _gutenberg_mask_api_key( $key ) {
  * @param string $provider_id The WP AI client provider ID.
  * @return bool|null True if valid, false if invalid, null if unable to determine.
  */
-function _gutenberg_is_api_key_valid( $key, $provider_id ) {
+function _gutenberg_is_api_key_valid( string $key, string $provider_id ): ?bool {
 	try {
 		$registry = \WordPress\AiClient\AiClient::defaultRegistry();
 
@@ -56,7 +56,7 @@ function _gutenberg_is_api_key_valid( $key, $provider_id ) {
  * @param string $key         The API key.
  * @param string $provider_id The WP AI client provider ID.
  */
-function _gutenberg_set_provider_api_key( $key, $provider_id ) {
+function _gutenberg_set_provider_api_key( string $key, string $provider_id ): void {
 	try {
 		$registry = \WordPress\AiClient\AiClient::defaultRegistry();
 
@@ -84,7 +84,7 @@ function _gutenberg_set_provider_api_key( $key, $provider_id ) {
  * @param string $mask_callback  The mask filter function name.
  * @return string The real API key value.
  */
-function _gutenberg_get_real_api_key( $option_name, $mask_callback ) {
+function _gutenberg_get_real_api_key( string $option_name, string $mask_callback ): string {
 	remove_filter( "option_{$option_name}", $mask_callback );
 	$value = get_option( $option_name, '' );
 	add_filter( "option_{$option_name}", $mask_callback );
@@ -101,7 +101,7 @@ function _gutenberg_get_real_api_key( $option_name, $mask_callback ) {
  * @param string $value The raw option value.
  * @return string Masked key or empty string.
  */
-function _gutenberg_mask_gemini_api_key( $value ) {
+function _gutenberg_mask_gemini_api_key( string $value ): string {
 	if ( empty( $value ) ) {
 		return $value;
 	}
@@ -117,7 +117,7 @@ function _gutenberg_mask_gemini_api_key( $value ) {
  * @param string $old_value The previous value.
  * @return string The value to persist.
  */
-function _gutenberg_validate_gemini_api_key_on_save( $value, $old_value ) {
+function _gutenberg_validate_gemini_api_key_on_save( string $value, string $old_value ): string {
 	if ( empty( $value ) ) {
 		return $value;
 	}
@@ -135,7 +135,7 @@ function _gutenberg_validate_gemini_api_key_on_save( $value, $old_value ) {
  * @param string $value The raw option value.
  * @return string Masked key or empty string.
  */
-function _gutenberg_mask_openai_api_key( $value ) {
+function _gutenberg_mask_openai_api_key( string $value ): string {
 	if ( empty( $value ) ) {
 		return $value;
 	}
@@ -151,7 +151,7 @@ function _gutenberg_mask_openai_api_key( $value ) {
  * @param string $old_value The previous value.
  * @return string The value to persist.
  */
-function _gutenberg_validate_openai_api_key_on_save( $value, $old_value ) {
+function _gutenberg_validate_openai_api_key_on_save( string $value, string $old_value ): string {
 	if ( empty( $value ) ) {
 		return $value;
 	}
@@ -169,7 +169,7 @@ function _gutenberg_validate_openai_api_key_on_save( $value, $old_value ) {
  * @param string $value The raw option value.
  * @return string Masked key or empty string.
  */
-function _gutenberg_mask_anthropic_api_key( $value ) {
+function _gutenberg_mask_anthropic_api_key( string $value ): string {
 	if ( empty( $value ) ) {
 		return $value;
 	}
@@ -185,7 +185,7 @@ function _gutenberg_mask_anthropic_api_key( $value ) {
  * @param string $old_value The previous value.
  * @return string The value to persist.
  */
-function _gutenberg_validate_anthropic_api_key_on_save( $value, $old_value ) {
+function _gutenberg_validate_anthropic_api_key_on_save( string $value, string $old_value ): string {
 	if ( empty( $value ) ) {
 		return $value;
 	}
@@ -210,7 +210,7 @@ function _gutenberg_validate_anthropic_api_key_on_save( $value, $old_value ) {
  * @param WP_REST_Request  $request  The request object.
  * @return WP_REST_Response The potentially modified response.
  */
-function _gutenberg_validate_connector_keys_in_rest( $response, $server, $request ) {
+function _gutenberg_validate_connector_keys_in_rest( WP_REST_Response $response, WP_REST_Server $server, WP_REST_Request $request ): WP_REST_Response {
 	if ( '/wp/v2/settings' !== $request->get_route() ) {
 		return $response;
 	}
@@ -253,7 +253,7 @@ add_filter( 'rest_post_dispatch', '_gutenberg_validate_connector_keys_in_rest', 
  *
  * @access private
  */
-function _gutenberg_register_default_connector_settings() {
+function _gutenberg_register_default_connector_settings(): void {
 	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
 		return;
 	}
@@ -295,7 +295,7 @@ add_action( 'init', '_gutenberg_register_default_connector_settings' );
  *
  * @access private
  */
-function _gutenberg_pass_default_connector_keys_to_ai_client() {
+function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
 		return;
 	}
