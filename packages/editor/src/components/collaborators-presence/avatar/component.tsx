@@ -11,6 +11,7 @@ extend( [ a11yPlugin ] );
  * WordPress dependencies
  */
 import { Icon, Tooltip } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -40,20 +41,25 @@ function Avatar( {
 				.join( '' )
 				.toUpperCase()
 		: undefined;
+	const nameColor = useMemo(
+		() =>
+			borderColor &&
+			colord( borderColor ).isReadable( '#1e1e1e', {
+				level: 'AA',
+				size: 'normal',
+			} )
+				? '#1e1e1e'
+				: '#fff',
+		[ borderColor ]
+	);
+
 	const customProperties = {
 		...style,
 		...( src ? { '--editor-avatar-url': `url(${ src })` } : {} ),
 		...( borderColor
 			? {
 					'--editor-avatar-outline-color': borderColor,
-					'--editor-avatar-name-color': colord(
-						borderColor
-					).isReadable( '#1e1e1e', {
-						level: 'AA',
-						size: 'normal',
-					} )
-						? '#1e1e1e'
-						: '#fff',
+					'--editor-avatar-name-color': nameColor,
 			  }
 			: {} ),
 	} as React.CSSProperties;
@@ -68,8 +74,8 @@ function Avatar( {
 				'is-dimmed': dimmed,
 			} ) }
 			style={ customProperties }
-			role="img"
-			aria-label={ name }
+			role={ name ? 'img' : undefined }
+			aria-label={ name || undefined }
 			{ ...props }
 		>
 			<span className="editor-avatar__image">{ ! src && initials }</span>
