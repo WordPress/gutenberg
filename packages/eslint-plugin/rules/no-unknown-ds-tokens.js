@@ -36,7 +36,7 @@ function extractCSSVariables( value, prefix = '' ) {
 }
 
 const knownTokens = new Set( tokenList );
-const wpdsTokensRegex = new RegExp( `[^\\w]--${ DS_TOKEN_PREFIX }`, 'i' );
+const wpdsTokensRegex = new RegExp( `(?:^|[^\\w])--${ DS_TOKEN_PREFIX }`, 'i' );
 
 module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 	meta: {

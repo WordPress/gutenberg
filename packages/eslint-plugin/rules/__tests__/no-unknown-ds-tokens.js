@@ -91,5 +91,21 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 				},
 			],
 		},
+		{
+			code: `const token = '--wpds-nonexistent-token';`,
+			errors: [
+				{
+					messageId: 'onlyKnownTokens',
+				},
+			],
+		},
+		{
+			code: 'const style = `--wpds-dimension-gap-${ size }`;',
+			errors: [
+				{
+					messageId: 'dynamicToken',
+				},
+			],
+		},
 	],
 } );
