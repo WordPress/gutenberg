@@ -22,6 +22,9 @@ ruleTester.run( 'no-ds-tokens', rule, {
 			code: 'const style = `border: 1px solid var(--other-prefix-token)`;',
 		},
 		{
+			code: `const name = 'something--wpds-color';`,
+		},
+		{
 			code: `<div style={ { color: 'var(--my-custom-prop)' } } />`,
 		},
 	],
