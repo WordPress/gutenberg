@@ -1,3 +1,4 @@
+/* eslint-disable @wordpress/no-unknown-ds-tokens */
 import { addFallbackToVar } from '../add-fallback-to-var';
 
 const mockFallbacks: Record< string, string > = {
@@ -89,3 +90,4 @@ describe( 'addFallbackToVar', () => {
 		expect( second ).toBe( first );
 	} );
 } );
+/* eslint-enable @wordpress/no-unknown-ds-tokens */

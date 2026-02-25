@@ -9,6 +9,7 @@ const ruleName = 'plugin-wpds/no-setting-wpds-custom-properties';
 
 const messages = ruleMessages( ruleName, {
 	rejected: () =>
+		// eslint-disable-next-line @wordpress/no-unknown-ds-tokens
 		`Do not set CSS custom properties using the Design System tokens namespace (i.e. beginning with --wpds-*).`,
 } );
 
