@@ -36,6 +36,7 @@ jest.mock( '../../../lock-unlock', () => ( {
 import {
 	computeDisplayUrl,
 	computeBadges,
+	isHomepage,
 	useLinkPreview,
 } from '../use-link-preview';
 
@@ -135,6 +136,74 @@ describe( 'computeDisplayUrl', () => {
 	} );
 } );
 
+describe( 'isHomepage', () => {
+	const host = 'homepage.com';
+	const siteUrl = 'https://' + host;
+
+	test.each( [
+		[ '/', siteUrl ],
+		[ '/', undefined ],
+	] )( 'should return true for root path "%s"', ( url, siteUrlParam ) => {
+		expect( isHomepage( url, siteUrlParam ) ).toBe( true );
+	} );
+
+	// Check combinations of http/s and trailing slash
+	test.each( [
+		[ `http://${ host }`, siteUrl ],
+		[ `https://${ host }`, siteUrl ],
+		[ `http://${ host }/`, siteUrl ],
+		[ `https://${ host }/`, siteUrl ],
+	] )( 'should return true for site URL "%s"', ( url ) => {
+		expect( isHomepage( url, siteUrl ) ).toBe( true );
+	} );
+
+	test.each( [
+		[ '', siteUrl ],
+		[ `https://${ host }`, '' ],
+		[ `https://${ host }`, undefined ],
+	] )(
+		'should return false when url or siteUrl is empty and not a / path',
+		( url, siteUrlParam ) => {
+			expect( isHomepage( url, siteUrlParam ) ).toBe( false );
+		}
+	);
+
+	const subdomain = 'sub.' + host;
+	test.each( [
+		[ false, `http://${ subdomain }/`, siteUrl ],
+		[ false, `https://${ subdomain }`, siteUrl ],
+		[ true, `http://${ subdomain }/`, `https://${ subdomain }` ],
+		[ true, `https://${ subdomain }`, `https://${ subdomain }` ],
+	] )(
+		'should return %s for subdomain (url=%s, siteUrl=%s)',
+		( expected, url, siteUrlParam ) => {
+			expect( isHomepage( url, siteUrlParam ) ).toBe( expected );
+		}
+	);
+
+	const path = '/wordpress';
+	const subdirSiteUrl = 'https://' + host + path;
+
+	test.each( [
+		[ `https://${ host }${ path }`, subdirSiteUrl ],
+		[ `https://${ host }${ path }/`, subdirSiteUrl ],
+		[ `http://${ host }${ path }`, subdirSiteUrl ],
+		[ `http://${ host }${ path }/`, subdirSiteUrl ],
+	] )( 'should return true for subdirectory homepage "%s"', ( url ) => {
+		expect( isHomepage( url, subdirSiteUrl ) ).toBe( true );
+	} );
+
+	test.each( [
+		[ `https://${ host }/page`, siteUrl ],
+		[ '/page', siteUrl ],
+		[ `https://${ host }`, subdirSiteUrl ],
+		[ `https://${ host }/`, subdirSiteUrl ],
+		[ `https://${ host }${ path }/page`, subdirSiteUrl ],
+	] )( 'should return false for non-homepage "%s"', ( url, siteUrlParam ) => {
+		expect( isHomepage( url, siteUrlParam ) ).toBe( false );
+	} );
+} );
+
 describe( 'computeBadges', () => {
 	describe( 'kind badges', () => {
 		it( 'should show "External link" badge for external links', () => {
@@ -185,6 +254,55 @@ describe( 'computeBadges', () => {
 				intent: 'default',
 			} );
 		} );
+
+		test.each( [
+			[ 'https://example.com' ],
+			[ 'https://example.com/' ],
+			[ 'http://example.com' ],
+			[ 'http://example.com/' ],
+		] )( 'should show "Homepage" badge when url is "%s"', ( url ) => {
+			const badges = computeBadges( {
+				url,
+				siteUrl: 'https://example.com',
+				isExternal: false,
+			} );
+			expect( badges ).toContainEqual( {
+				label: 'Homepage',
+				intent: 'default',
+			} );
+		} );
+
+		test.each( [ [ 'https://sub.example.com/', 'https://example.com' ] ] )(
+			'should not show Homepage badge when subdomain url "%s" does not match siteUrl "%s"',
+			( url, siteUrl ) => {
+				const badges = computeBadges( {
+					url,
+					siteUrl,
+					isExternal: false,
+				} );
+				expect( badges ).not.toContainEqual( {
+					label: 'Homepage',
+					intent: 'default',
+				} );
+			}
+		);
+
+		test.each( [
+			[ 'https://sub.example.com/', 'https://sub.example.com' ],
+		] )(
+			'should show Homepage badge when subdomain url "%s" matches siteUrl "%s"',
+			( url, siteUrl ) => {
+				const badges = computeBadges( {
+					url,
+					siteUrl,
+					isExternal: false,
+				} );
+				expect( badges ).toContainEqual( {
+					label: 'Homepage',
+					intent: 'default',
+				} );
+			}
+		);
 
 		it( 'should show page badge for relative paths', () => {
 			const badges = computeBadges( {

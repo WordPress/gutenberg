@@ -27,6 +27,41 @@ function capitalize( str ) {
 }
 
 /**
+ * Check if a URL points to the site homepage.
+ * Handles protocol (http/https) and trailing slash variations.
+ * Does not match subdomains unless they are the site URL.
+ *
+ * @param {string} url     - The URL to check
+ * @param {string} siteUrl - The WordPress site URL
+ * @return {boolean} True if url is the homepage
+ */
+export function isHomepage( url, siteUrl ) {
+	if ( url === '/' ) {
+		return true;
+	}
+	if ( ! url || ! siteUrl ) {
+		return false;
+	}
+	try {
+		const urlParsed = new URL( url, siteUrl );
+		const siteParsed = new URL( siteUrl );
+
+		// Same host (sub.homepage.com !== homepage.com unless siteUrl is sub.homepage.com)
+		if ( urlParsed.hostname !== siteParsed.hostname ) {
+			return false;
+		}
+
+		// Path must match site root (normalize trailing slash)
+		const urlPath = urlParsed.pathname.replace( /\/$/, '' );
+		const sitePath = siteParsed.pathname.replace( /\/$/, '' );
+
+		return urlPath === sitePath;
+	} catch {
+		return false;
+	}
+}
+
+/**
  * Compute display URL - strips site URL if internal, shows full URL if external.
  *
  * @param {Object} options         - Parameters object
@@ -82,6 +117,7 @@ export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
  *
  * @param {Object}  options                   - Options object
  * @param {string}  options.url               - Link URL
+ * @param {string}  options.siteUrl           - WordPress site URL (for homepage detection)
  * @param {string}  options.type              - Entity type (page, post, etc.)
  * @param {boolean} options.isExternal        - Whether link is external
  * @param {string}  options.entityStatus      - Entity status (publish, draft, etc.)
@@ -91,6 +127,7 @@ export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
  */
 export function computeBadges( {
 	url,
+	siteUrl,
 	type,
 	isExternal,
 	entityStatus,
@@ -112,7 +149,7 @@ export function computeBadges( {
 				label: __( 'Internal link' ),
 				intent: 'default',
 			} );
-		} else if ( url === '/' ) {
+		} else if ( isHomepage( url, siteUrl ) ) {
 			badges.push( {
 				label: __( 'Homepage' ),
 				intent: 'default',
@@ -233,6 +270,7 @@ export function useLinkPreview( {
 	// Compute badges
 	const badges = computeBadges( {
 		url,
+		siteUrl,
 		type,
 		isExternal,
 		entityStatus: entityRecord?.status,
