@@ -23,6 +23,8 @@ describe( 'feature-detection', () => {
 		navigator,
 		'connection'
 	);
+	const originalHardwareConcurrencyDescriptor =
+		Object.getOwnPropertyDescriptor( navigator, 'hardwareConcurrency' );
 
 	beforeEach( () => {
 		// Clear the cache before each test.
@@ -62,6 +64,10 @@ describe( 'feature-detection', () => {
 			// @ts-ignore
 			delete navigator.connection;
 		}
+		if ( 'hardwareConcurrency' in navigator ) {
+			// @ts-ignore
+			delete navigator.hardwareConcurrency;
+		}
 	} );
 
 	afterEach( () => {
@@ -99,6 +105,18 @@ describe( 'feature-detection', () => {
 		} else if ( 'connection' in navigator ) {
 			// @ts-ignore
 			delete navigator.connection;
+		}
+
+		// Restore navigator.hardwareConcurrency.
+		if ( originalHardwareConcurrencyDescriptor ) {
+			Object.defineProperty(
+				navigator,
+				'hardwareConcurrency',
+				originalHardwareConcurrencyDescriptor
+			);
+		} else if ( 'hardwareConcurrency' in navigator ) {
+			// @ts-ignore
+			delete navigator.hardwareConcurrency;
 		}
 	} );
 
@@ -194,6 +212,35 @@ describe( 'feature-detection', () => {
 			global.SharedArrayBuffer = originalSharedArrayBuffer;
 
 			Object.defineProperty( navigator, 'deviceMemory', {
+				value: 4,
+				configurable: true,
+			} );
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( true );
+		} );
+
+		it( 'returns not supported when hardware concurrency is less than 4', () => {
+			global.WebAssembly = originalWebAssembly;
+			global.SharedArrayBuffer = originalSharedArrayBuffer;
+
+			Object.defineProperty( navigator, 'hardwareConcurrency', {
+				value: 2,
+				configurable: true,
+			} );
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( false );
+			expect( result.reason ).toContain( 'insufficient CPU cores' );
+		} );
+
+		it( 'returns supported when hardware concurrency is 4 or more', () => {
+			global.WebAssembly = originalWebAssembly;
+			global.SharedArrayBuffer = originalSharedArrayBuffer;
+
+			Object.defineProperty( navigator, 'hardwareConcurrency', {
 				value: 4,
 				configurable: true,
 			} );
