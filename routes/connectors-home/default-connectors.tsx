@@ -8,7 +8,7 @@ import {
 	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -38,78 +38,7 @@ interface ConnectorConfig {
 	helpUrl: string;
 	helpLabel: string;
 	Logo: React.ComponentType;
-	validate?: ( value: string ) => string | undefined;
 }
-
-interface KeyValidationRule {
-	prefix: string;
-	pattern: RegExp;
-	minLength: number;
-	exactLength?: number;
-}
-
-function createKeyValidator( providerName: string, rule: KeyValidationRule ) {
-	return ( value: string ): string | undefined => {
-		if ( ! value.startsWith( rule.prefix ) ) {
-			return rule.exactLength
-				? sprintf(
-						/* translators: 1: provider name, 2: key prefix, 3: number of characters */
-						__(
-							'%1$s API keys start with "%2$s" and are %3$d characters long.'
-						),
-						providerName,
-						rule.prefix,
-						rule.exactLength
-				  )
-				: sprintf(
-						/* translators: 1: provider name, 2: key prefix, 3: minimum number of characters */
-						__(
-							'%1$s API keys start with "%2$s" and are at least %3$d characters long.'
-						),
-						providerName,
-						rule.prefix,
-						rule.minLength
-				  );
-		}
-		if ( ! rule.pattern.test( value ) ) {
-			return rule.exactLength
-				? sprintf(
-						/* translators: 1: provider name, 2: number of characters */
-						__( '%1$s API keys are %2$d characters long.' ),
-						providerName,
-						rule.exactLength
-				  )
-				: sprintf(
-						/* translators: 1: provider name, 2: minimum number of characters */
-						__(
-							'%1$s API keys are at least %2$d characters long.'
-						),
-						providerName,
-						rule.minLength
-				  );
-		}
-		return undefined;
-	};
-}
-
-const validateOpenAIKey = createKeyValidator( 'OpenAI', {
-	prefix: 'sk-',
-	pattern: /^sk-(proj-|svcacct-|admin-)?[A-Za-z0-9_-]{20,}/,
-	minLength: 40,
-} );
-
-const validateAnthropicKey = createKeyValidator( 'Anthropic', {
-	prefix: 'sk-ant-',
-	pattern: /^sk-ant-[a-zA-Z0-9_-]{20,}/,
-	minLength: 40,
-} );
-
-const validateGeminiKey = createKeyValidator( 'Gemini', {
-	prefix: 'AIza',
-	pattern: /^AIza[A-Za-z0-9_-]{35}$/,
-	minLength: 39,
-	exactLength: 39,
-} );
 
 function ProviderConnector( {
 	label,
@@ -119,7 +48,6 @@ function ProviderConnector( {
 	helpUrl,
 	helpLabel,
 	Logo,
-	validate,
 }: ConnectorRenderProps & ConnectorConfig ) {
 	const {
 		pluginStatus,
@@ -170,7 +98,6 @@ function ProviderConnector( {
 					helpUrl={ helpUrl }
 					helpLabel={ helpLabel }
 					readOnly={ isConnected }
-					validate={ validate }
 					onRemove={ removeApiKey }
 					onSave={ async ( apiKey: string ) => {
 						await saveApiKey( apiKey );
@@ -192,7 +119,6 @@ function OpenAIConnector( props: ConnectorRenderProps ) {
 			helpUrl="https://platform.openai.com"
 			helpLabel="platform.openai.com"
 			Logo={ OpenAILogo }
-			validate={ validateOpenAIKey }
 		/>
 	);
 }
@@ -207,7 +133,6 @@ function ClaudeConnector( props: ConnectorRenderProps ) {
 			helpUrl="https://console.anthropic.com"
 			helpLabel="console.anthropic.com"
 			Logo={ ClaudeLogo }
-			validate={ validateAnthropicKey }
 		/>
 	);
 }
@@ -222,7 +147,6 @@ function GeminiConnector( props: ConnectorRenderProps ) {
 			helpUrl="https://aistudio.google.com"
 			helpLabel="aistudio.google.com"
 			Logo={ GeminiLogo }
-			validate={ validateGeminiKey }
 		/>
 	);
 }

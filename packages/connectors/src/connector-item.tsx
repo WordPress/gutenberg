@@ -62,7 +62,6 @@ export interface DefaultConnectorSettingsProps {
 	helpUrl?: string;
 	helpLabel?: string;
 	readOnly?: boolean;
-	validate?: ( value: string ) => string | undefined;
 }
 
 /**
@@ -75,15 +74,10 @@ export function DefaultConnectorSettings( {
 	helpUrl,
 	helpLabel,
 	readOnly = false,
-	validate,
 }: DefaultConnectorSettingsProps ) {
 	const [ apiKey, setApiKey ] = useState( initialValue );
-	const [ hasBlurred, setHasBlurred ] = useState( false );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ saveError, setSaveError ] = useState< string | null >( null );
-
-	const validationError =
-		! readOnly && hasBlurred && apiKey ? validate?.( apiKey ) : undefined;
 
 	const helpLinkLabel =
 		helpLabel || helpUrl?.replace( /^https?:\/\//, '' );
@@ -115,13 +109,6 @@ export function DefaultConnectorSettings( {
 				</span>
 			);
 		}
-		if ( validationError ) {
-			return (
-				<span style={ { color: '#cc1818' } }>
-					{ validationError }
-				</span>
-			);
-		}
 		return helpLink;
 	};
 
@@ -134,7 +121,7 @@ export function DefaultConnectorSettings( {
 			setSaveError(
 				error instanceof Error
 					? error.message
-					: __( 'Failed to save API key. Please try again.' )
+					: __( 'It was not possible to connect to the provider using this key.' )
 			);
 		} finally {
 			setIsSaving( false );
@@ -155,7 +142,6 @@ export function DefaultConnectorSettings( {
 					setSaveError( null );
 					setApiKey( value );
 				} }
-				onBlur={ () => setHasBlurred( true ) }
 				placeholder="YOUR_API_KEY"
 				disabled={ readOnly || isSaving }
 				help={ getHelp() }
@@ -172,7 +158,7 @@ export function DefaultConnectorSettings( {
 				<HStack justify="flex-start">
 					<Button
 						variant="primary"
-						disabled={ ! apiKey || !! validationError || isSaving }
+						disabled={ ! apiKey || isSaving }
 						isBusy={ isSaving }
 						onClick={ handleSave }
 					>
