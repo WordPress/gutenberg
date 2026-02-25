@@ -17,7 +17,7 @@ import save from './save';
 import deprecated from './deprecated';
 import LeafMoreMenu from './edit/leaf-more-menu';
 import { NavigationLinkUI } from './edit/navigation-link-ui';
-import NavigationListViewProviderWrapper from './edit/navigation-list-view-provider-wrapper';
+import NavigationListViewHeader from './edit/navigation-list-view-header';
 
 const { name } = metadata;
 
@@ -78,7 +78,7 @@ export const settings = {
 	listView: {
 		blockSettingsMenu: LeafMoreMenu,
 		additionalBlockContent: NavigationLinkUI,
-		panelHeader: NavigationListViewProviderWrapper,
+		panelHeader: NavigationListViewHeader,
 	},
 	deprecated,
 };
