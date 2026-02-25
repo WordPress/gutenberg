@@ -301,6 +301,23 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'expected_wrapper'    => '<div class="has-background" style="background-image:url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-repeat:repeat;background-size:cover;">Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
+			'background image with attachment id and fixed attachment falls back to CSS' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-rules-are-output',
+				'background_settings' => array(
+					'backgroundImage' => true,
+				),
+				'background_style'    => array(
+					'backgroundImage'      => array(
+						'id'  => 99999,
+						'url' => 'https://example.com/image.jpg',
+					),
+					'backgroundSize'       => 'cover',
+					'backgroundAttachment' => 'fixed',
+				),
+				'expected_wrapper'    => '<div class="has-background" style="background-image:url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover;background-attachment:fixed;">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
 		);
 	}
 
