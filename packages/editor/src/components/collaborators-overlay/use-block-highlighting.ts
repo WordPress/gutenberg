@@ -70,6 +70,9 @@ export function useBlockHighlighting(
 			return;
 		}
 
+		// Deduplicate by blockId — when multiple collaborators select the
+		// same block, only the first one gets the highlight and avatar label.
+		const seen = new Set< string >();
 		const blocksToHighlight = userStates
 			.filter(
 				( userState ) =>
@@ -97,9 +100,18 @@ export function useBlockHighlighting(
 					),
 				};
 			} )
-			.filter( ( block ): block is NonNullable< typeof block > => {
-				return block !== null;
-			} );
+			.filter(
+				( block ): block is NonNullable< typeof block > => {
+					if ( ! block ) {
+						return false;
+					}
+					if ( seen.has( block.blockId ) ) {
+						return false;
+					}
+					seen.add( block.blockId );
+					return true;
+				}
+			);
 
 		// Unhighlight blocks that are no longer selected.
 		const selectedBlockIds = new Set(
