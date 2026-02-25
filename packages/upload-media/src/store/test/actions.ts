@@ -612,6 +612,45 @@ describe( 'actions', () => {
 
 			consoleErrorSpy.mockRestore();
 		} );
+
+		it( 'clears pending retry timer on manual cancel', async () => {
+			const onError = jest.fn();
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+				onError,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Schedule a retry to put item in PendingRetry with a pending timer.
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'Network error' ) );
+
+			const pendingItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+			expect( pendingItem.status ).toBe( ItemStatus.PendingRetry );
+
+			// Now manually cancel the item while it's pending retry.
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'Manual cancel' ), true );
+
+			// Item should be removed from queue.
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+
+			// Advance timers — the old retry timer should NOT fire.
+			await jest.runAllTimersAsync();
+
+			// Queue should still be empty (timer was cleared).
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+		} );
 	} );
 
 	describe( 'scheduleRetry', () => {
@@ -821,6 +860,38 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 			expect( updatedItem.retryCount ).toBe( 1 );
+		} );
+
+		it( 'creates a fresh AbortController after retry', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+			const originalController = item.abortController;
+
+			// Schedule retry to put item in PendingRetry status.
+			await registry
+				.dispatch( uploadStore )
+				.scheduleRetry( item.id, new Error( 'Network error' ) );
+
+			// Execute the retry.
+			await registry.dispatch( uploadStore ).executeRetry( item.id );
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Should have a new AbortController instance.
+			expect( updatedItem.abortController ).toBeInstanceOf(
+				AbortController
+			);
+			expect( updatedItem.abortController ).not.toBe(
+				originalController
+			);
+			// The new controller should not be aborted.
+			expect( updatedItem.abortController?.signal.aborted ).toBe( false );
 		} );
 
 		it( 'does nothing if item does not exist', async () => {
