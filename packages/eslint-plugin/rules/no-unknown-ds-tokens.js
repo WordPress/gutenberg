@@ -42,7 +42,7 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 	meta: {
 		type: 'problem',
 		docs: {
-			description: 'Prevent use of non-existing --wpds-* variables', // eslint-disable-line @wordpress/no-unknown-ds-tokens
+			description: 'Prevent use of non-existing --wpds-* variables',
 		},
 		schema: [],
 		messages: {

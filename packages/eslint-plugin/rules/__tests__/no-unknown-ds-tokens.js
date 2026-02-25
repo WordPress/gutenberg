@@ -1,4 +1,3 @@
-/* eslint-disable @wordpress/no-unknown-ds-tokens */
 import { RuleTester } from 'eslint';
 import rule from '../no-unknown-ds-tokens';
 
@@ -94,4 +93,3 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 		},
 	],
 } );
-/* eslint-enable @wordpress/no-unknown-ds-tokens */

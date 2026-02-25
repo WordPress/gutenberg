@@ -538,5 +538,11 @@ module.exports = {
 				'@wordpress/dependency-group': [ 'error', 'never' ],
 			},
 		},
+		{
+			files: [ 'packages/eslint-plugin/**', 'packages/theme/**' ],
+			rules: {
+				'@wordpress/no-unknown-ds-tokens': 'off',
+			},
+		},
 	],
 };
