@@ -80,11 +80,11 @@ function _gutenberg_set_provider_api_key( string $key, string $provider_id ): vo
  *
  * @access private
  *
- * @param string $option_name    The option name for the API key.
- * @param string $mask_callback  The mask filter function name.
+ * @param string   $option_name   The option name for the API key.
+ * @param callable $mask_callback The mask filter function.
  * @return string The real API key value.
  */
-function _gutenberg_get_real_api_key( string $option_name, string $mask_callback ): string {
+function _gutenberg_get_real_api_key( string $option_name, callable $mask_callback ): string {
 	remove_filter( "option_{$option_name}", $mask_callback );
 	$value = get_option( $option_name, '' );
 	add_filter( "option_{$option_name}", $mask_callback );
