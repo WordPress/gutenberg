@@ -82,8 +82,10 @@ function gutenberg_render_background_support( $block_content, $block ) {
 	}
 
 	/*
-	 * Use an <img> element for media library images with cover/contain sizing and no repeat,
+	 * Use an <img> element for media library images with cover/contain sizing and no tiling,
 	 * so the browser can benefit from srcset, sizes, loading="lazy", and decoding="async".
+	 * 'no-repeat' is treated the same as unset — both are compatible with object-fit.
+	 * Only explicit tiling values (repeat, repeat-x, repeat-y) require CSS background-image.
 	 */
 	$attachment_id = is_array( $background_styles['backgroundImage'] )
 		? (int) ( $background_styles['backgroundImage']['id'] ?? 0 )
@@ -92,7 +94,7 @@ function gutenberg_render_background_support( $block_content, $block ) {
 	$use_img_element = (
 		$attachment_id > 0 &&
 		in_array( $background_styles['backgroundSize'], array( 'cover', 'contain' ), true ) &&
-		empty( $background_styles['backgroundRepeat'] ) &&
+		( empty( $background_styles['backgroundRepeat'] ) || 'no-repeat' === $background_styles['backgroundRepeat'] ) &&
 		empty( $background_styles['backgroundAttachment'] )
 	);
 
@@ -106,11 +108,13 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		}
 
 		$img_attrs = array(
-			'class'           => 'wp-block__background-image alignfull',
+			'class'           => 'wp-block__background-image',
 			'style'           => $img_style,
 			'alt'             => '',
 			'aria-hidden'     => 'true',
 			'data-object-fit' => $object_fit,
+			'loading'         => 'lazy',
+			'decoding'        => 'async',
 		);
 		if ( $object_position ) {
 			$img_attrs['data-object-position'] = $object_position;
@@ -125,8 +129,13 @@ function gutenberg_render_background_support( $block_content, $block ) {
 				$existing_style = $tags->get_attribute( 'style' );
 
 				if ( is_string( $existing_style ) && '' !== $existing_style ) {
-					$separator     = str_ends_with( $existing_style, ';' ) ? '' : ';';
-					$wrapper_style = $existing_style . $separator . 'position:relative;';
+					$separator = str_ends_with( $existing_style, ';' ) ? '' : ';';
+					// Only add position:relative when there is no existing position rule.
+					if ( ! preg_match( '/(?:^|;)\s*position\s*:/', $existing_style ) ) {
+						$wrapper_style = $existing_style . $separator . 'position:relative;';
+					} else {
+						$wrapper_style = rtrim( $existing_style, ';' ) . ';';
+					}
 				} else {
 					$wrapper_style = 'position:relative;';
 				}

@@ -338,7 +338,7 @@ export default function BackgroundImagePanel( {
 			setImmutably(
 				value,
 				[ 'background', 'backgroundAttachment' ],
-				attachmentValue === 'fixed' ? 'scroll' : 'fixed'
+				attachmentValue === 'fixed' ? undefined : 'fixed'
 			)
 		);
 

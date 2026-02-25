@@ -92,10 +92,11 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 	const bgAttachment = bgData.backgroundAttachment;
 
 	// background-attachment:fixed requires CSS background properties, not <img>.
+	// 'no-repeat' is allowed: contain always sets it, and it's compatible with <img> object-fit.
 	const useImgElement =
 		!! bgImageId &&
 		[ 'cover', 'contain' ].includes( bgSize ) &&
-		! bgRepeat &&
+		( ! bgRepeat || bgRepeat === 'no-repeat' ) &&
 		bgAttachment !== 'fixed';
 
 	// When using <img>, strip background-* CSS from wrapper and add position:relative.
@@ -161,7 +162,7 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 	// position:relative on the outer wrapper never displaces editor appenders.
 	const bgImgElement = useImgElement && bgUrl && (
 		<img
-			className="wp-block__background-image alignfull"
+			className="wp-block__background-image"
 			alt=""
 			aria-hidden="true"
 			src={ bgUrl }
