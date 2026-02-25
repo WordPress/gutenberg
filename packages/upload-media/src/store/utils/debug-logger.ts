@@ -5,8 +5,6 @@
  * Set DEBUG_ENABLED to true to enable logging.
  */
 
-/* eslint-disable jsdoc/require-param */
-
 // Set to true to enable debug logging for client-side media processing.
 // Keep disabled by default to avoid test failures from unexpected console output.
 const DEBUG_ENABLED = false;
@@ -30,8 +28,19 @@ interface LogOptions {
 	data?: Record< string, unknown >;
 }
 
+interface MeasureOptions {
+	measureName: string;
+	startTime: number;
+	endTime?: number;
+	tooltipText?: string;
+	properties?: Array< [ string, string ] >;
+}
+
 /**
  * Formats bytes into human-readable size.
+ *
+ * @param bytes Number of bytes.
+ * @return Human-readable size string.
  */
 function formatBytes( bytes: number ): string {
 	if ( bytes === 0 ) {
@@ -56,6 +65,9 @@ function getTimestamp(): string {
 
 /**
  * Core logging function with styled output.
+ *
+ * @param message Log message.
+ * @param options Log options including category and data.
  */
 function log( message: string, options: LogOptions ): void {
 	if ( ! DEBUG_ENABLED ) {
@@ -81,7 +93,62 @@ function log( message: string, options: LogOptions ): void {
 }
 
 /**
+ * Records a performance measure visible in DevTools Performance panel.
+ *
+ * Uses the User Timings API (performance.measure) to create entries
+ * under a custom "Upload Media" track in DevTools.
+ *
+ * @param options             Measure options.
+ * @param options.measureName Name for the performance measure entry.
+ * @param options.startTime   Start time from performance.now().
+ * @param options.endTime     End time from performance.now(). Defaults to current time.
+ * @param options.tooltipText Tooltip text shown in DevTools.
+ * @param options.properties  Key-value pairs shown in DevTools detail view.
+ */
+export function measure( options: MeasureOptions ): void {
+	if ( ! DEBUG_ENABLED ) {
+		return;
+	}
+
+	const {
+		measureName,
+		startTime,
+		endTime = performance.now(),
+		tooltipText,
+		properties,
+	} = options;
+
+	const detail: Record< string, unknown > = {
+		devtools: {
+			dataType: 'track-entry',
+			track: 'Upload Media',
+			tooltipText,
+			properties: properties?.map( ( [ key, value ] ) => ( {
+				key,
+				value,
+			} ) ),
+		},
+	};
+
+	try {
+		performance.measure( measureName, {
+			start: startTime,
+			end: endTime,
+			detail,
+		} );
+	} catch {
+		// Silently ignore if User Timings API is unavailable.
+	}
+}
+
+/**
  * Log when an item is added to the queue.
+ *
+ * @param itemId   Queue item ID.
+ * @param fileName File name.
+ * @param fileSize File size in bytes.
+ * @param fileType File MIME type.
+ * @param batchId  Optional batch ID.
  */
 export function logQueueAdd(
 	itemId: string,
@@ -104,6 +171,11 @@ export function logQueueAdd(
 
 /**
  * Log when a sideload item is added to the queue.
+ *
+ * @param itemId    Queue item ID.
+ * @param fileName  File name.
+ * @param parentId  Parent item ID.
+ * @param imageSize Image size name.
  */
 export function logSideloadAdd(
 	itemId: string,
@@ -124,6 +196,9 @@ export function logSideloadAdd(
 
 /**
  * Log when an item starts processing.
+ *
+ * @param itemId   Queue item ID.
+ * @param fileName File name.
  */
 export function logProcessStart( itemId: string, fileName: string ): void {
 	log( `Processing started: ${ fileName }`, {
@@ -134,6 +209,10 @@ export function logProcessStart( itemId: string, fileName: string ): void {
 
 /**
  * Log when an operation starts.
+ *
+ * @param itemId    Queue item ID.
+ * @param operation Operation name.
+ * @param fileName  File name.
  */
 export function logOperationStart(
 	itemId: string,
@@ -148,6 +227,11 @@ export function logOperationStart(
 
 /**
  * Log when an operation completes.
+ *
+ * @param itemId    Queue item ID.
+ * @param operation Operation name.
+ * @param fileName  File name.
+ * @param duration  Duration in milliseconds.
  */
 export function logOperationComplete(
 	itemId: string,
@@ -167,6 +251,10 @@ export function logOperationComplete(
 
 /**
  * Log when prepare determines operations.
+ *
+ * @param itemId     Queue item ID.
+ * @param fileName   File name.
+ * @param operations List of operation names.
  */
 export function logPrepareOperations(
 	itemId: string,
@@ -185,6 +273,15 @@ export function logPrepareOperations(
 
 /**
  * Log resize/crop operation details.
+ *
+ * @param itemId        Queue item ID.
+ * @param fileName      File name.
+ * @param resize        Resize dimensions and crop settings.
+ * @param resize.width  Target width.
+ * @param resize.height Target height.
+ * @param resize.crop   Crop setting.
+ * @param isThreshold   Whether this is a big image threshold resize.
+ * @param isSubSize     Whether this is a sub-size (thumbnail) resize.
  */
 export function logResizeCrop(
 	itemId: string,
@@ -214,6 +311,14 @@ export function logResizeCrop(
 
 /**
  * Log resize completion with dimensions.
+ *
+ * @param itemId         Queue item ID.
+ * @param fileName       File name.
+ * @param originalWidth  Original image width.
+ * @param originalHeight Original image height.
+ * @param newWidth       New image width.
+ * @param newHeight      New image height.
+ * @param newFileSize    New file size in bytes.
  */
 export function logResizeComplete(
 	itemId: string,
@@ -243,6 +348,10 @@ export function logResizeComplete(
 
 /**
  * Log rotation operation.
+ *
+ * @param itemId      Queue item ID.
+ * @param fileName    File name.
+ * @param orientation EXIF orientation value.
  */
 export function logRotation(
 	itemId: string,
@@ -271,6 +380,11 @@ export function logRotation(
 
 /**
  * Log rotation completion.
+ *
+ * @param itemId    Queue item ID.
+ * @param fileName  File name.
+ * @param newWidth  New image width after rotation.
+ * @param newHeight New image height after rotation.
  */
 export function logRotationComplete(
 	itemId: string,
@@ -289,6 +403,12 @@ export function logRotationComplete(
 
 /**
  * Log format transcoding operation.
+ *
+ * @param itemId       Queue item ID.
+ * @param fileName     File name.
+ * @param inputFormat  Input image format.
+ * @param outputFormat Target output format.
+ * @param quality      Output quality (0-1).
  */
 export function logTranscode(
 	itemId: string,
@@ -310,6 +430,12 @@ export function logTranscode(
 
 /**
  * Log format transcoding completion.
+ *
+ * @param itemId       Queue item ID.
+ * @param fileName     File name.
+ * @param outputFormat Output image format.
+ * @param inputSize    Input file size in bytes.
+ * @param outputSize   Output file size in bytes.
  */
 export function logTranscodeComplete(
 	itemId: string,
@@ -333,6 +459,10 @@ export function logTranscodeComplete(
 
 /**
  * Log upload start.
+ *
+ * @param itemId   Queue item ID.
+ * @param fileName File name.
+ * @param fileSize File size in bytes.
  */
 export function logUploadStart(
 	itemId: string,
@@ -350,6 +480,11 @@ export function logUploadStart(
 
 /**
  * Log upload completion.
+ *
+ * @param itemId       Queue item ID.
+ * @param fileName     File name.
+ * @param attachmentId WordPress attachment ID.
+ * @param url          Attachment URL.
  */
 export function logUploadComplete(
 	itemId: string,
@@ -369,6 +504,11 @@ export function logUploadComplete(
 
 /**
  * Log sideload start.
+ *
+ * @param itemId       Queue item ID.
+ * @param fileName     File name.
+ * @param attachmentId WordPress attachment ID.
+ * @param imageSize    Image size name.
  */
 export function logSideloadStart(
 	itemId: string,
@@ -388,6 +528,10 @@ export function logSideloadStart(
 
 /**
  * Log sideload completion.
+ *
+ * @param itemId    Queue item ID.
+ * @param fileName  File name.
+ * @param imageSize Image size name.
  */
 export function logSideloadComplete(
 	itemId: string,
@@ -405,6 +549,10 @@ export function logSideloadComplete(
 
 /**
  * Log thumbnail generation start.
+ *
+ * @param itemId       Queue item ID.
+ * @param fileName     File name.
+ * @param missingSizes List of missing image size names.
  */
 export function logThumbnailGenerationStart(
 	itemId: string,
@@ -423,6 +571,12 @@ export function logThumbnailGenerationStart(
 
 /**
  * Log individual thumbnail creation.
+ *
+ * @param itemId   Queue item ID.
+ * @param sizeName Image size name.
+ * @param width    Thumbnail width.
+ * @param height   Thumbnail height.
+ * @param crop     Crop setting.
  */
 export function logThumbnailCreate(
 	itemId: string,
@@ -445,6 +599,9 @@ export function logThumbnailCreate(
 
 /**
  * Log item removal from queue.
+ *
+ * @param itemId   Queue item ID.
+ * @param fileName File name.
  */
 export function logQueueRemove( itemId: string, fileName?: string ): void {
 	log( `Item removed from queue${ fileName ? `: ${ fileName }` : '' }`, {
@@ -455,6 +612,10 @@ export function logQueueRemove( itemId: string, fileName?: string ): void {
 
 /**
  * Log item cancellation.
+ *
+ * @param itemId   Queue item ID.
+ * @param fileName File name.
+ * @param error    Error that caused cancellation.
  */
 export function logCancel(
 	itemId: string,
@@ -473,6 +634,10 @@ export function logCancel(
 
 /**
  * Log error.
+ *
+ * @param context Error context description.
+ * @param error   Error object or message.
+ * @param itemId  Optional queue item ID.
  */
 export function logError(
 	context: string,
@@ -501,6 +666,10 @@ export function logVipsInit(): void {
 
 /**
  * Log VIPS operation start.
+ *
+ * @param operation VIPS operation name.
+ * @param itemId    Queue item ID.
+ * @param inputType Input file type.
  */
 export function logVipsOperationStart(
 	operation: string,
@@ -518,6 +687,10 @@ export function logVipsOperationStart(
 
 /**
  * Log VIPS operation complete.
+ *
+ * @param operation  VIPS operation name.
+ * @param itemId     Queue item ID.
+ * @param outputType Output file type.
  */
 export function logVipsOperationComplete(
 	operation: string,
@@ -535,6 +708,8 @@ export function logVipsOperationComplete(
 
 /**
  * Log queue pause.
+ *
+ * @param reason Optional reason for pausing.
  */
 export function logQueuePause( reason?: string ): void {
 	log( `Queue paused${ reason ? `: ${ reason }` : '' }`, {
@@ -553,6 +728,9 @@ export function logQueueResume(): void {
 
 /**
  * Log item pause (for sideload race condition avoidance).
+ *
+ * @param itemId Queue item ID.
+ * @param reason Reason for pausing.
  */
 export function logItemPause( itemId: string, reason: string ): void {
 	log( `Item paused: ${ reason }`, {
@@ -563,6 +741,8 @@ export function logItemPause( itemId: string, reason: string ): void {
 
 /**
  * Log item resume.
+ *
+ * @param itemId Queue item ID.
  */
 export function logItemResume( itemId: string ): void {
 	log( 'Item resumed', {
@@ -573,6 +753,10 @@ export function logItemResume( itemId: string ): void {
 
 /**
  * Log concurrency limit hit.
+ *
+ * @param itemId        Queue item ID.
+ * @param activeCount   Number of active uploads.
+ * @param maxConcurrent Maximum concurrent uploads allowed.
  */
 export function logConcurrencyLimit(
 	itemId: string,
@@ -591,6 +775,8 @@ export function logConcurrencyLimit(
 
 /**
  * Log batch completion.
+ *
+ * @param batchId Batch ID.
  */
 export function logBatchComplete( batchId: string ): void {
 	log( `Batch completed`, {
@@ -601,6 +787,8 @@ export function logBatchComplete( batchId: string ): void {
 
 /**
  * Log settings update.
+ *
+ * @param settings Updated settings object.
  */
 export function logSettingsUpdate( settings: Record< string, unknown > ): void {
 	log( 'Settings updated', {
@@ -611,6 +799,9 @@ export function logSettingsUpdate( settings: Record< string, unknown > ): void {
 
 /**
  * Log general info message.
+ *
+ * @param message Log message.
+ * @param data    Optional additional data.
  */
 export function logInfo(
 	message: string,
@@ -624,6 +815,11 @@ export function logInfo(
 
 /**
  * Log when a retry is scheduled for a failed item.
+ *
+ * @param itemId     Queue item ID.
+ * @param fileName   File name.
+ * @param retryCount Current retry attempt number.
+ * @param delayMs    Delay before retry in milliseconds.
  */
 export function logRetryScheduled(
 	itemId: string,
@@ -642,6 +838,10 @@ export function logRetryScheduled(
 
 /**
  * Log when a retry attempt is being executed.
+ *
+ * @param itemId     Queue item ID.
+ * @param fileName   File name.
+ * @param retryCount Current retry attempt number.
  */
 export function logRetryExecuting(
 	itemId: string,
@@ -656,6 +856,11 @@ export function logRetryExecuting(
 
 /**
  * Log when maximum retries have been exceeded.
+ *
+ * @param itemId     Queue item ID.
+ * @param fileName   File name.
+ * @param maxRetries Maximum number of retries allowed.
+ * @param error      The error that caused the final failure.
  */
 export function logMaxRetriesExceeded(
 	itemId: string,
@@ -668,15 +873,3 @@ export function logMaxRetriesExceeded(
 		data: { itemId, maxRetries, error: error.message },
 	} );
 }
-
-/**
- * Create a timing helper to measure operation duration.
- */
-export function createTimer(): { stop: () => number } {
-	const start = performance.now();
-	return {
-		stop: () => Math.round( performance.now() - start ),
-	};
-}
-
-/* eslint-enable jsdoc/require-param */

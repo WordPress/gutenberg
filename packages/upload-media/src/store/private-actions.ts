@@ -18,6 +18,7 @@ import { cloneFile, convertBlobToFile, renameFile } from '../utils';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES } from './constants';
 import { StubFile } from '../stub-file';
 import { UploadError } from '../upload-error';
+import { measure } from './utils/debug-logger';
 import {
 	vipsResizeImage,
 	vipsRotateImage,
@@ -790,6 +791,8 @@ export function uploadItem( id: QueueItemId ) {
 			return;
 		}
 
+		const startTime = performance.now();
+
 		select.getSettings().mediaUpload( {
 			filesList: [ item.file ],
 			additionalData: item.additionalData,
@@ -802,6 +805,16 @@ export function uploadItem( id: QueueItemId ) {
 				}
 			},
 			onSuccess: ( [ attachment ] ) => {
+				measure( {
+					measureName: `Upload ${ item.file.name }`,
+					startTime,
+					tooltipText: item.file.name,
+					properties: [
+						[ 'Item ID', item.id ],
+						[ 'File name', item.file.name ],
+					],
+				} );
+
 				dispatch.finishOperation( id, {
 					attachment,
 				} );
@@ -835,12 +848,24 @@ export function sideloadItem( id: QueueItemId ) {
 			return;
 		}
 
+		const startTime = performance.now();
+
 		mediaSideload( {
 			file: item.file,
 			attachmentId: post as number,
 			additionalData,
 			signal: item.abortController?.signal,
 			onFileChange: ( [ attachment ] ) => {
+				measure( {
+					measureName: `Sideload ${ item.file.name }`,
+					startTime,
+					tooltipText: item.file.name,
+					properties: [
+						[ 'Item ID', item.id ],
+						[ 'File name', item.file.name ],
+					],
+				} );
+
 				dispatch.finishOperation( id, { attachment } );
 				dispatch.resumeItemByPostId( post as number );
 			},
@@ -874,6 +899,8 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 			return;
 		}
 
+		const startTime = performance.now();
+
 		// Add dimension suffix for sub-sizes (thumbnails).
 		const addSuffix = Boolean( item.parentId );
 		// Add '-scaled' suffix for big image threshold resizing.
@@ -889,6 +916,16 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				item.abortController?.signal,
 				scaledSuffix
 			);
+
+			measure( {
+				measureName: `ResizeCrop ${ item.file.name }`,
+				startTime,
+				tooltipText: item.file.name,
+				properties: [
+					[ 'Item ID', item.id ],
+					[ 'File name', item.file.name ],
+				],
+			} );
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
@@ -944,6 +981,8 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 			return;
 		}
 
+		const startTime = performance.now();
+
 		try {
 			const file = await vipsRotateImage(
 				item.id,
@@ -951,6 +990,16 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 				args.orientation,
 				item.abortController?.signal
 			);
+
+			measure( {
+				measureName: `Rotate ${ item.file.name }`,
+				startTime,
+				tooltipText: item.file.name,
+				properties: [
+					[ 'Item ID', item.id ],
+					[ 'File name', item.file.name ],
+				],
+			} );
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
@@ -1008,6 +1057,8 @@ export function transcodeImageItem(
 			return;
 		}
 
+		const startTime = performance.now();
+
 		const outputMimeType = `image/${ args.outputFormat }` as
 			| 'image/jpeg'
 			| 'image/png'
@@ -1025,6 +1076,16 @@ export function transcodeImageItem(
 				quality,
 				interlaced
 			);
+
+			measure( {
+				measureName: `Transcode ${ item.file.name }`,
+				startTime,
+				tooltipText: item.file.name,
+				properties: [
+					[ 'Item ID', item.id ],
+					[ 'File name', item.file.name ],
+				],
+			} );
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
