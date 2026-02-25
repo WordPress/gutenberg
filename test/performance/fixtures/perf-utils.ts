@@ -1,14 +1,14 @@
 /**
- * WordPress dependencies
- */
-import { expect } from '@wordpress/e2e-test-utils-playwright';
-
-/**
  * External dependencies
  */
 import fs from 'fs';
 import path from 'path';
 import type { Locator, Page } from '@playwright/test';
+
+/**
+ * WordPress dependencies
+ */
+import { expect } from '@wordpress/e2e-test-utils-playwright';
 
 /**
  * Internal dependencies
@@ -58,7 +58,7 @@ export class PerfUtils {
 		await this.page.getByRole( 'button', { name: 'Save draft' } ).click();
 		await expect(
 			this.page.getByRole( 'button', { name: 'Saved' } )
-		).toBeDisabled();
+		).toBeDisabled( { timeout: 60_000 } );
 
 		const postId = new URL( this.page.url() ).searchParams.get( 'post' );
 

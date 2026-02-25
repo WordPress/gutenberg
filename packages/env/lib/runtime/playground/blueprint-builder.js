@@ -70,13 +70,13 @@ function buildBlueprint( config ) {
 
 	// Match Docker runtime defaults:
 	// - Set the site title to the project name (Docker uses --title in wp core install)
-	// - Reset to plain permalinks (Playground defaults to pretty, Docker to plain)
+	// - Enable pretty permalinks (Docker uses: wp rewrite structure '/%year%/%monthnum%/%day%/%postname%/' --hard)
 	blueprint.steps.push( {
 		step: 'runPHP',
 		code: `<?php
 			require '/wordpress/wp-load.php';
 			update_option( 'blogname', '${ config.name }' );
-			update_option( 'permalink_structure', '' );
+			update_option( 'permalink_structure', '/%year%/%monthnum%/%day%/%postname%/' );
 			flush_rewrite_rules();
 		`,
 	} );
