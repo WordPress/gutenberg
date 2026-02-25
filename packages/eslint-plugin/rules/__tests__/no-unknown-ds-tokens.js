@@ -30,6 +30,9 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 		{
 			code: `const token = 'var(--wpds-color-fg-content-neutral)';`,
 		},
+		{
+			code: `const name = 'something--wpds-color';`,
+		},
 	],
 	invalid: [
 		{
