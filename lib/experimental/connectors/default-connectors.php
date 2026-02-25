@@ -109,20 +109,20 @@ function _gutenberg_mask_gemini_api_key( string $value ): string {
 }
 
 /**
- * Validates the Gemini API key before saving.
+ * Sanitizes and validates the Gemini API key before saving.
  *
  * @access private
  *
- * @param string $value     The new value.
- * @param string $old_value The previous value.
- * @return string The value to persist.
+ * @param string $value The new value.
+ * @return string The sanitized value, or empty string if the key is not valid.
  */
-function _gutenberg_validate_gemini_api_key_on_save( string $value, string $old_value ): string {
+function _gutenberg_sanitize_gemini_api_key( string $value ): string {
+	$value = sanitize_text_field( $value );
 	if ( '' === $value ) {
 		return $value;
 	}
 	$valid = _gutenberg_is_api_key_valid( $value, 'google' );
-	return true === $valid ? $value : $old_value;
+	return true === $valid ? $value : '';
 }
 
 // --- OpenAI ---
@@ -143,20 +143,20 @@ function _gutenberg_mask_openai_api_key( string $value ): string {
 }
 
 /**
- * Validates the OpenAI API key before saving.
+ * Sanitizes and validates the OpenAI API key before saving.
  *
  * @access private
  *
- * @param string $value     The new value.
- * @param string $old_value The previous value.
- * @return string The value to persist.
+ * @param string $value The new value.
+ * @return string The sanitized value, or empty string if the key is not valid.
  */
-function _gutenberg_validate_openai_api_key_on_save( string $value, string $old_value ): string {
+function _gutenberg_sanitize_openai_api_key( string $value ): string {
+	$value = sanitize_text_field( $value );
 	if ( '' === $value ) {
 		return $value;
 	}
 	$valid = _gutenberg_is_api_key_valid( $value, 'openai' );
-	return false === $valid ? $old_value : $value;
+	return true === $valid ? $value : '';
 }
 
 // --- Anthropic ---
@@ -177,20 +177,20 @@ function _gutenberg_mask_anthropic_api_key( string $value ): string {
 }
 
 /**
- * Validates the Anthropic API key before saving.
+ * Sanitizes and validates the Anthropic API key before saving.
  *
  * @access private
  *
- * @param string $value     The new value.
- * @param string $old_value The previous value.
- * @return string The value to persist.
+ * @param string $value The new value.
+ * @return string The sanitized value, or empty string if the key is not valid.
  */
-function _gutenberg_validate_anthropic_api_key_on_save( string $value, string $old_value ): string {
+function _gutenberg_sanitize_anthropic_api_key( string $value ): string {
+	$value = sanitize_text_field( $value );
 	if ( '' === $value ) {
 		return $value;
 	}
 	$valid = _gutenberg_is_api_key_valid( $value, 'anthropic' );
-	return false === $valid ? $old_value : $value;
+	return true === $valid ? $value : '';
 }
 
 // --- Connector definitions ---
@@ -200,24 +200,24 @@ function _gutenberg_validate_anthropic_api_key_on_save( string $value, string $o
  *
  * @access private
  *
- * @return array<string, array{ provider: string, mask: callable, validate: callable }> Connectors.
+ * @return array<string, array{ provider: string, mask: callable, sanitize: callable }> Connectors.
  */
 function _gutenberg_get_connectors(): array {
 	return array(
 		'connectors_gemini_api_key'    => array(
 			'provider' => 'google',
 			'mask'     => '_gutenberg_mask_gemini_api_key',
-			'validate' => '_gutenberg_validate_gemini_api_key_on_save',
+			'sanitize' => '_gutenberg_sanitize_gemini_api_key',
 		),
 		'connectors_openai_api_key'    => array(
 			'provider' => 'openai',
 			'mask'     => '_gutenberg_mask_openai_api_key',
-			'validate' => '_gutenberg_validate_openai_api_key_on_save',
+			'sanitize' => '_gutenberg_sanitize_openai_api_key',
 		),
 		'connectors_anthropic_api_key' => array(
 			'provider' => 'anthropic',
 			'mask'     => '_gutenberg_mask_anthropic_api_key',
-			'validate' => '_gutenberg_validate_anthropic_api_key_on_save',
+			'sanitize' => '_gutenberg_sanitize_anthropic_api_key',
 		),
 	);
 }
@@ -293,11 +293,10 @@ function _gutenberg_register_default_connector_settings(): void {
 				'type'              => 'string',
 				'default'           => '',
 				'show_in_rest'      => true,
-				'sanitize_callback' => 'sanitize_text_field',
+				'sanitize_callback' => $config['sanitize'],
 			)
 		);
 		add_filter( "option_{$option_name}", $config['mask'] );
-		add_filter( "pre_update_option_{$option_name}", $config['validate'], 10, 2 );
 	}
 }
 add_action( 'init', '_gutenberg_register_default_connector_settings' );
