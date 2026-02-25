@@ -26,7 +26,12 @@ import type {
 	State,
 } from './types';
 import { ItemStatus, Type } from './types';
-import { calculateRetryDelay, shouldRetryError } from './utils/retry';
+import {
+	calculateRetryDelay,
+	clearRetryTimer,
+	retryTimers,
+	shouldRetryError,
+} from './utils/retry';
 import {
 	logRetryScheduled,
 	logRetryExecuting,
@@ -46,27 +51,6 @@ import { vipsCancelOperations } from './utils';
 import { validateMimeType } from '../validate-mime-type';
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
 import { validateFileSize } from '../validate-file-size';
-
-/**
- * Module-level storage for retry timer IDs.
- *
- * Timer references are kept outside Redux state because they are
- * non-serializable and only needed for cleanup on cancellation.
- */
-const retryTimers = new Map< QueueItemId, ReturnType< typeof setTimeout > >();
-
-/**
- * Clears any pending retry timer for the given item.
- *
- * @param id Item ID.
- */
-export function clearRetryTimer( id: QueueItemId ): void {
-	const pendingTimer = retryTimers.get( id );
-	if ( pendingTimer !== undefined ) {
-		clearTimeout( pendingTimer );
-		retryTimers.delete( id );
-	}
-}
 
 type ActionCreators = {
 	addItem: typeof addItem;

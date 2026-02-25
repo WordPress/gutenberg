@@ -9,6 +9,7 @@
  * Internal dependencies
  */
 import { UploadError } from '../../upload-error';
+import type { QueueItemId } from '../types';
 
 export interface RetryDelayOptions {
 	/** The current retry attempt number (1-based). */
@@ -105,4 +106,28 @@ export function shouldRetryError(
 	return RETRYABLE_MESSAGE_PATTERNS.some( ( pattern ) =>
 		pattern.test( message )
 	);
+}
+
+/**
+ * Module-level storage for retry timer IDs.
+ *
+ * Timer references are kept outside Redux state because they are
+ * non-serializable and only needed for cleanup on cancellation.
+ */
+export const retryTimers = new Map<
+	QueueItemId,
+	ReturnType< typeof setTimeout >
+>();
+
+/**
+ * Clears any pending retry timer for the given item.
+ *
+ * @param id Item ID.
+ */
+export function clearRetryTimer( id: QueueItemId ): void {
+	const pendingTimer = retryTimers.get( id );
+	if ( pendingTimer !== undefined ) {
+		clearTimeout( pendingTimer );
+		retryTimers.delete( id );
+	}
 }

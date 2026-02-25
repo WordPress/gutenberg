@@ -55,8 +55,8 @@ import type {
 	UpdateSettingsAction,
 } from './types';
 import { ItemStatus, OperationType, Type } from './types';
-import { clearRetryTimer } from './actions';
 import type { cancelItem } from './actions';
+import { clearRetryTimer } from './utils/retry';
 
 const DEFAULT_OUTPUT_QUALITY = 0.82;
 
