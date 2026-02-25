@@ -31,7 +31,7 @@ function ConnectorsPage() {
 			) }
 		>
 			<div className="connectors-page">
-				<VStack spacing={ 4 }>
+				<VStack spacing={ 3 }>
 					{ connectors.map( ( connector: ConnectorConfig ) => {
 						if ( connector.render ) {
 							return (

@@ -43,8 +43,8 @@ export function ConnectorItem( {
 					{ icon }
 					<FlexBlock>
 						<VStack spacing={ 0 }>
-							<Text weight={ 600 }>{ name }</Text>
-							<Text variant="muted">{ description }</Text>
+							<Text weight={ 600 } size={ 15 }>{ name }</Text>
+							<Text variant="muted" size={ 12 }>{ description }</Text>
 						</VStack>
 					</FlexBlock>
 					{ actionArea }

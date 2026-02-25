@@ -18,10 +18,10 @@ import { useConnectorPlugin } from './use-connector-plugin';
 const ConnectedBadge = () => (
 	<span
 		style={ {
-			color: '#2e7d32',
-			backgroundColor: '#e8f5e9',
+			color: '#345b37',
+			backgroundColor: '#eff8f0',
 			padding: '4px 12px',
-			borderRadius: '4px',
+			borderRadius: '2px',
 			fontSize: '13px',
 			fontWeight: 500,
 			whiteSpace: 'nowrap',
@@ -34,8 +34,8 @@ const ConnectedBadge = () => (
 // OpenAI logo as inline SVG
 const OpenAILogo = () => (
 	<svg
-		width="32"
-		height="32"
+		width="40"
+		height="40"
 		viewBox="0 0 24 24"
 		fill="none"
 		xmlns="http://www.w3.org/2000/svg"
@@ -50,8 +50,8 @@ const OpenAILogo = () => (
 // Claude/Anthropic logo as inline SVG
 const ClaudeLogo = () => (
 	<svg
-		width="32"
-		height="32"
+		width="40"
+		height="40"
 		viewBox="0 0 32 32"
 		fill="none"
 		xmlns="http://www.w3.org/2000/svg"
@@ -66,8 +66,8 @@ const ClaudeLogo = () => (
 // Gemini logo as inline SVG
 const GeminiLogo = () => (
 	<svg
-		width="32"
-		height="32"
+		width="40"
+		height="40"
 		style={ { flex: 'none', lineHeight: 1 } }
 		viewBox="0 0 24 24"
 		xmlns="http://www.w3.org/2000/svg"
