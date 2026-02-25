@@ -78,6 +78,6 @@ export class UploadError extends Error {
 	 * @return Whether the error can be retried.
 	 */
 	get isRetryable(): boolean {
-		return RETRYABLE_CODES.includes( this.code );
+		return RETRYABLE_CODES.includes( this.code as ErrorCode );
 	}
 }
