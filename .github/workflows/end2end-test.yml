@@ -121,13 +121,20 @@ jobs:
                   pattern: flaky-tests-report*
                   delete-merged: true
 
-            - name: Download blob reports
+            - name: Merge blob reports
+              uses: actions/upload-artifact/merge@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+              continue-on-error: true
+              with:
+                  name: blob-reports-merged
+                  pattern: blob-reports--*
+                  delete-merged: true
+
+            - name: Download merged blob reports
               uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
               continue-on-error: true
               with:
+                  name: blob-reports-merged
                   path: all-blob-reports
-                  pattern: blob-reports--*
-                  merge-multiple: true
 
             - name: Merge blob reports into HTML report
               run: npx playwright merge-reports --reporter html ./all-blob-reports
