@@ -11,6 +11,8 @@ Let’s look at the big picture and the architectural and UX principles of the b
 -   [Styles in the editor](/docs/explanations/architecture/styles.md).
 -   [Performance](/docs/explanations/architecture/performance.md).
 
+-   [Client-side media processing](/docs/explanations/architecture/client-side-media.md).
+
 ## Gutenberg repository
 
 -   [Modularity and WordPress Packages](/docs/explanations/architecture/modularity.md).

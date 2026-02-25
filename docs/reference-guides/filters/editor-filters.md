@@ -224,6 +224,52 @@ function example_filter_block_editor_rest_api_preload_paths_when_post_provided( 
 }
 ```
 
+## Client-side media processing
+
+Client-side media processing handles image compression, resizing, format conversion, rotation, and thumbnail generation in the browser using WebAssembly. The following filters and parameters control its behavior.
+
+For a full overview, see the [architecture explanation](/docs/explanations/architecture/client-side-media.md) and the [developer how-to guide](/docs/how-to-guides/client-side-media.md).
+
+### `wp_client_side_media_processing_enabled`
+
+This PHP filter controls whether client-side media processing is enabled. It defaults to `true`.
+
+```php
+// Disable client-side media processing entirely.
+add_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
+```
+
+You can also disable it conditionally:
+
+```php
+add_filter( 'wp_client_side_media_processing_enabled', 'example_disable_for_editors' );
+
+function example_disable_for_editors( $enabled ) {
+	if ( current_user_can( 'edit_posts' ) && ! current_user_can( 'manage_options' ) ) {
+		return false;
+	}
+	return $enabled;
+}
+```
+
+When disabled, all uploads revert to the traditional server-side processing pipeline.
+
+### Filters respected by client-side processing
+
+Client-side processing reads the following existing WordPress filters from the server via the REST API and applies them during browser-based image processing:
+
+-   **`big_image_size_threshold`** — Maximum image dimension before scaling. Images exceeding this threshold are scaled down client-side. Default: 2560px.
+-   **`image_editor_output_format`** — Maps input MIME types to output MIME types for automatic format conversion (e.g., JPEG → WebP). Applied during client-side transcoding.
+-   **`image_save_progressive`** — Controls progressive (JPEG) or interlaced (PNG, GIF) encoding. Applied during client-side compression and format conversion.
+-   **`wp_image_maybe_exif_rotate`** — Controls EXIF-based image rotation. When client-side processing is active, server-side rotation is disabled and the client handles it instead.
+
+### REST API parameters
+
+Client-side processing uses two additional REST API parameters when uploading media:
+
+-   **`generate_sub_sizes`** (boolean, default: `true`) — When set to `false` on `POST /wp/v2/media`, the server skips thumbnail generation. Client-side processing sets this to `false` so it can generate and sideload thumbnails itself.
+-   **`convert_format`** (boolean, default: `true`) — When set to `false` on `POST /wp/v2/media` or `POST /wp/v2/media/{id}/sideload`, the server skips format conversion via the `image_editor_output_format` filter. Used when the client has already performed the conversion.
+
 ## Logging errors
 
 A JavaScript error in a part of the UI shouldn't break the whole app. To solve this problem for users, React library uses the concept of an ["error boundary"](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary). Error boundaries are React components that catch JavaScript errors anywhere in their child component tree and display a fallback UI instead of the component tree that crashed.
