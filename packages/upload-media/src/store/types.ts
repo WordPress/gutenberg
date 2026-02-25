@@ -21,7 +21,6 @@ export interface QueueItem {
 	error?: Error;
 	retryCount?: number;
 	nextRetryTimestamp?: number;
-	retryTimerId?: ReturnType< typeof setTimeout >;
 	progress?: number;
 	batchId?: string;
 	sourceUrl?: string;
@@ -97,7 +96,6 @@ export type ScheduleRetryAction = Action<
 		error: Error;
 		retryCount: number;
 		nextRetryTimestamp: number;
-		retryTimerId: ReturnType< typeof setTimeout >;
 	}
 >;
 export type PauseItemAction = Action< Type.PauseItem, { id: QueueItemId } >;

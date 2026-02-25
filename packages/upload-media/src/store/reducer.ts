@@ -158,7 +158,6 @@ function reducer(
 									retryCount: action.retryCount,
 									nextRetryTimestamp:
 										action.nextRetryTimestamp,
-									retryTimerId: action.retryTimerId,
 							  }
 							: item
 				),

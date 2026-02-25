@@ -47,6 +47,14 @@ import { validateMimeType } from '../validate-mime-type';
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
 import { validateFileSize } from '../validate-file-size';
 
+/**
+ * Module-level storage for retry timer IDs.
+ *
+ * Timer references are kept outside Redux state because they are
+ * non-serializable and only needed for cleanup on cancellation.
+ */
+const retryTimers = new Map< QueueItemId, ReturnType< typeof setTimeout > >();
+
 type ActionCreators = {
 	addItem: typeof addItem;
 	addItems: typeof addItems;
@@ -173,6 +181,13 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 			 * by the error handler in optimizeImageItem().
 			 */
 			return;
+		}
+
+		// Clear any pending retry timer for this item.
+		const pendingTimer = retryTimers.get( id );
+		if ( pendingTimer !== undefined ) {
+			clearTimeout( pendingTimer );
+			retryTimers.delete( id );
 		}
 
 		// Check if we should automatically retry instead of cancelling.
@@ -302,10 +317,12 @@ export function scheduleRetry( id: QueueItemId, error: Error ) {
 
 		logRetryScheduled( id, item.file.name, nextRetryCount, delay );
 
-		// Schedule the retry execution and capture timer ID for cleanup.
-		const retryTimerId = setTimeout( () => {
+		// Schedule the retry execution and store timer ID for cleanup.
+		const timerId = setTimeout( () => {
+			retryTimers.delete( id );
 			dispatch.executeRetry( id );
 		}, delay );
+		retryTimers.set( id, timerId );
 
 		dispatch< ScheduleRetryAction >( {
 			type: Type.ScheduleRetry,
@@ -313,7 +330,6 @@ export function scheduleRetry( id: QueueItemId, error: Error ) {
 			error,
 			retryCount: currentRetryCount,
 			nextRetryTimestamp: Date.now() + delay,
-			retryTimerId,
 		} );
 	};
 }
