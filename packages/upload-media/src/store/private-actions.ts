@@ -43,7 +43,6 @@ import type {
 	PauseQueueAction,
 	QueueItem,
 	QueueItemId,
-	ResumeItemAction,
 	ResumeQueueAction,
 	RevokeBlobUrlsAction,
 	SideloadAdditionalData,
@@ -63,7 +62,6 @@ type ActionCreators = {
 	addSideloadItem: typeof addSideloadItem;
 	removeItem: typeof removeItem;
 	pauseItem: typeof pauseItem;
-	resumeItemByPostId: typeof resumeItemByPostId;
 	prepareItem: typeof prepareItem;
 	processItem: typeof processItem;
 	finishOperation: typeof finishOperation;
@@ -93,32 +91,6 @@ type ThunkArgs = {
 	dispatch: ActionCreators;
 	registry: WPDataRegistry;
 };
-
-/**
- * Determines if an upload should be paused to avoid race conditions.
- *
- * When sideloading thumbnails, we need to pause uploads if another
- * upload to the same post is already in progress.
- *
- * @param item      Queue item to check.
- * @param operation Current operation type.
- * @param select    Store selectors.
- * @return Whether the upload should be paused.
- */
-function shouldPauseForSideload(
-	item: QueueItem,
-	operation: OperationType | undefined,
-	select: Selectors
-): boolean {
-	if (
-		operation !== OperationType.Upload ||
-		! item.parentId ||
-		! item.additionalData.post
-	) {
-		return false;
-	}
-	return select.isUploadingToPost( item.additionalData.post as number );
-}
 
 interface AddItemArgs {
 	// It should always be a File, but some consumers might still pass Blobs only.
@@ -305,16 +277,6 @@ export function processItem( id: QueueItemId ) {
 		const operationArgs = Array.isArray( item.operations?.[ 0 ] )
 			? item.operations[ 0 ][ 1 ]
 			: undefined;
-
-		// If we're sideloading a thumbnail, pause upload to avoid race conditions.
-		// It will be resumed after the previous upload finishes.
-		if ( shouldPauseForSideload( item, operation, select ) ) {
-			dispatch< PauseItemAction >( {
-				type: Type.PauseItem,
-				id,
-			} );
-			return;
-		}
 
 		/*
 		 * If the next operation is an upload, check concurrency limit.
@@ -513,28 +475,6 @@ export function pauseItem( id: QueueItemId ) {
 			type: Type.PauseItem,
 			id,
 		} );
-	};
-}
-
-/**
- * Resumes processing for a given post/attachment ID.
- *
- * This function looks up paused uploads by post ID and resumes them.
- * It's typically called after a sideload completes to resume paused
- * thumbnail uploads.
- *
- * @param postOrAttachmentId Post or attachment ID.
- */
-export function resumeItemByPostId( postOrAttachmentId: number ) {
-	return async ( { select, dispatch }: ThunkArgs ) => {
-		const item = select.getPausedUploadForPost( postOrAttachmentId );
-		if ( item ) {
-			dispatch< ResumeItemAction >( {
-				type: Type.ResumeItem,
-				id: item.id,
-			} );
-			dispatch.processItem( item.id );
-		}
 	};
 }
 
@@ -850,11 +790,9 @@ export function sideloadItem( id: QueueItemId ) {
 			signal: item.abortController?.signal,
 			onFileChange: ( [ attachment ] ) => {
 				dispatch.finishOperation( id, { attachment } );
-				dispatch.resumeItemByPostId( post as number );
 			},
 			onError: ( error ) => {
 				dispatch.cancelItem( id, error );
-				dispatch.resumeItemByPostId( post as number );
 			},
 		} );
 	};

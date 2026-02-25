@@ -336,6 +336,181 @@ describe( 'actions', () => {
 		} );
 	} );
 
+	describe( 'concurrent sideloads', () => {
+		it( 'does not pause sideload items targeting the same post', async () => {
+			// Configure mediaSideload so sideload uploads can proceed.
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				mediaSideload: jest.fn(),
+			} );
+
+			// Add a parent item first.
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const parentItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Add two sideload items targeting the same post.
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				parentId: parentItem.id,
+				additionalData: { post: 100, image_size: 'thumbnail' },
+				operations: [ OperationType.Upload ],
+			} );
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				parentId: parentItem.id,
+				additionalData: { post: 100, image_size: 'medium' },
+				operations: [ OperationType.Upload ],
+			} );
+
+			// Resume the queue to trigger processing.
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
+			const items = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+			const sideloadItems = items.filter(
+				( item ) => item.parentId === parentItem.id
+			);
+
+			// Neither sideload item should be paused.
+			for ( const item of sideloadItems ) {
+				expect( item.status ).not.toBe( ItemStatus.Paused );
+			}
+		} );
+
+		it( 'allows multiple sideloads to the same attachment to upload concurrently', async () => {
+			const mediaSideload = jest.fn();
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				mediaSideload,
+				maxConcurrentUploads: 5,
+			} );
+
+			// Add a parent item first.
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const parentItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Add 3 sideload items to same post.
+			for ( const size of [ 'thumbnail', 'medium', 'large' ] ) {
+				unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+					file: jpegFile,
+					parentId: parentItem.id,
+					additionalData: { post: 200, image_size: size },
+					operations: [ OperationType.Upload ],
+				} );
+			}
+
+			// Resume the queue.
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
+			// All 3 sideloads should have started (not serialized).
+			expect( mediaSideload ).toHaveBeenCalledTimes( 3 );
+		} );
+
+		it( 'respects maxConcurrentUploads for sideloads', async () => {
+			const mediaSideload = jest.fn();
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				mediaSideload,
+				maxConcurrentUploads: 2,
+			} );
+
+			// Use a fake parentId so the parent item does not consume
+			// an upload slot. Only sideload items compete for slots.
+			const fakeParentId = 'fake-parent-id';
+
+			// Add 4 sideload items.
+			for ( const size of [
+				'thumbnail',
+				'medium',
+				'large',
+				'medium_large',
+			] ) {
+				unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+					file: jpegFile,
+					parentId: fakeParentId,
+					additionalData: { post: 300, image_size: size },
+					operations: [ OperationType.Upload ],
+				} );
+			}
+
+			// Resume the queue.
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
+			// Only 2 should have started due to concurrency limit.
+			expect( mediaSideload ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'starts pending sideloads after one finishes', async () => {
+			let onFileChangeCallback:
+				| ( (
+						attachments: Array< Record< string, unknown > >
+				  ) => void )
+				| undefined;
+			const mediaSideload = jest.fn( ( { onFileChange } ) => {
+				// Capture the first callback to simulate completion later.
+				if ( ! onFileChangeCallback ) {
+					onFileChangeCallback = onFileChange;
+				}
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				mediaSideload,
+				maxConcurrentUploads: 1,
+			} );
+
+			// Use a fake parentId so the parent item does not consume
+			// an upload slot.
+			const fakeParentId = 'fake-parent-id';
+
+			// Add 2 sideload items.
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				parentId: fakeParentId,
+				additionalData: { post: 400, image_size: 'thumbnail' },
+				operations: [ OperationType.Upload ],
+			} );
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				parentId: fakeParentId,
+				additionalData: { post: 400, image_size: 'medium' },
+				operations: [ OperationType.Upload ],
+			} );
+
+			// Resume the queue.
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
+			// Only 1 should have started due to maxConcurrentUploads=1.
+			expect( mediaSideload ).toHaveBeenCalledTimes( 1 );
+
+			// Complete the first upload to trigger the pending one.
+			onFileChangeCallback?.( [
+				{ id: 400, url: 'https://example.com/img.jpg' },
+			] );
+
+			// Allow async dispatch to propagate.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			// The second sideload should now have started.
+			expect( mediaSideload ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'resumeItemByPostId is not on private dispatch', () => {
+			const privateDispatch = unlock( registry.dispatch( uploadStore ) );
+			expect(
+				( privateDispatch as Record< string, unknown > )
+					.resumeItemByPostId
+			).toBeUndefined();
+		} );
+	} );
+
 	describe( 'cancelItem', () => {
 		beforeEach( () => {
 			( vipsCancelOperations as jest.Mock ).mockClear();
