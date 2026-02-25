@@ -25,4 +25,3 @@ function _gutenberg_connectors_add_settings_menu_item() {
 }
 
 require __DIR__ . '/default-connectors.php';
-require __DIR__ . '/debug-test.php';
