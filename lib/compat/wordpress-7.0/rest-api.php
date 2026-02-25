@@ -65,7 +65,7 @@ function gutenberg_register_overlay_template_part_area( $areas ) {
 		'area'        => 'navigation-overlay',
 		'label'       => __( 'Navigation Overlay', 'gutenberg' ),
 		'description' => __(
-			'The Navigation Overlay template defines a full-screen overlay area that typically contains navigation links and can be toggled on and off.'
+			'The Navigation Overlay template defines a overlay area that typically contains navigation links and can be toggled open and closed.'
 		),
 		'icon'        => 'navigation-overlay',
 		'area_tag'    => 'div',
