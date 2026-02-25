@@ -13,7 +13,7 @@ import { ESCAPE } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import useConstrainedTabbing from '../use-constrained-tabbing';
-import useFocusOnMount from '../use-focus-on-mount';
+import { useFocusOnMount } from '../use-focus-on-mount';
 import useFocusReturn from '../use-focus-return';
 import useFocusOutside from '../use-focus-outside';
 import useMergeRefs from '../use-merge-refs';

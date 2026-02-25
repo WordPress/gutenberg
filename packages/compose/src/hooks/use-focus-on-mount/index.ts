@@ -95,5 +95,3 @@ export function useFocusOnMount(
 export namespace useFocusOnMount {
 	export type Mode = boolean | 'firstElement' | 'firstInputElement';
 }
-
-export default useFocusOnMount;
