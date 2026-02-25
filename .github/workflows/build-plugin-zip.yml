@@ -190,6 +190,15 @@ jobs:
               github.event_name == 'workflow_dispatch' ||
               github.repository == 'WordPress/gutenberg'
             )
+        strategy:
+            matrix:
+                IS_GUTENBERG_PLUGIN: [true]
+                IS_WORDPREESS_CORE: [false]
+
+                include:
+                    - IS_GUTENBERG_PLUGIN: [false]
+                      IS_WORDPRESS_CORE: [true]
+
         outputs:
             job_status: ${{ job.status }}
 
@@ -211,11 +220,13 @@ jobs:
               run: ./bin/build-plugin-zip.sh
               env:
                   NO_CHECKS: 'true'
+                  IS_GUTENBERG_PLUGIN: ${{ matrix.IS_GUTENBERG_PLUGIN }}
+                  IS_WORDPRESS_CORE: ${{ matrix.IS_WORDPRESS_CORE }}
 
             - name: Upload artifact
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               with:
-                  name: gutenberg-plugin
+                  name: gutenberg-${{ matrix.IS_WORDPREESS_CORE && 'wordpress-develop' || 'plugin' }}
                   path: ./gutenberg.zip
 
             - name: Build release notes draft
@@ -258,7 +269,7 @@ jobs:
             - name: Download build artifact
               uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
               with:
-                  name: gutenberg-plugin
+                  name: gutenberg-wordpress-develop
 
             # Noting the hash helps keep track of the commit the zip was built from.
             - name: Add a file for tracking the SHA value used.
