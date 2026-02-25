@@ -30,6 +30,10 @@ describe( 'feature-detection', () => {
 		// Clear the cache before each test.
 		clearFeatureDetectionCache();
 
+		// Restore WebAssembly and SharedArrayBuffer before each test.
+		global.WebAssembly = originalWebAssembly;
+		global.SharedArrayBuffer = originalSharedArrayBuffer;
+
 		// By default, provide a mock Worker that does not throw (CSP allows blob workers).
 		global.Worker = class MockWorker {
 			terminate() {}
@@ -122,10 +126,6 @@ describe( 'feature-detection', () => {
 
 	describe( 'detectClientSideMediaSupport', () => {
 		it( 'returns supported when all features are available', () => {
-			// Ensure all features are available.
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			const result = detectClientSideMediaSupport();
 
 			expect( result.supported ).toBe( true );
@@ -145,7 +145,6 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when SharedArrayBuffer is unavailable', () => {
-			global.WebAssembly = originalWebAssembly;
 			// @ts-ignore - Intentionally setting SharedArrayBuffer to undefined for testing.
 			global.SharedArrayBuffer = undefined;
 
@@ -156,8 +155,6 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when Worker is unavailable', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
 			// @ts-ignore - Intentionally setting Worker to undefined for testing.
 			global.Worker = undefined;
 
@@ -170,9 +167,6 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when credentialless iframes are not supported', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			// Remove credentialless from the prototype.
 			delete ( window.HTMLIFrameElement.prototype as any ).credentialless;
 
@@ -183,9 +177,6 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns supported when credentialless iframes are supported', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			// credentialless is already mocked in beforeEach.
 			const result = detectClientSideMediaSupport();
 
@@ -193,9 +184,6 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when device memory is 2 GB or less', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			Object.defineProperty( navigator, 'deviceMemory', {
 				value: 2,
 				configurable: true,
@@ -208,9 +196,6 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns supported when device memory is greater than 2 GB', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			Object.defineProperty( navigator, 'deviceMemory', {
 				value: 4,
 				configurable: true,
@@ -222,9 +207,6 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when hardware concurrency is less than 4', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			Object.defineProperty( navigator, 'hardwareConcurrency', {
 				value: 2,
 				configurable: true,
@@ -237,9 +219,6 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns supported when hardware concurrency is 4 or more', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			Object.defineProperty( navigator, 'hardwareConcurrency', {
 				value: 4,
 				configurable: true,
@@ -251,9 +230,6 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when data saver is enabled', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			Object.defineProperty( navigator, 'connection', {
 				value: { saveData: true, effectiveType: '4g' },
 				configurable: true,
@@ -266,9 +242,6 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when connection is 2g', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			Object.defineProperty( navigator, 'connection', {
 				value: { saveData: false, effectiveType: '2g' },
 				configurable: true,
@@ -281,9 +254,6 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when connection is 3g', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			Object.defineProperty( navigator, 'connection', {
 				value: { saveData: false, effectiveType: '3g' },
 				configurable: true,
@@ -296,9 +266,6 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when connection is slow-2g', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			Object.defineProperty( navigator, 'connection', {
 				value: {
 					saveData: false,
@@ -314,9 +281,6 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when CSP blocks blob workers', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			// Simulate CSP blocking blob URL workers by throwing a SecurityError.
 			global.Worker = class ThrowingWorker {
 				constructor() {
@@ -335,9 +299,6 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'caches the result', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			const result1 = detectClientSideMediaSupport();
 			expect( result1.supported ).toBe( true );
 
@@ -353,9 +314,6 @@ describe( 'feature-detection', () => {
 
 	describe( 'isClientSideMediaSupported', () => {
 		it( 'returns true when all features are available', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			expect( isClientSideMediaSupported() ).toBe( true );
 		} );
 
@@ -369,9 +327,6 @@ describe( 'feature-detection', () => {
 
 	describe( 'clearFeatureDetectionCache', () => {
 		it( 'clears the cached result', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			const result1 = detectClientSideMediaSupport();
 			expect( result1.supported ).toBe( true );
 
