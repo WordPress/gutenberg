@@ -7,6 +7,7 @@ export const LAYOUT_DEFINITIONS = {
 		name: 'default',
 		slug: 'flow',
 		className: 'is-layout-flow',
+		displayMode: 'flow-root',
 		baseStyles: [
 			{
 				selector: ' > .alignleft',
@@ -58,6 +59,7 @@ export const LAYOUT_DEFINITIONS = {
 		name: 'constrained',
 		slug: 'constrained',
 		className: 'is-layout-constrained',
+		displayMode: 'flow-root',
 		baseStyles: [
 			{
 				selector: ' > .alignleft',

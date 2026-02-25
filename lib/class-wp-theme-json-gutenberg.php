@@ -1811,7 +1811,7 @@ class WP_Theme_JSON_Gutenberg {
 		if (
 			static::ROOT_BLOCK_SELECTOR === $selector
 		) {
-			$valid_display_modes = array( 'block', 'flex', 'grid' );
+			$valid_display_modes = array( 'block', 'flex', 'grid', 'flow-root' );
 			foreach ( $layout_definitions as $layout_definition ) {
 				$class_name       = $layout_definition['className'] ?? false;
 				$base_style_rules = $layout_definition['baseStyles'] ?? array();
