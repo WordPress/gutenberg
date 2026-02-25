@@ -68,6 +68,19 @@ function buildBlueprint( config ) {
 		} );
 	}
 
+	// Match Docker runtime defaults:
+	// - Set the site title to the project name (Docker uses --title in wp core install)
+	// - Reset to plain permalinks (Playground defaults to pretty, Docker to plain)
+	blueprint.steps.push( {
+		step: 'runPHP',
+		code: `<?php
+			require '/wordpress/wp-load.php';
+			update_option( 'blogname', '${ config.name }' );
+			update_option( 'permalink_structure', '' );
+			flush_rewrite_rules();
+		`,
+	} );
+
 	// Handle multisite
 	if ( envConfig.multisite ) {
 		blueprint.steps.push( {
@@ -130,11 +143,21 @@ function getMountArgs( config ) {
 			// For zip URLs, let Playground download WordPress natively.
 			args.push( '--wp', envConfig.coreSource.url );
 		} else if ( envConfig.coreSource.type === 'git' ) {
-			// For git sources, pass the version ref to Playground's --wp flag.
-			// e.g., WordPress/WordPress#6.5 → --wp 6.5
-			// WordPress/WordPress (no ref) → default "latest", no flag needed.
 			if ( envConfig.coreSource.ref ) {
+				// For git sources with a specific ref, pass it to --wp.
+				// e.g., WordPress/WordPress#6.5 → --wp 6.5
 				args.push( '--wp', envConfig.coreSource.ref );
+			} else {
+				// No ref means "latest" — mount the cloned repo so we get
+				// the full distribution (all bundled themes, etc.) rather
+				// than Playground's trimmed-down WordPress package.
+				args.push(
+					'--mount-dir-before-install',
+					envConfig.coreSource.path,
+					'/wordpress',
+					'--wordpress-install-mode',
+					'install-from-existing-files-if-needed'
+				);
 			}
 		} else {
 			// For local sources, mount the directory and tell Playground to
