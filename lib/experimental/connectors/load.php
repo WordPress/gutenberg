@@ -5,12 +5,14 @@
  * @package gutenberg
  */
 
-add_action( 'admin_menu', 'gutenberg_connectors_add_settings_menu_item' );
+add_action( 'admin_menu', '_gutenberg_connectors_add_settings_menu_item' );
 
 /**
  * Registers the Connectors menu item under Settings.
+ *
+ * @access private
  */
-function gutenberg_connectors_add_settings_menu_item() {
+function _gutenberg_connectors_add_settings_menu_item() {
 	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
 		return;
 	}
@@ -27,8 +29,10 @@ function gutenberg_connectors_add_settings_menu_item() {
 
 /**
  * Registers the example connectors extension as a script module.
+ *
+ * @access private
  */
-function gutenberg_register_connectors_extension_module() {
+function _gutenberg_register_connectors_extension_module() {
 	wp_register_script_module(
 		'gutenberg/connectors-extension',
 		gutenberg_url( 'lib/experimental/connectors/connectors-extension.js' ),
@@ -36,20 +40,22 @@ function gutenberg_register_connectors_extension_module() {
 		filemtime( __DIR__ . '/connectors-extension.js' )
 	);
 }
-//add_action( 'init', 'gutenberg_register_connectors_extension_module' );
+//add_action( 'init', '_gutenberg_register_connectors_extension_module' );
 
 /**
  * Enqueues the connectors extension on the Connectors page.
  *
+ * @access private
+ *
  * @param string $hook_suffix The current admin page.
  */
-function gutenberg_enqueue_connectors_extension( $hook_suffix ) {
+function _gutenberg_enqueue_connectors_extension( $hook_suffix ) {
 	if ( 'settings_page_connectors-wp-admin' !== $hook_suffix ) {
 		return;
 	}
 	wp_enqueue_script_module( 'gutenberg/connectors-extension' );
 }
-add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_connectors_extension' );
+add_action( 'admin_enqueue_scripts', '_gutenberg_enqueue_connectors_extension' );
 
 require __DIR__ . '/default-connectors.php';
 require __DIR__ . '/debug-test.php';
