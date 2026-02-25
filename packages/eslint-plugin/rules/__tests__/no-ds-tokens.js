@@ -58,5 +58,21 @@ ruleTester.run( 'no-ds-tokens', rule, {
 				},
 			],
 		},
+		{
+			code: `const token = '--wpds-color-fg';`,
+			errors: [
+				{
+					messageId: 'disallowed',
+				},
+			],
+		},
+		{
+			code: 'const style = `--wpds-color-fg: red`;',
+			errors: [
+				{
+					messageId: 'disallowed',
+				},
+			],
+		},
 	],
 } );
