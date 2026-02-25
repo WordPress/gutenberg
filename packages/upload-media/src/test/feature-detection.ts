@@ -233,6 +233,21 @@ describe( 'feature-detection', () => {
 			expect( result.reason ).toContain( 'too slow' );
 		} );
 
+		it( 'returns not supported when connection is 3g', () => {
+			global.WebAssembly = originalWebAssembly;
+			global.SharedArrayBuffer = originalSharedArrayBuffer;
+
+			Object.defineProperty( navigator, 'connection', {
+				value: { saveData: false, effectiveType: '3g' },
+				configurable: true,
+			} );
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( false );
+			expect( result.reason ).toContain( 'too slow' );
+		} );
+
 		it( 'returns not supported when connection is slow-2g', () => {
 			global.WebAssembly = originalWebAssembly;
 			global.SharedArrayBuffer = originalSharedArrayBuffer;

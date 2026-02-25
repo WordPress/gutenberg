@@ -30,7 +30,7 @@ let cachedResult: FeatureDetectionResult | null = null;
  *    by default. Developers can re-enable the feature via the server-side
  *    `wp_client_side_media_processing_enabled` filter if it works for their site.
  * 5. Device memory (disables on devices with ≤2 GB RAM)
- * 6. Network conditions (disables when data saver / reduced data mode is on or connection is 2g/slow-2g)
+ * 6. Network conditions (disables when data saver / reduced data mode is on or connection is 3g/2g/slow-2g)
  * 7. Web Worker support (baseline requirement)
  *
  * Results are cached after the first call. Use `clearFeatureDetectionCache()` to reset.
@@ -110,8 +110,9 @@ export function detectClientSideMediaSupport(): FeatureDetectionResult {
 				return cachedResult;
 			}
 			if (
+				connection.effectiveType === 'slow-2g' ||
 				connection.effectiveType === '2g' ||
-				connection.effectiveType === 'slow-2g'
+				connection.effectiveType === '3g'
 			) {
 				cachedResult = {
 					supported: false,
