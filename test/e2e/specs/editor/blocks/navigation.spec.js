@@ -2132,6 +2132,140 @@ test.describe( 'Navigation block', () => {
 			} );
 		} );
 	} );
+
+	test.describe( 'Navigation List View Leaf More Menu', () => {
+		let testPage;
+
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			testPage = await requestUtils.createPage( {
+				title: 'Test Page',
+				status: 'publish',
+			} );
+
+			await admin.createNewPost();
+
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content:
+					`<!-- wp:navigation-link {"label":"Test Page","type":"page","id":${ testPage.id },"url":"${ testPage.link }","kind":"post-type"} /-->` +
+					'<!-- wp:navigation-link {"label":"Empty Link"} /-->',
+			} );
+
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menu.id,
+				},
+			} );
+		} );
+
+		test.afterEach( async ( { requestUtils } ) => {
+			await Promise.all( [
+				requestUtils.deleteAllPages(),
+				requestUtils.deleteAllMenus(),
+			] );
+		} );
+
+		test( 'shows "Go to" option for navigation links with URLs in the list view', async ( {
+			editor,
+			page,
+		} ) => {
+			// Select the Navigation block to show its inspector controls.
+			const navBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Navigation',
+			} );
+			await editor.selectBlocks( navBlock );
+
+			// Open the document settings sidebar.
+			await editor.openDocumentSettingsSidebar();
+
+			const sidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await expect( sidebar ).toBeVisible();
+
+			// Click the "List View" tab if it is available to show the navigation list view.
+			const listViewTab = sidebar.getByRole( 'tab', {
+				name: 'List View',
+			} );
+			if ( await listViewTab.isVisible() ) {
+				await listViewTab.click();
+			}
+
+			// Find the navigation list view in the inspector.
+			const listView = sidebar.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+			await expect( listView ).toBeVisible();
+
+			// Hover over the navigation link row to reveal the Options button.
+			const linkRow = listView
+				.getByRole( 'row' )
+				.filter( { hasText: 'Test Page' } );
+			await linkRow.hover();
+
+			// Click the Options button for the navigation link with URL.
+			const optionsButton = linkRow.getByRole( 'button', {
+				name: 'Options',
+			} );
+			await optionsButton.click();
+
+			// "Go to Test Page" should be visible.
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Go to Test Page' } )
+			).toBeVisible();
+		} );
+
+		test( 'does not show "Go to" option for navigation links without URLs', async ( {
+			editor,
+			page,
+		} ) => {
+			// Select the Navigation block to show its inspector controls.
+			const navBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Navigation',
+			} );
+			await editor.selectBlocks( navBlock );
+
+			// Open the document settings sidebar.
+			await editor.openDocumentSettingsSidebar();
+
+			const sidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await expect( sidebar ).toBeVisible();
+
+			// Click the "List View" tab if it is available to show the navigation list view.
+			const listViewTab = sidebar.getByRole( 'tab', {
+				name: 'List View',
+			} );
+			if ( await listViewTab.isVisible() ) {
+				await listViewTab.click();
+			}
+
+			// Find the navigation list view in the inspector.
+			const listView = sidebar.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+			await expect( listView ).toBeVisible();
+
+			// Hover over the empty link row to reveal the Options button.
+			const emptyLinkRow = listView
+				.getByRole( 'row' )
+				.filter( { hasText: 'Empty Link' } );
+			await emptyLinkRow.hover();
+
+			// Click the Options button for the navigation link without URL.
+			const optionsButton = emptyLinkRow.getByRole( 'button', {
+				name: 'Options',
+			} );
+			await optionsButton.click();
+
+			// "Go to Empty Link" should NOT be visible.
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Go to Empty Link' } )
+			).toBeHidden();
+		} );
+	} );
 } );
 
 class Navigation {
