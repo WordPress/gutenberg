@@ -118,7 +118,6 @@ function gutenberg_allow_background_image_combined( $allow_css, $css_test_string
 	if ( $allow_css ) {
 		return $allow_css;
 	}
-
 	/*
 	 * The test string at this point has url() values already removed by
 	 * safecss_filter_attr. What remains is a gradient with comma/whitespace
@@ -131,7 +130,7 @@ function gutenberg_allow_background_image_combined( $allow_css, $css_test_string
 	 * to confirm a url() was actually removed. Without that residue, the
 	 * gradient alone would already pass core's own check.
 	 */
-	$gradient_pattern = '(?:linear|radial|conic|repeating-linear|repeating-radial|repeating-conic)-gradient\((?:[^()]|(?:rgba?\([^()]*\)))*\)';
+	$gradient_pattern = '(?:linear|radial|conic|repeating-linear|repeating-radial|repeating-conic)-gradient\((?:[^()]|\([^()]*\))*\)';
 	$var_pattern      = 'var\(--[a-zA-Z0-9_-]+(?:--[a-zA-Z0-9_-]+)*\)';
 	$value_pattern    = "(?:$gradient_pattern|$var_pattern)";
 
