@@ -185,6 +185,9 @@ function gutenberg_pass_connector_key_to_ai_client( $option_name, $provider_id )
  * Registers the default connector settings.
  */
 function gutenberg_register_default_connector_settings() {
+	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
+		return;
+	}
 	gutenberg_register_connector_api_key_setting( 'connectors_gemini_api_key', 'google' );
 	gutenberg_register_connector_api_key_setting( 'connectors_openai_api_key', 'openai' );
 	gutenberg_register_connector_api_key_setting( 'connectors_anthropic_api_key', 'anthropic' );
@@ -195,6 +198,9 @@ add_action( 'init', 'gutenberg_register_default_connector_settings' );
  * Passes the default connector API keys to the WP AI client.
  */
 function gutenberg_pass_default_connector_keys_to_ai_client() {
+	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
+		return;
+	}
 	gutenberg_pass_connector_key_to_ai_client( 'connectors_gemini_api_key', 'google' );
 	gutenberg_pass_connector_key_to_ai_client( 'connectors_openai_api_key', 'openai' );
 	gutenberg_pass_connector_key_to_ai_client( 'connectors_anthropic_api_key', 'anthropic' );

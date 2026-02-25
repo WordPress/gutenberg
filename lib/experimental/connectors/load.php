@@ -11,6 +11,9 @@ add_action( 'admin_menu', 'gutenberg_connectors_add_settings_menu_item' );
  * Registers the Connectors menu item under Settings.
  */
 function gutenberg_connectors_add_settings_menu_item() {
+	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
+		return;
+	}
 	add_submenu_page(
 		'options-general.php',
 		__( 'Connectors', 'gutenberg' ),
