@@ -36,7 +36,7 @@ function gutenberg_register_connectors_extension_module() {
 		filemtime( __DIR__ . '/connectors-extension.js' )
 	);
 }
-add_action( 'init', 'gutenberg_register_connectors_extension_module' );
+//add_action( 'init', 'gutenberg_register_connectors_extension_module' );
 
 /**
  * Enqueues the connectors extension on the Connectors page.
