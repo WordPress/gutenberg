@@ -162,7 +162,7 @@ export const Select = styled.select< SelectProps >`
 		cursor: inherit;
 		display: block;
 		font-family: inherit;
-		line-height: 1.2;
+		line-height: 1.2; // Override forms.css styles, large enough value to prevent descender clipping without affecting height
 		margin: 0;
 		width: 100%;
 		max-width: none;
