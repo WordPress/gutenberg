@@ -83,6 +83,12 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 	// Clear any DOM elements from previous player.
 	ref.innerHTML = '';
 
+	// Read translated labels from server-rendered data attributes.
+	const labels = {
+		play: ref.dataset.labelPlay,
+		pause: ref.dataset.labelPause,
+	};
+
 	// Initialize using the shared core.
 	const player = initWaveformPlayer( ref, {
 		src: track.url,
@@ -90,6 +96,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		artist: track.artist,
 		image: track.image,
 		autoPlay: shouldAutoPlay,
+		labels,
 		onEnded: () => {
 			// Advance to next track (autoPlay handles playback).
 			const currentIndex = context.tracks.findIndex(

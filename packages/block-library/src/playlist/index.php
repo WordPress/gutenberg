@@ -98,9 +98,13 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 		)
 	);
 
-	// Add waveform player container.
-	$html = '<div class="wp-block-playlist__waveform-player"
+	// Add waveform player container with translated button labels.
+	$label_play  = esc_attr__( 'Play', 'default' );
+	$label_pause = esc_attr__( 'Pause', 'default' );
+	$html        = '<div class="wp-block-playlist__waveform-player"
 		data-wp-watch="callbacks.initWaveformPlayer"
+		data-label-play="' . $label_play . '"
+		data-label-pause="' . $label_pause . '"
 	></div>';
 
 	// Add the HTML for the current track inside the figure.

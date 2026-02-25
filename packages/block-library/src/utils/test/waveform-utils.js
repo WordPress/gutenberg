@@ -202,7 +202,7 @@ describe( 'Waveform utilities', () => {
 	} );
 
 	describe( 'setupPlayButtonAccessibility', () => {
-		it( 'should set aria-label on play button', () => {
+		it( 'should set aria-label to Play initially', () => {
 			const container = document.createElement( 'div' );
 			const playBtn = document.createElement( 'button' );
 			playBtn.className = 'waveform-btn';
@@ -210,6 +210,62 @@ describe( 'Waveform utilities', () => {
 
 			setupPlayButtonAccessibility( container );
 
+			expect( playBtn ).toHaveAttribute( 'aria-label', 'Play' );
+		} );
+
+		it( 'should change aria-label to Pause on play event', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			setupPlayButtonAccessibility( container );
+			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
+
+			expect( playBtn ).toHaveAttribute( 'aria-label', 'Pause' );
+		} );
+
+		it( 'should change aria-label back to Play on pause event', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			setupPlayButtonAccessibility( container );
+			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
+			container.dispatchEvent(
+				new CustomEvent( 'waveformplayer:pause' )
+			);
+
+			expect( playBtn ).toHaveAttribute( 'aria-label', 'Play' );
+		} );
+
+		it( 'should change aria-label back to Play on ended event', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			setupPlayButtonAccessibility( container );
+			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
+			container.dispatchEvent(
+				new CustomEvent( 'waveformplayer:ended' )
+			);
+
+			expect( playBtn ).toHaveAttribute( 'aria-label', 'Play' );
+		} );
+
+		it( 'should return cleanup function that removes listeners', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			const cleanup = setupPlayButtonAccessibility( container );
+			cleanup();
+
+			// After cleanup, events should not change the label.
+			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
 			expect( playBtn ).toHaveAttribute( 'aria-label', 'Play' );
 		} );
 

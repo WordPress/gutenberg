@@ -104,17 +104,36 @@ export function styleSvgIcons( container, buttonColor ) {
 }
 
 /**
- * Set up play button accessibility: aria attributes.
+ * Set up play button accessibility: aria-label that toggles on play/pause.
  *
- * @param {Element} container - The waveform container element.
+ * @param {Element} container    - The waveform container element.
+ * @param {Object}  labels       - Button labels.
+ * @param {string}  labels.play  - Label for the play state.
+ * @param {string}  labels.pause - Label for the pause state.
  */
-export function setupPlayButtonAccessibility( container ) {
+export function setupPlayButtonAccessibility(
+	container,
+	{ play: playLabel = 'Play', pause: pauseLabel = 'Pause' } = {}
+) {
 	const playBtn = container.querySelector( '.waveform-btn' );
 	if ( ! playBtn ) {
 		return;
 	}
 
-	playBtn.setAttribute( 'aria-label', 'Play' );
+	playBtn.setAttribute( 'aria-label', playLabel );
+
+	const onPlay = () => playBtn.setAttribute( 'aria-label', pauseLabel );
+	const onPause = () => playBtn.setAttribute( 'aria-label', playLabel );
+
+	container.addEventListener( 'waveformplayer:play', onPlay );
+	container.addEventListener( 'waveformplayer:pause', onPause );
+	container.addEventListener( 'waveformplayer:ended', onPause );
+
+	return () => {
+		container.removeEventListener( 'waveformplayer:play', onPlay );
+		container.removeEventListener( 'waveformplayer:pause', onPause );
+		container.removeEventListener( 'waveformplayer:ended', onPause );
+	};
 }
 
 /**
@@ -145,11 +164,12 @@ export function logPlayError( error ) {
  * @param {string}   options.image    - The artwork image URL.
  * @param {boolean}  options.autoPlay - Whether to auto-play when ready.
  * @param {Function} options.onEnded  - Callback when track ends.
+ * @param {Object}   options.labels   - Translated button labels.
  * @return {Object} Object with instance, container, and destroy function.
  */
 export function initWaveformPlayer(
 	element,
-	{ src, title, artist, image, autoPlay, onEnded }
+	{ src, title, artist, image, autoPlay, onEnded, labels }
 ) {
 	// Get colors from computed styles.
 	const { textColor, waveformColor, progressColor } =
@@ -171,10 +191,14 @@ export function initWaveformPlayer(
 	const instance = new WaveformPlayerLib( container );
 
 	// Set up event handlers.
+	let cleanupAccessibility;
 	const handlers = {
 		ready: () => {
 			styleSvgIcons( container, textColor );
-			setupPlayButtonAccessibility( container );
+			cleanupAccessibility = setupPlayButtonAccessibility(
+				container,
+				labels
+			);
 			if ( autoPlay ) {
 				instance.play()?.catch( logPlayError );
 			}
@@ -190,6 +214,7 @@ export function initWaveformPlayer(
 		instance,
 		container,
 		destroy: () => {
+			cleanupAccessibility?.();
 			container.removeEventListener(
 				'waveformplayer:ready',
 				handlers.ready
