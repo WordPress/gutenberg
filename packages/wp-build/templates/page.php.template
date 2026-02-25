@@ -150,7 +150,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 	$routes = {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_routes();
 
 	// Get boot module asset file for dependencies
-	$asset_file = __DIR__ . '/../../modules/boot/index.min.asset.php';
+	$asset_file = __DIR__ . '/../../page-prerequisites.asset.php';
 	if ( file_exists( $asset_file ) ) {
 		$asset = require $asset_file;
 

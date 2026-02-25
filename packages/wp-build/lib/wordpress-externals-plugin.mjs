@@ -12,6 +12,27 @@ import { createHash } from 'crypto';
 import { getPackageInfo } from './package-utils.mjs';
 
 /**
+ * Map of vendor packages to their global variables and WordPress script handles.
+ * Shared between the externals plugin and the page prerequisites asset generator.
+ */
+export const vendorExternals = {
+	react: { global: 'React', handle: 'react' },
+	'react-dom': { global: 'ReactDOM', handle: 'react-dom' },
+	'react/jsx-runtime': {
+		global: 'ReactJSXRuntime',
+		handle: 'react-jsx-runtime',
+	},
+	'react/jsx-dev-runtime': {
+		global: 'ReactJSXRuntime',
+		handle: 'react-jsx-runtime',
+	},
+	moment: { global: 'moment', handle: 'moment' },
+	lodash: { global: 'lodash', handle: 'lodash' },
+	'lodash-es': { global: 'lodash', handle: 'lodash' },
+	jquery: { global: 'jQuery', handle: 'jquery' },
+};
+
+/**
  * Generate a content hash from file contents.
  * Uses SHA256 algorithm for broad compatibility across Node.js versions.
  *
@@ -121,23 +142,8 @@ export function createWordpressExternalsPlugin(
 					return false;
 				}
 
-				// Map of vendor packages to their global variables and handles
-				const vendorExternals = {
-					react: { global: 'React', handle: 'react' },
-					'react-dom': { global: 'ReactDOM', handle: 'react-dom' },
-					'react/jsx-runtime': {
-						global: 'ReactJSXRuntime',
-						handle: 'react-jsx-runtime',
-					},
-					'react/jsx-dev-runtime': {
-						global: 'ReactJSXRuntime',
-						handle: 'react-jsx-runtime',
-					},
-					moment: { global: 'moment', handle: 'moment' },
-					lodash: { global: 'lodash', handle: 'lodash' },
-					'lodash-es': { global: 'lodash', handle: 'lodash' },
-					jquery: { global: 'jQuery', handle: 'jquery' },
-				};
+				// Vendor externals map is defined at the module level and exported
+				// for sharing with the page prerequisites asset generator.
 
 				// Build list of package namespace configurations
 				const packageExternals = [

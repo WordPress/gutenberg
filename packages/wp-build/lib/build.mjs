@@ -55,7 +55,10 @@ import {
 	renderTemplateToString,
 } from './php-generator.mjs';
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
-import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
+import {
+	createWordpressExternalsPlugin,
+	vendorExternals,
+} from './wordpress-externals-plugin.mjs';
 import {
 	getAllRoutes,
 	getRouteFiles,
@@ -876,6 +879,102 @@ async function inferStyleDependencies( scriptDependencies, packageName ) {
 	}
 
 	return styleDeps;
+}
+
+/**
+ * Generate a page-prerequisites.asset.php file by statically analyzing
+ * the `@wordpress/boot` package.json dependencies.
+ *
+ * This replaces the old approach of bundling boot/route/theme/private-apis
+ * from node_modules. Instead, we read boot's declared dependencies and
+ * produce an asset file listing the classic script handles that WordPress
+ * needs to load before the page's boot module can initialize.
+ *
+ * WordPress's script dependency system handles transitive dependencies
+ * automatically, so we only need to capture direct dependencies.
+ */
+async function generatePagePrerequisitesAsset() {
+	const { createRequire } = await import( 'module' );
+	const require = createRequire( import.meta.url );
+
+	// Resolve @wordpress/boot's package.json from node_modules
+	const bootPackageJsonPath = require.resolve(
+		'@wordpress/boot/package.json',
+		{ paths: [ ROOT_DIR ] }
+	);
+
+	const bootPackageJson = JSON.parse(
+		await readFile( bootPackageJsonPath, 'utf8' )
+	);
+
+	const dependencies = new Set();
+
+	// Collect all direct dependencies and peerDependencies
+	const allDeps = {
+		...( bootPackageJson.dependencies || {} ),
+		...( bootPackageJson.peerDependencies || {} ),
+	};
+
+	for ( const depName of Object.keys( allDeps ) ) {
+		// Handle @wordpress/* packages
+		if ( depName.startsWith( '@wordpress/' ) ) {
+			const shortName = depName.split( '/' )[ 1 ];
+			let depPackageJson;
+
+			try {
+				const depPath = require.resolve( `${ depName }/package.json`, {
+					paths: [ ROOT_DIR ],
+				} );
+
+				depPackageJson = JSON.parse(
+					await readFile( depPath, 'utf8' )
+				);
+			} catch {
+				continue;
+			}
+
+			// Only add packages that register as classic scripts (wpScript)
+			if ( depPackageJson.wpScript ) {
+				dependencies.add( `wp-${ shortName }` );
+			}
+			// Packages with only wpScriptModuleExports are handled by the
+			// module system and don't need to be listed here.
+			continue;
+		}
+
+		// Handle vendor dependencies using the shared vendorExternals map
+		if ( vendorExternals[ depName ] ) {
+			dependencies.add( vendorExternals[ depName ].handle );
+
+			// React's JSX transform compiles JSX to calls into react-jsx-runtime,
+			// which WordPress registers as a separate script handle.
+			if ( depName === 'react' ) {
+				dependencies.add( 'react-jsx-runtime' );
+			}
+
+			continue;
+		}
+	}
+
+	// Generate content-based version hash from boot's package.json
+	const hash = createHash( 'sha256' );
+	hash.update( await readFile( bootPackageJsonPath ) );
+	const version = hash.digest( 'hex' ).slice( 0, 20 );
+
+	const dependenciesString = Array.from( dependencies )
+		.sort()
+		.map( ( dep ) => `'${ dep }'` )
+		.join( ', ' );
+
+	const assetContent = `<?php return array('dependencies' => array(${ dependenciesString }), 'version' => '${ version }');`;
+
+	const assetFilePath = path.join(
+		BUILD_DIR,
+		'page-prerequisites.asset.php'
+	);
+
+	await mkdir( path.dirname( assetFilePath ), { recursive: true } );
+	await writeFile( assetFilePath, assetContent );
 }
 
 /**
@@ -1821,46 +1920,13 @@ async function buildAll( baseUrlExpression ) {
 		};
 	} );
 
-	// Bundle boot, route, and theme packages from node_modules when pages exist
+	// Generate page prerequisites asset file when pages exist
 	if ( pageData.length > 0 ) {
 		try {
-			const { createRequire } = await import( 'module' );
-			const require = createRequire( import.meta.url );
-
-			// Resolve the @wordpress packages directory from node_modules
-			const bootPackageJson = require.resolve(
-				'@wordpress/boot/package.json',
-				{ paths: [ ROOT_DIR ] }
-			);
-			const wordpressPackagesDir = path.dirname(
-				path.dirname( bootPackageJson )
-			);
-
-			// Bundle boot, route, theme, and private-apis packages
-			const externalPackages = [
-				'boot',
-				'route',
-				'theme',
-				'private-apis',
-			];
-			for ( const pkgName of externalPackages ) {
-				const result = await bundlePackage( pkgName, {
-					sourceDir: wordpressPackagesDir,
-					handlePrefix: 'wp',
-					scriptGlobal: 'wp',
-					packageNamespace: 'wordpress',
-				} );
-
-				if ( result && result.modules ) {
-					modules.push( ...result.modules );
-				}
-				if ( result && result.scripts ) {
-					scripts.push( ...result.scripts );
-				}
-			}
+			await generatePagePrerequisitesAsset();
 		} catch ( error ) {
 			console.warn(
-				'\n⚠️  Warning: Could not bundle WordPress packages for pages:',
+				'\n⚠️  Warning: Could not generate page prerequisites asset:',
 				error.message
 			);
 		}
