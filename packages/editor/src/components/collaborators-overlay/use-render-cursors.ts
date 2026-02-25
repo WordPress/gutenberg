@@ -2,7 +2,7 @@ import {
 	privateApis as coreDataPrivateApis,
 	SelectionType,
 } from '@wordpress/core-data';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from './get-avatar-url';
@@ -49,94 +49,97 @@ export function useRenderCursors(
 		[]
 	);
 
-	const computeCursors = useMemo(
-		() => () => {
-			if ( ! overlayElement || ! blockEditorDocument ) {
-				setCursorPositions( [] );
+	// Bump this counter to force the effect to re-run (e.g. after a layout shift).
+	const [ recomputeToken, setRecomputeToken ] = useState( 0 );
+
+	// All DOM position computations live inside useEffect.
+	useEffect( () => {
+		if ( ! overlayElement || ! blockEditorDocument ) {
+			setCursorPositions( [] );
+			return;
+		}
+
+		const results: CursorData[] = [];
+
+		sortedUsers.forEach( ( user: any ) => {
+			if ( user.isMe ) {
 				return;
 			}
 
-			const results: CursorData[] = [];
+			const selection = user.editorState?.selection ?? {
+				type: SelectionType.None,
+			};
+			const userName = user.collaboratorInfo.name;
+			const clientId = user.clientId;
+			const color = getAvatarBorderColor( user.collaboratorInfo.id );
+			const avatarUrl = getAvatarUrl( user.collaboratorInfo.avatar_urls );
 
-			sortedUsers.forEach( ( user: any ) => {
-				if ( user.isMe ) {
-					return;
+			let coords: {
+				x: number;
+				y: number;
+				height: number;
+			} | null = null;
+
+			if ( selection.type === SelectionType.None ) {
+				// Nothing selected.
+			} else if ( selection.type === SelectionType.WholeBlock ) {
+				// Don't draw a cursor for a whole block selection.
+			} else if ( selection.type === SelectionType.Cursor ) {
+				const { textIndex, localClientId } =
+					resolveSelection( selection );
+				if ( localClientId ) {
+					coords = getCursorPosition(
+						textIndex,
+						localClientId,
+						blockEditorDocument,
+						overlayElement
+					);
 				}
-
-				const selection = user.editorState?.selection ?? {
-					type: SelectionType.None,
-				};
-				const userName = user.collaboratorInfo.name;
-				const clientId = user.clientId;
-				const color = getAvatarBorderColor( user.collaboratorInfo.id );
-				const avatarUrl = getAvatarUrl(
-					user.collaboratorInfo.avatar_urls
-				);
-
-				let coords: {
-					x: number;
-					y: number;
-					height: number;
-				} | null = null;
-
-				if ( selection.type === SelectionType.None ) {
-					// Nothing selected.
-				} else if ( selection.type === SelectionType.WholeBlock ) {
-					// Don't draw a cursor for a whole block selection.
-				} else if ( selection.type === SelectionType.Cursor ) {
-					const { textIndex, localClientId } =
-						resolveSelection( selection );
-					if ( localClientId ) {
-						coords = getCursorPosition(
-							textIndex,
-							localClientId,
-							blockEditorDocument,
-							overlayElement
-						);
-					}
-				} else if (
-					selection.type === SelectionType.SelectionInOneBlock ||
-					selection.type === SelectionType.SelectionInMultipleBlocks
-				) {
-					const { textIndex, localClientId } = resolveSelection( {
-						type: SelectionType.Cursor,
-						cursorPosition: selection.cursorStartPosition,
-					} );
-					if ( localClientId ) {
-						coords = getCursorPosition(
-							textIndex,
-							localClientId,
-							blockEditorDocument,
-							overlayElement
-						);
-					}
+			} else if (
+				selection.type === SelectionType.SelectionInOneBlock ||
+				selection.type === SelectionType.SelectionInMultipleBlocks
+			) {
+				const { textIndex, localClientId } = resolveSelection( {
+					type: SelectionType.Cursor,
+					cursorPosition: selection.cursorStartPosition,
+				} );
+				if ( localClientId ) {
+					coords = getCursorPosition(
+						textIndex,
+						localClientId,
+						blockEditorDocument,
+						overlayElement
+					);
 				}
+			}
 
-				if ( coords ) {
-					results.push( {
-						userName,
-						clientId,
-						color,
-						avatarUrl,
-						...coords,
-					} );
-				}
-			} );
+			if ( coords ) {
+				results.push( {
+					userName,
+					clientId,
+					color,
+					avatarUrl,
+					...coords,
+				} );
+			}
+		} );
 
-			setCursorPositions( results );
-		},
-		[ blockEditorDocument, resolveSelection, overlayElement, sortedUsers ]
-	);
+		setCursorPositions( results );
+	}, [
+		blockEditorDocument,
+		resolveSelection,
+		overlayElement,
+		sortedUsers,
+		recomputeToken,
+	] );
 
-	useEffect( computeCursors, [ computeCursors ] );
-
-	const rerenderCursorsAfterDelay = useMemo(
-		() => () => {
-			const timeout = setTimeout( computeCursors, 500 );
-			return () => clearTimeout( timeout );
-		},
-		[ computeCursors ]
-	);
+	// The delayed rerender just bumps state — no direct DOM mutation.
+	const rerenderCursorsAfterDelay = useCallback( () => {
+		const timeout = setTimeout( () => {
+			setRecomputeToken( ( t ) => t + 1 );
+		}, 500 );
+		return () => clearTimeout( timeout );
+	}, [] );
 
 	return { cursors: cursorPositions, rerenderCursorsAfterDelay };
 }
@@ -236,11 +239,10 @@ const getOffsetPositionInBlock = (
 
 	let cursorHeight = cursorRect.height;
 	if ( cursorHeight === 0 ) {
+		const view = editorDocument.defaultView ?? window;
 		cursorHeight =
-			parseInt(
-				window.getComputedStyle( blockElement ).lineHeight,
-				10
-			) || blockRect.height;
+			parseInt( view.getComputedStyle( blockElement ).lineHeight, 10 ) ||
+			blockRect.height;
 	}
 
 	return {
