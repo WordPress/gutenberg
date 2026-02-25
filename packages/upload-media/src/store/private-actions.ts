@@ -717,22 +717,7 @@ export function prepareItem( id: QueueItemId ) {
 
 		// For images that can be processed by vips, check if we need to scale down based on threshold.
 		if ( isImage && isVipsSupported ) {
-			const { bigImageSizeThreshold, imageOutputFormats } = settings;
-
-			// If a threshold is set, add a resize operation to scale down large images.
-			// This matches WordPress core's behavior in wp_create_image_subsizes().
-			if ( bigImageSizeThreshold ) {
-				operations.push( [
-					OperationType.ResizeCrop,
-					{
-						resize: {
-							width: bigImageSizeThreshold,
-							height: bigImageSizeThreshold,
-						},
-						isThresholdResize: true,
-					},
-				] );
-			}
+			const { imageOutputFormats } = settings;
 
 			// Check if we need to transcode to a different format.
 			// Uses WordPress image_editor_output_format filter settings.
@@ -1126,8 +1111,8 @@ export function generateThumbnails( id: QueueItemId ) {
 			// Use sourceFile for thumbnail generation to preserve quality.
 			// WordPress core generates thumbnails from the original (unscaled) image.
 			// Vips will auto-rotate based on EXIF orientation during thumbnail generation.
-			const file = attachment.media_filename
-				? renameFile( item.sourceFile, attachment.media_filename )
+			const file = attachment.filename
+				? renameFile( item.sourceFile, attachment.filename )
 				: item.sourceFile;
 			const batchId = uuidv4();
 
@@ -1203,6 +1188,54 @@ export function generateThumbnails( id: QueueItemId ) {
 						convert_format: false,
 					},
 					operations: thumbnailOperations,
+				} );
+			}
+
+			// Create and sideload the scaled version.
+			const { bigImageSizeThreshold } = settings;
+			if ( bigImageSizeThreshold && attachment.id ) {
+				// Rename sourceFile to match the server attachment filename.
+				const sourceForScaled = attachment.filename
+					? renameFile( item.sourceFile, attachment.filename )
+					: item.sourceFile;
+
+				// Add scaling to queue.
+				const scaledOperations: Operation[] = [
+					[
+						OperationType.ResizeCrop,
+						{
+							resize: {
+								width: bigImageSizeThreshold,
+								height: bigImageSizeThreshold,
+							},
+							isThresholdResize: true,
+						},
+					],
+				];
+
+				// Add transcoding if format conversion is configured.
+				if ( thumbnailTranscodeOperation ) {
+					scaledOperations.push( thumbnailTranscodeOperation );
+				}
+
+				scaledOperations.push( OperationType.Upload );
+
+				dispatch.addSideloadItem( {
+					file: sourceForScaled,
+					onChange: ( [ updatedAttachment ] ) => {
+						if ( isBlobURL( updatedAttachment.url ) ) {
+							return;
+						}
+						item.onChange?.( [ updatedAttachment ] );
+					},
+					batchId,
+					parentId: item.id,
+					additionalData: {
+						post: attachment.id,
+						image_size: 'scaled',
+						convert_format: false,
+					},
+					operations: scaledOperations,
 				} );
 			}
 		}

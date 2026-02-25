@@ -1,12 +1,18 @@
-# Understanding global state, local context and derived state
+# Understanding global state, local context, derived state and config
 
-The Interactivity API offers a powerful framework for creating interactive blocks. To make the most of its capabilities, it's crucial to understand when to use global state, local context, or derived state. This guide will clarify these concepts and provide practical examples to help you decide when to use each one.
+The Interactivity API offers a powerful framework for creating interactive blocks. To make the most of its capabilities, it's crucial to understand when to use global state, local context, derived state, or config. This guide will clarify these concepts and provide practical examples to help you decide when to use each one.
 
-Let's start with a brief definition of global state, local context and derived state.
+The Interactivity API distinguishes between **reactive** data, which triggers UI updates when it changes, and **non-reactive** data, which remains static throughout the client-side lifecycle. Let's start with a brief definition of each concept.
+
+**Reactive (state and context):**
 
 -   **Global state:** Global data that can be accessed and modified by any interactive block on the page, allowing different parts of your interactive blocks to stay in sync.
 -   **Local context:** Local data defined within a specific element in the HTML structure, accessible only to that element and its children, providing independent state for individual blocks.
 -   **Derived state:** Computed values based on global state or local context, dynamically calculated on-demand to ensure consistent data representation without storing redundant data.
+
+**Non-reactive:**
+
+-   **Config:** Static configuration data serialized from the server to the client, such as API endpoints, nonces, or feature flags. Config values don't trigger UI updates and remain constant during user interaction.
 
 Let's now dive into each of these concepts to study them in more detail and provide some examples.
 
@@ -805,7 +811,12 @@ Consider a quiz that has multiple questions. Each question is a separate page. W
 ```
 
 ```javascript
-import { store, getContext, getServerContext, withSyncEvent } from '@wordpress/interactivity';
+import {
+	store,
+	getContext,
+	getServerContext,
+	withSyncEvent,
+} from '@wordpress/interactivity';
 
 store( 'myPlugin', {
 	actions: {
