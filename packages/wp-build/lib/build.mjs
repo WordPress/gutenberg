@@ -330,9 +330,9 @@ function transformPhpContent( content, transforms, allFunctionNames = [] ) {
 	if ( functionPrefix ) {
 		// Find functions defined in this file.
 		const localFunctions = new Set(
-			Array.from(
-				content.matchAll( /^\s*function ([^\(]+)/gm )
-			).map( ( [ , name ] ) => name )
+			Array.from( content.matchAll( /^\s*function ([^\(]+)/gm ) ).map(
+				( [ , name ] ) => name
+			)
 		);
 
 		// Rename locally-defined functions and all their references in this file.
@@ -354,8 +354,12 @@ function transformPhpContent( content, transforms, allFunctionNames = [] ) {
 			( name ) => ! localFunctions.has( name )
 		);
 		if ( crossFileFunctions.length ) {
+			const funcPattern = crossFileFunctions.join( '|' );
 			content = content.replace(
-				new RegExp( crossFileFunctions.join( '|' ), 'g' ),
+				new RegExp(
+					'(?<![a-zA-Z0-9_])(?:' + funcPattern + ')(?![a-zA-Z0-9_])',
+					'g'
+				),
 				( match ) =>
 					`${ functionPrefix }${ match.replace( /^wp_/, '' ) }`
 			);
