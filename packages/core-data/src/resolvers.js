@@ -235,6 +235,12 @@ export const getEntityRecord =
 							resolveSelect
 								.getEditedEntityRecord( kind, name, key )
 								.then( ( editedRecord ) => {
+									// Don't trigger a save if the record is still an auto-draft.
+									const { status } = editedRecord;
+									if ( 'auto-draft' === status ) {
+										return;
+									}
+
 									dispatch.saveEntityRecord(
 										kind,
 										name,

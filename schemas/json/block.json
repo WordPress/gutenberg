@@ -790,6 +790,20 @@
 							}
 						}
 					]
+				},
+				"css": {
+					"description": "Custom CSS selector used when generating the block's custom CSS rules set via Global Styles.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"root": { "type": "string" }
+							}
+						}
+					]
 				}
 			}
 		},

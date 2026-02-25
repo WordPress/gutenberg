@@ -4,6 +4,7 @@
 	.backdrop {
 		position: fixed;
 		inset: 0;
+		z-index: var(--wp-ui-dialog-z-index, initial);
 		background-color: rgba(0, 0, 0, 0.35);
 
 		&[data-starting-style],
@@ -25,6 +26,7 @@
 		top: 50%;
 		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical centering technique used with transform: translate(-50%, -50%) */
 		left: 50%;
+		z-index: var(--wp-ui-dialog-z-index, initial);
 		transform: translate(-50%, -50%);
 		box-sizing: border-box;
 		min-width: 320px;

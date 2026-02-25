@@ -4,13 +4,18 @@
 
 ### Bug Fixes
 
+- DataForm: Fix label color of array control. [#75730](https://github.com/WordPress/gutenberg/pull/75730)
 - DataForm: Fix focus loss when collapsing in Card view. [#75689](https://github.com/WordPress/gutenberg/pull/75689)
 - DataViews: Fix spacing in first column. [#75693](https://github.com/WordPress/gutenberg/pull/75693)
 - DataViews: Fix search input losing characters during debounce when externally synced. [#75810](https://github.com/WordPress/gutenberg/pull/75810)
+- DataForm: Fix vertical alignment of summary fields in card layout. [#75864](https://github.com/WordPress/gutenberg/pull/75864)
+- DataViews: Remove visual divider between quick and regular actions in the actions menu. [#75893](https://github.com/WordPress/gutenberg/pull/75893)
 
 ### Enhancements
 
+- Documentation: Update README.md. [#75881](https://github.com/WordPress/gutenberg/pull/75881)
 - DataViews: Adjust column spacing in table layout when no titleField is provided. [#75410](https://github.com/WordPress/gutenberg/pull/75410)
+- DataViews: minimize padding for primary actions. [#75721](https://github.com/WordPress/gutenberg/pull/75721)
 
 ## 12.0.0 (2026-02-18)
 
@@ -40,6 +45,7 @@
 - DataViews: Consistent rendering of selection checkbox and actions in grid layout. [#75056](https://github.com/WordPress/gutenberg/pull/75056)
 
 ### Code Quality
+
 - DataForm: Style SummaryButton in panel layout with `is-disabled` classname. [#75470](https://github.com/WordPress/gutenberg/pull/75470)
 
 ### Internal
