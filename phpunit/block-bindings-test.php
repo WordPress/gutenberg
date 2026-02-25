@@ -85,7 +85,7 @@ class Tests_Block_Bindings extends WP_UnitTestCase {
 <!-- /wp:paragraph -->
 HTML
 				,
-				'<p class="wp-block-paragraph">test source value</p>',
+				'<p class="wp-block-paragraph">test-source-value</p>',
 			),
 			'button block'    => array(
 				'text',
@@ -95,7 +95,17 @@ HTML
 <!-- /wp:button -->
 HTML
 				,
-				'<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">test source value</a></div>',
+				'<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">test-source-value</a></div>',
+			),
+			'cover block (with bound non-sourced attribute)' => array(
+				'url',
+				<<<HTML
+<!-- wp:cover -->
+<div class="wp-block-cover is-layout-flow wp-block-cover-is-layout-flow"><img class="wp-block-cover__image-background" src="this-should-not-appear.jpg"/></div>
+<!-- /wp:cover -->
+HTML
+				,
+				'<div class="wp-block-cover is-layout-flow wp-block-cover-is-layout-flow"><img class="wp-block-cover__image-background" src="http://test-source-value"/></div>',
 			),
 			'test block'      => array(
 				'myAttribute',
@@ -105,7 +115,7 @@ HTML
 <!-- /wp:test/block -->
 HTML
 				,
-				'<p>test source value</p>',
+				'<p>test-source-value</p>',
 			),
 		);
 	}
@@ -119,7 +129,7 @@ HTML
 	 */
 	public function test_update_block_with_value_from_source( $bound_attribute, $block_content, $expected_result ) {
 		$get_value_callback = function () {
-			return 'test source value';
+			return 'test-source-value';
 		};
 
 		register_block_bindings_source(
@@ -144,7 +154,7 @@ HTML
 		$result = $block->render();
 
 		$this->assertSame(
-			'test source value',
+			'test-source-value',
 			$block->attributes[ $bound_attribute ],
 			"The '{$bound_attribute}' attribute should be updated with the value returned by the source."
 		);

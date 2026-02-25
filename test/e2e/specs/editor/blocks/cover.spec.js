@@ -555,6 +555,64 @@ test.describe( 'Cover', () => {
 		const overlay = coverBlock.locator( '.wp-block-cover__background' );
 		await expect( overlay ).toBeVisible();
 	} );
+
+	test.describe( 'Block Bindings', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+			// Upload the image so the url_field of the test source resolves.
+			await requestUtils.uploadMedia(
+				path.join(
+					'./test/e2e/assets',
+					'10x10_e2e_test_image_z9T8jK.png'
+				)
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllMedia();
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
+
+		test( 'computes overlay color when url attribute is bound', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/cover',
+				attributes: {
+					metadata: {
+						bindings: {
+							url: {
+								source: 'testing/complete-source',
+								args: { key: 'url_field' },
+							},
+						},
+					},
+				},
+			} );
+
+			const coverBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Cover',
+			} );
+
+			// The overlay should be visible because the bound URL
+			// resolves to an image.
+			const overlay = coverBlock.locator( '.wp-block-cover__background' );
+			await expect( overlay ).toBeVisible();
+
+			// The overlay color should be auto-detected from the
+			// bound image (average of ~50% black, ~50% white = gray).
+			// Without the fix, the CSS default for .has-background-dim
+			// (black) would apply instead.
+			await expect( overlay ).toHaveCSS(
+				'background-color',
+				'rgb(179, 179, 179)'
+			);
+		} );
+	} );
 } );
 
 class CoverBlockUtils {

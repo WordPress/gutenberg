@@ -143,39 +143,6 @@ function CoverEdit( {
 		media?.media_details?.sizes?.[ sizeSlug ]?.source_url ??
 		media?.source_url;
 
-	// User can change the featured image outside of the block, but we still
-	// need to update the block when that happens. This effect should only
-	// run when the featured image changes in that case. All other cases are
-	// handled in their respective callbacks.
-	useEffect( () => {
-		( async () => {
-			if ( ! useFeaturedImage ) {
-				return;
-			}
-
-			const averageBackgroundColor = await getMediaColor( mediaUrl );
-
-			let newOverlayColor = overlayColor.color;
-			if ( ! isUserOverlayColor ) {
-				newOverlayColor = averageBackgroundColor;
-				__unstableMarkNextChangeAsNotPersistent();
-				setOverlayColor( newOverlayColor );
-			}
-
-			const newIsDark = compositeIsDark(
-				dimRatio,
-				newOverlayColor,
-				averageBackgroundColor
-			);
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				isDark: newIsDark,
-				isUserOverlayColor: isUserOverlayColor || false,
-			} );
-		} )();
-		// Update the block only when the featured image changes.
-	}, [ mediaUrl ] );
-
 	// instead of destructuring the attributes
 	// we define the url and background type
 	// depending on the value of the useFeaturedImage flag
@@ -188,14 +155,50 @@ function CoverEdit( {
 		? IMAGE_BACKGROUND_TYPE
 		: originalBackgroundType;
 
+	// User can change the featured image outside of the block, but we still
+	// need to update the block when that happens. This effect should only
+	// run when the featured image changes in that case. All other cases are
+	// handled in their respective callbacks.
+	useEffect( () => {
+		( async () => {
+			if ( ! useFeaturedImage && ! attributes?.metadata?.bindings?.url ) {
+				return;
+			}
+
+			const averageBackgroundColor = await getMediaColor( url );
+
+			let newOverlayColor = overlayColor.color;
+			if ( ! isUserOverlayColor ) {
+				newOverlayColor = averageBackgroundColor;
+				__unstableMarkNextChangeAsNotPersistent();
+				setOverlayColor( newOverlayColor );
+			}
+
+			const newDimRatio = dimRatio === 100 ? 50 : dimRatio;
+
+			const newIsDark = compositeIsDark(
+				newDimRatio,
+				newOverlayColor,
+				averageBackgroundColor
+			);
+
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				dimRatio: newDimRatio,
+				isDark: newIsDark,
+				isUserOverlayColor: isUserOverlayColor || false,
+			} );
+		} )();
+		// Update the block only when the featured image changes.
+	}, [ url ] );
+
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 
 	const onSelectMedia = async ( newMedia ) => {
 		const mediaAttributes = attributesFromMedia( newMedia );
-		const isImage = [ newMedia?.type, newMedia?.media_type ].includes(
-			IMAGE_BACKGROUND_TYPE
-		);
+		const isImage =
+			mediaAttributes.backgroundType === IMAGE_BACKGROUND_TYPE;
 
 		const averageBackgroundColor = await getMediaColor(
 			isImage ? newMedia?.url : undefined

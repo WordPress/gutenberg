@@ -14,15 +14,15 @@ test.describe( 'Registered sources', () => {
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 		await requestUtils.deleteAllMedia();
 		const placeholderMedia = await requestUtils.uploadMedia(
-			path.join( './test/e2e/assets', '10x10_e2e_test_image_z9T8jK.png' )
-		);
-		imagePlaceholderSrc = placeholderMedia.source_url;
-
-		const testingImgMedia = await requestUtils.uploadMedia(
 			path.join(
 				'./test/e2e/assets',
 				'1024x768_e2e_test_image_size.jpeg'
 			)
+		);
+		imagePlaceholderSrc = placeholderMedia.source_url;
+
+		const testingImgMedia = await requestUtils.uploadMedia(
+			path.join( './test/e2e/assets', '10x10_e2e_test_image_z9T8jK.png' )
 		);
 		testingImgSrc = testingImgMedia.source_url;
 	} );
