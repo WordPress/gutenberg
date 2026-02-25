@@ -306,10 +306,10 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 		'connectors_anthropic_api_key' => array( 'anthropic', '_gutenberg_mask_anthropic_api_key' ),
 	);
 
-	foreach ( $connectors as $option_name => $config ) {
-		$api_key = _gutenberg_get_real_api_key( $option_name, $config[1] );
+	foreach ( $connectors as $option_name => list( $provider, $callback ) ) {
+		$api_key = _gutenberg_get_real_api_key( $option_name, $callback );
 		if ( ! empty( $api_key ) ) {
-			_gutenberg_set_provider_api_key( $api_key, $config[0] );
+			_gutenberg_set_provider_api_key( $api_key, $provider );
 		}
 	}
 }
