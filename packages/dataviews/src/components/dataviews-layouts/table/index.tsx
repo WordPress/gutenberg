@@ -429,7 +429,7 @@ function ViewTable< Item >( {
 							className={ clsx(
 								`dataviews-view-table__col-${ column }`,
 								{
-									'dataviews-view-table__col-first-data':
+									'dataviews-view-table__col-first-expand':
 										! hasPrimaryColumn &&
 										index === columns.length - 1,
 								}
