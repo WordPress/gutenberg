@@ -168,11 +168,7 @@ function getAnchor(
 	return createVirtualAnchorElement( range, editableContentElement );
 }
 
-type AnchorSettings = Pick< WPFormat, 'tagName' | 'className' > & {
-	isActive?: boolean;
-};
-
-const DEFAULT_SETTINGS: AnchorSettings = {
+const DEFAULT_SETTINGS = {
 	tagName: '',
 	className: '',
 };
@@ -190,12 +186,23 @@ const DEFAULT_SETTINGS: AnchorSettings = {
  */
 export function useAnchor( {
 	editableContentElement,
-	settings = DEFAULT_SETTINGS,
+	settings,
 }: {
 	editableContentElement: HTMLElement | null;
-	settings?: AnchorSettings;
+	settings?: WPFormat;
 } ): Element | VirtualAnchorElement | undefined | null {
-	const { tagName, className, isActive } = settings;
+	const { tagName, className } = settings ?? DEFAULT_SETTINGS;
+
+	// `isActive` is not a property of `WPFormat`, but it has made its way into
+	// `settings` in certain cases (see `core/link` format). Avoid making this
+	// exception "public" in the function signature: tell TS how to look for it
+	// dynamically.
+	const isActive = !! (
+		settings &&
+		'isActive' in settings &&
+		settings.isActive
+	);
+
 	const [ anchor, setAnchor ] = useState( () =>
 		getAnchor( editableContentElement, tagName, className ?? '' )
 	);

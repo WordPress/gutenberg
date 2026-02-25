@@ -460,9 +460,9 @@ This hook, to be used in a format type's Edit component, returns the active elem
 
 _Parameters_
 
--   _obj_ `{ editableContentElement: HTMLElement | null; settings?: AnchorSettings; }`: Named parameters.
+-   _obj_ `{ editableContentElement: HTMLElement | null; settings?: WPFormat; }`: Named parameters.
 -   _obj.editableContentElement_ `HTMLElement | null`: The element containing the editable content.
--   _obj.settings_ `AnchorSettings`: The format type's settings.
+-   _obj.settings_ `WPFormat`: The format type's settings.
 
 _Returns_
 
