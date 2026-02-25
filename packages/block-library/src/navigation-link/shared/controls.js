@@ -5,7 +5,6 @@ import {
 	Button,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalHStack as HStack,
 	CheckboxControl,
 	TextControl,
 	TextareaControl,
@@ -150,7 +149,7 @@ export function Controls( {
 
 	// Check if URL is viewable (not hash link or other relative path like ./ or ../)
 	const isViewableUrl =
-		url &&
+		!! url &&
 		( ! isHashLink( url ) ||
 			( isRelativePath( url ) && ! url.startsWith( '/' ) ) );
 
@@ -232,51 +231,38 @@ export function Controls( {
 						/>
 					</ToolsPanelItem>
 
-					{ url && (
-						<HStack
-							className="navigation-link-to__actions"
-							alignment="stretch"
-							style={ { gridColumn: '1 / -1' } }
+					{ !! url &&
+						hasUrlBinding &&
+						isBoundEntityAvailable &&
+						entityRecord?.id &&
+						attributes.kind === 'post-type' &&
+						onNavigateToEntityRecord && (
+							<Button
+								variant="secondary"
+								onClick={ () => {
+									onNavigateToEntityRecord( {
+										postId: entityRecord.id,
+										postType: attributes.type,
+									} );
+								} }
+								__next40pxDefaultSize
+								className="navigation-link-to__action-button"
+							>
+								{ __( 'Edit' ) }
+							</Button>
+						) }
+					{ isViewableUrl && (
+						<Button
+							variant="secondary"
+							href={ viewUrl }
+							target="_blank"
+							icon={ external }
+							iconPosition="right"
+							__next40pxDefaultSize
+							className="navigation-link-to__action-button"
 						>
-							{ hasUrlBinding &&
-								isBoundEntityAvailable &&
-								entityRecord?.id &&
-								attributes.kind === 'post-type' &&
-								onNavigateToEntityRecord && (
-									<Button
-										variant="secondary"
-										onClick={ () => {
-											onNavigateToEntityRecord( {
-												postId: entityRecord.id,
-												postType: attributes.type,
-											} );
-										} }
-										__next40pxDefaultSize
-										style={ {
-											flex: 1,
-											justifyContent: 'center',
-										} }
-									>
-										{ __( 'Edit' ) }
-									</Button>
-								) }
-							{ isViewableUrl && (
-								<Button
-									variant="secondary"
-									href={ viewUrl }
-									target="_blank"
-									icon={ external }
-									iconPosition="right"
-									__next40pxDefaultSize
-									style={ {
-										flex: 1,
-										justifyContent: 'center',
-									} }
-								>
-									{ __( 'View' ) }
-								</Button>
-							) }
-						</HStack>
+							{ __( 'View' ) }
+						</Button>
 					) }
 				</>
 			) }
