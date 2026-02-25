@@ -27,35 +27,5 @@ function _gutenberg_connectors_add_settings_menu_item() {
 	);
 }
 
-/**
- * Registers the example connectors extension as a script module.
- *
- * @access private
- */
-function _gutenberg_register_connectors_extension_module() {
-	wp_register_script_module(
-		'gutenberg/connectors-extension',
-		gutenberg_url( 'lib/experimental/connectors/connectors-extension.js' ),
-		array( '@wordpress/connectors' ),
-		filemtime( __DIR__ . '/connectors-extension.js' )
-	);
-}
-//add_action( 'init', '_gutenberg_register_connectors_extension_module' );
-
-/**
- * Enqueues the connectors extension on the Connectors page.
- *
- * @access private
- *
- * @param string $hook_suffix The current admin page.
- */
-function _gutenberg_enqueue_connectors_extension( $hook_suffix ) {
-	if ( 'settings_page_connectors-wp-admin' !== $hook_suffix ) {
-		return;
-	}
-	wp_enqueue_script_module( 'gutenberg/connectors-extension' );
-}
-add_action( 'admin_enqueue_scripts', '_gutenberg_enqueue_connectors_extension' );
-
 require __DIR__ . '/default-connectors.php';
 require __DIR__ . '/debug-test.php';
