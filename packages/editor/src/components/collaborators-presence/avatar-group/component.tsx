@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { Children } from '@wordpress/element';
+import { sprintf, _n } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -34,7 +35,15 @@ function AvatarGroup( {
 			{ overflowCount > 0 && (
 				<span
 					className="editor-avatar-group__overflow"
-					aria-label={ `${ overflowCount } more` }
+					aria-label={ sprintf(
+						/* translators: %d: number of additional collaborators not shown */
+						_n(
+							'%d more collaborator',
+							'%d more collaborators',
+							overflowCount
+						),
+						overflowCount
+					) }
 				>
 					{ `+${ overflowCount }` }
 				</span>
