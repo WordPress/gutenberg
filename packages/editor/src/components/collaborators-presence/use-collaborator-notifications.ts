@@ -18,7 +18,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
-const { useActiveCollaborators, useBroadcastSaveEvent } = unlock( privateApis );
+const { useActiveCollaborators, useLastPostSave } = unlock( privateApis );
 
 /**
  * Notice IDs for each notification type. Using stable IDs prevents duplicate
@@ -77,20 +77,11 @@ export function useCollaboratorNotifications(
 		postType
 	) as PostEditorAwarenessState[];
 
-	const broadcastSaveEvent = useBroadcastSaveEvent( postId, postType );
+	const lastPostSave = useLastPostSave( postId, postType );
 
-	const {
-		isSaving,
-		isAutosaving,
-		didSaveSucceed,
-		postStatus,
-		isCollaborationEnabled,
-	} = useSelect( ( select ) => {
+	const { postStatus, isCollaborationEnabled } = useSelect( ( select ) => {
 		const editorSel = select( editorStore );
 		return {
-			isSaving: editorSel.isSavingPost(),
-			isAutosaving: editorSel.isAutosavingPost(),
-			didSaveSucceed: editorSel.didPostSaveRequestSucceed(),
 			postStatus: editorSel.getCurrentPostAttribute( 'status' ) as
 				| string
 				| undefined,
@@ -111,33 +102,10 @@ export function useCollaboratorNotifications(
 	);
 
 	const prevCollaborators = usePrevious( activeCollaborators );
-	const prevIsSaving = usePrevious( isSaving );
-	const prevIsAutosaving = usePrevious( isAutosaving );
-
-	// Broadcast our own saves to collaborators via awareness.
-	useEffect( () => {
-		if (
-			prevIsSaving &&
-			! isSaving &&
-			! prevIsAutosaving &&
-			didSaveSucceed &&
-			isCollaborationEnabled &&
-			postStatus
-		) {
-			broadcastSaveEvent( postStatus );
-		}
-	}, [
-		isSaving,
-		prevIsSaving,
-		prevIsAutosaving,
-		didSaveSucceed,
-		postStatus,
-		isCollaborationEnabled,
-		broadcastSaveEvent,
-	] );
+	const prevPostSave = usePrevious( lastPostSave );
 
 	/*
-	 * Detect collaborator joins, leaves, and remote saves.
+	 * Detect collaborator joins and leaves.
 	 */
 	useEffect( () => {
 		if ( ! isCollaborationEnabled ) {
@@ -153,9 +121,6 @@ export function useCollaboratorNotifications(
 			return;
 		}
 
-		/*
-		 * Convenience wrapper to keep notice calls concise.
-		 */
 		function notify( noticeId: string, message: string ) {
 			void createNotice( 'info', message, {
 				id: noticeId,
@@ -235,44 +200,57 @@ export function useCollaboratorNotifications(
 				);
 			}
 		}
-
-		// Detect remote save events from other collaborators.
-		if ( notificationsConfig.postUpdated ) {
-			for ( const [ clientId, collaborator ] of newMap ) {
-				if ( collaborator.isMe || ! collaborator.lastSaveEvent ) {
-					continue;
-				}
-
-				const prevCollab = prevMap.get( clientId );
-
-				/*
-				 * Only notify for save events from collaborators we already
-				 * knew about. A newly appeared collaborator may carry a
-				 * historical save event that predates our session.
-				 */
-				if ( ! prevCollab ) {
-					continue;
-				}
-
-				const prevSavedAt = prevCollab.lastSaveEvent?.savedAt;
-				const { savedAt, status } = collaborator.lastSaveEvent;
-
-				if ( savedAt > ( prevSavedAt ?? 0 ) ) {
-					notify(
-						`${ NOTIFICATION_TYPE.POST_UPDATED }-${ collaborator.collaboratorInfo.id }`,
-						getPostUpdatedMessage(
-							collaborator.collaboratorInfo.name,
-							status
-						)
-					);
-				}
-			}
-		}
 	}, [
 		activeCollaborators,
 		prevCollaborators,
 		isCollaborationEnabled,
 		notificationsConfig,
+		createNotice,
+	] );
+
+	/*
+	 * Detect remote save events via the CRDT state map. The savedByClientId
+	 * is a Y.Doc client ID which maps to a collaborator via clientId.
+	 */
+	useEffect( () => {
+		if (
+			! isCollaborationEnabled ||
+			! notificationsConfig.postUpdated ||
+			! lastPostSave ||
+			! postStatus
+		) {
+			return;
+		}
+
+		if ( prevPostSave && lastPostSave.savedAt === prevPostSave.savedAt ) {
+			return;
+		}
+
+		const saver = activeCollaborators.find(
+			( c ) => c.clientId === lastPostSave.savedByClientId && ! c.isMe
+		);
+
+		if ( ! saver ) {
+			return;
+		}
+
+		const message = getPostUpdatedMessage(
+			saver.collaboratorInfo.name,
+			postStatus
+		);
+
+		void createNotice( 'info', message, {
+			id: `${ NOTIFICATION_TYPE.POST_UPDATED }-${ saver.collaboratorInfo.id }`,
+			type: 'snackbar',
+			isDismissible: false,
+		} );
+	}, [
+		lastPostSave,
+		prevPostSave,
+		activeCollaborators,
+		isCollaborationEnabled,
+		notificationsConfig,
+		postStatus,
 		createNotice,
 	] );
 }
