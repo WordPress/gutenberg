@@ -303,17 +303,16 @@ export function scheduleRetry( id: QueueItemId, error: Error ) {
 		}
 
 		const currentRetryCount = item.retryCount ?? 0;
-		const nextRetryCount = currentRetryCount + 1;
 
 		const delay = calculateRetryDelay( {
-			attempt: nextRetryCount,
+			attempt: currentRetryCount + 1,
 			initialDelay: retrySettings.initialRetryDelayMs,
 			maxDelay: retrySettings.maxRetryDelayMs,
 			multiplier: retrySettings.backoffMultiplier,
 			jitter: retrySettings.retryJitter,
 		} );
 
-		logRetryScheduled( id, item.file.name, nextRetryCount, delay );
+		logRetryScheduled( id, item.file.name, currentRetryCount + 1, delay );
 
 		// Schedule the retry execution and store timer ID for cleanup.
 		const timerId = setTimeout( () => {
