@@ -48,8 +48,3 @@ export const LOCAL_EDITOR_ORIGIN = 'gutenberg';
  * Origin string for CRDT document changes originating from the sync manager.
  */
 export const LOCAL_SYNC_MANAGER_ORIGIN = 'syncManager';
-
-/**
- * WordPress meta key used to persist the CRDT document for an entity.
- */
-export const WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE = '_crdt_document';

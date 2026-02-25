@@ -87,9 +87,14 @@ function createVirtualAnchorElement( range, editableContentElement ) {
 	return {
 		contextElement: editableContentElement,
 		getBoundingClientRect() {
-			return editableContentElement.contains( range.startContainer )
-				? getRectangleFromRange( range )
-				: editableContentElement.getBoundingClientRect();
+			if ( editableContentElement.contains( range.startContainer ) ) {
+				return (
+					getRectangleFromRange( range ) ??
+					range.getBoundingClientRect()
+				);
+			}
+
+			return editableContentElement.getBoundingClientRect();
 		},
 	};
 }

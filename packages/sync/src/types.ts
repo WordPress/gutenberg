@@ -9,11 +9,6 @@ import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
 
-/**
- * Internal dependencies
- */
-import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
-
 /* globalThis */
 declare global {
 	interface Window {
@@ -33,15 +28,9 @@ export type ObjectType = string;
 // its origin.
 export type Origin = any;
 
-// Object data represents any entity record, post, term, user, site, etc. There
-// are not many expectations that can hold on its shape.
-export interface ObjectData extends Record< string, unknown > {
-	meta?: ObjectMeta;
-}
-
-export interface ObjectMeta extends Record< string, unknown > {
-	[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]?: string;
-}
+// Object data represents any entity record. There are not any expectations that
+// can hold on its shape, beyond a record with string keys and unknown values.
+export type ObjectData = Record< string, unknown >;
 
 /**
  * Event map for provider events.
@@ -151,14 +140,14 @@ export interface SyncConfig {
 		ydoc: Y.Doc,
 		editedRecord: ObjectData
 	) => ObjectData;
-	supports?: Record< string, true >;
+	getPersistedCrdtDoc?: ( record: ObjectData ) => string | null;
 }
 
 export interface SyncManager {
-	createMeta: (
+	createPersistedCRDTDoc: (
 		objectType: ObjectType,
 		objectId: ObjectID
-	) => Record< string, string >;
+	) => string | null;
 	getAwareness: < State extends Awareness >(
 		objectType: ObjectType,
 		objectId: ObjectID
