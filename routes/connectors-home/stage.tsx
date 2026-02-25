@@ -3,7 +3,10 @@
  */
 import { Page } from '@wordpress/admin-ui';
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { type ConnectorConfig, privateApis as connectorsPrivateApis } from '@wordpress/connectors';
+import {
+	privateApis as connectorsPrivateApis,
+	type ConnectorConfig,
+} from '@wordpress/connectors';
 import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';

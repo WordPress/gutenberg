@@ -43,8 +43,12 @@ export function ConnectorItem( {
 					{ icon }
 					<FlexBlock>
 						<VStack spacing={ 0 }>
-							<Text weight={ 600 } size={ 15 }>{ name }</Text>
-							<Text variant="muted" size={ 12 }>{ description }</Text>
+							<Text weight={ 600 } size={ 15 }>
+								{ name }
+							</Text>
+							<Text variant="muted" size={ 12 }>
+								{ description }
+							</Text>
 						</VStack>
 					</FlexBlock>
 					{ actionArea }
@@ -66,6 +70,14 @@ export interface DefaultConnectorSettingsProps {
 
 /**
  * Default settings form for connectors.
+ *
+ * @param props               - Component props.
+ * @param props.onSave        - Callback invoked with the API key when the user saves.
+ * @param props.onRemove      - Callback invoked when the user removes the connector.
+ * @param props.initialValue  - Initial value for the API key field.
+ * @param props.helpUrl       - URL to documentation for obtaining an API key.
+ * @param props.helpLabel     - Custom label for the help link. Defaults to the URL without protocol.
+ * @param props.readOnly      - Whether the form is in read-only mode.
  */
 export function DefaultConnectorSettings( {
 	onSave,
@@ -79,8 +91,7 @@ export function DefaultConnectorSettings( {
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ saveError, setSaveError ] = useState< string | null >( null );
 
-	const helpLinkLabel =
-		helpLabel || helpUrl?.replace( /^https?:\/\//, '' );
+	const helpLinkLabel = helpLabel || helpUrl?.replace( /^https?:\/\//, '' );
 
 	const helpLink = helpUrl ? (
 		<>
@@ -93,7 +104,9 @@ export function DefaultConnectorSettings( {
 		if ( readOnly ) {
 			return (
 				<>
-					{ __( 'Your API key is stored securely. You can reset it at' ) }{ ' ' }
+					{ __(
+						'Your API key is stored securely. You can reset it at'
+					) }{ ' ' }
 					{ helpUrl ? (
 						<ExternalLink href={ helpUrl }>
 							{ helpLinkLabel }
@@ -103,11 +116,7 @@ export function DefaultConnectorSettings( {
 			);
 		}
 		if ( saveError ) {
-			return (
-				<span style={ { color: '#cc1818' } }>
-					{ saveError }
-				</span>
-			);
+			return <span style={ { color: '#cc1818' } }>{ saveError }</span>;
 		}
 		return helpLink;
 	};
@@ -121,7 +130,9 @@ export function DefaultConnectorSettings( {
 			setSaveError(
 				error instanceof Error
 					? error.message
-					: __( 'It was not possible to connect to the provider using this key.' )
+					: __(
+							'It was not possible to connect to the provider using this key.'
+					  )
 			);
 		} finally {
 			setIsSaving( false );
@@ -132,33 +143,40 @@ export function DefaultConnectorSettings( {
 		<VStack
 			spacing={ 4 }
 			className="connector-settings"
-			style={ readOnly ? { '--wp-components-color-background': '#f0f0f0' } as React.CSSProperties : undefined }
+			style={
+				readOnly
+					? ( {
+							'--wp-components-color-background': '#f0f0f0',
+					  } as React.CSSProperties )
+					: undefined
+			}
 		>
 			<TextControl
 				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				label={ __( 'API Key' ) }
 				value={ apiKey }
-				onChange={ readOnly ? undefined : ( value ) => {
-					setSaveError( null );
-					setApiKey( value );
+				onChange={ ( value ) => {
+					if ( ! readOnly ) {
+						setSaveError( null );
+						setApiKey( value );
+					}
 				} }
 				placeholder="YOUR_API_KEY"
 				disabled={ readOnly || isSaving }
 				help={ getHelp() }
 			/>
 			{ readOnly ? (
-				<Button
-					variant="link"
-					isDestructive
-					onClick={ onRemove }
-				>
+				<Button variant="link" isDestructive onClick={ onRemove }>
 					{ __( 'Remove and replace' ) }
 				</Button>
 			) : (
 				<HStack justify="flex-start">
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
 						disabled={ ! apiKey || isSaving }
+						accessibleWhenDisabled
 						isBusy={ isSaving }
 						onClick={ handleSave }
 					>
