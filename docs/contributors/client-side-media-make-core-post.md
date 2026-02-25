@@ -8,7 +8,7 @@ This post outlines what's changing, how it works, and what plugin and theme deve
 
 Traditionally, when a user uploads an image in the block editor, the file is sent to the server where PHP (using GD or Imagick) generates thumbnails, applies format conversions, handles EXIF rotation, and scales large images. This approach is limited by PHP memory constraints, server CPU availability, and the capabilities of the installed image library.
 
-Client-side media processing moves this work to the browser. Images are processed using [wasm-vips](https://github.com/nicolo-ribaudo/libvips), a WebAssembly compilation of the high-performance libvips image processing library. The processed images — including all thumbnails — are then uploaded to the server, which simply stores them without additional processing.
+Client-side media processing moves this work to the browser. Images are processed using [wasm-vips](https://github.com/kleisauke/wasm-vips), a WebAssembly compilation of the high-performance libvips image processing library. The processed images — including all thumbnails — are then uploaded to the server, which simply stores them without additional processing.
 
 ## Key benefits
 

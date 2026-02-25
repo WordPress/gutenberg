@@ -64,7 +64,7 @@ The `core/upload-media` data store manages the upload queue and coordinates the 
 
 ### `@wordpress/vips` — WASM image processing
 
-A JavaScript wrapper around [wasm-vips](https://github.com/nicolo-ribaudo/libvips) (a WebAssembly compilation of libvips). It runs in a Web Worker to avoid blocking the main thread and provides:
+A JavaScript wrapper around [wasm-vips](https://github.com/kleisauke/wasm-vips) (a WebAssembly compilation of libvips). It runs in a Web Worker to avoid blocking the main thread and provides:
 
 -   Format conversion (JPEG, PNG, WebP, AVIF, GIF).
 -   Resizing and cropping with smart crop support.

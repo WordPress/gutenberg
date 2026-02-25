@@ -185,11 +185,9 @@ POST /wp/v2/media/{id}/sideload
 const formData = new FormData();
 formData.append( 'file', thumbnailBlob, 'image-150x150.webp' );
 
-await fetch( '/wp-json/wp/v2/media/123/sideload?image_size=thumbnail', {
+await wp.apiFetch( {
+	path: `/wp/v2/media/123/sideload?image_size=thumbnail`,
 	method: 'POST',
-	headers: {
-		'X-WP-Nonce': wpApiSettings.nonce,
-	},
 	body: formData,
 } );
 ```
