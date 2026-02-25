@@ -98,7 +98,6 @@ export function computeBadges( {
 	isEntityAvailable,
 } ) {
 	const badges = [];
-
 	// Kind badge
 	if ( url ) {
 		if ( isExternal ) {
@@ -111,6 +110,11 @@ export function computeBadges( {
 			// because they're not entity links even if type is set
 			badges.push( {
 				label: __( 'Internal link' ),
+				intent: 'default',
+			} );
+		} else if ( url === '/' ) {
+			badges.push( {
+				label: __( 'Homepage' ),
 				intent: 'default',
 			} );
 		} else if ( type && type !== 'custom' ) {
