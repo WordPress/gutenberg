@@ -1,11 +1,11 @@
 {
-	"name": "@wordpress/connections-home-route",
+	"name": "@wordpress/connectors-home-route",
 	"version": "1.0.0",
 	"private": true,
 	"route": {
 		"path": "/",
 		"page": [
-			"connections"
+			"connectors"
 		]
 	},
 	"dependencies": {

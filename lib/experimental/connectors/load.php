@@ -16,8 +16,8 @@ function gutenberg_connectors_add_settings_menu_item() {
 		__( 'Connectors', 'gutenberg' ),
 		__( 'Connectors', 'gutenberg' ),
 		'manage_options',
-		'connections-wp-admin',
-		'gutenberg_connections_wp_admin_render_page',
+		'connectors-wp-admin',
+		'gutenberg_connectors_wp_admin_render_page',
 		1
 	);
 }
@@ -41,7 +41,7 @@ add_action( 'init', 'gutenberg_register_connectors_extension_module' );
  * @param string $hook_suffix The current admin page.
  */
 function gutenberg_enqueue_connectors_extension( $hook_suffix ) {
-	if ( 'settings_page_connections-wp-admin' !== $hook_suffix ) {
+	if ( 'settings_page_connectors-wp-admin' !== $hook_suffix ) {
 		return;
 	}
 	wp_enqueue_script_module( 'gutenberg/connectors-extension' );

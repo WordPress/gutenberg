@@ -30,7 +30,7 @@ function ConnectorsPage() {
 				'All of your API keys and credentials are stored here and shared across plugins. Configure once and use everywhere.'
 			) }
 		>
-			<div className="connections-page">
+			<div className="connectors-page">
 				<VStack spacing={ 4 }>
 					{ connectors.map( ( connector: ConnectorConfig ) => {
 						if ( connector.render ) {

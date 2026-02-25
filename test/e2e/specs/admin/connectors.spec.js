@@ -4,9 +4,9 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const SETTINGS_PAGE_PATH = 'options-general.php';
-const CONNECTORS_PAGE_QUERY = 'page=connections-wp-admin';
+const CONNECTORS_PAGE_QUERY = 'page=connectors-wp-admin';
 
-test.describe( 'Connections', () => {
+test.describe( 'Connectors', () => {
 	test( 'should show a Connectors link in the Settings menu', async ( {
 		page,
 		admin,

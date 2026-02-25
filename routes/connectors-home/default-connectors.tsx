@@ -151,14 +151,18 @@ function createKeyValidator( providerName: string, rule: KeyValidationRule ) {
 			return rule.exactLength
 				? sprintf(
 						/* translators: 1: provider name, 2: key prefix, 3: number of characters */
-						__( '%1$s API keys start with "%2$s" and are %3$d characters long.' ),
+						__(
+							'%1$s API keys start with "%2$s" and are %3$d characters long.'
+						),
 						providerName,
 						rule.prefix,
 						rule.exactLength
 				  )
 				: sprintf(
 						/* translators: 1: provider name, 2: key prefix, 3: minimum number of characters */
-						__( '%1$s API keys start with "%2$s" and are at least %3$d characters long.' ),
+						__(
+							'%1$s API keys start with "%2$s" and are at least %3$d characters long.'
+						),
 						providerName,
 						rule.prefix,
 						rule.minLength
@@ -174,7 +178,9 @@ function createKeyValidator( providerName: string, rule: KeyValidationRule ) {
 				  )
 				: sprintf(
 						/* translators: 1: provider name, 2: minimum number of characters */
-						__( '%1$s API keys are at least %2$d characters long.' ),
+						__(
+							'%1$s API keys are at least %2$d characters long.'
+						),
 						providerName,
 						rule.minLength
 				  );
