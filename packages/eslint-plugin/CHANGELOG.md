@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added [`no-ds-tokens`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-ds-tokens.md) rule to disallow usage of Design System token CSS custom properties (`--wpds-*`).
+
 ## 24.2.0 (2026-02-18)
 
 ## 24.1.0 (2026-01-29)
