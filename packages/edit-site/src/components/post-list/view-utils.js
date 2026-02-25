@@ -19,7 +19,15 @@ import {
 import { OPERATOR_IS_ANY } from '../../utils/constants';
 
 export const defaultLayouts = {
-	table: {},
+	table: {
+		layout: {
+			styles: {
+				author: {
+					align: 'start',
+				},
+			},
+		},
+	},
 	grid: {},
 	list: {},
 };
