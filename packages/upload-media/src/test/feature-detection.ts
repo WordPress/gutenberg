@@ -140,7 +140,7 @@ describe( 'feature-detection', () => {
 
 			expect( result.supported ).toBe( false );
 			expect( result.reason ).toBe(
-				'WebAssembly is not supported in this browser'
+				'WebAssembly is not supported in this browser.'
 			);
 		} );
 
