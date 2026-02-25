@@ -1,3 +1,4 @@
+/* eslint-disable @wordpress/no-unknown-ds-tokens */
 import { RuleTester } from 'eslint';
 import rule from '../no-unknown-ds-tokens';
 
@@ -26,6 +27,9 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 		},
 		{
 			code: '<div style={ { color: `var(--wpds-color-fg-content-neutral)` } } />',
+		},
+		{
+			code: `const token = 'var(--wpds-color-fg-content-neutral)';`,
 		},
 	],
 	invalid: [
@@ -56,5 +60,38 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 				},
 			],
 		},
+		{
+			code: `const token = 'var(--wpds-nonexistent-token)';`,
+			errors: [
+				{
+					messageId: 'onlyKnownTokens',
+				},
+			],
+		},
+		{
+			code: 'const token = `var(--wpds-nonexistent-token)`;',
+			errors: [
+				{
+					messageId: 'onlyKnownTokens',
+				},
+			],
+		},
+		{
+			code: 'const token = `var(--wpds-dimension-gap-${ size })`;',
+			errors: [
+				{
+					messageId: 'dynamicToken',
+				},
+			],
+		},
+		{
+			code: '<div style={ { gap: `var(--wpds-dimension-gap-${ size })` } } />',
+			errors: [
+				{
+					messageId: 'dynamicToken',
+				},
+			],
+		},
 	],
 } );
+/* eslint-enable @wordpress/no-unknown-ds-tokens */
