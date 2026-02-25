@@ -213,6 +213,11 @@
 
 	&.is-refreshing {
 		opacity: 0.5;
+
+		@media not (prefers-reduced-motion) {
+			opacity: 1;
+			animation: dataviews-pulse 1s ease-in-out infinite;
+		}
 	}
 
 	& + .dataviews-pagination {
