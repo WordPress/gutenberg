@@ -69,7 +69,6 @@
 		"@wordpress/commands": "file:../commands",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
-		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/dataviews": "file:../dataviews",
 		"@wordpress/date": "file:../date",
