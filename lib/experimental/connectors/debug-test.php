@@ -21,7 +21,7 @@ function gutenberg_test_ai_provider( $registry, $provider_id ) {
 	);
 
 	try {
-		$response = wp_ai_client_prompt( 'Say the word I will pass' )
+		$response              = wp_ai_client_prompt( 'Say the word I will pass' )
 			->with_text( 'hello' )
 			->using_provider( $provider_id )
 			->generate_text();
