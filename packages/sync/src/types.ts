@@ -140,7 +140,7 @@ export interface SyncConfig {
 		ydoc: Y.Doc,
 		editedRecord: ObjectData
 	) => ObjectData;
-	getPersistedCrdtDoc?: ( record: ObjectData ) => string | null;
+	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
 }
 
 export interface SyncManager {

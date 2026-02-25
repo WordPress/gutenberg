@@ -61,6 +61,43 @@ test.describe( 'Collaboration - CRDT persistence', () => {
 		} );
 
 		expect( persistedCrdtDoc ).toBeTruthy();
+
+		// Refresh the page and verify the CRDT document is loaded from the persisted meta.
+		await page.reload();
+
+		// Wait for the entity record resolver to finish.
+		await page.waitForFunction(
+			() => {
+				const postId = ( window as any ).wp.data
+					.select( 'core/editor' )
+					.getCurrentPostId();
+				if ( ! postId ) {
+					return false;
+				}
+				return ( window as any ).wp.data
+					.select( 'core' )
+					.hasFinishedResolution( 'getEntityRecord', [
+						'postType',
+						'post',
+						postId,
+					] );
+			},
+			{ timeout: 5000 }
+		);
+
+		const reloadedCrdtDoc = await page.evaluate( () => {
+			return window.wp.data
+				.select( 'core' )
+				.getEntityRecord(
+					'postType',
+					'post',
+					window.wp.data.select( 'core/editor' ).getCurrentPostId()
+				).meta._crdt_document;
+		} );
+
+		// No invalidations should occur on reload, so the CRDT document should be
+		// the same as before.
+		expect( reloadedCrdtDoc ).toBe( persistedCrdtDoc );
 	} );
 
 	test( 'does not save CRDT document for auto-draft posts', async ( {

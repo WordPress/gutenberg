@@ -408,13 +408,13 @@ export function createSyncManager( debug = false ): SyncManager {
 			syncConfig: {
 				applyChangesToCRDTDoc,
 				getChangesFromCRDTDoc,
-				getPersistedCrdtDoc,
+				getPersistedCRDTDoc,
 			},
 			ydoc: targetDoc,
 		} = entityState;
 
 		// Get the persisted CRDT document, if it exists.
-		const serialized = getPersistedCrdtDoc?.( record );
+		const serialized = getPersistedCRDTDoc?.( record );
 		const tempDoc = serialized ? deserializeCrdtDoc( serialized ) : null;
 
 		if ( ! tempDoc ) {
