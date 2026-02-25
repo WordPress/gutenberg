@@ -44,6 +44,19 @@ import getDataByGroup from '../utils/get-data-by-group';
 import { PropertiesSection } from '../../dataviews-view-config/properties-section';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
+function getEffectiveAlign(
+	explicitAlign: 'start' | 'center' | 'end' | undefined,
+	fieldType: string | undefined
+): 'start' | 'center' | 'end' | undefined {
+	if ( explicitAlign ) {
+		return explicitAlign;
+	}
+	if ( fieldType === 'integer' || fieldType === 'number' ) {
+		return 'end';
+	}
+	return undefined;
+}
+
 interface TableColumnFieldProps< Item > {
 	fields: NormalizedField< Item >[];
 	column: string;
@@ -226,6 +239,8 @@ function TableRow< Item >( {
 				// Explicit picks the supported styles.
 				const { width, maxWidth, minWidth, align } =
 					view.layout?.styles?.[ column ] ?? {};
+				const field = fields.find( ( f ) => f.id === column );
+				const effectiveAlign = getEffectiveAlign( align, field?.type );
 
 				return (
 					<td
@@ -240,7 +255,7 @@ function TableRow< Item >( {
 							fields={ fields }
 							item={ item }
 							column={ column }
-							align={ align }
+							align={ effectiveAlign }
 						/>
 					</td>
 				);
@@ -501,6 +516,13 @@ function ViewTable< Item >( {
 							// Explicit picks the supported styles.
 							const { width, maxWidth, minWidth, align } =
 								view.layout?.styles?.[ column ] ?? {};
+							const field = fields.find(
+								( f ) => f.id === column
+							);
+							const effectiveAlign = getEffectiveAlign(
+								align,
+								field?.type
+							);
 							const canInsertOrMove =
 								view.layout?.enableMoving ?? true;
 							return (
@@ -510,7 +532,7 @@ function ViewTable< Item >( {
 										width,
 										maxWidth,
 										minWidth,
-										textAlign: align,
+										textAlign: effectiveAlign,
 									} }
 									aria-sort={
 										view.sort?.direction &&
