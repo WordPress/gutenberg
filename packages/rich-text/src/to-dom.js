@@ -13,6 +13,13 @@ import { isRangeEqual } from './is-range-equal';
  */
 const MATHML_NAMESPACE = 'http://www.w3.org/1998/Math/MathML';
 
+/**
+ * SVG namespace URI.
+ *
+ * @see https://www.w3.org/2000/svg
+ */
+const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
@@ -89,6 +96,12 @@ function append( element, child ) {
 					MATHML_NAMESPACE,
 					type
 				);
+			} else if ( type === 'svg' ) {
+				// Root svg element always uses SVG namespace
+				child = element.ownerDocument.createElementNS(
+					SVG_NAMESPACE,
+					type
+				);
 			} else if ( parentNamespace === MATHML_NAMESPACE ) {
 				if ( element.tagName === 'MTEXT' ) {
 					// mtext switches back to HTML namespace for phrasing content
@@ -97,6 +110,17 @@ function append( element, child ) {
 					// All other elements in MathML context use MathML namespace
 					child = element.ownerDocument.createElementNS(
 						MATHML_NAMESPACE,
+						type
+					);
+				}
+			} else if ( parentNamespace === SVG_NAMESPACE ) {
+				if ( element.tagName === 'foreignObject' ) {
+					// foreignObject switches back to HTML namespace
+					child = element.ownerDocument.createElement( type );
+				} else {
+					// All other elements in SVG context use SVG namespace
+					child = element.ownerDocument.createElementNS(
+						SVG_NAMESPACE,
 						type
 					);
 				}
