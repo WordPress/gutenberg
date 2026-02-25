@@ -230,6 +230,7 @@ function ProviderConnector( {
 
 	return (
 		<ConnectorItem
+			className={ `connector-item--${ pluginSlug }` }
 			icon={ <Logo /> }
 			name={ label }
 			description={ description }

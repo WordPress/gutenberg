@@ -20,6 +20,7 @@ import { __ } from '@wordpress/i18n';
 import type { ReactNode } from 'react';
 
 export interface ConnectorItemProps {
+	className?: string;
 	icon?: ReactNode;
 	name: string;
 	description: string;
@@ -28,6 +29,7 @@ export interface ConnectorItemProps {
 }
 
 export function ConnectorItem( {
+	className,
 	icon,
 	name,
 	description,
@@ -35,7 +37,7 @@ export function ConnectorItem( {
 	children,
 }: ConnectorItemProps ) {
 	return (
-		<Item>
+		<Item className={ className }>
 			<VStack spacing={ 4 }>
 				<HStack alignment="center" spacing={ 4 }>
 					{ icon }
