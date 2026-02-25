@@ -73,14 +73,31 @@
 			border-bottom: 0;
 		}
 
-		.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
+		.dataviews-item-actions {
+			position: relative;
+		}
+
+		.dataviews-primary-actions {
+			display: flex;
+			align-items: center;
+			position: absolute;
+			right: 100%;
+			top: -$grid-unit-15;
+			bottom: -$grid-unit-15;
+			gap: $grid-unit-05;
 			opacity: 0;
+			pointer-events: none;
+			white-space: nowrap;
+			background-color: var(--wp-dataviews-color-background, $white);
+			padding-inline: $grid-unit-10;
+			border-left: 1px solid $gray-100;
 		}
 
 		@media (hover: none) {
 			// Show quick-actions on devices that do not support hover.
-			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
+			.dataviews-primary-actions {
 				opacity: 1;
+				pointer-events: auto;
 			}
 		}
 
@@ -96,14 +113,29 @@
 			.dataviews-view-table__actions-column--sticky {
 				background-color: color-mix(in srgb, rgb(var(--wp-admin-theme-color--rgb)) 4%, $white);
 			}
+
+			.dataviews-primary-actions {
+				background-color: color-mix(in srgb, rgb(var(--wp-admin-theme-color--rgb)) 4%, $white);
+			}
 		}
 
 		// Show action buttons on hover/focus for all rows
 		&:focus-within,
 		&.is-hovered,
 		&:hover {
-			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
+			.dataviews-primary-actions {
 				opacity: 1;
+				pointer-events: auto;
+			}
+
+			.dataviews-view-table__actions-column--stuck::after {
+				display: none;
+			}
+		}
+
+		&.is-selected {
+			.dataviews-view-table__actions-column--stuck::after {
+				display: none;
 			}
 		}
 	}
@@ -233,12 +265,22 @@
 		th {
 			padding: $grid-unit-05 $grid-unit-10;
 		}
+
+		tr .dataviews-primary-actions {
+			top: -$grid-unit-05;
+			bottom: -$grid-unit-05;
+		}
 	}
 
 	&.has-comfortable-density {
 		td,
 		th {
 			padding: $grid-unit-20 $grid-unit-15;
+		}
+
+		tr .dataviews-primary-actions {
+			top: -$grid-unit-20;
+			bottom: -$grid-unit-20;
 		}
 	}
 
