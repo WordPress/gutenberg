@@ -138,6 +138,7 @@ export function useBlockHighlighting(
 
 		// Highlight blocks and compute positions for avatar labels.
 		const results: BlockHighlightData[] = [];
+		const overlayRect = overlayElement?.getBoundingClientRect() ?? null;
 
 		blocksToHighlight.forEach( ( block ) => {
 			const { color, blockId, userName, avatarUrl } = block;
@@ -157,9 +158,8 @@ export function useBlockHighlighting(
 			);
 			highlightedBlockIds.current.add( blockId );
 
-			if ( overlayElement ) {
+			if ( overlayRect ) {
 				const blockRect = blockElement.getBoundingClientRect();
-				const overlayRect = overlayElement.getBoundingClientRect();
 
 				results.push( {
 					blockId,
