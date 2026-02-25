@@ -89,7 +89,7 @@ function save( { attributes } ) {
 
 ## When not to use
 
-This rule should not be disabled. If you think you need an exception, consider:
+Consider carefully before disabling this rule. In most cases, the better fix is to refactor the block to avoid translation in save altogether. If you have a genuine edge case (e.g. a migration block that must preserve previously saved translated strings), prefer one of these alternatives instead:
 
 1. Using a render callback in PHP to handle translation
 2. Storing translatable content in block attributes
