@@ -299,8 +299,6 @@ export function scheduleRetry( id: QueueItemId, error: Error ) {
 		const retrySettings = settings.retry;
 
 		if ( ! retrySettings ) {
-			// Retry settings not configured, fall back to regular cancellation
-			dispatch.cancelItem( id, error, false );
 			return;
 		}
 
