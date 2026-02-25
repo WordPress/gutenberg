@@ -28,11 +28,7 @@ import {
 } from './crdt-blocks';
 import { type Post } from '../entity-types/post';
 import { type Type } from '../entity-types';
-import {
-	CRDT_DOC_META_PERSISTENCE_KEY,
-	CRDT_RECORD_MAP_KEY,
-	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-} from '../sync';
+import { CRDT_DOC_META_PERSISTENCE_KEY, CRDT_RECORD_MAP_KEY } from '../sync';
 import type { WPSelection } from '../types';
 import {
 	getSelectionHistory,
@@ -78,6 +74,8 @@ export interface YPostRecord extends YMapRecord {
 	title: Y.Text;
 }
 
+export const POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE = '_crdt_document';
+
 // Properties that are allowed to be synced for a post.
 const allowedPostProperties = new Set< string >( [
 	'author',
@@ -101,7 +99,7 @@ const allowedPostProperties = new Set< string >( [
 
 // Post meta keys that should *not* be synced.
 const disallowedPostMetaKeys = new Set< string >( [
-	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 ] );
 
 /**
