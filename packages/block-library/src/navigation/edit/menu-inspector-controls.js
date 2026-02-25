@@ -24,9 +24,12 @@ import NavigationListViewHeader from './navigation-list-view-header';
 
 const actionLabel =
 	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
-const { PrivateListView, PrivateBlockContext, useListViewPanelState } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	PrivateListView,
+	PrivateBlockContext,
+	useListViewPanelState,
+	useBlockDisplayTitle,
+} = unlock( blockEditorPrivateApis );
 
 const MainContent = ( {
 	clientId,
@@ -105,6 +108,11 @@ const MenuInspectorControls = ( props ) => {
 
 	const { isSelectionWithinCurrentSection } =
 		useContext( PrivateBlockContext );
+
+	const blockTitle = useBlockDisplayTitle( {
+		clientId,
+		context: 'list-view',
+	} );
 
 	// Only make panel collapsible in contentOnly mode
 	const showBlockTitle = isSelectionWithinCurrentSection;
