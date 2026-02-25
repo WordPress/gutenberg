@@ -17,7 +17,7 @@ module.exports = {
 		docs: {
 			description: 'Disallow translation functions in block save methods',
 			category: 'Best Practices',
-			recommended: true,
+			recommended: false,
 		},
 	},
 	create( context ) {
