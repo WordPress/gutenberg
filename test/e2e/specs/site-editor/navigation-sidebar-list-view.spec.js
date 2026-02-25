@@ -162,6 +162,82 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		).toBeVisible();
 	} );
 
+	test( 'can create a new page from the sidebar list view appender', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu =
+			await requestUtils.createNavigationMenu( navMenuFixture );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await expect( listView ).toBeVisible();
+
+		const appender = listView.getByRole( 'button', { name: 'Add page' } );
+		await appender.click();
+
+		// The search input should be focused immediately.
+		await expect( linkControl.getLinkControlSearch() ).toBeFocused();
+
+		// Type a new page title that doesn't exist yet.
+		await page.keyboard.type( 'Brand New Page', { delay: 50 } );
+
+		// Tab twice to reach the "Create page" button.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+
+		const createPageButton = page.getByRole( 'button', {
+			name: 'Create page',
+		} );
+		await expect( createPageButton ).toBeVisible();
+		await expect( createPageButton ).toBeFocused();
+
+		// Open the page creation form.
+		await page.keyboard.press( 'Enter' );
+
+		// The title field should be pre-populated with the typed text.
+		const titleField = page.getByRole( 'textbox', { name: 'Title' } );
+		await expect( titleField ).toHaveValue( 'Brand New Page' );
+
+		// The Back button should be focused after entering the creation form.
+		const backButton = page.locator( '.link-ui-page-creator__back' );
+		await expect( backButton ).toBeFocused();
+
+		// Tab to the title field.
+		await page.keyboard.press( 'Tab' );
+		await expect( titleField ).toBeFocused();
+
+		// Tab to the Publish checkbox (on by default).
+		await page.keyboard.press( 'Tab' );
+		const publishCheckbox = page.getByRole( 'checkbox', {
+			name: 'Publish',
+		} );
+		await expect( publishCheckbox ).toBeFocused();
+		await expect( publishCheckbox ).toBeChecked();
+
+		// Tab twice more to reach the Create page button.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await expect( createPageButton ).toBeFocused();
+		await page.keyboard.press( 'Enter' );
+
+		// The newly created page should appear as a new item in the list view.
+		await expect(
+			listView
+				.getByRole( 'gridcell', { name: 'Brand New Page' } )
+				.filter( { hasText: 'Block 2 of 2, Level 1.' } )
+		).toBeVisible();
+	} );
+
 	test( 'focus is managed correctly when dismissing the link UI without selecting a URL', async ( {
 		admin,
 		page,
