@@ -31,12 +31,17 @@ function FiltersToggle() {
 		},
 		[ onChangeView, setIsShowingFilter ]
 	);
-	const visibleFilters = filters.filter( ( filter ) => filter.isVisible );
+	const hasPrimaryOrLockedFilters = filters.some(
+		( filter ) => filter.isPrimary || filter.isLocked
+	);
 
-	const hasVisibleFilters = !! visibleFilters.length;
-	if ( filters.length === 0 ) {
+	// When there are primary or locked filters, the filter bar is always
+	// visible and cannot be hidden, so the toggle button serves no purpose.
+	if ( filters.length === 0 || hasPrimaryOrLockedFilters ) {
 		return null;
 	}
+
+	const hasVisibleFilters = filters.some( ( filter ) => filter.isVisible );
 
 	const addFilterButtonProps = {
 		label: __( 'Add filter' ),
