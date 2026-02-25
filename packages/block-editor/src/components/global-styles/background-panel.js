@@ -333,14 +333,21 @@ export default function BackgroundImagePanel( {
 			)
 		);
 
-	const toggleScrollWithPage = () =>
+	const toggleScrollWithPage = () => {
+		const enablingFixed = attachmentValue !== 'fixed';
 		onChange(
-			setImmutably(
-				value,
-				[ 'background', 'backgroundAttachment' ],
-				attachmentValue === 'fixed' ? undefined : 'fixed'
-			)
+			setImmutably( value, [ 'background' ], {
+				...value?.background,
+				backgroundAttachment: enablingFixed ? 'fixed' : undefined,
+				// Clear focal point when enabling fixed, mirroring the Cover block's
+				// toggleParallax behavior. With background-attachment:fixed the position
+				// is viewport-relative, so the element-relative focal point no longer
+				// applies. The picker stays visible so the user can still set a position
+				// that will take effect when fixed falls back to scroll on mobile.
+				...( enablingFixed ? { backgroundPosition: undefined } : {} ),
+			} )
 		);
+	};
 
 	return (
 		<Wrapper
