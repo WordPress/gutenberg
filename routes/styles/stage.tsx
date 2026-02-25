@@ -91,7 +91,7 @@ function Stage() {
 			<GlobalStylesUIWrapper
 				path={ section }
 				onPathChange={ onChangeSection }
-				editorSettings={ editorSettings }
+				settings={ editorSettings }
 			/>
 		</Page>
 	);

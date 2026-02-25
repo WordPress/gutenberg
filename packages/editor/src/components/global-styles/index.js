@@ -10,23 +10,15 @@ import { uploadMedia } from '@wordpress/media-utils';
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../../store';
 import { GlobalStylesBlockLink } from './block-link';
 import { useGlobalStyles } from './hooks';
 
 /**
  * Hook to fetch server CSS and settings for BlockEditorProvider that are not Global Styles.
  *
- * @param {Object} editorSettings The editor settings object. Falls back to the
- *                                editor store settings if not provided.
+ * @param {Object} settings The editor settings object.
  */
-function useServerData( editorSettings ) {
-	const editorStoreSettings = useSelect(
-		( select ) => select( editorStore ).getEditorSettings(),
-		[]
-	);
-	const settings = editorSettings || editorStoreSettings;
-
+function useServerData( settings ) {
 	const styles = settings?.styles;
 	const __unstableResolvedAssets = settings?.__unstableResolvedAssets;
 	const colors = settings?.colors;
@@ -86,7 +78,7 @@ function useServerData( editorSettings ) {
 export default function GlobalStylesUIWrapper( {
 	path,
 	onPathChange,
-	editorSettings,
+	settings,
 } ) {
 	const {
 		user: userConfig,
@@ -95,7 +87,7 @@ export default function GlobalStylesUIWrapper( {
 		isReady,
 	} = useGlobalStyles();
 	const { serverCSS, serverSettings, fontLibraryEnabled } =
-		useServerData( editorSettings );
+		useServerData( settings );
 
 	// Show loading state while data is being fetched
 	if ( ! isReady ) {

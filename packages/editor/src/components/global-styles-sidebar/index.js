@@ -171,7 +171,7 @@ export default function GlobalStylesSidebar() {
 				<GlobalStylesUI
 					path={ stylesPath }
 					onPathChange={ setStylesPath }
-					editorSettings={ editorSettings }
+					settings={ editorSettings }
 				/>
 			</DefaultSidebar>
 			<WelcomeGuideStyles />

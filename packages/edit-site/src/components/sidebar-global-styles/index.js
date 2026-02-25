@@ -107,7 +107,7 @@ export default function SidebarGlobalStyles() {
 			<GlobalStylesUIWrapper
 				path={ section }
 				onPathChange={ onChangeSection }
-				editorSettings={ settings }
+				settings={ settings }
 			/>
 		</Page>
 	);
