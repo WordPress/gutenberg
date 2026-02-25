@@ -559,6 +559,10 @@ describe( 'actions', () => {
 		} );
 
 		it( 'does NOT schedule retry for non-retryable errors', async () => {
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
+
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 			} );
@@ -575,9 +579,15 @@ describe( 'actions', () => {
 			expect(
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
+
+			consoleErrorSpy.mockRestore();
 		} );
 
 		it( 'does NOT schedule retry when retry settings are undefined', async () => {
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
+
 			// Disable retry settings.
 			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 				retry: undefined,
@@ -599,6 +609,8 @@ describe( 'actions', () => {
 			expect(
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
+
+			consoleErrorSpy.mockRestore();
 		} );
 	} );
 
