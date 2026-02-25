@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
+import { select } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
+// @ts-ignore No exported types for block editor store selectors.
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -11,6 +14,7 @@ import type { YPostRecord } from './crdt';
 import type { YBlock, YBlocks } from './crdt-blocks';
 import { getRootMap } from './crdt-utils';
 import type {
+	AbsoluteBlockIndexPath,
 	WPBlockSelection,
 	SelectionState,
 	SelectionNone,
@@ -35,6 +39,11 @@ export enum SelectionType {
 /**
  * Converts WordPress block editor selection to a SelectionState.
  *
+ * Uses getBlockPathForLocalClientId to locate blocks in the Yjs document by
+ * their tree position (index path) rather than clientId, since clientIds may
+ * differ between the block-editor store and the Yjs document (e.g. in "Show
+ * Template" mode).
+ *
  * @param selectionStart - The start position of the selection
  * @param selectionEnd   - The end position of the selection
  * @param yDoc           - The Yjs document
@@ -46,15 +55,15 @@ export function getSelectionState(
 	yDoc: Y.Doc
 ): SelectionState {
 	const ymap = getRootMap< YPostRecord >( yDoc, CRDT_RECORD_MAP_KEY );
-	const yBlocks = ymap.get( 'blocks' ) ?? new Y.Array< YBlock >();
+	const yBlocks = ymap.get( 'blocks' );
 
 	const isSelectionEmpty = Object.keys( selectionStart ).length === 0;
 	const noSelection: SelectionNone = {
 		type: SelectionType.None,
 	};
 
-	if ( isSelectionEmpty ) {
-		// Case 1: No selection
+	if ( isSelectionEmpty || ! yBlocks ) {
+		// Case 1: No selection, or no blocks in the document.
 		return noSelection;
 	}
 
@@ -70,9 +79,18 @@ export function getSelectionState(
 
 	if ( isSelectionAWholeBlock ) {
 		// Case 2: A whole block is selected.
+		const path = getBlockPathForLocalClientId( selectionStart.clientId );
+		const blockPosition = path
+			? createRelativePositionForBlockPath( path, yBlocks )
+			: null;
+
+		if ( ! blockPosition ) {
+			return noSelection;
+		}
+
 		return {
 			type: SelectionType.WholeBlock,
-			blockId: selectionStart.clientId,
+			blockPosition,
 		};
 	} else if ( isCursorOnly ) {
 		// Case 3: Cursor only, no text selected
@@ -85,7 +103,6 @@ export function getSelectionState(
 
 		return {
 			type: SelectionType.Cursor,
-			blockId: selectionStart.clientId,
 			cursorPosition,
 		};
 	} else if ( isSelectionInOneBlock ) {
@@ -103,13 +120,12 @@ export function getSelectionState(
 
 		return {
 			type: SelectionType.SelectionInOneBlock,
-			blockId: selectionStart.clientId,
 			cursorStartPosition,
 			cursorEndPosition,
 		};
 	}
 
-	// Caes 5: Selection in multiple blocks
+	// Case 5: Selection in multiple blocks
 	const cursorStartPosition = getCursorPosition( selectionStart, yBlocks );
 	const cursorEndPosition = getCursorPosition( selectionEnd, yBlocks );
 	if ( ! cursorStartPosition || ! cursorEndPosition ) {
@@ -119,8 +135,6 @@ export function getSelectionState(
 
 	return {
 		type: SelectionType.SelectionInMultipleBlocks,
-		blockStartId: selectionStart.clientId,
-		blockEndId: selectionEnd.clientId,
 		cursorStartPosition,
 		cursorEndPosition,
 	};
@@ -137,7 +151,8 @@ function getCursorPosition(
 	selection: WPBlockSelection,
 	blocks: YBlocks
 ): CursorPosition | null {
-	const block = findBlockByClientId( selection.clientId, blocks );
+	const path = getBlockPathForLocalClientId( selection.clientId );
+	const block = path ? findBlockByPath( path, blocks ) : null;
 	if (
 		! block ||
 		! selection.attributeKey ||
@@ -166,32 +181,103 @@ function getCursorPosition(
 }
 
 /**
- * Find a block by its client ID.
+ * Resolves a local block-editor clientId to its index path relative to the
+ * post content blocks. This allows finding the corresponding block in the Yjs
+ * document even when clientIds differ (e.g. in "Show Template" mode where
+ * blocks are cloned).
  *
- * @param blockId - The client ID of the block.
- * @param blocks  - The blocks to search through.
- * @return The block if found, null otherwise.
+ * In template mode, the block tree includes template parts and wrapper blocks
+ * around a core/post-content block. The Yjs document only contains the post
+ * content blocks, so we stop the upward walk when the parent is
+ * core/post-content (its inner blocks correspond to the Yjs root blocks).
+ *
+ * @param clientId - The local block-editor clientId to resolve.
+ * @return The index path from root, or null if not resolvable.
  */
-function findBlockByClientId(
-	blockId: string,
+export function getBlockPathForLocalClientId(
+	clientId: string
+): AbsoluteBlockIndexPath | null {
+	const { getBlockIndex, getBlockRootClientId, getBlockName } =
+		select( blockEditorStore );
+
+	const path: AbsoluteBlockIndexPath = [];
+	let current: string | null = clientId;
+	while ( current ) {
+		const index = getBlockIndex( current );
+		if ( index === -1 ) {
+			return null;
+		}
+		path.unshift( index );
+		const parent = getBlockRootClientId( current );
+		if ( ! parent ) {
+			break;
+		}
+		// If the parent is core/post-content, stop here — the Yjs doc
+		// root blocks correspond to post-content's inner blocks.
+		const parentName = getBlockName( parent );
+		if ( parentName === 'core/post-content' ) {
+			break;
+		}
+		current = parent;
+	}
+	return path.length > 0 ? path : null;
+}
+
+/**
+ * Find a block by navigating a tree index path in the Yjs block hierarchy.
+ *
+ * @param path   - The index path, e.g. [0, 1] for blocks[0].innerBlocks[1].
+ * @param blocks - The root-level Yjs blocks array.
+ * @return The block Y.Map if found, null otherwise.
+ */
+function findBlockByPath(
+	path: AbsoluteBlockIndexPath,
 	blocks: YBlocks
 ): YBlock | null {
-	for ( const block of blocks ) {
-		if ( block.get( 'clientId' ) === blockId ) {
+	let currentBlocks = blocks;
+	for ( let i = 0; i < path.length; i++ ) {
+		if ( path[ i ] >= currentBlocks.length ) {
+			return null;
+		}
+		const block = currentBlocks.get( path[ i ] );
+		if ( ! block ) {
+			return null;
+		}
+		if ( i === path.length - 1 ) {
 			return block;
 		}
-
-		const innerBlocks = block.get( 'innerBlocks' );
-
-		if ( innerBlocks && innerBlocks.length > 0 ) {
-			const innerBlock = findBlockByClientId( blockId, innerBlocks );
-
-			if ( innerBlock ) {
-				return innerBlock;
-			}
-		}
+		currentBlocks =
+			block.get( 'innerBlocks' ) ?? ( new Y.Array() as YBlocks );
 	}
+	return null;
+}
 
+/**
+ * Create a Y.RelativePosition for a block by navigating a tree index path.
+ *
+ * @param path   - The index path, e.g. [0, 1] for blocks[0].innerBlocks[1].
+ * @param blocks - The root-level Yjs blocks array.
+ * @return A Y.RelativePosition for the block, or null if the path is invalid.
+ */
+function createRelativePositionForBlockPath(
+	path: AbsoluteBlockIndexPath,
+	blocks: YBlocks
+): Y.RelativePosition | null {
+	let currentBlocks = blocks;
+	for ( let i = 0; i < path.length; i++ ) {
+		if ( path[ i ] >= currentBlocks.length ) {
+			return null;
+		}
+		if ( i === path.length - 1 ) {
+			return Y.createRelativePositionFromTypeIndex(
+				currentBlocks,
+				path[ i ]
+			);
+		}
+		const block = currentBlocks.get( path[ i ] );
+		currentBlocks =
+			block?.get( 'innerBlocks' ) ?? ( new Y.Array() as YBlocks );
+	}
 	return null;
 }
 
@@ -215,19 +301,13 @@ export function areSelectionsStatesEqual(
 			return true;
 
 		case SelectionType.Cursor:
-			return (
-				selection1.blockId ===
-					( selection2 as SelectionCursor ).blockId &&
-				areCursorPositionsEqual(
-					selection1.cursorPosition,
-					( selection2 as SelectionCursor ).cursorPosition
-				)
+			return areCursorPositionsEqual(
+				selection1.cursorPosition,
+				( selection2 as SelectionCursor ).cursorPosition
 			);
 
 		case SelectionType.SelectionInOneBlock:
 			return (
-				selection1.blockId ===
-					( selection2 as SelectionInOneBlock ).blockId &&
 				areCursorPositionsEqual(
 					selection1.cursorStartPosition,
 					( selection2 as SelectionInOneBlock ).cursorStartPosition
@@ -240,10 +320,6 @@ export function areSelectionsStatesEqual(
 
 		case SelectionType.SelectionInMultipleBlocks:
 			return (
-				selection1.blockStartId ===
-					( selection2 as SelectionInMultipleBlocks ).blockStartId &&
-				selection1.blockEndId ===
-					( selection2 as SelectionInMultipleBlocks ).blockEndId &&
 				areCursorPositionsEqual(
 					selection1.cursorStartPosition,
 					( selection2 as SelectionInMultipleBlocks )
@@ -256,9 +332,9 @@ export function areSelectionsStatesEqual(
 				)
 			);
 		case SelectionType.WholeBlock:
-			return (
-				selection1.blockId ===
-				( selection2 as SelectionWholeBlock ).blockId
+			return Y.compareRelativePositions(
+				selection1.blockPosition,
+				( selection2 as SelectionWholeBlock ).blockPosition
 			);
 
 		default:
@@ -277,9 +353,10 @@ function areCursorPositionsEqual(
 	cursorPosition1: CursorPosition,
 	cursorPosition2: CursorPosition
 ): boolean {
-	const isRelativePositionEqual =
-		JSON.stringify( cursorPosition1.relativePosition ) ===
-		JSON.stringify( cursorPosition2.relativePosition );
+	const isRelativePositionEqual = Y.compareRelativePositions(
+		cursorPosition1.relativePosition,
+		cursorPosition2.relativePosition
+	);
 
 	// Ensure a change in calculated absolute offset results in a treating the cursor as modified.
 	// This is necessary because Y.Text relative positions can remain the same after text changes.

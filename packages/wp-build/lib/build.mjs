@@ -173,7 +173,7 @@ function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 			map: false,
 		} );
 
-		let cssModule = `if (typeof document !== 'undefined' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
+		let cssModule = `if (typeof document !== 'undefined' && process.env.NODE_ENV !== 'test' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
 	const style = document.createElement("style");
 	style.setAttribute("data-wp-hash", "${ hash }");
 	style.appendChild(document.createTextNode(${ JSON.stringify( css ) }));

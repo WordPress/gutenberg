@@ -18,31 +18,26 @@ export const CRDT_DOC_META_PERSISTENCE_KEY = 'fromPersistence';
 export const CRDT_RECORD_MAP_KEY = 'document';
 
 /**
- * Root-level key for the map that holds entity record metadata. This map should
- * only contain metadata that is not represented by the entity record itself.
+ * Root-level key for the map that holds the state information about the CRDT
+ * document itself.
  */
-export const CRDT_RECORD_METADATA_MAP_KEY = 'documentMeta';
+export const CRDT_STATE_MAP_KEY = 'state';
 
 /**
  * Y.Map key representing the timestamp of the last save operation.
  */
-export const CRDT_RECORD_METADATA_SAVED_AT_KEY = 'savedAt';
+export const CRDT_STATE_MAP_SAVED_AT_KEY = 'savedAt';
 
 /**
  * Y.Map key representing the Y.Doc client ID of the user who performed the last
  * save operation.
  */
-export const CRDT_RECORD_METADATA_SAVED_BY_KEY = 'savedBy';
+export const CRDT_STATE_MAP_SAVED_BY_KEY = 'savedBy';
 
 /**
- * Root-level key for the map that holds the state information about the CRDT
- * document itself. It should not contain information related to the entity
- * record.
+ * Y.Map key representing the version of the CRDT document schema.
  */
-export const CRDT_STATE_MAP_KEY = 'state';
-
-// Y.Map keys for the state map.
-export const CRDT_STATE_VERSION_KEY = 'version';
+export const CRDT_STATE_MAP_VERSION_KEY = 'version';
 
 /**
  * Origin string for CRDT document changes originating from the local editor.

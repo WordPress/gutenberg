@@ -10,8 +10,8 @@ import type { Awareness } from 'y-protocols/awareness';
 import {
 	CRDT_RECORD_MAP_KEY as RECORD_KEY,
 	LOCAL_SYNC_MANAGER_ORIGIN,
-	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_KEY,
-	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
+	CRDT_STATE_MAP_KEY,
+	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 } from './config';
 import {
 	logPerformanceTiming,
@@ -151,7 +151,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		const ydoc = createYjsDoc( { objectType } );
 		const recordMap = ydoc.getMap( RECORD_KEY );
-		const recordMetaMap = ydoc.getMap( RECORD_METADATA_KEY );
+		const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
 		const now = Date.now();
 
 		// Clean up providers and in-memory state when the entity is unloaded.
@@ -159,7 +159,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			providerResults.forEach( ( result ) => result.destroy() );
 			handlers.onStatusChange( null );
 			recordMap.unobserveDeep( onRecordUpdate );
-			recordMetaMap.unobserve( onRecordMetaUpdate );
+			stateMap.unobserve( onStateMapUpdate );
 			ydoc.destroy();
 			entityStates.delete( entityId );
 		};
@@ -183,7 +183,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			void internal.updateEntityRecord( objectType, objectId );
 		};
 
-		const onRecordMetaUpdate = (
+		const onStateMapUpdate = (
 			event: Y.YMapEvent< unknown >,
 			transaction: Y.Transaction
 		) => {
@@ -194,7 +194,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			event.keysChanged.forEach( ( key ) => {
 				switch ( key ) {
 					case SAVED_AT_KEY:
-						const newValue = recordMetaMap.get( SAVED_AT_KEY );
+						const newValue = stateMap.get( SAVED_AT_KEY );
 						if ( 'number' === typeof newValue && newValue > now ) {
 							// Another peer has saved the record. Refetch it so that we have
 							// a correct understanding of our own unsaved edits.
@@ -247,7 +247,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Attach observers.
 		recordMap.observeDeep( onRecordUpdate );
-		recordMetaMap.observe( onRecordMetaUpdate );
+		stateMap.observe( onStateMapUpdate );
 
 		// Get and apply the persisted CRDT document, if it exists.
 		internal.applyPersistedCrdtDoc( objectType, objectId, record );
@@ -276,19 +276,19 @@ export function createSyncManager( debug = false ): SyncManager {
 		}
 
 		const ydoc = createYjsDoc( { collection: true, objectType } );
-		const recordMetaMap = ydoc.getMap( RECORD_METADATA_KEY );
+		const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
 		const now = Date.now();
 
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
 			providerResults.forEach( ( result ) => result.destroy() );
 			handlers.onStatusChange( null );
-			recordMetaMap.unobserve( onRecordMetaUpdate );
+			stateMap.unobserve( onStateMapUpdate );
 			ydoc.destroy();
 			collectionStates.delete( objectType );
 		};
 
-		const onRecordMetaUpdate = (
+		const onStateMapUpdate = (
 			event: Y.YMapEvent< unknown >,
 			transaction: Y.Transaction
 		) => {
@@ -299,7 +299,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			event.keysChanged.forEach( ( key ) => {
 				switch ( key ) {
 					case SAVED_AT_KEY:
-						const newValue = recordMetaMap.get( SAVED_AT_KEY );
+						const newValue = stateMap.get( SAVED_AT_KEY );
 						if ( 'number' === typeof newValue && newValue > now ) {
 							// Another peer has mutated the collection. Refetch it so that we
 							// obtain the updated records.
@@ -341,7 +341,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		);
 
 		// Attach observers.
-		recordMetaMap.observe( onRecordMetaUpdate );
+		stateMap.observe( onStateMapUpdate );
 	}
 
 	/**

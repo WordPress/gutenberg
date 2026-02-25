@@ -34,7 +34,11 @@ import {
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from '../sync';
 import type { WPSelection } from '../types';
-import { updateSelectionHistory } from './crdt-selection';
+import {
+	getSelectionHistory,
+	getShiftedSelection,
+	updateSelectionHistory,
+} from './crdt-selection';
 import {
 	createYMap,
 	getRootMap,
@@ -413,6 +417,20 @@ export function getPostChangesFromCRDTDoc(
 		changes.meta = {
 			...editedRecord.meta,
 			...allowedMetaChanges,
+		};
+	}
+
+	// When remote content changes are detected, recalculate the local user's
+	// selection using Y.RelativePosition to account for text shifts. The ydoc
+	// has already been updated with remote content at this point, so converting
+	// relative positions to absolute gives corrected offsets. Including the
+	// selection in PostChanges ensures it dispatches atomically with content.
+	const selectionHistory = getSelectionHistory( ydoc );
+	const shiftedSelection = getShiftedSelection( ydoc, selectionHistory );
+	if ( shiftedSelection ) {
+		changes.selection = {
+			...shiftedSelection,
+			initialPosition: 0,
 		};
 	}
 

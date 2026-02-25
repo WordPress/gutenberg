@@ -35,10 +35,7 @@ test.use( {
 	},
 } );
 
-// Client-side media processing (and cross-origin isolation) is temporarily
-// disabled in the Gutenberg plugin. Skip until re-enabled.
-// See https://github.com/WordPress/gutenberg/pull/75756
-test.describe.skip( 'Cross-origin isolation', () => {
+test.describe( 'Cross-origin isolation', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );

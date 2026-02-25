@@ -12,6 +12,10 @@
 
 -   `ToggleGroupControl`: Make unselected item color consistent across all variants ([#75737](https://github.com/WordPress/gutenberg/pull/75737)).
 
+### Internal
+
+-   `NumberControl`: Improved code and types for state reducer ([#75822](https://github.com/WordPress/gutenberg/pull/75822)).
+
 ## 32.2.0 (2026-02-18)
 
 ### Bug Fixes
