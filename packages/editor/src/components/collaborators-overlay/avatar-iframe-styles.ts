@@ -28,6 +28,7 @@ export const AVATAR_IFRAME_STYLES = `
 	display: inline-flex;
 	align-items: center;
 	border-radius: ${ RADIUS_FULL };
+	overflow: hidden;
 	overflow: clip;
 	flex-shrink: 0;
 	box-shadow: 0 0 0 var(--wp-admin-border-width-focus, 2px) ${ WHITE }, ${ ELEVATION_X_SMALL };
@@ -40,6 +41,7 @@ export const AVATAR_IFRAME_STYLES = `
 	border-radius: ${ RADIUS_FULL };
 	border: 0;
 	background-color: var(--wp-admin-theme-color, #3858e9);
+	overflow: hidden;
 	overflow: clip;
 	flex-shrink: 0;
 	font-size: 0;
