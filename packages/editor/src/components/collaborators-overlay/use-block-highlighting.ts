@@ -6,13 +6,7 @@ import {
 	SelectionType,
 	type PostEditorAwarenessState,
 } from '@wordpress/core-data';
-import {
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -66,7 +60,11 @@ export function useBlockHighlighting(
 		[]
 	);
 
-	const computeHighlights = useCallback( () => {
+	// Bump this counter to force the effect to re-run (e.g. after a layout shift).
+	const [ recomputeToken, setRecomputeToken ] = useState( 0 );
+
+	// All DOM mutations and position computations live inside useEffect.
+	useEffect( () => {
 		if ( ! blockEditorDocument ) {
 			setHighlights( [] );
 			return;
@@ -163,17 +161,27 @@ export function useBlockHighlighting(
 		} );
 
 		setHighlights( results );
-	}, [ userStates, blockEditorDocument, overlayElement, resolveSelection ] );
 
-	useEffect( computeHighlights, [ computeHighlights ] );
+		// Clean up all highlights on unmount.
+		return () => {
+			for ( const blockId of highlightedBlockIds.current ) {
+				const el = getBlockElementById( blockEditorDocument, blockId );
+				if ( el ) {
+					el.classList.remove( 'is-collaborator-selected' );
+					el.style.removeProperty( '--collaborator-outline-color' );
+				}
+			}
+			highlightedBlockIds.current.clear();
+		};
+	}, [ userStates, blockEditorDocument, overlayElement, recomputeToken, resolveSelection ] );
 
-	const rerenderHighlightsAfterDelay = useMemo(
-		() => () => {
-			const timeout = setTimeout( computeHighlights, 500 );
-			return () => clearTimeout( timeout );
-		},
-		[ computeHighlights ]
-	);
+	// The delayed rerender just bumps state — no direct DOM mutation.
+	const rerenderHighlightsAfterDelay = useCallback( () => {
+		const timeout = setTimeout( () => {
+			setRecomputeToken( ( t ) => t + 1 );
+		}, 500 );
+		return () => clearTimeout( timeout );
+	}, [] );
 
 	return { highlights, rerenderHighlightsAfterDelay };
 }
