@@ -18,6 +18,10 @@ import { useMemo } from '@wordpress/element';
  */
 import type { AvatarProps } from './types';
 
+// Runtime equivalents of @wordpress/base-styles tokens ($gray-900, $white).
+const GRAY_900 = '#1e1e1e';
+const WHITE = '#fff';
+
 function Avatar( {
 	className,
 	src,
@@ -44,12 +48,12 @@ function Avatar( {
 	const nameColor = useMemo(
 		() =>
 			borderColor &&
-			colord( borderColor ).isReadable( '#1e1e1e', {
+			colord( borderColor ).isReadable( GRAY_900, {
 				level: 'AA',
 				size: 'normal',
 			} )
-				? '#1e1e1e'
-				: '#fff',
+				? GRAY_900
+				: WHITE,
 		[ borderColor ]
 	);
 
