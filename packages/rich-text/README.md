@@ -462,7 +462,7 @@ _Parameters_
 
 -   _$1_ `Object`: Named parameters.
 -   _$1.editableContentElement_ `HTMLElement|null`: The element containing the editable content.
--   _$1.settings_ `WPFormat=`: The format type's settings.
+-   _$1.settings_ `AnchorSettings=`: The format type's settings.
 
 _Returns_
 
