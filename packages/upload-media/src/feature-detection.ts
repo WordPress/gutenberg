@@ -1,3 +1,13 @@
+interface NavigatorNetworkInformation {
+	saveData: boolean;
+	effectiveType: 'slow-2g' | '2g' | '3g' | '4g';
+}
+
+interface NavigatorExtended extends Navigator {
+	deviceMemory?: number;
+	connection?: NavigatorNetworkInformation;
+}
+
 /**
  * Result of client-side media processing support detection.
  */
@@ -90,7 +100,7 @@ export function detectClientSideMediaSupport(): FeatureDetectionResult {
 	if (
 		typeof navigator !== 'undefined' &&
 		'deviceMemory' in navigator &&
-		( navigator as any ).deviceMemory <= 2
+		( navigator as NavigatorExtended ).deviceMemory! <= 2
 	) {
 		cachedResult = {
 			supported: false,
@@ -114,7 +124,7 @@ export function detectClientSideMediaSupport(): FeatureDetectionResult {
 
 	// Check network conditions.
 	if ( typeof navigator !== 'undefined' ) {
-		const connection = ( navigator as any ).connection;
+		const connection = ( navigator as NavigatorExtended ).connection;
 		if ( connection ) {
 			if ( connection.saveData ) {
 				cachedResult = {
