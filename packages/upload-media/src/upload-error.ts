@@ -36,7 +36,7 @@ export enum ErrorCode {
  * Error codes that are safe to retry automatically.
  * These are typically transient issues that may resolve on retry.
  */
-const RETRYABLE_CODES: string[] = [
+const RETRYABLE_CODES: ErrorCode[] = [
 	ErrorCode.NETWORK_ERROR,
 	ErrorCode.TIMEOUT_ERROR,
 	ErrorCode.SERVER_ERROR,
