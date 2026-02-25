@@ -55,6 +55,7 @@ import type {
 	UpdateSettingsAction,
 } from './types';
 import { ItemStatus, OperationType, Type } from './types';
+import { clearRetryTimer } from './actions';
 import type { cancelItem } from './actions';
 
 const DEFAULT_OUTPUT_QUALITY = 0.82;
@@ -529,6 +530,9 @@ export function removeItem( id: QueueItemId ) {
 		if ( ! item ) {
 			return;
 		}
+
+		// Clear any pending retry timer for this item.
+		clearRetryTimer( id );
 
 		dispatch( {
 			type: Type.Remove,

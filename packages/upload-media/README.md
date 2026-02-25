@@ -69,6 +69,14 @@ _Parameters_
 -   _error_ `Error`: Error instance.
 -   _silent_ Whether to cancel the item silently, without invoking its `onError` callback.
 
+#### clearRetryTimer
+
+Clears any pending retry timer for the given item.
+
+_Parameters_
+
+-   _id_ `QueueItemId`: Item ID.
+
 #### executeRetry
 
 Executes a scheduled retry for an item.

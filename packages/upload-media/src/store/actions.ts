@@ -55,6 +55,19 @@ import { validateFileSize } from '../validate-file-size';
  */
 const retryTimers = new Map< QueueItemId, ReturnType< typeof setTimeout > >();
 
+/**
+ * Clears any pending retry timer for the given item.
+ *
+ * @param id Item ID.
+ */
+export function clearRetryTimer( id: QueueItemId ): void {
+	const pendingTimer = retryTimers.get( id );
+	if ( pendingTimer !== undefined ) {
+		clearTimeout( pendingTimer );
+		retryTimers.delete( id );
+	}
+}
+
 type ActionCreators = {
 	addItem: typeof addItem;
 	addItems: typeof addItems;
@@ -184,11 +197,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		}
 
 		// Clear any pending retry timer for this item.
-		const pendingTimer = retryTimers.get( id );
-		if ( pendingTimer !== undefined ) {
-			clearTimeout( pendingTimer );
-			retryTimers.delete( id );
-		}
+		clearRetryTimer( id );
 
 		// Check if we should automatically retry instead of cancelling.
 		if ( ! silent && error ) {
