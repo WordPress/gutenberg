@@ -278,7 +278,9 @@ export function hasExceededMaxRetries(
 	state: State,
 	id: QueueItemId
 ): boolean {
+	if ( ! state.settings.retry ) {
+		return true;
+	}
 	const item = state.queue.find( ( i ) => i.id === id );
-	const maxRetries = state.settings.retry?.maxRetryAttempts ?? 3;
-	return ( item?.retryCount ?? 0 ) >= maxRetries;
+	return ( item?.retryCount ?? 0 ) >= state.settings.retry.maxRetryAttempts;
 }
