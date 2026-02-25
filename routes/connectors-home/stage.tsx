@@ -60,7 +60,7 @@ function ConnectorsPage() {
 						{
 							a: (
 								// eslint-disable-next-line jsx-a11y/anchor-has-content
-								<a href="plugin-install.php?s=connector&tab=search&type=tag" />
+								<a href="plugin-install.php" />
 							),
 						}
 					) }
