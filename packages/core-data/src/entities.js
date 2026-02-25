@@ -417,8 +417,12 @@ async function loadPostTypeEntities() {
 			 * @param {import('@wordpress/sync').ObjectData} record
 			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
 			 */
-			getPersistedCRDTDoc: ( record ) =>
-				record[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ] || null,
+			getPersistedCRDTDoc: ( record ) => {
+				return (
+					record?.meta[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ] ||
+					null
+				);
+			},
 		};
 
 		return entity;

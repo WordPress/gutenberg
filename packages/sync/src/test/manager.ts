@@ -86,7 +86,7 @@ describe( 'SyncManager', () => {
 			createAwareness: jest.fn(
 				( ydoc: Y.Doc ) => new Awareness( ydoc )
 			),
-			getPersistedCrdtDoc: jest.fn( () => null ),
+			getPersistedCRDTDoc: jest.fn( () => null ),
 		};
 
 		mockHandlers = {
@@ -272,7 +272,7 @@ describe( 'SyncManager', () => {
 			it( 'accepts a valid persisted CRDT doc without applying changes', async () => {
 				mockSyncConfig = {
 					...mockSyncConfig,
-					getPersistedCrdtDoc: jest.fn( () =>
+					getPersistedCRDTDoc: jest.fn( () =>
 						createPersistedCRDTDoc( mockRecord )
 					),
 				};
@@ -308,7 +308,7 @@ describe( 'SyncManager', () => {
 			it( 'applies a persisted CRDT doc with invalidated fields, then applies changes', async () => {
 				mockSyncConfig = {
 					...mockSyncConfig,
-					getPersistedCrdtDoc: jest.fn( () =>
+					getPersistedCRDTDoc: jest.fn( () =>
 						createPersistedCRDTDoc( {
 							...mockRecord,
 							title: 'Invalidated title from persisted CRDT doc',
