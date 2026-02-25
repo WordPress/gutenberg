@@ -537,9 +537,7 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await page.keyboard.press( 'Enter' );
 
-		await expect(
-			page.getByText( 'This Navigation Menu is empty.' )
-		).toBeVisible();
+		await expect( page.getByText( 'No items yet.' ) ).toBeVisible();
 
 		// Move focus to the appender
 		await page.keyboard.press( 'ArrowDown' );
