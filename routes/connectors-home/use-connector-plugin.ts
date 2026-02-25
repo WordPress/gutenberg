@@ -167,7 +167,7 @@ export function useConnectorPlugin( {
 			// change, the server rejected the update (validation failed).
 			if ( apiKey && result[ settingName ] === currentApiKey ) {
 				throw new Error(
-					'The API key could not be saved. The key may be invalid.'
+					'It was not possible to connect to the provider using this key.'
 				);
 			}
 
