@@ -118,14 +118,12 @@ async function resolveConfigPorts( config, portResolver ) {
 			continue;
 		}
 
-		// Only the main web port uses strict mode (fail if busy).
-		// Other ports (phpmyadminPort) always auto-fallback.
-		const strict = currentValue !== null && property === 'port';
+		// When --auto-port is active (the only time this runs),
+		// always auto-fallback to an available port.
 		const configPath = `env.${ key }`;
 		config.env[ env ][ property ] = await portResolver.resolve(
 			preferredPort,
-			configPath,
-			strict
+			configPath
 		);
 	}
 

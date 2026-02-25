@@ -88,8 +88,10 @@ describe( 'resolve-available-ports', () => {
 			);
 		} );
 
-		it( 'should resolve explicit ports in strict mode', async () => {
-			isPortAvailable.mockResolvedValue( true );
+		it( 'should resolve explicit ports with auto-fallback', async () => {
+			findAvailablePort.mockImplementation( ( { preferredPort } ) =>
+				Promise.resolve( preferredPort )
+			);
 
 			const resolver = createPortResolver();
 			const config = {
@@ -103,9 +105,13 @@ describe( 'resolve-available-ports', () => {
 
 			expect( config.env.development.port ).toBe( 9000 );
 			expect( config.env.tests.port ).toBe( 9001 );
-			// Strict mode uses isPortAvailable, not findAvailablePort.
-			expect( isPortAvailable ).toHaveBeenCalledWith( 9000 );
-			expect( isPortAvailable ).toHaveBeenCalledWith( 9001 );
+			// Auto-port always uses findAvailablePort (non-strict).
+			expect( findAvailablePort ).toHaveBeenCalledWith(
+				expect.objectContaining( { preferredPort: 9000 } )
+			);
+			expect( findAvailablePort ).toHaveBeenCalledWith(
+				expect.objectContaining( { preferredPort: 9001 } )
+			);
 		} );
 
 		it( 'should resolve explicit phpmyadminPort with auto-fallback', async () => {
