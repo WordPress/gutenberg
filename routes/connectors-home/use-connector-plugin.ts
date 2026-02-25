@@ -44,7 +44,7 @@ export function useConnectorPlugin( {
 	const fetchApiKey = useCallback( async () => {
 		try {
 			const settings = await apiFetch< Record< string, string > >( {
-				path: '/wp/v2/settings',
+				path: `/wp/v2/settings?_fields=${ settingName }`,
 			} );
 			const key = settings[ settingName ] || '';
 			setCurrentApiKey( key === 'invalid_key' ? '' : key );
@@ -155,7 +155,7 @@ export function useConnectorPlugin( {
 		try {
 			const result = await apiFetch< Record< string, string > >( {
 				method: 'POST',
-				path: '/wp/v2/settings',
+				path: `/wp/v2/settings?_fields=${ settingName }`,
 				data: {
 					[ settingName ]: apiKey,
 				},
@@ -181,7 +181,7 @@ export function useConnectorPlugin( {
 		try {
 			await apiFetch( {
 				method: 'POST',
-				path: '/wp/v2/settings',
+				path: `/wp/v2/settings?_fields=${ settingName }`,
 				data: {
 					[ settingName ]: '',
 				},

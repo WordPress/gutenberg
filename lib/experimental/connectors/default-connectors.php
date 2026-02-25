@@ -202,6 +202,47 @@ function _gutenberg_validate_anthropic_api_key_on_save( $value, $old_value ) {
 	return false === $valid ? $old_value : $value;
 }
 
+// --- REST API filtering ---
+
+/**
+ * Short-circuits get_option for connector API key settings that were not
+ * explicitly requested via _fields on the REST settings endpoint.
+ *
+ * This prevents the mask filter (and its expensive isProviderConfigured
+ * validation) from running for connector settings that the caller did
+ * not ask for.
+ *
+ * @access private
+ *
+ * @param mixed           $response Result to send to the client. Usually null.
+ * @param WP_REST_Server  $server   The server instance.
+ * @param WP_REST_Request $request  The request object.
+ * @return mixed Unmodified $response.
+ */
+function _gutenberg_skip_unrequested_connector_validation( $response, $server, $request ) {
+	if ( '/wp/v2/settings' !== $request->get_route() ) {
+		return $response;
+	}
+
+	$fields    = $request->get_param( '_fields' );
+	$requested = $fields ? array_map( 'trim', explode( ',', $fields ) ) : array();
+
+	$connector_options = array(
+		'connectors_gemini_api_key',
+		'connectors_openai_api_key',
+		'connectors_anthropic_api_key',
+	);
+
+	foreach ( $connector_options as $option_name ) {
+		if ( ! in_array( $option_name, $requested, true ) ) {
+			add_filter( "pre_option_{$option_name}", '__return_empty_string' );
+		}
+	}
+
+	return $response;
+}
+add_filter( 'rest_pre_dispatch', '_gutenberg_skip_unrequested_connector_validation', 10, 3 );
+
 // --- Registration ---
 
 /**
