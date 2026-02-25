@@ -67,15 +67,15 @@
 		transition: background-color 0.2s ease;
 
 		&:hover:not(:disabled) {
-			background-color: rgba(#3858e9, 0.04);
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 		}
 
 		&:active:not(:disabled) {
-			background-color: rgba(#3858e9, 0.04);
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
 		}
 
 		&:focus-visible {
-			outline: $border-width-focus-fallback solid var(--wp-admin-theme-color, #007cba);
+			outline: $border-width-focus-fallback solid var(--wp-admin-theme-color, #3858e9);
 			outline-offset: -$border-width-focus-fallback;
 		}
 
