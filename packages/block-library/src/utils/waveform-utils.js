@@ -14,7 +14,6 @@ import WaveformPlayerLib from '@arraypress/waveform-player';
  * Note: DEFAULT_WAVEFORM_HEIGHT should match $waveform-player-height in style.scss.
  */
 const DEFAULT_WAVEFORM_HEIGHT = 100;
-const SEEK_AMOUNT = 5; // Seconds to seek with arrow keys.
 
 /**
  * Get computed style for an element, using ownerDocument for iframe compatibility.
@@ -105,49 +104,17 @@ export function styleSvgIcons( container, buttonColor ) {
 }
 
 /**
- * Set up play button accessibility: aria attributes and keyboard seeking.
+ * Set up play button accessibility: aria attributes.
  *
  * @param {Element} container - The waveform container element.
- * @return {Function} Cleanup function to remove event listener.
  */
 export function setupPlayButtonAccessibility( container ) {
 	const playBtn = container.querySelector( '.waveform-btn' );
 	if ( ! playBtn ) {
-		return () => {};
+		return;
 	}
 
 	playBtn.setAttribute( 'aria-label', 'Play' );
-
-	// Add keyboard support for seeking.
-	const keyboardHandler = ( event ) => {
-		const audio = container.querySelector( 'audio' );
-		if ( ! audio ) {
-			return;
-		}
-
-		switch ( event.key ) {
-			case 'ArrowLeft':
-				event.preventDefault();
-				audio.currentTime = Math.max(
-					0,
-					audio.currentTime - SEEK_AMOUNT
-				);
-				break;
-			case 'ArrowRight':
-				event.preventDefault();
-				audio.currentTime = Math.min(
-					audio.duration,
-					audio.currentTime + SEEK_AMOUNT
-				);
-				break;
-		}
-	};
-
-	playBtn.addEventListener( 'keydown', keyboardHandler );
-
-	return () => {
-		playBtn.removeEventListener( 'keydown', keyboardHandler );
-	};
 }
 
 /**
@@ -203,16 +170,11 @@ export function initWaveformPlayer(
 	// Initialize the WaveformPlayer library.
 	const instance = new WaveformPlayerLib( container );
 
-	// Track cleanup function for accessibility.
-	let cleanupAccessibility = () => {};
-
 	// Set up event handlers.
 	const handlers = {
 		ready: () => {
 			styleSvgIcons( container, textColor );
-			// Set up accessibility features.
-			cleanupAccessibility = setupPlayButtonAccessibility( container );
-			// Auto-play if requested.
+			setupPlayButtonAccessibility( container );
 			if ( autoPlay ) {
 				instance.play()?.catch( logPlayError );
 			}
@@ -236,7 +198,6 @@ export function initWaveformPlayer(
 				'waveformplayer:ended',
 				handlers.ended
 			);
-			cleanupAccessibility();
 			instance.destroy();
 			container.remove();
 		},
