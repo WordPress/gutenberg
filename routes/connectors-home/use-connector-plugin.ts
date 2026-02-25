@@ -70,8 +70,8 @@ export function useConnectorPlugin( {
 				if ( ! plugin ) {
 					setPluginStatus( 'not-installed' );
 				} else if ( plugin.status === 'active' ) {
+					await fetchApiKey();
 					setPluginStatus( 'active' );
-					fetchApiKey();
 				} else {
 					setPluginStatus( 'inactive' );
 				}
