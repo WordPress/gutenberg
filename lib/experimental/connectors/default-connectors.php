@@ -94,19 +94,16 @@ function _gutenberg_get_real_api_key( $option_name, $mask_callback ) {
 // --- Gemini (Google) ---
 
 /**
- * Masks and validates the Gemini API key on read.
+ * Masks the Gemini API key on read.
  *
  * @access private
  *
  * @param string $value The raw option value.
- * @return string Masked key, 'invalid_key', or empty string.
+ * @return string Masked key or empty string.
  */
 function _gutenberg_mask_gemini_api_key( $value ) {
 	if ( empty( $value ) ) {
 		return $value;
-	}
-	if ( false === _gutenberg_is_api_key_valid( $value, 'google' ) ) {
-		return 'invalid_key';
 	}
 	return _gutenberg_mask_api_key( $value );
 }
@@ -131,19 +128,16 @@ function _gutenberg_validate_gemini_api_key_on_save( $value, $old_value ) {
 // --- OpenAI ---
 
 /**
- * Masks and validates the OpenAI API key on read.
+ * Masks the OpenAI API key on read.
  *
  * @access private
  *
  * @param string $value The raw option value.
- * @return string Masked key, 'invalid_key', or empty string.
+ * @return string Masked key or empty string.
  */
 function _gutenberg_mask_openai_api_key( $value ) {
 	if ( empty( $value ) ) {
 		return $value;
-	}
-	if ( false === _gutenberg_is_api_key_valid( $value, 'openai' ) ) {
-		return 'invalid_key';
 	}
 	return _gutenberg_mask_api_key( $value );
 }
@@ -168,19 +162,16 @@ function _gutenberg_validate_openai_api_key_on_save( $value, $old_value ) {
 // --- Anthropic ---
 
 /**
- * Masks and validates the Anthropic API key on read.
+ * Masks the Anthropic API key on read.
  *
  * @access private
  *
  * @param string $value The raw option value.
- * @return string Masked key, 'invalid_key', or empty string.
+ * @return string Masked key or empty string.
  */
 function _gutenberg_mask_anthropic_api_key( $value ) {
 	if ( empty( $value ) ) {
 		return $value;
-	}
-	if ( false === _gutenberg_is_api_key_valid( $value, 'anthropic' ) ) {
-		return 'invalid_key';
 	}
 	return _gutenberg_mask_api_key( $value );
 }
@@ -205,43 +196,55 @@ function _gutenberg_validate_anthropic_api_key_on_save( $value, $old_value ) {
 // --- REST API filtering ---
 
 /**
- * Short-circuits get_option for connector API key settings that were not
- * explicitly requested via _fields on the REST settings endpoint.
+ * Validates connector API keys in the REST response when explicitly requested.
  *
- * This prevents the mask filter (and its expensive isProviderConfigured
- * validation) from running for connector settings that the caller did
- * not ask for.
+ * Runs on `rest_post_dispatch` for `/wp/v2/settings` requests that include
+ * connector fields via `_fields`. For each requested connector field, reads
+ * the real (unmasked) key, validates it against the provider, and replaces
+ * the response value with 'invalid_key' if validation fails.
  *
  * @access private
  *
- * @param mixed           $response Result to send to the client. Usually null.
- * @param WP_REST_Server  $server   The server instance.
- * @param WP_REST_Request $request  The request object.
- * @return mixed Unmodified $response.
+ * @param WP_REST_Response $response The response object.
+ * @param WP_REST_Server   $server   The server instance.
+ * @param WP_REST_Request  $request  The request object.
+ * @return WP_REST_Response The potentially modified response.
  */
-function _gutenberg_skip_unrequested_connector_validation( $response, $server, $request ) {
+function _gutenberg_validate_connector_keys_in_rest( $response, $server, $request ) {
 	if ( '/wp/v2/settings' !== $request->get_route() ) {
 		return $response;
 	}
 
-	$fields    = $request->get_param( '_fields' );
-	$requested = $fields ? array_map( 'trim', explode( ',', $fields ) ) : array();
+	$fields = $request->get_param( '_fields' );
+	if ( ! $fields ) {
+		return $response;
+	}
 
-	$connector_options = array(
-		'connectors_gemini_api_key',
-		'connectors_openai_api_key',
-		'connectors_anthropic_api_key',
+	$requested  = array_map( 'trim', explode( ',', $fields ) );
+	$data       = $response->get_data();
+	$connectors = array(
+		'connectors_gemini_api_key'    => array( 'google', '_gutenberg_mask_gemini_api_key' ),
+		'connectors_openai_api_key'    => array( 'openai', '_gutenberg_mask_openai_api_key' ),
+		'connectors_anthropic_api_key' => array( 'anthropic', '_gutenberg_mask_anthropic_api_key' ),
 	);
 
-	foreach ( $connector_options as $option_name ) {
+	foreach ( $connectors as $option_name => $config ) {
 		if ( ! in_array( $option_name, $requested, true ) ) {
-			add_filter( "pre_option_{$option_name}", '__return_empty_string' );
+			continue;
+		}
+		$real_key = _gutenberg_get_real_api_key( $option_name, $config[1] );
+		if ( empty( $real_key ) ) {
+			continue;
+		}
+		if ( false === _gutenberg_is_api_key_valid( $real_key, $config[0] ) ) {
+			$data[ $option_name ] = 'invalid_key';
 		}
 	}
 
+	$response->set_data( $data );
 	return $response;
 }
-add_filter( 'rest_pre_dispatch', '_gutenberg_skip_unrequested_connector_validation', 10, 3 );
+add_filter( 'rest_post_dispatch', '_gutenberg_validate_connector_keys_in_rest', 10, 3 );
 
 // --- Registration ---
 
