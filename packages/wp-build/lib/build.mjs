@@ -21,6 +21,26 @@ import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
 import { NodePackageImporter } from 'sass-embedded';
 
+// Optional dependency: @wordpress/theme provides plugins that inject fallback
+// values for design system tokens. Fails gracefully when the package is not
+// installed (it is an optional peerDependency).
+let dsTokenFallbacks;
+let dsTokenFallbacksJs;
+try {
+	const { default: postcssPlugin } = await import(
+		// eslint-disable-next-line import/no-unresolved
+		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
+	);
+	const { default: esbuildPlugin } = await import(
+		// eslint-disable-next-line import/no-unresolved
+		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
+	);
+	dsTokenFallbacks = postcssPlugin;
+	dsTokenFallbacksJs = esbuildPlugin;
+} catch {
+	// @wordpress/theme is optional; skip token fallbacks if not available.
+}
+
 /**
  * Internal dependencies
  */
@@ -150,8 +170,9 @@ function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 
 		let moduleExports = null;
 
-		// Transform the code: CSS modules and minification.
+		// Transform the code: token fallbacks, CSS modules and minification.
 		const plugins = [
+			dsTokenFallbacks,
 			cssModules &&
 				postcssModules( {
 					generateScopedName: '[contenthash]__[local]',
@@ -1251,6 +1272,11 @@ async function transpilePackage( packageName ) {
 		},
 	};
 	const plugins = [
+		// Note: dsTokenFallbacksJs and emotionPlugin both use esbuild's onLoad
+		// hook, which is non-composable — the first to return contents wins. If a
+		// file contains --wpds-* tokens, the Emotion transform will be skipped.
+		// Avoid using design tokens in Emotion styles until Emotion is removed.
+		dsTokenFallbacksJs,
 		needsEmotionPlugin && emotionPlugin,
 		wasmInlinePlugin,
 		externalizeAllExceptCssPlugin,
@@ -1408,12 +1434,13 @@ async function compileStyles( packageName ) {
 						embedded: true,
 						...getSassOptions( packageDir ),
 						async transform( source ) {
-							// Process with autoprefixer for LTR version
-							const ltrResult = await postcss( [
-								autoprefixer( { grid: true } ),
-							] ).process( source, { from: undefined } );
+							const ltrResult = await postcss(
+								[
+									dsTokenFallbacks,
+									autoprefixer( { grid: true } ),
+								].filter( Boolean )
+							).process( source, { from: undefined } );
 
-							// Process with rtlcss for RTL version
 							const rtlResult = await postcss( [
 								rtlcss(),
 							] ).process( ltrResult.css, { from: undefined } );
