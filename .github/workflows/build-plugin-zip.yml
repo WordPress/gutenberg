@@ -192,12 +192,12 @@ jobs:
             )
         strategy:
             matrix:
-                IS_GUTENBERG_PLUGIN: ['true']
-                IS_WORDPRESS_CORE: ['false']
+                IS_GUTENBERG_PLUGIN: [true]
+                IS_WORDPRESS_CORE: [false]
 
                 include:
-                    - IS_GUTENBERG_PLUGIN: 'false'
-                      IS_WORDPRESS_CORE: 'true'
+                    - IS_GUTENBERG_PLUGIN: false
+                      IS_WORDPRESS_CORE: true
 
         outputs:
             job_status: ${{ job.status }}
@@ -293,7 +293,7 @@ jobs:
             # See https://github.com/orgs/community/discussions/27086 for more info.
             - name: Push built plugin ZIP file to GitHub Container Registry
               run: |
-                  oras push "ghcr.io/wordpress/gutenberg/gutenberg-build:${{ github.sha }}" \
+                  oras push "ghcr.io/wordpress/gutenberg/gutenberg-wp-develop-build:${{ github.sha }}" \
                   "gutenberg.zip:application/zip" \
                   --annotation "org.opencontainers.image.description=Gutenberg plugin build for commit ${{ github.sha }}" \
                   --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
