@@ -102,7 +102,7 @@ function _gutenberg_get_real_api_key( string $option_name, callable $mask_callba
  * @return string Masked key or empty string.
  */
 function _gutenberg_mask_gemini_api_key( string $value ): string {
-	if ( empty( $value ) ) {
+	if ( '' === $value ) {
 		return $value;
 	}
 	return _gutenberg_mask_api_key( $value );
