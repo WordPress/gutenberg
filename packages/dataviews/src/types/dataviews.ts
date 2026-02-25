@@ -457,7 +457,6 @@ export interface ViewBaseProps< Item > {
 	isItemClickable: ( item: Item ) => boolean;
 	view: View;
 	empty: ReactNode;
-	hasInitiallyLoaded?: boolean;
 }
 
 export type ViewPickerBaseProps< Item > = Omit<

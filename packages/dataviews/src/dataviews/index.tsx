@@ -255,7 +255,6 @@ function DataViews< Item >( {
 				actions,
 				data: displayData,
 				isLoading,
-				hasInitiallyLoaded,
 				paginationInfo,
 				selection: _selection,
 				onChangeSelection: setSelectionWithChange,
@@ -275,6 +274,7 @@ function DataViews< Item >( {
 				setIsShowingFilter,
 				config,
 				empty,
+				hasInitiallyLoaded,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
 				onReset,
 			} }

@@ -388,7 +388,6 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		view,
 		className,
 		empty,
-		hasInitiallyLoaded,
 	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list' );
 	const isDelayedLoading = useDelayedLoading( !! isLoading );
@@ -521,9 +520,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	const dataByGroup =
 		hasData && groupField ? getDataByGroup( data, groupField ) : null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
-	const noResults = ! hasData && hasInitiallyLoaded;
-
-	if ( noResults ) {
+	if ( ! hasData ) {
 		return (
 			<div
 				className={ clsx( 'dataviews-no-results', {
@@ -533,9 +530,6 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 				{ empty }
 			</div>
 		);
-	}
-	if ( ! hasData && ! isInfiniteScroll ) {
-		return null;
 	}
 
 	// Render data grouped by field
@@ -652,7 +646,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					);
 				} ) }
 			</Composite>
-			{ isInfiniteScroll && isLoading && hasInitiallyLoaded && (
+			{ isInfiniteScroll && isLoading && (
 				<p className="dataviews-loading-more">
 					<Spinner />
 				</p>

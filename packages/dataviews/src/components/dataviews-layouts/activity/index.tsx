@@ -21,15 +21,7 @@ import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 export default function ViewActivity< Item >(
 	props: ViewActivityProps< Item >
 ) {
-	const {
-		empty,
-		data,
-		fields,
-		isLoading,
-		hasInitiallyLoaded,
-		view,
-		className,
-	} = props;
+	const { empty, data, fields, isLoading, view, className } = props;
 
 	const isDelayedLoading = useDelayedLoading( !! isLoading );
 	const hasData = !! data?.length;
@@ -42,9 +34,7 @@ export default function ViewActivity< Item >(
 		hasData && groupField ? getDataByGroup( data, groupField ) : null;
 
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
-	const noResults = ! hasData && hasInitiallyLoaded;
-
-	if ( noResults ) {
+	if ( ! hasData ) {
 		return (
 			<div
 				className={ clsx( 'dataviews-no-results', {
@@ -54,9 +44,6 @@ export default function ViewActivity< Item >(
 				{ empty }
 			</div>
 		);
-	}
-	if ( ! hasData && ! isInfiniteScroll ) {
-		return null;
 	}
 
 	const isRefreshing = ! isInfiniteScroll && isDelayedLoading;
@@ -111,7 +98,7 @@ export default function ViewActivity< Item >(
 			>
 				<ActivityItems< Item > { ...props } />
 			</div>
-			{ isInfiniteScroll && isLoading && hasInitiallyLoaded && (
+			{ isInfiniteScroll && isLoading && (
 				<p className="dataviews-loading-more">
 					<Spinner />
 				</p>

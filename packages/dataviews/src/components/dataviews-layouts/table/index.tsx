@@ -286,7 +286,6 @@ function ViewTable< Item >( {
 	view,
 	className,
 	empty,
-	hasInitiallyLoaded,
 }: ViewTableProps< Item > ) {
 	const { containerRef } = useContext( DataViewsContext );
 	const isDelayedLoading = useDelayedLoading( isLoading );
@@ -386,9 +385,7 @@ function ViewTable< Item >( {
 		};
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 	const isRtl = isRTL();
-	const noResults = ! hasData && hasInitiallyLoaded;
-
-	if ( noResults ) {
+	if ( ! hasData ) {
 		return (
 			<div
 				className={ clsx( 'dataviews-no-results', {
@@ -399,9 +396,6 @@ function ViewTable< Item >( {
 				{ empty }
 			</div>
 		);
-	}
-	if ( ! hasData && ! isInfiniteScroll ) {
-		return null;
 	}
 
 	return (
@@ -658,7 +652,7 @@ function ViewTable< Item >( {
 					</tbody>
 				) }
 			</table>
-			{ isInfiniteScroll && isLoading && hasInitiallyLoaded && (
+			{ isInfiniteScroll && isLoading && (
 				<div className="dataviews-loading" id={ tableNoticeId }>
 					<p className="dataviews-loading-more">
 						<Spinner />

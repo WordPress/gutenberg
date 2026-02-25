@@ -32,7 +32,6 @@ function ViewGrid< Item >( {
 	view,
 	className,
 	empty,
-	hasInitiallyLoaded,
 }: ViewGridProps< Item > ) {
 	const isDelayedLoading = useDelayedLoading( !! isLoading );
 	const hasData = !! data?.length;
@@ -41,9 +40,7 @@ function ViewGrid< Item >( {
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
-	const noResults = ! hasData && hasInitiallyLoaded;
-
-	if ( noResults ) {
+	if ( ! hasData ) {
 		return (
 			<div
 				className={ clsx( 'dataviews-no-results', {
@@ -53,9 +50,6 @@ function ViewGrid< Item >( {
 				{ empty }
 			</div>
 		);
-	}
-	if ( ! hasData && ! isInfiniteScroll ) {
-		return null;
 	}
 	const gridProps = {
 		className: clsx( className, {
@@ -117,7 +111,7 @@ function ViewGrid< Item >( {
 					/>
 				)
 			}
-			{ isInfiniteScroll && isLoading && hasInitiallyLoaded && (
+			{ isInfiniteScroll && isLoading && (
 				<p className="dataviews-loading-more">
 					<Spinner />
 				</p>
