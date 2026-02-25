@@ -313,15 +313,9 @@ function transformPhpContent( content, transforms, allFunctionNames = [] ) {
 
 	content = content.toString();
 
-	// Prefix known external functions (e.g., WordPress core functions).
 	if ( prefixFunctions.length ) {
 		content = content.replace(
-			new RegExp(
-				'(?<![a-zA-Z0-9_])(?:' +
-					prefixFunctions.join( '|' ) +
-					')(?![a-zA-Z0-9_])',
-				'g'
-			),
+			new RegExp( prefixFunctions.join( '|' ), 'g' ),
 			( match ) => `${ functionPrefix }${ match.replace( /^wp_/, '' ) }`
 		);
 	}
@@ -343,6 +337,7 @@ function transformPhpContent( content, transforms, allFunctionNames = [] ) {
 
 		// Rename locally-defined functions and all their references in this file.
 		for ( const functionName of localFunctions ) {
+			// Skip functions already prefixed (e.g., by the prefixFunctions step above).
 			if ( functionName.startsWith( functionPrefix ) ) {
 				continue;
 			}
@@ -354,29 +349,15 @@ function transformPhpContent( content, transforms, allFunctionNames = [] ) {
 
 		// Prefix cross-file function references (functions defined in other
 		// files within the same package). Skip functions that are local to
-		// this file since they were already handled above. Matches inside
-		// PHP comments are left untouched.
+		// this file since they were already handled above.
 		const crossFileFunctions = allFunctionNames.filter(
 			( name ) => ! localFunctions.has( name )
 		);
 		if ( crossFileFunctions.length ) {
-			const funcPattern = crossFileFunctions.join( '|' );
 			content = content.replace(
-				new RegExp(
-					'\\/\\/[^\\n]*|\\/\\*[\\s\\S]*?\\*\\/|(?<![a-zA-Z0-9_])(?:' +
-						funcPattern +
-						')(?![a-zA-Z0-9_])',
-					'g'
-				),
-				( match ) => {
-					if (
-						match.startsWith( '//' ) ||
-						match.startsWith( '/*' )
-					) {
-						return match;
-					}
-					return `${ functionPrefix }${ match.replace( /^wp_/, '' ) }`;
-				}
+				new RegExp( crossFileFunctions.join( '|' ), 'g' ),
+				( match ) =>
+					`${ functionPrefix }${ match.replace( /^wp_/, '' ) }`
 			);
 		}
 	}
