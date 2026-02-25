@@ -80,7 +80,7 @@ export function detectClientSideMediaSupport(): FeatureDetectionResult {
 	) {
 		cachedResult = {
 			supported: false,
-			reason: 'Browser does not support credentialless iframes. Cross-origin isolation would break third-party embeds. Developers can re-enable via the wp_client_side_media_processing_enabled filter.',
+			reason: 'Browser does not support credentialless iframes. Cross-origin isolation would break third-party embeds',
 		};
 		return cachedResult;
 	}
