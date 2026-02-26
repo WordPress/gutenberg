@@ -3,6 +3,7 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/z-index" as *;
 @use "../utils/grid-items.scss" as *;
+@use "../../../dataviews/style" as *;
 
 .dataviews-view-grid {
 	padding: 0 $grid-unit-30 $grid-unit-30;
@@ -166,13 +167,7 @@
 	}
 
 	&.is-refreshing {
-		opacity: 0.5;
-		pointer-events: none;
-
-		@media not (prefers-reduced-motion) {
-			opacity: 1;
-			animation: dataviews-pulse 1s ease-in-out infinite;
-		}
+		@include dataviews-refreshing();
 	}
 }
 

@@ -2,6 +2,7 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/z-index" as *;
+@use "../../../dataviews/style" as *;
 
 .dataviews-view-table {
 	width: 100%;
@@ -311,14 +312,5 @@
 }
 
 .dataviews-view-table.is-refreshing {
-	opacity: 0.5;
-
-	@media not (prefers-reduced-motion) {
-		opacity: 1;
-		animation: dataviews-pulse 1s ease-in-out infinite;
-	}
-
-	tbody {
-		pointer-events: none;
-	}
+	@include dataviews-refreshing();
 }

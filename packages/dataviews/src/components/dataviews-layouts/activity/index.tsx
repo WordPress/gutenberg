@@ -46,10 +46,9 @@ export default function ViewActivity< Item >(
 		);
 	}
 
-	const isRefreshing = ! isInfiniteScroll && isDelayedLoading;
 	const isInert = ! isInfiniteScroll && !! isLoading;
 	const wrapperClassName = clsx( 'dataviews-view-activity', className, {
-		'is-refreshing': isRefreshing,
+		'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 	} );
 
 	// Convert dataByGroup entries into array.
