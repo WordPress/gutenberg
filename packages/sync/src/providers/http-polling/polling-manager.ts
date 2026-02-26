@@ -302,7 +302,10 @@ function toggleVisbilityChange() {
 			clearTimeout( pollingTimeoutId );
 			pollingTimeoutId = null;
 		}
-		poll();
+
+		if ( isPolling ) {
+			poll();
+		}
 	}
 }
 
