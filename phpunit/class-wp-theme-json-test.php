@@ -6813,7 +6813,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		$this->assertStringContainsString( ':where(.wp-block-navigation .wp-block-navigation-item.current-menu-item)', $stylesheet );
+		$this->assertStringContainsString( ':where(.wp-block-navigation .current-menu-item)', $stylesheet );
 		$this->assertStringNotContainsString( ':where(.wp-block-navigation-link)', $stylesheet );
 	}
 
@@ -6851,7 +6851,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = ':root :where(.wp-block-navigation .wp-block-navigation-item.current-menu-item){background-color: blue;color: red;}:root :where(.wp-block-navigation .wp-block-navigation-item.current-menu-item:hover){background-color: white;color: blue;}:root :where(.wp-block-navigation .wp-block-navigation-item.current-menu-item:focus){background-color: yellow;color: green;}';
+		$expected = ':root :where(.wp-block-navigation .current-menu-item){background-color: blue;color: red;}:root :where(.wp-block-navigation .current-menu-item:hover){background-color: white;color: blue;}:root :where(.wp-block-navigation .current-menu-item:focus){background-color: yellow;color: green;}';
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
