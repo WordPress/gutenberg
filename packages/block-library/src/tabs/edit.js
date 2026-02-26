@@ -23,7 +23,10 @@ const TABS_TEMPLATE = [
 				remove: true,
 			},
 		},
-		[ [ 'core/tabs-menu-item', { anchor: 'tab-1-button' } ] ],
+		[
+			[ 'core/tabs-menu-item', { anchor: 'tab-1-button' } ],
+			[ 'core/tabs-menu-item', { anchor: 'tab-2-button' } ],
+		],
 	],
 	[
 		'core/tab-panel',
@@ -38,6 +41,14 @@ const TABS_TEMPLATE = [
 				{
 					anchor: 'tab-1',
 					label: 'Tab 1',
+				},
+				[ [ 'core/paragraph' ] ],
+			],
+			[
+				'core/tab',
+				{
+					anchor: 'tab-2',
+					label: 'Tab 2',
 				},
 				[ [ 'core/paragraph' ] ],
 			],
