@@ -39,7 +39,7 @@ function _gutenberg_is_api_key_valid( string $key, string $provider_id ): ?bool 
 				__FUNCTION__,
 				sprintf(
 					/* translators: %s: AI provider ID. */
-					__( 'The provider "%s" is not registered in the AI client registry.' ),
+					__( 'The provider "%s" is not registered in the AI client registry.', 'gutenberg' ),
 					$provider_id
 				),
 				'7.0.0'
@@ -105,12 +105,12 @@ function _gutenberg_get_provider_settings(): array {
 			'provider'    => $provider,
 			'label'       => sprintf(
 				/* translators: %s: AI provider name. */
-				__( '%s API Key' ),
+				__( '%s API Key', 'gutenberg' ),
 				$data['name']
 			),
 			'description' => sprintf(
 				/* translators: %s: AI provider name. */
-				__( 'API key for the %s AI provider.' ),
+				__( 'API key for the %s AI provider.', 'gutenberg' ),
 				$data['name']
 			),
 			'mask'        => '_gutenberg_mask_api_key',
