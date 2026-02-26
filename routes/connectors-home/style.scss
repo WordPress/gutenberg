@@ -6,7 +6,7 @@
 	margin: 0 auto;
 	padding: 24px;
 
-	.components-item {
+	.connector-card {
 		padding: 20px;
 		border-radius: 8px;
 		border: 1px solid #ddd;
@@ -14,8 +14,50 @@
 		overflow: hidden;
 	}
 
+	.connector-card__header {
+		cursor: default;
+	}
+
+	.connector-card__toggle {
+		flex-shrink: 0;
+
+		svg {
+			transition: transform 0.2s ease;
+		}
+	}
+
+	.connector-card.is-expanded .connector-card__toggle svg {
+		transform: rotate(180deg);
+	}
+
+	.connector-card__body {
+		margin-top: 16px;
+		padding-top: 16px;
+		border-top: 1px solid #ddd;
+	}
+
 	.connector-settings .components-text-control__input {
 		font-family: monospace;
+	}
+
+	.connector-settings__inline {
+		// Align the Save button with the input field, not the label.
+		.components-flex-block {
+			min-width: 0;
+		}
+
+		> .components-button {
+			flex-shrink: 0;
+		}
+	}
+
+	.connector-settings__help {
+		font-size: 12px;
+		color: $gray-700;
+
+		a {
+			font-size: inherit;
+		}
 	}
 
 	> p {

@@ -4,7 +4,6 @@
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalItem as Item,
 	__experimentalText as Text,
 	ExternalLink,
 	FlexBlock,
@@ -13,6 +12,7 @@ import {
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -26,6 +26,8 @@ export interface ConnectorItemProps {
 	description: string;
 	actionArea?: ReactNode;
 	children?: ReactNode;
+	isExpanded?: boolean;
+	onToggle?: () => void;
 }
 
 export function ConnectorItem( {
@@ -35,27 +37,51 @@ export function ConnectorItem( {
 	description,
 	actionArea,
 	children,
+	isExpanded = false,
+	onToggle,
 }: ConnectorItemProps ) {
+	const classes = [ 'connector-card', isExpanded && 'is-expanded', className ]
+		.filter( Boolean )
+		.join( ' ' );
+
 	return (
-		<Item className={ className }>
-			<VStack spacing={ 4 }>
-				<HStack alignment="center" spacing={ 4 }>
-					{ icon }
-					<FlexBlock>
-						<VStack spacing={ 0 }>
-							<Text weight={ 600 } size={ 15 }>
-								{ name }
-							</Text>
-							<Text variant="muted" size={ 12 }>
-								{ description }
-							</Text>
-						</VStack>
-					</FlexBlock>
-					{ actionArea }
-				</HStack>
-				{ children }
-			</VStack>
-		</Item>
+		<div className={ classes }>
+			<HStack
+				alignment="center"
+				spacing={ 4 }
+				className="connector-card__header"
+			>
+				{ icon }
+				<FlexBlock>
+					<VStack spacing={ 0 }>
+						<Text weight={ 600 } size={ 15 }>
+							{ name }
+						</Text>
+						<Text variant="muted" size={ 12 }>
+							{ description }
+						</Text>
+					</VStack>
+				</FlexBlock>
+				{ actionArea }
+				{ onToggle && (
+					<Button
+						className="connector-card__toggle"
+						onClick={ onToggle }
+						aria-expanded={ isExpanded }
+						label={
+							isExpanded
+								? __( 'Collapse settings' )
+								: __( 'Expand settings' )
+						}
+						icon={ chevronDown }
+						size="compact"
+					/>
+				) }
+			</HStack>
+			{ isExpanded && children && (
+				<div className="connector-card__body">{ children }</div>
+			) }
+		</div>
 	);
 }
 
@@ -116,7 +142,7 @@ export function DefaultConnectorSettings( {
 			);
 		}
 		if ( saveError ) {
-			return <span style={ { color: '#cc1818' } }>{ saveError }</span>;
+			return <Text style={ { color: '#cc1818' } }>{ saveError }</Text>;
 		}
 		return helpLink;
 	};
@@ -151,38 +177,67 @@ export function DefaultConnectorSettings( {
 					: undefined
 			}
 		>
-			<TextControl
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
-				label={ __( 'API Key' ) }
-				value={ apiKey }
-				onChange={ ( value ) => {
-					if ( ! readOnly ) {
-						setSaveError( null );
-						setApiKey( value );
-					}
-				} }
-				placeholder="YOUR_API_KEY"
-				disabled={ readOnly || isSaving }
-				help={ getHelp() }
-			/>
 			{ readOnly ? (
-				<Button variant="link" isDestructive onClick={ onRemove }>
-					{ __( 'Remove and replace' ) }
-				</Button>
-			) : (
-				<HStack justify="flex-start">
-					<Button
+				<>
+					<TextControl
+						__nextHasNoMarginBottom
 						__next40pxDefaultSize
-						variant="primary"
-						disabled={ ! apiKey || isSaving }
-						accessibleWhenDisabled
-						isBusy={ isSaving }
-						onClick={ handleSave }
-					>
-						{ __( 'Save' ) }
+						label={ __( 'API Key' ) }
+						value={ apiKey }
+						onChange={ () => {} }
+						placeholder="YOUR_API_KEY"
+						disabled
+						help={ getHelp() }
+					/>
+					<Button variant="link" isDestructive onClick={ onRemove }>
+						{ __( 'Remove and replace' ) }
 					</Button>
-				</HStack>
+				</>
+			) : (
+				<>
+					<HStack
+						alignment="bottom"
+						spacing={ 3 }
+						className="connector-settings__inline"
+					>
+						<FlexBlock>
+							<TextControl
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+								label={ __( 'API Key' ) }
+								value={ apiKey }
+								onChange={ ( value ) => {
+									setSaveError( null );
+									setApiKey( value );
+								} }
+								placeholder="YOUR_API_KEY"
+								disabled={ isSaving }
+							/>
+						</FlexBlock>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							disabled={ ! apiKey || isSaving }
+							accessibleWhenDisabled
+							isBusy={ isSaving }
+							onClick={ handleSave }
+						>
+							{ __( 'Save' ) }
+						</Button>
+					</HStack>
+					{ ( saveError || helpLink ) && (
+						<Text
+							className="connector-settings__help"
+							variant={ saveError ? undefined : 'muted' }
+							size={ 12 }
+							style={
+								saveError ? { color: '#cc1818' } : undefined
+							}
+						>
+							{ saveError || helpLink }
+						</Text>
+					) }
+				</>
 			) }
 		</VStack>
 	);

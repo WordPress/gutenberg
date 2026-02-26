@@ -71,27 +71,30 @@ function ProviderConnector( {
 			icon={ <Logo /> }
 			name={ label }
 			description={ description }
+			isExpanded={ isExpanded }
+			onToggle={
+				pluginStatus === 'active'
+					? () => setIsExpanded( ! isExpanded )
+					: undefined
+			}
 			actionArea={
 				<HStack spacing={ 3 } expanded={ false }>
 					{ isConnected && <ConnectedBadge /> }
-					<Button
-						variant={
-							isExpanded || isConnected ? 'tertiary' : 'secondary'
-						}
-						size={
-							isExpanded || isConnected ? undefined : 'compact'
-						}
-						onClick={ handleButtonClick }
-						disabled={ pluginStatus === 'checking' || isBusy }
-						isBusy={ isBusy }
-						aria-expanded={ isExpanded }
-					>
-						{ getButtonLabel() }
-					</Button>
+					{ getButtonLabel() && (
+						<Button
+							variant={ isConnected ? 'tertiary' : 'secondary' }
+							size={ isConnected ? undefined : 'compact' }
+							onClick={ handleButtonClick }
+							disabled={ pluginStatus === 'checking' || isBusy }
+							isBusy={ isBusy }
+						>
+							{ getButtonLabel() }
+						</Button>
+					) }
 				</HStack>
 			}
 		>
-			{ isExpanded && pluginStatus === 'active' && (
+			{ pluginStatus === 'active' && (
 				<DefaultConnectorSettings
 					key={ isConnected ? 'connected' : 'setup' }
 					initialValue={ currentApiKey }

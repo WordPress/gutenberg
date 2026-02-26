@@ -124,8 +124,6 @@ export function useConnectorPlugin( {
 			installPlugin();
 		} else if ( pluginStatus === 'inactive' ) {
 			activatePlugin();
-		} else {
-			setIsExpanded( ! isExpanded );
 		}
 	};
 
@@ -135,12 +133,6 @@ export function useConnectorPlugin( {
 				? __( 'Installing…' )
 				: __( 'Activating…' );
 		}
-		if ( isExpanded ) {
-			return __( 'Cancel' );
-		}
-		if ( isConnected ) {
-			return __( 'Edit' );
-		}
 		switch ( pluginStatus ) {
 			case 'checking':
 				return __( 'Checking…' );
@@ -149,7 +141,7 @@ export function useConnectorPlugin( {
 			case 'inactive':
 				return __( 'Activate' );
 			case 'active':
-				return __( 'Set up' );
+				return '';
 		}
 	};
 
