@@ -660,7 +660,9 @@ function gutenberg_unique_id_from_values( array $data, string $prefix = '' ): st
  * @return string                Filtered block content.
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
-	static $global_styles = null;
+	static $global_styles = array();
+
+	$theme = get_stylesheet();
 
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
@@ -929,8 +931,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		// Get default blockGap value from global styles for use in layouts like grid.
 		// Check style variation first, then block-specific styles, then fall back to root styles.
 		$block_name = $block['blockName'] ?? '';
-		if ( null === $global_styles ) {
-			$global_styles = gutenberg_get_global_styles();
+		if ( empty( $global_styles[ $theme ] ) ) {
+			$global_styles[ $theme ] = gutenberg_get_global_styles();
 		}
 
 		// Check if the block has an active style variation with a blockGap value.
@@ -942,11 +944,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$registered_styles = $styles_registry->get_registered_styles_for_block( $block_name );
 			$variation_name    = gutenberg_get_block_style_variation_name_from_registered_style( $block_class_name, $registered_styles );
 			if ( $variation_name ) {
-				$variation_block_gap_value = $global_styles['blocks'][ $block_name ]['variations'][ $variation_name ]['spacing']['blockGap'] ?? null;
+				$variation_block_gap_value = $global_styles[ $theme ]['blocks'][ $block_name ]['variations'][ $variation_name ]['spacing']['blockGap'] ?? null;
 			}
 		}
 
-		$global_block_gap_value = $variation_block_gap_value ?? $global_styles['blocks'][ $block_name ]['spacing']['blockGap'] ?? $global_styles['spacing']['blockGap'] ?? null;
+		$global_block_gap_value = $variation_block_gap_value ?? $global_styles[ $theme ]['blocks'][ $block_name ]['spacing']['blockGap'] ?? $global_styles[ $theme ]['spacing']['blockGap'] ?? null;
 
 		if ( null !== $global_block_gap_value ) {
 			$fallback_gap_value = $global_block_gap_value;
