@@ -62,6 +62,21 @@ export default function PostTitleEdit( {
 		},
 		[ isDescendentOfQueryLoop, postType, postId ]
 	);
+	const titlePlaceholder = useSelect(
+		( select ) => {
+			if ( ! postType ) {
+				return undefined;
+			}
+			const titleSupports =
+				select( coreStore ).getPostType( postType )?.supports?.title;
+			if ( Array.isArray( titleSupports ) ) {
+				return titleSupports[ 0 ]?.placeholder;
+			}
+			return undefined;
+		},
+		[ postType ]
+	);
+	const noTitleText = titlePlaceholder || __( '(no title)' );
 	const [ rawTitle = '', setTitle, fullTitle ] = useEntityProp(
 		'postType',
 		postType,
@@ -80,13 +95,17 @@ export default function PostTitleEdit( {
 	const blockEditingMode = useBlockEditingMode();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	let titleElement = <TagName { ...blockProps }>{ __( 'Title' ) }</TagName>;
+	let titleElement = (
+		<TagName { ...blockProps }>
+			{ titlePlaceholder || __( 'Title' ) }
+		</TagName>
+	);
 
 	if ( postType && postId ) {
 		titleElement = userCanEdit ? (
 			<PlainText
 				tagName={ TagName }
-				placeholder={ __( '(no title)' ) }
+				placeholder={ noTitleText }
 				value={ rawTitle }
 				onChange={ setTitle }
 				__experimentalVersion={ 2 }
@@ -97,7 +116,7 @@ export default function PostTitleEdit( {
 			<TagName
 				{ ...blockProps }
 				dangerouslySetInnerHTML={ {
-					__html: fullTitle?.rendered || __( '(no title)' ),
+					__html: fullTitle?.rendered || noTitleText,
 				} }
 			/>
 		);
@@ -111,9 +130,7 @@ export default function PostTitleEdit( {
 					href={ link }
 					target={ linkTarget }
 					rel={ rel }
-					placeholder={
-						! rawTitle.length ? __( '(no title)' ) : null
-					}
+					placeholder={ ! rawTitle.length ? noTitleText : null }
 					value={ rawTitle }
 					onChange={ setTitle }
 					__experimentalVersion={ 2 }
@@ -128,7 +145,7 @@ export default function PostTitleEdit( {
 					rel={ rel }
 					onClick={ ( event ) => event.preventDefault() }
 					dangerouslySetInnerHTML={ {
-						__html: fullTitle?.rendered || __( '(no title)' ),
+						__html: fullTitle?.rendered || noTitleText,
 					} }
 				/>
 			</TagName>
