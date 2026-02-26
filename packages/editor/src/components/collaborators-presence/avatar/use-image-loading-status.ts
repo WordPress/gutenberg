@@ -1,82 +1,32 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 
 export type ImageLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';
 
 /**
- * Probes an image URL via a side-channel `new Image()` preloader and returns
- * the current loading status. The DOM `<img>` should only mount when the
- * status is `'loaded'`, preventing broken-image icons from ever appearing.
+ * Tracks the loading status of an image URL. Returns the current status and
+ * `onLoad`/`onError` callbacks to attach to the `<img>` element.
  *
- * @param src - The image URL to probe. When falsy, status is `'idle'`.
+ * Unlike a side-channel `new Image()` preloader, this hook relies on the
+ * native `<img>` element's own events, which avoids cross-browser issues
+ * with Safari's privacy features blocking programmatic image requests.
+ *
+ * @param src - The image URL. When falsy, status is `'idle'`.
  */
-export function useImageLoadingStatus( src?: string ): ImageLoadingStatus {
-	const [ status, setStatus ] = useState< ImageLoadingStatus >( () =>
-		getInitialStatus( src )
+export function useImageLoadingStatus( src?: string ) {
+	const [ status, setStatus ] = useState< ImageLoadingStatus >(
+		src ? 'loading' : 'idle'
 	);
 
+	// Reset when src changes.
 	useEffect( () => {
-		if ( ! src ) {
-			setStatus( 'idle' );
-			return;
-		}
-
-		// Check if the image is already cached by the browser.
-		const image = new window.Image();
-		image.src = src;
-
-		if ( image.complete && image.naturalWidth > 0 ) {
-			setStatus( 'loaded' );
-			return;
-		}
-
-		setStatus( 'loading' );
-
-		let isMounted = true;
-
-		image.onload = () => {
-			if ( isMounted ) {
-				setStatus( 'loaded' );
-			}
-		};
-
-		image.onerror = () => {
-			if ( isMounted ) {
-				setStatus( 'error' );
-			}
-		};
-
-		return () => {
-			isMounted = false;
-		};
+		setStatus( src ? 'loading' : 'idle' );
 	}, [ src ] );
 
-	return status;
-}
+	const handleLoad = useCallback( () => setStatus( 'loaded' ), [] );
+	const handleError = useCallback( () => setStatus( 'error' ), [] );
 
-/**
- * Returns the initial status synchronously — avoids a flash of initials for
- * images that are already in the browser cache.
- *
- * @param src - The image URL to check.
- */
-function getInitialStatus( src?: string ): ImageLoadingStatus {
-	if ( ! src ) {
-		return 'idle';
-	}
-
-	if ( typeof window === 'undefined' ) {
-		return 'loading';
-	}
-
-	const image = new window.Image();
-	image.src = src;
-
-	if ( image.complete && image.naturalWidth > 0 ) {
-		return 'loaded';
-	}
-
-	return 'loading';
+	return { status, handleLoad, handleError };
 }

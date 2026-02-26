@@ -1,62 +1,18 @@
 /**
  * External dependencies
  */
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
 import Avatar from '..';
 
-// Mock window.Image so useImageLoadingStatus can probe URLs synchronously.
-// By default, every Image instance appears "cached" (complete + naturalWidth).
-type MockImage = {
-	src: string;
-	complete: boolean;
-	naturalWidth: number;
-	onload: ( () => void ) | null;
-	onerror: ( () => void ) | null;
-};
-
-let mockImages: MockImage[];
-
-function mockCachedImages() {
-	mockImages = [];
-	jest.spyOn( window, 'Image' ).mockImplementation( () => {
-		const img: MockImage = {
-			src: '',
-			complete: true,
-			naturalWidth: 48,
-			onload: null,
-			onerror: null,
-		};
-		mockImages.push( img );
-		return img as unknown as HTMLImageElement;
-	} );
-}
-
-function mockUncachedImages() {
-	mockImages = [];
-	jest.spyOn( window, 'Image' ).mockImplementation( () => {
-		const img: MockImage = {
-			src: '',
-			complete: false,
-			naturalWidth: 0,
-			onload: null,
-			onerror: null,
-		};
-		mockImages.push( img );
-		return img as unknown as HTMLImageElement;
-	} );
-}
-
-beforeEach( () => {
-	mockCachedImages();
-} );
-
-afterEach( () => {
-	jest.restoreAllMocks();
-} );
+/**
+ * In JSDOM, `<img>` elements never fire `load` or `error` events on their
+ * own. We simulate them using `fireEvent` on the `<img>` element, which we
+ * locate via `getByAltText('')` (the `<img>` has `alt=""`).
+ */
 
 describe( 'Avatar', () => {
 	it( 'should render with default props', () => {
@@ -80,7 +36,24 @@ describe( 'Avatar', () => {
 		expect( avatar ).not.toHaveAttribute( 'aria-label' );
 	} );
 
-	it( 'should render an img element when image loads successfully', () => {
+	it( 'should render an img element when src is provided', () => {
+		render(
+			<Avatar
+				data-testid="avatar"
+				name="Jane Doe"
+				src="https://example.com/avatar.jpg"
+			/>
+		);
+		// The <img> should be in the DOM (hidden until loaded).
+		const img = screen.getByAltText( '' );
+		expect( img.tagName ).toBe( 'IMG' );
+		expect( img ).toHaveAttribute(
+			'src',
+			'https://example.com/avatar.jpg'
+		);
+	} );
+
+	it( 'should apply has-src class only after image loads', () => {
 		render(
 			<Avatar
 				data-testid="avatar"
@@ -89,9 +62,12 @@ describe( 'Avatar', () => {
 			/>
 		);
 		const avatar = screen.getByTestId( 'avatar' );
+		// Before load fires, has-src should not be set.
+		expect( avatar ).not.toHaveClass( 'has-src' );
+
+		// Simulate image load.
+		fireEvent.load( screen.getByAltText( '' ) );
 		expect( avatar ).toHaveClass( 'has-src' );
-		// Initials should not be visible when the image has loaded.
-		expect( screen.queryByText( 'JD' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'should apply is-small class for small size', () => {
@@ -257,7 +233,7 @@ describe( 'Avatar', () => {
 			expect( screen.queryByText( 'icon' ) ).not.toBeInTheDocument();
 		} );
 
-		it( 'should still apply has-src class when dimmed with src', () => {
+		it( 'should apply has-src class when dimmed after image loads', () => {
 			render(
 				<Avatar
 					data-testid="avatar"
@@ -265,6 +241,7 @@ describe( 'Avatar', () => {
 					dimmed
 				/>
 			);
+			fireEvent.load( screen.getByAltText( '' ) );
 			const avatar = screen.getByTestId( 'avatar' );
 			expect( avatar ).toHaveClass( 'has-src' );
 			expect( avatar ).toHaveClass( 'is-dimmed' );
@@ -292,13 +269,14 @@ describe( 'Avatar', () => {
 			expect( screen.getByText( 'JD' ) ).toBeInTheDocument();
 		} );
 
-		it( 'should not show initials when image has loaded', () => {
+		it( 'should not show initials after image loads', () => {
 			render(
 				<Avatar
 					name="Tanner Robinson"
 					src="https://example.com/avatar.jpg"
 				/>
 			);
+			fireEvent.load( screen.getByAltText( '' ) );
 			expect( screen.queryByText( 'TR' ) ).not.toBeInTheDocument();
 		} );
 
@@ -312,7 +290,6 @@ describe( 'Avatar', () => {
 
 	describe( 'image loading', () => {
 		it( 'should show initials while image is loading', () => {
-			mockUncachedImages();
 			render(
 				<Avatar
 					data-testid="avatar"
@@ -321,13 +298,12 @@ describe( 'Avatar', () => {
 				/>
 			);
 			const avatar = screen.getByTestId( 'avatar' );
-			// Image hasn't loaded yet, so initials should show.
+			// Before load event, initials should show.
 			expect( avatar ).not.toHaveClass( 'has-src' );
 			expect( screen.getByText( 'JD' ) ).toBeInTheDocument();
 		} );
 
 		it( 'should show image after successful load', () => {
-			mockUncachedImages();
 			render(
 				<Avatar
 					data-testid="avatar"
@@ -336,11 +312,7 @@ describe( 'Avatar', () => {
 				/>
 			);
 
-			// Simulate image load completing.
-			act( () => {
-				const lastImage = mockImages[ mockImages.length - 1 ];
-				lastImage.onload?.();
-			} );
+			fireEvent.load( screen.getByAltText( '' ) );
 
 			const avatar = screen.getByTestId( 'avatar' );
 			expect( avatar ).toHaveClass( 'has-src' );
@@ -348,7 +320,6 @@ describe( 'Avatar', () => {
 		} );
 
 		it( 'should fall back to initials when image fails to load', () => {
-			mockUncachedImages();
 			render(
 				<Avatar
 					data-testid="avatar"
@@ -357,30 +328,16 @@ describe( 'Avatar', () => {
 				/>
 			);
 
-			// Simulate image load error.
-			act( () => {
-				const lastImage = mockImages[ mockImages.length - 1 ];
-				lastImage.onerror?.();
-			} );
+			fireEvent.error( screen.getByAltText( '' ) );
 
 			const avatar = screen.getByTestId( 'avatar' );
 			expect( avatar ).not.toHaveClass( 'has-src' );
 			expect( screen.getByText( 'JD' ) ).toBeInTheDocument();
 		} );
 
-		it( 'should render cached images immediately without flash', () => {
-			// Default mock returns cached images.
-			render(
-				<Avatar
-					data-testid="avatar"
-					name="Jane Doe"
-					src="https://example.com/avatar.jpg"
-				/>
-			);
-			// On the first render, image should already be "loaded".
-			const avatar = screen.getByTestId( 'avatar' );
-			expect( avatar ).toHaveClass( 'has-src' );
-			expect( screen.queryByText( 'JD' ) ).not.toBeInTheDocument();
+		it( 'should not render img element when no src is provided', () => {
+			render( <Avatar data-testid="avatar" name="Jane Doe" /> );
+			expect( screen.queryByAltText( '' ) ).not.toBeInTheDocument();
 		} );
 	} );
 

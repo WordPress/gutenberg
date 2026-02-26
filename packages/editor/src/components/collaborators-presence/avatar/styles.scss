@@ -43,7 +43,7 @@ $-accent-color: var(--wp-admin-theme-color, #3858e9);
 }
 
 // The <img> element, absolutely positioned to fill the __image container.
-// Only rendered when the image has loaded successfully (via useImageLoadingStatus).
+// Starts invisible; becomes visible when the image loads (has-src class).
 .editor-avatar__img {
 	position: absolute;
 	inset: 0;
@@ -51,6 +51,11 @@ $-accent-color: var(--wp-admin-theme-color, #3858e9);
 	height: 100%;
 	object-fit: cover;
 	border-radius: inherit;
+	opacity: 0;
+
+	.has-src > .editor-avatar__image > & {
+		opacity: 1;
+	}
 }
 
 // Initials fallback: show name characters when no image has loaded.

@@ -63,6 +63,10 @@ export const AVATAR_IFRAME_STYLES = `
 	height: 100%;
 	object-fit: cover;
 	border-radius: inherit;
+	opacity: 0;
+}
+.has-src > .editor-avatar__image > .editor-avatar__img {
+	opacity: 1;
 }
 .editor-avatar:not(.has-src) > .editor-avatar__image {
 	display: flex;

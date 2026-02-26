@@ -37,7 +37,11 @@ function Avatar( {
 	...props
 }: AvatarProps &
 	Omit< React.HTMLAttributes< HTMLDivElement >, keyof AvatarProps > ) {
-	const imageStatus = useImageLoadingStatus( src );
+	const {
+		status: imageStatus,
+		handleLoad,
+		handleError,
+	} = useImageLoadingStatus( src );
 	const imageLoaded = imageStatus === 'loaded';
 
 	const showBadge = variant === 'badge' && !! name;
@@ -86,8 +90,14 @@ function Avatar( {
 			{ ...props }
 		>
 			<span className="editor-avatar__image">
-				{ imageLoaded && (
-					<img src={ src } alt="" className="editor-avatar__img" />
+				{ src && (
+					<img
+						src={ src }
+						alt=""
+						className="editor-avatar__img"
+						onLoad={ handleLoad }
+						onError={ handleError }
+					/>
 				) }
 				{ ! imageLoaded && initials }
 			</span>
