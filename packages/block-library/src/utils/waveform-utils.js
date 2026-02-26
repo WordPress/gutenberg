@@ -142,7 +142,9 @@ export function setupPlayButtonAccessibility(
  * @param {Error} error - The error from play().
  */
 export function logPlayError( error ) {
-	// AbortError is expected when play() is interrupted by pause() or track change.
+	// The browser throws AbortError when a play() promise is interrupted
+	// by a subsequent pause() or a new audio source load (track change).
+	// This is normal during rapid user interaction and safe to ignore.
 	if ( error.name === 'AbortError' ) {
 		return;
 	}
