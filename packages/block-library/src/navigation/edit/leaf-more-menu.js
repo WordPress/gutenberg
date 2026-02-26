@@ -124,11 +124,21 @@ export default function LeafMoreMenu( props ) {
 
 	const { rootClientId, canDuplicate, canInsertBlock } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, canInsertBlockType } =
-				select( blockEditorStore );
+			const {
+				getBlockRootClientId,
+				canInsertBlockType,
+				getDirectInsertBlock,
+			} = select( blockEditorStore );
 			const { getDefaultBlockName } = select( blocksStore );
 
 			const _rootClientId = getBlockRootClientId( clientId );
+			const canInsertDefaultBlock = canInsertBlockType(
+				getDefaultBlockName(),
+				_rootClientId
+			);
+			const directInsertBlock = _rootClientId
+				? getDirectInsertBlock( _rootClientId )
+				: null;
 
 			return {
 				rootClientId: _rootClientId,
@@ -136,10 +146,10 @@ export default function LeafMoreMenu( props ) {
 					!! block &&
 					hasBlockSupport( block.name, 'multiple', true ) &&
 					canInsertBlockType( block.name, _rootClientId ),
-				canInsertBlock: canInsertBlockType(
-					getDefaultBlockName(),
-					_rootClientId
-				),
+				canInsertBlock:
+					( canInsertDefaultBlock || !! directInsertBlock ) &&
+					!! block &&
+					canInsertBlockType( block.name, _rootClientId ),
 			};
 		},
 		[ clientId, block ]
