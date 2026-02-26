@@ -22,6 +22,13 @@ export async function setPreferences(
 ) {
 	await this.page.waitForFunction( () => window?.wp?.data );
 
+	await this.page.waitForFunction( () => {
+		const store = ( window.wp as any )?.data?.dispatch?.(
+			'core/preferences'
+		);
+		return !! store && typeof store.set === 'function';
+	} );
+
 	await this.page.evaluate(
 		async ( props ) => {
 			for ( const [ key, value ] of Object.entries(
