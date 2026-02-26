@@ -73,7 +73,7 @@ function FontLibraryPage() {
 	}
 
 	return (
-		<Page title={ __( 'Fonts' ) } ariaLabel={ __( 'Fonts' ) }>
+		<Page title={ __( 'Fonts' ) }>
 			<Tabs
 				selectedTabId={ activeTab }
 				onSelect={ ( tabId: string ) => setActiveTab( tabId ) }

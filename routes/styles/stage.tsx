@@ -74,7 +74,6 @@ function Stage() {
 			}
 			className="routes-styles__page"
 			title={ __( 'Styles' ) }
-			ariaLabel={ __( 'Styles' ) }
 		>
 			<GlobalStylesUIWrapper
 				path={ section }

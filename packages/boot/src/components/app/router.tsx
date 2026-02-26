@@ -38,11 +38,7 @@ const {
 function NotFoundComponent() {
 	return (
 		<div className="boot-layout__stage">
-			<Page
-				title={ __( 'Route not found' ) }
-				ariaLabel={ __( 'Route not found' ) }
-				hasPadding
-			>
+			<Page title={ __( 'Route not found' ) } hasPadding>
 				{ __( "The page you're looking for does not exist" ) }
 			</Page>
 		</div>

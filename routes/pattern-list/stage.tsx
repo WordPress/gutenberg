@@ -258,7 +258,6 @@ function PatternList() {
 	return (
 		<Page
 			title={ __( 'Patterns' ) }
-			ariaLabel={ __( 'Patterns' ) }
 			subTitle={ __(
 				'Reusable design elements for your site. Create once, use everywhere.'
 			) }

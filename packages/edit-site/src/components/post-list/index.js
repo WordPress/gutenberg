@@ -273,7 +273,6 @@ export default function PostList( { postType } ) {
 	return (
 		<Page
 			title={ labels?.name }
-			ariaLabel={ labels?.name ?? '' }
 			actions={
 				<>
 					{ labels?.add_new_item && canCreateRecord && (
