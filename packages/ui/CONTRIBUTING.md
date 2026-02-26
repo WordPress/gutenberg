@@ -59,71 +59,45 @@ When components expose CSS custom properties (variables) for theming or composit
 
 > **Custom properties = configurable values. CSS properties = state machine.**
 
--   Define custom properties for each visual "slot" (default, active/hover, disabled, etc.) and assign them to design tokens or other values.
--   In state selectors (`:hover`, `:active`, `:focus`, `[data-disabled]`, etc.), set **CSS properties** (like `background-color`, `color`, `border-color`) to reference the appropriate custom property for that state. Do **not** reassign the custom property itself.
+Define custom properties for each visual "slot" (default, active/hover, disabled, etc.) and assign them to design tokens or other values. In state selectors (`:hover`, `:active`, `:focus`, `[data-disabled]`, etc.), set **CSS properties** (like `background-color`, `color`) to reference the appropriate custom property for that state — do **not** reassign the custom property itself.
 
-#### Why this matters
+In CSS cascade layers, a rule in a higher-priority layer always wins over a lower-priority layer regardless of selector specificity. If a component reassigns a custom property inside a state selector, a higher layer that overrides that same custom property will win unconditionally — the state-based reassignment in the lower layer becomes dead code.
 
-In CSS cascade layers, a rule in a higher-priority layer **always** wins over a rule in a lower-priority layer, regardless of selector specificity. If a component reassigns a custom property inside a state selector, a higher layer that overrides that same custom property will take precedence unconditionally — the state-based reassignment in the lower layer is effectively dead code.
+#### Do this
 
-By keeping state handling in CSS property declarations and using custom properties only as configurable inputs, higher layers can safely override the custom property values without interfering with how states resolve.
-
-#### Example: the correct pattern
-
-The `Button` component demonstrates this approach. It defines a set of custom properties for each visual state:
+Define a separate custom property per state, and use CSS property declarations in state selectors:
 
 ```css
 .button {
-	/* Configurable values — one custom property per visual state */
-	--wp-ui-button-background-color: var(--wpds-color-bg-interactive-brand-strong);
-	--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-brand-strong-active);
-	--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-strong-disabled);
+	--button-bg: blue;
+	--button-bg-hover: darkblue;
+	background-color: var(--button-bg);
 
-	/* Default state: CSS property reads from the "default" custom property */
-	background-color: var(--wp-ui-button-background-color);
-
-	/* Interactive states: CSS property reads from the "active" custom property */
-	&:not([data-disabled]):is(:hover, :active, :focus) {
-		background-color: var(--wp-ui-button-background-color-active);
-	}
-
-	/* Disabled state: CSS property reads from the "disabled" custom property */
-	&[data-disabled] {
-		background-color: var(--wp-ui-button-background-color-disabled);
+	&:hover {
+		background-color: var(--button-bg-hover);
 	}
 }
 ```
 
-A composition (e.g. a destructive dialog button) in a higher layer can then safely override the custom properties, and all states continue to work:
+A composition in a higher layer can safely override both custom properties, and all states continue to work as expected.
+
+#### Don't do this
+
+Do not reassign the same custom property in state selectors:
 
 ```css
-@layer wp-ui-compositions {
-	.destructive-button {
-		--wp-ui-button-background-color: var(--wpds-color-bg-interactive-danger-strong);
-		--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-danger-strong-active);
-		--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-strong-disabled);
-	}
-}
-```
-
-#### The broken pattern to avoid
-
-Do **not** reassign the same custom property in state selectors:
-
-```css
-/* DO NOT do this */
 .button {
 	--button-bg: blue;
 	background-color: var(--button-bg);
 
 	&:hover {
-		--button-bg: darkblue; /* reassigning the variable for hover */
+		--button-bg: darkblue;
 	}
 }
 ```
 
-If a higher layer then does `.special-button { --button-bg: red; }`, that override wins over the hover reassignment (because layer precedence trumps specificity). The hover state will be `red` instead of `darkblue`, and there is no way for the lower layer to recover.
+If a higher layer sets `.special-button { --button-bg: red; }`, that override wins over the hover reassignment (layer precedence trumps specificity). The hover state will show `red` instead of `darkblue`, and there is no way for the lower layer to recover.
 
 ### Disabled State Styling
 
-When styling disabled states, use the `data-disabled` attribute provided by Base UI rather than targeting `disabled` or `aria-disabled` directly. Base UI applies `data-disabled` consistently regardless of whether the underlying implementation uses the native `disabled` attribute or `aria-disabled` (which depends on the `focusableWhenDisabled` prop). This keeps styles decoupled from the specific HTML attribute and avoids verbose selectors that would need to target both.
+For components built on Base UI, use the `data-disabled` attribute when styling disabled states rather than targeting `disabled` or `aria-disabled` directly. Base UI applies `data-disabled` consistently regardless of whether the underlying implementation uses the native `disabled` attribute or `aria-disabled` (which depends on the `focusableWhenDisabled` prop). This keeps styles decoupled from the specific HTML attribute and avoids verbose selectors that would need to target both.
