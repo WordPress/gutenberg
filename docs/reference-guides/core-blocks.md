@@ -1053,7 +1053,7 @@ Display the tab buttons for a tabbed interface. ([Source](https://github.com/Wor
 
 ## Tab Menu Item
 
-A single tab button in the tabs menu. Can be styled individually. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs-menu-item))
+A single tab button in the tabs menu. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs-menu-item))
 
 -	**Name:** core/tabs-menu-item
 -	**Experimental:** true
