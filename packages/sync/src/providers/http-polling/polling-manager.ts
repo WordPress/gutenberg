@@ -240,8 +240,23 @@ function processDocUpdate(
 }
 
 let isPolling = false;
+let isUnloadPending = false;
 let pollInterval = POLLING_INTERVAL_IN_MS;
 let pageHideListenerRegistered = false;
+
+/**
+ * Mark that a page unload has been requested. This fires on
+ * `beforeunload` which happens before the browser aborts in-flight
+ * fetches, allowing us to distinguish poll failures caused by
+ * navigation from genuine server errors in the catch block.
+ *
+ * If the user cancels the unload (e.g. by dismissing a "Save Changes?" dialog),
+ * the flag is reset at the start of the next poll cycle so that polling can
+ * resume.
+ */
+function handleBeforeUnload(): void {
+	isUnloadPending = true;
+}
 
 /**
  * Send a disconnect signal for all registered rooms when the page is
@@ -269,6 +284,11 @@ function poll(): void {
 			isPolling = false;
 			return;
 		}
+
+		// Reset the unloading flag at the start of each poll cycle so
+		// it doesn't permanently suppress disconnect after the user
+		// cancels a beforeunload dialog.
+		isUnloadPending = false;
 
 		// Emit 'connecting' status.
 		roomStates.forEach( ( state ) => {
@@ -371,9 +391,14 @@ function poll(): void {
 				);
 			}
 
-			roomStates.forEach( ( state ) => {
-				state.onStatusChange( { status: 'disconnected' } );
-			} );
+			// Don't report disconnected status when the request was aborted
+			// due to page unload (e.g. during a refresh) to avoid briefly
+			// flashing the disconnect dialog before the new page loads.
+			if ( ! isUnloadPending ) {
+				roomStates.forEach( ( state ) => {
+					state.onStatusChange( { status: 'disconnected' } );
+				} );
+			}
 		}
 
 		setTimeout( poll, pollInterval );
@@ -441,6 +466,7 @@ function registerRoom( {
 	roomStates.set( room, roomState );
 
 	if ( ! pageHideListenerRegistered ) {
+		window.addEventListener( 'beforeunload', handleBeforeUnload );
 		window.addEventListener( 'pagehide', handlePageHide );
 		pageHideListenerRegistered = true;
 	}
@@ -471,6 +497,7 @@ function unregisterRoom( room: string ): void {
 	}
 
 	if ( roomStates.size === 0 && pageHideListenerRegistered ) {
+		window.removeEventListener( 'beforeunload', handleBeforeUnload );
 		window.removeEventListener( 'pagehide', handlePageHide );
 		pageHideListenerRegistered = false;
 	}
