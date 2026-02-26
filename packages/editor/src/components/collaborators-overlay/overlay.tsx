@@ -1,7 +1,7 @@
 // @ts-expect-error No exported types
 import { useStyleOverride } from '@wordpress/block-editor';
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 import Avatar from '../collaborators-presence/avatar';
 import { AVATAR_IFRAME_STYLES } from './avatar-iframe-styles';
@@ -52,8 +52,15 @@ export function Overlay( {
 		postType ?? null
 	);
 
-	// Combine both delayed rerenders so layout changes recompute everything.
-	const rerenderAfterDelay = useCallback( () => {
+	// Detect layout changes on overlay (e.g. turning on "Show Template") and window
+	// resizes, and re-render the cursors and block highlights.
+	const resizeObserverRef = useResizeObserver( () => {
+		rerenderCursorsAfterDelay();
+		rerenderHighlightsAfterDelay();
+	} );
+
+	// Trigger the initial position computation on mount.
+	useEffect( () => {
 		const cleanupCursors = rerenderCursorsAfterDelay();
 		const cleanupHighlights = rerenderHighlightsAfterDelay();
 		return () => {
@@ -61,11 +68,6 @@ export function Overlay( {
 			cleanupHighlights();
 		};
 	}, [ rerenderCursorsAfterDelay, rerenderHighlightsAfterDelay ] );
-
-	// Detect layout changes on overlay (e.g. turning on "Show Template") and window
-	// resizes, and re-render the cursors and block highlights.
-	const resizeObserverRef = useResizeObserver( rerenderAfterDelay );
-	useEffect( rerenderAfterDelay, [ rerenderAfterDelay ] );
 
 	// Merge the refs to use the same element for both overlay and resize observation
 	const mergedRef = useMergeRefs< HTMLDivElement | null >( [
