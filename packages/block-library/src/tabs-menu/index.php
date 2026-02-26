@@ -36,7 +36,11 @@ function block_core_tabs_menu_render_callback( array $attributes, string $conten
 			continue;
 		}
 
-		$tab = $tabs_list[ $tab_index ] ?? array();
+		if ( $tab_index >= count( $tabs_list ) ) {
+			break;
+		}
+
+		$tab = $tabs_list[ $tab_index ];
 
 		$item_context = array_merge(
 			$block->context,
