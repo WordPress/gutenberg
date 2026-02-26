@@ -101,8 +101,8 @@ export default function PostTitleEdit( {
 		</TagName>
 	);
 
-	if ( postType && postId ) {
-		titleElement = userCanEdit ? (
+	if ( postType && postId && userCanEdit ) {
+		titleElement = (
 			<PlainText
 				tagName={ TagName }
 				placeholder={ noTitleText }
@@ -112,14 +112,18 @@ export default function PostTitleEdit( {
 				__unstableOnSplitAtEnd={ onSplitAtEnd }
 				{ ...blockProps }
 			/>
-		) : (
+		);
+	} else if ( postType && postId && fullTitle?.rendered ) {
+		titleElement = (
 			<TagName
 				{ ...blockProps }
 				dangerouslySetInnerHTML={ {
-					__html: fullTitle?.rendered || noTitleText,
+					__html: fullTitle.rendered,
 				} }
 			/>
 		);
+	} else if ( postType && postId ) {
+		titleElement = <TagName { ...blockProps }>{ noTitleText }</TagName>;
 	}
 
 	if ( isLink && postType && postId ) {
@@ -139,15 +143,26 @@ export default function PostTitleEdit( {
 			</TagName>
 		) : (
 			<TagName { ...blockProps }>
-				<a
-					href={ link }
-					target={ linkTarget }
-					rel={ rel }
-					onClick={ ( event ) => event.preventDefault() }
-					dangerouslySetInnerHTML={ {
-						__html: fullTitle?.rendered || noTitleText,
-					} }
-				/>
+				{ fullTitle?.rendered ? (
+					<a
+						href={ link }
+						target={ linkTarget }
+						rel={ rel }
+						onClick={ ( event ) => event.preventDefault() }
+						dangerouslySetInnerHTML={ {
+							__html: fullTitle.rendered,
+						} }
+					/>
+				) : (
+					<a
+						href={ link }
+						target={ linkTarget }
+						rel={ rel }
+						onClick={ ( event ) => event.preventDefault() }
+					>
+						{ noTitleText }
+					</a>
+				) }
 			</TagName>
 		);
 	}
