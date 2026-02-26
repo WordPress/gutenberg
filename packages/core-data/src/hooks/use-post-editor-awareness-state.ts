@@ -11,19 +11,29 @@ import type {
 	PostEditorAwarenessState as ActiveCollaborator,
 	YDocDebugData,
 } from '../awareness/types';
-import type { SelectionCursor } from '../types';
+import type { SelectionState } from '../types';
 import type { PostEditorAwareness } from '../awareness/post-editor-awareness';
+
+interface ResolvedSelection {
+	textIndex: number | null;
+	localClientId: string | null;
+}
 
 interface AwarenessState {
 	activeCollaborators: ActiveCollaborator[];
-	getAbsolutePositionIndex: ( selection: SelectionCursor ) => number | null;
+	resolveSelection: ( selection: SelectionState ) => ResolvedSelection;
 	getDebugData: () => YDocDebugData;
 	isCurrentCollaboratorDisconnected: boolean;
 }
 
+const defaultResolvedSelection: ResolvedSelection = {
+	textIndex: null,
+	localClientId: null,
+};
+
 const defaultState: AwarenessState = {
 	activeCollaborators: [],
-	getAbsolutePositionIndex: () => null,
+	resolveSelection: () => defaultResolvedSelection,
 	getDebugData: () => ( {
 		doc: {},
 		clients: {},
@@ -40,8 +50,8 @@ function getAwarenessState(
 
 	return {
 		activeCollaborators,
-		getAbsolutePositionIndex: ( selection: SelectionCursor ) =>
-			awareness.getAbsolutePositionIndex( selection ),
+		resolveSelection: ( selection: SelectionState ) =>
+			awareness.convertSelectionStateToAbsolute( selection ),
 		getDebugData: () => awareness.getDebugData(),
 		isCurrentCollaboratorDisconnected:
 			activeCollaborators.find( ( collaborator ) => collaborator.isMe )
@@ -105,18 +115,17 @@ export function useActiveCollaborators(
 }
 
 /**
- * Hook to get the absolute position index for a post editor.
+ * Hook to resolve a selection state to a text index and block client ID.
  *
- * @param  postId   - The ID of the post.
- * @param  postType - The type of the post.
- * @return {SelectionCursor} The absolute position index.
+ * @param postId   - The ID of the post.
+ * @param postType - The type of the post.
+ * @return A function that resolves a selection to its text index and block client ID.
  */
-export function useGetAbsolutePositionIndex(
+export function useResolvedSelection(
 	postId: number | null,
 	postType: string | null
-): ( selection: SelectionCursor ) => number | null {
-	return usePostEditorAwarenessState( postId, postType )
-		.getAbsolutePositionIndex;
+): ( selection: SelectionState ) => ResolvedSelection {
+	return usePostEditorAwarenessState( postId, postType ).resolveSelection;
 }
 
 /**

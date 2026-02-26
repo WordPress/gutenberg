@@ -475,40 +475,17 @@ export const getContentLockingParent = ( state, clientId ) => {
 };
 
 /**
- * Retrieves the client ID of the parent section block.
+ * Checks whether a block meets the raw criteria to be a section block,
+ * without considering contextual factors like nesting or the edited
+ * content-only section. Used internally by `isSectionBlock` and
+ * `getParentSectionBlock` to avoid circular calls between them.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client Id of the block.
  *
- * @return {?string} Client ID of the ancestor block that is a contentOnly section.
+ * @return {boolean} Whether the block is a candidate section block.
  */
-export const getParentSectionBlock = ( state, clientId ) => {
-	let current = clientId;
-	let result;
-
-	// If sections are nested, return the top level section block.
-	// Don't return early.
-	while ( ( current = state.blocks.parents.get( current ) ) ) {
-		if ( isSectionBlock( state, current ) ) {
-			result = current;
-		}
-	}
-	return result;
-};
-
-/**
- * Returns whether the block is a contentOnly section.
- *
- * @param {Object} state    Global application state.
- * @param {string} clientId Client Id of the block.
- *
- * @return {boolean} Whether the block is a contentOnly section.
- */
-export function isSectionBlock( state, clientId ) {
-	if ( clientId === state.editedContentOnlySection ) {
-		return false;
-	}
-
+function isSectionBlockCandidate( state, clientId ) {
 	const blockName = getBlockName( state, clientId );
 	if ( blockName === 'core/block' ) {
 		return true;
@@ -536,16 +513,70 @@ export function isSectionBlock( state, clientId ) {
 	// TemplateLock cascades to all inner parent blocks. Only the top-level
 	// block that's contentOnly templateLocked is the true contentLocker,
 	// all the others are mere imitators.
-	const hasContentOnlyTempateLock =
+	const hasContentOnlyTemplateLock =
 		getTemplateLock( state, clientId ) === 'contentOnly';
 	const rootClientId = getBlockRootClientId( state, clientId );
 	const hasRootContentOnlyTemplateLock =
 		getTemplateLock( state, rootClientId ) === 'contentOnly';
-	if ( hasContentOnlyTempateLock && ! hasRootContentOnlyTemplateLock ) {
+	if ( hasContentOnlyTemplateLock && ! hasRootContentOnlyTemplateLock ) {
 		return true;
 	}
 
 	return false;
+}
+
+/**
+ * Retrieves the client ID of the parent section block.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client Id of the block.
+ *
+ * @return {?string} Client ID of the ancestor block that is a contentOnly section.
+ */
+export const getParentSectionBlock = ( state, clientId ) => {
+	// If this block is within the edited content-only section,
+	// it has no parent section — it's temporarily fully editable.
+	if ( isWithinEditedContentOnlySection( state, clientId ) ) {
+		return undefined;
+	}
+
+	let current = clientId;
+	let result;
+
+	// If sections are nested, return the top level section block.
+	// Don't return early.
+	while ( ( current = state.blocks.parents.get( current ) ) ) {
+		if ( isSectionBlockCandidate( state, current ) ) {
+			result = current;
+		}
+	}
+	return result;
+};
+
+/**
+ * Returns whether the block is a contentOnly section.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client Id of the block.
+ *
+ * @return {boolean} Whether the block is a contentOnly section.
+ */
+export function isSectionBlock( state, clientId ) {
+	// isWithinEditedContentOnlySection -
+	// If the section is being edited or a parent section is being edited,
+	// this block is temporarily not considered a section.
+	//
+	// getParentSectionBlock -
+	// Only the top level section is considered the section,
+	// a nested section is managed by its parent section.
+	if (
+		isWithinEditedContentOnlySection( state, clientId ) ||
+		getParentSectionBlock( state, clientId )
+	) {
+		return false;
+	}
+
+	return isSectionBlockCandidate( state, clientId );
 }
 
 /**

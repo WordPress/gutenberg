@@ -11,17 +11,16 @@ import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 /**
  * Internal dependencies
  */
-import {
-	CRDT_RECORD_MAP_KEY,
-	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-} from '../../sync';
+import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import {
 	applyPostChangesToCRDTDoc,
 	getPostChangesFromCRDTDoc,
+	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 	type PostChanges,
 	type YPostRecord,
 } from '../crdt';
-import type { YBlock, YBlocks } from '../crdt-blocks';
+import type { YBlock, YBlockRecord, YBlocks } from '../crdt-blocks';
+import { updateSelectionHistory } from '../crdt-selection';
 import { createYMap, getRootMap, type YMapWrap } from '../crdt-utils';
 import type { Post, Type } from '../../entity-types';
 
@@ -604,10 +603,7 @@ describe( 'crdt', () => {
 		it( 'excludes disallowed meta keys in changes', () => {
 			const metaMap = createYMap();
 			metaMap.set( 'public_meta', 'new value' );
-			metaMap.set(
-				WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-				'exclude me'
-			);
+			metaMap.set( POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE, 'exclude me' );
 			map.set( 'meta', metaMap );
 
 			const editedRecord = {
@@ -626,8 +622,138 @@ describe( 'crdt', () => {
 				public_meta: 'new value', // from CRDT
 			} );
 			expect( changes.meta ).not.toHaveProperty(
-				WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE
+				POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE
 			);
+		} );
+
+		describe( 'selection recalculation', () => {
+			it( 'includes recalculated selection when text is inserted before cursor', () => {
+				const ytext = addBlockToDoc( map, 'block-1', 'Hello world' );
+
+				// Record a selection at offset 5 (cursor between "Hello" and " world").
+				updateSelectionHistory( doc, {
+					selectionStart: {
+						clientId: 'block-1',
+						attributeKey: 'content',
+						offset: 5,
+					},
+					selectionEnd: {
+						clientId: 'block-1',
+						attributeKey: 'content',
+						offset: 5,
+					},
+				} );
+
+				// Simulate remote insertion: insert "XXX" at position 0.
+				ytext.insert( 0, 'XXX' );
+
+				const editedRecord = {
+					title: 'CRDT Title',
+					status: 'draft',
+					blocks: [],
+				} as unknown as Post;
+
+				const changes = getPostChangesFromCRDTDoc(
+					doc,
+					editedRecord,
+					mockPostType
+				);
+
+				expect( changes.selection ).toBeDefined();
+				expect( changes.selection?.selectionStart.offset ).toBe( 8 ); // 5 + 3
+				expect( changes.selection?.selectionStart.clientId ).toBe(
+					'block-1'
+				);
+				expect( changes.selection?.selectionStart.attributeKey ).toBe(
+					'content'
+				);
+				expect( changes.selection?.selectionEnd.offset ).toBe( 8 );
+			} );
+
+			it( 'includes recalculated selection when text is deleted before cursor', () => {
+				const ytext = addBlockToDoc( map, 'block-1', 'Hello world' );
+
+				// Record a selection at offset 8 (cursor between "Hello wo" and "rld").
+				updateSelectionHistory( doc, {
+					selectionStart: {
+						clientId: 'block-1',
+						attributeKey: 'content',
+						offset: 8,
+					},
+					selectionEnd: {
+						clientId: 'block-1',
+						attributeKey: 'content',
+						offset: 8,
+					},
+				} );
+
+				// Simulate remote deletion: delete "Hello" (5 chars at position 0).
+				ytext.delete( 0, 5 );
+
+				const editedRecord = {
+					title: 'CRDT Title',
+					status: 'draft',
+					blocks: [],
+				} as unknown as Post;
+
+				const changes = getPostChangesFromCRDTDoc(
+					doc,
+					editedRecord,
+					mockPostType
+				);
+
+				expect( changes.selection ).toBeDefined();
+				expect( changes.selection?.selectionStart.offset ).toBe( 3 ); // 8 - 5
+			} );
+
+			it( 'does not include selection when selection history is empty', () => {
+				addBlockToDoc( map, 'block-1', 'Hello world' );
+
+				const editedRecord = {
+					title: 'CRDT Title',
+					status: 'draft',
+					blocks: [],
+				} as unknown as Post;
+
+				const changes = getPostChangesFromCRDTDoc(
+					doc,
+					editedRecord,
+					mockPostType
+				);
+
+				expect( changes.selection ).toBeUndefined();
+			} );
 		} );
 	} );
 } );
+
+/**
+ * Helper to create a block with a Y.Text content attribute
+ * in the CRDT document.
+ *
+ * @param map
+ * @param clientId Block client ID.
+ * @param content  Initial text content.
+ */
+function addBlockToDoc(
+	map: YMapWrap< YPostRecord >,
+	clientId: string,
+	content: string
+): Y.Text {
+	let blocks = map.get( 'blocks' );
+	if ( ! ( blocks instanceof Y.Array ) ) {
+		blocks = new Y.Array< YBlock >();
+		map.set( 'blocks', blocks );
+	}
+
+	const block = createYMap< YBlockRecord >();
+	block.set( 'clientId', clientId );
+	const attrs = new Y.Map();
+	const ytext = new Y.Text( content );
+	attrs.set( 'content', ytext );
+	block.set( 'attributes', attrs );
+	block.set( 'innerBlocks', new Y.Array() );
+	( blocks as YBlocks ).push( [ block ] );
+
+	return ytext;
+}

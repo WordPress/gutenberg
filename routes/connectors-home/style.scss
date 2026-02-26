@@ -1,0 +1,25 @@
+@use "@wordpress/base-styles/colors" as *;
+
+.connectors-page {
+	width: 100%;
+	max-width: 680px;
+	margin: 0 auto;
+	padding: 24px;
+
+	.components-item {
+		padding: 20px;
+		border-radius: 8px;
+		border: 1px solid #ddd;
+		background: #fff;
+		overflow: hidden;
+	}
+
+	.connector-settings .components-text-control__input {
+		font-family: monospace;
+	}
+
+	> p {
+		text-align: center;
+		color: $gray-600;
+	}
+}

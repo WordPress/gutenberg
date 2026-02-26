@@ -5,6 +5,8 @@
 	width: max-content;
 	text-decoration: none;
 	cursor: pointer;
+	flex-basis: inherit !important;
+	flex-grow: inherit !important;
 
 	// Button reset
 	border: none;
@@ -24,10 +26,6 @@
 	letter-spacing: inherit;
 	text-transform: inherit;
 	text-align: inherit;
-
-	&:focus {
-		outline: none;
-	}
 
 	&:focus-visible {
 		outline: 2px solid #000;

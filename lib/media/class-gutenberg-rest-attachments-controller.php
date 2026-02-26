@@ -2,11 +2,14 @@
 /**
  * Class Gutenberg_REST_Attachments_Controller.
  *
- * @package MediaExperiments
+ * @package gutenberg
  */
 
 /**
- * Class Gutenberg_REST_Attachments_Controller.
+ * REST API controller for media attachments.
+ *
+ * Extends the core attachments controller to add client-side media processing
+ * functionality including sideload support and sub-size generation control.
  */
 class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controller {
 	/**
@@ -17,10 +20,15 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	public function register_routes(): void {
 		parent::register_routes();
 
+		// Override the parent's sideload route so that 'scaled' is included
+		// in the image_size enum. Without the override, core's handler
+		// validates first and rejects 'scaled' before ours is tried.
 		$valid_image_sizes = array_keys( wp_get_registered_image_subsizes() );
 
 		// Special case to set 'original_image' in attachment metadata.
 		$valid_image_sizes[] = 'original';
+		// Client-side big image threshold: sideload the scaled version.
+		$valid_image_sizes[] = 'scaled';
 		// Used for PDF thumbnails.
 		$valid_image_sizes[] = 'full';
 
@@ -47,7 +55,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				),
 				'allow_batch' => $this->allow_batch,
 				'schema'      => array( $this, 'get_public_item_schema' ),
-			)
+			),
+			true // Override core's route so 'scaled' is included in the enum.
 		);
 	}
 
@@ -204,6 +213,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// Disable server-side EXIF rotation so the client can handle it.
 			// This preserves the original orientation value in the metadata.
 			add_filter( 'wp_image_maybe_exif_rotate', '__return_false', 100 );
+			// Disable server-side big image scaling since the client handles it.
+			add_filter( 'big_image_size_threshold', '__return_zero', 100 );
 		}
 
 		if ( ! $request['convert_format'] ) {
@@ -215,6 +226,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		remove_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 100 );
 		remove_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
 		remove_filter( 'wp_image_maybe_exif_rotate', '__return_false', 100 );
+		remove_filter( 'big_image_size_threshold', '__return_zero', 100 );
 		remove_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 
 		return $response;
@@ -248,16 +260,14 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 *
 	 * @link https://github.com/WordPress/wordpress-develop/blob/30954f7ac0840cfdad464928021d7f380940c347/src/wp-includes/functions.php#L2576-L2582
 	 *
-	 * @param string        $filename                 Unique file name.
-	 * @param string        $ext                      File extension. Example: ".png".
-	 * @param string        $dir                      Directory path.
-	 * @param callable|null $unique_filename_callback Callback function that generates the unique file name.
-	 * @param string[]      $alt_filenames            Array of alternate file names that were checked for collisions.
-	 * @param int|string    $number                   The highest number that was used to make the file name unique
-	 *                                                or an empty string if unused.
+	 * @param string     $filename            Unique file name.
+	 * @param string     $dir                 Directory path.
+	 * @param int|string $number              The highest number that was used to make the file name unique
+	 *                                        or an empty string if unused.
+	 * @param string     $attachment_filename Original attachment file name.
 	 * @return string Filtered file name.
 	 */
-	private function filter_wp_unique_filename( $filename, $ext, $dir, $unique_filename_callback, $alt_filenames, $number, $attachment_filename ) {
+	private static function filter_wp_unique_filename( $filename, $dir, $number, $attachment_filename ) {
 		if ( empty( $number ) || ! $attachment_filename ) {
 			return $filename;
 		}
@@ -271,7 +281,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		$matches = array();
-		if ( preg_match( '/(.*)(-\d+x\d+)-' . $number . '$/', $name, $matches ) ) {
+		if ( preg_match( '/(.*)(-\d+x\d+|-scaled)-' . $number . '$/', $name, $matches ) ) {
 			$filename_without_suffix = $matches[1] . $matches[2] . ".$ext";
 			if ( $matches[1] === $orig_name && ! file_exists( "$dir/$filename_without_suffix" ) ) {
 				return $filename_without_suffix;
@@ -335,8 +345,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		 *                                                or an empty string if unused.
 		 * @return string Filtered file name.
 		 */
-		$filter_filename = function ( $filename, $ext, $dir, $unique_filename_callback, $alt_filenames, $number ) use ( $attachment_filename ) {
-			return $this->filter_wp_unique_filename( $filename, $ext, $dir, $unique_filename_callback, $alt_filenames, $number, $attachment_filename );
+		$filter_filename = static function ( $filename, $ext, $dir, $unique_filename_callback, $alt_filenames, $number ) use ( $attachment_filename ) {
+			return self::filter_wp_unique_filename( $filename, $dir, $number, $attachment_filename );
 		};
 
 		add_filter( 'wp_unique_filename', $filter_filename, 10, 6 );
@@ -377,6 +387,20 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		if ( 'original' === $image_size ) {
 			$metadata['original_image'] = wp_basename( $path );
+		} elseif ( 'scaled' === $image_size ) {
+			// The current attached file is the original; record it as original_image.
+			$current_file               = get_attached_file( $attachment_id, true );
+			$metadata['original_image'] = wp_basename( $current_file );
+
+			// Update the attached file to point to the scaled version.
+			update_attached_file( $attachment_id, $path );
+
+			$size = wp_getimagesize( $path );
+
+			$metadata['width']    = $size ? $size[0] : 0;
+			$metadata['height']   = $size ? $size[1] : 0;
+			$metadata['filesize'] = wp_filesize( $path );
+			$metadata['file']     = _wp_relative_upload_path( $path );
 		} else {
 			$metadata['sizes'] = $metadata['sizes'] ?? array();
 
