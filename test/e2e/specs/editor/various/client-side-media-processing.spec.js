@@ -46,10 +46,7 @@ class MediaProcessingUtils {
 		);
 		const uniqueName = uuid();
 		const extension = path.extname( fileName );
-		const tmpFileName = path.join(
-			tmpDirectory,
-			uniqueName + extension
-		);
+		const tmpFileName = path.join( tmpDirectory, uniqueName + extension );
 		await fs.copyFile( path.join( ASSETS_DIR, fileName ), tmpFileName );
 		await inputElement.setInputFiles( tmpFileName );
 		return uniqueName;
@@ -84,7 +81,6 @@ class MediaProcessingUtils {
 		const isCrossOriginIsolated = await this.page.evaluate(
 			() => window.crossOriginIsolated
 		);
-		// eslint-disable-next-line playwright/no-skipped-test
 		testInstance.skip(
 			! isCrossOriginIsolated,
 			'Cross-origin isolation headers not configured on server'
@@ -97,11 +93,11 @@ class MediaProcessingUtils {
 	 * @return {Promise<number|undefined>} The image attachment ID.
 	 */
 	async getSelectedBlockImageId() {
-		return await this.page.evaluate(
-			() =>
-				window.wp.data
-					.select( 'core/block-editor' )
-					.getSelectedBlock()?.attributes?.id
+		return await this.page.evaluate( () =>
+			window.wp.data
+				.select( 'core/block-editor' )
+				.getSelectedBlock()
+				?.attributes?.id
 		);
 	}
 
@@ -135,7 +131,6 @@ test.describe( 'Client-side media processing', () => {
 
 	test.describe( 'Basic image upload with compression', () => {
 		test( 'should upload a JPEG with client-side processing', async ( {
-			page,
 			editor,
 			mediaProcessingUtils,
 			requestUtils,
@@ -150,9 +145,7 @@ test.describe( 'Client-side media processing', () => {
 			await expect( imageBlock ).toBeVisible();
 
 			await mediaProcessingUtils.upload(
-				imageBlock.locator(
-					'data-testid=form-file-upload-input'
-				),
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
 				'1024x768_e2e_test_image_size.jpeg'
 			);
 
@@ -182,7 +175,6 @@ test.describe( 'Client-side media processing', () => {
 		} );
 
 		test( 'should upload a PNG with client-side processing', async ( {
-			page,
 			editor,
 			mediaProcessingUtils,
 			requestUtils,
@@ -197,9 +189,7 @@ test.describe( 'Client-side media processing', () => {
 			await expect( imageBlock ).toBeVisible();
 
 			await mediaProcessingUtils.upload(
-				imageBlock.locator(
-					'data-testid=form-file-upload-input'
-				),
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
 				'200x150_e2e_test_image_opaque.png'
 			);
 
@@ -226,7 +216,6 @@ test.describe( 'Client-side media processing', () => {
 		} );
 
 		test( 'should compress uploaded images', async ( {
-			page,
 			editor,
 			mediaProcessingUtils,
 			requestUtils,
@@ -247,9 +236,7 @@ test.describe( 'Client-side media processing', () => {
 			await expect( imageBlock ).toBeVisible();
 
 			await mediaProcessingUtils.upload(
-				imageBlock.locator(
-					'data-testid=form-file-upload-input'
-				),
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
 				'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
 			);
 
@@ -280,7 +267,6 @@ test.describe( 'Client-side media processing', () => {
 		} );
 
 		test( 'should show transient state during processing', async ( {
-			page,
 			editor,
 			mediaProcessingUtils,
 		} ) => {
@@ -294,9 +280,7 @@ test.describe( 'Client-side media processing', () => {
 			await expect( imageBlock ).toBeVisible();
 
 			await mediaProcessingUtils.upload(
-				imageBlock.locator(
-					'data-testid=form-file-upload-input'
-				),
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
 				'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
 			);
 
@@ -319,7 +303,6 @@ test.describe( 'Client-side media processing', () => {
 
 	test.describe( 'Sub-size generation', () => {
 		test( 'should generate standard thumbnail sizes client-side', async ( {
-			page,
 			editor,
 			mediaProcessingUtils,
 			requestUtils,
@@ -335,9 +318,7 @@ test.describe( 'Client-side media processing', () => {
 
 			// Upload a large image that will need sub-sizes generated.
 			await mediaProcessingUtils.upload(
-				imageBlock.locator(
-					'data-testid=form-file-upload-input'
-				),
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
 				'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
 			);
 
@@ -368,7 +349,6 @@ test.describe( 'Client-side media processing', () => {
 		} );
 
 		test( 'should generate correctly proportioned thumbnails', async ( {
-			page,
 			editor,
 			mediaProcessingUtils,
 			requestUtils,
@@ -383,9 +363,7 @@ test.describe( 'Client-side media processing', () => {
 			await expect( imageBlock ).toBeVisible();
 
 			await mediaProcessingUtils.upload(
-				imageBlock.locator(
-					'data-testid=form-file-upload-input'
-				),
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
 				'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
 			);
 
@@ -430,7 +408,6 @@ test.describe( 'Client-side media processing', () => {
 		} );
 
 		test( 'should create scaled version for large images', async ( {
-			page,
 			editor,
 			mediaProcessingUtils,
 			requestUtils,
@@ -445,9 +422,7 @@ test.describe( 'Client-side media processing', () => {
 			await expect( imageBlock ).toBeVisible();
 
 			await mediaProcessingUtils.upload(
-				imageBlock.locator(
-					'data-testid=form-file-upload-input'
-				),
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
 				'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
 			);
 
@@ -475,7 +450,6 @@ test.describe( 'Client-side media processing', () => {
 
 	test.describe( 'Multiple image uploads', () => {
 		test( 'should upload multiple images via gallery block', async ( {
-			page,
 			editor,
 			mediaProcessingUtils,
 		} ) => {
@@ -506,14 +480,8 @@ test.describe( 'Client-side media processing', () => {
 			for ( const file of files ) {
 				const uniqueName = uuid();
 				const ext = path.extname( file );
-				const tmpFile = path.join(
-					tmpDirectory,
-					uniqueName + ext
-				);
-				await fs.copyFile(
-					path.join( ASSETS_DIR, file ),
-					tmpFile
-				);
+				const tmpFile = path.join( tmpDirectory, uniqueName + ext );
+				await fs.copyFile( path.join( ASSETS_DIR, file ), tmpFile );
 				tmpFiles.push( tmpFile );
 			}
 
@@ -559,14 +527,8 @@ test.describe( 'Client-side media processing', () => {
 			for ( const file of files ) {
 				const uniqueName = uuid();
 				const ext = path.extname( file );
-				const tmpFile = path.join(
-					tmpDirectory,
-					uniqueName + ext
-				);
-				await fs.copyFile(
-					path.join( ASSETS_DIR, file ),
-					tmpFile
-				);
+				const tmpFile = path.join( tmpDirectory, uniqueName + ext );
+				await fs.copyFile( path.join( ASSETS_DIR, file ), tmpFile );
 				tmpFiles.push( tmpFile );
 			}
 
@@ -710,9 +672,7 @@ test.describe( 'Client-side media processing', () => {
 			await expect( imageBlock ).toBeVisible();
 
 			await mediaProcessingUtils.upload(
-				imageBlock.locator(
-					'data-testid=form-file-upload-input'
-				),
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
 				'1024x768_e2e_test_image_size.jpeg'
 			);
 
@@ -785,7 +745,6 @@ test.describe( 'Client-side media processing', () => {
 
 	test.describe( 'MIME types and format conversion', () => {
 		test( 'should upload JPEG images', async ( {
-			page,
 			editor,
 			mediaProcessingUtils,
 			requestUtils,
@@ -799,9 +758,7 @@ test.describe( 'Client-side media processing', () => {
 			);
 
 			await mediaProcessingUtils.upload(
-				imageBlock.locator(
-					'data-testid=form-file-upload-input'
-				),
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
 				'1024x768_e2e_test_image_size.jpeg'
 			);
 
@@ -825,7 +782,6 @@ test.describe( 'Client-side media processing', () => {
 		} );
 
 		test( 'should upload PNG images', async ( {
-			page,
 			editor,
 			mediaProcessingUtils,
 			requestUtils,
@@ -839,9 +795,7 @@ test.describe( 'Client-side media processing', () => {
 			);
 
 			await mediaProcessingUtils.upload(
-				imageBlock.locator(
-					'data-testid=form-file-upload-input'
-				),
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
 				'200x150_e2e_test_image_opaque.png'
 			);
 
@@ -865,7 +819,6 @@ test.describe( 'Client-side media processing', () => {
 		} );
 
 		test( 'should upload GIF images', async ( {
-			page,
 			editor,
 			mediaProcessingUtils,
 			requestUtils,
@@ -879,9 +832,7 @@ test.describe( 'Client-side media processing', () => {
 			);
 
 			await mediaProcessingUtils.upload(
-				imageBlock.locator(
-					'data-testid=form-file-upload-input'
-				),
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
 				'100x80_e2e_test_image_animated.gif'
 			);
 
@@ -1072,7 +1023,6 @@ test.describe( 'Client-side media processing', () => {
 
 	test.describe( 'Special image handling', () => {
 		test( 'should preserve transparency in PNG uploads', async ( {
-			page,
 			editor,
 			mediaProcessingUtils,
 			requestUtils,
@@ -1087,9 +1037,7 @@ test.describe( 'Client-side media processing', () => {
 			await expect( imageBlock ).toBeVisible();
 
 			await mediaProcessingUtils.upload(
-				imageBlock.locator(
-					'data-testid=form-file-upload-input'
-				),
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
 				'200x150_e2e_test_image_transparent.png'
 			);
 
@@ -1114,7 +1062,6 @@ test.describe( 'Client-side media processing', () => {
 		} );
 
 		test( 'should auto-rotate images based on EXIF orientation', async ( {
-			page,
 			editor,
 			mediaProcessingUtils,
 			requestUtils,
@@ -1131,9 +1078,7 @@ test.describe( 'Client-side media processing', () => {
 			// Upload image with EXIF orientation=6 (90 degrees CW).
 			// Original pixel dimensions are 1024x768 but after rotation should be 768x1024.
 			await mediaProcessingUtils.upload(
-				imageBlock.locator(
-					'data-testid=form-file-upload-input'
-				),
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
 				'1024x768_e2e_test_image_rotated.jpeg'
 			);
 
@@ -1160,7 +1105,6 @@ test.describe( 'Client-side media processing', () => {
 		} );
 
 		test( 'should handle oversized images', async ( {
-			page,
 			editor,
 			mediaProcessingUtils,
 			requestUtils,
@@ -1176,9 +1120,7 @@ test.describe( 'Client-side media processing', () => {
 
 			// Upload 5000x4000 image, well above the 2560 threshold.
 			await mediaProcessingUtils.upload(
-				imageBlock.locator(
-					'data-testid=form-file-upload-input'
-				),
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
 				'5000x4000_e2e_test_image_oversized.jpeg'
 			);
 
@@ -1204,7 +1146,6 @@ test.describe( 'Client-side media processing', () => {
 		} );
 
 		test( 'should not modify images below threshold', async ( {
-			page,
 			editor,
 			mediaProcessingUtils,
 			requestUtils,
@@ -1220,9 +1161,7 @@ test.describe( 'Client-side media processing', () => {
 
 			// Upload 1024x768, well below the 2560 threshold.
 			await mediaProcessingUtils.upload(
-				imageBlock.locator(
-					'data-testid=form-file-upload-input'
-				),
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
 				'1024x768_e2e_test_image_size.jpeg'
 			);
 

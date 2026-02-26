@@ -436,6 +436,7 @@ function createAnimatedGIF( width, height ) {
 		// Pack bits: clear(3 bits) + color(3 bits) + eoi(3 bits) = 9 bits minimum.
 		// Actually need to fit the pixel count of width*height pixels.
 		const pixels = width * height;
+		/** @type {Array<number>} */
 		const bits = [];
 
 		// Push clear code (3 bits for min code size 2).
@@ -471,12 +472,25 @@ function createAnimatedGIF( width, height ) {
 	return Buffer.concat( parts );
 }
 
+/**
+ * Pushes individual bits of a value into a bit array (LSB first).
+ *
+ * @param {Array<number>} bits  Target bit array.
+ * @param {number}        value Value to decompose.
+ * @param {number}        count Number of bits to push.
+ */
 function pushBits( bits, value, count ) {
 	for ( let i = 0; i < count; i++ ) {
 		bits.push( ( value >> i ) & 1 );
 	}
 }
 
+/**
+ * Converts a bit array to a byte array.
+ *
+ * @param {Array<number>} bits Source bit array.
+ * @return {Array<number>} Byte array.
+ */
 function bitsToBytes( bits ) {
 	const bytes = [];
 	for ( let i = 0; i < bits.length; i += 8 ) {

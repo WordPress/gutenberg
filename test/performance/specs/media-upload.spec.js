@@ -229,3 +229,5 @@ test.describe( 'Media Upload Performance', () => {
 		}
 	} );
 } );
+
+/* eslint-enable playwright/expect-expect */
