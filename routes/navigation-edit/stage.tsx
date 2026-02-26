@@ -1,12 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useParams } from '@wordpress/route';
-import { Page, Breadcrumbs } from '@wordpress/admin-ui';
+import { useParams, useNavigate } from '@wordpress/route';
+import { Page } from '@wordpress/admin-ui';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
+import { Button, __experimentalHStack as HStack } from '@wordpress/components';
+import { chevronLeft } from '@wordpress/icons';
 import type { Post } from '@wordpress/core-data';
 
 /**
@@ -18,6 +20,7 @@ const NAVIGATION_POST_TYPE = 'wp_navigation';
 
 function NavigationEditStage() {
 	const { id } = useParams( { from: '/navigation/edit/$id' } );
+	const navigate = useNavigate();
 	const navigationId = parseInt( id );
 	const { navigationMenu } = useSelect(
 		( select ) => {
@@ -43,20 +46,18 @@ function NavigationEditStage() {
 
 	return (
 		<Page
-			ariaLabel={ decodeEntities( menuTitle ) }
-			breadcrumbs={
-				<Breadcrumbs
-					items={ [
-						{
-							label: __( 'Navigation' ),
-							to: '/navigation/list',
-						},
-						{
-							label: decodeEntities( menuTitle ),
-						},
-					] }
-				/>
+			title={
+				<HStack spacing={ 2 } alignment="center">
+					<Button
+						icon={ chevronLeft }
+						label={ __( 'Back to Navigation' ) }
+						size="compact"
+						onClick={ () => navigate( { to: '/navigation/list' } ) }
+					/>
+					<span>{ decodeEntities( menuTitle ) }</span>
+				</HStack>
 			}
+			subTitle={ __( 'Edit the navigation menu.' ) }
 			hasPadding
 		>
 			<NavigationMenuEditor id={ navigationId } />
