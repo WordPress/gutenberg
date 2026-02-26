@@ -269,6 +269,7 @@ function _gutenberg_validate_connector_keys_in_rest( WP_REST_Response $response,
 	$response->set_data( $data );
 	return $response;
 }
+remove_filter( 'rest_post_dispatch', '_wp_connectors_validate_keys_in_rest', 10 );
 add_filter( 'rest_post_dispatch', '_gutenberg_validate_connector_keys_in_rest', 10, 3 );
 
 // --- Registration ---
@@ -299,6 +300,7 @@ function _gutenberg_register_default_connector_settings(): void {
 		add_filter( "option_{$option_name}", $config['mask'] );
 	}
 }
+remove_action( 'init', '_wp_register_default_connector_settings' );
 add_action( 'init', '_gutenberg_register_default_connector_settings' );
 
 /**
@@ -320,4 +322,5 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 		}
 	}
 }
+remove_action( 'init', '_wp_connectors_pass_default_keys_to_ai_client' );
 add_action( 'init', '_gutenberg_pass_default_connector_keys_to_ai_client' );
