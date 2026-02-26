@@ -146,8 +146,8 @@ $-accent-color: var(--wp-admin-theme-color, #3858e9);
 	align-items: center;
 	justify-content: center;
 	z-index: 1;
-	color: $black;
-	fill: $black;
+	color: $gray-900;
+	fill: $gray-900;
 
 	.is-small > & {
 		width: $button-size-small;

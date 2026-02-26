@@ -289,6 +289,31 @@ describe( 'Avatar', () => {
 	} );
 
 	describe( 'image loading', () => {
+		it( 'should reset to loading state when src changes', () => {
+			const { rerender } = render(
+				<Avatar
+					data-testid="avatar"
+					name="Jane Doe"
+					src="https://example.com/a.jpg"
+				/>
+			);
+			fireEvent.load( screen.getByAltText( '' ) );
+			expect( screen.getByTestId( 'avatar' ) ).toHaveClass( 'has-src' );
+
+			rerender(
+				<Avatar
+					data-testid="avatar"
+					name="Jane Doe"
+					src="https://example.com/b.jpg"
+				/>
+			);
+			// New src should reset to loading — initials visible again.
+			expect( screen.getByTestId( 'avatar' ) ).not.toHaveClass(
+				'has-src'
+			);
+			expect( screen.getByText( 'JD' ) ).toBeInTheDocument();
+		} );
+
 		it( 'should show initials while image is loading', () => {
 			render(
 				<Avatar
