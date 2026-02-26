@@ -77,6 +77,7 @@ import ManageMenusButton from './manage-menus-button';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
+import AddSubmenuItemFill from './leaf-more-menu';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
@@ -1045,6 +1046,7 @@ function Navigation( {
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider uniqueId={ recursionId }>
+				<AddSubmenuItemFill />
 				{ blockEditingMode === 'default' && stylingInspectorControls }
 				{ blockEditingMode === 'contentOnly' && isEntityAvailable && (
 					<NavigationAddPageButton clientId={ clientId } />

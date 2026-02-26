@@ -2,26 +2,19 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
+import { addSubmenu } from '@wordpress/icons';
+import { MenuItem } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import {
-	addSubmenu,
-	chevronUp,
-	chevronDown,
-	moreVertical,
-} from '@wordpress/icons';
-import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
-import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
+	BlockSettingsMenuControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { DEFAULT_BLOCK } from '../constants';
-
-const POPOVER_PROPS = {
-	className: 'block-editor-block-settings-menu__popover',
-	placement: 'bottom-start',
-};
 
 const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [
 	'core/navigation-link',
@@ -38,14 +31,18 @@ function AddSubmenuItem( {
 	const { insertBlock, replaceBlock, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
 
+	if (
+		! block ||
+		! BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.includes( block.name )
+	) {
+		return null;
+	}
+
 	const clientId = block.clientId;
-	const isDisabled = ! BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.includes(
-		block.name
-	);
+
 	return (
 		<MenuItem
 			icon={ addSubmenu }
-			disabled={ isDisabled }
 			onClick={ () => {
 				const updateSelectionOnInsert = false;
 				const newLink = createBlock(
@@ -86,10 +83,12 @@ function AddSubmenuItem( {
 				// This call sets the local List View state for the "last inserted block".
 				// This is required for the Nav Block to determine whether or not to display
 				// the Link UI for this new block.
-				setInsertedBlock( newLink );
+				if ( setInsertedBlock ) {
+					setInsertedBlock( newLink );
+				}
 
-				if ( ! expandedState[ block.clientId ] ) {
-					expand( block.clientId );
+				if ( expandedState && expand && ! expandedState[ clientId ] ) {
+					expand( clientId );
 				}
 				onClose();
 			} }
@@ -99,78 +98,10 @@ function AddSubmenuItem( {
 	);
 }
 
-export default function LeafMoreMenu( props ) {
-	const { block } = props;
-	const { clientId } = block;
-
-	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
-		useDispatch( blockEditorStore );
-
-	const removeLabel = sprintf(
-		/* translators: %s: block name */
-		__( 'Remove %s' ),
-		BlockTitle( { clientId, maximumLength: 25 } )
-	);
-
-	const rootClientId = useSelect(
-		( select ) => {
-			const { getBlockRootClientId } = select( blockEditorStore );
-
-			return getBlockRootClientId( clientId );
-		},
-		[ clientId ]
-	);
-
+export default function AddSubmenuItemFill() {
 	return (
-		<DropdownMenu
-			icon={ moreVertical }
-			label={ __( 'Options' ) }
-			className="block-editor-block-settings-menu"
-			popoverProps={ POPOVER_PROPS }
-			noIcons
-			{ ...props }
-		>
-			{ ( { onClose } ) => (
-				<>
-					<MenuGroup>
-						<MenuItem
-							icon={ chevronUp }
-							onClick={ () => {
-								moveBlocksUp( [ clientId ], rootClientId );
-								onClose();
-							} }
-						>
-							{ __( 'Move up' ) }
-						</MenuItem>
-						<MenuItem
-							icon={ chevronDown }
-							onClick={ () => {
-								moveBlocksDown( [ clientId ], rootClientId );
-								onClose();
-							} }
-						>
-							{ __( 'Move down' ) }
-						</MenuItem>
-						<AddSubmenuItem
-							block={ block }
-							onClose={ onClose }
-							expandedState={ props.expandedState }
-							expand={ props.expand }
-							setInsertedBlock={ props.setInsertedBlock }
-						/>
-					</MenuGroup>
-					<MenuGroup>
-						<MenuItem
-							onClick={ () => {
-								removeBlocks( [ clientId ], false );
-								onClose();
-							} }
-						>
-							{ removeLabel }
-						</MenuItem>
-					</MenuGroup>
-				</>
-			) }
-		</DropdownMenu>
+		<BlockSettingsMenuControls>
+			{ ( fillProps ) => <AddSubmenuItem { ...fillProps } /> }
+		</BlockSettingsMenuControls>
 	);
 }
