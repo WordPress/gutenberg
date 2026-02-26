@@ -82,11 +82,12 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 				artwork: track.image,
 			} )
 			.then( () => {
+				existing.url = track.url;
 				if ( shouldAutoPlay ) {
 					existing.instance.play()?.catch( logPlayError );
 				}
-			} );
-		existing.url = track.url;
+			} )
+			.catch( logPlayError );
 		return;
 	}
 
