@@ -87,7 +87,7 @@
 	},
 	"selectors": {
 		"states": {
-			"@current": ".wp-block-navigation .wp-block-navigation-item.current-menu-item"
+			"@current": ".wp-block-navigation .current-menu-item"
 		}
 	},
 	"editorStyle": "wp-block-navigation-link-editor",
