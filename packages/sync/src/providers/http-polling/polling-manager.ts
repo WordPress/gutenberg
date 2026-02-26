@@ -293,11 +293,13 @@ function toggleVisbilityChange() {
 	const wasActive = isActiveBrowser;
 	isActiveBrowser = document.visibilityState !== 'hidden';
 	if ( isActiveBrowser && ! wasActive ) {
-		// Remove scheduled polling and repoll immediately when reactivated.
-		//
-		// This ensures that any updates by collaborators are immediately reflected
-		// in the document once the browser tab becomes active. Otherwise there would
-		// be a delay of 30 seconds before the updates came through.
+		/*
+		 * Remove scheduled polling and repoll immediately when reactivated.
+		 *
+		 * This ensures that any updates by collaborators are immediately reflected
+		 * in the document once the browser tab becomes active. Otherwise there would
+		 * be a delay of 30 seconds before the updates came through.
+		 */
 		if ( pollingTimeoutId ) {
 			clearTimeout( pollingTimeoutId );
 			pollingTimeoutId = null;
