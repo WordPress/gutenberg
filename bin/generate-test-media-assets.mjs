@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-bitwise */
+
 /**
  * Generate test media assets for client-side media processing E2E tests.
  *
@@ -26,7 +28,6 @@ mkdirSync( ASSETS_DIR, { recursive: true } );
  * @return {Buffer} PNG file buffer.
  */
 function createPNG( width, height, transparent = false ) {
-	const channels = transparent ? 4 : 3;
 	const colorType = transparent ? 6 : 2;
 
 	// Build raw image data (filter byte + pixel data per row).
@@ -128,8 +129,8 @@ function createJPEG( width, height, exif = null ) {
 
 	// JFIF APP0.
 	const jfif = Buffer.from( [
-		0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0x02,
-		0x00, 0x00, 0x48, 0x00, 0x48, 0x00, 0x00,
+		0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0x02, 0x00,
+		0x00, 0x48, 0x00, 0x48, 0x00, 0x00,
 	] );
 	parts.push( jfif );
 
@@ -290,12 +291,7 @@ function createExifOrientation( orientation ) {
 	// Next IFD offset (0 = no more IFDs).
 	const nextIFD = Buffer.alloc( 4, 0 );
 
-	const exifBody = Buffer.concat( [
-		tiff,
-		ifdCount,
-		orientEntry,
-		nextIFD,
-	] );
+	const exifBody = Buffer.concat( [ tiff, ifdCount, orientEntry, nextIFD ] );
 
 	const payload = Buffer.concat( [ exifHeader, exifBody ] );
 
@@ -385,16 +381,20 @@ function createAnimatedGIF( width, height ) {
 	// Global color table (2 entries = 6 bytes).
 	parts.push(
 		Buffer.from( [
-			0xff, 0x00, 0x00, // Red.
-			0x00, 0x00, 0xff, // Blue.
+			0xff,
+			0x00,
+			0x00, // Red.
+			0x00,
+			0x00,
+			0xff, // Blue.
 		] )
 	);
 
 	// Application extension for animation (NETSCAPE2.0).
 	parts.push(
 		Buffer.from( [
-			0x21, 0xff, 0x0b, 0x4e, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50,
-			0x45, 0x32, 0x2e, 0x30, 0x03, 0x01, 0x00, 0x00, 0x00,
+			0x21, 0xff, 0x0b, 0x4e, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50, 0x45,
+			0x32, 0x2e, 0x30, 0x03, 0x01, 0x00, 0x00, 0x00,
 		] )
 	);
 
@@ -458,7 +458,9 @@ function createAnimatedGIF( width, height ) {
 		while ( offset < byteArr.length ) {
 			const blockSize = Math.min( 255, byteArr.length - offset );
 			parts.push( Buffer.from( [ blockSize ] ) );
-			parts.push( Buffer.from( byteArr.slice( offset, offset + blockSize ) ) );
+			parts.push(
+				Buffer.from( byteArr.slice( offset, offset + blockSize ) )
+			);
 			offset += blockSize;
 		}
 
@@ -693,3 +695,4 @@ writeFileSync(
 console.log( '  Created 5000x4000_e2e_test_image_oversized.jpeg' );
 
 console.log( 'Done! All test media assets generated.' );
+/* eslint-enable no-bitwise */

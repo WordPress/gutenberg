@@ -37,7 +37,7 @@ class MediaProcessingUtils {
 	 * Copies the file to a temp directory with a unique name to avoid collisions.
 	 *
 	 * @param {import('@playwright/test').Locator} inputElement File input locator.
-	 * @param {string}                             fileName    File name in the assets directory.
+	 * @param {string}                             fileName     File name in the assets directory.
 	 * @return {Promise<string>} The unique file name (without extension).
 	 */
 	async upload( inputElement, fileName ) {
@@ -93,11 +93,10 @@ class MediaProcessingUtils {
 	 * @return {Promise<number|undefined>} The image attachment ID.
 	 */
 	async getSelectedBlockImageId() {
-		return await this.page.evaluate( () =>
-			window.wp.data
-				.select( 'core/block-editor' )
-				.getSelectedBlock()
-				?.attributes?.id
+		return await this.page.evaluate(
+			() =>
+				window.wp.data.select( 'core/block-editor' ).getSelectedBlock()
+					?.attributes?.id
 		);
 	}
 
@@ -260,9 +259,7 @@ test.describe( 'Client-side media processing', () => {
 			if ( media.filesize ) {
 				// The uploaded file may be slightly larger or smaller depending on processing,
 				// but should not be dramatically larger.
-				expect( media.filesize ).toBeLessThan(
-					originalStats.size * 3
-				);
+				expect( media.filesize ).toBeLessThan( originalStats.size * 3 );
 			}
 		} );
 
@@ -568,9 +565,7 @@ test.describe( 'Client-side media processing', () => {
 				await expect( imageBlock ).toBeVisible();
 
 				await mediaProcessingUtils.upload(
-					imageBlock.locator(
-						'data-testid=form-file-upload-input'
-					),
+					imageBlock.locator( 'data-testid=form-file-upload-input' ),
 					'1024x768_e2e_test_image_size.jpeg'
 				);
 
@@ -578,11 +573,9 @@ test.describe( 'Client-side media processing', () => {
 					name: 'This image has an empty alt attribute',
 				} );
 				await expect( image ).toBeVisible();
-				await expect( image ).toHaveAttribute(
-					'src',
-					/^https?:\/\//,
-					{ timeout: 30_000 }
-				);
+				await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+					timeout: 30_000,
+				} );
 
 				const imageId =
 					await mediaProcessingUtils.getSelectedBlockImageId();
@@ -880,9 +873,7 @@ test.describe( 'Client-side media processing', () => {
 
 				// Upload an opaque PNG (no transparency).
 				await mediaProcessingUtils.upload(
-					imageBlock.locator(
-						'data-testid=form-file-upload-input'
-					),
+					imageBlock.locator( 'data-testid=form-file-upload-input' ),
 					'200x150_e2e_test_image_opaque.png'
 				);
 
@@ -935,9 +926,7 @@ test.describe( 'Client-side media processing', () => {
 
 				// Upload a transparent PNG.
 				await mediaProcessingUtils.upload(
-					imageBlock.locator(
-						'data-testid=form-file-upload-input'
-					),
+					imageBlock.locator( 'data-testid=form-file-upload-input' ),
 					'200x150_e2e_test_image_transparent.png'
 				);
 
@@ -989,9 +978,7 @@ test.describe( 'Client-side media processing', () => {
 				await expect( imageBlock ).toBeVisible();
 
 				await mediaProcessingUtils.upload(
-					imageBlock.locator(
-						'data-testid=form-file-upload-input'
-					),
+					imageBlock.locator( 'data-testid=form-file-upload-input' ),
 					'1024x768_e2e_test_image_size.jpeg'
 				);
 
