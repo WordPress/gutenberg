@@ -8,7 +8,7 @@ import {
 } from '@wordpress/blocks';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { moreVertical } from '@wordpress/icons';
+import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
 import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -74,6 +74,9 @@ export function BlockSettingsDropdown( {
 	clientIds,
 	children,
 	__experimentalSelectBlock,
+	expand,
+	expandedState,
+	setInsertedBlock,
 	...props
 } ) {
 	// Get the client id of the current block for this menu, if one is set.
@@ -88,10 +91,14 @@ export function BlockSettingsDropdown( {
 		isContentOnly,
 		isZoomOut,
 		canEdit,
+		isFirstBlock,
+		isLastBlock,
 	} = useSelect(
 		( select ) => {
 			const {
 				getBlockName,
+				getBlockIndex,
+				getBlockOrder,
 				getBlockRootClientId,
 				getPreviousBlockClientId,
 				getSelectedBlockClientIds,
@@ -107,6 +114,11 @@ export function BlockSettingsDropdown( {
 				getBlockRootClientId( firstBlockClientId );
 			const parentBlockName =
 				_firstParentClientId && getBlockName( _firstParentClientId );
+
+			const lastBlockClientId = clientIds[ clientIds.length - 1 ];
+			const firstBlockIndex = getBlockIndex( firstBlockClientId );
+			const lastBlockIndex = getBlockIndex( lastBlockClientId );
+			const blockOrder = getBlockOrder( _firstParentClientId );
 
 			return {
 				firstParentClientId: _firstParentClientId,
@@ -124,10 +136,15 @@ export function BlockSettingsDropdown( {
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
 				isZoomOut: _isZoomOut(),
 				canEdit: canEditBlock( firstBlockClientId ),
+				isFirstBlock: firstBlockIndex === 0,
+				isLastBlock: lastBlockIndex === blockOrder.length - 1,
 			};
 		},
-		[ firstBlockClientId ]
+		[ firstBlockClientId, clientIds ]
 	);
+
+	const { moveBlocksDown, moveBlocksUp } =
+		useDispatch( blockEditorStore );
 
 	const { getBlockOrder, getSelectedBlockClientIds } =
 		useSelect( blockEditorStore );
@@ -235,6 +252,34 @@ export function BlockSettingsDropdown( {
 									<__unstableBlockSettingsMenuFirstItem.Slot
 										fillProps={ { onClose } }
 									/>
+									<MenuItem
+										icon={ chevronUp }
+										onClick={ () => {
+											moveBlocksUp(
+												clientIds,
+												firstParentClientId
+											);
+											onClose();
+										} }
+										disabled={ isFirstBlock }
+										accessibleWhenDisabled
+									>
+										{ __( 'Move up' ) }
+									</MenuItem>
+									<MenuItem
+										icon={ chevronDown }
+										onClick={ () => {
+											moveBlocksDown(
+												clientIds,
+												firstParentClientId
+											);
+											onClose();
+										} }
+										disabled={ isLastBlock }
+										accessibleWhenDisabled
+									>
+										{ __( 'Move down' ) }
+									</MenuItem>
 									{ shouldShowBlockParentMenuItem && (
 										<BlockParentSelectorMenuItem
 											parentClientId={
@@ -328,16 +373,18 @@ export function BlockSettingsDropdown( {
 										) }
 									</MenuGroup>
 								) }
-								{ ! isContentOnly && (
-									<BlockSettingsMenuControls.Slot
-										fillProps={ {
-											onClose,
-											count,
-											firstBlockClientId,
-										} }
-										clientIds={ clientIds }
-									/>
-								) }
+								<BlockSettingsMenuControls.Slot
+									fillProps={ {
+										onClose,
+										count,
+										firstBlockClientId,
+										block,
+										expand,
+										expandedState,
+										setInsertedBlock,
+									} }
+									clientIds={ clientIds }
+								/>
 								{ typeof children === 'function'
 									? children( { onClose } )
 									: Children.map( ( child ) =>

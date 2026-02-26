@@ -146,7 +146,8 @@
 			}
 		},
 		"interactivity": true,
-		"renaming": false
+		"renaming": false,
+		"listView": true
 	},
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"

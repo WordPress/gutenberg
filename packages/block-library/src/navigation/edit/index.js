@@ -74,10 +74,10 @@ import useCreateNavigationMenu from './use-create-navigation-menu';
 import { useInnerBlocks } from './use-inner-blocks';
 import { detectColors } from './utils';
 import ManageMenusButton from './manage-menus-button';
-import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
+import AddSubmenuItemFill from './leaf-more-menu';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
@@ -962,21 +962,6 @@ function Navigation( {
 					{ __( 'Unsaved Navigation Menu.' ) }
 				</AccessibleDescription>
 
-				<MenuInspectorControls
-					clientId={ clientId }
-					createNavigationMenuIsSuccess={
-						createNavigationMenuIsSuccess
-					}
-					createNavigationMenuIsError={ createNavigationMenuIsError }
-					currentMenuId={ ref }
-					isNavigationMenuMissing={ isNavigationMenuMissing }
-					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
-					onCreateNew={ createUntitledEmptyNavigationMenu }
-					onSelectClassicMenu={ onSelectClassicMenu }
-					onSelectNavigationMenu={ onSelectNavigationMenu }
-					isLoading={ isLoading }
-					blockEditingMode={ blockEditingMode }
-				/>
 				{ blockEditingMode === 'default' && stylingInspectorControls }
 				<ResponsiveWrapper
 					id={ clientId }
@@ -1006,21 +991,6 @@ function Navigation( {
 	if ( ref && isNavigationMenuMissing ) {
 		return (
 			<TagName { ...blockProps }>
-				<MenuInspectorControls
-					clientId={ clientId }
-					createNavigationMenuIsSuccess={
-						createNavigationMenuIsSuccess
-					}
-					createNavigationMenuIsError={ createNavigationMenuIsError }
-					currentMenuId={ ref }
-					isNavigationMenuMissing={ isNavigationMenuMissing }
-					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
-					onCreateNew={ createUntitledEmptyNavigationMenu }
-					onSelectClassicMenu={ onSelectClassicMenu }
-					onSelectNavigationMenu={ onSelectNavigationMenu }
-					isLoading={ isLoading }
-					blockEditingMode={ blockEditingMode }
-				/>
 				<DeletedNavigationWarning
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 				/>
@@ -1076,21 +1046,7 @@ function Navigation( {
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider uniqueId={ recursionId }>
-				<MenuInspectorControls
-					clientId={ clientId }
-					createNavigationMenuIsSuccess={
-						createNavigationMenuIsSuccess
-					}
-					createNavigationMenuIsError={ createNavigationMenuIsError }
-					currentMenuId={ ref }
-					isNavigationMenuMissing={ isNavigationMenuMissing }
-					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
-					onCreateNew={ createUntitledEmptyNavigationMenu }
-					onSelectClassicMenu={ onSelectClassicMenu }
-					onSelectNavigationMenu={ onSelectNavigationMenu }
-					isLoading={ isLoading }
-					blockEditingMode={ blockEditingMode }
-				/>
+				<AddSubmenuItemFill />
 				{ blockEditingMode === 'default' && stylingInspectorControls }
 				{ blockEditingMode === 'contentOnly' && isEntityAvailable && (
 					<NavigationAddPageButton clientId={ clientId } />

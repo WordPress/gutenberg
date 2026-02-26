@@ -15,6 +15,8 @@ import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import deprecated from './deprecated';
+import { NavigationLinkUI } from './edit/navigation-link-ui';
+import NavigationListViewHeader from './edit/navigation-list-view-header';
 
 const { name } = metadata;
 
@@ -71,6 +73,10 @@ export const settings = {
 		}
 
 		return decodeEntities( navigation.title );
+	},
+	listView: {
+		additionalBlockContent: NavigationLinkUI,
+		panelHeader: NavigationListViewHeader,
 	},
 	deprecated,
 };

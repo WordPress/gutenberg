@@ -15,7 +15,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import LeafMoreMenu from './leaf-more-menu';
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
@@ -100,7 +99,6 @@ export default function NavigationMenuContent( { rootClientId } ) {
 				<PrivateListView
 					rootClientId={ listViewRootClientId }
 					onSelect={ offCanvasOnselect }
-					blockSettingsMenu={ LeafMoreMenu }
 					showAppender={ false }
 					isExpanded
 				/>
