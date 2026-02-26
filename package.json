@@ -135,7 +135,7 @@
 		"build:profile-types": "rimraf ./ts-traces && npm run clean:package-types && node ./bin/packages/validate-typescript-version.js && ( tsc --build --extendedDiagnostics --generateTrace ./ts-traces || ( echo 'tsc failed.'; exit 1 ) ) && node ./bin/packages/check-build-type-declaration-files.js && npx --yes @typescript/analyze-trace ts-traces > ts-traces/analysis.txt && node -p \"'\\n\\nDone! Build traces saved to ts-traces/ directory.\\nTrace analysis saved to ts-traces/analysis.txt.'\"",
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
 		"clean:package-types": "tsc --build --clean && rimraf --glob \"./packages/*/build-types\"",
-		"clean:packages": "rimraf --glob \"./packages/*/{build,build-module,build-wp,build-style}\"",
+		"clean:packages": "rimraf --glob \"./packages/*/{build,build-module,build-wp,build-style}\" \"./build\"",
 		"component-usage-stats": "node ./node_modules/react-scanner/bin/react-scanner -c ./react-scanner.config.js",
 		"dev": "node ./bin/dev.mjs",
 		"distclean": "git clean --force -d -X",
