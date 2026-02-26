@@ -2,8 +2,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Composite, Tooltip } from '@wordpress/components';
-import { Icon, check } from '@wordpress/icons';
+import {
+	Dropdown,
+	Button,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	FlexBlock,
+} from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 /**
  * External dependencies
@@ -29,6 +36,13 @@ const BACKGROUND_CLIP_OPTIONS = [
 	},
 ];
 
+const BACKGROUND_POPOVER_PROPS = {
+	placement: 'left-start',
+	offset: 36,
+	shift: true,
+	className: 'block-editor-background-clip-control__popover',
+};
+
 function BackgroundClipPreview( { value } ) {
 	const isText = value === 'text';
 
@@ -37,11 +51,9 @@ function BackgroundClipPreview( { value } ) {
 			aria-hidden="true"
 			className={ clsx( 'block-editor-background-clip-control__preview', {
 				'is-text': isText,
+				'is-padding-box': value === 'padding-box',
+				'is-content-box': value === 'content-box',
 			} ) }
-			style={ {
-				backgroundClip: value,
-				WebkitBackgroundClip: value,
-			} }
 		>
 			{ isText && 'Ab' }
 		</span>
@@ -50,53 +62,107 @@ function BackgroundClipPreview( { value } ) {
 
 function BackgroundClipOption( { label, value, isActive, onSelect } ) {
 	return (
-		<Tooltip text={ label }>
-			<Composite.Item
-				role="option"
-				aria-label={ label }
-				aria-selected={ isActive }
-				className={ clsx(
-					'block-editor-background-clip-control__item',
-					{
-						'is-active': isActive,
-					}
-				) }
-				render={
-					<button
-						className="block-editor-background-clip-control__option"
-						onClick={ onSelect }
-					>
-						<BackgroundClipPreview value={ value } />
-						{ isActive && <Icon icon={ check } /> }
-					</button>
-				}
-			/>
-		</Tooltip>
+		<button
+			role="option"
+			aria-label={ label }
+			aria-selected={ isActive }
+			className={ clsx( 'block-editor-background-clip-control__option', {
+				'is-active': isActive,
+			} ) }
+			onClick={ onSelect }
+		>
+			<BackgroundClipPreview value={ value } />
+			<span className="block-editor-background-clip-control__option-label">
+				{ label }
+			</span>
+		</button>
+	);
+}
+
+function BackgroundClipToggle( { value, toggleProps } ) {
+	const activeOption = BACKGROUND_CLIP_OPTIONS.find(
+		( option ) => option.value === value
+	);
+	const label = activeOption ? activeOption.label : __( 'Border box' );
+
+	return (
+		<Button __next40pxDefaultSize { ...toggleProps }>
+			<HStack className="block-editor-background-clip-control__toggle-inner">
+				<BackgroundClipPreview value={ value || 'border-box' } />
+				<FlexBlock>{ label }</FlexBlock>
+			</HStack>
+		</Button>
 	);
 }
 
 export default function BackgroundClipControl( { value, onChange } ) {
+	const [ isOpen, setIsOpen ] = useState( false );
+
 	return (
-		<Composite
-			role="listbox"
-			className="block-editor-background-clip-control__list"
-			aria-label={ __( 'Background clip' ) }
+		<div
+			className={ clsx(
+				'block-editor-background-clip-control__container',
+				{
+					'is-open': isOpen,
+				}
+			) }
 		>
-			{ BACKGROUND_CLIP_OPTIONS.map( ( option ) => (
-				<BackgroundClipOption
-					key={ option.value }
-					label={ option.label }
-					value={ option.value }
-					isActive={ value === option.value }
-					onSelect={ () =>
-						onChange(
-							value === option.value
-								? undefined
-								: option.value
-						)
-					}
-				/>
-			) ) }
-		</Composite>
+			<Dropdown
+				popoverProps={ BACKGROUND_POPOVER_PROPS }
+				renderToggle={ ( { onToggle, isOpen: dropdownIsOpen } ) => {
+					return (
+						<BackgroundClipToggle
+							value={ value }
+							toggleProps={ {
+								onClick: () => {
+									onToggle();
+									setIsOpen( ! dropdownIsOpen );
+								},
+								className:
+									'block-editor-background-clip-control__dropdown-toggle',
+								'aria-expanded': dropdownIsOpen,
+								'aria-label': __(
+									'Background clipping options'
+								),
+							} }
+						/>
+					);
+				} }
+				onClose={ () => setIsOpen( false ) }
+				renderContent={ () => (
+					<DropdownContentWrapper
+						className="block-editor-background-clip-control__dropdown-content-wrapper"
+						paddingSize="medium"
+					>
+						<VStack spacing={ 2 }>
+							<span className="block-editor-background-clip-control__popover-title">
+								{ __( 'Clipping' ) }
+							</span>
+							<div
+								role="listbox"
+								className="block-editor-background-clip-control__options"
+								aria-label={ __( 'Background clip' ) }
+							>
+								{ BACKGROUND_CLIP_OPTIONS.map( ( option ) => (
+									<BackgroundClipOption
+										key={ option.value }
+										label={ option.label }
+										value={ option.value }
+										isActive={ value === option.value }
+										onSelect={ () =>
+											onChange(
+												value === option.value
+													? undefined
+													: option.value
+											)
+										}
+									/>
+								) ) }
+							</div>
+						</VStack>
+					</DropdownContentWrapper>
+				) }
+			/>
+		</div>
 	);
 }

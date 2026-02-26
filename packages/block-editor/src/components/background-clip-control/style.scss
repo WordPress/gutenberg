@@ -1,66 +1,162 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/colors" as *;
 
-.block-editor-background-clip-control__list {
-	display: flex;
-	gap: 12px;
-	flex-wrap: wrap;
-	padding-bottom: $grid-unit-10;
+.block-editor-background-clip-control__container {
+	border: $border-width solid $gray-300;
+	border-radius: $radius-small;
+	// Full width. ToolsPanel lays out children in a grid.
+	grid-column: 1 / -1;
+	position: relative;
+
+	&.is-open {
+		background-color: $gray-100;
+	}
+
+	.components-dropdown {
+		display: block;
+	}
+}
+
+.block-editor-background-clip-control__dropdown-toggle {
+	cursor: pointer;
+	background: transparent;
+	border: none;
+	height: $button-size-next-default-40px;
+	width: 100%;
+	padding-left: $grid-unit-15;
+	padding-right: $grid-unit-15;
+	color: $gray-900;
+
+	&:hover {
+		color: var(--wp-admin-theme-color);
+	}
+
+	&:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+}
+
+// Popover content
+.block-editor-background-clip-control__dropdown-content-wrapper {
+	min-width: 260px;
+}
+
+.block-editor-background-clip-control__popover-title {
+	font-size: 11px;
+	font-weight: 500;
+	text-transform: uppercase;
+	color: $gray-700;
+}
+
+.block-editor-background-clip-control__options {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: $grid-unit-10;
 }
 
 .block-editor-background-clip-control__option {
 	appearance: none;
-	background: none;
-	color: $gray-800;
-	border: $gray-200 $border-width solid;
+	background: $gray-100;
+	color: $gray-900;
+	border: $border-width solid $gray-200;
 	border-radius: $radius-small;
 	cursor: pointer;
-	display: inline-flex;
+	display: flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	padding: 0;
-	height: $button-size-small + 2 * $border-width;
-	width: $button-size-small + 2 * $border-width;
+	gap: $grid-unit-10;
+	padding: $grid-unit-15;
 	box-sizing: border-box;
-	transform: scale(1);
-	@media not (prefers-reduced-motion) {
-		transition: transform 0.1s ease;
-	}
-	will-change: transform;
 
-	&:focus {
-		border: #{$border-width * 2} solid $gray-700;
+	@media not (prefers-reduced-motion) {
+		transition:
+			border-color 0.1s ease,
+			background-color 0.1s ease;
 	}
 
 	&:hover {
-		transform: scale(1.2);
+		background-color: $gray-200;
+		border-color: $gray-400;
+	}
+
+	&:focus-visible {
+		outline: none;
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+
+	&.is-active {
+		background-color: $white;
+		border-color: var(--wp-admin-theme-color);
+		box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
 	}
 }
 
-.block-editor-background-clip-control__item.is-active
-	.block-editor-background-clip-control__option {
-	border-color: $gray-700;
+.block-editor-background-clip-control__option-label {
+	font-size: 12px;
+	line-height: 1;
 }
 
+// Preview swatch shared styles
 .block-editor-background-clip-control__preview {
-	display: block;
-	width: 20px;
-	height: 20px;
-	border: 3px dashed $gray-400;
-	padding: 2px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
 	border-radius: 2px;
-	background-color: $gray-300;
-	background-clip: border-box; // default, overridden via inline style
+	box-sizing: border-box;
+
+	// Background gradient as the "fill" that gets clipped.
+	background: linear-gradient(135deg, var(--wp-admin-theme-color) 0%, var(--wp-admin-theme-color-darker-20, #{$gray-700}) 100%);
+
+	// Default: border-box — fill extends to border edge.
+	// Show a dashed border to indicate the border area is included.
+	border: 3px dashed rgba(0, 0, 0, 0.15);
+	background-clip: border-box;
+
+	&.is-padding-box {
+		// Fill clips to inside the border — border area is empty.
+		border: 3px dashed $gray-400;
+		background-clip: padding-box;
+	}
+
+	&.is-content-box {
+		// Fill clips to content only — padding and border are empty.
+		border: 3px dashed $gray-400;
+		padding: 4px;
+		background-clip: content-box;
+	}
 
 	&.is-text {
-		font-size: 9px;
-		font-weight: 700;
-		line-height: 20px;
+		font-size: 18px;
+		font-weight: 800;
+		line-height: 1;
 		color: transparent;
 		border: none;
 		padding: 0;
-		background-color: $gray-800;
 		-webkit-background-clip: text;
 		background-clip: text;
+	}
+}
+
+// Smaller preview in the toggle button row.
+.block-editor-background-clip-control__toggle-inner {
+	height: 100%;
+
+	.block-editor-background-clip-control__preview {
+		width: 20px;
+		height: 20px;
+		border-width: 2px;
+		flex-shrink: 0;
+
+		&.is-content-box {
+			padding: 2px;
+			border-width: 2px;
+		}
+
+		&.is-text {
+			font-size: 11px;
+		}
 	}
 }
