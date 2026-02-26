@@ -832,8 +832,8 @@ describe( 'canUser', () => {
 			batch: ( callback ) => callback(),
 		};
 		dispatch = Object.assign( jest.fn(), {
-			receiveUserPermission: jest.fn(),
-			finishResolution: jest.fn(),
+			receiveUserPermissions: jest.fn(),
+			finishResolutions: jest.fn(),
 		} );
 		triggerFetch.mockReset();
 	} );
@@ -859,7 +859,7 @@ describe( 'canUser', () => {
 			parse: false,
 		} );
 
-		expect( dispatch.receiveUserPermission ).not.toHaveBeenCalled();
+		expect( dispatch.receiveUserPermissions ).not.toHaveBeenCalled();
 	} );
 
 	it( 'throws an error when an entity resource object is malformed', async () => {
@@ -888,9 +888,8 @@ describe( 'canUser', () => {
 			parse: false,
 		} );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/media',
-			false
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( { 'create/media': false } )
 		);
 	} );
 
@@ -911,9 +910,8 @@ describe( 'canUser', () => {
 			parse: false,
 		} );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/postType/attachment',
-			false
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( { 'create/postType/attachment': false } )
 		);
 	} );
 
@@ -933,9 +931,8 @@ describe( 'canUser', () => {
 			parse: false,
 		} );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/media',
-			true
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( { 'create/media': true } )
 		);
 	} );
 
@@ -956,9 +953,8 @@ describe( 'canUser', () => {
 			parse: false,
 		} );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/postType/attachment',
-			true
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( { 'create/postType/attachment': true } )
 		);
 	} );
 
@@ -979,9 +975,8 @@ describe( 'canUser', () => {
 			parse: false,
 		} );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/blocks/123',
-			true
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( { 'create/blocks/123': true } )
 		);
 	} );
 
@@ -1006,9 +1001,8 @@ describe( 'canUser', () => {
 			parse: false,
 		} );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/postType/wp_block/123',
-			true
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( { 'create/postType/wp_block/123': true } )
 		);
 	} );
 
@@ -1035,13 +1029,11 @@ describe( 'canUser', () => {
 
 		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/blocks',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'read/blocks',
-			true
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				'create/blocks': true,
+				'read/blocks': true,
+			} )
 		);
 	} );
 
@@ -1076,13 +1068,11 @@ describe( 'canUser', () => {
 
 		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/postType/wp_block',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'read/postType/wp_block',
-			true
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				'create/postType/wp_block': true,
+				'read/postType/wp_block': true,
+			} )
 		);
 	} );
 
@@ -1115,21 +1105,13 @@ describe( 'canUser', () => {
 			'blocks'
 		)( { dispatch, registry, resolveSelect } );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/blocks',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'read/blocks',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'update/blocks',
-			false
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'delete/blocks',
-			false
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				'create/blocks': true,
+				'read/blocks': true,
+				'update/blocks': false,
+				'delete/blocks': false,
+			} )
 		);
 	} );
 
@@ -1168,21 +1150,13 @@ describe( 'canUser', () => {
 
 		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/blocks/123',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'read/blocks/123',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'update/blocks/123',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'delete/blocks/123',
-			true
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				'create/blocks/123': true,
+				'read/blocks/123': true,
+				'update/blocks/123': true,
+				'delete/blocks/123': true,
+			} )
 		);
 	} );
 
@@ -1221,21 +1195,13 @@ describe( 'canUser', () => {
 
 		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/postType/wp_block/123',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'read/postType/wp_block/123',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'update/postType/wp_block/123',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'delete/postType/wp_block/123',
-			true
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				'create/postType/wp_block/123': true,
+				'read/postType/wp_block/123': true,
+				'update/postType/wp_block/123': true,
+				'delete/postType/wp_block/123': true,
+			} )
 		);
 	} );
 } );
