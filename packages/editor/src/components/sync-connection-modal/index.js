@@ -4,7 +4,10 @@
 import { useSelect, select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { serialize } from '@wordpress/blocks';
-import { store as coreDataStore } from '@wordpress/core-data';
+import {
+	store as coreDataStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import {
 	privateApis,
 	store as blockEditorStore,
@@ -27,6 +30,7 @@ import { getSyncErrorMessages } from '../../utils/sync-error-messages';
 import { unlock } from '../../lock-unlock';
 
 const { BlockCanvasCover } = unlock( privateApis );
+const { retrySyncConnection } = unlock( coreDataPrivateApis );
 
 // Debounce time for initial disconnected status to allow connection to establish.
 const INITIAL_DISCONNECTED_DEBOUNCE_MS = 5000;
@@ -168,8 +172,8 @@ export function SyncConnectionModal() {
 					<VStack alignment="center" justify="center" spacing={ 1 }>
 						<Icon fill="#ccc" icon={ errorIcon } size={ 64 } />
 						<h1>{ title }</h1>
-						<p
-							className="editor-sync-connection-modal__retry-countdown"
+						<div
+							className="editor-sync-connection-modal__retry"
 							style={ {
 								visibility:
 									secondsRemaining !== null
@@ -177,8 +181,16 @@ export function SyncConnectionModal() {
 										: 'hidden',
 							} }
 						>
-							{ retryCountdownText }
-						</p>
+							<p className="editor-sync-connection-modal__retry-countdown">
+								{ retryCountdownText }
+							</p>
+							<Button
+								variant="link"
+								onClick={ retrySyncConnection }
+							>
+								{ __( 'Retry now' ) }
+							</Button>
+						</div>
 						<p className="editor-sync-connection-modal__description">
 							{ description }
 						</p>

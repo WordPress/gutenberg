@@ -8,11 +8,13 @@ import {
 	useResolvedSelection,
 } from './hooks/use-post-editor-awareness-state';
 import { lock } from './lock-unlock';
+import { retrySyncConnection } from './sync';
 
 export const privateApis = {};
 lock( privateApis, {
 	useEntityRecordsWithPermissions,
 	RECEIVE_INTERMEDIATE_RESULTS,
+	retrySyncConnection,
 	useActiveCollaborators,
 	useResolvedSelection,
 } );

@@ -37,6 +37,7 @@ type LogFunction = ( message: string, debug?: object ) => void;
 
 interface PollingManager {
 	registerRoom: ( options: RegisterRoomOptions ) => void;
+	retryNow: () => void;
 	unregisterRoom: ( room: string ) => void;
 }
 
@@ -240,6 +241,7 @@ function processDocUpdate(
 }
 
 let isPolling = false;
+let pendingPollTimeout: ReturnType< typeof setTimeout > | null = null;
 let pollInterval = POLLING_INTERVAL_IN_MS;
 let pageHideListenerRegistered = false;
 
@@ -263,6 +265,7 @@ function handlePageHide(): void {
 
 function poll(): void {
 	isPolling = true;
+	pendingPollTimeout = null;
 
 	async function start(): Promise< void > {
 		if ( 0 === roomStates.size ) {
@@ -379,7 +382,7 @@ function poll(): void {
 			} );
 		}
 
-		setTimeout( poll, pollInterval );
+		pendingPollTimeout = setTimeout( poll, pollInterval );
 	}
 
 	// Start polling.
@@ -479,7 +482,23 @@ function unregisterRoom( room: string ): void {
 	}
 }
 
+/**
+ * Immediately retry the sync connection by cancelling any pending backoff
+ * timeout and triggering a new poll. If a request is already in-flight,
+ * the backoff interval is reset so the next scheduled poll fires sooner.
+ */
+function retryNow(): void {
+	pollInterval = POLLING_INTERVAL_IN_MS;
+
+	if ( pendingPollTimeout ) {
+		clearTimeout( pendingPollTimeout );
+		pendingPollTimeout = null;
+		poll();
+	}
+}
+
 export const pollingManager: PollingManager = {
 	registerRoom,
+	retryNow,
 	unregisterRoom,
 };
