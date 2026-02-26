@@ -49,7 +49,6 @@ import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { page } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
-import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -63,7 +62,6 @@ import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 import useNavigationNotice from './use-navigation-notice';
-import OverlayMenuPreview from './overlay-menu-preview';
 import OverlayPanel from './overlay-panel';
 import useConvertClassicToBlockMenu, {
 	CLASSIC_MENU_CONVERSION_ERROR,
@@ -445,8 +443,6 @@ function Navigation( {
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] =
 		useState( false );
 
-	const [ overlayMenuPreview, setOverlayMenuPreview ] = useState( false );
-
 	const {
 		hasResolvedNavigationMenus,
 		isNavigationMenuResolved,
@@ -753,11 +749,6 @@ function Navigation( {
 	const hasManagePermissions =
 		canUserCreateNavigationMenus || canUserUpdateNavigationMenu;
 
-	const overlayMenuPreviewClasses = clsx(
-		'wp-block-navigation__overlay-menu-preview',
-		{ open: overlayMenuPreview }
-	);
-
 	const submenuAccessibilityNotice =
 		! showSubmenuIcon &&
 		submenuVisibility !== 'click' &&
@@ -774,11 +765,6 @@ function Navigation( {
 		}
 		isFirstRender.current = false;
 	}, [ submenuAccessibilityNotice ] );
-
-	const overlayMenuPreviewId = useInstanceId(
-		OverlayMenuPreview,
-		`overlay-menu-preview`
-	);
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -910,12 +896,8 @@ function Navigation( {
 						overlay={ overlay }
 						setAttributes={ setAttributes }
 						onNavigateToEntityRecord={ onNavigateToEntityRecord }
-						overlayMenuPreview={ overlayMenuPreview }
-						setOverlayMenuPreview={ setOverlayMenuPreview }
 						hasIcon={ hasIcon }
 						icon={ icon }
-						overlayMenuPreviewClasses={ overlayMenuPreviewClasses }
-						overlayMenuPreviewId={ overlayMenuPreviewId }
 						isResponsive={ isResponsive }
 						currentTheme={ currentTheme }
 						hasOverlays={ hasOverlays }
