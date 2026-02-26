@@ -6,7 +6,7 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
 /**
  * Internal dependencies
  */
-import { initWaveformPlayer } from '../utils/waveform-utils';
+import { initWaveformPlayer, logPlayError } from '../utils/waveform-utils';
 
 /**
  * Store player state for each element.
@@ -73,15 +73,22 @@ const { state } = store(
  * @param {Object}  context        - The Interactivity API context.
  */
 function initPlayer( ref, track, shouldAutoPlay, context ) {
-	// Clean up any existing player.
 	const existing = playerState.get( ref );
-	if ( existing ) {
-		existing.destroy();
-		playerState.delete( ref );
-	}
 
-	// Clear any DOM elements from previous player.
-	ref.innerHTML = '';
+	// If a player already exists, load the new track without recreating.
+	if ( existing?.instance ) {
+		existing.instance
+			.loadTrack( track.url, track.title, track.artist, {
+				artwork: track.image,
+			} )
+			.then( () => {
+				if ( shouldAutoPlay ) {
+					existing.instance.play()?.catch( logPlayError );
+				}
+			} );
+		existing.url = track.url;
+		return;
+	}
 
 	// Read translated labels from server-rendered data attributes.
 	const labels = {
@@ -109,9 +116,10 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		},
 	} );
 
-	// Store state for cleanup.
+	// Store state for cleanup, including instance for loadTrack reuse.
 	playerState.set( ref, {
 		url: track.url,
+		instance: player.instance,
 		destroy: player.destroy,
 	} );
 }
