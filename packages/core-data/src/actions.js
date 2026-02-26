@@ -771,6 +771,15 @@ export const saveEntityRecord =
 				} else {
 					let edits = record;
 					if ( entityConfig.__unstablePrePersist ) {
+						// When sync (collaboration) is enabled, Y.Doc updates
+						// are deferred via setTimeout(0). Yield to the event
+						// loop so pending updates are flushed before
+						// __unstablePrePersist serializes the CRDT document.
+						if ( entityConfig.syncConfig ) {
+							await new Promise( ( resolve ) =>
+								setTimeout( resolve, 0 )
+							);
+						}
 						edits = {
 							...edits,
 							...entityConfig.__unstablePrePersist(

@@ -75,4 +75,61 @@ test.describe( 'Collaboration - CRDT persistence', () => {
 			await collaborationUtils.getCrdtDocument( page );
 		expect( persistedCrdtDoc ).toBeFalsy();
 	} );
+
+	test( 'persisted CRDT document matches content after save and reload', async ( {
+		admin,
+		collaborationUtils,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// Create a draft post with initial content.
+		const post = await requestUtils.createPost( {
+			title: 'Persistence Test - Save Reload',
+			content:
+				'<!-- wp:paragraph -->\n<p>Initial content</p>\n<!-- /wp:paragraph -->',
+			status: 'draft',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		// Open the post in the editor.
+		await admin.visitAdminPage(
+			'post.php',
+			`post=${ post.id }&action=edit`
+		);
+		await editor.setPreferences( 'core/edit-post', {
+			welcomeGuide: false,
+			fullscreenMode: false,
+		} );
+
+		// Wait for collaboration runtime and entity record to be ready.
+		await collaborationUtils.waitForEntityReady( page );
+
+		// Edit the paragraph to ensure Y.Doc reflects meaningful changes.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await page.keyboard.press( 'Meta+a' );
+		await page.keyboard.type( 'Updated content' );
+
+		// saveDraft() resolves only after the "Draft saved" notice appears,
+		// so isSavingPost() is already false when it returns.
+		await editor.saveDraft();
+
+		const crdtDocAfterSave =
+			await collaborationUtils.getCrdtDocument( page );
+		expect( crdtDocAfterSave ).toBeTruthy();
+
+		// Reload and wait for entity resolution and any in-flight save to
+		// settle before reading store values.
+		await page.reload();
+		await collaborationUtils.waitForEntityReadyAndSaveSettled( page );
+
+		// The CRDT document must be unchanged after reload. A difference means
+		// the _crdt_document persisted during save was stale (e.g. deferred
+		// Y.Doc updates not yet flushed at serialization time).
+		const crdtDocAfterReload =
+			await collaborationUtils.getCrdtDocument( page );
+		expect( crdtDocAfterReload ).toBe( crdtDocAfterSave );
+	} );
 } );
