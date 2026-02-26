@@ -91,17 +91,17 @@ function _gutenberg_get_real_api_key( string $option_name, callable $mask_callba
 	return $value;
 }
 
-// --- Gemini (Google) ---
+// --- Google ---
 
 /**
- * Masks the Gemini API key on read.
+ * Masks the Google API key on read.
  *
  * @access private
  *
  * @param string $value The raw option value.
  * @return string Masked key or empty string.
  */
-function _gutenberg_mask_gemini_api_key( string $value ): string {
+function _gutenberg_mask_google_api_key( string $value ): string {
 	if ( '' === $value ) {
 		return $value;
 	}
@@ -109,14 +109,14 @@ function _gutenberg_mask_gemini_api_key( string $value ): string {
 }
 
 /**
- * Sanitizes and validates the Gemini API key before saving.
+ * Sanitizes and validates the Google API key before saving.
  *
  * @access private
  *
  * @param string $value The new value.
  * @return string The sanitized value, or empty string if the key is not valid.
  */
-function _gutenberg_sanitize_gemini_api_key( string $value ): string {
+function _gutenberg_sanitize_google_api_key( string $value ): string {
 	$value = sanitize_text_field( $value );
 	if ( '' === $value ) {
 		return $value;
@@ -204,17 +204,17 @@ function _gutenberg_sanitize_anthropic_api_key( string $value ): string {
  */
 function _gutenberg_get_connectors(): array {
 	return array(
-		'connectors_gemini_api_key'    => array(
+		'connectors_ai_google_api_key'    => array(
 			'provider' => 'google',
-			'mask'     => '_gutenberg_mask_gemini_api_key',
-			'sanitize' => '_gutenberg_sanitize_gemini_api_key',
+			'mask'     => '_gutenberg_mask_google_api_key',
+			'sanitize' => '_gutenberg_sanitize_google_api_key',
 		),
-		'connectors_openai_api_key'    => array(
+		'connectors_ai_openai_api_key'    => array(
 			'provider' => 'openai',
 			'mask'     => '_gutenberg_mask_openai_api_key',
 			'sanitize' => '_gutenberg_sanitize_openai_api_key',
 		),
-		'connectors_anthropic_api_key' => array(
+		'connectors_ai_anthropic_api_key' => array(
 			'provider' => 'anthropic',
 			'mask'     => '_gutenberg_mask_anthropic_api_key',
 			'sanitize' => '_gutenberg_sanitize_anthropic_api_key',
