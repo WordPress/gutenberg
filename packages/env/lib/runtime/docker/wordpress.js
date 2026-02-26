@@ -86,6 +86,11 @@ async function configureWordPress( environment, config, spinner ) {
 		'set -eo pipefail',
 		cliConfigCommand,
 		installCommand,
+		// Enable pretty permalinks by default to match what WordPress core
+		// does on a fresh install. The loopback test that WordPress normally
+		// uses to verify pretty permalinks fails in Docker because the CLI
+		// container can't reach the WordPress container at the site URL.
+		`wp rewrite structure '/%year%/%monthnum%/%day%/%postname%/' --hard`,
 	];
 
 	// Bootstrap .htaccess for multisite

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -9,18 +14,21 @@ import {
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	Placeholder,
 } from '@wordpress/components';
 import {
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
 	useBlockEditingMode,
-	store as blockEditorStore,
+	__experimentalUseColorProps as useColorProps,
+	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
+	getDimensionsClassesAndStyles as useDimensionsProps,
 } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import { SVG, Rect, Path } from '@wordpress/primitives';
+import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,50 +36,58 @@ import { useState, useEffect } from '@wordpress/element';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
-import { unlock } from '../lock-unlock';
+
+const IconPlaceholder = ( { className, style } ) => (
+	<SVG
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 60 60"
+		preserveAspectRatio="none"
+		fill="none"
+		aria-hidden="true"
+		className={ clsx( 'wp-block-icon__placeholder', className ) }
+		style={ style }
+	>
+		<Rect width="60" height="60" fill="currentColor" fillOpacity={ 0.1 } />
+		<Path
+			vectorEffect="non-scaling-stroke"
+			stroke="currentColor"
+			strokeOpacity={ 0.25 }
+			d="M60 60 0 0"
+		/>
+	</SVG>
+);
 
 export function Edit( { attributes, setAttributes } ) {
-	const { icon, ariaLabel, style } = attributes;
+	const { icon, ariaLabel } = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
-
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
 
-	const allIcons = useSelect( ( select ) => {
-		return unlock( select( coreDataStore ) ).getIcons();
-	}, [] );
+	const colorProps = useColorProps( attributes );
+	const spacingProps = useSpacingProps( attributes );
+	const borderProps = useBorderProps( attributes );
+	const dimensionsProps = useDimensionsProps( attributes );
 
-	// Is the width value is 0, reset it to the default value.
-	useEffect( () => {
-		if (
-			! style?.dimensions?.width ||
-			parseFloat( style?.dimensions?.width ) === 0
-		) {
-			// To avoid interfering with undo/redo operations any changes in this
-			// effect must not make history and should be preceded by
-			// `__unstableMarkNextChangeAsNotPersistent()`.
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				style: {
-					...style,
-					dimensions: { ...style?.dimensions, width: '12px' },
-				},
-			} );
-		}
-	}, [
-		icon,
-		style,
-		setAttributes,
-		__unstableMarkNextChangeAsNotPersistent,
-	] );
+	const { selectedIcon, allIcons = [] } = useSelect(
+		( select ) => {
+			const { getEntityRecord, getEntityRecords } =
+				select( coreDataStore );
+			return {
+				selectedIcon: icon
+					? getEntityRecord( 'root', 'icon', icon )
+					: null,
+				allIcons: isInserterOpen
+					? getEntityRecords( 'root', 'icon', {
+							per_page: -1,
+					  } )
+					: undefined,
+			};
+		},
+		[ isInserterOpen, icon ]
+	);
 
-	const iconToDisplay =
-		allIcons?.length > 0
-			? allIcons?.find( ( { name } ) => name === icon )?.content
-			: '';
+	const iconToDisplay = selectedIcon?.content || '';
 
 	const blockControls = (
 		<>
@@ -161,13 +177,35 @@ export function Edit( { attributes, setAttributes } ) {
 			{ inspectorControls }
 			<div { ...useBlockProps() }>
 				{ icon ? (
-					<HtmlRenderer html={ iconToDisplay } />
+					<HtmlRenderer
+						html={ iconToDisplay }
+						wrapperProps={ {
+							className: clsx(
+								colorProps.className,
+								borderProps.className,
+								spacingProps.className,
+								dimensionsProps.className
+							),
+							style: {
+								...colorProps.style,
+								...borderProps.style,
+								...spacingProps.style,
+								...dimensionsProps.style,
+							},
+						} }
+					/>
 				) : (
-					<Placeholder
-						withIllustration
+					<IconPlaceholder
+						className={ clsx(
+							borderProps.className,
+							spacingProps.className,
+							dimensionsProps.className
+						) }
 						style={ {
-							height: attributes?.style?.dimensions?.width,
-							width: attributes?.style?.dimensions?.width,
+							...borderProps.style,
+							...spacingProps.style,
+							...dimensionsProps.style,
+							height: 'auto',
 						} }
 					/>
 				) }

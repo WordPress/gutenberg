@@ -500,3 +500,32 @@ export function hideViewportModal() {
 		type: 'HIDE_VIEWPORT_MODAL',
 	};
 }
+
+/**
+ * Requests to open a specific inspector tab, optionally with additional options.
+ * This action signals intent to switch to a particular tab in the block inspector.
+ *
+ * @param {string} tabName             The name of the tab to open (e.g., 'list-view', 'settings', 'styles').
+ * @param {Object} [options]           Optional configuration.
+ * @param {string} [options.openPanel] Client ID of a specific panel to open (for tabs that support panels).
+ *
+ * @return {Object} Action object.
+ */
+export function requestInspectorTab( tabName, options = {} ) {
+	return {
+		type: 'REQUEST_INSPECTOR_TAB',
+		tabName,
+		options,
+	};
+}
+
+/**
+ * Clears the requested inspector tab state after it has been handled.
+ *
+ * @return {Object} Action object.
+ */
+export function clearRequestedInspectorTab() {
+	return {
+		type: 'CLEAR_REQUESTED_INSPECTOR_TAB',
+	};
+}

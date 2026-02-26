@@ -6,12 +6,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import {
-	getDefaultTemplateId,
-	getEntityRecord,
-	type State,
-	type Icon,
-} from './selectors';
+import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
 import { getSyncManager } from './sync';
@@ -40,12 +35,8 @@ type EntityRecordKey = string | number;
  * @return The undo manager.
  */
 export function getUndoManager( state: State ) {
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		// undoManager is undefined until the first sync-enabled entity is loaded.
-		return getSyncManager()?.undoManager ?? state.undoManager;
-	}
-
-	return state.undoManager;
+	// undoManager is undefined until the first sync-enabled entity is loaded.
+	return getSyncManager()?.undoManager ?? state.undoManager;
 }
 
 /**
@@ -312,14 +303,4 @@ export function getEditorSettings(
  */
 export function getEditorAssets( state: State ): Record< string, any > | null {
 	return state.editorAssets;
-}
-
-/**
- * Returns the list of available icons.
- *
- * @param state Data state.
- * @return The list of icons or empty array if not loaded.
- */
-export function getIcons( state: State ): Icon[] {
-	return state.icons ?? [];
 }

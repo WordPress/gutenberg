@@ -21,6 +21,26 @@ import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
 import { NodePackageImporter } from 'sass-embedded';
 
+// Optional dependency: @wordpress/theme provides plugins that inject fallback
+// values for design system tokens. Fails gracefully when the package is not
+// installed (it is an optional peerDependency).
+let dsTokenFallbacks;
+let dsTokenFallbacksJs;
+try {
+	const { default: postcssPlugin } = await import(
+		// eslint-disable-next-line import/no-unresolved
+		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
+	);
+	const { default: esbuildPlugin } = await import(
+		// eslint-disable-next-line import/no-unresolved
+		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
+	);
+	dsTokenFallbacks = postcssPlugin;
+	dsTokenFallbacksJs = esbuildPlugin;
+} catch {
+	// @wordpress/theme is optional; skip token fallbacks if not available.
+}
+
 /**
  * Internal dependencies
  */
@@ -151,8 +171,9 @@ function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 
 		let moduleExports = null;
 
-		// Transform the code: CSS modules and minification.
+		// Transform the code: token fallbacks, CSS modules and minification.
 		const plugins = [
+			dsTokenFallbacks,
 			cssModules &&
 				postcssModules( {
 					generateScopedName: '[contenthash]__[local]',
@@ -174,7 +195,7 @@ function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 			map: false,
 		} );
 
-		let cssModule = `if (typeof document !== 'undefined' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
+		let cssModule = `if (typeof document !== 'undefined' && process.env.NODE_ENV !== 'test' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
 	const style = document.createElement("style");
 	style.setAttribute("data-wp-hash", "${ hash }");
 	style.appendChild(document.createTextNode(${ JSON.stringify( css ) }));
@@ -838,6 +859,9 @@ async function inferStyleDependencies( scriptDependencies, packageName ) {
  * @param {Record<string, string>} replacements PHP template replacements.
  */
 async function generateModuleRegistrationPhp( modules, replacements ) {
+	// Sort modules by ID for deterministic output.
+	modules.sort( ( a, b ) => a.id.localeCompare( b.id ) );
+
 	// Generate modules array for registry
 	const modulesArray = modules
 		.map(
@@ -871,6 +895,9 @@ async function generateModuleRegistrationPhp( modules, replacements ) {
  * @param {Record<string, string>} replacements PHP template replacements.
  */
 async function generateScriptRegistrationPhp( scripts, replacements ) {
+	// Sort scripts by handle for deterministic output.
+	scripts.sort( ( a, b ) => a.handle.localeCompare( b.handle ) );
+
 	// Generate scripts array for registry
 	const scriptsArray = scripts
 		.map(
@@ -917,6 +944,9 @@ async function generateConstantsPhp( replacements ) {
  * @param {Record<string, string>} replacements PHP template replacements.
  */
 async function generateStyleRegistrationPhp( styles, replacements ) {
+	// Sort styles by handle for deterministic output.
+	styles.sort( ( a, b ) => a.handle.localeCompare( b.handle ) );
+
 	// Generate styles array for registry
 	const stylesArray = styles
 		.map(
@@ -1243,6 +1273,11 @@ async function transpilePackage( packageName ) {
 		},
 	};
 	const plugins = [
+		// Note: dsTokenFallbacksJs and emotionPlugin both use esbuild's onLoad
+		// hook, which is non-composable — the first to return contents wins. If a
+		// file contains --wpds-* tokens, the Emotion transform will be skipped.
+		// Avoid using design tokens in Emotion styles until Emotion is removed.
+		dsTokenFallbacksJs,
 		needsEmotionPlugin && emotionPlugin,
 		wasmInlinePlugin,
 		externalizeAllExceptCssPlugin,
@@ -1400,12 +1435,13 @@ async function compileStyles( packageName ) {
 						embedded: true,
 						...getSassOptions( packageDir ),
 						async transform( source ) {
-							// Process with autoprefixer for LTR version
-							const ltrResult = await postcss( [
-								autoprefixer( { grid: true } ),
-							] ).process( source, { from: undefined } );
+							const ltrResult = await postcss(
+								[
+									dsTokenFallbacks,
+									autoprefixer( { grid: true } ),
+								].filter( Boolean )
+							).process( source, { from: undefined } );
 
-							// Process with rtlcss for RTL version
 							const rtlResult = await postcss( [
 								rtlcss(),
 							] ).process( ltrResult.css, { from: undefined } );

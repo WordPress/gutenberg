@@ -439,6 +439,20 @@ function gutenberg_enqueue_latex_to_mathml_loader() {
 	wp_enqueue_script_module( '@wordpress/latex-to-mathml/loader' );
 }
 
+/**
+ * Enqueue the vips loader script module in the block editor.
+ *
+ * This registers @wordpress/vips/worker as a dynamic dependency in the import map,
+ * enabling on-demand loading of the ~3.8MB WASM-based image processing module
+ * when client-side media processing is triggered via @wordpress/upload-media.
+ *
+ * @see packages/vips/src/loader.ts
+ */
+add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_vips_loader' );
+function gutenberg_enqueue_vips_loader() {
+	wp_enqueue_script_module( '@wordpress/vips/loader' );
+}
+
 add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_core_abilities' );
 function gutenberg_enqueue_core_abilities() {
 	wp_enqueue_script_module( '@wordpress/core-abilities' );

@@ -41,6 +41,7 @@ import {
 import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
 import { usePaddingAppender } from './use-padding-appender';
 import { useEditContentOnlySectionExit } from './use-edit-content-only-section-exit';
+import { SyncConnectionModal } from '../sync-connection-modal';
 
 const {
 	LayoutStyle,
@@ -333,6 +334,8 @@ function VisualEditor( {
 		// Disable resizing in zoomed-out mode.
 		! isZoomedOut;
 
+	const isNavigationPreview = postType === NAVIGATION_POST_TYPE && isPreview;
+
 	// Calculate the minimum height including scroll offset to fit all notes.
 	const calculatedMinHeight = useMemo( () => {
 		if ( ! localRef.current ) {
@@ -351,6 +354,8 @@ function VisualEditor( {
 		! isPreview && renderingMode === 'post-only' && ! isDesignPostType
 	);
 
+	const centerContentCSS = `display:flex;align-items:center;justify-content:center;`;
+
 	const iframeStyles = useMemo( () => {
 		return [
 			...( styles ?? [] ),
@@ -365,19 +370,32 @@ function VisualEditor( {
 				}}.is-root-container{display:flow-root;${
 					// Some themes will have `min-height: 100vh` for the root container,
 					// which isn't a requirement in auto resize mode.
-					enableResizing ? 'min-height:0!important;' : ''
+					enableResizing || isNavigationPreview
+						? 'min-height:0!important;'
+						: ''
 				}}
 				${ paddingStyle ? paddingStyle : '' }
 				${
 					enableResizing
-						? `.block-editor-iframe__html{background:var(--wp-editor-canvas-background);display:flex;align-items:center;justify-content:center;min-height:100vh;}.block-editor-iframe__body{width:100%;}`
+						? `.block-editor-iframe__html{background:var(--wp-editor-canvas-background);min-height:100vh;${ centerContentCSS }}.block-editor-iframe__body{width:100%;}`
+						: ''
+				}${
+					isNavigationPreview
+						? `.block-editor-iframe__body{${ centerContentCSS }}`
 						: ''
 				}`,
-				// The CSS above centers the body content vertically when resizing is enabled and applies a background
+				// The CSS for enableResizing centers the body content vertically when resizing is enabled and applies a background
 				// color to the iframe HTML element to match the background color of the editor canvas.
+				// The CSS for isNavigationPreview centers the body content vertically and horizontally when the navigation is in preview mode.
 			},
 		];
-	}, [ styles, enableResizing, calculatedMinHeight, paddingStyle ] );
+	}, [
+		styles,
+		enableResizing,
+		isNavigationPreview,
+		calculatedMinHeight,
+		paddingStyle,
+	] );
 
 	const typewriterRef = useTypewriter();
 	contentRef = useMergeRefs( [
@@ -409,6 +427,7 @@ function VisualEditor( {
 				}
 			) }
 		>
+			<SyncConnectionModal />
 			<ResizableEditor enableResizing={ enableResizing } height="100%">
 				<BlockCanvas
 					shouldIframe={ ! disableIframe }

@@ -28,13 +28,13 @@ import {
 } from './crdt-blocks';
 import { type Post } from '../entity-types/post';
 import { type Type } from '../entity-types';
-import {
-	CRDT_DOC_META_PERSISTENCE_KEY,
-	CRDT_RECORD_MAP_KEY,
-	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-} from '../sync';
+import { CRDT_DOC_META_PERSISTENCE_KEY, CRDT_RECORD_MAP_KEY } from '../sync';
 import type { WPSelection } from '../types';
-import { updateSelectionHistory } from './crdt-selection';
+import {
+	getSelectionHistory,
+	getShiftedSelection,
+	updateSelectionHistory,
+} from './crdt-selection';
 import {
 	createYMap,
 	getRootMap,
@@ -74,6 +74,8 @@ export interface YPostRecord extends YMapRecord {
 	title: Y.Text;
 }
 
+export const POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE = '_crdt_document';
+
 // Properties that are allowed to be synced for a post.
 const allowedPostProperties = new Set< string >( [
 	'author',
@@ -97,7 +99,7 @@ const allowedPostProperties = new Set< string >( [
 
 // Post meta keys that should *not* be synced.
 const disallowedPostMetaKeys = new Set< string >( [
-	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 ] );
 
 /**
@@ -198,7 +200,7 @@ export function applyPostChangesToCRDTDoc(
 				// Draft" template title is not synced.
 				if (
 					key === 'title' &&
-					! currentValue &&
+					! currentValue?.toString() &&
 					'Auto Draft' === rawValue
 				) {
 					rawValue = '';
@@ -413,6 +415,20 @@ export function getPostChangesFromCRDTDoc(
 		changes.meta = {
 			...editedRecord.meta,
 			...allowedMetaChanges,
+		};
+	}
+
+	// When remote content changes are detected, recalculate the local user's
+	// selection using Y.RelativePosition to account for text shifts. The ydoc
+	// has already been updated with remote content at this point, so converting
+	// relative positions to absolute gives corrected offsets. Including the
+	// selection in PostChanges ensures it dispatches atomically with content.
+	const selectionHistory = getSelectionHistory( ydoc );
+	const shiftedSelection = getShiftedSelection( ydoc, selectionHistory );
+	if ( shiftedSelection ) {
+		changes.selection = {
+			...shiftedSelection,
+			initialPosition: 0,
 		};
 	}
 

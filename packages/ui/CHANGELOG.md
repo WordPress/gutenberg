@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Dialog`: Add `--wp-ui-dialog-z-index` CSS custom property for legacy z-index compatibility ([#75874](https://github.com/WordPress/gutenberg/pull/75874)).
+
+### Bug Fixes
+
+-   `IconButton`: Hide tooltip when the button is truly disabled ([#75754](https://github.com/WordPress/gutenberg/pull/75754)).
+
+### Internal
+
+-   Update `@base-ui/react` from 1.0.0 to 1.2.0 ([#75698](https://github.com/WordPress/gutenberg/pull/75698)).
+-   `Input`: Align ref type with upstream widening to `HTMLElement` ([#75698](https://github.com/WordPress/gutenberg/pull/75698)).
+
+## 0.7.0 (2026-02-18)
+
 ### Breaking Changes
 
 -   Remove `Box` component. Components that previously used `Box` should use the equivalent design tokens in their CSS directly ([#74981](https://github.com/WordPress/gutenberg/issues/74981)).
@@ -14,7 +29,10 @@
 
 ### Bug Fixes
 
+-   `Tabs`: Replace hardcoded font values with design tokens on tab buttons ([#75537](https://github.com/WordPress/gutenberg/pull/75537)).
 -   `Field`: Fix default gap spacing ([#75446](https://github.com/WordPress/gutenberg/pull/75446)).
+-   `Button`: Fix disabled styles while `focusableWhenDisabled={false}` ([#75568](https://github.com/WordPress/gutenberg/pull/75568)).
+-   `IconButton`: make icon always `24px` regardless of `size` prop ([#75677](https://github.com/WordPress/gutenberg/pull/75677)).
 
 ### Enhancements
 
@@ -23,6 +41,7 @@
 ### Internal
 
 -   `Button`, `InputLayout`, `Tabs`: use semantic dimension tokens ([#74557](https://github.com/WordPress/gutenberg/pull/74557)).
+-   `Button`: Fix overriding of internal CSS variables ([#75568](https://github.com/WordPress/gutenberg/pull/75568)).
 
 ## 0.6.0 (2026-01-29)
 

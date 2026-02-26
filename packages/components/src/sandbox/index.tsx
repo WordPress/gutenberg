@@ -134,7 +134,7 @@ function SandBox( {
 	onFocus,
 	tabIndex,
 }: SandBoxProps ) {
-	const ref = useRef< HTMLIFrameElement >();
+	const ref = useRef< HTMLIFrameElement >( null );
 	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
 

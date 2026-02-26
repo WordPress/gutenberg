@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/theme",
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"description": "Theme and context provider for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -42,6 +42,21 @@
 			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
 			"import": "./build-module/prebuilt/js/design-tokens.mjs",
 			"default": "./build/prebuilt/js/design-tokens.cjs"
+		},
+		"./postcss-plugins/postcss-ds-token-fallbacks": {
+			"types": "./src/postcss-plugins/postcss-ds-token-fallbacks.d.mts",
+			"import": "./src/postcss-plugins/postcss-ds-token-fallbacks.mjs",
+			"default": "./src/postcss-plugins/postcss-ds-token-fallbacks.mjs"
+		},
+		"./esbuild-plugins/esbuild-ds-token-fallbacks": {
+			"types": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.d.mts",
+			"import": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.mjs",
+			"default": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.mjs"
+		},
+		"./vite-plugins/vite-ds-token-fallbacks": {
+			"types": "./src/vite-plugins/vite-ds-token-fallbacks.d.mts",
+			"import": "./src/vite-plugins/vite-ds-token-fallbacks.mjs",
+			"default": "./src/vite-plugins/vite-ds-token-fallbacks.mjs"
 		},
 		"./stylelint-plugins/no-unknown-ds-tokens": {
 			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.ts",

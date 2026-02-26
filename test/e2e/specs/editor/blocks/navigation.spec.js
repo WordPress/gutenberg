@@ -426,8 +426,9 @@ test.describe( 'Navigation block', () => {
 				await navigation.useLinkShortcut();
 
 				await navigation.addSubmenuPage( 'Dog' );
-				await pageUtils.pressKeys( 'ArrowUp' );
-				await pageUtils.pressKeys( 'ArrowRight' );
+				// Navigate to the Dog link content using ArrowLeft (ArrowUp skips
+				// blocks with nested focusables).
+				await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
 			} );
 
 			await test.step( 'can use the shortcut to open the preview with the keyboard and escape keypress sends focus back to the navigation link block in the submenu', async () => {
@@ -512,8 +513,9 @@ test.describe( 'Navigation block', () => {
 			 */
 			// Exit the toolbar
 			await page.keyboard.press( 'Escape' );
-			// Move to the submenu item
-			await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
+			// Move to the submenu item (only one ArrowUp needed - skips the
+			// submenu wrapper directly to Cat's content)
+			await page.keyboard.press( 'ArrowUp' );
 			await page.keyboard.press( 'Home' );
 
 			// Check we're on our submenu link
@@ -575,9 +577,9 @@ test.describe( 'Navigation block', () => {
 			await navigation.addCustomURL( 'https://wordpress.org' );
 			await navigation.expectToHaveTextSelected( 'wordpress.org' );
 
-			await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
+			// One ArrowUp to get to Dog (skips wrapper)
+			await page.keyboard.press( 'ArrowUp' );
 			await navigation.checkLabelFocus( 'Dog' );
-			await pageUtils.pressKeys( 'ArrowUp', { times: 1 } );
 			await pageUtils.pressKeys( 'access+z' );
 			await pageUtils.pressKeys( 'ArrowDown' );
 			await navigation.checkLabelFocus( 'example.com' );

@@ -97,6 +97,8 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 
 	/**
 	 * The choices for the device type.
+	 * Duplicated in block-editor block-visibility constants and edit-site
+	 * use-viewport-sync. Update all three when adding new viewport types.
 	 *
 	 * @type {Array}
 	 */

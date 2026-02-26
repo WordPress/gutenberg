@@ -61,7 +61,7 @@ function KeyboardShortcuts( {
 	bindGlobal,
 	eventName,
 }: KeyboardShortcutsProps ) {
-	const target = useRef( null );
+	const target = useRef< HTMLDivElement >( null );
 
 	const element = Object.entries( shortcuts ?? {} ).map(
 		( [ shortcut, callback ] ) => (

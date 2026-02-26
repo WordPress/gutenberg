@@ -15,10 +15,10 @@ import { isAppleOS } from '@wordpress/keycodes';
  *
  * @typedef {Object} WPKeyboardShortcutConfig
  *
- * @property {boolean}                      [bindGlobal] Handle keyboard events anywhere including inside textarea/input fields.
- * @property {string}                       [eventName]  Event name used to trigger the handler, defaults to keydown.
- * @property {boolean}                      [isDisabled] Disables the keyboard handler if the value is true.
- * @property {React.RefObject<HTMLElement>} [target]     React reference to the DOM element used to catch the keyboard event.
+ * @property {boolean}                             [bindGlobal] Handle keyboard events anywhere including inside textarea/input fields.
+ * @property {string}                              [eventName]  Event name used to trigger the handler, defaults to keydown.
+ * @property {boolean}                             [isDisabled] Disables the keyboard handler if the value is true.
+ * @property {React.RefObject<HTMLElement | null>} [target]     React reference to the DOM element used to catch the keyboard event.
  */
 
 /**

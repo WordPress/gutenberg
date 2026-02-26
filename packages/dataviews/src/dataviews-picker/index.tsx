@@ -128,7 +128,7 @@ function DataViewsPicker< Item >( {
 	empty,
 }: DataViewsPickerProps< Item > ) {
 	const { infiniteScrollHandler } = paginationInfo;
-	const containerRef = useRef< HTMLDivElement | null >( null );
+	const containerRef = useRef< HTMLDivElement >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver(
 		( resizeObserverEntries: any ) => {
@@ -237,6 +237,7 @@ function DataViewsPicker< Item >( {
 				config,
 				itemListLabel,
 				empty,
+				hasInitiallyLoaded: true,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
 			} }
 		>

@@ -1,5 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
 	"apiVersion": 3,
 	"name": "core/tabs-menu-item",
 	"title": "Tab Menu Item",
@@ -17,32 +18,7 @@
 		"core/tabs-activeTabIndex",
 		"core/tabs-editorActiveTabIndex"
 	],
-	"attributes": {
-		"activeBackgroundColor": {
-			"type": "string"
-		},
-		"customActiveBackgroundColor": {
-			"type": "string"
-		},
-		"activeTextColor": {
-			"type": "string"
-		},
-		"customActiveTextColor": {
-			"type": "string"
-		},
-		"hoverBackgroundColor": {
-			"type": "string"
-		},
-		"customHoverBackgroundColor": {
-			"type": "string"
-		},
-		"hoverTextColor": {
-			"type": "string"
-		},
-		"customHoverTextColor": {
-			"type": "string"
-		}
-	},
+	"attributes": {},
 	"supports": {
 		"html": false,
 		"reusable": false,

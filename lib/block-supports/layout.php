@@ -8,24 +8,23 @@
 /**
  * Get the first style variation name from a className string that matches a registered style.
  *
- * @param string $class_name        CSS class string for a block.
- * @param array  $registered_styles Currently registered block styles.
- *
+ * @param string                              $class_name        CSS class string for a block.
+ * @param array<string, array<string, mixed>> $registered_styles Currently registered block styles.
  * @return string|null The name of the first registered variation, or null if none found.
  */
-function gutenberg_get_variation_name_from_class( $class_name, $registered_styles = array() ) {
-	if ( empty( $class_name ) ) {
+function gutenberg_get_block_style_variation_name_from_registered_style( string $class_name, array $registered_styles = array() ): ?string {
+	if ( ! $class_name ) {
 		return null;
 	}
 
 	$registered_names = array_filter( array_column( $registered_styles, 'name' ) );
 
 	$prefix = 'is-style-';
-	$len    = strlen( $prefix );
+	$length = strlen( $prefix );
 
 	foreach ( explode( ' ', $class_name ) as $class ) {
 		if ( str_starts_with( $class, $prefix ) ) {
-			$variation = substr( $class, $len );
+			$variation = substr( $class, $length );
 			if ( 'default' !== $variation && in_array( $variation, $registered_names, true ) ) {
 				return $variation;
 			}
@@ -938,16 +937,16 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		// Only check the registry if the className contains a variation class to avoid unnecessary lookups.
 		$variation_block_gap_value = null;
 		$block_class_name          = $block['attrs']['className'] ?? '';
-		if ( ! empty( $block_class_name ) && str_contains( $block_class_name, 'is-style-' ) && ! empty( $block_name ) ) {
+		if ( $block_class_name && str_contains( $block_class_name, 'is-style-' ) && $block_name ) {
 			$styles_registry   = WP_Block_Styles_Registry::get_instance();
 			$registered_styles = $styles_registry->get_registered_styles_for_block( $block_name );
-			$variation_name    = gutenberg_get_variation_name_from_class( $block_class_name, $registered_styles );
+			$variation_name    = gutenberg_get_block_style_variation_name_from_registered_style( $block_class_name, $registered_styles );
 			if ( $variation_name ) {
 				$variation_block_gap_value = $global_styles['blocks'][ $block_name ]['variations'][ $variation_name ]['spacing']['blockGap'] ?? null;
 			}
 		}
 
-		$global_block_gap_value = $variation_block_gap_value ?? $global_styles['blocks'][ $block_name ]['spacing']['blockGap'] ?? ( $global_styles['spacing']['blockGap'] ?? null );
+		$global_block_gap_value = $variation_block_gap_value ?? $global_styles['blocks'][ $block_name ]['spacing']['blockGap'] ?? $global_styles['spacing']['blockGap'] ?? null;
 
 		if ( null !== $global_block_gap_value ) {
 			$fallback_gap_value = $global_block_gap_value;
