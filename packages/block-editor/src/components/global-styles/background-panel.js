@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import BackgroundClipControl from '../background-clip-control';
 import BackgroundImageControl from '../background-image-control';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
@@ -27,7 +28,11 @@ const DEFAULT_CONTROLS = {
  * @return {boolean}        Whether site settings has activated background panel.
  */
 export function useHasBackgroundPanel( settings ) {
-	return Platform.OS === 'web' && settings?.background?.backgroundImage;
+	return (
+		Platform.OS === 'web' &&
+		( settings?.background?.backgroundImage ||
+			settings?.background?.backgroundClip )
+	);
 }
 
 /**
@@ -99,8 +104,13 @@ export default function BackgroundImagePanel( {
 	headerLabel = __( 'Background' ),
 } ) {
 	const showBackgroundImageControl = useHasBackgroundPanel( settings );
+	const showBackgroundClipControl = !! settings?.background?.backgroundClip;
 	const resetBackground = () =>
 		onChange( setImmutably( value, [ 'background' ], {} ) );
+	const resetBackgroundClip = () =>
+		onChange(
+			setImmutably( value, [ 'background', 'backgroundClip' ], undefined )
+		);
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
 			...previousValue,
@@ -131,6 +141,21 @@ export default function BackgroundImagePanel( {
 						inheritedValue={ inheritedValue }
 						defaultControls={ defaultControls }
 						defaultValues={ defaultValues }
+					/>
+				</ToolsPanelItem>
+			) }
+			{ showBackgroundClipControl && (
+				<ToolsPanelItem
+					hasValue={ () => !! value?.background?.backgroundClip }
+					label={ __( 'Clipping' ) }
+					onDeselect={ resetBackgroundClip }
+					isShownByDefault={ defaultControls.backgroundClip }
+					panelId={ panelId }
+				>
+					<BackgroundClipControl
+						value={ value }
+						onChange={ onChange }
+						settings={ settings }
 					/>
 				</ToolsPanelItem>
 			) }

@@ -45,7 +45,8 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 		return (
 			!! support?.backgroundImage ||
 			!! support?.backgroundSize ||
-			!! support?.backgroundRepeat
+			!! support?.backgroundRepeat ||
+			!! support?.backgroundClip
 		);
 	}
 
@@ -174,6 +175,9 @@ export function BackgroundImagePanel( {
 			backgroundSize:
 				settings?.background?.backgroundSize &&
 				hasBackgroundSupport( name, 'backgroundSize' ),
+			backgroundClip:
+				settings?.background?.backgroundClip &&
+				hasBackgroundSupport( name, 'backgroundClip' ),
 		},
 	};
 
