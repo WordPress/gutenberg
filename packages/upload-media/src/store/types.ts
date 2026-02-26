@@ -232,6 +232,7 @@ export enum OperationType {
 	Rotate = 'ROTATE',
 	TranscodeImage = 'TRANSCODE_IMAGE',
 	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
+	Finalize = 'FINALIZE',
 }
 
 /**

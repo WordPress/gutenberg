@@ -6,8 +6,10 @@ import { v4 as uuidv4 } from 'uuid';
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
@@ -74,6 +76,7 @@ type ActionCreators = {
 	rotateItem: typeof rotateItem;
 	transcodeImageItem: typeof transcodeImageItem;
 	generateThumbnails: typeof generateThumbnails;
+	finalizeItem: typeof finalizeItem;
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
 	< T = Record< string, unknown > >( args: T ): void;
@@ -380,6 +383,15 @@ export function processItem( id: QueueItemId ) {
 					return;
 				}
 
+				// If parent has pending operations (like Finalize), trigger them.
+				if (
+					parentItem.operations &&
+					parentItem.operations.length > 0
+				) {
+					dispatch.processItem( parentId );
+					return;
+				}
+
 				if ( attachment ) {
 					parentItem.onSuccess?.( [ attachment ] );
 				}
@@ -400,6 +412,14 @@ export function processItem( id: QueueItemId ) {
 			 Do nothing and let the removal happen once the last side-loaded item finishes.
 			 */
 
+			return;
+		}
+
+		// For Finalize, wait until all child sideloads are complete.
+		if (
+			operation === OperationType.Finalize &&
+			select.hasPendingItemsByParentId( id )
+		) {
 			return;
 		}
 
@@ -445,6 +465,10 @@ export function processItem( id: QueueItemId ) {
 
 			case OperationType.ThumbnailGeneration:
 				dispatch.generateThumbnails( id );
+				break;
+
+			case OperationType.Finalize:
+				dispatch.finalizeItem( id );
 				break;
 		}
 	};
@@ -735,7 +759,8 @@ export function prepareItem( id: QueueItemId ) {
 
 			operations.push(
 				OperationType.Upload,
-				OperationType.ThumbnailGeneration
+				OperationType.ThumbnailGeneration,
+				OperationType.Finalize
 			);
 		} else {
 			operations.push( OperationType.Upload );
@@ -863,6 +888,22 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		const addSuffix = Boolean( item.parentId );
 		// Add '-scaled' suffix for big image threshold resizing.
 		const scaledSuffix = Boolean( args.isThresholdResize );
+
+		/**
+		 * Filters the image quality setting for resize/crop operations.
+		 *
+		 * Allows plugins to control the quality (0-1) used when resizing images.
+		 * Note: Quality is not yet wired through to the vips worker but will
+		 * be in a future update. This hook is provided as an extension point.
+		 *
+		 * @param {number} quality Default quality (0-1).
+		 * @param {Object} context Context object containing item, mimeType, and resize args.
+		 */
+		applyFilters( 'editor.media.imageQuality', DEFAULT_OUTPUT_QUALITY, {
+			item,
+			mimeType: item.file.type,
+			resize: args?.resize,
+		} );
 
 		try {
 			const file = await vipsResizeImage(
@@ -1108,6 +1149,33 @@ export function generateThumbnails( id: QueueItemId ) {
 			attachment.missing_image_sizes &&
 			attachment.missing_image_sizes.length > 0
 		) {
+			const settings = select.getSettings();
+			const allImageSizes = settings.allImageSizes || {};
+
+			/**
+			 * Filters the list of image sizes to generate for an uploaded image.
+			 *
+			 * @param {string[]} sizesToGenerate Array of image size names to generate.
+			 * @param {Object}   context         Context object containing item, attachment, and allImageSizes.
+			 */
+			const filteredSizes = applyFilters(
+				'editor.media.imageSizesToGenerate',
+				attachment.missing_image_sizes,
+				{ item, attachment, allImageSizes }
+			);
+			const sizesToGenerate: string[] =
+				Array.isArray( filteredSizes ) &&
+				filteredSizes.every(
+					( size: unknown ) => typeof size === 'string'
+				)
+					? ( filteredSizes as string[] )
+					: ( attachment.missing_image_sizes as string[] );
+
+			if ( sizesToGenerate.length === 0 ) {
+				dispatch.finishOperation( id, {} );
+				return;
+			}
+
 			// Use sourceFile for thumbnail generation to preserve quality.
 			// WordPress core generates thumbnails from the original (unscaled) image.
 			// Vips will auto-rotate based on EXIF orientation during thumbnail generation.
@@ -1116,8 +1184,6 @@ export function generateThumbnails( id: QueueItemId ) {
 				: item.sourceFile;
 			const batchId = uuidv4();
 
-			const settings = select.getSettings();
-			const allImageSizes = settings.allImageSizes || {};
 			const { imageOutputFormats } = settings;
 
 			// Check if thumbnails should be transcoded to a different format.
@@ -1141,7 +1207,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				);
 			}
 
-			for ( const name of attachment.missing_image_sizes ) {
+			for ( const name of sizesToGenerate ) {
 				const imageSize = allImageSizes[ name ];
 				if ( ! imageSize ) {
 					// eslint-disable-next-line no-console
@@ -1237,6 +1303,42 @@ export function generateThumbnails( id: QueueItemId ) {
 					},
 					operations: scaledOperations,
 				} );
+			}
+		}
+
+		dispatch.finishOperation( id, {} );
+	};
+}
+
+/**
+ * Finalizes an uploaded item by calling the server's finalize endpoint.
+ *
+ * This triggers the wp_generate_attachment_metadata filter so that PHP
+ * plugins can process the attachment after all client-side operations
+ * (including thumbnail sideloads) are complete.
+ *
+ * @param id Item ID.
+ */
+export function finalizeItem( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		const attachment = item.attachment;
+
+		// Only finalize if we have an attachment ID.
+		if ( attachment?.id ) {
+			try {
+				await apiFetch( {
+					path: `/wp/v2/media/${ attachment.id }/finalize`,
+					method: 'POST',
+				} );
+			} catch ( error ) {
+				// Log but don't fail the upload if finalization fails.
+				// eslint-disable-next-line no-console
+				console.warn( 'Media finalization failed:', error );
 			}
 		}
 
