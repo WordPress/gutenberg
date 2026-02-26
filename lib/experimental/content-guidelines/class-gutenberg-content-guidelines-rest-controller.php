@@ -314,19 +314,19 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		}
 
 		if ( rest_is_field_included( 'date', $fields ) ) {
-			$data['date'] = mysql_to_rfc3339( $post->post_date );
+			$data['date'] = $this->prepare_date_response( $post->post_date_gmt, $post->post_date );
 		}
 
 		if ( rest_is_field_included( 'date_gmt', $fields ) ) {
-			$data['date_gmt'] = mysql_to_rfc3339( $post->post_date_gmt );
+			$data['date_gmt'] = $this->prepare_date_response( $post->post_date_gmt );
 		}
 
 		if ( rest_is_field_included( 'modified', $fields ) ) {
-			$data['modified'] = mysql_to_rfc3339( $post->post_modified );
+			$data['modified'] = $this->prepare_date_response( $post->post_modified_gmt, $post->post_modified );
 		}
 
 		if ( rest_is_field_included( 'modified_gmt', $fields ) ) {
-			$data['modified_gmt'] = mysql_to_rfc3339( $post->post_modified_gmt );
+			$data['modified_gmt'] = $this->prepare_date_response( $post->post_modified_gmt );
 		}
 
 		if ( rest_is_field_included( 'author', $fields ) ) {
