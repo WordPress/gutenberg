@@ -79,7 +79,10 @@ function BlockQuickNavigationItem( {
 		);
 
 	const blockType = getBlockType( blockName );
-	const displayTitle = useBlockDisplayTitle( { clientId, context: 'list-view' } );
+	const displayTitle = useBlockDisplayTitle( {
+		clientId,
+		context: 'list-view',
+	} );
 	const blockTitle = displayTitle || blockType?.title || blockName;
 	const { selectBlock } = useDispatch( blockEditorStore );
 
