@@ -24,7 +24,11 @@ export default function Header( {
 	showSidebarToggle?: boolean;
 } ) {
 	return (
-		<header className="admin-ui-page__header">
+		<Stack
+			direction="column"
+			className="admin-ui-page__header"
+			render={ <header /> }
+		>
 			<Stack direction="row" justify="space-between" gap="sm">
 				<Stack direction="row" gap="sm" align="center" justify="start">
 					{ showSidebarToggle && (
@@ -53,6 +57,6 @@ export default function Header( {
 			{ subTitle && (
 				<p className="admin-ui-page__header-subtitle">{ subTitle }</p>
 			) }
-		</header>
+		</Stack>
 	);
 }
