@@ -82,7 +82,20 @@ function Avatar( {
 			aria-label={ name || undefined }
 			{ ...props }
 		>
-			<span className="editor-avatar__image">{ ! src && initials }</span>
+			<span
+				className="editor-avatar__image"
+				style={
+					// Safari does not resolve url() inside CSS custom
+					// properties, so set backgroundImage inline.
+					// Skip when dimmed — the dimmed state renders the
+					// image via a ::before pseudo-element instead.
+					src && ! dimmed
+						? { backgroundImage: `url(${ src })` }
+						: undefined
+				}
+			>
+				{ ! src && initials }
+			</span>
 			{ dimmed && !! statusIndicator && (
 				<span className="editor-avatar__status-indicator">
 					<Icon icon={ statusIndicator } />
