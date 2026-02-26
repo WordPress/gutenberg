@@ -240,12 +240,11 @@ function processDocUpdate(
 	}
 }
 
+let areListenersRegistered = false;
 let isPolling = false;
 let isUnloadPending = false;
 let isActiveBrowser = document.visibilityState === 'visible';
 let pollInterval = POLLING_INTERVAL_IN_MS;
-let pageHideListenerRegistered = false;
-let pageVisibilityListenerRegistered = false;
 let pollingTimeoutId: ReturnType< typeof setTimeout > | null = null;
 
 /**
@@ -503,15 +502,11 @@ function registerRoom( {
 	awareness.on( 'change', onAwarenessUpdate );
 	roomStates.set( room, roomState );
 
-	if ( ! pageHideListenerRegistered ) {
+	if ( ! areListenersRegistered ) {
 		window.addEventListener( 'beforeunload', handleBeforeUnload );
 		window.addEventListener( 'pagehide', handlePageHide );
-		pageHideListenerRegistered = true;
-	}
-
-	if ( ! pageVisibilityListenerRegistered ) {
 		document.addEventListener( 'visibilitychange', toggleVisibilityChange );
-		pageVisibilityListenerRegistered = true;
+		areListenersRegistered = true;
 	}
 
 	if ( ! isPolling ) {
@@ -539,18 +534,14 @@ function unregisterRoom( room: string ): void {
 		roomStates.delete( room );
 	}
 
-	if ( roomStates.size === 0 && pageHideListenerRegistered ) {
+	if ( 0 === roomStates.size && areListenersRegistered ) {
 		window.removeEventListener( 'beforeunload', handleBeforeUnload );
 		window.removeEventListener( 'pagehide', handlePageHide );
-		pageHideListenerRegistered = false;
-	}
-
-	if ( roomStates.size === 0 && pageVisibilityListenerRegistered ) {
 		document.removeEventListener(
 			'visibilitychange',
 			toggleVisibilityChange
 		);
-		pageVisibilityListenerRegistered = false;
+		areListenersRegistered = false;
 	}
 }
 
