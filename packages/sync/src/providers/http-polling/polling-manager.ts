@@ -547,11 +547,14 @@ function unregisterRoom( room: string ): void {
 		window.removeEventListener( 'pagehide', handlePageHide );
 		pageHideListenerRegistered = false;
 	}
-}
 
-if ( roomStates.size === 0 && pageVisibilityListenerRegistered ) {
-	document.removeEventListener( 'visibilitychange', toggleVisbilityChange );
-	pageVisibilityListenerRegistered = false;
+	if ( roomStates.size === 0 && pageVisibilityListenerRegistered ) {
+		document.removeEventListener(
+			'visibilitychange',
+			toggleVisbilityChange
+		);
+		pageVisibilityListenerRegistered = false;
+	}
 }
 
 export const pollingManager: PollingManager = {
