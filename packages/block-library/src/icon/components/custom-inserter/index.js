@@ -13,7 +13,7 @@ import IconGrid from './icon-grid';
 import { normalizeSearchInput } from '../../../utils/search-patterns';
 
 export default function CustomInserterModal( {
-	icons,
+	icons = [],
 	setInserterOpen,
 	attributes,
 	setAttributes,

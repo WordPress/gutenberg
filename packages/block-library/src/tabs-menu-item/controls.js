@@ -9,10 +9,7 @@ import clsx from 'clsx';
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	BlockControls,
-	InspectorControls,
 	store as blockEditorStore,
-	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
-	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarItem, Button } from '@wordpress/components';
 import {
@@ -163,32 +160,12 @@ function TabBlockMover( {
 }
 
 export default function Controls( {
-	attributes,
-	setAttributes,
-	clientId,
 	tabsClientId,
 	tabClientId,
 	tabIndex,
 	tabsCount,
 	tabsMenuClientId,
-	activeBackgroundColor,
-	setActiveBackgroundColor,
-	activeTextColor,
-	setActiveTextColor,
-	hoverBackgroundColor,
-	setHoverBackgroundColor,
-	hoverTextColor,
-	setHoverTextColor,
 } ) {
-	const {
-		customActiveBackgroundColor,
-		customActiveTextColor,
-		customHoverBackgroundColor,
-		customHoverTextColor,
-	} = attributes;
-
-	const colorSettings = useMultipleOriginColorsAndGradients();
-
 	return (
 		<>
 			<TabBlockMover
@@ -200,91 +177,6 @@ export default function Controls( {
 			/>
 			<AddTabToolbarControl tabsClientId={ tabsClientId } />
 			<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
-			<InspectorControls group="color">
-				<ColorGradientSettingsDropdown
-					settings={ [
-						{
-							label: __( 'Active background' ),
-							colorValue:
-								activeBackgroundColor?.color ??
-								customActiveBackgroundColor,
-							onColorChange: ( value ) => {
-								setActiveBackgroundColor( value );
-								setAttributes( {
-									customActiveBackgroundColor: value,
-								} );
-							},
-							resetAllFilter: () => {
-								setActiveBackgroundColor( undefined );
-								setAttributes( {
-									customActiveBackgroundColor: undefined,
-								} );
-							},
-							clearable: true,
-						},
-						{
-							label: __( 'Active text' ),
-							colorValue:
-								activeTextColor?.color ?? customActiveTextColor,
-							onColorChange: ( value ) => {
-								setActiveTextColor( value );
-								setAttributes( {
-									customActiveTextColor: value,
-								} );
-							},
-							resetAllFilter: () => {
-								setActiveTextColor( undefined );
-								setAttributes( {
-									customActiveTextColor: undefined,
-								} );
-							},
-							clearable: true,
-						},
-						{
-							label: __( 'Hover background' ),
-							colorValue:
-								hoverBackgroundColor?.color ??
-								customHoverBackgroundColor,
-							onColorChange: ( value ) => {
-								setHoverBackgroundColor( value );
-								setAttributes( {
-									customHoverBackgroundColor: value,
-								} );
-							},
-							resetAllFilter: () => {
-								setHoverBackgroundColor( undefined );
-								setAttributes( {
-									customHoverBackgroundColor: undefined,
-								} );
-							},
-							clearable: true,
-						},
-						{
-							label: __( 'Hover text' ),
-							colorValue:
-								hoverTextColor?.color ?? customHoverTextColor,
-							onColorChange: ( value ) => {
-								setHoverTextColor( value );
-								setAttributes( {
-									customHoverTextColor: value,
-								} );
-							},
-							resetAllFilter: () => {
-								setHoverTextColor( undefined );
-								setAttributes( {
-									customHoverTextColor: undefined,
-								} );
-							},
-							clearable: true,
-						},
-					] }
-					panelId={ clientId }
-					disableCustomColors={ false }
-					__experimentalIsRenderedInSidebar
-					__next40pxDefaultSize
-					{ ...colorSettings }
-				/>
-			</InspectorControls>
 		</>
 	);
 }

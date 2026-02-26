@@ -4,6 +4,18 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Iframed block', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
+	} );
+
 	test.beforeEach( async ( { requestUtils, admin } ) => {
 		await requestUtils.activatePlugin( 'gutenberg-test-iframed-block' );
 		await admin.createNewPost( { postType: 'page' } );

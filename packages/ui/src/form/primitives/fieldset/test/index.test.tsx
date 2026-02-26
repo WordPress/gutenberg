@@ -117,6 +117,12 @@ describe( 'Fieldset', () => {
 				description: 'More details follow.',
 			} )
 		).toBeVisible();
+
+		expect(
+			screen.getByRole( 'link', {
+				name: 'Learn more about these options',
+			} )
+		).toBeVisible();
 	} );
 
 	it( 'forwards className to the details element', () => {

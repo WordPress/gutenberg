@@ -13,7 +13,7 @@ import {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_DOC_VERSION,
 	CRDT_STATE_MAP_KEY,
-	CRDT_STATE_VERSION_KEY,
+	CRDT_STATE_MAP_VERSION_KEY as VERSION_KEY,
 } from '../config';
 
 describe( 'utils', () => {
@@ -44,9 +44,7 @@ describe( 'utils', () => {
 			const ydoc = createYjsDoc( {} );
 			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
 
-			expect( stateMap.get( CRDT_STATE_VERSION_KEY ) ).toBe(
-				CRDT_DOC_VERSION
-			);
+			expect( stateMap.get( VERSION_KEY ) ).toBe( CRDT_DOC_VERSION );
 		} );
 	} );
 
@@ -142,9 +140,7 @@ describe( 'utils', () => {
 			expect( deserialized ).toBeInstanceOf( Y.Doc );
 
 			const stateMap = deserialized!.getMap( CRDT_STATE_MAP_KEY );
-			expect( stateMap.get( CRDT_STATE_VERSION_KEY ) ).toBe(
-				CRDT_DOC_VERSION
-			);
+			expect( stateMap.get( VERSION_KEY ) ).toBe( CRDT_DOC_VERSION );
 		} );
 	} );
 

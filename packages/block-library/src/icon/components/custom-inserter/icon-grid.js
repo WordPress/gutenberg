@@ -12,7 +12,7 @@ import HtmlRenderer from '../../../utils/html-renderer';
 export default function IconGrid( { icons, onChange, attributes } ) {
 	return (
 		<div className="wp-block-icon__inserter-grid">
-			{ icons.length === 0 ? (
+			{ ! icons?.length ? (
 				<div className="wp-block-icon__inserter-grid-no-results">
 					<p>{ __( 'No results found.' ) }</p>
 				</div>
