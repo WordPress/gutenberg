@@ -10,8 +10,19 @@ import { defineConfig, devices } from '@playwright/test';
  */
 import baseConfig from '@wordpress/scripts/config/playwright.config.js';
 
+// The Playground runtime (WASM PHP) is ~3x slower than Docker.
+// Scale up timeouts to avoid false negatives in CI.
+const timeoutMultiplier = process.env.TIMEOUT_MULTIPLIER
+	? Number( process.env.TIMEOUT_MULTIPLIER )
+	: 1;
+
 const config = defineConfig( {
 	...baseConfig,
+	timeout: ( baseConfig.timeout ?? 100_000 ) * timeoutMultiplier,
+	expect: {
+		...baseConfig.expect,
+		timeout: ( baseConfig.expect?.timeout ?? 5_000 ) * timeoutMultiplier,
+	},
 	webServer: {
 		...baseConfig.webServer,
 		command: 'npm run wp-env-test -- start',
@@ -23,6 +34,11 @@ const config = defineConfig( {
 	globalSetup: fileURLToPath(
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
 	),
+	use: {
+		...baseConfig.use,
+		actionTimeout:
+			( baseConfig.use?.actionTimeout ?? 10_000 ) * timeoutMultiplier,
+	},
 	projects: [
 		{
 			name: 'chromium',
