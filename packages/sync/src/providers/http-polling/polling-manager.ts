@@ -284,12 +284,12 @@ function handlePageHide(): void {
  * Toggle visibility state of browser tab.
  *
  * Used to trigger a slow down of the collaboration syncs when the
- * browser tab becomes inactive (either the user swtiches tabs or the
- * screen saveer comes on).
+ * browser tab becomes inactive (either the user switches tabs or the
+ * screen saver comes on).
  *
  * Fires on the document's visibilitychange event.
  */
-function toggleVisbilityChange() {
+function toggleVisibilityChange() {
 	const wasActive = isActiveBrowser;
 	isActiveBrowser = document.visibilityState === 'visible';
 	if ( isActiveBrowser && ! wasActive ) {
@@ -510,7 +510,7 @@ function registerRoom( {
 	}
 
 	if ( ! pageVisibilityListenerRegistered ) {
-		document.addEventListener( 'visibilitychange', toggleVisbilityChange );
+		document.addEventListener( 'visibilitychange', toggleVisibilityChange );
 		pageVisibilityListenerRegistered = true;
 	}
 
@@ -548,7 +548,7 @@ function unregisterRoom( room: string ): void {
 	if ( roomStates.size === 0 && pageVisibilityListenerRegistered ) {
 		document.removeEventListener(
 			'visibilitychange',
-			toggleVisbilityChange
+			toggleVisibilityChange
 		);
 		pageVisibilityListenerRegistered = false;
 	}
