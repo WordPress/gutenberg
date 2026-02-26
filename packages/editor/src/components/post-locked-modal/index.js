@@ -15,6 +15,7 @@ import { useEffect, createInterpolateElement } from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
 import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Internal dependencies
@@ -26,6 +27,7 @@ function PostLockedModal() {
 	const hookName = 'core/editor/post-locked-modal-' + instanceId;
 	const { autosave, updatePostLock } = useDispatch( editorStore );
 	const {
+		hasCollaborationBeenDisabled,
 		isCollaborationEnabled,
 		isLocked,
 		isTakeover,
@@ -47,8 +49,10 @@ function PostLockedModal() {
 			getEditedPostPreviewLink,
 			getEditorSettings,
 		} = select( editorStore );
+		const { isCollaborationDisabled } = unlock( select( coreStore ) );
 		const { getPostType } = select( coreStore );
 		return {
+			hasCollaborationBeenDisabled: isCollaborationDisabled(),
 			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
@@ -197,29 +201,38 @@ function PostLockedModal() {
 				) }
 				<div>
 					{ !! isTakeover && (
-						<p>
-							{ createInterpolateElement(
-								userDisplayName
-									? sprintf(
-											/* translators: %s: user's display name */
-											__(
-												'<strong>%s</strong> now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
-											),
-											userDisplayName
-									  )
-									: __(
-											'Another user now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
-									  ),
-								{
-									strong: <strong />,
-									PreviewLink: (
-										<ExternalLink href={ previewLink }>
-											{ __( 'preview' ) }
-										</ExternalLink>
-									),
-								}
+						<>
+							<p>
+								{ createInterpolateElement(
+									userDisplayName
+										? sprintf(
+												/* translators: %s: user's display name */
+												__(
+													'<strong>%s</strong> now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
+												),
+												userDisplayName
+										  )
+										: __(
+												'Another user now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
+										  ),
+									{
+										strong: <strong />,
+										PreviewLink: (
+											<ExternalLink href={ previewLink }>
+												{ __( 'preview' ) }
+											</ExternalLink>
+										),
+									}
+								) }
+							</p>
+							{ hasCollaborationBeenDisabled && (
+								<p>
+									{ __(
+										'Because this post uses plugins that aren’t compatible with real-time collaboration, only one person can edit at a time.'
+									) }
+								</p>
 							) }
-						</p>
+						</>
 					) }
 					{ ! isTakeover && (
 						<>
@@ -246,6 +259,13 @@ function PostLockedModal() {
 									}
 								) }
 							</p>
+							{ hasCollaborationBeenDisabled && (
+								<p>
+									{ __(
+										'Because this post uses plugins that aren’t compatible with real-time collaboration, only one person can edit at a time.'
+									) }
+								</p>
+							) }
 							<p>
 								{ __(
 									'If you take over, the other user will lose editing control to the post, but their changes will be saved.'

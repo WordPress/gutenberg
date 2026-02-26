@@ -304,3 +304,14 @@ export function getEditorSettings(
 export function getEditorAssets( state: State ): Record< string, any > | null {
 	return state.editorAssets;
 }
+
+/**
+ * Returns whether collaboration has been disabled at runtime
+ * (e.g. due to incompatible meta boxes).
+ *
+ * @param state Data state.
+ * @return Whether collaboration has been disabled.
+ */
+export function isCollaborationDisabled( state: State ): boolean {
+	return state.collaborationDisabled;
+}
