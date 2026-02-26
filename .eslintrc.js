@@ -536,6 +536,12 @@ module.exports = {
 			},
 		},
 		{
+			files: [ 'packages/block-library/src/*/save.[tj]s?(x)' ],
+			rules: {
+				'@wordpress/no-i18n-in-save': 'error',
+			},
+		},
+		{
 			files: [ 'packages/interactivity*/src/**' ],
 			rules: {
 				'react-compiler/react-compiler': 'off',
