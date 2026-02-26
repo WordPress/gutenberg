@@ -298,6 +298,18 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	}
 
 	/**
+	 * Test that unauthenticated users cannot read guidelines.
+	 */
+	public function test_get_items_unauthenticated() {
+		wp_set_current_user( 0 );
+
+		$request  = new WP_REST_Request( 'GET', self::REST_BASE );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_forbidden', $response, 401 );
+	}
+
+	/**
 	 * Test that editors can read guidelines (edit_posts capability).
 	 */
 	public function test_get_items_editor_can_read() {
