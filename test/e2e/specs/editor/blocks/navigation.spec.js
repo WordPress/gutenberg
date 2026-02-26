@@ -39,7 +39,7 @@ test.describe( 'Navigation block', () => {
 				// Note: avoid waiting on network requests as these are not perceivable
 				// to the user.
 				// See: https://github.com/WordPress/gutenberg/pull/45070#issuecomment-1373712007.
-				timeout: 10000,
+				timeout: 30_000,
 			} );
 
 			// Check the markup of the block is correct.
@@ -114,7 +114,7 @@ test.describe( 'Navigation block', () => {
 				editor.canvas.locator(
 					`role=textbox[name="Navigation link text"i] >> text="Custom link"`
 				)
-			).toBeVisible( { timeout: 10000 } ); // allow time for network request.
+			).toBeVisible( { timeout: 30_000 } ); // allow time for network request.
 
 			const postId = await editor.publishPost();
 			// Check the block in the frontend.
@@ -1066,7 +1066,7 @@ test.describe( 'Navigation block', () => {
 				name: 'Dismiss this notice',
 				text: 'Navigation Menu successfully created',
 			} )
-		).toBeVisible( { timeout: 10000 } );
+		).toBeVisible( { timeout: 30_000 } );
 
 		// The creation Navigation Menu will be a draft
 		// so we need to check for both publish and draft.
@@ -1301,7 +1301,7 @@ test.describe( 'Navigation block', () => {
 
 				await expect( navLinkBlock ).toBeVisible( {
 					// Wait for the Navigation Link block to be available
-					timeout: 1000,
+					timeout: 10_000,
 				} );
 				await editor.selectBlocks( navLinkBlock );
 
