@@ -248,7 +248,7 @@ export function BlockSettingsDropdown( {
 											parentBlockType={ parentBlockType }
 										/>
 									) }
-									{ canMove && (
+									{ canMove && isContentOnly && (
 										<>
 											<MenuItem
 												onClick={ pipe( onClose, () => {
