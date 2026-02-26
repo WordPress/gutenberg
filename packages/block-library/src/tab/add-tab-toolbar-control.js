@@ -22,47 +22,48 @@ import { useDispatch, useSelect } from '@wordpress/data';
 export default function AddTabToolbarControl( { tabsClientId } ) {
 	const { insertBlock } = useDispatch( blockEditorStore );
 
-	const { tabPanelClientId, tabsMenuClientId, existingAnchors } = useSelect(
-		( select ) => {
-			if ( ! tabsClientId ) {
+	const { tabPanelClientId, tabsMenuClientId, tabCount, existingAnchors } =
+		useSelect(
+			( select ) => {
+				if ( ! tabsClientId ) {
+					return {
+						tabPanelClientId: null,
+						tabsMenuClientId: null,
+						existingAnchors: [],
+					};
+				}
+				const { getBlocks } = select( blockEditorStore );
+				const innerBlocks = getBlocks( tabsClientId );
+				const tabPanel = innerBlocks.find(
+					( block ) => block.name === 'core/tab-panel'
+				);
+				const tabsMenu = innerBlocks.find(
+					( block ) => block.name === 'core/tabs-menu'
+				);
 				return {
-					tabPanelClientId: null,
-					tabsMenuClientId: null,
-					existingAnchors: [],
+					tabPanelClientId: tabPanel?.clientId || null,
+					tabsMenuClientId: tabsMenu?.clientId || null,
+					tabCount: tabPanel?.innerBlocks?.length || 0,
+					existingAnchors: ( tabPanel?.innerBlocks || [] )
+						.map( ( block ) => block.attributes.anchor )
+						.filter( Boolean ),
 				};
-			}
-			const { getBlocks } = select( blockEditorStore );
-			const innerBlocks = getBlocks( tabsClientId );
-			const tabPanel = innerBlocks.find(
-				( block ) => block.name === 'core/tab-panel'
-			);
-			const tabsMenu = innerBlocks.find(
-				( block ) => block.name === 'core/tabs-menu'
-			);
-			return {
-				tabPanelClientId: tabPanel?.clientId || null,
-				tabsMenuClientId: tabsMenu?.clientId || null,
-				existingAnchors: ( tabPanel?.innerBlocks || [] )
-					.map( ( block ) => block.attributes.anchor )
-					.filter( Boolean ),
-			};
-		},
-		[ tabsClientId ]
-	);
+			},
+			[ tabsClientId ]
+		);
 
 	const addTab = () => {
 		if ( ! tabPanelClientId ) {
 			return;
 		}
 
-		// Find the highest existing tab-N number and increment from there.
-		const tabNumber =
-			existingAnchors.reduce( ( max, anchor ) => {
-				const match = anchor.match( /^tab-(\d+)$/ );
-				return match
-					? Math.max( max, parseInt( match[ 1 ], 10 ) )
-					: max;
-			}, 0 ) + 1;
+		// Start from count + 1 so the label stays sequential, then increment
+		// until the anchor slot is free.
+		const existingAnchorSet = new Set( existingAnchors );
+		let tabNumber = tabCount + 1;
+		while ( existingAnchorSet.has( `tab-${ tabNumber }` ) ) {
+			tabNumber++;
+		}
 
 		const newTabBlock = createBlock( 'core/tab', {
 			anchor: `tab-${ tabNumber }`,

@@ -18,7 +18,6 @@ import { useMemo, useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import slugFromLabel from '../tab/slug-from-label';
 import Controls from './controls';
 
 const EMPTY_ARRAY = [];
@@ -110,18 +109,11 @@ function Edit( {
 
 	const handleLabelChange = useCallback(
 		( newLabel ) => {
-			const newAnchor = slugFromLabel( newLabel, tabIndex );
 			if ( tabClientId ) {
-				updateBlockAttributes( tabClientId, {
-					label: newLabel,
-					anchor: newAnchor,
-				} );
+				updateBlockAttributes( tabClientId, { label: newLabel } );
 			}
-			updateBlockAttributes( clientId, {
-				anchor: `${ newAnchor }-button`,
-			} );
 		},
-		[ tabClientId, clientId, updateBlockAttributes, tabIndex ]
+		[ tabClientId, updateBlockAttributes ]
 	);
 
 	const blockProps = useBlockProps( {
