@@ -242,7 +242,7 @@ function processDocUpdate(
 
 let isPolling = false;
 let isUnloadPending = false;
-let isActiveBrowser = document.visibilityState !== 'hidden';
+let isActiveBrowser = document.visibilityState === 'visible';
 let pollInterval = POLLING_INTERVAL_IN_MS;
 let pageHideListenerRegistered = false;
 let pageVisibilityListenerRegistered = false;
@@ -291,7 +291,7 @@ function handlePageHide(): void {
  */
 function toggleVisbilityChange() {
 	const wasActive = isActiveBrowser;
-	isActiveBrowser = document.visibilityState !== 'hidden';
+	isActiveBrowser = document.visibilityState === 'visible';
 	if ( isActiveBrowser && ! wasActive ) {
 		/*
 		 * Remove scheduled polling and repoll immediately when reactivated.
