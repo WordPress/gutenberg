@@ -6,6 +6,7 @@ import type { View, Filter } from '@wordpress/dataviews';
 type ActiveViewOverrides = {
 	filters?: Filter[];
 	sort?: View[ 'sort' ];
+	layout?: Record< string, unknown >;
 };
 
 /**
@@ -61,6 +62,17 @@ export function mergeActiveViewOverrides(
 		}
 	}
 
+	// Merge layout - override keys always win
+	if ( activeViewOverrides.layout ) {
+		result = {
+			...result,
+			layout: {
+				...( result as any ).layout,
+				...activeViewOverrides.layout,
+			},
+		} as View;
+	}
+
 	return result;
 }
 
@@ -111,6 +123,18 @@ export function stripActiveViewOverrides(
 			...result,
 			sort: defaultView?.sort,
 		};
+	}
+
+	// Strip layout keys managed by overrides
+	if ( activeViewOverrides.layout && 'layout' in result && result.layout ) {
+		const layout = { ...result.layout } as Record< string, unknown >;
+		for ( const key of Object.keys( activeViewOverrides.layout ) ) {
+			delete layout[ key ];
+		}
+		result = {
+			...result,
+			layout: Object.keys( layout ).length > 0 ? layout : undefined,
+		} as View;
 	}
 
 	return result;

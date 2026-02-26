@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import type { View, Filter } from '@wordpress/dataviews';
+import type { View, Filter, SupportedLayouts } from '@wordpress/dataviews';
 
 export interface ViewConfig {
 	/**
@@ -34,7 +34,15 @@ export interface ViewConfig {
 	activeViewOverrides?: {
 		filters?: Filter[];
 		sort?: View[ 'sort' ];
+		layout?: Record< string, unknown >;
 	};
+
+	/**
+	 * Per-layout-type default configuration (e.g. table column styles).
+	 * The layout property for the current view type is treated as an
+	 * active view override: merged on read, stripped before persisting.
+	 */
+	defaultLayouts?: SupportedLayouts;
 
 	/**
 	 * Optional query parameters from URL (page, search)

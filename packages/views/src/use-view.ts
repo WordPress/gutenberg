@@ -8,7 +8,7 @@ import { dequal } from 'dequal';
  */
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import type { View } from '@wordpress/dataviews';
+import type { View, SupportedLayouts } from '@wordpress/dataviews';
 // @ts-ignore - Preferences package is not typed
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -53,6 +53,7 @@ export function useView( config: ViewConfig ): UseViewReturn {
 		name,
 		slug,
 		defaultView,
+		defaultLayouts,
 		activeViewOverrides,
 		queryParams,
 		onChangeQueryParams,
@@ -71,10 +72,26 @@ export function useView( config: ViewConfig ): UseViewReturn {
 	const { set } = useDispatch( preferencesStore );
 
 	const baseView: View = persistedView ?? defaultView;
+
+	// Derive layout override for current view type
+	const layoutOverride = defaultLayouts?.[
+		baseView.type as keyof SupportedLayouts
+	]?.layout as Record< string, unknown > | undefined;
+
+	// Combine caller's activeViewOverrides with the derived layout override
+	const effectiveOverrides = useMemo( () => {
+		if ( ! layoutOverride && ! activeViewOverrides ) {
+			return undefined;
+		}
+		return {
+			...activeViewOverrides,
+			...( layoutOverride ? { layout: layoutOverride } : {} ),
+		};
+	}, [ activeViewOverrides, layoutOverride ] );
 	const page = Number( queryParams?.page ?? baseView.page ?? 1 );
 	const search = queryParams?.search ?? baseView.search ?? '';
 
-	// Merge URL query parameters (page, search) and activeViewOverrides into the view
+	// Merge URL query parameters (page, search) and effective overrides into the view
 	const view: View = useMemo( () => {
 		return mergeActiveViewOverrides(
 			{
@@ -82,10 +99,10 @@ export function useView( config: ViewConfig ): UseViewReturn {
 				page,
 				search,
 			},
-			activeViewOverrides,
+			effectiveOverrides,
 			defaultView
 		);
-	}, [ baseView, page, search, activeViewOverrides, defaultView ] );
+	}, [ baseView, page, search, effectiveOverrides, defaultView ] );
 
 	const isModified = !! persistedView;
 
@@ -96,11 +113,11 @@ export function useView( config: ViewConfig ): UseViewReturn {
 				page: newView?.page,
 				search: newView?.search,
 			};
-			// Strip activeViewOverrides and URL params before persisting
+			// Strip effective overrides and URL params before persisting
 			// Cast is safe: omitting page/search doesn't change the discriminant (type field)
 			const preferenceView = stripActiveViewOverrides(
 				omit( newView, [ 'page', 'search' ] ) as View,
-				activeViewOverrides,
+				effectiveOverrides,
 				defaultView
 			);
 
@@ -112,15 +129,15 @@ export function useView( config: ViewConfig ): UseViewReturn {
 				onChangeQueryParams( urlParams );
 			}
 
-			// Compare with baseView and defaultView after stripping activeViewOverrides
+			// Compare with baseView and defaultView after stripping effective overrides
 			const comparableBaseView = stripActiveViewOverrides(
 				baseView,
-				activeViewOverrides,
+				effectiveOverrides,
 				defaultView
 			);
 			const comparableDefaultView = stripActiveViewOverrides(
 				defaultView,
-				activeViewOverrides,
+				effectiveOverrides,
 				defaultView
 			);
 
@@ -139,7 +156,7 @@ export function useView( config: ViewConfig ): UseViewReturn {
 			search,
 			baseView,
 			defaultView,
-			activeViewOverrides,
+			effectiveOverrides,
 			set,
 			preferenceKey,
 		]
