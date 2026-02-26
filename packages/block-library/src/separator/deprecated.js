@@ -23,6 +23,12 @@ const v2 = {
 			enum: [ 'hr', 'div' ],
 			default: 'hr',
 		},
+		backgroundColor: {
+			type: 'string',
+		},
+		style: {
+			type: 'object',
+		},
 	},
 	save( { attributes } ) {
 		const { backgroundColor, style, opacity, tagName: Tag } = attributes;

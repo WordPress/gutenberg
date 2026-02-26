@@ -5,7 +5,8 @@
 		"attributes": {
 			"backgroundColor": "accent",
 			"opacity": "css",
-			"tagName": "hr"
+			"tagName": "hr",
+			"isDecorative": true
 		},
 		"innerBlocks": []
 	}

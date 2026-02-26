@@ -3,9 +3,9 @@
 		"blockName": "core/separator",
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "\n<hr class=\"wp-block-separator has-alpha-channel-opacity\"/>\n",
+		"innerHTML": "\n<hr class=\"wp-block-separator has-alpha-channel-opacity\" role=\"none\" aria-label=\"\"/>\n",
 		"innerContent": [
-			"\n<hr class=\"wp-block-separator has-alpha-channel-opacity\"/>\n"
+			"\n<hr class=\"wp-block-separator has-alpha-channel-opacity\" role=\"none\" aria-label=\"\"/>\n"
 		]
 	}
 ]

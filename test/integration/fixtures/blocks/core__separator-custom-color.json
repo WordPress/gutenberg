@@ -9,7 +9,8 @@
 				"color": {
 					"background": "#5da54c"
 				}
-			}
+			},
+			"isDecorative": true
 		},
 		"innerBlocks": []
 	}
