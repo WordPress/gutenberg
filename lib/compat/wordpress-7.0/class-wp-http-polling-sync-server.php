@@ -90,6 +90,14 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		}
 
 		/**
+		 * Schema for a stored awareness entry.
+		 *
+		 * @since 7.0.0
+		 * @var array<string, mixed>
+		 */
+		private array $awareness_entry_schema;
+
+		/**
 		 * Registers REST API routes.
 		 *
 		 * @since 7.0.0
@@ -123,8 +131,32 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					'type'     => 'integer',
 				),
 				'awareness' => array(
-					'required' => true,
-					'type'     => array( 'object', 'null' ),
+					'required'             => true,
+					'type'                 => array( 'object', 'null' ),
+					'sanitize_callback'    => static function ( $value ) {
+						if ( null === $value ) {
+							return null;
+						}
+						return (object) $value;
+					},
+					'properties'           => array(
+						'client_id'        => array(
+							'type' => 'integer',
+						),
+						'collaboratorInfo' => array(
+							'type' => 'object',
+						),
+						'editorState'      => array(
+							'type' => 'object',
+						),
+						'state'            => array(
+							'type' => 'object',
+						),
+						'updated_at'       => array(
+							'type' => 'integer',
+						),
+					),
+					'additionalProperties' => false,
 				),
 				'client_id' => array(
 					'minimum'  => 1,
@@ -143,6 +175,8 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					'type'     => 'array',
 				),
 			);
+
+			$this->awareness_entry_schema = $room_args['awareness'];
 
 			register_rest_route(
 				self::REST_NAMESPACE,
@@ -226,7 +260,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			);
 
 			foreach ( $rooms as $room_request ) {
-				$awareness = (object) $room_request['awareness'];
+				$awareness = $room_request['awareness'];
 				$client_id = $room_request['client_id'];
 				$cursor    = $room_request['after'];
 				$room      = $room_request['room'];
@@ -320,17 +354,17 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 *
 		 * @param string                    $room             Room identifier.
 		 * @param int                       $client_id        Client identifier.
-		 * @param object|null               $awareness_update Awareness state sent by the client.
+		 * @param array<string, mixed>|null $awareness_update Awareness state sent by the client.
 		 * @return array<int, array<string, mixed>> Map of client ID to awareness state.
 		 */
-		private function process_awareness_update( string $room, int $client_id, ?object $awareness_update ): array {
+		private function process_awareness_update( string $room, int $client_id, ?array $awareness_update ): array {
 			$existing_awareness = $this->storage->get_awareness_state( $room );
 			$updated_awareness  = array();
 			$current_time       = time();
 
 			foreach ( $existing_awareness as $entry ) {
-				// Skip entries with unexpected structure.
-				if ( ! is_array( $entry ) || ! isset( $entry['client_id'], $entry['state'], $entry['updated_at'] ) ) {
+				// Skip entries that don't match the expected schema.
+				if ( is_wp_error( rest_validate_value_from_schema( $entry, $this->awareness_entry_schema ) ) ) {
 					continue;
 				}
 
