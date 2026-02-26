@@ -306,12 +306,11 @@ export function getEditorAssets( state: State ): Record< string, any > | null {
 }
 
 /**
- * Returns whether collaboration has been disabled at runtime
- * (e.g. due to incompatible meta boxes).
+ * Returns whether collaboration is supported.
  *
  * @param state Data state.
- * @return Whether collaboration has been disabled.
+ * @return Whether collaboration is supported.
  */
-export function isCollaborationDisabled( state: State ): boolean {
-	return state.collaborationDisabled;
+export function isCollaborationSupported( state: State ): boolean {
+	return state.collaborationSupported;
 }

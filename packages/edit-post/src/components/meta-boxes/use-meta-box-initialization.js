@@ -27,7 +27,7 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		} ),
 		[ enabled ]
 	);
-	const { disableCollaboration } = unlock( useDispatch( coreStore ) );
+	const { setCollaborationSupported } = unlock( useDispatch( coreStore ) );
 
 	const { initializeMetaBoxes } = useDispatch( editPostStore );
 	// The effect has to rerun when the editor is ready because initializeMetaBoxes
@@ -38,13 +38,13 @@ export const useMetaBoxInitialization = ( enabled ) => {
 
 			// Disable real-time collaboration when legacy meta boxes are detected.
 			if ( isCollaborationEnabled ) {
-				disableCollaboration();
+				setCollaborationSupported( false );
 			}
 		}
 	}, [
 		isEnabledAndEditorReady,
 		initializeMetaBoxes,
 		isCollaborationEnabled,
-		disableCollaboration,
+		setCollaborationSupported,
 	] );
 };

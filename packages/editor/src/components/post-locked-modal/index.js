@@ -27,7 +27,7 @@ function PostLockedModal() {
 	const hookName = 'core/editor/post-locked-modal-' + instanceId;
 	const { autosave, updatePostLock } = useDispatch( editorStore );
 	const {
-		hasCollaborationBeenDisabled,
+		collaborationSupported,
 		isCollaborationEnabled,
 		isLocked,
 		isTakeover,
@@ -49,10 +49,10 @@ function PostLockedModal() {
 			getEditedPostPreviewLink,
 			getEditorSettings,
 		} = select( editorStore );
-		const { isCollaborationDisabled } = unlock( select( coreStore ) );
+		const { isCollaborationSupported } = unlock( select( coreStore ) );
 		const { getPostType } = select( coreStore );
 		return {
-			hasCollaborationBeenDisabled: isCollaborationDisabled(),
+			collaborationSupported: isCollaborationSupported(),
 			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
@@ -225,7 +225,7 @@ function PostLockedModal() {
 									}
 								) }
 							</p>
-							{ hasCollaborationBeenDisabled && (
+							{ ! collaborationSupported && (
 								<p>
 									{ __(
 										'Because this post uses plugins that aren’t compatible with real-time collaboration, only one person can edit at a time.'
@@ -259,7 +259,7 @@ function PostLockedModal() {
 									}
 								) }
 							</p>
-							{ hasCollaborationBeenDisabled && (
+							{ ! collaborationSupported && (
 								<p>
 									{ __(
 										'Because this post uses plugins that aren’t compatible with real-time collaboration, only one person can edit at a time.'

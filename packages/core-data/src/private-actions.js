@@ -7,7 +7,6 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import { getSyncManager } from './sync';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -162,13 +161,8 @@ export function receiveEditorAssets( assets ) {
 	};
 }
 
-/**
- * Disable real-time collaboration for a given entity record by disconnecting
- * its sync providers.
- */
-export const disableCollaboration =
-	() =>
+export const setCollaborationSupported =
+	( supported ) =>
 	( { dispatch } ) => {
-		dispatch( { type: 'DISABLE_COLLABORATION' } );
-		getSyncManager()?.disable();
+		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
 	};

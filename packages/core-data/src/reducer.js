@@ -688,20 +688,22 @@ export function syncConnectionStatuses( state = {}, action ) {
 }
 
 /**
- * Reducer returning whether collaboration has been disabled at runtime
- * (e.g. due to incompatible meta boxes).
+ * Reducer managing whether collaboration is supported.
+ *
+ * Default to true, as collaboration is supported by default
+ * unless explicitly disabled due to unsupported conditions
+ * such as metaboxes.
  *
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
  *
  * @return {boolean} Updated state.
  */
-export function collaborationDisabled( state = false, action ) {
+export function collaborationSupported( state = true, action ) {
 	switch ( action.type ) {
-		case 'DISABLE_COLLABORATION':
-			return true;
+		case 'SET_COLLABORATION_SUPPORTED':
+			return action.supported;
 	}
-
 	return state;
 }
 
@@ -728,5 +730,5 @@ export default combineReducers( {
 	editorSettings,
 	editorAssets,
 	syncConnectionStatuses,
-	collaborationDisabled,
+	collaborationSupported,
 } );

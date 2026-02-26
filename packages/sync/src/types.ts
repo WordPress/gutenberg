@@ -144,7 +144,6 @@ export interface SyncConfig {
 }
 
 export interface SyncManager {
-	disable: () => void;
 	createPersistedCRDTDoc: (
 		objectType: ObjectType,
 		objectId: ObjectID

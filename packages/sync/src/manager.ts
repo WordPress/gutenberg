@@ -32,7 +32,6 @@ import type {
 	SyncManager,
 	SyncManagerUpdateOptions,
 	SyncUndoManager,
-	ProviderCreatorResult,
 } from './types';
 import { createUndoManager } from './undo-manager';
 import {
@@ -86,11 +85,6 @@ export function createSyncManager( debug = false ): SyncManager {
 	const entityStates: Map< EntityID, EntityState > = new Map();
 
 	/**
-	 * Identifies if the sync manager should be disabled.
-	 */
-	let isDisabled = false;
-
-	/**
 	 * A "sync-aware" undo manager for all synced entities. It is lazily created
 	 * when the first entity is loaded.
 	 *
@@ -120,16 +114,6 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * etc.), so this limitation may be temporary.
 	 */
 	let undoManager: SyncUndoManager | undefined;
-
-	/**
-	 * Disable syncing, unload all entities and collections, and clean up
-	 * providers and in-memory state.
-	 */
-	function disable(): void {
-		isDisabled = true;
-		entityStates.forEach( ( state ) => state.unload() );
-		collectionStates.forEach( ( state ) => state.unload() );
-	}
 
 	/**
 	 * Log debug messages if debugging is enabled.
@@ -185,10 +169,6 @@ export function createSyncManager( debug = false ): SyncManager {
 			return; // Already bootstrapped.
 		}
 
-		if ( isDisabled ) {
-			return; // Syncing has been disabled.
-		}
-
 		log( 'loadEntity', 'loading', entityId );
 
 		handlers = {
@@ -200,8 +180,6 @@ export function createSyncManager( debug = false ): SyncManager {
 			restoreUndoMeta: debugWrap( handlers.restoreUndoMeta ),
 			saveRecord: debugWrap( handlers.saveRecord ),
 		};
-
-		let providerResults: ProviderCreatorResult[] = [];
 
 		const ydoc = createYjsDoc( { objectType } );
 		const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
@@ -287,7 +265,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		log( 'loadEntity', 'connecting', entityId );
 
 		// Create providers for the given entity and its Yjs document.
-		providerResults = await Promise.all(
+		const providerResults = await Promise.all(
 			providerCreators.map( async ( create ) => {
 				const provider = await create( {
 					objectType,
@@ -335,12 +313,6 @@ export function createSyncManager( debug = false ): SyncManager {
 			log( 'loadCollection', 'already loaded', entityId );
 			return; // Already loaded.
 		}
-
-		if ( isDisabled ) {
-			return; // Syncing has been disabled.
-		}
-
-		let providerResults: ProviderCreatorResult[] = [];
 
 		log( 'loadCollection', 'loading', entityId );
 
@@ -396,7 +368,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		log( 'loadCollection', 'connecting', entityId );
 
 		// Create providers for the given entity and its Yjs document.
-		providerResults = await Promise.all(
+		const providerResults = await Promise.all(
 			providerCreators.map( async ( create ) => {
 				const provider = await create( {
 					awareness,
@@ -678,7 +650,6 @@ export function createSyncManager( debug = false ): SyncManager {
 
 	// Wrap and return the public API.
 	return {
-		disable: debugWrap( disable ),
 		createPersistedCRDTDoc: debugWrap( createPersistedCRDTDoc ),
 		getAwareness,
 		load: debugWrap( loadEntity ),
