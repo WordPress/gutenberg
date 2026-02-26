@@ -103,7 +103,7 @@ export default function BackgroundImagePanel( {
 	defaultValues = {},
 	headerLabel = __( 'Background' ),
 } ) {
-	const showBackgroundImageControl = useHasBackgroundPanel( settings );
+	const showBackgroundImageControl = !! settings?.background?.backgroundImage;
 	const showBackgroundClipControl = !! settings?.background?.backgroundClip;
 	const resetBackground = () =>
 		onChange( setImmutably( value, [ 'background' ], {} ) );
@@ -153,8 +153,16 @@ export default function BackgroundImagePanel( {
 					panelId={ panelId }
 				>
 					<BackgroundClipControl
-						value={ value }
-						onChange={ onChange }
+						value={ value?.background?.backgroundClip }
+						onChange={ ( newClip ) => {
+							onChange(
+								setImmutably(
+									value,
+									[ 'background', 'backgroundClip' ],
+									newClip
+								)
+							);
+						} }
 						settings={ settings }
 					/>
 				</ToolsPanelItem>

@@ -157,7 +157,7 @@ export function BackgroundImagePanel( {
 
 	if (
 		! useHasBackgroundPanel( settings ) ||
-		! hasBackgroundSupport( name, 'backgroundImage' )
+		! hasBackgroundSupport( name )
 	) {
 		return null;
 	}
