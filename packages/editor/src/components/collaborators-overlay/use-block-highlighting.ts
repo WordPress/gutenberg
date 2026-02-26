@@ -70,6 +70,10 @@ export function useBlockHighlighting(
 			return;
 		}
 
+		// Capture the ref value so the cleanup closure sees the same Set
+		// even if a later render replaces it.
+		const currentHighlightedIds = highlightedBlockIds.current;
+
 		// Deduplicate by blockId — when multiple collaborators select the
 		// same block, only the first one gets the highlight and avatar label.
 		const seen = new Set< string >();
@@ -118,7 +122,7 @@ export function useBlockHighlighting(
 			blocksToHighlight.map( ( block ) => block.blockId )
 		);
 
-		for ( const blockId of highlightedBlockIds.current ) {
+		for ( const blockId of currentHighlightedIds ) {
 			if ( ! selectedBlockIds.has( blockId ) ) {
 				const blockElement = getBlockElementById(
 					blockEditorDocument,
@@ -132,7 +136,7 @@ export function useBlockHighlighting(
 					);
 				}
 
-				highlightedBlockIds.current.delete( blockId );
+				currentHighlightedIds.delete( blockId );
 			}
 		}
 
@@ -156,7 +160,7 @@ export function useBlockHighlighting(
 				'--collaborator-outline-color',
 				color
 			);
-			highlightedBlockIds.current.add( blockId );
+			currentHighlightedIds.add( blockId );
 
 			if ( overlayRect ) {
 				const blockRect = blockElement.getBoundingClientRect();
@@ -176,14 +180,14 @@ export function useBlockHighlighting(
 
 		// Clean up all highlights on unmount.
 		return () => {
-			for ( const blockId of highlightedBlockIds.current ) {
+			for ( const blockId of currentHighlightedIds ) {
 				const el = getBlockElementById( blockEditorDocument, blockId );
 				if ( el ) {
 					el.classList.remove( 'is-collaborator-selected' );
 					el.style.removeProperty( '--collaborator-outline-color' );
 				}
 			}
-			highlightedBlockIds.current.clear();
+			currentHighlightedIds.clear();
 		};
 	}, [ userStates, blockEditorDocument, overlayElement, recomputeToken, resolveSelection ] );
 
