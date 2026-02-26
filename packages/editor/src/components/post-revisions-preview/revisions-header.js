@@ -15,14 +15,8 @@ import { seen } from '@wordpress/icons';
 import HeaderSkeleton from '../header/header-skeleton';
 import MoreMenu from '../more-menu';
 import PostPreviewButton from '../post-preview-button';
-import PreviewDropdown from '../preview-dropdown';
 import RevisionsSlider from './revisions-slider';
 import { store as editorStore } from '../../store';
-import {
-	TEMPLATE_PART_POST_TYPE,
-	PATTERN_POST_TYPE,
-	NAVIGATION_POST_TYPE,
-} from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -35,31 +29,20 @@ import { unlock } from '../../lock-unlock';
  */
 function RevisionsHeader( { showDiff, onToggleDiff } ) {
 	const isWideViewport = useViewportMatch( 'large' );
-	const { postType, showIconLabels, currentRevisionId } = useSelect(
-		( select ) => {
-			const { get: getPreference } = select( preferencesStore );
-			const { getCurrentPostType } = select( editorStore );
+	const { showIconLabels, currentRevisionId } = useSelect( ( select ) => {
+		const { get: getPreference } = select( preferencesStore );
 
-			return {
-				postType: getCurrentPostType(),
-				showIconLabels: getPreference( 'core', 'showIconLabels' ),
-				currentRevisionId: unlock(
-					select( editorStore )
-				).getCurrentRevisionId(),
-			};
-		},
-		[]
-	);
+		return {
+			showIconLabels: getPreference( 'core', 'showIconLabels' ),
+			currentRevisionId: unlock(
+				select( editorStore )
+			).getCurrentRevisionId(),
+		};
+	}, [] );
 
 	const { setCurrentRevisionId, restoreRevision } = unlock(
 		useDispatch( editorStore )
 	);
-
-	const disablePreviewOption = [
-		NAVIGATION_POST_TYPE,
-		TEMPLATE_PART_POST_TYPE,
-		PATTERN_POST_TYPE,
-	].includes( postType );
 
 	const canRestore = !! currentRevisionId;
 
@@ -85,8 +68,6 @@ function RevisionsHeader( { showDiff, onToggleDiff } ) {
 			center={ <RevisionsSlider /> }
 			settings={
 				<>
-					<PreviewDropdown disabled={ disablePreviewOption } />
-
 					<PostPreviewButton className="editor-header__post-preview-button" />
 
 					{ ( isWideViewport || ! showIconLabels ) && (
