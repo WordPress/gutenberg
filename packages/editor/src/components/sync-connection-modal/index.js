@@ -28,50 +28,13 @@ import { error as errorIcon } from '@wordpress/icons';
  */
 import { getSyncErrorMessages } from '../../utils/sync-error-messages';
 import { unlock } from '../../lock-unlock';
+import { useRetryCountdown } from './use-retry-countdown';
 
 const { BlockCanvasCover } = unlock( privateApis );
 const { retrySyncConnection } = unlock( coreDataPrivateApis );
 
 // Debounce time for initial disconnected status to allow connection to establish.
 const INITIAL_DISCONNECTED_DEBOUNCE_MS = 5000;
-
-/**
- * Hook that computes a countdown in seconds from a retryInMs value.
- *
- * @param {number|undefined} retryInMs Milliseconds until next retry.
- * @param {string|undefined} status    Current connection status.
- * @return {number|null} Seconds remaining, or null if no countdown.
- */
-function useRetryCountdown( retryInMs, status ) {
-	const [ secondsRemaining, setSecondsRemaining ] = useState( null );
-	const retryAtRef = useRef( null );
-
-	useEffect( () => {
-		if ( status !== 'disconnected' || ! retryInMs ) {
-			setSecondsRemaining( null );
-			retryAtRef.current = null;
-			return;
-		}
-
-		const retryAt = Date.now() + retryInMs;
-		retryAtRef.current = retryAt;
-		setSecondsRemaining( Math.ceil( retryInMs / 1000 ) );
-
-		const intervalId = setInterval( () => {
-			const remaining = Math.ceil(
-				( retryAtRef.current - Date.now() ) / 1000
-			);
-			setSecondsRemaining( Math.max( 0, remaining ) );
-			if ( remaining <= 0 ) {
-				clearInterval( intervalId );
-			}
-		}, 1000 );
-
-		return () => clearInterval( intervalId );
-	}, [ retryInMs, status ] );
-
-	return secondsRemaining;
-}
 
 /**
  * Sync connection modal that displays when any entity reports a disconnection.
@@ -84,7 +47,7 @@ export function SyncConnectionModal() {
 		return selectFn( coreDataStore ).getSyncConnectionStatus() || null;
 	}, [] );
 
-	const secondsRemaining = useRetryCountdown(
+	const { secondsRemaining, markRetrying } = useRetryCountdown(
 		connectionState?.retryInMs,
 		connectionState?.status
 	);
@@ -144,18 +107,23 @@ export function SyncConnectionModal() {
 
 	const { title, description } = syncConnectionMessage;
 
-	const retryCountdownText =
-		secondsRemaining !== null
-			? sprintf(
-					/* translators: %d: number of seconds until retry */
-					_n(
-						'Retrying in %d second\u2026',
-						'Retrying in %d seconds\u2026',
-						secondsRemaining
-					),
-					secondsRemaining
-			  )
-			: '\u00A0'; // &nbsp; to preserve layout when countdown is hidden
+	let retryCountdownText;
+	if ( secondsRemaining > 0 ) {
+		retryCountdownText = sprintf(
+			/* translators: %d: number of seconds until retry */
+			_n(
+				'Retrying in %d second\u2026',
+				'Retrying in %d seconds\u2026',
+				secondsRemaining
+			),
+			secondsRemaining
+		);
+	} else if ( secondsRemaining === 0 ) {
+		retryCountdownText = __( 'Retrying\u2026' );
+	} else {
+		// &nbsp; to preserve layout when countdown is hidden
+		retryCountdownText = '\u00A0';
+	}
 
 	return (
 		<BlockCanvasCover.Fill>
@@ -186,7 +154,16 @@ export function SyncConnectionModal() {
 							</p>
 							<Button
 								variant="link"
-								onClick={ retrySyncConnection }
+								style={ {
+									visibility:
+										secondsRemaining === 0
+											? 'hidden'
+											: 'visible',
+								} }
+								onClick={ () => {
+									markRetrying();
+									retrySyncConnection();
+								} }
 							>
 								{ __( 'Retry now' ) }
 							</Button>

@@ -488,7 +488,7 @@ function unregisterRoom( room: string ): void {
  * the backoff interval is reset so the next scheduled poll fires sooner.
  */
 function retryNow(): void {
-	pollInterval = POLLING_INTERVAL_IN_MS;
+	pollInterval = POLLING_INTERVAL_IN_MS * 2;
 
 	if ( pendingPollTimeout ) {
 		clearTimeout( pendingPollTimeout );
