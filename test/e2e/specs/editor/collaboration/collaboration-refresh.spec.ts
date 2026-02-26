@@ -59,16 +59,12 @@ test.describe( 'Collaboration - Refresh', () => {
 			{ timeout: 15000 }
 		);
 
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'Saved content from User A' },
-		} );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'Saved content from User A' );
 
-		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/editor' ).savePost()
-		);
-
-		await page.waitForTimeout( 3000 );
+		await editor.saveDraft();
 
 		// Step 2: User B loads the post and adds content.
 		secondContext = await page
@@ -114,15 +110,14 @@ test.describe( 'Collaboration - Refresh', () => {
 				.waitFor( { timeout: 15000 } ),
 		] );
 
-		await page.waitForTimeout( 3000 );
-
-		// User B adds content.
-		await page2.evaluate( () => {
-			const block = window.wp.blocks.createBlock( 'core/paragraph', {
-				content: 'Content from User B',
-			} );
-			window.wp.data.dispatch( 'core/block-editor' ).insertBlock( block );
-		} );
+		// User B adds content below the existing paragraph.
+		await editor2.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.last()
+			.click();
+		await page2.keyboard.press( 'End' );
+		await page2.keyboard.press( 'Enter' );
+		await page2.keyboard.type( 'Content from User B' );
 
 		// User A should see User B's content.
 		await expect
@@ -137,8 +132,6 @@ test.describe( 'Collaboration - Refresh', () => {
 				{ timeout: 5000 }
 			)
 			.toContain( 'Content from User B' );
-
-		await page.waitForTimeout( 3000 );
 
 		// Step 3: User A refreshes the page.
 		await page.reload( { waitUntil: 'load' } );
@@ -162,15 +155,14 @@ test.describe( 'Collaboration - Refresh', () => {
 				.waitFor( { timeout: 15000 } ),
 		] );
 
-		await page.waitForTimeout( 3000 );
-
 		// Step 4: User A adds new content after refresh.
-		await page.evaluate( () => {
-			const block = window.wp.blocks.createBlock( 'core/paragraph', {
-				content: 'After refresh from User A',
-			} );
-			window.wp.data.dispatch( 'core/block-editor' ).insertBlock( block );
-		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.last()
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'After refresh from User A' );
 
 		// User B should see User A's new content.
 		// The bug in #75976 causes User A's post-refresh edits to be
