@@ -30,6 +30,7 @@ test.describe( 'Collaboration with meta boxes', () => {
 		const post = await requestUtils.createPost( {
 			title: 'Meta Box Lock Test',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 
 		// User 1 (admin) opens the post.
