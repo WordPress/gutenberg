@@ -13,10 +13,10 @@ import OverlayMenuPreviewControls from './overlay-menu-preview-controls';
 /**
  * Overlay Menu Preview Button component.
  *
- * @param {Object}   props              Component props.
- * @param {boolean}  props.isResponsive Whether overlay menu is responsive.
- * @param {boolean}  props.hasIcon      Whether the overlay menu has an icon.
- * @param {string}   props.icon         Icon type for overlay menu.
+ * @param {Object}   props               Component props.
+ * @param {boolean}  props.isResponsive  Whether overlay menu is responsive.
+ * @param {boolean}  props.hasIcon       Whether the overlay menu has an icon.
+ * @param {string}   props.icon          Icon type for overlay menu.
  * @param {Function} props.setAttributes Function to update block attributes.
  * @return {React.JSX.Element}           The overlay menu preview or null if not responsive.
  */
