@@ -57,20 +57,9 @@ export const route = {
 
 		return __( 'Navigation' );
 	},
-	canvas: async ( {
-		params,
-	}: {
-		params: {
-			id: string;
-		};
-	} ) => {
-		const postId = parseInt( params.id );
-		return {
-			postType: NAVIGATION_POST_TYPE,
-			postId,
-			isPreview: true,
-			editLink: `/types/wp_navigation/edit/${ postId }`,
-		};
+	canvas: async () => {
+		// Return null to use custom canvas from canvas.tsx
+		return null;
 	},
 	loader: async ( {
 		params,
@@ -80,10 +69,31 @@ export const route = {
 		};
 	} ) => {
 		const navigationId = parseInt( params.id );
-		await resolveSelect( coreStore ).getEntityRecord(
-			'postType',
-			NAVIGATION_POST_TYPE,
-			navigationId
-		);
+		await Promise.all( [
+			// Preload the navigation menu
+			resolveSelect( coreStore ).getEntityRecord(
+				'postType',
+				NAVIGATION_POST_TYPE,
+				navigationId
+			),
+			// Preload template parts for the canvas grid
+			resolveSelect( coreStore ).getEntityRecords(
+				'postType',
+				'wp_template_part',
+				{ per_page: -1 }
+			),
+			// Preload fallback navigation menu for "used in" detection
+			resolveSelect( coreStore ).getEntityRecords(
+				'postType',
+				'wp_navigation',
+				{
+					per_page: 1,
+					orderby: 'date',
+					order: 'desc',
+					status: 'publish',
+					_fields: 'id',
+				}
+			),
+		] );
 	},
 };
