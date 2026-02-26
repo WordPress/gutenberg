@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createRegistry } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
@@ -21,8 +22,19 @@ jest.mock( '@wordpress/blob', () => ( {
 
 jest.mock( '../utils', () => ( {
 	vipsCancelOperations: jest.fn( () => Promise.resolve( true ) ),
-	vipsResizeImage: jest.fn(),
+	vipsResizeImage: jest.fn( () =>
+		Promise.resolve(
+			new File( [ 'resized' ], 'example-100x100.jpg', {
+				type: 'image/jpeg',
+			} )
+		)
+	),
 	terminateVipsWorker: jest.fn(),
+} ) );
+
+jest.mock( '@wordpress/hooks', () => ( {
+	__esModule: true,
+	applyFilters: jest.fn( ( hookName: string, value: unknown ) => value ),
 } ) );
 
 // Import the mocked module to access the mock function.
@@ -409,6 +421,64 @@ describe( 'actions', () => {
 				.cancelItem( item.id, new Error( 'Test error' ), true );
 
 			expect( onError ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'resizeCropItem', () => {
+		beforeEach( () => {
+			( applyFilters as jest.Mock ).mockClear();
+		} );
+
+		it( 'applies the editor.media.imageQuality filter with correct arguments', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			const resizeArgs = {
+				resize: { width: 100, height: 100 },
+			};
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id,
+				resizeArgs
+			);
+
+			expect( applyFilters ).toHaveBeenCalledWith(
+				'editor.media.imageQuality',
+				0.82,
+				expect.objectContaining( {
+					item: expect.objectContaining( {
+						id: item.id,
+						file: jpegFile,
+					} ),
+					mimeType: 'image/jpeg',
+					resize: resizeArgs.resize,
+				} )
+			);
+		} );
+
+		it( 'does not apply the filter when no resize args are provided', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id
+			);
+
+			expect( applyFilters ).not.toHaveBeenCalledWith(
+				'editor.media.imageQuality',
+				expect.anything(),
+				expect.anything()
+			);
 		} );
 	} );
 } );
