@@ -32,19 +32,19 @@ import RemoveTabToolbarControl from '../tab/remove-tab-toolbar-control';
  * to keep them in sync.
  *
  * @param {Object} props
- * @param {string} props.tabClientId      Client ID of the core/tab block.
  * @param {number} props.tabIndex         Zero-based position of this tab.
  * @param {number} props.tabsCount        Total number of tabs.
- * @param {string} props.tabsMenuClientId Client ID of the core/tabs-menu block.
+ * @param {string} props.tabClientId      Client ID of the core/tab block.
  * @param {string} props.tabsClientId     Client ID of the core/tabs block.
+ * @param {string} props.tabsMenuClientId Client ID of the core/tabs-menu block.
  * @param {string} props.menuItemClientId Client ID of this core/tabs-menu-item.
  */
 function TabBlockMover( {
-	tabClientId,
 	tabIndex,
 	tabsCount,
-	tabsMenuClientId,
+	tabClientId,
 	tabsClientId,
+	tabsMenuClientId,
 	menuItemClientId,
 } ) {
 	const {
@@ -180,11 +180,11 @@ export default function Controls( {
 	return (
 		<>
 			<TabBlockMover
-				tabClientId={ tabClientId }
 				tabIndex={ tabIndex }
 				tabsCount={ tabsCount }
-				tabsMenuClientId={ tabsMenuClientId }
+				tabClientId={ tabClientId }
 				tabsClientId={ tabsClientId }
+				tabsMenuClientId={ tabsMenuClientId }
 				menuItemClientId={ menuItemClientId }
 			/>
 			<AddTabToolbarControl tabsClientId={ tabsClientId } />
