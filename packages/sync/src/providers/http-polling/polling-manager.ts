@@ -509,15 +509,12 @@ function registerRoom( {
 		pageHideListenerRegistered = true;
 	}
 
-	if ( ! isPolling ) {
-		if ( ! pageVisibilityListenerRegistered ) {
-			document.addEventListener(
-				'visibilitychange',
-				toggleVisbilityChange
-			);
-			pageVisibilityListenerRegistered = true;
-		}
+	if ( ! pageVisibilityListenerRegistered ) {
+		document.addEventListener( 'visibilitychange', toggleVisbilityChange );
+		pageVisibilityListenerRegistered = true;
+	}
 
+	if ( ! isPolling ) {
 		poll();
 	}
 }
