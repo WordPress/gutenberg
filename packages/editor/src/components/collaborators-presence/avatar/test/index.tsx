@@ -1,12 +1,62 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
 import Avatar from '..';
+
+// Mock window.Image so useImageLoadingStatus can probe URLs synchronously.
+// By default, every Image instance appears "cached" (complete + naturalWidth).
+type MockImage = {
+	src: string;
+	complete: boolean;
+	naturalWidth: number;
+	onload: ( () => void ) | null;
+	onerror: ( () => void ) | null;
+};
+
+let mockImages: MockImage[];
+
+function mockCachedImages() {
+	mockImages = [];
+	jest.spyOn( window, 'Image' ).mockImplementation( () => {
+		const img: MockImage = {
+			src: '',
+			complete: true,
+			naturalWidth: 48,
+			onload: null,
+			onerror: null,
+		};
+		mockImages.push( img );
+		return img as unknown as HTMLImageElement;
+	} );
+}
+
+function mockUncachedImages() {
+	mockImages = [];
+	jest.spyOn( window, 'Image' ).mockImplementation( () => {
+		const img: MockImage = {
+			src: '',
+			complete: false,
+			naturalWidth: 0,
+			onload: null,
+			onerror: null,
+		};
+		mockImages.push( img );
+		return img as unknown as HTMLImageElement;
+	} );
+}
+
+beforeEach( () => {
+	mockCachedImages();
+} );
+
+afterEach( () => {
+	jest.restoreAllMocks();
+} );
 
 describe( 'Avatar', () => {
 	it( 'should render with default props', () => {
@@ -30,46 +80,18 @@ describe( 'Avatar', () => {
 		expect( avatar ).not.toHaveAttribute( 'aria-label' );
 	} );
 
-	it( 'should apply the avatar image via CSS custom property', () => {
+	it( 'should render an img element when image loads successfully', () => {
 		render(
-			<Avatar data-testid="avatar" src="https://example.com/avatar.jpg" />
+			<Avatar
+				data-testid="avatar"
+				name="Jane Doe"
+				src="https://example.com/avatar.jpg"
+			/>
 		);
 		const avatar = screen.getByTestId( 'avatar' );
 		expect( avatar ).toHaveClass( 'has-src' );
-		expect( avatar.style.getPropertyValue( '--editor-avatar-url' ) ).toBe(
-			'url(https://example.com/avatar.jpg)'
-		);
-	} );
-
-	it( 'should set inline backgroundImage on the image span', () => {
-		render(
-			<Avatar name="Jane Doe" src="https://example.com/avatar.jpg" />
-		);
-		const avatar = screen.getByRole( 'img', { name: 'Jane Doe' } );
-		expect( avatar ).toHaveStyle( {
-			'--editor-avatar-url': 'url(https://example.com/avatar.jpg)',
-		} );
-		// The inner image span also gets an inline backgroundImage for Safari.
-		expect(
-			screen.getByText( '', { selector: '.editor-avatar__image' } )
-		).toHaveStyle( {
-			backgroundImage: 'url(https://example.com/avatar.jpg)',
-		} );
-	} );
-
-	it( 'should not set inline backgroundImage when dimmed', () => {
-		render(
-			<Avatar
-				name="Jane Doe"
-				src="https://example.com/avatar.jpg"
-				dimmed
-			/>
-		);
-		expect(
-			screen.getByText( '', { selector: '.editor-avatar__image' } )
-		).not.toHaveStyle( {
-			backgroundImage: 'url(https://example.com/avatar.jpg)',
-		} );
+		// Initials should not be visible when the image has loaded.
+		expect( screen.queryByText( 'JD' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'should apply is-small class for small size', () => {
@@ -124,15 +146,15 @@ describe( 'Avatar', () => {
 		render(
 			<Avatar
 				data-testid="avatar"
-				src="https://example.com/avatar.jpg"
+				borderColor="#3858e9"
 				style={ { left: '10px' } }
 			/>
 		);
 		const avatar = screen.getByTestId( 'avatar' );
 		expect( avatar ).toHaveStyle( { left: '10px' } );
-		expect( avatar.style.getPropertyValue( '--editor-avatar-url' ) ).toBe(
-			'url(https://example.com/avatar.jpg)'
-		);
+		expect(
+			avatar.style.getPropertyValue( '--editor-avatar-outline-color' )
+		).toBe( '#3858e9' );
 	} );
 
 	describe( 'variant: badge', () => {
@@ -270,7 +292,7 @@ describe( 'Avatar', () => {
 			expect( screen.getByText( 'JD' ) ).toBeInTheDocument();
 		} );
 
-		it( 'should not show initials when src is provided', () => {
+		it( 'should not show initials when image has loaded', () => {
 			render(
 				<Avatar
 					name="Tanner Robinson"
@@ -285,6 +307,80 @@ describe( 'Avatar', () => {
 			const avatar = screen.getByTestId( 'avatar' );
 			// Without a name, the image span should be empty (no initials).
 			expect( avatar ).not.toHaveTextContent( /.+/ );
+		} );
+	} );
+
+	describe( 'image loading', () => {
+		it( 'should show initials while image is loading', () => {
+			mockUncachedImages();
+			render(
+				<Avatar
+					data-testid="avatar"
+					name="Jane Doe"
+					src="https://example.com/avatar.jpg"
+				/>
+			);
+			const avatar = screen.getByTestId( 'avatar' );
+			// Image hasn't loaded yet, so initials should show.
+			expect( avatar ).not.toHaveClass( 'has-src' );
+			expect( screen.getByText( 'JD' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should show image after successful load', () => {
+			mockUncachedImages();
+			render(
+				<Avatar
+					data-testid="avatar"
+					name="Jane Doe"
+					src="https://example.com/avatar.jpg"
+				/>
+			);
+
+			// Simulate image load completing.
+			act( () => {
+				const lastImage = mockImages[ mockImages.length - 1 ];
+				lastImage.onload?.();
+			} );
+
+			const avatar = screen.getByTestId( 'avatar' );
+			expect( avatar ).toHaveClass( 'has-src' );
+			expect( screen.queryByText( 'JD' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should fall back to initials when image fails to load', () => {
+			mockUncachedImages();
+			render(
+				<Avatar
+					data-testid="avatar"
+					name="Jane Doe"
+					src="https://example.com/bad.jpg"
+				/>
+			);
+
+			// Simulate image load error.
+			act( () => {
+				const lastImage = mockImages[ mockImages.length - 1 ];
+				lastImage.onerror?.();
+			} );
+
+			const avatar = screen.getByTestId( 'avatar' );
+			expect( avatar ).not.toHaveClass( 'has-src' );
+			expect( screen.getByText( 'JD' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should render cached images immediately without flash', () => {
+			// Default mock returns cached images.
+			render(
+				<Avatar
+					data-testid="avatar"
+					name="Jane Doe"
+					src="https://example.com/avatar.jpg"
+				/>
+			);
+			// On the first render, image should already be "loaded".
+			const avatar = screen.getByTestId( 'avatar' );
+			expect( avatar ).toHaveClass( 'has-src' );
+			expect( screen.queryByText( 'JD' ) ).not.toBeInTheDocument();
 		} );
 	} );
 

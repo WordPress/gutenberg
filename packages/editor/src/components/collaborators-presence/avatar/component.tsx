@@ -17,6 +17,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import type { AvatarProps } from './types';
+import { useImageLoadingStatus } from './use-image-loading-status';
 
 // Runtime equivalents of @wordpress/base-styles tokens ($gray-900, $white).
 const GRAY_900 = '#1e1e1e';
@@ -36,6 +37,9 @@ function Avatar( {
 	...props
 }: AvatarProps &
 	Omit< React.HTMLAttributes< HTMLDivElement >, keyof AvatarProps > ) {
+	const imageStatus = useImageLoadingStatus( src );
+	const imageLoaded = imageStatus === 'loaded';
+
 	const showBadge = variant === 'badge' && !! name;
 	const initials = name
 		? name
@@ -59,7 +63,6 @@ function Avatar( {
 
 	const customProperties = {
 		...style,
-		...( src ? { '--editor-avatar-url': `url(${ src })` } : {} ),
 		...( borderColor
 			? {
 					'--editor-avatar-outline-color': borderColor,
@@ -72,7 +75,7 @@ function Avatar( {
 		<div
 			className={ clsx( 'editor-avatar', className, {
 				'has-avatar-border-color': !! borderColor,
-				'has-src': !! src,
+				'has-src': imageLoaded,
 				'is-badge': showBadge,
 				'is-small': size === 'small',
 				'is-dimmed': dimmed,
@@ -82,19 +85,11 @@ function Avatar( {
 			aria-label={ name || undefined }
 			{ ...props }
 		>
-			<span
-				className="editor-avatar__image"
-				style={
-					// Safari does not resolve url() inside CSS custom
-					// properties, so set backgroundImage inline.
-					// Skip when dimmed — the dimmed state renders the
-					// image via a ::before pseudo-element instead.
-					src && ! dimmed
-						? { backgroundImage: `url(${ src })` }
-						: undefined
-				}
-			>
-				{ ! src && initials }
+			<span className="editor-avatar__image">
+				{ imageLoaded && (
+					<img src={ src } alt="" className="editor-avatar__img" />
+				) }
+				{ ! imageLoaded && initials }
 			</span>
 			{ dimmed && !! statusIndicator && (
 				<span className="editor-avatar__status-indicator">

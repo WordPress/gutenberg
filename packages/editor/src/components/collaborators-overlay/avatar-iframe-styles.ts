@@ -51,15 +51,18 @@ export const AVATAR_IFRAME_STYLES = `
 	width: ${ BUTTON_SIZE_SMALL };
 	height: ${ BUTTON_SIZE_SMALL };
 }
-.has-src > .editor-avatar__image {
-	background-image: var(--editor-avatar-url);
-	background-size: cover;
-	background-position: center;
-}
 .has-avatar-border-color > .editor-avatar__image {
 	border: var(--wp-admin-border-width-focus, 2px) solid var(--editor-avatar-outline-color);
 	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, 2px) ${ WHITE };
 	background-clip: padding-box;
+}
+.editor-avatar__img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: inherit;
 }
 .editor-avatar:not(.has-src) > .editor-avatar__image {
 	display: flex;

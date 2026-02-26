@@ -35,12 +35,6 @@ $-accent-color: var(--wp-admin-theme-color, #3858e9);
 		height: $button-size-small;
 	}
 
-	.has-src > & {
-		background-image: var(--editor-avatar-url);
-		background-size: cover;
-		background-position: center;
-	}
-
 	.has-avatar-border-color > & {
 		border: var(--wp-admin-border-width-focus) solid var(--editor-avatar-outline-color);
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
@@ -48,7 +42,18 @@ $-accent-color: var(--wp-admin-theme-color, #3858e9);
 	}
 }
 
-// Initials fallback: show name characters when no image.
+// The <img> element, absolutely positioned to fill the __image container.
+// Only rendered when the image has loaded successfully (via useImageLoadingStatus).
+.editor-avatar__img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: inherit;
+}
+
+// Initials fallback: show name characters when no image has loaded.
 .editor-avatar:not(.has-src) > .editor-avatar__image {
 	display: flex;
 	align-items: center;
@@ -119,21 +124,9 @@ $-accent-color: var(--wp-admin-theme-color, #3858e9);
 	border-color: $gray-700;
 }
 
-// Images: desaturate via luminosity blend at full opacity. The parent
-// element's opacity: 0.5 handles the overall fade.
-.editor-avatar.is-dimmed.has-src > .editor-avatar__image {
-	background-image: none;
-
-	&::before {
-		content: "";
-		position: absolute;
-		inset: 0;
-		border-radius: inherit;
-		background-image: var(--editor-avatar-url);
-		background-size: cover;
-		background-position: center;
-		mix-blend-mode: luminosity;
-	}
+// Dimmed images: desaturate via CSS filter instead of mix-blend-mode.
+.editor-avatar.is-dimmed .editor-avatar__img {
+	filter: grayscale(1);
 }
 
 // Status indicator: positioned over the image area, outside __image so it
