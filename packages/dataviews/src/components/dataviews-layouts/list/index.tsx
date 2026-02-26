@@ -33,6 +33,7 @@ import { Stack } from '@wordpress/ui';
 import { unlock } from '../../../lock-unlock';
 import { ActionsMenuGroup, ActionModal } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
+import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 import type {
 	Action,
 	NormalizedField,
@@ -389,6 +390,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		empty,
 	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list' );
+	const isDelayedLoading = useDelayedLoading( !! isLoading );
 
 	const selectedItem = data?.findLast( ( item ) =>
 		selection.includes( getItemId( item ) )
@@ -511,31 +513,24 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		[ selectCompositeItem, activeItemIndex ]
 	);
 
-	const hasData = data?.length;
-	if ( ! hasData ) {
-		return (
-			<div
-				className={ clsx( {
-					'dataviews-loading': isLoading,
-					'dataviews-no-results': ! hasData && ! isLoading,
-				} ) }
-			>
-				{ ! hasData &&
-					( isLoading ? (
-						<p>
-							<Spinner />
-						</p>
-					) : (
-						empty
-					) ) }
-			</div>
-		);
-	}
-
+	const hasData = !! data?.length;
 	const groupField = view.groupBy?.field
 		? fields.find( ( field ) => field.id === view.groupBy?.field )
 		: null;
-	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
+	const dataByGroup =
+		hasData && groupField ? getDataByGroup( data, groupField ) : null;
+	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	if ( ! hasData ) {
+		return (
+			<div
+				className={ clsx( 'dataviews-no-results', {
+					'is-refreshing': isDelayedLoading,
+				} ) }
+			>
+				{ empty }
+			</div>
+		);
+	}
 
 	// Render data grouped by field
 	if ( hasData && groupField && dataByGroup ) {
@@ -614,10 +609,15 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 						[ 'compact', 'comfortable' ].includes(
 							view.layout.density
 						),
+					'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 				} ) }
 				role={ view.infiniteScrollEnabled ? 'feed' : 'grid' }
 				activeId={ activeCompositeId }
 				setActiveId={ setActiveCompositeId }
+				// @ts-ignore
+				inert={
+					! isInfiniteScroll && !! isLoading ? 'true' : undefined
+				}
 			>
 				{ data.map( ( item, index ) => {
 					const id = generateCompositeItemIdPrefix( item );
@@ -646,7 +646,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					);
 				} ) }
 			</Composite>
-			{ hasData && isLoading && (
+			{ isInfiniteScroll && isLoading && (
 				<p className="dataviews-loading-more">
 					<Spinner />
 				</p>

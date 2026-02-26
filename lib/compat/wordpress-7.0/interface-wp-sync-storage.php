@@ -9,21 +9,15 @@ if ( ! interface_exists( 'WP_Sync_Storage' ) ) {
 
 	interface WP_Sync_Storage {
 		/**
-		 * Initializes the storage mechanism.
-		 *
-		 * @since 7.0.0
-		 */
-		public function init(): void;
-
-		/**
 		 * Adds a sync update to a given room.
 		 *
 		 * @since 7.0.0
 		 *
 		 * @param string $room   Room identifier.
 		 * @param mixed  $update Serializable sync update, opaque to the storage implementation.
+		 * @return bool True on success, false on failure.
 		 */
-		public function add_update( string $room, mixed $update ): void;
+		public function add_update( string $room, $update ): bool;
 
 		/**
 		 * Gets awareness state for a given room.
@@ -36,7 +30,7 @@ if ( ! interface_exists( 'WP_Sync_Storage' ) ) {
 		public function get_awareness_state( string $room ): array;
 
 		/**
-		 * Get the current cursor for a given room. This should return a monotonically
+		 * Gets the current cursor for a given room. This should return a monotonically
 		 * increasing integer that represents the last update that was returned for the
 		 * room during the current request. This allows clients to retrieve updates
 		 * after a specific cursor on subsequent requests.
@@ -66,7 +60,7 @@ if ( ! interface_exists( 'WP_Sync_Storage' ) ) {
 		 *
 		 * @param string $room   Room identifier.
 		 * @param int    $cursor Return updates after this cursor.
-		 * @return array<mixed> Array of sync updates.
+		 * @return array<int, mixed> Sync updates.
 		 */
 		public function get_updates_after_cursor( string $room, int $cursor ): array;
 
@@ -77,8 +71,9 @@ if ( ! interface_exists( 'WP_Sync_Storage' ) ) {
 		 *
 		 * @param string $room   Room identifier.
 		 * @param int    $cursor Remove updates with markers < this cursor.
+		 * @return bool True on success, false on failure.
 		 */
-		public function remove_updates_before_cursor( string $room, int $cursor ): void;
+		public function remove_updates_before_cursor( string $room, int $cursor ): bool;
 
 		/**
 		 * Sets awareness state for a given room.
@@ -87,7 +82,8 @@ if ( ! interface_exists( 'WP_Sync_Storage' ) ) {
 		 *
 		 * @param string            $room      Room identifier.
 		 * @param array<int, mixed> $awareness Serializable awareness state.
+		 * @return bool True on success, false on failure.
 		 */
-		public function set_awareness_state( string $room, array $awareness ): void;
+		public function set_awareness_state( string $room, array $awareness ): bool;
 	}
 }

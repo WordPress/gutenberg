@@ -7,7 +7,7 @@
 
 if ( ! defined( '_GUTENBERG_VERSION_MIGRATION' ) ) {
 	// It's necessary to update this version every time a new migration is needed.
-	define( '_GUTENBERG_VERSION_MIGRATION', '9.8.0' );
+	define( '_GUTENBERG_VERSION_MIGRATION', '22.6.0' );
 }
 
 /**
@@ -23,6 +23,10 @@ function _gutenberg_migrate_database() {
 	if ( _GUTENBERG_VERSION_MIGRATION !== $gutenberg_installed_version ) {
 		if ( version_compare( $gutenberg_installed_version, '9.8.0', '<' ) ) {
 			_gutenberg_migrate_remove_fse_drafts();
+		}
+
+		if ( version_compare( $gutenberg_installed_version, '22.6.0', '<' ) ) {
+			_gutenberg_migrate_enable_real_time_collaboration();
 		}
 
 		update_option( 'gutenberg_version_migration', _GUTENBERG_VERSION_MIGRATION );
@@ -57,6 +61,21 @@ function _gutenberg_migrate_remove_fse_drafts() {
 	// Delete useless options.
 	delete_option( 'gutenberg_last_synchronize_theme_template_checks' );
 	delete_option( 'gutenberg_last_synchronize_theme_template-part_checks' );
+}
+
+/**
+ * Replace unprefixed option enable_real_time_collaboration with prefixed version.
+ *
+ * Adds a `wp_` prefix to the option name to follow the convention for adding new
+ * options to WordPress since WP 5.8.0.
+ *
+ * @since 22.6.0
+ */
+function _gutenberg_migrate_enable_real_time_collaboration() {
+	$current_value = get_option( 'enable_real_time_collaboration', '0' );
+
+	update_option( 'wp_enable_real_time_collaboration', $current_value );
+	delete_option( 'enable_real_time_collaboration' );
 }
 
 // Deletion of the `_wp_file_based` term (in _gutenberg_migrate_remove_fse_drafts) must happen
