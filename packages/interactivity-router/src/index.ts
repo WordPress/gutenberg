@@ -516,7 +516,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 
 				window.history[
 					options.replace ? 'replaceState' : 'pushState'
-				]( { wp_iapi_sessionId: sessionId }, '', href );
+				]( { wpInteractivityId: sessionId }, '', href );
 
 				if ( screenReaderAnnouncement ) {
 					a11ySpeak( 'loaded' );

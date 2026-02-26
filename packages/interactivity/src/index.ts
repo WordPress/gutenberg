@@ -116,7 +116,7 @@ onDOMReady( hydrateRegions );
 // Tag the current history entry with the session ID so that, within the same
 // session, all entries share the same ID and back/forward works normally.
 window.history.replaceState(
-	{ ...window.history.state, wp_iapi_sessionId: sessionId },
+	{ ...window.history.state, wpInteractivityId: sessionId },
 	''
 );
 
@@ -126,7 +126,7 @@ window.history.replaceState(
 // the page content would remain stale because the interactivity router — which
 // handles client-side navigations — might not be loaded yet.
 window.addEventListener( 'popstate', ( event ) => {
-	if ( event.state?.wp_iapi_sessionId !== sessionId ) {
+	if ( event.state?.wpInteractivityId !== sessionId ) {
 		window.location.reload();
 	}
 } );
