@@ -91,12 +91,10 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 		return rest_get_server()->dispatch( $request );
 	}
 
-	// -------------------------------------------------------------------------
-	// Route registration
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Test that content-guidelines routes are registered.
+	 *
+	 * @covers ::register_routes
 	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
@@ -105,12 +103,10 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 		$this->assertArrayHasKey( self::REST_BASE . '/(?P<id>[\d]+)', $routes, 'Single item route not registered.' );
 	}
 
-	// -------------------------------------------------------------------------
-	// Create
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Test that an admin can create a guidelines post.
+	 *
+	 * @covers ::create_item
 	 */
 	public function test_create_item() {
 		$response = $this->create_guidelines();
@@ -126,6 +122,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Test that guidelines can be created with publish status.
+	 *
+	 * @covers ::create_item
 	 */
 	public function test_create_item_with_publish_status() {
 		$response = $this->create_guidelines( array( 'status' => 'publish' ) );
@@ -136,6 +134,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Test that only one guidelines post can exist (singleton enforcement).
+	 *
+	 * @covers ::create_item
 	 */
 	public function test_create_item_singleton_enforcement() {
 		$this->create_guidelines();
@@ -146,6 +146,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Test that editors cannot create guidelines (requires manage_options).
+	 *
+	 * @covers ::create_item_permissions_check
 	 */
 	public function test_create_item_no_permission_editor() {
 		wp_set_current_user( self::$editor_id );
@@ -157,12 +159,10 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 		$this->assertErrorResponse( 'rest_cannot_create', $response, 403 );
 	}
 
-	// -------------------------------------------------------------------------
-	// Read (collection / singleton GET)
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Test that GET returns the singleton guidelines with categories.
+	 *
+	 * @covers ::get_guidelines
 	 */
 	public function test_get_items() {
 		wp_set_current_user( self::$admin_id );
@@ -189,6 +189,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Test that GET returns an empty placeholder when no guidelines exist.
+	 *
+	 * @covers ::get_guidelines
 	 */
 	public function test_get_items_empty() {
 		wp_set_current_user( self::$admin_id );
@@ -205,6 +207,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Test that the status query parameter filters guidelines correctly.
+	 *
+	 * @covers ::get_guidelines
 	 */
 	public function test_get_items_status_filter() {
 		wp_set_current_user( self::$admin_id );
@@ -229,6 +233,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Test that the category query parameter returns only the requested category.
+	 *
+	 * @covers ::get_guidelines
 	 */
 	public function test_get_items_category_filter() {
 		wp_set_current_user( self::$admin_id );
@@ -253,6 +259,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Test that the block query parameter returns only the matching block entry.
+	 *
+	 * @covers ::get_guidelines
 	 */
 	public function test_get_items_block_filter() {
 		wp_set_current_user( self::$admin_id );
@@ -283,6 +291,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Test that filtering by a non-existent block returns empty categories.
+	 *
+	 * @covers ::get_guidelines
 	 */
 	public function test_get_items_block_filter_nonexistent() {
 		wp_set_current_user( self::$admin_id );
@@ -299,6 +309,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Test that unauthenticated users cannot read guidelines.
+	 *
+	 * @covers ::get_guidelines_permissions_check
 	 */
 	public function test_get_items_unauthenticated() {
 		wp_set_current_user( 0 );
@@ -311,6 +323,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Test that editors can read guidelines (edit_posts capability).
+	 *
+	 * @covers ::get_guidelines_permissions_check
 	 */
 	public function test_get_items_editor_can_read() {
 		wp_set_current_user( self::$admin_id );
@@ -324,12 +338,10 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 		$this->assertSame( 200, $response->get_status() );
 	}
 
-	// -------------------------------------------------------------------------
-	// Get single item
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Test that GET with a valid ID returns the guidelines post.
+	 *
+	 * @covers ::get_item
 	 */
 	public function test_get_item() {
 		wp_set_current_user( self::$admin_id );
@@ -345,6 +357,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Test that GET with an invalid ID returns 404.
+	 *
+	 * @covers ::get_item
 	 */
 	public function test_get_item_invalid_id() {
 		wp_set_current_user( self::$admin_id );
@@ -355,12 +369,10 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 		$this->assertErrorResponse( 'rest_post_invalid_id', $response, 404 );
 	}
 
-	// -------------------------------------------------------------------------
-	// Update
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Test that an admin can update guidelines and change status.
+	 *
+	 * @covers ::update_item
 	 */
 	public function test_update_item() {
 		wp_set_current_user( self::$admin_id );
@@ -386,6 +398,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Test that editors cannot update guidelines.
+	 *
+	 * @covers ::update_item_permissions_check
 	 */
 	public function test_update_item_no_permission_editor() {
 		wp_set_current_user( self::$admin_id );
@@ -401,12 +415,10 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 		$this->assertErrorResponse( 'rest_cannot_edit', $response, 403 );
 	}
 
-	// -------------------------------------------------------------------------
-	// Delete
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Test that an admin can force-delete a guidelines post.
+	 *
+	 * @covers ::delete_item
 	 */
 	public function test_delete_item() {
 		wp_set_current_user( self::$admin_id );
@@ -427,6 +439,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Test that editors cannot delete guidelines.
+	 *
+	 * @covers ::delete_item_permissions_check
 	 */
 	public function test_delete_item_no_permission_editor() {
 		wp_set_current_user( self::$admin_id );
@@ -442,12 +456,10 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
 	}
 
-	// -------------------------------------------------------------------------
-	// Response shape and links
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Test that response includes self, about, and version-history links.
+	 *
+	 * @covers ::prepare_item_for_response
 	 */
 	public function test_response_includes_links() {
 		wp_set_current_user( self::$admin_id );
@@ -465,6 +477,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Test that _fields parameter filters response to requested fields only.
+	 *
+	 * @covers ::prepare_item_for_response
 	 */
 	public function test_fields_parameter_filtering() {
 		wp_set_current_user( self::$admin_id );
@@ -481,12 +495,10 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 		$this->assertArrayNotHasKey( 'guideline_categories', $data, '_fields should exclude unrequested fields.' );
 	}
 
-	// -------------------------------------------------------------------------
-	// Block name validation
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Test that valid block names (namespace/block-name) are accepted.
+	 *
+	 * @covers ::prepare_item_for_database
 	 */
 	public function test_block_name_validation_valid() {
 		wp_set_current_user( self::$admin_id );
@@ -511,6 +523,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Test that invalid block names are stripped from the response.
+	 *
+	 * @covers ::prepare_item_for_database
 	 */
 	public function test_block_name_validation_invalid() {
 		wp_set_current_user( self::$admin_id );
@@ -535,12 +549,10 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 		$this->assertArrayNotHasKey( 'has spaces/block', $blocks );
 	}
 
-	// -------------------------------------------------------------------------
-	// Revisions
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Tests that updating guidelines creates revisions.
+	 *
+	 * @covers ::update_item
 	 */
 	public function test_revisions_created_on_update() {
 		wp_set_current_user( self::$admin_id );
@@ -563,6 +575,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Tests that revision responses include guideline_categories.
+	 *
+	 * @covers ::prepare_item_for_response
 	 */
 	public function test_revision_includes_guideline_categories() {
 		wp_set_current_user( self::$admin_id );
@@ -591,6 +605,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Tests that restoring a revision works and returns parent post response.
+	 *
+	 * @covers Gutenberg_Content_Guidelines_Revisions_Controller::restore_revision
 	 */
 	public function test_restore_revision() {
 		wp_set_current_user( self::$admin_id );
@@ -633,6 +649,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Tests that restore response includes _links (via prepare_item_for_response).
+	 *
+	 * @covers Gutenberg_Content_Guidelines_Revisions_Controller::restore_revision
 	 */
 	public function test_restore_revision_response_includes_links() {
 		wp_set_current_user( self::$admin_id );
@@ -662,6 +680,8 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 	/**
 	 * Tests that restoring requires admin permissions.
+	 *
+	 * @covers Gutenberg_Content_Guidelines_Revisions_Controller::restore_revision_permissions_check
 	 */
 	public function test_restore_revision_no_permission() {
 		wp_set_current_user( self::$admin_id );
@@ -690,12 +710,10 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 		$this->assertErrorResponse( 'rest_cannot_restore', $response, 403 );
 	}
 
-	// -------------------------------------------------------------------------
-	// Schema
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Test that the schema contains expected properties and status enum.
+	 *
+	 * @covers ::get_item_schema
 	 */
 	public function test_get_item_schema() {
 		$request  = new WP_REST_Request( 'OPTIONS', self::REST_BASE );
@@ -710,10 +728,6 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 		$this->assertContains( 'draft', $schema['properties']['status']['enum'] );
 		$this->assertContains( 'publish', $schema['properties']['status']['enum'] );
 	}
-
-	// -------------------------------------------------------------------------
-	// Required abstract method stubs
-	// -------------------------------------------------------------------------
 
 	/**
 	 * @doesNotPerformAssertions
