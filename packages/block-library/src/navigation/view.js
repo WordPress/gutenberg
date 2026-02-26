@@ -126,7 +126,7 @@ const { state, actions } = store(
 					ref.focus();
 				}
 				const { menuOpenedBy } = state;
-				if ( menuOpenedBy.click || menuOpenedBy.focus || menuOpenedBy.hover ) {
+				if ( menuOpenedBy.click || menuOpenedBy.focus ) {
 					actions.closeMenu( 'click' );
 					actions.closeMenu( 'focus' );
 					actions.closeMenu( 'hover' );
