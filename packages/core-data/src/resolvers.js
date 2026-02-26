@@ -1105,7 +1105,7 @@ export const getRevisions =
 				// When requesting all fields, the list of results can be used to
 				// resolve the `getRevision` selector in addition to `getRevisions`.
 				if ( ! query?._fields && ! query.context ) {
-					const key = entityConfig.key || DEFAULT_ENTITY_KEY;
+					const key = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
 					const resolutionsArgs = records
 						.filter( ( record ) => record[ key ] )
 						.map( ( record ) => [
