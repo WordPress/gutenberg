@@ -19,11 +19,10 @@ export const route = {
 			id: string;
 		};
 	} ) => {
-		const postId = parseInt( params.id, 10 );
-
-		if ( Number.isNaN( postId ) ) {
-			throw notFound();
-		}
+		// Try to parse as integer for numeric post IDs
+		const numericId = parseInt( params.id, 10 );
+		// Use numeric ID if valid, otherwise use string ID (e.g., template part slugs)
+		const postId = Number.isNaN( numericId ) ? params.id : numericId;
 
 		try {
 			const [ postType, post ] = await Promise.all( [
@@ -50,14 +49,19 @@ export const route = {
 			id: string;
 		};
 	} ) => {
+		// Try to parse as integer for numeric post IDs
+		const numericId = parseInt( params.id, 10 );
+		// Use numeric ID if valid, otherwise use string ID (e.g., template part slugs)
+		const postId = Number.isNaN( numericId ) ? params.id : numericId;
+
 		const post = await resolveSelect( coreStore ).getEntityRecord(
 			'postType',
 			params.type,
-			params.id
+			postId
 		);
 
-		if ( post?.title?.rendered ) {
-			return decodeEntities( post.title.rendered );
+		if ( ( post as any )?.title?.rendered ) {
+			return decodeEntities( ( post as any ).title.rendered );
 		}
 
 		const postType = await resolveSelect( coreStore ).getPostType(
