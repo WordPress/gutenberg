@@ -11,8 +11,6 @@ test.describe( 'Collaboration - CRDT persistence', () => {
 		page,
 		requestUtils,
 	} ) => {
-		await collaborationUtils.setCollaboration( true );
-
 		// Create a draft post — it will not have _crdt_document meta.
 		const post = await requestUtils.createPost( {
 			title: 'Persistence Test - Draft',
@@ -30,73 +28,23 @@ test.describe( 'Collaboration - CRDT persistence', () => {
 			fullscreenMode: false,
 		} );
 
-		// Wait for the entity record resolver to finish.
-		await page.waitForFunction(
-			() => {
-				const postId = ( window as any ).wp.data
-					.select( 'core/editor' )
-					.getCurrentPostId();
-				if ( ! postId ) {
-					return false;
-				}
-				return ( window as any ).wp.data
-					.select( 'core' )
-					.hasFinishedResolution( 'getEntityRecord', [
-						'postType',
-						'post',
-						postId,
-					] );
-			},
-			{ timeout: 5000 }
-		);
+		// Wait for collaboration runtime and entity record to be ready.
+		await collaborationUtils.waitForEntityReady( page );
 
-		const persistedCrdtDoc = await page.evaluate( () => {
-			return window.wp.data
-				.select( 'core' )
-				.getEntityRecord(
-					'postType',
-					'post',
-					window.wp.data.select( 'core/editor' ).getCurrentPostId()
-				).meta._crdt_document;
-		} );
-
+		const persistedCrdtDoc =
+			await collaborationUtils.getCrdtDocument( page );
 		expect( persistedCrdtDoc ).toBeTruthy();
 
-		// Refresh the page and verify the CRDT document is loaded from the persisted meta.
+		// Refresh the page and verify the CRDT document is loaded from the
+		// persisted meta and no reconciliation save is triggered.
 		await page.reload();
+		await collaborationUtils.waitForEntityReady( page );
 
-		// Wait for the entity record resolver to finish.
-		await page.waitForFunction(
-			() => {
-				const postId = ( window as any ).wp.data
-					.select( 'core/editor' )
-					.getCurrentPostId();
-				if ( ! postId ) {
-					return false;
-				}
-				return ( window as any ).wp.data
-					.select( 'core' )
-					.hasFinishedResolution( 'getEntityRecord', [
-						'postType',
-						'post',
-						postId,
-					] );
-			},
-			{ timeout: 5000 }
-		);
+		const reloadedCrdtDoc =
+			await collaborationUtils.getCrdtDocument( page );
 
-		const reloadedCrdtDoc = await page.evaluate( () => {
-			return window.wp.data
-				.select( 'core' )
-				.getEntityRecord(
-					'postType',
-					'post',
-					window.wp.data.select( 'core/editor' ).getCurrentPostId()
-				).meta._crdt_document;
-		} );
-
-		// No invalidations should occur on reload, so the CRDT document should be
-		// the same as before.
+		// No invalidations should occur on reload, so the CRDT document should
+		// be identical to the one persisted before reload.
 		expect( reloadedCrdtDoc ).toBe( persistedCrdtDoc );
 	} );
 
@@ -106,8 +54,6 @@ test.describe( 'Collaboration - CRDT persistence', () => {
 		editor,
 		page,
 	} ) => {
-		await collaborationUtils.setCollaboration( true );
-
 		// Navigate to create a new post (auto-draft).
 		await admin.visitAdminPage( 'post-new.php' );
 		await editor.setPreferences( 'core/edit-post', {
@@ -115,42 +61,18 @@ test.describe( 'Collaboration - CRDT persistence', () => {
 			fullscreenMode: false,
 		} );
 
-		// Wait for collaboration runtime to initialize.
+		// Wait for collaboration runtime to initialize separately first, then
+		// wait for the entity record resolver to finish.
 		await page.waitForFunction(
 			() => ( window as any )._wpCollaborationEnabled === true,
 			{ timeout: 5000 }
 		);
-
-		// Wait for the entity record resolver to finish.
-		await page.waitForFunction(
-			() => {
-				const postId = ( window as any ).wp.data
-					.select( 'core/editor' )
-					.getCurrentPostId();
-				if ( ! postId ) {
-					return false;
-				}
-				return ( window as any ).wp.data
-					.select( 'core' )
-					.hasFinishedResolution( 'getEntityRecord', [
-						'postType',
-						'post',
-						postId,
-					] );
-			},
-			{ timeout: 5000 }
-		);
-
-		const persistedCrdtDoc = await page.evaluate( () => {
-			return window.wp.data
-				.select( 'core' )
-				.getEntityRecord(
-					'postType',
-					'post',
-					window.wp.data.select( 'core/editor' ).getCurrentPostId()
-				).meta._crdt_document;
+		await collaborationUtils.waitForEntityReady( page, {
+			requireCollaboration: false,
 		} );
 
+		const persistedCrdtDoc =
+			await collaborationUtils.getCrdtDocument( page );
 		expect( persistedCrdtDoc ).toBeFalsy();
 	} );
 } );
