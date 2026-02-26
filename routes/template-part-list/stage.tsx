@@ -250,6 +250,7 @@ function TemplatePartList() {
 	return (
 		<Page
 			title={ postTypeObject.labels?.name }
+			ariaLabel={ postTypeObject.labels?.name ?? '' }
 			subTitle={ postTypeObject.labels?.description }
 			className="template-part-page"
 			actions={

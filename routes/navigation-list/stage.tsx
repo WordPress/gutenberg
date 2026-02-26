@@ -131,6 +131,7 @@ function NavigationList() {
 		<>
 			<Page
 				title={ __( 'Navigation' ) }
+				ariaLabel={ __( 'Navigation' ) }
 				className="navigation-page"
 				hasPadding={ false }
 				actions={

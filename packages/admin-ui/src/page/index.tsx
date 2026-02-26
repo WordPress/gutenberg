@@ -29,19 +29,14 @@ function Page( {
 	children: React.ReactNode;
 	className?: string;
 	actions?: React.ReactNode;
-	ariaLabel?: string;
+	ariaLabel: string;
 	hasPadding?: boolean;
 	showSidebarToggle?: boolean;
 } ) {
 	const classes = clsx( 'admin-ui-page', className );
 
 	return (
-		<NavigableRegion
-			className={ classes }
-			ariaLabel={
-				ariaLabel ?? ( typeof title === 'string' ? title : undefined )
-			}
-		>
+		<NavigableRegion className={ classes } ariaLabel={ ariaLabel }>
 			{ ( title || breadcrumbs || badges ) && (
 				<Header
 					breadcrumbs={ breadcrumbs }

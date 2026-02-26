@@ -273,6 +273,7 @@ function PostList() {
 	return (
 		<Page
 			title={ postTypeObject.labels?.name }
+			ariaLabel={ postTypeObject.labels?.name ?? '' }
 			subTitle={ postTypeObject.labels?.description }
 			className={ `${ postTypeObject.name.toLowerCase() }-page` }
 			actions={

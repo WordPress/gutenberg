@@ -202,6 +202,7 @@ export default function DataviewsPatterns() {
 			<Page
 				className="edit-site-page-patterns-dataviews"
 				title={ title }
+				ariaLabel={ title ?? '' }
 				subTitle={ description }
 				actions={
 					<PatternsActions

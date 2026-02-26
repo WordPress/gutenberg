@@ -97,6 +97,7 @@ export default function SidebarGlobalStyles() {
 			}
 			className="edit-site-styles"
 			title={ __( 'Styles' ) }
+			ariaLabel={ __( 'Styles' ) }
 		>
 			<GlobalStylesUIWrapper
 				path={ section }

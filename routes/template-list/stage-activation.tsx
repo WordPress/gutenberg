@@ -300,6 +300,7 @@ function TemplateListActivation() {
 	return (
 		<Page
 			title={ __( 'Templates' ) }
+			ariaLabel={ __( 'Templates' ) }
 			className="template-page"
 			actions={ <AddNewTemplate /> }
 			hasPadding={ false }
