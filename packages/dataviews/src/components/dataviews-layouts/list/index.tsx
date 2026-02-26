@@ -304,7 +304,9 @@ function ListItem< Item >( {
 					<Composite.Item
 						id={ generateItemWrapperCompositeId( idPrefix ) }
 						aria-pressed={ isSelected }
-						aria-labelledby={ renderedTitleField ? labelId : undefined }
+						aria-labelledby={
+							renderedTitleField ? labelId : undefined
+						}
 						aria-describedby={ descriptionId }
 						className="dataviews-view-list__item"
 						onClick={ () => onSelect( item ) }
@@ -368,7 +370,6 @@ function ListItem< Item >( {
 					</Stack>
 
 					{ usedActions }
-
 				</Stack>
 			</Stack>
 		</Composite.Row>
