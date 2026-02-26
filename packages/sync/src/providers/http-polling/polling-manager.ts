@@ -372,7 +372,10 @@ function poll(): void {
 			}
 
 			roomStates.forEach( ( state ) => {
-				state.onStatusChange( { status: 'disconnected' } );
+				state.onStatusChange( {
+					status: 'disconnected',
+					retryInMs: pollInterval,
+				} );
 			} );
 		}
 

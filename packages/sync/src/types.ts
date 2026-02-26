@@ -75,16 +75,28 @@ export interface ConnectionError extends Error {
 }
 
 /**
- * Current connection status of a sync provider, including status and optional error information.
+ * Current connection status of a sync provider.
  */
-export interface ConnectionStatus {
-	status: 'connected' | 'connecting' | 'disconnected';
-
-	/**
-	 * Optional error information when status is 'disconnected'.
-	 */
-	error?: ConnectionError;
+export interface ConnectionStatusConnected {
+	status: 'connected';
 }
+
+export interface ConnectionStatusConnecting {
+	status: 'connecting';
+}
+
+export interface ConnectionStatusDisconnected {
+	status: 'disconnected';
+	/** Optional error information. */
+	error?: ConnectionError;
+	/** Milliseconds until the next automatic retry attempt. */
+	retryInMs?: number;
+}
+
+export type ConnectionStatus =
+	| ConnectionStatusConnected
+	| ConnectionStatusConnecting
+	| ConnectionStatusDisconnected;
 
 export type OnStatusChangeCallback = (
 	status: ConnectionStatus | null

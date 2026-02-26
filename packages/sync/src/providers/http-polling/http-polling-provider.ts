@@ -82,13 +82,16 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 	}
 
 	/**
-	 * Emit connection status.
+	 * Emit connection status, passing the full object through so that
+	 * additional fields (e.g. `retryInMs`) are preserved for consumers.
 	 *
-	 * @param status        The connection status
-	 * @param status.error  Optional error information when status is 'disconnected'
-	 * @param status.status The connection status ('connected', 'connecting', 'disconnected')
+	 * @param connectionStatus The connection status object
 	 */
-	protected emitStatus = ( { error, status }: ConnectionStatus ): void => {
+	protected emitStatus = ( connectionStatus: ConnectionStatus ): void => {
+		const { status } = connectionStatus;
+		const error =
+			status === 'disconnected' ? connectionStatus.error : undefined;
+
 		if ( this.status === status && ! error ) {
 			return;
 		}
@@ -102,7 +105,7 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 
 		// ObservableV2 expects arguments as an array
 		this.status = status;
-		this.emit( 'status', [ { error, status } ] );
+		this.emit( 'status', [ connectionStatus ] );
 	};
 
 	/**

@@ -17,7 +17,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState, useEffect, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { error as errorIcon } from '@wordpress/icons';
 
 /**
@@ -32,6 +32,44 @@ const { BlockCanvasCover } = unlock( privateApis );
 const INITIAL_DISCONNECTED_DEBOUNCE_MS = 5000;
 
 /**
+ * Hook that computes a countdown in seconds from a retryInMs value.
+ *
+ * @param {number|undefined} retryInMs Milliseconds until next retry.
+ * @param {string|undefined} status    Current connection status.
+ * @return {number|null} Seconds remaining, or null if no countdown.
+ */
+function useRetryCountdown( retryInMs, status ) {
+	const [ secondsRemaining, setSecondsRemaining ] = useState( null );
+	const retryAtRef = useRef( null );
+
+	useEffect( () => {
+		if ( status !== 'disconnected' || ! retryInMs ) {
+			setSecondsRemaining( null );
+			retryAtRef.current = null;
+			return;
+		}
+
+		const retryAt = Date.now() + retryInMs;
+		retryAtRef.current = retryAt;
+		setSecondsRemaining( Math.ceil( retryInMs / 1000 ) );
+
+		const intervalId = setInterval( () => {
+			const remaining = Math.ceil(
+				( retryAtRef.current - Date.now() ) / 1000
+			);
+			setSecondsRemaining( Math.max( 0, remaining ) );
+			if ( remaining <= 0 ) {
+				clearInterval( intervalId );
+			}
+		}, 1000 );
+
+		return () => clearInterval( intervalId );
+	}, [ retryInMs, status ] );
+
+	return secondsRemaining;
+}
+
+/**
  * Sync connection modal that displays when any entity reports a disconnection.
  * Uses BlockCanvasCover.Fill to render in the block canvas.
  *
@@ -41,6 +79,11 @@ export function SyncConnectionModal() {
 	const connectionState = useSelect( ( selectFn ) => {
 		return selectFn( coreDataStore ).getSyncConnectionStatus() || null;
 	}, [] );
+
+	const secondsRemaining = useRetryCountdown(
+		connectionState?.retryInMs,
+		connectionState?.status
+	);
 
 	const copyButtonRef = useCopyToClipboard( () => {
 		const blocks = select( blockEditorStore ).getBlocks();
@@ -97,6 +140,19 @@ export function SyncConnectionModal() {
 
 	const { title, description } = syncConnectionMessage;
 
+	const retryCountdownText =
+		secondsRemaining !== null
+			? sprintf(
+					/* translators: %d: number of seconds until retry */
+					_n(
+						'Retrying in %d second\u2026',
+						'Retrying in %d seconds\u2026',
+						secondsRemaining
+					),
+					secondsRemaining
+			  )
+			: '\u00A0'; // &nbsp; to preserve layout when countdown is hidden
+
 	return (
 		<BlockCanvasCover.Fill>
 			<Modal
@@ -109,9 +165,20 @@ export function SyncConnectionModal() {
 				shouldCloseOnEsc={ false }
 			>
 				<div className="editor-sync-connection-modal__container">
-					<VStack alignment="center" justify="center" spacing={ 2 }>
+					<VStack alignment="center" justify="center" spacing={ 1 }>
 						<Icon fill="#ccc" icon={ errorIcon } size={ 64 } />
 						<h1>{ title }</h1>
+						<p
+							className="editor-sync-connection-modal__retry-countdown"
+							style={ {
+								visibility:
+									secondsRemaining !== null
+										? 'visible'
+										: 'hidden',
+							} }
+						>
+							{ retryCountdownText }
+						</p>
 						<p className="editor-sync-connection-modal__description">
 							{ description }
 						</p>
