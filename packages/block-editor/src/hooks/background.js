@@ -47,7 +47,8 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 			!! support?.backgroundImage ||
 			!! support?.backgroundSize ||
 			!! support?.backgroundRepeat ||
-			!! support?.gradient
+			!! support?.gradient ||
+			!! support?.backgroundClip
 		);
 	}
 
@@ -117,11 +118,18 @@ export function getBackgroundImageClasses( style ) {
 
 function BackgroundInspectorControl( { children } ) {
 	const resetAllFilter = useCallback( ( attributes ) => {
+		const prevClip = attributes.style?.background?.backgroundClip;
+		const isTextGradient = prevClip === 'text';
 		return {
 			...attributes,
 			style: {
 				...attributes.style,
-				background: undefined,
+				background: isTextGradient
+					? {
+							gradient: attributes.style?.background?.gradient,
+							backgroundClip: prevClip,
+					  }
+					: undefined,
 			},
 		};
 	}, [] );
@@ -179,6 +187,9 @@ export function BackgroundImagePanel( {
 			backgroundSize:
 				settings?.background?.backgroundSize &&
 				hasBackgroundSupport( name, 'backgroundSize' ),
+			backgroundClip:
+				settings?.background?.backgroundClip &&
+				hasBackgroundSupport( name, 'backgroundClip' ),
 		},
 	};
 

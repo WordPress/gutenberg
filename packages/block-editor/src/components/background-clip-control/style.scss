@@ -1,0 +1,158 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.block-editor-background-clip-control__container {
+	position: relative;
+
+	&.is-open {
+		background-color: $gray-100;
+	}
+
+	.components-dropdown {
+		display: block;
+	}
+}
+
+.block-editor-background-clip-control__dropdown-toggle {
+	cursor: pointer;
+	background: transparent;
+	border: none;
+	height: $button-size-next-default-40px;
+	width: 100%;
+	padding-left: $grid-unit-15;
+	padding-right: $grid-unit-15;
+	color: $gray-900;
+
+	&:hover {
+		color: var(--wp-admin-theme-color);
+	}
+
+	&:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+}
+
+// Popover content
+.block-editor-background-clip-control__dropdown-content-wrapper {
+	min-width: 260px;
+}
+
+.block-editor-background-clip-control__popover-title {
+	font-size: 11px;
+	font-weight: 500;
+	text-transform: uppercase;
+	color: $gray-700;
+}
+
+.block-editor-background-clip-control__options {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: $grid-unit-10;
+}
+
+.block-editor-background-clip-control__option {
+	appearance: none;
+	background: $gray-100;
+	color: $gray-900;
+	border: $border-width solid $gray-200;
+	border-radius: $radius-small;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: $grid-unit-10;
+	padding: $grid-unit-15;
+	box-sizing: border-box;
+
+	@media not (prefers-reduced-motion) {
+		transition:
+			border-color 0.1s ease,
+			background-color 0.1s ease;
+	}
+
+	&:hover {
+		background-color: $gray-200;
+		border-color: $gray-400;
+	}
+
+	&:focus-visible {
+		outline: none;
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+
+	&.is-active {
+		background-color: $white;
+		border-color: var(--wp-admin-theme-color);
+		box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
+	}
+}
+
+.block-editor-background-clip-control__option-label {
+	font-size: 12px;
+	line-height: 1;
+}
+
+// Preview swatch shared styles
+.block-editor-background-clip-control__preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	border-radius: 2px;
+	box-sizing: border-box;
+
+	// Background gradient as the "fill" that gets clipped.
+	background: linear-gradient(135deg, var(--wp-admin-theme-color) 0%, var(--wp-admin-theme-color-darker-20, #{$gray-700}) 100%);
+
+	// Default: border-box — fill extends to border edge.
+	// Show a dashed border to indicate the border area is included.
+	border: 3px dashed rgba(0, 0, 0, 0.15);
+	background-clip: border-box;
+
+	&.is-padding-box {
+		// Fill clips to inside the border — border area is empty.
+		border: 3px dashed $gray-400;
+		background-clip: padding-box;
+	}
+
+	&.is-content-box {
+		// Fill clips to content only — padding and border are empty.
+		border: 3px dashed $gray-400;
+		padding: 4px;
+		background-clip: content-box;
+	}
+
+	&.is-text {
+		font-size: 18px;
+		font-weight: 800;
+		line-height: 1;
+		color: transparent;
+		border: none;
+		padding: 0;
+		-webkit-background-clip: text;
+		background-clip: text;
+	}
+}
+
+// Smaller preview in the toggle button row.
+.block-editor-background-clip-control__toggle-inner {
+	height: 100%;
+
+	.block-editor-background-clip-control__preview {
+		width: 20px;
+		height: 20px;
+		border-width: 2px;
+		flex-shrink: 0;
+
+		&.is-content-box {
+			padding: 2px;
+			border-width: 2px;
+		}
+
+		&.is-text {
+			font-size: 11px;
+		}
+	}
+}

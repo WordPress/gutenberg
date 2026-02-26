@@ -314,6 +314,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$actual   = $theme_json->get_settings();
 		$expected = array(
 			'background' => array(
+				'backgroundClip'  => true,
 				'backgroundImage' => true,
 				'backgroundSize'  => true,
 				'gradient'        => true,
@@ -357,6 +358,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'core/group'     => array(
 					'background' => array(
+						'backgroundClip'  => true,
 						'backgroundImage' => true,
 						'backgroundSize'  => true,
 						'gradient'        => true,

@@ -31,7 +31,13 @@ export function compileCSS( style: Style, options: StyleOptions = {} ): string {
 	if ( ! options?.selector ) {
 		const inlineRules: string[] = [];
 		rules.forEach( ( rule ) => {
-			inlineRules.push( `${ kebabCase( rule.key ) }: ${ rule.value };` );
+			inlineRules.push(
+				`${
+					rule.key.startsWith( '-' )
+						? rule.key
+						: kebabCase( rule.key )
+				}: ${ rule.value };`
+			);
 		} );
 		return inlineRules.join( ' ' );
 	}
@@ -56,7 +62,11 @@ export function compileCSS( style: Style, options: StyleOptions = {} ): string {
 				`${ subSelector } { ${ groupedRules[ subSelector ]
 					.map(
 						( rule: GeneratedCSSRule ) =>
-							`${ kebabCase( rule.key ) }: ${ rule.value };`
+							`${
+								rule.key.startsWith( '-' )
+									? rule.key
+									: kebabCase( rule.key )
+							}: ${ rule.value };`
 					)
 					.join( ' ' ) } }`
 			);

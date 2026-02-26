@@ -12,6 +12,9 @@ import { getValueFromVariable } from '@wordpress/global-styles-engine';
 /**
  * Internal dependencies
  */
+import BackgroundClipControl, {
+	ALL_BACKGROUND_CLIP_VALUES,
+} from '../background-clip-control';
 import BackgroundImageControl from '../background-image-control';
 import { ColorPanelDropdown } from './color-panel';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
@@ -20,7 +23,7 @@ import { setImmutably } from '../../utils/object';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
-	gradient: true,
+	gradient: false,
 };
 
 /**
@@ -46,8 +49,12 @@ export function useHasBackgroundControl(
  * @return {boolean}        Whether site settings has activated background panel.
  */
 export function useHasBackgroundPanel( settings ) {
-	const { backgroundImage, gradient } = settings?.background || {};
-	return Platform.OS === 'web' && ( backgroundImage || gradient );
+	const { backgroundImage, gradient, backgroundClip } =
+		settings?.background || {};
+	return (
+		Platform.OS === 'web' &&
+		( backgroundImage || gradient || backgroundClip )
+	);
 }
 
 /**
@@ -144,6 +151,9 @@ export default function BackgroundImagePanel( {
 	const areCustomGradientsEnabled = settings?.color?.customGradient;
 	const hasGradientColors = gradients.length > 0 || areCustomGradientsEnabled;
 
+	// Determine whether backgroundClip is currently set to text (text gradient).
+	const isTextGradient = value?.background?.backgroundClip === 'text';
+
 	const hasBackgroundGradientControl = useHasBackgroundControl(
 		settings,
 		'gradient'
@@ -152,14 +162,55 @@ export default function BackgroundImagePanel( {
 		hasGradientColors && hasBackgroundGradientControl;
 	const showBackgroundImageControl = useHasBackgroundControl( settings );
 
+	const clipSetting = settings?.background?.backgroundClip;
+	let allowedClipValues = [];
+	if ( clipSetting === true ) {
+		allowedClipValues = ALL_BACKGROUND_CLIP_VALUES;
+	} else if ( Array.isArray( clipSetting ) ) {
+		allowedClipValues = clipSetting;
+	}
+	// When text gradient support is active (the color panel's text section
+	// handles setting backgroundClip to 'text'), exclude 'text' from the
+	// background panel's clip control. This avoids shared-state confusion
+	// between the two panels.
+	const hasTextGradientSupport =
+		allowedClipValues.includes( 'text' ) && hasBackgroundGradientControl;
+	if ( hasTextGradientSupport ) {
+		allowedClipValues = allowedClipValues.filter( ( v ) => v !== 'text' );
+	}
+	const showBackgroundClipControl = allowedClipValues.length > 0;
+
+	const resetBackgroundClip = () =>
+		onChange(
+			setImmutably( value, [ 'background', 'backgroundClip' ], undefined )
+		);
+
 	const resetAllFilter = useCallback( ( previousValue ) => {
+		const prevClip = previousValue?.background?.backgroundClip;
+		const isTextGrad = prevClip === 'text';
+
 		return {
 			...previousValue,
-			background: {},
+			background: {
+				// When a text gradient is active, the color panel owns
+				// gradient and backgroundClip. Preserve them here so the
+				// background panel's "Reset all" only clears background-
+				// panel values (image, size, position, etc.).
+				...( isTextGrad
+					? {
+							gradient: previousValue?.background?.gradient,
+							backgroundClip: prevClip,
+					  }
+					: {} ),
+			},
 		};
 	}, [] );
 
-	if ( ! showBackgroundGradientControl && ! showBackgroundImageControl ) {
+	if (
+		! showBackgroundGradientControl &&
+		! showBackgroundImageControl &&
+		! showBackgroundClipControl
+	) {
 		return null;
 	}
 
@@ -177,7 +228,7 @@ export default function BackgroundImagePanel( {
 			: gradientValue;
 	};
 
-	const resetBackground = () =>
+	const resetBackgroundImage = () =>
 		onChange(
 			setImmutably(
 				value,
@@ -186,10 +237,23 @@ export default function BackgroundImagePanel( {
 			)
 		);
 
-	const resetGradient = () =>
-		onChange(
-			setImmutably( value, [ 'background', 'gradient' ], undefined )
+	const resetGradient = () => {
+		let newValue = setImmutably(
+			value,
+			[ 'background', 'gradient' ],
+			undefined
 		);
+		// If the gradient was used as a text gradient, also clear backgroundClip
+		// to avoid leaving text invisible with no gradient applied.
+		if ( value?.background?.backgroundClip === 'text' ) {
+			newValue = setImmutably(
+				newValue,
+				[ 'background', 'backgroundClip' ],
+				undefined
+			);
+		}
+		onChange( newValue );
+	};
 
 	// Get current gradient value, decoding preset slug references.
 	const currentGradient = decodeValue( value?.background?.gradient );
@@ -221,7 +285,7 @@ export default function BackgroundImagePanel( {
 					className="block-editor-background-panel__item"
 					hasValue={ () => hasBackgroundImageValue( value ) }
 					label={ __( 'Image' ) }
-					onDeselect={ resetBackground }
+					onDeselect={ resetBackgroundImage }
 					isShownByDefault={ defaultControls.backgroundImage }
 					panelId={ panelId }
 				>
@@ -239,7 +303,9 @@ export default function BackgroundImagePanel( {
 				<ColorPanelDropdown
 					className="block-editor-background-panel__item"
 					label={ __( 'Gradient' ) }
-					hasValue={ () => hasBackgroundGradientValue( value ) }
+					hasValue={ () =>
+						hasBackgroundGradientValue( value ) && ! isTextGradient
+					}
 					resetValue={ resetGradient }
 					isShownByDefault={ defaultControls.gradient }
 					indicators={ [ currentGradient ] }
@@ -262,6 +328,33 @@ export default function BackgroundImagePanel( {
 					} }
 					panelId={ panelId }
 				/>
+			) }
+			{ showBackgroundClipControl && (
+				<ToolsPanelItem
+					className="block-editor-background-panel__item"
+					hasValue={ () =>
+						!! value?.background?.backgroundClip &&
+						value?.background?.backgroundClip !== 'text'
+					}
+					label={ __( 'Clip' ) }
+					onDeselect={ resetBackgroundClip }
+					isShownByDefault={ defaultControls.backgroundClip }
+					panelId={ panelId }
+				>
+					<BackgroundClipControl
+						value={ value?.background?.backgroundClip }
+						onChange={ ( newClip ) => {
+							onChange(
+								setImmutably(
+									value,
+									[ 'background', 'backgroundClip' ],
+									newClip
+								)
+							);
+						} }
+						allowedValues={ allowedClipValues }
+					/>
+				</ToolsPanelItem>
 			) }
 		</Wrapper>
 	);

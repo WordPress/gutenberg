@@ -1,6 +1,7 @@
 @use "@wordpress/base-styles/default-custom-properties";
 @use "@wordpress/base-styles/mixins" as *;
 @use "./autocompleters/style.scss" as *;
+@use "./components/background-clip-control/style.scss" as *;
 @use "./components/background-image-control/style.scss" as *;
 @use "./components/block-alignment-control/style.scss" as *;
 @use "./components/block-canvas/style.scss" as *;
