@@ -40,24 +40,35 @@ function gutenberg_register_background_support( $block_type ) {
  * @return string                Filtered block content.
  */
 function gutenberg_render_background_support( $block_content, $block ) {
-	$block_type                   = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$block_attributes             = ( isset( $block['attrs'] ) && is_array( $block['attrs'] ) ) ? $block['attrs'] : array();
-	$has_background_image_support = block_has_support( $block_type, array( 'background', 'backgroundImage' ), false );
+	$block_type       = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$block_attributes = ( isset( $block['attrs'] ) && is_array( $block['attrs'] ) ) ? $block['attrs'] : array();
+
+	$has_background_image_support = block_has_support( $block_type, array( 'background', 'backgroundImage' ), false )
+		&& ! wp_should_skip_block_supports_serialization( $block_type, 'background', 'backgroundImage' );
+
+	$has_background_clip_support = block_has_support( $block_type, array( 'background', 'backgroundClip' ), false )
+		&& ! wp_should_skip_block_supports_serialization( $block_type, 'background', 'backgroundClip' );
 
 	if (
-		! $has_background_image_support ||
-		wp_should_skip_block_supports_serialization( $block_type, 'background', 'backgroundImage' ) ||
+		( ! $has_background_image_support && ! $has_background_clip_support ) ||
 		! isset( $block_attributes['style']['background'] )
 	) {
 		return $block_content;
 	}
 
-	$background_styles                         = array();
-	$background_styles['backgroundImage']      = $block_attributes['style']['background']['backgroundImage'] ?? null;
-	$background_styles['backgroundSize']       = $block_attributes['style']['background']['backgroundSize'] ?? null;
-	$background_styles['backgroundPosition']   = $block_attributes['style']['background']['backgroundPosition'] ?? null;
-	$background_styles['backgroundRepeat']     = $block_attributes['style']['background']['backgroundRepeat'] ?? null;
-	$background_styles['backgroundAttachment'] = $block_attributes['style']['background']['backgroundAttachment'] ?? null;
+	$background_styles = array();
+
+	if ( $has_background_image_support ) {
+		$background_styles['backgroundImage']      = $block_attributes['style']['background']['backgroundImage'] ?? null;
+		$background_styles['backgroundSize']       = $block_attributes['style']['background']['backgroundSize'] ?? null;
+		$background_styles['backgroundPosition']   = $block_attributes['style']['background']['backgroundPosition'] ?? null;
+		$background_styles['backgroundRepeat']     = $block_attributes['style']['background']['backgroundRepeat'] ?? null;
+		$background_styles['backgroundAttachment'] = $block_attributes['style']['background']['backgroundAttachment'] ?? null;
+	}
+
+	if ( $has_background_clip_support ) {
+		$background_styles['backgroundClip'] = $block_attributes['style']['background']['backgroundClip'] ?? null;
+	}
 	if ( ! empty( $background_styles['backgroundImage'] ) ) {
 		$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
 		// If the background size is set to `contain` and no position is set, set the position to `center`.
