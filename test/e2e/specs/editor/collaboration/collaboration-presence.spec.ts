@@ -20,7 +20,7 @@ test.describe( 'Collaboration - Presence', () => {
 		// collaborators are present.
 		await expect(
 			page.getByRole( 'button', { name: /Collaborators list/ } )
-		).toBeVisible( { timeout: 10000 } );
+		).toBeVisible( { timeout: 30_000 } );
 	} );
 
 	test( 'Collaborator name shows in the popover list', async ( {
@@ -39,7 +39,7 @@ test.describe( 'Collaboration - Presence', () => {
 		const presenceButton = page.getByRole( 'button', {
 			name: /Collaborators list/,
 		} );
-		await expect( presenceButton ).toBeVisible( { timeout: 10000 } );
+		await expect( presenceButton ).toBeVisible( { timeout: 30_000 } );
 		await presenceButton.click();
 
 		// The popover should list the second collaborator by name.

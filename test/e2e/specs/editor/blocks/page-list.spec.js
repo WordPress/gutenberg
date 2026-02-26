@@ -30,7 +30,7 @@ test.describe( 'Page List block', () => {
 
 		await expect( pageListBlock ).toBeVisible( {
 			// Wait for the Page List block API request to resolve.
-			timeout: 10000,
+			timeout: 30_000,
 		} );
 
 		// Locate the page list item

@@ -51,6 +51,9 @@ test.describe( 'Widgets screen', () => {
 			'Update button should start out disabled'
 		).toBeDisabled();
 
+		// Wait for widget areas to render before calling .all()
+		// (which doesn't auto-wait and returns an empty array if called too early).
+		await expect( widgetsScreen.widgetAreas.first() ).toBeVisible();
 		const [ firstWidgetArea, secondWidgetArea ] =
 			await widgetsScreen.widgetAreas.all();
 

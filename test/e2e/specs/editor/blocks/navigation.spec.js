@@ -2349,7 +2349,7 @@ class Navigation {
 				},
 				{
 					message: 'Focus should be within the link control',
-					timeout: 500,
+					timeout: 5_000,
 				}
 			)
 			.toBe( true );

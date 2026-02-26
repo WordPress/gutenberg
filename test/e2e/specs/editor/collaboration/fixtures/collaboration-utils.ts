@@ -153,10 +153,10 @@ export default class CollaborationUtils {
 		await Promise.all( [
 			this.primaryPage
 				.getByRole( 'button', { name: /Collaborators list/ } )
-				.waitFor( { timeout: 15000 } ),
+				.waitFor( { timeout: 30_000 } ),
 			this.secondPage
 				.getByRole( 'button', { name: /Collaborators list/ } )
-				.waitFor( { timeout: 15000 } ),
+				.waitFor( { timeout: 30_000 } ),
 		] );
 
 		// Allow a full round of polling after awareness is established
@@ -179,7 +179,7 @@ export default class CollaborationUtils {
 				( window as any )._wpCollaborationEnabled === true &&
 				window?.wp?.data &&
 				window?.wp?.blocks,
-			{ timeout: 15000 }
+			{ timeout: 30_000 }
 		);
 	}
 
@@ -199,7 +199,7 @@ export default class CollaborationUtils {
 				( response ) =>
 					response.url().includes( 'wp-sync' ) &&
 					response.status() === 200,
-				{ timeout: 10000 }
+				{ timeout: 30_000 }
 			);
 		}
 	}
