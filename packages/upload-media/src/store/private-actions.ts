@@ -1151,25 +1151,8 @@ export function generateThumbnails( id: QueueItemId ) {
 		) {
 			const settings = select.getSettings();
 			const allImageSizes = settings.allImageSizes || {};
-
-			/**
-			 * Filters the list of image sizes to generate for an uploaded image.
-			 *
-			 * @param {string[]} sizesToGenerate Array of image size names to generate.
-			 * @param {Object}   context         Context object containing item, attachment, and allImageSizes.
-			 */
-			const filteredSizes = applyFilters(
-				'editor.media.imageSizesToGenerate',
-				attachment.missing_image_sizes,
-				{ item, attachment, allImageSizes }
-			);
 			const sizesToGenerate: string[] =
-				Array.isArray( filteredSizes ) &&
-				filteredSizes.every(
-					( size: unknown ) => typeof size === 'string'
-				)
-					? ( filteredSizes as string[] )
-					: ( attachment.missing_image_sizes as string[] );
+				attachment.missing_image_sizes as string[];
 
 			if ( sizesToGenerate.length === 0 ) {
 				dispatch.finishOperation( id, {} );
