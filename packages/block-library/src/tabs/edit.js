@@ -134,16 +134,15 @@ function Edit( {
 			return;
 		}
 
-		// Find which tab index was removed.
-		const removedIndex = prevClientIds.findIndex(
-			( id ) => ! currentClientIds.includes( id )
-		);
-
-		if ( removedIndex === -1 || ! menuItemClientIds[ removedIndex ] ) {
-			return;
-		}
-
-		removeBlock( menuItemClientIds[ removedIndex ], false );
+		// Remove the menu item for each tab that was deleted.
+		prevClientIds.forEach( ( id, index ) => {
+			if (
+				! currentClientIds.includes( id ) &&
+				menuItemClientIds[ index ]
+			) {
+				removeBlock( menuItemClientIds[ index ], false );
+			}
+		} );
 	}, [ tabs, menuItemClientIds, removeBlock ] );
 
 	/**
@@ -170,16 +169,12 @@ function Edit( {
 			return;
 		}
 
-		// Find which index was removed.
-		const removedIndex = prevMenuItemIds.findIndex(
-			( id ) => ! menuItemClientIds.includes( id )
-		);
-
-		if ( removedIndex === -1 || ! tabs[ removedIndex ] ) {
-			return;
-		}
-
-		removeBlock( tabs[ removedIndex ].clientId, false );
+		// Remove the tab for each menu item that was deleted.
+		prevMenuItemIds.forEach( ( id, index ) => {
+			if ( ! menuItemClientIds.includes( id ) && tabs[ index ] ) {
+				removeBlock( tabs[ index ].clientId, false );
+			}
+		} );
 	}, [ menuItemClientIds, tabs, removeBlock ] );
 
 	/**
