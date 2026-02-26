@@ -1,0 +1,66 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.block-editor-background-clip-control__list {
+	display: flex;
+	gap: 12px;
+	flex-wrap: wrap;
+	padding-bottom: $grid-unit-10;
+}
+
+.block-editor-background-clip-control__option {
+	appearance: none;
+	background: none;
+	color: $gray-800;
+	border: $gray-200 $border-width solid;
+	border-radius: $radius-small;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	height: $button-size-small + 2 * $border-width;
+	width: $button-size-small + 2 * $border-width;
+	box-sizing: border-box;
+	transform: scale(1);
+	@media not (prefers-reduced-motion) {
+		transition: transform 0.1s ease;
+	}
+	will-change: transform;
+
+	&:focus {
+		border: #{$border-width * 2} solid $gray-700;
+	}
+
+	&:hover {
+		transform: scale(1.2);
+	}
+}
+
+.block-editor-background-clip-control__item.is-active
+	.block-editor-background-clip-control__option {
+	border-color: $gray-700;
+}
+
+.block-editor-background-clip-control__preview {
+	display: block;
+	width: 20px;
+	height: 20px;
+	border: 3px dashed $gray-400;
+	padding: 2px;
+	border-radius: 2px;
+	background-color: $gray-300;
+	background-clip: border-box; // default, overridden via inline style
+
+	&.is-text {
+		font-size: 9px;
+		font-weight: 700;
+		line-height: 20px;
+		color: transparent;
+		border: none;
+		padding: 0;
+		background-color: $gray-800;
+		-webkit-background-clip: text;
+		background-clip: text;
+	}
+}
