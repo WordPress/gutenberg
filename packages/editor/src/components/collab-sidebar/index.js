@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -20,7 +20,11 @@ import {
 	ALL_NOTES_SIDEBAR,
 	FLOATING_NOTES_SIDEBAR,
 	SIDEBARS,
+	NOTES_FILTER_ALL,
+	NOTES_FILTER_UNRESOLVED,
+	NOTES_FILTER_RESOLVED,
 } from './constants';
+import NotesAppearancePopover from './appearance-popover';
 import { Comments } from './comments';
 import { store as editorStore } from '../../store';
 import AddCommentMenuItem from './comment-menu-item';
@@ -36,7 +40,9 @@ import { unlock } from '../../lock-unlock';
 
 function NotesSidebarContent( {
 	styles,
-	comments,
+	allComments,
+	unresolvedComments,
+	resolvedComments,
 	commentSidebarRef,
 	reflowComments,
 	commentLastUpdated,
@@ -44,6 +50,35 @@ function NotesSidebarContent( {
 } ) {
 	const { onCreate, onEdit, onDelete } =
 		useBlockCommentsActions( reflowComments );
+
+	// Read the filter preference directly so changes are picked up
+	// inside the Slot/Fill portal without depending on parent re-renders.
+	const notesFilter = useSelect(
+		( select ) =>
+			select( preferencesStore ).get( 'core', 'notesFilter' ) ||
+			NOTES_FILTER_UNRESOLVED,
+		[]
+	);
+
+	const comments = useMemo( () => {
+		if ( isFloating ) {
+			return unresolvedComments;
+		}
+		switch ( notesFilter ) {
+			case NOTES_FILTER_RESOLVED:
+				return resolvedComments;
+			case NOTES_FILTER_ALL:
+				return allComments;
+			default:
+				return unresolvedComments;
+		}
+	}, [
+		isFloating,
+		notesFilter,
+		allComments,
+		unresolvedComments,
+		resolvedComments,
+	] );
 
 	return (
 		<VStack
@@ -79,7 +114,8 @@ function NotesSidebarContent( {
 
 function NotesSidebar( { postId } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
 	const { toggleBlockSpotlight, selectBlock } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -121,6 +157,7 @@ function NotesSidebar( { postId } ) {
 	const {
 		resultComments,
 		unresolvedSortedThreads,
+		resolvedSortedThreads,
 		reflowComments,
 		commentLastUpdated,
 	} = useBlockComments( postId );
@@ -203,7 +240,15 @@ function NotesSidebar( { postId } ) {
 			{ !! currentThread && (
 				<CommentAvatarIndicator
 					thread={ currentThread }
-					onClick={ openTheSidebar }
+					onClick={ async () => {
+						const activeArea =
+							await getActiveComplementaryArea( 'core' );
+						if ( SIDEBARS.includes( activeArea ) ) {
+							disableComplementaryArea( 'core' );
+						} else {
+							openTheSidebar();
+						}
+					} }
 				/>
 			) }
 			<AddCommentMenuItem onClick={ openTheSidebar } />
@@ -213,15 +258,20 @@ function NotesSidebar( { postId } ) {
 					name={ ALL_NOTES_SIDEBAR }
 					title={ __( 'All notes' ) }
 					header={
-						<h2 className="interface-complementary-area-header__title">
-							{ __( 'All notes' ) }
-						</h2>
+						<>
+							<h2 className="interface-complementary-area-header__title">
+								{ __( 'All notes' ) }
+							</h2>
+							<NotesAppearancePopover />
+						</>
 					}
 					icon={ commentIcon }
 					closeLabel={ __( 'Close Notes' ) }
 				>
 					<NotesSidebarContent
-						comments={ resultComments }
+						allComments={ resultComments }
+						unresolvedComments={ unresolvedSortedThreads }
+						resolvedComments={ resolvedSortedThreads }
 						commentSidebarRef={ commentSidebarRef }
 					/>
 				</PluginSidebar>
@@ -236,7 +286,9 @@ function NotesSidebar( { postId } ) {
 					backgroundColor={ backgroundColor }
 				>
 					<NotesSidebarContent
-						comments={ unresolvedSortedThreads }
+						allComments={ resultComments }
+						unresolvedComments={ unresolvedSortedThreads }
+						resolvedComments={ resolvedSortedThreads }
 						commentSidebarRef={ commentSidebarRef }
 						reflowComments={ reflowComments }
 						commentLastUpdated={ commentLastUpdated }

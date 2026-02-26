@@ -72,6 +72,8 @@ export function initializeEditor(
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
 		isPublishSidebarEnabled: true,
+		notesFilter: 'unresolved',
+		notesDensity: 'balanced',
 	} );
 
 	if ( window.__clientSideMediaProcessing ) {

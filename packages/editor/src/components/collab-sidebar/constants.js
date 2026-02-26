@@ -1,3 +1,9 @@
 export const ALL_NOTES_SIDEBAR = 'edit-post/collab-history-sidebar';
 export const FLOATING_NOTES_SIDEBAR = 'edit-post/collab-sidebar';
 export const SIDEBARS = [ ALL_NOTES_SIDEBAR, FLOATING_NOTES_SIDEBAR ];
+
+export const NOTES_FILTER_ALL = 'all';
+export const NOTES_FILTER_UNRESOLVED = 'unresolved';
+export const NOTES_FILTER_RESOLVED = 'resolved';
+export const NOTES_DENSITY_BALANCED = 'balanced';
+export const NOTES_DENSITY_COMPACT = 'compact';
