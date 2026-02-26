@@ -20,15 +20,14 @@ export default function EditSectionButton( { clientId } ) {
 		stopEditingContentOnlySection,
 	} = useContentOnlySectionEdit( clientId );
 
-	const { blockName, isPreviewMode } = useSelect(
+	const { blockName } = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
-				return { blockName: null, isPreviewMode: false };
+				return { blockName: null };
 			}
-			const { getBlockName, getSettings } = select( blockEditorStore );
+			const { getBlockName } = select( blockEditorStore );
 			return {
 				blockName: getBlockName( clientId ),
-				isPreviewMode: getSettings().isPreviewMode,
 			};
 		},
 		[ clientId ]
@@ -39,13 +38,11 @@ export default function EditSectionButton( { clientId } ) {
 	// their own toolbar buttons ("Edit original").
 	// Note: isSectionBlock returns false while the section is being edited,
 	// so we also check isEditingContentOnlySection to show "Exit pattern".
-	// Also disable in preview mode (e.g. revision mode).
 	if (
 		! clientId ||
 		( ! isSectionBlock && ! isEditingContentOnlySection ) ||
 		isReusableBlock( blockType ) ||
-		isTemplatePart( blockType ) ||
-		isPreviewMode
+		isTemplatePart( blockType )
 	) {
 		return null;
 	}

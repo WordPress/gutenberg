@@ -78,6 +78,7 @@ export function PrivateBlockToolbar( {
 		showBlockVisibilityButton,
 		showSwitchSectionStyleButton,
 		areSelectedBlocksHiddenOnViewport,
+		isPreviewMode,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -124,8 +125,9 @@ export function PrivateBlockToolbar( {
 		const _isSectionBlock = isSectionBlock( selectedBlockClientId );
 		const _showSwitchSectionStyleButton = _isZoomOut || _isSectionBlock;
 
+		const settings = getSettings();
 		const _currentDeviceType =
-			getSettings()?.[ deviceTypeKey ]?.toLowerCase() || 'desktop';
+			settings?.[ deviceTypeKey ]?.toLowerCase() || 'desktop';
 		const _areSelectedBlocksHiddenOnViewport =
 			selectedBlockClientIds.length > 0 &&
 			selectedBlockClientIds.every( ( id ) =>
@@ -161,6 +163,7 @@ export function PrivateBlockToolbar( {
 			showSwitchSectionStyleButton: _showSwitchSectionStyleButton,
 			areSelectedBlocksHiddenOnViewport:
 				_areSelectedBlocksHiddenOnViewport,
+			isPreviewMode: settings?.isPreviewMode,
 		};
 	}, [] );
 
@@ -245,7 +248,7 @@ export function PrivateBlockToolbar( {
 					shouldShowVisualToolbar &&
 					isMultiToolbar &&
 					showGroupButtons && <BlockGroupToolbar /> }
-				{ ! isMultiToolbar && (
+				{ ! isPreviewMode && ! isMultiToolbar && (
 					<EditSectionButton clientId={ blockClientIds[ 0 ] } />
 				) }
 				{ ! areSelectedBlocksHiddenOnViewport && showShuffleButton && (
