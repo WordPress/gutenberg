@@ -48,7 +48,7 @@ const createNavigationOverlay = async ( {
 
 	await expect(
 		page.locator( 'h1' ).filter( { hasText: 'Navigation Overlay' } )
-	).toBeVisible( { timeout: 10000 } );
+	).toBeVisible( { timeout: 30_000 } );
 };
 
 test.describe( 'Navigation Overlay Template Part', () => {

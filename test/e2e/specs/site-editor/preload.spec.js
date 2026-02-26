@@ -40,13 +40,20 @@ test.describe( 'Preload', () => {
 		await admin.visitSiteEditor();
 
 		// To do: these should all be removed or preloaded.
-		expect( requests ).toEqual( [
-			// Abilities system initialization.
+		// The abilities request may or may not fire before the iframe
+		// depending on PHP execution speed (Docker vs Playground WASM).
+		const allowedPreIframeRequests = [
 			'/wp-abilities/v1/categories',
 			'/wp-abilities/v1/abilities',
-			// Seems to be coming from `enableComplementaryArea`.
 			'/wp/v2/users/me',
 			'/wp/v2/settings',
-		] );
+		];
+		for ( const request of requests ) {
+			expect( allowedPreIframeRequests ).toContain( request );
+		}
+		// Ensure no new requests are introduced.
+		expect( requests.length ).toBeLessThanOrEqual(
+			allowedPreIframeRequests.length
+		);
 	} );
 } );

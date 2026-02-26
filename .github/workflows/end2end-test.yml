@@ -149,7 +149,7 @@ jobs:
                   SHARD_TOTAL: ${{ matrix.totalParts }}
                   # Playground (WASM PHP) is ~3x slower than Docker.
                   # Scale up Playwright timeouts to avoid false negatives.
-                  TIMEOUT_MULTIPLIER: 2
+                  TIMEOUT_MULTIPLIER: 3
               run: |
                   xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e -- --shard="${SHARD_PART}/${SHARD_TOTAL}"
 
