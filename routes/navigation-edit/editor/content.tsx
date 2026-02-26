@@ -10,8 +10,10 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 // @ts-expect-error - No type declarations available for @wordpress/blocks
 import { createBlock } from '@wordpress/blocks';
-import { useCallback } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+// @ts-expect-error - No type declarations available for @wordpress/block-library
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -26,6 +28,99 @@ type Block = {
 };
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
+const { LinkUI, updateAttributes, useEntityBinding } = unlock(
+	blockLibraryPrivateApis
+);
+
+const BLOCKS_WITH_LINK_UI_SUPPORT = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
+
+function AdditionalBlockContent( {
+	block,
+	insertedBlock,
+	setInsertedBlock,
+}: {
+	block: Block;
+	insertedBlock: Block | null;
+	setInsertedBlock: ( block: Block | null ) => void;
+} ) {
+	const {
+		updateBlockAttributes,
+		removeBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
+	const supportsLinkControls = BLOCKS_WITH_LINK_UI_SUPPORT.includes(
+		insertedBlock?.name ?? ''
+	);
+	const blockWasJustInserted = insertedBlock?.clientId === block.clientId;
+	const showLinkControls = supportsLinkControls && blockWasJustInserted;
+
+	const { createBinding, clearBinding } = useEntityBinding( {
+		clientId: insertedBlock?.clientId ?? '',
+		attributes: insertedBlock?.attributes || {},
+	} );
+
+	if ( ! showLinkControls ) {
+		return null;
+	}
+
+	const cleanupInsertedBlock = () => {
+		const shouldAutoSelectBlock = false;
+		if ( ! insertedBlock?.attributes?.url && insertedBlock?.clientId ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
+		}
+		setInsertedBlock( null );
+	};
+
+	const setInsertedBlockAttributes =
+		( _insertedBlockClientId: string ) =>
+		( _updatedAttributes: Record< string, unknown > ) => {
+			if ( ! _insertedBlockClientId ) {
+				return;
+			}
+			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
+		};
+
+	const handleSetInsertedBlock = ( newBlock: Block | null ) => {
+		const shouldAutoSelectBlock = false;
+		if ( insertedBlock?.clientId && newBlock ) {
+			removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
+		}
+		setInsertedBlock( newBlock );
+	};
+
+	return (
+		<LinkUI
+			clientId={ insertedBlock?.clientId }
+			link={ insertedBlock?.attributes }
+			onBlockInsert={ handleSetInsertedBlock }
+			onClose={ () => {
+				cleanupInsertedBlock();
+			} }
+			onChange={ ( updatedValue: any ) => {
+				const { isEntityLink, attributes: updatedAttributes } =
+					updateAttributes(
+						updatedValue,
+						setInsertedBlockAttributes(
+							insertedBlock?.clientId ?? ''
+						),
+						insertedBlock?.attributes
+					);
+
+				if ( isEntityLink ) {
+					createBinding( updatedAttributes );
+				} else {
+					clearBinding();
+				}
+
+				setInsertedBlock( null );
+			} }
+		/>
+	);
+}
 
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
 const MAX_PAGE_COUNT = 100;
@@ -48,6 +143,10 @@ export default function NavigationMenuContent( {
 }: {
 	rootClientId: string;
 } ) {
+	const [ insertedBlock, setInsertedBlock ] = useState< Block | null >(
+		null
+	);
+
 	const { listViewRootClientId, isLoading } = useSelect(
 		( select ) => {
 			const {
@@ -95,10 +194,12 @@ export default function NavigationMenuContent( {
 				! block.attributes.url
 			) {
 				__unstableMarkNextChangeAsNotPersistent();
-				replaceBlock(
-					block.clientId,
-					createBlock( 'core/navigation-link', block.attributes )
+				const newBlock = createBlock(
+					'core/navigation-link',
+					block.attributes
 				);
+				replaceBlock( block.clientId, newBlock );
+				setInsertedBlock( newBlock );
 			}
 		},
 		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
@@ -115,6 +216,13 @@ export default function NavigationMenuContent( {
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender={ false }
 					isExpanded
+					additionalBlockContent={ ( block: Block ) => (
+						<AdditionalBlockContent
+							block={ block }
+							insertedBlock={ insertedBlock }
+							setInsertedBlock={ setInsertedBlock }
+						/>
+					) }
 				/>
 			) }
 			<div className="navigation-edit-editor__hidden-blocks">
