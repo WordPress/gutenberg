@@ -15,8 +15,7 @@
 	-webkit-appearance: none;
 
 	margin: 0;
-	padding-block: var(--wp--preset--spacing--20, 0.5em);
-	padding-inline: var(--wp--preset--spacing--30, 1em);
+	padding: var(--wp--preset--spacing--20, 0.5em) var(--wp--preset--spacing--30, 1em);
 
 	// Inherit typography from parent
 	font-size: inherit;
@@ -28,13 +27,7 @@
 	text-align: inherit;
 
 	&:focus-visible {
-		outline: 2px solid #000;
 		outline-offset: 2px;
-	}
-
-	&:hover {
-		background-color: #eaeaea;
-		color: #000;
 	}
 
 	&[aria-selected="true"],
