@@ -3,10 +3,22 @@
  */
 import type { View, Filter } from '@wordpress/dataviews';
 
-type ActiveViewOverrides = {
-	filters?: Filter[];
-	sort?: View[ 'sort' ];
-};
+/**
+ * Internal dependencies
+ */
+import type { ActiveViewOverrides } from './types';
+
+const SCALAR_VALUES = [
+	'titleField',
+	'mediaField',
+	'descriptionField',
+	'showTitle',
+	'showMedia',
+	'showDescription',
+	'showLevels',
+	'groupBy',
+	'infiniteScrollEnabled',
+] as const;
 
 /**
  * Merges activeViewOverrides into a view.
@@ -28,6 +40,13 @@ export function mergeActiveViewOverrides(
 	}
 
 	let result = view;
+
+	// Merge scalar overrides — always win over persisted values
+	for ( const key of SCALAR_VALUES ) {
+		if ( key in activeViewOverrides ) {
+			result = { ...result, [ key ]: activeViewOverrides[ key ] };
+		}
+	}
 
 	// Merge filters
 	if (
@@ -61,6 +80,28 @@ export function mergeActiveViewOverrides(
 		}
 	}
 
+	// Merge layout — shallow merge, override keys always win
+	if ( activeViewOverrides.layout ) {
+		result = {
+			...result,
+			layout: {
+				...( result as any ).layout,
+				...activeViewOverrides.layout,
+			},
+		} as View;
+	}
+
+	// Merge groupBy — shallow merge, override keys always win
+	if ( activeViewOverrides.groupBy ) {
+		result = {
+			...result,
+			groupBy: {
+				...( result as any ).groupBy,
+				...activeViewOverrides.groupBy,
+			},
+		} as View;
+	}
+
 	return result;
 }
 
@@ -84,6 +125,14 @@ export function stripActiveViewOverrides(
 	}
 
 	let result = view;
+
+	// Strip scalar keys managed by overrides
+	for ( const key of SCALAR_VALUES ) {
+		if ( key in activeViewOverrides ) {
+			const { [ key ]: _, ...rest } = result;
+			result = rest as View;
+		}
+	}
 
 	// Strip managed filters
 	if (
@@ -111,6 +160,34 @@ export function stripActiveViewOverrides(
 			...result,
 			sort: defaultView?.sort,
 		};
+	}
+
+	// Strip layout keys managed by overrides
+	if ( activeViewOverrides.layout && 'layout' in result && result.layout ) {
+		const layout = { ...result.layout } as Record< string, unknown >;
+		for ( const key of Object.keys( activeViewOverrides.layout ) ) {
+			delete layout[ key ];
+		}
+		result = {
+			...result,
+			layout: Object.keys( layout ).length > 0 ? layout : undefined,
+		} as View;
+	}
+
+	// Strip groupBy keys managed by overrides
+	if (
+		activeViewOverrides.groupBy &&
+		'groupBy' in result &&
+		result.groupBy
+	) {
+		const groupBy = { ...result.groupBy } as Record< string, unknown >;
+		for ( const key of Object.keys( activeViewOverrides.groupBy ) ) {
+			delete groupBy[ key ];
+		}
+		result = {
+			...result,
+			groupBy: Object.keys( groupBy ).length > 0 ? groupBy : undefined,
+		} as View;
 	}
 
 	return result;
