@@ -931,6 +931,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		// Get default blockGap value from global styles for use in layouts like grid.
 		// Check style variation first, then block-specific styles, then fall back to root styles.
 		$block_name = $block['blockName'] ?? '';
+		// We cache global styles on a per-theme basis to ensure that they don't persists across theme switches,
+		// which could lead to invalid styles being generated.
 		if ( empty( $global_styles[ $theme ] ) ) {
 			$global_styles[ $theme ] = gutenberg_get_global_styles();
 		}
