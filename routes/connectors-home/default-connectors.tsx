@@ -115,7 +115,7 @@ function OpenAIConnector( props: ConnectorRenderProps ) {
 		<ProviderConnector
 			{ ...props }
 			pluginSlug="ai-provider-for-openai"
-			settingName="connectors_openai_api_key"
+			settingName="connectors_ai_openai_api_key"
 			helpUrl="https://platform.openai.com"
 			helpLabel="platform.openai.com"
 			Logo={ OpenAILogo }
@@ -129,7 +129,7 @@ function ClaudeConnector( props: ConnectorRenderProps ) {
 		<ProviderConnector
 			{ ...props }
 			pluginSlug="ai-provider-for-anthropic"
-			settingName="connectors_anthropic_api_key"
+			settingName="connectors_ai_anthropic_api_key"
 			helpUrl="https://console.anthropic.com"
 			helpLabel="console.anthropic.com"
 			Logo={ ClaudeLogo }
@@ -143,7 +143,7 @@ function GeminiConnector( props: ConnectorRenderProps ) {
 		<ProviderConnector
 			{ ...props }
 			pluginSlug="ai-provider-for-google"
-			settingName="connectors_gemini_api_key"
+			settingName="connectors_ai_google_api_key"
 			helpUrl="https://aistudio.google.com"
 			helpLabel="aistudio.google.com"
 			Logo={ GeminiLogo }
