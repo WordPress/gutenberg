@@ -15,18 +15,17 @@ import {
 import {
 	Button,
 	Modal,
-	Icon,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { error as errorIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { getSyncErrorMessages } from '../../utils/sync-error-messages';
+import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useRetryCountdown } from './use-retry-countdown';
 
@@ -35,6 +34,7 @@ const { retrySyncConnection } = unlock( coreDataPrivateApis );
 
 // Debounce time for initial disconnected status to allow connection to establish.
 const INITIAL_DISCONNECTED_DEBOUNCE_MS = 5000;
+const noop = () => {};
 
 /**
  * Sync connection modal that displays when any entity reports a disconnection.
@@ -43,8 +43,15 @@ const INITIAL_DISCONNECTED_DEBOUNCE_MS = 5000;
  * @return {Element|null} The modal component or null if not disconnected.
  */
 export function SyncConnectionModal() {
-	const connectionState = useSelect( ( selectFn ) => {
-		return selectFn( coreDataStore ).getSyncConnectionStatus() || null;
+	const { connectionState, postType } = useSelect( ( selectFn ) => {
+		const currentPostType = selectFn( editorStore ).getCurrentPostType();
+		return {
+			connectionState:
+				selectFn( coreDataStore ).getSyncConnectionStatus() || null,
+			postType: currentPostType
+				? selectFn( coreDataStore ).getPostType( currentPostType )
+				: null,
+		};
 	}, [] );
 
 	const { secondsRemaining, markRetrying } = useRetryCountdown(
@@ -63,23 +70,24 @@ export function SyncConnectionModal() {
 	// Once true, disconnected status will show immediately without debounce.
 	const hasInitializedRef = useRef( false );
 
-	useEffect( () => {
-		const status = connectionState?.status;
+	const connectionStatus = connectionState?.status;
+	const connectionErrorCode = connectionState?.error?.code;
 
+	useEffect( () => {
 		// Clear any pending debounce timer when status changes.
 		if ( debounceTimerRef.current ) {
 			clearTimeout( debounceTimerRef.current );
 			debounceTimerRef.current = null;
 		}
 
-		if ( status === 'connected' ) {
+		if ( connectionStatus === 'connected' ) {
 			hasInitializedRef.current = true;
 			setSyncConnectionMessage( null );
-		} else if ( status === 'disconnected' ) {
+		} else if ( connectionStatus === 'disconnected' ) {
 			const showModal = () => {
 				hasInitializedRef.current = true;
 				setSyncConnectionMessage(
-					getSyncErrorMessages( connectionState.error ?? {} )
+					getSyncErrorMessages( { code: connectionErrorCode } )
 				);
 			};
 
@@ -99,97 +107,89 @@ export function SyncConnectionModal() {
 				clearTimeout( debounceTimerRef.current );
 			}
 		};
-	}, [ connectionState ] );
+	}, [ connectionStatus, connectionErrorCode ] );
 
 	if ( ! syncConnectionMessage ) {
 		return null;
 	}
 
-	const { title, description } = syncConnectionMessage;
+	const { title, description, canRetry } = syncConnectionMessage;
 
 	let retryCountdownText;
 	if ( secondsRemaining > 0 ) {
 		retryCountdownText = sprintf(
 			/* translators: %d: number of seconds until retry */
 			_n(
-				'Retrying in %d second\u2026',
-				'Retrying in %d seconds\u2026',
+				'Retrying connection in %d second\u2026',
+				'Retrying connection in %d seconds\u2026',
 				secondsRemaining
 			),
 			secondsRemaining
 		);
 	} else if ( secondsRemaining === 0 ) {
 		retryCountdownText = __( 'Retrying\u2026' );
-	} else {
-		// &nbsp; to preserve layout when countdown is hidden
-		retryCountdownText = '\u00A0';
 	}
+
+	let editPostHref = 'edit.php';
+	if ( postType?.slug ) {
+		editPostHref = `edit.php?post_type=${ postType.slug }`;
+	}
+
+	const isRetrying = secondsRemaining === 0;
 
 	return (
 		<BlockCanvasCover.Fill>
 			<Modal
-				__experimentalHideHeader
-				icon={ errorIcon }
+				className="editor-sync-connection-modal"
 				isDismissible={ false }
-				isFullScreen={ false }
-				onRequestClose={ () => {} }
+				onRequestClose={ noop }
 				shouldCloseOnClickOutside={ false }
 				shouldCloseOnEsc={ false }
+				size="medium"
+				title={ title }
 			>
-				<div className="editor-sync-connection-modal__container">
-					<VStack alignment="center" justify="center" spacing={ 1 }>
-						<Icon fill="#ccc" icon={ errorIcon } size={ 64 } />
-						<h1>{ title }</h1>
-						<div
-							className="editor-sync-connection-modal__retry"
-							style={ {
-								visibility:
-									secondsRemaining !== null
-										? 'visible'
-										: 'hidden',
-							} }
+				<VStack spacing={ 6 }>
+					<p>{ description }</p>
+					{ retryCountdownText && (
+						<p className="editor-sync-connection-modal__retry-countdown">
+							{ retryCountdownText }
+						</p>
+					) }
+					<HStack justify="right">
+						<Button
+							__next40pxDefaultSize
+							href={ editPostHref }
+							isDestructive
+							variant="tertiary"
 						>
-							<p className="editor-sync-connection-modal__retry-countdown">
-								{ retryCountdownText }
-							</p>
+							{ sprintf(
+								/* translators: %s: Post type name (e.g., "Posts", "Pages"). */
+								__( 'Back to %s' ),
+								postType?.labels?.name ?? __( 'Posts' )
+							) }
+						</Button>
+						<Button
+							__next40pxDefaultSize
+							ref={ copyButtonRef }
+							variant={ canRetry ? 'secondary' : 'primary' }
+						>
+							{ __( 'Copy Post Content' ) }
+						</Button>
+						{ canRetry && (
 							<Button
-								variant="link"
-								style={ {
-									visibility:
-										secondsRemaining === 0
-											? 'hidden'
-											: 'visible',
-								} }
+								__next40pxDefaultSize
+								isBusy={ isRetrying }
+								variant="primary"
 								onClick={ () => {
 									markRetrying();
 									retrySyncConnection();
 								} }
 							>
-								{ __( 'Retry now' ) }
+								{ __( 'Retry' ) }
 							</Button>
-						</div>
-						<p className="editor-sync-connection-modal__description">
-							{ description }
-						</p>
-						<HStack spacing={ 2 } justify="center">
-							<Button
-								__next40pxDefaultSize
-								ref={ copyButtonRef }
-								variant="primary"
-							>
-								{ __( 'Copy post content' ) }
-							</Button>
-							<Button
-								__next40pxDefaultSize
-								href="edit.php"
-								isDestructive
-								variant="secondary"
-							>
-								{ __( 'Edit another post' ) }
-							</Button>
-						</HStack>
-					</VStack>
-				</div>
+						) }
+					</HStack>
+				</VStack>
 			</Modal>
 		</BlockCanvasCover.Fill>
 	);
