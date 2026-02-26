@@ -92,7 +92,7 @@ describe( 'computeDisplayUrl', () => {
 		it( 'should treat same-origin URLs as internal', () => {
 			const result = computeDisplayUrl( {
 				linkUrl: 'https://example.com/my-page',
-				siteUrl: 'https://example.com',
+				homeUrl: 'https://example.com',
 			} );
 			expect( result.isExternal ).toBe( false );
 		} );
