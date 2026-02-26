@@ -262,9 +262,9 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		entityStates.set( entityId, entityState );
 
+		// Create providers for the given entity and its Yjs document.
 		log( 'loadEntity', 'connecting', entityId );
 
-		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
 			providerCreators.map( async ( create ) => {
 				const provider = await create( {
@@ -365,9 +365,9 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		collectionStates.set( objectType, collectionState );
 
+		// Create providers for the given entity and its Yjs document.
 		log( 'loadCollection', 'connecting', entityId );
 
-		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
 			providerCreators.map( async ( create ) => {
 				const provider = await create( {
