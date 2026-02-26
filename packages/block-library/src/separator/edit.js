@@ -33,7 +33,7 @@ const HtmlElementControl = ( { tagName, setAttributes } ) => {
 			value={ tagName }
 			onChange={ ( newValue ) => {
 				setAttributes( { tagName: newValue } );
-				// When switching to div, ensure it's decorative
+				// When switching to div, ensure it's decorative.
 				if ( newValue === 'div' ) {
 					setAttributes( { isDecorative: true } );
 				}
