@@ -890,7 +890,7 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		const scaledSuffix = Boolean( args.isThresholdResize );
 
 		/**
-		 * Filters the image quality setting for resize/crop operations.
+		 * Filters the image quality setting for client side media processing.
 		 *
 		 * Allows plugins to control the quality (0-1) used when resizing images.
 		 * Note: Quality is not yet wired through to the vips worker but will
