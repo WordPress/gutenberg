@@ -85,9 +85,14 @@ export function useBlockHighlighting(
 						SelectionType.WholeBlock
 			)
 			.map( ( userState ) => {
-				const { localClientId } = resolveSelection(
-					userState.editorState?.selection
-				);
+				let localClientId;
+				try {
+					( { localClientId } = resolveSelection(
+						userState.editorState?.selection
+					) );
+				} catch {
+					return null;
+				}
 
 				if ( ! localClientId ) {
 					return null;
@@ -104,18 +109,16 @@ export function useBlockHighlighting(
 					),
 				};
 			} )
-			.filter(
-				( block ): block is NonNullable< typeof block > => {
-					if ( ! block ) {
-						return false;
-					}
-					if ( seen.has( block.blockId ) ) {
-						return false;
-					}
-					seen.add( block.blockId );
-					return true;
+			.filter( ( block ): block is NonNullable< typeof block > => {
+				if ( ! block ) {
+					return false;
 				}
-			);
+				if ( seen.has( block.blockId ) ) {
+					return false;
+				}
+				seen.add( block.blockId );
+				return true;
+			} );
 
 		// Unhighlight blocks that are no longer selected.
 		const selectedBlockIds = new Set(
@@ -189,7 +192,13 @@ export function useBlockHighlighting(
 			}
 			currentHighlightedIds.clear();
 		};
-	}, [ userStates, blockEditorDocument, overlayElement, recomputeToken, resolveSelection ] );
+	}, [
+		userStates,
+		blockEditorDocument,
+		overlayElement,
+		recomputeToken,
+		resolveSelection,
+	] );
 
 	// The delayed rerender just bumps state — no direct DOM mutation.
 	const rerenderHighlightsAfterDelay = useCallback( () => {

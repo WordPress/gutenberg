@@ -85,31 +85,39 @@ export function useRenderCursors(
 			} else if ( selection.type === SelectionType.WholeBlock ) {
 				// Don't draw a cursor for a whole block selection.
 			} else if ( selection.type === SelectionType.Cursor ) {
-				const { textIndex, localClientId } =
-					resolveSelection( selection );
-				if ( localClientId ) {
-					coords = getCursorPosition(
-						textIndex,
-						localClientId,
-						blockEditorDocument,
-						overlayElement
-					);
+				try {
+					const { textIndex, localClientId } =
+						resolveSelection( selection );
+					if ( localClientId ) {
+						coords = getCursorPosition(
+							textIndex,
+							localClientId,
+							blockEditorDocument,
+							overlayElement
+						);
+					}
+				} catch {
+					// Selection may reference a stale Yjs position.
 				}
 			} else if (
 				selection.type === SelectionType.SelectionInOneBlock ||
 				selection.type === SelectionType.SelectionInMultipleBlocks
 			) {
-				const { textIndex, localClientId } = resolveSelection( {
-					type: SelectionType.Cursor,
-					cursorPosition: selection.cursorStartPosition,
-				} );
-				if ( localClientId ) {
-					coords = getCursorPosition(
-						textIndex,
-						localClientId,
-						blockEditorDocument,
-						overlayElement
-					);
+				try {
+					const { textIndex, localClientId } = resolveSelection( {
+						type: SelectionType.Cursor,
+						cursorPosition: selection.cursorStartPosition,
+					} );
+					if ( localClientId ) {
+						coords = getCursorPosition(
+							textIndex,
+							localClientId,
+							blockEditorDocument,
+							overlayElement
+						);
+					}
+				} catch {
+					// Selection may reference a stale Yjs position.
 				}
 			}
 
