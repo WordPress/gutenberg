@@ -50,7 +50,7 @@ const previewField = {
 	enableSorting: false,
 };
 
-export function Canvas() {
+function Canvas() {
 	const { id } = useParams( { from: '/navigation/edit/$id' } );
 	const navigate = useNavigate();
 	const navigationId = parseInt( id );
@@ -147,3 +147,7 @@ export function Canvas() {
 		</div>
 	);
 }
+
+// Export as both Canvas (for React component rules) and canvas (for route framework)
+export { Canvas };
+export { Canvas as canvas };
