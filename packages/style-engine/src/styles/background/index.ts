@@ -84,10 +84,57 @@ const backgroundAttachment = {
 	},
 };
 
+const VALID_BACKGROUND_CLIP_VALUES = [
+	'border-box',
+	'padding-box',
+	'content-box',
+	'text',
+];
+
+const backgroundClip = {
+	name: 'backgroundClip',
+	generate: (
+		style: Style,
+		options: StyleOptions
+	): ReturnType< typeof generateRule > => {
+		const value = style?.background?.backgroundClip;
+
+		if ( ! value || ! VALID_BACKGROUND_CLIP_VALUES.includes( value ) ) {
+			return [];
+		}
+
+		const rules = [
+			{
+				selector: options.selector,
+				key: 'backgroundClip',
+				value,
+			},
+		];
+
+		if ( value === 'text' ) {
+			rules.push(
+				{
+					selector: options.selector,
+					key: 'WebkitBackgroundClip',
+					value: 'text',
+				},
+				{
+					selector: options.selector,
+					key: 'WebkitTextFillColor',
+					value: 'transparent',
+				}
+			);
+		}
+
+		return rules;
+	},
+};
+
 export default [
 	backgroundImage,
 	backgroundPosition,
 	backgroundRepeat,
 	backgroundSize,
 	backgroundAttachment,
+	backgroundClip,
 ];

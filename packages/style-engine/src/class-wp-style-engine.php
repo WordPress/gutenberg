@@ -73,6 +73,10 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 					'path'          => array( 'background', 'backgroundAttachment' ),
 				),
+				'backgroundClip'       => array(
+					'value_func' => array( self::class, 'get_background_clip_css_declarations' ),
+					'path'       => array( 'background', 'backgroundClip' ),
+				),
 			),
 			'color'      => array(
 				'text'       => array(
@@ -652,6 +656,40 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				if ( null !== $value ) {
 					$css_declarations[ $style_definition['property_keys']['default'] ] = $value;
 				}
+			}
+
+			return $css_declarations;
+		}
+
+		/**
+		 * Style value parser that returns CSS declarations for background-clip.
+		 *
+		 * When the value is 'text', this also outputs the necessary vendor-prefixed
+		 * properties to clip the background to the text.
+		 *
+		 * @param string $style_value      A single raw style value from $block_styles array.
+		 * @param array  $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 *
+		 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+		 */
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- Required by value_func callback signature.
+		protected static function get_background_clip_css_declarations( $style_value, $style_definition ) {
+			if ( empty( $style_value ) || ! is_string( $style_value ) ) {
+				return array();
+			}
+
+			$valid_values = array( 'border-box', 'padding-box', 'content-box', 'text' );
+			if ( ! in_array( $style_value, $valid_values, true ) ) {
+				return array();
+			}
+
+			$css_declarations = array(
+				'background-clip' => $style_value,
+			);
+
+			if ( 'text' === $style_value ) {
+				$css_declarations['-webkit-background-clip'] = 'text';
+				$css_declarations['-webkit-text-fill-color'] = 'transparent';
 			}
 
 			return $css_declarations;
