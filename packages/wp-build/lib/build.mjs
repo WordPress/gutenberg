@@ -62,7 +62,11 @@ import {
 	getRouteMetadata,
 	generateContentEntryPoint,
 } from './route-utils.mjs';
-import { getAllWidgets, getWidgetFiles } from './widget-utils.mjs';
+import {
+	isWidgetsBuildEnabled,
+	getAllWidgets,
+	getWidgetFiles,
+} from './widget-utils.mjs';
 import {
 	generateWorkerPlaceholder,
 	buildWorkers,
@@ -1927,8 +1931,10 @@ async function buildAll( baseUrlExpression ) {
 	// Build routes
 	await buildAllRoutes();
 
-	// Build dashboard widgets
-	await buildAllWidgets();
+	// Build dashboard widgets (experimental)
+	if ( isWidgetsBuildEnabled( WP_PLUGIN_CONFIG ) ) {
+		await buildAllWidgets();
+	}
 
 	// Collect route and page data for PHP generation
 	// Use flatMap to expand routes with multiple pages into separate entries
@@ -2022,18 +2028,19 @@ async function buildAll( baseUrlExpression ) {
 		}
 	}
 
-	// Collect widget data for PHP generation
-	const widgetNames = getAllWidgets( ROOT_DIR );
-	const widgetData = widgetNames.map( ( widgetName ) => {
-		const widgetFiles = getWidgetFiles(
-			path.join( ROOT_DIR, 'dashboard-widgets', widgetName )
-		);
-		return {
-			name: widgetName,
-			hasRender: widgetFiles.hasRender,
-			hasWidget: widgetFiles.hasWidget,
-		};
-	} );
+	// Collect widget data for PHP generation (experimental)
+	const widgetData = isWidgetsBuildEnabled( WP_PLUGIN_CONFIG )
+		? getAllWidgets( ROOT_DIR ).map( ( widgetName ) => {
+				const widgetFiles = getWidgetFiles(
+					path.join( ROOT_DIR, 'dashboard-widgets', widgetName )
+				);
+				return {
+					name: widgetName,
+					hasRender: widgetFiles.hasRender,
+					hasWidget: widgetFiles.hasWidget,
+				};
+			} )
+		: [];
 
 	console.log( '\n📄 Generating PHP registration files...\n' );
 	const phpReplacements = await getPhpReplacements(
@@ -2105,7 +2112,9 @@ async function watchMode() {
 
 	// Get all routes and widgets for dependency tracking
 	const allRoutes = getAllRoutes( ROOT_DIR );
-	const allWidgets = getAllWidgets( ROOT_DIR );
+	const allWidgets = isWidgetsBuildEnabled( WP_PLUGIN_CONFIG )
+		? getAllWidgets( ROOT_DIR )
+		: [];
 
 	/**
 	 * Rebuild a package and any affected scripts/modules.

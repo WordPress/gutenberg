@@ -5,6 +5,22 @@ import { readdirSync } from 'fs';
 import path from 'path';
 
 /**
+ * @typedef {Object} WpPluginConfig
+ * @property {Object}  [experimentalFeatures]                  Experimental feature flags.
+ * @property {boolean} [experimentalFeatures.dashboardWidgets] Enable dashboard widgets build.
+ */
+
+/**
+ * Check whether the dashboard widgets build is enabled.
+ *
+ * @param {WpPluginConfig} wpPluginConfig The wpPlugin config from package.json.
+ * @return {boolean} True if dashboardWidgets experimental feature is enabled.
+ */
+export function isWidgetsBuildEnabled( wpPluginConfig = {} ) {
+	return wpPluginConfig?.experimentalFeatures?.dashboardWidgets === true;
+}
+
+/**
  * Get all widget names from the dashboard-widgets directory.
  *
  * @param {string} rootDir Root directory of the project.

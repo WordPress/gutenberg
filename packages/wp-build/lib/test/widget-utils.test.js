@@ -1,12 +1,16 @@
 /**
  * External dependencies
  */
-import { readdirSync } from 'fs';
+const { readdirSync } = require( 'fs' );
 
 /**
  * Internal dependencies
  */
-import { getAllWidgets, getWidgetFiles } from '../widget-utils.mjs';
+const {
+	isWidgetsBuildEnabled,
+	getAllWidgets,
+	getWidgetFiles,
+} = require( '../widget-utils.mjs' );
 
 jest.mock( 'fs', () => ( {
 	readdirSync: jest.fn(),
@@ -15,6 +19,19 @@ jest.mock( 'fs', () => ( {
 describe( 'widget-utils', () => {
 	afterEach( () => {
 		jest.resetAllMocks();
+	} );
+
+	describe( 'isWidgetsBuildEnabled', () => {
+		it.each( [
+			[ undefined, false ],
+			[ {}, false ],
+			[ { experimentalFeatures: {} }, false ],
+			[ { experimentalFeatures: { dashboardWidgets: false } }, false ],
+			[ { experimentalFeatures: { dashboardWidgets: 'yes' } }, false ],
+			[ { experimentalFeatures: { dashboardWidgets: true } }, true ],
+		] )( 'given config %o should return %s', ( config, expected ) => {
+			expect( isWidgetsBuildEnabled( config ) ).toBe( expected );
+		} );
 	} );
 
 	describe( 'getAllWidgets', () => {
