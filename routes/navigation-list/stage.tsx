@@ -7,10 +7,13 @@ import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import type { Post } from '@wordpress/core-data';
 import { Page } from '@wordpress/admin-ui';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useView } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
@@ -20,6 +23,7 @@ import { unlock } from '../lock-unlock';
 import { getDefaultView } from './view-utils';
 import { useEditNavigationAction } from './actions/edit-navigation';
 import { AddNavigationModal } from './add-navigation';
+import useNavigationStatus from './use-navigation-status';
 
 /**
  * Style dependencies
@@ -29,6 +33,7 @@ import './style.scss';
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { Badge } = unlock( componentsPrivateApis );
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
@@ -83,9 +88,52 @@ function NavigationList() {
 		PRELOADED_NAVIGATION_MENUS_QUERY
 	);
 
-	const fields = usePostFields( {
+	const baseFields = usePostFields( {
 		postType: NAVIGATION_POST_TYPE,
 	} );
+
+	const { statusMap, isResolving: isResolvingStatus } = useNavigationStatus();
+
+	const fields = useMemo( () => {
+		if ( ! baseFields ) {
+			return baseFields;
+		}
+
+		return baseFields.map( ( field: any ) => {
+			// Add badges to the title field
+			if ( field.id === 'title' ) {
+				return {
+					...field,
+					render: ( props: any ) => {
+						const originalRender = field.render
+							? field.render( props )
+							: props.item.title?.rendered || '';
+
+						const count = statusMap[ props.item.id ] || 0;
+						const isActive = count > 0;
+						const badgeText = isActive
+							? sprintf(
+									/* translators: %d: number of locations */
+									__( 'Active (%d locations)' ),
+									count
+							  )
+							: __( 'Inactive' );
+
+						return (
+							<>
+								{ originalRender }
+								<Badge intent={ isActive ? 'info' : 'default' }>
+									{ badgeText }
+								</Badge>
+							</>
+						);
+					},
+				};
+			}
+			return field;
+		} );
+	}, [ baseFields, statusMap ] );
+
 	const [ showAddModal, setShowAddModal ] = useState( false );
 
 	const editAction = useEditNavigationAction();
@@ -148,7 +196,7 @@ function NavigationList() {
 					fields={ fields }
 					view={ view }
 					onChangeView={ updateView }
-					isLoading={ isResolving || ! fields }
+					isLoading={ isResolving || isResolvingStatus || ! fields }
 					actions={ actions }
 					paginationInfo={ {
 						totalItems,

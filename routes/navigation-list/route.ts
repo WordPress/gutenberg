@@ -66,6 +66,24 @@ export const route = {
 			resolveSelect( coreStore ).getEntityRecords( 'root', 'user', {
 				per_page: -1,
 			} ),
+			// Preload template parts for status badges
+			resolveSelect( coreStore ).getEntityRecords(
+				'postType',
+				'wp_template_part',
+				{ per_page: -1 }
+			),
+			// Preload fallback navigation menu for "used in" detection
+			resolveSelect( coreStore ).getEntityRecords(
+				'postType',
+				'wp_navigation',
+				{
+					per_page: 1,
+					orderby: 'date',
+					order: 'desc',
+					status: 'publish',
+					_fields: 'id',
+				}
+			),
 		] );
 	},
 };
