@@ -24,6 +24,8 @@ export default function BlockStylesMenuItems( {
 						key={ style.name }
 						icon={ activeStyle.name === style.name ? check : null }
 						onClick={ () => onSelect( style ) }
+						onFocus={ () => onHoverStyle( style ) }
+						onBlur={ () => onHoverStyle( null ) }
 						onMouseEnter={ () => onHoverStyle( style ) }
 						onMouseLeave={ () => onHoverStyle( null ) }
 					>
