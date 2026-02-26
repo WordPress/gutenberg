@@ -125,8 +125,14 @@ window.history.replaceState(
 // server can render the correct content. Without this, the URL would change but
 // the page content would remain stale because the interactivity router — which
 // handles client-side navigations — might not be loaded yet.
-window.addEventListener( 'popstate', ( event ) => {
-	if ( event.state?.wpInteractivityId !== sessionId ) {
-		window.location.reload();
-	}
+//
+// The check runs inside `setTimeout` because `history.state` is not yet updated
+// when the `popstate` callback executes synchronously:
+// https://developer.mozilla.org/en-US/docs/Web/API/Window/popstate_event#:~:text=Note%3A%20When,setTimeout(doSomeThing%2C%200)%3B
+window.addEventListener( 'popstate', () => {
+	setTimeout( () => {
+		if ( window.history.state?.wpInteractivityId !== sessionId ) {
+			window.location.reload();
+		}
+	} );
 } );
