@@ -19,7 +19,6 @@
 		"npm": ">=10.2.3"
 	},
 	"wpPlugin": {
-		"name": "gutenberg",
 		"scriptGlobal": "wp",
 		"packageNamespace": "wordpress",
 		"handlePrefix": "wp",
@@ -37,7 +36,8 @@
 		]
 	},
 	"config": {
-		"IS_GUTENBERG_PLUGIN": true
+		"IS_GUTENBERG_PLUGIN": true,
+		"WP_PLUGIN_NAME": "gutenberg"
 	},
 	"devDependencies": {
 		"@apidevtools/json-schema-ref-parser": "11.6.4",
