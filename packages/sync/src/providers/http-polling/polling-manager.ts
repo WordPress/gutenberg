@@ -25,6 +25,7 @@ import {
 	createSyncUpdate,
 	createUpdateQueue,
 	postSyncUpdate,
+	postSyncUpdateNonBlocking,
 } from './utils';
 
 const POLLING_INTERVAL_IN_MS = 1000; // 1 second or 1000 milliseconds
@@ -240,6 +241,25 @@ function processDocUpdate(
 
 let isPolling = false;
 let pollInterval = POLLING_INTERVAL_IN_MS;
+let pageHideListenerRegistered = false;
+
+/**
+ * Send a disconnect signal for all registered rooms when the page is
+ * being unloaded. Uses `sendBeacon` so the request survives navigation.
+ */
+function handlePageHide(): void {
+	const rooms = Array.from( roomStates.entries() ).map(
+		( [ room, state ] ) => ( {
+			after: 0,
+			awareness: null,
+			client_id: state.clientId,
+			room,
+			updates: [],
+		} )
+	);
+
+	postSyncUpdateNonBlocking( { rooms } );
+}
 
 function poll(): void {
 	isPolling = true;
@@ -394,7 +414,6 @@ function registerRoom( {
 	function unregister(): void {
 		doc.off( 'update', onDocUpdate );
 		awareness.off( 'change', onAwarenessUpdate );
-		// TODO: poll will null awareness state to trigger removal
 		updateQueue.clear();
 	}
 
@@ -421,14 +440,40 @@ function registerRoom( {
 	awareness.on( 'change', onAwarenessUpdate );
 	roomStates.set( room, roomState );
 
+	if ( ! pageHideListenerRegistered ) {
+		window.addEventListener( 'pagehide', handlePageHide );
+		pageHideListenerRegistered = true;
+	}
+
 	if ( ! isPolling ) {
 		poll();
 	}
 }
 
 function unregisterRoom( room: string ): void {
-	roomStates.get( room )?.unregister();
-	roomStates.delete( room );
+	const state = roomStates.get( room );
+	if ( state ) {
+		// Send a disconnect signal so the server removes this client's
+		// awareness entry immediately instead of waiting for the timeout.
+		const rooms = [
+			{
+				after: 0,
+				awareness: null,
+				client_id: state.clientId,
+				room,
+				updates: [],
+			},
+		];
+
+		postSyncUpdateNonBlocking( { rooms } );
+		state.unregister();
+		roomStates.delete( room );
+	}
+
+	if ( roomStates.size === 0 && pageHideListenerRegistered ) {
+		window.removeEventListener( 'pagehide', handlePageHide );
+		pageHideListenerRegistered = false;
+	}
 }
 
 export const pollingManager: PollingManager = {

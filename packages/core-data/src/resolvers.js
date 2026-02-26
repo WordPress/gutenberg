@@ -229,9 +229,24 @@ export const getEntityRecord =
 								query
 							);
 						},
-						// Save the current entity record's unsaved edits.
+						// Save the current entity record, whether or not it has unsaved
+						// edits. This is used to trigger a persisted CRDT document.
 						saveRecord: () => {
-							dispatch.saveEditedEntityRecord( kind, name, key );
+							resolveSelect
+								.getEditedEntityRecord( kind, name, key )
+								.then( ( editedRecord ) => {
+									// Don't trigger a save if the record is still an auto-draft.
+									const { status } = editedRecord;
+									if ( 'auto-draft' === status ) {
+										return;
+									}
+
+									dispatch.saveEntityRecord(
+										kind,
+										name,
+										editedRecord
+									);
+								} );
 						},
 						addUndoMeta: ( ydoc, meta ) => {
 							const selectionHistory =
@@ -1090,7 +1105,7 @@ export const getRevisions =
 				// When requesting all fields, the list of results can be used to
 				// resolve the `getRevision` selector in addition to `getRevisions`.
 				if ( ! query?._fields && ! query.context ) {
-					const key = entityConfig.key || DEFAULT_ENTITY_KEY;
+					const key = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
 					const resolutionsArgs = records
 						.filter( ( record ) => record[ key ] )
 						.map( ( record ) => [
