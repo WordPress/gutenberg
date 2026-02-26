@@ -245,6 +245,7 @@ let isUnloadPending = false;
 let isActiveBrowser = document.visibilityState !== 'hidden';
 let pollInterval = POLLING_INTERVAL_IN_MS;
 let pageHideListenerRegistered = false;
+let pageVisibilityListenerRegistered = false;
 let pollingTimeoutId: ReturnType< typeof setTimeout > | null = null;
 
 /**
@@ -440,9 +441,6 @@ function poll(): void {
 	// Start polling.
 	void start();
 }
-
-document.addEventListener( 'visibilitychange', toggleVisbilityChange );
-
 function registerRoom( {
 	room,
 	doc,
@@ -507,6 +505,14 @@ function registerRoom( {
 	}
 
 	if ( ! isPolling ) {
+		if ( ! pageVisibilityListenerRegistered ) {
+			document.addEventListener(
+				'visibilitychange',
+				toggleVisbilityChange
+			);
+			pageVisibilityListenerRegistered = true;
+		}
+
 		poll();
 	}
 }
@@ -536,6 +542,11 @@ function unregisterRoom( room: string ): void {
 		window.removeEventListener( 'pagehide', handlePageHide );
 		pageHideListenerRegistered = false;
 	}
+}
+
+if ( roomStates.size === 0 && pageVisibilityListenerRegistered ) {
+	document.removeEventListener( 'visibilitychange', toggleVisbilityChange );
+	pageVisibilityListenerRegistered = false;
 }
 
 export const pollingManager: PollingManager = {
