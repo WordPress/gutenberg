@@ -113,6 +113,7 @@ const { state, actions } = store(
 			closeMenuOnClick() {
 				actions.closeMenu( 'click' );
 				actions.closeMenu( 'focus' );
+				actions.closeMenu( 'hover' );
 			},
 			openMenuOnFocus() {
 				actions.openMenu( 'focus' );
@@ -125,9 +126,10 @@ const { state, actions } = store(
 					ref.focus();
 				}
 				const { menuOpenedBy } = state;
-				if ( menuOpenedBy.click || menuOpenedBy.focus ) {
+				if ( menuOpenedBy.click || menuOpenedBy.focus || menuOpenedBy.hover ) {
 					actions.closeMenu( 'click' );
 					actions.closeMenu( 'focus' );
+					actions.closeMenu( 'hover' );
 				} else {
 					ctx.previousFocus = ref;
 					actions.openMenu( 'click' );
@@ -142,6 +144,7 @@ const { state, actions } = store(
 						event.stopPropagation(); // Keeps ancestor menus open.
 						actions.closeMenu( 'click' );
 						actions.closeMenu( 'focus' );
+						actions.closeMenu( 'hover' );
 						return;
 					}
 
@@ -183,6 +186,7 @@ const { state, actions } = store(
 				) {
 					actions.closeMenu( 'click' );
 					actions.closeMenu( 'focus' );
+					actions.closeMenu( 'hover' );
 				}
 			} ),
 
