@@ -6,6 +6,8 @@ import {
 	useState,
 	useCallback,
 	useMemo,
+	useRef,
+	useEffect,
 } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
@@ -17,6 +19,7 @@ import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
 import type { View, Field, ActionButton } from '@wordpress/dataviews';
+import { Stack } from '@wordpress/ui';
 import {
 	altTextField,
 	attachedToField,
@@ -40,9 +43,16 @@ import { isBlobURL } from '@wordpress/blob';
 import type { Attachment, RestAttachment } from '../../utils/types';
 import { transformAttachment } from '../../utils/transform-attachment';
 import { uploadMedia } from '../../utils/upload-media';
+import { UploadError } from '../../utils/upload-error';
 import { unlock } from '../../lock-unlock';
+import {
+	UploadStatusPopover,
+	type UploadingFile,
+} from './upload-status-popover';
 
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
+
+let uploadIdCounter = 0;
 
 // Layout constants - matching the picker layout types
 const LAYOUT_PICKER_GRID = 'pickerGrid';
@@ -173,8 +183,32 @@ export function MediaUploadModal( {
 			: [ String( value ) ];
 	} );
 
-	const { createSuccessNotice, createErrorNotice, createInfoNotice } =
-		useDispatch( noticesStore );
+	const [ uploadingFiles, setUploadingFiles ] = useState< UploadingFile[] >(
+		[]
+	);
+	const completionTimeoutRef = useRef< ReturnType< typeof setTimeout > >();
+	const isPopoverOpenRef = useRef( false );
+
+	// Clear timeout on unmount.
+	useEffect( () => {
+		return () => {
+			if ( completionTimeoutRef.current ) {
+				clearTimeout( completionTimeoutRef.current );
+			}
+		};
+	}, [] );
+
+	const handlePopoverOpenChange = useCallback( ( open: boolean ) => {
+		isPopoverOpenRef.current = open;
+		// When the popover closes, clear completed files.
+		if ( ! open ) {
+			setUploadingFiles( ( prev ) =>
+				prev.filter( ( f ) => f.status !== 'complete' )
+			);
+		}
+	}, [] );
+
+	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { invalidateResolution } = useDispatch( coreStore );
 
 	// DataViews configuration - allow view updates
@@ -344,7 +378,26 @@ export function MediaUploadModal( {
 			);
 
 			if ( allComplete && attachments.length > 0 ) {
-				// Show success notice (replaces progress notice via ID)
+				// Mark uploading files as complete
+				setUploadingFiles( ( prev ) =>
+					prev.map( ( f ) =>
+						f.status === 'uploading'
+							? { ...f, status: 'complete' as const }
+							: f
+					)
+				);
+
+				// Clear completed entries after a delay, but only if the
+				// popover isn't open. If it is, they'll be cleared on close.
+				completionTimeoutRef.current = setTimeout( () => {
+					if ( ! isPopoverOpenRef.current ) {
+						setUploadingFiles( ( prev ) =>
+							prev.filter( ( f ) => f.status !== 'complete' )
+						);
+					}
+				}, 2000 );
+
+				// Show success notice
 				createSuccessNotice(
 					sprintf(
 						// translators: %s: number of files
@@ -387,17 +440,30 @@ export function MediaUploadModal( {
 	);
 
 	// Shared upload error handler
-	const handleUploadError = useCallback(
-		( error: Error ) => {
-			// Show error notice (replaces progress notice via ID)
-			createErrorNotice( error.message, {
-				type: 'snackbar',
-				context: NOTICES_CONTEXT,
-				id: NOTICE_ID_UPLOAD_PROGRESS,
+	const handleUploadError = useCallback( ( error: Error ) => {
+		const fileName =
+			error instanceof UploadError ? error.file.name : undefined;
+
+		setUploadingFiles( ( prev ) => {
+			let matched = false;
+			return prev.map( ( f ) => {
+				if (
+					! matched &&
+					fileName &&
+					f.name === fileName &&
+					f.status === 'uploading'
+				) {
+					matched = true;
+					return {
+						...f,
+						status: 'error' as const,
+						error: error.message,
+					};
+				}
+				return f;
 			} );
-		},
-		[ createErrorNotice ]
-	);
+		} );
+	}, [] );
 
 	const handleFileSelect = useCallback(
 		( event: React.ChangeEvent< HTMLInputElement > ) => {
@@ -405,24 +471,15 @@ export function MediaUploadModal( {
 			if ( files && files.length > 0 ) {
 				const filesArray = Array.from( files );
 
-				// Show upload start notice
-				createInfoNotice(
-					sprintf(
-						// translators: %s: number of files
-						_n(
-							'Uploading %s file',
-							'Uploading %s files',
-							filesArray.length
-						),
-						filesArray.length.toLocaleString()
-					),
-					{
-						type: 'snackbar',
-						context: NOTICES_CONTEXT,
-						id: NOTICE_ID_UPLOAD_PROGRESS,
-						explicitDismiss: true,
-					}
+				// Track uploading files in popover
+				const newEntries: UploadingFile[] = filesArray.map(
+					( file ) => ( {
+						id: String( ++uploadIdCounter ),
+						name: file.name,
+						status: 'uploading' as const,
+					} )
 				);
+				setUploadingFiles( ( prev ) => [ ...prev, ...newEntries ] );
 
 				handleUpload( {
 					allowedTypes,
@@ -432,13 +489,7 @@ export function MediaUploadModal( {
 				} );
 			}
 		},
-		[
-			allowedTypes,
-			handleUpload,
-			createInfoNotice,
-			handleUploadComplete,
-			handleUploadError,
-		]
+		[ allowedTypes, handleUpload, handleUploadComplete, handleUploadError ]
 	);
 
 	const paginationInfo = useMemo(
@@ -525,24 +576,18 @@ export function MediaUploadModal( {
 						);
 					}
 					if ( filteredFiles.length > 0 ) {
-						// Show upload start notice
-						createInfoNotice(
-							sprintf(
-								// translators: %s: number of files
-								_n(
-									'Uploading %s file',
-									'Uploading %s files',
-									filteredFiles.length
-								),
-								filteredFiles.length.toLocaleString()
-							),
-							{
-								type: 'snackbar',
-								context: NOTICES_CONTEXT,
-								id: NOTICE_ID_UPLOAD_PROGRESS,
-								explicitDismiss: true,
-							}
+						// Track uploading files in popover
+						const newEntries: UploadingFile[] = filteredFiles.map(
+							( file ) => ( {
+								id: String( ++uploadIdCounter ),
+								name: file.name,
+								status: 'uploading' as const,
+							} )
 						);
+						setUploadingFiles( ( prev ) => [
+							...prev,
+							...newEntries,
+						] );
 
 						handleUpload( {
 							allowedTypes,
@@ -566,10 +611,51 @@ export function MediaUploadModal( {
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
 				getItemId={ ( item: RestAttachment ) => String( item.id ) }
-				search={ search }
-				searchLabel={ searchLabel }
 				itemListLabel={ __( 'Media items' ) }
-			/>
+			>
+				<Stack
+					direction="row"
+					align="top"
+					justify="space-between"
+					className="dataviews__view-actions"
+					gap="xs"
+				>
+					<Stack
+						direction="row"
+						gap="sm"
+						justify="start"
+						className="dataviews__search"
+					>
+						{ search && (
+							<DataViewsPicker.Search label={ searchLabel } />
+						) }
+						<DataViewsPicker.FiltersToggle />
+					</Stack>
+					<Stack direction="row" gap="xs" style={ { flexShrink: 0 } }>
+						<DataViewsPicker.ViewConfig />
+					</Stack>
+				</Stack>
+				<DataViewsPicker.FiltersToggled className="dataviews-filters__container" />
+				<DataViewsPicker.Layout />
+				<div
+					className={
+						uploadingFiles.length > 0
+							? 'media-upload-modal__footer is-uploading'
+							: 'media-upload-modal__footer'
+					}
+				>
+					<UploadStatusPopover
+						uploadingFiles={ uploadingFiles }
+						onDismissError={ ( fileId ) => {
+							setUploadingFiles( ( prev ) =>
+								prev.filter( ( f ) => f.id !== fileId )
+							);
+						} }
+						onOpenChange={ handlePopoverOpenChange }
+					/>
+					<DataViewsPicker.BulkActionToolbar />
+				</div>
+			</DataViewsPicker>
 			{ createPortal(
 				<SnackbarNotices
 					className="media-upload-modal__snackbar"
