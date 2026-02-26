@@ -97,6 +97,18 @@ const allowedPostProperties = new Set< string >( [
 	'title',
 ] );
 
+/**
+ * Register taxonomy rest_base values as allowed post properties for CRDT sync.
+ * Called during entity loading when taxonomies are fetched from the REST API.
+ *
+ * @param {string[]} restBases Array of taxonomy rest_base values to allow.
+ */
+export function registerTaxonomyRestBases( restBases: string[] ): void {
+	for ( const restBase of restBases ) {
+		allowedPostProperties.add( restBase );
+	}
+}
+
 // Post meta keys that should *not* be synced.
 const disallowedPostMetaKeys = new Set< string >( [
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,

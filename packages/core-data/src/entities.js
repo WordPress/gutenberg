@@ -19,6 +19,7 @@ import {
 	applyPostChangesToCRDTDoc,
 	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
+	registerTaxonomyRestBases,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from './utils/crdt';
 
@@ -438,6 +439,13 @@ async function loadTaxonomyEntities() {
 	const taxonomies = await apiFetch( {
 		path: '/wp/v2/taxonomies?context=view',
 	} );
+
+	// Auto-register all taxonomy rest_base values for CRDT sync.
+	const restBases = Object.values( taxonomies ?? {} )
+		.map( ( taxonomy ) => taxonomy.rest_base )
+		.filter( Boolean );
+	registerTaxonomyRestBases( restBases );
+
 	return Object.entries( taxonomies ?? {} ).map( ( [ name, taxonomy ] ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		const entity = {

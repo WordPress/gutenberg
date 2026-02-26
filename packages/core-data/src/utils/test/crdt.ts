@@ -15,6 +15,7 @@ import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import {
 	applyPostChangesToCRDTDoc,
 	getPostChangesFromCRDTDoc,
+	registerTaxonomyRestBases,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 	type PostChanges,
 	type YPostRecord,
@@ -723,6 +724,48 @@ describe( 'crdt', () => {
 
 				expect( changes.selection ).toBeUndefined();
 			} );
+		} );
+	} );
+
+	describe( 'registerTaxonomyRestBases', () => {
+		const mockPostType = {} as Type;
+
+		let map: YMapWrap< YPostRecord >;
+
+		beforeEach( () => {
+			map = getRootMap< YPostRecord >( doc, CRDT_RECORD_MAP_KEY );
+		} );
+
+		it( 'allows dynamically registered taxonomy properties to be synced', () => {
+			registerTaxonomyRestBases( [ 'genres' ] );
+
+			const changes = {
+				genres: [ 10, 15 ],
+			} as unknown as PostChanges;
+
+			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+
+			expect( map.get( 'genres' ) ).toEqual( [ 10, 15 ] );
+		} );
+
+		it( 'allows dynamically registered taxonomy properties to be read from CRDT', () => {
+			registerTaxonomyRestBases( [ 'genres' ] );
+
+			map.set( 'genres' as keyof YPostRecord, [ 10, 15 ] );
+
+			const editedRecord = {
+				genres: [ 10 ],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( ( changes as Record< string, unknown > ).genres ).toEqual( [
+				10, 15,
+			] );
 		} );
 	} );
 } );
