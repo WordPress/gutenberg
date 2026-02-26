@@ -88,6 +88,7 @@ export function BlockSettingsDropdown( {
 		isContentOnly,
 		isZoomOut,
 		canEdit,
+		canMove,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -99,6 +100,7 @@ export function BlockSettingsDropdown( {
 				getBlockEditingMode,
 				isZoomOut: _isZoomOut,
 				canEditBlock,
+				canMoveBlocks,
 			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
@@ -124,13 +126,16 @@ export function BlockSettingsDropdown( {
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
 				isZoomOut: _isZoomOut(),
 				canEdit: canEditBlock( firstBlockClientId ),
+				canMove: canMoveBlocks( clientIds ),
 			};
 		},
-		[ firstBlockClientId ]
+		[ firstBlockClientId, clientIds ]
 	);
 
 	const { getBlockOrder, getSelectedBlockClientIds } =
 		useSelect( blockEditorStore );
+
+	const { moveBlocksDown, moveBlocksUp } = useDispatch( blockEditorStore );
 
 	const shortcuts = useSelect( ( select ) => {
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
@@ -242,6 +247,30 @@ export function BlockSettingsDropdown( {
 											}
 											parentBlockType={ parentBlockType }
 										/>
+									) }
+									{ canMove && (
+										<>
+											<MenuItem
+												onClick={ pipe( onClose, () => {
+													moveBlocksUp(
+														clientIds,
+														firstParentClientId
+													);
+												} ) }
+											>
+												{ __( 'Move up' ) }
+											</MenuItem>
+											<MenuItem
+												onClick={ pipe( onClose, () => {
+													moveBlocksDown(
+														clientIds,
+														firstParentClientId
+													);
+												} ) }
+											>
+												{ __( 'Move down' ) }
+											</MenuItem>
+										</>
 									) }
 									{ canEdit && count === 1 && (
 										<BlockHTMLConvertButton

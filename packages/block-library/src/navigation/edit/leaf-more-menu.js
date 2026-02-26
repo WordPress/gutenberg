@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import {
+	createBlock,
+	hasBlockSupport,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import {
 	addSubmenu,
 	chevronUp,
@@ -103,8 +107,14 @@ export default function LeafMoreMenu( props ) {
 	const { block } = props;
 	const { clientId } = block;
 
-	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
-		useDispatch( blockEditorStore );
+	const {
+		moveBlocksDown,
+		moveBlocksUp,
+		removeBlocks,
+		duplicateBlocks,
+		insertBeforeBlock,
+		insertAfterBlock,
+	} = useDispatch( blockEditorStore );
 
 	const removeLabel = sprintf(
 		/* translators: %s: block name */
@@ -112,13 +122,27 @@ export default function LeafMoreMenu( props ) {
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 
-	const rootClientId = useSelect(
+	const { rootClientId, canDuplicate, canInsertBlock } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId } = select( blockEditorStore );
+			const { getBlockRootClientId, canInsertBlockType } =
+				select( blockEditorStore );
+			const { getDefaultBlockName } = select( blocksStore );
 
-			return getBlockRootClientId( clientId );
+			const _rootClientId = getBlockRootClientId( clientId );
+
+			return {
+				rootClientId: _rootClientId,
+				canDuplicate:
+					!! block &&
+					hasBlockSupport( block.name, 'multiple', true ) &&
+					canInsertBlockType( block.name, _rootClientId ),
+				canInsertBlock: canInsertBlockType(
+					getDefaultBlockName(),
+					_rootClientId
+				),
+			};
 		},
-		[ clientId ]
+		[ clientId, block ]
 	);
 
 	return (
@@ -158,6 +182,36 @@ export default function LeafMoreMenu( props ) {
 							expand={ props.expand }
 							setInsertedBlock={ props.setInsertedBlock }
 						/>
+						{ canDuplicate && (
+							<MenuItem
+								onClick={ () => {
+									duplicateBlocks( [ clientId ] );
+									onClose();
+								} }
+							>
+								{ __( 'Duplicate' ) }
+							</MenuItem>
+						) }
+						{ canInsertBlock && (
+							<>
+								<MenuItem
+									onClick={ () => {
+										insertBeforeBlock( clientId );
+										onClose();
+									} }
+								>
+									{ __( 'Add before' ) }
+								</MenuItem>
+								<MenuItem
+									onClick={ () => {
+										insertAfterBlock( clientId );
+										onClose();
+									} }
+								>
+									{ __( 'Add after' ) }
+								</MenuItem>
+							</>
+						) }
 					</MenuGroup>
 					<MenuGroup>
 						<MenuItem
