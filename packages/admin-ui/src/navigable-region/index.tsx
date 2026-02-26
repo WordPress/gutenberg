@@ -14,7 +14,7 @@ import { forwardRef } from '@wordpress/element';
 type NavigableRegionProps = {
 	children: React.ReactNode;
 	className?: string;
-	ariaLabel?: string;
+	ariaLabel: string;
 	as?: React.ElementType;
 	[ key: string ]: any;
 };
