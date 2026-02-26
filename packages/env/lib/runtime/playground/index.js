@@ -90,9 +90,8 @@ class PlaygroundRuntime {
 	 * @param {Object} config          The wp-env config object.
 	 * @param {Object} options         Start options.
 	 * @param {Object} options.spinner A CLI spinner which indicates progress.
-	 * @param {string} options.xdebug  The Xdebug mode to set.
 	 */
-	async start( config, { spinner, xdebug } ) {
+	async start( config, { spinner } ) {
 		const envConfig = config.env.development;
 
 		spinner.text = 'Starting WordPress Playground.';

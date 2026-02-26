@@ -320,8 +320,8 @@ describe( 'postProcessConfig', () => {
 			);
 		} );
 
-		it( 'should skip port validation for disabled tests environment', () => {
-			expect( () => {
+		it( 'should skip port validation for disabled tests environment', async () => {
+			await expect(
 				postProcessConfig( {
 					testsEnvironment: false,
 					port: 123,
@@ -329,8 +329,8 @@ describe( 'postProcessConfig', () => {
 						development: {},
 						tests: {},
 					},
-				} );
-			} ).not.toThrow();
+				} )
+			).resolves.toBeDefined();
 		} );
 
 		it( 'should not fail when both environments have null ports', async () => {
@@ -349,8 +349,8 @@ describe( 'postProcessConfig', () => {
 	} );
 
 	describe( 'testsEnvironment', () => {
-		it( 'should ignore env overrides entirely when testsEnvironment is false', () => {
-			const processed = postProcessConfig( {
+		it( 'should ignore env overrides entirely when testsEnvironment is false', async () => {
+			const processed = await postProcessConfig( {
 				testsEnvironment: false,
 				port: 123,
 				testsPort: 456,
