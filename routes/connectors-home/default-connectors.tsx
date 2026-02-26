@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalHStack as HStack, Button } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	Button,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
@@ -15,6 +19,9 @@ import { __ } from '@wordpress/i18n';
  */
 import { useConnectorPlugin } from './use-connector-plugin';
 import { OpenAILogo, ClaudeLogo, GeminiLogo } from './logos';
+import { unlock } from '../lock-unlock';
+
+const { Badge } = unlock( componentsPrivateApis );
 
 type ConnectorAuthentication =
 	| { method: 'api_key'; settingName: string; credentialsUrl: string | null }
@@ -66,6 +73,10 @@ const ConnectedBadge = () => (
 	</span>
 );
 
+const UnavailableActionBadge = () => (
+	<Badge intent="default">{ __( 'Not available' ) }</Badge>
+);
+
 interface ApiKeyConnectorConfig {
 	pluginSlug?: string;
 	settingName: string;
@@ -92,6 +103,7 @@ function ApiKeyConnector( {
 
 	const {
 		pluginStatus,
+		canInstallPlugins,
 		isExpanded,
 		setIsExpanded,
 		isBusy,
@@ -105,6 +117,9 @@ function ApiKeyConnector( {
 		pluginSlug,
 		settingName,
 	} );
+	const showUnavailableBadge =
+		pluginStatus === 'not-installed' && canInstallPlugins !== true;
+	const showActionButton = ! showUnavailableBadge;
 
 	return (
 		<ConnectorItem
@@ -117,20 +132,27 @@ function ApiKeyConnector( {
 			actionArea={
 				<HStack spacing={ 3 } expanded={ false }>
 					{ isConnected && <ConnectedBadge /> }
-					<Button
-						variant={
-							isExpanded || isConnected ? 'tertiary' : 'secondary'
-						}
-						size={
-							isExpanded || isConnected ? undefined : 'compact'
-						}
-						onClick={ handleButtonClick }
-						disabled={ pluginStatus === 'checking' || isBusy }
-						isBusy={ isBusy }
-						aria-expanded={ isExpanded }
-					>
-						{ getButtonLabel() }
-					</Button>
+					{ showUnavailableBadge && <UnavailableActionBadge /> }
+					{ showActionButton && (
+						<Button
+							variant={
+								isExpanded || isConnected
+									? 'tertiary'
+									: 'secondary'
+							}
+							size={
+								isExpanded || isConnected
+									? undefined
+									: 'compact'
+							}
+							onClick={ handleButtonClick }
+							disabled={ pluginStatus === 'checking' || isBusy }
+							isBusy={ isBusy }
+							aria-expanded={ isExpanded }
+						>
+							{ getButtonLabel() }
+						</Button>
+					) }
 				</HStack>
 			}
 		>

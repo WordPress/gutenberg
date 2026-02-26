@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -14,6 +16,7 @@ interface UseConnectorPluginOptions {
 
 interface UseConnectorPluginReturn {
 	pluginStatus: PluginStatus;
+	canInstallPlugins: boolean | undefined;
 	isExpanded: boolean;
 	setIsExpanded: ( expanded: boolean ) => void;
 	isBusy: boolean;
@@ -34,6 +37,15 @@ export function useConnectorPlugin( {
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ isBusy, setIsBusy ] = useState( false );
 	const [ currentApiKey, setCurrentApiKey ] = useState( '' );
+
+	const canInstallPlugins = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'create', {
+				kind: 'root',
+				name: 'plugin',
+			} ),
+		[]
+	);
 
 	const isConnected =
 		pluginStatus === 'active' &&
@@ -134,6 +146,9 @@ export function useConnectorPlugin( {
 
 	const handleButtonClick = () => {
 		if ( pluginStatus === 'not-installed' ) {
+			if ( canInstallPlugins === false ) {
+				return;
+			}
 			installPlugin();
 		} else if ( pluginStatus === 'inactive' ) {
 			activatePlugin();
@@ -211,6 +226,7 @@ export function useConnectorPlugin( {
 
 	return {
 		pluginStatus,
+		canInstallPlugins,
 		isExpanded,
 		setIsExpanded,
 		isBusy,
