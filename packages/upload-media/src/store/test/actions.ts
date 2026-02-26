@@ -347,6 +347,7 @@ describe( 'actions', () => {
 
 			expect( vipsCancelOperations ).toHaveBeenCalledWith( item.id );
 			expect( consoleErrorSpy ).toHaveBeenCalled();
+			expect( console ).toHaveWarned();
 
 			consoleErrorSpy.mockRestore();
 		} );
@@ -371,6 +372,7 @@ describe( 'actions', () => {
 			expect(
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
+			expect( console ).toHaveWarned();
 
 			consoleErrorSpy.mockRestore();
 		} );
@@ -409,6 +411,7 @@ describe( 'actions', () => {
 				.cancelItem( item.id, new Error( 'Test error' ), true );
 
 			expect( onError ).not.toHaveBeenCalled();
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -474,6 +477,7 @@ describe( 'actions', () => {
 			).getAllItems()[ 0 ];
 			expect( updatedItem.status ).toBe( ItemStatus.Processing );
 			expect( updatedItem.error ).toBeUndefined();
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'increments retryCount', async () => {
@@ -496,6 +500,7 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 			expect( updatedItem.retryCount ).toBe( 1 );
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -537,6 +542,7 @@ describe( 'actions', () => {
 			).getAllItems()[ 0 ];
 			expect( updatedItem ).toBeDefined();
 			expect( updatedItem.status ).toBe( ItemStatus.PendingRetry );
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'does NOT schedule retry when silent=true', async () => {
@@ -556,6 +562,7 @@ describe( 'actions', () => {
 			expect(
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'does NOT schedule retry for non-retryable errors', async () => {
@@ -579,6 +586,7 @@ describe( 'actions', () => {
 			expect(
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
+			expect( console ).toHaveWarned();
 
 			consoleErrorSpy.mockRestore();
 		} );
@@ -609,6 +617,7 @@ describe( 'actions', () => {
 			expect(
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
+			expect( console ).toHaveWarned();
 
 			consoleErrorSpy.mockRestore();
 		} );
@@ -650,6 +659,7 @@ describe( 'actions', () => {
 			expect(
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -687,6 +697,7 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 			expect( updatedItem.status ).toBe( ItemStatus.PendingRetry );
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'stores the error on the item', async () => {
@@ -706,6 +717,7 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 			expect( updatedItem.error ).toBe( error );
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'sets nextRetryTimestamp', async () => {
@@ -727,6 +739,7 @@ describe( 'actions', () => {
 			expect( updatedItem.nextRetryTimestamp ).toBeGreaterThan(
 				beforeTime
 			);
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'does nothing if item does not exist', async () => {
@@ -769,6 +782,7 @@ describe( 'actions', () => {
 			).getAllItems()[ 0 ];
 			expect( updatedItem.status ).toBe( ItemStatus.Processing );
 			expect( updatedItem.retryCount ).toBe( 1 );
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -810,6 +824,7 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 			expect( updatedItem.status ).toBe( ItemStatus.Processing );
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'clears the error on the item', async () => {
@@ -838,6 +853,7 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 			expect( updatedItem.error ).toBeUndefined();
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'increments retryCount', async () => {
@@ -860,6 +876,7 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 			expect( updatedItem.retryCount ).toBe( 1 );
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'creates a fresh AbortController after retry', async () => {
@@ -892,6 +909,7 @@ describe( 'actions', () => {
 			);
 			// The new controller should not be aborted.
 			expect( updatedItem.abortController?.signal.aborted ).toBe( false );
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'does nothing if item does not exist', async () => {

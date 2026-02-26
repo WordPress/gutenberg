@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
  * WordPress dependencies
  */
 import type { createRegistry } from '@wordpress/data';
+import warning from '@wordpress/warning';
 
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
@@ -32,15 +33,6 @@ import {
 	retryTimers,
 	shouldRetryError,
 } from './utils/retry';
-import {
-	logRetryScheduled,
-	logRetryExecuting,
-	logMaxRetriesExceeded,
-	logInfo,
-	logCancel,
-	logError,
-	logBatchComplete,
-} from './utils/debug-logger';
 import type {
 	addItem,
 	processItem,
@@ -193,7 +185,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 				const maxRetries = retrySettings.maxRetryAttempts;
 
 				if ( shouldRetryError( error, retryCount, maxRetries ) ) {
-					logInfo(
+					warning(
 						`Scheduling retry for item ${ id } (${ item.file.name })`
 					);
 					dispatch.scheduleRetry( id, error );
@@ -201,11 +193,8 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 				}
 
 				if ( retryCount >= maxRetries ) {
-					logMaxRetriesExceeded(
-						id,
-						item.file.name,
-						maxRetries,
-						error
+					warning(
+						`Max retries exceeded for ${ item.file.name } (item ${ id }, max ${ maxRetries }): ${ error.message }`
 					);
 				}
 			}
@@ -220,12 +209,18 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 			const { onError } = item;
 			onError?.( error ?? new Error( 'Upload cancelled' ) );
 			if ( ! onError && error ) {
-				logError( `Upload cancelled for item ${ id }`, error );
+				warning(
+					`Upload cancelled for item ${ id }: ${ error.message }`
+				);
 				// eslint-disable-next-line no-console -- Deliberately log errors here.
 				console.error( 'Upload cancelled', error );
 			}
 		} else {
-			logCancel( id, item.file.name, error );
+			warning(
+				`Item cancelled: ${ item.file.name } (item ${ id }): ${
+					error instanceof Error ? error.message : error
+				}`
+			);
 		}
 
 		dispatch< CancelAction >( {
@@ -238,7 +233,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 
 		// All items of this batch were cancelled or finished.
 		if ( item.batchId && select.isBatchUploaded( item.batchId ) ) {
-			logBatchComplete( item.batchId );
+			warning( `Batch completed: ${ item.batchId }` );
 			item.onBatchSuccess?.();
 		}
 	};
@@ -305,7 +300,11 @@ export function scheduleRetry( id: QueueItemId, error: Error ) {
 			jitter: retrySettings.retryJitter,
 		} );
 
-		logRetryScheduled( id, item.file.name, currentRetryCount + 1, delay );
+		warning(
+			`Retry scheduled for ${ item.file.name } (item ${ id }, attempt ${
+				currentRetryCount + 1
+			}) in ${ delay }ms`
+		);
 
 		// Schedule the retry execution and store timer ID for cleanup.
 		const timerId = setTimeout( () => {
@@ -343,7 +342,11 @@ export function executeRetry( id: QueueItemId ) {
 			return;
 		}
 
-		logRetryExecuting( id, item.file.name, item.retryCount ?? 0 );
+		warning(
+			`Executing retry for ${ item.file.name } (item ${ id }, attempt ${
+				item.retryCount ?? 0
+			})`
+		);
 
 		// Reset the item to Processing status and clear the error
 		dispatch< RetryItemAction >( {

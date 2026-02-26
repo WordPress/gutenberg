@@ -71,6 +71,9 @@ const RETRYABLE_MESSAGE_PATTERNS = [
 	/socket/i,
 	/ETIMEDOUT/i,
 	/ENOTFOUND/i,
+	/Could not get a valid response/i, // apiFetch fetch_error (English)
+	/Failed to fetch/i, // Chrome raw fetch TypeError
+	/Load failed/i, // Safari raw fetch TypeError
 ];
 
 /**

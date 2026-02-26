@@ -286,6 +286,30 @@ describe( 'shouldRetryError', () => {
 			).toBe( true );
 		} );
 
+		it( 'should return true for apiFetch fetch_error messages', () => {
+			expect(
+				shouldRetryError(
+					new Error(
+						'Could not get a valid response from the server.'
+					),
+					0,
+					3
+				)
+			).toBe( true );
+		} );
+
+		it( 'should return true for Chrome raw fetch TypeError', () => {
+			expect(
+				shouldRetryError( new Error( 'Failed to fetch' ), 0, 3 )
+			).toBe( true );
+		} );
+
+		it( 'should return true for Safari raw fetch TypeError', () => {
+			expect( shouldRetryError( new Error( 'Load failed' ), 0, 3 ) ).toBe(
+				true
+			);
+		} );
+
 		it( 'should return true for ENOTFOUND errors', () => {
 			expect( shouldRetryError( new Error( 'ENOTFOUND' ), 0, 3 ) ).toBe(
 				true
