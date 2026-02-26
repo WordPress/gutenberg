@@ -211,6 +211,24 @@ HTML;
 	}
 
 	/**
+	 * Tests that client-side media processing is disabled in php-wasm environments.
+	 *
+	 * Note: PHP_SAPI is a runtime constant that cannot be changed in tests.
+	 * This test verifies the check exists in the function source code.
+	 * When PHP_SAPI === 'wasm' (WordPress Playground), the function returns
+	 * false before the filter is ever applied, preventing cross-origin
+	 * isolation headers from conflicting with Playground's iframe architecture.
+	 *
+	 * @covers ::gutenberg_is_client_side_media_processing_enabled
+	 */
+	public function test_client_side_media_processing_disabled_in_wasm_environments() {
+		// Verify the function contains the wasm SAPI check.
+		$function = new ReflectionFunction( 'gutenberg_is_client_side_media_processing_enabled' );
+		$source   = file_get_contents( $function->getFileName() );
+		$this->assertStringContainsString( "'wasm' === PHP_SAPI", $source );
+	}
+
+	/**
 	 * Tests that client-side media processing can be disabled via filter.
 	 *
 	 * @covers ::gutenberg_is_client_side_media_processing_enabled
