@@ -53,14 +53,11 @@ test.describe( 'Links', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content:
-						'Here comes a link: <a href="http://localhost:8889/?p=' +
-						postId +
-						'" data-type="post" data-id="' +
-						postId +
-						'">' +
-						titleText +
-						'</a>',
+					content: expect.stringMatching(
+						new RegExp(
+							`Here comes a link: <a href="[^"]*" data-type="post" data-id="${ postId }">${ titleText }</a>`
+						)
+					),
 				},
 			},
 		] );
@@ -385,7 +382,7 @@ test.describe( 'Links', () => {
 		await expect(
 			page.getByRole( 'option', {
 				// "post" disambiguates from the "Create page" option.
-				name: `${ titleText } post`,
+				name: new RegExp( `${ titleText }.*post` ),
 			} )
 		).toBeVisible();
 

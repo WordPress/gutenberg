@@ -55,7 +55,7 @@ Updates are tagged with a type to enable different server-side handling:
 | `sync_step1` | State vector announcement    | Stored, delivered to other clients   |
 | `sync_step2` | Missing updates response     | Stored, delivered to other clients   |
 | `update`     | Regular document change      | Stored until compacted               |
-| `compaction` | Merged updates via Y.mergeUpdates | Clears older updates, then stored |
+| `compaction` | Full document state via Y.encodeStateAsUpdate | Clears older updates, then stored |
 
 ## Data Flow
 
@@ -109,13 +109,9 @@ To prevent unbounded message growth, the server coordinates compaction:
 
 1. **Threshold reached**: Server detects >50 stored updates for a room
 2. **Client selection**: Server nominates the lowest active client ID
-3. **Compaction request**: Server sends all updates to the nominated client via `compaction_request`
-4. **Client merges**: Uses `Y.mergeUpdates()` to combine all updates, preserving operation metadata
-5. **Client sends compaction**: The merged update replaces older updates on the server
-
-**Why Y.mergeUpdates instead of Y.encodeStateAsUpdate?**
-
-`Y.mergeUpdates()` preserves the original operation metadata (client IDs, logical clocks). This allows Yjs to correctly deduplicate when a compaction is applied to a document that already contains some of those operations. Using `Y.encodeStateAsUpdate()` would create fresh metadata, causing content duplication on clients that already have overlapping state.
+3. **Compaction request**: Server sends `should_compact: true` to the nominated client
+4. **Client encodes**: Uses `Y.encodeStateAsUpdate()` to capture the full document state
+5. **Client sends compaction**: The encoded state replaces older updates on the server
 
 ### 5. Awareness
 
@@ -164,7 +160,7 @@ Single endpoint for bidirectional sync including awareness. Clients send their u
       "updates": [
         { "type": "update", "data": "base64-encoded-yjs-update" }
       ],
-      "compaction_request": null
+      "should_compact": false
     }
   ]
 }
@@ -177,7 +173,7 @@ Single endpoint for bidirectional sync including awareness. Clients send their u
 - `after`: Cursor timestamp; only receive updates newer than this
 - `awareness`: Client's awareness state (or null to disconnect)
 - `end_cursor`: New cursor to use in next request
-- `compaction_request`: Array of all updates if this client should compact (null otherwise)
+- `should_compact`: Boolean indicating whether this client should compact
 - `updates`: Array of typed updates with base64-encoded Yjs data
 
 ## Permissions

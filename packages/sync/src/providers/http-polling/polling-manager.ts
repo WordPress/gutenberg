@@ -25,6 +25,7 @@ import {
 	createSyncUpdate,
 	createUpdateQueue,
 	postSyncUpdate,
+	postSyncUpdateNonBlocking,
 } from './utils';
 
 const POLLING_INTERVAL_IN_MS = 1000; // 1 second or 1000 milliseconds
@@ -50,6 +51,7 @@ interface RegisterRoomOptions {
 
 interface RoomState {
 	clientId: number;
+	createCompactionUpdate: () => SyncUpdate;
 	endCursor: number;
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
@@ -67,9 +69,11 @@ const roomStates: Map< string, RoomState > = new Map();
  * the original operation metadata (client IDs, logical clocks) so that
  * Yjs deduplication works correctly when the compaction is applied.
  *
+ * Deprecated: The server is moving towards full state updates for compaction.
+ *
  * @param updates The updates to merge
  */
-function createCompactionUpdate( updates: SyncUpdate[] ): SyncUpdate {
+function createDeprecatedCompactionUpdate( updates: SyncUpdate[] ): SyncUpdate {
 	// Extract only compaction and update types for merging (skip sync-step updates).
 	// Decode base64 updates to Uint8Array for merging.
 	const mergeable = updates
@@ -237,6 +241,25 @@ function processDocUpdate(
 
 let isPolling = false;
 let pollInterval = POLLING_INTERVAL_IN_MS;
+let pageHideListenerRegistered = false;
+
+/**
+ * Send a disconnect signal for all registered rooms when the page is
+ * being unloaded. Uses `sendBeacon` so the request survives navigation.
+ */
+function handlePageHide(): void {
+	const rooms = Array.from( roomStates.entries() ).map(
+		( [ room, state ] ) => ( {
+			after: 0,
+			awareness: null,
+			client_id: state.clientId,
+			room,
+			updates: [],
+		} )
+	);
+
+	postSyncUpdateNonBlocking( { rooms } );
+}
 
 function poll(): void {
 	isPolling = true;
@@ -306,11 +329,21 @@ function poll(): void {
 				roomState.updateQueue.addBulk( responseUpdates );
 
 				// Respond to compaction requests from server. The server asks only one
-				// client at a time to compact (lowest active client ID). We merge the
-				// received updates (the server has given us everything it has).
-				if ( room.compaction_request ) {
+				// client at a time to compact (lowest active client ID). We encode our
+				// full document state to replace all prior updates on the server.
+				if ( room.should_compact ) {
+					roomState.log( 'Server requested compaction update' );
+					roomState.updateQueue.clear();
 					roomState.updateQueue.add(
-						createCompactionUpdate( room.compaction_request )
+						roomState.createCompactionUpdate()
+					);
+				} else if ( room.compaction_request ) {
+					// Deprecated
+					roomState.log( 'Server requested (old) compaction update' );
+					roomState.updateQueue.add(
+						createDeprecatedCompactionUpdate(
+							room.compaction_request
+						)
 					);
 				}
 			} );
@@ -381,12 +414,16 @@ function registerRoom( {
 	function unregister(): void {
 		doc.off( 'update', onDocUpdate );
 		awareness.off( 'change', onAwarenessUpdate );
-		// TODO: poll will null awareness state to trigger removal
 		updateQueue.clear();
 	}
 
 	const roomState: RoomState = {
 		clientId: doc.clientID,
+		createCompactionUpdate: () =>
+			createSyncUpdate(
+				Y.encodeStateAsUpdate( doc ),
+				SyncUpdateType.COMPACTION
+			),
 		endCursor: 0,
 		localAwarenessState: awareness.getLocalState() ?? {},
 		log,
@@ -403,14 +440,40 @@ function registerRoom( {
 	awareness.on( 'change', onAwarenessUpdate );
 	roomStates.set( room, roomState );
 
+	if ( ! pageHideListenerRegistered ) {
+		window.addEventListener( 'pagehide', handlePageHide );
+		pageHideListenerRegistered = true;
+	}
+
 	if ( ! isPolling ) {
 		poll();
 	}
 }
 
 function unregisterRoom( room: string ): void {
-	roomStates.get( room )?.unregister();
-	roomStates.delete( room );
+	const state = roomStates.get( room );
+	if ( state ) {
+		// Send a disconnect signal so the server removes this client's
+		// awareness entry immediately instead of waiting for the timeout.
+		const rooms = [
+			{
+				after: 0,
+				awareness: null,
+				client_id: state.clientId,
+				room,
+				updates: [],
+			},
+		];
+
+		postSyncUpdateNonBlocking( { rooms } );
+		state.unregister();
+		roomStates.delete( room );
+	}
+
+	if ( roomStates.size === 0 && pageHideListenerRegistered ) {
+		window.removeEventListener( 'pagehide', handlePageHide );
+		pageHideListenerRegistered = false;
+	}
 }
 
 export const pollingManager: PollingManager = {

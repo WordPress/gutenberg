@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.40.0 (2026-02-18)
+
 ### Deprecations
 
 -   Move `state.navigation.hasStarted` and `state.navigation.hasFinished` to a private store and deprecate direct access from the public `core/router` store. ([#70882](https://github.com/WordPress/gutenberg/pull/70882))

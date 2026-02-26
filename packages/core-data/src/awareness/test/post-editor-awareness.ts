@@ -9,7 +9,11 @@ import { dispatch, select, subscribe, resolveSelect } from '@wordpress/data';
  */
 import { PostEditorAwareness } from '../post-editor-awareness';
 import { SelectionType } from '../../utils/crdt-user-selections';
-import type { SelectionNone, SelectionCursor } from '../../types';
+import type {
+	SelectionNone,
+	SelectionCursor,
+	SelectionWholeBlock,
+} from '../../types';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import type { CollaboratorInfo } from '../types';
 
@@ -46,23 +50,117 @@ const createMockUser = () => ( {
 	avatar_urls: mockAvatarUrls,
 } );
 
+type MockBlock = {
+	clientId: string;
+	name?: string;
+	innerBlocks: MockBlock[];
+};
+
+interface MockBlockEditorOverrides {
+	blocks?: MockBlock[];
+	getBlocks?: jest.Mock;
+	getBlockName?: string;
+	getSelectionStart?: jest.Mock;
+	getSelectionEnd?: jest.Mock;
+}
+
+/**
+ * Mock the block-editor store selectors returned by `select( blockEditorStore )`.
+ *
+ * Only the fields that vary between tests need to be passed — everything else
+ * gets sensible defaults. Pass `blocks` for the common case (static return
+ * value) or `getBlocks` when you need `mockImplementation` (e.g. template mode).
+ *
+ * Returns `{ getBlocks }` so callers can assert on it (e.g. `toHaveBeenCalledWith`).
+ *
+ * @param overrides - Optional selector overrides.
+ */
+function mockBlockEditorStore( overrides: MockBlockEditorOverrides = {} ) {
+	const defaultBlocks = [
+		{
+			clientId: 'block-1',
+			name: 'core/paragraph',
+			innerBlocks: [],
+		},
+	];
+
+	const getBlocks =
+		overrides.getBlocks ??
+		jest.fn().mockReturnValue( overrides.blocks ?? defaultBlocks );
+
+	( select as jest.Mock ).mockReturnValue( {
+		getSelectionStart:
+			overrides.getSelectionStart ?? jest.fn().mockReturnValue( {} ),
+		getSelectionEnd:
+			overrides.getSelectionEnd ?? jest.fn().mockReturnValue( {} ),
+		getSelectedBlocksInitialCaretPosition: jest
+			.fn()
+			.mockReturnValue( null ),
+		getBlockIndex: jest.fn().mockReturnValue( 0 ),
+		getBlockRootClientId: jest.fn().mockReturnValue( '' ),
+		getBlockName: jest
+			.fn()
+			.mockReturnValue( overrides.getBlockName ?? 'core/paragraph' ),
+		getBlocks,
+	} );
+
+	return { getBlocks };
+}
+
+/**
+ * Helper to create a single Yjs block with optional text content and inner blocks.
+ * @param clientId
+ * @param name
+ * @param options
+ * @param options.textContent
+ * @param options.innerBlocks
+ */
+function createYBlock(
+	clientId: string,
+	name: string,
+	{
+		textContent,
+		innerBlocks = [],
+	}: { textContent?: string; innerBlocks?: Y.Map< any >[] } = {}
+): Y.Map< any > {
+	const block = new Y.Map();
+	block.set( 'clientId', clientId );
+	block.set( 'name', name );
+
+	const attrs = new Y.Map();
+	if ( textContent !== undefined ) {
+		attrs.set( 'content', new Y.Text( textContent ) );
+	}
+
+	block.set( 'attributes', attrs );
+	const inner = new Y.Array();
+	if ( innerBlocks.length ) {
+		inner.push( innerBlocks );
+	}
+
+	block.set( 'innerBlocks', inner );
+	return block;
+}
+
 /**
  * Helper function to create a Y.Doc with blocks structure for testing
+ * @param blocks
  */
-function createTestDocWithBlocks() {
+function createTestDocWithBlocks( blocks?: Y.Map< any >[] ) {
 	const ydoc = new Y.Doc();
 	const documentMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
-	const blocks = new Y.Array();
-	documentMap.set( 'blocks', blocks );
+	const yBlocks = new Y.Array();
+	documentMap.set( 'blocks', yBlocks );
 
-	// Create a block with content
-	const block = new Y.Map();
-	block.set( 'clientId', 'block-1' );
-	const attrs = new Y.Map();
-	attrs.set( 'content', new Y.Text( 'Hello world' ) );
-	block.set( 'attributes', attrs );
-	block.set( 'innerBlocks', new Y.Array() );
-	blocks.push( [ block ] );
+	if ( blocks ) {
+		yBlocks.push( blocks );
+	} else {
+		// Default: single block with content
+		const block = createYBlock( 'block-1', 'core/paragraph', {
+			textContent: 'Hello world',
+		} );
+		yBlocks.push( [ block ] );
+	}
 
 	return ydoc;
 }
@@ -82,14 +180,7 @@ describe( 'PostEditorAwareness', () => {
 
 		jest.spyOn( Date, 'now' ).mockReturnValue( 1704067200000 );
 
-		// Mock select to return block editor selectors
-		( select as jest.Mock ).mockReturnValue( {
-			getSelectionStart: jest.fn().mockReturnValue( {} ),
-			getSelectionEnd: jest.fn().mockReturnValue( {} ),
-			getSelectedBlocksInitialCaretPosition: jest
-				.fn()
-				.mockReturnValue( null ),
-		} );
+		mockBlockEditorStore();
 
 		// Mock subscribe to capture the callback
 		( subscribe as jest.Mock ).mockImplementation( ( callback ) => {
@@ -205,12 +296,9 @@ describe( 'PostEditorAwareness', () => {
 					offset: 5,
 				} );
 
-			( select as jest.Mock ).mockReturnValue( {
+			mockBlockEditorStore( {
 				getSelectionStart: mockGetSelectionStart,
 				getSelectionEnd: mockGetSelectionEnd,
-				getSelectedBlocksInitialCaretPosition: jest
-					.fn()
-					.mockReturnValue( null ),
 			} );
 
 			const awareness = new PostEditorAwareness(
@@ -257,12 +345,9 @@ describe( 'PostEditorAwareness', () => {
 					offset: 5,
 				} );
 
-			( select as jest.Mock ).mockReturnValue( {
+			mockBlockEditorStore( {
 				getSelectionStart: mockGetSelectionStart,
 				getSelectionEnd: mockGetSelectionEnd,
-				getSelectedBlocksInitialCaretPosition: jest
-					.fn()
-					.mockReturnValue( null ),
 			} );
 
 			const awareness = new PostEditorAwareness(
@@ -339,8 +424,8 @@ describe( 'PostEditorAwareness', () => {
 		} );
 	} );
 
-	describe( 'getAbsolutePositionIndex', () => {
-		test( 'should return null when relative position cannot be resolved', () => {
+	describe( 'convertSelectionStateToAbsolute', () => {
+		test( 'should return nulls when relative position cannot be resolved', () => {
 			const awareness = new PostEditorAwareness(
 				doc,
 				'postType',
@@ -361,20 +446,21 @@ describe( 'PostEditorAwareness', () => {
 
 			const selection: SelectionCursor = {
 				type: SelectionType.Cursor,
-				blockId: 'block-1',
 				cursorPosition: {
 					relativePosition,
 					absoluteOffset: 2,
 				},
 			};
 
-			const result = awareness.getAbsolutePositionIndex( selection );
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
 
-			// Should return null when the relative position's type cannot be found
-			expect( result ).toBeNull();
+			// Should return nulls when the relative position's type cannot be found
+			expect( result.textIndex ).toBeNull();
+			expect( result.localClientId ).toBeNull();
 		} );
 
-		test( 'should return absolute position index for valid selection', () => {
+		test( 'should return text index and block client ID for valid cursor selection', () => {
 			const awareness = new PostEditorAwareness(
 				doc,
 				'postType',
@@ -399,16 +485,49 @@ describe( 'PostEditorAwareness', () => {
 
 			const selection: SelectionCursor = {
 				type: SelectionType.Cursor,
-				blockId: 'block-1',
 				cursorPosition: {
 					relativePosition,
 					absoluteOffset: 5,
 				},
 			};
 
-			const result = awareness.getAbsolutePositionIndex( selection );
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
 
-			expect( result ).toBe( 5 );
+			expect( result.textIndex ).toBe( 5 );
+			expect( result.localClientId ).toBe( 'block-1' );
+		} );
+
+		test( 'should resolve WholeBlock selection to block client ID', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+
+			// Get the blocks array from the doc
+			const documentMap = doc.getMap( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.get( 'blocks' ) as Y.Array<
+				Y.Map< any >
+			>;
+
+			// Create a block relative position
+			const blockPosition = Y.createRelativePositionFromTypeIndex(
+				blocks,
+				0
+			);
+
+			const selection: SelectionWholeBlock = {
+				type: SelectionType.WholeBlock,
+				blockPosition,
+			};
+
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
+
+			expect( result.textIndex ).toBeNull();
+			expect( result.localClientId ).toBe( 'block-1' );
 		} );
 	} );
 
@@ -556,6 +675,511 @@ describe( 'PostEditorAwareness', () => {
 			] );
 
 			expect( callback ).toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'convertSelectionStateToAbsolute with nested blocks', () => {
+		test( 'should resolve cursor in second root block (path [1])', () => {
+			const nestedDoc = createTestDocWithBlocks( [
+				createYBlock( 'yjs-block-0', 'core/paragraph', {
+					textContent: 'First',
+				} ),
+				createYBlock( 'yjs-block-1', 'core/paragraph', {
+					textContent: 'Second',
+				} ),
+				createYBlock( 'yjs-block-2', 'core/paragraph', {
+					textContent: 'Third',
+				} ),
+			] );
+
+			mockBlockEditorStore( {
+				blocks: [
+					{ clientId: 'local-0', innerBlocks: [] },
+					{ clientId: 'local-1', innerBlocks: [] },
+					{ clientId: 'local-2', innerBlocks: [] },
+				],
+			} );
+
+			const awareness = new PostEditorAwareness(
+				nestedDoc,
+				'postType',
+				'post',
+				123
+			);
+
+			// Create a cursor in the third block's text
+			const documentMap = nestedDoc.getMap( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.get( 'blocks' ) as Y.Array<
+				Y.Map< any >
+			>;
+			const block2 = blocks.get( 2 );
+			const attrs2 = block2.get( 'attributes' ) as Y.Map< Y.Text >;
+			const yText2 = attrs2.get( 'content' ) as Y.Text;
+
+			const relativePosition = Y.createRelativePositionFromTypeIndex(
+				yText2,
+				2
+			);
+
+			const selection: SelectionCursor = {
+				type: SelectionType.Cursor,
+				cursorPosition: {
+					relativePosition,
+					absoluteOffset: 2,
+				},
+			};
+
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
+
+			expect( result.textIndex ).toBe( 2 );
+			expect( result.localClientId ).toBe( 'local-2' );
+
+			nestedDoc.destroy();
+		} );
+
+		test( 'should resolve cursor in a nested inner block (path [0, 1])', () => {
+			const innerParagraph0 = createYBlock(
+				'yjs-inner-0',
+				'core/paragraph',
+				{ textContent: 'Inner zero' }
+			);
+			const innerParagraph1 = createYBlock(
+				'yjs-inner-1',
+				'core/paragraph',
+				{ textContent: 'Inner one' }
+			);
+			const outerColumn = createYBlock( 'yjs-outer', 'core/column', {
+				innerBlocks: [ innerParagraph0, innerParagraph1 ],
+			} );
+
+			const nestedDoc = createTestDocWithBlocks( [ outerColumn ] );
+
+			mockBlockEditorStore( {
+				blocks: [
+					{
+						clientId: 'local-outer',
+						innerBlocks: [
+							{ clientId: 'local-inner-0', innerBlocks: [] },
+							{ clientId: 'local-inner-1', innerBlocks: [] },
+						],
+					},
+				],
+			} );
+
+			const awareness = new PostEditorAwareness(
+				nestedDoc,
+				'postType',
+				'post',
+				123
+			);
+
+			// Create cursor in the second inner paragraph
+			const documentMap = nestedDoc.getMap( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.get( 'blocks' ) as Y.Array<
+				Y.Map< any >
+			>;
+			const outer = blocks.get( 0 );
+			const innerBlocks = outer.get( 'innerBlocks' ) as Y.Array<
+				Y.Map< any >
+			>;
+			const innerBlock1 = innerBlocks.get( 1 );
+			const innerAttrs = innerBlock1.get(
+				'attributes'
+			) as Y.Map< Y.Text >;
+			const yText = innerAttrs.get( 'content' ) as Y.Text;
+
+			const relativePosition = Y.createRelativePositionFromTypeIndex(
+				yText,
+				5
+			);
+
+			const selection: SelectionCursor = {
+				type: SelectionType.Cursor,
+				cursorPosition: {
+					relativePosition,
+					absoluteOffset: 5,
+				},
+			};
+
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
+
+			expect( result.textIndex ).toBe( 5 );
+			expect( result.localClientId ).toBe( 'local-inner-1' );
+
+			nestedDoc.destroy();
+		} );
+
+		test( 'should resolve WholeBlock for a nested image block', () => {
+			const innerImage = createYBlock( 'yjs-img', 'core/image' );
+			const outerColumn = createYBlock( 'yjs-col', 'core/column', {
+				innerBlocks: [ innerImage ],
+			} );
+
+			const nestedDoc = createTestDocWithBlocks( [ outerColumn ] );
+
+			mockBlockEditorStore( {
+				blocks: [
+					{
+						clientId: 'local-col',
+						innerBlocks: [
+							{ clientId: 'local-img', innerBlocks: [] },
+						],
+					},
+				],
+			} );
+
+			const awareness = new PostEditorAwareness(
+				nestedDoc,
+				'postType',
+				'post',
+				123
+			);
+
+			// Create a WholeBlock relative position for the inner image
+			const documentMap = nestedDoc.getMap( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.get( 'blocks' ) as Y.Array<
+				Y.Map< any >
+			>;
+			const outer = blocks.get( 0 );
+			const innerBlocks = outer.get( 'innerBlocks' ) as Y.Array<
+				Y.Map< any >
+			>;
+
+			const blockPosition = Y.createRelativePositionFromTypeIndex(
+				innerBlocks,
+				0
+			);
+
+			const selection: SelectionWholeBlock = {
+				type: SelectionType.WholeBlock,
+				blockPosition,
+			};
+
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
+
+			expect( result.textIndex ).toBeNull();
+			expect( result.localClientId ).toBe( 'local-img' );
+
+			nestedDoc.destroy();
+		} );
+
+		test( 'should resolve a deeply nested block (path [1, 0, 1])', () => {
+			const deepParagraph0 = createYBlock(
+				'yjs-deep-0',
+				'core/paragraph',
+				{ textContent: 'Deep zero' }
+			);
+			const deepParagraph1 = createYBlock(
+				'yjs-deep-1',
+				'core/paragraph',
+				{ textContent: 'Deep one content' }
+			);
+			const midColumn = createYBlock( 'yjs-mid', 'core/column', {
+				innerBlocks: [ deepParagraph0, deepParagraph1 ],
+			} );
+			const outerColumns0 = createYBlock( 'yjs-outer-0', 'core/columns' );
+			const outerColumns1 = createYBlock( 'yjs-outer-1', 'core/columns', {
+				innerBlocks: [ midColumn ],
+			} );
+
+			const nestedDoc = createTestDocWithBlocks( [
+				outerColumns0,
+				outerColumns1,
+			] );
+
+			mockBlockEditorStore( {
+				blocks: [
+					{ clientId: 'local-outer-0', innerBlocks: [] },
+					{
+						clientId: 'local-outer-1',
+						innerBlocks: [
+							{
+								clientId: 'local-mid',
+								innerBlocks: [
+									{
+										clientId: 'local-deep-0',
+										innerBlocks: [],
+									},
+									{
+										clientId: 'local-deep-1',
+										innerBlocks: [],
+									},
+								],
+							},
+						],
+					},
+				],
+			} );
+
+			const awareness = new PostEditorAwareness(
+				nestedDoc,
+				'postType',
+				'post',
+				123
+			);
+
+			// Create cursor in the deeply nested second paragraph
+			const documentMap = nestedDoc.getMap( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.get( 'blocks' ) as Y.Array<
+				Y.Map< any >
+			>;
+			const outer1 = blocks.get( 1 );
+			const outer1Inner = outer1.get( 'innerBlocks' ) as Y.Array<
+				Y.Map< any >
+			>;
+			const mid = outer1Inner.get( 0 );
+			const midInner = mid.get( 'innerBlocks' ) as Y.Array<
+				Y.Map< any >
+			>;
+			const deep1 = midInner.get( 1 );
+			const deep1Attrs = deep1.get( 'attributes' ) as Y.Map< Y.Text >;
+			const yText = deep1Attrs.get( 'content' ) as Y.Text;
+
+			const relativePosition = Y.createRelativePositionFromTypeIndex(
+				yText,
+				7
+			);
+
+			const selection: SelectionCursor = {
+				type: SelectionType.Cursor,
+				cursorPosition: {
+					relativePosition,
+					absoluteOffset: 7,
+				},
+			};
+
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
+
+			expect( result.textIndex ).toBe( 7 );
+			expect( result.localClientId ).toBe( 'local-deep-1' );
+
+			nestedDoc.destroy();
+		} );
+	} );
+
+	describe( 'template mode (core/post-content handling)', () => {
+		test( 'should resolve cursor when getBlocks returns template tree with core/post-content', () => {
+			// Yjs doc has only the post content blocks (no template wrapper)
+			const templateDoc = createTestDocWithBlocks( [
+				createYBlock( 'yjs-para-0', 'core/paragraph', {
+					textContent: 'Post paragraph 1',
+				} ),
+				createYBlock( 'yjs-para-1', 'core/paragraph', {
+					textContent: 'Post paragraph 2',
+				} ),
+			] );
+
+			// In template mode, getBlocks() returns the full template tree.
+			// The Yjs paths are relative to post content, so the receiver needs
+			// to find core/post-content and navigate from there.
+			const postContentClientId = 'local-post-content';
+			const mockGetBlocks = jest
+				.fn()
+				.mockImplementation( ( rootClientId?: string ) => {
+					if ( rootClientId === postContentClientId ) {
+						// Controlled inner blocks of core/post-content
+						return [
+							{
+								clientId: 'local-para-0',
+								name: 'core/paragraph',
+								innerBlocks: [],
+							},
+							{
+								clientId: 'local-para-1',
+								name: 'core/paragraph',
+								innerBlocks: [],
+							},
+						];
+					}
+					// Full template tree
+					return [
+						{
+							clientId: 'local-header',
+							name: 'core/template-part',
+							innerBlocks: [],
+						},
+						{
+							clientId: 'local-group',
+							name: 'core/group',
+							innerBlocks: [
+								{
+									clientId: postContentClientId,
+									name: 'core/post-content',
+									innerBlocks: [], // empty because they're controlled inner blocks
+								},
+							],
+						},
+						{
+							clientId: 'local-footer',
+							name: 'core/template-part',
+							innerBlocks: [],
+						},
+					];
+				} );
+
+			mockBlockEditorStore( { getBlocks: mockGetBlocks } );
+
+			const awareness = new PostEditorAwareness(
+				templateDoc,
+				'postType',
+				'post',
+				123
+			);
+
+			// Create cursor in the second post content paragraph
+			const documentMap = templateDoc.getMap( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.get( 'blocks' ) as Y.Array<
+				Y.Map< any >
+			>;
+			const block1 = blocks.get( 1 );
+			const attrs = block1.get( 'attributes' ) as Y.Map< Y.Text >;
+			const yText = attrs.get( 'content' ) as Y.Text;
+
+			const relativePosition = Y.createRelativePositionFromTypeIndex(
+				yText,
+				4
+			);
+
+			const selection: SelectionCursor = {
+				type: SelectionType.Cursor,
+				cursorPosition: {
+					relativePosition,
+					absoluteOffset: 4,
+				},
+			};
+
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
+
+			expect( result.textIndex ).toBe( 4 );
+			// Should resolve to the post-content inner block, not a template block
+			expect( result.localClientId ).toBe( 'local-para-1' );
+			// Verify getBlocks was called with the post-content clientId
+			expect( mockGetBlocks ).toHaveBeenCalledWith( postContentClientId );
+
+			templateDoc.destroy();
+		} );
+
+		test( 'should resolve WholeBlock in template mode', () => {
+			const templateDoc = createTestDocWithBlocks( [
+				createYBlock( 'yjs-img', 'core/image' ),
+			] );
+
+			const postContentClientId = 'local-post-content';
+			const mockGetBlocks = jest
+				.fn()
+				.mockImplementation( ( rootClientId?: string ) => {
+					if ( rootClientId === postContentClientId ) {
+						return [
+							{
+								clientId: 'local-img',
+								name: 'core/image',
+								innerBlocks: [],
+							},
+						];
+					}
+					return [
+						{
+							clientId: 'local-group',
+							name: 'core/group',
+							innerBlocks: [
+								{
+									clientId: postContentClientId,
+									name: 'core/post-content',
+									innerBlocks: [],
+								},
+							],
+						},
+					];
+				} );
+
+			mockBlockEditorStore( {
+				getBlocks: mockGetBlocks,
+				getBlockName: 'core/image',
+			} );
+
+			const awareness = new PostEditorAwareness(
+				templateDoc,
+				'postType',
+				'post',
+				123
+			);
+
+			const documentMap = templateDoc.getMap( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.get( 'blocks' ) as Y.Array<
+				Y.Map< any >
+			>;
+
+			const blockPosition = Y.createRelativePositionFromTypeIndex(
+				blocks,
+				0
+			);
+
+			const selection: SelectionWholeBlock = {
+				type: SelectionType.WholeBlock,
+				blockPosition,
+			};
+
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
+
+			expect( result.textIndex ).toBeNull();
+			expect( result.localClientId ).toBe( 'local-img' );
+
+			templateDoc.destroy();
+		} );
+
+		test( 'should fall back to root blocks when no core/post-content exists', () => {
+			// Normal mode (no template) — should use root blocks directly
+			const normalDoc = createTestDocWithBlocks( [
+				createYBlock( 'yjs-para', 'core/paragraph', {
+					textContent: 'Normal mode',
+				} ),
+			] );
+
+			mockBlockEditorStore( {
+				blocks: [ { clientId: 'local-para', innerBlocks: [] } ],
+			} );
+
+			const awareness = new PostEditorAwareness(
+				normalDoc,
+				'postType',
+				'post',
+				123
+			);
+
+			const documentMap = normalDoc.getMap( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.get( 'blocks' ) as Y.Array<
+				Y.Map< any >
+			>;
+			const block = blocks.get( 0 );
+			const attrs = block.get( 'attributes' ) as Y.Map< Y.Text >;
+			const yText = attrs.get( 'content' ) as Y.Text;
+
+			const relativePosition = Y.createRelativePositionFromTypeIndex(
+				yText,
+				3
+			);
+
+			const selection: SelectionCursor = {
+				type: SelectionType.Cursor,
+				cursorPosition: {
+					relativePosition,
+					absoluteOffset: 3,
+				},
+			};
+
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
+
+			expect( result.textIndex ).toBe( 3 );
+			expect( result.localClientId ).toBe( 'local-para' );
+
+			normalDoc.destroy();
 		} );
 	} );
 } );

@@ -14,3 +14,17 @@ export const DEFAULT_MAX_CONCURRENT_UPLOADS = 5;
  * uploading many images at once.
  */
 export const DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING = 2;
+
+/**
+ * MIME types supported by client-side media processing.
+ *
+ * These are the image formats that can be processed using
+ * WebAssembly-based vips in the browser.
+ */
+export const CLIENT_SIDE_SUPPORTED_MIME_TYPES: readonly string[] = [
+	'image/jpeg',
+	'image/png',
+	'image/gif',
+	'image/webp',
+	'image/avif',
+] as const;

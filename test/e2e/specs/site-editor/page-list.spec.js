@@ -114,7 +114,7 @@ test.describe( 'Page List', () => {
 			statusVisibility: {
 				performEdit: async ( page ) => {
 					const editButton = page.getByRole( 'button', {
-						name: 'Edit Status & Visibility',
+						name: 'Edit Status',
 					} );
 					await editButton.locator( '..' ).hover();
 					await editButton.click();
@@ -146,7 +146,7 @@ test.describe( 'Page List', () => {
 				assertInitialState: async ( page ) => {
 					const statusAndVisibility = page
 						.getByRole( 'button', {
-							name: 'Edit Status & Visibility',
+							name: 'Edit Status',
 						} )
 						.locator( '..' );
 					await expect( statusAndVisibility ).toContainText(
@@ -156,7 +156,7 @@ test.describe( 'Page List', () => {
 				assertEditedState: async ( page ) => {
 					const statusAndVisibility = page
 						.getByRole( 'button', {
-							name: 'Edit Status & Visibility',
+							name: 'Edit Status',
 						} )
 						.locator( '..' );
 					await expect( statusAndVisibility ).toContainText(
@@ -252,7 +252,7 @@ test.describe( 'Page List', () => {
 					await editButton.click();
 					await expect(
 						page.getByRole( 'link', {
-							name: 'http://localhost:8889/?',
+							name: /http:\/\/localhost:8889\//,
 						} )
 					).toBeVisible();
 				},
@@ -277,6 +277,7 @@ test.describe( 'Page List', () => {
 
 					await page
 						.getByRole( 'option', { name: 'Sample Page' } )
+						.first()
 						.click();
 				},
 				assertEditedState: async ( page ) => {
@@ -340,9 +341,6 @@ test.describe( 'Page List', () => {
 		};
 
 		test.beforeAll( async ( { requestUtils } ) => {
-			await requestUtils.setGutenbergExperiments( [
-				'gutenberg-quick-edit-dataviews',
-			] );
 			// Create a test user for `author` field testing.
 			await requestUtils.createUser( {
 				username: 'testauthor',
@@ -360,8 +358,15 @@ test.describe( 'Page List', () => {
 			await page.getByRole( 'button', { name: 'Layout' } ).click();
 			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 
-			// Trigger Quick Edit action on Privacy Policy row
-			const row = page.getByRole( 'row', { name: /Privacy Policy/ } );
+			// Trigger Quick Edit action on Privacy Policy row.
+			const row = page
+				.getByRole( 'row', {
+					name: /Privacy Policy/,
+				} )
+				.filter( {
+					// Targets newly created pages which are published by default.
+					has: page.getByRole( 'cell', { name: 'Published' } ),
+				} );
 			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
 		} );
 
@@ -477,7 +482,6 @@ test.describe( 'Page List', () => {
 		// } );
 
 		test.afterAll( async ( { requestUtils } ) => {
-			await requestUtils.setGutenbergExperiments( [] );
 			await requestUtils.deleteAllUsers();
 		} );
 	} );

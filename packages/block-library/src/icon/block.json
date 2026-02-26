@@ -3,7 +3,6 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"name": "core/icon",
 	"title": "Icon",
-	"__experimental": true,
 	"category": "media",
 	"description": "Insert an SVG icon.",
 	"keywords": [ "icon", "svg" ],
@@ -12,14 +11,6 @@
 		"icon": {
 			"type": "string",
 			"role": "content"
-		},
-		"style": {
-			"type": "object",
-			"default": {
-				"dimensions": {
-					"width": "24px"
-				}
-			}
 		}
 	},
 	"supports": {
@@ -69,6 +60,15 @@
 	},
 	"selectors": {
 		"root": ".wp-block-icon",
+		"color": {
+			"root": ".wp-block-icon svg"
+		},
+		"border": {
+			"root": ".wp-block-icon svg"
+		},
+		"spacing": {
+			"padding": ".wp-block-icon svg"
+		},
 		"dimensions": {
 			"root": ".wp-block-icon svg",
 			"width": ".wp-block-icon svg"

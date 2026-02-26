@@ -627,7 +627,7 @@ export default function MediaEdit< Item >( {
 			const normalizedValue = normalizeValue( value );
 			// Sorted IDs ensure stable cache key, avoiding
 			// unnecessary new requests on reorder.
-			const sortedIds = [ ...normalizedValue ].sort( ( a, b ) => a - b );
+			const sortedIds = normalizedValue.toSorted( ( a, b ) => a - b );
 			const { getEntityRecords } = select( coreStore );
 			return getEntityRecords( 'postType', 'attachment', {
 				include: sortedIds,

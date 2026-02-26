@@ -55,10 +55,18 @@ add_filter( 'register_wp_template_part_post_type_args', 'gutenberg_modify_wp_tem
  * @return array Modified array of template part area definitions.
  */
 function gutenberg_register_overlay_template_part_area( $areas ) {
+	foreach ( $areas as $area ) {
+		if ( isset( $area['area'] ) && 'navigation-overlay' === $area['area'] ) {
+			return $areas;
+		}
+	}
+
 	$areas[] = array(
 		'area'        => 'navigation-overlay',
 		'label'       => __( 'Navigation Overlay', 'gutenberg' ),
-		'description' => __( 'Custom overlay area for navigation overlays.', 'gutenberg' ),
+		'description' => __(
+			'The Navigation Overlay template defines an overlay area that typically contains navigation links and can be toggled open and closed.'
+		),
 		'icon'        => 'navigation-overlay',
 		'area_tag'    => 'div',
 	);
