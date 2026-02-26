@@ -10,6 +10,7 @@
 - DataViews: Fix search input losing characters during debounce when externally synced. [#75810](https://github.com/WordPress/gutenberg/pull/75810)
 - DataForm: Fix vertical alignment of summary fields in card layout. [#75864](https://github.com/WordPress/gutenberg/pull/75864)
 - DataViews: Remove visual divider between quick and regular actions in the actions menu. [#75893](https://github.com/WordPress/gutenberg/pull/75893)
+- DataForm: field label for panel layout are no longer uppercased. [#75944](https://github.com/WordPress/gutenberg/pull/75944)
 
 ### Enhancements
 
