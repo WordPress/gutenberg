@@ -124,6 +124,23 @@ function block_core_navigation_link_build_css_font_sizes( $context ) {
 }
 
 /**
+ * Returns the top-level submenu SVG chevron icon.
+ *
+ * @since 5.9.0
+ * @deprecated 7.0.0 Use block_core_navigation_render_submenu_icon() instead.
+ *
+ * @return string
+ */
+function block_core_navigation_link_render_submenu_icon() {
+	_deprecated_function(
+		__FUNCTION__,
+		'7.0.0',
+		'block_core_navigation_render_submenu_icon'
+	);
+	return block_core_navigation_render_submenu_icon();
+}
+
+/**
  * Decodes a url if it's encoded, returning the same url if not.
  *
  * @since 6.2.0
