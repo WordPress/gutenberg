@@ -110,36 +110,41 @@ describe( 'Notice', () => {
 
 	describe( 'decorative icon', () => {
 		it( 'renders icon for non-neutral intents', () => {
-			render(
+			const { container } = render(
 				<Notice.Root intent="info">
 					<Notice.Description>Info message</Notice.Description>
 				</Notice.Root>
 			);
-			const icon = screen.getByRole( 'img', { hidden: true } );
+			// Disable reason: The decorative SVG has aria-hidden and no role,
+			// so there is no Testing Library query that can target it.
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const icon = container.querySelector( 'svg' );
 			expect( icon ).toBeVisible();
 			expect( icon ).toHaveAttribute( 'aria-hidden', 'true' );
 		} );
 
 		it( 'does not render icon for neutral intent', () => {
-			render(
+			const { container } = render(
 				<Notice.Root intent="neutral">
 					<Notice.Description>Neutral message</Notice.Description>
 				</Notice.Root>
 			);
-			expect(
-				screen.queryByRole( 'img', { hidden: true } )
-			).not.toBeInTheDocument();
+			// Disable reason: The decorative SVG has aria-hidden and no role,
+			// so there is no Testing Library query that can target it.
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			expect( container.querySelector( 'svg' ) ).not.toBeInTheDocument();
 		} );
 
 		it( 'hides icon when icon prop is null', () => {
-			render(
+			const { container } = render(
 				<Notice.Root intent="info" icon={ null }>
 					<Notice.Description>No icon</Notice.Description>
 				</Notice.Root>
 			);
-			expect(
-				screen.queryByRole( 'img', { hidden: true } )
-			).not.toBeInTheDocument();
+			// Disable reason: The decorative SVG has aria-hidden and no role,
+			// so there is no Testing Library query that can target it.
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			expect( container.querySelector( 'svg' ) ).not.toBeInTheDocument();
 		} );
 	} );
 
@@ -180,7 +185,7 @@ describe( 'Notice', () => {
 			);
 			expect(
 				screen.getByText( 'Update available.', {
-					selector: '[aria-live="polite"] *',
+					selector: '[aria-live="polite"]',
 				} )
 			).toBeInTheDocument();
 		} );
@@ -193,7 +198,7 @@ describe( 'Notice', () => {
 			);
 			expect(
 				screen.getByText( 'Something failed.', {
-					selector: '[aria-live="assertive"] *',
+					selector: '[aria-live="assertive"]',
 				} )
 			).toBeInTheDocument();
 		} );
