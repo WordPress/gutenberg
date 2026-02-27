@@ -119,6 +119,9 @@ require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/extensible-site-editor.php';
 require __DIR__ . '/experimental/fonts/load.php';
+if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
+	require __DIR__ . '/experimental/connectors/load.php';
+}
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
 	require __DIR__ . '/experimental/workflow-palette.php';
@@ -200,3 +203,8 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigatio
 
 // Block patterns for navigation overlays.
 require __DIR__ . '/overlay-patterns.php';
+
+// Content Guidelines (only load when experiment is enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-content-guidelines' ) ) {
+	require __DIR__ . '/experimental/content-guidelines/index.php';
+}

@@ -1,5 +1,3 @@
-// @ts-expect-error No exported types
-import { useStyleOverride } from '@wordpress/block-editor';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
 import { useEffect, useState } from '@wordpress/element';
@@ -221,11 +219,6 @@ export function Overlay( {
 	postId,
 	postType,
 }: OverlayProps ) {
-	useStyleOverride( {
-		id: 'collaborators-overlay',
-		css: COLLABORATORS_OVERLAY_STYLES,
-	} );
-
 	// Use state for the overlay element so that the hook re-runs once the ref is attached.
 	const [ overlayElement, setOverlayElement ] =
 		useState< HTMLDivElement | null >( null );
@@ -258,6 +251,7 @@ export function Overlay( {
 	// scrollable elements like cursor indicators.
 	return (
 		<div className="collaborators-overlay-full" ref={ mergedRef }>
+			<style>{ COLLABORATORS_OVERLAY_STYLES }</style>
 			{ cursors.map( ( cursor ) => (
 				<div
 					key={ cursor.clientId }

@@ -31,6 +31,7 @@ import DataViewsViewConfig, {
 	ViewTypeMenu,
 } from '../components/dataviews-view-config';
 import normalizeFields from '../field-types';
+import useData from '../hooks/use-data';
 import type { Action, Field, View, SupportedLayouts } from '../types';
 import type { SelectionOrUpdater } from '../types/private';
 type ItemWithId = { id: string };
@@ -236,6 +237,12 @@ function DataViews< Item >( {
 		[ defaultLayoutsProperty ]
 	);
 
+	const {
+		data: displayData,
+		paginationInfo: displayPaginationInfo,
+		hasInitiallyLoaded,
+	} = useData( data, isLoading, paginationInfo );
+
 	if ( ! defaultLayouts[ view.type ] ) {
 		return null;
 	}
@@ -247,9 +254,9 @@ function DataViews< Item >( {
 				onChangeView,
 				fields: _fields,
 				actions,
-				data,
+				data: displayData,
 				isLoading,
-				paginationInfo,
+				paginationInfo: displayPaginationInfo,
 				selection: _selection,
 				onChangeSelection: setSelectionWithChange,
 				openedFilter,
@@ -268,6 +275,7 @@ function DataViews< Item >( {
 				setIsShowingFilter,
 				config,
 				empty,
+				hasInitiallyLoaded,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
 				onReset,
 			} }

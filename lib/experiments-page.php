@@ -197,6 +197,18 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-content-guidelines',
+		__( 'Content Guidelines', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables Content Guidelines feature for managing editorial voice and tone guidelines under Settings.', 'gutenberg' ),
+			'id'    => 'gutenberg-content-guidelines',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

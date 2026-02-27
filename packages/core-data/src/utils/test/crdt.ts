@@ -11,13 +11,11 @@ import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 /**
  * Internal dependencies
  */
-import {
-	CRDT_RECORD_MAP_KEY,
-	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-} from '../../sync';
+import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import {
 	applyPostChangesToCRDTDoc,
 	getPostChangesFromCRDTDoc,
+	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 	type PostChanges,
 	type YPostRecord,
 } from '../crdt';
@@ -605,10 +603,7 @@ describe( 'crdt', () => {
 		it( 'excludes disallowed meta keys in changes', () => {
 			const metaMap = createYMap();
 			metaMap.set( 'public_meta', 'new value' );
-			metaMap.set(
-				WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-				'exclude me'
-			);
+			metaMap.set( POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE, 'exclude me' );
 			map.set( 'meta', metaMap );
 
 			const editedRecord = {
@@ -627,7 +622,7 @@ describe( 'crdt', () => {
 				public_meta: 'new value', // from CRDT
 			} );
 			expect( changes.meta ).not.toHaveProperty(
-				WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE
+				POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE
 			);
 		} );
 

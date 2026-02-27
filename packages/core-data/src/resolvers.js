@@ -235,6 +235,12 @@ export const getEntityRecord =
 							resolveSelect
 								.getEditedEntityRecord( kind, name, key )
 								.then( ( editedRecord ) => {
+									// Don't trigger a save if the record is still an auto-draft.
+									const { status } = editedRecord;
+									if ( 'auto-draft' === status ) {
+										return;
+									}
+
 									dispatch.saveEntityRecord(
 										kind,
 										name,
@@ -707,21 +713,21 @@ export const canUser =
 		const permissions = getUserPermissionsFromAllowHeader(
 			response.headers?.get( 'allow' )
 		);
-		registry.batch( () => {
-			for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
-				const key = getUserPermissionCacheKey( action, resource, id );
+		const receiveUserPermissionArgs = {};
+		const canUserResolutionsArgs = [];
+		for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+			receiveUserPermissionArgs[
+				getUserPermissionCacheKey( action, resource, id )
+			] = permissions[ action ];
 
-				dispatch.receiveUserPermission( key, permissions[ action ] );
-
-				// Mark related action resolutions as finished.
-				if ( action !== requestedAction ) {
-					dispatch.finishResolution( 'canUser', [
-						action,
-						resource,
-						id,
-					] );
-				}
+			// Mark related action resolutions as finished.
+			if ( action !== requestedAction ) {
+				canUserResolutionsArgs.push( [ action, resource, id ] );
 			}
+		}
+		registry.batch( () => {
+			dispatch.receiveUserPermissions( receiveUserPermissionArgs );
+			dispatch.finishResolutions( 'canUser', canUserResolutionsArgs );
 		} );
 	};
 
@@ -1099,7 +1105,7 @@ export const getRevisions =
 				// When requesting all fields, the list of results can be used to
 				// resolve the `getRevision` selector in addition to `getRevisions`.
 				if ( ! query?._fields && ! query.context ) {
-					const key = entityConfig.key || DEFAULT_ENTITY_KEY;
+					const key = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
 					const resolutionsArgs = records
 						.filter( ( record ) => record[ key ] )
 						.map( ( record ) => [

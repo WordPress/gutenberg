@@ -237,6 +237,7 @@ function DataViewsPicker< Item >( {
 				config,
 				itemListLabel,
 				empty,
+				hasInitiallyLoaded: true,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
 			} }
 		>
