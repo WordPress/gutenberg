@@ -50,6 +50,7 @@ export default function Header( {
 					gap="sm"
 					style={ { width: 'auto', flexShrink: 0 } }
 					className="admin-ui-page__header-actions"
+					align="center"
 				>
 					{ actions }
 				</Stack>
