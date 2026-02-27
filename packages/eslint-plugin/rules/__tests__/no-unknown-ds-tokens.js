@@ -33,6 +33,12 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 		{
 			code: `const name = 'something--wpds-color';`,
 		},
+		{
+			code: '`${ prefix }: var(--wpds-color-fg-content-neutral)`',
+		},
+		{
+			code: '`var(--wpds-color-fg-content-neutral) ${ suffix }`',
+		},
 	],
 	invalid: [
 		{
@@ -40,6 +46,9 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 			errors: [
 				{
 					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames: "'--wpds-nonexistent-token'",
+					},
 				},
 			],
 		},
@@ -59,6 +68,9 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 			errors: [
 				{
 					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames: "'--wpds-nonexistent'",
+					},
 				},
 			],
 		},
@@ -67,6 +79,9 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 			errors: [
 				{
 					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames: "'--wpds-nonexistent-token'",
+					},
 				},
 			],
 		},
@@ -75,6 +90,9 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 			errors: [
 				{
 					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames: "'--wpds-nonexistent-token'",
+					},
 				},
 			],
 		},
@@ -99,6 +117,9 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 			errors: [
 				{
 					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames: "'--wpds-nonexistent-token'",
+					},
 				},
 			],
 		},
@@ -107,6 +128,17 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 			errors: [
 				{
 					messageId: 'dynamicToken',
+				},
+			],
+		},
+		{
+			code: '`${ prefix }: var(--wpds-nonexistent-token)`',
+			errors: [
+				{
+					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames: "'--wpds-nonexistent-token'",
+					},
 				},
 			],
 		},

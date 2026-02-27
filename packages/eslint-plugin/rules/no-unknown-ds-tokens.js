@@ -53,14 +53,76 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 		},
 	},
 	create( context ) {
-		const dynamicTokensAST = `TemplateLiteral[expressions.length>0] TemplateElement[value.raw=${ wpdsTokensRegex }]`;
+		const dynamicTemplateLiteralAST = `TemplateLiteral[expressions.length>0]:has(TemplateElement[value.raw=${ wpdsTokensRegex }])`;
 		const staticTokensAST = `:matches(Literal[value=${ wpdsTokensRegex }], TemplateLiteral[expressions.length=0] TemplateElement[value.raw=${ wpdsTokensRegex }])`;
+		const dynamicTokenEndRegex = new RegExp(
+			`--${ DS_TOKEN_PREFIX }[\\w-]*$`
+		);
+
 		return {
-			[ dynamicTokensAST ]( node ) {
-				context.report( {
-					node: node.parent,
-					messageId: 'dynamicToken',
-				} );
+			/**
+			 * For template literals with expressions, check each quasi
+			 * individually: flag as dynamic only when a `--wpds-*` token
+			 * name is split across a quasi/expression boundary, and
+			 * validate any complete static tokens normally.
+			 *
+			 * @param {import('estree').TemplateLiteral} node
+			 */
+			[ dynamicTemplateLiteralAST ]( node ) {
+				let hasDynamic = false;
+				const unknownTokens = [];
+
+				for ( const quasi of node.quasis ) {
+					const raw = quasi.value.raw;
+					const value = quasi.value.cooked ?? raw;
+					const isFollowedByExpression = ! quasi.tail;
+
+					if (
+						isFollowedByExpression &&
+						dynamicTokenEndRegex.test( raw )
+					) {
+						hasDynamic = true;
+					}
+
+					const tokens = extractCSSVariables(
+						value,
+						DS_TOKEN_PREFIX
+					);
+
+					// Remove the trailing incomplete token — it's the one
+					// being dynamically constructed by the next expression.
+					if ( isFollowedByExpression ) {
+						const endMatch = value.match( /(--([\w-]+))$/ );
+						if ( endMatch ) {
+							tokens.delete( endMatch[ 1 ] );
+						}
+					}
+
+					for ( const token of tokens ) {
+						if ( ! knownTokens.has( token ) ) {
+							unknownTokens.push( token );
+						}
+					}
+				}
+
+				if ( hasDynamic ) {
+					context.report( {
+						node,
+						messageId: 'dynamicToken',
+					} );
+				}
+
+				if ( unknownTokens.length > 0 ) {
+					context.report( {
+						node,
+						messageId: 'onlyKnownTokens',
+						data: {
+							tokenNames: unknownTokens
+								.map( ( token ) => `'${ token }'` )
+								.join( ', ' ),
+						},
+					} );
+				}
 			},
 			/** @param {import('estree').Literal | import('estree').TemplateElement} node */
 			[ staticTokensAST ]( node ) {
