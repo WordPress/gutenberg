@@ -25,6 +25,7 @@
 ### New Features
 
 -   Add `Notice` primitive ([#75981](https://github.com/WordPress/gutenberg/pull/75981)).
+-   Add `Link` primitive with `brand` and `neutral` tone variants and an `unstyled` variant for custom styling.
 
 ### Enhancements
 

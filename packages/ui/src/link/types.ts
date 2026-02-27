@@ -1,0 +1,32 @@
+import { type ReactNode } from 'react';
+import { type ComponentProps } from '../utils/types';
+
+export interface LinkProps extends Omit< ComponentProps< 'a' >, 'href' > {
+	/**
+	 * The URL to navigate to when the link is clicked.
+	 */
+	href?: string;
+
+	/**
+	 * The visual treatment of the link.
+	 *
+	 * - `default`: Applies tone-based color and underline styles.
+	 * - `unstyled`: Strips all visual styles so consumers can bring their own.
+	 *
+	 * @default "default"
+	 */
+	variant?: 'default' | 'unstyled';
+
+	/**
+	 * The tone of the link. Tone describes a semantic color intent.
+	 * Only applies when `variant` is `default`.
+	 *
+	 * @default "brand"
+	 */
+	tone?: 'brand' | 'neutral';
+
+	/**
+	 * The content to be rendered inside the component.
+	 */
+	children?: ReactNode;
+}

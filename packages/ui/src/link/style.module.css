@@ -1,0 +1,37 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.link {
+		text-underline-offset: 0.2em;
+		text-decoration-thickness: 0.5px;
+	}
+
+	/* Brand tone */
+	.is-brand,
+	.is-brand:visited {
+		color: var(--wpds-color-fg-interactive-brand);
+	}
+
+	.is-brand:hover,
+	.is-brand:active {
+		color: var(--wpds-color-fg-interactive-brand-active);
+	}
+
+	/* Neutral tone */
+	.is-neutral,
+	.is-neutral:visited {
+		color: var(--wpds-color-fg-interactive-neutral);
+		text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
+	}
+
+	.is-neutral:hover,
+	.is-neutral:active {
+		color: var(--wpds-color-fg-interactive-neutral-active);
+	}
+
+	/* Unstyled variant */
+	.is-unstyled {
+		color: inherit;
+		text-decoration: none;
+	}
+}
