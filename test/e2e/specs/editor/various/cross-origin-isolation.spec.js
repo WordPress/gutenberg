@@ -179,6 +179,77 @@ test.describe( 'Cross-origin isolation', () => {
 	} );
 } );
 
+test.describe( 'Document-Isolation-Policy', () => {
+	test.beforeEach( async ( { admin, page } ) => {
+		// These tests only apply to Chrome 137+.
+		const chromeVersion = await page.evaluate( () => {
+			const match = window.navigator.userAgent.match( /Chrome\/(\d+)/ );
+			return match ? parseInt( match[ 1 ], 10 ) : 0;
+		} );
+
+		test.skip(
+			chromeVersion < 137,
+			'Document-Isolation-Policy requires Chrome 137+'
+		);
+
+		await admin.createNewPost();
+	} );
+
+	test( 'should send Document-Isolation-Policy header instead of COEP/COOP', async ( {
+		page,
+	} ) => {
+		// Navigate and capture response headers.
+		const response = await page.goto( page.url() );
+		const headers = response.headers();
+
+		expect( headers[ 'document-isolation-policy' ] ).toBe(
+			'isolate-and-credentialless'
+		);
+		expect( headers[ 'cross-origin-embedder-policy' ] ).toBeUndefined();
+		expect( headers[ 'cross-origin-opener-policy' ] ).toBeUndefined();
+	} );
+
+	test( 'should not add credentialless to plugin iframes', async ( {
+		page,
+	} ) => {
+		// Inject a test iframe (simulating a plugin iframe).
+		await page.evaluate( () => {
+			const iframe = document.createElement( 'iframe' );
+			iframe.setAttribute( 'src', 'about:blank' );
+			iframe.setAttribute( 'data-testid', 'plugin-iframe' );
+			document.body.appendChild( iframe );
+		} );
+
+		// Wait for the iframe to be present in DOM.
+		const pluginIframe = page.locator( '[data-testid="plugin-iframe"]' );
+		await pluginIframe.waitFor();
+
+		// The iframe should NOT have the credentialless attribute with DIP.
+		await expect( pluginIframe ).not.toHaveAttribute( 'credentialless' );
+	} );
+
+	test( 'should render all embed previews normally with DIP', async ( {
+		editor,
+		embedUtils,
+	} ) => {
+		await embedUtils.interceptRequests( {
+			'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
+		} );
+
+		await embedUtils.insertEmbed( 'https://twitter.com/notnownikki' );
+
+		// With DIP, the embed should render its preview iframe normally.
+		const embedBlock = editor.canvas
+			.getByRole( 'document', { name: 'Block' } )
+			.last();
+		const iframe = embedBlock.locator( 'iframe' );
+		await expect(
+			iframe,
+			'Embed should render iframe preview with DIP active'
+		).toHaveAttribute( 'title', 'Embedded content from twitter.com' );
+	} );
+} );
+
 class EmbedUtils {
 	/** @type {Page} */
 	#page;

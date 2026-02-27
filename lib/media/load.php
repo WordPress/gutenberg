@@ -17,6 +17,18 @@ function gutenberg_set_client_side_media_processing_flag() {
 		return;
 	}
 	wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
+
+	$chrome_version = gutenberg_get_chrome_major_version();
+
+	/** This filter is documented in gutenberg/lib/media/load.php */
+	$use_dip = apply_filters(
+		'gutenberg_use_document_isolation_policy',
+		$chrome_version !== null && $chrome_version >= 137
+	);
+
+	if ( $use_dip ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__documentIsolationPolicy = true', 'before' );
+	}
 }
 add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
 
@@ -220,6 +232,23 @@ function gutenberg_filter_mod_rewrite_rules( string $rules ): string {
 add_filter( 'mod_rewrite_rules', 'gutenberg_filter_mod_rewrite_rules' );
 
 /**
+ * Returns the major Chrome/Chromium version from the current request's User-Agent.
+ *
+ * Matches all Chromium-based browsers (Chrome, Edge, Opera, Brave).
+ *
+ * @return int|null The major Chrome version, or null if not a Chromium browser.
+ */
+function gutenberg_get_chrome_major_version(): ?int {
+	if ( empty( $_SERVER['HTTP_USER_AGENT'] ) ) {
+		return null;
+	}
+	if ( preg_match( '/Chrome\/(\d+)/', $_SERVER['HTTP_USER_AGENT'], $matches ) ) {
+		return (int) $matches[1];
+	}
+	return null;
+}
+
+/**
  * Enables cross-origin isolation in the block editor.
  *
  * Required for enabling SharedArrayBuffer for WebAssembly-based
@@ -274,12 +303,33 @@ add_action( 'load-widgets.php', 'gutenberg_set_up_cross_origin_isolation' );
 function gutenberg_start_cross_origin_isolation_output_buffer(): void {
 	global $is_safari;
 
-	$coep = $is_safari ? 'require-corp' : 'credentialless';
+	$chrome_version = gutenberg_get_chrome_major_version();
+
+	/**
+	 * Filters whether to use Document-Isolation-Policy instead of COEP/COOP.
+	 *
+	 * Document-Isolation-Policy provides per-document cross-origin isolation
+	 * without affecting other iframes on the page, avoiding breakage of plugins
+	 * like Elementor whose iframes lose credentials/DOM access with COEP.
+	 *
+	 * @since 21.8.0
+	 *
+	 * @param bool $use_dip Whether DIP is supported and should be used.
+	 */
+	$use_dip = apply_filters(
+		'gutenberg_use_document_isolation_policy',
+		$chrome_version !== null && $chrome_version >= 137
+	);
 
 	ob_start(
-		function ( string $output ) use ( $coep ): string {
-			header( 'Cross-Origin-Opener-Policy: same-origin' );
-			header( "Cross-Origin-Embedder-Policy: $coep" );
+		function ( string $output ) use ( $is_safari, $use_dip ): string {
+			if ( $use_dip ) {
+				header( 'Document-Isolation-Policy: isolate-and-credentialless' );
+			} else {
+				$coep = $is_safari ? 'require-corp' : 'credentialless';
+				header( 'Cross-Origin-Opener-Policy: same-origin' );
+				header( "Cross-Origin-Embedder-Policy: $coep" );
+			}
 
 			return gutenberg_add_crossorigin_attributes( $output );
 		}

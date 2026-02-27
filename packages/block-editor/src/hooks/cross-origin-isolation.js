@@ -15,8 +15,13 @@ function addCrossOriginAttributes( el ) {
 		el.setAttribute( 'crossorigin', 'anonymous' );
 	}
 
-	// For iframes, add the credentialless attribute.
-	if ( el.nodeName === 'IFRAME' && ! el.hasAttribute( 'credentialless' ) ) {
+	// For iframes, add the credentialless attribute — only when NOT using DIP.
+	// With Document-Isolation-Policy, iframes don't need credentialless.
+	if (
+		! window.__documentIsolationPolicy &&
+		el.nodeName === 'IFRAME' &&
+		! el.hasAttribute( 'credentialless' )
+	) {
 		// Do not modify the iframed editor canvas.
 		if ( el.getAttribute( 'src' )?.startsWith( 'blob:' ) ) {
 			return;
@@ -55,7 +60,11 @@ if ( window.crossOriginIsolated ) {
 						addCrossOriginAttributes( v );
 					} );
 
-					if ( el.nodeName === 'IFRAME' ) {
+					// With DIP, iframes are not modified, so no need to observe their content.
+					if (
+						el.nodeName === 'IFRAME' &&
+						! window.__documentIsolationPolicy
+					) {
 						const iframeNode = el;
 
 						/*
@@ -135,8 +144,9 @@ if ( window.crossOriginIsolated ) {
 	startObservingBody();
 }
 
-// Only apply the embed preview filter when cross-origin isolated.
-if ( window.crossOriginIsolated ) {
+// Only apply the embed preview filter when cross-origin isolated via COEP/COOP.
+// With DIP, all embeds preview normally — no filtering needed.
+if ( window.crossOriginIsolated && ! window.__documentIsolationPolicy ) {
 	const supportsCredentialless =
 		'credentialless' in window.HTMLIFrameElement.prototype;
 
