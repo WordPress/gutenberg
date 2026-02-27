@@ -138,69 +138,69 @@ describe( 'computeDisplayUrl', () => {
 
 describe( 'isHomepage', () => {
 	const host = 'homepage.com';
-	const siteUrl = 'https://' + host;
+	const homeUrl = 'https://' + host;
 
 	test.each( [
-		[ '/', siteUrl ],
+		[ '/', homeUrl ],
 		[ '/', undefined ],
-	] )( 'should return true for root path "%s"', ( url, siteUrlParam ) => {
-		expect( isHomepage( url, siteUrlParam ) ).toBe( true );
+	] )( 'should return true for root path "%s"', ( url, homeUrlParam ) => {
+		expect( isHomepage( url, homeUrlParam ) ).toBe( true );
 	} );
 
 	// Check combinations of http/s and trailing slash
 	test.each( [
-		[ `http://${ host }`, siteUrl ],
-		[ `https://${ host }`, siteUrl ],
-		[ `http://${ host }/`, siteUrl ],
-		[ `https://${ host }/`, siteUrl ],
+		[ `http://${ host }`, homeUrl ],
+		[ `https://${ host }`, homeUrl ],
+		[ `http://${ host }/`, homeUrl ],
+		[ `https://${ host }/`, homeUrl ],
 	] )( 'should return true for site URL "%s"', ( url ) => {
-		expect( isHomepage( url, siteUrl ) ).toBe( true );
+		expect( isHomepage( url, homeUrl ) ).toBe( true );
 	} );
 
 	test.each( [
-		[ '', siteUrl ],
+		[ '', homeUrl ],
 		[ `https://${ host }`, '' ],
 		[ `https://${ host }`, undefined ],
 	] )(
-		'should return false when url or siteUrl is empty and not a / path',
-		( url, siteUrlParam ) => {
-			expect( isHomepage( url, siteUrlParam ) ).toBe( false );
+		'should return false when url or homeUrl is empty and not a / path',
+		( url, homeUrlParam ) => {
+			expect( isHomepage( url, homeUrlParam ) ).toBe( false );
 		}
 	);
 
 	const subdomain = 'sub.' + host;
 	test.each( [
-		[ false, `http://${ subdomain }/`, siteUrl ],
-		[ false, `https://${ subdomain }`, siteUrl ],
+		[ false, `http://${ subdomain }/`, homeUrl ],
+		[ false, `https://${ subdomain }`, homeUrl ],
 		[ true, `http://${ subdomain }/`, `https://${ subdomain }` ],
 		[ true, `https://${ subdomain }`, `https://${ subdomain }` ],
 	] )(
-		'should return %s for subdomain (url=%s, siteUrl=%s)',
-		( expected, url, siteUrlParam ) => {
-			expect( isHomepage( url, siteUrlParam ) ).toBe( expected );
+		'should return %s for subdomain (url=%s, homeUrl=%s)',
+		( expected, url, homeUrlParam ) => {
+			expect( isHomepage( url, homeUrlParam ) ).toBe( expected );
 		}
 	);
 
 	const path = '/wordpress';
-	const subdirSiteUrl = 'https://' + host + path;
+	const subdirHomeUrl = 'https://' + host + path;
 
 	test.each( [
-		[ `https://${ host }${ path }`, subdirSiteUrl ],
-		[ `https://${ host }${ path }/`, subdirSiteUrl ],
-		[ `http://${ host }${ path }`, subdirSiteUrl ],
-		[ `http://${ host }${ path }/`, subdirSiteUrl ],
+		[ `https://${ host }${ path }`, subdirHomeUrl ],
+		[ `https://${ host }${ path }/`, subdirHomeUrl ],
+		[ `http://${ host }${ path }`, subdirHomeUrl ],
+		[ `http://${ host }${ path }/`, subdirHomeUrl ],
 	] )( 'should return true for subdirectory homepage "%s"', ( url ) => {
-		expect( isHomepage( url, subdirSiteUrl ) ).toBe( true );
+		expect( isHomepage( url, subdirHomeUrl ) ).toBe( true );
 	} );
 
 	test.each( [
-		[ `https://${ host }/page`, siteUrl ],
-		[ '/page', siteUrl ],
-		[ `https://${ host }`, subdirSiteUrl ],
-		[ `https://${ host }/`, subdirSiteUrl ],
-		[ `https://${ host }${ path }/page`, subdirSiteUrl ],
-	] )( 'should return false for non-homepage "%s"', ( url, siteUrlParam ) => {
-		expect( isHomepage( url, siteUrlParam ) ).toBe( false );
+		[ `https://${ host }/page`, homeUrl ],
+		[ '/page', homeUrl ],
+		[ `https://${ host }`, subdirHomeUrl ],
+		[ `https://${ host }/`, subdirHomeUrl ],
+		[ `https://${ host }${ path }/page`, subdirHomeUrl ],
+	] )( 'should return false for non-homepage "%s"', ( url, homeUrlParam ) => {
+		expect( isHomepage( url, homeUrlParam ) ).toBe( false );
 	} );
 } );
 
@@ -263,7 +263,7 @@ describe( 'computeBadges', () => {
 		] )( 'should show "Homepage" badge when url is "%s"', ( url ) => {
 			const badges = computeBadges( {
 				url,
-				siteUrl: 'https://example.com',
+				homeUrl: 'https://example.com',
 				isExternal: false,
 			} );
 			expect( badges ).toContainEqual( {
@@ -273,11 +273,11 @@ describe( 'computeBadges', () => {
 		} );
 
 		test.each( [ [ 'https://sub.example.com/', 'https://example.com' ] ] )(
-			'should not show Homepage badge when subdomain url "%s" does not match siteUrl "%s"',
-			( url, siteUrl ) => {
+			'should not show Homepage badge when subdomain url "%s" does not match homeUrl "%s"',
+			( url, homeUrl ) => {
 				const badges = computeBadges( {
 					url,
-					siteUrl,
+					homeUrl,
 					isExternal: false,
 				} );
 				expect( badges ).not.toContainEqual( {
@@ -290,11 +290,11 @@ describe( 'computeBadges', () => {
 		test.each( [
 			[ 'https://sub.example.com/', 'https://sub.example.com' ],
 		] )(
-			'should show Homepage badge when subdomain url "%s" matches siteUrl "%s"',
-			( url, siteUrl ) => {
+			'should show Homepage badge when subdomain url "%s" matches homeUrl "%s"',
+			( url, homeUrl ) => {
 				const badges = computeBadges( {
 					url,
-					siteUrl,
+					homeUrl,
 					isExternal: false,
 				} );
 				expect( badges ).toContainEqual( {

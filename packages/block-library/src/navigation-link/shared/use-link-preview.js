@@ -32,21 +32,21 @@ function capitalize( str ) {
  * Does not match subdomains unless they are the site URL.
  *
  * @param {string} url     - The URL to check
- * @param {string} siteUrl - The WordPress site URL
+ * @param {string} homeUrl - The WordPress site URL
  * @return {boolean} True if url is the homepage
  */
-export function isHomepage( url, siteUrl ) {
+export function isHomepage( url, homeUrl ) {
 	if ( url === '/' ) {
 		return true;
 	}
-	if ( ! url || ! siteUrl ) {
+	if ( ! url || ! homeUrl ) {
 		return false;
 	}
 	try {
-		const urlParsed = new URL( url, siteUrl );
-		const siteParsed = new URL( siteUrl );
+		const urlParsed = new URL( url, homeUrl );
+		const siteParsed = new URL( homeUrl );
 
-		// Same host (sub.homepage.com !== homepage.com unless siteUrl is sub.homepage.com)
+		// Same host (sub.homepage.com !== homepage.com unless homeUrl is sub.homepage.com)
 		if ( urlParsed.hostname !== siteParsed.hostname ) {
 			return false;
 		}
@@ -117,7 +117,7 @@ export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
  *
  * @param {Object}  options                   - Options object
  * @param {string}  options.url               - Link URL
- * @param {string}  options.siteUrl           - WordPress site URL (for homepage detection)
+ * @param {string}  options.homeUrl           - WordPress site URL (for homepage detection)
  * @param {string}  options.type              - Entity type (page, post, etc.)
  * @param {boolean} options.isExternal        - Whether link is external
  * @param {string}  options.entityStatus      - Entity status (publish, draft, etc.)
@@ -127,7 +127,7 @@ export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
  */
 export function computeBadges( {
 	url,
-	siteUrl,
+	homeUrl,
 	type,
 	isExternal,
 	entityStatus,
@@ -149,7 +149,7 @@ export function computeBadges( {
 				label: __( 'Internal link' ),
 				intent: 'default',
 			} );
-		} else if ( isHomepage( url, siteUrl ) ) {
+		} else if ( isHomepage( url, homeUrl ) ) {
 			badges.push( {
 				label: __( 'Homepage' ),
 				intent: 'default',
@@ -270,7 +270,7 @@ export function useLinkPreview( {
 	// Compute badges
 	const badges = computeBadges( {
 		url,
-		siteUrl,
+		homeUrl,
 		type,
 		isExternal,
 		entityStatus: entityRecord?.status,
