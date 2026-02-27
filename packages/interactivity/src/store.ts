@@ -1,12 +1,10 @@
 /**
  * Internal dependencies
  */
-import { proxifyState, proxifyStore, deepMerge } from './proxies';
-/**
- * External dependencies
- */
+import { proxifyState, proxifyStore, deepMerge, peek } from './proxies';
+import { PENDING_GETTER } from './proxies/state';
 import { getNamespace } from './namespaces';
-import { isPlainObject } from './utils';
+import { isPlainObject, navigationSignal, deepClone } from './utils';
 
 export const stores = new Map();
 const rawStores = new Map();
@@ -24,9 +22,9 @@ export const getConfig = ( namespace?: string ) =>
 	storeConfigs.get( namespace || getNamespace() ) || {};
 
 /**
- * Gets the part of the state defined and updated from the server.
+ * Gets the state defined and updated from the server.
  *
- * The object returned is read-only, and includes the state defined in PHP with
+ * The object returned is a deep clone of the state defined in PHP with
  * `wp_interactivity_state()`. When using `actions.navigate()`, this object is
  * updated to reflect the changes in its properties, without affecting the state
  * returned by `store()`. Directives can subscribe to those changes to update
@@ -34,7 +32,7 @@ export const getConfig = ( namespace?: string ) =>
  *
  * @example
  * ```js
- *  const { state } = store('myStore', {
+ *  const { state } = store( 'myPlugin', {
  *    callbacks: {
  *      updateServerState() {
  *        const serverState = getServerState();
@@ -42,19 +40,27 @@ export const getConfig = ( namespace?: string ) =>
  *        state.overridableProp = serverState.overridableProp;
  *      },
  *    },
- *  });
+ *  } );
  * ```
  *
- * @param namespace Store's namespace from which to retrieve the server state.
+ * @param namespace Store namespace. By default, it inherits the namespace of
+ *                  the store where it is defined.
  * @return The server state for the given namespace.
  */
-export const getServerState = ( namespace?: string ) => {
+export function getServerState( namespace?: string ): Record< string, unknown >;
+export function getServerState< T extends object >( namespace?: string ): T;
+export function getServerState< T extends object >( namespace?: string ): T {
 	const ns = namespace || getNamespace();
 	if ( ! serverStates.has( ns ) ) {
-		serverStates.set( ns, proxifyState( ns, {}, { readOnly: true } ) );
+		serverStates.set( ns, {} );
 	}
-	return serverStates.get( ns );
-};
+	// Accesses the navigation signal to make this reactive. It assigns it to an
+	// arbitrary property (`subscribe`) to prevent the JavaScript minifier from
+	// removing this line.
+	getServerState.subscribe = navigationSignal.value;
+	return deepClone( serverStates.get( ns ) ) as T;
+}
+getServerState.subscribe = 0;
 
 interface StoreOptions {
 	/**
@@ -272,12 +278,17 @@ export const parseServerData = ( dom = document ) => {
 export const populateServerData = ( data?: {
 	state?: Record< string, unknown >;
 	config?: Record< string, unknown >;
+	derivedStateClosures?: Record< string, string[] >;
 } ) => {
+	// Resets all the previous server states and configs.
+	serverStates.clear();
+	storeConfigs.clear();
+
 	if ( isPlainObject( data?.state ) ) {
 		Object.entries( data!.state ).forEach( ( [ namespace, state ] ) => {
 			const st = store< any >( namespace, {}, { lock: universalUnlock } );
 			deepMerge( st.state, state, false );
-			deepMerge( getServerState( namespace ), state );
+			serverStates.set( namespace, state! );
 		} );
 	}
 	if ( isPlainObject( data?.config ) ) {
@@ -285,8 +296,36 @@ export const populateServerData = ( data?: {
 			storeConfigs.set( namespace, config );
 		} );
 	}
-};
+	if ( isPlainObject( data?.derivedStateClosures ) ) {
+		Object.entries( data!.derivedStateClosures ).forEach(
+			( [ namespace, paths ] ) => {
+				const st = store< any >(
+					namespace,
+					{},
+					{ lock: universalUnlock }
+				);
+				paths.forEach( ( path ) => {
+					const pathParts = path.split( '.' );
+					const prop = pathParts.splice( -1, 1 )[ 0 ];
+					const parent = pathParts.reduce(
+						( prev, key ) => peek( prev, key ),
+						st
+					);
 
-// Parse and populate the initial state and config.
-const data = parseServerData();
-populateServerData( data );
+					// Get the descriptor of the derived state prop.
+					const desc = Object.getOwnPropertyDescriptor(
+						parent,
+						prop
+					);
+
+					// The derived state prop is considered a pending getter
+					// only if its value is a plain object, which is how
+					// closures are serialized from PHP.
+					if ( isPlainObject( desc?.value ) ) {
+						parent[ prop ] = PENDING_GETTER;
+					}
+				} );
+			}
+		);
+	}
+};

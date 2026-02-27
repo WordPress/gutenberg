@@ -1,0 +1,9 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.block-editor-fit-text-size-warning {
+	margin: $grid-unit-10 0 0 0;
+
+	.components-notice__content {
+		margin-right: 0;
+	}
+}

@@ -63,8 +63,13 @@
 					"type": "object",
 					"default": {}
 				},
+				"phpmyadmin": {
+					"description": "Whether to enable phpMyAdmin for database management.",
+					"type": "boolean",
+					"default": false
+				},
 				"phpmyadminPort": {
-					"description": "The port number to access phpMyAdmin.",
+					"description": "The port number to access phpMyAdmin. Setting this also enables phpMyAdmin.",
 					"type": "integer"
 				},
 				"multisite": {
@@ -82,6 +87,7 @@
 				"port",
 				"config",
 				"mappings",
+				"phpmyadmin",
 				"phpmyadminPort",
 				"multisite"
 			]
@@ -120,6 +126,11 @@
 					"type": "integer",
 					"default": 8889
 				},
+				"testsEnvironment": {
+					"description": "Whether to create the tests environment. Set to false to skip creating test containers, saving resources.",
+					"type": "boolean",
+					"default": true
+				},
 				"lifecycleScripts": {
 					"description": "Mapping of commands that should be executed at certain points in the lifecycle.",
 					"type": "object",
@@ -153,6 +164,7 @@
 							"$schema",
 							"env",
 							"testsPort",
+							"testsEnvironment",
 							"lifecycleScripts"
 						]
 					}

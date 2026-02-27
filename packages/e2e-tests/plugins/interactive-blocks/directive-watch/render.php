@@ -29,6 +29,14 @@
 		0
 	</div>
 
+	<div
+		data-testid="multiple watches"
+		data-wp-watch--one="callbacks.watch1"
+		data-wp-watch---two="callbacks.watch2"
+		data-wp-bind--data-watch-one="state.watch1"
+		data-wp-bind--data-watch-two="state.watch2"
+	></div>
+
 	<button data-testid="toggle" data-wp-on--click="actions.toggle">
 		Update
 	</button>

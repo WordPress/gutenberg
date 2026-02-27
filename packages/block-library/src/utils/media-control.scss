@@ -1,0 +1,41 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.block-library-utils__media-control {
+	// Ensure the dropzone is positioned to the size of the item.
+	position: relative;
+
+	// Since there is no option to skip rendering the drag'n'drop icon in drop
+	// zone, we hide it for now.
+	.components-drop-zone__content-icon {
+		display: none;
+	}
+
+	button.components-button {
+		color: $gray-900;
+		box-shadow: inset 0 0 0 1px $gray-400;
+		width: 100%;
+		display: block;
+		height: $grid-unit-50;
+
+		&:hover {
+			color: var(--wp-admin-theme-color);
+		}
+
+		&:focus {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
+	}
+
+	.components-dropdown {
+		display: block;
+	}
+
+	img {
+		width: 20px;
+		min-width: 20px;
+		aspect-ratio: 1;
+		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+		border-radius: 2px;
+	}
+}

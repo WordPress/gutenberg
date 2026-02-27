@@ -22,7 +22,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	$post_ID = $block->context['postId'];
 
 	$is_link        = isset( $attributes['isLink'] ) && $attributes['isLink'];
-	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
+	$size_slug      = $attributes['sizeSlug'] ?? 'post-thumbnail';
 	$attr           = get_block_core_post_featured_image_border_attributes( $attributes );
 	$overlay_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
 
@@ -166,10 +166,8 @@ function get_block_core_post_featured_image_overlay_element_markup( $attributes 
 	}
 
 	// Apply overlay and gradient classes.
-	if ( $has_dim_background ) {
-		$class_names[] = 'has-background-dim';
-		$class_names[] = "has-background-dim-{$attributes['dimRatio']}";
-	}
+	$class_names[] = 'has-background-dim';
+	$class_names[] = "has-background-dim-{$attributes['dimRatio']}";
 
 	if ( $has_solid_overlay ) {
 		$class_names[] = "has-{$attributes['overlayColor']}-background-color";
@@ -236,9 +234,9 @@ function get_block_core_post_featured_image_border_attributes( $attributes ) {
 	foreach ( $sides as $side ) {
 		$border                 = $attributes['style']['border'][ $side ] ?? null;
 		$border_styles[ $side ] = array(
-			'color' => isset( $border['color'] ) ? $border['color'] : null,
-			'style' => isset( $border['style'] ) ? $border['style'] : null,
-			'width' => isset( $border['width'] ) ? $border['width'] : null,
+			'color' => $border['color'] ?? null,
+			'style' => $border['style'] ?? null,
+			'width' => $border['width'] ?? null,
 		);
 	}
 

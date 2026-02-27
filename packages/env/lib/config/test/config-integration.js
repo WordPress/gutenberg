@@ -1,5 +1,5 @@
 'use strict';
-/* eslint-disable jest/no-conditional-expect */
+
 /**
  * External dependencies
  */
@@ -201,4 +201,3 @@ describe( 'Config Integration', () => {
 		expect( config ).toMatchSnapshot();
 	} );
 } );
-/* eslint-enable jest/no-conditional-expect */

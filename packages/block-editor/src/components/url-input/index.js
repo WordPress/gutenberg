@@ -16,6 +16,7 @@ import {
 	Spinner,
 	withSpokenMessages,
 	Popover,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
 	compose,
@@ -30,6 +31,9 @@ import { isURL } from '@wordpress/url';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 /**
  * Whether the argument is a function.
@@ -52,7 +56,8 @@ class URLInput extends Component {
 		this.handleOnClick = this.handleOnClick.bind( this );
 		this.bindSuggestionNode = this.bindSuggestionNode.bind( this );
 		this.autocompleteRef = props.autocompleteRef || createRef();
-		this.inputRef = createRef();
+		this.inputRef = props.inputRef || createRef();
+		this.hasRenderedValidation = { current: false };
 		this.updateSuggestions = debounce(
 			this.updateSuggestions.bind( this ),
 			200
@@ -424,6 +429,10 @@ class URLInput extends Component {
 			__experimentalRenderControl: renderControl,
 			value = '',
 			hideLabelFromVision = false,
+			help = null,
+			disabled = false,
+			customValidity,
+			markWhenOptional,
 		} = this.props;
 
 		const {
@@ -448,12 +457,14 @@ class URLInput extends Component {
 		const inputProps = {
 			id: inputId,
 			value,
-			required: true,
+			required: this.props.required ?? true,
 			type: 'text',
-			onChange: this.onChange,
-			onFocus: this.onFocus,
+			name: inputId,
+			autoComplete: 'off',
+			onChange: disabled ? () => {} : this.onChange, // Disable onChange when disabled
+			onFocus: disabled ? () => {} : this.onFocus, // Disable onFocus when disabled
 			placeholder,
-			onKeyDown: this.onKeyDown,
+			onKeyDown: disabled ? () => {} : this.onKeyDown, // Disable onKeyDown when disabled
 			role: 'combobox',
 			'aria-label': label ? undefined : __( 'URL' ), // Ensure input always has an accessible label
 			'aria-expanded': showSuggestions,
@@ -464,16 +475,43 @@ class URLInput extends Component {
 					? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
 					: undefined,
 			ref: this.inputRef,
+			disabled,
 			suffix: this.props.suffix,
+			help,
+		};
+
+		const validationProps = {
+			customValidity,
+			// Suppress the "(Required)" indicator in the label.
+			// The field is still required for validation, but the indicator
+			// can be hidden when markWhenOptional is set to true.
+			...( markWhenOptional !== undefined && {
+				markWhenOptional,
+			} ),
 		};
 
 		if ( renderControl ) {
 			return renderControl( controlProps, inputProps, loading );
 		}
 
+		// Use ValidatedInputControl if customValidity has ever had a non-undefined value.
+		if ( customValidity !== undefined ) {
+			this.hasRenderedValidation.current = true;
+		}
+
+		const MaybeValidatedInputControl = this.hasRenderedValidation.current
+			? ValidatedInputControl
+			: InputControl;
+
 		return (
-			<BaseControl __nextHasNoMarginBottom { ...controlProps }>
-				<InputControl { ...inputProps } __next40pxDefaultSize />
+			<BaseControl { ...controlProps }>
+				<MaybeValidatedInputControl
+					{ ...inputProps }
+					{ ...( this.hasRenderedValidation.current
+						? validationProps
+						: {} ) }
+					__next40pxDefaultSize
+				/>
 				{ loading && <Spinner /> }
 			</BaseControl>
 		);

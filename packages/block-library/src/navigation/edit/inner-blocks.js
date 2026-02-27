@@ -26,6 +26,7 @@ export default function NavigationInnerBlocks( {
 		isImmediateParentOfSelectedBlock,
 		selectedBlockHasChildren,
 		isSelected,
+		hasSelectedDescendant,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -41,6 +42,7 @@ export default function NavigationInnerBlocks( {
 					false
 				),
 				selectedBlockHasChildren: !! getBlockCount( selectedBlockId ),
+				hasSelectedDescendant: hasSelectedInnerBlock( clientId, true ),
 
 				// This prop is already available but computing it here ensures it's
 				// fresh compared to isImmediateParentOfSelectedBlock.
@@ -96,6 +98,7 @@ export default function NavigationInnerBlocks( {
 				isSelected ||
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasChildren ) ||
+				hasSelectedDescendant ||
 				// Show the appender while dragging to allow inserting element between item and the appender.
 				parentOrChildHasSelection
 					? InnerBlocks.ButtonBlockAppender

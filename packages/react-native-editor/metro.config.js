@@ -6,7 +6,6 @@ const fs = require( 'fs' );
 const {
 	getDefaultConfig,
 	mergeConfig,
-	// eslint-disable-next-line import/no-extraneous-dependencies
 } = require( '@react-native/metro-config' );
 
 const PACKAGES_DIR = path.resolve( __dirname, '..' );

@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/z-index" as *;
+
 .customize-control-sidebar_block_editor .block-editor-block-list__block-popover {
 	// FloatingUI library used in Popover component forces us to have an "absolute" inline style.
 	// We need to override this in the customizer.

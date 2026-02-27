@@ -68,5 +68,6 @@ function UnforwardedNavigationBackButton(
 export const NavigationBackButton = forwardRef(
 	UnforwardedNavigationBackButton
 );
+NavigationBackButton.displayName = 'NavigationBackButton';
 
 export default NavigationBackButton;

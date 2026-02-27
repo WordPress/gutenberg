@@ -4,8 +4,7 @@
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { layout, symbol, navigation, styles, page } from '@wordpress/icons';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -14,8 +13,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
-import { unlock } from '../../lock-unlock';
-import { store as editSiteStore } from '../../store';
 
 export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 	return (
@@ -82,14 +79,6 @@ export default function SidebarNavigationScreenMain( { customDescription } ) {
 		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
 		[]
 	);
-	const { setEditorCanvasContainerView } = unlock(
-		useDispatch( editSiteStore )
-	);
-
-	// Clear the editor canvas container view when accessing the main navigation screen.
-	useEffect( () => {
-		setEditorCanvasContainerView( undefined );
-	}, [ setEditorCanvasContainerView ] );
 
 	let description;
 	if ( customDescription ) {

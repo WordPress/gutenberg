@@ -1,8 +1,6 @@
 /**
  * External dependencies
  */
-// Disable reason: `eslint-plugin-import` doesn't support `exports` (https://github.com/import-js/eslint-plugin-import/issues/1810)
-// eslint-disable-next-line import/no-unresolved
 import _sprintf from '@tannin/sprintf';
 
 /**

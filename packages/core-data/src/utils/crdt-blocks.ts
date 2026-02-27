@@ -1,0 +1,574 @@
+/**
+ * External dependencies
+ */
+import { v4 as uuidv4 } from 'uuid';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+
+/**
+ * WordPress dependencies
+ */
+// @ts-expect-error No exported types.
+import { getBlockTypes } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
+import { Y } from '@wordpress/sync';
+
+/**
+ * Internal dependencies
+ */
+import { createYMap, type YMapRecord, type YMapWrap } from './crdt-utils';
+import { Delta } from '../sync';
+
+interface BlockAttributes {
+	[ key: string ]: unknown;
+}
+
+interface BlockType {
+	name: string;
+	attributes?: Record< string, { type?: string } >;
+}
+
+// A block as represented in Gutenberg's data store.
+export interface Block {
+	attributes: BlockAttributes;
+	clientId?: string;
+	innerBlocks: Block[];
+	isValid?: boolean;
+	name: string;
+	originalContent?: string;
+	validationIssues?: string[]; // unserializable
+}
+
+// A block as represented in the CRDT document (Y.Map).
+export interface YBlockRecord extends YMapRecord {
+	attributes: YBlockAttributes;
+	clientId: string;
+	innerBlocks: YBlocks;
+	isValid?: boolean;
+	originalContent?: string;
+	name: string;
+}
+
+export type YBlock = YMapWrap< YBlockRecord >;
+export type YBlocks = Y.Array< YBlock >;
+
+// Block attribute schema cannot be known at compile time, so we use Y.Map.
+// Attribute values will be typed as the union of `Y.Text` and `unknown`.
+export type YBlockAttributes = Y.Map< Y.Text | unknown >;
+
+const serializableBlocksCache = new WeakMap< WeakKey, Block[] >();
+
+function makeBlockAttributesSerializable(
+	attributes: BlockAttributes
+): BlockAttributes {
+	const newAttributes = { ...attributes };
+	for ( const [ key, value ] of Object.entries( attributes ) ) {
+		if ( value instanceof RichTextData ) {
+			newAttributes[ key ] = value.valueOf();
+		}
+	}
+	return newAttributes;
+}
+
+function makeBlocksSerializable( blocks: Block[] ): Block[] {
+	return blocks.map( ( block: Block ) => {
+		const { name, innerBlocks, attributes, ...rest } = block;
+		delete rest.validationIssues;
+		return {
+			...rest,
+			name,
+			attributes: makeBlockAttributesSerializable( attributes ),
+			innerBlocks: makeBlocksSerializable( innerBlocks ),
+		};
+	} );
+}
+
+/**
+ * @param {any}   gblock
+ * @param {Y.Map} yblock
+ */
+function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
+	const yblockAsJson = yblock.toJSON();
+
+	// we must not sync clientId, as this can't be generated consistently and
+	// hence will lead to merge conflicts.
+	const overwrites = {
+		innerBlocks: null,
+		clientId: null,
+	};
+	const res = fastDeepEqual(
+		Object.assign( {}, gblock, overwrites ),
+		Object.assign( {}, yblockAsJson, overwrites )
+	);
+	const inners = gblock.innerBlocks || [];
+	const yinners = yblock.get( 'innerBlocks' );
+	return (
+		res &&
+		inners.length === yinners?.length &&
+		inners.every( ( block: Block, i: number ) =>
+			areBlocksEqual( block, yinners.get( i ) )
+		)
+	);
+}
+
+function createNewYAttributeMap(
+	blockName: string,
+	attributes: BlockAttributes
+): YBlockAttributes {
+	return new Y.Map(
+		Object.entries( attributes ).map(
+			( [ attributeName, attributeValue ] ) => {
+				return [
+					attributeName,
+					createNewYAttributeValue(
+						blockName,
+						attributeName,
+						attributeValue
+					),
+				];
+			}
+		)
+	);
+}
+
+function createNewYAttributeValue(
+	blockName: string,
+	attributeName: string,
+	attributeValue: unknown
+): Y.Text | unknown {
+	const isRichText = isRichTextAttribute( blockName, attributeName );
+
+	if ( isRichText ) {
+		return new Y.Text( attributeValue?.toString() ?? '' );
+	}
+
+	return attributeValue;
+}
+
+function createNewYBlock( block: Block ): YBlock {
+	return createYMap< YBlockRecord >(
+		Object.fromEntries(
+			Object.entries( block ).map( ( [ key, value ] ) => {
+				switch ( key ) {
+					case 'attributes': {
+						return [
+							key,
+							createNewYAttributeMap( block.name, value ),
+						];
+					}
+
+					case 'innerBlocks': {
+						const innerBlocks = new Y.Array();
+
+						// If not an array, set to empty Y.Array.
+						if ( ! Array.isArray( value ) ) {
+							return [ key, innerBlocks ];
+						}
+
+						innerBlocks.insert(
+							0,
+							value.map( ( innerBlock: Block ) =>
+								createNewYBlock( innerBlock )
+							)
+						);
+
+						return [ key, innerBlocks ];
+					}
+
+					default:
+						return [ key, value ];
+				}
+			} )
+		)
+	);
+}
+
+/**
+ * Merge incoming block data into the local Y.Doc.
+ * This function is called to sync local block changes to a shared Y.Doc.
+ *
+ * @param yblocks        The blocks in the local Y.Doc.
+ * @param incomingBlocks Gutenberg blocks being synced.
+ * @param cursorPosition The position of the cursor after the change occurs.
+ */
+export function mergeCrdtBlocks(
+	yblocks: YBlocks,
+	incomingBlocks: Block[],
+	cursorPosition: number | null
+): void {
+	// Ensure we are working with serializable block data.
+	if ( ! serializableBlocksCache.has( incomingBlocks ) ) {
+		serializableBlocksCache.set(
+			incomingBlocks,
+			makeBlocksSerializable( incomingBlocks )
+		);
+	}
+	const allBlocks = serializableBlocksCache.get( incomingBlocks ) ?? [];
+
+	// Ensure we skip blocks that we don't want to sync at the moment
+	const blocksToSync = allBlocks.filter( ( block ) =>
+		shouldBlockBeSynced( block )
+	);
+
+	// This is a rudimentary diff implementation similar to the y-prosemirror diffing
+	// approach.
+	// A better implementation would also diff the textual content and represent it
+	// using a Y.Text type.
+	// However, at this time it makes more sense to keep this algorithm generic to
+	// support all kinds of block types.
+	// Ideally, we ensure that block data structure have a consistent data format.
+	// E.g.:
+	//   - textual content (using rich-text formatting?) may always be stored under `block.text`
+	//   - local information that shouldn't be shared (e.g. clientId or isDragging) is stored under `block.private`
+	//
+	// @credit Kevin Jahns (dmonad)
+	// @link https://github.com/WordPress/gutenberg/pull/68483
+	const numOfCommonEntries = Math.min(
+		blocksToSync.length ?? 0,
+		yblocks.length
+	);
+
+	let left = 0;
+	let right = 0;
+
+	// skip equal blocks from left
+	for (
+		;
+		left < numOfCommonEntries &&
+		areBlocksEqual( blocksToSync[ left ], yblocks.get( left ) );
+		left++
+	) {
+		/* nop */
+	}
+
+	// skip equal blocks from right
+	for (
+		;
+		right < numOfCommonEntries - left &&
+		areBlocksEqual(
+			blocksToSync[ blocksToSync.length - right - 1 ],
+			yblocks.get( yblocks.length - right - 1 )
+		);
+		right++
+	) {
+		/* nop */
+	}
+
+	const numOfUpdatesNeeded = numOfCommonEntries - left - right;
+	const numOfInsertionsNeeded = Math.max(
+		0,
+		blocksToSync.length - yblocks.length
+	);
+	const numOfDeletionsNeeded = Math.max(
+		0,
+		yblocks.length - blocksToSync.length
+	);
+
+	// updates
+	for ( let i = 0; i < numOfUpdatesNeeded; i++, left++ ) {
+		const block = blocksToSync[ left ];
+		const yblock = yblocks.get( left );
+		Object.entries( block ).forEach( ( [ key, value ] ) => {
+			switch ( key ) {
+				case 'attributes': {
+					const currentAttributes = yblock.get( key );
+
+					// If attributes are not set on the yblock, use the new values.
+					if ( ! currentAttributes ) {
+						yblock.set(
+							key,
+							createNewYAttributeMap( block.name, value )
+						);
+						break;
+					}
+
+					Object.entries( value ).forEach(
+						( [ attributeName, attributeValue ] ) => {
+							const currentAttribute =
+								currentAttributes?.get( attributeName );
+
+							const isExpectedType = isExpectedAttributeType(
+								block.name,
+								attributeName,
+								currentAttribute
+							);
+
+							const isAttributeChanged =
+								! isExpectedType ||
+								! fastDeepEqual(
+									currentAttribute,
+									attributeValue
+								);
+
+							if ( isAttributeChanged ) {
+								updateYBlockAttribute(
+									block.name,
+									attributeName,
+									attributeValue,
+									currentAttributes,
+									cursorPosition
+								);
+							}
+						}
+					);
+
+					// Delete any attributes that are no longer present.
+					currentAttributes.forEach(
+						( _attrValue: unknown, attrName: string ) => {
+							if ( ! value.hasOwnProperty( attrName ) ) {
+								currentAttributes.delete( attrName );
+							}
+						}
+					);
+
+					break;
+				}
+
+				case 'innerBlocks': {
+					// Recursively merge innerBlocks
+					let yInnerBlocks = yblock.get( key );
+
+					if ( ! ( yInnerBlocks instanceof Y.Array ) ) {
+						yInnerBlocks = new Y.Array< YBlock >();
+						yblock.set( key, yInnerBlocks );
+					}
+
+					mergeCrdtBlocks(
+						yInnerBlocks,
+						value ?? [],
+						cursorPosition
+					);
+					break;
+				}
+
+				default:
+					if ( ! fastDeepEqual( block[ key ], yblock.get( key ) ) ) {
+						yblock.set( key, value );
+					}
+			}
+		} );
+		yblock.forEach( ( _v, k ) => {
+			if ( ! block.hasOwnProperty( k ) ) {
+				yblock.delete( k );
+			}
+		} );
+	}
+
+	// deletes
+	yblocks.delete( left, numOfDeletionsNeeded );
+
+	// inserts
+	for ( let i = 0; i < numOfInsertionsNeeded; i++, left++ ) {
+		const newBlock = [ createNewYBlock( blocksToSync[ left ] ) ];
+
+		yblocks.insert( left, newBlock );
+	}
+
+	// remove duplicate clientids
+	const knownClientIds = new Set< string >();
+	for ( let j = 0; j < yblocks.length; j++ ) {
+		const yblock: YBlock = yblocks.get( j );
+
+		let clientId = yblock.get( 'clientId' );
+
+		if ( ! clientId ) {
+			continue;
+		}
+
+		if ( knownClientIds.has( clientId ) ) {
+			clientId = uuidv4();
+			yblock.set( 'clientId', clientId );
+		}
+		knownClientIds.add( clientId );
+	}
+}
+
+/**
+ * Determine if a block should be synced.
+ *
+ * Ex: A gallery block should not be synced until the images have been
+ * uploaded to WordPress, and their url is available. Before that,
+ * it's not possible to access the blobs on a client as those are
+ * local.
+ *
+ * @param block The block to check.
+ * @return True if the block should be synced, false otherwise.
+ */
+function shouldBlockBeSynced( block: Block ): boolean {
+	// Verify that the gallery block is ready to be synced.
+	// This means that, all images have had their blobs converted to full URLs.
+	// Checking for only the blobs ensures that blocks that have just been inserted work as well.
+	if ( 'core/gallery' === block.name ) {
+		return ! block.innerBlocks.some(
+			( innerBlock ) =>
+				innerBlock.attributes && innerBlock.attributes.blob
+		);
+	}
+
+	// Allow all other blocks to be synced.
+	return true;
+}
+
+/**
+ * Update a single attribute on a Yjs block attributes map (currentAttributes).
+ *
+ * For rich-text attributes that already exist as Y.Text instances, the update
+ * is applied as a delta merge so that concurrent edits are preserved. All
+ * other attributes are replaced wholesale via `createNewYAttributeValue`.
+ *
+ * @param blockName         The block type name, e.g. 'core/paragraph'.
+ * @param attributeName     The name of the attribute to update, e.g. 'content'.
+ * @param attributeValue    The new value for the attribute.
+ * @param currentAttributes The Y.Map holding the block's current attributes.
+ * @param cursorPosition    The local cursor position, used when merging rich-text deltas.
+ */
+function updateYBlockAttribute(
+	blockName: string,
+	attributeName: string,
+	attributeValue: unknown,
+	currentAttributes: YBlockAttributes,
+	cursorPosition: number | null
+): void {
+	const isRichText = isRichTextAttribute( blockName, attributeName );
+	const currentAttribute = currentAttributes.get( attributeName );
+
+	if (
+		isRichText &&
+		'string' === typeof attributeValue &&
+		currentAttributes.has( attributeName ) &&
+		currentAttribute instanceof Y.Text
+	) {
+		// Rich text values are stored as persistent Y.Text instances.
+		// Update the value with a delta in place.
+		mergeRichTextUpdate( currentAttribute, attributeValue, cursorPosition );
+	} else {
+		currentAttributes.set(
+			attributeName,
+			createNewYAttributeValue( blockName, attributeName, attributeValue )
+		);
+	}
+}
+
+// Cached types for block attributes.
+let cachedBlockAttributeTypes: Map< string, Map< string, string > >;
+
+/**
+ * Get the defined attribute type for a block attribute.
+ *
+ * @param blockName     The name of the block, e.g. 'core/paragraph'.
+ * @param attributeName The name of the attribute, e.g. 'content'.
+ * @return The type of the attribute, e.g. 'rich-text' or 'string'.
+ */
+function getBlockAttributeType(
+	blockName: string,
+	attributeName: string
+): string | undefined {
+	if ( ! cachedBlockAttributeTypes ) {
+		// Parse the attributes for all blocks once.
+		cachedBlockAttributeTypes = new Map< string, Map< string, string > >();
+
+		for ( const blockType of getBlockTypes() as BlockType[] ) {
+			const blockAttributeTypeMap = new Map< string, string >();
+
+			for ( const [ name, definition ] of Object.entries(
+				blockType.attributes ?? {}
+			) ) {
+				if ( definition.type ) {
+					blockAttributeTypeMap.set( name, definition.type );
+				}
+			}
+
+			cachedBlockAttributeTypes.set(
+				blockType.name,
+				blockAttributeTypeMap
+			);
+		}
+	}
+
+	return cachedBlockAttributeTypes.get( blockName )?.get( attributeName );
+}
+
+/**
+ * Check if an attribute value is the expected type.
+ *
+ * @param blockName      The name of the block, e.g. 'core/paragraph'.
+ * @param attributeName  The name of the attribute, e.g. 'content'.
+ * @param attributeValue The current attribute value.
+ * @return True if the attribute type is expected, false otherwise.
+ */
+function isExpectedAttributeType(
+	blockName: string,
+	attributeName: string,
+	attributeValue: unknown
+): boolean {
+	const expectedAttributeType = getBlockAttributeType(
+		blockName,
+		attributeName
+	);
+
+	if ( expectedAttributeType === 'rich-text' ) {
+		return attributeValue instanceof Y.Text;
+	} else if ( expectedAttributeType === 'string' ) {
+		return typeof attributeValue === 'string';
+	}
+
+	// No other types comparisons use special logic.
+	return true;
+}
+
+/**
+ * Given a block name and attribute key, return true if the attribute is rich-text typed.
+ *
+ * @param blockName     The name of the block, e.g. 'core/paragraph'.
+ * @param attributeName The name of the attribute to check, e.g. 'content'.
+ * @return True if the attribute is rich-text typed, false otherwise.
+ */
+function isRichTextAttribute(
+	blockName: string,
+	attributeName: string
+): boolean {
+	return 'rich-text' === getBlockAttributeType( blockName, attributeName );
+}
+
+let localDoc: Y.Doc;
+
+/**
+ * Given a Y.Text object and an updated string value, diff the new value and
+ * apply the delta to the Y.Text.
+ *
+ * @param blockYText     The Y.Text to update.
+ * @param updatedValue   The updated value.
+ * @param cursorPosition The position of the cursor after the change occurs.
+ */
+export function mergeRichTextUpdate(
+	blockYText: Y.Text,
+	updatedValue: string,
+	cursorPosition: number | null = null
+): void {
+	// Gutenberg does not use Yjs shared types natively, so we can only subscribe
+	// to changes from store and apply them to Yjs types that we create and
+	// manage. Crucially, for rich-text attributes, we do not receive granular
+	// string updates; we get the new full string value on each change, even when
+	// only a single character changed.
+	//
+	// The code below allows us to compute a delta between the current and new
+	// value, then apply it to the Y.Text.
+
+	if ( ! localDoc ) {
+		// Y.Text must be attached to a Y.Doc to be able to do operations on it.
+		// Create a temporary Y.Text attached to a local Y.Doc for delta computation.
+		localDoc = new Y.Doc();
+	}
+
+	const localYText = localDoc.getText( 'temporary-text' );
+	localYText.delete( 0, localYText.length );
+	localYText.insert( 0, updatedValue );
+
+	const currentValueAsDelta = new Delta( blockYText.toDelta() );
+	const updatedValueAsDelta = new Delta( localYText.toDelta() );
+	const deltaDiff = currentValueAsDelta.diffWithCursor(
+		updatedValueAsDelta,
+		cursorPosition
+	);
+
+	blockYText.applyDelta( deltaDiff.ops );
+}

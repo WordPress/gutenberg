@@ -67,7 +67,6 @@ export function AllowOverridesModal( {
 						) }
 					</Text>
 					<TextControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						value={ editedBlockName }
 						label={ __( 'Name' ) }

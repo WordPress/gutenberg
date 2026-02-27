@@ -17,6 +17,7 @@
 		"viewportWidth": 350
 	},
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"layout": true,
@@ -60,6 +61,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		},
 		"__experimentalBorder": {
 			"radius": true,

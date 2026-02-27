@@ -53,14 +53,17 @@ export default function PostTemplatePanel() {
 		return canCreateTemplates;
 	}, [] );
 
-	const canViewTemplates = useSelect( ( select ) => {
-		return (
-			select( coreStore ).canUser( 'read', {
-				kind: 'postType',
-				name: 'wp_template',
-			} ) ?? false
-		);
-	}, [] );
+	const canViewTemplates = useSelect(
+		( select ) => {
+			return isVisible
+				? select( coreStore ).canUser( 'read', {
+						kind: 'postType',
+						name: 'wp_template',
+				  } )
+				: false;
+		},
+		[ isVisible ]
+	);
 
 	if ( ( ! isBlockTheme || ! canViewTemplates ) && isVisible ) {
 		return <ClassicThemeControl />;

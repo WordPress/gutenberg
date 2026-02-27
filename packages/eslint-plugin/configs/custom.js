@@ -6,6 +6,8 @@ module.exports = {
 		'@wordpress/no-unguarded-get-range-at': 'error',
 		'@wordpress/no-global-active-element': 'error',
 		'@wordpress/no-global-get-selection': 'error',
+		'@wordpress/no-setting-ds-tokens': 'error',
+		'@wordpress/no-unknown-ds-tokens': 'error',
 		'@wordpress/no-unsafe-wp-apis': 'error',
 		'@wordpress/no-wp-process-env': 'error',
 	},
@@ -19,11 +21,7 @@ module.exports = {
 			},
 		},
 		{
-			files: [
-				'*.test.js',
-				'**/test/*.js',
-				'packages/e2e-test-utils/**/*.js',
-			],
+			files: [ '*.test.js', '**/test/*.js' ],
 			rules: {
 				'@wordpress/no-global-active-element': 'off',
 				'@wordpress/no-global-get-selection': 'off',

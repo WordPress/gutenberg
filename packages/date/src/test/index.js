@@ -466,6 +466,29 @@ describe( 'Function dateI18n', () => {
 		setSettings( settings );
 	} );
 
+	it( 'should format date into a UTC date when given UTC offset 0', () => {
+		const settings = getSettings();
+
+		// Simulate different timezone.
+		setSettings( {
+			...settings,
+			timezone: { offset: -4, string: 'America/New_York' },
+		} );
+
+		// Check that offset 0 formats in UTC, not site timezone.
+		// This is a regression test for a bug where offset 0 was falsy
+		// and fell through to use site timezone instead.
+		const formattedDate = dateI18n(
+			'Y-m-d H:i',
+			'2019-06-18T11:00:00.000Z',
+			0
+		);
+		expect( formattedDate ).toBe( '2019-06-18 11:00' );
+
+		// Restore default settings.
+		setSettings( settings );
+	} );
+
 	it( 'should format date into a UTC date if `gmt` is set to `true`', () => {
 		const settings = getSettings();
 

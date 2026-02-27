@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * External dependencies
  */
-import type { StoryObj, Meta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -15,7 +15,8 @@ import { ValidatedRadioControl } from '../radio-control';
 import { formDecorator } from './story-utils';
 
 const meta: Meta< typeof ValidatedRadioControl > = {
-	title: 'Components (Experimental)/Validated Form Controls/ValidatedRadioControl',
+	title: 'Components/Selection & Input/Validated Form Controls/ValidatedRadioControl',
+	id: 'components-validatedradiocontrol',
 	component: ValidatedRadioControl,
 	tags: [ 'status-private' ],
 	decorators: formDecorator,
@@ -39,10 +40,18 @@ export const Default: StoryObj< typeof ValidatedRadioControl > = {
 			<ValidatedRadioControl
 				{ ...args }
 				selected={ selected }
-				onChange={ ( value ) => {
-					setSelected( value );
-					onChange?.( value );
+				onChange={ ( newValue ) => {
+					setSelected( newValue );
+					onChange?.( newValue );
 				} }
+				customValidity={
+					selected === 'b'
+						? {
+								type: 'invalid',
+								message: 'Option B is not allowed.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},
@@ -55,10 +64,4 @@ Default.args = {
 		{ label: 'Option A', value: 'a' },
 		{ label: 'Option B (not allowed)', value: 'b' },
 	],
-	customValidator: ( value ) => {
-		if ( value === 'b' ) {
-			return 'Option B is not allowed.';
-		}
-		return undefined;
-	},
 };

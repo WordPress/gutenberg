@@ -79,8 +79,10 @@
 	></div>
 
 	<div
-		data-wp-class--main-bg----color="state.trueValue"
 		data-testid="can use classes with several dashes"
+		data-wp-class--main-bg--color="state.trueValue"
+		data-wp-class--main-bg---color="state.trueValue"
+		data-wp-class--main-bg----color="state.trueValue"
 	></div>
 
 	<div data-wp-context='{ "value": false }'>

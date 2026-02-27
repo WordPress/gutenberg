@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .block-editor-block-variation-picker__variations,
 .block-editor-block-variation-picker__skip,
 .wp-block-group-placeholder__variations {

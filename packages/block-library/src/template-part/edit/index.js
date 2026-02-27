@@ -40,6 +40,8 @@ import {
 	useTemplatePartArea,
 } from './utils/hooks';
 
+const SUPPORTED_AREAS = [ 'header', 'footer', 'navigation-overlay' ];
+
 function ReplaceButton( {
 	isEntityAvailable,
 	area,
@@ -57,7 +59,7 @@ function ReplaceButton( {
 	const canReplace =
 		isEntityAvailable &&
 		hasReplacements &&
-		( area === 'header' || area === 'footer' );
+		SUPPORTED_AREAS.includes( area );
 
 	if ( ! canReplace ) {
 		return null;
@@ -83,7 +85,7 @@ function TemplatesList( { area, clientId, isEntityAvailable, onSelect } ) {
 	const canReplace =
 		isEntityAvailable &&
 		!! blockPatterns.length &&
-		( area === 'header' || area === 'footer' );
+		SUPPORTED_AREAS.includes( area );
 
 	if ( ! canReplace ) {
 		return null;
@@ -240,14 +242,14 @@ export default function TemplatePartEdit( {
 					canUserEdit && (
 						<BlockControls group="other">
 							<ToolbarButton
-								onClick={ () =>
+								onClick={ () => {
 									onNavigateToEntityRecord( {
 										postId: templatePartId,
 										postType: 'wp_template_part',
-									} )
-								}
+									} );
+								} }
 							>
-								{ __( 'Edit' ) }
+								{ __( 'Edit original' ) }
 							</ToolbarButton>
 						</BlockControls>
 					) }
@@ -305,7 +307,7 @@ export default function TemplatePartEdit( {
 					} }
 				</BlockSettingsMenuControls>
 
-				<InspectorControls>
+				<InspectorControls group="settings">
 					<TemplatesList
 						area={ area }
 						clientId={ clientId }

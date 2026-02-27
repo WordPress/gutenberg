@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -12,7 +12,6 @@ import { View } from '../../view';
 const meta: Meta< typeof Flex > = {
 	component: Flex,
 	title: 'Components/Flex',
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { FlexBlock, FlexItem },
 	argTypes: {
 		align: { control: { type: 'text' } },
@@ -32,6 +31,11 @@ const meta: Meta< typeof Flex > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation. For use cases not covered by `HStack` and `VStack`, write your own CSS.',
+		},
 	},
 };
 export default meta;

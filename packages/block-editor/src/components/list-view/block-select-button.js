@@ -9,10 +9,17 @@ import clsx from 'clsx';
 import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
+	Tooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
+import {
+	Icon,
+	lockSmall as lock,
+	pinSmall,
+	unseen,
+	symbol,
+} from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
 
@@ -27,6 +34,8 @@ import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { getBlockVisibilityLabel } from '../block-visibility';
+
 const { Badge } = unlock( componentsPrivateApis );
 
 function ListViewBlockSelectButton(
@@ -53,17 +62,24 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { isContentOnly } = useSelect(
-		( select ) => ( {
-			isContentOnly:
-				select( blockEditorStore ).getBlockEditingMode( clientId ) ===
-				'contentOnly',
-		} ),
+	const { hasPatternName, blockVisibility } = useSelect(
+		( select ) => {
+			const { getBlockAttributes } = unlock( select( blockEditorStore ) );
+			const attributes = getBlockAttributes( clientId );
+			return {
+				hasPatternName: !! attributes?.metadata?.patternName,
+				blockVisibility: attributes?.metadata?.blockVisibility,
+			};
+		},
 		[ clientId ]
 	);
-	const shouldShowLockIcon = isLocked && ! isContentOnly;
+
+	const shouldShowLockIcon = isLocked;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
+
+	// Determine visibility label from blockVisibility metadata
+	const visibilityLabel = getBlockVisibilityLabel( blockVisibility );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -105,7 +121,7 @@ function ListViewBlockSelectButton(
 		>
 			<ListViewExpander onClick={ onToggleExpanded } />
 			<BlockIcon
-				icon={ blockInformation?.icon }
+				icon={ hasPatternName ? symbol : blockInformation?.icon }
 				showColors
 				context="list-view"
 			/>
@@ -147,6 +163,16 @@ function ListViewBlockSelectButton(
 						) ) }
 					</span>
 				) : null }
+				{ !! visibilityLabel && (
+					<Tooltip text={ visibilityLabel }>
+						<span
+							className="block-editor-list-view-block-select-button__block-visibility"
+							aria-hidden="true"
+						>
+							<Icon icon={ unseen } />
+						</span>
+					</Tooltip>
+				) }
 				{ shouldShowLockIcon && (
 					<span className="block-editor-list-view-block-select-button__lock">
 						<Icon icon={ lock } />

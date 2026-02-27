@@ -14,7 +14,7 @@ export function createListBlockFromDOMElement( listElement ) {
 	const type = listElement.getAttribute( 'type' );
 	const listAttributes = {
 		ordered: 'OL' === listElement.tagName,
-		anchor: listElement.id === '' ? undefined : listElement.id,
+		anchor: listElement.id ? listElement.id : undefined,
 		start: listElement.getAttribute( 'start' )
 			? parseInt( listElement.getAttribute( 'start' ), 10 )
 			: undefined,

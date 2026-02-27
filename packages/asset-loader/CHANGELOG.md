@@ -1,0 +1,17 @@
+# Changelog
+
+## Unreleased
+
+## 1.6.0 (2026-02-18)
+
+## 1.5.0 (2026-01-29)
+
+## 1.4.0 (2026-01-16)
+
+## 1.2.0 (2025-11-26)
+
+## 1.1.0 (2025-11-12)
+
+### New Features
+
+-   Initial release of asset-loader package.

@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .block-directory-downloadable-block-list-item {
 	& + & {
 		margin-top: $grid-unit-05;

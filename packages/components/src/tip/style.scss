@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .components-tip {
 	display: flex;
 	color: $gray-700;

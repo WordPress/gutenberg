@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * External dependencies
  */
-import type { StoryObj, Meta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -15,7 +15,8 @@ import { formDecorator } from './story-utils';
 import { ValidatedRangeControl } from '../range-control';
 
 const meta: Meta< typeof ValidatedRangeControl > = {
-	title: 'Components (Experimental)/Validated Form Controls/ValidatedRangeControl',
+	title: 'Components/Selection & Input/Validated Form Controls/ValidatedRangeControl',
+	id: 'components-validatedrangecontrol',
 	component: ValidatedRangeControl,
 	tags: [ 'status-private' ],
 	decorators: formDecorator,
@@ -41,6 +42,14 @@ export const Default: StoryObj< typeof ValidatedRangeControl > = {
 					setValue( newValue );
 					onChange?.( newValue );
 				} }
+				customValidity={
+					value && value % 2 !== 0
+						? {
+								type: 'invalid',
+								message: 'Choose an even number.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},
@@ -51,10 +60,4 @@ Default.args = {
 	help: 'Odd numbers are not allowed.',
 	min: 0,
 	max: 20,
-	customValidator: ( value ) => {
-		if ( value && value % 2 !== 0 ) {
-			return 'Choose an even number.';
-		}
-		return undefined;
-	},
 };

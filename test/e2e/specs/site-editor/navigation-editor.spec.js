@@ -93,19 +93,24 @@ test.describe( 'Editing Navigation Menus', () => {
 
 			await expect( sidebar ).toBeVisible();
 
-			// Check that the `Menu` control is visible.
+			// Check that the `Navigation` control is visible.
 			// This is effectively the contents of the "List View" tab.
 			await expect(
-				sidebar.getByRole( 'heading', { name: 'Menu', exact: true } )
+				sidebar.getByRole( 'heading', {
+					name: 'Navigation',
+					exact: true,
+				} )
 			).toBeVisible();
 
-			// Check the standard tabs are not present.
+			// Check the Document Overview tab is not present.
 			await expect(
 				sidebar.getByRole( 'tab', { name: 'Document Overview' } )
 			).toBeHidden();
+
+			// The Settings tab is visible due to Custom CSS support.
 			await expect(
 				sidebar.getByRole( 'tab', { name: 'Settings' } )
-			).toBeHidden();
+			).toBeVisible();
 			await expect(
 				sidebar.getByRole( 'tab', { name: 'Styles' } )
 			).toBeHidden();

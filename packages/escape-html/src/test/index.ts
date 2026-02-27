@@ -68,6 +68,7 @@ describe( 'escapeGreaterThan', () => {
 describe( 'escapeAttribute', () => {
 	testEscapeAmpersand( escapeAttribute );
 	testEscapeQuotationMark( escapeAttribute );
+	testEscapeLessThan( escapeAttribute );
 	testUnstableEscapeGreaterThan( escapeAttribute );
 } );
 

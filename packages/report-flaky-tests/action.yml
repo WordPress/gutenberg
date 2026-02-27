@@ -14,4 +14,4 @@ inputs:
         default: 'flaky-tests'
 runs:
     using: 'node20'
-    main: 'build/index.js'
+    main: 'build/index.cjs'

@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import glob from 'fast-glob';
 import { format } from 'util';
+import glob from 'fast-glob';
 
 /**
  * WordPress dependencies
  */
+import prettierConfig from '@wordpress/prettier-config';
 import {
 	getBlockTypes,
 	parse,
@@ -18,7 +19,6 @@ import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import prettierConfig from '@wordpress/prettier-config';
 
 /**
  * Internal dependencies
@@ -34,13 +34,6 @@ import {
 	writeBlockFixtureJSON,
 	writeBlockFixtureSerializedHTML,
 } from '../fixtures';
-
-/* eslint-disable no-restricted-syntax */
-import * as form from '@wordpress/block-library/src/form';
-import * as formInput from '@wordpress/block-library/src/form-input';
-import * as formSubmitButton from '@wordpress/block-library/src/form-submit-button';
-import * as formSubmissionNotification from '@wordpress/block-library/src/form-submission-notification';
-/* eslint-enable no-restricted-syntax */
 
 const blockBasenames = getAvailableBlockFixturesBasenames();
 
@@ -70,17 +63,10 @@ describe( 'full post content fixture', () => {
 			} )
 		);
 		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
-		registerCoreBlocks();
-
 		// Form-related blocks will not be registered unless they are opted
-		// in on the experimental settings page. Therefore, these blocks
-		// must be explicitly registered.
-		registerCoreBlocks( [
-			form,
-			formInput,
-			formSubmitButton,
-			formSubmissionNotification,
-		] );
+		// in on the experimental settings page.
+		window.__experimentalEnableFormBlocks = true;
+		registerCoreBlocks();
 
 		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 			__experimentalRegisterExperimentalCoreBlocks( {

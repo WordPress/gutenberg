@@ -102,4 +102,5 @@ function UnforwardedToolbar(
  * ```
  */
 export const Toolbar = forwardRef( UnforwardedToolbar );
+Toolbar.displayName = 'Toolbar';
 export default Toolbar;

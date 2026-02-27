@@ -5,10 +5,13 @@ build-style
 build-types
 build-wp
 node_modules
+.wasm-vips-build
 gutenberg.zip
+.content-entry.js
 coverage
 .phpunit.result.cache
 .reassure
+.dev-ready
 
 
 # Directories/files that may appear in your environment
@@ -41,6 +44,7 @@ junit.xml
 
 # Local overrides
 .wp-env.override.json
+.wp-env.test.override.json
 playwright.config.override.ts
 phpcs.xml
 phpunit.xml

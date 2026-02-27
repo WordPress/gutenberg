@@ -115,4 +115,16 @@ test.describe( 'data-wp-style', () => {
 		await page.getByTestId( 'toggle context' ).click();
 		await expect( el ).toHaveAttribute( 'style', 'color: red;' );
 	} );
+
+	test( 'can use CSS variables', async ( { page } ) => {
+		const el = page.getByTestId( 'can use CSS variables' );
+		await expect( el ).toHaveCSS( 'color', 'rgb(255, 0, 0)' );
+		await page.getByTestId( 'toggle color' ).click();
+		await expect( el ).toHaveCSS( 'color', 'rgb(0, 0, 255)' );
+	} );
+
+	test( 'ignores unique-ids', async ( { page } ) => {
+		const el = page.getByTestId( 'ignores unique-ids' );
+		await expect( el ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
+	} );
 } );

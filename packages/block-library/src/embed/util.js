@@ -196,6 +196,21 @@ export const removeAspectRatioClasses = ( existingClassNames ) => {
 };
 
 /**
+ * Checks if HTML already contains responsive aspect ratio styling.
+ * Some embed providers (like Flickr) include their own responsive wrapper
+ * with padding-bottom or padding-top percentages for aspect ratio.
+ *
+ * @param {string} html The embed HTML to check.
+ * @return {boolean} True if the HTML already has responsive styling.
+ */
+export function hasInlineResponsivePadding( html ) {
+	// Check for padding-bottom or padding-top with percentage values in style attributes
+	// This pattern matches: padding-bottom: 56.25%; or padding-top: 50%; etc.
+	const paddingPattern = /padding-(top|bottom)\s*:\s*[\d.]+%/i;
+	return paddingPattern.test( html );
+}
+
+/**
  * Returns class names with any relevant responsive aspect ratio names.
  *
  * @param {string}  html               The preview HTML that possibly contains an iframe with width and height set.
@@ -209,6 +224,12 @@ export function getClassNames(
 	allowResponsive = true
 ) {
 	if ( ! allowResponsive ) {
+		return removeAspectRatioClasses( existingClassNames );
+	}
+
+	// If the embed HTML already contains responsive wrapper styling (like Flickr),
+	// don't add our own aspect ratio classes to avoid double padding.
+	if ( hasInlineResponsivePadding( html ) ) {
 		return removeAspectRatioClasses( existingClassNames );
 	}
 

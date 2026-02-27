@@ -1,0 +1,167 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.dataforms-layouts-panel__field-trigger {
+	position: relative;
+	color: inherit;
+	display: flex;
+	width: 100%;
+	min-height: $grid-unit-30;
+	cursor: pointer;
+	align-items: flex-start;
+	border-radius: $radius-small;
+	isolation: isolate;
+
+	&--label-side {
+		flex-direction: row;
+		gap: var(--wpds-dimension-gap-md);
+	}
+
+	&--label-top {
+		display: grid;
+		grid-template-columns: 1fr auto;
+	}
+
+	&--label-none {
+		align-items: center;
+	}
+
+	&:not(.is-disabled):hover {
+		color: var(--wp-admin-theme-color);
+
+		.dataforms-layouts-panel__field-trigger-icon {
+			opacity: 1;
+		}
+
+		.dataforms-layouts-panel__field-label {
+			color: var(--wp-admin-theme-color);
+		}
+	}
+
+	&.is-disabled {
+		cursor: default;
+
+		.dataforms-layouts-panel__field-control {
+			color: $gray-700;
+			font-weight: var(--wpds-font-weight-regular);
+		}
+	}
+}
+
+.dataforms-layouts-panel__field-trigger--edit-always
+.dataforms-layouts-panel__field-trigger-icon {
+	opacity: 1;
+	fill: currentColor;
+
+	&:hover,
+	&:focus-visible {
+		fill: var(--wp-admin-theme-color);
+	}
+}
+
+.dataforms-layouts-panel__field-trigger-icon {
+	padding: 0;
+	color: var(--wp-admin-theme-color);
+	flex: 0 0 auto;
+	opacity: 0;
+	border-radius: var(--wpds-border-radius-xs);
+
+	&:focus-visible {
+		opacity: 1;
+		outline:
+			var(--wpds-border-width-focus) solid
+			var(--wp-admin-theme-color);
+	}
+}
+
+.dataforms-layouts-panel__field-dropdown-anchor {
+	width: 100%;
+
+	.components-dropdown {
+		width: 100%;
+	}
+}
+
+.dataforms-layouts-panel__field-label {
+	width: 38%;
+	flex-shrink: 0;
+	min-height: $grid-unit-30;
+	display: flex;
+	align-items: center;
+	line-height: $grid-unit-05 * 5;
+	hyphens: auto;
+	color: $gray-700;
+
+	.components-base-control__label {
+		display: inline;
+		margin-bottom: 0;
+		line-height: inherit;
+	}
+
+	&.has-error {
+		color: $alert-red;
+	}
+}
+
+.dataforms-layouts-panel__field-label-error-content {
+	position: relative;
+	z-index: 1;
+	cursor: help;
+	fill: $alert-red;
+	display: inline-flex;
+	flex-direction: row;
+	align-items: center;
+	gap: $grid-unit-05;
+	svg {
+		fill: currentColor;
+	}
+}
+
+.dataforms-layouts-panel__field-control {
+	flex-grow: 1;
+	min-width: 0;
+	min-height: $grid-unit-30;
+	line-height: var(--wpds-font-line-height-md);
+	display: flex;
+	align-items: center;
+	overflow: hidden;
+	font-weight: var(--wpds-font-weight-medium);
+
+	> * {
+		min-width: 0;
+	}
+}
+
+.dataforms-layouts-panel__field-trigger--label-top
+.dataforms-layouts-panel__field-label {
+	width: 100%;
+}
+
+.dataforms-layouts-panel__field-trigger--label-top
+.dataforms-layouts-panel__field-control {
+	grid-column: 1 / -1;
+}
+
+.dataforms-layouts-panel__field-trigger--label-top
+.dataforms-layouts-panel__field-trigger-icon {
+	grid-row: 1;
+	grid-column: 2;
+}
+
+.dataforms-layouts-panel__field-dropdown .components-popover__content {
+	min-width: 320px;
+	padding: $grid-unit-20;
+}
+
+.dataforms-layouts-panel__dropdown-header {
+	margin-bottom: $grid-unit-20;
+}
+
+.dataforms-layouts-panel__modal-footer {
+	margin-top: $grid-unit-20;
+}
+
+.components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown {
+	z-index: z-index(".components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown");
+}

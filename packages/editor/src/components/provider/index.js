@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useLayoutEffect, useMemo } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
@@ -23,16 +28,17 @@ import { createBlock } from '@wordpress/blocks';
  */
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
+import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
 import NavigationBlockEditingMode from './navigation-block-editing-mode';
 import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
 import useCommands from '../commands';
+import useUploadSaveLock from './use-upload-save-lock';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
-import ContentOnlySettingsMenu from '../block-settings-menu/content-only-settings-menu';
 import StartTemplateOptions from '../start-template-options';
 import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
@@ -175,12 +181,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			( select ) => {
 				const {
 					getEditorSettings,
-					getEditorSelection,
 					getRenderingMode,
 					__unstableIsEditorReady,
 					getDefaultRenderingMode,
 				} = unlock( select( editorStore ) );
-				const { getEntitiesConfig } = select( coreStore );
+				const { getEntitiesConfig, getEntityRecordEdits } =
+					select( coreStore );
 
 				const _mode = getRenderingMode();
 				const _defaultMode = getDefaultRenderingMode( post.type );
@@ -198,6 +204,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				// Wait until the default mode is retrieved and start rendering canvas.
 				const isRenderingModeReady = _defaultMode !== undefined;
 
+				// Read selection directly from entity edits using the post prop,
+				// bypassing getCurrentPostId() which lags behind in useEffect.
+				const entityEdits = getEntityRecordEdits(
+					'postType',
+					post.type,
+					post.id
+				);
+
 				return {
 					editorSettings: getEditorSettings(),
 					isReady: __unstableIsEditorReady(),
@@ -205,14 +219,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					defaultMode: hasResolvedDefaultMode
 						? _defaultMode
 						: undefined,
-					selection: getEditorSelection(),
+					selection: entityEdits?.selection,
 					postTypeEntities:
 						post.type === 'wp_template'
 							? getEntitiesConfig( 'postType' )
 							: null,
 				};
 			},
-			[ post.type, hasTemplate ]
+			[ post.type, post.id, hasTemplate ]
 		);
 
 		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
@@ -282,7 +296,22 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setEditedPost,
 			setRenderingMode,
 		} = unlock( useDispatch( editorStore ) );
-		const { createWarningNotice } = useDispatch( noticesStore );
+		const { editEntityRecord } = useDispatch( coreStore );
+
+		const onChangeSelection = useCallback(
+			( newSelection ) => {
+				editEntityRecord(
+					'postType',
+					post.type,
+					post.id,
+					{ selection: newSelection },
+					{ undoIgnore: true }
+				);
+			},
+			[ editEntityRecord, post.type, post.id ]
+		);
+		const { createWarningNotice, removeNotice } =
+			useDispatch( noticesStore );
 
 		// Ideally this should be synced on each change and not just something you do once.
 		useLayoutEffect( () => {
@@ -318,7 +347,16 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Synchronizes the active post with the state
 		useEffect( () => {
 			setEditedPost( post.type, post.id );
-		}, [ post.type, post.id, setEditedPost ] );
+			if (
+				typeof window !== 'undefined' &&
+				window.__experimentalTemplateActivate
+			) {
+				// Clear any notices dependent on the post context.
+				removeNotice( 'template-activate-notice' );
+			}
+
+			return () => setEditedPost( null, null );
+		}, [ post.type, post.id, setEditedPost, removeNotice ] );
 
 		// Synchronize the editor settings as they change.
 		useEffect( () => {
@@ -342,8 +380,36 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Register the editor commands.
 		useCommands();
 
+		// Lock post saving when media uploads are in progress (experimental feature).
+		useUploadSaveLock();
+
 		if ( ! isReady || ! mode ) {
 			return null;
+		}
+
+		const isAttachment =
+			post.type === ATTACHMENT_POST_TYPE &&
+			window?.__experimentalMediaEditor;
+
+		// Early return for attachments - no block editor needed
+		if ( isAttachment ) {
+			return (
+				<EntityProvider kind="root" type="site">
+					<EntityProvider
+						kind="postType"
+						type={ post.type }
+						id={ post.id }
+					>
+						{ children }
+						{ ! settings.isPreviewMode && (
+							<>
+								<EditorKeyboardShortcuts />
+								<KeyboardShortcutHelpModal />
+							</>
+						) }
+					</EntityProvider>
+				</EntityProvider>
+			);
 		}
 
 		return (
@@ -359,6 +425,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							onChange={ onChange }
 							onInput={ onInput }
 							selection={ selection }
+							onChangeSelection={ onChangeSelection }
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
 						>
@@ -367,7 +434,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 								<>
 									<PatternsMenuItems />
 									<TemplatePartMenuItems />
-									<ContentOnlySettingsMenu />
 									{ mode === 'template-locked' && (
 										<DisableNonPageContentBlocks />
 									) }

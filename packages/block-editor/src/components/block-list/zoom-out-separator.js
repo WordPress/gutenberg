@@ -49,7 +49,6 @@ export function ZoomOutSeparator( {
 		return {
 			sectionRootClientId: root,
 			sectionClientIds: sectionRootClientIds,
-			blockOrder: getBlockOrder( root ),
 			insertionPoint: getInsertionPoint(),
 			blockInsertionPoint: getBlockInsertionPoint(),
 			blockInsertionPointVisible: isBlockInsertionPointVisible(),

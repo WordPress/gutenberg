@@ -45,7 +45,7 @@ function deleteRecordingFile( filePath ) {
 
 let allPassed = true;
 
-// eslint-disable-next-line jest/no-jasmine-globals, no-undef
+// eslint-disable-next-line no-undef
 jasmine.getEnv().addReporter( {
 	specStarted: ( { testPath, id } ) => {
 		if ( ! isMacOSEnvironment() ) {

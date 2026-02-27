@@ -1,0 +1,19 @@
+/* Valid: Using known design system tokens */
+.example {
+	background-color: var(--wpds-color-bg-surface-neutral);
+	color: var(--wpds-color-fg-content-neutral);
+	border-radius: var(--wpds-border-radius-sm);
+	padding: var(--wpds-dimension-padding-2xl);
+}
+
+/* Valid: Using tokens with fallbacks */
+.with-fallback {
+	color: var(--wpds-color-fg-content-neutral, inherit);
+}
+
+/* Valid: Non-wpds custom properties are ignored */
+.other-vars {
+	color: var(--my-custom-color);
+	background: var(--some-other-var);
+}
+

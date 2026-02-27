@@ -365,5 +365,6 @@ function UnforwardedColorPalette(
  * ```
  */
 export const ColorPalette = forwardRef( UnforwardedColorPalette );
+ColorPalette.displayName = 'ColorPalette';
 
 export default ColorPalette;

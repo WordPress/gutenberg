@@ -1,0 +1,9 @@
+/* Invalid: Setting wpds custom properties is not allowed */
+:root {
+	--wpds-custom-override: #f00;
+}
+
+.example {
+	--wpds-local-token: #00f;
+}
+

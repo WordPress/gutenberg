@@ -16,7 +16,7 @@ import {
 	withFilters,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { keyboardReturn } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
@@ -29,6 +29,7 @@ import MediaUploadCheck from '../media-upload/check';
 import URLPopover from '../url-popover';
 import { store as blockEditorStore } from '../../store';
 import { parseDropEvent } from '../use-on-block-drop';
+import { getComputedAcceptAttribute } from './utils';
 
 const noop = () => {};
 
@@ -150,15 +151,29 @@ export function MediaPlaceholder( {
 		} );
 	}
 
-	const mediaUpload = useSelect( ( select ) => {
+	const { mediaUpload, allowedMimeTypes } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings().mediaUpload;
+		const settings = getSettings();
+		return {
+			mediaUpload: settings.mediaUpload,
+			allowedMimeTypes: settings.allowedMimeTypes,
+		};
 	}, [] );
 	const [ src, setSrc ] = useState( '' );
 
 	useEffect( () => {
 		setSrc( value?.src ?? '' );
 	}, [ value?.src ] );
+
+	const computedAccept = useMemo(
+		() =>
+			getComputedAcceptAttribute(
+				allowedTypes,
+				allowedMimeTypes,
+				accept
+			),
+		[ allowedTypes, allowedMimeTypes, accept ]
+	);
 
 	const onlyAllowsImages = () => {
 		if ( ! allowedTypes || allowedTypes.length === 0 ) {
@@ -470,7 +485,7 @@ export function MediaPlaceholder( {
 					{ renderDropZone() }
 					<FormFileUpload
 						onChange={ onUpload }
-						accept={ accept }
+						accept={ computedAccept }
 						multiple={ !! multiple }
 						render={ ( { openFileDialog } ) => {
 							const content = (
@@ -518,7 +533,7 @@ export function MediaPlaceholder( {
 							</Button>
 						) }
 						onChange={ onUpload }
-						accept={ accept }
+						accept={ computedAccept }
 						multiple={ !! multiple }
 					/>
 					{ uploadMediaLibraryButton }

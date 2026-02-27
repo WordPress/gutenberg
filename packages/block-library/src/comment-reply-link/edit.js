@@ -1,49 +1,20 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	AlignmentControl,
-	BlockControls,
-	useBlockProps,
-} from '@wordpress/block-editor';
+import { useBlockProps } from '@wordpress/block-editor';
 
 /**
- * Renders the `core/comment-reply-link` block on the editor.
- *
- * @param {Object} props                      React props.
- * @param {Object} props.setAttributes        Callback for updating block attributes.
- * @param {Object} props.attributes           Block attributes.
- * @param {string} props.attributes.textAlign The `textAlign` attribute.
- *
- * @return {JSX.Element} React element.
+ * Internal dependencies
  */
-function Edit( { setAttributes, attributes: { textAlign } } ) {
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
-	const blockControls = (
-		<BlockControls group="block">
-			<AlignmentControl
-				value={ textAlign }
-				onChange={ ( newAlign ) =>
-					setAttributes( { textAlign: newAlign } )
-				}
-			/>
-		</BlockControls>
-	);
+function Edit( props ) {
+	useDeprecatedTextAlign( props );
+	const blockProps = useBlockProps();
 
 	return (
 		<>
-			{ blockControls }
 			<div { ...blockProps }>
 				<a
 					href="#comment-reply-pseudo-link"

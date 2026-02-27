@@ -45,9 +45,7 @@ test.describe( 'Global styles variations', () => {
 		// TODO: instead of locating these elements by class,
 		//  we could update the source code to group them in a <section> or other container,
 		//  then add `aria-labelledby` and `aria-describedby` etc to provide accessible information,
-		const variations = page.locator(
-			'.edit-site-global-styles-variations_item'
-		);
+		const variations = page.locator( '.global-styles-ui-variations_item' );
 
 		await expect( variations ).toHaveCount( 3 );
 

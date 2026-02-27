@@ -22,7 +22,7 @@ test.describe( 'Navigation colors', () => {
 		const { id: menuId } = await requestUtils.createNavigationMenu( {
 			title: 'Colored menu',
 			content: `<!-- wp:navigation-submenu {"label":"Custom Link","type":"custom","url":"https://wordpress.org","kind":"custom"} --><!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"https://wordpress.org","kind":"custom"} /--><!-- /wp:navigation-submenu --><!-- wp:navigation-link {"label":"Page Link","type":"page","id": ${ pageId },"url":"http://localhost:8889/?page_id=${ pageId }","kind":"post-type"} /-->`,
-			attributes: { openSubmenusOnClick: true },
+			attributes: { submenuVisibility: 'click' },
 		} );
 
 		await admin.createNewPost();
@@ -408,7 +408,10 @@ class ColorControl {
 		// Switch to settings tab.
 		await this.page.getByRole( 'tab', { name: 'Settings' } ).click();
 		// Set it to always be the mobile view, but don't save this setting so we can still check all the frontend colors.
-		await this.page.getByRole( 'radio', { name: 'Always' } ).click();
+		await this.page
+			.getByRole( 'radiogroup', { name: 'Configure overlay visibility' } )
+			.getByRole( 'radio', { name: 'Always' } )
+			.click();
 		await this.editor.canvas
 			.getByRole( 'button', { name: 'Open menu' } )
 			.click();

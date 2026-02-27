@@ -8,9 +8,16 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/post-comments-count' ],
-			transform: ( { textAlign } ) => {
+			transform: ( { style } ) => {
+				const textAlign = style?.typography?.textAlign;
 				return createBlock( 'core/post-comments-count', {
-					textAlign,
+					...( textAlign && {
+						style: {
+							typography: {
+								textAlign,
+							},
+						},
+					} ),
 				} );
 			},
 		},

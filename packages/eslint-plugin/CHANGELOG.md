@@ -2,13 +2,66 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added [`no-ds-tokens`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-ds-tokens.md) rule to disallow usage of Design System token CSS custom properties (`--wpds-*`).
+
+## 24.2.0 (2026-02-18)
+
+## 24.1.0 (2026-01-29)
+
+### Enhancements
+
+-   The `dependency-group` rule now accepts an optional `"never"` mode to forbid dependency group comments.
+
+## 24.0.0 (2026-01-16)
+
+### Breaking Changes
+
+-   Updated recommended ruleset to enforce [`import/no-unresolved`](https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-unresolved.md) for `@wordpress/` packages. These packages were previously exempted from the rule. ([#72978](https://github.com/WordPress/gutenberg/pull/72978))
+-   Removed default configuration of [`import/internal-regex`](https://github.com/import-js/eslint-plugin-import/tree/main?tab=readme-ov-file#importinternal-regex) to classify `@wordpress/` packages as internal. From the perspective of an external consumer of this package, `@wordpress/` packages should be considered external. ([#72978](https://github.com/WordPress/gutenberg/pull/72978))
+
+### New Features
+
+-   Added [`no-setting-ds-tokens`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-setting-ds-tokens.md) rule to disallow setting Design System token CSS custom properties (`--wpds-*`). ([#74325](https://github.com/WordPress/gutenberg/pull/74325))
+-   Added [`no-unknown-ds-tokens`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unknown-ds-tokens.md) rule to disallow unknown Design System tokens. ([#74325](https://github.com/WordPress/gutenberg/pull/74325))
+-   Added [`components-no-missing-40px-size-prop`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md) rule to opt-in to the new 40px default size for components from the `@wordpress/components` package. ([#74611](https://github.com/WordPress/gutenberg/pull/74611))
+-   Added [`components-no-unsafe-button-disabled`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/components-no-unsafe-button-disabled.md) rule to ensure that buttons from the `@wordpress/components` package are accessible when disabled. ([#74611](https://github.com/WordPress/gutenberg/pull/74611))
+
+### Enhancements
+
+- The `dependency-group` rule is not recommended anymore. ([#73616](https://github.com/WordPress/gutenberg/pull/73616))
+
+## 22.22.0 (2025-11-26)
+
+## 22.21.0 (2025-11-12)
+
+### Enhancements
+
+-   Disabled `import/no-unresolved`, `import/default`, and `import/named` checks for TypeScript files when TypeScript is installed, since these issues are [already checked by TypeScript](https://typescript-eslint.io/troubleshooting/typed-linting/performance/).
+-   Improved resolution behavior to support modern package export semantics by updating default import resolver to [`eslint-import-resolver-typescript`](https://www.npmjs.com/package/eslint-import-resolver-typescript), including for non-TypeScript files.
+
+## 22.20.0 (2025-10-29)
+
+## 22.19.0 (2025-10-17)
+
+## 22.18.0 (2025-10-01)
+
+## 22.17.0 (2025-09-17)
+
+## 22.16.0 (2025-09-03)
+
+## 22.15.0 (2025-08-20)
+
+## 22.14.0 (2025-08-07)
+
 ## 22.13.0 (2025-07-23)
 
 ### Enhancements
 
-- Added stricter ESLint checks for translator comments.
-- Supports unnamed (%s, %d, %f), positional (%1$s, etc.) and named placeholders.
-- Flags missing and extra/outdated placeholders.
+-   Added stricter ESLint checks for translator comments.
+-   Supports unnamed (%s, %d, %f), positional (%1$s, etc.) and named placeholders.
+-   Flags missing and extra/outdated placeholders.
 
 ## 22.12.0 (2025-06-25)
 
@@ -56,8 +109,8 @@
 
 ### Breaking Changes
 
--   Add [`@wordpress/i18n-no-flanking-whitespace`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-no-flanking-whitespace.md) to the recommended i18n ruleset ([#64710](https://github.com/WordPress/gutenberg/pull/64710).
--   Add [`@wordpress/i18n-hyphenated-range`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-hyphenated-range.md) to the recommended i18n ruleset ([#64710](https://github.com/WordPress/gutenberg/pull/64710).
+-   Add [`@wordpress/i18n-no-flanking-whitespace`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-no-flanking-whitespace.md) to the recommended i18n ruleset ([#64710](https://github.com/WordPress/gutenberg/pull/64710)).
+-   Add [`@wordpress/i18n-hyphenated-range`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-hyphenated-range.md) to the recommended i18n ruleset ([#64710](https://github.com/WordPress/gutenberg/pull/64710)).
 
 ## 20.3.0 (2024-08-21)
 

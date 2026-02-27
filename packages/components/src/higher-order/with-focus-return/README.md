@@ -14,7 +14,6 @@ const EnhancedComponent = withFocusReturn( () => (
 	<div>
 		Focus will return to the previous input when this component is unmounted
 		<TextControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			autoFocus={ true }
 			onChange={ () => {} }
@@ -32,7 +31,6 @@ const MyComponentWithFocusReturn = () => {
 	return (
 		<div>
 			<TextControl
-				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				placeholder="Type something"
 				value={ text }

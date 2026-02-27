@@ -299,6 +299,10 @@ _Returns_
 
 -   `RichTextValue`: A new combined value.
 
+### privateApis
+
+Private @wordpress/rich-text APIs.
+
 ### registerFormatType
 
 Registers a new format provided a unique name and an object defining its behavior.

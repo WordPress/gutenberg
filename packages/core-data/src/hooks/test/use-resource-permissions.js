@@ -99,7 +99,7 @@ describe( 'useResourcePermissions', () => {
 		const TestComponent = () => {
 			data = useResourcePermissions( {
 				kind: 'root',
-				name: 'media',
+				name: 'user',
 			} );
 			return <div />;
 		};
@@ -132,7 +132,7 @@ describe( 'useResourcePermissions', () => {
 		const TestComponent = () => {
 			data = useResourcePermissions( {
 				kind: 'root',
-				name: 'media',
+				name: 'user',
 				id: 1,
 			} );
 			return <div />;
@@ -170,7 +170,7 @@ describe( 'useResourcePermissions', () => {
 			useResourcePermissions(
 				{
 					kind: 'root',
-					name: 'media',
+					name: 'user',
 				},
 				1
 			);

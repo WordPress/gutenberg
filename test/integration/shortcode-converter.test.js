@@ -13,6 +13,7 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 	beforeAll( () => {
 		registerCoreBlocks();
 		registerBlockType( 'test/gallery', {
+			apiVersion: 3,
 			title: 'Test Gallery',
 			category: 'text',
 			attributes: {
@@ -41,6 +42,7 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 			save: () => null,
 		} );
 		registerBlockType( 'test/broccoli', {
+			apiVersion: 3,
 			title: 'Test Broccoli',
 			category: 'text',
 			attributes: {
@@ -69,6 +71,7 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 			save: () => null,
 		} );
 		registerBlockType( 'test/fallback-broccoli', {
+			apiVersion: 3,
 			title: 'Test Fallback Broccoli',
 			category: 'text',
 			attributes: {

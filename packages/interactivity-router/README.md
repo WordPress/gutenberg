@@ -45,15 +45,6 @@ When loaded, this package [adds the following state and actions](https://github.
 const { state, actions } = store( 'core/router', {
 	state: {
 		url: window.location.href,
-		navigation: {
-			hasStarted: false,
-			hasFinished: false,
-			texts: {
-				loading: '',
-				loaded: '',
-			},
-			message: '',
-		},
 	},
 	actions: {
 		*navigate(href, options) {...},
@@ -70,7 +61,13 @@ const { state, actions } = store( 'core/router', {
 
 #### `data-wp-router-region`
 
-It defines a region that is updated on navigation. It requires a unique ID as the value and can only be used in root interactive elements, i.e., elements with `data-wp-interactive` that are not nested inside other elements with `data-wp-interactive`.
+
+It defines a region that is updated on navigation. It requires a unique ID as the value and must be used alongside `data-wp-interactive` to receive the proper namespace. Router regions can be placed anywhere within interactive regions, including nested interactive elements.
+
+<div class="callout callout-warning">
+When adding <code>data-wp-router-region</code> to a child element inside a parent with <code>data-wp-interactive</code>, always include <code>data-wp-interactive</code> on the child element as well. This is required for the router region to function correctly.
+</div>
+
 
 The value can be a string with the region ID, or a JSON object containing the `id` and an optional `attachTo` property.
 
@@ -151,7 +148,6 @@ prefetch( url: string, options: PrefetchOptions = {} )
 ### State
 
 `state.url` is a reactive property synchronized with the current URL.
-Properties under `state.navigation` are meant for loading bar animations.
 
 ## Installation
 

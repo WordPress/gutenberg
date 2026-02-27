@@ -22,7 +22,6 @@ const TEXTCONTROL_MAX = 100;
 const noop = () => {};
 
 export default function FocalPointPickerControls( {
-	__nextHasNoMarginBottom,
 	hasHelpText,
 	onChange = noop,
 	point = {
@@ -51,7 +50,6 @@ export default function FocalPointPickerControls( {
 	return (
 		<ControlWrapper
 			className="focal-point-picker__controls"
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			hasHelpText={ hasHelpText }
 			gap={ 4 }
 		>

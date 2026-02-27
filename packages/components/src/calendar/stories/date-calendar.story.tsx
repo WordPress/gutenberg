@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 import {
 	enUS,
 	fr,
@@ -21,7 +21,7 @@ import {
 	ar,
 	sv,
 } from 'date-fns/locale';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -35,6 +35,7 @@ import { DateCalendar, TZDate } from '..';
 const meta: Meta< typeof DateCalendar > = {
 	title: 'Components/Selection & Input/Time & Date/DateCalendar',
 	component: DateCalendar,
+	tags: [ 'status-private' ],
 	argTypes: {
 		locale: {
 			options: [

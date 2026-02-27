@@ -169,7 +169,7 @@ export default function PostExcerptEditor( {
 	let trimmedExcerpt = '';
 	if ( wordCountType === 'words' ) {
 		trimmedExcerpt = rawOrRenderedExcerpt
-			.split( ' ', excerptLength )
+			.split( /\s+/, excerptLength )
 			.join( ' ' );
 	} else if ( wordCountType === 'characters_excluding_spaces' ) {
 		/*
@@ -213,6 +213,8 @@ export default function PostExcerptEditor( {
 			}
 			onChange={ setExcerpt }
 			tagName="p"
+			allowedFormats={ [] }
+			preserveWhiteSpace
 		/>
 	) : (
 		<p className={ excerptClassName }>
@@ -253,7 +255,6 @@ export default function PostExcerptEditor( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show link on new line' ) }
 							checked={ showMoreOnNewLine }
 							onChange={ ( newShowMoreOnNewLine ) =>
@@ -273,7 +274,6 @@ export default function PostExcerptEditor( {
 					>
 						<RangeControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Max number of words' ) }
 							value={ excerptLength }
 							onChange={ ( value ) => {

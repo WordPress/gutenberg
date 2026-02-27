@@ -39,7 +39,6 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Display login as form' ) }
 							checked={ displayLoginAsForm }
 							onChange={ () =>
@@ -58,7 +57,6 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Redirect to current URL' ) }
 							checked={ redirectToCurrent }
 							onChange={ () =>

@@ -90,7 +90,6 @@ const MyRangeControl = () => {
 
 	return (
 		<RangeControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			label="Columns"
 			value={ columns }
@@ -366,13 +365,6 @@ Determines if the `input` number field will render next to the RangeControl. Thi
 ### `__next40pxDefaultSize`: `boolean`
 
 Start opting into the larger default height that will become the default size in a future version.
-
--   Required: No
--   Default: `false`
-
-### `__nextHasNoMarginBottom`: `boolean`
-
-Start opting into the new margin-free styles that will become the default in a future version.
 
 -   Required: No
 -   Default: `false`

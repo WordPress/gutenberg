@@ -9,9 +9,19 @@ import styled from '@emotion/styled';
  */
 import { Flex } from '../../flex';
 import UnitControl from '../../unit-control';
-import { COLORS, CONFIG } from '../../utils';
+import { View } from '../../view';
+import { COLORS, CONFIG, boxSizingReset, font } from '../../utils';
 import type { FocalPointPickerControlsProps } from '../types';
 import { INITIAL_BOUNDS } from '../utils';
+
+export const Container = styled( View )`
+	border: 0;
+	padding: 0;
+	margin: 0;
+	font-family: ${ font( 'default.fontFamily' ) };
+	font-size: ${ font( 'default.fontSize' ) };
+	${ boxSizingReset }
+`;
 
 export const MediaWrapper = styled.div`
 	background-color: transparent;
@@ -71,16 +81,6 @@ export const StyledUnitControl = styled( UnitControl )`
 	width: 100%;
 `;
 
-const deprecatedBottomMargin = ( {
-	__nextHasNoMarginBottom,
-}: FocalPointPickerControlsProps ) => {
-	return ! __nextHasNoMarginBottom
-		? css`
-				padding-bottom: 1em;
-		  `
-		: undefined;
-};
-
 const extraHelpTextMargin = ( {
 	hasHelpText = false,
 }: FocalPointPickerControlsProps ) => {
@@ -96,7 +96,6 @@ export const ControlWrapper = styled( Flex )`
 	padding-top: 1em;
 
 	${ extraHelpTextMargin }
-	${ deprecatedBottomMargin }
 `;
 
 export const GridView = styled.div`

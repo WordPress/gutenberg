@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * External dependencies
  */
-import type { StoryObj, Meta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -16,7 +16,8 @@ import { ValidatedToggleGroupControl } from '../toggle-group-control';
 import { ToggleGroupControlOption } from '../../../toggle-group-control';
 
 const meta: Meta< typeof ValidatedToggleGroupControl > = {
-	title: 'Components (Experimental)/Validated Form Controls/ValidatedToggleGroupControl',
+	title: 'Components/Selection & Input/Validated Form Controls/ValidatedToggleGroupControl',
+	id: 'components-validatedtogglegroupcontrol',
 	component: ValidatedToggleGroupControl,
 	tags: [ 'status-private' ],
 	decorators: formDecorator,
@@ -44,6 +45,14 @@ export const Default: StoryObj< typeof ValidatedToggleGroupControl > = {
 					setValue( newValue );
 					onChange?.( newValue );
 				} }
+				customValidity={
+					value === '2'
+						? {
+								type: 'invalid',
+								message: 'Option 2 is not allowed.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},
@@ -57,10 +66,4 @@ Default.args = {
 		<ToggleGroupControlOption value="2" key="2" label="Option 2" />,
 	],
 	help: 'Selecting option 2 will trigger an error.',
-	customValidator: ( value ) => {
-		if ( value === '2' ) {
-			return 'Option 2 is not allowed.';
-		}
-		return undefined;
-	},
 };

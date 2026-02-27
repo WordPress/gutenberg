@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { StoryFn, Meta } from '@storybook/react';
+import type { StoryFn, Meta } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -11,7 +11,7 @@ import { VStack } from '../..';
 
 const meta: Meta< typeof VStack > = {
 	component: VStack,
-	title: 'Components (Experimental)/VStack',
+	title: 'Components/VStack',
 };
 export default meta;
 

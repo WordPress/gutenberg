@@ -14,8 +14,8 @@ import {
  * WordPress dependencies
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
-import { registerCoreBlocks } from '@wordpress/block-library';
 import { ENTER } from '@wordpress/keycodes';
+import { registerCoreBlocks } from '@wordpress/block-library';
 
 beforeAll( () => {
 	// Register all core blocks
@@ -34,10 +34,10 @@ describe( 'Verse block', () => {
 		const screen = await initializeEditor();
 
 		// Add block
-		await addBlock( screen, 'Verse' );
+		await addBlock( screen, 'Poetry' );
 
 		// Get block
-		const verseBlock = await getBlock( screen, 'Verse' );
+		const verseBlock = await getBlock( screen, 'Poetry' );
 		expect( verseBlock ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
@@ -50,7 +50,7 @@ describe( 'Verse block', () => {
 		} );
 
 		// Get block
-		const verseBlock = await getBlock( screen, 'Verse' );
+		const verseBlock = await getBlock( screen, 'Poetry' );
 		expect( verseBlock ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
@@ -58,7 +58,7 @@ describe( 'Verse block', () => {
 	it( 'should produce expected markup for multiline text', async () => {
 		// Arrange
 		const screen = await initializeEditor();
-		await addBlock( screen, 'Verse' );
+		await addBlock( screen, 'Poetry' );
 
 		// Act
 		const verseTextInput =
@@ -82,7 +82,7 @@ describe( 'Verse block', () => {
 	it( 'should split on triple Enter', async () => {
 		// Arrange
 		const screen = await initializeEditor();
-		await addBlock( screen, 'Verse' );
+		await addBlock( screen, 'Poetry' );
 
 		// Act
 		const verseTextInput =

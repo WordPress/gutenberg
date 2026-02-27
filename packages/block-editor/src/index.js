@@ -6,6 +6,7 @@ export {
 	getBorderClassesAndStyles as __experimentalGetBorderClassesAndStyles,
 	useBorderProps as __experimentalUseBorderProps,
 	getColorClassesAndStyles as __experimentalGetColorClassesAndStyles,
+	getDimensionsClassesAndStyles,
 	getTypographyClassesAndStyles,
 	useColorProps as __experimentalUseColorProps,
 	useCustomSides as __experimentalUseCustomSides,

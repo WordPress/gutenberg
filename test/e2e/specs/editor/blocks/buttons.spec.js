@@ -34,6 +34,9 @@ test.describe( 'Buttons', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/buttons' );
+		await expect(
+			page.getByRole( 'option', { name: 'Buttons' } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Content' );
 
@@ -111,7 +114,7 @@ test.describe( 'Buttons', () => {
 		).toBeVisible();
 	} );
 
-	test( 'appends http protocol to links added which are missing a protocol', async ( {
+	test( 'appends https protocol to links added which are missing a protocol', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -135,8 +138,8 @@ test.describe( 'Buttons', () => {
 		await pageUtils.pressKeys( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
-		// Check the value of the URL input has had http:// prepended.
-		await expect( urlInput ).toHaveValue( 'http://example.com' );
+		// Check the value of the URL input has had https:// prepended.
+		await expect( urlInput ).toHaveValue( 'https://example.com' );
 	} );
 
 	test( 'can jump to the link editor using the keyboard shortcut', async ( {
@@ -147,7 +150,9 @@ test.describe( 'Buttons', () => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'WordPress' );
 		await pageUtils.pressKeys( 'primary+k' );
-		await page.keyboard.type( 'https://www.wordpress.org/' );
+		await page
+			.getByRole( 'combobox', { name: 'Search or type URL' } )
+			.fill( 'https://www.wordpress.org/' );
 		await page.keyboard.press( 'Enter' );
 		// Make sure that the dialog is still opened, and that focus is retained
 		// within (focusing on the link preview).
@@ -174,7 +179,9 @@ test.describe( 'Buttons', () => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'WordPress' );
 		await pageUtils.pressKeys( 'primary+k' );
-		await page.keyboard.type( 'https://www.wordpress.org/' );
+		await page
+			.getByRole( 'combobox', { name: 'Search or type URL' } )
+			.fill( 'https://www.wordpress.org/' );
 		await page.keyboard.press( 'Enter' );
 
 		// Edit link.
@@ -203,7 +210,7 @@ test.describe( 'Buttons', () => {
 		await page
 			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
 			.locator( '.block-editor-link-control' )
-			.getByRole( 'button', { name: 'Save' } )
+			.getByRole( 'button', { name: 'Apply' } )
 			.click();
 
 		// The link should have been inserted.
@@ -237,7 +244,7 @@ test.describe( 'Buttons', () => {
 		await page
 			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
 			.locator( '.block-editor-link-control' )
-			.getByRole( 'button', { name: 'Save' } )
+			.getByRole( 'button', { name: 'Apply' } )
 			.click();
 
 		// Check the content again.

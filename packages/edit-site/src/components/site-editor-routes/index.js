@@ -20,10 +20,12 @@ import { templatesRoute } from './templates';
 import { templateItemRoute } from './template-item';
 import { pagesRoute } from './pages';
 import { pageItemRoute } from './page-item';
+import { attachmentItemRoute } from './attachment-item';
 import { stylebookRoute } from './stylebook';
 import { notFoundRoute } from './notfound';
 
 const routes = [
+	...( window?.__experimentalMediaEditor ? [ attachmentItemRoute ] : [] ),
 	pageItemRoute,
 	pagesRoute,
 	templateItemRoute,

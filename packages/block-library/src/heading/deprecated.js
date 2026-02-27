@@ -12,6 +12,11 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import migrateTextAlignAttributeToBlockSupport from '../utils/migrate-text-align';
+
 const blockSupports = {
 	className: false,
 	anchor: true,
@@ -75,7 +80,9 @@ const v1 = {
 		},
 	},
 	migrate: ( attributes ) =>
-		migrateCustomColors( migrateTextAlign( attributes ) ),
+		migrateTextAlignAttributeToBlockSupport(
+			migrateCustomColors( migrateTextAlign( attributes ) )
+		),
 	save( { attributes } ) {
 		const { align, level, content, textColor, customTextColor } =
 			attributes;
@@ -111,7 +118,9 @@ const v2 = {
 		},
 	},
 	migrate: ( attributes ) =>
-		migrateCustomColors( migrateTextAlign( attributes ) ),
+		migrateTextAlignAttributeToBlockSupport(
+			migrateCustomColors( migrateTextAlign( attributes ) )
+		),
 	save( { attributes } ) {
 		const { align, content, customTextColor, level, textColor } =
 			attributes;
@@ -149,7 +158,9 @@ const v3 = {
 		},
 	},
 	migrate: ( attributes ) =>
-		migrateCustomColors( migrateTextAlign( attributes ) ),
+		migrateTextAlignAttributeToBlockSupport(
+			migrateCustomColors( migrateTextAlign( attributes ) )
+		),
 	save( { attributes } ) {
 		const { align, content, customTextColor, level, textColor } =
 			attributes;
@@ -195,7 +206,10 @@ const v4 = {
 	},
 	attributes: blockAttributes,
 	isEligible: ( { align } ) => TEXT_ALIGN_OPTIONS.includes( align ),
-	migrate: migrateTextAlign,
+	migrate: ( attributes ) =>
+		migrateTextAlignAttributeToBlockSupport(
+			migrateCustomColors( migrateTextAlign( attributes ) )
+		),
 	save( { attributes } ) {
 		const { align, content, level } = attributes;
 		const TagName = 'h' + level;
@@ -283,8 +297,107 @@ const v5 = {
 			</TagName>
 		);
 	},
+	migrate: ( attributes ) =>
+		migrateTextAlignAttributeToBlockSupport(
+			migrateCustomColors( migrateTextAlign( attributes ) )
+		),
 };
 
-const deprecated = [ v5, v4, v3, v2, v1 ];
+const v6 = {
+	supports: {
+		align: [ 'wide', 'full' ],
+		anchor: true,
+		className: true,
+		splitting: true,
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			style: true,
+			width: true,
+		},
+		color: {
+			gradients: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
+		},
+		spacing: {
+			margin: true,
+			padding: true,
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontStyle: true,
+			__experimentalFontWeight: true,
+			__experimentalLetterSpacing: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalWritingMode: true,
+			fitText: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		__unstablePasteTextInline: true,
+		__experimentalSlashInserter: true,
+		interactivity: {
+			clientNavigation: true,
+		},
+	},
+	attributes: {
+		textAlign: {
+			type: 'string',
+		},
+		content: {
+			type: 'string',
+			source: 'html',
+			selector: 'h1,h2,h3,h4,h5,h6',
+			default: '',
+			role: 'content',
+		},
+		level: {
+			type: 'number',
+			default: 2,
+		},
+		levelOptions: {
+			type: 'array',
+		},
+		placeholder: {
+			type: 'string',
+		},
+	},
+	save( { attributes } ) {
+		const { textAlign, content, level } = attributes;
+		const TagName = 'h' + level;
+
+		const className = clsx( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} );
+
+		return (
+			<TagName { ...useBlockProps.save( { className } ) }>
+				<RichText.Content value={ content } />
+			</TagName>
+		);
+	},
+	migrate: ( attributes ) =>
+		migrateTextAlignAttributeToBlockSupport(
+			migrateCustomColors( migrateTextAlign( attributes ) )
+		),
+	isEligible( attributes ) {
+		return (
+			!! attributes.textAlign ||
+			!! attributes.className?.match(
+				/\bhas-text-align-(left|center|right)\b/
+			)
+		);
+	},
+};
+
+const deprecated = [ v6, v5, v4, v3, v2, v1 ];
 
 export default deprecated;
