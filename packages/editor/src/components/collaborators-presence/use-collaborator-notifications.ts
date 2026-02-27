@@ -42,15 +42,25 @@ const DEFAULT_NOTIFICATIONS_CONFIG: CollaborationNotificationsConfig = {
 	postUpdated: true,
 };
 
+const PUBLISHED_STATUSES = [ 'publish', 'private', 'future' ];
+
 /**
- * Returns the snackbar message for a post updated notification based on post status.
+ * Returns the snackbar message for a post updated notification.
  *
- * @param name   Display name of the collaborator who saved.
- * @param status WordPress post status at the time of save.
+ * @param name           Display name of the collaborator who saved.
+ * @param status         WordPress post status at the time of save.
+ * @param isFirstPublish Whether this save transitioned the post to published.
  */
-function getPostUpdatedMessage( name: string, status: string ): string {
-	const isPublished = [ 'publish', 'private', 'future' ].includes( status );
-	if ( isPublished ) {
+function getPostUpdatedMessage(
+	name: string,
+	status: string,
+	isFirstPublish: boolean
+): string {
+	if ( isFirstPublish ) {
+		/* translators: %s: collaborator display name */
+		return sprintf( __( 'Post published by %s.' ), name );
+	}
+	if ( PUBLISHED_STATUSES.includes( status ) ) {
 		/* translators: %s: collaborator display name */
 		return sprintf( __( 'Post updated by %s.' ), name );
 	}
@@ -234,9 +244,22 @@ export function useCollaboratorNotifications(
 			return;
 		}
 
+		// Prefer the remote status from Y.Doc (accurate at save time) over
+		// the local Redux value, which may not have synced yet.
+		const effectiveStatus =
+			lastPostSave.postStatus ?? postStatus ?? 'draft';
+
+		// prevPostSave is null on the first save this session, so fall back
+		// to the Redux status (still pre-save when the notification fires).
+		const prevStatus = prevPostSave?.postStatus ?? postStatus;
+		const isFirstPublish =
+			! ( prevStatus && PUBLISHED_STATUSES.includes( prevStatus ) ) &&
+			PUBLISHED_STATUSES.includes( effectiveStatus );
+
 		const message = getPostUpdatedMessage(
 			saver.collaboratorInfo.name,
-			postStatus
+			effectiveStatus,
+			isFirstPublish
 		);
 
 		void createNotice( 'info', message, {

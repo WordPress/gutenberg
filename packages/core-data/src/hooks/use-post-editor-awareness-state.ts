@@ -161,6 +161,7 @@ export function useIsDisconnected(
 export interface PostSaveEvent {
 	savedAt: number;
 	savedByClientId: number;
+	postStatus: string | undefined;
 }
 
 /**
@@ -194,6 +195,7 @@ export function useLastPostSave(
 		}
 
 		const stateMap = awareness.doc.getMap( 'state' );
+		const recordMap = awareness.doc.getMap( 'document' );
 
 		// Only notify for saves that occur after the observer is
 		// set up. This prevents false notifications when the Y.Doc
@@ -210,7 +212,10 @@ export function useLastPostSave(
 					typeof savedByClientId === 'number' &&
 					savedAt > setupTime
 				) {
-					setLastSave( { savedAt, savedByClientId } );
+					const postStatus = recordMap.get( 'status' ) as
+						| string
+						| undefined;
+					setLastSave( { savedAt, savedByClientId, postStatus } );
 				}
 			}
 		};
