@@ -27,6 +27,10 @@ $waveform-player-height: 100px;
 		min-width: $waveform-player-height;
 		background: currentColor;
 		margin: 0;
+
+		&:hover:not(:disabled) {
+			transform: none;
+		}
 	}
 
 	.waveform-track.waveform-align-bottom .waveform-btn {
