@@ -5,7 +5,7 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 	 * Modified to point $manifest_path at Gutenberg packages
 	 */
 	protected function __construct() {
-		$icons_directory = __DIR__ . '/../../../packages/icons/src/';
+		$icons_directory = gutenberg_dir_path() . 'packages/icons/src';
 		$icons_directory = trailingslashit( $icons_directory );
 		$manifest_path   = $icons_directory . 'manifest.php';
 
