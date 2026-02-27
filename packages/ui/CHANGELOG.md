@@ -12,6 +12,7 @@
 
 ### Internal
 
+-   `InputLayout`: Replace slot context with data attributes for cross-version compatibility ([#76011](https://github.com/WordPress/gutenberg/pull/76011)).
 -   Update `@base-ui/react` from 1.0.0 to 1.2.0 ([#75698](https://github.com/WordPress/gutenberg/pull/75698)).
 -   `Input`: Align ref type with upstream widening to `HTMLElement` ([#75698](https://github.com/WordPress/gutenberg/pull/75698)).
 
