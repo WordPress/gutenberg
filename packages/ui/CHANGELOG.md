@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `Text` primitive with predefined typographic variants (`heading-2xl` through `heading-sm`, `body-xl` through `body-sm`) built on design tokens.
+-   Add `Text` primitive with predefined typographic variants (`heading-2xl` through `heading-sm`, `body-xl` through `body-sm`) built on design tokens. ([#75870](https://github.com/WordPress/gutenberg/pull/75870))
 
 ### Bug Fixes
 
