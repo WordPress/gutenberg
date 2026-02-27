@@ -280,10 +280,11 @@ export default function TemplatePartEdit( {
 					</TagName>
 				) }
 				<BlockSettingsMenuControls>
-					{ ( { selectedClientIds } ) => {
+					{ ( { selectedClientIds, isContentOnly } ) => {
 						// Only enable for single selection that matches the current block.
 						// Ensures menu item doesn't render multiple times.
 						if (
+							isContentOnly ||
 							! (
 								selectedClientIds.length === 1 &&
 								clientId === selectedClientIds[ 0 ]
