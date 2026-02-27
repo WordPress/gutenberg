@@ -86,6 +86,7 @@ zip --recurse-paths --no-dir-entries \
 	build-module \
 	readme.txt \
 	changelog.txt \
-	README.md
+	README.md \
+	--exclude "build/modules/**/*.map"
 
 success "Done. You've built Gutenberg! 🎉 "

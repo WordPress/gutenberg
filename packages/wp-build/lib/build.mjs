@@ -559,7 +559,7 @@ async function bundlePackage( packageName, options = {} ) {
 						`${ fileName }.min.js`
 					),
 					bundle: true,
-					sourcemap: true,
+					sourcemap: false,
 					format: 'esm',
 					target,
 					platform: 'browser',
@@ -573,30 +573,38 @@ async function bundlePackage( packageName, options = {} ) {
 							true // Generate asset file for minified build
 						),
 					],
-				} ),
-				esbuild.build( {
-					entryPoints: [ entryPoint ],
-					outfile: path.join(
-						rootBuildModuleDir,
-						`${ fileName }.js`
-					),
-					bundle: true,
-					sourcemap: true,
-					format: 'esm',
-					target,
-					platform: 'browser',
-					minify: false,
-					define: getDefine( true ),
-					plugins: [
-						wordpressExternalsPlugin(
-							`${ baseFileName }.min`,
-							'esm',
-							[],
-							false // Skip asset file for non-minified build
-						),
-					],
 				} )
 			);
+
+			// Skip unminified builds for packages with wpWorkers.
+			// These packages contain inlined WASM where unminified
+			// output provides no debugging value and adds ~10MB.
+			if ( ! packageJson.wpWorkers ) {
+				builds.push(
+					esbuild.build( {
+						entryPoints: [ entryPoint ],
+						outfile: path.join(
+							rootBuildModuleDir,
+							`${ fileName }.js`
+						),
+						bundle: true,
+						sourcemap: false,
+						format: 'esm',
+						target,
+						platform: 'browser',
+						minify: false,
+						define: getDefine( true ),
+						plugins: [
+							wordpressExternalsPlugin(
+								`${ baseFileName }.min`,
+								'esm',
+								[],
+								false // Skip asset file for non-minified build
+							),
+						],
+					} )
+				);
+			}
 
 			const scriptModuleId =
 				exportName === '.'

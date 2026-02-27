@@ -28,13 +28,21 @@ if ( ! function_exists( '{{PREFIX}}_register_script_modules' ) ) {
 			$asset_path = $modules_dir . '/' . $module['asset'];
 			$asset = file_exists( $asset_path ) ? require $asset_path : array();
 
+			$module_extension = $extension;
+			if ( '.js' === $extension ) {
+				$unminified_path = $modules_dir . '/' . $module['path'] . '.js';
+				if ( ! file_exists( $unminified_path ) ) {
+					$module_extension = '.min.js';
+				}
+			}
+
 			// Deregister first to override any previously registered version
 			// (e.g., Core's default modules when running as a plugin).
 			wp_deregister_script_module( $module['id'] );
 
 			wp_register_script_module(
 				$module['id'],
-				$base_url . $module['path'] . $extension,
+				$base_url . $module['path'] . $module_extension,
 				$asset['module_dependencies'] ?? array(),
 				$asset['version'] ?? false,
 				array(
