@@ -24,17 +24,8 @@ export interface InputLayoutProps
 	suffix?: React.ReactNode;
 }
 
-export type InputLayoutSlotType = 'prefix' | 'suffix';
-
 export interface InputLayoutSlotProps
-	extends Omit< React.HTMLAttributes< HTMLDivElement >, 'type' > {
-	/**
-	 * The type of the slot.
-	 *
-	 * When not provided, the type will be automatically inferred from the
-	 * `InputLayout` context if the slot is used within a `prefix` or `suffix`.
-	 */
-	type?: InputLayoutSlotType;
+	extends React.HTMLAttributes< HTMLDivElement > {
 	/**
 	 * The padding of the slot.
 	 *
