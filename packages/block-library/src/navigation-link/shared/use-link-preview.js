@@ -44,18 +44,18 @@ export function isHomepage( url, homeUrl ) {
 	}
 	try {
 		const urlParsed = new URL( url, homeUrl );
-		const siteParsed = new URL( homeUrl );
+		const homeParsed = new URL( homeUrl );
 
-		// Same host (sub.homepage.com !== homepage.com unless homeUrl is sub.homepage.com)
-		if ( urlParsed.hostname !== siteParsed.hostname ) {
+		// Same host, i.e. sub.homepage.com or homepage.com
+		if ( urlParsed.hostname !== homeParsed.hostname ) {
 			return false;
 		}
 
 		// Path must match site root (normalize trailing slash)
 		const urlPath = urlParsed.pathname.replace( /\/$/, '' );
-		const sitePath = siteParsed.pathname.replace( /\/$/, '' );
+		const homePath = homeParsed.pathname.replace( /\/$/, '' );
 
-		return urlPath === sitePath;
+		return urlPath === homePath;
 	} catch {
 		return false;
 	}
