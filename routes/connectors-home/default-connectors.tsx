@@ -16,6 +16,35 @@ import { __ } from '@wordpress/i18n';
 import { useConnectorPlugin } from './use-connector-plugin';
 import { OpenAILogo, ClaudeLogo, GeminiLogo } from './logos';
 
+interface ProviderData {
+	name: string;
+	description: string;
+	credentialsUrl: string | null;
+	settings: string[];
+}
+
+/**
+ * Reads provider data passed from PHP via the script module data mechanism.
+ */
+function getProviderData(): Record< string, ProviderData > {
+	try {
+		const parsed = JSON.parse(
+			document.getElementById(
+				'wp-script-module-data-connectors-wp-admin'
+			)?.textContent ?? ''
+		);
+		return parsed?.providers ?? {};
+	} catch {
+		return {};
+	}
+}
+
+const PROVIDER_LOGOS: Record< string, React.ComponentType > = {
+	google: GeminiLogo,
+	openai: OpenAILogo,
+	anthropic: ClaudeLogo,
+};
+
 const ConnectedBadge = () => (
 	<span
 		style={ {
@@ -35,9 +64,9 @@ const ConnectedBadge = () => (
 interface ConnectorConfig {
 	pluginSlug: string;
 	settingName: string;
-	helpUrl: string;
-	helpLabel: string;
-	Logo: React.ComponentType;
+	helpUrl?: string;
+	helpLabel?: string;
+	Logo?: React.ComponentType;
 }
 
 function ProviderConnector( {
@@ -68,7 +97,7 @@ function ProviderConnector( {
 	return (
 		<ConnectorItem
 			className={ `connector-item--${ pluginSlug }` }
-			icon={ <Logo /> }
+			icon={ Logo ? <Logo /> : undefined }
 			name={ label }
 			description={ description }
 			actionArea={
@@ -109,69 +138,33 @@ function ProviderConnector( {
 	);
 }
 
-// OpenAI connector render component
-function OpenAIConnector( props: ConnectorRenderProps ) {
-	return (
-		<ProviderConnector
-			{ ...props }
-			pluginSlug="ai-provider-for-openai"
-			settingName="connectors_ai_openai_api_key"
-			helpUrl="https://platform.openai.com"
-			helpLabel="platform.openai.com"
-			Logo={ OpenAILogo }
-		/>
-	);
-}
-
-// Claude connector render component
-function ClaudeConnector( props: ConnectorRenderProps ) {
-	return (
-		<ProviderConnector
-			{ ...props }
-			pluginSlug="ai-provider-for-anthropic"
-			settingName="connectors_ai_anthropic_api_key"
-			helpUrl="https://console.anthropic.com"
-			helpLabel="console.anthropic.com"
-			Logo={ ClaudeLogo }
-		/>
-	);
-}
-
-// Gemini connector render component
-function GeminiConnector( props: ConnectorRenderProps ) {
-	return (
-		<ProviderConnector
-			{ ...props }
-			pluginSlug="ai-provider-for-google"
-			settingName="connectors_ai_google_api_key"
-			helpUrl="https://aistudio.google.com"
-			helpLabel="aistudio.google.com"
-			Logo={ GeminiLogo }
-		/>
-	);
-}
-
-// Register built-in connectors
+// Register connectors from server-provided provider data.
 export function registerDefaultConnectors() {
-	registerConnector( 'core/openai', {
-		label: __( 'OpenAI' ),
-		description: __(
-			'Text, image, and code generation with GPT and DALL-E.'
-		),
-		render: OpenAIConnector,
-	} );
+	const providers = getProviderData();
 
-	registerConnector( 'core/claude', {
-		label: __( 'Claude' ),
-		description: __( 'Writing, research, and analysis with Claude.' ),
-		render: ClaudeConnector,
-	} );
+	for ( const [ providerId, data ] of Object.entries( providers ) ) {
+		const settingName = data.settings[ 0 ];
+		if ( ! settingName ) {
+			continue;
+		}
 
-	registerConnector( 'core/gemini', {
-		label: __( 'Gemini' ),
-		description: __(
-			"Content generation, translation, and vision with Google's Gemini."
-		),
-		render: GeminiConnector,
-	} );
+		const helpLabel = data.credentialsUrl
+			?.replace( /^https?:\/\//, '' )
+			.replace( /\/$/, '' );
+
+		registerConnector( `core/${ providerId }`, {
+			label: data.name,
+			description: data.description,
+			render: ( props: ConnectorRenderProps ) => (
+				<ProviderConnector
+					{ ...props }
+					pluginSlug={ `ai-provider-for-${ providerId }` }
+					settingName={ settingName }
+					helpUrl={ data.credentialsUrl ?? undefined }
+					helpLabel={ helpLabel }
+					Logo={ PROVIDER_LOGOS[ providerId ] }
+				/>
+			),
+		} );
+	}
 }
