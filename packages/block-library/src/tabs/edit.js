@@ -110,72 +110,70 @@ function Edit( {
 	);
 
 	/**
-	 * Sync tabs-menu-item blocks when a core/tab is deleted directly.
+	 * Keep tabs and menu items in sync when either is deleted directly (e.g.
+	 * via the Backspace key or List View).
 	 */
-	const prevTabClientIdsRef = useRef( null );
+	const prevSyncStateRef = useRef( null );
 	useEffect( () => {
-		const currentClientIds = tabs.map( ( tab ) => tab.clientId );
-		const prevClientIds = prevTabClientIdsRef.current;
+		const currentTabIds = tabs.map( ( tab ) => tab.clientId );
 
-		prevTabClientIdsRef.current = currentClientIds;
-
-		// Skip on initial render.
-		if ( prevClientIds === null ) {
+		if ( prevSyncStateRef.current === null ) {
+			prevSyncStateRef.current = {
+				tabIds: currentTabIds,
+				menuItemIds: [ ...menuItemClientIds ],
+			};
 			return;
 		}
 
-		// Only act on tab removals.
-		if ( currentClientIds.length >= prevClientIds.length ) {
+		const { tabIds: prevTabIds, menuItemIds: prevMenuIds } =
+			prevSyncStateRef.current;
+
+		const tabsRemoved = currentTabIds.length < prevTabIds.length;
+		const menuItemsRemoved = menuItemClientIds.length < prevMenuIds.length;
+
+		// Update snapshot to the current state.
+		prevSyncStateRef.current = {
+			tabIds: currentTabIds,
+			menuItemIds: [ ...menuItemClientIds ],
+		};
+
+		// Lists are in sync, nothing changed, or toolbar already removed both.
+		if (
+			( ! tabsRemoved && ! menuItemsRemoved ) ||
+			( tabsRemoved && menuItemsRemoved )
+		) {
 			return;
 		}
 
-		// If menu items are already in sync, the toolbar already handled removal.
-		if ( menuItemClientIds.length <= currentClientIds.length ) {
-			return;
+		if ( tabsRemoved ) {
+			// A tab was removed without its menu item. Find which one and remove it.
+			prevTabIds.forEach( ( id, index ) => {
+				if (
+					! currentTabIds.includes( id ) &&
+					menuItemClientIds[ index ]
+				) {
+					const menuItemId = menuItemClientIds[ index ];
+					removeBlock( menuItemId, false );
+					prevSyncStateRef.current.menuItemIds =
+						prevSyncStateRef.current.menuItemIds.filter(
+							( mId ) => mId !== menuItemId
+						);
+				}
+			} );
+		} else {
+			// A menu item was removed without its tab. Find which one and remove it.
+			prevMenuIds.forEach( ( id, index ) => {
+				if ( ! menuItemClientIds.includes( id ) && tabs[ index ] ) {
+					const tabClientId = tabs[ index ].clientId;
+					removeBlock( tabClientId, false );
+					prevSyncStateRef.current.tabIds =
+						prevSyncStateRef.current.tabIds.filter(
+							( tId ) => tId !== tabClientId
+						);
+				}
+			} );
 		}
-
-		// Remove the menu item for each tab that was deleted.
-		prevClientIds.forEach( ( id, index ) => {
-			if (
-				! currentClientIds.includes( id ) &&
-				menuItemClientIds[ index ]
-			) {
-				removeBlock( menuItemClientIds[ index ], false );
-			}
-		} );
 	}, [ tabs, menuItemClientIds, removeBlock ] );
-
-	/**
-	 * Sync core/tab blocks when a core/tabs-menu-item is deleted directly.
-	 */
-	const prevMenuItemClientIdsRef = useRef( null );
-	useEffect( () => {
-		const prevMenuItemIds = prevMenuItemClientIdsRef.current;
-
-		prevMenuItemClientIdsRef.current = menuItemClientIds;
-
-		// Skip on initial render.
-		if ( prevMenuItemIds === null ) {
-			return;
-		}
-
-		// Only act on menu item removals.
-		if ( menuItemClientIds.length >= prevMenuItemIds.length ) {
-			return;
-		}
-
-		// If tabs are already in sync, the toolbar already handled removal.
-		if ( tabs.length <= menuItemClientIds.length ) {
-			return;
-		}
-
-		// Remove the tab for each menu item that was deleted.
-		prevMenuItemIds.forEach( ( id, index ) => {
-			if ( ! menuItemClientIds.includes( id ) && tabs[ index ] ) {
-				removeBlock( tabs[ index ].clientId, false );
-			}
-		} );
-	}, [ menuItemClientIds, tabs, removeBlock ] );
 
 	/**
 	 * Memoize context value to prevent unnecessary re-renders.
