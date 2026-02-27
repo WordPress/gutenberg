@@ -68,8 +68,8 @@ function render_block_core_cover( $attributes, $content ) {
 						$query_params['playsinline']    = '1';
 
 						$path                     = $parsed_url['path'] ?? '';
-						$path_segments            = explode('/', $path);
-						$video_id                 = end($path_segments);
+						$path_segments            = explode( '/', $path );
+						$video_id                 = end( $path_segments );
 						$query_params['playlist'] = $video_id;
 					} elseif ( 'vimeo' === $provider ) {
 						$query_params['autoplay']    = '1';
