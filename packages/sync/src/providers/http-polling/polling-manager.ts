@@ -241,9 +241,10 @@ function processDocUpdate(
 }
 
 let areListenersRegistered = false;
+let hasCollaborators = false;
+let isActiveBrowser = 'visible' === document.visibilityState;
 let isPolling = false;
 let isUnloadPending = false;
-let isActiveBrowser = document.visibilityState === 'visible';
 let pollInterval = POLLING_INTERVAL_IN_MS;
 let pollingTimeoutId: ReturnType< typeof setTimeout > | null = null;
 
@@ -280,7 +281,7 @@ function handlePageHide(): void {
 }
 
 /**
- * Toggle visibility state of browser tab.
+ * Hangle change in visibility state of browser tab.
  *
  * Used to trigger a slow down of the collaboration syncs when the
  * browser tab becomes inactive (either the user switches tabs or the
@@ -288,9 +289,10 @@ function handlePageHide(): void {
  *
  * Fires on the document's visibilitychange event.
  */
-function toggleVisibilityChange() {
+function handleVisibilityChange() {
 	const wasActive = isActiveBrowser;
 	isActiveBrowser = document.visibilityState === 'visible';
+
 	if ( isActiveBrowser && ! wasActive ) {
 		/*
 		 * Remove scheduled polling and repoll immediately when reactivated.
@@ -348,11 +350,6 @@ function poll(): void {
 		try {
 			const { rooms } = await postSyncUpdate( payload );
 
-			// Reset poll interval on success.
-			pollInterval = isActiveBrowser
-				? POLLING_INTERVAL_IN_MS
-				: POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
-
 			// Emit 'connected' status.
 			roomStates.forEach( ( state ) => {
 				state.onStatusChange( { status: 'connected' } );
@@ -372,9 +369,7 @@ function poll(): void {
 				// If there is another collaborator, resume the queue for the next poll
 				// and increase polling frequency.
 				if ( Object.keys( room.awareness ).length > 1 ) {
-					pollInterval = isActiveBrowser
-						? POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS
-						: POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
+					hasCollaborators = true;
 					roomState.updateQueue.resume();
 				}
 
@@ -405,6 +400,15 @@ function poll(): void {
 					);
 				}
 			} );
+
+			// Recalculate polling interval.
+			if ( isActiveBrowser && hasCollaborators ) {
+				pollInterval = POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS;
+			} else if ( isActiveBrowser ) {
+				pollInterval = POLLING_INTERVAL_IN_MS;
+			} else {
+				pollInterval = POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
+			}
 		} catch ( error ) {
 			// Exponential backoff on error: double the backoff time, up to max
 			pollInterval = Math.min(
@@ -505,7 +509,7 @@ function registerRoom( {
 	if ( ! areListenersRegistered ) {
 		window.addEventListener( 'beforeunload', handleBeforeUnload );
 		window.addEventListener( 'pagehide', handlePageHide );
-		document.addEventListener( 'visibilitychange', toggleVisibilityChange );
+		document.addEventListener( 'visibilitychange', handleVisibilityChange );
 		areListenersRegistered = true;
 	}
 
@@ -539,7 +543,7 @@ function unregisterRoom( room: string ): void {
 		window.removeEventListener( 'pagehide', handlePageHide );
 		document.removeEventListener(
 			'visibilitychange',
-			toggleVisibilityChange
+			handleVisibilityChange
 		);
 		areListenersRegistered = false;
 	}
