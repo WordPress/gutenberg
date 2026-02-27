@@ -5,6 +5,7 @@ import { createBlock } from '@wordpress/blocks';
 import { addSubmenu } from '@wordpress/icons';
 import { MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockSettingsMenuControls,
@@ -15,6 +16,7 @@ import {
  * Internal dependencies
  */
 import { DEFAULT_BLOCK } from '../constants';
+import { NavigationLinkUI } from './navigation-link-ui';
 
 const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [
 	'core/navigation-link',
@@ -46,6 +48,8 @@ function AddSubmenuItem( {
 					DEFAULT_BLOCK.attributes
 				);
 
+				let expandClientId = clientId;
+
 				if ( block.name === 'core/navigation-submenu' ) {
 					insertBlock(
 						newLink,
@@ -74,17 +78,20 @@ function AddSubmenuItem( {
 						[ newLink ],
 						updateSelectionOnInsert
 					);
+
+					expandClientId = newSubmenu.clientId;
 				}
 
 				if ( setInsertedBlock ) {
-					// This call sets the local List View state for the "last inserted block".
-					// This is required for the Nav Block to determine whether or not to display
-					// the Link UI for this new block.
 					setInsertedBlock( newLink );
 				}
 
-				if ( expandedState && expand && ! expandedState[ clientId ] ) {
-					expand( clientId );
+				if (
+					expandedState &&
+					expand &&
+					! expandedState[ expandClientId ]
+				) {
+					expand( expandClientId );
 				}
 				onClose();
 			} }
@@ -95,15 +102,27 @@ function AddSubmenuItem( {
 }
 
 export default function AddSubmenuFill( { navigationBlockClientId } ) {
+	const [ insertedBlock, setInsertedBlock ] = useState( null );
+
 	return (
-		<BlockSettingsMenuControls supportsContentOnly>
-			{ ( fillProps ) => (
-				<AddSubmenuFillContent
-					navigationBlockClientId={ navigationBlockClientId }
-					{ ...fillProps }
+		<>
+			<BlockSettingsMenuControls supportsContentOnly>
+				{ ( fillProps ) => (
+					<AddSubmenuFillContent
+						navigationBlockClientId={ navigationBlockClientId }
+						setInsertedBlock={ setInsertedBlock }
+						{ ...fillProps }
+					/>
+				) }
+			</BlockSettingsMenuControls>
+			{ insertedBlock && (
+				<NavigationLinkUI
+					block={ insertedBlock }
+					insertedBlock={ insertedBlock }
+					setInsertedBlock={ setInsertedBlock }
 				/>
 			) }
-		</BlockSettingsMenuControls>
+		</>
 	);
 }
 
