@@ -250,7 +250,7 @@ describe( 'mergeActiveViewOverrides', () => {
 				},
 			};
 			const result = mergeActiveViewOverrides( view, {
-				groupBy: { field: 'status', direction: 'asc', showLabel: true },
+				groupBy: { showLabel: true },
 			} );
 			expect( result.groupBy ).toEqual( {
 				field: 'status',
@@ -447,7 +447,7 @@ describe( 'stripActiveViewOverrides', () => {
 				},
 			};
 			const result = stripActiveViewOverrides( view, {
-				groupBy: { field: 'status', direction: 'asc', showLabel: true },
+				groupBy: { showLabel: true },
 			} );
 			expect( result.groupBy ).toEqual( {
 				field: 'status',
