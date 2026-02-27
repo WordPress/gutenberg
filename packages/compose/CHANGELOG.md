@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `useFocusOnMount`: In `firstInputElement` mode, retry focus until the input element is available (up to 200ms) before falling back, so async-loaded controls (e.g. DataViews select fields) receive focus correctly ([#75540](https://github.com/WordPress/gutenberg/issues/75540)).
+
 ## 7.40.0 (2026-02-18)
 
 ## 7.39.0 (2026-01-29)

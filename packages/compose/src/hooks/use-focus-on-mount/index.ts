@@ -66,8 +66,11 @@ export function useFocusOnMount(
 			return;
 		}
 
-		const timerId = setTimeout( () => {
-			// For 'firstInputElement' mode, try to find a form input element first
+		let timerId: ReturnType< typeof setTimeout >;
+		let searchCounter = 0;
+
+		const tryFocus = () => {
+			// For 'firstInputElement' mode, try to find a form input element first.
 			if ( focusOnMountRef.current === 'firstInputElement' ) {
 				const formInput = node.querySelector< HTMLElement >(
 					'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
@@ -77,6 +80,13 @@ export function useFocusOnMount(
 					setFocus( formInput );
 					return;
 				}
+
+				// If the input isn't available yet (e.g. async loading controls),
+				// retry until the deadline before falling back.
+				if ( searchCounter++ < 4 ) {
+					timerId = setTimeout( tryFocus, 50 );
+					return;
+				}
 			}
 
 			// Fallback to the first tabbable element
@@ -84,7 +94,9 @@ export function useFocusOnMount(
 			if ( firstTabbable ) {
 				setFocus( firstTabbable );
 			}
-		}, 0 );
+		};
+
+		timerId = setTimeout( tryFocus, 0 );
 
 		return () => {
 			clearTimeout( timerId );
