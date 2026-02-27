@@ -467,6 +467,10 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			const targetCompositeItemId = generateCompositeId( itemIdPrefix );
 
 			setActiveCompositeId( targetCompositeItemId );
+			// The active composite item is controlled state that
+			// can update without needing a focus move (e.g., searching
+			// can trigger an active ID update). Only move DOM focus
+			// when it's already within the list.
 			if (
 				compositeRef.current?.contains(
 					compositeRef.current.ownerDocument.activeElement
