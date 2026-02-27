@@ -3,6 +3,8 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { dispatch, select } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -29,6 +31,19 @@ export async function fetchContentGuidelines(): Promise< RestGuidelinesResponse 
 
 		return response;
 	} catch ( error: unknown ) {
+		const { createErrorNotice } = dispatch( noticesStore ) as {
+			createErrorNotice: (
+				message: string,
+				options?: { type?: 'snackbar' | 'default'; context?: string }
+			) => void;
+		};
+
+		createErrorNotice(
+			__(
+				'There was an error loading your content guidelines. Please try again.'
+			),
+			{ type: 'snackbar' }
+		);
 		throw error;
 	}
 }
@@ -74,6 +89,8 @@ export async function saveContentGuidelines(): Promise< RestGuidelinesResponse >
 		data.id = id;
 	}
 
+	const { createSuccessNotice, createErrorNotice } = dispatch( noticesStore );
+
 	try {
 		const hasExistingId = !! ( id && id > 0 );
 		const path = hasExistingId
@@ -89,8 +106,18 @@ export async function saveContentGuidelines(): Promise< RestGuidelinesResponse >
 
 		setFromResponse( response );
 
+		createSuccessNotice( __( 'Content guidelines saved.' ), {
+			type: 'snackbar',
+		} );
+
 		return response;
 	} catch ( error: unknown ) {
+		createErrorNotice(
+			__(
+				'There was an error saving your content guidelines. Please try again.'
+			),
+			{ type: 'snackbar' }
+		);
 		throw error;
 	}
 }
