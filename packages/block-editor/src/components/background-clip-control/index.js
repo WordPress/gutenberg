@@ -121,9 +121,7 @@ export default function BackgroundClipControl( { value, onChange } ) {
 								className:
 									'block-editor-background-clip-control__dropdown-toggle',
 								'aria-expanded': dropdownIsOpen,
-								'aria-label': __(
-									'Background clipping options'
-								),
+								'aria-label': __( 'Background clip options' ),
 							} }
 						/>
 					);
@@ -136,7 +134,7 @@ export default function BackgroundClipControl( { value, onChange } ) {
 					>
 						<VStack spacing={ 2 }>
 							<span className="block-editor-background-clip-control__popover-title">
-								{ __( 'Clipping' ) }
+								{ __( 'Background clip' ) }
 							</span>
 							<div
 								role="listbox"
