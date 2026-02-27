@@ -11,12 +11,13 @@
  * @access private
  *
  * @param string $key The API key to mask.
- * @return string The masked key, e.g. "••••••••••••fj39".
+ * @return string The masked key, e.g. "************fj39".
  */
 function _gutenberg_mask_api_key( string $key ): string {
 	if ( strlen( $key ) <= 4 ) {
 		return $key;
 	}
+
 	return str_repeat( "\u{2022}", min( strlen( $key ) - 4, 16 ) ) . substr( $key, -4 );
 }
 
@@ -34,6 +35,15 @@ function _gutenberg_is_api_key_valid( string $key, string $provider_id ): ?bool 
 		$registry = \WordPress\AiClient\AiClient::defaultRegistry();
 
 		if ( ! $registry->hasProvider( $provider_id ) ) {
+			_doing_it_wrong(
+				__FUNCTION__,
+				sprintf(
+					/* translators: %s: AI provider ID. */
+					__( 'The provider "%s" is not registered in the AI client registry.', 'gutenberg' ),
+					$provider_id
+				),
+				'7.0.0'
+			);
 			return null;
 		}
 
@@ -43,33 +53,9 @@ function _gutenberg_is_api_key_valid( string $key, string $provider_id ): ?bool 
 		);
 
 		return $registry->isProviderConfigured( $provider_id );
-	} catch ( \Error $e ) {
+	} catch ( Exception $e ) {
+		wp_trigger_error( __FUNCTION__, $e->getMessage() );
 		return null;
-	}
-}
-
-/**
- * Sets the API key authentication for a provider on the WP AI Client registry.
- *
- * @access private
- *
- * @param string $key         The API key.
- * @param string $provider_id The WP AI client provider ID.
- */
-function _gutenberg_set_provider_api_key( string $key, string $provider_id ): void {
-	try {
-		$registry = \WordPress\AiClient\AiClient::defaultRegistry();
-
-		if ( ! $registry->hasProvider( $provider_id ) ) {
-			return;
-		}
-
-		$registry->setProviderRequestAuthentication(
-			$provider_id,
-			new \WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication( $key )
-		);
-	} catch ( \Error $e ) {
-		// WP AI Client not available.
 	}
 }
 
@@ -88,149 +74,68 @@ function _gutenberg_get_real_api_key( string $option_name, callable $mask_callba
 	remove_filter( "option_{$option_name}", $mask_callback );
 	$value = get_option( $option_name, '' );
 	add_filter( "option_{$option_name}", $mask_callback );
-	return $value;
-}
-
-// --- Google ---
-
-/**
- * Masks the Google API key on read.
- *
- * @access private
- *
- * @param string $value The raw option value.
- * @return string Masked key or empty string.
- */
-function _gutenberg_mask_google_api_key( string $value ): string {
-	if ( '' === $value ) {
-		return $value;
-	}
-	return _gutenberg_mask_api_key( $value );
+	return (string) $value;
 }
 
 /**
- * Sanitizes and validates the Google API key before saving.
+ * Gets the registered connector provider settings.
  *
  * @access private
  *
- * @param string $value The new value.
- * @return string The sanitized value, or empty string if the key is not valid.
+ * @return array<string, array{provider: string, label: string, description: string, mask: callable, sanitize: callable}> Provider settings keyed by setting name.
  */
-function _gutenberg_sanitize_google_api_key( string $value ): string {
-	$value = sanitize_text_field( $value );
-	if ( '' === $value ) {
-		return $value;
-	}
-	$valid = _gutenberg_is_api_key_valid( $value, 'google' );
-	return true === $valid ? $value : '';
-}
-
-// --- OpenAI ---
-
-/**
- * Masks the OpenAI API key on read.
- *
- * @access private
- *
- * @param string $value The raw option value.
- * @return string Masked key or empty string.
- */
-function _gutenberg_mask_openai_api_key( string $value ): string {
-	if ( '' === $value ) {
-		return $value;
-	}
-	return _gutenberg_mask_api_key( $value );
-}
-
-/**
- * Sanitizes and validates the OpenAI API key before saving.
- *
- * @access private
- *
- * @param string $value The new value.
- * @return string The sanitized value, or empty string if the key is not valid.
- */
-function _gutenberg_sanitize_openai_api_key( string $value ): string {
-	$value = sanitize_text_field( $value );
-	if ( '' === $value ) {
-		return $value;
-	}
-	$valid = _gutenberg_is_api_key_valid( $value, 'openai' );
-	return true === $valid ? $value : '';
-}
-
-// --- Anthropic ---
-
-/**
- * Masks the Anthropic API key on read.
- *
- * @access private
- *
- * @param string $value The raw option value.
- * @return string Masked key or empty string.
- */
-function _gutenberg_mask_anthropic_api_key( string $value ): string {
-	if ( '' === $value ) {
-		return $value;
-	}
-	return _gutenberg_mask_api_key( $value );
-}
-
-/**
- * Sanitizes and validates the Anthropic API key before saving.
- *
- * @access private
- *
- * @param string $value The new value.
- * @return string The sanitized value, or empty string if the key is not valid.
- */
-function _gutenberg_sanitize_anthropic_api_key( string $value ): string {
-	$value = sanitize_text_field( $value );
-	if ( '' === $value ) {
-		return $value;
-	}
-	$valid = _gutenberg_is_api_key_valid( $value, 'anthropic' );
-	return true === $valid ? $value : '';
-}
-
-// --- Connector definitions ---
-
-/**
- * Gets the provider connectors.
- *
- * @access private
- *
- * @return array<string, array{ provider: string, mask: callable, sanitize: callable }> Connectors.
- */
-function _gutenberg_get_connectors(): array {
-	return array(
-		'connectors_ai_google_api_key'    => array(
-			'provider' => 'google',
-			'mask'     => '_gutenberg_mask_google_api_key',
-			'sanitize' => '_gutenberg_sanitize_google_api_key',
+function _gutenberg_get_provider_settings(): array {
+	$providers = array(
+		'google'    => array(
+			'name' => 'Google',
 		),
-		'connectors_ai_openai_api_key'    => array(
-			'provider' => 'openai',
-			'mask'     => '_gutenberg_mask_openai_api_key',
-			'sanitize' => '_gutenberg_sanitize_openai_api_key',
+		'openai'    => array(
+			'name' => 'OpenAI',
 		),
-		'connectors_ai_anthropic_api_key' => array(
-			'provider' => 'anthropic',
-			'mask'     => '_gutenberg_mask_anthropic_api_key',
-			'sanitize' => '_gutenberg_sanitize_anthropic_api_key',
+		'anthropic' => array(
+			'name' => 'Anthropic',
 		),
 	);
-}
 
-// --- REST API filtering ---
+	$provider_settings = array();
+	foreach ( $providers as $provider => $data ) {
+		$setting_name = "connectors_ai_{$provider}_api_key";
+
+		$provider_settings[ $setting_name ] = array(
+			'provider'    => $provider,
+			'label'       => sprintf(
+				/* translators: %s: AI provider name. */
+				__( '%s API Key', 'gutenberg' ),
+				$data['name']
+			),
+			'description' => sprintf(
+				/* translators: %s: AI provider name. */
+				__( 'API key for the %s AI provider.', 'gutenberg' ),
+				$data['name']
+			),
+			'mask'        => '_gutenberg_mask_api_key',
+			'sanitize'    => static function ( string $value ) use ( $provider ): string {
+				$value = sanitize_text_field( $value );
+				if ( '' === $value ) {
+					return $value;
+				}
+
+				$valid = _gutenberg_is_api_key_valid( $value, $provider );
+				return true === $valid ? $value : '';
+			},
+		);
+	}
+
+	return $provider_settings;
+}
 
 /**
  * Validates connector API keys in the REST response when explicitly requested.
  *
- * Runs on `rest_post_dispatch` for `/wp/v2/settings` requests that include
- * connector fields via `_fields`. For each requested connector field, reads
- * the real (unmasked) key, validates it against the provider, and replaces
- * the response value with 'invalid_key' if validation fails.
+ * Runs on `rest_post_dispatch` for `/wp/v2/settings` requests that include connector
+ * fields via `_fields`. For each requested connector field, it validates the unmasked
+ * key against the provider and replaces the response value with `invalid_key` if
+ * validation fails.
  *
  * @access private
  *
@@ -244,25 +149,38 @@ function _gutenberg_validate_connector_keys_in_rest( WP_REST_Response $response,
 		return $response;
 	}
 
+	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
+		return $response;
+	}
+
 	$fields = $request->get_param( '_fields' );
 	if ( ! $fields ) {
 		return $response;
 	}
 
-	$requested  = array_map( 'trim', explode( ',', $fields ) );
-	$data       = $response->get_data();
-	$connectors = _gutenberg_get_connectors();
+	if ( is_array( $fields ) ) {
+		$requested = $fields;
+	} else {
+		$requested = array_map( 'trim', explode( ',', $fields ) );
+	}
 
-	foreach ( $connectors as $option_name => $config ) {
-		if ( ! in_array( $option_name, $requested, true ) ) {
+	$data = $response->get_data();
+	if ( ! is_array( $data ) ) {
+		return $response;
+	}
+
+	foreach ( _gutenberg_get_provider_settings() as $setting_name => $config ) {
+		if ( ! in_array( $setting_name, $requested, true ) ) {
 			continue;
 		}
-		$real_key = _gutenberg_get_real_api_key( $option_name, $config['mask'] );
+
+		$real_key = _gutenberg_get_real_api_key( $setting_name, $config['mask'] );
 		if ( '' === $real_key ) {
 			continue;
 		}
+
 		if ( true !== _gutenberg_is_api_key_valid( $real_key, $config['provider'] ) ) {
-			$data[ $option_name ] = 'invalid_key';
+			$data[ $setting_name ] = 'invalid_key';
 		}
 	}
 
@@ -272,10 +190,8 @@ function _gutenberg_validate_connector_keys_in_rest( WP_REST_Response $response,
 remove_filter( 'rest_post_dispatch', '_wp_connectors_validate_keys_in_rest', 10 );
 add_filter( 'rest_post_dispatch', '_gutenberg_validate_connector_keys_in_rest', 10, 3 );
 
-// --- Registration ---
-
 /**
- * Registers the default connector settings, mask filters, and validation filters.
+ * Registers default connector settings and mask/sanitize filters.
  *
  * @access private
  */
@@ -284,27 +200,27 @@ function _gutenberg_register_default_connector_settings(): void {
 		return;
 	}
 
-	$connectors = _gutenberg_get_connectors();
-
-	foreach ( $connectors as $option_name => $config ) {
+	foreach ( _gutenberg_get_provider_settings() as $setting_name => $config ) {
 		register_setting(
 			'connectors',
-			$option_name,
+			$setting_name,
 			array(
 				'type'              => 'string',
+				'label'             => $config['label'],
+				'description'       => $config['description'],
 				'default'           => '',
 				'show_in_rest'      => true,
 				'sanitize_callback' => $config['sanitize'],
 			)
 		);
-		add_filter( "option_{$option_name}", $config['mask'] );
+		add_filter( "option_{$setting_name}", $config['mask'] );
 	}
 }
 remove_action( 'init', '_wp_register_default_connector_settings' );
 add_action( 'init', '_gutenberg_register_default_connector_settings' );
 
 /**
- * Passes the default connector API keys to the WP AI client.
+ * Passes stored connector API keys to the WP AI client.
  *
  * @access private
  */
@@ -313,13 +229,21 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 		return;
 	}
 
-	$connectors = _gutenberg_get_connectors();
+	try {
+		$registry = \WordPress\AiClient\AiClient::defaultRegistry();
+		foreach ( _gutenberg_get_provider_settings() as $setting_name => $config ) {
+			$api_key = _gutenberg_get_real_api_key( $setting_name, $config['mask'] );
+			if ( '' === $api_key || ! $registry->hasProvider( $config['provider'] ) ) {
+				continue;
+			}
 
-	foreach ( $connectors as $option_name => $config ) {
-		$api_key = _gutenberg_get_real_api_key( $option_name, $config['mask'] );
-		if ( ! empty( $api_key ) ) {
-			_gutenberg_set_provider_api_key( $api_key, $config['provider'] );
+			$registry->setProviderRequestAuthentication(
+				$config['provider'],
+				new \WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication( $api_key )
+			);
 		}
+	} catch ( Exception $e ) {
+		wp_trigger_error( __FUNCTION__, $e->getMessage() );
 	}
 }
 remove_action( 'init', '_wp_connectors_pass_default_keys_to_ai_client' );
