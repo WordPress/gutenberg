@@ -82,50 +82,114 @@ function _gutenberg_get_real_api_key( string $option_name, callable $mask_callba
  *
  * @access private
  *
- * @return array<string, array{provider: string, label: string, description: string, mask: callable, sanitize: callable}> Provider settings keyed by setting name.
+ * @return array {
+ *     Provider settings keyed by provider ID.
+ *
+ *     @type array ...$0 {
+ *         Data for a single provider.
+ *
+ *         @type string      $name            The provider's display name.
+ *         @type string      $description     The provider's description.
+ *         @type string|null $credentials_url URL where users can obtain API credentials.
+ *         @type array       $settings        {
+ *             Settings keyed by setting name.
+ *
+ *             @type array ...$0 {
+ *                 Data for a single setting.
+ *
+ *                 @type string   $label       The setting label.
+ *                 @type string   $description The setting description.
+ *                 @type callable $sanitize    Callback to sanitize the input value.
+ *             }
+ *         }
+ *     }
+ * }
  */
 function _gutenberg_get_provider_settings(): array {
 	$providers = array(
 		'google'    => array(
-			'name' => 'Google',
+			'name'            => 'Gemini',
+			'description'     => __( 'Content generation, translation, and vision with Google\'s Gemini.', 'gutenberg' ),
+			'credentials_url' => 'https://aistudio.google.com/',
 		),
 		'openai'    => array(
-			'name' => 'OpenAI',
+			'name'            => 'OpenAI',
+			'description'     => __( 'Text, image, and code generation with GPT and DALL-E.', 'gutenberg' ),
+			'credentials_url' => 'https://platform.openai.com/',
 		),
 		'anthropic' => array(
-			'name' => 'Anthropic',
+			'name'            => 'Claude',
+			'description'     => __( 'Writing, research, and analysis with Claude.', 'gutenberg' ),
+			'credentials_url' => 'https://console.anthropic.com/',
 		),
 	);
+
+	$registry = \WordPress\AiClient\AiClient::defaultRegistry();
+
+	foreach ( $registry->getRegisteredProviderIds() as $provider_id ) {
+		$provider_class_name = $registry->getProviderClassName( $provider_id );
+		$provider_metadata   = $provider_class_name::metadata();
+
+		$auth_method = $provider_metadata->getAuthenticationMethod();
+		if ( null === $auth_method || ! $auth_method->isApiKey() ) {
+			continue;
+		}
+
+		$registry_data = array_filter(
+			array(
+				'name'            => $provider_metadata->getName(),
+				'credentials_url' => $provider_metadata->getCredentialsUrl(),
+			)
+		);
+
+		if ( isset( $providers[ $provider_id ] ) ) {
+			// Merge non-empty registry data over hardcoded fallbacks.
+			$providers[ $provider_id ] = array_merge( $providers[ $provider_id ], $registry_data );
+		} else {
+			$providers[ $provider_id ] = array_merge(
+				array(
+					'name'            => '',
+					'description'     => '',
+					'credentials_url' => null,
+				),
+				$registry_data
+			);
+		}
+	}
 
 	$provider_settings = array();
 	foreach ( $providers as $provider => $data ) {
 		$setting_name = "connectors_ai_{$provider}_api_key";
 
-		$provider_settings[ $setting_name ] = array(
-			'provider'    => $provider,
-			'label'       => sprintf(
-				/* translators: %s: AI provider name. */
-				__( '%s API Key', 'gutenberg' ),
-				$data['name']
-			),
-			'description' => sprintf(
-				/* translators: %s: AI provider name. */
-				__( 'API key for the %s AI provider.', 'gutenberg' ),
-				$data['name']
-			),
-			'mask'        => '_gutenberg_mask_api_key',
-			'sanitize'    => static function ( string $value ) use ( $provider ): string {
-				$value = sanitize_text_field( $value );
-				if ( '' === $value ) {
-					return $value;
-				}
+		$provider_settings[ $provider ] = array(
+			'name'            => $data['name'],
+			'description'     => $data['description'],
+			'credentials_url' => $data['credentials_url'],
+			'settings'        => array(
+				$setting_name => array(
+					'label'       => sprintf(
+						/* translators: %s: AI provider name. */
+						__( '%s API Key', 'gutenberg' ),
+						$data['name']
+					),
+					'description' => sprintf(
+						/* translators: %s: AI provider name. */
+						__( 'API key for the %s AI provider.', 'gutenberg' ),
+						$data['name']
+					),
+					'sanitize'    => static function ( string $value ) use ( $provider ): string {
+						$value = sanitize_text_field( $value );
+						if ( '' === $value ) {
+							return $value;
+						}
 
-				$valid = _gutenberg_is_api_key_valid( $value, $provider );
-				return true === $valid ? $value : '';
-			},
+						$valid = _gutenberg_is_api_key_valid( $value, $provider );
+						return true === $valid ? $value : '';
+					},
+				),
+			),
 		);
 	}
-
 	return $provider_settings;
 }
 
@@ -169,18 +233,20 @@ function _gutenberg_validate_connector_keys_in_rest( WP_REST_Response $response,
 		return $response;
 	}
 
-	foreach ( _gutenberg_get_provider_settings() as $setting_name => $config ) {
-		if ( ! in_array( $setting_name, $requested, true ) ) {
-			continue;
-		}
+	foreach ( _gutenberg_get_provider_settings() as $provider => $provider_data ) {
+		foreach ( $provider_data['settings'] as $setting_name => $config ) {
+			if ( ! in_array( $setting_name, $requested, true ) ) {
+				continue;
+			}
 
-		$real_key = _gutenberg_get_real_api_key( $setting_name, $config['mask'] );
-		if ( '' === $real_key ) {
-			continue;
-		}
+			$real_key = _gutenberg_get_real_api_key( $setting_name, '_gutenberg_mask_api_key' );
+			if ( '' === $real_key ) {
+				continue;
+			}
 
-		if ( true !== _gutenberg_is_api_key_valid( $real_key, $config['provider'] ) ) {
-			$data[ $setting_name ] = 'invalid_key';
+			if ( true !== _gutenberg_is_api_key_valid( $real_key, $provider ) ) {
+				$data[ $setting_name ] = 'invalid_key';
+			}
 		}
 	}
 
@@ -200,20 +266,22 @@ function _gutenberg_register_default_connector_settings(): void {
 		return;
 	}
 
-	foreach ( _gutenberg_get_provider_settings() as $setting_name => $config ) {
-		register_setting(
-			'connectors',
-			$setting_name,
-			array(
-				'type'              => 'string',
-				'label'             => $config['label'],
-				'description'       => $config['description'],
-				'default'           => '',
-				'show_in_rest'      => true,
-				'sanitize_callback' => $config['sanitize'],
-			)
-		);
-		add_filter( "option_{$setting_name}", $config['mask'] );
+	foreach ( _gutenberg_get_provider_settings() as $provider_data ) {
+		foreach ( $provider_data['settings'] as $setting_name => $config ) {
+			register_setting(
+				'connectors',
+				$setting_name,
+				array(
+					'type'              => 'string',
+					'label'             => $config['label'],
+					'description'       => $config['description'],
+					'default'           => '',
+					'show_in_rest'      => true,
+					'sanitize_callback' => $config['sanitize'],
+				)
+			);
+			add_filter( "option_{$setting_name}", '_gutenberg_mask_api_key' );
+		}
 	}
 }
 remove_action( 'init', '_wp_register_default_connector_settings' );
@@ -231,16 +299,18 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 
 	try {
 		$registry = \WordPress\AiClient\AiClient::defaultRegistry();
-		foreach ( _gutenberg_get_provider_settings() as $setting_name => $config ) {
-			$api_key = _gutenberg_get_real_api_key( $setting_name, $config['mask'] );
-			if ( '' === $api_key || ! $registry->hasProvider( $config['provider'] ) ) {
-				continue;
-			}
+		foreach ( _gutenberg_get_provider_settings() as $provider => $provider_data ) {
+			foreach ( $provider_data['settings'] as $setting_name => $config ) {
+				$api_key = _gutenberg_get_real_api_key( $setting_name, '_gutenberg_mask_api_key' );
+				if ( '' === $api_key || ! $registry->hasProvider( $provider ) ) {
+					continue;
+				}
 
-			$registry->setProviderRequestAuthentication(
-				$config['provider'],
-				new \WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication( $api_key )
-			);
+				$registry->setProviderRequestAuthentication(
+					$provider,
+					new \WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication( $api_key )
+				);
+			}
 		}
 	} catch ( Exception $e ) {
 		wp_trigger_error( __FUNCTION__, $e->getMessage() );
