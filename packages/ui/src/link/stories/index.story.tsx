@@ -46,11 +46,3 @@ export const AllVariants: Story = {
 		</Stack>
 	),
 };
-
-export const WithRenderProp: Story = {
-	render: () => (
-		<Link href="#" render={ <span /> }>
-			A link rendered as a span
-		</Link>
-	),
-};
