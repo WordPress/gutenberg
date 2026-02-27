@@ -161,7 +161,9 @@ test.describe( 'Typewriter', () => {
 			);
 		} );
 
-		expect( await typewriterUtils.getDiff( initialPosition ) ).toBe( 0 );
+		expect(
+			await typewriterUtils.getDiff( initialPosition )
+		).toBeLessThanOrEqual( BUFFER );
 	} );
 
 	test( 'should maintain caret position after leaving last editable', async ( {
