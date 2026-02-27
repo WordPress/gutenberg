@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `Text` primitive with predefined typographic variants (`heading-2xl` through `heading-sm`, `body-xl` through `body-sm`) built on design tokens.
+
 ### Bug Fixes
 
 -   `VisuallyHidden`: Add `word-break: normal` to prevent text wrapping issues in screen reader content ([#75539](https://github.com/WordPress/gutenberg/pull/75539)).
