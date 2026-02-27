@@ -11,7 +11,7 @@ export const DEFAULT_VIEW: View = {
 		field: 'title',
 		direction: 'asc' as const,
 	},
-	fields: [ 'author', 'active', 'slug', 'post_types' ],
+	fields: [ 'author', 'active', 'slug' ],
 	titleField: 'title',
 	descriptionField: 'description',
 	mediaField: 'preview',
@@ -20,7 +20,7 @@ export const DEFAULT_VIEW: View = {
 
 export const DEFAULT_VIEW_LEGACY: View = {
 	...DEFAULT_VIEW,
-	fields: [ 'author', 'post_types' ],
+	fields: [ 'author' ],
 };
 
 export const DEFAULT_LAYOUTS = {

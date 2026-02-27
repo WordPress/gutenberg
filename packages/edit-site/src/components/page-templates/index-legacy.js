@@ -99,18 +99,26 @@ export default function PageTemplates() {
 		} ) );
 	}, [ records ] );
 
+	const hasPostTypes = useMemo(
+		() =>
+			records?.some(
+				( record ) => record.post_types && record.post_types.length > 0
+			),
+		[ records ]
+	);
+
 	const fields = useMemo(
 		() => [
 			previewField,
 			templateTitleField,
 			descriptionField,
-			postTypesField,
+			...( hasPostTypes ? [ postTypesField ] : [] ),
 			{
 				...authorField,
 				elements: authors,
 			},
 		],
-		[ authors ]
+		[ authors, hasPostTypes ]
 	);
 
 	const { data, paginationInfo } = useMemo( () => {

@@ -212,7 +212,7 @@ export const postTypesField = {
 	render: function Render( { item } ) {
 		const postTypes = item.post_types;
 		if ( ! postTypes || postTypes.length === 0 ) {
-			return null;
+			return <span>{ '\u2014' }</span>;
 		}
 		return postTypes.join( ', ' );
 	},

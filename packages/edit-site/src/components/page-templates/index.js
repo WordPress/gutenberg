@@ -224,6 +224,13 @@ export default function PageTemplates() {
 	} );
 	const dateField = postTypeFields.find( ( field ) => field.id === 'date' );
 	const themeField = useThemeField();
+	const hasPostTypes = useMemo(
+		() =>
+			records.some(
+				( record ) => record.post_types && record.post_types.length > 0
+			),
+		[ records ]
+	);
 	const fields = useMemo( () => {
 		const _fields = [
 			previewField,
@@ -231,8 +238,10 @@ export default function PageTemplates() {
 			descriptionField,
 			activeField,
 			slugField,
-			postTypesField,
 		];
+		if ( hasPostTypes ) {
+			_fields.push( postTypesField );
+		}
 		if ( activeView === 'user' ) {
 			_fields.push( themeField );
 			if ( dateField ) {
@@ -251,7 +260,7 @@ export default function PageTemplates() {
 			elements,
 		} );
 		return _fields;
-	}, [ users, activeView, themeField, dateField ] );
+	}, [ users, activeView, themeField, dateField, hasPostTypes ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( records, view, fields );

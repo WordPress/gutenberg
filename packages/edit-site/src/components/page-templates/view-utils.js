@@ -20,7 +20,7 @@ export const DEFAULT_VIEW = {
 	titleField: 'title',
 	descriptionField: 'description',
 	mediaField: 'preview',
-	fields: [ 'author', 'active', 'slug', 'post_types', 'theme' ],
+	fields: [ 'author', 'active', 'slug', 'theme' ],
 	filters: [],
 	...defaultLayouts.grid,
 };
