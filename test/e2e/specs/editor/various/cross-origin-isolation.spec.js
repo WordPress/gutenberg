@@ -6,6 +6,19 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 /** @typedef {import('@playwright/test').Page} Page */
 /** @typedef {import('@wordpress/e2e-test-utils-playwright').Editor} Editor */
 
+/**
+ * Returns the major Chrome version from the browser's user agent, or 0 if not Chromium.
+ *
+ * @param {Page} page Playwright page object.
+ * @return {Promise<number>} Major Chrome version.
+ */
+async function getChromeMajorVersion( page ) {
+	return page.evaluate( () => {
+		const match = window.navigator.userAgent.match( /Chrome\/(\d+)/ );
+		return match ? parseInt( match[ 1 ], 10 ) : 0;
+	} );
+}
+
 const EMBED_URLS = [
 	'/oembed/1.0/proxy',
 	`rest_route=${ encodeURIComponent( '/oembed/1.0/proxy' ) }`,
@@ -36,7 +49,13 @@ test.use( {
 } );
 
 test.describe( 'Cross-origin isolation', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, page } ) => {
+		// These tests only apply when COEP/COOP is used (Chrome < 137).
+		// On Chrome 137+, Document-Isolation-Policy is used instead.
+		test.skip(
+			( await getChromeMajorVersion( page ) ) >= 137,
+			'COEP/COOP not used on Chrome 137+ (uses Document-Isolation-Policy)'
+		);
 		await admin.createNewPost();
 	} );
 
@@ -106,13 +125,8 @@ test.describe( 'Cross-origin isolation', () => {
 test.describe( 'Document-Isolation-Policy', () => {
 	test.beforeEach( async ( { admin, page } ) => {
 		// These tests only apply to Chrome 137+.
-		const chromeVersion = await page.evaluate( () => {
-			const match = window.navigator.userAgent.match( /Chrome\/(\d+)/ );
-			return match ? parseInt( match[ 1 ], 10 ) : 0;
-		} );
-
 		test.skip(
-			chromeVersion < 137,
+			( await getChromeMajorVersion( page ) ) < 137,
 			'Document-Isolation-Policy requires Chrome 137+'
 		);
 
