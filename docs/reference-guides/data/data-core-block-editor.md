@@ -1587,6 +1587,8 @@ Action that resets blocks state to the specified array of blocks, taking precede
 _Parameters_
 
 -   _blocks_ `Array`: Array of blocks.
+-   _options_ `Object`: Optional options.
+-   _options.isExternal_ `boolean`: Whether this reset is from an external action (e.g. real-time collaboration).
 
 ### resetSelection
 

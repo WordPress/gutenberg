@@ -2254,7 +2254,7 @@ export function insertionPoint( state = null, action ) {
  *
  * @return {Object} Updated state.
  */
-function openedListViewPanels(
+export function openedListViewPanels(
 	state = { allOpen: false, panels: {} },
 	action
 ) {
@@ -2293,9 +2293,15 @@ function openedListViewPanels(
 			} );
 			return hasChanges ? { ...state, panels: newPanels } : state;
 		}
-		case 'RESET_BLOCKS':
-			// Clear all panel state when blocks are reset
+		case 'RESET_BLOCKS': {
+			// Ignore external resets (like from real-time collaboration) and
+			// keep the user's sidebar from collapsing due to remote changes.
+			if ( action.isExternal ) {
+				return state;
+			}
+
 			return { allOpen: false, panels: {} };
+		}
 	}
 	return state;
 }
