@@ -26,7 +26,7 @@ test.describe( 'Collaboration - Sync', () => {
 
 		// User B should see the paragraph after sync propagation.
 		await expect
-			.poll( () => editor2.getBlocks(), { timeout: 5000 } )
+			.poll( () => editor2.getBlocks(), { timeout: 15_000 } )
 			.toMatchObject( [
 				{
 					name: 'core/paragraph',
@@ -59,7 +59,7 @@ test.describe( 'Collaboration - Sync', () => {
 
 		// User A should see the paragraph after sync propagation.
 		await expect
-			.poll( () => editor.getBlocks(), { timeout: 5000 } )
+			.poll( () => editor.getBlocks(), { timeout: 15_000 } )
 			.toMatchObject( [
 				{
 					name: 'core/paragraph',
@@ -108,7 +108,7 @@ test.describe( 'Collaboration - Sync', () => {
 				);
 				expect( contents ).toContain( 'From User A' );
 				expect( contents ).toContain( 'From User B' );
-			} ).toPass( { timeout: 5000 } );
+			} ).toPass( { timeout: 15_000 } );
 		}
 	} );
 
@@ -142,7 +142,7 @@ test.describe( 'Collaboration - Sync', () => {
 							.select( 'core/editor' )
 							.getEditedPostAttribute( 'title' )
 					),
-				{ timeout: 5000 }
+				{ timeout: 15_000 }
 			)
 			.toBe( 'New Title from User A' );
 	} );

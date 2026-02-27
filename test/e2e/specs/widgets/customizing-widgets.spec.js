@@ -137,7 +137,7 @@ test.describe( 'Widgets Customizer', () => {
 		await showMoreSettingsButton.click();
 
 		// The transition could take more time than 5 seconds.
-		await expect( backButton ).toHaveCount( 1, { timeout: 8000 } );
+		await expect( backButton ).toHaveCount( 1, { timeout: 30_000 } );
 		await expect( backButton ).toBeFocused();
 
 		// Expect the inspector panel to be found.

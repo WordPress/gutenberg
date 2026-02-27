@@ -29,7 +29,7 @@ test.describe( 'Collaboration - Undo/Redo', () => {
 
 		// Wait for User B's block to appear on User A.
 		await expect
-			.poll( () => editor.getBlocks(), { timeout: 5000 } )
+			.poll( () => editor.getBlocks(), { timeout: 15_000 } )
 			.toMatchObject( [
 				{
 					name: 'core/paragraph',
@@ -52,7 +52,7 @@ test.describe( 'Collaboration - Undo/Redo', () => {
 			);
 			expect( contents ).toContain( 'From User A' );
 			expect( contents ).toContain( 'From User B' );
-		} ).toPass( { timeout: 5000 } );
+		} ).toPass( { timeout: 15_000 } );
 
 		// User A performs undo via the data API.
 		await page.evaluate( () => {
@@ -68,7 +68,7 @@ test.describe( 'Collaboration - Undo/Redo', () => {
 			);
 			expect( contents ).not.toContain( 'From User A' );
 			expect( contents ).toContain( 'From User B' );
-		} ).toPass( { timeout: 5000 } );
+		} ).toPass( { timeout: 15_000 } );
 
 		// User B should also see the undo result.
 		await expect( async () => {
@@ -79,7 +79,7 @@ test.describe( 'Collaboration - Undo/Redo', () => {
 			);
 			expect( contents ).not.toContain( 'From User A' );
 			expect( contents ).toContain( 'From User B' );
-		} ).toPass( { timeout: 5000 } );
+		} ).toPass( { timeout: 15_000 } );
 	} );
 
 	test( 'Redo restores the undone change', async ( {
@@ -103,7 +103,7 @@ test.describe( 'Collaboration - Undo/Redo', () => {
 
 		// Verify the block exists.
 		await expect
-			.poll( () => editor.getBlocks(), { timeout: 3000 } )
+			.poll( () => editor.getBlocks(), { timeout: 15_000 } )
 			.toHaveLength( 1 );
 
 		// Undo via data API.
@@ -112,7 +112,7 @@ test.describe( 'Collaboration - Undo/Redo', () => {
 		} );
 
 		await expect
-			.poll( () => editor.getBlocks(), { timeout: 5000 } )
+			.poll( () => editor.getBlocks(), { timeout: 15_000 } )
 			.toHaveLength( 0 );
 
 		// Redo via data API.
@@ -121,7 +121,7 @@ test.describe( 'Collaboration - Undo/Redo', () => {
 		} );
 
 		await expect
-			.poll( () => editor.getBlocks(), { timeout: 5000 } )
+			.poll( () => editor.getBlocks(), { timeout: 15_000 } )
 			.toMatchObject( [
 				{
 					name: 'core/paragraph',

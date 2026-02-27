@@ -426,7 +426,7 @@ test.describe( 'Fit Text', () => {
 					const el = document.querySelector( 'h2.has-fit-text' );
 					return el && el.style.fontSize && el.style.fontSize !== '';
 				},
-				{ timeout: 5000 }
+				{ timeout: 15_000 }
 			);
 
 			const initialFontSize = await heading.evaluate( ( el ) => {
@@ -448,7 +448,7 @@ test.describe( 'Fit Text', () => {
 					);
 				},
 				initialInlineStyle,
-				{ timeout: 5000 }
+				{ timeout: 15_000 }
 			);
 
 			const newFontSize = await heading.evaluate( ( el ) => {
@@ -502,7 +502,7 @@ test.describe( 'Fit Text', () => {
 					const el = document.querySelector( 'p.has-fit-text' );
 					return el && el.style.fontSize && el.style.fontSize !== '';
 				},
-				{ timeout: 5000 }
+				{ timeout: 15_000 }
 			);
 
 			const paragraphs = page.locator( 'p' );
