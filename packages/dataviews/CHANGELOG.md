@@ -9,6 +9,7 @@
 - DataViews: Avoid flickering while refreshing. [#74572](https://github.com/WordPress/gutenberg/pull/74572)
 - DataViews: Fix spacing in first column. [#75693](https://github.com/WordPress/gutenberg/pull/75693)
 - DataViews: Remove visual divider between quick and regular actions in the actions menu. [#75893](https://github.com/WordPress/gutenberg/pull/75893)
+- DataForm: field label for panel layout are no longer uppercased. [#75944](https://github.com/WordPress/gutenberg/pull/75944)
 
 ### Enhancements
 
