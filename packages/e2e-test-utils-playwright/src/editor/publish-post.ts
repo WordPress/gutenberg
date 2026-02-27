@@ -22,9 +22,19 @@ export async function publishPost( this: Editor ) {
 		: publishButton;
 	await buttonToClick.click();
 
-	const entitiesSaveButton = this.page
-		.getByRole( 'region', { name: 'Editor publish' } )
-		.getByRole( 'button', { name: 'Save', exact: true } );
+	const publishRegion = this.page.getByRole( 'region', {
+		name: 'Editor publish',
+	} );
+
+	// Wait for the publish panel to render before checking its contents.
+	// In slower runtimes (e.g. Playground WASM), the panel may not appear
+	// immediately after the top-bar button click.
+	await publishRegion.waitFor();
+
+	const entitiesSaveButton = publishRegion.getByRole( 'button', {
+		name: 'Save',
+		exact: true,
+	} );
 	const isEntitiesSavePanelVisible = await entitiesSaveButton.isVisible();
 
 	// Save any entities.
@@ -34,10 +44,7 @@ export async function publishPost( this: Editor ) {
 	}
 
 	// Handle saving just the post.
-	await this.page
-		.getByRole( 'region', {
-			name: 'Editor publish',
-		} )
+	await publishRegion
 		.getByRole( 'button', { name: 'Publish', exact: true } )
 		.click();
 
