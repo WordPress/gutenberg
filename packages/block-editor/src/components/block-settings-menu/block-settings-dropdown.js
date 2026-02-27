@@ -223,20 +223,6 @@ export function BlockSettingsDropdown( {
 				onCopy,
 				onPasteStyles,
 			} ) => {
-				// It is possible that some plugins register fills for this menu
-				// even if Core doesn't render anything in the block settings menu.
-				// in which case, we may want to render the menu anyway.
-				// That said for now, we can start more conservative.
-				const isEmpty =
-					! canRemove &&
-					! canDuplicate &&
-					! canInsertBlock &&
-					isContentOnly;
-
-				if ( isEmpty ) {
-					return null;
-				}
-
 				return (
 					<DropdownMenu
 						icon={ moreVertical }
