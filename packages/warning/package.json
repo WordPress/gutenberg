@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/warning",
-	"version": "3.40.1-next.v.202602241322.0+bce7cff88",
+	"version": "3.40.0",
 	"description": "Warning utility for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

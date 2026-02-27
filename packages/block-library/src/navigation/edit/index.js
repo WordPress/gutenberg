@@ -55,7 +55,6 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
-import useNavigationEntities from '../use-navigation-entities';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
@@ -339,7 +338,10 @@ function Navigation( {
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
-	const { menus: classicMenus } = useNavigationEntities();
+	const { records: classicMenus } = useEntityRecords( 'root', 'menu', {
+		per_page: -1,
+		context: 'view',
+	} );
 
 	const [ showNavigationMenuStatusNotice, hideNavigationMenuStatusNotice ] =
 		useNavigationNotice( {

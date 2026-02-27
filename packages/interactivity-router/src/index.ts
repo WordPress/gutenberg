@@ -25,6 +25,7 @@ const {
 	routerRegions,
 	h: createElement,
 	navigationSignal,
+	sessionId,
 	warn,
 } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
@@ -515,7 +516,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 
 				window.history[
 					options.replace ? 'replaceState' : 'pushState'
-				]( {}, '', href );
+				]( { wpInteractivityId: sessionId }, '', href );
 
 				if ( screenReaderAnnouncement ) {
 					a11ySpeak( 'loaded' );

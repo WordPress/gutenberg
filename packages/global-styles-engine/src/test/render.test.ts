@@ -7,6 +7,7 @@ import {
 	generateCustomProperties,
 	transformToStyles,
 	getBlockSelectors,
+	generateGlobalStyles,
 } from '../core/render';
 import type { GlobalStylesConfig } from '../types';
 import {
@@ -691,6 +692,120 @@ describe( 'global styles renderer', () => {
 				transformToStyles( Object.freeze( tree ), 'body' )
 			).toEqual(
 				':root { --wp--style--global--content-size: 840px; --wp--style--global--wide-size: 1100px;}:where(body) {margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
+			);
+		} );
+	} );
+
+	describe( 'generateGlobalStyles', () => {
+		beforeEach( () => {
+			jest.clearAllMocks();
+			const mockSelect = require( '@wordpress/data' ).select as jest.Mock;
+			mockSelect.mockReturnValue( {
+				getBlockStyles: () => [],
+			} );
+		} );
+
+		it( 'should use css feature selector for block custom CSS when defined', () => {
+			const config = {
+				version: 3,
+				settings: {},
+				styles: {
+					blocks: {
+						'core/paragraph': {
+							css: 'color:red;',
+						},
+					},
+				},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/paragraph',
+					selectors: {
+						root: 'p',
+						css: '.custom-p',
+					},
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles( config, blockTypes );
+			const customCssStylesheet = styles.find(
+				( s: any ) => s.css && s.css.includes( 'color:red;' )
+			);
+			expect( customCssStylesheet ).toBeDefined();
+			expect( customCssStylesheet.css ).toContain(
+				':root :where(.custom-p){color:red;}'
+			);
+			expect( customCssStylesheet.css ).not.toContain(
+				':root :where(p){color:red;}'
+			);
+		} );
+
+		it( 'should use css feature selector object form with root subkey for block custom CSS', () => {
+			const config = {
+				version: 3,
+				settings: {},
+				styles: {
+					blocks: {
+						'core/paragraph': {
+							css: 'color:red;',
+						},
+					},
+				},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/paragraph',
+					selectors: {
+						root: 'p',
+						css: { root: '.custom-p' },
+					},
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles( config, blockTypes );
+			const customCssStylesheet = styles.find(
+				( s: any ) => s.css && s.css.includes( 'color:red;' )
+			);
+			expect( customCssStylesheet ).toBeDefined();
+			expect( customCssStylesheet.css ).toContain(
+				':root :where(.custom-p){color:red;}'
+			);
+			expect( customCssStylesheet.css ).not.toContain(
+				':root :where(p){color:red;}'
+			);
+		} );
+
+		it( 'should fall back to root selector for block custom CSS when no css feature selector is defined', () => {
+			const config = {
+				version: 3,
+				settings: {},
+				styles: {
+					blocks: {
+						'core/paragraph': {
+							css: 'color:red;',
+						},
+					},
+				},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/paragraph',
+					selectors: {
+						root: 'p',
+					},
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles( config, blockTypes );
+			const customCssStylesheet = styles.find(
+				( s: any ) => s.css && s.css.includes( 'color:red;' )
+			);
+			expect( customCssStylesheet ).toBeDefined();
+			expect( customCssStylesheet.css ).toContain(
+				':root :where(p){color:red;}'
 			);
 		} );
 	} );

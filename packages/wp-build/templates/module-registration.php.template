@@ -28,6 +28,10 @@ if ( ! function_exists( '{{PREFIX}}_register_script_modules' ) ) {
 			$asset_path = $modules_dir . '/' . $module['asset'];
 			$asset = file_exists( $asset_path ) ? require $asset_path : array();
 
+			// Deregister first to override any previously registered version
+			// (e.g., Core's default modules when running as a plugin).
+			wp_deregister_script_module( $module['id'] );
+
 			wp_register_script_module(
 				$module['id'],
 				$base_url . $module['path'] . $extension,
