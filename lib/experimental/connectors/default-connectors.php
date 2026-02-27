@@ -318,3 +318,30 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 }
 remove_action( 'init', '_wp_connectors_pass_default_keys_to_ai_client' );
 add_action( 'init', '_gutenberg_pass_default_connector_keys_to_ai_client' );
+
+/**
+ * Exposes connector provider settings to the connectors-wp-admin script module.
+ *
+ * @access private
+ *
+ * @param array $data Existing script module data.
+ * @return array Script module data with providers added.
+ */
+function _gutenberg_get_connector_provider_script_module_data( array $data ): array {
+	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
+		return $data;
+	}
+
+	$providers = array();
+	foreach ( _gutenberg_get_provider_settings() as $provider_id => $provider_data ) {
+		$providers[ $provider_id ] = array(
+			'name'           => $provider_data['name'],
+			'description'    => $provider_data['description'],
+			'credentialsUrl' => $provider_data['credentials_url'],
+			'settings'       => array_keys( $provider_data['settings'] ),
+		);
+	}
+	$data['providers'] = $providers;
+	return $data;
+}
+add_filter( 'script_module_data_connectors-wp-admin', '_gutenberg_get_connector_provider_script_module_data' );
