@@ -61,6 +61,7 @@ export function WaveformPlayer( { src, title, artist, image, onEnded } ) {
 			// injected dynamically, so getComputedStyle may return the
 			// default black on first render.
 			// Using a requestAnimationFrame loop isn't sufficient to solve the issue.
+			// TODO - find a better option than a setTimeout, so we're not relying on an arbitrary number.
 			const timeoutId = setTimeout( init, 100 );
 
 			return () => {
