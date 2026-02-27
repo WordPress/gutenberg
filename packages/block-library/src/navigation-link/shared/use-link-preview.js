@@ -63,7 +63,7 @@ export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
 			}
 			displayUrl = path;
 		} else {
-			// Different origin - this is an external link
+			// Different host - this is an external link
 			isExternal = true;
 		}
 	} catch ( e ) {
