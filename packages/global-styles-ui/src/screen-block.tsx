@@ -336,6 +336,10 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
+					defaultControls={ {
+						backgroundImage: true,
+						backgroundClip: true,
+					} }
 					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
 				/>
 			) }

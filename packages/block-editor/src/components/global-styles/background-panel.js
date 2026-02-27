@@ -17,6 +17,7 @@ import { setImmutably } from '../../utils/object';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
+	backgroundClip: true,
 };
 
 /**
