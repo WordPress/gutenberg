@@ -9,11 +9,11 @@ const env = require( '../env' );
  * Mocked dependencies
  */
 jest.spyOn( process, 'exit' ).mockImplementation( () => {} );
-jest.mock( 'ora', () => () => ( {
-	start() {
-		return { text: '', succeed: jest.fn(), fail: jest.fn() };
-	},
-} ) );
+jest.mock( 'ora', () => () => {
+	const spinner = { text: '', succeed: jest.fn(), fail: jest.fn() };
+	spinner.start = () => spinner;
+	return spinner;
+} );
 jest.mock( '../env', () => {
 	const actual = jest.requireActual( '../env' );
 	return {

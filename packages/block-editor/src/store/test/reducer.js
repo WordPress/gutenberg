@@ -46,7 +46,7 @@ import {
 } from '../reducer';
 
 import { unlock } from '../../lock-unlock';
-import { sectionRootClientIdKey } from '.././private-keys';
+import { sectionRootClientIdKey, isIsolatedEditorKey } from '.././private-keys';
 
 const { isContentBlock } = unlock( privateApis );
 
@@ -1839,6 +1839,43 @@ describe( 'state', () => {
 				'ribs',
 				'veggies',
 			] );
+		} );
+
+		it( 'should not remove last block when fromRootClientId is incorrect', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [
+							{
+								clientId: 'nested',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					},
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'nested' ],
+				fromRootClientId: '',
+				toRootClientId: '',
+				index: 0,
+			} );
+
+			// The state should be unchnaged - no blocks moved or removed.
+			expect( state.order.get( '' ) ).toEqual( [ 'chicken', 'ribs' ] );
 		} );
 
 		describe( 'blocks', () => {
@@ -3909,6 +3946,248 @@ describe( 'state', () => {
 				expect( derivedBlockEditingModes ).toEqual( new Map() );
 			} );
 
+			it( 'synced pattern inner blocks keep their editing modes when inside an editedContentOnlySection', () => {
+				// Set up an unsynced pattern containing a synced pattern.
+				// When the unsynced pattern is the editedContentOnlySection,
+				// synced pattern inner blocks should retain their locked modes
+				// rather than becoming fully editable ('default').
+				const stateWithSyncedInUnsynced = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ sectionRootClientIdKey ]: '',
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'unsynced-pattern-group',
+									attributes: {
+										metadata: {
+											patternName: 'test-pattern',
+										},
+									},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-in-unsynced',
+											attributes: {},
+											innerBlocks: [],
+										},
+										{
+											name: 'core/block',
+											clientId: 'synced-in-unsynced',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'synced-in-unsynced',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'synced-in-unsynced',
+							blocks: [
+								{
+									name: 'core/paragraph',
+									clientId: 'synced-inner-paragraph',
+									attributes: {},
+									innerBlocks: [],
+								},
+								{
+									name: 'core/group',
+									clientId: 'synced-inner-group',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId:
+												'synced-inner-paragraph-with-overrides',
+											attributes: {
+												metadata: {
+													bindings: {
+														__default:
+															'core/pattern-overrides',
+													},
+												},
+											},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+
+				// Start editing the unsynced pattern section.
+				const editingState = dispatchActions(
+					[
+						{
+							type: 'EDIT_CONTENT_ONLY_SECTION',
+							clientId: 'unsynced-pattern-group',
+						},
+					],
+					testReducer,
+					stateWithSyncedInUnsynced
+				);
+
+				expect( editingState.derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							// Root is outside the edited section.
+							'': 'disabled',
+							// The edited section itself is fully editable.
+							'unsynced-pattern-group': 'default',
+							// Non-synced child of the edited section is fully editable.
+							'paragraph-in-unsynced': 'default',
+							// synced-in-unsynced (core/block) has no derived mode —
+							// the synced pattern logic returns early without setting one.
+							// Inner blocks of the synced pattern retain their locked modes.
+							'synced-inner-paragraph': 'disabled',
+							'synced-inner-group': 'disabled',
+							'synced-inner-paragraph-with-overrides':
+								'contentOnly',
+						} )
+					)
+				);
+			} );
+
+			it( 'nested synced patterns remain disabled when inside an editedContentOnlySection', () => {
+				// Set up an unsynced pattern containing a synced pattern,
+				// which itself contains another synced pattern.
+				// All doubly-nested synced pattern blocks should remain disabled.
+				const stateWithNestedSynced = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ sectionRootClientIdKey ]: '',
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'unsynced-pattern-group',
+									attributes: {
+										metadata: {
+											patternName: 'test-pattern',
+										},
+									},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-in-unsynced',
+											attributes: {},
+											innerBlocks: [],
+										},
+										{
+											name: 'core/block',
+											clientId: 'synced-in-unsynced',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'synced-in-unsynced',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'synced-in-unsynced',
+							blocks: [
+								{
+									name: 'core/paragraph',
+									clientId:
+										'synced-inner-paragraph-with-overrides',
+									attributes: {
+										metadata: {
+											bindings: {
+												__default:
+													'core/pattern-overrides',
+											},
+										},
+									},
+									innerBlocks: [],
+								},
+								{
+									name: 'core/block',
+									clientId: 'nested-synced',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'nested-synced',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'nested-synced',
+							blocks: [
+								{
+									name: 'core/paragraph',
+									clientId: 'deeply-nested-paragraph',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+
+				// Start editing the unsynced pattern section.
+				const editingState = dispatchActions(
+					[
+						{
+							type: 'EDIT_CONTENT_ONLY_SECTION',
+							clientId: 'unsynced-pattern-group',
+						},
+					],
+					testReducer,
+					stateWithNestedSynced
+				);
+
+				expect( editingState.derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							// Root is outside the edited section.
+							'': 'disabled',
+							// The edited section itself is fully editable.
+							'unsynced-pattern-group': 'default',
+							// Non-synced child of the edited section is fully editable.
+							'paragraph-in-unsynced': 'default',
+							// synced-in-unsynced (core/block) has no derived mode.
+							// Its direct inner block with bindings retains contentOnly.
+							'synced-inner-paragraph-with-overrides':
+								'contentOnly',
+							// The doubly-nested synced pattern and its inner blocks
+							// are all disabled.
+							'nested-synced': 'disabled',
+							'deeply-nested-paragraph': 'disabled',
+						} )
+					)
+				);
+			} );
+
 			it( 'returns the expected block editing modes for synced patterns when switching to zoomed out mode', () => {
 				const { derivedBlockEditingModes } = dispatchActions(
 					[
@@ -4659,6 +4938,176 @@ describe( 'state', () => {
 				);
 
 				expect( derivedBlockEditingModes ).toEqual( new Map() );
+			} );
+		} );
+
+		describe( 'isIsolatedEditor setting', () => {
+			let stateWithUnsyncedPatternAndTemplatePart;
+			beforeAll( () => {
+				// Set up a state with both an unsynced pattern and a template part.
+				stateWithUnsyncedPatternAndTemplatePart = dispatchActions(
+					[
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'unsynced-pattern',
+									attributes: {
+										metadata: {
+											patternName: 'test-pattern',
+										},
+									},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'pattern-paragraph',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+								{
+									name: 'core/template-part',
+									clientId: 'template-part',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'template-part',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'template-part',
+							blocks: [
+								{
+									name: 'core/paragraph',
+									clientId: 'template-part-paragraph',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+			} );
+
+			it( 'applies contentOnly modes to unsynced patterns and template parts when isIsolatedEditor is false', () => {
+				expect(
+					stateWithUnsyncedPatternAndTemplatePart.derivedBlockEditingModes
+				).toEqual(
+					new Map(
+						Object.entries( {
+							'pattern-paragraph': 'contentOnly',
+							'template-part-paragraph': 'contentOnly',
+						} )
+					)
+				);
+			} );
+
+			it( 'clears contentOnly modes when isIsolatedEditor changes to true', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ isIsolatedEditorKey ]: true,
+							},
+						},
+					],
+					testReducer,
+					stateWithUnsyncedPatternAndTemplatePart
+				);
+
+				expect( derivedBlockEditingModes ).toEqual( new Map() );
+			} );
+
+			it( 'recomputes contentOnly modes when isIsolatedEditor changes from true to false', () => {
+				const stateWithIsolatedEditor = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ isIsolatedEditorKey ]: true,
+							},
+						},
+					],
+					testReducer,
+					stateWithUnsyncedPatternAndTemplatePart
+				);
+
+				// Verify that no derived modes exist with isIsolatedEditor enabled.
+				expect(
+					stateWithIsolatedEditor.derivedBlockEditingModes
+				).toEqual( new Map() );
+
+				// Now disable isIsolatedEditor and verify modes are recomputed.
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ isIsolatedEditorKey ]: false,
+							},
+						},
+					],
+					testReducer,
+					stateWithIsolatedEditor
+				);
+
+				expect( derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'pattern-paragraph': 'contentOnly',
+							'template-part-paragraph': 'contentOnly',
+						} )
+					)
+				);
+			} );
+
+			it( 'returns no derived editing modes for unsynced patterns when isIsolatedEditor is initially true', () => {
+				const stateWithIsolatedEditorFromStart = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ isIsolatedEditorKey ]: true,
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'group-1',
+									attributes: {
+										metadata: {
+											patternName: 'test-pattern',
+										},
+									},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+
+				expect(
+					stateWithIsolatedEditorFromStart.derivedBlockEditingModes
+				).toEqual( new Map() );
 			} );
 		} );
 

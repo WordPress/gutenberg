@@ -55,7 +55,6 @@
 		"ora": "^4.0.2",
 		"rimraf": "^5.0.10",
 		"simple-git": "^3.5.0",
-		"terminal-link": "^2.0.0",
 		"yargs": "^17.3.0"
 	},
 	"publishConfig": {

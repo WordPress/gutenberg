@@ -6,6 +6,8 @@ import {
 } from 'vite';
 import react from '@vitejs/plugin-react';
 import type { StorybookConfig } from '@storybook/react-vite';
+import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
+import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
 
 const { NODE_ENV = 'development' } = process.env;
 
@@ -77,6 +79,7 @@ const config: StorybookConfig = {
 	viteFinal: async ( viteConfig ) => {
 		return mergeConfig( viteConfig, {
 			plugins: [
+				dsTokenFallbacksJs(),
 				react( {
 					jsxImportSource: '@emotion/react',
 					babel: {
@@ -173,6 +176,13 @@ const config: StorybookConfig = {
 				'globalThis.SCRIPT_DEBUG': JSON.stringify(
 					NODE_ENV === 'development'
 				),
+			},
+			css: {
+				postcss: {
+					// Vite bundles its own PostCSS, creating a deep
+					// type incompatibility with the top-level PostCSS.
+					plugins: [ dsTokenFallbacks as any ],
+				},
 			},
 			optimizeDeps: {
 				esbuildOptions: {

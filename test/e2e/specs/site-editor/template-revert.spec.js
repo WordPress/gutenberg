@@ -238,28 +238,8 @@ class TemplateRevertUtils {
 	}
 
 	async getCurrentSiteEditorContent() {
-		return this.page.evaluate( () => {
-			const postId = window.wp.data
-				.select( 'core/editor' )
-				.getCurrentPostId();
-			const postType = window.wp.data
-				.select( 'core/editor' )
-				.getCurrentPostType();
-			const record = window.wp.data
-				.select( 'core' )
-				.getEditedEntityRecord( 'postType', postType, postId );
-			if ( record ) {
-				if ( typeof record.content === 'function' ) {
-					return record.content( record );
-				} else if ( record.blocks ) {
-					return window.wp.blocks.__unstableSerializeAndClean(
-						record.blocks
-					);
-				} else if ( record.content ) {
-					return record.content;
-				}
-			}
-			return '';
-		} );
+		return this.page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).getEditedPostContent()
+		);
 	}
 }

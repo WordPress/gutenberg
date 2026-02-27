@@ -102,7 +102,9 @@ function PatternsManageButton( { clientId } ) {
 						}
 					} }
 				>
-					{ __( 'Disconnect pattern' ) }
+					{ isSyncedPattern
+						? __( 'Disconnect pattern' )
+						: __( 'Detach pattern' ) }
 				</MenuItem>
 			) }
 			<MenuItem href={ managePatternsUrl }>

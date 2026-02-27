@@ -351,7 +351,12 @@ export const getCurrentRevision = createRegistrySelector(
 		if ( ! revisions ) {
 			return null;
 		}
-		return revisions.find( ( r ) => r.id === revisionId ) ?? null;
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revKey = entityConfig?.revisionKey || 'id';
+		return revisions.find( ( r ) => r[ revKey ] === revisionId ) ?? null;
 	}
 );
 
@@ -408,8 +413,13 @@ export const getPreviousRevision = createRegistrySelector(
 		);
 
 		// Find current revision index.
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revKey = entityConfig?.revisionKey || 'id';
 		const currentIndex = sortedRevisions.findIndex(
-			( r ) => r.id === currentRevisionId
+			( r ) => r[ revKey ] === currentRevisionId
 		);
 
 		// Return the previous revision (older one) if it exists.

@@ -297,8 +297,8 @@ const v4 = {
 			backgroundColor: isSolidColorStyle ? mainColor : undefined,
 			borderColor: isSolidColorStyle ? undefined : mainColor,
 			textAlign: isSolidColorStyle ? 'left' : undefined,
-			style,
 			...attributes,
+			style,
 		};
 	},
 };
@@ -454,8 +454,8 @@ const v3 = {
 			backgroundColor: isSolidColorStyle ? mainColor : undefined,
 			borderColor: isSolidColorStyle ? undefined : mainColor,
 			textAlign: isSolidColorStyle ? 'left' : undefined,
-			style,
 			...attributes,
+			style,
 		};
 	},
 };
@@ -572,8 +572,8 @@ const v2 = {
 			backgroundColor: isSolidColorStyle ? mainColor : undefined,
 			borderColor: isSolidColorStyle ? undefined : mainColor,
 			textAlign: isSolidColorStyle ? 'left' : undefined,
-			style,
 			...attributes,
+			style,
 		};
 	},
 };

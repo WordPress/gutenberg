@@ -1,13 +1,7 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
-	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
@@ -27,21 +21,19 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { useArchiveLabel } from './use-archive-label';
 import { usePostTypeLabel } from './use-post-type-label';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 const SUPPORTED_TYPES = [ 'archive', 'search', 'post-type' ];
 
-export default function QueryTitleEdit( {
-	attributes: {
-		type,
-		level,
-		levelOptions,
-		textAlign,
-		showPrefix,
-		showSearchTerm,
-	},
-	setAttributes,
-	context: { query },
-} ) {
+export default function QueryTitleEdit( props ) {
+	useDeprecatedTextAlign( props );
+
+	const {
+		attributes: { type, level, levelOptions, showPrefix, showSearchTerm },
+		setAttributes,
+		context: { query },
+	} = props;
+
 	const { archiveTypeLabel, archiveNameLabel } = useArchiveLabel();
 	const { postTypeLabel } = usePostTypeLabel( query?.postType );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -49,9 +41,7 @@ export default function QueryTitleEdit( {
 	const TagName = level === 0 ? 'p' : `h${ level }`;
 
 	const blockProps = useBlockProps( {
-		className: clsx( 'wp-block-query-title__placeholder', {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
+		className: 'wp-block-query-title__placeholder',
 	} );
 
 	if ( ! SUPPORTED_TYPES.includes( type ) ) {
@@ -238,12 +228,6 @@ export default function QueryTitleEdit( {
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}
-				/>
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
 				/>
 			</BlockControls>
 			{ titleElement }

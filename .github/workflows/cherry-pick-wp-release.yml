@@ -5,8 +5,10 @@ on:
         branches:
             - trunk
     # We also want to attempt cherry-picking when a PR is labeled after the PR
-    # is merged.
-    pull_request:
+    # is merged. Using pull_request_target instead of pull_request so that
+    # the workflow has access to repository secrets for fork PRs.
+    # https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#pull_request_target
+    pull_request_target:
         types: [labeled]
         branches:
             - trunk
@@ -78,7 +80,7 @@ jobs:
 
             - name: Checkout repository
               if: env.cherry_pick == 'true'
-              uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   token: ${{ secrets.GUTENBERG_TOKEN }}
                   fetch-depth: 0
