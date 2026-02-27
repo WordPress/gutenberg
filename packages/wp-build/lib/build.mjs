@@ -336,6 +336,11 @@ function transformPhpContent( content, transforms ) {
 
 	content = content.toString();
 
+	// Skip any transforms when building for WordPress Core.
+	if ( toBool( process.env.IS_WORDPRESS_CORE ) ) {
+		return content;
+	}
+
 	if ( prefixFunctions.length ) {
 		content = content.replace(
 			new RegExp( prefixFunctions.join( '|' ), 'g' ),
