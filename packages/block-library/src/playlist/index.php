@@ -100,8 +100,8 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	);
 
 	// Add waveform player container with translated button labels.
-	$label_play  = esc_attr__( 'Play', 'default' );
-	$label_pause = esc_attr__( 'Pause', 'default' );
+	$label_play  = esc_attr__( 'Play' );
+	$label_pause = esc_attr__( 'Pause' );
 	$html        = '<div class="wp-block-playlist__waveform-player"
 		data-wp-watch="callbacks.initWaveformPlayer"
 		data-label-play="' . $label_play . '"
