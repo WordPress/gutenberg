@@ -16,7 +16,6 @@
 - DataForm: Fix vertical alignment of summary fields in card layout. [#75864](https://github.com/WordPress/gutenberg/pull/75864)
 - DataViews: Remove visual divider between quick and regular actions in the actions menu. [#75893](https://github.com/WordPress/gutenberg/pull/75893)
 - DataForm: field label for panel layout are no longer uppercased. [#75944](https://github.com/WordPress/gutenberg/pull/75944)
-- DataViews: Align to end integer and number field types. [#75917](https://github.com/WordPress/gutenberg/pull/75917)
 
 ### Enhancements
 
