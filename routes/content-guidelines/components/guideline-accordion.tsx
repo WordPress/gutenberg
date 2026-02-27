@@ -39,6 +39,7 @@ export default function GuidelineAccordion( {
 	const headingId = useId();
 	const descriptionId = useId();
 
+	// @ts-ignore
 	const { setGuideline } = useDispatch( STORE_NAME );
 
 	const { value } = useSelect(
@@ -49,9 +50,12 @@ export default function GuidelineAccordion( {
 		[ slug ]
 	);
 
-	const handleSave = ( event: React.FormEvent< HTMLFormElement > ) => {
+	const [ draft, setDraft ] = useState( value );
+
+	const handleSave = ( event: SubmitEvent ) => {
 		event.preventDefault();
-		void saveContentGuidelines();
+		setGuideline( slug, draft );
+		saveContentGuidelines();
 	};
 
 	return (
@@ -116,10 +120,8 @@ export default function GuidelineAccordion( {
 						<TextareaControl
 							label={ __( 'Copy guidelines' ) }
 							hideLabelFromVision
-							value={ value }
-							onChange={ ( newValue: string ) => {
-								setGuideline( slug, newValue );
-							} }
+							value={ draft }
+							onChange={ setDraft }
 						/>
 						<Button
 							variant="primary"

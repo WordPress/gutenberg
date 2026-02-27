@@ -49,25 +49,22 @@ export async function fetchContentGuidelines(): Promise< RestGuidelinesResponse 
 }
 
 export async function saveContentGuidelines(): Promise< RestGuidelinesResponse > {
-	const { setFromResponse } = dispatch( STORE_NAME ) as {
-		setFromResponse: ( response: RestGuidelinesResponse ) => void;
-	};
+	// @ts-ignore
+	const { setFromResponse } = dispatch( STORE_NAME );
 
 	const guidelinesStore = select( STORE_NAME ) as {
 		getId: () => number | null;
 		getStatus: () => string | null;
 		getAllGuidelines: () => Partial< Record< string, string > >;
+		getGuideline: ( category: string ) => string;
 	};
 
 	const id = guidelinesStore.getId();
 	const status = guidelinesStore.getStatus() || 'draft';
 	const categories = guidelinesStore.getAllGuidelines();
 
-	const data: {
-		id?: number;
-		status: string;
-		guideline_categories: RestGuidelinesResponse[ 'guideline_categories' ];
-	} = {
+	const data = {
+		id: id && id > 0 ? id : undefined,
 		status,
 		guideline_categories: {
 			site: {
@@ -84,10 +81,6 @@ export async function saveContentGuidelines(): Promise< RestGuidelinesResponse >
 			},
 		},
 	};
-
-	if ( id && id > 0 ) {
-		data.id = id;
-	}
 
 	const { createSuccessNotice, createErrorNotice } = dispatch( noticesStore );
 

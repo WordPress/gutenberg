@@ -8,7 +8,7 @@ export const STORE_NAME = 'core/content-guidelines';
 export interface ContentGuidelinesState {
 	id: number | null;
 	status: string | null;
-	categories: Partial< Record< string, string > >;
+	categories: Record< string, string >;
 }
 
 const DEFAULT_STATE: ContentGuidelinesState = {
@@ -16,6 +16,8 @@ const DEFAULT_STATE: ContentGuidelinesState = {
 	status: null,
 	categories: {},
 };
+
+const CATEGORIES = [ 'site', 'copy', 'images', 'additional' ];
 
 const actions = {
 	setFromResponse( response: unknown ) {
@@ -48,17 +50,16 @@ function parseResponse( response: unknown ): Partial< ContentGuidelinesState > {
 
 	const categoriesFromResponse = data.guideline_categories ?? {};
 
-	const result: Partial< ContentGuidelinesState > = {
-		id: typeof data.id === 'number' ? data.id : null,
-		status: typeof data.status === 'string' ? data.status : null,
+	const result = {
+		id: data.id as number | null,
+		status: data.status as string | null,
 		categories: {},
 	};
 
-	[ 'site', 'copy', 'images', 'additional' ].forEach( ( slug ) => {
-		const guidelines = categoriesFromResponse?.[ slug ]?.guidelines;
+	CATEGORIES.forEach( ( category ) => {
+		const guidelines = categoriesFromResponse?.[ category ]?.guidelines;
 		if ( typeof guidelines === 'string' ) {
-			( result.categories as Record< string, string > )[ slug ] =
-				guidelines;
+			result.categories[ category ] = guidelines;
 		}
 	} );
 
@@ -89,8 +90,8 @@ function reducer(
 }
 
 const selectors = {
-	getGuideline( state: ContentGuidelinesState, slug: string ): string {
-		return state.categories[ slug ] ?? '';
+	getGuideline( state: ContentGuidelinesState, category: string ): string {
+		return state.categories[ category ] ?? '';
 	},
 	getAllGuidelines(
 		state: ContentGuidelinesState
