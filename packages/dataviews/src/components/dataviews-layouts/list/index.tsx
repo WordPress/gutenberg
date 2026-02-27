@@ -325,16 +325,17 @@ function ListItem< Item >( {
 						gap="xs"
 						className="dataviews-view-list__field-wrapper"
 					>
-						{ renderedTitleField && (
-							<Stack direction="row" align="center">
+						<Stack direction="row" align="center">
+							{ renderedTitleField && (
 								<div
 									className="dataviews-title-field dataviews-view-list__title-field"
 									id={ labelId }
 								>
 									{ renderedTitleField }
 								</div>
-							</Stack>
-						) }
+							) }
+							{ usedActions }
+						</Stack>
 						{ showDescription && descriptionField?.render && (
 							<div className="dataviews-view-list__field">
 								<descriptionField.render
@@ -368,8 +369,6 @@ function ListItem< Item >( {
 							) ) }
 						</div>
 					</Stack>
-
-					{ usedActions }
 				</Stack>
 			</Stack>
 		</Composite.Row>
