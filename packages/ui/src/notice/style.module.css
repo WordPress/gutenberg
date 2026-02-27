@@ -59,6 +59,7 @@
 		flex-wrap: wrap;
 	}
 
+	/* If .actions is not the only content, add top margin to match design specs */
 	.notice:has(.title) .actions,
 	.notice:has(.description) .actions {
 		margin-block-start: var(--wpds-dimension-gap-sm);
@@ -90,10 +91,12 @@
 			color: var(--wpds-color-fg-interactive-neutral-active);
 		}
 
+		/* Add more horizontal space when following another action link/button */
 		&:not(:first-child) {
 			margin-inline-start: var(--wpds-dimension-gap-xs);
 		}
 
+		/* Add more horizontal space when followed by another action link/button */
 		&:not(:last-child) {
 			margin-inline-end: var(--wpds-dimension-gap-xs);
 		}
@@ -135,6 +138,8 @@
 }
 
 @layer wp-ui-compositions {
+	/* Add partial transparency to CloseIcon and outline/minimal ActionButton
+	 * for a better look over tinted backgrounds */
 	.close-icon,
 	.action-button:is(.is-action-button-outline, .is-action-button-minimal) {
 		--wp-ui-button-background-color-active: color-mix(in srgb, transparent 50%, var(--wpds-color-bg-interactive-neutral-weak-active));

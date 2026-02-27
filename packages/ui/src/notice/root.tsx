@@ -17,10 +17,18 @@ const icons: { [ key in NoticeIntent ]: IconProps[ 'icon' ] | null } = {
 	error,
 };
 
+/**
+ * Returns the default politeness level based on the notice intent.
+ * Error uses 'assertive' for urgent announcements, others use 'polite'.
+ */
 function getDefaultPoliteness( intent: NoticeIntent ): 'polite' | 'assertive' {
 	return intent === 'error' ? 'assertive' : 'polite';
 }
 
+/**
+ * Safely converts a message to a string for screen reader announcement.
+ * Returns undefined if the message can't be safely serialized.
+ */
 function safeRenderToString( message: RootProps[ 'spokenMessage' ] ) {
 	if ( ! message ) {
 		return undefined;
@@ -31,10 +39,15 @@ function safeRenderToString( message: RootProps[ 'spokenMessage' ] ) {
 	try {
 		return renderToString( message );
 	} catch {
+		// If renderToString fails (e.g., due to complex components like Tooltip),
+		// return undefined and skip the announcement
 		return undefined;
 	}
 }
 
+/**
+ * Custom hook which announces the message with the given politeness.
+ */
 function useSpokenMessage(
 	message: RootProps[ 'spokenMessage' ],
 	politeness: 'polite' | 'assertive'
@@ -80,6 +93,8 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
 	},
 	ref
 ) {
+	// Announce to screen readers via speak() API - no role attribute needed
+	// as it would cause double announcements
 	useSpokenMessage( spokenMessage, politeness );
 
 	const iconElement = icon === null ? null : icon ?? icons[ intent ];
