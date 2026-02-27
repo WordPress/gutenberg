@@ -273,6 +273,14 @@ function gutenberg_set_up_cross_origin_isolation() {
 		return;
 	}
 
+	// Skip when a third-party page builder (e.g. Elementor) overrides the
+	// block editor. DIP isolates the document into its own agent cluster,
+	// which blocks same-origin iframe access that these editors rely on.
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( isset( $_GET['action'] ) && 'edit' !== $_GET['action'] ) {
+		return;
+	}
+
 	$user_id = get_current_user_id();
 	if ( ! $user_id ) {
 		return;
