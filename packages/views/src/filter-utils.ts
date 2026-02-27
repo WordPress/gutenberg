@@ -90,15 +90,12 @@ export function mergeActiveViewOverrides(
 		} as View;
 	}
 
-	// Merge groupBy — shallow merge, override keys always win
+	// Merge groupBy — full replacement, override always wins
 	if ( activeViewOverrides.groupBy ) {
 		result = {
 			...result,
-			groupBy: {
-				...( result as any ).groupBy,
-				...activeViewOverrides.groupBy,
-			},
-		} as View;
+			groupBy: activeViewOverrides.groupBy,
+		};
 	}
 
 	return result;
@@ -173,20 +170,10 @@ export function stripActiveViewOverrides(
 		} as View;
 	}
 
-	// Strip groupBy keys managed by overrides
-	if (
-		activeViewOverrides.groupBy &&
-		'groupBy' in result &&
-		result.groupBy
-	) {
-		const groupBy = { ...result.groupBy } as Record< string, unknown >;
-		for ( const key of Object.keys( activeViewOverrides.groupBy ) ) {
-			delete groupBy[ key ];
-		}
-		result = {
-			...result,
-			groupBy: Object.keys( groupBy ).length > 0 ? groupBy : undefined,
-		} as View;
+	// Strip groupBy managed by overrides
+	if ( activeViewOverrides.groupBy && 'groupBy' in result ) {
+		const { groupBy: _, ...rest } = result;
+		result = rest as View;
 	}
 
 	return result;

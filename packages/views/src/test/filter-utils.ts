@@ -240,7 +240,7 @@ describe( 'mergeActiveViewOverrides', () => {
 	} );
 
 	describe( 'groupBy overrides', () => {
-		it( 'should merge groupBy override into existing groupBy', () => {
+		it( 'should replace groupBy with override', () => {
 			const view: View = {
 				...baseView,
 				groupBy: {
@@ -250,12 +250,11 @@ describe( 'mergeActiveViewOverrides', () => {
 				},
 			};
 			const result = mergeActiveViewOverrides( view, {
-				groupBy: { showLabel: true },
+				groupBy: { field: 'category', direction: 'desc' },
 			} );
 			expect( result.groupBy ).toEqual( {
-				field: 'status',
-				direction: 'asc',
-				showLabel: true,
+				field: 'category',
+				direction: 'desc',
 			} );
 		} );
 
@@ -437,7 +436,7 @@ describe( 'stripActiveViewOverrides', () => {
 	} );
 
 	describe( 'groupBy stripping', () => {
-		it( 'should strip groupBy keys managed by overrides', () => {
+		it( 'should remove groupBy when managed by overrides', () => {
 			const view: View = {
 				...baseView,
 				groupBy: {
@@ -447,23 +446,9 @@ describe( 'stripActiveViewOverrides', () => {
 				},
 			};
 			const result = stripActiveViewOverrides( view, {
-				groupBy: { showLabel: true },
+				groupBy: { field: 'category', direction: 'desc' },
 			} );
-			expect( result.groupBy ).toEqual( {
-				field: 'status',
-				direction: 'asc',
-			} );
-		} );
-
-		it( 'should set groupBy to undefined when all keys are stripped', () => {
-			const view: View = {
-				...baseView,
-				groupBy: { field: 'status', direction: 'asc' },
-			};
-			const result = stripActiveViewOverrides( view, {
-				groupBy: { field: 'status', direction: 'asc' },
-			} );
-			expect( result.groupBy ).toBeUndefined();
+			expect( result ).not.toHaveProperty( 'groupBy' );
 		} );
 
 		it( 'should not touch groupBy when view has no groupBy', () => {
