@@ -72,31 +72,57 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 			return;
 		}
 
-		timerIdRef.current = setTimeout( () => {
-			// For 'firstInputElement' mode, try to find a form input element first
-			if ( focusOnMountRef.current === 'firstInputElement' ) {
-				/** @type {HTMLElement | null} */
-				let formInput = null;
-				if (
-					typeof window !== 'undefined' &&
-					node instanceof window.Element
-				) {
-					formInput = node.querySelector(
-						'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
-					);
-				}
-
-				if ( formInput ) {
-					setFocus( formInput );
-					return;
-				}
-			}
-
-			// Fallback to the first tabbable element
+		const focusFirstTabbable = () => {
 			const firstTabbable = focus.tabbable.find( node )[ 0 ];
 			if ( firstTabbable ) {
 				setFocus( firstTabbable );
 			}
+		};
+
+		timerIdRef.current = setTimeout( () => {
+			// For 'firstInputElement' mode, try to find a form input element first
+			if ( focusOnMountRef.current === 'firstInputElement' ) {
+				/** @type {() => HTMLElement | null} */
+				const findFormInput = () => {
+					if (
+						typeof window !== 'undefined' &&
+						node instanceof window.Element
+					) {
+						return /** @type {HTMLElement | null} */ (
+							node.querySelector(
+								'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
+							)
+						);
+					}
+					return null;
+				};
+
+				const formInput = findFormInput();
+				if ( formInput ) {
+					setFocus( formInput );
+					return;
+				}
+
+				// Retry for up to 200ms to accommodate async loading
+				// controls that may show a placeholder before the input.
+				let retries = 4;
+				const retry = () => {
+					timerIdRef.current = setTimeout( () => {
+						const input = findFormInput();
+						if ( input ) {
+							setFocus( input );
+						} else if ( --retries > 0 ) {
+							retry();
+						} else {
+							focusFirstTabbable();
+						}
+					}, 50 );
+				};
+				retry();
+				return;
+			}
+
+			focusFirstTabbable();
 		}, 0 );
 
 		return () => {

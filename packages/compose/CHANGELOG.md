@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   `useFocusOnMount`: The `firstInputElement` mode now retries finding a form input for up to 200ms before falling back to the first tabbable element, to accommodate async loading controls ([#75540](https://github.com/WordPress/gutenberg/issues/75540)).
+
 ## 7.40.0 (2026-02-18)
 
 ## 7.39.0 (2026-01-29)
