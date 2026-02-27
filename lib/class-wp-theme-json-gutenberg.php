@@ -2556,6 +2556,19 @@ class WP_Theme_JSON_Gutenberg {
 				'name'  => $css_property,
 				'value' => $value,
 			);
+
+			// When background-clip is set to 'text', add vendor-prefixed
+			// properties for cross-browser support.
+			if ( 'background-clip' === $css_property && 'text' === $value ) {
+				$declarations[] = array(
+					'name'  => '-webkit-background-clip',
+					'value' => 'text',
+				);
+				$declarations[] = array(
+					'name'  => '-webkit-text-fill-color',
+					'value' => 'transparent',
+				);
+			}
 		}
 
 		// If a variable value is added to the root, the corresponding property should be removed.
