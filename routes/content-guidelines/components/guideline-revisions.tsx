@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useState, useCallback } from '@wordpress/element';
+import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
 import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
@@ -14,11 +14,14 @@ import { dateI18n } from '@wordpress/date';
 import { chevronLeft } from '@wordpress/icons';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import type { Action, Field, View } from '@wordpress/dataviews';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import type { Revision, GuidelineCategories } from '../types';
+import type { GuidelineCategories, Revision } from '../types';
+import { fetchRevisions, restoreRevision } from '../api';
+import { STORE_NAME } from '../store';
 
 interface RevisionItem {
 	id: string;
@@ -29,17 +32,29 @@ interface RevisionItem {
 	categories: GuidelineCategories;
 }
 
-interface RevisionHistoryScreenProps {
-	revisions: Array< Revision & { categories: GuidelineCategories } >;
-	currentRevisionId: number | null;
-	onRestore: ( revisionId: number, categories: GuidelineCategories ) => void;
-}
+export default function GuidelineRevisions() {
+	const { revisions, currentRevisionId, postId } = useSelect( ( select ) => {
+		const storeSelect = select( STORE_NAME ) as {
+			getRevisions: () => Array<
+				Revision & { categories: GuidelineCategories }
+			>;
+			getCurrentRevisionId: () => number | null;
+			getId: () => number | null;
+		};
+		return {
+			revisions: storeSelect.getRevisions(),
+			currentRevisionId: storeSelect.getCurrentRevisionId(),
+			postId: storeSelect.getId(),
+		};
+	}, [] );
 
-export default function RevisionHistoryScreen( {
-	revisions,
-	currentRevisionId,
-	onRestore,
-}: RevisionHistoryScreenProps ) {
+	// Lazy-load revisions when this screen mounts.
+	useEffect( () => {
+		if ( postId ) {
+			fetchRevisions( postId );
+		}
+	}, [ postId ] );
+
 	const items: RevisionItem[] = useMemo( () => {
 		return revisions.map( ( revision ) => ( {
 			id: String( revision.id ),
@@ -144,7 +159,7 @@ export default function RevisionHistoryScreen( {
 								<Button
 									variant="primary"
 									onClick={ () => {
-										onRestore(
+										restoreRevision(
 											item.revisionId,
 											item.categories
 										);
@@ -161,7 +176,7 @@ export default function RevisionHistoryScreen( {
 				isEligible: ( item: RevisionItem ) => ! item.isCurrent,
 			},
 		],
-		[ onRestore ]
+		[]
 	);
 
 	return (

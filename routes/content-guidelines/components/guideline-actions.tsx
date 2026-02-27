@@ -14,27 +14,43 @@ import {
 	useNavigator,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import type { GuidelineCategories } from '../types';
+import { DEFAULT_CATEGORIES } from '../types';
 import { validateGuidelinesJson } from '../utils/import-export';
+import { saveContentGuidelines } from '../api';
+import { STORE_NAME } from '../store';
 
-interface ActionsSectionProps {
-	guidelines: GuidelineCategories | null;
-	onImport: ( categories: GuidelineCategories ) => void;
-}
-
-export default function ActionsSection( {
-	guidelines,
-	onImport,
-}: ActionsSectionProps ) {
+export default function GuidelineActions() {
 	const fileInputRef = useRef< HTMLInputElement >( null );
 	const { goTo } = useNavigator();
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { setGuideline, setBlocks } = useDispatch( STORE_NAME ) as {
+		setGuideline: ( category: string, value: string ) => void;
+		setBlocks: ( blocks: GuidelineCategories[ 'blocks' ] ) => void;
+	};
+
+	const { categories, blocks } = useSelect(
+		( select ) => ( {
+			categories: select( STORE_NAME ).getAllGuidelines() as Partial<
+				Record< string, string >
+			>,
+			blocks: (
+				select( STORE_NAME ) as {
+					getBlocks: () => GuidelineCategories[ 'blocks' ];
+				}
+			 ).getBlocks(),
+		} ),
+		[]
+	);
+
+	const hasGuidelines =
+		Object.values( categories ).some( ( v ) => !! v ) || blocks.length > 0;
 
 	const handleImport = useCallback(
 		( event: React.ChangeEvent< HTMLInputElement > ) => {
@@ -48,7 +64,7 @@ export default function ActionsSection( {
 
 			const reader = new FileReader();
 
-			reader.onload = ( e ) => {
+			reader.onload = async ( e ) => {
 				try {
 					const text = e.target?.result;
 					if ( typeof text !== 'string' ) {
@@ -79,7 +95,20 @@ export default function ActionsSection( {
 						return;
 					}
 
-					onImport( parsed as GuidelineCategories );
+					const imported = parsed as GuidelineCategories;
+
+					// Write each text category to the store.
+					(
+						[ 'site', 'copy', 'images', 'additional' ] as const
+					 ).forEach( ( slug ) => {
+						setGuideline( slug, imported[ slug ].guidelines );
+					} );
+
+					// Write blocks to the store.
+					setBlocks( imported.blocks );
+
+					// Persist to backend.
+					await saveContentGuidelines();
 				} catch {
 					createErrorNotice(
 						__( 'An error occurred while importing guidelines.' ),
@@ -96,15 +125,37 @@ export default function ActionsSection( {
 
 			reader.readAsText( file );
 		},
-		[ onImport, createErrorNotice ]
+		[ setGuideline, setBlocks, createErrorNotice ]
 	);
 
 	const handleExport = useCallback( () => {
-		if ( ! guidelines ) {
+		if ( ! hasGuidelines ) {
 			return;
 		}
 
-		const json = JSON.stringify( guidelines, null, 2 );
+		// Build the full GuidelineCategories shape from the store, reattaching
+		// default labels since the store only persists the guidelines text.
+		const exportData: GuidelineCategories = {
+			site: {
+				label: DEFAULT_CATEGORIES.site.label,
+				guidelines: categories.site ?? '',
+			},
+			copy: {
+				label: DEFAULT_CATEGORIES.copy.label,
+				guidelines: categories.copy ?? '',
+			},
+			images: {
+				label: DEFAULT_CATEGORIES.images.label,
+				guidelines: categories.images ?? '',
+			},
+			additional: {
+				label: DEFAULT_CATEGORIES.additional.label,
+				guidelines: categories.additional ?? '',
+			},
+			blocks,
+		};
+
+		const json = JSON.stringify( exportData, null, 2 );
 		const blob = new Blob( [ json ], { type: 'application/json' } );
 		const url = URL.createObjectURL( blob );
 
@@ -118,7 +169,7 @@ export default function ActionsSection( {
 		link.click();
 		document.body.removeChild( link );
 		URL.revokeObjectURL( url );
-	}, [ guidelines ] );
+	}, [ hasGuidelines, categories, blocks ] );
 
 	return (
 		<VStack spacing={ 4 } className="content-guidelines__actions">
@@ -180,7 +231,7 @@ export default function ActionsSection( {
 						<FlexItem>
 							<Button
 								variant="secondary"
-								disabled={ ! guidelines }
+								disabled={ ! hasGuidelines }
 								accessibleWhenDisabled
 								onClick={ handleExport }
 								__next40pxDefaultSize
@@ -209,7 +260,7 @@ export default function ActionsSection( {
 						<FlexItem>
 							<Button
 								variant="secondary"
-								disabled={ ! guidelines }
+								disabled={ ! hasGuidelines }
 								accessibleWhenDisabled
 								onClick={ () => goTo( '/revisions' ) }
 								__next40pxDefaultSize

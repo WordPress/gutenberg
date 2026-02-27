@@ -3,81 +3,58 @@
  */
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
-import { Navigator } from '@wordpress/components';
-import { useState, useCallback } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
+import { useEffect, useState } from '@wordpress/element';
+import { Spinner, Navigator } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import type { GuidelineCategories, Revision } from './types';
-import ActionsSection from './components/actions-section';
-import RevisionHistoryScreen from './components/revision-history-screen';
 import './style.scss';
+import GuidelineAccordion from './components/guideline-accordion';
+import GuidelineActions from './components/guideline-actions';
+import GuidelineRevisions from './components/guideline-revisions';
+import { fetchContentGuidelines } from './api';
 
-function HomeScreen( {
-	guidelines,
-	onImport,
-}: {
-	guidelines: GuidelineCategories | null;
-	onImport: ( categories: GuidelineCategories ) => void;
-} ) {
-	return (
-		<div className="content-guidelines__content">
-			<ActionsSection guidelines={ guidelines } onImport={ onImport } />
-		</div>
-	);
-}
+const GUIDELINE_ITEMS = [
+	{
+		title: __( 'Site' ),
+		description: __(
+			"Describe your site's purpose, goals, and primary audience."
+		),
+
+		slug: 'site',
+	},
+	{
+		title: __( 'Copy' ),
+		description: __(
+			'Set your writing standards for tone, voice, style, and formatting.'
+		),
+
+		slug: 'copy',
+	},
+	{
+		title: __( 'Images' ),
+		description: __(
+			'Outline your style, dimensions, formats, mood and aesthetic preferences.'
+		),
+
+		slug: 'images',
+	},
+	{
+		title: __( 'Internal' ),
+		description: __( 'Add private notes and standards for your team.' ),
+
+		slug: 'additional',
+	},
+];
 
 function ContentGuidelinesPage() {
-	const [ guidelines, setGuidelines ] =
-		useState< GuidelineCategories | null >( null );
-	const [ revisions, setRevisions ] = useState<
-		Array< Revision & { categories: GuidelineCategories } >
-	>( [] );
-	const [ currentRevisionId, setCurrentRevisionId ] = useState<
-		number | null
-	>( null );
-	const { createSuccessNotice } = useDispatch( noticesStore );
-	const currentUser = useSelect(
-		( select ) => select( coreStore ).getCurrentUser(),
-		[]
-	);
+	const [ loading, setLoading ] = useState( true );
 
-	const handleImport = useCallback(
-		( categories: GuidelineCategories ) => {
-			const id = Date.now();
-			setGuidelines( categories );
-			setCurrentRevisionId( id );
-			setRevisions( ( prev ) => [
-				{
-					id,
-					date: new Date().toISOString(),
-					author_name: currentUser?.name || __( 'User' ),
-					categories,
-				},
-				...prev,
-			] );
-			createSuccessNotice(
-				__( 'Content guidelines imported successfully.' ),
-				{ type: 'snackbar' }
-			);
-		},
-		[ createSuccessNotice, currentUser ]
-	);
-
-	const handleRestore = useCallback(
-		( revisionId: number, categories: GuidelineCategories ) => {
-			setGuidelines( categories );
-			setCurrentRevisionId( revisionId );
-			createSuccessNotice( __( 'Revision restored successfully.' ), {
-				type: 'snackbar',
-			} );
-		},
-		[ createSuccessNotice ]
-	);
+	useEffect( () => {
+		// Populate the store with the content guidelines.
+		fetchContentGuidelines().then( () => setLoading( false ) );
+	}, [] );
 
 	return (
 		<Page
@@ -86,22 +63,48 @@ function ContentGuidelinesPage() {
 				"Set content standards that guide your team, inform plugins, and help AI tools generate content that matches your site's voice and requirements."
 			) }
 		>
-			<Navigator initialPath="/">
-				<Navigator.Screen path="/">
-					<HomeScreen
-						guidelines={ guidelines }
-						onImport={ handleImport }
-					/>
-				</Navigator.Screen>
+			{ loading ? (
+				<div className="content-guidelines__loading">
+					<Spinner />
+				</div>
+			) : (
+				<Navigator initialPath="/">
+					<Navigator.Screen path="/">
+						<div className="content-guidelines__content">
+							{ /*
+							 * Disable reason: The `list` ARIA role is redundant but
+							 * Safari+VoiceOver won't announce the list otherwise.
+							 */
+							/* eslint-disable jsx-a11y/no-redundant-roles */ }
+							<ul
+								role="list"
+								className="content-guidelines__list"
+							>
+								{ GUIDELINE_ITEMS.map( ( item ) => (
+									<li
+										key={ item.slug }
+										className="content-guidelines__list-item"
+									>
+										<div className="content-guidelines__accordion-item">
+											<GuidelineAccordion
+												title={ item.title }
+												description={ item.description }
+												slug={ item.slug }
+											/>
+										</div>
+									</li>
+								) ) }
+							</ul>
+							{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+							<GuidelineActions />
+						</div>
+					</Navigator.Screen>
 
-				<Navigator.Screen path="/revisions">
-					<RevisionHistoryScreen
-						revisions={ revisions }
-						currentRevisionId={ currentRevisionId }
-						onRestore={ handleRestore }
-					/>
-				</Navigator.Screen>
-			</Navigator>
+					<Navigator.Screen path="/revisions">
+						<GuidelineRevisions />
+					</Navigator.Screen>
+				</Navigator>
+			) }
 		</Page>
 	);
 }
