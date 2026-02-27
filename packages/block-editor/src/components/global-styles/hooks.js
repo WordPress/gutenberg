@@ -195,16 +195,6 @@ export function useSettingsForBlockElement(
 			}
 		);
 
-		// backgroundClip needs explicit handling since it may not be in
-		// parent settings. If the block supports it, enable it.
-		if ( supportedStyles.includes( 'backgroundClip' ) ) {
-			updatedSettings.background = {
-				...updatedSettings.background,
-				backgroundClip:
-					updatedSettings.background?.backgroundClip ?? true,
-			};
-		}
-
 		updatedSettings.shadow = supportedStyles.includes( 'shadow' )
 			? updatedSettings.shadow
 			: false;
