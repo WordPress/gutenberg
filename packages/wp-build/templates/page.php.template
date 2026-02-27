@@ -265,18 +265,10 @@ if ( ! function_exists( '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page' ) ) {
 		print_admin_styles();
 		print_head_scripts();
 
-		/**
-		 * Fires in head section for a specific admin page.
-		 *
-		 * @since 2.1.0
-		 */
+		/** This action is documented in wp-admin/admin-header.php */
 		do_action( "admin_head-{$hook_suffix}" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 
-		/**
-		 * Fires in head section for all admin pages.
-		 *
-		 * @since 2.1.0
-		 */
+		/** This action is documented in wp-admin/admin-header.php */
 		do_action( 'admin_head' );
 		// END see wp-admin/admin-header.php
 		?>
@@ -286,11 +278,7 @@ if ( ! function_exists( '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page' ) ) {
 		<?php
 		// BEGIN see wp-admin/admin-footer.php
 
-		/**
-		 * Prints scripts or data before the default footer scripts.
-		 *
-		 * @since 1.2.0
-		 */
+		/** This action is documented in wp-admin/admin-footer.php */
 		do_action( 'admin_footer', $hook_suffix );
 
 		// Print import map first so it's available for inline scripts
@@ -300,11 +288,7 @@ if ( ! function_exists( '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page' ) ) {
 		wp_script_modules()->print_script_module_preloads();
 		wp_script_modules()->print_script_module_data();
 
-		/**
-		 * Prints scripts or data after the default footer scripts.
-		 *
-		 * @since 2.8.0
-		 */
+		/** This action is documented in wp-admin/admin-footer.php */
 		do_action( "admin_footer-{$hook_suffix}" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		// END see wp-admin/admin-footer.php
 		?>
