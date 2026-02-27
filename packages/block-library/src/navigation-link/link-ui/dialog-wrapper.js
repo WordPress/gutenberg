@@ -64,7 +64,12 @@ function DialogWrapper( { className, title, description, onBack, children } ) {
 				<p id={ dialogDescriptionId }>{ description }</p>
 			</VisuallyHidden>
 
-			<BackButton className={ backButtonClassName } onBack={ onBack } />
+			{ onBack && (
+				<BackButton
+					className={ backButtonClassName }
+					onBack={ onBack }
+				/>
+			) }
 
 			{ children }
 		</div>

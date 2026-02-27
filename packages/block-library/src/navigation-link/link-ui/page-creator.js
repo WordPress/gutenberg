@@ -24,19 +24,23 @@ import DialogWrapper from './dialog-wrapper';
 /**
  * Component for creating new pages within the Navigation Link UI.
  *
- * @param {Object}   props                  Component props.
- * @param {string}   props.postType         The post type to create.
- * @param {Function} props.onBack           Callback when user wants to go back.
- * @param {Function} props.onPageCreated    Callback when page is successfully created.
- * @param {string}   [props.initialTitle]   Initial title to pre-fill the form.
- * @param {Object}   [props.additionalData] Additional data to include when saving the entity record.
+ * @param {Object}   props                Component props.
+ * @param {string}   props.postType       The post type to create.
+ * @param {Function} [props.onBack]       Callback when user wants to go back. Shows a back button when provided.
+ * @param {Function} props.onClose        Callback to close the creator without going back.
+ * @param {Function} props.onPageCreated  Callback when page is successfully created.
+ * @param {string}   [props.initialTitle] Initial title to pre-fill the form.
+ * @param {number}   [props.menuOrder]    Menu order for the new page.
+ * @param {number}   [props.parent]       Parent page ID for the new page.
  */
 export function LinkUIPageCreator( {
 	postType,
 	onBack,
+	onClose,
 	onPageCreated,
 	initialTitle = '',
-	additionalData = {},
+	menuOrder,
+	parent,
 } ) {
 	const [ title, setTitle ] = useState( initialTitle );
 	const [ shouldPublish, setShouldPublish ] = useState( true );
@@ -76,7 +80,10 @@ export function LinkUIPageCreator( {
 				{
 					title,
 					status: shouldPublish ? 'publish' : 'draft',
-					...additionalData,
+					...( menuOrder !== undefined && {
+						menu_order: menuOrder,
+					} ),
+					...( parent !== undefined && { parent } ),
 				},
 				{ throwOnError: true }
 			);
@@ -120,6 +127,8 @@ export function LinkUIPageCreator( {
 
 	const isSubmitDisabled = isSaving || ! isTitleValid;
 
+	const handleDismiss = onBack || onClose;
+
 	return (
 		<DialogWrapper
 			className="link-ui-page-creator"
@@ -157,7 +166,7 @@ export function LinkUIPageCreator( {
 							<Button
 								__next40pxDefaultSize
 								variant="tertiary"
-								onClick={ onBack }
+								onClick={ handleDismiss }
 								disabled={ isSaving }
 								accessibleWhenDisabled
 							>

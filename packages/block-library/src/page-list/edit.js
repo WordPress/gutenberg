@@ -55,6 +55,7 @@ function BlockContent( {
 	blockList,
 	pages,
 	parentPageID,
+	showAppender,
 } ) {
 	if ( ! hasResolvedPages ) {
 		return (
@@ -115,7 +116,13 @@ function BlockContent( {
 	}
 
 	if ( pages.length > 0 ) {
-		return <ul { ...innerBlocksProps }></ul>;
+		const { children, ...ulProps } = innerBlocksProps;
+		return (
+			<ul { ...ulProps }>
+				{ children }
+				{ showAppender && <PageCreatorAppender /> }
+			</ul>
+		);
 	}
 }
 
@@ -313,18 +320,18 @@ export default function PageListEdit( {
 		);
 	}, [ pages ] );
 
-	const additionalPageData = useMemo(
+	const pageCreatorContextValue = useMemo(
 		() => ( {
-			menu_order: nextMenuOrder,
+			menuOrder: nextMenuOrder,
 			...( parentPageID ? { parent: parentPageID } : {} ),
 		} ),
 		[ nextMenuOrder, parentPageID ]
 	);
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		renderAppender: showAppender ? PageCreatorAppender : false,
+		renderAppender: false,
 		__unstableDisableDropZone: true,
-		templateLock: showAppender ? false : 'all',
+		templateLock: isChildOfNavigation ? false : 'all',
 		onInput: NOOP,
 		onChange: NOOP,
 		value: blockList,
@@ -335,9 +342,7 @@ export default function PageListEdit( {
 	}, [ isNested, setAttributes ] );
 
 	return (
-		<PageCreatorContext.Provider
-			value={ { additionalData: additionalPageData } }
-		>
+		<PageCreatorContext.Provider value={ pageCreatorContextValue }>
 			{ ( pagesTree.length > 0 || allowConvertToLinks ) && (
 				<InspectorControls>
 					<ToolsPanel
@@ -417,6 +422,7 @@ export default function PageListEdit( {
 				blockList={ blockList }
 				pages={ pages }
 				parentPageID={ parentPageID }
+				showAppender={ showAppender }
 			/>
 		</PageCreatorContext.Provider>
 	);
