@@ -178,9 +178,13 @@ export function SyncConnectionModal() {
 						{ canRetry && (
 							<Button
 								__next40pxDefaultSize
+								aria-disabled={ isRetrying }
 								isBusy={ isRetrying }
 								variant="primary"
 								onClick={ () => {
+									if ( isRetrying ) {
+										return;
+									}
 									markRetrying();
 									retrySyncConnection();
 								} }
