@@ -6,7 +6,12 @@ import {
 	serialize,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import {
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+	__experimentalUseSlotFills as useSlotFills,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
 import { Children, cloneElement } from '@wordpress/element';
@@ -206,6 +211,9 @@ export function BlockSettingsDropdown( {
 	const shouldShowBlockParentMenuItem =
 		! parentBlockIsSelected && !! firstParentClientId;
 
+	const fills = useSlotFills( BlockSettingsMenuControls.Slot.__unstableName );
+	const hasFills = !! fills?.length;
+
 	return (
 		<BlockActions
 			clientIds={ clientIds }
@@ -223,6 +231,20 @@ export function BlockSettingsDropdown( {
 				onCopy,
 				onPasteStyles,
 			} ) => {
+				// Hide the dropdown when there are no actions and no
+				// registered fills. In content-only mode, fills registered
+				// with supportsContentOnly may still need to render.
+				const isEmpty =
+					! canRemove &&
+					! canDuplicate &&
+					! canInsertBlock &&
+					isContentOnly &&
+					! hasFills;
+
+				if ( isEmpty ) {
+					return null;
+				}
+
 				return (
 					<DropdownMenu
 						icon={ moreVertical }
