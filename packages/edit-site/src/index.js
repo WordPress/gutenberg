@@ -73,8 +73,6 @@ export function initializeEditor( id, settings ) {
 		showBlockBreadcrumbs: true,
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
-		notesFilter: 'unresolved',
-		notesDensity: 'balanced',
 	} );
 
 	if ( window.__clientSideMediaProcessing ) {

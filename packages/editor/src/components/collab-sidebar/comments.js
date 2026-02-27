@@ -24,7 +24,6 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useDebounce } from '@wordpress/compose';
-import { humanTimeDiff, getDate } from '@wordpress/date';
 import { published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -33,7 +32,6 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -41,15 +39,10 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
-import {
-	focusCommentThread,
-	getCommentExcerpt,
-	getAvatarBorderColor,
-} from './utils';
+import { focusCommentThread, getCommentExcerpt } from './utils';
 import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
-import { NOTES_DENSITY_COMPACT, NOTES_DENSITY_BALANCED } from './constants';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -67,13 +60,6 @@ export function Comments( {
 	const [ heights, setHeights ] = useState( {} );
 	const [ boardOffsets, setBoardOffsets ] = useState( {} );
 	const [ blockRefs, setBlockRefs ] = useState( {} );
-
-	const notesDensity = useSelect(
-		( select ) =>
-			select( preferencesStore ).get( 'core', 'notesDensity' ) ||
-			NOTES_DENSITY_BALANCED,
-		[]
-	);
 
 	const { setCanvasMinHeight, selectNote } = unlock(
 		useDispatch( editorStore )
@@ -444,7 +430,6 @@ export function Comments( {
 					setHeights={ setHeights }
 					setBlockRef={ setBlockRef }
 					commentLastUpdated={ commentLastUpdated }
-					density={ notesDensity }
 					onKeyDown={ ( event ) =>
 						handleThreadNavigation(
 							event,
@@ -471,7 +456,6 @@ function Thread( {
 	setHeights,
 	setBlockRef,
 	commentLastUpdated,
-	density,
 	onKeyDown,
 } ) {
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
@@ -585,65 +569,6 @@ function Thread( {
 				y={ y }
 				refs={ refs }
 			/>
-		);
-	}
-
-	// Compact mode: show a minimal avatar indicator for non-selected threads.
-	const shouldShowCompact =
-		density === NOTES_DENSITY_COMPACT && ! isSelected && ! isFloating;
-
-	if ( shouldShowCompact ) {
-		const avatarUrl = thread?.author_avatar_urls?.[ 48 ];
-		const authorName = thread?.author_name;
-		const commentDate = getDate( thread?.date );
-		const timeAgo = commentDate ? humanTimeDiff( commentDate ) : '';
-
-		return (
-			<HStack
-				className="editor-collab-sidebar-panel__minified-indicator"
-				id={ `comment-thread-${ thread.id }` }
-				onClick={ handleCommentSelect }
-				onMouseEnter={ onMouseEnter }
-				onMouseLeave={ onMouseLeave }
-				onFocus={ onFocus }
-				onBlur={ () => {
-					toggleBlockHighlight( thread.blockClientId, false );
-				} }
-				onKeyDown={ ( event ) => {
-					if ( event.key === 'Enter' || event.key === ' ' ) {
-						event.preventDefault();
-						handleCommentSelect();
-					} else {
-						onKeyDown( event );
-					}
-				} }
-				tabIndex={ 0 }
-				role="treeitem"
-				aria-label={ ariaLabel }
-				aria-expanded={ false }
-				spacing="2"
-			>
-				{ avatarUrl && (
-					<img
-						src={ avatarUrl }
-						alt={ authorName }
-						className="editor-collab-sidebar-panel__minified-avatar"
-						width={ 20 }
-						height={ 20 }
-						style={ {
-							borderColor: getAvatarBorderColor( thread?.author ),
-						} }
-					/>
-				) }
-				<span className="editor-collab-sidebar-panel__minified-meta">
-					<span className="editor-collab-sidebar-panel__minified-name">
-						{ authorName }
-					</span>
-					<span className="editor-collab-sidebar-panel__minified-time">
-						{ timeAgo }
-					</span>
-				</span>
-			</HStack>
 		);
 	}
 

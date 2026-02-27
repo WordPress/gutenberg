@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useMemo, useRef } from '@wordpress/element';
+import { useMemo, useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -21,7 +21,6 @@ import {
 	FLOATING_NOTES_SIDEBAR,
 	SIDEBARS,
 	NOTES_FILTER_ALL,
-	NOTES_FILTER_UNRESOLVED,
 	NOTES_FILTER_RESOLVED,
 } from './constants';
 import NotesAppearancePopover from './appearance-popover';
@@ -47,18 +46,10 @@ function NotesSidebarContent( {
 	reflowComments,
 	commentLastUpdated,
 	isFloating = false,
+	notesFilter,
 } ) {
 	const { onCreate, onEdit, onDelete } =
 		useBlockCommentsActions( reflowComments );
-
-	// Read the filter preference directly so changes are picked up
-	// inside the Slot/Fill portal without depending on parent re-renders.
-	const notesFilter = useSelect(
-		( select ) =>
-			select( preferencesStore ).get( 'core', 'notesFilter' ) ||
-			NOTES_FILTER_UNRESOLVED,
-		[]
-	);
 
 	const comments = useMemo( () => {
 		if ( isFloating ) {
@@ -122,6 +113,7 @@ function NotesSidebar( { postId } ) {
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
+	const [ notesFilter, setNotesFilter ] = useState( NOTES_FILTER_ALL );
 
 	const { clientId, blockCommentId, isClassicBlock } = useSelect(
 		( select ) => {
@@ -262,7 +254,10 @@ function NotesSidebar( { postId } ) {
 							<h2 className="interface-complementary-area-header__title">
 								{ __( 'All notes' ) }
 							</h2>
-							<NotesAppearancePopover />
+							<NotesAppearancePopover
+								notesFilter={ notesFilter }
+								setNotesFilter={ setNotesFilter }
+							/>
 						</>
 					}
 					icon={ commentIcon }
@@ -273,6 +268,7 @@ function NotesSidebar( { postId } ) {
 						unresolvedComments={ unresolvedSortedThreads }
 						resolvedComments={ resolvedSortedThreads }
 						commentSidebarRef={ commentSidebarRef }
+						notesFilter={ notesFilter }
 					/>
 				</PluginSidebar>
 			) }
@@ -292,6 +288,7 @@ function NotesSidebar( { postId } ) {
 						commentSidebarRef={ commentSidebarRef }
 						reflowComments={ reflowComments }
 						commentLastUpdated={ commentLastUpdated }
+						notesFilter={ notesFilter }
 						styles={ {
 							backgroundColor,
 						} }
