@@ -112,6 +112,13 @@ function Edit( {
 	/**
 	 * Keep tabs and menu items in sync when either is deleted directly (e.g.
 	 * via the Backspace key or List View).
+	 *
+	 * TODO: This effect only handles deletions. If a user pastes a core/tab
+	 * block directly into the tab-panel (or duplicates one), no corresponding
+	 * tabs-menu-item is created, leaving the two lists out of sync. We should
+	 * extend this effect to handle insertions, detecting when
+	 * tabs.length > menuItemClientIds.length and inserting the missing menu
+	 * item(s) at the correct index.
 	 */
 	const prevSyncStateRef = useRef( null );
 	useEffect( () => {
