@@ -20,7 +20,11 @@ export async function setPreferences(
 	context: PreferencesContext,
 	preferences: Record< string, any >
 ) {
-	await this.page.waitForFunction( () => window?.wp?.data );
+	await this.page.waitForFunction(
+		() =>
+			window?.wp?.data &&
+			window.wp.data.dispatch( 'core/preferences' ) !== null
+	);
 
 	await this.page.evaluate(
 		async ( props ) => {
