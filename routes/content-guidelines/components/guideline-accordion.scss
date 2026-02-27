@@ -1,0 +1,32 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.content-guidelines__accordion {
+	padding: $grid-unit-30;
+
+	.rotate-180 {
+		transition: transform 0.3s ease-in-out;
+		transform: rotate(180deg);
+	}
+
+	.rotate-0 {
+		transition: transform 0.3s ease-in-out;
+		transform: rotate(0deg);
+	}
+}
+
+.content-guidelines__accordion-header {
+	color: $gray-900;
+}
+
+.content-guidelines__accordion-description {
+	color: $gray-700;
+}
+
+.content-guidelines__accordion-form {
+	margin-top: $grid-unit-30;
+
+	.save-button {
+		width: 122px;
+	}
+}
