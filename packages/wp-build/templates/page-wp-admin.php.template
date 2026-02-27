@@ -145,7 +145,9 @@ if ( ! function_exists( '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_sc
 		// Load build constants
 		$build_constants = require __DIR__ . '/../../constants.php';
 
-		// Fire init action for extensions to register routes and menu items
+		/**
+		 * Fires as the {{PAGE_SLUG}} screen is initialized.
+		 */
 		do_action( '{{PAGE_SLUG}}-wp-admin_init' );
 
 		// Preload REST API data
