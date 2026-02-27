@@ -16,7 +16,6 @@ const SCALAR_VALUES = [
 	'showMedia',
 	'showDescription',
 	'showLevels',
-	'groupBy',
 	'infiniteScrollEnabled',
 ] as const;
 
