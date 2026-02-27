@@ -43,6 +43,7 @@ import {
 	editedContentOnlySection,
 	withDerivedBlockEditingModes,
 	viewportModalClientIds,
+	openedListViewPanels,
 } from '../reducer';
 
 import { unlock } from '../../lock-unlock';
@@ -3015,6 +3016,28 @@ describe( 'state', () => {
 			expect( state.selectionStart ).toEqual( {} );
 			expect( state.selectionEnd ).toEqual( {} );
 		} );
+
+		it( 'should preserve the selection on RESET_BLOCKS if the selected block exists as a nested inner block', () => {
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'nested-child' },
+				selectionEnd: { clientId: 'nested-child' },
+			} );
+			const action = {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'parent',
+						innerBlocks: [
+							{ clientId: 'nested-child', innerBlocks: [] },
+						],
+					},
+				],
+			};
+			const state = selection( original, action );
+
+			expect( state.selectionStart ).toEqual( original.selectionStart );
+			expect( state.selectionEnd ).toEqual( original.selectionEnd );
+		} );
 	} );
 
 	describe( 'preferences()', () => {
@@ -5363,6 +5386,147 @@ describe( 'state', () => {
 				type: 'UNKNOWN_ACTION',
 			} );
 			expect( state ).toBe( currentState );
+		} );
+	} );
+
+	describe( 'openedListViewPanels', () => {
+		it( 'should preserve all panel state on external RESET_BLOCKS', () => {
+			const original = deepFreeze( {
+				allOpen: false,
+				panels: { blockA: true },
+			} );
+			const state = openedListViewPanels( original, {
+				type: 'RESET_BLOCKS',
+				blocks: [ { clientId: 'a', innerBlocks: [] } ],
+				isExternal: true,
+			} );
+
+			expect( state ).toBe( original );
+		} );
+
+		it( 'should clear allOpen flag on local RESET_BLOCKS', () => {
+			const original = deepFreeze( { allOpen: true, panels: {} } );
+			const state = openedListViewPanels( original, {
+				type: 'RESET_BLOCKS',
+				blocks: [ { clientId: 'a', innerBlocks: [] } ],
+			} );
+
+			expect( state ).toEqual( { allOpen: false, panels: {} } );
+		} );
+
+		it( 'should clear panel state on local RESET_BLOCKS', () => {
+			const original = deepFreeze( {
+				allOpen: false,
+				panels: { blockA: true },
+			} );
+			const state = openedListViewPanels( original, {
+				type: 'RESET_BLOCKS',
+				blocks: [ { clientId: 'blockA', innerBlocks: [] } ],
+			} );
+
+			expect( state ).toEqual( { allOpen: false, panels: {} } );
+		} );
+	} );
+
+	describe( 'selection() with nested blocks and RESET_BLOCKS', () => {
+		it( 'should preserve selection for a nested block on external RESET_BLOCKS', () => {
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'nested-list' },
+				selectionEnd: { clientId: 'nested-list' },
+			} );
+			const state = selection( original, {
+				type: 'RESET_BLOCKS',
+				isExternal: true,
+				blocks: [
+					{
+						clientId: 'group',
+						innerBlocks: [
+							{
+								clientId: 'nested-list',
+								innerBlocks: [
+									{ clientId: 'item-1', innerBlocks: [] },
+								],
+							},
+						],
+					},
+				],
+			} );
+
+			expect( state.selectionStart ).toEqual( original.selectionStart );
+			expect( state.selectionEnd ).toEqual( original.selectionEnd );
+		} );
+
+		it( 'should clear selection for a nested block that no longer exists on external RESET_BLOCKS', () => {
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'removed-nested' },
+				selectionEnd: { clientId: 'removed-nested' },
+			} );
+			const state = selection( original, {
+				type: 'RESET_BLOCKS',
+				isExternal: true,
+				blocks: [
+					{
+						clientId: 'group',
+						innerBlocks: [
+							{ clientId: 'other-block', innerBlocks: [] },
+						],
+					},
+				],
+			} );
+
+			expect( state.selectionStart ).toEqual( {} );
+			expect( state.selectionEnd ).toEqual( {} );
+		} );
+
+		it( 'should collapse selection when start is nested and exists but end does not on external RESET_BLOCKS', () => {
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'nested-start' },
+				selectionEnd: { clientId: 'removed-end' },
+			} );
+			const state = selection( original, {
+				type: 'RESET_BLOCKS',
+				isExternal: true,
+				blocks: [
+					{
+						clientId: 'parent',
+						innerBlocks: [
+							{
+								clientId: 'nested-start',
+								innerBlocks: [],
+							},
+						],
+					},
+				],
+			} );
+
+			expect( state.selectionStart ).toEqual( original.selectionStart );
+			expect( state.selectionEnd ).toEqual( original.selectionStart );
+		} );
+
+		it( 'should clear selection for a nested block on local RESET_BLOCKS (shallow check)', () => {
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'nested-list' },
+				selectionEnd: { clientId: 'nested-list' },
+			} );
+			const state = selection( original, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'group',
+						innerBlocks: [
+							{
+								clientId: 'nested-list',
+								innerBlocks: [],
+							},
+						],
+					},
+				],
+			} );
+
+			// Local reset only checks top-level blocks, so nested
+			// block is not found and selection is cleared.
+			expect( state.selectionStart ).toEqual( {} );
+			expect( state.selectionEnd ).toEqual( {} );
 		} );
 	} );
 } );
