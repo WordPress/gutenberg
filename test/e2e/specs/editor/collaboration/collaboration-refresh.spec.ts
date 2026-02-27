@@ -165,8 +165,6 @@ test.describe( 'Collaboration - Refresh', () => {
 		await page.keyboard.type( 'After refresh from User A' );
 
 		// User B should see User A's new content.
-		// The bug in #75976 causes User A's post-refresh edits to be
-		// invisible to User B despite the polling connection appearing active.
 		await expect
 			.poll(
 				async () => {
