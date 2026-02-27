@@ -1243,8 +1243,7 @@ export default function Image( {
 
 	const featuredImageControl = (
 		<BlockSettingsMenuControls>
-			{ ( { selectedClientIds, isContentOnly } ) =>
-				! isContentOnly &&
+			{ ( { selectedClientIds } ) =>
 				selectedClientIds.length === 1 &&
 				! isDescendentOfQueryLoop &&
 				postId &&

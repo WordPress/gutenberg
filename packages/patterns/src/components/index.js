@@ -12,25 +12,20 @@ import PatternsManageButton from './patterns-manage-button';
 export default function PatternsMenuItems( { rootClientId } ) {
 	return (
 		<BlockSettingsMenuControls>
-			{ ( { selectedClientIds, onClose, isContentOnly } ) => {
-				if ( isContentOnly ) {
-					return null;
-				}
-				return (
-					<>
-						<PatternConvertButton
-							clientIds={ selectedClientIds }
-							rootClientId={ rootClientId }
-							closeBlockSettingsMenu={ onClose }
+			{ ( { selectedClientIds, onClose } ) => (
+				<>
+					<PatternConvertButton
+						clientIds={ selectedClientIds }
+						rootClientId={ rootClientId }
+						closeBlockSettingsMenu={ onClose }
+					/>
+					{ selectedClientIds.length === 1 && (
+						<PatternsManageButton
+							clientId={ selectedClientIds[ 0 ] }
 						/>
-						{ selectedClientIds.length === 1 && (
-							<PatternsManageButton
-								clientId={ selectedClientIds[ 0 ] }
-							/>
-						) }
-					</>
-				);
-			} }
+					) }
+				</>
+			) }
 		</BlockSettingsMenuControls>
 	);
 }

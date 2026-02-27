@@ -134,13 +134,29 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md
  *
- * @param {Object} props Fill props.
+ * @param {Object}           props                     Fill props.
+ * @param {boolean}          props.supportsContentOnly Whether the fill should render in content-only mode.
+ * @param {Function|Element} props.children            Fill children.
  * @return {Element} Element.
  */
-function BlockSettingsMenuControls( { ...props } ) {
+function BlockSettingsMenuControls( {
+	supportsContentOnly,
+	children,
+	...props
+} ) {
+	const wrappedChildren =
+		typeof children === 'function' && ! supportsContentOnly
+			? ( fillProps ) => {
+					if ( fillProps.isContentOnly ) {
+						return null;
+					}
+					return children( fillProps );
+			  }
+			: children;
+
 	return (
 		<StyleProvider document={ document }>
-			<Fill { ...props } />
+			<Fill { ...props }>{ wrappedChildren }</Fill>
 		</StyleProvider>
 	);
 }

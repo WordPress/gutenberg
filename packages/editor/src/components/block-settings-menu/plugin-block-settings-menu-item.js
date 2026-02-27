@@ -87,11 +87,8 @@ const PluginBlockSettingsMenuItem = ( {
 	role,
 } ) => (
 	<BlockSettingsMenuControls>
-		{ ( { selectedBlocks, onClose, isContentOnly } ) => {
-			if (
-				isContentOnly ||
-				! shouldRenderItem( selectedBlocks, allowedBlocks )
-			) {
+		{ ( { selectedBlocks, onClose } ) => {
+			if ( ! shouldRenderItem( selectedBlocks, allowedBlocks ) ) {
 				return null;
 			}
 			return (

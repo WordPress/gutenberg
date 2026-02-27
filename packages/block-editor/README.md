@@ -256,6 +256,8 @@ _Related_
 _Parameters_
 
 -   _props_ `Object`: Fill props.
+-   _props.supportsContentOnly_ `boolean`: Whether the fill should render in content-only mode.
+-   _props.children_ `Function|Element`: Fill children.
 
 _Returns_
 

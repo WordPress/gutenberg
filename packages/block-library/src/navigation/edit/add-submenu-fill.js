@@ -96,7 +96,7 @@ function AddSubmenuItem( {
 
 export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	return (
-		<BlockSettingsMenuControls>
+		<BlockSettingsMenuControls supportsContentOnly>
 			{ ( fillProps ) => (
 				<AddSubmenuFillContent
 					navigationBlockClientId={ navigationBlockClientId }

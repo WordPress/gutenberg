@@ -16,17 +16,12 @@ import ConvertToTemplatePart from './convert-to-template-part';
 export default function TemplatePartMenuItems() {
 	return (
 		<BlockSettingsMenuControls>
-			{ ( { selectedClientIds, onClose, isContentOnly } ) => {
-				if ( isContentOnly ) {
-					return null;
-				}
-				return (
-					<TemplatePartConverterMenuItem
-						clientIds={ selectedClientIds }
-						onClose={ onClose }
-					/>
-				);
-			} }
+			{ ( { selectedClientIds, onClose } ) => (
+				<TemplatePartConverterMenuItem
+					clientIds={ selectedClientIds }
+					onClose={ onClose }
+				/>
+			) }
 		</BlockSettingsMenuControls>
 	);
 }
