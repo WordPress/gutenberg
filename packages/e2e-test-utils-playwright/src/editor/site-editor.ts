@@ -21,6 +21,8 @@ export async function saveSiteEditorEntities(
 	const editorTopBar = this.page.getByRole( 'region', {
 		name: 'Editor top bar',
 	} );
+	// Wait for the top bar region to be ready before checking button state.
+	await editorTopBar.waitFor();
 
 	// If we have changes in a single entity which can be published the label is `Publish`.
 	const saveButton = editorTopBar.getByRole( 'button', {
@@ -30,17 +32,18 @@ export async function saveSiteEditorEntities(
 	const publishButton = editorTopBar.getByRole( 'button', {
 		name: 'Publish',
 	} );
-	const publishButtonIsVisible = ! ( await saveButton.isVisible() );
+	const saveButtonIsVisible = await saveButton.isVisible();
 	// First Save button in the top bar.
-	const buttonToClick = publishButtonIsVisible ? publishButton : saveButton;
+	const buttonToClick = saveButtonIsVisible ? saveButton : publishButton;
 	await buttonToClick.click();
 
 	if ( ! options.isOnlyCurrentEntityDirty ) {
-		// Second Save button in the entities panel.
-		await this.page
-			.getByRole( 'region', {
-				name: /(Editor publish|Save panel)/,
-			} )
+		// Wait for the entities panel to appear, then click Save.
+		const entitiesPanel = this.page.getByRole( 'region', {
+			name: /(Editor publish|Save panel)/,
+		} );
+		await entitiesPanel.waitFor();
+		await entitiesPanel
 			.getByRole( 'button', { name: 'Save', exact: true } )
 			.click();
 	}

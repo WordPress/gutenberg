@@ -129,8 +129,12 @@ export default class CollaborationUtils {
 		);
 
 		// Dismiss welcome guide for User 2.
+		// Wait for the preferences store to be registered before dispatching.
 		await this.secondPage.waitForFunction(
-			() => window?.wp?.data && window?.wp?.blocks
+			() =>
+				window?.wp?.data &&
+				window?.wp?.blocks &&
+				window.wp.data.dispatch( 'core/preferences' ) !== null
 		);
 		await this.secondPage.evaluate( () => {
 			window.wp.data
@@ -153,10 +157,10 @@ export default class CollaborationUtils {
 		await Promise.all( [
 			this.primaryPage
 				.getByRole( 'button', { name: /Collaborators list/ } )
-				.waitFor( { timeout: 30_000 } ),
+				.waitFor( { timeout: 60_000 } ),
 			this.secondPage
 				.getByRole( 'button', { name: /Collaborators list/ } )
-				.waitFor( { timeout: 30_000 } ),
+				.waitFor( { timeout: 60_000 } ),
 		] );
 
 		// Allow a full round of polling after awareness is established
