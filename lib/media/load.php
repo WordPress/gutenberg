@@ -317,11 +317,13 @@ function gutenberg_start_cross_origin_isolation_output_buffer(): void {
 		null !== $chrome_version && $chrome_version >= 137
 	);
 
+	if ( ! $use_dip ) {
+		return;
+	}
+
 	ob_start(
-		function ( string $output ) use ( $use_dip ): string {
-			if ( $use_dip ) {
-				header( 'Document-Isolation-Policy: isolate-and-credentialless' );
-			}
+		function ( string $output ): string {
+			header( 'Document-Isolation-Policy: isolate-and-credentialless' );
 
 			return gutenberg_add_crossorigin_attributes( $output );
 		}
