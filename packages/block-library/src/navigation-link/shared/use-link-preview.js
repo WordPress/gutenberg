@@ -53,9 +53,7 @@ export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
 		const parsedUrl = new URL( linkUrl );
 		// Use provided homeUrl or fall back to window.location
 		// Compare by host (not origin) so http/https to same site both count as internal
-		const siteHost = homeUrl
-			? new URL( homeUrl ).host
-			: window.location.host;
+		const siteHost = new URL( homeUrl ).host;
 
 		if ( parsedUrl.host === siteHost ) {
 			// Show only the pathname (and search/hash if present)
