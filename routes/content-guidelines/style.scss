@@ -20,3 +20,10 @@
 	width: min(680px, 100%);
 	margin: 0 auto;
 }
+
+.content-guidelines__loading {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top: $grid-unit-20;
+}

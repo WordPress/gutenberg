@@ -14,25 +14,45 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown } from '@wordpress/icons';
 import { useState, useId } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './guideline-accordion.scss';
+import { STORE_NAME } from '../store';
+import { saveContentGuidelines } from '../api';
 
 interface GuidelineAccordionProps {
 	title: string;
 	description: string;
+	slug: string;
 }
 
 export default function GuidelineAccordion( {
 	title,
 	description,
+	slug,
 }: GuidelineAccordionProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const contentId = useId();
 	const headingId = useId();
 	const descriptionId = useId();
+
+	const { setGuideline } = useDispatch( STORE_NAME );
+
+	const { value } = useSelect(
+		( select ) => ( {
+			// @ts-ignore
+			value: select( STORE_NAME ).getGuideline( slug ) as string,
+		} ),
+		[ slug ]
+	);
+
+	const handleSave = ( event: React.FormEvent< HTMLFormElement > ) => {
+		event.preventDefault();
+		void saveContentGuidelines();
+	};
 
 	return (
 		<Card className="content-guidelines__accordion">
@@ -89,13 +109,17 @@ export default function GuidelineAccordion( {
 					id={ contentId }
 					aria-labelledby={ headingId }
 					aria-describedby={ descriptionId }
-					onSubmit={ ( event ) => event.preventDefault() }
+					onSubmit={ handleSave }
 					className="content-guidelines__accordion-form"
 				>
 					<VStack spacing={ 4 }>
 						<TextareaControl
 							label={ __( 'Copy guidelines' ) }
 							hideLabelFromVision
+							value={ value }
+							onChange={ ( newValue: string ) => {
+								setGuideline( slug, newValue );
+							} }
 						/>
 						<Button
 							variant="primary"
