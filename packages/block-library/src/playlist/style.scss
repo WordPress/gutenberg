@@ -1,32 +1,44 @@
+@use "@arraypress/waveform-player/dist/waveform-player";
+
+// Waveform player dimensions.
+$waveform-player-height: 100px;
+
 .wp-block-playlist {
-	.wp-block-playlist__current-item {
-		display: flex;
-		align-items: center;
-		gap: var(--wp--preset--spacing--40, 1.5em);
-		align-self: stretch;
-		padding-bottom: var(--wp--preset--spacing--30, 1em);
-		margin-bottom: var(--wp--preset--spacing--30, 1em);
-
-		div {
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			gap: var(--wp--preset--spacing--20, 0.5em);
-		}
-
-		& .wp-block-playlist__current-item-artist-album {
-			flex-direction: row;
-		}
-
-		.wp-block-playlist__item-title {
-			word-break: break-all;
-		}
-
+	// Main waveform player container.
+	.wp-block-playlist__waveform-player {
+		width: 100%;
+		margin: var(--wp--preset--spacing--20, 0.625em) 0;
+		position: relative;
 	}
 
-	audio {
-		width: 100%;
-		margin-top: var(--wp--preset--spacing--20, 0.625em);
+	// Set the waveform track height and remove gap between button and waveform.
+	.waveform-track {
+		height: $waveform-player-height;
+		gap: 0;
+	}
+
+	// WaveformPlayer button styling.
+	.waveform-btn {
+		border-radius: 0;
+		border-end-start-radius: 0.125rem;
+		border-start-start-radius: 0.125rem;
+		width: $waveform-player-height;
+		height: $waveform-player-height;
+		min-width: $waveform-player-height;
+		background: currentColor;
+		margin: 0;
+
+		&:hover:not(:disabled) {
+			transform: none;
+		}
+	}
+
+	.waveform-track.waveform-align-bottom .waveform-btn {
+		margin-bottom: 0;
+	}
+
+	.waveform-subtitle {
+		opacity: 0.7;
 	}
 
 	.wp-block-playlist__tracklist {
@@ -48,10 +60,5 @@
 		&.wp-block-playlist__tracklist-show-numbers {
 			counter-reset: playlist-track;
 		}
-	}
-
-	li.block-list-appender.block-list-appender {
-		position: initial;
-		margin-top: var(--wp--preset--spacing--30, 1em);
 	}
 }

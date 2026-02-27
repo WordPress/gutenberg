@@ -31,10 +31,10 @@ function capitalize( str ) {
  *
  * @param {Object} options         - Parameters object
  * @param {string} options.linkUrl - The URL to process
- * @param {string} options.siteUrl - The WordPress site URL (falls back to window.location.origin)
+ * @param {string} options.homeUrl - The WordPress site URL (falls back to window.location.origin)
  * @return {Object} Object with displayUrl and isExternal flag
  */
-export function computeDisplayUrl( { linkUrl, siteUrl } = {} ) {
+export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
 	if ( ! linkUrl ) {
 		return { displayUrl: '', isExternal: false };
 	}
@@ -51,8 +51,11 @@ export function computeDisplayUrl( { linkUrl, siteUrl } = {} ) {
 	// This must happen before trusting the type attribute
 	try {
 		const parsedUrl = new URL( linkUrl );
-		// Use provided siteUrl or fall back to window.location.origin
-		const siteDomain = siteUrl || window.location.origin;
+		// Use provided homeUrl or fall back to window.location.origin
+		const siteDomain = homeUrl
+			? new URL( homeUrl ).origin
+			: window.location.origin;
+
 		if ( parsedUrl.origin === siteDomain ) {
 			// Show only the pathname (and search/hash if present)
 			let path = parsedUrl.pathname + parsedUrl.search + parsedUrl.hash;
@@ -174,13 +177,12 @@ export function useLinkPreview( {
 	hasBinding,
 	isEntityAvailable,
 } ) {
-	// Get the WordPress site URL from settings
-	const siteUrl = useSelect( ( select ) => {
-		const siteEntity = select( coreDataStore ).getEntityRecord(
+	// Get the WordPress homepage URL from settings
+	const homeUrl = useSelect( ( select ) => {
+		return select( coreDataStore ).getEntityRecord(
 			'root',
-			'site'
-		);
-		return siteEntity?.url;
+			'__unstableBase'
+		)?.home;
 	}, [] );
 
 	const title =
@@ -194,7 +196,7 @@ export function useLinkPreview( {
 	// Compute display URL and external flag
 	const { displayUrl, isExternal } = computeDisplayUrl( {
 		linkUrl: url,
-		siteUrl,
+		homeUrl,
 	} );
 
 	const image = useSelect(

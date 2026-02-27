@@ -30,6 +30,7 @@ import {
 
 const POLLING_INTERVAL_IN_MS = 1000; // 1 second or 1000 milliseconds
 const POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS = 250; // 250 milliseconds
+const POLLING_INTERVAL_BACKGROUND_TAB_IN_MS = 30 * 1000; // 30 seconds
 const MAX_ERROR_BACKOFF_IN_MS = 30 * 1000; // 30 seconds
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
 
@@ -239,9 +240,27 @@ function processDocUpdate(
 	}
 }
 
+let areListenersRegistered = false;
+let hasCollaborators = false;
+let isActiveBrowser = 'visible' === document.visibilityState;
 let isPolling = false;
+let isUnloadPending = false;
 let pollInterval = POLLING_INTERVAL_IN_MS;
-let pageHideListenerRegistered = false;
+let pollingTimeoutId: ReturnType< typeof setTimeout > | null = null;
+
+/**
+ * Mark that a page unload has been requested. This fires on
+ * `beforeunload` which happens before the browser aborts in-flight
+ * fetches, allowing us to distinguish poll failures caused by
+ * navigation from genuine server errors in the catch block.
+ *
+ * If the user cancels the unload (e.g. by dismissing a "Save Changes?" dialog),
+ * the flag is reset at the start of the next poll cycle so that polling can
+ * resume.
+ */
+function handleBeforeUnload(): void {
+	isUnloadPending = true;
+}
 
 /**
  * Send a disconnect signal for all registered rooms when the page is
@@ -261,6 +280,38 @@ function handlePageHide(): void {
 	postSyncUpdateNonBlocking( { rooms } );
 }
 
+/**
+ * Hangle change in visibility state of browser tab.
+ *
+ * Used to trigger a slow down of the collaboration syncs when the
+ * browser tab becomes inactive (either the user switches tabs or the
+ * screen saver comes on).
+ *
+ * Fires on the document's visibilitychange event.
+ */
+function handleVisibilityChange() {
+	const wasActive = isActiveBrowser;
+	isActiveBrowser = document.visibilityState === 'visible';
+
+	if ( isActiveBrowser && ! wasActive ) {
+		/*
+		 * Remove scheduled polling and repoll immediately when reactivated.
+		 *
+		 * This ensures that any updates by collaborators are immediately reflected
+		 * in the document once the browser tab becomes active. Otherwise there would
+		 * be a delay of 30 seconds before the updates came through.
+		 */
+		if ( pollingTimeoutId ) {
+			clearTimeout( pollingTimeoutId );
+			pollingTimeoutId = null;
+		}
+
+		if ( isPolling ) {
+			poll();
+		}
+	}
+}
+
 function poll(): void {
 	isPolling = true;
 
@@ -269,6 +320,11 @@ function poll(): void {
 			isPolling = false;
 			return;
 		}
+
+		// Reset the unloading flag at the start of each poll cycle so
+		// it doesn't permanently suppress disconnect after the user
+		// cancels a beforeunload dialog.
+		isUnloadPending = false;
 
 		// Emit 'connecting' status.
 		roomStates.forEach( ( state ) => {
@@ -294,9 +350,6 @@ function poll(): void {
 		try {
 			const { rooms } = await postSyncUpdate( payload );
 
-			// Reset poll interval on success.
-			pollInterval = POLLING_INTERVAL_IN_MS;
-
 			// Emit 'connected' status.
 			roomStates.forEach( ( state ) => {
 				state.onStatusChange( { status: 'connected' } );
@@ -316,7 +369,7 @@ function poll(): void {
 				// If there is another collaborator, resume the queue for the next poll
 				// and increase polling frequency.
 				if ( Object.keys( room.awareness ).length > 1 ) {
-					pollInterval = POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS;
+					hasCollaborators = true;
 					roomState.updateQueue.resume();
 				}
 
@@ -347,6 +400,15 @@ function poll(): void {
 					);
 				}
 			} );
+
+			// Recalculate polling interval.
+			if ( isActiveBrowser && hasCollaborators ) {
+				pollInterval = POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS;
+			} else if ( isActiveBrowser ) {
+				pollInterval = POLLING_INTERVAL_IN_MS;
+			} else {
+				pollInterval = POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
+			}
 		} catch ( error ) {
 			// Exponential backoff on error: double the backoff time, up to max
 			pollInterval = Math.min(
@@ -371,18 +433,22 @@ function poll(): void {
 				);
 			}
 
-			roomStates.forEach( ( state ) => {
-				state.onStatusChange( { status: 'disconnected' } );
-			} );
+			// Don't report disconnected status when the request was aborted
+			// due to page unload (e.g. during a refresh) to avoid briefly
+			// flashing the disconnect dialog before the new page loads.
+			if ( ! isUnloadPending ) {
+				roomStates.forEach( ( state ) => {
+					state.onStatusChange( { status: 'disconnected' } );
+				} );
+			}
 		}
 
-		setTimeout( poll, pollInterval );
+		pollingTimeoutId = setTimeout( poll, pollInterval );
 	}
 
 	// Start polling.
 	void start();
 }
-
 function registerRoom( {
 	room,
 	doc,
@@ -440,9 +506,11 @@ function registerRoom( {
 	awareness.on( 'change', onAwarenessUpdate );
 	roomStates.set( room, roomState );
 
-	if ( ! pageHideListenerRegistered ) {
+	if ( ! areListenersRegistered ) {
+		window.addEventListener( 'beforeunload', handleBeforeUnload );
 		window.addEventListener( 'pagehide', handlePageHide );
-		pageHideListenerRegistered = true;
+		document.addEventListener( 'visibilitychange', handleVisibilityChange );
+		areListenersRegistered = true;
 	}
 
 	if ( ! isPolling ) {
@@ -470,9 +538,14 @@ function unregisterRoom( room: string ): void {
 		roomStates.delete( room );
 	}
 
-	if ( roomStates.size === 0 && pageHideListenerRegistered ) {
+	if ( 0 === roomStates.size && areListenersRegistered ) {
+		window.removeEventListener( 'beforeunload', handleBeforeUnload );
 		window.removeEventListener( 'pagehide', handlePageHide );
-		pageHideListenerRegistered = false;
+		document.removeEventListener(
+			'visibilitychange',
+			handleVisibilityChange
+		);
+		areListenersRegistered = false;
 	}
 }
 
