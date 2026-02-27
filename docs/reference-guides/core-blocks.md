@@ -780,7 +780,7 @@ Displays the title of a post, page, or any other content-type. ([Source](https:/
 -	**Name:** core/post-title
 -	**Category:** theme
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
--	**Attributes:** isLink, level, levelOptions, linkTarget, rel
+-	**Attributes:** isLink, level, levelOptions, linkTarget, placeholder, rel
 
 ## Preformatted
 
