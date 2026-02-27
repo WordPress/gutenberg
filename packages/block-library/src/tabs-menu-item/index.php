@@ -48,9 +48,11 @@ function block_core_tabs_menu_item_render_callback( array $attributes, string $c
 	$output = $tag_processor->get_updated_html();
 
 	// Inject the tab label into the button.
-	$output = preg_replace(
-		'/(<button[^>]*>)(<\/button>)/s',
-		'$1<span>' . wp_kses_post( $tab_label ) . '</span>$2',
+	$output = preg_replace_callback(
+		'/(<button[^>]*>).*?(<\/button>)/s',
+		static function ( $matches ) use ( $tab_label ) {
+			return $matches[1] . '<span>' . wp_kses_post( $tab_label ) . '</span>' . $matches[2];
+		},
 		$output
 	);
 
