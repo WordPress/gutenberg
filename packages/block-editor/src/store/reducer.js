@@ -2636,7 +2636,7 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 		}
 
 		if ( syncedPatternClientIds.length ) {
-			// Check whether this block is a synced pattern block (core/block).
+			// Synced pattern blocks (core/block).
 			if ( syncedPatternClientIds.includes( clientId ) ) {
 				// This is a synced pattern nested in another synced pattern,
 				// disable the core/block itself.
@@ -2662,6 +2662,8 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 				syncedPatternClientIds
 			);
 			if ( parentSyncedPatternClientId ) {
+				// This is an inner block of a synced pattern that's nested in another synced pattern,
+				// disable its contents.
 				if (
 					findParentInClientIdsList(
 						state,
@@ -2669,8 +2671,6 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 						syncedPatternClientIds
 					)
 				) {
-					// This is an inner block of a synced pattern that's nested in another synced pattern,
-					// disable its contents.
 					derivedBlockEditingModes.set( clientId, 'disabled' );
 					return;
 				}
