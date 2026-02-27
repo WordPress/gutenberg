@@ -3,7 +3,7 @@
  */
 import { useState, useEffect, useRef } from '@wordpress/element';
 
-const MIN_RETRYING_DISPLAY_MS = 1000;
+const MIN_RETRYING_DISPLAY_MS = 600;
 
 /**
  * Hook that computes a countdown in seconds from a retryInMs value.
@@ -57,6 +57,7 @@ export function useRetryCountdown( retryInMs, status ) {
 			setSecondsRemaining( Math.max( 0, remaining ) );
 			if ( remaining <= 0 ) {
 				clearInterval( intervalId );
+				setIsRetrying( true );
 			}
 		}, 1000 );
 
