@@ -19,69 +19,6 @@ export const Default: Story = {
 	},
 };
 
-export const Heading2xl: Story = {
-	args: {
-		variant: 'heading-2xl',
-		children: 'Heading 2XL',
-	},
-};
-
-export const HeadingXl: Story = {
-	args: {
-		variant: 'heading-xl',
-		children: 'Heading XL',
-	},
-};
-
-export const HeadingLg: Story = {
-	args: {
-		variant: 'heading-lg',
-		children: 'Heading LG',
-	},
-};
-
-export const HeadingMd: Story = {
-	args: {
-		variant: 'heading-md',
-		children: 'Heading MD',
-	},
-};
-
-export const HeadingSm: Story = {
-	args: {
-		variant: 'heading-sm',
-		children: 'Heading SM',
-	},
-};
-
-export const BodyXl: Story = {
-	args: {
-		variant: 'body-xl',
-		children: 'The quick brown fox jumps over the lazy dog.',
-	},
-};
-
-export const BodyLg: Story = {
-	args: {
-		variant: 'body-lg',
-		children: 'The quick brown fox jumps over the lazy dog.',
-	},
-};
-
-export const BodyMd: Story = {
-	args: {
-		variant: 'body-md',
-		children: 'The quick brown fox jumps over the lazy dog.',
-	},
-};
-
-export const BodySm: Story = {
-	args: {
-		variant: 'body-sm',
-		children: 'The quick brown fox jumps over the lazy dog.',
-	},
-};
-
 export const AllVariants: Story = {
 	render: () => (
 		<Stack
