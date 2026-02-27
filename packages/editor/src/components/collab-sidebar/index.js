@@ -3,13 +3,18 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
+import {
+	__experimentalVStack as VStack,
+	DropdownMenu,
+	MenuGroup,
+	MenuItemsChoice,
+} from '@wordpress/components';
+import { useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as interfaceStore } from '@wordpress/interface';
+import { store as interfaceStore, PinnedItems } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -79,34 +84,39 @@ function NotesSidebarContent( {
 
 function NotesSidebar( { postId } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
 	const { toggleBlockSpotlight, selectBlock } = unlock(
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
+	const [ notesDisplayMode, setNotesDisplayMode ] = useState( 'show' );
 
-	const { clientId, blockCommentId, isClassicBlock } = useSelect(
-		( select ) => {
-			const {
-				getBlockAttributes,
-				getSelectedBlockClientId,
-				getBlockName,
-			} = select( blockEditorStore );
-			const _clientId = getSelectedBlockClientId();
-			return {
-				clientId: _clientId,
-				blockCommentId: _clientId
-					? getBlockAttributes( _clientId )?.metadata?.noteId
-					: null,
-				isClassicBlock: _clientId
-					? getBlockName( _clientId ) === 'core/freeform'
-					: false,
-			};
-		},
-		[]
-	);
+	const {
+		clientId,
+		blockCommentId,
+		isClassicBlock,
+		isAllNotesSidebarActive,
+	} = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
+			select( blockEditorStore );
+		const _clientId = getSelectedBlockClientId();
+		return {
+			clientId: _clientId,
+			blockCommentId: _clientId
+				? getBlockAttributes( _clientId )?.metadata?.noteId
+				: null,
+			isClassicBlock: _clientId
+				? getBlockName( _clientId ) === 'core/freeform'
+				: false,
+			isAllNotesSidebarActive:
+				select( interfaceStore ).getActiveComplementaryArea(
+					'core'
+				) === ALL_NOTES_SIDEBAR,
+		};
+	}, [] );
 	const { isDistractionFree } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
@@ -162,6 +172,9 @@ function NotesSidebar( { postId } ) {
 		: null;
 
 	async function openTheSidebar( selectedClientId ) {
+		if ( notesDisplayMode === 'hide' ) {
+			setNotesDisplayMode( 'show' );
+		}
 		const prevArea = await getActiveComplementaryArea( 'core' );
 		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
 		const targetClientId =
@@ -194,6 +207,13 @@ function NotesSidebar( { postId } ) {
 		selectNote( targetNote ? targetNote.id : 'new', { focus: true } );
 	}
 
+	let notesDropdownValue = 'show';
+	if ( isAllNotesSidebarActive ) {
+		notesDropdownValue = 'show-all';
+	} else if ( notesDisplayMode === 'hide' ) {
+		notesDropdownValue = 'hide';
+	}
+
 	if ( isDistractionFree ) {
 		return <AddCommentMenuItem isDistractionFree />;
 	}
@@ -208,7 +228,56 @@ function NotesSidebar( { postId } ) {
 			) }
 			<AddCommentMenuItem onClick={ openTheSidebar } />
 			{ showAllNotesSidebar && (
+				<PinnedItems scope="core">
+					<DropdownMenu
+						icon={ commentIcon }
+						label={ __( 'Notes' ) }
+						menuProps={ {
+							'aria-label': __( 'Notes display options' ),
+						} }
+						toggleProps={ {
+							size: 'compact',
+						} }
+					>
+						{ () => (
+							<MenuGroup>
+								<MenuItemsChoice
+									choices={ [
+										{
+											value: 'show-all',
+											label: __( 'Show all notes' ),
+										},
+										{
+											value: 'hide',
+											label: __( 'Hide notes' ),
+										},
+									] }
+									value={ notesDropdownValue }
+									onSelect={ ( value ) => {
+										if ( value === 'show-all' ) {
+											enableComplementaryArea(
+												'core',
+												ALL_NOTES_SIDEBAR
+											);
+											setNotesDisplayMode( 'show' );
+										} else {
+											if ( isAllNotesSidebarActive ) {
+												disableComplementaryArea(
+													'core'
+												);
+											}
+											setNotesDisplayMode( value );
+										}
+									} }
+								/>
+							</MenuGroup>
+						) }
+					</DropdownMenu>
+				</PinnedItems>
+			) }
+			{ showAllNotesSidebar && notesDisplayMode !== 'hide' && (
 				<PluginSidebar
+					isPinnable={ ! isLargeViewport }
 					identifier={ ALL_NOTES_SIDEBAR }
 					name={ ALL_NOTES_SIDEBAR }
 					title={ __( 'All notes' ) }
@@ -226,7 +295,7 @@ function NotesSidebar( { postId } ) {
 					/>
 				</PluginSidebar>
 			) }
-			{ isLargeViewport && (
+			{ isLargeViewport && notesDisplayMode !== 'hide' && (
 				<PluginSidebar
 					isPinnable={ false }
 					header={ false }
