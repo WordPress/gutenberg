@@ -122,38 +122,45 @@ export default function LeafMoreMenu( props ) {
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 
-	const { rootClientId, canDuplicate, canInsertBlock } = useSelect(
-		( select ) => {
-			const {
-				getBlockRootClientId,
-				canInsertBlockType,
-				getDirectInsertBlock,
-			} = select( blockEditorStore );
-			const { getDefaultBlockName } = select( blocksStore );
+	const { rootClientId, canDuplicate, canInsertBlock, isFirst, isLast } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockRootClientId,
+					canInsertBlockType,
+					getDirectInsertBlock,
+					getBlockIndex,
+					getBlockCount,
+				} = select( blockEditorStore );
+				const { getDefaultBlockName } = select( blocksStore );
 
-			const _rootClientId = getBlockRootClientId( clientId );
-			const canInsertDefaultBlock = canInsertBlockType(
-				getDefaultBlockName(),
-				_rootClientId
-			);
-			const directInsertBlock = _rootClientId
-				? getDirectInsertBlock( _rootClientId )
-				: null;
+				const _rootClientId = getBlockRootClientId( clientId );
+				const canInsertDefaultBlock = canInsertBlockType(
+					getDefaultBlockName(),
+					_rootClientId
+				);
+				const directInsertBlock = _rootClientId
+					? getDirectInsertBlock( _rootClientId )
+					: null;
 
-			return {
-				rootClientId: _rootClientId,
-				canDuplicate:
-					!! block &&
-					hasBlockSupport( block.name, 'multiple', true ) &&
-					canInsertBlockType( block.name, _rootClientId ),
-				canInsertBlock:
-					( canInsertDefaultBlock || !! directInsertBlock ) &&
-					!! block &&
-					canInsertBlockType( block.name, _rootClientId ),
-			};
-		},
-		[ clientId, block ]
-	);
+				return {
+					rootClientId: _rootClientId,
+					canDuplicate:
+						!! block &&
+						hasBlockSupport( block.name, 'multiple', true ) &&
+						canInsertBlockType( block.name, _rootClientId ),
+					canInsertBlock:
+						( canInsertDefaultBlock || !! directInsertBlock ) &&
+						!! block &&
+						canInsertBlockType( block.name, _rootClientId ),
+					isFirst: getBlockIndex( clientId ) === 0,
+					isLast:
+						getBlockIndex( clientId ) ===
+						getBlockCount( _rootClientId ) - 1,
+				};
+			},
+			[ clientId, block ]
+		);
 
 	return (
 		<DropdownMenu
@@ -169,6 +176,8 @@ export default function LeafMoreMenu( props ) {
 					<MenuGroup>
 						<MenuItem
 							icon={ chevronUp }
+							disabled={ isFirst }
+							accessibleWhenDisabled
 							onClick={ () => {
 								moveBlocksUp( [ clientId ], rootClientId );
 								onClose();
@@ -178,6 +187,8 @@ export default function LeafMoreMenu( props ) {
 						</MenuItem>
 						<MenuItem
 							icon={ chevronDown }
+							disabled={ isLast }
+							accessibleWhenDisabled
 							onClick={ () => {
 								moveBlocksDown( [ clientId ], rootClientId );
 								onClose();

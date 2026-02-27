@@ -8,7 +8,7 @@ import {
 } from '@wordpress/blocks';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { moreVertical } from '@wordpress/icons';
+import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
 import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -89,6 +89,8 @@ export function BlockSettingsDropdown( {
 		isZoomOut,
 		canEdit,
 		canMove,
+		isFirst,
+		isLast,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -101,6 +103,8 @@ export function BlockSettingsDropdown( {
 				isZoomOut: _isZoomOut,
 				canEditBlock,
 				canMoveBlocks,
+				getBlockIndex,
+				getBlockCount,
 			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
@@ -127,6 +131,10 @@ export function BlockSettingsDropdown( {
 				isZoomOut: _isZoomOut(),
 				canEdit: canEditBlock( firstBlockClientId ),
 				canMove: canMoveBlocks( clientIds ),
+				isFirst: getBlockIndex( firstBlockClientId ) === 0,
+				isLast:
+					getBlockIndex( firstBlockClientId ) ===
+					getBlockCount( _firstParentClientId ) - 1,
 			};
 		},
 		[ firstBlockClientId, clientIds ]
@@ -251,6 +259,9 @@ export function BlockSettingsDropdown( {
 									{ canMove && isContentOnly && (
 										<>
 											<MenuItem
+												icon={ chevronUp }
+												disabled={ isFirst }
+												accessibleWhenDisabled
 												onClick={ pipe( onClose, () => {
 													moveBlocksUp(
 														clientIds,
@@ -261,6 +272,9 @@ export function BlockSettingsDropdown( {
 												{ __( 'Move up' ) }
 											</MenuItem>
 											<MenuItem
+												icon={ chevronDown }
+												disabled={ isLast }
+												accessibleWhenDisabled
 												onClick={ pipe( onClose, () => {
 													moveBlocksDown(
 														clientIds,
