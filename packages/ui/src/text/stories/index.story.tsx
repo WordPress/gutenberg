@@ -1,6 +1,5 @@
 /* eslint-disable jsx-a11y/heading-has-content */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Fragment } from '@wordpress/element';
 import { Text } from '../index';
 import { Stack } from '../../stack';
 
@@ -39,14 +38,12 @@ export const AllVariants: Story = {
 					'body-sm',
 				] as const
 			 ).map( ( variant ) => (
-				<Fragment key={ variant }>
-					<Stack direction="column" gap="xs">
-						<Text variant="heading-sm">{ variant }</Text>
-						<Text variant={ variant }>
-							The quick brown fox jumps over the lazy dog.
-						</Text>
-					</Stack>
-				</Fragment>
+				<Stack key={ variant } direction="column" gap="xs">
+					<Text variant="heading-sm">{ variant }</Text>
+					<Text variant={ variant }>
+						The quick brown fox jumps over the lazy dog.
+					</Text>
+				</Stack>
 			) ) }
 		</Stack>
 	),
