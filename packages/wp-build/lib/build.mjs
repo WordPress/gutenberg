@@ -443,7 +443,7 @@ async function bundlePackage( packageName, options = {} ) {
 		handlePrefix = HANDLE_PREFIX,
 		scriptGlobal = SCRIPT_GLOBAL,
 		packageNamespace = PACKAGE_NAMESPACE,
-		production = false,
+		noScriptDebug = false,
 	} = options;
 
 	const builtModules = [];
@@ -509,7 +509,7 @@ async function bundlePackage( packageName, options = {} ) {
 			} )
 		);
 
-		if ( ! production ) {
+		if ( ! noScriptDebug ) {
 			builds.push(
 				esbuild.build( {
 					...baseConfig,
@@ -582,7 +582,7 @@ async function bundlePackage( packageName, options = {} ) {
 				} )
 			);
 
-			if ( ! production ) {
+			if ( ! noScriptDebug ) {
 				builds.push(
 					esbuild.build( {
 						entryPoints: [ entryPoint ],
@@ -650,7 +650,7 @@ async function bundlePackage( packageName, options = {} ) {
 					const content = await readFile( cssFile, 'utf8' );
 
 					// Write non-minified version (for SCRIPT_DEBUG=true)
-					if ( ! production ) {
+					if ( ! noScriptDebug ) {
 						await writeFile( destPath, content );
 					}
 
@@ -1537,10 +1537,10 @@ function getPackageName( filename ) {
  *
  * @param {string}  routeName            Route name.
  * @param {Object}  root0                Options object.
- * @param {boolean} root0.production     Whether to skip unminified builds.
+ * @param {boolean} root0.noScriptDebug  Whether to skip unminified builds.
  * @return {Promise<number>} Build time in milliseconds.
  */
-async function buildRoute( routeName, { production = false } = {} ) {
+async function buildRoute( routeName, { noScriptDebug = false } = {} ) {
 	const startTime = Date.now();
 	const routeDir = path.join( ROOT_DIR, 'routes', routeName );
 	const outputDir = path.join( BUILD_DIR, 'routes', routeName );
@@ -1578,7 +1578,7 @@ async function buildRoute( routeName, { production = false } = {} ) {
 				} ),
 			];
 
-			if ( ! production ) {
+			if ( ! noScriptDebug ) {
 				routeBuilds.push(
 					esbuild.build( {
 						entryPoints: routeEntryPoints,
@@ -1634,7 +1634,7 @@ async function buildRoute( routeName, { production = false } = {} ) {
 			} ),
 		];
 
-		if ( ! production ) {
+		if ( ! noScriptDebug ) {
 			contentBuilds.push(
 				esbuild.build( {
 					entryPoints: [ tempEntryPath ],
@@ -1669,10 +1669,10 @@ async function buildRoute( routeName, { production = false } = {} ) {
  * Build all discovered routes.
  *
  * @param {Object}  root0            Options object.
- * @param {boolean} root0.production Whether to skip unminified builds.
+ * @param {boolean} root0.noScriptDebug Whether to skip unminified builds.
  * @return {Promise<void>}
  */
-async function buildAllRoutes( { production = false } = {} ) {
+async function buildAllRoutes( { noScriptDebug = false } = {} ) {
 	console.log( '\n🚦 Phase 3: Building routes...\n' );
 
 	const routes = getAllRoutes( ROOT_DIR );
@@ -1684,7 +1684,7 @@ async function buildAllRoutes( { production = false } = {} ) {
 
 	await Promise.all(
 		routes.map( async ( routeName ) => {
-			const buildTime = await buildRoute( routeName, { production } );
+			const buildTime = await buildRoute( routeName, { noScriptDebug } );
 			console.log(
 				`   ✔ Built route ${ routeName } (${ buildTime }ms)`
 			);
@@ -1697,9 +1697,9 @@ async function buildAllRoutes( { production = false } = {} ) {
  *
  * @param {string?} baseUrlExpression
  * @param {Object}  root0                Options object.
- * @param {boolean} root0.production     Whether to skip unminified builds.
+ * @param {boolean} root0.noScriptDebug  Whether to skip unminified builds.
  */
-async function buildAll( baseUrlExpression, { production = false } = {} ) {
+async function buildAll( baseUrlExpression, { noScriptDebug = false } = {} ) {
 	console.log( '🔨 Building packages...\n' );
 
 	const startTime = Date.now();
@@ -1741,7 +1741,7 @@ async function buildAll( baseUrlExpression, { production = false } = {} ) {
 		PACKAGES.map( async ( packageName ) => {
 			const startBundleTime = Date.now();
 			const ret = await bundlePackage( packageName, {
-				production,
+				noScriptDebug,
 			} );
 			const buildTime = Date.now() - startBundleTime;
 			if ( ret ) {
@@ -1763,7 +1763,7 @@ async function buildAll( baseUrlExpression, { production = false } = {} ) {
 	);
 
 	// Build routes
-	await buildAllRoutes( { production } );
+	await buildAllRoutes( { noScriptDebug } );
 
 	// Collect route and page data for PHP generation
 	// Use flatMap to expand routes with multiple pages into separate entries
@@ -1862,7 +1862,7 @@ async function buildAll( baseUrlExpression, { production = false } = {} ) {
 		ROOT_DIR,
 		baseUrlExpression
 	);
-	phpReplacements[ '{{HAS_DEBUG_ASSETS}}' ] = production ? 'false' : 'true';
+	phpReplacements[ '{{HAS_DEBUG_ASSETS}}' ] = noScriptDebug ? 'false' : 'true';
 	await Promise.all( [
 		generateMainBuildPhp( phpReplacements ),
 		generateModuleRegistrationPhp( modules, phpReplacements ),
@@ -2157,7 +2157,7 @@ async function main() {
 				short: 'w',
 				default: false,
 			},
-			production: {
+			'no-script-debug': {
 				type: 'boolean',
 				default: false,
 			},
@@ -2170,16 +2170,16 @@ async function main() {
 	} );
 
 	const baseUrlExpression = values[ 'base-url' ];
-	let production = values.production;
+	let noScriptDebug = values[ 'no-script-debug' ];
 
-	if ( production && values.watch ) {
+	if ( noScriptDebug && values.watch ) {
 		console.warn(
-			'⚠️  --production is ignored in watch mode (watch is for development).'
+			'⚠️  --no-script-debug is ignored in watch mode (watch is for development).'
 		);
-		production = false;
+		noScriptDebug = false;
 	}
 
-	await buildAll( baseUrlExpression, { production } );
+	await buildAll( baseUrlExpression, { noScriptDebug } );
 
 	if ( values.watch ) {
 		console.log( '\n👀 Watching for changes...\n' );
