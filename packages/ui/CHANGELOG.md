@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.0-next.0 (2026-02-27)
+
 ### New Features
 
 -   Add `Notice` primitive ([#75981](https://github.com/WordPress/gutenberg/pull/75981)).

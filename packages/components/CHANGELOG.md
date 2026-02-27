@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 32.3.0-next.0 (2026-02-27)
+
 ### Code Quality
 
 -   Improve typing of `focusOnMount` prop in `Dropdown`, `Modal` and `Popover` ([#75442](https://github.com/WordPress/gutenberg/pull/75442)).

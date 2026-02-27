@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.1.0-next.0 (2026-02-27)
+
 ### Bug Fixes
 
 - DataForm: Fix label color of array control. [#75730](https://github.com/WordPress/gutenberg/pull/75730)
