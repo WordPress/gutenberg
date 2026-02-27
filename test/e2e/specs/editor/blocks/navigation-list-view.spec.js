@@ -552,44 +552,41 @@ test.describe( 'Navigation block - List view editing', () => {
 		).toBeFocused();
 	} );
 
-	test( 'displays custom menu name in List View tab header', async ( {
+	test( 'displays custom menu name in List View tab header in contentOnly mode', async ( {
 		page,
 		editor,
 		requestUtils,
+		pageUtils,
 	} ) => {
-		// Create two navigation menus with different names
+		// Create a navigation menu with a custom name.
 		const headerMenu = await requestUtils.createNavigationMenu( {
 			title: 'Header Menu',
 			content: navMenuBlocksFixture.content,
 		} );
-		const footerMenu = await requestUtils.createNavigationMenu( {
-			title: 'Footer Menu',
-			content: navMenuBlocksFixture.content,
-		} );
 
-		// Insert both navigation blocks
-		await editor.insertBlock( {
-			name: 'core/navigation',
-			attributes: {
-				ref: headerMenu.id,
-			},
-		} );
-		await editor.insertBlock( {
-			name: 'core/navigation',
-			attributes: {
-				ref: footerMenu.id,
-			},
-		} );
+		// Use the code editor to insert a contentOnly-locked group containing
+		// the navigation block. This triggers contentOnly mode where
+		// isSelectionWithinCurrentSection is true.
+		await pageUtils.pressKeys( 'secondary+M' );
+		await page
+			.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill(
+				`<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->` +
+					`<div class="wp-block-group">` +
+					`<!-- wp:navigation {"ref":${ headerMenu.id }} /-->` +
+					`</div>` +
+					`<!-- /wp:group -->`
+			);
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		// Select the navigation block inside the contentOnly group.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.click();
 
 		await editor.openDocumentSettingsSidebar();
 
-		// Select the first navigation block (the one above the currently selected block)
-		const navigationBlocks = editor.canvas.getByRole( 'document', {
-			name: 'Block: Navigation',
-		} );
-		await navigationBlocks.first().click();
-
-		// Verify the List View tab header shows "Header Menu"
+		// Click the List View tab.
 		const listViewTab = page.getByRole( 'tab', { name: 'List View' } );
 		await listViewTab.click();
 
@@ -597,17 +594,10 @@ test.describe( 'Navigation block - List view editing', () => {
 			name: 'List View',
 		} );
 
-		// Check that the panel heading shows the custom menu name
+		// In contentOnly mode, the PanelBody title should show the custom
+		// menu name as a collapsible panel button.
 		await expect(
-			listViewPanel.getByRole( 'heading', { name: 'Header Menu' } )
-		).toBeVisible();
-
-		// Select the second navigation block
-		await navigationBlocks.last().click();
-
-		// Verify the List View tab header shows "Footer Menu"
-		await expect(
-			listViewPanel.getByRole( 'heading', { name: 'Footer Menu' } )
+			listViewPanel.getByRole( 'button', { name: 'Header Menu' } )
 		).toBeVisible();
 	} );
 } );
