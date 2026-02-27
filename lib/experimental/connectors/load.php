@@ -14,6 +14,10 @@ remove_action( 'admin_menu', '_wp_connectors_add_settings_menu_item' );
  * @access private
  */
 function _gutenberg_connectors_add_settings_menu_item(): void {
+	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) || ! function_exists( 'gutenberg_connectors_wp_admin_render_page' ) ) {
+		return;
+	}
+
 	// Remove Core's connectors menu item if it exists.
 	remove_submenu_page( 'options-general.php', 'connectors-wp-admin' );
 	add_submenu_page(

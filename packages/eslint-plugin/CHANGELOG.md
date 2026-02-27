@@ -6,6 +6,10 @@
 
 -   Added [`no-ds-tokens`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-ds-tokens.md) rule to disallow usage of Design System token CSS custom properties (`--wpds-*`).
 
+### Enhancements
+
+-   The `no-unknown-ds-tokens` rule now checks all string literals and template literals, not just JSX `style` attributes. It also reports dynamically constructed `--wpds-*` token names.
+
 ## 24.2.0 (2026-02-18)
 
 ## 24.1.0 (2026-01-29)
