@@ -68,7 +68,7 @@ function PostTitleRaw( _, forwardedRef ) {
 	return (
 		<TextareaControl
 			ref={ focusRef }
-			value={ title }
+			value={ decodeEntities( title ) }
 			onChange={ onChange }
 			onFocus={ onSelect }
 			onBlur={ onUnselect }
