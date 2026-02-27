@@ -29,7 +29,7 @@ function block_core_tabs_menu_item_render_callback( array $attributes, string $c
 		$tab_id = 'tab-' . $tab_index;
 	}
 
-	// Add IAPI directives and tab-specific attributes to the button.
+	// Add Interactivity API directives and tab-specific attributes to the button.
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 
 	if ( $tag_processor->next_tag() ) {
