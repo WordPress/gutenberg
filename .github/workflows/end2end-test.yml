@@ -68,6 +68,14 @@ jobs:
                   path: artifacts/test-results
                   if-no-files-found: ignore
 
+            - name: Archive blob reports (HTML)
+              uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+              if: ${{ !cancelled() }}
+              with:
+                  name: blob-reports--${{ matrix.part }}
+                  path: blob-report
+                  if-no-files-found: ignore
+
             - name: Archive flaky tests report
               uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
               if: ${{ !cancelled() }}
@@ -81,10 +89,19 @@ jobs:
         if: ${{ !cancelled() }}
         needs: [e2e-playwright]
         runs-on: 'ubuntu-24.04'
-        permissions: {}
+        permissions:
+            contents: read
         outputs:
             has-flaky-test-report: ${{ !!steps.merge-flaky-tests-reports.outputs.artifact-id }}
         steps:
+            - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
             - name: Merge failures artifacts
               uses: actions/upload-artifact/merge@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
               # Don't fail the job if there aren't any artifacts to merge.
@@ -103,6 +120,33 @@ jobs:
                   name: flaky-tests-report
                   pattern: flaky-tests-report*
                   delete-merged: true
+
+            - name: Merge blob reports
+              uses: actions/upload-artifact/merge@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+              continue-on-error: true
+              with:
+                  name: blob-reports-merged
+                  pattern: blob-reports--*
+                  delete-merged: true
+
+            - name: Download merged blob reports
+              uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+              continue-on-error: true
+              with:
+                  name: blob-reports-merged
+                  path: all-blob-reports
+
+            - name: Merge blob reports into HTML report
+              run: npx playwright merge-reports --reporter html ./all-blob-reports
+              continue-on-error: true
+
+            - name: Upload merged HTML report
+              uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+              continue-on-error: true
+              with:
+                  name: html-report--attempt-${{ github.run_attempt }}
+                  path: playwright-report
+                  if-no-files-found: ignore
 
     report-to-issues:
         name: Report to GitHub

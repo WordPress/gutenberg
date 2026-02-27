@@ -207,7 +207,7 @@ const view = {
 
 Properties:
 
--   `type`: view type, one of `table`, `grid`, `list`. See "Layout types".
+-   `type`: view type, one of `table`, `grid`, `list`, `activity`, `pickerTable`, `pickerGrid`. See "Layout types".
 -   `search`: the text search applied to the dataset.
 -   `filters`: the filters applied to the dataset. Each item describes:
     -   `field`: which field this filter is bound to.
@@ -230,7 +230,9 @@ Properties:
 
     -   `field`: the field used for grouping the dataset.
     -   `direction`: the direction to use for sorting the groups, one of `asc` or `desc`. Default `asc`.
+    -   `showLabel`: whether to show the field label in the group header. `true` by default.
 
+-   `infiniteScrollEnabled`: whether infinite scroll is enabled. `false` by default.
 -   `fields`: a list of remaining field `id` that are visible in the UI and the specific order in which they are displayed.
 -   `layout`: config that is specific to a particular layout type.
 
@@ -238,7 +240,7 @@ Properties:
 
 | Props / Layout | `table` | `pickerTable` | `grid` | `pickerGrid` | `list` | `activity` |
 | -------------- | ------- | ------------- | ------ | ------------ | ------ | ---------- |
-| `density`      | ✓       | ✓             |        |              |        | ✓          |
+| `density`      | ✓       | ✓             |        |              | ✓      | ✓          |
 | `enableMoving` | ✓       | ✓             |        |              |        |            |
 | `styles`       | ✓       | ✓             |        |              |        |            |
 | `badgeFields`  |         |               | ✓      | ✓            |        |            |
@@ -248,10 +250,10 @@ Properties:
 
 -   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 -   `enableMoving`: whether the table columns should display moving controls.
--   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column.
+-   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column. The `align` property accepts `'start'`, `'center'`, or `'end'`.
 
 **For column alignment (`align` property), follow these guidelines:**
-Right-align whenever the cell value is fundamentally quantitative—numbers, decimals, currency, percentages—so that digits and decimal points line up, aiding comparison and calculation. Otherwise, default to left-alignment for all other types (text, codes, labels, dates).
+Right-align (`'end'`) whenever the cell value is fundamentally quantitative—numbers, decimals, currency, percentages—so that digits and decimal points line up, aiding comparison and calculation. Otherwise, default to left-alignment (`'start'`) for all other types (text, codes, labels, dates).
 
 `grid` and `pickerGrid` layout:
 
@@ -260,7 +262,7 @@ Right-align whenever the cell value is fundamentally quantitative—numbers, dec
 
 `list` layout:
 
--   None
+-   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 
 `activity` layout:
 
@@ -400,7 +402,7 @@ What text to show in the search input. "Search" by default.
 
 Whether the data is loading. `false` by default.
 
-#### `defaultLayouts`: `Record< string, view >`
+#### `defaultLayouts`: `Object`
 
 This property limits the available layout and provides layout information about active view types. If empty, this enables all layout types (see "Layout Types") with empty layout data.
 
@@ -417,7 +419,7 @@ const defaultLayouts = {
 };
 ```
 
-The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, `list`, and `activity`. These properties are applied to the view object each time the user switches to the corresponding layout.
+The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, `list`, `activity`, `pickerTable`, and `pickerGrid`. These properties are applied to the view object each time the user switches to the corresponding layout.
 
 #### `selection`: `string[]`
 
@@ -823,7 +825,7 @@ const fields = [
 ];
 ```
 
-#### `form`: `Object[]`
+#### `form`: `Object`
 
 -   `layout`: an object describing the layout used to render the top-level fields present in `fields`. See `layout` prop in "Form Field API".
 -   `fields`: a list of fields ids that should be rendered. Field ids can also be defined as an object and allow you to define a `layout`, `labelPosition` or `children` if displaying combined fields. See "Form Field API" for a description of every property.
@@ -893,7 +895,9 @@ return (
 
 Object that determines the validation status of each field. There's a `useFormValidity` hook that can be used to create the validity object — see the utility below. This section documents the `validity` object in case you want to create it via other means.
 
-The top-level props of the `validity` object are the field IDs. Fields declare their validity status for each of the validation rules supported: `required`, `elements`, `custom`. If a rule is valid, it should not be present in the object; if a field is valid for all the rules, it should not be present in the object either.
+The top-level props of the `validity` object are the field IDs. Fields declare their validity status for each of the validation rules supported: `required`, `elements`, `pattern`, `minLength`, `maxLength`, `min`, `max`, `custom`. If a rule is valid, it should not be present in the object; if a field is valid for all the rules, it should not be present in the object either.
+
+A field's validity can also contain a `children` property (`Record<string, FieldValidity>`) for nested field validity when using combined fields.
 
 For example:
 
@@ -908,6 +912,32 @@ For example:
 		"elements": {
 			"type": "invalid",
 			"message": "Value must be one of the elements."
+		}
+	},
+	"slug": {
+		"pattern": {
+			"type": "invalid",
+			"message": "Must match the required pattern."
+		}
+	},
+	"description": {
+		"minLength": {
+			"type": "invalid",
+			"message": "Must be at least 10 characters."
+		},
+		"maxLength": {
+			"type": "invalid",
+			"message": "Must be at most 200 characters."
+		}
+	},
+	"price": {
+		"min": {
+			"type": "invalid",
+			"message": "Must be at least 0."
+		},
+		"max": {
+			"type": "invalid",
+			"message": "Must be at most 9999."
 		}
 	},
 	"publisher": {
@@ -981,6 +1011,26 @@ Returns an object containing:
 		elements: {
 			type: 'invalid',
 			message: 'Value must be one of the elements.' // Optional
+		},
+		pattern: {
+			type: 'invalid',
+			message: 'Must match the required pattern.'
+		},
+		minLength: {
+			type: 'invalid',
+			message: 'Must be at least 10 characters.'
+		},
+		maxLength: {
+			type: 'invalid',
+			message: 'Must be at most 200 characters.'
+		},
+		min: {
+			type: 'invalid',
+			message: 'Must be at least 0.'
+		},
+		max: {
+			type: 'invalid',
+			message: 'Must be at most 9999.'
 		},
 		custom: {
 			type: 'validating',
@@ -1084,7 +1134,7 @@ Function that performs the required action.
 
 ```js
 {
-	callback: ( items, { onActionPerformed } ) => {
+	callback: ( items, { registry, onActionPerformed } ) => {
 		// Perform action.
 		onActionPerformed?.( items );
 	};
@@ -1231,7 +1281,7 @@ Example:
 
 React element used by some layouts (table, grid) to display the field name — useful to add icons, etc.
 
--   Type: React element.
+-   Type: `string` | React element.
 -   Optional.
 -   Defaults to the `label` value.
 
@@ -1533,6 +1583,8 @@ Finally, the field author can always provide its own custom `Edit` control. It r
 -   `field`: the field definition
 -   `onChange`: the callback with the updates
 -   `hideLabelFromVision`: boolean representing if the label should be hidden
+-   `markWhenOptional`: boolean indicating whether to label the control as "optional" when the field is not required, instead of showing "required"
+-   `operator`: the currently selected filter operator for this field. Used by DataViews filters to determine which control to render based on the operator type
 -   `validity`: object representing the validity of the field's value (see validity section)
 -   `config`: object representing extra config for the component:
     -   `prefix`: a React component to be rendered as a prefix
@@ -1621,6 +1673,11 @@ Object that contains the validation rules for the field. If a rule is not met, t
 
 -   `required`: boolean indicating whether the field is required or not. Disabled by default.
 -   `elements`: boolean restricting selection to the provided list of elements only. Enabled by default. The `array` Edit control uses it to restrict the input values.
+-   `pattern`: a regex pattern string that the field value must match.
+-   `minLength`: minimum string length for the field value.
+-   `maxLength`: maximum string length for the field value.
+-   `min`: minimum numeric value for the field.
+-   `max`: maximum numeric value for the field.
 -   `custom`: a function that validates a field's value. If the value is invalid, the function should return a string explaining why the value is invalid. Otherwise, the function must return null.
 
 Fields that define a type come with default validation for the type. For example, the `integer` type ensures that the value is a valid integer:
@@ -1952,10 +2009,29 @@ Valid operators per field type:
 
 ### `format`
 
-Display format configuration for fields. Supported for date, number, and integer fields. This configuration affects how the field is displayed in the `render` method, the `Edit` control, and filter controls.
+Display format configuration for fields. Supported for `datetime`, `date`, `number`, and `integer` fields. This configuration affects how the field is displayed in the `render` method, the `Edit` control, and filter controls.
 
 -   Type: `object`.
 -   Optional.
+
+For `datetime` fields:
+-   Properties:
+    -   `datetime`: The format string using PHP date format (e.g., `'M j, Y g:i a'` for `'Jan 1, 2021 2:30 pm'`). Optional, defaults to WordPress date format settings.
+    -   `weekStartsOn`: Specifies the first day of the week for calendar controls. One of 0, 1, 2, 3, 4, 5, 6. Optional, defaults to WordPress "Week Starts On" setting, whose value is 0 (Sunday).
+
+Example:
+
+```js
+{
+	id: 'createdAt',
+	type: 'datetime',
+	label: 'Created At',
+	format: {
+		datetime: 'M j, Y g:i a',
+		weekStartsOn: 1,
+	},
+}
+```
 
 For `date` fields:
 -   Properties:
@@ -2035,7 +2111,7 @@ Example:
 
 ### `layout`
 
-Represents the type of layout used to render the field. It'll be one of Regular, Panel, Card, or Row. This prop is the same as the `form.layout` prop.
+Represents the type of layout used to render the field. It'll be one of Regular, Panel, Card, Row, or Details. This prop is the same as the `form.layout` prop.
 
 #### Regular
 
@@ -2116,6 +2192,7 @@ For example:
 
 -   `type`: `row`. Required.
 -   `alignment`: one of `start`, `center`, or `end`. Optional. `center` by default.
+-   `styles`: an object mapping field IDs to style objects. Each style object supports a `flex` property (any valid CSS `flex` value) to control how the field sizes within the row. Optional.
 
 The Row layout displays fields horizontally in a single row. It's particularly useful for grouping related fields that should be displayed side by side. This layout can be used both as a top-level form layout and for individual field groups.
 
@@ -2126,7 +2203,30 @@ For example:
 	id: 'field_id',
 	layout: {
 		type: 'row',
-		alignment: 'start'
+		alignment: 'start',
+		styles: {
+			field1: { flex: '1 1 auto' },
+			field2: { flex: '0 0 200px' },
+		},
+	},
+}
+```
+
+#### Details
+
+-   `type`: `details`. Required.
+-   `summary`: Summary field configuration. Optional. Specifies which field to display in the details summary. A string (single field ID)
+
+The Details layout renders the field inside a collapsible `<details>` HTML element. The `summary` property controls the text shown in the disclosure summary.
+
+For example:
+
+```js
+{
+	id: 'field_id',
+	layout: {
+		type: 'details',
+		summary: 'summaryFieldId'
 	},
 }
 ```
@@ -2144,6 +2244,24 @@ Example:
 	id: 'field_id',
 	label: 'Combined Field',
 	children: [ 'field1', 'field2' ]
+}
+```
+
+### `description`
+
+A string describing the form field's purpose or usage. Used to provide additional context.
+
+-   Type: `string`.
+-   Optional.
+
+Example:
+
+```js
+{
+	id: 'field_id',
+	label: 'Status & Visibility',
+	description: 'Control the publish status and visibility of the post.',
+	children: [ 'status', 'password' ],
 }
 ```
 

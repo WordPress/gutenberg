@@ -2,6 +2,7 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/z-index" as *;
+@use "../../../dataviews/style" as *;
 
 .dataviews-view-table {
 	width: 100%;
@@ -308,4 +309,8 @@
 /* Column width intents via colgroup: make non-primary columns shrink-to-fit */
 .dataviews-view-table col[class^="dataviews-view-table__col-"]:not(.dataviews-view-table__col-first-data):not(.dataviews-view-table__col-expand) {
 	width: 1%;
+}
+
+.dataviews-view-table.is-refreshing {
+	@include dataviews-refreshing();
 }
