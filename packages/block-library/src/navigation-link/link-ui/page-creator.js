@@ -24,17 +24,19 @@ import DialogWrapper from './dialog-wrapper';
 /**
  * Component for creating new pages within the Navigation Link UI.
  *
- * @param {Object}   props                Component props.
- * @param {string}   props.postType       The post type to create.
- * @param {Function} props.onBack         Callback when user wants to go back.
- * @param {Function} props.onPageCreated  Callback when page is successfully created.
- * @param {string}   [props.initialTitle] Initial title to pre-fill the form.
+ * @param {Object}   props                  Component props.
+ * @param {string}   props.postType         The post type to create.
+ * @param {Function} props.onBack           Callback when user wants to go back.
+ * @param {Function} props.onPageCreated    Callback when page is successfully created.
+ * @param {string}   [props.initialTitle]   Initial title to pre-fill the form.
+ * @param {Object}   [props.additionalData] Additional data to include when saving the entity record.
  */
 export function LinkUIPageCreator( {
 	postType,
 	onBack,
 	onPageCreated,
 	initialTitle = '',
+	additionalData = {},
 } ) {
 	const [ title, setTitle ] = useState( initialTitle );
 	const [ shouldPublish, setShouldPublish ] = useState( true );
@@ -74,6 +76,7 @@ export function LinkUIPageCreator( {
 				{
 					title,
 					status: shouldPublish ? 'publish' : 'draft',
+					...additionalData,
 				},
 				{ throwOnError: true }
 			);

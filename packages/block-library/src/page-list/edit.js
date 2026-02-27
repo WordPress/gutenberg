@@ -22,20 +22,13 @@ import {
 	Notice,
 	ComboboxControl,
 	Button,
-	Modal,
-	TextControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useEffect, useCallback } from '@wordpress/element';
-import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { store as noticesStore } from '@wordpress/notices';
-import { decodeEntities } from '@wordpress/html-entities';
-import { Icon, plus } from '@wordpress/icons';
+import { useEntityRecords } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -46,11 +39,15 @@ import {
 	ConvertToLinksModal,
 } from './convert-to-links-modal';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import PageCreatorAppender, {
+	PageCreatorContext,
+} from './page-creator-appender';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
+
 function BlockContent( {
 	blockProps,
 	innerBlocksProps,
@@ -134,10 +131,6 @@ export default function PageListEdit( {
 	const closeModal = () => setOpen( false );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	// Page creation state
-	const [ isCreatingPage, setIsCreatingPage ] = useState( false );
-	const [ pageTitle, setPageTitle ] = useState( '' );
-
 	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
 		'postType',
 		'page',
@@ -150,92 +143,6 @@ export default function PageListEdit( {
 			orderby: 'menu_order',
 			order: 'asc',
 		}
-	);
-
-	// Page creation helpers
-	const { lastError, isSaving } = useSelect(
-		( select ) => ( {
-			lastError: select( coreStore ).getLastEntitySaveError(
-				'postType',
-				'page'
-			),
-			isSaving: select( coreStore ).isSavingEntityRecord(
-				'postType',
-				'page'
-			),
-		} ),
-		[]
-	);
-
-	const { saveEntityRecord } = useDispatch( coreStore );
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
-
-	const isTitleValid = pageTitle.trim().length > 0;
-
-	const createPage = useCallback(
-		async ( event ) => {
-			event.preventDefault();
-			if ( isSaving || ! isTitleValid ) {
-				return;
-			}
-
-			try {
-				const pageData = {
-					title: pageTitle,
-					status: 'publish',
-				};
-
-				// If there's a parent page ID, set it
-				if ( parentPageID ) {
-					pageData.parent = parentPageID;
-				}
-
-				const savedRecord = await saveEntityRecord(
-					'postType',
-					'page',
-					pageData,
-					{ throwOnError: true }
-				);
-
-				if ( savedRecord ) {
-					// Show success notice
-					createSuccessNotice(
-						sprintf(
-							// translators: %s: the title of the new page.
-							__( 'Page "%s" created successfully.' ),
-							decodeEntities( savedRecord.title.rendered )
-						),
-						{
-							type: 'snackbar',
-							id: 'page-created-success',
-						}
-					);
-
-					// Reset the form
-					setPageTitle( '' );
-					setIsCreatingPage( false );
-				}
-			} catch ( error ) {
-				// Show error notice
-				createErrorNotice(
-					__( 'Failed to create page. Please try again.' ),
-					{
-						type: 'snackbar',
-						id: 'page-created-error',
-					}
-				);
-			}
-		},
-		[
-			isSaving,
-			isTitleValid,
-			pageTitle,
-			parentPageID,
-			saveEntityRecord,
-			createSuccessNotice,
-			createErrorNotice,
-		]
 	);
 
 	const allowConvertToLinks =
@@ -354,7 +261,6 @@ export default function PageListEdit( {
 		isNested,
 		hasSelectedChild,
 		parentClientId,
-		hasDraggedChild,
 		isChildOfNavigation,
 		isSelected,
 	} = useSelect(
@@ -362,7 +268,6 @@ export default function PageListEdit( {
 			const {
 				getBlockParentsByBlockName,
 				hasSelectedInnerBlock,
-				hasDraggedInnerBlock,
 				getSelectedBlockClientId,
 			} = select( blockEditorStore );
 			const blockParents = getBlockParentsByBlockName(
@@ -379,7 +284,6 @@ export default function PageListEdit( {
 				isNested: blockParents.length > 0,
 				isChildOfNavigation: navigationBlockParents.length > 0,
 				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
-				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
 				parentClientId: navigationBlockParents[ 0 ],
 				isSelected: getSelectedBlockClientId() === clientId,
 			};
@@ -394,50 +298,46 @@ export default function PageListEdit( {
 		parentPageID,
 	} );
 
-	// Create a custom appender that hijacks the block appender to create pages
-	const customAppender = () => (
-		<Button
-			__next40pxDefaultSize
-			className="block-editor-button-block-appender"
-			onClick={ () => setIsCreatingPage( true ) }
-			label={ __( 'Add page' ) }
-			showTooltip
-		>
-			<Icon icon={ plus } />
-		</Button>
+	const showAppender =
+		! isChildOfNavigation && ( isSelected || hasSelectedChild );
+
+	const nextMenuOrder = useMemo( () => {
+		if ( ! pages?.length ) {
+			return 0;
+		}
+		return (
+			pages.reduce(
+				( max, page ) => Math.max( max, page.menu_order ),
+				0
+			) + 1
+		);
+	}, [ pages ] );
+
+	const additionalPageData = useMemo(
+		() => ( {
+			menu_order: nextMenuOrder,
+			...( parentPageID ? { parent: parentPageID } : {} ),
+		} ),
+		[ nextMenuOrder, parentPageID ]
 	);
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		renderAppender:
-			isChildOfNavigation && isSelected ? customAppender : false,
+		renderAppender: showAppender ? PageCreatorAppender : false,
 		__unstableDisableDropZone: true,
-		templateLock: isChildOfNavigation ? false : 'all',
+		templateLock: showAppender ? false : 'all',
 		onInput: NOOP,
 		onChange: NOOP,
 		value: blockList,
 	} );
-
-	const { selectBlock } = useDispatch( blockEditorStore );
-
-	useEffect( () => {
-		if ( hasSelectedChild || hasDraggedChild ) {
-			openModal();
-			selectBlock( parentClientId );
-		}
-	}, [
-		hasSelectedChild,
-		hasDraggedChild,
-		parentClientId,
-		selectBlock,
-		openModal,
-	] );
 
 	useEffect( () => {
 		setAttributes( { isNested } );
 	}, [ isNested, setAttributes ] );
 
 	return (
-		<>
+		<PageCreatorContext.Provider
+			value={ { additionalData: additionalPageData } }
+		>
 			{ ( pagesTree.length > 0 || allowConvertToLinks ) && (
 				<InspectorControls>
 					<ToolsPanel
@@ -518,64 +418,6 @@ export default function PageListEdit( {
 				pages={ pages }
 				parentPageID={ parentPageID }
 			/>
-			{ isCreatingPage && (
-				<Modal
-					title={ __( 'Create new page' ) }
-					onRequestClose={ () => {
-						setIsCreatingPage( false );
-						setPageTitle( '' );
-					} }
-					size="small"
-				>
-					<form onSubmit={ createPage }>
-						<VStack spacing={ 4 }>
-							<p>
-								{ __(
-									'Create a new page to add to your Page List.'
-								) }
-							</p>
-
-							<TextControl
-								__next40pxDefaultSize
-								label={ __( 'Page title' ) }
-								onChange={ setPageTitle }
-								placeholder={ __( 'Enter page title' ) }
-								value={ pageTitle }
-							/>
-
-							{ lastError && (
-								<Notice status="error" isDismissible={ false }>
-									{ lastError.message }
-								</Notice>
-							) }
-
-							<HStack spacing={ 2 } justify="flex-end">
-								<Button
-									__next40pxDefaultSize
-									variant="tertiary"
-									onClick={ () => {
-										setIsCreatingPage( false );
-										setPageTitle( '' );
-									} }
-									disabled={ isSaving }
-									accessibleWhenDisabled
-								>
-									{ __( 'Cancel' ) }
-								</Button>
-								<Button
-									__next40pxDefaultSize
-									variant="primary"
-									type="submit"
-									isBusy={ isSaving }
-									aria-disabled={ isSaving || ! isTitleValid }
-								>
-									{ __( 'Create page' ) }
-								</Button>
-							</HStack>
-						</VStack>
-					</form>
-				</Modal>
-			) }
-		</>
+		</PageCreatorContext.Provider>
 	);
 }
