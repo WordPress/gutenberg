@@ -31,7 +31,7 @@ function capitalize( str ) {
  *
  * @param {Object} options         - Parameters object
  * @param {string} options.linkUrl - The URL to process
- * @param {string} options.homeUrl - The WordPress site URL (falls back to window.location.origin)
+ * @param {string} options.homeUrl - The WordPress site URL (required for internal/external detection)
  * @return {Object} Object with displayUrl and isExternal flag
  */
 export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
@@ -51,12 +51,10 @@ export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
 	// This must happen before trusting the type attribute
 	try {
 		const parsedUrl = new URL( linkUrl );
-		// Use provided homeUrl or fall back to window.location.origin
-		const siteDomain = homeUrl
-			? new URL( homeUrl ).origin
-			: window.location.origin;
+		// Compare by host (not origin) so http/https to same site both count as internal
+		const siteHost = new URL( homeUrl ).host;
 
-		if ( parsedUrl.origin === siteDomain ) {
+		if ( parsedUrl.host === siteHost ) {
 			// Show only the pathname (and search/hash if present)
 			let path = parsedUrl.pathname + parsedUrl.search + parsedUrl.hash;
 			// Remove trailing slash
@@ -65,12 +63,11 @@ export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
 			}
 			displayUrl = path;
 		} else {
-			// Different origin - this is an external link
+			// Different host - this is an external link
 			isExternal = true;
 		}
 	} catch ( e ) {
-		// URL parsing failed - this means it's likely a URL without a protocol (e.g., "www.example.com")
-		// Since we already checked for relative paths and hash links above, treat as external
+		// URL parsing failed - treat as external (e.g. no homeUrl, or URL without protocol)
 		isExternal = true;
 	}
 

@@ -105,6 +105,15 @@ describe( 'computeDisplayUrl', () => {
 			expect( result.isExternal ).toBe( false );
 			expect( result.displayUrl ).toBe( '/my-page' );
 		} );
+
+		it( 'should treat http and https to same host as internal (compare by host, not origin)', () => {
+			const result = computeDisplayUrl( {
+				linkUrl: 'http://example.com/my-page',
+				homeUrl: 'https://example.com',
+			} );
+			expect( result.isExternal ).toBe( false );
+			expect( result.displayUrl ).toBe( '/my-page' );
+		} );
 	} );
 
 	describe( 'special protocols and edge cases', () => {
