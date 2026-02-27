@@ -576,9 +576,8 @@ async function bundlePackage( packageName, options = {} ) {
 				} )
 			);
 
-			// Skip unminified builds for packages with wpWorkers.
-			// These packages contain inlined WASM where unminified
-			// output provides no debugging value and adds ~10MB.
+			// Skip unminified builds for packages with wpWorkers which contain inlined
+			// WASM providing little debugging value.
 			if ( ! packageJson.wpWorkers ) {
 				builds.push(
 					esbuild.build( {
