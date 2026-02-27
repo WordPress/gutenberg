@@ -69,20 +69,6 @@
 		font-weight: var(--wpds-font-weight-regular);
 		line-height: var(--wpds-font-line-height-sm);
 		margin-block: auto;
-		text-underline-offset: 0.2em;
-		text-decoration-thickness: 0.5px;
-		color: var(--wpds-color-fg-interactive-neutral);
-		text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
-
-		&:visited {
-			color: var(--wpds-color-fg-interactive-neutral);
-			text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
-		}
-
-		&:hover,
-		&:active {
-			color: var(--wpds-color-fg-interactive-neutral-active);
-		}
 
 		/* Add more horizontal space when following another action link/button */
 		&:not(:first-child) {
