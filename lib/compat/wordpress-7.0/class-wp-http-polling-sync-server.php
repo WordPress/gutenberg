@@ -363,11 +363,6 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			$current_time       = time();
 
 			foreach ( $existing_awareness as $entry ) {
-				// Skip entries that don't match the expected schema.
-				if ( is_wp_error( rest_validate_value_from_schema( $entry, $this->awareness_entry_schema ) ) ) {
-					continue;
-				}
-
 				// Remove this client's entry (it will be updated below).
 				if ( $client_id === $entry['client_id'] ) {
 					continue;
@@ -396,7 +391,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			// Convert to client_id => state map for response.
 			$response = array();
 			foreach ( $updated_awareness as $entry ) {
-				$response[ $entry['client_id'] ] = (object) $entry['state'];
+				$response[ $entry['client_id'] ] = $entry['state'];
 			}
 
 			return $response;
