@@ -86,6 +86,7 @@ export function BlockSettingsDropdown( {
 		previousBlockClientId,
 		selectedBlockClientIds,
 		isContentOnly,
+		isParentContentOnly,
 		isZoomOut,
 		canEdit,
 		canMove,
@@ -128,6 +129,10 @@ export function BlockSettingsDropdown( {
 				selectedBlockClientIds: getSelectedBlockClientIds(),
 				isContentOnly:
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
+				isParentContentOnly:
+					!! _firstParentClientId &&
+					getBlockEditingMode( _firstParentClientId ) ===
+						'contentOnly',
 				isZoomOut: _isZoomOut(),
 				canEdit: canEditBlock( firstBlockClientId ),
 				canMove: canMoveBlocks( clientIds ),
@@ -256,7 +261,7 @@ export function BlockSettingsDropdown( {
 											parentBlockType={ parentBlockType }
 										/>
 									) }
-									{ canMove && isContentOnly && (
+									{ canMove && isParentContentOnly && (
 										<>
 											<MenuItem
 												icon={ chevronUp }
