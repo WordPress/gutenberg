@@ -111,6 +111,8 @@ export function SocialLinksEdit( props ) {
 
 	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		defaultBlock: { name: 'core/social-link' },
+		directInsert: true,
 		templateLock: false,
 		orientation: attributes.layout?.orientation ?? 'horizontal',
 		__experimentalAppenderTagName: 'li',
