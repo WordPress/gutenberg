@@ -299,6 +299,13 @@ add_action( 'load-post-new.php', 'gutenberg_set_up_cross_origin_isolation' );
 add_action( 'load-site-editor.php', 'gutenberg_set_up_cross_origin_isolation' );
 add_action( 'load-widgets.php', 'gutenberg_set_up_cross_origin_isolation' );
 
+// Remove core's COEP/COOP-based cross-origin isolation in favor of
+// Gutenberg's DIP-based approach, which also skips third-party editors.
+remove_action( 'load-post.php', 'wp_set_up_cross_origin_isolation' );
+remove_action( 'load-post-new.php', 'wp_set_up_cross_origin_isolation' );
+remove_action( 'load-site-editor.php', 'wp_set_up_cross_origin_isolation' );
+remove_action( 'load-widgets.php', 'wp_set_up_cross_origin_isolation' );
+
 /**
  * Sends headers for cross-origin isolation.
  *
