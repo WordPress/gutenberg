@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 - DataForm: Fix label color of array control. [#75730](https://github.com/WordPress/gutenberg/pull/75730)
+- DataViews: Fix focus transfer while searching in `list` layout. [#75999](https://github.com/WordPress/gutenberg/pull/75999)
 - DataForm: Fix focus loss when collapsing in Card view. [#75689](https://github.com/WordPress/gutenberg/pull/75689)
 - DataViews: Avoid flickering while refreshing. [#74572](https://github.com/WordPress/gutenberg/pull/74572)
 - DataViews: Fix spacing in first column. [#75693](https://github.com/WordPress/gutenberg/pull/75693)
