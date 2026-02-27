@@ -11,8 +11,8 @@ import {
 	Button,
 	TextControl,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { createInterpolateElement, useState } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -93,27 +93,43 @@ export function DefaultConnectorSettings( {
 
 	const helpLinkLabel = helpLabel || helpUrl?.replace( /^https?:\/\//, '' );
 
-	const helpLink = helpUrl ? (
-		<>
-			{ __( 'Get your API key at' ) }{ ' ' }
-			<ExternalLink href={ helpUrl }>{ helpLinkLabel }</ExternalLink>
-		</>
-	) : undefined;
-
-	const getHelp = () => {
-		if ( readOnly ) {
-			return (
-				<>
-					{ __(
-						'Your API key is stored securely. You can reset it at'
-					) }{ ' ' }
-					{ helpUrl ? (
+	const helpLink = helpUrl
+		? createInterpolateElement(
+				sprintf(
+					/* translators: %s: Link to provider settings. */
+					__( 'Get your API key at %s' ),
+					'<a></a>'
+				),
+				{
+					a: (
 						<ExternalLink href={ helpUrl }>
 							{ helpLinkLabel }
 						</ExternalLink>
-					) : undefined }
-				</>
-			);
+					),
+				}
+		  )
+		: undefined;
+
+	const getHelp = () => {
+		if ( readOnly ) {
+			return helpUrl
+				? createInterpolateElement(
+						sprintf(
+							/* translators: %s: Link to provider settings. */
+							__(
+								'Your API key is stored securely. You can reset it at %s'
+							),
+							'<a></a>'
+						),
+						{
+							a: (
+								<ExternalLink href={ helpUrl }>
+									{ helpLinkLabel }
+								</ExternalLink>
+							),
+						}
+				  )
+				: __( 'Your API key is stored securely.' );
 		}
 		if ( saveError ) {
 			return <span style={ { color: '#cc1818' } }>{ saveError }</span>;
