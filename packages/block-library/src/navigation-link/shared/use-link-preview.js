@@ -52,7 +52,10 @@ export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
 	try {
 		const parsedUrl = new URL( linkUrl );
 		// Use provided homeUrl or fall back to window.location.origin
-		const siteDomain = homeUrl || window.location.origin;
+		const siteDomain = homeUrl
+			? new URL( homeUrl ).origin
+			: window.location.origin;
+
 		if ( parsedUrl.origin === siteDomain ) {
 			// Show only the pathname (and search/hash if present)
 			let path = parsedUrl.pathname + parsedUrl.search + parsedUrl.hash;

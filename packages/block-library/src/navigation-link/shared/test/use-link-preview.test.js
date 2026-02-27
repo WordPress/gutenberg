@@ -96,6 +96,15 @@ describe( 'computeDisplayUrl', () => {
 			} );
 			expect( result.isExternal ).toBe( false );
 		} );
+
+		it( 'should treat same-origin URLs as internal when homeUrl includes a path', () => {
+			const result = computeDisplayUrl( {
+				linkUrl: 'https://example.com/my-page',
+				homeUrl: 'https://example.com/blog',
+			} );
+			expect( result.isExternal ).toBe( false );
+			expect( result.displayUrl ).toBe( '/my-page' );
+		} );
 	} );
 
 	describe( 'special protocols and edge cases', () => {
