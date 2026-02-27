@@ -102,6 +102,7 @@ export function ListViewContentPopover( { listViewRef } ) {
 	return (
 		<Popover
 			{ ...( popoverProps ?? {} ) }
+			className="block-editor-inspector-list-view-content-popover"
 			anchor={ anchorElement }
 			onClose={ closeListViewContentPanel }
 		>

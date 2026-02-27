@@ -156,117 +156,127 @@ export const getEntityRecord =
 			}
 
 			// Entity supports syncing.
-			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-				if (
-					entityConfig.syncConfig &&
-					isNumericID( key ) &&
-					! query
-				) {
-					const objectType = `${ kind }/${ name }`;
-					const objectId = key;
+			if ( entityConfig.syncConfig && isNumericID( key ) && ! query ) {
+				const objectType = `${ kind }/${ name }`;
+				const objectId = key;
 
-					// Use the new transient "read/write" config to compute transients for
-					// the sync manager. Otherwise these transients are not available
-					// if / until the record is edited. Use a copy of the record so that
-					// it does not change the behavior outside this experimental flag.
-					const recordWithTransients = { ...record };
-					Object.entries( entityConfig.transientEdits ?? {} )
-						.filter(
-							( [ propName, transientConfig ] ) =>
-								undefined ===
-									recordWithTransients[ propName ] &&
-								transientConfig &&
-								'object' === typeof transientConfig &&
-								'read' in transientConfig &&
-								'function' === typeof transientConfig.read
-						)
-						.forEach( ( [ propName, transientConfig ] ) => {
-							recordWithTransients[ propName ] =
-								transientConfig.read( recordWithTransients );
-						} );
+				// Use the new transient "read/write" config to compute transients for
+				// the sync manager. Otherwise these transients are not available
+				// if / until the record is edited. Use a copy of the record so that
+				// it does not change the behavior outside this experimental flag.
+				const recordWithTransients = { ...record };
+				Object.entries( entityConfig.transientEdits ?? {} )
+					.filter(
+						( [ propName, transientConfig ] ) =>
+							undefined === recordWithTransients[ propName ] &&
+							transientConfig &&
+							'object' === typeof transientConfig &&
+							'read' in transientConfig &&
+							'function' === typeof transientConfig.read
+					)
+					.forEach( ( [ propName, transientConfig ] ) => {
+						recordWithTransients[ propName ] =
+							transientConfig.read( recordWithTransients );
+					} );
 
-					// Load the entity record for syncing. Do not await promise.
-					void getSyncManager()?.load(
-						entityConfig.syncConfig,
-						objectType,
-						objectId,
-						recordWithTransients,
-						{
-							// Handle edits sourced from the sync manager.
-							editRecord: ( edits, options = {} ) => {
-								if ( ! Object.keys( edits ).length ) {
-									return;
-								}
+				// Load the entity record for syncing. Do not await promise.
+				void getSyncManager()?.load(
+					entityConfig.syncConfig,
+					objectType,
+					objectId,
+					recordWithTransients,
+					{
+						// Handle edits sourced from the sync manager.
+						editRecord: ( edits, options = {} ) => {
+							if ( ! Object.keys( edits ).length ) {
+								return;
+							}
 
-								dispatch( {
-									type: 'EDIT_ENTITY_RECORD',
-									kind,
-									name,
-									recordId: key,
-									edits,
-									meta: {
-										undo: undefined,
-									},
-									options,
-								} );
-							},
-							// Get the current entity record (with edits)
-							getEditedRecord: async () =>
-								await resolveSelect.getEditedEntityRecord(
-									kind,
-									name,
-									key
-								),
-							// Refetch the current entity record from the database.
-							refetchRecord: async () => {
-								dispatch.receiveEntityRecords(
-									kind,
-									name,
-									await apiFetch( { path, parse: true } ),
-									query
-								);
-							},
-							// Save the current entity record's unsaved edits.
-							saveRecord: () => {
-								dispatch.saveEditedEntityRecord(
-									kind,
-									name,
-									key
-								);
-							},
-							addUndoMeta: ( ydoc, meta ) => {
-								const selectionHistory =
-									getSelectionHistory( ydoc );
+							dispatch( {
+								type: 'EDIT_ENTITY_RECORD',
+								kind,
+								name,
+								recordId: key,
+								edits,
+								meta: {
+									undo: undefined,
+								},
+								options,
+							} );
+						},
+						// Get the current entity record (with edits)
+						getEditedRecord: async () =>
+							await resolveSelect.getEditedEntityRecord(
+								kind,
+								name,
+								key
+							),
+						// Handle sync connection status changes.
+						onStatusChange: ( status ) => {
+							dispatch.setSyncConnectionStatus(
+								kind,
+								name,
+								key,
+								status
+							);
+						},
+						// Refetch the current entity record from the database.
+						refetchRecord: async () => {
+							dispatch.receiveEntityRecords(
+								kind,
+								name,
+								await apiFetch( { path, parse: true } ),
+								query
+							);
+						},
+						// Save the current entity record, whether or not it has unsaved
+						// edits. This is used to trigger a persisted CRDT document.
+						saveRecord: () => {
+							resolveSelect
+								.getEditedEntityRecord( kind, name, key )
+								.then( ( editedRecord ) => {
+									// Don't trigger a save if the record is still an auto-draft.
+									const { status } = editedRecord;
+									if ( 'auto-draft' === status ) {
+										return;
+									}
 
-								if ( selectionHistory ) {
-									meta.set(
-										'selectionHistory',
-										selectionHistory
+									dispatch.saveEntityRecord(
+										kind,
+										name,
+										editedRecord
 									);
-								}
-							},
-							restoreUndoMeta: ( ydoc, meta ) => {
-								const selectionHistory =
-									meta.get( 'selectionHistory' );
+								} );
+						},
+						addUndoMeta: ( ydoc, meta ) => {
+							const selectionHistory =
+								getSelectionHistory( ydoc );
 
-								if ( selectionHistory ) {
-									// Because Yjs initiates an undo, we need to
-									// wait until the content is restored before
-									// we can update the selection.
-									// Use setTimeout() to wait until content is
-									// finished updating, and then set the correct
-									// selection.
-									setTimeout( () => {
-										restoreSelection(
-											selectionHistory,
-											ydoc
-										);
-									}, 0 );
-								}
-							},
-						}
-					);
-				}
+							if ( selectionHistory ) {
+								meta.set(
+									'selectionHistory',
+									selectionHistory
+								);
+							}
+						},
+						restoreUndoMeta: ( ydoc, meta ) => {
+							const selectionHistory =
+								meta.get( 'selectionHistory' );
+
+							if ( selectionHistory ) {
+								// Because Yjs initiates an undo, we need to
+								// wait until the content is restored before
+								// we can update the selection.
+								// Use setTimeout() to wait until content is
+								// finished updating, and then set the correct
+								// selection.
+								setTimeout( () => {
+									restoreSelection( selectionHistory, ydoc );
+								}, 0 );
+							}
+						},
+					}
+				);
 			}
 
 			registry.batch( () => {
@@ -462,24 +472,30 @@ export const getEntityRecords =
 				};
 			}
 
-			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-				if ( entityConfig.syncConfig && -1 === query.per_page ) {
-					const objectType = `${ kind }/${ name }`;
-					getSyncManager()?.loadCollection(
-						entityConfig.syncConfig,
-						objectType,
-						{
-							refetchRecords: async () => {
-								dispatch.receiveEntityRecords(
-									kind,
-									name,
-									await apiFetch( { path, parse: true } ),
-									query
-								);
-							},
-						}
-					);
-				}
+			if ( entityConfig.syncConfig && -1 === query.per_page ) {
+				const objectType = `${ kind }/${ name }`;
+				getSyncManager()?.loadCollection(
+					entityConfig.syncConfig,
+					objectType,
+					{
+						onStatusChange: ( status ) => {
+							dispatch.setSyncConnectionStatus(
+								kind,
+								name,
+								null,
+								status
+							);
+						},
+						refetchRecords: async () => {
+							dispatch.receiveEntityRecords(
+								kind,
+								name,
+								await apiFetch( { path, parse: true } ),
+								query
+							);
+						},
+					}
+				);
 			}
 
 			// If we request fields but the result doesn't contain the fields,
@@ -697,21 +713,21 @@ export const canUser =
 		const permissions = getUserPermissionsFromAllowHeader(
 			response.headers?.get( 'allow' )
 		);
-		registry.batch( () => {
-			for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
-				const key = getUserPermissionCacheKey( action, resource, id );
+		const receiveUserPermissionArgs = {};
+		const canUserResolutionsArgs = [];
+		for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+			receiveUserPermissionArgs[
+				getUserPermissionCacheKey( action, resource, id )
+			] = permissions[ action ];
 
-				dispatch.receiveUserPermission( key, permissions[ action ] );
-
-				// Mark related action resolutions as finished.
-				if ( action !== requestedAction ) {
-					dispatch.finishResolution( 'canUser', [
-						action,
-						resource,
-						id,
-					] );
-				}
+			// Mark related action resolutions as finished.
+			if ( action !== requestedAction ) {
+				canUserResolutionsArgs.push( [ action, resource, id ] );
 			}
+		}
+		registry.batch( () => {
+			dispatch.receiveUserPermissions( receiveUserPermissionArgs );
+			dispatch.finishResolutions( 'canUser', canUserResolutionsArgs );
 		} );
 	};
 
@@ -1089,7 +1105,7 @@ export const getRevisions =
 				// When requesting all fields, the list of results can be used to
 				// resolve the `getRevision` selector in addition to `getRevisions`.
 				if ( ! query?._fields && ! query.context ) {
-					const key = entityConfig.key || DEFAULT_ENTITY_KEY;
+					const key = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
 					const resolutionsArgs = records
 						.filter( ( record ) => record[ key ] )
 						.map( ( record ) => [

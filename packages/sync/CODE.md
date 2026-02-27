@@ -9,10 +9,6 @@ Relevant docs and discussions:
 -   https://github.com/WordPress/gutenberg/discussions/65012
 -   https://docs.yjs.dev/
 
-## Availability
-
-Real-time collaboration is automatically enabled when using the Gutenberg plugin. The `core-data` package checks for `IS_GUTENBERG_PLUGIN` to determine whether entity syncing is available.
-
 ## The data flow
 
 Each entity with sync enabled is represented by a CRDT (Yjs) document. Local edits (unsaved changes) to an entity record are applied to its CRDT document, which is synced with other peers via a provider. Those peers use the CRDT document to update their local state.

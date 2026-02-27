@@ -27,7 +27,7 @@
 		align-items: center;
 	}
 
-	&:not([aria-disabled="true"]):hover {
+	&:not(.is-disabled):hover {
 		color: var(--wp-admin-theme-color);
 
 		.dataforms-layouts-panel__field-trigger-icon {
@@ -39,7 +39,7 @@
 		}
 	}
 
-	&[aria-disabled="true"] {
+	&.is-disabled {
 		cursor: default;
 
 		.dataforms-layouts-panel__field-control {
@@ -49,29 +49,29 @@
 	}
 }
 
+.dataforms-layouts-panel__field-trigger--edit-always
 .dataforms-layouts-panel__field-trigger-icon {
-	appearance: none;
-	background: none;
-	border: none;
+	opacity: 1;
+	fill: currentColor;
+
+	&:hover,
+	&:focus-visible {
+		fill: var(--wp-admin-theme-color);
+	}
+}
+
+.dataforms-layouts-panel__field-trigger-icon {
 	padding: 0;
-	margin: 0;
-	cursor: pointer;
-	display: flex;
-	align-items: center;
-	fill: var(--wp-admin-theme-color);
+	color: var(--wp-admin-theme-color);
 	flex: 0 0 auto;
 	opacity: 0;
 	border-radius: var(--wpds-border-radius-xs);
 
-	&::after {
-		content: "";
-		position: absolute;
-		inset: 0;
-	}
-
 	&:focus-visible {
 		opacity: 1;
-		outline: var(--wpds-border-width-focus) solid var(--wp-admin-theme-color);
+		outline:
+			var(--wpds-border-width-focus) solid
+			var(--wp-admin-theme-color);
 	}
 }
 
@@ -92,6 +92,7 @@
 	line-height: $grid-unit-05 * 5;
 	hyphens: auto;
 	color: $gray-700;
+	text-transform: capitalize;
 
 	.components-base-control__label {
 		display: inline;
@@ -133,15 +134,18 @@
 	}
 }
 
-.dataforms-layouts-panel__field-trigger--label-top .dataforms-layouts-panel__field-label {
+.dataforms-layouts-panel__field-trigger--label-top
+.dataforms-layouts-panel__field-label {
 	width: 100%;
 }
 
-.dataforms-layouts-panel__field-trigger--label-top .dataforms-layouts-panel__field-control {
+.dataforms-layouts-panel__field-trigger--label-top
+.dataforms-layouts-panel__field-control {
 	grid-column: 1 / -1;
 }
 
-.dataforms-layouts-panel__field-trigger--label-top .dataforms-layouts-panel__field-trigger-icon {
+.dataforms-layouts-panel__field-trigger--label-top
+.dataforms-layouts-panel__field-trigger-icon {
 	grid-row: 1;
 	grid-column: 2;
 }

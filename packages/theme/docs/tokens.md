@@ -114,6 +114,12 @@ Do not edit directly.
 | `--wpds-color-stroke-interactive-error-strong`        | Accessible stroke color used for interactive error-toned elements with strong emphasis.                                                     |
 | `--wpds-color-stroke-focus-brand`                     | Accessible stroke color applied to focus rings.                                                                                             |
 
+### Cursor
+
+| Variable name           | Description                                                                                       |
+| ----------------------- | ------------------------------------------------------------------------------------------------- |
+| `--wpds-cursor-control` | Cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). |
+
 ### Dimension
 
 | Variable name                  | Description            |

@@ -11,10 +11,10 @@ import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 // Event handlers that are triggered from `document` listeners accept a MouseEvent,
 // while those triggered from React listeners accept a React.MouseEvent.
 /**
- * @param {Object}                                  props
- * @param {(e: import('react').MouseEvent) => void} props.onDragStart
- * @param {(e: MouseEvent) => void}                 props.onDragMove
- * @param {(e?: MouseEvent) => void}                props.onDragEnd
+ * @param {Object}                        props
+ * @param {(e: React.MouseEvent) => void} props.onDragStart
+ * @param {(e: MouseEvent) => void}       props.onDragMove
+ * @param {(e?: MouseEvent) => void}      props.onDragEnd
  */
 export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
@@ -46,7 +46,7 @@ export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 		document.removeEventListener( 'mouseup', endDrag );
 		setIsDragging( false );
 	}, [] );
-	/** @type {(e: import('react').MouseEvent) => void} */
+	/** @type {(e: React.MouseEvent) => void} */
 	const startDrag = useCallback( ( event ) => {
 		if ( eventsRef.current.onDragStart ) {
 			eventsRef.current.onDragStart( event );

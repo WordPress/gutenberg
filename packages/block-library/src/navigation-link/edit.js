@@ -167,10 +167,11 @@ export default function NavigationLinkEdit( {
 	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
-	const { hasUrlBinding, isBoundEntityAvailable } = useEntityBinding( {
-		clientId,
-		attributes,
-	} );
+	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
+		useEntityBinding( {
+			clientId,
+			attributes,
+		} );
 
 	const handleLinkChange = useHandleLinkChange( {
 		clientId,
@@ -462,6 +463,11 @@ export default function NavigationLinkEdit( {
 							ref={ linkUIref }
 							clientId={ clientId }
 							link={ attributes }
+							entity={ {
+								entityRecord,
+								hasBinding: hasUrlBinding,
+								isEntityAvailable: isBoundEntityAvailable,
+							} }
 							onClose={ () => {
 								setIsLinkOpen( false );
 								// If there is no link and no binding, remove the auto-inserted block.

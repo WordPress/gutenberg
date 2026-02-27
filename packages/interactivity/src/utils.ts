@@ -508,6 +508,15 @@ export function deepReadOnly< T extends object >(
 export const navigationSignal = signal( 0 );
 
 /**
+ * Unique identifier for the current browser session of the interactivity
+ * runtime. Generated once when the module is first evaluated. Used by the
+ * router to tag history entries so that, after a full page reload, popstate
+ * events for entries created in a previous session trigger a full reload
+ * instead of a client-side navigation that would leave stale content.
+ */
+export const sessionId = crypto.randomUUID();
+
+/**
  * Recursively clones the passed object.
  *
  * @param source Source object.

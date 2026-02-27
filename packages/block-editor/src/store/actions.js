@@ -2187,6 +2187,11 @@ export function __unstableToggleListViewPanel( clientId, isOpen ) {
 /**
  * Increments the List View expand revision to force re-render.
  *
+ * This action increments a counter that is used in the ListView component's key prop.
+ * When the key changes, the component will remount with a fresh expanded state,
+ * ensuring parent blocks show their children. For example, after click-through
+ * navigation.
+ *
  * @return {Object} Action object.
  */
 export function __unstableIncrementListViewExpandRevision() {

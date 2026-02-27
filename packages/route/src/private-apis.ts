@@ -12,6 +12,7 @@ import {
 	Outlet,
 	redirect,
 	RouterProvider,
+	useBlocker,
 	useCanGoBack,
 	useLoaderData,
 	useLocation,
@@ -52,6 +53,7 @@ lock( privateApis, {
 	useMatches,
 	useRouter,
 	useRouterState,
+	useBlocker,
 
 	// History utilities
 	parseHref,

@@ -95,6 +95,18 @@ function gutenberg_render_custom_css_class_name( $block_content, $block ) {
 	return $tags->get_updated_html();
 }
 
+// Remove core filters and action to avoid rendering duplicate custom CSS styles.
+if ( function_exists( 'wp_render_custom_css_class_name' ) ) {
+	remove_filter( 'render_block', 'wp_render_custom_css_class_name' );
+}
+if ( function_exists( 'wp_render_custom_css_support_styles' ) ) {
+	remove_filter( 'render_block_data', 'wp_render_custom_css_support_styles' );
+}
+if ( function_exists( 'wp_enqueue_block_custom_css' ) ) {
+	remove_action( 'wp_enqueue_scripts', 'wp_enqueue_block_custom_css' );
+}
+
+// Add Gutenberg filters and action.
 add_filter( 'render_block', 'gutenberg_render_custom_css_class_name', 10, 2 );
 add_filter( 'render_block_data', 'gutenberg_render_custom_css_support_styles', 10, 1 );
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_block_custom_css', 1 );

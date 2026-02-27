@@ -11,6 +11,7 @@ import * as syncProtocol from 'y-protocols/sync';
 /**
  * Internal dependencies
  */
+import type { ConnectionStatus } from '../../types';
 import {
 	type AwarenessState,
 	type LocalAwarenessState,
@@ -24,31 +25,38 @@ import {
 	createSyncUpdate,
 	createUpdateQueue,
 	postSyncUpdate,
+	postSyncUpdateNonBlocking,
 } from './utils';
 
 const POLLING_INTERVAL_IN_MS = 1000; // 1 second or 1000 milliseconds
 const POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS = 250; // 250 milliseconds
+const POLLING_INTERVAL_BACKGROUND_TAB_IN_MS = 30 * 1000; // 30 seconds
 const MAX_ERROR_BACKOFF_IN_MS = 30 * 1000; // 30 seconds
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
 
 type LogFunction = ( message: string, debug?: object ) => void;
 
 interface PollingManager {
-	registerRoom: (
-		room: string,
-		doc: Y.Doc,
-		awareness: Awareness,
-		onSync: () => void,
-		log: LogFunction
-	) => void;
+	registerRoom: ( options: RegisterRoomOptions ) => void;
 	unregisterRoom: ( room: string ) => void;
+}
+
+interface RegisterRoomOptions {
+	room: string;
+	doc: Y.Doc;
+	awareness: Awareness;
+	log: LogFunction;
+	onStatusChange: ( status: ConnectionStatus ) => void;
+	onSync: () => void;
 }
 
 interface RoomState {
 	clientId: number;
+	createCompactionUpdate: () => SyncUpdate;
 	endCursor: number;
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
+	onStatusChange: ( status: ConnectionStatus ) => void;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
 	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
 	unregister: () => void;
@@ -62,9 +70,11 @@ const roomStates: Map< string, RoomState > = new Map();
  * the original operation metadata (client IDs, logical clocks) so that
  * Yjs deduplication works correctly when the compaction is applied.
  *
+ * Deprecated: The server is moving towards full state updates for compaction.
+ *
  * @param updates The updates to merge
  */
-function createCompactionUpdate( updates: SyncUpdate[] ): SyncUpdate {
+function createDeprecatedCompactionUpdate( updates: SyncUpdate[] ): SyncUpdate {
 	// Extract only compaction and update types for merging (skip sync-step updates).
 	// Decode base64 updates to Uint8Array for merging.
 	const mergeable = updates
@@ -230,8 +240,77 @@ function processDocUpdate(
 	}
 }
 
+let areListenersRegistered = false;
+let hasCollaborators = false;
+let isActiveBrowser = 'visible' === document.visibilityState;
 let isPolling = false;
+let isUnloadPending = false;
 let pollInterval = POLLING_INTERVAL_IN_MS;
+let pollingTimeoutId: ReturnType< typeof setTimeout > | null = null;
+
+/**
+ * Mark that a page unload has been requested. This fires on
+ * `beforeunload` which happens before the browser aborts in-flight
+ * fetches, allowing us to distinguish poll failures caused by
+ * navigation from genuine server errors in the catch block.
+ *
+ * If the user cancels the unload (e.g. by dismissing a "Save Changes?" dialog),
+ * the flag is reset at the start of the next poll cycle so that polling can
+ * resume.
+ */
+function handleBeforeUnload(): void {
+	isUnloadPending = true;
+}
+
+/**
+ * Send a disconnect signal for all registered rooms when the page is
+ * being unloaded. Uses `sendBeacon` so the request survives navigation.
+ */
+function handlePageHide(): void {
+	const rooms = Array.from( roomStates.entries() ).map(
+		( [ room, state ] ) => ( {
+			after: 0,
+			awareness: null,
+			client_id: state.clientId,
+			room,
+			updates: [],
+		} )
+	);
+
+	postSyncUpdateNonBlocking( { rooms } );
+}
+
+/**
+ * Hangle change in visibility state of browser tab.
+ *
+ * Used to trigger a slow down of the collaboration syncs when the
+ * browser tab becomes inactive (either the user switches tabs or the
+ * screen saver comes on).
+ *
+ * Fires on the document's visibilitychange event.
+ */
+function handleVisibilityChange() {
+	const wasActive = isActiveBrowser;
+	isActiveBrowser = document.visibilityState === 'visible';
+
+	if ( isActiveBrowser && ! wasActive ) {
+		/*
+		 * Remove scheduled polling and repoll immediately when reactivated.
+		 *
+		 * This ensures that any updates by collaborators are immediately reflected
+		 * in the document once the browser tab becomes active. Otherwise there would
+		 * be a delay of 30 seconds before the updates came through.
+		 */
+		if ( pollingTimeoutId ) {
+			clearTimeout( pollingTimeoutId );
+			pollingTimeoutId = null;
+		}
+
+		if ( isPolling ) {
+			poll();
+		}
+	}
+}
 
 function poll(): void {
 	isPolling = true;
@@ -241,6 +320,16 @@ function poll(): void {
 			isPolling = false;
 			return;
 		}
+
+		// Reset the unloading flag at the start of each poll cycle so
+		// it doesn't permanently suppress disconnect after the user
+		// cancels a beforeunload dialog.
+		isUnloadPending = false;
+
+		// Emit 'connecting' status.
+		roomStates.forEach( ( state ) => {
+			state.onStatusChange( { status: 'connecting' } );
+		} );
 
 		// Create a payload with all queued updates. We include rooms even if they
 		// have no updates to ensure we receive any incoming updates. Note that we
@@ -261,8 +350,10 @@ function poll(): void {
 		try {
 			const { rooms } = await postSyncUpdate( payload );
 
-			// Reset poll interval on success.
-			pollInterval = POLLING_INTERVAL_IN_MS;
+			// Emit 'connected' status.
+			roomStates.forEach( ( state ) => {
+				state.onStatusChange( { status: 'connected' } );
+			} );
 
 			rooms.forEach( ( room ) => {
 				if ( ! roomStates.has( room.room ) ) {
@@ -278,7 +369,7 @@ function poll(): void {
 				// If there is another collaborator, resume the queue for the next poll
 				// and increase polling frequency.
 				if ( Object.keys( room.awareness ).length > 1 ) {
-					pollInterval = POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS;
+					hasCollaborators = true;
 					roomState.updateQueue.resume();
 				}
 
@@ -291,14 +382,33 @@ function poll(): void {
 				roomState.updateQueue.addBulk( responseUpdates );
 
 				// Respond to compaction requests from server. The server asks only one
-				// client at a time to compact (lowest active client ID). We merge the
-				// received updates (the server has given us everything it has).
-				if ( room.compaction_request ) {
+				// client at a time to compact (lowest active client ID). We encode our
+				// full document state to replace all prior updates on the server.
+				if ( room.should_compact ) {
+					roomState.log( 'Server requested compaction update' );
+					roomState.updateQueue.clear();
 					roomState.updateQueue.add(
-						createCompactionUpdate( room.compaction_request )
+						roomState.createCompactionUpdate()
+					);
+				} else if ( room.compaction_request ) {
+					// Deprecated
+					roomState.log( 'Server requested (old) compaction update' );
+					roomState.updateQueue.add(
+						createDeprecatedCompactionUpdate(
+							room.compaction_request
+						)
 					);
 				}
 			} );
+
+			// Recalculate polling interval.
+			if ( isActiveBrowser && hasCollaborators ) {
+				pollInterval = POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS;
+			} else if ( isActiveBrowser ) {
+				pollInterval = POLLING_INTERVAL_IN_MS;
+			} else {
+				pollInterval = POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
+			}
 		} catch ( error ) {
 			// Exponential backoff on error: double the backoff time, up to max
 			pollInterval = Math.min(
@@ -322,22 +432,31 @@ function poll(): void {
 					}
 				);
 			}
+
+			// Don't report disconnected status when the request was aborted
+			// due to page unload (e.g. during a refresh) to avoid briefly
+			// flashing the disconnect dialog before the new page loads.
+			if ( ! isUnloadPending ) {
+				roomStates.forEach( ( state ) => {
+					state.onStatusChange( { status: 'disconnected' } );
+				} );
+			}
 		}
 
-		setTimeout( poll, pollInterval );
+		pollingTimeoutId = setTimeout( poll, pollInterval );
 	}
 
 	// Start polling.
 	void start();
 }
-
-function registerRoom(
-	room: string,
-	doc: Y.Doc,
-	awareness: Awareness,
-	onSync: () => void,
-	log: LogFunction
-): void {
+function registerRoom( {
+	room,
+	doc,
+	awareness,
+	log,
+	onSync,
+	onStatusChange,
+}: RegisterRoomOptions ): void {
 	if ( roomStates.has( room ) ) {
 		return;
 	}
@@ -361,15 +480,20 @@ function registerRoom(
 	function unregister(): void {
 		doc.off( 'update', onDocUpdate );
 		awareness.off( 'change', onAwarenessUpdate );
-		// TODO: poll will null awareness state to trigger removal
 		updateQueue.clear();
 	}
 
 	const roomState: RoomState = {
 		clientId: doc.clientID,
+		createCompactionUpdate: () =>
+			createSyncUpdate(
+				Y.encodeStateAsUpdate( doc ),
+				SyncUpdateType.COMPACTION
+			),
 		endCursor: 0,
 		localAwarenessState: awareness.getLocalState() ?? {},
 		log,
+		onStatusChange,
 		processAwarenessUpdate: ( state: AwarenessState ) =>
 			processAwarenessUpdate( state, awareness ),
 		processDocUpdate: ( update: SyncUpdate ) =>
@@ -382,14 +506,47 @@ function registerRoom(
 	awareness.on( 'change', onAwarenessUpdate );
 	roomStates.set( room, roomState );
 
+	if ( ! areListenersRegistered ) {
+		window.addEventListener( 'beforeunload', handleBeforeUnload );
+		window.addEventListener( 'pagehide', handlePageHide );
+		document.addEventListener( 'visibilitychange', handleVisibilityChange );
+		areListenersRegistered = true;
+	}
+
 	if ( ! isPolling ) {
 		poll();
 	}
 }
 
 function unregisterRoom( room: string ): void {
-	roomStates.get( room )?.unregister();
-	roomStates.delete( room );
+	const state = roomStates.get( room );
+	if ( state ) {
+		// Send a disconnect signal so the server removes this client's
+		// awareness entry immediately instead of waiting for the timeout.
+		const rooms = [
+			{
+				after: 0,
+				awareness: null,
+				client_id: state.clientId,
+				room,
+				updates: [],
+			},
+		];
+
+		postSyncUpdateNonBlocking( { rooms } );
+		state.unregister();
+		roomStates.delete( room );
+	}
+
+	if ( 0 === roomStates.size && areListenersRegistered ) {
+		window.removeEventListener( 'beforeunload', handleBeforeUnload );
+		window.removeEventListener( 'pagehide', handlePageHide );
+		document.removeEventListener(
+			'visibilitychange',
+			handleVisibilityChange
+		);
+		areListenersRegistered = false;
+	}
 }
 
 export const pollingManager: PollingManager = {

@@ -8,7 +8,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
  */
 import {
 	useActiveCollaborators,
-	useGetAbsolutePositionIndex,
+	useResolvedSelection,
 	useGetDebugData,
 	useIsDisconnected,
 } from '../use-post-editor-awareness-state';
@@ -43,7 +43,6 @@ const createMockActiveUser = (
 		slug: 'test-user',
 		avatar_urls: mockAvatarUrls,
 		browserType: 'Chrome',
-		color: '#3858E9',
 		enteredAt: 1704067200000,
 	},
 	editorState: {
@@ -65,7 +64,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		setUp: jest.Mock;
 		getCurrentState: jest.Mock;
 		onStateChange: jest.Mock;
-		getAbsolutePositionIndex: jest.Mock;
+		convertSelectionStateToAbsolute: jest.Mock;
 		getDebugData: jest.Mock;
 	};
 	let mockSyncManager: {
@@ -85,7 +84,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				stateChangeCallback = callback;
 				return jest.fn(); // unsubscribe function
 			} ),
-			getAbsolutePositionIndex: jest.fn().mockReturnValue( null ),
+			convertSelectionStateToAbsolute: jest.fn().mockReturnValue( null ),
 			getDebugData: jest.fn().mockReturnValue( createMockDebugData() ),
 		};
 
@@ -242,45 +241,52 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 	} );
 
-	describe( 'useGetAbsolutePositionIndex', () => {
-		test( 'should return function that returns null when postId is null', () => {
+	describe( 'useResolvedSelection', () => {
+		test( 'should return function that returns default when postId is null', () => {
 			const { result } = renderHook( () =>
-				useGetAbsolutePositionIndex( null, 'post' )
+				useResolvedSelection( null, 'post' )
 			);
 
 			const mockSelection: SelectionCursor = {
 				type: SelectionType.Cursor,
-				blockId: 'block-1',
 				cursorPosition: {
 					relativePosition: {} as any,
 					absoluteOffset: 5,
 				},
 			};
 
-			expect( result.current( mockSelection ) ).toBeNull();
+			expect( result.current( mockSelection ) ).toEqual( {
+				textIndex: null,
+				localClientId: null,
+			} );
 		} );
 
-		test( 'should call awareness.getAbsolutePositionIndex with selection', () => {
+		test( 'should call awareness.convertSelectionStateToAbsolute with selection', () => {
 			const mockSelection: SelectionCursor = {
 				type: SelectionType.Cursor,
-				blockId: 'block-1',
 				cursorPosition: {
 					relativePosition: {} as any,
 					absoluteOffset: 5,
 				},
 			};
-			mockAwareness.getAbsolutePositionIndex.mockReturnValue( 10 );
+			mockAwareness.convertSelectionStateToAbsolute.mockReturnValue( {
+				textIndex: 10,
+				localClientId: 'block-1',
+			} );
 
 			const { result } = renderHook( () =>
-				useGetAbsolutePositionIndex( 123, 'post' )
+				useResolvedSelection( 123, 'post' )
 			);
 
 			const position = result.current( mockSelection );
 
 			expect(
-				mockAwareness.getAbsolutePositionIndex
+				mockAwareness.convertSelectionStateToAbsolute
 			).toHaveBeenCalledWith( mockSelection );
-			expect( position ).toBe( 10 );
+			expect( position ).toEqual( {
+				textIndex: 10,
+				localClientId: 'block-1',
+			} );
 		} );
 	} );
 
@@ -419,7 +425,6 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 					slug: 'user-one',
 					avatar_urls: mockAvatarUrls,
 					browserType: 'Chrome',
-					color: '#3858E9',
 					enteredAt: 1704067200000,
 				},
 			} );
@@ -432,7 +437,6 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 					slug: 'user-two',
 					avatar_urls: mockAvatarUrls,
 					browserType: 'Firefox',
-					color: '#E33184',
 					enteredAt: 1704067300000,
 				},
 			} );

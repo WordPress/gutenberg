@@ -180,7 +180,7 @@ export type NavigationItemBaseProps = {
 	 * If no `children` are passed, this prop allows to specify a custom icon for
 	 * the menu item.
 	 */
-	icon?: JSX.Element;
+	icon?: React.JSX.Element;
 	/**
 	 * The unique identifier of the item.
 	 */

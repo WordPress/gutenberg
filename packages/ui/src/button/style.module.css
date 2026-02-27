@@ -70,20 +70,22 @@
 			text-decoration: inherit;
 		}
 
-		/* States */
-		&:not([aria-disabled="true"]):is(:hover, :active, :focus) {
+		/* States — use property declarations (not variable reassignment) so that
+		   higher CSS layers can safely override the custom property values without
+		   breaking state handling. */
+		&:not([data-disabled]):is(:hover, :active, :focus) {
 			/* hover/active/focus states apply when the button is not disabled. A non
 			disabled, loading button will have hover/active/focus styles */
-			--wp-ui-button-background-color: var(--wp-ui-button-background-color-active);
-			--wp-ui-button-foreground-color: var(--wp-ui-button-foreground-color-active);
-			--wp-ui-button-border-color: var(--wp-ui-button-border-color-active);
+			background-color: var(--wp-ui-button-background-color-active);
+			color: var(--wp-ui-button-foreground-color-active);
+			border-color: var(--wp-ui-button-border-color-active);
 		}
 
-		&[aria-disabled="true"]:not(.is-loading) {
+		&[data-disabled]:not(.is-loading) {
 			/* A loading button, even when disabled, won't "look" disabled */
-			--wp-ui-button-background-color: var(--wp-ui-button-background-color-disabled);
-			--wp-ui-button-foreground-color: var(--wp-ui-button-foreground-color-disabled);
-			--wp-ui-button-border-color: var(--wp-ui-button-border-color-disabled);
+			background-color: var(--wp-ui-button-background-color-disabled);
+			color: var(--wp-ui-button-foreground-color-disabled);
+			border-color: var(--wp-ui-button-border-color-disabled);
 
 			@media ( forced-colors: active ) {
 				border-color: GrayText;
@@ -201,6 +203,12 @@
 
 	.is-loading {
 		color: transparent;
+
+		/* Keep text transparent when a loading button is hovered — needed because
+		 the hover state now sets `color` as a property declaration. */
+		&:not([data-disabled]):is(:hover, :active, :focus) {
+			color: transparent;
+		}
 
 		* {
 			opacity: 0;

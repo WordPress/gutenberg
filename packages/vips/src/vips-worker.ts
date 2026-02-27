@@ -43,7 +43,7 @@ function getWorkerAPI(): Remote< WorkerAPI > {
 			type: 'application/javascript',
 		} );
 		workerBlobUrl = URL.createObjectURL( blob );
-		worker = new Worker( workerBlobUrl );
+		worker = new Worker( workerBlobUrl, { type: 'module' } );
 		workerAPI = wrap< WorkerAPI >( worker );
 	}
 	return workerAPI;
@@ -138,6 +138,29 @@ export async function vipsHasTransparency(
 ): Promise< boolean > {
 	const api = getWorkerAPI();
 	return api.hasTransparency( buffer );
+}
+
+/**
+ * Rotates an image based on EXIF orientation using vips in a worker.
+ *
+ * @param id          Item ID.
+ * @param buffer      Original file buffer.
+ * @param type        Mime type.
+ * @param orientation EXIF orientation value (1-8).
+ * @return Rotated file data plus the new dimensions.
+ */
+export async function vipsRotateImage(
+	id: ItemId,
+	buffer: ArrayBuffer,
+	type: string,
+	orientation: number
+): Promise< {
+	buffer: ArrayBuffer | ArrayBufferLike;
+	width: number;
+	height: number;
+} > {
+	const api = getWorkerAPI();
+	return api.rotateImage( id, buffer, type, orientation );
 }
 
 /**

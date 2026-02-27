@@ -164,7 +164,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		} );
 
 		const appender = listView.getByRole( 'button', {
-			name: 'Add block',
+			name: 'Add page',
 		} );
 
 		await expect( appender ).toBeVisible();
@@ -476,7 +476,7 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await listView
 			.getByRole( 'button', {
-				name: 'Add block',
+				name: 'Add page',
 			} )
 			.click();
 
@@ -548,7 +548,7 @@ test.describe( 'Navigation block - List view editing', () => {
 				.getByRole( 'document', {
 					name: 'Block: Navigation',
 				} )
-				.getByLabel( 'Add block' )
+				.getByLabel( 'Add page' )
 		).toBeFocused();
 	} );
 } );
@@ -598,6 +598,7 @@ class LinkControl {
 
 		return result
 			.locator( '.components-menu-item__item' ) // this is the only way to get the label text without the URL.
+			.last()
 			.innerText();
 	}
 }

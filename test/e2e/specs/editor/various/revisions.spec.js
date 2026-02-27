@@ -70,7 +70,7 @@ test.describe( 'Revisions', () => {
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Revision restored' } )
+				.filter( { hasText: 'Restored to revision' } )
 		).toBeVisible();
 
 		// Verify the original content is restored.

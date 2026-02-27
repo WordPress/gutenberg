@@ -210,7 +210,7 @@ const ConstrainedTabbingExample = () => {
 
 _Returns_
 
--   `import('react').RefCallback<Element>`: Element Ref.
+-   `React.RefCallback<Element>`: Element Ref.
 
 ### useCopyOnClick
 
@@ -220,7 +220,7 @@ Copies the text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _ref_ `import('react').RefObject<string | Element | NodeListOf<Element>>`: Reference with the element.
+-   _ref_ `React.RefObject<string | Element | NodeListOf<Element>>`: Reference with the element.
 -   _text_ `string|Function`: The text to copy.
 -   _timeout_ `[number]`: Optional timeout to reset the returned state. 4 seconds by default.
 
@@ -239,7 +239,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').Ref<TElementType>`: A ref to assign to the target element.
+-   `React.Ref<TElementType>`: A ref to assign to the target element.
 
 ### useDebounce
 
@@ -303,7 +303,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').RefCallback<HTMLElement>`: Element Ref.
+-   `React.RefCallback<HTMLElement>`: Element Ref.
 
 ### useEvent
 
@@ -338,7 +338,7 @@ _Returns_
 
 ### useFocusOnMount
 
-Hook used to focus the first tabbable element on mount.
+Determines focus behavior when the element mounts.
 
 _Usage_
 
@@ -358,11 +358,11 @@ const WithFocusOnMount = () => {
 
 _Parameters_
 
--   _focusOnMount_ `boolean | 'firstElement' | 'firstInputElement'`: Focus on mount mode.
+-   _focusOnMount_ `useFocusOnMount.Mode`: Behavioral mode. Defaults to `"firstElement"` which focuses the first tabbable element within; `"firstInputElement"` focuses the first value control within; `true` focuses the element itself; `false` does nothing.
 
 _Returns_
 
--   `import('react').RefCallback<HTMLElement>`: Ref callback.
+-   Ref callback.
 
 ### useFocusReturn
 
@@ -390,7 +390,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').RefCallback<HTMLElement>`: Element Ref.
+-   `React.RefCallback<HTMLElement>`: Element Ref.
 
 ### useInstanceId
 
@@ -421,7 +421,7 @@ _Related_
 _Parameters_
 
 -   _shortcuts_ `string[]|string`: Keyboard Shortcuts.
--   _callback_ `(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
+-   _callback_ `(e: Mousetrap.ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
 -   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
 
 ### useMediaQuery
@@ -467,11 +467,11 @@ return <div ref={ mergedRefs } />;
 
 _Parameters_
 
--   _refs_ `Array<TRef>`: The refs to be merged.
+-   _refs_ `Ref< T >[]`: The refs to be merged.
 
 _Returns_
 
--   `import('react').RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
+-   `RefCallback< T >`: The merged ref callback.
 
 ### useObservableValue
 

@@ -523,4 +523,111 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( innerElement ).toBeHidden();
 		} );
 	} );
+
+	test.describe( 'Legacy openSubmenusOnClick backward compatibility', () => {
+		test( 'Should render and migrate legacy openSubmenusOnClick blocks', async ( {
+			page,
+			admin,
+			editor,
+			requestUtils,
+		} ) => {
+			let postId;
+
+			await test.step( 'Insert post directly to database with legacy markup', async () => {
+				// Insert directly to database to avoid editor migration
+				const response = await requestUtils.rest( {
+					method: 'POST',
+					path: '/wp/v2/posts',
+					data: {
+						title: 'Legacy Navigation Test',
+						content: `<!-- wp:navigation {"openSubmenusOnClick":true,"overlayMenu":"never"} -->
+<!-- wp:navigation-submenu {"label":"Products"} -->
+<!-- wp:navigation-link {"label":"Product 1","url":"#"} /-->
+<!-- wp:navigation-link {"label":"Product 2","url":"#"} /-->
+<!-- /wp:navigation-submenu -->
+<!-- wp:navigation-link {"label":"About","url":"#"} /-->
+<!-- /wp:navigation -->`,
+						status: 'publish',
+					},
+				} );
+
+				postId = response.id;
+			} );
+
+			await test.step( 'Verify frontend renders correctly before editor load', async () => {
+				await page.goto( `/?p=${ postId }` );
+
+				// Find the submenu list item
+				const submenuItem = page
+					.locator( 'li.wp-block-navigation-item' )
+					.filter( { has: page.locator( 'text="Products"' ) } )
+					.first();
+
+				// Should have open-on-click class for backward compatibility
+				await expect( submenuItem ).toHaveClass( /open-on-click/ );
+			} );
+
+			await test.step( 'Load in editor - migration runs in memory only', async () => {
+				await admin.editPost( postId );
+
+				// Wait for blocks to load
+				const navigationBlock = editor.canvas.locator(
+					'[data-type="core/navigation"]'
+				);
+				await expect( navigationBlock ).toBeVisible();
+
+				// The deprecation runs in the editor in memory, transforming the block
+				// But the database is NOT updated automatically - requires an edit + save
+				const contentInEditor = await editor.getEditedPostContent();
+				// Raw content still shows legacy attribute since no save happened yet
+				expect( contentInEditor ).toContain( 'openSubmenusOnClick' );
+
+				// Make an edit to trigger save capability
+				// This causes the migrated block attributes to be persisted on save
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content: 'Test paragraph' },
+				} );
+			} );
+
+			await test.step( 'Save post and verify migration was written to database', async () => {
+				// For published posts, we need to use the save button (Update)
+				const saveButton = page
+					.getByRole( 'region', {
+						name: 'Editor top bar',
+					} )
+					.getByRole( 'button', { name: 'Save', exact: true } );
+
+				await saveButton.click();
+
+				// Fetch the post from the database to see what was actually saved
+				const savedPost = await requestUtils.rest( {
+					path: `/wp/v2/posts/${ postId }`,
+					params: {
+						context: 'edit',
+					},
+				} );
+
+				// After saving, the migration should have been applied
+				// The content should now have submenuVisibility instead of openSubmenusOnClick
+				const content = savedPost.content.raw;
+
+				expect( content ).toContain( '"submenuVisibility":"click"' );
+				expect( content ).not.toContain( 'openSubmenusOnClick' );
+			} );
+
+			await test.step( 'Verify frontend still works after migration', async () => {
+				// Navigate to frontend
+				await page.goto( `/?p=${ postId }` );
+
+				const submenuItem = page
+					.locator( 'li.wp-block-navigation-item' )
+					.filter( { has: page.locator( 'text="Products"' ) } )
+					.first();
+
+				// Should still have open-on-click class after migration
+				await expect( submenuItem ).toHaveClass( /open-on-click/ );
+			} );
+		} );
+	} );
 } );

@@ -14,7 +14,7 @@ import {
 	type UpdateQueue,
 } from './types';
 
-const SYNC_API_PATH = '/wp/v2/sync/updates';
+const SYNC_API_PATH = '/wp-sync/v1/updates';
 
 export function uint8ArrayToBase64( data: Uint8Array ): string {
 	let binary = '';
@@ -125,4 +125,25 @@ export async function postSyncUpdate(
 	}
 
 	return await response.json();
+}
+
+/**
+ * Fire-and-forget variant of postSyncUpdate. Uses `keepalive` so the
+ * request survives page unload, and errors are silently ignored.
+ *
+ * @param payload The sync payload to send.
+ */
+export function postSyncUpdateNonBlocking( payload: SyncPayload ): void {
+	if ( payload.rooms.length === 0 ) {
+		return;
+	}
+
+	apiFetch( {
+		body: JSON.stringify( payload ),
+		headers: { 'Content-Type': 'application/json' },
+		keepalive: true,
+		method: 'POST',
+		parse: false,
+		path: SYNC_API_PATH,
+	} ).catch( () => {} );
 }
