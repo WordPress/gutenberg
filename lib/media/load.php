@@ -23,7 +23,7 @@ function gutenberg_set_client_side_media_processing_flag() {
 	/** This filter is documented in gutenberg/lib/media/load.php */
 	$use_dip = apply_filters(
 		'gutenberg_use_document_isolation_policy',
-		$chrome_version !== null && $chrome_version >= 137
+		null !== $chrome_version && $chrome_version >= 137
 	);
 
 	if ( $use_dip ) {
@@ -297,12 +297,8 @@ add_action( 'load-widgets.php', 'gutenberg_set_up_cross_origin_isolation' );
  * Uses an output buffer to add crossorigin="anonymous" where needed.
  *
  * @link https://web.dev/coop-coep/
- *
- * @global bool $is_safari
  */
 function gutenberg_start_cross_origin_isolation_output_buffer(): void {
-	global $is_safari;
-
 	$chrome_version = gutenberg_get_chrome_major_version();
 
 	/**
@@ -318,17 +314,13 @@ function gutenberg_start_cross_origin_isolation_output_buffer(): void {
 	 */
 	$use_dip = apply_filters(
 		'gutenberg_use_document_isolation_policy',
-		$chrome_version !== null && $chrome_version >= 137
+		null !== $chrome_version && $chrome_version >= 137
 	);
 
 	ob_start(
-		function ( string $output ) use ( $is_safari, $use_dip ): string {
+		function ( string $output ) use ( $use_dip ): string {
 			if ( $use_dip ) {
 				header( 'Document-Isolation-Policy: isolate-and-credentialless' );
-			} else {
-				$coep = $is_safari ? 'require-corp' : 'credentialless';
-				header( 'Cross-Origin-Opener-Policy: same-origin' );
-				header( "Cross-Origin-Embedder-Policy: $coep" );
 			}
 
 			return gutenberg_add_crossorigin_attributes( $output );

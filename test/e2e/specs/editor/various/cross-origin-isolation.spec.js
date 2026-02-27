@@ -40,19 +40,7 @@ test.describe( 'Cross-origin isolation', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'should be cross-origin isolated by default', async ( { page } ) => {
-		// Verify that cross-origin isolation IS enabled (default state
-		// now that client-side media processing is graduated).
-		const isCrossOriginIsolated = await page.evaluate(
-			() => window.crossOriginIsolated
-		);
-		expect( isCrossOriginIsolated ).toBe( true );
-	} );
-
-	test( 'should render embed previews when cross-origin isolated', async ( {
-		editor,
-		embedUtils,
-	} ) => {
+	test( 'should render embed previews', async ( { editor, embedUtils } ) => {
 		await embedUtils.interceptRequests( {
 			'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
 		} );
@@ -64,13 +52,13 @@ test.describe( 'Cross-origin isolation', () => {
 			.getByRole( 'document', { name: 'Block' } )
 			.last();
 		const iframe = embedBlock.locator( 'iframe' );
-		await expect(
-			iframe,
-			'Embed should render iframe when cross-origin isolated'
-		).toHaveAttribute( 'title', 'Embedded content from twitter.com' );
+		await expect( iframe, 'Embed should render iframe' ).toHaveAttribute(
+			'title',
+			'Embedded content from twitter.com'
+		);
 	} );
 
-	test( 'should render video embeds with aspect ratio when cross-origin isolated', async ( {
+	test( 'should render video embeds with aspect ratio', async ( {
 		editor,
 		embedUtils,
 	} ) => {
@@ -112,70 +100,6 @@ test.describe( 'Cross-origin isolation', () => {
 			iframe,
 			'Embed iframe should have crossorigin attribute'
 		).toHaveAttribute( 'crossorigin', 'anonymous' );
-	} );
-
-	test( 'should add credentialless attribute to embed iframes when supported', async ( {
-		page,
-		editor,
-		embedUtils,
-	} ) => {
-		// Check if browser supports credentialless iframes.
-		const supportsCredentialless = await page.evaluate(
-			() => 'credentialless' in window.HTMLIFrameElement.prototype
-		);
-
-		test.skip(
-			! supportsCredentialless,
-			'Browser does not support credentialless iframes'
-		);
-
-		await embedUtils.interceptRequests( {
-			'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
-		} );
-
-		await embedUtils.insertEmbed( 'https://twitter.com/notnownikki' );
-
-		const embedBlock = editor.canvas
-			.getByRole( 'document', { name: 'Block' } )
-			.last();
-		const iframe = embedBlock.locator( 'iframe.components-sandbox' );
-
-		await expect(
-			iframe,
-			'Embed iframe should have credentialless attribute'
-		).toHaveAttribute( 'credentialless', '' );
-	} );
-
-	test( 'should show placeholder for denylisted providers when credentialless not supported', async ( {
-		page,
-		editor,
-		embedUtils,
-	} ) => {
-		// This test only applies when credentialless is NOT supported.
-		const supportsCredentialless = await page.evaluate(
-			() => 'credentialless' in window.HTMLIFrameElement.prototype
-		);
-
-		test.skip(
-			supportsCredentialless,
-			'Browser supports credentialless iframes'
-		);
-
-		await embedUtils.interceptRequests( {
-			'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
-		} );
-
-		await embedUtils.insertEmbed( 'https://twitter.com/notnownikki' );
-
-		const embedBlock = editor.canvas
-			.getByRole( 'document', { name: 'Block' } )
-			.last();
-
-		// When credentialless is not supported, embeds should show a placeholder.
-		await expect(
-			embedBlock.locator( '.components-placeholder__error' ),
-			'Should show placeholder when credentialless not supported'
-		).toContainText( "can't be previewed" );
 	} );
 } );
 
