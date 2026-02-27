@@ -39,10 +39,8 @@ const GUIDELINE_ITEMS = [
 		slug: 'images',
 	},
 	{
-		title: __( 'Additional guidelines' ),
-		description: __(
-			'Include any additional standards such as SEO preferences, legal requirements, citation styles, or other content considerations.'
-		),
+		title: __( 'Internal' ),
+		description: __( 'Add private notes and standards for your team.' ),
 
 		slug: 'additional',
 	},
