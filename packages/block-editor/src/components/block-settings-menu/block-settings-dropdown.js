@@ -75,6 +75,9 @@ export function BlockSettingsDropdown( {
 	children,
 	__experimentalSelectBlock,
 	isContentOnlyListView,
+	expand,
+	expandedState,
+	setInsertedBlock,
 	...props
 } ) {
 	// Get the client id of the current block for this menu, if one is set.
@@ -372,16 +375,18 @@ export function BlockSettingsDropdown( {
 										) }
 									</MenuGroup>
 								) }
-								{ ! isContentOnly && (
-									<BlockSettingsMenuControls.Slot
-										fillProps={ {
-											onClose,
-											count,
-											firstBlockClientId,
-										} }
-										clientIds={ clientIds }
-									/>
-								) }
+								<BlockSettingsMenuControls.Slot
+									fillProps={ {
+										onClose,
+										count,
+										firstBlockClientId,
+										isContentOnly,
+										expand,
+										expandedState,
+										setInsertedBlock,
+									} }
+									clientIds={ clientIds }
+								/>
 								{ typeof children === 'function'
 									? children( { onClose } )
 									: Children.map( ( child ) =>
