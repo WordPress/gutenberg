@@ -26,7 +26,7 @@ function gutenberg_admin_bar_command_palette_menu( WP_Admin_Bar $wp_admin_bar ):
 			'href'  => '#',
 			'meta'  => array(
 				'class'   => 'hide-if-no-js',
-				'onclick' => 'if ( window.wp && wp.data && wp.data.dispatch ) { var store = wp.data.dispatch( "core/commands" ); if ( store && typeof store.open === "function" ) { store.open(); } } return false;',
+				'onclick' => 'wp.data.dispatch( "core/commands" ).open(); return false;',
 			),
 		)
 	);
