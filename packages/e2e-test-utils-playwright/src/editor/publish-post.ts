@@ -60,9 +60,11 @@ export async function publishPost( this: Editor ) {
 	// Save any entities if the entities panel appeared.
 	if ( await entitiesSaveButton.isVisible() ) {
 		await entitiesSaveButton.click();
+		// After entity save, the publish confirmation may appear next.
+		await publishConfirmButton.or( successNotice ).first().waitFor();
 	}
 
-	// Click the publish confirmation button if the publish panel appeared.
+	// Click the publish confirmation button if visible.
 	if ( await publishConfirmButton.isVisible() ) {
 		await publishConfirmButton.click();
 	}
