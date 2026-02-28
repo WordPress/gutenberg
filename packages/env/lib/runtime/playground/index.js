@@ -600,10 +600,6 @@ class PlaygroundRuntime {
 	 * the REST API is ready, causing subsequent REST calls to fail with
 	 * "Internal Server Error".
 	 *
-	 * We additionally verify the response is valid JSON, which proves
-	 * the PHP WASM worker processed the request end-to-end (as opposed
-	 * to the HTTP layer returning a generic error page).
-	 *
 	 * @param {number} port Port to check.
 	 * @return {Promise<void>}
 	 */
@@ -613,27 +609,13 @@ class PlaygroundRuntime {
 			const req = http.get(
 				`http://localhost:${ port }/?rest_route=/wp/v2/types`,
 				( res ) => {
-					let body = '';
-					res.on( 'data', ( chunk ) => {
-						body += chunk;
-					} );
-					res.on( 'end', () => {
-						if ( res.statusCode < 200 || res.statusCode >= 400 ) {
-							reject(
-								new Error( `Status: ${ res.statusCode }` )
-							);
-							return;
-						}
-						// Verify the response is valid JSON — a text/HTML
-						// error page would indicate the PHP worker crashed.
-						try {
-							JSON.parse( body );
-						} catch {
-							reject( new Error( 'Response is not valid JSON' ) );
-							return;
-						}
+					// Drain the response body.
+					res.resume();
+					if ( res.statusCode >= 200 && res.statusCode < 400 ) {
 						resolve();
-					} );
+					} else {
+						reject( new Error( `Status: ${ res.statusCode }` ) );
+					}
 				}
 			);
 			req.on( 'error', reject );
