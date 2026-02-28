@@ -47,7 +47,7 @@ export async function publishPost( this: Editor ) {
 		name: 'Publish',
 		exact: true,
 	} );
-	await entitiesSaveButton.or( publishConfirmButton ).waitFor();
+	await entitiesSaveButton.or( publishConfirmButton ).first().waitFor();
 
 	const isEntitiesSavePanelVisible = await entitiesSaveButton.isVisible();
 

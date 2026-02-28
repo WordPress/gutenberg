@@ -59,7 +59,8 @@ export async function saveSiteEditorEntities(
 		} );
 
 		// Wait for either the entities Save button or the success notice.
-		await entitiesSaveButton.or( successNotice ).waitFor();
+		// Use .first() to avoid strict mode violation when both match.
+		await entitiesSaveButton.or( successNotice ).first().waitFor();
 
 		if ( await entitiesSaveButton.isVisible() ) {
 			await entitiesSaveButton.click();
