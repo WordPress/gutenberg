@@ -529,29 +529,66 @@ class PlaygroundRuntime {
 	}
 
 	/**
-	 * Wait for the server to be ready.
+	 * Wait for the server to be ready and stable.
+	 *
+	 * After the server first responds, we run a stabilization phase that
+	 * verifies the REST API answers correctly several times in a row with
+	 * a gap between each check.  This guards against a race condition
+	 * where the HTTP server begins accepting requests before WordPress
+	 * (and its plugins) are fully initialized, causing early REST calls
+	 * to return "Internal Server Error".
 	 *
 	 * @param {number} port    Port to check.
 	 * @param {number} timeout Timeout in milliseconds.
 	 * @return {Promise<void>}
 	 */
-	async _waitForServer( port, timeout = 30000 ) {
+	async _waitForServer( port, timeout = 120000 ) {
 		const start = Date.now();
+		const STABILIZATION_CHECKS = 3;
+		const STABILIZATION_GAP_MS = 1000;
 
+		// Phase 1 — wait for the very first successful response.
 		while ( Date.now() - start < timeout ) {
 			try {
 				await this._checkServer( port );
-				return;
+				break; // First response received — enter stabilization.
 			} catch {
 				await new Promise( ( r ) => setTimeout( r, 500 ) );
 			}
 		}
 
-		throw new Error(
-			`Playground server did not start within ${
-				timeout / 1000
-			} seconds.`
-		);
+		if ( Date.now() - start >= timeout ) {
+			throw new Error(
+				`Playground server did not start within ${
+					timeout / 1000
+				} seconds.`
+			);
+		}
+
+		// Phase 2 — stabilization: require several consecutive successes
+		// with a pause between each to confirm the server is fully ready.
+		let consecutiveOk = 0;
+		while (
+			consecutiveOk < STABILIZATION_CHECKS &&
+			Date.now() - start < timeout
+		) {
+			await new Promise( ( r ) => setTimeout( r, STABILIZATION_GAP_MS ) );
+			try {
+				await this._checkServer( port );
+				consecutiveOk++;
+			} catch {
+				// A failed check during stabilization resets the counter.
+				consecutiveOk = 0;
+			}
+		}
+
+		if ( consecutiveOk < STABILIZATION_CHECKS ) {
+			throw new Error(
+				`Playground server started but failed to stabilize within ${
+					timeout / 1000
+				} seconds.`
+			);
+		}
 	}
 
 	/**
@@ -563,6 +600,10 @@ class PlaygroundRuntime {
 	 * the REST API is ready, causing subsequent REST calls to fail with
 	 * "Internal Server Error".
 	 *
+	 * We additionally verify the response is valid JSON, which proves
+	 * the PHP WASM worker processed the request end-to-end (as opposed
+	 * to the HTTP layer returning a generic error page).
+	 *
 	 * @param {number} port Port to check.
 	 * @return {Promise<void>}
 	 */
@@ -572,13 +613,27 @@ class PlaygroundRuntime {
 			const req = http.get(
 				`http://localhost:${ port }/?rest_route=/wp/v2/types`,
 				( res ) => {
-					// Drain the response body.
-					res.resume();
-					if ( res.statusCode >= 200 && res.statusCode < 400 ) {
+					let body = '';
+					res.on( 'data', ( chunk ) => {
+						body += chunk;
+					} );
+					res.on( 'end', () => {
+						if ( res.statusCode < 200 || res.statusCode >= 400 ) {
+							reject(
+								new Error( `Status: ${ res.statusCode }` )
+							);
+							return;
+						}
+						// Verify the response is valid JSON — a text/HTML
+						// error page would indicate the PHP worker crashed.
+						try {
+							JSON.parse( body );
+						} catch {
+							reject( new Error( 'Response is not valid JSON' ) );
+							return;
+						}
 						resolve();
-					} else {
-						reject( new Error( `Status: ${ res.statusCode }` ) );
-					}
+					} );
 				}
 			);
 			req.on( 'error', reject );
