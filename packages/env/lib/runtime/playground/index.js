@@ -551,22 +551,34 @@ class PlaygroundRuntime {
 	}
 
 	/**
-	 * Check if server is responding.
+	 * Check if server is responding and the REST API is functional.
+	 *
+	 * Hitting the REST API endpoint instead of the homepage ensures that
+	 * WordPress is fully initialized (database tables created, plugins
+	 * loaded, rewrite rules flushed). The homepage may return 200 before
+	 * the REST API is ready, causing subsequent REST calls to fail with
+	 * "Internal Server Error".
 	 *
 	 * @param {number} port Port to check.
 	 * @return {Promise<void>}
 	 */
 	_checkServer( port ) {
 		return new Promise( ( resolve, reject ) => {
-			const req = http.get( `http://localhost:${ port }`, ( res ) => {
-				if ( res.statusCode >= 200 && res.statusCode < 400 ) {
-					resolve();
-				} else {
-					reject( new Error( `Status: ${ res.statusCode }` ) );
+			// Use ?rest_route= form which works regardless of permalink settings.
+			const req = http.get(
+				`http://localhost:${ port }/?rest_route=/wp/v2/types`,
+				( res ) => {
+					// Drain the response body.
+					res.resume();
+					if ( res.statusCode >= 200 && res.statusCode < 400 ) {
+						resolve();
+					} else {
+						reject( new Error( `Status: ${ res.statusCode }` ) );
+					}
 				}
-			} );
+			);
 			req.on( 'error', reject );
-			req.setTimeout( 1000, () => {
+			req.setTimeout( 5000, () => {
 				req.destroy();
 				reject( new Error( 'Timeout' ) );
 			} );
