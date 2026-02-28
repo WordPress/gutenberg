@@ -669,16 +669,16 @@ test.describe( 'Client-side media processing', () => {
 				'1024x768_e2e_test_image_size.jpeg'
 			);
 
-			// Wait for error to appear (snackbar notice or notice region).
-			const snackbar = page.locator(
-				'.components-snackbar-list .components-snackbar'
+			// Wait for the upload queue to drain after the failure.
+			await mediaProcessingUtils.waitForUploadQueueEmpty( 60_000 );
+
+			// The image block should not have a successfully uploaded image.
+			// It should remain in its placeholder state (no <img> with a
+			// wp-content upload src) since the server rejected the upload.
+			const uploadedImage = imageBlock.locator(
+				'img[src*="wp-content/uploads"]'
 			);
-			const notice = page.locator(
-				'.components-notice.is-error, .components-notice.is-warning'
-			);
-			await expect( snackbar.or( notice ) ).toBeVisible( {
-				timeout: 60_000,
-			} );
+			await expect( uploadedImage ).toHaveCount( 0 );
 
 			// Clean up the route interception.
 			await page.unroute( '**/wp/v2/media' );
