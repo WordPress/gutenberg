@@ -92,15 +92,16 @@ function render_block_core_button( $attributes, $content ) {
 
 		$is_percentage = str_ends_with( $resolved_width, '%' );
 
-		$p = new WP_HTML_Tag_Processor( $content );
+		$processor = new WP_HTML_Tag_Processor( $content );
 		// Target the outer wrapper div.
-		if ( $p->next_tag( array( 'class_name' => 'wp-block-button' ) ) ) {
-			$p->add_class( 'has-custom-width' );
-			$existing_style = $p->get_attribute( 'style' ) ?? '';
+		if ( $processor->next_tag( array( 'class_name' => 'wp-block-button' ) ) ) {
+			$processor->add_class( 'has-custom-width' );
+			$existing_style = $processor->get_attribute( 'style' );
+			$existing_style = is_string( $existing_style ) ? $existing_style : '';
 
 			if ( $is_percentage ) {
 				$numeric_width = (float) $resolved_width;
-				$p->add_class( 'wp-block-button__width' );
+				$processor->add_class( 'wp-block-button__width' );
 
 				// Maintain legacy class for the standard percentage widths.
 				$legacy_widths = array(
@@ -110,20 +111,20 @@ function render_block_core_button( $attributes, $content ) {
 					'100%' => 'wp-block-button__width-100',
 				);
 				if ( isset( $legacy_widths[ $resolved_width ] ) ) {
-					$p->add_class( $legacy_widths[ $resolved_width ] );
+					$processor->add_class( $legacy_widths[ $resolved_width ] );
 				}
 
 				$width_style = "--wp--block-button--width: $numeric_width;";
-				$p->set_attribute( 'style', $width_style . ( $existing_style ? ' ' . $existing_style : '' ) );
+				$processor->set_attribute( 'style', $width_style . ( $existing_style ? ' ' . $existing_style : '' ) );
 			} else {
 				$css_value   = $is_preset
 					? 'var(--wp--preset--dimension--' . _wp_to_kebab_case( $slug ) . ')'
 					: $width;
 				$width_style = "width: $css_value;";
-				$p->set_attribute( 'style', $width_style . ( $existing_style ? ' ' . $existing_style : '' ) );
+				$processor->set_attribute( 'style', $width_style . ( $existing_style ? ' ' . $existing_style : '' ) );
 			}
 
-			$content = $p->get_updated_html();
+			$content = $processor->get_updated_html();
 		}
 	}
 
