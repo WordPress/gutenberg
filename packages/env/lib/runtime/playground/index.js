@@ -165,11 +165,13 @@ class PlaygroundRuntime {
 		const siteUrl = `http://localhost:${ port }`;
 
 		// Build command arguments for direct execution.
-		// Note: --experimental-multi-worker is intentionally omitted.
-		// Multi-worker mode spawns separate PHP workers that may process
-		// REST API requests before the blueprint has finished running on
-		// the main worker, causing "Internal Server Error" responses.
-		// Single-worker mode ensures blueprint completion before serving.
+		// Multi-worker mode allows concurrent request handling which is
+		// essential for reasonable E2E test performance.  The
+		// stabilization phase in _waitForServer ensures the environment
+		// is fully initialized before tests begin, preventing the
+		// "Internal Server Error" race condition that multi-worker
+		// previously caused (where workers process requests before the
+		// blueprint finishes on the main worker).
 		const cliArgs = [
 			'server',
 			'--port',
@@ -181,6 +183,7 @@ class PlaygroundRuntime {
 			'--blueprint',
 			blueprintPath,
 			'--login',
+			'--experimental-multi-worker',
 			...mountArgs,
 		];
 
