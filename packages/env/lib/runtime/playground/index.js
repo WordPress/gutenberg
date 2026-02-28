@@ -96,6 +96,19 @@ class PlaygroundRuntime {
 	async start( config, { spinner, debug, xdebug } ) {
 		const envConfig = config.env.development;
 
+		// Determine port early so we can check if it's in use.
+		const port = envConfig.port || 8888;
+
+		// Ensure any previous Playground instance is fully stopped before
+		// starting a new one. Without this, a stale process from a previous
+		// run may still hold the port, causing _waitForServer to connect to
+		// the old (potentially corrupted) instance instead of the new one.
+		await this.stop( config, { spinner } );
+
+		// Additionally, verify the port is actually free. A previous run's
+		// multi-worker child processes may survive the main process kill.
+		await this._waitForPortRelease( port, 5000 );
+
 		spinner.text = 'Starting WordPress Playground.';
 
 		// Download remote sources (git/zip) if needed
@@ -148,8 +161,6 @@ class PlaygroundRuntime {
 		// Get mount arguments
 		const mountArgs = getMountArgs( config );
 
-		// Determine port
-		const port = envConfig.port || 8888;
 		const phpVersion = envConfig.phpVersion || '8.2';
 		const siteUrl = `http://localhost:${ port }`;
 
@@ -352,6 +363,8 @@ class PlaygroundRuntime {
 				try {
 					process.kill( -pid, 0 ); // Check if process group exists
 					process.kill( -pid, 'SIGKILL' ); // Force kill entire group
+					// Wait for the process to fully terminate and release the port
+					await new Promise( ( r ) => setTimeout( r, 500 ) );
 				} catch {
 					// Process group already terminated
 				}
@@ -558,6 +571,43 @@ class PlaygroundRuntime {
 				reject( new Error( 'Timeout' ) );
 			} );
 		} );
+	}
+
+	/**
+	 * Wait until nothing is listening on the given port.
+	 *
+	 * This guards against stale Playground processes (e.g. multi-worker
+	 * children) that survive a PID-based kill.  If the port is still
+	 * occupied after the timeout, we proceed anyway — the new process
+	 * will fail to bind and _waitForServer will surface the error.
+	 *
+	 * @param {number} port    Port to wait for.
+	 * @param {number} timeout Max wait in milliseconds.
+	 * @return {Promise<void>}
+	 */
+	async _waitForPortRelease( port, timeout = 5000 ) {
+		const start = Date.now();
+
+		while ( Date.now() - start < timeout ) {
+			const inUse = await new Promise( ( resolve ) => {
+				const req = http.get( `http://localhost:${ port }`, ( res ) => {
+					// Drain the response to free the socket.
+					res.resume();
+					resolve( true );
+				} );
+				req.on( 'error', () => resolve( false ) );
+				req.setTimeout( 500, () => {
+					req.destroy();
+					resolve( false );
+				} );
+			} );
+
+			if ( ! inUse ) {
+				return;
+			}
+
+			await new Promise( ( r ) => setTimeout( r, 250 ) );
+		}
 	}
 }
 
