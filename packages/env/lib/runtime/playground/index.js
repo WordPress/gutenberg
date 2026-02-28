@@ -164,7 +164,12 @@ class PlaygroundRuntime {
 		const phpVersion = envConfig.phpVersion || '8.2';
 		const siteUrl = `http://localhost:${ port }`;
 
-		// Build command arguments for direct execution
+		// Build command arguments for direct execution.
+		// Note: --experimental-multi-worker is intentionally omitted.
+		// Multi-worker mode spawns separate PHP workers that may process
+		// REST API requests before the blueprint has finished running on
+		// the main worker, causing "Internal Server Error" responses.
+		// Single-worker mode ensures blueprint completion before serving.
 		const cliArgs = [
 			'server',
 			'--port',
@@ -176,7 +181,6 @@ class PlaygroundRuntime {
 			'--blueprint',
 			blueprintPath,
 			'--login',
-			'--experimental-multi-worker',
 			...mountArgs,
 		];
 
