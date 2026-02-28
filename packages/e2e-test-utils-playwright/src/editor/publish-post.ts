@@ -39,31 +39,35 @@ export async function publishPost( this: Editor ) {
 		exact: true,
 	} );
 
-	// In slower runtimes (e.g. Playground WASM), the publish panel may not
-	// appear immediately after clicking the top-bar button. Wait for the
-	// first actionable element inside the panel (either entities Save or
-	// the Publish confirmation button).
 	const publishConfirmButton = publishRegion.getByRole( 'button', {
 		name: 'Publish',
 		exact: true,
 	} );
-	await entitiesSaveButton.or( publishConfirmButton ).first().waitFor();
 
-	const isEntitiesSavePanelVisible = await entitiesSaveButton.isVisible();
+	// In some runtimes (e.g. Playground WASM), the publish panel may not
+	// appear at all — the post is saved directly. Watch for either the
+	// panel content or the success notice.
+	const successNotice = this.page
+		.getByRole( 'button', { name: 'Dismiss this notice' } )
+		.filter( { hasText: 'published' } );
 
-	// Save any entities.
-	if ( isEntitiesSavePanelVisible ) {
-		// Handle saving entities.
+	await entitiesSaveButton
+		.or( publishConfirmButton )
+		.or( successNotice )
+		.first()
+		.waitFor();
+
+	// Save any entities if the entities panel appeared.
+	if ( await entitiesSaveButton.isVisible() ) {
 		await entitiesSaveButton.click();
 	}
 
-	// Handle saving just the post.
-	await publishConfirmButton.click();
+	// Click the publish confirmation button if the publish panel appeared.
+	if ( await publishConfirmButton.isVisible() ) {
+		await publishConfirmButton.click();
+	}
 
-	await this.page
-		.getByRole( 'button', { name: 'Dismiss this notice' } )
-		.filter( { hasText: 'published' } )
-		.waitFor();
+	await successNotice.waitFor();
 	const postId = new URL( this.page.url() ).searchParams.get( 'post' );
 
 	return typeof postId === 'string' ? parseInt( postId, 10 ) : null;
