@@ -10,13 +10,21 @@ import type { Editor } from './index';
  * @param this
  */
 export async function publishPost( this: Editor ) {
+	const editorTopBar = this.page.getByRole( 'region', {
+		name: 'Editor top bar',
+	} );
+	// Wait for the top bar to render before checking button visibility.
+	await editorTopBar.waitFor();
+
 	// If we have changes in other entities, the label is `Save` instead of `Publish`.
-	const saveButton = this.page
-		.getByRole( 'region', { name: 'Editor top bar' } )
-		.getByRole( 'button', { name: 'Save', exact: true } );
-	const publishButton = this.page
-		.getByRole( 'region', { name: 'Editor top bar' } )
-		.getByRole( 'button', { name: 'Publish', exact: true } );
+	const saveButton = editorTopBar.getByRole( 'button', {
+		name: 'Save',
+		exact: true,
+	} );
+	const publishButton = editorTopBar.getByRole( 'button', {
+		name: 'Publish',
+		exact: true,
+	} );
 	const buttonToClick = ( await saveButton.isVisible() )
 		? saveButton
 		: publishButton;
@@ -26,15 +34,21 @@ export async function publishPost( this: Editor ) {
 		name: 'Editor publish',
 	} );
 
-	// Wait for the publish panel to render before checking its contents.
-	// In slower runtimes (e.g. Playground WASM), the panel may not appear
-	// immediately after the top-bar button click.
-	await publishRegion.waitFor();
-
 	const entitiesSaveButton = publishRegion.getByRole( 'button', {
 		name: 'Save',
 		exact: true,
 	} );
+
+	// In slower runtimes (e.g. Playground WASM), the publish panel may not
+	// appear immediately after clicking the top-bar button. Wait for the
+	// first actionable element inside the panel (either entities Save or
+	// the Publish confirmation button).
+	const publishConfirmButton = publishRegion.getByRole( 'button', {
+		name: 'Publish',
+		exact: true,
+	} );
+	await entitiesSaveButton.or( publishConfirmButton ).waitFor();
+
 	const isEntitiesSavePanelVisible = await entitiesSaveButton.isVisible();
 
 	// Save any entities.
@@ -44,9 +58,7 @@ export async function publishPost( this: Editor ) {
 	}
 
 	// Handle saving just the post.
-	await publishRegion
-		.getByRole( 'button', { name: 'Publish', exact: true } )
-		.click();
+	await publishConfirmButton.click();
 
 	await this.page
 		.getByRole( 'button', { name: 'Dismiss this notice' } )
