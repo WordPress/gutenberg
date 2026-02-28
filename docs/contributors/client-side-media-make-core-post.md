@@ -14,8 +14,9 @@ Client-side media processing moves this work to the browser. Images are processe
 
 - **No more PHP memory limit failures.** Large image processing that would exceed PHP's memory limit now succeeds because it runs in the browser's memory space.
 - **Reduced server load.** Image processing is offloaded to the user's device, freeing server CPU and memory for other tasks.
-- **Consistent, high-quality output.** All users get the same libvips-powered processing regardless of whether the server has GD or Imagick, and regardless of which version is installed.
-- **Faster perceived uploads.** Images are optimized before uploading, reducing the amount of data transferred over the network.
+- **Consistent, high-quality output with modern image support.** All users get the same libvips-powered processing regardless of whether the server has GD or Imagick, and regardless of which version is installed.
+- **More resilient uploads.** The system can resume uploading individual thumbnails if a network interruption occurs, rather than having to restart the entire upload.
+
 
 ## What changed
 
@@ -25,7 +26,7 @@ Client-side media processing introduces several new capabilities:
 - **Thumbnail generation in the browser**: All registered image sub-sizes are generated client-side and uploaded individually via a new sideload REST API endpoint.
 - **Automatic format conversion**: The existing `image_editor_output_format` filter is respected client-side, enabling automatic conversion (e.g., JPEG to WebP) before upload.
 - **Smart fallback**: Browsers that don't support the required features (WebAssembly, SharedArrayBuffer, blob workers) automatically fall back to server-side processing with no user-facing change.
-- **Cross-origin isolation**: WordPress now sends COOP/COEP headers on block editor screens and adds `crossorigin="anonymous"` attributes to cross-origin resources, enabling `SharedArrayBuffer` access for WASM threading.
+- **Cross-origin isolation**: WordPress now sends the required headers on block editor screens and iframes to enable `SharedArrayBuffer` access for WASM threading. This enables running the image eprocessing in the background - which means the editor remains responsive even during large image uploads.
 
 ## Technical overview
 
@@ -62,7 +63,7 @@ Client-side processing reads settings from the server and respects:
 - `image_save_progressive` — Controls progressive/interlaced encoding.
 - `wp_image_maybe_exif_rotate` — Controls EXIF rotation.
 
-No changes are needed to existing filter usage.
+See https://github.com/WordPress/gutenberg/pull/74913 for additional details on filter usage and examples.
 
 ### Cross-origin isolation impact
 
