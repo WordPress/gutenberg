@@ -159,12 +159,17 @@ function getMountArgs( config ) {
 				// No ref means "latest" — mount the cloned repo so we get
 				// the full distribution (all bundled themes, etc.) rather
 				// than Playground's trimmed-down WordPress package.
+				// Use 'install-from-existing-files' (not '-if-needed') to
+				// force a fresh WordPress installation on every start. The
+				// '-if-needed' variant skips installation when it detects
+				// existing files, which causes stale database state when
+				// the same environment is stopped and restarted.
 				args.push(
 					'--mount-dir-before-install',
 					envConfig.coreSource.path,
 					'/wordpress',
 					'--wordpress-install-mode',
-					'install-from-existing-files-if-needed'
+					'install-from-existing-files'
 				);
 			}
 		} else {
@@ -175,7 +180,7 @@ function getMountArgs( config ) {
 				envConfig.coreSource.path,
 				'/wordpress',
 				'--wordpress-install-mode',
-				'install-from-existing-files-if-needed'
+				'install-from-existing-files'
 			);
 		}
 	}
