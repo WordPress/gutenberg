@@ -38,14 +38,18 @@ export async function saveSiteEditorEntities(
 	await buttonToClick.click();
 
 	if ( ! options.isOnlyCurrentEntityDirty ) {
-		// Wait for the entities panel to appear, then click Save.
+		// Wait for the entities panel Save button to appear.
+		// In slower runtimes (e.g. Playground WASM), the panel region element
+		// may exist but stay hidden until the content renders.
 		const entitiesPanel = this.page.getByRole( 'region', {
 			name: /(Editor publish|Save panel)/,
 		} );
-		await entitiesPanel.waitFor();
-		await entitiesPanel
-			.getByRole( 'button', { name: 'Save', exact: true } )
-			.click();
+		const entitiesSaveButton = entitiesPanel.getByRole( 'button', {
+			name: 'Save',
+			exact: true,
+		} );
+		await entitiesSaveButton.waitFor();
+		await entitiesSaveButton.click();
 	}
 	// The text in the notice can be different based on the edited entity, whether
 	// we are saving multiple entities and whether we publish or update. So for now,

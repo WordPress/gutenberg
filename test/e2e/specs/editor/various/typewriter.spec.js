@@ -5,8 +5,9 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /** @typedef {import('@playwright/test').Page} Page */
 
-// Allow the scroll position to be 1px off.
-const BUFFER = 1;
+// Allow the scroll position to be slightly off due to sub-pixel rendering
+// differences across runtimes (e.g. Docker vs Playground WASM).
+const BUFFER = 2;
 
 test.use( {
 	typewriterUtils: async ( { page }, use ) => {
