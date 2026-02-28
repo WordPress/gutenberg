@@ -37,10 +37,19 @@ export async function saveSiteEditorEntities(
 	const buttonToClick = saveButtonIsVisible ? saveButton : publishButton;
 	await buttonToClick.click();
 
+	// The text in the notice can be different based on the edited entity, whether
+	// we are saving multiple entities and whether we publish or update. So for now,
+	// we locate it based on the last part.
+	const successNotice = this.page
+		.getByRole( 'button', { name: 'Dismiss this notice' } )
+		.getByText( /(updated|published)\./ )
+		.first();
+
 	if ( ! options.isOnlyCurrentEntityDirty ) {
 		// Wait for the entities panel Save button to appear.
-		// In slower runtimes (e.g. Playground WASM), the panel region element
-		// may exist but stay hidden until the content renders.
+		// In some runtimes (e.g. Playground WASM), the top-bar Save button
+		// may directly save without showing the entities panel, so also
+		// watch for the success notice as a fallback.
 		const entitiesPanel = this.page.getByRole( 'region', {
 			name: /(Editor publish|Save panel)/,
 		} );
@@ -48,15 +57,14 @@ export async function saveSiteEditorEntities(
 			name: 'Save',
 			exact: true,
 		} );
-		await entitiesSaveButton.waitFor();
-		await entitiesSaveButton.click();
+
+		// Wait for either the entities Save button or the success notice.
+		await entitiesSaveButton.or( successNotice ).waitFor();
+
+		if ( await entitiesSaveButton.isVisible() ) {
+			await entitiesSaveButton.click();
+		}
 	}
-	// The text in the notice can be different based on the edited entity, whether
-	// we are saving multiple entities and whether we publish or update. So for now,
-	// we locate it based on the last part.
-	await this.page
-		.getByRole( 'button', { name: 'Dismiss this notice' } )
-		.getByText( /(updated|published)\./ )
-		.first()
-		.waitFor();
+
+	await successNotice.waitFor();
 }
