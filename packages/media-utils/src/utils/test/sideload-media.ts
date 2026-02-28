@@ -30,4 +30,25 @@ describe( 'sideloadMedia', () => {
 		expect( sideloadToServer ).toHaveBeenCalled();
 		expect( onFileChange ).toHaveBeenCalled();
 	} );
+
+	it( 'should pass onProgress callback to sideloadToServer', async () => {
+		const onError = jest.fn();
+		const onFileChange = jest.fn();
+		const onProgress = jest.fn();
+		await sideloadMedia( {
+			file: imageFile,
+			attachmentId: 1,
+			onError,
+			onFileChange,
+			onProgress,
+		} );
+
+		expect( sideloadToServer ).toHaveBeenCalledWith(
+			imageFile,
+			1,
+			expect.anything(),
+			undefined,
+			onProgress
+		);
+	} );
 } );

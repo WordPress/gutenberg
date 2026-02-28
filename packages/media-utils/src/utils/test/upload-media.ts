@@ -211,6 +211,25 @@ describe( 'uploadMedia', () => {
 		expect( uploadToServer ).not.toHaveBeenCalled();
 	} );
 
+	it( 'should pass onProgress callback to uploadToServer', () => {
+		const onError = jest.fn();
+		const onFileChange = jest.fn();
+		const onProgress = jest.fn();
+		uploadMedia( {
+			filesList: [ imageFile ],
+			onError,
+			onFileChange,
+			onProgress,
+		} );
+
+		expect( uploadToServer ).toHaveBeenCalledWith(
+			imageFile,
+			expect.anything(),
+			undefined,
+			onProgress
+		);
+	} );
+
 	it( 'should return error that is not an Error object', () => {
 		( uploadToServer as jest.Mock ).mockImplementation( () => {
 			throw {
