@@ -1128,13 +1128,9 @@ function resolveFeatureSelector(
  * Collects CSS variable declarations for a single preset metadata entry
  * across all origins.
  *
- * @param {Record<string,any>}             presets           The preset values keyed by origin.
- * @param {GlobalStylesConfig['settings']} mergedSettings    The merged global styles settings.
- * @param {Object}                         root0             The preset metadata.
- * @param {string[]}                       root0.path        Path to the preset values.
- * @param {string}                         root0.valueKey    Key to read the value from.
- * @param {Function}                       root0.valueFunc   Function to compute the value.
- * @param {string}                         root0.cssVarInfix The CSS variable infix string.
+ * @param {Record<string,any>}             presets        The preset values keyed by origin.
+ * @param {GlobalStylesConfig['settings']} mergedSettings The merged global styles settings.
+ * @param {PresetMetadata}                 presetMetadata The preset metadata.
  * @return {string[]} The CSS variable declarations.
  */
 function getPresetVarDeclarations(
