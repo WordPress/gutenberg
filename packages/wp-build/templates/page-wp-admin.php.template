@@ -301,7 +301,7 @@ if ( ! function_exists( '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_inline_sty
 			}
 		<?php
 		$styles = ob_get_clean();
-		$styles .= "\n//# sourceURL=" . rawurlencode( __FUNCTION__ );
+		$styles .= "\n/*# sourceURL=" . rawurlencode( __FUNCTION__ ) . '*/';
 		return $styles;
 	}
 }
