@@ -33,6 +33,8 @@ const playgroundTestIgnore = isPlayground
 			'**/specs/widgets/customizing-widgets.spec.js',
 			'**/specs/editor/blocks/fit-text.spec.js',
 			'**/specs/admin/connectors.spec.js',
+			'**/specs/editor/various/multi-block-selection.spec.js',
+			'**/specs/editor/plugins/wp-editor-meta-box.spec.js',
 	  ]
 	: [];
 
@@ -74,11 +76,8 @@ const playgroundGrepInvert = isPlayground
 				'should be possible to edit the value of the text custom field from the image alt',
 				// Navigation frontend: migration persistence.
 				'Save post and verify migration was written to database',
-				// Multi-block selection: pointer event interception in Playground.
-				'should select with shift + click',
-				'should partially select with shift + click',
-				'should multi-select blocks without text selection',
-				'should clear selection when clicking next to blocks',
+				// Navigation: focus management timing after link creation.
+				'creating a link sends focus to the newly created navigation link item',
 				// Writing flow (webkit/firefox): focus/selection differs.
 				'should extend selection into paragraph for list with longer last item',
 				'should move to the start of the first line on ArrowUp',
