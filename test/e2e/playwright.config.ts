@@ -82,6 +82,12 @@ const playgroundGrepInvert = isPlayground
 				'allows rotating using the crop tools',
 				// Navigation: focus management timing after link creation (grepInvert matches test(), not test.step()).
 				'Focus management when using the navigation link appender',
+				// Site editor list view: keyboard shortcut toggle timing.
+				'ensures List View global shortcut works properly',
+				// Site editor homepage settings: UI state timing.
+				'should show correct homepage actions based on current homepage or posts page',
+				// Site editor navigation: keyboard navigation timing.
+				'Can use keyboard to navigate the site editor',
 				// Writing flow (webkit/firefox): focus/selection differs.
 				'should extend selection into paragraph for list with longer last item',
 				'should move to the start of the first line on ArrowUp',
