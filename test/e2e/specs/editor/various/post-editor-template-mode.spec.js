@@ -23,7 +23,7 @@ test.use( {
 test.describe( 'Post Editor Template mode', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin( 'gutenberg-test-block-templates' );
-		// Cross-origin isolation (COEP) prevents page navigations
+		// Cross-origin isolation prevents page navigations
 		// from working properly during template creation.
 		await requestUtils.activatePlugin(
 			'gutenberg-test-plugin-disable-client-side-media-processing'

@@ -19,7 +19,7 @@ test.use( {
 
 test.describe( 'Classic', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		// Cross-origin isolation (COEP) prevents TinyMCE from
+		// Cross-origin isolation prevents TinyMCE from
 		// initializing properly in its iframe.
 		await requestUtils.activatePlugin(
 			'gutenberg-test-plugin-disable-client-side-media-processing'

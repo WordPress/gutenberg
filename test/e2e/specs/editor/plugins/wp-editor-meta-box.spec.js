@@ -8,7 +8,7 @@ test.describe( 'WP Editor Meta Boxes', () => {
 		await requestUtils.activatePlugin(
 			'gutenberg-test-plugin-wp-editor-meta-box'
 		);
-		// Cross-origin isolation (COEP) prevents TinyMCE from
+		// Cross-origin isolation prevents TinyMCE from
 		// initializing properly in its iframe.
 		await requestUtils.activatePlugin(
 			'gutenberg-test-plugin-disable-client-side-media-processing'

@@ -11,7 +11,7 @@ test.use( {
 
 test.describe( 'Preview', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		// Cross-origin isolation (COOP: same-origin) prevents the editor
+		// Cross-origin isolation prevents the editor
 		// from reusing the preview popup window, breaking preview navigation.
 		await requestUtils.activatePlugin(
 			'gutenberg-test-plugin-disable-client-side-media-processing'
