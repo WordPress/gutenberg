@@ -247,20 +247,92 @@ test.describe( 'PHP-only auto-register blocks', () => {
 
 		// Verify auto-generated controls are present
 		// String attribute → text input
-		await expect( page.getByLabel( 'Title' ) ).toBeVisible();
+		const titleInput = page.getByRole( 'textbox', { name: 'Title' } );
+		await expect( titleInput ).toBeVisible();
+		await expect( titleInput ).toHaveValue( 'My Emoji Collection' );
 
 		// Integer attribute → number input
-		await expect( page.getByLabel( 'Count' ) ).toBeVisible();
+		const countInput = page.getByRole( 'spinbutton', { name: 'Count' } );
+		await expect( countInput ).toBeVisible();
+		await expect( countInput ).toHaveValue( '5' );
 
 		// Number attribute → number control
-		await expect( page.getByLabel( 'Spacing' ) ).toBeVisible();
+		const spacingInput = page.getByRole( 'spinbutton', {
+			name: 'Spacing',
+		} );
+		await expect( spacingInput ).toBeVisible();
+		await expect( spacingInput ).toHaveValue( '0.1' );
 
 		// Boolean attribute → toggle/checkbox
-		await expect( page.getByLabel( 'Show Emojis' ) ).toBeVisible();
+		const showEmojisInput = page.getByRole( 'checkbox', {
+			name: 'Show Emojis',
+		} );
+		await expect( showEmojisInput ).toBeVisible();
+		await expect( showEmojisInput ).toBeChecked();
+
+		// Enum attribute → select control
+		const emojiInput = page.getByRole( 'combobox', {
+			name: 'Emoji',
+			exact: true,
+		} );
+		await expect( emojiInput ).toBeVisible();
+		await expect( emojiInput ).toHaveValue( '⭐' );
 
 		// Enum attribute → select control
 		await expect(
 			page.getByLabel( 'Emoji', { exact: true } )
 		).toBeVisible();
+	} );
+
+	test( 'should reset block attributes to their default values', async ( {
+		editor,
+		page,
+	} ) => {
+		// Insert the block with auto-generated controls
+		await editor.insertBlock( {
+			name: 'test/auto-register-with-controls',
+		} );
+
+		// Open the document settings sidebar
+		await editor.openDocumentSettingsSidebar();
+
+		// Verify auto-generated controls are present
+		// String attribute → text input
+		const titleInput = page.getByRole( 'textbox', { name: 'Title' } );
+		await titleInput.fill( 'My New Emoji Collection' );
+
+		// Integer attribute → number input
+		const countInput = page.getByRole( 'spinbutton', { name: 'Count' } );
+		await countInput.fill( '10' );
+
+		// Number attribute → number control
+		const spacingInput = page.getByRole( 'spinbutton', {
+			name: 'Spacing',
+		} );
+		await spacingInput.fill( '0.2' );
+
+		// Boolean attribute → toggle/checkbox
+		const showEmojisInput = page.getByRole( 'checkbox', {
+			name: 'Show Emojis',
+		} );
+		await showEmojisInput.uncheck();
+
+		// Enum attribute → select control
+		const emojiInput = page.getByRole( 'combobox', {
+			name: 'Emoji',
+			exact: true,
+		} );
+		await emojiInput.selectOption( '❤️' );
+
+		// Click the Reset All button
+		await page.getByRole( 'button', { name: 'Settings options' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Reset all' } ).click();
+
+		// Verify the block attributes are reset to their default values
+		await expect( titleInput ).toHaveValue( 'My Emoji Collection' );
+		await expect( countInput ).toHaveValue( '5' );
+		await expect( spacingInput ).toHaveValue( '0.1' );
+		await expect( showEmojisInput ).toBeChecked();
+		await expect( emojiInput ).toHaveValue( '⭐' );
 	} );
 } );
