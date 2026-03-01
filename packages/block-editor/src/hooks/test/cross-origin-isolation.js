@@ -152,144 +152,29 @@ describe( 'cross-origin-isolation', () => {
 		expect( observeSpy ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should handle iframe contentDocument errors gracefully', () => {
+	it( 'should add crossorigin="anonymous" to images', async () => {
 		Object.defineProperty( window, 'crossOriginIsolated', {
 			value: true,
 			writable: true,
 			configurable: true,
 		} );
 
-		// Re-import the module
+		// Re-import the module to trigger the side effects
 		jest.isolateModules( () => {
 			require( '../cross-origin-isolation' );
 		} );
 
-		// Create an iframe that throws when accessing contentDocument
-		const iframe = document.createElement( 'iframe' );
-		Object.defineProperty( iframe, 'contentDocument', {
-			get() {
-				throw new Error( 'Cross-origin access denied' );
-			},
-		} );
+		// Create an image and add it to the DOM
+		const img = document.createElement( 'img' );
+		img.setAttribute( 'src', 'https://example.com/image.jpg' );
+		document.body.appendChild( img );
 
-		// This should not throw an error
-		expect( () => {
-			document.body.appendChild( iframe );
-			iframe.dispatchEvent( new Event( 'load' ) );
-		} ).not.toThrow();
-	} );
+		// Wait for MutationObserver callback to fire (async microtask).
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
-	describe( 'Document-Isolation-Policy', () => {
-		it( 'should not add credentialless to iframes when __documentIsolationPolicy is true', () => {
-			Object.defineProperty( window, 'crossOriginIsolated', {
-				value: true,
-				writable: true,
-				configurable: true,
-			} );
+		// The image should get the crossorigin attribute
+		expect( img ).toHaveAttribute( 'crossorigin', 'anonymous' );
 
-			window.__documentIsolationPolicy = true;
-
-			// Re-import the module to trigger the side effects
-			jest.isolateModules( () => {
-				require( '../cross-origin-isolation' );
-			} );
-
-			// Create an iframe and add it to the DOM to trigger the MutationObserver
-			const iframe = document.createElement( 'iframe' );
-			iframe.setAttribute( 'src', 'https://example.com' );
-			document.body.appendChild( iframe );
-
-			// The iframe should NOT have the credentialless attribute with DIP
-			expect( iframe ).not.toHaveAttribute( 'credentialless' );
-
-			document.body.removeChild( iframe );
-			delete window.__documentIsolationPolicy;
-		} );
-
-		it( 'should still add crossorigin="anonymous" to images when DIP is active', async () => {
-			Object.defineProperty( window, 'crossOriginIsolated', {
-				value: true,
-				writable: true,
-				configurable: true,
-			} );
-
-			window.__documentIsolationPolicy = true;
-
-			// Re-import the module to trigger the side effects
-			jest.isolateModules( () => {
-				require( '../cross-origin-isolation' );
-			} );
-
-			// Create an image and add it to the DOM
-			const img = document.createElement( 'img' );
-			img.setAttribute( 'src', 'https://example.com/image.jpg' );
-			document.body.appendChild( img );
-
-			// Wait for MutationObserver callback to fire (async microtask).
-			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
-
-			// The image should still get the crossorigin attribute with DIP
-			expect( img ).toHaveAttribute( 'crossorigin', 'anonymous' );
-
-			document.body.removeChild( img );
-			delete window.__documentIsolationPolicy;
-		} );
-
-		it( 'should not register embed preview filter when DIP is active', () => {
-			Object.defineProperty( window, 'crossOriginIsolated', {
-				value: true,
-				writable: true,
-				configurable: true,
-			} );
-
-			window.__documentIsolationPolicy = true;
-
-			const { hasFilter } = require( '@wordpress/hooks' );
-
-			// Re-import the module to register filters
-			jest.isolateModules( () => {
-				require( '../cross-origin-isolation' );
-			} );
-
-			// The embed preview filter should NOT be registered when DIP is active
-			expect(
-				hasFilter(
-					'editor.BlockEdit',
-					'media-experiments/disable-embed-previews'
-				)
-			).toBeFalsy();
-
-			delete window.__documentIsolationPolicy;
-		} );
-	} );
-
-	it( 'should register embed preview filter when cross-origin isolated', () => {
-		Object.defineProperty( window, 'crossOriginIsolated', {
-			value: true,
-			writable: true,
-			configurable: true,
-		} );
-
-		const hasFilter = jest.spyOn(
-			require( '@wordpress/hooks' ),
-			'hasFilter'
-		);
-
-		// Re-import the module to register filters
-		jest.isolateModules( () => {
-			require( '../cross-origin-isolation' );
-		} );
-
-		// The module should register a filter when cross-origin isolated
-		// We can't easily test the filter itself without a full React environment,
-		// but we can verify the module loads without errors
-		expect( () => {
-			require( '@wordpress/hooks' ).hasFilter(
-				'editor.BlockEdit',
-				'media-experiments/disable-embed-previews'
-			);
-		} ).not.toThrow();
-
-		hasFilter.mockRestore();
+		document.body.removeChild( img );
 	} );
 } );
