@@ -136,6 +136,44 @@ dispatch( uploadStore ).addItems( {
 | `cancelItem( id, error )` | Cancel an in-progress upload and clean up resources. |
 | `retryItem( id )` | Retry a failed upload. |
 
+## Server-side plugin compatibility
+
+When client-side processing is active, server-side image generation hooks like `wp_generate_attachment_metadata` are bypassed during the initial upload. However, after all client-side operations complete (including thumbnail sideloads), WordPress calls a finalize endpoint (`POST /wp/v2/media/{id}/finalize`) that re-applies the `wp_generate_attachment_metadata` filter. This means plugins that rely on this hook for watermarking, CDN sync, custom image sizes, or other post-processing continue to work without modification.
+
+If the finalize request fails, the error is logged but the upload still succeeds — finalization is best-effort so that a plugin failure does not block the user's upload.
+
+## Controlling image quality (JavaScript)
+
+The `editor.media.imageQuality` filter allows plugins to control the quality setting (0–1) used during client-side image resize and crop operations. The default quality is `0.82`.
+
+```js
+wp.hooks.addFilter(
+	'editor.media.imageQuality',
+	'my-plugin/custom-quality',
+	( quality, context ) => {
+		// context contains: item, mimeType, resize
+		if ( context.mimeType === 'image/webp' ) {
+			return 0.9;
+		}
+		return quality;
+	}
+);
+```
+
+Note: The quality value is not yet wired through to the vips worker but the hook is provided as an extension point for future use.
+
+## Using the finalize endpoint
+
+After all client-side thumbnail sideloads complete, the finalize endpoint triggers server-side post-processing:
+
+```
+POST /wp/v2/media/{id}/finalize
+```
+
+This endpoint re-applies the `wp_generate_attachment_metadata` filter with context `'update'`, then saves the updated metadata. It requires `edit_post` and `upload_files` capabilities.
+
+WordPress calls this endpoint automatically as part of the client-side upload pipeline. Plugin developers do not need to call it manually — it is documented here for context on how server-side hooks are preserved.
+
 ## Cross-origin isolation considerations
 
 Client-side media processing requires [cross-origin isolation](https://developer.mozilla.org/en-US/docs/Web/API/Window/crossOriginIsolated), which WordPress enables automatically on block editor screens. This has implications for plugins:

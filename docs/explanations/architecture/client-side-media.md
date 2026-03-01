@@ -40,7 +40,8 @@ The client-side media processing pipeline flows through several layers:
 │  @wordpress/vips         │  │  REST API                         │
 │  WASM image processing   │  │  POST /wp/v2/media                │
 │  (Web Worker)            │  │  POST /wp/v2/media/{id}/sideload  │
-└──────────────────────────┘  └───────────────────────────────────┘
+└──────────────────────────┘  │  POST /wp/v2/media/{id}/finalize  │
+                              └───────────────────────────────────┘
 ```
 
 ## Three-package split
@@ -53,7 +54,7 @@ The `core/upload-media` data store manages the upload queue and coordinates the 
 
 -   Maintains a queue of items with statuses (queued, processing, paused, uploaded, error).
 -   Enforces concurrency limits (max 5 concurrent uploads, max 2 concurrent image processing operations).
--   Chains operations sequentially per item: prepare → transcode → upload → thumbnail generation → sideload.
+-   Chains operations sequentially per item: prepare → transcode → upload → thumbnail generation → sideload → finalize.
 -   Handles batch grouping, progress tracking, retry logic, and error handling.
 -   Manages blob URLs for image previews and revokes them after use.
 
@@ -111,6 +112,33 @@ If the original image requires EXIF rotation (orientation ≠ 1), a rotated vers
 Each thumbnail is processed client-side (resize/crop → optional format conversion) and then uploaded to the server via the sideload endpoint (`POST /wp/v2/media/{id}/sideload`). The server stores each sub-size in the attachment metadata.
 
 To prevent race conditions, sideload uploads to the same post are serialized — if one item is being sideloaded, other items targeting the same post are paused until the sideload completes.
+
+### 6. Finalize
+
+After all sideloads for an item complete, the `finalizeItem()` operation calls `POST /wp/v2/media/{id}/finalize`. This endpoint re-applies the `wp_generate_attachment_metadata` filter on the server, ensuring that server-side plugins (e.g., for watermarking, CDN sync, or custom metadata processing) can post-process the attachment after all client-side operations are done.
+
+The finalize step uses a gate: if any child sideloads are still pending, the operation waits. Once the last sideload completes, it triggers the parent item's pending Finalize operation.
+
+If the finalize request fails, the error is logged but the upload is still considered successful — finalization is best-effort so that a plugin failure doesn't block the user's upload.
+
+## Extension points
+
+### `editor.media.imageQuality` (JavaScript filter)
+
+The `editor.media.imageQuality` filter allows plugins to control the quality setting (0–1) used during client-side image resize and crop operations. It is called via `@wordpress/hooks` in the `resizeCropItem()` action.
+
+```js
+wp.hooks.addFilter(
+	'editor.media.imageQuality',
+	'my-plugin/custom-quality',
+	( quality, context ) => {
+		// context: { item, mimeType, resize }
+		return quality;
+	}
+);
+```
+
+Note: The quality value is not yet wired through to the vips worker but the hook is provided as an extension point for future use.
 
 ## WASM module loading
 
@@ -235,6 +263,16 @@ POST /wp/v2/media/{id}/sideload
 ```
 
 Uploads a processed image variant (thumbnail, scaled version, or rotated original) to an existing attachment. The `image_size` parameter specifies which variant is being uploaded and accepts any registered image size name, plus `original` and `scaled`.
+
+### Finalize endpoint
+
+```
+POST /wp/v2/media/{id}/finalize
+```
+
+Triggers the `wp_generate_attachment_metadata` filter after all client-side operations (upload, thumbnail generation, sideloads) are complete. This ensures server-side plugins that hook into `wp_generate_attachment_metadata` — such as those for watermarking, CDN sync, or custom image sizes — can post-process the attachment.
+
+The endpoint requires `edit_post` and `upload_files` capabilities. It reads the existing attachment metadata, re-applies the `wp_generate_attachment_metadata` filter with context `'update'`, and saves the result.
 
 ### REST index media settings
 

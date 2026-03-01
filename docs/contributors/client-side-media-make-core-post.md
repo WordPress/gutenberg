@@ -26,7 +26,9 @@ Client-side media processing introduces several new capabilities:
 - **Thumbnail generation in the browser**: All registered image sub-sizes are generated client-side and uploaded individually via a new sideload REST API endpoint.
 - **Automatic format conversion**: The existing `image_editor_output_format` filter is respected client-side, enabling automatic conversion (e.g., JPEG to WebP) before upload.
 - **Smart fallback**: Browsers that don't support the required features (WebAssembly, SharedArrayBuffer, blob workers) automatically fall back to server-side processing with no user-facing change.
-- **Cross-origin isolation**: WordPress now sends the required headers on block editor screens and iframes to enable `SharedArrayBuffer` access for WASM threading. This enables running the image eprocessing in the background - which means the editor remains responsive even during large image uploads.
+- **Cross-origin isolation**: WordPress now sends the required headers on block editor screens and iframes to enable `SharedArrayBuffer` access for WASM threading. This enables running the image processing in the background - which means the editor remains responsive even during large image uploads.
+- **Server-side hook compatibility**: After all client-side operations complete, a finalize step triggers `wp_generate_attachment_metadata` on the server, ensuring plugins that rely on this hook continue to work.
+- **Image quality filter**: A new `editor.media.imageQuality` JavaScript filter allows plugins to control the quality setting (0–1) for client-side resize and crop operations.
 
 ## Technical overview
 
@@ -54,6 +56,10 @@ If your plugin needs to disable client-side media processing, use the `wp_client
 add_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
 ```
 
+### Server-side hooks still fire
+
+A common concern: if client-side processing bypasses server-side image generation, do plugins that hook into `wp_generate_attachment_metadata` stop working? No — after all client-side operations complete (including thumbnail sideloads), WordPress calls a finalize endpoint that re-triggers this filter, ensuring plugins for watermarking, CDN sync, custom metadata processing, and similar use cases continue to work without modification.
+
 ### Existing filters still work
 
 Client-side processing reads settings from the server and respects:
@@ -63,7 +69,25 @@ Client-side processing reads settings from the server and respects:
 - `image_save_progressive` — Controls progressive/interlaced encoding.
 - `wp_image_maybe_exif_rotate` — Controls EXIF rotation.
 
-See https://github.com/WordPress/gutenberg/pull/74913 for additional details on filter usage and examples.
+### New JavaScript hooks
+
+- **`editor.media.imageQuality`** — Filter to control image quality (0–1) for client-side resize and crop operations. Example usage:
+
+```js
+wp.hooks.addFilter(
+	'editor.media.imageQuality',
+	'my-plugin/custom-quality',
+	( quality, context ) => {
+		// context: { item, mimeType, resize }
+		if ( context.mimeType === 'image/webp' ) {
+			return 0.9;
+		}
+		return quality;
+	}
+);
+```
+
+Note: The quality value is not yet wired through to the vips worker but the hook is provided as an extension point for future use.
 
 ### Cross-origin isolation impact
 
