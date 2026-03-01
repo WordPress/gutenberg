@@ -74,10 +74,14 @@ const playgroundGrepInvert = isPlayground
 				// Block bindings: image element positioning.
 				'should show the returned values in image attributes',
 				'should be possible to edit the value of the text custom field from the image alt',
-				// Navigation frontend: migration persistence.
-				'Save post and verify migration was written to database',
-				// Navigation: focus management timing after link creation.
-				'creating a link sends focus to the newly created navigation link item',
+				// Navigation frontend: migration persistence (grepInvert matches test(), not test.step()).
+				'Should render and migrate legacy openSubmenusOnClick blocks',
+				// Font library: font file upload/processing too slow in WASM.
+				'should allow user to add and remove multiple local font files',
+				// Image: crop/rotation produces different pixel output in Playground.
+				'allows rotating using the crop tools',
+				// Navigation: focus management timing after link creation (grepInvert matches test(), not test.step()).
+				'Focus management when using the navigation link appender',
 				// Writing flow (webkit/firefox): focus/selection differs.
 				'should extend selection into paragraph for list with longer last item',
 				'should move to the start of the first line on ArrowUp',
