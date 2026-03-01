@@ -17,18 +17,6 @@ function gutenberg_set_client_side_media_processing_flag() {
 		return;
 	}
 	wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
-
-	$chrome_version = gutenberg_get_chrome_major_version();
-
-	/** This filter is documented in gutenberg/lib/media/load.php */
-	$use_dip = apply_filters(
-		'gutenberg_use_document_isolation_policy',
-		null !== $chrome_version && $chrome_version >= 137
-	);
-
-	if ( $use_dip ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__documentIsolationPolicy = true', 'before' );
-	}
 }
 add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
 
@@ -252,9 +240,8 @@ function gutenberg_get_chrome_major_version(): ?int {
  * Enables cross-origin isolation in the block editor.
  *
  * Required for enabling SharedArrayBuffer for WebAssembly-based
- * media processing in the editor.
- *
- * @link https://web.dev/coop-coep/
+ * media processing in the editor. Uses Document-Isolation-Policy
+ * on supported browsers (Chrome 137+).
  */
 function gutenberg_set_up_cross_origin_isolation() {
 	// Re-check the filter at action time, since other plugins (loaded after Gutenberg)
@@ -307,21 +294,19 @@ remove_action( 'load-site-editor.php', 'wp_set_up_cross_origin_isolation' );
 remove_action( 'load-widgets.php', 'wp_set_up_cross_origin_isolation' );
 
 /**
- * Sends headers for cross-origin isolation.
+ * Sends the Document-Isolation-Policy header for cross-origin isolation.
  *
  * Uses an output buffer to add crossorigin="anonymous" where needed.
- *
- * @link https://web.dev/coop-coep/
  */
 function gutenberg_start_cross_origin_isolation_output_buffer(): void {
 	$chrome_version = gutenberg_get_chrome_major_version();
 
 	/**
-	 * Filters whether to use Document-Isolation-Policy instead of COEP/COOP.
+	 * Filters whether to use Document-Isolation-Policy for cross-origin isolation.
 	 *
 	 * Document-Isolation-Policy provides per-document cross-origin isolation
 	 * without affecting other iframes on the page, avoiding breakage of plugins
-	 * like Elementor whose iframes lose credentials/DOM access with COEP.
+	 * like Elementor whose iframes lose credentials/DOM access.
 	 *
 	 * @since 21.8.0
 	 *

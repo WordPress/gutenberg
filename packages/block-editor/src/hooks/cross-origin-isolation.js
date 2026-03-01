@@ -1,38 +1,11 @@
 /**
- * WordPress dependencies
- */
-import { addFilter } from '@wordpress/hooks';
-import { createHigherOrderComponent } from '@wordpress/compose';
-
-/**
- * Adds crossorigin and credentialless attributes to elements as needed.
+ * Adds crossorigin="anonymous" to an element if missing.
  *
  * @param {Element} el The element to modify.
  */
-function addCrossOriginAttributes( el ) {
-	// Add the crossorigin attribute if missing.
+function addCrossOriginAttribute( el ) {
 	if ( ! el.hasAttribute( 'crossorigin' ) ) {
 		el.setAttribute( 'crossorigin', 'anonymous' );
-	}
-
-	// For iframes, add the credentialless attribute — only when NOT using DIP.
-	// With Document-Isolation-Policy, iframes don't need credentialless.
-	if (
-		! window.__documentIsolationPolicy &&
-		el.nodeName === 'IFRAME' &&
-		! el.hasAttribute( 'credentialless' )
-	) {
-		// Do not modify the iframed editor canvas.
-		if ( el.getAttribute( 'src' )?.startsWith( 'blob:' ) ) {
-			return;
-		}
-
-		el.setAttribute( 'credentialless', '' );
-
-		// Reload the iframe to ensure the new attribute is taken into account.
-		const origSrc = el.getAttribute( 'src' ) || '';
-		el.setAttribute( 'src', '' );
-		el.setAttribute( 'src', origSrc );
 	}
 }
 
@@ -55,62 +28,17 @@ if ( window.crossOriginIsolated ) {
 					}
 
 					el.querySelectorAll(
-						'img,source,script,video,link,iframe'
+						'img,source,script,video,link'
 					).forEach( ( v ) => {
-						addCrossOriginAttributes( v );
+						addCrossOriginAttribute( v );
 					} );
 
-					// With DIP, iframes are not modified, so no need to observe their content.
 					if (
-						el.nodeName === 'IFRAME' &&
-						! window.__documentIsolationPolicy
+						[ 'IMG', 'SOURCE', 'SCRIPT', 'VIDEO', 'LINK' ].includes(
+							el.nodeName
+						)
 					) {
-						const iframeNode = el;
-
-						/*
-						 * Sandboxed iframes should not get modified. For example embedding a tweet served in a sandboxed
-						 * iframe, the tweet itself would not be modified.
-						 */
-						const isEmbedSandboxIframe =
-							iframeNode.classList.contains(
-								'components-sandbox'
-							);
-
-						if ( ! isEmbedSandboxIframe ) {
-							iframeNode.addEventListener( 'load', () => {
-								try {
-									if (
-										iframeNode.contentDocument &&
-										iframeNode.contentDocument.body
-									) {
-										observer.observe(
-											iframeNode.contentDocument,
-											{
-												childList: true,
-												attributes: true,
-												subtree: true,
-											}
-										);
-									}
-								} catch ( e ) {
-									// Iframe may be cross-origin or otherwise inaccessible.
-									// Silently ignore these cases.
-								}
-							} );
-						}
-					}
-
-					if (
-						[
-							'IMG',
-							'SOURCE',
-							'SCRIPT',
-							'VIDEO',
-							'LINK',
-							'IFRAME',
-						].includes( el.nodeName )
-					) {
-						addCrossOriginAttributes( el );
+						addCrossOriginAttribute( el );
 					}
 				} );
 			} );
@@ -142,41 +70,4 @@ if ( window.crossOriginIsolated ) {
 	}
 
 	startObservingBody();
-}
-
-// Only apply the embed preview filter when cross-origin isolated via COEP/COOP.
-// With DIP, all embeds preview normally — no filtering needed.
-if ( window.crossOriginIsolated && ! window.__documentIsolationPolicy ) {
-	const supportsCredentialless =
-		'credentialless' in window.HTMLIFrameElement.prototype;
-
-	const disableEmbedPreviews = createHigherOrderComponent(
-		( BlockEdit ) =>
-			function DisableEmbedPreviews( props ) {
-				if ( 'core/embed' !== props.name ) {
-					return <BlockEdit { ...props } />;
-				}
-
-				// List of embeds that do not support a preview is from packages/block-library/src/embed/variations.js.
-				const previewable =
-					supportsCredentialless &&
-					! [ 'facebook', 'smugmug' ].includes(
-						props.attributes.providerNameSlug
-					);
-
-				return (
-					<BlockEdit
-						{ ...props }
-						attributes={ { ...props.attributes, previewable } }
-					/>
-				);
-			},
-		'withDisabledEmbedPreview'
-	);
-
-	addFilter(
-		'editor.BlockEdit',
-		'media-experiments/disable-embed-previews',
-		disableEmbedPreviews
-	);
 }
