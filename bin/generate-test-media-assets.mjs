@@ -694,5 +694,18 @@ writeFileSync(
 );
 console.log( '  Created 5000x4000_e2e_test_image_oversized.jpeg' );
 
+// 8. Large JPEG for responsive/lightbox performance tests (3200x2400).
+const responsiveLightboxJpeg = createJPEG( 3200, 2400 );
+writeFileSync(
+	join(
+		ASSETS_DIR,
+		'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+	),
+	responsiveLightboxJpeg
+);
+console.log(
+	'  Created 3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+);
+
 console.log( 'Done! All test media assets generated.' );
 /* eslint-enable no-bitwise */
