@@ -260,8 +260,8 @@ function gutenberg_set_up_cross_origin_isolation() {
 		return;
 	}
 
-	// Skip when a third-party page builder (e.g. Elementor) overrides the
-	// block editor. DIP isolates the document into its own agent cluster,
+	// Skip when a third-party page builder overrides the block editor.
+	// DIP isolates the document into its own agent cluster,
 	// which blocks same-origin iframe access that these editors rely on.
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	if ( isset( $_GET['action'] ) && 'edit' !== $_GET['action'] ) {
@@ -306,7 +306,7 @@ function gutenberg_start_cross_origin_isolation_output_buffer(): void {
 	 *
 	 * Document-Isolation-Policy provides per-document cross-origin isolation
 	 * without affecting other iframes on the page, avoiding breakage of plugins
-	 * like Elementor whose iframes lose credentials/DOM access.
+	 * whose iframes lose credentials/DOM access.
 	 *
 	 * @since 21.8.0
 	 *
