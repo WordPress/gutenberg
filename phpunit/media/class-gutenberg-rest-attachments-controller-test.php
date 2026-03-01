@@ -187,22 +187,22 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 
 		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
 		$request->set_header( 'Content-Type', 'image/jpeg' );
-		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-777x777.jpg' );
-		$request->set_param( 'image_size', 'medium' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-150x150.jpg' );
+		$request->set_param( 'image_size', 'thumbnail' );
 
-		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		// Use test-image.jpg (50x50) which fits within thumbnail constraints (150x150 max).
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.jpg' ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( 'image', $data['media_type'] );
 		$this->assertArrayHasKey( 'missing_image_sizes', $data );
-		$this->assertEmpty( $data['missing_image_sizes'] );
 		$this->assertArrayHasKey( 'media_details', $data );
 		$this->assertArrayHasKey( 'sizes', $data['media_details'] );
-		$this->assertArrayHasKey( 'medium', $data['media_details']['sizes'] );
-		$this->assertArrayHasKey( 'file', $data['media_details']['sizes']['medium'] );
-		$this->assertSame( 'canola-777x777.jpg', $data['media_details']['sizes']['medium']['file'] );
+		$this->assertArrayHasKey( 'thumbnail', $data['media_details']['sizes'] );
+		$this->assertArrayHasKey( 'file', $data['media_details']['sizes']['thumbnail'] );
+		$this->assertSame( 'canola-150x150.jpg', $data['media_details']['sizes']['thumbnail']['file'] );
 	}
 
 	/**
@@ -240,10 +240,11 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 
 		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
 		$request->set_header( 'Content-Type', 'image/jpeg' );
-		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-year-month-777x777.jpg' );
-		$request->set_param( 'image_size', 'medium' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-year-month-150x150.jpg' );
+		$request->set_param( 'image_size', 'thumbnail' );
 
-		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		// Use test-image.jpg (50x50) which fits within thumbnail constraints.
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.jpg' ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -295,10 +296,11 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 
 		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
 		$request->set_header( 'Content-Type', 'image/jpeg' );
-		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-year-month-page-777x777.jpg' );
-		$request->set_param( 'image_size', 'medium' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-year-month-page-150x150.jpg' );
+		$request->set_param( 'image_size', 'thumbnail' );
 
-		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		// Use test-image.jpg (50x50) which fits within thumbnail constraints.
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.jpg' ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -510,8 +512,8 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$request->set_header( 'Content-Disposition', 'attachment; filename=2004-07-22-DSC_0008-150x150.jpg' );
 		$request->set_param( 'image_size', 'thumbnail' );
 
-		// Use a smaller image for the sub-size (dimensions don't matter for this test).
-		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		// Use test-image.jpg (50x50) which fits within thumbnail constraints (150x150 max).
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.jpg' ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -553,29 +555,30 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 
 		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
 		$request->set_header( 'Content-Type', 'image/jpeg' );
-		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-300x200.jpg' );
-		$request->set_param( 'image_size', 'medium' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-150x150.jpg' );
+		$request->set_param( 'image_size', 'thumbnail' );
 
-		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		// Use test-image.jpg (50x50) which fits within thumbnail constraints (150x150 max).
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.jpg' ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertArrayHasKey( 'sizes', $data['media_details'] );
-		$this->assertArrayHasKey( 'medium', $data['media_details']['sizes'] );
+		$this->assertArrayHasKey( 'thumbnail', $data['media_details']['sizes'] );
 
-		$medium_size = $data['media_details']['sizes']['medium'];
+		$thumbnail_size = $data['media_details']['sizes']['thumbnail'];
 
 		// Verify all expected metadata fields are present for the sub-size.
-		$this->assertArrayHasKey( 'file', $medium_size );
-		$this->assertArrayHasKey( 'width', $medium_size );
-		$this->assertArrayHasKey( 'height', $medium_size );
-		$this->assertArrayHasKey( 'mime_type', $medium_size );
-		$this->assertArrayHasKey( 'filesize', $medium_size );
+		$this->assertArrayHasKey( 'file', $thumbnail_size );
+		$this->assertArrayHasKey( 'width', $thumbnail_size );
+		$this->assertArrayHasKey( 'height', $thumbnail_size );
+		$this->assertArrayHasKey( 'mime_type', $thumbnail_size );
+		$this->assertArrayHasKey( 'filesize', $thumbnail_size );
 
-		$this->assertSame( 'canola-300x200.jpg', $medium_size['file'] );
-		$this->assertSame( 'image/jpeg', $medium_size['mime_type'] );
-		$this->assertGreaterThan( 0, $medium_size['filesize'] );
+		$this->assertSame( 'canola-150x150.jpg', $thumbnail_size['file'] );
+		$this->assertSame( 'image/jpeg', $thumbnail_size['mime_type'] );
+		$this->assertGreaterThan( 0, $thumbnail_size['filesize'] );
 	}
 
 	/**
@@ -739,7 +742,8 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$request->set_header( 'Content-Disposition', 'attachment; filename=landscape-150x150.jpg' );
 		$request->set_param( 'image_size', 'thumbnail' );
 
-		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		// Use test-image.jpg (50x50) which fits within thumbnail constraints (150x150 max).
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.jpg' ) );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertSame( 200, $response->get_status() );
 
@@ -868,5 +872,72 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertSame( $meta_server['iso'], $meta_client['iso'] );
 		$this->assertSame( $meta_server['shutter_speed'], $meta_client['shutter_speed'] );
 		$this->assertSame( $meta_server['created_timestamp'], $meta_client['created_timestamp'] );
+	}
+
+	/**
+	 * @covers ::sideload_item
+	 * @covers ::validate_image_dimensions
+	 */
+	public function test_sideload_item_rejects_oversized_dimensions() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = self::factory()->attachment->create_object(
+			DIR_TESTDATA . '/images/canola.jpg',
+			0,
+			array(
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		wp_update_attachment_metadata(
+			$attachment_id,
+			wp_generate_attachment_metadata( $attachment_id, DIR_TESTDATA . '/images/canola.jpg' )
+		);
+
+		// Upload a large image claiming it's a thumbnail (typically 150x150 max).
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-150x150.jpg' );
+		$request->set_param( 'image_size', 'thumbnail' );
+
+		// canola.jpg is 1024x768, much larger than thumbnail dimensions.
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'rest_upload_dimension_mismatch', $response->get_data()['code'] );
+	}
+
+	/**
+	 * @covers ::sideload_item
+	 * @covers ::validate_image_dimensions
+	 */
+	public function test_sideload_item_accepts_valid_dimensions() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = self::factory()->attachment->create_object(
+			DIR_TESTDATA . '/images/canola.jpg',
+			0,
+			array(
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		wp_update_attachment_metadata(
+			$attachment_id,
+			wp_generate_attachment_metadata( $attachment_id, DIR_TESTDATA . '/images/canola.jpg' )
+		);
+
+		// Use a small test image that fits within thumbnail constraints.
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=test-thumbnail.jpg' );
+		$request->set_param( 'image_size', 'thumbnail' );
+
+		// test-image.jpg is 50x50, valid for thumbnail (max 150x150).
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
 	}
 }
