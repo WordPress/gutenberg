@@ -468,10 +468,7 @@ function registerRoom( {
 	// this, peers may receive subsequent operations that depend on these
 	// earlier operations but never receive the operations themselves, causing
 	// all updates to be stuck in Yjs's pendingStructs buffer.
-	const updateQueue = createUpdateQueue( [
-		createSyncStep1Update( doc ),
-		createSyncUpdate( Y.encodeStateAsUpdate( doc ), SyncUpdateType.UPDATE ),
-	] );
+	const updateQueue = createUpdateQueue( [ createSyncStep1Update( doc ) ] );
 
 	function onAwarenessUpdate(): void {
 		roomState.localAwarenessState = awareness.getLocalState() ?? {};

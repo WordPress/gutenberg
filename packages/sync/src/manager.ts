@@ -37,6 +37,7 @@ import { createUndoManager } from './undo-manager';
 import {
 	createYjsDoc,
 	deserializeCrdtDoc,
+	initializeYjsDoc,
 	markEntityAsSaved,
 	serializeCrdtDoc,
 } from './utils';
@@ -284,6 +285,9 @@ export function createSyncManager( debug = false ): SyncManager {
 		recordMap.observeDeep( onRecordUpdate );
 		stateMap.observe( onStateMapUpdate );
 
+		// Initialize the Yjs document with the necessary CRDT state.
+		initializeYjsDoc( ydoc );
+
 		// Get and apply the persisted CRDT document, if it exists.
 		internal.applyPersistedCrdtDoc( objectType, objectId, record );
 	}
@@ -384,6 +388,9 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Attach observers.
 		stateMap.observe( onStateMapUpdate );
+
+		// Initialize the Yjs document with the necessary CRDT state.
+		initializeYjsDoc( ydoc );
 	}
 
 	/**
