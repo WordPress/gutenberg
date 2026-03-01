@@ -26,10 +26,16 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * Awareness timeout in seconds. Clients that haven't updated
 		 * their awareness state within this time are considered disconnected.
 		 *
+		 * Background tabs poll every 30 s, but Chrome's intensive throttling
+		 * (after ~5 min in background) can delay polls to ~60 s. The timeout
+		 * must exceed that to avoid false disconnects.
+		 *
+		 * @see https://developer.chrome.com/blog/timer-throttling-in-chrome-88
+		 *
 		 * @since 7.0.0
 		 * @var int
 		 */
-		const AWARENESS_TIMEOUT = 30;
+		const AWARENESS_TIMEOUT = 70;
 
 		/**
 		 * Threshold used to signal clients to send a compaction update.
