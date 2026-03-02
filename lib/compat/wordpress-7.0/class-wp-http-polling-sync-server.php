@@ -90,14 +90,6 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		}
 
 		/**
-		 * Schema for a stored awareness entry.
-		 *
-		 * @since 7.0.0
-		 * @var array<string, mixed>
-		 */
-		private array $awareness_entry_schema;
-
-		/**
 		 * Registers REST API routes.
 		 *
 		 * @since 7.0.0
@@ -175,8 +167,6 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					'type'     => 'array',
 				),
 			);
-
-			$this->awareness_entry_schema = $room_args['awareness'];
 
 			register_rest_route(
 				self::REST_NAMESPACE,
