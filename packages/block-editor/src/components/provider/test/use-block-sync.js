@@ -73,7 +73,9 @@ describe( 'useBlockSync hook', () => {
 		expect( onChange ).not.toHaveBeenCalled();
 		expect( onInput ).not.toHaveBeenCalled();
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
-		expect( resetBlocks ).toHaveBeenCalledWith( fakeBlocks );
+		expect( resetBlocks ).toHaveBeenCalledWith( fakeBlocks, {
+			isExternal: true,
+		} );
 		expect( resetBlocks ).toHaveBeenCalledTimes( 1 );
 
 		const testBlocks = [
@@ -91,7 +93,9 @@ describe( 'useBlockSync hook', () => {
 		expect( onChange ).not.toHaveBeenCalled();
 		expect( onInput ).not.toHaveBeenCalled();
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
-		expect( resetBlocks ).toHaveBeenCalledWith( testBlocks );
+		expect( resetBlocks ).toHaveBeenCalledWith( testBlocks, {
+			isExternal: true,
+		} );
 		expect( resetBlocks ).toHaveBeenCalledTimes( 2 );
 
 		unmount();
