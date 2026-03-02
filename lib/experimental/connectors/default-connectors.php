@@ -115,7 +115,7 @@ function _gutenberg_get_provider_settings(): array {
 		'openai'    => array(
 			'name'            => 'OpenAI',
 			'description'     => __( 'Text, image, and code generation with GPT and DALL-E.', 'gutenberg' ),
-			'credentials_url' => 'https://platform.openai.com/',
+			'credentials_url' => 'https://platform.openai.com/api-keys',
 		),
 		'anthropic' => array(
 			'name'            => 'Claude',
