@@ -50,6 +50,7 @@ export const RadioItem = forwardRef<
 		>
 			<Ariakit.MenuItemCheck
 				store={ menuContext.store }
+				checked={ props.checked }
 				render={ <Styled.ItemPrefixWrapper /> }
 				// Override some ariakit inline styles
 				style={ { width: 'auto', height: 'auto' } }
