@@ -3,7 +3,7 @@
 .dataviews-view-grid-items {
 	margin-bottom: auto;
 	display: grid;
-	gap: $grid-unit-40;
+	gap: $grid-unit-30;
 	grid-template-rows: max-content;
 	grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
 	padding: 0 $grid-unit-30 $grid-unit-30;
@@ -18,6 +18,6 @@
 	}
 
 	&.has-comfortable-density {
-		gap: $grid-unit-50;
+		gap: $grid-unit-40;
 	}
 }
