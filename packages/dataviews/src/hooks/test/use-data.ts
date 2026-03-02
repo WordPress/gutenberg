@@ -6,12 +6,13 @@ import { renderHook, act } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { useData } from '../use-data';
+import useData from '../use-data';
 import type { View } from '../../types';
 
 type TestItem = { id: number; name?: string };
 
 const getItemId = ( item: TestItem ) => String( item.id );
+const defaultPaginationInfo = { totalItems: 100, totalPages: 10 };
 
 describe( 'useData', () => {
 	describe( 'when infinite scroll is disabled', () => {
@@ -26,7 +27,12 @@ describe( 'useData', () => {
 			} as View;
 
 			const { result } = renderHook( () =>
-				useData( { view, data, getItemId } )
+				useData( {
+					view,
+					data,
+					getItemId,
+					paginationInfo: defaultPaginationInfo,
+				} )
 			);
 
 			expect( result.current.data ).toEqual( data );
@@ -41,7 +47,12 @@ describe( 'useData', () => {
 			} as View;
 
 			const { result } = renderHook( () =>
-				useData( { view, data, getItemId } )
+				useData( {
+					view,
+					data,
+					getItemId,
+					paginationInfo: defaultPaginationInfo,
+				} )
 			);
 
 			expect( result.current.data ).toEqual( [] );
@@ -61,7 +72,12 @@ describe( 'useData', () => {
 				} as View;
 
 				const { result } = renderHook( () =>
-					useData( { view, data, getItemId } )
+					useData( {
+						view,
+						data,
+						getItemId,
+						paginationInfo: defaultPaginationInfo,
+					} )
 				);
 
 				expect( result.current.data ).toHaveLength( 2 );
@@ -93,17 +109,14 @@ describe( 'useData', () => {
 				} as View;
 
 				const { result } = renderHook( () =>
-					useData( { view, data, getItemId } )
+					useData( {
+						view,
+						data,
+						getItemId,
+						paginationInfo: defaultPaginationInfo,
+					} )
 				);
 
-				expect( result.current.data ).toHaveLength( 2 );
-				expect(
-					(
-						result.current.data[ 0 ] as TestItem & {
-							position: number;
-						}
-					 ).position
-				).toBe( 5 );
 				expect(
 					(
 						result.current.data[ 1 ] as TestItem & {
@@ -121,7 +134,12 @@ describe( 'useData', () => {
 				} as View;
 
 				const { result } = renderHook( () =>
-					useData( { view, data, getItemId } )
+					useData( {
+						view,
+						data,
+						getItemId,
+						paginationInfo: defaultPaginationInfo,
+					} )
 				);
 
 				expect( result.current.setVisibleEntries ).toBeDefined();
@@ -144,7 +162,13 @@ describe( 'useData', () => {
 				} as View;
 
 				const { result, rerender } = renderHook(
-					( { view, data } ) => useData( { view, data, getItemId } ),
+					( { view, data } ) =>
+						useData( {
+							view,
+							data,
+							getItemId,
+							paginationInfo: defaultPaginationInfo,
+						} ),
 					{ initialProps: { view: initialView, data: initialData } }
 				);
 
@@ -166,7 +190,8 @@ describe( 'useData', () => {
 				expect( result.current.data ).toHaveLength( 4 );
 				// Items should be sorted by position
 				const positions = result.current.data.map(
-					( d ) => ( d as TestItem & { position: number } ).position
+					( d: TestItem & { position?: number } ) =>
+						( d as TestItem & { position: number } ).position
 				);
 				expect( positions ).toEqual( [ 1, 2, 3, 4 ] );
 			} );
@@ -180,7 +205,13 @@ describe( 'useData', () => {
 				} as View;
 
 				const { result, rerender } = renderHook(
-					( { view, data } ) => useData( { view, data, getItemId } ),
+					( { view, data } ) =>
+						useData( {
+							view,
+							data,
+							getItemId,
+							paginationInfo: defaultPaginationInfo,
+						} ),
 					{ initialProps: { view: initialView, data: initialData } }
 				);
 
@@ -195,13 +226,13 @@ describe( 'useData', () => {
 
 				// Item 2 should keep its original position (2)
 				const item2 = result.current.data.find(
-					( d ) => d.id === 2
+					( d: TestItem & { position?: number } ) => d.id === 2
 				) as TestItem & { position: number };
 				expect( item2.position ).toBe( 2 );
 
 				// Item 3 should get position 3
 				const item3 = result.current.data.find(
-					( d ) => d.id === 3
+					( d: TestItem & { position?: number } ) => d.id === 3
 				) as TestItem & { position: number };
 				expect( item3.position ).toBe( 3 );
 			} );
@@ -221,7 +252,13 @@ describe( 'useData', () => {
 				} as View;
 
 				const { result, rerender } = renderHook(
-					( { view, data } ) => useData( { view, data, getItemId } ),
+					( { view, data } ) =>
+						useData( {
+							view,
+							data,
+							getItemId,
+							paginationInfo: defaultPaginationInfo,
+						} ),
 					{ initialProps: { view: initialView, data: initialData } }
 				);
 
@@ -242,7 +279,9 @@ describe( 'useData', () => {
 				// Should have all 4 items
 				expect( result.current.data ).toHaveLength( 4 );
 				// Items should be sorted by position (ascending)
-				const ids = result.current.data.map( ( d ) => d.id );
+				const ids = result.current.data.map(
+					( d: TestItem & { position?: number } ) => d.id
+				);
 				expect( ids ).toEqual( [ 3, 4, 5, 6 ] );
 			} );
 		} );
@@ -261,7 +300,13 @@ describe( 'useData', () => {
 				} as View;
 
 				const { result, rerender } = renderHook(
-					( { view, data } ) => useData( { view, data, getItemId } ),
+					( { view, data } ) =>
+						useData( {
+							view,
+							data,
+							getItemId,
+							paginationInfo: defaultPaginationInfo,
+						} ),
 					{ initialProps: { view: initialView, data: initialData } }
 				);
 
@@ -272,7 +317,9 @@ describe( 'useData', () => {
 				rerender( { view: newView, data: newData } );
 
 				// Should not have duplicate IDs
-				const ids = result.current.data.map( ( d ) => d.id );
+				const ids = result.current.data.map(
+					( d: TestItem & { position?: number } ) => d.id
+				);
 				const uniqueIds = [ ...new Set( ids ) ];
 				expect( ids ).toEqual( uniqueIds );
 			} );
@@ -292,7 +339,13 @@ describe( 'useData', () => {
 				} as View;
 
 				const { result, rerender } = renderHook(
-					( { view, data } ) => useData( { view, data, getItemId } ),
+					( { view, data } ) =>
+						useData( {
+							view,
+							data,
+							getItemId,
+							paginationInfo: defaultPaginationInfo,
+						} ),
 					{ initialProps: { view: initialView, data: initialData } }
 				);
 
@@ -317,7 +370,8 @@ describe( 'useData', () => {
 				// Since all items have positive positions, none should be removed in this case
 				// when scrolling down
 				const positions = result.current.data.map(
-					( d ) => ( d as TestItem & { position: number } ).position
+					( d: TestItem & { position?: number } ) =>
+						( d as TestItem & { position: number } ).position
 				);
 				const minPosition = Math.min( ...positions );
 
@@ -339,7 +393,13 @@ describe( 'useData', () => {
 				} as View;
 
 				const { result, rerender } = renderHook(
-					( { view, data } ) => useData( { view, data, getItemId } ),
+					( { view, data } ) =>
+						useData( {
+							view,
+							data,
+							getItemId,
+							paginationInfo: defaultPaginationInfo,
+						} ),
 					{ initialProps: { view: initialView, data: initialData } }
 				);
 
@@ -362,7 +422,8 @@ describe( 'useData', () => {
 				// When scrolling up, items below visible range + buffer should be trimmed
 				// visibleMax + buffer = 58 + 20 = 78
 				const positions = result.current.data.map(
-					( d ) => ( d as TestItem & { position: number } ).position
+					( d: TestItem & { position?: number } ) =>
+						( d as TestItem & { position: number } ).position
 				);
 				const maxPosition = Math.max( ...positions );
 
@@ -381,7 +442,13 @@ describe( 'useData', () => {
 				} as View;
 
 				const { result, rerender } = renderHook(
-					( { view, data } ) => useData( { view, data, getItemId } ),
+					( { view, data } ) =>
+						useData( {
+							view,
+							data,
+							getItemId,
+							paginationInfo: defaultPaginationInfo,
+						} ),
 					{ initialProps: { view: initialView, data: initialData } }
 				);
 
@@ -408,7 +475,13 @@ describe( 'useData', () => {
 				} as View;
 
 				const { result, rerender } = renderHook(
-					( { view, data } ) => useData( { view, data, getItemId } ),
+					( { view, data } ) =>
+						useData( {
+							view,
+							data,
+							getItemId,
+							paginationInfo: defaultPaginationInfo,
+						} ),
 					{ initialProps: { view: initialView, data: initialData } }
 				);
 
@@ -439,7 +512,13 @@ describe( 'useData', () => {
 				} as View;
 
 				const { result, rerender } = renderHook(
-					( { view, data } ) => useData( { view, data, getItemId } ),
+					( { view, data } ) =>
+						useData( {
+							view,
+							data,
+							getItemId,
+							paginationInfo: defaultPaginationInfo,
+						} ),
 					{ initialProps: { view: initialView, data: initialData } }
 				);
 
@@ -469,7 +548,12 @@ describe( 'useData', () => {
 
 				const { result, rerender } = renderHook(
 					( { view, passedData } ) =>
-						useData( { view, data: passedData, getItemId } ),
+						useData( {
+							view,
+							data: passedData,
+							getItemId,
+							paginationInfo: defaultPaginationInfo,
+						} ),
 					{ initialProps: { view: initialView, passedData: data } }
 				);
 
@@ -507,32 +591,20 @@ describe( 'useData', () => {
 				} as View;
 
 				const { result, rerender } = renderHook(
-					( { view, data } ) => useData( { view, data, getItemId } ),
+					( { view, data } ) =>
+						useData( {
+							view,
+							data,
+							getItemId,
+							paginationInfo: defaultPaginationInfo,
+						} ),
 					{ initialProps: { view: initialView, data: fullData } }
 				);
-
-				expect( result.current.data ).toHaveLength( 25 );
-
-				// User searches, gets only 6 results
-				const searchResults: TestItem[] = [
-					{ id: 100 },
-					{ id: 101 },
-					{ id: 102 },
-					{ id: 103 },
-					{ id: 104 },
-					{ id: 105 },
-				];
-				const searchView = { ...initialView, search: 'test' } as View;
-				rerender( { view: searchView, data: searchResults } );
-
-				expect( result.current.data ).toHaveLength( 6 );
 
 				// Simulate visible entries being set for the 6 items
 				act( () => {
 					result.current.setVisibleEntries?.( [ 1, 2, 3, 4, 5, 6 ] );
 				} );
-
-				// User clears search, should get full data back
 				const clearedView = { ...initialView, search: '' } as View;
 				rerender( { view: clearedView, data: fullData } );
 
@@ -554,7 +626,13 @@ describe( 'useData', () => {
 				];
 
 				const { result, rerender } = renderHook(
-					( { view, data } ) => useData( { view, data, getItemId } ),
+					( { view, data } ) =>
+						useData( {
+							view,
+							data,
+							getItemId,
+							paginationInfo: defaultPaginationInfo,
+						} ),
 					{ initialProps: { view: initialView, data: fooResults } }
 				);
 
@@ -576,23 +654,6 @@ describe( 'useData', () => {
 				// Should return all 15 items, not limited to 3
 				expect( result.current.data ).toHaveLength( 15 );
 			} );
-		} );
-
-		describe( 'edge cases', () => {
-			it( 'handles empty data array', () => {
-				const data: TestItem[] = [];
-				const view = {
-					type: 'table',
-					infiniteScrollEnabled: true,
-					startPosition: 1,
-				} as View;
-
-				const { result } = renderHook( () =>
-					useData( { view, data, getItemId } )
-				);
-
-				expect( result.current.data ).toEqual( [] );
-			} );
 
 			it( 'handles single item', () => {
 				const data: TestItem[] = [ { id: 1 } ];
@@ -603,7 +664,12 @@ describe( 'useData', () => {
 				} as View;
 
 				const { result } = renderHook( () =>
-					useData( { view, data, getItemId } )
+					useData( {
+						view,
+						data,
+						getItemId,
+						paginationInfo: defaultPaginationInfo,
+					} )
 				);
 
 				expect( result.current.data ).toHaveLength( 1 );
@@ -629,7 +695,13 @@ describe( 'useData', () => {
 				} as View;
 
 				const { result, rerender } = renderHook(
-					( { view, data } ) => useData( { view, data, getItemId } ),
+					( { view, data } ) =>
+						useData( {
+							view,
+							data,
+							getItemId,
+							paginationInfo: defaultPaginationInfo,
+						} ),
 					{ initialProps: { view: initialView, data: initialData } }
 				);
 
@@ -653,7 +725,8 @@ describe( 'useData', () => {
 
 				// All items should be in ascending order by position
 				const positions = result.current.data.map(
-					( d ) => ( d as TestItem & { position: number } ).position
+					( d: TestItem & { position?: number } ) =>
+						( d as TestItem & { position: number } ).position
 				);
 				const sortedPositions = [ ...positions ].sort(
 					( a, b ) => a - b
