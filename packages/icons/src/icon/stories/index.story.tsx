@@ -71,7 +71,7 @@ export const Default = (): ReactElement => {
 
 const LibraryExample = (): ReactElement => {
 	const [ filter, setFilter ] = useState< string >( '' );
-	const [ size, setSize ] = useState< string | number | undefined >( '32' );
+	const [ size, setSize ] = useState< string | number | undefined >( '24' );
 	const [ highlightPublicIcons, setHighlightPublicIcons ] =
 		useState< boolean >( false );
 	const filteredIcons = filter.length
@@ -96,7 +96,7 @@ const LibraryExample = (): ReactElement => {
 	return (
 		<Spacer padding={ 10 }>
 			<VStack spacing={ 8 }>
-				<HStack justify="flex-start" spacing={ 8 } wrap>
+				<HStack justify="flex-start" alignment="end" spacing={ 8 } wrap>
 					<SearchControl
 						__next40pxDefaultSize
 						label="Icon name"
@@ -111,7 +111,7 @@ const LibraryExample = (): ReactElement => {
 						onChange={ ( value ) => setSize( value ) }
 						__next40pxDefaultSize
 					>
-						{ [ '24', '32', '40' ].map( ( option ) => (
+						{ [ '16', '24', '32' ].map( ( option ) => (
 							<ToggleGroupControlOption
 								key={ option }
 								value={ option }
@@ -125,7 +125,7 @@ const LibraryExample = (): ReactElement => {
 						onChange={ ( value ) =>
 							setHighlightPublicIcons( value )
 						}
-						help="Public icons are those available by default in the WordPress SVG icon registry."
+						help="Emphasize icons available in the SVG icon registry."
 					/>
 				</HStack>
 				{ hasResults ? (
