@@ -15,26 +15,26 @@ const packagePathCache = new Map();
 /**
  * @typedef  {Object} PackageJson
  *
- * @property {string}                 name                    Package name.
- * @property {string}                 version                 Package version.
- * @property {string}                 [description]           Package description.
- * @property {string}                 [author]                Package author.
- * @property {string}                 [license]               Package license.
- * @property {string}                 [main]                  Main entry point.
- * @property {string}                 [module]                ES module entry point.
- * @property {string}                 [react-native]          React Native entry point.
- * @property {Record<string, string>} [dependencies]          Runtime dependencies.
- * @property {Record<string, string>} [devDependencies]       Development dependencies.
- * @property {Record<string, string>} [peerDependencies]      Peer dependencies.
- * @property {string[]}               [wpScript]              WordPress script handles for dependency extraction.
- * @property {Record<string, string>} [wpScriptModuleExports] WordPress script module exports.
+ * @property {string}                 name                         Package name.
+ * @property {string}                 version                      Package version.
+ * @property {string}                 [description]                Package description.
+ * @property {string}                 [author]                     Package author.
+ * @property {string}                 [license]                    Package license.
+ * @property {string}                 [main]                       Main entry point.
+ * @property {string}                 [module]                     ES module entry point.
+ * @property {string}                 [react-native]               React Native entry point.
+ * @property {Record<string, string>} [dependencies]               Runtime dependencies.
+ * @property {Record<string, string>} [devDependencies]            Development dependencies.
+ * @property {Record<string, string>} [peerDependencies]           Peer dependencies.
+ * @property {string[]}               [wpScript]                   WordPress script handles for dependency extraction.
+ * @property {Record<string, string>} [wpScriptModuleExports]      WordPress script module exports.
  * @property {boolean}                [wpScriptModuleMinifiedOnly] Only output minified script module builds (skip sourcemaps and unminified .js).
- * @property {Object}                 [sideEffects]           Side effects configuration for tree shaking.
- * @property {string}                 [publishConfig]         NPM publish configuration.
- * @property {Record<string, string>} [scripts]               NPM scripts.
- * @property {string[]}               [files]                 Files to include in package.
- * @property {string}                 [repository]            Repository URL.
- * @property {string[]}               [keywords]              Package keywords.
+ * @property {Object}                 [sideEffects]                Side effects configuration for tree shaking.
+ * @property {string}                 [publishConfig]              NPM publish configuration.
+ * @property {Record<string, string>} [scripts]                    NPM scripts.
+ * @property {string[]}               [files]                      Files to include in package.
+ * @property {string}                 [repository]                 Repository URL.
+ * @property {string[]}               [keywords]                   Package keywords.
  */
 
 // Create a new type that extends PackageJson with an optional "route" property
