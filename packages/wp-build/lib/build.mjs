@@ -1774,10 +1774,10 @@ async function buildAll( baseUrlExpression ) {
 	} );
 
 	// When building for WordPress Core, exclude experimental pages.
-	const IS_WORDPRESS_CORE = Boolean(
+	const isCoreBuild = Boolean(
 		process.env.npm_package_config_IS_WORDPRESS_CORE
 	);
-	const activePages = IS_WORDPRESS_CORE
+	const activePages = isCoreBuild
 		? normalizedPages.filter( ( page ) => ! page.experimental )
 		: normalizedPages;
 
