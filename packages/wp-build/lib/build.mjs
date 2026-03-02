@@ -619,6 +619,7 @@ async function bundlePackage( packageName, options = {} ) {
 				id: scriptModuleId,
 				path: `${ packageName }/${ fileName }`,
 				asset: `${ packageName }/${ fileName }.min.asset.php`,
+				minifiedOnly,
 			} );
 		}
 	}
@@ -875,14 +876,17 @@ async function generateModuleRegistrationPhp( modules, replacements ) {
 
 	// Generate modules array for registry
 	const modulesArray = modules
-		.map(
-			( module ) =>
-				`\tarray(\n` +
-				`\t\t'id' => '${ module.id }',\n` +
-				`\t\t'path' => '${ module.path }',\n` +
-				`\t\t'asset' => '${ module.asset }',\n` +
-				`\t),`
-		)
+		.map( ( module ) => {
+			const lines = [
+				`\t\t'id' => '${ module.id }'`,
+				`\t\t'path' => '${ module.path }'`,
+				`\t\t'asset' => '${ module.asset }'`,
+			];
+			if ( module.minifiedOnly ) {
+				lines.push( `\t\t'minified_only' => true` );
+			}
+			return `\tarray(\n${ lines.join( ',\n' ) },\n\t),`;
+		} )
 		.join( '\n' );
 
 	await Promise.all( [

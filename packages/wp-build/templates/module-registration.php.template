@@ -28,12 +28,12 @@ if ( ! function_exists( '{{PREFIX}}_register_script_modules' ) ) {
 			$asset_path = $modules_dir . '/' . $module['asset'];
 			$asset = file_exists( $asset_path ) ? require $asset_path : array();
 
+			// Modules marked as minified_only (e.g. packages that inline large
+			// WASM binaries) only ship a .min.js file. Always use .min.js for
+			// these modules regardless of the SCRIPT_DEBUG setting.
 			$module_extension = $extension;
-			if ( '.js' === $extension ) {
-				$unminified_path = $modules_dir . '/' . $module['path'] . '.js';
-				if ( ! file_exists( $unminified_path ) ) {
-					$module_extension = '.min.js';
-				}
+			if ( '.js' === $extension && ! empty( $module['minified_only'] ) ) {
+				$module_extension = '.min.js';
 			}
 
 			// Deregister first to override any previously registered version
