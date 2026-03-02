@@ -16,7 +16,6 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import { chevronDown, chevronUp } from '@wordpress/icons';
 
 /**
@@ -102,6 +101,10 @@ export default function FormCardField< Item >( {
 	const bodyId = useInstanceId(
 		FormCardField,
 		'dataforms-layouts-card-card-body'
+	);
+	const titleId = useInstanceId(
+		FormCardField,
+		'dataforms-layouts-card-card-title'
 	);
 
 	const form: NormalizedForm = useMemo(
@@ -240,7 +243,10 @@ export default function FormCardField< Item >( {
 							alignItems: 'center',
 						} }
 					>
-						<span className="dataforms-layouts-card__field-header-label">
+						<span
+							id={ titleId }
+							className="dataforms-layouts-card__field-header-label"
+						>
 							{ label }
 						</span>
 						{ validationBadge }
@@ -266,9 +272,7 @@ export default function FormCardField< Item >( {
 							icon={ isOpen ? chevronUp : chevronDown }
 							aria-expanded={ isOpen }
 							aria-controls={ bodyId }
-							aria-label={
-								isOpen ? __( 'Collapse' ) : __( 'Expand' )
-							}
+							aria-labelledby={ titleId }
 						/>
 					) }
 				</OriginalCardHeader>
