@@ -146,7 +146,7 @@ if ( ! function_exists( '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page' ) ) {
 		}
 
 		/**
-		 * Fire init action for extensions to register routes and menu items.
+		 * Fires for {{PAGE_SLUG}} page extensions to register routes and menu items.
 		 */
 		do_action( '{{PAGE_SLUG}}_init' );
 
