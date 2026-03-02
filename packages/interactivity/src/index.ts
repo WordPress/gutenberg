@@ -79,6 +79,7 @@ export const privateApis = (
 		return {
 			getRegionRootFragment,
 			initialVdom,
+			initialVdomPromise,
 			toVdom,
 			directive,
 			getNamespace,
