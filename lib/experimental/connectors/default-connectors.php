@@ -120,7 +120,7 @@ function _gutenberg_get_provider_settings(): array {
 		'anthropic' => array(
 			'name'            => 'Claude',
 			'description'     => __( 'Writing, research, and analysis with Claude.', 'gutenberg' ),
-			'credentials_url' => 'https://console.anthropic.com/',
+			'credentials_url' => 'https://platform.claude.com/settings/keys',
 		),
 	);
 
