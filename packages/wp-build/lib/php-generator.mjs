@@ -39,6 +39,23 @@ export async function getPhpReplacements( rootDir, baseUrlExpression ) {
 }
 
 /**
+ * Whether the current build targets WordPress Core.
+ * When true, `if ( ! function_exists() )` pluggable guards are omitted from
+ * generated PHP files. Both conditions must be met:
+ * - npm_package_config_IS_WORDPRESS_CORE must be truthy
+ * - wpPlugin.name in root package.json must equal 'wp'
+ *
+ * @param {Record<string, string>} replacements Replacements object from getPhpReplacements().
+ * @return {boolean} Whether this is a WordPress Core build.
+ */
+function isWordPressCoreBuild( replacements ) {
+	return (
+		Boolean( process.env.npm_package_config_IS_WORDPRESS_CORE ) &&
+		replacements[ '{{PREFIX}}' ] === 'wp'
+	);
+}
+
+/**
  * Apply template replacements to a template string.
  *
  * @param {string}                 template     Template string with placeholders.
@@ -56,6 +73,12 @@ export function applyTemplateReplacements( template, replacements ) {
 /**
  * Render a template to a string with replacements.
  *
+ * Performs two passes:
+ * 1. Static placeholder replacements ({{PREFIX}}, {{VERSION}}, {{BASE_URL}}, etc.)
+ * 2. Pluggable guard resolution — {{IF_PLUGGABLE:fname}} / {{END_IF_PLUGGABLE}} markers
+ *    are expanded to `if ( ! function_exists( 'fname' ) ) {` / `}` for plugin builds,
+ *    or removed entirely for WordPress Core builds.
+ *
  * @param {string}                 templateName Template file name.
  * @param {Record<string, string>} replacements Replacements object (e.g. {'{{PREFIX}}': 'gutenberg'}).
  * @return {Promise<string>} Rendered template string.
@@ -70,8 +93,39 @@ export async function renderTemplateToString( templateName, replacements ) {
 		'utf8'
 	);
 
-	// Apply replacements
-	return applyTemplateReplacements( template, replacements );
+	// First pass: apply static replacements
+	let content = applyTemplateReplacements( template, replacements );
+
+	// Second pass: resolve pluggable guard markers.
+	// Matches the entire block from {{IF_PLUGGABLE:fname}} to {{END_IF_PLUGGABLE}}
+	// so the block body can be indented (plugin builds) or left as-is (Core builds).
+	const pluggableBlockRegex =
+		/\{\{IF_PLUGGABLE:([^}]+)\}\}\n([\s\S]*?)\n\{\{END_IF_PLUGGABLE\}\}/g;
+
+	if ( isWordPressCoreBuild( replacements ) ) {
+		// Remove the guard wrappers entirely — functions are defined unconditionally
+		content = content.replace(
+			pluggableBlockRegex,
+			( _match, _fnName, body ) => body
+		);
+	} else {
+		// Wrap block body in `if ( ! function_exists() )` and indent it by one tab
+		content = content.replace(
+			pluggableBlockRegex,
+			( _match, fnName, body ) => {
+				const indented = body
+					.split( '\n' )
+					.map(
+					/** @param {string} line */
+					( line ) => ( line.length ? `\t${ line }` : line )
+				)
+					.join( '\n' );
+				return `if ( ! function_exists( '${ fnName }' ) ) {\n${ indented }\n}`;
+			}
+		);
+	}
+
+	return content;
 }
 
 /**
