@@ -69,19 +69,26 @@ interface ApiKeyConnectorConfig {
 	pluginSlug: string;
 	settingName: string;
 	helpUrl?: string;
-	helpLabel?: string;
 	Logo?: React.ComponentType;
 }
 
-function ApiKeyProviderConnector( {
+function ApiKeyConnector( {
 	label,
 	description,
 	pluginSlug,
 	settingName,
 	helpUrl,
-	helpLabel,
 	Logo,
 }: ConnectorRenderProps & ApiKeyConnectorConfig ) {
+	let helpLabel: string | undefined;
+	try {
+		if ( helpUrl ) {
+			helpLabel = new URL( helpUrl ).hostname;
+		}
+	} catch {
+		// Invalid URL — leave helpLabel undefined.
+	}
+
 	const {
 		pluginStatus,
 		isExpanded,
@@ -156,15 +163,6 @@ export function registerDefaultConnectors() {
 			continue;
 		}
 
-		let helpLabel: string | undefined;
-		try {
-			if ( authentication.credentialsUrl ) {
-				helpLabel = new URL( authentication.credentialsUrl ).hostname;
-			}
-		} catch {
-			// Invalid URL — leave helpLabel undefined.
-		}
-
 		const sanitize = ( s: string ) => s.replace( /[^a-z0-9-]/gi, '-' );
 		const connectorName = `${ sanitize( data.type ) }/${ sanitize(
 			connectorId
@@ -172,13 +170,12 @@ export function registerDefaultConnectors() {
 		registerConnector( connectorName, {
 			label: data.name,
 			description: data.description,
-			render: ( props: ConnectorRenderProps ) => (
-				<ApiKeyProviderConnector
+			render: ( props ) => (
+				<ApiKeyConnector
 					{ ...props }
 					pluginSlug={ `ai-provider-for-${ connectorId }` }
 					settingName={ authentication.settingName }
 					helpUrl={ authentication.credentialsUrl ?? undefined }
-					helpLabel={ helpLabel }
 					Logo={ CONNECTOR_LOGOS[ connectorId ] }
 				/>
 			),
