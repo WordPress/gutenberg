@@ -16,7 +16,7 @@ import type {
 import type { SelectionState } from '../types';
 import type { PostEditorAwareness } from '../awareness/post-editor-awareness';
 
-interface ResolvedSelection {
+export interface ResolvedSelection {
 	textIndex: number | null;
 	localClientId: string | null;
 }
