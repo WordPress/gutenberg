@@ -30,8 +30,12 @@ export const getRegionRootFragment = (
 export const initialVdom = new WeakMap< Element, ComponentChild >();
 
 // Promise that resolves with the populated initialVdom after hydration completes.
-let resolveInitialVdom!: ( map: WeakMap< Element, ComponentChild > ) => void;
-export const initialVdomPromise = new Promise< WeakMap< Element, ComponentChild > >( ( resolve ) => {
+let resolveInitialVdom!: (
+	map: WeakMap< Element, ComponentChild >
+) => void;
+export const initialVdomPromise = new Promise<
+	WeakMap< Element, ComponentChild >
+>( ( resolve ) => {
 	resolveInitialVdom = resolve;
 } );
 
