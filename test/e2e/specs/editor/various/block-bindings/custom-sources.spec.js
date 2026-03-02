@@ -893,12 +893,7 @@ test.describe( 'Registered sources', () => {
 				} )
 				.getByRole( 'textbox' )
 				.click();
-			await page
-				.getByRole( 'tabpanel', {
-					name: 'Settings',
-				} )
-				.getByLabel( 'Attributes options' )
-				.click();
+			await page.getByLabel( 'Attributes options' ).click();
 			const urlAttribute = page.getByRole( 'menuitemcheckbox', {
 				name: 'Show url',
 			} );
