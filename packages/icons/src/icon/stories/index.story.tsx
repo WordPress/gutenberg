@@ -102,13 +102,17 @@ const LibraryExample = (): ReactElement => {
 						label="Icon name"
 						hideLabelFromVision={ false }
 						value={ filter }
-						onChange={ ( value ) => setFilter( value ) }
+						onChange={ ( value: string | undefined ) =>
+							setFilter( value ?? '' )
+						}
 					/>
 					<ToggleGroupControl
 						label="Icon size"
 						isBlock
 						value={ size }
-						onChange={ ( value ) => setSize( value ) }
+						onChange={ ( value: string | number | undefined ) =>
+							setSize( value )
+						}
 						__next40pxDefaultSize
 					>
 						{ [ '16', '24', '32' ].map( ( option ) => (
@@ -122,7 +126,7 @@ const LibraryExample = (): ReactElement => {
 					<ToggleControl
 						label="Highlight public icons"
 						checked={ highlightPublicIcons }
-						onChange={ ( value ) =>
+						onChange={ ( value: boolean ) =>
 							setHighlightPublicIcons( value )
 						}
 						help="Emphasize icons available in the SVG icon registry."
