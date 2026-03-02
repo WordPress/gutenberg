@@ -91,6 +91,7 @@ function _gutenberg_get_real_api_key( string $option_name, callable $mask_callba
  *         @type string      $name                  The provider's display name.
  *         @type string      $description           The provider's description.
  *         @type string|null $credentials_url       URL where users can obtain API credentials.
+ *         @type string      $type                  The connector type: 'ai_provider'.
  *         @type string      $authentication_method The authentication method: 'api_key' or 'none'.
  *         @type array       $settings              {
  *             Settings keyed by setting name.
@@ -112,18 +113,21 @@ function _gutenberg_get_provider_settings(): array {
 			'name'                  => 'Gemini',
 			'description'           => __( 'Content generation, translation, and vision with Google\'s Gemini.', 'gutenberg' ),
 			'credentials_url'       => 'https://aistudio.google.com/api-keys',
+			'type'                  => 'ai_provider',
 			'authentication_method' => 'api_key',
 		),
 		'openai'    => array(
 			'name'                  => 'OpenAI',
 			'description'           => __( 'Text, image, and code generation with GPT and DALL-E.', 'gutenberg' ),
 			'credentials_url'       => 'https://platform.openai.com/api-keys',
+			'type'                  => 'ai_provider',
 			'authentication_method' => 'api_key',
 		),
 		'anthropic' => array(
 			'name'                  => 'Claude',
 			'description'           => __( 'Writing, research, and analysis with Claude.', 'gutenberg' ),
 			'credentials_url'       => 'https://platform.claude.com/settings/keys',
+			'type'                  => 'ai_provider',
 			'authentication_method' => 'api_key',
 		),
 	);
@@ -155,6 +159,7 @@ function _gutenberg_get_provider_settings(): array {
 					'name'                  => ucwords( $provider_id ),
 					'description'           => '',
 					'credentials_url'       => null,
+					'type'                  => 'ai_provider',
 					'authentication_method' => 'none',
 				),
 				$registry_data
@@ -195,6 +200,7 @@ function _gutenberg_get_provider_settings(): array {
 			'name'                  => $data['name'],
 			'description'           => $data['description'],
 			'credentials_url'       => $data['credentials_url'],
+			'type'                  => $data['type'],
 			'authentication_method' => $data['authentication_method'],
 			'settings'              => $settings,
 		);
@@ -309,6 +315,9 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 	try {
 		$registry = \WordPress\AiClient\AiClient::defaultRegistry();
 		foreach ( _gutenberg_get_provider_settings() as $provider => $provider_data ) {
+			if ( 'ai_provider' !== $provider_data['type'] ) {
+				continue;
+			}
 			foreach ( $provider_data['settings'] as $setting_name => $config ) {
 				$api_key = _gutenberg_get_real_api_key( $setting_name, '_gutenberg_mask_api_key' );
 				if ( '' === $api_key || ! $registry->hasProvider( $provider ) ) {
@@ -347,6 +356,7 @@ function _gutenberg_get_connector_provider_script_module_data( array $data ): ar
 			'name'                 => $provider_data['name'],
 			'description'          => $provider_data['description'],
 			'credentialsUrl'       => $provider_data['credentials_url'],
+			'type'                 => $provider_data['type'],
 			'authenticationMethod' => $provider_data['authentication_method'],
 			'settings'             => array_keys( $provider_data['settings'] ),
 		);

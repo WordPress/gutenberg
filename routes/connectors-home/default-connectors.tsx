@@ -20,6 +20,7 @@ interface ProviderData {
 	name: string;
 	description: string;
 	credentialsUrl: string | null;
+	type: 'ai_provider';
 	authenticationMethod: 'api_key' | 'none';
 	settings: string[];
 }
@@ -144,7 +145,10 @@ export function registerDefaultConnectors() {
 	const providers = getProviderData();
 
 	for ( const [ providerId, data ] of Object.entries( providers ) ) {
-		if ( data.authenticationMethod !== 'api_key' ) {
+		if (
+			data.type !== 'ai_provider' ||
+			data.authenticationMethod !== 'api_key'
+		) {
 			continue;
 		}
 
