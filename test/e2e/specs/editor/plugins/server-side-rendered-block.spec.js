@@ -315,8 +315,8 @@ test.describe( 'PHP-only auto-register blocks', () => {
 			await expect( page.getByLabel( 'Title' ) ).toHaveValue(
 				'Value of the text custom field'
 			);
-			await expect( page.getByLabel( 'Count' ) ).toHaveValue( '5' );
-			await expect( page.getByLabel( 'Spacing' ) ).toHaveValue( '5.5' );
+			await expect( page.getByLabel( 'Count' ) ).toHaveValue( '3' );
+			await expect( page.getByLabel( 'Spacing' ) ).toHaveValue( '0.5' );
 			await expect( page.getByLabel( 'Show Emojis' ) ).toBeChecked();
 		} );
 	} );
