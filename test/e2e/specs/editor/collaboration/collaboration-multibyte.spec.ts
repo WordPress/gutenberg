@@ -18,6 +18,7 @@ test.describe( 'Collaboration - Multi-byte character encoding', () => {
 		const post = await requestUtils.createPost( {
 			title: 'Emoji Sync Test',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 
 		await collaborationUtils.openCollaborativeSession( post.id );
@@ -51,6 +52,7 @@ test.describe( 'Collaboration - Multi-byte character encoding', () => {
 		const post = await requestUtils.createPost( {
 			title: 'Multi-Emoji Sync Test',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 
 		await collaborationUtils.openCollaborativeSession( post.id );
@@ -82,6 +84,7 @@ test.describe( 'Collaboration - Multi-byte character encoding', () => {
 		const post = await requestUtils.createPost( {
 			title: 'Emoji Insert Sync Test',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 
 		await collaborationUtils.openCollaborativeSession( post.id );
@@ -90,10 +93,15 @@ test.describe( 'Collaboration - Multi-byte character encoding', () => {
 
 		// User 2: Insert a paragraph with emoji via the data API.
 		await page2.evaluate( () => {
-			const block = window.wp.blocks.createBlock( 'core/paragraph', {
-				content: 'Hello 😀 World',
-			} );
-			window.wp.data.dispatch( 'core/block-editor' ).insertBlock( block );
+			const block = ( window as any ).wp.blocks.createBlock(
+				'core/paragraph',
+				{
+					content: 'Hello 😀 World',
+				}
+			);
+			( window as any ).wp.data
+				.dispatch( 'core/block-editor' )
+				.insertBlock( block );
 		} );
 
 		// User 1: Verify the emoji appears correctly.
@@ -119,6 +127,7 @@ test.describe( 'Collaboration - Multi-byte character encoding', () => {
 		const post = await requestUtils.createPost( {
 			title: 'CJK Extension B Sync Test',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 
 		await collaborationUtils.openCollaborativeSession( post.id );
@@ -151,6 +160,7 @@ test.describe( 'Collaboration - Multi-byte character encoding', () => {
 		const post = await requestUtils.createPost( {
 			title: 'Math Symbol Sync Test',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 
 		await collaborationUtils.openCollaborativeSession( post.id );
