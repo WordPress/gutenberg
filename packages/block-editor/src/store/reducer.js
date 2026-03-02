@@ -141,29 +141,6 @@ function getFlattenedBlockAttributes( blocks ) {
 }
 
 /**
- * Returns true if a block with the given clientId exists anywhere in the
- * block tree (including nested innerBlocks), or false otherwise.
- *
- * @param {Object[]} blocks         Array of block objects with innerBlocks.
- * @param {string}   targetClientId The clientId to search for.
- *
- * @return {boolean} Whether the block exists in the tree.
- */
-function blockExistsInTree( blocks, targetClientId ) {
-	const stack = [ ...blocks ];
-	while ( stack.length ) {
-		const block = stack.pop();
-		if ( block.clientId === targetClientId ) {
-			return true;
-		}
-		if ( block.innerBlocks?.length ) {
-			stack.push( ...block.innerBlocks );
-		}
-	}
-	return false;
-}
-
-/**
  * Returns true if the two object arguments have the same keys, or false
  * otherwise.
  *
@@ -1531,7 +1508,7 @@ export function selection( state = {}, action ) {
 				selectionStart: { clientId: start },
 				selectionEnd: { clientId: end },
 			};
-		case 'RESET_BLOCKS': {
+		case 'RESET_BLOCKS':
 			const startClientId = state?.selectionStart?.clientId;
 			const endClientId = state?.selectionEnd?.clientId;
 
@@ -1540,20 +1517,29 @@ export function selection( state = {}, action ) {
 				return state;
 			}
 
-			if ( ! blockExistsInTree( action.blocks, startClientId ) ) {
+			// If the start of the selection won't exist after reset, remove selection.
+			if (
+				! action.blocks.some(
+					( block ) => block.clientId === startClientId
+				)
+			) {
 				return {
 					selectionStart: {},
 					selectionEnd: {},
 				};
 			}
 
-			if ( ! blockExistsInTree( action.blocks, endClientId ) ) {
+			// If the end of the selection won't exist after reset, collapse selection.
+			if (
+				! action.blocks.some(
+					( block ) => block.clientId === endClientId
+				)
+			) {
 				return {
 					...state,
 					selectionEnd: state.selectionStart,
 				};
 			}
-		}
 	}
 
 	const selectionStart = selectionHelper( state.selectionStart, action );
