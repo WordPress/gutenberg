@@ -32,10 +32,6 @@
 
 		padding-block: var(--text-vertical-padding);
 
-		font-family: var(--wpds-font-family-heading);
-		font-size: var(--wpds-font-size-md);
-		font-weight: var(--wpds-font-weight-medium);
-		line-height: var(--wpds-font-line-height-sm);
 		color: var(--wp-ui-notice-text-color);
 	}
 
@@ -44,10 +40,6 @@
 
 		padding-block: var(--text-vertical-padding);
 
-		font-family: var(--wpds-font-family-body);
-		font-size: var(--wpds-font-size-md);
-		font-weight: var(--wpds-font-weight-regular);
-		line-height: var(--wpds-font-line-height-sm);
 		text-wrap: pretty;
 		color: var(--wp-ui-notice-text-color);
 	}
