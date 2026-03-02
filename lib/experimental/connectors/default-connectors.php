@@ -110,7 +110,7 @@ function _gutenberg_get_provider_settings(): array {
 		'google'    => array(
 			'name'            => 'Gemini',
 			'description'     => __( 'Content generation, translation, and vision with Google\'s Gemini.', 'gutenberg' ),
-			'credentials_url' => 'https://aistudio.google.com/',
+			'credentials_url' => 'https://aistudio.google.com/api-keys',
 		),
 		'openai'    => array(
 			'name'            => 'OpenAI',
