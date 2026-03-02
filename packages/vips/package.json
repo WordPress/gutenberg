@@ -41,6 +41,7 @@
 		},
 		"./package.json": "./package.json"
 	},
+	"wpScriptModuleMinifiedOnly": true,
 	"wpWorkers": {
 		"./worker": {
 			"entry": "./src/worker.ts",

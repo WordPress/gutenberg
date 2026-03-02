@@ -551,9 +551,11 @@ async function bundlePackage( packageName, options = {} ) {
 			const entryPoint = path.join( packageDir, exportPath );
 			const baseFileName = path.basename( fileName );
 
-			// Skip sourcemaps and unminified builds for the vips package
-			// which inlines large WASM binaries.
-			const isVips = packageName === 'vips';
+			// When wpScriptModuleMinifiedOnly is set, skip sourcemaps and
+			// unminified builds to reduce output size (e.g. for packages
+			// that inline large WASM binaries).
+			const minifiedOnly =
+				packageJson.wpScriptModuleMinifiedOnly === true;
 
 			builds.push(
 				esbuild.build( {
@@ -563,7 +565,7 @@ async function bundlePackage( packageName, options = {} ) {
 						`${ fileName }.min.js`
 					),
 					bundle: true,
-					sourcemap: ! isVips,
+					sourcemap: ! minifiedOnly,
 					format: 'esm',
 					target,
 					platform: 'browser',
@@ -580,9 +582,8 @@ async function bundlePackage( packageName, options = {} ) {
 				} )
 			);
 
-			// Also skip the unminified build for vips; the inlined WASM
-			// doubles the output size and offers little debugging value.
-			if ( ! isVips ) {
+			// Skip the unminified build when minifiedOnly is set.
+			if ( ! minifiedOnly ) {
 				builds.push(
 					esbuild.build( {
 						entryPoints: [ entryPoint ],
