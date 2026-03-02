@@ -462,12 +462,6 @@ function registerRoom( {
 	}
 
 	// Note: Queue is initially paused. Call .resume() to unpause.
-	// Include the current doc state as an UPDATE alongside the SYNC_STEP_1 to
-	// ensure any operations created before the onDocUpdate handler is attached
-	// (e.g. the VERSION_KEY set in createYjsDoc) are sent to peers. Without
-	// this, peers may receive subsequent operations that depend on these
-	// earlier operations but never receive the operations themselves, causing
-	// all updates to be stuck in Yjs's pendingStructs buffer.
 	const updateQueue = createUpdateQueue( [ createSyncStep1Update( doc ) ] );
 
 	function onAwarenessUpdate(): void {
