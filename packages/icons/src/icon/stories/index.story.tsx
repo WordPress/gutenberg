@@ -4,11 +4,6 @@
 import type { ReactElement } from 'react';
 
 /**
- * WordPress dependencies
- */
-import { useState } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
 import Icon from '../';
@@ -59,11 +54,17 @@ export const Default = (): ReactElement => {
 	);
 };
 
-const LibraryExample = (): ReactElement => {
-	const [ filter, setFilter ] = useState< string >( '' );
-	const [ size, setSize ] = useState< string | number | undefined >( '24' );
-	const [ highlightPublicIcons, setHighlightPublicIcons ] =
-		useState< boolean >( false );
+interface LibraryExampleProps {
+	filter?: string;
+	size?: string | number;
+	highlightPublicIcons?: boolean;
+}
+
+const LibraryExample = ( {
+	filter = '',
+	size = '24',
+	highlightPublicIcons = false,
+}: LibraryExampleProps ): ReactElement => {
 	const filteredIcons = filter.length
 		? Object.fromEntries(
 				Object.entries( availableIcons ).filter( ( [ name ] ) => {
@@ -84,79 +85,7 @@ const LibraryExample = (): ReactElement => {
 	const hasResults = Object.keys( filteredIcons ).length > 0;
 
 	return (
-		<div style={ { padding: 40 } }>
-			<div
-				style={ {
-					display: 'flex',
-					gap: 16,
-					flexFlow: 'column',
-				} }
-			>
-				<div>
-					<label
-						htmlFor="filter-icons"
-						style={ { paddingRight: 10 } }
-					>
-						Filter Icons
-					</label>
-					<input
-						// eslint-disable-next-line no-restricted-syntax
-						id="filter-icons"
-						type="search"
-						value={ filter }
-						placeholder="Icon name"
-						onChange={ ( event ) =>
-							setFilter( event.target.value )
-						}
-					/>
-				</div>
-				<fieldset
-					// eslint-disable-next-line no-restricted-syntax
-					id="icon-size"
-					style={ {
-						margin: 0,
-						padding: 0,
-						border: 'none',
-						display: 'flex',
-						gap: 8,
-					} }
-				>
-					<legend>Icon size</legend>
-					{ [ '16', '24', '32' ].map( ( option ) => (
-						<>
-							<input
-								id={ `icon-size-${ option }` }
-								type="radio"
-								name="icon-size"
-								value={ option }
-								checked={ size === option }
-								onChange={ () => setSize( option ) }
-							/>
-							<label htmlFor={ `icon-size-${ option }` }>
-								{ option }px
-							</label>
-						</>
-					) ) }
-				</fieldset>
-				<div>
-					<input
-						// eslint-disable-next-line no-restricted-syntax
-						id="highlight-public-icons"
-						type="checkbox"
-						checked={ highlightPublicIcons }
-						onChange={ ( event ) =>
-							setHighlightPublicIcons( event.target.checked )
-						}
-					/>
-					<label htmlFor="highlight-public-icons">
-						Highlight public icons{ ' ' }
-						<small>
-							(Emphasize icons available in the SVG icon
-							registry.)
-						</small>
-					</label>
-				</div>
-			</div>
+		<div style={ { padding: 24 } }>
 			{ hasResults ? (
 				<div
 					style={ {
@@ -205,4 +134,32 @@ const LibraryExample = (): ReactElement => {
 	);
 };
 
-export const Library = (): ReactElement => <LibraryExample />;
+export const Library = ( args: LibraryExampleProps ): ReactElement => (
+	<LibraryExample { ...args } />
+);
+
+Library.args = {
+	filter: '',
+	size: '24',
+	highlightPublicIcons: false,
+};
+
+Library.argTypes = {
+	filter: {
+		name: 'Filter Icons',
+		control: 'text',
+	},
+	size: {
+		name: 'Icon size',
+		control: 'radio',
+		options: {
+			'16px': '16',
+			'24px': '24',
+			'32px': '32',
+		},
+	},
+	highlightPublicIcons: {
+		name: 'Highlight public icons',
+		control: 'boolean',
+	},
+};
