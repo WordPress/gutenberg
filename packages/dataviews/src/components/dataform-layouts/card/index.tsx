@@ -98,14 +98,9 @@ export default function FormCardField< Item >( {
 	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedCardLayout;
 	const cardBodyRef = useRef< HTMLDivElement >( null );
-	const bodyId = useInstanceId(
-		FormCardField,
-		'dataforms-layouts-card-card-body'
-	);
-	const titleId = useInstanceId(
-		FormCardField,
-		'dataforms-layouts-card-card-title'
-	);
+	const instanceId = useInstanceId( FormCardField );
+	const bodyId = `dataforms-layouts-card-card-body-${ instanceId }`;
+	const titleId = `dataforms-layouts-card-card-title-${ instanceId }`;
 
 	const form: NormalizedForm = useMemo(
 		() => ( {
