@@ -202,11 +202,11 @@ HTML;
 	}
 
 	/**
-	 * Tests that client-side media processing is enabled by default.
+	 * Tests that client-side media processing is enabled by default in the Gutenberg plugin.
 	 *
 	 * @covers ::gutenberg_is_client_side_media_processing_enabled
 	 */
-	public function test_client_side_media_processing_enabled_by_default() {
+	public function test_client_side_media_processing_enabled_by_default_in_plugin() {
 		$this->assertTrue( gutenberg_is_client_side_media_processing_enabled() );
 	}
 
@@ -215,12 +215,10 @@ HTML;
 	 *
 	 * @covers ::gutenberg_is_client_side_media_processing_enabled
 	 */
-	public function test_client_side_media_processing_can_be_disabled() {
+	public function test_client_side_media_processing_can_be_disabled_via_filter() {
 		add_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
-		$enabled = gutenberg_is_client_side_media_processing_enabled();
+		$this->assertFalse( gutenberg_is_client_side_media_processing_enabled() );
 		remove_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
-
-		$this->assertFalse( $enabled );
 	}
 
 	/**
@@ -242,11 +240,12 @@ HTML;
 	}
 
 	/**
-	 * Tests that the 6.9 compat REST controller is not used when filter is enabled (default).
+	 * Tests that the 6.9 compat REST controller is not used when filter is enabled.
 	 *
 	 * @covers ::gutenberg_override_attachments_rest_controller
 	 */
 	public function test_compat_rest_controller_not_used_when_filter_enabled() {
+		// Feature is enabled by default (core compat layer).
 		$result = gutenberg_override_attachments_rest_controller( array(), 'attachment' );
 
 		$this->assertSame( array(), $result );
