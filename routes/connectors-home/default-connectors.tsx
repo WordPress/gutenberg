@@ -156,9 +156,14 @@ export function registerDefaultConnectors() {
 			continue;
 		}
 
-		const helpLabel = authentication.credentialsUrl
-			?.replace( /^https?:\/\//, '' )
-			.replace( /\/$/, '' );
+		let helpLabel: string | undefined;
+		try {
+			if ( authentication.credentialsUrl ) {
+				helpLabel = new URL( authentication.credentialsUrl ).hostname;
+			}
+		} catch {
+			// Invalid URL — leave helpLabel undefined.
+		}
 
 		registerConnector( `core/${ connectorId }`, {
 			label: data.name,
