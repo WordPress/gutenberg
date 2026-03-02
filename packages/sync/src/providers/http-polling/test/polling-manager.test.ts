@@ -9,6 +9,7 @@ import {
 	it,
 	jest,
 } from '@jest/globals';
+import type { SyncResponse } from '../types';
 
 // Mock all external dependencies before imports.
 jest.mock( 'yjs', () => ( {
@@ -111,7 +112,9 @@ const syncResponse = {
 
 describe( 'polling-manager', () => {
 	let pollingManager: PollingManager;
-	let mockPostSyncUpdate: jest.Mock;
+	let mockPostSyncUpdate: jest.Mock<
+		typeof import('../utils').postSyncUpdate
+	>;
 
 	beforeEach( () => {
 		jest.useFakeTimers();
@@ -137,7 +140,7 @@ describe( 'polling-manager', () => {
 		it( 'does not spawn a duplicate poll when a request is in-flight', () => {
 			// Keep the first postSyncUpdate pending so we can simulate
 			// a visibility change while the request is in-flight.
-			const deferred = createDeferred();
+			const deferred = createDeferred< SyncResponse >();
 			mockPostSyncUpdate.mockReturnValue( deferred.promise );
 
 			pollingManager.registerRoom( {
