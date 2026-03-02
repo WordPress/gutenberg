@@ -2559,6 +2559,25 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	traverseBlockTree( state, treeClientId, ( block ) => {
 		const { clientId, name: blockName } = block;
 
+		const hasEditedContentOnlySection = !! state.editedContentOnlySection;
+		let isWithinEditedContentOnlySection = false;
+		if ( hasEditedContentOnlySection ) {
+			isWithinEditedContentOnlySection =
+				clientId === state.editedContentOnlySection ||
+				!! findParentInClientIdsList( state, clientId, [
+					state.editedContentOnlySection,
+				] );
+
+			// When a contentOnly section is being edited, all blocks outside
+			// the section are disabled. This should never be overridable by any
+			// other block editing modes, it helps to constrain keyboard navigation
+			// to within the edited section.
+			if ( ! isWithinEditedContentOnlySection ) {
+				derivedBlockEditingModes.set( clientId, 'disabled' );
+				return;
+			}
+		}
+
 		// If the block already has an explicit block editing mode set,
 		// don't override it.
 		if ( state.blockEditingModes.has( clientId ) ) {
@@ -2670,26 +2689,10 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 		}
 
 		// Set the edited section and all blocks within it to 'default', so that all changes can be made.
-		if ( state.editedContentOnlySection ) {
-			// If this is the edited section, use the default mode.
-			if ( state.editedContentOnlySection === clientId ) {
-				derivedBlockEditingModes.set( clientId, 'default' );
-				return;
-			}
-
-			// If the block is within the edited section also use the default mode.
-			const parentTempEditedClientId = findParentInClientIdsList(
-				state,
-				clientId,
-				[ state.editedContentOnlySection ]
-			);
-			if ( parentTempEditedClientId ) {
-				derivedBlockEditingModes.set( clientId, 'default' );
-				return;
-			}
-
-			// Disable blocks that are outside of the edited section.
-			derivedBlockEditingModes.set( clientId, 'disabled' );
+		if ( hasEditedContentOnlySection && isWithinEditedContentOnlySection ) {
+			derivedBlockEditingModes.set( clientId, 'default' );
+			// When there's an editedContentOnlySection, it overrides any modes that are usually
+			// set for `contentOnlyParents`, return early to prevent continuing to code below.
 			return;
 		}
 

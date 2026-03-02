@@ -124,7 +124,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				),
 				'awareness' => array(
 					'required' => true,
-					'type'     => 'object',
+					'type'     => array( 'object', 'null' ),
 				),
 				'client_id' => array(
 					'minimum'  => 1,

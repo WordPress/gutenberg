@@ -25,6 +25,8 @@ export const test = base.extend< Fixtures >( {
 			page,
 		} );
 		await utils.setCollaboration( true );
+		// Clean up any leftover users from previous runs before creating.
+		await requestUtils.deleteAllUsers();
 		await requestUtils.createUser( SECOND_USER );
 		await use( utils );
 		await utils.teardown();

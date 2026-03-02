@@ -33,6 +33,7 @@ import { Stack } from '@wordpress/ui';
 import { unlock } from '../../../lock-unlock';
 import { ActionsMenuGroup, ActionModal } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
+import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 import type {
 	Action,
 	NormalizedField,
@@ -389,6 +390,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		empty,
 	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list' );
+	const isDelayedLoading = useDelayedLoading( !! isLoading );
 
 	const selectedItem = data?.findLast( ( item ) =>
 		selection.includes( getItemId( item ) )
@@ -424,6 +426,8 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	const [ activeCompositeId, setActiveCompositeId ] = useState<
 		string | null | undefined
 	>( undefined );
+
+	const compositeRef = useRef< HTMLDivElement >( null );
 
 	// Update the active composite item when the selected item changes.
 	useEffect( () => {
@@ -463,7 +467,17 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			const targetCompositeItemId = generateCompositeId( itemIdPrefix );
 
 			setActiveCompositeId( targetCompositeItemId );
-			document.getElementById( targetCompositeItemId )?.focus();
+			// The active composite item is controlled state that
+			// can update without needing a focus move (e.g., searching
+			// can trigger an active ID update). Only move DOM focus
+			// when it's already within the list.
+			if (
+				compositeRef.current?.contains(
+					compositeRef.current.ownerDocument.activeElement
+				)
+			) {
+				document.getElementById( targetCompositeItemId )?.focus();
+			}
 		},
 		[ data, generateCompositeItemIdPrefix ]
 	);
@@ -511,36 +525,30 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		[ selectCompositeItem, activeItemIndex ]
 	);
 
-	const hasData = data?.length;
-	if ( ! hasData ) {
-		return (
-			<div
-				className={ clsx( {
-					'dataviews-loading': isLoading,
-					'dataviews-no-results': ! hasData && ! isLoading,
-				} ) }
-			>
-				{ ! hasData &&
-					( isLoading ? (
-						<p>
-							<Spinner />
-						</p>
-					) : (
-						empty
-					) ) }
-			</div>
-		);
-	}
-
+	const hasData = !! data?.length;
 	const groupField = view.groupBy?.field
 		? fields.find( ( field ) => field.id === view.groupBy?.field )
 		: null;
-	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
+	const dataByGroup =
+		hasData && groupField ? getDataByGroup( data, groupField ) : null;
+	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	if ( ! hasData ) {
+		return (
+			<div
+				className={ clsx( 'dataviews-no-results', {
+					'is-refreshing': isDelayedLoading,
+				} ) }
+			>
+				{ empty }
+			</div>
+		);
+	}
 
 	// Render data grouped by field
 	if ( hasData && groupField && dataByGroup ) {
 		return (
 			<Composite
+				ref={ compositeRef }
 				id={ `${ baseId }` }
 				render={ <div /> }
 				className="dataviews-view-list__group"
@@ -606,6 +614,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	return (
 		<>
 			<Composite
+				ref={ compositeRef }
 				id={ baseId }
 				render={ <div /> }
 				className={ clsx( 'dataviews-view-list', className, {
@@ -614,10 +623,15 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 						[ 'compact', 'comfortable' ].includes(
 							view.layout.density
 						),
+					'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 				} ) }
 				role={ view.infiniteScrollEnabled ? 'feed' : 'grid' }
 				activeId={ activeCompositeId }
 				setActiveId={ setActiveCompositeId }
+				// @ts-ignore
+				inert={
+					! isInfiniteScroll && !! isLoading ? 'true' : undefined
+				}
 			>
 				{ data.map( ( item, index ) => {
 					const id = generateCompositeItemIdPrefix( item );
@@ -646,7 +660,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					);
 				} ) }
 			</Composite>
-			{ hasData && isLoading && (
+			{ isInfiniteScroll && isLoading && (
 				<p className="dataviews-loading-more">
 					<Spinner />
 				</p>

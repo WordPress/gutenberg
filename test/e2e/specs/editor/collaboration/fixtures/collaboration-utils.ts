@@ -66,6 +66,15 @@ export default class CollaborationUtils {
 		const html = await response.text();
 		const nonce = html.match( /name="_wpnonce" value="([^"]+)"/ )![ 1 ];
 
+		// WordPress core (7.0+) uses 'enable_real_time_collaboration',
+		// while the Gutenberg plugin uses 'wp_enable_real_time_collaboration'.
+		// Detect which field name is present on the page.
+		const optionName = html.includes(
+			'name="enable_real_time_collaboration"'
+		)
+			? 'enable_real_time_collaboration'
+			: 'wp_enable_real_time_collaboration';
+
 		const formData: Record< string, string | number > = {
 			option_page: 'writing',
 			action: 'update',
@@ -77,7 +86,7 @@ export default class CollaborationUtils {
 		};
 
 		if ( enabled ) {
-			formData.wp_enable_real_time_collaboration = 1;
+			formData[ optionName ] = 1;
 		}
 
 		await this.requestUtils.request.post( '/wp-admin/options.php', {

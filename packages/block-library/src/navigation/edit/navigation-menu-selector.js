@@ -11,13 +11,12 @@ import { moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { useEntityProp } from '@wordpress/core-data';
+import { useEntityRecords, useEntityProp } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
-import useNavigationEntities from '../use-navigation-entities';
 
 function buildMenuLabel( title, id, status ) {
 	if ( ! title ) {
@@ -53,7 +52,10 @@ function NavigationMenuSelector( {
 
 	actionLabel = actionLabel || createActionLabel;
 
-	const { menus: classicMenus } = useNavigationEntities();
+	const { records: classicMenus } = useEntityRecords( 'root', 'menu', {
+		per_page: -1,
+		context: 'view',
+	} );
 
 	const {
 		navigationMenus,
