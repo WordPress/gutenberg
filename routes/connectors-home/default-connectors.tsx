@@ -165,7 +165,11 @@ export function registerDefaultConnectors() {
 			// Invalid URL — leave helpLabel undefined.
 		}
 
-		registerConnector( `core/${ connectorId }`, {
+		const sanitize = ( s: string ) => s.replace( /[^a-z0-9-]/gi, '-' );
+		const connectorName = `${ sanitize( data.type ) }/${ sanitize(
+			connectorId
+		) }`;
+		registerConnector( connectorName, {
 			label: data.name,
 			description: data.description,
 			render: ( props: ConnectorRenderProps ) => (
