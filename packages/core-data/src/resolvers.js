@@ -1033,6 +1033,7 @@ export const getRevisions =
 			return;
 		}
 
+		const rawQuery = { ...query };
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,
 			[ 'entities', 'records', kind, name, recordKey, 'revisions' ],
@@ -1112,7 +1113,7 @@ export const getRevisions =
 					// subsequent getRevision calls skip redundant API fetches.
 					const key = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
 					const normalizedQuery =
-						normalizeQueryForResolution( query );
+						normalizeQueryForResolution( rawQuery );
 					const resolutionsArgs = records
 						.filter( ( record ) => record[ key ] )
 						.map( ( record ) => [
