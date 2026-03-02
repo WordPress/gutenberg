@@ -1326,6 +1326,7 @@ export function isTyping( state = false, action ) {
 			return true;
 
 		case 'STOP_TYPING':
+		case 'REPLACE_BLOCKS':
 			return false;
 	}
 

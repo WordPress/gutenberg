@@ -2577,6 +2577,14 @@ describe( 'state', () => {
 
 			expect( state ).toBe( false );
 		} );
+
+		it( 'should reset the typing flag to false when blocks are replaced', () => {
+			const state = isTyping( true, {
+				type: 'REPLACE_BLOCKS',
+			} );
+
+			expect( state ).toBe( false );
+		} );
 	} );
 
 	describe( 'isDragging', () => {
