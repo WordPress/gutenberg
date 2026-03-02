@@ -16,13 +16,15 @@ import { __ } from '@wordpress/i18n';
 import { useConnectorPlugin } from './use-connector-plugin';
 import { OpenAILogo, ClaudeLogo, GeminiLogo } from './logos';
 
+type ProviderAuthentication =
+	| { method: 'api_key'; settingName: string; credentialsUrl: string | null }
+	| { method: 'none' };
+
 interface ProviderData {
 	name: string;
 	description: string;
-	credentialsUrl: string | null;
 	type: 'ai_provider';
-	authenticationMethod: 'api_key' | 'none';
-	settings: string[];
+	authentication: ProviderAuthentication;
 }
 
 /**
@@ -145,19 +147,16 @@ export function registerDefaultConnectors() {
 	const providers = getProviderData();
 
 	for ( const [ providerId, data ] of Object.entries( providers ) ) {
+		const { authentication } = data;
+
 		if (
 			data.type !== 'ai_provider' ||
-			data.authenticationMethod !== 'api_key'
+			authentication.method !== 'api_key'
 		) {
 			continue;
 		}
 
-		const settingName = data.settings[ 0 ];
-		if ( ! settingName ) {
-			continue;
-		}
-
-		const helpLabel = data.credentialsUrl
+		const helpLabel = authentication.credentialsUrl
 			?.replace( /^https?:\/\//, '' )
 			.replace( /\/$/, '' );
 
@@ -168,8 +167,8 @@ export function registerDefaultConnectors() {
 				<ApiKeyProviderConnector
 					{ ...props }
 					pluginSlug={ `ai-provider-for-${ providerId }` }
-					settingName={ settingName }
-					helpUrl={ data.credentialsUrl ?? undefined }
+					settingName={ authentication.settingName }
+					helpUrl={ authentication.credentialsUrl ?? undefined }
 					helpLabel={ helpLabel }
 					Logo={ PROVIDER_LOGOS[ providerId ] }
 				/>
