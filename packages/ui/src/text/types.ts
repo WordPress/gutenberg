@@ -19,5 +19,5 @@ export interface TextProps extends ComponentProps< 'span' > {
 	/**
 	 * The content to be rendered inside the component.
 	 */
-	children: React.ReactNode;
+	children?: React.ReactNode;
 }
