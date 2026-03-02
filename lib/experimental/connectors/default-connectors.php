@@ -78,7 +78,7 @@ function _gutenberg_get_real_api_key( string $option_name, callable $mask_callba
 }
 
 /**
- * Gets the registered connector provider settings.
+ * Gets the registered connector settings.
  *
  * @access private
  *
@@ -101,7 +101,7 @@ function _gutenberg_get_real_api_key( string $option_name, callable $mask_callba
  *     }
  * }
  */
-function _gutenberg_get_provider_settings(): array {
+function _gutenberg_get_connector_settings(): array {
 	$providers = array(
 		'google'    => array(
 			'name'           => 'Gemini',
@@ -235,7 +235,7 @@ function _gutenberg_validate_connector_keys_in_rest( WP_REST_Response $response,
 		return $response;
 	}
 
-	foreach ( _gutenberg_get_provider_settings() as $provider => $provider_data ) {
+	foreach ( _gutenberg_get_connector_settings() as $provider => $provider_data ) {
 		$auth = $provider_data['authentication'];
 		if ( 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
 			continue;
@@ -272,7 +272,7 @@ function _gutenberg_register_default_connector_settings(): void {
 		return;
 	}
 
-	foreach ( _gutenberg_get_provider_settings() as $provider => $provider_data ) {
+	foreach ( _gutenberg_get_connector_settings() as $provider => $provider_data ) {
 		$auth = $provider_data['authentication'];
 		if ( 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
 			continue;
@@ -325,7 +325,7 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 
 	try {
 		$registry = \WordPress\AiClient\AiClient::defaultRegistry();
-		foreach ( _gutenberg_get_provider_settings() as $provider => $provider_data ) {
+		foreach ( _gutenberg_get_connector_settings() as $provider => $provider_data ) {
 			if ( 'ai_provider' !== $provider_data['type'] ) {
 				continue;
 			}
@@ -366,7 +366,7 @@ function _gutenberg_get_connector_provider_script_module_data( array $data ): ar
 	}
 
 	$providers = array();
-	foreach ( _gutenberg_get_provider_settings() as $provider_id => $provider_data ) {
+	foreach ( _gutenberg_get_connector_settings() as $provider_id => $provider_data ) {
 		$auth     = $provider_data['authentication'];
 		$auth_out = array( 'method' => $auth['method'] );
 
