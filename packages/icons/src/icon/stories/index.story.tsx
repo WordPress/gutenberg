@@ -7,16 +7,6 @@ import type { ReactElement } from 'react';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import {
-	SearchControl,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	__experimentalSpacer as Spacer,
-	__experimentalGrid as Grid,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	ToggleControl,
-} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -94,82 +84,124 @@ const LibraryExample = (): ReactElement => {
 	const hasResults = Object.keys( filteredIcons ).length > 0;
 
 	return (
-		<Spacer padding={ 10 }>
-			<VStack spacing={ 8 }>
-				<HStack justify="flex-start" alignment="end" spacing={ 8 } wrap>
-					<SearchControl
-						__next40pxDefaultSize
-						label="Icon name"
-						hideLabelFromVision={ false }
-						value={ filter }
-						onChange={ ( value: string | undefined ) =>
-							setFilter( value ?? '' )
-						}
-					/>
-					<ToggleGroupControl
-						label="Icon size"
-						isBlock
-						value={ size }
-						onChange={ ( value: string | number | undefined ) =>
-							setSize( value )
-						}
-						__next40pxDefaultSize
+		<div style={ { padding: 40 } }>
+			<div
+				style={ {
+					display: 'flex',
+					gap: 16,
+					flexFlow: 'column',
+				} }
+			>
+				<div>
+					<label
+						htmlFor="filter-icons"
+						style={ { paddingRight: 10 } }
 					>
-						{ [ '16', '24', '32' ].map( ( option ) => (
-							<ToggleGroupControlOption
-								key={ option }
-								value={ option }
-								label={ option }
-							/>
-						) ) }
-					</ToggleGroupControl>
-					<ToggleControl
-						label="Highlight public icons"
-						checked={ highlightPublicIcons }
-						onChange={ ( value: boolean ) =>
-							setHighlightPublicIcons( value )
+						Filter Icons
+					</label>
+					<input
+						// eslint-disable-next-line no-restricted-syntax
+						id="filter-icons"
+						type="search"
+						value={ filter }
+						placeholder="Icon name"
+						onChange={ ( event ) =>
+							setFilter( event.target.value )
 						}
-						help="Emphasize icons available in the SVG icon registry."
 					/>
-				</HStack>
-				{ hasResults ? (
-					<Grid templateColumns="repeat(auto-fill, minmax(100px, 1fr))">
-						{ Object.entries( filteredIcons ).map(
-							( [ name, icon ] ) => {
-								const isPublic = PUBLIC_ICONS.has(
-									nameToSlug( name )
-								);
-								return (
-									<VStack
-										key={ name }
-										as="div"
-										alignment="center"
-										spacing={ 2 }
-										style={ {
-											opacity:
-												highlightPublicIcons &&
-												! isPublic
-													? 0.2
-													: 1,
-										} }
-									>
-										<Icon
-											icon={ icon }
-											size={ Number( size ) }
-										/>
-										<span style={ { fontSize: '11px' } }>
-											{ name }
-										</span>
-									</VStack>
-								);
-							}
-						) }
-					</Grid>
-				) : (
-					<p>No icons found.</p>
-				) }
-			</VStack>
-		</Spacer>
+				</div>
+				<fieldset
+					// eslint-disable-next-line no-restricted-syntax
+					id="icon-size"
+					style={ {
+						margin: 0,
+						padding: 0,
+						border: 'none',
+						display: 'flex',
+						gap: 8,
+					} }
+				>
+					<legend>Icon size</legend>
+					{ [ '16', '24', '32' ].map( ( option ) => (
+						<>
+							<input
+								id={ `icon-size-${ option }` }
+								type="radio"
+								name="icon-size"
+								value={ option }
+								checked={ size === option }
+								onChange={ () => setSize( option ) }
+							/>
+							<label htmlFor={ `icon-size-${ option }` }>
+								{ option }px
+							</label>
+						</>
+					) ) }
+				</fieldset>
+				<div>
+					<input
+						// eslint-disable-next-line no-restricted-syntax
+						id="highlight-public-icons"
+						type="checkbox"
+						checked={ highlightPublicIcons }
+						onChange={ ( event ) =>
+							setHighlightPublicIcons( event.target.checked )
+						}
+					/>
+					<label htmlFor="highlight-public-icons">
+						Highlight public icons{ ' ' }
+						<small>
+							(Emphasize icons available in the SVG icon
+							registry.)
+						</small>
+					</label>
+				</div>
+			</div>
+			{ hasResults ? (
+				<div
+					style={ {
+						display: 'grid',
+						gap: '32px 16px',
+						gridTemplateColumns:
+							'repeat(auto-fill, minmax(100px, 1fr))',
+						marginTop: 32,
+					} }
+				>
+					{ Object.entries( filteredIcons ).map(
+						( [ name, icon ] ) => {
+							const isPublic = PUBLIC_ICONS.has(
+								nameToSlug( name )
+							);
+							return (
+								<div
+									key={ name }
+									style={ {
+										display: 'flex',
+										flexDirection: 'column',
+										alignItems: 'center',
+										gap: 8,
+										opacity:
+											highlightPublicIcons && ! isPublic
+												? 0.2
+												: 1,
+									} }
+								>
+									<Icon
+										icon={ icon }
+										size={ Number( size ) }
+									/>
+									<span style={ { fontSize: 11 } }>
+										{ name }
+									</span>
+								</div>
+							);
+						}
+					) }
+				</div>
+			) : (
+				<p>No icons found.</p>
+			) }
+		</div>
 	);
 };
 
