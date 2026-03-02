@@ -3,8 +3,7 @@
  */
 import { usePrevious } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useMemo } from '@wordpress/element';
-import { applyFilters } from '@wordpress/hooks';
+import { useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import {
@@ -30,13 +29,7 @@ const NOTIFICATION_TYPE = {
 	USER_EXITED: 'collab-user-exited',
 } as const;
 
-interface CollaborationNotificationsConfig {
-	userEntered: boolean;
-	userExited: boolean;
-	postUpdated: boolean;
-}
-
-const DEFAULT_NOTIFICATIONS_CONFIG: CollaborationNotificationsConfig = {
+const NOTIFICATIONS_CONFIG = {
 	userEntered: true,
 	userExited: true,
 	postUpdated: true,
@@ -72,9 +65,6 @@ function getPostUpdatedMessage(
  * Hook that watches for collaborator join/leave events and remote save events,
  * dispatching snackbar notices accordingly.
  *
- * Notification types can be enabled/disabled via the
- * `editor.collaborationNotifications` WordPress filter.
- *
  * @param postId   The ID of the post being edited.
  * @param postType The post type of the post being edited.
  */
@@ -101,15 +91,6 @@ export function useCollaboratorNotifications(
 	}, [] );
 
 	const { createNotice } = useDispatch( noticesStore );
-
-	const notificationsConfig = useMemo(
-		() =>
-			applyFilters(
-				'editor.collaborationNotifications',
-				DEFAULT_NOTIFICATIONS_CONFIG
-			) as CollaborationNotificationsConfig,
-		[]
-	);
 
 	const prevCollaborators = usePrevious( activeCollaborators );
 	const prevPostSave = usePrevious( lastPostSave );
@@ -149,7 +130,7 @@ export function useCollaboratorNotifications(
 		/*
 		 * Detect joins: new clientIds that weren't in the previous state.
 		 */
-		if ( notificationsConfig.userEntered ) {
+		if ( NOTIFICATIONS_CONFIG.userEntered ) {
 			const me = activeCollaborators.find( ( c ) => c.isMe );
 
 			for ( const [ clientId, collaborator ] of newMap ) {
@@ -189,7 +170,7 @@ export function useCollaboratorNotifications(
 		 * Already-disconnected collaborators that are later removed from the
 		 * list (after the 5 s delay) are silently ignored.
 		 */
-		if ( notificationsConfig.userExited ) {
+		if ( NOTIFICATIONS_CONFIG.userExited ) {
 			for ( const [ clientId, prevCollab ] of prevMap ) {
 				if ( prevCollab.isMe || ! prevCollab.isConnected ) {
 					continue;
@@ -214,7 +195,6 @@ export function useCollaboratorNotifications(
 		activeCollaborators,
 		prevCollaborators,
 		isCollaborationEnabled,
-		notificationsConfig,
 		createNotice,
 	] );
 
@@ -225,7 +205,7 @@ export function useCollaboratorNotifications(
 	useEffect( () => {
 		if (
 			! isCollaborationEnabled ||
-			! notificationsConfig.postUpdated ||
+			! NOTIFICATIONS_CONFIG.postUpdated ||
 			! lastPostSave ||
 			! postStatus
 		) {
@@ -272,7 +252,6 @@ export function useCollaboratorNotifications(
 		prevPostSave,
 		activeCollaborators,
 		isCollaborationEnabled,
-		notificationsConfig,
 		postStatus,
 		createNotice,
 	] );
