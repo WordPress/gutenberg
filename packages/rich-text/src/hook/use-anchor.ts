@@ -52,13 +52,10 @@ function getFormatElement(
 		element = element.parentElement;
 	}
 
-	if ( ! element ) {
-		// FIXME: Should no longer be needed
-		return;
-	}
 	if ( element === editableContentElement ) {
 		return;
 	}
+
 	if ( ! editableContentElement.contains( element ) ) {
 		return;
 	}
