@@ -243,6 +243,7 @@ export default function PostTemplateEdit( {
 				posts: getEntityRecords( 'postType', usedPostType, {
 					...query,
 					...restQueryArgs,
+					context: 'view',
 				} ),
 				blocks: getBlocks( clientId ),
 			};
