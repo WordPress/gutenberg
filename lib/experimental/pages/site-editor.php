@@ -31,6 +31,5 @@ function gutenberg_site_editor_register_default_menu_items() {
 	gutenberg_register_site_editor_v2_menu_item( 'templates', __( 'Templates', 'gutenberg' ), '/templates', '' );
 	gutenberg_register_site_editor_v2_menu_item( 'templateParts', __( 'Template Parts', 'gutenberg' ), '/template-parts', '' );
 	gutenberg_register_site_editor_v2_menu_item( 'patterns', __( 'Patterns', 'gutenberg' ), '/patterns', '' );
-	gutenberg_register_site_editor_v2_menu_item( 'fontList', __( 'Fonts', 'gutenberg' ), '/font-list', '' );
 }
 add_action( 'site-editor-v2_init', 'gutenberg_site_editor_register_default_menu_items', 5 );
