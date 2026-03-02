@@ -19,6 +19,12 @@ store(
 				}
 				return playlist.tracks[ currentId ] || {};
 			},
+			get currentTrackAriaLabel() {
+				const { isPlaying } = getContext();
+				const baseLabel = this.currentTrack?.ariaLabel || '';
+				const action = isPlaying ? 'Pause ' : 'Play ';
+				return action + baseLabel;
+			},
 			get isCurrentTrack() {
 				const { currentId, uniqueId } = getContext();
 				return currentId === uniqueId;

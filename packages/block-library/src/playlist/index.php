@@ -127,7 +127,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 			data-wp-on--play="actions.isPlaying"
 			data-wp-on--pause="actions.isPaused"
 			data-wp-bind--src="state.currentTrack.url"
-			data-wp-bind--aria-label="state.currentTrack.ariaLabel"
+			data-wp-bind--aria-label="state.currentTrackAriaLabel"
 			data-wp-watch="callbacks.autoPlay"
 		></audio>
 	';
