@@ -83,26 +83,27 @@ function _gutenberg_get_real_api_key( string $option_name, callable $mask_callba
  * @access private
  *
  * @return array {
- *     Provider settings keyed by provider ID.
+ *     Connector settings keyed by connector ID.
  *
  *     @type array ...$0 {
- *         Data for a single provider.
+ *         Data for a single connector.
  *
- *         @type string $name           The provider's display name.
- *         @type string $description    The provider's description.
+ *         @type string $name           The connector's display name.
+ *         @type string $description    The connector's description.
  *         @type string $type           The connector type: 'ai_provider'.
  *         @type array  $authentication {
- *             Authentication configuration.
+ *             Authentication configuration. When method is 'api_key', includes
+ *             credentials_url and setting_name. When 'none', only method is present.
  *
  *             @type string      $method          The authentication method: 'api_key' or 'none'.
- *             @type string|null $credentials_url URL where users can obtain API credentials (api_key only).
- *             @type string      $setting_name    The setting name for the API key (api_key only).
+ *             @type string|null $credentials_url Optional. URL where users can obtain API credentials.
+ *             @type string      $setting_name    Optional. The setting name for the API key.
  *         }
  *     }
  * }
  */
 function _gutenberg_get_connector_settings(): array {
-	$providers = array(
+	$connectors = array(
 		'google'    => array(
 			'name'           => 'Gemini',
 			'description'    => __( 'Content generation, translation, and vision with Google\'s Gemini.', 'gutenberg' ),
@@ -134,65 +135,57 @@ function _gutenberg_get_connector_settings(): array {
 
 	$registry = \WordPress\AiClient\AiClient::defaultRegistry();
 
-	foreach ( $registry->getRegisteredProviderIds() as $provider_id ) {
-		$provider_class_name = $registry->getProviderClassName( $provider_id );
-		$provider_metadata   = $provider_class_name::metadata();
+	foreach ( $registry->getRegisteredProviderIds() as $connector_id ) {
+		$provider_class = $registry->getProviderClassName( $connector_id );
+		$metadata       = $provider_class::metadata();
 
-		$auth_method     = $provider_metadata->getAuthenticationMethod();
-		$is_api_key      = null !== $auth_method && $auth_method->isApiKey();
-		$credentials_url = $provider_metadata->getCredentialsUrl();
+		$auth_method = $metadata->getAuthenticationMethod();
+		$is_api_key  = null !== $auth_method && $auth_method->isApiKey();
 
-		$authentication = $is_api_key
-			? array(
+		if ( $is_api_key ) {
+			$credentials_url = $metadata->getCredentialsUrl();
+			$authentication  = array(
 				'method'          => 'api_key',
 				'credentials_url' => $credentials_url ? $credentials_url : null,
-			)
-			: array( 'method' => 'none' );
-
-		$registry_data = array_filter(
-			array(
-				'name'        => $provider_metadata->getName(),
-				'description' => method_exists( $provider_metadata, 'getDescription' ) ? $provider_metadata->getDescription() : null,
-			)
-		);
-
-		if ( isset( $providers[ $provider_id ] ) ) {
-			// Merge non-empty registry data over hardcoded fallbacks.
-			$providers[ $provider_id ] = array_merge( $providers[ $provider_id ], $registry_data );
-			// Update authentication from the registry.
-			$providers[ $provider_id ]['authentication'] = array_merge(
-				$providers[ $provider_id ]['authentication'],
-				array_filter( $authentication )
 			);
 		} else {
-			$providers[ $provider_id ] = array_merge(
-				array(
-					'name'           => ucwords( $provider_id ),
-					'description'    => '',
-					'type'           => 'ai_provider',
-					'authentication' => $authentication,
-				),
-				$registry_data
+			$authentication = array( 'method' => 'none' );
+		}
+
+		$name        = $metadata->getName();
+		$description = method_exists( $metadata, 'getDescription' ) ? $metadata->getDescription() : null;
+
+		if ( isset( $connectors[ $connector_id ] ) ) {
+			// Override fields with non-empty registry values.
+			if ( $name ) {
+				$connectors[ $connector_id ]['name'] = $name;
+			}
+			if ( $description ) {
+				$connectors[ $connector_id ]['description'] = $description;
+			}
+			// Always update auth method; keep existing credentials_url as fallback.
+			$connectors[ $connector_id ]['authentication']['method'] = $authentication['method'];
+			if ( ! empty( $authentication['credentials_url'] ) ) {
+				$connectors[ $connector_id ]['authentication']['credentials_url'] = $authentication['credentials_url'];
+			}
+		} else {
+			$connectors[ $connector_id ] = array(
+				'name'           => $name ? $name : ucwords( $connector_id ),
+				'description'    => $description ? $description : '',
+				'type'           => 'ai_provider',
+				'authentication' => $authentication,
 			);
 		}
 	}
 
-	$provider_settings = array();
-	foreach ( $providers as $provider => $data ) {
-		$auth = $data['authentication'];
-
-		if ( 'api_key' === $auth['method'] ) {
-			$auth['setting_name'] = "connectors_ai_{$provider}_api_key";
+	// Add setting_name for connectors that use API key authentication.
+	foreach ( $connectors as $connector_id => $connector ) {
+		if ( 'api_key' === $connector['authentication']['method'] ) {
+			$connectors[ $connector_id ]['authentication']['setting_name'] = "connectors_ai_{$connector_id}_api_key";
 		}
-
-		$provider_settings[ $provider ] = array(
-			'name'           => $data['name'],
-			'description'    => $data['description'],
-			'type'           => $data['type'],
-			'authentication' => $auth,
-		);
 	}
-	return $provider_settings;
+
+	return $connectors;
 }
 
 /**
@@ -235,8 +228,8 @@ function _gutenberg_validate_connector_keys_in_rest( WP_REST_Response $response,
 		return $response;
 	}
 
-	foreach ( _gutenberg_get_connector_settings() as $provider => $provider_data ) {
-		$auth = $provider_data['authentication'];
+	foreach ( _gutenberg_get_connector_settings() as $connector_id => $connector_data ) {
+		$auth = $connector_data['authentication'];
 		if ( 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
 			continue;
 		}
@@ -251,7 +244,7 @@ function _gutenberg_validate_connector_keys_in_rest( WP_REST_Response $response,
 			continue;
 		}
 
-		if ( true !== _gutenberg_is_api_key_valid( $real_key, $provider ) ) {
+		if ( true !== _gutenberg_is_api_key_valid( $real_key, $connector_id ) ) {
 			$data[ $setting_name ] = 'invalid_key';
 		}
 	}
@@ -272,8 +265,8 @@ function _gutenberg_register_default_connector_settings(): void {
 		return;
 	}
 
-	foreach ( _gutenberg_get_connector_settings() as $provider => $provider_data ) {
-		$auth = $provider_data['authentication'];
+	foreach ( _gutenberg_get_connector_settings() as $connector_id => $connector_data ) {
+		$auth = $connector_data['authentication'];
 		if ( 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
 			continue;
 		}
@@ -287,22 +280,22 @@ function _gutenberg_register_default_connector_settings(): void {
 				'label'             => sprintf(
 					/* translators: %s: AI provider name. */
 					__( '%s API Key', 'gutenberg' ),
-					$provider_data['name']
+					$connector_data['name']
 				),
 				'description'       => sprintf(
 					/* translators: %s: AI provider name. */
 					__( 'API key for the %s AI provider.', 'gutenberg' ),
-					$provider_data['name']
+					$connector_data['name']
 				),
 				'default'           => '',
 				'show_in_rest'      => true,
-				'sanitize_callback' => static function ( string $value ) use ( $provider ): string {
+				'sanitize_callback' => static function ( string $value ) use ( $connector_id ): string {
 					$value = sanitize_text_field( $value );
 					if ( '' === $value ) {
 						return $value;
 					}
 
-					$valid = _gutenberg_is_api_key_valid( $value, $provider );
+					$valid = _gutenberg_is_api_key_valid( $value, $connector_id );
 					return true === $valid ? $value : '';
 				},
 			)
@@ -325,23 +318,23 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 
 	try {
 		$registry = \WordPress\AiClient\AiClient::defaultRegistry();
-		foreach ( _gutenberg_get_connector_settings() as $provider => $provider_data ) {
-			if ( 'ai_provider' !== $provider_data['type'] ) {
+		foreach ( _gutenberg_get_connector_settings() as $connector_id => $connector_data ) {
+			if ( 'ai_provider' !== $connector_data['type'] ) {
 				continue;
 			}
 
-			$auth = $provider_data['authentication'];
+			$auth = $connector_data['authentication'];
 			if ( 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
 				continue;
 			}
 
 			$api_key = _gutenberg_get_real_api_key( $auth['setting_name'], '_gutenberg_mask_api_key' );
-			if ( '' === $api_key || ! $registry->hasProvider( $provider ) ) {
+			if ( '' === $api_key || ! $registry->hasProvider( $connector_id ) ) {
 				continue;
 			}
 
 			$registry->setProviderRequestAuthentication(
-				$provider,
+				$connector_id,
 				new \WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication( $api_key )
 			);
 		}
@@ -353,21 +346,21 @@ remove_action( 'init', '_wp_connectors_pass_default_keys_to_ai_client' );
 add_action( 'init', '_gutenberg_pass_default_connector_keys_to_ai_client' );
 
 /**
- * Exposes connector provider settings to the connectors-wp-admin script module.
+ * Exposes connector settings to the connectors-wp-admin script module.
  *
  * @access private
  *
  * @param array $data Existing script module data.
- * @return array Script module data with providers added.
+ * @return array Script module data with connectors added.
  */
-function _gutenberg_get_connector_provider_script_module_data( array $data ): array {
+function _gutenberg_get_connector_script_module_data( array $data ): array {
 	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
 		return $data;
 	}
 
-	$providers = array();
-	foreach ( _gutenberg_get_connector_settings() as $provider_id => $provider_data ) {
-		$auth     = $provider_data['authentication'];
+	$connectors = array();
+	foreach ( _gutenberg_get_connector_settings() as $connector_id => $connector_data ) {
+		$auth     = $connector_data['authentication'];
 		$auth_out = array( 'method' => $auth['method'] );
 
 		if ( 'api_key' === $auth['method'] ) {
@@ -375,14 +368,14 @@ function _gutenberg_get_connector_provider_script_module_data( array $data ): ar
 			$auth_out['credentialsUrl'] = $auth['credentials_url'] ?? null;
 		}
 
-		$providers[ $provider_id ] = array(
-			'name'           => $provider_data['name'],
-			'description'    => $provider_data['description'],
-			'type'           => $provider_data['type'],
+		$connectors[ $connector_id ] = array(
+			'name'           => $connector_data['name'],
+			'description'    => $connector_data['description'],
+			'type'           => $connector_data['type'],
 			'authentication' => $auth_out,
 		);
 	}
-	$data['providers'] = $providers;
+	$data['connectors'] = $connectors;
 	return $data;
 }
-add_filter( 'script_module_data_connectors-wp-admin', '_gutenberg_get_connector_provider_script_module_data' );
+add_filter( 'script_module_data_connectors-wp-admin', '_gutenberg_get_connector_script_module_data' );

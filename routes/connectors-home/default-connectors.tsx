@@ -16,34 +16,34 @@ import { __ } from '@wordpress/i18n';
 import { useConnectorPlugin } from './use-connector-plugin';
 import { OpenAILogo, ClaudeLogo, GeminiLogo } from './logos';
 
-type ProviderAuthentication =
+type ConnectorAuthentication =
 	| { method: 'api_key'; settingName: string; credentialsUrl: string | null }
 	| { method: 'none' };
 
-interface ProviderData {
+interface ConnectorData {
 	name: string;
 	description: string;
 	type: 'ai_provider';
-	authentication: ProviderAuthentication;
+	authentication: ConnectorAuthentication;
 }
 
 /**
- * Reads provider data passed from PHP via the script module data mechanism.
+ * Reads connector data passed from PHP via the script module data mechanism.
  */
-function getProviderData(): Record< string, ProviderData > {
+function getConnectorData(): Record< string, ConnectorData > {
 	try {
 		const parsed = JSON.parse(
 			document.getElementById(
 				'wp-script-module-data-connectors-wp-admin'
 			)?.textContent ?? ''
 		);
-		return parsed?.providers ?? {};
+		return parsed?.connectors ?? {};
 	} catch {
 		return {};
 	}
 }
 
-const PROVIDER_LOGOS: Record< string, React.ComponentType > = {
+const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
 	google: GeminiLogo,
 	openai: OpenAILogo,
 	anthropic: ClaudeLogo,
@@ -142,11 +142,11 @@ function ApiKeyProviderConnector( {
 	);
 }
 
-// Register connectors from server-provided provider data.
+// Register connectors from server-provided connector data.
 export function registerDefaultConnectors() {
-	const providers = getProviderData();
+	const connectors = getConnectorData();
 
-	for ( const [ providerId, data ] of Object.entries( providers ) ) {
+	for ( const [ connectorId, data ] of Object.entries( connectors ) ) {
 		const { authentication } = data;
 
 		if (
@@ -160,17 +160,17 @@ export function registerDefaultConnectors() {
 			?.replace( /^https?:\/\//, '' )
 			.replace( /\/$/, '' );
 
-		registerConnector( `core/${ providerId }`, {
+		registerConnector( `core/${ connectorId }`, {
 			label: data.name,
 			description: data.description,
 			render: ( props: ConnectorRenderProps ) => (
 				<ApiKeyProviderConnector
 					{ ...props }
-					pluginSlug={ `ai-provider-for-${ providerId }` }
+					pluginSlug={ `ai-provider-for-${ connectorId }` }
 					settingName={ authentication.settingName }
 					helpUrl={ authentication.credentialsUrl ?? undefined }
 					helpLabel={ helpLabel }
-					Logo={ PROVIDER_LOGOS[ providerId ] }
+					Logo={ CONNECTOR_LOGOS[ connectorId ] }
 				/>
 			),
 		} );
