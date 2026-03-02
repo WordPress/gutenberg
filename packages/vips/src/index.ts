@@ -134,7 +134,11 @@ export async function convertImageFormat(
 			}
 		};
 
-		const saveOptions: SaveOptions< typeof outputType > = {};
+		const saveOptions: SaveOptions< typeof outputType > = {
+			// Strip metadata except ICC color profiles,
+			// matching WordPress core's behavior.
+			keep: 'icc',
+		};
 
 		if ( supportsQuality( outputType ) ) {
 			saveOptions.Q = quality * 100;
@@ -189,6 +193,7 @@ export async function compressImage(
  * @param type      Mime type.
  * @param resize    Resize options.
  * @param smartCrop Whether to use smart cropping (i.e. saliency-aware).
+ * @param quality   Desired quality (0-1).
  * @return Processed file data plus the old and new dimensions.
  */
 export async function resizeImage(
@@ -196,7 +201,8 @@ export async function resizeImage(
 	buffer: ArrayBuffer,
 	type: string,
 	resize: ImageSizeCrop,
-	smartCrop = false
+	smartCrop = false,
+	quality = 0.82
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -321,8 +327,16 @@ export async function resizeImage(
 			image.onProgress = onProgress;
 		}
 
-		// TODO: Allow passing quality?
-		const saveOptions: SaveOptions< typeof type > = {};
+		const saveOptions: SaveOptions< typeof type > = {
+			// Strip metadata except ICC color profiles,
+			// matching WordPress core's behavior.
+			keep: 'icc',
+		};
+
+		if ( supportsQuality( type ) ) {
+			saveOptions.Q = quality * 100;
+		}
+
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {
