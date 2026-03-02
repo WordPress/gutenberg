@@ -8,55 +8,33 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
-	TextareaControl,
 	Card,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown } from '@wordpress/icons';
-import { useState, useId } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useState, useId, Children, cloneElement } from '@wordpress/element';
+import type { ReactNode, ReactElement } from 'react';
 
 /**
  * Internal dependencies
  */
 import './guideline-accordion.scss';
-import { STORE_NAME } from '../store';
-import { saveContentGuidelines } from '../api';
 
 interface GuidelineAccordionProps {
 	title: string;
 	description: string;
-	slug: string;
+	children: ReactNode;
 }
 
 export default function GuidelineAccordion( {
 	title,
 	description,
-	slug,
+	children,
 }: GuidelineAccordionProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const contentId = useId();
 	const headingId = useId();
 	const descriptionId = useId();
-
-	// @ts-ignore
-	const { setGuideline } = useDispatch( STORE_NAME );
-
-	const { value } = useSelect(
-		( select ) => ( {
-			// @ts-ignore
-			value: select( STORE_NAME ).getGuideline( slug ) as string,
-		} ),
-		[ slug ]
-	);
-
-	const [ draft, setDraft ] = useState( value );
-
-	const handleSave = ( event: SubmitEvent ) => {
-		event.preventDefault();
-		setGuideline( slug, draft );
-		saveContentGuidelines();
-	};
 
 	return (
 		<Card className="content-guidelines__accordion">
@@ -108,31 +86,12 @@ export default function GuidelineAccordion( {
 					/>
 				</HStack>
 			</VStack>
-			{ isOpen && (
-				<form
-					id={ contentId }
-					aria-labelledby={ headingId }
-					aria-describedby={ descriptionId }
-					onSubmit={ handleSave }
-					className="content-guidelines__accordion-form"
-				>
-					<VStack spacing={ 4 }>
-						<TextareaControl
-							label={ __( 'Copy guidelines' ) }
-							hideLabelFromVision
-							value={ draft }
-							onChange={ setDraft }
-						/>
-						<Button
-							variant="primary"
-							type="submit"
-							className="save-button"
-						>
-							{ __( 'Save guidelines' ) }
-						</Button>
-					</VStack>
-				</form>
-			) }
+			{ isOpen &&
+				cloneElement( Children.only( children ) as ReactElement, {
+					contentId,
+					headingId,
+					descriptionId,
+				} ) }
 		</Card>
 	);
 }

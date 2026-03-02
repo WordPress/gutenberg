@@ -11,6 +11,7 @@ import { Spinner } from '@wordpress/components';
  */
 import './style.scss';
 import GuidelineAccordion from './components/guideline-accordion';
+import GuidelineAccordionForm from './components/guideline-accordion-form';
 import { fetchContentGuidelines } from './api';
 
 const GUIDELINE_ITEMS = [
@@ -82,8 +83,11 @@ function ContentGuidelinesPage() {
 									<GuidelineAccordion
 										title={ item.title }
 										description={ item.description }
-										slug={ item.slug }
-									/>
+									>
+										<GuidelineAccordionForm
+											slug={ item.slug }
+										/>
+									</GuidelineAccordion>
 								</div>
 							</li>
 						) ) }
