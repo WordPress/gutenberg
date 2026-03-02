@@ -277,7 +277,7 @@ test.describe( 'PHP-only auto-register blocks', () => {
 			);
 		} );
 
-		test( 'should reflect bound attribute values in auto-generated inspector controls', async ( {
+		test( 'generated inspector controls should reflect bound attribute values', async ( {
 			editor,
 			page,
 		} ) => {
