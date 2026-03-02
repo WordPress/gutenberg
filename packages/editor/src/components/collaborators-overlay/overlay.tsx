@@ -45,6 +45,12 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	box-shadow: ${ ELEVATION_X_SMALL };
 	animation: collaborators-overlay-cursor-blink 1s infinite;
 }
+.collaborators-overlay-selection-rect {
+	position: absolute;
+	opacity: 0.3;
+	pointer-events: none;
+	border-radius: 2px;
+}
 
 /* ── Avatar component (compiled from packages/components/src/avatar/styles.scss) ── */
 .components-avatar {
@@ -253,29 +259,43 @@ export function Overlay( {
 		<div className="collaborators-overlay-full" ref={ mergedRef }>
 			<style>{ COLLABORATORS_OVERLAY_STYLES }</style>
 			{ cursors.map( ( cursor ) => (
-				<div
-					key={ cursor.clientId }
-					className="collaborators-overlay-user"
-					style={ {
-						left: `${ cursor.x }px`,
-						top: `${ cursor.y }px`,
-					} }
-				>
+				<div key={ cursor.clientId }>
+					{ cursor.selectionRects?.map( ( rect, index ) => (
+						<div
+							key={ `${ cursor.clientId }-sel-${ index }` }
+							className="collaborators-overlay-selection-rect"
+							style={ {
+								left: `${ rect.x }px`,
+								top: `${ rect.y }px`,
+								width: `${ rect.width }px`,
+								height: `${ rect.height }px`,
+								backgroundColor: cursor.color,
+							} }
+						/>
+					) ) }
 					<div
-						className="collaborators-overlay-user-cursor"
+						className="collaborators-overlay-user"
 						style={ {
-							backgroundColor: cursor.color,
-							height: `${ cursor.height }px`,
+							left: `${ cursor.x }px`,
+							top: `${ cursor.y }px`,
 						} }
-					/>
-					<Avatar
-						className="collaborators-overlay-user-label"
-						badge
-						size="small"
-						src={ cursor.avatarUrl }
-						name={ cursor.userName }
-						borderColor={ cursor.color }
-					/>
+					>
+						<div
+							className="collaborators-overlay-user-cursor"
+							style={ {
+								backgroundColor: cursor.color,
+								height: `${ cursor.height }px`,
+							} }
+						/>
+						<Avatar
+							className="collaborators-overlay-user-label"
+							badge
+							size="small"
+							src={ cursor.avatarUrl }
+							name={ cursor.userName }
+							borderColor={ cursor.color }
+						/>
+					</div>
 				</div>
 			) ) }
 		</div>

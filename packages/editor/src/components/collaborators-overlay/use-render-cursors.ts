@@ -11,6 +11,13 @@ import { getAvatarBorderColor } from '../collab-sidebar/utils';
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
 
+export interface SelectionRect {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+}
+
 export interface CursorData {
 	userName: string;
 	clientId: number;
@@ -19,6 +26,7 @@ export interface CursorData {
 	x: number;
 	y: number;
 	height: number;
+	selectionRects?: SelectionRect[];
 }
 
 /**
@@ -78,6 +86,7 @@ export function useRenderCursors(
 					y: number;
 					height: number;
 				} | null = null;
+				let selectionRects: SelectionRect[] | undefined;
 
 				if ( selection.type === SelectionType.None ) {
 					// Nothing selected.
@@ -98,17 +107,113 @@ export function useRenderCursors(
 					selection.type === SelectionType.SelectionInOneBlock ||
 					selection.type === SelectionType.SelectionInMultipleBlocks
 				) {
-					const { textIndex, localClientId } = resolveSelection( {
+					const start = resolveSelection( {
 						type: SelectionType.Cursor,
 						cursorPosition: selection.cursorStartPosition,
 					} );
-					if ( localClientId ) {
-						coords = getCursorPosition(
-							textIndex,
-							localClientId,
-							blockEditorDocument,
-							overlayElement
-						);
+					const end = resolveSelection( {
+						type: SelectionType.Cursor,
+						cursorPosition: selection.cursorEndPosition,
+					} );
+
+					if (
+						start.localClientId &&
+						end.localClientId &&
+						start.textIndex !== null &&
+						end.textIndex !== null
+					) {
+						let allRects: SelectionRect[] = [];
+
+						if (
+							selection.type === SelectionType.SelectionInOneBlock
+						) {
+							const blockElement =
+								blockEditorDocument.querySelector< HTMLElement >(
+									`[data-block="${ start.localClientId }"]`
+								);
+							if ( blockElement ) {
+								const rects = getSelectionRects(
+									blockElement,
+									start.textIndex,
+									end.textIndex,
+									blockEditorDocument,
+									overlayElement
+								);
+								if ( rects ) {
+									allRects = rects;
+								}
+							}
+						} else {
+							// Multi-block selection.
+							const startBlock =
+								blockEditorDocument.querySelector< HTMLElement >(
+									`[data-block="${ start.localClientId }"]`
+								);
+							const endBlock =
+								blockEditorDocument.querySelector< HTMLElement >(
+									`[data-block="${ end.localClientId }"]`
+								);
+
+							if ( startBlock && endBlock ) {
+								// Start block: from startTextIndex to end of block.
+								const startRects = getSelectionRects(
+									startBlock,
+									start.textIndex,
+									Number.MAX_SAFE_INTEGER,
+									blockEditorDocument,
+									overlayElement
+								);
+								if ( startRects ) {
+									allRects.push( ...startRects );
+								}
+
+								// Intermediate blocks: full content.
+								const intermediateBlocks = getBlocksBetween(
+									start.localClientId,
+									end.localClientId,
+									blockEditorDocument
+								);
+								for ( const intermediateBlock of intermediateBlocks ) {
+									const rects = getFullBlockSelectionRects(
+										intermediateBlock,
+										blockEditorDocument,
+										overlayElement
+									);
+									allRects.push( ...rects );
+								}
+
+								// End block: from 0 to endTextIndex.
+								const endRects = getSelectionRects(
+									endBlock,
+									0,
+									end.textIndex,
+									blockEditorDocument,
+									overlayElement
+								);
+								if ( endRects ) {
+									allRects.push( ...endRects );
+								}
+							}
+						}
+
+						if ( allRects.length > 0 ) {
+							// Place cursor at the END of the selection.
+							const lastRect = allRects[ allRects.length - 1 ];
+							coords = {
+								x: lastRect.x + lastRect.width,
+								y: lastRect.y,
+								height: lastRect.height,
+							};
+							selectionRects = allRects;
+						} else {
+							// Fallback: cursor at start position only.
+							coords = getCursorPosition(
+								start.textIndex,
+								start.localClientId,
+								blockEditorDocument,
+								overlayElement
+							);
+						}
 					}
 				}
 
@@ -119,6 +224,7 @@ export function useRenderCursors(
 						color,
 						avatarUrl,
 						...coords,
+						...( selectionRects ? { selectionRects } : {} ),
 					} );
 				}
 			} );
@@ -248,6 +354,162 @@ const getOffsetPositionInBlock = (
 		y: cursorY,
 		height: cursorHeight,
 	};
+};
+
+/**
+ * Computes selection highlight rectangles for a text range within a single block.
+ *
+ * @param blockElement   - The block element
+ * @param startOffset    - Start character offset within the block
+ * @param endOffset      - End character offset within the block
+ * @param editorDocument - The editor document
+ * @param overlay        - The overlay element for coordinate conversion
+ * @return Array of selection rectangles relative to the overlay, or null on failure
+ */
+const getSelectionRects = (
+	blockElement: HTMLElement,
+	startOffset: number,
+	endOffset: number,
+	editorDocument: Document,
+	overlay: HTMLElement
+): SelectionRect[] | null => {
+	// Normalize direction.
+	let normalizedStart = startOffset;
+	let normalizedEnd = endOffset;
+	if ( normalizedStart > normalizedEnd ) {
+		[ normalizedStart, normalizedEnd ] = [ normalizedEnd, normalizedStart ];
+	}
+
+	const startPos = findInnerBlockOffset(
+		blockElement,
+		normalizedStart,
+		editorDocument
+	);
+	const endPos = findInnerBlockOffset(
+		blockElement,
+		normalizedEnd,
+		editorDocument
+	);
+
+	const range = editorDocument.createRange();
+	try {
+		range.setStart( startPos.node, startPos.offset );
+		range.setEnd( endPos.node, endPos.offset );
+	} catch {
+		return null;
+	}
+
+	const overlayRect = overlay.getBoundingClientRect();
+	const clientRects = range.getClientRects();
+	const rects: SelectionRect[] = [];
+
+	for ( const rect of clientRects ) {
+		if ( rect.width === 0 && rect.height === 0 ) {
+			continue;
+		}
+		rects.push( {
+			x: rect.left - overlayRect.left,
+			y: rect.top - overlayRect.top,
+			width: rect.width,
+			height: rect.height,
+		} );
+	}
+
+	return rects.length > 0 ? rects : null;
+};
+
+/**
+ * Computes selection highlight rectangles for the full content of a block.
+ * Used for intermediate blocks in a multi-block selection.
+ *
+ * @param blockElement   - The block element
+ * @param editorDocument - The editor document
+ * @param overlay        - The overlay element
+ * @return Array of selection rectangles relative to the overlay
+ */
+const getFullBlockSelectionRects = (
+	blockElement: HTMLElement,
+	editorDocument: Document,
+	overlay: HTMLElement
+): SelectionRect[] => {
+	const range = editorDocument.createRange();
+	range.selectNodeContents( blockElement );
+
+	const overlayRect = overlay.getBoundingClientRect();
+	const clientRects = range.getClientRects();
+	const rects: SelectionRect[] = [];
+
+	for ( const rect of clientRects ) {
+		if ( rect.width === 0 && rect.height === 0 ) {
+			continue;
+		}
+		rects.push( {
+			x: rect.left - overlayRect.left,
+			y: rect.top - overlayRect.top,
+			width: rect.width,
+			height: rect.height,
+		} );
+	}
+
+	// Fallback: if getClientRects returned nothing, use the block's bounding rect.
+	if ( rects.length === 0 ) {
+		const blockRect = blockElement.getBoundingClientRect();
+		if ( blockRect.width > 0 && blockRect.height > 0 ) {
+			rects.push( {
+				x: blockRect.left - overlayRect.left,
+				y: blockRect.top - overlayRect.top,
+				width: blockRect.width,
+				height: blockRect.height,
+			} );
+		}
+	}
+
+	return rects;
+};
+
+/**
+ * Finds all block elements between two blocks in DOM order (exclusive of start and end).
+ *
+ * @param startBlockId   - The clientId of the start block
+ * @param endBlockId     - The clientId of the end block
+ * @param editorDocument - The editor document
+ * @return Array of intermediate block HTMLElements in document order
+ */
+const getBlocksBetween = (
+	startBlockId: string,
+	endBlockId: string,
+	editorDocument: Document
+): HTMLElement[] => {
+	const allBlocks =
+		editorDocument.querySelectorAll< HTMLElement >( '[data-block]' );
+
+	let startIndex = -1;
+	let endIndex = -1;
+
+	for ( let i = 0; i < allBlocks.length; i++ ) {
+		const blockId = allBlocks[ i ].getAttribute( 'data-block' );
+		if ( blockId === startBlockId ) {
+			startIndex = i;
+		}
+		if ( blockId === endBlockId ) {
+			endIndex = i;
+		}
+	}
+
+	if ( startIndex === -1 || endIndex === -1 ) {
+		return [];
+	}
+
+	// Normalize order.
+	if ( startIndex > endIndex ) {
+		[ startIndex, endIndex ] = [ endIndex, startIndex ];
+	}
+
+	const result: HTMLElement[] = [];
+	for ( let i = startIndex + 1; i < endIndex; i++ ) {
+		result.push( allBlocks[ i ] );
+	}
+	return result;
 };
 
 const MAX_NODE_OFFSET_COUNT = 1000;
