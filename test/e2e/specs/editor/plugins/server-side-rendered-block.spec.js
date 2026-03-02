@@ -281,15 +281,27 @@ test.describe( 'PHP-only auto-register blocks', () => {
 			editor,
 			page,
 		} ) => {
-			// Insert the block with a binding on the title attribute.
+			// Insert the block with bindings on multiple attributes.
 			await editor.insertBlock( {
 				name: 'test/auto-register-with-controls',
 				attributes: {
 					metadata: {
 						bindings: {
 							title: {
-								source: 'testing/complete-source',
-								args: { key: 'text_field' },
+								source: 'core/post-meta',
+								args: { key: 'text_custom_field' },
+							},
+							count: {
+								source: 'core/post-meta',
+								args: { key: 'integer' },
+							},
+							spacing: {
+								source: 'core/post-meta',
+								args: { key: 'number_custom_field' },
+							},
+							showEmojis: {
+								source: 'core/post-meta',
+								args: { key: 'boolean' },
 							},
 						},
 					},
@@ -300,8 +312,12 @@ test.describe( 'PHP-only auto-register blocks', () => {
 
 			// Controls should show bound values from the source,
 			// not the block attribute defaults.
-			const titleInput = page.getByLabel( 'Title' );
-			await expect( titleInput ).toHaveValue( 'Text Field Value' );
+			await expect( page.getByLabel( 'Title' ) ).toHaveValue(
+				'Value of the text custom field'
+			);
+			await expect( page.getByLabel( 'Count' ) ).toHaveValue( '5' );
+			await expect( page.getByLabel( 'Spacing' ) ).toHaveValue( '5.5' );
+			await expect( page.getByLabel( 'Show Emojis' ) ).toBeChecked();
 		} );
 	} );
 } );
