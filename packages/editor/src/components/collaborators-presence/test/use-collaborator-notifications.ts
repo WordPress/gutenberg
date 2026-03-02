@@ -7,7 +7,6 @@ import { renderHook } from '@testing-library/react';
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -28,12 +27,6 @@ let mockEditorState = {
 jest.mock( '@wordpress/data', () => ( {
 	useSelect: jest.fn(),
 	useDispatch: jest.fn(),
-} ) );
-
-jest.mock( '@wordpress/hooks', () => ( {
-	applyFilters: jest.fn(
-		( _hook: string, defaultValue: unknown ) => defaultValue
-	),
 } ) );
 
 jest.mock( '@wordpress/notices', () => ( {
@@ -113,9 +106,6 @@ beforeEach( () => {
 		isCollaborationEnabled: true,
 	};
 	mockCreateNotice.mockClear();
-	( applyFilters as jest.Mock ).mockImplementation(
-		( _hook: string, defaultValue: unknown ) => defaultValue
-	);
 	( useSelect as jest.Mock ).mockImplementation( ( selector: Function ) =>
 		selector( buildMockSelect() )
 	);
@@ -455,79 +445,6 @@ describe( 'useCollaboratorNotifications', () => {
 			mockLastPostSave = {
 				savedAt: Date.now(),
 				savedByClientId: 12345,
-			};
-			rerender();
-
-			expect( mockCreateNotice ).not.toHaveBeenCalled();
-		} );
-	} );
-
-	describe( 'WordPress filter: editor.collaborationNotifications', () => {
-		it( 'suppresses join notifications when userEntered is false', () => {
-			( applyFilters as jest.Mock ).mockReturnValue( {
-				userEntered: false,
-				userExited: true,
-				postUpdated: true,
-			} );
-
-			mockActiveCollaborators = [ makeMe() ];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
-
-			mockActiveCollaborators = [
-				makeMe(),
-				makeCollaborator( {
-					collaboratorInfo: {
-						id: 100,
-						name: 'Alice',
-						slug: 'alice',
-						avatar_urls: {},
-						browserType: 'Chrome',
-						enteredAt: BASE_ENTERED_AT + 10000,
-					},
-				} ),
-			];
-			rerender();
-
-			expect( mockCreateNotice ).not.toHaveBeenCalled();
-		} );
-
-		it( 'suppresses leave notifications when userExited is false', () => {
-			( applyFilters as jest.Mock ).mockReturnValue( {
-				userEntered: true,
-				userExited: false,
-				postUpdated: true,
-			} );
-
-			const alice = makeCollaborator();
-			mockActiveCollaborators = [ makeMe(), alice ];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
-
-			mockActiveCollaborators = [ makeMe() ];
-			rerender();
-
-			expect( mockCreateNotice ).not.toHaveBeenCalled();
-		} );
-
-		it( 'suppresses post updated notifications when postUpdated is false', () => {
-			( applyFilters as jest.Mock ).mockReturnValue( {
-				userEntered: true,
-				userExited: true,
-				postUpdated: false,
-			} );
-
-			const alice = makeCollaborator();
-			mockActiveCollaborators = [ makeMe(), alice ];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
-
-			mockLastPostSave = {
-				savedAt: Date.now(),
-				savedByClientId: alice.clientId,
 			};
 			rerender();
 
