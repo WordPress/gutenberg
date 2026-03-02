@@ -22,6 +22,7 @@ import {
 	SelectionType,
 } from '../utils/crdt-user-selections';
 
+import { SelectionDirection } from '../types';
 import type { SelectionState, WPBlockSelection } from '../types';
 import type { YBlocks } from '../utils/crdt-blocks';
 import type {
@@ -80,6 +81,8 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				return;
 			}
 
+			const prevStart = selectionStart;
+			const prevEnd = selectionEnd;
 			selectionStart = newSelectionStart;
 			selectionEnd = newSelectionEnd;
 
@@ -91,6 +94,14 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				selectionStart,
 				selectionEnd,
 				initialPosition
+			);
+
+			// Infer selection direction from which edge moved.
+			const selectionDirection = detectSelectionDirection(
+				prevStart,
+				prevEnd,
+				newSelectionStart,
+				newSelectionEnd
 			);
 
 			// We receive two selection changes in quick succession
@@ -106,7 +117,8 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				const selectionState = getSelectionState(
 					selectionStart,
 					selectionEnd,
-					this.doc
+					this.doc,
+					{ selectionDirection }
 				);
 
 				this.setThrottledLocalStateField(
@@ -324,4 +336,51 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			collaboratorMap: Object.fromEntries( collaboratorMapData ),
 		};
 	}
+}
+
+/**
+ * Detect the direction of a selection change by comparing old and new edges.
+ *
+ * When the user extends a selection backward (e.g. Shift+Left), the
+ * selectionStart edge moves while selectionEnd stays fixed, so the caret
+ * is at the start.  The reverse is true for forward extension.
+ *
+ * @param prevStart - The previous selectionStart.
+ * @param prevEnd   - The previous selectionEnd.
+ * @param newStart  - The new selectionStart.
+ * @param newEnd    - The new selectionEnd.
+ * @return The detected direction, defaulting to Forward when indeterminate.
+ */
+function detectSelectionDirection(
+	prevStart: WPBlockSelection,
+	prevEnd: WPBlockSelection,
+	newStart: WPBlockSelection,
+	newEnd: WPBlockSelection
+): SelectionDirection {
+	const startMoved = ! areBlockSelectionsEqual( prevStart, newStart );
+	const endMoved = ! areBlockSelectionsEqual( prevEnd, newEnd );
+
+	if ( startMoved && ! endMoved ) {
+		return SelectionDirection.Backward;
+	}
+
+	return SelectionDirection.Forward;
+}
+
+/**
+ * Compare two WPBlockSelection objects by value.
+ *
+ * @param a - First selection.
+ * @param b - Second selection.
+ * @return True if all fields are equal.
+ */
+function areBlockSelectionsEqual(
+	a: WPBlockSelection,
+	b: WPBlockSelection
+): boolean {
+	return (
+		a.clientId === b.clientId &&
+		a.attributeKey === b.attributeKey &&
+		a.offset === b.offset
+	);
 }

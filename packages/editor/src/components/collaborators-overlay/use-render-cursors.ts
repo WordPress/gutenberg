@@ -1,5 +1,6 @@
 import {
 	privateApis as coreDataPrivateApis,
+	SelectionDirection,
 	SelectionType,
 } from '@wordpress/core-data';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -27,6 +28,24 @@ export interface CursorData {
 	y: number;
 	height: number;
 	selectionRects?: SelectionRect[];
+}
+
+interface CursorCoords {
+	x: number;
+	y: number;
+	height: number;
+}
+
+/** Common parameters passed to cursor/selection computation helpers. */
+interface CursorContext {
+	editorDocument: Document;
+	overlay: HTMLElement;
+}
+
+/** Resolved selection endpoint returned by resolveSelection(). */
+interface ResolvedEndpoint {
+	textIndex: number | null;
+	localClientId: string | null;
 }
 
 /**
@@ -64,7 +83,12 @@ export function useRenderCursors(
 				return;
 			}
 
-			const results: CursorData[] = [];
+			const cursorContext: CursorContext = {
+				editorDocument: blockEditorDocument,
+				overlay: overlayElement,
+			};
+
+			const cursors: CursorData[] = [];
 
 			sortedUsers.forEach( ( user: any ) => {
 				if ( user.isMe ) {
@@ -81,155 +105,31 @@ export function useRenderCursors(
 					user.collaboratorInfo.avatar_urls
 				);
 
-				let coords: {
-					x: number;
-					y: number;
-					height: number;
-				} | null = null;
-				let selectionRects: SelectionRect[] | undefined;
+				const selectionVisual = computeSelectionVisual(
+					selection,
+					resolveSelection,
+					cursorContext
+				);
 
-				if ( selection.type === SelectionType.None ) {
-					// Nothing selected.
-				} else if ( selection.type === SelectionType.WholeBlock ) {
-					// Don't draw a cursor for a whole block selection.
-				} else if ( selection.type === SelectionType.Cursor ) {
-					const { textIndex, localClientId } =
-						resolveSelection( selection );
-					if ( localClientId ) {
-						coords = getCursorPosition(
-							textIndex,
-							localClientId,
-							blockEditorDocument,
-							overlayElement
-						);
-					}
-				} else if (
-					selection.type === SelectionType.SelectionInOneBlock ||
-					selection.type === SelectionType.SelectionInMultipleBlocks
-				) {
-					const start = resolveSelection( {
-						type: SelectionType.Cursor,
-						cursorPosition: selection.cursorStartPosition,
-					} );
-					const end = resolveSelection( {
-						type: SelectionType.Cursor,
-						cursorPosition: selection.cursorEndPosition,
-					} );
-
-					if (
-						start.localClientId &&
-						end.localClientId &&
-						start.textIndex !== null &&
-						end.textIndex !== null
-					) {
-						let allRects: SelectionRect[] = [];
-
-						if (
-							selection.type === SelectionType.SelectionInOneBlock
-						) {
-							const blockElement =
-								blockEditorDocument.querySelector< HTMLElement >(
-									`[data-block="${ start.localClientId }"]`
-								);
-							if ( blockElement ) {
-								const rects = getSelectionRects(
-									blockElement,
-									start.textIndex,
-									end.textIndex,
-									blockEditorDocument,
-									overlayElement
-								);
-								if ( rects ) {
-									allRects = rects;
-								}
-							}
-						} else {
-							// Multi-block selection.
-							const startBlock =
-								blockEditorDocument.querySelector< HTMLElement >(
-									`[data-block="${ start.localClientId }"]`
-								);
-							const endBlock =
-								blockEditorDocument.querySelector< HTMLElement >(
-									`[data-block="${ end.localClientId }"]`
-								);
-
-							if ( startBlock && endBlock ) {
-								// Start block: from startTextIndex to end of block.
-								const startRects = getSelectionRects(
-									startBlock,
-									start.textIndex,
-									Number.MAX_SAFE_INTEGER,
-									blockEditorDocument,
-									overlayElement
-								);
-								if ( startRects ) {
-									allRects.push( ...startRects );
-								}
-
-								// Intermediate blocks: full content.
-								const intermediateBlocks = getBlocksBetween(
-									start.localClientId,
-									end.localClientId,
-									blockEditorDocument
-								);
-								for ( const intermediateBlock of intermediateBlocks ) {
-									const rects = getFullBlockSelectionRects(
-										intermediateBlock,
-										blockEditorDocument,
-										overlayElement
-									);
-									allRects.push( ...rects );
-								}
-
-								// End block: from 0 to endTextIndex.
-								const endRects = getSelectionRects(
-									endBlock,
-									0,
-									end.textIndex,
-									blockEditorDocument,
-									overlayElement
-								);
-								if ( endRects ) {
-									allRects.push( ...endRects );
-								}
-							}
-						}
-
-						if ( allRects.length > 0 ) {
-							// Place cursor at the END of the selection.
-							const lastRect = allRects[ allRects.length - 1 ];
-							coords = {
-								x: lastRect.x + lastRect.width,
-								y: lastRect.y,
-								height: lastRect.height,
-							};
-							selectionRects = allRects;
-						} else {
-							// Fallback: cursor at start position only.
-							coords = getCursorPosition(
-								start.textIndex,
-								start.localClientId,
-								blockEditorDocument,
-								overlayElement
-							);
-						}
-					}
-				}
-
-				if ( coords ) {
-					results.push( {
+				if ( selectionVisual.coords ) {
+					const cursorData: CursorData = {
 						userName,
 						clientId,
 						color,
 						avatarUrl,
-						...coords,
-						...( selectionRects ? { selectionRects } : {} ),
-					} );
+						...selectionVisual.coords,
+					};
+
+					if ( selectionVisual.selectionRects ) {
+						cursorData.selectionRects =
+							selectionVisual.selectionRects;
+					}
+
+					cursors.push( cursorData );
 				}
 			} );
 
-			setCursorPositions( results );
+			setCursorPositions( cursors );
 		},
 		[ blockEditorDocument, resolveSelection, overlayElement, sortedUsers ]
 	);
@@ -248,6 +148,238 @@ export function useRenderCursors(
 }
 
 /**
+ * Compute cursor coords and optional selection rects for a single user's selection.
+ *
+ * @param selection        - The selection state from the awareness layer.
+ * @param resolveSelection - Resolves a SelectionState to a text index + block clientId.
+ * @param cursorContext    - Shared editor document / overlay references.
+ * @return Cursor coordinates and optional selection rectangles.
+ */
+function computeSelectionVisual(
+	selection: any,
+	resolveSelection: ( sel: any ) => ResolvedEndpoint,
+	cursorContext: CursorContext
+): { coords: CursorCoords | null; selectionRects?: SelectionRect[] } {
+	if (
+		selection.type === SelectionType.None ||
+		selection.type === SelectionType.WholeBlock
+	) {
+		return { coords: null };
+	}
+
+	if ( selection.type === SelectionType.Cursor ) {
+		return computeCursorOnly( selection, resolveSelection, cursorContext );
+	}
+
+	// SelectionInOneBlock or SelectionInMultipleBlocks.
+	return computeTextSelection( selection, resolveSelection, cursorContext );
+}
+
+/**
+ * Compute cursor coordinates for a simple cursor (no highlighted text).
+ *
+ * @param selection        - The selection state.
+ * @param resolveSelection - Resolves a SelectionState to a text index + block clientId.
+ * @param cursorContext    - Shared editor document / overlay references.
+ * @return Cursor coordinates.
+ */
+function computeCursorOnly(
+	selection: any,
+	resolveSelection: ( sel: any ) => ResolvedEndpoint,
+	cursorContext: CursorContext
+): { coords: CursorCoords | null } {
+	const { textIndex, localClientId } = resolveSelection( selection );
+	if ( ! localClientId ) {
+		return { coords: null };
+	}
+	return {
+		coords: getCursorPosition(
+			textIndex,
+			localClientId,
+			cursorContext.editorDocument,
+			cursorContext.overlay
+		),
+	};
+}
+
+/**
+ * Compute cursor coordinates and selection highlight rects for a text selection
+ * (single-block or multi-block).
+ *
+ * @param selection        - The selection state.
+ * @param resolveSelection - Resolves a SelectionState to a text index + block clientId.
+ * @param cursorContext    - Shared editor document / overlay references.
+ * @return Cursor coordinates and optional selection rectangles.
+ */
+function computeTextSelection(
+	selection: any,
+	resolveSelection: ( sel: any ) => ResolvedEndpoint,
+	cursorContext: CursorContext
+): { coords: CursorCoords | null; selectionRects?: SelectionRect[] } {
+	const start = resolveSelection( {
+		type: SelectionType.Cursor,
+		cursorPosition: selection.cursorStartPosition,
+	} );
+	const end = resolveSelection( {
+		type: SelectionType.Cursor,
+		cursorPosition: selection.cursorEndPosition,
+	} );
+
+	if (
+		! start.localClientId ||
+		! end.localClientId ||
+		start.textIndex === null ||
+		end.textIndex === null
+	) {
+		return { coords: null };
+	}
+
+	const allRects =
+		selection.type === SelectionType.SelectionInOneBlock
+			? computeSingleBlockRects( start, end, cursorContext )
+			: computeMultiBlockRects( start, end, cursorContext );
+
+	if ( allRects.length > 0 ) {
+		// Place the cursor at the active end of the selection —
+		// backward means the caret sits at the start.
+		const isReverse =
+			selection.selectionDirection === SelectionDirection.Backward;
+		const activeEnd = isReverse ? start : end;
+
+		return {
+			coords: getCursorPosition(
+				activeEnd.textIndex,
+				activeEnd.localClientId!,
+				cursorContext.editorDocument,
+				cursorContext.overlay
+			),
+			selectionRects: allRects,
+		};
+	}
+
+	// Fallback: cursor at start position only.
+	return {
+		coords: getCursorPosition(
+			start.textIndex,
+			start.localClientId!,
+			cursorContext.editorDocument,
+			cursorContext.overlay
+		),
+	};
+}
+
+/**
+ * Compute selection rects for a selection within a single block.
+ *
+ * @param start         - Resolved start endpoint.
+ * @param end           - Resolved end endpoint.
+ * @param cursorContext - Shared editor document / overlay references.
+ * @return Array of selection rectangles.
+ */
+function computeSingleBlockRects(
+	start: ResolvedEndpoint,
+	end: ResolvedEndpoint,
+	cursorContext: CursorContext
+): SelectionRect[] {
+	const blockElement =
+		cursorContext.editorDocument.querySelector< HTMLElement >(
+			`[data-block="${ start.localClientId }"]`
+		);
+	if ( ! blockElement ) {
+		return [];
+	}
+	return (
+		getSelectionRects(
+			blockElement,
+			start.textIndex!,
+			end.textIndex!,
+			cursorContext.editorDocument,
+			cursorContext.overlay
+		) ?? []
+	);
+}
+
+/**
+ * Compute selection rects for a selection spanning multiple blocks.
+ *
+ * Normalizes to document order — for backward selections the block editor
+ * reports start after end.
+ *
+ * @param start         - Resolved start endpoint.
+ * @param end           - Resolved end endpoint.
+ * @param cursorContext - Shared editor document / overlay references.
+ * @return Array of selection rectangles.
+ */
+function computeMultiBlockRects(
+	start: ResolvedEndpoint,
+	end: ResolvedEndpoint,
+	cursorContext: CursorContext
+): SelectionRect[] {
+	let docFirst = start;
+	let docLast = end;
+	let firstBlock = cursorContext.editorDocument.querySelector< HTMLElement >(
+		`[data-block="${ docFirst.localClientId }"]`
+	);
+	let lastBlock = cursorContext.editorDocument.querySelector< HTMLElement >(
+		`[data-block="${ docLast.localClientId }"]`
+	);
+
+	// Swap to document order if needed.
+	if ( firstBlock && lastBlock && isNodeBefore( lastBlock, firstBlock ) ) {
+		docFirst = end;
+		docLast = start;
+		[ firstBlock, lastBlock ] = [ lastBlock, firstBlock ];
+	}
+
+	if ( ! firstBlock || ! lastBlock ) {
+		return [];
+	}
+
+	const allRects: SelectionRect[] = [];
+
+	// First block: from start offset to end of block.
+	const startRects = getSelectionRects(
+		firstBlock,
+		docFirst.textIndex!,
+		Number.MAX_SAFE_INTEGER,
+		cursorContext.editorDocument,
+		cursorContext.overlay
+	);
+	if ( startRects ) {
+		allRects.push( ...startRects );
+	}
+
+	// Intermediate blocks: full content.
+	const intermediateBlocks = getBlocksBetween(
+		docFirst.localClientId!,
+		docLast.localClientId!,
+		cursorContext.editorDocument
+	);
+	for ( const intermediateBlock of intermediateBlocks ) {
+		const rects = getFullBlockSelectionRects(
+			intermediateBlock,
+			cursorContext.editorDocument,
+			cursorContext.overlay
+		);
+		allRects.push( ...rects );
+	}
+
+	// Last block: from 0 to end offset.
+	const endRects = getSelectionRects(
+		lastBlock,
+		0,
+		docLast.textIndex!,
+		cursorContext.editorDocument,
+		cursorContext.overlay
+	);
+	if ( endRects ) {
+		allRects.push( ...endRects );
+	}
+
+	return allRects;
+}
+
+/**
  * Given a selection, returns the coordinates of the cursor in the block.
  *
  * @param absolutePositionIndex - The absolute position index
@@ -261,7 +393,7 @@ const getCursorPosition = (
 	blockId: string,
 	editorDocument: Document,
 	overlay: HTMLElement
-): { x: number; y: number; height: number } | null => {
+): CursorCoords | null => {
 	if ( absolutePositionIndex === null ) {
 		// An absolute position index can be null if a cursor was set in a block that
 		// has since been deleted.
@@ -606,3 +738,13 @@ const findInnerBlockOffset = (
 	// We didn't find any text nodes. Return the beginning of the block.
 	return { node: blockElement, offset: 0 };
 };
+
+/**
+ * Check if node `a` precedes node `b` in document order.
+ *
+ * @param a - First node.
+ * @param b - Second node.
+ * @return True if `a` comes before `b`.
+ */
+const isNodeBefore = ( a: Node, b: Node ): boolean =>
+	a.compareDocumentPosition( b ) === Node.DOCUMENT_POSITION_FOLLOWING;

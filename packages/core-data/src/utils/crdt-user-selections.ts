@@ -13,16 +13,17 @@ import { CRDT_RECORD_MAP_KEY } from '../sync';
 import type { YPostRecord } from './crdt';
 import type { YBlock, YBlocks } from './crdt-blocks';
 import { getRootMap } from './crdt-utils';
-import type {
-	AbsoluteBlockIndexPath,
-	WPBlockSelection,
-	SelectionState,
-	SelectionNone,
-	SelectionCursor,
-	SelectionInOneBlock,
-	SelectionInMultipleBlocks,
-	SelectionWholeBlock,
-	CursorPosition,
+import type { SelectionDirection } from '../types';
+import {
+	type AbsoluteBlockIndexPath,
+	type WPBlockSelection,
+	type SelectionState,
+	type SelectionNone,
+	type SelectionCursor,
+	type SelectionInOneBlock,
+	type SelectionInMultipleBlocks,
+	type SelectionWholeBlock,
+	type CursorPosition,
 } from '../types';
 
 /**
@@ -44,16 +45,20 @@ export enum SelectionType {
  * differ between the block-editor store and the Yjs document (e.g. in "Show
  * Template" mode).
  *
- * @param selectionStart - The start position of the selection
- * @param selectionEnd   - The end position of the selection
- * @param yDoc           - The Yjs document
+ * @param selectionStart             - The start position of the selection
+ * @param selectionEnd               - The end position of the selection
+ * @param yDoc                       - The Yjs document
+ * @param options                    - Optional parameters
+ * @param options.selectionDirection - The direction of the selection (forward or backward)
  * @return The SelectionState
  */
 export function getSelectionState(
 	selectionStart: WPBlockSelection,
 	selectionEnd: WPBlockSelection,
-	yDoc: Y.Doc
+	yDoc: Y.Doc,
+	options?: { selectionDirection?: SelectionDirection }
 ): SelectionState {
+	const { selectionDirection } = options ?? {};
 	const ymap = getRootMap< YPostRecord >( yDoc, CRDT_RECORD_MAP_KEY );
 	const yBlocks = ymap.get( 'blocks' );
 
@@ -122,6 +127,7 @@ export function getSelectionState(
 			type: SelectionType.SelectionInOneBlock,
 			cursorStartPosition,
 			cursorEndPosition,
+			selectionDirection,
 		};
 	}
 
@@ -137,6 +143,7 @@ export function getSelectionState(
 		type: SelectionType.SelectionInMultipleBlocks,
 		cursorStartPosition,
 		cursorEndPosition,
+		selectionDirection,
 	};
 }
 
@@ -315,7 +322,9 @@ export function areSelectionsStatesEqual(
 				areCursorPositionsEqual(
 					selection1.cursorEndPosition,
 					( selection2 as SelectionInOneBlock ).cursorEndPosition
-				)
+				) &&
+				selection1.selectionDirection ===
+					( selection2 as SelectionInOneBlock ).selectionDirection
 			);
 
 		case SelectionType.SelectionInMultipleBlocks:
@@ -329,7 +338,10 @@ export function areSelectionsStatesEqual(
 					selection1.cursorEndPosition,
 					( selection2 as SelectionInMultipleBlocks )
 						.cursorEndPosition
-				)
+				) &&
+				selection1.selectionDirection ===
+					( selection2 as SelectionInMultipleBlocks )
+						.selectionDirection
 			);
 		case SelectionType.WholeBlock:
 			return Y.compareRelativePositions(
