@@ -10,6 +10,7 @@ import type { Y } from '@wordpress/sync';
 import { getSyncManager } from '../sync';
 import type {
 	PostEditorAwarenessState as ActiveCollaborator,
+	PostSaveEvent,
 	YDocDebugData,
 } from '../awareness/types';
 import type { SelectionState } from '../types';
@@ -156,12 +157,6 @@ export function useIsDisconnected(
 ): boolean {
 	return usePostEditorAwarenessState( postId, postType )
 		.isCurrentCollaboratorDisconnected;
-}
-
-export interface PostSaveEvent {
-	savedAt: number;
-	savedByClientId: number;
-	postStatus: string | undefined;
 }
 
 /**
