@@ -138,6 +138,7 @@ function _gutenberg_get_provider_settings(): array {
 		$registry_data = array_filter(
 			array(
 				'name'            => $provider_metadata->getName(),
+				'description'     => method_exists( $provider_metadata, 'getDescription' ) ? $provider_metadata->getDescription() : null,
 				'credentials_url' => $provider_metadata->getCredentialsUrl(),
 			)
 		);
