@@ -263,51 +263,45 @@ test.describe( 'PHP-only auto-register blocks', () => {
 			page.getByLabel( 'Emoji', { exact: true } )
 		).toBeVisible();
 	} );
-} );
 
-test.describe( 'PHP-only auto-register blocks with bindings', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activatePlugin(
-			'gutenberg-test-server-side-rendered-block'
-		);
-		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
-	} );
+	test.describe( 'with block bindings', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
-		await requestUtils.deactivatePlugin(
-			'gutenberg-test-server-side-rendered-block'
-		);
-	} );
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
 
-	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
-	} );
-
-	test( 'should reflect bound attribute values in auto-generated inspector controls', async ( {
-		editor,
-		page,
-	} ) => {
-		// Insert the block with a binding on the title attribute.
-		await editor.insertBlock( {
-			name: 'test/auto-register-with-controls',
-			attributes: {
-				metadata: {
-					bindings: {
-						title: {
-							source: 'testing/complete-source',
-							args: { key: 'text_field' },
+		test( 'should reflect bound attribute values in auto-generated inspector controls', async ( {
+			editor,
+			page,
+		} ) => {
+			// Insert the block with a binding on the title attribute.
+			await editor.insertBlock( {
+				name: 'test/auto-register-with-controls',
+				attributes: {
+					metadata: {
+						bindings: {
+							title: {
+								source: 'testing/complete-source',
+								args: { key: 'text_field' },
+							},
 						},
 					},
 				},
-			},
+			} );
+
+			await editor.openDocumentSettingsSidebar();
+
+			// Controls should show bound values from the source,
+			// not the block attribute defaults.
+			const titleInput = page.getByLabel( 'Title' );
+			await expect( titleInput ).toHaveValue( 'Text Field Value' );
 		} );
-
-		await editor.openDocumentSettingsSidebar();
-
-		// The Title control should show the bound value from the source,
-		// not the block attribute default ("My Emoji Collection").
-		const titleInput = page.getByLabel( 'Title' );
-		await expect( titleInput ).toHaveValue( 'Text Field Value' );
 	} );
 } );
