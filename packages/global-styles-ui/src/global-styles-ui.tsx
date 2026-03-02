@@ -32,6 +32,7 @@ import ScreenColorPalette from './screen-color-palette';
 import ScreenBackground from './screen-background';
 import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';
 import ScreenLayout from './screen-layout';
+import ScreenSiteLogoAndIcon from './screen-site-logo-and-icon';
 import ScreenStyleVariations from './screen-style-variations';
 import ScreenCSS from './screen-css';
 import ScreenRevisions from './screen-revisions';
@@ -176,6 +177,9 @@ export function GlobalStylesUI( {
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/colors">
 						<ScreenColors />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/site-logo-and-icon">
+						<ScreenSiteLogoAndIcon />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/typography">
 						<ScreenTypography />

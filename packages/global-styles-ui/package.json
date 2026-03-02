@@ -47,6 +47,7 @@
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
+		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
@@ -59,7 +60,9 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/notices": "file:../notices",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/url": "file:../url",
 		"change-case": "^4.1.2",
 		"clsx": "^2.1.0",
 		"colord": "^2.7.0"

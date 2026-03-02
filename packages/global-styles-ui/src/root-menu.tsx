@@ -8,6 +8,7 @@ import {
 	color,
 	layout,
 	shadow as shadowIcon,
+	siteLogo,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 // @ts-expect-error: Not typed yet.
@@ -60,6 +61,12 @@ function RootMenu() {
 						{ __( 'Colors' ) }
 					</NavigationButtonAsItem>
 				) }
+				<NavigationButtonAsItem
+					icon={ siteLogo }
+					path="/site-logo-and-icon"
+				>
+					{ __( 'Site Logo & Icon' ) }
+				</NavigationButtonAsItem>
 				{ hasBackgroundPanel && (
 					<NavigationButtonAsItem
 						icon={ background }

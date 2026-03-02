@@ -270,3 +270,44 @@
 .global-styles-ui-gradient-palette-panel {
 	padding: variables.$grid-unit-20;
 }
+
+// Site Logo & Icon screen
+// Mirrors block-library-utils__media-control styles exactly.
+.global-styles-ui-site-identity__media-control {
+	// Ensure the dropzone is positioned to the size of the item.
+	position: relative;
+
+	// Since there is no option to skip rendering the drag'n'drop icon in drop
+	// zone, we hide it for now.
+	.components-drop-zone__content-icon {
+		display: none;
+	}
+
+	button.components-button {
+		color: colors.$gray-900;
+		box-shadow: inset 0 0 0 1px colors.$gray-400;
+		width: 100%;
+		display: block;
+		height: variables.$grid-unit-50;
+
+		&:hover {
+			color: var(--wp-admin-theme-color);
+		}
+
+		&:focus {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
+	}
+
+	.components-dropdown {
+		display: block;
+	}
+
+	img {
+		width: 20px;
+		min-width: 20px;
+		aspect-ratio: 1;
+		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+		border-radius: 2px;
+	}
+}
