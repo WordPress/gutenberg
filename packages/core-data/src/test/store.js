@@ -36,6 +36,10 @@ function createTestRegistry() {
 		__unstable_rest_base: 'posts',
 		supportsPagination: true,
 		revisionKey: 'id',
+		getRevisionsUrl: ( parentId, revisionId ) =>
+			`/wp/v2/posts/${ parentId }/revisions${
+				revisionId ? '/' + revisionId : ''
+			}`,
 	};
 
 	// Add the post entity to the store
@@ -256,5 +260,60 @@ describe( 'clearEntityRecordEdits', () => {
 		expect(
 			select.getEditedEntityRecord( 'postType', 'post', post.id )
 		).toEqual( select.getRawEntityRecord( 'postType', 'post', post.id ) );
+	} );
+} );
+
+describe( 'getRevisions', () => {
+	const KIND = 'postType';
+	const NAME = 'post';
+	const RECORD_KEY = 1;
+	const REVISIONS = [ { id: 1 }, { id: 2 }, { id: 3 } ];
+
+	let registry;
+
+	beforeEach( () => {
+		registry = createTestRegistry();
+		triggerFetch.mockReset();
+	} );
+
+	it( 'preserves all revisions when getRevision is called after getRevisions with the same query', async () => {
+		triggerFetch.mockImplementation( ( { path } ) => {
+			if ( path && path.includes( 'revisions' ) ) {
+				return Promise.resolve( {
+					json: () => Promise.resolve( REVISIONS ),
+					headers: { get: () => String( REVISIONS.length ) },
+				} );
+			}
+			return Promise.resolve( {} );
+		} );
+
+		const resolveSelectStore = registry.resolveSelect( coreDataStore );
+
+		await resolveSelectStore.getRevisions( KIND, NAME, RECORD_KEY, {
+			context: 'edit',
+		} );
+
+		triggerFetch.mockImplementation( ( { path } ) => {
+			if ( path && path.includes( 'revisions' ) ) {
+				return Promise.resolve( REVISIONS[ 0 ] );
+			}
+			return Promise.resolve( {} );
+		} );
+		triggerFetch.mockClear();
+
+		// Call getRevision for revision 1 with the same query.
+		// With the fix: resolver is already marked done → no API call.
+		// Without the fix: resolver fires → receives single revision with
+		// { context: 'edit' } query → getMergedItemIds corrupts stored IDs.
+		await resolveSelectStore.getRevision( KIND, NAME, RECORD_KEY, 1, {
+			context: 'edit',
+		} );
+
+		expect( triggerFetch ).not.toHaveBeenCalled();
+
+		const allRevisions = registry
+			.select( coreDataStore )
+			.getRevisions( KIND, NAME, RECORD_KEY, { context: 'edit' } );
+		expect( allRevisions ).toHaveLength( 3 );
 	} );
 } );
