@@ -149,7 +149,7 @@ function _gutenberg_get_provider_settings(): array {
 		} else {
 			$providers[ $provider_id ] = array_merge(
 				array(
-					'name'            => '',
+					'name'            => ucwords( $provider_id ),
 					'description'     => '',
 					'credentials_url' => null,
 				),
