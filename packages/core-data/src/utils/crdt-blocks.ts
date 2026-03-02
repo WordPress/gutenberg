@@ -532,6 +532,43 @@ function isRichTextAttribute(
 let localDoc: Y.Doc;
 
 /**
+ * Convert a cursor offset in rendered text (visible characters only) to the
+ * corresponding offset in a raw HTML string. HTML tags are skipped so they
+ * don't count toward the rendered position.
+ *
+ * This is needed because Gutenberg's selectionStart.offset is measured in
+ * rendered-text coordinates, but the CRDT diff operates on the serialized
+ * HTML string where tags like `<strong>` occupy additional characters.
+ *
+ * @param html           The serialized HTML string.
+ * @param renderedOffset The cursor offset in rendered text.
+ * @return The corresponding offset in the HTML string.
+ */
+function renderedOffsetToHtmlOffset(
+	html: string,
+	renderedOffset: number
+): number {
+	let rendered = 0;
+	let inTag = false;
+
+	for ( let i = 0; i < html.length; i++ ) {
+		if ( rendered === renderedOffset ) {
+			return i;
+		}
+
+		if ( html[ i ] === '<' ) {
+			inTag = true;
+		} else if ( html[ i ] === '>' ) {
+			inTag = false;
+		} else if ( ! inTag ) {
+			rendered++;
+		}
+	}
+
+	return html.length;
+}
+
+/**
  * Given a Y.Text object and an updated string value, diff the new value and
  * apply the delta to the Y.Text.
  *
@@ -565,9 +602,18 @@ export function mergeRichTextUpdate(
 
 	const currentValueAsDelta = new Delta( blockYText.toDelta() );
 	const updatedValueAsDelta = new Delta( localYText.toDelta() );
+
+	// The cursor position from the editor (selectionStart.offset) is in
+	// rendered-text coordinates (visible characters only). The diff operates on
+	// the raw HTML string, so we must convert to HTML-string coordinates.
+	const htmlCursorPosition =
+		cursorPosition !== null
+			? renderedOffsetToHtmlOffset( updatedValue, cursorPosition )
+			: null;
+
 	const deltaDiff = currentValueAsDelta.diffWithCursor(
 		updatedValueAsDelta,
-		cursorPosition
+		htmlCursorPosition
 	);
 
 	blockYText.applyDelta( deltaDiff.ops );

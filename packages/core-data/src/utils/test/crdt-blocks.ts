@@ -1416,4 +1416,104 @@ describe( 'crdt-blocks', () => {
 			} );
 		} );
 	} );
+
+	describe( 'inline markup cursor position handling', () => {
+		// The cursor position from selectionStart.offset is in rendered-text
+		// coordinates (visible characters only), but the diff operates on the
+		// raw HTML string. Without proper conversion, the cursor hint in
+		// diffWithCursor can match a character inside an HTML tag and produce
+		// garbled output.
+
+		it( 'should not garble HTML when inserting a character that matches a tag character', () => {
+			// Old HTML: "s<strong>x</strong>b" — rendered: "sxb"
+			// User types 's' after the bold text: "sxsb" with cursor at 3
+			// Without fix: cursor=3 lands inside <strong> tag, matches 's',
+			// and splits the tag producing "s<sstrong>x</strong>b"
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, 's<strong>x</strong>b' );
+
+			mergeRichTextUpdate( yText, 's<strong>x</strong>sb', 3 );
+
+			expect( yText.toString() ).toBe( 's<strong>x</strong>sb' );
+		} );
+
+		it( 'should handle typing before any HTML tags', () => {
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, 'ab<strong>cd</strong>' );
+
+			// Rendered: "abcd" → "axbcd" with cursor at 2
+			mergeRichTextUpdate( yText, 'axb<strong>cd</strong>', 2 );
+
+			expect( yText.toString() ).toBe( 'axb<strong>cd</strong>' );
+		} );
+
+		it( 'should handle typing after closing tag', () => {
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, '<em>hello</em> world' );
+
+			// Rendered: "hello world" → "hello world!" with cursor at 12
+			mergeRichTextUpdate( yText, '<em>hello</em> world!', 12 );
+
+			expect( yText.toString() ).toBe( '<em>hello</em> world!' );
+		} );
+
+		it( 'should handle deleting a character after inline markup', () => {
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, '<strong>hello</strong> world' );
+
+			// Rendered: "hello world" → "hello worl" with cursor at 10
+			mergeRichTextUpdate( yText, '<strong>hello</strong> worl', 10 );
+
+			expect( yText.toString() ).toBe( '<strong>hello</strong> worl' );
+		} );
+
+		it( 'should handle emoji combined with inline markup', () => {
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, '<strong>😀</strong>b' );
+
+			// Rendered: "😀b" → "😀xb" with cursor at 3 (😀=2, x=1)
+			mergeRichTextUpdate( yText, '<strong>😀</strong>xb', 3 );
+
+			expect( yText.toString() ).toBe( '<strong>😀</strong>xb' );
+		} );
+
+		it( 'should handle multiple inline tags', () => {
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, '<strong>a</strong><em>b</em>c' );
+
+			// Rendered: "abc" → "abxc" with cursor at 3
+			mergeRichTextUpdate( yText, '<strong>a</strong><em>b</em>xc', 3 );
+
+			expect( yText.toString() ).toBe( '<strong>a</strong><em>b</em>xc' );
+		} );
+
+		it( 'should handle nested inline tags', () => {
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, '<strong><em>ab</em></strong>c' );
+
+			// Rendered: "abc" → "abxc" with cursor at 3
+			mergeRichTextUpdate( yText, '<strong><em>ab</em></strong>xc', 3 );
+
+			expect( yText.toString() ).toBe( '<strong><em>ab</em></strong>xc' );
+		} );
+
+		it( 'should handle link tags with attributes', () => {
+			const yText = doc.getText( 'test' );
+			yText.insert(
+				0,
+				'Click <a href="https://example.com">here</a> now'
+			);
+
+			// Rendered: "Click here now" → "Click here now!" with cursor at 15
+			mergeRichTextUpdate(
+				yText,
+				'Click <a href="https://example.com">here</a> now!',
+				15
+			);
+
+			expect( yText.toString() ).toBe(
+				'Click <a href="https://example.com">here</a> now!'
+			);
+		} );
+	} );
 } );
