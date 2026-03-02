@@ -14,6 +14,7 @@ import { batch, effect } from '@preact/signals';
 import registerDirectives, { routerRegions } from './directives';
 import {
 	initialVdom,
+	initialVdomPromise,
 	hydrateRegions,
 	getRegionRootFragment,
 } from './hydration';
