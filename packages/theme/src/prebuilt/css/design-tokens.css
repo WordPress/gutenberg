@@ -109,6 +109,11 @@
 	--wpds-dimension-gap-sm: 8px; /* Small gap */
 	--wpds-dimension-gap-xl: 24px; /* Extra large gap */
 	--wpds-dimension-gap-xs: 4px; /* Extra small gap */
+	--wpds-dimension-measure-lg: 720px; /* Large measure (width) */
+	--wpds-dimension-measure-md: 560px; /* Medium measure (width) */
+	--wpds-dimension-measure-sm: 400px; /* Small measure (width) */
+	--wpds-dimension-measure-xl: 960px; /* Extra large measure (width) */
+	--wpds-dimension-measure-xs: 320px; /* Extra small measure (width) */
 	--wpds-dimension-padding-2xl: 24px; /* 2x extra large padding */
 	--wpds-dimension-padding-3xl: 32px; /* 3x extra large padding */
 	--wpds-dimension-padding-lg: 16px; /* Large padding */
@@ -188,6 +193,11 @@
 	--wpds-dimension-gap-sm: 8px; /* Small gap */
 	--wpds-dimension-gap-xl: 24px; /* Extra large gap */
 	--wpds-dimension-gap-xs: 4px; /* Extra small gap */
+	--wpds-dimension-measure-lg: 720px; /* Large measure (width) */
+	--wpds-dimension-measure-md: 560px; /* Medium measure (width) */
+	--wpds-dimension-measure-sm: 400px; /* Small measure (width) */
+	--wpds-dimension-measure-xl: 960px; /* Extra large measure (width) */
+	--wpds-dimension-measure-xs: 320px; /* Extra small measure (width) */
 	--wpds-dimension-padding-2xl: 24px; /* 2x extra large padding */
 	--wpds-dimension-padding-3xl: 32px; /* 3x extra large padding */
 	--wpds-dimension-padding-lg: 16px; /* Large padding */
