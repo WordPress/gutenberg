@@ -20,6 +20,7 @@ interface ProviderData {
 	name: string;
 	description: string;
 	credentialsUrl: string | null;
+	authenticationMethod: 'api_key' | 'none';
 	settings: string[];
 }
 
@@ -61,7 +62,7 @@ const ConnectedBadge = () => (
 	</span>
 );
 
-interface ConnectorConfig {
+interface ApiKeyConnectorConfig {
 	pluginSlug: string;
 	settingName: string;
 	helpUrl?: string;
@@ -69,7 +70,7 @@ interface ConnectorConfig {
 	Logo?: React.ComponentType;
 }
 
-function ProviderConnector( {
+function ApiKeyProviderConnector( {
 	label,
 	description,
 	pluginSlug,
@@ -77,7 +78,7 @@ function ProviderConnector( {
 	helpUrl,
 	helpLabel,
 	Logo,
-}: ConnectorRenderProps & ConnectorConfig ) {
+}: ConnectorRenderProps & ApiKeyConnectorConfig ) {
 	const {
 		pluginStatus,
 		isExpanded,
@@ -143,6 +144,10 @@ export function registerDefaultConnectors() {
 	const providers = getProviderData();
 
 	for ( const [ providerId, data ] of Object.entries( providers ) ) {
+		if ( data.authenticationMethod !== 'api_key' ) {
+			continue;
+		}
+
 		const settingName = data.settings[ 0 ];
 		if ( ! settingName ) {
 			continue;
@@ -156,7 +161,7 @@ export function registerDefaultConnectors() {
 			label: data.name,
 			description: data.description,
 			render: ( props: ConnectorRenderProps ) => (
-				<ProviderConnector
+				<ApiKeyProviderConnector
 					{ ...props }
 					pluginSlug={ `ai-provider-for-${ providerId }` }
 					settingName={ settingName }
