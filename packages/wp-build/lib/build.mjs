@@ -228,6 +228,7 @@ function createStyleBundlingPlugins( workingDir ) {
 		// Handle CSS modules (.module.css and .module.scss)
 		sassPlugin( {
 			embedded: true,
+			sourceMap: false,
 			filter: /\.module\.(css|scss)$/,
 			transform: compileInlineStyle( { cssModules: true } ),
 			type: inlineStyle,
@@ -237,6 +238,7 @@ function createStyleBundlingPlugins( workingDir ) {
 		// Note: .module.css and .module.scss already handled by plugin above
 		sassPlugin( {
 			embedded: true,
+			sourceMap: false,
 			filter: /\.(css|scss)$/,
 			transform: compileInlineStyle(),
 			type: inlineStyle,
