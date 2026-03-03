@@ -48,6 +48,7 @@ export const LayoutTable = {
 		hasClickableItems: true,
 		perPageSizes: [ 10, 25, 50, 100 ],
 		showMedia: true,
+		scrollY: 'wrapper',
 	},
 	argTypes: {
 		backgroundColor: {
@@ -74,6 +75,12 @@ export const LayoutTable = {
 		showMedia: {
 			control: 'boolean',
 			description: 'Whether to display the media field',
+		},
+		scrollY: {
+			control: 'select',
+			options: [ 'wrapper', 'table' ],
+			description:
+				'Where vertical scrolling occurs. Use "table" to keep filters and actions fixed while the table body scrolls.',
 		},
 	},
 };

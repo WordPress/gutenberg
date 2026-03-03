@@ -19,6 +19,7 @@ export const LayoutTableComponent = ( {
 	groupByLabel = true,
 	perPageSizes = [ 10, 25, 50, 100 ],
 	showMedia = true,
+	scrollY = 'wrapper',
 }: {
 	backgroundColor?: string;
 	hasClickableItems?: boolean;
@@ -26,13 +27,16 @@ export const LayoutTableComponent = ( {
 	groupByLabel?: boolean;
 	perPageSizes?: number[];
 	showMedia?: boolean;
+	scrollY?: 'wrapper' | 'table';
 } ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_TABLE,
 		search: '',
 		page: 1,
 		perPage: 10,
-		layout: {},
+		layout: {
+			scrollY,
+		},
 		filters: [],
 		fields: [ 'categories' ],
 		titleField: 'title',
@@ -45,6 +49,10 @@ export const LayoutTableComponent = ( {
 		setView( ( prevView ) => {
 			return {
 				...prevView,
+				layout: {
+					...prevView.layout,
+					scrollY,
+				},
 				groupBy: groupBy
 					? {
 							field: 'type',
@@ -53,9 +61,9 @@ export const LayoutTableComponent = ( {
 					  }
 					: undefined,
 				showMedia,
-			};
+			} as View;
 		} );
-	}, [ groupBy, groupByLabel, showMedia ] );
+	}, [ groupBy, groupByLabel, showMedia, scrollY ] );
 
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
@@ -65,6 +73,7 @@ export const LayoutTableComponent = ( {
 			style={
 				{
 					'--wp-dataviews-color-background': backgroundColor,
+					height: scrollY === 'table' ? '400px' : undefined,
 				} as React.CSSProperties
 			}
 		>
