@@ -2,20 +2,24 @@
  * Internal dependencies
  */
 import { test, expect } from './fixtures';
+import { pressKey, LINE_START_KEY } from './fixtures/keyboard-utils';
 
 test.describe( 'Collaboration - Selection Rendering', () => {
-	test( 'Single-block text selection renders highlight rectangles on the other user screen', async ( {
+	test( 'Text selection is visible to other users', async ( {
 		collaborationUtils,
 		requestUtils,
 		editor,
 		page,
 	} ) => {
 		const post = await requestUtils.createPost( {
-			title: 'Selection Test - Single Block',
+			title: 'Selection Test - Forward Keyboard',
 			status: 'draft',
 			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openCollaborativeSession( post.id );
+		// Dock the block toolbar at the top so the floating popover
+		// doesn't overlap other paragraphs during clicks.
+		await editor.setIsFixedToolbar( true );
 
 		const { page2 } = collaborationUtils;
 
@@ -37,18 +41,15 @@ test.describe( 'Collaboration - Selection Rendering', () => {
 				},
 			] );
 
-		// User A selects "World" (characters 6-11) in the first block.
-		await page.evaluate( () => {
-			const blocks = window.wp.data
-				.select( 'core/block-editor' )
-				.getBlockOrder();
-			window.wp.data.dispatch( 'core/block-editor' ).selectionChange( {
-				clientId: blocks[ 0 ],
-				attributeKey: 'content',
-				startOffset: 6,
-				endOffset: 11,
-			} );
-		} );
+		// Click the paragraph to place the cursor inside the contenteditable,
+		// then forward-select "World" (offsets 6-11).
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click();
+		await page.keyboard.press( LINE_START_KEY );
+		await pressKey( page, 'ArrowRight', 6 );
+		await pressKey( page, 'Shift+ArrowRight', 5 );
 
 		// User B should see selection highlight rectangles after sync.
 		const editorFrame = page2.frameLocator(
@@ -70,18 +71,21 @@ test.describe( 'Collaboration - Selection Rendering', () => {
 		expect( boundingBox!.height ).toBeGreaterThan( 0 );
 	} );
 
-	test( 'Multi-block text selection renders highlight rectangles across blocks', async ( {
+	test( 'Text selection across two blocks renders selections in both blocks', async ( {
 		collaborationUtils,
 		requestUtils,
 		editor,
 		page,
 	} ) => {
 		const post = await requestUtils.createPost( {
-			title: 'Selection Test - Multi Block',
+			title: 'Selection Test - Cross Block Keyboard',
 			status: 'draft',
 			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openCollaborativeSession( post.id );
+		// Dock the block toolbar at the top so the floating popover
+		// doesn't overlap other paragraphs during clicks.
+		await editor.setIsFixedToolbar( true );
 
 		const { page2 } = collaborationUtils;
 
@@ -111,17 +115,16 @@ test.describe( 'Collaboration - Selection Rendering', () => {
 				},
 			] );
 
-		// User A makes a multi-block selection spanning both paragraphs.
-		await page.evaluate( () => {
-			const blocks = window.wp.data
-				.select( 'core/block-editor' )
-				.getBlockOrder();
-			window.wp.data
-				.dispatch( 'core/block-editor' )
-				.multiSelect( blocks[ 0 ], blocks[ 1 ] );
-		} );
+		// Click the first paragraph to focus it.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click();
+		await page.keyboard.press( LINE_START_KEY );
+		await pressKey( page, 'ArrowRight', 6 );
+		await page.keyboard.press( 'Shift+ArrowDown' );
 
-		// User B should see selection highlight rectangles after sync.
+		// User B should see selection rects spanning both blocks.
 		const editorFrame = page2.frameLocator(
 			'iframe[name="editor-canvas"]'
 		);
@@ -129,10 +132,19 @@ test.describe( 'Collaboration - Selection Rendering', () => {
 			'.collaborators-overlay-selection-rect'
 		);
 
-		// Multi-block selection should produce at least 2 rects (one per block).
+		// At least 2 rects: one for each block in the selection.
 		await expect
 			.poll( () => selectionRects.count(), { timeout: 15000 } )
 			.toBeGreaterThanOrEqual( 2 );
+
+		// Verify all rects have non-zero dimensions.
+		const count = await selectionRects.count();
+		for ( let i = 0; i < count; i++ ) {
+			const box = await selectionRects.nth( i ).boundingBox();
+			expect( box ).toBeTruthy();
+			expect( box!.width ).toBeGreaterThan( 0 );
+			expect( box!.height ).toBeGreaterThan( 0 );
+		}
 	} );
 
 	test( 'Clearing a selection removes highlight rectangles', async ( {
@@ -147,6 +159,9 @@ test.describe( 'Collaboration - Selection Rendering', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openCollaborativeSession( post.id );
+		// Dock the block toolbar at the top so the floating popover
+		// doesn't overlap other paragraphs during clicks.
+		await editor.setIsFixedToolbar( true );
 
 		const { page2 } = collaborationUtils;
 
@@ -168,18 +183,13 @@ test.describe( 'Collaboration - Selection Rendering', () => {
 				},
 			] );
 
-		// User A selects text in the paragraph.
-		await page.evaluate( () => {
-			const blocks = window.wp.data
-				.select( 'core/block-editor' )
-				.getBlockOrder();
-			window.wp.data.dispatch( 'core/block-editor' ).selectionChange( {
-				clientId: blocks[ 0 ],
-				attributeKey: 'content',
-				startOffset: 0,
-				endOffset: 6,
-			} );
-		} );
+		// User A selects text via keyboard.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click();
+		await page.keyboard.press( LINE_START_KEY );
+		await pressKey( page, 'Shift+ArrowRight', 6 );
 
 		const editorFrame = page2.frameLocator(
 			'iframe[name="editor-canvas"]'
@@ -194,17 +204,7 @@ test.describe( 'Collaboration - Selection Rendering', () => {
 			.toBeGreaterThan( 0 );
 
 		// User A collapses the selection to a cursor (no text highlighted).
-		await page.evaluate( () => {
-			const blocks = window.wp.data
-				.select( 'core/block-editor' )
-				.getBlockOrder();
-			window.wp.data.dispatch( 'core/block-editor' ).selectionChange( {
-				clientId: blocks[ 0 ],
-				attributeKey: 'content',
-				startOffset: 0,
-				endOffset: 0,
-			} );
-		} );
+		await page.keyboard.press( 'ArrowLeft' );
 
 		// Selection rects should disappear on User B's side.
 		await expect
