@@ -1,5 +1,4 @@
 @use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/mixins" as *;
 
 .media-upload-modal {
 	.components-modal__header {
@@ -22,7 +21,4 @@
 		padding-bottom: $grid-unit-10;
 	}
 
-	.media-upload-modal__snackbar {
-		@include snackbar-container();
-	}
 }

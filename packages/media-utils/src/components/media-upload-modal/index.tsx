@@ -26,7 +26,7 @@ import {
 	mediaThumbnailField,
 	mimeTypeField,
 } from '@wordpress/media-fields';
-import { store as noticesStore, SnackbarNotices } from '@wordpress/notices';
+import { store as noticesStore } from '@wordpress/notices';
 import { isBlobURL } from '@wordpress/blob';
 
 /**
@@ -42,9 +42,6 @@ const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 // Layout constants - matching the picker layout types
 const LAYOUT_PICKER_GRID = 'pickerGrid';
 const LAYOUT_PICKER_TABLE = 'pickerTable';
-
-// Custom notices context for the media modal
-const NOTICES_CONTEXT = 'media-modal';
 
 // Notice ID - reused for all upload-related notices to prevent flooding
 const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
@@ -352,7 +349,7 @@ export function MediaUploadModal( {
 					),
 					{
 						type: 'snackbar',
-						context: NOTICES_CONTEXT,
+
 						id: NOTICE_ID_UPLOAD_PROGRESS,
 					}
 				);
@@ -387,7 +384,6 @@ export function MediaUploadModal( {
 			// Show error notice (replaces progress notice via ID)
 			createErrorNotice( error.message, {
 				type: 'snackbar',
-				context: NOTICES_CONTEXT,
 				id: NOTICE_ID_UPLOAD_PROGRESS,
 			} );
 		},
@@ -413,7 +409,7 @@ export function MediaUploadModal( {
 					),
 					{
 						type: 'snackbar',
-						context: NOTICES_CONTEXT,
+
 						id: NOTICE_ID_UPLOAD_PROGRESS,
 						explicitDismiss: true,
 					}
@@ -533,7 +529,7 @@ export function MediaUploadModal( {
 							),
 							{
 								type: 'snackbar',
-								context: NOTICES_CONTEXT,
+
 								id: NOTICE_ID_UPLOAD_PROGRESS,
 								explicitDismiss: true,
 							}
@@ -564,10 +560,6 @@ export function MediaUploadModal( {
 				search={ search }
 				searchLabel={ searchLabel }
 				itemListLabel={ __( 'Media items' ) }
-			/>
-			<SnackbarNotices
-				className="media-upload-modal__snackbar"
-				context={ NOTICES_CONTEXT }
 			/>
 		</Modal>
 	);

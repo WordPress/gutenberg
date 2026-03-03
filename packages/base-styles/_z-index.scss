@@ -112,8 +112,8 @@ $z-layers: (
 	// Below the block toolbar.
 	".block-editor-grid-visualizer": 30,
 
-	// Show snackbars above everything (similar to popovers)
-	".components-snackbar-list": 100000,
+	// Show snackbars above modals so transient notifications remain visible.
+	".components-snackbar-list": 200000,
 
 	// Show modal under the wp-admin menus and the popover
 	".components-modal__screen-overlay": 100000,
