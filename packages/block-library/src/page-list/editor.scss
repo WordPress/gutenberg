@@ -68,3 +68,17 @@
 .wp-block-page-list__loading-indicator-container {
 	padding: $grid-unit-10 $grid-unit-15;
 }
+
+// Page creator appender button.
+.wp-block-page-list__appender-toggle.components-button {
+	background: $gray-900;
+	color: $white;
+	padding: 0;
+	min-width: $button-size-small;
+	height: $button-size-small;
+
+	&:hover {
+		color: $white;
+		background: var(--wp-admin-theme-color);
+	}
+}
