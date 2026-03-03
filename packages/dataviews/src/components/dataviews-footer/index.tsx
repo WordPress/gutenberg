@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { useContext } from '@wordpress/element';
@@ -14,6 +19,7 @@ import {
 	useSomeItemHasAPossibleBulkAction,
 } from '../dataviews-bulk-actions';
 import { LAYOUT_GRID, LAYOUT_TABLE } from '../../constants';
+import { useDelayedLoading } from '../../hooks/use-delayed-loading';
 
 const EMPTY_ARRAY: [] = [];
 
@@ -23,30 +29,51 @@ export default function DataViewsFooter() {
 		paginationInfo: { totalItems = 0, totalPages },
 		data,
 		actions = EMPTY_ARRAY,
+		isLoading,
+		hasInitiallyLoaded,
+		hasInfiniteScrollHandler,
 	} = useContext( DataViewsContext );
+
+	const isRefreshing =
+		!! isLoading &&
+		hasInitiallyLoaded &&
+		! hasInfiniteScrollHandler &&
+		!! data?.length;
+
+	const isDelayedRefreshing = useDelayedLoading( !! isRefreshing );
+
 	const hasBulkActions =
 		useSomeItemHasAPossibleBulkAction( actions, data ) &&
 		[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type );
 
 	if (
-		! totalItems ||
-		! totalPages ||
-		( totalPages <= 1 && ! hasBulkActions )
+		! isRefreshing &&
+		( ! totalItems ||
+			! totalPages ||
+			( totalPages <= 1 && ! hasBulkActions ) )
 	) {
 		return null;
 	}
 	return (
-		!! totalItems && (
-			<Stack
-				direction="row"
-				justify="end"
-				align="center"
+		( !! totalItems || isRefreshing ) && (
+			<div
 				className="dataviews-footer"
-				gap="sm"
+				// @ts-ignore
+				inert={ isRefreshing ? 'true' : undefined }
 			>
-				{ hasBulkActions && <BulkActionsFooter /> }
-				<DataViewsPagination />
-			</Stack>
+				<Stack
+					direction="row"
+					justify="end"
+					align="center"
+					className={ clsx( 'dataviews-footer__content', {
+						'is-refreshing': isDelayedRefreshing,
+					} ) }
+					gap="sm"
+				>
+					{ hasBulkActions && <BulkActionsFooter /> }
+					<DataViewsPagination />
+				</Stack>
+			</div>
 		)
 	);
 }

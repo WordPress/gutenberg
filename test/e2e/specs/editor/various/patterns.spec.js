@@ -5,8 +5,19 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Unsynced pattern', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
+		// Cross-origin isolation (COEP) prevents page navigations
+		// from working properly during pattern editing.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -335,7 +346,7 @@ test.describe( 'Unsynced pattern', () => {
 		).toHaveCount( 2 );
 	} );
 
-	test( 'supports editing pattern via Edit section button', async ( {
+	test( 'supports editing pattern via Edit pattern button', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -384,12 +395,12 @@ test.describe( 'Unsynced pattern', () => {
 		// Click on the pattern in List View to select it.
 		await listView.getByRole( 'gridcell', { name: 'My pattern' } ).click();
 
-		// Open settings sidebar and click "Edit section" button.
+		// Open settings sidebar and click "Edit pattern" button.
 		await editor.openDocumentSettingsSidebar();
 
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Edit section' } )
+			.getByRole( 'button', { name: 'Edit pattern' } )
 			.click();
 
 		// Expand the inner Group to see all blocks including separator.
@@ -413,10 +424,10 @@ test.describe( 'Unsynced pattern', () => {
 			} )
 		).toBeVisible();
 
-		// Exit pattern editing by clicking the "Exit section" button.
+		// Exit pattern editing by clicking the "Exit pattern" button.
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Exit section' } )
+			.getByRole( 'button', { name: 'Exit pattern' } )
 			.click();
 
 		// Verify pattern is back to content-only mode (separator hidden again).
@@ -450,7 +461,36 @@ test.describe( 'Unsynced pattern', () => {
 		).toBeVisible();
 	} );
 
-	test( 'supports editing pattern via Edit section toolbar button', async ( {
+	test( 'detaches an unsynced pattern via the block options menu', async ( {
+		editor,
+	} ) => {
+		// Insert a paragraph block with unsynced pattern metadata.
+		await editor.setContent(
+			`<!-- wp:paragraph {"metadata":{"patternName":"my-pattern","name":"My unsynced pattern"}} -->
+<p>Pattern content</p>
+<!-- /wp:paragraph -->`
+		);
+
+		// Select the paragraph block (the unsynced pattern).
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+
+		// Open the block options menu and click "Detach pattern".
+		await editor.clickBlockOptionsMenuItem( 'Detach pattern' );
+
+		// Verify block content is preserved but patternName is removed from metadata.
+		const blocks = await editor.getBlocks();
+		expect( blocks ).toHaveLength( 1 );
+		expect( blocks[ 0 ].name ).toBe( 'core/paragraph' );
+		expect( blocks[ 0 ].attributes.content ).toBe( 'Pattern content' );
+		expect( blocks[ 0 ].attributes.metadata?.patternName ).toBeUndefined();
+		expect( blocks[ 0 ].attributes.metadata?.name ).toBe(
+			'My unsynced pattern'
+		);
+	} );
+
+	test( 'supports editing pattern via Edit pattern toolbar button', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -499,8 +539,8 @@ test.describe( 'Unsynced pattern', () => {
 		// Click on the pattern in List View to select it.
 		await listView.getByRole( 'gridcell', { name: 'My pattern' } ).click();
 
-		// Click "Edit section" in the block toolbar.
-		await editor.clickBlockToolbarButton( 'Edit section' );
+		// Click "Edit pattern" in the block toolbar.
+		await editor.clickBlockToolbarButton( 'Edit pattern' );
 
 		// Expand the inner Group to see all blocks including separator.
 		await listView
@@ -523,8 +563,8 @@ test.describe( 'Unsynced pattern', () => {
 			} )
 		).toBeVisible();
 
-		// Exit pattern editing by clicking "Exit section" in the block toolbar.
-		await editor.clickBlockToolbarButton( 'Exit section' );
+		// Exit pattern editing by clicking "Exit pattern" in the block toolbar.
+		await editor.clickBlockToolbarButton( 'Exit pattern' );
 
 		// Verify pattern is back to content-only mode (separator hidden again).
 		await expect(
@@ -560,12 +600,23 @@ test.describe( 'Unsynced pattern', () => {
 
 test.describe( 'Synced pattern', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
+		// Cross-origin isolation (COEP) prevents page navigations
+		// from working properly during pattern editing.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {

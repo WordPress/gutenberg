@@ -114,18 +114,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-media-processing',
-		__( 'Client-side media processing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables client-side media processing to leverage the browser\'s capabilities to handle tasks like image resizing and compression.', 'gutenberg' ),
-			'id'    => 'gutenberg-media-processing',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-color-randomizer',
 		__( 'Color randomizer', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -206,6 +194,18 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enables editing media items (attachments) directly in the block editor with a dedicated media preview and metadata panel.', 'gutenberg' ),
 			'id'    => 'gutenberg-media-editor',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-content-guidelines',
+		__( 'Content Guidelines', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables Content Guidelines feature for managing editorial voice and tone guidelines under Settings.', 'gutenberg' ),
+			'id'    => 'gutenberg-content-guidelines',
 		)
 	);
 

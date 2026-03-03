@@ -15,6 +15,7 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
  * Internal dependencies
  */
 import { cloneFile, convertBlobToFile, renameFile } from '../utils';
+import { CLIENT_SIDE_SUPPORTED_MIME_TYPES } from './constants';
 import { StubFile } from '../stub-file';
 import { UploadError } from '../upload-error';
 import {
@@ -710,25 +711,13 @@ export function prepareItem( id: QueueItemId ) {
 		const settings = select.getSettings();
 
 		const isImage = file.type.startsWith( 'image/' );
+		const isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
+			file.type
+		);
 
-		// For images, check if we need to scale down based on threshold.
-		if ( isImage ) {
-			const { bigImageSizeThreshold, imageOutputFormats } = settings;
-
-			// If a threshold is set, add a resize operation to scale down large images.
-			// This matches WordPress core's behavior in wp_create_image_subsizes().
-			if ( bigImageSizeThreshold ) {
-				operations.push( [
-					OperationType.ResizeCrop,
-					{
-						resize: {
-							width: bigImageSizeThreshold,
-							height: bigImageSizeThreshold,
-						},
-						isThresholdResize: true,
-					},
-				] );
-			}
+		// For images that can be processed by vips, check if we need to scale down based on threshold.
+		if ( isImage && isVipsSupported ) {
+			const { imageOutputFormats } = settings;
 
 			// Check if we need to transcode to a different format.
 			// Uses WordPress image_editor_output_format filter settings.
@@ -758,7 +747,19 @@ export function prepareItem( id: QueueItemId ) {
 			operations,
 		} );
 
-		dispatch.finishOperation( id, {} );
+		// If the file is not processed by vips, tell the server to
+		// generate sub-sizes since they won't be created client-side.
+		const updates =
+			! isVipsSupported || ! isImage
+				? {
+						additionalData: {
+							...item.additionalData,
+							generate_sub_sizes: true,
+						},
+				  }
+				: {};
+
+		dispatch.finishOperation( id, updates );
 	};
 }
 
@@ -1110,8 +1111,8 @@ export function generateThumbnails( id: QueueItemId ) {
 			// Use sourceFile for thumbnail generation to preserve quality.
 			// WordPress core generates thumbnails from the original (unscaled) image.
 			// Vips will auto-rotate based on EXIF orientation during thumbnail generation.
-			const file = attachment.media_filename
-				? renameFile( item.sourceFile, attachment.media_filename )
+			const file = attachment.filename
+				? renameFile( item.sourceFile, attachment.filename )
 				: item.sourceFile;
 			const batchId = uuidv4();
 
@@ -1188,6 +1189,65 @@ export function generateThumbnails( id: QueueItemId ) {
 					},
 					operations: thumbnailOperations,
 				} );
+			}
+
+			// Create and sideload the scaled version.
+			const { bigImageSizeThreshold } = settings;
+			if ( bigImageSizeThreshold && attachment.id ) {
+				// Check if the image actually exceeds the threshold.
+				// Only create a scaled version for images larger than the threshold,
+				// matching WordPress core's wp_create_image_subsizes() behavior.
+				const bitmap = await createImageBitmap( item.sourceFile );
+				const needsScaling =
+					bitmap.width > bigImageSizeThreshold ||
+					bitmap.height > bigImageSizeThreshold;
+				bitmap.close();
+
+				if ( needsScaling ) {
+					// Rename sourceFile to match the server attachment filename.
+					const sourceForScaled = attachment.filename
+						? renameFile( item.sourceFile, attachment.filename )
+						: item.sourceFile;
+
+					// Add scaling to queue.
+					const scaledOperations: Operation[] = [
+						[
+							OperationType.ResizeCrop,
+							{
+								resize: {
+									width: bigImageSizeThreshold,
+									height: bigImageSizeThreshold,
+								},
+								isThresholdResize: true,
+							},
+						],
+					];
+
+					// Add transcoding if format conversion is configured.
+					if ( thumbnailTranscodeOperation ) {
+						scaledOperations.push( thumbnailTranscodeOperation );
+					}
+
+					scaledOperations.push( OperationType.Upload );
+
+					dispatch.addSideloadItem( {
+						file: sourceForScaled,
+						onChange: ( [ updatedAttachment ] ) => {
+							if ( isBlobURL( updatedAttachment.url ) ) {
+								return;
+							}
+							item.onChange?.( [ updatedAttachment ] );
+						},
+						batchId,
+						parentId: item.id,
+						additionalData: {
+							post: attachment.id,
+							image_size: 'scaled',
+							convert_format: false,
+						},
+						operations: scaledOperations,
+					} );
+				}
 			}
 		}
 

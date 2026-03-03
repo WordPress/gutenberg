@@ -437,6 +437,16 @@ module.exports = {
 			extends: [ 'plugin:ssr-friendly/recommended' ],
 		},
 		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
+			rules: {
+				// Disallow usage of Design System token CSS custom properties (`--wpds-*`)
+				// because the fallback injection in the build process is not compatible with Emotion files.
+				// Can be removed when there are no more Emotion files in the package.
+				'@wordpress/no-ds-tokens': 'error',
+			},
+		},
+		{
 			files: [
 				'packages/block-editor/src/**',
 				'packages/components/src/**',
@@ -526,6 +536,12 @@ module.exports = {
 			},
 		},
 		{
+			files: [ 'packages/block-library/src/*/save.[tj]s?(x)' ],
+			rules: {
+				'@wordpress/no-i18n-in-save': 'error',
+			},
+		},
+		{
 			files: [ 'packages/interactivity*/src/**' ],
 			rules: {
 				'react-compiler/react-compiler': 'off',
@@ -536,6 +552,12 @@ module.exports = {
 			files: [ 'packages/ui/src/**' ],
 			rules: {
 				'@wordpress/dependency-group': [ 'error', 'never' ],
+			},
+		},
+		{
+			files: [ 'packages/eslint-plugin/**', 'packages/theme/**' ],
+			rules: {
+				'@wordpress/no-unknown-ds-tokens': 'off',
 			},
 		},
 	],

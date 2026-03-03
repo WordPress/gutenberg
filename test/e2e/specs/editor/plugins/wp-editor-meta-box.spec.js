@@ -8,11 +8,19 @@ test.describe( 'WP Editor Meta Boxes', () => {
 		await requestUtils.activatePlugin(
 			'gutenberg-test-plugin-wp-editor-meta-box'
 		);
+		// Cross-origin isolation (COEP) prevents TinyMCE from
+		// initializing properly in its iframe.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-plugin-wp-editor-meta-box'
+		);
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
 		);
 	} );
 

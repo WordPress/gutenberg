@@ -4,10 +4,38 @@
 
 ### Breaking Changes
 
+- DataViews: Align to end integer and number field types. [#75917](https://github.com/WordPress/gutenberg/pull/75917)
+
+### Bug Fixes
+
+- DataForm: Fix label color of array control. [#75730](https://github.com/WordPress/gutenberg/pull/75730)
+- DataForm: Fix `card` layout's toggle button screen reader text. [#76039](https://github.com/WordPress/gutenberg/pull/76039)
+- DataViews: Fix focus transfer while searching in `list` layout. [#75999](https://github.com/WordPress/gutenberg/pull/75999)
+- DataForm: Fix focus loss when collapsing in Card view. [#75689](https://github.com/WordPress/gutenberg/pull/75689)
+- DataViews: Avoid flickering while refreshing. [#74572](https://github.com/WordPress/gutenberg/pull/74572)
+- DataViews: Fix spacing in first column. [#75693](https://github.com/WordPress/gutenberg/pull/75693)
+- DataViews: Fix filter toggle flickering when there are locked or primary filters. [#75913](https://github.com/WordPress/gutenberg/pull/75913)
+- DataViews: Fix search input losing characters during debounce when externally synced. [#75810](https://github.com/WordPress/gutenberg/pull/75810)
+- DataForm: Fix vertical alignment of summary fields in card layout. [#75864](https://github.com/WordPress/gutenberg/pull/75864)
+- DataViews: Remove visual divider between quick and regular actions in the actions menu. [#75893](https://github.com/WordPress/gutenberg/pull/75893)
+- DataForm: field label for panel layout are no longer uppercased. [#75944](https://github.com/WordPress/gutenberg/pull/75944)
+
+### Enhancements
+
+- Documentation: Update README.md. [#75881](https://github.com/WordPress/gutenberg/pull/75881)
+- DataViews: Improve UI in `list` layout when we render only title and/or media fields. [#76042](https://github.com/WordPress/gutenberg/pull/76042)
+- DataViews: Adjust column spacing in table layout when no titleField is provided. [#75410](https://github.com/WordPress/gutenberg/pull/75410)
+- DataViews: minimize padding for primary actions. [#75721](https://github.com/WordPress/gutenberg/pull/75721)
+
+## 12.0.0 (2026-02-18)
+
+### Breaking Changes
+
 - The design tokens stylesheet (`@wordpress/theme/design-tokens.css`) is no longer embedded in the DataViews stylesheet. Applications using DataViews outside of WordPress must now explicitly include the design tokens stylesheet. See the README for installation instructions. [#75182](https://github.com/WordPress/gutenberg/pull/75182)
 
 ### Bug Fixes
 
+- DataViews: Fix first/last column header text misalignment in table layout when no bulk actions are present. [#75372](https://github.com/WordPress/gutenberg/issues/75372)
 - DataForm: Fix text selection in panel layout summary rows by replacing `::after` overlay with accessible card pattern. [#75565](https://github.com/WordPress/gutenberg/pull/75565)
 - DataViews: Improve styling for filters when long values are in use. [#75369](https://github.com/WordPress/gutenberg/pull/75369)
 - DataForm: Fix label case for regular layout. [#75292](https://github.com/WordPress/gutenberg/pull/75292)
@@ -27,6 +55,7 @@
 - DataViews: Consistent rendering of selection checkbox and actions in grid layout. [#75056](https://github.com/WordPress/gutenberg/pull/75056)
 
 ### Code Quality
+
 - DataForm: Style SummaryButton in panel layout with `is-disabled` classname. [#75470](https://github.com/WordPress/gutenberg/pull/75470)
 
 ### Internal
@@ -34,8 +63,9 @@
 - DataForm: Use public `ColorPicker` component instead of internal `Picker` in color control. [#75394](https://github.com/WordPress/gutenberg/pull/75394)
 - Update Testing Library packages used in unit tests. [#75340](https://github.com/WordPress/gutenberg/pull/75340)
 - Always specify initial values for `useRef` calls. [#75513](https://github.com/WordPress/gutenberg/pull/75513)
-- Clean up type declarations using the `React` namespace. ([#75508](https://github.com/WordPress/gutenberg/pull/75508)
+- Clean up type declarations using the `React` namespace. [#75508](https://github.com/WordPress/gutenberg/pull/75508)
 - Update `RefObject` type usage for React 19 compatibility. [#75567](https://github.com/WordPress/gutenberg/pull/75567)
+- Upgraded `@ariakit/react` (v0.4.21). [#75620](https://github.com/WordPress/gutenberg/pull/75620)
 
 ## 11.3.0 (2026-01-29)
 

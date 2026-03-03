@@ -11,6 +11,7 @@ import { makeCSSVar } from '@terrazzo/token-tools/css';
 import pluginModeOverrides from './bin/terrazzo-plugin-mode-overrides/index';
 import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index';
 import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
+import pluginDsTokenFallbacks from './bin/terrazzo-plugin-ds-token-fallbacks/index';
 import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index';
 import typescriptTypes from './bin/terrazzo-plugin-typescript-types/index';
 
@@ -18,6 +19,7 @@ export default defineConfig( {
 	tokens: [
 		'./tokens/border.json',
 		'./tokens/color.json',
+		'./tokens/cursor.json',
 		'./tokens/dimension.json',
 		'./tokens/elevation.json',
 		'./tokens/typography.json',
@@ -94,6 +96,9 @@ export default defineConfig( {
 		} ),
 		pluginKnownWpdsCssVariables( {
 			filename: 'js/design-tokens.mjs',
+		} ),
+		pluginDsTokenFallbacks( {
+			filename: 'js/design-token-fallbacks.mjs',
 		} ),
 		pluginDsTokenDocs( {
 			filename: '../../docs/tokens.md',

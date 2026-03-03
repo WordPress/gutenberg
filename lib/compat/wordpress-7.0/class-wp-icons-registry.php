@@ -58,10 +58,6 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 					return;
 				}
 
-				if ( ! ( $icon_data['public'] ?? false ) ) {
-					continue;
-				}
-
 				$this->register(
 					'core/' . $icon_name,
 					array(

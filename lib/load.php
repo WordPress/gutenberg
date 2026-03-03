@@ -109,6 +109,7 @@ require __DIR__ . '/compat/wordpress-7.0/preload.php';
 require __DIR__ . '/compat/wordpress-7.0/auto-register.php';
 require __DIR__ . '/compat/wordpress-7.0/blocks.php';
 require __DIR__ . '/compat/wordpress-7.0/kses.php';
+require __DIR__ . '/compat/wordpress-7.0/media.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -119,6 +120,9 @@ require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/extensible-site-editor.php';
 require __DIR__ . '/experimental/fonts/load.php';
+if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
+	require __DIR__ . '/experimental/connectors/load.php';
+}
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
 	require __DIR__ . '/experimental/workflow-palette.php';
@@ -190,9 +194,7 @@ require __DIR__ . '/block-supports/block-visibility.php';
 require __DIR__ . '/block-supports/custom-css.php';
 
 // Client-side media processing.
-if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
-	require_once __DIR__ . '/experimental/media/load.php';
-}
+require_once __DIR__ . '/media/load.php';
 
 // Interactivity API full-page client-side navigation.
 if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
@@ -202,3 +204,8 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigatio
 
 // Block patterns for navigation overlays.
 require __DIR__ . '/overlay-patterns.php';
+
+// Content Guidelines (only load when experiment is enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-content-guidelines' ) ) {
+	require __DIR__ . '/experimental/content-guidelines/index.php';
+}

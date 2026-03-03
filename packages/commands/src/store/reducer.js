@@ -52,6 +52,7 @@ function commandLoaders( state = {}, action ) {
 				[ action.name ]: {
 					name: action.name,
 					context: action.context,
+					category: action.category,
 					hook: action.hook,
 				},
 			};

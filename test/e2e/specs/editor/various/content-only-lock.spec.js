@@ -77,7 +77,7 @@ test.describe( 'Content-only lock', () => {
 		] );
 	} );
 
-	test( 'should be able to edit all blocks via Edit section button and exit via Exit section button', async ( {
+	test( 'should be able to edit all blocks via Edit pattern button and exit via Exit pattern button', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -106,10 +106,10 @@ test.describe( 'Content-only lock', () => {
 		await editor.canvas
 			.locator( 'role=document[name="Block: Group"i]' )
 			.click();
-		// Click "Edit section" button to temporarily edit as blocks.
+		// Click "Edit pattern" button to temporarily edit as blocks.
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Edit section' } )
+			.getByRole( 'button', { name: 'Edit pattern' } )
 			.click();
 		// Selected a nest paragraph verify Block is not content locked
 		// Styles can be changed and nested blocks can be removed
@@ -121,10 +121,10 @@ test.describe( 'Content-only lock', () => {
 			page.locator( '.color-block-support-panel' )
 		).toBeAttached();
 		await editor.clickBlockOptionsMenuItem( 'Delete' );
-		// Click "Exit section" button to exit edit mode
+		// Click "Exit pattern" button to exit edit mode
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Exit section' } )
+			.getByRole( 'button', { name: 'Exit pattern' } )
 			.click();
 
 		// Select a locked nested paragraph block again
@@ -137,7 +137,7 @@ test.describe( 'Content-only lock', () => {
 		).not.toBeAttached();
 	} );
 
-	test( 'allows editing all blocks via Edit section toolbar button and exiting via Exit section toolbar button', async ( {
+	test( 'allows editing all blocks via Edit pattern toolbar button and exiting via Exit pattern toolbar button', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -171,8 +171,8 @@ test.describe( 'Content-only lock', () => {
 		await editor.canvas
 			.locator( 'role=document[name="Block: Group"i]' )
 			.click();
-		// Click "Edit section" in the block toolbar.
-		await editor.clickBlockToolbarButton( 'Edit section' );
+		// Click "Edit pattern" in the block toolbar.
+		await editor.clickBlockToolbarButton( 'Edit pattern' );
 		// Select a nested paragraph — verify block is not content locked.
 		// Style panels are visible when the block is unlocked for editing.
 		await editor.canvas
@@ -193,8 +193,8 @@ test.describe( 'Content-only lock', () => {
 		await editor.selectBlocks(
 			editor.canvas.locator( 'role=document[name="Block: Group"i]' )
 		);
-		// Click "Exit section" in the block toolbar.
-		await editor.clickBlockToolbarButton( 'Exit section' );
+		// Click "Exit pattern" in the block toolbar.
+		await editor.clickBlockToolbarButton( 'Exit pattern' );
 
 		// Select a locked nested paragraph block again.
 		await editor.canvas
@@ -248,11 +248,11 @@ test.describe( 'Content-only lock', () => {
 		} );
 		await separator.dblclick( { force: true } );
 
-		// Wait for edit mode to be entered - "Edit section" button should disappear
+		// Wait for edit mode to be entered - "Edit pattern" button should disappear
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Edit section' } )
+				.getByRole( 'button', { name: 'Edit pattern' } )
 		).toBeHidden();
 
 		// Select first paragraph to verify it's not content locked

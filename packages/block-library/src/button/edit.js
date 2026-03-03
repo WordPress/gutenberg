@@ -10,10 +10,9 @@ import {
 import {
 	ToolbarButton,
 	Popover,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	ExternalLink,
+	TextControl,
+	HTMLElementControl,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -31,7 +30,6 @@ import {
 	useBlockBindingsUtils,
 	getTypographyClassesAndStyles as useTypographyProps,
 	useSettings,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
@@ -47,87 +45,7 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { unlock } from '../lock-unlock';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
-
-const { LinkPicker } = unlock( blockEditorPrivateApis );
-
-/**
- * Capitalize the first letter of a string.
- *
- * @param {string} str String to capitalize.
- * @return {string} Capitalized string.
- */
-function capitalize( str ) {
-	return str.charAt( 0 ).toUpperCase() + str.slice( 1 );
-}
-
-/**
- * Compute preview URL for LinkPicker - strips site URL if internal.
- *
- * @param {string} url URL to process.
- * @return {string} Display URL.
- */
-function computePreviewUrl( url ) {
-	if ( ! url ) {
-		return '';
-	}
-
-	try {
-		const linkUrl = new URL( url );
-		const siteUrl = window.location.origin;
-		if ( linkUrl.origin === siteUrl ) {
-			let path = linkUrl.pathname + linkUrl.search + linkUrl.hash;
-			if ( path.endsWith( '/' ) && path.length > 1 ) {
-				path = path.slice( 0, -1 );
-			}
-			return path;
-		}
-	} catch ( e ) {
-		// fall through
-	}
-
-	return url;
-}
-
-/**
- * Given a selected entity type/kind, return the query params for /wp/v2/search.
- *
- * Mirrors Navigation Link's logic so the LinkPicker UI matches.
- *
- * @param {string} type Entity type.
- * @param {string} kind Entity kind.
- * @return {Object} Query params.
- */
-function getSuggestionsQuery( type, kind ) {
-	switch ( type ) {
-		case 'post':
-		case 'page':
-			return { type: 'post', subtype: type };
-		case 'category':
-			return { type: 'term', subtype: 'category' };
-		case 'tag':
-			return { type: 'term', subtype: 'post_tag' };
-		case 'post_format':
-			return { type: 'post-format' };
-		default:
-			if ( kind === 'taxonomy' ) {
-				return { type: 'term', subtype: type };
-			}
-			if ( kind === 'post-type' ) {
-				return { type: 'post', subtype: type };
-			}
-			return {
-				// For custom link which has no type, always show pages as initial suggestions.
-				initialSuggestionsSearchOptions: {
-					type: 'post',
-					subtype: 'page',
-					perPage: 20,
-				},
-			};
-	}
-}
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -193,69 +111,6 @@ function useEnter( props ) {
 	}, [] );
 }
 
-function SettingsPanel( { selectedWidth, setAttributes, linkPanel } ) {
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-
-	return (
-		<ToolsPanel
-			label={ __( 'Settings' ) }
-			resetAll={ () => {
-				linkPanel?.onReset?.();
-				setAttributes( { width: undefined } );
-			} }
-			dropdownMenuProps={ dropdownMenuProps }
-		>
-			<ToolsPanelItem
-				label={ __( 'Width' ) }
-				isShownByDefault
-				hasValue={ () => !! selectedWidth }
-				onDeselect={ () => setAttributes( { width: undefined } ) }
-			>
-				<ToggleGroupControl
-					label={ __( 'Width' ) }
-					value={ selectedWidth }
-					onChange={ ( newWidth ) =>
-						setAttributes( { width: newWidth } )
-					}
-					isBlock
-					__next40pxDefaultSize
-				>
-					{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
-						return (
-							<ToggleGroupControlOption
-								key={ widthValue }
-								value={ widthValue }
-								label={ sprintf(
-									/* translators: %d: Percentage value. */
-									__( '%d%%' ),
-									widthValue
-								) }
-							/>
-						);
-					} ) }
-				</ToggleGroupControl>
-			</ToolsPanelItem>
-
-			{ linkPanel && (
-				<ToolsPanelItem
-					label={ __( 'Link to' ) }
-					hasValue={ linkPanel.hasValue }
-					onDeselect={ linkPanel.onDeselect }
-					isShownByDefault
-				>
-					<LinkPicker
-						preview={ linkPanel.preview }
-						onSelect={ linkPanel.onSelect }
-						suggestionsQuery={ linkPanel.suggestionsQuery }
-						label={ __( 'Link to' ) }
-						help={ linkPanel.help }
-					/>
-				</ToolsPanelItem>
-			) }
-		</ToolsPanel>
-	);
-}
-
 function ButtonEdit( props ) {
 	const {
 		attributes,
@@ -275,9 +130,10 @@ function ButtonEdit( props ) {
 		style,
 		text,
 		url,
-		width,
 		metadata,
 	} = attributes;
+	const width = style?.dimensions?.width;
+
 	useDeprecatedTextAlign( props );
 
 	const TagName = tagName || 'a';
@@ -299,10 +155,9 @@ function ButtonEdit( props ) {
 	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
 	const shadowProps = useShadowProps( attributes );
-	const ref = useRef();
 	const richTextRef = useRef();
 	const blockProps = useBlockProps( {
-		ref: useMergeRefs( [ setPopoverAnchor, ref ] ),
+		ref: useMergeRefs( [ setPopoverAnchor ] ),
 		onKeyDown,
 	} );
 	const blockEditingMode = useBlockEditingMode();
@@ -387,189 +242,6 @@ function ButtonEdit( props ) {
 			},
 		} );
 	};
-
-	const boundKind = boundEntityArgs?.kind;
-	const boundType = boundEntityArgs?.type;
-	const boundId = boundEntityArgs?.id;
-
-	const { entityRecord, isBoundEntityAvailable } = useSelect(
-		( select ) => {
-			if (
-				! isEntityUrlBinding ||
-				! boundKind ||
-				! boundType ||
-				! boundId
-			) {
-				return { entityRecord: null, isBoundEntityAvailable: true };
-			}
-
-			const { getEntityRecord, hasFinishedResolution } =
-				select( coreDataStore );
-
-			if ( boundKind === 'post-type' ) {
-				const record = getEntityRecord(
-					'postType',
-					boundType,
-					boundId
-				);
-				const hasResolved = hasFinishedResolution( 'getEntityRecord', [
-					'postType',
-					boundType,
-					boundId,
-				] );
-				return {
-					entityRecord: record || null,
-					isBoundEntityAvailable: hasResolved
-						? record !== undefined
-						: true,
-				};
-			}
-
-			if ( boundKind === 'taxonomy' ) {
-				const taxonomySlug =
-					boundType === 'tag' ? 'post_tag' : boundType;
-				const record = getEntityRecord(
-					'taxonomy',
-					taxonomySlug,
-					boundId
-				);
-				const hasResolved = hasFinishedResolution( 'getEntityRecord', [
-					'taxonomy',
-					taxonomySlug,
-					boundId,
-				] );
-				return {
-					entityRecord: record || null,
-					isBoundEntityAvailable: hasResolved
-						? record !== undefined
-						: true,
-				};
-			}
-
-			return { entityRecord: null, isBoundEntityAvailable: true };
-		},
-		[ isEntityUrlBinding, boundKind, boundType, boundId ]
-	);
-
-	const linkPanel = useMemo( () => {
-		const previewUrl = isEntityUrlBinding ? resolvedEntityUrl : url;
-		const title =
-			entityRecord?.title?.rendered ||
-			entityRecord?.title ||
-			entityRecord?.name ||
-			'';
-		const typeLabel = isEntityUrlBinding ? boundType : undefined;
-
-		const badges = [];
-		if ( previewUrl ) {
-			if ( typeLabel ) {
-				badges.push( {
-					label: capitalize( typeLabel ),
-					intent: 'default',
-				} );
-			}
-		}
-		if ( ! previewUrl ) {
-			badges.push( { label: __( 'No link selected' ), intent: 'error' } );
-		} else if ( isEntityUrlBinding && ! isBoundEntityAvailable ) {
-			badges.push( { label: __( 'Deleted' ), intent: 'error' } );
-		} else if ( entityRecord?.status ) {
-			const statusMap = {
-				publish: { label: __( 'Published' ), intent: 'success' },
-				future: { label: __( 'Scheduled' ), intent: 'warning' },
-				draft: { label: __( 'Draft' ), intent: 'warning' },
-				pending: { label: __( 'Pending' ), intent: 'warning' },
-				private: { label: __( 'Private' ), intent: 'default' },
-				trash: { label: __( 'Trash' ), intent: 'error' },
-			};
-			const badge = statusMap[ entityRecord.status ];
-			if ( badge ) {
-				badges.push( badge );
-			}
-		}
-
-		const preview = {
-			title: previewUrl
-				? title || computePreviewUrl( previewUrl )
-				: __( 'Add link' ),
-			url: computePreviewUrl( previewUrl ),
-			image: null,
-			badges,
-		};
-
-		const help = isEntityUrlBinding
-			? sprintf(
-					/* translators: %s is the entity type (e.g., "page", "post", "category") */
-					__( 'Synced with the selected %s.' ),
-					boundType || __( 'item' )
-			  )
-			: undefined;
-
-		return {
-			hasValue: () => isURLSet,
-			onDeselect: () => unlink(),
-			onReset: () => unlink(),
-			preview,
-			suggestionsQuery: getSuggestionsQuery( boundType, boundKind ),
-			help,
-			onSelect: ( updatedLink ) => {
-				if ( ! updatedLink ) {
-					return;
-				}
-
-				const nextUrl = updatedLink.url;
-				const nextOpensInNewTab =
-					updatedLink.opensInNewTab ?? opensInNewTab;
-				const nextNofollow = updatedLink.nofollow ?? nofollow;
-
-				const updatedLinkAttributes = getUpdatedLinkAttributes( {
-					rel,
-					url: nextUrl,
-					opensInNewTab: nextOpensInNewTab,
-					nofollow: nextNofollow,
-				} );
-
-				const hasEntitySelection = !! (
-					updatedLink.id &&
-					updatedLink.kind &&
-					updatedLink.type
-				);
-
-				if ( hasEntitySelection ) {
-					createEntityUrlBinding( {
-						id: updatedLink.id,
-						kind: updatedLink.kind,
-						type: updatedLink.type,
-					} );
-					setAttributes( {
-						...updatedLinkAttributes,
-						url: undefined,
-					} );
-					return;
-				}
-
-				clearEntityUrlBinding();
-				setAttributes( updatedLinkAttributes );
-			},
-		};
-	}, [
-		boundId,
-		boundKind,
-		boundType,
-		clearEntityUrlBinding,
-		createEntityUrlBinding,
-		entityRecord,
-		isBoundEntityAvailable,
-		isEntityUrlBinding,
-		isURLSet,
-		nofollow,
-		opensInNewTab,
-		rel,
-		resolvedEntityUrl,
-		setAttributes,
-		unlink,
-		url,
-	] );
 
 	const {
 		createPageEntity,
@@ -686,7 +358,8 @@ function ButtonEdit( props ) {
 
 	const [ fluidTypographySettings, layout ] = useSettings(
 		'typography.fluid',
-		'layout'
+		'layout',
+		'dimensions.dimensionSizes'
 	);
 	const typographyProps = useTypographyProps( attributes, {
 		typography: {
@@ -858,12 +531,37 @@ function ButtonEdit( props ) {
 						/>
 					</Popover>
 				) }
-			<InspectorControls>
-				<SettingsPanel
-					selectedWidth={ width }
-					setAttributes={ setAttributes }
-					linkPanel={ isLinkTag ? linkPanel : null }
+			<InspectorControls group="advanced">
+				<HTMLElementControl
+					tagName={ tagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+					options={ [
+						{ label: __( 'Default (<a>)' ), value: 'a' },
+						{ label: '<button>', value: 'button' },
+					] }
 				/>
+				{ isLinkTag && (
+					<TextControl
+						__next40pxDefaultSize
+						label={ __( 'Link relation' ) }
+						help={ createInterpolateElement(
+							__(
+								'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+							),
+							{
+								a: (
+									<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+								),
+							}
+						) }
+						value={ rel || '' }
+						onChange={ ( newRel ) =>
+							setAttributes( { rel: newRel } )
+						}
+					/>
+				) }
 			</InspectorControls>
 		</>
 	);

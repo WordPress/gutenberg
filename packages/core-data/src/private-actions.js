@@ -162,15 +162,14 @@ export function receiveEditorAssets( assets ) {
 }
 
 /**
- * Returns an action object used to receive icons.
+ * Returns an action object used to set whether collaboration is supported.
  *
- * @param {Array} icons List of icons.
+ * @param {boolean} supported Whether collaboration is supported.
  *
  * @return {Object} Action object.
  */
-export function receiveIcons( icons ) {
-	return {
-		type: 'RECEIVE_ICONS',
-		icons,
+export const setCollaborationSupported =
+	( supported ) =>
+	( { dispatch } ) => {
+		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
 	};
-}

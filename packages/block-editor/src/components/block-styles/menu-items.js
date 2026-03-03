@@ -4,19 +4,14 @@
 import { MenuItem, __experimentalText as Text } from '@wordpress/components';
 import { check } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
-import useStylesForBlocks from './use-styles-for-block';
-
 const noop = () => {};
 
-export default function BlockStylesMenuItems( { clientId, onSwitch = noop } ) {
-	const { onSelect, stylesToRender, activeStyle } = useStylesForBlocks( {
-		clientId,
-		onSwitch,
-	} );
-
+export default function BlockStylesMenuItems( {
+	stylesToRender,
+	activeStyle,
+	onSelect = noop,
+	onHoverStyle = noop,
+} ) {
 	if ( ! stylesToRender || stylesToRender.length === 0 ) {
 		return null;
 	}
@@ -29,6 +24,10 @@ export default function BlockStylesMenuItems( { clientId, onSwitch = noop } ) {
 						key={ style.name }
 						icon={ activeStyle.name === style.name ? check : null }
 						onClick={ () => onSelect( style ) }
+						onFocus={ () => onHoverStyle( style ) }
+						onBlur={ () => onHoverStyle( null ) }
+						onMouseEnter={ () => onHoverStyle( style ) }
+						onMouseLeave={ () => onHoverStyle( null ) }
 					>
 						<Text
 							as="span"
