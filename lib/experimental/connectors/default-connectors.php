@@ -30,7 +30,7 @@ function _gutenberg_mask_api_key( string $key ): string {
  * @param string $provider_id The WP AI client provider ID.
  * @return bool|null True if valid, false if invalid, null if unable to determine.
  */
-function _gutenberg_is_api_key_valid( string $key, string $provider_id ): ?bool {
+function _gutenberg_is_ai_api_key_valid( string $key, string $provider_id ): ?bool {
 	try {
 		$registry = \WordPress\AiClient\AiClient::defaultRegistry();
 
@@ -244,7 +244,7 @@ function _gutenberg_validate_connector_keys_in_rest( WP_REST_Response $response,
 			continue;
 		}
 
-		if ( true !== _gutenberg_is_api_key_valid( $real_key, $connector_id ) ) {
+		if ( true !== _gutenberg_is_ai_api_key_valid( $real_key, $connector_id ) ) {
 			$data[ $setting_name ] = 'invalid_key';
 		}
 	}
@@ -295,7 +295,7 @@ function _gutenberg_register_default_connector_settings(): void {
 						return $value;
 					}
 
-					$valid = _gutenberg_is_api_key_valid( $value, $connector_id );
+					$valid = _gutenberg_is_ai_api_key_valid( $value, $connector_id );
 					return true === $valid ? $value : '';
 				},
 			)
