@@ -23,6 +23,7 @@ import type {
 	Field,
 	NormalizedForm,
 	NormalizedFormField,
+	NormalizedPanelLayout,
 	FieldLayoutProps,
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
@@ -40,6 +41,8 @@ function ModalContent< Item >( {
 	fieldLabel,
 	onClose,
 	touched,
+	applyButtonText,
+	cancelButtonText,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -47,6 +50,8 @@ function ModalContent< Item >( {
 	onClose: () => void;
 	fieldLabel: string;
 	touched: boolean;
+	applyButtonText?: string;
+	cancelButtonText?: string;
 } ) {
 	const { fields } = useContext( DataFormContext );
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
@@ -147,14 +152,14 @@ function ModalContent< Item >( {
 					onClick={ onClose }
 					__next40pxDefaultSize
 				>
-					{ __( 'Cancel' ) }
+					{ cancelButtonText ?? __( 'Cancel' ) }
 				</Button>
 				<Button
 					variant="primary"
 					onClick={ onApply }
 					__next40pxDefaultSize
 				>
-					{ __( 'Apply' ) }
+					{ applyButtonText ?? __( 'Apply' ) }
 				</Button>
 			</Stack>
 		</Modal>
@@ -176,6 +181,11 @@ function PanelModal< Item >( {
 	if ( ! fieldDefinition ) {
 		return null;
 	}
+
+	const panelLayout =
+		field.layout.type === 'panel'
+			? ( field.layout as NormalizedPanelLayout )
+			: undefined;
 
 	const handleClose = () => {
 		setIsOpen( false );
@@ -203,6 +213,8 @@ function PanelModal< Item >( {
 					fieldLabel={ fieldLabel ?? '' }
 					onClose={ handleClose }
 					touched={ touched }
+					applyButtonText={ panelLayout?.applyButtonText }
+					cancelButtonText={ panelLayout?.cancelButtonText }
 				/>
 			) }
 		</>

@@ -268,11 +268,15 @@ const getPanelLayoutFromStoryArgs = ( {
 	labelPosition,
 	openAs,
 	editVisibility,
+	applyButtonText,
+	cancelButtonText,
 }: {
 	summary?: string[];
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
 	openAs?: 'default' | 'dropdown' | 'modal';
 	editVisibility?: 'default' | EditVisibility;
+	applyButtonText?: string;
+	cancelButtonText?: string;
 } ): Layout | undefined => {
 	const panelLayout: PanelLayout = {
 		type: 'panel',
@@ -294,6 +298,14 @@ const getPanelLayoutFromStoryArgs = ( {
 		panelLayout.editVisibility = editVisibility;
 	}
 
+	if ( applyButtonText ) {
+		panelLayout.applyButtonText = applyButtonText;
+	}
+
+	if ( cancelButtonText ) {
+		panelLayout.cancelButtonText = cancelButtonText;
+	}
+
 	return panelLayout;
 };
 
@@ -301,11 +313,15 @@ const LayoutPanelComponent = ( {
 	labelPosition,
 	openAs,
 	editVisibility,
+	applyButtonText,
+	cancelButtonText,
 }: {
 	type: 'default' | 'regular' | 'panel' | 'card';
 	labelPosition: 'default' | 'top' | 'side' | 'none';
 	openAs: 'default' | 'dropdown' | 'modal';
 	editVisibility: 'default' | EditVisibility;
+	applyButtonText?: string;
+	cancelButtonText?: string;
 } ) => {
 	const [ post, setPost ] = useState< SamplePost >( {
 		title: 'Hello, World!',
@@ -336,6 +352,8 @@ const LayoutPanelComponent = ( {
 				labelPosition,
 				openAs,
 				editVisibility,
+				applyButtonText,
+				cancelButtonText,
 			} ),
 			fields: [
 				'title',
@@ -373,6 +391,8 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						applyButtonText,
+						cancelButtonText,
 					} ),
 				},
 				{
@@ -384,11 +404,19 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						applyButtonText,
+						cancelButtonText,
 					} ),
 				},
 			],
 		};
-	}, [ labelPosition, openAs, editVisibility ] );
+	}, [
+		labelPosition,
+		openAs,
+		editVisibility,
+		applyButtonText,
+		cancelButtonText,
+	] );
 
 	return (
 		<DataForm< SamplePost >

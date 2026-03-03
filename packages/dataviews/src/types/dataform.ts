@@ -29,6 +29,8 @@ export type PanelLayout = {
 	openAs?: 'dropdown' | 'modal';
 	summary?: PanelSummaryField;
 	editVisibility?: EditVisibility;
+	applyButtonText?: string;
+	cancelButtonText?: string;
 };
 export type NormalizedPanelLayout = {
 	type: 'panel';
@@ -36,6 +38,8 @@ export type NormalizedPanelLayout = {
 	openAs: 'dropdown' | 'modal';
 	summary: NormalizedPanelSummaryField;
 	editVisibility: EditVisibility;
+	applyButtonText?: string;
+	cancelButtonText?: string;
 };
 
 export type CardSummaryField =
