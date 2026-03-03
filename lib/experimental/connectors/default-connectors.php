@@ -106,7 +106,7 @@ function _gutenberg_get_connector_settings(): array {
 	$connectors = array(
 		'google'    => array(
 			'name'           => 'Gemini',
-			'description'    => __( 'Content generation, translation, and vision with Google\'s Gemini.', 'gutenberg' ),
+			'description'    => __( 'Text and image generation with Gemini and Imagen.', 'gutenberg' ),
 			'type'           => 'ai_provider',
 			'authentication' => array(
 				'method'          => 'api_key',
