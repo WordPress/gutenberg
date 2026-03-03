@@ -38,6 +38,7 @@ type LogFunction = ( message: string, debug?: object ) => void;
 
 interface PollingManager {
 	registerRoom: ( options: RegisterRoomOptions ) => void;
+	retryNow: () => void;
 	unregisterRoom: ( room: string ) => void;
 }
 
@@ -314,6 +315,7 @@ function handleVisibilityChange() {
 
 function poll(): void {
 	isPolling = true;
+	pollingTimeoutId = null;
 
 	async function start(): Promise< void > {
 		if ( 0 === roomStates.size ) {
@@ -438,7 +440,10 @@ function poll(): void {
 			// flashing the disconnect dialog before the new page loads.
 			if ( ! isUnloadPending ) {
 				roomStates.forEach( ( state ) => {
-					state.onStatusChange( { status: 'disconnected' } );
+					state.onStatusChange( {
+						status: 'disconnected',
+						retryInMs: pollInterval,
+					} );
 				} );
 			}
 		}
@@ -549,7 +554,23 @@ function unregisterRoom( room: string ): void {
 	}
 }
 
+/**
+ * Immediately retry the sync connection by cancelling any pending backoff
+ * timeout and triggering a new poll. If a request is already in-flight,
+ * the backoff interval is reset so the next scheduled poll fires sooner.
+ */
+function retryNow(): void {
+	pollInterval = POLLING_INTERVAL_IN_MS * 2;
+
+	if ( pollingTimeoutId ) {
+		clearTimeout( pollingTimeoutId );
+		pollingTimeoutId = null;
+		poll();
+	}
+}
+
 export const pollingManager: PollingManager = {
 	registerRoom,
+	retryNow,
 	unregisterRoom,
 };

@@ -1,11 +1,9 @@
-.editor-sync-connection-modal__container {
-	align-items: center;
-	display: flex;
-	margin: auto;
-	max-width: 30rem;
+@use "@wordpress/base-styles/colors" as *;
+
+.editor-sync-connection-modal p {
+	margin: 0;
 }
 
-.editor-sync-connection-modal__description {
-	font-size: 1.3rem;
-	text-align: center;
+.editor-sync-connection-modal__retry-countdown {
+	color: $gray-700;
 }
