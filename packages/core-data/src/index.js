@@ -139,7 +139,6 @@ register( store ); // Register store after unlocking private selectors to allow 
  */
 export { SelectionType } from './utils/crdt-user-selections';
 export { SelectionDirection } from './types';
-export { ResolvedSelection } from './hooks/use-post-editor-awareness-state';
 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';

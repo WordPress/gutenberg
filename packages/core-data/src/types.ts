@@ -125,3 +125,8 @@ export type SelectionState =
 	| SelectionInOneBlock
 	| SelectionInMultipleBlocks
 	| SelectionWholeBlock;
+
+export interface ResolvedSelection {
+	textIndex: number | null;
+	localClientId: string | null;
+}
