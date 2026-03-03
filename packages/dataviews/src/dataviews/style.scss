@@ -27,6 +27,12 @@
 	background-color: var(--wp-dataviews-color-background, $white);
 }
 
+.dataviews-wrapper--scroll-y-table,
+.dataviews-picker-wrapper--scroll-y-table {
+	overflow-y: hidden;
+	overflow-x: auto;
+}
+
 .dataviews__view-actions,
 .dataviews-filters__container {
 	box-sizing: border-box;

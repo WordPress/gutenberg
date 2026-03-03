@@ -255,6 +255,22 @@
 	}
 }
 
+.dataviews-view-table__scroll-container {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+	min-height: 0;
+	background-color: inherit;
+}
+
+.dataviews-view-table__vertical-scroll {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	overflow-x: auto;
+	background-color: inherit;
+}
+
 
 .dataviews-view-table-selection-checkbox {
 	--checkbox-input-size: 24px;

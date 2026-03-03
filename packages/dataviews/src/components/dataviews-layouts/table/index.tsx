@@ -302,7 +302,7 @@ function ViewTable< Item >( {
 	className,
 	empty,
 }: ViewTableProps< Item > ) {
-	const { containerRef } = useContext( DataViewsContext );
+	const { containerRef, scrollContainerRef } = useContext( DataViewsContext );
 	const isDelayedLoading = useDelayedLoading( isLoading );
 	const headerMenuRefs = useRef<
 		Map< string, { node: HTMLButtonElement; fallback: string } >
@@ -323,8 +323,13 @@ function ViewTable< Item >( {
 
 	const tableNoticeId = useId();
 
+	const isVerticalScrollInTable = view.layout?.scrollY === 'table';
+	const horizontalScrollContainerRef = isVerticalScrollInTable
+		? scrollContainerRef
+		: containerRef;
+
 	const isHorizontalScrollEnd = useIsHorizontalScrollEnd( {
-		scrollContainerRef: containerRef,
+		scrollContainerRef: horizontalScrollContainerRef,
 		enabled: !! actions?.length,
 	} );
 
@@ -413,7 +418,7 @@ function ViewTable< Item >( {
 		);
 	}
 
-	return (
+	const tableElement = (
 		<>
 			<table
 				className={ clsx( 'dataviews-view-table', className, {
@@ -674,6 +679,23 @@ function ViewTable< Item >( {
 					</tbody>
 				) }
 			</table>
+		</>
+	);
+
+	return (
+		<>
+			{ isVerticalScrollInTable ? (
+				<div className="dataviews-view-table__scroll-container">
+					<div
+						className="dataviews-view-table__vertical-scroll"
+						ref={ scrollContainerRef }
+					>
+						{ tableElement }
+					</div>
+				</div>
+			) : (
+				tableElement
+			) }
 			{ isInfiniteScroll && isLoading && (
 				<div className="dataviews-loading" id={ tableNoticeId }>
 					<p className="dataviews-loading-more">

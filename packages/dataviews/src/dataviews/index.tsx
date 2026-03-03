@@ -146,6 +146,7 @@ function DataViews< Item >( {
 }: DataViewsProps< Item > ) {
 	const { infiniteScrollHandler } = paginationInfo;
 	const containerRef = useRef< HTMLDivElement >( null );
+	const scrollContainerRef = useRef< HTMLDivElement >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver(
 		( resizeObserverEntries: any ) => {
@@ -196,6 +197,8 @@ function DataViews< Item >( {
 	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
 
 	// Attach scroll event listener for infinite scroll
+	const viewScrollY = ( view.layout as { scrollY?: string } | undefined )
+		?.scrollY;
 	useEffect( () => {
 		if ( ! view.infiniteScrollEnabled || ! containerRef.current ) {
 			return;
@@ -214,13 +217,19 @@ function DataViews< Item >( {
 		}, 100 ); // Throttle to 100ms
 
 		const container = containerRef.current;
-		container.addEventListener( 'scroll', handleScroll );
+		const scrollContainer = scrollContainerRef.current ?? container;
+		scrollContainer.addEventListener( 'scroll', handleScroll );
 
 		return () => {
-			container.removeEventListener( 'scroll', handleScroll );
+			scrollContainer.removeEventListener( 'scroll', handleScroll );
 			handleScroll.cancel(); // Cancel any pending throttled calls
 		};
-	}, [ infiniteScrollHandler, view.infiniteScrollEnabled ] );
+	}, [
+		infiniteScrollHandler,
+		view.infiniteScrollEnabled,
+		view.type,
+		viewScrollY,
+	] );
 
 	// Filter out DataViewsPicker layouts.
 	const defaultLayouts = useMemo(
@@ -247,6 +256,17 @@ function DataViews< Item >( {
 		return null;
 	}
 
+	const scrollYMode =
+		view.type === 'table' || view.type === 'pickerTable'
+			? view.layout?.scrollY
+			: undefined;
+
+	const shouldScrollYInTable = scrollYMode === 'table';
+
+	const wrapperClassName = shouldScrollYInTable
+		? 'dataviews-wrapper dataviews-wrapper--scroll-y-table'
+		: 'dataviews-wrapper';
+
 	return (
 		<DataViewsContext.Provider
 			value={ {
@@ -268,6 +288,7 @@ function DataViews< Item >( {
 				renderItemLink,
 				containerWidth,
 				containerRef,
+				scrollContainerRef,
 				resizeObserverRef,
 				defaultLayouts,
 				filters,
@@ -280,7 +301,7 @@ function DataViews< Item >( {
 				onReset,
 			} }
 		>
-			<div className="dataviews-wrapper" ref={ containerRef }>
+			<div className={ wrapperClassName } ref={ containerRef }>
 				{ children ?? (
 					<DefaultUI
 						header={ header }

@@ -234,6 +234,16 @@ export interface ViewTable extends ViewBase {
 
 	layout?: {
 		/**
+		 * Where vertical scrolling should live for the table.
+		 *
+		 * Use `table` to keep the view actions and filters fixed while the table
+		 * scrolls vertically.
+		 *
+		 * @default 'wrapper'
+		 */
+		scrollY?: 'wrapper' | 'table';
+
+		/**
 		 * The styles for the columns.
 		 */
 		styles?: Record< string, ColumnStyle >;
@@ -308,6 +318,16 @@ export interface ViewPickerTable extends ViewBase {
 	type: 'pickerTable';
 
 	layout?: {
+		/**
+		 * Where vertical scrolling should live for the table.
+		 *
+		 * Use `table` to keep the view actions and filters fixed while the table
+		 * scrolls vertically.
+		 *
+		 * @default 'wrapper'
+		 */
+		scrollY?: 'wrapper' | 'table';
+
 		/**
 		 * The styles for the columns.
 		 */

@@ -47,6 +47,7 @@ type DataViewsContextType< Item > = {
 	isItemClickable: ( item: Item ) => boolean;
 	containerWidth: number;
 	containerRef: React.MutableRefObject< HTMLDivElement | null >;
+	scrollContainerRef: React.MutableRefObject< HTMLDivElement | null >;
 	resizeObserverRef:
 		| ( ( element?: HTMLDivElement | null ) => void )
 		| React.RefObject< HTMLDivElement >;
@@ -80,6 +81,7 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 	renderItemLink: undefined,
 	containerWidth: 0,
 	containerRef: createRef(),
+	scrollContainerRef: createRef(),
 	resizeObserverRef: () => {},
 	defaultLayouts: { list: {}, grid: {}, table: {} },
 	filters: [],

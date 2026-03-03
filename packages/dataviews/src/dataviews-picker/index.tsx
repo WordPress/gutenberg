@@ -129,6 +129,7 @@ function DataViewsPicker< Item >( {
 }: DataViewsPickerProps< Item > ) {
 	const { infiniteScrollHandler } = paginationInfo;
 	const containerRef = useRef< HTMLDivElement >( null );
+	const scrollContainerRef = useRef< HTMLDivElement >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver(
 		( resizeObserverEntries: any ) => {
@@ -166,6 +167,8 @@ function DataViewsPicker< Item >( {
 	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
 
 	// Attach scroll event listener for infinite scroll
+	const viewScrollY = ( view.layout as { scrollY?: string } | undefined )
+		?.scrollY;
 	useEffect( () => {
 		if ( ! view.infiniteScrollEnabled || ! containerRef.current ) {
 			return;
@@ -184,13 +187,19 @@ function DataViewsPicker< Item >( {
 		}, 100 ); // Throttle to 100ms
 
 		const container = containerRef.current;
-		container.addEventListener( 'scroll', handleScroll );
+		const scrollContainer = scrollContainerRef.current ?? container;
+		scrollContainer.addEventListener( 'scroll', handleScroll );
 
 		return () => {
-			container.removeEventListener( 'scroll', handleScroll );
+			scrollContainer.removeEventListener( 'scroll', handleScroll );
 			handleScroll.cancel(); // Cancel any pending throttled calls
 		};
-	}, [ infiniteScrollHandler, view.infiniteScrollEnabled ] );
+	}, [
+		infiniteScrollHandler,
+		view.infiniteScrollEnabled,
+		view.type,
+		viewScrollY,
+	] );
 
 	// Filter out DataViewsPicker layouts.
 	const defaultLayouts = useMemo(
@@ -211,6 +220,13 @@ function DataViewsPicker< Item >( {
 		return null;
 	}
 
+	const shouldScrollYInTable =
+		view.type === 'pickerTable' && view.layout?.scrollY === 'table';
+
+	const wrapperClassName = shouldScrollYInTable
+		? 'dataviews-picker-wrapper dataviews-picker-wrapper--scroll-y-table'
+		: 'dataviews-picker-wrapper';
+
 	return (
 		<DataViewsContext.Provider
 			value={ {
@@ -229,6 +245,7 @@ function DataViewsPicker< Item >( {
 				getItemId,
 				containerWidth,
 				containerRef,
+				scrollContainerRef,
 				resizeObserverRef,
 				defaultLayouts,
 				filters,
@@ -241,7 +258,7 @@ function DataViewsPicker< Item >( {
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
 			} }
 		>
-			<div className="dataviews-picker-wrapper" ref={ containerRef }>
+			<div className={ wrapperClassName } ref={ containerRef }>
 				{ children ?? (
 					<DefaultUI search={ search } searchLabel={ searchLabel } />
 				) }
