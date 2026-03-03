@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 
 export type ImageLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';
 
@@ -16,14 +16,18 @@ export type ImageLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';
  * @param src - The image URL. When falsy, status is `'idle'`.
  */
 export function useImageLoadingStatus( src?: string ) {
+	const [ prevSrc, setPrevSrc ] = useState( src );
 	const [ status, setStatus ] = useState< ImageLoadingStatus >(
 		src ? 'loading' : 'idle'
 	);
 
-	// Reset when src changes.
-	useEffect( () => {
+	// Synchronous reset when src changes — runs during render, not after
+	// commit, so a cached image's `load` event cannot sneak in before
+	// the reset and get overwritten.
+	if ( prevSrc !== src ) {
+		setPrevSrc( src );
 		setStatus( src ? 'loading' : 'idle' );
-	}, [ src ] );
+	}
 
 	const handleLoad = useCallback( () => setStatus( 'loaded' ), [] );
 	const handleError = useCallback( () => setStatus( 'error' ), [] );
