@@ -334,13 +334,7 @@ return array(
 		'filePath' => 'library/symbol-filled.svg',
 	),
 	'table'               => array(
-		// FIXME: Label amended to test the search feature:
-		//
-		//     /wp/v2/icons?search=verse
-		//     -> core/verse
-		//     -> core/table
-		//
-		'label'    => _x( 'Table Verse', 'icon label', 'gutenberg' ),
+		'label'    => _x( 'Table', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/table.svg',
 	),
 	'tablet'              => array(
