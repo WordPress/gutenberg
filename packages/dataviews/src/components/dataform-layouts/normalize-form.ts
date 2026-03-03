@@ -61,12 +61,8 @@ function normalizeLayout( layout?: Layout ): NormalizedLayout {
 			openAs: layout?.openAs ?? 'dropdown',
 			summary: normalizedSummary,
 			editVisibility: layout?.editVisibility ?? 'on-hover',
-			...( layout?.applyButtonText !== undefined && {
-				applyButtonText: layout.applyButtonText,
-			} ),
-			...( layout?.cancelButtonText !== undefined && {
-				cancelButtonText: layout.cancelButtonText,
-			} ),
+			applyButtonText: layout?.applyButtonText,
+			cancelButtonText: layout?.cancelButtonText,
 		} satisfies NormalizedPanelLayout;
 	} else if ( layout?.type === 'card' ) {
 		if ( layout.withHeader === false ) {
