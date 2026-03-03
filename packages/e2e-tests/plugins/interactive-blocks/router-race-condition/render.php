@@ -1,3 +1,12 @@
+<?php
+/**
+ * HTML for testing the router hydration race condition.
+ *
+ * @package gutenberg-test-interactive-blocks
+ *
+ * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
+ */
+?>
 <div
 	data-wp-interactive="router-race-condition"
 	data-wp-context='{ "counter": 0 }'
