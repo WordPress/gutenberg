@@ -39,6 +39,7 @@ jest.mock( '@wordpress/blocks', () => ( {
  */
 import {
 	mergeCrdtBlocks,
+	mergeRichTextUpdate,
 	type Block,
 	type YBlock,
 	type YBlocks,
@@ -1067,6 +1068,352 @@ describe( 'crdt-blocks', () => {
 			const attrs2 = block2.get( 'attributes' ) as YBlockAttributes;
 			expect( attrs2.has( 'content' ) ).toBe( true );
 			expect( attrs2.has( 'caption' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'emoji handling', () => {
+		// Emoji like 😀 (U+1F600) are surrogate pairs in UTF-16 (.length === 2).
+		// The CRDT sync must preserve them without corruption (no U+FFFD / '�').
+
+		it( 'preserves emoji in initial block content', () => {
+			const blocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Hello 😀 World' },
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, blocks, null );
+
+			const block = yblocks.get( 0 );
+			const content = (
+				block.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' ) as Y.Text;
+			expect( content.toString() ).toBe( 'Hello 😀 World' );
+		} );
+
+		it( 'handles inserting emoji into existing rich-text', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Hello World' },
+					innerBlocks: [],
+					clientId: 'block-1',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Hello 😀 World' },
+					innerBlocks: [],
+					clientId: 'block-1',
+				},
+			];
+
+			// Cursor after 'Hello 😀' = 6 + 2 = 8
+			mergeCrdtBlocks( yblocks, updatedBlocks, 8 );
+
+			const block = yblocks.get( 0 );
+			const content = (
+				block.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' ) as Y.Text;
+			expect( content.toString() ).toBe( 'Hello 😀 World' );
+		} );
+
+		it( 'handles deleting emoji from rich-text', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Hello 😀 World' },
+					innerBlocks: [],
+					clientId: 'block-1',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Hello  World' },
+					innerBlocks: [],
+					clientId: 'block-1',
+				},
+			];
+
+			// Cursor at position 6 (after 'Hello ', emoji was deleted)
+			mergeCrdtBlocks( yblocks, updatedBlocks, 6 );
+
+			const block = yblocks.get( 0 );
+			const content = (
+				block.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' ) as Y.Text;
+			expect( content.toString() ).toBe( 'Hello  World' );
+		} );
+
+		it( 'handles typing after emoji in rich-text', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'a😀b' },
+					innerBlocks: [],
+					clientId: 'block-1',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'a😀xb' },
+					innerBlocks: [],
+					clientId: 'block-1',
+				},
+			];
+
+			// Cursor after 'a😀x' = 1 + 2 + 1 = 4
+			mergeCrdtBlocks( yblocks, updatedBlocks, 4 );
+
+			const block = yblocks.get( 0 );
+			const content = (
+				block.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' ) as Y.Text;
+			expect( content.toString() ).toBe( 'a😀xb' );
+		} );
+
+		it( 'handles multiple emoji in rich-text updates', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: '😀🎉🚀' },
+					innerBlocks: [],
+					clientId: 'block-1',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			// Insert ' hello ' between first and second emoji
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: '😀 hello 🎉🚀' },
+					innerBlocks: [],
+					clientId: 'block-1',
+				},
+			];
+
+			// Cursor after '😀 hello ' = 2 + 7 = 9
+			mergeCrdtBlocks( yblocks, updatedBlocks, 9 );
+
+			const block = yblocks.get( 0 );
+			const content = (
+				block.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' ) as Y.Text;
+			expect( content.toString() ).toBe( '😀 hello 🎉🚀' );
+		} );
+	} );
+
+	describe( 'mergeRichTextUpdate - emoji handling', () => {
+		it( 'preserves emoji when appending text', () => {
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, '😀' );
+
+			mergeRichTextUpdate( yText, '😀x' );
+
+			expect( yText.toString() ).toBe( '😀x' );
+		} );
+
+		it( 'preserves emoji when inserting before emoji', () => {
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, '😀' );
+
+			mergeRichTextUpdate( yText, 'x😀' );
+
+			expect( yText.toString() ).toBe( 'x😀' );
+		} );
+
+		it( 'preserves emoji when replacing text around emoji', () => {
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, 'a😀b' );
+
+			mergeRichTextUpdate( yText, 'a😀c', 4 );
+
+			expect( yText.toString() ).toBe( 'a😀c' );
+		} );
+
+		it( 'handles inserting emoji into plain text', () => {
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, 'ab' );
+
+			mergeRichTextUpdate( yText, 'a😀b', 3 );
+
+			expect( yText.toString() ).toBe( 'a😀b' );
+		} );
+
+		it( 'handles deleting emoji', () => {
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, 'a😀b' );
+
+			mergeRichTextUpdate( yText, 'ab', 1 );
+
+			expect( yText.toString() ).toBe( 'ab' );
+		} );
+
+		it( 'handles text with multiple emoji', () => {
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, 'Hello 😀 World 🎉' );
+
+			mergeRichTextUpdate( yText, 'Hello 😀 Beautiful World 🎉', 19 );
+
+			expect( yText.toString() ).toBe( 'Hello 😀 Beautiful World 🎉' );
+		} );
+
+		it( 'handles compound emoji (flag emoji)', () => {
+			// Flag emoji like 🏳️‍🌈 are compound and has .length === 6 in JavaScript
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, 'a🏳️‍🌈b' );
+
+			mergeRichTextUpdate( yText, 'a🏳️‍🌈xb', 7 );
+
+			expect( yText.toString() ).toBe( 'a🏳️‍🌈xb' );
+		} );
+
+		it( 'handles emoji with skin tone modifier', () => {
+			// 👋🏽 is U+1F44B U+1F3FD (wave + medium skin tone), .length === 4
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, 'Hi 👋🏽' );
+
+			mergeRichTextUpdate( yText, 'Hi 👋🏽!', 6 );
+
+			expect( yText.toString() ).toBe( 'Hi 👋🏽!' );
+		} );
+	} );
+
+	describe( 'supplementary plane characters (non-emoji)', () => {
+		// Characters above U+FFFF are stored as surrogate pairs in UTF-16,
+		// so .length === 2 per character. The diff library v8 counts them
+		// as 1 grapheme cluster, causing the same mismatch as emoji.
+
+		describe( 'mergeCrdtBlocks', () => {
+			it( 'handles CJK Extension B characters (rare kanji)', () => {
+				// 𠮷 (U+20BB7) is a real character used in Japanese names.
+				// Surrogate pair: .length === 2.
+				const initialBlocks: Block[] = [
+					{
+						name: 'core/paragraph',
+						attributes: { content: '𠮷野家' },
+						innerBlocks: [],
+						clientId: 'block-1',
+					},
+				];
+
+				mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+				const updatedBlocks: Block[] = [
+					{
+						name: 'core/paragraph',
+						attributes: { content: '𠮷野家は美味しい' },
+						innerBlocks: [],
+						clientId: 'block-1',
+					},
+				];
+
+				// Cursor after '𠮷野家は美味しい' = 2+1+1+1+1+1+1+1 = 9
+				mergeCrdtBlocks( yblocks, updatedBlocks, 9 );
+
+				const block = yblocks.get( 0 );
+				const content = (
+					block.get( 'attributes' ) as YBlockAttributes
+				 ).get( 'content' ) as Y.Text;
+				expect( content.toString() ).toBe( '𠮷野家は美味しい' );
+			} );
+
+			it( 'handles mathematical symbols from supplementary plane', () => {
+				// 𝐀 (U+1D400) — .length === 2
+				const initialBlocks: Block[] = [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Let 𝐀 be' },
+						innerBlocks: [],
+						clientId: 'block-1',
+					},
+				];
+
+				mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+				const updatedBlocks: Block[] = [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Let 𝐀 be a matrix' },
+						innerBlocks: [],
+						clientId: 'block-1',
+					},
+				];
+
+				mergeCrdtBlocks( yblocks, updatedBlocks, 18 );
+
+				const block = yblocks.get( 0 );
+				const content = (
+					block.get( 'attributes' ) as YBlockAttributes
+				 ).get( 'content' ) as Y.Text;
+				expect( content.toString() ).toBe( 'Let 𝐀 be a matrix' );
+			} );
+		} );
+
+		describe( 'mergeRichTextUpdate', () => {
+			it( 'preserves CJK Extension B characters when appending', () => {
+				const yText = doc.getText( 'test' );
+				yText.insert( 0, '𠮷' );
+
+				mergeRichTextUpdate( yText, '𠮷x' );
+
+				expect( yText.toString() ).toBe( '𠮷x' );
+			} );
+
+			it( 'handles inserting after CJK Extension B character', () => {
+				const yText = doc.getText( 'test' );
+				yText.insert( 0, 'a𠮷b' );
+
+				mergeRichTextUpdate( yText, 'a𠮷xb', 4 );
+
+				expect( yText.toString() ).toBe( 'a𠮷xb' );
+			} );
+
+			it( 'handles mathematical symbols from supplementary plane', () => {
+				// 𝐀 (U+1D400) — .length === 2
+				const yText = doc.getText( 'test' );
+				yText.insert( 0, 'a𝐀b' );
+
+				mergeRichTextUpdate( yText, 'a𝐀xb', 4 );
+
+				expect( yText.toString() ).toBe( 'a𝐀xb' );
+			} );
+
+			it( 'handles mixed surrogate pairs and BMP text', () => {
+				// 𠮷 (CJK Ext B) + 😀 (emoji) — both surrogate pairs
+				const yText = doc.getText( 'test' );
+				yText.insert( 0, '𠮷😀' );
+
+				mergeRichTextUpdate( yText, '𠮷😀!' );
+
+				expect( yText.toString() ).toBe( '𠮷😀!' );
+			} );
+
+			it( 'handles musical symbols (supplementary plane)', () => {
+				// 𝄞 (U+1D11E, Musical Symbol G Clef) — .length === 2
+				const yText = doc.getText( 'test' );
+				yText.insert( 0, 'a𝄞b' );
+
+				mergeRichTextUpdate( yText, 'a𝄞xb', 4 );
+
+				expect( yText.toString() ).toBe( 'a𝄞xb' );
+			} );
 		} );
 	} );
 } );

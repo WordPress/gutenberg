@@ -16,6 +16,40 @@ import { __ } from '@wordpress/i18n';
 import { useConnectorPlugin } from './use-connector-plugin';
 import { OpenAILogo, ClaudeLogo, GeminiLogo } from './logos';
 
+type ConnectorAuthentication =
+	| { method: 'api_key'; settingName: string; credentialsUrl: string | null }
+	| { method: 'none' };
+
+interface ConnectorData {
+	name: string;
+	description: string;
+	type: 'ai_provider';
+	plugin?: { slug: string };
+	authentication: ConnectorAuthentication;
+}
+
+/**
+ * Reads connector data passed from PHP via the script module data mechanism.
+ */
+function getConnectorData(): Record< string, ConnectorData > {
+	try {
+		const parsed = JSON.parse(
+			document.getElementById(
+				'wp-script-module-data-connectors-wp-admin'
+			)?.textContent ?? ''
+		);
+		return parsed?.connectors ?? {};
+	} catch {
+		return {};
+	}
+}
+
+const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
+	google: GeminiLogo,
+	openai: OpenAILogo,
+	anthropic: ClaudeLogo,
+};
+
 const ConnectedBadge = () => (
 	<span
 		style={ {
@@ -32,23 +66,30 @@ const ConnectedBadge = () => (
 	</span>
 );
 
-interface ConnectorConfig {
-	pluginSlug: string;
+interface ApiKeyConnectorConfig {
+	pluginSlug?: string;
 	settingName: string;
-	helpUrl: string;
-	helpLabel: string;
-	Logo: React.ComponentType;
+	helpUrl?: string;
+	Logo?: React.ComponentType;
 }
 
-function ProviderConnector( {
+function ApiKeyConnector( {
 	label,
 	description,
 	pluginSlug,
 	settingName,
 	helpUrl,
-	helpLabel,
 	Logo,
-}: ConnectorRenderProps & ConnectorConfig ) {
+}: ConnectorRenderProps & ApiKeyConnectorConfig ) {
+	let helpLabel: string | undefined;
+	try {
+		if ( helpUrl ) {
+			helpLabel = new URL( helpUrl ).hostname;
+		}
+	} catch {
+		// Invalid URL — leave helpLabel undefined.
+	}
+
 	const {
 		pluginStatus,
 		isExpanded,
@@ -67,8 +108,10 @@ function ProviderConnector( {
 
 	return (
 		<ConnectorItem
-			className={ `connector-item--${ pluginSlug }` }
-			icon={ <Logo /> }
+			className={
+				pluginSlug ? `connector-item--${ pluginSlug }` : undefined
+			}
+			icon={ Logo ? <Logo /> : undefined }
 			name={ label }
 			description={ description }
 			actionArea={
@@ -109,69 +152,37 @@ function ProviderConnector( {
 	);
 }
 
-// OpenAI connector render component
-function OpenAIConnector( props: ConnectorRenderProps ) {
-	return (
-		<ProviderConnector
-			{ ...props }
-			pluginSlug="ai-provider-for-openai"
-			settingName="connectors_ai_openai_api_key"
-			helpUrl="https://platform.openai.com"
-			helpLabel="platform.openai.com"
-			Logo={ OpenAILogo }
-		/>
-	);
-}
-
-// Claude connector render component
-function ClaudeConnector( props: ConnectorRenderProps ) {
-	return (
-		<ProviderConnector
-			{ ...props }
-			pluginSlug="ai-provider-for-anthropic"
-			settingName="connectors_ai_anthropic_api_key"
-			helpUrl="https://console.anthropic.com"
-			helpLabel="console.anthropic.com"
-			Logo={ ClaudeLogo }
-		/>
-	);
-}
-
-// Gemini connector render component
-function GeminiConnector( props: ConnectorRenderProps ) {
-	return (
-		<ProviderConnector
-			{ ...props }
-			pluginSlug="ai-provider-for-google"
-			settingName="connectors_ai_google_api_key"
-			helpUrl="https://aistudio.google.com"
-			helpLabel="aistudio.google.com"
-			Logo={ GeminiLogo }
-		/>
-	);
-}
-
-// Register built-in connectors
+// Register connectors from server-provided connector data.
 export function registerDefaultConnectors() {
-	registerConnector( 'core/openai', {
-		label: __( 'OpenAI' ),
-		description: __(
-			'Text, image, and code generation with GPT and DALL-E.'
-		),
-		render: OpenAIConnector,
-	} );
+	const connectors = getConnectorData();
 
-	registerConnector( 'core/claude', {
-		label: __( 'Claude' ),
-		description: __( 'Writing, research, and analysis with Claude.' ),
-		render: ClaudeConnector,
-	} );
+	const sanitize = ( s: string ) => s.replace( /[^a-z0-9-]/gi, '-' );
 
-	registerConnector( 'core/gemini', {
-		label: __( 'Gemini' ),
-		description: __(
-			"Content generation, translation, and vision with Google's Gemini."
-		),
-		render: GeminiConnector,
-	} );
+	for ( const [ connectorId, data ] of Object.entries( connectors ) ) {
+		const { authentication } = data;
+
+		if (
+			data.type !== 'ai_provider' ||
+			authentication.method !== 'api_key'
+		) {
+			continue;
+		}
+
+		const connectorName = `${ sanitize( data.type ) }/${ sanitize(
+			connectorId
+		) }`;
+		registerConnector( connectorName, {
+			label: data.name,
+			description: data.description,
+			render: ( props ) => (
+				<ApiKeyConnector
+					{ ...props }
+					pluginSlug={ data.plugin?.slug }
+					settingName={ authentication.settingName }
+					helpUrl={ authentication.credentialsUrl ?? undefined }
+					Logo={ CONNECTOR_LOGOS[ connectorId ] }
+				/>
+			),
+		} );
+	}
 }

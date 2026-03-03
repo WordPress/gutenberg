@@ -906,4 +906,127 @@ describe( 'global styles renderer', () => {
 			} );
 		} );
 	} );
+
+	describe( 'button width declarations', () => {
+		it( 'should convert direct percentage width to calc() formula', () => {
+			const tree: GlobalStylesConfig = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/button': {
+							dimensions: {
+								width: '25%',
+							},
+						},
+					},
+				},
+			};
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button .wp-block-button__link',
+					featureSelectors: {
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-button){width: calc(25 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 25 / 100)));}'
+			);
+		} );
+
+		it( 'should convert preset percentage width to calc() formula', () => {
+			const tree: GlobalStylesConfig = {
+				settings: {
+					blocks: {
+						'core/button': {
+							dimensions: {
+								dimensionSizes: {
+									default: [
+										{
+											slug: '50',
+											name: '50%',
+											size: '50%',
+										},
+									],
+								},
+							},
+						},
+					},
+				},
+				styles: {
+					blocks: {
+						'core/button': {
+							dimensions: {
+								width: 'var:preset|dimension|50',
+							},
+						},
+					},
+				},
+			};
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button .wp-block-button__link',
+					featureSelectors: {
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-button){width: calc(50 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 50 / 100)));}'
+			);
+		} );
+
+		it( 'should not convert non-percentage width', () => {
+			const tree: GlobalStylesConfig = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/button': {
+							dimensions: {
+								width: '200px',
+							},
+						},
+					},
+				},
+			};
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button .wp-block-button__link',
+					featureSelectors: {
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-button){width: 200px;}'
+			);
+		} );
+	} );
 } );

@@ -54,6 +54,7 @@ export interface State {
 	editorSettings: Record< string, any > | null;
 	editorAssets: Record< string, any > | null;
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
+	collaborationSupported: boolean;
 }
 
 type EntityRecordKey = string | number;

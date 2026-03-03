@@ -21,8 +21,20 @@
 	.dataviews-footer {
 		padding-bottom: $grid-unit-10;
 	}
+}
 
-	.media-upload-modal__snackbar {
-		@include snackbar-container();
+.media-upload-modal__snackbar {
+	@include snackbar-container();
+	z-index: 200000;
+
+	// Override the transform and transform-origin applied by the Snackbar component
+	// to prevent the snackbar from shifting position when its content changes while
+	// the media upload modal is open. This is an edge case particular to the media
+	// upload modal when instantiated from a popover, such as the Replace control in
+	// the Image Block. In that case, the Framer Motion transform appears to get
+	// confused by the Snackbars being a child of the popover.
+	> div {
+		transform: none !important;
+		transform-origin: 0 !important;
 	}
 }

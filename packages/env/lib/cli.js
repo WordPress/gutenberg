@@ -151,6 +151,11 @@ module.exports = function cli() {
 				choices: getAvailableRuntimes(),
 				default: 'docker',
 			} );
+			args.option( 'auto-port', {
+				type: 'boolean',
+				describe:
+					'Automatically find available ports when configured ports are busy. Overrides the .wp-env.json "autoPort" setting.',
+			} );
 		},
 		withSpinner( env.start )
 	);
