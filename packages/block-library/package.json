@@ -72,6 +72,7 @@
 				"functionPrefix": "gutenberg_",
 				"classSuffix": "_Gutenberg",
 				"prefixFunctions": [
+					"block_core_shared_navigation_render_submenu_icon",
 					"wp_apply_colors_support",
 					"wp_enqueue_block_support_styles",
 					"wp_get_typography_font_size_value",
