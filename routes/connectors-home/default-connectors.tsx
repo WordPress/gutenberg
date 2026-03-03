@@ -31,7 +31,11 @@ interface ConnectorData {
 	name: string;
 	description: string;
 	type: 'ai_provider';
-	plugin?: { slug: string };
+	plugin?: {
+		slug: string;
+		isInstalled: boolean;
+		isActivated: boolean;
+	};
 	authentication: ConnectorAuthentication;
 }
 
