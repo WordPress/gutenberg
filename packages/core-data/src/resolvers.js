@@ -1197,9 +1197,6 @@ export const getRevision =
 		);
 
 		try {
-			// Check the cache after acquiring the lock. This ensures we benefit
-			// from data that getRevisions may have stored and released its lock
-			// for before we acquired ours.
 			const cached = select.getRevision(
 				kind,
 				name,
