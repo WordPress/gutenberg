@@ -668,9 +668,13 @@
 }
 
 @mixin inserter-toggle() {
+	// Basic look
 	background: colors.$gray-900;
 	color: colors.$white;
 	padding: 0;
+
+	// TODO: Consider passing size="small" to the Inserter toggle instead.
+	// Special dimensions for this button.
 	min-width: variables.$button-size-small;
 	height: variables.$button-size-small;
 
