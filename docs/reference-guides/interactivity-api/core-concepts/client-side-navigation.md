@@ -35,16 +35,27 @@ The `@wordpress/interactivity-router` package is bundled with WordPress Core sin
 npx @wordpress/create-block@latest my-interactive-block --template @wordpress/create-block-interactive-template
 ```
 
-If you already have an interactive block and want to add client-side navigation, you need to:
+Whether you are working with a block or a classic theme, adding client-side navigation involves the same steps:
 
-1. **Mark your script module as compatible with client-side navigation**: Ensure your block's `block.json` declares interactivity support (e.g., `"supports": { "interactivity": true }`) so that WordPress automatically marks its script module for loading during client-side navigation. See [Ensuring script modules load during navigation](#ensuring-script-modules-load-during-navigation) for details.
-2. **Add the router dependency**: Add `@wordpress/interactivity-router` as a dependency of your block's script module. This is typically done by dynamically importing the package in your `view.js` file (as shown in the examples below), which ensures it is only loaded when needed.
+1. **Add the router dependency**: Add `@wordpress/interactivity-router` as a dependency of your script module.
+2. **Ensure your script module loads during navigation**: Mark your script module so the router knows to load it on new pages.
 3. **Define router regions**: Mark the HTML elements that should be updated during navigation using the `data-wp-router-region` attribute.
-4. **Trigger navigation**: Use the router's `actions.navigate()` function to navigate programmatically when the user interacts with your block.
+4. **Trigger navigation**: Use the router's `actions.navigate()` function to navigate programmatically.
 
-### Using client-side navigation in Classic themes
+Steps 1 and 2 differ depending on whether you are working with a block or a classic theme, and are covered right below. Steps 3 and 4 are the same regardless of your setup.
 
-Client-side navigation is not limited to blocks — you can also use it in classic PHP themes by adding the Interactivity API directives directly in your theme's template files and processing them with `wp_interactivity_process_directives()`, as explained in the [Server-side rendering](/docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md#processing-directives-in-classic-themes) guide. Instead of relying on a block's `block.json` to declare script module dependencies, you register and enqueue your script module manually, taking into account that the `@wordpress/interactivity-router` module should be dynamically imported:
+### Adding the router dependency
+
+The `@wordpress/interactivity-router` module should be added as a dynamic dependency so it is only fetched when needed.
+
+For **blocks**, this is done by dynamically importing the package in your `view.js` file. The block build tooling (`wp-scripts`) detects the dynamic import and registers the PHP-side dependency automatically:
+
+```js
+const { actions } = yield import( '@wordpress/interactivity-router' );
+yield actions.navigate( url );
+```
+
+For **classic themes**, instead of relying on a block's `block.json`, you register and enqueue your script module manually in PHP, listing `@wordpress/interactivity-router` as a dynamic dependency. You also add the Interactivity API directives directly in your theme's template files and process them with `wp_interactivity_process_directives()`, as explained in the [Server-side rendering](/docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md#processing-directives-in-classic-themes) guide.
 
 ```php
 // functions.php
@@ -63,10 +74,6 @@ add_action( 'wp_enqueue_scripts', function () {
     wp_enqueue_script_module( 'my-theme/navigation' );
 } );
 ```
-
-Since classic themes don't use `block.json`, you must also register your script module for client-side navigation explicitly using `add_client_navigation_support_to_script_module()`. Without this, the router will not load your script module when navigating to a page that needs it. See [Ensuring script modules load during navigation](#ensuring-script-modules-load-during-navigation) for details.
-
-The rest of the guide — router regions, prefetching, navigation options — applies in exactly the same way regardless of whether you are working with a block or a classic theme.
 
 ### Ensuring script modules load during navigation
 
@@ -904,7 +911,7 @@ The Interactivity API uses [script modules](https://make.wordpress.org/core/2024
 
 **Identifying script modules for client-side navigation**
 
-Not all script modules should be loaded during client-side navigation. Some modules might be for admin functionality, or for features that only apply on initial page load. As described in the [Getting started](#getting-started-with-the-interactivity-router) and [Classic themes](#using-client-side-navigation-in-classic-themes) sections, WordPress uses the `data-wp-router-options` attribute to mark which script modules should be loaded during navigation:
+Not all script modules should be loaded during client-side navigation. Some modules might be for admin functionality, or for features that only apply on initial page load. As described in the [Getting started](#getting-started-with-the-interactivity-router) section, WordPress uses the `data-wp-router-options` attribute to mark which script modules should be loaded during navigation:
 
 ```html
 <script
