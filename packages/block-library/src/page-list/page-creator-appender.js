@@ -27,6 +27,7 @@ export default function PageCreatorAppender() {
 		<div className="block-list-appender wp-block">
 			<Button
 				__next40pxDefaultSize
+				size="small"
 				ref={ ref }
 				className="wp-block-page-list__appender-toggle"
 				icon={ plus }
