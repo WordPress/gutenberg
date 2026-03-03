@@ -115,7 +115,7 @@ function _gutenberg_get_connector_settings(): array {
 		),
 		'openai'    => array(
 			'name'           => 'OpenAI',
-			'description'    => __( 'Text, image, and code generation with GPT and DALL-E.', 'gutenberg' ),
+			'description'    => __( 'Text and image generation with GPT and Dall-E.', 'gutenberg' ),
 			'type'           => 'ai_provider',
 			'authentication' => array(
 				'method'          => 'api_key',
