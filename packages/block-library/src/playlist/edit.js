@@ -402,6 +402,7 @@ const PlaylistEdit = ( {
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
 					<WaveformPlayer
+						key={ currentTrack }
 						src={ currentTrackData?.src }
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
