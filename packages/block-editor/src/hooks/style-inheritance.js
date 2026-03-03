@@ -581,11 +581,13 @@ function StyleInheritanceGroupControl( {
 	return (
 		<InspectorControls group={ inspectorGroup }>
 			<Notice isDismissible={ false } status="info">
-				{ sprintf(
-					/* translators: %s: parent block title */
-					__( 'Inherited from %s' ),
-					providerTitle
-				) }
+				<span style={ { whiteSpace: 'nowrap' } }>
+					{ sprintf(
+						/* translators: %s: parent block title */
+						__( 'Inherited from %s' ),
+						providerTitle
+					) }
+				</span>
 				<br />
 				<Button variant="link" onClick={ handleOverride }>
 					{ __( 'Override' ) }
