@@ -9,7 +9,7 @@ import {
 } from '@wordpress/element';
 import { Button, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Icon, plus } from '@wordpress/icons';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -28,14 +28,12 @@ export default function PageCreatorAppender() {
 			<Button
 				__next40pxDefaultSize
 				ref={ ref }
-				className="block-list-appender__toggle"
-				style={ { display: 'flex' } }
+				className="block-editor-inserter__toggle"
+				icon={ plus }
 				onClick={ () => setShowCreator( true ) }
 				label={ __( 'Add page' ) }
 				showTooltip
-			>
-				<Icon icon={ plus } />
-			</Button>
+			/>
 			{ showCreator && (
 				<Popover anchor={ ref.current } placement="bottom-start" shift>
 					<LinkUIPageCreator
