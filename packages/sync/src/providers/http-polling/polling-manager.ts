@@ -298,16 +298,19 @@ function handleVisibilityChange() {
 		/*
 		 * Remove scheduled polling and repoll immediately when reactivated.
 		 *
-		 * This ensures that any updates by collaborators are immediately reflected
-		 * in the document once the browser tab becomes active. Otherwise there would
-		 * be a delay of 30 seconds before the updates came through.
+		 * This ensures that any updates by collaborators are immediately
+		 * reflected in the document once the browser tab becomes active.
+		 * Otherwise there would be a delay of up to 30 seconds before the
+		 * updates came through.
+		 *
+		 * Only repoll if we cleared a pending timeout, meaning the poll loop
+		 * was idle between cycles. If no timeout is pending, a poll request
+		 * is already in-flight and will pick up the updated isActiveBrowser
+		 * value when it schedules the next cycle.
 		 */
 		if ( pollingTimeoutId ) {
 			clearTimeout( pollingTimeoutId );
 			pollingTimeoutId = null;
-		}
-
-		if ( isPolling ) {
 			poll();
 		}
 	}
