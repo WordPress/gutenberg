@@ -23,6 +23,12 @@ export default function PageCreatorAppender() {
 	const ref = useRef();
 	const contextData = useContext( PageCreatorContext );
 
+	const closeCreator = () => {
+		setShowCreator( false );
+		// Return focus to the appender button after closing
+		ref.current?.focus();
+	};
+
 	return (
 		<>
 			<Button
@@ -39,12 +45,12 @@ export default function PageCreatorAppender() {
 					anchor={ ref.current }
 					placement="bottom-start"
 					shift
-					onClose={ () => setShowCreator( false ) }
+					onClose={ closeCreator }
 				>
 					<LinkUIPageCreator
 						postType="page"
-						onClose={ () => setShowCreator( false ) }
-						onPageCreated={ () => setShowCreator( false ) }
+						onClose={ closeCreator }
+						onPageCreated={ closeCreator }
 						menuOrder={ contextData?.menuOrder }
 					/>
 				</Popover>
