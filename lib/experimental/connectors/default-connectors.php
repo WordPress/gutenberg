@@ -90,7 +90,7 @@ function _gutenberg_get_real_api_key( string $option_name, callable $mask_callba
  *
  *         @type string $name           The connector's display name.
  *         @type string $description    The connector's description.
- *         @type string $type           The connector type: 'ai_provider'.
+ *         @type string $type           The connector type. Currently, only 'ai_provider' is supported.
  *         @type array  $authentication {
  *             Authentication configuration. When method is 'api_key', includes
  *             credentials_url and setting_name. When 'none', only method is present.
