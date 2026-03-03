@@ -23,7 +23,7 @@
 
 ### Enhancements
 
-- DataViews: Add `scrollY` layout option for table and pickerTable views to keep filters and actions fixed while the table body scrolls vertically.
+- DataViews: Add `scrollY` layout option for table and pickerTable views to keep filters and actions fixed while the table body scrolls vertically. [#76091](https://github.com/WordPress/gutenberg/pull/76091)
 - Documentation: Update README.md. [#75881](https://github.com/WordPress/gutenberg/pull/75881)
 - DataViews: Improve UI in `list` layout when we render only title and/or media fields. [#76042](https://github.com/WordPress/gutenberg/pull/76042)
 - DataViews: Adjust column spacing in table layout when no titleField is provided. [#75410](https://github.com/WordPress/gutenberg/pull/75410)
