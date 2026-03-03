@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
 export type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';
 
 interface UseConnectorPluginOptions {
-	pluginSlug: string;
+	pluginSlug?: string;
 	settingName: string;
 }
 
@@ -56,6 +56,13 @@ export function useConnectorPlugin( {
 	// Check plugin status on mount
 	useEffect( () => {
 		const checkPluginStatus = async () => {
+			if ( ! pluginSlug ) {
+				// No plugin slug — assume active, just fetch the API key.
+				await fetchApiKey();
+				setPluginStatus( 'active' );
+				return;
+			}
+
 			try {
 				const plugins = await apiFetch<
 					Array< { plugin: string; status: string } >
@@ -84,6 +91,9 @@ export function useConnectorPlugin( {
 	}, [ pluginSlug, fetchApiKey ] );
 
 	const installPlugin = async () => {
+		if ( ! pluginSlug ) {
+			return;
+		}
 		setIsBusy( true );
 		try {
 			await apiFetch( {
@@ -102,6 +112,9 @@ export function useConnectorPlugin( {
 	};
 
 	const activatePlugin = async () => {
+		if ( ! pluginSlug ) {
+			return;
+		}
 		setIsBusy( true );
 		try {
 			await apiFetch( {
