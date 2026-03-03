@@ -48,7 +48,7 @@ export function useConnectorPlugin( {
 
 	const canInstallPlugins = useSelect(
 		( select ) =>
-			select( coreStore ).canUser( 'create', {
+			!! select( coreStore ).canUser( 'create', {
 				kind: 'root',
 				name: 'plugin',
 			} ),
