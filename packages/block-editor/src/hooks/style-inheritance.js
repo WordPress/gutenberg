@@ -92,7 +92,7 @@ function hasInheritorSupport( blockName ) {
  * @param {Object}   attributes Block attributes.
  * @return {Object} CSS var name → value.
  */
-function buildProviderStyleVars( provides, attributes ) {
+export function buildProviderStyleVars( provides, attributes ) {
 	const vars = {};
 	const {
 		textColor,
@@ -237,7 +237,7 @@ function buildProviderStyleVars( provides, attributes ) {
  * @param {Object}   parentVars   Merged CSS var map from all nearest ancestor providers.
  * @return {string} CSS string, or empty string if no rules apply.
  */
-function buildInheritorCSS( selector, activeGroups, parentVars ) {
+export function buildInheritorCSS( selector, activeGroups, parentVars ) {
 	const rules = [];
 
 	if ( activeGroups.includes( 'color' ) ) {
