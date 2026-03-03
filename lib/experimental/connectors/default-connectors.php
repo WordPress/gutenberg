@@ -123,7 +123,7 @@ function _gutenberg_get_connector_settings(): array {
 			),
 		),
 		'anthropic' => array(
-			'name'           => 'Claude',
+			'name'           => 'Anthropic',
 			'description'    => __( 'Text generation with Claude.', 'gutenberg' ),
 			'type'           => 'ai_provider',
 			'authentication' => array(
