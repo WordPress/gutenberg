@@ -21,6 +21,7 @@ import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { published, commentAuthorAvatar } from '@wordpress/icons';
+import { dateField } from '@wordpress/fields';
 
 /**
  * Internal dependencies
@@ -143,7 +144,7 @@ function TemplateListActivation() {
 				label: users[ author ]?.name ?? author,
 			} );
 		}
-		return [
+		const _fields = [
 			previewField,
 			templateTitleField,
 			descriptionField,
@@ -154,7 +155,11 @@ function TemplateListActivation() {
 				elements,
 			},
 		];
-	}, [ users ] );
+		if ( activeView === 'user' ) {
+			_fields.push( dateField );
+		}
+		return _fields;
+	}, [ users, activeView ] );
 
 	// Apply filtering, sorting, and pagination on the client side
 	const { data: posts, paginationInfo } = useMemo( () => {
