@@ -91,6 +91,7 @@ export function NavigationLinkUI( {
 			clientId={ insertedBlock?.clientId }
 			link={ insertedBlock?.attributes }
 			anchor={ anchor }
+			placement={ anchor ? 'bottom-start' : undefined }
 			onBlockInsert={ handleSetInsertedBlock }
 			onClose={ () => {
 				// Use cleanup function

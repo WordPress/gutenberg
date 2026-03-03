@@ -105,21 +105,35 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 
+	// Find the parent submenu block so the popover anchors to the same
+	// row where the block settings dropdown was opened.
+	const anchorBlockClientId = useSelect(
+		( select ) => {
+			if ( ! insertedBlock?.clientId ) {
+				return null;
+			}
+			return select( blockEditorStore ).getBlockRootClientId(
+				insertedBlock.clientId
+			);
+		},
+		[ insertedBlock?.clientId ]
+	);
+
 	useEffect( () => {
-		if ( ! insertedBlock?.clientId ) {
+		if ( ! anchorBlockClientId ) {
 			setPopoverAnchor( null );
 			return;
 		}
 		// Wait for the list view to re-render with the new block
 		// before querying for the DOM element.
 		const rafId = window.requestAnimationFrame( () => {
-			const listViewRow = document.querySelector(
-				`.editor-list-view-sidebar [data-block="${ insertedBlock.clientId }"]`
+			const settingsButton = document.querySelector(
+				`.editor-list-view-sidebar [data-block="${ anchorBlockClientId }"] .block-editor-list-view-block__menu`
 			);
-			setPopoverAnchor( listViewRow || null );
+			setPopoverAnchor( settingsButton || null );
 		} );
 		return () => window.cancelAnimationFrame( rafId );
-	}, [ insertedBlock?.clientId ] );
+	}, [ anchorBlockClientId ] );
 
 	return (
 		<>
