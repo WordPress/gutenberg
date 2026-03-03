@@ -24,9 +24,9 @@ const { useActiveCollaborators, useLastPostSave } = unlock( privateApis );
  * notices if the same event is processed more than once.
  */
 const NOTIFICATION_TYPE = {
-	POST_UPDATED: 'collab-post-updated',
-	USER_ENTERED: 'collab-user-entered',
-	USER_EXITED: 'collab-user-exited',
+	COLLAB_POST_UPDATED: 'collab-post-updated',
+	COLLAB_USER_ENTERED: 'collab-user-entered',
+	COLLAB_USER_EXITED: 'collab-user-exited',
 } as const;
 
 const NOTIFICATIONS_CONFIG = {
@@ -152,7 +152,7 @@ export function useCollaboratorNotifications(
 				}
 
 				notify(
-					`${ NOTIFICATION_TYPE.USER_ENTERED }-${ collaborator.collaboratorInfo.id }`,
+					`${ NOTIFICATION_TYPE.COLLAB_USER_ENTERED }-${ collaborator.collaboratorInfo.id }`,
 					sprintf(
 						/* translators: %s: collaborator display name */
 						__( '%s has joined the post.' ),
@@ -182,7 +182,7 @@ export function useCollaboratorNotifications(
 				}
 
 				notify(
-					`${ NOTIFICATION_TYPE.USER_EXITED }-${ prevCollab.collaboratorInfo.id }`,
+					`${ NOTIFICATION_TYPE.COLLAB_USER_EXITED }-${ prevCollab.collaboratorInfo.id }`,
 					sprintf(
 						/* translators: %s: collaborator display name */
 						__( '%s has left the post.' ),
@@ -243,7 +243,7 @@ export function useCollaboratorNotifications(
 		);
 
 		void createNotice( 'info', message, {
-			id: `${ NOTIFICATION_TYPE.POST_UPDATED }-${ saver.collaboratorInfo.id }`,
+			id: `${ NOTIFICATION_TYPE.COLLAB_POST_UPDATED }-${ saver.collaboratorInfo.id }`,
 			type: 'snackbar',
 			isDismissible: false,
 		} );
