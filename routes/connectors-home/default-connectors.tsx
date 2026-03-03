@@ -86,6 +86,8 @@ interface ApiKeyConnectorConfig {
 	settingName: string;
 	helpUrl?: string;
 	Logo?: React.ComponentType;
+	isInstalled?: boolean;
+	isActivated?: boolean;
 }
 
 function ApiKeyConnector( {
@@ -95,6 +97,8 @@ function ApiKeyConnector( {
 	settingName,
 	helpUrl,
 	Logo,
+	isInstalled,
+	isActivated,
 }: ConnectorRenderProps & ApiKeyConnectorConfig ) {
 	let helpLabel: string | undefined;
 	try {
@@ -120,6 +124,8 @@ function ApiKeyConnector( {
 	} = useConnectorPlugin( {
 		pluginSlug,
 		settingName,
+		isInstalled,
+		isActivated,
 	} );
 	const showUnavailableBadge =
 		pluginStatus === 'not-installed' && canInstallPlugins !== true;
@@ -207,6 +213,8 @@ export function registerDefaultConnectors() {
 					settingName={ authentication.settingName }
 					helpUrl={ authentication.credentialsUrl ?? undefined }
 					Logo={ CONNECTOR_LOGOS[ connectorId ] }
+					isInstalled={ data.plugin?.isInstalled }
+					isActivated={ data.plugin?.isActivated }
 				/>
 			),
 		} );

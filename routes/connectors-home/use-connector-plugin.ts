@@ -12,6 +12,8 @@ export type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';
 interface UseConnectorPluginOptions {
 	pluginSlug?: string;
 	settingName: string;
+	isInstalled?: boolean;
+	isActivated?: boolean;
 }
 
 interface UseConnectorPluginReturn {
@@ -31,6 +33,8 @@ interface UseConnectorPluginReturn {
 export function useConnectorPlugin( {
 	pluginSlug,
 	settingName,
+	isInstalled,
+	isActivated,
 }: UseConnectorPluginOptions ): UseConnectorPluginReturn {
 	const [ pluginStatus, setPluginStatus ] =
 		useState< PluginStatus >( 'checking' );
@@ -95,12 +99,20 @@ export function useConnectorPlugin( {
 					setPluginStatus( 'inactive' );
 				}
 			} catch {
-				setPluginStatus( 'not-installed' );
+				// Fallback to server-provided status when API fails (e.g., no permissions).
+				if ( isActivated ) {
+					await fetchApiKey();
+					setPluginStatus( 'active' );
+				} else if ( isInstalled ) {
+					setPluginStatus( 'inactive' );
+				} else {
+					setPluginStatus( 'not-installed' );
+				}
 			}
 		};
 
 		checkPluginStatus();
-	}, [ pluginSlug, fetchApiKey ] );
+	}, [ pluginSlug, fetchApiKey, isInstalled, isActivated ] );
 
 	const installPlugin = async () => {
 		if ( ! pluginSlug ) {
