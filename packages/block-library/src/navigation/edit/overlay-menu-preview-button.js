@@ -35,7 +35,7 @@ export default function OverlayMenuPreviewButton( {
 			<div
 				className="wp-block-navigation__overlay-menu-preview"
 				role="img"
-				aria-label={ __( 'Overlay menu button preview' ) }
+				aria-label={ __( 'Overlay menu button preview showing three lines hamburger menu to open the overlay and X to close it' ) }
 			>
 				{ hasIcon && (
 					<>
