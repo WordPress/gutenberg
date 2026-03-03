@@ -117,14 +117,16 @@ function BlockContent( {
 
 	if ( pages.length > 0 ) {
 		return (
-			<ul { ...innerBlocksProps }>
-				{ innerBlocksProps.children }
+			<div { ...blockProps }>
+				<ul { ...innerBlocksProps }>
+					{ innerBlocksProps.children }
+				</ul>
 				{ showAppender && (
-					<li className="wp-block-page-list__appender-container">
+					<div className="wp-block-page-list__appender-container">
 						<PageCreatorAppender />
-					</li>
+					</div>
 				) }
-			</ul>
+			</div>
 		);
 	}
 }
@@ -333,14 +335,17 @@ export default function PageListEdit( {
 		[ nextMenuOrder ]
 	);
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		renderAppender: false,
-		__unstableDisableDropZone: true,
-		templateLock: isChildOfNavigation ? false : 'all',
-		onInput: NOOP,
-		onChange: NOOP,
-		value: blockList,
-	} );
+	const innerBlocksProps = useInnerBlocksProps(
+		{},
+		{
+			renderAppender: false,
+			__unstableDisableDropZone: true,
+			templateLock: isChildOfNavigation ? false : 'all',
+			onInput: NOOP,
+			onChange: NOOP,
+			value: blockList,
+		}
+	);
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
