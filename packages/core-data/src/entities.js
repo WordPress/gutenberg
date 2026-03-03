@@ -19,7 +19,6 @@ import {
 	applyPostChangesToCRDTDoc,
 	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
-	registerTaxonomyRestBases,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from './utils/crdt';
 
@@ -332,11 +331,35 @@ async function loadPostTypeEntities() {
 	const postTypes = await apiFetch( {
 		path: '/wp/v2/types?context=view',
 	} );
+	const taxonomies = await apiFetch( {
+		path: '/wp/v2/taxonomies?context=view',
+	} );
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
 		);
 		const namespace = postType?.rest_namespace ?? 'wp/v2';
+
+		const syncedProperties = new Set( [
+			'author',
+			'blocks',
+			'content',
+			'comment_status',
+			'date',
+			'excerpt',
+			'featured_media',
+			'format',
+			'meta',
+			'ping_status',
+			'slug',
+			'status',
+			'sticky',
+			'template',
+			'title',
+			...( postType.taxonomies?.map(
+				( taxonomy ) => taxonomies[ taxonomy ].rest_base
+			) ?? [] ),
+		] );
 
 		const entity = {
 			kind: 'postType',
@@ -385,7 +408,7 @@ async function loadPostTypeEntities() {
 			 * @return {void}
 			 */
 			applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
-				applyPostChangesToCRDTDoc( crdtDoc, changes, postType ),
+				applyPostChangesToCRDTDoc( crdtDoc, changes, syncedProperties ),
 
 			/**
 			 * Create the awareness instance for the entity's CRDT document.
@@ -409,7 +432,11 @@ async function loadPostTypeEntities() {
 			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
 			 */
 			getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
-				getPostChangesFromCRDTDoc( crdtDoc, editedRecord, postType ),
+				getPostChangesFromCRDTDoc(
+					crdtDoc,
+					editedRecord,
+					syncedProperties
+				),
 
 			/**
 			 * Extract changes from a CRDT document that can be used to update the
@@ -439,13 +466,6 @@ async function loadTaxonomyEntities() {
 	const taxonomies = await apiFetch( {
 		path: '/wp/v2/taxonomies?context=view',
 	} );
-
-	// Auto-register all taxonomy rest_base values for CRDT sync.
-	const restBases = Object.values( taxonomies ?? {} )
-		.map( ( taxonomy ) => taxonomy.rest_base )
-		.filter( Boolean );
-	registerTaxonomyRestBases( restBases );
-
 	return Object.entries( taxonomies ?? {} ).map( ( [ name, taxonomy ] ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		const entity = {
