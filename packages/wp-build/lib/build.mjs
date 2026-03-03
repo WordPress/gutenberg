@@ -264,8 +264,9 @@ const wasmInlinePlugin = {
 				try {
 					const resolved = require.resolve( args.path );
 					return {
-						path: resolved,
+						path: normalizePath( path.relative( ROOT_DIR, resolved ) ),
 						namespace: 'wasm-inline',
+						pluginData: { resolvedPath: resolved },
 					};
 				} catch {
 					// If resolution fails, let other plugins handle it.
@@ -279,7 +280,7 @@ const wasmInlinePlugin = {
 		build.onLoad(
 			{ filter: /.*/, namespace: 'wasm-inline' },
 			async ( args ) => {
-				const wasmBuffer = await readFile( args.path );
+				const wasmBuffer = await readFile( args.pluginData.resolvedPath );
 				const base64 = wasmBuffer.toString( 'base64' );
 				const dataUrl = `data:application/wasm;base64,${ base64 }`;
 
