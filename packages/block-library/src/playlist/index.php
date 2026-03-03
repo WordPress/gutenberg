@@ -58,16 +58,17 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					);
 				}
 
-				// Data is passed to wp_interactivity_state() which JSON-encodes it,
-				// so we use wp_strip_all_tags() instead of esc_html() to prevent
-				// HTML injection without double-encoding. URLs still use esc_url().
+				// Data is passed to wp_interactivity_state() which JSON-encodes it.
+				// We use wp_kses() to strip HTML tags safely (preserving non-tag
+				// characters like </>), then wp_specialchars_decode() to convert
+				// any entities back to plain text for JSON encoding.
 				$tracks_data[ $unique_id ] = array(
 					'url'       => esc_url( $url ),
-					'title'     => wp_strip_all_tags( $title ),
-					'artist'    => wp_strip_all_tags( $artist ),
-					'album'     => wp_strip_all_tags( $album ),
+					'title'     => wp_specialchars_decode( wp_kses( $title, array() ) ),
+					'artist'    => wp_specialchars_decode( wp_kses( $artist, array() ) ),
+					'album'     => wp_specialchars_decode( wp_kses( $album, array() ) ),
 					'image'     => esc_url( $image ),
-					'ariaLabel' => wp_strip_all_tags( $aria_label ),
+					'ariaLabel' => wp_specialchars_decode( wp_kses( $aria_label, array() ) ),
 				);
 
 				if ( $unique_id === $current_media_id ) {
