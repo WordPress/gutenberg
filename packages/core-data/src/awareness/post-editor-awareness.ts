@@ -70,6 +70,18 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		let selectionEnd = getSelectionEnd();
 		let localCursorTimeout: NodeJS.Timeout | null = null;
 
+		// During rapid selection changes (e.g. undo restoring content and
+		// selection), the debounce discards intermediate events. If we use the
+		// last intermediate state instead of the overall change it can produce
+		// the wrong direction.
+		// Use selectionBeforeDebounce to capture the selection state from
+		// before the debounce window so that direction is computed across the
+		// full window when it fires.
+		let selectionBeforeDebounce: {
+			start: WPBlockSelection;
+			end: WPBlockSelection;
+		} | null = null;
+
 		subscribe( () => {
 			const newSelectionStart = getSelectionStart();
 			const newSelectionEnd = getSelectionEnd();
@@ -81,8 +93,15 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				return;
 			}
 
-			const prevStart = selectionStart;
-			const prevEnd = selectionEnd;
+			// On the first change of a debounce window, snapshot the state
+			// we're moving away from.
+			if ( ! selectionBeforeDebounce ) {
+				selectionBeforeDebounce = {
+					start: selectionStart,
+					end: selectionEnd,
+				};
+			}
+
 			selectionStart = newSelectionStart;
 			selectionEnd = newSelectionEnd;
 
@@ -96,14 +115,6 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				initialPosition
 			);
 
-			// Infer selection direction from which edge moved.
-			const selectionDirection = detectSelectionDirection(
-				prevStart,
-				prevEnd,
-				newSelectionStart,
-				newSelectionEnd
-			);
-
 			// We receive two selection changes in quick succession
 			// from local selection events:
 			//   { clientId: "123...", attributeKey: "content", offset: undefined }
@@ -114,11 +125,29 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			}
 
 			localCursorTimeout = setTimeout( () => {
+				// Compute direction across the full debounce window.
+				const selectionStateOptions: {
+					selectionDirection?: SelectionDirection;
+				} = {};
+
+				if ( selectionBeforeDebounce ) {
+					selectionStateOptions.selectionDirection =
+						detectSelectionDirection(
+							selectionBeforeDebounce.start,
+							selectionBeforeDebounce.end,
+							selectionStart,
+							selectionEnd
+						);
+
+					// Reset debounced selection state.
+					selectionBeforeDebounce = null;
+				}
+
 				const selectionState = getSelectionState(
 					selectionStart,
 					selectionEnd,
 					this.doc,
-					{ selectionDirection }
+					selectionStateOptions
 				);
 
 				this.setThrottledLocalStateField(
