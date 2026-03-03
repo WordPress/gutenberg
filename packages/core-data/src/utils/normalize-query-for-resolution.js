@@ -9,6 +9,10 @@
  * @return {Object|undefined} Normalised query or undefined.
  */
 export default function normalizeQueryForResolution( query ) {
+	if ( ! query ) {
+		return undefined;
+	}
+
 	const filtered = Object.fromEntries(
 		Object.entries( query ).filter(
 			( [ k, v ] ) => ( k === 'context' || k === '_fields' ) && !! v
