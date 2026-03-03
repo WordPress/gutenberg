@@ -24,7 +24,7 @@ export default function PageCreatorAppender() {
 	const contextData = useContext( PageCreatorContext );
 
 	return (
-		<div className="block-list-appender wp-block">
+		<>
 			<Button
 				size="small"
 				ref={ ref }
@@ -35,7 +35,12 @@ export default function PageCreatorAppender() {
 				showTooltip
 			/>
 			{ showCreator && (
-				<Popover anchor={ ref.current } placement="bottom-start" shift>
+				<Popover
+					anchor={ ref.current }
+					placement="bottom-start"
+					shift
+					onClose={ () => setShowCreator( false ) }
+				>
 					<LinkUIPageCreator
 						postType="page"
 						onClose={ () => setShowCreator( false ) }
@@ -44,6 +49,6 @@ export default function PageCreatorAppender() {
 					/>
 				</Popover>
 			) }
-		</div>
+		</>
 	);
 }

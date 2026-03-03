@@ -55,6 +55,7 @@ function BlockContent( {
 	blockList,
 	pages,
 	parentPageID,
+	showAppender,
 } ) {
 	if ( ! hasResolvedPages ) {
 		return (
@@ -115,7 +116,16 @@ function BlockContent( {
 	}
 
 	if ( pages.length > 0 ) {
-		return <ul { ...innerBlocksProps }></ul>;
+		return (
+			<ul { ...innerBlocksProps }>
+				{ innerBlocksProps.children }
+				{ showAppender && (
+					<li className="wp-block-page-list__appender-container">
+						<PageCreatorAppender />
+					</li>
+				) }
+			</ul>
+		);
 	}
 }
 
@@ -434,8 +444,8 @@ export default function PageListEdit( {
 					blockList={ blockList }
 					pages={ pages }
 					parentPageID={ parentPageID }
+					showAppender={ showAppender }
 				/>
-				{ showAppender && <PageCreatorAppender /> }
 			</PageCreatorContext.Provider>
 		</>
 	);

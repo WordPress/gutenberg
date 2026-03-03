@@ -70,16 +70,13 @@
 	padding: $grid-unit-10 $grid-unit-15;
 }
 
-// Page creator appender button.
-.wp-block-page-list__appender-toggle.components-button {
-	background: $gray-900;
-	color: $white;
-	padding: 0;
-	width: $button-size-small;
-	height: $button-size-small;
+// Page creator appender container and button.
+.wp-block-page-list__appender-container {
+	list-style: none;
+	margin-top: $grid-unit-20;
+}
 
-	&:hover {
-		color: $white;
-		background: var(--wp-admin-theme-color);
-	}
+.wp-block-page-list__appender-toggle.components-button {
+	@include inserter-toggle;
+	width: $button-size-small;
 }
