@@ -109,9 +109,9 @@ export async function renderTemplateToString( templateName, replacements ) {
 				const indented = body
 					.split( '\n' )
 					.map(
-					/** @param {string} line */
-					( line ) => ( line.length ? `\t${ line }` : line )
-				)
+						/** @param {string} line */
+						( line ) => ( line.length ? `\t${ line }` : line )
+					)
 					.join( '\n' );
 				return `if ( ! function_exists( '${ fnName }' ) ) {\n${ indented }\n}`;
 			}
