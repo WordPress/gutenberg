@@ -12,6 +12,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { createBlock, parse } from '@wordpress/blocks';
+import { EntityProvider } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
@@ -163,20 +164,27 @@ export default function RevisionsCanvas( { showDiff } ) {
 		};
 	}, [] );
 
-	const { revision, previousRevision, postType, blockEditorSettings } =
-		useSelect( ( select ) => {
-			const {
-				getCurrentRevision,
-				getPreviousRevision,
-				getCurrentPostType,
-			} = unlock( select( editorStore ) );
-			return {
-				revision: getCurrentRevision(),
-				previousRevision: getPreviousRevision(),
-				postType: getCurrentPostType(),
-				blockEditorSettings: select( blockEditorStore ).getSettings(),
-			};
-		}, [] );
+	const {
+		revision,
+		previousRevision,
+		postType,
+		currentRevisionId,
+		blockEditorSettings,
+	} = useSelect( ( select ) => {
+		const {
+			getCurrentRevision,
+			getCurrentRevisionId: getRevisionId,
+			getPreviousRevision,
+			getCurrentPostType,
+		} = unlock( select( editorStore ) );
+		return {
+			revision: getCurrentRevision(),
+			previousRevision: getPreviousRevision(),
+			postType: getCurrentPostType(),
+			currentRevisionId: getRevisionId(),
+			blockEditorSettings: select( blockEditorStore ).getSettings(),
+		};
+	}, [] );
 
 	// Track previously rendered blocks to preserve clientIds between renders.
 	const previousBlocksRef = useRef( [] );
@@ -234,12 +242,17 @@ export default function RevisionsCanvas( { showDiff } ) {
 	);
 
 	return revision ? (
-		<ExperimentalBlockEditorProvider value={ blocks } settings={ settings }>
-			<DiffStyleOverrides showDiff={ showDiff } />
-			<div className="editor-revisions-canvas__content">
-				<CanvasContent showDiff={ showDiff } />
-			</div>
-		</ExperimentalBlockEditorProvider>
+		<EntityProvider revisionId={ currentRevisionId }>
+			<ExperimentalBlockEditorProvider
+				value={ blocks }
+				settings={ settings }
+			>
+				<DiffStyleOverrides showDiff={ showDiff } />
+				<div className="editor-revisions-canvas__content">
+					<CanvasContent showDiff={ showDiff } />
+				</div>
+			</ExperimentalBlockEditorProvider>
+		</EntityProvider>
 	) : (
 		<div className="editor-revisions-canvas__loading">
 			<Spinner />
