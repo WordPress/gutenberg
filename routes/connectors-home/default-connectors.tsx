@@ -112,6 +112,7 @@ function ApiKeyConnector( {
 	const {
 		pluginStatus,
 		canInstallPlugins,
+		canActivatePlugins,
 		isExpanded,
 		setIsExpanded,
 		isBusy,
@@ -128,7 +129,8 @@ function ApiKeyConnector( {
 		isActivated,
 	} );
 	const showUnavailableBadge =
-		pluginStatus === 'not-installed' && canInstallPlugins !== true;
+		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
+		( pluginStatus === 'inactive' && canActivatePlugins === false );
 	const showActionButton = ! showUnavailableBadge;
 
 	return (

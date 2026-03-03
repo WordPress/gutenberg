@@ -19,6 +19,7 @@ interface UseConnectorPluginOptions {
 interface UseConnectorPluginReturn {
 	pluginStatus: PluginStatus;
 	canInstallPlugins: boolean | undefined;
+	canActivatePlugins: boolean | undefined;
 	isExpanded: boolean;
 	setIsExpanded: ( expanded: boolean ) => void;
 	isBusy: boolean;
@@ -41,6 +42,9 @@ export function useConnectorPlugin( {
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ isBusy, setIsBusy ] = useState( false );
 	const [ currentApiKey, setCurrentApiKey ] = useState( '' );
+	// Track if user can manage plugins based on REST API access.
+	// If the /wp/v2/plugins call succeeds, user has activate_plugins capability.
+	const [ canManagePlugins, setCanManagePlugins ] = useState< boolean >();
 
 	const canInstallPlugins = useSelect(
 		( select ) =>
@@ -50,6 +54,9 @@ export function useConnectorPlugin( {
 			} ),
 		[]
 	);
+
+	// Use canManagePlugins (from REST API result) for activation capability.
+	const canActivatePlugins = canManagePlugins;
 
 	const isConnected =
 		pluginStatus === 'active' &&
@@ -86,6 +93,9 @@ export function useConnectorPlugin( {
 					path: '/wp/v2/plugins',
 				} );
 
+				// API call succeeded, user has activate_plugins capability.
+				setCanManagePlugins( true );
+
 				const plugin = plugins.find(
 					( p ) => p.plugin === `${ pluginSlug }/plugin`
 				);
@@ -99,6 +109,9 @@ export function useConnectorPlugin( {
 					setPluginStatus( 'inactive' );
 				}
 			} catch {
+				// API call failed, user likely lacks activate_plugins capability.
+				setCanManagePlugins( false );
+
 				// Fallback to server-provided status when API fails (e.g., no permissions).
 				if ( isActivated ) {
 					await fetchApiKey();
@@ -163,6 +176,9 @@ export function useConnectorPlugin( {
 			}
 			installPlugin();
 		} else if ( pluginStatus === 'inactive' ) {
+			if ( canActivatePlugins === false ) {
+				return;
+			}
 			activatePlugin();
 		} else {
 			setIsExpanded( ! isExpanded );
@@ -239,6 +255,7 @@ export function useConnectorPlugin( {
 	return {
 		pluginStatus,
 		canInstallPlugins,
+		canActivatePlugins,
 		isExpanded,
 		setIsExpanded,
 		isBusy,
