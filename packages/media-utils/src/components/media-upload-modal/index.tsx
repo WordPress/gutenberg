@@ -359,7 +359,6 @@ export function MediaUploadModal( {
 						type: 'snackbar',
 						context: NOTICES_CONTEXT,
 						id: NOTICE_ID_UPLOAD_PROGRESS,
-						explicitDismiss: true,
 					}
 				);
 
