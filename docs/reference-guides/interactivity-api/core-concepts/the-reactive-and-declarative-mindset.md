@@ -154,7 +154,7 @@ In this declarative example, the UI automatically updates based on the current s
 
 ### Can you spot the bug?
 
-In the imperative example, a bug has been intentionally introduced for didactical purposes. Can you find it? It's not easy!
+In the imperative example, a bug has been intentionally introduced for didactic purposes. Can you find it? It's not easy!
 
 <details>
 <summary>Show me the answer!</summary>
@@ -183,7 +183,7 @@ The Interactivity API uses a fine-grained reactivity system. Here's how it works
     - **Local context**: This is local data that is specific to a particular element and its children.
     - **Derived State**: In addition to basic state properties, you can define computed properties that automatically update when their dependencies change.
 
-    _Please, visit the [Understanding global state, local context and derived state](/docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md) guide to learn more about how to work with the different types of reactive state in the Interactivity API._
+    _Please, visit the [Understanding global state, local context, derived state and config](/docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-derived-state-and-config.md) guide to learn more about how to work with the different types of reactive state in the Interactivity API._
 
 2. **Actions**: These are functions, usually triggered by event handlers, that mutate the global state or local context.
 

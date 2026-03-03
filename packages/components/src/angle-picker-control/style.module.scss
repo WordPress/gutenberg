@@ -1,0 +1,40 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
+.circle-root {
+	border-radius: $radius-round;
+	border: $border-width solid $components-color-border;
+	box-sizing: border-box;
+	cursor: grab;
+	height: 32px;
+	overflow: hidden;
+	width: 32px;
+
+	&:active {
+		cursor: grabbing;
+	}
+}
+
+.circle-indicator-wrapper {
+	box-sizing: border-box;
+	position: relative;
+	width: 100%;
+	height: 100%;
+
+	&:focus-visible {
+		outline: none;
+	}
+}
+
+.circle-indicator {
+	background: $components-color-accent;
+	border-radius: $radius-round;
+	box-sizing: border-box;
+	display: block;
+	left: 50%;
+	top: 4px;
+	transform: translateX(-50%);
+	position: absolute;
+	width: 6px;
+	height: 6px;
+}

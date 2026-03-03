@@ -1,4 +1,4 @@
-/* eslint-disable playwright/no-conditional-in-test, playwright/expect-expect */
+/* eslint-disable playwright/expect-expect */
 
 /**
  * WordPress dependencies
@@ -492,12 +492,14 @@ test.describe( 'Post Editor Performance', () => {
 				.getByRole( 'button', {
 					name: 'Block Inserter',
 				} );
-			const paragraphBlockItem = page.locator(
-				'.block-editor-inserter__menu .editor-block-list-item-paragraph'
-			);
-			const headingBlockItem = page.locator(
-				'.block-editor-inserter__menu .editor-block-list-item-heading'
-			);
+			const paragraphBlockItem = page.getByRole( 'option', {
+				name: 'Paragraph',
+				exact: true,
+			} );
+			const headingBlockItem = page.getByRole( 'option', {
+				name: 'Heading',
+				exact: true,
+			} );
 
 			// Open Inserter.
 			await globalInserterToggle.click();
@@ -717,4 +719,4 @@ test.describe( 'Post Editor Performance', () => {
 	} );
 } );
 
-/* eslint-enable playwright/no-conditional-in-test, playwright/expect-expect */
+/* eslint-enable playwright/expect-expect */

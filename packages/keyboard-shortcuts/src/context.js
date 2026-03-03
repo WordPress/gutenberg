@@ -24,3 +24,5 @@ export const context = createContext( {
 		}
 	},
 } );
+
+context.displayName = 'KeyboardShortcutsContext';

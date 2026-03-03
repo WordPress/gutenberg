@@ -1,7 +1,212 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * Internal dependencies
  */
 import migrateFontFamily from '../utils/migrate-font-family';
+
+const v3 = {
+	attributes: {
+		datetime: {
+			type: 'string',
+			role: 'content',
+		},
+		textAlign: {
+			type: 'string',
+		},
+		format: {
+			type: 'string',
+		},
+		isLink: {
+			type: 'boolean',
+			default: false,
+			role: 'content',
+		},
+	},
+	supports: {
+		html: false,
+		color: {
+			gradients: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+				link: true,
+			},
+		},
+		spacing: {
+			margin: true,
+			padding: true,
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		interactivity: {
+			clientNavigation: true,
+		},
+		__experimentalBorder: {
+			radius: true,
+			color: true,
+			width: true,
+			style: true,
+			__experimentalDefaultControls: {
+				radius: true,
+				color: true,
+				width: true,
+				style: true,
+			},
+		},
+	},
+	save() {
+		return null;
+	},
+	migrate( {
+		metadata: {
+			bindings: {
+				datetime: {
+					source,
+					args: { key, ...otherArgs },
+				},
+				...otherBindings
+			},
+			...otherMetadata
+		},
+		...otherAttributes
+	} ) {
+		// Change the block bindings source argument name from "key" to "field".
+		return {
+			metadata: {
+				bindings: {
+					datetime: {
+						source,
+						args: { field: key, ...otherArgs },
+					},
+					...otherBindings,
+				},
+				...otherMetadata,
+			},
+			...otherAttributes,
+		};
+	},
+	isEligible( attributes ) {
+		return (
+			attributes?.metadata?.bindings?.datetime?.source ===
+				'core/post-data' &&
+			!! attributes?.metadata?.bindings?.datetime?.args?.key
+		);
+	},
+};
+
+const v2 = {
+	attributes: {
+		textAlign: {
+			type: 'string',
+		},
+		format: {
+			type: 'string',
+		},
+		isLink: {
+			type: 'boolean',
+			default: false,
+			role: 'content',
+		},
+		displayType: {
+			type: 'string',
+			default: 'date',
+		},
+	},
+	supports: {
+		html: false,
+		color: {
+			gradients: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+				link: true,
+			},
+		},
+		spacing: {
+			margin: true,
+			padding: true,
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		interactivity: {
+			clientNavigation: true,
+		},
+		__experimentalBorder: {
+			radius: true,
+			color: true,
+			width: true,
+			style: true,
+			__experimentalDefaultControls: {
+				radius: true,
+				color: true,
+				width: true,
+				style: true,
+			},
+		},
+	},
+	save() {
+		return null;
+	},
+	migrate( { className, displayType, metadata, ...otherAttributes } ) {
+		if ( displayType === 'date' || displayType === 'modified' ) {
+			if ( displayType === 'modified' ) {
+				className = clsx(
+					className,
+					'wp-block-post-date__modified-date'
+				);
+			}
+
+			return {
+				...otherAttributes,
+				className,
+				metadata: {
+					...metadata,
+					bindings: {
+						datetime: {
+							source: 'core/post-data',
+							args: { field: displayType },
+						},
+					},
+				},
+			};
+		}
+	},
+	isEligible( attributes ) {
+		// If there's neither an explicit `datetime` attribute nor a block binding for that attribute,
+		// then we're dealing with an old version of the block.
+		return (
+			! attributes.datetime && ! attributes?.metadata?.bindings?.datetime
+		);
+	},
+};
 
 const v1 = {
 	attributes: {
@@ -49,4 +254,4 @@ const v1 = {
  *
  * See block-deprecation.md
  */
-export default [ v1 ];
+export default [ v3, v2, v1 ];

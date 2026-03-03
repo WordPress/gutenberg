@@ -1,3 +1,8 @@
+@use "sass:color";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
 .components-notice {
 	display: flex;
 	font-family: $default-font;
@@ -10,46 +15,40 @@
 
 	&.is-dismissible {
 		position: relative;
+
+		.components-notice__content {
+			margin-right: #{ $button-size-small + $border-width };
+		}
 	}
 
 	&.is-success {
 		border-left-color: $alert-green;
-		background-color: lighten($alert-green, 45%);
+		background-color: color.adjust($alert-green, $lightness: +45%);
 	}
 
 	&.is-warning {
 		border-left-color: $alert-yellow;
-		background-color: lighten($alert-yellow, 35%);
+		background-color: color.adjust($alert-yellow, $lightness: +35%);
 	}
 
 	&.is-error {
 		border-left-color: $alert-red;
-		background-color: lighten($alert-red, 35%);
+		background-color: color.adjust($alert-red, $lightness: +35%);
 	}
 }
 
 .components-notice__content {
 	flex-grow: 1;
-	margin: $grid-unit-05 #{ $button-size-small + $border-width } $grid-unit-05 0;
+	margin-top: $grid-unit-05;
+	margin-bottom: $grid-unit-05;
 }
 
 .components-notice__actions {
 	display: flex;
 	flex-wrap: wrap;
-}
-
-.components-notice__action.components-button {
-	&,
-	&.is-link {
-		margin-left: $grid-unit-15;
-	}
-	&.is-secondary {
-		vertical-align: initial;
-	}
-
-	// When it has better support, this can be replaced
-	// with column-gap since these are flex items.
-	margin-right: $grid-unit-10;
+	align-items: center;
+	gap: $grid-unit-15;
+	margin-top: $grid-unit-15;
 }
 
 .components-notice__dismiss {
@@ -80,11 +79,5 @@
 		margin-top: $grid-unit-15;
 		margin-bottom: $grid-unit-15;
 		line-height: 2;
-	}
-
-	.components-notice__action.components-button {
-		display: block;
-		margin-left: 0;
-		margin-top: $grid-unit-10;
 	}
 }

@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import { Slot, Fill, Provider } from '../';
+import { Slot, Fill, Provider, useSlotFills } from '../';
 
 /**
  * WordPress dependencies
@@ -381,4 +381,27 @@ describe( 'Slot', () => {
 			} );
 		}
 	);
+
+	it( 'should not infinite loop with useSlotFills', () => {
+		function App() {
+			// if `useSlotFills` triggers a state update every time the `Fill` is rerendered with
+			// new `children`, it will cause infinite rerender loop. This test checks we don't do that.
+			const fills = useSlotFills( 'editor' );
+			return (
+				<div>
+					<div>fills:{ fills?.length ?? 'none' }</div>
+					<Slot name="editor" />
+					<Fill name="editor">
+						<div>fill content</div>
+					</Fill>
+				</div>
+			);
+		}
+		const { container } = render(
+			<Provider>
+				<App />
+			</Provider>
+		);
+		expect( container ).toMatchSnapshot();
+	} );
 } );

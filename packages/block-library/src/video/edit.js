@@ -20,17 +20,18 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	useBlockProps,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { prependHTTPS } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import PosterImage from './poster-image';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import {
 	useUploadMediaFromBlobURL,
@@ -40,6 +41,7 @@ import VideoCommonSettings from './edit-common-settings';
 import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 import { Caption } from '../utils/caption';
+import PosterImage from '../utils/poster-image';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -55,6 +57,8 @@ function VideoEdit( {
 	const { id, controls, poster, src, tracks } = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const blockEditingMode = useBlockEditingMode();
+	const hasNonContentControls = blockEditingMode === 'default';
 
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
@@ -70,6 +74,7 @@ function VideoEdit( {
 		}
 	}, [ poster ] );
 
+	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
 	function onSelectVideo( media ) {
 		if ( ! media || ! media.url ) {
 			// In this case there was an error
@@ -106,9 +111,10 @@ function VideoEdit( {
 
 	function onSelectURL( newSrc ) {
 		if ( newSrc !== src ) {
+			const url = prependHTTPS( newSrc );
 			// Check if there's an embed block that handles this URL.
 			const embedBlock = createUpgradedEmbedBlock( {
-				attributes: { url: newSrc },
+				attributes: { url },
 			} );
 			if ( undefined !== embedBlock && onReplace ) {
 				onReplace( embedBlock );
@@ -116,7 +122,7 @@ function VideoEdit( {
 			}
 			setAttributes( {
 				blob: undefined,
-				src: newSrc,
+				src: url,
 				id: undefined,
 				poster: undefined,
 			} );
@@ -193,6 +199,7 @@ function VideoEdit( {
 							onSelectURL={ onSelectURL }
 							onError={ onUploadError }
 							onReset={ () => onSelectVideo( undefined ) }
+							variant="toolbar"
 						/>
 					</BlockControls>
 				</>
@@ -219,7 +226,11 @@ function VideoEdit( {
 					/>
 					<PosterImage
 						poster={ poster }
-						setAttributes={ setAttributes }
+						onChange={ ( posterImage ) =>
+							setAttributes( {
+								poster: posterImage?.url,
+							} )
+						}
 					/>
 				</ToolsPanel>
 			</InspectorControls>
@@ -246,7 +257,9 @@ function VideoEdit( {
 					isSelected={ isSingleSelected }
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Video caption text' ) }
-					showToolbarButton={ isSingleSelected }
+					showToolbarButton={
+						isSingleSelected && hasNonContentControls
+					}
 				/>
 			</figure>
 		</>

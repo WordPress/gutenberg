@@ -6,10 +6,18 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Site editor url navigation', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
+		// Cross-origin isolation (COEP) prevents page navigations
+		// from working properly during template creation.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test.beforeEach( async ( { requestUtils } ) => {
@@ -34,6 +42,9 @@ test.describe( 'Site editor url navigation', () => {
 		await admin.visitSiteEditor();
 		await page.click( 'role=button[name="Templates"]' );
 		await page.click( 'role=button[name="Add Template"i]' );
+		// Wait for network idle to avoid flaky tests.
+		// eslint-disable-next-line playwright/no-networkidle
+		await page.waitForLoadState( 'networkidle' );
 		await page
 			.getByRole( 'button', {
 				name: 'Single item: Post',
@@ -79,7 +90,7 @@ test.describe( 'Site editor url navigation', () => {
 		await navigation.getByRole( 'button', { name: 'General' } ).click();
 		await page
 			.getByRole( 'region', {
-				name: 'Patterns content',
+				name: 'General',
 			} )
 			.getByText( 'header', { exact: true } )
 			.click();

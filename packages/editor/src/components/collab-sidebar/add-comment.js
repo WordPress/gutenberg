@@ -1,63 +1,108 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+/**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
+import { focusCommentThread, noop } from './utils';
+import { store as editorStore } from '../../store';
 
-/**
- * Renders the UI for adding a comment in the Gutenberg editor's collaboration sidebar.
- *
- * @param {Object}   props                     - The component props.
- * @param {Function} props.onSubmit            - A callback function to be called when the user submits a comment.
- * @param {boolean}  props.showCommentBoard    - The function to edit the comment.
- * @param {Function} props.setShowCommentBoard - The function to delete the comment.
- * @return {React.ReactNode} The rendered comment input UI.
- */
+const { useBlockElement } = unlock( blockEditorPrivateApis );
+
 export function AddComment( {
 	onSubmit,
-	showCommentBoard,
-	setShowCommentBoard,
+	commentSidebarRef,
+	reflowComments = noop,
+	isFloating = false,
+	y,
+	refs,
 } ) {
-	const { clientId, blockCommentId } = useSelect( ( select ) => {
-		const { getSelectedBlock } = select( blockEditorStore );
-		const selectedBlock = getSelectedBlock();
+	const { clientId } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId } = select( blockEditorStore );
 		return {
-			clientId: selectedBlock?.clientId,
-			blockCommentId: selectedBlock?.attributes?.blockCommentId,
+			clientId: getSelectedBlockClientId(),
 		};
-	} );
+	}, [] );
+	const selectedNote = useSelect(
+		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
+		[]
+	);
+	const blockElement = useBlockElement( clientId );
+	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+	const { selectNote } = unlock( useDispatch( editorStore ) );
 
-	if ( ! showCommentBoard || ! clientId || undefined !== blockCommentId ) {
+	const unselectThread = () => {
+		selectNote( undefined );
+		blockElement?.focus();
+		toggleBlockSpotlight( clientId, false );
+	};
+
+	if ( selectedNote !== 'new' || ! clientId ) {
 		return null;
 	}
 
 	return (
 		<VStack
+			className={ clsx(
+				'editor-collab-sidebar-panel__thread is-selected',
+				{
+					'is-floating': isFloating,
+				}
+			) }
 			spacing="3"
-			className="editor-collab-sidebar-panel__thread editor-collab-sidebar-panel__active-thread editor-collab-sidebar-panel__focus-thread"
+			tabIndex={ 0 }
+			aria-label={ __( 'New note' ) }
+			role="treeitem"
+			ref={ isFloating ? refs.setFloating : undefined }
+			style={
+				isFloating
+					? // Delay showing the floating note box until a Y position is known to prevent blink.
+					  { top: y, opacity: ! y ? 0 : undefined }
+					: undefined
+			}
+			onBlur={ ( event ) => {
+				// Don't deselect notes when the browser window/tab loses focus.
+				if ( ! document.hasFocus() ) {
+					return;
+				}
+				if ( event.currentTarget.contains( event.relatedTarget ) ) {
+					return;
+				}
+				toggleBlockSpotlight( clientId, false );
+				selectNote( undefined );
+			} }
 		>
 			<HStack alignment="left" spacing="3">
 				<CommentAuthorInfo />
 			</HStack>
 			<CommentForm
-				onSubmit={ ( inputComment ) => {
-					onSubmit( inputComment );
+				onSubmit={ async ( inputComment ) => {
+					const { id } = await onSubmit( { content: inputComment } );
+					selectNote( id );
+					focusCommentThread( id, commentSidebarRef.current );
 				} }
-				onCancel={ () => {
-					setShowCommentBoard( false );
-				} }
-				submitButtonText={ _x( 'Comment', 'Add comment button' ) }
+				onCancel={ unselectThread }
+				reflowComments={ reflowComments }
+				submitButtonText={ __( 'Add note' ) }
+				labelText={ __( 'New note' ) }
 			/>
 		</VStack>
 	);

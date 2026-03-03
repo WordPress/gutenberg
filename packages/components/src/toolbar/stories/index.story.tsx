@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -41,13 +41,9 @@ const meta: Meta< typeof Toolbar > = {
 	title: 'Components/Toolbar',
 	component: Toolbar,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		ToolbarButton,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		ToolbarGroup,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		ToolbarItem,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		ToolbarDropdownMenu,
 	},
 	argTypes: {
@@ -60,6 +56,10 @@ const meta: Meta< typeof Toolbar > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'editor',
+		},
 	},
 };
 

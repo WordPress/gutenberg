@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { decodeEntities } from '@wordpress/html-entities';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -22,19 +23,21 @@ export function isTemplateOrTemplatePart(
 	return p.type === 'wp_template' || p.type === 'wp_template_part';
 }
 
-export function getItemTitle( item: {
-	title: string | { rendered: string } | { raw: string };
-} ) {
+export function getItemTitle(
+	item: {
+		title: string | { rendered: string } | { raw: string };
+	},
+	fallback: string = __( '(no title)' )
+) {
+	let title = '';
 	if ( typeof item.title === 'string' ) {
-		return decodeEntities( item.title );
+		title = decodeEntities( item.title );
+	} else if ( item.title && 'rendered' in item.title ) {
+		title = decodeEntities( item.title.rendered );
+	} else if ( item.title && 'raw' in item.title ) {
+		title = decodeEntities( item.title.raw );
 	}
-	if ( item.title && 'rendered' in item.title ) {
-		return decodeEntities( item.title.rendered );
-	}
-	if ( item.title && 'raw' in item.title ) {
-		return decodeEntities( item.title.raw );
-	}
-	return '';
+	return title || fallback;
 }
 
 /**

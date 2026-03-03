@@ -6,7 +6,7 @@ import { useCallback, useReducer } from '@wordpress/element';
 import type { UndoManager } from '@wordpress/undo-manager';
 
 type UndoRedoState< T > = {
-	manager: UndoManager;
+	manager: UndoManager< T >;
 	value: T;
 };
 

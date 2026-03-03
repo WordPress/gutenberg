@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
 
 /**
@@ -67,13 +67,17 @@ function UnforwardedExternalLink(
 				{ children }
 			</span>
 			<span
-				className="components-external-link__icon"
+				className={ clsx(
+					'components-external-link__icon',
+					// This class prevents the arrow from being replaced by a Twemoji image.
+					'wp-exclude-emoji'
+				) }
 				aria-label={
 					/* translators: accessibility text */
 					__( '(opens in a new tab)' )
 				}
 			>
-				&#8599;
+				{ isRTL() ? '\u2196' : '\u2197' }
 			</span>
 		</a>
 		/* eslint-enable react/jsx-no-target-blank */
@@ -92,5 +96,6 @@ function UnforwardedExternalLink(
  * ```
  */
 export const ExternalLink = forwardRef( UnforwardedExternalLink );
+ExternalLink.displayName = 'ExternalLink';
 
 export default ExternalLink;

@@ -18,8 +18,6 @@ import { useSettings } from '../use-settings';
 export default function FontFamilyControl( {
 	/** Start opting into the larger default height that will become the default size in a future version. */
 	__next40pxDefaultSize = false,
-	/** Start opting into the new margin-free styles that will become the default in a future version. */
-	__nextHasNoMarginBottom = false,
 	value = '',
 	onChange,
 	fontFamilies,
@@ -47,17 +45,6 @@ export default function FontFamilyControl( {
 		} ) ),
 	];
 
-	if ( ! __nextHasNoMarginBottom ) {
-		deprecated(
-			'Bottom margin styles for wp.blockEditor.FontFamilyControl',
-			{
-				since: '6.7',
-				version: '7.0',
-				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version',
-			}
-		);
-	}
-
 	if (
 		! __next40pxDefaultSize &&
 		( props.size === undefined || props.size === 'default' )
@@ -82,9 +69,7 @@ export default function FontFamilyControl( {
 			value={ selectedValue }
 			onChange={ ( { selectedItem } ) => onChange( selectedItem.key ) }
 			options={ options }
-			className={ clsx( 'block-editor-font-family-control', className, {
-				'is-next-has-no-margin-bottom': __nextHasNoMarginBottom,
-			} ) }
+			className={ clsx( 'block-editor-font-family-control', className ) }
 			{ ...props }
 		/>
 	);

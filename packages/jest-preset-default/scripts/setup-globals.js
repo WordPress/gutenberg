@@ -17,7 +17,6 @@ global.window.setImmediate = function ( callback ) {
 global.window.requestAnimationFrame = function requestAnimationFrame(
 	callback
 ) {
-	// eslint-disable-next-line no-restricted-syntax
 	const randomDelay = Math.round( ( Math.random() * 1_000 ) / 60 );
 
 	return setTimeout( () => callback( Date.now() ), randomDelay );

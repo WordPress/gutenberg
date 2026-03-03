@@ -7,7 +7,7 @@
 		"types": [ "jest" ]
 	},
 	"references": [ { "path": "./tsconfig.json" } ],
-	"files": [ "src/test/store.ts" ],
+	"files": [ "src/test/types.ts" ],
 	"include": [],
 	"exclude": []
 }

@@ -15,6 +15,7 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useEffect } from '@wordpress/element';
+import { getBlockSelector } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -30,9 +31,12 @@ import {
 	getDuotoneStylesheet,
 	getDuotoneUnsetStylesheet,
 } from '../components/duotone/utils';
-import { getBlockCSSSelector } from '../components/global-styles/get-block-css-selector';
 import { scopeSelector } from '../components/global-styles/utils';
-import { useBlockSettings, usePrivateStyleOverride } from './utils';
+import {
+	cleanEmptyObject,
+	useBlockSettings,
+	usePrivateStyleOverride,
+} from './utils';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
@@ -141,7 +145,9 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 								...newDuotone?.filter,
 							},
 						};
-						setAttributes( { style: newStyle } );
+						setAttributes( {
+							style: cleanEmptyObject( newStyle ),
+						} );
 					} }
 					settings={ settings }
 				/>
@@ -166,7 +172,9 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 								duotone: maybePreset ?? newDuotone, // use preset or fallback to custom colors.
 							},
 						};
-						setAttributes( { style: newStyle } );
+						setAttributes( {
+							style: cleanEmptyObject( newStyle ),
+						} );
 					} }
 					settings={ settings }
 				/>
@@ -346,14 +354,14 @@ function useBlockProps( { clientId, name, style } ) {
 				false
 			);
 			if ( experimentalDuotone ) {
-				const rootSelector = getBlockCSSSelector( blockType );
+				const rootSelector = getBlockSelector( blockType );
 				return typeof experimentalDuotone === 'string'
 					? scopeSelector( rootSelector, experimentalDuotone )
 					: rootSelector;
 			}
 
 			// Regular filter.duotone support uses filter.duotone selectors with fallbacks.
-			return getBlockCSSSelector( blockType, 'filter.duotone', {
+			return getBlockSelector( blockType, 'filter.duotone', {
 				fallback: true,
 			} );
 		}

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -19,7 +19,8 @@ import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
-import { getSyncProvider } from './sync';
+import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
+import logEntityDeprecation from './utils/log-entity-deprecation';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -87,10 +88,10 @@ export function receiveEntityRecords(
 	kind,
 	name,
 	records,
-	query,
+	query = undefined,
 	invalidateCache = false,
-	edits,
-	meta
+	edits = undefined,
+	meta = undefined
 ) {
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
@@ -286,6 +287,7 @@ export const deleteEntityRecord =
 		{ __unstableFetch = apiFetch, throwOnError = false } = {}
 	) =>
 	async ( { dispatch, resolveSelect } ) => {
+		logEntityDeprecation( kind, name, 'deleteEntityRecord' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
@@ -311,8 +313,21 @@ export const deleteEntityRecord =
 			} );
 
 			let hasError = false;
+			let { baseURL } = entityConfig;
+			if (
+				kind === 'postType' &&
+				name === 'wp_template' &&
+				( ( recordId &&
+					typeof recordId === 'string' &&
+					! /^\d+$/.test( recordId ) ) ||
+					! window?.__experimentalTemplateActivate )
+			) {
+				baseURL =
+					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
+					'/templates';
+			}
 			try {
-				let path = `${ entityConfig.baseURL }/${ recordId }`;
+				let path = `${ baseURL }/${ recordId }`;
 
 				if ( query ) {
 					path = addQueryArgs( path, query );
@@ -324,6 +339,13 @@ export const deleteEntityRecord =
 				} );
 
 				await dispatch( removeItems( kind, name, recordId, true ) );
+
+				if ( entityConfig.syncConfig ) {
+					const objectType = `${ kind }/${ name }`;
+					const objectId = recordId;
+
+					getSyncManager()?.unload( objectType, objectId );
+				}
 			} catch ( _error ) {
 				hasError = true;
 				error = _error;
@@ -363,6 +385,7 @@ export const deleteEntityRecord =
 export const editEntityRecord =
 	( kind, name, recordId, edits, options = {} ) =>
 	( { select, dispatch } ) => {
+		logEntityDeprecation( kind, name, 'editEntityRecord' );
 		const entityConfig = select.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
 			throw new Error(
@@ -377,6 +400,16 @@ export const editEntityRecord =
 			recordId
 		);
 
+		// Some fields are merged with the existing value instead of replaced.
+		// See `mergedEdits` definition on the entity config.
+		const editsWithMerges = Object.keys( edits ).reduce( ( acc, key ) => {
+			acc[ key ] = mergedEdits[ key ]
+				? { ...editedRecord[ key ], ...edits[ key ] }
+				: edits[ key ];
+
+			return acc;
+		}, {} );
+
 		const edit = {
 			kind,
 			name,
@@ -385,51 +418,111 @@ export const editEntityRecord =
 			// so that the property is not considered dirty.
 			edits: Object.keys( edits ).reduce( ( acc, key ) => {
 				const recordValue = record[ key ];
-				const editedRecordValue = editedRecord[ key ];
-				const value = mergedEdits[ key ]
-					? { ...editedRecordValue, ...edits[ key ] }
-					: edits[ key ];
+				const value = editsWithMerges[ key ];
 				acc[ key ] = fastDeepEqual( recordValue, value )
 					? undefined
 					: value;
 				return acc;
 			}, {} ),
 		};
-		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
-			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-				const objectId = entityConfig.getSyncObjectId( recordId );
-				getSyncProvider().update(
-					entityConfig.syncObjectType + '--edit',
-					objectId,
-					edit.edits
-				);
-			}
-		} else {
-			if ( ! options.undoIgnore ) {
-				select.getUndoManager().addRecord(
-					[
-						{
-							id: { kind, name, recordId },
-							changes: Object.keys( edits ).reduce(
-								( acc, key ) => {
-									acc[ key ] = {
-										from: editedRecord[ key ],
-										to: edits[ key ],
-									};
-									return acc;
-								},
-								{}
-							),
-						},
-					],
-					options.isCached
-				);
-			}
-			dispatch( {
-				type: 'EDIT_ENTITY_RECORD',
-				...edit,
-			} );
+		if ( entityConfig.syncConfig ) {
+			const objectType = `${ kind }/${ name }`;
+			const objectId = recordId;
+
+			// Determine whether this edit should create a new undo level.
+			//
+			// In Gutenberg, block changes flow through two callbacks:
+			// - `onInput`: For transient/in-progress changes (e.g., typing each
+			//   character). These use `isCached: true` and get merged into
+			//   the current undo item.
+			// - `onChange`: For persistent/completed changes (e.g., formatting
+			//   transforms, block insertions). These use `isCached: false` and
+			//   should create a new undo level.
+			//
+			// Additionally, `undoIgnore: true` means the change should not
+			// affect the undo history at all (e.g., selection-only changes).
+			const isNewUndoLevel = options.undoIgnore
+				? false
+				: ! options.isCached;
+
+			getSyncManager()?.update(
+				objectType,
+				objectId,
+				editsWithMerges,
+				LOCAL_EDITOR_ORIGIN,
+				{ isNewUndoLevel }
+			);
 		}
+		if ( ! options.undoIgnore ) {
+			select.getUndoManager().addRecord(
+				[
+					{
+						id: { kind, name, recordId },
+						changes: Object.keys( edits ).reduce( ( acc, key ) => {
+							acc[ key ] = {
+								from: editedRecord[ key ],
+								to: edits[ key ],
+							};
+							return acc;
+						}, {} ),
+					},
+				],
+				options.isCached
+			);
+		}
+		dispatch( {
+			type: 'EDIT_ENTITY_RECORD',
+			...edit,
+		} );
+	};
+
+/**
+ * Action triggered to clear all edits from
+ * an entity record.
+ *
+ * @param {string}        kind     Kind of the entity.
+ * @param {string}        name     Name of the entity.
+ * @param {number|string} recordId Record ID of the entity record.
+ *
+ * @return {Object} Action object.
+ */
+export const clearEntityRecordEdits =
+	( kind, name, recordId ) =>
+	( { select, dispatch } ) => {
+		const entityConfig = select.getEntityConfig( kind, name );
+		logEntityDeprecation( kind, name, 'clearEntityRecordEdits' );
+		if ( ! entityConfig ) {
+			throw new Error(
+				`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
+			);
+		}
+
+		const currentEdits = select.getEntityRecordEdits(
+			kind,
+			name,
+			recordId
+		);
+		if ( ! currentEdits ) {
+			return;
+		}
+
+		// Build an edits object with all current edit keys set to undefined
+		// so the reducer removes them.
+		const clearedEdits = Object.keys( currentEdits ).reduce(
+			( acc, key ) => {
+				acc[ key ] = undefined;
+				return acc;
+			},
+			{}
+		);
+
+		dispatch( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind,
+			name,
+			recordId,
+			edits: clearedEdits,
+		} );
 	};
 
 /**
@@ -503,6 +596,7 @@ export const saveEntityRecord =
 		} = {}
 	) =>
 	async ( { select, resolveSelect, dispatch } ) => {
+		logEntityDeprecation( kind, name, 'saveEntityRecord' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
@@ -510,8 +604,9 @@ export const saveEntityRecord =
 		if ( ! entityConfig ) {
 			return;
 		}
-		const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
+		const entityIdKey = entityConfig.key ?? DEFAULT_ENTITY_KEY;
 		const recordId = record[ entityIdKey ];
+		const isNewRecord = !! entityIdKey && ! recordId;
 
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,
@@ -550,15 +645,26 @@ export const saveEntityRecord =
 			let updatedRecord;
 			let error;
 			let hasError = false;
+			let { baseURL } = entityConfig;
+			// For "string" IDs, use the old templates endpoint.
+			if (
+				kind === 'postType' &&
+				name === 'wp_template' &&
+				( ( recordId &&
+					typeof recordId === 'string' &&
+					! /^\d+$/.test( recordId ) ) ||
+					! window?.__experimentalTemplateActivate )
+			) {
+				baseURL =
+					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
+					'/templates';
+			}
 			try {
-				const path = `${ entityConfig.baseURL }${
-					recordId ? '/' + recordId : ''
-				}`;
-				const persistedRecord = select.getRawEntityRecord(
-					kind,
-					name,
-					recordId
-				);
+				const path = `${ baseURL }${ recordId ? '/' + recordId : '' }`;
+				// Skip the raw values check when creating a new record; they don't exist yet.
+				const persistedRecord = ! isNewRecord
+					? select.getRawEntityRecord( kind, name, recordId )
+					: {};
 
 				if ( isAutosave ) {
 					// Most of this autosave logic is very specific to posts.
@@ -667,10 +773,10 @@ export const saveEntityRecord =
 					if ( entityConfig.__unstablePrePersist ) {
 						edits = {
 							...edits,
-							...entityConfig.__unstablePrePersist(
+							...( await entityConfig.__unstablePrePersist(
 								persistedRecord,
 								edits
-							),
+							) ),
 						};
 					}
 					updatedRecord = await __unstableFetch( {
@@ -686,6 +792,15 @@ export const saveEntityRecord =
 						true,
 						edits
 					);
+					if ( entityConfig.syncConfig ) {
+						getSyncManager()?.update(
+							`${ kind }/${ name }`,
+							recordId,
+							updatedRecord,
+							LOCAL_EDITOR_ORIGIN,
+							{ isSave: true }
+						);
+					}
 				}
 			} catch ( _error ) {
 				hasError = true;
@@ -781,6 +896,7 @@ export const __experimentalBatch =
 export const saveEditedEntityRecord =
 	( kind, name, recordId, options ) =>
 	async ( { select, dispatch, resolveSelect } ) => {
+		logEntityDeprecation( kind, name, 'saveEditedEntityRecord' );
 		if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 			return;
 		}
@@ -814,6 +930,11 @@ export const saveEditedEntityRecord =
 export const __experimentalSaveSpecifiedEntityEdits =
 	( kind, name, recordId, itemsToSave, options ) =>
 	async ( { select, dispatch, resolveSelect } ) => {
+		logEntityDeprecation(
+			kind,
+			name,
+			'__experimentalSaveSpecifiedEntityEdits'
+		);
 		if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 			return;
 		}
@@ -974,6 +1095,7 @@ export function receiveDefaultTemplateId( query, templateId ) {
 export const receiveRevisions =
 	( kind, name, recordKey, records, query, invalidateCache = false, meta ) =>
 	async ( { dispatch, resolveSelect } ) => {
+		logEntityDeprecation( kind, name, 'receiveRevisions' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
@@ -995,3 +1117,32 @@ export const receiveRevisions =
 			invalidateCache,
 		} );
 	};
+
+/**
+ * Returns an action object used to set the sync connection status for an entity or collection.
+ *
+ * @param {string}             kind   Kind of the entity.
+ * @param {string}             name   Name of the entity.
+ * @param {number|string|null} key    The entity key, or null for collections.
+ * @param {Object|null}        status The connection state object or null on unload.
+ *
+ * @return {Object} Action object.
+ */
+export function setSyncConnectionStatus( kind, name, key, status ) {
+	if ( ! status ) {
+		return {
+			type: 'CLEAR_SYNC_CONNECTION_STATUS',
+			kind,
+			name,
+			key,
+		};
+	}
+
+	return {
+		type: 'SET_SYNC_CONNECTION_STATUS',
+		kind,
+		name,
+		key,
+		status,
+	};
+}

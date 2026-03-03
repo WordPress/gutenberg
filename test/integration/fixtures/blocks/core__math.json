@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/math",
+		"isValid": true,
+		"attributes": {
+			"latex": "x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}",
+			"mathML": "<semantics><mrow><mi>x</mi><mo>=</mo><mfrac><mrow><mo lspace=\"0em\" rspace=\"0em\">−</mo><mi>b</mi><mo>±</mo><msqrt><mrow><msup><mi>b</mi><mn>2</mn></msup><mo>−</mo><mn>4</mn><mi>a</mi><mi>c</mi></mrow></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac></mrow><annotation encoding=\"application/x-tex\">x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}</annotation></semantics>"
+		},
+		"innerBlocks": []
+	}
+]

@@ -11,6 +11,10 @@ const em = { type: 'em' };
 const strong = { type: 'strong' };
 const img = { type: 'img', attributes: { src: '' } };
 const a = { type: 'a', attributes: { href: '#' } };
+const math = { type: 'math' };
+const mi = { type: 'mi' };
+const mo = { type: 'mo' };
+const mtext = { type: 'mtext' };
 
 export const spec = [
 	{
@@ -603,6 +607,65 @@ export const spec = [
 			text: '\ufffc',
 		},
 	},
+	{
+		description:
+			'should unwrap element with data-rich-text-bogus attribute',
+		html: '<span data-rich-text-bogus="true">test</span>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 1,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 4 ],
+		record: {
+			start: 0,
+			end: 4,
+			formats: [ , , , , ],
+			replacements: [ , , , , ],
+			text: 'test',
+		},
+	},
+	{
+		description:
+			'should unwrap data-rich-text-bogus element but preserve child formatting',
+		html: '<span data-rich-text-bogus="true">hello <em>world</em></span>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 1,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 1, 0, 5 ],
+		record: {
+			start: 0,
+			end: 11,
+			formats: [ , , , , , , [ em ], [ em ], [ em ], [ em ], [ em ] ],
+			replacements: [ , , , , , , , , , , , ],
+			text: 'hello world',
+		},
+	},
+	{
+		description: 'should unwrap nested data-rich-text-bogus elements',
+		html: '<span data-rich-text-bogus="true"><strong>te</strong><span data-rich-text-bogus="true">st</span></span>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 1,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 1, 2 ],
+		record: {
+			start: 0,
+			end: 4,
+			formats: [ [ strong ], [ strong ], , , ],
+			replacements: [ , , , , ],
+			text: 'test',
+		},
+	},
 ];
 
 export const specWithRegistration = [
@@ -772,6 +835,71 @@ export const specWithRegistration = [
 				},
 			],
 			text: OBJECT_REPLACEMENT_CHARACTER,
+		},
+	},
+	{
+		description: 'should handle simple MathML expression',
+		html: '<math><mi>x</mi></math>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element.querySelector( 'mi' ).firstChild,
+			endOffset: 1,
+			endContainer: element.querySelector( 'mi' ).firstChild,
+		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 0, 1 ],
+		value: {
+			formats: [ [ math, mi ] ],
+			replacements: [],
+			text: 'x',
+		},
+	},
+	{
+		description: 'should handle MathML with operator',
+		html: '<math><mi>x</mi><mo>+</mo><mi>y</mi></math>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element.querySelector( 'mi' ).firstChild,
+			endOffset: 1,
+			endContainer: element.querySelectorAll( 'mi' )[ 1 ].firstChild,
+		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 2, 1 ],
+		value: {
+			formats: [
+				[ math, mi ],
+				[ math, mo ],
+				[ math, mi ],
+			],
+			replacements: [ , , , ],
+			text: 'x+y',
+		},
+	},
+	{
+		description: 'should handle HTML within MathML mtext',
+		html: '<math><mtext><strong>bold text</strong></mtext></math>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element.querySelector( 'strong' ).firstChild,
+			endOffset: 9,
+			endContainer: element.querySelector( 'strong' ).firstChild,
+		} ),
+		startPath: [ 0, 0, 0, 0 ],
+		endPath: [ 0, 0, 0, 9 ],
+		value: {
+			formats: [
+				[ math, mtext, strong ],
+				[ math, mtext, strong ],
+				[ math, mtext, strong ],
+				[ math, mtext, strong ],
+				[ math, mtext, strong ],
+				[ math, mtext, strong ],
+				[ math, mtext, strong ],
+				[ math, mtext, strong ],
+				[ math, mtext, strong ],
+			],
+			replacements: [ , , , , , , , , , ],
+			text: 'bold text',
 		},
 	},
 ];

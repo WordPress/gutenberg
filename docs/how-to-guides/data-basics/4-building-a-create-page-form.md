@@ -87,7 +87,6 @@ function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCanc
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
-				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				label="Page title:"
 				value={ title }
@@ -348,7 +347,6 @@ function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCanc
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
-				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				label="Page title:"
 				value={ title }

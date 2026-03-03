@@ -49,6 +49,9 @@ const userList = [
 ];
 test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 		await Promise.all(
 			userList.map( ( user ) =>
 				requestUtils.createUser( {
@@ -65,6 +68,9 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		await requestUtils.deleteAllUsers();
 		await requestUtils.deactivatePlugin( 'gutenberg-test-autocompleter' );
 		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -411,7 +417,10 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 					)
 				).toBeVisible();
 				await page.keyboard.press( 'Enter' );
-				await page.keyboard.type( ' test' );
+				// Autocompleter might continue matching right after insertion,
+				// Emulate typing speed to avoid that.
+				// Remove after https://github.com/WordPress/gutenberg/issues/42925 is resolved.
+				await page.keyboard.type( ' test', { delay: 100 } );
 				await page.keyboard.press( 'Enter' );
 			}
 
@@ -563,13 +572,11 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 
 		await page.keyboard.type( 'heading' );
 		await expect(
-			page.locator( `role=option[name="Heading"i]` )
+			page.getByRole( 'option', { name: 'Heading', exact: true } )
 		).toBeVisible();
 		// Get the assertive live region screen reader announcement.
 		await expect(
-			page.getByText(
-				'2 results found, use up and down arrow keys to navigate.'
-			)
+			page.getByText( 'use up and down arrow keys to navigate.' )
 		).toBeVisible();
 	} );
 } );

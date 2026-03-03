@@ -14,27 +14,80 @@ import {
 	useRef,
 	useCallback,
 	useMemo,
+	isValidElement,
+	Component,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	Modal,
 	TextHighlight,
 	__experimentalHStack as HStack,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
 	store as keyboardShortcutsStore,
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
-import { Icon, search as inputIcon } from '@wordpress/icons';
+import { Icon, search as inputIcon, arrowRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { store as commandsStore } from '../store';
+import { unlock } from '../lock-unlock';
+
+const { withIgnoreIMEEvents } = unlock( componentsPrivateApis );
 
 const inputLabel = __( 'Search commands and settings' );
 
-function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
+/**
+ * Icons enforced per command category.
+ * Categories listed here will always use the specified icon,
+ * ignoring whatever icon the command itself provides.
+ */
+const CATEGORY_ICONS = {
+	view: arrowRight,
+};
+
+/**
+ * Translatable labels for command categories.
+ */
+const CATEGORY_LABELS = {
+	command: __( 'Command' ),
+	view: __( 'View' ),
+	edit: __( 'Edit' ),
+	action: __( 'Action' ),
+	workflow: __( 'Workflow' ),
+};
+
+/**
+ * Function that checks if the parameter is a valid icon.
+ * Taken from @wordpress/blocks/src/api/utils.js and copied
+ * in case requirements diverge and to avoid a dependency on @wordpress/blocks.
+ *
+ * @param {*} icon Parameter to be checked.
+ *
+ * @return {boolean} True if the parameter is a valid icon and false otherwise.
+ */
+
+export function isValidIcon( icon ) {
+	return (
+		!! icon &&
+		( typeof icon === 'string' ||
+			isValidElement( icon ) ||
+			typeof icon === 'function' ||
+			icon instanceof Component )
+	);
+}
+
+function CommandMenuLoader( {
+	name,
+	search,
+	hook,
+	setLoader,
+	close,
+	category,
+} ) {
 	const { isLoading, commands = [] } = hook( { search } ) ?? {};
 	useEffect( () => {
 		setLoader( name, isLoading );
@@ -46,34 +99,59 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 
 	return (
 		<>
-			{ commands.map( ( command ) => (
-				<Command.Item
-					key={ command.name }
-					value={ command.searchLabel ?? command.label }
-					onSelect={ () => command.callback( { close } ) }
-					id={ command.name }
-				>
-					<HStack
-						alignment="left"
-						className={ clsx( 'commands-command-menu__item', {
-							'has-icon': command.icon,
-						} ) }
+			{ commands.map( ( command ) => {
+				const commandCategory = command.category ?? category;
+				return (
+					<Command.Item
+						key={ command.name }
+						value={ command.searchLabel ?? command.label }
+						keywords={ command.keywords }
+						onSelect={ () => command.callback( { close } ) }
+						id={ command.name }
 					>
-						{ command.icon && <Icon icon={ command.icon } /> }
-						<span>
-							<TextHighlight
-								text={ command.label }
-								highlight={ search }
-							/>
-						</span>
-					</HStack>
-				</Command.Item>
-			) ) }
+						<HStack
+							alignment="left"
+							className={ clsx( 'commands-command-menu__item', {
+								'has-icon':
+									CATEGORY_ICONS[ commandCategory ] ||
+									command.icon,
+							} ) }
+						>
+							{ CATEGORY_ICONS[ commandCategory ] && (
+								<Icon
+									icon={ CATEGORY_ICONS[ commandCategory ] }
+								/>
+							) }
+							{ ! CATEGORY_ICONS[ commandCategory ] &&
+								isValidIcon( command.icon ) && (
+									<Icon icon={ command.icon } />
+								) }
+							<span className="commands-command-menu__item-label">
+								<TextHighlight
+									text={ command.label }
+									highlight={ search }
+								/>
+							</span>
+							{ CATEGORY_LABELS[ commandCategory ] && (
+								<span className="commands-command-menu__item-category">
+									{ CATEGORY_LABELS[ commandCategory ] }
+								</span>
+							) }
+						</HStack>
+					</Command.Item>
+				);
+			} ) }
 		</>
 	);
 }
 
-export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
+export function CommandMenuLoaderWrapper( {
+	hook,
+	search,
+	setLoader,
+	close,
+	category,
+} ) {
 	// The "hook" prop is actually a custom React hook
 	// so to avoid breaking the rules of hooks
 	// the CommandMenuLoaderWrapper component need to be
@@ -95,6 +173,7 @@ export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
 			search={ search }
 			setLoader={ setLoader }
 			close={ close }
+			category={ category }
 		/>
 	);
 }
@@ -121,22 +200,34 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 				<Command.Item
 					key={ command.name }
 					value={ command.searchLabel ?? command.label }
+					keywords={ command.keywords }
 					onSelect={ () => command.callback( { close } ) }
 					id={ command.name }
 				>
 					<HStack
 						alignment="left"
 						className={ clsx( 'commands-command-menu__item', {
-							'has-icon': command.icon,
+							'has-icon':
+								CATEGORY_ICONS[ command.category ] ||
+								command.icon,
 						} ) }
 					>
-						{ command.icon && <Icon icon={ command.icon } /> }
+						{ CATEGORY_ICONS[ command.category ] ? (
+							<Icon icon={ CATEGORY_ICONS[ command.category ] } />
+						) : (
+							command.icon && <Icon icon={ command.icon } />
+						) }
 						<span>
 							<TextHighlight
 								text={ command.label }
 								highlight={ search }
 							/>
 						</span>
+						{ CATEGORY_LABELS[ command.category ] && (
+							<span className="commands-command-menu__item-category">
+								{ CATEGORY_LABELS[ command.category ] }
+							</span>
+						) }
 					</HStack>
 				</Command.Item>
 			) ) }
@@ -147,6 +238,7 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 					search={ search }
 					setLoader={ setLoader }
 					close={ close }
+					category={ loader.category }
 				/>
 			) ) }
 		</Command.Group>
@@ -175,7 +267,6 @@ function CommandInput( { isOpen, search, setSearch } ) {
 			onValueChange={ setSearch }
 			placeholder={ inputLabel }
 			aria-activedescendant={ selectedItemId }
-			icon={ search }
 		/>
 	);
 }
@@ -207,8 +298,8 @@ export function CommandMenu() {
 
 	useShortcut(
 		'core/commands',
-		/** @type {import('react').KeyboardEventHandler} */
-		( event ) => {
+		/** @type {React.KeyboardEventHandler} */
+		withIgnoreIMEEvents( ( event ) => {
 			// Bails to avoid obscuring the effect of the preceding handler(s).
 			if ( event.defaultPrevented ) {
 				return;
@@ -220,7 +311,7 @@ export function CommandMenu() {
 			} else {
 				open();
 			}
-		},
+		} ),
 		{
 			bindGlobal: true,
 		}
@@ -243,19 +334,6 @@ export function CommandMenu() {
 		return false;
 	}
 
-	const onKeyDown = ( event ) => {
-		if (
-			// Ignore keydowns from IMEs
-			event.nativeEvent.isComposing ||
-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
-			// is `isComposing=false`, even though it's technically still part of the composition.
-			// These can only be detected by keyCode.
-			event.keyCode === 229
-		) {
-			event.preventDefault();
-		}
-	};
-
 	const isLoading = Object.values( loaders ).some( Boolean );
 
 	return (
@@ -267,14 +345,17 @@ export function CommandMenu() {
 			contentLabel={ __( 'Command palette' ) }
 		>
 			<div className="commands-command-menu__container">
-				<Command label={ inputLabel } onKeyDown={ onKeyDown }>
+				<Command label={ inputLabel }>
 					<div className="commands-command-menu__header">
+						<Icon
+							className="commands-command-menu__header-search-icon"
+							icon={ inputIcon }
+						/>
 						<CommandInput
 							search={ search }
 							setSearch={ setSearch }
 							isOpen={ isOpen }
 						/>
-						<Icon icon={ inputIcon } />
 					</div>
 					<Command.List label={ __( 'Command suggestions' ) }>
 						{ search && ! isLoading && (

@@ -5,6 +5,7 @@
 		"attributes": {
 			"images": [],
 			"ids": [],
+			"navigationButtonType": "icon",
 			"shortCodeTransforms": [],
 			"columns": 1,
 			"caption": "",
@@ -13,7 +14,8 @@
 			"fixedHeight": true,
 			"linkTo": "none",
 			"sizeSlug": "large",
-			"allowResize": false
+			"allowResize": false,
+			"aspectRatio": "auto"
 		},
 		"innerBlocks": [
 			{

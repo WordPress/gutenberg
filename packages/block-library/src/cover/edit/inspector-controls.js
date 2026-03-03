@@ -35,7 +35,7 @@ import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
-import PosterImage from './poster-image';
+import PosterImage from '../../utils/poster-image';
 
 const { cleanEmptyObject, ResolutionTool, HTMLElementControl } = unlock(
 	blockEditorPrivateApis
@@ -131,7 +131,12 @@ export default function CoverInspectorControls( {
 	const image = useSelect(
 		( select ) =>
 			id && isImageBackground
-				? select( coreStore ).getMedia( id, { context: 'view' } )
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id,
+						{ context: 'view' }
+				  )
 				: null,
 		[ id, isImageBackground ]
 	);
@@ -173,9 +178,7 @@ export default function CoverInspectorControls( {
 		} );
 	};
 
-	const showFocalPointPicker =
-		isVideoBackground ||
-		( isImageBackground && ( ! hasParallax || isRepeated ) );
+	const showFocalPointPicker = isVideoBackground || isImageBackground;
 
 	const imperativeFocalPointPreview = ( value ) => {
 		const [ styleOfRef, property ] = mediaElement.current
@@ -191,7 +194,7 @@ export default function CoverInspectorControls( {
 	return (
 		<>
 			<InspectorControls>
-				{ !! url && (
+				{ ( !! url || useFeaturedImage ) && (
 					<ToolsPanel
 						label={ __( 'Settings' ) }
 						resetAll={ () => {
@@ -220,7 +223,6 @@ export default function CoverInspectorControls( {
 									}
 								>
 									<ToggleControl
-										__nextHasNoMarginBottom
 										label={ __( 'Fixed background' ) }
 										checked={ !! hasParallax }
 										onChange={ toggleParallax }
@@ -238,7 +240,6 @@ export default function CoverInspectorControls( {
 									}
 								>
 									<ToggleControl
-										__nextHasNoMarginBottom
 										label={ __( 'Repeated background' ) }
 										checked={ isRepeated }
 										onChange={ toggleIsRepeated }
@@ -258,7 +259,6 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<FocalPointPicker
-									__nextHasNoMarginBottom
 									label={ __( 'Focal point' ) }
 									url={ url }
 									value={ focalPoint }
@@ -275,7 +275,11 @@ export default function CoverInspectorControls( {
 						{ isVideoBackground && (
 							<PosterImage
 								poster={ poster }
-								setAttributes={ setAttributes }
+								onChange={ ( posterImage ) =>
+									setAttributes( {
+										poster: posterImage?.url,
+									} )
+								}
 							/>
 						) }
 						{ ! useFeaturedImage && url && ! isVideoBackground && (
@@ -288,7 +292,6 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<TextareaControl
-									__nextHasNoMarginBottom
 									label={ __( 'Alternative text' ) }
 									value={ alt }
 									onChange={ ( newAlt ) =>
@@ -369,7 +372,6 @@ export default function CoverInspectorControls( {
 						panelId={ clientId }
 					>
 						<RangeControl
-							__nextHasNoMarginBottom
 							label={ __( 'Overlay opacity' ) }
 							value={ dimRatio }
 							onChange={ ( newDimRatio ) =>

@@ -2,7 +2,7 @@
 /**
  * PHPUnit bootstrap file
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 // Debug settings for parity with WordPress Core's PHPUnit tests.
@@ -91,6 +91,7 @@ $GLOBALS['wp_tests_options'] = array(
 		'gutenberg-form-blocks'        => 1,
 		'gutenberg-block-experiments'  => 1,
 		'gutenberg-media-processing'   => 1,
+		'gutenberg-content-guidelines' => 1,
 	),
 );
 

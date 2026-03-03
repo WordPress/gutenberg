@@ -49,9 +49,8 @@ const ColorSelectorIcon = ( { style, className } ) => {
  *
  * @return {*} React toggle button component.
  */
-const renderToggleComponent =
-	( { TextColor, BackgroundColor } ) =>
-	( { onToggle, isOpen } ) => {
+const renderToggleComponent = ( { TextColor, BackgroundColor } ) =>
+	function ToggleComponent( { onToggle, isOpen } ) {
 		const openOnArrowDown = ( event ) => {
 			if ( ! isOpen && event.keyCode === DOWN ) {
 				event.preventDefault();

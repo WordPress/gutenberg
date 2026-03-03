@@ -137,7 +137,6 @@ export default function PostPublishPanelPostpublish( {
 				<div className="post-publish-panel__postpublish-post-address-container">
 					<TextControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						className="post-publish-panel__postpublish-post-address"
 						readOnly
 						label={ sprintf(

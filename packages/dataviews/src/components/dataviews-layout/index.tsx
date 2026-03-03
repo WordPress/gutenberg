@@ -7,12 +7,13 @@ import type { ComponentType } from 'react';
  * WordPress dependencies
  */
 import { useContext } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import DataViewsContext from '../dataviews-context';
-import { VIEW_LAYOUTS } from '../../dataviews-layouts';
+import { VIEW_LAYOUTS } from '../dataviews-layouts';
 import type { ViewBaseProps } from '../../types';
 
 type DataViewsLayoutProps = {
@@ -26,6 +27,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		fields,
 		getItemId,
 		getItemLevel,
+		hasInitiallyLoaded,
 		isLoading,
 		view,
 		onChangeView,
@@ -35,10 +37,17 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		onClickItem,
 		isItemClickable,
 		renderItemLink,
+		defaultLayouts,
+		empty = <p>{ __( 'No results' ) }</p>,
 	} = useContext( DataViewsContext );
 
-	const ViewComponent = VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
-		?.component as ComponentType< ViewBaseProps< any > >;
+	if ( ! hasInitiallyLoaded ) {
+		return null;
+	}
+
+	const ViewComponent = VIEW_LAYOUTS.find(
+		( v ) => v.type === view.type && defaultLayouts[ v.type ]
+	)?.component as ComponentType< ViewBaseProps< any > >;
 
 	return (
 		<ViewComponent
@@ -57,6 +66,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 			renderItemLink={ renderItemLink }
 			isItemClickable={ isItemClickable }
 			view={ view }
+			empty={ empty }
 		/>
 	);
 }

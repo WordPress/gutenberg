@@ -195,6 +195,7 @@ function BlockListBlock( {
 		isParentSelected,
 		order,
 		mayDisplayControls,
+		mayDisplayPatternEditingControls,
 		blockEditingMode,
 	} = useSelect(
 		( select ) => {
@@ -263,6 +264,7 @@ function BlockListBlock( {
 						getMultiSelectedBlockClientIds().every(
 							( id ) => getBlockName( id ) === name
 						) ),
+				mayDisplayPatternEditingControls: false, // Section/pattern editing not yet supported on native
 				blockEditingMode: getBlockEditingMode( clientId ),
 			};
 		},
@@ -403,6 +405,9 @@ function BlockListBlock( {
 							}
 							wrapperProps={ wrapperProps }
 							mayDisplayControls={ mayDisplayControls }
+							mayDisplayPatternEditingControls={
+								mayDisplayPatternEditingControls
+							}
 							blockEditingMode={ blockEditingMode }
 						/>
 						<View onLayout={ onLayout } />

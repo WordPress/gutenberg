@@ -1,16 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { BlockControls, store } from '@wordpress/block-editor';
-import {
-	ToolbarGroup,
-	ToolbarButton,
-	Modal,
-	Button,
-	Flex,
-	FlexItem,
-} from '@wordpress/components';
-import { useEffect, useState, RawHTML } from '@wordpress/element';
+import { store } from '@wordpress/block-editor';
+import { Modal, Button, Flex, FlexItem } from '@wordpress/components';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { fullscreen } from '@wordpress/icons';
@@ -74,81 +67,55 @@ function ClassicEdit( props ) {
 	return <textarea { ...props } />;
 }
 
-export default function ModalEdit( props ) {
-	const {
-		clientId,
-		attributes: { content },
-		setAttributes,
-		onReplace,
-	} = props;
-	const [ isOpen, setOpen ] = useState( false );
+export default function ModalEdit( { clientId, content, onClose, onChange } ) {
 	const [ isModalFullScreen, setIsModalFullScreen ] = useState( false );
 	const id = `editor-${ clientId }`;
 
-	const onClose = () => ( content ? setOpen( false ) : onReplace( [] ) );
-
 	return (
-		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarButton onClick={ () => setOpen( true ) }>
-						{ __( 'Edit' ) }
-					</ToolbarButton>
-				</ToolbarGroup>
-			</BlockControls>
-			{ content && <RawHTML>{ content }</RawHTML> }
-			{ ( isOpen || ! content ) && (
-				<Modal
-					title={ __( 'Classic Editor' ) }
-					onRequestClose={ onClose }
-					shouldCloseOnClickOutside={ false }
-					overlayClassName="block-editor-freeform-modal"
-					isFullScreen={ isModalFullScreen }
-					className="block-editor-freeform-modal__content"
-					headerActions={
-						<ModalAuxiliaryActions
-							onClick={ () =>
-								setIsModalFullScreen( ! isModalFullScreen )
-							}
-							isModalFullScreen={ isModalFullScreen }
-						/>
+		<Modal
+			title={ __( 'Classic Editor' ) }
+			onRequestClose={ onClose }
+			shouldCloseOnClickOutside={ false }
+			overlayClassName="block-editor-freeform-modal"
+			isFullScreen={ isModalFullScreen }
+			className="block-editor-freeform-modal__content"
+			headerActions={
+				<ModalAuxiliaryActions
+					onClick={ () =>
+						setIsModalFullScreen( ! isModalFullScreen )
 					}
-				>
-					<ClassicEdit id={ id } defaultValue={ content } />
-					<Flex
-						className="block-editor-freeform-modal__actions"
-						justify="flex-end"
-						expanded={ false }
+					isModalFullScreen={ isModalFullScreen }
+				/>
+			}
+		>
+			<ClassicEdit id={ id } defaultValue={ content } />
+			<Flex
+				className="block-editor-freeform-modal__actions"
+				justify="flex-end"
+				expanded={ false }
+			>
+				<FlexItem>
+					<Button
+						__next40pxDefaultSize
+						variant="tertiary"
+						onClick={ onClose }
 					>
-						<FlexItem>
-							<Button
-								__next40pxDefaultSize
-								variant="tertiary"
-								onClick={ onClose }
-							>
-								{ __( 'Cancel' ) }
-							</Button>
-						</FlexItem>
-						<FlexItem>
-							<Button
-								__next40pxDefaultSize
-								variant="primary"
-								onClick={ () => {
-									setAttributes( {
-										content:
-											window.wp.oldEditor.getContent(
-												id
-											),
-									} );
-									setOpen( false );
-								} }
-							>
-								{ __( 'Save' ) }
-							</Button>
-						</FlexItem>
-					</Flex>
-				</Modal>
-			) }
-		</>
+						{ __( 'Cancel' ) }
+					</Button>
+				</FlexItem>
+				<FlexItem>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ () => {
+							onChange( window.wp.oldEditor.getContent( id ) );
+							onClose();
+						} }
+					>
+						{ __( 'Save' ) }
+					</Button>
+				</FlexItem>
+			</Flex>
+		</Modal>
 	);
 }

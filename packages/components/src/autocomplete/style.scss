@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .components-autocomplete__popover .components-popover__content {
 	padding: $grid-unit-10;
 	min-width: 200px;

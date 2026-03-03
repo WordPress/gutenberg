@@ -1,0 +1,20 @@
+name: 'Pull Request Labeler'
+on:
+    pull_request_target:
+        types: [opened, synchronize]
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    auto_label_pull_request:
+        permissions:
+            contents: read
+            pull-requests: write
+        runs-on: ubuntu-24.04
+        steps:
+            - uses: actions/labeler@634933edcd8ababfe52f92936142cc22ac488b1b # v6.0.1
+              with:
+                  dot: true
+                  sync-labels: true

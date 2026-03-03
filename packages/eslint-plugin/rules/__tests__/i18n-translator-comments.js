@@ -87,6 +87,22 @@ _x( '"%1$s"/ %2$s', 'caption' );
 _x( '"%1$s"/ %2$s', 'caption' );
 			`,
 		},
+		{
+			code: ` // translators: %s: Hello at 6:00 AM
+		i18n.sprintf( i18n.__( 'Hello at %s' ), '6:00 AM' );`,
+		},
+		{
+			code: `// translators: %.2f: Percentage
+		i18n.sprintf( i18n.__( 'Percentage: %.2f' ), 1.00 );`,
+		},
+		{
+			code: `// translators: %.*f: Percentage
+		i18n.sprintf( i18n.__( 'Percentage: %.*f' ), 2, 1.00 );`,
+		},
+		{
+			code: `// translators: %(named).2s: truncated name
+		i18n.sprintf( i18n.__( 'Truncated name: %(named).2s' ), { named: 'Long Name' } );`,
+		},
 	],
 	invalid: [
 		{

@@ -18,7 +18,7 @@ const titleField: Field< CommonPost > = {
 	placeholder: __( 'No title' ),
 	getValue: ( { item } ) => getItemTitle( item ),
 	render: TitleView,
-	enableHiding: false,
+	enableHiding: true,
 	enableGlobalSearch: true,
 	filterBy: false,
 };

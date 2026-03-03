@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .editor-post-discussion__panel-dialog .editor-post-discussion {
 	// sidebar width - popover padding - form margin
 	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;

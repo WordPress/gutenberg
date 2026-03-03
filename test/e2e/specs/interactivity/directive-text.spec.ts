@@ -42,4 +42,13 @@ test.describe( 'data-wp-text', () => {
 		const elBool = page.getByTestId( 'show state boolean' );
 		await expect( elBool ).toHaveText( 'true' );
 	} );
+
+	test( 'should ignore suffixes and unique-ids in text directive', async ( {
+		page,
+	} ) => {
+		const ignoresSuffixes = page.getByTestId( 'ignores suffixes' );
+		await expect( ignoresSuffixes ).not.toHaveText( 'Text 1' );
+		const ignoresUniqueIds = page.getByTestId( 'ignores unique-ids' );
+		await expect( ignoresUniqueIds ).not.toHaveText( 'Text 1' );
+	} );
 } );

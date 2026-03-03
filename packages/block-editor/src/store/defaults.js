@@ -157,6 +157,10 @@ export const SETTINGS_DEFAULTS = {
 	// Allows to disable block locking interface.
 	canLockBlocks: true,
 
+	// Whether the user can edit custom CSS (requires edit_css capability).
+	// Defaults to false for safety - PHP passes true when user has capability.
+	canEditCSS: false,
+
 	// Allows to disable Openverse media category in the inserter.
 	enableOpenverseMediaCategory: true,
 

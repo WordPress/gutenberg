@@ -386,6 +386,7 @@ function UnforwardedTreeGrid(
  * @see {@link https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html}
  */
 export const TreeGrid = forwardRef( UnforwardedTreeGrid );
+TreeGrid.displayName = 'TreeGrid';
 
 export default TreeGrid;
 export { default as TreeGridRow } from './row';

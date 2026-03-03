@@ -1,0 +1,188 @@
+/**
+ * WordPress dependencies
+ */
+import { __experimentalHStack as HStack, Button } from '@wordpress/components';
+import {
+	__experimentalRegisterConnector as registerConnector,
+	__experimentalConnectorItem as ConnectorItem,
+	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
+	type ConnectorRenderProps,
+} from '@wordpress/connectors';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { useConnectorPlugin } from './use-connector-plugin';
+import { OpenAILogo, ClaudeLogo, GeminiLogo } from './logos';
+
+type ConnectorAuthentication =
+	| { method: 'api_key'; settingName: string; credentialsUrl: string | null }
+	| { method: 'none' };
+
+interface ConnectorData {
+	name: string;
+	description: string;
+	type: 'ai_provider';
+	plugin?: { slug: string };
+	authentication: ConnectorAuthentication;
+}
+
+/**
+ * Reads connector data passed from PHP via the script module data mechanism.
+ */
+function getConnectorData(): Record< string, ConnectorData > {
+	try {
+		const parsed = JSON.parse(
+			document.getElementById(
+				'wp-script-module-data-connectors-wp-admin'
+			)?.textContent ?? ''
+		);
+		return parsed?.connectors ?? {};
+	} catch {
+		return {};
+	}
+}
+
+const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
+	google: GeminiLogo,
+	openai: OpenAILogo,
+	anthropic: ClaudeLogo,
+};
+
+const ConnectedBadge = () => (
+	<span
+		style={ {
+			color: '#345b37',
+			backgroundColor: '#eff8f0',
+			padding: '4px 12px',
+			borderRadius: '2px',
+			fontSize: '13px',
+			fontWeight: 500,
+			whiteSpace: 'nowrap',
+		} }
+	>
+		{ __( 'Connected' ) }
+	</span>
+);
+
+interface ApiKeyConnectorConfig {
+	pluginSlug?: string;
+	settingName: string;
+	helpUrl?: string;
+	Logo?: React.ComponentType;
+}
+
+function ApiKeyConnector( {
+	label,
+	description,
+	pluginSlug,
+	settingName,
+	helpUrl,
+	Logo,
+}: ConnectorRenderProps & ApiKeyConnectorConfig ) {
+	let helpLabel: string | undefined;
+	try {
+		if ( helpUrl ) {
+			helpLabel = new URL( helpUrl ).hostname;
+		}
+	} catch {
+		// Invalid URL — leave helpLabel undefined.
+	}
+
+	const {
+		pluginStatus,
+		isExpanded,
+		setIsExpanded,
+		isBusy,
+		isConnected,
+		currentApiKey,
+		handleButtonClick,
+		getButtonLabel,
+		saveApiKey,
+		removeApiKey,
+	} = useConnectorPlugin( {
+		pluginSlug,
+		settingName,
+	} );
+
+	return (
+		<ConnectorItem
+			className={
+				pluginSlug ? `connector-item--${ pluginSlug }` : undefined
+			}
+			icon={ Logo ? <Logo /> : undefined }
+			name={ label }
+			description={ description }
+			actionArea={
+				<HStack spacing={ 3 } expanded={ false }>
+					{ isConnected && <ConnectedBadge /> }
+					<Button
+						variant={
+							isExpanded || isConnected ? 'tertiary' : 'secondary'
+						}
+						size={
+							isExpanded || isConnected ? undefined : 'compact'
+						}
+						onClick={ handleButtonClick }
+						disabled={ pluginStatus === 'checking' || isBusy }
+						isBusy={ isBusy }
+						aria-expanded={ isExpanded }
+					>
+						{ getButtonLabel() }
+					</Button>
+				</HStack>
+			}
+		>
+			{ isExpanded && pluginStatus === 'active' && (
+				<DefaultConnectorSettings
+					key={ isConnected ? 'connected' : 'setup' }
+					initialValue={ currentApiKey }
+					helpUrl={ helpUrl }
+					helpLabel={ helpLabel }
+					readOnly={ isConnected }
+					onRemove={ removeApiKey }
+					onSave={ async ( apiKey: string ) => {
+						await saveApiKey( apiKey );
+						setIsExpanded( false );
+					} }
+				/>
+			) }
+		</ConnectorItem>
+	);
+}
+
+// Register connectors from server-provided connector data.
+export function registerDefaultConnectors() {
+	const connectors = getConnectorData();
+
+	const sanitize = ( s: string ) => s.replace( /[^a-z0-9-]/gi, '-' );
+
+	for ( const [ connectorId, data ] of Object.entries( connectors ) ) {
+		const { authentication } = data;
+
+		if (
+			data.type !== 'ai_provider' ||
+			authentication.method !== 'api_key'
+		) {
+			continue;
+		}
+
+		const connectorName = `${ sanitize( data.type ) }/${ sanitize(
+			connectorId
+		) }`;
+		registerConnector( connectorName, {
+			label: data.name,
+			description: data.description,
+			render: ( props ) => (
+				<ApiKeyConnector
+					{ ...props }
+					pluginSlug={ data.plugin?.slug }
+					settingName={ authentication.settingName }
+					helpUrl={ authentication.credentialsUrl ?? undefined }
+					Logo={ CONNECTOR_LOGOS[ connectorId ] }
+				/>
+			),
+		} );
+	}
+}

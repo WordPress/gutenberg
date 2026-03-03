@@ -19,7 +19,6 @@ import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import {
 	useCallback,
-	useEffect,
 	useMemo,
 	useRef,
 	useReducer,
@@ -66,8 +65,8 @@ const expanded = ( state, action ) => {
 
 export const BLOCK_LIST_ITEM_HEIGHT = 32;
 
-/** @typedef {import('react').ComponentType} ComponentType */
-/** @typedef {import('react').Ref<HTMLElement>} Ref */
+/** @typedef {React.ComponentType} ComponentType */
+/** @typedef {React.Ref<HTMLElement>} Ref */
 
 /**
  * Show a hierarchical list of blocks.
@@ -118,7 +117,8 @@ function ListViewComponent(
 		useListViewClientIds( { blocks, rootClientId } );
 	const blockIndexes = useListViewBlockIndexes( clientIdsTree );
 
-	const { getBlock } = useSelect( blockEditorStore );
+	const { getBlock, getSelectedBlockClientIds } =
+		useSelect( blockEditorStore );
 	const { visibleBlockCount } = useSelect(
 		( select ) => {
 			const { getGlobalBlockCount, getClientIdsOfDescendants } =
@@ -172,21 +172,25 @@ function ListViewComponent(
 		selectBlock: selectEditorBlock,
 	} );
 
+	const focusSelectedBlock = useCallback(
+		( node ) => {
+			const [ firstSelectedClientId ] = getSelectedBlockClientIds();
+			// If a blocks are already selected when the list view is initially
+			// mounted, shift focus to the first selected block.
+			if ( firstSelectedClientId && node ) {
+				focusListItem( firstSelectedClientId, node );
+			}
+		},
+		[ getSelectedBlockClientIds ]
+	);
+
 	const treeGridRef = useMergeRefs( [
 		clipBoardRef,
+		focusSelectedBlock,
 		elementRef,
 		dropZoneRef,
 		ref,
 	] );
-
-	useEffect( () => {
-		// If a blocks are already selected when the list view is initially
-		// mounted, shift focus to the first selected block.
-		if ( selectedClientIds?.length ) {
-			focusListItem( selectedClientIds[ 0 ], elementRef?.current );
-		}
-		// Only focus on the selected item when the list view is mounted.
-	}, [] );
 
 	const expand = useCallback(
 		( clientId ) => {

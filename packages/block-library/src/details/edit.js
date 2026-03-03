@@ -92,7 +92,6 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 						} }
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Open by default' ) }
 							checked={ showContent }
 							onChange={ () =>
@@ -107,7 +106,6 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 			<InspectorControls group="advanced">
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Name attribute' ) }
 					value={ name || '' }
 					onChange={ ( newName ) =>
@@ -122,6 +120,7 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 				{ ...innerBlocksProps }
 				open={ isOpen || hasSelectedInnerBlock }
 				onToggle={ ( event ) => setIsOpen( event.target.open ) }
+				name={ name || '' }
 			>
 				<summary
 					onKeyDown={ withIgnoreIMEEvents( handleSummaryKeyDown ) }

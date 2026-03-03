@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -10,16 +10,22 @@ import { Elevation } from '..';
 
 const meta: Meta< typeof Elevation > = {
 	component: Elevation,
-	title: 'Components (Experimental)/Elevation',
+	title: 'Components/Elevation',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		borderRadius: { control: { type: 'text' } },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation. Use [elevation tokens](?path=/docs/foundations-design-language-elevation--page) from `@wordpress/base-styles` instead.',
+		},
 	},
 };
 export default meta;

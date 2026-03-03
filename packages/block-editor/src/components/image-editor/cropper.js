@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import Cropper from 'react-easy-crop';
 import clsx from 'clsx';
 
 /**
@@ -9,12 +8,11 @@ import clsx from 'clsx';
  */
 import { Spinner } from '@wordpress/components';
 import { useResizeObserver } from '@wordpress/compose';
+import { ImageCropper as ImageCropperComponent } from '@wordpress/image-cropper';
 
 /**
  * Internal dependencies
  */
-import { MIN_ZOOM, MAX_ZOOM } from './constants';
-
 import { useImageEditingContext } from './context';
 
 export default function ImageCropper( {
@@ -25,17 +23,7 @@ export default function ImageCropper( {
 	naturalWidth,
 	borderProps,
 } ) {
-	const {
-		isInProgress,
-		editedUrl,
-		position,
-		zoom,
-		aspect,
-		setPosition,
-		setCrop,
-		setZoom,
-		rotation,
-	} = useImageEditingContext();
+	const { isInProgress, editedUrl, rotation } = useImageEditingContext();
 	const [ contentResizeListener, { width: clientWidth } ] =
 		useResizeObserver();
 
@@ -60,24 +48,7 @@ export default function ImageCropper( {
 				height: editedHeight,
 			} }
 		>
-			<Cropper
-				image={ editedUrl || url }
-				disabled={ isInProgress }
-				minZoom={ MIN_ZOOM / 100 }
-				maxZoom={ MAX_ZOOM / 100 }
-				crop={ position }
-				zoom={ zoom / 100 }
-				aspect={ aspect }
-				onCropChange={ ( pos ) => {
-					setPosition( pos );
-				} }
-				onCropComplete={ ( newCropPercent ) => {
-					setCrop( newCropPercent );
-				} }
-				onZoomChange={ ( newZoom ) => {
-					setZoom( newZoom * 100 );
-				} }
-			/>
+			<ImageCropperComponent src={ editedUrl || url } />
 			{ isInProgress && <Spinner /> }
 		</div>
 	);

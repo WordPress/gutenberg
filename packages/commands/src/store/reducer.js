@@ -21,8 +21,10 @@ function commands( state = {}, action ) {
 					label: action.label,
 					searchLabel: action.searchLabel,
 					context: action.context,
+					category: action.category,
 					callback: action.callback,
 					icon: action.icon,
+					keywords: action.keywords,
 				},
 			};
 		case 'UNREGISTER_COMMAND': {
@@ -50,6 +52,7 @@ function commandLoaders( state = {}, action ) {
 				[ action.name ]: {
 					name: action.name,
 					context: action.context,
+					category: action.category,
 					hook: action.hook,
 				},
 			};

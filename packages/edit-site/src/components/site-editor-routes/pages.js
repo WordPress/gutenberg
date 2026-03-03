@@ -3,6 +3,7 @@
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { __ } from '@wordpress/i18n';
+import { loadView } from '@wordpress/views';
 
 /**
  * Internal dependencies
@@ -13,9 +14,24 @@ import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-uns
 import DataViewsSidebarContent from '../sidebar-dataviews';
 import PostList from '../post-list';
 import { unlock } from '../../lock-unlock';
-import { PostEdit } from '../post-edit';
+import {
+	DEFAULT_VIEW,
+	getActiveViewOverridesForTab,
+} from '../post-list/view-utils';
 
 const { useLocation } = unlock( routerPrivateApis );
+
+async function isListView( query ) {
+	const { activeView = 'all' } = query;
+	const view = await loadView( {
+		kind: 'postType',
+		name: 'page',
+		slug: 'default',
+		defaultView: DEFAULT_VIEW,
+		activeViewOverrides: getActiveViewOverridesForTab( activeView ),
+	} );
+	return view.type === 'list';
+}
 
 function MobilePagesView() {
 	const { query = {} } = useLocation();
@@ -44,15 +60,13 @@ export const pagesRoute = {
 			const isBlockTheme = siteData.currentTheme?.is_block_theme;
 			return isBlockTheme ? <PostList postType="page" /> : undefined;
 		},
-		preview( { query, siteData } ) {
+		async preview( { query, siteData } ) {
 			const isBlockTheme = siteData.currentTheme?.is_block_theme;
 			if ( ! isBlockTheme ) {
 				return undefined;
 			}
-			const isListView =
-				( query.layout === 'list' || ! query.layout ) &&
-				query.isCustom !== 'true';
-			return isListView ? <Editor /> : undefined;
+			const isList = await isListView( query );
+			return isList ? <Editor /> : undefined;
 		},
 		mobile( { siteData } ) {
 			const isBlockTheme = siteData.currentTheme?.is_block_theme;
@@ -62,25 +76,11 @@ export const pagesRoute = {
 				<SidebarNavigationScreenUnsupported />
 			);
 		},
-		edit( { query } ) {
-			const hasQuickEdit =
-				( query.layout ?? 'list' ) !== 'list' && !! query.quickEdit;
-			return hasQuickEdit ? (
-				<PostEdit postType="page" postId={ query.postId } />
-			) : undefined;
-		},
 	},
 	widths: {
-		content( { query } ) {
-			const isListView =
-				( query.layout === 'list' || ! query.layout ) &&
-				query.isCustom !== 'true';
-			return isListView ? 380 : undefined;
-		},
-		edit( { query } ) {
-			const hasQuickEdit =
-				( query.layout ?? 'list' ) !== 'list' && !! query.quickEdit;
-			return hasQuickEdit ? 380 : undefined;
+		async content( { query } ) {
+			const isList = await isListView( query );
+			return isList ? 380 : undefined;
 		},
 	},
 };

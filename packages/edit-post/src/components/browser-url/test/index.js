@@ -4,9 +4,25 @@
 import { render } from '@testing-library/react';
 
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
-import { getPostEditURL, BrowserURL } from '../';
+import { default as BrowserURL, getPostEditURL } from '../';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+
+function setupUseSelectMock( { postId, postStatus } ) {
+	useSelect.mockImplementation( () => {
+		return {
+			postId,
+			postStatus,
+		};
+	} );
+}
 
 describe( 'getPostEditURL', () => {
 	it( 'should generate relative path with post and action arguments', () => {
@@ -32,20 +48,28 @@ describe( 'BrowserURL', () => {
 	} );
 
 	it( 'not update URL if post is auto-draft', () => {
-		const { rerender } = render( <BrowserURL /> );
+		setupUseSelectMock( {
+			postId: 1,
+			postStatus: 'auto-draft',
+		} );
 
-		rerender( <BrowserURL postId={ 1 } postStatus="auto-draft" /> );
-
+		render( <BrowserURL /> );
 		expect( replaceStateSpy ).not.toHaveBeenCalled();
 	} );
 
 	it( 'update URL if post is no longer auto-draft', () => {
+		setupUseSelectMock( {
+			postId: 1,
+			postStatus: 'auto-draft',
+		} );
 		const { rerender } = render( <BrowserURL /> );
 
-		rerender( <BrowserURL postId={ 1 } postStatus="auto-draft" /> );
+		setupUseSelectMock( {
+			postId: 1,
+			postStatus: 'draft',
+		} );
 
-		rerender( <BrowserURL postId={ 1 } postStatus="draft" /> );
-
+		rerender( <BrowserURL /> );
 		expect( replaceStateSpy ).toHaveBeenCalledWith(
 			{ id: 1 },
 			'Post 1',
@@ -54,26 +78,32 @@ describe( 'BrowserURL', () => {
 	} );
 
 	it( 'not update URL if history is already set', () => {
+		setupUseSelectMock( {
+			postId: 1,
+			postStatus: 'draft',
+		} );
 		const { rerender } = render( <BrowserURL /> );
-
-		rerender( <BrowserURL postId={ 1 } postStatus="draft" /> );
 
 		replaceStateSpy.mockReset();
 
-		rerender( <BrowserURL postId={ 1 } postStatus="draft" /> );
-
+		rerender( <BrowserURL /> );
 		expect( replaceStateSpy ).not.toHaveBeenCalled();
 	} );
 
 	it( 'update URL if post ID changes', () => {
+		setupUseSelectMock( {
+			postId: 1,
+			postStatus: 'draft',
+		} );
 		const { rerender } = render( <BrowserURL /> );
 
-		rerender( <BrowserURL postId={ 1 } postStatus="draft" /> );
-
+		setupUseSelectMock( {
+			postId: 2,
+			postStatus: 'draft',
+		} );
 		replaceStateSpy.mockReset();
 
-		rerender( <BrowserURL postId={ 2 } postStatus="draft" /> );
-
+		rerender( <BrowserURL /> );
 		expect( replaceStateSpy ).toHaveBeenCalledWith(
 			{ id: 2 },
 			'Post 2',

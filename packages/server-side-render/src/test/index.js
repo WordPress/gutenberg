@@ -1,10 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	rendererPath,
-	removeBlockSupportAttributes,
-} from '../server-side-render';
+import { rendererPath, removeBlockSupportAttributes } from '../hook';
 
 describe( 'rendererPath', () => {
 	test( 'should return an base path for empty input', () => {
@@ -107,6 +104,7 @@ describe( 'rendererPath', () => {
 							},
 						},
 					},
+					shadow: 'var:preset|shadow|crisp',
 					spacing: {
 						margin: {
 							top: '10px',

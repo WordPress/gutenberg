@@ -218,7 +218,7 @@ _Parameters_
 
 _Returns_
 
--   `?number`: ID of current post.
+-   `?(number|string)`: The current post ID (number) or template slug (string).
 
 ### getCurrentPostLastRevisionId
 
@@ -298,11 +298,15 @@ _Usage_
 const getFeaturedMediaUrl = useSelect( ( select ) => {
 	const getFeaturedMediaId =
 		select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
-	const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
+	const media = select( 'core' ).getEntityRecord(
+		'postType',
+		'attachment',
+		getFeaturedMediaId
+	);
 
 	return (
-		getMedia?.media_details?.sizes?.large?.source_url ||
-		getMedia?.source_url ||
+		media?.media_details?.sizes?.large?.source_url ||
+		media?.source_url ||
 		''
 	);
 }, [] );
@@ -767,6 +771,14 @@ _Returns_
 
 -   `boolean`: Whether new post and unsaved values exist.
 
+### isCollaborationEnabledForCurrentPost
+
+Returns whether the collaboration is enabled for the current post.
+
+_Returns_
+
+-   `boolean`: Whether collaboration is enabled.
+
 ### isCurrentPostPending
 
 Returns true if post is pending review.
@@ -1226,22 +1238,6 @@ _Usage_
 ```js
 // Update the post title
 wp.data.dispatch( 'core/editor' ).editPost( { title: `${ newTitle }` } );
-```
-
-```js
-// Get specific media size based on the featured media ID
-// Note: change sizes?.large for any registered size
-const getFeaturedMediaUrl = useSelect( ( select ) => {
-	const getFeaturedMediaId =
-		select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
-	const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
-
-	return (
-		getMedia?.media_details?.sizes?.large?.source_url ||
-		getMedia?.source_url ||
-		''
-	);
-}, [] );
 ```
 
 _Parameters_

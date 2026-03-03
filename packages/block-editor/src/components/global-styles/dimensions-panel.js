@@ -17,13 +17,14 @@ import {
 } from '@wordpress/components';
 import { Icon, alignNone, stretchWide } from '@wordpress/icons';
 import { useCallback, useState, Platform } from '@wordpress/element';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
+import { useToolsPanelDropdownMenuProps } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
-import HeightControl from '../height-control';
+import DimensionControl from '../dimension-control';
 import ChildLayoutControl from '../child-layout-control';
 import AspectRatioTool from '../dimensions-tool/aspect-ratio-tool';
 import { cleanEmptyObject } from '../../hooks/utils';
@@ -37,7 +38,9 @@ export function useHasDimensionsPanel( settings ) {
 	const hasPadding = useHasPadding( settings );
 	const hasMargin = useHasMargin( settings );
 	const hasGap = useHasGap( settings );
+	const hasHeight = useHasHeight( settings );
 	const hasMinHeight = useHasMinHeight( settings );
+	const hasWidth = useHasWidth( settings );
 	const hasAspectRatio = useHasAspectRatio( settings );
 	const hasChildLayout = useHasChildLayout( settings );
 
@@ -48,7 +51,9 @@ export function useHasDimensionsPanel( settings ) {
 			hasPadding ||
 			hasMargin ||
 			hasGap ||
+			hasHeight ||
 			hasMinHeight ||
+			hasWidth ||
 			hasAspectRatio ||
 			hasChildLayout )
 	);
@@ -74,8 +79,16 @@ function useHasGap( settings ) {
 	return settings?.spacing?.blockGap;
 }
 
+function useHasHeight( settings ) {
+	return settings?.dimensions?.height;
+}
+
 function useHasMinHeight( settings ) {
 	return settings?.dimensions?.minHeight;
+}
+
+function useHasWidth( settings ) {
+	return settings?.dimensions?.width;
 }
 
 function useHasAspectRatio( settings ) {
@@ -204,7 +217,9 @@ const DEFAULT_CONTROLS = {
 	padding: true,
 	margin: true,
 	blockGap: true,
+	height: true,
 	minHeight: true,
+	width: true,
 	aspectRatio: true,
 	childLayout: true,
 };
@@ -383,6 +398,40 @@ export default function DimensionsPanel( {
 	};
 	const hasMinHeightValue = () => !! value?.dimensions?.minHeight;
 
+	// Height
+	const showHeightControl = useHasHeight( settings );
+	const heightValue = decodeValue( inheritedValue?.dimensions?.height );
+	const setHeightValue = ( newValue ) => {
+		const tempValue = setImmutably(
+			value,
+			[ 'dimensions', 'height' ],
+			newValue
+		);
+		// Apply height, while removing any applied aspect ratio.
+		onChange(
+			setImmutably(
+				tempValue,
+				[ 'dimensions', 'aspectRatio' ],
+				undefined
+			)
+		);
+	};
+	const resetHeightValue = () => {
+		setHeightValue( undefined );
+	};
+	const hasHeightValue = () => !! value?.dimensions?.height;
+
+	// Width
+	const showWidthControl = useHasWidth( settings );
+	const widthValue = decodeValue( inheritedValue?.dimensions?.width );
+	const setWidthValue = ( newValue ) => {
+		onChange( setImmutably( value, [ 'dimensions', 'width' ], newValue ) );
+	};
+	const resetWidthValue = () => {
+		setWidthValue( undefined );
+	};
+	const hasWidthValue = () => !! value?.dimensions?.width;
+
 	// Aspect Ratio
 	const showAspectRatioControl = useHasAspectRatio( settings );
 	const aspectRatioValue = decodeValue(
@@ -436,8 +485,10 @@ export default function DimensionsPanel( {
 			},
 			dimensions: {
 				...previousValue?.dimensions,
+				height: undefined,
 				minHeight: undefined,
 				aspectRatio: undefined,
+				width: undefined,
 			},
 		};
 	}, [] );
@@ -680,10 +731,47 @@ export default function DimensionsPanel( {
 					}
 					panelId={ panelId }
 				>
-					<HeightControl
+					<DimensionControl
 						label={ __( 'Minimum height' ) }
 						value={ minHeightValue }
 						onChange={ setMinHeightValue }
+						dimensionSizes={ dimensions?.dimensionSizes }
+					/>
+				</ToolsPanelItem>
+			) }
+			{ showHeightControl && (
+				<ToolsPanelItem
+					hasValue={ hasHeightValue }
+					label={ __( 'Height' ) }
+					onDeselect={ resetHeightValue }
+					isShownByDefault={
+						defaultControls.height ?? DEFAULT_CONTROLS.height
+					}
+					panelId={ panelId }
+				>
+					<DimensionControl
+						label={ __( 'Height' ) }
+						value={ heightValue }
+						onChange={ setHeightValue }
+						dimensionSizes={ dimensions?.dimensionSizes }
+					/>
+				</ToolsPanelItem>
+			) }
+			{ showWidthControl && (
+				<ToolsPanelItem
+					hasValue={ hasWidthValue }
+					label={ __( 'Width' ) }
+					onDeselect={ resetWidthValue }
+					isShownByDefault={
+						defaultControls.width ?? DEFAULT_CONTROLS.width
+					}
+					panelId={ panelId }
+				>
+					<DimensionControl
+						label={ __( 'Width' ) }
+						value={ widthValue }
+						onChange={ setWidthValue }
+						dimensionSizes={ dimensions?.dimensionSizes }
 					/>
 				</ToolsPanelItem>
 			) }

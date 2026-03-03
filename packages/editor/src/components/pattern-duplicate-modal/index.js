@@ -17,24 +17,32 @@ const { DuplicatePatternModal } = unlock( patternsPrivateApis );
 export const modalName = 'editor/pattern-duplicate';
 
 export default function PatternDuplicateModal() {
-	const { record, postType } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
-		const { getEditedEntityRecord } = select( coreStore );
-		const _postType = getCurrentPostType();
-		return {
-			record: getEditedEntityRecord(
-				'postType',
-				_postType,
-				getCurrentPostId()
-			),
-			postType: _postType,
-		};
-	}, [] );
-	const { closeModal } = useDispatch( interfaceStore );
-
 	const isActive = useSelect( ( select ) =>
 		select( interfaceStore ).isModalActive( modalName )
 	);
+
+	const { record, postType } = useSelect(
+		( select ) => {
+			if ( ! isActive ) {
+				return {};
+			}
+
+			const { getCurrentPostType, getCurrentPostId } =
+				select( editorStore );
+			const { getEditedEntityRecord } = select( coreStore );
+			const _postType = getCurrentPostType();
+			return {
+				record: getEditedEntityRecord(
+					'postType',
+					_postType,
+					getCurrentPostId()
+				),
+				postType: _postType,
+			};
+		},
+		[ isActive ]
+	);
+	const { closeModal } = useDispatch( interfaceStore );
 
 	if ( ! isActive || postType !== PATTERN_POST_TYPE ) {
 		return null;

@@ -2,11 +2,12 @@
  * WordPress dependencies
  */
 import { useDispatch } from '@wordpress/data';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import {
 	MediaUploadProvider,
 	store as uploadStore,
+	detectClientSideMediaSupport,
 } from '@wordpress/upload-media';
 
 /**
@@ -19,10 +20,69 @@ import { BlockRefsProvider } from './block-refs-provider';
 import { unlock } from '../../lock-unlock';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import useMediaUploadSettings from './use-media-upload-settings';
+import { SelectionContext } from './selection-context';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
 const noop = () => {};
+
+/**
+ * Flag to track if we've already logged the fallback message.
+ */
+let hasLoggedFallback = false;
+
+/**
+ * Cached result of whether client-side media processing should be enabled.
+ * This is computed once per session for efficiency and stability.
+ */
+let isClientSideMediaEnabledCache = null;
+
+/**
+ * Checks if client-side media processing should be enabled.
+ *
+ * Returns true only if:
+ * 1. The client-side media processing flag is enabled
+ * 2. The browser supports WebAssembly, SharedArrayBuffer, cross-origin isolation, and CSP allows blob workers
+ *
+ * The result is cached for the session to ensure stability during React renders.
+ *
+ * @return {boolean} Whether client-side media processing should be enabled.
+ */
+function shouldEnableClientSideMediaProcessing() {
+	// Return cached result if available.
+	if ( isClientSideMediaEnabledCache !== null ) {
+		return isClientSideMediaEnabledCache;
+	}
+
+	// Check if the client-side media processing flag is enabled first.
+	if ( ! window.__clientSideMediaProcessing ) {
+		isClientSideMediaEnabledCache = false;
+		return false;
+	}
+
+	// Safety check in case the import is unavailable.
+	if ( typeof detectClientSideMediaSupport !== 'function' ) {
+		isClientSideMediaEnabledCache = false;
+		return false;
+	}
+
+	const detection = detectClientSideMediaSupport();
+	if ( ! detection || ! detection.supported ) {
+		// Only log once per session to avoid console spam.
+		if ( ! hasLoggedFallback ) {
+			// eslint-disable-next-line no-console
+			console.info(
+				`Client-side media processing unavailable: ${ detection.reason }. Using server-side processing.`
+			);
+			hasLoggedFallback = true;
+		}
+		isClientSideMediaEnabledCache = false;
+		return false;
+	}
+
+	isClientSideMediaEnabledCache = true;
+	return true;
+}
 
 /**
  * Upload a media file when the file upload button is activated
@@ -51,7 +111,7 @@ function mediaUpload(
 	}
 ) {
 	void registry.dispatch( uploadStore ).addItems( {
-		files: filesList,
+		files: Array.from( filesList ),
 		onChange: onFileChange,
 		onSuccess,
 		onBatchSuccess,
@@ -59,6 +119,18 @@ function mediaUpload(
 		additionalData,
 		allowedTypes,
 	} );
+}
+
+/**
+ * Calls useBlockSync as a child of SelectionContext.Provider so that the
+ * hook can read selection state from the context provided by this tree
+ * rather than from a parent provider (which may not exist for the root).
+ *
+ * @param {Object} props Props forwarded to useBlockSync.
+ */
+function BlockSyncEffect( props ) {
+	useBlockSync( props );
+	return null;
 }
 
 export const ExperimentalBlockEditorProvider = withRegistryProvider(
@@ -71,18 +143,19 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 
 		const mediaUploadSettings = useMediaUploadSettings( _settings );
 
-		let settings = _settings;
+		const isClientSideMediaEnabled =
+			shouldEnableClientSideMediaProcessing();
 
-		if ( window.__experimentalMediaProcessing && _settings.mediaUpload ) {
-			// Create a new variable so that the original props.settings.mediaUpload is not modified.
-			settings = useMemo(
-				() => ( {
+		const settings = useMemo( () => {
+			if ( isClientSideMediaEnabled && _settings?.mediaUpload ) {
+				// Create a new object so that the original props.settings.mediaUpload is not modified.
+				return {
 					..._settings,
 					mediaUpload: mediaUpload.bind( null, registry ),
-				} ),
-				[ _settings, registry ]
-			);
-		}
+				};
+			}
+			return _settings;
+		}, [ _settings, registry, isClientSideMediaEnabled ] );
 
 		const { __experimentalUpdateSettings } = unlock(
 			useDispatch( blockEditorStore )
@@ -104,8 +177,24 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 			__experimentalUpdateSettings,
 		] );
 
-		// Syncs the entity provider with changes in the block-editor store.
-		useBlockSync( props );
+		// Store selection and onChangeSelection in refs and expose
+		// stable getters/callers so that the context value is a
+		// complete constant.  This prevents re-rendering the entire
+		// block tree (including async-rendered off-screen blocks)
+		// when either value changes.
+		const selectionRef = useRef( props.selection );
+		selectionRef.current = props.selection;
+		const onChangeSelectionRef = useRef( props.onChangeSelection ?? noop );
+		onChangeSelectionRef.current = props.onChangeSelection ?? noop;
+
+		const selectionContextValue = useMemo(
+			() => ( {
+				getSelection: () => selectionRef.current,
+				onChangeSelection: ( ...args ) =>
+					onChangeSelectionRef.current( ...args ),
+			} ),
+			[]
+		);
 
 		const children = (
 			<SlotFillProvider passthrough>
@@ -114,18 +203,30 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 			</SlotFillProvider>
 		);
 
-		if ( window.__experimentalMediaProcessing ) {
+		const content = (
+			<SelectionContext.Provider value={ selectionContextValue }>
+				<BlockSyncEffect
+					clientId={ props.clientId }
+					value={ props.value }
+					onChange={ props.onChange }
+					onInput={ props.onInput }
+				/>
+				{ children }
+			</SelectionContext.Provider>
+		);
+
+		if ( isClientSideMediaEnabled ) {
 			return (
 				<MediaUploadProvider
 					settings={ mediaUploadSettings }
 					useSubRegistry={ false }
 				>
-					{ children }
+					{ content }
 				</MediaUploadProvider>
 			);
 		}
 
-		return children;
+		return content;
 	}
 );
 

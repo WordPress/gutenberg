@@ -85,6 +85,7 @@ describe( 'selectors', () => {
 
 	beforeEach( () => {
 		registerBlockType( 'core/block', {
+			apiVersion: 3,
 			save: () => null,
 			category: 'reusable',
 			title: 'Reusable Block Stub',
@@ -94,6 +95,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-a', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'design',
 			title: 'Test Block A',
@@ -102,6 +104,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-b', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block B',
@@ -113,6 +116,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-c', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block C',
@@ -122,6 +126,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/freeform', {
+			apiVersion: 3,
 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
 			category: 'text',
 			title: 'Test Freeform Content Handler',
@@ -134,6 +139,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/post-content-child', {
+			apiVersion: 3,
 			save: () => null,
 			category: 'text',
 			title: 'Test Block Post Content Child',
@@ -143,6 +149,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-ancestor', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block required as ancestor',
@@ -151,6 +158,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-parent', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block required as parent',
@@ -159,6 +167,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-requires-ancestor', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block that requires ancestor',
@@ -168,6 +177,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-requires-ancestor-parent', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block that requires both ancestor and parent',
@@ -2666,9 +2676,12 @@ describe( 'selectors', () => {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
+					order: new Map(),
+					parents: new Map(),
 				},
 				blockListSettings: {},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/invalid' ) ).toBe( false );
 		} );
@@ -2678,11 +2691,14 @@ describe( 'selectors', () => {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
+					order: new Map(),
+					parents: new Map(),
 				},
 				blockListSettings: {},
 				settings: {
 					allowedBlockTypes: [],
 				},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				false
@@ -2714,11 +2730,13 @@ describe( 'selectors', () => {
 					byClientId: new Map(),
 					attributes: new Map(),
 					order: new Map(),
+					parents: new Map(),
 				},
 				blockListSettings: {},
 				settings: {
 					templateLock: 'all',
 				},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				false
@@ -3078,7 +3096,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(
 						Object.entries( {
 							block1: { name: 'core/test-block-ancestor' },
-							block2: { name: 'core/block' },
+							block2: { name: 'core/group' },
 							block3: { name: 'core/test-block-parent' },
 						} )
 					),
@@ -3402,6 +3420,18 @@ describe( 'selectors', () => {
 				( item ) => item.id === 'core/block/1'
 			);
 			expect( reusableBlockItem ).toEqual( {
+				blocks: [
+					expect.objectContaining( {
+						attributes: {
+							metadata: expect.objectContaining( {
+								name: 'Reusable Block 1',
+								patternName: 'core/block/1',
+							} ),
+						},
+						isValid: true,
+						innerBlocks: [],
+					} ),
+				],
 				category: 'reusable',
 				content: '<!-- /wp:test-block-a -->',
 				frecency: 0,
@@ -3533,6 +3563,7 @@ describe( 'selectors', () => {
 	describe( 'getBlockTransformItems', () => {
 		beforeAll( () => {
 			registerBlockType( 'core/with-tranforms-a', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'Transforms a',
 				edit: () => {},
@@ -3562,6 +3593,7 @@ describe( 'selectors', () => {
 				},
 			} );
 			registerBlockType( 'core/with-tranforms-b', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'Transforms b',
 				edit: () => {},
@@ -3577,6 +3609,7 @@ describe( 'selectors', () => {
 				},
 			} );
 			registerBlockType( 'core/with-tranforms-c', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'Transforms c',
 				edit: () => {},
@@ -3863,6 +3896,19 @@ describe( 'selectors', () => {
 			};
 
 			expect( getTemplateLock( state, 'chicken' ) ).toBe( 'insert' );
+		} );
+
+		it( 'should return false if the block has contentOnly template lock and is an edited section', () => {
+			const state = {
+				editedContentOnlySection: 'chicken',
+				blockListSettings: {
+					chicken: {
+						templateLock: 'contentOnly',
+					},
+				},
+			};
+
+			expect( getTemplateLock( state, 'chicken' ) ).toBe( false );
 		} );
 	} );
 
@@ -4231,18 +4277,21 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 	// the core blocks (usually by using the `init` action), thus affecting the display order.
 	beforeEach( () => {
 		registerBlockType( 'plugin/block-a', {
+			apiVersion: 3,
 			save() {},
 			category: 'text',
 			title: 'Plugin Block A',
 			icon: 'test',
 		} );
 		registerBlockType( 'another-plugin/block-b', {
+			apiVersion: 3,
 			save() {},
 			category: 'text',
 			title: 'Another Plugin Block B',
 			icon: 'test',
 		} );
 		registerBlockType( 'plugin/block-c-with-variations', {
+			apiVersion: 3,
 			save() {},
 			category: 'text',
 			title: 'Plugin Block C with variations',
@@ -4250,11 +4299,13 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 			variations: [ { name: 'variation-a' }, { name: 'variation-b' } ],
 		} );
 		registerBlockType( 'core/block', {
+			apiVersion: 3,
 			save() {},
 			category: 'text',
 			title: 'Core Block A',
 		} );
 		registerBlockType( 'core/test-block-a', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'design',
 			title: 'Core Block B',
@@ -4262,6 +4313,7 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 			keywords: [ 'testing' ],
 		} );
 		registerBlockType( 'core/test-block-with-variations', {
+			apiVersion: 3,
 			save() {},
 			category: 'text',
 			title: 'Core Block C with variations',
@@ -4380,90 +4432,6 @@ describe( '__unstableGetClientIdsTree', () => {
 
 describe( 'getBlockEditingMode', () => {
 	const baseState = {
-		settings: {},
-		blocks: {
-			byClientId: new Map( [
-				[
-					'6cf70164-9097-4460-bcbf-200560546988',
-					{ name: 'core/template-part' },
-				], // Header
-				[
-					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-					{ name: 'core/group' },
-				], // Group
-				[
-					'b26fc763-417d-4f01-b81c-2ec61e14a972',
-					{ name: 'core/post-title' },
-				], // |  Post Title
-				[
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-					{ name: 'core/group' },
-				], // |  Group
-				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', { name: 'core/p' } ], // | |  Paragraph
-				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', { name: 'core/p' } ], // | |  Paragraph
-				[
-					'9b9c5c3f-2e46-4f02-9e14-9fed515b958s',
-					{ name: 'core/group' },
-				], // | | Group
-			] ),
-			order: new Map( [
-				[
-					'',
-					[
-						'6cf70164-9097-4460-bcbf-200560546988',
-						'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-					],
-				],
-				[ '6cf70164-9097-4460-bcbf-200560546988', [] ],
-				[
-					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-					[
-						'b26fc763-417d-4f01-b81c-2ec61e14a972',
-						'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-					],
-				],
-				[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', [] ],
-				[
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-					[
-						'b3247f75-fd94-4fef-97f9-5bfd162cc416',
-						'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
-						'9b9c5c3f-2e46-4f02-9e14-9fed515b958s',
-					],
-				],
-				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', [] ],
-				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', [] ],
-				[ '9b9c5c3f-2e46-4f02-9e14-9fed515b958s', [] ],
-			] ),
-			parents: new Map( [
-				[ '6cf70164-9097-4460-bcbf-200560546988', '' ],
-				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', '' ],
-				[
-					'b26fc763-417d-4f01-b81c-2ec61e14a972',
-					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-				],
-				[
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-				],
-				[
-					'b3247f75-fd94-4fef-97f9-5bfd162cc416',
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-				],
-				[
-					'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-				],
-				[
-					'9b9c5c3f-2e46-4f02-9e14-9fed515b958s',
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-				],
-			] ),
-		},
-		blockListSettings: {
-			'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337': {},
-			'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {},
-		},
 		blockEditingModes: new Map( [] ),
 		derivedBlockEditingModes: new Map( [] ),
 	};
@@ -4514,115 +4482,59 @@ describe( 'getBlockEditingMode', () => {
 		).toBe( 'contentOnly' );
 	} );
 
-	it( 'should return disabled if explicitly set on a parent', () => {
-		const state = {
-			...baseState,
-			blockEditingModes: new Map( [
-				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-			] ),
-			derivedBlockEditingModes: new Map( [
-				[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
-				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
-				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
-				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
-				[ '9b9c5c3f-2e46-4f02-9e14-9fed515b958s', 'disabled' ],
-			] ),
-		};
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'disabled' );
-	} );
+	describe( 'derived block editing modes override standard block editing modes', () => {
+		it( 'should return default if explicitly set', () => {
+			const state = {
+				...baseState,
+				blockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
+				] ),
+				derivedBlockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
+				] ),
+			};
+			expect(
+				getBlockEditingMode(
+					state,
+					'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+				)
+			).toBe( 'default' );
+		} );
 
-	it( 'should return default if parent is set to contentOnly', () => {
-		const state = {
-			...baseState,
-			blockEditingModes: new Map( [
-				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'contentOnly' ],
-			] ),
-		};
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'default' );
-	} );
+		it( 'should return disabled if explicitly set', () => {
+			const state = {
+				...baseState,
+				blockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
+				] ),
+				derivedBlockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
+				] ),
+			};
+			expect(
+				getBlockEditingMode(
+					state,
+					'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+				)
+			).toBe( 'disabled' );
+		} );
 
-	it( 'should return disabled if overridden by a parent', () => {
-		const state = {
-			...baseState,
-			blockEditingModes: new Map( [
-				[ '', 'disabled' ],
-				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'default' ],
-				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
-			] ),
-			derivedBlockEditingModes: new Map( [
-				[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
-				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
-				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
-				[ '9b9c5c3f-2e46-4f02-9e14-9fed515b958s', 'disabled' ],
-			] ),
-		};
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'disabled' );
-	} );
-
-	it( 'should return disabled if explicitly set on root', () => {
-		const state = {
-			...baseState,
-			blockEditingModes: new Map( [ [ '', 'disabled' ] ] ),
-			derivedBlockEditingModes: new Map( [
-				[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
-				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-				[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
-				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
-				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
-				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
-				[ '9b9c5c3f-2e46-4f02-9e14-9fed515b958s', 'disabled' ],
-			] ),
-		};
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'disabled' );
-	} );
-
-	it( 'should return default if root is contentOnly', () => {
-		const state = {
-			...baseState,
-			blockEditingModes: new Map( [ [ '', 'contentOnly' ] ] ),
-		};
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'default' );
-	} );
-
-	it( 'should return disabled if parent is locked and the block has no content role', () => {
-		const state = {
-			...baseState,
-			blockListSettings: {
-				...baseState.blockListSettings,
-				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {
-					templateLock: 'contentOnly',
-				},
-			},
-		};
-		hasContentRoleAttribute.mockReturnValueOnce( false );
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'disabled' );
-	} );
-
-	it( 'should return contentOnly if parent is locked and the block has a content role', () => {
-		const state = {
-			...baseState,
-			blockListSettings: {
-				...baseState.blockListSettings,
-				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {
-					templateLock: 'contentOnly',
-				},
-			},
-		};
-		hasContentRoleAttribute.mockReturnValueOnce( true );
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'contentOnly' );
+		it( 'should return contentOnly if explicitly set', () => {
+			const state = {
+				...baseState,
+				blockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
+				] ),
+				derivedBlockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
+				] ),
+			};
+			expect(
+				getBlockEditingMode(
+					state,
+					'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+				)
+			).toBe( 'contentOnly' );
+		} );
 	} );
 } );

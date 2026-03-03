@@ -4,6 +4,11 @@
 import { __ } from '@wordpress/i18n';
 
 /**
+ * Internal dependencies
+ */
+import { ATTACHMENT_POST_TYPE } from '../constants';
+
+/**
  * Builds the arguments for a success notification dispatch.
  *
  * @param {Object} data Incoming data to build the arguments from.
@@ -31,6 +36,10 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 	// Always should a notice, which will be spoken for accessibility.
 	if ( willTrash ) {
 		noticeMessage = postType.labels.item_trashed;
+		shouldShowLink = false;
+	} else if ( post.type === ATTACHMENT_POST_TYPE ) {
+		// Attachments should always show a simple updated message because they don't have a draft state.
+		noticeMessage = __( 'Media updated.' );
 		shouldShowLink = false;
 	} else if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
@@ -89,17 +98,42 @@ export function getNotificationArgumentsForSaveFail( data ) {
 
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = publishStatus.indexOf( post.status ) !== -1;
-	// If the post was being published, we show the corresponding publish error message
-	// Unless we publish an "updating failed" message.
+
+	if ( error.code === 'offline_error' ) {
+		const messages = {
+			publish: __(
+				'Publishing failed because you were offline. Please verify your connection and try again.'
+			),
+			private: __(
+				'Publishing failed because you were offline. Please verify your connection and try again.'
+			),
+			future: __(
+				'Scheduling failed because you were offline. Please verify your connection and try again.'
+			),
+			default: __(
+				'Updating failed because you were offline. Please verify your connection and try again.'
+			),
+		};
+
+		const noticeMessage =
+			! isPublished && edits.status in messages
+				? messages[ edits.status ]
+				: messages.default;
+
+		return [ noticeMessage, { id: 'editor-save' } ];
+	}
+
 	const messages = {
 		publish: __( 'Publishing failed.' ),
 		private: __( 'Publishing failed.' ),
 		future: __( 'Scheduling failed.' ),
+		default: __( 'Updating failed.' ),
 	};
+
 	let noticeMessage =
-		! isPublished && publishStatus.indexOf( edits.status ) !== -1
+		! isPublished && edits.status in messages
 			? messages[ edits.status ]
-			: __( 'Updating failed.' );
+			: messages.default;
 
 	// Check if message string contains HTML. Notice text is currently only
 	// supported as plaintext, and stripping the tags may muddle the meaning.

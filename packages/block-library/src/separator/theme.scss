@@ -1,5 +1,5 @@
 // Import styles for rendering the static content of deprecated block versions.
-@import "./deprecated.scss";
+@use "./deprecated.scss" as *;
 
 .wp-block-separator {
 	border: none;

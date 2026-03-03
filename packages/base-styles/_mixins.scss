@@ -221,6 +221,22 @@
  * Styles that are reused verbatim in a few places
  */
 
+@mixin snackbar-container() {
+	position: fixed;
+	bottom: 24px;
+	left: 0;
+	right: 0;
+	padding-inline: 16px;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	pointer-events: none;
+
+	.components-snackbar {
+		margin-inline: auto;
+	}
+}
+
 // These are additional styles for all captions, when the theme opts in to block styles.
 @mixin caption-style() {
 	margin-top: 0.5em;
@@ -283,15 +299,7 @@
 	}
 
 	// Use opacity to work in various editor styles.
-	&::-webkit-input-placeholder {
-		color: colors.$dark-gray-placeholder;
-	}
-
-	&::-moz-placeholder {
-		color: colors.$dark-gray-placeholder;
-	}
-
-	&:-ms-input-placeholder {
+	&::placeholder {
 		color: colors.$dark-gray-placeholder;
 	}
 }
@@ -313,11 +321,6 @@
 	&:checked {
 		background: var(--wp-admin-theme-color);
 		border-color: var(--wp-admin-theme-color);
-
-		// Hide default checkbox styles in IE.
-		&::-ms-check {
-			opacity: 0;
-		}
 	}
 
 	&:checked::before,
@@ -680,4 +683,21 @@
 	bottom: 0;
 	left: 0;
 	@include selected-block-outline($widthRatio);
+}
+
+/**
+ * Creates a checkerboard pattern background to indicate transparency.
+ * @param {String} $size - The size of the squares in the checkerboard pattern. Default is 12px.
+ */
+@mixin checkerboard-background($size: 12px) {
+	// The background image creates a checkerboard pattern. Ignore rtlcss to
+	// make it work both in LTR and RTL.
+	// See https://github.com/WordPress/gutenberg/pull/42510
+	/*rtl:begin:ignore*/
+	background-image:
+		repeating-linear-gradient(45deg, colors.$gray-200 25%, transparent 25%, transparent 75%, colors.$gray-200 75%, colors.$gray-200),
+		repeating-linear-gradient(45deg, colors.$gray-200 25%, transparent 25%, transparent 75%, colors.$gray-200 75%, colors.$gray-200);
+	background-position: 0 0, $size $size;
+	/*rtl:end:ignore*/
+	background-size: calc(2 * $size) calc(2 * $size);
 }

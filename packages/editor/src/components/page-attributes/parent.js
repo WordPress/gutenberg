@@ -91,9 +91,10 @@ export function PageAttributesParent() {
 				_fields: 'id,title,parent',
 			};
 
-			// Perform a search when the field is changed.
+			// Perform a search by relevance when the field is changed.
 			if ( !! fieldValue ) {
 				query.search = fieldValue;
+				query.orderby = 'relevance';
 			}
 
 			const parentPost = pageId
@@ -193,7 +194,6 @@ export function PageAttributesParent() {
 
 	return (
 		<ComboboxControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			className="editor-page-attributes__parent"
 			label={ __( 'Parent' ) }
@@ -226,7 +226,6 @@ function PostParentToggle( { isOpen, onClick } ) {
 	return (
 		<Button
 			size="compact"
-			className="editor-post-parent__panel-toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }
 			aria-label={

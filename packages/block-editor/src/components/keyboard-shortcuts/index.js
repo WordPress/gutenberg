@@ -115,6 +115,15 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
+			name: 'core/block-editor/stop-editing-as-blocks',
+			category: 'block',
+			description: __( 'Finish editing a design.' ),
+			keyCombination: {
+				character: 'escape',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/block-editor/select-all',
 			category: 'selection',
 			description: __(
@@ -141,6 +150,7 @@ function KeyboardShortcutsRegister() {
 			description: __( 'Select text across multiple blocks.' ),
 			keyCombination: {
 				modifier: 'shift',
+				// Spotted during my own research — invalid character?
 				character: 'arrow',
 			},
 		} );
@@ -195,6 +205,26 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'primary',
 				character: 'g',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/toggle-block-visibility',
+			category: 'block',
+			description: __( 'Show or hide the selected block(s).' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: 'h',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/rename',
+			category: 'block',
+			description: __( 'Rename the selected block.' ),
+			keyCombination: {
+				modifier: 'primaryAlt',
+				character: 'r',
 			},
 		} );
 	}, [ registerShortcut ] );

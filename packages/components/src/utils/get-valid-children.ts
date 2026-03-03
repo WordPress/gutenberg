@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode, ReactChild, ReactFragment, ReactPortal } from 'react';
+import type { ReactNode, ReactElement, ReactPortal } from 'react';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,9 @@ import { Children, isValidElement } from '@wordpress/element';
  */
 export function getValidChildren(
 	children: ReactNode
-): Array< ReactChild | ReactFragment | ReactPortal > {
+): Array<
+	ReactElement | number | string | Iterable< ReactNode > | ReactPortal
+> {
 	if ( typeof children === 'string' ) {
 		return [ children ];
 	}

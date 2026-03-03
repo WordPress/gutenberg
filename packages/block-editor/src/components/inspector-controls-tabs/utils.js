@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { cog, styles, listView } from '@wordpress/icons';
+import { cog, styles, listView, page } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 export const TAB_SETTINGS = {
@@ -16,6 +16,13 @@ export const TAB_STYLES = {
 	title: __( 'Styles' ),
 	value: 'styles',
 	icon: styles,
+};
+
+export const TAB_CONTENT = {
+	name: 'content',
+	title: __( 'Content' ),
+	value: 'content',
+	icon: page,
 };
 
 export const TAB_LIST_VIEW = {

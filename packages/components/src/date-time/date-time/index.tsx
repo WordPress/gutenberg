@@ -78,5 +78,6 @@ function UnforwardedDateTimePicker(
  * ```
  */
 export const DateTimePicker = forwardRef( UnforwardedDateTimePicker );
+DateTimePicker.displayName = 'DateTimePicker';
 
 export default DateTimePicker;

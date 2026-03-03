@@ -1,0 +1,201 @@
+@use "sass:color";
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/default-custom-properties" as *;
+
+// Here we extend the modal styles to be tighter, and to the center. Because the palette uses the modal as a container.
+.workflows-workflow-menu {
+	border-radius: $grid-unit-05;
+	width: calc(100% - #{$grid-unit-40});
+	margin: auto;
+	max-width: 400px;
+	position: relative;
+	top: calc(5% + #{$header-height});
+
+	@include break-small() {
+		top: calc(10% + #{$header-height});
+	}
+
+	.components-modal__content {
+		margin: 0;
+		padding: 0;
+	}
+}
+
+.workflows-workflow-menu__overlay {
+	display: block;
+	align-items: start;
+}
+
+.workflows-workflow-menu__header {
+	padding: 0 $grid-unit-20;
+}
+
+.workflows-workflow-menu__header-search-icon {
+	&:dir(ltr) {
+		transform: scaleX(-1);
+	}
+}
+
+.workflows-workflow-menu__container {
+	// the style here is a hack to force safari to repaint to avoid a style glitch
+	will-change: transform;
+
+	&:focus {
+		outline: none;
+	}
+
+	[cmdk-input] {
+		border: none;
+		width: 100%;
+		padding: $grid-unit-20 $grid-unit-05;
+		outline: none;
+		color: $gray-900;
+		margin: 0;
+		font-size: 15px;
+		line-height: 28px;
+		border-radius: 0;
+
+		&::placeholder {
+			color: $gray-700;
+		}
+
+		&:focus {
+			box-shadow: none;
+			outline: none;
+		}
+	}
+
+	[cmdk-item] {
+		border-radius: $radius-small;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		color: $gray-900;
+		font-size: $default-font-size;
+
+		&[aria-selected="true"],
+		&:active {
+			background: var(--wp-admin-theme-color);
+			color: $white;
+		}
+
+		&[aria-disabled="true"] {
+			color: $gray-600;
+			cursor: not-allowed;
+		}
+
+		> div {
+			min-height: $button-size-next-default-40px;
+			padding: $grid-unit-05;
+			padding-left: $grid-unit-20;
+		}
+	}
+
+	[cmdk-root] > [cmdk-list] {
+		max-height: $palette-max-height; // Specific to not have workflows overflow oddly.
+		overflow: auto;
+
+		// Ensures there is always padding bottom on the last group, when there are workflows.
+		&
+		[cmdk-list-sizer] > [cmdk-group]:last-child
+		[cmdk-group-items]:not(:empty) {
+			padding-bottom: $grid-unit-10;
+		}
+
+		& [cmdk-list-sizer] > [cmdk-group] > [cmdk-group-items]:not(:empty) {
+			padding: 0 $grid-unit-10;
+		}
+	}
+
+	[cmdk-empty] {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		white-space: pre-wrap;
+		color: $gray-900;
+		padding: $grid-unit-10 0 $grid-unit-40;
+	}
+
+	[cmdk-loading] {
+		padding: $grid-unit-20;
+	}
+
+	[cmdk-list-sizer] {
+		position: relative;
+	}
+}
+
+.workflows-workflow-menu__item span {
+	// Ensure workflows do not run off the edge (great for post titles).
+	display: inline-block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.workflows-workflow-menu__item mark {
+	color: inherit;
+	background: unset;
+	font-weight: 600;
+}
+
+.workflows-workflow-menu__output {
+	padding: $grid-unit-20;
+}
+
+.workflows-workflow-menu__output-header {
+	margin-bottom: $grid-unit-20;
+	border-bottom: 1px solid $gray-300;
+	padding-bottom: $grid-unit-10;
+
+	h3 {
+		margin: 0 0 $grid-unit-05;
+		font-size: 16px;
+		font-weight: 600;
+		color: $gray-900;
+	}
+}
+
+.workflows-workflow-menu__output-hint {
+	margin: 0;
+	font-size: 12px;
+	color: $gray-700;
+}
+
+.workflows-workflow-menu__output-content {
+	max-height: 400px;
+	overflow: auto;
+
+	pre {
+		margin: 0;
+		padding: $grid-unit-15;
+		background: $gray-100;
+		border-radius: $radius-small;
+		font-size: 12px;
+		line-height: 1.5;
+		white-space: pre-wrap;
+		word-break: break-word;
+		color: $gray-900;
+	}
+}
+
+.workflows-workflow-menu__output-error {
+	padding: $grid-unit-15;
+	background: $gray-200;
+	border: 1px solid #{color.adjust( $alert-red, $lightness: -10% )};
+	border-radius: $radius-small;
+	color: $alert-red;
+
+	p {
+		margin: 0;
+		font-size: 13px;
+	}
+}
+
+.workflows-workflow-menu__executing {
+	padding: $grid-unit-30 $grid-unit-20;
+	color: $gray-700;
+	font-size: 14px;
+}

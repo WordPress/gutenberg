@@ -25,7 +25,6 @@ export default function CoverPlaceholder( {
 				title: __( 'Cover' ),
 			} }
 			onSelect={ onSelectMedia }
-			accept="image/*,video/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			disableMediaButtons={ disableMediaButtons }
 			onToggleFeaturedImage={ toggleUseFeaturedImage }

@@ -22,12 +22,14 @@
 			"type": "boolean",
 			"default": true
 		},
-		"displayExcerpt": {
-			"type": "boolean",
-			"default": true
+		"displayContent": {
+			"type": "string",
+			"default": "excerpt",
+			"enum": [ "none", "excerpt", "full" ]
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": true,
 		"color": {
 			"gradients": true,
@@ -60,6 +62,5 @@
 			"clientNavigation": true
 		}
 	},
-	"editorStyle": "wp-block-latest-comments-editor",
 	"style": "wp-block-latest-comments"
 }

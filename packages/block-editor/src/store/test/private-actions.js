@@ -7,9 +7,10 @@ import {
 	expandBlock,
 	__experimentalUpdateSettings,
 	setInsertionPoint,
-	setOpenedBlockSettingsMenu,
 	startDragging,
 	stopDragging,
+	showViewportModal,
+	hideViewportModal,
 } from '../private-actions';
 
 describe( 'private actions', () => {
@@ -84,22 +85,6 @@ describe( 'private actions', () => {
 		} );
 	} );
 
-	describe( 'setOpenedBlockSettingsMenu', () => {
-		it( 'should return the SET_OPENED_BLOCK_SETTINGS_MENU action', () => {
-			expect( setOpenedBlockSettingsMenu() ).toEqual( {
-				clientId: undefined,
-				type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
-			} );
-		} );
-
-		it( 'should return the SET_OPENED_BLOCK_SETTINGS_MENU action with client id if provided', () => {
-			expect( setOpenedBlockSettingsMenu( 'abcd' ) ).toEqual( {
-				clientId: 'abcd',
-				type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
-			} );
-		} );
-	} );
-
 	describe( 'startDragging', () => {
 		it( 'should return the START_DRAGGING action', () => {
 			expect( startDragging() ).toEqual( {
@@ -135,6 +120,24 @@ describe( 'private actions', () => {
 			).toEqual( {
 				type: 'SET_INSERTION_POINT',
 				value: { rootClientId: '', index: '123' },
+			} );
+		} );
+	} );
+
+	describe( 'showViewportModal', () => {
+		it( 'should return the SHOW_VIEWPORT_MODAL action with clientIds', () => {
+			const clientIds = [ 'client-1', 'client-2' ];
+			expect( showViewportModal( clientIds ) ).toEqual( {
+				type: 'SHOW_VIEWPORT_MODAL',
+				clientIds,
+			} );
+		} );
+	} );
+
+	describe( 'hideViewportModal', () => {
+		it( 'should return the HIDE_VIEWPORT_MODAL action', () => {
+			expect( hideViewportModal() ).toEqual( {
+				type: 'HIDE_VIEWPORT_MODAL',
 			} );
 		} );
 	} );

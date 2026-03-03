@@ -20,7 +20,10 @@ export type ToolsPanelProps = {
 	/**
 	 * The dropdown menu props to configure the panel's `DropdownMenu`.
 	 */
-	dropdownMenuProps?: React.ComponentProps< typeof DropdownMenu >;
+	dropdownMenuProps?: Omit<
+		React.ComponentProps< typeof DropdownMenu >,
+		'label'
+	>;
 	/**
 	 * Flags that the items in this ToolsPanel will be contained within an inner
 	 * wrapper element allowing the panel to lay them out accordingly.
@@ -77,7 +80,10 @@ export type ToolsPanelHeaderProps = {
 	/**
 	 * The dropdown menu props to configure the panel's `DropdownMenu`.
 	 */
-	dropdownMenuProps?: React.ComponentProps< typeof DropdownMenu >;
+	dropdownMenuProps?: Omit<
+		React.ComponentProps< typeof DropdownMenu >,
+		'label'
+	>;
 	/**
 	 * The heading level of the panel's header.
 	 *

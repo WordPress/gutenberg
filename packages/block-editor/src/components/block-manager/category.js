@@ -83,7 +83,6 @@ function BlockManagerCategory( {
 			className="block-editor-block-manager__category"
 		>
 			<CheckboxControl
-				__nextHasNoMarginBottom
 				checked={ isAllChecked }
 				onChange={ toggleAllVisible }
 				className="block-editor-block-manager__category-title"

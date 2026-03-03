@@ -60,6 +60,7 @@ const {
 
 describe( 'actions', () => {
 	const defaultBlockSettings = {
+		apiVersion: 3,
 		attributes: {
 			content: {},
 		},
@@ -89,7 +90,7 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ clientId ],
 				attributes,
-				uniqueByBlock: false,
+				options: { uniqueByBlock: false },
 			} );
 		} );
 
@@ -101,7 +102,19 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds,
 				attributes,
-				uniqueByBlock: false,
+				options: { uniqueByBlock: false },
+			} );
+		} );
+
+		it( 'should fold boolean uniqueByBlock option into an object', () => {
+			const clientId = 'myclientid';
+			const attributes = {};
+			const result = updateBlockAttributes( clientId, attributes, true );
+			expect( result ).toEqual( {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientIds: [ clientId ],
+				attributes,
+				options: { uniqueByBlock: true },
 			} );
 		} );
 	} );
@@ -851,6 +864,7 @@ describe( 'actions', () => {
 
 		it( 'should merge the blocks if blocks of the same type', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {},
 				},
@@ -921,6 +935,7 @@ describe( 'actions', () => {
 
 		it( 'should not merge the blocks have different types without transformation', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {},
 				},
@@ -974,6 +989,7 @@ describe( 'actions', () => {
 
 		it( 'should transform and merge the blocks', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {
 						type: 'string',
@@ -992,6 +1008,7 @@ describe( 'actions', () => {
 				title: 'test block',
 			} );
 			registerBlockType( 'core/test-block-2', {
+				apiVersion: 3,
 				attributes: {
 					content2: {
 						type: 'string',
@@ -1069,6 +1086,7 @@ describe( 'actions', () => {
 
 		it( 'should not merge the blocks if blockB editing mode is `disabled`', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {},
 				},
@@ -1128,6 +1146,7 @@ describe( 'actions', () => {
 
 		it( 'should not merge the blocks if blockA editing mode is `disabled`', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {},
 				},

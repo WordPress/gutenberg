@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * External dependencies
  */
-import type { StoryObj, Meta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -15,7 +15,8 @@ import { ValidatedComboboxControl } from '../combobox-control';
 import { formDecorator } from './story-utils';
 
 const meta: Meta< typeof ValidatedComboboxControl > = {
-	title: 'Components (Experimental)/Validated Form Controls/ValidatedComboboxControl',
+	title: 'Components/Selection & Input/Validated Form Controls/ValidatedComboboxControl',
+	id: 'components-validatedcomboboxcontrol',
 	component: ValidatedComboboxControl,
 	tags: [ 'status-private' ],
 	decorators: formDecorator,
@@ -43,6 +44,14 @@ export const Default: StoryObj< typeof ValidatedComboboxControl > = {
 					setValue( newValue );
 					onChange?.( newValue );
 				} }
+				customValidity={
+					value === 'a'
+						? {
+								type: 'invalid',
+								message: 'Option A is not allowed.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},
@@ -55,10 +64,4 @@ Default.args = {
 		{ value: 'a', label: 'Option A (not allowed)' },
 		{ value: 'b', label: 'Option B' },
 	],
-	customValidator: ( value ) => {
-		if ( value === 'a' ) {
-			return 'Option A is not allowed.';
-		}
-		return undefined;
-	},
 };

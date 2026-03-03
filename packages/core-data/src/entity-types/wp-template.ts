@@ -57,6 +57,11 @@ declare module './base-entity-records' {
 				'view' | 'edit',
 				C
 			>;
+			blocks: ContextualField<
+				Array< Record< string, any > > | undefined,
+				'edit',
+				C
+			>;
 			/**
 			 * Title of template.
 			 */
@@ -85,6 +90,10 @@ declare module './base-entity-records' {
 			 * The ID for the author of the template.
 			 */
 			author: number;
+			/**
+			 * The display name for the author of the template.
+			 */
+			author_text: string;
 			/**
 			 * Whether a template is a custom template.
 			 */

@@ -5,6 +5,15 @@
  * @package WordPress
  */
 
+// Path differs between source and build: './shared/' in source, './navigation-link/shared/' in build.
+if ( file_exists( __DIR__ . '/shared/item-should-render.php' ) ) {
+	require_once __DIR__ . '/shared/item-should-render.php';
+	require_once __DIR__ . '/shared/render-submenu-icon.php';
+} else {
+	require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
+	require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
+}
+
 /**
  * Build an array with CSS classes and inline styles defining the colors
  * which will be applied to the navigation markup in the front-end.
@@ -115,17 +124,6 @@ function block_core_navigation_link_build_css_font_sizes( $context ) {
 }
 
 /**
- * Returns the top-level submenu SVG chevron icon.
- *
- * @since 5.9.0
- *
- * @return string
- */
-function block_core_navigation_link_render_submenu_icon() {
-	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
-}
-
-/**
  * Decodes a url if it's encoded, returning the same url if not.
  *
  * @since 6.2.0
@@ -170,29 +168,9 @@ function block_core_navigation_link_maybe_urldecode( $url ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation_link( $attributes, $content, $block ) {
-	$navigation_link_has_id = isset( $attributes['id'] ) && is_numeric( $attributes['id'] );
-	$is_post_type           = isset( $attributes['kind'] ) && 'post-type' === $attributes['kind'];
-	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
-
-	// Don't render the block's subtree if it is a draft or if the ID does not exist.
-	if ( $is_post_type && $navigation_link_has_id ) {
-		$post = get_post( $attributes['id'] );
-		/**
-		 * Filter allowed post_status for navigation link block to render.
-		 *
-		 * @since 6.8.0
-		 *
-		 * @param array $post_status
-		 * @param array $attributes
-		 * @param WP_Block $block
-		 */
-		$allowed_post_status = (array) apply_filters(
-			'render_block_core_navigation_link_allowed_post_status',
-			array( 'publish' ),
-			$attributes,
-			$block
-		);
-		if ( ! $post || ! in_array( $post->post_status, $allowed_post_status, true ) ) {
+	// Check if this navigation item should render based on post status.
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		if ( ! gutenberg_block_core_shared_navigation_item_should_render( $attributes, $block ) ) {
 			return '';
 		}
 	}
@@ -208,8 +186,14 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	);
 	$style_attribute = $font_sizes['inline_styles'];
 
+	// Render inner blocks first to check if any menu items will actually display.
+	$inner_blocks_html = '';
+	foreach ( $block->inner_blocks as $inner_block ) {
+		$inner_blocks_html .= $inner_block->render();
+	}
+	$has_submenu = ! empty( trim( $inner_blocks_html ) );
+
 	$css_classes = trim( implode( ' ', $classes ) );
-	$has_submenu = count( $block->inner_blocks ) > 0;
 	$kind        = empty( $attributes['kind'] ) ? 'post_type' : str_replace( '-', '_', $attributes['kind'] );
 	$is_active   = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
 
@@ -278,15 +262,10 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	if ( isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'] && $has_submenu ) {
 		// The submenu icon can be hidden by a CSS rule on the Navigation Block.
-		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_link_render_submenu_icon() . '</span>';
+		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_render_submenu_icon() . '</span>';
 	}
 
 	if ( $has_submenu ) {
-		$inner_blocks_html = '';
-		foreach ( $block->inner_blocks as $inner_block ) {
-			$inner_blocks_html .= $inner_block->render();
-		}
-
 		$html .= sprintf(
 			'<ul class="wp-block-navigation__submenu-container">%s</ul>',
 			$inner_blocks_html
@@ -312,11 +291,50 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 	$title       = '';
 	$description = '';
 
+	// Get default labels based on entity type
+	$default_labels = null;
+	if ( $entity instanceof WP_Post_Type ) {
+		$default_labels = WP_Post_Type::get_default_labels();
+	} elseif ( $entity instanceof WP_Taxonomy ) {
+		$default_labels = WP_Taxonomy::get_default_labels();
+	}
+
+	// Get title and check if it's default
+	$is_default_title = false;
 	if ( property_exists( $entity->labels, 'item_link' ) ) {
 		$title = $entity->labels->item_link;
+		if ( isset( $default_labels['item_link'] ) ) {
+			$is_default_title = in_array( $title, $default_labels['item_link'], true );
+		}
 	}
+
+	// Get description and check if it's default
+	$is_default_description = false;
 	if ( property_exists( $entity->labels, 'item_link_description' ) ) {
 		$description = $entity->labels->item_link_description;
+		if ( isset( $default_labels['item_link_description'] ) ) {
+			$is_default_description = in_array( $description, $default_labels['item_link_description'], true );
+		}
+	}
+
+	// Calculate singular name once (used for both title and description)
+	$singular = $entity->labels->singular_name ?? ucfirst( $entity->name );
+
+	// Set default title if needed
+	if ( $is_default_title || '' === $title ) {
+		/* translators: %s: Singular label of the entity. */
+		$title = sprintf( __( '%s link' ), $singular );
+	}
+
+	// Default description if needed.
+	// Use a single space character instead of an empty string to prevent fallback to the
+	// block.json default description ("Add a page, link, or another item to your navigation.").
+	// An empty string would be treated as missing and trigger the fallback, while a single
+	// space appears blank in the UI but prevents the fallback behavior.
+	// We avoid generating descriptions like "A link to a %s" to prevent grammatical errors
+	// (e.g., "A link to a event" should be "A link to an event").
+	if ( $is_default_description || '' === $description ) {
+		$description = ' ';
 	}
 
 	$variation = array(
@@ -368,6 +386,7 @@ function build_variation_for_navigation_link( $entity, $kind ) {
  *
  * @param array         $variations Array of registered variations for a block type.
  * @param WP_Block_Type $block_type The full block type object.
+ * @return array Numerically indexed array of block variations.
  */
 function block_core_navigation_link_filter_variations( $variations, $block_type ) {
 	if ( 'core/navigation-link' !== $block_type->name ) {
@@ -375,7 +394,28 @@ function block_core_navigation_link_filter_variations( $variations, $block_type 
 	}
 
 	$generated_variations = block_core_navigation_link_build_variations();
-	return array_merge( $variations, $generated_variations );
+
+	/*
+	 * IMPORTANT: Order matters for deduplication.
+	 *
+	 * The variations returned from this filter are bootstrapped to JavaScript and
+	 * processed by the block variations reducer. The reducer uses `getUniqueItemsByName()`
+	 * (packages/blocks/src/store/reducer.js:51-57) which keeps the FIRST variation with
+	 * a given 'name' and discards later duplicates when processing the array in order.
+	 *
+	 * By placing generated variations first in `array_merge()`, the improved
+	 * labels (e.g., "Product link" instead of generic "Post Link") are processed first
+	 * and preserved. The generic incoming variations are then discarded as duplicates.
+	 *
+	 * Why `array_merge()` instead of manual deduplication?
+	 * - Both arrays use numeric indices (0, 1, 2...), so `array_merge()` concatenates
+	 *   and re-indexes them sequentially, preserving order
+	 * - The reducer handles deduplication, so it is not needed here
+	 * - This keeps the PHP code simple and relies on the established JavaScript behavior
+	 *
+	 * See: https://github.com/WordPress/gutenberg/pull/72517
+	 */
+	return array_merge( $generated_variations, $variations );
 }
 
 /**
@@ -419,7 +459,9 @@ function block_core_navigation_link_build_variations() {
 		}
 	}
 
-	return array_merge( $built_ins, $variations );
+	$all_variations = array_merge( $built_ins, $variations );
+
+	return $all_variations;
 }
 
 /**

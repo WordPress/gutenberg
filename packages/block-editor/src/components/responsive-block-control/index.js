@@ -90,7 +90,6 @@ function ResponsiveBlockControl( props ) {
 
 			<div className="block-editor-responsive-block-control__inner">
 				<ToggleControl
-					__nextHasNoMarginBottom
 					className="block-editor-responsive-block-control__toggle"
 					label={ toggleControlLabel }
 					checked={ ! isResponsive }

@@ -1,0 +1,34 @@
+@use "@wordpress/base-styles/variables";
+
+.boot-navigation-screen {
+	// Avoid cutting off focus ring of the last menu item
+	padding-block-end: variables.$grid-unit-05;
+}
+
+.boot-navigation-screen .components-text {
+	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
+}
+
+.boot-navigation-screen__title-icon {
+	position: sticky;
+	top: 0;
+	padding:
+		variables.$grid-unit-15 variables.$grid-unit-20
+		variables.$grid-unit-10 variables.$grid-unit-20;
+}
+
+.boot-navigation-screen__title {
+	flex-grow: 1;
+	overflow-wrap: break-word;
+
+	&#{&},
+	&#{&} .boot-navigation-screen__title {
+		line-height: variables.$font-line-height-x-large;
+		color: var(--wpds-color-fg-content-neutral, #1e1e1e);
+	}
+}
+
+.boot-navigation-screen__actions {
+	display: flex;
+	flex-shrink: 0;
+}

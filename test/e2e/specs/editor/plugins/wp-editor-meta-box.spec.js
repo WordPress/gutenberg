@@ -8,11 +8,19 @@ test.describe( 'WP Editor Meta Boxes', () => {
 		await requestUtils.activatePlugin(
 			'gutenberg-test-plugin-wp-editor-meta-box'
 		);
+		// Cross-origin isolation (COEP) prevents TinyMCE from
+		// initializing properly in its iframe.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-plugin-wp-editor-meta-box'
+		);
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
 		);
 	} );
 
@@ -24,6 +32,11 @@ test.describe( 'WP Editor Meta Boxes', () => {
 			.locator( 'role=textbox[name="Add title"i]' )
 			.type( 'Hello Meta' );
 
+		// Open the meta box pane. The click isn’t in the center because that
+		// would hit the resize handle instead of the located element.
+		await page
+			.getByRole( 'button', { name: 'Meta Boxes' } )
+			.click( { position: { x: 0, y: 0 } } );
 		// Switch tinymce to Text mode, first waiting for it to initialize
 		// because otherwise it will flip back to Visual mode once initialized.
 		await page.locator( '#test_tinymce_id_ifr' ).waitFor();
