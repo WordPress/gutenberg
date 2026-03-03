@@ -29,7 +29,7 @@
 
 ### Code Quality
 
-- Remove unused dependencies from `package.json`. [#76075](https://github.com/WordPress/gutenberg/pull/76075/)
+- Remove unused dependencies from `package.json`. [#76075](https://github.com/WordPress/gutenberg/pull/76075)
 
 ## 12.0.0 (2026-02-18)
 
