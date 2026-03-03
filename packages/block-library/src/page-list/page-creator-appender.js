@@ -28,7 +28,8 @@ export default function PageCreatorAppender() {
 			<Button
 				__next40pxDefaultSize
 				ref={ ref }
-				className="wp-block-page-list__appender-toggle"
+				className="block-list-appender__toggle"
+				style={ { display: 'flex' } }
 				icon={ plus }
 				onClick={ () => setShowCreator( true ) }
 				label={ __( 'Add page' ) }
