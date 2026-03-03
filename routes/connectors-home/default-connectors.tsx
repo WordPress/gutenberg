@@ -153,6 +153,8 @@ function ApiKeyConnector( {
 export function registerDefaultConnectors() {
 	const connectors = getConnectorData();
 
+	const sanitize = ( s: string ) => s.replace( /[^a-z0-9-]/gi, '-' );
+
 	for ( const [ connectorId, data ] of Object.entries( connectors ) ) {
 		const { authentication } = data;
 
@@ -163,7 +165,6 @@ export function registerDefaultConnectors() {
 			continue;
 		}
 
-		const sanitize = ( s: string ) => s.replace( /[^a-z0-9-]/gi, '-' );
 		const connectorName = `${ sanitize( data.type ) }/${ sanitize(
 			connectorId
 		) }`;
