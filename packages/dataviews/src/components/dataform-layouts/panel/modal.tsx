@@ -40,8 +40,8 @@ function ModalContent< Item >( {
 	fieldLabel,
 	onClose,
 	touched,
-	applyButtonText,
-	cancelButtonText,
+	applyLabel,
+	cancelLabel,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -49,8 +49,8 @@ function ModalContent< Item >( {
 	onClose: () => void;
 	fieldLabel: string;
 	touched: boolean;
-	applyButtonText?: string;
-	cancelButtonText?: string;
+	applyLabel?: string;
+	cancelLabel?: string;
 } ) {
 	const { fields } = useContext( DataFormContext );
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
@@ -151,14 +151,14 @@ function ModalContent< Item >( {
 					onClick={ onClose }
 					__next40pxDefaultSize
 				>
-					{ cancelButtonText || __( 'Cancel' ) }
+					{ cancelLabel || __( 'Cancel' ) }
 				</Button>
 				<Button
 					variant="primary"
 					onClick={ onApply }
 					__next40pxDefaultSize
 				>
-					{ applyButtonText || __( 'Apply' ) }
+					{ applyLabel || __( 'Apply' ) }
 				</Button>
 			</Stack>
 		</Modal>
@@ -210,8 +210,8 @@ function PanelModal< Item >( {
 					fieldLabel={ fieldLabel ?? '' }
 					onClose={ handleClose }
 					touched={ touched }
-					applyButtonText={ panelLayout?.applyButtonText }
-					cancelButtonText={ panelLayout?.cancelButtonText }
+					applyLabel={ panelLayout?.applyLabel }
+					cancelLabel={ panelLayout?.cancelLabel }
 				/>
 			) }
 		</>

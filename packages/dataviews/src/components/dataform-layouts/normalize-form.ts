@@ -55,14 +55,22 @@ function normalizeLayout( layout?: Layout ): NormalizedLayout {
 			? summary
 			: [ summary ];
 
+		const openAs = layout?.openAs;
+		const modalConfig =
+			typeof openAs === 'object' && openAs.type === 'modal'
+				? openAs
+				: undefined;
+		const resolvedOpenAs: 'dropdown' | 'modal' =
+			modalConfig || openAs === 'modal' ? 'modal' : 'dropdown';
+
 		normalizedLayout = {
 			type: 'panel',
 			labelPosition: layout?.labelPosition ?? 'side',
-			openAs: layout?.openAs ?? 'dropdown',
+			openAs: resolvedOpenAs,
 			summary: normalizedSummary,
 			editVisibility: layout?.editVisibility ?? 'on-hover',
-			applyButtonText: layout?.applyButtonText,
-			cancelButtonText: layout?.cancelButtonText,
+			applyLabel: modalConfig?.applyLabel,
+			cancelLabel: modalConfig?.cancelLabel,
 		} satisfies NormalizedPanelLayout;
 	} else if ( layout?.type === 'card' ) {
 		if ( layout.withHeader === false ) {

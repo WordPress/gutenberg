@@ -185,6 +185,63 @@ describe( 'normalizeFormFields', () => {
 			} );
 		} );
 
+		it( 'panel: openAs string "modal" normalizes without labels', () => {
+			const form: Form = {
+				layout: { type: 'panel', openAs: 'modal' },
+				fields: [ 'field1' ],
+			};
+			const result = normalizeForm( form );
+			expect( result.layout ).toEqual( {
+				type: 'panel',
+				labelPosition: 'side',
+				openAs: 'modal',
+				summary: [],
+				editVisibility: 'on-hover',
+			} );
+		} );
+
+		it( 'panel: openAs object normalizes to string with labels', () => {
+			const form: Form = {
+				layout: {
+					type: 'panel',
+					openAs: {
+						type: 'modal',
+						applyLabel: 'Save',
+						cancelLabel: 'Dismiss',
+					},
+				},
+				fields: [ 'field1' ],
+			};
+			const result = normalizeForm( form );
+			expect( result.layout ).toEqual( {
+				type: 'panel',
+				labelPosition: 'side',
+				openAs: 'modal',
+				summary: [],
+				editVisibility: 'on-hover',
+				applyLabel: 'Save',
+				cancelLabel: 'Dismiss',
+			} );
+		} );
+
+		it( 'panel: openAs object without labels normalizes correctly', () => {
+			const form: Form = {
+				layout: {
+					type: 'panel',
+					openAs: { type: 'modal' },
+				},
+				fields: [ 'field1' ],
+			};
+			const result = normalizeForm( form );
+			expect( result.layout ).toEqual( {
+				type: 'panel',
+				labelPosition: 'side',
+				openAs: 'modal',
+				summary: [],
+				editVisibility: 'on-hover',
+			} );
+		} );
+
 		it( 'card: with default layout options', () => {
 			const form: Form = {
 				layout: { type: 'card' },

@@ -67,15 +67,17 @@ export const LayoutPanel = {
 			description: 'Chooses when the edit icon is visible.',
 			options: [ 'default', 'always', 'on-hover' ],
 		},
-		applyButtonText: {
+		applyLabel: {
 			control: { type: 'text' },
 			description:
 				'Custom text for the modal apply button. Defaults to "Apply".',
+			if: { arg: 'openAs', eq: 'modal' },
 		},
-		cancelButtonText: {
+		cancelLabel: {
 			control: { type: 'text' },
 			description:
 				'Custom text for the modal cancel button. Defaults to "Cancel".',
+			if: { arg: 'openAs', eq: 'modal' },
 		},
 	},
 	args: {

@@ -23,14 +23,18 @@ export type NormalizedRegularLayout = {
 
 export type EditVisibility = 'always' | 'on-hover';
 
+export type PanelOpenAsModal = {
+	type: 'modal';
+	applyLabel?: string;
+	cancelLabel?: string;
+};
+
 export type PanelLayout = {
 	type: 'panel';
 	labelPosition?: LabelPosition;
-	openAs?: 'dropdown' | 'modal';
+	openAs?: 'dropdown' | 'modal' | PanelOpenAsModal;
 	summary?: PanelSummaryField;
 	editVisibility?: EditVisibility;
-	applyButtonText?: string;
-	cancelButtonText?: string;
 };
 export type NormalizedPanelLayout = {
 	type: 'panel';
@@ -38,8 +42,8 @@ export type NormalizedPanelLayout = {
 	openAs: 'dropdown' | 'modal';
 	summary: NormalizedPanelSummaryField;
 	editVisibility: EditVisibility;
-	applyButtonText?: string;
-	cancelButtonText?: string;
+	applyLabel?: string;
+	cancelLabel?: string;
 };
 
 export type CardSummaryField =
