@@ -50,10 +50,10 @@ export default function BlockBindingsAttributeControl( {
 				getBlockType,
 			} = unlock( select( blocksStore ) );
 
-			const _attributeType =
-				getBlockType( blockName ).attributes?.[ attribute ]?.type;
+			const _attribute =
+				getBlockType( blockName ).attributes?.[ attribute ];
 			const attributeType =
-				_attributeType === 'rich-text' ? 'string' : _attributeType;
+				_attribute?.type === 'rich-text' ? 'string' : _attribute?.type;
 
 			const sourceFields = {};
 			Object.entries( getAllBlockBindingsSources() ).forEach(
@@ -66,7 +66,17 @@ export default function BlockBindingsAttributeControl( {
 						return;
 					}
 					const compatibleFieldsList = fieldsList.filter(
-						( field ) => field.type === attributeType
+						( field ) => {
+							if ( field.type !== attributeType ) {
+								return false;
+							}
+							if ( _attribute?.enum ) {
+								return field?.enum?.every( ( item ) =>
+									_attribute.enum.includes( item )
+								);
+							}
+							return true;
+						}
 					);
 					if ( compatibleFieldsList.length ) {
 						sourceFields[ sourceName ] = compatibleFieldsList;

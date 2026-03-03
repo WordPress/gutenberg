@@ -38,6 +38,12 @@ function gutenberg_test_block_bindings_registration() {
 			'value' => 10.5,
 			'type'  => 'number',
 		),
+		'text_field_with_enum' => array(
+			'label' => 'Text Field with Enum Label',
+			'value' => '🌈',
+			'type'  => 'string',
+			'enum'  => array( '⭐', '❤️', '🌈' ),
+		),
 	);
 
 	// Enqueue a custom script for the plugin.

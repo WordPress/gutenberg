@@ -33,6 +33,7 @@ registerBlockBindingsSource( {
 		return Object.entries( fieldsList || {} ).map( ( [ key, field ] ) => ( {
 			label: field.label || key,
 			type: field.type || 'string',
+			enum: field.enum,
 			args: field.args || { key },
 		} ) );
 	},

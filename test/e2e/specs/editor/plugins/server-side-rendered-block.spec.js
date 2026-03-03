@@ -303,6 +303,10 @@ test.describe( 'PHP-only auto-register blocks', () => {
 								source: 'core/post-meta',
 								args: { key: 'boolean' },
 							},
+							emoji: {
+								source: 'testing/complete-source',
+								args: { key: 'text_field_with_enum' },
+							},
 						},
 					},
 				},
@@ -318,6 +322,9 @@ test.describe( 'PHP-only auto-register blocks', () => {
 			await expect( page.getByLabel( 'Count' ) ).toHaveValue( '3' );
 			await expect( page.getByLabel( 'Spacing' ) ).toHaveValue( '0.5' );
 			await expect( page.getByLabel( 'Show Emojis' ) ).toBeChecked();
+			await expect(
+				page.getByLabel( 'Emoji', { exact: true } )
+			).toHaveValue( '🌈' );
 		} );
 	} );
 } );
