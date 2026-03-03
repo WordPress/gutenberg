@@ -301,7 +301,8 @@ export default function PageListEdit( {
 		parentPageID,
 	} );
 
-	const showAppender = ! isChildOfNavigation && isSelected;
+	const showAppender =
+		! isChildOfNavigation && ( isSelected || hasSelectedChild );
 
 	const nextMenuOrder = useMemo( () => {
 		if ( ! pages?.length ) {
