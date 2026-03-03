@@ -43,7 +43,6 @@ export default function PageCreatorAppender() {
 						onClose={ () => setShowCreator( false ) }
 						onPageCreated={ () => setShowCreator( false ) }
 						menuOrder={ contextData?.menuOrder }
-						parent={ contextData?.parent }
 					/>
 				</Popover>
 			) }

@@ -31,7 +31,6 @@ import DialogWrapper from './dialog-wrapper';
  * @param {Function} props.onPageCreated  Callback when page is successfully created.
  * @param {string}   [props.initialTitle] Initial title to pre-fill the form.
  * @param {number}   [props.menuOrder]    Menu order for the new page.
- * @param {number}   [props.parent]       Parent page ID for the new page.
  */
 export function LinkUIPageCreator( {
 	postType,
@@ -40,7 +39,6 @@ export function LinkUIPageCreator( {
 	onPageCreated,
 	initialTitle = '',
 	menuOrder,
-	parent,
 } ) {
 	const [ title, setTitle ] = useState( initialTitle );
 	const [ shouldPublish, setShouldPublish ] = useState( true );
@@ -83,7 +81,6 @@ export function LinkUIPageCreator( {
 					...( menuOrder !== undefined && {
 						menu_order: menuOrder,
 					} ),
-					...( parent !== undefined && { parent } ),
 				},
 				{ throwOnError: true }
 			);

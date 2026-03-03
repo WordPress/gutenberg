@@ -301,8 +301,7 @@ export default function PageListEdit( {
 		parentPageID,
 	} );
 
-	const showAppender =
-		! isChildOfNavigation && ( isSelected || hasSelectedChild );
+	const showAppender = ! isChildOfNavigation && isSelected;
 
 	const nextMenuOrder = useMemo( () => {
 		if ( ! pages?.length ) {
@@ -319,9 +318,8 @@ export default function PageListEdit( {
 	const pageCreatorContextValue = useMemo(
 		() => ( {
 			menuOrder: nextMenuOrder,
-			...( parentPageID ? { parent: parentPageID } : {} ),
 		} ),
-		[ nextMenuOrder, parentPageID ]
+		[ nextMenuOrder ]
 	);
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
