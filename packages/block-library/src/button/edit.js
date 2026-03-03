@@ -5,14 +5,14 @@ import {
 	useState,
 	useRef,
 	useMemo,
+	useCallback,
 	createInterpolateElement,
 } from '@wordpress/element';
 import {
 	ToolbarButton,
 	Popover,
-	ExternalLink,
-	TextControl,
-	HTMLElementControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -24,12 +24,13 @@ import {
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	__experimentalGetShadowClassesAndStyles as useShadowProps,
+	__experimentalGetDimensionsClassesAndStyles as useDimensionsProps,
 	__experimentalGetElementClassName,
 	store as blockEditorStore,
 	useBlockEditingMode,
-	useBlockBindingsUtils,
 	getTypographyClassesAndStyles as useTypographyProps,
 	useSettings,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
@@ -45,7 +46,86 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { unlock } from '../lock-unlock';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+import { getWidthClasses, isPercentageWidth } from './utils';
+
+const { HTMLElementControl, LinkPicker } = unlock( blockEditorPrivateApis );
+
+/**
+ * Capitalize the first letter of a string.
+ *
+ * @param {string} str String to capitalize.
+ * @return {string} Capitalized string.
+ */
+function capitalize( str ) {
+	return str.charAt( 0 ).toUpperCase() + str.slice( 1 );
+}
+
+/**
+ * Compute preview URL for LinkPicker - strips site URL if internal.
+ *
+ * @param {string} url URL to process.
+ * @return {string} Display URL.
+ */
+function computePreviewUrl( url ) {
+	if ( ! url ) {
+		return '';
+	}
+
+	try {
+		const linkUrl = new URL( url );
+		const siteUrl = window.location.origin;
+		if ( linkUrl.origin === siteUrl ) {
+			let path = linkUrl.pathname + linkUrl.search + linkUrl.hash;
+			if ( path.endsWith( '/' ) && path.length > 1 ) {
+				path = path.slice( 0, -1 );
+			}
+			return path;
+		}
+	} catch ( e ) {
+		// fall through
+	}
+
+	return url;
+}
+
+/**
+ * Given a selected entity type/kind, return the query params for /wp/v2/search.
+ *
+ * @param {string} type Entity type.
+ * @param {string} kind Entity kind.
+ * @return {Object} Query params.
+ */
+function getSuggestionsQuery( type, kind ) {
+	switch ( type ) {
+		case 'post':
+		case 'page':
+			return { type: 'post', subtype: type };
+		case 'category':
+			return { type: 'term', subtype: 'category' };
+		case 'tag':
+			return { type: 'term', subtype: 'post_tag' };
+		case 'post_format':
+			return { type: 'post-format' };
+		default:
+			if ( kind === 'taxonomy' ) {
+				return { type: 'term', subtype: type };
+			}
+			if ( kind === 'post-type' ) {
+				return { type: 'post', subtype: type };
+			}
+			return {
+				// For custom link which has no type, always show pages as initial suggestions.
+				initialSuggestionsSearchOptions: {
+					type: 'post',
+					subtype: 'page',
+					perPage: 20,
+				},
+			};
+	}
+}
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -111,6 +191,37 @@ function useEnter( props ) {
 	}, [] );
 }
 
+function SettingsPanel( { linkPanel } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	return (
+		<ToolsPanel
+			label={ __( 'Settings' ) }
+			resetAll={ () => {
+				linkPanel?.onReset?.();
+			} }
+			dropdownMenuProps={ dropdownMenuProps }
+		>
+			{ linkPanel && (
+				<ToolsPanelItem
+					label={ __( 'Link to' ) }
+					hasValue={ linkPanel.hasValue }
+					onDeselect={ linkPanel.onDeselect }
+					isShownByDefault
+				>
+					<LinkPicker
+						preview={ linkPanel.preview }
+						onSelect={ linkPanel.onSelect }
+						suggestionsQuery={ linkPanel.suggestionsQuery }
+						label={ __( 'Link to' ) }
+						help={ linkPanel.help }
+					/>
+				</ToolsPanelItem>
+			) }
+		</ToolsPanel>
+	);
+}
+
 function ButtonEdit( props ) {
 	const {
 		attributes,
@@ -155,93 +266,131 @@ function ButtonEdit( props ) {
 	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
 	const shadowProps = useShadowProps( attributes );
+	const dimensionsProps = useDimensionsProps( attributes );
 	const richTextRef = useRef();
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor ] ),
 		onKeyDown,
 	} );
 	const blockEditingMode = useBlockEditingMode();
-	const { updateBlockBindings } = useBlockBindingsUtils( clientId );
 
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const opensInNewTab = linkTarget === NEW_TAB_TARGET;
 	const nofollow = !! rel?.includes( NOFOLLOW_REL );
 	const isLinkTag = 'a' === TagName;
 
+	// Entity binding uses core/post-data and core/term-data sources (like Navigation Link).
+	// Entity info (id, kind, type) is stored in metadata for Button block.
 	const urlBinding = metadata?.bindings?.url;
-	const isEntityUrlBinding = urlBinding?.source === 'core/entity';
-	const isLegacyContextualEntityBinding =
+	const isEntityUrlBinding =
 		urlBinding?.source === 'core/post-data' ||
 		urlBinding?.source === 'core/term-data';
-	const boundEntityArgs = isEntityUrlBinding ? urlBinding?.args : null;
+	const boundEntityId = metadata?.id;
+	const boundEntityKind = metadata?.kind;
+	const boundEntityType = metadata?.type;
 
-	const resolvedEntityUrl = useSelect(
+	const { resolvedEntityUrl } = useSelect(
 		( select ) => {
-			if ( ! isEntityUrlBinding ) {
-				return '';
-			}
-
-			const key = boundEntityArgs?.key;
-			const kind = boundEntityArgs?.kind;
-			const type = boundEntityArgs?.type;
-			const id = boundEntityArgs?.id;
-
-			if ( key !== 'url' || ! kind || ! type || ! id ) {
-				return '';
+			if (
+				! isEntityUrlBinding ||
+				! boundEntityId ||
+				! boundEntityKind ||
+				! boundEntityType
+			) {
+				return {
+					resolvedEntityUrl: '',
+				};
 			}
 
 			const { getEntityRecord } = select( coreDataStore );
 
-			if ( kind === 'post-type' ) {
-				return getEntityRecord( 'postType', type, id )?.link || '';
-			}
-
-			if ( kind === 'taxonomy' ) {
-				const taxonomySlug = type === 'tag' ? 'post_tag' : type;
-				return (
-					getEntityRecord( 'taxonomy', taxonomySlug, id )?.link || ''
+			if ( boundEntityKind === 'post-type' ) {
+				const record = getEntityRecord(
+					'postType',
+					boundEntityType,
+					boundEntityId
 				);
+				return {
+					resolvedEntityUrl: record?.link || '',
+				};
 			}
 
-			return '';
+			if ( boundEntityKind === 'taxonomy' ) {
+				const taxonomySlug =
+					boundEntityType === 'tag' ? 'post_tag' : boundEntityType;
+				const record = getEntityRecord(
+					'taxonomy',
+					taxonomySlug,
+					boundEntityId
+				);
+				return {
+					resolvedEntityUrl: record?.link || '',
+				};
+			}
+
+			return {
+				resolvedEntityUrl: '',
+			};
 		},
-		[ isEntityUrlBinding, boundEntityArgs ]
+		[ isEntityUrlBinding, boundEntityId, boundEntityKind, boundEntityType ]
 	);
 
 	// Consider a bound entity as "URL set" even while the URL is resolving.
 	const isURLSet = isEntityUrlBinding || !! url || !! resolvedEntityUrl;
 
-	// Cleanup: remove legacy contextual entity bindings on Button.
-	// These can incorrectly resolve to the *current* post being edited.
-	useEffect( () => {
-		if ( isLegacyContextualEntityBinding ) {
-			updateBlockBindings( { url: undefined } );
-		}
-	}, [ isLegacyContextualEntityBinding, updateBlockBindings ] );
-
-	const clearEntityUrlBinding = () => {
-		if ( isEntityUrlBinding ) {
-			updateBlockBindings( { url: undefined } );
-		}
-	};
-
-	const createEntityUrlBinding = ( { id, kind, type } ) => {
-		if ( ! id || ! kind || ! type ) {
+	const clearEntityUrlBinding = useCallback( () => {
+		if ( ! isEntityUrlBinding ) {
 			return;
 		}
+		// Clear binding and entity metadata
+		const { bindings, ...restMetadata } = metadata || {};
+		if ( bindings?.url ) {
+			const { url: _urlBinding, ...restBindings } = bindings;
+			if ( Object.keys( restBindings ).length > 0 ) {
+				setAttributes( {
+					metadata: {
+						...restMetadata,
+						bindings: restBindings,
+					},
+				} );
+			} else if ( Object.keys( restMetadata ).length > 0 ) {
+				setAttributes( { metadata: restMetadata } );
+			} else {
+				setAttributes( { metadata: undefined } );
+			}
+		}
+	}, [ isEntityUrlBinding, metadata, setAttributes ] );
 
-		updateBlockBindings( {
-			url: {
-				source: 'core/entity',
-				args: {
-					key: 'url',
+	const createEntityUrlBinding = useCallback(
+		( { id, kind, type } ) => {
+			if ( ! id || ! kind || ! type ) {
+				return;
+			}
+
+			const source =
+				kind === 'taxonomy' ? 'core/term-data' : 'core/post-data';
+
+			setAttributes( {
+				metadata: {
+					...metadata,
 					id,
 					kind,
 					type,
+					bindings: {
+						...metadata?.bindings,
+						url: {
+							source,
+							args: {
+								field: 'link',
+							},
+						},
+					},
 				},
-			},
-		} );
-	};
+				url: undefined,
+			} );
+		},
+		[ metadata, setAttributes ]
+	);
 
 	const {
 		createPageEntity,
@@ -259,12 +408,16 @@ function ButtonEdit( props ) {
 			const blockBindingsSource =
 				getBlockBindingsSource( bindingSourceName );
 
+			// Entity bindings (core/post-data, core/term-data) should not lock controls
+			const isEntityBinding =
+				bindingSourceName === 'core/post-data' ||
+				bindingSourceName === 'core/term-data';
+
 			return {
 				createPageEntity: _settings.__experimentalCreatePageEntity,
 				userCanCreatePages: _settings.__experimentalUserCanCreatePages,
 				lockUrlControls:
-					// Keep controls available for entity-bound button links.
-					bindingSourceName !== 'core/entity' &&
+					! isEntityBinding &&
 					!! metadata?.bindings?.url &&
 					! blockBindingsSource?.canUserEditValue?.( {
 						select,
@@ -307,7 +460,7 @@ function ButtonEdit( props ) {
 		setIsEditingURL( true );
 	}
 
-	function unlink() {
+	const unlink = useCallback( () => {
 		clearEntityUrlBinding();
 		setAttributes( {
 			url: undefined,
@@ -315,7 +468,7 @@ function ButtonEdit( props ) {
 			rel: undefined,
 		} );
 		setIsEditingURL( false );
-	}
+	}, [ clearEntityUrlBinding, setAttributes ] );
 
 	useEffect( () => {
 		if ( ! isSelected ) {
@@ -329,9 +482,9 @@ function ButtonEdit( props ) {
 		let entityValue = {};
 		if ( isEntityUrlBinding ) {
 			entityValue = {
-				id: boundEntityArgs?.id,
-				kind: boundEntityArgs?.kind,
-				type: boundEntityArgs?.type,
+				id: boundEntityId,
+				kind: boundEntityKind,
+				type: boundEntityType,
 			};
 		}
 
@@ -348,19 +501,29 @@ function ButtonEdit( props ) {
 		opensInNewTab,
 		nofollow,
 		isEntityUrlBinding,
-		boundEntityArgs?.id,
-		boundEntityArgs?.kind,
-		boundEntityArgs?.type,
+		boundEntityId,
+		boundEntityKind,
+		boundEntityType,
 	] );
 
 	const useEnterRef = useEnter( { content: text, clientId } );
 	const mergedRef = useMergeRefs( [ useEnterRef, richTextRef ] );
 
-	const [ fluidTypographySettings, layout ] = useSettings(
+	const [ fluidTypographySettings, layout, dimensionSizes ] = useSettings(
 		'typography.fluid',
 		'layout',
 		'dimensions.dimensionSizes'
 	);
+	const dimensionPresets = useMemo( () => {
+		if ( ! dimensionSizes ) {
+			return [];
+		}
+		return [
+			...( dimensionSizes?.custom ?? [] ),
+			...( dimensionSizes?.theme ?? [] ),
+			...( dimensionSizes?.default ?? [] ),
+		];
+	}, [ dimensionSizes ] );
 	const typographyProps = useTypographyProps( attributes, {
 		typography: {
 			fluid: fluidTypographySettings,
@@ -370,18 +533,140 @@ function ButtonEdit( props ) {
 		},
 	} );
 
+	// Resolve preset dimension references to their actual values.
+	const resolvedWidth = useMemo( () => {
+		if ( ! width ) {
+			return undefined;
+		}
+		const presetPrefix = 'var:preset|dimension|';
+		if ( width.startsWith( presetPrefix ) ) {
+			const slug = width.slice( presetPrefix.length );
+			const preset = dimensionPresets?.find( ( p ) => p.slug === slug );
+			return preset?.size ?? width;
+		}
+		return width;
+	}, [ width, dimensionPresets ] );
+
 	const hasNonContentControls = blockEditingMode === 'default';
 	const hasBlockControls =
 		hasNonContentControls || ( isLinkTag && ! lockUrlControls );
+	const classes = clsx(
+		blockProps.className,
+		getWidthClasses( resolvedWidth )
+	);
+
+	const widthStyle = useMemo( () => {
+		if ( ! width ) {
+			return {};
+		}
+		if ( isPercentageWidth( resolvedWidth ) ) {
+			return {
+				'--wp--block-button--width': parseFloat( resolvedWidth ),
+			};
+		}
+		return dimensionsProps.style;
+	}, [ width, resolvedWidth, dimensionsProps.style ] );
+
+	const linkPanel = useMemo( () => {
+		const previewUrl = isEntityUrlBinding ? resolvedEntityUrl : url;
+		const title =
+			resolvedEntityUrl && boundEntityType
+				? capitalize( boundEntityType )
+				: '';
+
+		const badges = [];
+		if ( previewUrl ) {
+			if ( title ) {
+				badges.push( {
+					label: title,
+					intent: 'default',
+				} );
+			}
+		}
+		if ( ! previewUrl ) {
+			badges.push( { label: __( 'No link selected' ), intent: 'error' } );
+		}
+
+		const preview = {
+			title: previewUrl
+				? computePreviewUrl( previewUrl )
+				: __( 'Add link' ),
+			url: computePreviewUrl( previewUrl ),
+			image: null,
+			badges,
+		};
+
+		const help = isEntityUrlBinding
+			? sprintf(
+					/* translators: %s is the entity type (e.g., "page", "post", "category") */
+					__( 'Synced with the selected %s.' ),
+					boundEntityType || __( 'item' )
+			  )
+			: undefined;
+
+		return {
+			hasValue: () => isURLSet,
+			onDeselect: () => unlink(),
+			onReset: () => unlink(),
+			preview,
+			suggestionsQuery: getSuggestionsQuery(
+				boundEntityType,
+				boundEntityKind
+			),
+			help,
+			onSelect: ( updatedLink ) => {
+				if ( ! updatedLink ) {
+					return;
+				}
+
+				const hasEntitySelection = !! (
+					updatedLink.id &&
+					updatedLink.kind &&
+					updatedLink.type
+				);
+
+				if ( hasEntitySelection ) {
+					createEntityUrlBinding( {
+						id: updatedLink.id,
+						kind: updatedLink.kind,
+						type: updatedLink.type,
+					} );
+					return;
+				}
+
+				const updatedLinkAttributes = getUpdatedLinkAttributes( {
+					rel,
+					url: updatedLink.url,
+					opensInNewTab: updatedLink.opensInNewTab ?? opensInNewTab,
+					nofollow: updatedLink.nofollow ?? nofollow,
+				} );
+
+				clearEntityUrlBinding();
+				setAttributes( updatedLinkAttributes );
+			},
+		};
+	}, [
+		boundEntityKind,
+		boundEntityType,
+		clearEntityUrlBinding,
+		createEntityUrlBinding,
+		isEntityUrlBinding,
+		isURLSet,
+		nofollow,
+		opensInNewTab,
+		rel,
+		resolvedEntityUrl,
+		setAttributes,
+		unlink,
+		url,
+	] );
 
 	return (
 		<>
 			<div
 				{ ...blockProps }
-				className={ clsx( blockProps.className, {
-					[ `has-custom-width wp-block-button__width-${ width }` ]:
-						width,
-				} ) }
+				className={ classes }
+				style={ { ...blockProps.style, ...widthStyle } }
 			>
 				<RichText
 					ref={ mergedRef }
@@ -468,52 +753,30 @@ function ButtonEdit( props ) {
 									type,
 								} = nextValue || {};
 
-								const updatedLinkAttributes =
-									getUpdatedLinkAttributes( {
-										rel,
-										url: newURL,
-										opensInNewTab: newOpensInNewTab,
-										nofollow: newNofollow,
-									} );
-
 								const hasEntitySelection = !! (
 									id &&
 									kind &&
 									type
 								);
-								const isSameAsBoundEntityUrl =
-									isEntityUrlBinding &&
-									resolvedEntityUrl &&
-									newURL === resolvedEntityUrl;
-
-								// If the user typed a URL that differs from the bound entity URL,
-								// treat it as an "unlink" operation without changing the UI.
-								if (
-									isEntityUrlBinding &&
-									newURL &&
-									resolvedEntityUrl &&
-									! isSameAsBoundEntityUrl
-								) {
-									clearEntityUrlBinding();
-									setAttributes( updatedLinkAttributes );
-									return;
-								}
 
 								if ( hasEntitySelection ) {
-									// Create/refresh entity binding and avoid persisting a static URL attribute.
 									createEntityUrlBinding( {
 										id,
 										kind,
 										type,
 									} );
-									setAttributes( {
-										...updatedLinkAttributes,
-										url: undefined,
-									} );
 									return;
 								}
 
-								// Static URL: clear any entity binding and persist the URL.
+								const updatedLinkAttributes =
+									getUpdatedLinkAttributes( {
+										rel,
+										url: newURL,
+										opensInNewTab:
+											newOpensInNewTab ?? opensInNewTab,
+										nofollow: newNofollow ?? nofollow,
+									} );
+
 								clearEntityUrlBinding();
 								setAttributes( updatedLinkAttributes );
 							} }
@@ -531,6 +794,9 @@ function ButtonEdit( props ) {
 						/>
 					</Popover>
 				) }
+			<InspectorControls>
+				<SettingsPanel linkPanel={ isLinkTag ? linkPanel : null } />
+			</InspectorControls>
 			<InspectorControls group="advanced">
 				<HTMLElementControl
 					tagName={ tagName }
@@ -542,26 +808,6 @@ function ButtonEdit( props ) {
 						{ label: '<button>', value: 'button' },
 					] }
 				/>
-				{ isLinkTag && (
-					<TextControl
-						__next40pxDefaultSize
-						label={ __( 'Link relation' ) }
-						help={ createInterpolateElement(
-							__(
-								'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
-							),
-							{
-								a: (
-									<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
-								),
-							}
-						) }
-						value={ rel || '' }
-						onChange={ ( newRel ) =>
-							setAttributes( { rel: newRel } )
-						}
-					/>
-				) }
 			</InspectorControls>
 		</>
 	);
