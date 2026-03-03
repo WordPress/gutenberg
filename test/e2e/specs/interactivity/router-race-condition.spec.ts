@@ -1,38 +1,49 @@
-import { test, expect } from '@wordpress/e2e-test-utils-playwright';
-
 /**
- * Covers the race condition from #75778 fixed in #76053.
+ * E2E tests: Interactivity API router hydration race condition.
+ *
+ * Covers the bug in #75778 fixed in #76053.
  *
  * The test/router-race-condition block declares the router as a STATIC
- * dependency in view.asset.php ('import' => 'static'). This places the
- * router at the root of the ES module graph so its module-level code
- * always runs before hydrateRegions() populates initialVdom -- making
- * the race deterministic in all browsers, not just Firefox and Safari.
+ * dependency in view.asset.php ( 'import' => 'static' ). This places the
+ * router in the initial ES module graph so its module-level code always
+ * runs before hydrateRegions() populates initialVdom, making the race
+ * deterministic in every browser and every CI run.
  *
- * Without the fix:
- *   router reads empty initialVdom -> calls toVdom() on full document ->
- *   every island is added to hydratedIslands -> hydrateRegions() skips
- *   all islands -> dead DOM, no event listeners attached.
+ * Without the fix: router reads empty initialVdom, calls toVdom() on the
+ * full document, marks every island in hydratedIslands, hydrateRegions()
+ * skips all islands, dead DOM on every load.
  *
- * With the fix (initialVdomPromise):
- *   router awaits the promise before reading initialVdom ->
- *   hydrateRegions() runs normally -> all bindings attached.
+ * With initialVdomPromise: router awaits the promise, hydrateRegions()
+ * runs normally, all bindings are attached.
  */
+
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
+
 test.describe( 'Interactivity API router hydration race condition', () => {
+	let pageId: number;
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		const createdPage = await requestUtils.createPage( {
+			title: 'Router race condition test',
+			content: '<!-- wp:test/router-race-condition /-->',
+			status: 'publish',
+		} );
+		pageId = createdPage.id;
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPages();
+	} );
+
 	/**
 	 * context-counter: data-wp-on--click bound to local context.
-	 * If hydration is skipped the click has no effect and the assertion
-	 * times out, reproducing the dead DOM observable in #75778.
+	 * If hydration is skipped the binding is never attached, clicks have
+	 * no effect, and the assertion times out -- reproducing dead DOM.
 	 */
 	test( 'context-driven binding works when router is a static dependency', async ( {
 		page,
-		admin,
 	} ) => {
-		await admin.createNewPost( { postType: 'page' } );
-		await admin.insertBlock( 'test/router-race-condition' );
-		await admin.publishPost();
-
-		await page.goto( page.url() );
+		await page.goto( `/?p=${ pageId }` );
 
 		const button = page.getByTestId( 'context-counter' );
 
@@ -47,18 +58,12 @@ test.describe( 'Interactivity API router hydration race condition', () => {
 
 	/**
 	 * global-counter: data-wp-on--click bound to global state.
-	 * Tests that state-driven bindings are also correctly hydrated when
-	 * the router is loaded statically.
+	 * Tests that state-driven bindings are also correctly hydrated.
 	 */
 	test( 'global-state binding works when router is a static dependency', async ( {
 		page,
-		admin,
 	} ) => {
-		await admin.createNewPost( { postType: 'page' } );
-		await admin.insertBlock( 'test/router-race-condition' );
-		await admin.publishPost();
-
-		await page.goto( page.url() );
+		await page.goto( `/?p=${ pageId }` );
 
 		const button = page.getByTestId( 'global-counter' );
 
