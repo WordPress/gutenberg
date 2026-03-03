@@ -189,6 +189,8 @@ export function useLastPostSave(
 			return;
 		}
 
+		awareness.setUp();
+
 		const stateMap = awareness.doc.getMap( 'state' );
 		const recordMap = awareness.doc.getMap( 'document' );
 
