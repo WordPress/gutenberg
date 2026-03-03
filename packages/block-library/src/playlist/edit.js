@@ -88,6 +88,7 @@ const PlaylistEdit = ( {
 		showImages,
 		showArtists,
 		currentTrack,
+		repeat,
 	} = attributes;
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
@@ -201,16 +202,17 @@ const PlaylistEdit = ( {
 		( track ) => track.uniqueId === currentTrack
 	);
 
-	// Handle track end - advance to next track or loop to first.
+	// Handle track end - advance to next track, or loop to first if repeat is enabled.
 	const onTrackEnded = useCallback( () => {
 		const currentIndex = tracks.findIndex(
 			( track ) => track.uniqueId === currentTrack
 		);
-		const nextTrack = tracks[ currentIndex + 1 ] || tracks[ 0 ];
+		const nextTrack =
+			tracks[ currentIndex + 1 ] || ( repeat ? tracks[ 0 ] : null );
 		if ( nextTrack?.uniqueId ) {
 			setAttributes( { currentTrack: nextTrack.uniqueId } );
 		}
-	}, [ currentTrack, tracks, setAttributes ] );
+	}, [ currentTrack, tracks, repeat, setAttributes ] );
 
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
@@ -310,6 +312,7 @@ const PlaylistEdit = ( {
 							showNumbers: true,
 							showImages: true,
 							order: 'asc',
+							repeat: false,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -395,6 +398,20 @@ const PlaylistEdit = ( {
 								{ label: __( 'Ascending' ), value: 'asc' },
 							] }
 							onChange={ ( value ) => onChangeOrder( value ) }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Repeat' ) }
+						isShownByDefault
+						hasValue={ () => repeat !== false }
+						onDeselect={ () =>
+							setAttributes( { repeat: false } )
+						}
+					>
+						<ToggleControl
+							label={ __( 'Repeat' ) }
+							onChange={ toggleAttribute( 'repeat' ) }
+							checked={ repeat }
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>

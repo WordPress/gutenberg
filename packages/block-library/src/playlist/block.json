@@ -37,6 +37,10 @@
 			"type": "boolean",
 			"default": true
 		},
+		"repeat": {
+			"type": "boolean",
+			"default": false
+		},
 		"caption": {
 			"type": "string"
 		}
