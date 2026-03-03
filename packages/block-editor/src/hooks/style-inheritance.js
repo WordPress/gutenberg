@@ -619,7 +619,7 @@ function StyleInheritanceEdit( {
 
 	return inherits.map( ( group ) => {
 		const provider = providersByGroup[ group ];
-		if ( ! provider ) {
+		if ( ! provider || ! Object.keys( provider.styleVars ).length ) {
 			return null;
 		}
 
