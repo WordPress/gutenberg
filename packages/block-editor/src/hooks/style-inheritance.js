@@ -18,6 +18,7 @@ import useBlockDisplayInformation from '../components/use-block-display-informat
 
 const STYLE_INHERITANCE_SUPPORT_KEY = '__experimentalStyleInheritance';
 const STYLE_INHERIT_INHERITOR_REFERENCE = {};
+const IGNORE_OPT_OUT = {};
 
 // --- CSS custom property name constants ---
 const COLOR_CSS_VARS = {
@@ -361,7 +362,7 @@ function buildInheritorCSS( selector, activeGroups, parentVars ) {
  * @return {Object} Filtered settings.
  */
 function addAttributes( settings ) {
-	if ( ! hasInheritorSupport( settings ) ) {
+	if ( ! hasInheritorSupport( settings.name ) ) {
 		return settings;
 	}
 
@@ -514,8 +515,7 @@ function StyleInheritanceGroupControl( {
 			const { getBlockAttributes } = select( blockEditorStore );
 			const childAttrs = getBlockAttributes( childClientId );
 			return {
-				// Only fetch provider attributes when opted out.
-				providerAttributes: isOptedOut
+				providerAttributes: ! isOptedOut
 					? getBlockAttributes( providerClientId )
 					: null,
 				childStyle: childAttrs?.style ?? {},
@@ -609,7 +609,7 @@ function StyleInheritanceEdit( {
 		clientId,
 		name,
 		styleInheritanceOptOut,
-		/* optOutOverride= */ {}
+		IGNORE_OPT_OUT
 	);
 
 	const inherits =
@@ -663,19 +663,6 @@ function addProviderSaveProps( props, name, attributes ) {
 	};
 }
 
-// Inheritor save props: naturally-inheriting CSS properties (color, font-size,
-// etc.) cascade from the provider without any extra markup on the frontend.
-// Non-inheriting properties (background, padding, border) require a companion
-// frontend stylesheet with var() rules — left as a future improvement.
-//
-// TODO: Add a block stylesheet that emits `var()` rules for non-inheriting
-//       properties on the frontend.
-function addInheritorSaveProps( props ) {
-	return props;
-}
-
-// ---- Feature export objects ----
-
 export const styleInheritanceProvider = {
 	hasSupport: hasProviderSupport,
 	attributeKeys: [
@@ -693,11 +680,13 @@ export const styleInheritanceProvider = {
 export const styleInheritanceInheritor = {
 	hasSupport: hasInheritorSupport,
 	attributeKeys: [ 'styleInheritanceOptOut' ],
-	// Always render even when styleInheritanceOptOut is the default `{}`.
 	isMatch: () => true,
 	useBlockProps: useInheritorBlockProps,
 	edit: StyleInheritanceEdit,
-	addSaveProps: addInheritorSaveProps,
+	// TODO: Add addSaveProps that emits var() rules for non-naturally-inheriting
+	// properties (background, padding, border) on the frontend. Currently
+	// only naturally-inheriting CSS properties (color, font) cascade
+	// automatically via the provider's inline CSS vars.
 };
 
 export default {

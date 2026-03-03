@@ -99,7 +99,6 @@ createBlockSaveFilter( [
 	fontFamily,
 	fontSize,
 	styleInheritanceProvider,
-	styleInheritanceInheritor,
 ] );
 
 export { useCustomSides } from './dimensions';
