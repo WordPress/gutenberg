@@ -104,9 +104,13 @@ class Tests_Icons_WpIconsRegistry extends WP_UnitTestCase {
 			'content' => '<svg></svg>',
 		);
 
-		$result = $this->register_icon( $name, $settings );
-		$this->assertTrue( $result );
-		$result2 = $this->register_icon( $name, $settings );
-		$this->assertFalse( $result2 );
+		$this->register_icon( $name, $settings );
+		$this->assertTrue( $this->registry->is_registered( $name ) );
+
+		$registered_icons = $this->registry->get_registered_icons();
+		$this->register_icon( $name, $settings );
+
+		$registered_icons_after = $this->registry->get_registered_icons();
+		$this->assertEquals( count( $registered_icons ), count( $registered_icons_after ) );
 	}
 }
