@@ -124,7 +124,7 @@ function _gutenberg_get_connector_settings(): array {
 		),
 		'anthropic' => array(
 			'name'           => 'Claude',
-			'description'    => __( 'Writing, research, and analysis with Claude.', 'gutenberg' ),
+			'description'    => __( 'Text generation with Claude.', 'gutenberg' ),
 			'type'           => 'ai_provider',
 			'authentication' => array(
 				'method'          => 'api_key',
