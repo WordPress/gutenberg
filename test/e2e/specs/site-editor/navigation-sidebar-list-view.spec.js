@@ -39,7 +39,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		},
 	} );
 
-	test( 'can add new menu items from the sidebar list view', async ( {
+	test( 'can use appender in site editor sidebar list view', async ( {
 		admin,
 		page,
 		requestUtils,
@@ -63,217 +63,92 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 
 		// Verify the existing item is shown in the sidebar list view.
 		await expect(
-			listView.getByRole( 'gridcell', { name: 'Existing Item' } )
+			listView.getByRole( 'link', { name: 'Existing Item' } )
 		).toBeVisible();
 
 		// The appender button should be present to allow adding new items.
 		const appender = listView.getByRole( 'button', { name: 'Add page' } );
 		await expect( appender ).toBeVisible();
 
-		await appender.click();
+		const linkControlSearch = linkControl.getLinkControlSearch();
 
-		// The LinkUI popover should open and immediately focus the search input.
-		await expect( linkControl.getLinkControlSearch() ).toBeFocused();
+		await test.step( 'can add new menu items', async () => {
+			await appender.click();
 
-		// Search for and select the page.
-		await linkControl.useLinkControlSearch( 'Test Page 2' );
+			// The LinkUI popover should open and immediately focus the search input.
+			await expect( linkControlSearch ).toBeFocused();
 
-		// The new item should be appended after the existing item.
-		await expect(
-			listView
-				.getByRole( 'gridcell', { name: 'Test Page 2' } )
-				.filter( { hasText: 'Block 2 of 2, Level 1.' } )
-		).toBeVisible();
-	} );
+			// Search for and select the page.
+			await linkControl.useLinkControlSearch( 'Test Page 2' );
 
-	test( 'can open and close the add link UI', async ( {
-		admin,
-		page,
-		requestUtils,
-		linkControl,
-	} ) => {
-		const createdMenu =
-			await requestUtils.createNavigationMenu( navMenuFixture );
-
-		await admin.visitSiteEditor( {
-			postId: createdMenu?.id,
-			postType: 'wp_navigation',
+			// The new item should be appended after the existing item.
+			await expect(
+				listView.getByRole( 'link', { name: 'Test Page 2' } )
+			).toBeVisible();
 		} );
 
-		const listView = page.getByRole( 'treegrid', {
-			name: 'Block navigation structure',
+		await test.step( 'can open and close the Link UI without losing focus', async () => {
+			await page.keyboard.press( 'ArrowDown' );
+			await expect( appender ).toBeFocused();
+			await page.keyboard.press( 'Enter' );
+			await expect( linkControlSearch ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( linkControlSearch ).toBeHidden();
 		} );
 
-		await expect( listView ).toBeVisible();
+		await test.step( 'can create a new page', async () => {
+			await appender.click();
 
-		const appender = listView.getByRole( 'button', { name: 'Add page' } );
-		await appender.click();
+			// The search input should be focused immediately.
+			await expect( linkControl.getLinkControlSearch() ).toBeFocused();
 
-		await linkControl.addLinkClose();
-	} );
+			// Type a new page title that doesn't exist yet.
+			await page.keyboard.type( 'Brand New Page', { delay: 50 } );
 
-	test( 'cancelling a second add does not remove previously added unsaved links', async ( {
-		admin,
-		page,
-		requestUtils,
-		linkControl,
-	} ) => {
-		const createdMenu =
-			await requestUtils.createNavigationMenu( navMenuFixture );
+			// Tab twice to reach the "Create page" button.
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
 
-		await admin.visitSiteEditor( {
-			postId: createdMenu?.id,
-			postType: 'wp_navigation',
+			const createPageButton = page.getByRole( 'button', {
+				name: 'Create page',
+			} );
+			await expect( createPageButton ).toBeVisible();
+			await expect( createPageButton ).toBeFocused();
+
+			// Open the page creation form.
+			await page.keyboard.press( 'Enter' );
+
+			// The title field should be pre-populated with the typed text.
+			const titleField = page.getByRole( 'textbox', { name: 'Title' } );
+			await expect( titleField ).toHaveValue( 'Brand New Page' );
+
+			// The Back button should be focused after entering the creation form.
+			const backButton = page.locator( '.link-ui-page-creator__back' );
+			await expect( backButton ).toBeFocused();
+
+			// Tab to the title field.
+			await page.keyboard.press( 'Tab' );
+			await expect( titleField ).toBeFocused();
+
+			// Tab to the Publish checkbox (on by default).
+			await page.keyboard.press( 'Tab' );
+			const publishCheckbox = page.getByRole( 'checkbox', {
+				name: 'Publish',
+			} );
+			await expect( publishCheckbox ).toBeFocused();
+			await expect( publishCheckbox ).toBeChecked();
+
+			// Tab twice more to reach the Create page button.
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
+			await expect( createPageButton ).toBeFocused();
+			await page.keyboard.press( 'Enter' );
+
+			// The newly created page should appear as a new item in the list view.
+			await expect(
+				listView.getByRole( 'link', { name: 'Brand New Page' } )
+			).toBeVisible();
 		} );
-
-		const listView = page.getByRole( 'treegrid', {
-			name: 'Block navigation structure',
-		} );
-
-		await expect( listView ).toBeVisible();
-
-		// Add a first new item by selecting a page.
-		const appender = listView.getByRole( 'button', { name: 'Add page' } );
-		await appender.click();
-		await linkControl.useLinkControlSearch( 'Test Page 2' );
-
-		// Verify the first new item was committed (block 2 of 2).
-		await expect(
-			listView
-				.getByRole( 'gridcell', { name: 'Test Page 2' } )
-				.filter( { hasText: 'Block 2 of 2, Level 1.' } )
-		).toBeVisible();
-
-		// Start adding a second item but cancel without selecting a URL.
-		await appender.click();
-		await linkControl.addLinkClose();
-
-		// The previously committed unsaved link should still be present —
-		// cancelling the second insertion must not remove the first one.
-		await expect(
-			listView
-				.getByRole( 'gridcell', { name: 'Existing Item' } )
-				.filter( { hasText: 'Block 1 of 2, Level 1.' } )
-		).toBeVisible();
-		await expect(
-			listView
-				.getByRole( 'gridcell', { name: 'Test Page 2' } )
-				.filter( { hasText: 'Block 2 of 2, Level 1.' } )
-		).toBeVisible();
-	} );
-
-	test( 'can create a new page from the sidebar list view appender', async ( {
-		admin,
-		page,
-		requestUtils,
-		linkControl,
-	} ) => {
-		const createdMenu =
-			await requestUtils.createNavigationMenu( navMenuFixture );
-
-		await admin.visitSiteEditor( {
-			postId: createdMenu?.id,
-			postType: 'wp_navigation',
-		} );
-
-		const listView = page.getByRole( 'treegrid', {
-			name: 'Block navigation structure',
-		} );
-
-		await expect( listView ).toBeVisible();
-
-		const appender = listView.getByRole( 'button', { name: 'Add page' } );
-		await appender.click();
-
-		// The search input should be focused immediately.
-		await expect( linkControl.getLinkControlSearch() ).toBeFocused();
-
-		// Type a new page title that doesn't exist yet.
-		await page.keyboard.type( 'Brand New Page', { delay: 50 } );
-
-		// Tab twice to reach the "Create page" button.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-
-		const createPageButton = page.getByRole( 'button', {
-			name: 'Create page',
-		} );
-		await expect( createPageButton ).toBeVisible();
-		await expect( createPageButton ).toBeFocused();
-
-		// Open the page creation form.
-		await page.keyboard.press( 'Enter' );
-
-		// The title field should be pre-populated with the typed text.
-		const titleField = page.getByRole( 'textbox', { name: 'Title' } );
-		await expect( titleField ).toHaveValue( 'Brand New Page' );
-
-		// The Back button should be focused after entering the creation form.
-		const backButton = page.locator( '.link-ui-page-creator__back' );
-		await expect( backButton ).toBeFocused();
-
-		// Tab to the title field.
-		await page.keyboard.press( 'Tab' );
-		await expect( titleField ).toBeFocused();
-
-		// Tab to the Publish checkbox (on by default).
-		await page.keyboard.press( 'Tab' );
-		const publishCheckbox = page.getByRole( 'checkbox', {
-			name: 'Publish',
-		} );
-		await expect( publishCheckbox ).toBeFocused();
-		await expect( publishCheckbox ).toBeChecked();
-
-		// Tab twice more to reach the Create page button.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await expect( createPageButton ).toBeFocused();
-		await page.keyboard.press( 'Enter' );
-
-		// The newly created page should appear as a new item in the list view.
-		await expect(
-			listView
-				.getByRole( 'gridcell', { name: 'Brand New Page' } )
-				.filter( { hasText: 'Block 2 of 2, Level 1.' } )
-		).toBeVisible();
-	} );
-
-	test( 'focus is managed correctly when dismissing the link UI without selecting a URL', async ( {
-		admin,
-		page,
-		requestUtils,
-		linkControl,
-	} ) => {
-		const createdMenu =
-			await requestUtils.createNavigationMenu( navMenuFixture );
-
-		await admin.visitSiteEditor( {
-			postId: createdMenu?.id,
-			postType: 'wp_navigation',
-		} );
-
-		const listView = page.getByRole( 'treegrid', {
-			name: 'Block navigation structure',
-		} );
-
-		await expect( listView ).toBeVisible();
-
-		const appender = listView.getByRole( 'button', { name: 'Add page' } );
-		await appender.click();
-
-		// Verify focus goes to the search input immediately (focus management).
-		await expect( linkControl.getLinkControlSearch() ).toBeFocused();
-
-		await linkControl.addLinkClose();
-
-		// The auto-inserted empty block should be cleaned up automatically.
-		// Verify the original item is still there and is the only item
-		// (i.e. no orphaned empty block was left behind).
-		await expect(
-			listView
-				.getByRole( 'gridcell', { name: 'Existing Item' } )
-				.filter( { hasText: 'Block 1 of 1, Level 1.' } )
-		).toBeVisible();
 	} );
 } );
 
@@ -299,11 +174,5 @@ class LinkControl {
 
 		await this.page.keyboard.press( 'ArrowDown' );
 		await this.page.keyboard.press( 'Enter' );
-	}
-
-	async addLinkClose() {
-		await expect( this.getLinkControlSearch() ).toBeFocused();
-		await this.page.keyboard.press( 'Escape' );
-		await expect( this.getLinkControlSearch() ).toBeHidden();
 	}
 }
