@@ -64,9 +64,7 @@ export default function SidebarNavigationScreenNavigationMenu( { backPath } ) {
 	if ( isLoading ) {
 		return (
 			<SidebarNavigationScreenWrapper
-				description={ __(
-					'Navigation Menus are a curated collection of blocks that allow visitors to get around your site.'
-				) }
+				description={ __( 'Edit this navigation.' ) }
 				backPath={ backPath }
 			>
 				<Spinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />

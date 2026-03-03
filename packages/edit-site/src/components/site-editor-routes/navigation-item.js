@@ -8,7 +8,10 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import Editor from '../editor';
 import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
+import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
+import NavigationMenuTemplateAreas from '../sidebar-navigation-screen-navigation-menu/navigation-menu-template-areas';
+import NavigationMenuDetail from '../sidebar-navigation-screen-navigation-menu/navigation-menu-detail';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
@@ -31,15 +34,19 @@ export const navigationItemRoute = {
 		sidebar( { siteData } ) {
 			const isBlockTheme = siteData.currentTheme?.is_block_theme;
 			return isBlockTheme ? (
-				<SidebarNavigationScreenNavigationMenu backPath="/navigation" />
+				<SidebarNavigationScreenNavigationMenus backPath="/" />
 			) : (
 				<SidebarNavigationScreenUnsupported />
 			);
 		},
+		content( { siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			return isBlockTheme ? <NavigationMenuDetail /> : null;
+		},
 		preview( { siteData } ) {
 			const isBlockTheme = siteData.currentTheme?.is_block_theme;
 			return isBlockTheme ? (
-				<Editor />
+				<NavigationMenuTemplateAreas />
 			) : (
 				<SidebarNavigationScreenUnsupported />
 			);
@@ -52,5 +59,8 @@ export const navigationItemRoute = {
 				<SidebarNavigationScreenUnsupported />
 			);
 		},
+	},
+	widths: {
+		content: 320,
 	},
 };

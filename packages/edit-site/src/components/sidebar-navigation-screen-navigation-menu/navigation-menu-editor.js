@@ -5,6 +5,7 @@ import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
+import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -12,10 +13,14 @@ import { createBlock } from '@wordpress/blocks';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import NavigationMenuContent from '../sidebar-navigation-screen-navigation-menus/navigation-menu-content';
+import useNavigateToEntityRecord from '../block-editor/use-navigate-to-entity-record';
 
 const noop = () => {};
 
-export default function NavigationMenuEditor( { navigationMenuId } ) {
+export default function NavigationMenuEditor( {
+	navigationMenuId,
+	hasDarkBackground = true,
+} ) {
 	const { storedSettings } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
 
@@ -23,6 +28,17 @@ export default function NavigationMenuEditor( { navigationMenuId } ) {
 			storedSettings: getSettings(),
 		};
 	}, [] );
+
+	const onNavigateToEntityRecord = useNavigateToEntityRecord();
+
+	const settings = useMemo( () => {
+		return {
+			...storedSettings,
+			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
+				fetchLinkSuggestions( search, searchOptions, storedSettings ),
+			onNavigateToEntityRecord,
+		};
+	}, [ storedSettings, onNavigateToEntityRecord ] );
 
 	const blocks = useMemo( () => {
 		if ( ! navigationMenuId ) {
@@ -38,12 +54,18 @@ export default function NavigationMenuEditor( { navigationMenuId } ) {
 
 	return (
 		<BlockEditorProvider
-			settings={ storedSettings }
+			settings={ settings }
 			value={ blocks }
 			onChange={ noop }
 			onInput={ noop }
 		>
-			<div className="edit-site-sidebar-navigation-screen-navigation-menus__content">
+			<div
+				className={
+					hasDarkBackground
+						? 'edit-site-sidebar-navigation-screen-navigation-menus__content'
+						: undefined
+				}
+			>
 				<NavigationMenuContent rootClientId={ blocks[ 0 ].clientId } />
 			</div>
 		</BlockEditorProvider>

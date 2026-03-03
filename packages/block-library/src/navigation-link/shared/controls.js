@@ -76,12 +76,14 @@ function getEntityTypeName( type, kind ) {
  * @param {Function} props.setAttributes  - Function to update block attributes
  * @param {string}   props.clientId       - Block client ID
  * @param {boolean}  props.isLinkEditable - Whether link editing should be allowed
+ * @param {boolean}  props.contentOnly    - Whether to hide non-content fields (description, rel)
  */
 export function Controls( {
 	attributes,
 	setAttributes,
 	clientId,
 	isLinkEditable = true,
+	contentOnly: forceContentOnly = false,
 } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -137,7 +139,8 @@ export function Controls( {
 		[ clientId ]
 	);
 
-	const isContentOnly = blockEditingMode === 'contentOnly';
+	const isContentOnly =
+		forceContentOnly || blockEditingMode === 'contentOnly';
 
 	const preview = useLinkPreview( {
 		url,

@@ -3,6 +3,12 @@
  */
 import { default as BlockKeyboardShortcuts } from './block-keyboard-shortcuts';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from './navigation/constants';
+import {
+	LinkUI,
+	updateAttributes,
+	useEntityBinding,
+	Controls as NavigationLinkControls,
+} from './navigation-link/shared';
 import { lock } from './lock-unlock';
 
 /**
@@ -12,4 +18,8 @@ export const privateApis = {};
 lock( privateApis, {
 	BlockKeyboardShortcuts,
 	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
+	LinkUI,
+	updateAttributes,
+	useEntityBinding,
+	NavigationLinkControls,
 } );
