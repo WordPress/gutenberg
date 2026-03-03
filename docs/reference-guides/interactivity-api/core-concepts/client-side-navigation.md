@@ -440,6 +440,80 @@ _Page with modal (page-2.php):_
 
 When navigating from Page 1 to Page 2, the modal region is created and appended to `<body>`. When navigating back to Page 1, the modal is automatically removed.
 
+### Preserving elements with `data-wp-key`
+
+During client-side navigation, the router uses Preact's reconciliation algorithm to update the content inside router regions. This algorithm relies on heuristics to efficiently match elements between the current and target pages. These heuristics work well for most cases, but they can fail under certain conditions — for example, when two elements have the same type and position on different pages but use different directives. In such cases, the algorithm may incorrectly treat them as the same element, leading to corrupted state or broken behavior.
+
+To prevent this, you can use the `data-wp-key` directive to give elements a stable, explicit identity. When the reconciliation algorithm encounters keyed elements, it matches them by key instead of relying on heuristics. Elements with matching keys are updated in place, preserving their internal state: focus, scroll position, CSS animations, form input values, and any JavaScript references to the DOM node. Unmatched elements are cleanly removed or created as needed.
+
+Keys are especially important in two scenarios:
+
+1. **Lists that change across pages** — such as paginated posts, filtered results, or sorted tables.
+2. **Regions whose structure differs between pages** — for example, a region that contains a sidebar on one page but not on another, or pages that render different blocks in the same region.
+
+Without keys, the reconciliation heuristics may incorrectly match unrelated elements that happen to share the same type and position. In the best case this causes unnecessary DOM recreation; in the worst case it can corrupt element state or produce broken markup — for example, applying one element's directives to a completely different element.
+
+With keys based on a stable identifier, the algorithm can match elements by identity instead of relying on heuristics. This ensures that each element is correctly identified across navigations.
+
+**PHP:**
+
+```php
+<div
+    data-wp-interactive="myPagination"
+    data-wp-router-region="myPagination/posts"
+>
+    <ul>
+        <?php while ( $query->have_posts() ) : $query->the_post(); ?>
+            <li data-wp-key="post-<?php echo get_the_ID(); ?>">
+                <a href="<?php the_permalink(); ?>">
+                    <?php the_title(); ?>
+                </a>
+            </li>
+        <?php endwhile; wp_reset_postdata(); ?>
+    </ul>
+</div>
+```
+
+Each `<li>` is keyed by the post ID. If the user navigates from one page of results to another and a post appears on both pages, the router reuses the existing DOM node for that post rather than destroying and recreating it.
+
+Keys are equally useful for non-list elements. If a router region renders structurally different content on different pages, keying the top-level sections helps the algorithm tell them apart:
+
+```php
+<div
+    data-wp-interactive="myPlugin"
+    data-wp-router-region="myPlugin/content"
+>
+    <?php if ( is_product_page() ) : ?>
+        <section data-wp-key="product-detail">
+            <!-- Product detail layout -->
+        </section>
+    <?php else : ?>
+        <section data-wp-key="product-list">
+            <!-- Product list layout -->
+        </section>
+    <?php endif; ?>
+</div>
+```
+
+Without keys, navigating between these two pages would cause the algorithm to patch the product-detail `<section>` into the product-list `<section>` (or vice versa) by position, potentially corrupting their internal state. With distinct keys, the algorithm recognizes they are different elements and cleanly replaces one with the other.
+
+#### Choosing good key values
+
+A key should be:
+
+-   **Stable**: The same item should always produce the same key, regardless of its position in the list.
+-   **Unique among siblings**: No two sibling elements should share the same key. Keys only need to be unique within their parent, not globally.
+
+Use data-derived identifiers whenever possible — post IDs, term IDs, or any value that uniquely identifies the item. Avoid using array indices as keys, because indices change when items are reordered, added, or removed, which defeats the purpose of keying.
+
+```html
+<!-- Good: stable, data-derived key -->
+<li data-wp-key="post-42">...</li>
+
+<!-- Bad: index-based key (changes when items shift) -->
+<li data-wp-key="item-0">...</li>
+```
+
 ### Handling server state updates
 
 During client-side navigation, the client-side state persists while the server provides new state for the target page. In some cases, you may want parts of your client state to stay in sync with what the server provides for each page — for example, updating a product count that changes across pages, or resetting an "expanded" flag based on the new page's context.
@@ -784,6 +858,8 @@ This is the most common case. When a region with a given ID exists on both the c
 Rather than simply replacing the entire region's HTML (which would destroy any internal state and cause a jarring visual transition), the router uses a virtual DOM diffing algorithm. This algorithm compares the current region's virtual DOM with the new region's virtual DOM and calculates the minimum set of changes needed to transform one into the other.
 
 For example, if a product list region contains 10 products on the current page and 10 different products on the new page, the diffing algorithm might determine that it only needs to update the text content and image sources within the existing list item elements — rather than destroying and recreating all 10 items from scratch. This preserves DOM state (like scroll position within the region, or focus state) and produces smoother visual transitions.
+
+The reconciliation algorithm relies on heuristics that can fail when elements share the same type and position but represent different things. You can use the `data-wp-key` directive to give elements a stable identity, ensuring they are correctly matched across navigations. See [Preserving elements with `data-wp-key`](#preserving-elements-with-data-wp-key) for details.
 
 **Scenario 2: Region exists only on the target page with `attachTo` (create)**
 
