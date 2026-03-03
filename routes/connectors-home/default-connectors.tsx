@@ -24,6 +24,7 @@ interface ConnectorData {
 	name: string;
 	description: string;
 	type: 'ai_provider';
+	plugin?: { slug: string };
 	authentication: ConnectorAuthentication;
 }
 
@@ -66,7 +67,7 @@ const ConnectedBadge = () => (
 );
 
 interface ApiKeyConnectorConfig {
-	pluginSlug: string;
+	pluginSlug?: string;
 	settingName: string;
 	helpUrl?: string;
 	Logo?: React.ComponentType;
@@ -107,7 +108,9 @@ function ApiKeyConnector( {
 
 	return (
 		<ConnectorItem
-			className={ `connector-item--${ pluginSlug }` }
+			className={
+				pluginSlug ? `connector-item--${ pluginSlug }` : undefined
+			}
 			icon={ Logo ? <Logo /> : undefined }
 			name={ label }
 			description={ description }
@@ -174,7 +177,7 @@ export function registerDefaultConnectors() {
 			render: ( props ) => (
 				<ApiKeyConnector
 					{ ...props }
-					pluginSlug={ `ai-provider-for-${ connectorId }` }
+					pluginSlug={ data.plugin?.slug }
 					settingName={ authentication.settingName }
 					helpUrl={ authentication.credentialsUrl ?? undefined }
 					Logo={ CONNECTOR_LOGOS[ connectorId ] }

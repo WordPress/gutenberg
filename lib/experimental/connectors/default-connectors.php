@@ -91,6 +91,9 @@ function _gutenberg_get_real_api_key( string $option_name, callable $mask_callba
  *         @type string $name           The connector's display name.
  *         @type string $description    The connector's description.
  *         @type string $type           The connector type. Currently, only 'ai_provider' is supported.
+ *         @type array  $plugin         Optional. Plugin data for install/activate UI.
+ *             @type string $slug       The WordPress.org plugin slug.
+ *         }
  *         @type array  $authentication {
  *             Authentication configuration. When method is 'api_key', includes
  *             credentials_url and setting_name. When 'none', only method is present.
@@ -108,6 +111,9 @@ function _gutenberg_get_connector_settings(): array {
 			'name'           => 'Google',
 			'description'    => __( 'Text and image generation with Gemini and Imagen.', 'gutenberg' ),
 			'type'           => 'ai_provider',
+			'plugin'         => array(
+				'slug' => 'ai-provider-for-google',
+			),
 			'authentication' => array(
 				'method'          => 'api_key',
 				'credentials_url' => 'https://aistudio.google.com/api-keys',
@@ -117,6 +123,9 @@ function _gutenberg_get_connector_settings(): array {
 			'name'           => 'OpenAI',
 			'description'    => __( 'Text and image generation with GPT and Dall-E.', 'gutenberg' ),
 			'type'           => 'ai_provider',
+			'plugin'         => array(
+				'slug' => 'ai-provider-for-openai',
+			),
 			'authentication' => array(
 				'method'          => 'api_key',
 				'credentials_url' => 'https://platform.openai.com/api-keys',
@@ -126,6 +135,9 @@ function _gutenberg_get_connector_settings(): array {
 			'name'           => 'Anthropic',
 			'description'    => __( 'Text generation with Claude.', 'gutenberg' ),
 			'type'           => 'ai_provider',
+			'plugin'         => array(
+				'slug' => 'ai-provider-for-anthropic',
+			),
 			'authentication' => array(
 				'method'          => 'api_key',
 				'credentials_url' => 'https://platform.claude.com/settings/keys',
@@ -368,12 +380,18 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 			$auth_out['credentialsUrl'] = $auth['credentials_url'] ?? null;
 		}
 
-		$connectors[ $connector_id ] = array(
+		$connector_out = array(
 			'name'           => $connector_data['name'],
 			'description'    => $connector_data['description'],
 			'type'           => $connector_data['type'],
 			'authentication' => $auth_out,
 		);
+
+		if ( ! empty( $connector_data['plugin'] ) ) {
+			$connector_out['plugin'] = $connector_data['plugin'];
+		}
+
+		$connectors[ $connector_id ] = $connector_out;
 	}
 	$data['connectors'] = $connectors;
 	return $data;
