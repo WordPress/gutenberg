@@ -41,7 +41,9 @@ If you already have an interactive block and want to add client-side navigation,
 2. **Define router regions**: Mark the HTML elements that should be updated during navigation using the `data-wp-router-region` attribute.
 3. **Trigger navigation**: Use the router's `actions.navigate()` function to navigate programmatically when the user interacts with your block.
 
-Client-side navigation is not limited to blocks — you can also use it in classic PHP themes by adding the Interactivity API directives directly in your theme's template files and processing them with `wp_interactivity_process_directives()`, as explained in the [Server-side rendering](/docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md#processing-directives-in-classic-themes). Instead of relying on a block's `block.json` to declare script module dependencies, you register and enqueue your script module manually, taking into account that the `@wordpress/interactivity-router` module should be dynamically imported:
+## Using client-side navigation in Classic themes
+
+Client-side navigation is not limited to blocks — you can also use it in classic PHP themes by adding the Interactivity API directives directly in your theme's template files and processing them with `wp_interactivity_process_directives()`, as explained in the [Server-side rendering](/docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md#processing-directives-in-classic-themes) guide. Instead of relying on a block's `block.json` to declare script module dependencies, you register and enqueue your script module manually, taking into account that the `@wordpress/interactivity-router` module should be dynamically imported:
 
 ```php
 // functions.php
@@ -89,46 +91,52 @@ Here's a basic router region:
 
 Router regions can be placed anywhere on the page. Their behavior depends on where they sit relative to other interactive elements and other router regions:
 
-**As a standalone element** — When a router region is not inside any existing `data-wp-interactive` element, it serves a dual role: it is the interactive boundary (since it carries `data-wp-interactive`) _and_ its content is updated during navigation:
+-   **As a standalone element** — When a router region is not inside any existing `data-wp-interactive` element, it serves a dual role: it is the interactive boundary (since it also contains `data-wp-interactive`) _and_ its content is updated during navigation:
 
-```html
-<div data-wp-interactive="myPlugin" data-wp-router-region="myPlugin/content">
-	<!-- Interactive boundary + navigable region -->
-	<p data-wp-text="state.message">Hello</p>
-</div>
-```
+    ```html
+    <div
+    	data-wp-interactive="myPlugin"
+    	data-wp-router-region="myPlugin/content"
+    >
+    	<!-- Interactive boundary + navigable region -->
+    	<p data-wp-text="state.message">Hello</p>
+    </div>
+    ```
 
-**Inside an interactive element** — When a router region is nested inside an element that already has `data-wp-interactive`, the region becomes part of that element's virtual DOM. The parent interactive element stays untouched during navigation, but the region's content is updated:
+-   **Inside an interactive element** — When a router region is nested inside an element that already has `data-wp-interactive`, the region becomes part of that element's interactivity. The parent interactive element stays untouched during navigation, but the region's content is updated:
 
-```html
-<div data-wp-interactive="myPlugin">
-	<h1>This heading is never updated during navigation</h1>
+    ```html
+    <div data-wp-interactive="myPlugin">
+    	<h1>This heading is never updated during navigation</h1>
 
-	<div data-wp-interactive="myPlugin" data-wp-router-region="myPlugin/posts">
-		<!-- This content is updated during navigation -->
-	</div>
-</div>
-```
+    	<div
+    		data-wp-interactive="myPlugin"
+    		data-wp-router-region="myPlugin/posts"
+    	>
+    		<!-- This content is updated during navigation -->
+    	</div>
+    </div>
+    ```
 
-Note that the router region still needs its own `data-wp-interactive` directive, even though it is already inside one.
+    Note that the router region still needs its own `data-wp-interactive` directive, even though it is already inside one.
 
-**Inside another router region** — When a router region is nested inside another router region, it becomes part of the parent region. The parent region is updated as a single unit during navigation; the nested region is not processed independently:
+-   **Inside another router region** — When a router region is nested inside another router region, it becomes part of the parent region. The parent region is updated as a single unit during navigation; the nested region is not processed independently:
 
-```html
-<div data-wp-interactive="myPlugin" data-wp-router-region="myPlugin/main">
-	<!-- This inner region is part of "myPlugin/main" -->
-	<div
-		data-wp-interactive="myPlugin"
-		data-wp-router-region="myPlugin/sidebar"
-	>
-		<!-- Updated together with the parent region -->
-	</div>
-</div>
-```
+    ```html
+    <div data-wp-interactive="myPlugin" data-wp-router-region="myPlugin/main">
+    	<!-- This inner region is part of "myPlugin/main" -->
+    	<div
+    		data-wp-interactive="myPlugin"
+    		data-wp-router-region="myPlugin/sidebar"
+    	>
+    		<!-- Updated together with the parent region -->
+    	</div>
+    </div>
+    ```
 
 ### Implementing navigation
 
-To trigger client-side navigation, you define an **action** in your store and connect it to a DOM event using an Interactivity API directive. Actions are functions defined inside `store()` that handle user interactions — similar to event handlers in other frameworks. When connected to an element through a directive like `data-wp-on--click`, the action runs whenever that event fires.
+To trigger client-side navigation, you define an **action** in your store and connect it to a DOM event using an Interactivity API directive. Actions are functions defined inside `store()` that handle user interactions. When connected to an element through a directive like `data-wp-on--click`, the action runs whenever that event fires.
 
 Here's how to implement a link that navigates client-side. First, the HTML connects the link's click event to the `navigateTo` action:
 
@@ -162,7 +170,7 @@ The <code>withSyncEvent()</code> wrapper is required for actions that need to ca
 
 ### Implementing prefetching
 
-The router also provides a `prefetch()` function that fetches a page and stores it in an internal cache without performing navigation. By prefetching pages before the user clicks, subsequent navigations feel instant because the content is already available.
+The router also provides a `prefetch()` function that fetches a page and stores it in an internal in-memory cache without performing navigation. By prefetching pages before the user clicks, subsequent navigations feel instant because the content is already available.
 
 A common pattern is to prefetch a page when the user hovers over a link, and navigate when they click. You can combine both behaviors on the same element using two directives — `data-wp-on--mouseenter` for prefetching and `data-wp-on--click` for navigation:
 
@@ -444,7 +452,7 @@ store( 'myPlugin', {
 	actions: {
 		deleteAndRefresh: function* () {
 			// Wait for the deletion to complete.
-			yield fetch( '/api/items/123', { method: 'DELETE' } );
+			yield fetch( '/wp-json/wp/v2/posts/123', { method: 'DELETE' } );
 
 			// Now refresh the page to show updated data.
 			const { actions } = yield import(
@@ -477,11 +485,7 @@ yield actions.prefetch( '/custom-page/', {
 } );
 ```
 
-This is useful for:
-
--   Optimistic UI updates where you construct the expected HTML before the server responds.
--   Offline scenarios where you provide cached or fallback content.
--   Testing and development.
+This is useful when you need to control the `fetch` request yourself.
 
 ### Managing browser history
 
@@ -497,7 +501,6 @@ yield actions.navigate( '/page-2/', { replace: true } );
 
 Use `replace: true` when:
 
--   Implementing redirects where the original URL shouldn't be in history.
 -   Updating query parameters for filtering/sorting where each change shouldn't be a separate history entry.
 -   Implementing infinite scroll where you update the URL but don't want each page to be a separate history entry.
 
@@ -578,7 +581,7 @@ When `clientNavigationDisabled` is `true`:
 
 The Interactivity API router includes built-in feedback during navigation:
 
--   **Loading animation**: A progress bar that appears at the top of the page during navigation. The bar appears after a short delay (400ms) if navigation hasn't completed yet.
+-   **Loading animation**: A progress bar that appears at the top of the page during navigation. The bar appears after a short delay (400ms) if navigation hasn't completed yet. This 400ms delay is introduced to avoid showing the animation if the page has been sucessfully prefetched or in very fast connections.
 -   **Screen reader announcements**: Accessibility announcements for navigation progress.
 
 In some cases, you may want to disable these:
@@ -628,13 +631,17 @@ store( 'myPlugin', {
 } );
 ```
 
+<div class="callout callout-info">
+The `core/router` store and `state.url` are available and populated on page load, so there's no need to import the `@wordpress/interactivity-router` package to access them.
+</div>
+
 ## The Interactivity Router in depth
 
 This section provides a detailed technical explanation of how client-side navigation works internally. Understanding these internals can help you debug issues, optimize performance, and make informed decisions about how to structure your code.
 
-### The internal page cache
+### The internal in-memory page cache
 
-At the heart of the Interactivity API router is an internal in-memory page cache — a simple in-memory store that maps URLs to their processed page representations. When you call `prefetch()` or `navigate()`, the router first checks this cache to see if the target page has already been fetched and processed.
+At the heart of the Interactivity API router is an internal in-memory page cache — a simple store that maps URLs to their processed page representations. When you call `prefetch()` or `navigate()`, the router first checks this cache to see if the target page has already been fetched and processed.
 
 The cache uses a normalized version of the URL as its key. This normalization strips away the domain and any hash fragments, keeping only the pathname and query parameters. For example, `https://example.com/products/?category=shoes#details` becomes `/products/?category=shoes`. This ensures that navigations to the same logical page (regardless of how the URL was constructed) share the same cache entry.
 
@@ -802,7 +809,7 @@ One of the trickier aspects of client-side navigation is managing CSS style shee
 
 CSS rules are applied in a specific order, and when two rules have the same specificity, the one that appears later in the document "wins." This means that the order of `<link>` and `<style>` elements in your HTML matters. If the router simply appended new style sheets to the end of the document, it could inadvertently change which rules take precedence, causing visual bugs.
 
-Consider this example: Page A has style sheets [base.css, theme.css], and Page B has [base.css, components.css, theme.css]. If the user navigates from A to B, the router needs to insert components.css between base.css and theme.css — not at the end. Otherwise, any rules in theme.css that are meant to override components.css would stop working.
+Consider this example: Page A has style sheets `base.css` and `theme.css`, and Page B has `base.css`, `components.css` and `theme.css`. If the user navigates from A to B, the router needs to insert `components.css` between `base.css` and `theme.css` — not at the end. Otherwise, any rules in `theme.css` that are meant to override `components.css` would stop working.
 
 **How styles are extracted and prepared**
 
@@ -854,7 +861,7 @@ By keeping deactivated style elements in the DOM (rather than removing them), th
 
 ### Script module handling
 
-The Interactivity API uses [script modules](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/) for interactive behavior. The router must ensure that when navigating to a new page, any script modules required by that page are loaded and executed.
+The Interactivity API uses [script modules](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/) for interactive behavior. The router must ensure that when navigating to a new page, the required script modules are loaded and executed.
 
 **Identifying script modules for client-side navigation**
 
@@ -924,7 +931,7 @@ Each script module's top-level code runs, which typically includes calls to `sto
 
 ### Server state and context
 
-Interactive elements often need data from the server — configuration values, content from the database, user preferences, and more. The Interactivity API provides two mechanisms for this: [global state and local context](/docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md).
+Interactive elements often need data from the server — configuration values, content from the database, user preferences, and more. The Interactivity API provides three mechanisms for this: [global state, local context and config](/docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-derived-state-and-config.md).
 
 During client-side navigation, this server-provided data needs to be extracted from the new page and made available to the client-side code.
 
@@ -942,6 +949,10 @@ When WordPress renders a page with interactive elements, it embeds server-provid
 		"state": {
 			"myPlugin": {
 				"cartItemCount": 3,
+			}
+		}
+		"config": {
+			"myPlugin": {
 				"userLoggedIn": true
 			}
 		}
@@ -960,13 +971,15 @@ Local context is embedded directly in the `data-wp-context` attribute of element
 </div>
 ```
 
-**Extracting state and context during fetch**
+**Extracting state, context and config during fetch**
 
-When the router fetches a new page, it extracts both types of server data:
+When the router fetches a new page, it extracts these types of server data:
 
-1. **Global state**: The router finds the `<script type="application/json">` element with ID `wp-script-module-data-@wordpress/interactivity` and parses its JSON content. This state is stored in the internal in-memory page cache entry.
+1. **Global state**: The router finds the `<script type="application/json">` element with ID `wp-script-module-data-@wordpress/interactivity` and parses its JSON content to extrat its `state` property. This state comes from `wp_interactivity_state` is stored in the internal in-memory page cache entry.
 
 2. **Local context**: Context values are embedded in the virtual DOM representation of each router region. When a region's HTML is converted to vDOM, the `data-wp-context` attributes are preserved and will be processed during rendering.
+
+3. **Config**: The router finds the `<script type="application/json">` element with ID `wp-script-module-data-@wordpress/interactivity` and parses its JSON content to extrat its `config` property. This configuration comes from `wp_interactivity_config` and is stored in the internal in-memory page cache entry.
 
 **Merging server data during navigation**
 
@@ -1051,17 +1064,17 @@ When `navigate()` is called (for example, on link click):
 2. If not already prefetched, the fetch process from Phase 1 runs now.
 3. The router waits for the page to be ready (fetch complete, styles loaded).
 4. A loading indicator may appear if the wait exceeds a threshold (400ms).
-5. Script modules for the new page are imported and executed.
-6. The rendering phase begins (wrapped in a batch for efficiency):
+5. The rendering phase begins (wrapped in a batch for efficiency):
+    - Script modules for the new page are executed.
     - Server state is merged with client state.
     - Each router region is updated with its new virtual DOM.
     - Regions with `attachTo` that don't exist are created and appended.
     - Styles are activated/deactivated as needed.
     - The document title is updated.
-7. Browser history is updated (pushState or replaceState).
-8. Screen reader announcement is made for accessibility.
-9. If the URL has a hash, the page scrolls to that element.
-10. Navigation is complete.
+6. Browser history is updated (pushState or replaceState).
+7. Screen reader announcement is made for accessibility.
+8. If the URL has a hash, the page scrolls to that element.
+9. Navigation is complete.
 
 #### Race condition protection
 
