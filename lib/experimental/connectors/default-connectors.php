@@ -204,7 +204,7 @@ function _gutenberg_get_connector_settings(): array {
 	}
 	$plugin_files_by_slug = array();
 	foreach ( array_keys( get_plugins() ) as $plugin_file ) {
-		$slug                         = str_contains( $plugin_file, '/' ) ? dirname( $plugin_file ) : str_replace( '.php', '', $plugin_file );
+		$slug                          = str_contains( $plugin_file, '/' ) ? dirname( $plugin_file ) : str_replace( '.php', '', $plugin_file );
 		$plugin_files_by_slug[ $slug ] = $plugin_file;
 	}
 
