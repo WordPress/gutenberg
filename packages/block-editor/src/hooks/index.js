@@ -39,6 +39,10 @@ import listView from './list-view';
 import './block-renaming';
 import './grid-visualizer';
 import AutoRegisterControls from './auto-inspector-controls';
+import {
+	styleInheritanceProvider,
+	styleInheritanceInheritor,
+} from './style-inheritance';
 
 createBlockEditFilter(
 	[
@@ -59,6 +63,7 @@ createBlockEditFilter(
 		blockFields,
 		listView,
 		AutoRegisterControls,
+		styleInheritanceInheritor,
 	].filter( Boolean )
 );
 createBlockListBlockFilter( [
@@ -77,6 +82,8 @@ createBlockListBlockFilter( [
 	position,
 	blockStyleVariation,
 	childLayout,
+	styleInheritanceProvider,
+	styleInheritanceInheritor,
 ] );
 createBlockSaveFilter( [
 	align,
@@ -91,6 +98,8 @@ createBlockSaveFilter( [
 	style,
 	fontFamily,
 	fontSize,
+	styleInheritanceProvider,
+	styleInheritanceInheritor,
 ] );
 
 export { useCustomSides } from './dimensions';

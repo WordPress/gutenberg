@@ -58,7 +58,10 @@
 		},
 		"shadow": true,
 		"visibility": false,
-		"lock": false
+		"lock": false,
+		"__experimentalStyleInheritance": {
+			"inherits": [ "color", "typography", "border" ]
+		}
 	},
 	"selectors": {
 		"typography": {

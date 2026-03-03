@@ -56,7 +56,10 @@
 			}
 		},
 		"contentRole": true,
-		"listView": true
+		"listView": true,
+		"__experimentalStyleInheritance": {
+			"provides": [ "color", "typography", "border" ]
+		}
 	},
 	"attributes": {
 		"iconPosition": {
