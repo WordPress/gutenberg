@@ -23,7 +23,6 @@ import type {
 	Field,
 	NormalizedForm,
 	NormalizedFormField,
-	NormalizedPanelLayout,
 	FieldLayoutProps,
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
@@ -152,14 +151,14 @@ function ModalContent< Item >( {
 					onClick={ onClose }
 					__next40pxDefaultSize
 				>
-					{ cancelButtonText ?? __( 'Cancel' ) }
+					{ cancelButtonText || __( 'Cancel' ) }
 				</Button>
 				<Button
 					variant="primary"
 					onClick={ onApply }
 					__next40pxDefaultSize
 				>
-					{ applyButtonText ?? __( 'Apply' ) }
+					{ applyButtonText || __( 'Apply' ) }
 				</Button>
 			</Stack>
 		</Modal>
@@ -183,9 +182,7 @@ function PanelModal< Item >( {
 	}
 
 	const panelLayout =
-		field.layout.type === 'panel'
-			? ( field.layout as NormalizedPanelLayout )
-			: undefined;
+		field.layout.type === 'panel' ? field.layout : undefined;
 
 	const handleClose = () => {
 		setIsOpen( false );
