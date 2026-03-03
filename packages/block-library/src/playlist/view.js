@@ -48,7 +48,7 @@ const { state } = store(
 
 				const existing = playerState.get( ref );
 
-				// Skip if we already initialized with this exact URL and track.
+				// Skip if we already initialized with this exact URL and track ID.
 				if (
 					existing?.url === track.url &&
 					existing?.currentId === context.currentId
