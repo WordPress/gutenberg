@@ -27,6 +27,13 @@
 // Make links unclickable in the editor.
 .wp-block-pages-list__item__link {
 	pointer-events: none;
+
+	// RawHTML wraps page titles in a <div>, which is block-level.
+	// Firefox renders list markers on a separate line from block content.
+	// Force inline display so bullets align with titles across all browsers.
+	> div {
+		display: inline;
+	}
 }
 
 // Modal that shows conversion option.

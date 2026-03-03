@@ -28,7 +28,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useEffect, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -55,7 +55,6 @@ function BlockContent( {
 	blockList,
 	pages,
 	parentPageID,
-	showAppender,
 } ) {
 	if ( ! hasResolvedPages ) {
 		return (
@@ -116,13 +115,7 @@ function BlockContent( {
 	}
 
 	if ( pages.length > 0 ) {
-		const { children, ...ulProps } = innerBlocksProps;
-		return (
-			<ul { ...ulProps }>
-				{ children }
-				{ showAppender && <PageCreatorAppender /> }
-			</ul>
-		);
+		return <ul { ...innerBlocksProps }></ul>;
 	}
 }
 
@@ -268,6 +261,7 @@ export default function PageListEdit( {
 		isNested,
 		hasSelectedChild,
 		parentClientId,
+		hasDraggedChild,
 		isChildOfNavigation,
 		isSelected,
 	} = useSelect(
@@ -275,6 +269,7 @@ export default function PageListEdit( {
 			const {
 				getBlockParentsByBlockName,
 				hasSelectedInnerBlock,
+				hasDraggedInnerBlock,
 				getSelectedBlockClientId,
 			} = select( blockEditorStore );
 			const blockParents = getBlockParentsByBlockName(
@@ -291,6 +286,7 @@ export default function PageListEdit( {
 				isNested: blockParents.length > 0,
 				isChildOfNavigation: navigationBlockParents.length > 0,
 				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
+				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
 				parentClientId: navigationBlockParents[ 0 ],
 				isSelected: getSelectedBlockClientId() === clientId,
 			};
@@ -337,12 +333,28 @@ export default function PageListEdit( {
 		value: blockList,
 	} );
 
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	useEffect( () => {
+		if ( isChildOfNavigation && ( hasSelectedChild || hasDraggedChild ) ) {
+			openModal();
+			selectBlock( parentClientId );
+		}
+	}, [
+		isChildOfNavigation,
+		hasSelectedChild,
+		hasDraggedChild,
+		parentClientId,
+		selectBlock,
+		openModal,
+	] );
+
 	useEffect( () => {
 		setAttributes( { isNested } );
 	}, [ isNested, setAttributes ] );
 
 	return (
-		<PageCreatorContext.Provider value={ pageCreatorContextValue }>
+		<>
 			{ ( pagesTree.length > 0 || allowConvertToLinks ) && (
 				<InspectorControls>
 					<ToolsPanel
@@ -415,15 +427,17 @@ export default function PageListEdit( {
 					) }
 				</>
 			) }
-			<BlockContent
-				blockProps={ blockProps }
-				innerBlocksProps={ innerBlocksProps }
-				hasResolvedPages={ hasResolvedPages }
-				blockList={ blockList }
-				pages={ pages }
-				parentPageID={ parentPageID }
-				showAppender={ showAppender }
-			/>
-		</PageCreatorContext.Provider>
+			<PageCreatorContext.Provider value={ pageCreatorContextValue }>
+				<BlockContent
+					blockProps={ blockProps }
+					innerBlocksProps={ innerBlocksProps }
+					hasResolvedPages={ hasResolvedPages }
+					blockList={ blockList }
+					pages={ pages }
+					parentPageID={ parentPageID }
+				/>
+				{ showAppender && <PageCreatorAppender /> }
+			</PageCreatorContext.Provider>
+		</>
 	);
 }

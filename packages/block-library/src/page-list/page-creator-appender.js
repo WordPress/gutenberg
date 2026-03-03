@@ -24,11 +24,12 @@ export default function PageCreatorAppender() {
 	const contextData = useContext( PageCreatorContext );
 
 	return (
-		<>
+		<div className="block-list-appender wp-block">
 			<Button
 				__next40pxDefaultSize
 				ref={ ref }
-				className="block-editor-button-block-appender block-list-appender__toggle"
+				className="block-list-appender__toggle"
+				style={ { display: 'flex' } }
 				onClick={ () => setShowCreator( true ) }
 				label={ __( 'Add page' ) }
 				showTooltip
@@ -46,6 +47,6 @@ export default function PageCreatorAppender() {
 					/>
 				</Popover>
 			) }
-		</>
+		</div>
 	);
 }
