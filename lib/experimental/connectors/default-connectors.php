@@ -230,7 +230,7 @@ function _gutenberg_validate_connector_keys_in_rest( WP_REST_Response $response,
 
 	foreach ( _gutenberg_get_connector_settings() as $connector_id => $connector_data ) {
 		$auth = $connector_data['authentication'];
-		if ( 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
+		if ( 'ai_provider' !== $connector_data['type'] || 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
 			continue;
 		}
 
