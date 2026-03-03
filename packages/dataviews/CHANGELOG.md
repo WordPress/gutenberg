@@ -27,6 +27,10 @@
 - DataViews: Adjust column spacing in table layout when no titleField is provided. [#75410](https://github.com/WordPress/gutenberg/pull/75410)
 - DataViews: minimize padding for primary actions. [#75721](https://github.com/WordPress/gutenberg/pull/75721)
 
+### Code Quality
+
+- Remove unused dependencies from `package.json`. [#76075](https://github.com/WordPress/gutenberg/pull/76075/)
+
 ## 12.0.0 (2026-02-18)
 
 ### Breaking Changes
