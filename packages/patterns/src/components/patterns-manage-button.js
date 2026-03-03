@@ -81,13 +81,13 @@ function PatternsManageButton( { clientId } ) {
 		useDispatch( patternsStore )
 	);
 
-	if ( ! isVisible || isPreviewMode ) {
+	if ( ! isVisible ) {
 		return null;
 	}
 
 	return (
 		<>
-			{ canDetach && (
+			{ canDetach && ! isPreviewMode && (
 				<MenuItem
 					onClick={ () => {
 						if ( isSyncedPattern ) {
