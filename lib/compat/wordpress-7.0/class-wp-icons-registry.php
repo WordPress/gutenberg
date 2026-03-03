@@ -122,7 +122,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 			if ( $this->is_registered( $icon_name ) ) {
 				_doing_it_wrong(
 					__METHOD__,
-						__( 'Icon is already registered.' ),
+					__( 'Icon is already registered.' ),
 					'7.0.0'
 				);
 				return false;
