@@ -4,7 +4,6 @@
 import {
 	__experimentalHStack as HStack,
 	Button,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
 	__experimentalRegisterConnector as registerConnector,
@@ -13,15 +12,13 @@ import {
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
 import { __ } from '@wordpress/i18n';
+import { Badge } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import { useConnectorPlugin } from './use-connector-plugin';
 import { OpenAILogo, ClaudeLogo, GeminiLogo } from './logos';
-import { unlock } from '../lock-unlock';
-
-const { Badge } = unlock( componentsPrivateApis );
 
 type ConnectorAuthentication =
 	| { method: 'api_key'; settingName: string; credentialsUrl: string | null }
@@ -77,9 +74,7 @@ const ConnectedBadge = () => (
 	</span>
 );
 
-const UnavailableActionBadge = () => (
-	<Badge intent="default">{ __( 'Not available' ) }</Badge>
-);
+const UnavailableActionBadge = () => <Badge>{ __( 'Not available' ) }</Badge>;
 
 interface ApiKeyConnectorConfig {
 	pluginSlug?: string;
