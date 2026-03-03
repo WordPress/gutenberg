@@ -773,10 +773,10 @@ export const saveEntityRecord =
 					if ( entityConfig.__unstablePrePersist ) {
 						edits = {
 							...edits,
-							...entityConfig.__unstablePrePersist(
+							...( await entityConfig.__unstablePrePersist(
 								persistedRecord,
 								edits
-							),
+							) ),
 						};
 					}
 					updatedRecord = await __unstableFetch( {
