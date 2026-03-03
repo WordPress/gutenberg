@@ -5,7 +5,7 @@ import { createBlock } from '@wordpress/blocks';
 import { addSubmenu } from '@wordpress/icons';
 import { MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockSettingsMenuControls,
@@ -103,6 +103,23 @@ function AddSubmenuItem( {
 
 export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+
+	useEffect( () => {
+		if ( ! insertedBlock?.clientId ) {
+			setPopoverAnchor( null );
+			return;
+		}
+		// Wait for the list view to re-render with the new block
+		// before querying for the DOM element.
+		const rafId = window.requestAnimationFrame( () => {
+			const listViewRow = document.querySelector(
+				`.editor-list-view-sidebar [data-block="${ insertedBlock.clientId }"]`
+			);
+			setPopoverAnchor( listViewRow || null );
+		} );
+		return () => window.cancelAnimationFrame( rafId );
+	}, [ insertedBlock?.clientId ] );
 
 	return (
 		<>
@@ -110,16 +127,17 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 				{ ( fillProps ) => (
 					<AddSubmenuFillContent
 						navigationBlockClientId={ navigationBlockClientId }
-						setInsertedBlock={ setInsertedBlock }
 						{ ...fillProps }
+						setInsertedBlock={ setInsertedBlock }
 					/>
 				) }
 			</BlockSettingsMenuControls>
-			{ insertedBlock && (
+			{ insertedBlock && popoverAnchor && (
 				<NavigationLinkUI
 					block={ insertedBlock }
 					insertedBlock={ insertedBlock }
 					setInsertedBlock={ setInsertedBlock }
+					anchor={ popoverAnchor }
 				/>
 			) }
 		</>
