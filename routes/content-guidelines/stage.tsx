@@ -74,23 +74,35 @@ function ContentGuidelinesPage() {
 					 */
 					/* eslint-disable jsx-a11y/no-redundant-roles */ }
 					<ul role="list" className="content-guidelines__list">
-						{ GUIDELINE_ITEMS.map( ( item ) => (
-							<li
-								key={ item.slug }
-								className="content-guidelines__list-item"
-							>
-								<div className="content-guidelines__accordion-item">
-									<GuidelineAccordion
-										title={ item.title }
-										description={ item.description }
-									>
-										<GuidelineAccordionForm
-											slug={ item.slug }
-										/>
-									</GuidelineAccordion>
-								</div>
-							</li>
-						) ) }
+						{ GUIDELINE_ITEMS.map( ( item ) => {
+							const contentId = `content-guidelines-${ item.slug }`;
+							const headingId = `content-guidelines-${ item.slug }-heading`;
+							const descriptionId = `content-guidelines-${ item.slug }-description`;
+
+							return (
+								<li
+									key={ item.slug }
+									className="content-guidelines__list-item"
+								>
+									<div className="content-guidelines__accordion-item">
+										<GuidelineAccordion
+											title={ item.title }
+											description={ item.description }
+											contentId={ contentId }
+											headingId={ headingId }
+											descriptionId={ descriptionId }
+										>
+											<GuidelineAccordionForm
+												slug={ item.slug }
+												contentId={ contentId }
+												headingId={ headingId }
+												descriptionId={ descriptionId }
+											/>
+										</GuidelineAccordion>
+									</div>
+								</li>
+							);
+						} ) }
 					</ul>
 					{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 				</div>

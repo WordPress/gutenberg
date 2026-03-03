@@ -12,8 +12,8 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown } from '@wordpress/icons';
-import { useState, useId, Children, cloneElement } from '@wordpress/element';
-import type { ReactNode, ReactElement } from 'react';
+import { useState } from '@wordpress/element';
+import type { ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -24,17 +24,20 @@ interface GuidelineAccordionProps {
 	title: string;
 	description: string;
 	children: ReactNode;
+	contentId?: string;
+	headingId?: string;
+	descriptionId?: string;
 }
 
 export default function GuidelineAccordion( {
 	title,
 	description,
 	children,
+	contentId,
+	headingId,
+	descriptionId,
 }: GuidelineAccordionProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const contentId = useId();
-	const headingId = useId();
-	const descriptionId = useId();
 
 	return (
 		<Card className="content-guidelines__accordion">
@@ -86,12 +89,7 @@ export default function GuidelineAccordion( {
 					/>
 				</HStack>
 			</VStack>
-			{ isOpen &&
-				cloneElement( Children.only( children ) as ReactElement, {
-					contentId,
-					headingId,
-					descriptionId,
-				} ) }
+			{ isOpen && children }
 		</Card>
 	);
 }
