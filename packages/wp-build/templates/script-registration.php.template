@@ -74,10 +74,18 @@ if ( ! function_exists( '{{PREFIX}}_register_package_scripts' ) ) {
 			$dependencies = $asset['dependencies'] ?? array();
 			$version      = $asset['version'] ?? $default_version;
 
+			$script_extension = $extension;
+			if ( '.js' === $extension ) {
+				$unminified_path = $scripts_dir . '/' . $script_data['path'] . '.js';
+				if ( ! file_exists( $unminified_path ) ) {
+					$script_extension = '.min.js';
+				}
+			}
+
 			{{PREFIX}}_override_script(
 				$scripts,
 				$script_data['handle'],
-				$build_constants['build_url'] . 'scripts/' . $script_data['path'] . $extension,
+				$build_constants['build_url'] . 'scripts/' . $script_data['path'] . $script_extension,
 				$dependencies,
 				$version,
 				true

@@ -460,6 +460,11 @@ async function bundlePackage( packageName, options = {} ) {
 		const outputDir = path.join( BUILD_DIR, 'scripts', packageName );
 		const target = browserslistToEsbuild();
 
+		// When wpScriptDebugSupport is false, skip sourcemaps and
+		// unminified builds to reduce output size.
+		const skipDebugBuilds =
+			packageJson.wpScriptDebugSupport === false;
+
 		// Check if package matches the namespace and should expose a global
 		const packageFullName = packageJson.name;
 		const matchesNamespace = packageFullName.startsWith(
@@ -474,7 +479,7 @@ async function bundlePackage( packageName, options = {} ) {
 		const baseConfig = {
 			entryPoints: [ entryPoint ],
 			bundle: true,
-			sourcemap: true,
+			sourcemap: ! skipDebugBuilds,
 			format: 'iife',
 			target,
 			platform: 'browser',
@@ -505,23 +510,29 @@ async function bundlePackage( packageName, options = {} ) {
 						true // Generate asset file for minified build
 					),
 				],
-			} ),
-			esbuild.build( {
-				...baseConfig,
-				outfile: path.join( outputDir, 'index.js' ),
-				minify: false,
-				define: getDefine( true ),
-				plugins: [
-					...baseBundlePlugins,
-					wordpressExternalsPlugin(
-						'index.min',
-						'iife',
-						packageJson.wpScriptExtraDependencies || [],
-						false // Skip asset file for non-minified build
-					),
-				],
 			} )
 		);
+
+		// Skip the unminified build when debug support is disabled.
+		if ( ! skipDebugBuilds ) {
+			builds.push(
+				esbuild.build( {
+					...baseConfig,
+					outfile: path.join( outputDir, 'index.js' ),
+					minify: false,
+					define: getDefine( true ),
+					plugins: [
+						...baseBundlePlugins,
+						wordpressExternalsPlugin(
+							'index.min',
+							'iife',
+							packageJson.wpScriptExtraDependencies || [],
+							false // Skip asset file for non-minified build
+						),
+					],
+				} )
+			);
+		}
 
 		builtScripts.push( {
 			handle: `${ handlePrefix }-${ packageName }`,
@@ -551,11 +562,11 @@ async function bundlePackage( packageName, options = {} ) {
 			const entryPoint = path.join( packageDir, exportPath );
 			const baseFileName = path.basename( fileName );
 
-			// When wpScriptModuleMinifiedOnly is set, skip sourcemaps and
+			// When wpScriptDebugSupport is false, skip sourcemaps and
 			// unminified builds to reduce output size (e.g. for packages
 			// that inline large WASM binaries).
-			const minifiedOnly =
-				packageJson.wpScriptModuleMinifiedOnly === true;
+			const skipDebugBuilds =
+				packageJson.wpScriptDebugSupport === false;
 
 			builds.push(
 				esbuild.build( {
@@ -565,7 +576,7 @@ async function bundlePackage( packageName, options = {} ) {
 						`${ fileName }.min.js`
 					),
 					bundle: true,
-					sourcemap: ! minifiedOnly,
+					sourcemap: ! skipDebugBuilds,
 					format: 'esm',
 					target,
 					platform: 'browser',
@@ -582,8 +593,8 @@ async function bundlePackage( packageName, options = {} ) {
 				} )
 			);
 
-			// Skip the unminified build when minifiedOnly is set.
-			if ( ! minifiedOnly ) {
+			// Skip the unminified build when debug support is disabled.
+			if ( ! skipDebugBuilds ) {
 				builds.push(
 					esbuild.build( {
 						entryPoints: [ entryPoint ],
@@ -646,18 +657,22 @@ async function bundlePackage( packageName, options = {} ) {
 			// Generate minified path: style.css -> style.min.css, style-rtl.css -> style-rtl.min.css
 			const minifiedPath = destPath.replace( /\.css$/, '.min.css' );
 
-			// Always produce both versions (like JavaScript does):
-			// 1. Non-minified version (for SCRIPT_DEBUG=true)
-			// 2. Minified version (for SCRIPT_DEBUG=false)
+			// When wpScriptDebugSupport is false, skip the non-minified
+			// CSS version to reduce output size.
+			const skipDebugBuilds =
+				packageJson.wpScriptDebugSupport === false;
+
 			builds.push(
 				( async () => {
 					await mkdir( destDir, { recursive: true } );
 					const content = await readFile( cssFile, 'utf8' );
 
-					// Write non-minified version
-					await writeFile( destPath, content );
+					// Write non-minified version (for SCRIPT_DEBUG=true)
+					if ( ! skipDebugBuilds ) {
+						await writeFile( destPath, content );
+					}
 
-					// Write minified version
+					// Write minified version (for SCRIPT_DEBUG=false)
 					const result = await postcss( [
 						cssnano( {
 							preset: [
