@@ -396,4 +396,5 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 	$data['connectors'] = $connectors;
 	return $data;
 }
+remove_filter( 'script_module_data_connectors-wp-admin', '_wp_connectors_get_connector_script_module_data' );
 add_filter( 'script_module_data_connectors-wp-admin', '_gutenberg_get_connector_script_module_data' );
