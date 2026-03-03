@@ -1,0 +1,16 @@
+<div
+	data-wp-interactive="router-race-condition"
+	data-wp-context='{ "counter": 0 }'
+>
+	<button
+		data-testid="context-counter"
+		data-wp-text="context.counter"
+		data-wp-on--click="actions.increment"
+	>0</button>
+
+	<button
+		data-testid="global-counter"
+		data-wp-text="state.counter"
+		data-wp-on--click="actions.incrementGlobal"
+	>0</button>
+</div>
