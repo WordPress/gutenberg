@@ -601,7 +601,7 @@ button.wp-block-navigation-item__content {
 
 				// Inherit alignment settings from container.
 				align-items: var(--navigation-layout-justification-setting, inherit);
-        text-align: var(--navigation-layout-text-align, inherit);
+				text-align: var(--navigation-layout-text-align, inherit);
 
 				// Always align the contents of the menu to the top.
 				&,
@@ -655,7 +655,7 @@ button.wp-block-navigation-item__content {
 					flex-direction: column;
 					// Inherit alignment settings from container.
 					align-items: var(--navigation-layout-justification-setting, initial);
-          text-align: var(--navigation-layout-text-align, inherit);
+					text-align: var(--navigation-layout-text-align, inherit);
 				}
 			}
 
