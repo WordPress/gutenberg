@@ -105,22 +105,8 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 
-	// Find the parent submenu block so the popover anchors to the same
-	// row where the block settings dropdown was opened.
-	const anchorBlockClientId = useSelect(
-		( select ) => {
-			if ( ! insertedBlock?.clientId ) {
-				return null;
-			}
-			return select( blockEditorStore ).getBlockRootClientId(
-				insertedBlock.clientId
-			);
-		},
-		[ insertedBlock?.clientId ]
-	);
-
 	useEffect( () => {
-		if ( ! anchorBlockClientId ) {
+		if ( ! insertedBlock?.clientId ) {
 			setPopoverAnchor( null );
 			return;
 		}
@@ -128,12 +114,12 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 		// before querying for the DOM element.
 		const rafId = window.requestAnimationFrame( () => {
 			const settingsButton = document.querySelector(
-				`.editor-list-view-sidebar [data-block="${ anchorBlockClientId }"] .block-editor-list-view-block__menu`
+				`.editor-list-view-sidebar [data-block="${ insertedBlock.clientId }"] .block-editor-list-view-block__menu`
 			);
 			setPopoverAnchor( settingsButton || null );
 		} );
 		return () => window.cancelAnimationFrame( rafId );
-	}, [ anchorBlockClientId ] );
+	}, [ insertedBlock?.clientId ] );
 
 	return (
 		<>
