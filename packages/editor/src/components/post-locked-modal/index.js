@@ -22,12 +22,29 @@ import { unlock } from '../../lock-unlock';
  */
 import { store as editorStore } from '../../store';
 
+function CollaborationContext() {
+	const isCollaborationSupported = useSelect( ( select ) => {
+		return unlock( select( coreStore ) ).isCollaborationSupported();
+	}, [] );
+
+	if ( isCollaborationSupported ) {
+		return null;
+	}
+
+	return (
+		<p>
+			{ __(
+				'Because this post uses plugins that aren’t compatible with real-time collaboration, only one person can edit at a time.'
+			) }
+		</p>
+	);
+}
+
 function PostLockedModal() {
 	const instanceId = useInstanceId( PostLockedModal );
 	const hookName = 'core/editor/post-locked-modal-' + instanceId;
 	const { autosave, updatePostLock } = useDispatch( editorStore );
 	const {
-		collaborationSupported,
 		isCollaborationEnabled,
 		isLocked,
 		isTakeover,
@@ -49,10 +66,8 @@ function PostLockedModal() {
 			getEditedPostPreviewLink,
 			getEditorSettings,
 		} = select( editorStore );
-		const { isCollaborationSupported } = unlock( select( coreStore ) );
 		const { getPostType } = select( coreStore );
 		return {
-			collaborationSupported: isCollaborationSupported(),
 			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
@@ -225,13 +240,7 @@ function PostLockedModal() {
 									}
 								) }
 							</p>
-							{ ! collaborationSupported && (
-								<p>
-									{ __(
-										'Because this post uses plugins that aren’t compatible with real-time collaboration, only one person can edit at a time.'
-									) }
-								</p>
-							) }
+							<CollaborationContext />
 						</>
 					) }
 					{ ! isTakeover && (
@@ -259,13 +268,7 @@ function PostLockedModal() {
 									}
 								) }
 							</p>
-							{ ! collaborationSupported && (
-								<p>
-									{ __(
-										'Because this post uses plugins that aren’t compatible with real-time collaboration, only one person can edit at a time.'
-									) }
-								</p>
-							) }
+							<CollaborationContext />
 							<p>
 								{ __(
 									'If you take over, the other user will lose editing control to the post, but their changes will be saved.'

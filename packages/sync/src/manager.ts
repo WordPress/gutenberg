@@ -264,7 +264,6 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Create providers for the given entity and its Yjs document.
 		log( 'loadEntity', 'connecting', entityId );
-
 		const providerResults = await Promise.all(
 			providerCreators.map( async ( create ) => {
 				const provider = await create( {
