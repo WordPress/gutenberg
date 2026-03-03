@@ -1,0 +1,50 @@
+{
+	"wpds-motion": {
+		"duration": {
+			"$type": "duration",
+			"xs": {
+				"$value": "50ms",
+				"$description": "Micro-delays and transition offsets"
+			},
+			"sm": {
+				"$value": "100ms",
+				"$description": "Micro-interactions like focus rings and state changes"
+			},
+			"md": {
+				"$value": "200ms",
+				"$description": "Standard transitions like menus and popovers"
+			},
+			"lg": {
+				"$value": "300ms",
+				"$description": "Deliberate animations like slides and reveals"
+			},
+			"xl": {
+				"$value": "400ms",
+				"$description": "Extended animations like complex or multi-step transitions"
+			}
+		},
+		"easing": {
+			"$type": "cubicBezier",
+			"standard": {
+				"$value": [ 0.4, 0, 0.2, 1 ],
+				"$description": "Balanced easing for state changes like hover, color, and toggle transitions"
+			},
+			"decelerate": {
+				"$value": [ 0, 0, 0, 1 ],
+				"$description": "Decelerating easing for elements entering the screen, such as menus and popovers"
+			},
+			"accelerate": {
+				"$value": [ 1, 0, 1, 1 ],
+				"$description": "Accelerating easing for elements leaving the screen"
+			},
+			"emphasized-decelerate": {
+				"$value": [ 0.29, 0, 0, 1 ],
+				"$description": "Expressive entrance for prominent elements like dialogs and drawers"
+			},
+			"emphasized-accelerate": {
+				"$value": [ 1, 0, 0.2, 1 ],
+				"$description": "Expressive exit for prominent elements like dialogs and drawers"
+			}
+		}
+	}
+}

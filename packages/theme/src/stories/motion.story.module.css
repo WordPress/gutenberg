@@ -1,0 +1,123 @@
+@keyframes slideRight {
+	from {
+		left: 4px;
+	}
+	to {
+		left: calc(100% - 36px);
+	}
+}
+
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wpds-dimension-gap-xl);
+	color: var(--wpds-color-fg-content-neutral);
+	font-family: var(--wpds-font-family-body);
+}
+
+.replayButton {
+	align-self: flex-start;
+	padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-lg);
+	border-radius: var(--wpds-border-radius-sm);
+	border: 1px solid var(--wpds-color-stroke-surface-neutral);
+	background-color: var(--wpds-color-bg-surface-neutral);
+	color: var(--wpds-color-fg-content-neutral);
+	font-family: var(--wpds-font-family-body);
+	font-size: var(--wpds-font-size-md);
+	cursor: pointer;
+}
+
+.sectionTitle {
+	font-size: var(--wpds-font-size-lg);
+	color: var(--wpds-color-fg-content-neutral);
+	margin: 0 0 var(--wpds-dimension-gap-lg);
+}
+
+.sectionDescription {
+	font-size: var(--wpds-font-size-sm);
+	color: var(--wpds-color-fg-content-neutral-weak);
+	margin: 0 0 var(--wpds-dimension-gap-lg);
+}
+
+.rows {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wpds-dimension-gap-md);
+}
+
+.row {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-lg);
+}
+
+.labelGroup {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wpds-dimension-gap-xs);
+	width: 320px;
+	flex-shrink: 0;
+}
+
+.label {
+	font-family: var(--wpds-font-family-mono);
+	font-size: var(--wpds-font-size-sm);
+	color: var(--wpds-color-fg-content-neutral);
+}
+
+.description {
+	font-family: var(--wpds-font-family-body);
+	font-size: var(--wpds-font-size-xs);
+	color: var(--wpds-color-fg-content-neutral-weak);
+}
+
+.controls {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-md);
+	margin-bottom: var(--wpds-dimension-gap-lg);
+}
+
+.controlLabel {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-sm);
+	font-size: var(--wpds-font-size-sm);
+	color: var(--wpds-color-fg-content-neutral-weak);
+}
+
+.select,
+.customInput {
+	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
+	border-radius: var(--wpds-border-radius-sm);
+	border: 1px solid var(--wpds-color-stroke-surface-neutral);
+	background-color: var(--wpds-color-bg-surface-neutral);
+	color: var(--wpds-color-fg-content-neutral);
+	font-family: var(--wpds-font-family-body);
+	font-size: var(--wpds-font-size-sm);
+}
+
+.customInput {
+	width: 80px;
+}
+
+.track {
+	position: relative;
+	height: 40px;
+	border-radius: var(--wpds-border-radius-sm);
+	background-color: var(--wpds-color-bg-surface-neutral-weak);
+	overflow: hidden;
+	flex: 1;
+}
+
+.dot {
+	position: absolute;
+	top: 4px;
+	left: 4px;
+	width: 32px;
+	height: 32px;
+	border-radius: var(--wpds-border-radius-sm);
+	background-color: var(--wpds-color-bg-interactive-brand-strong);
+	animation-name: slideRight;
+	animation-fill-mode: forwards;
+}
