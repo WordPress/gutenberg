@@ -7,16 +7,15 @@ import { createHigherOrderComponent, pure } from '@wordpress/compose';
  * Internal dependencies
  */
 import useSelect from '../use-select';
-
-/** @typedef {React.ComponentType} ComponentType */
+import type { SelectFunction, DataRegistry } from '../../types';
 
 /**
  * Higher-order component used to inject state-derived props using registered
  * selectors.
  *
- * @param {Function} mapSelectToProps Function called on every state change,
- *                                    expected to return object of props to
- *                                    merge with the component's own props.
+ * @param mapSelectToProps Function called on every state change,
+ *                         expected to return object of props to
+ *                         merge with the component's own props.
  *
  * @example
  * ```js
@@ -48,14 +47,22 @@ import useSelect from '../use-select';
  * component and update automatically if the price of a hammer ever changes in
  * the store.
  *
- * @return {ComponentType} Enhanced component with merged state data props.
+ * @return Enhanced component with merged state data props.
  */
-const withSelect = ( mapSelectToProps ) =>
+const withSelect = (
+	mapSelectToProps: (
+		select: SelectFunction,
+		ownProps: Record< string, unknown >,
+		registry: DataRegistry
+	) => Record< string, unknown >
+) =>
 	createHigherOrderComponent(
 		( WrappedComponent ) =>
-			pure( ( ownProps ) => {
-				const mapSelect = ( select, registry ) =>
-					mapSelectToProps( select, ownProps, registry );
+			pure( ( ownProps: Record< string, unknown > ) => {
+				const mapSelect = (
+					select: SelectFunction,
+					registry: DataRegistry
+				) => mapSelectToProps( select, ownProps, registry );
 				const mergeProps = useSelect( mapSelect );
 				return <WrappedComponent { ...ownProps } { ...mergeProps } />;
 			} ),

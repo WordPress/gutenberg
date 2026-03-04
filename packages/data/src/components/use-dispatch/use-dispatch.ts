@@ -2,15 +2,11 @@
  * Internal dependencies
  */
 import useRegistry from '../registry-provider/use-registry';
-
-/**
- * @typedef {import('../../types').StoreDescriptor<StoreConfig>} StoreDescriptor
- * @template {import('../../types').AnyConfig} StoreConfig
- */
-/**
- * @typedef {import('../../types').UseDispatchReturn<StoreNameOrDescriptor>} UseDispatchReturn
- * @template StoreNameOrDescriptor
- */
+import type {
+	StoreDescriptor,
+	AnyConfig,
+	UseDispatchReturn,
+} from '../../types';
 
 /**
  * A custom react hook returning the current registry dispatch actions creators.
@@ -18,12 +14,11 @@ import useRegistry from '../registry-provider/use-registry';
  * Note: The component using this hook must be within the context of a
  * RegistryProvider.
  *
- * @template {undefined | string | StoreDescriptor<any>} StoreNameOrDescriptor
- * @param {StoreNameOrDescriptor} [storeNameOrDescriptor] Optionally provide the name of the
- *                                                        store or its descriptor from which to
- *                                                        retrieve action creators. If not
- *                                                        provided, the registry.dispatch
- *                                                        function is returned instead.
+ * @param storeNameOrDescriptor Optionally provide the name of the
+ *                              store or its descriptor from which to
+ *                              retrieve action creators. If not
+ *                              provided, the registry.dispatch
+ *                              function is returned instead.
  *
  * @example
  * This illustrates a pattern where you may need to retrieve dynamic data from
@@ -56,13 +51,23 @@ import useRegistry from '../registry-provider/use-registry';
  * //
  * // <SaleButton>Start Sale!</SaleButton>
  * ```
- * @return {UseDispatchReturn<StoreNameOrDescriptor>} A custom react hook.
+ *
+ * @return The dispatch function or action creators for the store.
  */
-const useDispatch = ( storeNameOrDescriptor ) => {
+const useDispatch = <
+	StoreNameOrDescriptor extends
+		| undefined
+		| string
+		| StoreDescriptor< AnyConfig > = undefined,
+>(
+	storeNameOrDescriptor?: StoreNameOrDescriptor
+): UseDispatchReturn< StoreNameOrDescriptor > => {
 	const { dispatch } = useRegistry();
-	return storeNameOrDescriptor === void 0
-		? dispatch
-		: dispatch( storeNameOrDescriptor );
+	return (
+		storeNameOrDescriptor === void 0
+			? dispatch
+			: dispatch( storeNameOrDescriptor as StoreDescriptor< AnyConfig > )
+	) as UseDispatchReturn< StoreNameOrDescriptor >;
 };
 
 export default useDispatch;

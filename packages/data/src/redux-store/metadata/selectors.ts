@@ -8,10 +8,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { createSelector } from '../../create-selector';
 import { selectorArgsToStateKey } from './utils';
-
-/** @typedef {Record<string, import('./reducer').State>} State */
-/** @typedef {import('./reducer').StateValue} StateValue */
-/** @typedef {import('./reducer').Status} Status */
+import type { State, StateValue } from './reducer';
 
 /**
  * Returns the raw resolution state value for a given selector name,
@@ -19,13 +16,17 @@ import { selectorArgsToStateKey } from './utils';
  * or not resolved for the given set of arguments, otherwise true or false for
  * resolution started and completed respectively.
  *
- * @param {State}      state        Data state.
- * @param {string}     selectorName Selector name.
- * @param {unknown[]?} args         Arguments passed to selector.
+ * @param state        Data state.
+ * @param selectorName Selector name.
+ * @param args         Arguments passed to selector.
  *
- * @return {StateValue|undefined} isResolving value.
+ * @return isResolving value.
  */
-export function getResolutionState( state, selectorName, args ) {
+export function getResolutionState(
+	state: Record< string, State >,
+	selectorName: string,
+	args?: unknown[] | null
+): StateValue | undefined {
 	const map = state[ selectorName ];
 	if ( ! map ) {
 		return;
@@ -46,13 +47,17 @@ export function getResolutionState( state, selectorName, args ) {
  *
  * @deprecated
  *
- * @param {State}      state        Data state.
- * @param {string}     selectorName Selector name.
- * @param {unknown[]?} args         Arguments passed to selector.
+ * @param state        Data state.
+ * @param selectorName Selector name.
+ * @param args         Arguments passed to selector.
  *
- * @return {boolean | undefined} isResolving value.
+ * @return isResolving value.
  */
-export function getIsResolving( state, selectorName, args ) {
+export function getIsResolving(
+	state: Record< string, State >,
+	selectorName: string,
+	args?: unknown[] | null
+): boolean | undefined {
 	deprecated( 'wp.data.select( store ).getIsResolving', {
 		since: '6.6',
 		version: '6.8',
@@ -67,13 +72,17 @@ export function getIsResolving( state, selectorName, args ) {
  * Returns true if resolution has already been triggered for a given
  * selector name, and arguments set.
  *
- * @param {State}      state        Data state.
- * @param {string}     selectorName Selector name.
- * @param {unknown[]?} args         Arguments passed to selector.
+ * @param state        Data state.
+ * @param selectorName Selector name.
+ * @param args         Arguments passed to selector.
  *
- * @return {boolean} Whether resolution has been triggered.
+ * @return Whether resolution has been triggered.
  */
-export function hasStartedResolution( state, selectorName, args ) {
+export function hasStartedResolution(
+	state: Record< string, State >,
+	selectorName: string,
+	args?: unknown[] | null
+): boolean {
 	return getResolutionState( state, selectorName, args ) !== undefined;
 }
 
@@ -81,13 +90,17 @@ export function hasStartedResolution( state, selectorName, args ) {
  * Returns true if resolution has completed for a given selector
  * name, and arguments set.
  *
- * @param {State}      state        Data state.
- * @param {string}     selectorName Selector name.
- * @param {unknown[]?} args         Arguments passed to selector.
+ * @param state        Data state.
+ * @param selectorName Selector name.
+ * @param args         Arguments passed to selector.
  *
- * @return {boolean} Whether resolution has completed.
+ * @return Whether resolution has completed.
  */
-export function hasFinishedResolution( state, selectorName, args ) {
+export function hasFinishedResolution(
+	state: Record< string, State >,
+	selectorName: string,
+	args?: unknown[] | null
+): boolean {
 	const status = getResolutionState( state, selectorName, args )?.status;
 	return status === 'finished' || status === 'error';
 }
@@ -96,13 +109,17 @@ export function hasFinishedResolution( state, selectorName, args ) {
  * Returns true if resolution has failed for a given selector
  * name, and arguments set.
  *
- * @param {State}      state        Data state.
- * @param {string}     selectorName Selector name.
- * @param {unknown[]?} args         Arguments passed to selector.
+ * @param state        Data state.
+ * @param selectorName Selector name.
+ * @param args         Arguments passed to selector.
  *
- * @return {boolean} Has resolution failed
+ * @return Has resolution failed
  */
-export function hasResolutionFailed( state, selectorName, args ) {
+export function hasResolutionFailed(
+	state: Record< string, State >,
+	selectorName: string,
+	args?: unknown[] | null
+): boolean {
 	return getResolutionState( state, selectorName, args )?.status === 'error';
 }
 
@@ -111,13 +128,17 @@ export function hasResolutionFailed( state, selectorName, args ) {
  * Note it may be of an Error type, but may also be null, undefined, or anything else
  * that can be `throw`-n.
  *
- * @param {State}      state        Data state.
- * @param {string}     selectorName Selector name.
- * @param {unknown[]?} args         Arguments passed to selector.
+ * @param state        Data state.
+ * @param selectorName Selector name.
+ * @param args         Arguments passed to selector.
  *
- * @return {Error|unknown} Last resolution error
+ * @return Last resolution error
  */
-export function getResolutionError( state, selectorName, args ) {
+export function getResolutionError(
+	state: Record< string, State >,
+	selectorName: string,
+	args?: unknown[] | null
+): Error | unknown {
 	const resolutionState = getResolutionState( state, selectorName, args );
 	return resolutionState?.status === 'error' ? resolutionState.error : null;
 }
@@ -126,13 +147,17 @@ export function getResolutionError( state, selectorName, args ) {
  * Returns true if resolution has been triggered but has not yet completed for
  * a given selector name, and arguments set.
  *
- * @param {State}      state        Data state.
- * @param {string}     selectorName Selector name.
- * @param {unknown[]?} args         Arguments passed to selector.
+ * @param state        Data state.
+ * @param selectorName Selector name.
+ * @param args         Arguments passed to selector.
  *
- * @return {boolean} Whether resolution is in progress.
+ * @return Whether resolution is in progress.
  */
-export function isResolving( state, selectorName, args ) {
+export function isResolving(
+	state: Record< string, State >,
+	selectorName: string,
+	args?: unknown[] | null
+): boolean {
 	return (
 		getResolutionState( state, selectorName, args )?.status === 'resolving'
 	);
@@ -141,22 +166,26 @@ export function isResolving( state, selectorName, args ) {
 /**
  * Returns the list of the cached resolvers.
  *
- * @param {State} state Data state.
+ * @param state Data state.
  *
- * @return {State} Resolvers mapped by args and selectorName.
+ * @return Resolvers mapped by args and selectorName.
  */
-export function getCachedResolvers( state ) {
+export function getCachedResolvers(
+	state: Record< string, State >
+): Record< string, State > {
 	return state;
 }
 
 /**
  * Whether the store has any currently resolving selectors.
  *
- * @param {State} state Data state.
+ * @param state Data state.
  *
- * @return {boolean} True if one or more selectors are resolving, false otherwise.
+ * @return True if one or more selectors are resolving, false otherwise.
  */
-export function hasResolvingSelectors( state ) {
+export function hasResolvingSelectors(
+	state: Record< string, State >
+): boolean {
 	return Object.values( state ).some( ( selectorState ) =>
 		/**
 		 * This uses the internal `_map` property of `EquivalentKeyMap` for
@@ -165,8 +194,8 @@ export function hasResolvingSelectors( state ) {
 		 *
 		 * @see https://github.com/aduth/equivalent-key-map
 		 */
-		Array.from( selectorState._map.values() ).some(
-			( resolution ) => resolution[ 1 ]?.status === 'resolving'
+		Array.from( ( selectorState as any )._map.values() ).some(
+			( resolution: any ) => resolution[ 1 ]?.status === 'resolving'
 		)
 	);
 }
@@ -174,13 +203,13 @@ export function hasResolvingSelectors( state ) {
 /**
  * Retrieves the total number of selectors, grouped per status.
  *
- * @param {State} state Data state.
+ * @param state Data state.
  *
- * @return {Object} Object, containing selector totals by status.
+ * @return Object, containing selector totals by status.
  */
 export const countSelectorsByStatus = createSelector(
-	( state ) => {
-		const selectorsByStatus = {};
+	( state: Record< string, State > ): Record< string, number > => {
+		const selectorsByStatus: Record< string, number > = {};
 
 		Object.values( state ).forEach( ( selectorState ) =>
 			/**
@@ -190,8 +219,8 @@ export const countSelectorsByStatus = createSelector(
 			 *
 			 * @see https://github.com/aduth/equivalent-key-map
 			 */
-			Array.from( selectorState._map.values() ).forEach(
-				( resolution ) => {
+			Array.from( ( selectorState as any )._map.values() ).forEach(
+				( resolution: any ) => {
 					const currentStatus = resolution[ 1 ]?.status ?? 'error';
 					if ( ! selectorsByStatus[ currentStatus ] ) {
 						selectorsByStatus[ currentStatus ] = 0;
@@ -203,5 +232,5 @@ export const countSelectorsByStatus = createSelector(
 
 		return selectorsByStatus;
 	},
-	( state ) => [ state ]
+	( state: Record< string, State > ) => [ state ]
 );

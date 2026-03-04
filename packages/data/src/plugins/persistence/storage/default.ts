@@ -1,9 +1,10 @@
 /**
  * Internal dependencies
  */
+import type { StorageInterface } from '../../../types';
 import objectStorage from './object';
 
-let storage;
+let storage: StorageInterface & { removeItem?: ( key: string ) => void };
 
 try {
 	// Private Browsing in Safari 10 and earlier will throw an error when
@@ -11,7 +12,7 @@ try {
 	// causing a thrown error as condition for using fallback object storage.
 	storage = window.localStorage;
 	storage.setItem( '__wpDataTestLocalStorage', '' );
-	storage.removeItem( '__wpDataTestLocalStorage' );
+	storage.removeItem!( '__wpDataTestLocalStorage' );
 } catch ( error ) {
 	storage = objectStorage;
 }

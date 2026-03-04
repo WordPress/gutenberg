@@ -8,6 +8,12 @@ import { useIsomorphicLayoutEffect } from '@wordpress/compose';
  * Internal dependencies
  */
 import useRegistry from '../registry-provider/use-registry';
+import type { DataRegistry } from '../../types';
+
+type DispatchMap = (
+	dispatch: DataRegistry[ 'dispatch' ],
+	registry: DataRegistry
+) => Record< string, ( ...args: unknown[] ) => unknown >;
 
 /**
  * Custom react hook for returning aggregate dispatch actions using the provided
@@ -15,15 +21,18 @@ import useRegistry from '../registry-provider/use-registry';
  *
  * Currently this is an internal api only and is implemented by `withDispatch`
  *
- * @param {Function} dispatchMap Receives the `registry.dispatch` function as
- *                               the first argument and the `registry` object
- *                               as the second argument.  Should return an
- *                               object mapping props to functions.
- * @param {Array}    deps        An array of dependencies for the hook.
- * @return {Object}  An object mapping props to functions created by the passed
- *                   in dispatchMap.
+ * @param dispatchMap Receives the `registry.dispatch` function as
+ *                    the first argument and the `registry` object
+ *                    as the second argument.  Should return an
+ *                    object mapping props to functions.
+ * @param deps        An array of dependencies for the hook.
+ * @return An object mapping props to functions created by the passed
+ *         in dispatchMap.
  */
-const useDispatchWithMap = ( dispatchMap, deps ) => {
+const useDispatchWithMap = (
+	dispatchMap: DispatchMap,
+	deps: unknown[]
+): Record< string, ( ...args: unknown[] ) => unknown > => {
 	const registry = useRegistry();
 	const currentDispatchMapRef = useRef( dispatchMap );
 
@@ -47,7 +56,7 @@ const useDispatchWithMap = ( dispatchMap, deps ) => {
 					}
 					return [
 						propName,
-						( ...args ) =>
+						( ...args: unknown[] ) =>
 							currentDispatchMapRef
 								.current( registry.dispatch, registry )
 								[ propName ]( ...args ),

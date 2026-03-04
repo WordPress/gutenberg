@@ -16,10 +16,21 @@ import { isShallowEqual } from '@wordpress/is-shallow-equal';
  */
 import useRegistry from '../registry-provider/use-registry';
 import useAsyncMode from '../async-mode-provider/use-async-mode';
+import type {
+	MapSelect,
+	SelectFunction,
+	StoreDescriptor,
+	AnyConfig,
+	UseSelectReturn,
+	DataRegistry,
+} from '../../types';
 
 const renderQueue = createQueue();
 
-function warnOnUnstableReference( a, b ) {
+function warnOnUnstableReference(
+	a: Record< string, unknown >,
+	b: Record< string, unknown >
+): void {
 	if ( ! a || ! b ) {
 		return;
 	}
@@ -38,41 +49,32 @@ function warnOnUnstableReference( a, b ) {
 	);
 }
 
-/**
- * @typedef {import('../../types').StoreDescriptor<C>} StoreDescriptor
- * @template {import('../../types').AnyConfig} C
- */
-/**
- * @typedef {import('../../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
- * @template State
- * @template {Record<string,import('../../types').ActionCreator>} Actions
- * @template Selectors
- */
-/** @typedef {import('../../types').MapSelect} MapSelect */
-/**
- * @typedef {import('../../types').UseSelectReturn<T>} UseSelectReturn
- * @template {MapSelect|StoreDescriptor<any>} T
- */
+interface StoreSubscriber {
+	subscribe: ( listener: () => void ) => () => void;
+	updateStores: ( newStores: string[] ) => void;
+}
 
-function Store( registry, suspense ) {
-	const select = suspense ? registry.suspendSelect : registry.select;
+function Store( registry: DataRegistry, suspense: boolean ) {
+	const select = ( suspense
+		? registry.suspendSelect
+		: registry.select ) as unknown as SelectFunction;
 	const queueContext = {};
-	let lastMapSelect;
-	let lastMapResult;
+	let lastMapSelect: MapSelect | undefined;
+	let lastMapResult: unknown;
 	let lastMapResultValid = false;
-	let lastIsAsync;
-	let subscriber;
-	let didWarnUnstableReference;
-	const storeStatesOnMount = new Map();
+	let lastIsAsync: boolean | undefined;
+	let subscriber: StoreSubscriber | undefined;
+	let didWarnUnstableReference: boolean | undefined;
+	const storeStatesOnMount = new Map< string, unknown >();
 
-	function getStoreState( name ) {
+	function getStoreState( name: string ): unknown {
 		// If there's no store property (custom generic store), return an empty
 		// object. When comparing the state, the empty objects will cause the
 		// equality check to fail, setting `lastMapResultValid` to false.
 		return registry.stores[ name ]?.store?.getState?.() ?? {};
 	}
 
-	const createSubscriber = ( stores ) => {
+	const createSubscriber = ( stores: string[] ): StoreSubscriber => {
 		// The set of stores the `subscribe` function is supposed to subscribe to. Here it is
 		// initialized, and then the `updateStores` function can add new stores to it.
 		const activeStores = [ ...stores ];
@@ -80,9 +82,9 @@ function Store( registry, suspense ) {
 		// The `subscribe` function, which is passed to the `useSyncExternalStore` hook, could
 		// be called multiple times to establish multiple subscriptions. That's why we need to
 		// keep a set of active subscriptions;
-		const activeSubscriptions = new Set();
+		const activeSubscriptions = new Set< ( storeName: string ) => void >();
 
-		function subscribe( listener ) {
+		function subscribe( listener: () => void ): () => void {
 			// Maybe invalidate the value right after subscription was created.
 			// React will call `getValue` after subscribing, to detect store
 			// updates that happened in the interval between the `getValue` call
@@ -116,8 +118,8 @@ function Store( registry, suspense ) {
 				}
 			};
 
-			const unsubs = [];
-			function subscribeStore( storeName ) {
+			const unsubs: Array< VoidFunction > = [];
+			function subscribeStore( storeName: string ) {
 				unsubs.push( registry.subscribe( onChange, storeName ) );
 			}
 
@@ -140,7 +142,7 @@ function Store( registry, suspense ) {
 		}
 
 		// Check if `newStores` contains some stores we're not subscribed to yet, and add them.
-		function updateStores( newStores ) {
+		function updateStores( newStores: string[] ) {
 			for ( const newStore of newStores ) {
 				if ( activeStores.includes( newStore ) ) {
 					continue;
@@ -159,22 +161,22 @@ function Store( registry, suspense ) {
 		return { subscribe, updateStores };
 	};
 
-	return ( mapSelect, isAsync ) => {
-		function updateValue() {
+	return ( mapSelect: MapSelect, isAsync: boolean ) => {
+		function updateValue(): void {
 			// If the last value is valid, and the `mapSelect` callback hasn't changed,
 			// then we can safely return the cached value. The value can change only on
 			// store update, and in that case value will be invalidated by the listener.
 			if ( lastMapResultValid && mapSelect === lastMapSelect ) {
-				return lastMapResult;
+				return;
 			}
 
-			const listeningStores = { current: null };
+			const listeningStores = { current: null as string[] | null };
 			const mapResult = registry.__unstableMarkListeningStores(
 				() => mapSelect( select, registry ),
 				listeningStores
 			);
 
-			if ( globalThis.SCRIPT_DEBUG ) {
+			if ( ( globalThis as any ).SCRIPT_DEBUG ) {
 				if ( ! didWarnUnstableReference ) {
 					const secondMapResult = mapSelect( select, registry );
 					if ( ! isShallowEqual( mapResult, secondMapResult ) ) {
@@ -185,12 +187,12 @@ function Store( registry, suspense ) {
 			}
 
 			if ( ! subscriber ) {
-				for ( const name of listeningStores.current ) {
+				for ( const name of listeningStores.current! ) {
 					storeStatesOnMount.set( name, getStoreState( name ) );
 				}
-				subscriber = createSubscriber( listeningStores.current );
+				subscriber = createSubscriber( listeningStores.current! );
 			} else {
-				subscriber.updateStores( listeningStores.current );
+				subscriber.updateStores( listeningStores.current! );
 			}
 
 			// If the new value is shallow-equal to the old one, keep the old one so
@@ -221,15 +223,19 @@ function Store( registry, suspense ) {
 		lastIsAsync = isAsync;
 
 		// Return a pair of functions that can be passed to `useSyncExternalStore`.
-		return { subscribe: subscriber.subscribe, getValue };
+		return { subscribe: subscriber!.subscribe, getValue };
 	};
 }
 
-function _useStaticSelect( storeName ) {
+function _useStaticSelect( storeName: StoreDescriptor< AnyConfig > | string ) {
 	return useRegistry().select( storeName );
 }
 
-function _useMappingSelect( suspense, mapSelect, deps ) {
+function _useMappingSelect(
+	suspense: boolean,
+	mapSelect: MapSelect,
+	deps: unknown[]
+) {
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
 	const store = useMemo(
@@ -239,6 +245,7 @@ function _useMappingSelect( suspense, mapSelect, deps ) {
 
 	// These are "pass-through" dependencies from the parent hook,
 	// and the parent should catch any hook rule violations.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const selector = useCallback( mapSelect, deps );
 	const { subscribe, getValue } = store( selector, isAsync );
 	const result = useSyncExternalStore( subscribe, getValue, getValue );
@@ -252,16 +259,15 @@ function _useMappingSelect( suspense, mapSelect, deps ) {
  * In general, this custom React hook follows the
  * [rules of hooks](https://react.dev/reference/rules/rules-of-hooks).
  *
- * @template {MapSelect | StoreDescriptor<any>} T
- * @param {T}          mapSelect Function called on every state change. The returned value is
- *                               exposed to the component implementing this hook. The function
- *                               receives the `registry.select` method on the first argument
- *                               and the `registry` on the second argument.
- *                               When a store key is passed, all selectors for the store will be
- *                               returned. This is only meant for usage of these selectors in event
- *                               callbacks, not for data needed to create the element tree.
- * @param {unknown[]=} deps      If provided, this memoizes the mapSelect so the same `mapSelect` is
- *                               invoked on every state change unless the dependencies change.
+ * @param mapSelect Function called on every state change. The returned value is
+ *                  exposed to the component implementing this hook. The function
+ *                  receives the `registry.select` method on the first argument
+ *                  and the `registry` on the second argument.
+ *                  When a store key is passed, all selectors for the store will be
+ *                  returned. This is only meant for usage of these selectors in event
+ *                  callbacks, not for data needed to create the element tree.
+ * @param deps      If provided, this memoizes the mapSelect so the same `mapSelect` is
+ *                  invoked on every state change unless the dependencies change.
  *
  * @example
  * ```js
@@ -308,9 +314,12 @@ function _useMappingSelect( suspense, mapSelect, deps ) {
  *   return <div onPaste={ onPaste }>{ children }</div>;
  * }
  * ```
- * @return {UseSelectReturn<T>} A custom react hook.
+ *
+ * @return The selected data or store selectors.
  */
-export default function useSelect( mapSelect, deps ) {
+export default function useSelect<
+	T extends MapSelect | StoreDescriptor< AnyConfig >,
+>( mapSelect: T, deps?: unknown[] ): UseSelectReturn< T > {
 	// On initial call, on mount, determine the mode of this `useSelect` call
 	// and then never allow it to change on subsequent updates.
 	const staticSelectMode = typeof mapSelect !== 'function';
@@ -326,30 +335,35 @@ export default function useSelect( mapSelect, deps ) {
 
 	// `staticSelectMode` is not allowed to change during the hook instance's,
 	// lifetime, so the rules of hooks are not really violated.
-	return staticSelectMode
-		? _useStaticSelect( mapSelect )
-		: _useMappingSelect( false, mapSelect, deps );
+
+	return (
+		staticSelectMode
+			? _useStaticSelect( mapSelect as StoreDescriptor< AnyConfig > )
+			: _useMappingSelect( false, mapSelect as MapSelect, deps! )
+	) as UseSelectReturn< T >;
 }
 
 /**
  * A variant of the `useSelect` hook that has the same API, but is a compatible
  * Suspense-enabled data source.
  *
- * @template {MapSelect} T
- * @param {T}     mapSelect Function called on every state change. The
- *                          returned value is exposed to the component
- *                          using this hook. The function receives the
- *                          `registry.suspendSelect` method as the first
- *                          argument and the `registry` as the second one.
- * @param {Array} deps      A dependency array used to memoize the `mapSelect`
- *                          so that the same `mapSelect` is invoked on every
- *                          state change unless the dependencies change.
+ * @param mapSelect Function called on every state change. The
+ *                  returned value is exposed to the component
+ *                  using this hook. The function receives the
+ *                  `registry.suspendSelect` method as the first
+ *                  argument and the `registry` as the second one.
+ * @param deps      A dependency array used to memoize the `mapSelect`
+ *                  so that the same `mapSelect` is invoked on every
+ *                  state change unless the dependencies change.
  *
- * @throws {Promise} A suspense Promise that is thrown if any of the called
+ * @throws A suspense Promise that is thrown if any of the called
  * selectors is in an unresolved state.
  *
- * @return {ReturnType<T>} Data object returned by the `mapSelect` function.
+ * @return Data object returned by the `mapSelect` function.
  */
-export function useSuspenseSelect( mapSelect, deps ) {
-	return _useMappingSelect( true, mapSelect, deps );
+export function useSuspenseSelect< T extends MapSelect >(
+	mapSelect: T,
+	deps: unknown[]
+): ReturnType< T > {
+	return _useMappingSelect( true, mapSelect, deps ) as ReturnType< T >;
 }

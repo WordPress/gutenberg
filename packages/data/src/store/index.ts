@@ -1,20 +1,25 @@
-const coreDataStore = {
+/**
+ * Internal dependencies
+ */
+import type { DataRegistry, StoreDescriptor, AnyConfig } from '../types';
+
+const coreDataStore: StoreDescriptor< AnyConfig > = {
 	name: 'core/data',
-	instantiate( registry ) {
+	instantiate( registry: DataRegistry ) {
 		const getCoreDataSelector =
-			( selectorName ) =>
-			( key, ...args ) => {
+			( selectorName: string ) =>
+			( key: string, ...args: unknown[] ) => {
 				return registry.select( key )[ selectorName ]( ...args );
 			};
 
 		const getCoreDataAction =
-			( actionName ) =>
-			( key, ...args ) => {
+			( actionName: string ) =>
+			( key: string, ...args: unknown[] ) => {
 				return registry.dispatch( key )[ actionName ]( ...args );
 			};
 
 		return {
-			getSelectors() {
+			getSelectors(): Record< string, ( ...args: any[] ) => any > {
 				return Object.fromEntries(
 					[
 						'getIsResolving',
@@ -29,7 +34,7 @@ const coreDataStore = {
 				);
 			},
 
-			getActions() {
+			getActions(): Record< string, ( ...args: any[] ) => any > {
 				return Object.fromEntries(
 					[
 						'startResolution',

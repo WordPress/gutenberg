@@ -7,19 +7,18 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  * Internal dependencies
  */
 import { useDispatchWithMap } from '../use-dispatch';
-
-/** @typedef {React.ComponentType} ComponentType */
+import type { DataRegistry } from '../../types';
 
 /**
  * Higher-order component used to add dispatch props using registered action
  * creators.
  *
- * @param {Function} mapDispatchToProps A function of returning an object of
- *                                      prop names where value is a
- *                                      dispatch-bound action creator, or a
- *                                      function to be called with the
- *                                      component's props and returning an
- *                                      action creator.
+ * @param mapDispatchToProps A function of returning an object of
+ *                           prop names where value is a
+ *                           dispatch-bound action creator, or a
+ *                           function to be called with the
+ *                           component's props and returning an
+ *                           action creator.
  *
  * @example
  * ```jsx
@@ -89,13 +88,21 @@ import { useDispatchWithMap } from '../use-dispatch';
  * returns an object with the same keys. For example, it should not contain
  * conditions under which a different value would be returned.
  *
- * @return {ComponentType} Enhanced component with merged dispatcher props.
+ * @return Enhanced component with merged dispatcher props.
  */
-const withDispatch = ( mapDispatchToProps ) =>
+const withDispatch = (
+	mapDispatchToProps: (
+		dispatch: DataRegistry[ 'dispatch' ],
+		ownProps: Record< string, unknown >,
+		registry: DataRegistry
+	) => Record< string, ( ...args: unknown[] ) => unknown >
+) =>
 	createHigherOrderComponent(
-		( WrappedComponent ) => ( ownProps ) => {
-			const mapDispatch = ( dispatch, registry ) =>
-				mapDispatchToProps( dispatch, ownProps, registry );
+		( WrappedComponent ) => ( ownProps: Record< string, unknown > ) => {
+			const mapDispatch = (
+				dispatch: DataRegistry[ 'dispatch' ],
+				registry: DataRegistry
+			) => mapDispatchToProps( dispatch, ownProps, registry );
 			const dispatchProps = useDispatchWithMap( mapDispatch, [] );
 			return <WrappedComponent { ...ownProps } { ...dispatchProps } />;
 		},

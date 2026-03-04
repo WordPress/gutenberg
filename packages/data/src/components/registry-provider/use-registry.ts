@@ -7,6 +7,7 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { Context } from './context';
+import type { DataRegistry } from '../../types';
 
 /**
  * A custom react hook exposing the registry context for use.
@@ -45,8 +46,8 @@ import { Context } from './context';
  * };
  * ```
  *
- * @return {import('../../types').DataRegistry} A custom react hook exposing the registry context value.
+ * @return A custom react hook exposing the registry context value.
  */
-export default function useRegistry() {
+export default function useRegistry(): DataRegistry {
 	return useContext( Context );
 }

@@ -3,4 +3,6 @@
  */
 import { createRegistry } from './registry';
 
-export default createRegistry();
+const defaultRegistry = createRegistry();
+
+export default defaultRegistry;

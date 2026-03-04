@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { createStore, applyMiddleware } from 'redux';
+import type { Store as ReduxStore, StoreEnhancer } from 'redux';
 import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
@@ -22,23 +23,43 @@ import createThunkMiddleware from './thunk-middleware';
 import metadataReducer from './metadata/reducer';
 import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
+import type {
+	DataRegistry,
+	ListenerFunction,
+	StoreDescriptor,
+	ReduxStoreConfig,
+	ActionCreator,
+	NormalizedResolver,
+} from '../types';
 
 export { combineReducers };
 
-/** @typedef {import('../types').DataRegistry} DataRegistry */
-/** @typedef {import('../types').ListenerFunction} ListenerFunction */
 /**
- * @typedef {import('../types').StoreDescriptor<C>} StoreDescriptor
- * @template {import('../types').AnyConfig} C
+ * Augment the Redux store with internal properties used by the data module.
  */
-/**
- * @typedef {import('../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
- * @template State
- * @template {Record<string,import('../types').ActionCreator>} Actions
- * @template Selectors
- */
+interface AugmentedReduxStore extends ReduxStore {
+	__unstableOriginalGetState: ReduxStore[ 'getState' ];
+}
 
-const trimUndefinedValues = ( array ) => {
+interface ResolversCache {
+	isRunning: ( selectorName: string, args: unknown[] ) => boolean;
+	clear: ( selectorName: string, args: unknown[] ) => void;
+	markAsRunning: ( selectorName: string, args: unknown[] ) => void;
+}
+
+interface BindingCache {
+	get: ( itemName: string ) => ( ( ...args: unknown[] ) => unknown ) | null;
+}
+
+interface SelectorLike {
+	( ...args: any[] ): any;
+	hasResolver?: boolean;
+	isRegistrySelector?: boolean;
+	registry?: DataRegistry;
+	__unstableNormalizeArgs?: ( args: unknown[] ) => unknown[];
+}
+
+const trimUndefinedValues = ( array: unknown[] ): unknown[] => {
 	const result = [ ...array ];
 	for ( let i = result.length - 1; i >= 0; i-- ) {
 		if ( result[ i ] === undefined ) {
@@ -52,11 +73,14 @@ const trimUndefinedValues = ( array ) => {
  * Creates a new object with the same keys, but with `callback()` called as
  * a transformer function on each of the values.
  *
- * @param {Object}   obj      The object to transform.
- * @param {Function} callback The function to transform each object value.
- * @return {Array} Transformed object.
+ * @param obj      The object to transform.
+ * @param callback The function to transform each object value.
+ * @return Transformed object.
  */
-const mapValues = ( obj, callback ) =>
+const mapValues = < T, U >(
+	obj: Record< string, T > | undefined,
+	callback: ( value: T, key: string ) => U
+): Record< string, U > =>
 	Object.fromEntries(
 		Object.entries( obj ?? {} ).map( ( [ key, value ] ) => [
 			key,
@@ -65,12 +89,15 @@ const mapValues = ( obj, callback ) =>
 	);
 
 // Convert  non serializable types to plain objects
-const devToolsReplacer = ( key, state ) => {
+const devToolsReplacer = ( _key: string, state: unknown ): unknown => {
 	if ( state instanceof Map ) {
 		return Object.fromEntries( state );
 	}
 
-	if ( state instanceof window.HTMLElement ) {
+	if (
+		typeof window !== 'undefined' &&
+		state instanceof window.HTMLElement
+	) {
 		return null;
 	}
 
@@ -80,25 +107,25 @@ const devToolsReplacer = ( key, state ) => {
 /**
  * Create a cache to track whether resolvers started running or not.
  *
- * @return {Object} Resolvers Cache.
+ * @return Resolvers Cache.
  */
-function createResolversCache() {
-	const cache = {};
+function createResolversCache(): ResolversCache {
+	const cache: Record< string, EquivalentKeyMap< unknown[], boolean > > = {};
 	return {
-		isRunning( selectorName, args ) {
-			return (
+		isRunning( selectorName: string, args: unknown[] ): boolean {
+			return !! (
 				cache[ selectorName ] &&
 				cache[ selectorName ].get( trimUndefinedValues( args ) )
 			);
 		},
 
-		clear( selectorName, args ) {
+		clear( selectorName: string, args: unknown[] ): void {
 			if ( cache[ selectorName ] ) {
 				cache[ selectorName ].delete( trimUndefinedValues( args ) );
 			}
 		},
 
-		markAsRunning( selectorName, args ) {
+		markAsRunning( selectorName: string, args: unknown[] ): void {
 			if ( ! cache[ selectorName ] ) {
 				cache[ selectorName ] = new EquivalentKeyMap();
 			}
@@ -108,11 +135,20 @@ function createResolversCache() {
 	};
 }
 
-function createBindingCache( getItem, bindItem ) {
-	const cache = new WeakMap();
+function createBindingCache(
+	getItem: ( name: string ) => ( ( ...args: any[] ) => any ) | undefined,
+	bindItem: (
+		item: ( ...args: any[] ) => any,
+		name: string
+	) => ( ...args: unknown[] ) => unknown
+): BindingCache {
+	const cache = new WeakMap<
+		( ...args: any[] ) => any,
+		( ...args: unknown[] ) => unknown
+	>();
 
 	return {
-		get( itemName ) {
+		get( itemName: string ) {
 			const item = getItem( itemName );
 			if ( ! item ) {
 				return null;
@@ -127,9 +163,12 @@ function createBindingCache( getItem, bindItem ) {
 	};
 }
 
-function createPrivateProxy( publicItems, privateItems ) {
+function createPrivateProxy< T extends Record< string, any > >(
+	publicItems: T,
+	privateItems: BindingCache
+): T {
 	return new Proxy( publicItems, {
-		get: ( target, itemName ) =>
+		get: ( target, itemName: string ) =>
 			privateItems.get( itemName ) || Reflect.get( target, itemName ),
 	} );
 }
@@ -150,32 +189,40 @@ function createPrivateProxy( publicItems, privateItems ) {
  * } );
  * ```
  *
- * @template State
- * @template {Record<string,import('../types').ActionCreator>} Actions
- * @template Selectors
- * @param {string}                                    key     Unique namespace identifier.
- * @param {ReduxStoreConfig<State,Actions,Selectors>} options Registered store options, with properties
- *                                                            describing reducer, actions, selectors,
- *                                                            and resolvers.
+ * @param key     Unique namespace identifier.
+ * @param options Registered store options, with properties
+ *                describing reducer, actions, selectors,
+ *                and resolvers.
  *
- * @return   {StoreDescriptor<ReduxStoreConfig<State,Actions,Selectors>>} Store Object.
+ * @return Store Object.
  */
-export default function createReduxStore( key, options ) {
-	const privateActions = {};
-	const privateSelectors = {};
+export default function createReduxStore<
+	State,
+	Actions extends Record< string, ActionCreator >,
+	Selectors,
+>(
+	key: string,
+	options: ReduxStoreConfig< State, Actions, Selectors >
+): StoreDescriptor< ReduxStoreConfig< State, Actions, Selectors > > {
+	const privateActions: Record< string, ActionCreator > = {};
+	const privateSelectors: Record< string, SelectorLike > = {};
 	const privateRegistrationFunctions = {
 		privateActions,
-		registerPrivateActions: ( actions ) => {
+		registerPrivateActions: (
+			actions: Record< string, ActionCreator >
+		) => {
 			Object.assign( privateActions, actions );
 		},
 		privateSelectors,
-		registerPrivateSelectors: ( selectors ) => {
+		registerPrivateSelectors: (
+			selectors: Record< string, SelectorLike >
+		) => {
 			Object.assign( privateSelectors, selectors );
 		},
 	};
 	const storeDescriptor = {
 		name: key,
-		instantiate: ( registry ) => {
+		instantiate: ( registry: DataRegistry ) => {
 			/**
 			 * Stores listener functions registered with `subscribe()`.
 			 *
@@ -185,10 +232,8 @@ export default function createReduxStore( key, options ) {
 			 * subscription in this store instance it's possible to
 			 * optimize checking if the state has changed before calling
 			 * each listener.
-			 *
-			 * @type {Set<ListenerFunction>}
 			 */
-			const listeners = new Set();
+			const listeners = new Set< ListenerFunction >();
 			const reducer = options.reducer;
 
 			// Object that every thunk function receives as the first argument. It contains the
@@ -212,7 +257,7 @@ export default function createReduxStore( key, options ) {
 				options,
 				registry,
 				thunkArgs
-			);
+			) as AugmentedReduxStore;
 
 			// Expose the private registration functions on the store
 			// so they can be copied to a sub registry in registry.js.
@@ -223,8 +268,8 @@ export default function createReduxStore( key, options ) {
 			// These are the functions that are returned by `useDispatch`, for example.
 			// It always returns a `Promise`, although actions are not always async. That's an
 			// unfortunate backward compatibility measure.
-			function bindAction( action ) {
-				return ( ...args ) =>
+			function bindAction( action: ( ...args: any[] ) => any ) {
+				return ( ...args: unknown[] ) =>
 					Promise.resolve( store.dispatch( action( ...args ) ) );
 			}
 
@@ -232,7 +277,10 @@ export default function createReduxStore( key, options ) {
 			 * Object with all public actions, both metadata and store actions.
 			 */
 			const actions = {
-				...mapValues( metadataActions, bindAction ),
+				...mapValues(
+					metadataActions as Record< string, ActionCreator >,
+					bindAction
+				),
 				...mapValues( options.actions, bindAction ),
 			};
 
@@ -253,8 +301,10 @@ export default function createReduxStore( key, options ) {
 			// correspond to bound registered actions, both public and private. Implemented with the proxy
 			// `get` method, delegating to `allActions`.
 			const thunkDispatch = new Proxy(
-				( action ) => store.dispatch( action ),
-				{ get: ( target, name ) => allActions[ name ] }
+				( action: any ) => store.dispatch( action ),
+				{
+					get: ( _target, name: string ) => allActions[ name ],
+				}
 			);
 
 			// To the public `actions` object, add the "locked" `allActions` object. When used,
@@ -262,17 +312,24 @@ export default function createReduxStore( key, options ) {
 			lock( actions, allActions );
 
 			// If we have selector resolvers, convert them to a normalized form.
-			const resolvers = options.resolvers
-				? mapValues( options.resolvers, mapResolver )
-				: {};
+			const resolvers: Record< string, NormalizedResolver > =
+				options.resolvers
+					? mapValues(
+							options.resolvers as Record< string, any >,
+							mapResolver
+					  )
+					: {};
 
 			// Bind a selector to the store. Call the selector with the current state, correct registry,
 			// and if there is a resolver, attach the resolver logic to the selector.
-			function bindSelector( selector, selectorName ) {
+			function bindSelector(
+				selector: SelectorLike,
+				selectorName: string
+			): SelectorLike {
 				if ( selector.isRegistrySelector ) {
 					selector.registry = registry;
 				}
-				const boundSelector = ( ...args ) => {
+				const boundSelector: SelectorLike = ( ...args: any[] ) => {
 					args = normalize( selector, args );
 					const state = store.__unstableOriginalGetState();
 					// Before calling the selector, switch to the correct registry.
@@ -307,16 +364,19 @@ export default function createReduxStore( key, options ) {
 
 			// Metadata selectors are bound differently: different state (`state.metadata`), no resolvers,
 			// normalization depending on the target selector.
-			function bindMetadataSelector( metaDataSelector ) {
-				const boundSelector = (
-					selectorName,
-					selectorArgs,
-					...args
+			function bindMetadataSelector(
+				metaDataSelector: ( ...args: any[] ) => any
+			): SelectorLike {
+				const boundSelector: SelectorLike = (
+					selectorName: string,
+					selectorArgs: unknown[],
+					...args: unknown[]
 				) => {
 					// Normalize the arguments passed to the target selector.
 					if ( selectorName ) {
-						const targetSelector =
-							options.selectors?.[ selectorName ];
+						const targetSelector = ( options.selectors as any )?.[
+							selectorName
+						];
 						if ( targetSelector ) {
 							selectorArgs = normalize(
 								targetSelector,
@@ -341,18 +401,24 @@ export default function createReduxStore( key, options ) {
 			// Perform binding of both metadata and store selectors and combine them in one
 			// `selectors` object. These are all public selectors of the store.
 			const boundMetadataSelectors = mapValues(
-				metadataSelectors,
+				metadataSelectors as Record<
+					string,
+					( ...args: any[] ) => any
+				>,
 				bindMetadataSelector
 			);
 
-			const boundSelectors = mapValues( options.selectors, bindSelector );
+			const boundSelectors = mapValues(
+				options.selectors as Record< string, SelectorLike > | undefined,
+				bindSelector
+			);
 
 			const selectors = {
 				...boundMetadataSelectors,
 				...boundSelectors,
 			};
 
-			// Cache of bould private selectors. They are bound only when first accessed, because
+			// Cache of bound private selectors. They are bound only when first accessed, because
 			// new private selectors can be registered at any time (with `registerPrivateSelectors`).
 			// Once bound, they are cached to give them a stable identity.
 			const boundPrivateSelectors = createBindingCache(
@@ -376,8 +442,11 @@ export default function createReduxStore( key, options ) {
 			// correspond to bound registered selectors, both public and private. Implemented with the proxy
 			// `get` method, delegating to `allSelectors`.
 			const thunkSelect = new Proxy(
-				( selector ) => selector( store.__unstableOriginalGetState() ),
-				{ get: ( target, name ) => allSelectors[ name ] }
+				( selector: ( state: any ) => any ) =>
+					selector( store.__unstableOriginalGetState() ),
+				{
+					get: ( _target, name: string ) => allSelectors[ name ],
+				}
 			);
 
 			// To the public `selectors` object, add the "locked" `allSelectors` object. When used,
@@ -401,7 +470,10 @@ export default function createReduxStore( key, options ) {
 			const allResolveSelectors = createPrivateProxy(
 				resolveSelectors,
 				createBindingCache(
-					( name ) => boundPrivateSelectors.get( name ),
+					( name ) =>
+						boundPrivateSelectors.get( name ) as (
+							...args: any[]
+						) => any | undefined,
 					bindResolveSelector
 				)
 			);
@@ -424,7 +496,10 @@ export default function createReduxStore( key, options ) {
 			const allSuspendSelectors = createPrivateProxy(
 				suspendSelectors,
 				createBindingCache(
-					( name ) => boundPrivateSelectors.get( name ),
+					( name ) =>
+						boundPrivateSelectors.get( name ) as (
+							...args: any[]
+						) => any | undefined,
 					bindSuspendSelector
 				)
 			);
@@ -445,13 +520,11 @@ export default function createReduxStore( key, options ) {
 
 			// Customize subscribe behavior to call listeners only on effective change,
 			// not on every dispatch.
-			const subscribe =
-				store &&
-				( ( listener ) => {
-					listeners.add( listener );
+			const subscribe = ( listener: ListenerFunction ) => {
+				listeners.add( listener );
 
-					return () => listeners.delete( listener );
-				} );
+				return () => listeners.delete( listener );
+			};
 
 			let lastState = store.__unstableOriginalGetState();
 			store.subscribe( () => {
@@ -488,27 +561,34 @@ export default function createReduxStore( key, options ) {
 	// public actions and selectors are stored.
 	lock( storeDescriptor, privateRegistrationFunctions );
 
-	return storeDescriptor;
+	return storeDescriptor as unknown as StoreDescriptor<
+		ReduxStoreConfig< State, Actions, Selectors >
+	>;
 }
 
 /**
  * Creates a redux store for a namespace.
  *
- * @param {string}       key       Unique namespace identifier.
- * @param {Object}       options   Registered store options, with properties
- *                                 describing reducer, actions, selectors,
- *                                 and resolvers.
- * @param {DataRegistry} registry  Registry reference.
- * @param {Object}       thunkArgs Argument object for the thunk middleware.
- * @return {Object} Newly created redux store.
+ * @param key       Unique namespace identifier.
+ * @param options   Registered store options, with properties
+ *                  describing reducer, actions, selectors,
+ *                  and resolvers.
+ * @param registry  Registry reference.
+ * @param thunkArgs Argument object for the thunk middleware.
+ * @return Newly created redux store.
  */
-function instantiateReduxStore( key, options, registry, thunkArgs ) {
+function instantiateReduxStore(
+	key: string,
+	options: ReduxStoreConfig< any, any, any >,
+	registry: DataRegistry,
+	thunkArgs: unknown
+): ReduxStore {
 	const controls = {
 		...options.controls,
 		...builtinControls,
 	};
 
-	const normalizedControls = mapValues( controls, ( control ) =>
+	const normalizedControls = mapValues( controls, ( control: any ) =>
 		control.isRegistryControl ? control( registry ) : control
 	);
 
@@ -519,13 +599,13 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
 		createThunkMiddleware( thunkArgs ),
 	];
 
-	const enhancers = [ applyMiddleware( ...middlewares ) ];
+	const enhancers: StoreEnhancer[] = [ applyMiddleware( ...middlewares ) ];
 	if (
 		typeof window !== 'undefined' &&
-		window.__REDUX_DEVTOOLS_EXTENSION__
+		( window as any ).__REDUX_DEVTOOLS_EXTENSION__
 	) {
 		enhancers.push(
-			window.__REDUX_DEVTOOLS_EXTENSION__( {
+			( window as any ).__REDUX_DEVTOOLS_EXTENSION__( {
 				name: key,
 				instanceId: key,
 				serialize: {
@@ -543,28 +623,31 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
 
 	return createStore(
 		enhancedReducer,
-		{ root: initialState },
-		compose( enhancers )
+		{ root: initialState } as any,
+		compose( ...enhancers ) as unknown as StoreEnhancer
 	);
 }
 
 /**
  * Maps selectors to functions that return a resolution promise for them.
  *
- * @param {Object} store                  The redux store the selectors are bound to.
- * @param {Object} boundMetadataSelectors The bound metadata selectors.
+ * @param store                  The redux store the selectors are bound to.
+ * @param boundMetadataSelectors The bound metadata selectors.
  *
- * @return {Function} Function that maps selectors to resolvers.
+ * @return Function that maps selectors to resolvers.
  */
-function mapResolveSelector( store, boundMetadataSelectors ) {
-	return ( selector, selectorName ) => {
+function mapResolveSelector(
+	store: ReduxStore,
+	boundMetadataSelectors: Record< string, SelectorLike >
+) {
+	return ( selector: SelectorLike, selectorName: string ) => {
 		// If the selector doesn't have a resolver, just convert the return value
 		// (including exceptions) to a Promise, no additional extra behavior is needed.
 		if ( ! selector.hasResolver ) {
-			return async ( ...args ) => selector.apply( null, args );
+			return async ( ...args: unknown[] ) => selector( ...args );
 		}
 
-		return ( ...args ) =>
+		return ( ...args: unknown[] ) =>
 			new Promise( ( resolve, reject ) => {
 				const hasFinished = () => {
 					return boundMetadataSelectors.hasFinishedResolution(
@@ -572,7 +655,7 @@ function mapResolveSelector( store, boundMetadataSelectors ) {
 						args
 					);
 				};
-				const finalize = ( result ) => {
+				const finalize = ( result: unknown ) => {
 					const hasFailed =
 						boundMetadataSelectors.hasResolutionFailed(
 							selectorName,
@@ -588,7 +671,7 @@ function mapResolveSelector( store, boundMetadataSelectors ) {
 						resolve( result );
 					}
 				};
-				const getResult = () => selector.apply( null, args );
+				const getResult = () => selector( ...args );
 
 				// Trigger the selector (to trigger the resolver)
 				const result = getResult();
@@ -609,20 +692,23 @@ function mapResolveSelector( store, boundMetadataSelectors ) {
 /**
  * Maps selectors to functions that throw a suspense promise if not yet resolved.
  *
- * @param {Object} store                  The redux store the selectors select from.
- * @param {Object} boundMetadataSelectors The bound metadata selectors.
+ * @param store                  The redux store the selectors select from.
+ * @param boundMetadataSelectors The bound metadata selectors.
  *
- * @return {Function} Function that maps selectors to their suspending versions.
+ * @return Function that maps selectors to their suspending versions.
  */
-function mapSuspendSelector( store, boundMetadataSelectors ) {
-	return ( selector, selectorName ) => {
+function mapSuspendSelector(
+	store: ReduxStore,
+	boundMetadataSelectors: Record< string, SelectorLike >
+) {
+	return ( selector: SelectorLike, selectorName: string ) => {
 		// Selector without a resolver doesn't have any extra suspense behavior.
 		if ( ! selector.hasResolver ) {
 			return selector;
 		}
 
-		return ( ...args ) => {
-			const result = selector.apply( null, args );
+		return ( ...args: unknown[] ) => {
+			const result = selector( ...args );
 
 			if (
 				boundMetadataSelectors.hasFinishedResolution(
@@ -645,7 +731,7 @@ function mapSuspendSelector( store, boundMetadataSelectors ) {
 				return result;
 			}
 
-			throw new Promise( ( resolve ) => {
+			throw new Promise< void >( ( resolve ) => {
 				const unsubscribe = store.subscribe( () => {
 					if (
 						boundMetadataSelectors.hasFinishedResolution(
@@ -666,9 +752,9 @@ function mapSuspendSelector( store, boundMetadataSelectors ) {
  * Convert a resolver to a normalized form, an object with `fulfill` method and
  * optional methods like `isFulfilled`.
  *
- * @param {Function} resolver Resolver to convert
+ * @param resolver Resolver to convert
  */
-function mapResolver( resolver ) {
+function mapResolver( resolver: any ): NormalizedResolver {
 	if ( resolver.fulfill ) {
 		return resolver;
 	}
@@ -684,22 +770,22 @@ function mapResolver( resolver ) {
  * Resolvers are side effects invoked once per argument set of a given selector call,
  * used in ensuring that the data needs for the selector are satisfied.
  *
- * @param {Object} selector               The selector function to be bound.
- * @param {string} selectorName           The selector name.
- * @param {Object} resolver               Resolver to call.
- * @param {Object} store                  The redux store to which the resolvers should be mapped.
- * @param {Object} resolversCache         Resolvers Cache.
- * @param {Object} boundMetadataSelectors The bound metadata selectors.
+ * @param selector               The selector function to be bound.
+ * @param selectorName           The selector name.
+ * @param resolver               Resolver to call.
+ * @param store                  The redux store to which the resolvers should be mapped.
+ * @param resolversCache         Resolvers Cache.
+ * @param boundMetadataSelectors The bound metadata selectors.
  */
 function mapSelectorWithResolver(
-	selector,
-	selectorName,
-	resolver,
-	store,
-	resolversCache,
-	boundMetadataSelectors
-) {
-	function fulfillSelector( args ) {
+	selector: SelectorLike,
+	selectorName: string,
+	resolver: NormalizedResolver,
+	store: AugmentedReduxStore,
+	resolversCache: ResolversCache,
+	boundMetadataSelectors: Record< string, SelectorLike >
+): SelectorLike {
+	function fulfillSelector( args: unknown[] ): void {
 		if (
 			resolversCache.isRunning( selectorName, args ) ||
 			boundMetadataSelectors.hasStartedResolution( selectorName, args )
@@ -735,7 +821,7 @@ function mapSelectorWithResolver(
 		}, 0 );
 	}
 
-	const selectorResolver = ( ...args ) => {
+	const selectorResolver: SelectorLike = ( ...args: unknown[] ) => {
 		args = normalize( selector, args );
 		fulfillSelector( args );
 		return selector( ...args );
@@ -748,11 +834,11 @@ function mapSelectorWithResolver(
  * Applies selector's normalization function to the given arguments
  * if it exists.
  *
- * @param {Object} selector The selector potentially with a normalization method property.
- * @param {Array}  args     selector arguments to normalize.
- * @return {Array} Potentially normalized arguments.
+ * @param selector The selector potentially with a normalization method property.
+ * @param args     selector arguments to normalize.
+ * @return Potentially normalized arguments.
  */
-function normalize( selector, args ) {
+function normalize( selector: SelectorLike, args: unknown[] ): unknown[] {
 	if (
 		selector.__unstableNormalizeArgs &&
 		typeof selector.__unstableNormalizeArgs === 'function' &&
