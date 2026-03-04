@@ -26,6 +26,14 @@ export interface LinkProps extends Omit< ComponentProps< 'a' >, 'href' > {
 	tone?: 'brand' | 'neutral';
 
 	/**
+	 * Whether to open the link in a new browser tab.
+	 * When true, sets `target="_blank"` and `rel="noopener"`.
+	 *
+	 * @default false
+	 */
+	openInNewTab?: boolean;
+
+	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;

@@ -9,6 +9,7 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 		children,
 		variant = 'default',
 		tone = 'brand',
+		openInNewTab = false,
 		render,
 		className,
 		...props
@@ -27,6 +28,10 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 				className
 			),
 			children,
+			...( openInNewTab && {
+				target: '_blank',
+				rel: 'noopener',
+			} ),
 		} ),
 	} );
 
