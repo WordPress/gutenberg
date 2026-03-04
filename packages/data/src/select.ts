@@ -9,6 +9,9 @@ import defaultRegistry from './default-registry';
  * The selector functions are been pre-bound to pass the current state automatically.
  * As a consumer, you need only pass arguments of the selector, if applicable.
  *
+ * Warning: This global `select` function only works with the default registry.
+ * It will not work with custom `RegistryProvider` or `BlockEditorProvider` contexts.
+ * In React components, prefer the `useSelect` hook instead, which is registry-aware.
  *
  * @param storeNameOrDescriptor The store descriptor. The legacy calling convention
  *                              of passing the store name is also supported.
