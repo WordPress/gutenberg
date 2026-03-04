@@ -1762,11 +1762,23 @@ async function buildAll( baseUrlExpression ) {
 			id: page.id,
 			init: page.init || [],
 			title: page.title || undefined,
+			experimental: page.experimental || false,
 		};
 	} );
 
-	const pageData = normalizedPages.map( ( page ) => {
-		const pageRoutes = routes.filter( ( r ) => r.page === page.id );
+	// When building for WordPress Core, exclude experimental pages.
+	const isCoreBuild = Boolean(
+		process.env.npm_package_config_IS_WORDPRESS_CORE
+	);
+	const activePages = isCoreBuild
+		? normalizedPages.filter( ( page ) => ! page.experimental )
+		: normalizedPages;
+
+	const activePageIds = new Set( activePages.map( ( p ) => p.id ) );
+	const activeRoutes = routes.filter( ( r ) => activePageIds.has( r.page ) );
+
+	const pageData = activePages.map( ( page ) => {
+		const pageRoutes = activeRoutes.filter( ( r ) => r.page === page.id );
 		return {
 			slug: page.id,
 			routes: pageRoutes,
@@ -1831,8 +1843,8 @@ async function buildAll( baseUrlExpression ) {
 		generateScriptRegistrationPhp( scripts, phpReplacements ),
 		generateStyleRegistrationPhp( styles, phpReplacements ),
 		generateConstantsPhp( phpReplacements ),
-		generateRoutesRegistry( routes, phpReplacements ),
-		generateRoutesPhp( routes, phpReplacements ),
+		generateRoutesRegistry( activeRoutes, phpReplacements ),
+		generateRoutesPhp( activeRoutes, phpReplacements ),
 		generatePagesPhp( pageData, phpReplacements ),
 	] );
 	console.log( '   ✔ Generated build/build.php' );
