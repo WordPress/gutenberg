@@ -35,6 +35,7 @@ import {
 	pageTitleField,
 	patternTitleField,
 	notesField,
+	scheduledDateField,
 } from '@wordpress/fields';
 import {
 	altTextField,
@@ -267,6 +268,7 @@ export const registerPostTypeSchema =
 					discussionField,
 				templateField,
 				passwordField,
+				scheduledDateField,
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,
