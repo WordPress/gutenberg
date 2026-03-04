@@ -1197,14 +1197,9 @@ export const getRevision =
 		);
 
 		try {
-			const cached = select.getRevision(
-				kind,
-				name,
-				recordKey,
-				revisionKey,
-				query
-			);
-			if ( cached !== undefined ) {
+			if (
+				select.hasRevision( kind, name, recordKey, revisionKey, query )
+			) {
 				return;
 			}
 
