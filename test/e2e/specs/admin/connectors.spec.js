@@ -4,7 +4,7 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const SETTINGS_PAGE_PATH = 'options-general.php';
-const CONNECTORS_PAGE_QUERY = 'page=connectors-wp-admin';
+const CONNECTORS_PAGE_QUERY = 'page=options-connectors-wp-admin';
 
 const CONNECTORS = [
 	{
