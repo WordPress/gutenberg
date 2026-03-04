@@ -101,9 +101,9 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 		 * Load the real-time collaboration setting and, when enabled, ensure that an
 		 * an autosave revision is always targeted.
 		 */
-		$is_collaboration_enabled = get_option( 'wp_enable_real_time_collaboration' );
+		$is_collaboration_disabled = boolval( get_option( 'wp_disable_real_time_collaboration' ) );
 
-		if ( $is_draft && (int) $post->post_author === $user_id && ! $post_lock && ! $is_collaboration_enabled ) {
+		if ( $is_draft && (int) $post->post_author === $user_id && ! $post_lock && $is_collaboration_disabled ) {
 			/*
 			 * Draft posts for the same author: autosaving updates the post and does not create a revision.
 			 * Convert the post object to an array and add slashes, wp_update_post() expects escaped array.

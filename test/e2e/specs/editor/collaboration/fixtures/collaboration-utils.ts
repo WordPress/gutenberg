@@ -66,14 +66,15 @@ export default class CollaborationUtils {
 		const html = await response.text();
 		const nonce = html.match( /name="_wpnonce" value="([^"]+)"/ )![ 1 ];
 
-		// WordPress core (7.0+) uses 'enable_real_time_collaboration',
-		// while the Gutenberg plugin uses 'wp_enable_real_time_collaboration'.
-		// Detect which field name is present on the page.
-		const optionName = html.includes(
-			'name="enable_real_time_collaboration"'
-		)
-			? 'enable_real_time_collaboration'
-			: 'wp_enable_real_time_collaboration';
+		// WordPress Core Beta 3 switched from 'wp_enable_real_time_collaboration' to
+		// 'wp_disable_real_time_collaboration' (with flipped boolean values). Detect
+		// which field name is present on the page.
+		let optionName = 'wp_disable_real_time_collaboration';
+		let optionValue = enabled ? 0 : 1;
+		if ( html.includes( 'name="wp_enable_real_time_collaboration"' ) ) {
+			optionName = 'wp_enable_real_time_collaboration';
+			optionValue = enabled ? 1 : 0;
+		}
 
 		const formData: Record< string, string | number > = {
 			option_page: 'writing',
@@ -85,9 +86,7 @@ export default class CollaborationUtils {
 			default_post_format: 0,
 		};
 
-		if ( enabled ) {
-			formData[ optionName ] = 1;
-		}
+		formData[ optionName ] = optionValue;
 
 		await this.requestUtils.request.post( '/wp-admin/options.php', {
 			form: formData,
@@ -355,7 +354,6 @@ export default class CollaborationUtils {
 			this.secondPage = null;
 			this.secondEditor = null;
 		}
-		await this.setCollaboration( false );
 		await this.requestUtils.deleteAllUsers();
 	}
 }
