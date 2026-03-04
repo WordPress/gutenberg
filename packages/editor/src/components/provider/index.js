@@ -36,6 +36,7 @@ import NavigationBlockEditingMode from './navigation-block-editing-mode';
 import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
 import useCommands from '../commands';
 import useUploadSaveLock from './use-upload-save-lock';
+import useInvalidateMediaAfterUpload from './use-invalidate-media-after-upload';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
@@ -382,6 +383,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 		// Lock post saving when media uploads are in progress (experimental feature).
 		useUploadSaveLock();
+
+		// Invalidate attachment entities after uploads complete so blocks see updated data.
+		useInvalidateMediaAfterUpload();
 
 		if ( ! isReady || ! mode ) {
 			return null;
