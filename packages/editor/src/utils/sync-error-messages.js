@@ -8,31 +8,36 @@ import { __ } from '@wordpress/i18n';
  */
 const ERROR_MESSAGES = {
 	'authentication-failed': {
-		title: __( 'Authentication Failed' ),
+		title: __( 'Unable to connect' ),
 		description: __(
-			'Authentication with the collaborative editing server failed. ' +
-				'Please verify that you have the necessary permissions.'
+			"Real-time collaboration couldn't verify your permissions. " +
+				'Check that you have access to edit this post, or contact your site administrator.'
 		),
+		canRetry: false,
 	},
 	'connection-expired': {
-		title: __( 'Connection Expired' ),
+		title: __( 'Connection expired' ),
 		description: __(
-			'The connection to the collaborative editing server has expired.'
+			'Your connection to real-time collaboration has timed out. ' +
+				'Editing is paused to prevent conflicts with other editors.'
 		),
+		canRetry: true,
 	},
 	'connection-limit-exceeded': {
-		title: __( 'Connection Limit Exceeded' ),
+		title: __( 'Too many editors connected' ),
 		description: __(
-			'The collaborative editing server has reached its maximum connection capacity. ' +
-				'Please try again later or contact your site administrator.'
+			'Real-time collaboration has reached its connection limit. ' +
+				'Try again later or contact your site administrator.'
 		),
+		canRetry: true,
 	},
 	'unknown-error': {
-		title: __( 'Disconnected' ),
+		title: __( 'Connection lost' ),
 		description: __(
-			'You are currently disconnected from the collaborative editing server. ' +
-				'Editing is temporarily disabled to prevent conflicts.'
+			'The connection to real-time collaboration was interrupted. ' +
+				'Editing is paused to prevent conflicts with other editors.'
 		),
+		canRetry: true,
 	},
 };
 
@@ -42,7 +47,7 @@ const ERROR_MESSAGES = {
  * Provides default messages based on error.code.
  *
  * @param {Object} error - Connection error object.
- * @return {Object} Object with title and description strings.
+ * @return {Object} Object with title, description, and canRetry flag.
  */
 export function getSyncErrorMessages( error ) {
 	if ( ERROR_MESSAGES[ error?.code ] ) {

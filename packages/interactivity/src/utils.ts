@@ -25,7 +25,11 @@ interface Flusher {
 declare global {
 	interface Window {
 		scheduler?: {
-			readonly yield?: () => Promise< void >;
+			postTask: (
+				callback: () => unknown,
+				options?: object
+			) => Promise< unknown >;
+			yield: () => Promise< void >;
 		};
 	}
 }

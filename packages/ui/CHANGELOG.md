@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.8.0 (2026-03-04)
+
+### Breaking Changes
+
+-   `InputLayout`: Remove the `type` prop from `InputLayout.Slot` ([#76011](https://github.com/WordPress/gutenberg/pull/76011)).
+
 ### New Features
 
 -   Add `Notice` primitive ([#75981](https://github.com/WordPress/gutenberg/pull/75981)).

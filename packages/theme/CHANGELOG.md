@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.0 (2026-03-04)
+
 ### New Features
 
 -   Added PostCSS, esbuild, and Vite build plugins that inject fallback values for design system tokens (`--wpds-*`). Available as package exports: `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks`, `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`, `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks` ([#75589](https://github.com/WordPress/gutenberg/pull/75589)).
