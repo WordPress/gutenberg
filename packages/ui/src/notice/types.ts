@@ -47,7 +47,7 @@ export interface TitleProps extends ComponentProps< 'span' > {
 	children?: ReactNode;
 }
 
-export interface DescriptionProps extends ComponentProps< 'div' > {
+export interface DescriptionProps extends ComponentProps< 'span' > {
 	/**
 	 * The description text of the notice.
 	 */

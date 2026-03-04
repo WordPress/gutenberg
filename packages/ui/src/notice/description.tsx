@@ -7,16 +7,15 @@ import styles from './style.module.css';
 /**
  * The description text for a notice.
  */
-export const Description = forwardRef< HTMLDivElement, DescriptionProps >(
-	function NoticeDescription( { className, children, ...props }, ref ) {
+export const Description = forwardRef< HTMLSpanElement, DescriptionProps >(
+	function NoticeDescription( { className, ...props }, ref ) {
 		return (
 			<Text
+				ref={ ref }
 				variant="body-md"
-				render={ <div ref={ ref } { ...props } /> }
 				className={ clsx( styles.description, className ) }
-			>
-				{ children }
-			</Text>
+				{ ...props }
+			/>
 		);
 	}
 );
