@@ -10,6 +10,7 @@ import { useEffect } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { store as siteEditorStore } from '../../store';
 import { homeRoute } from './home';
+import { siteLogoAndIconRoute } from './site-logo-and-icon';
 import { stylesRoute } from './styles';
 import { navigationRoute } from './navigation';
 import { navigationItemRoute } from './navigation-item';
@@ -35,6 +36,7 @@ const routes = [
 	patternsRoute,
 	navigationItemRoute,
 	navigationRoute,
+	siteLogoAndIconRoute,
 	stylesRoute,
 	homeRoute,
 	stylebookRoute,

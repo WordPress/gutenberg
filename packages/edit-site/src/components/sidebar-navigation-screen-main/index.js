@@ -3,7 +3,14 @@
  */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { layout, symbol, navigation, styles, page } from '@wordpress/icons';
+import {
+	layout,
+	symbol,
+	navigation,
+	styles,
+	page,
+	siteLogo,
+} from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -13,6 +20,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
+import { SidebarNavigationItemSiteLogoAndIcon } from '../sidebar-navigation-screen-site-logo-and-icon';
 
 export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 	return (
@@ -34,6 +42,13 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 					>
 						{ __( 'Navigation' ) }
 					</SidebarNavigationItem>
+					<SidebarNavigationItemSiteLogoAndIcon
+						to="/site-logo-and-icon"
+						uid="site-logo-and-icon-navigation-item"
+						icon={ siteLogo }
+					>
+						{ __( 'Site Logo & Icon' ) }
+					</SidebarNavigationItemSiteLogoAndIcon>
 					<SidebarNavigationItem
 						uid="page-navigation-item"
 						to="/page"

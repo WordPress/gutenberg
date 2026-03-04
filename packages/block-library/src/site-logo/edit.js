@@ -7,11 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
-import {
-	createInterpolateElement,
-	useEffect,
-	useState,
-} from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	RangeControl,
@@ -257,28 +253,8 @@ const SiteLogo = ( {
 		);
 	}
 
-	// Support the previous location for the Site Icon settings. To be removed
-	// when the required WP core version for Gutenberg is >= 6.5.0.
-	const shouldUseNewUrl = ! window?.__experimentalUseCustomizerSiteLogoUrl;
-
-	const siteIconSettingsUrl = shouldUseNewUrl
-		? siteUrl + '/wp-admin/options-general.php'
-		: siteUrl + '/wp-admin/customize.php?autofocus[section]=title_tagline';
-
-	const syncSiteIconHelpText = createInterpolateElement(
-		__(
-			'Site Icons are what you see in browser tabs, bookmark bars, and within the WordPress mobile apps. To use a custom icon that is different from your site logo, use the <a>Site Icon settings</a>.'
-		),
-		{
-			a: (
-				// eslint-disable-next-line jsx-a11y/anchor-has-content
-				<a
-					href={ siteIconSettingsUrl }
-					target="_blank"
-					rel="noopener noreferrer"
-				/>
-			),
-		}
+	const syncSiteIconHelpText = __(
+		'Site Icons are what you see in browser tabs, bookmark bars, and within the WordPress mobile apps.'
 	);
 
 	return (
