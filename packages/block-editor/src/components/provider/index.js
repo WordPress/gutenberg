@@ -148,10 +148,16 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 
 		const settings = useMemo( () => {
 			if ( isClientSideMediaEnabled && _settings?.mediaUpload ) {
-				// Create a new object so that the original props.settings.mediaUpload is not modified.
+				// Preserve the original server-side function. If _settings already
+				// has __unstableMediaUploadServer (from a parent provider), reuse it;
+				// otherwise use _settings.mediaUpload (the real function at root level).
+				const serverMediaUpload =
+					_settings.__unstableMediaUploadServer ||
+					_settings.mediaUpload;
 				return {
 					..._settings,
 					mediaUpload: mediaUpload.bind( null, registry ),
+					__unstableMediaUploadServer: serverMediaUpload,
 				};
 			}
 			return _settings;
