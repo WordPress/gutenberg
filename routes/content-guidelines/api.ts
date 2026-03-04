@@ -10,12 +10,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { STORE_NAME } from './store';
-
-interface RestGuidelinesResponse {
-	id: number;
-	status: string;
-	guideline_categories?: Record< string, { guidelines?: string } >;
-}
+import type { RestGuidelinesResponse } from './types';
 
 export async function fetchContentGuidelines(): Promise< RestGuidelinesResponse > {
 	const { setFromResponse } = dispatch( STORE_NAME ) as {

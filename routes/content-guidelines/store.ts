@@ -3,13 +3,12 @@
  */
 import { createReduxStore, register } from '@wordpress/data';
 
-export const STORE_NAME = 'core/content-guidelines';
+/**
+ * Internal dependencies
+ */
+import type { ContentGuidelinesState, RestGuidelinesResponse } from './types';
 
-export interface ContentGuidelinesState {
-	id: number | null;
-	status: string | null;
-	categories: Record< string, string >;
-}
+export const STORE_NAME = 'core/content-guidelines';
 
 const DEFAULT_STATE: ContentGuidelinesState = {
 	id: null,
@@ -20,7 +19,7 @@ const DEFAULT_STATE: ContentGuidelinesState = {
 const CATEGORIES = [ 'site', 'copy', 'images', 'additional' ];
 
 const actions = {
-	setFromResponse( response: unknown ) {
+	setFromResponse( response: RestGuidelinesResponse ) {
 		return {
 			type: 'SET_FROM_RESPONSE' as const,
 			response,
@@ -37,22 +36,18 @@ const actions = {
 
 type Action = ReturnType< ( typeof actions )[ keyof typeof actions ] >;
 
-function parseResponse( response: unknown ): Partial< ContentGuidelinesState > {
+function parseResponse(
+	response: RestGuidelinesResponse | null | undefined
+): Partial< ContentGuidelinesState > {
 	if ( ! response || typeof response !== 'object' ) {
 		return {};
 	}
 
-	const data = response as {
-		id?: unknown;
-		status?: unknown;
-		guideline_categories?: Record< string, { guidelines?: unknown } >;
-	};
-
-	const categoriesFromResponse = data.guideline_categories ?? {};
+	const categoriesFromResponse = response.guideline_categories ?? {};
 
 	const result = {
-		id: data.id as number | null,
-		status: data.status as string | null,
+		id: response.id ?? null,
+		status: response.status ?? null,
 		categories: {},
 	};
 

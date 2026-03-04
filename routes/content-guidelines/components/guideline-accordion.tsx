@@ -13,21 +13,12 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
-import type { ReactNode } from 'react';
 
 /**
  * Internal dependencies
  */
 import './guideline-accordion.scss';
-
-interface GuidelineAccordionProps {
-	title: string;
-	description: string;
-	children: ReactNode;
-	contentId?: string;
-	headingId?: string;
-	descriptionId?: string;
-}
+import type { GuidelineAccordionProps } from '../types';
 
 export default function GuidelineAccordion( {
 	title,

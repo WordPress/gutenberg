@@ -17,13 +17,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  */
 import { STORE_NAME } from '../store';
 import { saveContentGuidelines } from '../api';
-
-interface GuidelineAccordionFormProps {
-	slug: string;
-	contentId?: string; // Used for a11y.
-	headingId?: string; // Used for a11y.
-	descriptionId?: string;
-}
+import type { GuidelineAccordionFormProps } from '../types';
 
 export default function GuidelineAccordionForm( {
 	slug,
