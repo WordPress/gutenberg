@@ -311,17 +311,6 @@ const LayoutPanelComponent = ( {
 	applyLabel?: string;
 	cancelLabel?: string;
 } ) => {
-	let openAs: PanelLayout[ 'openAs' ];
-	if ( openAsArg === 'modalConfig' ) {
-		openAs = {
-			type: 'modal',
-			applyLabel: applyLabel || undefined,
-			cancelLabel: cancelLabel || undefined,
-		};
-	} else if ( openAsArg !== 'default' ) {
-		openAs = openAsArg;
-	}
-
 	const [ post, setPost ] = useState< SamplePost >( {
 		title: 'Hello, World!',
 		order: 2,
@@ -346,6 +335,17 @@ const LayoutPanelComponent = ( {
 	} );
 
 	const form: Form = useMemo( () => {
+		let openAs: PanelLayout[ 'openAs' ];
+		if ( openAsArg === 'modalConfig' ) {
+			openAs = {
+				type: 'modal',
+				applyLabel: applyLabel || undefined,
+				cancelLabel: cancelLabel || undefined,
+			};
+		} else if ( openAsArg !== 'default' ) {
+			openAs = openAsArg;
+		}
+
 		return {
 			layout: getPanelLayoutFromStoryArgs( {
 				labelPosition,
@@ -403,7 +403,7 @@ const LayoutPanelComponent = ( {
 				},
 			],
 		};
-	}, [ labelPosition, openAs, editVisibility ] );
+	}, [ labelPosition, openAsArg, applyLabel, cancelLabel, editVisibility ] );
 
 	return (
 		<DataForm< SamplePost >

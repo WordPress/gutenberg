@@ -185,7 +185,7 @@ describe( 'normalizeFormFields', () => {
 			} );
 		} );
 
-		it( 'panel: openAs string "modal" normalizes without labels', () => {
+		it( 'panel: openAs string "modal" stays as string', () => {
 			const form: Form = {
 				layout: { type: 'panel', openAs: 'modal' },
 				fields: [ 'field1' ],
@@ -200,7 +200,7 @@ describe( 'normalizeFormFields', () => {
 			} );
 		} );
 
-		it( 'panel: openAs object normalizes to string with labels', () => {
+		it( 'panel: openAs object preserves labels', () => {
 			const form: Form = {
 				layout: {
 					type: 'panel',
@@ -216,11 +216,13 @@ describe( 'normalizeFormFields', () => {
 			expect( result.layout ).toEqual( {
 				type: 'panel',
 				labelPosition: 'side',
-				openAs: 'modal',
+				openAs: {
+					type: 'modal',
+					applyLabel: 'Save',
+					cancelLabel: 'Dismiss',
+				},
 				summary: [],
 				editVisibility: 'on-hover',
-				applyLabel: 'Save',
-				cancelLabel: 'Dismiss',
 			} );
 		} );
 
@@ -236,7 +238,7 @@ describe( 'normalizeFormFields', () => {
 			expect( result.layout ).toEqual( {
 				type: 'panel',
 				labelPosition: 'side',
-				openAs: 'modal',
+				openAs: { type: 'modal' },
 				summary: [],
 				editVisibility: 'on-hover',
 			} );
