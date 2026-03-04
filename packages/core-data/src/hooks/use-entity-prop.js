@@ -8,6 +8,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { STORE_NAME } from '../name';
+import { DEFAULT_ENTITY_KEY } from '../entities';
 import { EntityContext } from '../entity-context';
 import useEntityId from './use-entity-id';
 
@@ -55,7 +56,7 @@ export default function useEntityProp( kind, name, prop, _id ) {
 					kind,
 					name
 				);
-				const revKey = entityConfig?.revisionKey || 'id';
+				const revKey = entityConfig?.revisionKey || DEFAULT_ENTITY_KEY;
 				const revision = revisions?.find(
 					( r ) => r[ revKey ] === revisionId
 				);

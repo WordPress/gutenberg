@@ -164,27 +164,20 @@ export default function RevisionsCanvas( { showDiff } ) {
 		};
 	}, [] );
 
-	const {
-		revision,
-		previousRevision,
-		postType,
-		currentRevisionId,
-		blockEditorSettings,
-	} = useSelect( ( select ) => {
-		const {
-			getCurrentRevision,
-			getCurrentRevisionId: getRevisionId,
-			getPreviousRevision,
-			getCurrentPostType,
-		} = unlock( select( editorStore ) );
-		return {
-			revision: getCurrentRevision(),
-			previousRevision: getPreviousRevision(),
-			postType: getCurrentPostType(),
-			currentRevisionId: getRevisionId(),
-			blockEditorSettings: select( blockEditorStore ).getSettings(),
-		};
-	}, [] );
+	const { revision, previousRevision, postType, blockEditorSettings } =
+		useSelect( ( select ) => {
+			const {
+				getCurrentRevision,
+				getPreviousRevision,
+				getCurrentPostType,
+			} = unlock( select( editorStore ) );
+			return {
+				revision: getCurrentRevision(),
+				previousRevision: getPreviousRevision(),
+				postType: getCurrentPostType(),
+				blockEditorSettings: select( blockEditorStore ).getSettings(),
+			};
+		}, [] );
 
 	// Track previously rendered blocks to preserve clientIds between renders.
 	const previousBlocksRef = useRef( [] );
@@ -242,7 +235,10 @@ export default function RevisionsCanvas( { showDiff } ) {
 	);
 
 	return revision ? (
-		<EntityProvider revisionId={ currentRevisionId }>
+		// EntityProvider without kind/type/id inherits those from the
+		// parent context. Only revisionId is added so that useEntityProp
+		// reads from the revision record instead of the current entity.
+		<EntityProvider revisionId={ revision.id }>
 			<ExperimentalBlockEditorProvider
 				value={ blocks }
 				settings={ settings }
