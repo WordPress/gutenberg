@@ -65,7 +65,12 @@ export default function GuidelineAccordion( {
 								className={ isOpen ? 'rotate-180' : 'rotate-0' }
 							/>
 						}
-						onClick={ () => setIsOpen( ! isOpen ) }
+						onClick={ (
+							event: React.MouseEvent< HTMLButtonElement >
+						) => {
+							event.stopPropagation();
+							setIsOpen( ! isOpen );
+						} }
 						aria-expanded={ isOpen }
 						aria-controls={ contentId }
 						aria-label={
