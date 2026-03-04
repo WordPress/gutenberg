@@ -17,7 +17,6 @@
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
-		"@wordpress/compose": "file:../../packages/compose",
 		"@wordpress/dataviews": "file:../../packages/dataviews",
 		"@wordpress/notices": "file:../../packages/notices",
 		"@wordpress/ui": "file:../../packages/ui"
