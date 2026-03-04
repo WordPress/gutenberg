@@ -13,7 +13,7 @@
 ### Enhancements
 
 -   `Dialog`: Add `--wp-ui-dialog-z-index` CSS custom property for legacy z-index compatibility ([#75874](https://github.com/WordPress/gutenberg/pull/75874)).
--   `Tooltip`: Change default `side` from `bottom` to `top`.
+-   `Tooltip`: Change default `side` from `bottom` to `top`. ([#76131](https://github.com/WordPress/gutenberg/pull/76131)).
 
 ### Bug Fixes
 
