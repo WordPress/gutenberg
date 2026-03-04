@@ -6,10 +6,22 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 const SETTINGS_PAGE_PATH = 'options-general.php';
 const CONNECTORS_PAGE_QUERY = 'page=connectors-wp-admin';
 
-const CONNECTOR_SLUGS = [
-	'ai-provider-for-openai',
-	'ai-provider-for-anthropic',
-	'ai-provider-for-google',
+const CONNECTORS = [
+	{
+		slug: 'ai-provider-for-openai',
+		name: 'OpenAI',
+		description: 'Text and image generation with GPT and Dall-E.',
+	},
+	{
+		slug: 'ai-provider-for-anthropic',
+		name: 'Anthropic',
+		description: 'Text generation with Claude.',
+	},
+	{
+		slug: 'ai-provider-for-google',
+		name: 'Google',
+		description: 'Text and image generation with Gemini and Imagen.',
+	},
 ];
 
 test.describe( 'Connectors', () => {
@@ -41,10 +53,14 @@ test.describe( 'Connectors', () => {
 			page.getByRole( 'heading', { name: 'Connectors' } )
 		).toBeVisible();
 
-		// Verify each connector card has an Install button.
-		for ( const slug of CONNECTOR_SLUGS ) {
+		// Verify each connector card shows name, description, and Install button.
+		for ( const { slug, name, description } of CONNECTORS ) {
 			const card = page.locator( `.connector-item--${ slug }` );
 			await expect( card ).toBeVisible();
+			await expect(
+				card.getByText( name, { exact: true } )
+			).toBeVisible();
+			await expect( card.getByText( description ) ).toBeVisible();
 			await expect(
 				card.getByRole( 'button', { name: 'Install' } )
 			).toBeVisible();
@@ -98,7 +114,7 @@ test.describe( 'Connectors', () => {
 					CONNECTORS_PAGE_QUERY
 				);
 
-				for ( const slug of CONNECTOR_SLUGS ) {
+				for ( const { slug } of CONNECTORS ) {
 					const card = page.locator( `.connector-item--${ slug }` );
 					await expect( card ).toBeVisible();
 					await expect(
