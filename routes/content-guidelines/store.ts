@@ -75,7 +75,7 @@ function parseResponse(
 		},
 	};
 
-	CATEGORIES.forEach( ( category ) => {
+	FLAT_CATEGORIES.forEach( ( category ) => {
 		const guidelines = categoriesFromResponse?.[ category ]?.guidelines;
 		if ( typeof guidelines === 'string' ) {
 			result.categories[ category ] = guidelines;

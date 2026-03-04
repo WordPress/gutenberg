@@ -28,6 +28,10 @@ export interface RestGuidelinesResponse {
 	guideline_categories?: Record< string, BlockGuideline >;
 }
 
+export interface GuidelinesImportData {
+	guideline_categories: Record< string, { guidelines?: string } >;
+}
+
 export interface GuidelineAccordionProps {
 	title: string;
 	description: string;

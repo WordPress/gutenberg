@@ -10,6 +10,12 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useRef, useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { importContentGuidelines, exportContentGuidelines } from '../api';
 
 const ACTIONS = [
 	{
@@ -45,11 +51,59 @@ const ACTIONS = [
 ];
 
 export default function ActionsSection() {
+	const fileInputRef = useRef< HTMLInputElement >( null );
+	const [ isImporting, setIsImporting ] = useState( false );
+
+	function handleImportClick() {
+		fileInputRef.current?.click();
+	}
+
+	async function handleFileChange(
+		event: React.ChangeEvent< HTMLInputElement >
+	) {
+		const file = event.target.files?.[ 0 ];
+		if ( ! file ) {
+			return;
+		}
+		event.target.value = ''; // allow re-importing the same file
+		setIsImporting( true );
+		try {
+			await importContentGuidelines( file );
+		} finally {
+			setIsImporting( false );
+		}
+	}
+
+	function handleExportClick() {
+		exportContentGuidelines();
+	}
+
+	const buttonProps: Partial<
+		Record<
+			string,
+			{ onClick: () => void; isBusy?: boolean; disabled?: boolean }
+		>
+	> = {
+		import: {
+			onClick: handleImportClick,
+			isBusy: isImporting,
+			disabled: isImporting,
+		},
+		export: { onClick: handleExportClick },
+	};
+
 	return (
 		<VStack spacing={ 3 } className="content-guidelines__actions">
 			<Heading level={ 2 } size={ 15 } weight={ 600 }>
 				{ __( 'Actions' ) }
 			</Heading>
+			<input
+				type="file"
+				accept=".json"
+				ref={ fileInputRef }
+				onChange={ handleFileChange }
+				style={ { display: 'none' } }
+			/>
 			<Card className="content-guidelines__actions-card">
 				{ /*
 				 * Disable reason: The `list` ARIA role is redundant but
@@ -94,6 +148,8 @@ export default function ActionsSection() {
 										__next40pxDefaultSize
 										aria-label={ action.ariaLabel }
 										aria-describedby={ descriptionId }
+										{ ...( buttonProps[ action.slug ] ??
+											{} ) }
 									>
 										{ action.buttonLabel }
 									</Button>
