@@ -19,7 +19,7 @@ import { test, expect } from './fixtures';
  * With initialVdomPromise: router awaits the promise ->
  * hydrateRegions() runs normally -> all bindings attached.
  */
-test.describe( 'Interactivity API router hydration race condition', () => {
+test.describe( 'Interactivity API router hydration race condition (@webkit, @firefox)', () => {
 	test.beforeAll( async ( { interactivityUtils: utils } ) => {
 		await utils.activatePlugins();
 		await utils.addPostWithBlock( 'test/router-race-condition', {
