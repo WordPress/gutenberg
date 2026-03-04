@@ -76,7 +76,7 @@ jobs:
               run: npm run lint:js -- --format compact
 
             - name: Lint Styles
-              run: npm run lint:css -- --formatter github
+              run: npm run lint:css -- --formatter compact
 
             - name: Type checking
               run: npm run build
