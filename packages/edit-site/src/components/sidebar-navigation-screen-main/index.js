@@ -47,7 +47,7 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 						uid="site-logo-and-icon-navigation-item"
 						icon={ siteLogo }
 					>
-						{ __( 'Site Logo & Icon' ) }
+						{ __( 'Identity' ) }
 					</SidebarNavigationItemSiteLogoAndIcon>
 					<SidebarNavigationItem
 						uid="page-navigation-item"

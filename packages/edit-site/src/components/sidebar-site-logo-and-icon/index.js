@@ -14,27 +14,27 @@ const fields = [
 		id: 'site_logo',
 		type: 'media',
 		label: __( 'Site Logo' ),
-		description: __( 'Upload a logo to display in the Site Logo block.' ),
+		description: __(
+			"Displays in your site's layout via the Site Logo block."
+		),
+		placeholder: __( 'Choose logo' ),
 		Edit: MediaEdit,
 		setValue: ( { value } ) => ( {
 			site_logo: value ?? 0,
 		} ),
-		enableSorting: false,
-		filterBy: false,
 	},
 	{
 		id: 'site_icon',
 		type: 'media',
 		label: __( 'Site Icon' ),
 		description: __(
-			'Site Icons are what you see in browser tabs, bookmark bars, and within the WordPress mobile apps. It should be square and at least 512 by 512 pixels.'
+			'Shown in browser tabs, bookmarks, and mobile apps. It should be square and at least 512 by 512 pixels.'
 		),
+		placeholder: __( 'Choose icon' ),
 		Edit: MediaEdit,
 		setValue: ( { value } ) => ( {
 			site_icon: value ?? 0,
 		} ),
-		enableSorting: false,
-		filterBy: false,
 	},
 ];
 
@@ -67,7 +67,13 @@ export default function SidebarSiteLogoAndIcon() {
 	};
 
 	return (
-		<Page title={ __( 'Site Logo & Icon' ) } hasPadding>
+		<Page
+			title={ __( 'Identity' ) }
+			subTitle={ __(
+				"Your site logo and icon help visitors recognize your brand across the web. The logo appears in your site's layout wherever the Site Logo block is placed. The icon shows in browser tabs, bookmarks, and mobile app shortcuts."
+			) }
+			hasPadding
+		>
 			<DataForm
 				data={ data }
 				fields={ fields }
