@@ -36,8 +36,8 @@ jobs:
 
                 include:
                     # Only generate annotations once.
-                    - node: ['24']
-                      os: ['ubuntu-24.04']
+                    - node: '24'
+                      os: 'ubuntu-24.04'
                       annotations: true
                 exclude:
                     # On PRs: Only test Node 20 on Ubuntu and Windows
