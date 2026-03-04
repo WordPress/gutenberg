@@ -13,8 +13,8 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock, parse } from '@wordpress/blocks';
 import { EntityProvider } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useSelect, useRegistry } from '@wordpress/data';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -164,20 +164,23 @@ export default function RevisionsCanvas( { showDiff } ) {
 		};
 	}, [] );
 
-	const { revision, previousRevision, postType, blockEditorSettings } =
-		useSelect( ( select ) => {
-			const {
-				getCurrentRevision,
-				getPreviousRevision,
-				getCurrentPostType,
-			} = unlock( select( editorStore ) );
-			return {
-				revision: getCurrentRevision(),
-				previousRevision: getPreviousRevision(),
-				postType: getCurrentPostType(),
-				blockEditorSettings: select( blockEditorStore ).getSettings(),
-			};
-		}, [] );
+	const { revision, previousRevision, postType } = useSelect( ( select ) => {
+		const { getCurrentRevision, getPreviousRevision, getCurrentPostType } =
+			unlock( select( editorStore ) );
+		return {
+			revision: getCurrentRevision(),
+			previousRevision: getPreviousRevision(),
+			postType: getCurrentPostType(),
+		};
+	}, [] );
+
+	// Capture block editor settings once on mount to avoid a feedback loop
+	// when useSubRegistry={false}: the provider writes settings back to the
+	// same store, which would re-trigger useSelect and create an infinite loop.
+	const registry = useRegistry();
+	const [ blockEditorSettings ] = useState( () =>
+		registry.select( blockEditorStore ).getSettings()
+	);
 
 	// Track previously rendered blocks to preserve clientIds between renders.
 	const previousBlocksRef = useRef( [] );
@@ -242,6 +245,9 @@ export default function RevisionsCanvas( { showDiff } ) {
 			<ExperimentalBlockEditorProvider
 				value={ blocks }
 				settings={ settings }
+				// Since we take over the whole editor, we can take over the global
+				// registry which would be similar to a new screen/route.
+				useSubRegistry={ false }
 			>
 				<DiffStyleOverrides showDiff={ showDiff } />
 				<div className="editor-revisions-canvas__content">

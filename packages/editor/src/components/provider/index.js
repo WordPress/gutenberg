@@ -177,6 +177,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			mode,
 			defaultMode,
 			postTypeEntities,
+			isInRevisionsMode,
 		} = useSelect(
 			( select ) => {
 				const {
@@ -184,6 +185,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					getRenderingMode,
 					__unstableIsEditorReady,
 					getDefaultRenderingMode,
+					isRevisionsMode: _isRevisionsMode,
 				} = unlock( select( editorStore ) );
 				const { getEntitiesConfig, getEntityRecordEdits } =
 					select( coreStore );
@@ -224,6 +226,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						post.type === 'wp_template'
 							? getEntitiesConfig( 'postType' )
 							: null,
+					isInRevisionsMode: _isRevisionsMode(),
 				};
 			},
 			[ post.type, post.id, hasTemplate ]
@@ -421,9 +424,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				>
 					<BlockContextProvider value={ defaultBlockContext }>
 						<BlockEditorProviderComponent
-							value={ blocks }
-							onChange={ onChange }
-							onInput={ onInput }
+							value={ isInRevisionsMode ? undefined : blocks }
+							onChange={ isInRevisionsMode ? noop : onChange }
+							onInput={ isInRevisionsMode ? noop : onInput }
 							selection={ selection }
 							onChangeSelection={ onChangeSelection }
 							settings={ blockEditorSettings }
