@@ -685,10 +685,9 @@ export const styleInheritanceInheritor = {
 	isMatch: () => true,
 	useBlockProps: useInheritorBlockProps,
 	edit: StyleInheritanceEdit,
-	// TODO: Add addSaveProps that emits var() rules for non-naturally-inheriting
-	// properties (background, padding, border) on the frontend. Currently
-	// only naturally-inheriting CSS properties (color, font) cascade
-	// automatically via the provider's inline CSS vars.
+	// Non-inherited CSS properties (background, padding, border) are handled
+	// by lib/compat/wordpress-7.1/style-inheritance.php, which injects inline
+	// styles onto the inheritor's wrapper via render_block.
 };
 
 export default {
