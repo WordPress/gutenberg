@@ -53,7 +53,7 @@ export default function GuidelineAccordion( {
 							className="content-guidelines__accordion-description"
 							size={ 13 }
 							weight={ 400 }
-							color="#757575"
+							variant="muted"
 						>
 							{ description }
 						</Text>
