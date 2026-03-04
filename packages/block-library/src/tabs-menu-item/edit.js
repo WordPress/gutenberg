@@ -23,6 +23,7 @@ import Controls from './controls';
 const EMPTY_ARRAY = [];
 
 function Edit( {
+	attributes,
 	context,
 	clientId,
 	__unstableLayoutClassNames: layoutClassNames,
@@ -35,54 +36,69 @@ function Edit( {
 		return editorActiveTabIndex ?? activeTabIndex;
 	}, [ editorActiveTabIndex, activeTabIndex ] );
 
-	const { tabIndex, tabsClientId, tabsMenuClientId, selectedTabClientId } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockOrder,
-					getBlockRootClientId,
-					getSelectedBlockClientIds,
-					hasSelectedInnerBlock,
-				} = select( blockEditorStore );
+	const {
+		menuItemIndex,
+		tabsClientId,
+		tabsMenuClientId,
+		selectedTabClientId,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockOrder,
+				getBlockRootClientId,
+				getSelectedBlockClientIds,
+				hasSelectedInnerBlock,
+			} = select( blockEditorStore );
 
-				const _tabsMenuClientId = getBlockRootClientId( clientId );
-				const _tabsClientId = _tabsMenuClientId
-					? getBlockRootClientId( _tabsMenuClientId )
-					: null;
+			const _tabsMenuClientId = getBlockRootClientId( clientId );
+			const _tabsClientId = _tabsMenuClientId
+				? getBlockRootClientId( _tabsMenuClientId )
+				: null;
 
-				// Determine this button's index by its position within tabs-menu.
-				const siblings = getBlockOrder( _tabsMenuClientId );
-				const _tabIndex = siblings.indexOf( clientId );
+			const siblings = getBlockOrder( _tabsMenuClientId );
+			const _menuItemIndex = siblings.indexOf( clientId );
 
-				// Find which tab panel block is currently selected.
-				const selectedIds = getSelectedBlockClientIds();
-				let _selectedTabClientId = null;
-				for ( const tab of tabsList ) {
-					if (
-						selectedIds.includes( tab.clientId ) ||
-						hasSelectedInnerBlock( tab.clientId, true )
-					) {
-						_selectedTabClientId = tab.clientId;
-						break;
-					}
+			// Find which tab panel block is currently selected.
+			const selectedIds = getSelectedBlockClientIds();
+			let _selectedTabClientId = null;
+			for ( const tab of tabsList ) {
+				if (
+					selectedIds.includes( tab.clientId ) ||
+					hasSelectedInnerBlock( tab.clientId, true )
+				) {
+					_selectedTabClientId = tab.clientId;
+					break;
 				}
+			}
 
-				return {
-					tabIndex: _tabIndex,
-					tabsClientId: _tabsClientId,
-					tabsMenuClientId: _tabsMenuClientId,
-					selectedTabClientId: _selectedTabClientId,
-				};
-			},
-			[ clientId, tabsList ]
-		);
+			return {
+				menuItemIndex: _menuItemIndex,
+				tabsClientId: _tabsClientId,
+				tabsMenuClientId: _tabsMenuClientId,
+				selectedTabClientId: _selectedTabClientId,
+			};
+		},
+		[ clientId, tabsList ]
+	);
 
-	const tab = tabsList[ tabIndex ] ?? {};
-	const tabId = tab.id || `tab-${ tabIndex }`;
+	// Find the corresponding tab's anchor from this menu item's anchor
+	// attribute (e.g., "tab-1-button" → "tab-1"), then look it up in tabsList.
+	// Falls back to positional lookup when no anchor is set.
+	const tabAnchor = attributes.anchor?.replace( /-button$/, '' ) ?? '';
+	const tab =
+		( tabAnchor && tabsList.find( ( t ) => t.id === tabAnchor ) ) ||
+		tabsList[ menuItemIndex ] ||
+		{};
+
+	// tabListIndex is the tab's position in tabsList, used for active-state
+	// checks and click handling. menuItemIndex is used for the mover controls.
+	const tabListIndex = tab.index ?? menuItemIndex;
+
+	const tabId = tab.id || `tab-${ menuItemIndex }`;
 	const tabClientId = tab.clientId || '';
 	const label = tab.label || '';
 
-	const isActive = tabIndex === effectiveActiveIndex;
+	const isActive = tabListIndex === effectiveActiveIndex;
 	const isSelected = tabClientId === selectedTabClientId;
 
 	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
@@ -91,16 +107,16 @@ function Edit( {
 	const handleTabClick = useCallback(
 		( event ) => {
 			event.preventDefault();
-			if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
+			if ( tabsClientId && tabListIndex !== effectiveActiveIndex ) {
 				__unstableMarkNextChangeAsNotPersistent();
 				updateBlockAttributes( tabsClientId, {
-					editorActiveTabIndex: tabIndex,
+					editorActiveTabIndex: tabListIndex,
 				} );
 			}
 		},
 		[
 			tabsClientId,
-			tabIndex,
+			tabListIndex,
 			effectiveActiveIndex,
 			updateBlockAttributes,
 			__unstableMarkNextChangeAsNotPersistent,
@@ -132,7 +148,7 @@ function Edit( {
 	return (
 		<>
 			<Controls
-				tabIndex={ tabIndex }
+				tabIndex={ menuItemIndex }
 				tabsCount={ tabsList.length }
 				tabClientId={ tabClientId }
 				tabsClientId={ tabsClientId }
@@ -146,7 +162,7 @@ function Edit( {
 					placeholder={ sprintf(
 						/* translators: %d is the tab index + 1 */
 						__( 'Tab title %d' ),
-						tabIndex + 1
+						menuItemIndex + 1
 					) }
 					value={ label }
 					onChange={ handleLabelChange }
