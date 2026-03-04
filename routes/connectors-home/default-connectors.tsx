@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalHStack as HStack,
-	Button,
-} from '@wordpress/components';
+import { __experimentalHStack as HStack, Button } from '@wordpress/components';
 import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
