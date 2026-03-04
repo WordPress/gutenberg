@@ -2,7 +2,7 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .content-guidelines__accordion {
-	padding: $grid-unit-30;
+	padding: $grid-unit-20 $grid-unit-30;
 
 	.rotate-180 {
 		transition: transform 0.3s ease-in-out;
@@ -15,12 +15,18 @@
 	}
 }
 
+.content-guidelines__accordion-header-container {
+	cursor: pointer;
+}
+
 .content-guidelines__accordion-header {
 	color: $gray-900;
+	padding-top: $grid-unit-05;
 }
 
 .content-guidelines__accordion-description {
 	color: $gray-700;
+	padding-bottom: $grid-unit-05;
 }
 
 .content-guidelines__accordion-form {

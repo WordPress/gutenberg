@@ -41,15 +41,19 @@ export default function GuidelineAccordion( {
 
 	return (
 		<Card className="content-guidelines__accordion">
-			<VStack spacing={ 4 }>
+			<VStack
+				spacing={ 4 }
+				onClick={ () => setIsOpen( ! isOpen ) }
+				className="content-guidelines__accordion-header-container"
+			>
 				<HStack spacing={ 4 }>
-					<VStack spacing={ 4 }>
+					<VStack spacing={ 1 }>
 						<Heading
 							id={ headingId }
 							className="content-guidelines__accordion-header"
 							level={ 2 }
 							size={ 15 }
-							weight={ 500 }
+							weight={ 400 }
 						>
 							{ title }
 						</Heading>
