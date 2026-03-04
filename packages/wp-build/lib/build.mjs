@@ -462,8 +462,7 @@ async function bundlePackage( packageName, options = {} ) {
 
 		// When wpScriptDebugSupport is false, skip sourcemaps and
 		// unminified builds to reduce output size.
-		const skipDebugBuilds =
-			packageJson.wpScriptDebugSupport === false;
+		const skipDebugBuilds = packageJson.wpScriptDebugSupport === false;
 
 		// Check if package matches the namespace and should expose a global
 		const packageFullName = packageJson.name;
@@ -565,8 +564,7 @@ async function bundlePackage( packageName, options = {} ) {
 			// When wpScriptDebugSupport is false, skip sourcemaps and
 			// unminified builds to reduce output size (e.g. for packages
 			// that inline large WASM binaries).
-			const skipDebugBuilds =
-				packageJson.wpScriptDebugSupport === false;
+			const skipDebugBuilds = packageJson.wpScriptDebugSupport === false;
 
 			builds.push(
 				esbuild.build( {
@@ -658,8 +656,7 @@ async function bundlePackage( packageName, options = {} ) {
 
 			// When wpScriptDebugSupport is false, skip the non-minified
 			// CSS version to reduce output size.
-			const skipDebugBuilds =
-				packageJson.wpScriptDebugSupport === false;
+			const skipDebugBuilds = packageJson.wpScriptDebugSupport === false;
 
 			builds.push(
 				( async () => {
