@@ -278,14 +278,18 @@ export async function writeWorkerCodeOutputs(
 			if ( packageJson.module ) {
 				await writeFile(
 					path.join( buildModuleDir, 'worker-code.mjs' ),
-					`export const workerCode = ${ JSON.stringify( workerContent ) };\n`
+					`export const workerCode = ${ JSON.stringify(
+						workerContent
+					) };\n`
 				);
 			}
 
 			if ( packageJson.main ) {
 				await writeFile(
 					path.join( buildDir, 'worker-code.cjs' ),
-					`"use strict";\nObject.defineProperty(exports, "__esModule", { value: true });\nexports.workerCode = ${ JSON.stringify( workerContent ) };\n`
+					`"use strict";\nObject.defineProperty(exports, "__esModule", { value: true });\nexports.workerCode = ${ JSON.stringify(
+						workerContent
+					) };\n`
 				);
 			}
 		} catch ( error ) {
