@@ -10,6 +10,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -24,8 +25,14 @@ const { store } = unlock( connectorsPrivateApis );
 registerDefaultConnectors();
 
 function ConnectorsPage() {
-	const connectors = useSelect(
-		( select ) => unlock( select( store ) ).getConnectors(),
+	const { connectors, canInstallPlugins } = useSelect(
+		( select ) => ( {
+			connectors: unlock( select( store ) ).getConnectors(),
+			canInstallPlugins: select( coreStore ).canUser( 'create', {
+				kind: 'root',
+				name: 'plugin',
+			} ),
+		} ),
 		[]
 	);
 
@@ -52,19 +59,21 @@ function ConnectorsPage() {
 						return null;
 					} ) }
 				</VStack>
-				<p>
-					{ createInterpolateElement(
-						__(
-							'Find more connectors in <a>the plugin directory</a>'
-						),
-						{
-							a: (
-								// eslint-disable-next-line jsx-a11y/anchor-has-content
-								<a href="plugin-install.php" />
+				{ canInstallPlugins && (
+					<p>
+						{ createInterpolateElement(
+							__(
+								'Find more connectors in <a>the plugin directory</a>'
 							),
-						}
-					) }
-				</p>
+							{
+								a: (
+									// eslint-disable-next-line jsx-a11y/anchor-has-content
+									<a href="plugin-install.php" />
+								),
+							}
+						) }
+					</p>
+				) }
 			</div>
 		</Page>
 	);
