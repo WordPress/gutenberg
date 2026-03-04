@@ -27,3 +27,50 @@
 	align-items: center;
 	margin-top: $grid-unit-20;
 }
+
+.content-guidelines__actions {
+	width: min(680px, 100%);
+	margin: $grid-unit-20 auto 0;
+}
+
+.content-guidelines__actions-card {
+	padding: 0;
+	overflow: hidden;
+}
+
+.content-guidelines__actions-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.content-guidelines__action-row {
+	padding: $grid-unit-20 $grid-unit-30;
+	align-items: center;
+	width: 100%;
+	box-sizing: border-box;
+
+	> :first-child {
+		flex: 1;
+		min-width: 0;
+	}
+}
+
+.content-guidelines__action-row--bordered {
+	border-bottom: 1px solid $gray-200;
+}
+
+.content-guidelines__actions-card .components-button {
+	min-width: 130px;
+	justify-content: center;
+	font-size: 13px;
+	font-weight: 400;
+}
+
+.content-guidelines__action-title {
+	color: $gray-900;
+}
+
+.content-guidelines__action-description {
+	color: $gray-700;
+}

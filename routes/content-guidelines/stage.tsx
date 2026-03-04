@@ -18,6 +18,7 @@ import GuidelineAccordionForm from './components/guideline-accordion-form';
 import { fetchContentGuidelines } from './api';
 import BlockGuidelines from './components/block-guidelines';
 import { bootstrapBlockRegistry } from './bootstrap-block-registry';
+import ActionsSection from './components/actions-section';
 
 // Bootstrap Core blocks so block icons are available (e.g. in Block Guidelines).
 bootstrapBlockRegistry();
@@ -149,6 +150,7 @@ function ContentGuidelinesPage() {
 							} ) }
 						</ul>
 						{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+						<ActionsSection />
 					</div>
 				)
 			) }
