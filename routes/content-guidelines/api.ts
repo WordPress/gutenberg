@@ -22,30 +22,13 @@ export async function fetchContentGuidelines(): Promise< RestGuidelinesResponse 
 		setFromResponse: ( response: RestGuidelinesResponse ) => void;
 	};
 
-	try {
-		const response = ( await apiFetch( {
-			path: '/wp/v2/content-guidelines?context=edit',
-		} ) ) as RestGuidelinesResponse;
+	const response = ( await apiFetch( {
+		path: '/wp/v2/content-guidelines?context=edit',
+	} ) ) as RestGuidelinesResponse;
 
-		setFromResponse( response );
+	setFromResponse( response );
 
-		return response;
-	} catch ( error: unknown ) {
-		const { createErrorNotice } = dispatch( noticesStore ) as {
-			createErrorNotice: (
-				message: string,
-				options?: { type?: 'snackbar' | 'default'; context?: string }
-			) => void;
-		};
-
-		createErrorNotice(
-			__(
-				'There was an error loading your content guidelines. Please try again.'
-			),
-			{ type: 'snackbar' }
-		);
-		throw error;
-	}
+	return response;
 }
 
 export async function saveContentGuidelines(): Promise< RestGuidelinesResponse > {
@@ -82,35 +65,25 @@ export async function saveContentGuidelines(): Promise< RestGuidelinesResponse >
 		},
 	};
 
-	const { createSuccessNotice, createErrorNotice } = dispatch( noticesStore );
+	const { createSuccessNotice } = dispatch( noticesStore );
 
-	try {
-		const hasExistingId = !! ( id && id > 0 );
-		const path = hasExistingId
-			? `/wp/v2/content-guidelines/${ id }`
-			: '/wp/v2/content-guidelines';
-		const method = hasExistingId ? 'PUT' : 'POST';
+	const hasExistingId = !! ( id && id > 0 );
+	const path = hasExistingId
+		? `/wp/v2/content-guidelines/${ id }`
+		: '/wp/v2/content-guidelines';
+	const method = hasExistingId ? 'PUT' : 'POST';
 
-		const response = ( await apiFetch( {
-			path,
-			method,
-			data,
-		} ) ) as RestGuidelinesResponse;
+	const response = ( await apiFetch( {
+		path,
+		method,
+		data,
+	} ) ) as RestGuidelinesResponse;
 
-		setFromResponse( response );
+	setFromResponse( response );
 
-		createSuccessNotice( __( 'Content guidelines saved.' ), {
-			type: 'snackbar',
-		} );
+	createSuccessNotice( __( 'Content guidelines saved.' ), {
+		type: 'snackbar',
+	} );
 
-		return response;
-	} catch ( error: unknown ) {
-		createErrorNotice(
-			__(
-				'There was an error saving your content guidelines. Please try again.'
-			),
-			{ type: 'snackbar' }
-		);
-		throw error;
-	}
+	return response;
 }

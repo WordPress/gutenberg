@@ -6,7 +6,8 @@ import {
 	__experimentalVStack as VStack,
 	TextareaControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { Notice } from '@wordpress/ui';
+import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import type { FormEvent } from 'react';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -32,6 +33,8 @@ export default function GuidelineAccordionForm( {
 }: GuidelineAccordionFormProps ) {
 	// @ts-ignore
 	const { setGuideline } = useDispatch( STORE_NAME );
+	const [ loading, setLoading ] = useState( false );
+	const [ error, setError ] = useState< string | null >( null );
 
 	const { value } = useSelect(
 		( select ) => ( {
@@ -46,7 +49,10 @@ export default function GuidelineAccordionForm( {
 	const handleSave = ( event: FormEvent< HTMLFormElement > ) => {
 		event.preventDefault();
 		setGuideline( slug, draft );
-		saveContentGuidelines();
+		setLoading( true );
+		saveContentGuidelines()
+			.catch( ( e: Error ) => setError( e.message ) )
+			.finally( () => setLoading( false ) );
 	};
 
 	return (
@@ -64,7 +70,23 @@ export default function GuidelineAccordionForm( {
 					value={ draft }
 					onChange={ setDraft }
 				/>
-				<Button variant="primary" type="submit" className="save-button">
+				{ error && (
+					<Notice.Root intent="error">
+						<Notice.Title>
+							{ sprintf(
+								/* translators: %s: Error message. */
+								__( 'Error saving guidelines: %s' ),
+								error
+							) }
+						</Notice.Title>
+					</Notice.Root>
+				) }
+				<Button
+					variant="primary"
+					type="submit"
+					className="save-button"
+					disabled={ loading }
+				>
 					{ __( 'Save guidelines' ) }
 				</Button>
 			</VStack>
