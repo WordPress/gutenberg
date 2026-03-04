@@ -164,7 +164,8 @@ function NewTemplateModal( { onClose } ) {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const containerRef = useRef( null );
-	const isMobile = useViewportMatch( 'medium', '<' );
+	const isMedium = useViewportMatch( 'medium', '<' );
+	const isMobile = useViewportMatch( 'mobile', '<' );
 
 	const homeUrl = useSelect( ( select ) => {
 		// Site index.
@@ -261,7 +262,10 @@ function NewTemplateModal( { onClose } ) {
 	} else if ( modalContent === modalContentMap.customGenericTemplate ) {
 		modalTitle = __( 'Create custom template' );
 	}
-
+	let gridColumns = 3;
+	if ( isMobile || isMedium ) {
+		gridColumns = isMobile ? 1 : 2;
+	}
 	return (
 		<Modal
 			title={ modalTitle }
@@ -281,7 +285,7 @@ function NewTemplateModal( { onClose } ) {
 		>
 			{ modalContent === modalContentMap.templatesList && (
 				<Grid
-					columns={ isMobile ? 2 : 3 }
+					columns={ gridColumns }
 					gap={ 4 }
 					align="flex-start"
 					justify="center"
