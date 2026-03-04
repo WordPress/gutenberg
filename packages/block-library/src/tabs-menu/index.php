@@ -58,9 +58,11 @@ function block_core_tabs_menu_render_callback( array $attributes, string $conten
 	}
 
 	// Replace the saved inner block HTML with the re-rendered buttons.
-	$result = preg_replace(
+	$result = preg_replace_callback(
 		'/(<div\b[^>]*\bwp-block-tabs-menu\b[^>]*>).*?(<\/div>)/s',
-		'$1' . $buttons_html . '$2',
+		static function ( $matches ) use ( $buttons_html ) {
+			return $matches[1] . $buttons_html . $matches[2];
+		},
 		$content
 	);
 
