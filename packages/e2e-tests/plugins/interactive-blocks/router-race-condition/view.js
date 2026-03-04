@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { store, getContext } from '@wordpress/interactivity';
+import '@wordpress/interactivity-router';
 
 const { state } = store( 'router-race-condition', {
 	state: {
