@@ -55,6 +55,7 @@ const PlaylistEdit = ( {
 		showNumbers,
 		showImages,
 		showArtists,
+		visualizationStyle,
 		currentTrack,
 	} = attributes;
 	const blockProps = useBlockProps();
@@ -278,6 +279,7 @@ const PlaylistEdit = ( {
 							showNumbers: true,
 							showImages: true,
 							order: 'asc',
+							visualizationStyle: 'bars',
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -365,6 +367,53 @@ const PlaylistEdit = ( {
 							onChange={ ( value ) => onChangeOrder( value ) }
 						/>
 					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Visualization style' ) }
+						isShownByDefault
+						hasValue={ () => visualizationStyle !== 'bars' }
+						onDeselect={ () =>
+							setAttributes( {
+								visualizationStyle: 'bars',
+							} )
+						}
+					>
+						<SelectControl
+							__next40pxDefaultSize
+							label={ __( 'Visualization style' ) }
+							value={ visualizationStyle }
+							options={ [
+								{
+									label: __( 'Bars' ),
+									value: 'bars',
+								},
+								{
+									label: __( 'Mirror' ),
+									value: 'mirror',
+								},
+								{
+									label: __( 'Line' ),
+									value: 'line',
+								},
+								{
+									label: __( 'Blocks' ),
+									value: 'blocks',
+								},
+								{
+									label: __( 'Dots' ),
+									value: 'dots',
+								},
+								{
+									label: __( 'Seekbar' ),
+									value: 'seekbar',
+								},
+							] }
+							onChange={ ( value ) =>
+								setAttributes( {
+									visualizationStyle: value,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
 			<figure { ...blockProps }>
@@ -374,6 +423,7 @@ const PlaylistEdit = ( {
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
 						image={ currentTrackData?.image }
+						visualizationStyle={ visualizationStyle }
 						onEnded={ onTrackEnded }
 					/>
 				</Disabled>

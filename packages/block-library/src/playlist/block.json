@@ -37,6 +37,10 @@
 			"type": "boolean",
 			"default": true
 		},
+		"visualizationStyle": {
+			"type": "string",
+			"default": "bars"
+		},
 		"caption": {
 			"type": "string"
 		}

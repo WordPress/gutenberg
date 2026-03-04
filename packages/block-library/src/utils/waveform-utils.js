@@ -51,6 +51,7 @@ export function getWaveformColors( element ) {
  * @param {string} options.progressColor - The progress indicator color.
  * @param {string} options.buttonColor   - The play button color.
  * @param {number} options.height        - The waveform height in pixels.
+ * @param {string} options.waveformStyle - The visualization style (bars, mirror, line, blocks, dots, seekbar).
  * @return {Element} The configured container element.
  */
 export function createWaveformContainer( {
@@ -62,12 +63,13 @@ export function createWaveformContainer( {
 	progressColor,
 	buttonColor,
 	height = DEFAULT_WAVEFORM_HEIGHT,
+	waveformStyle = 'bars',
 } ) {
 	const container = document.createElement( 'div' );
 	container.setAttribute( 'data-waveform-player', '' );
 	container.setAttribute( 'data-url', url );
 	container.setAttribute( 'data-height', String( height ) );
-	container.setAttribute( 'data-waveform-style', 'bars' );
+	container.setAttribute( 'data-waveform-style', waveformStyle );
 	container.setAttribute( 'data-waveform-color', waveformColor );
 	container.setAttribute( 'data-progress-color', progressColor );
 	container.setAttribute( 'data-button-color', buttonColor );
@@ -158,20 +160,21 @@ export function logPlayError( error ) {
  * This is the shared core logic used by both the React component (editor)
  * and the Interactivity API (frontend).
  *
- * @param {Element}  element          - The container element (must be in DOM).
- * @param {Object}   options          - Configuration options.
- * @param {string}   options.src      - The audio file URL.
- * @param {string}   options.title    - The track title.
- * @param {string}   options.artist   - The artist name.
- * @param {string}   options.image    - The artwork image URL.
- * @param {boolean}  options.autoPlay - Whether to auto-play when ready.
- * @param {Function} options.onEnded  - Callback when track ends.
- * @param {Object}   options.labels   - Translated button labels.
+ * @param {Element}  element                    - The container element (must be in DOM).
+ * @param {Object}   options                    - Configuration options.
+ * @param {string}   options.src                - The audio file URL.
+ * @param {string}   options.title              - The track title.
+ * @param {string}   options.artist             - The artist name.
+ * @param {string}   options.image              - The artwork image URL.
+ * @param {boolean}  options.autoPlay           - Whether to auto-play when ready.
+ * @param {Function} options.onEnded            - Callback when track ends.
+ * @param {Object}   options.labels             - Translated button labels.
+ * @param {string}   options.visualizationStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
  * @return {Object} Object with instance, container, and destroy function.
  */
 export function initWaveformPlayer(
 	element,
-	{ src, title, artist, image, autoPlay, onEnded, labels }
+	{ src, title, artist, image, autoPlay, onEnded, labels, visualizationStyle }
 ) {
 	// Get colors from computed styles.
 	const { textColor, waveformColor, progressColor } =
@@ -186,6 +189,7 @@ export function initWaveformPlayer(
 		waveformColor,
 		progressColor,
 		buttonColor: textColor,
+		waveformStyle: visualizationStyle,
 	} );
 	element.appendChild( container );
 
