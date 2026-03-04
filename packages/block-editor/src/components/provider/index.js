@@ -146,8 +146,21 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		const isClientSideMediaEnabled =
 			shouldEnableClientSideMediaProcessing();
 
+		// Preview providers must not set up their own MediaUploadProvider or
+		// replace the mediaUpload setting.  Every MediaUploadProvider with
+		// useSubRegistry={false} writes to the same shared upload-media store,
+		// so a nested preview provider would overwrite the parent's original
+		// server-side mediaUpload function with the already-replaced
+		// client-side interceptor, causing uploads in the main editor to
+		// dispatch back into the upload-media store in an infinite loop.
+		const isPreviewMode = !! _settings?.isPreviewMode;
+
 		const settings = useMemo( () => {
-			if ( isClientSideMediaEnabled && _settings?.mediaUpload ) {
+			if (
+				isClientSideMediaEnabled &&
+				_settings?.mediaUpload &&
+				! isPreviewMode
+			) {
 				// Create a new object so that the original props.settings.mediaUpload is not modified.
 				return {
 					..._settings,
@@ -155,7 +168,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 				};
 			}
 			return _settings;
-		}, [ _settings, registry, isClientSideMediaEnabled ] );
+		}, [ _settings, registry, isClientSideMediaEnabled, isPreviewMode ] );
 
 		const { __experimentalUpdateSettings } = unlock(
 			useDispatch( blockEditorStore )
@@ -215,7 +228,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 			</SelectionContext.Provider>
 		);
 
-		if ( isClientSideMediaEnabled ) {
+		if ( isClientSideMediaEnabled && ! isPreviewMode ) {
 			return (
 				<MediaUploadProvider
 					settings={ mediaUploadSettings }
