@@ -16,7 +16,6 @@ import {
 
 const {
 	getRegionRootFragment,
-	initialVdom,
 	initialVdomPromise,
 	toVdom,
 	render,
@@ -51,7 +50,7 @@ export interface PrefetchOptions {
 }
 
 interface VdomParams {
-	vdom?: typeof initialVdom;
+	vdom?: WeakMap< Element, any >;
 }
 
 interface Page {
