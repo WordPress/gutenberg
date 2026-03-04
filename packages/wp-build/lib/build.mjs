@@ -69,9 +69,9 @@ import {
 	getWidgetFiles,
 } from './widget-utils.mjs';
 import {
-	generateWorkerPlaceholder,
+	createWorkerCodeExternalPlugin,
 	buildWorkers,
-	generateWorkerCode,
+	writeWorkerCodeOutputs,
 } from './worker-build.mjs';
 
 const ROOT_DIR = process.cwd();
@@ -1365,11 +1365,6 @@ async function transpilePackage( packageName ) {
 
 	const builds = [];
 
-	// Generate placeholder worker-code.ts if this package has wpWorkers defined
-	// and the file doesn't exist yet. This is needed because transpilation happens
-	// before worker bundling, but vips-worker.ts imports from worker-code.ts.
-	await generateWorkerPlaceholder( packageDir, packageJson );
-
 	// Check if this is the components package that needs emotion babel plugin.
 	// Ideally we should remove this exception and move away from emotion.
 	const needsEmotionPlugin = packageName === 'components';
@@ -1450,6 +1445,9 @@ async function transpilePackage( packageName ) {
 		dsTokenFallbacksJs,
 		needsEmotionPlugin && emotionPlugin,
 		wasmInlinePlugin,
+		// Must come before externalizeAllExceptCssPlugin so the filesystem is
+		// never consulted for the stub src/worker-code.ts.
+		packageJson.wpWorkers && createWorkerCodeExternalPlugin(),
 		// CSS modules import @wordpress/style-runtime in generated JS. Resolve
 		// that alias before externalizing imports so the runtime is bundled.
 		...createStyleBundlingPlugins( packageDir ),
@@ -1535,13 +1533,12 @@ async function transpilePackage( packageName ) {
 		wasmInlinePlugin,
 	} );
 
-	// Generate inline worker code exports and re-transpile worker-code.ts.
-	await generateWorkerCode( packageDir, packageName, packageJson, {
-		srcDir,
+	// Write worker-code.mjs / worker-code.cjs directly to the build directories.
+	// The src/worker-code.ts stub is only for TypeScript type checking; the
+	// real output is written here to avoid touching src/ and triggering the watcher.
+	await writeWorkerCodeOutputs( packageName, packageJson, {
 		buildDir,
 		buildModuleDir,
-		target,
-		plugins,
 	} );
 
 	await compileStyles( packageName );

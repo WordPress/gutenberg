@@ -1,7 +1,7 @@
 /**
  * Worker build utilities for wp-build.
  *
- * Handles building worker bundles and generating inline worker code
+ * Handles building worker bundles and writing inline worker code exports
  * for packages that define wpWorkers in their package.json.
  *
  * @package
@@ -10,7 +10,7 @@
 /**
  * External dependencies
  */
-import { readFile, writeFile, access } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import path from 'path';
 import esbuild from 'esbuild';
 
@@ -101,38 +101,29 @@ function getWorkerResolveMap( workerConfig ) {
 }
 
 /**
- * Generate placeholder worker-code.ts for packages with wpWorkers.
+ * Creates an esbuild plugin that short-circuits resolution of `./worker-code`
+ * imports, marking them as external without touching the filesystem.
  *
- * This must run before transpilation since worker files import worker-code.ts.
- * The placeholder is later replaced with actual bundled worker content.
+ * `src/worker-code.ts` is a committed stub used only for TypeScript type
+ * checking. The real output (`build-module/worker-code.mjs` / `build/
+ * worker-code.cjs`) is written directly by `writeWorkerCodeOutputs` after the
+ * worker bundle is built. This plugin prevents esbuild from attempting a
+ * filesystem stat on the stub during transpilation.
  *
- * @param {string} packageDir  Path to the package directory.
- * @param {Object} packageJson Parsed package.json contents.
+ * @return {Object} An esbuild plugin.
  */
-export async function generateWorkerPlaceholder( packageDir, packageJson ) {
-	if ( ! packageJson.wpWorkers ) {
-		return;
-	}
-
-	const workerCodeFile = path.join( packageDir, 'src', 'worker-code.ts' );
-	try {
-		await access( workerCodeFile );
-	} catch {
-		// File doesn't exist, create placeholder
-		const placeholderContent = `/**
- * Worker code for inline Blob URL creation.
- *
- * This file is a placeholder that gets overwritten by the build process.
- * If you see this placeholder content at runtime, run \`npm run build\` first.
- *
- * @package gutenberg
- */
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const workerCode = '/* Placeholder - run npm run build to generate actual worker code */';
-`;
-		await writeFile( workerCodeFile, placeholderContent );
-	}
+export function createWorkerCodeExternalPlugin() {
+	return {
+		name: 'worker-code-external',
+		setup( build ) {
+			const newExt =
+				build.initialOptions.format === 'cjs' ? '.cjs' : '.mjs';
+			build.onResolve( { filter: /\/worker-code$/ }, () => ( {
+				path: `./worker-code${ newExt }`,
+				external: true,
+			} ) );
+		},
+	};
 }
 
 /**
@@ -242,26 +233,27 @@ export async function buildWorkers(
 }
 
 /**
- * Generate inline worker code exports and re-transpile worker-code.ts.
+ * Write worker code output files directly to the build directories.
  *
- * Creates worker-code.ts with bundled content for Blob URL loading,
- * then re-transpiles it to the output directories.
+ * Reads the built worker bundle from build-module/ and writes
+ * `worker-code.mjs` (ESM) and `worker-code.cjs` (CJS) directly, without
+ * going through a transpilation step. The content is a simple string export
+ * that requires no transformation.
  *
- * @param {string}   packageDir             Path to the package directory.
- * @param {string}   packageName            Name of the package.
- * @param {Object}   packageJson            Parsed package.json contents.
- * @param {Object}   options                Build options.
- * @param {string}   options.srcDir         Path to the source directory.
- * @param {string}   options.buildDir       Path to the CJS build directory.
- * @param {string}   options.buildModuleDir Path to the ESM build-module directory.
- * @param {string[]} options.target         esbuild target configuration.
- * @param {Array}    options.plugins        esbuild plugins for transpilation.
+ * This replaces the old approach of writing to `src/worker-code.ts` and
+ * re-transpiling, which caused an infinite watcher loop because the build was
+ * writing into the watched source directory.
+ *
+ * @param {string} packageName            Name of the package (for warnings).
+ * @param {Object} packageJson            Parsed package.json contents.
+ * @param {Object} options                Build options.
+ * @param {string} options.buildDir       Path to the CJS build directory.
+ * @param {string} options.buildModuleDir Path to the ESM build-module directory.
  */
-export async function generateWorkerCode(
-	packageDir,
+export async function writeWorkerCodeOutputs(
 	packageName,
 	packageJson,
-	{ srcDir, buildDir, buildModuleDir, target, plugins }
+	{ buildDir, buildModuleDir }
 ) {
 	if ( ! packageJson.wpWorkers ) {
 		return;
@@ -273,98 +265,34 @@ export async function generateWorkerCode(
 			? Object.entries( packageJson.wpWorkers )
 			: [];
 
-	// Generate inline worker code exports for each worker.
-	// This allows the worker code to be bundled inline and loaded via Blob URL,
-	// which works even when import.meta.url is not available (e.g., webpack bundles).
 	for ( const [ outputName ] of workerEntries ) {
 		const workerOutputName = outputName.replace( /^\.\//, '' );
-		const workerOutputPath = path.join(
+		const workerBundlePath = path.join(
 			buildModuleDir,
 			`${ workerOutputName }.mjs`
 		);
 
 		try {
-			const workerContent = await readFile( workerOutputPath, 'utf8' );
-			const workerCodeFile = path.join(
-				packageDir,
-				'src',
-				'worker-code.ts'
-			);
-			const workerCodeContent = `/**
- * Worker code for inline Blob URL creation.
- *
- * This file is auto-generated by the build process.
- * Do not edit manually - run \`npm run build\` to regenerate.
- *
- * @package gutenberg
- */
+			const workerContent = await readFile( workerBundlePath, 'utf8' );
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const workerCode = ${ JSON.stringify( workerContent ) };
-`;
-			await writeFile( workerCodeFile, workerCodeContent );
+			if ( packageJson.module ) {
+				await writeFile(
+					path.join( buildModuleDir, 'worker-code.mjs' ),
+					`export const workerCode = ${ JSON.stringify( workerContent ) };\n`
+				);
+			}
+
+			if ( packageJson.main ) {
+				await writeFile(
+					path.join( buildDir, 'worker-code.cjs' ),
+					`"use strict";\nObject.defineProperty(exports, "__esModule", { value: true });\nexports.workerCode = ${ JSON.stringify( workerContent ) };\n`
+				);
+			}
 		} catch ( error ) {
 			console.warn(
-				`Warning: Could not generate worker-code.ts for ${ packageName }:`,
+				`Warning: Could not write worker-code outputs for ${ packageName }:`,
 				error.message
 			);
 		}
 	}
-
-	// Re-transpile worker-code.ts to output directories.
-	// The initial transpilation used placeholder content because worker
-	// bundling hadn't completed yet. Now that src/worker-code.ts contains
-	// the real bundled worker code, re-transpile it so that
-	// build-module/worker-code.mjs (and build/worker-code.cjs if applicable)
-	// reflect the actual worker code in a single build run.
-	const workerCodeSrcFile = path.join( packageDir, 'src', 'worker-code.ts' );
-	const retranspileBuilds = [];
-
-	if ( packageJson.module ) {
-		retranspileBuilds.push(
-			esbuild.build( {
-				entryPoints: [ workerCodeSrcFile ],
-				outdir: buildModuleDir,
-				outbase: srcDir,
-				outExtension: { '.js': '.mjs' },
-				bundle: true,
-				// Emit UTF-8 so binary-encoded inlined WASM stays compact
-				// (ASCII output would escape high bytes as \uXXXX).
-				charset: 'utf8',
-				platform: 'neutral',
-				format: 'esm',
-				sourcemap: true,
-				target,
-				jsx: 'automatic',
-				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
-				plugins,
-			} )
-		);
-	}
-
-	if ( packageJson.main ) {
-		retranspileBuilds.push(
-			esbuild.build( {
-				entryPoints: [ workerCodeSrcFile ],
-				outdir: buildDir,
-				outbase: srcDir,
-				outExtension: { '.js': '.cjs' },
-				bundle: true,
-				// Emit UTF-8 so binary-encoded inlined WASM stays compact
-				// (ASCII output would escape high bytes as \uXXXX).
-				charset: 'utf8',
-				platform: 'node',
-				format: 'cjs',
-				sourcemap: true,
-				target,
-				jsx: 'automatic',
-				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
-				plugins,
-			} )
-		);
-	}
-
-	await Promise.all( retranspileBuilds );
 }
