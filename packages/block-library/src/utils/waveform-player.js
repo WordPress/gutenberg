@@ -15,13 +15,12 @@ import { initWaveformPlayer } from './waveform-utils';
  * Renders an audio waveform visualization with play/pause controls.
  * Automatically inherits colors from the parent block's text color.
  *
- * @param {Object}   props          - Component props.
- * @param {string}   props.src      - The audio file URL.
- * @param {string}   props.title    - The track title.
- * @param {string}   props.artist   - The artist name.
- * @param {string}   props.image    - The artwork image URL.
- * @param {Function} props.onEnded  - Callback when the track finishes playing.
- * @param {boolean}  props.autoPlay - Whether to auto-play on initialization.
+ * @param {Object}   props         - Component props.
+ * @param {string}   props.src     - The audio file URL.
+ * @param {string}   props.title   - The track title.
+ * @param {string}   props.artist  - The artist name.
+ * @param {string}   props.image   - The artwork image URL.
+ * @param {Function} props.onEnded - Callback when the track finishes playing.
  * @return {Element} The WaveformPlayer element.
  */
 export function WaveformPlayer( {
@@ -39,6 +38,12 @@ export function WaveformPlayer( {
 	// during editor resizes.
 	const onEndedRef = useRef( onEnded );
 	onEndedRef.current = onEnded;
+
+	// Store autoPlay in a ref so it can be read during init without being
+	// a useRefEffect dependency. The component is remounted via key={currentTrack}
+	// when the track changes, so the value is always correct at mount time.
+	const autoPlayRef = useRef( autoPlay );
+	autoPlayRef.current = autoPlay;
 
 	const ref = useRefEffect(
 		( element ) => {
@@ -58,7 +63,7 @@ export function WaveformPlayer( {
 					title,
 					artist,
 					image,
-					autoPlay,
+					autoPlay: autoPlayRef.current,
 					onEnded: () => onEndedRef.current?.(),
 				} );
 				playerDestroy = destroy;
@@ -79,7 +84,7 @@ export function WaveformPlayer( {
 				playerDestroy?.();
 			};
 		},
-		[ src, title, artist, image, autoPlay ]
+		[ src, title, artist, image ]
 	);
 
 	return <div ref={ ref } className="wp-block-playlist__waveform-player" />;
