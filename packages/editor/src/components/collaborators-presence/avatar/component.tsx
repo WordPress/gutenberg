@@ -94,6 +94,7 @@ function Avatar( {
 					<img
 						src={ src }
 						alt=""
+						crossOrigin="anonymous"
 						className="editor-avatar__img"
 						onLoad={ handleLoad }
 						onError={ handleError }
