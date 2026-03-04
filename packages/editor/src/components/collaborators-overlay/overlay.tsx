@@ -47,7 +47,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 }
 .collaborators-overlay-selection-rect {
 	position: absolute;
-	opacity: 0.3;
+	opacity: 0.15;
 	pointer-events: none;
 	border-radius: 2px;
 }
