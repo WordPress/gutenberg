@@ -6,7 +6,7 @@ import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { Notice } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
@@ -36,6 +36,7 @@ export default function GuidelineAccordionForm( {
 	);
 
 	const [ draft, setDraft ] = useState( value );
+	useEffect( () => setDraft( value ), [ value ] );
 
 	const data = useMemo( () => ( { guidelines: draft } ), [ draft ] );
 
