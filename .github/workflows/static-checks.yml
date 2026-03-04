@@ -30,6 +30,7 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
+                event: ['${{ github.event_name }}']
                 node: ['20', '22', '24']
                 os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
 
@@ -40,8 +41,10 @@ jobs:
                       annotations: true
                 exclude:
                     # On PRs: Only test Node 20 on Ubuntu and Windows
-                    - node: '22'
-                    - os: 'macos-15'
+                    - event: 'pull_request'
+                      node: '22'
+                    - event: 'pull_request'
+                      os: 'macos-15'
 
         steps:
             - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
