@@ -32,63 +32,61 @@ foreach ( $routes_by_page as $page_slug => $page_routes ) {
 	$GLOBALS[ $global_name ] = $page_routes;
 }
 
-if ( ! function_exists( '{{PREFIX}}_register_page_routes' ) ) {
-	/**
-	 * Generic helper function to register routes for a page.
-	 *
-	 * @param array  $page_routes           Array of route data for the page.
-	 * @param string $register_function_name Name of the function to call for registering each route.
-	 */
-	function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name ) {
-		// Load build constants
-		$build_constants = require __DIR__ . '/constants.php';
+/**
+ * Generic helper function to register routes for a page.
+ *
+ * @param array  $page_routes           Array of route data for the page.
+ * @param string $register_function_name Name of the function to call for registering each route.
+ */
+function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name ) {
+	// Load build constants
+	$build_constants = require __DIR__ . '/constants.php';
 
-		foreach ( $page_routes as $route ) {
-			$content_handle = null;
-			$route_handle = null;
+	foreach ( $page_routes as $route ) {
+		$content_handle = null;
+		$route_handle = null;
 
-			// Register content module if exists
-			if ( $route['has_content'] ) {
-				$content_asset_path = __DIR__ . "/routes/{$route['name']}/content.min.asset.php";
-				if ( file_exists( $content_asset_path ) ) {
-					$content_asset = require $content_asset_path;
-					$content_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/content';
-					$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
-					// Deregister first to override any previously registered version
-					// (e.g., Core's default modules when running as a plugin).
-					wp_deregister_script_module( $content_handle );
-					wp_register_script_module(
-						$content_handle,
-						$build_constants['build_url'] . 'routes/' . $route['name'] . '/content' . $extension,
-						$content_asset['module_dependencies'] ?? array(),
-						$content_asset['version'] ?? false
-					);
-				}
+		// Register content module if exists
+		if ( $route['has_content'] ) {
+			$content_asset_path = __DIR__ . "/routes/{$route['name']}/content.min.asset.php";
+			if ( file_exists( $content_asset_path ) ) {
+				$content_asset = require $content_asset_path;
+				$content_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/content';
+				$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
+				// Deregister first to override any previously registered version
+				// (e.g., Core's default modules when running as a plugin).
+				wp_deregister_script_module( $content_handle );
+				wp_register_script_module(
+					$content_handle,
+					$build_constants['build_url'] . 'routes/' . $route['name'] . '/content' . $extension,
+					$content_asset['module_dependencies'] ?? array(),
+					$content_asset['version'] ?? false
+				);
 			}
+		}
 
-			// Register route module if exists
-			if ( $route['has_route'] ) {
-				$route_asset_path = __DIR__ . "/routes/{$route['name']}/route.min.asset.php";
-				if ( file_exists( $route_asset_path ) ) {
-					$route_asset = require $route_asset_path;
-					$route_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/route';
-					$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
-					// Deregister first to override any previously registered version
-					// (e.g., Core's default modules when running as a plugin).
-					wp_deregister_script_module( $route_handle );
-					wp_register_script_module(
-						$route_handle,
-						$build_constants['build_url'] . 'routes/' . $route['name'] . '/route' . $extension,
-						$route_asset['module_dependencies'] ?? array(),
-						$route_asset['version'] ?? false
-					);
-				}
+		// Register route module if exists
+		if ( $route['has_route'] ) {
+			$route_asset_path = __DIR__ . "/routes/{$route['name']}/route.min.asset.php";
+			if ( file_exists( $route_asset_path ) ) {
+				$route_asset = require $route_asset_path;
+				$route_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/route';
+				$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
+				// Deregister first to override any previously registered version
+				// (e.g., Core's default modules when running as a plugin).
+				wp_deregister_script_module( $route_handle );
+				wp_register_script_module(
+					$route_handle,
+					$build_constants['build_url'] . 'routes/' . $route['name'] . '/route' . $extension,
+					$route_asset['module_dependencies'] ?? array(),
+					$route_asset['version'] ?? false
+				);
 			}
+		}
 
-			// Register route with page
-			if ( function_exists( $register_function_name ) ) {
-				call_user_func( $register_function_name, $route['path'], $content_handle, $route_handle );
-			}
+		// Register route with page
+		if ( function_exists( $register_function_name ) ) {
+			call_user_func( $register_function_name, $route['path'], $content_handle, $route_handle );
 		}
 	}
 }
