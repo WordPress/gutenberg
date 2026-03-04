@@ -1,15 +1,12 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	__experimentalVStack as VStack,
-	TextareaControl,
-} from '@wordpress/components';
+import { Button, __experimentalVStack as VStack } from '@wordpress/components';
+import { DataForm } from '@wordpress/dataviews';
+import type { Field, Form } from '@wordpress/dataviews';
 import { Notice } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
-import type { FormEvent } from 'react';
+import { useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
@@ -40,7 +37,33 @@ export default function GuidelineAccordionForm( {
 
 	const [ draft, setDraft ] = useState( value );
 
-	const handleSave = ( event: FormEvent< HTMLFormElement > ) => {
+	const data = useMemo( () => ( { guidelines: draft } ), [ draft ] );
+
+	const fields: Field< { guidelines: string } >[] = useMemo(
+		() => [
+			{
+				id: 'guidelines',
+				label: sprintf(
+					/* translators: %s: Guideline category. */
+					__( '%s guidelines' ),
+					slug
+				),
+				type: 'text',
+				Edit: 'textarea',
+			},
+		],
+		[ slug ]
+	);
+
+	const form: Form = useMemo(
+		() => ( {
+			layout: { type: 'regular', labelPosition: 'none' },
+			fields: [ 'guidelines' ],
+		} ),
+		[]
+	);
+
+	const handleSave = ( event: React.FormEvent< HTMLFormElement > ) => {
 		event.preventDefault();
 		setGuideline( slug, draft );
 		setLoading( true );
@@ -58,11 +81,13 @@ export default function GuidelineAccordionForm( {
 			className="content-guidelines__accordion-form"
 		>
 			<VStack spacing={ 4 }>
-				<TextareaControl
-					label={ __( 'Copy guidelines' ) }
-					hideLabelFromVision
-					value={ draft }
-					onChange={ setDraft }
+				<DataForm
+					data={ data }
+					fields={ fields }
+					form={ form }
+					onChange={ ( edits ) =>
+						setDraft( edits.guidelines ?? draft )
+					}
 				/>
 				{ error && (
 					<Notice.Root intent="error">
