@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 13.0.0 (2026-03-04)
+
 ### Breaking Changes
 
 - DataViews: Align to end integer and number field types. [#75917](https://github.com/WordPress/gutenberg/pull/75917)

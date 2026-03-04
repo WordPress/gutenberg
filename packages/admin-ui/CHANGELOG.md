@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.9.0 (2026-03-04)
+
 ### Bug Fixes
 
 - Fix type mismatch between Page `title` (ReactNode) and NavigableRegion `ariaLabel` (string) by adding an optional `ariaLabel` prop to Page that falls back to `title` when it is a string. [#75899](https://github.com/WordPress/gutenberg/pull/75899/)

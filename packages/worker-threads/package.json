@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/worker-threads",
-	"version": "1.0.0",
+	"version": "1.1.0-prerelease",
 	"description": "Utilities for type-safe Web Worker communication with RPC.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
