@@ -41,8 +41,8 @@ const GUIDELINE_ITEMS = [
 		slug: 'images',
 	},
 	{
-		title: __( 'Internal' ),
-		description: __( 'Add private notes and standards for your team.' ),
+		title: __( 'Additional' ),
+		description: __( 'Add additional guidelines for your team.' ),
 
 		slug: 'additional',
 	},
