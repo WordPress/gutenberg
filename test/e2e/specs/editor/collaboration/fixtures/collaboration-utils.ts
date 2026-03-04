@@ -66,6 +66,15 @@ export default class CollaborationUtils {
 		const html = await response.text();
 		const nonce = html.match( /name="_wpnonce" value="([^"]+)"/ )![ 1 ];
 
+		// WordPress core (7.0+) uses 'enable_real_time_collaboration',
+		// while the Gutenberg plugin uses 'wp_enable_real_time_collaboration'.
+		// Detect which field name is present on the page.
+		const optionName = html.includes(
+			'name="enable_real_time_collaboration"'
+		)
+			? 'enable_real_time_collaboration'
+			: 'wp_enable_real_time_collaboration';
+
 		const formData: Record< string, string | number > = {
 			option_page: 'writing',
 			action: 'update',
@@ -77,7 +86,7 @@ export default class CollaborationUtils {
 		};
 
 		if ( enabled ) {
-			formData.wp_enable_real_time_collaboration = 1;
+			formData[ optionName ] = 1;
 		}
 
 		await this.requestUtils.request.post( '/wp-admin/options.php', {
@@ -165,6 +174,114 @@ export default class CollaborationUtils {
 			this.waitForSyncCycle( this.primaryPage ),
 			this.waitForSyncCycle( this.secondPage ),
 		] );
+	}
+
+	/**
+	 * Wait for the editor to be fully ready: collaboration runtime enabled and
+	 * the entity record resolver finished. Optionally skips the collaboration
+	 * check (e.g. for the auto-draft test which checks collaboration separately).
+	 *
+	 * @param page                           The Playwright page to wait on.
+	 * @param [options]                      Optional settings.
+	 * @param [options.requireCollaboration] Whether to require _wpCollaborationEnabled (default true).
+	 * @param [options.timeout]              Maximum wait time in ms (default 10000).
+	 */
+	async waitForEntityReady(
+		page: Page,
+		{
+			requireCollaboration = true,
+			timeout = 10000,
+		}: { requireCollaboration?: boolean; timeout?: number } = {}
+	) {
+		await page.waitForFunction(
+			( { requireCollab } ) => {
+				const postId = ( window as any ).wp?.data
+					?.select( 'core/editor' )
+					?.getCurrentPostId();
+				if ( ! postId ) {
+					return false;
+				}
+				if (
+					requireCollab &&
+					( window as any )._wpCollaborationEnabled !== true
+				) {
+					return false;
+				}
+				return ( window as any ).wp.data
+					.select( 'core' )
+					.hasFinishedResolution( 'getEntityRecord', [
+						'postType',
+						'post',
+						postId,
+					] );
+			},
+			{ requireCollab: requireCollaboration },
+			{ timeout }
+		);
+	}
+
+	/**
+	 * Wait for entity resolution AND for any triggered reconciliation save to
+	 * settle. Use this after a page reload when a reconciliation save may be
+	 * initiated synchronously upon entity resolution.
+	 *
+	 * @param page              The Playwright page to wait on.
+	 * @param [options]         Optional settings.
+	 * @param [options.timeout] Maximum wait time in ms (default 15000).
+	 */
+	async waitForEntityReadyAndSaveSettled(
+		page: Page,
+		{ timeout = 15000 }: { timeout?: number } = {}
+	) {
+		await page.waitForFunction(
+			() => {
+				const postId = ( window as any ).wp?.data
+					?.select( 'core/editor' )
+					?.getCurrentPostId();
+				if ( ! postId ) {
+					return false;
+				}
+				if ( ( window as any )._wpCollaborationEnabled !== true ) {
+					return false;
+				}
+				if (
+					! ( window as any ).wp.data
+						.select( 'core' )
+						.hasFinishedResolution( 'getEntityRecord', [
+							'postType',
+							'post',
+							postId,
+						] )
+				) {
+					return false;
+				}
+				// Entity is resolved; wait for any triggered reconciliation
+				// save to settle before we read store values.
+				return ! ( window as any ).wp.data
+					.select( 'core/editor' )
+					.isSavingPost();
+			},
+			{ timeout }
+		);
+	}
+
+	/**
+	 * Read the _crdt_document meta value from the currently loaded entity record.
+	 *
+	 * @param page The Playwright page to evaluate on.
+	 */
+	async getCrdtDocument( page: Page ): Promise< string | null > {
+		return page.evaluate( () => {
+			const postId = ( window as any ).wp.data
+				.select( 'core/editor' )
+				.getCurrentPostId();
+			return (
+				( window as any ).wp.data
+					.select( 'core' )
+					.getEntityRecord( 'postType', 'post', postId )?.meta
+					?._crdt_document ?? null
+			);
+		} );
 	}
 
 	/**

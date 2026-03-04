@@ -683,6 +683,16 @@
 						}
 					]
 				},
+				"contentRole": {
+					"description": "This property marks the block itself as content. It is intended primarily for blocks that do not declare content attributes, or whose content is expressed only through their inner blocks. When enabled, content-only editing modes can still edit these blocks and allow inner blocks to be added or removed.",
+					"type": "boolean",
+					"default": false
+				},
+				"listView": {
+					"description": "This property enables a dedicated List View panel in the block inspector for the block. When enabled, the inspector shows a List View tree for the block's inner blocks, allowing users to inspect, reorder, and manage the block's items from the sidebar instead of only using the global document List View.",
+					"type": "boolean",
+					"default": false
+				},
 				"splitting": {
 					"description": "This property indicates whether the block can split when the Enter key is pressed or when blocks are pasted.",
 					"type": "boolean",

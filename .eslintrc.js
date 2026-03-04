@@ -536,6 +536,12 @@ module.exports = {
 			},
 		},
 		{
+			files: [ 'packages/block-library/src/*/save.[tj]s?(x)' ],
+			rules: {
+				'@wordpress/no-i18n-in-save': 'error',
+			},
+		},
+		{
 			files: [ 'packages/interactivity*/src/**' ],
 			rules: {
 				'react-compiler/react-compiler': 'off',
@@ -546,6 +552,12 @@ module.exports = {
 			files: [ 'packages/ui/src/**' ],
 			rules: {
 				'@wordpress/dependency-group': [ 'error', 'never' ],
+			},
+		},
+		{
+			files: [ 'packages/eslint-plugin/**', 'packages/theme/**' ],
+			rules: {
+				'@wordpress/no-unknown-ds-tokens': 'off',
 			},
 		},
 	],

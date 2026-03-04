@@ -461,6 +461,35 @@ test.describe( 'Unsynced pattern', () => {
 		).toBeVisible();
 	} );
 
+	test( 'detaches an unsynced pattern via the block options menu', async ( {
+		editor,
+	} ) => {
+		// Insert a paragraph block with unsynced pattern metadata.
+		await editor.setContent(
+			`<!-- wp:paragraph {"metadata":{"patternName":"my-pattern","name":"My unsynced pattern"}} -->
+<p>Pattern content</p>
+<!-- /wp:paragraph -->`
+		);
+
+		// Select the paragraph block (the unsynced pattern).
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+
+		// Open the block options menu and click "Detach pattern".
+		await editor.clickBlockOptionsMenuItem( 'Detach pattern' );
+
+		// Verify block content is preserved but patternName is removed from metadata.
+		const blocks = await editor.getBlocks();
+		expect( blocks ).toHaveLength( 1 );
+		expect( blocks[ 0 ].name ).toBe( 'core/paragraph' );
+		expect( blocks[ 0 ].attributes.content ).toBe( 'Pattern content' );
+		expect( blocks[ 0 ].attributes.metadata?.patternName ).toBeUndefined();
+		expect( blocks[ 0 ].attributes.metadata?.name ).toBe(
+			'My unsynced pattern'
+		);
+	} );
+
 	test( 'supports editing pattern via Edit pattern toolbar button', async ( {
 		editor,
 		page,

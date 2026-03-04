@@ -36,7 +36,7 @@ test.describe( 'Test Custom Post Types', () => {
 			} )
 			.click();
 
-		await page.locator( '.editor-post-parent__panel-toggle' ).click();
+		await page.getByRole( 'button', { name: /^Change parent:/ } ).click();
 
 		const parentPageLocator = page.getByRole( 'combobox', {
 			name: 'Parent',
@@ -53,7 +53,7 @@ test.describe( 'Test Custom Post Types', () => {
 		await editor.publishPost();
 		await page.reload();
 
-		await page.locator( '.editor-post-parent__panel-toggle' ).click();
+		await page.getByRole( 'button', { name: /^Change parent:/ } ).click();
 
 		// Confirm parent page selection matches after reloading.
 		await expect( parentPageLocator ).toHaveValue( parentPage );

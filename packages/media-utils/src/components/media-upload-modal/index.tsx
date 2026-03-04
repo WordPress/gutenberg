@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useMemo } from '@wordpress/element';
+import {
+	createPortal,
+	useState,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	privateApis as coreDataPrivateApis,
@@ -565,10 +570,13 @@ export function MediaUploadModal( {
 				searchLabel={ searchLabel }
 				itemListLabel={ __( 'Media items' ) }
 			/>
-			<SnackbarNotices
-				className="media-upload-modal__snackbar"
-				context={ NOTICES_CONTEXT }
-			/>
+			{ createPortal(
+				<SnackbarNotices
+					className="media-upload-modal__snackbar"
+					context={ NOTICES_CONTEXT }
+				/>,
+				document.body
+			) }
 		</Modal>
 	);
 }

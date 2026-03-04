@@ -19,6 +19,7 @@ import { Icon, chevronRight } from '@wordpress/icons';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
 export default function BlockQuickNavigation( {
 	clientIds,
@@ -78,7 +79,11 @@ function BlockQuickNavigationItem( {
 		);
 
 	const blockType = getBlockType( blockName );
-	const blockTitle = blockType?.title || blockName;
+	const displayTitle = useBlockDisplayTitle( {
+		clientId,
+		context: 'list-view',
+	} );
+	const blockTitle = displayTitle || blockType?.title || blockName;
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const hasChildren = childBlocks && childBlocks.length > 0;

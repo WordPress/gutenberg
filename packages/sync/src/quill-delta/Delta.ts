@@ -24,6 +24,21 @@ function cloneDeep< T >( value: T ): T {
 
 const NULL_CHARACTER = String.fromCharCode( 0 ); // Placeholder char for embed in diff()
 
+/**
+ * Normalize diff changes so that `count` reflects UTF-16 code-unit length
+ * rather than grapheme-cluster count (which diffChars may return when
+ * Intl.Segmenter is available, e.g. diff v8+).
+ *
+ * @param changes - The array of changes from diffChars.
+ * @return The changes with `count` normalized to UTF-16 code-unit length.
+ */
+function normalizeChangeCounts( changes: Change[] ): Change[] {
+	return changes.map( ( change ) => ( {
+		...change,
+		count: change.value.length,
+	} ) );
+}
+
 interface EmbedHandler< T > {
 	compose: ( a: T, b: T, keepNull: boolean ) => T;
 	invert: ( a: T, b: T ) => T;
@@ -399,7 +414,9 @@ class Delta {
 			return new Delta();
 		}
 		const strings = this.deltasToStrings( other );
-		const diffResult = diffChars( strings[ 0 ], strings[ 1 ] );
+		const diffResult = normalizeChangeCounts(
+			diffChars( strings[ 0 ], strings[ 1 ] )
+		);
 		const thisIter = new OpIterator( this.ops );
 		const otherIter = new OpIterator( other.ops );
 		const retDelta = this.convertChangesToDelta(
@@ -612,7 +629,9 @@ class Delta {
 		}
 
 		const strings = this.deltasToStrings( other );
-		let diffs = diffChars( strings[ 0 ], strings[ 1 ] );
+		let diffs = normalizeChangeCounts(
+			diffChars( strings[ 0 ], strings[ 1 ] )
+		);
 		let lastDiffPosition = 0;
 		const adjustedDiffs: Change[] = [];
 

@@ -61,7 +61,7 @@ jobs:
                   xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e -- --shard="${SHARD_PART}/${SHARD_TOTAL}"
 
             - name: Archive debug artifacts (screenshots, traces)
-              uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               if: ${{ !cancelled() }}
               with:
                   name: failures-artifacts--${{ matrix.part }}
@@ -69,7 +69,7 @@ jobs:
                   if-no-files-found: ignore
 
             - name: Archive blob reports (HTML)
-              uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               if: ${{ !cancelled() }}
               with:
                   name: blob-reports--${{ matrix.part }}
@@ -77,7 +77,7 @@ jobs:
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               if: ${{ !cancelled() }}
               with:
                   name: flaky-tests-report--${{ matrix.part }}
@@ -94,7 +94,7 @@ jobs:
         outputs:
             has-flaky-test-report: ${{ !!steps.merge-flaky-tests-reports.outputs.artifact-id }}
         steps:
-            - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -103,7 +103,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Merge failures artifacts
-              uses: actions/upload-artifact/merge@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+              uses: actions/upload-artifact/merge@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               # Don't fail the job if there aren't any artifacts to merge.
               continue-on-error: true
               with:
@@ -114,7 +114,7 @@ jobs:
 
             - name: Merge flaky tests reports
               id: merge-flaky-tests-reports
-              uses: actions/upload-artifact/merge@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+              uses: actions/upload-artifact/merge@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               continue-on-error: true
               with:
                   name: flaky-tests-report
@@ -122,7 +122,7 @@ jobs:
                   delete-merged: true
 
             - name: Merge blob reports
-              uses: actions/upload-artifact/merge@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+              uses: actions/upload-artifact/merge@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               continue-on-error: true
               with:
                   name: blob-reports-merged
@@ -130,7 +130,7 @@ jobs:
                   delete-merged: true
 
             - name: Download merged blob reports
-              uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+              uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
               continue-on-error: true
               with:
                   name: blob-reports-merged
@@ -141,7 +141,7 @@ jobs:
               continue-on-error: true
 
             - name: Upload merged HTML report
-              uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               continue-on-error: true
               with:
                   name: html-report--attempt-${{ github.run_attempt }}
@@ -166,7 +166,7 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
-            - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+            - uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
               # Don't fail the job if there isn't any flaky tests report.
               continue-on-error: true
               with:
