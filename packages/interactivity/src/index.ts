@@ -13,7 +13,6 @@ import { batch, effect } from '@preact/signals';
  */
 import registerDirectives, { routerRegions } from './directives';
 import {
-	initialVdom,
 	initialVdomPromise,
 	hydrateRegions,
 	getRegionRootFragment,
@@ -79,7 +78,6 @@ export const privateApis = (
 	if ( lock === requiredConsent ) {
 		return {
 			getRegionRootFragment,
-			initialVdom,
 			initialVdomPromise,
 			toVdom,
 			directive,
