@@ -13,9 +13,7 @@ import { useMemo } from '@wordpress/element';
 function useMediaUploadSettings( settings = {} ) {
 	return useMemo(
 		() => ( {
-			mediaUpload:
-				settings.__unstableMediaUploadServer ||
-				settings.mediaUpload,
+			mediaUpload: settings.__unstableMediaUploadServer || settings.mediaUpload,
 			mediaSideload: settings.mediaSideload,
 			maxUploadFileSize: settings.maxUploadFileSize,
 			allowedMimeTypes: settings.allowedMimeTypes,
