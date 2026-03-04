@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 2.41.0 (2026-03-04)
+
+### Bug Fixes
+
+-   Fix race condition where the router evaluates before `hydrateRegions()` completes on Safari and Firefox, causing all interactive regions to be permanently non-functional (dead DOM). ([#76053](https://github.com/WordPress/gutenberg/pull/76053))
+
 ## 2.40.0 (2026-02-18)
 
 ### Deprecations
