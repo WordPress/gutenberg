@@ -75,6 +75,10 @@ const fields: Field< SamplePost >[] = [
 			{ value: 2, label: 'John' },
 			{ value: 3, label: 'Alice' },
 			{ value: 4, label: 'Bob' },
+			{
+				value: 5,
+				label: 'Superadministratoraccountwithalongunhyphenatedusername',
+			},
 		],
 		setValue: ( { value } ) => ( {
 			author: Number( value ),
@@ -310,7 +314,7 @@ const LayoutPanelComponent = ( {
 	const [ post, setPost ] = useState< SamplePost >( {
 		title: 'Hello, World!',
 		order: 2,
-		author: 1,
+		author: 5,
 		status: 'draft',
 		reviewer: 'fulano',
 		date: '2021-01-01T12:00:00',
