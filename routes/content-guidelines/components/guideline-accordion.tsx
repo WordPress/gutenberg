@@ -2,13 +2,13 @@
  * WordPress dependencies
  */
 import {
-	Button,
 	Icon,
 	__experimentalText as Text,
 	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	Card,
+	Button,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown } from '@wordpress/icons';
@@ -32,10 +32,25 @@ export default function GuidelineAccordion( {
 
 	return (
 		<Card className="content-guidelines__accordion">
-			<VStack
-				spacing={ 4 }
+			<Button
+				className="content-guidelines__accordion-trigger"
 				onClick={ () => setIsOpen( ! isOpen ) }
-				className="content-guidelines__accordion-header-container"
+				aria-expanded={ isOpen }
+				aria-controls={ contentId }
+				aria-describedby={ descriptionId }
+				aria-label={
+					isOpen
+						? sprintf(
+								/* translators: %s: Guideline title */
+								__( 'Collapse %s guidelines' ),
+								title
+						  )
+						: sprintf(
+								/* translators: %s: Guideline title */
+								__( 'Expand %s guidelines' ),
+								title
+						  )
+				}
 			>
 				<HStack spacing={ 4 }>
 					<VStack spacing={ 1 }>
@@ -58,42 +73,17 @@ export default function GuidelineAccordion( {
 							{ description }
 						</Text>
 					</VStack>
-					<Button
-						icon={
-							<Icon
-								icon={ chevronDown }
-								className={
-									isOpen
-										? 'content-guidelines__accordion-chevron-up'
-										: 'content-guidelines__accordion-chevron-down'
-								}
-							/>
-						}
-						onClick={ (
-							event: React.MouseEvent< HTMLButtonElement >
-						) => {
-							event.stopPropagation();
-							setIsOpen( ! isOpen );
-						} }
-						aria-expanded={ isOpen }
-						aria-controls={ contentId }
-						aria-label={
+					<Icon
+						icon={ chevronDown }
+						className={
 							isOpen
-								? sprintf(
-										/* translators: %s: Guideline title */
-										__( 'Collapse %s guidelines' ),
-										title
-								  )
-								: sprintf(
-										/* translators: %s: Guideline title */
-										__( 'Expand %s guidelines' ),
-										title
-								  )
+								? 'content-guidelines__accordion-chevron-up'
+								: 'content-guidelines__accordion-chevron-down'
 						}
 					/>
 				</HStack>
-			</VStack>
-			{ isOpen && children }
+			</Button>
+			<div hidden={ ! isOpen }>{ children }</div>
 		</Card>
 	);
 }
