@@ -1,0 +1,165 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://schemas.wordpress.org/wp-env.schema.json",
+	"title": "wp-env config",
+	"type": "object",
+	"additionalProperties": false,
+	"properties": {
+		"$schema": {
+			"type": "string"
+		},
+		"core": {
+			"type": [ "string", "null" ]
+		},
+		"phpVersion": {
+			"type": [ "string", "null" ],
+			"pattern": "^[0-9]+\\.[0-9]+$"
+		},
+		"plugins": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"themes": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"port": {
+			"type": "integer",
+			"minimum": 1,
+			"maximum": 65535
+		},
+		"testsPort": {
+			"type": "integer",
+			"minimum": 1,
+			"maximum": 65535
+		},
+		"mysqlPort": {
+			"type": [ "integer", "null" ],
+			"minimum": 1,
+			"maximum": 65535
+		},
+		"phpmyadmin": {
+			"type": "boolean"
+		},
+		"phpmyadminPort": {
+			"type": [ "integer", "null" ],
+			"minimum": 1,
+			"maximum": 65535
+		},
+		"multisite": {
+			"type": "boolean"
+		},
+		"testsEnvironment": {
+			"type": "boolean"
+		},
+		"autoPort": {
+			"type": "boolean"
+		},
+		"config": {
+			"type": "object",
+			"additionalProperties": {
+				"type": [ "string", "number", "boolean" ]
+			}
+		},
+		"mappings": {
+			"type": "object",
+			"additionalProperties": {
+				"type": "string"
+			}
+		},
+		"lifecycleScripts": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"afterStart": {
+					"type": [ "string", "null" ]
+				},
+				"afterClean": {
+					"type": [ "string", "null" ]
+				},
+				"afterReset": {
+					"type": [ "string", "null" ]
+				},
+				"afterCleanup": {
+					"type": [ "string", "null" ]
+				},
+				"afterDestroy": {
+					"type": [ "string", "null" ]
+				}
+			}
+		},
+		"env": {
+			"type": "object",
+			"additionalProperties": {
+				"$ref": "#/definitions/environmentConfig"
+			}
+		}
+	},
+	"definitions": {
+		"environmentConfig": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"$schema": {
+					"type": "string"
+				},
+				"core": {
+					"type": [ "string", "null" ]
+				},
+				"phpVersion": {
+					"type": [ "string", "null" ],
+					"pattern": "^[0-9]+\\.[0-9]+$"
+				},
+				"plugins": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"themes": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"port": {
+					"type": "integer",
+					"minimum": 1,
+					"maximum": 65535
+				},
+				"mysqlPort": {
+					"type": [ "integer", "null" ],
+					"minimum": 1,
+					"maximum": 65535
+				},
+				"phpmyadmin": {
+					"type": "boolean"
+				},
+				"phpmyadminPort": {
+					"type": [ "integer", "null" ],
+					"minimum": 1,
+					"maximum": 65535
+				},
+				"multisite": {
+					"type": "boolean"
+				},
+				"config": {
+					"type": "object",
+					"additionalProperties": {
+						"type": [ "string", "number", "boolean" ]
+					}
+				},
+				"mappings": {
+					"type": "object",
+					"additionalProperties": {
+						"type": "string"
+					}
+				}
+			}
+		}
+	}
+}
