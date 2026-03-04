@@ -33,6 +33,14 @@ jobs:
                 event: ['${{ github.event_name }}']
                 node: ['20', '22', '24']
                 os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
+                annotations: [false]
+
+                include:
+                    # Only generate annotations once.
+                    - event: 'pull_request'
+                      node: ['24']
+                      os: ['ubuntu-24.04']
+                      annotations: true
                 exclude:
                     # On PRs: Only test Node 20 on Ubuntu and Windows
                     - event: 'pull_request'
@@ -74,10 +82,10 @@ jobs:
               run: npm run lint:tsconfig
 
             - name: Lint JavaScript
-              run: npm run lint:js -- --format compact
+              run: npm run lint:js${{ matrix.annotiations && ' -- --format compact' || '' }}
 
             - name: Lint Styles
-              run: npm run lint:css -- --formatter compact
+              run: npm run lint:css${{ matrix.annotiations && ' -- --formatter compact' || '' }}
 
             - name: Type checking
               run: npm run build
