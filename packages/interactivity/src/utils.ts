@@ -521,7 +521,9 @@ export const navigationSignal = signal( 0 );
 export const sessionId =
 	typeof crypto?.randomUUID === 'function'
 		? crypto.randomUUID()
-		: Math.random().toString( 36 ).substr( 2 ) + Date.now().toString( 36 );
+		: Array.from( crypto.getRandomValues( new Uint8Array( 16 ) ), ( b ) =>
+				b.toString( 16 ).padStart( 2, '0' )
+		  ).join( '' );
 
 /**
  * Recursively clones the passed object.
