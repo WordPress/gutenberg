@@ -23,9 +23,11 @@ function PatternsManageButton( { clientId } ) {
 		managePatternsUrl,
 		isSyncedPattern,
 		isUnsyncedPattern,
+		canEdit,
 	} = useSelect(
 		( select ) => {
-			const { canRemoveBlock, getBlock } = select( blockEditorStore );
+			const { canRemoveBlock, getBlock, canEditBlock } =
+				select( blockEditorStore );
 			const { canUser } = select( coreStore );
 			const block = getBlock( clientId );
 
@@ -43,6 +45,7 @@ function PatternsManageButton( { clientId } ) {
 
 			return {
 				attributes: block.attributes,
+				canEdit: canEditBlock( clientId ),
 				// For unsynced patterns, detaching is simply removing the `patternName` attribute.
 				// For synced patterns, the `core:block` block is replaced with its inner blocks,
 				// so checking whether `canRemoveBlock` is possible is required.
@@ -78,7 +81,7 @@ function PatternsManageButton( { clientId } ) {
 		useDispatch( patternsStore )
 	);
 
-	if ( ! isVisible ) {
+	if ( ! isVisible || ! canEdit ) {
 		return null;
 	}
 
