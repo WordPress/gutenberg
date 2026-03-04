@@ -263,12 +263,13 @@ const wasmInlinePlugin = {
 				const require = createRequire( args.resolveDir + '/index.js' );
 				try {
 					const resolved = require.resolve( args.path );
-					return { path: resolved,
+					return {
+						path: resolved,
 						namespace: 'wasm-inline',
-			};
-						} catch {
-				// If resolution fails, let other plugins handle it.
-							return null;
+					};
+				} catch {
+					// If resolution fails, let other plugins handle it.
+					return null;
 				}
 			}
 			return null;
