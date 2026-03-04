@@ -267,7 +267,7 @@ describe( 'getRevisions', () => {
 	const KIND = 'postType';
 	const NAME = 'post';
 	const RECORD_KEY = 1;
-	const REVISIONS = [ { id: 1 }, { id: 2 }, { id: 3 } ];
+	const REVISIONS = [ { id: 2 }, { id: 3 }, { id: 4 } ];
 
 	let registry;
 
@@ -276,9 +276,19 @@ describe( 'getRevisions', () => {
 		triggerFetch.mockReset();
 	} );
 
-	it( 'preserves all revisions when getRevision is called after getRevisions with the same query', async () => {
+	it( 'preserves all revisions when getRevision resolves after getRevisions', async () => {
+		let resolveSlowFetch;
+		const slowFetchPromise = new Promise( ( resolve ) => {
+			resolveSlowFetch = resolve;
+		} );
+
 		triggerFetch.mockImplementation( ( { path } ) => {
 			if ( path && path.includes( 'revisions' ) ) {
+				// Single revision fetch: return slow promise.
+				if ( /revisions\/\d+/.test( path ) ) {
+					return slowFetchPromise;
+				}
+				// Collection fetch: return immediately.
 				return Promise.resolve( {
 					json: () => Promise.resolve( REVISIONS ),
 					headers: { get: () => String( REVISIONS.length ) },
@@ -289,31 +299,28 @@ describe( 'getRevisions', () => {
 
 		const resolveSelectStore = registry.resolveSelect( coreDataStore );
 
+		// Start getRevision first (slow), then getRevisions (fast).
+		const revisionPromise = resolveSelectStore.getRevision(
+			KIND,
+			NAME,
+			RECORD_KEY,
+			1,
+			{ context: 'edit' }
+		);
 		await resolveSelectStore.getRevisions( KIND, NAME, RECORD_KEY, {
 			context: 'edit',
 		} );
 
-		triggerFetch.mockImplementation( ( { path } ) => {
-			if ( path && path.includes( 'revisions' ) ) {
-				return Promise.resolve( REVISIONS[ 0 ] );
-			}
-			return Promise.resolve( {} );
-		} );
-		triggerFetch.mockClear();
+		// Now resolve the slow single-revision fetch.
+		resolveSlowFetch( REVISIONS[ 0 ] );
+		await revisionPromise;
 
-		// Call getRevision for revision 1 with the same query.
-		// With the fix: resolver is already marked done → no API call.
-		// Without the fix: resolver fires → receives single revision with
-		// { context: 'edit' } query → getMergedItemIds corrupts stored IDs.
-		await resolveSelectStore.getRevision( KIND, NAME, RECORD_KEY, 1, {
-			context: 'edit',
-		} );
-
-		expect( triggerFetch ).not.toHaveBeenCalled();
+		// Wait for all pending thunks (receiveRevisions) to settle.
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 		const allRevisions = registry
 			.select( coreDataStore )
 			.getRevisions( KIND, NAME, RECORD_KEY, { context: 'edit' } );
-		expect( allRevisions ).toHaveLength( 3 );
+		expect( allRevisions.map( ( r ) => r.id ) ).toEqual( [ 2, 3, 4 ] );
 	} );
 } );
