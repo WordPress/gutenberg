@@ -6813,8 +6813,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		$this->assertStringContainsString( ':where(.wp-block-navigation .current-menu-item)', $stylesheet );
-		$this->assertStringNotContainsString( ':where(.wp-block-navigation-link)', $stylesheet );
+		$expected   = ':root :where(.wp-block-navigation .current-menu-item){background-color: blue;color: red;}';
+		$this->assertSameCSS( $expected, $stylesheet );
 	}
 
 	/**
