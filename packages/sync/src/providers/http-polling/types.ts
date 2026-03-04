@@ -33,7 +33,6 @@ interface SyncEnvelopeFromServer {
 	awareness: AwarenessState;
 	compaction_request?: SyncUpdate[]; // deprecated
 	end_cursor: number; // use as `after` in next request
-	read_only?: boolean;
 	should_compact?: boolean;
 	room: string;
 	updates: SyncUpdate[];

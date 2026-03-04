@@ -368,23 +368,6 @@ function poll(): void {
 				}
 
 				const roomState = roomStates.get( room.room )!;
-
-				// If the server indicates the room is full, notify
-				// the client and stop syncing this room.
-				if ( room.read_only ) {
-					roomState.onStatusChange( {
-						status: 'disconnected',
-						error: {
-							code: 'connection-limit-exceeded',
-							name: 'ConnectionError',
-							message:
-								'This post has reached its maximum number of simultaneous editors.',
-						},
-					} );
-					unregisterRoom( room.room );
-					return;
-				}
-
 				roomState.endCursor = room.end_cursor;
 
 				// Process awareness update.
@@ -434,6 +417,28 @@ function poll(): void {
 				pollInterval = POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
 			}
 		} catch ( error ) {
+			// If the server returned 429, the room is full. Notify all
+			// rooms and stop polling — this is permanent, not transient.
+			if ( error instanceof Response && error.status === 429 ) {
+				const rooms = Array.from( roomStates.keys() );
+				for ( const room of rooms ) {
+					const state = roomStates.get( room );
+					if ( state ) {
+						state.onStatusChange( {
+							status: 'disconnected',
+							error: {
+								code: 'connection-limit-exceeded',
+								name: 'ConnectionError',
+								message:
+									'This post has reached its maximum number of simultaneous editors.',
+							},
+						} );
+					}
+					unregisterRoom( room );
+				}
+				return;
+			}
+
 			// Exponential backoff on error: double the backoff time, up to max
 			pollInterval = Math.min(
 				pollInterval * 2,
