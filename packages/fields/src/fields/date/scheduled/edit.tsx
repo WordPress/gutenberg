@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-// @ts-ignore
+// @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { getSettings } from '@wordpress/date';
@@ -38,7 +38,9 @@ export default function ScheduledDateEdit( {
 	return (
 		<PrivatePublishDateTimePicker
 			currentDate={ currentDate }
-			onChange={ ( newDate: any ) => onChange( { date: newDate } ) }
+			onChange={ ( newDate: string | undefined ) =>
+				onChange( { date: newDate } )
+			}
 			is12Hour={ is12HourTime }
 			dateOrder={
 				/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */

@@ -259,6 +259,8 @@ export const registerPostTypeSchema =
 				statusField,
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					dateField,
+				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+					scheduledDateField,
 				slugField,
 				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 				postTypeConfig.supports?.comments && commentStatusField,
