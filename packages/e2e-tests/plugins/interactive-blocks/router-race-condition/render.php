@@ -9,6 +9,7 @@
 ?>
 <div
 	data-wp-interactive="router-race-condition"
+	data-wp-router-region="router-race-condition/buttons"
 	data-wp-context='{ "counter": 0 }'
 >
 	<button
