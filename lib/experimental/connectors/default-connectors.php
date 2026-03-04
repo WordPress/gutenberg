@@ -197,6 +197,32 @@ function _gutenberg_get_connector_settings(): array {
 		}
 	}
 
+	// Add plugin installation and activation status.
+	// Build a slug-to-file map following the same pattern as WP_Plugin_Dependencies::get_plugin_dirnames().
+	if ( ! function_exists( 'get_plugins' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+	$plugin_files_by_slug = array();
+	foreach ( array_keys( get_plugins() ) as $plugin_file ) {
+		$slug                          = str_contains( $plugin_file, '/' ) ? dirname( $plugin_file ) : str_replace( '.php', '', $plugin_file );
+		$plugin_files_by_slug[ $slug ] = $plugin_file;
+	}
+
+	foreach ( $connectors as $connector_id => $connector ) {
+		if ( empty( $connector['plugin']['slug'] ) ) {
+			continue;
+		}
+
+		$plugin_slug = $connector['plugin']['slug'];
+		$plugin_file = $plugin_files_by_slug[ $plugin_slug ] ?? null;
+
+		$is_installed = null !== $plugin_file;
+		$is_activated = $is_installed && is_plugin_active( $plugin_file );
+
+		$connectors[ $connector_id ]['plugin']['is_installed'] = $is_installed;
+		$connectors[ $connector_id ]['plugin']['is_activated'] = $is_activated;
+	}
+
 	return $connectors;
 }
 
@@ -388,7 +414,11 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 		);
 
 		if ( ! empty( $connector_data['plugin'] ) ) {
-			$connector_out['plugin'] = $connector_data['plugin'];
+			$connector_out['plugin'] = array(
+				'slug'        => $connector_data['plugin']['slug'],
+				'isInstalled' => $connector_data['plugin']['is_installed'] ?? false,
+				'isActivated' => $connector_data['plugin']['is_activated'] ?? false,
+			);
 		}
 
 		$connectors[ $connector_id ] = $connector_out;

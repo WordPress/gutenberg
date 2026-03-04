@@ -9,6 +9,7 @@ import {
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
 import { __ } from '@wordpress/i18n';
+import { Badge } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -24,7 +25,11 @@ interface ConnectorData {
 	name: string;
 	description: string;
 	type: 'ai_provider';
-	plugin?: { slug: string };
+	plugin?: {
+		slug: string;
+		isInstalled: boolean;
+		isActivated: boolean;
+	};
 	authentication: ConnectorAuthentication;
 }
 
@@ -66,11 +71,15 @@ const ConnectedBadge = () => (
 	</span>
 );
 
+const UnavailableActionBadge = () => <Badge>{ __( 'Not available' ) }</Badge>;
+
 interface ApiKeyConnectorConfig {
 	pluginSlug?: string;
 	settingName: string;
 	helpUrl?: string;
 	Logo?: React.ComponentType;
+	isInstalled?: boolean;
+	isActivated?: boolean;
 }
 
 function ApiKeyConnector( {
@@ -80,6 +89,8 @@ function ApiKeyConnector( {
 	settingName,
 	helpUrl,
 	Logo,
+	isInstalled,
+	isActivated,
 }: ConnectorRenderProps & ApiKeyConnectorConfig ) {
 	let helpLabel: string | undefined;
 	try {
@@ -92,6 +103,8 @@ function ApiKeyConnector( {
 
 	const {
 		pluginStatus,
+		canInstallPlugins,
+		canActivatePlugins,
 		isExpanded,
 		setIsExpanded,
 		isBusy,
@@ -104,7 +117,13 @@ function ApiKeyConnector( {
 	} = useConnectorPlugin( {
 		pluginSlug,
 		settingName,
+		isInstalled,
+		isActivated,
 	} );
+	const showUnavailableBadge =
+		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
+		( pluginStatus === 'inactive' && canActivatePlugins === false );
+	const showActionButton = ! showUnavailableBadge;
 
 	return (
 		<ConnectorItem
@@ -117,20 +136,27 @@ function ApiKeyConnector( {
 			actionArea={
 				<HStack spacing={ 3 } expanded={ false }>
 					{ isConnected && <ConnectedBadge /> }
-					<Button
-						variant={
-							isExpanded || isConnected ? 'tertiary' : 'secondary'
-						}
-						size={
-							isExpanded || isConnected ? undefined : 'compact'
-						}
-						onClick={ handleButtonClick }
-						disabled={ pluginStatus === 'checking' || isBusy }
-						isBusy={ isBusy }
-						aria-expanded={ isExpanded }
-					>
-						{ getButtonLabel() }
-					</Button>
+					{ showUnavailableBadge && <UnavailableActionBadge /> }
+					{ showActionButton && (
+						<Button
+							variant={
+								isExpanded || isConnected
+									? 'tertiary'
+									: 'secondary'
+							}
+							size={
+								isExpanded || isConnected
+									? undefined
+									: 'compact'
+							}
+							onClick={ handleButtonClick }
+							disabled={ pluginStatus === 'checking' || isBusy }
+							isBusy={ isBusy }
+							aria-expanded={ isExpanded }
+						>
+							{ getButtonLabel() }
+						</Button>
+					) }
 				</HStack>
 			}
 		>
@@ -181,6 +207,8 @@ export function registerDefaultConnectors() {
 					settingName={ authentication.settingName }
 					helpUrl={ authentication.credentialsUrl ?? undefined }
 					Logo={ CONNECTOR_LOGOS[ connectorId ] }
+					isInstalled={ data.plugin?.isInstalled }
+					isActivated={ data.plugin?.isActivated }
 				/>
 			),
 		} );
