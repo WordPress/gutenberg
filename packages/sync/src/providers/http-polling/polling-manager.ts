@@ -419,7 +419,11 @@ function poll(): void {
 		} catch ( error ) {
 			// If the server returned 429, the room is full. Notify all
 			// rooms and stop polling — this is permanent, not transient.
-			if ( error instanceof Response && error.status === 429 ) {
+			if (
+				typeof Response !== 'undefined' &&
+				error instanceof Response &&
+				error.status === 429
+			) {
 				const rooms = Array.from( roomStates.keys() );
 				for ( const room of rooms ) {
 					const state = roomStates.get( room );
