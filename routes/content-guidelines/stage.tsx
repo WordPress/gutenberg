@@ -55,6 +55,7 @@ function ContentGuidelinesPage() {
 	useEffect( () => {
 		// Populate the store with the content guidelines.
 		fetchContentGuidelines()
+			.then( () => setError( null ) )
 			.catch( ( e: Error ) => setError( e.message ) )
 			.finally( () => setLoading( false ) );
 	}, [] );

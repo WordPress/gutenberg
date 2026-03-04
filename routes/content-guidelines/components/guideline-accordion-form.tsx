@@ -69,6 +69,7 @@ export default function GuidelineAccordionForm( {
 		setGuideline( slug, draft );
 		setLoading( true );
 		saveContentGuidelines()
+			.then( () => setError( null ) )
 			.catch( ( e: Error ) => setError( e.message ) )
 			.finally( () => setLoading( false ) );
 	};
@@ -105,7 +106,7 @@ export default function GuidelineAccordionForm( {
 					variant="primary"
 					type="submit"
 					className="save-button"
-					disabled={ loading }
+					disabled={ loading || ! draft }
 				>
 					{ __( 'Save guidelines' ) }
 				</Button>
