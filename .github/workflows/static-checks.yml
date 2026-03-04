@@ -32,7 +32,6 @@ jobs:
             matrix:
                 node: ['20', '22', '24']
                 os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
-                annotations: [false]
 
                 include:
                     # Only generate annotations once.
