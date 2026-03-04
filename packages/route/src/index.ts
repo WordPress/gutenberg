@@ -25,6 +25,7 @@ export type {
  * Internal dependencies
  */
 export { privateApis } from './private-apis';
+export type { Router } from './types';
 
 /**
  * Hook to invalidate the router cache and trigger a re-render.
