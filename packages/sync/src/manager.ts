@@ -633,16 +633,21 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * @param {ObjectType} objectType Object type.
 	 * @param {ObjectID}   objectId   Object ID.
 	 */
-	function createPersistedCRDTDoc(
+	async function createPersistedCRDTDoc(
 		objectType: ObjectType,
 		objectId: ObjectID
-	): string | null {
+	): Promise< string | null > {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
 		if ( ! entityState?.ydoc ) {
 			return null;
 		}
+
+		// Y.Doc updates are deferred via yieldToEventLoop. Await a promise that
+		// resolves on the next tick of the event loop so pending updates are flushed
+		// before we serialize the document.
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 		return serializeCrdtDoc( entityState.ydoc );
 	}

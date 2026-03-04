@@ -491,6 +491,8 @@ Given a store descriptor, returns an object of the store's action creators. Call
 
 Note: Action creators returned by the dispatch will return a promise when they are called.
 
+Warning: This global `dispatch` function only works with the default registry. It will not work with custom `RegistryProvider` or `BlockEditorProvider` contexts. In React components, prefer the `useDispatch` hook instead, which is registry-aware.
+
 _Usage_
 
 ```js
@@ -625,6 +627,8 @@ _Returns_
 ### select
 
 Given a store descriptor, returns an object of the store's selectors. The selector functions are been pre-bound to pass the current state automatically. As a consumer, you need only pass arguments of the selector, if applicable.
+
+Warning: This global `select` function only works with the default registry. It will not work with custom `RegistryProvider` or `BlockEditorProvider` contexts. In React components, prefer the `useSelect` hook instead, which is registry-aware.
 
 _Usage_
 

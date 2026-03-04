@@ -176,18 +176,6 @@ function CalendarDateTimeControl< Item >( {
 			hideLabelFromVision={ hideLabelFromVision }
 		>
 			<Stack direction="column" gap="lg">
-				{ /* Calendar widget */ }
-				<DateCalendar
-					style={ { width: '100%' } }
-					selected={
-						value ? parseDateTime( value ) || undefined : undefined
-					}
-					onSelect={ onSelectDate }
-					month={ calendarMonth }
-					onMonthChange={ setCalendarMonth }
-					timeZone={ timezoneString || undefined }
-					weekStartsOn={ weekStartsOn }
-				/>
 				{ /* Manual datetime input */ }
 				<ValidatedInputControl
 					ref={ inputControlRef }
@@ -205,6 +193,18 @@ function CalendarDateTimeControl< Item >( {
 							: ''
 					}
 					onChange={ handleManualDateTimeChange }
+				/>
+				{ /* Calendar widget */ }
+				<DateCalendar
+					style={ { width: '100%' } }
+					selected={
+						value ? parseDateTime( value ) || undefined : undefined
+					}
+					onSelect={ onSelectDate }
+					month={ calendarMonth }
+					onMonthChange={ setCalendarMonth }
+					timeZone={ timezoneString || undefined }
+					weekStartsOn={ weekStartsOn }
 				/>
 			</Stack>
 		</BaseControl>

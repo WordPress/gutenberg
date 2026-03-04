@@ -1241,21 +1241,20 @@ export default function Image( {
 		} );
 	};
 
-	const featuredImageControl = (
-		<BlockSettingsMenuControls>
-			{ ( { selectedClientIds } ) =>
-				selectedClientIds.length === 1 &&
-				! isDescendentOfQueryLoop &&
-				postId &&
-				id &&
-				clientId === selectedClientIds[ 0 ] && (
-					<MenuItem onClick={ setPostFeatureImage }>
-						{ __( 'Set as featured image' ) }
-					</MenuItem>
-				)
-			}
-		</BlockSettingsMenuControls>
-	);
+	const featuredImageControl =
+		! isDescendentOfQueryLoop && postId && id ? (
+			<BlockSettingsMenuControls>
+				{ ( { canEdit, selectedClientIds } ) =>
+					canEdit &&
+					selectedClientIds.length === 1 &&
+					clientId === selectedClientIds[ 0 ] && (
+						<MenuItem onClick={ setPostFeatureImage }>
+							{ __( 'Set as featured image' ) }
+						</MenuItem>
+					)
+				}
+			</BlockSettingsMenuControls>
+		) : null;
 
 	return (
 		<>

@@ -160,3 +160,16 @@ export function receiveEditorAssets( assets ) {
 		assets,
 	};
 }
+
+/**
+ * Returns an action object used to set whether collaboration is supported.
+ *
+ * @param {boolean} supported Whether collaboration is supported.
+ *
+ * @return {Object} Action object.
+ */
+export const setCollaborationSupported =
+	( supported ) =>
+	( { dispatch } ) => {
+		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
+	};
