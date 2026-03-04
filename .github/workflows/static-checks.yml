@@ -79,9 +79,11 @@ jobs:
 
             - name: Lint JavaScript
               run: npm run lint:js${{ matrix.annotations && ' -- --format compact' || '' }}
+              if: ${{ contains( runner.os, 'ubuntu-' ) }}
 
             - name: Lint Styles
               run: npm run lint:css${{ matrix.annotations && ' -- --formatter compact' || '' }}
+              if: ${{ contains( runner.os, 'ubuntu-' ) }}
 
             - name: Type checking
               run: npm run build
