@@ -4,12 +4,12 @@
 .content-guidelines__accordion {
 	padding: $grid-unit-20 $grid-unit-30;
 
-	.rotate-180 {
+	&-chevron-up {
 		transition: transform 0.3s ease-in-out;
 		transform: rotate(180deg);
 	}
 
-	.rotate-0 {
+	&-chevron-down {
 		transition: transform 0.3s ease-in-out;
 		transform: rotate(0deg);
 	}

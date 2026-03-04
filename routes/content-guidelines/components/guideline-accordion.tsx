@@ -62,7 +62,11 @@ export default function GuidelineAccordion( {
 						icon={
 							<Icon
 								icon={ chevronDown }
-								className={ isOpen ? 'rotate-180' : 'rotate-0' }
+								className={
+									isOpen
+										? 'content-guidelines__accordion-chevron-up'
+										: 'content-guidelines__accordion-chevron-down'
+								}
 							/>
 						}
 						onClick={ (
