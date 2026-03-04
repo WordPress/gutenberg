@@ -78,7 +78,7 @@ jobs:
 
             - name: Lint JavaScript
               if: ${{ matrix.annotations }}
-              run: npm run lint:js$ -- --format compact
+              run: npm run lint:js -- --format compact
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}
