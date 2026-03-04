@@ -292,6 +292,10 @@ export function areSelectionsStatesEqual(
 	selection1: SelectionState,
 	selection2: SelectionState
 ): boolean {
+	if ( ! selection1 || ! selection2 ) {
+		return selection1 === selection2;
+	}
+
 	if ( selection1.type !== selection2.type ) {
 		return false;
 	}

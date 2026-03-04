@@ -369,6 +369,65 @@ describe( 'PostEditorAwareness', () => {
 		} );
 	} );
 
+	describe( 'areEditorStatesEqual with missing selection', () => {
+		let awareness: PostEditorAwareness;
+
+		beforeEach( () => {
+			awareness = new PostEditorAwareness( doc, 'postType', 'post', 123 );
+			awareness.setUp();
+		} );
+
+		test( 'should treat two editorState: {} as equal', () => {
+			awareness.setLocalStateField( 'editorState', {} as any );
+
+			const callback = jest.fn();
+			awareness.onStateChange( callback );
+
+			// Register the state via change event.
+			awareness.emit( 'change', [
+				{
+					added: [],
+					updated: [ awareness.clientID ],
+					removed: [],
+				},
+			] );
+			callback.mockClear();
+
+			// Set same empty editorState again.
+			awareness.setLocalStateField( 'editorState', {} as any );
+			awareness.emit( 'change', [
+				{
+					added: [],
+					updated: [ awareness.clientID ],
+					removed: [],
+				},
+			] );
+
+			// Should not notify because both states lack a selection.
+			expect( callback ).not.toHaveBeenCalled();
+		} );
+
+		test( 'should treat editorState: undefined vs editorState: { selection: undefined } as not equal', () => {
+			// Default local state has no editorState field (undefined).
+			const callback = jest.fn();
+			awareness.onStateChange( callback );
+
+			awareness.setLocalStateField( 'editorState', {
+				selection: undefined,
+			} as any );
+
+			awareness.emit( 'change', [
+				{
+					added: [],
+					updated: [ awareness.clientID ],
+					removed: [],
+				},
+			] );
+
+			expect( callback ).toHaveBeenCalled();
+		} );
+	} );
+
 	describe( 'areEditorStatesEqual', () => {
 		test( 'should return true when both states are undefined', () => {
 			const awareness = new PostEditorAwareness(
