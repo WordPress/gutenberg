@@ -268,15 +268,11 @@ const getPanelLayoutFromStoryArgs = ( {
 	labelPosition,
 	openAs,
 	editVisibility,
-	applyLabel,
-	cancelLabel,
 }: {
 	summary?: string[];
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
-	openAs?: 'default' | 'dropdown' | 'modal';
+	openAs?: PanelLayout[ 'openAs' ];
 	editVisibility?: 'default' | EditVisibility;
-	applyLabel?: string;
-	cancelLabel?: string;
 } ): Layout | undefined => {
 	const panelLayout: PanelLayout = {
 		type: 'panel',
@@ -286,16 +282,8 @@ const getPanelLayoutFromStoryArgs = ( {
 		panelLayout.labelPosition = labelPosition;
 	}
 
-	if ( openAs !== 'default' ) {
-		if ( openAs === 'modal' && ( applyLabel || cancelLabel ) ) {
-			panelLayout.openAs = {
-				type: 'modal',
-				...( applyLabel && { applyLabel } ),
-				...( cancelLabel && { cancelLabel } ),
-			};
-		} else {
-			panelLayout.openAs = openAs;
-		}
+	if ( openAs ) {
+		panelLayout.openAs = openAs;
 	}
 
 	if ( summary !== undefined ) {
@@ -311,18 +299,29 @@ const getPanelLayoutFromStoryArgs = ( {
 
 const LayoutPanelComponent = ( {
 	labelPosition,
-	openAs,
+	openAs: openAsArg,
 	editVisibility,
 	applyLabel,
 	cancelLabel,
 }: {
 	type: 'default' | 'regular' | 'panel' | 'card';
 	labelPosition: 'default' | 'top' | 'side' | 'none';
-	openAs: 'default' | 'dropdown' | 'modal';
+	openAs: 'default' | 'dropdown' | 'modal' | 'modalConfig';
 	editVisibility: 'default' | EditVisibility;
 	applyLabel?: string;
 	cancelLabel?: string;
 } ) => {
+	let openAs: PanelLayout[ 'openAs' ];
+	if ( openAsArg === 'modalConfig' ) {
+		openAs = {
+			type: 'modal',
+			applyLabel: applyLabel || undefined,
+			cancelLabel: cancelLabel || undefined,
+		};
+	} else if ( openAsArg !== 'default' ) {
+		openAs = openAsArg;
+	}
+
 	const [ post, setPost ] = useState< SamplePost >( {
 		title: 'Hello, World!',
 		order: 2,
@@ -352,8 +351,6 @@ const LayoutPanelComponent = ( {
 				labelPosition,
 				openAs,
 				editVisibility,
-				applyLabel,
-				cancelLabel,
 			} ),
 			fields: [
 				'title',
@@ -391,8 +388,6 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
-						applyLabel,
-						cancelLabel,
 					} ),
 				},
 				{
@@ -404,13 +399,11 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
-						applyLabel,
-						cancelLabel,
 					} ),
 				},
 			],
 		};
-	}, [ labelPosition, openAs, editVisibility, applyLabel, cancelLabel ] );
+	}, [ labelPosition, openAs, editVisibility ] );
 
 	return (
 		<DataForm< SamplePost >
