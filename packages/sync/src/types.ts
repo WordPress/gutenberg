@@ -9,11 +9,6 @@ import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
 
-/**
- * Internal dependencies
- */
-import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
-
 /* globalThis */
 declare global {
 	interface Window {
@@ -33,15 +28,9 @@ export type ObjectType = string;
 // its origin.
 export type Origin = any;
 
-// Object data represents any entity record, post, term, user, site, etc. There
-// are not many expectations that can hold on its shape.
-export interface ObjectData extends Record< string, unknown > {
-	meta?: ObjectMeta;
-}
-
-export interface ObjectMeta extends Record< string, unknown > {
-	[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]?: string;
-}
+// Object data represents any entity record. There are not any expectations that
+// can hold on its shape, beyond a record with string keys and unknown values.
+export type ObjectData = Record< string, unknown >;
 
 /**
  * Event map for provider events.
@@ -86,16 +75,28 @@ export interface ConnectionError extends Error {
 }
 
 /**
- * Current connection status of a sync provider, including status and optional error information.
+ * Current connection status of a sync provider.
  */
-export interface ConnectionStatus {
-	status: 'connected' | 'connecting' | 'disconnected';
-
-	/**
-	 * Optional error information when status is 'disconnected'.
-	 */
-	error?: ConnectionError;
+export interface ConnectionStatusConnected {
+	status: 'connected';
 }
+
+export interface ConnectionStatusConnecting {
+	status: 'connecting';
+}
+
+export interface ConnectionStatusDisconnected {
+	status: 'disconnected';
+	/** Optional error information. */
+	error?: ConnectionError;
+	/** Milliseconds until the next automatic retry attempt. */
+	retryInMs?: number;
+}
+
+export type ConnectionStatus =
+	| ConnectionStatusConnected
+	| ConnectionStatusConnecting
+	| ConnectionStatusDisconnected;
 
 export type OnStatusChangeCallback = (
 	status: ConnectionStatus | null
@@ -135,7 +136,7 @@ export interface RecordHandlers {
 	onStatusChange: OnStatusChangeCallback;
 	refetchRecord: () => Promise< void >;
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
-	saveRecord: () => Promise< void >;
+	saveRecord: () => void;
 }
 
 export interface SyncConfig {
@@ -151,14 +152,14 @@ export interface SyncConfig {
 		ydoc: Y.Doc,
 		editedRecord: ObjectData
 	) => ObjectData;
-	supports?: Record< string, true >;
+	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
 }
 
 export interface SyncManager {
-	createMeta: (
+	createPersistedCRDTDoc: (
 		objectType: ObjectType,
 		objectId: ObjectID
-	) => Record< string, string >;
+	) => Promise< string | null >;
 	getAwareness: < State extends Awareness >(
 		objectType: ObjectType,
 		objectId: ObjectID

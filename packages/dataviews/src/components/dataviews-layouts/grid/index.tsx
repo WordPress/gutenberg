@@ -16,6 +16,7 @@ import { Stack } from '@wordpress/ui';
 import type { ViewGridProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
 import CompositeGrid from './composite-grid';
+import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
 function ViewGrid< Item >( {
 	actions,
@@ -32,14 +33,29 @@ function ViewGrid< Item >( {
 	className,
 	empty,
 }: ViewGridProps< Item > ) {
+	const isDelayedLoading = useDelayedLoading( !! isLoading );
 	const hasData = !! data?.length;
 	const groupField = view.groupBy?.field
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	if ( ! hasData ) {
+		return (
+			<div
+				className={ clsx( 'dataviews-no-results', {
+					'is-refreshing': isDelayedLoading,
+				} ) }
+			>
+				{ empty }
+			</div>
+		);
+	}
 	const gridProps = {
-		className,
+		className: clsx( className, {
+			'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
+		} ),
+		inert: ! isInfiniteScroll && !! isLoading ? 'true' : undefined,
 		isLoading,
 		view,
 		fields,
@@ -87,7 +103,7 @@ function ViewGrid< Item >( {
 			}
 			{
 				// Render a single grid with all data.
-				hasData && ! dataByGroup && (
+				! dataByGroup && (
 					<CompositeGrid
 						{ ...gridProps }
 						data={ data }
@@ -95,26 +111,7 @@ function ViewGrid< Item >( {
 					/>
 				)
 			}
-			{
-				// Render empty state.
-				! hasData && (
-					<div
-						className={ clsx( {
-							'dataviews-loading': isLoading,
-							'dataviews-no-results': ! isLoading,
-						} ) }
-					>
-						{ isLoading ? (
-							<p>
-								<Spinner />
-							</p>
-						) : (
-							empty
-						) }
-					</div>
-				)
-			}
-			{ hasData && isLoading && (
+			{ isInfiniteScroll && isLoading && (
 				<p className="dataviews-loading-more">
 					<Spinner />
 				</p>

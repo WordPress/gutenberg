@@ -14,11 +14,19 @@ test.describe( 'Template Revert', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		// Cross-origin isolation (COEP) prevents page navigations
+		// from working properly during template creation.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 	test.beforeEach( async ( { admin, requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
@@ -230,28 +238,8 @@ class TemplateRevertUtils {
 	}
 
 	async getCurrentSiteEditorContent() {
-		return this.page.evaluate( () => {
-			const postId = window.wp.data
-				.select( 'core/editor' )
-				.getCurrentPostId();
-			const postType = window.wp.data
-				.select( 'core/editor' )
-				.getCurrentPostType();
-			const record = window.wp.data
-				.select( 'core' )
-				.getEditedEntityRecord( 'postType', postType, postId );
-			if ( record ) {
-				if ( typeof record.content === 'function' ) {
-					return record.content( record );
-				} else if ( record.blocks ) {
-					return window.wp.blocks.__unstableSerializeAndClean(
-						record.blocks
-					);
-				} else if ( record.content ) {
-					return record.content;
-				}
-			}
-			return '';
-		} );
+		return this.page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).getEditedPostContent()
+		);
 	}
 }

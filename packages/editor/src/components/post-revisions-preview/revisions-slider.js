@@ -20,11 +20,12 @@ import { unlock } from '../../lock-unlock';
  * @return {React.JSX.Element} The revisions slider component.
  */
 function RevisionsSlider() {
-	const { revisions, isLoading, currentRevisionId } = useSelect(
+	const { revisions, isLoading, currentRevisionId, revisionKey } = useSelect(
 		( select ) => {
 			const { getCurrentPostId, getCurrentPostType } =
 				select( editorStore );
-			const { getRevisions, isResolving } = select( coreStore );
+			const { getRevisions, isResolving, getEntityConfig } =
+				select( coreStore );
 
 			const postId = getCurrentPostId();
 			const postType = getCurrentPostType();
@@ -33,6 +34,7 @@ function RevisionsSlider() {
 				return {};
 			}
 
+			const entityConfig = getEntityConfig( 'postType', postType );
 			const query = { per_page: -1, context: 'edit' };
 			return {
 				revisions: getRevisions( 'postType', postType, postId, query ),
@@ -45,6 +47,7 @@ function RevisionsSlider() {
 				currentRevisionId: unlock(
 					select( editorStore )
 				).getCurrentRevisionId(),
+				revisionKey: entityConfig?.revisionKey || 'id',
 			};
 		},
 		[]
@@ -62,13 +65,13 @@ function RevisionsSlider() {
 	}, [ revisions ] );
 
 	const selectedIndex = sortedRevisions.findIndex(
-		( r ) => r.id === currentRevisionId
+		( r ) => r[ revisionKey ] === currentRevisionId
 	);
 
 	const handleSliderChange = ( index ) => {
 		const revision = sortedRevisions[ index ];
 		if ( revision ) {
-			setCurrentRevisionId( revision.id );
+			setCurrentRevisionId( revision[ revisionKey ] );
 		}
 	};
 

@@ -193,7 +193,6 @@ export interface Attachment {
 	mime_type: string;
 	featured_media?: number;
 	missing_image_sizes?: string[];
-	media_filename?: string;
 	poster?: string;
 	/**
 	 * EXIF orientation value from the original image.
