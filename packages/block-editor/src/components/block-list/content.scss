@@ -191,6 +191,12 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		}
 	}
 
+	// Block has custom CSS that will be stripped on save (user lacks unfiltered_html).
+	&.has-custom-css-will-be-stripped {
+		border-left: 4px solid $alert-yellow;
+		box-sizing: border-box;
+	}
+
 	// Clear floats.
 	&[data-clear="true"] {
 		float: none;

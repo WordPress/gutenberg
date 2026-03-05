@@ -71,6 +71,61 @@ function gutenberg_override_core_kses_init_filters() {
 add_action( 'init', 'gutenberg_override_core_kses_init_filters', 20 );
 add_action( 'set_current_user', 'gutenberg_override_core_kses_init_filters' );
 
+/**
+ * Strip block-level custom CSS for users without unfiltered_html capability.
+ *
+ * When a user without unfiltered_html saves post content, filter_block_content()
+ * runs filter_block_kses() on each block. wp_kses() treats attrs.style.css as
+ * HTML and encodes & and >, corrupting CSS (e.g. nesting selectors). This runs
+ * before wp_pre_kses_block_attributes (priority 10) so content is stripped
+ * before filter_block_content can mangle it.
+ *
+ * @see https://core.trac.wordpress.org/ticket/64771
+ *
+ * @param string $content           Content to be run through KSES.
+ * @param array[]|string $allowed_html Allowed HTML elements or context name.
+ * @param string[]       $allowed_protocols Allowed URL protocols.
+ * @return string Filtered content.
+ */
+function gutenberg_strip_block_custom_css_for_restricted_users( $content, $allowed_html, $allowed_protocols ) {
+	if ( current_user_can( 'unfiltered_html' ) ) {
+		return $content;
+	}
+	if ( false === strpos( $content, '<!-- wp:' ) ) {
+		return $content;
+	}
+
+	$blocks = parse_blocks( $content );
+	$blocks = gutenberg_strip_custom_css_from_blocks( $blocks );
+	return serialize_blocks( $blocks );
+}
+
+/**
+ * Recursively strip attrs.style.css from blocks.
+ *
+ * @param array[] $blocks Parsed blocks.
+ * @return array[] Blocks with custom CSS removed.
+ */
+function gutenberg_strip_custom_css_from_blocks( $blocks ) {
+	foreach ( $blocks as &$block ) {
+		if ( empty( $block['blockName'] ) ) {
+			continue;
+		}
+		if ( isset( $block['attrs']['style']['css'] ) && trim( (string) $block['attrs']['style']['css'] ) !== '' ) {
+			$block['attrs']['style']['css'] = '';
+			if ( empty( array_filter( (array) $block['attrs']['style'] ) ) ) {
+				unset( $block['attrs']['style'] );
+			}
+		}
+		if ( ! empty( $block['innerBlocks'] ) ) {
+			$block['innerBlocks'] = gutenberg_strip_custom_css_from_blocks( $block['innerBlocks'] );
+		}
+	}
+	return $blocks;
+}
+
+add_filter( 'pre_kses', 'gutenberg_strip_block_custom_css_for_restricted_users', 5, 3 );
+
 if ( ! function_exists( 'allow_filter_in_styles' ) ) {
 	/**
 	 * See https://github.com/WordPress/wordpress-develop/pull/4108
