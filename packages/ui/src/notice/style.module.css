@@ -139,8 +139,8 @@
 
 	/* TODO: Replace 320px with a measure token from the Theme package. */
 	@container (max-width: 320px) {
-		.description,
-		.actions {
+		.notice:has(.title) .description,
+		.notice:has(.title) .actions {
 			grid-column: 1 / 3;
 		}
 	}
