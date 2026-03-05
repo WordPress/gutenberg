@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.1.0 (2026-03-04)
+
 ### Bug Fixes
 
 -   Suppress spinner and success message output when using `--json` flag to ensure clean, parseable JSON output.

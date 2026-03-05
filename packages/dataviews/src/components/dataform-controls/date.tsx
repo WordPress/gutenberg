@@ -293,6 +293,7 @@ function CalendarDateControl< Item >( {
 	const {
 		id,
 		label,
+		description,
 		setValue,
 		getValue,
 		isValid,
@@ -385,6 +386,7 @@ function CalendarDateControl< Item >( {
 				id={ id }
 				className="dataviews-controls__date"
 				label={ displayLabel }
+				help={ description }
 				hideLabelFromVision={ hideLabelFromVision }
 			>
 				<Stack direction="column" gap="lg">
@@ -462,7 +464,14 @@ function CalendarDateRangeControl< Item >( {
 	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label, getValue, setValue, format: fieldFormat } = field;
+	const {
+		id,
+		label,
+		description,
+		getValue,
+		setValue,
+		format: fieldFormat,
+	} = field;
 	let value: DateRange;
 	const fieldValue = getValue( { item: data } );
 	if (
@@ -597,6 +606,7 @@ function CalendarDateRangeControl< Item >( {
 				id={ id }
 				className="dataviews-controls__date"
 				label={ displayLabel }
+				help={ description }
 				hideLabelFromVision={ hideLabelFromVision }
 			>
 				<Stack direction="column" gap="lg">
