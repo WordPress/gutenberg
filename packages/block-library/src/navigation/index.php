@@ -1124,8 +1124,6 @@ function block_core_navigation_add_directives_to_overlay_close( $tags ) {
  * Images in the overlay are hidden until the menu is opened, so they should
  * not compete with the actual LCP image on the page.
  *
- * fetchpriority="low" is set explicitly so the browser deprioritizes the fetch.
- *
  * @since 7.0.0
  *
  * @param string $overlay_blocks_html The rendered HTML of the overlay blocks.
