@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The `no-unknown-ds-tokens` rule now reports bare `--wpds-*` tokens not wrapped in `var()`, which would silently miss build-time fallback injection.
+
 ## 24.3.0 (2026-03-04)
 
 ### New Features
