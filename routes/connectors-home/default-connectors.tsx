@@ -24,6 +24,7 @@ type ConnectorAuthentication =
 interface ConnectorData {
 	name: string;
 	description: string;
+	logoUrl?: string;
 	type: 'ai_provider';
 	plugin?: {
 		slug: string;
@@ -55,6 +56,21 @@ const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
 	anthropic: ClaudeLogo,
 };
 
+function getConnectorLogo(
+	connectorId: string,
+	name: string,
+	logoUrl?: string
+): React.ReactNode {
+	if ( logoUrl ) {
+		return <img src={ logoUrl } alt={ name } width={ 40 } height={ 40 } />;
+	}
+	const Logo = CONNECTOR_LOGOS[ connectorId ];
+	if ( Logo ) {
+		return <Logo />;
+	}
+	return undefined;
+}
+
 const ConnectedBadge = () => (
 	<span
 		style={ {
@@ -77,7 +93,7 @@ interface ApiKeyConnectorConfig {
 	pluginSlug?: string;
 	settingName: string;
 	helpUrl?: string;
-	Logo?: React.ComponentType;
+	icon?: React.ReactNode;
 	isInstalled?: boolean;
 	isActivated?: boolean;
 }
@@ -88,7 +104,7 @@ function ApiKeyConnector( {
 	pluginSlug,
 	settingName,
 	helpUrl,
-	Logo,
+	icon,
 	isInstalled,
 	isActivated,
 }: ConnectorRenderProps & ApiKeyConnectorConfig ) {
@@ -130,7 +146,7 @@ function ApiKeyConnector( {
 			className={
 				pluginSlug ? `connector-item--${ pluginSlug }` : undefined
 			}
-			icon={ Logo ? <Logo /> : undefined }
+			icon={ icon }
 			name={ label }
 			description={ description }
 			actionArea={
@@ -206,7 +222,11 @@ export function registerDefaultConnectors() {
 					pluginSlug={ data.plugin?.slug }
 					settingName={ authentication.settingName }
 					helpUrl={ authentication.credentialsUrl ?? undefined }
-					Logo={ CONNECTOR_LOGOS[ connectorId ] }
+					icon={ getConnectorLogo(
+						connectorId,
+						data.name,
+						data.logoUrl
+					) }
 					isInstalled={ data.plugin?.isInstalled }
 					isActivated={ data.plugin?.isActivated }
 				/>

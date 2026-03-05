@@ -166,6 +166,7 @@ function _gutenberg_get_connector_settings(): array {
 
 		$name        = $metadata->getName();
 		$description = method_exists( $metadata, 'getDescription' ) ? $metadata->getDescription() : null;
+		$logo        = method_exists( $metadata, 'getLogoUrl' ) ? $metadata->getLogoUrl() : null;
 
 		if ( isset( $connectors[ $connector_id ] ) ) {
 			// Override fields with non-empty registry values.
@@ -174,6 +175,9 @@ function _gutenberg_get_connector_settings(): array {
 			}
 			if ( $description ) {
 				$connectors[ $connector_id ]['description'] = $description;
+			}
+			if ( $logo ) {
+				$connectors[ $connector_id ]['logo_url'] = $logo;
 			}
 			// Always update auth method; keep existing credentials_url as fallback.
 			$connectors[ $connector_id ]['authentication']['method'] = $authentication['method'];
@@ -184,6 +188,7 @@ function _gutenberg_get_connector_settings(): array {
 			$connectors[ $connector_id ] = array(
 				'name'           => $name ? $name : ucwords( $connector_id ),
 				'description'    => $description ? $description : '',
+				'logo_url'       => $logo ?? plugins_url( 'default-connector-logo.svg', __FILE__ ),
 				'type'           => 'ai_provider',
 				'authentication' => $authentication,
 			);
@@ -409,6 +414,7 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 		$connector_out = array(
 			'name'           => $connector_data['name'],
 			'description'    => $connector_data['description'],
+			'logoUrl'        => ! empty( $connector_data['logo_url'] ) ? $connector_data['logo_url'] : null,
 			'type'           => $connector_data['type'],
 			'authentication' => $auth_out,
 		);
