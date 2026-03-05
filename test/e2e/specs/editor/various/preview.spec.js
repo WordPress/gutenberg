@@ -216,6 +216,10 @@ test.describe( 'Preview', () => {
 
 test.describe( 'Preview with Custom Fields enabled', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
+		// Document-Isolation-Policy places the editor in its own agent cluster.
+		// Preview opens frontend pages without the DIP header, creating an
+		// agent cluster mismatch that breaks popup reuse and cross-window
+		// communication.
 		await requestUtils.activatePlugin(
 			'gutenberg-test-plugin-disable-client-side-media-processing'
 		);
