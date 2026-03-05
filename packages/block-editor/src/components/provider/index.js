@@ -146,16 +146,34 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		const isClientSideMediaEnabled =
 			shouldEnableClientSideMediaProcessing();
 
+		// Nested providers (e.g. from useBlockPreview) inherit settings
+		// where mediaUpload has already been replaced with the
+		// interceptor.  Detect this so we skip the replacement and
+		// MediaUploadProvider for them — see the longer comment below.
+		const isMediaUploadIntercepted =
+			!! _settings?.mediaUpload?.__isMediaUploadInterceptor;
+
 		const settings = useMemo( () => {
-			if ( isClientSideMediaEnabled && _settings?.mediaUpload ) {
+			if (
+				isClientSideMediaEnabled &&
+				_settings?.mediaUpload &&
+				! isMediaUploadIntercepted
+			) {
 				// Create a new object so that the original props.settings.mediaUpload is not modified.
+				const interceptor = mediaUpload.bind( null, registry );
+				interceptor.__isMediaUploadInterceptor = true;
 				return {
 					..._settings,
-					mediaUpload: mediaUpload.bind( null, registry ),
+					mediaUpload: interceptor,
 				};
 			}
 			return _settings;
-		}, [ _settings, registry, isClientSideMediaEnabled ] );
+		}, [
+			_settings,
+			registry,
+			isClientSideMediaEnabled,
+			isMediaUploadIntercepted,
+		] );
 
 		const { __experimentalUpdateSettings } = unlock(
 			useDispatch( blockEditorStore )
@@ -215,7 +233,21 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 			</SelectionContext.Provider>
 		);
 
-		if ( isClientSideMediaEnabled ) {
+		// MediaUploadProvider writes the mediaUpload function from
+		// _settings into the shared upload-media store so the store can
+		// hand files off to the server. useMediaUploadSettings extracts
+		// mediaUpload from the original _settings prop — *before* the
+		// interceptor replacement above — so the store receives the
+		// real server-side upload function.
+		//
+		// Only the first (outermost) provider should do this.
+		// Nested providers (e.g. from useBlockPreview in
+		// core/post-template) inherit settings that already contain
+		// the interceptor, so their MediaUploadProvider would
+		// overwrite the store's server-side function with the
+		// interceptor, causing uploads to loop instead of reaching
+		// the server.
+		if ( isClientSideMediaEnabled && ! isMediaUploadIntercepted ) {
 			return (
 				<MediaUploadProvider
 					settings={ mediaUploadSettings }
