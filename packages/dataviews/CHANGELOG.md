@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 - DataViews: Fix last column classname in table layout. [#76133](https://github.com/WordPress/gutenberg/pull/76133)
+- DataForm: Properly handle dates in datetime control. [#76193](https://github.com/WordPress/gutenberg/pull/76193)
 
 ### Code Quality
 
@@ -18,7 +19,6 @@
 
 ### Bug Fixes
 
-- DataForm: Properly handle dates in datetime control. [#76193](https://github.com/WordPress/gutenberg/pull/76193)
 - DataForm: Fix label color of array control. [#75730](https://github.com/WordPress/gutenberg/pull/75730)
 - DataForm: Fix text overflow for long unhyphenated text in panel layout. [#76073](https://github.com/WordPress/gutenberg/pull/76073)
 - DataForm: Fix `card` layout's toggle button screen reader text. [#76039](https://github.com/WordPress/gutenberg/pull/76039)
