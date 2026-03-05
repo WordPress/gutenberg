@@ -8,7 +8,6 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
 import type { Status } from './constants';
 
@@ -37,6 +36,11 @@ export interface EntityRecordResolution< RecordType > {
 	 * Does the record have any local edits?
 	 */
 	hasEdits: boolean;
+
+	/**
+	 * Has the resolution started?
+	 */
+	hasStarted: boolean;
 
 	/**
 	 * Is the record resolved by now?
@@ -169,45 +173,68 @@ export default function useEntityRecord< RecordType >(
 		[ editEntityRecord, kind, name, recordId, saveEditedEntityRecord ]
 	);
 
-	const { editedRecord, hasEdits, edits } = useSelect(
+	const { record, editedRecord, hasEdits, edits, ...resolution } = useSelect(
 		( select ) => {
 			if ( ! options.enabled ) {
 				return {
+					record: null,
 					editedRecord: EMPTY_OBJECT,
 					hasEdits: false,
 					edits: EMPTY_OBJECT,
 				};
 			}
 
-			return {
-				editedRecord: select( coreStore ).getEditedEntityRecord(
-					kind,
-					name,
-					recordId
-				),
-				hasEdits: select( coreStore ).hasEditsForEntityRecord(
-					kind,
-					name,
-					recordId
-				),
-				edits: select( coreStore ).getEntityRecordNonTransientEdits(
-					kind,
-					name,
-					recordId
-				),
-			};
-		},
-		[ kind, name, recordId, options.enabled ]
-	);
+			const storeSelectors = select( coreStore );
+			const resolutionStatus = (
+				storeSelectors as any
+			 ).getResolutionState( 'getEntityRecord', [ kind, name, recordId ] )
+				?.status;
 
-	const { data: record, ...querySelectRest } = useQuerySelect(
-		( query ) => {
-			if ( ! options.enabled ) {
-				return {
-					data: null,
-				};
+			let status: Status;
+			switch ( resolutionStatus ) {
+				case 'resolving':
+					status = 'RESOLVING' as Status;
+					break;
+				case 'finished':
+					status = 'SUCCESS' as Status;
+					break;
+				case 'error':
+					status = 'ERROR' as Status;
+					break;
+				case undefined:
+				default:
+					status = 'IDLE' as Status;
+					break;
 			}
-			return query( coreStore ).getEntityRecord( kind, name, recordId );
+
+			return {
+				record: storeSelectors.getEntityRecord(
+					kind,
+					name,
+					recordId
+				) as RecordType | undefined,
+				editedRecord: storeSelectors.getEditedEntityRecord(
+					kind,
+					name,
+					recordId
+				) as unknown as Partial< RecordType >,
+				hasEdits: storeSelectors.hasEditsForEntityRecord(
+					kind,
+					name,
+					recordId
+				),
+				edits: storeSelectors.getEntityRecordNonTransientEdits(
+					kind,
+					name,
+					recordId
+				),
+				isResolving: status === ( 'RESOLVING' as Status ),
+				hasStarted: status !== ( 'IDLE' as Status ),
+				hasResolved:
+					status === ( 'SUCCESS' as Status ) ||
+					status === ( 'ERROR' as Status ),
+				status,
+			};
 		},
 		[ kind, name, recordId, options.enabled ]
 	);
@@ -217,9 +244,9 @@ export default function useEntityRecord< RecordType >(
 		editedRecord,
 		hasEdits,
 		edits,
-		...querySelectRest,
+		...resolution,
 		...mutations,
-	};
+	} as EntityRecordResolution< RecordType >;
 }
 
 export function useDeprecatedEntityRecord(
