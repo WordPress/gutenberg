@@ -381,11 +381,14 @@ function ListViewBlock( {
 				return;
 			}
 
-			// Don't allow visibility toggle for blocks that
-			// are not in the default editing mode.
+			// Don't allow visibility toggle for blocks that are not in the
+			// default editing mode or when block editing is disabled
+			// (e.g. Revisions UI with isPreviewMode).
 			if (
 				blocksToUpdate.some(
-					( id ) => getBlockEditingMode( id ) !== 'default'
+					( id ) =>
+						getBlockEditingMode( id ) !== 'default' ||
+						! canEditBlock( id )
 				)
 			) {
 				return;

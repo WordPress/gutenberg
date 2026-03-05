@@ -92,6 +92,7 @@ export default function BlockTools( {
 		getBlockName,
 		isGroupable,
 		getEditedContentOnlySection,
+		canEditBlock,
 	} = unlock( useSelect( blockEditorStore ) );
 	const { getGroupingBlockName } = useSelect( blocksStore );
 	const { showEmptyBlockSideInserter, showBlockToolbarPopover } =
@@ -255,11 +256,14 @@ export default function BlockTools( {
 					return;
 				}
 
-				// Don't allow visibility toggle for blocks that
-				// are not in the default editing mode.
+				// Don't allow visibility toggle for blocks that are not in the
+				// default editing mode or when block editing is disabled
+				// (e.g. Revisions UI with isPreviewMode).
 				if (
 					clientIds.some(
-						( id ) => getBlockEditingMode( id ) !== 'default'
+						( id ) =>
+							getBlockEditingMode( id ) !== 'default' ||
+							! canEditBlock( id )
 					)
 				) {
 					return;
