@@ -5,7 +5,6 @@ import {
 	getBlockType,
 	getBlockTypes,
 	getBlockVariations,
-	getDefaultBlockName,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
 	switchToBlockType,
@@ -1705,10 +1704,8 @@ const canInsertBlockTypeUnmemoized = (
 	}
 
 	const blockEditingMode = getBlockEditingMode( state, rootClientId ?? '' );
-	if (
-		blockEditingMode === 'disabled' &&
-		blockName !== getDefaultBlockName()
-	) {
+	const isContentRoleBlock = isContentBlock( blockName );
+	if ( blockEditingMode === 'disabled' && ! isContentRoleBlock ) {
 		return false;
 	}
 
@@ -1722,7 +1719,6 @@ const canInsertBlockTypeUnmemoized = (
 
 	// It shouldn't be possible to insert inside a section block unless in
 	// some cases when the block is a content block.
-	const isContentRoleBlock = isContentBlock( blockName );
 	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
 	const sectionClientId = isParentSectionBlock
 		? rootClientId
@@ -1749,15 +1745,15 @@ const canInsertBlockTypeUnmemoized = (
 			rootClientId
 		)
 	) {
-		// Allow inserting the default block anywhere that another default block already exists
+		// Allow inserting the default block anywhere that another default block already exists,
+		// or allow inserting any content block if another content block already exists
 		// when in contentOnly mode.
-		if ( blockName === getDefaultBlockName() ) {
+		if ( isContentRoleBlock ) {
 			const existingBlocks = getBlockOrder( state, rootClientId );
-			const hasDefaultBlock = existingBlocks.some(
-				( clientId ) =>
-					getBlockName( state, clientId ) === getDefaultBlockName()
+			const hasContentBlock = existingBlocks.some( ( clientId ) =>
+				isContentBlock( getBlockName( state, clientId ) )
 			);
-			if ( ! hasDefaultBlock ) {
+			if ( ! hasContentBlock ) {
 				return false;
 			}
 		} else {
@@ -1938,26 +1934,27 @@ export function canRemoveBlock( state, clientId ) {
 
 	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
 	const blockName = getBlockName( state, clientId );
+	const isBlockContentRole = isContentBlock( blockName );
 	// Check if the parent container allows insertion/removal in contentOnly mode.
 	if (
 		( isParentSectionBlock ||
 			rootBlockEditingMode === 'contentOnly' ||
-			blockName === getDefaultBlockName() ) &&
+			isBlockContentRole ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
 			getBlockName( state, clientId ),
 			rootClientId
 		)
 	) {
-		// Allow removing the default block when other default blocks exist
+		// Allow removing any content block if other content blocks exist
 		// in contentOnly mode.
-		if ( blockName === getDefaultBlockName() ) {
+		if ( isBlockContentRole ) {
 			const existingBlocks = getBlockOrder( state, rootClientId );
-			const defaultBlocks = existingBlocks.filter(
-				( id ) => getBlockName( state, id ) === getDefaultBlockName()
+			const contentBlocks = existingBlocks.filter( ( id ) =>
+				isContentBlock( getBlockName( state, id ) )
 			);
-			// Allow removal if there are other default blocks besides this one
-			if ( defaultBlocks.length > 1 ) {
+			// Allow removal if there are other content blocks besides this one
+			if ( contentBlocks.length > 1 ) {
 				return true;
 			}
 		} else {
