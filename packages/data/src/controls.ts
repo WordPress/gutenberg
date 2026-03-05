@@ -8,7 +8,7 @@ const SELECT = '@@data/SELECT';
 const RESOLVE_SELECT = '@@data/RESOLVE_SELECT';
 const DISPATCH = '@@data/DISPATCH';
 
-function isObject( object: unknown ): object is Record< string, unknown > {
+function isStoreDescriptor( object: unknown ): object is StoreDescriptor {
 	return object !== null && typeof object === 'object';
 }
 
@@ -42,7 +42,7 @@ function select(
 ) {
 	return {
 		type: SELECT,
-		storeKey: isObject( storeNameOrDescriptor )
+		storeKey: isStoreDescriptor( storeNameOrDescriptor )
 			? storeNameOrDescriptor.name
 			: storeNameOrDescriptor,
 		selectorName,
@@ -81,7 +81,7 @@ function resolveSelect(
 ) {
 	return {
 		type: RESOLVE_SELECT,
-		storeKey: isObject( storeNameOrDescriptor )
+		storeKey: isStoreDescriptor( storeNameOrDescriptor )
 			? storeNameOrDescriptor.name
 			: storeNameOrDescriptor,
 		selectorName,
@@ -116,7 +116,7 @@ function dispatch(
 ) {
 	return {
 		type: DISPATCH,
-		storeKey: isObject( storeNameOrDescriptor )
+		storeKey: isStoreDescriptor( storeNameOrDescriptor )
 			? storeNameOrDescriptor.name
 			: storeNameOrDescriptor,
 		actionName,
@@ -147,8 +147,12 @@ export const builtinControls = {
 	[ RESOLVE_SELECT ]: createRegistryControl(
 		( registry ) =>
 			( { storeKey, selectorName, args }: SelectorControlArgs ) => {
-				const method = registry.select( storeKey )[ selectorName ]
-					.hasResolver
+				const selector = registry.select( storeKey )[
+					selectorName
+				] as ( ( ...a: any[] ) => any ) & {
+					hasResolver?: boolean;
+				};
+				const method = selector.hasResolver
 					? 'resolveSelect'
 					: 'select';
 				return registry[ method ]( storeKey )[ selectorName ](

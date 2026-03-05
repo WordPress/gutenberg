@@ -12,8 +12,10 @@ import type {
  * Internal dependencies
  */
 import type { DataEmitter } from './utils/emitter';
-import type * as metadataActions from './redux-store/metadata/actions';
-import type * as metadataSelectors from './redux-store/metadata/selectors';
+import type {
+	MetadataSelectors,
+	MetadataActions,
+} from './redux-store/metadata/types';
 
 type MapOf< T > = { [ name: string ]: T };
 
@@ -66,7 +68,7 @@ export type UseSelectReturn< F extends MapSelect | StoreDescriptor< any > > =
 export type UseDispatchReturn< StoreNameOrDescriptor > =
 	StoreNameOrDescriptor extends StoreDescriptor< any >
 		? ActionCreatorsOf< ConfigOf< StoreNameOrDescriptor > > &
-				MetadataActions
+				MetadataActions< StoreNameOrDescriptor >
 		: StoreNameOrDescriptor extends undefined
 		? DispatchFunction
 		: any;
@@ -78,7 +80,7 @@ export type DispatchFunction = < StoreNameOrDescriptor >(
 export type DispatchReturn< StoreNameOrDescriptor > =
 	StoreNameOrDescriptor extends StoreDescriptor< any >
 		? ActionCreatorsOf< ConfigOf< StoreNameOrDescriptor > > &
-				MetadataActions
+				MetadataActions< StoreNameOrDescriptor >
 		: unknown;
 
 export type MapSelect = (
@@ -94,40 +96,12 @@ export type SelectFunction = < S >( store: S ) => CurriedSelectorsOf< S >;
  */
 export type ListenerFunction = () => void;
 
-/**
- * Metadata selectors injected into every Redux store.
- *
- * These are resolution-tracking selectors that the data module
- * automatically adds to every registered store. Derived from
- * the actual metadata selector definitions with the state
- * parameter removed (curried).
- */
-export type MetadataSelectors = {
-	[ K in keyof typeof metadataSelectors ]: CurriedState<
-		( typeof metadataSelectors )[ K ]
-	>;
-};
-
-/**
- * Metadata actions injected into every Redux store.
- *
- * These are resolution-tracking actions that the data module
- * automatically adds to every registered store. Derived from
- * the actual metadata action definitions with the return type
- * wrapped in a Promise (as done by bindAction).
- */
-export type MetadataActions = {
-	[ K in keyof typeof metadataActions ]: (
-		...args: Parameters< ( typeof metadataActions )[ K ] >
-	) => Promise< void >;
-};
-
 export type CurriedSelectorsOf< S > = S extends StoreDescriptor<
 	ReduxStoreConfig< any, any, infer Selectors >
 >
 	? {
 			[ key in keyof Selectors ]: CurriedState< Selectors[ key ] >;
-	  } & MetadataSelectors
+	  } & MetadataSelectors< S >
 	: never;
 
 /**
@@ -259,22 +233,30 @@ export interface DataRegistry {
 		< S extends StoreDescriptor< any > >(
 			store: S
 		): CurriedSelectorsOf< S >;
-		( store: string ): Record< string, ( ...args: any[] ) => any >;
 		(
 			store: StoreNameOrDescriptor
 		): Record< string, ( ...args: any[] ) => any >;
 	};
-	resolveSelect: (
-		storeNameOrDescriptor: StoreNameOrDescriptor
-	) => Record< string, ( ...args: any[] ) => Promise< any > >;
-	suspendSelect: (
-		storeNameOrDescriptor: StoreNameOrDescriptor
-	) => Record< string, ( ...args: any[] ) => any >;
+	resolveSelect: {
+		< S extends StoreDescriptor< any > >(
+			store: S
+		): CurriedSelectorsResolveOf< S >;
+		(
+			store: StoreNameOrDescriptor
+		): Record< string, ( ...args: any[] ) => Promise< any > >;
+	};
+	suspendSelect: {
+		< S extends StoreDescriptor< any > >(
+			store: S
+		): CurriedSelectorsOf< S >;
+		(
+			store: StoreNameOrDescriptor
+		): Record< string, ( ...args: any[] ) => any >;
+	};
 	dispatch: {
 		< S extends StoreDescriptor< any > >(
 			store: S
-		): ActionCreatorsOf< ConfigOf< S > >;
-		( store: string ): Record< string, ( ...args: any[] ) => any >;
+		): ActionCreatorsOf< ConfigOf< S > > & MetadataActions< S >;
 		(
 			store: StoreNameOrDescriptor
 		): Record< string, ( ...args: any[] ) => any >;
@@ -459,12 +441,14 @@ export type PromisifiedActionCreators<
 	>;
 };
 
-// Wraps action creator return types with a Promise and handles thunks.
+// Wraps action creator return types with a Promise and handles thunks and generators.
 export type PromisifyActionCreator< Action extends ActionCreator > = (
 	...args: Parameters< Action >
 ) => Promise<
 	ReturnType< Action > extends ( ..._args: any[] ) => any
 		? ThunkReturnType< Action >
+		: ReturnType< Action > extends Generator< any, infer TReturn, any >
+		? TReturn
 		: ReturnType< Action >
 >;
 
