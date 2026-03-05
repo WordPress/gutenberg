@@ -5,6 +5,7 @@ import { symbol as icon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -22,21 +23,27 @@ export const settings = {
 	deprecated,
 	edit,
 	icon,
-	__experimentalLabel: ( { ref } ) => {
-		if ( ! ref ) {
-			return;
+	__experimentalLabel: ( { ref, slug } ) => {
+		if ( ref ) {
+			const entity = select( coreStore ).getEditedEntityRecord(
+				'postType',
+				'wp_block',
+				ref
+			);
+			if ( entity?.title ) {
+				return decodeEntities( entity.title );
+			}
 		}
 
-		const entity = select( coreStore ).getEditedEntityRecord(
-			'postType',
-			'wp_block',
-			ref
-		);
-		if ( ! entity?.title ) {
-			return;
+		if ( slug ) {
+			const pattern =
+				select(
+					blockEditorStore
+				).__experimentalGetParsedPattern( slug );
+			if ( pattern?.title ) {
+				return decodeEntities( pattern.title );
+			}
 		}
-
-		return decodeEntities( entity.title );
 	},
 };
 

@@ -90,15 +90,16 @@ const NOOP = () => {};
 // that allows short-circuiting rendering as early as possible, before any
 // of the other effects in the block edit have run.
 export default function ReusableBlockEditRecursionWrapper( props ) {
-	const { ref } = props.attributes;
-	const hasAlreadyRendered = useHasRecursion( ref );
+	const { ref, slug } = props.attributes;
+	const uniqueId = ref || slug;
+	const hasAlreadyRendered = useHasRecursion( uniqueId );
 
 	if ( hasAlreadyRendered ) {
 		return <RecursionWarning />;
 	}
 
 	return (
-		<RecursionProvider uniqueId={ ref }>
+		<RecursionProvider uniqueId={ uniqueId }>
 			<ReusableBlockEdit { ...props } />
 		</RecursionProvider>
 	);
@@ -149,46 +150,44 @@ function ReusableBlockControl( {
 	);
 }
 
+function PatternBlockControl( { canOverrideBlocks, hasContent, resetContent } ) {
+	return (
+		<>
+			{ canOverrideBlocks && (
+				<BlockControls group="other">
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ resetContent }
+							disabled={ ! hasContent }
+						>
+							{ __( 'Reset' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+		</>
+	);
+}
+
 const EMPTY_OBJECT = {};
 
-function ReusableBlockEdit( {
-	name,
-	attributes: { ref, content },
-	__unstableParentLayout: parentLayout,
-	setAttributes,
-} ) {
-	const { record, hasResolved } = useEntityRecord(
-		'postType',
-		'wp_block',
-		ref
+function useCanOverrideBlocks( blocks ) {
+	const { hasPatternOverridesSource, supportedBlockTypesRaw } = useSelect(
+		( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			return {
+				hasPatternOverridesSource:
+					!! getBlockBindingsSource( 'core/pattern-overrides' ),
+				supportedBlockTypesRaw:
+					getSettings()
+						.__experimentalBlockBindingsSupportedAttributes ||
+					EMPTY_OBJECT,
+			};
+		},
+		[]
 	);
-	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
-		id: ref,
-	} );
-	const isMissing = hasResolved && ! record;
 
-	const { __unstableMarkLastChangeAsPersistent } =
-		useDispatch( blockEditorStore );
-
-	const {
-		onNavigateToEntityRecord,
-		hasPatternOverridesSource,
-		supportedBlockTypesRaw,
-	} = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		// For editing link to the site editor if the theme and user permissions support it.
-		return {
-			onNavigateToEntityRecord: getSettings().onNavigateToEntityRecord,
-			hasPatternOverridesSource: !! getBlockBindingsSource(
-				'core/pattern-overrides'
-			),
-			supportedBlockTypesRaw:
-				getSettings().__experimentalBlockBindingsSupportedAttributes ||
-				EMPTY_OBJECT,
-		};
-	}, [] );
-
-	const canOverrideBlocks = useMemo( () => {
+	return useMemo( () => {
 		const supportedBlockTypes = Object.keys( supportedBlockTypesRaw );
 		const hasOverridableBlocks = ( _blocks ) =>
 			_blocks.some( ( block ) => {
@@ -202,6 +201,63 @@ function ReusableBlockEdit( {
 			} );
 		return hasPatternOverridesSource && hasOverridableBlocks( blocks );
 	}, [ hasPatternOverridesSource, blocks, supportedBlockTypesRaw ] );
+}
+
+function ReusableBlockEdit( {
+	name,
+	attributes: { ref, slug, content },
+	__unstableParentLayout: parentLayout,
+	setAttributes,
+} ) {
+	if ( slug && ! ref ) {
+		return (
+			<SlugPatternEdit
+				name={ name }
+				slug={ slug }
+				content={ content }
+				parentLayout={ parentLayout }
+				setAttributes={ setAttributes }
+			/>
+		);
+	}
+
+	return (
+		<RefPatternEdit
+			name={ name }
+			patternRef={ ref }
+			content={ content }
+			parentLayout={ parentLayout }
+			setAttributes={ setAttributes }
+		/>
+	);
+}
+
+function RefPatternEdit( {
+	name,
+	patternRef,
+	content,
+	parentLayout,
+	setAttributes,
+} ) {
+	const { record, hasResolved } = useEntityRecord(
+		'postType',
+		'wp_block',
+		patternRef
+	);
+	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
+		id: patternRef,
+	} );
+	const isMissing = hasResolved && ! record;
+
+	const { __unstableMarkLastChangeAsPersistent } =
+		useDispatch( blockEditorStore );
+
+	const onNavigateToEntityRecord = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().onNavigateToEntityRecord;
+	}, [] );
+
+	const canOverrideBlocks = useCanOverrideBlocks( blocks );
 
 	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
 	const layoutClasses = useLayoutClasses( { layout }, name );
@@ -226,14 +282,13 @@ function ReusableBlockEdit( {
 
 	const handleEditOriginal = () => {
 		onNavigateToEntityRecord( {
-			postId: ref,
+			postId: patternRef,
 			postType: 'wp_block',
 		} );
 	};
 
 	const resetContent = () => {
 		if ( content ) {
-			// Make sure any previous changes are persisted before resetting.
 			__unstableMarkLastChangeAsPersistent();
 			setAttributes( { content: undefined } );
 		}
@@ -261,7 +316,7 @@ function ReusableBlockEdit( {
 		<>
 			{ hasResolved && ! isMissing && (
 				<ReusableBlockControl
-					recordId={ ref }
+					recordId={ patternRef }
 					canOverrideBlocks={ canOverrideBlocks }
 					hasContent={ !! content }
 					handleEditOriginal={
@@ -278,6 +333,83 @@ function ReusableBlockEdit( {
 			) : (
 				<div { ...blockProps }>{ children }</div>
 			) }
+		</>
+	);
+}
+
+function SlugPatternEdit( {
+	name,
+	slug,
+	content,
+	parentLayout,
+	setAttributes,
+} ) {
+	const { blocks, isMissing } = useSelect(
+		( select ) => {
+			const pattern =
+				select(
+					blockEditorStore
+				).__experimentalGetParsedPattern( slug );
+			return {
+				blocks: pattern?.blocks ?? [],
+				isMissing: ! pattern,
+			};
+		},
+		[ slug ]
+	);
+
+	const { __unstableMarkLastChangeAsPersistent } =
+		useDispatch( blockEditorStore );
+
+	const canOverrideBlocks = useCanOverrideBlocks( blocks );
+
+	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
+	const layoutClasses = useLayoutClasses( { layout }, name );
+
+	const blockProps = useBlockProps( {
+		className: clsx(
+			'block-library-block__reusable-block-container',
+			layout && layoutClasses,
+			{ [ `align${ alignment }` ]: alignment }
+		),
+	} );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		layout,
+		value: blocks,
+		onInput: NOOP,
+		onChange: NOOP,
+		renderAppender: blocks?.length
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
+	} );
+
+	const resetContent = () => {
+		if ( content ) {
+			__unstableMarkLastChangeAsPersistent();
+			setAttributes( { content: undefined } );
+		}
+	};
+
+	if ( isMissing ) {
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __( 'Block has been deleted or is unavailable.' ) }
+				</Warning>
+			</div>
+		);
+	}
+
+	return (
+		<>
+			<PatternBlockControl
+				canOverrideBlocks={ canOverrideBlocks }
+				hasContent={ !! content }
+				resetContent={ resetContent }
+			/>
+
+			<div { ...innerBlocksProps } />
 		</>
 	);
 }
