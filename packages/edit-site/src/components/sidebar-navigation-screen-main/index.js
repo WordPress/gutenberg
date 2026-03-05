@@ -20,7 +20,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
-import { SidebarNavigationItemSiteLogoAndIcon } from '../sidebar-navigation-screen-site-logo-and-icon';
+import { SidebarNavigationItemIdentity } from '../sidebar-navigation-screen-identity';
 
 export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 	return (
@@ -42,13 +42,13 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 					>
 						{ __( 'Navigation' ) }
 					</SidebarNavigationItem>
-					<SidebarNavigationItemSiteLogoAndIcon
-						to="/site-logo-and-icon"
-						uid="site-logo-and-icon-navigation-item"
+					<SidebarNavigationItemIdentity
+						to="/identity"
+						uid="identity-navigation-item"
 						icon={ siteLogo }
 					>
 						{ __( 'Identity' ) }
-					</SidebarNavigationItemSiteLogoAndIcon>
+					</SidebarNavigationItemIdentity>
 					<SidebarNavigationItem
 						uid="page-navigation-item"
 						to="/page"

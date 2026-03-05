@@ -14,17 +14,17 @@ import { MainSidebarNavigationContent } from '../sidebar-navigation-screen-main'
 
 const { useLocation } = unlock( routerPrivateApis );
 
-export function SidebarNavigationItemSiteLogoAndIcon( props ) {
+export function SidebarNavigationItemIdentity( props ) {
 	const { name } = useLocation();
 	return (
 		<SidebarNavigationItem
 			{ ...props }
-			aria-current={ name === 'site-logo-and-icon' }
+			aria-current={ name === 'identity' }
 		/>
 	);
 }
 
-export default function SidebarNavigationScreenSiteLogoAndIcon() {
+export default function SidebarNavigationScreenIdentity() {
 	return (
 		<SidebarNavigationScreen
 			isRoot

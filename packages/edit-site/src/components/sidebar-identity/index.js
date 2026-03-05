@@ -45,11 +45,10 @@ const form = {
 	fields: [ 'site_logo', 'site_icon' ],
 };
 
-export default function SidebarSiteLogoAndIcon() {
+export default function SidebarIdentity() {
 	const data = useSelect(
 		( select ) =>
 			select( coreStore ).getEditedEntityRecord( 'root', 'site' ),
-
 		[]
 	);
 	const { editEntityRecord } = useDispatch( coreStore );
@@ -59,13 +58,7 @@ export default function SidebarSiteLogoAndIcon() {
 	};
 
 	return (
-		<Page
-			title={ __( 'Identity' ) }
-			subTitle={ __(
-				"Your site logo and icon help visitors recognize your brand across the web. The logo appears in your site's layout wherever the Site Logo block is placed. The icon shows in browser tabs, bookmarks, and mobile app shortcuts."
-			) }
-			hasPadding
-		>
+		<Page title={ __( 'Identity' ) } hasPadding>
 			<DataForm
 				data={ data }
 				fields={ fields }
