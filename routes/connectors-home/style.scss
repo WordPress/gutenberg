@@ -1,6 +1,7 @@
 @use "@wordpress/base-styles/colors" as *;
 
 .connectors-page {
+	box-sizing: border-box;
 	width: 100%;
 	max-width: 680px;
 	margin: 0 auto;
