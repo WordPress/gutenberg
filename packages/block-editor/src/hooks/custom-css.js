@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -126,13 +131,26 @@ function useBlockProps( { style } ) {
 	// Inject the CSS via style override.
 	useStyleOverride( { css: transformedCSS } );
 
+	const canUserUseUnfilteredHTML = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()
+				.__experimentalCanUserUseUnfilteredHTML,
+		[]
+	);
+
 	// Only add the class if there's valid custom CSS.
 	if ( ! isValidCSS ) {
 		return {};
 	}
 
+	const willLoseCSSOnSave = ! canUserUseUnfilteredHTML;
+
 	return {
-		className: `has-custom-css ${ customCSSIdentifier }`,
+		className: clsx(
+			'has-custom-css',
+			customCSSIdentifier,
+			willLoseCSSOnSave && 'has-custom-css-will-be-stripped'
+		),
 	};
 }
 
