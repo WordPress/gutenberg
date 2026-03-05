@@ -135,9 +135,14 @@ const { state, actions } = store(
 					ref.focus();
 				}
 				const { menuOpenedBy } = state;
-				if ( menuOpenedBy.click || menuOpenedBy.focus ) {
+				if (
+					menuOpenedBy.click ||
+					menuOpenedBy.focus ||
+					menuOpenedBy.hover
+				) {
 					actions.closeMenu( 'click' );
 					actions.closeMenu( 'focus' );
+					actions.closeMenu( 'hover' );
 				} else {
 					ctx.previousFocus = ref;
 					actions.openMenu( 'click' );
