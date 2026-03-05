@@ -106,7 +106,8 @@
 		"submenuVisibility": "submenuVisibility",
 		"openSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
-		"maxNestingLevel": "maxNestingLevel"
+		"maxNestingLevel": "maxNestingLevel",
+		"layout": "layout"
 	},
 	"supports": {
 		"anchor": true,
