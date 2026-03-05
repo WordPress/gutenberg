@@ -103,6 +103,15 @@ class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revision
 			$response->set_data( $data );
 		}
 
+		// Add embeddable author link to get author name in revision history screen
+		if ( ! empty( $item->post_author ) ) {
+			$response->add_link(
+				'author',
+				rest_url( 'wp/v2/users/' . $item->post_author ),
+				array( 'embeddable' => true )
+			);
+		}
+
 		return $response;
 	}
 

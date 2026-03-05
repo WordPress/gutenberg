@@ -11,7 +11,7 @@ import {
 } from '@wordpress/components';
 import { DataViews } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { arrowLeft } from '@wordpress/icons';
 import type { View, Field, Action } from '@wordpress/dataviews';
@@ -54,7 +54,7 @@ const FIELDS: Field< ContentGuidelinesRevision >[] = [
 		),
 		enableSorting: false,
 		enableHiding: false,
-		enableGlobalSearch: false,
+		enableGlobalSearch: true,
 	},
 	{
 		id: 'author',
@@ -100,7 +100,6 @@ export default function RevisionHistory() {
 			guidelinesId,
 			page: view.page,
 			perPage: view.perPage,
-			search: view.search,
 		} )
 			.then( ( result ) => {
 				setRevisions( result.revisions );
@@ -108,7 +107,22 @@ export default function RevisionHistory() {
 				setTotalPages( result.totalPages );
 			} )
 			.finally( () => setIsLoading( false ) );
-	}, [ guidelinesId, view.page, view.perPage, view.search ] );
+	}, [ guidelinesId, view.page, view.perPage ] );
+
+	// Filter revisions based on search term in the view. This is done client-side
+	const displayedRevisions = useMemo( () => {
+		const term = view.search?.trim().toLowerCase();
+		if ( ! term ) {
+			return revisions;
+		}
+		return revisions.filter( ( revision ) => {
+			const author = (
+				revision._embedded?.author?.[ 0 ]?.name ?? ''
+			).toLowerCase();
+			const date = formatDate( revision.date ).toLowerCase();
+			return author.includes( term ) || date.includes( term );
+		} );
+	}, [ revisions, view.search ] );
 
 	const actions: Action< ContentGuidelinesRevision >[] = [
 		{
@@ -153,13 +167,26 @@ export default function RevisionHistory() {
 			</Text>
 
 			<DataViews
-				data={ revisions }
+				data={ displayedRevisions }
 				fields={ FIELDS }
 				view={ view }
 				onChangeView={ setView }
 				actions={ actions }
 				isLoading={ isLoading }
-				paginationInfo={ { totalItems: total, totalPages } }
+				paginationInfo={
+					view.search
+						? {
+								totalItems: displayedRevisions.length,
+								totalPages: Math.max(
+									1,
+									Math.ceil(
+										displayedRevisions.length /
+											( view.perPage ?? 10 )
+									)
+								),
+						  }
+						: { totalItems: total, totalPages }
+				}
 				defaultLayouts={ { table: {} } }
 				getItemId={ ( item ) => String( item.id ) }
 			/>
