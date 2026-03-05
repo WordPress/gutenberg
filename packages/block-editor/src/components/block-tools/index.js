@@ -235,7 +235,10 @@ export default function BlockTools( {
 			if ( clientIds.length === 1 ) {
 				const isContentOnly =
 					getBlockEditingMode( clientIds[ 0 ] ) === 'contentOnly';
-				const canRenameBlock = canRename && ! isContentOnly;
+				const canRenameBlock =
+					canRename &&
+					! isContentOnly &&
+					canEditBlock( clientIds[ 0 ] );
 				if ( canRenameBlock ) {
 					event.preventDefault();
 					setRenamingBlockClientId( clientIds[ 0 ] );
