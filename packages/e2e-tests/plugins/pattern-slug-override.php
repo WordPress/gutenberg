@@ -22,7 +22,7 @@ add_action(
 			'test/slug-pattern-with-overrides',
 			array(
 				'title'   => 'Slug Pattern With Overrides',
-				'content' => '<!-- wp:heading {"metadata":{"name":"heading","bindings":{"content":{"source":"core/pattern-overrides"}}}} --><h2 class="wp-block-heading">Default Heading</h2><!-- /wp:heading --><!-- wp:paragraph {"metadata":{"name":"description","bindings":{"content":{"source":"core/pattern-overrides"}}}} --><p>Default description</p><!-- /wp:paragraph -->',
+				'content' => '<!-- wp:heading {"metadata":{"name":"heading","bindings":{"__default":{"source":"core/pattern-overrides"}}}} --><h2 class="wp-block-heading">Default Heading</h2><!-- /wp:heading --><!-- wp:paragraph {"metadata":{"name":"description","bindings":{"__default":{"source":"core/pattern-overrides"}}}} --><p>Default description</p><!-- /wp:paragraph -->',
 			)
 		);
 	}
