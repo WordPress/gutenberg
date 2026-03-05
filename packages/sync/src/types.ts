@@ -124,6 +124,7 @@ export interface CollectionHandlers {
 export interface SyncManagerUpdateOptions {
 	isSave?: boolean;
 	isNewUndoLevel?: boolean;
+	undoIgnore?: boolean;
 }
 
 export interface RecordHandlers {

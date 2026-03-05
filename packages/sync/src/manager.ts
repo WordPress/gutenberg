@@ -551,7 +551,11 @@ export function createSyncManager( debug = false ): SyncManager {
 		origin: string,
 		options: SyncManagerUpdateOptions = {}
 	): void {
-		const { isSave = false, isNewUndoLevel = false } = options;
+		const {
+			isSave = false,
+			isNewUndoLevel = false,
+			undoIgnore = false,
+		} = options;
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 		const collectionState = collectionStates.get( objectType );
@@ -568,6 +572,11 @@ export function createSyncManager( debug = false ): SyncManager {
 				undoManager.stopCapturing?.();
 			}
 
+			// Use a non-tracked origin for changes that should be invisible
+			// to the undo manager: undoIgnore edits and save-response updates.
+			const transactionOrigin =
+				undoIgnore || isSave ? LOCAL_SYNC_MANAGER_ORIGIN : origin;
+
 			ydoc.transact( () => {
 				log( 'updateCRDTDoc', 'applying changes', entityId, {
 					changedKeys: Object.keys( changes ),
@@ -577,7 +586,7 @@ export function createSyncManager( debug = false ): SyncManager {
 				if ( isSave ) {
 					markEntityAsSaved( ydoc );
 				}
-			}, origin );
+			}, transactionOrigin );
 		}
 
 		if ( collectionState && isSave ) {

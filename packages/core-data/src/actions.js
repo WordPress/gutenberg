@@ -450,7 +450,10 @@ export const editEntityRecord =
 				objectId,
 				editsWithMerges,
 				LOCAL_EDITOR_ORIGIN,
-				{ isNewUndoLevel }
+				{
+					isNewUndoLevel,
+					undoIgnore: !! options.undoIgnore,
+				}
 			);
 		}
 		if ( ! options.undoIgnore ) {
