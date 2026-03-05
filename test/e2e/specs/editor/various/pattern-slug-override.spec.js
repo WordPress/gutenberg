@@ -54,9 +54,9 @@ test.describe( 'Pattern block with slug attribute', () => {
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
-		await expect(
-			page.locator( '.wp-block-heading' )
-		).toHaveText( 'Pattern Heading' );
+		await expect( page.locator( '.wp-block-heading' ) ).toHaveText(
+			'Pattern Heading'
+		);
 		await expect(
 			page.locator( '.wp-block-paragraph' ).first()
 		).toHaveText( 'Pattern paragraph content' );
@@ -89,9 +89,9 @@ test.describe( 'Pattern block with slug attribute', () => {
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
-		await expect(
-			page.locator( '.wp-block-heading' )
-		).toHaveText( 'Custom Heading' );
+		await expect( page.locator( '.wp-block-heading' ) ).toHaveText(
+			'Custom Heading'
+		);
 		await expect(
 			page.locator( '.wp-block-paragraph' ).first()
 		).toHaveText( 'Custom description' );
@@ -150,9 +150,9 @@ test.describe( 'Pattern block with slug attribute', () => {
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
-		await expect(
-			page.locator( '.wp-block-heading' )
-		).toHaveText( 'Default Heading' );
+		await expect( page.locator( '.wp-block-heading' ) ).toHaveText(
+			'Default Heading'
+		);
 		await expect(
 			page.locator( '.wp-block-paragraph' ).first()
 		).toHaveText( 'Default description' );
