@@ -13,7 +13,7 @@ export type FieldsetLegendProps = ComponentProps< typeof _Fieldset.Legend > & {
 	 *
 	 * @default false
 	 */
-	visuallyHidden?: boolean;
+	hideFromVision?: boolean;
 };
 
 export type FieldsetDescriptionProps = ComponentProps< 'p' > & {

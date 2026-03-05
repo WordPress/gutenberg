@@ -32,7 +32,7 @@ describe( 'Fieldset', () => {
 	it( 'keeps the accessible name when the legend is visually hidden', () => {
 		render(
 			<Fieldset.Root>
-				<Fieldset.Legend visuallyHidden>
+				<Fieldset.Legend hideFromVision>
 					Choose your options
 				</Fieldset.Legend>
 			</Fieldset.Root>

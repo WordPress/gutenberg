@@ -7,7 +7,7 @@ import type { FieldLabelProps } from './types';
 
 export const Label = forwardRef< HTMLLabelElement, FieldLabelProps >(
 	function Label(
-		{ className, visuallyHidden, variant, ...restProps },
+		{ className, hideFromVision, variant, ...restProps },
 		ref
 	) {
 		return (
@@ -18,7 +18,7 @@ export const Label = forwardRef< HTMLLabelElement, FieldLabelProps >(
 					variant && fieldStyles[ `is-${ variant }` ],
 					className
 				) }
-				{ ...( visuallyHidden && {
+				{ ...( hideFromVision && {
 					render: <VisuallyHidden />,
 					nativeLabel: false,
 				} ) }

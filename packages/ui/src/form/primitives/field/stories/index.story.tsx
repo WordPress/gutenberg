@@ -101,14 +101,14 @@ export const UsingAriaLabelledby: StoryObj< typeof Field.Root > = {
 };
 
 /**
- * When `hideLabelFromVision` is set on `Field.Label`, the label is visually
+ * When `hideFromVision` is set on `Field.Label`, the label is visually
  * hidden but remains accessible to screen readers.
  */
 export const HiddenLabel: StoryObj< typeof Field.Root > = {
 	args: {
 		children: (
 			<>
-				<Field.Label visuallyHidden>Label</Field.Label>
+				<Field.Label hideFromVision>Label</Field.Label>
 				<Field.Control
 					render={ <input type="text" placeholder="Placeholder" /> }
 				/>

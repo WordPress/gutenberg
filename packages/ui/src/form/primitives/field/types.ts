@@ -39,7 +39,7 @@ export type FieldLabelProps = ComponentProps< typeof Field.Label > & {
 	 *
 	 * @default false
 	 */
-	visuallyHidden?: boolean;
+	hideFromVision?: boolean;
 	/**
 	 * The visual variant of the label.
 	 *

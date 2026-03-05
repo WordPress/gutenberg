@@ -7,14 +7,14 @@ import type { FieldsetLegendProps } from './types';
 
 export const FieldsetLegend = forwardRef< HTMLDivElement, FieldsetLegendProps >(
 	function FieldsetLegend(
-		{ className, visuallyHidden, ...restProps },
+		{ className, hideFromVision, ...restProps },
 		ref
 	) {
 		return (
 			<_Fieldset.Legend
 				ref={ ref }
 				className={ clsx( fieldStyles.label, className ) }
-				{ ...( visuallyHidden && {
+				{ ...( hideFromVision && {
 					render: <VisuallyHidden />,
 				} ) }
 				{ ...restProps }

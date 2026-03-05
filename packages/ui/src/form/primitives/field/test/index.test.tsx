@@ -37,7 +37,7 @@ describe( 'Field', () => {
 	it( 'keeps the accessible name when the label is visually hidden', () => {
 		render(
 			<Field.Root>
-				<Field.Label visuallyHidden>Field Label</Field.Label>
+				<Field.Label hideFromVision>Field Label</Field.Label>
 				<Field.Control render={ <input /> } />
 			</Field.Root>
 		);

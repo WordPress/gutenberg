@@ -34,14 +34,14 @@ export const Default: Story = {
 };
 
 /**
- * When `hideLabelFromVision` is set on `Fieldset.Legend`, the legend is visually
+ * When `hideFromVision` is set on `Fieldset.Legend`, the legend is visually
  * hidden but remains accessible to screen readers.
  */
 export const HiddenLegend: Story = {
 	args: {
 		children: (
 			<>
-				<Fieldset.Legend visuallyHidden>Legend</Fieldset.Legend>
+				<Fieldset.Legend hideFromVision>Legend</Fieldset.Legend>
 				{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
 					// eslint-disable-next-line jsx-a11y/label-has-associated-control
 					<label key={ fruit }>
