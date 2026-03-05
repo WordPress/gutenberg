@@ -68,6 +68,11 @@
 			"import": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs",
 			"default": "./build/stylelint-plugins/no-setting-wpds-custom-properties.cjs"
 		},
+		"./stylelint-plugins/no-token-fallback-values": {
+			"types": "./build-types/stylelint-plugins/no-token-fallback-values.d.ts",
+			"import": "./src/stylelint-plugins/no-token-fallback-values.mjs",
+			"default": "./build/stylelint-plugins/no-token-fallback-values.cjs"
+		},
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",

@@ -1,0 +1,13 @@
+/* Valid: Using wpds tokens without fallbacks */
+.example {
+	color: var(--wpds-color-fg-content-neutral);
+	background-color: var(--wpds-color-bg-surface-neutral);
+	border-radius: var(--wpds-border-radius-sm);
+	padding: var(--wpds-dimension-padding-md);
+}
+
+/* Valid: Non-wpds custom properties with fallbacks are fine */
+.other-vars {
+	color: var(--my-custom-color, red);
+	background: var(--some-other-var, #fff);
+}

@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`flags warnings with invalid css (wpds fallbacks) snapshot matches warnings 1`] = `
+[
+  {
+    "column": 2,
+    "endColumn": 55,
+    "endLine": 3,
+    "line": 3,
+    "rule": "plugin-wpds/no-token-fallback-values",
+    "severity": "error",
+    "text": "Do not add a fallback value for Design System token '--wpds-color-fg-content-neutral'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
+  },
+  {
+    "column": 2,
+    "endColumn": 71,
+    "endLine": 4,
+    "line": 4,
+    "rule": "plugin-wpds/no-token-fallback-values",
+    "severity": "error",
+    "text": "Do not add a fallback value for Design System token '--wpds-color-bg-surface-neutral-weak'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
+  },
+  {
+    "column": 2,
+    "endColumn": 51,
+    "endLine": 5,
+    "line": 5,
+    "rule": "plugin-wpds/no-token-fallback-values",
+    "severity": "error",
+    "text": "Do not add a fallback value for Design System token '--wpds-border-radius-sm'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
+  },
+  {
+    "column": 2,
+    "endColumn": 99,
+    "endLine": 10,
+    "line": 10,
+    "rule": "plugin-wpds/no-token-fallback-values",
+    "severity": "error",
+    "text": "Do not add a fallback value for Design System token '--wpds-border-width-focus'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
+  },
+  {
+    "column": 2,
+    "endColumn": 99,
+    "endLine": 10,
+    "line": 10,
+    "rule": "plugin-wpds/no-token-fallback-values",
+    "severity": "error",
+    "text": "Do not add a fallback value for Design System token '--wpds-color-stroke-focus-brand'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
+  },
+]
+`;

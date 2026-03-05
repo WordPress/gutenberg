@@ -1,13 +1,13 @@
 import { getStylelintResult } from './utils';
 
-const CONFIG = './.stylelintrc.no-setting-wpds-custom-properties.json';
+const CONFIG = './.stylelintrc.no-token-fallback-values.json';
 
-describe( 'flags no warnings with valid wpds custom properties css', () => {
+describe( 'flags no warnings with valid css (no wpds fallbacks)', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
 	beforeEach( () => {
 		result = getStylelintResult(
-			'./fixtures/no-setting-wpds-custom-properties-valid.css',
+			'./fixtures/no-token-fallback-values-valid.css',
 			CONFIG
 		);
 	} );
@@ -23,12 +23,12 @@ describe( 'flags no warnings with valid wpds custom properties css', () => {
 	} );
 } );
 
-describe( 'flags warnings with invalid wpds custom properties css', () => {
+describe( 'flags warnings with invalid css (wpds fallbacks)', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
 	beforeEach( () => {
 		result = getStylelintResult(
-			'./fixtures/no-setting-wpds-custom-properties-invalid.css',
+			'./fixtures/no-token-fallback-values-invalid.css',
 			CONFIG
 		);
 	} );
@@ -39,7 +39,7 @@ describe( 'flags warnings with invalid wpds custom properties css', () => {
 
 	it( 'flags correct number of warnings', () => {
 		return result.then( ( data ) =>
-			expect( data.results[ 0 ].warnings ).toHaveLength( 2 )
+			expect( data.results[ 0 ].warnings ).toHaveLength( 5 )
 		);
 	} );
 
