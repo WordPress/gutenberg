@@ -274,8 +274,10 @@ class PostEditorTemplateMode {
 			.getByRole( 'button', { name: 'Save', exact: true } )
 			.click();
 		// Avoid publishing the post.
-		await editorPublishRegion
-			.getByRole( 'button', { name: 'Cancel' } )
-			.click();
+		const cancelButton = editorPublishRegion.getByRole( 'button', {
+			name: 'Cancel',
+		} );
+		await expect( cancelButton ).toBeEnabled();
+		await cancelButton.click();
 	}
 }
