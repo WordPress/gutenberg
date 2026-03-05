@@ -41,6 +41,15 @@ export interface GuidelineAccordionProps {
 	descriptionId?: string;
 }
 
+export interface ContentGuidelinesRevision {
+	id: number;
+	date: string;
+	author: number;
+	_embedded?: {
+		author: Array< { name: string } >;
+	};
+}
+
 export interface GuidelineAccordionFormProps {
 	slug: string;
 	contentId?: string; // Used for a11y.

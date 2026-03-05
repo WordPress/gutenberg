@@ -4,6 +4,7 @@
 import {
 	Button,
 	Card,
+	useNavigator,
 	__experimentalText as Text,
 	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
@@ -51,6 +52,7 @@ const ACTIONS = [
 ];
 
 export default function ActionsSection() {
+	const { goTo } = useNavigator();
 	const fileInputRef = useRef< HTMLInputElement >( null );
 	const [ isImporting, setIsImporting ] = useState( false );
 
@@ -90,6 +92,8 @@ export default function ActionsSection() {
 			disabled: isImporting,
 		},
 		export: { onClick: handleExportClick },
+		'manage-access': { onClick: () => goTo( '/manage-access' ) },
+		revert: { onClick: () => goTo( '/revision-history' ) },
 	};
 
 	return (
