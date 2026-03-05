@@ -67,6 +67,7 @@ function gutenberg_style_inheritance_push_provider( $parsed_block ) {
 	);
 
 	// Only push if the provider actually has styles to offer.
+	// Set a flag on the parsed block so apply_and_pop knows whether to pop.
 	if ( ! empty( $vars ) ) {
 		gutenberg_style_inheritance_stack(
 			array(
@@ -74,6 +75,7 @@ function gutenberg_style_inheritance_push_provider( $parsed_block ) {
 				'vars'     => $vars,
 			)
 		);
+		$parsed_block['__styleInheritancePushed'] = true;
 	}
 
 	return $parsed_block;
@@ -111,8 +113,9 @@ function gutenberg_style_inheritance_apply_and_pop( $block_content, $block ) {
 		);
 	}
 
-	// Pop provider after all inner blocks have rendered.
-	if ( ! empty( $support['provides'] ) ) {
+	// Pop provider after all inner blocks have rendered, but only if a push
+	// actually happened (providers with no styles set are not pushed).
+	if ( ! empty( $block['__styleInheritancePushed'] ) ) {
 		gutenberg_style_inheritance_stack( null, /* pop */ true );
 	}
 
