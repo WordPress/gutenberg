@@ -630,4 +630,79 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			} );
 		} );
 	} );
+
+	test.describe( 'Submenu touch device interactions (@firefox, @webkit)', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+				canvas: 'edit',
+			} );
+			await requestUtils.createNavigationMenu( {
+				title: 'Touch test menu',
+				content: `
+					<!-- wp:navigation-submenu {"label":"Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- /wp:navigation-submenu -->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'off' },
+			} );
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
+		} );
+
+		test( 'submenu does not open via hover on touch devices', async ( {
+			page,
+		} ) => {
+			// Mock (hover: none) to simulate a touch device where
+			// mouseenter is a synthetic event from tapping.
+			await page.addInitScript( () => {
+				const originalMatchMedia = window.matchMedia.bind( window );
+				window.matchMedia = ( query ) => {
+					if ( query === '(hover: none)' ) {
+						return {
+							matches: true,
+							media: query,
+							onchange: null,
+							addListener: () => {},
+							removeListener: () => {},
+							addEventListener: () => {},
+							removeEventListener: () => {},
+							dispatchEvent: () => false,
+						};
+					}
+					return originalMatchMedia( query );
+				};
+			} );
+
+			await page.goto( '/' );
+			const arrowButton = page.getByRole( 'button', {
+				name: 'Submenu submenu',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Submenu Link',
+			} );
+
+			// Submenu should be hidden initially.
+			await expect( innerElement ).toBeHidden();
+
+			// Simulate the synthetic mouseenter that fires on touch tap.
+			// With the (hover: none) guard, this should NOT open the submenu.
+			const submenuLi = page.locator( 'li.has-child' ).first();
+			await submenuLi.dispatchEvent( 'mouseenter' );
+			await expect( innerElement ).toBeHidden();
+
+			// Click the arrow to open the submenu.
+			await arrowButton.click();
+			await expect( innerElement ).toBeVisible();
+
+			// Click the arrow again to close the submenu (single tap close).
+			await arrowButton.click();
+			await expect( innerElement ).toBeHidden();
+		} );
+	} );
 } );
