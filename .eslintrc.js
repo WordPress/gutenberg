@@ -557,6 +557,7 @@ module.exports = {
 		{
 			files: [ 'packages/eslint-plugin/**', 'packages/theme/**' ],
 			rules: {
+				'@wordpress/no-setting-ds-tokens': 'off',
 				'@wordpress/no-unknown-ds-tokens': 'off',
 			},
 		},
