@@ -39,7 +39,7 @@ export function ConnectorItem( {
 	return (
 		<Item className={ className }>
 			<VStack spacing={ 4 }>
-				<HStack alignment="center" spacing={ 4 }>
+				<HStack alignment="center" spacing={ 4 } wrap>
 					{ icon }
 					<FlexBlock>
 						<VStack spacing={ 0 }>

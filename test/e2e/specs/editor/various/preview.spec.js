@@ -10,20 +10,6 @@ test.use( {
 } );
 
 test.describe( 'Preview', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		// Cross-origin isolation (COOP: same-origin) prevents the editor
-		// from reusing the preview popup window, breaking preview navigation.
-		await requestUtils.activatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deactivatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -230,6 +216,10 @@ test.describe( 'Preview', () => {
 
 test.describe( 'Preview with Custom Fields enabled', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
+		// Document-Isolation-Policy places the editor in its own agent cluster.
+		// Preview opens frontend pages without the DIP header, creating an
+		// agent cluster mismatch that breaks popup reuse and cross-window
+		// communication.
 		await requestUtils.activatePlugin(
 			'gutenberg-test-plugin-disable-client-side-media-processing'
 		);

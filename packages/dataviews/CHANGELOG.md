@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 - DataViews: Fix last column classname in table layout. [#76133](https://github.com/WordPress/gutenberg/pull/76133)
+- DataForm: Properly handle dates in datetime control. [#76193](https://github.com/WordPress/gutenberg/pull/76193)
 
 ### Code Quality
 
