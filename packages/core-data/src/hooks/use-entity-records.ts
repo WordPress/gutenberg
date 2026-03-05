@@ -9,7 +9,6 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
 import type { Options } from './use-entity-record';
 import type { Status } from './constants';
@@ -24,6 +23,11 @@ interface EntityRecordsResolution< RecordType > {
 	 * Is the record still being resolved?
 	 */
 	isResolving: boolean;
+
+	/**
+	 * Has the resolution started?
+	 */
+	hasStarted: boolean;
 
 	/**
 	 * Is the record resolved by now?
@@ -108,38 +112,65 @@ export default function useEntityRecords< RecordType >(
 	// if the values remain the same.
 	const queryAsString = addQueryArgs( '', queryArgs );
 
-	const { data: records, ...rest } = useQuerySelect(
-		( query ) => {
-			if ( ! options.enabled ) {
-				return {
-					// Avoiding returning a new reference on every execution.
-					data: EMPTY_ARRAY,
-				};
-			}
-			return query( coreStore ).getEntityRecords( kind, name, queryArgs );
-		},
-		[ kind, name, queryAsString, options.enabled ]
-	);
-
-	const { totalItems, totalPages } = useSelect(
+	const { records, totalItems, totalPages, ...rest } = useSelect(
 		( select ) => {
 			if ( ! options.enabled ) {
 				return {
+					// Avoiding returning a new reference on every execution.
+					records: EMPTY_ARRAY,
 					totalItems: null,
 					totalPages: null,
 				};
 			}
+
+			const storeSelectors = select( coreStore );
+			const resolutionStatus = (
+				storeSelectors as any
+			 ).getResolutionState( 'getEntityRecords', [
+				kind,
+				name,
+				queryArgs,
+			] )?.status;
+
+			let status: Status;
+			switch ( resolutionStatus ) {
+				case 'resolving':
+					status = 'RESOLVING' as Status;
+					break;
+				case 'finished':
+					status = 'SUCCESS' as Status;
+					break;
+				case 'error':
+					status = 'ERROR' as Status;
+					break;
+				case undefined:
+				default:
+					status = 'IDLE' as Status;
+					break;
+			}
+
 			return {
-				totalItems: select( coreStore ).getEntityRecordsTotalItems(
+				records: storeSelectors.getEntityRecords(
 					kind,
 					name,
 					queryArgs
 				),
-				totalPages: select( coreStore ).getEntityRecordsTotalPages(
+				totalItems: storeSelectors.getEntityRecordsTotalItems(
 					kind,
 					name,
 					queryArgs
 				),
+				totalPages: storeSelectors.getEntityRecordsTotalPages(
+					kind,
+					name,
+					queryArgs
+				),
+				isResolving: status === ( 'RESOLVING' as Status ),
+				hasStarted: status !== ( 'IDLE' as Status ),
+				hasResolved:
+					status === ( 'SUCCESS' as Status ) ||
+					status === ( 'ERROR' as Status ),
+				status,
 			};
 		},
 		[ kind, name, queryAsString, options.enabled ]
@@ -150,7 +181,7 @@ export default function useEntityRecords< RecordType >(
 		totalItems,
 		totalPages,
 		...rest,
-	};
+	} as EntityRecordsResolution< RecordType >;
 }
 
 export function useDeprecatedEntityRecords(
