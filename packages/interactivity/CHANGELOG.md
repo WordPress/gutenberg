@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Fix `sessionId` generation crashing in non-secure (non-HTTPS) contexts. ([#76151](https://github.com/WordPress/gutenberg/pull/76151))
 -   Add `initialVdomPromise` synchronization promise to ensure the router waits for hydration to complete before initializing, fixing dead DOM on Safari and Firefox. ([#76053](https://github.com/WordPress/gutenberg/pull/76053))
 
 ## 6.41.0 (2026-03-04)
@@ -12,7 +13,7 @@
 
 ### New Features
 
--   Export `watch()` function for subscribing to signal changes outside of directives.
+-   Export `watch()` function for subscribing to signal changes outside of directives. ([#75563](https://github.com/WordPress/gutenberg/pull/75563))
 
 ## 6.39.0 (2026-01-29)
 
