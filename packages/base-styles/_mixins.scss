@@ -667,6 +667,23 @@
 	}
 }
 
+@mixin inserter-toggle() {
+	// Basic look
+	background: colors.$gray-900;
+	color: colors.$white;
+	padding: 0;
+
+	// TODO: Consider passing size="small" to the Inserter toggle instead.
+	// Special dimensions for this button.
+	min-width: variables.$button-size-small;
+	height: variables.$button-size-small;
+
+	&:hover {
+		color: colors.$white;
+		background: var(--wp-admin-theme-color);
+	}
+}
+
 @mixin selected-block-outline($widthRatio: 1) {
 	outline-color: var(--wp-admin-theme-color);
 	outline-style: solid;

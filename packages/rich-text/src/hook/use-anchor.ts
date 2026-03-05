@@ -5,21 +5,27 @@ import { usePrevious } from '@wordpress/compose';
 import { useState, useLayoutEffect } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 
-/** @typedef {import('../register-format-type').WPFormat} WPFormat */
-/** @typedef {import('../types').RichTextValue} RichTextValue */
+/**
+ * Internal dependencies
+ */
+import type { WPFormat } from '../register-format-type';
 
 /**
  * Given a range and a format tag name and class name, returns the closest
  * format element.
  *
- * @param {Range}       range                  The Range to check.
- * @param {HTMLElement} editableContentElement The editable wrapper.
- * @param {string}      tagName                The tag name of the format element.
- * @param {string}      className              The class name of the format element.
- *
- * @return {HTMLElement|undefined} The format element, if found.
+ * @param range                  The Range to check.
+ * @param editableContentElement The editable wrapper.
+ * @param tagName                The tag name of the format element.
+ * @param className              The class name of the format element.
+ * @return                       The format element, if found.
  */
-function getFormatElement( range, editableContentElement, tagName, className ) {
+function getFormatElement(
+	range: Range,
+	editableContentElement: HTMLElement,
+	tagName: string,
+	className: string
+): HTMLElement | undefined {
 	let element = range.startContainer;
 
 	// Even if the active format is defined, the actually DOM range's start
@@ -28,6 +34,7 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
 	// So at a given selection index, start with the deepest format DOM element.
 	if (
 		element.nodeType === element.TEXT_NODE &&
+		element instanceof window.Text &&
 		range.startOffset === element.length &&
 		element.nextSibling
 	) {
@@ -39,20 +46,27 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
 	}
 
 	if ( element.nodeType !== element.ELEMENT_NODE ) {
+		if ( ! element.parentElement ) {
+			return;
+		}
 		element = element.parentElement;
 	}
 
-	if ( ! element ) {
-		return;
-	}
 	if ( element === editableContentElement ) {
 		return;
 	}
+
 	if ( ! editableContentElement.contains( element ) ) {
 		return;
 	}
 
 	const selector = tagName + ( className ? '.' + className : '' );
+
+	if ( ! ( element instanceof window.HTMLElement ) ) {
+		return;
+	}
+
+	let closestElement: HTMLElement | null = element;
 
 	// .closest( selector ), but with a boundary. Check if the element matches
 	// the selector. If it doesn't match, try the parent element if it's not the
@@ -60,30 +74,33 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
 	// wrapper, which is what .closest( selector ) would do. When the element is
 	// the editable wrapper (which is most likely the case because most text is
 	// unformatted), this never runs.
-	while ( element !== editableContentElement ) {
-		if ( element.matches( selector ) ) {
-			return element;
+	while ( closestElement && closestElement !== editableContentElement ) {
+		if ( closestElement.matches( selector ) ) {
+			return closestElement;
 		}
 
-		element = element.parentElement;
+		closestElement = closestElement.parentElement;
 	}
+
+	return undefined;
 }
 
-/**
- * @typedef {Object} VirtualAnchorElement
- * @property {() => DOMRect} getBoundingClientRect A function returning a DOMRect
- * @property {HTMLElement}   contextElement        The actual DOM element
- */
+interface VirtualAnchorElement {
+	getBoundingClientRect: () => DOMRect;
+	contextElement: HTMLElement;
+}
 
 /**
  * Creates a virtual anchor element for a range.
  *
- * @param {Range}       range                  The range to create a virtual anchor element for.
- * @param {HTMLElement} editableContentElement The editable wrapper.
- *
- * @return {VirtualAnchorElement} The virtual anchor element.
+ * @param range                  The range to create a virtual anchor element for.
+ * @param editableContentElement The editable wrapper.
+ * @return                       The virtual anchor element.
  */
-function createVirtualAnchorElement( range, editableContentElement ) {
+function createVirtualAnchorElement(
+	range: Range,
+	editableContentElement: HTMLElement
+): VirtualAnchorElement {
 	return {
 		contextElement: editableContentElement,
 		getBoundingClientRect() {
@@ -103,22 +120,23 @@ function createVirtualAnchorElement( range, editableContentElement ) {
  * Get the anchor: a format element if there is a matching one based on the
  * tagName and className or a range otherwise.
  *
- * @param {HTMLElement} editableContentElement The editable wrapper.
- * @param {string}      tagName                The tag name of the format
- *                                             element.
- * @param {string}      className              The class name of the format
- *                                             element.
- *
- * @return {HTMLElement|VirtualAnchorElement|undefined} The anchor.
+ * @param editableContentElement The editable wrapper.
+ * @param tagName                The tag name of the format element.
+ * @param className              The class name of the format element.
+ * @return                       The anchor.
  */
-function getAnchor( editableContentElement, tagName, className ) {
+function getAnchor(
+	editableContentElement: HTMLElement | null,
+	tagName: string,
+	className: string
+): HTMLElement | VirtualAnchorElement | undefined {
 	if ( ! editableContentElement ) {
 		return;
 	}
 
 	const { ownerDocument } = editableContentElement;
 	const { defaultView } = ownerDocument;
-	const selection = defaultView.getSelection();
+	const selection = defaultView?.getSelection();
 
 	if ( ! selection ) {
 		return;
@@ -147,22 +165,43 @@ function getAnchor( editableContentElement, tagName, className ) {
 	return createVirtualAnchorElement( range, editableContentElement );
 }
 
+const DEFAULT_SETTINGS = {
+	tagName: '',
+	className: '',
+};
+
 /**
  * This hook, to be used in a format type's Edit component, returns the active
  * element that is formatted, or a virtual element for the selection range if
  * no format is active. The returned value is meant to be used for positioning
  * UI, e.g. by passing it to the `Popover` component via the `anchor` prop.
  *
- * @param {Object}           $1                        Named parameters.
- * @param {HTMLElement|null} $1.editableContentElement The element containing
- *                                                     the editable content.
- * @param {WPFormat=}        $1.settings               The format type's settings.
- * @return {Element|VirtualAnchorElement|undefined|null} The active element or selection range.
+ * @param obj                        Named parameters.
+ * @param obj.editableContentElement The element containing the editable content.
+ * @param obj.settings               The format type's settings.
+ * @return                           The active element or selection range.
  */
-export function useAnchor( { editableContentElement, settings = {} } ) {
-	const { tagName, className, isActive } = settings;
+export function useAnchor( {
+	editableContentElement,
+	settings,
+}: {
+	editableContentElement: HTMLElement | null;
+	settings?: WPFormat;
+} ): Element | VirtualAnchorElement | undefined | null {
+	const { tagName, className } = settings ?? DEFAULT_SETTINGS;
+
+	// `isActive` is not a property of `WPFormat`, but it has made its way into
+	// `settings` in certain cases (see `core/link` format). Avoid making this
+	// exception "public" in the function signature: tell TS how to look for it
+	// dynamically.
+	const isActive = !! (
+		settings &&
+		'isActive' in settings &&
+		settings.isActive
+	);
+
 	const [ anchor, setAnchor ] = useState( () =>
-		getAnchor( editableContentElement, tagName, className )
+		getAnchor( editableContentElement, tagName, className ?? '' )
 	);
 	const wasActive = usePrevious( isActive );
 
@@ -173,7 +212,7 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 
 		function callback() {
 			setAnchor(
-				getAnchor( editableContentElement, tagName, className )
+				getAnchor( editableContentElement, tagName, className ?? '' )
 			);
 		}
 
@@ -197,7 +236,7 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 			( wasActive && ! isActive )
 		) {
 			setAnchor(
-				getAnchor( editableContentElement, tagName, className )
+				getAnchor( editableContentElement, tagName, className ?? '' )
 			);
 			attach();
 		}

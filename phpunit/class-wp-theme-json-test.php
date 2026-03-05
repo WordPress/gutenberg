@@ -46,6 +46,16 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		static::$user_id = self::factory()->user->create();
 	}
 
+	public function tear_down() {
+		$registry = WP_Block_Type_Registry::get_instance();
+
+		if ( $registry->is_registered( 'test/feature-selector' ) ) {
+			unregister_block_type( 'test/feature-selector' );
+		}
+
+		parent::tear_down();
+	}
+
 	/**
 	 * Pretty print CSS in test assertions so that it provides a better diff when a test fails.
 	 * Without this: the failing test outputs the entire css string as being different.
@@ -749,6 +759,58 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS(
 			'.wp-block-heading.has-white-color{color: var(--wp--preset--color--white) !important;}.wp-block-heading.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.wp-block-heading.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}',
 			$theme_json->get_stylesheet( array( 'presets' ) )
+		);
+	}
+
+	public function test_get_stylesheet_preset_css_vars_use_feature_selector() {
+		register_block_type(
+			'test/feature-selector',
+			array(
+				'api_version' => 3,
+				'selectors'   => array(
+					'root'       => '.wp-block-test-feature-selector .wp-block-test-feature-selector__inner',
+					'dimensions' => array(
+						'root' => '.wp-block-test-feature-selector',
+					),
+				),
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'blocks' => array(
+						'test/feature-selector' => array(
+							'dimensions' => array(
+								'dimensionSizes' => array(
+									array(
+										'slug' => '25',
+										'size' => '25%',
+									),
+									array(
+										'slug' => '50',
+										'size' => '50%',
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$variables = $theme_json->get_stylesheet( array( 'variables' ) );
+
+		// Dimension preset CSS vars should be on the feature selector,
+		// not the block's root selector.
+		$this->assertStringContainsString(
+			'.wp-block-test-feature-selector{--wp--preset--dimension--25: 25%;--wp--preset--dimension--50: 50%;}',
+			$variables
+		);
+		$this->assertStringNotContainsString(
+			'.wp-block-test-feature-selector .wp-block-test-feature-selector__inner{--wp--preset--dimension',
+			$variables
 		);
 	}
 
@@ -5149,6 +5211,176 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 				'expected_output' => ':root :where(.wp-block-separator){background-color: blue;border-color: pink;}',
+			),
+		);
+	}
+
+	/**
+	 * Tests that button block width declarations are updated for percentage values.
+	 *
+	 * @dataProvider data_update_button_width_declarations
+	 *
+	 * @param array  $theme_json_args Theme JSON arguments including styles and optional settings.
+	 * @param string $expected_output Expected CSS output.
+	 */
+	public function test_update_button_width_declarations( $theme_json_args, $expected_output ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array_merge(
+				array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA ),
+				$theme_json_args
+			),
+			'default'
+		);
+
+		$button_node = array(
+			'name'       => 'core/button',
+			'path'       => array( 'styles', 'blocks', 'core/button' ),
+			'selector'   => '.wp-block-button .wp-block-button__link',
+			'selectors'  => array(
+				'root'       => '.wp-block-button .wp-block-button__link',
+				'dimensions' => array(
+					'root'  => '.wp-block-button',
+					'width' => '.wp-block-button',
+				),
+			),
+			'duotone'    => null,
+			'variations' => array(),
+			'css'        => '.wp-block-button .wp-block-button__link',
+		);
+		$this->assertSame( $expected_output, $theme_json->get_styles_for_block( $button_node ) );
+	}
+
+	/**
+	 * Data provider for button width declaration tests.
+	 *
+	 * @return array
+	 */
+	public function data_update_button_width_declarations() {
+		return array(
+			'direct percentage value'                   => array(
+				array(
+					'styles' => array(
+						'blocks' => array(
+							'core/button' => array(
+								'dimensions' => array(
+									'width' => '25%',
+								),
+							),
+						),
+					),
+				),
+				'expected_output' => ':root :where(.wp-block-button){width: calc(25 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 25 / 100)));}',
+			),
+			'decimal percentage value'                  => array(
+				array(
+					'styles' => array(
+						'blocks' => array(
+							'core/button' => array(
+								'dimensions' => array(
+									'width' => '33.33%',
+								),
+							),
+						),
+					),
+				),
+				'expected_output' => ':root :where(.wp-block-button){width: calc(33.33 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 33.33 / 100)));}',
+			),
+			'non-percentage value is unchanged'         => array(
+				array(
+					'styles' => array(
+						'blocks' => array(
+							'core/button' => array(
+								'dimensions' => array(
+									'width' => '200px',
+								),
+							),
+						),
+					),
+				),
+				'expected_output' => ':root :where(.wp-block-button){width: 200px;}',
+			),
+			'preset dimension with percentage size (block-level settings)' => array(
+				array(
+					'settings' => array(
+						'blocks' => array(
+							'core/button' => array(
+								'dimensions' => array(
+									'dimensionSizes' => array(
+										array(
+											'slug' => '50',
+											'name' => '50%',
+											'size' => '50%',
+										),
+									),
+								),
+							),
+						),
+					),
+					'styles'   => array(
+						'blocks' => array(
+							'core/button' => array(
+								'dimensions' => array(
+									'width' => 'var(--wp--preset--dimension--50)',
+								),
+							),
+						),
+					),
+				),
+				'expected_output' => ':root :where(.wp-block-button){width: calc(50 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 50 / 100)));}',
+			),
+			'preset dimension with percentage size (top-level settings)' => array(
+				array(
+					'settings' => array(
+						'dimensions' => array(
+							'dimensionSizes' => array(
+								array(
+									'slug' => '25',
+									'name' => '25%',
+									'size' => '25%',
+								),
+							),
+						),
+					),
+					'styles'   => array(
+						'blocks' => array(
+							'core/button' => array(
+								'dimensions' => array(
+									'width' => 'var(--wp--preset--dimension--25)',
+								),
+							),
+						),
+					),
+				),
+				'expected_output' => ':root :where(.wp-block-button){width: calc(25 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 25 / 100)));}',
+			),
+			'preset dimension with non-percentage size' => array(
+				array(
+					'settings' => array(
+						'blocks' => array(
+							'core/button' => array(
+								'dimensions' => array(
+									'dimensionSizes' => array(
+										array(
+											'slug' => 'wide',
+											'name' => 'Wide',
+											'size' => '400px',
+										),
+									),
+								),
+							),
+						),
+					),
+					'styles'   => array(
+						'blocks' => array(
+							'core/button' => array(
+								'dimensions' => array(
+									'width' => 'var(--wp--preset--dimension--wide)',
+								),
+							),
+						),
+					),
+				),
+				'expected_output' => ':root :where(.wp-block-button){width: var(--wp--preset--dimension--wide);}',
 			),
 		);
 	}

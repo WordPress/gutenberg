@@ -87,6 +87,14 @@ add_action(
 			)
 		);
 
+		// Add binding support for the auto-register-with-controls block.
+		add_filter(
+			'block_bindings_supported_attributes_test/auto-register-with-controls',
+			static function () {
+				return array( 'title', 'count', 'spacing', 'showEmojis' );
+			}
+		);
+
 		// PHP-only block with auto-generated controls from various attribute types
 		register_block_type(
 			'test/auto-register-with-controls',
