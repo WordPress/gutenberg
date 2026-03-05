@@ -7,4 +7,4 @@
  * @package gutenberg-test-disable-client-side-media-processing
  */
 
-add_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
+add_filter( 'wp_client_side_media_processing_enabled', '__return_true' );
