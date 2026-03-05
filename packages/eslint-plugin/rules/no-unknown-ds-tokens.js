@@ -35,6 +35,30 @@ function extractCSSVariables( value, prefix = '' ) {
 	return variables;
 }
 
+/**
+ * Extracts CSS custom properties that appear as direct arguments to `var()`,
+ * optionally filtering by a specific prefix. Tokens in nested `var()` calls
+ * (e.g. `var(--a, var(--b))`) are all captured.
+ *
+ * @param {string} value       - The CSS value string to search.
+ * @param {string} [prefix=''] - Optional prefix to filter variables.
+ * @return {Set<string>} Tokens that are wrapped in `var()`.
+ */
+function extractVarWrappedTokens( value, prefix = '' ) {
+	const regex = /var\(\s*(--[\w-]+)/g;
+	const tokens = new Set();
+
+	let match;
+	while ( ( match = regex.exec( value ) ) !== null ) {
+		const variableName = match[ 1 ];
+		if ( variableName.startsWith( `--${ prefix }` ) ) {
+			tokens.add( variableName );
+		}
+	}
+
+	return tokens;
+}
+
 const knownTokens = new Set( tokenList );
 const wpdsTokensRegex = new RegExp( `(?:^|[^\\w])--${ DS_TOKEN_PREFIX }`, 'i' );
 
@@ -50,6 +74,8 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 				'The following CSS variables are not valid Design System tokens: {{ tokenNames }}',
 			dynamicToken:
 				'Design System tokens must not be dynamically constructed, as they cannot be statically verified for correctness or processed automatically to inject fallbacks.',
+			bareToken:
+				'Design System tokens must be wrapped in `var()` for build-time fallback injection to work: {{ tokenNames }}',
 		},
 	},
 	create( context ) {
@@ -71,6 +97,7 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 			[ dynamicTemplateLiteralAST ]( node ) {
 				let hasDynamic = false;
 				const unknownTokens = [];
+				const bareTokens = [];
 
 				for ( const quasi of node.quasis ) {
 					const raw = quasi.value.raw;
@@ -98,9 +125,17 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 						}
 					}
 
+					const varWrapped = extractVarWrappedTokens(
+						value,
+						DS_TOKEN_PREFIX
+					);
+
 					for ( const token of tokens ) {
 						if ( ! knownTokens.has( token ) ) {
 							unknownTokens.push( token );
+						}
+						if ( ! varWrapped.has( token ) ) {
+							bareTokens.push( token );
 						}
 					}
 				}
@@ -118,6 +153,18 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 						messageId: 'onlyKnownTokens',
 						data: {
 							tokenNames: unknownTokens
+								.map( ( token ) => `'${ token }'` )
+								.join( ', ' ),
+						},
+					} );
+				}
+
+				if ( bareTokens.length > 0 ) {
+					context.report( {
+						node,
+						messageId: 'bareToken',
+						data: {
+							tokenNames: bareTokens
 								.map( ( token ) => `'${ token }'` )
 								.join( ', ' ),
 						},
@@ -163,6 +210,35 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 								.join( ', ' ),
 						},
 					} );
+				}
+
+				// Skip bare-token check for property keys
+				// (e.g. `{ '--wpds-token': value }` declaring a custom property).
+				const isPropertyKey =
+					typeof node.value === 'string' &&
+					node.parent?.type === 'Property' &&
+					node.parent.key === node;
+
+				if ( ! isPropertyKey ) {
+					const varWrapped = extractVarWrappedTokens(
+						computedValue,
+						DS_TOKEN_PREFIX
+					);
+					const bareTokens = [ ...usedTokens ].filter(
+						( token ) => ! varWrapped.has( token )
+					);
+
+					if ( bareTokens.length > 0 ) {
+						context.report( {
+							node,
+							messageId: 'bareToken',
+							data: {
+								tokenNames: bareTokens
+									.map( ( token ) => `'${ token }'` )
+									.join( ', ' ),
+							},
+						} );
+					}
 				}
 			},
 		};
