@@ -95,20 +95,23 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	/**
 	 * @covers gutenberg_block_core_navigation_set_overlay_image_lazy_loading
 	 */
-	public function test_block_core_navigation_set_overlay_image_lazy_loading_adds_lazy() {
+	public function test_block_core_navigation_set_overlay_image_lazy_loading_adds_lazy_and_low_priority() {
 		$html   = '<div><img src="example.jpg" width="300" height="300" /></div>';
 		$result = gutenberg_block_core_navigation_set_overlay_image_lazy_loading( $html );
 		$this->assertStringContainsString( 'loading="lazy"', $result );
+		$this->assertStringContainsString( 'fetchpriority="low"', $result );
 	}
 
 	/**
 	 * @covers gutenberg_block_core_navigation_set_overlay_image_lazy_loading
 	 */
-	public function test_block_core_navigation_set_overlay_image_lazy_loading_overrides_eager() {
-		$html   = '<div><img src="example.jpg" loading="eager" /></div>';
+	public function test_block_core_navigation_set_overlay_image_lazy_loading_overrides_eager_and_high() {
+		$html   = '<div><img src="example.jpg" loading="eager" fetchpriority="high" /></div>';
 		$result = gutenberg_block_core_navigation_set_overlay_image_lazy_loading( $html );
 		$this->assertStringContainsString( 'loading="lazy"', $result );
 		$this->assertStringNotContainsString( 'loading="eager"', $result );
+		$this->assertStringContainsString( 'fetchpriority="low"', $result );
+		$this->assertStringNotContainsString( 'fetchpriority="high"', $result );
 	}
 
 	/**
@@ -118,6 +121,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$html   = '<div><img src="a.jpg" /><img src="b.jpg" /></div>';
 		$result = gutenberg_block_core_navigation_set_overlay_image_lazy_loading( $html );
 		$this->assertSame( 2, substr_count( $result, 'loading="lazy"' ) );
+		$this->assertSame( 2, substr_count( $result, 'fetchpriority="low"' ) );
 	}
 
 	/**

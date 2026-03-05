@@ -1118,22 +1118,24 @@ function block_core_navigation_add_directives_to_overlay_close( $tags ) {
 }
 
 /**
- * Sets loading="lazy" on all img elements within navigation overlay HTML.
+ * Sets loading="lazy" and fetchpriority="low" on all img elements within
+ * navigation overlay HTML.
  *
- * By pre-setting loading="lazy" on overlay images (which are hidden until the
- * menu is opened), the loading optimization function sees $attr['loading'] = 'lazy'
- * and sets $maybe_in_viewport = false — preventing both fetchpriority="high" from
- * being added and the shared LCP counter from being incremented for these images.
+ * Images in the overlay are hidden until the menu is opened, so they should
+ * not compete with the actual LCP image on the page.
+ *
+ * fetchpriority="low" is set explicitly so the browser deprioritizes the fetch.
  *
  * @since 7.0.0
  *
  * @param string $overlay_blocks_html The rendered HTML of the overlay blocks.
- * @return string Modified HTML with loading="lazy" on all img elements.
+ * @return string Modified HTML with loading="lazy" and fetchpriority="low" on all img elements.
  */
 function block_core_navigation_set_overlay_image_lazy_loading( $overlay_blocks_html ) {
 	$tags = new WP_HTML_Tag_Processor( $overlay_blocks_html );
 	while ( $tags->next_tag( 'IMG' ) ) {
 		$tags->set_attribute( 'loading', 'lazy' );
+		$tags->set_attribute( 'fetchpriority', 'low' );
 	}
 	return $tags->get_updated_html();
 }
