@@ -105,70 +105,6 @@ export default function ReusableBlockEditRecursionWrapper( props ) {
 	);
 }
 
-function ReusableBlockControl( {
-	recordId,
-	canOverrideBlocks,
-	hasContent,
-	handleEditOriginal,
-	resetContent,
-} ) {
-	const canUserEdit = useSelect(
-		( select ) =>
-			!! select( coreStore ).canUser( 'update', {
-				kind: 'postType',
-				name: 'wp_block',
-				id: recordId,
-			} ),
-		[ recordId ]
-	);
-
-	return (
-		<>
-			{ canUserEdit && !! handleEditOriginal && (
-				<BlockControls group="other">
-					<ToolbarGroup>
-						<ToolbarButton onClick={ handleEditOriginal }>
-							{ __( 'Edit original' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
-
-			{ canOverrideBlocks && (
-				<BlockControls group="other">
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ resetContent }
-							disabled={ ! hasContent }
-						>
-							{ __( 'Reset' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
-		</>
-	);
-}
-
-function PatternBlockControl( { canOverrideBlocks, hasContent, resetContent } ) {
-	return (
-		<>
-			{ canOverrideBlocks && (
-				<BlockControls group="other">
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ resetContent }
-							disabled={ ! hasContent }
-						>
-							{ __( 'Reset' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
-		</>
-	);
-}
-
 const EMPTY_OBJECT = {};
 
 function useCanOverrideBlocks( blocks ) {
@@ -176,8 +112,9 @@ function useCanOverrideBlocks( blocks ) {
 		( select ) => {
 			const { getSettings } = select( blockEditorStore );
 			return {
-				hasPatternOverridesSource:
-					!! getBlockBindingsSource( 'core/pattern-overrides' ),
+				hasPatternOverridesSource: !! getBlockBindingsSource(
+					'core/pattern-overrides'
+				),
 				supportedBlockTypesRaw:
 					getSettings()
 						.__experimentalBlockBindingsSupportedAttributes ||
@@ -232,6 +169,96 @@ function ReusableBlockEdit( {
 	);
 }
 
+function PatternBlockUI( {
+	name,
+	blocks,
+	hasResolved,
+	isMissing,
+	content,
+	parentLayout,
+	setAttributes,
+	children: extraControls,
+} ) {
+	const { __unstableMarkLastChangeAsPersistent } =
+		useDispatch( blockEditorStore );
+
+	const canOverrideBlocks = useCanOverrideBlocks( blocks );
+
+	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
+	const layoutClasses = useLayoutClasses( { layout }, name );
+
+	const blockProps = useBlockProps( {
+		className: clsx(
+			'block-library-block__reusable-block-container',
+			layout && layoutClasses,
+			{ [ `align${ alignment }` ]: alignment }
+		),
+	} );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		layout,
+		value: blocks,
+		onInput: NOOP,
+		onChange: NOOP,
+		renderAppender: blocks?.length
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
+	} );
+
+	const resetContent = () => {
+		if ( content ) {
+			__unstableMarkLastChangeAsPersistent();
+			setAttributes( { content: undefined } );
+		}
+	};
+
+	let placeholder = null;
+
+	if ( isMissing ) {
+		placeholder = (
+			<Warning>
+				{ __( 'Block has been deleted or is unavailable.' ) }
+			</Warning>
+		);
+	}
+
+	if ( ! hasResolved ) {
+		placeholder = (
+			<Placeholder>
+				<Spinner />
+			</Placeholder>
+		);
+	}
+
+	return (
+		<>
+			{ hasResolved && ! isMissing && (
+				<>
+					{ extraControls }
+					{ canOverrideBlocks && (
+						<BlockControls group="other">
+							<ToolbarGroup>
+								<ToolbarButton
+									onClick={ resetContent }
+									disabled={ ! content }
+								>
+									{ __( 'Reset' ) }
+								</ToolbarButton>
+							</ToolbarGroup>
+						</BlockControls>
+					) }
+				</>
+			) }
+
+			{ placeholder === null ? (
+				<div { ...innerBlocksProps } />
+			) : (
+				<div { ...blockProps }>{ placeholder }</div>
+			) }
+		</>
+	);
+}
+
 function RefPatternEdit( {
 	name,
 	patternRef,
@@ -249,91 +276,35 @@ function RefPatternEdit( {
 	} );
 	const isMissing = hasResolved && ! record;
 
-	const { __unstableMarkLastChangeAsPersistent } =
-		useDispatch( blockEditorStore );
-
 	const onNavigateToEntityRecord = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().onNavigateToEntityRecord;
 	}, [] );
 
-	const canOverrideBlocks = useCanOverrideBlocks( blocks );
-
-	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
-	const layoutClasses = useLayoutClasses( { layout }, name );
-
-	const blockProps = useBlockProps( {
-		className: clsx(
-			'block-library-block__reusable-block-container',
-			layout && layoutClasses,
-			{ [ `align${ alignment }` ]: alignment }
-		),
-	} );
-
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		layout,
-		value: blocks,
-		onInput: NOOP,
-		onChange: NOOP,
-		renderAppender: blocks?.length
-			? undefined
-			: InnerBlocks.ButtonBlockAppender,
-	} );
-
-	const handleEditOriginal = () => {
-		onNavigateToEntityRecord( {
-			postId: patternRef,
-			postType: 'wp_block',
-		} );
-	};
-
-	const resetContent = () => {
-		if ( content ) {
-			__unstableMarkLastChangeAsPersistent();
-			setAttributes( { content: undefined } );
-		}
-	};
-
-	let children = null;
-
-	if ( isMissing ) {
-		children = (
-			<Warning>
-				{ __( 'Block has been deleted or is unavailable.' ) }
-			</Warning>
-		);
-	}
-
-	if ( ! hasResolved ) {
-		children = (
-			<Placeholder>
-				<Spinner />
-			</Placeholder>
-		);
-	}
+	const handleEditOriginal = onNavigateToEntityRecord
+		? () => {
+				onNavigateToEntityRecord( {
+					postId: patternRef,
+					postType: 'wp_block',
+				} );
+		  }
+		: undefined;
 
 	return (
-		<>
-			{ hasResolved && ! isMissing && (
-				<ReusableBlockControl
-					recordId={ patternRef }
-					canOverrideBlocks={ canOverrideBlocks }
-					hasContent={ !! content }
-					handleEditOriginal={
-						onNavigateToEntityRecord
-							? handleEditOriginal
-							: undefined
-					}
-					resetContent={ resetContent }
-				/>
-			) }
-
-			{ children === null ? (
-				<div { ...innerBlocksProps } />
-			) : (
-				<div { ...blockProps }>{ children }</div>
-			) }
-		</>
+		<PatternBlockUI
+			name={ name }
+			blocks={ blocks }
+			hasResolved={ hasResolved }
+			isMissing={ isMissing }
+			content={ content }
+			parentLayout={ parentLayout }
+			setAttributes={ setAttributes }
+		>
+			<EditOriginalControl
+				recordId={ patternRef }
+				handleEditOriginal={ handleEditOriginal }
+			/>
+		</PatternBlockUI>
 	);
 }
 
@@ -344,72 +315,67 @@ function SlugPatternEdit( {
 	parentLayout,
 	setAttributes,
 } ) {
-	const { blocks, isMissing } = useSelect(
+	const { blocks, hasResolved, isMissing } = useSelect(
 		( select ) => {
 			const pattern =
-				select(
-					blockEditorStore
-				).__experimentalGetParsedPattern( slug );
+				select( blockEditorStore ).__experimentalGetParsedPattern(
+					slug
+				);
+			if ( pattern ) {
+				return {
+					blocks: pattern.blocks,
+					hasResolved: true,
+					isMissing: false,
+				};
+			}
+			// Pattern not found — check whether the REST API patterns
+			// have finished loading before declaring it missing.
+			const patternsLoaded =
+				select( coreStore ).hasFinishedResolution( 'getBlockPatterns' );
 			return {
-				blocks: pattern?.blocks ?? [],
-				isMissing: ! pattern,
+				blocks: [],
+				hasResolved: patternsLoaded,
+				isMissing: patternsLoaded,
 			};
 		},
 		[ slug ]
 	);
 
-	const { __unstableMarkLastChangeAsPersistent } =
-		useDispatch( blockEditorStore );
+	return (
+		<PatternBlockUI
+			name={ name }
+			blocks={ blocks }
+			hasResolved={ hasResolved }
+			isMissing={ isMissing }
+			content={ content }
+			parentLayout={ parentLayout }
+			setAttributes={ setAttributes }
+		/>
+	);
+}
 
-	const canOverrideBlocks = useCanOverrideBlocks( blocks );
+function EditOriginalControl( { recordId, handleEditOriginal } ) {
+	const canUserEdit = useSelect(
+		( select ) =>
+			!! select( coreStore ).canUser( 'update', {
+				kind: 'postType',
+				name: 'wp_block',
+				id: recordId,
+			} ),
+		[ recordId ]
+	);
 
-	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
-	const layoutClasses = useLayoutClasses( { layout }, name );
-
-	const blockProps = useBlockProps( {
-		className: clsx(
-			'block-library-block__reusable-block-container',
-			layout && layoutClasses,
-			{ [ `align${ alignment }` ]: alignment }
-		),
-	} );
-
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		layout,
-		value: blocks,
-		onInput: NOOP,
-		onChange: NOOP,
-		renderAppender: blocks?.length
-			? undefined
-			: InnerBlocks.ButtonBlockAppender,
-	} );
-
-	const resetContent = () => {
-		if ( content ) {
-			__unstableMarkLastChangeAsPersistent();
-			setAttributes( { content: undefined } );
-		}
-	};
-
-	if ( isMissing ) {
-		return (
-			<div { ...blockProps }>
-				<Warning>
-					{ __( 'Block has been deleted or is unavailable.' ) }
-				</Warning>
-			</div>
-		);
+	if ( ! canUserEdit || ! handleEditOriginal ) {
+		return null;
 	}
 
 	return (
-		<>
-			<PatternBlockControl
-				canOverrideBlocks={ canOverrideBlocks }
-				hasContent={ !! content }
-				resetContent={ resetContent }
-			/>
-
-			<div { ...innerBlocksProps } />
-		</>
+		<BlockControls group="other">
+			<ToolbarGroup>
+				<ToolbarButton onClick={ handleEditOriginal }>
+					{ __( 'Edit original' ) }
+				</ToolbarButton>
+			</ToolbarGroup>
+		</BlockControls>
 	);
 }
