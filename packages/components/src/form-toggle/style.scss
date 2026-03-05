@@ -165,6 +165,6 @@ $transition-duration: 0.2s;
 	}
 
 	&:not(:disabled, [aria-disabled="true"]) {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 }

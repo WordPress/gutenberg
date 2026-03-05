@@ -37,7 +37,7 @@
 	appearance: none;
 
 	&:not(:disabled) {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 
 	&:focus {
@@ -72,7 +72,7 @@
 	grid-row: 1;
 
 	.components-radio-control:not(:disabled) & {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 
 	line-height: $radio-input-size-sm;

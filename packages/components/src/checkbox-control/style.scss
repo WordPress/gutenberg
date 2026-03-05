@@ -19,7 +19,7 @@
 	line-height: var(--checkbox-input-size);
 
 	.components-checkbox-control:not(:has(:disabled)) & {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 }
 
@@ -54,7 +54,7 @@
 	}
 
 	&:not(:disabled) {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 
 	&:checked::before {
@@ -78,7 +78,7 @@ svg.components-checkbox-control__indeterminate {
 	--checkmark-size: var(--checkbox-input-size);
 
 	fill: $white;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	position: absolute;
 	left: 50%;
 	top: 50%;
