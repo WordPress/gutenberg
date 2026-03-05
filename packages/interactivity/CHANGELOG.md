@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Add `initialVdomPromise` synchronization promise to ensure the router waits for hydration to complete before initializing, fixing dead DOM on Safari and Firefox. ([#76053](https://github.com/WordPress/gutenberg/pull/76053))
+## 6.41.0 (2026-03-04)
+
 ## 6.40.0 (2026-02-18)
 
 ### New Features

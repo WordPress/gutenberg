@@ -10,7 +10,7 @@ const yaml = require( 'js-yaml' );
 /**
  * Internal dependencies
  */
-const { loadConfig, ValidationError } = require( '../../config' );
+const { ValidationError } = require( '../../config' );
 const buildDockerComposeConfig = require( './build-docker-compose-config' );
 
 /**
@@ -18,109 +18,62 @@ const buildDockerComposeConfig = require( './build-docker-compose-config' );
  */
 
 /**
- * Initializes the local environment so that Docker commands can be run. Reads
- * ./.wp-env.json, creates ~/.wp-env, ~/.wp-env/docker-compose.yml, and
- * ~/.wp-env/Dockerfile.
+ * Writes Docker configuration files (docker-compose.yml and Dockerfiles) for
+ * a fully resolved config. Called only by the `start` command.
  *
- * @param {Object}      options
- * @param {Object}      options.spinner          A CLI spinner which indicates progress.
- * @param {boolean}     options.debug            True if debug mode is enabled.
- * @param {string}      options.xdebug           The Xdebug mode to set. Defaults to "off".
- * @param {string}      options.spx              The SPX mode to set. Defaults to "off".
- * @param {boolean}     options.writeChanges     If true, writes the parsed config to the
- *                                               required docker files like docker-compose
- *                                               and Dockerfile. By default, this is false
- *                                               and only the `start` command writes any
- *                                               changes.
- * @param {string|null} options.customConfigPath Path to a custom .wp-env.json configuration file.
- * @return {WPConfig} The-env config object.
+ * The config must already have ports resolved, and `debug`, `xdebug`, and
+ * `spx` properties set before calling this function.
+ *
+ * @param {WPConfig} config A fully resolved wp-env config object.
+ * @return {WPConfig} The config object (unchanged).
  */
-module.exports = async function initConfig( {
-	spinner,
-	debug,
-	xdebug = 'off',
-	spx = 'off',
-	writeChanges = false,
-	customConfigPath = null,
-} ) {
-	const config = await loadConfig( path.resolve( '.' ), customConfigPath );
-	config.debug = debug;
-
-	// Adding this to the config allows the start command to understand that the
-	// config has changed when only the xdebug param has changed. This is needed
-	// so that Docker will rebuild the image whenever the xdebug flag changes.
-	config.xdebug = xdebug;
-
-	// Adding this to the config allows the start command to understand that the
-	// config has changed when only the spx param has changed. This is needed
-	// so that Docker will rebuild the image whenever the spx flag changes.
-	config.spx = spx;
-
+async function writeDockerFiles( config ) {
 	const dockerComposeConfig = buildDockerComposeConfig( config );
 
-	if ( config.debug ) {
-		spinner.info(
-			`Config:\n${ JSON.stringify(
-				config,
-				null,
-				4
-			) }\n\nDocker Compose Config:\n${ JSON.stringify(
-				dockerComposeConfig,
-				null,
-				4
-			) }`
-		);
-		spinner.start();
+	await mkdir( config.workDirectoryPath, { recursive: true } );
+
+	await writeFile(
+		config.dockerComposeConfigPath,
+		yaml.dump( dockerComposeConfig )
+	);
+
+	// Write four Dockerfiles for each service we provided.
+	// (WordPress and CLI services, then a development and test environment for each.)
+	for ( const imageType of [ 'WordPress', 'CLI' ] ) {
+		for ( const envType of [ 'development', 'tests' ] ) {
+			await writeFile(
+				path.resolve(
+					config.workDirectoryPath,
+					`${
+						envType === 'tests' ? 'Tests-' : ''
+					}${ imageType }.Dockerfile`
+				),
+				imageType === 'WordPress'
+					? wordpressDockerFileContents( envType, config )
+					: cliDockerFileContents( envType, config )
+			);
+		}
 	}
 
-	/**
-	 * We avoid writing changes most of the time so that we can better pass params
-	 * to the start command. For example, say you start wp-env with Xdebug enabled.
-	 * If you then run another command, like opening bash in the wp instance, it
-	 * would turn off Xdebug in the Dockerfile because it wouldn't have the --xdebug
-	 * arg. This basically makes it such that wp-env start is the only command
-	 * which updates any of the Docker configuration.
-	 */
-	if ( writeChanges ) {
-		await mkdir( config.workDirectoryPath, { recursive: true } );
+	return config;
+}
 
-		await writeFile(
-			config.dockerComposeConfigPath,
-			yaml.dump( dockerComposeConfig )
-		);
-
-		// Write Dockerfiles for each service we provided.
-		// (WordPress and CLI services, then a development and test environment for each.)
-		for ( const imageType of [ 'WordPress', 'CLI' ] ) {
-			for ( const envType of [ 'development', 'tests' ] ) {
-				if (
-					envType === 'tests' &&
-					config.testsEnvironment === false
-				) {
-					continue;
-				}
-				await writeFile(
-					path.resolve(
-						config.workDirectoryPath,
-						`${
-							envType === 'tests' ? 'Tests-' : ''
-						}${ imageType }.Dockerfile`
-					),
-					imageType === 'WordPress'
-						? wordpressDockerFileContents( envType, config )
-						: cliDockerFileContents( envType, config )
-				);
-			}
-		}
-	} else if ( ! existsSync( config.workDirectoryPath ) ) {
+/**
+ * Verifies that the Docker environment has been initialized (i.e. `wp-env
+ * start` has been run at least once). Exits with an error message when the
+ * work directory does not exist.
+ *
+ * @param {WPConfig} config  The wp-env config object.
+ * @param {Object}   spinner A CLI spinner which indicates progress.
+ */
+function ensureDockerInitialized( config, spinner ) {
+	if ( ! existsSync( config.workDirectoryPath ) ) {
 		spinner.fail(
 			'wp-env has not yet been initialized. Please run `wp-env start` to install the WordPress instance before using any other commands. This is only necessary to set up the environment for the first time; it is typically not necessary for the instance to be running after that in order to use other commands.'
 		);
 		process.exit( 1 );
 	}
-
-	return config;
-};
+}
 
 /**
  * Generates the Dockerfile used by wp-env's `wordpress` and `tests-wordpress` instances.
@@ -377,3 +330,8 @@ RUN echo 'spx.http_ip_whitelist="*"' >> /usr/local/etc/php/php.ini
 RUN echo 'spx.data_dir="/tmp/spx"' >> /usr/local/etc/php/php.ini
 RUN mkdir -p /tmp/spx && chmod 777 /tmp/spx`;
 }
+
+module.exports = {
+	writeDockerFiles,
+	ensureDockerInitialized,
+};

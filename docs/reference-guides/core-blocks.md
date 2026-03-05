@@ -426,7 +426,7 @@ Add custom HTML code and preview it as you edit. ([Source](https://github.com/Wo
 
 -	**Name:** core/html
 -	**Category:** widgets
--	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~
+-	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~visibility~~
 -	**Attributes:** content
 
 ## Icon
@@ -780,7 +780,7 @@ Displays the title of a post, page, or any other content-type. ([Source](https:/
 -	**Name:** core/post-title
 -	**Category:** theme
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
--	**Attributes:** isLink, level, levelOptions, linkTarget, rel
+-	**Attributes:** isLink, level, levelOptions, linkTarget, placeholder, rel
 
 ## Preformatted
 
@@ -929,7 +929,7 @@ Insert additional custom elements with a WordPress shortcode. ([Source](https://
 
 -	**Name:** core/shortcode
 -	**Category:** widgets
--	**Supports:** ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~
+-	**Supports:** ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~visibility~~
 -	**Attributes:** text
 
 ## Site Logo

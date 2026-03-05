@@ -2,18 +2,24 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 export type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';
 
 interface UseConnectorPluginOptions {
-	pluginSlug: string;
+	pluginSlug?: string;
 	settingName: string;
+	isInstalled?: boolean;
+	isActivated?: boolean;
 }
 
 interface UseConnectorPluginReturn {
 	pluginStatus: PluginStatus;
+	canInstallPlugins: boolean | undefined;
+	canActivatePlugins: boolean | undefined;
 	isExpanded: boolean;
 	setIsExpanded: ( expanded: boolean ) => void;
 	isBusy: boolean;
@@ -28,12 +34,29 @@ interface UseConnectorPluginReturn {
 export function useConnectorPlugin( {
 	pluginSlug,
 	settingName,
+	isInstalled,
+	isActivated,
 }: UseConnectorPluginOptions ): UseConnectorPluginReturn {
 	const [ pluginStatus, setPluginStatus ] =
 		useState< PluginStatus >( 'checking' );
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ isBusy, setIsBusy ] = useState( false );
 	const [ currentApiKey, setCurrentApiKey ] = useState( '' );
+	// Track if user can manage plugins based on REST API access.
+	// If the /wp/v2/plugins call succeeds, user has activate_plugins capability.
+	const [ canManagePlugins, setCanManagePlugins ] = useState< boolean >();
+
+	const canInstallPlugins = useSelect(
+		( select ) =>
+			!! select( coreStore ).canUser( 'create', {
+				kind: 'root',
+				name: 'plugin',
+			} ),
+		[]
+	);
+
+	// Use canManagePlugins (from REST API result) for activation capability.
+	const canActivatePlugins = canManagePlugins;
 
 	const isConnected =
 		pluginStatus === 'active' &&
@@ -56,12 +79,22 @@ export function useConnectorPlugin( {
 	// Check plugin status on mount
 	useEffect( () => {
 		const checkPluginStatus = async () => {
+			if ( ! pluginSlug ) {
+				// No plugin slug — assume active, just fetch the API key.
+				await fetchApiKey();
+				setPluginStatus( 'active' );
+				return;
+			}
+
 			try {
 				const plugins = await apiFetch<
 					Array< { plugin: string; status: string } >
 				>( {
 					path: '/wp/v2/plugins',
 				} );
+
+				// API call succeeded, user has activate_plugins capability.
+				setCanManagePlugins( true );
 
 				const plugin = plugins.find(
 					( p ) => p.plugin === `${ pluginSlug }/plugin`
@@ -76,14 +109,28 @@ export function useConnectorPlugin( {
 					setPluginStatus( 'inactive' );
 				}
 			} catch {
-				setPluginStatus( 'not-installed' );
+				// API call failed, user likely lacks activate_plugins capability.
+				setCanManagePlugins( false );
+
+				// Fallback to server-provided status when API fails (e.g., no permissions).
+				if ( isActivated ) {
+					await fetchApiKey();
+					setPluginStatus( 'active' );
+				} else if ( isInstalled ) {
+					setPluginStatus( 'inactive' );
+				} else {
+					setPluginStatus( 'not-installed' );
+				}
 			}
 		};
 
 		checkPluginStatus();
-	}, [ pluginSlug, fetchApiKey ] );
+	}, [ pluginSlug, fetchApiKey, isInstalled, isActivated ] );
 
 	const installPlugin = async () => {
+		if ( ! pluginSlug ) {
+			return;
+		}
 		setIsBusy( true );
 		try {
 			await apiFetch( {
@@ -102,6 +149,9 @@ export function useConnectorPlugin( {
 	};
 
 	const activatePlugin = async () => {
+		if ( ! pluginSlug ) {
+			return;
+		}
 		setIsBusy( true );
 		try {
 			await apiFetch( {
@@ -121,8 +171,14 @@ export function useConnectorPlugin( {
 
 	const handleButtonClick = () => {
 		if ( pluginStatus === 'not-installed' ) {
+			if ( canInstallPlugins === false ) {
+				return;
+			}
 			installPlugin();
 		} else if ( pluginStatus === 'inactive' ) {
+			if ( canActivatePlugins === false ) {
+				return;
+			}
 			activatePlugin();
 		} else {
 			setIsExpanded( ! isExpanded );
@@ -198,6 +254,8 @@ export function useConnectorPlugin( {
 
 	return {
 		pluginStatus,
+		canInstallPlugins,
+		canActivatePlugins,
 		isExpanded,
 		setIsExpanded,
 		isBusy,

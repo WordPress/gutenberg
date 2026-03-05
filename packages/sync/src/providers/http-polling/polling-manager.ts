@@ -30,7 +30,9 @@ import {
 
 const POLLING_INTERVAL_IN_MS = 1000; // 1 second or 1000 milliseconds
 const POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS = 250; // 250 milliseconds
-const POLLING_INTERVAL_BACKGROUND_TAB_IN_MS = 30 * 1000; // 30 seconds
+// Must be less than the server-side AWARENESS_TIMEOUT (30 s) to avoid
+// false disconnects when the tab is in the background.
+const POLLING_INTERVAL_BACKGROUND_TAB_IN_MS = 25 * 1000; // 25 seconds
 const MAX_ERROR_BACKOFF_IN_MS = 30 * 1000; // 30 seconds
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
 
@@ -38,6 +40,7 @@ type LogFunction = ( message: string, debug?: object ) => void;
 
 interface PollingManager {
 	registerRoom: ( options: RegisterRoomOptions ) => void;
+	retryNow: () => void;
 	unregisterRoom: ( room: string ) => void;
 }
 
@@ -297,16 +300,19 @@ function handleVisibilityChange() {
 		/*
 		 * Remove scheduled polling and repoll immediately when reactivated.
 		 *
-		 * This ensures that any updates by collaborators are immediately reflected
-		 * in the document once the browser tab becomes active. Otherwise there would
-		 * be a delay of 30 seconds before the updates came through.
+		 * This ensures that any updates by collaborators are immediately
+		 * reflected in the document once the browser tab becomes active.
+		 * Otherwise there would be a delay of up to 30 seconds before the
+		 * updates came through.
+		 *
+		 * Only repoll if we cleared a pending timeout, meaning the poll loop
+		 * was idle between cycles. If no timeout is pending, a poll request
+		 * is already in-flight and will pick up the updated isActiveBrowser
+		 * value when it schedules the next cycle.
 		 */
 		if ( pollingTimeoutId ) {
 			clearTimeout( pollingTimeoutId );
 			pollingTimeoutId = null;
-		}
-
-		if ( isPolling ) {
 			poll();
 		}
 	}
@@ -314,6 +320,7 @@ function handleVisibilityChange() {
 
 function poll(): void {
 	isPolling = true;
+	pollingTimeoutId = null;
 
 	async function start(): Promise< void > {
 		if ( 0 === roomStates.size ) {
@@ -438,7 +445,10 @@ function poll(): void {
 			// flashing the disconnect dialog before the new page loads.
 			if ( ! isUnloadPending ) {
 				roomStates.forEach( ( state ) => {
-					state.onStatusChange( { status: 'disconnected' } );
+					state.onStatusChange( {
+						status: 'disconnected',
+						retryInMs: pollInterval,
+					} );
 				} );
 			}
 		}
@@ -549,7 +559,23 @@ function unregisterRoom( room: string ): void {
 	}
 }
 
+/**
+ * Immediately retry the sync connection by cancelling any pending backoff
+ * timeout and triggering a new poll. If a request is already in-flight,
+ * the backoff interval is reset so the next scheduled poll fires sooner.
+ */
+function retryNow(): void {
+	pollInterval = POLLING_INTERVAL_IN_MS * 2;
+
+	if ( pollingTimeoutId ) {
+		clearTimeout( pollingTimeoutId );
+		pollingTimeoutId = null;
+		poll();
+	}
+}
+
 export const pollingManager: PollingManager = {
 	registerRoom,
+	retryNow,
 	unregisterRoom,
 };
