@@ -55,9 +55,12 @@ const PlaylistEdit = ( {
 		showNumbers,
 		showImages,
 		showArtists,
-		visualizationStyle,
 		currentTrack,
 	} = attributes;
+
+	// Extract the visualization style from the block style variation class.
+	const visualizationStyle =
+		attributes.className?.match( /is-style-(\w+)/ )?.[ 1 ] || 'bars';
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -279,7 +282,6 @@ const PlaylistEdit = ( {
 							showNumbers: true,
 							showImages: true,
 							order: 'asc',
-							visualizationStyle: 'bars',
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -365,53 +367,6 @@ const PlaylistEdit = ( {
 								{ label: __( 'Ascending' ), value: 'asc' },
 							] }
 							onChange={ ( value ) => onChangeOrder( value ) }
-						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						label={ __( 'Visualization style' ) }
-						isShownByDefault
-						hasValue={ () => visualizationStyle !== 'bars' }
-						onDeselect={ () =>
-							setAttributes( {
-								visualizationStyle: 'bars',
-							} )
-						}
-					>
-						<SelectControl
-							__next40pxDefaultSize
-							label={ __( 'Visualization style' ) }
-							value={ visualizationStyle }
-							options={ [
-								{
-									label: __( 'Bars' ),
-									value: 'bars',
-								},
-								{
-									label: __( 'Mirror' ),
-									value: 'mirror',
-								},
-								{
-									label: __( 'Line' ),
-									value: 'line',
-								},
-								{
-									label: __( 'Blocks' ),
-									value: 'blocks',
-								},
-								{
-									label: __( 'Dots' ),
-									value: 'dots',
-								},
-								{
-									label: __( 'Seekbar' ),
-									value: 'seekbar',
-								},
-							] }
-							onChange={ ( value ) =>
-								setAttributes( {
-									visualizationStyle: value,
-								} )
-							}
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
