@@ -149,4 +149,20 @@ function gutenberg_inject_real_time_collaboration_setting() {
 	}
 }
 add_action( 'admin_init', 'gutenberg_inject_real_time_collaboration_setting' );
+
+/**
+ * Temporarily disable RTC in the site editor until memory issues are resolved.
+ * Uses admin_enqueue_scripts so get_current_screen() is available, and runs
+ * after core's admin_init hook that sets _wpCollaborationEnabled = true.
+ */
+function gutenberg_disable_rtc_in_site_editor() {
+	if ( 'site-editor' === get_current_screen()->id ) {
+		wp_add_inline_script(
+			'wp-core-data',
+			'window._wpCollaborationEnabled = false;',
+			'after'
+		);
+	}
+}
+add_action( 'admin_enqueue_scripts', 'gutenberg_disable_rtc_in_site_editor' );
 add_filter( 'default_option_wp_enable_real_time_collaboration', '__return_true' );
