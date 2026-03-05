@@ -42,7 +42,7 @@ export async function saveContentGuidelines(): Promise< RestGuidelinesResponse >
 	const categories = guidelinesStore.getAllGuidelines();
 
 	const data = {
-		id: id && id > 0 ? id : undefined,
+		id,
 		status,
 		guideline_categories: {
 			site: {
@@ -62,11 +62,10 @@ export async function saveContentGuidelines(): Promise< RestGuidelinesResponse >
 
 	const { createSuccessNotice } = dispatch( noticesStore );
 
-	const hasExistingId = !! ( id && id > 0 );
-	const path = hasExistingId
+	const path = id
 		? `/wp/v2/content-guidelines/${ id }`
 		: '/wp/v2/content-guidelines';
-	const method = hasExistingId ? 'PUT' : 'POST';
+	const method = id ? 'PUT' : 'POST';
 
 	const response = ( await apiFetch( {
 		path,
