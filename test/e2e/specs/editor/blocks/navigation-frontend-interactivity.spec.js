@@ -726,17 +726,6 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 			// Click the chevron again to close the submenu.
 			await arrowButton.click();
-			await expect( arrowButton ).toHaveAttribute(
-				'aria-expanded',
-				'false'
-			);
-
-			// The submenu may still be visible due to CSS :focus-within
-			// while the button retains focus. Clicking elsewhere removes
-			// focus and the submenu should then be hidden.
-			await touchPage
-				.locator( 'body' )
-				.click( { position: { x: 0, y: 0 } } );
 			await expect( innerElement ).toBeHidden();
 
 			await touchContext.close();

@@ -88,7 +88,11 @@ const { state, actions } = store(
 				if ( window.matchMedia( '(hover: none)' ).matches ) {
 					return;
 				}
-				const { type, overlayOpenedBy } = getContext();
+				const ctx = getContext();
+				const { type, overlayOpenedBy } = ctx;
+				// Reset closedByClick so CSS :hover can show the submenu
+				// again when the mouse re-enters the item.
+				ctx.closedByClick = false;
 				if (
 					type === 'submenu' &&
 					// Only open on hover if the overlay is closed.
@@ -135,17 +139,17 @@ const { state, actions } = store(
 					ref.focus();
 				}
 				const { menuOpenedBy } = state;
-				if (
-					menuOpenedBy.click ||
-					menuOpenedBy.focus ||
-					menuOpenedBy.hover
-				) {
+				if ( menuOpenedBy.click || menuOpenedBy.focus ) {
 					actions.closeMenu( 'click' );
 					actions.closeMenu( 'focus' );
 					actions.closeMenu( 'hover' );
+					// Suppress CSS :hover from keeping the submenu
+					// visible after an explicit close via chevron.
+					ctx.closedByClick = true;
 				} else {
 					ctx.previousFocus = ref;
 					actions.openMenu( 'click' );
+					ctx.closedByClick = false;
 				}
 			},
 			handleMenuKeydown: withSyncEvent( ( event ) => {
