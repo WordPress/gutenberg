@@ -83,6 +83,11 @@ const { state, actions } = store(
 		},
 		actions: {
 			openMenuOnHover() {
+				// Don't open on hover for touch devices where mouseenter
+				// is a synthetic event from the tap.
+				if ( window.matchMedia( '(hover: none)' ).matches ) {
+					return;
+				}
 				const { type, overlayOpenedBy } = getContext();
 				if (
 					type === 'submenu' &&
@@ -94,6 +99,11 @@ const { state, actions } = store(
 				}
 			},
 			closeMenuOnHover() {
+				// Don't close on hover for touch devices where mouseleave
+				// is a synthetic event.
+				if ( window.matchMedia( '(hover: none)' ).matches ) {
+					return;
+				}
 				const { type, overlayOpenedBy } = getContext();
 				if (
 					type === 'submenu' &&
