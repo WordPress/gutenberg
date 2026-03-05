@@ -137,7 +137,7 @@ describe( 'normalizeFormFields', () => {
 				layout: {
 					labelPosition: 'side',
 					type: 'panel',
-					openAs: 'dropdown',
+					openAs: { type: 'dropdown' },
 					summary: [],
 					editVisibility: 'on-hover',
 				},
@@ -147,7 +147,7 @@ describe( 'normalizeFormFields', () => {
 						layout: {
 							type: 'panel',
 							labelPosition: 'side',
-							openAs: 'dropdown',
+							openAs: { type: 'dropdown' },
 							summary: [],
 							editVisibility: 'on-hover',
 						},
@@ -166,7 +166,7 @@ describe( 'normalizeFormFields', () => {
 				layout: {
 					labelPosition: 'top',
 					type: 'panel',
-					openAs: 'dropdown',
+					openAs: { type: 'dropdown' },
 					summary: [],
 					editVisibility: 'on-hover',
 				},
@@ -176,7 +176,7 @@ describe( 'normalizeFormFields', () => {
 						layout: {
 							type: 'panel',
 							labelPosition: 'top',
-							openAs: 'dropdown',
+							openAs: { type: 'dropdown' },
 							summary: [],
 							editVisibility: 'on-hover',
 						},
@@ -185,7 +185,7 @@ describe( 'normalizeFormFields', () => {
 			} );
 		} );
 
-		it( 'panel: openAs string "modal" stays as string', () => {
+		it( 'panel: openAs string "modal" normalizes to object', () => {
 			const form: Form = {
 				layout: { type: 'panel', openAs: 'modal' },
 				fields: [ 'field1' ],
@@ -194,7 +194,7 @@ describe( 'normalizeFormFields', () => {
 			expect( result.layout ).toEqual( {
 				type: 'panel',
 				labelPosition: 'side',
-				openAs: 'modal',
+				openAs: { type: 'modal' },
 				summary: [],
 				editVisibility: 'on-hover',
 			} );
@@ -419,7 +419,7 @@ describe( 'normalizeFormFields', () => {
 						layout: {
 							type: 'panel',
 							labelPosition: 'side',
-							openAs: 'dropdown',
+							openAs: { type: 'dropdown' },
 							summary: [],
 							editVisibility: 'on-hover',
 						},

@@ -55,10 +55,16 @@ function normalizeLayout( layout?: Layout ): NormalizedLayout {
 			? summary
 			: [ summary ];
 
+		const openAs = layout?.openAs;
+		const normalizedOpenAs: NormalizedPanelLayout[ 'openAs' ] =
+			typeof openAs === 'object'
+				? openAs
+				: { type: openAs ?? 'dropdown' };
+
 		normalizedLayout = {
 			type: 'panel',
 			labelPosition: layout?.labelPosition ?? 'side',
-			openAs: layout?.openAs ?? 'dropdown',
+			openAs: normalizedOpenAs,
 			summary: normalizedSummary,
 			editVisibility: layout?.editVisibility ?? 'on-hover',
 		} satisfies NormalizedPanelLayout;

@@ -59,9 +59,8 @@ export const LayoutPanel = {
 		},
 		openAs: {
 			control: { type: 'select' },
-			description:
-				'Chooses how to open the panel. "modalConfig" opens as modal with custom button labels.',
-			options: [ 'default', 'dropdown', 'modal', 'modalConfig' ],
+			description: 'Chooses how to open the panel.',
+			options: [ 'default', 'dropdown', 'modal' ],
 		},
 		editVisibility: {
 			control: { type: 'select' },
@@ -72,19 +71,17 @@ export const LayoutPanel = {
 			control: { type: 'text' },
 			description:
 				'Custom text for the modal apply button. Defaults to "Apply".',
-			if: { arg: 'openAs', eq: 'modalConfig' },
+			if: { arg: 'openAs', eq: 'modal' },
 		},
 		cancelLabel: {
 			control: { type: 'text' },
 			description:
 				'Custom text for the modal cancel button. Defaults to "Cancel".',
-			if: { arg: 'openAs', eq: 'modalConfig' },
+			if: { arg: 'openAs', eq: 'modal' },
 		},
 	},
 	args: {
-		openAs: 'modalConfig',
-		applyLabel: 'Save',
-		cancelLabel: 'Dismiss',
+		openAs: 'default',
 	},
 };
 

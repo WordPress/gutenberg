@@ -306,7 +306,7 @@ const LayoutPanelComponent = ( {
 }: {
 	type: 'default' | 'regular' | 'panel' | 'card';
 	labelPosition: 'default' | 'top' | 'side' | 'none';
-	openAs: 'default' | 'dropdown' | 'modal' | 'modalConfig';
+	openAs: 'default' | 'dropdown' | 'modal';
 	editVisibility: 'default' | EditVisibility;
 	applyLabel?: string;
 	cancelLabel?: string;
@@ -336,7 +336,7 @@ const LayoutPanelComponent = ( {
 
 	const form: Form = useMemo( () => {
 		let openAs: PanelLayout[ 'openAs' ];
-		if ( openAsArg === 'modalConfig' ) {
+		if ( openAsArg === 'modal' && ( applyLabel || cancelLabel ) ) {
 			openAs = {
 				type: 'modal',
 				applyLabel: applyLabel || undefined,

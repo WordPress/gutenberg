@@ -24,6 +24,7 @@ import type {
 	NormalizedForm,
 	NormalizedFormField,
 	NormalizedPanelLayout,
+	PanelOpenAsModal,
 	FieldLayoutProps,
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
@@ -41,8 +42,6 @@ function ModalContent< Item >( {
 	fieldLabel,
 	onClose,
 	touched,
-	applyLabel,
-	cancelLabel,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -50,9 +49,9 @@ function ModalContent< Item >( {
 	onClose: () => void;
 	fieldLabel: string;
 	touched: boolean;
-	applyLabel?: string;
-	cancelLabel?: string;
 } ) {
+	const { openAs } = field.layout as NormalizedPanelLayout;
+	const { applyLabel, cancelLabel } = openAs as PanelOpenAsModal;
 	const { fields } = useContext( DataFormContext );
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
 	const modalData = useMemo( () => {
@@ -182,9 +181,6 @@ function PanelModal< Item >( {
 		return null;
 	}
 
-	const { openAs } = field.layout as NormalizedPanelLayout;
-	const modalConfig = typeof openAs === 'object' ? openAs : undefined;
-
 	const handleClose = () => {
 		setIsOpen( false );
 		setTouched( true );
@@ -211,8 +207,6 @@ function PanelModal< Item >( {
 					fieldLabel={ fieldLabel ?? '' }
 					onClose={ handleClose }
 					touched={ touched }
-					applyLabel={ modalConfig?.applyLabel }
-					cancelLabel={ modalConfig?.cancelLabel }
 				/>
 			) }
 		</>
