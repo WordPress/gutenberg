@@ -31,7 +31,8 @@
 				]
 			},
 			"font-library",
-			"connectors"
+			"connectors",
+			"content-guidelines"
 		]
 	},
 	"config": {
