@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The `no-setting-ds-tokens` rule now checks all object property keys, not just those inside JSX `style` attributes ([#76212](https://github.com/WordPress/gutenberg/pull/76212)).
+
 ## 24.3.0 (2026-03-04)
 
 ### New Features
