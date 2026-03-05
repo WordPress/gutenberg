@@ -106,7 +106,7 @@ export default function GuidelineAccordionForm( {
 					variant="primary"
 					type="submit"
 					className="save-button"
-					disabled={ loading || ! draft }
+					disabled={ loading }
 				>
 					{ __( 'Save guidelines' ) }
 				</Button>
