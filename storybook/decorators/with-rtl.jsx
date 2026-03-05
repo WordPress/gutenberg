@@ -18,6 +18,10 @@ export const WithRTL = ( Story, context ) => {
 	const [ rerenderKey, setRerenderKey ] = useState( 0 );
 	const ref = useRef();
 
+	const direction = [ 'ltr', 'rtl' ].includes( context.globals.direction )
+		? context.globals.direction
+		: 'ltr';
+
 	useEffect( () => {
 		// Override the return value of i18n.isRTL()
 		addFilter(
@@ -25,7 +29,7 @@ export const WithRTL = ( Story, context ) => {
 			'storybook',
 			( translation, text, _context ) => {
 				if ( text === 'ltr' && _context === 'text direction' ) {
-					return context.globals.direction;
+					return direction;
 				}
 				return translation;
 			}
@@ -33,20 +37,20 @@ export const WithRTL = ( Story, context ) => {
 
 		ref.current.ownerDocument.documentElement.setAttribute(
 			'dir',
-			context.globals.direction
+			direction
 		);
 
 		setRerenderKey( ( prevValue ) => prevValue + 1 );
 
 		return () => removeFilter( 'i18n.gettext_with_context', 'storybook' );
-	}, [ context.globals.direction ] );
+	}, [ direction ] );
 
 	useLayoutEffect( () => {
 		const stylesToUse = [];
 
 		CONFIG.forEach( ( item ) => {
 			if ( item.componentIdMatcher.test( context.componentId ) ) {
-				stylesToUse.push( ...item[ context.globals.direction ] );
+				stylesToUse.push( ...item[ direction ] );
 			}
 		} );
 
@@ -57,7 +61,7 @@ export const WithRTL = ( Story, context ) => {
 		return () => {
 			document.head.removeChild( style );
 		};
-	}, [ context.componentId, context.globals.direction ] );
+	}, [ context.componentId, direction ] );
 
 	return (
 		<div ref={ ref } key={ rerenderKey }>

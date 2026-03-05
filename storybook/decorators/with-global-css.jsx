@@ -40,7 +40,7 @@ const config = {
 
 export const WithGlobalCSS = ( Story, context ) => {
 	const { lazyStyles, externalStyles, classes } =
-		config[ context.globals.css ];
+		config[ context.globals.css ] ?? config.none;
 
 	useEffect( () => {
 		const style = document.createElement( 'style' );
