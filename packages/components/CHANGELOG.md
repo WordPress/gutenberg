@@ -6,6 +6,10 @@
 
 -   Revert `word-break: break-word` addition ([#76230](https://github.com/WordPress/gutenberg/pull/76230)).
 
+### Enhancements
+
+-   `DateCalendar`, `DateRangeCalendar`: Add `showOutsideDays` and `fixedWeeks` props and style outside-month days ([#76199](https://github.com/WordPress/gutenberg/pull/76199)).
+
 ## 32.3.0 (2026-03-04)
 
 ### Code Quality
