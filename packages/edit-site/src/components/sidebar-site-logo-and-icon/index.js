@@ -3,7 +3,6 @@
  */
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
@@ -47,20 +46,13 @@ const form = {
 };
 
 export default function SidebarSiteLogoAndIcon() {
-	const { record } = useSelect( ( select ) => {
-		const { getEditedEntityRecord } = select( coreStore );
-		return {
-			record: getEditedEntityRecord( 'root', 'site' ),
-		};
-	}, [] );
-	const { editEntityRecord } = useDispatch( coreStore );
+	const data = useSelect(
+		( select ) =>
+			select( coreStore ).getEditedEntityRecord( 'root', 'site' ),
 
-	const data = useMemo( () => {
-		return {
-			site_logo: record?.site_logo ?? 0,
-			site_icon: record?.site_icon ?? 0,
-		};
-	}, [ record?.site_logo, record?.site_icon ] );
+		[]
+	);
+	const { editEntityRecord } = useDispatch( coreStore );
 
 	const onChange = ( edits ) => {
 		editEntityRecord( 'root', 'site', undefined, edits );
