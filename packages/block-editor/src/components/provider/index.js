@@ -166,7 +166,11 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 				! isMediaUploadIntercepted
 			) {
 				// Create a new object so that the original props.settings.mediaUpload is not modified.
-				const interceptor = mediaUpload.bind( null, registry, _settings );
+				const interceptor = mediaUpload.bind(
+					null,
+					registry,
+					_settings
+				);
 				interceptor.__isMediaUploadInterceptor = true;
 				return {
 					..._settings,
