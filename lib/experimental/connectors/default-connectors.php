@@ -341,8 +341,8 @@ function _gutenberg_register_default_connector_settings(): void {
 		add_filter( "option_{$setting_name}", '_gutenberg_mask_api_key' );
 	}
 }
-remove_action( 'init', '_wp_register_default_connector_settings' );
-add_action( 'init', '_gutenberg_register_default_connector_settings' );
+remove_action( 'init', '_wp_register_default_connector_settings', 20 );
+add_action( 'init', '_gutenberg_register_default_connector_settings', 20 );
 
 /**
  * Passes stored connector API keys to the WP AI client.
@@ -380,11 +380,11 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 		wp_trigger_error( __FUNCTION__, $e->getMessage() );
 	}
 }
-remove_action( 'init', '_wp_connectors_pass_default_keys_to_ai_client' );
-add_action( 'init', '_gutenberg_pass_default_connector_keys_to_ai_client' );
+remove_action( 'init', '_wp_connectors_pass_default_keys_to_ai_client', 20 );
+add_action( 'init', '_gutenberg_pass_default_connector_keys_to_ai_client', 20 );
 
 /**
- * Exposes connector settings to the connectors-wp-admin script module.
+ * Exposes connector settings to the options-connectors-wp-admin script module.
  *
  * @access private
  *
@@ -426,5 +426,5 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 	$data['connectors'] = $connectors;
 	return $data;
 }
-remove_filter( 'script_module_data_connectors-wp-admin', '_wp_connectors_get_connector_script_module_data' );
-add_filter( 'script_module_data_connectors-wp-admin', '_gutenberg_get_connector_script_module_data' );
+remove_filter( 'script_module_data_options-connectors-wp-admin', '_wp_connectors_get_connector_script_module_data' );
+add_filter( 'script_module_data_options-connectors-wp-admin', '_gutenberg_get_connector_script_module_data' );

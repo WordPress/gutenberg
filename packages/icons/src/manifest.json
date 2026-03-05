@@ -1307,9 +1307,9 @@
 		"filePath": "library/reset.svg"
 	},
 	{
-		"slug": "resize-corner-n-e",
-		"label": "Resize Corner N E",
-		"filePath": "library/resize-corner-n-e.svg"
+		"slug": "resize-corner-ne",
+		"label": "Resize Corner NE",
+		"filePath": "library/resize-corner-ne.svg"
 	},
 	{
 		"slug": "reusable-block",
