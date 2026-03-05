@@ -334,15 +334,8 @@ export async function setCollaboration(
 	const html = await response.text();
 	const nonce = html.match( /name="_wpnonce" value="([^"]+)"/ )![ 1 ];
 
-	// WordPress Core Beta 3 switched from 'wp_enable_real_time_collaboration' to
-	// 'wp_disable_real_time_collaboration' (with flipped boolean values). Detect
-	// which field name is present on the page.
-	let optionName = 'wp_disable_real_time_collaboration';
-	let optionValue = enabled ? 0 : 1;
-	if ( html.includes( 'name="wp_enable_real_time_collaboration"' ) ) {
-		optionName = 'wp_enable_real_time_collaboration';
-		optionValue = enabled ? 1 : 0;
-	}
+	const optionName = 'wp_enable_real_time_collaboration';
+	const optionValue = enabled ? 1 : 0;
 
 	const formData: Record< string, string | number > = {
 		option_page: 'writing',

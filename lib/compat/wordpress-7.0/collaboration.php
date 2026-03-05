@@ -103,14 +103,14 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 	 * Registers the real-time collaboration setting.
 	 */
 	function gutenberg_register_real_time_collaboration_setting() {
-		$option_name = 'wp_disable_real_time_collaboration';
+		$option_name = 'wp_enable_real_time_collaboration';
 
 		register_setting(
 			'writing',
 			$option_name,
 			array(
 				'type'              => 'boolean',
-				'description'       => __( 'Disable real-time collaboration', 'gutenberg' ),
+				'description'       => __( 'Enable Real-Time Collaboration', 'gutenberg' ),
 				'sanitize_callback' => 'rest_sanitize_boolean',
 				'default'           => false,
 				'show_in_rest'      => true,
@@ -121,12 +121,12 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 			$option_name,
 			__( 'Collaboration', 'gutenberg' ),
 			function () use ( $option_name ) {
-				$option_value = get_option( $option_name, 1 );
+				$option_value = get_option( $option_name );
 
 				?>
-				<label for="wp_disable_real_time_collaboration">
-					<input name="wp_disable_real_time_collaboration" type="checkbox" id="wp_disable_real_time_collaboration" value="1" <?php checked( '1', $option_value ); ?>/>
-					<?php _e( 'Disable real-time collaboration', 'gutenberg' ); ?>
+				<label for="wp_enable_real_time_collaboration">
+					<input name="wp_enable_real_time_collaboration" type="checkbox" id="wp_enable_real_time_collaboration" value="1" <?php checked( '1', $option_value ); ?>/>
+					<?php _e( 'Enable real-time collaboration', 'gutenberg' ); ?>
 				</label>
 				<?php
 			},
@@ -140,7 +140,7 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
  * Injects the real-time collaboration setting into a global variable.
  */
 function gutenberg_inject_real_time_collaboration_setting() {
-	if ( ! boolval( get_option( 'wp_disable_real_time_collaboration' ) ) ) {
+	if ( get_option( 'wp_enable_real_time_collaboration' ) ) {
 		wp_add_inline_script(
 			'wp-core-data',
 			'window._wpCollaborationEnabled = true;',
@@ -149,3 +149,4 @@ function gutenberg_inject_real_time_collaboration_setting() {
 	}
 }
 add_action( 'admin_init', 'gutenberg_inject_real_time_collaboration_setting' );
+add_filter( 'default_option_wp_enable_real_time_collaboration', '__return_true' );
