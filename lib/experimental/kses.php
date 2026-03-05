@@ -83,11 +83,9 @@ add_action( 'set_current_user', 'gutenberg_override_core_kses_init_filters' );
  * @see https://core.trac.wordpress.org/ticket/64771
  *
  * @param string $content           Content to be run through KSES.
- * @param array[]|string $allowed_html Allowed HTML elements or context name.
- * @param string[]       $allowed_protocols Allowed URL protocols.
  * @return string Filtered content.
  */
-function gutenberg_strip_block_custom_css_for_restricted_users( $content, $allowed_html, $allowed_protocols ) {
+function gutenberg_strip_block_custom_css_for_restricted_users( $content ) {
 	if ( current_user_can( 'unfiltered_html' ) ) {
 		return $content;
 	}
