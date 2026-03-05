@@ -50,14 +50,25 @@ const keywords: Partial< Record< string, string[] > > = {
 	unseen: [ 'hide' ],
 };
 
-const PUBLIC_ICONS = new Set(
-	manifest
-		.filter( ( entry: { public?: boolean } ) => !! entry.public )
-		.map( ( entry: { slug: string } ) => entry.slug )
+const ALL_ICONS_MANIFEST = new Map(
+	manifest.map( ( entry: { slug: string; public?: boolean } ) => [
+		entry.slug,
+		{ slug: entry.slug, public: !! entry.public },
+	] )
 );
 
 function nameToSlug( name: string ): string {
-	return name.replace( /[A-Z]/g, ( letter ) => `-${ letter.toLowerCase() }` );
+	return (
+		name
+			// Protect acronyms before conversion
+			.replace( /RTL/g, '-rtl' )
+			.replace( /LTR/g, '-ltr' )
+			.replace( /NE/g, '-ne' )
+			// Insert hyphen before each uppercase and convert to lowercase
+			.replace( /[A-Z]/g, ( letter ) => `-${ letter.toLowerCase() }` )
+			// Insert hyphen before digit when preceded by letter (e.g. Level1 -> level-1)
+			.replace( /([a-zA-Z])([0-9])/g, '$1-$2' )
+	);
 }
 
 const meta: Meta = {
@@ -135,9 +146,13 @@ const LibraryExample = (): ReactElement => {
 					<Grid templateColumns="repeat(auto-fill, minmax(100px, 1fr))">
 						{ Object.entries( filteredIcons ).map(
 							( [ name, icon ] ) => {
-								const isPublic = PUBLIC_ICONS.has(
-									nameToSlug( name )
-								);
+								const slug = nameToSlug( name );
+								const iconInfo = ALL_ICONS_MANIFEST.get( slug );
+								if ( ! iconInfo ) {
+									throw new Error(
+										`Icon "${ name }" (slug: ${ slug }) is not found in the manifest. Add it to packages/icons/src/manifest.json.`
+									);
+								}
 								return (
 									<div
 										key={ name }
@@ -148,7 +163,7 @@ const LibraryExample = (): ReactElement => {
 											gap: 8,
 											opacity:
 												highlightPublicIcons &&
-												! isPublic
+												! iconInfo.public
 													? 0.2
 													: 1,
 										} }
