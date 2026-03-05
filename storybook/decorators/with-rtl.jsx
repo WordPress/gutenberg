@@ -37,22 +37,15 @@ export const WithRTL = ( Story, context ) => {
 		return () => removeFilter( 'i18n.gettext_with_context', 'storybook' );
 	}, [ context.globals.direction ] );
 
-	const matchedIndices = [];
 	const stylesToUse = [];
 
-	CONFIG.forEach( ( item, index ) => {
+	CONFIG.forEach( ( item ) => {
 		if ( item.componentIdMatcher.test( context.componentId ) ) {
-			matchedIndices.push( index );
 			stylesToUse.push( ...item[ context.globals.direction ] );
 		}
 	} );
 
-	useSharedStyle( {
-		key: matchedIndices.length
-			? matchedIndices.join( ',' ) + ':' + context.globals.direction
-			: '',
-		cssText: stylesToUse.join( '\n' ),
-	} );
+	useSharedStyle( stylesToUse.join( '\n' ) );
 
 	return (
 		<div ref={ ref } key={ rerenderKey }>

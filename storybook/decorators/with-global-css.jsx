@@ -42,10 +42,7 @@ export const WithGlobalCSS = ( Story, context ) => {
 	const { lazyStyles, externalStyles, classes } =
 		config[ context.globals.css ];
 
-	useSharedStyle( {
-		key: 'global:' + context.globals.css,
-		cssText: lazyStyles.join( '\n' ),
-	} );
+	useSharedStyle( lazyStyles.join( '\n' ) );
 
 	return (
 		<div className={ clsx( classes ) }>
