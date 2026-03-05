@@ -146,25 +146,34 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		const isClientSideMediaEnabled =
 			shouldEnableClientSideMediaProcessing();
 
-		// Skip the interceptor replacement and MediaUploadProvider for
-		// preview providers. See the comment above MediaUploadProvider
-		// below for details.
-		const isPreviewMode = !! _settings?.isPreviewMode;
+		// Nested providers (e.g. from useBlockPreview) inherit settings
+		// where mediaUpload has already been replaced with the
+		// interceptor.  Detect this so we skip the replacement and
+		// MediaUploadProvider for them — see the longer comment below.
+		const isMediaUploadIntercepted =
+			!! _settings?.mediaUpload?.__isMediaUploadInterceptor;
 
 		const settings = useMemo( () => {
 			if (
 				isClientSideMediaEnabled &&
 				_settings?.mediaUpload &&
-				! isPreviewMode
+				! isMediaUploadIntercepted
 			) {
 				// Create a new object so that the original props.settings.mediaUpload is not modified.
+				const interceptor = mediaUpload.bind( null, registry );
+				interceptor.__isMediaUploadInterceptor = true;
 				return {
 					..._settings,
-					mediaUpload: mediaUpload.bind( null, registry ),
+					mediaUpload: interceptor,
 				};
 			}
 			return _settings;
-		}, [ _settings, registry, isClientSideMediaEnabled, isPreviewMode ] );
+		}, [
+			_settings,
+			registry,
+			isClientSideMediaEnabled,
+			isMediaUploadIntercepted,
+		] );
 
 		const { __experimentalUpdateSettings } = unlock(
 			useDispatch( blockEditorStore )
@@ -231,14 +240,14 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		// interceptor replacement above — so the store receives the
 		// real server-side upload function.
 		//
-		// Only the top-level (non-preview) provider should do this.
-		// Nested preview providers (e.g. from useBlockPreview in
+		// Only the first (outermost) provider should do this.
+		// Nested providers (e.g. from useBlockPreview in
 		// core/post-template) inherit settings that already contain
 		// the interceptor, so their MediaUploadProvider would
 		// overwrite the store's server-side function with the
 		// interceptor, causing uploads to loop instead of reaching
 		// the server.
-		if ( isClientSideMediaEnabled && ! isPreviewMode ) {
+		if ( isClientSideMediaEnabled && ! isMediaUploadIntercepted ) {
 			return (
 				<MediaUploadProvider
 					settings={ mediaUploadSettings }
