@@ -7,12 +7,12 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 /** @typedef {import('@wordpress/e2e-test-utils-playwright').Editor} Editor */
 
 /**
- * Returns the major Chrome version from the browser's user agent, or 0 if not Chromium.
+ * Returns the major Chromium version from the browser's user agent, or 0 if not Chromium.
  *
  * @param {Page} page Playwright page object.
- * @return {Promise<number>} Major Chrome version.
+ * @return {Promise<number>} Major Chromium version.
  */
-async function getChromeMajorVersion( page ) {
+async function getChromiumMajorVersion( page ) {
 	return page.evaluate( () => {
 		const match = window.navigator.userAgent.match( /Chrome\/(\d+)/ );
 		return match ? parseInt( match[ 1 ], 10 ) : 0;
@@ -41,10 +41,10 @@ test.use( {
 
 test.describe( 'Document-Isolation-Policy', () => {
 	test.beforeEach( async ( { admin, page } ) => {
-		// These tests only apply to Chrome 137+.
+		// These tests only apply to Chromium 137+.
 		test.skip(
-			( await getChromeMajorVersion( page ) ) < 137,
-			'Document-Isolation-Policy requires Chrome 137+'
+			( await getChromiumMajorVersion( page ) ) < 137,
+			'Document-Isolation-Policy requires Chromium 137+'
 		);
 
 		await admin.createNewPost();

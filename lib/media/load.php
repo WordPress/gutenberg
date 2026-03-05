@@ -220,13 +220,13 @@ function gutenberg_filter_mod_rewrite_rules( string $rules ): string {
 add_filter( 'mod_rewrite_rules', 'gutenberg_filter_mod_rewrite_rules' );
 
 /**
- * Returns the major Chrome/Chromium version from the current request's User-Agent.
+ * Returns the major Chromium version from the current request's User-Agent.
  *
  * Matches all Chromium-based browsers (Chrome, Edge, Opera, Brave).
  *
- * @return int|null The major Chrome version, or null if not a Chromium browser.
+ * @return int|null The major Chromium version, or null if not a Chromium browser.
  */
-function gutenberg_get_chrome_major_version(): ?int {
+function gutenberg_get_chromium_major_version(): ?int {
 	if ( empty( $_SERVER['HTTP_USER_AGENT'] ) ) {
 		return null;
 	}
@@ -241,7 +241,7 @@ function gutenberg_get_chrome_major_version(): ?int {
  *
  * Required for enabling SharedArrayBuffer for WebAssembly-based
  * media processing in the editor. Uses Document-Isolation-Policy
- * on supported browsers (Chrome 137+).
+ * on supported browsers (Chromium 137+).
  */
 function gutenberg_set_up_cross_origin_isolation() {
 	// Re-check the filter at action time, since other plugins (loaded after Gutenberg)
@@ -299,7 +299,7 @@ remove_action( 'load-widgets.php', 'wp_set_up_cross_origin_isolation' );
  * Uses an output buffer to add crossorigin="anonymous" where needed.
  */
 function gutenberg_start_cross_origin_isolation_output_buffer(): void {
-	$chrome_version = gutenberg_get_chrome_major_version();
+	$chromium_version = gutenberg_get_chromium_major_version();
 
 	/**
 	 * Filters whether to use Document-Isolation-Policy for cross-origin isolation.
@@ -314,7 +314,7 @@ function gutenberg_start_cross_origin_isolation_output_buffer(): void {
 	 */
 	$use_dip = apply_filters(
 		'gutenberg_use_document_isolation_policy',
-		null !== $chrome_version && $chrome_version >= 137
+		null !== $chromium_version && $chromium_version >= 137
 	);
 
 	if ( ! $use_dip ) {

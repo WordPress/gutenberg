@@ -15,7 +15,7 @@ Client-side media processing requires the following browser capabilities:
 
 | Browser | Minimum Version | Notes |
 |---------|-----------------|-------|
-| Chrome | 137+ | Full support via Document-Isolation-Policy |
+| Chromium | 137+ | Full support via Document-Isolation-Policy |
 | Edge | 137+ | Full support via Document-Isolation-Policy |
 | Firefox | Not supported | Does not support Document-Isolation-Policy |
 | Safari | Not supported | Does not support Document-Isolation-Policy |
