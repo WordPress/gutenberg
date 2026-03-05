@@ -8,6 +8,7 @@ import * as Ariakit from '@ariakit/react';
  */
 import { forwardRef, useContext } from '@wordpress/element';
 import { Icon } from '@wordpress/icons';
+import { SVG, Circle } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -16,7 +17,6 @@ import type { WordPressComponentProps } from '../context';
 import { Context } from './context';
 import type { RadioItemProps } from './types';
 import * as Styled from './styles';
-import { SVG, Circle } from '@wordpress/primitives';
 
 const radioCheck = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -50,7 +50,6 @@ export const RadioItem = forwardRef<
 		>
 			<Ariakit.MenuItemCheck
 				store={ menuContext.store }
-				checked={ props.checked }
 				render={ <Styled.ItemPrefixWrapper /> }
 				// Override some ariakit inline styles
 				style={ { width: 'auto', height: 'auto' } }
