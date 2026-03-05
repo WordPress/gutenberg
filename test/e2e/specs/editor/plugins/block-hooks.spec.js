@@ -3,6 +3,13 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+/**
+ * Internal dependencies
+ */
+const {
+	setCollaboration,
+} = require( '../../editor/collaboration/fixtures/collaboration-utils' );
+
 const dummyBlocksContent = `<!-- wp:heading -->
 <h2 class="wp-block-heading">This is a dummy heading</h2>
 <!-- /wp:heading -->
@@ -65,6 +72,12 @@ test.describe( 'Block Hooks API', () => {
 				} else {
 					containerPost = postObject;
 				}
+
+				/**
+				 * Since the Block Hooks API relies on server-side rendering to insert
+				 * the hooked blocks, there is a fundamental incompatibility with RTC.
+				 */
+				await setCollaboration( requestUtils, false );
 			} );
 
 			test.afterAll( async ( { requestUtils } ) => {
@@ -74,6 +87,7 @@ test.describe( 'Block Hooks API', () => {
 
 				await requestUtils.deleteAllPosts();
 				await requestUtils.deleteAllBlocks();
+				await setCollaboration( requestUtils, true );
 			} );
 
 			test( `should insert hooked blocks into ${ name } on frontend`, async ( {
@@ -198,6 +212,12 @@ test.describe( 'Block Hooks API', () => {
 				} else {
 					containerPost = postObject;
 				}
+
+				/**
+				 * Since the Block Hooks API relies on server-side rendering to insert
+				 * the hooked blocks, there is a fundamental incompatibility with RTC.
+				 */
+				await setCollaboration( requestUtils, false );
 			} );
 
 			test.afterAll( async ( { requestUtils } ) => {
@@ -207,6 +227,7 @@ test.describe( 'Block Hooks API', () => {
 
 				await requestUtils.deleteAllPosts();
 				await requestUtils.deleteAllBlocks();
+				await setCollaboration( requestUtils, true );
 			} );
 
 			test( `should insert hooked blocks into ${ name } on frontend`, async ( {
