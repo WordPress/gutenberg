@@ -12,9 +12,15 @@
 			"type": "string",
 			"default": "category"
 		},
-		"displayAsDropdown": {
-			"type": "boolean",
-			"default": false
+		"displayLayout": {
+			"type": "string",
+			"default": "list",
+			"enum": [ "list", "dropdown", "inline" ]
+		},
+		"delimiter": {
+			"type": "string",
+			"default": "comma",
+			"enum": [ "comma", "dot", "pipe", "slash" ]
 		},
 		"showHierarchy": {
 			"type": "boolean",
@@ -92,6 +98,10 @@
 			}
 		}
 	},
+	"styles": [
+		{ "name": "default", "label": "Default", "isDefault": true },
+		{ "name": "tag", "label": "Tag Style" }
+	],
 	"editorStyle": "wp-block-categories-editor",
 	"style": "wp-block-categories"
 }
