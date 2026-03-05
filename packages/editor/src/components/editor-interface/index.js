@@ -22,6 +22,7 @@ import { InlineNotices } from '@wordpress/notices';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import TemplateValidationNotice from '../template-validation-notice';
+import BlockCustomCSSStripNotice from '../block-custom-css-strip-notice';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
 import ListViewSidebar from '../list-view-sidebar';
@@ -53,6 +54,7 @@ const Notices = () => (
 		dismissibleNoticesClassName="editor-notices__dismissible"
 	>
 		<TemplateValidationNotice />
+		<BlockCustomCSSStripNotice />
 	</InlineNotices>
 );
 
