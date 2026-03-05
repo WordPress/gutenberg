@@ -13,6 +13,8 @@
  * block context (including pattern/overrides) is propagated, then renders
  * the block.
  *
+ * @since 22.8.0
+ *
  * @param WP_Block $block_instance The block instance to render.
  * @param string   $content        The serialized block content to parse and attach.
  *
@@ -65,6 +67,7 @@ function render_block_core_block_content( $block_instance, $content ) {
  */
 function render_block_core_block( $attributes, $content, $block_instance ) {
 	static $seen_refs = array();
+	global $wp_embed;
 
 	if ( ! empty( $attributes['ref'] ) ) {
 		$reusable_block = get_post( $attributes['ref'] );
@@ -90,7 +93,6 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 		$seen_refs[ $attributes['ref'] ] = true;
 
 		// Handle embeds for reusable blocks.
-		global $wp_embed;
 		$content = $wp_embed->run_shortcode( $reusable_block->post_content );
 		$content = $wp_embed->autoembed( $content );
 
@@ -152,7 +154,6 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 		$content = $pattern['content'];
 
 		// Handle embeds for pattern content.
-		global $wp_embed;
 		$content = $wp_embed->run_shortcode( $content );
 		$content = $wp_embed->autoembed( $content );
 

@@ -37,9 +37,9 @@ export const settings = {
 
 		if ( slug ) {
 			const pattern =
-				select(
-					blockEditorStore
-				).__experimentalGetParsedPattern( slug );
+				select( blockEditorStore ).__experimentalGetParsedPattern(
+					slug
+				);
 			if ( pattern?.title ) {
 				return decodeEntities( pattern.title );
 			}
