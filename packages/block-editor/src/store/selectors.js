@@ -1741,9 +1741,13 @@ const canInsertBlockTypeUnmemoized = (
 	}
 
 	// In content only mode, check if this container allows insertion.
+	// We need the `isParentSectionBlock` check because section blocks
+	// (synced patterns, contentOnly groups) have a `getBlockEditingMode`
+	// of 'default', not 'contentOnly' — the 'contentOnly' mode is only
+	// set on their *children*.
 	if (
 		isWithinSection &&
-		blockEditingMode === 'contentOnly' &&
+		( isParentSectionBlock || blockEditingMode === 'contentOnly' ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
 			blockName,
@@ -1942,10 +1946,15 @@ export function canRemoveBlock( state, clientId ) {
 	const blockName = getBlockName( state, clientId );
 	const defaultBlockName = getDefaultBlockName();
 
-	// Check if the parent container allows insertion/removal in contentOnly mode.
+	// Check if the parent container allows insertion/removal in contentOnly
+	// mode. We need the `isParentSectionBlock` check because section blocks
+	// (synced patterns, contentOnly groups) have a `getBlockEditingMode` of
+	// 'default', not 'contentOnly' — the 'contentOnly' mode is only set on
+	// their *children*.
 	if (
 		isWithinSection &&
-		( blockName === defaultBlockName ||
+		( isParentSectionBlock ||
+			blockName === defaultBlockName ||
 			rootBlockEditingMode === 'contentOnly' ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
@@ -2020,12 +2029,17 @@ export function canMoveBlock( state, clientId ) {
 		return false;
 	}
 
-	// If the parent is a section or is `contentOnly`, then check is the inner block
-	// should be allowed to move.
+	// If the block is within a section and the parent is either a section
+	// block itself or has contentOnly editing mode, check whether the inner
+	// block should be allowed to move. We need the `isParentSectionBlock`
+	// check because section blocks (synced patterns, contentOnly groups)
+	// have a `getBlockEditingMode` of 'default', not 'contentOnly' — the
+	// 'contentOnly' mode is only set on their *children*.
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
 	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
 	if (
 		isBlockWithinSection &&
-		rootBlockEditingMode === 'contentOnly' &&
+		( isParentSectionBlock || rootBlockEditingMode === 'contentOnly' ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
 			getBlockName( state, clientId ),
