@@ -61,6 +61,7 @@
 
 		/* Use pointer cursor for buttons that are links */
 		&[href] {
+			/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Links should always use pointer. */
 			cursor: pointer;
 		}
 
