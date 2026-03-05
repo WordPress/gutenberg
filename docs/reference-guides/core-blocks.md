@@ -83,7 +83,7 @@ Reuse this design across your site. ([Source](https://github.com/WordPress/guten
 -	**Name:** core/block
 -	**Category:** reusable
 -	**Supports:** interactivity (clientNavigation), ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
--	**Attributes:** content, ref
+-	**Attributes:** content, ref, slug
 
 ## Breadcrumbs
 
