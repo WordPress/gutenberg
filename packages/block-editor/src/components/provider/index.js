@@ -20,6 +20,7 @@ import { BlockRefsProvider } from './block-refs-provider';
 import { unlock } from '../../lock-unlock';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import useMediaUploadSettings from './use-media-upload-settings';
+import { mediaUploadOnSuccessKey } from '../../store/private-keys';
 import { SelectionContext } from './selection-context';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
@@ -89,6 +90,7 @@ function shouldEnableClientSideMediaProcessing() {
  * or when adding a file to the editor via drag & drop.
  *
  * @param {WPDataRegistry} registry
+ * @param {Object}         settings          Block editor settings.
  * @param {Object}         $3                Parameters object passed to the function.
  * @param {Array}          $3.allowedTypes   Array with the types of media that can be uploaded, if unset all types are allowed.
  * @param {Object}         $3.additionalData Additional data to include in the request.
@@ -100,6 +102,7 @@ function shouldEnableClientSideMediaProcessing() {
  */
 function mediaUpload(
 	registry,
+	settings,
 	{
 		allowedTypes,
 		additionalData = {},
@@ -113,7 +116,10 @@ function mediaUpload(
 	void registry.dispatch( uploadStore ).addItems( {
 		files: Array.from( filesList ),
 		onChange: onFileChange,
-		onSuccess,
+		onSuccess: ( attachments ) => {
+			settings?.[ mediaUploadOnSuccessKey ]?.( attachments );
+			onSuccess?.( attachments );
+		},
 		onBatchSuccess,
 		onError: ( { message } ) => onError( message ),
 		additionalData,
@@ -160,7 +166,11 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 				! isMediaUploadIntercepted
 			) {
 				// Create a new object so that the original props.settings.mediaUpload is not modified.
-				const interceptor = mediaUpload.bind( null, registry );
+				const interceptor = mediaUpload.bind(
+					null,
+					registry,
+					_settings
+				);
 				interceptor.__isMediaUploadInterceptor = true;
 				return {
 					..._settings,
