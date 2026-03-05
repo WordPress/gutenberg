@@ -252,13 +252,6 @@ class PostEditorTemplateMode {
 				'role=button[name="Dismiss this notice"i] >> text=Custom template created. You\'re in template mode now.'
 			)
 		).toBeVisible();
-
-		// Wait for the editor to be loaded and ready before making changes.
-		// Without this, the editor will move focus to body while still typing.
-		// And the save states will not be counted as dirty.
-		// There is likely a bug in the code, waiting for the snackbar above should be enough.
-		// eslint-disable-next-line playwright/no-networkidle
-		await this.page.waitForLoadState( 'networkidle' );
 	}
 
 	async saveTemplateWithoutPublishing() {
