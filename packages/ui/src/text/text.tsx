@@ -9,7 +9,7 @@ import styles from './style.module.css';
  * Built on design tokens for consistent typography across the UI.
  */
 export const Text = forwardRef< HTMLSpanElement, TextProps >( function Text(
-	{ children, variant, render, className, ...props },
+	{ variant, render, className, ...props },
 	ref
 ) {
 	const element = useRender( {
@@ -18,7 +18,6 @@ export const Text = forwardRef< HTMLSpanElement, TextProps >( function Text(
 		ref,
 		props: mergeProps< 'span' >( props, {
 			className: clsx( styles[ variant ], className ),
-			children,
 		} ),
 	} );
 
