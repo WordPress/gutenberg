@@ -174,8 +174,7 @@ const getQuickActionsCommands = () =>
 			canRemoveBlocks,
 			isBlockHiddenAnywhere,
 		} = unlock( useSelect( blockEditorStore ) );
-		const { getBlockEditingMode, canEditBlock } =
-			useSelect( blockEditorStore );
+		const { getBlockEditingMode } = useSelect( blockEditorStore );
 		const { getDefaultBlockName, getGroupingBlockName } =
 			useSelect( blocksStore );
 
@@ -307,12 +306,11 @@ const getQuickActionsCommands = () =>
 			( block ) =>
 				!! block && hasBlockSupport( block.name, 'visibility', true )
 		);
-		const allBlocksEditableAndDefaultMode = clientIds.every(
-			( id ) =>
-				getBlockEditingMode( id ) === 'default' && canEditBlock( id )
+		const allBlocksDefaultMode = clientIds.every(
+			( id ) => getBlockEditingMode( id ) === 'default'
 		);
 
-		if ( supportsVisibility && allBlocksEditableAndDefaultMode ) {
+		if ( supportsVisibility && allBlocksDefaultMode ) {
 			const hasHiddenBlock = clientIds.some( ( id ) =>
 				isBlockHiddenAnywhere( id )
 			);
