@@ -42,6 +42,43 @@ test.describe( 'Site Editor Performance', () => {
 		},
 	} );
 
+	// Temporary: log failed requests and per-test timing to diagnose CI slowness.
+	// eslint-disable-next-line no-console
+	const log = ( ...args ) => console.log( '[perf-debug]', ...args );
+	let testStart;
+	test.beforeEach( async ( { page }, testInfo ) => {
+		testStart = Date.now();
+		page.on( 'requestfailed', ( request ) => {
+			log(
+				`REQUEST FAILED: ${ request.url() } — ${
+					request.failure()?.errorText
+				}`
+			);
+		} );
+		page.on( 'response', async ( response ) => {
+			if ( response.status() >= 500 ) {
+				let body = '';
+				try {
+					body = await response.text();
+				} catch {}
+				log(
+					`SERVER ERROR ${ response.status() }: ${ response.url() } — ${ body.slice(
+						0,
+						500
+					) }`
+				);
+			}
+		} );
+		log( `START: ${ testInfo.title }` );
+	} );
+	test.afterEach( async ( {}, testInfo ) => {
+		log(
+			`END: ${ testInfo.title } — ${ Date.now() - testStart }ms (${
+				testInfo.status
+			})`
+		);
+	} );
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
