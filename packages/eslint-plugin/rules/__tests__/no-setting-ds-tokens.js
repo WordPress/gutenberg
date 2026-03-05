@@ -24,6 +24,12 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 		{
 			code: `<div style={ { margin: '10px' } } />`,
 		},
+		{
+			code: `const styles = { '--my-custom-prop': 'value' };`,
+		},
+		{
+			code: `const styles = { color: 'var(--wpds-color-fg-content-neutral)' };`,
+		},
 	],
 	invalid: [
 		{
@@ -36,6 +42,22 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 		},
 		{
 			code: `<div style={ { '--wpds-font-size-md': '10px', color: 'blue' } } />`,
+			errors: [
+				{
+					messageId: 'disallowedSet',
+				},
+			],
+		},
+		{
+			code: `const styles = { '--wpds-color-fg-content-neutral': 'red' };`,
+			errors: [
+				{
+					messageId: 'disallowedSet',
+				},
+			],
+		},
+		{
+			code: `function getStyles() { return { '--wpds-font-size-md': '10px' }; }`,
 			errors: [
 				{
 					messageId: 'disallowedSet',
