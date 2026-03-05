@@ -518,12 +518,7 @@ export const navigationSignal = signal( 0 );
  * events for entries created in a previous session trigger a full reload
  * instead of a client-side navigation that would leave stale content.
  */
-export const sessionId =
-	typeof crypto?.randomUUID === 'function'
-		? crypto.randomUUID()
-		: Array.from( crypto.getRandomValues( new Uint8Array( 16 ) ), ( b ) =>
-				b.toString( 16 ).padStart( 2, '0' )
-		  ).join( '' );
+export const sessionId = Math.random().toString( 36 ).slice( 2 );
 
 /**
  * Recursively clones the passed object.
