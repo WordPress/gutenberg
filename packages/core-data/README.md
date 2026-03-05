@@ -1065,6 +1065,35 @@ _Parameters_
 
 Hook that returns the value and a setter for the specified property of the nearest provided entity of the specified type.
 
+_Usage_
+
+```js
+import { useEntityProp } from '@wordpress/core-data';
+
+function MetaUpdater( { postType, postId } ) {
+	const [ meta, setMeta ] = useEntityProp(
+		'postType',
+		postType,
+		'meta',
+		postId
+	);
+
+	const handleSyncUpdate = () => {
+		const result = syncTask();
+
+		// Use setter with a static value:
+		setMeta( { ...meta, taskKey: result } );
+	};
+
+	const handleAsyncUpdate = async () => {
+		const result = await asyncTask();
+
+		// Use setter with an updater function:
+		setMeta( ( currentMeta ) => ( { ...currentMeta, taskKey: result } ) );
+	};
+}
+```
+
 _Parameters_
 
 -   _kind_ `string`: The entity kind.
@@ -1074,7 +1103,7 @@ _Parameters_
 
 _Returns_
 
--   `[*, Function, *]`: An array where the first item is the property value, the second is the setter and the third is the full value object from REST API containing more information like `raw`, `rendered` and `protected` props.
+-   `[*, Function, *]`: An array where the first item is the property value, the second is the setter (which accepts either a value or an updater function) and the third is the full value object from REST API containing more information like `raw`, `rendered` and `protected` props.
 
 ### useEntityRecord
 
