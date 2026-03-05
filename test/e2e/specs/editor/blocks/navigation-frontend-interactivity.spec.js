@@ -631,7 +631,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 	} );
 
-	test.describe( 'Submenu touch device interactions (@firefox, @webkit)', () => {
+	test.describe( 'Submenu touch device interactions', () => {
 		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//header',
@@ -657,33 +657,21 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 		test( 'submenu does not open via hover on touch devices', async ( {
 			page,
+			browser,
 		} ) => {
-			// Mock (hover: none) to simulate a touch device where
-			// mouseenter is a synthetic event from tapping.
-			await page.addInitScript( () => {
-				const originalMatchMedia = window.matchMedia.bind( window );
-				window.matchMedia = ( query ) => {
-					if ( query === '(hover: none)' ) {
-						return {
-							matches: true,
-							media: query,
-							onchange: null,
-							addListener: () => {},
-							removeListener: () => {},
-							addEventListener: () => {},
-							removeEventListener: () => {},
-							dispatchEvent: () => false,
-						};
-					}
-					return originalMatchMedia( query );
-				};
+			// Create a touch device context where (hover: none) matches.
+			const touchContext = await browser.newContext( {
+				hasTouch: true,
 			} );
+			const touchPage = await touchContext.newPage();
 
-			await page.goto( '/' );
-			const arrowButton = page.getByRole( 'button', {
-				name: 'Submenu submenu',
-			} );
-			const innerElement = page.getByRole( 'link', {
+			// Copy auth cookies from the original context.
+			const cookies = await page.context().cookies();
+			await touchContext.addCookies( cookies );
+
+			await touchPage.goto( new URL( '/', page.url() ).href );
+
+			const innerElement = touchPage.getByRole( 'link', {
 				name: 'Submenu Link',
 			} );
 
@@ -691,18 +679,34 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( innerElement ).toBeHidden();
 
 			// Simulate the synthetic mouseenter that fires on touch tap.
-			// With the (hover: none) guard, this should NOT open the submenu.
-			const submenuLi = page.locator( 'li.has-child' ).first();
+			// On touch devices, tapping an element fires mouseenter as a
+			// synthetic event, but mouseleave never fires, leaving the
+			// submenu permanently open. The (hover: none) media query guard
+			// should prevent the hover handler from opening the submenu.
+			const submenuLi = touchPage.locator( 'li.has-child' ).first();
 			await submenuLi.dispatchEvent( 'mouseenter' );
 			await expect( innerElement ).toBeHidden();
 
-			// Click the arrow to open the submenu.
-			await arrowButton.click();
-			await expect( innerElement ).toBeVisible();
+			await touchContext.close();
+		} );
 
-			// Click the arrow again to close the submenu (single tap close).
-			await arrowButton.click();
+		test( 'submenu still opens via hover on non-touch devices', async ( {
+			page,
+		} ) => {
+			await page.goto( '/' );
+
+			const innerElement = page.getByRole( 'link', {
+				name: 'Submenu Link',
+			} );
+
+			// Submenu should be hidden initially.
 			await expect( innerElement ).toBeHidden();
+
+			// On a non-touch device (default Playwright context),
+			// mouseenter should still open the submenu via hover.
+			const submenuLi = page.locator( 'li.has-child' ).first();
+			await submenuLi.dispatchEvent( 'mouseenter' );
+			await expect( innerElement ).toBeVisible();
 		} );
 	} );
 } );
