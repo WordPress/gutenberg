@@ -91,4 +91,41 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$inner_blocks  = new WP_Block_List( $parsed_blocks );
 		$this->assertFalse( gutenberg_block_core_navigation_block_tree_has_block_type( $inner_blocks, 'core/navigation' ) );
 	}
+
+	/**
+	 * @covers gutenberg_block_core_navigation_set_overlay_image_lazy_loading
+	 */
+	public function test_block_core_navigation_set_overlay_image_lazy_loading_adds_lazy() {
+		$html   = '<div><img src="example.jpg" width="300" height="300" /></div>';
+		$result = gutenberg_block_core_navigation_set_overlay_image_lazy_loading( $html );
+		$this->assertStringContainsString( 'loading="lazy"', $result );
+	}
+
+	/**
+	 * @covers gutenberg_block_core_navigation_set_overlay_image_lazy_loading
+	 */
+	public function test_block_core_navigation_set_overlay_image_lazy_loading_overrides_eager() {
+		$html   = '<div><img src="example.jpg" loading="eager" /></div>';
+		$result = gutenberg_block_core_navigation_set_overlay_image_lazy_loading( $html );
+		$this->assertStringContainsString( 'loading="lazy"', $result );
+		$this->assertStringNotContainsString( 'loading="eager"', $result );
+	}
+
+	/**
+	 * @covers gutenberg_block_core_navigation_set_overlay_image_lazy_loading
+	 */
+	public function test_block_core_navigation_set_overlay_image_lazy_loading_multiple_images() {
+		$html   = '<div><img src="a.jpg" /><img src="b.jpg" /></div>';
+		$result = gutenberg_block_core_navigation_set_overlay_image_lazy_loading( $html );
+		$this->assertSame( 2, substr_count( $result, 'loading="lazy"' ) );
+	}
+
+	/**
+	 * @covers gutenberg_block_core_navigation_set_overlay_image_lazy_loading
+	 */
+	public function test_block_core_navigation_set_overlay_image_lazy_loading_no_images() {
+		$html   = '<div><p>No images here</p></div>';
+		$result = gutenberg_block_core_navigation_set_overlay_image_lazy_loading( $html );
+		$this->assertSame( $html, $result );
+	}
 }

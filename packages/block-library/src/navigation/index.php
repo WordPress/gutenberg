@@ -710,6 +710,12 @@ class WP_Navigation_Block_Renderer {
 				$tags                = new WP_HTML_Tag_Processor( $overlay_blocks_html );
 				$overlay_blocks_html = block_core_navigation_add_directives_to_overlay_close( $tags );
 			}
+			// Images in the overlay are hidden until the menu is opened. Pre-set
+			// loading="lazy" so that when wp_filter_content_tags() processes the
+			// parent template part, it sees the attribute already present and calls
+			// wp_get_loading_optimization_attributes with loading="lazy", which both prevents
+			// fetchpriority="high" from being added and stops the LCP counter from being incremented.
+			$overlay_blocks_html = block_core_navigation_set_overlay_image_lazy_loading( $overlay_blocks_html );
 		}
 
 		$has_custom_overlay = ! empty( $overlay_blocks_html );
@@ -1107,6 +1113,27 @@ function block_core_navigation_add_directives_to_overlay_close( $tags ) {
 	) ) {
 		// Add the same close directive as the default close button.
 		$tags->set_attribute( 'data-wp-on--click', 'actions.closeMenuOnClick' );
+	}
+	return $tags->get_updated_html();
+}
+
+/**
+ * Sets loading="lazy" on all img elements within navigation overlay HTML.
+ *
+ * By pre-setting loading="lazy" on overlay images (which are hidden until the
+ * menu is opened), the loading optimization function sees $attr['loading'] = 'lazy'
+ * and sets $maybe_in_viewport = false — preventing both fetchpriority="high" from
+ * being added and the shared LCP counter from being incremented for these images.
+ *
+ * @since 7.0.0
+ *
+ * @param string $overlay_blocks_html The rendered HTML of the overlay blocks.
+ * @return string Modified HTML with loading="lazy" on all img elements.
+ */
+function block_core_navigation_set_overlay_image_lazy_loading( $overlay_blocks_html ) {
+	$tags = new WP_HTML_Tag_Processor( $overlay_blocks_html );
+	while ( $tags->next_tag( 'IMG' ) ) {
+		$tags->set_attribute( 'loading', 'lazy' );
 	}
 	return $tags->get_updated_html();
 }
