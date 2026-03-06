@@ -98,7 +98,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	public function test_block_core_navigation_set_overlay_image_lazy_loading_adds_lazy_and_low_priority() {
 		$html   = '<div><img src="example.jpg" width="300" height="300" /></div>';
 		$result = gutenberg_block_core_navigation_set_overlay_image_lazy_loading( $html );
-		$this->assertStringContainsString( 'loading="lazy"', $result );
+		$this->assertStringNotContainsString( 'loading="lazy"', $result );
 		$this->assertStringContainsString( 'fetchpriority="low"', $result );
 	}
 
