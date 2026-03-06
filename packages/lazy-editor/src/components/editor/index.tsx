@@ -92,6 +92,12 @@ export function Editor( {
 		() => ( {
 			...editorSettings,
 			...settings,
+			styles: [
+				...( editorSettings.styles ?? [] ),
+				...( settings?.isPreviewMode
+					? [ { css: 'body{min-height:100vh;}' } ]
+					: [] ),
+			],
 		} ),
 		[ editorSettings, settings ]
 	);
