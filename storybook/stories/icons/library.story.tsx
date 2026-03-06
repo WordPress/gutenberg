@@ -12,7 +12,6 @@ import {
 	SearchControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalSpacer as Spacer,
 	__experimentalGrid as Grid,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -104,7 +103,7 @@ const LibraryExample = (): ReactElement => {
 	const hasResults = Object.keys( filteredIcons ).length > 0;
 
 	return (
-		<Spacer padding={ 10 }>
+		<div style={ { padding: 10 } }>
 			<VStack spacing={ 8 }>
 				<HStack justify="flex-start" alignment="end" spacing={ 8 } wrap>
 					<SearchControl
@@ -190,7 +189,7 @@ const LibraryExample = (): ReactElement => {
 					<p>No icons found.</p>
 				) }
 			</VStack>
-		</Spacer>
+		</div>
 	);
 };
 
