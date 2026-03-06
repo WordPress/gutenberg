@@ -1,0 +1,40 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.header-content {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.header-trigger-wrapper {
+		flex-shrink: 0;
+		position: relative;
+
+		/* Since the button has absolute positioning, we have to explicitly
+		  specify the wrapper's width. This value should be kept in sync with the
+			`size` prop of the `IconButton` component used for the trigger button.  */
+		width: 32px;
+	}
+
+	.header-trigger {
+		/* Absolutely positioned to prevent making the header taller, in case
+		   the header content is not as tall as the button. This is mostly to
+			 preserve the same metrics between `Card` and `CollapsibleCard` (when open) */
+		position: absolute;
+		inset-block-start: 50%;
+		transform: translateY( -50% );
+	}
+}
+
+@layer wp-ui-compositions {
+	.header {
+		display: flex;
+		flex-direction: row;
+		align-items: stretch;
+		gap: var( --wpds-dimension-gap-sm );
+
+		&:has( .header-trigger:not( [data-disabled] ) ) {
+			cursor: var( --wpds-cursor-control );
+		}
+	}
+}
