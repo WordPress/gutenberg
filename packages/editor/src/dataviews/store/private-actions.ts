@@ -270,7 +270,6 @@ export const registerPostTypeSchema =
 					discussionField,
 				templateField,
 				passwordField,
-				scheduledDateField,
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,
