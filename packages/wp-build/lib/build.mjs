@@ -114,31 +114,33 @@ const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
 
 /**
- * Reliably casts a value into a boolean.
+ * Interprets a configuration value as a boolean, where `"true"` and `"1"`
+ * are considered true while all other values are false.
  *
- * This helps to avoid scenarios where falsey string values such as false or 0
- * are "truthy" and incorrectly typecast to Boolean true.
- *
- * @param {string|boolean|undefined} value The value to cast.
- * @returns {boolean} The typecast value.
+ * @param {string|undefined} value The configuration value to interpret.
+ * @return {boolean} Boolean interpretation of the given configuration value.
  */
-const castBool = ( value ) => {
-	if ( typeof value === 'boolean' ) {
-		return value;
-	}
-	return [ 'true', '1', 1 ].includes( value?.toLowerCase?.() ?? value );
+const boolConfigVal = ( value ) => {
+	return (
+		value !== undefined && [ 'true', '1' ].includes( value.toLowerCase() )
+	);
 };
 
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
-			castBool( process.env.IS_GUTENBERG_PLUGIN ) ??
-				castBool( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
+		Boolean(
+			boolConfigVal( globalThis.IS_GUTENBERG_PLUGIN ) ??
+				boolConfigVal(
+					process.env.npm_package_config_IS_GUTENBERG_PLUGIN
+				)
 		)
 	),
 	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
 		Boolean(
-			castBool( process.env.IS_WORDPRESS_CORE ) ??
-				castBool( process.env.npm_package_config_IS_WORDPRESS_CORE )
+			boolConfigVal( globalThis.IS_WORDPRESS_CORE ) ??
+				boolConfigVal(
+					process.env.npm_package_config_IS_WORDPRESS_CORE
+				)
 		)
 	),
 };
@@ -342,7 +344,7 @@ function transformPhpContent( content, transforms ) {
 	 * class prefixes, etc.). When building for WordPress Core, it's not
 	 * necessary to perform these steps.
 	 */
-	if ( castBool( process.env.IS_WORDPRESS_CORE ) ) {
+	if ( boolConfigVal( globalThis.IS_WORDPRESS_CORE ) ) {
 		return content;
 	}
 
@@ -2173,8 +2175,8 @@ async function main() {
 			},
 			'base-url': {
 				type: 'string',
-				default: castBool( process.env.IS_WORDPRESS_CORE )
-					? 'includes_url( \'build/\' )'
+				default: boolConfigVal( globalThis.IS_WORDPRESS_CORE )
+					? "includes_url( 'build/' )"
 					: 'plugin_dir_url( __FILE__ )',
 			},
 		},
