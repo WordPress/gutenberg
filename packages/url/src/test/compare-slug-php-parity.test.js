@@ -26,6 +26,8 @@ const cases = [
 		input: 'Ärger mit Übergängen',
 		php: 'aerger-mit-uebergaengen',
 	},
+	// German — capital Eszett (ẞ, U+1E9E), standardized in 2017 (DIN 5008)
+	{ locale: 'de_DE', input: 'STRAẞE', php: 'strasse' },
 	// German variants — same digraph rules apply
 	{ locale: 'de_CH', input: 'Zürich Straße', php: 'zuerich-strasse' },
 	{ locale: 'de_AT', input: 'Österreich', php: 'oesterreich' },

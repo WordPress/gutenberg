@@ -15,6 +15,7 @@ const LOCALE_CHAR_MAP: Record< string, Record< string, string > > = {
 		ö: 'oe',
 		Ü: 'Ue',
 		ü: 'ue',
+		ẞ: 'SS',
 		ß: 'ss',
 	},
 	da_DK: {

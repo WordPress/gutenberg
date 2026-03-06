@@ -1234,6 +1234,10 @@ describe( 'cleanForSlug', () => {
 			);
 		} );
 
+		it( 'should map capital Eszett (ẞ) to SS for de_DE locale', () => {
+			expect( cleanForSlug( 'STRAẞE', 'de_DE' ) ).toBe( 'strasse' );
+		} );
+
 		it( 'should apply German digraphs for de_AT locale', () => {
 			expect( cleanForSlug( 'Österreich', 'de_AT' ) ).toBe(
 				'oesterreich'
