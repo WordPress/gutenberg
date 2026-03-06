@@ -17,29 +17,18 @@ const MAX_NODE_OFFSET_COUNT = 500;
  * Given a selection, returns the coordinates of the cursor in the block.
  *
  * @param absolutePositionIndex - The absolute position index
- * @param blockId               - The block ID
+ * @param blockElement          - The block element (or null if deleted)
  * @param editorDocument        - The editor document
- * @param overlay               - The overlay element
+ * @param overlayRect           - Pre-computed bounding rect of the overlay element
  * @return The position of the cursor
  */
 export const getCursorPosition = (
 	absolutePositionIndex: number | null,
-	blockId: string,
+	blockElement: HTMLElement | null,
 	editorDocument: Document,
-	overlay: HTMLElement
+	overlayRect: DOMRect
 ): CursorCoords | null => {
-	if ( absolutePositionIndex === null ) {
-		// An absolute position index can be null if a cursor was set in a block that
-		// has since been deleted.
-		// Return null so we don't try to draw it.
-		return null;
-	}
-
-	const blockElement = editorDocument.querySelector(
-		`[data-block="${ blockId }"]`
-	) as HTMLElement;
-
-	if ( ! blockElement ) {
+	if ( absolutePositionIndex === null || ! blockElement ) {
 		return null;
 	}
 
@@ -48,7 +37,7 @@ export const getCursorPosition = (
 			blockElement,
 			absolutePositionIndex,
 			editorDocument,
-			overlay
+			overlayRect
 		) ?? null
 	);
 };
@@ -59,14 +48,14 @@ export const getCursorPosition = (
  * @param blockElement   - The block element
  * @param charOffset     - The character offset
  * @param editorDocument - The editor document
- * @param overlay        - The overlay element
+ * @param overlayRect    - Pre-computed bounding rect of the overlay element
  * @return The position of the cursor
  */
 const getOffsetPositionInBlock = (
 	blockElement: HTMLElement,
 	charOffset: number,
 	editorDocument: Document,
-	overlay: HTMLElement
+	overlayRect: DOMRect
 ) => {
 	const { node, offset } = findInnerBlockOffset(
 		blockElement,
@@ -86,7 +75,6 @@ const getOffsetPositionInBlock = (
 	cursorRange.collapse( true );
 
 	const cursorRect = cursorRange.getBoundingClientRect();
-	const overlayRect = overlay.getBoundingClientRect();
 	const blockRect = blockElement.getBoundingClientRect();
 
 	let cursorX = 0;
@@ -129,7 +117,7 @@ const getOffsetPositionInBlock = (
  * @param startOffset    - Start character offset within the block
  * @param endOffset      - End character offset within the block
  * @param editorDocument - The editor document
- * @param overlay        - The overlay element for coordinate conversion
+ * @param overlayRect    - Pre-computed bounding rect of the overlay element
  * @return Array of selection rectangles relative to the overlay, or null on failure
  */
 export const getSelectionRects = (
@@ -137,7 +125,7 @@ export const getSelectionRects = (
 	startOffset: number,
 	endOffset: number,
 	editorDocument: Document,
-	overlay: HTMLElement
+	overlayRect: DOMRect
 ): SelectionRect[] | null => {
 	// Normalize direction.
 	let normalizedStart = startOffset;
@@ -165,7 +153,6 @@ export const getSelectionRects = (
 		return null;
 	}
 
-	const overlayRect = overlay.getBoundingClientRect();
 	const clientRects = range.getClientRects();
 	const rects: SelectionRect[] = [];
 
@@ -190,18 +177,16 @@ export const getSelectionRects = (
  *
  * @param blockElement   - The block element
  * @param editorDocument - The editor document
- * @param overlay        - The overlay element
+ * @param overlayRect    - Pre-computed bounding rect of the overlay element
  * @return Array of selection rectangles relative to the overlay
  */
 export const getFullBlockSelectionRects = (
 	blockElement: HTMLElement,
 	editorDocument: Document,
-	overlay: HTMLElement
+	overlayRect: DOMRect
 ): SelectionRect[] => {
 	const range = editorDocument.createRange();
 	range.selectNodeContents( blockElement );
-
-	const overlayRect = overlay.getBoundingClientRect();
 	const clientRects = range.getClientRects();
 	const rects: SelectionRect[] = [];
 

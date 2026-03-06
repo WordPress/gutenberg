@@ -62,9 +62,10 @@ export function useRenderCursors(
 				return;
 			}
 
+			const overlayRect = overlayElement.getBoundingClientRect();
 			const cursorContext = {
 				editorDocument: blockEditorDocument,
-				overlay: overlayElement,
+				overlayRect,
 			};
 
 			const cursors: CursorData[] = [];

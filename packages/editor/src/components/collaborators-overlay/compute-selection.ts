@@ -19,7 +19,7 @@ interface CursorCoords {
 /** Common parameters passed to cursor/selection computation helpers. */
 interface CursorContext {
 	editorDocument: Document;
-	overlay: HTMLElement;
+	overlayRect: DOMRect;
 }
 
 /** Result of computing visual cursor/selection state for a single user. */
@@ -55,7 +55,10 @@ export function computeSelectionVisual(
 	}
 
 	// SelectionInOneBlock or SelectionInMultipleBlocks.
-	return computeTextSelection( selection, start, end!, cursorContext );
+	if ( ! end ) {
+		return {};
+	}
+	return computeTextSelection( selection, start, end, cursorContext );
 }
 
 /**
@@ -72,12 +75,16 @@ function computeCursorOnly(
 	if ( ! start.localClientId ) {
 		return {};
 	}
+	const blockElement =
+		cursorContext.editorDocument.querySelector< HTMLElement >(
+			`[data-block="${ start.localClientId }"]`
+		);
 	return {
 		coords: getCursorPosition(
 			start.textIndex,
-			start.localClientId,
+			blockElement,
 			cursorContext.editorDocument,
-			cursorContext.overlay
+			cursorContext.overlayRect
 		),
 	};
 }
@@ -107,36 +114,52 @@ function computeTextSelection(
 		return {};
 	}
 
-	const allRects =
-		selection.type === SelectionType.SelectionInOneBlock
-			? computeSingleBlockRects( start, end, cursorContext )
-			: computeMultiBlockRects( start, end, cursorContext );
+	const isReverse =
+		selection.selectionDirection === SelectionDirection.Backward;
+	const activeEnd = isReverse ? start : end;
+
+	let allRects: SelectionRect[];
+	let activeEndBlock: HTMLElement | null = null;
+
+	if ( selection.type === SelectionType.SelectionInOneBlock ) {
+		const result = computeSingleBlockRects( start, end, cursorContext );
+		allRects = result.rects;
+		// Single block: start and end share the same block element.
+		activeEndBlock = result.blockElement;
+	} else {
+		const result = computeMultiBlockRects( start, end, cursorContext );
+		allRects = result.rects;
+		// Pick the block element that matches the active end.
+		activeEndBlock =
+			activeEnd.localClientId === result.firstBlockClientId
+				? result.firstBlock
+				: result.lastBlock;
+	}
 
 	if ( allRects.length > 0 ) {
-		// Place the cursor at the active end of the selection —
-		// backward means the caret sits at the start.
-		const isReverse =
-			selection.selectionDirection === SelectionDirection.Backward;
-		const activeEnd = isReverse ? start : end;
-
 		return {
 			coords: getCursorPosition(
 				activeEnd.textIndex,
-				activeEnd.localClientId!,
+				activeEndBlock,
 				cursorContext.editorDocument,
-				cursorContext.overlay
+				cursorContext.overlayRect
 			),
 			selectionRects: allRects,
 		};
 	}
 
 	// Fallback: cursor at start position only.
+	const startBlock =
+		cursorContext.editorDocument.querySelector< HTMLElement >(
+			`[data-block="${ start.localClientId }"]`
+		);
+
 	return {
 		coords: getCursorPosition(
 			start.textIndex,
-			start.localClientId!,
+			startBlock,
 			cursorContext.editorDocument,
-			cursorContext.overlay
+			cursorContext.overlayRect
 		),
 	};
 }
@@ -153,23 +176,29 @@ function computeSingleBlockRects(
 	start: ResolvedSelection,
 	end: ResolvedSelection,
 	cursorContext: CursorContext
-): SelectionRect[] {
+): { rects: SelectionRect[]; blockElement: HTMLElement | null } {
 	const blockElement =
 		cursorContext.editorDocument.querySelector< HTMLElement >(
 			`[data-block="${ start.localClientId }"]`
 		);
-	if ( ! blockElement ) {
-		return [];
+	if (
+		! blockElement ||
+		start.textIndex === null ||
+		end.textIndex === null
+	) {
+		return { rects: [], blockElement: null };
 	}
-	return (
-		getSelectionRects(
-			blockElement,
-			start.textIndex!,
-			end.textIndex!,
-			cursorContext.editorDocument,
-			cursorContext.overlay
-		) ?? []
-	);
+	return {
+		rects:
+			getSelectionRects(
+				blockElement,
+				start.textIndex,
+				end.textIndex,
+				cursorContext.editorDocument,
+				cursorContext.overlayRect
+			) ?? [],
+		blockElement,
+	};
 }
 
 /**
@@ -187,7 +216,12 @@ function computeMultiBlockRects(
 	start: ResolvedSelection,
 	end: ResolvedSelection,
 	cursorContext: CursorContext
-): SelectionRect[] {
+): {
+	rects: SelectionRect[];
+	firstBlock: HTMLElement | null;
+	lastBlock: HTMLElement | null;
+	firstBlockClientId: string | null;
+} {
 	let docFirst = start;
 	let docLast = end;
 	let firstBlock = cursorContext.editorDocument.querySelector< HTMLElement >(
@@ -204,8 +238,20 @@ function computeMultiBlockRects(
 		[ firstBlock, lastBlock ] = [ lastBlock, firstBlock ];
 	}
 
-	if ( ! firstBlock || ! lastBlock ) {
-		return [];
+	if (
+		! firstBlock ||
+		! lastBlock ||
+		docFirst.textIndex === null ||
+		docLast.textIndex === null ||
+		! docFirst.localClientId ||
+		! docLast.localClientId
+	) {
+		return {
+			rects: [],
+			firstBlock: null,
+			lastBlock: null,
+			firstBlockClientId: null,
+		};
 	}
 
 	const allRects: SelectionRect[] = [];
@@ -213,10 +259,10 @@ function computeMultiBlockRects(
 	// First block: from start offset to end of block.
 	const startRects = getSelectionRects(
 		firstBlock,
-		docFirst.textIndex!,
+		docFirst.textIndex,
 		Number.MAX_SAFE_INTEGER,
 		cursorContext.editorDocument,
-		cursorContext.overlay
+		cursorContext.overlayRect
 	);
 	if ( startRects ) {
 		allRects.push( ...startRects );
@@ -224,15 +270,15 @@ function computeMultiBlockRects(
 
 	// Intermediate blocks: full content.
 	const intermediateBlocks = getBlocksBetween(
-		docFirst.localClientId!,
-		docLast.localClientId!,
+		docFirst.localClientId,
+		docLast.localClientId,
 		cursorContext.editorDocument
 	);
 	for ( const intermediateBlock of intermediateBlocks ) {
 		const rects = getFullBlockSelectionRects(
 			intermediateBlock,
 			cursorContext.editorDocument,
-			cursorContext.overlay
+			cursorContext.overlayRect
 		);
 		allRects.push( ...rects );
 	}
@@ -241,13 +287,18 @@ function computeMultiBlockRects(
 	const endRects = getSelectionRects(
 		lastBlock,
 		0,
-		docLast.textIndex!,
+		docLast.textIndex,
 		cursorContext.editorDocument,
-		cursorContext.overlay
+		cursorContext.overlayRect
 	);
 	if ( endRects ) {
 		allRects.push( ...endRects );
 	}
 
-	return allRects;
+	return {
+		rects: allRects,
+		firstBlock,
+		lastBlock,
+		firstBlockClientId: docFirst.localClientId,
+	};
 }
