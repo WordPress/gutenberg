@@ -28,14 +28,18 @@ type PanelOpenAsDropdown = {
 };
 export type PanelOpenAsModal = {
 	type: 'modal';
-	applyLabel?: string;
-	cancelLabel?: string;
+	applyLabel: string;
+	cancelLabel: string;
 };
 
 export type PanelLayout = {
 	type: 'panel';
 	labelPosition?: LabelPosition;
-	openAs?: 'dropdown' | 'modal' | PanelOpenAsDropdown | PanelOpenAsModal;
+	openAs?:
+		| 'dropdown'
+		| 'modal'
+		| { type: 'dropdown' }
+		| { type: 'modal'; applyLabel?: string; cancelLabel?: string };
 	summary?: PanelSummaryField;
 	editVisibility?: EditVisibility;
 };

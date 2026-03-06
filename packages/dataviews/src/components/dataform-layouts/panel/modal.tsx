@@ -11,7 +11,7 @@ import {
 	Button,
 	Modal,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+
 import { useContext, useMemo, useRef, useState } from '@wordpress/element';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
@@ -151,14 +151,14 @@ function ModalContent< Item >( {
 					onClick={ onClose }
 					__next40pxDefaultSize
 				>
-					{ cancelLabel || __( 'Cancel' ) }
+					{ cancelLabel }
 				</Button>
 				<Button
 					variant="primary"
 					onClick={ onApply }
 					__next40pxDefaultSize
 				>
-					{ applyLabel || __( 'Apply' ) }
+					{ applyLabel }
 				</Button>
 			</Stack>
 		</Modal>

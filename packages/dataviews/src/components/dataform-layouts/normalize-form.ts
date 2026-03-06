@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import type {
@@ -56,10 +61,22 @@ function normalizeLayout( layout?: Layout ): NormalizedLayout {
 			: [ summary ];
 
 		const openAs = layout?.openAs;
-		const normalizedOpenAs: NormalizedPanelLayout[ 'openAs' ] =
-			typeof openAs === 'object'
-				? openAs
-				: { type: openAs ?? 'dropdown' };
+		let normalizedOpenAs: NormalizedPanelLayout[ 'openAs' ];
+		if ( typeof openAs === 'object' && openAs.type === 'modal' ) {
+			normalizedOpenAs = {
+				type: 'modal',
+				applyLabel: openAs.applyLabel?.trim() || __( 'Apply' ),
+				cancelLabel: openAs.cancelLabel?.trim() || __( 'Cancel' ),
+			};
+		} else if ( openAs === 'modal' ) {
+			normalizedOpenAs = {
+				type: 'modal',
+				applyLabel: __( 'Apply' ),
+				cancelLabel: __( 'Cancel' ),
+			};
+		} else {
+			normalizedOpenAs = { type: 'dropdown' };
+		}
 
 		normalizedLayout = {
 			type: 'panel',

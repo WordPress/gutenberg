@@ -185,7 +185,7 @@ describe( 'normalizeFormFields', () => {
 			} );
 		} );
 
-		it( 'panel: openAs string "modal" normalizes to object', () => {
+		it( 'panel: openAs string "modal" normalizes to object with defaults', () => {
 			const form: Form = {
 				layout: { type: 'panel', openAs: 'modal' },
 				fields: [ 'field1' ],
@@ -194,7 +194,11 @@ describe( 'normalizeFormFields', () => {
 			expect( result.layout ).toEqual( {
 				type: 'panel',
 				labelPosition: 'side',
-				openAs: { type: 'modal' },
+				openAs: {
+					type: 'modal',
+					applyLabel: 'Apply',
+					cancelLabel: 'Cancel',
+				},
 				summary: [],
 				editVisibility: 'on-hover',
 			} );
@@ -226,7 +230,7 @@ describe( 'normalizeFormFields', () => {
 			} );
 		} );
 
-		it( 'panel: openAs object without labels normalizes correctly', () => {
+		it( 'panel: openAs object without labels gets defaults', () => {
 			const form: Form = {
 				layout: {
 					type: 'panel',
@@ -238,7 +242,37 @@ describe( 'normalizeFormFields', () => {
 			expect( result.layout ).toEqual( {
 				type: 'panel',
 				labelPosition: 'side',
-				openAs: { type: 'modal' },
+				openAs: {
+					type: 'modal',
+					applyLabel: 'Apply',
+					cancelLabel: 'Cancel',
+				},
+				summary: [],
+				editVisibility: 'on-hover',
+			} );
+		} );
+
+		it( 'panel: openAs object trims whitespace and falls back to defaults', () => {
+			const form: Form = {
+				layout: {
+					type: 'panel',
+					openAs: {
+						type: 'modal',
+						applyLabel: '  ',
+						cancelLabel: '',
+					},
+				},
+				fields: [ 'field1' ],
+			};
+			const result = normalizeForm( form );
+			expect( result.layout ).toEqual( {
+				type: 'panel',
+				labelPosition: 'side',
+				openAs: {
+					type: 'modal',
+					applyLabel: 'Apply',
+					cancelLabel: 'Cancel',
+				},
 				summary: [],
 				editVisibility: 'on-hover',
 			} );
