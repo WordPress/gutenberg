@@ -85,9 +85,6 @@ export default function ActionsSection() {
 			disabled: isImporting,
 		},
 		export: { onClick: handleExportClick },
-		// TODO: Manage access ACTTION is removed but the route exists for future implementation
-		// without duplicating the work.
-		'manage-access': { onClick: () => goTo( '/manage-access' ) },
 		revert: { onClick: () => goTo( '/revision-history' ) },
 	};
 

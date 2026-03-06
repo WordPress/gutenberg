@@ -81,33 +81,12 @@
 	color: $gray-700;
 }
 
-.content-guidelines__manage-access {
-	padding: $grid-unit-30;
-	display: flex;
-	flex-direction: column;
-	gap: $grid-unit-20;
-	max-width: 660px;
-}
-
-.content-guidelines__manage-access-back {
-	align-self: flex-start;
-	margin-left: -$grid-unit-15;
-	font-weight: 400;
-}
-
-.content-guidelines__manage-access-card {
-	padding: $grid-unit-30;
-}
-
 .content-guidelines__revision-history {
 	padding: $grid-unit-30;
 	display: flex;
 	flex-direction: column;
 	gap: $grid-unit-20;
 
-	// DataViews adds its own horizontal padding ($grid-unit-30) on the toolbar
-	// and first/last table columns, which would double up on our container padding.
-	// Override to zero so everything aligns with our container's padding.
 	.dataviews__view-actions,
 	.dataviews-filters__container {
 		padding-left: 0;

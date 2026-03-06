@@ -23,7 +23,6 @@ import { fetchContentGuidelines } from './api';
 import BlockGuidelines from './components/block-guidelines';
 import { bootstrapBlockRegistry } from './bootstrap-block-registry';
 import ActionsSection from './components/actions-section';
-import ManageAccess from './components/manage-access';
 import RevisionHistory from './components/revision-history';
 
 // Bootstrap Core blocks so block icons are available (e.g. in Block Guidelines).
@@ -174,9 +173,6 @@ function ContentGuidelinesPage() {
 								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 								<ActionsSection />
 							</VStack>
-						</Navigator.Screen>
-						<Navigator.Screen path="/manage-access">
-							<ManageAccess />
 						</Navigator.Screen>
 						<Navigator.Screen path="/revision-history">
 							<RevisionHistory />
