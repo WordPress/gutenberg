@@ -208,9 +208,9 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 						&& $wp_user_id !== $entry['wp_user_id']
 					) {
 						return new WP_Error(
-							'rest_forbidden',
+							'rest_cannot_edit',
 							__( 'Client ID is already in use by another user.', 'gutenberg' ),
-							array( 'status' => 403 )
+							array( 'status' => rest_authorization_required_code() )
 						);
 					}
 				}
