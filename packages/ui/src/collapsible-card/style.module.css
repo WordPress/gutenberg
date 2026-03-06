@@ -22,7 +22,7 @@
 			 preserve the same metrics between `Card` and `CollapsibleCard` (when open) */
 		position: absolute;
 		inset-block-start: 50%;
-		transform: translateY( -50% );
+		transform: translateY(-50%);
 	}
 }
 
@@ -31,10 +31,10 @@
 		display: flex;
 		flex-direction: row;
 		align-items: stretch;
-		gap: var( --wpds-dimension-gap-sm );
+		gap: var(--wpds-dimension-gap-sm);
 
-		&:has( .header-trigger:not( [data-disabled] ) ) {
-			cursor: var( --wpds-cursor-control );
+		&:has(.header-trigger:not([data-disabled])) {
+			cursor: var(--wpds-cursor-control);
 		}
 	}
 }
