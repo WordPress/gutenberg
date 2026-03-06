@@ -29,7 +29,7 @@ function AddSubmenuItem( {
 	expand,
 	expandedState,
 	setInsertedBlock,
-	setReturnFocusClientId,
+	setParentClientId,
 } ) {
 	const { insertBlock, replaceBlock, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
@@ -95,10 +95,10 @@ function AddSubmenuItem( {
 					expand( expandClientId );
 				}
 
-				// Track the parent block so focus can return to its
-				// Options button when the link popover closes.
-				if ( setReturnFocusClientId ) {
-					setReturnFocusClientId( expandClientId );
+				// Track the parent block so the link popover can anchor
+				// to its row and focus returns there when it closes.
+				if ( setParentClientId ) {
+					setParentClientId( expandClientId );
 				}
 
 				onClose();
@@ -112,70 +112,41 @@ function AddSubmenuItem( {
 export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
-	const returnFocusClientIdRef = useRef( null );
+	const parentClientIdRef = useRef( null );
 
-	const setReturnFocusClientId = useCallback( ( id ) => {
-		returnFocusClientIdRef.current = id;
+	const setParentClientId = useCallback( ( id ) => {
+		parentClientIdRef.current = id;
 	}, [] );
 
-	// When the link popover closes (insertedBlock becomes null),
-	// return focus to the parent block's Options button. Deferred
-	// to the next event loop tick so it runs after the Popover's
-	// own focus-return logic and any list view focus shifts from
-	// block removal.
+	// When insertedBlock changes, find the parent block's Options button
+	// to use as the popover anchor. When the popover closes (insertedBlock
+	// becomes null), return focus to that button. Focus is deferred to the
+	// next event loop tick so it runs after the Popover's own focus-return
+	// logic.
 	useEffect( () => {
-		if ( ! insertedBlock && returnFocusClientIdRef.current ) {
-			const clientId = returnFocusClientIdRef.current;
-			returnFocusClientIdRef.current = null;
+		if ( insertedBlock && parentClientIdRef.current ) {
+			const btn = document.querySelector(
+				`.editor-list-view-sidebar [data-block="${ parentClientIdRef.current }"] .block-editor-list-view-block__menu`
+			);
+			setPopoverAnchor( btn );
+		} else {
+			setPopoverAnchor( null );
 
-			const timerId = window.setTimeout( () => {
-				const btn = document.querySelector(
-					`.editor-list-view-sidebar [data-block="${ clientId }"] .block-editor-list-view-block__menu`
-				);
-				btn?.focus();
-			}, 0 );
+			if ( parentClientIdRef.current ) {
+				const clientId = parentClientIdRef.current;
+				parentClientIdRef.current = null;
 
-			return () => window.clearTimeout( timerId );
+				const timerId = window.setTimeout( () => {
+					const btn = document.querySelector(
+						`.editor-list-view-sidebar [data-block="${ clientId }"] .block-editor-list-view-block__menu`
+					);
+					btn?.focus();
+				}, 0 );
+
+				return () => window.clearTimeout( timerId );
+			}
 		}
 	}, [ insertedBlock ] );
-
-	useEffect( () => {
-		if ( ! insertedBlock?.clientId ) {
-			setPopoverAnchor( null );
-			return;
-		}
-
-		const selector = `.editor-list-view-sidebar [data-block="${ insertedBlock.clientId }"] .block-editor-list-view-block__menu`;
-
-		// Check if the element is already in the DOM.
-		const existing = document.querySelector( selector );
-		if ( existing ) {
-			setPopoverAnchor( existing );
-			return;
-		}
-
-		// Otherwise, observe the list view sidebar until the block
-		// row is rendered.
-		const sidebar = document.querySelector( '.editor-list-view-sidebar' );
-		if ( ! sidebar ) {
-			return;
-		}
-
-		const observer = new window.MutationObserver( () => {
-			const element = document.querySelector( selector );
-			if ( element ) {
-				observer.disconnect();
-				setPopoverAnchor( element );
-			}
-		} );
-
-		observer.observe( sidebar, {
-			childList: true,
-			subtree: true,
-		} );
-
-		return () => observer.disconnect();
-	}, [ insertedBlock?.clientId ] );
 
 	return (
 		<>
@@ -185,7 +156,7 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 						navigationBlockClientId={ navigationBlockClientId }
 						{ ...fillProps }
 						setInsertedBlock={ setInsertedBlock }
-						setReturnFocusClientId={ setReturnFocusClientId }
+						setParentClientId={ setParentClientId }
 					/>
 				) }
 			</BlockSettingsMenuControls>
@@ -209,7 +180,7 @@ function AddSubmenuFillContent( {
 	expand,
 	expandedState,
 	setInsertedBlock,
-	setReturnFocusClientId,
+	setParentClientId,
 } ) {
 	const isChildOfThisNav = useSelect(
 		( select ) => {
@@ -246,7 +217,7 @@ function AddSubmenuFillContent( {
 			expand={ expand }
 			expandedState={ expandedState }
 			setInsertedBlock={ setInsertedBlock }
-			setReturnFocusClientId={ setReturnFocusClientId }
+			setParentClientId={ setParentClientId }
 		/>
 	);
 }
