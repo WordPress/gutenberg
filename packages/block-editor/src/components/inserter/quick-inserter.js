@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, SearchControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -62,12 +62,6 @@ export default function QuickInserter( {
 	);
 
 	const showSearch = hasSearch && blockTypes.length > SEARCH_THRESHOLD;
-
-	useEffect( () => {
-		if ( setInserterIsOpened ) {
-			setInserterIsOpened( false );
-		}
-	}, [ setInserterIsOpened ] );
 
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected.
