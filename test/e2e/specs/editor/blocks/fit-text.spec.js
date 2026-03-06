@@ -30,11 +30,11 @@ test.describe( 'Fit Text', () => {
 				.click();
 			await page
 				.getByRole( 'menu', { name: 'Typography options' } )
-				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
+				.getByRole( 'menuitemcheckbox', { name: 'Show Fit-width text' } )
 				.click();
 
 			const fitTextToggle = page.getByRole( 'checkbox', {
-				name: 'Fit text',
+				name: 'Fit-width text',
 			} );
 
 			await fitTextToggle.click();
@@ -73,7 +73,7 @@ test.describe( 'Fit Text', () => {
 			await editor.openDocumentSettingsSidebar();
 
 			const fitTextToggle = page.getByRole( 'checkbox', {
-				name: 'Fit text',
+				name: 'Fit-width text',
 			} );
 
 			await fitTextToggle.click();
@@ -106,7 +106,7 @@ test.describe( 'Fit Text', () => {
 				.click();
 
 			const fitTextToggle = page.getByRole( 'checkbox', {
-				name: 'Fit text',
+				name: 'Fit-width text',
 			} );
 
 			await fitTextToggle.click();
@@ -287,7 +287,7 @@ test.describe( 'Fit Text', () => {
 				.click();
 
 			const fitTextToggle = page.getByRole( 'checkbox', {
-				name: 'Fit text',
+				name: 'Fit-width text',
 			} );
 
 			await fitTextToggle.click();
