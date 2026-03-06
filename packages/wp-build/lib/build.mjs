@@ -113,12 +113,31 @@ const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
 
+const toBool = (value) => {
+	if (value === undefined) return undefined;
+	if (typeof value === 'boolean') return value;
+	return value === 'true';
+};
+
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
+<<<<<<< HEAD
 		Boolean( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
 	),
 	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
 		Boolean( process.env.npm_package_config_IS_WORDPRESS_CORE )
+=======
+		Boolean(
+			toBool(process.env.IS_GUTENBERG_PLUGIN) ??
+			toBool(process.env.npm_package_config_IS_GUTENBERG_PLUGIN)
+		)
+	),
+	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
+		Boolean(
+			toBool(process.env.IS_WORDPRESS_CORE) ??
+			toBool(process.env.npm_package_config_IS_WORDPRESS_CORE)
+		)
+>>>>>>> eba463549f1 (Ensure boolean casting is more reliable.)
 	),
 };
 const getDefine = ( scriptDebug ) => ( {
@@ -2142,7 +2161,13 @@ async function main() {
 			},
 			'base-url': {
 				type: 'string',
+<<<<<<< HEAD
 				default: 'plugin_dir_url( __FILE__ )',
+=======
+				default: toBool( process.env.IS_WORDPRESS_CORE )
+					? 'includes_url( \'build/\' )'
+					: 'plugin_dir_url( __FILE__ )',
+>>>>>>> eba463549f1 (Ensure boolean casting is more reliable.)
 			},
 		},
 		strict: false,
