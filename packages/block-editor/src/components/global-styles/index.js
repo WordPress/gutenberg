@@ -23,4 +23,4 @@ export {
 	default as BackgroundPanel,
 	useHasBackgroundPanel,
 } from './background-panel';
-export { default as StateControl, useHasStates } from './state-control';
+export { default as StateControl } from './state-control';
