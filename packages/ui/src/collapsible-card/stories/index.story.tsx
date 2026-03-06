@@ -25,7 +25,7 @@ function Text( { children }: { children: React.ReactNode } ) {
 }
 
 const meta: Meta< typeof CollapsibleCard.Root > = {
-	title: 'Design System/CollapsibleCard',
+	title: 'Design System/Components/CollapsibleCard',
 	component: CollapsibleCard.Root,
 	subcomponents: {
 		'CollapsibleCard.Header': CollapsibleCard.Header,

@@ -24,7 +24,7 @@ function Text( { children }: { children: React.ReactNode } ) {
 }
 
 const meta: Meta< typeof Card.Root > = {
-	title: 'Design System/Card',
+	title: 'Design System/Components/Card',
 	component: Card.Root,
 	subcomponents: {
 		'Card.Header': Card.Header,
