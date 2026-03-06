@@ -425,18 +425,17 @@ function poll(): void {
 				error.status === 429
 			) {
 				roomStates.forEach( ( state, room ) => {
-						state.onStatusChange( {
-							status: 'disconnected',
-							error: {
-								code: 'connection-limit-exceeded',
-								name: 'ConnectionError',
-								message:
-									'This post has reached its maximum number of simultaneous editors.',
-							},
-						} );
-					}
+					state.onStatusChange( {
+						status: 'disconnected',
+						error: {
+							code: 'connection-limit-exceeded',
+							name: 'ConnectionError',
+							message:
+								'This post has reached its maximum number of simultaneous editors.',
+						},
+					} );
 					unregisterRoom( room );
-				}
+				} );
 				return;
 			}
 
