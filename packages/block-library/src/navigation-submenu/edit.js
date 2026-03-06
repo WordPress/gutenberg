@@ -420,6 +420,19 @@ export default function NavigationSubmenuEdit( {
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
+						<div style={ { gridColumn: '1 / -1' } }>
+							<Notice
+								spokenMessage={ null }
+								status="info"
+								isDismissible={ false }
+								className="wp-block-navigation-submenu__global-settings-notice"
+								style={ { margin: 0 } }
+							>
+								{ __(
+									'These settings apply to all submenus within this navigation block.'
+								) }
+							</Notice>
+						</div>
 						<ToolsPanelItem
 							hasValue={ () => submenuVisibility !== 'hover' }
 							label={ __( 'Submenu Visibility' ) }
