@@ -80,6 +80,9 @@ test.describe( 'Site Editor Performance', () => {
 			perfUtils,
 			metrics,
 		} ) => {
+			// Give each iteration enough time since they now share one timeout.
+			test.setTimeout( iterations * 120_000 );
+
 			for ( let i = 1; i <= iterations; i++ ) {
 				// Go to the test draft.
 				await admin.visitSiteEditor( {
@@ -213,6 +216,9 @@ test.describe( 'Site Editor Performance', () => {
 			page,
 			metrics,
 		} ) => {
+			// Give each iteration enough time since they now share one timeout.
+			test.setTimeout( iterations * 120_000 );
+
 			for ( let i = 1; i <= iterations; i++ ) {
 				await admin.visitSiteEditor( {
 					// The old URL is supported in both previous versions and new versions.
