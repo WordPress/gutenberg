@@ -36,13 +36,6 @@ const ACTIONS = [
 		ariaLabel: __( 'Export content guidelines' ),
 	},
 	{
-		slug: 'manage-access',
-		title: __( 'Manage access' ),
-		description: __( 'Control who can access your content guidelines.' ),
-		buttonLabel: __( 'Manage' ),
-		ariaLabel: __( 'Manage access to content guidelines' ),
-	},
-	{
 		slug: 'revert',
 		title: __( 'Revert' ),
 		description: __( 'Use a previous version of your content guidelines.' ),
@@ -92,6 +85,8 @@ export default function ActionsSection() {
 			disabled: isImporting,
 		},
 		export: { onClick: handleExportClick },
+		// TODO: Manage access ACTTION is removed but the route exists for future implementation
+		// without duplicating the work.
 		'manage-access': { onClick: () => goTo( '/manage-access' ) },
 		revert: { onClick: () => goTo( '/revision-history' ) },
 	};
