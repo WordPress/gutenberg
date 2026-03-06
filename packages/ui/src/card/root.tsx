@@ -26,7 +26,7 @@ import type { RootProps } from './types';
  * ```
  */
 export const Root = forwardRef< HTMLDivElement, RootProps >( function Card(
-	{ children, render, ...restProps },
+	{ render, ...restProps },
 	ref
 ) {
 	const mergedClassName = clsx( styles.root, resetStyles[ 'box-sizing' ] );
@@ -35,10 +35,7 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function Card(
 		defaultTagName: 'div',
 		render,
 		ref,
-		props: mergeProps< 'div' >(
-			{ className: mergedClassName, children },
-			restProps
-		),
+		props: mergeProps< 'div' >( { className: mergedClassName }, restProps ),
 	} );
 
 	return element;
