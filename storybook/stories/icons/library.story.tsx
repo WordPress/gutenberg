@@ -26,7 +26,6 @@ import manifest from '../../../packages/icons/src/manifest.json';
 
 const { Icon, ...availableIcons } = iconsPackage;
 
-// Keywords for icon search (mirrored from packages/icons/src/icon/stories/keywords.ts)
 const keywords: Partial< Record< string, string[] > > = {
 	archive: [ 'folder' ],
 	atSymbol: [ 'email' ],
