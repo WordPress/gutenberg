@@ -1,7 +1,7 @@
 // @ts-expect-error No exported types
 import { useStyleOverride } from '@wordpress/block-editor';
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 
 import Avatar from '../collaborators-presence/avatar';
 import { AVATAR_IFRAME_STYLES } from './avatar-iframe-styles';
@@ -58,10 +58,11 @@ export function Overlay( {
 
 	// Detect layout changes on overlay (e.g. turning on "Show Template") and window
 	// resizes, and re-render the cursors and block highlights.
-	const resizeObserverRef = useResizeObserver( () => {
+	const onResize = useCallback( () => {
 		rerenderCursorsAfterDelay();
 		rerenderHighlightsAfterDelay();
-	} );
+	}, [ rerenderCursorsAfterDelay, rerenderHighlightsAfterDelay ] );
+	const resizeObserverRef = useResizeObserver( onResize );
 
 	// Trigger the initial position computation on mount.
 	useEffect( () => {
