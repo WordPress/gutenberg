@@ -56,7 +56,7 @@
 
 	// Offset the layout based on the width of the ⌘K label. This ensures the
 	// title is centrally aligned.
-	&.has-shortcut-padding {
+	body.is-fullscreen-mode & {
 		@include break-medium() {
 			padding-left: $grid-unit-30;
 		}
@@ -94,8 +94,10 @@
 	min-width: $grid-unit-30;
 	display: none;
 
-	@include break-medium() {
-		display: initial;
+	body.is-fullscreen-mode & {
+		@include break-medium() {
+			display: initial;
+		}
 	}
 }
 

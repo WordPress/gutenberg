@@ -19,7 +19,6 @@ import { chevronLeftSmall, chevronRightSmall, layout } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
-import { store as preferencesStore } from '@wordpress/preferences';
 import { useRef, useEffect } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -76,7 +75,6 @@ export default function DocumentBar( props ) {
 		onNavigateToPreviousEntityRecord,
 		isTemplatePreview,
 		stylesCanvasTitle,
-		isFullscreenActive,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostType,
@@ -119,11 +117,6 @@ export default function DocumentBar( props ) {
 			_showStylebook
 		);
 
-		const _isFullscreenActive = select( preferencesStore ).get(
-			'core/edit-post',
-			'fullscreenMode'
-		);
-
 		return {
 			postId: _postId,
 			postType: _postType,
@@ -142,7 +135,6 @@ export default function DocumentBar( props ) {
 				getEditorSettings().onNavigateToPreviousEntityRecord,
 			isTemplatePreview: getRenderingMode() === 'template-locked',
 			stylesCanvasTitle: _stylesCanvasTitle,
-			isFullscreenActive: _isFullscreenActive,
 		};
 	}, [] );
 
@@ -222,9 +214,7 @@ export default function DocumentBar( props ) {
 					size="compact"
 				>
 					<motion.div
-						className={ clsx( 'editor-document-bar__title', {
-							'has-shortcut-padding': isFullscreenActive,
-						} ) }
+						className="editor-document-bar__title"
 						// Force entry animation when the back button is added or removed.
 						key={ hasBackButton }
 						initial={
@@ -277,11 +267,9 @@ export default function DocumentBar( props ) {
 								) }
 						</Text>
 					</motion.div>
-					{ isFullscreenActive && (
-						<span className="editor-document-bar__shortcut">
-							{ displayShortcut.primary( 'k' ) }
-						</span>
-					) }
+					<span className="editor-document-bar__shortcut">
+						{ displayShortcut.primary( 'k' ) }
+					</span>
 				</Button>
 			) }
 		</div>
