@@ -250,6 +250,7 @@ jobs:
             contents: read
             packages: write
         if: |
+            always() &&
             needs.build.outputs.job_status == 'success'
 
         steps:
