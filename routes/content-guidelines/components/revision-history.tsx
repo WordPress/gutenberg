@@ -23,6 +23,7 @@ import { STORE_NAME } from '../store';
 import {
 	fetchContentGuidelinesRevisions,
 	restoreContentGuidelinesRevision,
+	fetchContentGuidelines,
 } from '../api';
 import type { ContentGuidelinesRevision } from '../types';
 
@@ -152,6 +153,7 @@ export default function RevisionHistory() {
 				guidelinesId,
 				revisionToRestore.id
 			);
+			await fetchContentGuidelines();
 			setRevisionToRestore( null );
 			setRefetchKey( ( k ) => k + 1 );
 		} finally {
