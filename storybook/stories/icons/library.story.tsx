@@ -172,7 +172,13 @@ const LibraryExample = (): ReactElement => {
 											icon={ icon }
 											size={ Number( size ) }
 										/>
-										<span style={ { fontSize: 11 } }>
+										<span
+											style={ {
+												fontSize: 11,
+												textAlign: 'center',
+												wordBreak: 'break-all',
+											} }
+										>
 											{ name }
 										</span>
 									</div>
