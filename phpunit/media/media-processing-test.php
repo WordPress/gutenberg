@@ -207,7 +207,64 @@ HTML;
 	 * @covers ::gutenberg_is_client_side_media_processing_enabled
 	 */
 	public function test_client_side_media_processing_enabled_by_default_in_plugin() {
+		// No UA set in CLI context, so the browser gate does not apply.
 		$this->assertTrue( gutenberg_is_client_side_media_processing_enabled() );
+	}
+
+	/**
+	 * Tests that client-side media processing is disabled for Firefox.
+	 *
+	 * @covers ::gutenberg_disable_media_processing_for_non_chromium
+	 */
+	public function test_disabled_for_firefox() {
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0';
+		$this->assertFalse( gutenberg_is_client_side_media_processing_enabled() );
+		unset( $_SERVER['HTTP_USER_AGENT'] );
+	}
+
+	/**
+	 * Tests that client-side media processing is disabled for Safari.
+	 *
+	 * @covers ::gutenberg_disable_media_processing_for_non_chromium
+	 */
+	public function test_disabled_for_safari() {
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15';
+		$this->assertFalse( gutenberg_is_client_side_media_processing_enabled() );
+		unset( $_SERVER['HTTP_USER_AGENT'] );
+	}
+
+	/**
+	 * Tests that client-side media processing is enabled for Chrome.
+	 *
+	 * @covers ::gutenberg_disable_media_processing_for_non_chromium
+	 */
+	public function test_enabled_for_chrome() {
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36';
+		$this->assertTrue( gutenberg_is_client_side_media_processing_enabled() );
+		unset( $_SERVER['HTTP_USER_AGENT'] );
+	}
+
+	/**
+	 * Tests that client-side media processing is enabled with no User-Agent (CLI/cron).
+	 *
+	 * @covers ::gutenberg_disable_media_processing_for_non_chromium
+	 */
+	public function test_enabled_with_no_user_agent() {
+		unset( $_SERVER['HTTP_USER_AGENT'] );
+		$this->assertTrue( gutenberg_is_client_side_media_processing_enabled() );
+	}
+
+	/**
+	 * Tests that the browser gate respects a prior __return_false filter.
+	 *
+	 * @covers ::gutenberg_disable_media_processing_for_non_chromium
+	 */
+	public function test_respects_prior_return_false_filter() {
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36';
+		add_filter( 'wp_client_side_media_processing_enabled', '__return_false', 5 );
+		$this->assertFalse( gutenberg_is_client_side_media_processing_enabled() );
+		remove_filter( 'wp_client_side_media_processing_enabled', '__return_false', 5 );
+		unset( $_SERVER['HTTP_USER_AGENT'] );
 	}
 
 	/**

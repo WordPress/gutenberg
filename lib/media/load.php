@@ -220,23 +220,6 @@ function gutenberg_filter_mod_rewrite_rules( string $rules ): string {
 add_filter( 'mod_rewrite_rules', 'gutenberg_filter_mod_rewrite_rules' );
 
 /**
- * Returns the major Chromium version from the current request's User-Agent.
- *
- * Matches all Chromium-based browsers (Chrome, Edge, Opera, Brave).
- *
- * @return int|null The major Chromium version, or null if not a Chromium browser.
- */
-function gutenberg_get_chromium_major_version(): ?int {
-	if ( empty( $_SERVER['HTTP_USER_AGENT'] ) ) {
-		return null;
-	}
-	if ( preg_match( '/Chrome\/(\d+)/', $_SERVER['HTTP_USER_AGENT'], $matches ) ) {
-		return (int) $matches[1];
-	}
-	return null;
-}
-
-/**
  * Enables cross-origin isolation in the block editor.
  *
  * Required for enabling SharedArrayBuffer for WebAssembly-based
