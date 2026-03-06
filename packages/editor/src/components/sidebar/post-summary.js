@@ -45,7 +45,14 @@ import { unlock } from '../../lock-unlock';
 const PANEL_NAME = 'post-status';
 
 export default function PostSummary( { onActionPerformed } ) {
-	if ( window?.__experimentalDataFormInspector ) {
+	const postType = useSelect(
+		( select ) => select( editorStore ).getCurrentPostType(),
+		[]
+	);
+	if (
+		window?.__experimentalDataFormInspector &&
+		[ 'page', 'post' ].includes( postType )
+	) {
 		return <DataFormPostSummary onActionPerformed={ onActionPerformed } />;
 	}
 	return <ClassicPostSummary onActionPerformed={ onActionPerformed } />;

@@ -168,7 +168,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Replaces the bespoke editor inspector panels with a unified DataForm-based implementation, matching the QuickEdit experience.', 'gutenberg' ),
+			'label' => __( 'Replaces the bespoke editor inspector panels with a unified DataForm-based implementation for Pages and Posts, matching the QuickEdit experience.', 'gutenberg' ),
 			'id'    => 'gutenberg-dataform-inspector',
 		)
 	);
