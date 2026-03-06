@@ -150,7 +150,7 @@ The `data-wp-key` directive works like the `key` prop in React or Preact — it 
 </ul>
 ```
 
-Use a value that uniquely identifies each element across navigations, such as a post ID or slug — not an array index, which would change if items are reordered.
+Use a value that uniquely identifies each element across navigations, such as a post ID or slug — not an array index, which would change if items are reordered. Common places where `data-wp-key` is needed include pagination controls, image galleries, and any query-driven list where items can change between pages.
 
 #### Do not mutate the DOM outside the Interactivity API
 
