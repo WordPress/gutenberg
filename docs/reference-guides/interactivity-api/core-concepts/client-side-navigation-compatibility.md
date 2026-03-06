@@ -162,8 +162,7 @@ For cases where you need to update the inner HTML of an element or make other im
 <div
 	data-wp-interactive="myPlugin"
 	data-wp-watch="callbacks.updateContent"
->
-</div>
+></div>
 ```
 
 ```js
@@ -204,12 +203,12 @@ Before marking your block as compatible with client-side navigation, verify the 
 
 ## Quick reference
 
-| Block type | Compatible? | Action |
-|---|---|---|
-| Non-interactive block (no JS) | Yes | Set `clientNavigation` to `true` |
-| Interactive block using the Interactivity API | Yes (if guidelines are followed) | Set `interactivity` to `true` |
-| Interactive block using other libraries | No | Omit or set `clientNavigation` to `false` |
-| Block injecting or modifying CSS at runtime | No | Use server-rendered styles or `data-wp-class` |
-| Block using `wp_unique_id()` for CSS selectors | No | Use `wp_unique_id_from_values()` |
-| Block mutating the DOM outside the Interactivity API | No | Use directives or `data-wp-watch` |
-| Block using regular scripts (not script modules) | No | Migrate to script modules |
+| Block type                                           | Compatible?                      | Action                                        |
+| ---------------------------------------------------- | -------------------------------- | --------------------------------------------- |
+| Non-interactive block (no JS)                        | Yes                              | Set `clientNavigation` to `true`              |
+| Interactive block using the Interactivity API        | Yes (if guidelines are followed) | Set `interactivity` to `true`                 |
+| Interactive block using other libraries              | No                               | Omit or set `clientNavigation` to `false`     |
+| Block injecting or modifying CSS at runtime          | No                               | Use server-rendered styles or `data-wp-class` |
+| Block using `wp_unique_id()` for CSS selectors       | No                               | Use `wp_unique_id_from_values()`              |
+| Block mutating the DOM outside the Interactivity API | No                               | Use directives or `data-wp-watch`             |
+| Block using regular scripts (not script modules)     | No                               | Migrate to script modules                     |
