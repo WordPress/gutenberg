@@ -711,9 +711,9 @@ class WP_Navigation_Block_Renderer {
 				$overlay_blocks_html = block_core_navigation_add_directives_to_overlay_close( $tags );
 			}
 			// Images in the overlay are hidden until the menu is opened. Pre-set
-			// loading="lazy" so that when wp_filter_content_tags() processes the
+			// fetchpriority="low" so that when wp_filter_content_tags() processes the
 			// parent template part, it sees the attribute already present and calls
-			// wp_get_loading_optimization_attributes with loading="lazy", which both prevents
+			// wp_get_loading_optimization_attributes() with fetchpriority="low", which both prevents
 			// fetchpriority="high" from being added and stops the LCP counter from being incremented.
 			$overlay_blocks_html = block_core_navigation_set_overlay_image_lazy_loading( $overlay_blocks_html );
 		}
