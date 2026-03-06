@@ -1,7 +1,9 @@
-import { forwardRef } from 'react';
-import { useRender, mergeProps } from '@base-ui/react';
-import type { ContentProps } from './types';
+import { mergeProps, useRender } from '@base-ui/react';
+
+import { forwardRef } from '@wordpress/element';
+
 import styles from './style.module.css';
+import type { ContentProps } from './types';
 
 /**
  * The main content area of the card.

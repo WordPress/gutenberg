@@ -1,7 +1,9 @@
-import { forwardRef } from 'react';
-import { useRender, mergeProps } from '@base-ui/react';
-import type { TitleProps } from './types';
+import { mergeProps, useRender } from '@base-ui/react';
+
+import { forwardRef } from '@wordpress/element';
+
 import styles from './style.module.css';
+import type { TitleProps } from './types';
 
 /**
  * The title for a card. Renders as a `<div>` by default — use the `render`

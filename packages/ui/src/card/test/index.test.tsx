@@ -1,5 +1,7 @@
-import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
+
+import { createRef } from '@wordpress/element';
+
 import * as Card from '../index';
 
 describe( 'Card', () => {

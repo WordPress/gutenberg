@@ -1,7 +1,9 @@
-import { forwardRef } from 'react';
 import { Collapsible } from '@base-ui/react/collapsible';
-import type { ContentProps } from './types';
+
+import { forwardRef } from '@wordpress/element';
+
 import * as Card from '../card';
+import type { ContentProps } from './types';
 
 /**
  * The collapsible content area of the card. Hidden when collapsed,

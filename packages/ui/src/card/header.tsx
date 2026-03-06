@@ -1,7 +1,9 @@
-import { forwardRef } from 'react';
-import { useRender, mergeProps } from '@base-ui/react';
-import type { HeaderProps } from './types';
+import { mergeProps, useRender } from '@base-ui/react';
+
+import { forwardRef } from '@wordpress/element';
+
 import styles from './style.module.css';
+import type { HeaderProps } from './types';
 
 /**
  * A structural container for the card's heading area, typically containing

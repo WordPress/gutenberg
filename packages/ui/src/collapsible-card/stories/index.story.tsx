@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Card, CollapsibleCard } from '..';
+import * as Card from '../../card';
+import * as CollapsibleCard from '../index';
 
 /**
  * Temporary text component for story examples. This will be replaced by an

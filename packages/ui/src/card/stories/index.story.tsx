@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Card } from '..';
+import * as Card from '../index';
 
 /**
  * Temporary text component for story examples. This will be replaced by an

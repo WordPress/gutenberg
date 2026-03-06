@@ -1,7 +1,9 @@
-import { forwardRef } from 'react';
 import { Collapsible } from '@base-ui/react/collapsible';
-import type { RootProps } from './types';
+
+import { forwardRef } from '@wordpress/element';
+
 import * as Card from '../card';
+import type { RootProps } from './types';
 
 /**
  * A card that can be expanded and collapsed. When collapsed, only the

@@ -1,6 +1,8 @@
-import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
+import { createRef } from '@wordpress/element';
+
 import * as Card from '../../card';
 import * as CollapsibleCard from '../index';
 
