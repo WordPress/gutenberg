@@ -120,11 +120,6 @@ export default {
 	'--wpds-dimension-gap-sm': '8px',
 	'--wpds-dimension-gap-xl': '24px',
 	'--wpds-dimension-gap-xs': '4px',
-	'--wpds-dimension-measure-lg': '720px',
-	'--wpds-dimension-measure-md': '560px',
-	'--wpds-dimension-measure-sm': '400px',
-	'--wpds-dimension-measure-xl': '960px',
-	'--wpds-dimension-measure-xs': '320px',
 	'--wpds-dimension-padding-2xl': '24px',
 	'--wpds-dimension-padding-3xl': '32px',
 	'--wpds-dimension-padding-lg': '16px',
@@ -132,6 +127,11 @@ export default {
 	'--wpds-dimension-padding-sm': '8px',
 	'--wpds-dimension-padding-xl': '20px',
 	'--wpds-dimension-padding-xs': '4px',
+	'--wpds-dimension-width-lg': '720px',
+	'--wpds-dimension-width-md': '560px',
+	'--wpds-dimension-width-sm': '400px',
+	'--wpds-dimension-width-xl': '960px',
+	'--wpds-dimension-width-xs': '320px',
 	'--wpds-elevation-lg':
 		'0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012, 0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005',
 	'--wpds-elevation-md':

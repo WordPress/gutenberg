@@ -117,9 +117,9 @@ export default defineConfig( {
 					patterns: [ /^wpds-dimension\.gap\.([^.]+)$/ ],
 				},
 				{
-					name: 'MeasureSize',
-					description: 'Size scale for measure (width) tokens.',
-					patterns: [ /^wpds-dimension\.measure\.([^.]+)$/ ],
+					name: 'WidthSize',
+					description: 'Size scale for width tokens.',
+					patterns: [ /^wpds-dimension\.width\.([^.]+)$/ ],
 				},
 				{
 					name: 'BorderRadiusSize',

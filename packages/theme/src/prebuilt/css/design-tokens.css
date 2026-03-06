@@ -109,11 +109,6 @@
 	--wpds-dimension-gap-sm: 8px; /* Small gap */
 	--wpds-dimension-gap-xl: 24px; /* Extra large gap */
 	--wpds-dimension-gap-xs: 4px; /* Extra small gap */
-	--wpds-dimension-measure-lg: 720px; /* Large measure (width) */
-	--wpds-dimension-measure-md: 560px; /* Medium measure (width) */
-	--wpds-dimension-measure-sm: 400px; /* Small measure (width) */
-	--wpds-dimension-measure-xl: 960px; /* Extra large measure (width) */
-	--wpds-dimension-measure-xs: 320px; /* Extra small measure (width) */
 	--wpds-dimension-padding-2xl: 24px; /* 2x extra large padding */
 	--wpds-dimension-padding-3xl: 32px; /* 3x extra large padding */
 	--wpds-dimension-padding-lg: 16px; /* Large padding */
@@ -121,6 +116,11 @@
 	--wpds-dimension-padding-sm: 8px; /* Small padding */
 	--wpds-dimension-padding-xl: 20px; /* Extra large padding */
 	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
+	--wpds-dimension-width-lg: 720px; /* Large width */
+	--wpds-dimension-width-md: 560px; /* Medium width */
+	--wpds-dimension-width-sm: 400px; /* Small width */
+	--wpds-dimension-width-xl: 960px; /* Extra large width */
+	--wpds-dimension-width-xs: 320px; /* Extra small width */
 	--wpds-elevation-lg: 0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012,
 		0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005; /* For components that confirm decisions or handle necessary interruptions. Example: Modals. */
 	--wpds-elevation-md: 0 2px 3px 0 #0000000d, 0 4px 5px 0 #0000000a,
@@ -193,11 +193,6 @@
 	--wpds-dimension-gap-sm: 8px; /* Small gap */
 	--wpds-dimension-gap-xl: 24px; /* Extra large gap */
 	--wpds-dimension-gap-xs: 4px; /* Extra small gap */
-	--wpds-dimension-measure-lg: 720px; /* Large measure (width) */
-	--wpds-dimension-measure-md: 560px; /* Medium measure (width) */
-	--wpds-dimension-measure-sm: 400px; /* Small measure (width) */
-	--wpds-dimension-measure-xl: 960px; /* Extra large measure (width) */
-	--wpds-dimension-measure-xs: 320px; /* Extra small measure (width) */
 	--wpds-dimension-padding-2xl: 24px; /* 2x extra large padding */
 	--wpds-dimension-padding-3xl: 32px; /* 3x extra large padding */
 	--wpds-dimension-padding-lg: 16px; /* Large padding */
@@ -205,6 +200,11 @@
 	--wpds-dimension-padding-sm: 8px; /* Small padding */
 	--wpds-dimension-padding-xl: 20px; /* Extra large padding */
 	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
+	--wpds-dimension-width-lg: 720px; /* Large width */
+	--wpds-dimension-width-md: 560px; /* Medium width */
+	--wpds-dimension-width-sm: 400px; /* Small width */
+	--wpds-dimension-width-xl: 960px; /* Extra large width */
+	--wpds-dimension-width-xs: 320px; /* Extra small width */
 }
 
 @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {

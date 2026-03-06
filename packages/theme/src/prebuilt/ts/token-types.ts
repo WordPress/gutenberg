@@ -14,9 +14,9 @@ export type PaddingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 export type GapSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 
 /**
- * Size scale for measure (width) tokens.
+ * Size scale for width tokens.
  */
-export type MeasureSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type WidthSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 /**
  * Size scale for border radius tokens.

@@ -207,38 +207,38 @@
 				}
 			}
 		},
-		"measure": {
+		"width": {
 			"xs": {
 				"$value": { "value": 320, "unit": "px" },
-				"$description": "Extra small measure (width)",
+				"$description": "Extra small width",
 				"$extensions": {
 					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
 				}
 			},
 			"sm": {
 				"$value": { "value": 400, "unit": "px" },
-				"$description": "Small measure (width)",
+				"$description": "Small width",
 				"$extensions": {
 					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
 				}
 			},
 			"md": {
 				"$value": { "value": 560, "unit": "px" },
-				"$description": "Medium measure (width)",
+				"$description": "Medium width",
 				"$extensions": {
 					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
 				}
 			},
 			"lg": {
 				"$value": { "value": 720, "unit": "px" },
-				"$description": "Large measure (width)",
+				"$description": "Large width",
 				"$extensions": {
 					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
 				}
 			},
 			"xl": {
 				"$value": { "value": 960, "unit": "px" },
-				"$description": "Extra large measure (width)",
+				"$description": "Extra large width",
 				"$extensions": {
 					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
 				}
