@@ -1132,7 +1132,6 @@ function block_core_navigation_add_directives_to_overlay_close( $tags ) {
 function block_core_navigation_set_overlay_image_lazy_loading( $overlay_blocks_html ) {
 	$tags = new WP_HTML_Tag_Processor( $overlay_blocks_html );
 	while ( $tags->next_tag( 'IMG' ) ) {
-		$tags->set_attribute( 'loading', 'lazy' );
 		$tags->set_attribute( 'fetchpriority', 'low' );
 	}
 	return $tags->get_updated_html();
