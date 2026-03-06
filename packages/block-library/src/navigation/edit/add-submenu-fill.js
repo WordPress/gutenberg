@@ -5,7 +5,7 @@ import { createBlock } from '@wordpress/blocks';
 import { addSubmenu } from '@wordpress/icons';
 import { MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockSettingsMenuControls,
@@ -29,7 +29,8 @@ function AddSubmenuItem( {
 	expand,
 	expandedState,
 	setInsertedBlock,
-	setParentClientId,
+	toggleElement,
+	toggleElementRef,
 } ) {
 	const { insertBlock, replaceBlock, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
@@ -95,10 +96,10 @@ function AddSubmenuItem( {
 					expand( expandClientId );
 				}
 
-				// Track the parent block so the link popover can anchor
-				// to its row and focus returns there when it closes.
-				if ( setParentClientId ) {
-					setParentClientId( expandClientId );
+				// Store the toggle button element so the link popover
+				// can anchor to it and focus returns there on close.
+				if ( toggleElementRef ) {
+					toggleElementRef.current = toggleElement;
 				}
 
 				onClose();
@@ -111,40 +112,22 @@ function AddSubmenuItem( {
 
 export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
-	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
-	const parentClientIdRef = useRef( null );
+	const toggleElementRef = useRef( null );
 
-	const setParentClientId = useCallback( ( id ) => {
-		parentClientIdRef.current = id;
-	}, [] );
-
-	// When insertedBlock changes, find the parent block's Options button
-	// to use as the popover anchor. When the popover closes (insertedBlock
-	// becomes null), return focus to that button. Focus is deferred to the
-	// next event loop tick so it runs after the Popover's own focus-return
-	// logic.
+	// When the link popover closes (insertedBlock becomes null),
+	// return focus to the toggle button that opened it. Deferred to
+	// the next event loop tick so it runs after the Popover's own
+	// focus-return logic.
 	useEffect( () => {
-		if ( insertedBlock && parentClientIdRef.current ) {
-			const btn = document.querySelector(
-				`.editor-list-view-sidebar [data-block="${ parentClientIdRef.current }"] .block-editor-list-view-block__menu`
-			);
-			setPopoverAnchor( btn );
-		} else {
-			setPopoverAnchor( null );
+		if ( ! insertedBlock && toggleElementRef.current ) {
+			const element = toggleElementRef.current;
+			toggleElementRef.current = null;
 
-			if ( parentClientIdRef.current ) {
-				const clientId = parentClientIdRef.current;
-				parentClientIdRef.current = null;
+			const timerId = window.setTimeout( () => {
+				element?.focus();
+			}, 0 );
 
-				const timerId = window.setTimeout( () => {
-					const btn = document.querySelector(
-						`.editor-list-view-sidebar [data-block="${ clientId }"] .block-editor-list-view-block__menu`
-					);
-					btn?.focus();
-				}, 0 );
-
-				return () => window.clearTimeout( timerId );
-			}
+			return () => window.clearTimeout( timerId );
 		}
 	}, [ insertedBlock ] );
 
@@ -156,16 +139,16 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 						navigationBlockClientId={ navigationBlockClientId }
 						{ ...fillProps }
 						setInsertedBlock={ setInsertedBlock }
-						setParentClientId={ setParentClientId }
+						toggleElementRef={ toggleElementRef }
 					/>
 				) }
 			</BlockSettingsMenuControls>
-			{ insertedBlock && popoverAnchor && (
+			{ insertedBlock && toggleElementRef.current && (
 				<NavigationLinkUI
 					block={ insertedBlock }
 					insertedBlock={ insertedBlock }
 					setInsertedBlock={ setInsertedBlock }
-					anchor={ popoverAnchor }
+					anchor={ toggleElementRef.current }
 				/>
 			) }
 		</>
@@ -180,7 +163,8 @@ function AddSubmenuFillContent( {
 	expand,
 	expandedState,
 	setInsertedBlock,
-	setParentClientId,
+	toggleElement,
+	toggleElementRef,
 } ) {
 	const isChildOfThisNav = useSelect(
 		( select ) => {
@@ -217,7 +201,8 @@ function AddSubmenuFillContent( {
 			expand={ expand }
 			expandedState={ expandedState }
 			setInsertedBlock={ setInsertedBlock }
-			setParentClientId={ setParentClientId }
+			toggleElement={ toggleElement }
+			toggleElementRef={ toggleElementRef }
 		/>
 	);
 }

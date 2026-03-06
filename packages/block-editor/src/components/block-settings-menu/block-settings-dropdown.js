@@ -9,10 +9,15 @@ import {
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
-import { Children, cloneElement } from '@wordpress/element';
+import {
+	Children,
+	cloneElement,
+	useCallback,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { pipe, useCopyToClipboard } from '@wordpress/compose';
+import { pipe, useCopyToClipboard, useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -78,11 +83,21 @@ export function BlockSettingsDropdown( {
 	expand,
 	expandedState,
 	setInsertedBlock,
+	toggleProps,
 	...props
 } ) {
 	// Get the client id of the current block for this menu, if one is set.
 	const count = clientIds.length;
 	const firstBlockClientId = clientIds[ 0 ];
+
+	// Capture the toggle button element so fills can use it as a popover anchor.
+	const [ toggleElement, setToggleElement ] = useState( null );
+	const toggleRef = useCallback( ( node ) => setToggleElement( node ), [] );
+	const mergedToggleRef = useMergeRefs( [ toggleRef, toggleProps?.ref ] );
+	const mergedToggleProps = {
+		...toggleProps,
+		ref: mergedToggleRef,
+	};
 
 	const {
 		firstParentClientId,
@@ -246,6 +261,7 @@ export function BlockSettingsDropdown( {
 						popoverProps={ POPOVER_PROPS }
 						noIcons
 						{ ...props }
+						toggleProps={ mergedToggleProps }
 					>
 						{ ( { onClose } ) => (
 							<>
@@ -385,6 +401,7 @@ export function BlockSettingsDropdown( {
 										expand,
 										expandedState,
 										setInsertedBlock,
+										toggleElement,
 									} }
 									clientIds={ clientIds }
 								/>
