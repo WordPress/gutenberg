@@ -1,6 +1,5 @@
 import clsx from 'clsx';
-import type { MouseEvent } from 'react';
-import { forwardRef, useCallback, useRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { chevronDown, chevronUp } from '@wordpress/icons';
 import * as Card from '../card';
@@ -20,38 +19,24 @@ import type { HeaderProps } from './types';
  */
 export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 	function CollapsibleCardHeader(
-		{ children, className, onClick, ...restProps },
+		{ children, className, ...restProps },
 		ref
 	) {
-		const triggerRef = useRef< HTMLButtonElement >( null );
-
-		const handleHeaderClick = useCallback(
-			( event: MouseEvent< HTMLDivElement > ) => {
-				const trigger = triggerRef.current;
-				if (
-					trigger &&
-					event.target instanceof Node &&
-					! trigger.contains( event.target )
-				) {
-					trigger.click();
-				}
-
-				onClick?.( event );
-			},
-			[ onClick ]
-		);
-
 		return (
 			<Card.Header
 				ref={ ref }
 				className={ clsx( styles.header, className ) }
-				onClick={ handleHeaderClick }
 				{ ...restProps }
 			>
+				<Collapsible.Trigger
+					className={ styles[ 'header-background-trigger' ] }
+					render={ <div /> }
+					nativeButton={ false }
+					tabIndex={ -1 }
+				/>
 				<div className={ styles[ 'header-content' ] }>{ children }</div>
 				<div className={ styles[ 'header-trigger-wrapper' ] }>
 					<Collapsible.Trigger
-						ref={ triggerRef }
 						render={ ( props ) => (
 							<IconButton
 								{ ...props }
