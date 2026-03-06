@@ -1,23 +1,14 @@
 /**
- * External dependencies
- */
-import { useCommandState } from 'cmdk';
-
-/**
  * WordPress dependencies
  */
 import {
 	useSelect,
 	useDispatch,
 	select as globalSelect,
+	dispatch,
 } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { useCallback, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import {
-	store as keyboardShortcutsStore,
-	useShortcut,
-} from '@wordpress/keyboard-shortcuts';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -26,71 +17,44 @@ import { store as commandsStore } from '../store';
 
 const MAX_RECENTLY_SAVED = 30;
 const MAX_RECENTLY_DISPLAYED = 5;
+const EMPTY_SET = new Set();
 
-export function useRecentCommands() {
-	const { set: setPreference } = useDispatch( preferencesStore );
-	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
+export function recordUsage( name ) {
+	const current =
+		globalSelect( preferencesStore ).get(
+			'core/commands',
+			'recentlyUsed'
+		) ?? [];
+	const next = [ name, ...current.filter( ( n ) => n !== name ) ].slice(
+		0,
+		MAX_RECENTLY_SAVED
+	);
+	dispatch( preferencesStore ).set( 'core/commands', 'recentlyUsed', next );
+}
+
+export function useLoaderCollector( hook, name, filterNames, onResolved ) {
+	const { setLoaderLoading } = useDispatch( commandsStore );
+	const { isLoading: loading, commands = [] } = hook( { search: '' } ) ?? {};
 
 	useEffect( () => {
-		registerShortcut( {
-			name: 'core/commands/remove-recent',
-			category: 'global',
-			description: __( 'Remove from recent commands.' ),
-			keyCombination: {
-				modifier: 'shift',
-				character: 'Backspace',
-			},
-		} );
-	}, [ registerShortcut ] );
+		setLoaderLoading( name, loading );
+	}, [ setLoaderLoading, name, loading ] );
 
-	const recordUsage = useCallback(
-		( name ) => {
-			const current =
-				globalSelect( preferencesStore ).get(
-					'core/commands',
-					'recentlyUsed'
-				) ?? [];
-			const next = [
-				name,
-				...current.filter( ( n ) => n !== name ),
-			].slice( 0, MAX_RECENTLY_SAVED );
-			setPreference( 'core/commands', 'recentlyUsed', next );
-		},
-		[ setPreference ]
-	);
+	const filtered = filterNames
+		? commands.filter( ( c ) => filterNames.has( c.name ) )
+		: commands;
 
-	const removeFromRecent = useCallback(
-		( commandName ) => {
-			const current =
-				globalSelect( preferencesStore ).get(
-					'core/commands',
-					'recentlyUsed'
-				) ?? [];
-			const next = current.filter( ( n ) => n !== commandName );
-			setPreference( 'core/commands', 'recentlyUsed', next );
-		},
-		[ setPreference ]
-	);
+	useEffect( () => {
+		onResolved( name, filtered );
+	}, [ onResolved, name, filtered ] );
 
-	return { recordUsage, removeFromRecent };
+	// Clear this loader's entries when it unmounts.
+	useEffect( () => {
+		return () => onResolved( name, [] );
+	}, [ onResolved, name ] );
 }
 
-export function useRemoveRecentShortcut() {
-	const _value = useCommandState( ( state ) => state.value );
-	const { removeFromRecent } = useRecentCommands();
-
-	useShortcut( 'core/commands/remove-recent', ( event ) => {
-		if ( ! _value?.startsWith( 'recent-' ) ) {
-			return;
-		}
-
-		event.preventDefault();
-		const commandName = _value.slice( 'recent-'.length );
-		removeFromRecent( commandName );
-	} );
-}
-
-export function useRecentCommandsData() {
+export function useRecentCommands() {
 	const {
 		contextualCommands,
 		staticCommands,
@@ -112,23 +76,55 @@ export function useRecentCommandsData() {
 		};
 	}, [] );
 
+	const [ resolvedMap, setResolvedMap ] = useState( () => new Map() );
+
+	const onResolved = useCallback( ( loaderName, cmds ) => {
+		setResolvedMap( ( prev ) => {
+			const prevCmds = prev.get( loaderName );
+			if (
+				prevCmds &&
+				prevCmds.length === cmds.length &&
+				prevCmds.every( ( c, i ) => c.name === cmds[ i ].name )
+			) {
+				return prev;
+			}
+			const next = new Map( prev );
+			next.set( loaderName, cmds );
+			return next;
+		} );
+	}, [] );
+
+	const { recentNames, recentSet } = useMemo( () => {
+		const names = recentlyUsedNames.slice( 0, MAX_RECENTLY_DISPLAYED );
+		return { recentNames: names, recentSet: new Set( names ) };
+	}, [ recentlyUsedNames ] );
+
 	if ( ! recentlyUsedNames.length ) {
 		return {
 			commands: [],
 			loaders: [],
-			recentNames: [],
-			recentSet: new Set(),
+			recentSet: EMPTY_SET,
+			onResolved,
 		};
 	}
 
-	const allCommands = [ ...contextualCommands, ...staticCommands ];
+	const allStaticCommands = [ ...contextualCommands, ...staticCommands ];
 	const loaders = [ ...contextualLoaders, ...staticLoaders ];
 
-	const recentNames = recentlyUsedNames.slice( 0, MAX_RECENTLY_DISPLAYED );
-	const recentSet = new Set( recentNames );
+	// Merge static commands with loader-resolved commands.
+	const allByName = new Map();
+	allStaticCommands.forEach( ( c ) => allByName.set( c.name, c ) );
+	for ( const cmds of resolvedMap.values() ) {
+		cmds.forEach( ( c ) => {
+			if ( ! allByName.has( c.name ) ) {
+				allByName.set( c.name, c );
+			}
+		} );
+	}
+	// Return in recency order.
 	const commands = recentNames
-		.map( ( name ) => allCommands.find( ( c ) => c.name === name ) )
+		.map( ( n ) => allByName.get( n ) )
 		.filter( Boolean );
 
-	return { commands, loaders, recentNames, recentSet };
+	return { commands, loaders, recentSet, onResolved };
 }

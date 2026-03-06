@@ -34,9 +34,9 @@ import { Icon, search as inputIcon, arrowRight } from '@wordpress/icons';
 import { store as commandsStore } from '../store';
 import { unlock } from '../lock-unlock';
 import {
+	recordUsage,
+	useLoaderCollector,
 	useRecentCommands,
-	useRecentCommandsData,
-	useRemoveRecentShortcut,
 } from './use-recent-commands';
 
 const { withIgnoreIMEEvents } = unlock( componentsPrivateApis );
@@ -87,7 +87,6 @@ export function isValidIcon( icon ) {
 
 function CommandItem( { command, search, category, valuePrefix } ) {
 	const { close } = useDispatch( commandsStore );
-	const { recordUsage } = useRecentCommands();
 	const commandCategory = category ?? command.category;
 	const label = command.searchLabel ?? command.label;
 	const value = valuePrefix ? `${ valuePrefix }${ command.name }` : label;
@@ -136,41 +135,20 @@ function CommandItem( { command, search, category, valuePrefix } ) {
 	);
 }
 
-function CommandMenuLoader( {
-	name,
-	search,
-	hook,
-	category,
-	filterNames,
-	sortOrder,
-	valuePrefix,
-} ) {
+function CommandMenuLoader( { name, search, hook, category, valuePrefix } ) {
 	const { setLoaderLoading } = useDispatch( commandsStore );
 	const { isLoading: loading, commands = [] } = hook( { search } ) ?? {};
 	useEffect( () => {
 		setLoaderLoading( name, loading );
 	}, [ setLoaderLoading, name, loading ] );
 
-	let filtered = filterNames
-		? commands.filter( ( command ) => filterNames.has( command.name ) )
-		: commands;
-
-	if ( sortOrder ) {
-		const orderIndex = new Map( sortOrder.map( ( n, i ) => [ n, i ] ) );
-		filtered = [ ...filtered ].sort(
-			( a, b ) =>
-				( orderIndex.get( a.name ) ?? Infinity ) -
-				( orderIndex.get( b.name ) ?? Infinity )
-		);
-	}
-
-	if ( ! filtered.length ) {
+	if ( ! commands.length ) {
 		return null;
 	}
 
 	return (
 		<>
-			{ filtered.map( ( command ) => (
+			{ commands.map( ( command ) => (
 				<CommandItem
 					key={ command.name }
 					command={ command }
@@ -206,14 +184,7 @@ function CommandMenuLoaderWrapper( { hook, ...props } ) {
 	);
 }
 
-function CommandList( {
-	search,
-	commands,
-	loaders,
-	valuePrefix,
-	filterNames,
-	sortOrder,
-} ) {
+function CommandList( { search, commands, loaders, valuePrefix } ) {
 	return (
 		<>
 			{ commands.map( ( command ) => (
@@ -232,17 +203,19 @@ function CommandList( {
 					hook={ loader.hook }
 					category={ loader.category }
 					valuePrefix={ valuePrefix }
-					filterNames={ filterNames }
-					sortOrder={ sortOrder }
 				/>
 			) ) }
 		</>
 	);
 }
 
+function RecentLoaderRunner( { hook, name, filterNames, onResolved } ) {
+	useLoaderCollector( hook, name, filterNames, onResolved );
+	return null;
+}
+
 function RecentGroup() {
-	const { commands, loaders, recentNames, recentSet } =
-		useRecentCommandsData();
+	const { commands, loaders, recentSet, onResolved } = useRecentCommands();
 
 	if ( ! commands.length && ! loaders.length ) {
 		return null;
@@ -250,13 +223,23 @@ function RecentGroup() {
 
 	return (
 		<Command.Group heading={ __( 'Recent' ) }>
-			<CommandList
-				commands={ commands }
-				loaders={ loaders }
-				valuePrefix="recent-"
-				filterNames={ recentSet }
-				sortOrder={ recentNames }
-			/>
+			{ loaders.map( ( loader ) => (
+				<RecentLoaderRunner
+					key={ loader.name }
+					name={ loader.name }
+					hook={ loader.hook }
+					filterNames={ recentSet }
+					onResolved={ onResolved }
+				/>
+			) ) }
+			{ commands.map( ( command ) => (
+				<CommandItem
+					key={ command.name }
+					command={ command }
+					search=""
+					valuePrefix="recent-"
+				/>
+			) ) }
 		</Command.Group>
 	);
 }
@@ -308,7 +291,6 @@ function ResultsGroup( { search } ) {
 function CommandInput( { search, setSearch } ) {
 	const commandMenuInput = useRef();
 	const _value = useCommandState( ( state ) => state.value );
-	useRemoveRecentShortcut();
 	const selectedItemId = _value ? `${ ITEM_ID_PREFIX }${ _value }` : null;
 	useEffect( () => {
 		// Focus the command palette input when mounting the modal.
