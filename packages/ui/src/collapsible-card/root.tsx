@@ -25,30 +25,13 @@ import type { RootProps } from './types';
  * ```
  */
 export const Root = forwardRef< HTMLDivElement, RootProps >(
-	function CollapsibleCardRoot(
-		{
-			children,
-			open,
-			defaultOpen,
-			onOpenChange,
-			disabled,
-			render,
-			...restProps
-		},
-		ref
-	) {
+	function CollapsibleCardRoot( { render, ...restProps }, ref ) {
 		return (
 			<Collapsible.Root
 				ref={ ref }
-				open={ open }
-				defaultOpen={ defaultOpen }
-				onOpenChange={ onOpenChange }
-				disabled={ disabled }
 				render={ <Card.Root render={ render } /> }
 				{ ...restProps }
-			>
-				{ children }
-			</Collapsible.Root>
+			/>
 		);
 	}
 );

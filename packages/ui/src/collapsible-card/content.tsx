@@ -8,19 +8,13 @@ import type { ContentProps } from './types';
  * visible when expanded.
  */
 export const Content = forwardRef< HTMLDivElement, ContentProps >(
-	function CollapsibleCardContent(
-		{ children, className, render, ...restProps },
-		ref
-	) {
+	function CollapsibleCardContent( { render, ...restProps }, ref ) {
 		return (
 			<Collapsible.Panel
 				ref={ ref }
-				className={ className }
 				render={ <Card.Content render={ render } /> }
 				{ ...restProps }
-			>
-				{ children }
-			</Collapsible.Panel>
+			/>
 		);
 	}
 );
