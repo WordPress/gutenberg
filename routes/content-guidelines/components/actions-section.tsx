@@ -10,13 +10,24 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useState } from '@wordpress/element';
+import { Notice } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import { importContentGuidelines, exportContentGuidelines } from '../api';
+
+function getErrorMessage( error: unknown ): string {
+	if ( error instanceof Error ) {
+		return error.message;
+	}
+	if ( typeof error === 'object' && error !== null && 'message' in error ) {
+		return String( ( error as { message: unknown } ).message );
+	}
+	return __( 'Unknown error.' );
+}
 
 const ACTIONS = [
 	{
@@ -48,6 +59,7 @@ export default function ActionsSection() {
 	const { goTo } = useNavigator();
 	const fileInputRef = useRef< HTMLInputElement >( null );
 	const [ isImporting, setIsImporting ] = useState( false );
+	const [ error, setError ] = useState< string | null >( null );
 
 	function handleImportClick() {
 		fileInputRef.current?.click();
@@ -64,19 +76,43 @@ export default function ActionsSection() {
 		setIsImporting( true );
 		try {
 			await importContentGuidelines( file );
+			setError( null );
+		} catch ( importError ) {
+			setError(
+				sprintf(
+					/* translators: %s: Error message. */
+					__( 'We ran into a problem importing your guidelines: %s' ),
+					getErrorMessage( importError )
+				)
+			);
 		} finally {
 			setIsImporting( false );
 		}
 	}
 
-	function handleExportClick() {
-		exportContentGuidelines();
+	async function handleExportClick() {
+		try {
+			exportContentGuidelines();
+			setError( null );
+		} catch ( exportError ) {
+			setError(
+				sprintf(
+					/* translators: %s: Error message. */
+					__( 'We ran into a problem exporting your guidelines: %s' ),
+					getErrorMessage( exportError )
+				)
+			);
+		}
 	}
 
 	const buttonProps: Partial<
 		Record<
 			string,
-			{ onClick: () => void; isBusy?: boolean; disabled?: boolean }
+			{
+				onClick: () => void | Promise< void >;
+				isBusy?: boolean;
+				disabled?: boolean;
+			}
 		>
 	> = {
 		import: {
@@ -100,6 +136,17 @@ export default function ActionsSection() {
 				onChange={ handleFileChange }
 				style={ { display: 'none' } }
 			/>
+			{ error && (
+				<Notice.Root
+					intent="warning"
+					className="content-guidelines__actions-notice"
+				>
+					<Notice.Title className="content-guidelines__actions-notice-title">
+						{ error }
+					</Notice.Title>
+					<Notice.CloseIcon onClick={ () => setError( null ) } />
+				</Notice.Root>
+			) }
 			<Card className="content-guidelines__actions-card">
 				{ /*
 				 * Disable reason: The `list` ARIA role is redundant but
