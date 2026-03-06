@@ -1,5 +1,3 @@
-/* @jsx createElement */
-
 /**
  * WordPress dependencies
  */
@@ -7,30 +5,22 @@ import {
 	Button,
 	ComboboxControl,
 	Modal,
-	TextControl,
 	TextareaControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Notice } from '@wordpress/ui';
-import { createElement, useMemo, useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	privateApis as blocksPrivateApis,
-	store as blocksStore,
-} from '@wordpress/blocks';
-import { store as noticesStore } from '@wordpress/notices';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { saveContentGuidelines } from '../api';
 import { STORE_NAME } from '../store';
-import { unlock } from '../../lock-unlock';
 import './block-guideline-modal.scss';
-
-const { isContentBlock } = unlock( blocksPrivateApis );
 
 interface BlockGuidelineModalProps {
 	closeModal: () => void;
@@ -41,6 +31,7 @@ export default function BlockGuidelineModal( {
 	closeModal,
 	initialBlock,
 }: BlockGuidelineModalProps ) {
+	const [ guidelineText, setGuidelineText ] = useState( '' );
 	const [ selectedBlock, setSelectedBlock ] = useState< string | undefined >(
 		initialBlock
 	);
@@ -48,16 +39,21 @@ export default function BlockGuidelineModal( {
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ error, setError ] = useState< string | null >( null );
 
-	const blockGuidelines = useSelect(
+	const currentGuideline = useSelect(
 		// @ts-ignore
-		( select ) => select( STORE_NAME ).getBlockGuidelines(),
-		[]
+		( select ) => select( STORE_NAME ).getBlockGuideline( selectedBlock ),
+		[ selectedBlock ]
 	);
 
-	const isEditing = !! initialBlock;
+	const isEditing = !! currentGuideline;
 
-	const currentGuideline = blockGuidelines[ selectedBlock ] ?? '';
-	const [ guidelineText, setGuidelineText ] = useState( currentGuideline );
+	useEffect( () => {
+		setSelectedBlock( initialBlock );
+	}, [ initialBlock ] );
+
+	useEffect( () => {
+		setGuidelineText( currentGuideline ?? '' );
+	}, [ currentGuideline ] );
 
 	const blockOptions = useSelect(
 		// @ts-ignore
@@ -65,59 +61,37 @@ export default function BlockGuidelineModal( {
 		[]
 	);
 
-	const availableBlockOptions = useMemo( () => {
-		const set = new Set( Object.keys( blockGuidelines ) );
-		if ( initialBlock ) {
-			set.delete( initialBlock );
-		}
-		if ( selectedBlock ) {
-			set.delete( selectedBlock );
-		}
-
-		return blockOptions
-			.filter(
-				( block ) =>
-					isContentBlock( block.name ) && ! set.has( block.name )
-			)
-			.map( ( block ) => ( {
-				value: block.name,
-				label: block.title,
-			} ) );
-	}, [ blockGuidelines, blockOptions, initialBlock, selectedBlock ] );
-
-	const selectedBlockLabel = useMemo(
-		() =>
-			blockOptions.find( ( block ) => block.name === selectedBlock )
-				?.title || '',
-		[ blockOptions, selectedBlock ]
-	);
-
 	const { setBlockGuideline } = useDispatch( STORE_NAME );
-	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const handleSave = ( value: string ) => {
-		value = value.trim();
-		if ( ! selectedBlock ) {
+	const handleAddGuideline = () => {
+		if ( ! selectedBlock || ! guidelineText.trim() ) {
 			return;
 		}
-
 		setIsSaving( true );
-		const oldValue = blockGuidelines[ selectedBlock ];
-		setBlockGuideline( selectedBlock, value );
+		setBlockGuideline( selectedBlock, guidelineText.trim() );
 		saveContentGuidelines()
 			.then( () => {
 				setError( null );
-				createSuccessNotice(
-					value
-						? __( 'Block guideline saved.' )
-						: __( 'Block guideline removed.' ),
-					{ type: 'snackbar' }
-				);
+				closeModal();
+			} )
+			.catch( ( e: Error ) => setError( e.message ) )
+			.finally( () => setIsSaving( false ) );
+	};
+
+	const handleRemoveGuideline = () => {
+		if ( ! selectedBlock ) {
+			return;
+		}
+		setIsSaving( true );
+		setBlockGuideline( selectedBlock, '' );
+		saveContentGuidelines()
+			.then( () => {
+				setError( null );
 				closeModal();
 			} )
 			.catch( ( e: Error ) => {
 				setError( e.message );
-				setBlockGuideline( selectedBlock, oldValue );
+				setBlockGuideline( selectedBlock, currentGuideline );
 			} )
 			.finally( () => setIsSaving( false ) );
 	};
@@ -142,26 +116,19 @@ export default function BlockGuidelineModal( {
 			onRequestClose={ closeModal }
 		>
 			<VStack spacing={ 4 }>
-				{ isEditing ? (
-					<TextControl
-						__next40pxDefaultSize
-						label={ __( 'Block' ) }
-						value={ selectedBlockLabel }
-						onChange={ () => {} }
-						disabled
-					/>
-				) : (
-					<ComboboxControl
-						__next40pxDefaultSize
-						label={ __( 'Block' ) }
-						options={ availableBlockOptions }
-						value={ selectedBlock }
-						onChange={ ( value ) =>
-							setSelectedBlock( value ?? undefined )
-						}
-						placeholder={ __( 'Search for a block…' ) }
-					/>
-				) }
+				<ComboboxControl
+					__next40pxDefaultSize
+					label={ __( 'Block' ) }
+					options={ blockOptions.map( ( block ) => ( {
+						value: block.name,
+						label: block.title,
+					} ) ) }
+					value={ selectedBlock }
+					onChange={ ( value ) =>
+						setSelectedBlock( value ?? undefined )
+					}
+					placeholder={ __( 'Search for a block…' ) }
+				/>
 				<TextareaControl
 					label={ __( 'Guideline text' ) }
 					value={ guidelineText }
@@ -191,21 +158,17 @@ export default function BlockGuidelineModal( {
 						<Button
 							variant="tertiary"
 							isDestructive
-							// We need to pass an empty string to remove the guideline.
-							// This is because the API will only remove the guideline if the value is an empty string.
-							onClick={ () => handleSave( '' ) }
+							onClick={ handleRemoveGuideline }
 							disabled={ isSaving }
-							accessibleWhenDisabled
 						>
 							{ __( 'Remove' ) }
 						</Button>
 					) }
 					<Button
 						variant="primary"
-						onClick={ () => handleSave( guidelineText ) }
+						onClick={ handleAddGuideline }
 						disabled={ ! canSubmit || isSaving }
 						isBusy={ isSaving }
-						accessibleWhenDisabled
 					>
 						{ submitButtonLabel }
 					</Button>

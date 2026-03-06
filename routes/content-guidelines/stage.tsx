@@ -17,6 +17,7 @@ import GuidelineAccordion from './components/guideline-accordion';
 import GuidelineAccordionForm from './components/guideline-accordion-form';
 import { fetchContentGuidelines } from './api';
 import BlockGuidelines from './components/block-guidelines';
+import { bootstrapBlockRegistry } from './bootstrap-block-registry';
 
 const GUIDELINE_ITEMS = [
 	{
@@ -63,6 +64,8 @@ function ContentGuidelinesPage() {
 	const [ error, setError ] = useState< string | null >( null );
 
 	useEffect( () => {
+		// Bootstrap Core blocks so block icons are available (e.g. in Block Guidelines).
+		bootstrapBlockRegistry();
 		// Populate the store with the content guidelines.
 		fetchContentGuidelines()
 			.then( () => setError( null ) )

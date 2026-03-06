@@ -1,5 +1,3 @@
-@use "@wordpress/base-styles/variables" as *;
-
 .block-guideline-modal {
 	width: min(100%, 660px);
 
@@ -8,6 +6,6 @@
 	}
 
 	&__actions {
-		margin-top: $grid-unit-10;
+		margin-top: 8px;
 	}
 }
