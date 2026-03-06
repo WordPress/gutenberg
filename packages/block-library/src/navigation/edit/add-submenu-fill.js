@@ -119,14 +119,23 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	}, [] );
 
 	// When the link popover closes (insertedBlock becomes null),
-	// return focus to the parent block's Options button.
+	// return focus to the parent block's Options button. Deferred
+	// to the next event loop tick so it runs after the Popover's
+	// own focus-return logic and any list view focus shifts from
+	// block removal.
 	useEffect( () => {
 		if ( ! insertedBlock && returnFocusClientIdRef.current ) {
-			const btn = document.querySelector(
-				`.editor-list-view-sidebar [data-block="${ returnFocusClientIdRef.current }"] .block-editor-list-view-block__menu`
-			);
-			btn?.focus();
+			const clientId = returnFocusClientIdRef.current;
 			returnFocusClientIdRef.current = null;
+
+			const timerId = window.setTimeout( () => {
+				const btn = document.querySelector(
+					`.editor-list-view-sidebar [data-block="${ clientId }"] .block-editor-list-view-block__menu`
+				);
+				btn?.focus();
+			}, 0 );
+
+			return () => window.clearTimeout( timerId );
 		}
 	}, [ insertedBlock ] );
 
