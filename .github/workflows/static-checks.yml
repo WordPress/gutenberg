@@ -60,13 +60,15 @@ jobs:
               if: ${{ matrix.lint-js || matrix.lint-css }}
               run: echo "date=$(/bin/date -u --date='2 days ago' "+%F")" >> "$GITHUB_OUTPUT"
 
-            - uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+            - name: Configure caching for ESLint
+              uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
               if: ${{ matrix.lint-js }}
               with:
                   path: .cache/eslint/.eslintcache
                   key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-eslint-cache-${{ hashFiles('**/package.json', '**/.eslintignore', '**/.eslintrc.js', '**/.eslint.strict.js') }}
 
-            - uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+            - name: Configure caching for Stylelint
+              uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
               if: ${{ matrix.lint-css }}
               with:
                   path: .cache/.stylelintcache/
