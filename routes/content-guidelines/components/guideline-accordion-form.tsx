@@ -3,7 +3,12 @@
 /**
  * WordPress dependencies
  */
-import { Button, __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	Button,
+	Slot,
+	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { Notice } from '@wordpress/ui';
@@ -116,16 +121,27 @@ export default function GuidelineAccordionForm( {
 						</Notice.Title>
 					</Notice.Root>
 				) }
-				<Button
-					variant="primary"
-					type="submit"
-					className="save-button"
-					disabled={ loading }
-					accessibleWhenDisabled
-					isBusy={ loading }
-				>
-					{ __( 'Save guidelines' ) }
-				</Button>
+				<HStack spacing={ 3 } justify="flex-start">
+					<Button
+						variant="primary"
+						type="submit"
+						className="save-button"
+						disabled={ loading }
+						accessibleWhenDisabled
+						isBusy={ loading }
+					>
+						{ __( 'Save guidelines' ) }
+					</Button>
+					<Slot
+						name={ `ContentGuidelineSectionActions/${ slug }` }
+						fillProps={ {
+							section: slug,
+							content: draft,
+							setContentGuideline: ( text: string ) =>
+								setDraft( text ),
+						} }
+					/>
+				</HStack>
 			</VStack>
 		</form>
 	);

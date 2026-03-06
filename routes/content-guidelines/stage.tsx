@@ -7,6 +7,7 @@ import { Page } from '@wordpress/admin-ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { createElement, useEffect, useState } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
+import { PluginArea } from '@wordpress/plugins';
 import { Notice } from '@wordpress/ui';
 
 /**
@@ -71,47 +72,53 @@ function ContentGuidelinesPage() {
 	}, [] );
 
 	return (
-		<Page
-			title={ __( 'Content guidelines' ) }
-			subTitle={ __(
-				"Set content standards that guide your team, inform plugins, and help AI tools generate content that matches your site's voice and requirements."
-			) }
-		>
-			{ error && (
-				<div className="content-guidelines__content">
-					<Notice.Root intent="error">
-						<Notice.Title>
-							{ sprintf(
-								/* translators: %s: Error message. */
-								__( 'Error loading content guidelines: %s' ),
-								error
-							) }
-						</Notice.Title>
-						<Notice.Description>
-							{ __(
-								'Please try again. If the problem persists, contact support.'
-							) }
-						</Notice.Description>
-					</Notice.Root>
-				</div>
-			) }
-			{ loading ? (
-				<div className="content-guidelines__loading">
-					<Spinner />
-				</div>
-			) : (
-				! error && (
+		<>
+			<Page
+				title={ __( 'Content guidelines' ) }
+				subTitle={ __(
+					"Set content standards that guide your team, inform plugins, and help AI tools generate content that matches your site's voice and requirements."
+				) }
+			>
+				{ error && (
 					<div className="content-guidelines__content">
-						{ /*
-						 * Disable reason: The `list` ARIA role is redundant but
-						 * Safari+VoiceOver won't announce the list otherwise.
-						 */
-						/* eslint-disable jsx-a11y/no-redundant-roles */ }
-						<ul role="list" className="content-guidelines__list">
-							{ GUIDELINE_ITEMS.map( ( item ) => {
-								const contentId = `content-guidelines-${ item.slug }`;
-								const headingId = `content-guidelines-${ item.slug }-heading`;
-								const descriptionId = `content-guidelines-${ item.slug }-description`;
+						<Notice.Root intent="error">
+							<Notice.Title>
+								{ sprintf(
+									/* translators: %s: Error message. */
+									__(
+										'Error loading content guidelines: %s'
+									),
+									error
+								) }
+							</Notice.Title>
+							<Notice.Description>
+								{ __(
+									'Please try again. If the problem persists, contact support.'
+								) }
+							</Notice.Description>
+						</Notice.Root>
+					</div>
+				) }
+				{ loading ? (
+					<div className="content-guidelines__loading">
+						<Spinner />
+					</div>
+				) : (
+					! error && (
+						<div className="content-guidelines__content">
+							{ /*
+							 * Disable reason: The `list` ARIA role is redundant but
+							 * Safari+VoiceOver won't announce the list otherwise.
+							 */
+							/* eslint-disable jsx-a11y/no-redundant-roles */ }
+							<ul
+								role="list"
+								className="content-guidelines__list"
+							>
+								{ GUIDELINE_ITEMS.map( ( item ) => {
+									const contentId = `content-guidelines-${ item.slug }`;
+									const headingId = `content-guidelines-${ item.slug }-heading`;
+									const descriptionId = `content-guidelines-${ item.slug }-description`;
 
 								return (
 									<li
@@ -149,6 +156,8 @@ function ContentGuidelinesPage() {
 				)
 			) }
 		</Page>
+			<PluginArea scope="content-guidelines" />
+		</>
 	);
 }
 
