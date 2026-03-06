@@ -16,6 +16,9 @@ const scheduledDateField: Field< BasePost > = {
 	getValue: ( { item } ) => item.date,
 	setValue: ( { value } ) => ( { date: value } ),
 	isVisible: ( item ) => item.status === 'future',
+	enableHiding: false,
+	enableSorting: false,
+	filterBy: false,
 };
 
 /**
