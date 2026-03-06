@@ -257,13 +257,13 @@ export function FitTextControl( {
 		<InspectorControls group="typography">
 			<ToolsPanelItem
 				hasValue={ () => fitText }
-				label={ __( 'Fit text' ) }
+				label={ __( 'Fit-width text' ) }
 				onDeselect={ () => setAttributes( { fitText: undefined } ) }
 				resetAllFilter={ () => ( { fitText: undefined } ) }
 				panelId={ clientId }
 			>
 				<ToggleControl
-					label={ __( 'Fit text' ) }
+					label={ __( 'Fit-width text' ) }
 					checked={ fitText }
 					onChange={ () => {
 						const newFitText = ! fitText || undefined;
