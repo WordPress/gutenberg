@@ -115,9 +115,13 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	const toggleElementRef = useRef( null );
 
 	// When the link popover closes (insertedBlock becomes null),
-	// return focus to the toggle button that opened it. Deferred to
-	// the next event loop tick so it runs after the Popover's own
-	// focus-return logic.
+	// return focus to the toggle button that opened it.
+	//
+	// setTimeout( …, 0 ) is required because the Popover's
+	// useFocusReturn hook fires during the React commit phase
+	// (via a ref callback) and would move focus away from our
+	// target. Deferring to the next event loop tick ensures our
+	// focus() call runs after useFocusReturn has finished.
 	useEffect( () => {
 		if ( ! insertedBlock && toggleElementRef.current ) {
 			const element = toggleElementRef.current;
