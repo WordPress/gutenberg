@@ -247,7 +247,7 @@ export function useInfiniteScroll( {
 			) {
 				// Check if there's more data to load
 				if ( currentEndPosition < paginationInfo.totalItems ) {
-					const newStartPosition = currentEndPosition - 3;
+					const newStartPosition = currentEndPosition;
 					const newEndPosition = Math.min(
 						newStartPosition + batchSize,
 						paginationInfo.totalItems
@@ -268,7 +268,7 @@ export function useInfiniteScroll( {
 			if ( scrollDirection === 'up' && scrollTop <= TOP_THRESHOLD ) {
 				// Check if there's more data to load
 				if ( currentStartPosition > 1 ) {
-					const newEndPosition = currentStartPosition + 1;
+					const newEndPosition = currentStartPosition;
 					// Round to 1 if we're close to the beginning to avoid tiny batches
 					const calculatedStartPosition = newEndPosition - batchSize;
 					const newStartPosition =
