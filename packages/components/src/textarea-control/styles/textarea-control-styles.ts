@@ -13,23 +13,22 @@ import { CONFIG } from '../../utils';
 import { breakpoint } from '../../utils/breakpoint';
 
 const inputStyleNeutral = css`
-	box-shadow: 0 0 0 transparent;
+	outline-width: 0;
+	outline-style: solid;
+	outline-color: transparent;
+	outline-offset: 1px;
 	border-radius: ${ CONFIG.radiusSmall };
 	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
 
 	@media not ( prefers-reduced-motion ) {
-		transition: box-shadow 0.1s linear;
+		transition: outline 0.1s ease-out;
 	}
 `;
 
 const inputStyleFocus = css`
 	border-color: ${ COLORS.theme.accent };
-	box-shadow: 0 0 0
-		calc( ${ CONFIG.borderWidthFocus } - ${ CONFIG.borderWidth } )
-		${ COLORS.theme.accent };
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
+	outline-width: ${ CONFIG.borderWidthFocus };
+	outline-color: ${ COLORS.theme.accent };
 `;
 
 export const StyledTextarea = styled.textarea`

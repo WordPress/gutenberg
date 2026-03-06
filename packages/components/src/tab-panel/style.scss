@@ -26,7 +26,6 @@
 	&:focus:not(:disabled) {
 		position: relative;
 		box-shadow: none;
-		outline: none;
 	}
 
 	// Tab indicator
@@ -59,44 +58,29 @@
 	}
 
 	// Focus.
-	&::before {
-		content: "";
-		position: absolute;
-		top: $grid-unit-15;
-		right: $grid-unit-15;
-		bottom: $grid-unit-15;
-		left: $grid-unit-15;
-		pointer-events: none;
+	outline-width: 0;
+	outline-style: solid;
+	outline-color: transparent;
+	outline-offset: 1px;
 
-		// Draw the indicator.
-		box-shadow: 0 0 0 0 transparent;
-		border-radius: $radius-small;
-
-		// Animation
-		@media not (prefers-reduced-motion) {
-			transition: all 0.1s linear;
-		}
+	@media not (prefers-reduced-motion) {
+		transition: outline 0.1s ease-out;
 	}
 
-	&:focus-visible::before {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
-
-		// Windows high contrast mode.
-		outline: 2px solid transparent;
+	&:focus-visible {
+		outline-width: var(--wp-admin-border-width-focus);
+		outline-color: $components-color-accent;
 	}
 }
 
 .components-tab-panel__tab-content {
-	&:focus {
-		box-shadow: none;
-		outline: none;
-	}
+	outline-width: 0;
+	outline-style: solid;
+	outline-color: transparent;
+	outline-offset: 1px;
 
 	&:focus-visible {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
-
-		// Windows high contrast mode.
-		outline: 2px solid transparent;
-		outline-offset: 0;
+		outline-width: var(--wp-admin-border-width-focus);
+		outline-color: $components-color-accent;
 	}
 }

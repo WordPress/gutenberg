@@ -16,8 +16,11 @@ import {
 
 import type { Border } from './types';
 
-const focusBoxShadow = css`
-	box-shadow: inset ${ CONFIG.controlBoxShadowFocus };
+const focusOutline = css`
+	outline-width: ${ CONFIG.borderWidthFocus };
+	outline-style: solid;
+	outline-color: ${ COLORS.theme.accent };
+	outline-offset: 1px;
 `;
 
 export const borderControl = css`
@@ -70,10 +73,14 @@ export const borderControlDropdown = css`
 		)() }
 		border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
 
-		&:focus,
 		&:hover:not( :disabled ) {
-			${ focusBoxShadow }
 			border-color: ${ COLORS.ui.borderFocus };
+			z-index: 1;
+			position: relative;
+		}
+
+		&:focus {
+			${ focusOutline }
 			z-index: 1;
 			position: relative;
 		}

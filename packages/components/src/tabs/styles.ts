@@ -272,16 +272,13 @@ export const TabChevron = styled( Icon )`
 `;
 
 export const TabPanel = styled( Ariakit.TabPanel )`
-	&:focus {
-		box-shadow: none;
-		outline: none;
-	}
+	outline-width: 0;
+	outline-style: solid;
+	outline-color: transparent;
+	outline-offset: 1px;
 
 	&[data-focus-visible] {
-		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
-			${ COLORS.theme.accent };
-		// Windows high contrast mode.
-		outline: 2px solid transparent;
-		outline-offset: 0;
+		outline-width: var( --wp-admin-border-width-focus );
+		outline-color: ${ COLORS.theme.accent };
 	}
 `;

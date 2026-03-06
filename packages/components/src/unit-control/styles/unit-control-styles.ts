@@ -29,7 +29,7 @@ export const ValueInput = styled( NumberControl )`
 		}
 
 		${ BackdropUI } {
-			transition: box-shadow 0.1s linear;
+			transition: outline 0.1s ease-out;
 		}
 	}
 `;
@@ -90,8 +90,12 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 		small: css`
 			height: 100%;
 			border: 1px solid transparent;
+			outline-width: 0;
+			outline-style: solid;
+			outline-color: transparent;
+			outline-offset: 1px;
 			transition:
-				box-shadow 0.1s linear,
+				outline 0.1s ease-out,
 				border 0.1s linear;
 
 			${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
@@ -102,10 +106,8 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 
 			&:focus {
 				border: 1px solid ${ COLORS.ui.borderFocus };
-				box-shadow: inset 0 0 0
-					${ CONFIG.borderWidth + ' ' + COLORS.ui.borderFocus };
-				outline-offset: 0;
-				outline: 2px solid transparent;
+				outline-width: ${ CONFIG.borderWidthFocus };
+				outline-color: ${ COLORS.ui.borderFocus };
 				z-index: 1;
 			}
 		`,
@@ -113,17 +115,23 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 			display: flex;
 			justify-content: center;
 			align-items: center;
+			outline-width: 0;
+			outline-style: solid;
+			outline-color: transparent;
+			outline-offset: 1px;
+
+			@media not ( prefers-reduced-motion ) {
+				transition: outline 0.1s ease-out;
+			}
 
 			&:where( :not( :disabled ) ):hover {
-				box-shadow: 0 0 0
-					${ CONFIG.borderWidth + ' ' + COLORS.ui.borderFocus };
-				outline: ${ CONFIG.borderWidth } solid transparent; // For High Contrast Mode
+				outline-width: ${ CONFIG.borderWidth };
+				outline-color: ${ COLORS.ui.borderFocus };
 			}
 
 			&:focus {
-				box-shadow: 0 0 0
-					${ CONFIG.borderWidthFocus + ' ' + COLORS.ui.borderFocus };
-				outline: ${ CONFIG.borderWidthFocus } solid transparent; // For High Contrast Mode
+				outline-width: ${ CONFIG.borderWidthFocus };
+				outline-color: ${ COLORS.ui.borderFocus };
 			}
 		`,
 	};

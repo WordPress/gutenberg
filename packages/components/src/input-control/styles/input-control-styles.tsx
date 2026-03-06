@@ -69,6 +69,14 @@ export const BackdropUI = styled.div< BackdropProps >`
 		position: absolute;
 		right: 0;
 		top: 0;
+		outline-width: 0;
+		outline-style: solid;
+		outline-color: transparent;
+		outline-offset: 1px;
+
+		@media not ( prefers-reduced-motion ) {
+			transition: outline 0.1s ease-out;
+		}
 
 		${ rtl( { paddingLeft: 2 } ) }
 	}
@@ -84,10 +92,8 @@ export const Root = styled( Flex )`
 	&:focus-within:not( :has( :is( ${ Prefix }, ${ Suffix } ):focus-within ) ) {
 		${ BackdropUI } {
 			border-color: ${ COLORS.ui.borderFocus };
-			box-shadow: ${ CONFIG.controlBoxShadowFocus };
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 2px solid transparent;
-			outline-offset: -2px;
+			outline-width: ${ CONFIG.borderWidthFocus };
+			outline-color: ${ COLORS.theme.accent };
 		}
 	}
 `;

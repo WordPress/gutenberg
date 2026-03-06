@@ -153,7 +153,6 @@ const baseItem = css`
 	scroll-margin: ${ CONTENT_WRAPPER_PADDING };
 
 	user-select: none;
-	outline: none;
 
 	&[aria-disabled='true'] {
 		color: ${ COLORS.ui.textDisabled };
@@ -168,12 +167,15 @@ const baseItem = css`
 		color: ${ COLORS.theme.accentInverted };
 	}
 
+	outline-width: 0;
+	outline-style: solid;
+	outline-color: transparent;
+	outline-offset: 1px;
+
 	/* Keyboard focus (focus-visible) */
 	&[data-focus-visible] {
-		box-shadow: 0 0 0 1.5px ${ COLORS.theme.accent };
-
-		/* Only visible in Windows High Contrast mode */
-		outline: 2px solid transparent;
+		outline-width: var( --wp-admin-border-width-focus );
+		outline-color: ${ COLORS.theme.accent };
 	}
 
 	/* Active (ie. pressed, mouse down) */

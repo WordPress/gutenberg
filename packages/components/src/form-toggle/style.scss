@@ -29,11 +29,16 @@ $transition-duration: 0.2s;
 		width: $toggle-width;
 		height: $toggle-height;
 		border-radius: math.div($toggle-height, 2);
+		outline-width: 0;
+		outline-style: solid;
+		outline-color: transparent;
+		outline-offset: 1px;
 
 		@media not (prefers-reduced-motion) {
 			transition:
 				$transition-duration background-color ease,
-				$transition-duration border-color ease;
+				$transition-duration border-color ease,
+				outline 0.1s ease-out;
 		}
 
 		overflow: hidden;

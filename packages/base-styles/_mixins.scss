@@ -137,46 +137,48 @@
  */
 
 @mixin block-toolbar-button-style__focus() {
-	box-shadow: inset 0 0 0 variables.$border-width colors.$white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
+	outline-width: var(--wp-admin-border-width-focus);
+	outline-style: solid;
+	outline-color: var(--wp-admin-theme-color);
+	outline-offset: 1px;
 }
 
 // Tabs, Inputs, Square buttons.
 @mixin input-style__neutral() {
-	box-shadow: 0 0 0 transparent;
+	outline-width: 0;
+	outline-style: solid;
+	outline-color: transparent;
+	outline-offset: 1px;
 	border-radius: variables.$radius-small;
 	border: variables.$border-width solid colors.$gray-600;
 
 	@media not (prefers-reduced-motion) {
-		transition: box-shadow 0.1s linear;
+		transition: outline 0.1s ease-out;
 	}
 }
 
 
 @mixin input-style__focus($accent-color: var(--wp-admin-theme-color)) {
 	border-color: $accent-color;
-	// Expand the default border focus style by .5px to be a total of 1.5px.
-	box-shadow: 0 0 0 0.5px $accent-color;
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
+	outline-width: var(--wp-admin-border-width-focus);
+	outline-style: solid;
+	outline-color: $accent-color;
+	outline-offset: 1px;
 }
 
 @mixin button-style__focus() {
-	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
+	outline-width: var(--wp-admin-border-width-focus);
+	outline-style: solid;
+	outline-color: var(--wp-admin-theme-color);
+	outline-offset: 1px;
 }
 
 
 @mixin button-style-outset__focus($focus-color) {
-	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) colors.$white, 0 0 0 calc(2 * var(--wp-admin-border-width-focus)) $focus-color;
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-	outline-offset: 2px;
+	outline-width: var(--wp-admin-border-width-focus);
+	outline-style: solid;
+	outline-color: $focus-color;
+	outline-offset: 1px;
 }
 
 
@@ -312,10 +314,10 @@
 	@include input-control;
 
 	&:focus {
-		box-shadow: 0 0 0 (variables.$border-width * 2) colors.$white, 0 0 0 (variables.$border-width * 2 + variables.$border-width-focus-fallback) var(--wp-admin-theme-color);
-
-		// Only visible in Windows High Contrast mode.
-		outline: 2px solid transparent;
+		outline-width: var(--wp-admin-border-width-focus);
+		outline-style: solid;
+		outline-color: var(--wp-admin-theme-color);
+		outline-offset: 1px;
 	}
 
 	&:checked {
@@ -379,9 +381,13 @@
 	min-width: variables.$radio-input-size-sm;
 	max-width: variables.$radio-input-size-sm;
 	position: relative;
+	outline-width: 0;
+	outline-style: solid;
+	outline-color: transparent;
+	outline-offset: 1px;
 
 	@media not (prefers-reduced-motion) {
-		transition: box-shadow 0.1s linear;
+		transition: outline 0.1s ease-out;
 	}
 
 	@include break-small() {
@@ -412,10 +418,10 @@
 	}
 
 	&:focus {
-		box-shadow: 0 0 0 (variables.$border-width * 2) colors.$white, 0 0 0 (variables.$border-width * 2 + variables.$border-width-focus-fallback) var(--wp-admin-theme-color);
-
-		// Only visible in Windows High Contrast mode.
-		outline: 2px solid transparent;
+		outline-width: var(--wp-admin-border-width-focus);
+		outline-style: solid;
+		outline-color: var(--wp-admin-theme-color);
+		outline-offset: 1px;
 	}
 
 	&:checked {
@@ -442,7 +448,10 @@
 @mixin link-reset {
 	&:focus {
 		color: var(--wp-admin-theme-color--rgb);
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color, #007cba);
+		outline-width: var(--wp-admin-border-width-focus);
+		outline-style: solid;
+		outline-color: var(--wp-admin-theme-color, #007cba);
+		outline-offset: 1px;
 		border-radius: variables.$radius-small;
 	}
 }
@@ -465,10 +474,10 @@
 
 	&:focus {
 		border-color: var(--wp-admin-theme-color) !important;
-		box-shadow: 0 0 0 (variables.$border-width-focus-fallback - variables.$border-width) var(--wp-admin-theme-color) !important;
-
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline: 2px solid transparent !important;
+		outline-width: var(--wp-admin-border-width-focus) !important;
+		outline-style: solid !important;
+		outline-color: var(--wp-admin-theme-color) !important;
+		outline-offset: 1px !important;
 	}
 }
 

@@ -217,32 +217,28 @@ export const ThumbWrapper = styled.span`
 `;
 
 const thumbFocus = ( { isFocused }: ThumbProps ) => {
-	return isFocused
-		? css`
-				&::before {
-					content: ' ';
-					position: absolute;
-					background-color: ${ COLORS.theme.accent };
-					opacity: 0.4;
-					border-radius: ${ CONFIG.radiusRound };
-					height: ${ thumbSize + 8 }px;
-					width: ${ thumbSize + 8 }px;
-					top: -4px;
-					left: -4px;
+	return css`
+		outline-style: solid;
+		outline-offset: 1px;
+		outline-width: 0;
+		outline-color: transparent;
 
-					@media ( forced-colors: active ) {
-						background: GrayText;
-					}
-				}
-		  `
-		: '';
+		@media not ( prefers-reduced-motion ) {
+			transition: outline 0.1s ease-out;
+		}
+
+		${ isFocused &&
+		css`
+			outline-width: ${ CONFIG.borderWidthFocus };
+			outline-color: ${ COLORS.theme.accent };
+		` }
+	`;
 };
 
 export const Thumb = styled.span< ThumbProps >`
 	align-items: center;
 	border-radius: ${ CONFIG.radiusRound };
 	height: 100%;
-	outline: 0;
 	position: absolute;
 	user-select: none;
 	width: 100%;

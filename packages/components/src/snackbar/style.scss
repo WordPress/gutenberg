@@ -26,8 +26,18 @@
 		width: fit-content;
 	}
 
+	outline-width: 0;
+	outline-style: solid;
+	outline-color: transparent;
+	outline-offset: 1px;
+
+	@media not (prefers-reduced-motion) {
+		transition: outline 0.1s ease-out;
+	}
+
 	&:focus {
-		box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+		outline-width: var(--wp-admin-border-width-focus);
+		outline-color: $components-color-accent;
 	}
 
 	&.components-snackbar-explicit-dismiss {
@@ -57,9 +67,13 @@
 	color: $white;
 	flex-shrink: 0;
 
+	outline-style: solid;
+	outline-color: transparent;
+	outline-offset: 1px;
+
 	&:focus {
-		box-shadow: none;
-		outline: 1px dotted $white;
+		outline-width: var(--wp-admin-border-width-focus);
+		outline-color: $components-color-accent;
 	}
 
 	&:hover {

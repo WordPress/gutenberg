@@ -40,6 +40,7 @@
 		padding-right: $grid-unit-20;
 
 		// Don't show the focus inherited by the Button component.
+		// The toolbar uses ::before for its own focus ring.
 		&:focus:not(:disabled) {
 			box-shadow: none;
 			outline: none;
@@ -57,6 +58,10 @@
 			left: $grid-unit-10;
 			right: $grid-unit-10;
 			z-index: -1;
+			outline-width: 0;
+			outline-style: solid;
+			outline-color: transparent;
+			outline-offset: 1px;
 
 			// Animate in.
 			@media not ( prefers-reduced-motion ) {
@@ -89,6 +94,10 @@
 		// Focus style.
 		&:focus::before {
 			@include block-toolbar-button-style__focus();
+
+			@media not ( prefers-reduced-motion ) {
+				transition: outline 0.1s ease-out;
+			}
 		}
 
 		// Ensure the icon buttons remain square.
