@@ -11,7 +11,7 @@ import {
 } from '@wordpress/components';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { arrowLeft } from '@wordpress/icons';
 import type { View, Field, Action } from '@wordpress/dataviews';
@@ -43,34 +43,6 @@ function formatDate( dateString: string ): string {
 		hour12: true,
 	} ).format( new Date( dateString ) );
 }
-
-const FIELDS: Field< ContentGuidelinesRevision >[] = [
-	{
-		id: 'date',
-		label: __( 'Date' ),
-		getValue: ( { item } ) => formatDate( item.date ),
-		render: ( { item } ) => (
-			<time dateTime={ item.date }>{ formatDate( item.date ) }</time>
-		),
-		enableSorting: false,
-		enableHiding: false,
-		enableGlobalSearch: true,
-	},
-	{
-		id: 'author',
-		label: __( 'User' ),
-		getValue: ( { item } ) =>
-			item._embedded?.author?.[ 0 ]?.name ?? __( 'Unknown' ),
-		render: ( { item } ) => (
-			<span>
-				{ item._embedded?.author?.[ 0 ]?.name ?? __( 'Unknown' ) }
-			</span>
-		),
-		enableSorting: false,
-		enableHiding: false,
-		enableGlobalSearch: true,
-	},
-];
 
 export default function RevisionHistory() {
 	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
@@ -105,10 +77,61 @@ export default function RevisionHistory() {
 			.finally( () => setIsLoading( false ) );
 	}, [ guidelinesId, refetchKey ] );
 
+	const authorElements = useMemo( () => {
+		return [
+			...new Set(
+				revisions.map(
+					( r ) => r._embedded?.author?.[ 0 ]?.name ?? __( 'Unknown' )
+				)
+			),
+		].map( ( name ) => ( { value: name, label: name } ) );
+	}, [ revisions ] );
+
+	const fields = useMemo< Field< ContentGuidelinesRevision >[] >(
+		() => [
+			{
+				id: 'date',
+				type: 'date' as const,
+				label: __( 'Date' ),
+				getValue: ( { item } ) => item.date,
+				render: ( { item } ) => (
+					<time dateTime={ item.date }>
+						{ formatDate( item.date ) }
+					</time>
+				),
+				enableSorting: false,
+				enableHiding: false,
+				filterBy: {
+					operators: [ 'before', 'after', 'between', 'inThePast' ],
+				},
+			},
+			{
+				id: 'author',
+				label: __( 'User' ),
+				getValue: ( { item } ) =>
+					item._embedded?.author?.[ 0 ]?.name ?? __( 'Unknown' ),
+				render: ( { item } ) => (
+					<span>
+						{ item._embedded?.author?.[ 0 ]?.name ??
+							__( 'Unknown' ) }
+					</span>
+				),
+				enableSorting: false,
+				enableHiding: false,
+				enableGlobalSearch: true,
+				elements: authorElements,
+				filterBy: {
+					operators: [ 'isAny', 'isNone' ],
+				},
+			},
+		],
+		[ authorElements ]
+	);
+
 	const { data: displayedRevisions, paginationInfo } = filterSortAndPaginate(
 		revisions,
 		view,
-		FIELDS
+		fields
 	);
 
 	const actions: Action< ContentGuidelinesRevision >[] = [
@@ -155,7 +178,7 @@ export default function RevisionHistory() {
 
 			<DataViews
 				data={ displayedRevisions }
-				fields={ FIELDS }
+				fields={ fields }
 				view={ view }
 				onChangeView={ setView }
 				actions={ actions }
