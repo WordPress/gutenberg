@@ -1,11 +1,9 @@
 import { Collapsible } from '@base-ui/react/collapsible';
 import clsx from 'clsx';
 import type { MouseEvent } from 'react';
-
 import { forwardRef, useCallback, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { chevronDown, chevronUp } from '@wordpress/icons';
-
 import * as Card from '../card';
 import { IconButton } from '../icon-button';
 import styles from './style.module.css';

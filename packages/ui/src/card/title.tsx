@@ -1,7 +1,5 @@
 import { mergeProps, useRender } from '@base-ui/react';
-
 import { forwardRef } from '@wordpress/element';
-
 import styles from './style.module.css';
 import type { TitleProps } from './types';
 

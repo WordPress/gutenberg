@@ -1,8 +1,6 @@
 import { mergeProps, useRender } from '@base-ui/react';
 import clsx from 'clsx';
-
 import { forwardRef } from '@wordpress/element';
-
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
 import type { RootProps } from './types';
