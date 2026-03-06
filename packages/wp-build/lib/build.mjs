@@ -122,8 +122,11 @@ const PAGES = WP_PLUGIN_CONFIG.pages || [];
  * @param {string|boolean|undefined} value The value to cast.
  * @returns {boolean} The typecast value.
  */
-const castBool = (value) => {
-	if (typeof value === 'boolean') return value;
+const castBool = ( value ) => {
+	if ( typeof value === 'boolean' ) {
+		return value;
+	}
+	return [ 'true', '1', 1 ].includes( value?.toLowerCase?.() ?? value );
 };
 
 const baseDefine = {
