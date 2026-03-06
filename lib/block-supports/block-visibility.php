@@ -114,7 +114,7 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 			 * If these values ever become user-defined,
 			 * they should be sanitized and kebab-cased.
 			 */
-			$visibility_class = 'is-block-hidden-on-' . $hidden_viewport_size;
+			$visibility_class = 'is-hidden-on-' . $hidden_viewport_size;
 			$class_names[]    = $visibility_class;
 			$css_rules[]      = array(
 				'selector'     => '.' . $visibility_class,
