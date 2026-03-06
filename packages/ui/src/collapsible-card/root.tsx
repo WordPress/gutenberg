@@ -7,10 +7,10 @@ import type { RootProps } from './types';
 
 /**
  * A card that can be expanded and collapsed. When collapsed, only the
- * header is visible. Wraps Base UI's `Collapsible.Root`.
+ * header is visible.
  *
  * ```jsx
- * import { CollapsibleCard, Card } from '@automattic/design-system';
+ * import { CollapsibleCard, Card } from '@wordpress/ui';
  *
  * function MyComponent() {
  * 	return (

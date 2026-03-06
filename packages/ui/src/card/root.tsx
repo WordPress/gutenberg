@@ -11,7 +11,7 @@ import type { RootProps } from './types';
  * A visually contained surface that groups related content and actions.
  *
  * ```jsx
- * import { Card } from '@automattic/design-system';
+ * import { Card } from '@wordpress/ui';
  *
  * function MyComponent() {
  * 	return (

@@ -12,11 +12,9 @@ import styles from './style.module.css';
 import type { HeaderProps } from './types';
 
 /**
- * The header of a collapsible card. Always visible, with an icon button
- * on the trailing side that toggles the card's content.
- *
- * Clicking anywhere on the header toggles the card — clicks outside the
- * button are forwarded to the trigger programmatically.
+ * The header of a collapsible card. Always visible, and acts as the
+ * toggle trigger — clicking anywhere on it expands or collapses the
+ * card's content.
  */
 export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 	function CollapsibleCardHeader(
