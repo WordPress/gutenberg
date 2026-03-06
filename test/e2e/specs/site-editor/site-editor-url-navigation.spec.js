@@ -47,7 +47,7 @@ test.describe( 'Site editor url navigation', () => {
 		const singleItemPost = page.getByRole( 'button', {
 			name: 'Single item: Post',
 		} );
-		await singleItemPost.waitFor();
+		await expect( singleItemPost ).toBeEnabled();
 		await singleItemPost.click();
 		await page
 			.getByRole( 'button', { name: 'For a specific item' } )
