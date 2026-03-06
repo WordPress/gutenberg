@@ -2,7 +2,7 @@
 
 Client-side navigation (CSN) enables page transitions without a full page reload by updating only the parts of the page that change. For this to work correctly, **every block on the page must be compatible with client-side navigation**. If a single block on the page is not compatible, the Interactivity API will fall back to a full page reload for that navigation, losing all the performance and UX benefits.
 
-This guide explains how to declare that your block is compatible with CSN and what to consider when evaluating compatibility.
+This guide explains what to consider when evaluating compatibility. While the examples focus on blocks, the same principles apply to any code that outputs markup on the front end — including classic PHP themes and plugins.
 
 ## Declaring compatibility in `block.json`
 
@@ -51,9 +51,9 @@ Even if a block appears to work fine with CSN, the compatibility must always be 
 
 ## What makes a block compatible
 
-### Static blocks
+### Non-interactive blocks
 
-Static blocks — those that render HTML without any client-side interactivity — are generally compatible with CSN. Since they don't rely on JavaScript to function, client-side navigation can safely replace their HTML without breaking anything.
+Blocks that render HTML without any client-side interactivity — no JavaScript, no event listeners, no dynamic behavior — are generally compatible with CSN. Since they don't rely on scripts to function, client-side navigation can safely replace their HTML without breaking anything.
 
 However, compatibility must still be declared explicitly in `block.json`. The Interactivity API cannot infer compatibility on its own.
 
@@ -61,17 +61,17 @@ However, compatibility must still be declared explicitly in `block.json`. The In
 
 Blocks that use the Interactivity API for their client-side behavior are designed to work with CSN. The Interactivity API manages DOM updates through a virtual DOM diffing algorithm, ensuring that interactive state is preserved across navigations.
 
-That said, interactive blocks must follow certain practices to remain compatible. See [Ensuring compatibility for interactive blocks](#ensuring-compatibility-for-interactive-blocks) below.
+That said, interactive blocks must follow certain practices to remain compatible. See [Ensuring compatibility](#ensuring-compatibility) for details.
 
-### Blocks using vanilla JS, jQuery, or other frameworks
+### Interactive blocks using other libraries
 
 Blocks that use vanilla JavaScript, jQuery, or any framework other than the Interactivity API for client-side behavior are **not compatible** with CSN. Set `clientNavigation` to `false` (or omit it) for these blocks.
 
 These blocks typically rely on scripts that run once on page load to initialize behavior — attaching event listeners, manipulating the DOM, or setting up widgets. During client-side navigation, the HTML may be replaced, but those initialization scripts won't run again, leaving the block non-functional.
 
-## Ensuring compatibility for interactive blocks
+## Ensuring compatibility
 
-Even blocks built with the Interactivity API need to follow certain guidelines to work correctly with CSN. The sections below are organized by the type of issue: CSS, JavaScript, and HTML.
+Even code built with the Interactivity API needs to follow certain guidelines to work correctly with CSN. The sections below are organized by the type of issue: CSS, JavaScript, and HTML.
 
 ### CSS
 
@@ -91,6 +91,10 @@ Instead, use server-side logic to produce the correct stylesheets, or toggle CSS
 
 CSS selectors (class names, IDs, etc.) must be **stable across navigations**. If a selector changes between page loads, styles may break or apply to the wrong elements after a client-side navigation.
 
+This is especially important for elements **outside router regions**. Since those elements are not replaced during navigation, the incoming page's stylesheets must continue to match them. If both pages share the same template this is usually the case, but mismatches can occur when different templates produce different wrapper elements or class names for the same structural areas.
+
+CSS selectors applied to elements **inside router regions** must also be stable. Since regions are replaced during navigation, the incoming HTML must use the same selectors so that existing stylesheets continue to apply correctly.
+
 A common source of unstable selectors is [`wp_unique_id()`](https://developer.wordpress.org/reference/functions/wp_unique_id/). This function generates sequential IDs (`id-1`, `id-2`, etc.) based on a global counter that resets on each page load. When navigating between two pages, the same block may receive a different ID on each page, causing the CSS selector to no longer match the element.
 
 Instead, use [`wp_unique_id_from_values()`](https://developer.wordpress.org/reference/functions/wp_unique_id_from_values/) (available since WordPress 6.8). This function generates a deterministic hash-based identifier from an array of values, producing the same ID for the same inputs regardless of rendering order:
@@ -108,12 +112,6 @@ $id = wp_unique_id_from_values(
 
 This applies to any selector used in CSS — class names, IDs, or `data-*` attributes used in stylesheets.
 
-#### CSS selectors must match across navigations
-
-When using client-side navigation to navigate between two pages, the HTML elements and their CSS selectors **outside router regions** must match. This is usually the case when both pages share the same template, but mismatches can occur when different templates produce different wrapper elements or class names for the same structural areas.
-
-CSS selectors applied to elements **inside router regions** must also be stable across navigations. Since router regions are the parts of the page that get replaced during navigation, the incoming HTML must use the same selectors so that existing stylesheets continue to apply correctly. If the selectors change — for example, because of dynamically generated class names — styles may break after navigation.
-
 ### JavaScript
 
 #### Use script modules, not regular scripts
@@ -122,7 +120,9 @@ Client-side navigation only supports [script modules](https://make.wordpress.org
 
 Additionally, only **external** script modules (those with a `src` attribute) are processed during client-side navigation. Inline script modules — where the code is written directly inside the `<script>` tag — are not re-executed during navigation.
 
-Script modules that should be loaded during client-side navigation must be registered with the appropriate dependency declaration so that WordPress includes the `loadOnClientNavigation` flag. This happens automatically when a block declares its script module in `block.json` and sets `supports.interactivity.clientNavigation` to `true`.
+Script modules that should be loaded during client-side navigation must be registered with the appropriate dependency declaration so that WordPress includes the `loadOnClientNavigation` flag. For blocks, this happens automatically when the script module is declared in `block.json` and `supports.interactivity.clientNavigation` is set to `true`.
+
+For script modules that don't belong to a block — for example, those enqueued by a classic PHP theme or a plugin — you need to mark them manually by passing `loadOnClientNavigation: true` when registering the module with [`wp_register_script_module()`](https://developer.wordpress.org/reference/functions/wp_register_script_module/).
 
 For more details on how script modules are handled during navigation, see the [Script module handling](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#script-module-handling) section of the Client-Side Navigation guide.
 
@@ -130,7 +130,7 @@ For more details on how script modules are handled during navigation, see the [S
 
 #### Keep consistent HTML structures
 
-The Interactivity API uses Preact under the hood for virtual DOM diffing. When navigating between pages, Preact compares the current and incoming HTML to calculate the minimum set of DOM changes. Inconsistencies between the two can cause elements to be remounted instead of updated, which may result in lost state.
+The Interactivity API uses Preact under the hood for virtual DOM diffing. When navigating between pages, Preact compares the current and incoming HTML to calculate the minimum set of DOM changes. Inconsistencies between the two can cause elements to be remounted instead of updated — which may result in lost state — or cause different elements to be treated as the same node, breaking internal state or preventing lifecycle callbacks (like `data-wp-init` or `data-wp-watch`) from re-executing when they should.
 
 Common issues include:
 
@@ -206,9 +206,9 @@ Before marking your block as compatible with client-side navigation, verify the 
 
 | Block type | Compatible? | Action |
 |---|---|---|
-| Static block (no JS) | Yes | Set `clientNavigation` to `true` |
+| Non-interactive block (no JS) | Yes | Set `clientNavigation` to `true` |
 | Interactive block using the Interactivity API | Yes (if guidelines are followed) | Set `interactivity` to `true` |
-| Block using vanilla JS, jQuery, or other frameworks | No | Omit or set `clientNavigation` to `false` |
+| Interactive block using other libraries | No | Omit or set `clientNavigation` to `false` |
 | Block injecting or modifying CSS at runtime | No | Use server-rendered styles or `data-wp-class` |
 | Block using `wp_unique_id()` for CSS selectors | No | Use `wp_unique_id_from_values()` |
 | Block mutating the DOM outside the Interactivity API | No | Use directives or `data-wp-watch` |
