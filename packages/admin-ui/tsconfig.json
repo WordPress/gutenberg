@@ -5,6 +5,7 @@
 		{ "path": "../components" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },
-		{ "path": "../route" }
+		{ "path": "../route" },
+		{ "path": "../ui" }
 	]
 }
