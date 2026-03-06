@@ -271,7 +271,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					}
 
 					// Limit the number of tabs a single user can open for this post.
-					if ( ! $is_client_tracked && $same_user_client_count >= self::DEFAULT_MAX_CLIENTS_PER_USER ) {
+					if ( ! $is_client_tracked && $same_user_client_count >= $this->get_max_clients_per_user() ) {
 						return new WP_Error(
 							'rest_too_many_requests',
 							__( 'You have reached the maximum number of tabs for this post.', 'gutenberg' ),
@@ -465,6 +465,26 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			 * @param int $max_peers Default maximum peers per room.
 			 */
 			return (int) apply_filters( 'real_time_collaboration_max_peers_per_room', self::DEFAULT_MAX_PEERS_PER_ROOM );
+		}
+
+		/**
+		 * Returns the maximum number of simultaneous clients (tabs) a single
+		 * user may have in one room.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @return int Maximum clients per user per room.
+		 */
+		private function get_max_clients_per_user(): int {
+			/**
+			 * Filters the maximum number of simultaneous clients (tabs) a
+			 * single user may have in a real-time collaboration room.
+			 *
+			 * @since 7.0.0
+			 *
+			 * @param int $max_clients Default maximum clients per user per room.
+			 */
+			return (int) apply_filters( 'real_time_collaboration_max_clients_per_user', self::DEFAULT_MAX_CLIENTS_PER_USER );
 		}
 
 		/**
