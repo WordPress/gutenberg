@@ -51,7 +51,7 @@ function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
 		<HStack alignment="left" spacing={ 0 }>
 			{ !! imageUrl && (
 				<div
-					className={ clsx( 'page-templates-author-field__avatar', {
+					className={ clsx( 'fields-controls__author-avatar', {
 						'is-loaded': isImageLoaded,
 					} ) }
 				>
@@ -63,11 +63,11 @@ function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
 				</div>
 			) }
 			{ ! imageUrl && (
-				<div className="page-templates-author-field__icon">
+				<div className="fields-controls__author-icon">
 					<Icon icon={ authorIcon } />
 				</div>
 			) }
-			<span className="page-templates-author-field__name">{ text }</span>
+			<span className="fields-controls__author-name">{ text }</span>
 		</HStack>
 	);
 }
