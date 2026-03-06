@@ -28,8 +28,7 @@
 	/* Custom vertical gap between header and content */
 	.header + .content {
 		padding-block-start: 0;
-		margin-block-start:
- calc(var(--wp-ui-card-header-content-gap) - var(--wp-ui-card-padding));
+		margin-block-start: calc(var(--wp-ui-card-header-content-gap) - var(--wp-ui-card-padding));
 	}
 
 	.fullbleed {
