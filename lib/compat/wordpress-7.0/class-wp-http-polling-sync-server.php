@@ -48,6 +48,15 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		const DEFAULT_MAX_PEERS_PER_ROOM = 2;
 
 		/**
+		 * Default maximum number of simultaneous clients (tabs) a single
+		 * user may have in one room.
+		 *
+		 * @since 7.0.0
+		 * @var int
+		 */
+		const DEFAULT_MAX_CLIENTS_PER_USER = 2;
+
+		/**
 		 * Sync update type: compaction.
 		 *
 		 * @since 7.0.0
@@ -237,8 +246,9 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				// Enforce peer limit for single-entity rooms when the client
 				// is actively connecting (not sending a disconnect signal).
 				if ( null !== $object_id && null !== $room_awareness ) {
-					$is_already_tracked = false;
-					$other_user_ids     = array();
+					$is_client_tracked      = false;
+					$same_user_client_count = 0;
+					$other_user_ids         = array();
 
 					foreach ( $existing_awareness as $entry ) {
 						if ( $current_time - $entry['updated_at'] >= self::AWARENESS_TIMEOUT ) {
@@ -250,13 +260,28 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 						}
 
 						if ( $wp_user_id === $entry['wp_user_id'] ) {
-							$is_already_tracked = true;
+							if ( $client_id === $entry['client_id'] ) {
+								$is_client_tracked = true;
+							} else {
+								++$same_user_client_count;
+							}
 						} else {
 							$other_user_ids[ $entry['wp_user_id'] ] = true;
 						}
 					}
 
-					if ( ! $is_already_tracked && count( $other_user_ids ) >= $this->get_max_peers_per_room() ) {
+					// Limit the number of tabs a single user can open for this post.
+					if ( ! $is_client_tracked && $same_user_client_count >= self::DEFAULT_MAX_CLIENTS_PER_USER ) {
+						return new WP_Error(
+							'rest_too_many_requests',
+							__( 'You have reached the maximum number of tabs for this post.', 'gutenberg' ),
+							array( 'status' => 429 )
+						);
+					}
+
+					// Limit the total number of unique users in the room.
+					$is_user_tracked = $is_client_tracked || $same_user_client_count > 0;
+					if ( ! $is_user_tracked && count( $other_user_ids ) >= $this->get_max_peers_per_room() ) {
 						return new WP_Error(
 							'rest_too_many_requests',
 							__( 'This post has reached its maximum number of simultaneous editors.', 'gutenberg' ),
