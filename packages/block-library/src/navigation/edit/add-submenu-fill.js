@@ -110,15 +110,37 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 			setPopoverAnchor( null );
 			return;
 		}
-		// Wait for the list view to re-render with the new block
-		// before querying for the DOM element.
-		const rafId = window.requestAnimationFrame( () => {
-			const settingsButton = document.querySelector(
-				`.editor-list-view-sidebar [data-block="${ insertedBlock.clientId }"] .block-editor-list-view-block__menu`
-			);
-			setPopoverAnchor( settingsButton || null );
+
+		const selector = `.editor-list-view-sidebar [data-block="${ insertedBlock.clientId }"] .block-editor-list-view-block__menu`;
+
+		// Check if the element is already in the DOM.
+		const existing = document.querySelector( selector );
+		if ( existing ) {
+			setPopoverAnchor( existing );
+			return;
+		}
+
+		// Otherwise, observe the list view sidebar until the block
+		// row is rendered.
+		const sidebar = document.querySelector( '.editor-list-view-sidebar' );
+		if ( ! sidebar ) {
+			return;
+		}
+
+		const observer = new window.MutationObserver( () => {
+			const element = document.querySelector( selector );
+			if ( element ) {
+				observer.disconnect();
+				setPopoverAnchor( element );
+			}
 		} );
-		return () => window.cancelAnimationFrame( rafId );
+
+		observer.observe( sidebar, {
+			childList: true,
+			subtree: true,
+		} );
+
+		return () => observer.disconnect();
 	}, [ insertedBlock?.clientId ] );
 
 	return (

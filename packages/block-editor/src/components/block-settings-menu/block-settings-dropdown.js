@@ -211,7 +211,7 @@ export function BlockSettingsDropdown( {
 	const shouldShowBlockParentMenuItem =
 		! parentBlockIsSelected && !! firstParentClientId;
 
-	const fills = useSlotFills( BlockSettingsMenuControls.Slot.__unstableName );
+	const fills = useSlotFills( 'BlockSettingsMenuControls' );
 	const hasFills = !! fills?.length;
 
 	return (
@@ -232,8 +232,9 @@ export function BlockSettingsDropdown( {
 				onPasteStyles,
 			} ) => {
 				// Hide the dropdown when there are no actions and no
-				// registered fills. In content-only mode, fills registered
-				// with supportsContentOnly may still need to render.
+				// registered fills. Plugins may register fills even when
+				// Core doesn't render anything. In content-only mode,
+				// fills with supportsContentOnly may still need to render.
 				const isEmpty =
 					! canRemove &&
 					! canDuplicate &&
