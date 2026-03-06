@@ -2,11 +2,12 @@ import {
 	privateApis as coreDataPrivateApis,
 	SelectionType,
 } from '@wordpress/core-data';
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from './get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import { useDebouncedRecompute } from './use-debounced-recompute';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
@@ -52,7 +53,8 @@ export function useRenderCursors(
 	);
 
 	// Bump this counter to force the effect to re-run (e.g. after a layout shift).
-	const [ recomputeToken, setRecomputeToken ] = useState( 0 );
+	const [ recomputeToken, rerenderCursorsAfterDelay ] =
+		useDebouncedRecompute( delayMs );
 
 	// All DOM position computations live inside useEffect.
 	useEffect( () => {
@@ -142,14 +144,6 @@ export function useRenderCursors(
 		sortedUsers,
 		recomputeToken,
 	] );
-
-	// The delayed rerender just bumps state — no direct DOM mutation.
-	const rerenderCursorsAfterDelay = useCallback( () => {
-		const timeout = setTimeout( () => {
-			setRecomputeToken( ( t ) => t + 1 );
-		}, delayMs );
-		return () => clearTimeout( timeout );
-	}, [ delayMs ] );
 
 	return { cursors: cursorPositions, rerenderCursorsAfterDelay };
 }
