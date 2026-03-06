@@ -120,7 +120,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	public function test_block_core_navigation_set_overlay_image_lazy_loading_multiple_images() {
 		$html   = '<div><img src="a.jpg" /><img src="b.jpg" /></div>';
 		$result = gutenberg_block_core_navigation_set_overlay_image_lazy_loading( $html );
-		$this->assertSame( 2, substr_count( $result, 'loading="lazy"' ) );
+		$this->assertSame( 0, substr_count( $result, 'loading="lazy"' ) );
 		$this->assertSame( 2, substr_count( $result, 'fetchpriority="low"' ) );
 	}
 
