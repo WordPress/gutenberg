@@ -163,7 +163,7 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-dataform-inspector',
-		__( 'DataForm Inspector: Use DataForm for the document inspector sidebar', 'gutenberg' ),
+		__( 'Editor Inspector: Use DataForm', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
