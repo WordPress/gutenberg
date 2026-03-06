@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Replace `box-shadow` focus styles with `outline`-based focus rings across all components for consistency, better border-radius inheritance, and automatic forced-colors support ([#76249](https://github.com/WordPress/gutenberg/pull/76249)).
+
 ### Bug Fixes
 
 -   Revert `word-break: break-word` addition ([#76230](https://github.com/WordPress/gutenberg/pull/76230)).
