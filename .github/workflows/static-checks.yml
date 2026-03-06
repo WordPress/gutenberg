@@ -33,6 +33,12 @@ jobs:
                 event: ['${{ github.event_name }}']
                 node: ['20', '22', '24']
                 os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
+
+                include:
+                    # Only generate annotations once.
+                    - node: '24'
+                      os: 'ubuntu-24.04'
+                      annotations: true
                 exclude:
                     # On PRs: Only test Node 20 on Ubuntu and Windows
                     - event: 'pull_request'
@@ -47,14 +53,15 @@ jobs:
                   persist-credentials: false
 
             - name: Use desired version of Node.js
-              uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+              uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
               with:
                   node-version: ${{ matrix.node }}
+                  cache: npm
 
             - name: Pin npm version for consistency
               run: npm install -g npm@10
 
-            - name: Npm install
+            - name: npm install
               # A "full" install is executed, since `npm ci` does not always exit
               # with an error status code if the lock file is inaccurate. This also
               # helps to catch dependencies not being installed with exact version.
@@ -63,8 +70,22 @@ jobs:
               # See: https://github.com/WordPress/gutenberg/pull/39865
               run: npm install
 
-            - name: Lint JavaScript and Styles
-              run: npm run lint
+            - name: Lint package.json files
+              run: npm run lint:pkg-json
+
+            - name: Lint package-lock.json file
+              run: npm run lint:lockfile
+
+            - name: Validate TypeScript config
+              run: npm run lint:tsconfig
+
+            - name: Lint JavaScript
+              if: ${{ matrix.annotations }}
+              run: npm run lint:js -- --format compact
+
+            - name: Lint Styles
+              if: ${{ matrix.annotations }}
+              run: npm run lint:css -- --formatter compact
 
             - name: Type checking
               run: npm run build

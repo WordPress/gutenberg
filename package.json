@@ -32,7 +32,8 @@
 				"experimental": true
 			},
 			"font-library",
-			"options-connectors"
+			"options-connectors",
+			"content-guidelines"
 		]
 	},
 	"config": {
