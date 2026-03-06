@@ -128,20 +128,12 @@ const boolConfigVal = ( value ) => {
 
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
-		Boolean(
-			boolConfigVal( globalThis.IS_GUTENBERG_PLUGIN ) ??
-				boolConfigVal(
-					process.env.npm_package_config_IS_GUTENBERG_PLUGIN
-				)
-		)
+		boolConfigVal( process.env.IS_GUTENBERG_PLUGIN ) ||
+			boolConfigVal( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
 	),
 	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
-		Boolean(
-			boolConfigVal( globalThis.IS_WORDPRESS_CORE ) ??
-				boolConfigVal(
-					process.env.npm_package_config_IS_WORDPRESS_CORE
-				)
-		)
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ||
+			boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE )
 	),
 };
 const getDefine = ( scriptDebug ) => ( {
@@ -344,7 +336,7 @@ function transformPhpContent( content, transforms ) {
 	 * class prefixes, etc.). When building for WordPress Core, it's not
 	 * necessary to perform these steps.
 	 */
-	if ( boolConfigVal( globalThis.IS_WORDPRESS_CORE ) ) {
+	if ( boolConfigVal( process.env.IS_WORDPRESS_CORE ) ) {
 		return content;
 	}
 
@@ -2175,7 +2167,7 @@ async function main() {
 			},
 			'base-url': {
 				type: 'string',
-				default: boolConfigVal( globalThis.IS_WORDPRESS_CORE )
+				default: boolConfigVal( process.env.IS_WORDPRESS_CORE )
 					? "includes_url( 'build/' )"
 					: 'plugin_dir_url( __FILE__ )',
 			},
@@ -2197,3 +2189,5 @@ main().catch( ( error ) => {
 	console.error( '❌ Build failed:', error );
 	process.exit( 1 );
 } );
+
+/* eslint-enable @wordpress/no-wp-process-env, @wordpress/wp-global-usage */

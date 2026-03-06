@@ -292,7 +292,7 @@ jobs:
             - name: Setup ORAS
               uses: oras-project/setup-oras@22ce207df3b08e061f537244349aac6ae1d214f6 # v1.2.4
 
-            # The owner/repository is hard-coded  because capital letters are not allowed when publishing to GitHub
+            # The owner/repository is hard-coded because capital letters are not allowed when publishing to GitHub
             # Container Registry. The organization name is WordPress, so ${{ github.repository }} causes an error.
             # See https://github.com/orgs/community/discussions/27086 for more info.
             - name: Push built plugin .tar.gz file to GitHub Container Registry
