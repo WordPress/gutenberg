@@ -63,7 +63,7 @@ export function useRenderCursors(
 			}
 
 			const overlayRect = overlayElement.getBoundingClientRect();
-			const cursorContext = {
+			const overlayContext = {
 				editorDocument: blockEditorDocument,
 				overlayRect,
 			};
@@ -112,7 +112,7 @@ export function useRenderCursors(
 					selection,
 					start,
 					end,
-					cursorContext
+					overlayContext
 				);
 
 				if ( selectionVisual.coords ) {

@@ -17,7 +17,7 @@ interface CursorCoords {
 }
 
 /** Common parameters passed to cursor/selection computation helpers. */
-interface CursorContext {
+interface OverlayContext {
 	editorDocument: Document;
 	overlayRect: DOMRect;
 }
@@ -31,17 +31,17 @@ export interface SelectionVisual {
 /**
  * Compute cursor coords and optional selection rects for a single user's selection.
  *
- * @param selection     - The selection state from the awareness layer.
- * @param start         - Start position (block clientId + text index).
- * @param end           - End position (only for range selections).
- * @param cursorContext - Shared editor document / overlay references.
+ * @param selection      - The selection state from the awareness layer.
+ * @param start          - Start position (block clientId + text index).
+ * @param end            - End position (only for range selections).
+ * @param overlayContext - Shared editor document / overlay references.
  * @return Cursor coordinates and optional selection rectangles.
  */
 export function computeSelectionVisual(
 	selection: any,
 	start: ResolvedSelection,
 	end: ResolvedSelection | undefined,
-	cursorContext: CursorContext
+	overlayContext: OverlayContext
 ): SelectionVisual {
 	if (
 		selection.type === SelectionType.None ||
@@ -51,40 +51,40 @@ export function computeSelectionVisual(
 	}
 
 	if ( selection.type === SelectionType.Cursor ) {
-		return computeCursorOnly( start, cursorContext );
+		return computeCursorOnly( start, overlayContext );
 	}
 
 	// SelectionInOneBlock or SelectionInMultipleBlocks.
 	if ( ! end ) {
 		return {};
 	}
-	return computeTextSelection( selection, start, end, cursorContext );
+	return computeTextSelection( selection, start, end, overlayContext );
 }
 
 /**
  * Compute cursor coordinates for a simple cursor (no highlighted text).
  *
- * @param start         - Cursor position (block clientId + text index).
- * @param cursorContext - Shared editor document / overlay references.
+ * @param start          - Cursor position (block clientId + text index).
+ * @param overlayContext - Shared editor document / overlay references.
  * @return Cursor coordinates.
  */
 function computeCursorOnly(
 	start: ResolvedSelection,
-	cursorContext: CursorContext
+	overlayContext: OverlayContext
 ): SelectionVisual {
 	if ( ! start.localClientId ) {
 		return {};
 	}
 	const blockElement =
-		cursorContext.editorDocument.querySelector< HTMLElement >(
+		overlayContext.editorDocument.querySelector< HTMLElement >(
 			`[data-block="${ start.localClientId }"]`
 		);
 	return {
 		coords: getCursorPosition(
 			start.textIndex,
 			blockElement,
-			cursorContext.editorDocument,
-			cursorContext.overlayRect
+			overlayContext.editorDocument,
+			overlayContext.overlayRect
 		),
 	};
 }
@@ -93,17 +93,17 @@ function computeCursorOnly(
  * Compute cursor coordinates and selection highlight rects for a text selection
  * (single-block or multi-block).
  *
- * @param selection     - The selection state.
- * @param start         - Start position (block clientId + text index).
- * @param end           - End position (block clientId + text index).
- * @param cursorContext - Shared editor document / overlay references.
+ * @param selection      - The selection state.
+ * @param start          - Start position (block clientId + text index).
+ * @param end            - End position (block clientId + text index).
+ * @param overlayContext - Shared editor document / overlay references.
  * @return Cursor coordinates and optional selection rectangles.
  */
 function computeTextSelection(
 	selection: any,
 	start: ResolvedSelection,
 	end: ResolvedSelection,
-	cursorContext: CursorContext
+	overlayContext: OverlayContext
 ): SelectionVisual {
 	if (
 		! start.localClientId ||
@@ -122,12 +122,12 @@ function computeTextSelection(
 	let activeEndBlock: HTMLElement | null = null;
 
 	if ( selection.type === SelectionType.SelectionInOneBlock ) {
-		const result = computeSingleBlockRects( start, end, cursorContext );
+		const result = computeSingleBlockRects( start, end, overlayContext );
 		allRects = result.rects;
 		// Single block: start and end share the same block element.
 		activeEndBlock = result.blockElement;
 	} else {
-		const result = computeMultiBlockRects( start, end, cursorContext );
+		const result = computeMultiBlockRects( start, end, overlayContext );
 		allRects = result.rects;
 		// Pick the block element that matches the active end.
 		activeEndBlock =
@@ -141,8 +141,8 @@ function computeTextSelection(
 			coords: getCursorPosition(
 				activeEnd.textIndex,
 				activeEndBlock,
-				cursorContext.editorDocument,
-				cursorContext.overlayRect
+				overlayContext.editorDocument,
+				overlayContext.overlayRect
 			),
 			selectionRects: allRects,
 		};
@@ -150,7 +150,7 @@ function computeTextSelection(
 
 	// Fallback: cursor at start position only.
 	const startBlock =
-		cursorContext.editorDocument.querySelector< HTMLElement >(
+		overlayContext.editorDocument.querySelector< HTMLElement >(
 			`[data-block="${ start.localClientId }"]`
 		);
 
@@ -158,8 +158,8 @@ function computeTextSelection(
 		coords: getCursorPosition(
 			start.textIndex,
 			startBlock,
-			cursorContext.editorDocument,
-			cursorContext.overlayRect
+			overlayContext.editorDocument,
+			overlayContext.overlayRect
 		),
 	};
 }
@@ -167,18 +167,18 @@ function computeTextSelection(
 /**
  * Compute selection rects for a selection within a single block.
  *
- * @param start         - Start position (block clientId + text index).
- * @param end           - End position (block clientId + text index).
- * @param cursorContext - Shared editor document / overlay references.
+ * @param start          - Start position (block clientId + text index).
+ * @param end            - End position (block clientId + text index).
+ * @param overlayContext - Shared editor document / overlay references.
  * @return Array of selection rectangles.
  */
 function computeSingleBlockRects(
 	start: ResolvedSelection,
 	end: ResolvedSelection,
-	cursorContext: CursorContext
+	overlayContext: OverlayContext
 ): { rects: SelectionRect[]; blockElement: HTMLElement | null } {
 	const blockElement =
-		cursorContext.editorDocument.querySelector< HTMLElement >(
+		overlayContext.editorDocument.querySelector< HTMLElement >(
 			`[data-block="${ start.localClientId }"]`
 		);
 	if (
@@ -194,8 +194,8 @@ function computeSingleBlockRects(
 				blockElement,
 				start.textIndex,
 				end.textIndex,
-				cursorContext.editorDocument,
-				cursorContext.overlayRect
+				overlayContext.editorDocument,
+				overlayContext.overlayRect
 			) ?? [],
 		blockElement,
 	};
@@ -207,15 +207,15 @@ function computeSingleBlockRects(
  * Normalizes to document order — for backward selections the block editor
  * reports start after end.
  *
- * @param start         - Start position (block clientId + text index).
- * @param end           - End position (block clientId + text index).
- * @param cursorContext - Shared editor document / overlay references.
+ * @param start          - Start position (block clientId + text index).
+ * @param end            - End position (block clientId + text index).
+ * @param overlayContext - Shared editor document / overlay references.
  * @return Array of selection rectangles.
  */
 function computeMultiBlockRects(
 	start: ResolvedSelection,
 	end: ResolvedSelection,
-	cursorContext: CursorContext
+	overlayContext: OverlayContext
 ): {
 	rects: SelectionRect[];
 	firstBlock: HTMLElement | null;
@@ -224,10 +224,10 @@ function computeMultiBlockRects(
 } {
 	let docFirst = start;
 	let docLast = end;
-	let firstBlock = cursorContext.editorDocument.querySelector< HTMLElement >(
+	let firstBlock = overlayContext.editorDocument.querySelector< HTMLElement >(
 		`[data-block="${ docFirst.localClientId }"]`
 	);
-	let lastBlock = cursorContext.editorDocument.querySelector< HTMLElement >(
+	let lastBlock = overlayContext.editorDocument.querySelector< HTMLElement >(
 		`[data-block="${ docLast.localClientId }"]`
 	);
 
@@ -261,8 +261,8 @@ function computeMultiBlockRects(
 		firstBlock,
 		docFirst.textIndex,
 		Number.MAX_SAFE_INTEGER,
-		cursorContext.editorDocument,
-		cursorContext.overlayRect
+		overlayContext.editorDocument,
+		overlayContext.overlayRect
 	);
 	if ( startRects ) {
 		allRects.push( ...startRects );
@@ -272,13 +272,13 @@ function computeMultiBlockRects(
 	const intermediateBlocks = getBlocksBetween(
 		docFirst.localClientId,
 		docLast.localClientId,
-		cursorContext.editorDocument
+		overlayContext.editorDocument
 	);
 	for ( const intermediateBlock of intermediateBlocks ) {
 		const rects = getFullBlockSelectionRects(
 			intermediateBlock,
-			cursorContext.editorDocument,
-			cursorContext.overlayRect
+			overlayContext.editorDocument,
+			overlayContext.overlayRect
 		);
 		allRects.push( ...rects );
 	}
@@ -288,8 +288,8 @@ function computeMultiBlockRects(
 		lastBlock,
 		0,
 		docLast.textIndex,
-		cursorContext.editorDocument,
-		cursorContext.overlayRect
+		overlayContext.editorDocument,
+		overlayContext.overlayRect
 	);
 	if ( endRects ) {
 		allRects.push( ...endRects );
