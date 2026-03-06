@@ -35,13 +35,7 @@ function gutenberg_content_guidelines_enqueue_block_registry_scripts( $hook_suff
 		return;
 	}
 
-	$current_screen = get_current_screen();
-	$is_content_guidelines_page = (
-		( isset( $_GET['page'] ) && 'content-guidelines-wp-admin' === $_GET['page'] )
-		|| ( $current_screen && 'content-guidelines' === $current_screen->id )
-	);
-
-	if ( ! $is_content_guidelines_page ) {
+	if ( 'settings_page_content-guidelines-wp-admin' !== $hook_suffix ) {
 		return;
 	}
 
