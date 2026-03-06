@@ -15,6 +15,7 @@ export const Title = forwardRef< HTMLDivElement, TitleProps >(
 			defaultTagName: 'div',
 			render,
 			ref,
+			// TODO: use `Text` component instead, when ready
 			props: mergeProps< 'div' >( { className: styles.title }, props ),
 		} );
 

@@ -13,6 +13,7 @@
 		/* Since the button has absolute positioning, we have to explicitly
 		  specify the wrapper's width. This value should be kept in sync with the
 			`size` prop of the `IconButton` component used for the trigger button.  */
+		/* TODO: use size DS token when available */
 		width: 32px;
 	}
 
