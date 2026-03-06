@@ -59,8 +59,6 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 								icon={ state.open ? chevronUp : chevronDown }
 								variant="minimal"
 								tone="neutral"
-								// Note: this size should be kept in sync with the `width`
-								// assigned to `.header-trigger-wrapper` via CSS styles.
 								size="compact"
 							/>
 						) }
