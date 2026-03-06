@@ -5,7 +5,7 @@ export interface SelectionRect {
 	height: number;
 }
 
-interface CursorCoords {
+export interface CursorCoords {
 	x: number;
 	y: number;
 	height: number;

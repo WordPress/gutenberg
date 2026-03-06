@@ -8,18 +8,26 @@ import {
 	getBlocksBetween,
 	isNodeBefore,
 } from './cursor-dom-utils';
-import type { SelectionRect } from './cursor-dom-utils';
-
-interface CursorCoords {
-	x: number;
-	y: number;
-	height: number;
-}
+import type { CursorCoords, SelectionRect } from './cursor-dom-utils';
 
 /** Common parameters passed to cursor/selection computation helpers. */
 interface OverlayContext {
 	editorDocument: Document;
 	overlayRect: DOMRect;
+}
+
+/** Selection rects and the resolved block element for a single-block selection. */
+interface SingleBlockResult {
+	rects: SelectionRect[];
+	blockElement: HTMLElement | null;
+}
+
+/** Selection rects and the resolved block elements for a multi-block selection. */
+interface MultiBlockResult {
+	rects: SelectionRect[];
+	firstBlock: HTMLElement | null;
+	lastBlock: HTMLElement | null;
+	firstBlockClientId: string | null;
 }
 
 /** Result of computing visual cursor/selection state for a single user. */
@@ -176,7 +184,7 @@ function computeSingleBlockRects(
 	start: ResolvedSelection,
 	end: ResolvedSelection,
 	overlayContext: OverlayContext
-): { rects: SelectionRect[]; blockElement: HTMLElement | null } {
+): SingleBlockResult {
 	const blockElement =
 		overlayContext.editorDocument.querySelector< HTMLElement >(
 			`[data-block="${ start.localClientId }"]`
@@ -216,12 +224,7 @@ function computeMultiBlockRects(
 	start: ResolvedSelection,
 	end: ResolvedSelection,
 	overlayContext: OverlayContext
-): {
-	rects: SelectionRect[];
-	firstBlock: HTMLElement | null;
-	lastBlock: HTMLElement | null;
-	firstBlockClientId: string | null;
-} {
+): MultiBlockResult {
 	let docFirst = start;
 	let docLast = end;
 	let firstBlock = overlayContext.editorDocument.querySelector< HTMLElement >(
