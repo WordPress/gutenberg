@@ -13,7 +13,7 @@ import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { arrowLeft } from '@wordpress/icons';
+import { chevronLeft } from '@wordpress/icons';
 import type { View, Field, Action } from '@wordpress/dataviews';
 
 /**
@@ -164,7 +164,7 @@ export default function RevisionHistory() {
 	return (
 		<div className="content-guidelines__revision-history">
 			<Navigator.BackButton
-				icon={ arrowLeft }
+				icon={ chevronLeft }
 				className="content-guidelines__revision-history-back"
 			>
 				{ __( 'Revision history' ) }
@@ -173,7 +173,7 @@ export default function RevisionHistory() {
 			<Text
 				size={ 13 }
 				weight={ 400 }
-				className="content-guidelines__revision-history-description"
+				color="var(--wp-components-color-gray-800)"
 			>
 				{ __( 'Use a previous version of your content guidelines.' ) }
 			</Text>

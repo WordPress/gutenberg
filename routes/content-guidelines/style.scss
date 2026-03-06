@@ -129,7 +129,9 @@
 
 .content-guidelines__revision-history-back {
 	align-self: flex-start;
-	margin-left: -$grid-unit-15;
+	margin-left: -$grid-unit-10;
+	font-weight: 500;
+	color: $gray-900;
 }
 
 .content-guidelines__restore-modal-actions {
