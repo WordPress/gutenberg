@@ -55,10 +55,7 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 						render={ ( props, state ) => (
 							<IconButton
 								{ ...props }
-								label={ __(
-									'Expand or collapse card',
-									'wpds'
-								) }
+								label={ __( 'Expand or collapse card' ) }
 								icon={ state.open ? chevronUp : chevronDown }
 								variant="minimal"
 								tone="neutral"
