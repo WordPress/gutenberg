@@ -28,7 +28,8 @@ function block_core_tabs_menu_render_callback( array $attributes, string $conten
 	}
 
 	// Re-render each tabs-menu-item with per-item context (index, id, label).
-	$tab_index    = 0;
+	// Match by anchor so the correct tab is found even when the two lists
+	// are in different orders.
 	$buttons_html = '';
 
 	foreach ( $block->parsed_block['innerBlocks'] ?? array() as $parsed_menu_item ) {
@@ -36,11 +37,25 @@ function block_core_tabs_menu_render_callback( array $attributes, string $conten
 			continue;
 		}
 
-		if ( $tab_index >= count( $tabs_list ) ) {
-			break;
+		// Find the tab anchor from the menu item anchor (e.g. "tab-1-button" → "tab-1").
+		$menu_item_anchor = $parsed_menu_item['attrs']['anchor'] ?? '';
+		$tab_anchor       = preg_replace( '/-button$/', '', $menu_item_anchor );
+
+		// Find the matching tab in $tabs_list by id.
+		$tab       = null;
+		$tab_index = 0;
+		foreach ( $tabs_list as $index => $candidate ) {
+			if ( ( $candidate['id'] ?? '' ) === $tab_anchor ) {
+				$tab       = $candidate;
+				$tab_index = $index;
+				break;
+			}
 		}
 
-		$tab = $tabs_list[ $tab_index ];
+		// Skip menu items with no matching tab.
+		if ( null === $tab ) {
+			continue;
+		}
 
 		$item_context = array_merge(
 			$block->context,
@@ -53,8 +68,6 @@ function block_core_tabs_menu_render_callback( array $attributes, string $conten
 
 		$menu_item_block = new WP_Block( $parsed_menu_item, $item_context );
 		$buttons_html   .= $menu_item_block->render();
-
-		++$tab_index;
 	}
 
 	// Rebuild the wrapper using get_block_wrapper_attributes().
