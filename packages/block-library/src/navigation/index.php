@@ -1127,7 +1127,7 @@ function block_core_navigation_add_directives_to_overlay_close( $tags ) {
  * @since 7.0.0
  *
  * @param string $overlay_blocks_html The rendered HTML of the overlay blocks.
- * @return string Modified HTML with loading="lazy" and fetchpriority="low" on all img elements.
+ * @return string Modified HTML with fetchpriority="low" on all IMG tags.
  */
 function block_core_navigation_set_overlay_image_lazy_loading( $overlay_blocks_html ) {
 	$tags = new WP_HTML_Tag_Processor( $overlay_blocks_html );
