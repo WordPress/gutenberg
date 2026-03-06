@@ -140,24 +140,13 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
  * Injects the real-time collaboration setting into a global variable.
  */
 function gutenberg_inject_real_time_collaboration_setting() {
-	global $pagenow;
-
 	if ( ! get_option( 'wp_enable_real_time_collaboration' ) ) {
 		return;
 	}
 
-	// Disable real-time collaboration on the site editor.
-	$enabled = true;
-	if (
-		'site-editor.php' === $pagenow ||
-		( 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'site-editor-v2' === $_GET['page'] )
-	) {
-		$enabled = false;
-	}
-
 	wp_add_inline_script(
 		'wp-core-data',
-		'window._wpCollaborationEnabled = ' . ( $enabled ? 'true' : 'false' ) . ';',
+		'window._wpCollaborationEnabled = true;',
 		'after'
 	);
 }

@@ -67,6 +67,15 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		private static array $storage_post_ids = array();
 
 		/**
+		 * Cache of all updates by room, scoped to the current request.
+		 * Invalidated on writes to avoid stale reads.
+		 *
+		 * @since 7.0.0
+		 * @var array<string, array<int, array{ timestamp: int, value: mixed }>>
+		 */
+		private array $room_updates_cache = array();
+
+		/**
 		 * Adds a sync update to a given room.
 		 *
 		 * @since 7.0.0
@@ -87,7 +96,9 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 				'value'     => $update,
 			);
 
-			return (bool) add_post_meta( $post_id, self::SYNC_UPDATE_META_KEY, $envelope, false );
+			$result = (bool) add_post_meta( $post_id, self::SYNC_UPDATE_META_KEY, $envelope, false );
+			unset( $this->room_updates_cache[ $room ] );
+			return $result;
 		}
 
 		/**
@@ -99,6 +110,10 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 * @return array<int, array{ timestamp: int, value: mixed }> Sync updates.
 		 */
 		private function get_all_updates( string $room ): array {
+			if ( isset( $this->room_updates_cache[ $room ] ) ) {
+				return $this->room_updates_cache[ $room ];
+			}
+
 			$this->room_cursors[ $room ] = $this->get_time_marker() - 100; // Small buffer to ensure consistency.
 
 			$post_id = $this->get_storage_post_id( $room );
@@ -121,6 +136,7 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 			);
 
 			$this->room_update_counts[ $room ] = count( $updates );
+			$this->room_updates_cache[ $room ] = $updates;
 
 			return $updates;
 		}
@@ -325,6 +341,7 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 				}
 			}
 
+			unset( $this->room_updates_cache[ $room ] );
 			return $add_result;
 		}
 	}
