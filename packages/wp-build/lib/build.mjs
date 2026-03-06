@@ -2164,7 +2164,7 @@ async function main() {
 			'base-url': {
 				type: 'string',
 				default: castBool( process.env.IS_WORDPRESS_CORE )
-					? "includes_url( 'build/' )"
+					? 'includes_url( \'build/\' )'
 					: 'plugin_dir_url( __FILE__ )',
 			},
 		},
