@@ -92,8 +92,8 @@ export default function ActionsSection() {
 	};
 
 	return (
-		<VStack spacing={ 3 } className="content-guidelines__actions">
-			<Heading level={ 2 } size={ 15 } weight={ 600 }>
+		<VStack spacing={ 4 } className="content-guidelines__actions">
+			<Heading level={ 3 } size={ 15 } weight={ 500 }>
 				{ __( 'Actions' ) }
 			</Heading>
 			<input
@@ -110,24 +110,22 @@ export default function ActionsSection() {
 				 */
 				/* eslint-disable jsx-a11y/no-redundant-roles */ }
 				<ul role="list" className="content-guidelines__actions-list">
-					{ ACTIONS.map( ( action, index ) => {
+					{ ACTIONS.map( ( action ) => {
 						const descriptionId = `content-guidelines-action-${ action.slug }-description`;
 						return (
-							<li key={ action.slug }>
+							<li
+								key={ action.slug }
+								className="content-guidelines__action-list-item"
+							>
 								<HStack
 									justify="space-between"
-									className={
-										'content-guidelines__action-row' +
-										( index < ACTIONS.length - 1
-											? ' content-guidelines__action-row--bordered'
-											: '' )
-									}
+									className="content-guidelines__action-row"
 								>
 									<VStack spacing={ 1 }>
 										<Heading
 											level={ 3 }
 											size={ 13 }
-											weight={ 500 }
+											weight={ 400 }
 											className="content-guidelines__action-title"
 										>
 											{ action.title }
@@ -143,8 +141,8 @@ export default function ActionsSection() {
 										</Text>
 									</VStack>
 									<Button
+										size="compact"
 										variant="secondary"
-										__next40pxDefaultSize
 										aria-label={ action.ariaLabel }
 										aria-describedby={ descriptionId }
 										{ ...( buttonProps[ action.slug ] ??

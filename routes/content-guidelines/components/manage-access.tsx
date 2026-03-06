@@ -11,7 +11,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { arrowLeft } from '@wordpress/icons';
+import { chevronLeft } from '@wordpress/icons';
 
 export default function ManageAccess() {
 	const [ allowExternalAccess, setAllowExternalAccess ] = useState( true );
@@ -19,7 +19,7 @@ export default function ManageAccess() {
 	return (
 		<div className="content-guidelines__manage-access">
 			<Navigator.BackButton
-				icon={ arrowLeft }
+				icon={ chevronLeft }
 				className="content-guidelines__manage-access-back"
 			>
 				{ __( 'Manage access' ) }
@@ -28,17 +28,22 @@ export default function ManageAccess() {
 			<Text
 				size={ 13 }
 				weight={ 400 }
-				className="content-guidelines__manage-access-description"
+				color="var(--wp-components-color-gray-800)"
 			>
 				{ __( 'Control who can access your content guidelines.' ) }
 			</Text>
 
 			<Card className="content-guidelines__manage-access-card">
-				<VStack spacing={ 4 }>
+				<VStack spacing={ 2 }>
 					<Heading level={ 3 } size={ 15 } weight={ 500 }>
 						{ __( 'External AI agents…' ) }
 					</Heading>
-					<Text size={ 13 } weight={ 400 }>
+					<Text
+						size={ 13 }
+						weight={ 400 }
+						color="var(--wp-components-color-gray-700)"
+						style={ { marginBottom: '6px' } }
+					>
 						{ sprintf(
 							/* translators: %s is a URL path — do not translate */
 							__(
