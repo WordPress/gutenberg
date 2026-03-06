@@ -9,9 +9,9 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { DataViews } from '@wordpress/dataviews';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { arrowLeft } from '@wordpress/icons';
 import type { View, Field, Action } from '@wordpress/dataviews';
@@ -48,7 +48,7 @@ const FIELDS: Field< ContentGuidelinesRevision >[] = [
 	{
 		id: 'date',
 		label: __( 'Date' ),
-		getValue: ( { item } ) => item.date,
+		getValue: ( { item } ) => formatDate( item.date ),
 		render: ( { item } ) => (
 			<time dateTime={ item.date }>{ formatDate( item.date ) }</time>
 		),
@@ -77,12 +77,11 @@ export default function RevisionHistory() {
 	const [ revisions, setRevisions ] = useState< ContentGuidelinesRevision[] >(
 		[]
 	);
-	const [ total, setTotal ] = useState( 0 );
-	const [ totalPages, setTotalPages ] = useState( 0 );
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ revisionToRestore, setRevisionToRestore ] =
 		useState< ContentGuidelinesRevision | null >( null );
 	const [ isRestoring, setIsRestoring ] = useState( false );
+	const [ refetchKey, setRefetchKey ] = useState( 0 );
 
 	// @ts-ignore
 	const guidelinesId = useSelect(
@@ -98,31 +97,19 @@ export default function RevisionHistory() {
 		setIsLoading( true );
 		fetchContentGuidelinesRevisions( {
 			guidelinesId,
-			page: view.page,
-			perPage: view.perPage,
+			perPage: 100,
 		} )
 			.then( ( result ) => {
 				setRevisions( result.revisions );
-				setTotal( result.total );
-				setTotalPages( result.totalPages );
 			} )
 			.finally( () => setIsLoading( false ) );
-	}, [ guidelinesId, view.page, view.perPage ] );
+	}, [ guidelinesId, refetchKey ] );
 
-	// Filter revisions based on search term in the view. This is done client-side
-	const displayedRevisions = useMemo( () => {
-		const term = view.search?.trim().toLowerCase();
-		if ( ! term ) {
-			return revisions;
-		}
-		return revisions.filter( ( revision ) => {
-			const author = (
-				revision._embedded?.author?.[ 0 ]?.name ?? ''
-			).toLowerCase();
-			const date = formatDate( revision.date ).toLowerCase();
-			return author.includes( term ) || date.includes( term );
-		} );
-	}, [ revisions, view.search ] );
+	const { data: displayedRevisions, paginationInfo } = filterSortAndPaginate(
+		revisions,
+		view,
+		FIELDS
+	);
 
 	const actions: Action< ContentGuidelinesRevision >[] = [
 		{
@@ -143,7 +130,7 @@ export default function RevisionHistory() {
 				revisionToRestore.id
 			);
 			setRevisionToRestore( null );
-			setView( ( v ) => ( { ...v, page: 1 } ) );
+			setRefetchKey( ( k ) => k + 1 );
 		} finally {
 			setIsRestoring( false );
 		}
@@ -173,20 +160,7 @@ export default function RevisionHistory() {
 				onChangeView={ setView }
 				actions={ actions }
 				isLoading={ isLoading }
-				paginationInfo={
-					view.search
-						? {
-								totalItems: displayedRevisions.length,
-								totalPages: Math.max(
-									1,
-									Math.ceil(
-										displayedRevisions.length /
-											( view.perPage ?? 10 )
-									)
-								),
-						  }
-						: { totalItems: total, totalPages }
-				}
+				paginationInfo={ paginationInfo }
 				defaultLayouts={ { table: {} } }
 				getItemId={ ( item ) => String( item.id ) }
 			/>
