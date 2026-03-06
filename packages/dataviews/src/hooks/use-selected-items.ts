@@ -33,12 +33,14 @@ export default function useSelectedItems< Item >(
 	const selectedItemsCacheRef = useRef< Map< string, Item > >( new Map() );
 
 	return useMemo( () => {
+		const selectionSet = new Set( selection );
+
 		if ( view.infiniteScrollEnabled ) {
 			// Selection array contains selected item IDs
 			// Cache selected items so they remain available when scrolled out of view
 			data.forEach( ( item ) => {
 				const id = getItemId( item );
-				if ( selection.includes( id ) ) {
+				if ( selectionSet.has( id ) ) {
 					const passesFilter = filterFn ? filterFn( item ) : true;
 					if ( passesFilter ) {
 						selectedItemsCacheRef.current.set( id, item );
@@ -48,7 +50,7 @@ export default function useSelectedItems< Item >(
 
 			// Remove items from cache that are no longer selected
 			selectedItemsCacheRef.current.forEach( ( _, id ) => {
-				if ( ! selection.includes( id ) ) {
+				if ( ! selectionSet.has( id ) ) {
 					selectedItemsCacheRef.current.delete( id );
 				}
 			} );
@@ -60,7 +62,7 @@ export default function useSelectedItems< Item >(
 		// Non-infinite scroll mode
 		return data.filter( ( item ) => {
 			const id = getItemId( item );
-			if ( ! selection.includes( id ) ) {
+			if ( ! selectionSet.has( id ) ) {
 				return false;
 			}
 			// Apply optional filter (e.g., selectability check for bulk actions)
