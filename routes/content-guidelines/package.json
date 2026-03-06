@@ -19,6 +19,8 @@
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/dataviews": "file:../../packages/dataviews",
 		"@wordpress/notices": "file:../../packages/notices",
-		"@wordpress/ui": "file:../../packages/ui"
+		"@wordpress/ui": "file:../../packages/ui",
+		"@wordpress/block-library": "file:../../packages/block-library",
+		"@wordpress/blocks": "file:../../packages/blocks"
 	}
 }
