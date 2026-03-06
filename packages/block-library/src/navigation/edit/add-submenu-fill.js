@@ -30,7 +30,7 @@ function AddSubmenuItem( {
 	expandedState,
 	setInsertedBlock,
 	toggleElement,
-	toggleElementRef,
+	setAnchorContext,
 } ) {
 	const { insertBlock, replaceBlock, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
@@ -96,10 +96,16 @@ function AddSubmenuItem( {
 					expand( expandClientId );
 				}
 
-				// Store the toggle button element so the link popover
-				// can anchor to it and focus returns there on close.
-				if ( toggleElementRef ) {
-					toggleElementRef.current = toggleElement;
+				// When the block was converted to a submenu, the
+				// original toggleElement is unmounted. Pass the new
+				// block's clientId so the popover anchor and focus
+				// restoration can find the replacement row's button.
+				if ( setAnchorContext ) {
+					const wasConverted = expandClientId !== clientId;
+					setAnchorContext( {
+						toggleElement: wasConverted ? null : toggleElement,
+						clientId: expandClientId,
+					} );
 				}
 
 				onClose();
@@ -112,10 +118,32 @@ function AddSubmenuItem( {
 
 export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
-	const toggleElementRef = useRef( null );
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	const anchorContextRef = useRef( null );
+
+	const setAnchorContext = ( context ) => {
+		anchorContextRef.current = context;
+	};
+
+	// Resolve the popover anchor from the anchor context. When the
+	// block wasn't converted, toggleElement is the Options button
+	// we can use directly. When it was converted to a submenu, the
+	// original element is unmounted, so we look up the new block's
+	// Options button by clientId.
+	useEffect( () => {
+		if ( insertedBlock && anchorContextRef.current ) {
+			const { toggleElement, clientId } = anchorContextRef.current;
+			const anchor =
+				toggleElement ??
+				document.querySelector(
+					`[data-block="${ clientId }"] .block-editor-list-view-block__menu`
+				);
+			setPopoverAnchor( anchor );
+		}
+	}, [ insertedBlock ] );
 
 	// When the link popover closes (insertedBlock becomes null),
-	// return focus to the toggle button that opened it.
+	// return focus to the anchor button.
 	//
 	// setTimeout( …, 0 ) is required because the Popover's
 	// useFocusReturn hook fires during the React commit phase
@@ -123,9 +151,10 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	// target. Deferring to the next event loop tick ensures our
 	// focus() call runs after useFocusReturn has finished.
 	useEffect( () => {
-		if ( ! insertedBlock && toggleElementRef.current ) {
-			const element = toggleElementRef.current;
-			toggleElementRef.current = null;
+		if ( ! insertedBlock && popoverAnchor ) {
+			const element = popoverAnchor;
+			setPopoverAnchor( null );
+			anchorContextRef.current = null;
 
 			const timerId = window.setTimeout( () => {
 				element?.focus();
@@ -133,7 +162,7 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 
 			return () => window.clearTimeout( timerId );
 		}
-	}, [ insertedBlock ] );
+	}, [ insertedBlock, popoverAnchor ] );
 
 	return (
 		<>
@@ -143,16 +172,16 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 						navigationBlockClientId={ navigationBlockClientId }
 						{ ...fillProps }
 						setInsertedBlock={ setInsertedBlock }
-						toggleElementRef={ toggleElementRef }
+						setAnchorContext={ setAnchorContext }
 					/>
 				) }
 			</BlockSettingsMenuControls>
-			{ insertedBlock && toggleElementRef.current && (
+			{ insertedBlock && popoverAnchor && (
 				<NavigationLinkUI
 					block={ insertedBlock }
 					insertedBlock={ insertedBlock }
 					setInsertedBlock={ setInsertedBlock }
-					anchor={ toggleElementRef.current }
+					anchor={ popoverAnchor }
 				/>
 			) }
 		</>
@@ -168,7 +197,7 @@ function AddSubmenuFillContent( {
 	expandedState,
 	setInsertedBlock,
 	toggleElement,
-	toggleElementRef,
+	setAnchorContext,
 } ) {
 	const isChildOfThisNav = useSelect(
 		( select ) => {
@@ -206,7 +235,7 @@ function AddSubmenuFillContent( {
 			expandedState={ expandedState }
 			setInsertedBlock={ setInsertedBlock }
 			toggleElement={ toggleElement }
-			toggleElementRef={ toggleElementRef }
+			setAnchorContext={ setAnchorContext }
 		/>
 	);
 }
