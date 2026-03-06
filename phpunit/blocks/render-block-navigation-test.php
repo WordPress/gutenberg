@@ -93,21 +93,21 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers gutenberg_block_core_navigation_set_overlay_image_lazy_loading
+	 * @covers gutenberg_block_core_navigation_set_overlay_image_fetch_priority
 	 */
-	public function test_block_core_navigation_set_overlay_image_lazy_loading_adds_lazy_and_low_priority() {
+	public function test_block_core_navigation_set_overlay_image_fetch_priority_adds_low_priority() {
 		$html   = '<div><img src="example.jpg" width="300" height="300" /></div>';
-		$result = gutenberg_block_core_navigation_set_overlay_image_lazy_loading( $html );
+		$result = gutenberg_block_core_navigation_set_overlay_image_fetch_priority( $html );
 		$this->assertStringNotContainsString( 'loading="lazy"', $result );
 		$this->assertStringContainsString( 'fetchpriority="low"', $result );
 	}
 
 	/**
-	 * @covers gutenberg_block_core_navigation_set_overlay_image_lazy_loading
+	 * @covers gutenberg_block_core_navigation_set_overlay_image_fetch_priority
 	 */
-	public function test_block_core_navigation_set_overlay_image_lazy_loading_overrides_eager_and_high() {
+	public function test_block_core_navigation_set_overlay_image_fetch_priority_overrides_eager_and_high() {
 		$html   = '<div><img src="example.jpg" loading="eager" fetchpriority="high" /></div>';
-		$result = gutenberg_block_core_navigation_set_overlay_image_lazy_loading( $html );
+		$result = gutenberg_block_core_navigation_set_overlay_image_fetch_priority( $html );
 		$this->assertStringNotContainsString( 'loading="lazy"', $result );
 		$this->assertStringNotContainsString( 'loading="eager"', $result );
 		$this->assertStringContainsString( 'fetchpriority="low"', $result );
@@ -115,21 +115,21 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers gutenberg_block_core_navigation_set_overlay_image_lazy_loading
+	 * @covers gutenberg_block_core_navigation_set_overlay_image_fetch_priority
 	 */
-	public function test_block_core_navigation_set_overlay_image_lazy_loading_multiple_images() {
+	public function test_block_core_navigation_set_overlay_image_fetch_priority_multiple_images() {
 		$html   = '<div><img src="a.jpg" /><img src="b.jpg" /></div>';
-		$result = gutenberg_block_core_navigation_set_overlay_image_lazy_loading( $html );
+		$result = gutenberg_block_core_navigation_set_overlay_image_fetch_priority( $html );
 		$this->assertSame( 0, substr_count( $result, 'loading="lazy"' ) );
 		$this->assertSame( 2, substr_count( $result, 'fetchpriority="low"' ) );
 	}
 
 	/**
-	 * @covers gutenberg_block_core_navigation_set_overlay_image_lazy_loading
+	 * @covers gutenberg_block_core_navigation_set_overlay_image_fetch_priority
 	 */
-	public function test_block_core_navigation_set_overlay_image_lazy_loading_no_images() {
+	public function test_block_core_navigation_set_overlay_image_fetch_priority_no_images() {
 		$html   = '<div><p>No images here</p></div>';
-		$result = gutenberg_block_core_navigation_set_overlay_image_lazy_loading( $html );
+		$result = gutenberg_block_core_navigation_set_overlay_image_fetch_priority( $html );
 		$this->assertSame( $html, $result );
 	}
 }
