@@ -424,10 +424,7 @@ function poll(): void {
 				error instanceof Response &&
 				error.status === 429
 			) {
-				const rooms = Array.from( roomStates.keys() );
-				for ( const room of rooms ) {
-					const state = roomStates.get( room );
-					if ( state ) {
+				roomStates.forEach( ( state, room ) => {
 						state.onStatusChange( {
 							status: 'disconnected',
 							error: {
