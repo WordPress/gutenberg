@@ -5,7 +5,7 @@ import { createBlock } from '@wordpress/blocks';
 import { addSubmenu } from '@wordpress/icons';
 import { MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockSettingsMenuControls,
@@ -29,6 +29,7 @@ function AddSubmenuItem( {
 	expand,
 	expandedState,
 	setInsertedBlock,
+	setReturnFocusClientId,
 } ) {
 	const { insertBlock, replaceBlock, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
@@ -93,6 +94,13 @@ function AddSubmenuItem( {
 				) {
 					expand( expandClientId );
 				}
+
+				// Track the parent block so focus can return to its
+				// Options button when the link popover closes.
+				if ( setReturnFocusClientId ) {
+					setReturnFocusClientId( expandClientId );
+				}
+
 				onClose();
 			} }
 		>
@@ -104,6 +112,23 @@ function AddSubmenuItem( {
 export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	const returnFocusClientIdRef = useRef( null );
+
+	const setReturnFocusClientId = useCallback( ( id ) => {
+		returnFocusClientIdRef.current = id;
+	}, [] );
+
+	// When the link popover closes (insertedBlock becomes null),
+	// return focus to the parent block's Options button.
+	useEffect( () => {
+		if ( ! insertedBlock && returnFocusClientIdRef.current ) {
+			const btn = document.querySelector(
+				`.editor-list-view-sidebar [data-block="${ returnFocusClientIdRef.current }"] .block-editor-list-view-block__menu`
+			);
+			btn?.focus();
+			returnFocusClientIdRef.current = null;
+		}
+	}, [ insertedBlock ] );
 
 	useEffect( () => {
 		if ( ! insertedBlock?.clientId ) {
@@ -151,6 +176,7 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 						navigationBlockClientId={ navigationBlockClientId }
 						{ ...fillProps }
 						setInsertedBlock={ setInsertedBlock }
+						setReturnFocusClientId={ setReturnFocusClientId }
 					/>
 				) }
 			</BlockSettingsMenuControls>
@@ -174,6 +200,7 @@ function AddSubmenuFillContent( {
 	expand,
 	expandedState,
 	setInsertedBlock,
+	setReturnFocusClientId,
 } ) {
 	const isChildOfThisNav = useSelect(
 		( select ) => {
@@ -210,6 +237,7 @@ function AddSubmenuFillContent( {
 			expand={ expand }
 			expandedState={ expandedState }
 			setInsertedBlock={ setInsertedBlock }
+			setReturnFocusClientId={ setReturnFocusClientId }
 		/>
 	);
 }
