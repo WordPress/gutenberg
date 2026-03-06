@@ -1121,7 +1121,7 @@ function block_core_navigation_add_directives_to_overlay_close( $tags ) {
  * Sets fetchpriority="low" on all IMG tags within the navigation overlay.
  *
  * Images in the overlay are hidden until the menu is opened, so they should
- * not compete with the actual LCP image on the page.
+ * not compete with any actual LCP element image on the page.
  *
  * @since 7.0.0
  *
