@@ -90,6 +90,7 @@ export function UploadStatusPopover( {
 				<Popover
 					className="media-upload-modal__upload-status__popover"
 					placement="top-start"
+					offset={ 8 }
 					anchor={ triggerRef.current }
 					onClose={ () => {
 						// Let the button's onClick handle toggling when

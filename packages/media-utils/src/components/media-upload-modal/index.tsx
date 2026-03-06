@@ -57,6 +57,7 @@ import {
 
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 
+// Module-level counter for generating unique IDs for upload status entries.
 let uploadIdCounter = 0;
 
 // Layout constants - matching the picker layout types
