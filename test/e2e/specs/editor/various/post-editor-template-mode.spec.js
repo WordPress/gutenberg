@@ -252,6 +252,15 @@ class PostEditorTemplateMode {
 				'role=button[name="Dismiss this notice"i] >> text=Custom template created. You\'re in template mode now.'
 			)
 		).toBeVisible();
+
+		// Wait for the editor to be fully loaded and ready before making changes.
+		// Without this, the editor may move focus to body while still typing,
+		// and save states will not be counted as dirty.
+		await this.page.waitForFunction(
+			() =>
+				window.wp?.data?.select( 'core/block-editor' )?.getBlocks()
+					?.length > 0
+		);
 	}
 
 	async saveTemplateWithoutPublishing() {
