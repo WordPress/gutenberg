@@ -179,7 +179,7 @@ function UnforwardedLinkUI( props, ref ) {
 	return (
 		<Popover
 			ref={ ref }
-			placement="bottom"
+			placement={ props.placement || 'bottom' }
 			onClose={ props.onClose }
 			anchor={ props.anchor }
 			shift

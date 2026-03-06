@@ -5,6 +5,7 @@ import { createBlock } from '@wordpress/blocks';
 import { addSubmenu } from '@wordpress/icons';
 import { MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockSettingsMenuControls,
@@ -15,6 +16,7 @@ import {
  * Internal dependencies
  */
 import { DEFAULT_BLOCK } from '../constants';
+import { NavigationLinkUI } from './navigation-link-ui';
 
 const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [
 	'core/navigation-link',
@@ -100,15 +102,67 @@ function AddSubmenuItem( {
 }
 
 export default function AddSubmenuFill( { navigationBlockClientId } ) {
+	const [ insertedBlock, setInsertedBlock ] = useState( null );
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+
+	useEffect( () => {
+		if ( ! insertedBlock?.clientId ) {
+			setPopoverAnchor( null );
+			return;
+		}
+
+		const selector = `.editor-list-view-sidebar [data-block="${ insertedBlock.clientId }"] .block-editor-list-view-block__menu`;
+
+		// Check if the element is already in the DOM.
+		const existing = document.querySelector( selector );
+		if ( existing ) {
+			setPopoverAnchor( existing );
+			return;
+		}
+
+		// Otherwise, observe the list view sidebar until the block
+		// row is rendered.
+		const sidebar = document.querySelector( '.editor-list-view-sidebar' );
+		if ( ! sidebar ) {
+			return;
+		}
+
+		const observer = new window.MutationObserver( () => {
+			const element = document.querySelector( selector );
+			if ( element ) {
+				observer.disconnect();
+				setPopoverAnchor( element );
+			}
+		} );
+
+		observer.observe( sidebar, {
+			childList: true,
+			subtree: true,
+		} );
+
+		return () => observer.disconnect();
+	}, [ insertedBlock?.clientId ] );
+
 	return (
-		<BlockSettingsMenuControls supportsContentOnly>
-			{ ( fillProps ) => (
-				<AddSubmenuFillContent
-					navigationBlockClientId={ navigationBlockClientId }
-					{ ...fillProps }
+		<>
+			<BlockSettingsMenuControls supportsContentOnly>
+				{ ( fillProps ) => (
+					<AddSubmenuFillContent
+						navigationBlockClientId={ navigationBlockClientId }
+						{ ...fillProps }
+						setInsertedBlock={ setInsertedBlock }
+					/>
+				) }
+			</BlockSettingsMenuControls>
+			{ insertedBlock && popoverAnchor && (
+				<NavigationLinkUI
+					block={ insertedBlock }
+					insertedBlock={ insertedBlock }
+					setInsertedBlock={ setInsertedBlock }
+					anchor={ popoverAnchor }
 				/>
 			) }
-		</BlockSettingsMenuControls>
+		</>
 	);
 }
 
