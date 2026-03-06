@@ -35,13 +35,15 @@ export interface BlockHighlightData {
  * @param blockEditorDocument - Ref to the block editor document.
  * @param postId              - The ID of the post.
  * @param postType            - The type of the post.
+ * @param delayMs             - Milliseconds to wait before recomputing highlight positions.
  * @return Highlight data for rendering and a delayed recompute function.
  */
 export function useBlockHighlighting(
 	overlayElement: HTMLElement | null,
 	blockEditorDocument: Document | null,
 	postId: number | null,
-	postType: string | null
+	postType: string | null,
+	delayMs: number
 ): {
 	highlights: BlockHighlightData[];
 	rerenderHighlightsAfterDelay: () => () => void;
@@ -204,9 +206,9 @@ export function useBlockHighlighting(
 	const rerenderHighlightsAfterDelay = useCallback( () => {
 		const timeout = setTimeout( () => {
 			setRecomputeToken( ( t ) => t + 1 );
-		}, 500 );
+		}, delayMs );
 		return () => clearTimeout( timeout );
-	}, [] );
+	}, [ delayMs ] );
 
 	return { highlights, rerenderHighlightsAfterDelay };
 }

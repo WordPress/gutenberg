@@ -28,13 +28,15 @@ export interface CursorData {
  * @param blockEditorDocument - The block editor document
  * @param postId              - The ID of the post
  * @param postType            - The type of the post
+ * @param delayMs             - Milliseconds to wait before recomputing cursor positions.
  * @return An array of cursor data for rendering, and a function to trigger a delayed recompute.
  */
 export function useRenderCursors(
 	overlayElement: HTMLElement | null,
 	blockEditorDocument: Document | null,
 	postId: number | null,
-	postType: string | null
+	postType: string | null,
+	delayMs: number
 ): { cursors: CursorData[]; rerenderCursorsAfterDelay: () => () => void } {
 	const sortedUsers = useActiveCollaborators(
 		postId ?? null,
@@ -145,9 +147,9 @@ export function useRenderCursors(
 	const rerenderCursorsAfterDelay = useCallback( () => {
 		const timeout = setTimeout( () => {
 			setRecomputeToken( ( t ) => t + 1 );
-		}, 500 );
+		}, delayMs );
 		return () => clearTimeout( timeout );
-	}, [] );
+	}, [ delayMs ] );
 
 	return { cursors: cursorPositions, rerenderCursorsAfterDelay };
 }

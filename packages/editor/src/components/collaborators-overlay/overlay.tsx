@@ -9,6 +9,8 @@ import { OVERLAY_IFRAME_STYLES } from './overlay-iframe-styles';
 import { useBlockHighlighting } from './use-block-highlighting';
 import { useRenderCursors } from './use-render-cursors';
 
+const RERENDER_DELAY_MS = 500;
+
 interface OverlayProps {
 	blockEditorDocument?: Document;
 	postId: number | null;
@@ -42,14 +44,16 @@ export function Overlay( {
 		overlayElement,
 		blockEditorDocument ?? null,
 		postId ?? null,
-		postType ?? null
+		postType ?? null,
+		RERENDER_DELAY_MS
 	);
 
 	const { highlights, rerenderHighlightsAfterDelay } = useBlockHighlighting(
 		overlayElement,
 		blockEditorDocument ?? null,
 		postId ?? null,
-		postType ?? null
+		postType ?? null,
+		RERENDER_DELAY_MS
 	);
 
 	// Detect layout changes on overlay (e.g. turning on "Show Template") and window
