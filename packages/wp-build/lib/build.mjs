@@ -120,13 +120,10 @@ const PAGES = WP_PLUGIN_CONFIG.pages || [];
  * are "truthy" and incorrectly typecast to Boolean true.
  *
  * @param {string|boolean|undefined} value The value to cast.
- * @return {boolean} The typecast value.
+ * @returns {boolean} The typecast value.
  */
-const castBool = ( value ) => {
-	if ( typeof value === 'boolean' ) {
-		return value;
-	}
-	return value === 'true';
+const castBool = (value) => {
+	if (typeof value === 'boolean') return value;
 };
 
 const baseDefine = {
@@ -336,8 +333,13 @@ function transformPhpContent( content, transforms ) {
 
 	content = content.toString();
 
-	// Skip any transforms when building for WordPress Core.
-	if ( toBool( process.env.IS_WORDPRESS_CORE ) ) {
+	/*
+	 * Transforms are used to modify PHP files that are committed to version
+	 * control in their wordpress-develop state (`wp_` function prefixes, `WP_`
+	 * class prefixes, etc.). When building for WordPress Core, it's not
+	 * necessary to perform these steps.
+	 */
+	if ( castBool( process.env.IS_WORDPRESS_CORE ) ) {
 		return content;
 	}
 

@@ -30,11 +30,8 @@ export async function getPhpReplacements( rootDir, baseUrlExpression ) {
 	const name =
 		process.env.WP_PLUGIN_NAME ??
 		process.env.npm_package_config_WP_PLUGIN_NAME ??
-<<<<<<< HEAD
 		// @ts-expect-error specific override to package.json
 		rootPackageJson.wpPlugin?.name ??
-=======
->>>>>>> f25c45cd54e (Allow relevant values to be overridden more easily)
 		'gutenberg';
 	const version = rootPackageJson.version;
 
