@@ -11,15 +11,13 @@ class Tests_Resolve_AI_Provider_Logo_URL extends WP_UnitTestCase {
 	}
 
 	public function test_resolves_plugin_dir_path_to_url() {
-		$result   = _gutenberg_resolve_ai_provider_logo_url( WP_PLUGIN_DIR . '/my-plugin/logo.svg' );
-		$expected = plugins_url( '/my-plugin/logo.svg' );
-		$this->assertSame( $expected, $result );
+		$result = _gutenberg_resolve_ai_provider_logo_url( WP_PLUGIN_DIR . '/my-plugin/logo.svg' );
+		$this->assertSame( 'http://example.org/wp-content/plugins/my-plugin/logo.svg', $result );
 	}
 
 	public function test_resolves_mu_plugin_dir_path_to_url() {
-		$result   = _gutenberg_resolve_ai_provider_logo_url( WPMU_PLUGIN_DIR . '/my-mu-plugin/logo.svg' );
-		$expected = plugins_url( '/my-mu-plugin/logo.svg', WPMU_PLUGIN_DIR . '/.' );
-		$this->assertSame( $expected, $result );
+		$result = _gutenberg_resolve_ai_provider_logo_url( WPMU_PLUGIN_DIR . '/my-mu-plugin/logo.svg' );
+		$this->assertSame( 'http://example.org/wp-content/mu-plugins/my-mu-plugin/logo.svg', $result );
 	}
 
 	/**
