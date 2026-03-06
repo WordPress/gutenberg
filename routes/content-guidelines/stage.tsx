@@ -14,6 +14,8 @@ import './style.scss';
 import GuidelineAccordion from './components/guideline-accordion';
 import GuidelineAccordionForm from './components/guideline-accordion-form';
 import { fetchContentGuidelines } from './api';
+import BlockGuidelines from './components/block-guidelines';
+import { bootstrapBlockRegistry } from './bootstrap-block-registry';
 
 const GUIDELINE_ITEMS = [
 	{
@@ -41,6 +43,13 @@ const GUIDELINE_ITEMS = [
 		slug: 'images',
 	},
 	{
+		title: __( 'Blocks' ),
+		description: __(
+			'Create tailored guidelines for specific block types.'
+		),
+		slug: 'blocks',
+	},
+	{
 		title: __( 'Additional' ),
 		description: __( 'Add additional guidelines for your team.' ),
 
@@ -53,6 +62,8 @@ function ContentGuidelinesPage() {
 	const [ error, setError ] = useState< string | null >( null );
 
 	useEffect( () => {
+		// Bootstrap Core blocks so block icons are available (e.g. in Block Guidelines).
+		bootstrapBlockRegistry();
 		// Populate the store with the content guidelines.
 		fetchContentGuidelines()
 			.then( () => setError( null ) )
@@ -116,14 +127,18 @@ function ContentGuidelinesPage() {
 												headingId={ headingId }
 												descriptionId={ descriptionId }
 											>
-												<GuidelineAccordionForm
-													slug={ item.slug }
-													contentId={ contentId }
-													headingId={ headingId }
-													descriptionId={
-														descriptionId
-													}
-												/>
+												{ item.slug === 'blocks' ? (
+													<BlockGuidelines />
+												) : (
+													<GuidelineAccordionForm
+														slug={ item.slug }
+														contentId={ contentId }
+														headingId={ headingId }
+														descriptionId={
+															descriptionId
+														}
+													/>
+												) }
 											</GuidelineAccordion>
 										</div>
 									</li>

@@ -1,0 +1,20 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.block-guidelines {
+	margin-top: $grid-unit-30;
+
+	&__add-button {
+		width: 155px;
+	}
+
+	.dataviews-view-list__media-wrapper {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.dataviews-view-list__field-wrapper {
+		display: flex;
+		justify-content: center;
+	}
+}
