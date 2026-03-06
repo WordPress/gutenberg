@@ -192,12 +192,12 @@ jobs:
             )
         strategy:
             matrix:
-                IS_GUTENBERG_PLUGIN: [true]
-                IS_WORDPRESS_CORE: [false]
+                IS_GUTENBERG_PLUGIN: ['true']
+                IS_WORDPRESS_CORE: ['false']
 
                 include:
-                    - IS_GUTENBERG_PLUGIN: false
-                      IS_WORDPRESS_CORE: true
+                    - IS_GUTENBERG_PLUGIN: 'false'
+                      IS_WORDPRESS_CORE: 'true'
 
         outputs:
             job_status: ${{ job.status }}
@@ -222,6 +222,7 @@ jobs:
                   NO_CHECKS: 'true'
                   IS_GUTENBERG_PLUGIN: ${{ matrix.IS_GUTENBERG_PLUGIN }}
                   IS_WORDPRESS_CORE: ${{ matrix.IS_WORDPRESS_CORE }}
+                  WP_PLUGIN_NAME: ${{ matrix.IS_WORDPRESS_CORE && 'wp' || 'gutenberg' }}
 
             - name: Upload artifact
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
