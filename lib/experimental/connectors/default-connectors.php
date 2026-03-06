@@ -121,6 +121,48 @@ function _gutenberg_get_real_api_key( string $option_name, callable $mask_callba
 }
 
 /**
+ * Resolves an AI provider logo file path to a URL.
+ *
+ * The AI Client library returns absolute file paths (not URLs) for logo files
+ * since it is not WordPress-specific. This function converts a path within
+ * the plugins or must-use plugins directory to the corresponding URL.
+ *
+ * @access private
+ * @since 7.0.0
+ *
+ * @param string $path Absolute file path to the logo. Must be within
+ *                     WP_PLUGIN_DIR or WPMU_PLUGIN_DIR; triggers
+ *                     _doing_it_wrong() otherwise.
+ * @return string|null The logo URL, or null if the path is empty or
+ *                     outside the supported directories.
+ */
+function _gutenberg_resolve_ai_provider_logo_url( string $path ): ?string {
+	if ( ! $path ) {
+		return null;
+	}
+
+	$path = wp_normalize_path( $path );
+
+	$mu_plugin_dir = wp_normalize_path( WPMU_PLUGIN_DIR );
+	if ( str_starts_with( $path, $mu_plugin_dir . '/' ) ) {
+		return plugins_url( substr( $path, strlen( $mu_plugin_dir ) ), WPMU_PLUGIN_DIR . '/.' );
+	}
+
+	$plugin_dir = wp_normalize_path( WP_PLUGIN_DIR );
+	if ( str_starts_with( $path, $plugin_dir . '/' ) ) {
+		return plugins_url( substr( $path, strlen( $plugin_dir ) ) );
+	}
+
+	_doing_it_wrong(
+		__FUNCTION__,
+		__( 'Provider logo path must be located within the plugins or must-use plugins directory.', 'gutenberg' ),
+		'7.0.0'
+	);
+
+	return null;
+}
+
+/**
  * Gets the registered connector settings.
  *
  * @access private
@@ -209,7 +251,9 @@ function _gutenberg_get_connector_settings(): array {
 
 		$name        = $metadata->getName();
 		$description = method_exists( $metadata, 'getDescription' ) ? $metadata->getDescription() : null;
-		$logo        = method_exists( $metadata, 'getLogoUrl' ) ? $metadata->getLogoUrl() : null;
+		$logo_url    = method_exists( $metadata, 'getLogoPath' ) && $metadata->getLogoPath()
+			? _gutenberg_resolve_ai_provider_logo_url( $metadata->getLogoPath() )
+			: null;
 
 		if ( isset( $connectors[ $connector_id ] ) ) {
 			// Override fields with non-empty registry values.
@@ -219,8 +263,8 @@ function _gutenberg_get_connector_settings(): array {
 			if ( $description ) {
 				$connectors[ $connector_id ]['description'] = $description;
 			}
-			if ( $logo ) {
-				$connectors[ $connector_id ]['logo_url'] = $logo;
+			if ( $logo_url ) {
+				$connectors[ $connector_id ]['logo_url'] = $logo_url;
 			}
 			// Always update auth method; keep existing credentials_url as fallback.
 			$connectors[ $connector_id ]['authentication']['method'] = $authentication['method'];
@@ -231,7 +275,7 @@ function _gutenberg_get_connector_settings(): array {
 			$connectors[ $connector_id ] = array(
 				'name'           => $name ? $name : ucwords( $connector_id ),
 				'description'    => $description ? $description : '',
-				'logo_url'       => $logo ?? plugins_url( 'default-connector-logo.svg', __FILE__ ),
+				'logo_url'       => $logo_url ? $logo_url : plugins_url( 'default-connector-logo.svg', __FILE__ ),
 				'type'           => 'ai_provider',
 				'authentication' => $authentication,
 			);
