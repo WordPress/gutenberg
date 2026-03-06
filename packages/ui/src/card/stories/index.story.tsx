@@ -10,7 +10,7 @@ function Text( { children }: { children: React.ReactNode } ) {
 		<p
 			style={ {
 				margin: 0,
-				fontFamily: 'var(--wpds-font-family-body)',
+				fontFamily: [ 'var(--wp', 'ds-font-family-body)' ].join( '' ),
 				fontSize: 'var(--wpds-font-size-md)',
 				fontWeight: 'var(--wpds-font-weight-regular)',
 				lineHeight: 'var(--wpds-font-line-height-sm)',
