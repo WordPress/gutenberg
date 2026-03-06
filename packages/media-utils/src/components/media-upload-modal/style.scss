@@ -22,22 +22,6 @@
 	.dataviews-footer {
 		padding-bottom: $grid-unit-10;
 	}
-}
-
-.media-upload-modal__snackbar {
-	@include snackbar-container();
-	z-index: 200000;
-
-	// Override the transform and transform-origin applied by the Snackbar component
-	// to prevent the snackbar from shifting position when its content changes while
-	// the media upload modal is open. This is an edge case particular to the media
-	// upload modal when instantiated from a popover, such as the Replace control in
-	// the Image Block. In that case, the Framer Motion transform appears to get
-	// confused by the Snackbars being a child of the popover.
-	> div {
-		transform: none !important;
-		transform-origin: 0 !important;
-	}
 
 	.media-upload-modal__footer {
 		position: sticky;
@@ -76,13 +60,30 @@
 		.components-spinner {
 			width: $grid-unit-20;
 			height: $grid-unit-20;
+			margin: 0;
 		}
 	}
+}
 
-	.media-upload-modal__upload-status__popover {
-		.components-popover__content {
-			width: 320px;
-		}
+.media-upload-modal__snackbar {
+	@include snackbar-container();
+	z-index: 200000;
+
+	// Override the transform and transform-origin applied by the Snackbar component
+	// to prevent the snackbar from shifting position when its content changes while
+	// the media upload modal is open. This is an edge case particular to the media
+	// upload modal when instantiated from a popover, such as the Replace control in
+	// the Image Block. In that case, the Framer Motion transform appears to get
+	// confused by the Snackbars being a child of the popover.
+	> div {
+		transform: none !important;
+		transform-origin: 0 !important;
+	}
+}
+
+.media-upload-modal__upload-status__popover {
+	.components-popover__content {
+		width: 320px;
 	}
 
 	.media-upload-modal__upload-status__header {
@@ -90,12 +91,10 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: $grid-unit-15 $grid-unit-20;
-		border-bottom: 1px solid $gray-300;
-
 		h3 {
 			margin: 0;
 			font-size: 13px;
-			font-weight: 600;
+			font-weight: $font-weight-medium;
 		}
 	}
 
@@ -103,26 +102,23 @@
 		max-height: 200px;
 		overflow-y: auto;
 		margin: 0;
-		padding: 0;
+		padding: 0 0 $grid-unit-05;
 		list-style: none;
 	}
 
 	.media-upload-modal__upload-status__item {
 		display: flex;
 		align-items: flex-start;
+		margin-bottom: 0;
 		justify-content: space-between;
 		gap: $grid-unit-10;
 		padding: $grid-unit-10 $grid-unit-20;
-		border-bottom: 1px solid $gray-100;
-
-		&:last-child {
-			border-bottom: none;
-		}
 
 		.components-spinner {
 			flex-shrink: 0;
 			width: $grid-unit-20;
 			height: $grid-unit-20;
+			margin: 0;
 		}
 	}
 

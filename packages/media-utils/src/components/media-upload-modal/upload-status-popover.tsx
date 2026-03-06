@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { Button, Popover, Spinner } from '@wordpress/components';
-import { chevronDown } from '@wordpress/icons';
+import { Button, Icon, Notice, Popover, Spinner } from '@wordpress/components';
+import { check, chevronDown } from '@wordpress/icons';
 
 export interface UploadingFile {
 	id: string;
@@ -26,6 +26,7 @@ export function UploadStatusPopover( {
 }: UploadStatusPopoverProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const [ prevHadErrors, setPrevHadErrors ] = useState( false );
+	const triggerRef = useRef< HTMLButtonElement >( null );
 
 	const updateIsOpen = useCallback(
 		( open: boolean ) => {
@@ -77,18 +78,31 @@ export function UploadStatusPopover( {
 				className="media-upload-modal__upload-status__trigger"
 				variant="tertiary"
 				size="compact"
-				icon={ chevronDown }
-				iconPosition="right"
 				onClick={ () => updateIsOpen( ! isOpen ) }
+				aria-expanded={ isOpen }
+				ref={ triggerRef }
 			>
 				{ isUploading && <Spinner /> }
 				{ buttonLabel }
+				<Icon icon={ chevronDown } size={ 24 } />
 			</Button>
 			{ isOpen && (
 				<Popover
 					className="media-upload-modal__upload-status__popover"
 					placement="top-start"
-					onClose={ () => updateIsOpen( false ) }
+					anchor={ triggerRef.current }
+					onClose={ () => {
+						// Let the button's onClick handle toggling when
+						// the close was triggered by clicking the trigger.
+						if (
+							triggerRef.current?.contains(
+								triggerRef.current.ownerDocument.activeElement
+							)
+						) {
+							return;
+						}
+						updateIsOpen( false );
+					} }
 				>
 					<div className="media-upload-modal__upload-status__header">
 						<h3>{ __( 'Uploading' ) }</h3>
@@ -99,26 +113,29 @@ export function UploadStatusPopover( {
 								key={ file.id }
 								className="media-upload-modal__upload-status__item"
 							>
-								<span className="media-upload-modal__upload-status__filename">
-									{ file.name }
-								</span>
 								{ file.status === 'uploading' && <Spinner /> }
-								{ file.status === 'error' && (
-									<span className="media-upload-modal__upload-status__error">
-										{ file.error }
-										{ onDismissError && (
-											<Button
-												size="compact"
-												variant="link"
-												isDestructive
-												onClick={ () =>
-													onDismissError( file.id )
-												}
-											>
-												{ __( 'Dismiss' ) }
-											</Button>
-										) }
+								{ file.status === 'complete' && (
+									<Icon icon={ check } size={ 16 } />
+								) }
+								{ ( file.status === 'uploading' ||
+									file.status === 'complete' ) && (
+									<span
+										className="media-upload-modal__upload-status__filename"
+										title={ file.name }
+									>
+										{ file.name }
 									</span>
+								) }
+								{ file.status === 'error' && (
+									<Notice
+										status="error"
+										isDismissible={ !! onDismissError }
+										onRemove={ () =>
+											onDismissError?.( file.id )
+										}
+									>
+										{ file.name }: { file.error }
+									</Notice>
 								) }
 							</li>
 						) ) }

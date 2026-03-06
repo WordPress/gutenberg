@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -638,11 +643,9 @@ export function MediaUploadModal( {
 				<DataViewsPicker.FiltersToggled className="dataviews-filters__container" />
 				<DataViewsPicker.Layout />
 				<div
-					className={
-						uploadingFiles.length > 0
-							? 'media-upload-modal__footer is-uploading'
-							: 'media-upload-modal__footer'
-					}
+					className={ clsx( 'media-upload-modal__footer', {
+						'is-uploading': uploadingFiles.length > 0,
+					} ) }
 				>
 					<UploadStatusPopover
 						uploadingFiles={ uploadingFiles }
