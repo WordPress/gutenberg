@@ -8,14 +8,13 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import type { BasePost } from '../../../types';
-import ScheduledDateEdit from './edit';
 
 const scheduledDateField: Field< BasePost > = {
 	id: 'scheduled_date',
 	type: 'datetime',
 	label: __( 'Scheduled Date' ),
 	getValue: ( { item } ) => item.date,
-	Edit: ScheduledDateEdit,
+	setValue: ( { value } ) => ( { date: value } ),
 	isVisible: ( item ) => item.status === 'future',
 };
 
