@@ -95,6 +95,9 @@ function TabBlockMover( {
 	}
 
 	const handleMoveUp = () => {
+		if ( ! tabClientId || ! tabPanelClientId ) {
+			return;
+		}
 		// Move both the tab content block and the menu item button together.
 		moveBlocksUp( [ tabClientId ], tabPanelClientId );
 		moveBlocksUp( [ menuItemClientId ], tabsMenuClientId );
@@ -107,6 +110,9 @@ function TabBlockMover( {
 	};
 
 	const handleMoveDown = () => {
+		if ( ! tabClientId || ! tabPanelClientId ) {
+			return;
+		}
 		moveBlocksDown( [ tabClientId ], tabPanelClientId );
 		moveBlocksDown( [ menuItemClientId ], tabsMenuClientId );
 		if ( tabsClientId ) {
