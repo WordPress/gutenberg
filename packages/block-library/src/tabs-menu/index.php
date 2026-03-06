@@ -57,16 +57,9 @@ function block_core_tabs_menu_render_callback( array $attributes, string $conten
 		++$tab_index;
 	}
 
-	// Replace the saved inner block HTML with the re-rendered buttons.
-	$result = preg_replace_callback(
-		'/(<div\b[^>]*\bwp-block-tabs-menu\b[^>]*>).*?(<\/div>)/s',
-		static function ( $matches ) use ( $buttons_html ) {
-			return $matches[1] . $buttons_html . $matches[2];
-		},
-		$content
-	);
-
-	return $result ?? $content;
+	// Rebuild the wrapper using get_block_wrapper_attributes().
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'role' => 'tablist' ) );
+	return sprintf( '<div %s>%s</div>', $wrapper_attributes, $buttons_html );
 }
 
 /**
