@@ -6,12 +6,7 @@ import {
 	serialize,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	__experimentalUseSlotFills as useSlotFills,
-} from '@wordpress/components';
+import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
 import { Children, cloneElement } from '@wordpress/element';
@@ -211,9 +206,6 @@ export function BlockSettingsDropdown( {
 	const shouldShowBlockParentMenuItem =
 		! parentBlockIsSelected && !! firstParentClientId;
 
-	const fills = useSlotFills( 'BlockSettingsMenuControls' );
-	const hasFills = !! fills?.length;
-
 	return (
 		<BlockActions
 			clientIds={ clientIds }
@@ -231,16 +223,16 @@ export function BlockSettingsDropdown( {
 				onCopy,
 				onPasteStyles,
 			} ) => {
-				// Hide the dropdown when there are no actions and no
-				// registered fills. Plugins may register fills even when
-				// Core doesn't render anything. In content-only mode,
-				// fills with supportsContentOnly may still need to render.
+				// Hide the dropdown when there are no actions.
+				// It is possible that some plugins register fills
+				// for this menu even if Core doesn't render anything,
+				// in which case we may want to render the menu anyway.
+				// That said for now, we can start more conservative.
 				const isEmpty =
 					! canRemove &&
 					! canDuplicate &&
 					! canInsertBlock &&
-					isContentOnly &&
-					! hasFills;
+					isContentOnly;
 
 				if ( isEmpty ) {
 					return null;
