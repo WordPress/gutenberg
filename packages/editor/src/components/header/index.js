@@ -21,10 +21,12 @@ import PostPublishButtonOrToggle from '../post-publish-button/post-publish-butto
 import PostSavedState from '../post-saved-state';
 import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
+import TemplateDropdown from '../template-dropdown';
 import ZoomOutToggle from '../zoom-out-toggle';
 import { store as editorStore } from '../../store';
 import {
 	ATTACHMENT_POST_TYPE,
+	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_POST_TYPE,
 	NAVIGATION_POST_TYPE,
@@ -50,6 +52,7 @@ function Header( {
 		hasBlockSelection,
 		hasSectionRootClientId,
 		isStylesCanvasActive,
+		templateId,
 		isAttachment,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
@@ -57,6 +60,7 @@ function Header( {
 			getEditorMode,
 			getCurrentPostType,
 			getCurrentPostId,
+			getCurrentTemplateId,
 			isPublishSidebarOpened: _isPublishSidebarOpened,
 		} = select( editorStore );
 		const { getStylesPath, getShowStylebook } = unlock(
@@ -78,6 +82,7 @@ function Header( {
 			isStylesCanvasActive:
 				!! getStylesPath()?.startsWith( '/revisions' ) ||
 				getShowStylebook(),
+			templateId: getCurrentTemplateId(),
 			isAttachment:
 				getCurrentPostType() === ATTACHMENT_POST_TYPE &&
 				window?.__experimentalMediaEditor,
@@ -95,6 +100,16 @@ function Header( {
 			TEMPLATE_PART_POST_TYPE,
 			PATTERN_POST_TYPE,
 		].includes( postType ) || isStylesCanvasActive;
+
+	const showTemplateDropdown =
+		!! templateId &&
+		! [
+			ATTACHMENT_POST_TYPE,
+			TEMPLATE_POST_TYPE,
+			TEMPLATE_PART_POST_TYPE,
+			PATTERN_POST_TYPE,
+			NAVIGATION_POST_TYPE,
+		].includes( postType );
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
@@ -154,6 +169,8 @@ function Header( {
 						forceIsAutosaveable={ forceIsDirty }
 						disabled={ disablePreviewOption }
 					/>
+
+					{ showTemplateDropdown && <TemplateDropdown /> }
 
 					<PostPreviewButton
 						className="editor-header__post-preview-button"
