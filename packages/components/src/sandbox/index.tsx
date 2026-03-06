@@ -284,7 +284,7 @@ function SandBox( {
 			title={ title }
 			tabIndex={ tabIndex }
 			className="components-sandbox"
-			sandbox="allow-scripts allow-same-origin allow-presentation"
+			sandbox="allow-scripts allow-same-origin"
 			onFocus={ onFocus }
 			width={ Math.ceil( width ) }
 			height={ Math.ceil( height ) }
