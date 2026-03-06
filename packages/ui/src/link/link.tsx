@@ -13,7 +13,6 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 		openInNewTab = false,
 		render,
 		className,
-		rel = '',
 		onClick,
 		target,
 		...props
@@ -21,15 +20,6 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 	ref
 ) {
 	const isInternalAnchor = !! props.href?.startsWith( '#' );
-
-	const relParts = [
-		...rel.split( ' ' ),
-		...( openInNewTab ? [ 'noopener' ] : [] ),
-	];
-	const mergedRel =
-		relParts.filter( Boolean ).length > 0
-			? [ ...new Set( relParts.filter( Boolean ) ) ].join( ' ' )
-			: undefined;
 
 	const handleClick = ( event: React.MouseEvent< HTMLAnchorElement > ) => {
 		if ( openInNewTab && isInternalAnchor ) {
@@ -50,7 +40,6 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 				openInNewTab && styles[ 'has-link-icon' ],
 				className
 			),
-			rel: mergedRel,
 			onClick: handleClick,
 			target: openInNewTab ? '_blank' : target,
 			children: openInNewTab ? (
