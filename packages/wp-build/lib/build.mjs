@@ -2189,5 +2189,3 @@ main().catch( ( error ) => {
 	console.error( '❌ Build failed:', error );
 	process.exit( 1 );
 } );
-
-/* eslint-enable @wordpress/no-wp-process-env, @wordpress/wp-global-usage */
