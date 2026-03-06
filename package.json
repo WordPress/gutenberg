@@ -158,7 +158,7 @@
 		"lint": "concurrently \"npm run lint:lockfile\" \"npm run lint:tsconfig\" \"npm run lint:js\" \"npm run lint:pkg-json\" \"npm run lint:css\"",
 		"lint:css": "wp-scripts lint-style \"**/*.scss\" \"**/*.module.css\"",
 		"lint:css:fix": "npm run lint:css -- --fix",
-		"lint:js": "wp-scripts lint-js",
+		"lint:js": "wp-scripts lint-js --cache --cache-location .cache/eslint/.eslintcache",
 		"lint:js:fix": "npm run lint:js -- --fix",
 		"lint:lockfile": "node ./bin/validate-package-lock.js",
 		"lint:tsconfig": "node ./bin/validate-tsconfig.mjs",
