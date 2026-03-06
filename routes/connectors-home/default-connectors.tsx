@@ -17,8 +17,16 @@ import { Badge } from '@wordpress/ui';
 import { useConnectorPlugin } from './use-connector-plugin';
 import { OpenAILogo, ClaudeLogo, GeminiLogo } from './logos';
 
+export type ApiKeySource = 'env' | 'constant' | 'database' | 'none';
+
 type ConnectorAuthentication =
-	| { method: 'api_key'; settingName: string; credentialsUrl: string | null }
+	| {
+			method: 'api_key';
+			settingName: string;
+			credentialsUrl: string | null;
+			keySource?: ApiKeySource;
+			isConnected?: boolean;
+	  }
 	| { method: 'none' };
 
 interface ConnectorData {
@@ -80,6 +88,8 @@ interface ApiKeyConnectorConfig {
 	Logo?: React.ComponentType;
 	isInstalled?: boolean;
 	isActivated?: boolean;
+	keySource?: ApiKeySource;
+	initialIsConnected?: boolean;
 }
 
 function ApiKeyConnector( {
@@ -91,6 +101,8 @@ function ApiKeyConnector( {
 	Logo,
 	isInstalled,
 	isActivated,
+	keySource: initialKeySource,
+	initialIsConnected,
 }: ConnectorRenderProps & ApiKeyConnectorConfig ) {
 	let helpLabel: string | undefined;
 	try {
@@ -110,6 +122,8 @@ function ApiKeyConnector( {
 		isBusy,
 		isConnected,
 		currentApiKey,
+		keySource,
+		isExternallyConfigured,
 		handleButtonClick,
 		getButtonLabel,
 		saveApiKey,
@@ -119,6 +133,8 @@ function ApiKeyConnector( {
 		settingName,
 		isInstalled,
 		isActivated,
+		keySource: initialKeySource,
+		initialIsConnected,
 	} );
 	const showUnavailableBadge =
 		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
@@ -163,11 +179,18 @@ function ApiKeyConnector( {
 			{ isExpanded && pluginStatus === 'active' && (
 				<DefaultConnectorSettings
 					key={ isConnected ? 'connected' : 'setup' }
-					initialValue={ currentApiKey }
+					initialValue={
+						isExternallyConfigured
+							? '••••••••••••••••'
+							: currentApiKey
+					}
 					helpUrl={ helpUrl }
 					helpLabel={ helpLabel }
-					readOnly={ isConnected }
-					onRemove={ removeApiKey }
+					readOnly={ isConnected || isExternallyConfigured }
+					keySource={ keySource }
+					onRemove={
+						isExternallyConfigured ? undefined : removeApiKey
+					}
 					onSave={ async ( apiKey: string ) => {
 						await saveApiKey( apiKey );
 						setIsExpanded( false );
@@ -209,6 +232,8 @@ export function registerDefaultConnectors() {
 					Logo={ CONNECTOR_LOGOS[ connectorId ] }
 					isInstalled={ data.plugin?.isInstalled }
 					isActivated={ data.plugin?.isActivated }
+					keySource={ authentication.keySource }
+					initialIsConnected={ authentication.isConnected }
 				/>
 			),
 		} );

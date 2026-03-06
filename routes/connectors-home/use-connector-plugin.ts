@@ -8,12 +8,15 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 export type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';
+export type ApiKeySource = 'env' | 'constant' | 'database' | 'none';
 
 interface UseConnectorPluginOptions {
 	pluginSlug?: string;
 	settingName: string;
 	isInstalled?: boolean;
 	isActivated?: boolean;
+	keySource?: ApiKeySource;
+	initialIsConnected?: boolean;
 }
 
 interface UseConnectorPluginReturn {
@@ -25,6 +28,8 @@ interface UseConnectorPluginReturn {
 	isBusy: boolean;
 	isConnected: boolean;
 	currentApiKey: string;
+	keySource: ApiKeySource;
+	isExternallyConfigured: boolean;
 	handleButtonClick: () => void;
 	getButtonLabel: () => string;
 	saveApiKey: ( apiKey: string ) => Promise< void >;
@@ -36,6 +41,8 @@ export function useConnectorPlugin( {
 	settingName,
 	isInstalled,
 	isActivated,
+	keySource = 'none',
+	initialIsConnected = false,
 }: UseConnectorPluginOptions ): UseConnectorPluginReturn {
 	const [ pluginStatus, setPluginStatus ] =
 		useState< PluginStatus >( 'checking' );
@@ -58,10 +65,17 @@ export function useConnectorPlugin( {
 	// Use canManagePlugins (from REST API result) for activation capability.
 	const canActivatePlugins = canManagePlugins;
 
+	// Check if the key is configured externally (env var or constant).
+	const isExternallyConfigured =
+		keySource === 'env' || keySource === 'constant';
+
+	// For externally configured keys, use the server-provided connection status.
+	// For database keys, check if we have a valid API key.
 	const isConnected =
 		pluginStatus === 'active' &&
-		currentApiKey !== '' &&
-		currentApiKey !== 'invalid_key';
+		( isExternallyConfigured
+			? initialIsConnected
+			: currentApiKey !== '' && currentApiKey !== 'invalid_key' );
 
 	// Fetch the current API key
 	const fetchApiKey = useCallback( async () => {
@@ -261,6 +275,8 @@ export function useConnectorPlugin( {
 		isBusy,
 		isConnected,
 		currentApiKey,
+		keySource,
+		isExternallyConfigured,
 		handleButtonClick,
 		getButtonLabel,
 		saveApiKey,

@@ -6,6 +6,49 @@
  */
 
 /**
+ * Determines the source of an API key for a given provider.
+ *
+ * Checks in order: environment variable, PHP constant, database.
+ * Uses the same naming convention as the WP AI Client ProviderRegistry.
+ *
+ * @access private
+ *
+ * @param string $provider_id The provider ID (e.g., 'openai', 'anthropic', 'google').
+ * @return string The key source: 'env', 'constant', 'database', or 'none'.
+ */
+function _gutenberg_get_api_key_source( string $provider_id ): string {
+	// Convert provider ID to CONSTANT_CASE for env var name.
+	// e.g., 'openai' -> 'OPENAI', 'anthropic' -> 'ANTHROPIC'.
+	$constant_case_id = strtoupper(
+		preg_replace( '/([a-z])([A-Z])/', '$1_$2', str_replace( '-', '_', $provider_id ) )
+	);
+	$env_var_name = "{$constant_case_id}_API_KEY";
+
+	// Check environment variable first.
+	$env_value = getenv( $env_var_name );
+	if ( false !== $env_value && '' !== $env_value ) {
+		return 'env';
+	}
+
+	// Check PHP constant.
+	if ( defined( $env_var_name ) ) {
+		$const_value = constant( $env_var_name );
+		if ( is_string( $const_value ) && '' !== $const_value ) {
+			return 'constant';
+		}
+	}
+
+	// Check database.
+	$setting_name = "connectors_ai_{$provider_id}_api_key";
+	$db_value     = get_option( $setting_name, '' );
+	if ( '' !== $db_value ) {
+		return 'database';
+	}
+
+	return 'none';
+}
+
+/**
  * Masks an API key, showing only the last 4 characters.
  *
  * @access private
@@ -404,6 +447,19 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 		if ( 'api_key' === $auth['method'] ) {
 			$auth_out['settingName']    = $auth['setting_name'] ?? '';
 			$auth_out['credentialsUrl'] = $auth['credentials_url'] ?? null;
+			$auth_out['keySource']      = _gutenberg_get_api_key_source( $connector_id );
+
+			// Check if the provider is connected (has valid credentials).
+			$is_connected = false;
+			try {
+				$registry = \WordPress\AiClient\AiClient::defaultRegistry();
+				if ( $registry->hasProvider( $connector_id ) ) {
+					$is_connected = $registry->isProviderConfigured( $connector_id );
+				}
+			} catch ( Exception $e ) {
+				// $is_connected remains false.
+			}
+			$auth_out['isConnected'] = $is_connected;
 		}
 
 		$connector_out = array(
