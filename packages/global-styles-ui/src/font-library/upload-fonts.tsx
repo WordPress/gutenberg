@@ -22,7 +22,7 @@ import { ALLOWED_FILE_EXTENSIONS } from './utils/constants';
 import { FontLibraryContext } from './context';
 import { Font } from './lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
-import { loadFontFaceInBrowser } from './utils';
+import { loadFontFaceInBrowser, normalizeCSSFontFaceFontFamily } from './utils';
 
 function UploadFonts() {
 	const { installFonts } = useContext( FontLibraryContext );
@@ -174,65 +174,13 @@ function UploadFonts() {
 
 		const cssFontFamily = normalizeCSSFontFaceFontFamily( fontName );
 
-		// Double check
-		try {
-			const stylesheet = new CSSStyleSheet();
-			/* @ts-expect-error: This narrows from CSSRule to CSSFontFaceRule, it's correct */
-			const fontFaceRule: CSSFontFaceRule =
-				stylesheet.cssRules[ stylesheet.insertRule( '@font-face {}' ) ];
-			fontFaceRule.style.fontFamily = cssFontFamily;
-
-			if ( fontFaceRule.style.fontFamily !== cssFontFamily ) {
-				throw new Error(
-					`Font family "${ fontName }" is not valid and cannot be used in CSS.`
-				);
-			}
-		} catch {}
-
-		console.log( '%o // %o', fontName, cssFontFamily );
-		debugger;
-
 		return {
 			file: fontFile,
-			fontFamily: fontName,
+			fontFamily: cssFontFamily,
 			fontStyle: isItalic ? 'italic' : 'normal',
 			fontWeight: weightRange || fontWeight,
 		};
 	};
-
-	function normalizeCSSFontFaceFontFamily( fontName: string ): string {
-		return `"${ fontName
-			.trim()
-
-			/*
-			 * CSS Unicode escaping for problematic characters.
-			 * https://www.w3.org/TR/css-syntax-3/#escaping
-			 *
-			 * These characters are not required by CSS but may be problematic in WordPress:
-			 *
-			 * - Normalize and replace newlines. https://www.w3.org/TR/css-syntax-3/#input-preprocessing
-			 * - "<", ">", and "&" are replaced to prevent issues with KSES and other sanitization that
-			 *   is confused by HTML-like text.
-			 *   is confused by HTML-like text.
-			 * - `,`, `"` and `'` are replaced to prevent issues where font families may be processed later.
-			 *
-			 * Note that the Unicode escape sequences are used rather than backslash-escaping so the
-			 * problematic characters are removed completely.
-			 */
-			// Escape existing backslashes before any other processing
-			.replaceAll( '\\', '\\5C ' )
-			// Carriage return + line feed must be the first newline replacement.
-			.replaceAll( '\r\n', '\\A ' )
-			.replaceAll( '\r', '\\A ' )
-			.replaceAll( '\f', '\\A ' )
-			.replaceAll( '\n', '\\A ' )
-			.replaceAll( ',', '\\2C ' )
-			.replaceAll( '"', '\\22 ' )
-			.replaceAll( "'", '\\27 ' )
-			.replaceAll( '<', '\\3C ' )
-			.replaceAll( '>', '\\3E ' )
-			.replaceAll( '&', '\\26 ' ) }"`;
-	}
 
 	/**
 	 * Creates the font family definition and sends it to the server
