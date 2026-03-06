@@ -200,8 +200,8 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				);
 			}
 
-			$rooms        = $request['rooms'];
-			$wp_user_id   = get_current_user_id();
+			$rooms      = $request['rooms'];
+			$wp_user_id = get_current_user_id();
 
 			foreach ( $rooms as $room ) {
 				$client_id      = $room['client_id'];
@@ -249,7 +249,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					$same_user_client_count = 0;
 					$other_user_ids         = array();
 					$current_time           = time();
-					
+			
 					foreach ( $existing_awareness as $entry ) {
 						if ( $current_time - $entry['updated_at'] >= self::AWARENESS_TIMEOUT ) {
 							continue;
