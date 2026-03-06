@@ -13,17 +13,7 @@
 		 * Add border for the entire content controls and remove the similar border
 		 * for tools panel.
 		 */
-		border-top: $border-width solid $gray-200;
-	}
-
-	&.is-selected {
-		.block-editor-block-fields__header-icon svg {
-			fill: var(--wp-admin-theme-color);
-		}
-
-		.block-editor-block-fields__header-title {
-			color: var(--wp-admin-theme-color);
-		}
+		border-block-start: $border-width solid $gray-200;
 	}
 }
 

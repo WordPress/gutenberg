@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import {
 	privateApis as blocksPrivateApis,
 	getBlockType,
@@ -73,7 +72,7 @@ function BlockFields( {
 
 	const blockContext = useContext( BlockContext );
 
-	const { attributes, selectedBlockClientIds } = useSelect(
+	const attributes = useSelect(
 		( select ) => {
 			const _attributes =
 				select( blockEditorStore ).getBlockAttributes( clientId );
@@ -82,26 +81,21 @@ function BlockFields( {
 			}
 
 			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
-			const computedAttributes = Object.entries(
-				_attributes.metadata.bindings
-			).reduce( ( acc, [ attribute, binding ] ) => {
-				const source = getBlockBindingsSource( binding.source );
-				if ( ! source ) {
-					return acc;
-				}
-				const values = source.getValues( {
-					select,
-					context: blockContext,
-					bindings: { [ attribute ]: binding },
-				} );
-				return { ...acc, ...values };
-			}, _attributes );
-
-			return {
-				attributes: computedAttributes,
-				selectedBlockClientIds:
-					select( blockEditorStore ).getSelectedBlockClientIds(),
-			};
+			return Object.entries( _attributes.metadata.bindings ).reduce(
+				( acc, [ attribute, binding ] ) => {
+					const source = getBlockBindingsSource( binding.source );
+					if ( ! source ) {
+						return acc;
+					}
+					const values = source.getValues( {
+						select,
+						context: blockContext,
+						bindings: { [ attribute ]: binding },
+					} );
+					return { ...acc, ...values };
+				},
+				_attributes
+			);
 		},
 		[ blockContext, clientId ]
 	);
@@ -192,10 +186,7 @@ function BlockFields( {
 
 	return (
 		<div
-			className={ clsx( 'block-editor-block-fields__container', {
-				'is-selected':
-					isMultiBlock && selectedBlockClientIds.includes( clientId ),
-			} ) }
+			className="block-editor-block-fields__container"
 			onMouseEnter={
 				isMultiBlock
 					? () => debouncedToggleBlockHighlight( clientId, true )
