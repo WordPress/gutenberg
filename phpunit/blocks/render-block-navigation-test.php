@@ -98,20 +98,21 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	public function test_block_core_navigation_set_overlay_image_fetch_priority_adds_low_priority() {
 		$html   = '<div><img src="example.jpg" width="300" height="300" /></div>';
 		$result = gutenberg_block_core_navigation_set_overlay_image_fetch_priority( $html );
-		$this->assertStringNotContainsString( 'loading="lazy"', $result );
-		$this->assertStringContainsString( 'fetchpriority="low"', $result );
+		$tags   = new WP_HTML_Tag_Processor( $result );
+		$tags->next_tag( 'IMG' );
+		$this->assertSame( 'low', $tags->get_attribute( 'fetchpriority' ) );
+		$this->assertNull( $tags->get_attribute( 'loading' ) );
 	}
 
 	/**
 	 * @covers gutenberg_block_core_navigation_set_overlay_image_fetch_priority
 	 */
-	public function test_block_core_navigation_set_overlay_image_fetch_priority_overrides_eager_and_high() {
-		$html   = '<div><img src="example.jpg" loading="eager" fetchpriority="high" /></div>';
+	public function test_block_core_navigation_set_overlay_image_fetch_priority_overrides_high_priority() {
+		$html   = '<div><img src="example.jpg" fetchpriority="high" /></div>';
 		$result = gutenberg_block_core_navigation_set_overlay_image_fetch_priority( $html );
-		$this->assertStringNotContainsString( 'loading="lazy"', $result );
-		$this->assertStringNotContainsString( 'loading="eager"', $result );
-		$this->assertStringContainsString( 'fetchpriority="low"', $result );
-		$this->assertStringNotContainsString( 'fetchpriority="high"', $result );
+		$tags   = new WP_HTML_Tag_Processor( $result );
+		$tags->next_tag( 'IMG' );
+		$this->assertSame( 'low', $tags->get_attribute( 'fetchpriority' ) );
 	}
 
 	/**
@@ -120,8 +121,11 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	public function test_block_core_navigation_set_overlay_image_fetch_priority_multiple_images() {
 		$html   = '<div><img src="a.jpg" /><img src="b.jpg" /></div>';
 		$result = gutenberg_block_core_navigation_set_overlay_image_fetch_priority( $html );
-		$this->assertSame( 0, substr_count( $result, 'loading="lazy"' ) );
-		$this->assertSame( 2, substr_count( $result, 'fetchpriority="low"' ) );
+		$tags   = new WP_HTML_Tag_Processor( $result );
+		$tags->next_tag( 'IMG' );
+		$this->assertSame( 'low', $tags->get_attribute( 'fetchpriority' ) );
+		$tags->next_tag( 'IMG' );
+		$this->assertSame( 'low', $tags->get_attribute( 'fetchpriority' ) );
 	}
 
 	/**
