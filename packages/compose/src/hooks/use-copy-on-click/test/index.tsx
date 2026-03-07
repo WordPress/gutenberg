@@ -121,6 +121,19 @@ describe( 'useCopyOnClick', () => {
 	} );
 
 	it( 'should not update hasCopied after unmount', async () => {
+		const renderSpy = jest.fn();
+
+		const SpyComponent = ( { text }: { text: string } ) => {
+			const ref = useRef< HTMLButtonElement >( null );
+			const hasCopied = useCopyOnClick( ref, text );
+			renderSpy( hasCopied );
+			return (
+				<button ref={ ref } type="button">
+					{ hasCopied ? 'Copied!' : 'Copy' }
+				</button>
+			);
+		};
+
 		let resolvePromise: () => void;
 		const delayedPromise = new Promise< void >( ( resolve ) => {
 			resolvePromise = resolve;
@@ -130,7 +143,10 @@ describe( 'useCopyOnClick', () => {
 		);
 
 		const user = userEvent.setup();
-		const { unmount } = render( <TestComponent text="test" /> );
+		const { unmount } = render( <SpyComponent text="test" /> );
+
+		expect( renderSpy ).toHaveBeenLastCalledWith( false );
+		const renderCountBeforeUnmount = renderSpy.mock.calls.length;
 
 		await user.click( screen.getByRole( 'button' ) );
 		unmount();
@@ -140,7 +156,7 @@ describe( 'useCopyOnClick', () => {
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 		} );
 
-		// No state update after unmount — no throw, and we've resolved after unmount
-		expect( navigator.clipboard.writeText ).toHaveBeenCalled();
+		// No additional renders after unmount — setHasCopied(true) was not called.
+		expect( renderSpy ).toHaveBeenCalledTimes( renderCountBeforeUnmount );
 	} );
 } );
