@@ -73,6 +73,12 @@ export function CollaboratorsList( {
 							<div className="editor-collaborators-presence__list-item-info">
 								<div className="editor-collaborators-presence__list-item-name">
 									{ collaboratorState.collaboratorInfo.name }
+									{ collaboratorState.isMe && (
+										<span className="editor-collaborators-presence__list-item-you">
+											{ ' ' }
+											{ __( '(you)' ) }
+										</span>
+									) }
 								</div>
 							</div>
 						</button>
