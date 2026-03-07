@@ -99,5 +99,9 @@
 			text-overflow: ellipsis;
 			white-space: nowrap;
 		}
+
+		&-you {
+			color: $gray-700;
+		}
 	}
 }
