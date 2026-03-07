@@ -30,9 +30,6 @@ test.describe( 'Clipboard (useCopyToClipboard)', () => {
 							{
 								ref,
 								type: 'button',
-								style: {
-									width: '100%',
-								},
 							},
 							hasCopied ? 'Copied!' : 'Copy'
 						)
@@ -55,11 +52,13 @@ test.describe( 'Clipboard (useCopyToClipboard)', () => {
 
 		await editor.insertBlock( { name: 'test/copy-button-block' } );
 
-		const copyButtonBlock = editor.canvas.getByRole( 'document', {
-			name: 'Block: Copy Button Block',
-		} );
-		await copyButtonBlock.click();
-		await expect( copyButtonBlock ).toHaveText( 'Copied!' );
+		const copyButton = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Copy Button Block',
+			} )
+			.getByRole( 'button' );
+		await copyButton.click();
+		await expect( copyButton ).toHaveText( 'Copied!' );
 
 		const clipboardText = await page.evaluate( async () => {
 			return await window.navigator.clipboard.readText();
