@@ -5,6 +5,13 @@
 	width: 100%;
 }
 
+.dataforms-layouts-card__field-header-content {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+}
+
 .dataforms-layouts-card__field-description {
 	color: $gray-700;
 	display: block;

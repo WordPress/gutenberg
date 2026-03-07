@@ -4,6 +4,7 @@
 import {
 	useCallback,
 	useContext,
+	useEffect,
 	useMemo,
 	useRef,
 	useState,
@@ -95,7 +96,7 @@ function HeaderContent< Item >( {
 	);
 
 	return (
-		<>
+		<div className="dataforms-layouts-card__field-header-content">
 			<Card.Title>{ label }</Card.Title>
 			{ touched && layout.isCollapsible && (
 				<ValidationBadge validity={ validity } />
@@ -111,7 +112,7 @@ function HeaderContent< Item >( {
 					) ) }
 				</div>
 			) }
-		</>
+		</div>
 	);
 }
 
@@ -193,6 +194,10 @@ export default function FormCardField< Item >( {
 	const [ isOpen, setIsOpen ] = useState( isOpened );
 	const [ touched, setTouched ] = useState( false );
 
+	useEffect( () => {
+		setIsOpen( isOpened );
+	}, [ isOpened ] );
+
 	const handleOpenChange = useCallback( ( open: boolean ) => {
 		if ( ! open ) {
 			setTouched( true );
@@ -255,7 +260,7 @@ export default function FormCardField< Item >( {
 		return (
 			<CollapsibleCard.Root
 				className="dataforms-layouts-card__field"
-				defaultOpen={ isOpened }
+				open={ isOpen }
 				onOpenChange={ handleOpenChange }
 			>
 				<CollapsibleCard.Header>
