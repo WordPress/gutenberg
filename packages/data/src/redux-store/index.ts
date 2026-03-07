@@ -196,11 +196,7 @@ function createPrivateProxy< T extends Record< string, any > >(
  *
  * @return Store Object.
  */
-export default function createReduxStore<
-	State,
-	Actions extends Record< string, ActionCreator >,
-	Selectors,
->(
+export default function createReduxStore< State, Actions, Selectors >(
 	key: string,
 	options: ReduxStoreConfig< State, Actions, Selectors >
 ): StoreDescriptor< ReduxStoreConfig< State, Actions, Selectors > > {
@@ -281,7 +277,12 @@ export default function createReduxStore<
 					metadataActions as Record< string, ActionCreator >,
 					bindAction
 				),
-				...mapValues( options.actions, bindAction ),
+				...mapValues(
+					options.actions as
+						| Record< string, ActionCreator >
+						| undefined,
+					bindAction
+				),
 			};
 
 			// Object with both public and private actions. Private actions are accessed through a proxy,

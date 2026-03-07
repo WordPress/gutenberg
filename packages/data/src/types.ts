@@ -43,11 +43,7 @@ export interface StoreDescriptor< Config extends AnyConfig = AnyConfig > {
 	instantiate: ( registry: DataRegistry ) => StoreInstance< Config >;
 }
 
-export interface ReduxStoreConfig<
-	State,
-	ActionCreators extends MapOf< ActionCreator >,
-	Selectors,
-> {
+export interface ReduxStoreConfig< State, ActionCreators, Selectors > {
 	initialState?: State;
 	reducer: ( state: any, action: any ) => any;
 	actions?: ActionCreators;
@@ -421,25 +417,21 @@ export interface StorageInterface {
 
 export type ConfigOf< S > = S extends StoreDescriptor< infer C > ? C : never;
 
-export type ActionCreatorsOf< T extends AnyConfig | StoreDescriptor > =
-	T extends StoreDescriptor< infer C >
-		? ( C extends ReduxStoreConfig< any, infer ActionCreators, any >
-				? PromisifiedActionCreators< ActionCreators >
-				: never ) &
-				MetadataActions< T >
-		: T extends ReduxStoreConfig< any, infer ActionCreators, any >
-		? PromisifiedActionCreators< ActionCreators >
-		: never;
+export type ActionCreatorsOf< T > = T extends StoreDescriptor<
+	ReduxStoreConfig< any, infer ActionCreators, any >
+>
+	? PromisifiedActionCreators< ActionCreators > & MetadataActions< T >
+	: T extends ReduxStoreConfig< any, infer ActionCreators, any >
+	? PromisifiedActionCreators< ActionCreators >
+	: never;
 
 // Takes an object containing all action creators for a store and updates the
 // return type of each action creator to account for internal registry details --
 // for example, dispatched actions are wrapped with a Promise.
-export type PromisifiedActionCreators<
-	ActionCreators extends MapOf< ActionCreator >,
-> = {
-	[ Action in keyof ActionCreators ]: PromisifyActionCreator<
-		ActionCreators[ Action ]
-	>;
+export type PromisifiedActionCreators< ActionCreators > = {
+	[ Action in keyof ActionCreators ]: ActionCreators[ Action ] extends ActionCreator
+		? PromisifyActionCreator< ActionCreators[ Action ] >
+		: ActionCreators[ Action ];
 };
 
 // Wraps action creator return types with a Promise and handles thunks and generators.
@@ -486,7 +478,7 @@ type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
  */
 export interface ThunkArgs< S extends StoreDescriptor = StoreDescriptor > {
 	dispatch: ActionCreatorsOf< S > &
-		( ( action: Record< string, unknown > ) => void );
+		( ( action: Record< string, unknown > | Function ) => unknown );
 	select: CurriedSelectorsOf< S >;
 	resolveSelect: CurriedSelectorsResolveOf< S >;
 	registry: DataRegistry;
