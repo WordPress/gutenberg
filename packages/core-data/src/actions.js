@@ -19,7 +19,11 @@ import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
-import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
+import {
+	LOCAL_EDITOR_ORIGIN,
+	LOCAL_UNDO_IGNORED_ORIGIN,
+	getSyncManager,
+} from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 /**
@@ -445,11 +449,18 @@ export const editEntityRecord =
 				? false
 				: ! options.isCached;
 
+			// Use an untracked origin for undoIgnore changes so the Yjs
+			// UndoManager does not capture them as undo levels, while
+			// still syncing them to the CRDT document and other peers.
+			const origin = options.undoIgnore
+				? LOCAL_UNDO_IGNORED_ORIGIN
+				: LOCAL_EDITOR_ORIGIN;
+
 			getSyncManager()?.update(
 				objectType,
 				objectId,
 				editsWithMerges,
-				LOCAL_EDITOR_ORIGIN,
+				origin,
 				{ isNewUndoLevel }
 			);
 		}
@@ -793,11 +804,13 @@ export const saveEntityRecord =
 						edits
 					);
 					if ( entityConfig.syncConfig ) {
+						// Use an untracked origin so that the save
+						// response does not create undo levels.
 						getSyncManager()?.update(
 							`${ kind }/${ name }`,
 							recordId,
 							updatedRecord,
-							LOCAL_EDITOR_ORIGIN,
+							LOCAL_UNDO_IGNORED_ORIGIN,
 							{ isSave: true }
 						);
 					}

@@ -253,12 +253,14 @@ class PostEditorTemplateMode {
 			)
 		).toBeVisible();
 
-		// Wait for the editor to be loaded and ready before making changes.
-		// Without this, the editor will move focus to body while still typing.
-		// And the save states will not be counted as dirty.
-		// There is likely a bug in the code, waiting for the snackbar above should be enough.
-		// eslint-disable-next-line playwright/no-networkidle
-		await this.page.waitForLoadState( 'networkidle' );
+		// Wait for the editor to be fully loaded and ready before making changes.
+		// Without this, the editor may move focus to body while still typing,
+		// and save states will not be counted as dirty.
+		await this.page.waitForFunction(
+			() =>
+				window.wp?.data?.select( 'core/block-editor' )?.getBlocks()
+					?.length > 0
+		);
 	}
 
 	async saveTemplateWithoutPublishing() {
@@ -274,8 +276,10 @@ class PostEditorTemplateMode {
 			.getByRole( 'button', { name: 'Save', exact: true } )
 			.click();
 		// Avoid publishing the post.
-		await editorPublishRegion
-			.getByRole( 'button', { name: 'Cancel' } )
-			.click();
+		const cancelButton = editorPublishRegion.getByRole( 'button', {
+			name: 'Cancel',
+		} );
+		await expect( cancelButton ).toBeEnabled();
+		await cancelButton.click();
 	}
 }
