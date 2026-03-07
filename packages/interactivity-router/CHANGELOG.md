@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### Bug Fixes
-
+-   Preserve dynamically-injected stylesheets (e.g. consent-banner CSS added by third-party plugins) and runtime-activated deferred stylesheets (`media="not all"`) across client-side navigations. ([#76289](https://github.com/WordPress/gutenberg/pull/76289))
 -   Fix race condition where router evaluates before `hydrateRegions()` completes on Safari and Firefox, causing interactive regions to be permanently non-functional (dead DOM). ([#76053](https://github.com/WordPress/gutenberg/pull/76053))
 ## 2.41.0 (2026-03-04)
 
