@@ -146,7 +146,7 @@ describe( 'Collapsible', () => {
 
 	describe( 'render prop', () => {
 		it( 'supports render prop on Root', () => {
-			const ref = createRef< HTMLElement >();
+			const ref = createRef< HTMLDivElement >();
 			render(
 				<Collapsible.Root ref={ ref } render={ <section /> }>
 					<Collapsible.Trigger>Toggle</Collapsible.Trigger>
@@ -173,7 +173,7 @@ describe( 'Collapsible', () => {
 		} );
 
 		it( 'supports render prop on Panel', () => {
-			const ref = createRef< HTMLElement >();
+			const ref = createRef< HTMLDivElement >();
 			render(
 				<Collapsible.Root defaultOpen>
 					<Collapsible.Trigger>Toggle</Collapsible.Trigger>

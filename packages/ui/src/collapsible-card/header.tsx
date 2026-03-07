@@ -1,10 +1,10 @@
-import { Collapsible } from '@base-ui/react/collapsible';
 import clsx from 'clsx';
 import type { MouseEvent } from 'react';
 import { forwardRef, useCallback, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { chevronDown, chevronUp } from '@wordpress/icons';
 import * as Card from '../card';
+import * as Collapsible from '../collapsible';
 import { IconButton } from '../icon-button';
 import styles from './style.module.css';
 import type { HeaderProps } from './types';
@@ -52,11 +52,16 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 				<div className={ styles[ 'header-trigger-wrapper' ] }>
 					<Collapsible.Trigger
 						ref={ triggerRef }
-						render={ ( props, state ) => (
+						render={ ( props ) => (
 							<IconButton
 								{ ...props }
 								label={ __( 'Expand or collapse card' ) }
-								icon={ state.open ? chevronUp : chevronDown }
+								icon={
+									String( props[ 'aria-expanded' ] ) ===
+									'true'
+										? chevronUp
+										: chevronDown
+								}
 								variant="minimal"
 								tone="neutral"
 								size="compact"
