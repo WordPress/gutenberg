@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useState, useMemo } from '@wordpress/element';
-import { Card, CardHeader, CardBody } from '@wordpress/components';
+import { Card } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -39,9 +39,11 @@ const WithCardComponent = ( {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
 	return (
-		<Card>
-			<CardHeader>Header</CardHeader>
-			<CardBody style={ { height: containerHeight, minHeight: 0 } }>
+		<Card.Root>
+			<Card.Header>
+				<Card.Title>Header</Card.Title>
+			</Card.Header>
+			<Card.Content style={ { height: containerHeight, minHeight: 0 } }>
 				<DataViews
 					getItemId={ ( item ) => item.id.toString() }
 					paginationInfo={ paginationInfo }
@@ -59,8 +61,8 @@ const WithCardComponent = ( {
 						[ LAYOUT_ACTIVITY ]: {},
 					} }
 				/>
-			</CardBody>
-		</Card>
+			</Card.Content>
+		</Card.Root>
 	);
 };
 
