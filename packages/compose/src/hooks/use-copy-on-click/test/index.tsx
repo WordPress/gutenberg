@@ -7,6 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { useRef } from '@wordpress/element';
 
 /**
@@ -14,7 +15,7 @@ import { useRef } from '@wordpress/element';
  */
 import useCopyOnClick from '../';
 
-jest.mock( '@wordpress/deprecated', () => () => {} );
+jest.mock( '@wordpress/deprecated' );
 
 interface TestComponentProps {
 	text: string | ( () => string );
@@ -31,6 +32,19 @@ describe( 'useCopyOnClick', () => {
 			</button>
 		);
 	};
+
+	it( 'should call deprecated when the hook is used', () => {
+		jest.mocked( deprecated ).mockClear();
+		render( <TestComponent text="test text" /> );
+
+		expect( deprecated ).toHaveBeenCalledWith(
+			'wp.compose.useCopyOnClick',
+			{
+				since: '5.8',
+				alternative: 'wp.compose.useCopyToClipboard',
+			}
+		);
+	} );
 
 	it( 'should copy text on click', async () => {
 		const user = userEvent.setup();
