@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import useCopyToClipboard from '../';
+import useCopyToClipboard, { copyToClipboard, clearSelection } from '../';
 
 interface TestComponentProps {
 	text: string | ( () => string );
@@ -92,5 +92,53 @@ describe( 'useCopyToClipboard', () => {
 		} );
 
 		expect( onSuccess ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'copyToClipboard', () => {
+	it( 'should use execCommand fallback when clipboard API is not available', async () => {
+		const trigger = document.createElement( 'button' );
+		document.body.appendChild( trigger );
+
+		const originalClipboard = navigator.clipboard;
+		Object.defineProperty( navigator, 'clipboard', {
+			value: undefined,
+			configurable: true,
+		} );
+
+		// JSDOM does not implement execCommand; add a mock for the fallback path.
+		// See: https://github.com/jsdom/jsdom/issues/1742
+		const execCommandMock = jest.fn().mockReturnValue( true );
+		Object.defineProperty( document, 'execCommand', {
+			value: execCommandMock,
+			configurable: true,
+			writable: true,
+		} );
+
+		const result = await copyToClipboard( 'fallback text', trigger );
+
+		expect( result ).toBe( true );
+		expect( execCommandMock ).toHaveBeenCalledWith( 'copy' );
+
+		delete ( document as { execCommand?: unknown } ).execCommand;
+		Object.defineProperty( navigator, 'clipboard', {
+			value: originalClipboard,
+			configurable: true,
+		} );
+		document.body.removeChild( trigger );
+	} );
+} );
+
+describe( 'clearSelection', () => {
+	it( 'should focus the trigger element', () => {
+		const trigger = document.createElement( 'button' );
+		document.body.appendChild( trigger );
+		const focusMock = jest.spyOn( trigger, 'focus' );
+
+		clearSelection( trigger );
+
+		expect( focusMock ).toHaveBeenCalledTimes( 1 );
+
+		document.body.removeChild( trigger );
 	} );
 } );
