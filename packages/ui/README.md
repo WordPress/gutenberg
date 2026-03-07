@@ -108,7 +108,7 @@ For a given state `x`, the convention is:
 | --- | --- |
 | `defaultX` | Sets the initial value in **uncontrolled** mode. The component manages subsequent state changes internally. |
 | `x` | Sets the current value in **controlled** mode. The consumer is responsible for updating the value in response to changes. |
-| `onXChange` | Callback invoked when the state changes. Receives the new value as an argument. Works in both controlled and uncontrolled modes. |
+| `onXChange` | Callback invoked when the state changes. Receives the new value as its first argument. Works in both controlled and uncontrolled modes. |
 
 For example, a component with an open/closed state would expose:
 
@@ -151,7 +151,7 @@ function MyTabs() {
 In controlled mode, the consumer owns the state and passes it via `x`. State changes are handled through `onXChange`:
 
 ```tsx
-import { useState } from 'react';
+import { useState } from '@wordpress/element';
 import { CollapsibleCard } from '@wordpress/ui';
 
 function MyCard() {
@@ -168,7 +168,7 @@ function MyCard() {
 }
 ```
 
-When both `x` and `defaultX` are provided, `x` takes precedence and the component behaves in controlled mode.
+When both `x` and `defaultX` are provided, `x` takes precedence and the component behaves in controlled mode. When neither is provided, the component uses its own internal default (typically documented via a `@default` JSDoc tag on the `defaultX` prop).
 
 #### Difference from native `onChange`
 
