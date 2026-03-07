@@ -26,14 +26,14 @@ add_action( 'init', 'register_block_core_details' );
 /**
  * Sets fetchpriority="low" on all IMG tags within the collapsed Details block.
  *
- * Images in the overlay are hidden until the menu is opened, so they should
- * not compete with any actual LCP element image on the page.
+ * Images in a collapsed Details block are hidden until the block is expanded, so they should
+ * not compete with any resources in the critical rendering path, such as the LCP element image.
  *
  * @since 7.0.0
  *
  * @param array  $attributes The block attributes.
  * @param string $content    The saved content.
- * @return string Modified HTML with fetchpriority="low" on all IMG tags.
+ * @return string Modified HTML with fetchpriority="low" on all IMG tags when the showContent attribute is false.
  */
 function render_block_core_details( array $attributes, string $content ): string {
 	// If the Details block is open by default, short-circuit to let core add fetchpriority=high if appropriate,
