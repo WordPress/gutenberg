@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import type { Meta } from '@storybook/react-vite';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ReactElement } from 'react';
+import { useArgs } from 'storybook/preview-api';
 
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
 import {
 	SearchControl,
 	__experimentalHStack as HStack,
@@ -75,14 +75,30 @@ const meta: Meta = {
 	parameters: {
 		controls: { hideNoControlsWarning: true },
 	},
+	argTypes: {
+		filter: { control: false },
+		size: { control: false },
+		highlightPublicIcons: { control: false },
+	},
 };
 export default meta;
 
-const LibraryExample = (): ReactElement => {
-	const [ filter, setFilter ] = useState< string >( '' );
-	const [ size, setSize ] = useState< string | number | undefined >( '24' );
-	const [ highlightPublicIcons, setHighlightPublicIcons ] =
-		useState< boolean >( false );
+type LibraryArgs = {
+	filter: string;
+	size: string | number;
+	highlightPublicIcons: boolean;
+};
+
+type LibraryExampleProps = LibraryArgs & {
+	updateArgs: ( newArgs: Partial< LibraryArgs > ) => void;
+};
+
+const LibraryExample = ( {
+	filter,
+	size,
+	highlightPublicIcons,
+	updateArgs,
+}: LibraryExampleProps ): ReactElement => {
 	const filteredIcons = filter.length
 		? Object.fromEntries(
 				Object.entries( availableIcons ).filter( ( [ name ] ) => {
@@ -111,7 +127,7 @@ const LibraryExample = (): ReactElement => {
 						hideLabelFromVision={ false }
 						value={ filter }
 						onChange={ ( value: string | undefined ) =>
-							setFilter( value ?? '' )
+							updateArgs( { filter: value } )
 						}
 					/>
 					<ToggleGroupControl
@@ -119,7 +135,7 @@ const LibraryExample = (): ReactElement => {
 						isBlock
 						value={ size }
 						onChange={ ( value: string | number | undefined ) =>
-							setSize( value )
+							updateArgs( { size: value } )
 						}
 						__next40pxDefaultSize
 					>
@@ -135,7 +151,7 @@ const LibraryExample = (): ReactElement => {
 						label="Highlight public icons"
 						checked={ highlightPublicIcons }
 						onChange={ ( value: boolean ) =>
-							setHighlightPublicIcons( value )
+							updateArgs( { highlightPublicIcons: value } )
 						}
 						help="Emphasize icons available in the SVG icon registry."
 					/>
@@ -192,4 +208,14 @@ const LibraryExample = (): ReactElement => {
 	);
 };
 
-export const Library = (): ReactElement => <LibraryExample />;
+export const Library: StoryObj< typeof meta > = {
+	args: {
+		filter: '',
+		size: '24',
+		highlightPublicIcons: false,
+	},
+	render: function Library() {
+		const [ args, updateArgs ] = useArgs< LibraryArgs >();
+		return <LibraryExample { ...args } updateArgs={ updateArgs } />;
+	},
+};
