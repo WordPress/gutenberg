@@ -6,15 +6,50 @@ import { shortestCommonSupersequence } from './scs';
 export type StyleElement = HTMLLinkElement | HTMLStyleElement;
 
 /**
- * Compares the passed style or link elements to check if they can be
- * considered equal.
+ * Compares two style elements for equality, ignoring the `media` attribute.
+ *
+ * `media` is excluded because iAPI stores mutate it at runtime (e.g. a
+ * theme-switcher toggling `media="not all"` ↔ `"all"`). Using full
+ * `isEqualNode()` would treat those as different nodes and cause
+ * `applyStyles()` to disable the live element on the next navigation.
+ * Cloning and removing `media` before comparing preserves all other
+ * attributes (`integrity`, `crossorigin`, etc.) for a correct match.
  *
  * @param a `<style>` or `<link>` element.
  * @param b `<style>` or `<link>` element.
  * @return Whether they are considered equal.
  */
-const areNodesEqual = ( a: StyleElement, b: StyleElement ): boolean =>
-	a.isEqualNode( b );
+const areNodesEqual = ( a: StyleElement, b: StyleElement ): boolean => {
+	const aClone = a.cloneNode( true ) as StyleElement;
+	const bClone = b.cloneNode( true ) as StyleElement;
+	aClone.removeAttribute( 'media' );
+	bClone.removeAttribute( 'media' );
+	return aClone.isEqualNode( bClone );
+};
+
+/**
+ * Tracks style elements the router is responsible for managing.
+ *
+ * Seeded at module init from elements that carry an `id` attribute —
+ * `wp_enqueue_style()` always generates `id="{handle}-css"`, so every
+ * WordPress-enqueued sheet is captured. Elements injected dynamically
+ * by third-party plugins (e.g. Complianz GDPR consent CSS appended via
+ * `document.head.appendChild()`) never receive an `id` this way, so
+ * they are excluded from this set and are never disabled by the router.
+ *
+ * New elements are added the first time `applyStyles()` activates them
+ * from `media="preload"` state. Elements already active and untracked
+ * (plugin-injected) are never enrolled, even when they appear in
+ * `page.styles` on a back-navigation where the initial page was cached
+ * with `doc === window.document`.
+ */
+const routerManagedStyles = new Set< StyleElement >(
+	Array.from(
+		document.querySelectorAll< StyleElement >(
+			'link[rel=stylesheet][id], style[id]'
+		)
+	)
+);
 
 /**
  * Normalizes the passed style or link element, reverting the changes
@@ -231,8 +266,13 @@ export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
  * Traverses all style elements in the DOM, enabling only those included
  * in the passed list and disabling the others.
  *
- * If the style element has the `data-original-media` attribute, the
- * original `media` value is restored.
+ * Only elements in `routerManagedStyles` are candidates for being
+ * disabled. An element enters that set the first time this function
+ * activates it from `media="preload"` state — meaning the router
+ * explicitly loaded it for a specific page. Plugin-injected stylesheets
+ * that are already active in the DOM and were never put through the
+ * preload cycle are never enrolled and are left untouched on every
+ * navigation, including back-navigations to cached pages.
  *
  * @param styles List of style elements to apply.
  */
@@ -241,16 +281,23 @@ export const applyStyles = ( styles: StyleElement[] ) => {
 		.querySelectorAll( 'style,link[rel=stylesheet]' )
 		.forEach( ( el: HTMLLinkElement | HTMLStyleElement ) => {
 			if ( el.sheet ) {
-				if ( styles.includes( el ) ) {
-					// Only update mediaText when necessary.
-					if ( el.sheet.media.mediaText === 'preload' ) {
+				const isInNewPage = styles.includes( el );
+				const isPreloaded =
+					el.sheet.media.mediaText === 'preload';
+
+				if ( isInNewPage ) {
+					if ( isPreloaded ) {
+						// Activate from preload and enroll in managed set.
 						const { originalMedia = 'all' } = el.dataset;
 						el.sheet.media.mediaText = originalMedia;
+						routerManagedStyles.add( el );
 					}
 					el.sheet.disabled = false;
-				} else {
+				} else if ( routerManagedStyles.has( el ) ) {
+					// Managed element absent from new page — disable it.
 					el.sheet.disabled = true;
 				}
+				// Unmanaged elements (dynamic injections) are left untouched.
 			}
 		} );
 };
