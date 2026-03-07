@@ -187,7 +187,8 @@ jobs:
         if: |
             always() && (
               github.event_name == 'pull_request' ||
-              github.event_name == 'workflow_dispatch'
+              github.event_name == 'workflow_dispatch' ||
+              github.repository == 'WordPress/gutenberg'
             )
         strategy:
             matrix:
@@ -265,7 +266,9 @@ jobs:
             packages: write
         if: |
             always() &&
-            needs.build.outputs.job_status == 'success'
+            needs.build.outputs.job_status == 'success' &&
+            github.repository == 'WordPress/gutenberg' &&
+            github.event_name == 'push'
 
         steps:
             - name: Download build artifact
