@@ -4,7 +4,6 @@
 
 ### Enhancements
 
-- Introduced the `WP_PLUGIN_NAME` environment variable for overriding `wpPlugin.name` ([#75844](https://github.com/WordPress/gutenberg/pull/75844)).
 - Avoid unexpected results when typecasting `IS_GUTENBERG_PLUGIN` and `IS_WORDPRESS_CORE` values to Booleans ([#75844](https://github.com/WordPress/gutenberg/pull/75844)).
 - Skip PHP transforms during builds when building for WordPress Core ([#75844](https://github.com/WordPress/gutenberg/pull/75844)).
 

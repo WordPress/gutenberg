@@ -526,40 +526,6 @@ The build system generates:
 
 The boot package in Gutenberg will automatically use these routes and make them available.
 
-## Using Environment Variables to Control Behavior
-
-In some scenarios, it can be helpful to change how the build script works through environment variables. This is particularly useful within CI/CD workflows.
-
-The following environment variables can be used to override `wpPlugin` properties.
-
-| Environment Variable     | `wpPlugin` Property |
-|--------------------------|---------------------|
-| `WP_PLUGIN_NAME`         | `name`              |
-
-### Example
-
-Here is an example job for a GitHub Actions workflow file that uses environment variables to change behavior:
-
-```yaml
-build:
-	name: Build ${{ matrix.plugin-name }} plugin
-	runs-on: 'ubuntu-latest'
-	permissions:
-		contents: read
-
-	strategy:
-		matrix:
-			plugin-name: [ 'my-plugin', 'my-plugin-premium' ]
-
-	steps:
-		# Perform other steps to prepare for buildling (checkout repository, install dependencies, etc.)
-
-		- name: Build plugin
-		  run: npm run build
-		  env:
-			  WP_PLUGIN_NAME: ${{ matrix.plugin-name }}
-```
-
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose.

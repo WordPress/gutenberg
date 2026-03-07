@@ -215,13 +215,16 @@ jobs:
                   node-version-file: '.nvmrc'
                   check-latest: true
 
+            - name: Configure build for wordpress-develop
+              if: ${{ matrix.IS_WORDPRESS_CORE }}
+              run: jq --tab '.wpPlugin.name = "wp"' package.json > package.json.tmp && mv package.json.tmp package.json
+
             - name: Build Gutenberg plugin ZIP file
               run: ./bin/build-plugin-zip.sh
               env:
                   NO_CHECKS: 'true'
                   IS_GUTENBERG_PLUGIN: ${{ matrix.IS_GUTENBERG_PLUGIN }}
                   IS_WORDPRESS_CORE: ${{ matrix.IS_WORDPRESS_CORE }}
-                  WP_PLUGIN_NAME: ${{ matrix.IS_WORDPRESS_CORE && 'wp' || 'gutenberg' }}
 
             - name: Upload artifact
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
