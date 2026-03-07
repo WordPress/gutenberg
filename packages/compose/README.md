@@ -338,7 +338,7 @@ _Returns_
 
 ### useFocusOnMount
 
-Hook used to focus the first tabbable element on mount.
+Determines focus behavior when the element mounts.
 
 _Usage_
 
@@ -358,11 +358,11 @@ const WithFocusOnMount = () => {
 
 _Parameters_
 
--   _focusOnMount_ `boolean | 'firstElement' | 'firstInputElement'`: Focus on mount mode.
+-   _focusOnMount_ `useFocusOnMount.Mode`: Behavioral mode. Defaults to `"firstElement"` which focuses the first tabbable element within; `"firstInputElement"` focuses the first value control within; `true` focuses the element itself; `false` does nothing.
 
 _Returns_
 
--   `React.RefCallback<HTMLElement>`: Ref callback.
+-   Ref callback.
 
 ### useFocusReturn
 

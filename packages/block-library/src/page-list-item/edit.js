@@ -8,7 +8,6 @@ import clsx from 'clsx';
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { RawHTML } from '@wordpress/element';
 import { safeHTML } from '@wordpress/dom';
 
 /**
@@ -78,9 +77,10 @@ export default function PageListItemEdit( { context, attributes } ) {
 						type="button"
 						className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
 						aria-expanded="false"
-					>
-						<RawHTML>{ safeHTML( label ) }</RawHTML>
-					</button>
+						dangerouslySetInnerHTML={ {
+							__html: safeHTML( label ),
+						} }
+					/>
 					<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
 						<ItemSubmenuIcon />
 					</span>
@@ -91,9 +91,10 @@ export default function PageListItemEdit( { context, attributes } ) {
 						'wp-block-navigation-item__content': isNavigationChild,
 					} ) }
 					href={ link }
-				>
-					<RawHTML>{ safeHTML( title ) }</RawHTML>
-				</a>
+					dangerouslySetInnerHTML={ {
+						__html: safeHTML( title ),
+					} }
+				/>
 			) }
 			{ hasChildren && (
 				<>

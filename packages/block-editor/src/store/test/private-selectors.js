@@ -23,6 +23,7 @@ import {
 	isBlockHiddenAtViewport,
 	getViewportModalClientIds,
 	isSectionBlock,
+	getParentSectionBlock,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -1412,6 +1413,244 @@ describe( 'private selectors', () => {
 				disableContentOnlyForUnsyncedPatterns: false,
 			} );
 			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when nested inside another section block', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'outer-pattern', { name: 'core/group' } ],
+						[ 'inner-pattern', { name: 'core/group' } ],
+					] ),
+					attributes: new Map( [
+						[
+							'outer-pattern',
+							{ metadata: { patternName: 'outer' } },
+						],
+						[
+							'inner-pattern',
+							{ metadata: { patternName: 'inner' } },
+						],
+					] ),
+					parents: new Map( [
+						[ 'outer-pattern', '' ],
+						[ 'inner-pattern', 'outer-pattern' ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: undefined,
+			};
+			// inner-pattern is nested inside outer-pattern (also a section),
+			// so it is not considered a section itself.
+			expect( isSectionBlock( state, 'inner-pattern' ) ).toBe( false );
+		} );
+
+		it( 'returns false when the block itself is the editedContentOnlySection', () => {
+			const state = {
+				...createState( {
+					patternName: 'my-pattern',
+				} ),
+				editedContentOnlySection: 'block-1',
+			};
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns false when the block is nested within the editedContentOnlySection', () => {
+			// Create a nested structure: outer-pattern > block-1 (with patternName)
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'outer-pattern', { name: 'core/group' } ],
+						[ 'block-1', { name: 'core/group' } ],
+					] ),
+					attributes: new Map( [
+						[
+							'outer-pattern',
+							{ metadata: { patternName: 'outer' } },
+						],
+						[ 'block-1', { metadata: { patternName: 'inner' } } ],
+					] ),
+					parents: new Map( [
+						[ 'outer-pattern', '' ],
+						[ 'block-1', 'outer-pattern' ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: 'outer-pattern',
+			};
+			// block-1 has a patternName, so would normally be a section,
+			// but since its parent (outer-pattern) is being edited, it's not.
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true for section blocks outside the editedContentOnlySection', () => {
+			// Create a structure with two sibling patterns
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'pattern-a', { name: 'core/group' } ],
+						[ 'pattern-b', { name: 'core/group' } ],
+					] ),
+					attributes: new Map( [
+						[ 'pattern-a', { metadata: { patternName: 'a' } } ],
+						[ 'pattern-b', { metadata: { patternName: 'b' } } ],
+					] ),
+					parents: new Map( [
+						[ 'pattern-a', '' ],
+						[ 'pattern-b', '' ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: 'pattern-a',
+			};
+			// pattern-b is not the edited section and not within it
+			expect( isSectionBlock( state, 'pattern-b' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'getParentSectionBlock', () => {
+		it( 'returns undefined when there are no parent section blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'block-1', { name: 'core/paragraph' } ],
+					] ),
+					attributes: new Map( [ [ 'block-1', {} ] ] ),
+					parents: new Map( [ [ 'block-1', '' ] ] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: undefined,
+			};
+			expect( getParentSectionBlock( state, 'block-1' ) ).toBeUndefined();
+		} );
+
+		it( 'returns the parent section block clientId', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'pattern-block', { name: 'core/group' } ],
+						[ 'inner-block', { name: 'core/paragraph' } ],
+					] ),
+					attributes: new Map( [
+						[
+							'pattern-block',
+							{ metadata: { patternName: 'my-pattern' } },
+						],
+						[ 'inner-block', {} ],
+					] ),
+					parents: new Map( [
+						[ 'pattern-block', '' ],
+						[ 'inner-block', 'pattern-block' ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: undefined,
+			};
+			expect( getParentSectionBlock( state, 'inner-block' ) ).toBe(
+				'pattern-block'
+			);
+		} );
+
+		it( 'returns undefined when the parent is the editedContentOnlySection', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'pattern-block', { name: 'core/group' } ],
+						[ 'inner-block', { name: 'core/paragraph' } ],
+					] ),
+					attributes: new Map( [
+						[
+							'pattern-block',
+							{ metadata: { patternName: 'my-pattern' } },
+						],
+						[ 'inner-block', {} ],
+					] ),
+					parents: new Map( [
+						[ 'pattern-block', '' ],
+						[ 'inner-block', 'pattern-block' ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: 'pattern-block',
+			};
+			// Since pattern-block is the edited section, it's no longer
+			// considered a parent section for inner-block
+			expect(
+				getParentSectionBlock( state, 'inner-block' )
+			).toBeUndefined();
+		} );
+
+		it( 'returns undefined for deeply nested blocks when an ancestor is the editedContentOnlySection', () => {
+			// Structure: outer-pattern > nested-pattern > deep-block
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'outer-pattern', { name: 'core/group' } ],
+						[ 'nested-pattern', { name: 'core/group' } ],
+						[ 'deep-block', { name: 'core/paragraph' } ],
+					] ),
+					attributes: new Map( [
+						[
+							'outer-pattern',
+							{ metadata: { patternName: 'outer' } },
+						],
+						[
+							'nested-pattern',
+							{ metadata: { patternName: 'nested' } },
+						],
+						[ 'deep-block', {} ],
+					] ),
+					parents: new Map( [
+						[ 'outer-pattern', '' ],
+						[ 'nested-pattern', 'outer-pattern' ],
+						[ 'deep-block', 'nested-pattern' ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: 'outer-pattern',
+			};
+			// When outer-pattern is being edited, nested-pattern is no longer
+			// a section (tested above), so deep-block has no parent section
+			expect(
+				getParentSectionBlock( state, 'deep-block' )
+			).toBeUndefined();
+		} );
+
+		it( 'returns the correct parent when editedContentOnlySection is set but not in ancestry', () => {
+			// Structure: pattern-a > inner-block, pattern-b (sibling)
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'pattern-a', { name: 'core/group' } ],
+						[ 'inner-block', { name: 'core/paragraph' } ],
+						[ 'pattern-b', { name: 'core/group' } ],
+					] ),
+					attributes: new Map( [
+						[ 'pattern-a', { metadata: { patternName: 'a' } } ],
+						[ 'inner-block', {} ],
+						[ 'pattern-b', { metadata: { patternName: 'b' } } ],
+					] ),
+					parents: new Map( [
+						[ 'pattern-a', '' ],
+						[ 'inner-block', 'pattern-a' ],
+						[ 'pattern-b', '' ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: 'pattern-b',
+			};
+			// pattern-a is not being edited, so inner-block still has pattern-a as parent
+			expect( getParentSectionBlock( state, 'inner-block' ) ).toBe(
+				'pattern-a'
+			);
 		} );
 	} );
 } );

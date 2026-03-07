@@ -103,8 +103,15 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 			},
 			{
 				id: 'status',
-				label: __( 'Status & Visibility' ),
-				children: [ 'status', 'password' ],
+				label: __( 'Status' ),
+				children: [
+					{
+						id: 'status',
+						layout: { type: 'regular', labelPosition: 'none' },
+					},
+					'scheduled_date',
+					'password',
+				],
 			},
 			'author',
 			'date',
@@ -113,7 +120,13 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 			{
 				id: 'discussion',
 				label: __( 'Discussion' ),
-				children: [ 'comment_status', 'ping_status' ],
+				children: [
+					{
+						id: 'comment_status',
+						layout: { type: 'regular', labelPosition: 'none' },
+					},
+					'ping_status',
+				],
 			},
 			'template',
 		];

@@ -7,6 +7,7 @@ import {
 	generateCustomProperties,
 	transformToStyles,
 	getBlockSelectors,
+	generateGlobalStyles,
 } from '../core/render';
 import type { GlobalStylesConfig } from '../types';
 import {
@@ -695,6 +696,120 @@ describe( 'global styles renderer', () => {
 		} );
 	} );
 
+	describe( 'generateGlobalStyles', () => {
+		beforeEach( () => {
+			jest.clearAllMocks();
+			const mockSelect = require( '@wordpress/data' ).select as jest.Mock;
+			mockSelect.mockReturnValue( {
+				getBlockStyles: () => [],
+			} );
+		} );
+
+		it( 'should use css feature selector for block custom CSS when defined', () => {
+			const config = {
+				version: 3,
+				settings: {},
+				styles: {
+					blocks: {
+						'core/paragraph': {
+							css: 'color:red;',
+						},
+					},
+				},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/paragraph',
+					selectors: {
+						root: 'p',
+						css: '.custom-p',
+					},
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles( config, blockTypes );
+			const customCssStylesheet = styles.find(
+				( s: any ) => s.css && s.css.includes( 'color:red;' )
+			);
+			expect( customCssStylesheet ).toBeDefined();
+			expect( customCssStylesheet.css ).toContain(
+				':root :where(.custom-p){color:red;}'
+			);
+			expect( customCssStylesheet.css ).not.toContain(
+				':root :where(p){color:red;}'
+			);
+		} );
+
+		it( 'should use css feature selector object form with root subkey for block custom CSS', () => {
+			const config = {
+				version: 3,
+				settings: {},
+				styles: {
+					blocks: {
+						'core/paragraph': {
+							css: 'color:red;',
+						},
+					},
+				},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/paragraph',
+					selectors: {
+						root: 'p',
+						css: { root: '.custom-p' },
+					},
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles( config, blockTypes );
+			const customCssStylesheet = styles.find(
+				( s: any ) => s.css && s.css.includes( 'color:red;' )
+			);
+			expect( customCssStylesheet ).toBeDefined();
+			expect( customCssStylesheet.css ).toContain(
+				':root :where(.custom-p){color:red;}'
+			);
+			expect( customCssStylesheet.css ).not.toContain(
+				':root :where(p){color:red;}'
+			);
+		} );
+
+		it( 'should fall back to root selector for block custom CSS when no css feature selector is defined', () => {
+			const config = {
+				version: 3,
+				settings: {},
+				styles: {
+					blocks: {
+						'core/paragraph': {
+							css: 'color:red;',
+						},
+					},
+				},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/paragraph',
+					selectors: {
+						root: 'p',
+					},
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles( config, blockTypes );
+			const customCssStylesheet = styles.find(
+				( s: any ) => s.css && s.css.includes( 'color:red;' )
+			);
+			expect( customCssStylesheet ).toBeDefined();
+			expect( customCssStylesheet.css ).toContain(
+				':root :where(p){color:red;}'
+			);
+		} );
+	} );
+
 	describe( 'getBlockSelectors', () => {
 		beforeEach( () => {
 			// Reset mocks before each test
@@ -789,6 +904,129 @@ describe( 'global styles renderer', () => {
 					hasLayoutSupport: false,
 				},
 			} );
+		} );
+	} );
+
+	describe( 'button width declarations', () => {
+		it( 'should convert direct percentage width to calc() formula', () => {
+			const tree: GlobalStylesConfig = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/button': {
+							dimensions: {
+								width: '25%',
+							},
+						},
+					},
+				},
+			};
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button .wp-block-button__link',
+					featureSelectors: {
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-button){width: calc(25 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 25 / 100)));}'
+			);
+		} );
+
+		it( 'should convert preset percentage width to calc() formula', () => {
+			const tree: GlobalStylesConfig = {
+				settings: {
+					blocks: {
+						'core/button': {
+							dimensions: {
+								dimensionSizes: {
+									default: [
+										{
+											slug: '50',
+											name: '50%',
+											size: '50%',
+										},
+									],
+								},
+							},
+						},
+					},
+				},
+				styles: {
+					blocks: {
+						'core/button': {
+							dimensions: {
+								width: 'var:preset|dimension|50',
+							},
+						},
+					},
+				},
+			};
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button .wp-block-button__link',
+					featureSelectors: {
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-button){width: calc(50 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 50 / 100)));}'
+			);
+		} );
+
+		it( 'should not convert non-percentage width', () => {
+			const tree: GlobalStylesConfig = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/button': {
+							dimensions: {
+								width: '200px',
+							},
+						},
+					},
+				},
+			};
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button .wp-block-button__link',
+					featureSelectors: {
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-button){width: 200px;}'
+			);
 		} );
 	} );
 } );

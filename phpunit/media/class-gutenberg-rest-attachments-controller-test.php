@@ -594,6 +594,235 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that sideloading a scaled image sets original_image metadata
+	 * and updates the attached file to the scaled version, matching core behavior.
+	 *
+	 * @see https://github.com/WordPress/wordpress-develop/blob/trunk/tests/phpunit/tests/media.php
+	 *      For similar core media tests that verify equivalent server-side behavior.
+	 *
+	 * @covers ::sideload_item
+	 */
+	public function test_sideload_scaled_sets_original_image_metadata() {
+		wp_set_current_user( self::$admin_id );
+
+		// Upload the original image with client-side processing.
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=my-photo.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 201, $response->get_status() );
+		$attachment_id = $data['id'];
+
+		// Record the original attached file path before sideloading scaled.
+		$original_attached_file = get_attached_file( $attachment_id, true );
+
+		// Sideload the -scaled version (simulating client-side big image threshold resize).
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=my-photo-scaled.jpg' );
+		$request->set_param( 'image_size', 'scaled' );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+
+		// Verify original_image metadata points to the original filename.
+		$metadata = wp_get_attachment_metadata( $attachment_id, true );
+		$this->assertArrayHasKey( 'original_image', $metadata, 'original_image metadata should be set after scaled sideload.' );
+		$this->assertSame( wp_basename( $original_attached_file ), $metadata['original_image'], 'original_image should be the original filename before scaling.' );
+
+		// Verify the attached file now points to the scaled version.
+		$new_attached_file = get_attached_file( $attachment_id, true );
+		$this->assertStringContainsString( '-scaled', wp_basename( $new_attached_file ), 'Attached file should now be the -scaled version.' );
+		$this->assertSame( 'my-photo-scaled.jpg', wp_basename( $new_attached_file ) );
+
+		// Verify metadata dimensions and file are updated.
+		$this->assertArrayHasKey( 'width', $metadata );
+		$this->assertArrayHasKey( 'height', $metadata );
+		$this->assertArrayHasKey( 'filesize', $metadata );
+		$this->assertArrayHasKey( 'file', $metadata );
+		$this->assertGreaterThan( 0, $metadata['width'] );
+		$this->assertGreaterThan( 0, $metadata['height'] );
+		$this->assertGreaterThan( 0, $metadata['filesize'] );
+
+		// Verify wp_get_original_image_path returns the original file.
+		$original_path = wp_get_original_image_path( $attachment_id );
+		$this->assertSame( 'my-photo.jpg', wp_basename( $original_path ), 'wp_get_original_image_path() should return the original file.' );
+	}
+
+	/**
+	 * Verifies that sideloading with image_size=original sets original_image metadata
+	 * without changing the attached file.
+	 *
+	 * @covers ::sideload_item
+	 */
+	public function test_sideload_original_sets_original_image_metadata() {
+		wp_set_current_user( self::$admin_id );
+
+		// Upload via REST so the file is in the uploads directory.
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 201, $response->get_status() );
+		$attachment_id = $data['id'];
+
+		// The attached file before sideload.
+		$attached_file_before = get_attached_file( $attachment_id, true );
+
+		// Sideload the "original" version.
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-original.jpg' );
+		$request->set_param( 'image_size', 'original' );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+
+		// Verify original_image metadata is set to the sideloaded file.
+		$metadata = wp_get_attachment_metadata( $attachment_id, true );
+		$this->assertArrayHasKey( 'original_image', $metadata );
+		$this->assertSame( 'canola-original.jpg', $metadata['original_image'] );
+
+		// Verify the attached file was NOT changed (only scaled changes it).
+		$attached_file_after = get_attached_file( $attachment_id, true );
+		$this->assertSame( $attached_file_before, $attached_file_after, 'Attached file should not change when sideloading original.' );
+	}
+
+	/**
+	 * Verifies the full client-side upload flow with scaled image:
+	 * upload original, sideload sub-sizes, sideload scaled version.
+	 *
+	 * After the full flow, metadata should match core's server-side behavior:
+	 * - original_image points to the unscaled original
+	 * - attached file points to -scaled version
+	 * - sub-sizes are present in metadata
+	 *
+	 * @covers ::create_item
+	 * @covers ::sideload_item
+	 */
+	public function test_full_client_side_upload_flow_with_scaled_image() {
+		wp_set_current_user( self::$admin_id );
+
+		// Step 1: Upload the original image with client-side processing.
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=landscape.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 201, $response->get_status() );
+		$attachment_id = $data['id'];
+		$this->assertNotEmpty( $data['missing_image_sizes'], 'Should have missing image sizes after client-side upload.' );
+
+		// Step 2: Sideload a thumbnail sub-size.
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=landscape-150x150.jpg' );
+		$request->set_param( 'image_size', 'thumbnail' );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+
+		// Verify sub-size was added to metadata.
+		$metadata = wp_get_attachment_metadata( $attachment_id, true );
+		$this->assertArrayHasKey( 'thumbnail', $metadata['sizes'] );
+		$this->assertSame( 'landscape-150x150.jpg', $metadata['sizes']['thumbnail']['file'] );
+
+		// Step 3: Sideload the scaled version (big image threshold).
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=landscape-scaled.jpg' );
+		$request->set_param( 'image_size', 'scaled' );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+
+		// Verify final metadata matches expected state.
+		$metadata = wp_get_attachment_metadata( $attachment_id, true );
+
+		// original_image should point to the original unscaled file.
+		$this->assertArrayHasKey( 'original_image', $metadata );
+		$this->assertSame( 'landscape.jpg', $metadata['original_image'], 'original_image should be the original filename.' );
+
+		// The attached file should now be the scaled version.
+		$attached_file = get_attached_file( $attachment_id, true );
+		$this->assertSame( 'landscape-scaled.jpg', wp_basename( $attached_file ), 'Attached file should be the -scaled version.' );
+
+		// The metadata file should reflect the scaled version.
+		$this->assertStringContainsString( 'landscape-scaled.jpg', $metadata['file'] );
+
+		// Sub-sizes should still be present.
+		$this->assertArrayHasKey( 'thumbnail', $metadata['sizes'] );
+		$this->assertSame( 'landscape-150x150.jpg', $metadata['sizes']['thumbnail']['file'] );
+
+		// wp_get_original_image_path should resolve to the original.
+		$original_path = wp_get_original_image_path( $attachment_id );
+		$this->assertSame( 'landscape.jpg', wp_basename( $original_path ) );
+	}
+
+	/**
+	 * Verifies that the scaled sideload filename filter works correctly
+	 * and prevents WordPress from adding numeric suffixes to -scaled filenames.
+	 *
+	 * @covers ::sideload_item
+	 */
+	public function test_sideload_scaled_filename_not_suffixed() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=test-photo.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 201, $response->get_status() );
+		$attachment_id = $data['id'];
+
+		// Sideload the scaled version.
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=test-photo-scaled.jpg' );
+		$request->set_param( 'image_size', 'scaled' );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+
+		// The filename should not have a numeric suffix like -scaled-1.jpg.
+		$attached_file = get_attached_file( $attachment_id, true );
+		$this->assertSame( 'test-photo-scaled.jpg', wp_basename( $attached_file ), 'Scaled filename should not have a numeric suffix.' );
+		$this->assertStringNotContainsString( '-scaled-1', wp_basename( $attached_file ) );
+	}
+
+	/**
 	 * Verifies metadata consistency between server-side and client-side upload flows.
 	 *
 	 * The same image uploaded with server-side processing (generate_sub_sizes=true)

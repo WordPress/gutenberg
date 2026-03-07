@@ -2559,28 +2559,23 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	traverseBlockTree( state, treeClientId, ( block ) => {
 		const { clientId, name: blockName } = block;
 
-		// Set the edited section and all blocks within it to 'default', so that all changes can be made.
-		if ( state.editedContentOnlySection ) {
-			// If this is the edited section, use the default mode.
-			if ( state.editedContentOnlySection === clientId ) {
-				derivedBlockEditingModes.set( clientId, 'default' );
+		const hasEditedContentOnlySection = !! state.editedContentOnlySection;
+		let isWithinEditedContentOnlySection = false;
+		if ( hasEditedContentOnlySection ) {
+			isWithinEditedContentOnlySection =
+				clientId === state.editedContentOnlySection ||
+				!! findParentInClientIdsList( state, clientId, [
+					state.editedContentOnlySection,
+				] );
+
+			// When a contentOnly section is being edited, all blocks outside
+			// the section are disabled. This should never be overridable by any
+			// other block editing modes, it helps to constrain keyboard navigation
+			// to within the edited section.
+			if ( ! isWithinEditedContentOnlySection ) {
+				derivedBlockEditingModes.set( clientId, 'disabled' );
 				return;
 			}
-
-			// If the block is within the edited section also use the default mode.
-			const parentTempEditedClientId = findParentInClientIdsList(
-				state,
-				clientId,
-				[ state.editedContentOnlySection ]
-			);
-			if ( parentTempEditedClientId ) {
-				derivedBlockEditingModes.set( clientId, 'default' );
-				return;
-			}
-
-			// Disable blocks that are outside of the edited section.
-			derivedBlockEditingModes.set( clientId, 'disabled' );
-			return;
 		}
 
 		// If the block already has an explicit block editing mode set,
@@ -2643,7 +2638,8 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 		if ( syncedPatternClientIds.length ) {
 			// Synced pattern blocks (core/block).
 			if ( syncedPatternClientIds.includes( clientId ) ) {
-				// This is a pattern nested in another pattern, it should be disabled.
+				// This is a synced pattern nested in another synced pattern,
+				// disable the core/block itself.
 				if (
 					findParentInClientIdsList(
 						state,
@@ -2660,17 +2656,18 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			}
 
 			// Inner blocks of synced patterns.
-			const parentPatternClientId = findParentInClientIdsList(
+			const parentSyncedPatternClientId = findParentInClientIdsList(
 				state,
 				clientId,
 				syncedPatternClientIds
 			);
-			if ( parentPatternClientId ) {
-				// This is a pattern nested in another pattern, it should be disabled.
+			if ( parentSyncedPatternClientId ) {
+				// This is an inner block of a synced pattern that's nested in another synced pattern,
+				// disable its contents.
 				if (
 					findParentInClientIdsList(
 						state,
-						parentPatternClientId,
+						parentSyncedPatternClientId,
 						syncedPatternClientIds
 					)
 				) {
@@ -2687,7 +2684,16 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 				// from the instance, the user has to edit the pattern source,
 				// so return 'disabled'.
 				derivedBlockEditingModes.set( clientId, 'disabled' );
+				return;
 			}
+		}
+
+		// Set the edited section and all blocks within it to 'default', so that all changes can be made.
+		if ( hasEditedContentOnlySection && isWithinEditedContentOnlySection ) {
+			derivedBlockEditingModes.set( clientId, 'default' );
+			// When there's an editedContentOnlySection, it overrides any modes that are usually
+			// set for `contentOnlyParents`, return early to prevent continuing to code below.
+			return;
 		}
 
 		// Handle `templateLock=contentOnly` blocks and unsynced patterns.
@@ -3064,15 +3070,19 @@ export function withDerivedBlockEditingModes( reducer ) {
 				break;
 			}
 			case 'UPDATE_SETTINGS': {
-				// Recompute the entire tree if the section root or
-				// the effective disableContentOnlyForUnsyncedPatterns value changes.
+				// Recompute the entire tree if the section root,
+				// the effective disableContentOnlyForUnsyncedPatterns value,
+				// or the isIsolatedEditor value changes.
+				// These are all values that affect the computation.
 				if (
 					state?.settings?.[ sectionRootClientIdKey ] !==
 						nextState?.settings?.[ sectionRootClientIdKey ] ||
 					!! state?.settings
 						?.disableContentOnlyForUnsyncedPatterns !==
 						!! nextState?.settings
-							?.disableContentOnlyForUnsyncedPatterns
+							?.disableContentOnlyForUnsyncedPatterns ||
+					!! state?.settings?.[ isIsolatedEditorKey ] !==
+						!! nextState?.settings?.[ isIsolatedEditorKey ]
 				) {
 					return {
 						...nextState,

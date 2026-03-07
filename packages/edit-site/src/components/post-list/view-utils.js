@@ -19,7 +19,15 @@ import {
 import { OPERATOR_IS_ANY } from '../../utils/constants';
 
 export const defaultLayouts = {
-	table: {},
+	table: {
+		layout: {
+			styles: {
+				author: {
+					align: 'start',
+				},
+			},
+		},
+	},
 	grid: {},
 	list: {},
 };
@@ -158,11 +166,15 @@ const SLUG_TO_STATUS = {
 };
 
 export function getActiveViewOverridesForTab( activeView ) {
+	const base = {
+		...defaultLayouts.table,
+	};
 	const status = SLUG_TO_STATUS[ activeView ];
 	if ( ! status ) {
-		return {};
+		return base;
 	}
 	return {
+		...base,
 		filters: [
 			{
 				field: 'status',

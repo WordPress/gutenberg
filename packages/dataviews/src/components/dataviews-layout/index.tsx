@@ -27,6 +27,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		fields,
 		getItemId,
 		getItemLevel,
+		hasInitiallyLoaded,
 		isLoading,
 		view,
 		onChangeView,
@@ -39,6 +40,10 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		defaultLayouts,
 		empty = <p>{ __( 'No results' ) }</p>,
 	} = useContext( DataViewsContext );
+
+	if ( ! hasInitiallyLoaded ) {
+		return null;
+	}
 
 	const ViewComponent = VIEW_LAYOUTS.find(
 		( v ) => v.type === view.type && defaultLayouts[ v.type ]
