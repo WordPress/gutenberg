@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createSelector } from '@wordpress/data';
+import type { State } from './types';
 
 /**
  * Returns the registered static commands.
@@ -12,7 +13,7 @@ import { createSelector } from '@wordpress/data';
  * @return {import('./actions').WPCommandConfig[]} The list of registered commands.
  */
 export const getCommands = createSelector(
-	( state, contextual = false ) =>
+	( state: State, contextual = false ) =>
 		Object.values( state.commands ).filter( ( command ) => {
 			const isContextual =
 				command.context && command.context === state.context;
@@ -30,7 +31,7 @@ export const getCommands = createSelector(
  * @return {import('./actions').WPCommandLoaderConfig[]} The list of registered command loaders.
  */
 export const getCommandLoaders = createSelector(
-	( state, contextual = false ) =>
+	( state: State, contextual = false ) =>
 		Object.values( state.commandLoaders ).filter( ( loader ) => {
 			const isContextual =
 				loader.context && loader.context === state.context;
@@ -46,7 +47,7 @@ export const getCommandLoaders = createSelector(
  *
  * @return {boolean} Returns whether the command palette is open.
  */
-export function isOpen( state ) {
+export function isOpen( state: State ) {
 	return state.isOpen;
 }
 
@@ -57,6 +58,6 @@ export function isOpen( state ) {
  *
  * @return {string} Context.
  */
-export function getContext( state ) {
+export function getContext( state: State ) {
 	return state.context;
 }

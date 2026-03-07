@@ -126,7 +126,7 @@ useCommand( {
 
 _Parameters_
 
--   _command_ `import('../store/actions').WPCommandConfig`: command config.
+-   _command_ `WPCommandConfig`:
 
 ### useCommandLoader
 
@@ -200,7 +200,7 @@ useCommandLoader( {
 
 _Parameters_
 
--   _loader_ `import('../store/actions').WPCommandLoaderConfig`: command loader config.
+-   _loader_ `WPCommandLoaderConfig`: command loader config.
 
 ### useCommands
 

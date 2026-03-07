@@ -6,6 +6,7 @@
 		{ "path": "../api-fetch" },
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blob" },
+		{ "path": "../commands" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../data" },

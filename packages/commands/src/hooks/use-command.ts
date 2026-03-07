@@ -8,11 +8,10 @@ import { useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as commandsStore } from '../store';
+import type { WPCommandConfig } from '../store/actions';
 
 /**
  * Attach a command to the command palette. Used for static commands.
- *
- * @param {import('../store/actions').WPCommandConfig} command command config.
  *
  * @example
  * ```js
@@ -30,8 +29,9 @@ import { store as commandsStore } from '../store';
  *     },
  * } );
  * ```
+ * @param command
  */
-export function useCommand( command ) {
+export function useCommand( command: WPCommandConfig ) {
 	const { registerCommand, unregisterCommand } = useDispatch( commandsStore );
 	const currentCallbackRef = useRef( command.callback );
 	useEffect( () => {
@@ -103,9 +103,9 @@ export function useCommand( command ) {
  * ] );
  * ```
  */
-export function useCommands( commands ) {
+export function useCommands( commands: WPCommandConfig[] ) {
 	const { registerCommand, unregisterCommand } = useDispatch( commandsStore );
-	const currentCallbacksRef = useRef( {} );
+	const currentCallbacksRef = useRef< Record< string, Function > >( {} );
 
 	useEffect( () => {
 		if ( ! commands ) {
@@ -134,6 +134,7 @@ export function useCommands( commands ) {
 				searchLabel: command.searchLabel,
 				icon: command.icon,
 				keywords: command.keywords,
+
 				callback: ( ...args ) => {
 					const callback =
 						currentCallbacksRef.current[ command.name ];
