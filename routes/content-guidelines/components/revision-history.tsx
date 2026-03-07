@@ -34,6 +34,11 @@ const DEFAULT_VIEW: View = {
 	fields: [ 'date', 'author' ],
 	page: 1,
 	perPage: 10,
+	layout: {
+		styles: {
+			author: { align: 'end' },
+		},
+	},
 };
 
 export default function RevisionHistory() {
@@ -190,6 +195,7 @@ export default function RevisionHistory() {
 				size={ 13 }
 				weight={ 400 }
 				color="var(--wp-components-color-gray-800)"
+				className="content-guidelines__revision-description"
 			>
 				{ __( 'Use a previous version of your content guidelines.' ) }
 			</Text>
@@ -226,7 +232,9 @@ export default function RevisionHistory() {
 							) }
 						</Text>
 						<Text size={ 13 } weight={ 400 }>
-							{ __( 'This action cannot be undone.' ) }
+							{ __(
+								'A new version will be saved so you can always come back.'
+							) }
 						</Text>
 					</VStack>
 					<HStack

@@ -102,19 +102,21 @@
 
 	.dataviews__view-actions,
 	.dataviews-filters__container {
-		padding-left: 0;
-		padding-right: 0;
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-10;
 	}
 
 	.dataviews-view-table {
-		td:first-child,
-		th:first-child {
+		td:first-child {
+			padding-left: $grid-unit-10;
+		}
+
+		thead th:first-child {
 			padding-left: 0;
 		}
 
-		td:last-child,
-		th:last-child {
-			padding-right: 0;
+		.dataviews-view-table__cell-content-wrapper {
+			max-width: 100%;
 		}
 	}
 }
@@ -124,6 +126,10 @@
 	margin-left: -$grid-unit-10;
 	font-weight: 500;
 	color: $gray-900;
+}
+
+.content-guidelines__revision-description {
+	padding-left: $grid-unit-10;
 }
 
 .content-guidelines__restore-modal-actions {
