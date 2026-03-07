@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { downloadBlob } from '@wordpress/blob';
 import { dispatch, select } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -184,17 +185,11 @@ export function exportContentGuidelines(): void {
 			),
 		};
 
-	const blob = new Blob( [ JSON.stringify( data, null, 2 ) ], {
-		type: 'application/json',
-	} );
-	const url = URL.createObjectURL( blob );
-	const anchor = document.createElement( 'a' );
-	anchor.href = url;
-	anchor.download = 'guidelines.json';
-	document.body.appendChild( anchor );
-	anchor.click();
-	document.body.removeChild( anchor );
-	URL.revokeObjectURL( url );
+	downloadBlob(
+		'guidelines.json',
+		JSON.stringify( data, null, 2 ),
+		'application/json'
+	);
 
 	createSuccessNotice( __( 'Content guidelines exported.' ), {
 		type: 'snackbar',

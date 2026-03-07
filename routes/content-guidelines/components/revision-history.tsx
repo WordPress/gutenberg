@@ -10,10 +10,12 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
-import { chevronLeft } from '@wordpress/icons';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { chevronLeft, chevronRight } from '@wordpress/icons';
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
+import { store as noticesStore } from '@wordpress/notices';
 import type { View, Field, Action } from '@wordpress/dataviews';
 
 /**
@@ -34,17 +36,6 @@ const DEFAULT_VIEW: View = {
 	perPage: 10,
 };
 
-function formatDate( dateString: string ): string {
-	return new Intl.DateTimeFormat( undefined, {
-		year: 'numeric',
-		month: 'short',
-		day: 'numeric',
-		hour: 'numeric',
-		minute: '2-digit',
-		hour12: true,
-	} ).format( new Date( dateString ) );
-}
-
 export default function RevisionHistory() {
 	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
 	const [ revisions, setRevisions ] = useState< ContentGuidelinesRevision[] >(
@@ -55,6 +46,9 @@ export default function RevisionHistory() {
 		useState< ContentGuidelinesRevision | null >( null );
 	const [ isRestoring, setIsRestoring ] = useState( false );
 	const [ refetchKey, setRefetchKey ] = useState( 0 );
+
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	// @ts-ignore
 	const guidelinesId = useSelect(
@@ -67,15 +61,26 @@ export default function RevisionHistory() {
 		if ( ! guidelinesId ) {
 			return;
 		}
-		setIsLoading( true );
-		fetchContentGuidelinesRevisions( {
-			guidelinesId,
-			perPage: 100,
-		} )
-			.then( ( result ) => {
+
+		async function loadRevisions() {
+			setIsLoading( true );
+			try {
+				const result = await fetchContentGuidelinesRevisions( {
+					guidelinesId: guidelinesId!,
+					perPage: 100,
+				} );
 				setRevisions( result.revisions );
-			} )
-			.finally( () => setIsLoading( false ) );
+			} catch {
+				createErrorNotice(
+					__( 'Could not load revision history. Please try again.' ),
+					{ type: 'snackbar' }
+				);
+			} finally {
+				setIsLoading( false );
+			}
+		}
+
+		loadRevisions();
 	}, [ guidelinesId, refetchKey ] );
 
 	const authorElements = useMemo( () => {
@@ -97,7 +102,10 @@ export default function RevisionHistory() {
 				getValue: ( { item } ) => item.date,
 				render: ( { item } ) => (
 					<time dateTime={ item.date }>
-						{ formatDate( item.date ) }
+						{ dateI18n(
+							getSettings().formats.datetimeAbbreviated,
+							getDate( item.date )
+						) }
 					</time>
 				),
 				enableSorting: false,
@@ -156,6 +164,14 @@ export default function RevisionHistory() {
 			await fetchContentGuidelines();
 			setRevisionToRestore( null );
 			setRefetchKey( ( k ) => k + 1 );
+			createSuccessNotice( __( 'Revision restored.' ), {
+				type: 'snackbar',
+			} );
+		} catch {
+			createErrorNotice(
+				__( 'Could not restore revision. Please try again.' ),
+				{ type: 'snackbar' }
+			);
 		} finally {
 			setIsRestoring( false );
 		}
@@ -164,7 +180,7 @@ export default function RevisionHistory() {
 	return (
 		<div className="content-guidelines__revision-history">
 			<Navigator.BackButton
-				icon={ chevronLeft }
+				icon={ isRTL() ? chevronRight : chevronLeft }
 				className="content-guidelines__revision-history-back"
 			>
 				{ __( 'Revision history' ) }
@@ -203,7 +219,10 @@ export default function RevisionHistory() {
 								__(
 									'You are about to restore the content guidelines from %s.'
 								),
-								formatDate( revisionToRestore.date )
+								dateI18n(
+									getSettings().formats.datetimeAbbreviated,
+									getDate( revisionToRestore.date )
+								)
 							) }
 						</Text>
 						<Text size={ 13 } weight={ 400 }>
