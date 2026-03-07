@@ -168,7 +168,6 @@ export function DefaultConnectorSettings( {
 			}
 		>
 			<TextControl
-				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				label={ __( 'API Key' ) }
 				value={ apiKey }
@@ -178,7 +177,7 @@ export function DefaultConnectorSettings( {
 						setApiKey( value );
 					}
 				} }
-				placeholder="YOUR_API_KEY"
+				placeholder={ __( 'Enter your API key' ) }
 				disabled={ readOnly || isSaving }
 				help={ getHelp() }
 			/>

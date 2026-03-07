@@ -179,7 +179,7 @@ jobs:
                   fi
 
     build:
-        name: Build Release Artifact
+        name: ${{ matrix.IS_WORDPRESS_CORE && 'Build assets for wordpress-develop' || 'Build Release Artifact' }}
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
@@ -190,6 +190,15 @@ jobs:
               github.event_name == 'workflow_dispatch' ||
               github.repository == 'WordPress/gutenberg'
             )
+        strategy:
+            matrix:
+                IS_GUTENBERG_PLUGIN: [true]
+                IS_WORDPRESS_CORE: [false]
+
+                include:
+                    - IS_GUTENBERG_PLUGIN: false
+                      IS_WORDPRESS_CORE: true
+
         outputs:
             job_status: ${{ job.status }}
 
@@ -207,15 +216,21 @@ jobs:
                   node-version-file: '.nvmrc'
                   check-latest: true
 
+            - name: Configure build for wordpress-develop
+              if: ${{ matrix.IS_WORDPRESS_CORE }}
+              run: jq --tab '.wpPlugin.name = "wp"' package.json > package.json.tmp && mv package.json.tmp package.json
+
             - name: Build Gutenberg plugin ZIP file
               run: ./bin/build-plugin-zip.sh
               env:
                   NO_CHECKS: 'true'
+                  IS_GUTENBERG_PLUGIN: ${{ matrix.IS_GUTENBERG_PLUGIN }}
+                  IS_WORDPRESS_CORE: ${{ matrix.IS_WORDPRESS_CORE }}
 
             - name: Upload artifact
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               with:
-                  name: gutenberg-plugin
+                  name: gutenberg-${{ matrix.IS_WORDPRESS_CORE && 'wordpress-develop' || 'plugin' }}
                   path: ./gutenberg.zip
 
             - name: Build release notes draft
@@ -240,6 +255,59 @@ jobs:
               with:
                   name: release-notes
                   path: ./release-notes.txt
+
+    # Publishes the built plugin zip file to the GitHub Container registry.
+    publish-to-container-registry:
+        name: Publish to GitHub Container Registry
+        runs-on: 'ubuntu-24.04'
+        needs: ['bump-version', 'build']
+        permissions:
+            contents: read
+            packages: write
+        if: |
+            always() &&
+            needs.build.outputs.job_status == 'success' &&
+            github.repository == 'WordPress/gutenberg' &&
+            github.event_name == 'push'
+
+        steps:
+            - name: Download build artifact
+              uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+              with:
+                  name: gutenberg-wordpress-develop
+
+            - name: Unzip zip artifact
+              run: unzip gutenberg.zip && rm gutenberg.zip
+
+            # Noting the hash helps keep track of the commit the zip was built from.
+            - name: Add a file for tracking the SHA value used.
+              run: echo "${{ github.sha }}" > .gutenberg-hash
+
+            - name: Recompress as a .gz file
+              run: tar -czf ${{ runner.temp }}/gutenberg.tar.gz . && mv ${{ runner.temp }}/gutenberg.tar.gz .
+
+            - name: Login to GitHub Container Registry
+              uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            # OCI Registry As Storage (ORAS) provides a way to push and pull non-image, generic artifacts (.gz files,
+            # for example) to container registries such as GitHub Container Registry.
+            - name: Setup ORAS
+              uses: oras-project/setup-oras@22ce207df3b08e061f537244349aac6ae1d214f6 # v1.2.4
+
+            # The owner/repository is hard-coded because capital letters are not allowed when publishing to GitHub
+            # Container Registry. The organization name is WordPress, so ${{ github.repository }} causes an error.
+            # See https://github.com/orgs/community/discussions/27086 for more info.
+            - name: Push built plugin .tar.gz file to GitHub Container Registry
+              run: |
+                  oras push "ghcr.io/wordpress/gutenberg/gutenberg-wp-develop-build:${{ github.sha }}" \
+                  "gutenberg.tar.gz:application/gzip" \
+                  --annotation "org.opencontainers.image.description=Gutenberg plugin build for commit ${{ github.sha }}" \
+                  --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+                  --annotation "org.opencontainers.image.revision=${{ github.sha }}"
 
     revert-version-bump:
         name: Revert version bump if build failed

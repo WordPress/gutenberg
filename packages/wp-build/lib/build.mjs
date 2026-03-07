@@ -113,12 +113,27 @@ const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
 
+/**
+ * Interprets a configuration value as a boolean, where `"true"` and `"1"`
+ * are considered true while all other values are false.
+ *
+ * @param {string|undefined} value The configuration value to interpret.
+ * @return {boolean} Boolean interpretation of the given configuration value.
+ */
+const boolConfigVal = ( value ) => {
+	return (
+		value !== undefined && [ 'true', '1' ].includes( value.toLowerCase() )
+	);
+};
+
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
-		Boolean( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
+		boolConfigVal( process.env.IS_GUTENBERG_PLUGIN ) ||
+			boolConfigVal( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
 	),
 	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
-		Boolean( process.env.npm_package_config_IS_WORDPRESS_CORE )
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ||
+			boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE )
 	),
 };
 const getDefine = ( scriptDebug ) => ( {
@@ -314,6 +329,16 @@ function transformPhpContent( content, transforms ) {
 	} = transforms;
 
 	content = content.toString();
+
+	/*
+	 * Transforms are used to modify PHP files that are committed to version
+	 * control in their wordpress-develop state (`wp_` function prefixes, `WP_`
+	 * class prefixes, etc.). When building for WordPress Core, it's not
+	 * necessary to perform these steps.
+	 */
+	if ( boolConfigVal( process.env.IS_WORDPRESS_CORE ) ) {
+		return content;
+	}
 
 	if ( prefixFunctions.length ) {
 		content = content.replace(
@@ -2142,7 +2167,9 @@ async function main() {
 			},
 			'base-url': {
 				type: 'string',
-				default: 'plugin_dir_url( __FILE__ )',
+				default: boolConfigVal( process.env.IS_WORDPRESS_CORE )
+					? "includes_url( 'build/' )"
+					: 'plugin_dir_url( __FILE__ )',
 			},
 		},
 		strict: false,

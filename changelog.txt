@@ -1,5 +1,29 @@
 == Changelog ==
 
+= 22.7.0-rc.2 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Editor
+- RTC: Enable RTC by default ([75739](https://github.com/WordPress/gutenberg/pull/75739))
+- Interactivity: Fix crypto.randomUUID crash in non-secure contexts ([76151](https://github.com/WordPress/gutenberg/pull/76151))
+- Client-side media processing: Try plumbing invalidation to the block-editor's mediaUpload onSuccess callback ([76173](https://github.com/WordPress/gutenberg/pull/76173))
+- Client-side media processing: only use media upload provider when not in preview mode ([76124](https://github.com/WordPress/gutenberg/pull/76124))
+
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@andrewserong @chriszarate @scruffian
+
+
 = 22.7.0-rc.1 =
 
 

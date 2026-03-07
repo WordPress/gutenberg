@@ -109,6 +109,7 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 						id: 'status',
 						layout: { type: 'regular', labelPosition: 'none' },
 					},
+					'scheduled_date',
 					'password',
 				],
 			},
