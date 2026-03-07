@@ -244,6 +244,77 @@ describe( 'Router styles management', () => {
 			expect( childNodes[ 0 ] ).toHaveAttribute( 'media', 'preload' );
 		} );
 
+		/**
+		 * A `<link>` activated by an iAPI store (media="not all" → "all")
+		 * must be treated as the same resource as the server-returned element
+		 * still carrying media="not all". Full isEqualNode() treats them as
+		 * different nodes; the SCS algorithm then drops the live element and
+		 * applyStyles() disables the activated sheet on the next navigation.
+		 *
+		 * The comparator uses clone + removeAttribute('media') + isEqualNode(),
+		 * which preserves all other attribute checks (integrity, crossorigin, etc.)
+		 * while ignoring media differences.
+		 *
+		 * Relates to #76031.
+		 */
+		it( 'should treat <link> elements with same href but different media as equal', () => {
+			const liveLink = createLinkElement(
+				'theme-light-css',
+				'https://example.com/theme-light.css'
+			);
+			liveLink.setAttribute( 'media', 'all' );
+			liveLink.setAttribute( 'integrity', 'sha256-abc123' );
+
+			const serverLink = createLinkElement(
+				'theme-light-css',
+				'https://example.com/theme-light.css'
+			);
+			serverLink.setAttribute( 'media', 'not all' );
+			serverLink.setAttribute( 'integrity', 'sha256-abc123' );
+
+			parent.append( liveLink );
+
+			const promises = updateStylesWithSCS(
+				[ liveLink ],
+				[ serverLink ],
+				parent
+			);
+
+			// Same resource — no duplicate must be inserted.
+			expect( parent.childNodes.length ).toBe( 1 );
+			expect( promises.length ).toBe( 1 );
+			// Original live element (media="all") must be reused, not replaced.
+			expect( parent.childNodes[ 0 ] ).toBe( liveLink );
+			expect( ( parent.childNodes[ 0 ] as HTMLLinkElement ).media ).toBe(
+				'all'
+			);
+		} );
+
+		it( 'should treat <link> elements with different integrity as different nodes', () => {
+			const linkA = createLinkElement(
+				'theme-main-css',
+				'https://example.com/theme.css'
+			);
+			linkA.setAttribute( 'integrity', 'sha256-aaa' );
+
+			const linkB = createLinkElement(
+				'theme-main-css',
+				'https://example.com/theme.css'
+			);
+			linkB.setAttribute( 'integrity', 'sha256-bbb' );
+
+			parent.append( linkA );
+
+			const promises = updateStylesWithSCS(
+				[ linkA ],
+				[ linkB ],
+				parent
+			);
+
+			// Different integrity — treated as different resources, linkB inserted.
+			expect( promises.length ).toBe( 1 );
+		} );
+
 		it( 'should treat style elements as already loaded', async () => {
 			const X = [ createStyleElement( 'style1' ) ];
 			const Y = [ createStyleElement( 'style1' ) ];
@@ -568,12 +639,15 @@ describe( 'Router styles management', () => {
 			document.head.appendChild( style2 );
 			document.head.appendChild( style3 );
 
-			// Init `sheet` property.
-			mockSheet( style1, { disabled: true, mediaText: 'all' } );
-			mockSheet( style2, { disabled: false, mediaText: 'all' } );
+			// All start from preload so applyStyles() enrolls them on first call.
+			mockSheet( style1, { disabled: false, mediaText: 'preload' } );
+			mockSheet( style2, { disabled: false, mediaText: 'preload' } );
 			mockSheet( style3, { disabled: false, mediaText: 'preload' } );
 
-			// Apply styles to only style1 and style3.
+			// First navigation: activate all three, enrolling them as managed.
+			applyStyles( [ style1, style2, style3 ] );
+
+			// Second navigation: only style1 and style3 needed.
 			applyStyles( [ style1, style3 ] );
 
 			// style1 and style3 should be enabled, style2 should be disabled.
@@ -645,6 +719,77 @@ describe( 'Router styles management', () => {
 
 			// Check that media was preserved correctly.
 			expect( link.sheet!.media.mediaText ).toBe( 'print' );
+		} );
+
+		/**
+		 * Dynamically-injected plugin stylesheets (e.g. consent-banner CSS
+		 * appended via `document.head.appendChild()`) bypass `wp_enqueue_style()`
+		 * and therefore have no `id` attribute. They are absent from every
+		 * server-rendered HTML response and are never activated by the router, so
+		 * they must never be disabled on any navigation.
+		 *
+		 * Relates to #76031.
+		 */
+		it( 'should never disable dynamically-injected plugin styles', () => {
+			const routerLink = createLinkElement( 'theme-main-css' );
+			routerLink.setAttribute( 'media', 'preload' );
+
+			// No id — simulates a plugin-injected stylesheet.
+			const pluginLink = document.createElement( 'link' );
+			pluginLink.rel = 'stylesheet';
+			pluginLink.href = 'https://example.com/complianz/banner.css';
+
+			document.head.append( routerLink, pluginLink );
+			mockSheet( routerLink, { disabled: false, mediaText: 'preload' } );
+			mockSheet( pluginLink, { disabled: false, mediaText: 'all' } );
+
+			// First navigation — router activates and tracks routerLink.
+			applyStyles( [ routerLink ] );
+			expect( routerLink.sheet!.disabled ).toBe( false );
+			expect( pluginLink.sheet!.disabled ).toBe( false );
+
+			// Second navigation away — routerLink disabled, pluginLink untouched.
+			applyStyles( [] );
+			expect( routerLink.sheet!.disabled ).toBe( true );
+			expect( pluginLink.sheet!.disabled ).toBe( false );
+		} );
+
+		/**
+		 * On a back-navigation (A → B → C → A) `applyStyles()` receives
+		 * `pageA.styles` which includes the plugin-injected stylesheet because
+		 * page A was cached when `doc === window.document` (full DOM snapshot).
+		 * The plugin element must not be enrolled in tracking on that re-visit,
+		 * otherwise the next navigation away from A would disable it.
+		 *
+		 * Relates to #76031.
+		 */
+		it( 'should not enroll already-active plugin styles on back-navigation', () => {
+			const routerLink = createLinkElement( 'theme-main-css' );
+			routerLink.setAttribute( 'media', 'preload' );
+
+			const pluginLink = document.createElement( 'link' );
+			pluginLink.rel = 'stylesheet';
+			pluginLink.href = 'https://example.com/plugin/consent.css';
+
+			document.head.append( routerLink, pluginLink );
+			mockSheet( routerLink, { disabled: false, mediaText: 'preload' } );
+			mockSheet( pluginLink, { disabled: false, mediaText: 'all' } );
+
+			// Navigate to B — router activates routerLink.
+			applyStyles( [ routerLink ] );
+			// Navigate to C — routerLink disabled.
+			applyStyles( [] );
+			expect( routerLink.sheet!.disabled ).toBe( true );
+
+			// Back to A — page.styles contains both (cached DOM snapshot).
+			applyStyles( [ routerLink, pluginLink ] );
+			expect( routerLink.sheet!.disabled ).toBe( false );
+			expect( pluginLink.sheet!.disabled ).toBe( false );
+
+			// Navigate away from A — only routerLink may be disabled.
+			applyStyles( [] );
+			expect( routerLink.sheet!.disabled ).toBe( true );
+			expect( pluginLink.sheet!.disabled ).toBe( false );
 		} );
 	} );
 
