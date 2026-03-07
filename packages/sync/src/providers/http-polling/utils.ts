@@ -105,26 +105,14 @@ export function createUpdateQueue(
  * @param payload The sync payload including data and after cursor
  * @return The sync server response
  */
-export async function postSyncUpdate(
+export function postSyncUpdate(
 	payload: SyncPayload
 ): Promise< SyncResponse > {
-	const response = await apiFetch< SyncResponse, false >( {
-		body: JSON.stringify( payload ),
-		headers: {
-			'Content-Type': 'application/json',
-		},
+	return apiFetch( {
 		method: 'POST',
-		parse: false,
 		path: SYNC_API_PATH,
+		data: payload,
 	} );
-
-	if ( ! response.ok ) {
-		throw new Error(
-			`Sync update failed with status ${ response.status }`
-		);
-	}
-
-	return await response.json();
 }
 
 /**
@@ -139,11 +127,9 @@ export function postSyncUpdateNonBlocking( payload: SyncPayload ): void {
 	}
 
 	apiFetch( {
-		body: JSON.stringify( payload ),
-		headers: { 'Content-Type': 'application/json' },
-		keepalive: true,
 		method: 'POST',
-		parse: false,
 		path: SYNC_API_PATH,
+		data: payload,
+		keepalive: true,
 	} ).catch( () => {} );
 }
