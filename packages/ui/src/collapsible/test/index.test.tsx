@@ -144,6 +144,48 @@ describe( 'Collapsible', () => {
 		} );
 	} );
 
+	describe( 'render prop', () => {
+		it( 'supports render prop on Root', () => {
+			const ref = createRef< HTMLElement >();
+			render(
+				<Collapsible.Root ref={ ref } render={ <section /> }>
+					<Collapsible.Trigger>Toggle</Collapsible.Trigger>
+					<Collapsible.Panel>Content</Collapsible.Panel>
+				</Collapsible.Root>
+			);
+			expect( ref.current?.tagName ).toBe( 'SECTION' );
+		} );
+
+		it( 'supports render prop on Trigger', () => {
+			render(
+				<Collapsible.Root>
+					<Collapsible.Trigger
+						nativeButton={ false }
+						render={ <div /> }
+					>
+						Toggle
+					</Collapsible.Trigger>
+					<Collapsible.Panel>Content</Collapsible.Panel>
+				</Collapsible.Root>
+			);
+			const trigger = screen.getByRole( 'button', { name: 'Toggle' } );
+			expect( trigger.tagName ).toBe( 'DIV' );
+		} );
+
+		it( 'supports render prop on Panel', () => {
+			const ref = createRef< HTMLElement >();
+			render(
+				<Collapsible.Root defaultOpen>
+					<Collapsible.Trigger>Toggle</Collapsible.Trigger>
+					<Collapsible.Panel ref={ ref } render={ <section /> }>
+						Content
+					</Collapsible.Panel>
+				</Collapsible.Root>
+			);
+			expect( ref.current?.tagName ).toBe( 'SECTION' );
+		} );
+	} );
+
 	describe( 'custom className', () => {
 		it( 'applies className to Root', () => {
 			const ref = createRef< HTMLDivElement >();

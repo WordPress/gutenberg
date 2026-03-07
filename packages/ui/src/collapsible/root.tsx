@@ -1,5 +1,5 @@
-import { forwardRef } from '@wordpress/element';
 import { Collapsible as _Collapsible } from '@base-ui/react/collapsible';
+import { forwardRef } from '@wordpress/element';
 import type { RootProps } from './types';
 
 /**
