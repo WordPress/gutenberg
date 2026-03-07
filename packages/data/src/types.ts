@@ -469,4 +469,27 @@ type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
 	? { [ name in keyof Selectors ]: Function }
 	: never;
 
+/**
+ * The argument object passed to every thunk function. When parameterized with
+ * a store descriptor, `dispatch`, `select`, and `resolveSelect` are fully
+ * typed against that store's actions and selectors.
+ *
+ * @example
+ * ```ts
+ * const myAction =
+ *     ( id: number ) =>
+ *     async ( { dispatch, select }: ThunkArgs< typeof myStore > ) => {
+ *         const record = select.getRecord( id );
+ *         dispatch.setLoading( true );
+ *     };
+ * ```
+ */
+export interface ThunkArgs< S extends StoreDescriptor = StoreDescriptor > {
+	dispatch: ActionCreatorsOf< S > &
+		( ( action: Record< string, unknown > ) => void );
+	select: CurriedSelectorsOf< S >;
+	resolveSelect: CurriedSelectorsResolveOf< S >;
+	registry: DataRegistry;
+}
+
 export type combineReducers = typeof reduxCombineReducers;
