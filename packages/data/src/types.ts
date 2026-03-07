@@ -67,8 +67,7 @@ export type UseSelectReturn< F extends MapSelect | StoreDescriptor< any > > =
 // Return type for the useDispatch() hook.
 export type UseDispatchReturn< StoreNameOrDescriptor > =
 	StoreNameOrDescriptor extends StoreDescriptor< any >
-		? ActionCreatorsOf< ConfigOf< StoreNameOrDescriptor > > &
-				MetadataActions< StoreNameOrDescriptor >
+		? ActionCreatorsOf< StoreNameOrDescriptor >
 		: StoreNameOrDescriptor extends undefined
 		? DispatchFunction
 		: any;
@@ -79,8 +78,7 @@ export type DispatchFunction = < StoreNameOrDescriptor >(
 
 export type DispatchReturn< StoreNameOrDescriptor > =
 	StoreNameOrDescriptor extends StoreDescriptor< any >
-		? ActionCreatorsOf< ConfigOf< StoreNameOrDescriptor > > &
-				MetadataActions< StoreNameOrDescriptor >
+		? ActionCreatorsOf< StoreNameOrDescriptor >
 		: unknown;
 
 export type MapSelect = (
@@ -254,9 +252,7 @@ export interface DataRegistry {
 		): Record< string, ( ...args: any[] ) => any >;
 	};
 	dispatch: {
-		< S extends StoreDescriptor< any > >(
-			store: S
-		): ActionCreatorsOf< ConfigOf< S > > & MetadataActions< S >;
+		< S extends StoreDescriptor< any > >( store: S ): ActionCreatorsOf< S >;
 		(
 			store: StoreNameOrDescriptor
 		): Record< string, ( ...args: any[] ) => any >;
@@ -425,8 +421,13 @@ export interface StorageInterface {
 
 export type ConfigOf< S > = S extends StoreDescriptor< infer C > ? C : never;
 
-export type ActionCreatorsOf< Config extends AnyConfig > =
-	Config extends ReduxStoreConfig< any, infer ActionCreators, any >
+export type ActionCreatorsOf< T extends AnyConfig | StoreDescriptor > =
+	T extends StoreDescriptor< infer C >
+		? ( C extends ReduxStoreConfig< any, infer ActionCreators, any >
+				? PromisifiedActionCreators< ActionCreators >
+				: never ) &
+				MetadataActions< T >
+		: T extends ReduxStoreConfig< any, infer ActionCreators, any >
 		? PromisifiedActionCreators< ActionCreators >
 		: never;
 
