@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { JSX } from 'react';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
