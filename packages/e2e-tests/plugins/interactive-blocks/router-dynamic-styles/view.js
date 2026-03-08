@@ -35,44 +35,38 @@ import { store } from '@wordpress/interactivity';
  */
 const PLUGIN_STYLE_ID = 'test-router-plugin-style';
 
-store( 'test/router-dynamic-styles', {
+const { state } = store( 'test/router-dynamic-styles', {
 	state: {
 		/**
 		 * "active" | "inactive"
 		 *
-		 * Reads the live media attribute so any change made by activateDeferredStyle
-		 * or by the router's applyStyles() is reflected immediately.
+		 * Plain reactive field updated by activateDeferredStyle().
+		 * A DOM getter would not be reactive in Preact's signal system —
+		 * raw DOM reads do not create signal subscriptions, so the bound
+		 * data-wp-text span would never re-render after the media change.
 		 */
-		get deferredStyleStatus() {
-			const styleEl = document.getElementById(
-				'test-router-deferred-style'
-			);
-			// If the element exists and media is not 'not all', it is active.
-			return styleEl && styleEl.media !== 'not all'
-				? 'active'
-				: 'inactive';
-		},
+		deferredStyleStatus: 'inactive',
 
 		/**
 		 * "active" | "inactive"
 		 *
-		 * Reads the DOM on every access so the status is accurate immediately
-		 * after init() appends the element and after each SPA navigation.
+		 * Plain reactive field updated by init().
+		 * Same reason as deferredStyleStatus: getElementById() is not a
+		 * Preact signal, so a getter that reads it would be evaluated once
+		 * at hydration and never again, leaving the span stuck at "inactive"
+		 * even after the element is appended to <head>.
 		 */
-		get pluginStyleStatus() {
-			// If the injected style element exists, it is active.
-			return document.getElementById( PLUGIN_STYLE_ID )
-				? 'active'
-				: 'inactive';
-		},
+		pluginStyleStatus: 'inactive',
 	},
 
 	actions: {
 		/**
 		 * Simulates an iAPI store activating a deferred stylesheet.
 		 *
-		 * Changes media from "not all" to "all" on the deferred style element.
-		 * The router logic should preserve this state across SPA navigations.
+		 * Changes media from "not all" to "all" on the deferred style element,
+		 * then writes to the reactive state field so data-wp-text re-renders.
+		 * The router logic should preserve both the DOM change and the state
+		 * across SPA navigations.
 		 */
 		activateDeferredStyle() {
 			const styleEl = document.getElementById(
@@ -82,6 +76,8 @@ store( 'test/router-dynamic-styles', {
 				// Changing media to 'all' activates the stylesheet.
 				// The router logic should preserve this state.
 				styleEl.media = 'all';
+				// Update the reactive signal so data-wp-text re-renders.
+				state.deferredStyleStatus = 'active';
 			}
 		},
 	},
@@ -105,6 +101,9 @@ store( 'test/router-dynamic-styles', {
 				style.textContent = 'body { --test-plugin-style: 1; }';
 				document.head.appendChild( style );
 			}
+			// Update the reactive signal so data-wp-text re-renders.
+			// Called on every mount so the status is restored after SPA navigation.
+			state.pluginStyleStatus = 'active';
 		},
 	},
 } );
