@@ -34,7 +34,7 @@ import { store } from '@wordpress/interactivity';
  */
 let pluginStyleEl = null;
 
-const { state } = store( 'test/router-dynamic-styles', {
+const { state, actions, callbacks } = store( 'test/router-dynamic-styles', {
 	state: {
 		/** Text shown in data-testid="deferred-style-active". */
 		deferredStyleStatus: 'inactive',
@@ -88,8 +88,7 @@ const { state } = store( 'test/router-dynamic-styles', {
 			) {
 				pluginStyleEl = document.createElement( 'style' );
 				// Sets a detectable CSS custom property — disabled sheet → no property.
-				pluginStyleEl.textContent =
-					'body { --test-plugin-active: 1; }';
+				pluginStyleEl.textContent = 'body { --test-plugin-active: 1; }';
 				// Deliberately NO `id` attribute.
 				// wp_enqueue_style() always produces id="{handle}-css"; the absence
 				// of an id is the key signal that this element must be left unmanaged.
@@ -103,13 +102,18 @@ const { state } = store( 'test/router-dynamic-styles', {
 			// If applyStyles() preserved the activated sheet, the property is "1".
 			// If it incorrectly disabled the sheet, the property is "".
 			state.deferredStyleStatus =
-				cs.getPropertyValue( '--test-deferred-active' ).trim() === '1' ? 'active' : 'inactive';
+				cs.getPropertyValue( '--test-deferred-active' ).trim() === '1'
+					? 'active'
+					: 'inactive';
 
 			// Bug B: check sheet.disabled directly.
 			// routerManagedStyles must NOT contain pluginStyleEl (no id, never
 			// activated from preload state), so applyStyles() must leave it alone.
 			state.pluginStyleStatus =
-				pluginStyleEl && ( ! pluginStyleEl.sheet || ! pluginStyleEl.sheet.disabled ) ? 'active' : 'inactive';
+				pluginStyleEl &&
+				( ! pluginStyleEl.sheet || ! pluginStyleEl.sheet.disabled )
+					? 'active'
+					: 'inactive';
 		},
 	},
 } );
