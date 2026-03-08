@@ -56,6 +56,12 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 							<IconButton
 								{ ...props }
 								label={ __( 'Expand or collapse card' ) }
+								// The Collapsible wrapper's `render` prop
+								// uses a single-argument callback (via the
+								// ComponentProps utility), so Base UI's
+								// second `state` argument isn't available
+								// here. We derive the open state from
+								// `aria-expanded` instead of `state.open`.
 								icon={
 									props[ 'aria-expanded' ] === true
 										? chevronUp
