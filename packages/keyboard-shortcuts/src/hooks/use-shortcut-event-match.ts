@@ -8,7 +8,7 @@ import { isKeyboardEvent } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { store as keyboardShortcutsStore } from '../store';
-import type { WPShortcutKeyCombination } from '../store/actions';
+import type { ShortcutKeyCombination } from '../store/actions';
 
 /**
  * Returns a function to check if a keyboard event matches a shortcut name.
@@ -36,7 +36,7 @@ export default function useShortcutEventMatch(): (
 	 */
 	function isMatch( name: string, event: KeyboardEvent ) {
 		return getAllShortcutKeyCombinations( name ).some(
-			( combination: WPShortcutKeyCombination | null ) => {
+			( combination: ShortcutKeyCombination | null ) => {
 				if ( ! combination ) {
 					return false;
 				}

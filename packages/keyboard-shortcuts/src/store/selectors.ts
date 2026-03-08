@@ -11,12 +11,12 @@ import {
 /**
  * Internal dependencies
  */
-import type { WPShortcutKeyCombination } from './actions';
+import type { ShortcutKeyCombination } from './actions';
 
 interface ShortcutState {
 	category: string;
-	keyCombination: WPShortcutKeyCombination;
-	aliases?: WPShortcutKeyCombination[];
+	keyCombination: ShortcutKeyCombination;
+	aliases?: ShortcutKeyCombination[];
 	description: string;
 }
 
@@ -26,7 +26,7 @@ type ShortcutsState = Record< string, ShortcutState >;
  * Shared reference to an empty array for cases where it is important to avoid
  * returning a new array reference on every invocation.
  */
-const EMPTY_ARRAY: WPShortcutKeyCombination[] = [];
+const EMPTY_ARRAY: ShortcutKeyCombination[] = [];
 
 /**
  * Shortcut formatting methods.
@@ -47,7 +47,7 @@ const FORMATTING_METHODS = {
  * @return Shortcut representation.
  */
 function getKeyCombinationRepresentation(
-	shortcut: WPShortcutKeyCombination | null,
+	shortcut: ShortcutKeyCombination | null,
 	representation: keyof typeof FORMATTING_METHODS
 ): string | null {
 	if ( ! shortcut ) {
@@ -100,12 +100,12 @@ function getKeyCombinationRepresentation(
  * };
  *```
  *
- * @return {WPShortcutKeyCombination?} Key combination.
+ * @return {ShortcutKeyCombination?} Key combination.
  */
 export function getShortcutKeyCombination(
 	state: ShortcutsState,
 	name: string
-): WPShortcutKeyCombination | null {
+): ShortcutKeyCombination | null {
 	return state[ name ] ? state[ name ].keyCombination : null;
 }
 
@@ -235,12 +235,12 @@ export function getShortcutDescription(
  * };
  *```
  *
- * @return {WPShortcutKeyCombination[]} Key combinations.
+ * @return {ShortcutKeyCombination[]} Key combinations.
  */
 export function getShortcutAliases(
 	state: ShortcutsState,
 	name: string
-): WPShortcutKeyCombination[] {
+): ShortcutKeyCombination[] {
 	return state[ name ] && state[ name ].aliases
 		? state[ name ].aliases!
 		: EMPTY_ARRAY;
@@ -293,7 +293,7 @@ export function getShortcutAliases(
  * };
  *```
  *
- * @return {WPShortcutKeyCombination[]} Key combinations.
+ * @return {ShortcutKeyCombination[]} Key combinations.
  */
 export const getAllShortcutKeyCombinations = createSelector(
 	( state, name ) => {

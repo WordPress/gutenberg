@@ -6,7 +6,7 @@ import type { WPKeycodeModifier } from '@wordpress/keycodes';
 /**
  * Keyboard key combination.
  */
-export interface WPShortcutKeyCombination {
+export interface ShortcutKeyCombination {
 	character: string;
 	modifier: WPKeycodeModifier | undefined;
 }
@@ -18,16 +18,16 @@ export interface WPShortcutConfig {
 	name: string;
 	category: string;
 	description: string;
-	keyCombination: WPShortcutKeyCombination;
-	aliases?: WPShortcutKeyCombination[];
+	keyCombination: ShortcutKeyCombination;
+	aliases?: ShortcutKeyCombination[];
 }
 
 export interface RegisterShortcutAction {
 	type: 'REGISTER_SHORTCUT';
 	name: string;
 	category: string;
-	keyCombination: WPShortcutKeyCombination;
-	aliases?: WPShortcutKeyCombination[];
+	keyCombination: ShortcutKeyCombination;
+	aliases?: ShortcutKeyCombination[];
 	description: string;
 }
 

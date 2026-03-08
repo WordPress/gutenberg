@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import type { ShortcutAction, WPShortcutKeyCombination } from './actions';
+import type { ShortcutAction, ShortcutKeyCombination } from './actions';
 
 interface ShortcutState {
 	category: string;
-	keyCombination: WPShortcutKeyCombination;
-	aliases?: WPShortcutKeyCombination[];
+	keyCombination: ShortcutKeyCombination;
+	aliases?: ShortcutKeyCombination[];
 	description: string;
 }
 
