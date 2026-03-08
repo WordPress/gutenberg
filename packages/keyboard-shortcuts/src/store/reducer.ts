@@ -1,16 +1,8 @@
 /**
  * Internal dependencies
  */
-import type { ShortcutAction, ShortcutKeyCombination } from './actions';
-
-interface ShortcutState {
-	category: string;
-	keyCombination: ShortcutKeyCombination;
-	aliases?: ShortcutKeyCombination[];
-	description: string;
-}
-
-type ShortcutsState = Record< string, ShortcutState >;
+import type { ShortcutAction } from './actions';
+import type { ShortcutsState } from './types';
 
 /**
  * Reducer returning the registered shortcuts
