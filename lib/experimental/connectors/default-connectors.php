@@ -269,72 +269,7 @@ function _gutenberg_get_connector_settings(): array {
 	return $connectors;
 }
 
-/**
- * Validates connector API keys in the REST response when explicitly requested.
- *
- * Runs on `rest_post_dispatch` for `/wp/v2/settings` requests that include connector
- * fields via `_fields`. For each requested connector field, it validates the unmasked
- * key against the provider and replaces the response value with `invalid_key` if
- * validation fails.
- *
- * @access private
- *
- * @param WP_REST_Response $response The response object.
- * @param WP_REST_Server   $server   The server instance.
- * @param WP_REST_Request  $request  The request object.
- * @return WP_REST_Response The potentially modified response.
- */
-function _gutenberg_validate_connector_keys_in_rest( WP_REST_Response $response, WP_REST_Server $server, WP_REST_Request $request ): WP_REST_Response {
-	if ( '/wp/v2/settings' !== $request->get_route() ) {
-		return $response;
-	}
-
-	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
-		return $response;
-	}
-
-	$fields = $request->get_param( '_fields' );
-	if ( ! $fields ) {
-		return $response;
-	}
-
-	if ( is_array( $fields ) ) {
-		$requested = $fields;
-	} else {
-		$requested = array_map( 'trim', explode( ',', $fields ) );
-	}
-
-	$data = $response->get_data();
-	if ( ! is_array( $data ) ) {
-		return $response;
-	}
-
-	foreach ( _gutenberg_get_connector_settings() as $connector_id => $connector_data ) {
-		$auth = $connector_data['authentication'];
-		if ( 'ai_provider' !== $connector_data['type'] || 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
-			continue;
-		}
-
-		$setting_name = $auth['setting_name'];
-		if ( ! in_array( $setting_name, $requested, true ) ) {
-			continue;
-		}
-
-		$real_key = _gutenberg_get_real_api_key( $setting_name, '_gutenberg_mask_api_key' );
-		if ( '' === $real_key ) {
-			continue;
-		}
-
-		if ( true !== _gutenberg_is_ai_api_key_valid( $real_key, $connector_id ) ) {
-			$data[ $setting_name ] = 'invalid_key';
-		}
-	}
-
-	$response->set_data( $data );
-	return $response;
-}
 remove_filter( 'rest_post_dispatch', '_wp_connectors_validate_keys_in_rest', 10 );
-add_filter( 'rest_post_dispatch', '_gutenberg_validate_connector_keys_in_rest', 10, 3 );
 
 /**
  * Registers default connector settings and mask/sanitize filters.
