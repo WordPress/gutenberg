@@ -11,7 +11,7 @@
  *   algorithm recognises the live activated element as the same resource,
  *   keeps it in page.styles, and applyStyles() leaves it enabled.
  *
- * Bug B — plugin-injected stylesheet (no id, via appendChild):
+ * Bug B — plugin-injected stylesheet (stable id, via appendChild):
  *   init() appends a <style> element with a stable id, simulating
  *   plugins like Complianz GDPR that bypass wp_enqueue_style(). Because
  *   this element is appended after the router module has seeded
