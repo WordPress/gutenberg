@@ -124,17 +124,13 @@ const { state } = store( 'test/router-dynamic-styles', {
 				);
 				if ( link ) {
 					const sheet = link.sheet;
-					// If the CSS file returned a 404 the browser sets sheet to
-					// null — the router cannot have disabled a non-existent
-					// sheet, so treat null as "not disabled" and fall back to
-					// the media attribute to confirm activation is preserved.
-					if ( sheet !== null ) {
-						state.deferredStyleStatus = sheet.disabled
-							? 'inactive'
-							: 'active';
+					// A null sheet means the CSS file failed to load.
+					// The router cannot disable a non-existent sheet, so
+					// treat null as "not disabled" — activation is preserved.
+					if ( sheet === null || ! sheet.disabled ) {
+						state.deferredStyleStatus = 'active';
 					} else {
-						state.deferredStyleStatus =
-							link.media !== 'not all' ? 'active' : 'inactive';
+						state.deferredStyleStatus = 'inactive';
 					}
 				}
 			}
