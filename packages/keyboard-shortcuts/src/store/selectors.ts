@@ -408,11 +408,8 @@ export const getAllShortcutRawKeyCombinations = createSelector(
  */
 export const getCategoryShortcuts = createSelector(
 	( state: ShortcutsState, categoryName: string ): string[] => {
-		return Object.entries( state )
-			.filter(
-				( entry ): entry is [ string, ShortcutState ] =>
-					( entry[ 1 ] as ShortcutState ).category === categoryName
-			)
+		return Object.entries< ShortcutState >( state )
+			.filter( ( [ , shortcut ] ) => shortcut.category === categoryName )
 			.map( ( [ name ] ) => name );
 	},
 	( state: ShortcutsState ) => [ state ]
