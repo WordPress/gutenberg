@@ -86,17 +86,17 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 		await page.goto( utils.getLink( 'router-dynamic-styles-a' ) );
 
 		// Verify the plugin sheet is active on the initial page.
-		await expect(
-			page.getByTestId( 'plugin-style-active' )
-		).toHaveText( 'active' );
+		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
+			'active'
+		);
 
 		// Navigate to page B.
 		await page.getByTestId( 'nav-to-b' ).click();
 
 		// Plugin sheet must still be active after navigation.
-		await expect(
-			page.getByTestId( 'plugin-style-active' )
-		).toHaveText( 'active' );
+		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
+			'active'
+		);
 	} );
 
 	/**
@@ -115,31 +115,31 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 		page,
 	} ) => {
 		await page.goto( utils.getLink( 'router-dynamic-styles-a' ) );
-    await expect(
-			page.getByTestId( 'plugin-style-active' )
-		).toHaveText( 'active' );
+		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
+			'active'
+		);
 
 		await page.getByTestId( 'nav-to-b' ).click();
-		await expect(
-			page.getByTestId( 'plugin-style-active' )
-		).toHaveText( 'active' );
+		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
+			'active'
+		);
 
 		await page.getByTestId( 'nav-to-c' ).click();
-		await expect(
-			page.getByTestId( 'plugin-style-active' )
-		).toHaveText( 'active' );
+		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
+			'active'
+		);
 
 		// Back to A (cached page).
 		await page.goBack();
 		await page.goBack();
-		await expect(
-			page.getByTestId( 'plugin-style-active' )
-		).toHaveText( 'active' );
+		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
+			'active'
+		);
 
 		// Navigate away from A once more — plugin sheet must survive.
 		await page.getByTestId( 'nav-to-b' ).click();
-		await expect(
-			page.getByTestId( 'plugin-style-active' )
-		).toHaveText( 'active' );
+		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
+			'active'
+		);
 	} );
 } );
