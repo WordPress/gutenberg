@@ -34,7 +34,7 @@ import { store } from '@wordpress/interactivity';
  */
 let pluginStyleEl = null;
 
-const { state, actions, callbacks } = store( 'test/router-dynamic-styles', {
+const { state } = store( 'test/router-dynamic-styles', {
 	state: {
 		/** Text shown in data-testid="deferred-style-active". */
 		deferredStyleStatus: 'inactive',
@@ -103,19 +103,13 @@ const { state, actions, callbacks } = store( 'test/router-dynamic-styles', {
 			// If applyStyles() preserved the activated sheet, the property is "1".
 			// If it incorrectly disabled the sheet, the property is "".
 			state.deferredStyleStatus =
-				cs.getPropertyValue( '--test-deferred-active' ).trim() === '1'
-					? 'active'
-					: 'inactive';
+				cs.getPropertyValue( '--test-deferred-active' ).trim() === '1' ? 'active' : 'inactive';
 
 			// Bug B: check sheet.disabled directly.
 			// routerManagedStyles must NOT contain pluginStyleEl (no id, never
 			// activated from preload state), so applyStyles() must leave it alone.
 			state.pluginStyleStatus =
-				pluginStyleEl &&
-				( ! pluginStyleEl.sheet ||
-					! pluginStyleEl.sheet.disabled )
-					? 'active'
-					: 'inactive';
+				pluginStyleEl && ( ! pluginStyleEl.sheet || ! pluginStyleEl.sheet.disabled ) ? 'active' : 'inactive';
 		},
 	},
 } );
