@@ -409,6 +409,12 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 				continue;
 			}
 
+			// Skip if the key is already provided via env var or constant.
+			$key_source = _gutenberg_get_api_key_source( $connector_id );
+			if ( 'env' === $key_source || 'constant' === $key_source ) {
+				continue;
+			}
+
 			$api_key = _gutenberg_get_real_api_key( $auth['setting_name'], '_gutenberg_mask_api_key' );
 			if ( '' === $api_key || ! $registry->hasProvider( $connector_id ) ) {
 				continue;
@@ -439,6 +445,7 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 		return $data;
 	}
 
+	$registry   = \WordPress\AiClient\AiClient::defaultRegistry();
 	$connectors = array();
 	foreach ( _gutenberg_get_connector_settings() as $connector_id => $connector_data ) {
 		$auth     = $connector_data['authentication'];
@@ -448,18 +455,11 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 			$auth_out['settingName']    = $auth['setting_name'] ?? '';
 			$auth_out['credentialsUrl'] = $auth['credentials_url'] ?? null;
 			$auth_out['keySource']      = _gutenberg_get_api_key_source( $connector_id );
-
-			// Check if the provider is connected (has valid credentials).
-			$is_connected = false;
 			try {
-				$registry = \WordPress\AiClient\AiClient::defaultRegistry();
-				if ( $registry->hasProvider( $connector_id ) ) {
-					$is_connected = $registry->isProviderConfigured( $connector_id );
-				}
+				$auth_out['isConnected'] = $registry->hasProvider( $connector_id ) && $registry->isProviderConfigured( $connector_id );
 			} catch ( Exception $e ) {
-				// $is_connected remains false.
+				$auth_out['isConnected'] = false;
 			}
-			$auth_out['isConnected'] = $is_connected;
 		}
 
 		$connector_out = array(
