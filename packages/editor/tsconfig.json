@@ -27,12 +27,9 @@
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../keycodes" },
-<<<<<<< HEAD
+		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../media-editor" },
 		{ "path": "../media-fields" },
-=======
-		{ "path": "../keyboard-shortcuts" },
->>>>>>> 23d42f2874 (refactor:  migrate keyboard-shortcut package from js to ts for type safety)
 		{ "path": "../media-utils" },
 		{ "path": "../notices" },
 		{ "path": "../plugins" },

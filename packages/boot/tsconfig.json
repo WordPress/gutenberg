@@ -16,6 +16,7 @@
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../keycodes" },
 		{ "path": "../lazy-editor" },
 		{ "path": "../notices" },
