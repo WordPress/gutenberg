@@ -59,7 +59,7 @@ _Parameters_
 
 _Returns_
 
--   `WPShortcutKeyCombination[]`: Key combinations.
+-   `ShortcutKeyCombination[]`: Key combinations.
 
 ### getAllShortcutRawKeyCombinations
 
@@ -203,7 +203,7 @@ _Parameters_
 
 _Returns_
 
--   `WPShortcutKeyCombination[]`: Key combinations.
+-   `ShortcutKeyCombination[]`: Key combinations.
 
 ### getShortcutDescription
 
@@ -285,7 +285,7 @@ _Parameters_
 
 _Returns_
 
--   `WPShortcutKeyCombination?`: Key combination.
+-   `ShortcutKeyCombination?`: Key combination.
 
 ### getShortcutRepresentation
 
@@ -388,7 +388,7 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _config_ `WPShortcutConfig`: Shortcut config.
+-   _config_ `ShortcutConfig`: Shortcut config.
 
 _Returns_
 
