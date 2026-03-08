@@ -35,18 +35,13 @@ export default function useShortcutEventMatch(): (
 	 * @return True if the event matches unknown shortcuts, false if not.
 	 */
 	function isMatch( name: string, event: KeyboardEvent ) {
-		return getAllShortcutKeyCombinations( name ).some(
-			( combination: ShortcutKeyCombination | null ) => {
-				if ( ! combination ) {
-					return false;
-				}
-				const { modifier, character } = combination;
-				return isKeyboardEvent[ modifier || 'undefined' ](
-					event,
-					character
-				);
+		return getAllShortcutKeyCombinations( name ).some( ( combination ) => {
+			if ( ! combination ) {
+				return false;
 			}
-		);
+			const { modifier, character } = combination;
+			return isKeyboardEvent[ modifier! ]( event, character );
+		} );
 	}
 
 	return isMatch;
