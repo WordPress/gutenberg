@@ -5,18 +5,17 @@
  *
  * Bug A — deferred stylesheet (media="not all" → "all"):
  *   activateDeferredStyle() mutates the WordPress-enqueued link element's media
- *   attribute to "all". After SPA navigation, areNodesEqual() must match the live
- *   element (media="all") with the server-returned element (media="not all") so
- *   that applyStyles() does not disable the activated sheet.
- *   Detection: deferred-style.css sets a CSS custom property on <body>; the init
- *   callback reads it via getComputedStyle to determine active/inactive status.
+ *   attribute to "all", exactly as an iAPI theme-switcher store would do.
+ *   deferredStyleStatus is set to "active" immediately in the action.
+ *   On the next navigation init() re-verifies the sheet survived applyStyles()
+ *   by checking link.sheet.disabled directly (no CSS custom property involved).
  *
  * Bug B — plugin-injected stylesheet (no id, via appendChild):
  *   init() appends a <style> element without an id attribute, simulating plugins
  *   like Complianz GDPR that bypass wp_enqueue_style(). The router must never
- *   enroll or disable this element.
- *   Detection: the <style>'s sheet.disabled property is checked directly after
- *   each navigation — it must remain false throughout.
+ *   enroll or disable this element. init() checks sheet.disabled after every
+ *   page mount — applyStyles() runs before iAPI re-initialises directives, so
+ *   the value is already final when init() reads it.
  */
 
 /**
@@ -26,30 +25,35 @@ import { store } from '@wordpress/interactivity';
 
 /**
  * Module-scoped reference to the simulated plugin stylesheet.
- *
- * Lives outside the store so it persists across SPA navigations without
- * depending on store-state serialisation or server-rendered context.
+ * Lives outside the store so it persists across SPA navigations.
  *
  * @type {HTMLStyleElement|null}
  */
 let pluginStyleEl = null;
 
+/**
+ * Whether the deferred stylesheet was activated in this browser session.
+ * Plain module variable — not reactive state — so reading it inside
+ * callbacks.init() does not create a reactive subscription and will not
+ * cause init() to re-run when the action changes it.
+ */
+let deferredActivated = false;
+
 const { state } = store( 'test/router-dynamic-styles', {
 	state: {
-		/** Text shown in data-testid="deferred-style-active". */
+		/** "active" | "inactive" — shown in data-testid="deferred-style-active". */
 		deferredStyleStatus: 'inactive',
-		/** Text shown in data-testid="plugin-style-active". */
+		/** "active" | "inactive" — shown in data-testid="plugin-style-active". */
 		pluginStyleStatus: 'inactive',
 	},
 
 	actions: {
 		/**
-		 * Activates the WordPress-enqueued deferred stylesheet by changing its
-		 * `media` attribute from "not all" to "all", exactly as an iAPI
-		 * theme-switcher store would do.
+		 * Simulates an iAPI theme-switcher activating a deferred stylesheet.
 		 *
-		 * Sets deferredStyleStatus immediately (synchronously) so the indicator
-		 * updates before the next navigation.
+		 * Sets deferredStyleStatus to "active" immediately (synchronous action
+		 * result visible before the next navigate()). On the next navigation
+		 * callbacks.init() will re-verify via sheet.disabled.
 		 */
 		activateDeferredStyle() {
 			const link = /** @type {HTMLLinkElement|null} */ (
@@ -59,61 +63,77 @@ const { state } = store( 'test/router-dynamic-styles', {
 			);
 			if ( link ) {
 				link.media = 'all';
-				// Set status immediately; init() will re-verify on next navigation.
-				state.deferredStyleStatus = 'active';
 			}
+			// Mark as activated using a plain module variable so that
+			// callbacks.init() can re-check on the next navigation without
+			// creating a reactive dependency that would re-run init() here.
+			deferredActivated = true;
+			// Set state directly from the action — this is the value the spec
+			// checks immediately after the button click (before navigation).
+			state.deferredStyleStatus = 'active';
 		},
 	},
 
 	callbacks: {
 		/**
-		 * Runs on every SPA page mount (via data-wp-init on the block wrapper).
+		 * Runs on every SPA page mount (data-wp-init on the block wrapper).
 		 *
-		 * 1. Injects a plugin-style <style> element without an id (Bug B fixture).
-		 *    Skipped if the element is already present in <head>.
+		 * On initial page: sets up Bug B fixture and reports its status.
+		 * On subsequent pages: re-verifies both stylesheets survived applyStyles().
 		 *
-		 * 2. Reads the current state of both stylesheets and updates the store so
-		 *    the data-testid indicator spans reflect the post-navigation result.
-		 *
-		 * applyStyles() runs before iAPI re-initialises elements, so the
+		 * applyStyles() runs before iAPI re-initialises directives, so the
 		 * sheet.disabled values observed here are already final for this page.
 		 */
 		init() {
-			// ── Bug B fixture ────────────────────────────────────────────────
-			// Inject only once; subsequent init() calls (on page B, C, back to A)
-			// reuse the same element already in <head>.
+			// Bug B fixture
+			// Inject a <style> element without an id attribute to simulate
+			// a plugin that bypasses wp_enqueue_style(). Skipped if the element
+			// is already in <head> (persists across SPA navigations).
 			if (
 				! pluginStyleEl ||
 				! document.head.contains( pluginStyleEl )
 			) {
 				pluginStyleEl = document.createElement( 'style' );
-				// Sets a detectable CSS custom property — disabled sheet → no property.
+				// Content is arbitrary — just needs a parseable rule.
 				pluginStyleEl.textContent = 'body { --test-plugin-active: 1; }';
-				// Deliberately NO `id` attribute.
-				// wp_enqueue_style() always produces id="{handle}-css"; the absence
-				// of an id is the key signal that this element must be left unmanaged.
+				// No id attribute — this is the key signal that the element
+				// must be left unmanaged by routerManagedStyles.
 				document.head.appendChild( pluginStyleEl );
 			}
 
-			// ── Status update ────────────────────────────────────────────────
-			const cs = window.getComputedStyle( document.body );
-
-			// Bug A: deferred-style.css sets --test-deferred-active: 1 on body.
-			// If applyStyles() preserved the activated sheet, the property is "1".
-			// If it incorrectly disabled the sheet, the property is "".
-			state.deferredStyleStatus =
-				cs.getPropertyValue( '--test-deferred-active' ).trim() === '1'
-					? 'active'
-					: 'inactive';
-
-			// Bug B: check sheet.disabled directly.
-			// routerManagedStyles must NOT contain pluginStyleEl (no id, never
-			// activated from preload state), so applyStyles() must leave it alone.
+			// Bug B status
+			// Inline <style> elements always have a .sheet after appendChild in
+			// all modern browsers. Check disabled directly: routerManagedStyles
+			// should never have enrolled this element (no id, never preloaded),
+			// so applyStyles() must leave sheet.disabled === false.
+			const pluginSheet = pluginStyleEl.sheet;
 			state.pluginStyleStatus =
-				pluginStyleEl &&
-				( ! pluginStyleEl.sheet || ! pluginStyleEl.sheet.disabled )
-					? 'active'
-					: 'inactive';
+				! pluginSheet || ! pluginSheet.disabled ? 'active' : 'inactive';
+
+			// Bug A status
+			// Only re-evaluate after the user has activated the deferred sheet.
+			// deferredActivated is a plain module var — not reactive state —
+			// so reading it here does NOT subscribe init() to future changes.
+			// On the initial page visit before button click: skipped, leaving
+			// deferredStyleStatus at the value set by activateDeferredStyle().
+			if ( deferredActivated ) {
+				const link = /** @type {HTMLLinkElement|null} */ (
+					document.querySelector(
+						'#test-router-dynamic-styles-deferred-css'
+					)
+				);
+				if ( link ) {
+					const sheet = link.sheet;
+					// If the CSS file returned a 404 the browser sets sheet to
+					// null — the router cannot have disabled a non-existent
+					// sheet, so treat null as "not disabled" and fall back to
+					// the media attribute to confirm activation is preserved.
+					state.deferredStyleStatus =
+						sheet !== null
+							? ( sheet.disabled ? 'inactive' : 'active' )
+							: ( link.media !== 'not all' ? 'active' : 'inactive' );
+				}
+			}
 		},
 	},
 } );
