@@ -110,16 +110,12 @@ describe( 'CollapsibleCard', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		// In a real browser, clicking anywhere on the header toggles the
-		// card because `pointer-events: none` on the content layer lets
-		// clicks pass through to the background Collapsible.Trigger. jsdom
-		// doesn't apply CSS, so we target the background trigger directly.
 		it( 'toggles content when clicking the header area', async () => {
 			const user = userEvent.setup();
 
 			render(
 				<CollapsibleCard.Root>
-					<CollapsibleCard.Header data-testid="header">
+					<CollapsibleCard.Header>
 						<Card.Title>Header click test</Card.Title>
 					</CollapsibleCard.Header>
 					<CollapsibleCard.Content>
@@ -132,9 +128,7 @@ describe( 'CollapsibleCard', () => {
 				screen.queryByText( 'Header toggled content' )
 			).not.toBeInTheDocument();
 
-			const header = screen.getByTestId( 'header' );
-			// eslint-disable-next-line testing-library/no-node-access -- The background trigger has no accessible role; it's a visual-only click target.
-			await user.click( header.firstElementChild! );
+			await user.click( screen.getByText( 'Header click test' ) );
 
 			expect(
 				screen.getByText( 'Header toggled content' )

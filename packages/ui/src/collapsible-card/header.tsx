@@ -19,23 +19,31 @@ import type { HeaderProps } from './types';
  */
 export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 	function CollapsibleCardHeader(
-		{ children, className, ...restProps },
+		{ children, className, render, ...restProps },
 		ref
 	) {
 		return (
-			<Card.Header
-				ref={ ref }
+			<Collapsible.Trigger
 				className={ clsx( styles.header, className ) }
-				{ ...restProps }
+				render={
+					<Card.Header
+						ref={ ref }
+						render={ render }
+						{ ...restProps }
+					/>
+				}
+				nativeButton={ false }
+				tabIndex={ -1 }
 			>
-				<Collapsible.Trigger
-					className={ styles[ 'header-background-trigger' ] }
-					render={ <div /> }
-					nativeButton={ false }
-					tabIndex={ -1 }
-				/>
 				<div className={ styles[ 'header-content' ] }>{ children }</div>
-				<div className={ styles[ 'header-trigger-wrapper' ] }>
+				{ /* Stop click/keyboard events from bubbling to the outer
+				    Collapsible.Trigger, which would cause a double-toggle. */ }
+				<div
+					className={ styles[ 'header-trigger-wrapper' ] }
+					onClick={ ( event ) => event.stopPropagation() }
+					onKeyDown={ ( event ) => event.stopPropagation() }
+					role="presentation"
+				>
 					<Collapsible.Trigger
 						render={ ( props ) => (
 							<IconButton
@@ -60,7 +68,7 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 						className={ styles[ 'header-trigger' ] }
 					/>
 				</div>
-			</Card.Header>
+			</Collapsible.Trigger>
 		);
 	}
 );

@@ -4,9 +4,6 @@
 	.header-content {
 		flex: 1;
 		min-width: 0;
-		position: relative;
-		z-index: 1;
-		pointer-events: none;
 	}
 
 	.header-trigger-wrapper {
@@ -16,8 +13,6 @@
 		   preserving the same metrics between `Card` and `CollapsibleCard`. */
 		max-height: 0;
 		overflow: visible;
-		position: relative;
-		z-index: 1;
 	}
 
 	.header-trigger {
@@ -25,16 +20,6 @@
 		   at the wrapper's midpoint (which `align-self: center` places at
 		   the vertical center of the header). */
 		transform: translateY(-50%);
-	}
-
-	.header-background-trigger {
-		position: absolute;
-		inset: 0;
-		z-index: 0;
-
-		&:not([data-disabled]) {
-			cursor: var(--wpds-cursor-control);
-		}
 	}
 }
 
@@ -45,5 +30,9 @@
 		align-items: stretch;
 		gap: var(--wpds-dimension-gap-sm);
 		position: relative;
+
+		&:not([data-disabled]) {
+			cursor: var(--wpds-cursor-control);
+		}
 	}
 }
