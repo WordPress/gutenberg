@@ -93,22 +93,16 @@ const { state } = store( 'test/router-dynamic-styles', {
 			// Bug B fixture — inject a <style> without an id on first mount.
 			// Subsequent mounts reuse the existing element if it is still in
 			// <head>; if not, re-inject (e.g. after a full page reload).
-			if (
-				! pluginStyleEl ||
-				! document.head.contains( pluginStyleEl )
-			) {
+			if ( ! pluginStyleEl || ! document.head.contains( pluginStyleEl ) ) {
 				pluginStyleEl = document.createElement( 'style' );
-				pluginStyleEl.textContent =
-					'body { --test-plugin-active: 1; }';
+				pluginStyleEl.textContent = 'body { --test-plugin-active: 1; }';
 				document.head.appendChild( pluginStyleEl );
 			}
 
 			// Bug B status.
 			const pluginSheet = pluginStyleEl.sheet;
 			state.pluginStyleStatus =
-				! pluginSheet || ! pluginSheet.disabled 
-					? 'active'
-					: 'inactive';
+				! pluginSheet || ! pluginSheet.disabled ? 'active' : 'inactive';
 
 			// Bug A status — re-check only after the user has activated the
 			// sheet. Before activation deferredStyleStatus stays "inactive"
@@ -116,9 +110,7 @@ const { state } = store( 'test/router-dynamic-styles', {
 			if ( deferredActivated ) {
 				const sheet = deferredStyleEl.sheet;
 				state.deferredStyleStatus =
-					sheet && ! sheet.disabled 
-						? 'active'
-						: 'inactive';
+					sheet && ! sheet.disabled ? 'active' : 'inactive';
 			}
 		},
 	},
