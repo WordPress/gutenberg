@@ -4,6 +4,10 @@
 	"name": "test/router-dynamic-styles",
 	"title": "Test Router Dynamic Styles",
 	"category": "text",
+	"description": "",
+	"supports": {
+		"interactivity": true
+	},
 	"textdomain": "e2e-interactivity",
 	"viewScriptModule": "file:./view.js",
 	"render": "file:./render.php"
