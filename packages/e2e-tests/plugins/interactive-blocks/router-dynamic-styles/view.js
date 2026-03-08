@@ -128,10 +128,14 @@ const { state } = store( 'test/router-dynamic-styles', {
 					// null — the router cannot have disabled a non-existent
 					// sheet, so treat null as "not disabled" and fall back to
 					// the media attribute to confirm activation is preserved.
-					state.deferredStyleStatus =
-						sheet !== null
-							? ( sheet.disabled ? 'inactive' : 'active' )
-							: ( link.media !== 'not all' ? 'active' : 'inactive' );
+					if ( sheet !== null ) {
+						state.deferredStyleStatus = sheet.disabled
+							? 'inactive'
+							: 'active';
+					} else {
+						state.deferredStyleStatus =
+							link.media !== 'not all' ? 'active' : 'inactive';
+					}
 				}
 			}
 		},
