@@ -9,6 +9,7 @@
 		{ "path": "../components" },
 		{ "path": "../data" },
 		{ "path": "../element" },
+		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../private-apis" },
