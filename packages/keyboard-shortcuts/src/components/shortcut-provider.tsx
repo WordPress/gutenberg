@@ -25,7 +25,7 @@ interface ShortcutProviderProps extends React.HTMLAttributes< HTMLDivElement > {
  *
  * @return Component.
  */
-export function ShortcutProvider( props: ShortcutProviderProps ): JSX.Element {
+export function ShortcutProvider( props: ShortcutProviderProps ) {
 	const [ keyboardShortcuts ] = useState(
 		() => new Set< ShortcutCallback >()
 	);
