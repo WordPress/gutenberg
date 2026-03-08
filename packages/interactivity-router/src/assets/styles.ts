@@ -30,31 +30,45 @@ const areNodesEqual = ( a: StyleElement, b: StyleElement ): boolean => {
 /**
  * Tracks style elements the router is responsible for managing.
  *
- * CRITICAL: NOT seeded from initial DOM elements!
+ * Seeded at module init from **all** `<link rel="stylesheet">` and `<style>`
+ * elements present in the DOM at the time the module runs. This captures
+ * both WordPress-enqueued sheets (which carry `id="{handle}-css"`) and
+ * any inline `<style>` blocks rendered by blocks that do not use
+ * `wp_enqueue_style()` (which have no `id`).
  *
- * Elements are enrolled ONLY when `applyStyles()` activates them from
- * `media="preload"` state. This creates a natural boundary:
+ * Dynamically-injected stylesheets added by third-party plugins after
+ * module init (e.g. Complianz GDPR consent CSS appended later via
+ * `document.head.appendChild()`) are NOT in the DOM at this point and
+ * are therefore never enrolled. They are left untouched by the router
+ * on every navigation.
  *
- * - WordPress-enqueued styles go through preload cycle → enrolled
- * - Plugin-injected styles (via appendChild) never preload → never enrolled
- *
- * The enrollment gate ensures plugin styles are never disabled by the router,
- * even during back-navigation to cached pages that include plugin elements
- * in `page.styles`.
+ * New elements are added the first time `applyStyles()` activates them
+ * from `media="preload"` state. Elements already active and untracked
+ * (plugin-injected) are never enrolled, even when they appear in
+ * `page.styles` on a back-navigation where the initial page was cached
+ * with `doc === window.document`.
  */
-const routerManagedStyles = new Set< StyleElement >();
+const routerManagedStyles = new Set< StyleElement >(
+	Array.from(
+		document.querySelectorAll< StyleElement >(
+			'link[rel=stylesheet], style'
+		)
+	)
+);
 
 /**
  * Normalizes the passed style or link element, reverting the changes
  * made by {@link prepareStylePromise|`prepareStylePromise`} to the
  * `data-original-media` and `media`.
  *
- * KEY FIX: `media="not all"` is normalized to `"all"` because WordPress
- * uses it as a load-deferral sentinel — the stylesheet's intended scope
- * is "all" and iAPI stores activate it by changing the attribute to `"all"`.
- * Normalizing both to `"all"` ensures that the live activated element
- * (media="all") and the server-returned element (media="not all") are
- * recognised as the same resource by the SCS algorithm.
+ * `media="not all"` is treated as equivalent to `media="all"` because
+ * WordPress uses it purely as a load-deferral sentinel — the stylesheet's
+ * intended scope is "all" and iAPI stores activate it by changing the
+ * attribute to `"all"`. Normalizing both to `"all"` ensures that the live
+ * activated element (media="all") and the server-returned element
+ * (media="not all") are recognised as the same resource by the SCS
+ * algorithm, so `applyStyles()` does not disable the activated sheet on
+ * the next navigation.
  *
  * @example
  * The following elements should be normalized to the same element:
@@ -78,7 +92,6 @@ export const normalizeMedia = ( element: StyleElement ): StyleElement => {
 		element.media = originalMedia || 'all';
 		element.removeAttribute( 'data-original-media' );
 	} else if ( ! element.media || element.media === 'not all' ) {
-		// Normalize "not all" to "all"
 		element.media = 'all';
 	}
 	return element;
@@ -268,31 +281,37 @@ export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
  * Traverses all style elements in the DOM, enabling only those included
  * in the passed list and disabling the others.
  *
- * CRITICAL: Only elements in `routerManagedStyles` are candidates for
- * being disabled. This protects plugin-injected stylesheets from being
- * disabled by the router.
- *
- * ENROLLMENT: An element enters `routerManagedStyles` the first time
- * this function activates it from `media="preload"` state — meaning the
- * router explicitly loaded it for a specific page. Plugin-injected
- * stylesheets that are already active in the DOM and were never put
- * through the preload cycle are never enrolled and are left untouched
- * on every navigation, including back-navigations to cached pages.
+ * Only elements in `routerManagedStyles` are candidates for being
+ * disabled. An element enters that set the first time this function
+ * activates it from `media="preload"` state — meaning the router
+ * explicitly loaded it for a specific page. Plugin-injected stylesheets
+ * that are already active in the DOM and were never put through the
+ * preload cycle are never enrolled and are left untouched on every
+ * navigation, including back-navigations to cached pages.
  *
  * @param styles List of style elements to apply.
  */
 export const applyStyles = ( styles: StyleElement[] ) => {
+	// Normalize the incoming list once so each DOM scan only pays its own
+	// normalisation cost rather than N × M cloneNode calls.
+	// This also handles the case where the router stores Y-elements (from the
+	// fetched document) in page.styles while the live DOM holds the original
+	// X-element references: a deferred sheet activated at runtime
+	// (media="not all" → "all") would fail a reference check against the
+	// cached Y-element, so normalised equality is used as a fallback.
+	const normalizedStyles = styles.map( normalizeMedia );
+
 	window.document
-		.querySelectorAll< StyleElement >( 'style,link[rel=stylesheet]' )
-		.forEach( ( el ) => {
+		.querySelectorAll( 'style,link[rel=stylesheet]' )
+		.forEach( ( el: HTMLLinkElement | HTMLStyleElement ) => {
 			if ( el.sheet ) {
-				const isInNewPage = styles.includes( el );
+				const styleEl = el as StyleElement;
+				const isInNewPage = styles.includes( styleEl );
 				const isPreloaded = el.sheet.media.mediaText === 'preload';
 
 				if ( isInNewPage ) {
 					if ( isPreloaded ) {
-						// Activate from preload and ENROLL in managed set.
-						// This is the enrollment gate for router-managed styles.
+						// Activate from preload and enroll in managed set.
 						const { originalMedia = 'all' } = el.dataset;
 						el.sheet.media.mediaText = originalMedia;
 						routerManagedStyles.add( el );
@@ -302,7 +321,7 @@ export const applyStyles = ( styles: StyleElement[] ) => {
 					// Managed element absent from new page — disable it.
 					el.sheet.disabled = true;
 				}
-				// Unmanaged elements (plugin injections) are left untouched.
+				// Unmanaged elements (dynamic injections) are left untouched.
 			}
 		} );
 };
