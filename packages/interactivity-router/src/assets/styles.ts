@@ -282,8 +282,7 @@ export const applyStyles = ( styles: StyleElement[] ) => {
 		.forEach( ( el: HTMLLinkElement | HTMLStyleElement ) => {
 			if ( el.sheet ) {
 				const isInNewPage = styles.includes( el );
-				const isPreloaded =
-					el.sheet.media.mediaText === 'preload';
+				const isPreloaded = el.sheet.media.mediaText === 'preload';
 
 				if ( isInNewPage ) {
 					if ( isPreloaded ) {
