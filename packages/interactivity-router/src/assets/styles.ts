@@ -6,26 +6,15 @@ import { shortestCommonSupersequence } from './scs';
 export type StyleElement = HTMLLinkElement | HTMLStyleElement;
 
 /**
- * Compares two style elements for equality, ignoring the `media` attribute.
- *
- * `media` is excluded because iAPI stores mutate it at runtime (e.g. a
- * theme-switcher toggling `media="not all"` ↔ `"all"`). Using full
- * `isEqualNode()` would treat those as different nodes and cause
- * `applyStyles()` to disable the live element on the next navigation.
- * Cloning and removing `media` before comparing preserves all other
- * attributes (`integrity`, `crossorigin`, etc.) for a correct match.
+ * Compares the passed style or link elements to check if they can be
+ * considered equal.
  *
  * @param a `<style>` or `<link>` element.
  * @param b `<style>` or `<link>` element.
  * @return Whether they are considered equal.
  */
-const areNodesEqual = ( a: StyleElement, b: StyleElement ): boolean => {
-	const aClone = a.cloneNode( true ) as StyleElement;
-	const bClone = b.cloneNode( true ) as StyleElement;
-	aClone.removeAttribute( 'media' );
-	bClone.removeAttribute( 'media' );
-	return aClone.isEqualNode( bClone );
-};
+const areNodesEqual = ( a: StyleElement, b: StyleElement ): boolean =>
+	a.isEqualNode( b );
 
 /**
  * Tracks style elements the router is responsible for managing.
@@ -94,6 +83,14 @@ export const normalizeMedia = ( element: StyleElement ): StyleElement => {
 	} else if ( ! element.media || element.media === 'not all' ) {
 		element.media = 'all';
 	}
+
+	// Normalize href to absolute URL.
+	// Syncs the attribute to the absolute property, ensuring `isEqualNode`
+	// matches relative and absolute paths as the same resource.
+	if ( element.tagName === 'LINK' && ( element as HTMLLinkElement ).href ) {
+		element.setAttribute( 'href', ( element as HTMLLinkElement ).href );
+	}
+
 	return element;
 };
 
@@ -292,25 +289,11 @@ export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
  * @param styles List of style elements to apply.
  */
 export const applyStyles = ( styles: StyleElement[] ) => {
-	// Normalize the incoming list once so each DOM scan only pays its own
-	// normalisation cost rather than N × M cloneNode calls.
-	// This also handles the case where the router stores Y-elements (from the
-	// fetched document) in page.styles while the live DOM holds the original
-	// X-element references: a deferred sheet activated at runtime
-	// (media="not all" → "all") would fail a reference check against the
-	// cached Y-element, so normalised equality is used as a fallback.
-	const normalizedStyles = styles.map( normalizeMedia );
-
 	window.document
 		.querySelectorAll( 'style,link[rel=stylesheet]' )
 		.forEach( ( el: HTMLLinkElement | HTMLStyleElement ) => {
 			if ( el.sheet ) {
-				const styleEl = el as StyleElement;
-				const isInNewPage =
-					styles.includes( styleEl ) ||
-					normalizedStyles.some( ( ns ) =>
-						areNodesEqual( ns, normalizeMedia( styleEl ) )
-					);
+				const isInNewPage = styles.includes( el );
 				const isPreloaded = el.sheet.media.mediaText === 'preload';
 
 				if ( isInNewPage ) {
