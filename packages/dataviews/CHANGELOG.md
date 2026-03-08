@@ -27,7 +27,7 @@
 
 ### Code Quality
 
-- DataForm: Migrate card layout to use `Card` and `CollapsibleCard` from `@wordpress/ui`.
+- DataForm: Migrate card layout to use `Card` and `CollapsibleCard` from `@wordpress/ui`. [#76282](https://github.com/WordPress/gutenberg/pull/76282)
 - DataForm: Consolidate `date` and `datetime` input placement. [#76136](https://github.com/WordPress/gutenberg/pull/76136)
 
 ## 13.0.0 (2026-03-04)
