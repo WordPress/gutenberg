@@ -7,6 +7,17 @@ export type StyleElement = HTMLLinkElement | HTMLStyleElement;
 
 /**
  * Compares two style elements for equality, ignoring the `media` attribute.
+ *
+ * `media` is excluded because iAPI stores mutate it at runtime (e.g. a
+ * theme-switcher toggling `media="not all"` ↔ `"all"`). Using full
+ * `isEqualNode()` would treat those as different nodes and cause
+ * `applyStyles()` to disable the live element on the next navigation.
+ * Cloning and removing `media` before comparing preserves all other
+ * attributes (`integrity`, `crossorigin`, etc.) for a correct match.
+ *
+ * @param a `<style>` or `<link>` element.
+ * @param b `<style>` or `<link>` element.
+ * @return Whether they are considered equal.
  */
 const areNodesEqual = ( a: StyleElement, b: StyleElement ): boolean => {
 	const aClone = a.cloneNode( true ) as StyleElement;
@@ -18,6 +29,22 @@ const areNodesEqual = ( a: StyleElement, b: StyleElement ): boolean => {
 
 /**
  * Tracks style elements the router is responsible for managing.
+ *
+ * Seeded at module init from all `<link rel="stylesheet">` and `<style>`
+ * elements present in the DOM at the time the module first runs. This
+ * captures both WordPress-enqueued sheets and any inline `<style>` blocks
+ * rendered server-side by blocks that do not use `wp_enqueue_style()`.
+ *
+ * Stylesheets injected by third-party plugins after module init (e.g.
+ * Complianz GDPR consent CSS appended via `document.head.appendChild()`)
+ * are NOT in the DOM at this point and are therefore never enrolled. The
+ * router leaves them untouched on every navigation.
+ *
+ * New elements are enrolled the first time `applyStyles()` activates them
+ * from `media="preload"` state. Elements that are already active and were
+ * never put through the preload cycle (plugin-injected elements) are never
+ * enrolled, even when they appear in `page.styles` on a back-navigation
+ * to a cached page where `doc === window.document`.
  */
 const routerManagedStyles = new Set< StyleElement >(
 	Array.from(
@@ -28,7 +55,29 @@ const routerManagedStyles = new Set< StyleElement >(
 );
 
 /**
- * Normalizes media attribute.
+ * Normalizes the passed style or link element, reverting the changes
+ * made by {@link prepareStylePromise|`prepareStylePromise`} to the
+ * `data-original-media` and `media`.
+ *
+ * `media="not all"` is normalised to `"all"` because WordPress uses it
+ * purely as a load-deferral sentinel — the stylesheet's intended scope is
+ * "all" and iAPI stores activate it by changing the attribute to `"all"`.
+ * Normalising both to `"all"` ensures that the live activated element
+ * (media="all") and the server-returned element (media="not all") are
+ * recognised as the same resource by the SCS algorithm.
+ *
+ * @example
+ * The following elements should be normalized to the same element:
+ * ```html
+ * <link rel="stylesheet" src="./assets/styles.css">
+ * <link rel="stylesheet" src="./assets/styles.css" media="all">
+ * <link rel="stylesheet" src="./assets/styles.css" media="not all">
+ * <link rel="stylesheet" src="./assets/styles.css" media="preload">
+ * <link rel="stylesheet" src="./assets/styles.css" media="preload" data-original-media="all">
+ * ```
+ *
+ * @param element `<style>` or `<link>` element.
+ * @return Normalized node.
  */
 export const normalizeMedia = ( element: StyleElement ): StyleElement => {
 	element = element.cloneNode( true ) as StyleElement;
@@ -44,7 +93,27 @@ export const normalizeMedia = ( element: StyleElement ): StyleElement => {
 	return element;
 };
 
-/* ==================== updateStylesWithSCS (без змін) ==================== */
+/**
+ * Adds the minimum style elements from Y around those in X using a
+ * shortest common supersequence algorithm, returning a list of
+ * promises for all the elements in Y.
+ *
+ * If X is empty, it appends all elements in Y to the passed parent
+ * element or to `document.head` instead.
+ *
+ * The returned promises resolve once the corresponding style element
+ * is loaded and ready. Those elements that are also in X return a
+ * cached promise.
+ *
+ * The algorithm ensures that the final style elements present in the
+ * document (or the passed `parent` element) are in the correct order
+ * and they are included in either X or Y.
+ *
+ * @param X      Base list of style elements.
+ * @param Y      List of style elements.
+ * @param parent Optional parent element to append to the new style elements.
+ * @return List of promises that resolve once the elements in Y are ready.
+ */
 export function updateStylesWithSCS(
 	X: StyleElement[],
 	Y: StyleElement[],
@@ -58,15 +127,16 @@ export function updateStylesWithSCS(
 		} );
 	}
 
+	// Create normalized arrays for comparison.
 	const xNormalized = X.map( normalizeMedia );
 	const yNormalized = Y.map( normalizeMedia );
 
+	// The `scs` array contains normalized elements.
 	const scs = shortestCommonSupersequence(
 		xNormalized,
 		yNormalized,
 		areNodesEqual
 	);
-
 	const xLength = X.length;
 	const yLength = Y.length;
 	const promises = [];
@@ -75,11 +145,12 @@ export function updateStylesWithSCS(
 	let yIndex = 0;
 
 	for ( const scsElement of scs ) {
+		// Actual elements that will end up in the DOM.
 		const xElement = X[ xIndex ];
 		const yElement = Y[ yIndex ];
+		// Normalized elements for comparison.
 		const xNormEl = xNormalized[ xIndex ];
 		const yNormEl = yNormalized[ yIndex ];
-
 		if ( xIndex < xLength && areNodesEqual( xNormEl, scsElement ) ) {
 			if ( yIndex < yLength && areNodesEqual( yNormEl, scsElement ) ) {
 				promises.push( prepareStylePromise( xElement ) );
@@ -101,14 +172,41 @@ export function updateStylesWithSCS(
 	return promises;
 }
 
-/* ==================== prepareStylePromise (без змін) ==================== */
-const stylePromiseCache = new WeakMap< StyleElement, Promise< StyleElement > >();
+/**
+ * Cache of promises per style elements.
+ *
+ * Each style element has their own associated `Promise` that resolves
+ * once the element has been loaded and is ready.
+ */
+const stylePromiseCache = new WeakMap<
+	StyleElement,
+	Promise< StyleElement >
+>();
 
-const prepareStylePromise = ( element: StyleElement ): Promise< StyleElement > => {
+/**
+ * Prepares and returns the corresponding `Promise` for the passed style
+ * element.
+ *
+ * It returns the cached promise if it exists. Otherwise, constructs
+ * a `Promise` that resolves once the element has finished loading.
+ *
+ * For those elements that are not in the DOM yet, this function
+ * injects a `media="preload"` attribute to the passed element so the
+ * style is loaded without applying any styles to the document.
+ *
+ * @param element Style element.
+ * @return The associated `Promise` to the passed element.
+ */
+const prepareStylePromise = (
+	element: StyleElement
+): Promise< StyleElement > => {
 	if ( stylePromiseCache.has( element ) ) {
-		return stylePromiseCache.get( element )!;
+		return stylePromiseCache.get( element );
 	}
 
+	// When the element exists in the main document and its media attribute
+	// is not "preload", that means the element comes from the initial page.
+	// The `media` attribute doesn't need to be handled in this case.
 	if ( window.document.contains( element ) && element.media !== 'preload' ) {
 		const promise = Promise.resolve( element );
 		stylePromiseCache.set( element, promise );
@@ -131,7 +229,11 @@ const prepareStylePromise = ( element: StyleElement ): Promise< StyleElement > =
 		element.addEventListener( 'load', () => resolve( element ) );
 		element.addEventListener( 'error', ( event ) => {
 			const { href } = event.target as HTMLLinkElement;
-			reject( Error( `The style sheet with the following URL failed to load: ${ href }` ) );
+			reject(
+				Error(
+					`The style sheet with the following URL failed to load: ${ href }`
+				)
+			);
 		} );
 	} );
 
@@ -139,6 +241,24 @@ const prepareStylePromise = ( element: StyleElement ): Promise< StyleElement > =
 	return promise;
 };
 
+/**
+ * Prepares all style elements contained in the passed document.
+ *
+ * This function calls {@link updateStylesWithSCS|`updateStylesWithSCS`}
+ * to insert only the minimum amount of style elements into the DOM, so
+ * those present in the passed document end up in the DOM while the order
+ * is respected.
+ *
+ * New appended style elements contain a `media=preload` attribute to
+ * make them effectively disabled until they are applied with the
+ * {@link applyStyles|`applyStyles`} function.
+ *
+ * Note that this function alters the passed document, as it can transfer
+ * nodes from it to the global document.
+ *
+ * @param doc Document instance.
+ * @return A list of promises for each style element in the passed document.
+ */
 export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
 	const currentStyleElements = Array.from(
 		window.document.querySelectorAll< StyleElement >(
@@ -149,31 +269,46 @@ export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
 		doc.querySelectorAll< StyleElement >( 'style,link[rel=stylesheet]' )
 	);
 
+	// Set styles in order.
 	return updateStylesWithSCS( currentStyleElements, newStyleElements );
 };
 
 /**
- * Final simplified applyStyles.
+ * Traverses all style elements in the DOM, enabling only those included
+ * in the passed list and disabling the others.
+ *
+ * Only elements in `routerManagedStyles` are candidates for being disabled.
+ * An element enters that set either at module init time (all elements present
+ * in the DOM when the module first runs) or the first time `applyStyles()`
+ * activates it from `media="preload"` state.
+ *
+ * Plugin-injected stylesheets appended after module init (no id, never
+ * preloaded) are never enrolled and are left untouched on every navigation,
+ * including back-navigations to cached pages.
+ *
+ * @param styles List of style elements to apply.
  */
 export const applyStyles = ( styles: StyleElement[] ) => {
 	window.document
 		.querySelectorAll( 'style,link[rel=stylesheet]' )
 		.forEach( ( el: HTMLLinkElement | HTMLStyleElement ) => {
 			if ( el.sheet ) {
-				const styleEl = el as StyleElement;
-				const isInNewPage = styles.includes( styleEl );
+				const isInNewPage = styles.includes( el );
 				const isPreloaded = el.sheet.media.mediaText === 'preload';
 
 				if ( isInNewPage ) {
 					if ( isPreloaded ) {
+						// Activate from preload and enroll in managed set.
 						const { originalMedia = 'all' } = el.dataset;
 						el.sheet.media.mediaText = originalMedia;
 						routerManagedStyles.add( el );
 					}
 					el.sheet.disabled = false;
 				} else if ( routerManagedStyles.has( el ) ) {
+					// Managed element absent from new page — disable it.
 					el.sheet.disabled = true;
 				}
+				// Unmanaged elements (plugin injections) are left untouched.
 			}
 		} );
 };
