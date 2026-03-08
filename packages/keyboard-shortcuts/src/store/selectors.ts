@@ -251,7 +251,7 @@ export function getShortcutAliases(
 	name: string
 ): ShortcutKeyCombination[] {
 	return state[ name ] && state[ name ].aliases
-		? state[ name ].aliases!
+		? state[ name ].aliases
 		: EMPTY_ARRAY;
 }
 
