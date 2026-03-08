@@ -822,8 +822,10 @@ describe( 'Router styles management', () => {
 			linkElement.setAttribute( 'media', 'preload' );
 			const result3 = normalizeMedia( linkElement );
 			expect( result3 ).not.toBe( linkElement );
-			// Normalize media now also normalizes href to absolute URL.
-			expect( result3 ).toHaveAttribute( 'href', linkElement.href );
+			expect( result3 ).toHaveAttribute(
+				'href',
+				linkElement.getAttribute( 'href' )
+			);
 		} );
 
 		it( 'should remove media attribute when media="preload" and no data-original-media exists', () => {
