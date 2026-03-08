@@ -2,26 +2,24 @@
 /**
  * Test block render template for test/router-dynamic-styles.
  *
- * Bug A — runtime-activated deferred stylesheets (media="not all" → "all"):
- *   Uses block.json viewStyle to enqueue deferred-style.css. WordPress
- *   registers the style early (handle: "test-router-dynamic-styles-style").
- *   wp_style_add_data() is called here to set media="not all" before the
- *   style is printed (viewStyle styles print in wp_footer when the block
- *   renders after wp_head). The view script activates the sheet by mutating
- *   link.media to "all".
+ * Provides deterministic style-scenario fixtures for two router bugs:
  *
- * Bug B — dynamically-injected plugin stylesheets (no id, via appendChild):
- *   The view script injects a <style> element without an id attribute on
- *   every init(). The router must never disable it.
+ * Bug A — runtime-activated deferred stylesheets:
+ *   view.js injects an inline <style id="test-deferred-style"> with
+ *   media="not all" on the first init(). The activateDeferredStyle action
+ *   sets link.media = "all". After navigation init() re-checks whether
+ *   the sheet is still enabled.
+ *
+ * Bug B — dynamically-injected plugin stylesheets:
+ *   view.js injects a <style> element without an id attribute, simulating
+ *   plugins like Complianz GDPR that bypass wp_enqueue_style(). The router
+ *   must never disable it across any navigation path.
+ *
+ * Navigation links nav-to-b and nav-to-c resolve sibling posts by title so
+ * the spec's addPostWithBlock( …, { alias } ) pattern works out of the box.
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-// Set media="not all" on the viewStyle-registered stylesheet so it loads
-// without applying styles (deferred pattern). This must be called before the
-// style is printed — viewStyle styles are output in wp_footer, so this call
-// in the render callback is always early enough.
-wp_style_add_data( 'test-router-dynamic-styles-style', 'media', 'not all' );
 
 // Resolve sibling post URLs by alias (post title set by addPostWithBlock).
 $current_title = (string) get_the_title();
