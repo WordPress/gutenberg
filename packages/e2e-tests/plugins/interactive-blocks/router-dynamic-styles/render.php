@@ -20,7 +20,7 @@
  *   No external CSS file is required — the declaration is inlined.
  *
  * Bug B — dynamically-injected plugin stylesheets:
- *   view.js init() appends a <style> element without an id attribute,
+ *   view.js init() appends a <style> element with a stable id attribute,
  *   simulating plugins like Complianz GDPR that bypass wp_enqueue_style().
  *   The router must never disable it across any navigation path.
  *
