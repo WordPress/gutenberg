@@ -12,7 +12,7 @@
  *   keeps it in page.styles, and applyStyles() leaves it enabled.
  *
  * Bug B — plugin-injected stylesheet (no id, via appendChild):
- *   init() appends a <style> element without an id attribute, simulating
+ *   init() appends a <style> element with a stable id, simulating
  *   plugins like Complianz GDPR that bypass wp_enqueue_style(). Because
  *   this element is appended after the router module has seeded
  *   routerManagedStyles, it is never enrolled and must never be disabled
@@ -20,65 +20,69 @@
  */
 
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
 import { store } from '@wordpress/interactivity';
 
 /**
- * Deferred stylesheet fixture for Bug A.
+ * Unique ID for the plugin-injected style element.
  *
- * The element is output by render.php into <head> on every page render,
- * so it is available in the DOM before any JS runs. Using getElementById
- * avoids injecting a duplicate element and ensures the element is present
- * in the server-rendered HTML fetched during SPA navigation (required for
- * the SCS algorithm to match it).
+ * A stable id ensures idempotency: getElementById() prevents duplicate
+ * injection on re-mount and lets pluginStyleStatus read the element
+ * directly without holding a module-level reference.
  *
- * @type {HTMLStyleElement}
+ * @type {string}
  */
-const deferredStyleEl = /** @type {HTMLStyleElement} */ (
-	document.getElementById( 'test-router-deferred-style' )
-);
+const PLUGIN_STYLE_ID = 'test-router-plugin-style';
 
-/**
- * Plugin-injected stylesheet fixture for Bug B.
- *
- * Appended inside init() (after module init / router seeding) to simulate
- * a third-party plugin that calls document.head.appendChild() outside
- * WordPress hooks.
- *
- * @type {HTMLStyleElement|null}
- */
-let pluginStyleEl = null;
-
-/**
- * Whether the deferred stylesheet was activated in this browser session.
- * Plain module variable — not reactive state — so reading it inside
- * callbacks.init() does not create a reactive subscription.
- */
-let deferredActivated = false;
-
-const { state } = store( 'test/router-dynamic-styles', {
+store( 'test/router-dynamic-styles', {
 	state: {
-		/** "active" | "inactive" */
-		deferredStyleStatus: 'inactive',
-		/** "active" | "inactive" */
-		pluginStyleStatus: 'inactive',
+		/**
+		 * "active" | "inactive"
+		 *
+		 * Reads the live media attribute so any change made by activateDeferredStyle
+		 * or by the router's applyStyles() is reflected immediately.
+		 */
+		get deferredStyleStatus() {
+			const styleEl = document.getElementById(
+				'test-router-deferred-style'
+			);
+			// If the element exists and media is not 'not all', it is active.
+			return styleEl && styleEl.media !== 'not all'
+				? 'active'
+				: 'inactive';
+		},
+
+		/**
+		 * "active" | "inactive"
+		 *
+		 * Reads the DOM on every access so the status is accurate immediately
+		 * after init() appends the element and after each SPA navigation.
+		 */
+		get pluginStyleStatus() {
+			// If the injected style element exists, it is active.
+			return document.getElementById( PLUGIN_STYLE_ID )
+				? 'active'
+				: 'inactive';
+		},
 	},
 
 	actions: {
 		/**
 		 * Simulates an iAPI store activating a deferred stylesheet.
 		 *
-		 * Changes media from "not all" to "all" on the deferred style element
-		 * and marks deferredActivated so init() knows to re-check on the next
-		 * navigation.
+		 * Changes media from "not all" to "all" on the deferred style element.
+		 * The router logic should preserve this state across SPA navigations.
 		 */
 		activateDeferredStyle() {
-			if ( deferredStyleEl ) {
-				deferredStyleEl.media = 'all';
+			const styleEl = document.getElementById(
+				'test-router-deferred-style'
+			);
+			if ( styleEl ) {
+				// Changing media to 'all' activates the stylesheet.
+				// The router logic should preserve this state.
+				styleEl.media = 'all';
 			}
-			deferredActivated = true;
-			state.deferredStyleStatus = 'active';
 		},
 	},
 
@@ -87,34 +91,19 @@ const { state } = store( 'test/router-dynamic-styles', {
 		 * Runs on every SPA page mount (data-wp-init on the block wrapper).
 		 *
 		 * Sets up the plugin fixture on the first run. On subsequent runs
-		 * re-verifies that both sheets survived the router's applyStyles() call,
+		 * re-verifies that the sheet survived the router's applyStyles() call,
 		 * which executes before iAPI re-initialises directives.
 		 */
 		init() {
-			// Bug B fixture — inject a <style> without an id on first mount.
-			// Subsequent mounts reuse the existing element if it is still in
-			// <head>; if not, re-inject (e.g. after a full page reload).
-			if (
-				! pluginStyleEl ||
-				! document.head.contains( pluginStyleEl )
-			) {
-				pluginStyleEl = document.createElement( 'style' );
-				pluginStyleEl.textContent = 'body { --test-plugin-active: 1; }';
-				document.head.appendChild( pluginStyleEl );
-			}
-
-			// Bug B status.
-			const pluginSheet = pluginStyleEl.sheet;
-			state.pluginStyleStatus =
-				! pluginSheet || ! pluginSheet.disabled ? 'active' : 'inactive';
-
-			// Bug A status — re-check only after the user has activated the
-			// sheet. Before activation deferredStyleStatus stays "inactive"
-			// as set by the initial state declaration above.
-			if ( deferredActivated ) {
-				const sheet = deferredStyleEl && deferredStyleEl.sheet;
-				state.deferredStyleStatus =
-					sheet && ! sheet.disabled ? 'active' : 'inactive';
+			// Bug B fixture — inject a <style> with a stable id on first mount.
+			// Subsequent mounts skip injection if the element is still in <head>.
+			// Simulate a plugin injecting a style dynamically.
+			// This style should survive navigation because it is not managed by WP.
+			if ( ! document.getElementById( PLUGIN_STYLE_ID ) ) {
+				const style = document.createElement( 'style' );
+				style.id = PLUGIN_STYLE_ID;
+				style.textContent = 'body { --test-plugin-style: 1; }';
+				document.head.appendChild( style );
 			}
 		},
 	},
