@@ -22,8 +22,9 @@ export interface ShortcutConfig {
 	aliases?: ShortcutKeyCombination[];
 }
 
-export type ShortcutAction = ReturnType<typeof registerShortcut> 
-							| ReturnType<typeof unregisterShortcut>;
+export type ShortcutAction =
+	| ReturnType< typeof registerShortcut >
+	| ReturnType< typeof unregisterShortcut >;
 
 /**
  * Returns an action object used to register a new keyboard shortcut.
