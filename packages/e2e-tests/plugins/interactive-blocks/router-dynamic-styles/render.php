@@ -53,6 +53,7 @@ $link_c = $find_url( $base_alias . '-c' );
 ?>
 <div
 	data-wp-interactive="test/router-dynamic-styles"
+	data-wp-router-region="test-router-dynamic-styles"
 	<?php echo get_block_wrapper_attributes(); ?>
 >
 	<p>
