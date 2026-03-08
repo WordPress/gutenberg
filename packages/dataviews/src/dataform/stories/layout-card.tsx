@@ -2,16 +2,13 @@
  * WordPress dependencies
  */
 import { useMemo, useState } from '@wordpress/element';
-import { privateApis } from '@wordpress/components';
+import { Badge } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import DataForm from '../index';
 import type { Field, Form } from '../../types';
-import { unlock } from '../../lock-unlock';
-
-const { Badge } = unlock( privateApis );
 
 const LayoutCardComponent = ( {
 	withHeader,
@@ -46,6 +43,8 @@ const LayoutCardComponent = ( {
 			id: 'name',
 			label: 'Customer Name',
 			type: 'text',
+			// TODO: should use `<Text />` when ready?
+			render: ( { item } ) => <span>{ item.name }</span>,
 		},
 		{
 			id: 'phone',
@@ -115,7 +114,7 @@ const LayoutCardComponent = ( {
 			label: 'Due Date',
 			type: 'text',
 			render: ( { item } ) => {
-				return <Badge>Due on: { item.dueDate }</Badge>;
+				return <Badge>{ `Due on: ${ item.dueDate }` }</Badge>;
 			},
 		},
 		{
