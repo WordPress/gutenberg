@@ -274,14 +274,38 @@ export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
  * preload cycle are never enrolled and are left untouched on every
  * navigation, including back-navigations to cached pages.
  *
+ * Matching uses normalised equivalence (ignoring `media`) rather than
+ * reference equality. The router may cache `page.styles` as Y-elements
+ * from the fetched document, while the live DOM holds the original
+ * X-element references. A deferred stylesheet activated at runtime
+ * (`media="not all"` → `"all"`) would fail a reference check against
+ * the cached Y-element (`media="not all"`), causing it to be disabled.
+ * Normalised comparison resolves this without affecting any other logic.
+ *
  * @param styles List of style elements to apply.
  */
 export const applyStyles = ( styles: StyleElement[] ) => {
+	// Pre-normalise the incoming styles list once so each DOM element
+	// only pays the clone cost of its own normalisation, not N×M clones.
+	const normalizedStyles = styles.map( normalizeMedia );
+
 	window.document
 		.querySelectorAll( 'style,link[rel=stylesheet]' )
 		.forEach( ( el: HTMLLinkElement | HTMLStyleElement ) => {
 			if ( el.sheet ) {
-				const isInNewPage = styles.includes( el );
+				const styleEl = el as StyleElement;
+				// Try reference equality first (O(1), covers the common case
+				// where the router passes live DOM element references).
+				// Fall back to normalised equivalence to handle the case
+				// where the live element has a mutated `media` attribute
+				// (e.g. a deferred sheet activated via media="not all"→"all")
+				// that would fail a strict reference check against the cached
+				// Y-element in `styles`.
+				const isInNewPage =
+					styles.includes( styleEl ) ||
+					normalizedStyles.some( ( ns ) =>
+						areNodesEqual( ns, normalizeMedia( styleEl ) )
+					);
 				const isPreloaded = el.sheet.media.mediaText === 'preload';
 
 				if ( isInNewPage ) {
@@ -289,10 +313,10 @@ export const applyStyles = ( styles: StyleElement[] ) => {
 						// Activate from preload and enroll in managed set.
 						const { originalMedia = 'all' } = el.dataset;
 						el.sheet.media.mediaText = originalMedia;
-						routerManagedStyles.add( el );
+						routerManagedStyles.add( styleEl );
 					}
 					el.sheet.disabled = false;
-				} else if ( routerManagedStyles.has( el ) ) {
+				} else if ( routerManagedStyles.has( styleEl ) ) {
 					// Managed element absent from new page — disable it.
 					el.sheet.disabled = true;
 				}
