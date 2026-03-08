@@ -123,7 +123,15 @@ export async function loadFontFaceInBrowser(
 		}
 	);
 
-	const loadedFace = await newFont.load();
+	let loadedFace;
+	try {
+		loadedFace = await newFont.load();
+	} catch {
+		// Some fonts contain non-standard tables (e.g. vhea) that the browser's
+		// OTS parser rejects. The font can still be installed server-side;
+		// only the in-browser preview fails, so we bail out silently here.
+		return;
+	}
 
 	if ( addTo === 'document' || addTo === 'all' ) {
 		document.fonts.add( loadedFace );
