@@ -4,7 +4,7 @@
 	"name": "test/router-dynamic-styles",
 	"title": "Test Router Dynamic Styles",
 	"category": "text",
-	"textdomain": "gutenberg",
+	"textdomain": "e2e-interactivity",
 	"viewScriptModule": "file:./view.js",
 	"render": "file:./render.php"
 }
