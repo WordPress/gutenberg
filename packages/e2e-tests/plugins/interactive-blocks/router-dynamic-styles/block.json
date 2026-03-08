@@ -10,6 +10,5 @@
 	},
 	"textdomain": "e2e-interactivity",
 	"viewScriptModule": "file:./view.js",
-	"viewStyle": "file:./deferred-style.css",
 	"render": "file:./render.php"
 }
