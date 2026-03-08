@@ -36,14 +36,10 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 				tabIndex={ -1 }
 			>
 				<div className={ styles[ 'header-content' ] }>{ children }</div>
-				{ /* Stop click/keyboard events from bubbling to the outer
-				    Collapsible.Trigger, which would cause a double-toggle. */ }
-				<div
-					className={ styles[ 'header-trigger-wrapper' ] }
-					onClick={ ( event ) => event.stopPropagation() }
-					onKeyDown={ ( event ) => event.stopPropagation() }
-					role="presentation"
-				>
+				<div className={ styles[ 'header-trigger-wrapper' ] }>
+					{ /* onClick/onKeyDown stop events from bubbling to the
+					     outer Collapsible.Trigger (the header), which would
+					     cause a double-toggle. */ }
 					<Collapsible.Trigger
 						render={ ( props ) => (
 							<IconButton
@@ -66,6 +62,8 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 							/>
 						) }
 						className={ styles[ 'header-trigger' ] }
+						onClick={ ( event ) => event.stopPropagation() }
+						onKeyDown={ ( event ) => event.stopPropagation() }
 					/>
 				</div>
 			</Collapsible.Trigger>
