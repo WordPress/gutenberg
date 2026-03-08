@@ -6,65 +6,53 @@ import { shortestCommonSupersequence } from './scs';
 export type StyleElement = HTMLLinkElement | HTMLStyleElement;
 
 /**
- * Compares the passed style or link elements to check if they can be
- * considered equal.
+ * Returns true when two style elements represent the same stylesheet resource.
  *
- * @param a `<style>` or `<link>` element.
- * @param b `<style>` or `<link>` element.
- * @return Whether they are considered equal.
+ * Strips `media` from both clones before comparing so that a sheet whose
+ * `media` was mutated at runtime (e.g. "not all" → "all") and the same sheet
+ * as returned by the server (still "not all") are treated as one node. Without
+ * this, the SCS algorithm would insert a duplicate and applyStyles() would
+ * disable the activated sheet on the next navigation.
  */
-const areNodesEqual = ( a: StyleElement, b: StyleElement ): boolean =>
-	a.isEqualNode( b );
+const areNodesEqual = ( a: StyleElement, b: StyleElement ): boolean => {
+	const aClone = a.cloneNode( true ) as StyleElement;
+	const bClone = b.cloneNode( true ) as StyleElement;
+	aClone.removeAttribute( 'media' );
+	bClone.removeAttribute( 'media' );
+	return aClone.isEqualNode( bClone );
+};
 
 /**
- * Tracks style elements the router is responsible for managing.
+ * The set of style elements the router is allowed to disable.
  *
- * Seeded at module init from all `<link rel="stylesheet">` and `<style>`
- * elements present in the DOM at that moment. This covers both
- * WordPress-enqueued sheets and any inline `<style>` blocks rendered
- * server-side by blocks.
+ * Seeded once at module init from every identified stylesheet (those carrying
+ * an `id` attribute) already in the document. Stylesheets injected by plugins
+ * after module init carry no `id` and are therefore never enrolled — the router
+ * leaves them untouched on every navigation.
  *
- * Stylesheets injected by third-party plugins after module init (e.g.
- * Complianz GDPR consent CSS appended via `document.head.appendChild()`)
- * are NOT in the DOM at this point and are therefore never enrolled. The
- * router leaves them untouched on every navigation.
- *
- * New elements are enrolled the first time `applyStyles()` activates them
- * from `media="preload"` state.
+ * Additional elements are enrolled by applyStyles() on their first activation
+ * out of `media="preload"` state.
  */
 const routerManagedStyles = new Set< StyleElement >(
 	Array.from(
 		document.querySelectorAll< StyleElement >(
-			'link[rel=stylesheet], style'
+			'link[rel=stylesheet][id], style[id]'
 		)
 	)
 );
 
 /**
- * Normalizes the passed style or link element, reverting the changes
- * made by {@link prepareStylePromise|`prepareStylePromise`} to the
- * `data-original-media` and `media`.
+ * Returns a normalised clone of the element suitable for media-agnostic
+ * comparison. The original element is never mutated.
  *
- * `media="not all"` is normalised to `"all"` because WordPress uses it
- * purely as a load-deferral sentinel — the stylesheet's intended scope is
- * "all" once activated. Normalising both the live element (`media="all"`)
- * and the server-returned element (`media="not all"`) to the same value
- * ensures the SCS algorithm recognises them as the same resource, so
- * `applyStyles()` does not disable the activated sheet on the next
- * navigation.
+ * - `media="preload"` → restored to `data-original-media` (or "all")
+ * - `media=""` or `media="not all"` → normalised to "all"
  *
- * @example
- * The following elements should be normalized to the same element:
- * ```html
- * <link rel="stylesheet" src="./assets/styles.css">
- * <link rel="stylesheet" src="./assets/styles.css" media="all">
- * <link rel="stylesheet" src="./assets/styles.css" media="not all">
- * <link rel="stylesheet" src="./assets/styles.css" media="preload">
- * <link rel="stylesheet" src="./assets/styles.css" media="preload" data-original-media="all">
- * ```
- *
- * @param element `<style>` or `<link>` element.
- * @return Normalized node.
+ * WordPress defers optional stylesheets with `media="not all"`. Normalising
+ * that value to "all" means the live activated element (media="all") and the
+ * server-returned element (media="not all") produce the same normalised form,
+ * letting areNodesEqual() and the SCS algorithm recognise them as the same
+ * resource.
  */
 export const normalizeMedia = ( element: StyleElement ): StyleElement => {
 	element = element.cloneNode( true ) as StyleElement;
@@ -81,25 +69,23 @@ export const normalizeMedia = ( element: StyleElement ): StyleElement => {
 };
 
 /**
- * Adds the minimum style elements from Y around those in X using a
- * shortest common supersequence algorithm, returning a list of
- * promises for all the elements in Y.
+ * Merges the current page's style list (X) with the incoming page's style
+ * list (Y) using the Shortest Common Supersequence algorithm and returns a
+ * load promise for every element in Y.
  *
- * If X is empty, it appends all elements in Y to the passed parent
- * element or to `document.head` instead.
+ * Elements present in both lists are matched media-agnostically via
+ * areNodesEqual() so the live DOM node from X — which may carry a mutated
+ * `media` attribute — is reused instead of being replaced. New elements
+ * (only in Y) are inserted next to their neighbours and given
+ * `media="preload"` so the browser fetches them silently until applyStyles()
+ * activates them.
  *
- * The returned promises resolve once the corresponding style element
- * is loaded and ready. Those elements that are also in X return a
- * cached promise.
+ * When X is empty all elements in Y are appended to `parent`.
  *
- * The algorithm ensures that the final style elements present in the
- * document (or the passed `parent` element) are in the correct order
- * and they are included in either X or Y.
- *
- * @param X      Base list of style elements.
- * @param Y      List of style elements.
- * @param parent Optional parent element to append to the new style elements.
- * @return List of promises that resolve once the elements in Y are ready.
+ * @param X      Current page's style elements.
+ * @param Y      Incoming page's style elements.
+ * @param parent Target parent for new nodes. Defaults to `document.head`.
+ * @return Promises resolving once each element in Y is ready.
  */
 export function updateStylesWithSCS(
 	X: StyleElement[],
@@ -114,11 +100,9 @@ export function updateStylesWithSCS(
 		} );
 	}
 
-	// Create normalized arrays for comparison.
 	const xNormalized = X.map( normalizeMedia );
 	const yNormalized = Y.map( normalizeMedia );
 
-	// The `scs` array contains normalized elements.
 	const scs = shortestCommonSupersequence(
 		xNormalized,
 		yNormalized,
@@ -132,10 +116,8 @@ export function updateStylesWithSCS(
 	let yIndex = 0;
 
 	for ( const scsElement of scs ) {
-		// Actual elements that will end up in the DOM.
 		const xElement = X[ xIndex ];
 		const yElement = Y[ yIndex ];
-		// Normalized elements for comparison.
 		const xNormEl = xNormalized[ xIndex ];
 		const yNormEl = yNormalized[ yIndex ];
 		if ( xIndex < xLength && areNodesEqual( xNormEl, scsElement ) ) {
@@ -160,10 +142,10 @@ export function updateStylesWithSCS(
 }
 
 /**
- * Cache of promises per style elements.
+ * Per-element load promise cache, keyed by element reference.
  *
- * Each style element has their own associated `Promise` that resolves
- * once the element has been loaded and is ready.
+ * Ensures each element's load event is bound at most once and that every
+ * caller waiting on the same element shares the same Promise.
  */
 const stylePromiseCache = new WeakMap<
 	StyleElement,
@@ -171,18 +153,16 @@ const stylePromiseCache = new WeakMap<
 >();
 
 /**
- * Prepares and returns the corresponding `Promise` for the passed style
- * element.
+ * Returns a Promise that resolves once the given element has finished loading.
  *
- * It returns the cached promise if it exists. Otherwise, constructs
- * a `Promise` that resolves once the element has finished loading.
+ * Elements already in the document and not in preload state resolve
+ * immediately. New elements receive `media="preload"` so the browser fetches
+ * the resource without applying its styles; applyStyles() clears the sentinel
+ * when the page renders. Inline `<style>` elements resolve immediately.
+ * Results are memoised in stylePromiseCache.
  *
- * For those elements that are not in the DOM yet, this function
- * injects a `media="preload"` attribute to the passed element so the
- * style is loaded without applying any styles to the document.
- *
- * @param element Style element.
- * @return The associated `Promise` to the passed element.
+ * @param element Style or link element to prepare.
+ * @return Promise resolving to the element once it is ready.
  */
 const prepareStylePromise = (
 	element: StyleElement
@@ -191,9 +171,6 @@ const prepareStylePromise = (
 		return stylePromiseCache.get( element );
 	}
 
-	// When the element exists in the main document and its media attribute
-	// is not "preload", that means the element comes from the initial page.
-	// The `media` attribute doesn't need to be handled in this case.
 	if ( window.document.contains( element ) && element.media !== 'preload' ) {
 		const promise = Promise.resolve( element );
 		stylePromiseCache.set( element, promise );
@@ -229,22 +206,15 @@ const prepareStylePromise = (
 };
 
 /**
- * Prepares all style elements contained in the passed document.
+ * Collects all style elements from the incoming document, inserts the minimum
+ * required set into `window.document` via updateStylesWithSCS, and returns a
+ * load promise for each.
  *
- * This function calls {@link updateStylesWithSCS|`updateStylesWithSCS`}
- * to insert only the minimum amount of style elements into the DOM, so
- * those present in the passed document end up in the DOM while the order
- * is respected.
+ * New elements receive `media="preload"` and are activated by applyStyles()
+ * once the page is ready. May transfer nodes out of `doc`.
  *
- * New appended style elements contain a `media=preload` attribute to
- * make them effectively disabled until they are applied with the
- * {@link applyStyles|`applyStyles`} function.
- *
- * Note that this function alters the passed document, as it can transfer
- * nodes from it to the global document.
- *
- * @param doc Document instance.
- * @return A list of promises for each style element in the passed document.
+ * @param doc Parsed document for the incoming page.
+ * @return Promises resolving once each style element in `doc` is ready.
  */
 export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
 	const currentStyleElements = Array.from(
@@ -256,41 +226,42 @@ export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
 		doc.querySelectorAll< StyleElement >( 'style,link[rel=stylesheet]' )
 	);
 
-	// Set styles in order.
 	return updateStylesWithSCS( currentStyleElements, newStyleElements );
 };
 
 /**
- * Traverses all style elements in the DOM, enabling only those included
- * in the passed list and disabling the others.
+ * Enables only the stylesheets in `styles` and disables the rest, leaving
+ * anonymous plugin-injected stylesheets untouched.
  *
- * Only elements enrolled in `routerManagedStyles` are candidates for
- * being disabled. An element is enrolled either at module init time (all
- * elements present in the DOM when this module first runs) or the first
- * time this function activates it from `media="preload"` state.
+ * - **In `styles`**: enabled. On first activation out of `media="preload"`
+ *   the original media value is restored and the element is enrolled in
+ *   routerManagedStyles for future navigation cycles.
+ * - **Enrolled but absent**: disabled so it does not bleed into unrelated pages.
+ * - **Neither** (never enrolled): left untouched — covers plugin stylesheets
+ *   injected after module init that bypassed the preload cycle entirely.
  *
- * Stylesheets appended by plugins after module init (no preload cycle,
- * never seeded) are left untouched on every navigation.
+ * Because areNodesEqual() in updateStylesWithSCS() already matches live
+ * activated elements media-agnostically and places them in `styles` by
+ * identity, a plain `styles.includes()` check is sufficient here.
  *
- * @param styles List of style elements to apply.
+ * @param styles Style elements belonging to the incoming page.
  */
 export const applyStyles = ( styles: StyleElement[] ) => {
 	window.document
-		.querySelectorAll( 'style,link[rel=stylesheet]' )
-		.forEach( ( el: HTMLLinkElement | HTMLStyleElement ) => {
-			if ( el.sheet ) {
-				if ( styles.includes( el ) ) {
-					// Only update mediaText when necessary.
-					if ( el.sheet.media.mediaText === 'preload' ) {
-						const { originalMedia = 'all' } = el.dataset;
-						el.sheet.media.mediaText = originalMedia;
-						// Enroll on first activation from preload state.
-						routerManagedStyles.add( el );
-					}
-					el.sheet.disabled = false;
-				} else if ( routerManagedStyles.has( el ) ) {
-					el.sheet.disabled = true;
+		.querySelectorAll< StyleElement >( 'style,link[rel=stylesheet]' )
+		.forEach( ( el ) => {
+			if ( ! el.sheet ) {
+				return;
+			}
+			if ( styles.includes( el ) ) {
+				if ( el.sheet.media.mediaText === 'preload' ) {
+					const { originalMedia = 'all' } = el.dataset;
+					el.sheet.media.mediaText = originalMedia;
+					routerManagedStyles.add( el );
 				}
+				el.sheet.disabled = false;
+			} else if ( routerManagedStyles.has( el ) ) {
+				el.sheet.disabled = true;
 			}
 		} );
 };
