@@ -57,8 +57,7 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 								{ ...props }
 								label={ __( 'Expand or collapse card' ) }
 								icon={
-									String( props[ 'aria-expanded' ] ) ===
-									'true'
+									props[ 'aria-expanded' ] === true
 										? chevronUp
 										: chevronDown
 								}
