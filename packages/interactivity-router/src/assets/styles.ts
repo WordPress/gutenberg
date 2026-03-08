@@ -13,6 +13,10 @@ export type StyleElement = HTMLLinkElement | HTMLStyleElement;
  * as returned by the server (still "not all") are treated as one node. Without
  * this, the SCS algorithm would insert a duplicate and applyStyles() would
  * disable the activated sheet on the next navigation.
+ *
+ * @param a `<style>` or `<link>` element.
+ * @param b `<style>` or `<link>` element.
+ * @return Whether the two elements represent the same stylesheet resource.
  */
 const areNodesEqual = ( a: StyleElement, b: StyleElement ): boolean => {
 	const aClone = a.cloneNode( true ) as StyleElement;
@@ -53,6 +57,9 @@ const routerManagedStyles = new Set< StyleElement >(
  * server-returned element (media="not all") produce the same normalised form,
  * letting areNodesEqual() and the SCS algorithm recognise them as the same
  * resource.
+ *
+ * @param element `<style>` or `<link>` element.
+ * @return Normalised clone of the element.
  */
 export const normalizeMedia = ( element: StyleElement ): StyleElement => {
 	element = element.cloneNode( true ) as StyleElement;
