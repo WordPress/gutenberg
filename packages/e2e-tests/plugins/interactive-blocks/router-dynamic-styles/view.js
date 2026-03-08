@@ -34,7 +34,7 @@ import { store } from '@wordpress/interactivity';
  */
 let pluginStyleEl = null;
 
-const { state, actions, callbacks } = store( 'test/router-dynamic-styles', {
+const { state } = store( 'test/router-dynamic-styles', {
 	state: {
 		/** Text shown in data-testid="deferred-style-active". */
 		deferredStyleStatus: 'inactive',
