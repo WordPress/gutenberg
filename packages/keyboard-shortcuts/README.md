@@ -26,7 +26,7 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element`: Component.
+-   Component.
 
 ### store
 
