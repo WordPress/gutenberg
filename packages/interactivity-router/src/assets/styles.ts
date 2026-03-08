@@ -292,11 +292,25 @@ export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
  * @param styles List of style elements to apply.
  */
 export const applyStyles = ( styles: StyleElement[] ) => {
+	// Normalize the incoming list once so each DOM scan only pays its own
+	// normalisation cost rather than N × M cloneNode calls.
+	// This also handles the case where the router stores Y-elements (from the
+	// fetched document) in page.styles while the live DOM holds the original
+	// X-element references: a deferred sheet activated at runtime
+	// (media="not all" → "all") would fail a reference check against the
+	// cached Y-element, so normalised equality is used as a fallback.
+	const normalizedStyles = styles.map( normalizeMedia );
+
 	window.document
 		.querySelectorAll( 'style,link[rel=stylesheet]' )
 		.forEach( ( el: HTMLLinkElement | HTMLStyleElement ) => {
 			if ( el.sheet ) {
-				const isInNewPage = styles.includes( el );
+				const styleEl = el as StyleElement;
+				const isInNewPage =
+					styles.includes( styleEl ) ||
+					normalizedStyles.some( ( ns ) =>
+						areNodesEqual( ns, normalizeMedia( styleEl ) )
+					);
 				const isPreloaded = el.sheet.media.mediaText === 'preload';
 
 				if ( isInNewPage ) {
