@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { WPKeycodeModifier } from '@wordpress/keycodes';
 
 /**
