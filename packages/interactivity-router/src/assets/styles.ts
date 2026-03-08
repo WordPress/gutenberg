@@ -15,13 +15,6 @@ export type StyleElement = HTMLLinkElement | HTMLStyleElement;
  * Cloning and removing `media` before comparing preserves all other
  * attributes (`integrity`, `crossorigin`, etc.) for a correct match.
  *
- * Note: because both the live DOM element (media="all") and the server-
- * returned element (media="not all") are normalized by `normalizeMedia()`
- * before being passed here in the SCS algorithm, AND because this function
- * strips `media` from both clones before calling `isEqualNode`, the two
- * representations of the same deferred stylesheet are correctly matched
- * without needing `normalizeMedia` to also handle `"not all"` → `"all"`.
- *
  * @param a `<style>` or `<link>` element.
  * @param b `<style>` or `<link>` element.
  * @return Whether they are considered equal.
@@ -37,46 +30,38 @@ const areNodesEqual = ( a: StyleElement, b: StyleElement ): boolean => {
 /**
  * Tracks style elements the router is responsible for managing.
  *
- * Seeded at module init from `<link rel="stylesheet">` and `<style>` elements
- * that carry an `id` attribute. WordPress has assigned `id="{handle}-css"` to
- * every enqueued stylesheet since WordPress 2.6 — this is a stable API
- * contract. Plugin-injected elements appended via `document.head.appendChild()`
- * bypass `wp_enqueue_style()` and therefore never carry an `id`.
+ * CRITICAL: NOT seeded from initial DOM elements!
  *
- * Restricting the seed to id-bearing elements means:
- *  - All WordPress-managed sheets (theme, blocks, plugins via enqueue) are
- *    candidates for enable/disable across navigations.
- *  - Dynamically-injected sheets (Complianz GDPR, etc.) are never enrolled
- *    and are left untouched by the router on every navigation, even if they
- *    appear before our module evaluates.
+ * Elements are enrolled ONLY when `applyStyles()` activates them from
+ * `media="preload"` state. This creates a natural boundary:
  *
- * New elements (not in the initial DOM) are enrolled the first time
- * `applyStyles()` activates them from `media="preload"` state.
+ * - WordPress-enqueued styles go through preload cycle → enrolled
+ * - Plugin-injected styles (via appendChild) never preload → never enrolled
+ *
+ * The enrollment gate ensures plugin styles are never disabled by the router,
+ * even during back-navigation to cached pages that include plugin elements
+ * in `page.styles`.
  */
-const routerManagedStyles = new Set< StyleElement >(
-	Array.from(
-		document.querySelectorAll< StyleElement >(
-			'link[rel=stylesheet][id], style[id]'
-		)
-	)
-);
+const routerManagedStyles = new Set< StyleElement >();
 
 /**
  * Normalizes the passed style or link element, reverting the changes
  * made by {@link prepareStylePromise|`prepareStylePromise`} to the
  * `data-original-media` and `media`.
  *
- * Note: `media="not all"` is intentionally NOT normalized here. The
- * {@link areNodesEqual|`areNodesEqual`} function strips `media` entirely
- * before comparing, so normalizing `"not all"` → `"all"` is redundant and
- * risks changing SCS output for existing WordPress stylesheet configurations
- * that rely on `media="not all"` as a deferred-load sentinel.
+ * KEY FIX: `media="not all"` is normalized to `"all"` because WordPress
+ * uses it as a load-deferral sentinel — the stylesheet's intended scope
+ * is "all" and iAPI stores activate it by changing the attribute to `"all"`.
+ * Normalizing both to `"all"` ensures that the live activated element
+ * (media="all") and the server-returned element (media="not all") are
+ * recognised as the same resource by the SCS algorithm.
  *
  * @example
- * The following elements are normalized to the same element:
+ * The following elements should be normalized to the same element:
  * ```html
  * <link rel="stylesheet" src="./assets/styles.css">
  * <link rel="stylesheet" src="./assets/styles.css" media="all">
+ * <link rel="stylesheet" src="./assets/styles.css" media="not all">
  * <link rel="stylesheet" src="./assets/styles.css" media="preload">
  * <link rel="stylesheet" src="./assets/styles.css" media="preload" data-original-media="all">
  * ```
@@ -92,7 +77,8 @@ export const normalizeMedia = ( element: StyleElement ): StyleElement => {
 	if ( media === 'preload' ) {
 		element.media = originalMedia || 'all';
 		element.removeAttribute( 'data-original-media' );
-	} else if ( ! element.media ) {
+	} else if ( ! element.media || element.media === 'not all' ) {
+		// Normalize "not all" to "all"
 		element.media = 'all';
 	}
 	return element;
@@ -282,42 +268,31 @@ export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
  * Traverses all style elements in the DOM, enabling only those included
  * in the passed list and disabling the others.
  *
- * Only elements in `routerManagedStyles` are candidates for being
- * disabled. An element enters that set either at module init (if it
- * carries an `id` — the stable WordPress enqueue contract) or the first
- * time this function activates it from `media="preload"` state.
+ * CRITICAL: Only elements in `routerManagedStyles` are candidates for
+ * being disabled. This protects plugin-injected stylesheets from being
+ * disabled by the router.
  *
- * Plugin-injected stylesheets that were appended via `appendChild()` and
- * carry no `id` are never enrolled and are left untouched on every
- * navigation, including back-navigations to cached pages.
+ * ENROLLMENT: An element enters `routerManagedStyles` the first time
+ * this function activates it from `media="preload"` state — meaning the
+ * router explicitly loaded it for a specific page. Plugin-injected
+ * stylesheets that are already active in the DOM and were never put
+ * through the preload cycle are never enrolled and are left untouched
+ * on every navigation, including back-navigations to cached pages.
  *
  * @param styles List of style elements to apply.
  */
 export const applyStyles = ( styles: StyleElement[] ) => {
-	// Normalize the incoming list once so each DOM scan only pays its own
-	// normalisation cost rather than N × M cloneNode calls.
-	// The normalised fallback handles the deferred-stylesheet (Bug A) case:
-	// a sheet activated at runtime (media="not all" → "all") differs from
-	// the server-returned element only in `media`. areNodesEqual strips that
-	// attribute before comparing, so the live element is correctly identified
-	// as belonging to the new page.
-	const normalizedStyles = styles.map( normalizeMedia );
-
 	window.document
-		.querySelectorAll( 'style,link[rel=stylesheet]' )
-		.forEach( ( el: HTMLLinkElement | HTMLStyleElement ) => {
+		.querySelectorAll< StyleElement >( 'style,link[rel=stylesheet]' )
+		.forEach( ( el ) => {
 			if ( el.sheet ) {
-				const styleEl = el as StyleElement;
-				const isInNewPage =
-					styles.includes( styleEl ) ||
-					normalizedStyles.some( ( ns ) =>
-						areNodesEqual( ns, normalizeMedia( styleEl ) )
-					);
+				const isInNewPage = styles.includes( el );
 				const isPreloaded = el.sheet.media.mediaText === 'preload';
 
 				if ( isInNewPage ) {
 					if ( isPreloaded ) {
-						// Activate from preload and enroll in managed set.
+						// Activate from preload and ENROLL in managed set.
+						// This is the enrollment gate for router-managed styles.
 						const { originalMedia = 'all' } = el.dataset;
 						el.sheet.media.mediaText = originalMedia;
 						routerManagedStyles.add( el );
@@ -327,7 +302,7 @@ export const applyStyles = ( styles: StyleElement[] ) => {
 					// Managed element absent from new page — disable it.
 					el.sheet.disabled = true;
 				}
-				// Unmanaged elements (dynamic injections) are left untouched.
+				// Unmanaged elements (plugin injections) are left untouched.
 			}
 		} );
 };
