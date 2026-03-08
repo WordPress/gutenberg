@@ -14,7 +14,7 @@ export interface ShortcutKeyCombination {
 /**
  * Configuration of a registered keyboard shortcut.
  */
-export interface WPShortcutConfig {
+export interface ShortcutConfig {
 	name: string;
 	category: string;
 	description: string;
@@ -22,26 +22,13 @@ export interface WPShortcutConfig {
 	aliases?: ShortcutKeyCombination[];
 }
 
-export interface RegisterShortcutAction {
-	type: 'REGISTER_SHORTCUT';
-	name: string;
-	category: string;
-	keyCombination: ShortcutKeyCombination;
-	aliases?: ShortcutKeyCombination[];
-	description: string;
-}
-
-export interface UnregisterShortcutAction {
-	type: 'UNREGISTER_SHORTCUT';
-	name: string;
-}
-
-export type ShortcutAction = RegisterShortcutAction | UnregisterShortcutAction;
+export type ShortcutAction = ReturnType<typeof registerShortcut> 
+							| ReturnType<typeof unregisterShortcut>;
 
 /**
  * Returns an action object used to register a new keyboard shortcut.
  *
- * @param {WPShortcutConfig} config Shortcut config.
+ * @param {ShortcutConfig} config Shortcut config.
  *
  * @example
  *
@@ -89,9 +76,9 @@ export function registerShortcut( {
 	description,
 	keyCombination,
 	aliases,
-}: WPShortcutConfig ): RegisterShortcutAction {
+}: ShortcutConfig ) {
 	return {
-		type: 'REGISTER_SHORTCUT',
+		type: 'REGISTER_SHORTCUT' as const,
 		name,
 		category,
 		keyCombination,
@@ -137,9 +124,9 @@ export function registerShortcut( {
  *```
  * @return {Object} action.
  */
-export function unregisterShortcut( name: string ): UnregisterShortcutAction {
+export function unregisterShortcut( name: string ) {
 	return {
-		type: 'UNREGISTER_SHORTCUT',
+		type: 'UNREGISTER_SHORTCUT' as const,
 		name,
 	};
 }
