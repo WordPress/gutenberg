@@ -210,13 +210,14 @@ export function ColorPanelDropdown( {
 	tabs,
 	colorGradientControlSettings,
 	panelId,
+	className = 'block-editor-tools-panel-color-gradient-settings__item',
 } ) {
 	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
 	const { key: firstTabKey, ...firstTab } = tabs[ 0 ] ?? {};
 	const colorGradientDropdownButtonRef = useRef( undefined );
 	return (
 		<ToolsPanelItem
-			className="block-editor-tools-panel-color-gradient-settings__item"
+			className={ className }
 			hasValue={ hasValue }
 			label={ label }
 			onDeselect={ resetValue }

@@ -218,6 +218,7 @@ export default function BackgroundImagePanel( {
 		>
 			{ showBackgroundImageControl && (
 				<ToolsPanelItem
+					className="block-editor-background-panel__item"
 					hasValue={ () => hasBackgroundImageValue( value ) }
 					label={ __( 'Image' ) }
 					onDeselect={ resetBackground }
@@ -236,6 +237,7 @@ export default function BackgroundImagePanel( {
 			) }
 			{ showBackgroundGradientControl && (
 				<ColorPanelDropdown
+					className="block-editor-background-panel__item"
 					label={ __( 'Gradient' ) }
 					hasValue={ () => hasBackgroundGradientValue( value ) }
 					resetValue={ resetGradient }
