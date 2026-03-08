@@ -32,8 +32,17 @@ const EMPTY_ARRAY: ShortcutKeyCombination[] = [];
  * Shortcut formatting methods.
  */
 const FORMATTING_METHODS = {
+	/**
+	 * Display formatting.
+	 */
 	display: displayShortcut,
+	/**
+	 * Raw shortcut formatting.
+	 */
 	raw: rawShortcut,
+	/**
+	 * ARIA label formatting.
+	 */
 	ariaLabel: shortcutAriaLabel,
 };
 
