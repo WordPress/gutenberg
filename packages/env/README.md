@@ -590,7 +590,7 @@ To enable editor autocomplete and validation, add a `$schema` key:
 
 ```json
 {
-	"$schema": "https://schemas.wordpress.org/wp-env.schema.json",
+	"$schema": "https://schemas.wp.org/trunk/wp-env.json",
 	"plugins": [ "." ]
 }
 ```
