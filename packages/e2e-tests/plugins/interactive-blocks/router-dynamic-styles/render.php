@@ -5,34 +5,40 @@
  * Provides deterministic style-scenario fixtures for two bugs:
  *
  * Bug A — runtime-activated deferred stylesheets (media="not all" → "all"):
- *   Enqueues a stylesheet with media="not all". The view script exposes an
- *   action that mutates link.media to "all", simulating an iAPI theme-switcher.
+ *   Enqueues a stylesheet with media="not all" via wp_enqueue_scripts so the
+ *   <link> tag appears in <head>. The view script exposes an action that
+ *   mutates link.media to "all", simulating an iAPI theme-switcher.
  *   After navigation the deferred-style-active indicator must remain "active".
  *
  * Bug B — dynamically-injected plugin stylesheets (no id, via appendChild):
  *   The view script injects a <style> element without an id attribute,
- *   simulating Complianz GDPR and similar plugins that bypass wp_enqueue_style().
- *   The plugin-style-active indicator must remain "active" across all navigations.
+ *   simulating plugins like Complianz GDPR that bypass wp_enqueue_style().
+ *   The plugin-style-active indicator must remain "active" across navigations.
  *
- * Navigation links nav-to-b and nav-to-c resolve sibling posts by title so
- * the spec's addPostWithBlock( …, { alias } ) pattern works out of the box.
+ * @package gutenberg-test-interactive-blocks
  */
 
-// Enqueue the deferred stylesheet with media="not all".
+// Enqueue the deferred stylesheet with media="not all" during wp_enqueue_scripts
+// so the <link> tag is output inside <head>. Calling wp_enqueue_style() directly
+// in a render template runs after wp_head() and the tag never appears in <head>.
 // WordPress generates the id "test-router-dynamic-styles-deferred-css" from
 // the handle, which the view script uses to locate and activate the element.
-wp_enqueue_style(
-	'test-router-dynamic-styles-deferred',
-	plugins_url( 'deferred-style.css', __FILE__ ),
-	array(),
-	null,
-	'not all'
+add_action(
+	'wp_enqueue_scripts',
+	function () {
+		wp_enqueue_style(
+			'test-router-dynamic-styles-deferred',
+			plugin_dir_url( __FILE__ ) . 'deferred-style.css',
+			array(),
+			null,
+			'not all'
+		);
+	}
 );
 
 // Resolve sibling post URLs by alias (post title set by addPostWithBlock).
 $current_title = (string) get_the_title();
-// Strip the trailing variant suffix (-a, -b, -c …) to get the base alias.
-$base_alias = (string) preg_replace( '/-[a-z]$/', '', $current_title );
+$base_alias    = (string) preg_replace( '/-[a-z]$/', '', $current_title );
 
 $find_url = static function ( string $alias ): string {
 	$posts = get_posts(
