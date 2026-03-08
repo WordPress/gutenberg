@@ -10,6 +10,7 @@
 		--wp-ui-notice-text-color: var(--wpds-color-fg-content-neutral);
 		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-neutral);
 
+		container-type: inline-size;
 		display: grid;
 		align-items: start;
 		grid-template-columns: auto 1fr auto;
@@ -134,6 +135,14 @@
 		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-error);
 		--wp-ui-notice-text-color: var(--wpds-color-fg-content-error);
 		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-error-weak);
+	}
+
+	/* TODO: Replace 320px with a measure token from the Theme package. */
+	@container (max-width: 320px) {
+		.notice:has(.title) .description,
+		.notice:has(.title) .actions {
+			grid-column: 1 / 3;
+		}
 	}
 }
 
