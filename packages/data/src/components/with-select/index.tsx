@@ -7,7 +7,7 @@ import { createHigherOrderComponent, pure } from '@wordpress/compose';
  * Internal dependencies
  */
 import useSelect from '../use-select';
-import type { SelectFunction, DataRegistry } from '../../types';
+import type { DataRegistry } from '../../types';
 
 /**
  * Higher-order component used to inject state-derived props using registered
@@ -51,7 +51,7 @@ import type { SelectFunction, DataRegistry } from '../../types';
  */
 const withSelect = (
 	mapSelectToProps: (
-		select: SelectFunction,
+		select: DataRegistry[ 'select' ],
 		ownProps: Record< string, unknown >,
 		registry: DataRegistry
 	) => Record< string, unknown >
@@ -60,7 +60,7 @@ const withSelect = (
 		( WrappedComponent ) =>
 			pure( ( ownProps: Record< string, unknown > ) => {
 				const mapSelect = (
-					select: SelectFunction,
+					select: DataRegistry[ 'select' ],
 					registry: DataRegistry
 				) => mapSelectToProps( select, ownProps, registry );
 				const mergeProps = useSelect( mapSelect );

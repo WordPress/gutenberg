@@ -18,10 +18,12 @@ import useRegistry from '../registry-provider/use-registry';
 import useAsyncMode from '../async-mode-provider/use-async-mode';
 import type {
 	MapSelect,
-	SelectFunction,
+	CurriedSelectorsOf,
 	StoreDescriptor,
+	StoreNameOrDescriptor,
+	StoreRegistry,
+	StoreRegistryResult,
 	AnyConfig,
-	UseSelectReturn,
 	DataRegistry,
 } from '../../types';
 
@@ -55,9 +57,7 @@ interface StoreSubscriber {
 }
 
 function Store( registry: DataRegistry, suspense: boolean ) {
-	const select = ( suspense
-		? registry.suspendSelect
-		: registry.select ) as unknown as SelectFunction;
+	const select = suspense ? registry.suspendSelect : registry.select;
 	const queueContext = {};
 	let lastMapSelect: MapSelect | undefined;
 	let lastMapResult: unknown;
@@ -227,7 +227,7 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 	};
 }
 
-function _useStaticSelect( storeName: StoreDescriptor< AnyConfig > | string ) {
+function _useStaticSelect( storeName: StoreNameOrDescriptor ) {
 	return useRegistry().select( storeName );
 }
 
@@ -252,6 +252,17 @@ function _useMappingSelect(
 	useDebugValue( result );
 	return result;
 }
+
+function useSelect< T extends MapSelect >(
+	mapSelect: T,
+	deps?: unknown[]
+): ReturnType< T >;
+function useSelect< S extends StoreDescriptor< AnyConfig > >(
+	storeDescriptor: S
+): CurriedSelectorsOf< S >;
+function useSelect(
+	storeNameOrDescriptor: StoreNameOrDescriptor
+): Record< string, ( ...args: any[] ) => any >;
 
 /**
  * Custom react hook for retrieving props from registered selectors.
@@ -317,9 +328,10 @@ function _useMappingSelect(
  *
  * @return The selected data or store selectors.
  */
-export default function useSelect<
-	T extends MapSelect | StoreDescriptor< AnyConfig >,
->( mapSelect: T, deps?: unknown[] ): UseSelectReturn< T > {
+function useSelect(
+	mapSelect: MapSelect | StoreNameOrDescriptor,
+	deps?: unknown[]
+) {
 	// On initial call, on mount, determine the mode of this `useSelect` call
 	// and then never allow it to change on subsequent updates.
 	const staticSelectMode = typeof mapSelect !== 'function';
@@ -336,12 +348,12 @@ export default function useSelect<
 	// `staticSelectMode` is not allowed to change during the hook instance's,
 	// lifetime, so the rules of hooks are not really violated.
 
-	return (
-		staticSelectMode
-			? _useStaticSelect( mapSelect as StoreDescriptor< AnyConfig > )
-			: _useMappingSelect( false, mapSelect as MapSelect, deps! )
-	) as UseSelectReturn< T >;
+	return staticSelectMode
+		? _useStaticSelect( mapSelect as StoreDescriptor< AnyConfig > )
+		: _useMappingSelect( false, mapSelect as MapSelect, deps! );
 }
+
+export default useSelect;
 
 /**
  * A variant of the `useSelect` hook that has the same API, but is a compatible

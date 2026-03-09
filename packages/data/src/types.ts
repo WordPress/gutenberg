@@ -52,37 +52,10 @@ export interface ReduxStoreConfig< State, ActionCreators, Selectors > {
 	controls?: MapOf< Function >;
 }
 
-// Return type for the useSelect() hook.
-export type UseSelectReturn< F extends MapSelect | StoreDescriptor< any > > =
-	F extends MapSelect
-		? ReturnType< F >
-		: F extends StoreDescriptor< any >
-		? CurriedSelectorsOf< F >
-		: never;
-
-// Return type for the useDispatch() hook.
-export type UseDispatchReturn< StoreNameOrDescriptor > =
-	StoreNameOrDescriptor extends StoreDescriptor< any >
-		? ActionCreatorsOf< StoreNameOrDescriptor >
-		: StoreNameOrDescriptor extends undefined
-		? DispatchFunction
-		: any;
-
-export type DispatchFunction = < StoreNameOrDescriptor >(
-	store: StoreNameOrDescriptor
-) => DispatchReturn< StoreNameOrDescriptor >;
-
-export type DispatchReturn< StoreNameOrDescriptor > =
-	StoreNameOrDescriptor extends StoreDescriptor< any >
-		? ActionCreatorsOf< StoreNameOrDescriptor >
-		: unknown;
-
 export type MapSelect = (
-	select: SelectFunction,
+	select: DataRegistry[ 'select' ],
 	registry: DataRegistry
 ) => any;
-
-export type SelectFunction = < S >( store: S ) => CurriedSelectorsOf< S >;
 
 /**
  * Callback for store's `subscribe()` method that
@@ -224,33 +197,50 @@ export interface DataRegistry {
 		storeNameOrDescriptor?: StoreNameOrDescriptor
 	) => () => void;
 	select: {
+		< K extends keyof StoreRegistry >(
+			storeName: K
+		): StoreRegistryResult< K, CurriedSelectorsOf< StoreRegistry[ K ] > >;
 		< S extends StoreDescriptor< any > >(
-			store: S
+			storeDescriptor: S
 		): CurriedSelectorsOf< S >;
 		(
-			store: StoreNameOrDescriptor
+			storeNameOrDescriptor: StoreNameOrDescriptor
 		): Record< string, ( ...args: any[] ) => any >;
 	};
 	resolveSelect: {
+		< K extends keyof StoreRegistry >(
+			storeName: K
+		): StoreRegistryResult<
+			K,
+			CurriedSelectorsResolveOf< StoreRegistry[ K ] >
+		>;
 		< S extends StoreDescriptor< any > >(
-			store: S
+			storeDescriptor: S
 		): CurriedSelectorsResolveOf< S >;
 		(
-			store: StoreNameOrDescriptor
+			storeNameOrDescriptor: StoreNameOrDescriptor
 		): Record< string, ( ...args: any[] ) => Promise< any > >;
 	};
 	suspendSelect: {
+		< K extends keyof StoreRegistry >(
+			storeName: K
+		): StoreRegistryResult< K, CurriedSelectorsOf< StoreRegistry[ K ] > >;
 		< S extends StoreDescriptor< any > >(
-			store: S
+			storeDescriptor: S
 		): CurriedSelectorsOf< S >;
 		(
-			store: StoreNameOrDescriptor
+			storeNameOrDescriptor: StoreNameOrDescriptor
 		): Record< string, ( ...args: any[] ) => any >;
 	};
 	dispatch: {
-		< S extends StoreDescriptor< any > >( store: S ): ActionCreatorsOf< S >;
+		< K extends keyof StoreRegistry >(
+			storeName: K
+		): StoreRegistryResult< K, ActionCreatorsOf< StoreRegistry[ K ] > >;
+		< S extends StoreDescriptor< any > >(
+			storeDescriptor: S
+		): ActionCreatorsOf< S >;
 		(
-			store: StoreNameOrDescriptor
+			storeNameOrDescriptor: StoreNameOrDescriptor
 		): Record< string, ( ...args: any[] ) => any >;
 	};
 	use: (

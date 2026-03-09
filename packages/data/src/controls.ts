@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { createRegistryControl } from './factory';
-import type { StoreDescriptor } from './types';
+import type { StoreDescriptor, StoreNameOrDescriptor } from './types';
 
 const SELECT = '@@data/SELECT';
 const RESOLVE_SELECT = '@@data/RESOLVE_SELECT';
@@ -36,7 +36,7 @@ function isStoreDescriptor( object: unknown ): object is StoreDescriptor {
  * @return The control descriptor.
  */
 function select(
-	storeNameOrDescriptor: string | StoreDescriptor,
+	storeNameOrDescriptor: StoreNameOrDescriptor,
 	selectorName: string,
 	...args: unknown[]
 ) {
@@ -75,7 +75,7 @@ function select(
  * @return The control descriptor.
  */
 function resolveSelect(
-	storeNameOrDescriptor: string | StoreDescriptor< any >,
+	storeNameOrDescriptor: StoreNameOrDescriptor,
 	selectorName: string,
 	...args: any[]
 ) {
@@ -110,7 +110,7 @@ function resolveSelect(
  * @return   The control descriptor.
  */
 function dispatch(
-	storeNameOrDescriptor: string | StoreDescriptor,
+	storeNameOrDescriptor: StoreNameOrDescriptor,
 	actionName: string,
 	...args: unknown[]
 ) {

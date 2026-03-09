@@ -9,8 +9,6 @@ import type {
 	StoreDescriptor,
 	ReduxStoreConfig,
 	combineReducers as CombineReducers,
-	AnyConfig,
-	CurriedSelectorsResolveOf,
 } from './types';
 
 export { default as withSelect } from './components/with-select';
@@ -34,6 +32,8 @@ export { controls } from './controls';
 export { default as createReduxStore } from './redux-store';
 export { dispatch } from './dispatch';
 export { select } from './select';
+export { resolveSelect } from './resolve-select';
+export { suspendSelect } from './suspend-select';
 
 export type * from './types';
 
@@ -85,51 +85,6 @@ export { plugins };
  */
 export const combineReducers =
 	combineReducersModule as unknown as CombineReducers;
-
-/**
- * Given a store descriptor, returns an object containing the store's selectors
- * pre-bound to state so that you only need to supply additional arguments, and
- * modified so that they return promises that resolve to their eventual values,
- * after any resolvers have ran.
- *
- * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
- *                                                       convention of passing the store name is
- *                                                       also supported.
- *
- * @example
- * ```js
- * import { resolveSelect } from '@wordpress/data';
- * import { store as myCustomStore } from 'my-custom-store';
- *
- * resolveSelect( myCustomStore ).getPrice( 'hammer' ).then(console.log)
- * ```
- *
- * @return Object containing the store's promise-wrapped selectors.
- */
-export function resolveSelect< T extends StoreDescriptor< AnyConfig > >(
-	storeNameOrDescriptor: T | string
-): CurriedSelectorsResolveOf< T > {
-	return defaultRegistry.resolveSelect(
-		storeNameOrDescriptor
-	) as CurriedSelectorsResolveOf< T >;
-}
-
-/**
- * Given a store descriptor, returns an object containing the store's selectors pre-bound to state
- * so that you only need to supply additional arguments, and modified so that they throw promises
- * in case the selector is not resolved yet.
- *
- * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
- *                                                       convention of passing the store name is
- *                                                       also supported.
- *
- * @return {Object} Object containing the store's suspense-wrapped selectors.
- */
-export const suspendSelect = (
-	storeNameOrDescriptor:
-		| string
-		| StoreDescriptor< ReduxStoreConfig< any, any, any > >
-): any => defaultRegistry.suspendSelect( storeNameOrDescriptor );
 
 /**
  * Given a listener function, the function will be called any time the state value

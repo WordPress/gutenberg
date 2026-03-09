@@ -1,8 +1,22 @@
 /**
  * Internal dependencies
  */
-import type { AnyConfig, CurriedSelectorsOf, StoreDescriptor } from './types';
+import type {
+	AnyConfig,
+	CurriedSelectorsOf,
+	StoreDescriptor,
+	StoreRegistry,
+	StoreRegistryResult,
+	StoreNameOrDescriptor,
+} from './types';
 import defaultRegistry from './default-registry';
+
+export function select< S extends StoreDescriptor< AnyConfig > >(
+	storeDescriptor: S
+): CurriedSelectorsOf< S >;
+export function select(
+	storeNameOrDescriptor: StoreNameOrDescriptor
+): Record< string, ( ...args: any[] ) => any >;
 
 /**
  * Given a store descriptor, returns an object of the store's selectors.
@@ -26,10 +40,6 @@ import defaultRegistry from './default-registry';
  *
  * @return Object containing the store's selectors.
  */
-export function select< T extends StoreDescriptor< AnyConfig > >(
-	storeNameOrDescriptor: string | T
-): CurriedSelectorsOf< T > {
-	return defaultRegistry.select(
-		storeNameOrDescriptor
-	) as CurriedSelectorsOf< T >;
+export function select( storeNameOrDescriptor: StoreNameOrDescriptor ) {
+	return defaultRegistry.select( storeNameOrDescriptor );
 }

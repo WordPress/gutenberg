@@ -1,8 +1,22 @@
 /**
  * Internal dependencies
  */
-import type { AnyConfig, StoreDescriptor, DispatchReturn } from './types';
+import type {
+	AnyConfig,
+	StoreDescriptor,
+	StoreRegistry,
+	StoreRegistryResult,
+	StoreNameOrDescriptor,
+	ActionCreatorsOf,
+} from './types';
 import defaultRegistry from './default-registry';
+
+export function dispatch< S extends StoreDescriptor< AnyConfig > >(
+	storeDescriptor: S
+): ActionCreatorsOf< S >;
+export function dispatch(
+	storeNameOrDescriptor: StoreNameOrDescriptor
+): Record< string, ( ...args: any[] ) => any >;
 
 /**
  * Given a store descriptor, returns an object of the store's action creators.
@@ -27,12 +41,6 @@ import defaultRegistry from './default-registry';
  * ```
  * @return Object containing the action creators.
  */
-export function dispatch<
-	StoreNameOrDescriptor extends StoreDescriptor< AnyConfig > | string,
->(
-	storeNameOrDescriptor: StoreNameOrDescriptor
-): DispatchReturn< StoreNameOrDescriptor > {
-	return defaultRegistry.dispatch(
-		storeNameOrDescriptor
-	) as DispatchReturn< StoreNameOrDescriptor >;
+export function dispatch( storeNameOrDescriptor: StoreNameOrDescriptor ) {
+	return defaultRegistry.dispatch( storeNameOrDescriptor );
 }

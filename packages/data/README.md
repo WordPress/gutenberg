@@ -504,7 +504,7 @@ _Parameters_
 
 _Returns_
 
--   `DispatchReturn< StoreNameOrDescriptor >`: Object containing the action creators.
+-   Object containing the action creators.
 
 ### plugins
 
@@ -618,7 +618,7 @@ _Parameters_
 
 _Returns_
 
--   `CurriedSelectorsResolveOf< T >`: Object containing the store's promise-wrapped selectors.
+-   Object containing the store's promise-wrapped selectors.
 
 ### select
 
@@ -637,11 +637,11 @@ select( myCustomStore ).getPrice( 'hammer' );
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `string | T`: The store descriptor. The legacy calling convention of passing the store name is also supported.
+-   _storeNameOrDescriptor_ `StoreNameOrDescriptor`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
--   `CurriedSelectorsOf< T >`: Object containing the store's selectors.
+-   Object containing the store's selectors.
 
 ### subscribe
 
@@ -737,7 +737,7 @@ _Parameters_
 
 _Returns_
 
--   `UseDispatchReturn< StoreNameOrDescriptor >`: The dispatch function or action creators for the store.
+-   The dispatch function or action creators for the store.
 
 ### useRegistry
 
@@ -832,12 +832,12 @@ function Paste( { children } ) {
 
 _Parameters_
 
--   _mapSelect_ `T`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument. When a store key is passed, all selectors for the store will be returned. This is only meant for usage of these selectors in event callbacks, not for data needed to create the element tree.
+-   _mapSelect_ `MapSelect | StoreNameOrDescriptor`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument. When a store key is passed, all selectors for the store will be returned. This is only meant for usage of these selectors in event callbacks, not for data needed to create the element tree.
 -   _deps_ `unknown[]`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
 
 _Returns_
 
--   `UseSelectReturn< T >`: The selected data or store selectors.
+-   The selected data or store selectors.
 
 ### useSuspenseSelect
 
@@ -982,7 +982,7 @@ the store.
 
 _Parameters_
 
--   _mapSelectToProps_ `( select: SelectFunction, ownProps: Record< string, unknown >, registry: DataRegistry ) => Record< string, unknown >`: Function called on every state change, expected to return object of props to merge with the component's own props.
+-   _mapSelectToProps_ `( select: DataRegistry[ 'select' ], ownProps: Record< string, unknown >, registry: DataRegistry ) => Record< string, unknown >`: Function called on every state change, expected to return object of props to merge with the component's own props.
 
 _Returns_
 

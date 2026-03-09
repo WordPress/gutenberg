@@ -4,9 +4,21 @@
 import useRegistry from '../registry-provider/use-registry';
 import type {
 	StoreDescriptor,
+	StoreNameOrDescriptor,
+	StoreRegistry,
+	StoreRegistryResult,
 	AnyConfig,
-	UseDispatchReturn,
+	ActionCreatorsOf,
+	DataRegistry,
 } from '../../types';
+
+function useDispatch(): DataRegistry[ 'dispatch' ];
+function useDispatch< S extends StoreDescriptor< AnyConfig > >(
+	storeDescriptor: S
+): ActionCreatorsOf< S >;
+function useDispatch(
+	storeNameOrDescriptor: StoreNameOrDescriptor
+): Record< string, ( ...args: any[] ) => any >;
 
 /**
  * A custom react hook returning the current registry dispatch actions creators.
@@ -54,20 +66,11 @@ import type {
  *
  * @return The dispatch function or action creators for the store.
  */
-const useDispatch = <
-	StoreNameOrDescriptor extends
-		| undefined
-		| string
-		| StoreDescriptor< AnyConfig > = undefined,
->(
-	storeNameOrDescriptor?: StoreNameOrDescriptor
-): UseDispatchReturn< StoreNameOrDescriptor > => {
+function useDispatch( storeNameOrDescriptor?: StoreNameOrDescriptor ) {
 	const { dispatch } = useRegistry();
-	return (
-		storeNameOrDescriptor === void 0
-			? dispatch
-			: dispatch( storeNameOrDescriptor as StoreDescriptor< AnyConfig > )
-	) as UseDispatchReturn< StoreNameOrDescriptor >;
-};
+	return storeNameOrDescriptor === undefined
+		? dispatch
+		: dispatch( storeNameOrDescriptor );
+}
 
 export default useDispatch;
