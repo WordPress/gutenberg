@@ -1122,6 +1122,7 @@ export const receiveRevisions =
 			type: 'RECEIVE_ITEM_REVISIONS',
 			key,
 			items: Array.isArray( records ) ? records : [ records ],
+			singleItem: ! Array.isArray( records ),
 			recordKey,
 			meta,
 			query,

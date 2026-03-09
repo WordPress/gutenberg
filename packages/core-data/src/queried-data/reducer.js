@@ -224,18 +224,22 @@ const receiveQueries = compose( [
 	// reducer tracks only a single query object.
 	onSubKey( 'stableKey' ),
 ] )( ( state = {}, action ) => {
-	const { type, page, perPage, key = DEFAULT_ENTITY_KEY } = action;
+	if ( action.type !== 'RECEIVE_ITEMS' ) {
+		return state;
+	}
 
-	if ( type !== 'RECEIVE_ITEMS' ) {
+	if ( action.singleItem ) {
 		return state;
 	}
 
 	return {
 		itemIds: getMergedItemIds(
 			state?.itemIds || [],
-			action.items.map( ( item ) => item?.[ key ] ).filter( Boolean ),
-			page,
-			perPage
+			action.items
+				.map( ( item ) => item?.[ action.key ?? DEFAULT_ENTITY_KEY ] )
+				.filter( Boolean ),
+			action.page,
+			action.perPage
 		),
 		meta: action.meta,
 	};

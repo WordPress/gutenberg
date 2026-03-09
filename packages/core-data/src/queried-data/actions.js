@@ -11,6 +11,7 @@ export function receiveItems( items, edits, meta ) {
 	return {
 		type: 'RECEIVE_ITEMS',
 		items: Array.isArray( items ) ? items : [ items ],
+		singleItem: ! Array.isArray( items ),
 		persistedEdits: edits,
 		meta,
 	};
