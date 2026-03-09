@@ -1,3 +1,5 @@
+/* @jsx createElement */
+
 /**
  * WordPress dependencies
  */
@@ -13,7 +15,7 @@ import {
 	type View,
 } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { createElement, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { blockDefault } from '@wordpress/icons';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -133,6 +135,8 @@ export default function BlockGuidelines() {
 		setIsOpen( true );
 	};
 
+	const shouldShowDataViewControls = rows.length > 5;
+
 	return (
 		<VStack spacing={ 4 } className="block-guidelines">
 			{ error && (
@@ -158,7 +162,15 @@ export default function BlockGuidelines() {
 					defaultLayouts={ {
 						list: {},
 					} }
-				></DataViews>
+				>
+					<VStack spacing={ 4 }>
+						{ shouldShowDataViewControls && (
+							<DataViews.Search label={ __( 'Search blocks' ) } />
+						) }
+						<DataViews.Layout />
+						{ shouldShowDataViewControls && <DataViews.Footer /> }
+					</VStack>
+				</DataViews>
 			) }
 			<Button
 				variant="primary"
