@@ -101,7 +101,7 @@ export default function BlockGuidelineModal( {
 				createSuccessNotice(
 					sprintf(
 						/* translators: %s: Block label. */
-						__( 'Block guideline "%s"' ),
+						__( 'Block guideline %s' ),
 						value ? 'saved' : 'removed'
 					),
 					{ type: 'snackbar' }
