@@ -584,7 +584,6 @@ function BlockListBlockProvider( props ) {
 
 				getBlockIndex,
 				isBlockMultiSelected,
-				isBlockSubtreeDisabled,
 				isBlockHighlighted,
 				__unstableIsFullySelected,
 				__unstableSelectionHasUnmergeableBlock,
@@ -710,9 +709,6 @@ function BlockListBlockProvider( props ) {
 					) && hasSelectedInnerBlock( clientId ),
 				blockApiVersion: blockType?.apiVersion || 1,
 				blockTitle: match?.title || blockType?.title,
-				isSubtreeDisabled:
-					blockEditingMode === 'disabled' &&
-					isBlockSubtreeDisabled( clientId ),
 				hasOverlay:
 					__unstableHasActiveBlockOverlayActive( clientId ) &&
 					! isDragging(),
@@ -788,7 +784,6 @@ function BlockListBlockProvider( props ) {
 		blockApiVersion,
 		blockType,
 		blockTitle,
-		isSubtreeDisabled,
 		hasOverlay,
 		initialPosition,
 		isHighlighted,
@@ -821,7 +816,6 @@ function BlockListBlockProvider( props ) {
 		blockType,
 		blockTitle,
 		isSelected,
-		isSubtreeDisabled,
 		hasOverlay,
 		initialPosition,
 		blockEditingMode,

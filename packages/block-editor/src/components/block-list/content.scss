@@ -143,6 +143,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 
 	&.is-editing-disabled {
 		pointer-events: none;
+		user-select: none;
 	}
 
 	&.has-negative-margin {

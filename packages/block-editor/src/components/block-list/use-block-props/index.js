@@ -86,7 +86,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		blockApiVersion,
 		blockTitle,
 		isSelected,
-		isSubtreeDisabled,
 		hasOverlay,
 		initialPosition,
 		blockEditingMode,
@@ -175,7 +174,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
-		inert: isSubtreeDisabled ? 'true' : undefined,
+		'aria-disabled': isEditingDisabled ? true : undefined,
 		className: clsx(
 			'block-editor-block-list__block',
 			{

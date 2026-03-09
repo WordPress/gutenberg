@@ -29,7 +29,11 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
-import { blockBindingsKey, isPreviewModeKey } from '../block-edit/context';
+import {
+	blockBindingsKey,
+	blockEditingModeKey,
+	isPreviewModeKey,
+} from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useMarkPersistent } from './use-mark-persistent';
@@ -127,6 +131,7 @@ export function RichTextWrapper(
 	const [ anchorElement, setAnchorElement ] = useState( null );
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
+	const blockEditingMode = context[ blockEditingModeKey ];
 	const blockBindings = context[ blockBindingsKey ];
 	const blockContext = useContext( BlockContext );
 	const registry = useRegistry();
@@ -268,7 +273,10 @@ export function RichTextWrapper(
 		isInsidePatternOverrides && ! hasOverrideEnabled;
 
 	const shouldDisableEditing =
-		readOnly || disableBoundBlock || shouldDisableForPattern;
+		readOnly ||
+		disableBoundBlock ||
+		shouldDisableForPattern ||
+		blockEditingMode === 'disabled';
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
