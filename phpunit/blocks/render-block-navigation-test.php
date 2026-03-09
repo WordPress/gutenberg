@@ -122,7 +122,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$html   = '<div><img src="a.jpg" /><img src="b.jpg" /></div>';
 		$result = gutenberg_block_core_navigation_set_overlay_image_fetch_priority( $html );
 		$tags   = new WP_HTML_Tag_Processor( $result );
-		$tags->next_tag( 'IMG' );
+		$this->assertTrue( $tags->next_tag( 'IMG' ) );
 		$this->assertSame( 'low', $tags->get_attribute( 'fetchpriority' ) );
 		$tags->next_tag( 'IMG' );
 		$this->assertSame( 'low', $tags->get_attribute( 'fetchpriority' ) );
