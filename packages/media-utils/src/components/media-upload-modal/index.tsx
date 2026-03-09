@@ -175,7 +175,6 @@ export function MediaUploadModal( {
 
 	const { createSuccessNotice, createErrorNotice, createInfoNotice } =
 		useDispatch( noticesStore );
-	// @ts-expect-error - invalidateResolution is not in the typed actions but is available at runtime
 	const { invalidateResolution } = useDispatch( coreStore );
 
 	// DataViews configuration - allow view updates

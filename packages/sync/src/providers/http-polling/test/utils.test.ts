@@ -570,13 +570,7 @@ describe( 'http-polling utils', () => {
 		} );
 
 		it( 'sends a POST request to the sync endpoint', async () => {
-			const mockResponse = {
-				ok: true,
-				json: jest.fn().mockResolvedValue( {
-					rooms: [],
-				} as never ),
-			};
-			mockApiFetch.mockResolvedValue( mockResponse );
+			mockApiFetch.mockResolvedValue( { rooms: [] } );
 
 			const payload = {
 				rooms: [
@@ -593,12 +587,8 @@ describe( 'http-polling utils', () => {
 			await postSyncUpdate( payload );
 
 			expect( mockApiFetch ).toHaveBeenCalledWith( {
-				body: JSON.stringify( payload ),
-				headers: {
-					'Content-Type': 'application/json',
-				},
+				data: payload,
 				method: 'POST',
-				parse: false,
 				path: '/wp-sync/v1/updates',
 			} );
 		} );
@@ -614,39 +604,23 @@ describe( 'http-polling utils', () => {
 					},
 				],
 			};
-			const mockResponse = {
-				ok: true,
-				json: jest.fn().mockResolvedValue( expectedResponse as never ),
-			};
-			mockApiFetch.mockResolvedValue( mockResponse );
+			mockApiFetch.mockResolvedValue( expectedResponse );
 
 			const result = await postSyncUpdate( { rooms: [] } );
 
 			expect( result ).toEqual( expectedResponse );
 		} );
 
-		it( 'throws an error when response is not ok', async () => {
-			const mockResponse = {
-				ok: false,
-				status: 500,
-			};
-			mockApiFetch.mockResolvedValue( mockResponse as never );
+		it( 'propagates errors from apiFetch', async () => {
+			mockApiFetch.mockRejectedValue( {
+				code: 'internal_server_error',
+				message: 'Internal Server Error',
+			} );
 
-			await expect( postSyncUpdate( { rooms: [] } ) ).rejects.toThrow(
-				'Sync update failed with status 500'
-			);
-		} );
-
-		it( 'throws an error for 401 status', async () => {
-			const mockResponse = {
-				ok: false,
-				status: 401,
-			};
-			mockApiFetch.mockResolvedValue( mockResponse as never );
-
-			await expect( postSyncUpdate( { rooms: [] } ) ).rejects.toThrow(
-				'Sync update failed with status 401'
-			);
+			await expect( postSyncUpdate( { rooms: [] } ) ).rejects.toEqual( {
+				code: 'internal_server_error',
+				message: 'Internal Server Error',
+			} );
 		} );
 
 		it( 'propagates network errors', async () => {

@@ -12,6 +12,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { createBlock, parse } from '@wordpress/blocks';
+import { EntityProvider } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
@@ -234,12 +235,20 @@ export default function RevisionsCanvas( { showDiff } ) {
 	);
 
 	return revision ? (
-		<ExperimentalBlockEditorProvider value={ blocks } settings={ settings }>
-			<DiffStyleOverrides showDiff={ showDiff } />
-			<div className="editor-revisions-canvas__content">
-				<CanvasContent showDiff={ showDiff } />
-			</div>
-		</ExperimentalBlockEditorProvider>
+		// EntityProvider without kind/type/id inherits those from the
+		// parent context. Only revisionId is added so that useEntityProp
+		// reads from the revision record instead of the current entity.
+		<EntityProvider revisionId={ revision.id }>
+			<ExperimentalBlockEditorProvider
+				value={ blocks }
+				settings={ settings }
+			>
+				<DiffStyleOverrides showDiff={ showDiff } />
+				<div className="editor-revisions-canvas__content">
+					<CanvasContent showDiff={ showDiff } />
+				</div>
+			</ExperimentalBlockEditorProvider>
+		</EntityProvider>
 	) : (
 		<div className="editor-revisions-canvas__loading">
 			<Spinner />

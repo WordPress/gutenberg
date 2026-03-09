@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
+import type { Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -9,6 +10,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { getSyncManager } from '../sync';
 import type {
 	PostEditorAwarenessState as ActiveCollaborator,
+	PostSaveEvent,
 	YDocDebugData,
 } from '../awareness/types';
 import type { SelectionState } from '../types';
@@ -155,4 +157,72 @@ export function useIsDisconnected(
 ): boolean {
 	return usePostEditorAwarenessState( postId, postType )
 		.isCurrentCollaboratorDisconnected;
+}
+
+/**
+ * Hook that subscribes to the CRDT state map and returns the most recent
+ * save event (timestamp + client ID). The state map is updated by
+ * `markEntityAsSaved` in `@wordpress/sync`
+ *
+ * @param postId   The ID of the post.
+ * @param postType The type of the post.
+ */
+export function useLastPostSave(
+	postId: number | null,
+	postType: string | null
+): PostSaveEvent | null {
+	const [ lastSave, setLastSave ] = useState< PostSaveEvent | null >( null );
+
+	useEffect( () => {
+		if ( null === postId || null === postType ) {
+			setLastSave( null );
+			return;
+		}
+
+		const awareness = getSyncManager()?.getAwareness< PostEditorAwareness >(
+			`postType/${ postType }`,
+			postId.toString()
+		);
+
+		if ( ! awareness ) {
+			setLastSave( null );
+			return;
+		}
+
+		awareness.setUp();
+
+		const stateMap = awareness.doc.getMap( 'state' );
+		const recordMap = awareness.doc.getMap( 'document' );
+
+		// Only notify for saves that occur after the observer is
+		// set up. This prevents false notifications when the Y.Doc
+		// syncs historical state on page load or peer reconnect.
+		const setupTime = Date.now();
+
+		const observer = ( event: Y.YMapEvent< unknown > ) => {
+			if ( event.keysChanged.has( 'savedAt' ) ) {
+				const savedAt = stateMap.get( 'savedAt' ) as number;
+				const savedByClientId = stateMap.get( 'savedBy' ) as number;
+
+				if (
+					typeof savedAt === 'number' &&
+					typeof savedByClientId === 'number' &&
+					savedAt > setupTime
+				) {
+					const postStatus = recordMap.get( 'status' ) as
+						| string
+						| undefined;
+					setLastSave( { savedAt, savedByClientId, postStatus } );
+				}
+			}
+		};
+
+		stateMap.observe( observer );
+
+		return () => {
+			stateMap.unobserve( observer );
+		};
+	}, [ postId, postType ] );
+
+	return lastSave;
 }

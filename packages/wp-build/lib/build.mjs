@@ -113,12 +113,27 @@ const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
 
+/**
+ * Interprets a configuration value as a boolean, where `"true"` and `"1"`
+ * are considered true while all other values are false.
+ *
+ * @param {string|undefined} value The configuration value to interpret.
+ * @return {boolean} Boolean interpretation of the given configuration value.
+ */
+const boolConfigVal = ( value ) => {
+	return (
+		value !== undefined && [ 'true', '1' ].includes( value.toLowerCase() )
+	);
+};
+
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
-		Boolean( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
+		boolConfigVal( process.env.IS_GUTENBERG_PLUGIN ) ||
+			boolConfigVal( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
 	),
 	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
-		Boolean( process.env.npm_package_config_IS_WORDPRESS_CORE )
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ||
+			boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE )
 	),
 };
 const getDefine = ( scriptDebug ) => ( {
@@ -228,6 +243,7 @@ function createStyleBundlingPlugins( workingDir ) {
 		// Handle CSS modules (.module.css and .module.scss)
 		sassPlugin( {
 			embedded: true,
+			sourceMap: false,
 			filter: /\.module\.(css|scss)$/,
 			transform: compileInlineStyle( { cssModules: true } ),
 			type: inlineStyle,
@@ -237,6 +253,7 @@ function createStyleBundlingPlugins( workingDir ) {
 		// Note: .module.css and .module.scss already handled by plugin above
 		sassPlugin( {
 			embedded: true,
+			sourceMap: false,
 			filter: /\.(css|scss)$/,
 			transform: compileInlineStyle(),
 			type: inlineStyle,
@@ -312,6 +329,16 @@ function transformPhpContent( content, transforms ) {
 	} = transforms;
 
 	content = content.toString();
+
+	/*
+	 * Transforms are used to modify PHP files that are committed to version
+	 * control in their wordpress-develop state (`wp_` function prefixes, `WP_`
+	 * class prefixes, etc.). When building for WordPress Core, it's not
+	 * necessary to perform these steps.
+	 */
+	if ( boolConfigVal( process.env.IS_WORDPRESS_CORE ) ) {
+		return content;
+	}
 
 	if ( prefixFunctions.length ) {
 		content = content.replace(
@@ -1769,11 +1796,23 @@ async function buildAll( baseUrlExpression ) {
 			id: page.id,
 			init: page.init || [],
 			title: page.title || undefined,
+			experimental: page.experimental || false,
 		};
 	} );
 
-	const pageData = normalizedPages.map( ( page ) => {
-		const pageRoutes = routes.filter( ( r ) => r.page === page.id );
+	// When building for WordPress Core, exclude experimental pages.
+	const isCoreBuild = Boolean(
+		process.env.npm_package_config_IS_WORDPRESS_CORE
+	);
+	const activePages = isCoreBuild
+		? normalizedPages.filter( ( page ) => ! page.experimental )
+		: normalizedPages;
+
+	const activePageIds = new Set( activePages.map( ( p ) => p.id ) );
+	const activeRoutes = routes.filter( ( r ) => activePageIds.has( r.page ) );
+
+	const pageData = activePages.map( ( page ) => {
+		const pageRoutes = activeRoutes.filter( ( r ) => r.page === page.id );
 		return {
 			slug: page.id,
 			routes: pageRoutes,
@@ -1838,8 +1877,8 @@ async function buildAll( baseUrlExpression ) {
 		generateScriptRegistrationPhp( scripts, phpReplacements ),
 		generateStyleRegistrationPhp( styles, phpReplacements ),
 		generateConstantsPhp( phpReplacements ),
-		generateRoutesRegistry( routes, phpReplacements ),
-		generateRoutesPhp( routes, phpReplacements ),
+		generateRoutesRegistry( activeRoutes, phpReplacements ),
+		generateRoutesPhp( activeRoutes, phpReplacements ),
 		generatePagesPhp( pageData, phpReplacements ),
 	] );
 	console.log( '   ✔ Generated build/build.php' );
@@ -2128,7 +2167,9 @@ async function main() {
 			},
 			'base-url': {
 				type: 'string',
-				default: 'plugin_dir_url( __FILE__ )',
+				default: boolConfigVal( process.env.IS_WORDPRESS_CORE )
+					? "includes_url( 'build/' )"
+					: 'plugin_dir_url( __FILE__ )',
 			},
 		},
 		strict: false,

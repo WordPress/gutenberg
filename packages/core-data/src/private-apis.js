@@ -6,6 +6,7 @@ import { RECEIVE_INTERMEDIATE_RESULTS } from './utils';
 import {
 	useActiveCollaborators,
 	useResolvedSelection,
+	useLastPostSave,
 } from './hooks/use-post-editor-awareness-state';
 import { lock } from './lock-unlock';
 import { retrySyncConnection } from './sync';
@@ -17,4 +18,5 @@ lock( privateApis, {
 	retrySyncConnection,
 	useActiveCollaborators,
 	useResolvedSelection,
+	useLastPostSave,
 } );
