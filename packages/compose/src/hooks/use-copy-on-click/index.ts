@@ -60,30 +60,29 @@ export default function useCopyOnClick(
 			return;
 		}
 
-		const handleClick = ( event: Event ) => {
+		const handleClick = async ( event: Event ) => {
 			const trigger = event.currentTarget as Element;
 			if ( ! trigger ) {
 				return;
 			}
-			copyToClipboard(
+			const success = await copyToClipboard(
 				typeof text === 'function' ? text() : text || '',
 				trigger
-			).then( ( success ) => {
-				if ( ! isActive ) {
-					return;
+			);
+			if ( ! isActive ) {
+				return;
+			}
+			if ( success ) {
+				clearSelection( trigger );
+				if ( timeout ) {
+					setHasCopied( true );
+					clearTimeout( timeoutId );
+					timeoutId = setTimeout(
+						() => setHasCopied( false ),
+						timeout
+					);
 				}
-				if ( success ) {
-					clearSelection( trigger );
-					if ( timeout ) {
-						setHasCopied( true );
-						clearTimeout( timeoutId );
-						timeoutId = setTimeout(
-							() => setHasCopied( false ),
-							timeout
-						);
-					}
-				}
-			} );
+			}
 		};
 
 		for ( const target of targets ) {
