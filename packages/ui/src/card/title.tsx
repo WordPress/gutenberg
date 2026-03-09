@@ -1,5 +1,12 @@
 import { mergeProps, useRender } from '@base-ui/react';
-import { forwardRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import {
+	forwardRef,
+	useContext,
+	useLayoutEffect,
+	useRef,
+} from '@wordpress/element';
+import { TitleTextContext } from './context';
 import styles from './style.module.css';
 import type { TitleProps } from './types';
 
@@ -8,13 +15,31 @@ import type { TitleProps } from './types';
  * prop to swap in a semantic heading element when appropriate.
  */
 export const Title = forwardRef< HTMLDivElement, TitleProps >(
-	function CardTitle( { render, ...props }, ref ) {
+	function CardTitle( { render, ...restProps }, forwardedRef ) {
+		const titleTextContext = useContext( TitleTextContext );
+		const internalRef = useRef< HTMLDivElement >( null );
+		const mergedRef = useMergeRefs( [ internalRef, forwardedRef ] );
+
+		// Sync the rendered text content to the parent context (used by
+		// CollapsibleCard to build the trigger's accessible label). Runs on
+		// every render so the label stays current if children change
+		// dynamically. The cost is a single `textContent` read plus a
+		// bail-out `setState` when the value hasn't changed.
+		useLayoutEffect( () => {
+			const text = internalRef.current?.textContent?.trim() || undefined;
+			titleTextContext?.setTitleText( text );
+			return () => titleTextContext?.setTitleText( undefined );
+		} );
+
 		const element = useRender( {
 			defaultTagName: 'div',
 			render,
-			ref,
+			ref: mergedRef,
 			// TODO: use `Text` component instead, when ready
-			props: mergeProps< 'div' >( { className: styles.title }, props ),
+			props: mergeProps< 'div' >(
+				{ className: styles.title },
+				restProps
+			),
 		} );
 
 		return element;

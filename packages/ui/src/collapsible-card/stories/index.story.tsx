@@ -106,6 +106,49 @@ export const Disabled: Story = {
 };
 
 /**
+ * Multiple collapsible cards in a vertical stack. Each toggle button
+ * derives its accessible name from the card's title, so screen reader
+ * users can distinguish between them.
+ */
+export const MultipleCards: Story = {
+	argTypes: { open: { control: false } },
+	render: ( { open: _open, ...restArgs } ) => (
+		<div
+			style={ {
+				display: 'flex',
+				flexDirection: 'column',
+				gap: 'var( --wpds-dimension-gap-lg )',
+			} }
+		>
+			<CollapsibleCard.Root { ...restArgs }>
+				<CollapsibleCard.Header>
+					<Card.Title>General settings</Card.Title>
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content>
+					<Text>Configure your general preferences here.</Text>
+				</CollapsibleCard.Content>
+			</CollapsibleCard.Root>
+			<CollapsibleCard.Root { ...restArgs }>
+				<CollapsibleCard.Header>
+					<Card.Title>Privacy</Card.Title>
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content>
+					<Text>Manage your privacy options.</Text>
+				</CollapsibleCard.Content>
+			</CollapsibleCard.Root>
+			<CollapsibleCard.Root { ...restArgs }>
+				<CollapsibleCard.Header>
+					<Card.Title>Notifications</Card.Title>
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content>
+					<Text>Choose which notifications you receive.</Text>
+				</CollapsibleCard.Content>
+			</CollapsibleCard.Root>
+		</div>
+	),
+};
+
+/**
  * Visual comparison: a `CollapsibleCard` (open) next to a regular `Card`
  * to verify identical spacing and layout.
  */

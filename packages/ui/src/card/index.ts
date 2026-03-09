@@ -5,3 +5,4 @@ import { FullBleed } from './full-bleed';
 import { Title } from './title';
 
 export { Root, Header, Content, FullBleed, Title };
+export { TitleTextContext } from './context';

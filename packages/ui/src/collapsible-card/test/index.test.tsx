@@ -87,23 +87,19 @@ describe( 'CollapsibleCard', () => {
 				</CollapsibleCard.Root>
 			);
 
+			const trigger = screen.getByRole( 'button', {
+				name: 'Expand or collapse Title',
+			} );
+
 			expect(
 				screen.queryByText( 'Toggle content' )
 			).not.toBeInTheDocument();
 
-			await user.click(
-				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
-				} )
-			);
+			await user.click( trigger );
 
 			expect( screen.getByText( 'Toggle content' ) ).toBeVisible();
 
-			await user.click(
-				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
-				} )
-			);
+			await user.click( trigger );
 
 			expect(
 				screen.queryByText( 'Toggle content' )
@@ -152,7 +148,7 @@ describe( 'CollapsibleCard', () => {
 
 			await user.click(
 				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
+					name: 'Expand or collapse Title',
 				} )
 			);
 
@@ -179,7 +175,7 @@ describe( 'CollapsibleCard', () => {
 
 			await user.click(
 				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
+					name: 'Expand or collapse Title',
 				} )
 			);
 
@@ -187,19 +183,90 @@ describe( 'CollapsibleCard', () => {
 		} );
 	} );
 
-	describe( 'trigger', () => {
-		it( 'renders a toggle button', () => {
+	describe( 'trigger accessible label', () => {
+		it( 'includes the Card.Title text in the trigger label', () => {
 			render(
 				<CollapsibleCard.Root>
 					<CollapsibleCard.Header>
-						<Card.Title>Title</Card.Title>
+						<Card.Title>Settings</Card.Title>
 					</CollapsibleCard.Header>
 				</CollapsibleCard.Root>
 			);
 
 			expect(
 				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
+					name: 'Expand or collapse Settings',
+				} )
+			).toBeVisible();
+		} );
+
+		it( 'uses a static label that does not change when toggled', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header>
+						<Card.Title>Settings</Card.Title>
+					</CollapsibleCard.Header>
+					<CollapsibleCard.Content>
+						<p>Content</p>
+					</CollapsibleCard.Content>
+				</CollapsibleCard.Root>
+			);
+
+			const trigger = screen.getByRole( 'button', {
+				name: 'Expand or collapse Settings',
+			} );
+			expect( trigger ).toHaveAttribute( 'aria-expanded', 'false' );
+
+			await user.click( trigger );
+
+			expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
+			expect( trigger ).toHaveAccessibleName(
+				'Expand or collapse Settings'
+			);
+		} );
+
+		it( 'falls back to header content when no Card.Title is used', () => {
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header>
+						<span>Plain header text</span>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Expand or collapse Plain header text',
+				} )
+			).toBeVisible();
+		} );
+
+		it( 'produces unique labels for multiple cards', () => {
+			render(
+				<>
+					<CollapsibleCard.Root>
+						<CollapsibleCard.Header>
+							<Card.Title>General</Card.Title>
+						</CollapsibleCard.Header>
+					</CollapsibleCard.Root>
+					<CollapsibleCard.Root>
+						<CollapsibleCard.Header>
+							<Card.Title>Privacy</Card.Title>
+						</CollapsibleCard.Header>
+					</CollapsibleCard.Root>
+				</>
+			);
+
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Expand or collapse General',
+				} )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Expand or collapse Privacy',
 				} )
 			).toBeVisible();
 		} );

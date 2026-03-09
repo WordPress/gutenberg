@@ -1,10 +1,18 @@
 import { Collapsible } from '@base-ui/react/collapsible';
 import clsx from 'clsx';
 import type { MouseEvent } from 'react';
-import { forwardRef, useCallback, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import {
+	forwardRef,
+	useCallback,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown, chevronUp } from '@wordpress/icons';
 import * as Card from '../card';
+import { TitleTextContext } from '../card';
 import { IconButton } from '../icon-button';
 import styles from './style.module.css';
 import type { HeaderProps } from './types';
@@ -24,6 +32,30 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 		ref
 	) {
 		const triggerRef = useRef< HTMLButtonElement >( null );
+		const headerContentRef = useRef< HTMLDivElement >( null );
+		const [ titleText, setTitleText ] = useState< string >();
+		const [ headerText, setHeaderText ] = useState< string >();
+		const titleTextContextValue = useMemo( () => ( { setTitleText } ), [] );
+
+		// Fallback: read the header content's text when no Card.Title is
+		// present. When a Card.Title is used, its own effect keeps the label
+		// in sync (including dynamic updates); this only covers the uncommon
+		// case of a header without a Card.Title.
+		useLayoutEffect( () => {
+			if ( titleText === undefined ) {
+				const text = headerContentRef.current?.textContent?.trim();
+				setHeaderText( text || undefined );
+			}
+		}, [ titleText ] );
+
+		const identifierText = titleText ?? headerText;
+		const triggerLabel = identifierText
+			? sprintf(
+					/* translators: %s: title of the card being expanded or collapsed */
+					__( 'Expand or collapse %s' ),
+					identifierText
+			  )
+			: __( 'Expand or collapse' );
 
 		const handleHeaderClick = useCallback(
 			( event: MouseEvent< HTMLDivElement > ) => {
@@ -48,14 +80,21 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 				onClick={ handleHeaderClick }
 				{ ...restProps }
 			>
-				<div className={ styles[ 'header-content' ] }>{ children }</div>
+				<TitleTextContext.Provider value={ titleTextContextValue }>
+					<div
+						ref={ headerContentRef }
+						className={ styles[ 'header-content' ] }
+					>
+						{ children }
+					</div>
+				</TitleTextContext.Provider>
 				<div className={ styles[ 'header-trigger-wrapper' ] }>
 					<Collapsible.Trigger
 						ref={ triggerRef }
 						render={ ( props, state ) => (
 							<IconButton
 								{ ...props }
-								label={ __( 'Expand or collapse card' ) }
+								label={ triggerLabel }
 								icon={ state.open ? chevronUp : chevronDown }
 								variant="minimal"
 								tone="neutral"
