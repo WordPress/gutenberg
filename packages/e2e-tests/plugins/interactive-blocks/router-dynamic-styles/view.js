@@ -1,120 +1,100 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { store } from '@wordpress/interactivity';
+import { store, getElement } from '@wordpress/interactivity';
 
 const PLUGIN_STYLE_ID = 'test-router-plugin-style';
-
-/**
- * Access the router's reactive state so our computed getters re-evaluate
- * automatically after every SPA navigation.
- *
- * `routerState.url` is updated inside the same `batch()` that calls
- * `renderPage()`. Because `applyStyles()` runs before that batch flushes,
- * any getter that reads `routerState.url` will observe the post-applyStyles
- * DOM state when it is re-evaluated.
- */
-const { state: routerState } = store( 'core/router', {} );
 
 const { state } = store( 'test/router-dynamic-styles', {
 	state: {
 		/**
-		 * Internal toggle flipped by activateDeferredStyle(). Forces the
-		 * deferredStyleStatus getter to re-evaluate on click, since clicking
-		 * does not change routerState.url.
+		 * "active" | "inactive". Written by activateDeferredStyle() and
+		 * re-synchronised from the real DOM by init() on every SPA mount.
 		 *
-		 * @type {boolean}
+		 * Must be a plain reactive field, not a DOM getter: raw DOM reads are
+		 * not tracked by Preact's signal system, so a getter would be evaluated
+		 * once at hydration and never again, leaving the span stuck at "inactive".
 		 */
-		_deferredActivated: false,
+		deferredStyleStatus: 'inactive',
 
 		/**
-		 * Internal flag set by init() after the plugin style is injected.
-		 * Forces pluginStyleStatus to re-evaluate after the element appears,
-		 * since injection does not change routerState.url.
-		 *
-		 * @type {boolean}
+		 * "active" | "inactive". Written by init() on every SPA mount.
+		 * Plain reactive field for the same reason as deferredStyleStatus.
 		 */
-		_pluginStyleInjected: false,
-
-		/**
-		 * "active" | "inactive". Computed getter that reads the real DOM on
-		 * every SPA navigation (via routerState.url) and on every click of
-		 * "activate-deferred-style" (via state._deferredActivated).
-		 *
-		 * Reading routerState.url establishes a Preact signal dependency: the
-		 * router sets url inside the same batch as applyStyles(), so when the
-		 * signal fires the DOM already reflects the post-applyStyles state.
-		 *
-		 * @return {"active"|"inactive"} Whether the deferred stylesheet is active.
-		 */
-		get deferredStyleStatus() {
-			// Establish reactive dependencies so getter re-runs on nav + click.
-			void routerState.url;
-			void state._deferredActivated;
-
-			const el = document.getElementById(
-				'test-router-deferred-style'
-			);
-			return el?.sheet && ! el.sheet.disabled && el.media !== 'not all'
-				? 'active'
-				: 'inactive';
-		},
-
-		/**
-		 * "active" | "inactive". Computed getter that reads the real DOM on
-		 * every SPA navigation (via routerState.url) and after init() injects
-		 * the element (via state._pluginStyleInjected).
-		 *
-		 * @return {"active"|"inactive"} Whether the plugin stylesheet is present.
-		 */
-		get pluginStyleStatus() {
-			// Establish reactive dependencies.
-			void routerState.url;
-			void state._pluginStyleInjected;
-
-			const el = document.getElementById( PLUGIN_STYLE_ID );
-			return el?.sheet && ! el.sheet.disabled ? 'active' : 'inactive';
-		},
+		pluginStyleStatus: 'inactive',
 	},
 
 	actions: {
 		/**
 		 * Bug A fixture — activates the deferred stylesheet.
 		 *
-		 * Sets element.media from "not all" to "all", then toggles
-		 * state._deferredActivated so the deferredStyleStatus getter
-		 * re-evaluates and the span re-renders immediately.
+		 * Mutates media from "not all" to "all" on the inline style element, then
+		 * writes the reactive signal so data-wp-text re-renders immediately.
 		 */
 		activateDeferredStyle() {
-			const el = document.getElementById(
-				'test-router-deferred-style'
-			);
+			const el = document.getElementById( 'test-router-deferred-style' );
 			if ( el ) {
 				el.media = 'all';
-				state._deferredActivated = ! state._deferredActivated;
+				state.deferredStyleStatus = 'active';
 			}
+		},
+
+		/**
+		 * SPA navigation action — intercepts the anchor click and delegates to
+		 * the iAPI router's navigate() so the router performs a client-side
+		 * navigation instead of a full page reload.
+		 *
+		 * Without this, plain <a href="..."> links inside the router region
+		 * would cause a full page reload, resetting all reactive state and
+		 * making it impossible to verify that applyStyles() preserved the
+		 * activated stylesheet across navigation.
+		 *
+		 * Uses a generator function so the dynamic import of
+		 * @wordpress/interactivity-router can be yielded (iAPI async pattern).
+		 *
+		 * @param {MouseEvent} event The click event from data-wp-on--click.
+		 */
+		*navigate( event ) {
+			event.preventDefault();
+			const { ref } = getElement();
+			const { actions } = yield import( '@wordpress/interactivity-router' );
+			yield actions.navigate( ref.href );
 		},
 	},
 
 	callbacks: {
 		/**
-		 * Runs once on initial mount (data-wp-init = useEffect([], [])).
+		 * Runs on every SPA page mount (data-wp-init).
 		 *
-		 * Bug B: injects the plugin-style element idempotently, then sets
-		 *   state._pluginStyleInjected = true so pluginStyleStatus
-		 *   re-evaluates and the span re-renders immediately.
+		 * Execution order per navigation:
+		 *   1. applyStyles()  — router enables / disables sheets.
+		 *   2. iAPI re-initialises directives, calling this callback.
 		 *
-		 * deferredStyleStatus is handled entirely by the computed getter —
-		 * no DOM sync needed here.
+		 * Reading the DOM here therefore always reflects the post-applyStyles
+		 * state, allowing both signals to be synchronised accurately.
+		 *
+		 * Bug B: injects the plugin-style element on first mount; subsequent
+		 *   mounts confirm it survived applyStyles() without being disabled.
+		 *
+		 * Bug A: re-reads sheet.disabled so deferredStyleStatus reflects whether
+		 *   applyStyles() correctly preserved the activated sheet.
 		 */
 		init() {
+			// Bug B — idempotent plugin-style injection.
 			if ( ! document.getElementById( PLUGIN_STYLE_ID ) ) {
 				const style = document.createElement( 'style' );
 				style.id = PLUGIN_STYLE_ID;
 				style.textContent = 'body { --test-plugin-style: 1; }';
 				document.head.appendChild( style );
 			}
-			state._pluginStyleInjected = true;
+			state.pluginStyleStatus = 'active';
+
+			// Bug A — re-sync deferred status after applyStyles().
+			const el = document.getElementById( 'test-router-deferred-style' );
+			state.deferredStyleStatus =
+				el?.sheet && ! el.sheet.disabled && el.media !== 'not all'
+					? 'active'
+					: 'inactive';
 		},
 	},
 } );
