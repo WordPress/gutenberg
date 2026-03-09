@@ -155,8 +155,12 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 		);
 
 		// Back to A (cached page).
+		// waitForURL ensures the iAPI router's popstate handler has
+		// committed the navigation before we assert on the DOM.
 		await page.goBack();
+		await page.waitForURL( utils.getLink( 'router-dynamic-styles-b' ) );
 		await page.goBack();
+		await page.waitForURL( utils.getLink( 'router-dynamic-styles-a' ) );
 		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
 			'active'
 		);
