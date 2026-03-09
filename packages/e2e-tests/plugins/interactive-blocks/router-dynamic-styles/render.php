@@ -57,7 +57,7 @@ $link_b = $find_url( $base_alias . '-b' );
 $link_c = $find_url( $base_alias . '-c' );
 ?>
 
-<!-- Trigger style for deferred stylesheet test. Placed OUTSIDE the router region to ensure survival during navigation. -->
+<!-- Bug A fixture: deferred style outside router region, survives navigation. -->
 <style id="test-router-deferred-style" media="not all">body { --test-deferred-active: 1; }</style>
 
 <div
