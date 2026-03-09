@@ -25,7 +25,7 @@
 					"oneOf": [
 						{
 							"type": "string",
-							"pattern": "^[0-9]+\\.[0-9]+$"
+							"pattern": "^[0-9]+(?:\\.[0-9]+)*$"
 						},
 						{
 							"type": "null"
@@ -52,7 +52,7 @@
 				"port": {
 					"description": "The primary port number to use for the installation. You'll access the instance through the port: http://localhost:8888",
 					"type": "integer",
-					"minimum": 1,
+					"minimum": 0,
 					"maximum": 65535,
 					"default": 8888
 				},
@@ -61,7 +61,7 @@
 					"oneOf": [
 						{
 							"type": "integer",
-							"minimum": 1,
+							"minimum": 0,
 							"maximum": 65535
 						},
 						{
@@ -95,7 +95,7 @@
 					"oneOf": [
 						{
 							"type": "integer",
-							"minimum": 1,
+							"minimum": 0,
 							"maximum": 65535
 						},
 						{
@@ -156,7 +156,7 @@
 				"testsPort": {
 					"description": "The port number for the test site. You'll access the instance through the port: http://localhost:8889",
 					"type": "integer",
-					"minimum": 1,
+					"minimum": 0,
 					"maximum": 65535,
 					"default": 8889
 				},
