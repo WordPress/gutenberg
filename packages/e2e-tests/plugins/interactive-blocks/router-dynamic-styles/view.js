@@ -54,13 +54,13 @@ const { state } = store( 'test/router-dynamic-styles', {
 		 *
 		 * @param {MouseEvent} event The click event from data-wp-on--click.
 		 */
-		*navigate(event) {
+		*navigate( event ) {
 			event.preventDefault();
 			const { ref } = getElement();
 			const { actions } = yield import(
 				'@wordpress/interactivity-router'
 			);
-			yield actions.navigate(ref.href);
+			yield actions.navigate( ref.href );
 		},
 	},
 
