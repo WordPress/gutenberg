@@ -6,7 +6,10 @@
 import {
 	Button,
 	Icon,
+	Modal,
 	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { Notice } from '@wordpress/ui';
 import {
@@ -19,6 +22,7 @@ import { createElement, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { blockDefault } from '@wordpress/icons';
 import { store as blocksStore } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -41,6 +45,11 @@ const initialView: View = {
 		density: 'compact',
 	},
 };
+
+interface DataRow {
+	id: string;
+	label: string;
+}
 
 const fields = [
 	{
@@ -66,6 +75,11 @@ export default function BlockGuidelines() {
 	const [ view, setView ] = useState< View >( initialView );
 	const [ selectedItem, setSelectedItem ] = useState< string >();
 	const [ error, setError ] = useState< string | null >( null );
+	const [ busy, setBusy ] = useState( false );
+	const [ itemToDelete, setItemToDelete ] = useState< DataRow | null >(
+		null
+	);
+	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const blockGuidelines = useSelect(
 		// @ts-ignore
@@ -110,15 +124,30 @@ export default function BlockGuidelines() {
 				label: __( 'Remove' ),
 				callback: ( items ) => {
 					const item = items[ 0 ];
-					setBlockGuideline( item.id, '' );
-					saveContentGuidelines()
-						.then( () => setError( null ) )
-						.catch( ( e: Error ) => setError( e.message ) );
+					setItemToDelete( item );
 				},
 			},
 		],
-		[ setBlockGuideline ]
+		[ setItemToDelete ]
 	);
+
+	const handleDelete = () => {
+		if ( ! itemToDelete ) {
+			return;
+		}
+		setBlockGuideline( itemToDelete.id, '' );
+		setBusy( true );
+		saveContentGuidelines()
+			.then( () => {
+				setError( null );
+				setItemToDelete( null );
+				createSuccessNotice( __( 'Block guidelines removed.' ), {
+					type: 'snackbar',
+				} );
+			} )
+			.catch( ( e: Error ) => setError( e.message ) )
+			.finally( () => setBusy( false ) );
+	};
 
 	const { data: processedData, paginationInfo } = useMemo(
 		() => filterSortAndPaginate( rows, view, fields ),
@@ -185,6 +214,54 @@ export default function BlockGuidelines() {
 					closeModal={ closeModal }
 					initialBlock={ selectedItem }
 				/>
+			) }
+			{ itemToDelete && (
+				<Modal
+					className="block-guidelines__remove-modal"
+					title={ __( 'Remove block guidelines' ) }
+					onRequestClose={ () => setItemToDelete( null ) }
+					size="small"
+				>
+					<VStack spacing={ 6 }>
+						<VStack spacing={ 4 }>
+							<Text size={ 13 } weight={ 400 }>
+								{ sprintf(
+									/* translators: %s: Block name. */
+									__(
+										'You are about to remove the block guidelines for the %s block.'
+									),
+									itemToDelete.label
+								) }
+							</Text>
+							<Text size={ 13 } weight={ 400 }>
+								{ __(
+									'This can be undone from revision history.'
+								) }
+							</Text>
+						</VStack>
+						<HStack justify="flex-end">
+							<Button
+								variant="tertiary"
+								onClick={ () => setItemToDelete( null ) }
+								disabled={ busy }
+								accessibleWhenDisabled
+							>
+								{ __( 'Cancel' ) }
+							</Button>
+							<Button
+								disabled={ busy }
+								accessibleWhenDisabled
+								isBusy={ busy }
+								variant="primary"
+								onClick={ handleDelete }
+								isDestructive
+								__next40pxDefaultSize
+							>
+								{ __( 'Remove' ) }
+							</Button>
+						</HStack>
+					</VStack>
+				</Modal>
 			) }
 		</VStack>
 	);

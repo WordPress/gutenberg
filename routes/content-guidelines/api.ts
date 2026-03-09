@@ -3,8 +3,6 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { dispatch, select } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -70,8 +68,6 @@ export async function saveContentGuidelines(): Promise< RestGuidelinesResponse >
 		},
 	};
 
-	const { createSuccessNotice } = dispatch( noticesStore );
-
 	const path = id
 		? `/wp/v2/content-guidelines/${ id }`
 		: '/wp/v2/content-guidelines';
@@ -84,10 +80,6 @@ export async function saveContentGuidelines(): Promise< RestGuidelinesResponse >
 	} ) ) as RestGuidelinesResponse;
 
 	setFromResponse( response );
-
-	createSuccessNotice( __( 'Content guidelines saved.' ), {
-		type: 'snackbar',
-	} );
 
 	return response;
 }
