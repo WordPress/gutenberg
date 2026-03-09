@@ -104,6 +104,10 @@
 	z-index: 1;
 	position: absolute;
 
+	@media not (prefers-reduced-motion) {
+		transition: color 0.1s ease-out, background-color 0.1s ease-out;
+	}
+
 	&:hover {
 		color: $gray-900;
 		background-color: transparent;
