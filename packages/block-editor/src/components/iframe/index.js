@@ -132,6 +132,9 @@ function getIframeSrc( resolvedAssets ) {
 		${ resolvedAssets.styles ?? '' }
 		${ resolvedAssets.scripts ?? '' }
 	</head>
+	<body>
+		<script>document.currentScript.parentElement.remove()</script>
+	</body>
 </html>`;
 
 	src = URL.createObjectURL( new Blob( [ html ], { type: 'text/html' } ) );
