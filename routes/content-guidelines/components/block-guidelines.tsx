@@ -207,13 +207,11 @@ export default function BlockGuidelines() {
 					</VStack>
 				</DataViews>
 			) }
-			<Button
-				variant="primary"
-				onClick={ openModal }
-				className="block-guidelines__add-button"
-			>
-				{ __( 'Add block guidelines' ) }
-			</Button>
+			<HStack>
+				<Button variant="primary" onClick={ openModal }>
+					{ __( 'Add block guidelines' ) }
+				</Button>
+			</HStack>
 
 			{ isOpen && (
 				<BlockGuidelineModal
