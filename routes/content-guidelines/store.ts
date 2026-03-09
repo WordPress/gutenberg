@@ -115,10 +115,6 @@ function reducer(
 				[ action.blockName ]: action.value,
 			};
 
-			if ( ! action.value ) {
-				delete blocks[ action.blockName ];
-			}
-
 			return {
 				...state,
 				categories: {
