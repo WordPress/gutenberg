@@ -140,7 +140,7 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 
 				/*
 				 * Set all IMG tags to be `fetchpriority=auto` so that wp_get_loading_optimization_attributes() won't add
-				 * `fetchpriority=high` or increment the media count to effect whether subsequent IMG tags get `loading=lazy`.
+				 * `fetchpriority=high` or increment the media count to affect whether subsequent IMG tags get `loading=lazy`.
 				 */
 				do {
 					if ( 'IMG' === $processor->get_tag() ) {
