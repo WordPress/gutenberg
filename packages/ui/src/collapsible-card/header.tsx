@@ -1,6 +1,6 @@
 import { Collapsible } from '@base-ui/react/collapsible';
 import clsx from 'clsx';
-import type { MouseEvent } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 import {
 	forwardRef,
 	useCallback,
@@ -18,6 +18,40 @@ import styles from './style.module.css';
 import type { HeaderProps } from './types';
 
 /**
+ * Tracks the title text from a Card.Title child (via TitleTextContext) and
+ * falls back to the full header content text when no Card.Title is present.
+ * Returns the context provider value, a ref for the header content wrapper,
+ * and the composed trigger label.
+ */
+function useTriggerLabel( children: ReactNode ) {
+	const headerContentRef = useRef< HTMLDivElement >( null );
+	const [ titleText, setTitleText ] = useState< string >();
+	const [ headerText, setHeaderText ] = useState< string >();
+	const titleTextContextValue = useMemo( () => ( { setTitleText } ), [] );
+
+	// Fallback: read the header content's text when no Card.Title is
+	// present. `children` is listed as a dependency so the label
+	// re-syncs when the header content changes.
+	useLayoutEffect( () => {
+		if ( titleText === undefined ) {
+			const text = headerContentRef.current?.textContent?.trim();
+			setHeaderText( text || undefined );
+		}
+	}, [ titleText, children ] );
+
+	const identifierText = titleText ?? headerText;
+	const triggerLabel = identifierText
+		? sprintf(
+				/* translators: %s: title of the card being expanded or collapsed */
+				__( 'Expand or collapse %s' ),
+				identifierText
+		  )
+		: __( 'Expand or collapse' );
+
+	return { titleTextContextValue, headerContentRef, triggerLabel };
+}
+
+/**
  * The header of a collapsible card. Always visible, and acts as the
  * toggle trigger — clicking anywhere on it expands or collapses the
  * card's content.
@@ -32,29 +66,8 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 		ref
 	) {
 		const triggerRef = useRef< HTMLButtonElement >( null );
-		const headerContentRef = useRef< HTMLDivElement >( null );
-		const [ titleText, setTitleText ] = useState< string >();
-		const [ headerText, setHeaderText ] = useState< string >();
-		const titleTextContextValue = useMemo( () => ( { setTitleText } ), [] );
-
-		// Fallback: read the header content's text when no Card.Title is
-		// present. `children` is listed as a dependency so the label
-		// re-syncs when the header content changes.
-		useLayoutEffect( () => {
-			if ( titleText === undefined ) {
-				const text = headerContentRef.current?.textContent?.trim();
-				setHeaderText( text || undefined );
-			}
-		}, [ titleText, children ] );
-
-		const identifierText = titleText ?? headerText;
-		const triggerLabel = identifierText
-			? sprintf(
-					/* translators: %s: title of the card being expanded or collapsed */
-					__( 'Expand or collapse %s' ),
-					identifierText
-			  )
-			: __( 'Expand or collapse' );
+		const { titleTextContextValue, headerContentRef, triggerLabel } =
+			useTriggerLabel( children );
 
 		const handleHeaderClick = useCallback(
 			( event: MouseEvent< HTMLDivElement > ) => {
