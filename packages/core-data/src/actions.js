@@ -100,12 +100,11 @@ export function receiveEntityRecords(
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
 	if ( kind === 'postType' ) {
-		records = ( Array.isArray( records ) ? records : [ records ] ).map(
-			( record ) =>
-				record.status === 'auto-draft'
-					? { ...record, title: '' }
-					: record
-		);
+		const mapAutoDraft = ( record ) =>
+			record.status === 'auto-draft' ? { ...record, title: '' } : record;
+		records = Array.isArray( records )
+			? records.map( mapAutoDraft )
+			: mapAutoDraft( records );
 	}
 	let action;
 	if ( query ) {
@@ -1121,8 +1120,7 @@ export const receiveRevisions =
 		dispatch( {
 			type: 'RECEIVE_ITEM_REVISIONS',
 			key,
-			items: Array.isArray( records ) ? records : [ records ],
-			singleItem: ! Array.isArray( records ),
+			items: records,
 			recordKey,
 			meta,
 			query,

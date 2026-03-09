@@ -105,11 +105,14 @@ export function items( state = {}, action ) {
 		case 'RECEIVE_ITEMS': {
 			const context = getContextFromAction( action );
 			const key = action.key || DEFAULT_ENTITY_KEY;
+			const actionItems = Array.isArray( action.items )
+				? action.items
+				: [ action.items ];
 			return {
 				...state,
 				[ context ]: {
 					...state[ context ],
-					...action.items.reduce( ( accumulator, value ) => {
+					...actionItems.reduce( ( accumulator, value ) => {
 						const itemId = value?.[ key ];
 
 						accumulator[ itemId ] = conservativeMapItem(
@@ -149,6 +152,9 @@ export function itemIsComplete( state = {}, action ) {
 		case 'RECEIVE_ITEMS': {
 			const context = getContextFromAction( action );
 			const { query, key = DEFAULT_ENTITY_KEY } = action;
+			const actionItems = Array.isArray( action.items )
+				? action.items
+				: [ action.items ];
 
 			// An item is considered complete if it is received without an associated
 			// fields query. Ideally, this would be implemented in such a way where the
@@ -164,7 +170,7 @@ export function itemIsComplete( state = {}, action ) {
 				...state,
 				[ context ]: {
 					...state[ context ],
-					...action.items.reduce( ( result, item ) => {
+					...actionItems.reduce( ( result, item ) => {
 						const itemId = item?.[ key ];
 
 						// Defer to completeness if already assigned. Technically the
@@ -228,7 +234,7 @@ const receiveQueries = compose( [
 		return state;
 	}
 
-	if ( action.singleItem ) {
+	if ( ! Array.isArray( action.items ) ) {
 		return state;
 	}
 

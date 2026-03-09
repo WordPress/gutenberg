@@ -214,8 +214,11 @@ function entity( entityConfig ) {
 						}
 
 						const nextState = { ...state };
+						const actionItems = Array.isArray( action.items )
+							? action.items
+							: [ action.items ];
 
-						for ( const record of action.items ) {
+						for ( const record of actionItems ) {
 							const recordId = record?.[ action.key ];
 							const edits = nextState[ recordId ];
 							if ( ! edits ) {
