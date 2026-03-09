@@ -306,7 +306,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'background_style'    => array(
 					'backgroundClip' => 'text',
 				),
-				'expected_wrapper'    => '<div class="has-background" style="background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Content</div>',
+				'expected_wrapper'    => '<div style="background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
 			'background clip style is applied for block with only backgroundClip support' => array(
