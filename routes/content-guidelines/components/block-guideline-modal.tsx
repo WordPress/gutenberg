@@ -1,3 +1,5 @@
+/* @jsx createElement */
+
 /**
  * WordPress dependencies
  */
@@ -5,13 +7,14 @@ import {
 	Button,
 	ComboboxControl,
 	Modal,
+	TextControl,
 	TextareaControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Notice } from '@wordpress/ui';
-import { useState, useEffect } from '@wordpress/element';
+import { createElement, useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 
@@ -31,7 +34,6 @@ export default function BlockGuidelineModal( {
 	closeModal,
 	initialBlock,
 }: BlockGuidelineModalProps ) {
-	const [ guidelineText, setGuidelineText ] = useState( '' );
 	const [ selectedBlock, setSelectedBlock ] = useState< string | undefined >(
 		initialBlock
 	);
@@ -39,26 +41,42 @@ export default function BlockGuidelineModal( {
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ error, setError ] = useState< string | null >( null );
 
-	const currentGuideline = useSelect(
+	const blockGuidelines = useSelect(
 		// @ts-ignore
-		( select ) => select( STORE_NAME ).getBlockGuideline( selectedBlock ),
-		[ selectedBlock ]
+		( select ) => select( STORE_NAME ).getBlockGuidelines(),
+		[]
 	);
 
-	const isEditing = !! currentGuideline;
+	const isEditing = !! initialBlock;
 
-	useEffect( () => {
-		setSelectedBlock( initialBlock );
-	}, [ initialBlock ] );
-
-	useEffect( () => {
-		setGuidelineText( currentGuideline ?? '' );
-	}, [ currentGuideline ] );
+	const currentGuideline = blockGuidelines[ selectedBlock ] ?? '';
+	const [ guidelineText, setGuidelineText ] = useState( currentGuideline );
 
 	const blockOptions = useSelect(
 		// @ts-ignore
 		( select ) => select( blocksStore ).getBlockTypes(),
 		[]
+	);
+
+	const availableBlockOptions = useMemo( () => {
+		const set = new Set( Object.keys( blockGuidelines ) );
+		if ( initialBlock ) {
+			set.delete( initialBlock );
+		}
+
+		return blockOptions
+			.filter( ( block ) => ! set.has( block.name ) )
+			.map( ( block ) => ( {
+				value: block.name,
+				label: block.title,
+			} ) );
+	}, [ blockGuidelines, blockOptions, initialBlock ] );
+
+	const selectedBlockLabel = useMemo(
+		() =>
+			blockOptions.find( ( block ) => block.name === selectedBlock )
+				?.title || '',
+		[ blockOptions, selectedBlock ]
 	);
 
 	const { setBlockGuideline } = useDispatch( STORE_NAME );
@@ -116,19 +134,26 @@ export default function BlockGuidelineModal( {
 			onRequestClose={ closeModal }
 		>
 			<VStack spacing={ 4 }>
-				<ComboboxControl
-					__next40pxDefaultSize
-					label={ __( 'Block' ) }
-					options={ blockOptions.map( ( block ) => ( {
-						value: block.name,
-						label: block.title,
-					} ) ) }
-					value={ selectedBlock }
-					onChange={ ( value ) =>
-						setSelectedBlock( value ?? undefined )
-					}
-					placeholder={ __( 'Search for a block…' ) }
-				/>
+				{ isEditing ? (
+					<TextControl
+						__next40pxDefaultSize
+						label={ __( 'Block' ) }
+						value={ selectedBlockLabel }
+						onChange={ () => {} }
+						disabled
+					/>
+				) : (
+					<ComboboxControl
+						__next40pxDefaultSize
+						label={ __( 'Block' ) }
+						options={ availableBlockOptions }
+						value={ selectedBlock }
+						onChange={ ( value ) =>
+							setSelectedBlock( value ?? undefined )
+						}
+						placeholder={ __( 'Search for a block…' ) }
+					/>
+				) }
 				<TextareaControl
 					label={ __( 'Guideline text' ) }
 					value={ guidelineText }
