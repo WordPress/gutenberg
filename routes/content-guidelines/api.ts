@@ -20,10 +20,6 @@ import type {
 
 const FLAT_CATEGORIES = [ 'site', 'copy', 'images', 'additional' ] as const;
 
-function getErrorMessage( error: unknown ): string {
-	return error instanceof Error ? error.message : __( 'Unknown error.' );
-}
-
 function isValidGuidelinesImport(
 	data: unknown
 ): data is GuidelinesImportData {
@@ -117,9 +113,11 @@ export async function saveContentGuidelines(): Promise< RestGuidelinesResponse >
  */
 export async function importContentGuidelines( file: File ): Promise< void > {
 	// @ts-ignore
-	const { setGuideline } = dispatch( STORE_NAME );
+	const { setGuideline, setBlockGuideline } = dispatch( STORE_NAME );
+	const { createSuccessNotice } = dispatch( noticesStore );
 
-	const parsed: unknown = JSON.parse( await file.text() );
+	try {
+		const parsed: unknown = JSON.parse( await file.text() );
 
 		if ( ! isValidGuidelinesImport( parsed ) ) {
 			throw new Error( __( 'Invalid file format.' ) );
@@ -135,29 +133,27 @@ export async function importContentGuidelines( file: File ): Promise< void > {
 			}
 		} );
 
-		await saveContentGuidelines();
-	} catch ( e: unknown ) {
-		createErrorNotice(
-			sprintf(
-				/* translators: %s: Error message. */
-				__( 'Failed to import content guidelines: %s' ),
-				getErrorMessage( e )
-			),
-			{ type: 'snackbar' }
-		);
-	}
-
-	const { guideline_categories: contentGuidelinesCategories } = parsed;
-
-	CATEGORIES.forEach( ( guidelineCategory ) => {
-		const guidelines =
-			contentGuidelinesCategories[ guidelineCategory ]?.guidelines;
-		if ( typeof guidelines === 'string' ) {
-			setGuideline( guidelineCategory, guidelines );
+		const blocksData = contentGuidelinesCategories.blocks;
+		if ( blocksData && typeof blocksData === 'object' ) {
+			Object.entries( blocksData ).forEach(
+				( [ blockName, blockData ] ) => {
+					if (
+						blockData &&
+						typeof blockData.guidelines === 'string'
+					) {
+						setBlockGuideline( blockName, blockData.guidelines );
+					}
+				}
+			);
 		}
-	} );
 
-	await saveContentGuidelines();
+		await saveContentGuidelines();
+		createSuccessNotice( __( 'Content guidelines imported.' ), {
+			type: 'snackbar',
+		} );
+	} catch ( e: unknown ) {
+		throw e;
+	}
 }
 
 /**
@@ -166,24 +162,35 @@ export async function importContentGuidelines( file: File ): Promise< void > {
 export function exportContentGuidelines(): void {
 	const { createSuccessNotice } = dispatch( noticesStore );
 
-	try {
-		const contentGuidelinesCategories = (
-			select( STORE_NAME ) as {
-				getAllGuidelines: () => Categories;
-			}
-		 ).getAllGuidelines();
+	const guidelinesStore = select( STORE_NAME ) as unknown as {
+		getAllGuidelines: () => Categories;
+		getBlockGuidelines: () => Record< string, string >;
+	};
+	const contentGuidelinesCategories = guidelinesStore.getAllGuidelines();
+	const blockGuidelines = guidelinesStore.getBlockGuidelines();
 
-		const data = {
-			guideline_categories: Object.fromEntries(
+	const data = {
+		guideline_categories: {
+			...Object.fromEntries(
 				FLAT_CATEGORIES.map( ( guidelineCategory ) => [
 					guidelineCategory,
 					{
 						guidelines:
-							contentGuidelinesCategories[ guidelineCategory ],
+							contentGuidelinesCategories[ guidelineCategory ] ??
+							'',
 					},
 				] )
 			),
-		};
+			blocks: Object.fromEntries(
+				Object.entries( blockGuidelines ).map(
+					( [ blockName, guidelines ] ) => [
+						blockName,
+						{ guidelines },
+					]
+				)
+			),
+		},
+	};
 
 	downloadBlob(
 		'guidelines.json',

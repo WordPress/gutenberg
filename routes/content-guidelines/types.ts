@@ -29,7 +29,13 @@ export interface RestGuidelinesResponse {
 }
 
 export interface GuidelinesImportData {
-	guideline_categories: Record< string, { guidelines?: string } >;
+	guideline_categories: {
+		site?: { guidelines?: string };
+		copy?: { guidelines?: string };
+		images?: { guidelines?: string };
+		additional?: { guidelines?: string };
+		blocks?: Record< string, { guidelines?: string } >;
+	};
 }
 
 export interface GuidelineAccordionProps {

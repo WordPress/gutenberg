@@ -115,6 +115,11 @@
 			padding-left: 0;
 		}
 
+		// have the padding of td same as th which is 8x 4px
+		td {
+			padding: $grid-unit-20 $grid-unit-10;
+		}
+
 		.dataviews-view-table__cell-content-wrapper {
 			max-width: 100%;
 		}
