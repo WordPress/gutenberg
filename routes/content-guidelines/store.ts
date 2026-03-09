@@ -115,6 +115,10 @@ function reducer(
 				[ action.blockName ]: action.value,
 			};
 
+			if ( action.value === undefined ) {
+				delete blocks[ action.blockName ];
+			}
+
 			return {
 				...state,
 				categories: {
