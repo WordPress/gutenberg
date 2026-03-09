@@ -17,6 +17,7 @@ import { Notice } from '@wordpress/ui';
 import { createElement, useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -80,6 +81,7 @@ export default function BlockGuidelineModal( {
 	);
 
 	const { setBlockGuideline } = useDispatch( STORE_NAME );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const handleAddGuideline = () => {
 		if ( ! selectedBlock || ! guidelineText.trim() ) {
@@ -91,6 +93,9 @@ export default function BlockGuidelineModal( {
 			.then( () => {
 				setError( null );
 				closeModal();
+				createSuccessNotice( __( 'Block guideline saved.' ), {
+					type: 'snackbar',
+				} );
 			} )
 			.catch( ( e: Error ) => setError( e.message ) )
 			.finally( () => setIsSaving( false ) );
@@ -105,6 +110,9 @@ export default function BlockGuidelineModal( {
 		saveContentGuidelines()
 			.then( () => {
 				setError( null );
+				createSuccessNotice( __( 'Block guideline removed.' ), {
+					type: 'snackbar',
+				} );
 				closeModal();
 			} )
 			.catch( ( e: Error ) => {
