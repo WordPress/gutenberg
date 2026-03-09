@@ -61,25 +61,27 @@ export default function ActionsSection() {
 	const fileInputRef = useRef< HTMLInputElement >( null );
 	const [ isImporting, setIsImporting ] = useState( false );
 	const [ error, setError ] = useState< string | null >( null );
-	const [ isImportModalOpen, setIsImportModalOpen ] = useState( false );
+	const [ pendingImport, setPendingImport ] = useState< File | null >( null );
 
 	function handleImportClick() {
-		setIsImportModalOpen( true );
-	}
-
-	function handleModalContinue() {
-		setIsImportModalOpen( false );
 		fileInputRef.current?.click();
 	}
 
-	async function handleFileChange(
-		event: React.ChangeEvent< HTMLInputElement >
-	) {
+	function handleFileChange( event: React.ChangeEvent< HTMLInputElement > ) {
 		const file = event.target.files?.[ 0 ];
+		event.target.value = ''; // allow re-selecting the same file
 		if ( ! file ) {
 			return;
 		}
-		event.target.value = ''; // allow re-importing the same file
+		setPendingImport( file );
+	}
+
+	async function handleModalContinue() {
+		if ( ! pendingImport ) {
+			return;
+		}
+		const file = pendingImport;
+		setPendingImport( null );
 		setIsImporting( true );
 		try {
 			await importContentGuidelines( file );
@@ -125,7 +127,7 @@ export default function ActionsSection() {
 		import: {
 			onClick: handleImportClick,
 			isBusy: isImporting,
-			disabled: isImporting,
+			disabled: isImporting || !! pendingImport,
 		},
 		export: { onClick: handleExportClick },
 		revert: { onClick: () => goTo( '/revision-history' ) },
@@ -208,10 +210,10 @@ export default function ActionsSection() {
 				</ul>
 				{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 			</Card>
-			{ isImportModalOpen && (
+			{ pendingImport && (
 				<Modal
 					title={ __( 'Import guidelines' ) }
-					onRequestClose={ () => setIsImportModalOpen( false ) }
+					onRequestClose={ () => setPendingImport( null ) }
 					size="medium"
 				>
 					<VStack spacing={ 4 }>
@@ -232,7 +234,7 @@ export default function ActionsSection() {
 					>
 						<Button
 							variant="tertiary"
-							onClick={ () => setIsImportModalOpen( false ) }
+							onClick={ () => setPendingImport( null ) }
 						>
 							{ __( 'Cancel' ) }
 						</Button>

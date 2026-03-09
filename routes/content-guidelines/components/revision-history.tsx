@@ -233,7 +233,7 @@ export default function RevisionHistory() {
 						</Text>
 						<Text size={ 13 } weight={ 400 }>
 							{ __(
-								'A new version will be saved so you can always come back.'
+								'You can undo this anytime from revision history.'
 							) }
 						</Text>
 					</VStack>
