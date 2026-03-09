@@ -6,7 +6,7 @@
  *
  * Bug A — runtime-activated deferred stylesheets:
  *   A <style id="test-router-deferred-style" media="not all"> element is
- *   output server-side on every page request via wp_head (see below).
+ *   output server-side on every page request.
  *   This mirrors the real WordPress pattern of wp_enqueue_style() with
  *   media="not all". view.js finds it by id and the activateDeferredStyle
  *   action sets element.media = "all".
@@ -23,6 +23,11 @@
  *   view.js init() appends a <style> element with a stable id attribute,
  *   simulating plugins like Complianz GDPR that bypass wp_enqueue_style().
  *   The router must never disable it across any navigation path.
+ *
+ * Navigation links use data-wp-on--click="actions.navigate" to trigger
+ * iAPI router SPA navigation. Without this directive the plain <a> clicks
+ * would cause full page reloads, resetting all state and making the test
+ * unable to verify that styles survive navigation.
  *
  * Navigation links nav-to-b and nav-to-c resolve sibling posts by title so
  * the spec's addPostWithBlock( …, { alias } ) pattern works out of the box.
@@ -85,10 +90,12 @@ $link_c = $find_url( $base_alias . '-c' );
 		<a
 			data-testid="nav-to-b"
 			href="<?php echo esc_url( $link_b ); ?>"
+			data-wp-on--click="actions.navigate"
 		>Page B</a>
 		<a
 			data-testid="nav-to-c"
 			href="<?php echo esc_url( $link_c ); ?>"
+			data-wp-on--click="actions.navigate"
 		>Page C</a>
 	</nav>
 	<div data-wp-init="callbacks.init"></div>
