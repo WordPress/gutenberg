@@ -184,6 +184,8 @@ export default function BlockGuidelineModal( {
 						<Button
 							variant="tertiary"
 							isDestructive
+							// We need to pass an empty string to remove the guideline.
+							// This is because the API will only remove the guideline if the value is an empty string.
 							onClick={ () => handleSave( '' ) }
 							disabled={ isSaving }
 						>
