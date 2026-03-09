@@ -862,6 +862,24 @@ describe( 'canUser', () => {
 		expect( dispatch.receiveUserPermissions ).not.toHaveBeenCalled();
 	} );
 
+	it( 'receives false when the allow header is missing', async () => {
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map(),
+		} ) );
+
+		await canUser(
+			'create',
+			'media'
+		)( { dispatch, registry, resolveSelect } );
+
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith( {
+			'create/media': false,
+			'read/media': false,
+			'update/media': false,
+			'delete/media': false,
+		} );
+	} );
+
 	it( 'throws an error when an entity resource object is malformed', async () => {
 		await expect(
 			canUser( 'create', { name: 'wp_block' } )( {
@@ -888,9 +906,12 @@ describe( 'canUser', () => {
 			parse: false,
 		} );
 
-		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
-			expect.objectContaining( { 'create/media': false } )
-		);
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith( {
+			'create/media': false,
+			'read/media': true,
+			'update/media': false,
+			'delete/media': false,
+		} );
 	} );
 
 	it( 'receives false when the user is not allowed to perform an action on entities', async () => {
