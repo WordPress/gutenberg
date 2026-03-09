@@ -28,8 +28,14 @@ export const Title = forwardRef< HTMLDivElement, TitleProps >(
 		useLayoutEffect( () => {
 			const text = internalRef.current?.textContent?.trim() || undefined;
 			titleTextContext?.setTitleText( text );
-			return () => titleTextContext?.setTitleText( undefined );
 		} );
+
+		// Clear the registered text on unmount so the parent can fall back
+		// to the header content text. Kept separate from the per-render
+		// sync above to avoid transiently clearing the value between runs.
+		useLayoutEffect( () => {
+			return () => titleTextContext?.setTitleText( undefined );
+		}, [ titleTextContext ] );
 
 		const element = useRender( {
 			defaultTagName: 'div',

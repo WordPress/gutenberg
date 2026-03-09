@@ -12,7 +12,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown, chevronUp } from '@wordpress/icons';
 import * as Card from '../card';
-import { TitleTextContext } from '../card';
+import { TitleTextContext } from '../card/context';
 import { IconButton } from '../icon-button';
 import styles from './style.module.css';
 import type { HeaderProps } from './types';
@@ -38,15 +38,14 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 		const titleTextContextValue = useMemo( () => ( { setTitleText } ), [] );
 
 		// Fallback: read the header content's text when no Card.Title is
-		// present. When a Card.Title is used, its own effect keeps the label
-		// in sync (including dynamic updates); this only covers the uncommon
-		// case of a header without a Card.Title.
+		// present. `children` is listed as a dependency so the label
+		// re-syncs when the header content changes.
 		useLayoutEffect( () => {
 			if ( titleText === undefined ) {
 				const text = headerContentRef.current?.textContent?.trim();
 				setHeaderText( text || undefined );
 			}
-		}, [ titleText ] );
+		}, [ titleText, children ] );
 
 		const identifierText = titleText ?? headerText;
 		const triggerLabel = identifierText
