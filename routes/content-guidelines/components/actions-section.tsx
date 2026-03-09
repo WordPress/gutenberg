@@ -4,6 +4,7 @@
 import {
 	Button,
 	Card,
+	Modal,
 	useNavigator,
 	__experimentalText as Text,
 	__experimentalHeading as Heading,
@@ -60,8 +61,14 @@ export default function ActionsSection() {
 	const fileInputRef = useRef< HTMLInputElement >( null );
 	const [ isImporting, setIsImporting ] = useState( false );
 	const [ error, setError ] = useState< string | null >( null );
+	const [ isImportModalOpen, setIsImportModalOpen ] = useState( false );
 
 	function handleImportClick() {
+		setIsImportModalOpen( true );
+	}
+
+	function handleModalContinue() {
+		setIsImportModalOpen( false );
 		fileInputRef.current?.click();
 	}
 
@@ -201,6 +208,44 @@ export default function ActionsSection() {
 				</ul>
 				{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 			</Card>
+			{ isImportModalOpen && (
+				<Modal
+					title={ __( 'Import guidelines' ) }
+					onRequestClose={ () => setIsImportModalOpen( false ) }
+					size="medium"
+				>
+					<VStack spacing={ 4 }>
+						<Text size={ 13 } weight={ 400 }>
+							{ __(
+								'Importing new guidelines will replace your current content guidelines.'
+							) }
+						</Text>
+						<Text size={ 13 } weight={ 400 }>
+							{ __(
+								'This can be undone from revision history.'
+							) }
+						</Text>
+					</VStack>
+					<HStack
+						justify="flex-end"
+						className="content-guidelines__import-modal-actions"
+					>
+						<Button
+							variant="tertiary"
+							onClick={ () => setIsImportModalOpen( false ) }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+						<Button
+							variant="primary"
+							onClick={ handleModalContinue }
+							__next40pxDefaultSize
+						>
+							{ __( 'Continue' ) }
+						</Button>
+					</HStack>
+				</Modal>
+			) }
 		</VStack>
 	);
 }
