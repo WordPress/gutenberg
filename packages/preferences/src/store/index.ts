@@ -28,3 +28,13 @@ export const store = createReduxStore<
 } );
 
 register( store );
+
+/**
+ * Bind the store descriptor to the store name so that string-based
+ * access (e.g. `select( 'core/preferences' )`) is typed.
+ */
+declare module '@wordpress/data' {
+	interface StoreRegistry {
+		[ STORE_NAME ]: typeof store;
+	}
+}

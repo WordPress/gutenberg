@@ -45,3 +45,13 @@ if ( ! select( store ) ) {
 unlock( store ).registerPrivateActions( privateActions );
 // @ts-ignore
 unlock( store ).registerPrivateSelectors( privateSelectors );
+
+/**
+ * Bind the store descriptor to the store name so that string-based
+ * access (e.g. `select( 'core/upload-media' )`) is typed.
+ */
+declare module '@wordpress/data' {
+	interface StoreRegistry {
+		[ STORE_NAME ]: typeof store;
+	}
+}
