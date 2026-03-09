@@ -49,8 +49,9 @@ const { state } = store( 'test/router-dynamic-styles', {
 		 * making it impossible to verify that applyStyles() preserved the
 		 * activated stylesheet across navigation.
 		 *
-		 * Uses a generator function so the dynamic import of
-		 * `@wordpress/interactivity-router` can be yielded (iAPI async pattern).
+		 * Uses a generator function to yield the dynamic import.
+		 * actions.navigate() is called without yield (fire-and-forget),
+		 * matching the pattern used in full-page.ts.
 		 *
 		 * @param {MouseEvent} event The click event from data-wp-on--click.
 		 */
@@ -60,7 +61,7 @@ const { state } = store( 'test/router-dynamic-styles', {
 			const { actions } = yield import(
 				'@wordpress/interactivity-router'
 			);
-			yield actions.navigate( ref.href );
+			actions.navigate( ref.href );
 		},
 	},
 
