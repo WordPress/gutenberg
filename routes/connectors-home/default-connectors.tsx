@@ -16,7 +16,12 @@ import { Badge } from '@wordpress/ui';
  * Internal dependencies
  */
 import { useConnectorPlugin } from './use-connector-plugin';
-import { OpenAILogo, ClaudeLogo, GeminiLogo } from './logos';
+import {
+	OpenAILogo,
+	ClaudeLogo,
+	GeminiLogo,
+	DefaultConnectorLogo,
+} from './logos';
 
 type ConnectorAuthentication =
 	| {
@@ -75,7 +80,7 @@ function getConnectorLogo(
 	if ( Logo ) {
 		return <Logo />;
 	}
-	return undefined;
+	return <DefaultConnectorLogo />;
 }
 
 const ConnectedBadge = () => (

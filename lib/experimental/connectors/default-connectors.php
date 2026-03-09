@@ -143,6 +143,10 @@ function _gutenberg_resolve_ai_provider_logo_url( string $path ): ?string {
 
 	$path = wp_normalize_path( $path );
 
+	if ( ! file_exists( $path ) ) {
+		return null;
+	}
+
 	$mu_plugin_dir = wp_normalize_path( WPMU_PLUGIN_DIR );
 	if ( str_starts_with( $path, $mu_plugin_dir . '/' ) ) {
 		return plugins_url( substr( $path, strlen( $mu_plugin_dir ) ), WPMU_PLUGIN_DIR . '/.' );
@@ -179,6 +183,7 @@ function _gutenberg_resolve_ai_provider_logo_url( string $path ): ?string {
  *         @type array  $plugin         Optional. Plugin data for install/activate UI.
  *             @type string $slug       The WordPress.org plugin slug.
  *         }
+ *         @type string $logo_url       Optional. URL to the connector's logo image.
  *         @type array  $authentication {
  *             Authentication configuration. When method is 'api_key', includes
  *             credentials_url and setting_name. When 'none', only method is present.
@@ -275,7 +280,7 @@ function _gutenberg_get_connector_settings(): array {
 			$connectors[ $connector_id ] = array(
 				'name'           => $name ? $name : ucwords( $connector_id ),
 				'description'    => $description ? $description : '',
-				'logo_url'       => $logo_url ? $logo_url : plugins_url( 'default-connector-logo.svg', __FILE__ ),
+				'logo_url'       => $logo_url,
 				'type'           => 'ai_provider',
 				'authentication' => $authentication,
 			);
