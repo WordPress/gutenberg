@@ -105,7 +105,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers gutenberg_block_core_navigation_set_overlay_image_fetch_priority
+	 * @covers ::block_core_navigation_set_overlay_image_fetch_priority
 	 */
 	public function test_block_core_navigation_set_overlay_image_fetch_priority_overrides_high_priority() {
 		$html   = '<div><img src="example.jpg" fetchpriority="high" /></div>';
