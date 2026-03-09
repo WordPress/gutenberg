@@ -29,7 +29,6 @@
 ### Enhancements
 
 -   `Field.Label`, `Fieldset.Legend`: Add `hideFromVision` prop to visually hide the label while keeping it accessible to screen readers ([#76052](https://github.com/WordPress/gutenberg/pull/76052)).
--   `Notice`: Use `Text` component for `Title` and `Description` typography.
 -   `Dialog`: Add `--wp-ui-dialog-z-index` CSS custom property for legacy z-index compatibility ([#75874](https://github.com/WordPress/gutenberg/pull/75874)).
 -   `Tooltip`: Change default `side` from `bottom` to `top`. ([#76131](https://github.com/WordPress/gutenberg/pull/76131)).
 
