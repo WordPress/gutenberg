@@ -29,7 +29,7 @@
  * would cause full page reloads, resetting all state and making the test
  * unable to verify that styles survive navigation.
  *
- * Navigation links nav-to-b and nav-to-c resolve sibling posts by title so
+ * Navigation links nav-to-a, nav-to-b and nav-to-c resolve sibling posts by title so
  * the spec's addPostWithBlock( …, { alias } ) pattern works out of the box.
  *
  * @package gutenberg-test-interactive-blocks
@@ -53,6 +53,7 @@ $find_url = static function ( string $alias ): string {
 	return $posts ? (string) get_permalink( $posts[0] ) : '#';
 };
 
+$link_a = $find_url( $base_alias . '-a' );
 $link_b = $find_url( $base_alias . '-b' );
 $link_c = $find_url( $base_alias . '-c' );
 ?>
@@ -87,6 +88,11 @@ $link_c = $find_url( $base_alias . '-c' );
 		Activate deferred style
 	</button>
 	<nav>
+		<a
+			data-testid="nav-to-a"
+			href="<?php echo esc_url( $link_a ); ?>"
+			data-wp-on--click="actions.navigate"
+		>Page A</a>
 		<a
 			data-testid="nav-to-b"
 			href="<?php echo esc_url( $link_b ); ?>"
