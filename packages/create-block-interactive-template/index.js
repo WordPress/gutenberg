@@ -32,6 +32,16 @@ module.exports = {
 				'An interactive block with the Interactivity API using TypeScript.',
 			viewScriptModule: 'file:./view.ts',
 		},
+		'client-side-navigation': {
+			slug: 'example-interactive-client-side-navigation',
+			title: 'Example Interactive Client-Side Navigation',
+			description:
+				'An interactive block demonstrating client-side navigation with the Interactivity API Router.',
+			blockTemplatesPath: join(
+				__dirname,
+				'block-templates-client-side-navigation'
+			),
+		},
 	},
 	pluginTemplatesPath: join( __dirname, 'plugin-templates' ),
 	blockTemplatesPath: join( __dirname, 'block-templates' ),
