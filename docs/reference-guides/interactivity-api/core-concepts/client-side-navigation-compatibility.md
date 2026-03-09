@@ -201,7 +201,7 @@ Use a value that uniquely identifies each element across navigations, such as a 
 
 All DOM modifications should go through Interactivity API directives. Directly manipulating the DOM using vanilla JavaScript APIs — such as `document.createElement()`, `element.appendChild()`, `element.remove()`, or jQuery methods — is not compatible with CSN. Elements added this way (like dynamically created tooltips or injected widgets) will vanish after navigating away and back, because the virtual DOM diffing is not aware of them.
 
-For cases where you need to update the inner HTML of an element or make other imperative DOM changes, use the [`data-wp-watch`](/docs/reference-guides/interactivity-api/api-reference.md#wp-watch) directive. This directive runs a callback whenever [reactive state](/docs/reference-guides/interactivity-api/api-reference.md#the-store) — the global state managed by the Interactivity API's `store()` — changes, giving you a controlled way to perform side effects — including imperative DOM updates — that re-execute correctly after each navigation:
+For cases where you need to update the inner HTML of an element or make other imperative DOM changes, use the [`data-wp-watch`](/docs/reference-guides/interactivity-api/directives-and-store.md#wp-watch) directive. This directive runs a callback whenever [reactive state](/docs/reference-guides/interactivity-api/directives-and-store.md#the-store) — the global state managed by the Interactivity API's `store()` — changes, giving you a controlled way to perform side effects — including imperative DOM updates — that re-execute correctly after each navigation:
 
 ```html
 <div
