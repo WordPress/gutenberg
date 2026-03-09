@@ -64,6 +64,9 @@ export default function BlockGuidelineModal( {
 		if ( initialBlock ) {
 			set.delete( initialBlock );
 		}
+		if ( selectedBlock ) {
+			set.delete( selectedBlock );
+		}
 
 		return blockOptions
 			.filter( ( block ) => ! set.has( block.name ) )
@@ -71,7 +74,7 @@ export default function BlockGuidelineModal( {
 				value: block.name,
 				label: block.title,
 			} ) );
-	}, [ blockGuidelines, blockOptions, initialBlock ] );
+	}, [ blockGuidelines, blockOptions, initialBlock, selectedBlock ] );
 
 	const selectedBlockLabel = useMemo(
 		() =>
@@ -83,41 +86,31 @@ export default function BlockGuidelineModal( {
 	const { setBlockGuideline } = useDispatch( STORE_NAME );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const handleAddGuideline = () => {
-		if ( ! selectedBlock || ! guidelineText.trim() ) {
-			return;
-		}
-		setIsSaving( true );
-		setBlockGuideline( selectedBlock, guidelineText.trim() );
-		saveContentGuidelines()
-			.then( () => {
-				setError( null );
-				closeModal();
-				createSuccessNotice( __( 'Block guideline saved.' ), {
-					type: 'snackbar',
-				} );
-			} )
-			.catch( ( e: Error ) => setError( e.message ) )
-			.finally( () => setIsSaving( false ) );
-	};
-
-	const handleRemoveGuideline = () => {
+	const handleSave = ( value: string ) => {
+		value = value.trim();
 		if ( ! selectedBlock ) {
 			return;
 		}
+
 		setIsSaving( true );
-		setBlockGuideline( selectedBlock, '' );
+		const oldValue = blockGuidelines[ selectedBlock ];
+		setBlockGuideline( selectedBlock, value );
 		saveContentGuidelines()
 			.then( () => {
 				setError( null );
-				createSuccessNotice( __( 'Block guideline removed.' ), {
-					type: 'snackbar',
-				} );
+				createSuccessNotice(
+					sprintf(
+						/* translators: %s: Block label. */
+						__( 'Block guideline "%s"' ),
+						value ? 'saved' : 'removed'
+					),
+					{ type: 'snackbar' }
+				);
 				closeModal();
 			} )
 			.catch( ( e: Error ) => {
 				setError( e.message );
-				setBlockGuideline( selectedBlock, currentGuideline );
+				setBlockGuideline( selectedBlock, oldValue );
 			} )
 			.finally( () => setIsSaving( false ) );
 	};
@@ -191,7 +184,7 @@ export default function BlockGuidelineModal( {
 						<Button
 							variant="tertiary"
 							isDestructive
-							onClick={ handleRemoveGuideline }
+							onClick={ () => handleSave( '' ) }
 							disabled={ isSaving }
 						>
 							{ __( 'Remove' ) }
@@ -199,7 +192,7 @@ export default function BlockGuidelineModal( {
 					) }
 					<Button
 						variant="primary"
-						onClick={ handleAddGuideline }
+						onClick={ () => handleSave( guidelineText ) }
 						disabled={ ! canSubmit || isSaving }
 						isBusy={ isSaving }
 					>

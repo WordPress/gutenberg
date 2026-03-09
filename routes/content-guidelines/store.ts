@@ -110,14 +110,20 @@ function reducer(
 				},
 			};
 		case 'SET_BLOCK_GUIDELINE': {
+			const blocks = {
+				...state.categories.blocks,
+				[ action.blockName ]: action.value,
+			};
+
+			if ( ! action.value ) {
+				delete blocks[ action.blockName ];
+			}
+
 			return {
 				...state,
 				categories: {
 					...state.categories,
-					blocks: {
-						...state.categories.blocks,
-						[ action.blockName ]: action.value,
-					},
+					blocks,
 				},
 			};
 		}
