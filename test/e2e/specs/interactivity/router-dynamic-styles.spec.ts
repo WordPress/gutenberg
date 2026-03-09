@@ -155,17 +155,13 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 		);
 
 		// Back to A (cached page).
-		// waitForFunction polls window.location in the browser context —
-		// this works for SPA popstate navigation where no full page load
-		// event fires (waitForURL would hang forever in that case).
-		await page.goBack();
-		await page.waitForFunction( ( url: string ) =>
-			window.location.href.startsWith( url ),
-		utils.getLink( 'router-dynamic-styles-b' ) );
-		await page.goBack();
-		await page.waitForFunction( ( url: string ) =>
-			window.location.href.startsWith( url ),
-		utils.getLink( 'router-dynamic-styles-a' ) );
+		// page.evaluate( history.back ) fires popstate without waiting for a
+		// load event (which never fires in SPA context). expect(page).toHaveURL
+		// then polls page.url() until the URL matches — no load event needed.
+		await page.evaluate( () => window.history.back() );
+		await expect( page ).toHaveURL( utils.getLink( 'router-dynamic-styles-b' ) );
+		await page.evaluate( () => window.history.back() );
+		await expect( page ).toHaveURL( utils.getLink( 'router-dynamic-styles-a' ) );
 		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
 			'active'
 		);
