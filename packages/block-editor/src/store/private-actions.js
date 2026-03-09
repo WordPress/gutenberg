@@ -680,3 +680,96 @@ export function __experimentalRelinkBlockStyleSync(
 		scopeClientId,
 	};
 }
+
+/**
+ * Inserts a block (and its inner blocks) and then applies canonical sibling
+ * styles to any newly inserted blocks whose type declares
+ * `__experimentalSiblingStyleSync` support.
+ *
+ * This ensures a newly added inner block inherits the styles
+ * already set on the existing linked blocks, without the user needing to
+ * manually re-sync.
+ *
+ * @param {Object}  block           The block object to insert (may have innerBlocks).
+ * @param {number}  index           Position to insert at (undefined = end).
+ * @param {string}  rootClientId    ClientId of the parent block to insert into.
+ * @param {boolean} updateSelection Whether to update the editor selection.
+ */
+export const __experimentalInsertBlockWithSiblingStyles =
+	( block, index, rootClientId, updateSelection = true ) =>
+	( { select, dispatch, registry } ) => {
+		// Insert the block as normal first.
+		dispatch.insertBlock( block, index, rootClientId, updateSelection );
+
+		// Collect all clientIds in the newly inserted subtree.
+		function collectClientIds( b ) {
+			return [
+				b.clientId,
+				...( b.innerBlocks ?? [] ).flatMap( collectClientIds ),
+			];
+		}
+		const newClientIds = collectClientIds( block );
+
+		const privateSelect = unlock( registry.select( STORE_NAME ) );
+
+		registry.batch( () => {
+			for ( const newClientId of newClientIds ) {
+				const blockName = select.getBlockName( newClientId );
+				if ( ! blockName ) {
+					continue;
+				}
+
+				const syncSupport =
+					getBlockType( blockName )?.supports
+						?.__experimentalSiblingStyleSync;
+				if ( ! syncSupport ) {
+					continue;
+				}
+
+				// Check parent-level sync toggle.
+				const scopeClientId =
+					privateSelect.__experimentalGetSiblingStyleSyncScopeClientId(
+						newClientId,
+						blockName
+					);
+				const syncChildStyles =
+					select.getBlockAttributes( scopeClientId )
+						?.syncChildStyles ?? {};
+				if ( syncChildStyles[ blockName ] === false ) {
+					continue;
+				}
+
+				// Find an existing linked sibling to copy styles from.
+				const siblings =
+					privateSelect.__experimentalGetSiblingStyleSyncBlocks(
+						newClientId,
+						blockName
+					);
+				const canonicalSibling = siblings.find(
+					( s ) =>
+						! privateSelect.__experimentalIsBlockStyleSyncUnlinked(
+							s.clientId,
+							blockName
+						)
+				);
+				if ( ! canonicalSibling ) {
+					continue;
+				}
+
+				const canonicalAttrs = select.getBlockAttributes(
+					canonicalSibling.clientId
+				);
+				const { syncedAttributes } = partitionAttributesByGroups(
+					canonicalAttrs,
+					syncSupport.groups
+				);
+
+				if ( Object.keys( syncedAttributes ).length > 0 ) {
+					dispatch.updateBlockAttributes(
+						newClientId,
+						syncedAttributes
+					);
+				}
+			}
+		} );
+	};
