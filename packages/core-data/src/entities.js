@@ -328,12 +328,10 @@ export const prePersistPostType = async (
  * @return {Promise} Entities promise
  */
 async function loadPostTypeEntities() {
-	const postTypes = await apiFetch( {
-		path: '/wp/v2/types?context=view',
-	} );
-	const taxonomies = await apiFetch( {
-		path: '/wp/v2/taxonomies?context=view',
-	} );
+	const [ postTypes, taxonomies ] = await Promise.all( [
+		apiFetch( { path: '/wp/v2/types?context=view' } ),
+		apiFetch( { path: '/wp/v2/taxonomies?context=view' } ),
+	] );
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name

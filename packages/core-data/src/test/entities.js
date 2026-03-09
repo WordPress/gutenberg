@@ -8,6 +8,10 @@ jest.mock( '../sync', () => ( {
 	...jest.requireActual( '../sync' ),
 	getSyncManager: jest.fn(),
 } ) );
+jest.mock( '../utils/crdt', () => ( {
+	...jest.requireActual( '../utils/crdt' ),
+	applyPostChangesToCRDTDoc: jest.fn(),
+} ) );
 
 /**
  * Internal dependencies
@@ -19,7 +23,10 @@ import {
 	additionalEntityConfigLoaders,
 } from '../entities';
 import { getSyncManager } from '../sync';
-import { POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from '../utils/crdt';
+import {
+	applyPostChangesToCRDTDoc,
+	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+} from '../utils/crdt';
 
 describe( 'getMethodName', () => {
 	it( 'should return the right method name for an entity with the root kind', () => {
@@ -124,6 +131,58 @@ describe( 'prePersistPostType', () => {
 		);
 
 		getSyncManager.mockReset();
+	} );
+} );
+
+describe( 'loadPostTypeEntities', () => {
+	beforeEach( () => {
+		apiFetch.mockReset();
+		applyPostChangesToCRDTDoc.mockReset();
+	} );
+
+	it( 'should include custom taxonomy rest_bases in synced properties', async () => {
+		const mockPostTypes = {
+			book: {
+				name: 'Books',
+				rest_base: 'books',
+				rest_namespace: 'wp/v2',
+				taxonomies: [ 'genre', 'audience' ],
+			},
+		};
+		const mockTaxonomies = {
+			genre: {
+				name: 'Genres',
+				rest_base: 'genres',
+				rest_namespace: 'wp/v2',
+			},
+			audience: {
+				name: 'Audiences',
+				rest_base: 'audiences',
+				rest_namespace: 'wp/v2',
+			},
+		};
+
+		apiFetch
+			.mockResolvedValueOnce( mockPostTypes )
+			.mockResolvedValueOnce( mockTaxonomies );
+
+		const postTypeLoader = additionalEntityConfigLoaders.find(
+			( loader ) => loader.kind === 'postType'
+		);
+		const entities = await postTypeLoader.loadEntities();
+		const bookEntity = entities.find( ( e ) => e.name === 'book' );
+
+		bookEntity.syncConfig.applyChangesToCRDTDoc( {}, {} );
+
+		expect( applyPostChangesToCRDTDoc ).toHaveBeenCalledWith(
+			{},
+			{},
+			expect.any( Set )
+		);
+
+		const syncedProperties = applyPostChangesToCRDTDoc.mock.calls[ 0 ][ 2 ];
+		expect( syncedProperties ).toContain( 'genres' );
+		expect( syncedProperties ).toContain( 'audiences' );
 	} );
 } );
 
