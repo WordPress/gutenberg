@@ -1,9 +1,11 @@
+/* @jsx createElement */
+
 /**
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { createElement, useEffect, useState } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { Notice } from '@wordpress/ui';
 
@@ -16,6 +18,9 @@ import GuidelineAccordionForm from './components/guideline-accordion-form';
 import { fetchContentGuidelines } from './api';
 import BlockGuidelines from './components/block-guidelines';
 import { bootstrapBlockRegistry } from './bootstrap-block-registry';
+
+// Bootstrap Core blocks so block icons are available (e.g. in Block Guidelines).
+bootstrapBlockRegistry();
 
 const GUIDELINE_ITEMS = [
 	{
@@ -62,8 +67,6 @@ function ContentGuidelinesPage() {
 	const [ error, setError ] = useState< string | null >( null );
 
 	useEffect( () => {
-		// Bootstrap Core blocks so block icons are available (e.g. in Block Guidelines).
-		bootstrapBlockRegistry();
 		// Populate the store with the content guidelines.
 		fetchContentGuidelines()
 			.then( () => setError( null ) )
