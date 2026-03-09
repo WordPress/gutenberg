@@ -3,44 +3,10 @@
  */
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	__experimentalInputControl as InputControl,
-	__experimentalText as Text,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews';
 import { MediaEdit } from '@wordpress/fields';
-
-// Custom Edit component for text fields that renders the description using
-// <Text variant="muted"> to match how MediaEdit renders descriptions.
-// The built-in DataForm text control renders descriptions via InputControl's
-// `help` prop, which produces a smaller font size than MediaEdit's description.
-function TextEdit( { data, field, onChange, hideLabelFromVision } ) {
-	const value = field.getValue( { item: data } );
-	const onChangeValue = useCallback(
-		( newValue ) =>
-			onChange( field.setValue( { item: data, value: newValue } ) ),
-		[ data, field, onChange ]
-	);
-
-	return (
-		<VStack spacing={ 2 }>
-			<InputControl
-				label={ field.label }
-				hideLabelFromVision={ hideLabelFromVision }
-				value={ value ?? '' }
-				onChange={ onChangeValue }
-				__next40pxDefaultSize
-			/>
-			{ field.description && (
-				<Text variant="muted">{ field.description }</Text>
-			) }
-		</VStack>
-	);
-}
 
 const fields = [
 	{
@@ -50,7 +16,6 @@ const fields = [
 		description: __(
 			"Displays in your site's layout via the Site Title block."
 		),
-		Edit: TextEdit,
 	},
 	{
 		id: 'description',
@@ -59,7 +24,6 @@ const fields = [
 		description: __(
 			"In a few words, explain what this site is about. Displays in your site's layout via the Site Tagline block."
 		),
-		Edit: TextEdit,
 	},
 	{
 		id: 'site_logo',
