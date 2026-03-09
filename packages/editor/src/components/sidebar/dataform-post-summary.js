@@ -12,16 +12,15 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import PostCardPanel from '../post-card-panel';
+import PostLastEditedPanel from '../post-last-edited-panel';
+import PostContentInformation from '../post-content-information';
 import PostPanelSection from '../post-panel-section';
 import { store as editorStore } from '../../store';
 import PostTrash from '../post-trash';
 import usePostFields from '../post-fields';
 import { unlock } from '../../lock-unlock';
 
-const form = {
-	layout: {
-		type: 'panel',
-	},
+const topForm = {
 	fields: [
 		{
 			id: 'featured_media',
@@ -30,6 +29,14 @@ const form = {
 				labelPosition: 'none',
 			},
 		},
+	],
+};
+
+const bottomForm = {
+	layout: {
+		type: 'panel',
+	},
+	fields: [
 		{
 			id: 'status',
 			label: __( 'Status' ),
@@ -132,7 +139,17 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 				<DataForm
 					data={ record }
 					fields={ fields }
-					form={ form }
+					form={ topForm }
+					onChange={ onChange }
+				/>
+				<VStack spacing={ 1 }>
+					<PostContentInformation />
+					<PostLastEditedPanel />
+				</VStack>
+				<DataForm
+					data={ record }
+					fields={ fields }
+					form={ bottomForm }
 					onChange={ onChange }
 				/>
 				<PostTrash onActionPerformed={ onActionPerformed } />
