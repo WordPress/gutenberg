@@ -75,12 +75,12 @@ test.describe( 'Site Editor Performance', () => {
 		const samples = 10;
 		const throwaway = 1;
 		const iterations = samples + throwaway;
-		test( `Run ${ iterations } tests`, async ( {
-			admin,
-			perfUtils,
-			metrics,
-		} ) => {
-			for ( let i = 1; i <= iterations; i++ ) {
+		for ( let i = 1; i <= iterations; i++ ) {
+			test( `Run the test (${ i } of ${ iterations })`, async ( {
+				admin,
+				perfUtils,
+				metrics,
+			} ) => {
 				// Go to the test draft.
 				await admin.visitSiteEditor( {
 					postId: draftId,
@@ -116,8 +116,8 @@ test.describe( 'Site Editor Performance', () => {
 						results[ key ].push( value );
 					}
 				}
-			}
-		} );
+			} );
+		}
 	} );
 
 	test.describe( 'Typing', () => {
@@ -208,12 +208,12 @@ test.describe( 'Site Editor Performance', () => {
 		} );
 
 		const iterations = 5;
-		test( `Run ${ iterations } tests`, async ( {
-			admin,
-			page,
-			metrics,
-		} ) => {
-			for ( let i = 1; i <= iterations; i++ ) {
+		for ( let i = 1; i <= iterations; i++ ) {
+			test( `Run the test (${ i } of ${ iterations })`, async ( {
+				admin,
+				page,
+				metrics,
+			} ) => {
 				await admin.visitSiteEditor( {
 					// The old URL is supported in both previous versions and new versions.
 					path: '/wp_template',
@@ -250,8 +250,8 @@ test.describe( 'Site Editor Performance', () => {
 
 				// Save the results.
 				results.navigate.push( mouseClickEvents[ 0 ] );
-			}
-		} );
+			} );
+		}
 	} );
 
 	test.describe( 'Loading Patterns', () => {
