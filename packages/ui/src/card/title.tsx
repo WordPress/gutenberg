@@ -49,7 +49,7 @@ function useSyncTitleText( ref: React.RefObject< HTMLElement | null > ) {
  */
 export const Title = forwardRef< HTMLDivElement, TitleProps >(
 	function CardTitle( { render, ...restProps }, forwardedRef ) {
-		const internalRef = useRef< HTMLDivElement >( null );
+		const internalRef = useRef< HTMLElement >( null );
 		const mergedRef = useMergeRefs( [ internalRef, forwardedRef ] );
 
 		useSyncTitleText( internalRef );
