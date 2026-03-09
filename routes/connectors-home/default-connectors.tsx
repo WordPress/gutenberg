@@ -6,6 +6,7 @@ import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
 	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
+	type __experimentalApiKeySource as ApiKeySource,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
 import { __ } from '@wordpress/i18n';
@@ -16,8 +17,6 @@ import { Badge } from '@wordpress/ui';
  */
 import { useConnectorPlugin } from './use-connector-plugin';
 import { OpenAILogo, ClaudeLogo, GeminiLogo } from './logos';
-
-export type ApiKeySource = 'env' | 'constant' | 'database' | 'none';
 
 type ConnectorAuthentication =
 	| {
@@ -123,7 +122,6 @@ function ApiKeyConnector( {
 		isConnected,
 		currentApiKey,
 		keySource,
-		isExternallyConfigured,
 		handleButtonClick,
 		getButtonLabel,
 		saveApiKey,
@@ -136,6 +134,8 @@ function ApiKeyConnector( {
 		keySource: initialKeySource,
 		initialIsConnected,
 	} );
+	const isExternallyConfigured =
+		keySource === 'env' || keySource === 'constant';
 	const showUnavailableBadge =
 		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
 		( pluginStatus === 'inactive' && canActivatePlugins === false );

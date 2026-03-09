@@ -22,7 +22,7 @@ function _gutenberg_get_api_key_source( string $provider_id ): string {
 	$constant_case_id = strtoupper(
 		preg_replace( '/([a-z])([A-Z])/', '$1_$2', str_replace( '-', '_', $provider_id ) )
 	);
-	$env_var_name = "{$constant_case_id}_API_KEY";
+	$env_var_name     = "{$constant_case_id}_API_KEY";
 
 	// Check environment variable first.
 	$env_value = getenv( $env_var_name );

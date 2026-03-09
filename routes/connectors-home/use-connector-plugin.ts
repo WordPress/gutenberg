@@ -7,8 +7,9 @@ import { useSelect } from '@wordpress/data';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+import type { __experimentalApiKeySource as ApiKeySource } from '@wordpress/connectors';
+
 export type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';
-export type ApiKeySource = 'env' | 'constant' | 'database' | 'none';
 
 interface UseConnectorPluginOptions {
 	pluginSlug?: string;
@@ -29,7 +30,6 @@ interface UseConnectorPluginReturn {
 	isConnected: boolean;
 	currentApiKey: string;
 	keySource: ApiKeySource;
-	isExternallyConfigured: boolean;
 	handleButtonClick: () => void;
 	getButtonLabel: () => string;
 	saveApiKey: ( apiKey: string ) => Promise< void >;
@@ -66,10 +66,6 @@ export function useConnectorPlugin( {
 
 	// Use canManagePlugins (from REST API result) for activation capability.
 	const canActivatePlugins = canManagePlugins;
-
-	// Check if the key is configured externally (env var or constant).
-	const isExternallyConfigured =
-		keySource === 'env' || keySource === 'constant';
 
 	const isConnected = pluginStatus === 'active' && connectedState;
 
@@ -274,7 +270,6 @@ export function useConnectorPlugin( {
 		isConnected,
 		currentApiKey,
 		keySource,
-		isExternallyConfigured,
 		handleButtonClick,
 		getButtonLabel,
 		saveApiKey,

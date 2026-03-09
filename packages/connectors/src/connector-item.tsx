@@ -201,9 +201,9 @@ export function DefaultConnectorSettings( {
 			/>
 			{ readOnly ? (
 				onRemove && (
-				<Button variant="link" isDestructive onClick={ onRemove }>
-					{ __( 'Remove and replace' ) }
-				</Button>
+					<Button variant="link" isDestructive onClick={ onRemove }>
+						{ __( 'Remove and replace' ) }
+					</Button>
 				)
 			) : (
 				<HStack justify="flex-start">
