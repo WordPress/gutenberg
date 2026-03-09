@@ -38,8 +38,9 @@ export async function copyToClipboard(
 		const textarea = ownerDocument.createElement( 'textarea' );
 		textarea.value = text;
 		textarea.setAttribute( 'readonly', '' );
-		textarea.style.position = 'absolute';
+		textarea.style.position = 'fixed';
 		textarea.style.left = '-9999px';
+		textarea.style.top = '-9999px';
 		ownerDocument.body.appendChild( textarea );
 		textarea.select();
 		const success = ownerDocument.execCommand( 'copy' );
