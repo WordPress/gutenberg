@@ -860,11 +860,12 @@ const v7 = {
 			},
 		},
 	},
-	migrate( { width, height, ...attributes } ) {
+	migrate( attributes ) {
+		const { width, height } = attributes;
 		return {
 			...attributes,
-			width: `${ width }px`,
-			height: `${ height }px`,
+			width: typeof width === 'number' ? `${ width }px` : width,
+			height: typeof height === 'number' ? `${ height }px` : height,
 		};
 	},
 	save( { attributes } ) {
@@ -1297,13 +1298,6 @@ const v9 = {
 		shadow: {
 			__experimentalSkipSerialization: true,
 		},
-	},
-	isEligible( attributes ) {
-		return (
-			attributes.width !== undefined &&
-			attributes.width !== null &&
-			( attributes.height === undefined || attributes.height === null )
-		);
 	},
 	save( { attributes } ) {
 		const {
