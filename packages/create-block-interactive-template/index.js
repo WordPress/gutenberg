@@ -18,9 +18,10 @@ module.exports = {
 		viewScriptModule: 'file:./view.js',
 		render: 'file:./render.php',
 		example: {},
+		folderName: './src/$slug',
 		customScripts: {
-			build: 'wp-scripts build --experimental-modules',
-			start: 'wp-scripts start --experimental-modules',
+			build: 'wp-scripts build --experimental-modules --blocks-manifest',
+			start: 'wp-scripts start --experimental-modules --blocks-manifest',
 		},
 	},
 	variants: {
