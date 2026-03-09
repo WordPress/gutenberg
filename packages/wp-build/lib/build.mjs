@@ -1821,61 +1821,6 @@ async function buildAll( baseUrlExpression ) {
 		};
 	} );
 
-	// Build boot module for page prerequisites when pages exist
-	if ( pageData.length > 0 ) {
-		const bootAssetPath = path.join(
-			BUILD_DIR,
-			'modules',
-			'boot',
-			'index.min.asset.php'
-		);
-
-		// If boot wasn't built as a project package (external plugin case),
-		// build it from node_modules to generate the asset file.
-		// The JS output isn't used at runtime — Core/Gutenberg provides boot.
-		try {
-			await readFile( bootAssetPath );
-		} catch {
-			try {
-				const { createRequire } = await import( 'module' );
-				const require = createRequire( import.meta.url );
-
-				const bootPkgPath = require.resolve(
-					'@wordpress/boot/package.json',
-					{ paths: [ ROOT_DIR ] }
-				);
-
-				const wordpressPackagesDir = path.dirname(
-					path.dirname( bootPkgPath )
-				);
-
-				await bundlePackage( 'boot', {
-					sourceDir: wordpressPackagesDir,
-					handlePrefix: 'wp',
-					scriptGlobal: 'wp',
-					packageNamespace: 'wordpress',
-				} );
-				// Clean up JS output — only the asset file is needed.
-				const bootDir = path.join( BUILD_DIR, 'modules', 'boot' );
-				for ( const file of [
-					'index.js',
-					'index.js.map',
-					'index.min.js',
-					'index.min.js.map',
-				] ) {
-					await unlink( path.join( bootDir, file ) ).catch(
-						() => {}
-					);
-				}
-			} catch ( error ) {
-				console.warn(
-					'\n⚠️  Warning: Could not build boot module for page prerequisites:',
-					error.message
-				);
-			}
-		}
-	}
-
 	console.log( '\n📄 Generating PHP registration files...\n' );
 	const phpReplacements = await getPhpReplacements(
 		ROOT_DIR,
