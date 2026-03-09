@@ -18,7 +18,12 @@ import {
 	type View,
 } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
-import { createElement, useMemo, useState } from '@wordpress/element';
+import {
+	createElement,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { blockDefault } from '@wordpress/icons';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -32,11 +37,13 @@ import { saveContentGuidelines } from '../api';
 import { STORE_NAME } from '../store';
 import './block-guidelines.scss';
 
+const PER_PAGE = 5;
+
 const initialView: View = {
 	type: 'list',
 	search: '',
 	page: 1,
-	perPage: 5,
+	perPage: PER_PAGE,
 	filters: [],
 	mediaField: 'icon',
 	showMedia: true,
@@ -160,6 +167,21 @@ export default function BlockGuidelines() {
 		[ rows, view ]
 	);
 
+	useEffect( () => {
+		const lastPage = Math.max( paginationInfo.totalPages, 1 );
+
+		if ( view.page && view.page > lastPage ) {
+			setView( ( currentView ) =>
+				currentView.page && currentView.page > lastPage
+					? {
+							...currentView,
+							page: lastPage,
+					  }
+					: currentView
+			);
+		}
+	}, [ paginationInfo.totalPages, view.page ] );
+
 	const closeModal = () => {
 		setIsOpen( false );
 		setSelectedItem( undefined );
@@ -170,7 +192,7 @@ export default function BlockGuidelines() {
 		setIsOpen( true );
 	};
 
-	const shouldShowDataViewControls = rows.length > 5;
+	const shouldShowDataViewControls = rows.length > PER_PAGE;
 
 	return (
 		<VStack spacing={ 4 } className="block-guidelines">
@@ -193,7 +215,7 @@ export default function BlockGuidelines() {
 					onChangeView={ setView }
 					fields={ fields }
 					actions={ actions }
-					config={ { perPageSizes: [ 5, 10, 20, 50 ] } }
+					config={ { perPageSizes: [ PER_PAGE ] } }
 					defaultLayouts={ {
 						list: {},
 					} }
