@@ -12,6 +12,7 @@ import { URLInput } from '../';
 import LinkControlSearchResults from './search-results';
 import { CREATE_TYPE } from './constants';
 import useSearchHandler from './use-search-handler';
+import normalizeUrl from './normalize-url';
 
 // Must be a function as otherwise URLInput will default
 // to the fetchLinkSuggestions passed in block editor settings
@@ -161,7 +162,9 @@ const LinkControlSearchInput = forwardRef(
 							event.preventDefault();
 						} else {
 							onSuggestionSelected(
-								hasSuggestion || { url: value }
+								hasSuggestion || {
+									url: normalizeUrl( value ).url,
+								}
 							);
 						}
 					} }
