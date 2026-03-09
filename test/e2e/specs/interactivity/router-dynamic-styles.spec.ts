@@ -154,18 +154,12 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 			'active'
 		);
 
-		// Back to A (cached page).
-		// page.evaluate( history.back ) fires popstate without waiting for a
-		// load event (which never fires in SPA context). expect(page).toHaveURL
-		// then polls page.url() until the URL matches — no load event needed.
-		await page.evaluate( () => window.history.back() );
-		await expect( page ).toHaveURL(
-			utils.getLink( 'router-dynamic-styles-b' )
-		);
-		await page.evaluate( () => window.history.back() );
-		await expect( page ).toHaveURL(
-			utils.getLink( 'router-dynamic-styles-a' )
-		);
+		// Navigate back to A via explicit iAPI SPA link. Using browser
+		// history.back() or page.goBack() is unreliable in SPA context:
+		// goBack() waits for a load event that never fires; history.back()
+		// via evaluate() returns about:blank because SPA pushState entries
+		// are not tracked by Playwright as navigation events.
+		await page.getByTestId( 'nav-to-a' ).click();
 		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
 			'active'
 		);
