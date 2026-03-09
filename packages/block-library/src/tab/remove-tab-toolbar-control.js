@@ -58,7 +58,15 @@ export default function RemoveTabToolbarControl( { tabsClientId } ) {
 			const tabs = tabPanel?.innerBlocks || [];
 			const menuItems = tabsMenu?.innerBlocks || [];
 			const activeTab = tabs[ activeIndex ];
-			const activeMenuItem = menuItems[ activeIndex ];
+			// Match menu item by anchor (e.g. "tab-1" → "tab-1-button").
+			const expectedMenuAnchor = activeTab?.attributes?.anchor
+				? `${ activeTab.attributes.anchor }-button`
+				: null;
+			const activeMenuItem = expectedMenuAnchor
+				? menuItems.find(
+						( m ) => m.attributes?.anchor === expectedMenuAnchor
+				  )
+				: menuItems[ activeIndex ];
 			return {
 				activeTabClientId: activeTab?.clientId || null,
 				activeMenuItemClientId: activeMenuItem?.clientId || null,
