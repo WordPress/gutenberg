@@ -50,14 +50,14 @@ const { state } = store( 'test/router-dynamic-styles', {
 		 * activated stylesheet across navigation.
 		 *
 		 * Uses a generator function so the dynamic import of
-		 * @wordpress/interactivity-router can be yielded (iAPI async pattern).
+		 * `@wordpress/interactivity-router` can be yielded (iAPI async pattern).
 		 *
 		 * @param {MouseEvent} event The click event from data-wp-on--click.
 		 */
 		* navigate( event ) {
 			event.preventDefault();
 			const { ref } = getElement();
-			const { actions } = yield import( '@wordpress/interactivity-router' );
+			const { actions } = yield import('@wordpress/interactivity-router');
 			yield actions.navigate( ref.href );
 		},
 	},
