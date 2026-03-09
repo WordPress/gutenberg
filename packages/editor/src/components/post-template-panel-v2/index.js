@@ -1,0 +1,71 @@
+/**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+import ClassicThemeControl from '../post-template/classic-theme';
+import BlockThemeControlV2 from './block-theme';
+
+export default function PostTemplatePanelV2() {
+	const { templateId, isBlockTheme } = useSelect( ( select ) => {
+		const { getCurrentTemplateId, getEditorSettings } =
+			select( editorStore );
+		return {
+			templateId: getCurrentTemplateId(),
+			isBlockTheme: getEditorSettings().__unstableIsBlockBasedTheme,
+		};
+	}, [] );
+
+	const isVisible = useSelect( ( select ) => {
+		const postTypeSlug = select( editorStore ).getCurrentPostType();
+		const postType = select( coreStore ).getPostType( postTypeSlug );
+		if ( ! postType?.viewable ) {
+			return false;
+		}
+
+		const settings = select( editorStore ).getEditorSettings();
+		const hasTemplates =
+			!! settings.availableTemplates &&
+			Object.keys( settings.availableTemplates ).length > 0;
+		if ( hasTemplates ) {
+			return true;
+		}
+
+		if ( ! settings.supportsTemplateMode ) {
+			return false;
+		}
+
+		const canCreateTemplates =
+			select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} ) ?? false;
+		return canCreateTemplates;
+	}, [] );
+
+	const canViewTemplates = useSelect(
+		( select ) => {
+			return isVisible
+				? select( coreStore ).canUser( 'read', {
+						kind: 'postType',
+						name: 'wp_template',
+				  } )
+				: false;
+		},
+		[ isVisible ]
+	);
+
+	if ( ( ! isBlockTheme || ! canViewTemplates ) && isVisible ) {
+		return <ClassicThemeControl />;
+	}
+
+	if ( isBlockTheme && !! templateId ) {
+		return <BlockThemeControlV2 id={ templateId } />;
+	}
+	return null;
+}
