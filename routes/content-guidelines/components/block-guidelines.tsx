@@ -143,6 +143,8 @@ export default function BlockGuidelines() {
 			return;
 		}
 		const oldValue = blockGuidelines[ itemToDelete.id ];
+		// We need to pass an empty string to remove the guideline.
+		// This is because the API will only remove the guideline if the value is an empty string.
 		setBlockGuideline( itemToDelete.id, '' );
 		setBusy( true );
 		saveContentGuidelines()
