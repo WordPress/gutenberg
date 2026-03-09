@@ -17,4 +17,9 @@
 		display: flex;
 		justify-content: center;
 	}
+
+	.dataviews-wrapper {
+		margin-right: -$grid-unit-30;
+		margin-left: -$grid-unit-30;
+	}
 }
