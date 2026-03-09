@@ -181,7 +181,7 @@ describe( 'getEntityRecords', () => {
 		const allPosts = registry
 			.select( coreDataStore )
 			.getEntityRecords( 'postType', 'post', { context: 'edit' } );
-		expect( allPosts ).toHaveLength( POSTS.length );
+		expect( allPosts.map( ( p ) => p.id ) ).toEqual( [ 1, 2, 3 ] );
 	} );
 
 	it( 'preserves collection when getEntityRecord is called after getEntityRecords', async () => {
@@ -225,7 +225,7 @@ describe( 'getEntityRecords', () => {
 		const allPosts = registry
 			.select( coreDataStore )
 			.getEntityRecords( 'postType', 'post', { context: 'edit' } );
-		expect( allPosts ).toHaveLength( POSTS.length );
+		expect( allPosts.map( ( p ) => p.id ) ).toEqual( [ 1, 2, 3 ] );
 	} );
 } );
 
