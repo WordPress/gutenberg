@@ -116,7 +116,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers gutenberg_block_core_navigation_set_overlay_image_fetch_priority
+	 * @covers ::block_core_navigation_set_overlay_image_fetch_priority
 	 */
 	public function test_block_core_navigation_set_overlay_image_fetch_priority_multiple_images() {
 		$html   = '<div><img src="a.jpg" /><img src="b.jpg" /></div>';
