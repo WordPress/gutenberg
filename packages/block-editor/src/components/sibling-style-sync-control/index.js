@@ -1,0 +1,129 @@
+/**
+ * WordPress dependencies
+ */
+import { __, sprintf } from '@wordpress/i18n';
+import { Notice, Button } from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { getBlockType } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+import InspectorControls from '../inspector-controls';
+
+/**
+ * Renders a notice in the block inspector for inner blocks that participate in
+ * sibling style sync. Shows whether styles are currently synced or unlinked,
+ * and provides Unlink / Re-sync actions.
+ *
+ * Hidden when:
+ *  - there are no siblings of the same type in the sync scope
+ *  - the parent scope has disabled sync for this block type via syncChildStyles
+ *
+ * @param {Object} props
+ * @param {string} props.clientId Client ID of the current block.
+ * @param {string} props.name     Block name (e.g. 'core/accordion-heading').
+ */
+export function SiblingStyleSyncControl( { clientId, name } ) {
+	const { siblings, isUnlinked, scopeClientId, isSyncEnabled } = useSelect(
+		( select ) => {
+			const privateStore = unlock( select( blockEditorStore ) );
+			const scope =
+				privateStore.__experimentalGetSiblingStyleSyncScopeClientId(
+					clientId,
+					name
+				);
+			const syncChildStyles =
+				scope !== null
+					? select( blockEditorStore ).getBlockAttributes( scope )
+							?.syncChildStyles ?? {}
+					: {};
+
+			return {
+				siblings: privateStore.__experimentalGetSiblingStyleSyncBlocks(
+					clientId,
+					name
+				),
+				isUnlinked: privateStore.__experimentalIsBlockStyleSyncUnlinked(
+					clientId,
+					name
+				),
+				scopeClientId: scope,
+				isSyncEnabled: syncChildStyles[ name ] !== false,
+			};
+		},
+		[ clientId, name ]
+	);
+
+	const dispatch = useDispatch( blockEditorStore );
+
+	if ( siblings.length === 0 || ! isSyncEnabled ) {
+		return null;
+	}
+
+	const privateDispatch = unlock( dispatch );
+	const blockTitle = getBlockType( name )?.title ?? name;
+	const count = siblings.length;
+	const label =
+		count === 1
+			? sprintf(
+					/* translators: 1: number of sibling blocks, 2: block type name */
+					__( '%1$d other %2$s block' ),
+					count,
+					blockTitle
+			  )
+			: sprintf(
+					/* translators: 1: number of sibling blocks, 2: block type name */
+					__( '%1$d other %2$s blocks' ),
+					count,
+					blockTitle
+			  );
+
+	return (
+		<InspectorControls group="advanced">
+			{ isUnlinked ? (
+				<Notice status="warning" isDismissible={ false }>
+					{ sprintf(
+						/* translators: %s: description of sibling blocks e.g. "3 other Accordion Heading blocks" */
+						__( 'Styles are unlinked from %s.' ),
+						label
+					) }{ ' ' }
+					<Button
+						variant="link"
+						onClick={ () =>
+							privateDispatch.__experimentalRelinkBlockStyleSync(
+								clientId,
+								name,
+								scopeClientId
+							)
+						}
+					>
+						{ __( 'Re-sync styles' ) }
+					</Button>
+				</Notice>
+			) : (
+				<Notice status="info" isDismissible={ false }>
+					{ sprintf(
+						/* translators: %s: description of sibling blocks e.g. "3 other Accordion Heading blocks" */
+						__( 'Styles synced with %s.' ),
+						label
+					) }{ ' ' }
+					<Button
+						variant="link"
+						onClick={ () =>
+							privateDispatch.__experimentalUnlinkBlockStyleSync(
+								clientId,
+								name,
+								scopeClientId
+							)
+						}
+					>
+						{ __( 'Unlink this block' ) }
+					</Button>
+				</Notice>
+			) }
+		</InspectorControls>
+	);
+}

@@ -5,6 +5,17 @@ import { Platform } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
+import { getBlockType } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+import { STORE_NAME } from './constants';
+import {
+	partitionAttributesByGroups,
+	mergeStyleByGroups,
+} from './sibling-style-sync-utils';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -527,5 +538,145 @@ export function requestInspectorTab( tabName, options = {} ) {
 export function clearRequestedInspectorTab() {
 	return {
 		type: 'CLEAR_REQUESTED_INSPECTOR_TAB',
+	};
+}
+
+/**
+ * Updates block attributes with sibling style sync propagation.
+ *
+ * If the block type declares `__experimentalSiblingStyleSync` support, the
+ * attributes that belong to the declared sync groups are propagated to all
+ * linked siblings within the sync scope. Attributes outside the sync groups
+ * are only applied to the current block.
+ *
+ * Uses `registry.batch()` so that the whole propagation is a single undo step.
+ *
+ * @param {string} clientId   Client ID of the block being edited.
+ * @param {Object} attributes New attribute values (as passed to setAttributes).
+ */
+export const __experimentalUpdateSyncedBlockAttributes =
+	( clientId, attributes ) =>
+	( { select, dispatch, registry } ) => {
+		const blockName = select.getBlockName( clientId );
+		const syncSupport =
+			getBlockType( blockName )?.supports?.__experimentalSiblingStyleSync;
+
+		if ( ! syncSupport ) {
+			dispatch.updateBlockAttributes( clientId, attributes );
+			return;
+		}
+
+		const { syncedAttributes, unsyncedAttributes } =
+			partitionAttributesByGroups( attributes, syncSupport.groups );
+
+		const hasSyncedAttrs = Object.keys( syncedAttributes ).length > 0;
+		const hasUnsyncedAttrs = Object.keys( unsyncedAttributes ).length > 0;
+
+		const privateSelect = unlock( registry.select( STORE_NAME ) );
+		const scopeClientId =
+			privateSelect.__experimentalGetSiblingStyleSyncScopeClientId(
+				clientId,
+				blockName
+			);
+
+		// Check if the parent scope has sync disabled for this block type.
+		const syncChildStyles =
+			select.getBlockAttributes( scopeClientId )?.syncChildStyles ?? {};
+		if ( syncChildStyles[ blockName ] === false ) {
+			dispatch.updateBlockAttributes( clientId, attributes );
+			return;
+		}
+
+		const siblings = privateSelect.__experimentalGetSiblingStyleSyncBlocks(
+			clientId,
+			blockName
+		);
+		const linkedSiblingIds = siblings
+			.filter(
+				( s ) =>
+					! privateSelect.__experimentalIsBlockStyleSyncUnlinked(
+						s.clientId,
+						blockName
+					)
+			)
+			.map( ( s ) => s.clientId );
+
+		registry.batch( () => {
+			if ( hasUnsyncedAttrs ) {
+				dispatch.updateBlockAttributes( clientId, unsyncedAttributes );
+			}
+
+			if ( hasSyncedAttrs ) {
+				const allLinkedIds = [ clientId, ...linkedSiblingIds ];
+
+				if ( syncedAttributes.style ) {
+					// Per-sibling deep merge: preserve each sibling's
+					// unsynced style sub-keys.
+					allLinkedIds.forEach( ( sibId ) => {
+						const currentStyle =
+							select.getBlockAttributes( sibId )?.style ?? {};
+						const merged = mergeStyleByGroups(
+							currentStyle,
+							syncedAttributes.style,
+							syncSupport.groups
+						);
+						dispatch.updateBlockAttributes( sibId, {
+							...syncedAttributes,
+							style: merged,
+						} );
+					} );
+				} else {
+					dispatch.updateBlockAttributes(
+						allLinkedIds,
+						syncedAttributes
+					);
+				}
+			}
+		} );
+	};
+
+/**
+ * Unlinks a block from its sibling style sync group so that future style
+ * changes are not propagated to or from this block.
+ *
+ * @param {string} clientId      Client ID of the block to unlink.
+ * @param {string} blockName     Name of the block type.
+ * @param {string} scopeClientId Client ID of the scope ancestor.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalUnlinkBlockStyleSync(
+	clientId,
+	blockName,
+	scopeClientId
+) {
+	return {
+		type: 'UNLINK_SIBLING_STYLE_SYNC',
+		clientId,
+		blockName,
+		scopeClientId,
+	};
+}
+
+/**
+ * Re-links a block to its sibling style sync group. On the next style change
+ * by any linked sibling, the styles will propagate to this block again.
+ *
+ * @param {string} clientId      Client ID of the block to relink.
+ * @param {string} blockName     Name of the block type.
+ * @param {string} scopeClientId Client ID of the scope ancestor.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalRelinkBlockStyleSync(
+	clientId,
+	blockName,
+	scopeClientId
+) {
+	return {
+		type: 'RELINK_SIBLING_STYLE_SYNC',
+		clientId,
+		blockName,
+		scopeClientId,
 	};
 }

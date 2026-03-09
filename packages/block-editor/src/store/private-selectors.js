@@ -3,6 +3,7 @@
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
+	getBlockType,
 	hasBlockSupport,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
@@ -17,11 +18,13 @@ import {
 	getSettings,
 	canInsertBlockType,
 	getBlockName,
+	getBlocks,
 	getTemplateLock,
 	getClientIdsWithDescendants,
 	getBlockRootClientId,
 	getBlockAttributes,
 } from './selectors';
+import { findDescendantsOfType } from './sibling-style-sync-utils';
 import {
 	checkAllowListRecursive,
 	getAllPatternsDependants,
@@ -1048,4 +1051,100 @@ export function getViewportModalClientIds( state ) {
  */
 export function getRequestedInspectorTab( state ) {
 	return state.requestedInspectorTab;
+}
+
+/**
+ * Returns the clientId of the nearest ancestor block that acts as the sibling
+ * style sync scope for a given block. The scope is the ancestor block whose
+ * name matches the `scope` value declared in the block type's
+ * `__experimentalSiblingStyleSync` support. If no `scope` is declared, the
+ * direct parent is returned.
+ *
+ * @param {Object} state     Editor state.
+ * @param {string} clientId  Client ID of the block.
+ * @param {string} blockName Name of the block type.
+ *
+ * @return {string|null} ClientId of the scope ancestor, or null if not found.
+ */
+export function __experimentalGetSiblingStyleSyncScopeClientId(
+	state,
+	clientId,
+	blockName
+) {
+	const syncSupport =
+		getBlockType( blockName )?.supports?.__experimentalSiblingStyleSync;
+	if ( ! syncSupport ) {
+		return null;
+	}
+
+	const scopeBlockName = syncSupport.scope;
+	const parents = getBlockParents( state, clientId, true ); // ascending
+
+	if ( ! scopeBlockName ) {
+		// No scope declared (direct parent is the scope).
+		return parents[ 0 ] ?? null;
+	}
+
+	for ( const parentId of parents ) {
+		if ( getBlockName( state, parentId ) === scopeBlockName ) {
+			return parentId;
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Returns all blocks of the same type as `blockName` that exist within the
+ * sync scope ancestor of `clientId`, excluding `clientId` itself.
+ *
+ * @param {Object} state     Editor state.
+ * @param {string} clientId  Client ID of the block.
+ * @param {string} blockName Name of the block type.
+ *
+ * @return {Object[]} Sibling block objects.
+ */
+export const __experimentalGetSiblingStyleSyncBlocks = createSelector(
+	( state, clientId, blockName ) => {
+		const scopeId = __experimentalGetSiblingStyleSyncScopeClientId(
+			state,
+			clientId,
+			blockName
+		);
+		if ( ! scopeId ) {
+			return [];
+		}
+		const scopeBlocks = getBlocks( state, scopeId );
+		return findDescendantsOfType( scopeBlocks, blockName ).filter(
+			( block ) => block.clientId !== clientId
+		);
+	},
+	( state ) => [ state.blocks.tree, state.blocks.parents ]
+);
+
+/**
+ * Returns whether a specific block instance has been unlinked from its sibling
+ * style sync group.
+ *
+ * @param {Object} state     Editor state.
+ * @param {string} clientId  Client ID of the block.
+ * @param {string} blockName Name of the block type.
+ *
+ * @return {boolean} True if the block is unlinked.
+ */
+export function __experimentalIsBlockStyleSyncUnlinked(
+	state,
+	clientId,
+	blockName
+) {
+	const scopeId = __experimentalGetSiblingStyleSyncScopeClientId(
+		state,
+		clientId,
+		blockName
+	);
+	if ( ! scopeId ) {
+		return false;
+	}
+	const key = `${ scopeId }:${ blockName }`;
+	return state.siblingStyleSync[ key ]?.unlinkedIds.has( clientId ) ?? false;
 }
