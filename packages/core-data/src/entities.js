@@ -238,6 +238,14 @@ export const rootEntitiesConfig = [
 		supportsPagination: true,
 	},
 	{
+		label: __( 'Field Collection' ),
+		name: 'fieldCollection',
+		kind: 'root',
+		baseURL: '/wp/v2/field-collections',
+		plural: 'fieldCollections',
+		key: 'id',
+	},
+	{
 		label: __( 'Icons' ),
 		name: 'icon',
 		kind: 'root',

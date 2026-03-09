@@ -71,6 +71,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php';
 	require __DIR__ . '/compat/wordpress-7.1/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php';
+	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-field-collections-controller.php';
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/collaboration.php';
 
@@ -118,6 +119,8 @@ if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 require __DIR__ . '/compat/wordpress-7.1/media.php';
 require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
+require __DIR__ . '/compat/wordpress-7.1/field-collections.php';
+require __DIR__ . '/compat/wordpress-7.1/field-collections-register-core-collections.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/omnibar/load.php';
