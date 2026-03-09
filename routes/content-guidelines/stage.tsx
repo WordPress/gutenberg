@@ -19,6 +19,9 @@ import { fetchContentGuidelines } from './api';
 import BlockGuidelines from './components/block-guidelines';
 import { bootstrapBlockRegistry } from './bootstrap-block-registry';
 
+// Bootstrap Core blocks so block icons are available (e.g. in Block Guidelines).
+bootstrapBlockRegistry();
+
 const GUIDELINE_ITEMS = [
 	{
 		title: __( 'Site' ),
@@ -64,8 +67,6 @@ function ContentGuidelinesPage() {
 	const [ error, setError ] = useState< string | null >( null );
 
 	useEffect( () => {
-		// Bootstrap Core blocks so block icons are available (e.g. in Block Guidelines).
-		bootstrapBlockRegistry();
 		// Populate the store with the content guidelines.
 		fetchContentGuidelines()
 			.then( () => setError( null ) )
