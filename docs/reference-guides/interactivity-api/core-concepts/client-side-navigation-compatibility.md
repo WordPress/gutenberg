@@ -161,14 +161,11 @@ The key rules for script modules and CSN:
 -   Only `<script type="module">` tags are supported. Regular `<script>` tags without `type="module"` are ignored during navigation.
 -   Only **external** script modules (those with a `src` attribute) are processed. Inline script modules — where the code is written directly inside the `<script>` tag — are not re-executed.
 -   For blocks, the `loadOnClientNavigation` flag is set automatically when the script module is declared in `block.json` and `supports.interactivity.clientNavigation` is `true`.
--   For non-block script modules (e.g., those enqueued by a theme or plugin), set `loadOnClientNavigation` to `true` manually when registering with [`wp_register_script_module()`](https://developer.wordpress.org/reference/functions/wp_register_script_module/):
+-   For non-block script modules (e.g., those enqueued by a theme or plugin), register the script module for client-side navigation explicitly using [`add_client_navigation_support_to_script_module()`](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#ensuring-script-modules-load-during-navigation):
 
 ```php
-wp_register_script_module(
-	'my-plugin/navigation-handler',
-	plugin_dir_url( __FILE__ ) . 'assets/navigation-handler.js',
-	array(),
-	array( 'loadOnClientNavigation' => true )
+wp_interactivity()->add_client_navigation_support_to_script_module(
+	'my-plugin/navigation-handler'
 );
 ```
 
