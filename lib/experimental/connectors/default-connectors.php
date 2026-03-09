@@ -328,16 +328,15 @@ function _gutenberg_register_default_connector_settings(): void {
 		return;
 	}
 
-	foreach ( _gutenberg_get_connector_settings() as $connector_id => $connector_data ) {
+	foreach ( _gutenberg_get_connector_settings() as $connector_data ) {
 		$auth = $connector_data['authentication'];
 		if ( 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
 			continue;
 		}
 
-		$setting_name = $auth['setting_name'];
 		register_setting(
 			'connectors',
-			$setting_name,
+			$auth['setting_name'],
 			array(
 				'type'              => 'string',
 				'label'             => sprintf(
