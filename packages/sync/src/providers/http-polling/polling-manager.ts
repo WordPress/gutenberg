@@ -488,7 +488,7 @@ function registerRoom( {
 	}
 
 	function unregister(): void {
-		doc.off( 'update', onDocUpdate );
+		doc.off( 'updateV2', onDocUpdate );
 		awareness.off( 'change', onAwarenessUpdate );
 		updateQueue.clear();
 	}
@@ -512,7 +512,7 @@ function registerRoom( {
 		updateQueue,
 	};
 
-	doc.on( 'update', onDocUpdate );
+	doc.on( 'updateV2', onDocUpdate );
 	awareness.on( 'change', onAwarenessUpdate );
 	roomStates.set( room, roomState );
 
