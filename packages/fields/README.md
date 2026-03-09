@@ -71,6 +71,10 @@ Export action as JSON for Pattern.
 
 Featured Image field for BasePostWithEmbeddedFeaturedMedia.
 
+### formatField
+
+Format field for BasePost.
+
 ### MediaEdit
 
 A media edit control component that provides a media picker UI with upload functionality for selecting WordPress media attachments. Supports both the traditional WordPress media library and the experimental DataViews media modal.

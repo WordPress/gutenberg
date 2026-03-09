@@ -57,6 +57,7 @@ const form = {
 			],
 		},
 		'template',
+		'format',
 	],
 };
 
