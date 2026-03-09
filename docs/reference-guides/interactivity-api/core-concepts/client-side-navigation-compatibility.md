@@ -4,6 +4,14 @@ Client-side navigation (CSN) enables page transitions without a full page reload
 
 This guide explains what to consider when evaluating compatibility. While the examples focus on blocks, the same principles apply to any code that outputs markup on the front end — including classic PHP themes and plugins.
 
+<div class="callout callout-info">
+
+This guide assumes familiarity with [blocks](https://developer.wordpress.org/block-editor/getting-started/), [`block.json`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/), and the basics of the [Interactivity API](/docs/reference-guides/interactivity-api/). If you're new to the Interactivity API, start with the [Quick Start Guide](/docs/reference-guides/interactivity-api/iapi-quick-start-guide.md) first.
+
+</div>
+
+For an overview of how client-side navigation works — including the fetch-diff-apply cycle, router regions, and script module handling — see the [Client-Side Navigation guide](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md).
+
 ## Declaring compatibility in `block.json`
 
 Blocks declare CSN compatibility through the `supports.interactivity.clientNavigation` property in `block.json`:
@@ -59,9 +67,9 @@ However, compatibility must still be declared explicitly in `block.json`. The In
 
 ### Interactive blocks using the Interactivity API
 
-Blocks that use the Interactivity API for their client-side behavior are designed to work with CSN. The Interactivity API manages DOM updates through a virtual DOM diffing algorithm, ensuring that interactive state is preserved across navigations.
+Blocks that use the Interactivity API for their client-side behavior are designed to work with CSN. The Interactivity API manages DOM updates through its [virtual DOM diffing algorithm](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md), ensuring that interactive state is preserved across navigations.
 
-That said, interactive blocks must follow certain practices to remain compatible. See [Ensuring compatibility](#ensuring-compatibility) for details.
+That said, interactive blocks must follow certain practices to remain compatible. These guidelines cover three areas — CSS, JavaScript, and HTML — and are detailed in [Ensuring compatibility](#ensuring-compatibility).
 
 ### Interactive blocks using other libraries
 
@@ -69,33 +77,47 @@ Blocks that use vanilla JavaScript, jQuery, or any framework other than the Inte
 
 These blocks typically rely on scripts that run once on page load to initialize behavior — attaching event listeners, manipulating the DOM, or setting up widgets. During client-side navigation, the HTML may be replaced, but those initialization scripts won't run again, leaving the block non-functional.
 
+### Quick reference
+
+The table below summarizes the compatibility status and required action for each block type:
+
+| Block type                                           | Compatible?                      | Action                                        |
+| ---------------------------------------------------- | -------------------------------- | --------------------------------------------- |
+| Non-interactive block (no JS)                        | Yes                              | Set `clientNavigation` to `true`              |
+| Interactive block using the Interactivity API        | Yes (if guidelines are followed) | Set `interactivity` to `true` (shorthand)     |
+| Interactive block using other libraries              | No                               | Omit or set `clientNavigation` to `false`     |
+| Block injecting or modifying CSS at runtime          | No                               | Use server-rendered styles or `data-wp-class` |
+| Block using `wp_unique_id()` for CSS selectors       | No                               | Use `wp_unique_id_from_values()`              |
+| Block mutating the DOM outside the Interactivity API | No                               | Use directives or `data-wp-watch`             |
+| Block using regular scripts (not script modules)     | No                               | Migrate to script modules                     |
+
 ## Ensuring compatibility
 
-Even code built with the Interactivity API needs to follow certain guidelines to work correctly with CSN. The sections below are organized by the type of issue: CSS, JavaScript, and HTML.
+Any code that outputs front-end markup — whether it uses the Interactivity API, server-side rendering only, or a combination — needs to follow certain guidelines to work correctly with CSN. The sections below are organized by the type of issue: CSS, JavaScript, and HTML.
 
 ### CSS
 
 #### Do not inject CSS dynamically
 
-Blocks that inject `<style>` elements through JavaScript at runtime are not compatible with CSN. The Interactivity API manages stylesheets during navigation by tracking the `<link>` and `<style>` elements that the server includes in the page's `<head>`. Styles created dynamically by client-side code fall outside this system and may be lost or disabled during navigation.
+Blocks that inject `<style>` elements through JavaScript at runtime are not compatible with CSN. The Interactivity API manages stylesheets during navigation by tracking the `<link>` and `<style>` elements that the server includes in the page's `<head>`. Styles created dynamically by client-side code fall outside this system — after navigating, the block may appear unstyled or with broken layout.
 
-If a block needs conditional styles, use server-side logic to include the appropriate stylesheets when the block is rendered. For example, use [`wp_enqueue_block_support_styles()`](https://developer.wordpress.org/reference/functions/wp_enqueue_block_support_styles/) or conditionally enqueue a stylesheet in your block's `render_callback`.
+**Instead:** Use server-side logic to include the appropriate stylesheets when the block is rendered. For example, use [`wp_enqueue_block_support_styles()`](https://developer.wordpress.org/reference/functions/wp_enqueue_block_support_styles/) or conditionally enqueue a stylesheet in your block's `render_callback`.
 
 #### Do not modify existing stylesheets using JavaScript
 
-Programmatically modifying CSS rules at runtime — for example, using the [CSSOM](https://developer.mozilla.org/en-US/docs/Web/API/CSS_Object_Model) APIs like `CSSStyleSheet.insertRule()`, `CSSStyleSheet.deleteRule()`, or modifying `CSSStyleDeclaration` objects directly — is not compatible with CSN. These changes are not tracked by the Interactivity API and will be lost when the page's stylesheets are reconciled during navigation.
+Programmatically modifying CSS rules at runtime is not compatible with CSN. This includes using [CSSOM](https://developer.mozilla.org/en-US/docs/Web/API/CSS_Object_Model) APIs like `CSSStyleSheet.insertRule()`, `CSSStyleSheet.deleteRule()`, or modifying `CSSStyleDeclaration` objects directly. These changes are not tracked by the Interactivity API and will be lost when the page's stylesheets are reconciled during navigation.
 
-Instead, use server-side logic to produce the correct stylesheets, or toggle CSS classes on elements using Interactivity API directives like `data-wp-class`.
+**Instead:** Use server-side logic to produce the correct stylesheets, or toggle CSS classes on elements using Interactivity API directives like `data-wp-class`.
 
 #### Use stable CSS selectors
 
 CSS selectors (class names, IDs, etc.) must be **stable across navigations**. If a selector changes between page loads, styles may break or apply to the wrong elements after a client-side navigation.
 
-This is especially important for elements **outside router regions**. Since those elements are not replaced during navigation, the incoming page's stylesheets must continue to match them. If both pages share the same template this is usually the case, but mismatches can occur when different templates produce different wrapper elements or class names for the same structural areas.
+This is especially important for elements **outside [router regions](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#setting-up-router-regions)** — the areas of the page that the Interactivity API replaces during navigation. Since elements outside those regions are not replaced, the incoming page's stylesheets must continue to match them. If both pages share the same template this is usually the case, but mismatches can occur when different templates produce different wrapper elements or class names for shared layout elements like headers, footers, or sidebars.
 
 CSS selectors applied to elements **inside router regions** must also be stable. Since regions are replaced during navigation, the incoming HTML must use the same selectors so that existing stylesheets continue to apply correctly.
 
-A common source of unstable selectors is [`wp_unique_id()`](https://developer.wordpress.org/reference/functions/wp_unique_id/). This function generates sequential IDs (`id-1`, `id-2`, etc.) based on a global counter that resets on each page load. When navigating between two pages, the same block may receive a different ID on each page, causing the CSS selector to no longer match the element.
+One of the most frequent causes of CSN compatibility failures is [`wp_unique_id()`](https://developer.wordpress.org/reference/functions/wp_unique_id/). This function generates sequential IDs (`id-1`, `id-2`, etc.) based on a global counter that resets on each page load. When navigating between two pages, the same block may receive a different ID on each page, causing the CSS selector to no longer match the element.
 
 Instead, use [`wp_unique_id_from_values()`](https://developer.wordpress.org/reference/functions/wp_unique_id_from_values/) (available since WordPress 6.8). This function generates a deterministic hash-based identifier from an array of values, producing the same ID for the same inputs regardless of rendering order:
 
@@ -112,17 +134,43 @@ $id = wp_unique_id_from_values(
 
 This applies to any selector used in CSS — class names, IDs, or `data-*` attributes used in stylesheets.
 
+#### Handle CSS animations and transitions
+
+CSS animations and transitions may not replay after a client-side navigation. When the virtual DOM diffing algorithm updates an element in place rather than remounting it, the browser does not restart its CSS animations — the element was never removed from the DOM, so no new animation cycle begins.
+
+To re-trigger animations after navigation, toggle the animation's CSS class using `data-wp-class` combined with a state value that changes on each navigation, or use `data-wp-init` to programmatically restart the animation by removing and re-adding the relevant class:
+
+```html
+<div
+	data-wp-interactive="myPlugin"
+	data-wp-init="callbacks.restartAnimation"
+	data-wp-class--animate="state.shouldAnimate"
+>
+	Animated content
+</div>
+```
+
 ### JavaScript
 
 #### Use script modules, not regular scripts
 
-Client-side navigation only supports [script modules](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/) (`<script type="module">`). Regular scripts (`<script>` tags without `type="module"`) that run on page load will **not** be re-executed when a page is visited through client-side navigation.
+Client-side navigation only supports [script modules](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/) (`<script type="module">`). Regular scripts will **not** be re-executed when a page is visited through client-side navigation — so a jQuery slider or vanilla JS accordion will initialize on the first page load but stop working after the first navigation.
 
-Additionally, only **external** script modules (those with a `src` attribute) are processed during client-side navigation. Inline script modules — where the code is written directly inside the `<script>` tag — are not re-executed during navigation.
+The key rules for script modules and CSN:
 
-Script modules that should be loaded during client-side navigation must be registered with the appropriate dependency declaration so that WordPress includes the `loadOnClientNavigation` flag. For blocks, this happens automatically when the script module is declared in `block.json` and `supports.interactivity.clientNavigation` is set to `true`.
+-   Only `<script type="module">` tags are supported. Regular `<script>` tags without `type="module"` are ignored during navigation.
+-   Only **external** script modules (those with a `src` attribute) are processed. Inline script modules — where the code is written directly inside the `<script>` tag — are not re-executed.
+-   For blocks, the `loadOnClientNavigation` flag is set automatically when the script module is declared in `block.json` and `supports.interactivity.clientNavigation` is `true`.
+-   For non-block script modules (e.g., those enqueued by a theme or plugin), set `loadOnClientNavigation` to `true` manually when registering with [`wp_register_script_module()`](https://developer.wordpress.org/reference/functions/wp_register_script_module/):
 
-For script modules that don't belong to a block — for example, those enqueued by a classic PHP theme or a plugin — you need to mark them manually by passing `loadOnClientNavigation: true` when registering the module with [`wp_register_script_module()`](https://developer.wordpress.org/reference/functions/wp_register_script_module/).
+```php
+wp_register_script_module(
+	'my-plugin/navigation-handler',
+	plugin_dir_url( __FILE__ ) . 'assets/navigation-handler.js',
+	array(),
+	array( 'loadOnClientNavigation' => true )
+);
+```
 
 For more details on how script modules are handled during navigation, see the [Script module handling](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#script-module-handling) section of the Client-Side Navigation guide.
 
@@ -130,7 +178,7 @@ For more details on how script modules are handled during navigation, see the [S
 
 #### Keep consistent HTML structures
 
-The Interactivity API uses Preact under the hood for virtual DOM diffing. When navigating between pages, Preact compares the current and incoming HTML to calculate the minimum set of DOM changes. Inconsistencies between the two can cause elements to be remounted instead of updated — which may result in lost state — or cause different elements to be treated as the same node, breaking internal state or preventing lifecycle callbacks (like `data-wp-init` or `data-wp-watch`) from re-executing when they should.
+Inconsistent HTML between pages can cause a modal to lose its open/closed state, interactive elements to stop responding, or lifecycle callbacks (like `data-wp-init` or `data-wp-watch`) to not re-execute when they should. This happens because the Interactivity API uses [Preact](https://preactjs.com/) (a lightweight React-compatible library) under the hood, which compares the current and incoming HTML to calculate the minimum set of DOM changes. When the structure doesn't match, Preact may remount elements (losing state) or incorrectly reuse nodes (breaking behavior).
 
 Common issues include:
 
@@ -154,9 +202,9 @@ Use a value that uniquely identifies each element across navigations, such as a 
 
 #### Do not mutate the DOM outside the Interactivity API
 
-All DOM modifications should go through Interactivity API directives. Directly manipulating the DOM using vanilla JavaScript APIs — such as `document.createElement()`, `element.appendChild()`, `element.remove()`, or jQuery methods — is not compatible with CSN. The Interactivity API's virtual DOM diffing won't be aware of these changes, and they will be lost or cause conflicts during navigation.
+All DOM modifications should go through Interactivity API directives. Directly manipulating the DOM using vanilla JavaScript APIs — such as `document.createElement()`, `element.appendChild()`, `element.remove()`, or jQuery methods — is not compatible with CSN. Elements added this way (like dynamically created tooltips or injected widgets) will vanish after navigating away and back, because the virtual DOM diffing is not aware of them.
 
-For cases where you need to update the inner HTML of an element or make other imperative DOM changes, use the [`data-wp-watch`](/docs/reference-guides/interactivity-api/api-reference.md#wp-watch) directive. This directive runs a callback whenever reactive state changes, giving you a controlled way to perform side effects — including imperative DOM updates — that re-execute correctly after each navigation:
+For cases where you need to update the inner HTML of an element or make other imperative DOM changes, use the [`data-wp-watch`](/docs/reference-guides/interactivity-api/api-reference.md#wp-watch) directive. This directive runs a callback whenever [reactive state](/docs/reference-guides/interactivity-api/api-reference.md#the-store) — the global state managed by the Interactivity API's `store()` — changes, giving you a controlled way to perform side effects — including imperative DOM updates — that re-execute correctly after each navigation:
 
 ```html
 <div
@@ -187,6 +235,14 @@ The Interactivity API's client-side navigation only manages content inside [rout
 
 If a block needs to render content outside its main region — for example, an overlay that must be a direct child of `<body>` — use the router's `attachTo` property to define a region that can be dynamically created during navigation. This is explained in the [Client-Side Navigation guide](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#attaching-new-router-regions).
 
+## Verifying compatibility
+
+After implementing the guidelines above, use the following approach to confirm that client-side navigation is working correctly with your block:
+
+1. **Check for full-page reloads.** Open the browser's Network tab (DevTools), then click a link that navigates to a page containing your block. If CSN is active, you'll see a `fetch` request for the new page's HTML instead of a full document navigation. A full document load means something on the page is incompatible — the Interactivity API fell back to a traditional navigation.
+2. **Test interactive state preservation.** Open a modal, expand an accordion, or trigger any interactive state in your block. Navigate to another page and then back. If the block's state is preserved (or correctly re-initialized via `data-wp-init`), CSN is working as expected. If the block appears frozen or unresponsive, check for DOM mutations or scripts running outside the Interactivity API.
+3. **Test across different templates.** Navigate between pages that use different templates (e.g., a single post and an archive). This exercises the CSS selector stability and HTML structure consistency rules, since different templates may produce different wrapper elements.
+
 ## Compatibility checklist
 
 Before marking your block as compatible with client-side navigation, verify the following:
@@ -199,16 +255,4 @@ Before marking your block as compatible with client-side navigation, verify the 
 -   [ ] Lists of sibling elements that can change between navigations use `data-wp-key`.
 -   [ ] The block uses script modules, not regular `<script>` tags.
 -   [ ] CSS animations and transitions work correctly after a client-side navigation (they may need to be re-triggered).
--   [ ] The block works correctly with the [experimental full-page client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#full-page-client-side-navigation-experimental) mode.
-
-## Quick reference
-
-| Block type                                           | Compatible?                      | Action                                        |
-| ---------------------------------------------------- | -------------------------------- | --------------------------------------------- |
-| Non-interactive block (no JS)                        | Yes                              | Set `clientNavigation` to `true`              |
-| Interactive block using the Interactivity API        | Yes (if guidelines are followed) | Set `interactivity` to `true`                 |
-| Interactive block using other libraries              | No                               | Omit or set `clientNavigation` to `false`     |
-| Block injecting or modifying CSS at runtime          | No                               | Use server-rendered styles or `data-wp-class` |
-| Block using `wp_unique_id()` for CSS selectors       | No                               | Use `wp_unique_id_from_values()`              |
-| Block mutating the DOM outside the Interactivity API | No                               | Use directives or `data-wp-watch`             |
-| Block using regular scripts (not script modules)     | No                               | Migrate to script modules                     |
+-   [ ] (Optional) The block works correctly with the [experimental full-page client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#full-page-client-side-navigation-experimental) mode.
