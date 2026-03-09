@@ -195,12 +195,16 @@ add_action( 'admin_init', 'gutenberg_post_list_collaboration_ui' );
 function gutenberg_post_list_collaboration_styles() {
 	?>
 	<style type="text/css">
-		/* Hide the lock indicator icon in the checkbox column. */
-		.locked-indicator {
+		/*
+		 * Hide the lock indicator icon in the checkbox column.
+		 * WordPress core shows it via .wp-locked .locked-indicator,
+		 * so we must match that specificity to override it.
+		 */
+		.wp-locked .locked-indicator {
 			display: none;
 		}
 		/* Hide the user avatar in the locked info area. */
-		.locked-info .locked-avatar {
+		.wp-locked .locked-info .locked-avatar {
 			display: none;
 		}
 	</style>
