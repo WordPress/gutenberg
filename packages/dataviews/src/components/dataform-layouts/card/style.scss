@@ -10,7 +10,7 @@
 	justify-content: space-between;
 	align-items: center;
 	width: 100%;
-	min-height: var(--wpds-dimension-gap-2xl);
+	min-height: 24px; // TODO: use size / height DS token when available
 }
 
 .dataforms-layouts-card__field-description {
