@@ -135,18 +135,24 @@ export default function BlockGuidelines() {
 		if ( ! itemToDelete ) {
 			return;
 		}
+		const oldValue = blockGuidelines[ itemToDelete.id ];
 		setBlockGuideline( itemToDelete.id, '' );
 		setBusy( true );
 		saveContentGuidelines()
 			.then( () => {
 				setError( null );
-				setItemToDelete( null );
 				createSuccessNotice( __( 'Block guidelines removed.' ), {
 					type: 'snackbar',
 				} );
 			} )
-			.catch( ( e: Error ) => setError( e.message ) )
-			.finally( () => setBusy( false ) );
+			.catch( ( e: Error ) => {
+				setError( e.message );
+				setBlockGuideline( itemToDelete.id, oldValue );
+			} )
+			.finally( () => {
+				setBusy( false );
+				setItemToDelete( null );
+			} );
 	};
 
 	const { data: processedData, paginationInfo } = useMemo(
