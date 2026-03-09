@@ -9,7 +9,7 @@ import styles from './style.module.css';
  * Built on design tokens for consistent typography across the UI.
  */
 export const Text = forwardRef< HTMLSpanElement, TextProps >( function Text(
-	{ variant, render, className, ...props },
+	{ variant = 'body-md', render, className, ...props },
 	ref
 ) {
 	const element = useRender( {

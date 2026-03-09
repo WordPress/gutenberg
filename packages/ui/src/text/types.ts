@@ -4,8 +4,10 @@ export interface TextProps extends ComponentProps< 'span' > {
 	/**
 	 * The typographic variant to apply, controlling font family, size,
 	 * line height, and weight.
+	 *
+	 * @default "body-md"
 	 */
-	variant:
+	variant?:
 		| 'heading-2xl'
 		| 'heading-xl'
 		| 'heading-lg'
