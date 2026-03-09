@@ -113,7 +113,7 @@ export default function BlockGuidelines() {
 			{
 				id: 'edit',
 				label: __( 'Edit' ),
-				callback: ( items ) => {
+				callback: ( items: DataRow[] ) => {
 					const item = items[ 0 ];
 					setSelectedItem( item.id );
 					setIsOpen( true );
@@ -122,7 +122,7 @@ export default function BlockGuidelines() {
 			{
 				id: 'remove',
 				label: __( 'Remove' ),
-				callback: ( items ) => {
+				callback: ( items: DataRow[] ) => {
 					const item = items[ 0 ];
 					setItemToDelete( item );
 				},
