@@ -1826,6 +1826,31 @@
 				}
 			]
 		},
+		"stylesBlocksPseudoSelectorsProperties": {
+			"type": "object",
+			"properties": {
+				":hover": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":focus": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":focus-visible": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":active": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				}
+			}
+		},
+		"stylesBlocksPseudoSelectorsPropertyNames": {
+			"enum": [
+				":hover",
+				":focus",
+				":focus-visible",
+				":active"
+			]
+		},
 		"stylesElementsPseudoSelectorsProperties": {
 			"type": "object",
 			"properties": {
@@ -1848,23 +1873,6 @@
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
 				":visited": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				}
-			}
-		},
-		"stylesBlocksPseudoSelectorsProperties": {
-			"type": "object",
-			"properties": {
-				":hover": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				},
-				":focus": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				},
-				":focus-visible": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				},
-				":active": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			}
@@ -2000,10 +2008,59 @@
 				"core/button": {
 					"allOf": [
 						{
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+							"$ref": "#/definitions/stylesProperties"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"variations": {
+									"type": "object",
+									"patternProperties": {
+										"^[a-z][a-z0-9-]*$": {
+											"allOf": [
+												{
+													"$ref": "#/definitions/stylesProperties"
+												},
+												{
+													"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+												},
+												{
+													"type": "object",
+													"propertyNames": {
+														"anyOf": [
+															{
+																"$ref": "#/definitions/stylesPropertyNames"
+															},
+															{
+																"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+															}
+														]
+													}
+												}
+											]
+										}
+									}
+								}
+							}
 						},
 						{
 							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+						},
+						{
+							"type": "object",
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"enum": [ "variations" ]
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+									}
+								]
+							}
 						}
 					]
 				},
@@ -2455,7 +2512,27 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/button": {
-					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesProperties"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+						},
+						{
+							"type": "object",
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+									}
+								]
+							}
+						}
+					]
 				},
 				"core/buttons": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
