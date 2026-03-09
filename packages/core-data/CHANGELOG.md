@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Breaking Changes
-
--   Added `StoreRegistry` for typed string-based store access.
-
 ## 7.41.0 (2026-03-04)
 
 ## 7.40.0 (2026-02-18)

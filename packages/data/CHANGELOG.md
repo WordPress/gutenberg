@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Removed exported types: `UseSelectReturn`, `UseDispatchReturn`, `DispatchFunction`, `DispatchReturn`, `SelectFunction`, `AnyConfig`, `CurriedSelectorsResolveOf`.
+
+### Enhancements
+
+-   Added `StoreRegistry` interface for typed string-based store access via `select()`, `dispatch()`, `resolveSelect()`, `suspendSelect()`, `useSelect()`, and `useDispatch()`.
+-   Moved `resolveSelect` and `suspendSelect` to dedicated modules with typed overloads.
+
 ## 10.41.0 (2026-03-04)
 
 ## 10.40.0 (2026-02-18)
