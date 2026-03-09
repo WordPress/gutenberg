@@ -5,6 +5,7 @@
 		{ "path": "../a11y" },
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blob" },
+		{ "path": "../blocks" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../data" },
