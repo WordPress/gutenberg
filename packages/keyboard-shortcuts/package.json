@@ -33,9 +33,9 @@
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
+			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.mjs",
-			"require": "./build/index.cjs",
-			"types": "./build-types/index.d.ts"
+			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
