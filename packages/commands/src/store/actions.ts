@@ -40,7 +40,7 @@ export interface WPCommandConfig {
 	label: string;
 	searchLabel?: string;
 	context?: string;
-	category?: WPCommandCategory;
+	category: WPCommandCategory;
 	icon: JSX.Element;
 	callback: ( props: { close: () => void } ) => void;
 	disabled?: boolean;
@@ -64,7 +64,7 @@ type WPCommandLoaderHook = ( search: string ) => WPCommandConfig[];
 export interface WPCommandLoaderConfig {
 	name: string;
 	context?: string;
-	category: WPCommandCategory;
+	category?: WPCommandCategory;
 	hook: WPCommandLoaderHook;
 	disabled?: boolean;
 }

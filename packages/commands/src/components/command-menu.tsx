@@ -72,7 +72,7 @@ const CATEGORY_LABELS: Record< string, TranslatableText< string > > = {
  * @return {boolean} True if the parameter is a valid icon and false otherwise.
  */
 
-export function isValidIcon( icon: any ) {
+export function isValidIcon( icon: unknown ) {
 	return (
 		!! icon &&
 		( typeof icon === 'string' ||
@@ -82,10 +82,10 @@ export function isValidIcon( icon: any ) {
 	);
 }
 
-type SetLoader = ( name?: string, isLoading: boolean ) => void;
+type SetLoader = ( name: string, isLoading: boolean ) => void;
 
 interface CommandMenuLoaderProps {
-	name?: string;
+	name: string;
 	search: string;
 	hook: ( props: { search: string } ) => {
 		isLoading: boolean;
@@ -291,7 +291,7 @@ interface CommandInputProps {
 }
 
 function CommandInput( { isOpen, search, setSearch }: CommandInputProps ) {
-	const commandMenuInput = useRef< HTMLInputElement >();
+	const commandMenuInput = useRef< HTMLInputElement >( null );
 	const _value = useCommandState( ( state ) => state.value );
 	const selectedItemId = useMemo( () => {
 		const item = document.querySelector(
@@ -311,7 +311,9 @@ function CommandInput( { isOpen, search, setSearch }: CommandInputProps ) {
 			value={ search }
 			onValueChange={ setSearch }
 			placeholder={ inputLabel }
-			aria-activedescendant={ selectedItemId }
+			aria-activedescendant={
+				selectedItemId ? selectedItemId : undefined
+			}
 		/>
 	);
 }
@@ -327,7 +329,7 @@ export function CommandMenu() {
 		[]
 	);
 	const { open, close } = useDispatch( commandsStore );
-	const [ loaders, setLoaders ] = useState( {} );
+	const [ loaders, setLoaders ] = useState< SetLoader >( {} );
 
 	useEffect( () => {
 		registerShortcut( {
@@ -344,7 +346,7 @@ export function CommandMenu() {
 	useShortcut(
 		'core/commands',
 		/** @type {React.KeyboardEventHandler} */
-		withIgnoreIMEEvents( ( event ) => {
+		withIgnoreIMEEvents( ( event: KeyboardEvent ) => {
 			// Bails to avoid obscuring the effect of the preceding handler(s).
 			if ( event.defaultPrevented ) {
 				return;
