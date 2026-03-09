@@ -19,7 +19,11 @@ import {
  */
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
-import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
+import {
+	sectionRootClientIdKey,
+	isIsolatedEditorKey,
+	disableContentOnlyForTemplatePartsKey,
+} from './private-keys';
 import { unlock } from '../lock-unlock';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -2550,10 +2554,15 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 						state.blocks.attributes.get( clientId )?.metadata
 							?.patternName
 			  );
+	const disableContentOnlyForTemplateParts =
+		state.settings?.[ disableContentOnlyForTemplatePartsKey ];
+
 	const contentOnlyParents = [
 		...contentOnlyTemplateLockedClientIds,
 		...unsyncedPatternClientIds,
-		...( isIsolatedEditor ? [] : templatePartClientIds ),
+		...( isIsolatedEditor || disableContentOnlyForTemplateParts
+			? []
+			: templatePartClientIds ),
 	];
 
 	traverseBlockTree( state, treeClientId, ( block ) => {
@@ -3072,7 +3081,8 @@ export function withDerivedBlockEditingModes( reducer ) {
 			case 'UPDATE_SETTINGS': {
 				// Recompute the entire tree if the section root,
 				// the effective disableContentOnlyForUnsyncedPatterns value,
-				// or the isIsolatedEditor value changes.
+				// the isIsolatedEditor value, or the
+				// disableContentOnlyForTemplateParts value changes.
 				// These are all values that affect the computation.
 				if (
 					state?.settings?.[ sectionRootClientIdKey ] !==
@@ -3082,7 +3092,13 @@ export function withDerivedBlockEditingModes( reducer ) {
 						!! nextState?.settings
 							?.disableContentOnlyForUnsyncedPatterns ||
 					!! state?.settings?.[ isIsolatedEditorKey ] !==
-						!! nextState?.settings?.[ isIsolatedEditorKey ]
+						!! nextState?.settings?.[ isIsolatedEditorKey ] ||
+					!! state?.settings?.[
+						disableContentOnlyForTemplatePartsKey
+					] !==
+						!! nextState?.settings?.[
+							disableContentOnlyForTemplatePartsKey
+						]
 				) {
 					return {
 						...nextState,
