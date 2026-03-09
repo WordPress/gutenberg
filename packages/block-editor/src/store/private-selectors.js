@@ -36,7 +36,6 @@ import {
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 	isIsolatedEditorKey,
-	disableContentOnlyForTemplatePartsKey,
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
 
@@ -503,7 +502,7 @@ function isSectionBlockCandidate( state, clientId ) {
 		state.settings?.disableContentOnlyForUnsyncedPatterns;
 
 	const disableContentOnlyForTemplateParts =
-		state.settings?.[ disableContentOnlyForTemplatePartsKey ];
+		state.settings?.disableContentOnlyForTemplateParts;
 
 	if (
 		( ( ! disableContentOnlyForUnsyncedPatterns &&

@@ -19,11 +19,7 @@ import {
  */
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
-import {
-	sectionRootClientIdKey,
-	isIsolatedEditorKey,
-	disableContentOnlyForTemplatePartsKey,
-} from './private-keys';
+import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
 import { unlock } from '../lock-unlock';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -2555,7 +2551,7 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 							?.patternName
 			  );
 	const disableContentOnlyForTemplateParts =
-		state.settings?.[ disableContentOnlyForTemplatePartsKey ];
+		state.settings?.disableContentOnlyForTemplateParts;
 
 	const contentOnlyParents = [
 		...contentOnlyTemplateLockedClientIds,
@@ -3093,12 +3089,9 @@ export function withDerivedBlockEditingModes( reducer ) {
 							?.disableContentOnlyForUnsyncedPatterns ||
 					!! state?.settings?.[ isIsolatedEditorKey ] !==
 						!! nextState?.settings?.[ isIsolatedEditorKey ] ||
-					!! state?.settings?.[
-						disableContentOnlyForTemplatePartsKey
-					] !==
-						!! nextState?.settings?.[
-							disableContentOnlyForTemplatePartsKey
-						]
+					!! state?.settings?.disableContentOnlyForTemplateParts !==
+						!! nextState?.settings
+							?.disableContentOnlyForTemplateParts
 				) {
 					return {
 						...nextState,

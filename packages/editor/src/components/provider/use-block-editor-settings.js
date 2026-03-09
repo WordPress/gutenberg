@@ -105,7 +105,6 @@ const {
 	deviceTypeKey,
 	isNavigationOverlayContextKey,
 	mediaUploadOnSuccessKey,
-	disableContentOnlyForTemplatePartsKey,
 } = unlock( privateApis );
 
 /**
@@ -394,7 +393,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			].includes( postType ),
 			// When in template-locked mode (e.g., "Show Template" in the post editor),
 			// don't treat template parts as contentOnly sections.
-			[ disableContentOnlyForTemplatePartsKey ]:
+			disableContentOnlyForTemplateParts:
 				renderingMode === 'template-locked',
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
