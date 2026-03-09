@@ -11,6 +11,9 @@ import type {
 } from './types';
 import defaultRegistry from './default-registry';
 
+export function dispatch< K extends keyof StoreRegistry >(
+	storeName: K
+): StoreRegistryResult< K, ActionCreatorsOf< StoreRegistry[ K ] > >;
 export function dispatch< S extends StoreDescriptor< AnyConfig > >(
 	storeDescriptor: S
 ): ActionCreatorsOf< S >;

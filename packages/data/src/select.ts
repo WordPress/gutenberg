@@ -11,6 +11,9 @@ import type {
 } from './types';
 import defaultRegistry from './default-registry';
 
+export function select< K extends keyof StoreRegistry >(
+	storeName: K
+): StoreRegistryResult< K, CurriedSelectorsOf< StoreRegistry[ K ] > >;
 export function select< S extends StoreDescriptor< AnyConfig > >(
 	storeDescriptor: S
 ): CurriedSelectorsOf< S >;

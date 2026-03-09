@@ -5,10 +5,15 @@ import type {
 	AnyConfig,
 	CurriedSelectorsOf,
 	StoreDescriptor,
+	StoreRegistry,
+	StoreRegistryResult,
 	StoreNameOrDescriptor,
 } from './types';
 import defaultRegistry from './default-registry';
 
+export function suspendSelect< K extends keyof StoreRegistry >(
+	storeName: K
+): StoreRegistryResult< K, CurriedSelectorsOf< StoreRegistry[ K ] > >;
 export function suspendSelect< S extends StoreDescriptor< AnyConfig > >(
 	storeDescriptor: S
 ): CurriedSelectorsOf< S >;

@@ -5,10 +5,15 @@ import type {
 	AnyConfig,
 	CurriedSelectorsResolveOf,
 	StoreDescriptor,
+	StoreRegistry,
+	StoreRegistryResult,
 	StoreNameOrDescriptor,
 } from './types';
 import defaultRegistry from './default-registry';
 
+export function resolveSelect< K extends keyof StoreRegistry >(
+	storeName: K
+): StoreRegistryResult< K, CurriedSelectorsResolveOf< StoreRegistry[ K ] > >;
 export function resolveSelect< S extends StoreDescriptor< AnyConfig > >(
 	storeDescriptor: S
 ): CurriedSelectorsResolveOf< S >;

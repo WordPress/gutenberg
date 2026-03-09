@@ -257,6 +257,9 @@ function useSelect< T extends MapSelect >(
 	mapSelect: T,
 	deps?: unknown[]
 ): ReturnType< T >;
+function useSelect< K extends keyof StoreRegistry >(
+	storeName: K
+): StoreRegistryResult< K, CurriedSelectorsOf< StoreRegistry[ K ] > >;
 function useSelect< S extends StoreDescriptor< AnyConfig > >(
 	storeDescriptor: S
 ): CurriedSelectorsOf< S >;

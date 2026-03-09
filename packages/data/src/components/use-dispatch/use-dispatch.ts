@@ -13,6 +13,9 @@ import type {
 } from '../../types';
 
 function useDispatch(): DataRegistry[ 'dispatch' ];
+function useDispatch< K extends keyof StoreRegistry >(
+	storeName: K
+): StoreRegistryResult< K, ActionCreatorsOf< StoreRegistry[ K ] > >;
 function useDispatch< S extends StoreDescriptor< AnyConfig > >(
 	storeDescriptor: S
 ): ActionCreatorsOf< S >;

@@ -178,6 +178,39 @@ export interface SelectorWithCustomCurrySignature {
 }
 
 /**
+ * An augmentable mapping of store names to their store descriptors.
+ *
+ * Packages that register stores can augment this interface so that
+ * string-based `select`, `dispatch`, `resolveSelect`, and `suspendSelect`
+ * calls are fully typed without needing to import the store descriptor.
+ *
+ * @example
+ * ```ts
+ * declare module '@wordpress/data' {
+ *     interface StoreRegistry {
+ *         'core': typeof import('@wordpress/core-data').store;
+ *     }
+ * }
+ * ```
+ */
+export interface StoreRegistry {}
+
+/**
+ * Guards a `StoreRegistry`-keyed return type against `any`.
+ *
+ * When a store descriptor is typed as `any` (e.g. via `@ts-expect-error`
+ * imports), `K` is inferred as `any` and `string extends any` is `true`,
+ * so this resolves to `any` — preserving the pre-`StoreRegistry` behavior.
+ *
+ * When `K` is a concrete literal key like `'core'`, `string extends 'core'`
+ * is `false`, so the typed result `R` is used instead.
+ */
+export type StoreRegistryResult<
+	K extends keyof StoreRegistry,
+	R,
+> = string extends K ? any : R;
+
+/**
  * A store name or store descriptor, used throughout the API.
  */
 export type StoreNameOrDescriptor = string | StoreDescriptor;
