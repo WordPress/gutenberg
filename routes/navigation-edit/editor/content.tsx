@@ -7,10 +7,7 @@ import {
 	BlockList,
 	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
-// @ts-expect-error - No type declarations available for @wordpress/blocks
-import { createBlock } from '@wordpress/blocks';
-import { useCallback } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -19,13 +16,25 @@ import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '../../lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
 
-type Block = {
-	clientId: string;
-	name: string;
-	attributes: Record< string, unknown >;
-};
-
 const { PrivateListView } = unlock( blockEditorPrivateApis );
+
+// block-library is loaded dynamically via useEditorAssets before this component renders.
+// Access NavigationLinkUI from its private-apis at runtime rather than via static import.
+function getNavigationLinkUI() {
+	const blockLibrary = (
+		window as Window & {
+			wp: {
+				blockLibrary: { privateApis: Parameters< typeof unlock >[ 0 ] };
+			};
+		}
+	 ).wp?.blockLibrary;
+	if ( ! blockLibrary ) {
+		return null;
+	}
+	const { NavigationLinkUI } = unlock( blockLibrary.privateApis );
+
+	return NavigationLinkUI as any;
+}
 
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
 const MAX_PAGE_COUNT = 100;
@@ -85,24 +94,8 @@ export default function NavigationMenuContent( {
 		},
 		[ rootClientId ]
 	);
-	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
 
-	const offCanvasOnselect = useCallback(
-		( block: Block ) => {
-			if (
-				block.name === 'core/navigation-link' &&
-				! block.attributes.url
-			) {
-				__unstableMarkNextChangeAsNotPersistent();
-				replaceBlock(
-					block.clientId,
-					createBlock( 'core/navigation-link', block.attributes )
-				);
-			}
-		},
-		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
-	);
+	const NavigationLinkUI = getNavigationLinkUI();
 
 	// The hidden block is needed because it makes block edit side effects trigger.
 	// For example a navigation page list load its items has an effect on edit to load its items.
@@ -111,9 +104,9 @@ export default function NavigationMenuContent( {
 			{ ! isLoading && (
 				<PrivateListView
 					rootClientId={ listViewRootClientId }
-					onSelect={ offCanvasOnselect }
 					blockSettingsMenu={ LeafMoreMenu }
-					showAppender={ false }
+					additionalBlockContent={ NavigationLinkUI }
+					showAppender
 					isExpanded
 				/>
 			) }
