@@ -1,4 +1,4 @@
-import type { IconType } from '../icon';
+import type { IconType } from '@wordpress/components';
 
 export type AvatarProps = {
 	/**
@@ -19,17 +19,22 @@ export type AvatarProps = {
 	 */
 	label?: string;
 	/**
-	 * Whether to show the hover-expand badge that reveals the user's
-	 * name (or `label`) on hover. Requires `name` to be set.
+	 * Specifies the avatar's visual style treatment.
 	 *
-	 * @default false
+	 * - `'badge'`: Displays a hover-expand pill that reveals the user's
+	 *   name (or `label`) on hover. Requires `name` to be set.
+	 *
+	 * Leave undefined for the default circular avatar.
 	 */
-	badge?: boolean;
+	variant?: 'badge';
 	/**
 	 * Size of the avatar.
 	 *
-	 * - `'default'`: 32px
-	 * - `'small'`: 24px
+	 * - `'default'`: For standalone avatars and list items where the
+	 *   avatar is a primary visual element (e.g. collaborator lists,
+	 *   user profiles).
+	 * - `'small'`: For inline or compact contexts where space is
+	 *   limited (e.g. cursor labels, toolbars, badges alongside text).
 	 *
 	 * @default 'default'
 	 */
@@ -38,18 +43,20 @@ export type AvatarProps = {
 	 * CSS color value for an accent border ring around the avatar.
 	 *
 	 * When not provided, no border is rendered and the hover badge
-	 * and avatar status uses the admin theme color as its background.
+	 * uses the admin theme color as its background.
 	 */
 	borderColor?: string;
 	/**
-	 * A status string applied to the avatar. When set, the image is
-	 * dimmed to indicate a non-default state. A corresponding
-	 * `is-{status}` class is added for custom styling.
+	 * Whether to dim the avatar to indicate an inactive or away state.
+	 * When true, images are desaturated and faded, and initials are
+	 * reduced in opacity.
+	 *
+	 * @default false
 	 */
-	status?: string;
+	dimmed?: boolean;
 	/**
 	 * An icon or custom component rendered as a centered overlay on the
-	 * avatar image. Only visible when `status` is set.
+	 * avatar image. Only visible when `dimmed` is true.
 	 *
 	 * Accepts any value supported by the `Icon` component: an icon from
 	 * `@wordpress/icons`, a Dashicon name string, a component, or a
