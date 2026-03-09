@@ -114,14 +114,6 @@ function reducer(
 				[ action.blockName ]: action.value,
 			};
 
-<<<<<<< HEAD
-			if ( action.value === undefined ) {
-=======
-			if ( ! action.value ) {
->>>>>>> f229dee50d (Improve save/delete logic)
-				delete blocks[ action.blockName ];
-			}
-
 			return {
 				...state,
 				categories: {
