@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `Text` primitive with predefined typographic variants (`heading-2xl` through `heading-sm`, `body-xl` through `body-sm`) built on design tokens. ([#75870](https://github.com/WordPress/gutenberg/pull/75870))
+-   Add `Text` primitive with predefined typographic variants (`heading-2xl` through `heading-sm`, `body-xl` through `body-sm`) built on design tokens ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).
 -   Add `Card` and `CollapsibleCard` primitives ([#76252](https://github.com/WordPress/gutenberg/pull/76252)).
 
 ### Bug Fixes
