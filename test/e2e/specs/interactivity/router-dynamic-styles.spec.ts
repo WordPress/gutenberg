@@ -159,9 +159,13 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 		// load event (which never fires in SPA context). expect(page).toHaveURL
 		// then polls page.url() until the URL matches — no load event needed.
 		await page.evaluate( () => window.history.back() );
-		await expect( page ).toHaveURL( utils.getLink( 'router-dynamic-styles-b' ) );
+		await expect( page ).toHaveURL(
+			utils.getLink( 'router-dynamic-styles-b' )
+		);
 		await page.evaluate( () => window.history.back() );
-		await expect( page ).toHaveURL( utils.getLink( 'router-dynamic-styles-a' ) );
+		await expect( page ).toHaveURL(
+			utils.getLink( 'router-dynamic-styles-a' )
+		);
 		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
 			'active'
 		);
