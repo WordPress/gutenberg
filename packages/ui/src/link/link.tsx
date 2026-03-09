@@ -14,7 +14,6 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 		render,
 		className,
 		onClick,
-		target,
 		...props
 	},
 	ref
@@ -41,7 +40,7 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 				className
 			),
 			onClick: handleClick,
-			target: openInNewTab ? '_blank' : target,
+			target: openInNewTab ? '_blank' : undefined,
 			children: openInNewTab ? (
 				<>
 					<span className={ styles[ 'link-contents' ] }>
