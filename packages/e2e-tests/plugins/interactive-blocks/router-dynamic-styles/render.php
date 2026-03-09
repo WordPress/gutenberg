@@ -30,29 +30,6 @@
  * @package gutenberg-test-interactive-blocks
  */
 
-// Prevent function redeclaration if the render file is included multiple times.
-if ( ! function_exists( 'gutenberg_test_router_deferred_style' ) ) {
-	/**
-	 * Prints the inline deferred-style fixture for the router-dynamic-styles
-	 * test block. Hooked to wp_head at priority 20.
-	 *
-	 * The element intentionally carries no src/href so the test never relies
-	 * on resolving an external file. The id attribute is stable so view.js can
-	 * retrieve it with getElementById().
-	 */
-	function gutenberg_test_router_deferred_style() {
-		// Remove ourselves so subsequent pages in the same PHP process
-		// (e.g. REST-rendered block previews) do not duplicate the tag.
-		remove_action( 'wp_head', 'gutenberg_test_router_deferred_style', 20 );
-		echo '<style id="test-router-deferred-style" media="not all">body { --test-deferred-active: 1; }</style>' . "\n";
-	}
-}
-
-// Output the deferred-style fixture into <head> exactly once per page.
-if ( ! has_action( 'wp_head', 'gutenberg_test_router_deferred_style' ) ) {
-	add_action( 'wp_head', 'gutenberg_test_router_deferred_style', 20 );
-}
-
 // Resolve sibling post URLs by alias (post title set by addPostWithBlock).
 $current_title = (string) get_the_title();
 $base_alias    = (string) preg_replace( '/-[a-z]$/', '', $current_title );
@@ -74,6 +51,10 @@ $find_url = static function ( string $alias ): string {
 $link_b = $find_url( $base_alias . '-b' );
 $link_c = $find_url( $base_alias . '-c' );
 ?>
+
+<!-- Trigger style for deferred stylesheet test. Placed OUTSIDE the router region to ensure survival during navigation. -->
+<style id="test-router-deferred-style" media="not all">body { --test-deferred-active: 1; }</style>
+
 <div
 	data-wp-interactive="test/router-dynamic-styles"
 	data-wp-router-region="test-router-dynamic-styles"
