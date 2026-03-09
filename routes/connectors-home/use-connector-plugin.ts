@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
@@ -145,7 +144,11 @@ export function useConnectorPlugin( {
 	// Use canManagePlugins (from plugin entity resolution) for activation capability.
 	const canActivatePlugins = canManagePlugins;
 
-	const isConnected = pluginStatus === 'active' && connectedState;
+	const isConnected =
+		( pluginStatus === 'active' && connectedState ) ||
+		// After install/activate, if settings re-fetch reveals an existing key,
+		// update connected state (mirrors what the server would report on page load).
+		( pluginStatusOverride === 'active' && !! currentApiKey );
 
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 
@@ -155,11 +158,12 @@ export function useConnectorPlugin( {
 		}
 		setIsBusy( true );
 		try {
-			await apiFetch( {
-				method: 'POST',
-				path: '/wp/v2/plugins',
-				data: { slug: pluginSlug, status: 'active' },
-			} );
+			await saveEntityRecord(
+				'root',
+				'plugin',
+				{ slug: pluginSlug, status: 'active' },
+				{ throwOnError: true }
+			);
 			setPluginStatusOverride( 'active' );
 			// Re-fetch settings since the new plugin may register new settings.
 			invalidateResolution( 'getEntityRecord', [ 'root', 'site' ] );
@@ -177,11 +181,12 @@ export function useConnectorPlugin( {
 		}
 		setIsBusy( true );
 		try {
-			await apiFetch( {
-				method: 'PUT',
-				path: `/wp/v2/plugins/${ pluginSlug }/plugin`,
-				data: { status: 'active' },
-			} );
+			await saveEntityRecord(
+				'root',
+				'plugin',
+				{ plugin: `${ pluginSlug }/plugin`, status: 'active' },
+				{ throwOnError: true }
+			);
 			setPluginStatusOverride( 'active' );
 			// Re-fetch settings since the activated plugin may register new settings.
 			invalidateResolution( 'getEntityRecord', [ 'root', 'site' ] );
