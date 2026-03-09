@@ -12,6 +12,7 @@
 
 ### Enhancements
 
+-   `CollapsibleCard`: Include the card title in the toggle button's accessible label so multiple collapsible cards on the same page are distinguishable by screen reader users ([#76329](https://github.com/WordPress/gutenberg/pull/76329)).
 -   `Notice`: Improve narrow layout by letting description and actions span the icon column when a title is present ([#76202](https://github.com/WordPress/gutenberg/pull/76202)).
 
 ## 0.8.0 (2026-03-04)
