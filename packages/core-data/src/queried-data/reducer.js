@@ -105,22 +105,22 @@ export function items( state = {}, action ) {
 		case 'RECEIVE_ITEMS': {
 			const context = getContextFromAction( action );
 			const key = action.key || DEFAULT_ENTITY_KEY;
-			const actionItems = Array.isArray( action.items )
+			const itemsList = Array.isArray( action.items )
 				? action.items
 				: [ action.items ];
 			return {
 				...state,
 				[ context ]: {
 					...state[ context ],
-					...actionItems.reduce( ( accumulator, value ) => {
-						const itemId = value?.[ key ];
-
-						accumulator[ itemId ] = conservativeMapItem(
-							state?.[ context ]?.[ itemId ],
-							value
-						);
-						return accumulator;
-					}, {} ),
+					...Object.fromEntries(
+						itemsList.map( ( item ) => [
+							item?.[ key ],
+							conservativeMapItem(
+								state?.[ context ]?.[ item?.[ key ] ],
+								item
+							),
+						] )
+					),
 				},
 			};
 		}
@@ -152,7 +152,7 @@ export function itemIsComplete( state = {}, action ) {
 		case 'RECEIVE_ITEMS': {
 			const context = getContextFromAction( action );
 			const { query, key = DEFAULT_ENTITY_KEY } = action;
-			const actionItems = Array.isArray( action.items )
+			const itemsList = Array.isArray( action.items )
 				? action.items
 				: [ action.items ];
 
@@ -170,7 +170,7 @@ export function itemIsComplete( state = {}, action ) {
 				...state,
 				[ context ]: {
 					...state[ context ],
-					...actionItems.reduce( ( result, item ) => {
+					...itemsList.reduce( ( result, item ) => {
 						const itemId = item?.[ key ];
 
 						// Defer to completeness if already assigned. Technically the
@@ -238,12 +238,12 @@ const receiveQueries = compose( [
 		return state;
 	}
 
+	const key = action.key || DEFAULT_ENTITY_KEY;
+
 	return {
 		itemIds: getMergedItemIds(
 			state?.itemIds || [],
-			action.items
-				.map( ( item ) => item?.[ action.key ?? DEFAULT_ENTITY_KEY ] )
-				.filter( Boolean ),
+			action.items.map( ( item ) => item?.[ key ] ).filter( Boolean ),
 			action.page,
 			action.perPage
 		),

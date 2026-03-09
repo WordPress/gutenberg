@@ -26,6 +26,10 @@ import {
 } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
+function addTitleToAutoDraft( record ) {
+	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
+}
+
 /**
  * Returns an action object used in signalling that authors have been received.
  * Ignored from documentation as it's internal to the data store.
@@ -100,11 +104,9 @@ export function receiveEntityRecords(
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
 	if ( kind === 'postType' ) {
-		const mapAutoDraft = ( record ) =>
-			record.status === 'auto-draft' ? { ...record, title: '' } : record;
 		records = Array.isArray( records )
-			? records.map( mapAutoDraft )
-			: mapAutoDraft( records );
+			? records.map( addTitleToAutoDraft )
+			: addTitleToAutoDraft( records );
 	}
 	let action;
 	if ( query ) {
