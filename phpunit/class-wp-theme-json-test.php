@@ -6882,6 +6882,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$stylesheet_bogus = $theme_json_bogus_state->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+		$expected_bogus   = ':root :where(.wp-block-navigation-link){color: black;}';
+		$this->assertSameCSS( $expected_bogus, $stylesheet_bogus );
 		$this->assertStringNotContainsString( '@bogus', $stylesheet_bogus );
 		$this->assertStringNotContainsString( 'yellow', $stylesheet_bogus );
 
