@@ -124,7 +124,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$tags   = new WP_HTML_Tag_Processor( $result );
 		$this->assertTrue( $tags->next_tag( 'IMG' ) );
 		$this->assertSame( 'low', $tags->get_attribute( 'fetchpriority' ) );
-		$tags->next_tag( 'IMG' );
+		$this->assertTrue( $tags->next_tag( 'IMG' ) );
 		$this->assertSame( 'low', $tags->get_attribute( 'fetchpriority' ) );
 	}
 
