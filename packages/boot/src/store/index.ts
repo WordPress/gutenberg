@@ -21,13 +21,3 @@ export const store = createReduxStore( STORE_NAME, {
 register( store );
 
 export { STORE_NAME };
-
-/**
- * Bind the store descriptor to the store name so that string-based
- * access (e.g. `select( 'wordpress/boot' )`) is typed.
- */
-declare module '@wordpress/data' {
-	interface StoreRegistry {
-		[ STORE_NAME ]: typeof store;
-	}
-}

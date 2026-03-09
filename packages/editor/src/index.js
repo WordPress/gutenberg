@@ -1,7 +1,3 @@
-// Ensure the StoreRegistry module augmentation is included in the declaration
-// output so that consumers get typed access via store name (e.g. select('core/editor')).
-/// <reference path="./store-registry.ts" preserve="true" />
-
 /**
  * Internal dependencies
  */
