@@ -311,8 +311,8 @@ function _gutenberg_get_connector_settings(): array {
  * On every `/wp/v2/settings` response, masks connector API key values so raw
  * keys are never exposed via the REST API.
  *
- * On POST requests, validates each updated key against the provider before
- * masking. If validation fails, the key is reverted to an empty string.
+ * On POST or PUT requests, validates each updated key against the provider
+ * before masking. If validation fails, the key is reverted to an empty string.
  *
  * @access private
  *
