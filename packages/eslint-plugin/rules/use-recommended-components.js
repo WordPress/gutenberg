@@ -18,17 +18,19 @@ const ALLOWLIST = {
  * Denylist: the listed components are flagged with a message pointing
  * to a recommended alternative.
  *
+ * Messages support `{{ name }}` and `{{ source }}` placeholders.
+ *
  * @type {Record<string, Record<string, string>>}
  */
 const DENYLIST = {
-	// Example:
-	// '@wordpress/components': {
-	//     TextControl: 'Use `InputControl` from `@wordpress/ui` instead.',
-	// },
+	'@wordpress/components': {
+		__experimentalZStack:
+			'{{ name }} is planned for deprecation. Write your own CSS instead.',
+	},
 };
 
 /** @type {import('eslint').Rule.RuleModule} */
-module.exports = {
+const rule = {
 	meta: {
 		type: 'suggestion',
 		docs: {
@@ -87,7 +89,11 @@ module.exports = {
 							node: specifier,
 							messageId: 'restricted',
 							data: {
-								message: denylistEntry[ name ],
+								message: resolveMessage(
+									denylistEntry[ name ],
+									name,
+									source
+								),
 							},
 						} );
 					}
@@ -111,3 +117,7 @@ function resolveMessage( template, name, source ) {
 		.replace( /\{\{\s*name\s*\}\}/g, name )
 		.replace( /\{\{\s*source\s*\}\}/g, source );
 }
+
+module.exports = rule;
+module.exports.ALLOWLIST = ALLOWLIST;
+module.exports.DENYLIST = DENYLIST;
