@@ -16,7 +16,10 @@ import { __, sprintf } from '@wordpress/i18n';
 import { Notice } from '@wordpress/ui';
 import { createElement, useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { store as blocksStore } from '@wordpress/blocks';
+import {
+	privateApis as blocksPrivateApis,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -24,7 +27,10 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { saveContentGuidelines } from '../api';
 import { STORE_NAME } from '../store';
+import { unlock } from '../../lock-unlock';
 import './block-guideline-modal.scss';
+
+const { isContentBlock } = unlock( blocksPrivateApis );
 
 interface BlockGuidelineModalProps {
 	closeModal: () => void;
@@ -69,7 +75,10 @@ export default function BlockGuidelineModal( {
 		}
 
 		return blockOptions
-			.filter( ( block ) => ! set.has( block.name ) )
+			.filter(
+				( block ) =>
+					isContentBlock( block.name ) && ! set.has( block.name )
+			)
 			.map( ( block ) => ( {
 				value: block.name,
 				label: block.title,
@@ -99,11 +108,9 @@ export default function BlockGuidelineModal( {
 			.then( () => {
 				setError( null );
 				createSuccessNotice(
-					sprintf(
-						/* translators: %s: Block label. */
-						__( 'Block guideline %s.' ),
-						value ? 'saved' : 'removed'
-					),
+					value
+						? __( 'Block guideline saved.' )
+						: __( 'Block guideline removed.' ),
 					{ type: 'snackbar' }
 				);
 				closeModal();
@@ -188,6 +195,7 @@ export default function BlockGuidelineModal( {
 							// This is because the API will only remove the guideline if the value is an empty string.
 							onClick={ () => handleSave( '' ) }
 							disabled={ isSaving }
+							accessibleWhenDisabled
 						>
 							{ __( 'Remove' ) }
 						</Button>
@@ -197,6 +205,7 @@ export default function BlockGuidelineModal( {
 						onClick={ () => handleSave( guidelineText ) }
 						disabled={ ! canSubmit || isSaving }
 						isBusy={ isSaving }
+						accessibleWhenDisabled
 					>
 						{ submitButtonLabel }
 					</Button>

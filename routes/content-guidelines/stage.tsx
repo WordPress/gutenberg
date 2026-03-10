@@ -21,12 +21,8 @@ import GuidelineAccordion from './components/guideline-accordion';
 import GuidelineAccordionForm from './components/guideline-accordion-form';
 import { fetchContentGuidelines } from './api';
 import BlockGuidelines from './components/block-guidelines';
-import { bootstrapBlockRegistry } from './bootstrap-block-registry';
 import ActionsSection from './components/actions-section';
 import RevisionHistory from './components/revision-history';
-
-// Bootstrap Core blocks so block icons are available (e.g. in Block Guidelines).
-bootstrapBlockRegistry();
 
 const GUIDELINE_ITEMS = [
 	{
