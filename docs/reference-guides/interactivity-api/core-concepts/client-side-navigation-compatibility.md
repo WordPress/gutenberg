@@ -1,6 +1,6 @@
 # Client-Side Navigation Compatibility
 
-Client-side navigation (CSN) enables page transitions without a full page reload by updating only the parts of the page that change. For this to work correctly, **every block on the page must be compatible with client-side navigation**. If a single block on the page is not compatible, the Interactivity API will fall back to a full page reload for that navigation, losing all the performance and UX benefits.
+Client-side navigation (CSN) enables page transitions without a full page reload by updating only the parts of the page that change. For this to work correctly, **every block on the page must be compatible with client-side navigation**. If any block is incompatible, it may break silently after a navigation — losing state, failing to initialize, or rendering incorrectly. Some core blocks like `core/query` detect incompatible descendants and automatically fall back to a full page reload, but this safety net does not apply to custom implementations. In general, a single incompatible block on the page can compromise the entire navigation experience.
 
 This guide explains what to consider when evaluating compatibility. While the examples focus on blocks, the same principles apply to any code that outputs markup on the front end — including classic PHP themes and plugins.
 
