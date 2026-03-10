@@ -388,7 +388,7 @@ export function useFloatingThread( {
 	);
 
 	// Use floating-ui to track the block element's position with the calculated offset.
-	const { y, refs } = useFloating( {
+	const { y: floatingY, refs } = useFloating( {
 		placement: 'right-start',
 		middleware: [
 			offsetMiddleware( {
@@ -397,6 +397,9 @@ export function useFloatingThread( {
 		],
 		whileElementsMounted: autoUpdate,
 	} );
+
+	// Clamp y to minimum of 0 to prevent negative positioning.
+	const y = Math.max( 0, floatingY );
 
 	// Store the block reference for each thread.
 	useEffect( () => {
