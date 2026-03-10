@@ -277,7 +277,9 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.[ 'post-formats' ] &&
 					! disablePostFormats &&
 					formatField,
-				postTypeConfig.supports?.editor && postContentInfoField,
+				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+					postTypeConfig.supports?.editor &&
+					postContentInfoField,
 				passwordField,
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&

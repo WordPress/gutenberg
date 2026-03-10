@@ -16,8 +16,6 @@ const postContentInfoField: Field< BasePost > = {
 	type: 'text',
 	readOnly: true,
 	render: PostContentInfoView,
-	isVisible: ( post ) =>
-		! [ 'wp_template', 'wp_template_part' ].includes( post.type ),
 	enableSorting: false,
 	enableHiding: false,
 	filterBy: false,
