@@ -102,6 +102,10 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 				},
 			},
 			{
+				id: 'post-content-info',
+				layout: { type: 'regular', labelPosition: 'none' },
+			},
+			{
 				id: 'status',
 				label: __( 'Status' ),
 				children: [
@@ -109,6 +113,7 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 						id: 'status',
 						layout: { type: 'regular', labelPosition: 'none' },
 					},
+					'scheduled_date',
 					'password',
 				],
 			},

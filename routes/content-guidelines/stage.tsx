@@ -1,9 +1,11 @@
+/* @jsx createElement */
+
 /**
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { createElement, useEffect, useState } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 // TODO: Revert to the `Notice` in `@wordpress/components` for now.
 // eslint-disable-next-line @wordpress/use-recommended-components
@@ -16,6 +18,7 @@ import './style.scss';
 import GuidelineAccordion from './components/guideline-accordion';
 import GuidelineAccordionForm from './components/guideline-accordion-form';
 import { fetchContentGuidelines } from './api';
+import BlockGuidelines from './components/block-guidelines';
 
 const GUIDELINE_ITEMS = [
 	{
@@ -41,6 +44,13 @@ const GUIDELINE_ITEMS = [
 		),
 
 		slug: 'images',
+	},
+	{
+		title: __( 'Blocks' ),
+		description: __(
+			'Create tailored guidelines for specific block types.'
+		),
+		slug: 'blocks',
 	},
 	{
 		title: __( 'Additional' ),
@@ -118,14 +128,18 @@ function ContentGuidelinesPage() {
 												headingId={ headingId }
 												descriptionId={ descriptionId }
 											>
-												<GuidelineAccordionForm
-													slug={ item.slug }
-													contentId={ contentId }
-													headingId={ headingId }
-													descriptionId={
-														descriptionId
-													}
-												/>
+												{ item.slug === 'blocks' ? (
+													<BlockGuidelines />
+												) : (
+													<GuidelineAccordionForm
+														slug={ item.slug }
+														contentId={ contentId }
+														headingId={ headingId }
+														descriptionId={
+															descriptionId
+														}
+													/>
+												) }
 											</GuidelineAccordion>
 										</div>
 									</li>

@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `Text` primitive with predefined typographic variants (`heading-2xl` through `heading-sm`, `body-xl` through `body-sm`) built on design tokens ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).
+-   Add `Card` and `CollapsibleCard` primitives ([#76252](https://github.com/WordPress/gutenberg/pull/76252)).
+-   Add `Link` primitive ([#76013](https://github.com/WordPress/gutenberg/pull/76013)).
+
+### Bug Fixes
+
+-   `VisuallyHidden`: Add `word-break: normal` to prevent text wrapping issues in screen reader content ([#75539](https://github.com/WordPress/gutenberg/pull/75539)).
+
+### Enhancements
+
+-   `Notice`: Improve narrow layout by letting description and actions span the icon column when a title is present ([#76202](https://github.com/WordPress/gutenberg/pull/76202)).
+-   `Notice`: Use `Text` component for `Title` and `Description` typography ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).
+
 ## 0.8.0 (2026-03-04)
 
 ### Breaking Changes
@@ -16,6 +31,7 @@
 
 -   `Field.Label`, `Fieldset.Legend`: Add `hideFromVision` prop to visually hide the label while keeping it accessible to screen readers ([#76052](https://github.com/WordPress/gutenberg/pull/76052)).
 -   `Dialog`: Add `--wp-ui-dialog-z-index` CSS custom property for legacy z-index compatibility ([#75874](https://github.com/WordPress/gutenberg/pull/75874)).
+-   `Tooltip`: Change default `side` from `bottom` to `top`. ([#76131](https://github.com/WordPress/gutenberg/pull/76131)).
 
 ### Bug Fixes
 

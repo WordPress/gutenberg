@@ -23,6 +23,8 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
+import { drawerRight } from '@wordpress/icons';
 import type { Post } from '@wordpress/core-data';
 
 /**
@@ -36,6 +38,7 @@ import {
 	DEFAULT_LAYOUTS,
 	viewToQuery,
 } from './view-utils';
+import { QuickEditModal } from './quick-edit-modal';
 
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
@@ -46,6 +49,8 @@ const { Tabs } = unlock( componentsPrivateApis );
  * Style dependencies
  */
 import './style.scss';
+
+const LAYOUT_LIST = 'list';
 
 function getItemId( item: Post ) {
 	return item.id.toString();
@@ -133,6 +138,7 @@ function PostList() {
 		totalItems,
 		totalPages,
 		isResolving,
+		hasResolved,
 	} = useEntityRecordsWithPermissions( 'postType', postType, postTypeQuery );
 
 	const allFields = usePostFields( {
@@ -201,8 +207,36 @@ function PostList() {
 		},
 	} );
 
+	const quickEditAction = useMemo(
+		() => ( {
+			id: 'quick-edit',
+			label: __( 'Quick Edit' ),
+			icon: drawerRight,
+			isPrimary: true,
+			supportsBulk: true,
+			isEligible( post: Post ) {
+				// PostStatus only includes assignable statuses. 'trash' is managed
+				// internally by WordPress, but the REST API can still return it.
+				if ( ( post.status as string ) === 'trash' ) {
+					return false;
+				}
+				return post.type === 'page';
+			},
+			callback( items: Post[] ) {
+				navigate( {
+					search: {
+						...searchParams,
+						quickEdit: true,
+						postIds: items.map( ( item ) => item.id.toString() ),
+					},
+				} );
+			},
+		} ),
+		[ navigate, searchParams ]
+	);
+
 	const actions = useMemo( () => {
-		return [
+		const _actions = [
 			...postTypeActions?.flatMap< Action< Post > >( ( action ) => {
 				switch ( action.id ) {
 					case 'permanently-delete':
@@ -243,7 +277,11 @@ function PostList() {
 				return [ action ];
 			} ),
 		];
-	}, [ postTypeActions ] );
+		if ( view.type !== LAYOUT_LIST ) {
+			_actions.unshift( quickEditAction );
+		}
+		return _actions;
+	}, [ quickEditAction, postTypeActions, view.type ] );
 
 	const handleTabChange = useCallback(
 		( status: string ) => {
@@ -269,6 +307,15 @@ function PostList() {
 	if ( view.type === 'list' ) {
 		selection.splice( 1 );
 	}
+
+	const closeQuickEditModal = () => {
+		navigate( {
+			search: {
+				...searchParams,
+				quickEdit: undefined,
+			},
+		} );
+	};
 
 	return (
 		<Page
@@ -321,7 +368,7 @@ function PostList() {
 				view={ view }
 				onChangeView={ onChangeView }
 				actions={ actions }
-				isLoading={ isResolving }
+				isLoading={ isResolving || ! hasResolved }
 				paginationInfo={ {
 					totalItems,
 					totalPages,
@@ -357,6 +404,16 @@ function PostList() {
 					/>
 				) }
 			/>
+			{ searchParams.quickEdit &&
+				! isResolving &&
+				selection.length > 0 &&
+				view.type !== LAYOUT_LIST && (
+					<QuickEditModal
+						postType={ postType }
+						postId={ selection }
+						closeModal={ closeQuickEditModal }
+					/>
+				) }
 		</Page>
 	);
 }

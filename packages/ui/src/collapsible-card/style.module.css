@@ -1,0 +1,37 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.header-content {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.header-trigger-wrapper {
+		flex-shrink: 0;
+		align-self: center;
+		/* Prevent the trigger from making the header taller than its content,
+		   preserving the same metrics between `Card` and `CollapsibleCard`. */
+		max-height: 0;
+		overflow: visible;
+	}
+
+	.header-trigger {
+		/* Offset by half the button's own height so it visually centers
+		   at the wrapper's midpoint (which `align-self: center` places at
+		   the vertical center of the header). */
+		transform: translateY(-50%);
+	}
+}
+
+@layer wp-ui-compositions {
+	.header {
+		display: flex;
+		flex-direction: row;
+		align-items: stretch;
+		gap: var(--wpds-dimension-gap-sm);
+
+		&:has(.header-trigger:not([data-disabled])) {
+			cursor: var(--wpds-cursor-control);
+		}
+	}
+}
