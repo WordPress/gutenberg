@@ -4,16 +4,28 @@
 
 import type { ReactNode } from 'react';
 
+export interface Categories {
+	site: string;
+	copy: string;
+	images: string;
+	additional: string;
+	blocks: Record< string, string >;
+}
+
 export interface ContentGuidelinesState {
 	id: number | null;
 	status: string | null;
-	categories: Record< string, string >;
+	categories: Categories;
+}
+
+interface BlockGuideline {
+	guidelines: string | Record< string, string >;
 }
 
 export interface RestGuidelinesResponse {
 	id: number;
 	status: string;
-	guideline_categories?: Record< string, { guidelines?: string } >;
+	guideline_categories?: Record< string, BlockGuideline >;
 }
 
 export interface GuidelineAccordionProps {
