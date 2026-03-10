@@ -75,6 +75,60 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that uploading an image type not supported by the server's image editor
+	 * succeeds when generate_sub_sizes is false (client handles processing).
+	 *
+	 * @covers ::create_item_permissions_check
+	 */
+	public function test_create_item_skips_image_editor_support_check_when_not_generating_sub_sizes() {
+		wp_set_current_user( self::$admin_id );
+
+		// Force the image editor support check to reject the mime type.
+		add_filter( 'wp_image_editor_supports', '__return_false' );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'wp_image_editor_supports', '__return_false' );
+
+		// Should succeed even though the server doesn't support the image type,
+		// because the client will handle all image processing.
+		$this->assertSame( 201, $response->get_status() );
+	}
+
+	/**
+	 * Verifies that the image editor support check is still enforced
+	 * when generate_sub_sizes is true (server handles processing).
+	 *
+	 * @covers ::create_item_permissions_check
+	 */
+	public function test_create_item_enforces_image_editor_support_check_when_generating_sub_sizes() {
+		wp_set_current_user( self::$admin_id );
+
+		// Force the image editor support check to reject the mime type.
+		add_filter( 'wp_image_editor_supports', '__return_false' );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_param( 'generate_sub_sizes', true );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'wp_image_editor_supports', '__return_false' );
+
+		// Should fail because the server needs to generate sub-sizes but can't.
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'rest_upload_image_type_not_supported', $response->get_data()['code'] );
+	}
+
+	/**
 	 * Verifies that skipping sub-size generation works.
 	 *
 	 * @covers ::create_item
