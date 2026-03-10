@@ -46,8 +46,6 @@ const LayoutCardComponent = ( {
 			id: 'name',
 			label: 'Customer Name',
 			type: 'text',
-			// TODO: should use `<Text />` when ready?
-			render: ( { item } ) => <span>{ item.name }</span>,
 		},
 		{
 			id: 'phone',
