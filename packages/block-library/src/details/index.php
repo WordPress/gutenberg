@@ -22,7 +22,7 @@ function block_core_details_set_img_fetchpriority_low( $block_content, array $bl
 		return '';
 	}
 
-	// If the Details block is open by default, short-circuit to let core add fetchpriority=high if appropriate,
+	// If the Details block is open by default, short-circuit to let core add fetchpriority=high if appropriate.
 	if ( $block['attrs']['showContent'] ?? false ) {
 		return $block_content;
 	}
