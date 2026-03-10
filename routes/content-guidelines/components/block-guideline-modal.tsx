@@ -109,8 +109,8 @@ export default function BlockGuidelineModal( {
 				setError( null );
 				createSuccessNotice(
 					value
-						? __( 'Block guideline saved.' )
-						: __( 'Block guideline removed.' ),
+						? __( 'Guidelines saved.' )
+						: __( 'Guidelines removed.' ),
 					{ type: 'snackbar' }
 				);
 				closeModal();
