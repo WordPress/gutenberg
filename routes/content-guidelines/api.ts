@@ -122,6 +122,13 @@ export async function importContentGuidelines( file: File ): Promise< void > {
 		throw new Error( __( 'Invalid file format.' ) );
 	}
 
+	const guidelinesStore = select( STORE_NAME ) as unknown as {
+		getAllGuidelines: () => Categories;
+		getBlockGuidelines: () => Record< string, string >;
+	};
+	const previousCategories = guidelinesStore.getAllGuidelines();
+	const previousBlocks = { ...guidelinesStore.getBlockGuidelines() };
+
 	const { guideline_categories: contentGuidelinesCategories } = parsed;
 
 	FLAT_CATEGORIES.forEach( ( guidelineCategory ) => {
@@ -141,10 +148,26 @@ export async function importContentGuidelines( file: File ): Promise< void > {
 		} );
 	}
 
-	await saveContentGuidelines();
-	createSuccessNotice( __( 'Content guidelines imported.' ), {
-		type: 'snackbar',
-	} );
+	try {
+		await saveContentGuidelines();
+		createSuccessNotice( __( 'Content guidelines imported.' ), {
+			type: 'snackbar',
+		} );
+	} catch ( error ) {
+		FLAT_CATEGORIES.forEach( ( cat ) => {
+			setGuideline( cat, previousCategories[ cat ] ?? '' );
+		} );
+
+		const currentBlocks = guidelinesStore.getBlockGuidelines();
+		Object.keys( currentBlocks ).forEach( ( blockName ) =>
+			setBlockGuideline( blockName, '' )
+		);
+		Object.entries( previousBlocks ).forEach( ( [ blockName, value ] ) =>
+			setBlockGuideline( blockName, value )
+		);
+
+		throw error;
+	}
 }
 
 /**
