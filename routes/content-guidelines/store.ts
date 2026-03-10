@@ -76,24 +76,13 @@ function parseResponse(
 	};
 
 	CATEGORIES.forEach( ( category ) => {
-		const guidelines = (
-			categoriesFromResponse as Record<
-				string,
-				{ guidelines?: string } | undefined
-			>
-		 )[ category ]?.guidelines;
-
+		const guidelines = categoriesFromResponse?.[ category ]?.guidelines;
 		if ( typeof guidelines === 'string' ) {
-			result.categories[ category as keyof typeof result.categories ] =
-				guidelines;
+			result.categories[ category ] = guidelines;
 		} else if ( category === 'blocks' ) {
-			const blocks = ( categoriesFromResponse?.blocks ??
-				{} ) as unknown as Record< string, { guidelines?: string } >;
-
-			for ( const blockName in blocks ) {
-				( result.categories.blocks as Record< string, string > )[
-					blockName
-				] = blocks[ blockName ]?.guidelines ?? '';
+			const blocks = categoriesFromResponse?.blocks ?? {};
+			for ( const [ blockName, blockData ] of Object.entries( blocks ) ) {
+				result.categories.blocks[ blockName ] = blockData?.guidelines;
 			}
 		}
 	} );
@@ -116,7 +105,7 @@ function reducer(
 				...state,
 				categories: {
 					...state.categories,
-					[ action.category as keyof Categories ]: action.value,
+					[ action.category ]: action.value,
 				},
 			};
 		case 'SET_BLOCK_GUIDELINE': {
@@ -147,12 +136,7 @@ const selectors = {
 		state: ContentGuidelinesState,
 		category: string
 	): string | Record< string, string > {
-		return (
-			state.categories as unknown as Record<
-				string,
-				string | Record< string, string >
-			>
-		 )[ category ];
+		return state.categories[ category ];
 	},
 	getAllGuidelines( state: ContentGuidelinesState ): Categories {
 		return state.categories;
