@@ -5,6 +5,8 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 	setFreeformContentHandlerName,
+	setDefaultBlockName,
+	getDefaultBlockName,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
@@ -16,6 +18,7 @@ import { select, dispatch } from '@wordpress/data';
 import * as selectors from '../selectors';
 import { store } from '../';
 import { lock } from '../../lock-unlock';
+import { sectionRootClientIdKey } from '../private-keys';
 
 const {
 	getBlockName,
@@ -72,6 +75,8 @@ const {
 	wasBlockJustInserted,
 	getBlocksByName,
 	getBlockEditingMode,
+	canRemoveBlock,
+	canMoveBlock,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -85,6 +90,7 @@ describe( 'selectors', () => {
 
 	beforeEach( () => {
 		registerBlockType( 'core/block', {
+			apiVersion: 3,
 			save: () => null,
 			category: 'reusable',
 			title: 'Reusable Block Stub',
@@ -94,6 +100,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-a', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'design',
 			title: 'Test Block A',
@@ -102,6 +109,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-b', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block B',
@@ -113,6 +121,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-c', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block C',
@@ -122,6 +131,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/freeform', {
+			apiVersion: 3,
 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
 			category: 'text',
 			title: 'Test Freeform Content Handler',
@@ -134,6 +144,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/post-content-child', {
+			apiVersion: 3,
 			save: () => null,
 			category: 'text',
 			title: 'Test Block Post Content Child',
@@ -143,6 +154,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-ancestor', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block required as ancestor',
@@ -151,6 +163,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-parent', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block required as parent',
@@ -159,6 +172,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-requires-ancestor', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block that requires ancestor',
@@ -168,6 +182,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-requires-ancestor-parent', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block that requires both ancestor and parent',
@@ -175,6 +190,20 @@ describe( 'selectors', () => {
 			keywords: [ 'testing' ],
 			parent: [ 'core/test-block-parent' ],
 			ancestor: [ 'core/test-block-ancestor' ],
+		} );
+
+		registerBlockType( 'core/test-content-block', {
+			apiVersion: 3,
+			save: ( props ) => props.attributes.text,
+			category: 'text',
+			title: 'Test Content Block',
+			icon: 'test',
+			attributes: {
+				text: {
+					type: 'string',
+					role: 'content',
+				},
+			},
 		} );
 
 		setFreeformContentHandlerName( 'core/freeform' );
@@ -193,6 +222,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-parent' );
 		unregisterBlockType( 'core/test-block-requires-ancestor' );
 		unregisterBlockType( 'core/test-block-requires-ancestor-parent' );
+		unregisterBlockType( 'core/test-content-block' );
 
 		setFreeformContentHandlerName( undefined );
 	} );
@@ -2666,9 +2696,12 @@ describe( 'selectors', () => {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
+					order: new Map(),
+					parents: new Map(),
 				},
 				blockListSettings: {},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/invalid' ) ).toBe( false );
 		} );
@@ -2678,11 +2711,14 @@ describe( 'selectors', () => {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
+					order: new Map(),
+					parents: new Map(),
 				},
 				blockListSettings: {},
 				settings: {
 					allowedBlockTypes: [],
 				},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				false
@@ -2714,11 +2750,13 @@ describe( 'selectors', () => {
 					byClientId: new Map(),
 					attributes: new Map(),
 					order: new Map(),
+					parents: new Map(),
 				},
 				blockListSettings: {},
 				settings: {
 					templateLock: 'all',
 				},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				false
@@ -3072,13 +3110,170 @@ describe( 'selectors', () => {
 			).toBe( false );
 		} );
 
+		it( 'allows inserting blocks into a non-section contentOnly container', () => {
+			// When the parent has contentOnly editing mode but is NOT
+			// within a section hierarchy, the contentOnly insertion
+			// restriction does not apply.
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							parent: { name: 'core/test-block-a' },
+							child: { name: 'core/test-block-b' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							parent: {},
+							child: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							parent: '',
+							child: 'parent',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'parent' ] ],
+						[ 'parent', [ 'child' ] ],
+					] ),
+				},
+				blockListSettings: {
+					parent: {},
+				},
+				settings: {},
+				blockEditingModes: new Map(),
+				derivedBlockEditingModes: new Map( [
+					[ 'parent', 'contentOnly' ],
+				] ),
+			};
+			expect(
+				canInsertBlockType( state, 'core/test-block-b', 'parent' )
+			).toBe( true );
+		} );
+
+		it( 'prevents inserting content blocks into a non-insertable contentOnly container within a section', () => {
+			// When a contentOnly container is inside a section and is not
+			// the section root or a content-to-content match, the
+			// contentOnly insertion restriction blocks it.
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							section: { name: 'core/test-block-b' },
+							container: {
+								name: 'core/test-block-a',
+							},
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							section: {
+								// patternName makes this block a section.
+								metadata: { patternName: 'test-pattern' },
+							},
+							container: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							section: '',
+							container: 'section',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'section' ] ],
+						[ 'section', [ 'container' ] ],
+						[ 'container', [] ],
+					] ),
+				},
+				blockListSettings: {
+					section: {},
+					container: {},
+				},
+				settings: {
+					[ sectionRootClientIdKey ]: '',
+				},
+				blockEditingModes: new Map(),
+				derivedBlockEditingModes: new Map( [
+					[ 'container', 'contentOnly' ],
+				] ),
+			};
+			// A content block into a non-content container that is not the
+			// section root is blocked by the contentOnly gating.
+			expect(
+				canInsertBlockType(
+					state,
+					'core/test-content-block',
+					'container'
+				)
+			).toBe( false );
+		} );
+
+		it( 'allows inserting content blocks into a content container within a section', () => {
+			// When the container is a content block and the block being
+			// inserted is also a content block, insertion is allowed
+			// even within a section (content-to-content match).
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							section: { name: 'core/test-block-b' },
+							container: {
+								name: 'core/test-content-block',
+							},
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							section: {
+								// patternName makes this block a section.
+								metadata: { patternName: 'test-pattern' },
+							},
+							container: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							section: '',
+							container: 'section',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'section' ] ],
+						[ 'section', [ 'container' ] ],
+						[ 'container', [] ],
+					] ),
+				},
+				blockListSettings: {
+					section: {},
+					container: {},
+				},
+				settings: {
+					[ sectionRootClientIdKey ]: '',
+				},
+				blockEditingModes: new Map(),
+				derivedBlockEditingModes: new Map( [
+					[ 'container', 'contentOnly' ],
+				] ),
+			};
+			expect(
+				canInsertBlockType(
+					state,
+					'core/test-content-block',
+					'container'
+				)
+			).toBe( true );
+		} );
+
 		it( 'should allow blocks to be inserted if both parent and ancestor restrictions are met', () => {
 			const state = {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
 							block1: { name: 'core/test-block-ancestor' },
-							block2: { name: 'core/block' },
+							block2: { name: 'core/group' },
 							block3: { name: 'core/test-block-parent' },
 						} )
 					),
@@ -3481,6 +3676,7 @@ describe( 'selectors', () => {
 				'core/freeform',
 				'core/test-block-ancestor',
 				'core/test-block-parent',
+				'core/test-content-block',
 				'core/block/1',
 				'core/block/2',
 			] );
@@ -3500,6 +3696,7 @@ describe( 'selectors', () => {
 				'core/freeform',
 				'core/test-block-ancestor',
 				'core/test-block-parent',
+				'core/test-content-block',
 				'core/block/1',
 				'core/block/2',
 			] );
@@ -3545,6 +3742,7 @@ describe( 'selectors', () => {
 	describe( 'getBlockTransformItems', () => {
 		beforeAll( () => {
 			registerBlockType( 'core/with-tranforms-a', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'Transforms a',
 				edit: () => {},
@@ -3574,6 +3772,7 @@ describe( 'selectors', () => {
 				},
 			} );
 			registerBlockType( 'core/with-tranforms-b', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'Transforms b',
 				edit: () => {},
@@ -3589,6 +3788,7 @@ describe( 'selectors', () => {
 				},
 			} );
 			registerBlockType( 'core/with-tranforms-c', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'Transforms c',
 				edit: () => {},
@@ -3875,6 +4075,19 @@ describe( 'selectors', () => {
 			};
 
 			expect( getTemplateLock( state, 'chicken' ) ).toBe( 'insert' );
+		} );
+
+		it( 'should return false if the block has contentOnly template lock and is an edited section', () => {
+			const state = {
+				editedContentOnlySection: 'chicken',
+				blockListSettings: {
+					chicken: {
+						templateLock: 'contentOnly',
+					},
+				},
+			};
+
+			expect( getTemplateLock( state, 'chicken' ) ).toBe( false );
 		} );
 	} );
 
@@ -4233,6 +4446,367 @@ describe( 'selectors', () => {
 			).toBe( false );
 		} );
 	} );
+
+	describe( 'canRemoveBlock', () => {
+		it( 'allows removal from a non-section contentOnly container', () => {
+			// When the parent has contentOnly editing mode but is NOT
+			// within a section, the contentOnly removal restriction
+			// does not apply.
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							parent: { name: 'core/test-block-a' },
+							child: { name: 'core/test-block-b' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							parent: {},
+							child: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							parent: '',
+							child: 'parent',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'parent' ] ],
+						[ 'parent', [ 'child' ] ],
+					] ),
+				},
+				blockListSettings: {
+					parent: {},
+				},
+				settings: {},
+				blockEditingModes: new Map(),
+				derivedBlockEditingModes: new Map( [
+					[ 'parent', 'contentOnly' ],
+				] ),
+			};
+			expect( canRemoveBlock( state, 'child' ) ).toBe( true );
+		} );
+
+		it( 'prevents removal from a contentOnly container within a section', () => {
+			// When the parent is within a section and has contentOnly
+			// editing mode, blocks in a non-insertable container
+			// cannot be removed.
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							section: { name: 'core/test-block-b' },
+							container: {
+								name: 'core/test-block-a',
+							},
+							child: { name: 'core/test-content-block' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							section: {
+								// patternName makes this block a section.
+								metadata: { patternName: 'test-pattern' },
+							},
+							container: {},
+							child: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							section: '',
+							container: 'section',
+							child: 'container',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'section' ] ],
+						[ 'section', [ 'container' ] ],
+						[ 'container', [ 'child' ] ],
+					] ),
+				},
+				blockListSettings: {
+					section: {},
+					container: {},
+				},
+				settings: {
+					[ sectionRootClientIdKey ]: '',
+				},
+				blockEditingModes: new Map(),
+				derivedBlockEditingModes: new Map( [
+					[ 'container', 'contentOnly' ],
+				] ),
+			};
+			expect( canRemoveBlock( state, 'child' ) ).toBe( false );
+		} );
+
+		it( 'allows removal of a content block from a content container within a section', () => {
+			// When both the container and the child are content blocks,
+			// the contentOnly gating allows removal
+			// (content-to-content match).
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							section: { name: 'core/test-block-b' },
+							container: {
+								name: 'core/test-content-block',
+							},
+							child: { name: 'core/test-content-block' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							section: {
+								// patternName makes this block a section.
+								metadata: { patternName: 'test-pattern' },
+							},
+							container: {},
+							child: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							section: '',
+							container: 'section',
+							child: 'container',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'section' ] ],
+						[ 'section', [ 'container' ] ],
+						[ 'container', [ 'child' ] ],
+					] ),
+				},
+				blockListSettings: {
+					section: {},
+					container: {},
+				},
+				settings: {
+					[ sectionRootClientIdKey ]: '',
+				},
+				blockEditingModes: new Map(),
+				derivedBlockEditingModes: new Map( [
+					[ 'container', 'contentOnly' ],
+				] ),
+			};
+			expect( canRemoveBlock( state, 'child' ) ).toBe( true );
+		} );
+
+		it( 'allows removing one of multiple default blocks in a contentOnly section container', () => {
+			// When in contentOnly mode within a section, default blocks
+			// can be removed as long as at least one other default block
+			// remains.
+			const previousDefaultBlockName = getDefaultBlockName();
+			setDefaultBlockName( 'core/test-content-block' );
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							section: { name: 'core/test-block-b' },
+							container: {
+								name: 'core/test-block-a',
+							},
+							child1: {
+								name: 'core/test-content-block',
+							},
+							child2: {
+								name: 'core/test-content-block',
+							},
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							section: {
+								// patternName makes this block a section.
+								metadata: { patternName: 'test-pattern' },
+							},
+							container: {},
+							child1: {},
+							child2: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							section: '',
+							container: 'section',
+							child1: 'container',
+							child2: 'container',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'section' ] ],
+						[ 'section', [ 'container' ] ],
+						[ 'container', [ 'child1', 'child2' ] ],
+					] ),
+				},
+				blockListSettings: {
+					section: {},
+					container: {},
+				},
+				settings: {
+					[ sectionRootClientIdKey ]: '',
+				},
+				blockEditingModes: new Map(),
+				derivedBlockEditingModes: new Map( [
+					[ 'container', 'contentOnly' ],
+				] ),
+			};
+			expect( canRemoveBlock( state, 'child1' ) ).toBe( true );
+			setDefaultBlockName( previousDefaultBlockName );
+		} );
+	} );
+
+	describe( 'canMoveBlock', () => {
+		it( 'allows moving within a non-section contentOnly container', () => {
+			// When the parent has contentOnly editing mode but is NOT
+			// within a section, the contentOnly move restriction does
+			// not apply.
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							parent: { name: 'core/test-block-a' },
+							child: { name: 'core/test-block-b' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							parent: {},
+							child: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							parent: '',
+							child: 'parent',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'parent' ] ],
+						[ 'parent', [ 'child' ] ],
+					] ),
+				},
+				blockListSettings: {
+					parent: {},
+				},
+				settings: {},
+				blockEditingModes: new Map(),
+				derivedBlockEditingModes: new Map( [
+					[ 'parent', 'contentOnly' ],
+				] ),
+			};
+			expect( canMoveBlock( state, 'child' ) ).toBe( true );
+		} );
+
+		it( 'prevents moving within a contentOnly container inside a section', () => {
+			// When the parent is within a section and has contentOnly
+			// editing mode, blocks in a non-insertable container
+			// cannot be moved.
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							section: { name: 'core/test-block-b' },
+							container: {
+								name: 'core/test-block-a',
+							},
+							child: { name: 'core/test-content-block' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							section: {
+								// patternName makes this block a section.
+								metadata: { patternName: 'test-pattern' },
+							},
+							container: {},
+							child: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							section: '',
+							container: 'section',
+							child: 'container',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'section' ] ],
+						[ 'section', [ 'container' ] ],
+						[ 'container', [ 'child' ] ],
+					] ),
+				},
+				blockListSettings: {
+					section: {},
+					container: {},
+				},
+				settings: {
+					[ sectionRootClientIdKey ]: '',
+				},
+				blockEditingModes: new Map(),
+				derivedBlockEditingModes: new Map( [
+					[ 'container', 'contentOnly' ],
+				] ),
+			};
+			expect( canMoveBlock( state, 'child' ) ).toBe( false );
+		} );
+
+		it( 'allows moving a content block within a content container inside a section', () => {
+			// When both the container and the child are content blocks,
+			// the contentOnly gating allows moving
+			// (content-to-content match).
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							section: { name: 'core/test-block-b' },
+							container: {
+								name: 'core/test-content-block',
+							},
+							child: { name: 'core/test-content-block' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							section: {
+								// patternName makes this block a section.
+								metadata: { patternName: 'test-pattern' },
+							},
+							container: {},
+							child: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							section: '',
+							container: 'section',
+							child: 'container',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'section' ] ],
+						[ 'section', [ 'container' ] ],
+						[ 'container', [ 'child' ] ],
+					] ),
+				},
+				blockListSettings: {
+					section: {},
+					container: {},
+				},
+				settings: {
+					[ sectionRootClientIdKey ]: '',
+				},
+				blockEditingModes: new Map(),
+				derivedBlockEditingModes: new Map( [
+					[ 'container', 'contentOnly' ],
+				] ),
+			};
+			expect( canMoveBlock( state, 'child' ) ).toBe( true );
+		} );
+	} );
 } );
 
 describe( 'getInserterItems with core blocks prioritization', () => {
@@ -4243,18 +4817,21 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 	// the core blocks (usually by using the `init` action), thus affecting the display order.
 	beforeEach( () => {
 		registerBlockType( 'plugin/block-a', {
+			apiVersion: 3,
 			save() {},
 			category: 'text',
 			title: 'Plugin Block A',
 			icon: 'test',
 		} );
 		registerBlockType( 'another-plugin/block-b', {
+			apiVersion: 3,
 			save() {},
 			category: 'text',
 			title: 'Another Plugin Block B',
 			icon: 'test',
 		} );
 		registerBlockType( 'plugin/block-c-with-variations', {
+			apiVersion: 3,
 			save() {},
 			category: 'text',
 			title: 'Plugin Block C with variations',
@@ -4262,11 +4839,13 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 			variations: [ { name: 'variation-a' }, { name: 'variation-b' } ],
 		} );
 		registerBlockType( 'core/block', {
+			apiVersion: 3,
 			save() {},
 			category: 'text',
 			title: 'Core Block A',
 		} );
 		registerBlockType( 'core/test-block-a', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'design',
 			title: 'Core Block B',
@@ -4274,6 +4853,7 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 			keywords: [ 'testing' ],
 		} );
 		registerBlockType( 'core/test-block-with-variations', {
+			apiVersion: 3,
 			save() {},
 			category: 'text',
 			title: 'Core Block C with variations',
@@ -4394,7 +4974,6 @@ describe( 'getBlockEditingMode', () => {
 	const baseState = {
 		blockEditingModes: new Map( [] ),
 		derivedBlockEditingModes: new Map( [] ),
-		derivedNavModeBlockEditingModes: new Map( [] ),
 	};
 
 	const hasContentRoleAttribute = jest.fn( () => false );

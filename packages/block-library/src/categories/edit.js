@@ -189,12 +189,16 @@ export default function CategoriesEdit( {
 			? 'ul'
 			: 'div';
 
-	const classes = clsx( className, {
-		'wp-block-categories-list':
-			!! categories?.length && ! displayAsDropdown && ! isResolving,
-		'wp-block-categories-dropdown':
-			!! categories?.length && displayAsDropdown && ! isResolving,
-	} );
+	const classes = clsx(
+		className,
+		`wp-block-categories-taxonomy-${ taxonomySlug }`,
+		{
+			'wp-block-categories-list':
+				!! categories?.length && ! displayAsDropdown && ! isResolving,
+			'wp-block-categories-dropdown':
+				!! categories?.length && displayAsDropdown && ! isResolving,
+		}
+	);
 
 	const blockProps = useBlockProps( {
 		className: classes,
@@ -231,7 +235,6 @@ export default function CategoriesEdit( {
 							isShownByDefault
 						>
 							<SelectControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								label={ __( 'Taxonomy' ) }
 								options={ taxonomies.map( ( t ) => ( {
@@ -256,7 +259,6 @@ export default function CategoriesEdit( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Display as dropdown' ) }
 							checked={ displayAsDropdown }
 							onChange={ toggleAttribute( 'displayAsDropdown' ) }
@@ -272,7 +274,6 @@ export default function CategoriesEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								className="wp-block-categories__indentation"
 								label={ __( 'Show label' ) }
 								checked={ showLabel }
@@ -289,7 +290,6 @@ export default function CategoriesEdit( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show post counts' ) }
 							checked={ showPostCounts }
 							onChange={ toggleAttribute( 'showPostCounts' ) }
@@ -305,7 +305,6 @@ export default function CategoriesEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Show only top level terms' ) }
 								checked={ showOnlyTopLevel }
 								onChange={ toggleAttribute(
@@ -323,7 +322,6 @@ export default function CategoriesEdit( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show empty terms' ) }
 							checked={ showEmpty }
 							onChange={ toggleAttribute( 'showEmpty' ) }
@@ -339,7 +337,6 @@ export default function CategoriesEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Show hierarchy' ) }
 								checked={ showHierarchy }
 								onChange={ toggleAttribute( 'showHierarchy' ) }

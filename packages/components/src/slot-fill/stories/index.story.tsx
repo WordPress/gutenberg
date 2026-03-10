@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,6 @@ const meta: Meta< typeof Slot > = {
 	component: Slot,
 	title: 'Components/Utilities/SlotFill',
 	id: 'components-slotfill',
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { Fill, SlotFillProvider },
 	argTypes: {
 		name: { control: false },
@@ -27,6 +26,10 @@ const meta: Meta< typeof Slot > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+		},
 	},
 };
 

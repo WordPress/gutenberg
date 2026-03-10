@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { accordion as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -10,7 +11,6 @@ import edit from './edit';
 import save from './save';
 import metadata from './block.json';
 import initBlock from '../utils/init-block';
-import icon from './icon';
 
 const { name } = metadata;
 
@@ -21,10 +21,10 @@ export const settings = {
 	example: {
 		innerBlocks: [
 			{
-				name: 'core/accordion-content',
+				name: 'core/accordion-item',
 				innerBlocks: [
 					{
-						name: 'core/accordion-header',
+						name: 'core/accordion-heading',
 						attributes: {
 							title: __(
 								'Lorem ipsum dolor sit amet, consectetur.'
@@ -34,10 +34,10 @@ export const settings = {
 				],
 			},
 			{
-				name: 'core/accordion-content',
+				name: 'core/accordion-item',
 				innerBlocks: [
 					{
-						name: 'core/accordion-header',
+						name: 'core/accordion-heading',
 						attributes: {
 							title: __(
 								'Suspendisse commodo lacus, interdum et.'

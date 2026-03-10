@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { StoryFn, Meta } from '@storybook/react';
+import type { StoryFn, Meta } from '@storybook/react-vite';
 /**
  * Internal dependencies
  */
@@ -74,6 +74,11 @@ const meta: Meta< typeof HStack > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `Stack` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;

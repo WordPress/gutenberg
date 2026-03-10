@@ -5,7 +5,7 @@ import type {
 	CSSProperties,
 	FocusEventHandler,
 	MouseEventHandler,
-	MutableRefObject,
+	RefObject,
 } from 'react';
 
 /**
@@ -76,7 +76,7 @@ export type ControlledRangeValue = number | '' | null;
 
 export type RangeControlProps = Pick<
 	BaseControlProps,
-	'hideLabelFromVision' | 'help' | '__nextHasNoMarginBottom'
+	'__nextHasNoMarginBottom' | 'hideLabelFromVision' | 'help'
 > &
 	MarksProps & {
 		/**
@@ -254,10 +254,7 @@ export type InputRangeProps = {
 	value?: number | '';
 };
 
-export type WrapperProps = Pick<
-	BaseControlProps,
-	'__nextHasNoMarginBottom'
-> & {
+export type WrapperProps = {
 	color?: CSSProperties[ 'color' ];
 	marks?: RangeMarks;
 };
@@ -270,7 +267,7 @@ export type ThumbProps = {
 export type TooltipProps = {
 	show?: boolean;
 	placement?: string;
-	inputRef?: MutableRefObject< HTMLElement | undefined >;
+	inputRef?: RefObject< HTMLElement | null >;
 	tooltipPlacement?: string;
 	value?: ControlledRangeValue;
 	renderTooltipContent?: (

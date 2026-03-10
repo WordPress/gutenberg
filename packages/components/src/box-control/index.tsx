@@ -188,6 +188,8 @@ function BoxControl( {
 			</BaseControl.VisualLabel>
 			{ isLinked && (
 				<InputWrapper>
+					{ /* Disable reason: the parent component is handling the __next40pxDefaultSize prop */ }
+					{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
 					<InputControl side="all" { ...inputControlProps } />
 				</InputWrapper>
 			) }
@@ -203,6 +205,8 @@ function BoxControl( {
 			{ ! isLinked &&
 				splitOnAxis &&
 				[ 'vertical', 'horizontal' ].map( ( axis ) => (
+					// Disable reason: the parent component is handling the __next40pxDefaultSize prop
+					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
 					<InputControl
 						key={ axis }
 						side={ axis as 'horizontal' | 'vertical' }
@@ -212,6 +216,8 @@ function BoxControl( {
 			{ ! isLinked &&
 				! splitOnAxis &&
 				Array.from( sidesToRender ).map( ( axis ) => (
+					// Disable reason: the parent component is handling the __next40pxDefaultSize prop
+					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
 					<InputControl
 						key={ axis }
 						side={ axis }

@@ -30,6 +30,7 @@ export default function useDragSelection() {
 	const { startMultiSelect, stopMultiSelect } =
 		useDispatch( blockEditorStore );
 	const {
+		getSettings,
 		isSelectionEnabled,
 		hasSelectedBlock,
 		isDraggingBlocks,
@@ -123,7 +124,12 @@ export default function useDragSelection() {
 				// child elements of the content editable wrapper are editable
 				// and return true for this property. We only want to start
 				// multi selecting when the mouse leaves the wrapper.
-				if ( target.getAttribute( 'contenteditable' ) !== 'true' ) {
+				// In preview mode, allow drag selection from blocks since they
+				// are not contenteditable.
+				if (
+					target.getAttribute( 'contenteditable' ) !== 'true' &&
+					! getSettings().isPreviewMode
+				) {
 					return;
 				}
 

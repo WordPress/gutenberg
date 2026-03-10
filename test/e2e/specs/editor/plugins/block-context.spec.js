@@ -16,16 +16,13 @@ test.describe( 'Block context', () => {
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-context' );
 	} );
 
-	test( 'Block context propagates to inner blocks', async ( {
-		editor,
-		page,
-	} ) => {
+	test( 'Block context propagates to inner blocks', async ( { editor } ) => {
 		await editor.insertBlock( { name: 'gutenberg/test-context-provider' } );
 
-		const providerBlock = page.getByRole( 'document', {
+		const providerBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Test Context Provider',
 		} );
-		const consumerBlock = page.getByRole( 'document', {
+		const consumerBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Test Context Consumer',
 		} );
 
@@ -56,7 +53,7 @@ test.describe( 'Block context', () => {
 
 		// Return to editor to change context value to non-default.
 		await editorPage.bringToFront();
-		await editorPage
+		await editor.canvas
 			.getByRole( 'document', {
 				name: 'Block: Test Context Provider',
 			} )

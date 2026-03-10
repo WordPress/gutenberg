@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 import {
 	enUS,
 	fr,
@@ -21,7 +21,7 @@ import {
 	ar,
 	sv,
 } from 'date-fns/locale';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 /**
  * WordPress dependencies
  */
@@ -159,6 +159,17 @@ export const WithSelectedRangeAndMonth: Story = {
 			to: fourthDayOfNextMonth,
 		},
 		defaultMonth: firstDayOfNextMonth,
+	},
+};
+
+/**
+ * Shows days from adjacent months in the grid. Outside days use a lighter style
+ * and are still interactive. Use `fixedWeeks` to keep the grid height constant.
+ */
+export const WithOutsideDays: Story = {
+	args: {
+		showOutsideDays: true,
+		fixedWeeks: true,
 	},
 };
 

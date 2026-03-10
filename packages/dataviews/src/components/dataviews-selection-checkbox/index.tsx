@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { SetSelection } from '../../private-types';
+import type { SetSelection } from '../../types/private';
 import type { NormalizedField } from '../../types';
 
 interface DataViewsSelectionCheckboxProps< Item > {
@@ -39,7 +39,6 @@ export default function DataViewsSelectionCheckbox< Item >( {
 	return (
 		<CheckboxControl
 			className="dataviews-selection-checkbox"
-			__nextHasNoMarginBottom
 			aria-label={ selectionLabel }
 			aria-disabled={ disabled }
 			checked={ checked }

@@ -14,6 +14,11 @@ import {
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { mediaPosition } from './utils';
+
 export default function save( { attributes } ) {
 	const {
 		url,
@@ -27,6 +32,7 @@ export default function save( { attributes } ) {
 		height,
 		aspectRatio,
 		scale,
+		focalPoint,
 		id,
 		linkTarget,
 		sizeSlug,
@@ -64,6 +70,10 @@ export default function save( { attributes } ) {
 				...shadowProps.style,
 				aspectRatio,
 				objectFit: scale,
+				objectPosition:
+					focalPoint && scale
+						? mediaPosition( focalPoint )
+						: undefined,
 				width,
 				height,
 			} }

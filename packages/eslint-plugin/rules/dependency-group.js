@@ -1,5 +1,9 @@
 /** @typedef {import('estree').Comment} Comment */
 /** @typedef {import('estree').Node} Node */
+/** @typedef {import('estree').SourceLocation} SourceLocation */
+
+const DEPENDENCY_BLOCK_PATTERN =
+	/^\*?\n \* (External|Node|WordPress|Internal) dependencies\n $/;
 
 /** @type {import('eslint').Rule.RuleModule} */
 module.exports = {
@@ -9,10 +13,15 @@ module.exports = {
 			description: 'Enforce dependencies docblocks formatting',
 			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/dependency-group.md',
 		},
-		schema: [],
+		schema: [
+			{
+				enum: [ 'always', 'never' ],
+			},
+		],
 		fixable: 'code',
 	},
 	create( context ) {
+		const mode = context.options[ 0 ] || 'always';
 		const comments = context.getSourceCode().getAllComments();
 
 		/**
@@ -95,6 +104,20 @@ module.exports = {
 		}
 
 		/**
+		 * Returns true if the given comment node is any dependency block comment.
+		 *
+		 * @param {Comment} node Comment node to check.
+		 *
+		 * @return {boolean} Whether comment node is a dependency block.
+		 */
+		function isDependencyBlock( node ) {
+			return (
+				node.type === 'Block' &&
+				DEPENDENCY_BLOCK_PATTERN.test( node.value )
+			);
+		}
+
+		/**
 		 * Returns true if the given node occurs prior in code to a reference,
 		 * or false otherwise.
 		 *
@@ -157,6 +180,46 @@ module.exports = {
 			 * @param {import('estree').Program} node Program node.
 			 */
 			Program( node ) {
+				if ( mode === 'never' ) {
+					for ( const comment of comments ) {
+						if ( isDependencyBlock( comment ) ) {
+							context.report( {
+								loc: /** @type {SourceLocation} */ (
+									comment.loc
+								),
+								message:
+									'Unexpected dependency group comment block',
+								fix( fixer ) {
+									if ( ! comment.range ) {
+										return null;
+									}
+
+									const text = context
+										.getSourceCode()
+										.getText();
+
+									// Trim preceding and trailing newlines.
+									let [ start, end ] = comment.range;
+									while (
+										start > 1 &&
+										text[ start - 1 ] === '\n' &&
+										text[ start - 2 ] === '\n'
+									) {
+										start--;
+									}
+									while ( text[ end ] === '\n' ) {
+										end++;
+									}
+
+									return fixer.removeRange( [ start, end ] );
+								},
+							} );
+						}
+					}
+
+					return;
+				}
+
 				/**
 				 * The set of package localities which have been reported for
 				 * the current program. Each locality is reported at most one

@@ -26,7 +26,6 @@ function UnconnectedBorderControlStylePicker(
 ) {
 	return (
 		<ToggleGroupControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			ref={ forwardedRef }
 			isDeselectable

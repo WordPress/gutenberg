@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
@@ -214,8 +214,11 @@ function entity( entityConfig ) {
 						}
 
 						const nextState = { ...state };
+						const itemsList = Array.isArray( action.items )
+							? action.items
+							: [ action.items ];
 
-						for ( const record of action.items ) {
+						for ( const record of itemsList ) {
 							const recordId = record?.[ action.key ];
 							const edits = nextState[ recordId ];
 							if ( ! edits ) {
@@ -628,10 +631,83 @@ export function registeredPostMeta( state = {}, action ) {
 	return state;
 }
 
-export function templateAutoDraftId( state = {}, action ) {
-	return action.type === 'RECEIVE_TEMPLATE_AUTO_DRAFT_ID'
-		? { ...state, [ action.target ]: action.id }
-		: state;
+/**
+ * Reducer managing editor settings.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Object} Updated state.
+ */
+export function editorSettings( state = null, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_EDITOR_SETTINGS':
+			return action.settings;
+	}
+	return state;
+}
+
+/**
+ * Reducer managing editor assets.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Object} Updated state.
+ */
+export function editorAssets( state = null, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_EDITOR_ASSETS':
+			return action.assets;
+	}
+	return state;
+}
+
+/**
+ * Reducer managing sync connection states for entities.
+ * Keyed by "kind/name:id" (e.g., "postType/post:123").
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function syncConnectionStatuses( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_SYNC_CONNECTION_STATUS': {
+			const key = `${ action.kind }/${ action.name }:${ action.key }`;
+			return {
+				...state,
+				[ key ]: action.status,
+			};
+		}
+		case 'CLEAR_SYNC_CONNECTION_STATUS': {
+			const key = `${ action.kind }/${ action.name }:${ action.key }`;
+			const { [ key ]: _, ...rest } = state;
+			return rest;
+		}
+	}
+	return state;
+}
+
+/**
+ * Reducer managing whether collaboration is supported.
+ *
+ * Default to true, as collaboration is supported by default
+ * unless explicitly disabled due to unsupported conditions
+ * such as metaboxes.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function collaborationSupported( state = true, action ) {
+	switch ( action.type ) {
+		case 'SET_COLLABORATION_SUPPORTED':
+			return action.supported;
+	}
+	return state;
 }
 
 export default combineReducers( {
@@ -654,5 +730,8 @@ export default combineReducers( {
 	navigationFallbackId,
 	defaultTemplates,
 	registeredPostMeta,
-	templateAutoDraftId,
+	editorSettings,
+	editorAssets,
+	syncConnectionStatuses,
+	collaborationSupported,
 } );

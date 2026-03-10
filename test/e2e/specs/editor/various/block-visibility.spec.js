@@ -96,7 +96,7 @@ test.describe( 'Block Visibility', () => {
 		await expect(
 			page
 				.getByRole( 'tabpanel', { name: 'Blocks' } )
-				.getByRole( 'option', { name: 'Heading' } ),
+				.getByRole( 'option', { name: 'Heading', exact: true } ),
 			'Heading block should be visible'
 		).toBeVisible();
 	} );
@@ -173,7 +173,7 @@ test.describe( 'Block Visibility', () => {
 			.getByRole( 'searchbox', {
 				name: 'Search for a block',
 			} )
-			.fill( 'verse' );
+			.fill( 'poetry' );
 		const blockCategories = page
 			.getByRole( 'region', {
 				name: 'Available block types',
@@ -200,8 +200,8 @@ test.describe( 'Block Visibility', () => {
 		).toHaveCount( 1 );
 
 		await expect(
-			textCategoryBlocksList.getByRole( 'checkbox', { name: 'Verse' } ),
-			'Verse block should be visible'
+			textCategoryBlocksList.getByRole( 'checkbox', { name: 'Poetry' } ),
+			'Poetry block should be visible'
 		).toBeVisible();
 	} );
 

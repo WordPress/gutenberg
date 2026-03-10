@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 6.17.0 (2026-03-04)
+
+## 6.16.0 (2026-02-18)
+
+## 6.15.0 (2026-01-29)
+
+## 6.14.0 (2026-01-16)
+
+### Internal
+
+-   Remove outdated vendor prefix properties ([#74213](https://github.com/WordPress/gutenberg/pull/74213)).
+
+## 6.12.0 (2025-11-26)
+
+## 6.11.0 (2025-11-12)
+
+## 6.10.0 (2025-10-29)
+
+### Enhancements
+
+-   Update `$font-weight-medium` to 499 ([#72473](https://github.com/WordPress/gutenberg/pull/72473)).
+
+## 6.9.0 (2025-10-17)
+
+## 6.8.0 (2025-10-01)
+
 ## 6.7.0 (2025-09-17)
 
 ## 6.6.0 (2025-09-03)

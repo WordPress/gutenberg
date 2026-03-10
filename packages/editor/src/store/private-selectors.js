@@ -270,3 +270,163 @@ export const getDefaultRenderingMode = createRegistrySelector(
 		return defaultMode;
 	}
 );
+
+/**
+ * Get the current global styles navigation path.
+ *
+ * @param {Object} state Global application state.
+ * @return {string} The current styles path.
+ */
+export function getStylesPath( state ) {
+	return state.stylesPath ?? '/';
+}
+
+/**
+ * Get whether the stylebook is currently visible.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether the stylebook is visible.
+ */
+export function getShowStylebook( state ) {
+	return state.showStylebook ?? false;
+}
+
+/**
+ * Get the canvas minimum height.
+ *
+ * @param {Object} state Global application state.
+ * @return {number} The canvas minimum height.
+ */
+export function getCanvasMinHeight( state ) {
+	return state.canvasMinHeight;
+}
+
+/**
+ * Returns whether the editor is in revisions preview mode.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether revisions mode is active.
+ */
+export function isRevisionsMode( state ) {
+	return state.revisionId !== null;
+}
+
+/**
+ * Returns the current revision ID in revisions mode.
+ *
+ * @param {Object} state Global application state.
+ * @return {number|null} The revision ID, or null if not in revisions mode.
+ */
+export function getCurrentRevisionId( state ) {
+	return state.revisionId;
+}
+
+/**
+ * Returns the current revision object in revisions mode.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object|null|undefined} The revision object, null if loading, or undefined if not in revisions mode.
+ */
+export const getCurrentRevision = createRegistrySelector(
+	( select ) => ( state ) => {
+		const revisionId = getCurrentRevisionId( state );
+		if ( ! revisionId ) {
+			return undefined;
+		}
+
+		const { type: postType, id: postId } = getCurrentPost( state );
+		// - Use getRevisions (plural) instead of getRevision (singular) to
+		//   avoid a race condition where both API calls complete around the
+		//   same time and the single revision fetch overwrites the list in the
+		//   store.
+		// - getRevision also needs to be updated to check if there's any
+		//   received revisions from the collection API call to avoid unnecessary
+		//   API calls.
+		const revisions = select( coreStore ).getRevisions(
+			'postType',
+			postType,
+			postId,
+			{ per_page: -1, context: 'edit' }
+		);
+		if ( ! revisions ) {
+			return null;
+		}
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revKey = entityConfig?.revisionKey || 'id';
+		return revisions.find( ( r ) => r[ revKey ] === revisionId ) ?? null;
+	}
+);
+
+/**
+ * Returns the currently selected note ID.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {undefined|number|'new'} The selected note ID, 'new' for the new note form, or undefined if none.
+ */
+export function getSelectedNote( state ) {
+	return state.selectedNote?.noteId;
+}
+
+/**
+ * Returns whether the selected note should be focused.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the selected note should be focused.
+ */
+export function isNoteFocused( state ) {
+	return !! state.selectedNote?.options?.focus;
+}
+
+/**
+ * Returns the previous revision (the one before the current revision).
+ * Used for diffing between revisions.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object|null|undefined} The previous revision object, null if loading or no previous revision, or undefined if not in revisions mode.
+ */
+export const getPreviousRevision = createRegistrySelector(
+	( select ) => ( state ) => {
+		const currentRevisionId = getCurrentRevisionId( state );
+		if ( ! currentRevisionId ) {
+			return undefined;
+		}
+
+		const { type: postType, id: postId } = getCurrentPost( state );
+		const revisions = select( coreStore ).getRevisions(
+			'postType',
+			postType,
+			postId,
+			{ per_page: -1, context: 'edit' }
+		);
+		if ( ! revisions ) {
+			return null;
+		}
+
+		// Sort by date ascending (oldest first).
+		const sortedRevisions = [ ...revisions ].sort(
+			( a, b ) => new Date( a.date ) - new Date( b.date )
+		);
+
+		// Find current revision index.
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revKey = entityConfig?.revisionKey || 'id';
+		const currentIndex = sortedRevisions.findIndex(
+			( r ) => r[ revKey ] === currentRevisionId
+		);
+
+		// Return the previous revision (older one) if it exists.
+		if ( currentIndex > 0 ) {
+			return sortedRevisions[ currentIndex - 1 ];
+		}
+
+		return null;
+	}
+);

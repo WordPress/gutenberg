@@ -227,7 +227,7 @@ export const modifiers: WPModifierHandler< WPModifier > = {
  * ```js
  * // Assuming macOS:
  * rawShortcut.primary( 'm' )
- * // "meta+m""
+ * // "meta+m"
  * ```
  */
 export const rawShortcut: WPModifierHandler< WPKeyHandler< string > > =
@@ -237,6 +237,53 @@ export const rawShortcut: WPModifierHandler< WPKeyHandler< string > > =
 			return [ ...modifier( _isApple ), character.toLowerCase() ].join(
 				'+'
 			);
+		};
+	} );
+
+/**
+ * An object that contains functions to get shortcuts in a format compatible
+ * with the [`aria-keyshortcuts` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts).
+ *
+ * **Note**: The provided shortcut character strings (ie. not the modifiers) should follow
+ * the values specified in the [UI Events KeyboardEvent key Values spec](https://www.w3.org/TR/uievents-key/) — for example, "Enter", "Tab", "ArrowRight", "PageDown",
+ * "Escape", "Plus", or "F1". The spacebar key should be represented with the
+ * "Space" string (an exception to the UI Events KeyboardEvent key Values spec).
+ *
+ * @see https://www.w3.org/TR/wai-aria-1.2/#aria-keyshortcuts
+ * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts
+ * @see https://www.w3.org/TR/uievents-key/
+ *
+ * @example
+ * ```js
+ * // Assuming macOS:
+ * ariaKeyShortcut.primary( 'm' )
+ * // "Meta+M"
+ *
+ * ariaKeyShortcut.primaryAlt( 'm' )
+ * // "Meta+Alt+M"
+ *
+ * // Assuming Windows:
+ * ariaKeyShortcut.primary( 'm' )
+ * // "Control+M"
+ *
+ * ariaKeyShortcut.primaryAlt( 'm' )
+ * // "Control+Alt+M"
+ *
+ * ariaKeyShortcut.primaryShift( 'del' )
+ * // "Control+Shift+Delete"
+ * ```
+ */
+export const ariaKeyShortcut: WPModifierHandler< WPKeyHandler< string > > =
+	/* @__PURE__ */
+	mapValues( modifiers, ( modifier: WPModifier ) => {
+		return ( character: string, _isApple = isAppleOS ) => {
+			return [
+				...modifier( _isApple )
+					// Swap 'ctrl' for 'control' (spec-compliant)
+					.map( ( key ) => ( key === CTRL ? 'Control' : key ) )
+					.map( ( key ) => capitaliseFirstCharacter( key ) ),
+				capitaliseFirstCharacter( character ),
+			].join( '+' );
 		};
 	} );
 

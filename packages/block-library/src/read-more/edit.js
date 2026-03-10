@@ -44,7 +44,6 @@ export default function ReadMore( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Open in new tab' ) }
 							onChange={ ( value ) =>
 								setAttributes( {

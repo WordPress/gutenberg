@@ -12,11 +12,16 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
+	Button,
 	ComboboxControl,
 	SelectControl,
 	ToggleControl,
+	__experimentalText as Text,
+	__experimentalVStack as VStack,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -26,14 +31,19 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import { recreateWithRecommendedBlocks } from './utils';
 import {
 	useDefaultAvatar,
 	useToolsPanelDropdownMenuProps,
 } from '../utils/hooks';
+import { unlock } from '../lock-unlock';
+
+const { InspectorControlsLastItem } = unlock( blockEditorPrivateApis );
 
 const AUTHORS_QUERY = {
 	who: 'authors',
@@ -98,7 +108,6 @@ function AuthorCombobox( { value, onChange } ) {
 	return (
 		<ComboboxControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			label={ __( 'Author' ) }
 			options={ authorOptions }
 			value={ value?.id }
@@ -115,6 +124,7 @@ function PostAuthorEdit( {
 	context: { postType, postId, queryId },
 	attributes,
 	setAttributes,
+	clientId,
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -146,8 +156,12 @@ function PostAuthorEdit( {
 		},
 		[ postType, postId ]
 	);
-
+	const blockTypes = useSelect(
+		( select ) => select( blocksStore ).getBlockTypes(),
+		[]
+	);
 	const { editEntityRecord } = useDispatch( coreStore );
+	const { replaceBlock } = useDispatch( blockEditorStore );
 
 	const {
 		textAlign,
@@ -196,6 +210,13 @@ function PostAuthorEdit( {
 		);
 	}
 
+	function transformBlock() {
+		replaceBlock(
+			clientId,
+			recreateWithRecommendedBlocks( attributes, blockTypes )
+		);
+	}
+
 	return (
 		<>
 			<InspectorControls>
@@ -228,7 +249,6 @@ function PostAuthorEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show avatar' ) }
 							checked={ showAvatar }
 							onChange={ () =>
@@ -249,7 +269,6 @@ function PostAuthorEdit( {
 						>
 							<SelectControl
 								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 								label={ __( 'Avatar size' ) }
 								value={ avatarSize }
 								options={ avatarSizes }
@@ -270,7 +289,6 @@ function PostAuthorEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show bio' ) }
 							checked={ !! showBio }
 							onChange={ () =>
@@ -285,7 +303,6 @@ function PostAuthorEdit( {
 						onDeselect={ () => setAttributes( { isLink: false } ) }
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Link author name to author page' ) }
 							checked={ isLink }
 							onChange={ () =>
@@ -303,7 +320,6 @@ function PostAuthorEdit( {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {
@@ -316,6 +332,30 @@ function PostAuthorEdit( {
 					) }
 				</ToolsPanel>
 			</InspectorControls>
+			{ blockTypes.some(
+				( blockType ) => blockType.name === 'core/group'
+			) && (
+				<InspectorControlsLastItem>
+					<VStack
+						className="wp-block-post-author__transform"
+						alignment="left"
+						spacing={ 4 }
+					>
+						<Text as="p">
+							{ __(
+								'This block is no longer supported. Recreate its design with the Avatar, Author Name and Author Biography blocks.'
+							) }
+						</Text>
+						<Button
+							variant="primary"
+							onClick={ transformBlock }
+							__next40pxDefaultSize
+						>
+							{ __( 'Recreate' ) }
+						</Button>
+					</VStack>
+				</InspectorControlsLastItem>
+			) }
 
 			<BlockControls group="block">
 				<AlignmentControl

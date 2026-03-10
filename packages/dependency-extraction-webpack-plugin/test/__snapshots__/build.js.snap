@@ -86,10 +86,10 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`dynamic-import\` sh
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`error\` should produce expected output 1`] = `
-"ERROR in ./index.js 5:0-23
+"ERROR in ./index.js 1:0-23
 Module not found: Error: Attempted to use WordPress script in a module: jquery, which is not supported yet.
 
-ERROR in ./index.js 6:23-55
+ERROR in ./index.js 3:23-55
 Module not found: Error: Attempted to use WordPress script in a module: @wordpress/api-fetch, which is not supported yet.
 "
 `;

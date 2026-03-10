@@ -8,7 +8,7 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
-import i18nBlockSchema from './i18n-block.json';
+import i18nBlockSchema from './i18n-block.json' with { type: 'json' };
 import { store as blocksStore } from '../store';
 import { unlock } from '../lock-unlock';
 
@@ -134,6 +134,7 @@ import { unlock } from '../lock-unlock';
  * @property {Function} [getValues]        Optional function to get the values from the source.
  * @property {Function} [setValues]        Optional function to update multiple values connected to the source.
  * @property {Function} [canUserEditValue] Optional function to determine if the user can edit the value.
+ * @property {Function} [getFieldsList]    Optional function that returns fields list that will be shown in the UI.
  */
 
 function isObject( object ) {
@@ -902,7 +903,6 @@ export const registerBlockBindingsSource = ( source ) => {
 
 	// Check the `getFieldsList` property is correct.
 	if ( getFieldsList && typeof getFieldsList !== 'function' ) {
-		// eslint-disable-next-line no-console
 		warning( 'Block bindings source getFieldsList must be a function.' );
 		return;
 	}

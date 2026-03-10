@@ -16,11 +16,15 @@
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {
-					"align": "right",
 					"content": "My video",
 					"dropCap": false,
 					"placeholder": "Content…",
-					"fontSize": "large"
+					"fontSize": "large",
+					"style": {
+						"typography": {
+							"textAlign": "right"
+						}
+					}
 				},
 				"innerBlocks": []
 			}

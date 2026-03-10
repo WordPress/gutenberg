@@ -66,7 +66,7 @@ export function useAutocomplete( {
 		null
 	);
 	const [ AutocompleterUI, setAutocompleterUI ] = useState<
-		( ( props: AutocompleterUIProps ) => JSX.Element | null ) | null
+		( ( props: AutocompleterUIProps ) => React.JSX.Element | null ) | null
 	>( null );
 
 	const backspacingRef = useRef( false );
@@ -408,7 +408,8 @@ function useLastDifferentValue( value: UseAutocompleteProps[ 'record' ] ) {
 
 export function useAutocompleteProps( options: UseAutocompleteProps ) {
 	const ref = useRef< HTMLElement >( null );
-	const onKeyDownRef = useRef< ( event: KeyboardEvent ) => void >();
+	const onKeyDownRef =
+		useRef< ( event: KeyboardEvent ) => void >( undefined );
 	const { record } = options;
 	const previousRecord = useLastDifferentValue( record );
 	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {

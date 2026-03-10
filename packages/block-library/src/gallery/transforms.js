@@ -155,7 +155,7 @@ const transforms = {
 		{
 			type: 'shortcode',
 			tag: 'gallery',
-			transform( { named: { ids, columns = 3, link, orderby } } ) {
+			transform( { named: { ids, columns = 3, link, orderby, size } } ) {
 				const imageIds = parseShortcodeIds( ids ).map( ( id ) =>
 					parseInt( id, 10 )
 				);
@@ -173,9 +173,13 @@ const transforms = {
 						columns: parseInt( columns, 10 ),
 						linkTo,
 						randomOrder: orderby === 'rand',
+						...( size && { sizeSlug: size } ),
 					},
 					imageIds.map( ( imageId ) =>
-						createBlock( 'core/image', { id: imageId } )
+						createBlock( 'core/image', {
+							id: imageId,
+							...( size && { sizeSlug: size } ),
+						} )
 					)
 				);
 

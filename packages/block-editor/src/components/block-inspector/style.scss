@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .block-editor-block-inspector {
 	p:not(.components-base-control__help) {
 		margin-top: 0;
@@ -52,7 +55,10 @@
 	border-top: $border-width solid $gray-300;
 }
 
-.block-editor-block-inspector-edit-contents-button {
-	margin-top: $grid-unit-10;
-	justify-content: center;
+.block-editor-block-inspector-edit-contents {
+	margin: 0 $grid-unit-20 $grid-unit-20 $grid-unit-20;
+
+	.block-editor-block-inspector-edit-contents__button {
+		justify-content: center;
+	}
 }

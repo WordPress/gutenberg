@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -24,10 +25,17 @@ const meta: Meta< typeof ConfirmDialog > = {
 		},
 	},
 	tags: [ 'status-experimental' ],
+	args: {
+		onCancel: fn(),
+		onConfirm: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
+		},
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -54,7 +62,11 @@ const Template: StoryFn< typeof ConfirmDialog > = ( {
 
 	return (
 		<>
-			<Button variant="primary" onClick={ () => setIsOpen( true ) }>
+			<Button
+				__next40pxDefaultSize
+				variant="primary"
+				onClick={ () => setIsOpen( true ) }
+			>
 				Open ConfirmDialog
 			</Button>
 

@@ -30,7 +30,7 @@ function render_block_core_comment_author_avatar( $attributes, $content, $block 
 	 * We get the spacing attributes and transform the array provided into a string formatted for being applied as a style html tag.
 	 * Good candidate to be moved to a separate function in core.
 	*/
-	$spacing_attributes = isset( $attributes['style']['spacing'] ) ? $attributes['style']['spacing'] : null;
+	$spacing_attributes = $attributes['style']['spacing'] ?? null;
 	if ( isset( $spacing_attributes ) && ! empty( $spacing_attributes ) ) {
 		$spacing_array = array();
 		foreach ( $spacing_attributes as $spacing_attribute_key => $spacing_attribute_value ) {
@@ -41,10 +41,10 @@ function render_block_core_comment_author_avatar( $attributes, $content, $block 
 		$spacing_string = implode( ';', $spacing_array );
 	}
 
-	$width   = isset( $attributes['width'] ) ? $attributes['width'] : 96;
-	$height  = isset( $attributes['height'] ) ? $attributes['height'] : 96;
-	$styles  = isset( $wrapper_attributes['style'] ) ? $wrapper_attributes['style'] : '';
-	$classes = isset( $wrapper_attributes['class'] ) ? $wrapper_attributes['class'] : '';
+	$width   = $attributes['width'] ?? 96;
+	$height  = $attributes['height'] ?? 96;
+	$styles  = $wrapper_attributes['style'] ?? '';
+	$classes = $wrapper_attributes['class'] ?? '';
 
 	/* translators: %s: Author name. */
 	$alt = sprintf( __( '%s Avatar' ), $comment->comment_author );

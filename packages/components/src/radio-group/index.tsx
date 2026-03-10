@@ -74,4 +74,5 @@ function UnforwardedRadioGroup(
  * @deprecated Use `RadioControl` or `ToggleGroupControl` instead.
  */
 export const RadioGroup = forwardRef( UnforwardedRadioGroup );
+RadioGroup.displayName = 'RadioGroup';
 export default RadioGroup;

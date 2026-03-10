@@ -33,10 +33,9 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		// To do: run with iframe.
-		await editor.switchToLegacyCanvas();
-
-		await page.locator( 'role=button[name="Add default block"i]' ).click();
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'Cut - collapsed selection' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
@@ -44,7 +43,6 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+x' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
-		await pageUtils.pressKeys( 'Tab' );
 		await page.keyboard.press( 'ArrowDown' );
 		await pageUtils.pressKeys( 'primary+v' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -788,6 +786,41 @@ test.describe( 'Copy/cut/paste', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'bB',
+				},
+			},
+		] );
+	} );
+
+	test( 'should replace the default block on paste when the content is unmodified', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: {
+				content: 'AB',
+			},
+		} );
+		await pageUtils.pressKeys( 'primary+c' );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { metadata: { name: 'Test' } },
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'AB',
+					level: 2,
+				},
+			},
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'AB',
+					level: 2,
 				},
 			},
 		] );

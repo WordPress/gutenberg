@@ -72,7 +72,7 @@ function render_block_core_search( $attributes ) {
 	if ( $input->next_tag() ) {
 		$input->add_class( implode( ' ', $input_classes ) );
 		$input->set_attribute( 'id', $input_id );
-		$input->set_attribute( 'value', get_search_query() );
+		$input->set_attribute( 'value', get_search_query( false ) );
 		$input->set_attribute( 'placeholder', $attributes['placeholder'] );
 
 		// If it's interactive, enqueue the script module and add the directives.
@@ -183,8 +183,8 @@ function render_block_core_search( $attributes ) {
 		 data-wp-interactive="core/search"
 		 ' . $form_context . '
 		 data-wp-class--wp-block-search__searchfield-hidden="!context.isSearchInputVisible"
-		 data-wp-on-async--keydown="actions.handleSearchKeydown"
-		 data-wp-on-async--focusout="actions.handleSearchFocusout"
+		 data-wp-on--keydown="actions.handleSearchKeydown"
+		 data-wp-on--focusout="actions.handleSearchFocusout"
 		';
 	}
 

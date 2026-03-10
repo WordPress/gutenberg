@@ -6,10 +6,13 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
 import { rotateLeft, rotateRight, help, backup } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -17,8 +20,8 @@ import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
-const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useGlobalStyles } = unlock( editorPrivateApis );
 
 const getGlobalStylesToggleWelcomeGuideCommands = () =>
 	function useGlobalStylesToggleWelcomeGuideCommands() {
@@ -69,7 +72,14 @@ const getGlobalStylesToggleWelcomeGuideCommands = () =>
 
 const getGlobalStylesResetCommands = () =>
 	function useGlobalStylesResetCommands() {
-		const [ canReset, onReset ] = useGlobalStylesReset();
+		const { user, setUser } = useGlobalStyles();
+
+		// Check if there are user customizations that can be reset
+		const canReset =
+			!! user &&
+			( Object.keys( user?.styles ?? {} ).length > 0 ||
+				Object.keys( user?.settings ?? {} ).length > 0 );
+
 		const commands = useMemo( () => {
 			if ( ! canReset ) {
 				return [];
@@ -82,11 +92,11 @@ const getGlobalStylesResetCommands = () =>
 					icon: isRTL() ? rotateRight : rotateLeft,
 					callback: ( { close } ) => {
 						close();
-						onReset();
+						setUser( { styles: {}, settings: {} } );
 					},
 				},
 			];
-		}, [ canReset, onReset ] );
+		}, [ canReset, setUser ] );
 
 		return {
 			isLoading: false,
@@ -96,9 +106,8 @@ const getGlobalStylesResetCommands = () =>
 
 const getGlobalStylesOpenRevisionsCommands = () =>
 	function useGlobalStylesOpenRevisionsCommands() {
-		const { openGeneralSidebar, setEditorCanvasContainerView } = unlock(
-			useDispatch( editSiteStore )
-		);
+		const { openGeneralSidebar } = unlock( useDispatch( editSiteStore ) );
+		const { setStylesPath } = unlock( useDispatch( editorStore ) );
 		const { params } = useLocation();
 		const { canvas = 'view' } = params;
 		const history = useHistory();
@@ -131,16 +140,14 @@ const getGlobalStylesOpenRevisionsCommands = () =>
 							} );
 						}
 						openGeneralSidebar( 'edit-site/global-styles' );
-						setEditorCanvasContainerView(
-							'global-styles-revisions'
-						);
+						setStylesPath( '/revisions' );
 					},
 				},
 			];
 		}, [
 			history,
 			openGeneralSidebar,
-			setEditorCanvasContainerView,
+			setStylesPath,
 			hasRevisions,
 			canvas,
 		] );

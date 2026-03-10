@@ -40,4 +40,5 @@ function UnforwardedToolbarContainer(
 }
 
 export const ToolbarContainer = forwardRef( UnforwardedToolbarContainer );
+ToolbarContainer.displayName = 'ToolbarContainer';
 export default ToolbarContainer;

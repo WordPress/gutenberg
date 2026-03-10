@@ -5,7 +5,7 @@
  *
  * @since 6.6.0
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {

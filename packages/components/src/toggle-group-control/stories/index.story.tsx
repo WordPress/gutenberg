@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -25,7 +25,6 @@ import type {
 
 const meta: Meta< typeof ToggleGroupControl > = {
 	component: ToggleGroupControl,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
 	title: 'Components/Selection & Input/Common/ToggleGroupControl',
 	id: 'components-togglegroupcontrol',
@@ -38,6 +37,11 @@ const meta: Meta< typeof ToggleGroupControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `ToggleGroupControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -51,7 +55,6 @@ const Template: StoryFn< typeof ToggleGroupControl > = ( {
 
 	return (
 		<ToggleGroupControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			{ ...props }
 			onChange={ ( ...changeArgs ) => {

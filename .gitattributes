@@ -1,5 +1,5 @@
 # Set the default behavior, in case people don't have `core.autocrlf` set.
-* text=auto
+* text=auto eol=lf
 
 # Windows bat files in mobile/android.
 *.bat -text

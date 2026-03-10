@@ -1,0 +1,7 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.stack {
+		display: flex;
+	}
+}

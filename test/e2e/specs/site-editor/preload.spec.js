@@ -27,16 +27,11 @@ test.describe( 'Preload', () => {
 				// Stop recording when the iframe is initialized.
 				page.off( 'request', onRequest );
 			} else if ( request.resourceType() === 'fetch' ) {
-				const url = request.url();
-				const urlObject = new URL( url );
-				const restRoute = urlObject.searchParams.get( 'rest_route' );
-				if ( restRoute ) {
-					urlObject.searchParams.delete( 'rest_route' );
-					urlObject.searchParams.delete( '_locale' );
-					requests.push( restRoute + urlObject.search );
-				} else {
-					requests.push( url );
-				}
+				const urlObject = new URL( request.url() );
+				const restRoute =
+					urlObject.searchParams.get( 'rest_route' ) ??
+					urlObject.pathname.replace( /^\/wp-json/, '' );
+				requests.push( restRoute );
 			}
 		}
 
@@ -46,13 +41,11 @@ test.describe( 'Preload', () => {
 
 		// To do: these should all be removed or preloaded.
 		expect( requests ).toEqual( [
-			'/wp/v2/wp_template',
+			// Abilities system initialization.
+			'/wp-abilities/v1/categories',
+			'/wp-abilities/v1/abilities',
 			// Seems to be coming from `enableComplementaryArea`.
 			'/wp/v2/users/me',
-			// This is the auto-draft template.
-			expect.stringMatching( /\/wp\/v2\/wp_template\/\d+\?context=edit/ ),
-			// There are two separate settings OPTIONS requests. We should fix
-			// so the one for canUser and getEntityRecord are reused.
 			'/wp/v2/settings',
 		] );
 	} );

@@ -8,3 +8,9 @@ export const ALLOWED_MEDIA_TYPES = [ 'image' ];
 export const MEDIA_ID_NO_FEATURED_IMAGE_SET = 0;
 export const SIZED_LAYOUTS = [ 'flex', 'grid' ];
 export const DEFAULT_MEDIA_SIZE_SLUG = 'full';
+
+/**
+ * Delay in milliseconds before preloading an image after hovering.
+ * This prevents unnecessary preloading during quick scrolling or mouse movements.
+ */
+export const IMAGE_PRELOAD_DELAY = 200;

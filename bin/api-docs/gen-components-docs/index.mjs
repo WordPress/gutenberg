@@ -15,7 +15,10 @@ import { getTagsFromStorybook } from './get-tags-from-storybook.mjs';
 
 const MANIFEST_GLOB = 'packages/components/src/**/docs-manifest.json';
 
-// For consistency, options should generally match the options used in Storybook.
+/**
+ * For consistency, options should generally match the options used in Storybook.
+ * @type {import('react-docgen-typescript').ParserOptions}
+ */
 const OPTIONS = {
 	shouldExtractLiteralValuesFromEnum: true,
 	shouldRemoveUndefinedFromOptional: true,

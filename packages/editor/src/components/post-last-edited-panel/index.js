@@ -17,19 +17,18 @@ export default function PostLastEditedPanel() {
 			select( editorStore ).getEditedPostAttribute( 'modified' ),
 		[]
 	);
-	const lastEditedText =
-		modified &&
-		sprintf(
-			// translators: %s: Human-readable time difference, e.g. "2 days ago".
-			__( 'Last edited %s.' ),
-			humanTimeDiff( modified )
-		);
-	if ( ! lastEditedText ) {
+	if ( ! modified ) {
 		return null;
 	}
 	return (
 		<div className="editor-post-last-edited-panel">
-			<Text>{ lastEditedText }</Text>
+			<Text>
+				{ sprintf(
+					// translators: %s: Human-readable time difference, e.g. "2 days ago".
+					__( 'Last edited %s.' ),
+					humanTimeDiff( modified )
+				) }
+			</Text>
 		</div>
 	);
 }

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store, withSyncEvent } from '@wordpress/interactivity';
+import { store, withSyncEvent, getContext } from '@wordpress/interactivity';
 
 const { state } = store( 'router', {
 	state: {
@@ -31,16 +31,30 @@ const { state } = store( 'router', {
 			const { actions } = yield import(
 				'@wordpress/interactivity-router'
 			);
-			yield actions.navigate( e.target.href, { force, timeout } );
+
+			try {
+				yield actions.navigate( e.target.href, { force, timeout } );
+			} catch ( error ) {
+				state.status = 'fail';
+			}
 
 			state.navigations.pending -= 1;
 
-			if ( state.navigations.pending === 0 ) {
+			if ( state.navigations.pending === 0 && state.status === 'busy' ) {
 				state.status = 'idle';
 			}
 		} ),
 		toggleTimeout() {
 			state.timeout = state.timeout === 10000 ? 0 : 10000;
+		},
+	},
+} );
+
+store( 'router/derived-state', {
+	state: {
+		get derivedStateClosure() {
+			const { value } = getContext();
+			return `${ value }FromGetter`;
 		},
 	},
 } );

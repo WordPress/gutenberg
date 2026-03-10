@@ -23,6 +23,7 @@ import PostExcerptCheck from './check';
 import PluginPostExcerpt from './plugin';
 import { TEMPLATE_ORIGINS } from '../../store/constants';
 import { store as editorStore } from '../../store';
+import { getTemplateInfo } from '../../utils/get-template-info';
 
 /**
  * Module Constants
@@ -109,7 +110,6 @@ function PrivateExcerpt() {
 				getCurrentPostId,
 				getEditedPostAttribute,
 				isEditorPanelEnabled,
-				__experimentalGetDefaultTemplateType,
 			} = select( editorStore );
 			const postType = getCurrentPostType();
 			const isTemplateOrTemplatePart = [
@@ -124,6 +124,7 @@ function PrivateExcerpt() {
 			const _usedAttribute = isTemplateOrTemplatePart
 				? 'description'
 				: 'excerpt';
+			const _excerpt = getEditedPostAttribute( _usedAttribute );
 			// We need to fetch the entity in this case to check if we'll allow editing.
 			const template =
 				isTemplateOrTemplatePart &&
@@ -132,17 +133,22 @@ function PrivateExcerpt() {
 					postType,
 					getCurrentPostId()
 				);
-			const fallback = isTemplateOrTemplatePart
-				? __experimentalGetDefaultTemplateType( template.slug )
-						.description
-				: undefined;
+			const fallback =
+				! _excerpt && isTemplateOrTemplatePart
+					? getTemplateInfo( {
+							template,
+							templateTypes:
+								select( coreStore ).getCurrentTheme()
+									?.default_template_types,
+					  } )?.description
+					: undefined;
 			// For post types that use excerpt as description, we do not abide
 			// by the `isEnabled` panel flag in order to render them as text.
 			const _shouldRender =
 				isEditorPanelEnabled( PANEL_NAME ) ||
 				_shouldBeUsedAsDescription;
 			return {
-				excerpt: getEditedPostAttribute( _usedAttribute ) ?? fallback,
+				excerpt: _excerpt ?? fallback,
 				shouldRender: _shouldRender,
 				shouldBeUsedAsDescription: _shouldBeUsedAsDescription,
 				// If we should render, allow editing for all post types that are not used as description.

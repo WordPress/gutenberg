@@ -8,4 +8,5 @@ export interface ClipboardButtonProps {
 	onCopy: () => void;
 	onFinishCopy?: () => void;
 	text: string;
+	__next40pxDefaultSize?: boolean;
 }

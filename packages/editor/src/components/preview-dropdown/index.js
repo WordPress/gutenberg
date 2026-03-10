@@ -21,12 +21,12 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem } from '@wordpress/interface';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import PostPreviewButton from '../post-preview-button';
 import { unlock } from '../../lock-unlock';
 
@@ -97,6 +97,8 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 
 	/**
 	 * The choices for the device type.
+	 * Duplicated in block-editor block-visibility constants and edit-site
+	 * use-viewport-sync. Update all three when adding new viewport types.
 	 *
 	 * @type {Array}
 	 */

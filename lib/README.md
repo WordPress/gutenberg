@@ -117,7 +117,7 @@ The above recommendations in relation to plugin-specific prefixes/suffixes are r
 
 `Gutenberg` prefixes/suffixes _should not_ be used in Core PHP code. When syncing `/lib` files to Core, plugin-specific prefixes/suffixes are generally replaced with their `WP_` or `wp_` equivalents manually.
 
-Accordingly, unless required to run plugin-only code, you should avoid using plugin-specific prefixes/suffixes in any block PHP code. Core blocks in the plugin are [published as NPM packages](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/release.md#packages-releases-to-npm-and-wordpress-core-updates), which Core consumes as NPM dependencies.
+Accordingly, unless required to run plugin-only code, you should avoid using plugin-specific prefixes/suffixes in any block PHP code. Core blocks in the plugin are [published as NPM packages](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/release/README.md#packages-releases-to-npm-and-wordpress-core-updates), which Core consumes as NPM dependencies.
 
 See [block naming conventions](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library#naming-convention-for-php-functions) for more information on block naming conventions.
 

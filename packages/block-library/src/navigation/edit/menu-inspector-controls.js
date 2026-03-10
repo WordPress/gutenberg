@@ -6,14 +6,10 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	PanelBody,
-	__experimentalHStack as HStack,
-	__experimentalHeading as Heading,
-	Spinner,
-} from '@wordpress/components';
+import { PanelBody, Spinner } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,94 +19,17 @@ import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
-import { updateAttributes } from '../../navigation-link/update-attributes';
-import { LinkUI } from '../../navigation-link/link-ui';
+import { NavigationLinkUI } from './navigation-link-ui';
+import NavigationListViewHeader from './navigation-list-view-header';
 
 const actionLabel =
 	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
-const BLOCKS_WITH_LINK_UI_SUPPORT = [
-	'core/navigation-link',
-	'core/navigation-submenu',
-];
-const { PrivateListView } = unlock( blockEditorPrivateApis );
-
-function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
-	const { updateBlockAttributes, removeBlock } =
-		useDispatch( blockEditorStore );
-
-	const supportsLinkControls = BLOCKS_WITH_LINK_UI_SUPPORT?.includes(
-		insertedBlock?.name
-	);
-	const blockWasJustInserted = insertedBlock?.clientId === block.clientId;
-	const showLinkControls = supportsLinkControls && blockWasJustInserted;
-
-	if ( ! showLinkControls ) {
-		return null;
-	}
-
-	/**
-	 * Cleanup function for auto-inserted Navigation Link blocks.
-	 *
-	 * Removes the block if it has no URL and clears the inserted block state.
-	 * This ensures consistent cleanup behavior across different contexts.
-	 */
-	const cleanupInsertedBlock = () => {
-		// Prevent automatic block selection when removing blocks in list view context
-		// This avoids focus stealing that would close the list view and switch to canvas
-		const shouldAutoSelectBlock = false;
-
-		// Follows the exact same pattern as Navigation Link block's onClose handler
-		// If there is no URL then remove the auto-inserted block to avoid empty blocks
-		if ( ! insertedBlock?.attributes?.url && insertedBlock?.clientId ) {
-			// Remove the block entirely to avoid poor UX
-			// This matches the Navigation Link block's behavior
-			removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
-		}
-		setInsertedBlock( null );
-	};
-
-	const setInsertedBlockAttributes =
-		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
-			if ( ! _insertedBlockClientId ) {
-				return;
-			}
-			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
-		};
-
-	// Wrapper function to clean up original block when a new block is selected
-	const handleSetInsertedBlock = ( newBlock ) => {
-		// Prevent automatic block selection when removing blocks in list view context
-		// This avoids focus stealing that would close the list view and switch to canvas
-		const shouldAutoSelectBlock = false;
-
-		// If we have an existing inserted block and a new block is being set,
-		// remove the original block to avoid duplicates
-		if ( insertedBlock?.clientId && newBlock ) {
-			removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
-		}
-		setInsertedBlock( newBlock );
-	};
-
-	return (
-		<LinkUI
-			clientId={ insertedBlock?.clientId }
-			link={ insertedBlock?.attributes }
-			onBlockInsert={ handleSetInsertedBlock }
-			onClose={ () => {
-				// Use cleanup function
-				cleanupInsertedBlock();
-			} }
-			onChange={ ( updatedValue ) => {
-				updateAttributes(
-					updatedValue,
-					setInsertedBlockAttributes( insertedBlock?.clientId ),
-					insertedBlock?.attributes
-				);
-				setInsertedBlock( null );
-			} }
-		/>
-	);
-}
+const {
+	PrivateListView,
+	PrivateBlockContext,
+	useListViewPanelState,
+	useBlockDisplayTitle,
+} = unlock( blockEditorPrivateApis );
 
 const MainContent = ( {
 	clientId,
@@ -118,12 +37,17 @@ const MainContent = ( {
 	isLoading,
 	isNavigationMenuMissing,
 	onCreateNew,
+	expandRevision,
 } ) => {
 	const hasChildren = useSelect(
 		( select ) => {
 			return !! select( blockEditorStore ).getBlockCount( clientId );
 		},
 		[ clientId ]
+	);
+
+	const { openListViewContentPanel } = unlock(
+		useDispatch( blockEditorStore )
 	);
 
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
@@ -156,12 +80,14 @@ const MainContent = ( {
 				</p>
 			) }
 			<PrivateListView
+				key={ `${ clientId }-${ expandRevision }` }
 				rootClientId={ clientId }
 				isExpanded
 				description={ description }
 				showAppender
 				blockSettingsMenu={ LeafMoreMenu }
-				additionalBlockContent={ AdditionalBlockContent }
+				additionalBlockContent={ NavigationLinkUI }
+				onSelect={ openListViewContentPanel }
 			/>
 		</div>
 	);
@@ -169,6 +95,7 @@ const MainContent = ( {
 
 const MenuInspectorControls = ( props ) => {
 	const {
+		clientId,
 		createNavigationMenuIsSuccess,
 		createNavigationMenuIsError,
 		currentMenuId = null,
@@ -179,36 +106,77 @@ const MenuInspectorControls = ( props ) => {
 		blockEditingMode,
 	} = props;
 
+	const { isSelectionWithinCurrentSection } =
+		useContext( PrivateBlockContext );
+
+	const blockTitle = useBlockDisplayTitle( {
+		clientId,
+		context: 'list-view',
+	} );
+
+	// Only make panel collapsible in contentOnly mode
+	const showBlockTitle = isSelectionWithinCurrentSection;
+
+	const { isOpened, expandRevision, handleToggle } =
+		useListViewPanelState( clientId );
+
+	if ( ! showBlockTitle ) {
+		return (
+			<InspectorControls group="list">
+				<PanelBody title={ null }>
+					<NavigationListViewHeader
+						clientId={ clientId }
+						blockEditingMode={ blockEditingMode }
+						currentMenuId={ currentMenuId }
+						onSelectClassicMenu={ onSelectClassicMenu }
+						onSelectNavigationMenu={ onSelectNavigationMenu }
+						onCreateNew={ onCreateNew }
+						createNavigationMenuIsSuccess={
+							createNavigationMenuIsSuccess
+						}
+						createNavigationMenuIsError={
+							createNavigationMenuIsError
+						}
+						isManageMenusButtonDisabled={
+							isManageMenusButtonDisabled
+						}
+					/>
+					<MainContent
+						{ ...props }
+						expandRevision={ expandRevision }
+					/>
+				</PanelBody>
+			</InspectorControls>
+		);
+	}
+
+	// ContentOnly mode: use collapsible PanelBody
 	return (
 		<InspectorControls group="list">
-			<PanelBody title={ null }>
-				<HStack className="wp-block-navigation-off-canvas-editor__header">
-					<Heading
-						className="wp-block-navigation-off-canvas-editor__title"
-						level={ 2 }
-					>
-						{ __( 'Menu' ) }
-					</Heading>
-					{ blockEditingMode === 'default' && (
-						<NavigationMenuSelector
-							currentMenuId={ currentMenuId }
-							onSelectClassicMenu={ onSelectClassicMenu }
-							onSelectNavigationMenu={ onSelectNavigationMenu }
-							onCreateNew={ onCreateNew }
-							createNavigationMenuIsSuccess={
-								createNavigationMenuIsSuccess
-							}
-							createNavigationMenuIsError={
-								createNavigationMenuIsError
-							}
-							actionLabel={ actionLabel }
-							isManageMenusButtonDisabled={
-								isManageMenusButtonDisabled
-							}
-						/>
-					) }
-				</HStack>
-				<MainContent { ...props } />
+			<PanelBody
+				title={ blockTitle }
+				opened={ isOpened }
+				onToggle={ handleToggle }
+			>
+				{ blockEditingMode === 'default' && (
+					<NavigationMenuSelector
+						currentMenuId={ currentMenuId }
+						onSelectClassicMenu={ onSelectClassicMenu }
+						onSelectNavigationMenu={ onSelectNavigationMenu }
+						onCreateNew={ onCreateNew }
+						createNavigationMenuIsSuccess={
+							createNavigationMenuIsSuccess
+						}
+						createNavigationMenuIsError={
+							createNavigationMenuIsError
+						}
+						actionLabel={ actionLabel }
+						isManageMenusButtonDisabled={
+							isManageMenusButtonDisabled
+						}
+					/>
+				) }
+				<MainContent { ...props } expandRevision={ expandRevision } />
 			</PanelBody>
 		</InspectorControls>
 	);

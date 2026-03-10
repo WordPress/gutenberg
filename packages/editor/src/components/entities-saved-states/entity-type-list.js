@@ -5,18 +5,12 @@ import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useContext } from '@wordpress/element';
+import { getGlobalStylesChanges } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import EntityRecordItem from './entity-record-item';
-import { unlock } from '../../lock-unlock';
-
-const { getGlobalStylesChanges, GlobalStylesContext } = unlock(
-	blockEditorPrivateApis
-);
 
 function getEntityDescription( entity, count ) {
 	switch ( entity ) {
@@ -35,20 +29,28 @@ function getEntityDescription( entity, count ) {
 }
 
 function GlobalStylesDescription( { record } ) {
-	const { user: currentEditorGlobalStyles } =
-		useContext( GlobalStylesContext );
-	const savedRecord = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecord(
-				record.kind,
-				record.name,
-				record.key
-			),
+	const { editedRecord, savedRecord } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord, getEntityRecord } =
+				select( coreStore );
+			return {
+				editedRecord: getEditedEntityRecord(
+					record.kind,
+					record.name,
+					record.key
+				),
+				savedRecord: getEntityRecord(
+					record.kind,
+					record.name,
+					record.key
+				),
+			};
+		},
 		[ record.kind, record.name, record.key ]
 	);
 
 	const globalStylesChanges = getGlobalStylesChanges(
-		currentEditorGlobalStyles,
+		editedRecord,
 		savedRecord,
 		{
 			maxResults: 10,

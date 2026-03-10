@@ -28,7 +28,9 @@ test.describe( 'RenderAppender prop of InnerBlocks', () => {
 			name: 'test/inner-blocks-render-appender',
 		} );
 
-		const customAppender = page.locator( '.my-custom-awesome-appender' );
+		const customAppender = editor.canvas.locator(
+			'.my-custom-awesome-appender'
+		);
 
 		// Verify if the custom block appender text is the expected one.
 		await expect( customAppender ).toContainText(
@@ -71,7 +73,9 @@ test.describe( 'RenderAppender prop of InnerBlocks', () => {
 			name: 'test/inner-blocks-render-appender-dynamic',
 		} );
 
-		const dynamimcAppender = page.locator( '.my-dynamic-blocks-appender' );
+		const dynamimcAppender = editor.canvas.locator(
+			'.my-dynamic-blocks-appender'
+		);
 		const addBlockBtn = dynamimcAppender.getByRole( 'button', {
 			name: 'Add block',
 		} );

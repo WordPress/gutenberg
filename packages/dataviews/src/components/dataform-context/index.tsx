@@ -20,7 +20,9 @@ DataFormContext.displayName = 'DataFormContext';
 export function DataFormProvider< Item >( {
 	fields,
 	children,
-}: React.PropsWithChildren< { fields: NormalizedField< Item >[] } > ) {
+}: React.PropsWithChildren< {
+	fields: NormalizedField< Item >[];
+} > ) {
 	return (
 		<DataFormContext.Provider value={ { fields } }>
 			{ children }

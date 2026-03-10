@@ -8,7 +8,7 @@ import {
 	RawHTML,
 } from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { removep } from '@wordpress/autop';
 import deprecated from '@wordpress/deprecated';
 

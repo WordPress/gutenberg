@@ -12,7 +12,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { VisuallyHidden } from '..';
+import { VisuallyHidden } from '../visually-hidden';
 import * as Styled from './styles';
 import type {
 	CustomSelectContext as CustomSelectContextType,
@@ -31,7 +31,7 @@ export const CustomSelectContext =
 CustomSelectContext.displayName = 'CustomSelectContext';
 
 function defaultRenderSelectedValue(
-	value: CustomSelectButtonProps[ 'value' ]
+	value: CustomSelectButtonProps[ 'defaultValue' ]
 ) {
 	const isValueEmpty = Array.isArray( value )
 		? value.length === 0

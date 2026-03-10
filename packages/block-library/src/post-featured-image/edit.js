@@ -339,7 +339,6 @@ export default function PostFeaturedImageEdit( {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={
 									postType?.labels.singular_name
 										? sprintf(
@@ -368,7 +367,6 @@ export default function PostFeaturedImageEdit( {
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Open in new tab' ) }
 									onChange={ ( value ) =>
 										setAttributes( {
@@ -394,7 +392,6 @@ export default function PostFeaturedImageEdit( {
 							>
 								<TextControl
 									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={ __( 'Link relation' ) }
 									help={ createInterpolateElement(
 										__(

@@ -22,7 +22,6 @@ export default function InfiniteScrollToggle() {
 
 	return (
 		<ToggleControl
-			__nextHasNoMarginBottom
 			label={ __( 'Enable infinite scroll' ) }
 			help={ __(
 				'Automatically load more content as you scroll, instead of showing pagination links.'

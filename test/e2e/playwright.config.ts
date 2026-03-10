@@ -12,8 +12,12 @@ import baseConfig from '@wordpress/scripts/config/playwright.config.js';
 
 const config = defineConfig( {
 	...baseConfig,
+	webServer: {
+		...baseConfig.webServer,
+		command: 'npm run wp-env-test -- start',
+	},
 	reporter: process.env.CI
-		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ] ]
+		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ], [ 'blob' ] ]
 		: 'list',
 	workers: 1,
 	globalSetup: fileURLToPath(

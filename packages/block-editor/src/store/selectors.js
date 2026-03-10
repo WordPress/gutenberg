@@ -5,6 +5,7 @@ import {
 	getBlockType,
 	getBlockTypes,
 	getBlockVariations,
+	getDefaultBlockName,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
 	switchToBlockType,
@@ -17,7 +18,6 @@ import { symbol } from '@wordpress/icons';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -38,13 +38,12 @@ import { unlock } from '../lock-unlock';
 
 import {
 	getContentLockingParent,
-	getTemporarilyEditingAsBlocks,
-	getTemporarilyEditingFocusModeToRevert,
+	getEditedContentOnlySection,
 	getSectionRootClientId,
 	isSectionBlock,
 	getParentSectionBlock,
 	isZoomOut,
-	isContainerInsertableToInWriteMode,
+	isContainerInsertableToInContentOnlyMode,
 } from './private-selectors';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -789,7 +788,6 @@ export function getNextBlockClientId( state, startClientId ) {
 	return getAdjacentBlockClientId( state, startClientId, 1 );
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns the initial caret position for the selected block.
  * This position is to used to position the caret properly when the selected block changes.
@@ -800,7 +798,6 @@ export function getNextBlockClientId( state, startClientId ) {
  * @return {0|-1|null} Initial position.
  */
 export function getSelectedBlocksInitialCaretPosition( state ) {
-	/* eslint-enable jsdoc/valid-types */
 	return state.initialPosition;
 }
 
@@ -1577,7 +1574,21 @@ export function getTemplateLock( state, rootClientId ) {
 		return state.settings.templateLock ?? false;
 	}
 
-	return getBlockListSettings( state, rootClientId )?.templateLock ?? false;
+	const blockListTemplateLock = getBlockListSettings(
+		state,
+		rootClientId
+	)?.templateLock;
+
+	// If this is a contentOnly template locked block that's in the process
+	// of being edited, consider the template lock as temporarily inactive.
+	if (
+		blockListTemplateLock === 'contentOnly' &&
+		state.editedContentOnlySection === rootClientId
+	) {
+		return false;
+	}
+
+	return blockListTemplateLock ?? false;
 }
 
 /**
@@ -1671,6 +1682,11 @@ const canInsertBlockTypeUnmemoized = (
 	blockName,
 	rootClientId = null
 ) => {
+	// Disable insertion in preview mode.
+	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
 	if ( ! isBlockVisibleInTheInserter( state, blockName, rootClientId ) ) {
 		return false;
 	}
@@ -1683,20 +1699,16 @@ const canInsertBlockTypeUnmemoized = (
 		blockType = getBlockType( blockName );
 	}
 
-	const isLocked = !! getTemplateLock( state, rootClientId );
-	if ( isLocked ) {
-		return false;
-	}
-	const isContentRoleBlock = isContentBlock( blockName );
-	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
-	// It shouldn't be possible to insert inside a section block unless in
-	// some cases when the block is a content block.
-	if ( isParentSectionBlock && ! isContentRoleBlock ) {
+	const rootTemplateLock = getTemplateLock( state, rootClientId );
+	if ( rootTemplateLock && rootTemplateLock !== 'contentOnly' ) {
 		return false;
 	}
 
 	const blockEditingMode = getBlockEditingMode( state, rootClientId ?? '' );
-	if ( blockEditingMode === 'disabled' ) {
+	if (
+		blockEditingMode === 'disabled' &&
+		blockName !== getDefaultBlockName()
+	) {
 		return false;
 	}
 
@@ -1708,13 +1720,55 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
-	// In write mode, check if this container allows insertion.
+	// It shouldn't be possible to insert inside a section block unless in
+	// some cases when the block is a content block.
+	const isContentRoleBlock = isContentBlock( blockName );
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const sectionClientId = isParentSectionBlock
+		? rootClientId
+		: getParentSectionBlock( state, rootClientId );
+	const isWithinSection = !! sectionClientId;
+	if ( isWithinSection && ! isContentRoleBlock ) {
+		return false;
+	}
+
+	// Don't allow insertion into synced patterns.
 	if (
-		blockEditingMode === 'contentOnly' &&
-		isNavigationMode( state ) &&
-		! isContainerInsertableToInWriteMode( state, blockName, rootClientId )
+		isWithinSection &&
+		getBlockName( state, sectionClientId ) === 'core/block'
 	) {
 		return false;
+	}
+
+	// In content only mode, check if this container allows insertion.
+	// We need the `isParentSectionBlock` check because section blocks
+	// (synced patterns, contentOnly groups) have a `getBlockEditingMode`
+	// of 'default', not 'contentOnly' — the 'contentOnly' mode is only
+	// set on their *children*.
+	if (
+		isWithinSection &&
+		( isParentSectionBlock || blockEditingMode === 'contentOnly' ) &&
+		! isContainerInsertableToInContentOnlyMode(
+			state,
+			blockName,
+			rootClientId
+		)
+	) {
+		const defaultBlockName = getDefaultBlockName();
+		// Allow inserting the default block anywhere that another default block already exists
+		// when in contentOnly mode.
+		if ( blockName === defaultBlockName ) {
+			const existingBlocks = getBlockOrder( state, rootClientId );
+			const hasDefaultBlock = existingBlocks.some(
+				( clientId ) =>
+					getBlockName( state, clientId ) === defaultBlockName
+			);
+			if ( ! hasDefaultBlock ) {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 
 	const parentName = getBlockName( state, rootClientId );
@@ -1847,6 +1901,11 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
  * @return {boolean} Whether the given block is allowed to be removed.
  */
 export function canRemoveBlock( state, clientId ) {
+	// Disable removal in preview mode.
+	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return true;
@@ -1856,34 +1915,70 @@ export function canRemoveBlock( state, clientId ) {
 	}
 
 	const rootClientId = getBlockRootClientId( state, clientId );
-	if ( getTemplateLock( state, rootClientId ) ) {
+	const rootTemplateLock = getTemplateLock( state, rootClientId );
+	if ( rootTemplateLock && rootTemplateLock !== 'contentOnly' ) {
 		return false;
 	}
 
-	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
+	// It shouldn't be possible to move in a section block unless in
+	// some cases when the block is a content block.
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const sectionClientId = isParentSectionBlock
+		? rootClientId
+		: getParentSectionBlock( state, rootClientId );
+	const isWithinSection = !! sectionClientId;
 	const isContentRoleBlock = isContentBlock(
 		getBlockName( state, clientId )
 	);
-	if ( isBlockWithinSection && ! isContentRoleBlock ) {
+	if ( isWithinSection && ! isContentRoleBlock ) {
 		return false;
 	}
 
-	const blockEditingMode = getBlockEditingMode( state, rootClientId );
-
-	// Check if the parent container allows insertion/removal in write mode
+	// Disallow removal from synced patterns.
 	if (
-		blockEditingMode === 'contentOnly' &&
-		isNavigationMode( state ) &&
-		! isContainerInsertableToInWriteMode(
-			state,
-			getBlockName( state, rootClientId ),
-			rootClientId
-		)
+		isWithinSection &&
+		getBlockName( state, sectionClientId ) === 'core/block'
 	) {
 		return false;
 	}
 
-	return blockEditingMode !== 'disabled';
+	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
+	const blockName = getBlockName( state, clientId );
+	const defaultBlockName = getDefaultBlockName();
+
+	// Check if the parent container allows insertion/removal in contentOnly
+	// mode. We need the `isParentSectionBlock` check because section blocks
+	// (synced patterns, contentOnly groups) have a `getBlockEditingMode` of
+	// 'default', not 'contentOnly' — the 'contentOnly' mode is only set on
+	// their *children*.
+	if (
+		isWithinSection &&
+		( isParentSectionBlock ||
+			blockName === defaultBlockName ||
+			rootBlockEditingMode === 'contentOnly' ) &&
+		! isContainerInsertableToInContentOnlyMode(
+			state,
+			getBlockName( state, clientId ),
+			rootClientId
+		)
+	) {
+		// Allow removing the default block when other default blocks exist
+		// in contentOnly mode.
+		if ( blockName === defaultBlockName ) {
+			const existingBlocks = getBlockOrder( state, rootClientId );
+			const defaultBlocks = existingBlocks.filter(
+				( id ) => getBlockName( state, id ) === defaultBlockName
+			);
+			// Allow removal if there are other default blocks besides this one
+			if ( defaultBlocks.length > 1 ) {
+				return true;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	return rootBlockEditingMode !== 'disabled';
 }
 
 /**
@@ -1907,6 +2002,11 @@ export function canRemoveBlocks( state, clientIds ) {
  * @return {boolean} Whether the given block is allowed to be moved.
  */
 export function canMoveBlock( state, clientId ) {
+	// Disable moving in preview mode.
+	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return true;
@@ -1916,9 +2016,39 @@ export function canMoveBlock( state, clientId ) {
 	}
 
 	const rootClientId = getBlockRootClientId( state, clientId );
-	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
+	const rootTemplateLock = getTemplateLock( state, rootClientId );
+	if ( rootTemplateLock === 'all' ) {
 		return false;
 	}
+
+	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
+	const isContentRoleBlock = isContentBlock(
+		getBlockName( state, clientId )
+	);
+	if ( isBlockWithinSection && ! isContentRoleBlock ) {
+		return false;
+	}
+
+	// If the block is within a section and the parent is either a section
+	// block itself or has contentOnly editing mode, check whether the inner
+	// block should be allowed to move. We need the `isParentSectionBlock`
+	// check because section blocks (synced patterns, contentOnly groups)
+	// have a `getBlockEditingMode` of 'default', not 'contentOnly' — the
+	// 'contentOnly' mode is only set on their *children*.
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
+	if (
+		isBlockWithinSection &&
+		( isParentSectionBlock || rootBlockEditingMode === 'contentOnly' ) &&
+		! isContainerInsertableToInContentOnlyMode(
+			state,
+			getBlockName( state, clientId ),
+			rootClientId
+		)
+	) {
+		return false;
+	}
+
 	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 
@@ -1943,6 +2073,11 @@ export function canMoveBlocks( state, clientIds ) {
  * @return {boolean} Whether the given block is allowed to be edited.
  */
 export function canEditBlock( state, clientId ) {
+	// Disable editing in preview mode.
+	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return true;
@@ -1963,6 +2098,11 @@ export function canEditBlock( state, clientId ) {
  * @return {boolean} Whether a given block type can be locked/unlocked.
  */
 export function canLockBlockType( state, nameOrType ) {
+	// Disable locking in preview mode.
+	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
 	if ( ! hasBlockSupport( nameOrType, 'lock', true ) ) {
 		return false;
 	}
@@ -2030,6 +2170,8 @@ const getItemFromVariation = ( state, item ) => ( variation ) => {
 		innerBlocks: variation.innerBlocks,
 		keywords: variation.keywords || item.keywords,
 		frecency: calculateFrecency( time, count ),
+		// Pass through search-only flag for block-scope variations.
+		isSearchOnly: variation.isSearchOnly,
 	};
 };
 
@@ -2103,6 +2245,25 @@ const buildBlockTypeItem =
 			blockType.name,
 			'inserter'
 		);
+		const blockVariations = getBlockVariations( blockType.name, 'block' );
+		const allVariations = [
+			...inserterVariations,
+			// Built-in heading level variations have block scope but allow
+			// insertion via slash inserter.
+			// See https://github.com/WordPress/gutenberg/issues/74233.
+			...blockVariations
+				.filter(
+					( variation ) =>
+						blockType.name === 'core/heading' &&
+						[ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
+							variation.name
+						)
+				)
+				.map( ( variation ) => ( {
+					...variation,
+					isSearchOnly: true,
+				} ) ),
+		];
 		return {
 			...blockItemBase,
 			initialAttributes: {},
@@ -2111,7 +2272,7 @@ const buildBlockTypeItem =
 			keywords: blockType.keywords,
 			parent: blockType.parent,
 			ancestor: blockType.ancestor,
-			variations: inserterVariations,
+			variations: allVariations,
 			example: blockType.example,
 			utility: 1, // Deprecated.
 		};
@@ -2210,13 +2371,21 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 						)
 				);
 			} else {
+				const { getClosestAllowedInsertionPoint } = unlock(
+					select( STORE_NAME )
+				);
 				blockTypeInserterItems = blockTypeInserterItems
-					.filter( ( blockType ) =>
-						isBlockVisibleInTheInserter(
-							state,
-							blockType,
-							rootClientId
-						)
+					.filter(
+						( blockType ) =>
+							isBlockVisibleInTheInserter(
+								state,
+								blockType,
+								rootClientId
+							) &&
+							getClosestAllowedInsertionPoint(
+								blockType.name,
+								rootClientId
+							) !== null
 					)
 					.map( ( blockType ) => ( {
 						...blockType,
@@ -2798,36 +2967,6 @@ export function __experimentalGetLastBlockAttributeChanges( state ) {
 }
 
 /**
- * Returns whether the navigation mode is enabled.
- *
- * @param {Object} state Editor state.
- *
- * @return {boolean} Is navigation mode enabled.
- */
-export function isNavigationMode( state ) {
-	return __unstableGetEditorMode( state ) === 'navigation';
-}
-
-/**
- * Returns the current editor mode.
- *
- * @param {Object} state Editor state.
- *
- * @return {string} the editor mode.
- */
-export const __unstableGetEditorMode = createRegistrySelector(
-	( select ) => ( state ) => {
-		if ( ! window?.__experimentalEditorWriteMode ) {
-			return 'edit';
-		}
-		return (
-			state.settings.editorTool ??
-			select( preferencesStore ).get( 'core', 'editorTool' )
-		);
-	}
-);
-
-/**
  * Returns whether block moving mode is enabled.
  *
  * @deprecated
@@ -3088,20 +3227,11 @@ export function getBlockEditingMode( state, clientId = '' ) {
 		clientId = '';
 	}
 
-	const isNavMode = isNavigationMode( state );
-
-	// If the editor is currently not in navigation mode, check if the clientId
-	// has an editing mode set in the regular derived map.
+	// Check if the clientId has an editing mode set in the regular derived map.
 	// There may be an editing mode set here for synced patterns or in zoomed out
 	// mode.
-	if ( ! isNavMode && state.derivedBlockEditingModes?.has( clientId ) ) {
+	if ( state.derivedBlockEditingModes?.has( clientId ) ) {
 		return state.derivedBlockEditingModes.get( clientId );
-	}
-
-	// If the editor *is* in navigation mode, the block editing mode states
-	// are stored in the derivedNavModeBlockEditingModes map.
-	if ( isNavMode && state.derivedNavModeBlockEditingModes?.has( clientId ) ) {
-		return state.derivedNavModeBlockEditingModes.get( clientId );
 	}
 
 	// In normal mode, consider that an explicitly set editing mode takes over.
@@ -3119,6 +3249,7 @@ export function getBlockEditingMode( state, clientId = '' ) {
  * requirement of being the default grouping block.
  * Additionally a block can only be ungrouped if it has inner blocks and can
  * be removed.
+ * Section blocks are not ungroupable.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client Id of the block. If not passed the selected block's client id will be used.
@@ -3131,6 +3262,12 @@ export const isUngroupable = createRegistrySelector(
 			if ( ! _clientId ) {
 				return false;
 			}
+
+			// Section blocks should not be ungroupable.
+			if ( isSectionBlock( state, _clientId ) ) {
+				return false;
+			}
+
 			const { getGroupingBlockName } = select( blocksStore );
 			const block = getBlock( state, _clientId );
 			const groupingBlockName = getGroupingBlockName();
@@ -3214,25 +3351,5 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 			version: '6.7',
 		}
 	);
-	return getTemporarilyEditingAsBlocks( state );
-}
-
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- *
- * @deprecated
- *
- * @param {Object} state Global application state.
- */
-export function __unstableGetTemporarilyEditingFocusModeToRevert( state ) {
-	deprecated(
-		"wp.data.select( 'core/block-editor' ).__unstableGetTemporarilyEditingFocusModeToRevert",
-		{
-			since: '6.5',
-			version: '6.7',
-		}
-	);
-	return getTemporarilyEditingFocusModeToRevert( state );
+	return getEditedContentOnlySection( state );
 }

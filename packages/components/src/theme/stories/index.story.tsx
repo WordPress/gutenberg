@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -23,13 +23,20 @@ const meta: Meta< typeof Theme > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'This is an internal experiment and not meant for external use. Will be superseded by `@wordpress/theme`.',
+		},
 	},
 };
 export default meta;
 
 const Template: StoryFn< typeof Theme > = ( args ) => (
 	<Theme { ...args }>
-		<Button variant="primary">Hello</Button>
+		<Button __next40pxDefaultSize variant="primary">
+			Hello
+		</Button>
 	</Theme>
 );
 
@@ -38,10 +45,12 @@ Default.args = {};
 
 export const Nested: StoryFn< typeof Theme > = ( args ) => (
 	<Theme accent="crimson">
-		<Button variant="primary">Outer theme (hardcoded)</Button>
+		<Button __next40pxDefaultSize variant="primary">
+			Outer theme (hardcoded)
+		</Button>
 
 		<Theme { ...args }>
-			<Button variant="primary">
+			<Button __next40pxDefaultSize variant="primary">
 				Inner theme (set via Storybook controls)
 			</Button>
 		</Theme>

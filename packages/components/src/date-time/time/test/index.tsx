@@ -3,6 +3,12 @@
  */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import timezoneMock from 'timezone-mock';
+
+/**
+ * WordPress dependencies
+ */
+import { getSettings, setSettings, type DateSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -422,5 +428,209 @@ describe( 'TimePicker', () => {
 		expect( Number.isNaN( parseInt( yearInput, 10 ) ) ).toBe( false );
 		expect( Number.isNaN( parseInt( hoursInput, 10 ) ) ).toBe( false );
 		expect( Number.isNaN( parseInt( minutesInput, 10 ) ) ).toBe( false );
+	} );
+
+	describe( 'input types with timezone variations', () => {
+		let originalSettings: DateSettings;
+
+		beforeAll( () => {
+			originalSettings = getSettings();
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					offset: -5,
+					offsetFormatted: '-5',
+					string: 'America/New_York',
+					abbr: 'EST',
+				},
+			} );
+		} );
+
+		afterEach( () => {
+			jest.useRealTimers();
+			timezoneMock.unregister();
+		} );
+
+		afterAll( () => {
+			setSettings( originalSettings );
+		} );
+
+		describe.each( [
+			{
+				direction: 'browser behind site',
+				timezone: 'US/Pacific' as const,
+			},
+			{
+				direction: 'browser matches UTC (zero offset)',
+				timezone: 'UTC' as const,
+			},
+			{
+				direction: 'browser ahead of site',
+				timezone: 'Australia/Adelaide' as const,
+			},
+		] )( '$direction', ( { timezone } ) => {
+			beforeEach( () => {
+				timezoneMock.register( timezone );
+			} );
+
+			function transformOnChangeToDate( nextValue: string ): Date {
+				// Timezoneless string represents site timezone. Convert to UTC
+				// instant in site timezone. In typical usage, consumers should
+				// align `@wordpress/date` settings to match their browser timezone
+				// when working with dates, to avoid having to manage this
+				// conversion themselves.
+				const settings = getSettings();
+				const offsetMs = settings.timezone.offset * 60 * 60 * 1000;
+				const asUTC = new Date( nextValue + 'Z' );
+				return new Date( asUTC.getTime() - offsetMs );
+			}
+
+			describe.each( [
+				{
+					type: 'timezoneless string',
+					initialTime: '2025-12-18T07:00:00',
+					transformOnChange: ( nextValue: string ) => nextValue,
+				},
+				{
+					type: 'string with timezone',
+					initialTime: '2025-12-18T12:00:00Z',
+					transformOnChange: ( nextValue: string ) =>
+						transformOnChangeToDate( nextValue ).toISOString(),
+				},
+				{
+					type: 'Date object',
+					initialTime: new Date( Date.UTC( 2025, 11, 18, 12, 0, 0 ) ),
+					transformOnChange: transformOnChangeToDate,
+				},
+				{
+					type: 'timestamp',
+					initialTime: Date.UTC( 2025, 11, 18, 12, 0, 0 ),
+					transformOnChange: ( nextValue: string ) =>
+						transformOnChangeToDate( nextValue ).getTime(),
+				},
+				{
+					type: 'undefined',
+					initialTime: undefined,
+					transformOnChange: ( nextValue: string ) => nextValue,
+				},
+			] )( 'with $type', ( { initialTime, transformOnChange } ) => {
+				it( 'should output timezoneless string matching displayed time', async () => {
+					// For undefined, set fake system time to get a known current time
+					let user: ReturnType< typeof userEvent.setup >;
+					if ( initialTime === undefined ) {
+						jest.useFakeTimers();
+						// Set system time to 12:00 UTC
+						jest.setSystemTime(
+							Date.UTC( 2025, 11, 18, 12, 0, 0 )
+						);
+						user = userEvent.setup( {
+							advanceTimers: jest.advanceTimersByTime,
+						} );
+					} else {
+						user = userEvent.setup();
+					}
+
+					const onChange = jest.fn();
+
+					const { rerender } = render(
+						<TimePicker
+							currentTime={ initialTime }
+							onChange={ onChange }
+						/>
+					);
+
+					// Should display the correct initial date and time assuming
+					// settings for the current site.
+					expect( screen.getByLabelText( 'Hours' ) ).toHaveValue( 7 );
+					expect( screen.getByLabelText( 'Minutes' ) ).toHaveValue(
+						0
+					);
+					expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 18 );
+
+					// Changing the hours by one should adjust just the hour.
+					await user.clear( screen.getByLabelText( 'Hours' ) );
+					await user.type( screen.getByLabelText( 'Hours' ), '08' );
+					await user.keyboard( '{Tab}' );
+					expect( onChange ).toHaveBeenCalledWith(
+						'2025-12-18T08:00:00'
+					);
+
+					// Test round-trip by passing onChange output back as input
+					let nextDate = onChange.mock.calls[ 0 ][ 0 ];
+					rerender(
+						<TimePicker
+							currentTime={ transformOnChange( nextDate ) }
+							onChange={ onChange }
+						/>
+					);
+					expect( screen.getByLabelText( 'Hours' ) ).toHaveValue( 8 );
+					expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 18 );
+					onChange.mockClear();
+
+					// Changing the minutes should adjust just the minutes.
+					await user.clear( screen.getByLabelText( 'Minutes' ) );
+					await user.type( screen.getByLabelText( 'Minutes' ), '30' );
+					await user.keyboard( '{Tab}' );
+					expect( onChange ).toHaveBeenCalledWith(
+						'2025-12-18T08:30:00'
+					);
+
+					// Test round-trip by passing onChange output back as input
+					nextDate = onChange.mock.calls[ 0 ][ 0 ];
+					rerender(
+						<TimePicker
+							currentTime={ transformOnChange( nextDate ) }
+							onChange={ onChange }
+						/>
+					);
+					expect( screen.getByLabelText( 'Minutes' ) ).toHaveValue(
+						30
+					);
+					expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 18 );
+				} );
+			} );
+		} );
+	} );
+
+	describe( 'ISO 8601 compliance', () => {
+		it( 'should handle years below 1000 with zero-padded output', async () => {
+			const user = userEvent.setup();
+			const onChangeSpy = jest.fn();
+
+			render(
+				<TimePicker
+					currentTime="0999-10-18T11:00:00"
+					onChange={ onChangeSpy }
+					is12Hour
+				/>
+			);
+
+			const yearInput = screen.getByLabelText( 'Year' );
+
+			// Verify initial input displays correctly
+			expect( yearInput ).toHaveValue( 999 );
+
+			// Change to year 500
+			await user.clear( yearInput );
+			await user.type( yearInput, '500' );
+			await user.keyboard( '{Tab}' );
+
+			// Verify input field value after change (human-readable, not zero-padded)
+			expect( yearInput ).toHaveValue( 500 );
+
+			// Verify onChange emits zero-padded ISO 8601 format
+			expect( onChangeSpy ).toHaveBeenCalled();
+			const lastCall =
+				onChangeSpy.mock.calls[ onChangeSpy.mock.calls.length - 1 ];
+			const outputDate = lastCall[ 0 ];
+
+			// Extract year from output and verify it's zero-padded to 4 digits
+			const yearMatch = outputDate.match( /^(\d{4})-/ );
+			expect( yearMatch ).not.toBeNull();
+			expect( yearMatch[ 1 ] ).toBe( '0500' ); // Explicitly verify zero-padded year
+
+			expect( outputDate ).not.toContain( 'NaN' );
+			expect( outputDate ).not.toContain( 'Invalid' );
+		} );
 	} );
 } );

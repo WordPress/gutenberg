@@ -8,18 +8,20 @@ test.describe( 'Code', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'can be created by three backticks and enter', async ( {
-		editor,
-		page,
-	} ) => {
+	test( 'can be created by three backticks', async ( { editor, page } ) => {
 		await editor.canvas
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
-		await page.keyboard.type( '```' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '<?php' );
+		await page.keyboard.type( '```<?php' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/code',
+				attributes: {
+					content: '&lt;?php',
+				},
+			},
+		] );
 	} );
 
 	test( 'should delete block when backspace in an empty code', async ( {
