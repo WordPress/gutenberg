@@ -23,6 +23,10 @@
 
 		/* For an outline that looks like `IconButton`'s */
 		border-radius: var(--wpds-border-radius-sm);
+
+		@media not (prefers-reduced-motion) {
+			transition: rotate 0.15s ease-out;
+		}
 	}
 
 	.header[data-panel-open] .header-trigger {
