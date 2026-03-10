@@ -1844,12 +1844,7 @@
 			}
 		},
 		"stylesBlocksPseudoSelectorsPropertyNames": {
-			"enum": [
-				":hover",
-				":focus",
-				":focus-visible",
-				":active"
-			]
+			"enum": [ ":hover", ":focus", ":focus-visible", ":active" ]
 		},
 		"stylesElementsPseudoSelectorsProperties": {
 			"type": "object",
@@ -1873,23 +1868,6 @@
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
 				":visited": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				}
-			}
-		},
-		"stylesBlocksPseudoSelectorsProperties": {
-			"type": "object",
-			"properties": {
-				":hover": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				},
-				":focus": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				},
-				":focus-visible": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				},
-				":active": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			}
