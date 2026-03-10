@@ -99,11 +99,9 @@ export default function BlockGuidelineModal( {
 			.then( () => {
 				setError( null );
 				createSuccessNotice(
-					sprintf(
-						/* translators: %s: Block label. */
-						__( 'Block guideline %s.' ),
-						value ? 'saved' : 'removed'
-					),
+					value
+						? __( 'Block guideline saved.' )
+						: __( 'Block guideline removed.' ),
 					{ type: 'snackbar' }
 				);
 				closeModal();
