@@ -6,6 +6,14 @@
  */
 class Tests_Resolve_AI_Provider_Logo_URL extends WP_UnitTestCase {
 
+	public function set_up() {
+		parent::set_up();
+
+		if ( ! function_exists( '_gutenberg_resolve_ai_provider_logo_url' ) ) {
+			$this->markTestSkipped( 'The AI Client library is not available.' );
+		}
+	}
+
 	public function test_returns_null_when_path_is_empty() {
 		$this->assertNull( _gutenberg_resolve_ai_provider_logo_url( '' ) );
 	}
