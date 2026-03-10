@@ -7,6 +7,8 @@ import { useSelect } from '@wordpress/data';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+import type { __experimentalApiKeySource as ApiKeySource } from '@wordpress/connectors';
+
 export type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';
 
 interface UseConnectorPluginOptions {
@@ -14,6 +16,8 @@ interface UseConnectorPluginOptions {
 	settingName: string;
 	isInstalled?: boolean;
 	isActivated?: boolean;
+	keySource?: ApiKeySource;
+	initialIsConnected?: boolean;
 }
 
 interface UseConnectorPluginReturn {
@@ -25,6 +29,7 @@ interface UseConnectorPluginReturn {
 	isBusy: boolean;
 	isConnected: boolean;
 	currentApiKey: string;
+	keySource: ApiKeySource;
 	handleButtonClick: () => void;
 	getButtonLabel: () => string;
 	saveApiKey: ( apiKey: string ) => Promise< void >;
@@ -36,12 +41,16 @@ export function useConnectorPlugin( {
 	settingName,
 	isInstalled,
 	isActivated,
+	keySource = 'none',
+	initialIsConnected = false,
 }: UseConnectorPluginOptions ): UseConnectorPluginReturn {
 	const [ pluginStatus, setPluginStatus ] =
 		useState< PluginStatus >( 'checking' );
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ isBusy, setIsBusy ] = useState( false );
 	const [ currentApiKey, setCurrentApiKey ] = useState( '' );
+	const [ connectedState, setConnectedState ] =
+		useState( initialIsConnected );
 	// Track if user can manage plugins based on REST API access.
 	// If the /wp/v2/plugins call succeeds, user has activate_plugins capability.
 	const [ canManagePlugins, setCanManagePlugins ] = useState< boolean >();
@@ -58,10 +67,7 @@ export function useConnectorPlugin( {
 	// Use canManagePlugins (from REST API result) for activation capability.
 	const canActivatePlugins = canManagePlugins;
 
-	const isConnected =
-		pluginStatus === 'active' &&
-		currentApiKey !== '' &&
-		currentApiKey !== 'invalid_key';
+	const isConnected = pluginStatus === 'active' && connectedState;
 
 	// Fetch the current API key
 	const fetchApiKey = useCallback( async () => {
@@ -70,7 +76,7 @@ export function useConnectorPlugin( {
 				path: `/wp/v2/settings?_fields=${ settingName }`,
 			} );
 			const key = settings[ settingName ] || '';
-			setCurrentApiKey( key === 'invalid_key' ? '' : key );
+			setCurrentApiKey( key );
 		} catch {
 			// Ignore errors
 		}
@@ -228,6 +234,7 @@ export function useConnectorPlugin( {
 			}
 
 			setCurrentApiKey( result[ settingName ] || '' );
+			setConnectedState( true );
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'Failed to save API key:', error );
@@ -245,6 +252,7 @@ export function useConnectorPlugin( {
 				},
 			} );
 			setCurrentApiKey( '' );
+			setConnectedState( false );
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'Failed to remove API key:', error );
@@ -261,6 +269,7 @@ export function useConnectorPlugin( {
 		isBusy,
 		isConnected,
 		currentApiKey,
+		keySource,
 		handleButtonClick,
 		getButtonLabel,
 		saveApiKey,

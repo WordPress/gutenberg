@@ -6,6 +6,7 @@ import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
 	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
+	type __experimentalApiKeySource as ApiKeySource,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
 import { __ } from '@wordpress/i18n';
@@ -23,7 +24,13 @@ import {
 } from './logos';
 
 type ConnectorAuthentication =
-	| { method: 'api_key'; settingName: string; credentialsUrl: string | null }
+	| {
+			method: 'api_key';
+			settingName: string;
+			credentialsUrl: string | null;
+			keySource?: ApiKeySource;
+			isConnected?: boolean;
+	  }
 	| { method: 'none' };
 
 interface ConnectorData {
@@ -101,6 +108,8 @@ interface ApiKeyConnectorConfig {
 	icon?: React.ReactNode;
 	isInstalled?: boolean;
 	isActivated?: boolean;
+	keySource?: ApiKeySource;
+	initialIsConnected?: boolean;
 }
 
 function ApiKeyConnector( {
@@ -112,6 +121,8 @@ function ApiKeyConnector( {
 	icon,
 	isInstalled,
 	isActivated,
+	keySource: initialKeySource,
+	initialIsConnected,
 }: ConnectorRenderProps & ApiKeyConnectorConfig ) {
 	let helpLabel: string | undefined;
 	try {
@@ -131,6 +142,7 @@ function ApiKeyConnector( {
 		isBusy,
 		isConnected,
 		currentApiKey,
+		keySource,
 		handleButtonClick,
 		getButtonLabel,
 		saveApiKey,
@@ -140,7 +152,11 @@ function ApiKeyConnector( {
 		settingName,
 		isInstalled,
 		isActivated,
+		keySource: initialKeySource,
+		initialIsConnected,
 	} );
+	const isExternallyConfigured =
+		keySource === 'env' || keySource === 'constant';
 	const showUnavailableBadge =
 		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
 		( pluginStatus === 'inactive' && canActivatePlugins === false );
@@ -184,11 +200,18 @@ function ApiKeyConnector( {
 			{ isExpanded && pluginStatus === 'active' && (
 				<DefaultConnectorSettings
 					key={ isConnected ? 'connected' : 'setup' }
-					initialValue={ currentApiKey }
+					initialValue={
+						isExternallyConfigured
+							? '••••••••••••••••'
+							: currentApiKey
+					}
 					helpUrl={ helpUrl }
 					helpLabel={ helpLabel }
-					readOnly={ isConnected }
-					onRemove={ removeApiKey }
+					readOnly={ isConnected || isExternallyConfigured }
+					keySource={ keySource }
+					onRemove={
+						isExternallyConfigured ? undefined : removeApiKey
+					}
 					onSave={ async ( apiKey: string ) => {
 						await saveApiKey( apiKey );
 						setIsExpanded( false );
@@ -234,6 +257,8 @@ export function registerDefaultConnectors() {
 					) }
 					isInstalled={ data.plugin?.isInstalled }
 					isActivated={ data.plugin?.isActivated }
+					keySource={ authentication.keySource }
+					initialIsConnected={ authentication.isConnected }
 				/>
 			),
 		} );
