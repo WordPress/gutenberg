@@ -196,6 +196,7 @@ export default function ActionsSection() {
 									<Button
 										size="compact"
 										variant="secondary"
+										className="content-guidelines__action-button"
 										aria-label={ action.ariaLabel }
 										aria-describedby={ descriptionId }
 										{ ...( buttonProps[ action.slug ] ??
