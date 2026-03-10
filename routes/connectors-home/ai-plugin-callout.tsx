@@ -15,7 +15,7 @@ import { WpLogoDecoration } from './wp-logo-decoration';
 import type { PluginStatus } from './use-connector-plugin';
 
 const AI_PLUGIN_SLUG = 'ai';
-const AI_PLUGIN_ID = 'ai/plugin';
+const AI_PLUGIN_ID = 'ai/ai';
 const AI_PLUGIN_URL = 'https://wordpress.org/plugins/ai/';
 
 export function AiPluginCallout() {
@@ -33,39 +33,37 @@ export function AiPluginCallout() {
 				name: 'plugin',
 			} );
 
-			const plugins = store.getEntityRecords( 'root', 'plugin' ) as
-				| Array< { plugin: string; status: string } >
-				| null;
+			const plugin = store.getEntityRecord(
+				'root',
+				'plugin',
+				AI_PLUGIN_ID
+			) as { plugin: string; status: string } | undefined;
 
-			if ( plugins === null ) {
-				const hasFinished = store.hasFinishedResolution(
-					'getEntityRecords',
-					[ 'root', 'plugin' ]
-				);
+			const hasFinished = store.hasFinishedResolution(
+				'getEntityRecord',
+				[ 'root', 'plugin', AI_PLUGIN_ID ]
+			);
 
-				if ( ! hasFinished ) {
-					return {
-						pluginStatus: 'checking' as PluginStatus,
-						canInstallPlugins: canCreate,
-						canManagePlugins: undefined as boolean | undefined,
-					};
-				}
-
+			if ( ! hasFinished ) {
 				return {
-					pluginStatus: 'not-installed' as PluginStatus,
+					pluginStatus: 'checking' as PluginStatus,
 					canInstallPlugins: canCreate,
-					canManagePlugins: false,
+					canManagePlugins: undefined as boolean | undefined,
 				};
 			}
 
-			const plugin = plugins.find( ( p ) => p.plugin === AI_PLUGIN_ID );
-			let status: PluginStatus = 'not-installed';
-			if ( plugin ) {
-				status = plugin.status === 'active' ? 'active' : 'inactive';
+			if ( ! plugin ) {
+				return {
+					pluginStatus: 'not-installed' as PluginStatus,
+					canInstallPlugins: canCreate,
+					canManagePlugins: canCreate,
+				};
 			}
 
 			return {
-				pluginStatus: status,
+				pluginStatus: (
+					plugin.status === 'active' ? 'active' : 'inactive'
+				) as PluginStatus,
 				canInstallPlugins: canCreate,
 				canManagePlugins: true,
 			};
