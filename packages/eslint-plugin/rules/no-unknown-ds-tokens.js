@@ -36,21 +36,22 @@ function extractCSSVariables( value, prefix = '' ) {
 }
 
 /**
- * Extracts CSS custom properties that appear as direct arguments to `var()`,
- * optionally filtering by a specific prefix. Tokens in nested `var()` calls
- * (e.g. `var(--a, var(--b))`) are all captured.
+ * Extracts CSS custom properties that appear outside of `var()` calls,
+ * optionally filtering by a specific prefix. Works by stripping `var()`-wrapped
+ * tokens first, then searching the remainder for bare references.
  *
  * @param {string} value       - The CSS value string to search.
  * @param {string} [prefix=''] - Optional prefix to filter variables.
- * @return {Set<string>} Tokens that are wrapped in `var()`.
+ * @return {Set<string>} Tokens that are NOT wrapped in `var()`.
  */
-function extractVarWrappedTokens( value, prefix = '' ) {
-	const regex = /var\(\s*(--[\w-]+)/g;
+function extractBareTokens( value, prefix = '' ) {
+	const stripped = value.replace( /var\(\s*--[\w-]+/g, '' );
+	const regex = /--[\w-]+/g;
 	const tokens = new Set();
 
 	let match;
-	while ( ( match = regex.exec( value ) ) !== null ) {
-		const variableName = match[ 1 ];
+	while ( ( match = regex.exec( stripped ) ) !== null ) {
+		const variableName = match[ 0 ];
 		if ( variableName.startsWith( `--${ prefix }` ) ) {
 			tokens.add( variableName );
 		}
@@ -125,16 +126,12 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 						}
 					}
 
-					const varWrapped = extractVarWrappedTokens(
-						value,
-						DS_TOKEN_PREFIX
-					);
+					const bare = extractBareTokens( value, DS_TOKEN_PREFIX );
 
 					for ( const token of tokens ) {
 						if ( ! knownTokens.has( token ) ) {
 							unknownTokens.push( token );
-						}
-						if ( ! varWrapped.has( token ) ) {
+						} else if ( bare.has( token ) ) {
 							bareTokens.push( token );
 						}
 					}
@@ -220,12 +217,13 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 					node.parent.key === node;
 
 				if ( ! isPropertyKey ) {
-					const varWrapped = extractVarWrappedTokens(
+					const bare = extractBareTokens(
 						computedValue,
 						DS_TOKEN_PREFIX
 					);
 					const bareTokens = [ ...usedTokens ].filter(
-						( token ) => ! varWrapped.has( token )
+						( token ) =>
+							knownTokens.has( token ) && bare.has( token )
 					);
 
 					if ( bareTokens.length > 0 ) {

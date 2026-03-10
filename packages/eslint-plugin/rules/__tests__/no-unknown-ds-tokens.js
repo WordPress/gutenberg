@@ -124,12 +124,6 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 						tokenNames: "'--wpds-nonexistent-token'",
 					},
 				},
-				{
-					messageId: 'bareToken',
-					data: {
-						tokenNames: "'--wpds-nonexistent-token'",
-					},
-				},
 			],
 		},
 		{
@@ -186,6 +180,17 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 		},
 		{
 			code: '`${ prefix }: --wpds-color-fg-content-neutral`',
+			errors: [
+				{
+					messageId: 'bareToken',
+					data: {
+						tokenNames: "'--wpds-color-fg-content-neutral'",
+					},
+				},
+			],
+		},
+		{
+			code: '`var(--wpds-color-fg-content-neutral) --wpds-color-fg-content-neutral ${ x }`',
 			errors: [
 				{
 					messageId: 'bareToken',
