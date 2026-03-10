@@ -2,51 +2,169 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { createInterpolateElement } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { createInterpolateElement, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import halftoneWpLogo from './halftone-wp-logo';
+import { WpLogoDecoration } from './wp-logo-decoration';
 
-/**
- * Scattered dots decoration that appears around the halftone WordPress logo.
- * Dot positions extracted from the Figma design SVG, converted from absolute
- * card coordinates (origin 424,-15) to decoration-relative coordinates.
- * Each dot is a 2.187x2.187 square matching the Figma export.
- */
-const ScatteredDots = () => (
-	<svg
-		className="ai-plugin-callout__dots"
-		viewBox="0 0 248 248"
-		fill="black"
-		xmlns="http://www.w3.org/2000/svg"
-		aria-hidden="true"
-		focusable="false"
-	>
-		<rect x="184.055" y="54.995" width="2.187" height="2.187" />
-		<rect x="170.059" y="44.06" width="2.187" height="2.187" />
-		<rect x="200.238" y="77.302" width="2.187" height="2.187" />
-		<rect x="212.048" y="87.8" width="2.187" height="2.187" />
-		<rect x="206.799" y="83.425" width="2.187" height="2.187" />
-		<rect x="204.175" y="85.612" width="2.187" height="2.187" />
-		<rect x="219.046" y="103.108" width="2.187" height="2.187" />
-		<rect x="154.751" y="30.064" width="2.187" height="2.187" />
-		<rect x="188.866" y="63.742" width="2.187" height="2.187" />
-		<rect x="148.189" y="34" width="2.187" height="2.187" />
-		<rect x="134.051" y="31.707" width="2.187" height="2.187" />
-		<rect x="126.124" y="24.771" width="2.187" height="2.187" />
-		<rect x="115.385" y="29.19" width="2.187" height="2.187" />
-		<rect x="95.702" y="31.376" width="2.187" height="2.187" />
-		<rect x="91.766" y="27.002" width="2.187" height="2.187" />
-		<rect x="90.454" y="32.688" width="2.187" height="2.187" />
-		<rect x="184.389" y="45.58" width="2.187" height="2.187" />
-		<rect x="162.185" y="41.873" width="2.187" height="2.187" />
-	</svg>
-);
+import type { PluginStatus } from './use-connector-plugin';
+
+const AI_PLUGIN_SLUG = 'ai';
+const AI_PLUGIN_ID = 'ai/plugin';
+const AI_PLUGIN_URL = 'https://wordpress.org/plugins/ai/';
 
 export function AiPluginCallout() {
+	const [ isBusy, setIsBusy ] = useState( false );
+	const [ completedAction, setCompletedAction ] = useState<
+		'installed' | 'activated' | null
+	>( null );
+
+	const { pluginStatus, canInstallPlugins, canManagePlugins } = useSelect(
+		( select ) => {
+			const store = select( coreStore );
+
+			const canCreate = !! store.canUser( 'create', {
+				kind: 'root',
+				name: 'plugin',
+			} );
+
+			const plugins = store.getEntityRecords( 'root', 'plugin' ) as
+				| Array< { plugin: string; status: string } >
+				| null;
+
+			if ( plugins === null ) {
+				const hasFinished = store.hasFinishedResolution(
+					'getEntityRecords',
+					[ 'root', 'plugin' ]
+				);
+
+				if ( ! hasFinished ) {
+					return {
+						pluginStatus: 'checking' as PluginStatus,
+						canInstallPlugins: canCreate,
+						canManagePlugins: undefined as boolean | undefined,
+					};
+				}
+
+				return {
+					pluginStatus: 'not-installed' as PluginStatus,
+					canInstallPlugins: canCreate,
+					canManagePlugins: false,
+				};
+			}
+
+			const plugin = plugins.find( ( p ) => p.plugin === AI_PLUGIN_ID );
+			let status: PluginStatus = 'not-installed';
+			if ( plugin ) {
+				status = plugin.status === 'active' ? 'active' : 'inactive';
+			}
+
+			return {
+				pluginStatus: status,
+				canInstallPlugins: canCreate,
+				canManagePlugins: true,
+			};
+		},
+		[]
+	);
+
+	const { saveEntityRecord } = useDispatch( coreStore );
+
+	const installPlugin = async () => {
+		setIsBusy( true );
+		try {
+			await saveEntityRecord(
+				'root',
+				'plugin',
+				{ slug: AI_PLUGIN_SLUG, status: 'active' },
+				{ throwOnError: true }
+			);
+			setCompletedAction( 'installed' );
+		} catch {
+			// Handle error
+		} finally {
+			setIsBusy( false );
+		}
+	};
+
+	const activatePlugin = async () => {
+		setIsBusy( true );
+		try {
+			await saveEntityRecord(
+				'root',
+				'plugin',
+				{ plugin: AI_PLUGIN_ID, status: 'active' },
+				{ throwOnError: true }
+			);
+			setCompletedAction( 'activated' );
+		} catch {
+			// Handle error
+		} finally {
+			setIsBusy( false );
+		}
+	};
+
+	// Hide while checking to avoid flash.
+	if ( pluginStatus === 'checking' ) {
+		return null;
+	}
+
+	// Already active and no completed action to show.
+	if ( pluginStatus === 'active' && ! completedAction ) {
+		return null;
+	}
+
+	// No permissions to install.
+	if ( canInstallPlugins === false ) {
+		return null;
+	}
+
+	// Can't activate (no manage permissions).
+	if ( pluginStatus === 'inactive' && canManagePlugins === false ) {
+		return null;
+	}
+
+	const getPrimaryButtonProps = () => {
+		if ( completedAction === 'installed' ) {
+			return {
+				label: __( 'Installed' ),
+				disabled: true,
+				onClick: undefined,
+			};
+		}
+		if ( completedAction === 'activated' ) {
+			return {
+				label: __( 'Activated' ),
+				disabled: true,
+				onClick: undefined,
+			};
+		}
+		if ( pluginStatus === 'not-installed' ) {
+			return {
+				label: isBusy
+					? __( 'Installing…' )
+					: __( 'Install AI Experiments' ),
+				disabled: isBusy,
+				onClick: isBusy ? undefined : installPlugin,
+			};
+		}
+		// inactive
+		return {
+			label: isBusy
+				? __( 'Activating…' )
+				: __( 'Activate AI Experiments' ),
+			disabled: isBusy,
+			onClick: isBusy ? undefined : activatePlugin,
+		};
+	};
+
+	const primaryButton = getPrimaryButtonProps();
+
 	return (
 		<div className="ai-plugin-callout">
 			<div className="ai-plugin-callout__content">
@@ -61,20 +179,26 @@ export function AiPluginCallout() {
 					) }
 				</p>
 				<div className="ai-plugin-callout__actions">
-					<Button variant="primary" size="compact">
-						{ __( 'Install AI experiments' ) }
+					<Button
+						variant="primary"
+						size="compact"
+						isBusy={ isBusy }
+						disabled={ primaryButton.disabled }
+						onClick={ primaryButton.onClick }
+					>
+						{ primaryButton.label }
 					</Button>
-					<Button variant="tertiary">{ __( 'Learn more' ) }</Button>
+					<Button
+						variant="tertiary"
+						href={ AI_PLUGIN_URL }
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						{ __( 'Learn more' ) }
+					</Button>
 				</div>
 			</div>
-			<div className="ai-plugin-callout__decoration" aria-hidden="true">
-				<img
-					className="ai-plugin-callout__halftone"
-					src={ halftoneWpLogo }
-					alt=""
-				/>
-				<ScatteredDots />
-			</div>
+			<WpLogoDecoration />
 		</div>
 	);
 }

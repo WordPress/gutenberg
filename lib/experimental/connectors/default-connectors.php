@@ -290,6 +290,13 @@ function _gutenberg_get_connector_settings(): array {
 	$connectors = wp_get_connectors();
 	ksort( $connectors );
 
+	// Add setting_name for connectors that use API key authentication.
+	foreach ( $connectors as $connector_id => $connector ) {
+		if ( 'api_key' === $connector['authentication']['method'] ) {
+			$connectors[ $connector_id ]['authentication']['setting_name'] = "connectors_ai_{$connector_id}_api_key";
+		}
+	}
+
 	// Add plugin installation and activation status.
 	// Build a slug-to-file map following the same pattern as WP_Plugin_Dependencies::get_plugin_dirnames().
 	if ( ! function_exists( 'get_plugins' ) ) {
