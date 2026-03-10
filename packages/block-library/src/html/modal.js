@@ -173,7 +173,7 @@ export default function HTMLEditModal( {
 							direction={ isMobileViewport ? 'column' : 'row' }
 							className="block-library-html__modal-tabs"
 							align="stretch"
-							gap={ 4 }
+							gap={ 8 }
 						>
 							<div className="block-library-html__modal-content">
 								<Tabs.TabPanel
