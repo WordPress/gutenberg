@@ -64,7 +64,9 @@ const fields = [
 		label: __( 'Icon' ),
 		type: 'media' as const,
 		render: ( { item } ) => (
-			<Icon icon={ item.icon ?? blockDefault } size={ 16 } />
+			<div className="block-guidelines__icon">
+				<Icon icon={ item.icon ?? blockDefault } size={ 16 } />
+			</div>
 		),
 	},
 	{
