@@ -6,6 +6,7 @@ import {
 	unregisterBlockType,
 	setFreeformContentHandlerName,
 	setDefaultBlockName,
+	getDefaultBlockName,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
@@ -4598,6 +4599,7 @@ describe( 'selectors', () => {
 			// When in contentOnly mode within a section, default blocks
 			// can be removed as long as at least one other default block
 			// remains.
+			const previousDefaultBlockName = getDefaultBlockName();
 			setDefaultBlockName( 'core/test-content-block' );
 			const state = {
 				blocks: {
@@ -4653,7 +4655,7 @@ describe( 'selectors', () => {
 				] ),
 			};
 			expect( canRemoveBlock( state, 'child1' ) ).toBe( true );
-			setDefaultBlockName( undefined );
+			setDefaultBlockName( previousDefaultBlockName );
 		} );
 	} );
 
