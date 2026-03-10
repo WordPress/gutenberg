@@ -146,7 +146,7 @@ class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revision
 		if ( ! $parent || $this->parent_post_type !== $parent->post_type ) {
 			return new WP_Error(
 				'rest_post_not_found',
-				__( 'Content guidelines not found.', 'gutenberg' ),
+				__( 'Guidelines not found.', 'gutenberg' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -178,7 +178,7 @@ class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revision
 		if ( ! $parent || $this->parent_post_type !== $parent->post_type ) {
 			return new WP_Error(
 				'rest_post_not_found',
-				__( 'Content guidelines not found.', 'gutenberg' ),
+				__( 'Guidelines not found.', 'gutenberg' ),
 				array( 'status' => 404 )
 			);
 		}

@@ -202,7 +202,7 @@ export default function RevisionHistory() {
 				variant="muted"
 				className="content-guidelines__revision-description"
 			>
-				{ __( 'Use a previous version of your content guidelines.' ) }
+				{ __( 'Use a previous version of your guidelines.' ) }
 			</Text>
 
 			<DataViews
@@ -219,7 +219,7 @@ export default function RevisionHistory() {
 
 			{ revisionToRestore && (
 				<Modal
-					title={ __( 'Restore content guidelines' ) }
+					title={ __( 'Restore guidelines' ) }
 					onRequestClose={ () => setRevisionToRestore( null ) }
 					size="medium"
 				>
@@ -228,7 +228,7 @@ export default function RevisionHistory() {
 							{ sprintf(
 								/* translators: %s: formatted revision date */
 								__(
-									'You are about to restore the content guidelines from %s.'
+									'You are about to restore the guidelines from %s.'
 								),
 								dateI18n(
 									getSettings().formats.datetimeAbbreviated,

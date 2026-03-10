@@ -154,7 +154,7 @@ export async function importContentGuidelines( file: File ): Promise< void > {
 
 	try {
 		await saveContentGuidelines();
-		createSuccessNotice( __( 'Content guidelines imported.' ), {
+		createSuccessNotice( __( 'Guidelines imported.' ), {
 			type: 'snackbar',
 		} );
 	} catch ( error ) {
@@ -216,7 +216,7 @@ export function exportContentGuidelines(): void {
 		'application/json'
 	);
 
-	createSuccessNotice( __( 'Content guidelines exported.' ), {
+	createSuccessNotice( __( 'Guidelines exported.' ), {
 		type: 'snackbar',
 	} );
 }

@@ -78,7 +78,7 @@ function ContentGuidelinesPage() {
 
 	return (
 		<Page
-			title={ __( 'Content guidelines' ) }
+			title={ __( 'Guidelines' ) }
 			subTitle={ __(
 				"Set content standards that guide your team, inform plugins, and help AI tools generate content that matches your site's voice and requirements."
 			) }
@@ -89,7 +89,7 @@ function ContentGuidelinesPage() {
 						<Notice.Title>
 							{ sprintf(
 								/* translators: %s: Error message. */
-								__( 'Error loading content guidelines: %s' ),
+								__( 'Error loading guidelines: %s' ),
 								error
 							) }
 						</Notice.Title>
