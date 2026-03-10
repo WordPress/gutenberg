@@ -31,8 +31,8 @@ test.describe( 'Fit Text', () => {
 			await page
 				.getByRole( 'menu', { name: 'Typography options' } )
 				.getByRole( 'menuitemcheckbox', {
-					name: 'Show Fit-width text' },
-				 )
+					name: 'Show Fit-width text',
+				} )
 				.click();
 
 			const fitTextToggle = page.getByRole( 'checkbox', {
