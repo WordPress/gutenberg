@@ -15,6 +15,7 @@ import LayoutCustomComponent from './layout-custom';
 import InfiniteScrollComponent from './infinite-scroll';
 import WithCardComponent from './with-card';
 import FreeCompositionComponent from './free-composition';
+import FreeCompositionScrollYComponent from './free-composition-scroll-y';
 import MinimalUIComponent from './minimal-ui';
 import EmptyComponent from './empty';
 
@@ -252,6 +253,51 @@ export const MinimalUI = {
 
 export const FreeComposition = {
 	render: FreeCompositionComponent,
+};
+
+export const FreeCompositionScrollY = {
+	render: FreeCompositionScrollYComponent,
+	args: {
+		groupBy: false,
+		groupByLabel: true,
+		hasClickableItems: true,
+		perPageSizes: [ 10, 25, 50, 100 ],
+		showMedia: true,
+		scrollY: 'table',
+	},
+	argTypes: {
+		backgroundColor: {
+			control: 'color',
+			description: 'Background color of the DataViews component',
+		},
+		groupBy: {
+			control: 'boolean',
+			description: 'Whether items are grouped by field',
+		},
+		groupByLabel: {
+			control: 'boolean',
+			description:
+				'Whether to show the groupBy field label in headers (e.g., "Date: Dec 15" vs just "Dec 15")',
+		},
+		hasClickableItems: {
+			control: 'boolean',
+			description: 'Are the items clickable',
+		},
+		perPageSizes: {
+			control: 'object',
+			description: 'Array of available page sizes',
+		},
+		showMedia: {
+			control: 'boolean',
+			description: 'Whether to display the media field',
+		},
+		scrollY: {
+			control: 'select',
+			options: [ 'wrapper', 'table' ],
+			description:
+				'Where vertical scrolling occurs. Use "table" to keep filters and actions fixed while the table body scrolls.',
+		},
+	},
 };
 
 export const WithCard = {
