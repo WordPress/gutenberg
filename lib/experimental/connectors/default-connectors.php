@@ -178,6 +178,11 @@ function _gutenberg_resolve_ai_provider_logo_url( string $path ): ?string {
  * }
  */
 function _gutenberg_get_connector_settings(): array {
+	static $cached = null;
+	if ( null !== $cached ) {
+		return $cached;
+	}
+
 	$connectors = array(
 		'google'    => array(
 			'name'           => 'Google',
@@ -302,7 +307,8 @@ function _gutenberg_get_connector_settings(): array {
 		$connectors[ $connector_id ]['plugin']['is_activated'] = $is_activated;
 	}
 
-	return $connectors;
+	$cached = $connectors;
+	return $cached;
 }
 
 /**
