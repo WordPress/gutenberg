@@ -991,9 +991,11 @@ export const getDefaultTemplateId =
 			template.id = id;
 			registry.batch( () => {
 				dispatch.receiveDefaultTemplateId( query, id );
-				dispatch.receiveEntityRecords( 'postType', template.type, [
-					template,
-				] );
+				dispatch.receiveEntityRecords(
+					'postType',
+					template.type,
+					template
+				);
 				// Avoid further network requests.
 				dispatch.finishResolution( 'getEntityRecord', [
 					'postType',

@@ -9,7 +9,7 @@ Adhering to the `create-block` tool's structure is not mandatory, but it serves 
 ## `<plugin-file>.php`
 
 
-When creating a block in a WordPress plugin, you usually register the block on the server in the main PHP file of the plugin. This is done using the [`register_block_type()`](https://developer.wordpress.org/reference/functions/register_block_type/) function. 
+When creating a block in a WordPress plugin, you register the block on the server in the main PHP file of the plugin. For plugins built with `wp-scripts` (WordPress 6.8+), the recommended approach is to use [`wp_register_block_types_from_metadata_collection()`](https://developer.wordpress.org/reference/functions/wp_register_block_types_from_metadata_collection/), which registers all blocks from a generated `blocks-manifest.php` file in a single call. For simpler setups or older WordPress versions, you can use [`register_block_type()`](https://developer.wordpress.org/reference/functions/register_block_type/) to register individual blocks. See [Registration of a block](/docs/getting-started/fundamentals/registration-of-a-block.md) for full details on all available registration methods.
 
 <div class="callout callout-info">
     For more on creating a WordPress plugin, refer to the documentation on <a href="https://developer.wordpress.org/plugins/plugin-basics/">Plugin Basics</a> and the <a href="https://developer.wordpress.org/plugins/plugin-basics/header-requirements/"> Header Requirements</a> for the main PHP file.

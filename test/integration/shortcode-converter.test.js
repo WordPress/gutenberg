@@ -237,6 +237,24 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 		).toEqual( [ originalMultipleShortcodes ] );
 	} );
 
+	it( 'should convert a shortcode between br tags', () => {
+		const original = `<p>Some text<br />\n[foo bar="apple"]<br />\nSome other text</p>`;
+		const transformed = segmentHTMLToShortcodeBlock( original, 0 );
+		expect( transformed ).toHaveLength( 3 );
+		const expectedBlock = createBlock( 'core/shortcode', {
+			text: '[foo bar="apple"]',
+		} );
+		expectedBlock.clientId = transformed[ 1 ].clientId;
+		expect( transformed[ 1 ] ).toEqual( expectedBlock );
+	} );
+
+	it( 'should not convert inline shortcodes near br tags', () => {
+		const original = `<p>Hello<br />[foo bar] world</p>`;
+		expect( segmentHTMLToShortcodeBlock( original, 0 ) ).toEqual( [
+			original,
+		] );
+	} );
+
 	it( 'should convert regardless of shortcode alias', () => {
 		const original = `<p>[my-gallery ids="1,2,3"]</p>
 <p>[my-bunch-of-images ids="4,5,6"]</p>`;

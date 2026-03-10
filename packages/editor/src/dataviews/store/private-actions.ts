@@ -35,6 +35,9 @@ import {
 	pageTitleField,
 	patternTitleField,
 	notesField,
+	scheduledDateField,
+	formatField,
+	postContentInfoField,
 } from '@wordpress/fields';
 import {
 	altTextField,
@@ -192,6 +195,9 @@ export const registerPostTypeSchema =
 		const currentTheme = await registry
 			.resolveSelect( coreStore )
 			.getCurrentTheme();
+		const { disablePostFormats } = registry
+			.select( editorStore )
+			.getEditorSettings();
 
 		let canDuplicate =
 			! [ 'wp_block', 'wp_template_part' ].includes(
@@ -258,6 +264,8 @@ export const registerPostTypeSchema =
 				statusField,
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					dateField,
+				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+					scheduledDateField,
 				slugField,
 				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 				postTypeConfig.supports?.comments && commentStatusField,
@@ -266,6 +274,12 @@ export const registerPostTypeSchema =
 					postTypeConfig.supports?.trackbacks ) &&
 					discussionField,
 				templateField,
+				postTypeConfig.supports?.[ 'post-formats' ] &&
+					! disablePostFormats &&
+					formatField,
+				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+					postTypeConfig.supports?.editor &&
+					postContentInfoField,
 				passwordField,
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&

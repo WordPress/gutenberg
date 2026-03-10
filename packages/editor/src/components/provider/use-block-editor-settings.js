@@ -23,6 +23,7 @@ import {
  */
 import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
+import mediaUploadOnSuccess from '../../utils/media-upload/on-success';
 import { default as mediaSideload } from '../../utils/media-sideload';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -103,6 +104,7 @@ const {
 	isIsolatedEditorKey,
 	deviceTypeKey,
 	isNavigationOverlayContextKey,
+	mediaUploadOnSuccessKey,
 } = unlock( privateApis );
 
 /**
@@ -336,6 +338,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				? editMediaEntity
 				: undefined,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
+			[ mediaUploadOnSuccessKey ]: hasUploadPermissions
+				? mediaUploadOnSuccess
+				: undefined,
 			mediaSideload: hasUploadPermissions ? mediaSideload : undefined,
 			__experimentalBlockPatterns: blockPatterns,
 			[ selectBlockPatternsKey ]: ( select ) => {

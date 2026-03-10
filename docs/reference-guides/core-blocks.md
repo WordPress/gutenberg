@@ -101,8 +101,8 @@ Prompt visitors to take action with a button-style link. ([Source](https://githu
 -	**Name:** core/button
 -	**Category:** design
 -	**Parent:** core/buttons
--	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (padding), splitting, typography (fontSize, lineHeight, textAlign), ~~alignWide~~, ~~align~~, ~~reusable~~
--	**Attributes:** backgroundColor, gradient, linkTarget, placeholder, rel, tagName, text, textColor, title, type, url, width
+-	**Supports:** anchor, color (background, gradients, text), dimensions (width), interactivity (clientNavigation), shadow, spacing (padding), splitting, typography (fontSize, lineHeight, textAlign), ~~alignWide~~, ~~align~~, ~~reusable~~
+-	**Attributes:** backgroundColor, gradient, linkTarget, placeholder, rel, tagName, text, textColor, title, type, url
 
 ## Buttons
 
@@ -426,7 +426,7 @@ Add custom HTML code and preview it as you edit. ([Source](https://github.com/Wo
 
 -	**Name:** core/html
 -	**Category:** widgets
--	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~
+-	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~visibility~~
 -	**Attributes:** content
 
 ## Icon
@@ -725,8 +725,8 @@ Display the excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/trunk
 
 -	**Name:** core/post-excerpt
 -	**Category:** theme
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textColumns), ~~html~~
--	**Attributes:** excerptLength, moreText, showMoreOnNewLine, textAlign
+-	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign, textColumns), ~~html~~
+-	**Attributes:** excerptLength, moreText, showMoreOnNewLine
 
 ## Featured Image
 
@@ -780,7 +780,7 @@ Displays the title of a post, page, or any other content-type. ([Source](https:/
 -	**Name:** core/post-title
 -	**Category:** theme
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
--	**Attributes:** isLink, level, levelOptions, linkTarget, rel
+-	**Attributes:** isLink, level, levelOptions, linkTarget, placeholder, rel
 
 ## Preformatted
 
@@ -929,7 +929,7 @@ Insert additional custom elements with a WordPress shortcode. ([Source](https://
 
 -	**Name:** core/shortcode
 -	**Category:** widgets
--	**Supports:** ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~
+-	**Supports:** ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~visibility~~
 -	**Attributes:** text
 
 ## Site Logo

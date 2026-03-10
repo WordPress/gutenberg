@@ -94,3 +94,9 @@ export type EqualityFieldCheck< State, FieldName extends keyof State > = (
 	value1?: State[ FieldName ],
 	value2?: State[ FieldName ]
 ) => boolean;
+
+export interface PostSaveEvent {
+	savedAt: number;
+	savedByClientId: number;
+	postStatus: string | undefined;
+}

@@ -18,6 +18,7 @@ import {
 	useBlockProps,
 	RecursionProvider,
 	useHasRecursion,
+	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 	withColors,
 	ContrastChecker,
@@ -84,6 +85,8 @@ import {
 	DEFAULT_BLOCK,
 	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 } from '../constants';
+
+const { isIsolatedEditorKey } = unlock( blockEditorPrivateApis );
 
 /**
  * Component that renders the Add page button for the Navigation block.
@@ -319,19 +322,25 @@ function Navigation( {
 
 	// Skip recursion check when in preview mode.
 	const recursionDetected = useHasRecursion( recursionId );
-	const { isPreviewMode, onNavigateToEntityRecord, currentTheme } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			const settings = getSettings();
-			return {
-				isPreviewMode: settings.isPreviewMode,
-				onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
-				// Needed to construct the template part ID for the overlay preview.
-				currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
-			};
-		},
-		[]
-	);
+	const {
+		isPreviewMode,
+		onNavigateToEntityRecord,
+		currentTheme,
+		editorDisabledResponsive,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return {
+			isPreviewMode: settings.isPreviewMode,
+			onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
+			// Needed to construct the template part ID for the overlay preview.
+			currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
+			// In preview mode or isolated editor, always show navigation expanded (no hamburger)
+			// so users can see and interact with all menu items.
+			editorDisabledResponsive:
+				settings.isPreviewMode || !! settings?.[ isIsolatedEditorKey ],
+		};
+	}, [] );
 	const hasAlreadyRendered = isPreviewMode ? false : recursionDetected;
 
 	const blockEditingMode = useBlockEditingMode();
@@ -603,7 +612,8 @@ function Navigation( {
 		setAttributes,
 	] );
 
-	const isResponsive = 'never' !== overlayMenu;
+	const isResponsive = 'never' !== overlayMenu && ! editorDisabledResponsive;
+
 	const blockProps = useBlockProps( {
 		ref: navRef,
 		className: clsx(

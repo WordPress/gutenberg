@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import type { select as globalSelect } from './select';
+import type { DataRegistry } from './types';
 
 type RegistrySelector< Selector extends ( ...args: any[] ) => any > = {
 	( ...args: Parameters< Selector > ): ReturnType< Selector >;
@@ -101,9 +102,9 @@ export function createRegistrySelector<
  *
  * @return Registry control that can be registered with a store.
  */
-export function createRegistryControl< T extends ( ...args: any ) => any >(
-	registryControl: T & { isRegistryControl?: boolean }
-) {
+export function createRegistryControl<
+	T extends ( registry: DataRegistry ) => ( ...args: any ) => any,
+>( registryControl: T & { isRegistryControl?: boolean } ) {
 	registryControl.isRegistryControl = true;
 
 	return registryControl;

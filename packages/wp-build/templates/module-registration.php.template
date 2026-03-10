@@ -6,44 +6,42 @@
  * @package {{PREFIX}}
  */
 
-if ( ! function_exists( '{{PREFIX}}_register_script_modules' ) ) {
-	/**
-	 * Register all script modules.
-	 */
-	function {{PREFIX}}_register_script_modules() {
-		// Load build constants
-		$build_constants = require __DIR__ . '/constants.php';
-		$modules_dir     = __DIR__ . '/modules';
-		$modules_file    = $modules_dir . '/registry.php';
+/**
+ * Register all script modules.
+ */
+function {{PREFIX}}_register_script_modules() {
+	// Load build constants
+	$build_constants = require __DIR__ . '/constants.php';
+	$modules_dir     = __DIR__ . '/modules';
+	$modules_file    = $modules_dir . '/registry.php';
 
-		if ( ! file_exists( $modules_file ) ) {
-			return;
-		}
-
-		$modules = require $modules_file;
-		$base_url = $build_constants['build_url'] . 'modules/';
-		$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
-
-		foreach ( $modules as $module ) {
-			$asset_path = $modules_dir . '/' . $module['asset'];
-			$asset = file_exists( $asset_path ) ? require $asset_path : array();
-
-			// Deregister first to override any previously registered version
-			// (e.g., Core's default modules when running as a plugin).
-			wp_deregister_script_module( $module['id'] );
-
-			wp_register_script_module(
-				$module['id'],
-				$base_url . $module['path'] . $extension,
-				$asset['module_dependencies'] ?? array(),
-				$asset['version'] ?? false,
-				array(
-					'fetchpriority' => 'low',
-					'in_footer'     => true,
-				)
-			);
-		}
+	if ( ! file_exists( $modules_file ) ) {
+		return;
 	}
 
-	add_action( 'wp_default_scripts', '{{PREFIX}}_register_script_modules' );
+	$modules = require $modules_file;
+	$base_url = $build_constants['build_url'] . 'modules/';
+	$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
+
+	foreach ( $modules as $module ) {
+		$asset_path = $modules_dir . '/' . $module['asset'];
+		$asset = file_exists( $asset_path ) ? require $asset_path : array();
+
+		// Deregister first to override any previously registered version
+		// (e.g., Core's default modules when running as a plugin).
+		wp_deregister_script_module( $module['id'] );
+
+		wp_register_script_module(
+			$module['id'],
+			$base_url . $module['path'] . $extension,
+			$asset['module_dependencies'] ?? array(),
+			$asset['version'] ?? false,
+			array(
+				'fetchpriority' => 'low',
+				'in_footer'     => true,
+			)
+		);
+	}
 }
+
+add_action( 'wp_default_scripts', '{{PREFIX}}_register_script_modules' );

@@ -247,7 +247,13 @@ $navigation-icon-size: 24px;
 	}
 
 	// Show submenus on hover unless they open on click.
-	&:not(.open-on-click):hover > .wp-block-navigation__submenu-container,
+	// Restricted to true-hover devices to prevent sticky touch-hover on mobile.
+	@media (hover: hover) {
+		&:not(.open-on-click):hover > .wp-block-navigation__submenu-container {
+			@include show-submenu;
+			min-width: 200px;
+		}
+	}
 	// Keep submenus open when focus is within.
 	&:not(.open-on-click):not(.open-on-hover-click):focus-within > .wp-block-navigation__submenu-container,
 	// Show submenus on click.
