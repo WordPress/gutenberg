@@ -67,10 +67,13 @@ function render_block_core_cover( $attributes, $content ) {
 						$query_params['modestbranding'] = '1';
 						$query_params['playsinline']    = '1';
 
-						$path                     = $parsed_url['path'] ?? '';
-						$path_segments            = explode( '/', $path );
-						$video_id                 = end( $path_segments );
-						$query_params['playlist'] = $video_id;
+						// For loop to work, we need the playlist parameter.
+						$path          = $parsed_url['path'] ?? '';
+						$path_segments = explode( '/', $path );
+						$video_id      = end( $path_segments );
+						if ( $video_id ) {
+								$query_params['playlist'] = $video_id;
+						}
 					} elseif ( 'vimeo' === $provider ) {
 						$query_params['autoplay']    = '1';
 						$query_params['muted']       = '1';
