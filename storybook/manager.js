@@ -11,7 +11,10 @@ import sidebar from './sidebar';
 import theme from './theme';
 
 addons.setConfig( {
-	sidebar,
+	sidebar: {
+		...sidebar,
+		showRoots: false,
+	},
 	tagBadges: Object.entries( badges ).map(
 		( [ key, { title, styles, tooltip } ] ) => ( {
 			tags: `status-${ key }`,
