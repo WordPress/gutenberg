@@ -88,10 +88,10 @@ The table below summarizes the compatibility status and required action for each
 | Interactive block using other libraries              | No                               | Omit or set `clientNavigation` to `false`     |
 | Block injecting or modifying CSS at runtime          | No                               | Use server-rendered styles or `data-wp-class` |
 | Block using `wp_unique_id()` for CSS selectors       | No                               | Use `wp_unique_id_from_values()`              |
-| Block mutating the DOM outside the Interactivity API | No                               | Use directives or `data-wp-watch`             |
 | Block using regular scripts (not script modules)     | No                               | Migrate to script modules                     |
 | Block importing from `window.wp.*` globals           | No                               | Use ES module imports                         |
 | Block relying on DOM ready events for initialization | No                               | Use `data-wp-init`                            |
+| Block mutating the DOM outside the Interactivity API | No                               | Use directives or `data-wp-watch`             |
 
 ## Ensuring compatibility
 
@@ -306,12 +306,12 @@ Before marking your block as compatible with client-side navigation, verify the 
 -   [ ] The block does not inject `<style>` elements dynamically through JavaScript.
 -   [ ] The block does not modify existing stylesheets at runtime (e.g., via CSSOM APIs).
 -   [ ] CSS selectors (class names, IDs) are stable across navigations — no use of `wp_unique_id()` for selectors.
--   [ ] The block does not manipulate the DOM using APIs outside the Interactivity API (e.g., `document.createElement`, jQuery).
--   [ ] Any HTML that needs to live outside the block's region (e.g., overlays on `<body>`) uses `attachTo` to define its own region.
--   [ ] Lists of sibling elements that can change between navigations use `data-wp-key`.
+-   [ ] CSS animations and transitions work correctly after a client-side navigation (they may need to be re-triggered).
 -   [ ] The block uses script modules, not regular `<script>` tags.
 -   [ ] The block does not import from `window.wp.*` globals — it uses ES module imports instead.
 -   [ ] The block does not rely on `DOMContentLoaded` or `load` events for initialization — it uses `data-wp-init` instead.
 -   [ ] If the block needs to sync state or context from the server on each navigation, it uses `getServerState()` or `getServerContext()`.
--   [ ] CSS animations and transitions work correctly after a client-side navigation (they may need to be re-triggered).
+-   [ ] Lists of sibling elements that can change between navigations use `data-wp-key`.
+-   [ ] The block does not manipulate the DOM using APIs outside the Interactivity API (e.g., `document.createElement`, jQuery).
+-   [ ] Any HTML that needs to live outside the block's region (e.g., overlays on `<body>`) uses `attachTo` to define its own region.
 -   [ ] (Optional) The block works correctly with the [experimental full-page client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#full-page-client-side-navigation-experimental) mode.
