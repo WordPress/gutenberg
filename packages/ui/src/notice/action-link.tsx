@@ -12,9 +12,10 @@ export const ActionLink = forwardRef< HTMLAnchorElement, ActionLinkProps >(
 		return (
 			<Link
 				ref={ ref }
-				tone="neutral"
 				className={ clsx( styles[ 'action-link' ], className ) }
 				{ ...props }
+				tone="neutral"
+				variant="default"
 			/>
 		);
 	}
