@@ -358,6 +358,7 @@ export default function PostSummary( { onActionPerformed } ) {
 
 The following SlotFills are available in the `edit-post` or `editor` packages. Please refer to the individual items below for usage and example details:
 
+-   [ContentGuidelineSectionActions](/docs/reference-guides/slotfills/content-guideline-section-actions.md)
 -   [MainDashboardButton](/docs/reference-guides/slotfills/main-dashboard-button.md)
 -   [PluginBlockSettingsMenuItem](/docs/reference-guides/slotfills/plugin-block-settings-menu-item.md)
 -   [PluginDocumentSettingPanel](/docs/reference-guides/slotfills/plugin-document-setting-panel.md)
