@@ -115,6 +115,11 @@ export default function BlockGuidelines() {
 
 	const { setBlockGuideline } = useDispatch( STORE_NAME );
 
+	const handleRowClick = ( id: string ) => {
+		setSelectedItem( id );
+		setIsOpen( true );
+	};
+
 	const actions = useMemo(
 		() => [
 			{
@@ -122,8 +127,7 @@ export default function BlockGuidelines() {
 				label: __( 'Edit' ),
 				callback: ( items: DataRow[] ) => {
 					const item = items[ 0 ];
-					setSelectedItem( item.id );
-					setIsOpen( true );
+					handleRowClick( item.id );
 				},
 			},
 			{
@@ -218,6 +222,10 @@ export default function BlockGuidelines() {
 					fields={ fields }
 					actions={ actions }
 					config={ { perPageSizes: [ PER_PAGE ] } }
+					onChangeSelection={ ( items ) => {
+						const id = items[ 0 ];
+						handleRowClick( id );
+					} }
 					defaultLayouts={ {
 						list: {},
 					} }
