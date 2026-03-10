@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { getConnectorData } from './default-connectors';
 import { WpLogoDecoration } from './wp-logo-decoration';
 
 import type { PluginStatus } from './use-connector-plugin';
@@ -106,6 +107,14 @@ export function AiPluginCallout() {
 			setIsBusy( false );
 		}
 	};
+
+	// Only show when at least one AI provider connector is registered.
+	const hasAiProviders = Object.values( getConnectorData() ).some(
+		( connector ) => connector.type === 'ai_provider'
+	);
+	if ( ! hasAiProviders ) {
+		return null;
+	}
 
 	// Hide while checking to avoid flash.
 	if ( pluginStatus === 'checking' ) {
