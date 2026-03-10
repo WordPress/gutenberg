@@ -1,5 +1,5 @@
-import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
+import { forwardRef } from '@wordpress/element';
 import { Link } from '../link';
 import type { ActionLinkProps } from './types';
 import styles from './style.module.css';
