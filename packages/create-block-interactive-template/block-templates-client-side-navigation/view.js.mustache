@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	getElement,
-	store,
-	withScope,
-	withSyncEvent,
-} from '@wordpress/interactivity';
+import { getElement, store, withSyncEvent } from '@wordpress/interactivity';
 
 const { state } = store( '{{namespace}}', {
 	state: {
@@ -29,14 +24,27 @@ const { state } = store( '{{namespace}}', {
 		navigateTo: withSyncEvent( function* ( event ) {
 			event.preventDefault();
 			// getElement() must be called synchronously, before any yield.
-			const { ref } = getElement();
+			const { attributes } = getElement();
 			state.isNavigating = true;
+			if ( state.artificialDelay ) {
+				yield new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
+			}
 			const { actions } = yield import(
 				'@wordpress/interactivity-router'
 			);
-			yield actions.navigate( ref.href );
+			yield actions.navigate( attributes.href );
 			state.isNavigating = false;
 		} ),
+		*prefetchTo() {
+			const { attributes } = getElement();
+			const { actions } = yield import(
+				'@wordpress/interactivity-router'
+			);
+			yield actions.prefetch( attributes.href );
+		},
+		toggleDelay() {
+			state.artificialDelay = ! state.artificialDelay;
+		},
 	},
 	callbacks: {
 		/**
@@ -46,12 +54,9 @@ const { state } = store( '{{namespace}}', {
 		 * full page reload happened.
 		 */
 		startTimer() {
-			const interval = setInterval(
-				withScope( () => {
-					state.elapsed += 1;
-				} ),
-				10
-			);
+			const interval = setInterval( () => {
+				state.elapsed += 1;
+			}, 10 );
 			return () => clearInterval( interval );
 		},
 	},

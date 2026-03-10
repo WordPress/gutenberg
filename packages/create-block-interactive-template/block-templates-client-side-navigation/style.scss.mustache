@@ -63,10 +63,46 @@
 		}
 	}
 
-	// Loading indicator.
-	&__loading {
-		margin-top: 1em;
+	// Artificial delay checkbox.
+	&__delay {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		margin-bottom: 1em;
 		font-size: 0.85em;
-		color: #888;
+		color: #666;
+		cursor: pointer;
+	}
+
+	// Router region content wrapper.
+	&__content {
+		position: relative;
+	}
+
+	// Loading overlay — appears on top of the quote after 100ms.
+	&__loading {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(255, 255, 255, 0.8);
+		font-size: 0.9em;
+		color: #666;
+		animation: wp-block-create-block-loading-fade-in 0s 100ms both;
+
+		&[hidden] {
+			display: none;
+		}
+	}
+}
+
+@keyframes wp-block-create-block-loading-fade-in {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
 	}
 }

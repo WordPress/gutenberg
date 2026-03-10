@@ -43,8 +43,9 @@ $next_index  = ( $quote_index + 1 ) % $total;
 wp_interactivity_state(
 	'{{namespace}}',
 	array(
-		'timer'        => '00:00.00',
-		'isNavigating' => false,
+		'timer'           => '00:00.00',
+		'isNavigating'    => false,
+		'artificialDelay' => false,
 	)
 );
 ?>
@@ -55,10 +56,20 @@ wp_interactivity_state(
 >
 	<div class="wp-block-{{namespace}}-{{slug}}__timer" data-wp-init="callbacks.startTimer">
 		<?php esc_html_e( 'Client timer:', '{{textdomain}}' ); ?>
-		<span data-wp-text="state.timer">00:00.00</span>
+		<span data-wp-text="state.timer"></span>
 	</div>
 
+	<label class="wp-block-{{namespace}}-{{slug}}__delay">
+		<input
+			type="checkbox"
+			data-wp-bind--checked="state.artificialDelay"
+			data-wp-on--change="actions.toggleDelay"
+		/>
+		<?php esc_html_e( 'Introduce artificial network delay', '{{textdomain}}' ); ?>
+	</label>
+
 	<div
+		class="wp-block-{{namespace}}-{{slug}}__content"
 		data-wp-interactive="{{namespace}}"
 		data-wp-router-region="{{namespace}}/quote"
 	>
@@ -78,12 +89,14 @@ wp_interactivity_state(
 			<a
 				href="<?php echo esc_url( add_query_arg( 'quote', $prev_index ) ); ?>"
 				data-wp-on--click="actions.navigateTo"
+				data-wp-on--mouseenter="actions.prefetchTo"
 			>
 				← <?php esc_html_e( 'Prev', '{{textdomain}}' ); ?>
 			</a>
 			<a
 				href="<?php echo esc_url( add_query_arg( 'quote', $next_index ) ); ?>"
 				data-wp-on--click="actions.navigateTo"
+				data-wp-on--mouseenter="actions.prefetchTo"
 			>
 				<?php esc_html_e( 'Next', '{{textdomain}}' ); ?> →
 			</a>
@@ -92,7 +105,6 @@ wp_interactivity_state(
 		<div
 			class="wp-block-{{namespace}}-{{slug}}__loading"
 			data-wp-bind--hidden="!state.isNavigating"
-			hidden
 		>
 			<?php esc_html_e( 'Loading…', '{{textdomain}}' ); ?>
 		</div>
