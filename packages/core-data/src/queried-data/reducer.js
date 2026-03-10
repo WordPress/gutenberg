@@ -240,7 +240,7 @@ const receiveQueries = compose( [
 		return state;
 	}
 
-	const key = action.key || DEFAULT_ENTITY_KEY;
+	const key = action.key ?? DEFAULT_ENTITY_KEY;
 
 	return {
 		itemIds: getMergedItemIds(
