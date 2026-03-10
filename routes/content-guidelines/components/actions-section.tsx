@@ -34,25 +34,23 @@ const ACTIONS = [
 	{
 		slug: 'import',
 		title: __( 'Import' ),
-		description: __(
-			'Upload a JSON file to import your content guidelines.'
-		),
+		description: __( 'Upload a JSON file to import your guidelines.' ),
 		buttonLabel: __( 'Upload' ),
-		ariaLabel: __( 'Import content guidelines' ),
+		ariaLabel: __( 'Import guidelines' ),
 	},
 	{
 		slug: 'export',
 		title: __( 'Export' ),
-		description: __( 'Export your content guidelines to a JSON file.' ),
+		description: __( 'Export your guidelines to a JSON file.' ),
 		buttonLabel: __( 'Download' ),
-		ariaLabel: __( 'Export content guidelines' ),
+		ariaLabel: __( 'Export guidelines' ),
 	},
 	{
 		slug: 'revert',
 		title: __( 'Revert' ),
-		description: __( 'Use a previous version of your content guidelines.' ),
+		description: __( 'Use a previous version of your guidelines.' ),
 		buttonLabel: __( 'View history' ),
-		ariaLabel: __( 'View history of content guidelines' ),
+		ariaLabel: __( 'View history of guidelines' ),
 	},
 ];
 
@@ -220,7 +218,7 @@ export default function ActionsSection() {
 					<VStack spacing={ 4 }>
 						<Text size={ 13 } weight={ 400 }>
 							{ __(
-								'Importing new guidelines will replace your current content guidelines.'
+								'Importing new guidelines will replace your current one.'
 							) }
 						</Text>
 						<Text size={ 13 } weight={ 400 }>

@@ -15,8 +15,8 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_content_guidelines_enqueue_block
 function gutenberg_register_content_guidelines_settings_submenu() {
 	add_submenu_page(
 		'options-general.php',
-		__( 'Content Guidelines', 'gutenberg' ),
-		__( 'Content Guidelines', 'gutenberg' ),
+		__( 'Guidelines', 'gutenberg' ),
+		__( 'Guidelines', 'gutenberg' ),
 		'manage_options',
 		'content-guidelines-wp-admin',
 		'gutenberg_content_guidelines_wp_admin_render_page'
