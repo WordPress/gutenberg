@@ -86,8 +86,8 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	public function test_create_item_skips_image_editor_support_check_when_not_generating_sub_sizes() {
 		wp_set_current_user( self::$admin_id );
 
-		// Force the image editor support check to reject the mime type.
-		add_filter( 'wp_image_editor_supports', '__return_false' );
+		// Remove all image editors so wp_image_editor_supports() returns false.
+		add_filter( 'wp_image_editors', '__return_empty_array' );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
 		$request->set_file_params(
@@ -106,7 +106,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
 		$result     = $controller->create_item_permissions_check( $request );
 
-		remove_filter( 'wp_image_editor_supports', '__return_false' );
+		remove_filter( 'wp_image_editors', '__return_empty_array' );
 
 		// Should pass because the bypass filter was applied (client handles processing).
 		$this->assertTrue( $result );
@@ -124,8 +124,8 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	public function test_create_item_enforces_image_editor_support_check_when_generating_sub_sizes() {
 		wp_set_current_user( self::$admin_id );
 
-		// Force the image editor support check to reject the mime type.
-		add_filter( 'wp_image_editor_supports', '__return_false' );
+		// Remove all image editors so wp_image_editor_supports() returns false.
+		add_filter( 'wp_image_editors', '__return_empty_array' );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
 		$request->set_file_params(
@@ -144,7 +144,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
 		$result     = $controller->create_item_permissions_check( $request );
 
-		remove_filter( 'wp_image_editor_supports', '__return_false' );
+		remove_filter( 'wp_image_editors', '__return_empty_array' );
 
 		// Should fail because the server needs to generate sub-sizes but can't.
 		$this->assertWPError( $result );
