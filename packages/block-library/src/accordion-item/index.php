@@ -63,7 +63,6 @@ function block_core_accordion_item_render( array $attributes, string $content ):
 		$processor = new WP_HTML_Tag_Processor( $content );
 		while ( $processor->next_tag( 'IMG' ) ) {
 			$processor->set_attribute( 'fetchpriority', 'low' );
-			$processor->remove_attribute( 'loading' );
 		}
 		$content = $processor->get_updated_html();
 	}
