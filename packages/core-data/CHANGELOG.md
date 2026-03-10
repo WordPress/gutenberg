@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.41.1-next.0 (2026-03-10)
+
 ### Bug Fixes
 
 -   `canUser` no longer returns `undefined` when the allow header is missing from the response.
