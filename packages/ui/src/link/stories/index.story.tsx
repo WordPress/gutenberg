@@ -18,56 +18,65 @@ export const Default: Story = {
 	},
 };
 
-export const AllVariants: Story = {
-	render: () => (
-		<Stack
-			direction="column"
-			gap="lg"
-			style={ { color: 'var(--wpds-color-fg-content-neutral)' } }
-		>
-			<Stack direction="column" gap="xs">
-				<Text variant="heading-sm">Brand</Text>
-				<Link href="#" tone="brand">
-					Learn more
-				</Link>
-			</Stack>
-			<Stack direction="column" gap="xs">
-				<Text variant="heading-sm">Neutral</Text>
-				<Link href="#" tone="neutral">
-					Learn more
-				</Link>
-			</Stack>
-			<Stack direction="column" gap="xs">
-				<Text variant="heading-sm">Unstyled</Text>
-				<Link href="#" variant="unstyled">
-					Learn more
-				</Link>
-			</Stack>
+export const AllTonesAndVariants: Story = {
+	...Default,
+	argTypes: {
+		tone: {
+			control: false,
+		},
+		variant: {
+			control: false,
+		},
+	},
+	render: ( args ) => (
+		<Stack direction="column" gap="lg">
+			{ ( [ 'brand', 'neutral' ] as const ).map( ( tone ) =>
+				( [ 'default', 'unstyled' ] as const ).map( ( variant ) => (
+					<Stack
+						direction="column"
+						gap="xs"
+						key={ `${ tone }-${ variant }` }
+					>
+						<Text variant="heading-sm">
+							{ tone } tone, { variant } variant
+						</Text>
+						<Link { ...args } tone={ tone } variant={ variant } />
+					</Stack>
+				) )
+			) }
 		</Stack>
 	),
 };
 
 export const Inline: Story = {
-	render: () => (
+	...Default,
+	args: {
+		...Default.args,
+		children: 'inline link',
+	},
+	render: ( args ) => (
 		<Text variant="body-md" render={ <p /> }>
-			This is a paragraph with an <Link href="#">inline link</Link> that
-			inherits its typography from the parent Text component.
+			This is a paragraph with an <Link { ...args } /> that inherits its
+			typography from the parent Text component.
 		</Text>
 	),
 };
 
-/**
- * When composing `Text` and `Link` via the `render` prop, the order matters:
- * - `<Text render={ <Link /> } />` renders an `<a>` element (Link's default tag wins).
- * - `<Link render={ <Text /> } />` renders a `<span>` element (Text's default tag wins).
- */
 export const Standalone: Story = {
-	render: () => (
+	args: {
+		href: '#',
+	},
+	argTypes: {
+		children: {
+			control: false,
+		},
+	},
+	render: ( args ) => (
 		<Stack direction="column" gap="md">
-			<Text variant="body-md" render={ <Link href="#" /> }>
+			<Text variant="body-md" render={ <Link { ...args } /> }>
 				A standalone link with body-md typography
 			</Text>
-			<Text variant="body-sm" render={ <Link href="#" tone="neutral" /> }>
+			<Text variant="body-sm" render={ <Link { ...args } /> }>
 				A standalone link with body-sm typography
 			</Text>
 		</Stack>
