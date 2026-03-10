@@ -1,11 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useLayoutEffect, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockType, getBlockTypes } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -14,14 +14,22 @@ import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import { SiblingStyleSyncControl } from '../components/sibling-style-sync-control';
 import { SiblingStyleSyncParentControl } from '../components/sibling-style-sync-control/parent-control';
+import { partitionAttributesByGroups } from '../store/sibling-style-sync-utils';
 
 /**
- * Higher-order component that intercepts `setAttributes` for blocks that
- * declare `__experimentalSiblingStyleSync` support and routes attribute
- * updates through `__experimentalUpdateSyncedBlockAttributes`, which
- * propagates style changes to linked sibling blocks within the sync scope.
+ * This HOC performs the following actions:
  *
- * Blocks that do not declare the support are passed through unchanged.
+ * - Intercepts `setAttributes` for blocks with `__experimentalSiblingStyleSync`
+ *    support and routes updates through `__experimentalUpdateSyncedBlockAttributes`,
+ *    which propagates style changes to all linked siblings within the sync scope.
+ *
+ * - On first mount, checks whether the block is freshly inserted (no synced
+ *    styles of its own). If so, it inherits the canonical style from the first
+ *    linked sibling without creating a separate undo level — the style
+ *    initialisation is silently folded into the insert's undo entry via
+ *    `__unstableMarkNextChangeAsNotPersistent`.
+ *
+ * Blocks without the support are passed through unchanged.
  */
 const withSiblingStyleSync = createHigherOrderComponent(
 	( BlockEdit ) =>
@@ -30,6 +38,8 @@ const withSiblingStyleSync = createHigherOrderComponent(
 
 			const syncSupport =
 				getBlockType( name )?.supports?.__experimentalSiblingStyleSync;
+
+			const registry = useRegistry();
 
 			const { __experimentalUpdateSyncedBlockAttributes } = unlock(
 				useDispatch( blockEditorStore )
@@ -50,6 +60,92 @@ const withSiblingStyleSync = createHigherOrderComponent(
 				setAttributes,
 				__experimentalUpdateSyncedBlockAttributes,
 			] );
+
+			// On first mount, inherit canonical styles if block is fresh.
+			//
+			// This runs synchronously before paint (useLayoutEffect) so the
+			// block is never visible in an unstyled state.
+			//
+			// Intentionally passing an empty deps array: clientId and name are
+			// stable for a given block instance, and we only want this to run
+			// once — on the initial mount of a newly inserted block.
+			useLayoutEffect( () => {
+				if ( ! syncSupport ) {
+					return;
+				}
+
+				const storeSelect = registry.select( blockEditorStore );
+
+				// Skip if the block already has its own synced styles (loaded from saved content or previously styled by the user).
+				const currentAttrs = storeSelect.getBlockAttributes( clientId );
+				if ( ! currentAttrs ) {
+					return;
+				}
+				const { syncedAttributes: ownStyles } =
+					partitionAttributesByGroups(
+						currentAttrs,
+						syncSupport.groups
+					);
+				const hasOwnStyles = Object.values( ownStyles ).some(
+					( v ) => v !== undefined && v !== null
+				);
+				if ( hasOwnStyles ) {
+					return;
+				}
+
+				// Respect the parent scope's sync toggle.
+				const privateSelect = unlock(
+					registry.select( blockEditorStore )
+				);
+				const scopeClientId =
+					privateSelect.__experimentalGetSiblingStyleSyncScopeClientId(
+						clientId,
+						name
+					);
+				const syncChildStyles = scopeClientId
+					? storeSelect.getBlockAttributes( scopeClientId )
+							?.syncChildStyles ?? {}
+					: {};
+				if ( syncChildStyles[ name ] === false ) {
+					return;
+				}
+
+				// Find the first linked sibling that has styles to copy from.
+				const siblings =
+					privateSelect.__experimentalGetSiblingStyleSyncBlocks(
+						clientId,
+						name
+					);
+				const canonicalSibling = siblings.find(
+					( s ) =>
+						! privateSelect.__experimentalIsBlockStyleSyncUnlinked(
+							s.clientId,
+							name
+						)
+				);
+				if ( ! canonicalSibling ) {
+					return;
+				}
+
+				const canonicalAttrs = storeSelect.getBlockAttributes(
+					canonicalSibling.clientId
+				);
+				const { syncedAttributes } = partitionAttributesByGroups(
+					canonicalAttrs,
+					syncSupport.groups
+				);
+				if ( Object.keys( syncedAttributes ).length === 0 ) {
+					return;
+				}
+
+				// Apply without creating a new undo level.
+				const storeDispatch = registry.dispatch( blockEditorStore );
+				storeDispatch.__unstableMarkNextChangeAsNotPersistent();
+				storeDispatch.updateBlockAttributes(
+					clientId,
+					syncedAttributes
+				);
+			}, [] );
 
 			return (
 				<>

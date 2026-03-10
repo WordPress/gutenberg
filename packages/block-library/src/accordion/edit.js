@@ -27,7 +27,6 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { unlock } from '../lock-unlock';
 
 const ACCORDION_BLOCK_NAME = 'core/accordion-item';
 const ACCORDION_HEADING_BLOCK_NAME = 'core/accordion-heading';
@@ -53,10 +52,8 @@ export default function Edit( {
 		role: 'group',
 	} );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { __experimentalInsertBlockWithSiblingStyles } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { updateBlockAttributes, insertBlock } =
+		useDispatch( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 
@@ -68,18 +65,13 @@ export default function Edit( {
 	} );
 
 	const addAccordionItemBlock = () => {
-		// When adding, set the header's level to current headingLevel.
 		const newAccordionItem = createBlock( ACCORDION_BLOCK_NAME, {}, [
 			createBlock( ACCORDION_HEADING_BLOCK_NAME, {
 				level: headingLevel,
 			} ),
 			createBlock( 'core/accordion-panel', {} ),
 		] );
-		__experimentalInsertBlockWithSiblingStyles(
-			newAccordionItem,
-			undefined,
-			clientId
-		);
+		insertBlock( newAccordionItem, undefined, clientId );
 	};
 
 	/**
