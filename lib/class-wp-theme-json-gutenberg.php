@@ -626,9 +626,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var array
 	 */
 	const VALID_BLOCK_PSEUDO_SELECTORS = array(
-		'core/button'               => array( ':hover', ':focus', ':focus-visible', ':active' ),
-		'core/navigation-link'      => array( ':hover', ':focus', ':focus-visible', ':active' ),
-		'core/navigation-submenu'   => array( ':hover', ':focus', ':focus-visible', ':active' ),
+		'core/button'             => array( ':hover', ':focus', ':focus-visible', ':active' ),
+		'core/navigation-link'    => array( ':hover', ':focus', ':focus-visible', ':active' ),
+		'core/navigation-submenu' => array( ':hover', ':focus', ':focus-visible', ':active' ),
 	);
 
 	/**
