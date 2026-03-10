@@ -1114,10 +1114,7 @@ export const receiveRevisions =
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
-		const key =
-			entityConfig && entityConfig?.revisionKey
-				? entityConfig.revisionKey
-				: DEFAULT_ENTITY_KEY;
+		const key = entityConfig?.revisionKey ?? DEFAULT_ENTITY_KEY;
 
 		dispatch( {
 			type: 'RECEIVE_ITEM_REVISIONS',
