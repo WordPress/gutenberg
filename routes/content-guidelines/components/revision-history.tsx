@@ -145,10 +145,9 @@ export default function RevisionHistory() {
 		[ authorElements ]
 	);
 
-	const { data: displayedRevisions, paginationInfo } = filterSortAndPaginate(
-		revisions,
-		view,
-		fields
+	const { data: displayedRevisions, paginationInfo } = useMemo(
+		() => filterSortAndPaginate( revisions, view, fields ),
+		[ revisions, view, fields ]
 	);
 
 	const actions = useMemo< Action< ContentGuidelinesRevision >[] >(
