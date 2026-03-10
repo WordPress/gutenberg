@@ -18,6 +18,9 @@ export const Default: Story = {
 	},
 };
 
+/**
+ * Note: `tone` has no effect on `unstyled` variant
+ */
 export const AllTonesAndVariants: Story = {
 	...Default,
 	argTypes: {
