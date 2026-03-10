@@ -119,7 +119,11 @@ export async function importContentGuidelines( file: File ): Promise< void > {
 	const parsed: unknown = JSON.parse( await file.text() );
 
 	if ( ! isValidGuidelinesImport( parsed ) ) {
-		throw new Error( __( 'Invalid file format.' ) );
+		throw new Error(
+			__(
+				'Check that your file contains valid JSON markup and try again.'
+			)
+		);
 	}
 
 	const guidelinesStore = select( STORE_NAME ) as unknown as {
