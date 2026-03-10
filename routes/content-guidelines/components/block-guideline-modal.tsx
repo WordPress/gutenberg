@@ -186,6 +186,7 @@ export default function BlockGuidelineModal( {
 							// This is because the API will only remove the guideline if the value is an empty string.
 							onClick={ () => handleSave( '' ) }
 							disabled={ isSaving }
+							accessibleWhenDisabled
 						>
 							{ __( 'Remove' ) }
 						</Button>
@@ -195,6 +196,7 @@ export default function BlockGuidelineModal( {
 						onClick={ () => handleSave( guidelineText ) }
 						disabled={ ! canSubmit || isSaving }
 						isBusy={ isSaving }
+						accessibleWhenDisabled
 					>
 						{ submitButtonLabel }
 					</Button>
