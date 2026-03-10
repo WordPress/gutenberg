@@ -88,7 +88,7 @@ export default function ActionsSection() {
 			setError(
 				sprintf(
 					/* translators: %s: Error message. */
-					__( 'We ran into a problem importing your guidelines: %s' ),
+					__( 'We ran into a problem importing your guidelines. %s' ),
 					getErrorMessage( importError )
 				)
 			);

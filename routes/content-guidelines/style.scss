@@ -113,6 +113,11 @@
 		td {
 			padding: $grid-unit-20 $grid-unit-10;
 		}
+
+		thead th:has(.dataviews-view-table-header-button):first-child {
+			padding-left: 0;
+		}
+
 		.dataviews-view-table__cell-content-wrapper {
 			max-width: 100%;
 		}

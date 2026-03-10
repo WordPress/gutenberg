@@ -35,6 +35,7 @@ const DEFAULT_VIEW: View = {
 	page: 1,
 	perPage: 10,
 	layout: {
+		enableMoving: false,
 		styles: {
 			author: { align: 'end' },
 		},
