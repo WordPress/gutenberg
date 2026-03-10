@@ -14,7 +14,7 @@
 class Tests_Blocks_Render_Details extends WP_UnitTestCase {
 
 	/**
-	 * @covers ::block_core_details_set_img_fetchpriority_low()
+	 * @covers ::block_core_details_set_img_fetchpriority_low
 	 */
 	public function test_should_add_fetchpriority_low_to_img_in_collapsed_details_block(): void {
 		$details_block = <<<'BLOCK_CONTENT'
@@ -33,7 +33,7 @@ class Tests_Blocks_Render_Details extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers ::block_core_details_set_img_fetchpriority_low()
+	 * @covers ::block_core_details_set_img_fetchpriority_low
 	 */
 	public function test_should_not_add_fetchpriority_low_to_img_in_expanded_details_block(): void {
 		$details_block = <<<'BLOCK_CONTENT'
