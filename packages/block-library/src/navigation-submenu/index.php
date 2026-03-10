@@ -5,6 +5,9 @@
  * @package WordPress
  */
 
+require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
+require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
+
 /**
  * Returns the submenu visibility value with backward compatibility
  * for the deprecated openSubmenusOnClick attribute.
@@ -44,15 +47,6 @@ function block_core_navigation_submenu_get_submenu_visibility( $context ) {
 
 	// Use submenuVisibility for migrated/new blocks.
 	return $submenu_visibility ?? 'hover';
-}
-
-// Path differs between source and build: '../navigation-link/shared/' in source, './navigation-link/shared/' in build.
-if ( file_exists( __DIR__ . '/../navigation-link/shared/item-should-render.php' ) ) {
-	require_once __DIR__ . '/../navigation-link/shared/item-should-render.php';
-	require_once __DIR__ . '/../navigation-link/shared/render-submenu-icon.php';
-} else {
-	require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
-	require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
 }
 
 /**
