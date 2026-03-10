@@ -6,6 +6,7 @@
 
 -   Add `Text` primitive with predefined typographic variants (`heading-2xl` through `heading-sm`, `body-xl` through `body-sm`) built on design tokens ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).
 -   Add `Card` and `CollapsibleCard` primitives ([#76252](https://github.com/WordPress/gutenberg/pull/76252)).
+-   Add `Link` primitive with `brand` and `neutral` tone variants and an `unstyled` variant for custom styling.
 
 ### Bug Fixes
 
@@ -25,7 +26,6 @@
 ### New Features
 
 -   Add `Notice` primitive ([#75981](https://github.com/WordPress/gutenberg/pull/75981)).
--   Add `Link` primitive with `brand` and `neutral` tone variants and an `unstyled` variant for custom styling.
 
 ### Enhancements
 
