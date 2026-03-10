@@ -234,6 +234,8 @@ const receiveQueries = compose( [
 		return state;
 	}
 
+	// Single items don't have page or total count metadata
+	// (only collection query responses do), so skip updating itemIds.
 	if ( ! Array.isArray( action.items ) ) {
 		return state;
 	}
