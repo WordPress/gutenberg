@@ -90,6 +90,8 @@ The table below summarizes the compatibility status and required action for each
 | Block using `wp_unique_id()` for CSS selectors       | No                               | Use `wp_unique_id_from_values()`              |
 | Block mutating the DOM outside the Interactivity API | No                               | Use directives or `data-wp-watch`             |
 | Block using regular scripts (not script modules)     | No                               | Migrate to script modules                     |
+| Block importing from `window.wp.*` globals           | No                               | Use ES module imports                         |
+| Block relying on DOM ready events for initialization | No                               | Use `data-wp-init`                            |
 
 ## Ensuring compatibility
 
@@ -171,6 +173,63 @@ wp_interactivity()->add_client_navigation_support_to_script_module(
 
 For more details on how script modules are handled during navigation, see the [Script module handling](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#script-module-handling) section of the Client-Side Navigation guide.
 
+#### Do not import from `window.wp.*` globals
+
+Accessing WordPress packages through global variables like `window.wp.element` or `window.wp.data` is not compatible with CSN. These globals are set by regular scripts, which are not re-executed during client-side navigation.
+
+**Instead:** Use ES module imports from the corresponding `@wordpress/*` script module, if one is available. For example, `@wordpress/a11y` is available both as a regular script (`window.wp.a11y`) and as a script module:
+
+```js
+// Avoid: Relies on a global set by a regular script.
+const { speak } = window.wp.a11y;
+
+// Preferred: ES module import, resolved by the script module system.
+import { speak } from '@wordpress/a11y';
+```
+
+#### Do not rely on DOM ready events for initialization
+
+Block hydration and initialization code should not depend on DOM ready events such as `DOMContentLoaded` or `load`. These events fire only once — on the initial full page load — and will not fire again after a client-side navigation. Any setup logic inside these listeners will not run when the user navigates to a new page.
+
+**Instead:** Use the `data-wp-init` directive for code that needs to run each time the block enters the page:
+
+```html
+<div data-wp-interactive="myPlugin" data-wp-init="callbacks.setup">
+	Block content
+</div>
+```
+
+For code that needs to run on every navigation — such as analytics page-view tracking — use `data-wp-watch` with a reactive value that changes on each navigation, like the current URL from the global state:
+
+```js
+import { store, getConfig } from '@wordpress/interactivity';
+
+const { namespace } = getConfig();
+
+store( namespace, {
+	callbacks: {
+		logPageView() {
+			// Re-runs on every navigation because state.url changes.
+			const { url } = store( 'core/router' ).state;
+			// Send analytics event for the new URL.
+			sendPageView( url );
+		},
+	},
+} );
+```
+
+```html
+<div data-wp-interactive="myPlugin" data-wp-watch="callbacks.logPageView">
+	Tracked content
+</div>
+```
+
+#### Use `getServerState()` and `getServerContext()` to sync server data
+
+If your block's state or context needs to reflect server-rendered values on each navigation — for example, resetting a counter, updating a label, or syncing data that changes per page — use `getServerState()` and `getServerContext()` inside your callbacks. These functions return the values from the server-rendered HTML of the newly navigated page, allowing you to reconcile client-side state with fresh server data after each navigation.
+
+For more details, see the [Server state and context](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#server-state-and-context) section of the Client-Side Navigation guide.
+
 ### HTML
 
 #### Keep consistent HTML structures
@@ -251,5 +310,8 @@ Before marking your block as compatible with client-side navigation, verify the 
 -   [ ] Any HTML that needs to live outside the block's region (e.g., overlays on `<body>`) uses `attachTo` to define its own region.
 -   [ ] Lists of sibling elements that can change between navigations use `data-wp-key`.
 -   [ ] The block uses script modules, not regular `<script>` tags.
+-   [ ] The block does not import from `window.wp.*` globals — it uses ES module imports instead.
+-   [ ] The block does not rely on `DOMContentLoaded` or `load` events for initialization — it uses `data-wp-init` instead.
+-   [ ] If the block needs to sync state or context from the server on each navigation, it uses `getServerState()` or `getServerContext()`.
 -   [ ] CSS animations and transitions work correctly after a client-side navigation (they may need to be re-triggered).
 -   [ ] (Optional) The block works correctly with the [experimental full-page client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#full-page-client-side-navigation-experimental) mode.
