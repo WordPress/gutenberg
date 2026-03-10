@@ -81,9 +81,8 @@ function parseResponse(
 			result.categories[ category ] = guidelines;
 		} else if ( category === 'blocks' ) {
 			const blocks = categoriesFromResponse?.blocks ?? {};
-			for ( const blockName in blocks ) {
-				result.categories.blocks[ blockName ] =
-					blocks[ blockName ]?.guidelines;
+			for ( const [ blockName, blockData ] of Object.entries( blocks ) ) {
+				result.categories.blocks[ blockName ] = blockData?.guidelines;
 			}
 		}
 	} );

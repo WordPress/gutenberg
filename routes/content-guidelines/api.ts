@@ -28,12 +28,12 @@ export async function saveContentGuidelines(): Promise< RestGuidelinesResponse >
 	// @ts-ignore
 	const { setFromResponse } = dispatch( STORE_NAME );
 
-	const guidelinesStore = select( STORE_NAME ) as {
+	const guidelinesStore = select( STORE_NAME ) as unknown as {
 		getId: () => number | null;
 		getStatus: () => string | null;
 		getAllGuidelines: () => Categories;
 		getBlockGuidelines: () => Record< string, string >;
-		getGuideline: ( category: string ) => string;
+		getGuideline: ( category: string ) => string | Record< string, string >;
 	};
 
 	const id = guidelinesStore.getId();

@@ -18,10 +18,14 @@ export interface ContentGuidelinesState {
 	categories: Categories;
 }
 
+interface BlockGuideline {
+	guidelines: string | Record< string, string >;
+}
+
 export interface RestGuidelinesResponse {
 	id: number;
 	status: string;
-	guideline_categories?: Record< string, { guidelines?: string } >;
+	guideline_categories?: Record< string, BlockGuideline >;
 }
 
 export interface GuidelineAccordionProps {
