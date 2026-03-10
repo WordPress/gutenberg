@@ -41,6 +41,10 @@ module.exports = {
 				__dirname,
 				'block-templates-client-side-navigation'
 			),
+			npmDependencies: [
+				'@wordpress/interactivity',
+				'@wordpress/interactivity-router',
+			],
 		},
 	},
 	pluginTemplatesPath: join( __dirname, 'plugin-templates' ),
