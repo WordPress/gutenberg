@@ -61,9 +61,9 @@ export function AiPluginCallout() {
 			}
 
 			return {
-				pluginStatus: (
-					plugin.status === 'active' ? 'active' : 'inactive'
-				) as PluginStatus,
+				pluginStatus: ( plugin.status === 'active'
+					? 'active'
+					: 'inactive' ) as PluginStatus,
 				canInstallPlugins: canCreate,
 				canManagePlugins: true,
 			};
@@ -117,12 +117,12 @@ export function AiPluginCallout() {
 		return null;
 	}
 
-	// No permissions to install.
-	if ( canInstallPlugins === false ) {
+	// Not installed and no permissions to install.
+	if ( pluginStatus === 'not-installed' && canInstallPlugins === false ) {
 		return null;
 	}
 
-	// Can't activate (no manage permissions).
+	// Installed but can't activate (no manage permissions).
 	if ( pluginStatus === 'inactive' && canManagePlugins === false ) {
 		return null;
 	}
