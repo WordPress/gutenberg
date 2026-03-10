@@ -17,3 +17,4 @@ export { default as scheduledDateField } from './date/scheduled';
 export { default as authorField } from './author';
 export { default as notesField } from './notes';
 export { default as formatField } from './format';
+export { default as postContentInfoField } from './post-content-info';

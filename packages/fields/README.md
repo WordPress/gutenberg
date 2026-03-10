@@ -152,6 +152,10 @@ Delete action for PostWithPermissions.
 
 Ping status field for BasePost.
 
+### postContentInfoField
+
+Post content information field for BasePost.
+
 ### PostType
 
 Undocumented declaration.
