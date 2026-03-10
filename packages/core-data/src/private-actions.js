@@ -103,7 +103,7 @@ export const editMediaEntity =
 					dispatch.receiveEntityRecords(
 						kind,
 						name,
-						[ newRecord ],
+						newRecord,
 						undefined,
 						true,
 						undefined,

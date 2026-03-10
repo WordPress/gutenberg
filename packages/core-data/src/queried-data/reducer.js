@@ -105,19 +105,22 @@ export function items( state = {}, action ) {
 		case 'RECEIVE_ITEMS': {
 			const context = getContextFromAction( action );
 			const key = action.key || DEFAULT_ENTITY_KEY;
+			const itemsList = Array.isArray( action.items )
+				? action.items
+				: [ action.items ];
 			return {
 				...state,
 				[ context ]: {
 					...state[ context ],
-					...action.items.reduce( ( accumulator, value ) => {
-						const itemId = value?.[ key ];
-
-						accumulator[ itemId ] = conservativeMapItem(
-							state?.[ context ]?.[ itemId ],
-							value
-						);
-						return accumulator;
-					}, {} ),
+					...Object.fromEntries(
+						itemsList.map( ( item ) => [
+							item?.[ key ],
+							conservativeMapItem(
+								state?.[ context ]?.[ item?.[ key ] ],
+								item
+							),
+						] )
+					),
 				},
 			};
 		}
@@ -149,6 +152,9 @@ export function itemIsComplete( state = {}, action ) {
 		case 'RECEIVE_ITEMS': {
 			const context = getContextFromAction( action );
 			const { query, key = DEFAULT_ENTITY_KEY } = action;
+			const itemsList = Array.isArray( action.items )
+				? action.items
+				: [ action.items ];
 
 			// An item is considered complete if it is received without an associated
 			// fields query. Ideally, this would be implemented in such a way where the
@@ -164,7 +170,7 @@ export function itemIsComplete( state = {}, action ) {
 				...state,
 				[ context ]: {
 					...state[ context ],
-					...action.items.reduce( ( result, item ) => {
+					...itemsList.reduce( ( result, item ) => {
 						const itemId = item?.[ key ];
 
 						// Defer to completeness if already assigned. Technically the
@@ -224,18 +230,24 @@ const receiveQueries = compose( [
 	// reducer tracks only a single query object.
 	onSubKey( 'stableKey' ),
 ] )( ( state = {}, action ) => {
-	const { type, page, perPage, key = DEFAULT_ENTITY_KEY } = action;
-
-	if ( type !== 'RECEIVE_ITEMS' ) {
+	if ( action.type !== 'RECEIVE_ITEMS' ) {
 		return state;
 	}
+
+	// Single items don't have page or total count metadata
+	// (only collection query responses do), so skip updating itemIds.
+	if ( ! Array.isArray( action.items ) ) {
+		return state;
+	}
+
+	const key = action.key ?? DEFAULT_ENTITY_KEY;
 
 	return {
 		itemIds: getMergedItemIds(
 			state?.itemIds || [],
 			action.items.map( ( item ) => item?.[ key ] ).filter( Boolean ),
-			page,
-			perPage
+			action.page,
+			action.perPage
 		),
 		meta: action.meta,
 	};
