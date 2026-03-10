@@ -8028,6 +8028,39 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'current-menu-item', $stylesheet_unsupported );
 	}
 
+	/**
+	 * Test that core/navigation-submenu supports -current and its pseudo-selectors
+	 * independently from core/navigation-link, using its own CSS selector.
+	 */
+	public function test_block_custom_states_navigation_submenu() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/navigation-submenu' => array(
+							'-current' => array(
+								'color'  => array(
+									'text'       => 'red',
+									'background' => 'blue',
+								),
+								':hover' => array(
+									'color' => array(
+										'text' => 'white',
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+		$expected   = ':root :where(.wp-block-navigation .wp-block-navigation-submenu .current-menu-item){background-color: blue;color: red;}:root :where(.wp-block-navigation .wp-block-navigation-submenu .current-menu-item:hover){color: white;}';
+		$this->assertSameCSS( $expected, $stylesheet );
+	}
+
 	public function test_merge_incoming_data_block_level_inherits_global_default_setting() {
 		$defaults = new WP_Theme_JSON_Gutenberg(
 			array(
