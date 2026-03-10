@@ -36,12 +36,7 @@ function Edit( {
 		return editorActiveTabIndex ?? activeTabIndex;
 	}, [ editorActiveTabIndex, activeTabIndex ] );
 
-	const {
-		menuItemIndex,
-		tabsClientId,
-		tabsMenuClientId,
-		selectedTabClientId,
-	} = useSelect(
+	const { menuItemIndex, tabsClientId, selectedTabClientId } = useSelect(
 		( select ) => {
 			const {
 				getBlockOrder,
@@ -74,7 +69,6 @@ function Edit( {
 			return {
 				menuItemIndex: _menuItemIndex,
 				tabsClientId: _tabsClientId,
-				tabsMenuClientId: _tabsMenuClientId,
 				selectedTabClientId: _selectedTabClientId,
 			};
 		},
@@ -91,7 +85,7 @@ function Edit( {
 		{};
 
 	// tabListIndex is the tab's position in tabsList, used for active-state
-	// checks and click handling. menuItemIndex is used for the mover controls.
+	// checks and click handling.
 	const tabListIndex = tab.index ?? menuItemIndex;
 
 	const tabId = tab.id || `tab-${ menuItemIndex }`;
@@ -147,14 +141,7 @@ function Edit( {
 
 	return (
 		<>
-			<Controls
-				tabIndex={ menuItemIndex }
-				tabsCount={ tabsList.length }
-				tabClientId={ tabClientId }
-				tabsClientId={ tabsClientId }
-				tabsMenuClientId={ tabsMenuClientId }
-				menuItemClientId={ clientId }
-			/>
+			<Controls tabsClientId={ tabsClientId } />
 			<button { ...blockProps } type="button">
 				<RichText
 					tagName="span"
