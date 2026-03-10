@@ -916,35 +916,39 @@ export const getSuggestedPostFormat = createRegistrySelector(
  *
  * @return {string} Post content.
  */
-export const getEditedPostContent = createRegistrySelector( ( select ) => {
-	const serializationCache = new WeakMap();
-
-	return ( state ) => {
-		const postId = getCurrentPostId( state );
-		const postType = getCurrentPostType( state );
-		const record = select( coreStore ).getEditedEntityRecord(
-			'postType',
-			postType,
-			postId
-		);
-		if ( record ) {
-			if ( typeof record.content === 'function' ) {
-				return record.content( record );
-			} else if ( record.blocks ) {
-				let content = serializationCache.get( record.blocks );
-				if ( content === undefined ) {
-					content =
-						__unstableSerializeAndClean( record.blocks ) || '';
-					serializationCache.set( record.blocks, content );
+export const getEditedPostContent = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state ) => {
+			const postId = getCurrentPostId( state );
+			const postType = getCurrentPostType( state );
+			const record = select( coreStore ).getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+			if ( record ) {
+				if ( typeof record.content === 'function' ) {
+					return record.content( record );
+				} else if ( record.blocks ) {
+					return __unstableSerializeAndClean( record.blocks );
+				} else if ( record.content ) {
+					return record.content;
 				}
-				return content;
-			} else if ( record.content ) {
-				return record.content;
 			}
+			return '';
+		},
+		( state ) => {
+			const postId = getCurrentPostId( state );
+			const postType = getCurrentPostType( state );
+			const record = select( coreStore ).getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+			return [ record?.content, record?.blocks ];
 		}
-		return '';
-	};
-} );
+	)
+);
 
 /**
  * Returns true if the post is being published, or false otherwise.
