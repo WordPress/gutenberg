@@ -74,20 +74,6 @@
 			width: 248px;
 			height: 248px;
 		}
-
-		&__halftone {
-			width: 100%;
-			height: 100%;
-			mix-blend-mode: multiply;
-		}
-
-		&__dots {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-		}
 	}
 
 	> p {
