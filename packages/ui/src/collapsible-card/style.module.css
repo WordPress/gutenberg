@@ -37,6 +37,18 @@
 	.header[data-disabled] .header-trigger {
 		color: var(--wpds-color-fg-interactive-neutral-disabled);
 	}
+
+	.content {
+		@media not (prefers-reduced-motion) {
+			transition: opacity 0.15s ease, transform 0.15s ease;
+
+			&[data-starting-style],
+			&[data-ending-style] {
+				opacity: 0;
+				transform: translateY(-4px);
+			}
+		}
+	}
 }
 
 @layer wp-ui-compositions {
