@@ -3,6 +3,8 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { type LinkProps } from './types';
+import resetStyles from '../utils/css/resets.module.css';
+import focusStyles from '../utils/css/focus.module.css';
 import styles from './style.module.css';
 
 export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
@@ -33,6 +35,8 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 		ref,
 		props: mergeProps< 'a' >( props, {
 			className: clsx(
+				resetStyles[ 'box-sizing' ],
+				focusStyles[ 'outset-ring--focus' ],
 				variant !== 'unstyled' && styles.link,
 				variant !== 'unstyled' && styles[ `is-${ tone }` ],
 				variant === 'unstyled' && styles[ 'is-unstyled' ],
