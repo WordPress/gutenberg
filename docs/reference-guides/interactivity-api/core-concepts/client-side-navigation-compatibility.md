@@ -289,7 +289,7 @@ Interactive blocks should avoid injecting new HTML elements into the DOM outside
 
 The Interactivity API's client-side navigation only manages content inside [router regions](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#setting-up-router-regions). Any HTML created outside these regions won't be tracked, cleaned up, or updated during navigation.
 
-If a block needs to render content outside its main region — for example, an overlay that must be a direct child of `<body>` — use the router's `attachTo` property to define a region that can be dynamically created during navigation. This is explained in the [Client-Side Navigation guide](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#attaching-new-router-regions).
+If a block needs to render content outside its main region — for example, an overlay that must be a direct child of `<body>` — use the router's `attachTo` property to define a region that can be dynamically created during navigation. This is explained in the [Client-Side Navigation guide](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#adding-new-regions-on-navigation).
 
 ## Verifying compatibility
 
