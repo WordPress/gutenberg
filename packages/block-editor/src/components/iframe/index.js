@@ -290,6 +290,9 @@ function Iframe( {
 	] );
 
 	// Attach the body ref only when the iframe document and window are available.
+	// When an iframe element is moved in the DOM, like when reordering a list,
+	// its `window` object is destroyed and recreated, and the `defaultView` field is
+	// briefly `null`. We need to guard for such calls of the ref callbacks.
 	const bodyRef = useRefEffect(
 		( node ) => {
 			if ( node.ownerDocument.defaultView ) {
