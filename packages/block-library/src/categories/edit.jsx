@@ -3,9 +3,11 @@ import {
 	Placeholder,
 	SelectControl as WCSelectControl,
 	Spinner as WCSpinner,
+	TextControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import {
@@ -27,6 +29,7 @@ const DELIMITER_OPTIONS = [
 	{ label: __( 'Dot' ), value: 'dot' },
 	{ label: __( 'Pipe' ), value: 'pipe' },
 	{ label: __( 'Slash' ), value: 'slash' },
+	{ label: __( 'Custom' ), value: 'custom' },
 ];
 
 const DISPLAY_LAYOUT_OPTIONS = [
@@ -46,6 +49,7 @@ export default function CategoriesEdit( {
 	attributes: {
 		displayLayout,
 		delimiter,
+		customDelimiter,
 		showHierarchy,
 		showPostCounts,
 		showOnlyTopLevel,
@@ -141,7 +145,9 @@ export default function CategoriesEdit( {
 
 	const renderCategoryInline = () => {
 		const delimiterChar =
-			DELIMITER_CHARS[ delimiter ] || DELIMITER_CHARS.comma;
+			delimiter === 'custom'
+				? customDelimiter || ','
+				: DELIMITER_CHARS[ delimiter ] || DELIMITER_CHARS.comma;
 		const parentId = isHierarchicalTaxonomy && showHierarchy ? 0 : null;
 		const categoriesList = getCategoriesList( parentId );
 
@@ -268,6 +274,7 @@ export default function CategoriesEdit( {
 							taxonomy: 'category',
 							displayLayout: 'list',
 							delimiter: 'comma',
+							customDelimiter: '',
 							showHierarchy: false,
 							showPostCounts: false,
 							showOnlyTopLevel: false,
@@ -311,7 +318,7 @@ export default function CategoriesEdit( {
 						}
 						isShownByDefault
 					>
-						<SelectControl
+						<WCSelectControl
 							__next40pxDefaultSize
 							label={ __( 'Display layout' ) }
 							options={ DISPLAY_LAYOUT_OPTIONS }
@@ -340,22 +347,42 @@ export default function CategoriesEdit( {
 					) }
 					{ isInline && (
 						<ToolsPanelItem
-							hasValue={ () => delimiter !== 'comma' }
+							hasValue={ () =>
+								delimiter !== 'comma' || customDelimiter
+							}
 							label={ __( 'Delimiter' ) }
 							onDeselect={ () =>
-								setAttributes( { delimiter: 'comma' } )
+								setAttributes( {
+									delimiter: 'comma',
+									customDelimiter: '',
+								} )
 							}
 							isShownByDefault
 						>
-							<SelectControl
-								__next40pxDefaultSize
-								label={ __( 'Delimiter' ) }
-								options={ DELIMITER_OPTIONS }
-								value={ delimiter }
-								onChange={ ( value ) =>
-									setAttributes( { delimiter: value } )
-								}
-							/>
+							<VStack spacing={ 2 }>
+								<WCSelectControl
+									__next40pxDefaultSize
+									label={ __( 'Delimiter' ) }
+									options={ DELIMITER_OPTIONS }
+									value={ delimiter }
+									onChange={ ( value ) =>
+										setAttributes( { delimiter: value } )
+									}
+								/>
+								{ delimiter === 'custom' && (
+									<TextControl
+										__next40pxDefaultSize
+										label={ __( 'Custom delimiter' ) }
+										value={ customDelimiter }
+										onChange={ ( value ) =>
+											setAttributes( {
+												customDelimiter: value,
+											} )
+										}
+										placeholder={ __( 'e.g., •' ) }
+									/>
+								) }
+							</VStack>
 						</ToolsPanelItem>
 					) }
 					<ToolsPanelItem

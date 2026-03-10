@@ -19,8 +19,11 @@
 		},
 		"delimiter": {
 			"type": "string",
-			"default": "comma",
-			"enum": [ "comma", "dot", "pipe", "slash" ]
+			"default": "comma"
+		},
+		"customDelimiter": {
+			"type": "string",
+			"default": ""
 		},
 		"showHierarchy": {
 			"type": "boolean",
