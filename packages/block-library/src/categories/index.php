@@ -80,7 +80,13 @@ function render_block_core_categories( $attributes, $content, $block ) {
 			'pipe'  => ' | ',
 			'slash' => ' / ',
 		);
-		$delimiter_char = isset( $delimiter_chars[ $delimiter ] ) ? $delimiter_chars[ $delimiter ] : ', ';
+		
+		if ( 'custom' === $delimiter ) {
+			$custom_delimiter = isset( $attributes['customDelimiter'] ) ? $attributes['customDelimiter'] : '';
+			$delimiter_char = $custom_delimiter ? $custom_delimiter : ', ';
+		} else {
+			$delimiter_char = isset( $delimiter_chars[ $delimiter ] ) ? $delimiter_chars[ $delimiter ] : ', ';
+		}
 
 		$categories = get_categories( $args );
 		$items_markup = '';
