@@ -110,15 +110,8 @@
 	}
 }
 
-.editor-document-bar__icon-layout.editor-document-bar__icon-layout {
+.editor-template-dropdown.editor-template-dropdown {
 	position: absolute;
-	margin-left: $grid-unit-15;
-	display: none;
-	pointer-events: none;
-	svg {
-		fill: $gray-600;
-	}
-	@include break-small {
-		display: flex;
-	}
+	z-index: 1;
+	padding-inline-start: $grid-unit-15;
 }

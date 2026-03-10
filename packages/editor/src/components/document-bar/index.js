@@ -15,7 +15,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { BlockIcon, store as blockEditorStore } from '@wordpress/block-editor';
-import { chevronLeftSmall, chevronRightSmall, layout } from '@wordpress/icons';
+import { chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
@@ -27,8 +27,16 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_POST_TYPES } from '../../store/constants';
+import {
+	TEMPLATE_POST_TYPES,
+	ATTACHMENT_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+} from '../../store/constants';
 import { store as editorStore } from '../../store';
+import TemplateDropdown from '../template-dropdown';
 import usePageTypeBadge from '../../utils/pageTypeBadge';
 import { getTemplateInfo } from '../../utils/get-template-info';
 import { getStylesCanvasTitle } from '../styles-canvas';
@@ -73,14 +81,15 @@ export default function DocumentBar( props ) {
 		isNotFound,
 		templateTitle,
 		onNavigateToPreviousEntityRecord,
-		isTemplatePreview,
 		stylesCanvasTitle,
+		showTemplateDropdown,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostType,
 			getCurrentPostId,
 			getEditorSettings,
 			getRenderingMode,
+			getCurrentTemplateId,
 		} = select( editorStore );
 
 		const {
@@ -117,6 +126,8 @@ export default function DocumentBar( props ) {
 			_showStylebook
 		);
 
+		const _templateId = getCurrentTemplateId();
+
 		return {
 			postId: _postId,
 			postType: _postType,
@@ -135,6 +146,15 @@ export default function DocumentBar( props ) {
 				getEditorSettings().onNavigateToPreviousEntityRecord,
 			isTemplatePreview: getRenderingMode() === 'template-locked',
 			stylesCanvasTitle: _stylesCanvasTitle,
+			showTemplateDropdown:
+				!! _templateId &&
+				! [
+					ATTACHMENT_POST_TYPE,
+					TEMPLATE_POST_TYPE,
+					TEMPLATE_PART_POST_TYPE,
+					PATTERN_POST_TYPE,
+					NAVIGATION_POST_TYPE,
+				].includes( _postType ),
 		};
 	}, [] );
 
@@ -199,12 +219,7 @@ export default function DocumentBar( props ) {
 					</MotionButton>
 				) }
 			</AnimatePresence>
-			{ ! isTemplate && isTemplatePreview && ! hasBackButton && (
-				<BlockIcon
-					icon={ layout }
-					className="editor-document-bar__icon-layout"
-				/>
-			) }
+			{ ! hasBackButton && showTemplateDropdown && <TemplateDropdown /> }
 			{ isNotFound ? (
 				<Text>{ __( 'Document not found' ) }</Text>
 			) : (

@@ -5,7 +5,6 @@ import {
 	Button,
 	Modal,
 	SearchControl,
-	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -17,7 +16,7 @@ import {
 	store as blockEditorStore,
 	__experimentalBlockPatternsList as BlockPatternsList,
 } from '@wordpress/block-editor';
-import { layout, pencil, reusableBlock, plus, backup } from '@wordpress/icons';
+import { layout } from '@wordpress/icons';
 import { useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { parse } from '@wordpress/blocks';
@@ -169,7 +168,6 @@ export default function TemplateDropdown() {
 						<Menu.GroupLabel>{ __( 'Template' ) }</Menu.GroupLabel>
 						{ canCreateTemplate && (
 							<Menu.Item
-								prefix={ <Icon icon={ pencil } /> }
 								onClick={ async () => {
 									onNavigateToEntityRecord( {
 										postId: template.id,
@@ -213,7 +211,6 @@ export default function TemplateDropdown() {
 						<Menu.Item
 							disabled={ ! availableTemplates?.length }
 							onClick={ () => setShowSwapModal( true ) }
-							prefix={ <Icon icon={ reusableBlock } /> }
 						>
 							<Menu.ItemLabel>
 								{ __( 'Change template' ) }
@@ -221,7 +218,6 @@ export default function TemplateDropdown() {
 						</Menu.Item>
 						{ !! currentTemplateSlug && allowSwitchingTemplate && (
 							<Menu.Item
-								prefix={ <Icon icon={ backup } /> }
 								onClick={ () => {
 									editEntityRecord(
 										'postType',
@@ -240,7 +236,6 @@ export default function TemplateDropdown() {
 						{ canCreateTemplate && allowSwitchingTemplate && (
 							<Menu.Item
 								onClick={ () => setShowCreateModal( true ) }
-								prefix={ <Icon icon={ plus } /> }
 							>
 								<Menu.ItemLabel>
 									{ __( 'Create new' ) }
