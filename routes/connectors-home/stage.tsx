@@ -71,7 +71,7 @@ function ConnectorsPage() {
 								) }
 							</Text>
 						</VStack>
-						<Button variant="secondary">
+						<Button variant="secondary" href="plugin-install.php">
 							{ __( 'Learn more' ) }
 						</Button>
 					</VStack>
