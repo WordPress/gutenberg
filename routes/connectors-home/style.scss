@@ -81,9 +81,7 @@
 		color: $gray-600;
 	}
 
-	@media (max-width: 480px) {
-		padding: 8px;
-
+	@media (max-width: 680px) {
 		.ai-plugin-callout {
 			padding: 12px;
 			padding-right: 84px;
@@ -95,6 +93,10 @@
 				top: -8px;
 			}
 		}
+	}
+
+	@media (max-width: 480px) {
+		padding: 8px;
 
 		.components-item {
 			padding: 12px;
