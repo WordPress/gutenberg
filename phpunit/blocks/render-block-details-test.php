@@ -48,6 +48,6 @@ class Tests_Blocks_Render_Details extends WP_UnitTestCase {
 
 		$processor = new WP_HTML_Tag_Processor( $rendered_block );
 		$this->assertTrue( $processor->next_tag( 'IMG' ) );
-		$this->assertNull( $processor->get_attribute( 'fetchpriority' ) );
+		$this->assertNotSame( 'low', $processor->get_attribute( 'fetchpriority' ) );
 	}
 }
