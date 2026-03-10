@@ -7,6 +7,10 @@ import resetStyles from '../utils/css/resets.module.css';
 import focusStyles from '../utils/css/focus.module.css';
 import styles from './style.module.css';
 
+/**
+ * A styled anchor element with support for semantic color tones and an
+ * unstyled escape hatch.
+ */
 export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 	{
 		children,
