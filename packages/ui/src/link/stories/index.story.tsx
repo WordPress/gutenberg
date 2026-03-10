@@ -56,6 +56,11 @@ export const Inline: Story = {
 	),
 };
 
+/**
+ * When composing `Text` and `Link` via the `render` prop, the order matters:
+ * - `<Text render={ <Link /> } />` renders an `<a>` element (Link's default tag wins).
+ * - `<Link render={ <Text /> } />` renders a `<span>` element (Text's default tag wins).
+ */
 export const Standalone: Story = {
 	render: () => (
 		<Stack direction="column" gap="md">
