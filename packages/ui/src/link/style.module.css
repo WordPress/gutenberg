@@ -38,11 +38,11 @@
 	/* Link icon pattern — arrow rendered via ::after pseudo-element to avoid
 	 * Twemoji replacement and text-selection issues. Root <a> gets
 	 * text-decoration:none; the link-contents span re-applies it.
-	 * text-underline-offset and text-decoration-thickness are inherited
-	 * properties and propagate from .link on the root to .link-contents
-	 * automatically. text-decoration-color is NOT inherited, so
-	 * text-decoration-color:inherit on .link-contents carries the neutral
-	 * tone's custom color token through. */
+	 * text-underline-offset is inherited and propagates from .link
+	 * automatically. text-decoration-thickness and text-decoration-color
+	 * are NOT inherited, so they are explicitly redeclared on
+	 * .link-contents (the latter via `inherit` to carry the neutral
+	 * tone's custom color token through). */
 	.has-link-icon {
 		text-decoration: none;
 	}
