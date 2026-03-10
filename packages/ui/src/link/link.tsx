@@ -48,6 +48,7 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 					</span>
 					<span
 						className={ styles[ 'link-icon' ] }
+						role="img"
 						aria-label={
 							/* translators: accessibility text appended to link text */
 							__( '(opens in a new tab)' )

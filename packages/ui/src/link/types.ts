@@ -2,11 +2,7 @@ import { type ReactNode } from 'react';
 import { type ComponentProps } from '../utils/types';
 
 export interface LinkProps
-	extends Omit< ComponentProps< 'a' >, 'href' | 'target' > {
-	/**
-	 * The URL to navigate to when the link is clicked.
-	 */
-	href?: string;
+	extends Omit< ComponentProps< 'a' >,  'target' > {
 
 	/**
 	 * The visual treatment of the link.

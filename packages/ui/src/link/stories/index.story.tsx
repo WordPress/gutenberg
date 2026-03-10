@@ -15,8 +15,6 @@ export const Default: Story = {
 	args: {
 		children: 'Learn more',
 		href: '#',
-		tone: 'brand',
-		openInNewTab: false,
 	},
 };
 
