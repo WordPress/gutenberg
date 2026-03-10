@@ -144,6 +144,7 @@ Do not edit directly.
 | `--wpds-dimension-width-md`    | Medium width           |
 | `--wpds-dimension-width-lg`    | Large width            |
 | `--wpds-dimension-width-xl`    | Extra large width      |
+| `--wpds-dimension-width-2xl`   | 2x extra large width   |
 
 ### Elevation
 

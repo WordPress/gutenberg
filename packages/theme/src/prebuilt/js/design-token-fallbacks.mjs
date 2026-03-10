@@ -127,11 +127,12 @@ export default {
 	'--wpds-dimension-padding-sm': '8px',
 	'--wpds-dimension-padding-xl': '20px',
 	'--wpds-dimension-padding-xs': '4px',
-	'--wpds-dimension-width-lg': '720px',
-	'--wpds-dimension-width-md': '560px',
-	'--wpds-dimension-width-sm': '400px',
-	'--wpds-dimension-width-xl': '960px',
-	'--wpds-dimension-width-xs': '320px',
+	'--wpds-dimension-width-2xl': '960px',
+	'--wpds-dimension-width-lg': '560px',
+	'--wpds-dimension-width-md': '400px',
+	'--wpds-dimension-width-sm': '320px',
+	'--wpds-dimension-width-xl': '720px',
+	'--wpds-dimension-width-xs': '240px',
 	'--wpds-elevation-lg':
 		'0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012, 0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005',
 	'--wpds-elevation-md':

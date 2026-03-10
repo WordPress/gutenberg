@@ -122,6 +122,7 @@ export default [
 	'--wpds-dimension-width-md',
 	'--wpds-dimension-width-lg',
 	'--wpds-dimension-width-xl',
+	'--wpds-dimension-width-2xl',
 	'--wpds-elevation-xs',
 	'--wpds-elevation-sm',
 	'--wpds-elevation-md',
