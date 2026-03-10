@@ -700,8 +700,18 @@ button.wp-block-navigation-item__content {
 					display: none;
 				}
 
+				// Override justification dropdown menu positioning rules inside custom overlays.
+				// Mirrors the protection at lines 674-678 for default overlays, which does not
+				// apply here. Prevents .items-justified-right descendant rules from cascading
+				// right: 0 into the overlay and anchoring submenus off the left edge of the viewport.
+				// See: https://github.com/WordPress/gutenberg/issues/76276
 				.wp-block-navigation__overlay-container {
 					display: block;
+
+					.wp-block-navigation__submenu-container {
+						right: auto;
+						left: 0;
+					}
 				}
 			}
 		}
