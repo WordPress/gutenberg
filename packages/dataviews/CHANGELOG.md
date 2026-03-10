@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- DataForm: Reduce panel's dialog min-width. [#76345](https://github.com/WordPress/gutenberg/pull/76345)
+
 ### Bug Fixes
 
 - DataViews: Fix last column classname in table layout. [#76133](https://github.com/WordPress/gutenberg/pull/76133)
