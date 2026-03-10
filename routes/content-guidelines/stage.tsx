@@ -120,42 +120,50 @@ function ContentGuidelinesPage() {
 									const headingId = `content-guidelines-${ item.slug }-heading`;
 									const descriptionId = `content-guidelines-${ item.slug }-description`;
 
-								return (
-									<li
-										key={ item.slug }
-										className="content-guidelines__list-item"
-									>
-										<div className="content-guidelines__accordion-item">
-											<GuidelineAccordion
-												title={ item.title }
-												description={ item.description }
-												contentId={ contentId }
-												headingId={ headingId }
-												descriptionId={ descriptionId }
-											>
-												{ item.slug === 'blocks' ? (
-													<BlockGuidelines />
-												) : (
-													<GuidelineAccordionForm
-														slug={ item.slug }
-														contentId={ contentId }
-														headingId={ headingId }
-														descriptionId={
-															descriptionId
-														}
-													/>
-												) }
-											</GuidelineAccordion>
-										</div>
-									</li>
-								);
-							} ) }
-						</ul>
-						{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
-					</div>
-				)
-			) }
-		</Page>
+									return (
+										<li
+											key={ item.slug }
+											className="content-guidelines__list-item"
+										>
+											<div className="content-guidelines__accordion-item">
+												<GuidelineAccordion
+													title={ item.title }
+													description={
+														item.description
+													}
+													contentId={ contentId }
+													headingId={ headingId }
+													descriptionId={
+														descriptionId
+													}
+												>
+													{ item.slug === 'blocks' ? (
+														<BlockGuidelines />
+													) : (
+														<GuidelineAccordionForm
+															slug={ item.slug }
+															contentId={
+																contentId
+															}
+															headingId={
+																headingId
+															}
+															descriptionId={
+																descriptionId
+															}
+														/>
+													) }
+												</GuidelineAccordion>
+											</div>
+										</li>
+									);
+								} ) }
+							</ul>
+							{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+						</div>
+					)
+				) }
+			</Page>
 			<PluginArea scope="content-guidelines" />
 		</>
 	);
