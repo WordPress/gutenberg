@@ -116,44 +116,35 @@ export async function importContentGuidelines( file: File ): Promise< void > {
 	const { setGuideline, setBlockGuideline } = dispatch( STORE_NAME );
 	const { createSuccessNotice } = dispatch( noticesStore );
 
-	try {
-		const parsed: unknown = JSON.parse( await file.text() );
+	const parsed: unknown = JSON.parse( await file.text() );
 
-		if ( ! isValidGuidelinesImport( parsed ) ) {
-			throw new Error( __( 'Invalid file format.' ) );
+	if ( ! isValidGuidelinesImport( parsed ) ) {
+		throw new Error( __( 'Invalid file format.' ) );
+	}
+
+	const { guideline_categories: contentGuidelinesCategories } = parsed;
+
+	FLAT_CATEGORIES.forEach( ( guidelineCategory ) => {
+		const guidelines =
+			contentGuidelinesCategories[ guidelineCategory ]?.guidelines;
+		if ( typeof guidelines === 'string' ) {
+			setGuideline( guidelineCategory, guidelines );
 		}
+	} );
 
-		const { guideline_categories: contentGuidelinesCategories } = parsed;
-
-		FLAT_CATEGORIES.forEach( ( guidelineCategory ) => {
-			const guidelines =
-				contentGuidelinesCategories[ guidelineCategory ]?.guidelines;
-			if ( typeof guidelines === 'string' ) {
-				setGuideline( guidelineCategory, guidelines );
+	const blocksData = contentGuidelinesCategories.blocks;
+	if ( blocksData && typeof blocksData === 'object' ) {
+		Object.entries( blocksData ).forEach( ( [ blockName, blockData ] ) => {
+			if ( blockData && typeof blockData.guidelines === 'string' ) {
+				setBlockGuideline( blockName, blockData.guidelines );
 			}
 		} );
-
-		const blocksData = contentGuidelinesCategories.blocks;
-		if ( blocksData && typeof blocksData === 'object' ) {
-			Object.entries( blocksData ).forEach(
-				( [ blockName, blockData ] ) => {
-					if (
-						blockData &&
-						typeof blockData.guidelines === 'string'
-					) {
-						setBlockGuideline( blockName, blockData.guidelines );
-					}
-				}
-			);
-		}
-
-		await saveContentGuidelines();
-		createSuccessNotice( __( 'Content guidelines imported.' ), {
-			type: 'snackbar',
-		} );
-	} catch ( e: unknown ) {
-		throw e;
 	}
+
+	await saveContentGuidelines();
+	createSuccessNotice( __( 'Content guidelines imported.' ), {
+		type: 'snackbar',
+	} );
 }
 
 /**

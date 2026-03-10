@@ -55,12 +55,15 @@ export default function RevisionHistory() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	// @ts-ignore
 	const guidelinesId = useSelect(
-		// @ts-ignore
-		( select ) => select( STORE_NAME ).getId(),
+		( select ) =>
+			(
+				select( STORE_NAME ) as unknown as {
+					getId: () => number | null;
+				}
+			 ).getId(),
 		[]
-	) as number | null;
+	);
 
 	useEffect( () => {
 		if ( ! guidelinesId ) {
@@ -86,7 +89,7 @@ export default function RevisionHistory() {
 		}
 
 		loadRevisions();
-	}, [ guidelinesId, refetchKey ] );
+	}, [ guidelinesId, refetchKey, createErrorNotice ] );
 
 	const authorElements = useMemo( () => {
 		return [
@@ -148,13 +151,16 @@ export default function RevisionHistory() {
 		fields
 	);
 
-	const actions: Action< ContentGuidelinesRevision >[] = [
-		{
-			id: 'restore-revision',
-			label: __( 'Restore' ),
-			callback: ( items ) => setRevisionToRestore( items[ 0 ] ),
-		},
-	];
+	const actions = useMemo< Action< ContentGuidelinesRevision >[] >(
+		() => [
+			{
+				id: 'restore-revision',
+				label: __( 'Restore' ),
+				callback: ( items ) => setRevisionToRestore( items[ 0 ] ),
+			},
+		],
+		[ setRevisionToRestore ]
+	);
 
 	async function handleRestore() {
 		if ( ! guidelinesId || ! revisionToRestore ) {
@@ -194,7 +200,7 @@ export default function RevisionHistory() {
 			<Text
 				size={ 13 }
 				weight={ 400 }
-				color="var(--wp-components-color-gray-800)"
+				variant="muted"
 				className="content-guidelines__revision-description"
 			>
 				{ __( 'Use a previous version of your content guidelines.' ) }
