@@ -198,6 +198,12 @@ module.exports = {
 	},
 	overrides: [
 		{
+			files: [ 'routes/content-guidelines/**' ],
+			rules: {
+				'@wordpress/use-recommended-components': 'off',
+			},
+		},
+		{
 			files: [
 				'**/*.@(android|ios|native).js',
 				'packages/react-native-*/**/*.js',
