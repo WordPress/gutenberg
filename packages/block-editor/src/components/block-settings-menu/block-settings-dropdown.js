@@ -84,6 +84,7 @@ export function BlockSettingsDropdown( {
 	expandedState,
 	setInsertedBlock,
 	toggleProps,
+	popoverProps: callerPopoverProps,
 	...props
 } ) {
 	// Get the client id of the current block for this menu, if one is set.
@@ -265,10 +266,14 @@ export function BlockSettingsDropdown( {
 				const popoverProps = dropdownContentHidden
 					? {
 							...POPOVER_PROPS,
+							...callerPopoverProps,
 							style: { visibility: 'hidden' },
 							onFocusOutside() {},
 					  }
-					: POPOVER_PROPS;
+					: {
+							...POPOVER_PROPS,
+							...callerPopoverProps,
+					  };
 
 				return (
 					<DropdownMenu

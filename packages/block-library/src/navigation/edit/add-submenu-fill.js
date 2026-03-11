@@ -5,7 +5,7 @@ import { createBlock } from '@wordpress/blocks';
 import { addSubmenu } from '@wordpress/icons';
 import { MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback, useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockSettingsMenuControls,
@@ -116,24 +116,21 @@ function AddSubmenuItem( {
 export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	const anchorContextRef = useRef( null );
 	const dropdownOnCloseRef = useRef( null );
 	const setDropdownContentHiddenRef = useRef( null );
 	const menuItemRef = useRef( null );
 
 	// Called when the "Add submenu link" menu item is clicked.
-	// Hides the dropdown content (keeps it mounted) and stores
-	// the anchor context so NavigationLinkUI can position itself.
+	// Stores the anchor context and hides the dropdown content
+	// (keeps it mounted). The actual anchor element is resolved
+	// in the useEffect below, after React has flushed the DOM
+	// updates from replaceBlock.
 	const handleAddSubmenuLink = useCallback(
 		( { toggleElement, clientId, onClose, setDropdownContentHidden } ) => {
+			anchorContextRef.current = { toggleElement, clientId };
 			dropdownOnCloseRef.current = onClose;
 			setDropdownContentHiddenRef.current = setDropdownContentHidden;
-
-			const anchor =
-				toggleElement ??
-				document.querySelector(
-					`[data-block="${ clientId }"] .block-editor-list-view-block__menu`
-				);
-			setPopoverAnchor( anchor );
 
 			// Hide the dropdown popover but keep it mounted so the
 			// "Add submenu link" menu item remains focusable on cancel.
@@ -141,6 +138,22 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 		},
 		[]
 	);
+
+	// Resolve the popover anchor after React has flushed DOM updates.
+	// When the block was converted to a submenu, the new row only
+	// exists in the DOM after the list view re-renders, so we must
+	// wait until the useEffect fires (post-render) to query for it.
+	useEffect( () => {
+		if ( insertedBlock && anchorContextRef.current && ! popoverAnchor ) {
+			const { toggleElement, clientId } = anchorContextRef.current;
+			const anchor =
+				toggleElement ??
+				document.querySelector(
+					`[data-block="${ clientId }"] .block-editor-list-view-block__menu`
+				);
+			setPopoverAnchor( anchor );
+		}
+	}, [ insertedBlock, popoverAnchor ] );
 
 	// Called when the user selects a link in NavigationLinkUI.
 	// Closes the dropdown entirely and returns focus to the
