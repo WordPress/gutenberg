@@ -41,9 +41,10 @@ const withSiblingStyleSync = createHigherOrderComponent(
 
 			const registry = useRegistry();
 
-			const { __experimentalUpdateSyncedBlockAttributes } = unlock(
-				useDispatch( blockEditorStore )
-			);
+			const {
+				__experimentalUpdateSyncedBlockAttributes,
+				__experimentalUnlinkBlockStyleSync,
+			} = unlock( useDispatch( blockEditorStore ) );
 
 			const wrappedSetAttributes = useMemo( () => {
 				if ( ! syncSupport ) {
@@ -79,6 +80,26 @@ const withSiblingStyleSync = createHigherOrderComponent(
 				// Skip if the block already has its own synced styles (loaded from saved content or previously styled by the user).
 				const currentAttrs = storeSelect.getBlockAttributes( clientId );
 				if ( ! currentAttrs ) {
+					return;
+				}
+
+				// Restore unlink state from persisted attribute on page reload.
+				if ( currentAttrs.styleSyncUnlinked ) {
+					const privateSelect = unlock(
+						registry.select( blockEditorStore )
+					);
+					const scopeId =
+						privateSelect.__experimentalGetSiblingStyleSyncScopeClientId(
+							clientId,
+							name
+						);
+					if ( scopeId ) {
+						__experimentalUnlinkBlockStyleSync(
+							clientId,
+							name,
+							scopeId
+						);
+					}
 					return;
 				}
 				const { syncedAttributes: ownStyles } =
@@ -145,6 +166,7 @@ const withSiblingStyleSync = createHigherOrderComponent(
 					clientId,
 					syncedAttributes
 				);
+				// eslint-disable-next-line react-hooks/exhaustive-deps
 			}, [] );
 
 			return (
@@ -210,46 +232,4 @@ addFilter(
 	'editor.BlockEdit',
 	'core/sibling-style-sync/parent-control',
 	withSiblingStyleSyncParent
-);
-
-/**
- * Automatically adds the `syncChildStyles` attribute to blocks that act as a
- * sync scope, so they can store per-child-type sync on/off preferences without
- * requiring each scope block to manually declare the attribute in block.json.
- *
- * NOTE: `getBlockTypes()` is evaluated at block registration time. Blocks
- * registered after this filter runs will not be detected. For reliability
- * during development, scope blocks (e.g. core/accordion) can also declare
- * `syncChildStyles` explicitly in their block.json.
- *
- * @param {Object} settings Block type settings.
- * @param {string} name     Block name.
- * @return {Object} Possibly-modified settings.
- */
-function addSyncChildStylesAttribute( settings, name ) {
-	const isScope = getBlockTypes().some(
-		( type ) =>
-			type.supports?.__experimentalSiblingStyleSync?.scope === name
-	);
-
-	if ( ! isScope ) {
-		return settings;
-	}
-
-	return {
-		...settings,
-		attributes: {
-			...settings.attributes,
-			syncChildStyles: {
-				type: 'object',
-				default: {},
-			},
-		},
-	};
-}
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/sibling-style-sync/add-sync-child-styles-attribute',
-	addSyncChildStylesAttribute
 );
