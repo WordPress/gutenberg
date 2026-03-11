@@ -109,6 +109,7 @@ export const parameters = {
 					'Selection & Input',
 					'Typography',
 					'Utilities',
+					'Deprecated',
 				],
 				'Icons',
 				'Design System',
