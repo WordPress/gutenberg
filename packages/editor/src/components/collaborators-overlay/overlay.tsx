@@ -1,5 +1,6 @@
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
 import { useCallback, useEffect, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 import Avatar from '../collaborators-presence/avatar';
 import { AVATAR_IFRAME_STYLES } from './avatar-iframe-styles';
@@ -116,6 +117,7 @@ export function Overlay( {
 							size="small"
 							src={ cursor.avatarUrl }
 							name={ cursor.userName }
+							label={ cursor.isMe ? __( 'You' ) : undefined }
 							borderColor={ cursor.color }
 						/>
 					</div>
