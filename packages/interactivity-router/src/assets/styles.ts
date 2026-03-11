@@ -8,23 +8,19 @@ export type StyleElement = HTMLLinkElement | HTMLStyleElement;
 /**
  * Returns true when two style elements represent the same stylesheet resource.
  *
- * Strips `media` from both clones before comparing so that a sheet whose
- * `media` was mutated at runtime (e.g. "not all" → "all") and the same sheet
- * as returned by the server (still "not all") are treated as one node. Without
- * this, the SCS algorithm would insert a duplicate and applyStyles() would
- * disable the activated sheet on the next navigation.
+ * Media-agnostic matching is achieved via {@link normalizeMedia}: both the
+ * live activated element (media="all") and the server-returned element
+ * (media="not all") are normalised to "all" before the SCS comparison runs,
+ * so isEqualNode() sees identical forms and correctly recognises them as the
+ * same node. This avoids the need to strip media here and inadvertently
+ * collapsing semantically distinct sheets (e.g. media="print" vs "screen").
  *
  * @param a `<style>` or `<link>` element.
  * @param b `<style>` or `<link>` element.
  * @return Whether the two elements represent the same stylesheet resource.
  */
-const areNodesEqual = ( a: StyleElement, b: StyleElement ): boolean => {
-	const aClone = a.cloneNode( true ) as StyleElement;
-	const bClone = b.cloneNode( true ) as StyleElement;
-	aClone.removeAttribute( 'media' );
-	bClone.removeAttribute( 'media' );
-	return aClone.isEqualNode( bClone );
-};
+const areNodesEqual = ( a: StyleElement, b: StyleElement ): boolean =>
+	a.isEqualNode( b );
 
 /**
  * The set of style elements the router is allowed to disable.
