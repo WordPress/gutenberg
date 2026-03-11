@@ -1,7 +1,4 @@
-import {
-	Button,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import {
 	privateApis,
@@ -9,6 +6,8 @@ import {
 } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 
+import Avatar from './avatar';
+import AvatarGroup from './avatar-group';
 import { CollaboratorsList } from './list';
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
@@ -18,7 +17,6 @@ import './styles/collaborators-presence.scss';
 import { CollaboratorsOverlay } from '../collaborators-overlay';
 
 const { useActiveCollaborators } = unlock( privateApis );
-const { Avatar, AvatarGroup } = unlock( componentsPrivateApis );
 
 interface CollaboratorsPresenceProps {
 	postId: number | null;
@@ -74,7 +72,7 @@ export function CollaboratorsPresence( {
 						otherActiveCollaborators.length
 					) }
 				>
-					<AvatarGroup max={ 3 }>
+					<AvatarGroup max={ 4 }>
 						{ otherActiveCollaborators.map(
 							( collaboratorState ) => (
 								<Avatar
