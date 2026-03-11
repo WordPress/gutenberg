@@ -256,7 +256,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			};
 
 			expect( result.current( mockSelection ) ).toEqual( {
-				textIndex: null,
+				richTextOffset: null,
 				localClientId: null,
 			} );
 		} );
@@ -270,7 +270,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				},
 			};
 			mockAwareness.convertSelectionStateToAbsolute.mockReturnValue( {
-				textIndex: 10,
+				richTextOffset: 10,
 				localClientId: 'block-1',
 			} );
 
@@ -284,7 +284,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				mockAwareness.convertSelectionStateToAbsolute
 			).toHaveBeenCalledWith( mockSelection );
 			expect( position ).toEqual( {
-				textIndex: 10,
+				richTextOffset: 10,
 				localClientId: 'block-1',
 			} );
 		} );
