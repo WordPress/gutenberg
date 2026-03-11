@@ -2047,7 +2047,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			foreach ( $vars_by_selector as $rule_selector => $declarations ) {
-				$stylesheet .= WP_Style_Engine_Gutenberg::compile_css( $declarations, $selector );
+				$stylesheet .= WP_Style_Engine_Gutenberg::compile_css( $declarations, $rule_selector );
 			}
 		}
 

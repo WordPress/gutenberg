@@ -219,28 +219,35 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that non-string values are rejected without causing fatal errors.
+	 * Tests that non-string, non-numeric values are rejected without causing fatal errors,
+	 * while numeric values are accepted and cast to strings.
 	 *
 	 * @covers ::add_declaration
 	 */
-	public function test_should_reject_non_string_values() {
+	public function test_should_reject_non_string_non_numeric_values() {
 		$css_declarations = new WP_Style_Engine_CSS_Declarations_Gutenberg();
 
 		// Add valid string value first.
 		$css_declarations->add_declaration( 'color', 'red' );
 
-		// Try to add array value - should be silently rejected.
-		$css_declarations->add_declaration( 'padding-margin', array( 'top' => '10px' ) );
-
-		// Try to add other non-string values.
+		// Numeric values are valid CSS and should be accepted as strings.
 		$css_declarations->add_declaration( 'font-size', 123 );
+		$css_declarations->add_declaration( 'opacity', 0 );
+		$css_declarations->add_declaration( 'line-height', 1.5 );
+
+		// Arrays and null should be silently rejected to avoid fatal errors from malformed markup.
+		$css_declarations->add_declaration( 'padding', array( 'top' => '10px' ) );
 		$css_declarations->add_declaration( 'margin', null );
 
-		// Only the valid string value should be stored.
 		$this->assertSame(
-			array( 'color' => 'red' ),
+			array(
+				'color'       => 'red',
+				'font-size'   => '123',
+				'opacity'     => '0',
+				'line-height' => '1.5',
+			),
 			$css_declarations->get_declarations(),
-			'Non-string values should be rejected without causing errors.'
+			'Numeric values should be cast to strings; arrays and null should be rejected.'
 		);
 	}
 

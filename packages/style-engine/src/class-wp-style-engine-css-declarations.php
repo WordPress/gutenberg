@@ -50,8 +50,12 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 				return $this;
 			}
 
-			// Bail early if value is not a string. Prevents fatal errors from malformed block markup.
-			if ( ! is_string( $value ) ) {
+			// Bail early if value is not a string or number. Prevents fatal errors from malformed
+			// block markup passing arrays or objects (e.g. a nested spacing object).
+			// Numbers are cast to string so that valid CSS values like integer 0 are not dropped.
+			if ( is_numeric( $value ) ) {
+				$value = (string) $value;
+			} elseif ( ! is_string( $value ) ) {
 				return $this;
 			}
 			$value = trim( $value );
