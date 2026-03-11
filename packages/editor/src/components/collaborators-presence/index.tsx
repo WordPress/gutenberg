@@ -4,9 +4,7 @@ import {
 	privateApis,
 	type PostEditorAwarenessState,
 } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 import Avatar from './avatar';
 import AvatarGroup from './avatar-group';
@@ -42,22 +40,12 @@ export function CollaboratorsPresence( {
 		postType
 	) as PostEditorAwarenessState[];
 
-	const showOwnCursor = useSelect(
-		( select ) =>
-			select( preferencesStore ).get( 'core', 'showCollaborationCursor' ),
-		[]
-	);
-
 	const otherActiveCollaborators = activeCollaborators.filter(
 		( c ) => ! c.isMe
 	);
 
-	// When showing own cursor, include self in the list sorted first.
+	// Always include self in the list sorted first.
 	const collaboratorsForList = useMemo( () => {
-		if ( ! showOwnCursor ) {
-			return otherActiveCollaborators;
-		}
-
 		return [ ...activeCollaborators ].sort( ( a, b ) => {
 			if ( a.isMe && ! b.isMe ) {
 				return -1;
@@ -67,11 +55,7 @@ export function CollaboratorsPresence( {
 			}
 			return 0;
 		} );
-	}, [ showOwnCursor, activeCollaborators, otherActiveCollaborators ] );
-
-	const me = showOwnCursor
-		? activeCollaborators.find( ( c ) => c.isMe )
-		: undefined;
+	}, [ activeCollaborators ] );
 
 	const [ isPopoverVisible, setIsPopoverVisible ] = useState( false );
 	const [ popoverAnchor, setPopoverAnchor ] = useState< HTMLElement | null >(
@@ -84,6 +68,8 @@ export function CollaboratorsPresence( {
 	if ( otherActiveCollaborators.length === 0 ) {
 		return null;
 	}
+
+	const me = activeCollaborators.find( ( c ) => c.isMe );
 
 	return (
 		<>
