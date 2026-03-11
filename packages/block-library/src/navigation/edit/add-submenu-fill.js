@@ -166,26 +166,47 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 		if ( dropdownOnCloseRef.current ) {
 			dropdownOnCloseRef.current();
 		}
+		anchorContextRef.current = null;
 		dropdownOnCloseRef.current = null;
 		setDropdownContentHiddenRef.current = null;
 	}, [] );
 
 	// Called when the user presses Escape in NavigationLinkUI.
-	// Shows the dropdown again and focuses the "Add submenu link"
-	// menu item.
+	// If the block wasn't converted, shows the dropdown again and
+	// focuses the "Add submenu link" menu item. If the block was
+	// converted to a submenu, the original menu item no longer
+	// exists so we close the dropdown and focus the new block's
+	// Options button instead.
 	const handleCancel = useCallback( () => {
+		const anchor = popoverAnchor;
 		setPopoverAnchor( null );
-		if ( setDropdownContentHiddenRef.current ) {
-			setDropdownContentHiddenRef.current( false );
+
+		if ( menuItemRef.current ) {
+			// Non-conversion case: dropdown menu item still exists.
+			if ( setDropdownContentHiddenRef.current ) {
+				setDropdownContentHiddenRef.current( false );
+			}
+			window.setTimeout( () => {
+				menuItemRef.current?.focus();
+			}, 0 );
+		} else {
+			// Conversion case: block was replaced, close dropdown
+			// and focus the new block's Options button.
+			if ( setDropdownContentHiddenRef.current ) {
+				setDropdownContentHiddenRef.current( false );
+			}
+			if ( dropdownOnCloseRef.current ) {
+				dropdownOnCloseRef.current();
+			}
+			window.setTimeout( () => {
+				anchor?.focus();
+			}, 0 );
 		}
+
+		anchorContextRef.current = null;
 		dropdownOnCloseRef.current = null;
 		setDropdownContentHiddenRef.current = null;
-
-		// Defer focus to let the dropdown re-render as visible first.
-		window.setTimeout( () => {
-			menuItemRef.current?.focus();
-		}, 0 );
-	}, [] );
+	}, [ popoverAnchor ] );
 
 	return (
 		<>
