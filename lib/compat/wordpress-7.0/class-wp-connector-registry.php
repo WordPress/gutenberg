@@ -84,8 +84,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					__(
-						'Connector ID must contain only lowercase alphanumeric characters and underscores.',
-						'gutenberg'
+						'Connector ID must contain only lowercase alphanumeric characters and underscores.'
 					),
 					'7.0.0'
 				);
@@ -96,7 +95,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					/* translators: %s: Connector ID. */
-					sprintf( __( 'Connector "%s" is already registered.', 'gutenberg' ), esc_html( $id ) ),
+					sprintf( __( 'Connector "%s" is already registered.' ), esc_html( $id ) ),
 					'7.0.0'
 				);
 				return null;
@@ -107,7 +106,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					/* translators: %s: Connector ID. */
-					sprintf( __( 'Connector "%s" requires a non-empty "name" string.', 'gutenberg' ), esc_html( $id ) ),
+					sprintf( __( 'Connector "%s" requires a non-empty "name" string.' ), esc_html( $id ) ),
 					'7.0.0'
 				);
 				return null;
@@ -117,7 +116,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					/* translators: %s: Connector ID. */
-					sprintf( __( 'Connector "%s" requires a non-empty "type" string.', 'gutenberg' ), esc_html( $id ) ),
+					sprintf( __( 'Connector "%s" requires a non-empty "type" string.' ), esc_html( $id ) ),
 					'7.0.0'
 				);
 				return null;
@@ -127,7 +126,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					/* translators: %s: Connector ID. */
-					sprintf( __( 'Connector "%s" requires an "authentication" array.', 'gutenberg' ), esc_html( $id ) ),
+					sprintf( __( 'Connector "%s" requires an "authentication" array.' ), esc_html( $id ) ),
 					'7.0.0'
 				);
 				return null;
@@ -137,7 +136,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					/* translators: %s: Connector ID. */
-					sprintf( __( 'Connector "%s" authentication method must be "api_key" or "none".', 'gutenberg' ), esc_html( $id ) ),
+					sprintf( __( 'Connector "%s" authentication method must be "api_key" or "none".' ), esc_html( $id ) ),
 					'7.0.0'
 				);
 				return null;
@@ -180,7 +179,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					/* translators: %s: Connector ID. */
-					sprintf( __( 'Connector "%s" not found.', 'gutenberg' ), esc_html( $id ) ),
+					sprintf( __( 'Connector "%s" not found.' ), esc_html( $id ) ),
 					'7.0.0'
 				);
 				return null;
@@ -242,7 +241,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					/* translators: %s: Connector ID. */
-					sprintf( __( 'Connector "%s" not found.', 'gutenberg' ), esc_html( $id ) ),
+					sprintf( __( 'Connector "%s" not found.' ), esc_html( $id ) ),
 					'7.0.0'
 				);
 				return null;
@@ -273,7 +272,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 			if ( ! doing_action( 'init' ) ) {
 				_doing_it_wrong(
 					__METHOD__,
-					__( 'The connector registry instance must be set during the <code>init</code> action.', 'gutenberg' ),
+					__( 'The connector registry instance must be set during the <code>init</code> action.' ),
 					'7.0.0'
 				);
 				return;

@@ -34,5 +34,4 @@ function _gutenberg_connectors_add_settings_menu_item(): void {
 	);
 }
 
-require __DIR__ . '/class-wp-connector-registry.php';
 require __DIR__ . '/default-connectors.php';
