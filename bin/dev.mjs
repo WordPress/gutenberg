@@ -111,6 +111,45 @@ const readyMarkerFile = {
 };
 
 /**
+ * Track the git HEAD to detect branch switches.
+ * Stale TypeScript declaration files from a previous branch cause build
+ * errors, so we clean them automatically when the HEAD changes.
+ */
+const headTracker = {
+	markerPath: path.join( ROOT_DIR, '.dev-head' ),
+	getCurrentHead() {
+		try {
+			return fs
+				.readFileSync( path.join( ROOT_DIR, '.git', 'HEAD' ), 'utf8' )
+				.trim();
+		} catch {
+			return null;
+		}
+	},
+	hasChanged() {
+		const currentHead = this.getCurrentHead();
+		if ( ! currentHead ) {
+			return false;
+		}
+		try {
+			const previousHead = fs
+				.readFileSync( this.markerPath, 'utf8' )
+				.trim();
+			return currentHead !== previousHead;
+		} catch {
+			// No marker file means first run — no need to clean.
+			return false;
+		}
+	},
+	save() {
+		const currentHead = this.getCurrentHead();
+		if ( currentHead ) {
+			fs.writeFileSync( this.markerPath, currentHead );
+		}
+	},
+};
+
+/**
  * Main dev orchestration function.
  */
 async function dev() {
@@ -125,6 +164,17 @@ async function dev() {
 		// Step 1: Clean packages
 		console.log( '🧹 Cleaning packages...' );
 		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );
+
+		// Step 1.5: Clean TypeScript types if git HEAD changed (e.g. branch switch).
+		// Stale build-types from a previous branch cause compilation errors.
+		if ( headTracker.hasChanged() ) {
+			console.log(
+				'\n🔄 Branch change detected — cleaning TypeScript types...'
+			);
+			await exec( 'npm', [ 'run', 'clean:package-types' ], {
+				silent: true,
+			} );
+		}
 
 		// Step 2: Build workspaces
 		console.log( '\n📦 Building workspaces...' );
@@ -156,6 +206,9 @@ async function dev() {
 			throw new Error( 'TypeScript compilation failed' );
 		} );
 
+		// Save current HEAD so next run can detect branch switches.
+		headTracker.save();
+
 		// Step 5: Check build type declaration files
 		console.log( '\n✅ Checking type declaration files...' );
 		await exec( 'node', [
@@ -179,7 +232,7 @@ async function dev() {
 		console.log( '   - Package builder watching for source changes\n' );
 
 		// Start TypeScript watch
-		const tscWatch = execAsync( 'tsc', [
+		let tscWatch = execAsync( 'tsc', [
 			'--build',
 			'--watch',
 			'--preserveWatchOutput',
@@ -195,9 +248,55 @@ async function dev() {
 			env: { ...process.env, NODE_ENV: 'development' },
 		} );
 
+		// Watch for branch switches while dev mode is running.
+		// When the branch changes, stale build-types cause tsc errors,
+		// so we kill tsc, clean types, rebuild, and restart.
+		const gitHeadPath = path.join( ROOT_DIR, '.git', 'HEAD' );
+		let lastHead = headTracker.getCurrentHead();
+		let isRebuilding = false;
+
+		fs.watchFile( gitHeadPath, { interval: 2000 }, async () => {
+			const newHead = headTracker.getCurrentHead();
+			if ( newHead === lastHead || isRebuilding ) {
+				return;
+			}
+			lastHead = newHead;
+			isRebuilding = true;
+
+			console.log(
+				'\n\n🔄 Branch switch detected — rebuilding TypeScript types...\n'
+			);
+
+			tscWatch.kill();
+
+			try {
+				await exec( 'npm', [ 'run', 'clean:package-types' ], {
+					silent: true,
+				} );
+				await exec( 'tsc', [ '--build' ] );
+				headTracker.save();
+				console.log(
+					'\n✅ TypeScript types rebuilt for new branch.\n'
+				);
+			} catch {
+				console.error(
+					'\n❌ TypeScript rebuild failed after branch switch.' +
+						' Try restarting: npm start\n'
+				);
+			}
+
+			tscWatch = execAsync( 'tsc', [
+				'--build',
+				'--watch',
+				'--preserveWatchOutput',
+			] );
+			isRebuilding = false;
+		} );
+
 		// Handle process termination
 		const cleanup = () => {
 			console.log( '\n\n👋 Stopping watch mode...' );
+			fs.unwatchFile( gitHeadPath );
 			tscWatch.kill();
 			buildWatch.kill();
 			readyMarkerFile.cleanup();
