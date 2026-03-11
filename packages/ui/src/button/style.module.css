@@ -50,6 +50,7 @@
 		line-height: var(--wpds-font-line-height-sm);
 		text-decoration: none;
 		color: var(--wp-ui-button-foreground-color);
+		cursor: var(--wpds-cursor-control);
 
 		@media not ( prefers-reduced-motion ) {
 			transition: color 0.1s ease-out;
