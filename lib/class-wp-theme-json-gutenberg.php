@@ -3076,11 +3076,29 @@ class WP_Theme_JSON_Gutenberg {
 				if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $name ] ) ) {
 					foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $name ] as $pseudo_selector ) {
 						if ( isset( $theme_json['styles']['blocks'][ $name ][ $pseudo_selector ] ) ) {
+							/*
+							 * Append the pseudo-selector to each feature selector so that
+							 * get_feature_declarations_for_node generates CSS scoped to the
+							 * pseudo-state (e.g. '.wp-block-button:hover') rather than the
+							 * default state (e.g. '.wp-block-button').
+							 */
+							$pseudo_feature_selectors = array();
+							foreach ( $feature_selectors ?? array() as $feature => $feature_selector ) {
+								if ( is_array( $feature_selector ) ) {
+									$pseudo_feature_selectors[ $feature ] = array();
+									foreach ( $feature_selector as $subfeature => $subfeature_selector ) {
+										$pseudo_feature_selectors[ $feature ][ $subfeature ] = static::append_to_selector( $subfeature_selector, $pseudo_selector );
+									}
+								} else {
+									$pseudo_feature_selectors[ $feature ] = static::append_to_selector( $feature_selector, $pseudo_selector );
+								}
+							}
+
 							$nodes[] = array(
 								'name'       => $name,
 								'path'       => array( 'styles', 'blocks', $name, $pseudo_selector ),
 								'selector'   => static::append_to_selector( $selector, $pseudo_selector ),
-								'selectors'  => $feature_selectors,
+								'selectors'  => $pseudo_feature_selectors,
 								'duotone'    => $duotone_selector,
 								'variations' => $variation_selectors,
 								'css'        => static::append_to_selector( $selector, $pseudo_selector ),
@@ -3310,6 +3328,11 @@ class WP_Theme_JSON_Gutenberg {
 		) {
 			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json, $selector, $use_root_padding );
 		} else {
+			/*
+			 * For block pseudo-selector nodes (e.g. ':hover'), $node has already had any
+			 * feature-selector properties (e.g. writingMode) removed by get_feature_declarations_for_node,
+			 * so those properties are not output twice.
+			 */
 			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_padding );
 		}
 

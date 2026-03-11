@@ -1395,6 +1395,38 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
+	/**
+	 * Tests that when a block with a custom feature selector (e.g. core/button's writingMode
+	 * uses '.wp-block-button' rather than the root '.wp-block-button .wp-block-button__link')
+	 * has pseudo-state styles, the feature selector CSS is scoped to the pseudo-state and not
+	 * output under the block's default-state selector.
+	 */
+	public function test_get_stylesheet_pseudo_selector_scopes_feature_selector_css() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/button' => array(
+							':hover' => array(
+								'typography' => array(
+									'writingMode' => 'vertical-rl',
+								),
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		// writing-mode should be scoped to :hover, not the root block selector.
+		$this->assertStringContainsString( '.wp-block-button:hover', $css );
+		$this->assertSameCSS( ':root :where(.wp-block-button:hover){writing-mode: vertical-rl;}', $css );
+	}
+
 	public function test_get_stylesheet_custom_root_selector() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

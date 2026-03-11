@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { usePrevious } from '@wordpress/compose';
 import { useEffect, useState } from '@wordpress/element';
 import type { Y } from '@wordpress/sync';
 
@@ -167,7 +168,7 @@ export function useIsDisconnected(
  * @param postId   The ID of the post.
  * @param postType The type of the post.
  */
-export function useLastPostSave(
+function useLastPostSave(
 	postId: number | null,
 	postType: string | null
 ): PostSaveEvent | null {
@@ -225,4 +226,160 @@ export function useLastPostSave(
 	}, [ postId, postType ] );
 
 	return lastSave;
+}
+
+/**
+ * Hook that fires a callback when a new collaborator joins the post.
+ * Handles initial hydration and state diffing internally—consumers
+ * only receive "join" events for collaborators that appear after the
+ * initial state has loaded.
+ *
+ * The callback receives the joining collaborator and, when available,
+ * the current user's state (useful for comparing `enteredAt` timestamps).
+ *
+ * @param postId   The ID of the post.
+ * @param postType The type of the post.
+ * @param callback Invoked for each collaborator that joins.
+ */
+export function useOnCollaboratorJoin(
+	postId: number | null,
+	postType: string | null,
+	callback: (
+		collaborator: ActiveCollaborator,
+		me?: ActiveCollaborator
+	) => void
+): void {
+	const { activeCollaborators } = usePostEditorAwarenessState(
+		postId,
+		postType
+	);
+	const prevCollaborators = usePrevious( activeCollaborators );
+
+	useEffect( () => {
+		/*
+		 * On first render usePrevious returns undefined. On subsequent
+		 * renders the list may still be empty while the store hydrates.
+		 * In both cases, skip to avoid spurious "joined" callbacks for
+		 * users already present.
+		 */
+		if ( ! prevCollaborators || prevCollaborators.length === 0 ) {
+			return;
+		}
+
+		const prevMap = new Map< number, ActiveCollaborator >(
+			prevCollaborators.map( ( collaborator ) => [
+				collaborator.clientId,
+				collaborator,
+			] )
+		);
+		const me = activeCollaborators.find(
+			( collaborator ) => collaborator.isMe
+		);
+
+		for ( const collaborator of activeCollaborators ) {
+			if (
+				! prevMap.has( collaborator.clientId ) &&
+				! collaborator.isMe
+			) {
+				callback( collaborator, me );
+			}
+		}
+	}, [ activeCollaborators, prevCollaborators, callback ] );
+}
+
+/**
+ * Hook that fires a callback when a collaborator leaves the post.
+ * A "leave" is detected when a previously-connected collaborator either
+ * transitions to `isConnected = false` or disappears from the list
+ * entirely while still connected. Already-disconnected collaborators
+ * that are later removed from the list are silently ignored.
+ *
+ * @param postId   The ID of the post.
+ * @param postType The type of the post.
+ * @param callback Invoked for each collaborator that leaves.
+ */
+export function useOnCollaboratorLeave(
+	postId: number | null,
+	postType: string | null,
+	callback: ( collaborator: ActiveCollaborator ) => void
+): void {
+	const { activeCollaborators } = usePostEditorAwarenessState(
+		postId,
+		postType
+	);
+	const prevCollaborators = usePrevious( activeCollaborators );
+
+	useEffect( () => {
+		if ( ! prevCollaborators || prevCollaborators.length === 0 ) {
+			return;
+		}
+
+		const newMap = new Map< number, ActiveCollaborator >(
+			activeCollaborators.map( ( collaborator ) => [
+				collaborator.clientId,
+				collaborator,
+			] )
+		);
+
+		for ( const prevCollab of prevCollaborators ) {
+			if ( prevCollab.isMe || ! prevCollab.isConnected ) {
+				continue;
+			}
+
+			const newCollab = newMap.get( prevCollab.clientId );
+			if ( ! newCollab?.isConnected ) {
+				callback( prevCollab );
+			}
+		}
+	}, [ activeCollaborators, prevCollaborators, callback ] );
+}
+
+/**
+ * Hook that fires a callback when a remote collaborator saves the post.
+ * Only fires for saves by other collaborators (not the current user).
+ * Deduplicates by `savedAt` timestamp so the same save event is never
+ * reported twice.
+ *
+ * @param postId   The ID of the post.
+ * @param postType The type of the post.
+ * @param callback Invoked with the save event, the collaborator who saved,
+ *                 and the previous save event (if any) for transition detection.
+ */
+export function useOnPostSave(
+	postId: number | null,
+	postType: string | null,
+	callback: (
+		event: PostSaveEvent,
+		saver: ActiveCollaborator,
+		prevEvent: PostSaveEvent | null
+	) => void
+): void {
+	const { activeCollaborators } = usePostEditorAwarenessState(
+		postId,
+		postType
+	);
+	const lastPostSave = useLastPostSave( postId, postType );
+	const prevPostSave = usePrevious( lastPostSave );
+
+	useEffect( () => {
+		if ( ! lastPostSave ) {
+			return;
+		}
+
+		if ( prevPostSave && lastPostSave.savedAt === prevPostSave.savedAt ) {
+			return;
+		}
+
+		const saver = activeCollaborators.find(
+			( collaborator ) =>
+				collaborator.clientId === lastPostSave.savedByClientId &&
+				! collaborator.isMe
+		);
+
+		if ( ! saver ) {
+			return;
+		}
+
+		callback( lastPostSave, saver, prevPostSave ?? null );
+	}, [ lastPostSave, prevPostSave, activeCollaborators, callback ] );
 }

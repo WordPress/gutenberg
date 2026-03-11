@@ -1,5 +1,23 @@
 == Changelog ==
 
+= 22.7.0-rc.3 =
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Editor
+- Content Guidelines: Add block guidelines management ([76187](https://github.com/WordPress/gutenberg/pull/76187))
+- Content Guidelines: Add UX for site, copy, image, and additional guidelines ([75420](https://github.com/WordPress/gutenberg/pull/75420))
+- Guidelines: Add actions for Import, Export and Revisions of guidelines ([76155](https://github.com/WordPress/gutenberg/pull/76155))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@aswasif007 @iamchughmayank
+
+
 = 22.7.0-rc.2 =
 
 

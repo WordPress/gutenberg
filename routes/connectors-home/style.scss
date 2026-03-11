@@ -19,6 +19,16 @@
 		font-family: monospace;
 	}
 
+	&--empty {
+		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 32px;
+		text-align: center;
+	}
+
 	> p {
 		text-align: center;
 		color: $gray-600;
