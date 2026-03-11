@@ -77,6 +77,10 @@
 		},
 		"levelOptions": {
 			"type": "array"
+		},
+		"syncChildStyles": {
+			"type": "object",
+			"default": {}
 		}
 	},
 	"providesContext": {
