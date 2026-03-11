@@ -22,6 +22,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	{
 		align = 'center',
 		alignOffset,
+		animated = true,
 		children,
 		className,
 		collisionAvoidance,
@@ -55,8 +56,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 			style={ style }
 			className={ clsx(
 				resetStyles[ 'box-sizing' ],
-				variant !== 'unstyled' &&
-					dropdownMotionStyles[ 'dropdown-motion' ],
 				styles.positioner,
 				className
 			) }
@@ -66,7 +65,12 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 					ref={ ref }
 					initialFocus={ initialFocus }
 					finalFocus={ finalFocus }
-					className={ clsx( variant !== 'unstyled' && styles.popup ) }
+					className={ clsx(
+						variant !== 'unstyled' && styles.popup,
+						animated &&
+							variant !== 'unstyled' &&
+							dropdownMotionStyles[ 'dropdown-motion' ]
+					) }
 					{ ...props }
 				>
 					{ children }

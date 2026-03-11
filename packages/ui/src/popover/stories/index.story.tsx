@@ -274,20 +274,11 @@ export const Unstyled: Story = {
 			<>
 				<Popover.Trigger>Open Unstyled</Popover.Trigger>
 				<Popover.Popup variant="unstyled">
-					<div
-						style={ {
-							padding: 16,
-							background: 'lightyellow',
-							border: '2px dashed orange',
-							borderRadius: 8,
-						} }
-					>
-						<Popover.Title>Custom Styled</Popover.Title>
-						<Popover.Description>
-							This popup has no default styling — the consumer
-							controls all visual appearance.
-						</Popover.Description>
-					</div>
+					<Popover.Title>Custom Styled</Popover.Title>
+					<Popover.Description>
+						This popup has no default styling — the consumer
+						controls all visual appearance.
+					</Popover.Description>
 				</Popover.Popup>
 			</>
 		),
@@ -381,39 +372,24 @@ export const OverlayPlacement: Story = {
 };
 
 /**
- * Base UI exposes a `data-instant` attribute on the popup that can be used
- * in CSS to disable animations. Adding the following rule to your
- * stylesheet will skip all transitions:
- *
- * ```css
- * [data-instant] { transition: none !important; }
- * ```
- *
- * In this example, we add the rule via a `<style>` tag scoped to the story
- * wrapper. The popover opens and closes without any transition.
+ * Set `animated` to `false` on `Popover.Popup` to disable the open/close
+ * transition. The popover will appear and disappear instantly.
  */
 export const DisabledAnimations: Story = {
-	render: () => (
-		<div className="no-popover-animation">
-			<style>{ `
-				.no-popover-animation [data-instant] {
-					transition: none !important;
-				}
-			` }</style>
-			<Popover.Root>
+	args: {
+		children: (
+			<>
 				<Popover.Trigger>No Animation</Popover.Trigger>
-				<Popover.Popup>
+				<Popover.Popup animated={ false }>
 					<Popover.Arrow />
 					<Popover.Title>Instant</Popover.Title>
 					<Popover.Description>
-						This popover opens and closes without animation. The
-						`data-instant` attribute on the positioner is targeted
-						by a CSS rule that disables transitions.
+						This popover opens and closes without animation.
 					</Popover.Description>
 				</Popover.Popup>
-			</Popover.Root>
-		</div>
-	),
+			</>
+		),
+	},
 };
 
 /**
@@ -493,7 +469,7 @@ export const CollisionAvoidance: Story = {
 					</Popover.Popup>
 				</Popover.Root>
 			</div>
-			<div style={ { height: 400 } } />
+			<div style={ { height: 600 } } />
 		</div>
 	),
 };

@@ -35,6 +35,13 @@ export interface PopupProps
 		>,
 		Pick< _Popover.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
+	 * Whether the popup uses open/close animations.
+	 *
+	 * @default true
+	 */
+	animated?: boolean;
+
+	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
