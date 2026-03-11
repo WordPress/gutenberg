@@ -7,6 +7,7 @@ import {
 	Button,
 	Notice,
 	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
@@ -23,6 +24,7 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
+import RemoveGuidelineConfirmation from './remove-guideline-confirmation';
 import { STORE_NAME } from '../store';
 import { saveContentGuidelines } from '../api';
 import type { GuidelineAccordionFormProps } from '../types';
@@ -38,6 +40,8 @@ export default function GuidelineAccordionForm( {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const [ loading, setLoading ] = useState( false );
 	const [ error, setError ] = useState< string | null >( null );
+	const [ showClearConfirmation, setShowClearConfirmation ] =
+		useState( false );
 
 	const { value } = useSelect(
 		( select ) => ( {
@@ -91,6 +95,24 @@ export default function GuidelineAccordionForm( {
 			.finally( () => setLoading( false ) );
 	};
 
+	const handleClearClick = () => setShowClearConfirmation( true );
+
+	const handleClearConfirm = () => {
+		setGuideline( slug, '' );
+		setDraft( '' );
+		setLoading( true );
+		saveContentGuidelines()
+			.then( () => {
+				setError( null );
+				setShowClearConfirmation( false );
+				createSuccessNotice( __( 'Guidelines cleared.' ), {
+					type: 'snackbar',
+				} );
+			} )
+			.catch( ( e: Error ) => setError( e.message ) )
+			.finally( () => setLoading( false ) );
+	};
+
 	return (
 		<form
 			id={ contentId }
@@ -117,17 +139,51 @@ export default function GuidelineAccordionForm( {
 						) }
 					</Notice>
 				) }
-				<Button
-					variant="primary"
-					type="submit"
-					className="save-button"
-					disabled={ loading }
-					accessibleWhenDisabled
-					isBusy={ loading }
-				>
-					{ __( 'Save guidelines' ) }
-				</Button>
+				<HStack spacing={ 4 } alignment="left">
+					<Button
+						variant="primary"
+						type="submit"
+						className="save-button"
+						disabled={ loading || ! draft }
+						accessibleWhenDisabled
+						isBusy={ loading }
+					>
+						{ __( 'Save guidelines' ) }
+					</Button>
+					<Button
+						variant="tertiary"
+						type="button"
+						disabled={ loading || ! value }
+						accessibleWhenDisabled
+						isBusy={ loading }
+						onClick={ handleClearClick }
+					>
+						{ __( 'Clear guidelines' ) }
+					</Button>
+				</HStack>
 			</VStack>
+			{ showClearConfirmation && (
+				<RemoveGuidelineConfirmation
+					title={ sprintf(
+						/* translators: %s: Guideline category. */
+						__( 'Clear %s guidelines' ),
+						slug
+					) }
+					onClose={ () => setShowClearConfirmation( false ) }
+					onConfirm={ handleClearConfirm }
+					isBusy={ loading }
+					actionLabel={ __( 'Clear guidelines' ) }
+				>
+					{ sprintf(
+						/* translators: %s: Guideline category slug. */
+						__( 'You are about to clear the %s guidelines.' ),
+						slug
+					) }
+					<br />
+					<br />
+					{ __( 'This can be undone from revision history.' ) }
+				</RemoveGuidelineConfirmation>
+			) }
 		</form>
 	);
 }
