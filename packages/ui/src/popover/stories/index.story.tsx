@@ -1,13 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
-	createContext,
 	createPortal,
-	useContext,
 	useId,
 	useLayoutEffect,
 	useRef,
 	useState,
 } from '@wordpress/element';
+import { SlotFillProvider, Slot } from '@wordpress/components';
 import type { RefCallback } from 'react';
 import { Popover } from '../..';
 
@@ -583,44 +582,26 @@ export const CrossIframe: Story = {
 };
 
 /**
- * Minimal SlotFill implementation using React context. The `Slot` renders a
- * target `div` and shares its ref via context so that any descendant `Fill`
- * can read it and pass it to `Popover.Popup`'s `container` prop.
- */
-const PopoverSlotContext =
-	createContext< React.RefObject< HTMLElement > | null >( null );
-
-function PopoverSlotProvider( { children }: { children: React.ReactNode } ) {
-	const slotRef = useRef< HTMLDivElement >( null );
-
-	return (
-		<PopoverSlotContext.Provider
-			value={ slotRef as React.RefObject< HTMLElement > }
-		>
-			<div ref={ slotRef } />
-			{ children }
-		</PopoverSlotContext.Provider>
-	);
-}
-
-function usePopoverSlot() {
-	return useContext( PopoverSlotContext );
-}
-
-/**
- * Same cross-iframe scenario, but wired through a minimal SlotFill context
- * instead of manually passing a container ref.
+ * Same cross-iframe scenario, but using `SlotFillProvider` and `Slot` from
+ * `@wordpress/components` as the render target.
  *
- * `PopoverSlotProvider` renders a slot `div` in the parent document and
- * shares its ref via context. Inside the iframe, the popover reads it
- * with `usePopoverSlot()` and passes it to the `container` prop — no
- * manual ref plumbing needed.
+ * The `Slot` renders a `div` in the parent document, and its forwarded ref
+ * is passed to `Popover.Popup`'s `container` prop so the popup portals into
+ * the slot element. This mirrors the legacy Popover's `WithSlotOutsideIframe`
+ * pattern.
  */
 export const CrossIframeWithSlotFill: Story = {
 	name: 'Cross-Iframe (SlotFill)',
 	render: function Render() {
+		const slotRef = useRef< HTMLDivElement >( null );
+
 		return (
-			<PopoverSlotProvider>
+			<SlotFillProvider>
+				<Slot
+					name="popover-container"
+					bubblesVirtually
+					ref={ slotRef }
+				/>
 				<GenericIframe
 					style={ {
 						width: '100%',
@@ -642,39 +623,38 @@ export const CrossIframeWithSlotFill: Story = {
 								marginInline: 'auto',
 							} }
 						>
-							<SlotFillPopover />
+							<Popover.Root defaultOpen>
+								<Popover.Trigger
+									style={ {
+										padding: 8,
+										background: 'salmon',
+									} }
+								>
+									Popover&apos;s anchor (inside iframe)
+								</Popover.Trigger>
+								<Popover.Popup
+									container={
+										slotRef as React.RefObject< HTMLElement >
+									}
+								>
+									<Popover.Arrow />
+									<Popover.Title>
+										Cross-Iframe (SlotFill)
+									</Popover.Title>
+									<Popover.Description>
+										This popup renders in the parent
+										document via a `Slot` from
+										`@wordpress/components`.
+									</Popover.Description>
+								</Popover.Popup>
+							</Popover.Root>
 						</div>
 					</div>
 				</GenericIframe>
-			</PopoverSlotProvider>
+			</SlotFillProvider>
 		);
 	},
 };
-
-function SlotFillPopover() {
-	const slot = usePopoverSlot();
-
-	return (
-		<Popover.Root defaultOpen>
-			<Popover.Trigger
-				style={ {
-					padding: 8,
-					background: 'salmon',
-				} }
-			>
-				Popover&apos;s anchor (inside iframe)
-			</Popover.Trigger>
-			<Popover.Popup container={ slot }>
-				<Popover.Arrow />
-				<Popover.Title>Cross-Iframe (SlotFill)</Popover.Title>
-				<Popover.Description>
-					This popup renders in the parent document via a SlotFill
-					context — no manual ref wiring required.
-				</Popover.Description>
-			</Popover.Popup>
-		</Popover.Root>
-	);
-}
 
 /**
  * The `--wp-ui-popover-z-index` CSS variable controls the z-index of the
