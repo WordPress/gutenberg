@@ -122,9 +122,9 @@ export function useBlockHighlighting(
 
 				return {
 					blockId: localClientId,
-					color: getAvatarBorderColor(
-						userState.collaboratorInfo.id
-					),
+					color: userState.isMe
+						? 'var(--wp-admin-theme-color)'
+						: getAvatarBorderColor( userState.collaboratorInfo.id ),
 					userName: userState.collaboratorInfo.name,
 					avatarUrl: getAvatarUrl(
 						userState.collaboratorInfo.avatar_urls
