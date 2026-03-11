@@ -46,52 +46,55 @@ export const Default: Story = {
 };
 
 /**
- * Use the `side` and `align` props on `Popover.Popup` to control where the
- * popover appears relative to the trigger element.
+ * All combinations of `side` and `align` props on `Popover.Popup`.
+ *
+ * Each row shows a side (`top`, `right`, `bottom`, `left`), and each column
+ * shows an alignment (`start`, `center`, `end`).
  */
 export const Positioning: Story = {
-	render: () => (
-		<div
-			style={ {
-				display: 'flex',
-				gap: '2rem',
-				padding: '4rem',
-				justifyContent: 'center',
-			} }
-		>
-			<Popover.Root>
-				<Popover.Trigger>Top</Popover.Trigger>
-				<Popover.Popup side="top">
-					<Popover.Arrow />
-					<Popover.Description>Popover on top</Popover.Description>
-				</Popover.Popup>
-			</Popover.Root>
+	render: function Render() {
+		const sides = [ 'top', 'right', 'bottom', 'left' ] as const;
+		const aligns = [ 'start', 'center', 'end' ] as const;
 
-			<Popover.Root>
-				<Popover.Trigger>Right</Popover.Trigger>
-				<Popover.Popup side="right">
-					<Popover.Arrow />
-					<Popover.Description>Popover on right</Popover.Description>
-				</Popover.Popup>
-			</Popover.Root>
-
-			<Popover.Root>
-				<Popover.Trigger>Bottom</Popover.Trigger>
-				<Popover.Popup side="bottom">
-					<Popover.Arrow />
-					<Popover.Description>Popover on bottom</Popover.Description>
-				</Popover.Popup>
-			</Popover.Root>
-
-			<Popover.Root>
-				<Popover.Trigger>Left</Popover.Trigger>
-				<Popover.Popup side="left">
-					<Popover.Arrow />
-					<Popover.Description>Popover on left</Popover.Description>
-				</Popover.Popup>
-			</Popover.Root>
-		</div>
-	),
+		return (
+			<div
+				style={ {
+					display: 'grid',
+					gridTemplateColumns: 'repeat(3, 1fr)',
+					gap: '6rem',
+					padding: '6rem 4rem',
+					justifyItems: 'center',
+				} }
+			>
+				{ sides.flatMap( ( side ) =>
+					aligns.map( ( align ) => (
+						<Popover.Root
+							key={ `${ side }-${ align }` }
+							defaultOpen
+						>
+							<Popover.Trigger>
+								{ side } / { align }
+							</Popover.Trigger>
+							<Popover.Popup
+								side={ side }
+								align={ align }
+								animated={ false }
+								collisionAvoidance={ {
+									side: 'none',
+									align: 'none',
+								} }
+							>
+								<Popover.Arrow />
+								<Popover.Description>
+									{ side } / { align }
+								</Popover.Description>
+							</Popover.Popup>
+						</Popover.Root>
+					) )
+				) }
+			</div>
+		);
+	},
 };
 
 /**
