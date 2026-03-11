@@ -142,10 +142,6 @@ export default function filterSortAndPaginate< Item >(
 		view.startPosition !== undefined &&
 		view.endPosition !== undefined
 	) {
-		totalItems = filteredData?.length || 0;
-		totalPages = Math.ceil(
-			totalItems / ( view.perPage || totalItems || 1 )
-		);
 		// Convert 1-indexed positions to 0-indexed array indices
 		const start = view.startPosition - 1;
 		const end = view.endPosition;

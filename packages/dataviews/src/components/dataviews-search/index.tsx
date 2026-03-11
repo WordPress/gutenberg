@@ -36,6 +36,7 @@ const DataViewsSearch = memo( function Search( { label }: SearchProps ) {
 			onChangeViewRef.current( {
 				...viewRef.current,
 				page: 1,
+				startPosition: 1,
 				search: debouncedSearch,
 			} );
 		}
