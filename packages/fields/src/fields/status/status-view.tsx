@@ -16,7 +16,7 @@ function StatusView( { item }: { item: BasePost } ) {
 	return (
 		<HStack alignment="left" spacing={ 0 }>
 			{ icon && (
-				<div className="edit-site-post-list__status-icon">
+				<div className="fields-controls__status-icon">
 					<Icon icon={ icon } />
 				</div>
 			) }

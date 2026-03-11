@@ -127,6 +127,7 @@
 	display: flex;
 	align-items: center;
 	overflow: hidden;
+	word-break: break-word;
 	font-weight: var(--wpds-font-weight-medium);
 
 	> * {
@@ -151,7 +152,7 @@
 }
 
 .dataforms-layouts-panel__field-dropdown .components-popover__content {
-	min-width: 320px;
+	min-width: 256px;
 	padding: $grid-unit-20;
 }
 

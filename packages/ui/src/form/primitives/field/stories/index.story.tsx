@@ -101,6 +101,23 @@ export const UsingAriaLabelledby: StoryObj< typeof Field.Root > = {
 };
 
 /**
+ * When `hideFromVision` is set on `Field.Label`, the label is visually
+ * hidden but remains accessible to screen readers.
+ */
+export const HiddenLabel: StoryObj< typeof Field.Root > = {
+	args: {
+		children: (
+			<>
+				<Field.Label hideFromVision>Label</Field.Label>
+				<Field.Control
+					render={ <input type="text" placeholder="Placeholder" /> }
+				/>
+			</>
+		),
+	},
+};
+
+/**
  * To add rich content (such as links) to the description, use `Field.Details`.
  *
  * Although this content is not associated with the field using direct semantics,

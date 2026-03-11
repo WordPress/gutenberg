@@ -240,7 +240,7 @@ Properties:
 
 | Props / Layout | `table` | `pickerTable` | `grid` | `pickerGrid` | `list` | `activity` |
 | -------------- | ------- | ------------- | ------ | ------------ | ------ | ---------- |
-| `density`      | ✓       | ✓             |        |              | ✓      | ✓          |
+| `density`      | ✓       | ✓             | ✓      | ✓            | ✓      | ✓          |
 | `enableMoving` | ✓       | ✓             |        |              |        |            |
 | `styles`       | ✓       | ✓             |        |              |        |            |
 | `badgeFields`  |         |               | ✓      | ✓            |        |            |
@@ -258,6 +258,7 @@ Right-align (`'end'`) whenever the cell value is fundamentally quantitative—nu
 `grid` and `pickerGrid` layout:
 
 -   `badgeFields`: a list of field's `id` to render without label and styled as badges.
+-   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the gap between items in the grid.
 -   `previewSize`: a `number` representing the size of the preview.
 
 `list` layout:

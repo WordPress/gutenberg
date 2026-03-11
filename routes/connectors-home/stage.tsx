@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	Button,
+	__experimentalHeading as Heading,
+	__experimentalText as Text,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import {
 	privateApis as connectorsPrivateApis,
 	type ConnectorConfig,
@@ -10,6 +15,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -24,10 +30,18 @@ const { store } = unlock( connectorsPrivateApis );
 registerDefaultConnectors();
 
 function ConnectorsPage() {
-	const connectors = useSelect(
-		( select ) => unlock( select( store ) ).getConnectors(),
+	const { connectors, canInstallPlugins } = useSelect(
+		( select ) => ( {
+			connectors: unlock( select( store ) ).getConnectors(),
+			canInstallPlugins: select( coreStore ).canUser( 'create', {
+				kind: 'root',
+				name: 'plugin',
+			} ),
+		} ),
 		[]
 	);
+
+	const isEmpty = connectors.length === 0;
 
 	return (
 		<Page
@@ -36,35 +50,63 @@ function ConnectorsPage() {
 				'All of your API keys and credentials are stored here and shared across plugins. Configure once and use everywhere.'
 			) }
 		>
-			<div className="connectors-page">
-				<VStack spacing={ 3 }>
-					{ connectors.map( ( connector: ConnectorConfig ) => {
-						if ( connector.render ) {
-							return (
-								<connector.render
-									key={ connector.slug }
-									slug={ connector.slug }
-									label={ connector.label }
-									description={ connector.description }
-								/>
-							);
-						}
-						return null;
-					} ) }
-				</VStack>
-				<p>
-					{ createInterpolateElement(
-						__(
-							'Find more connectors in <a>the plugin directory</a>'
-						),
-						{
-							a: (
-								// eslint-disable-next-line jsx-a11y/anchor-has-content
-								<a href="plugin-install.php" />
+			<div
+				className={ `connectors-page${
+					isEmpty ? ' connectors-page--empty' : ''
+				}` }
+			>
+				{ isEmpty ? (
+					<VStack
+						alignment="center"
+						spacing={ 3 }
+						style={ { maxWidth: 480 } }
+					>
+						<VStack alignment="center" spacing={ 2 }>
+							<Heading level={ 2 } size={ 15 } weight={ 600 }>
+								{ __( 'No connectors yet' ) }
+							</Heading>
+							<Text size={ 12 }>
+								{ __(
+									'Connectors appear here when you install plugins that use external services. Each plugin registers the API keys it needs, and you manage them all in one place.'
+								) }
+							</Text>
+						</VStack>
+						<Button variant="secondary" href="plugin-install.php">
+							{ __( 'Learn more' ) }
+						</Button>
+					</VStack>
+				) : (
+					<VStack spacing={ 3 }>
+						{ connectors.map( ( connector: ConnectorConfig ) => {
+							if ( connector.render ) {
+								return (
+									<connector.render
+										key={ connector.slug }
+										slug={ connector.slug }
+										label={ connector.label }
+										description={ connector.description }
+									/>
+								);
+							}
+							return null;
+						} ) }
+					</VStack>
+				) }
+				{ canInstallPlugins && (
+					<p>
+						{ createInterpolateElement(
+							__(
+								'Find more connectors in <a>the plugin directory</a>'
 							),
-						}
-					) }
-				</p>
+							{
+								a: (
+									// eslint-disable-next-line jsx-a11y/anchor-has-content
+									<a href="plugin-install.php" />
+								),
+							}
+						) }
+					</p>
+				) }
 			</div>
 		</Page>
 	);

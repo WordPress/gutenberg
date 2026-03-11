@@ -175,7 +175,6 @@ export function MediaUploadModal( {
 
 	const { createSuccessNotice, createErrorNotice, createInfoNotice } =
 		useDispatch( noticesStore );
-	// @ts-expect-error - invalidateResolution is not in the typed actions but is available at runtime
 	const { invalidateResolution } = useDispatch( coreStore );
 
 	// DataViews configuration - allow view updates
@@ -187,10 +186,11 @@ export function MediaUploadModal( {
 		mediaField: 'media_thumbnail',
 		search: '',
 		page: 1,
-		perPage: 20,
+		perPage: 50,
 		filters: [],
 		layout: {
 			previewSize: 170,
+			density: 'compact',
 		},
 	} ) );
 

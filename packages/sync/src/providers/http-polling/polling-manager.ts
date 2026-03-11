@@ -30,7 +30,9 @@ import {
 
 const POLLING_INTERVAL_IN_MS = 1000; // 1 second or 1000 milliseconds
 const POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS = 250; // 250 milliseconds
-const POLLING_INTERVAL_BACKGROUND_TAB_IN_MS = 30 * 1000; // 30 seconds
+// Must be less than the server-side AWARENESS_TIMEOUT (30 s) to avoid
+// false disconnects when the tab is in the background.
+const POLLING_INTERVAL_BACKGROUND_TAB_IN_MS = 25 * 1000; // 25 seconds
 const MAX_ERROR_BACKOFF_IN_MS = 30 * 1000; // 30 seconds
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
 
@@ -88,7 +90,7 @@ function createDeprecatedCompactionUpdate( updates: SyncUpdate[] ): SyncUpdate {
 
 	// Merge all updates while preserving operation metadata.
 	return createSyncUpdate(
-		Y.mergeUpdates( mergeable ),
+		Y.mergeUpdatesV2( mergeable ),
 		SyncUpdateType.COMPACTION
 	);
 }
@@ -236,7 +238,7 @@ function processDocUpdate(
 		case SyncUpdateType.COMPACTION:
 		case SyncUpdateType.UPDATE: {
 			// Apply document update directly.
-			Y.applyUpdate( doc, data, POLLING_MANAGER_ORIGIN );
+			Y.applyUpdateV2( doc, data, POLLING_MANAGER_ORIGIN );
 		}
 	}
 }
@@ -486,7 +488,7 @@ function registerRoom( {
 	}
 
 	function unregister(): void {
-		doc.off( 'update', onDocUpdate );
+		doc.off( 'updateV2', onDocUpdate );
 		awareness.off( 'change', onAwarenessUpdate );
 		updateQueue.clear();
 	}
@@ -495,7 +497,7 @@ function registerRoom( {
 		clientId: doc.clientID,
 		createCompactionUpdate: () =>
 			createSyncUpdate(
-				Y.encodeStateAsUpdate( doc ),
+				Y.encodeStateAsUpdateV2( doc ),
 				SyncUpdateType.COMPACTION
 			),
 		endCursor: 0,
@@ -510,7 +512,7 @@ function registerRoom( {
 		updateQueue,
 	};
 
-	doc.on( 'update', onDocUpdate );
+	doc.on( 'updateV2', onDocUpdate );
 	awareness.on( 'change', onAwarenessUpdate );
 	roomStates.set( room, roomState );
 
