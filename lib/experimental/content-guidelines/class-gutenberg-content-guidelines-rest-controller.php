@@ -111,7 +111,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		if ( ! current_user_can( $post_type->cap->read ) ) {
 			return new WP_Error(
 				'rest_forbidden',
-				__( 'Sorry, you are not allowed to view content guidelines.', 'gutenberg' ),
+				__( 'Sorry, you are not allowed to view the guidelines.', 'gutenberg' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -161,14 +161,14 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		if ( $existing ) {
 			return new WP_Error(
 				'rest_guidelines_exists',
-				__( 'Content guidelines already exist. Use PATCH to update.', 'gutenberg' ),
+				__( 'Guidelines already exist. Use PATCH to update.', 'gutenberg' ),
 				array( 'status' => 400 )
 			);
 		}
 
 		$prepared             = $this->prepare_item_for_database( $request );
 		$prepared->post_type  = $this->post_type;
-		$prepared->post_title = __( 'Content Guidelines', 'gutenberg' );
+		$prepared->post_title = __( 'Guidelines', 'gutenberg' );
 
 		if ( ! isset( $prepared->post_status ) ) {
 			$prepared->post_status = 'draft';

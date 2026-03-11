@@ -11,6 +11,10 @@
 - DataViews: Fix last column classname in table layout. [#76133](https://github.com/WordPress/gutenberg/pull/76133)
 - DataForm: Properly handle dates in datetime control. [#76193](https://github.com/WordPress/gutenberg/pull/76193)
 
+### Enhancements
+
+- DataViews: Add density option to Grid and PickerGrid layouts. [#75887](https://github.com/WordPress/gutenberg/pull/75887)
+
 ### Code Quality
 
 - DataForm: Consolidate `date` and `datetime` input placement. [#76136](https://github.com/WordPress/gutenberg/pull/76136)

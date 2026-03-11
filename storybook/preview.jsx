@@ -11,6 +11,7 @@ import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
 import { WithDesignSystemTheme } from './decorators/with-design-system-theme';
 import { ComponentStatusIndicator } from './components/component-status-indicator';
+import theme from './theme';
 
 export const globalTypes = {
 	direction: {
@@ -75,6 +76,7 @@ export const parameters = {
 		disable: true,
 	},
 	docs: {
+		theme,
 		controls: {
 			sort: 'requiredFirst',
 		},

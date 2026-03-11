@@ -158,7 +158,7 @@ export default function BlockGuidelines() {
 		saveContentGuidelines()
 			.then( () => {
 				setError( null );
-				createSuccessNotice( __( 'Block guidelines removed.' ), {
+				createSuccessNotice( __( 'Guidelines removed.' ), {
 					type: 'snackbar',
 				} );
 			} )

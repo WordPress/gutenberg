@@ -1826,51 +1826,6 @@ async function buildAll( baseUrlExpression ) {
 		};
 	} );
 
-	// Bundle boot, route, and theme packages from node_modules when pages exist
-	if ( pageData.length > 0 ) {
-		try {
-			const { createRequire } = await import( 'module' );
-			const require = createRequire( import.meta.url );
-
-			// Resolve the @wordpress packages directory from node_modules
-			const bootPackageJson = require.resolve(
-				'@wordpress/boot/package.json',
-				{ paths: [ ROOT_DIR ] }
-			);
-			const wordpressPackagesDir = path.dirname(
-				path.dirname( bootPackageJson )
-			);
-
-			// Bundle boot, route, theme, and private-apis packages
-			const externalPackages = [
-				'boot',
-				'route',
-				'theme',
-				'private-apis',
-			];
-			for ( const pkgName of externalPackages ) {
-				const result = await bundlePackage( pkgName, {
-					sourceDir: wordpressPackagesDir,
-					handlePrefix: 'wp',
-					scriptGlobal: 'wp',
-					packageNamespace: 'wordpress',
-				} );
-
-				if ( result && result.modules ) {
-					modules.push( ...result.modules );
-				}
-				if ( result && result.scripts ) {
-					scripts.push( ...result.scripts );
-				}
-			}
-		} catch ( error ) {
-			console.warn(
-				'\n⚠️  Warning: Could not bundle WordPress packages for pages:',
-				error.message
-			);
-		}
-	}
-
 	console.log( '\n📄 Generating PHP registration files...\n' );
 	const phpReplacements = await getPhpReplacements(
 		ROOT_DIR,

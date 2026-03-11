@@ -34,7 +34,10 @@ const { retrySyncConnection } = unlock( coreDataPrivateApis );
 
 // Debounce time for initial disconnected status to allow connection to establish.
 const INITIAL_DISCONNECTED_DEBOUNCE_MS = 5000;
-const noop = () => {};
+
+// Debounce time for showing the disconnect dialog after the intial connection,
+// allowing brief network interruptions to resolve.
+const DISCONNECTED_DEBOUNCE_MS = 2000;
 
 /**
  * Sync connection modal that displays when any entity reports a disconnection.
@@ -67,7 +70,6 @@ export function SyncConnectionModal() {
 		useState( null );
 	const debounceTimerRef = useRef( null );
 	// Track whether we've passed the initial load phase.
-	// Once true, disconnected status will show immediately without debounce.
 	const hasInitializedRef = useRef( false );
 
 	const connectionStatus = connectionState?.status;
@@ -91,9 +93,13 @@ export function SyncConnectionModal() {
 				);
 			};
 
-			// Debounce only on first load to allow connection to establish.
+			// Debounce on first load and after connection is established to allow
+			// brief network interruptions to resolve.
 			if ( hasInitializedRef.current ) {
-				showModal();
+				debounceTimerRef.current = setTimeout(
+					showModal,
+					DISCONNECTED_DEBOUNCE_MS
+				);
 			} else {
 				debounceTimerRef.current = setTimeout(
 					showModal,
@@ -142,7 +148,7 @@ export function SyncConnectionModal() {
 			<Modal
 				className="editor-sync-connection-modal"
 				isDismissible={ false }
-				onRequestClose={ noop }
+				onRequestClose={ () => {} }
 				shouldCloseOnClickOutside={ false }
 				shouldCloseOnEsc={ false }
 				size="medium"
