@@ -86,7 +86,7 @@ function _gutenberg_connectors_init(): void {
 		$name        = $provider_metadata->getName();
 		$description = $provider_metadata->getDescription();
 		$logo_url    = method_exists( $provider_metadata, 'getLogoPath' ) && $provider_metadata->getLogoPath()
-			? _gutenberg_resolve_ai_provider_logo_url( $provider_metadata->getLogoPath() )
+			? _wp_connectors_resolve_ai_provider_logo_url( $provider_metadata->getLogoPath() )
 			: null;
 
 		if ( isset( $defaults[ $connector_id ] ) ) {
@@ -248,52 +248,6 @@ function _gutenberg_is_ai_api_key_valid( string $key, string $provider_id ): ?bo
 		wp_trigger_error( __FUNCTION__, $e->getMessage() );
 		return null;
 	}
-}
-
-/**
- * Resolves an AI provider logo file path to a URL.
- *
- * The AI Client library returns absolute file paths (not URLs) for logo files
- * since it is not WordPress-specific. This function converts a path within
- * the plugins or must-use plugins directory to the corresponding URL.
- *
- * @access private
- * @since 7.0.0
- *
- * @param string $path Absolute file path to the logo. Must be within
- *                     WP_PLUGIN_DIR or WPMU_PLUGIN_DIR; triggers
- *                     _doing_it_wrong() otherwise.
- * @return string|null The logo URL, or null if the path is empty or
- *                     outside the supported directories.
- */
-function _gutenberg_resolve_ai_provider_logo_url( string $path ): ?string {
-	if ( ! $path ) {
-		return null;
-	}
-
-	$path = wp_normalize_path( $path );
-
-	if ( ! file_exists( $path ) ) {
-		return null;
-	}
-
-	$mu_plugin_dir = wp_normalize_path( WPMU_PLUGIN_DIR );
-	if ( str_starts_with( $path, $mu_plugin_dir . '/' ) ) {
-		return plugins_url( substr( $path, strlen( $mu_plugin_dir ) ), WPMU_PLUGIN_DIR . '/.' );
-	}
-
-	$plugin_dir = wp_normalize_path( WP_PLUGIN_DIR );
-	if ( str_starts_with( $path, $plugin_dir . '/' ) ) {
-		return plugins_url( substr( $path, strlen( $plugin_dir ) ) );
-	}
-
-	_doing_it_wrong(
-		__FUNCTION__,
-		__( 'Provider logo path must be located within the plugins or must-use plugins directory.', 'gutenberg' ),
-		'7.0.0'
-	);
-
-	return null;
 }
 
 /**

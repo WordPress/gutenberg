@@ -67,3 +67,50 @@ if ( ! function_exists( 'wp_get_connectors' ) ) {
 		return $registry->get_all_registered();
 	}
 }
+
+if ( ! function_exists( '_wp_connectors_resolve_ai_provider_logo_url' ) ) {
+	/**
+	 * Resolves an AI provider logo file path to a URL.
+	 *
+	 * Converts an absolute file path within the plugins or must-use plugins
+	 * directory to the corresponding URL.
+	 *
+	 * @access private
+	 * @since 7.0.0
+	 *
+	 * @param string $path Absolute file path to the logo. Must be within
+	 *                     WP_PLUGIN_DIR or WPMU_PLUGIN_DIR; triggers
+	 *                     _doing_it_wrong() otherwise.
+	 * @return string|null The logo URL, or null if the path is empty or
+	 *                     outside the supported directories.
+	 */
+	function _wp_connectors_resolve_ai_provider_logo_url( string $path ): ?string {
+		if ( ! $path ) {
+			return null;
+		}
+
+		$path = wp_normalize_path( $path );
+
+		if ( ! file_exists( $path ) ) {
+			return null;
+		}
+
+		$mu_plugin_dir = wp_normalize_path( WPMU_PLUGIN_DIR );
+		if ( str_starts_with( $path, $mu_plugin_dir . '/' ) ) {
+			return plugins_url( substr( $path, strlen( $mu_plugin_dir ) ), WPMU_PLUGIN_DIR . '/.' );
+		}
+
+		$plugin_dir = wp_normalize_path( WP_PLUGIN_DIR );
+		if ( str_starts_with( $path, $plugin_dir . '/' ) ) {
+			return plugins_url( substr( $path, strlen( $plugin_dir ) ) );
+		}
+
+		_doing_it_wrong(
+			__FUNCTION__,
+			__( 'Provider logo path must be located within the plugins or must-use plugins directory.' ),
+			'7.0.0'
+		);
+
+		return null;
+	}
+}
