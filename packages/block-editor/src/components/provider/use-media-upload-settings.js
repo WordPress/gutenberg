@@ -15,6 +15,7 @@ function useMediaUploadSettings( settings = {} ) {
 		() => ( {
 			mediaUpload: settings.mediaUpload,
 			mediaSideload: settings.mediaSideload,
+			finalizeUpload: settings.finalizeUpload,
 			maxUploadFileSize: settings.maxUploadFileSize,
 			allowedMimeTypes: settings.allowedMimeTypes,
 			allImageSizes: settings.allImageSizes,

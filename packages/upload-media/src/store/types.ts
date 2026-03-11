@@ -181,6 +181,8 @@ export interface Settings {
 	// Default image quality (0-1) for resize/crop operations.
 	// Default is 0.82 if not set.
 	imageQuality?: number;
+	// Function for finalizing an upload after all client-side processing is complete.
+	finalizeUpload?: ( id: number ) => Promise< void >;
 }
 
 // Matches the Attachment type from the media-utils package.

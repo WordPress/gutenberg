@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from 'uuid';
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
@@ -1303,14 +1302,12 @@ export function finalizeItem( id: QueueItemId ) {
 		}
 
 		const attachment = item.attachment;
+		const { finalizeUpload } = select.getSettings();
 
-		// Only finalize if we have an attachment ID.
-		if ( attachment?.id ) {
+		// Only finalize if we have an attachment ID and a finalizeUpload callback.
+		if ( attachment?.id && finalizeUpload ) {
 			try {
-				await apiFetch( {
-					path: `/wp/v2/media/${ attachment.id }/finalize`,
-					method: 'POST',
-				} );
+				await finalizeUpload( attachment.id );
 			} catch ( error ) {
 				// Log but don't fail the upload if finalization fails.
 				// eslint-disable-next-line no-console
