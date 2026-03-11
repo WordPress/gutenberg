@@ -22,6 +22,7 @@ import {
 	base64ToUint8Array,
 	createSyncUpdate,
 	createUpdateQueue,
+	estimateUpdateSizeBytes,
 	postSyncUpdate,
 	uint8ArrayToBase64,
 } from '../utils';
@@ -172,6 +173,41 @@ describe( 'http-polling utils', () => {
 
 			expect( result.type ).toBe( SyncUpdateType.UPDATE );
 			expect( result.data ).toBe( '' );
+		} );
+	} );
+
+	describe( 'estimateUpdateSizeBytes', () => {
+		it( 'returns the length of the base64 data string', () => {
+			const data = new Uint8Array( [ 72, 101, 108, 108, 111 ] );
+			const update = createSyncUpdate( data, SyncUpdateType.UPDATE );
+
+			expect( estimateUpdateSizeBytes( update ) ).toBe(
+				update.data.length
+			);
+		} );
+
+		it( 'returns 0 for empty data', () => {
+			const update = createSyncUpdate(
+				new Uint8Array( [] ),
+				SyncUpdateType.UPDATE
+			);
+
+			expect( estimateUpdateSizeBytes( update ) ).toBe( 0 );
+		} );
+
+		it( 'scales with data size', () => {
+			const small = createSyncUpdate(
+				new Uint8Array( 10 ),
+				SyncUpdateType.UPDATE
+			);
+			const large = createSyncUpdate(
+				new Uint8Array( 1000 ),
+				SyncUpdateType.UPDATE
+			);
+
+			expect( estimateUpdateSizeBytes( large ) ).toBeGreaterThan(
+				estimateUpdateSizeBytes( small )
+			);
 		} );
 	} );
 

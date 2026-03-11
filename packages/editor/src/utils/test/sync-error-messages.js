@@ -8,6 +8,7 @@ describe( 'getSyncErrorMessages', () => {
 		'authentication-failed',
 		'connection-expired',
 		'connection-limit-exceeded',
+		'document-too-large',
 		'unknown-error',
 	] )(
 		'should return title, description, and canRetry for "%s"',
@@ -26,6 +27,13 @@ describe( 'getSyncErrorMessages', () => {
 	it( 'should set canRetry to false for authentication-failed', () => {
 		const result = getSyncErrorMessages( {
 			code: 'authentication-failed',
+		} );
+		expect( result.canRetry ).toBe( false );
+	} );
+
+	it( 'should set canRetry to false for document-too-large', () => {
+		const result = getSyncErrorMessages( {
+			code: 'document-too-large',
 		} );
 		expect( result.canRetry ).toBe( false );
 	} );

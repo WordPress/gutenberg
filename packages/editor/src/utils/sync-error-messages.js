@@ -31,6 +31,15 @@ const ERROR_MESSAGES = {
 		),
 		canRetry: true,
 	},
+	'document-too-large': {
+		title: __( 'Document too large' ),
+		description: __(
+			'This document has grown too large for real-time collaboration. ' +
+				'Some changes may not be synced. Try removing large content blocks ' +
+				'or contact your site administrator.'
+		),
+		canRetry: false,
+	},
 	'unknown-error': {
 		title: __( 'Connection lost' ),
 		description: __(

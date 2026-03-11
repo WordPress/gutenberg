@@ -52,6 +52,9 @@ jest.mock( '../utils', () => ( {
 		resume: jest.fn(),
 		size: jest.fn( () => 0 ),
 	} ) ),
+	estimateUpdateSizeBytes: jest.fn(
+		( update: { data: string } ) => update.data.length
+	),
 	postSyncUpdate: jest.fn(),
 	postSyncUpdateNonBlocking: jest.fn(),
 } ) );
@@ -62,9 +65,14 @@ interface PollingManager {
 		doc: unknown;
 		awareness: unknown;
 		log: () => void;
-		onStatusChange: () => void;
+		onStatusChange: ( status: unknown ) => void;
 		onSync: () => void;
+		sizeLimits?: {
+			maxDocumentSizeBytes?: number;
+			maxUpdateSizeBytes?: number;
+		};
 	} ) => void;
+	retryNow: () => void;
 	unregisterRoom: ( room: string ) => void;
 }
 
@@ -133,6 +141,116 @@ describe( 'polling-manager', () => {
 		Object.defineProperty( document, 'visibilityState', {
 			configurable: true,
 			get: () => 'visible',
+		} );
+	} );
+
+	describe( 'size limits', () => {
+		// Size limit tests need their own isolated modules with custom
+		// createSyncUpdate mocks to control the data size.
+		function setupWithSizeLimits(
+			dataSize: number,
+			sizeLimits?: {
+				maxDocumentSizeBytes?: number;
+				maxUpdateSizeBytes?: number;
+			}
+		) {
+			let mgr!: PollingManager;
+			let mockPost!: jest.Mock;
+
+			jest.isolateModules( () => {
+				// Override createSyncUpdate to return data of a specific size.
+				const utils = require( '../utils' );
+				utils.createSyncUpdate.mockImplementation(
+					( _data: unknown, type: string ) => ( {
+						data: 'x'.repeat( dataSize ),
+						type,
+					} )
+				);
+				utils.postSyncUpdate.mockResolvedValue( syncResponse );
+				mgr = require( '../polling-manager' ).pollingManager;
+				mockPost = utils.postSyncUpdate;
+			} );
+
+			const onStatusChange = jest.fn();
+			const doc = createMockDoc();
+
+			mgr.registerRoom( {
+				room: 'test-room',
+				doc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange,
+				onSync: jest.fn(),
+				sizeLimits,
+			} );
+
+			// Get the registered updateV2 handler.
+			const onDocUpdate = ( doc.on as jest.Mock ).mock.calls.find(
+				( call: unknown[] ) => call[ 0 ] === 'updateV2'
+			)?.[ 1 ] as
+				| ( ( update: Uint8Array, origin: unknown ) => void )
+				| undefined;
+
+			return { onStatusChange, onDocUpdate, mockPost };
+		}
+
+		it( 'drops updates exceeding maxUpdateSizeBytes and emits disconnected status', () => {
+			const { onStatusChange, onDocUpdate } = setupWithSizeLimits( 200, {
+				maxUpdateSizeBytes: 100,
+			} );
+
+			expect( onDocUpdate ).toBeDefined();
+			onDocUpdate( new Uint8Array( [ 1, 2, 3 ] ), 'some-origin' );
+
+			expect( onStatusChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					status: 'disconnected',
+					error: expect.objectContaining( {
+						code: 'document-too-large',
+					} ),
+				} )
+			);
+		} );
+
+		it( 'queues updates within maxUpdateSizeBytes normally', () => {
+			const { onStatusChange, onDocUpdate } = setupWithSizeLimits( 50, {
+				maxUpdateSizeBytes: 100,
+			} );
+
+			onDocUpdate( new Uint8Array( [ 1 ] ), 'some-origin' );
+
+			const sizeLimitCalls = onStatusChange.mock.calls.filter(
+				( call: unknown[] ) => {
+					const status = call[ 0 ] as Record< string, unknown >;
+					return (
+						status.status === 'disconnected' &&
+						( status.error as Record< string, unknown > )?.code ===
+							'document-too-large'
+					);
+				}
+			);
+			expect( sizeLimitCalls ).toHaveLength( 0 );
+		} );
+
+		it( 'allows all updates when no size limits are set', () => {
+			const { onStatusChange, onDocUpdate } = setupWithSizeLimits(
+				10000
+				// No sizeLimits — defaults to Infinity
+			);
+
+			onDocUpdate( new Uint8Array( [ 1 ] ), 'some-origin' );
+
+			const sizeLimitCalls = onStatusChange.mock.calls.filter(
+				( call: unknown[] ) => {
+					const status = call[ 0 ] as Record< string, unknown >;
+					return (
+						status.status === 'disconnected' &&
+						( status.error as Record< string, unknown > )?.code ===
+							'document-too-large'
+					);
+				}
+			);
+			expect( sizeLimitCalls ).toHaveLength( 0 );
 		} );
 	} );
 

@@ -12,6 +12,7 @@ import type {
 	ConnectionStatus,
 	ProviderCreator,
 	ProviderCreatorResult,
+	SizeLimits,
 } from '../../types';
 import { pollingManager } from './polling-manager';
 
@@ -19,6 +20,7 @@ export interface ProviderOptions {
 	awareness?: Awareness;
 	debug?: boolean;
 	room: string;
+	sizeLimits?: SizeLimits;
 	ydoc: Y.Doc;
 }
 
@@ -60,6 +62,7 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 			log: this.log,
 			onStatusChange: this.emitStatus,
 			onSync: this.onSync,
+			sizeLimits: this.options.sizeLimits,
 		} );
 	}
 
@@ -137,8 +140,13 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 
 /**
  * Create a provider creator function for the HttpPollingProvider
+ *
+ * @param {SizeLimits} sizeLimits - Optional size limits for sync updates and documents.
+ * @return {ProviderCreator} A provider creator function.
  */
-export function createHttpPollingProvider(): ProviderCreator {
+export function createHttpPollingProvider(
+	sizeLimits?: SizeLimits
+): ProviderCreator {
 	return async ( {
 		awareness,
 		objectType,
@@ -151,6 +159,7 @@ export function createHttpPollingProvider(): ProviderCreator {
 			awareness,
 			// debug: true,
 			room,
+			sizeLimits,
 			ydoc,
 		} );
 

@@ -11,7 +11,11 @@ import * as syncProtocol from 'y-protocols/sync';
 /**
  * Internal dependencies
  */
-import type { ConnectionStatus } from '../../types';
+import type {
+	ConnectionError,
+	ConnectionStatus,
+	SizeLimits,
+} from '../../types';
 import {
 	type AwarenessState,
 	type LocalAwarenessState,
@@ -24,6 +28,7 @@ import {
 	base64ToUint8Array,
 	createSyncUpdate,
 	createUpdateQueue,
+	estimateUpdateSizeBytes,
 	postSyncUpdate,
 	postSyncUpdateNonBlocking,
 } from './utils';
@@ -51,6 +56,12 @@ interface RegisterRoomOptions {
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
 	onSync: () => void;
+	sizeLimits?: SizeLimits;
+}
+
+interface ResolvedSizeLimits {
+	maxDocumentSizeBytes: number;
+	maxUpdateSizeBytes: number;
 }
 
 interface RoomState {
@@ -62,11 +73,27 @@ interface RoomState {
 	onStatusChange: ( status: ConnectionStatus ) => void;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
 	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
+	sizeLimits: ResolvedSizeLimits;
 	unregister: () => void;
 	updateQueue: UpdateQueue;
 }
 
 const roomStates: Map< string, RoomState > = new Map();
+
+/**
+ * Create a connection error for a size limit violation.
+ *
+ * @param kind Whether the limit was hit on a single update or the full document.
+ */
+function createSizeLimitError( kind: 'update' | 'document' ): ConnectionError {
+	const message =
+		kind === 'update'
+			? 'Individual update exceeds the maximum allowed size.'
+			: 'Document state exceeds the maximum allowed size.';
+	const error = new Error( message ) as ConnectionError;
+	error.code = 'document-too-large';
+	return error;
+}
 
 /**
  * Create a compaction update by merging existing updates. This preserves
@@ -393,10 +420,31 @@ function poll(): void {
 				// full document state to replace all prior updates on the server.
 				if ( room.should_compact ) {
 					roomState.log( 'Server requested compaction update' );
-					roomState.updateQueue.clear();
-					roomState.updateQueue.add(
-						roomState.createCompactionUpdate()
-					);
+					const compactionUpdate = roomState.createCompactionUpdate();
+
+					// Check document size before sending compaction.
+					if (
+						estimateUpdateSizeBytes( compactionUpdate ) >
+						roomState.sizeLimits.maxDocumentSizeBytes
+					) {
+						roomState.log(
+							'Document exceeds size limit, cannot compact',
+							{
+								size: estimateUpdateSizeBytes(
+									compactionUpdate
+								),
+								limit: roomState.sizeLimits
+									.maxDocumentSizeBytes,
+							}
+						);
+						roomState.onStatusChange( {
+							status: 'disconnected',
+							error: createSizeLimitError( 'document' ),
+						} );
+					} else {
+						roomState.updateQueue.clear();
+						roomState.updateQueue.add( compactionUpdate );
+					}
 				} else if ( room.compaction_request ) {
 					// Deprecated
 					roomState.log( 'Server requested (old) compaction update' );
@@ -466,10 +514,16 @@ function registerRoom( {
 	log,
 	onSync,
 	onStatusChange,
+	sizeLimits,
 }: RegisterRoomOptions ): void {
 	if ( roomStates.has( room ) ) {
 		return;
 	}
+
+	const resolvedLimits: ResolvedSizeLimits = {
+		maxDocumentSizeBytes: sizeLimits?.maxDocumentSizeBytes ?? Infinity,
+		maxUpdateSizeBytes: sizeLimits?.maxUpdateSizeBytes ?? Infinity,
+	};
 
 	// Note: Queue is initially paused. Call .resume() to unpause.
 	const updateQueue = createUpdateQueue( [ createSyncStep1Update( doc ) ] );
@@ -483,8 +537,25 @@ function registerRoom( {
 			return;
 		}
 
-		// Tag local document changes as 'update' type.
-		updateQueue.add( createSyncUpdate( update, SyncUpdateType.UPDATE ) );
+		const syncUpdate = createSyncUpdate( update, SyncUpdateType.UPDATE );
+
+		// Check individual update size before queuing.
+		if (
+			estimateUpdateSizeBytes( syncUpdate ) >
+			resolvedLimits.maxUpdateSizeBytes
+		) {
+			log( 'Update exceeds size limit, dropping', {
+				size: estimateUpdateSizeBytes( syncUpdate ),
+				limit: resolvedLimits.maxUpdateSizeBytes,
+			} );
+			onStatusChange( {
+				status: 'disconnected',
+				error: createSizeLimitError( 'update' ),
+			} );
+			return;
+		}
+
+		updateQueue.add( syncUpdate );
 	}
 
 	function unregister(): void {
@@ -508,6 +579,7 @@ function registerRoom( {
 			processAwarenessUpdate( state, awareness ),
 		processDocUpdate: ( update: SyncUpdate ) =>
 			processDocUpdate( update, doc, onSync ),
+		sizeLimits: resolvedLimits,
 		unregister,
 		updateQueue,
 	};

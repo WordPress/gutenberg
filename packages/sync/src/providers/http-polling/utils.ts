@@ -45,6 +45,17 @@ export function createSyncUpdate(
 	};
 }
 
+/**
+ * Estimate the byte size of a SyncUpdate's data payload. Base64 characters
+ * are ASCII, so one character equals one byte in the HTTP payload.
+ *
+ * @param update The sync update to measure.
+ * @return The estimated size in bytes.
+ */
+export function estimateUpdateSizeBytes( update: SyncUpdate ): number {
+	return update.data.length;
+}
+
 export function createUpdateQueue(
 	initial: SyncUpdate[] = [],
 	paused = true

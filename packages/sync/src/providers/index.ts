@@ -18,7 +18,12 @@ let providerCreators: ProviderCreator[] | null = null;
  * @return {ProviderCreator[]} Creator functions for Yjs providers.
  */
 export function getDefaultProviderCreators(): ProviderCreator[] {
-	return [ createHttpPollingProvider() ];
+	return [
+		createHttpPollingProvider( {
+			maxDocumentSizeBytes: 5 * 1024 * 1024, // 5 MB
+			maxUpdateSizeBytes: 1 * 1024 * 1024, // 1 MB
+		} ),
+	];
 }
 
 /**

@@ -62,7 +62,19 @@ export type ConnectionErrorCode =
 	| 'authentication-error'
 	| 'connection-expired'
 	| 'connection-limit-exceeded'
+	| 'document-too-large'
 	| 'unknown-error';
+
+/**
+ * Size limits for sync providers. Providers can use these to cap the size of
+ * individual updates and full document state payloads.
+ */
+export interface SizeLimits {
+	/** Maximum size in bytes for the full encoded document state (compaction). */
+	maxDocumentSizeBytes?: number;
+	/** Maximum size in bytes for a single update payload (base64-encoded). */
+	maxUpdateSizeBytes?: number;
+}
 
 /**
  * Sync connection error object.
