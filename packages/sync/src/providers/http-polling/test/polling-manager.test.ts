@@ -13,9 +13,9 @@ import type { SyncResponse } from '../types';
 
 // Mock all external dependencies before imports.
 jest.mock( 'yjs', () => ( {
-	mergeUpdates: jest.fn( () => new Uint8Array() ),
-	applyUpdate: jest.fn(),
-	encodeStateAsUpdate: jest.fn( () => new Uint8Array() ),
+	mergeUpdatesV2: jest.fn( () => new Uint8Array() ),
+	applyUpdateV2: jest.fn(),
+	encodeStateAsUpdateV2: jest.fn( () => new Uint8Array() ),
 } ) );
 
 jest.mock( 'lib0/encoding', () => ( {

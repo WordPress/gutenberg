@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, register } from '@wordpress/data';
+import { createReduxStore, createSelector, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -49,9 +49,11 @@ function reducer(
 }
 
 const selectors = {
-	getConnectors( state: ConnectorsState ): ConnectorConfig[] {
-		return Object.values( state.connectors );
-	},
+	getConnectors: createSelector(
+		( state: ConnectorsState ): ConnectorConfig[] =>
+			Object.values( state.connectors ),
+		( state: ConnectorsState ) => [ state.connectors ]
+	),
 	getConnector(
 		state: ConnectorsState,
 		slug: string

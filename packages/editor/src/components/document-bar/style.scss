@@ -25,7 +25,7 @@
 		border-radius: $grid-unit-05;
 
 		@media not (prefers-reduced-motion) {
-			transition: all 0.1s ease-out;
+			transition: background-color 0.1s ease-out;
 		}
 
 		&:hover {

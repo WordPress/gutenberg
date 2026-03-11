@@ -253,6 +253,11 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	}
 }
 
+// Outside month days (visible when showOutsideDays is true): use a lighter text color.
+.components-calendar__day--outside {
+	color: $components-color-gray-600;
+}
+
 // Hidden button (ie. outside current month but still rendered)
 .components-calendar__day--hidden {
 	visibility: hidden;
