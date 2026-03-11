@@ -8,7 +8,6 @@ import { isKeyboardEvent } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { store as keyboardShortcutsStore } from '../store';
-import type { ShortcutKeyCombination } from '../store/actions';
 
 /**
  * Returns a function to check if a keyboard event matches a shortcut name.
