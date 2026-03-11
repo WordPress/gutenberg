@@ -233,3 +233,35 @@ addFilter(
 	'core/sibling-style-sync/parent-control',
 	withSiblingStyleSyncParent
 );
+
+/**
+ * Automatically injects the `styleSyncUnlinked` attribute onto any block type
+ * that declares `__experimentalSiblingStyleSync` support. This persists the
+ * per-block unlink state across page reloads without requiring each synced
+ * block to manually add the attribute to its block.json.
+ *
+ * @param {Object} settings Block type settings.
+ * @return {Object} Possibly-modified settings.
+ */
+function addStyleSyncUnlinkedAttribute( settings ) {
+	if ( ! settings.supports?.__experimentalSiblingStyleSync ) {
+		return settings;
+	}
+
+	return {
+		...settings,
+		attributes: {
+			...settings.attributes,
+			styleSyncUnlinked: {
+				type: 'boolean',
+				default: false,
+			},
+		},
+	};
+}
+
+addFilter(
+	'blocks.registerBlockType',
+	'core/sibling-style-sync/add-style-sync-unlinked-attribute',
+	addStyleSyncUnlinkedAttribute
+);

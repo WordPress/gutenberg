@@ -639,44 +639,48 @@ export const __experimentalUpdateSyncedBlockAttributes =
  * Unlinks a block from its sibling style sync group so that future style
  * changes are not propagated to or from this block.
  *
+ * Persists the unlinked state to the block's `styleSyncUnlinked` attribute so
+ * it survives page reload.
+ *
  * @param {string} clientId      Client ID of the block to unlink.
  * @param {string} blockName     Name of the block type.
  * @param {string} scopeClientId Client ID of the scope ancestor.
- *
- * @return {Object} Action object.
  */
-export function __experimentalUnlinkBlockStyleSync(
-	clientId,
-	blockName,
-	scopeClientId
-) {
-	return {
-		type: 'UNLINK_SIBLING_STYLE_SYNC',
-		clientId,
-		blockName,
-		scopeClientId,
+export const __experimentalUnlinkBlockStyleSync =
+	( clientId, blockName, scopeClientId ) =>
+	( { dispatch } ) => {
+		dispatch( {
+			type: 'UNLINK_SIBLING_STYLE_SYNC',
+			clientId,
+			blockName,
+			scopeClientId,
+		} );
+		dispatch.updateBlockAttributes( clientId, {
+			styleSyncUnlinked: true,
+		} );
 	};
-}
 
 /**
  * Re-links a block to its sibling style sync group. On the next style change
  * by any linked sibling, the styles will propagate to this block again.
  *
+ * Clears the `styleSyncUnlinked` attribute so the re-linked state persists
+ * across page reloads.
+ *
  * @param {string} clientId      Client ID of the block to relink.
  * @param {string} blockName     Name of the block type.
  * @param {string} scopeClientId Client ID of the scope ancestor.
- *
- * @return {Object} Action object.
  */
-export function __experimentalRelinkBlockStyleSync(
-	clientId,
-	blockName,
-	scopeClientId
-) {
-	return {
-		type: 'RELINK_SIBLING_STYLE_SYNC',
-		clientId,
-		blockName,
-		scopeClientId,
+export const __experimentalRelinkBlockStyleSync =
+	( clientId, blockName, scopeClientId ) =>
+	( { dispatch } ) => {
+		dispatch( {
+			type: 'RELINK_SIBLING_STYLE_SYNC',
+			clientId,
+			blockName,
+			scopeClientId,
+		} );
+		dispatch.updateBlockAttributes( clientId, {
+			styleSyncUnlinked: false,
+		} );
 	};
-}
