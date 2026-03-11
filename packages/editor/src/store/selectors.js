@@ -916,10 +916,8 @@ export const getSuggestedPostFormat = createRegistrySelector(
  *
  * @return {string} Post content.
  */
-export const getEditedPostContent = createRegistrySelector( ( select ) => {
-	const serializationCache = new WeakMap();
-
-	return ( state ) => {
+export const getEditedPostContent = createRegistrySelector(
+	( select ) => ( state ) => {
 		const postId = getCurrentPostId( state );
 		const postType = getCurrentPostType( state );
 		const record = select( coreStore ).getEditedEntityRecord(
@@ -931,20 +929,14 @@ export const getEditedPostContent = createRegistrySelector( ( select ) => {
 			if ( typeof record.content === 'function' ) {
 				return record.content( record );
 			} else if ( record.blocks ) {
-				let content = serializationCache.get( record.blocks );
-				if ( content === undefined ) {
-					content =
-						__unstableSerializeAndClean( record.blocks ) || '';
-					serializationCache.set( record.blocks, content );
-				}
-				return content;
+				return __unstableSerializeAndClean( record.blocks ) || '';
 			} else if ( record.content ) {
 				return record.content;
 			}
 		}
 		return '';
-	};
-} );
+	}
+);
 
 /**
  * Returns true if the post is being published, or false otherwise.
