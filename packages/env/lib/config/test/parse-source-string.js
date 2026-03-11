@@ -110,7 +110,7 @@ describe( 'parseSourceString', () => {
 				url: 'http://downloads.wordpress.org/plugin/gutenberg.latest-stable.zip',
 			} );
 		} );
-		
+
 		it( 'should parse other sources', () => {
 			expect(
 				parseSourceString( 'http://example.com/testing.zip', options )
@@ -124,7 +124,10 @@ describe( 'parseSourceString', () => {
 
 		it( 'should parse other versioned sources', () => {
 			expect(
-				parseSourceString( 'http://example.com/testing.1.2.3.zip', options )
+				parseSourceString(
+					'http://example.com/testing.1.2.3.zip',
+					options
+				)
 			).toEqual( {
 				basename: 'testing',
 				path: '/test/cache/testing',
