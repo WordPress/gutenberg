@@ -169,9 +169,10 @@ addFilter(
 	'editor.BlockEdit',
 	'core/sibling-style-sync/wrap-set-attributes',
 	withSiblingStyleSync,
-	// Priority 5 ensures this wraps early, so the intercepted setAttributes
-	// is what other BlockEdit HOCs and the block component itself receive.
-	5
+	// Priority 20 (higher than createBlockEditFilter's default of 10) ensures
+	// this HOC is outermost. Inspector panel HOCs (color, typography, border,
+	// spacing) all run at priority 10 and pass setAttributes via {...props}.
+	20
 );
 
 /**
