@@ -140,35 +140,24 @@ export const WithCloseButton: Story = {
  * Use the `open` and `onOpenChange` props on `Popover.Root` to control the
  * popover's visibility programmatically.
  *
- * When external controls live outside the popover, clicks on them trigger
- * Base UI's click-outside dismiss before the button's own handler runs.
- * To prevent the flicker, filter out dismiss events whose click landed on
- * your external controls using the `event` in `onOpenChange`.
+ * The checkbox drives the popover state externally. The popover's trigger
+ * and click-outside dismiss both sync back to the same state via
+ * `onOpenChange`, keeping everything in sync.
  */
 export const Controlled: Story = {
 	render: function Render() {
 		const [ isOpen, setIsOpen ] = useState( false );
-		const externalControlsRef = useRef< HTMLDivElement >( null );
-
-		const handleOpenChange: React.ComponentProps<
-			typeof Popover.Root
-		>[ 'onOpenChange' ] = ( nextOpen, event ) => {
-			if (
-				! nextOpen &&
-				event &&
-				'event' in event &&
-				event.event instanceof Event &&
-				event.event.target instanceof Node &&
-				externalControlsRef.current?.contains( event.event.target )
-			) {
-				return;
-			}
-			setIsOpen( nextOpen );
-		};
+		const checkboxId = useId();
 
 		return (
-			<div style={ { display: 'flex', gap: '1rem' } }>
-				<Popover.Root open={ isOpen } onOpenChange={ handleOpenChange }>
+			<div
+				style={ {
+					display: 'flex',
+					gap: '1rem',
+					alignItems: 'center',
+				} }
+			>
+				<Popover.Root open={ isOpen } onOpenChange={ setIsOpen }>
 					<Popover.Trigger>Toggle Popover</Popover.Trigger>
 					<Popover.Popup>
 						<Popover.Arrow />
@@ -178,18 +167,15 @@ export const Controlled: Story = {
 						</Popover.Description>
 					</Popover.Popup>
 				</Popover.Root>
-				<div
-					ref={ externalControlsRef }
-					style={ { display: 'flex', gap: '1rem' } }
-				>
-					<button onClick={ () => setIsOpen( true ) }>
-						Open externally
-					</button>
-					<button onClick={ () => setIsOpen( false ) }>
-						Close externally
-					</button>
-				</div>
-				<span>open: { String( isOpen ) }</span>
+				<label htmlFor={ checkboxId }>
+					<input
+						id={ checkboxId }
+						type="checkbox"
+						checked={ isOpen }
+						onChange={ ( e ) => setIsOpen( e.target.checked ) }
+					/>{ ' ' }
+					Open
+				</label>
 			</div>
 		);
 	},
