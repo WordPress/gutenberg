@@ -267,9 +267,14 @@ export function useOnCollaboratorJoin(
 		}
 
 		const prevMap = new Map< number, ActiveCollaborator >(
-			prevCollaborators.map( ( c ) => [ c.clientId, c ] )
+			prevCollaborators.map( ( collaborator ) => [
+				collaborator.clientId,
+				collaborator,
+			] )
 		);
-		const me = activeCollaborators.find( ( c ) => c.isMe );
+		const me = activeCollaborators.find(
+			( collaborator ) => collaborator.isMe
+		);
 
 		for ( const collaborator of activeCollaborators ) {
 			if (
@@ -310,7 +315,10 @@ export function useOnCollaboratorLeave(
 		}
 
 		const newMap = new Map< number, ActiveCollaborator >(
-			activeCollaborators.map( ( c ) => [ c.clientId, c ] )
+			activeCollaborators.map( ( collaborator ) => [
+				collaborator.clientId,
+				collaborator,
+			] )
 		);
 
 		for ( const prevCollab of prevCollaborators ) {
@@ -363,7 +371,9 @@ export function useOnPostSave(
 		}
 
 		const saver = activeCollaborators.find(
-			( c ) => c.clientId === lastPostSave.savedByClientId && ! c.isMe
+			( collaborator ) =>
+				collaborator.clientId === lastPostSave.savedByClientId &&
+				! collaborator.isMe
 		);
 
 		if ( ! saver ) {
