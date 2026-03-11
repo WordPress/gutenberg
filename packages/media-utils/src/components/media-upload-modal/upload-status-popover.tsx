@@ -74,17 +74,17 @@ export function UploadStatusPopover( {
 
 	return (
 		<div className="media-upload-modal__upload-status">
+			{ isUploading && <Spinner /> }
 			<Button
 				className="media-upload-modal__upload-status__trigger"
-				variant="tertiary"
 				size="compact"
+				icon={ chevronDown }
+				iconPosition="right"
 				onClick={ () => updateIsOpen( ! isOpen ) }
 				aria-expanded={ isOpen }
 				ref={ triggerRef }
 			>
-				{ isUploading && <Spinner /> }
 				{ buttonLabel }
-				<Icon icon={ chevronDown } size={ 24 } />
 			</Button>
 			{ isOpen && (
 				<Popover
