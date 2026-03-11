@@ -235,6 +235,22 @@ export function Overlay( {
 	const resizeObserverRef = useResizeObserver( rerenderCursorsAfterDelay );
 	useEffect( rerenderCursorsAfterDelay, [ rerenderCursorsAfterDelay ] );
 
+	// Periodically recompute cursor positions to account for DOM layout
+	// changes that don't trigger awareness state updates (e.g. a collaborator
+	// applying formatting shifts text but the cursor's logical position is
+	// unchanged). Only active when remote cursors are visible.
+	const CURSOR_REDRAW_INTERVAL_MS = 10_000;
+	useEffect( () => {
+		if ( ! cursors.length ) {
+			return;
+		}
+		const interval = setInterval(
+			rerenderCursorsAfterDelay,
+			CURSOR_REDRAW_INTERVAL_MS
+		);
+		return () => clearInterval( interval );
+	}, [ cursors.length, rerenderCursorsAfterDelay ] );
+
 	// Merge the refs to use the same element for both overlay and resize observation
 	const mergedRef = useMergeRefs< HTMLDivElement | null >( [
 		setOverlayElement,
