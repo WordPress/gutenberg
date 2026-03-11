@@ -158,6 +158,29 @@ describe( 'TimePicker', () => {
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T11:59:00' );
 	} );
 
+	it( 'should call onChange with a bounded day if out of bounds', async () => {
+		const user = userEvent.setup();
+
+		const onChangeSpy = jest.fn();
+
+		render(
+			<TimePicker
+				currentTime="2026-02-05T00:00:00"
+				onChange={ onChangeSpy }
+				is12Hour
+			/>
+		);
+
+		const dayInput = screen.getByLabelText( 'Day' );
+
+		await user.clear( dayInput );
+		await user.type( dayInput, '30' );
+		await user.keyboard( '{Tab}' );
+
+		expect( onChangeSpy ).toHaveBeenCalledWith( '2026-02-28T00:00:00' );
+		expect( dayInput ).toHaveValue( 28 );
+	} );
+
 	it( 'should switch to PM correctly', async () => {
 		const user = userEvent.setup();
 

@@ -139,6 +139,13 @@ export function setInConfiguredTimezone(
 		...updates,
 	};
 
+	// Clamp the day to the last valid day of the month, to avoid producing
+	// invalid date strings (e.g. "2026-02-31"). Using day 0 of the next month
+	// takes advantage of JavaScript's built-in date wrapping logic, where day
+	// 0 is interpreted as the last day of the previous month.
+	const daysInMonth = new Date( values.year, values.month + 1, 0 ).getDate();
+	values.date = Math.min( values.date, daysInMonth );
+
 	const year = String( values.year ).padStart( 4, '0' );
 	const month = String( values.month + 1 ).padStart( 2, '0' );
 	const day = String( values.date ).padStart( 2, '0' );
