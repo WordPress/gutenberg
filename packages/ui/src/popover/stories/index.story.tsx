@@ -1,11 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
 	createPortal,
+	forwardRef,
 	useId,
 	useLayoutEffect,
 	useRef,
 	useState,
 } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 import { SlotFillProvider, Slot } from '@wordpress/components';
 import type { RefCallback } from 'react';
 import { Popover } from '../..';
@@ -425,88 +427,107 @@ export const Inline: Story = {
 
 /**
  * Use the `collisionAvoidance` prop to control how the popover behaves when
- * it collides with viewport edges.
+ * it collides with the edges of its collision boundary.
+ *
+ * Because the popup renders via a portal (outside the scrollable container),
+ * the container must be passed as `collisionBoundary` so Floating UI treats
+ * it as the clipping edge.
  *
  * - `side: 'flip'` flips to the opposite side (default).
- * - `side: 'shift'` shifts along the main axis.
  * - `side: 'none'` disables collision handling.
  *
  * Scroll the container to see collision avoidance in action.
  */
 export const CollisionAvoidance: Story = {
-	render: () => (
-		<div
-			style={ {
-				height: 300,
-				overflow: 'auto',
-				border: '1px solid #ccc',
-				padding: '200px 2rem',
-			} }
-		>
+	render: function Render() {
+		const [ boundary, setBoundary ] = useState< HTMLElement | null >(
+			null
+		);
+
+		return (
 			<div
+				ref={ setBoundary }
 				style={ {
-					display: 'flex',
-					gap: '2rem',
-					justifyContent: 'center',
+					height: 300,
+					overflow: 'auto',
+					border: '1px solid #ccc',
+					padding: '200px 2rem',
 				} }
 			>
-				<Popover.Root defaultOpen>
-					<Popover.Trigger>Flip (default)</Popover.Trigger>
-					<Popover.Popup side="top">
-						<Popover.Title>Flip</Popover.Title>
-						<Popover.Description>
-							Flips to bottom when clipped
-						</Popover.Description>
-					</Popover.Popup>
-				</Popover.Root>
+				<div
+					style={ {
+						display: 'flex',
+						gap: '2rem',
+						justifyContent: 'center',
+					} }
+				>
+					<Popover.Root defaultOpen>
+						<Popover.Trigger>Flip (default)</Popover.Trigger>
+						<Popover.Popup
+							side="top"
+							collisionBoundary={ boundary ?? undefined }
+						>
+							<Popover.Title>Flip</Popover.Title>
+							<Popover.Description>
+								Flips to bottom when clipped
+							</Popover.Description>
+						</Popover.Popup>
+					</Popover.Root>
 
-				<Popover.Root defaultOpen>
-					<Popover.Trigger>No collision</Popover.Trigger>
-					<Popover.Popup
-						side="top"
-						collisionAvoidance={ {
-							side: 'none',
-							align: 'none',
-						} }
-					>
-						<Popover.Title>None</Popover.Title>
-						<Popover.Description>
-							Stays on top even when clipped
-						</Popover.Description>
-					</Popover.Popup>
-				</Popover.Root>
+					<Popover.Root defaultOpen>
+						<Popover.Trigger>No collision</Popover.Trigger>
+						<Popover.Popup
+							side="top"
+							collisionBoundary={ boundary ?? undefined }
+							collisionAvoidance={ {
+								side: 'none',
+								align: 'none',
+							} }
+						>
+							<Popover.Title>None</Popover.Title>
+							<Popover.Description>
+								Stays on top even when clipped
+							</Popover.Description>
+						</Popover.Popup>
+					</Popover.Root>
+				</div>
+				<div style={ { height: 600 } } />
 			</div>
-			<div style={ { height: 600 } } />
-		</div>
-	),
+		);
+	},
 };
 
-function GenericIframe( {
-	children,
-	...props
-}: React.ComponentProps< 'iframe' > & { children: React.ReactNode } ) {
-	const [ containerNode, setContainerNode ] = useState< HTMLElement | null >(
-		null
-	);
+const GenericIframe = forwardRef< HTMLIFrameElement, GenericIframeProps >(
+	function GenericIframe( { children, ...props }, ref ) {
+		const [ containerNode, setContainerNode ] =
+			useState< HTMLElement | null >( null );
+		const iframeRef = useRef< HTMLIFrameElement >( null );
+		const mergedRef = useMergeRefs( [ ref, iframeRef ] );
 
-	return (
-		<iframe
-			title="Iframe"
-			{ ...props }
-			srcDoc="<!doctype html><html><body></body></html>"
-			// Waiting for the load event ensures that this works in Firefox.
-			// See https://github.com/facebook/react/issues/22847#issuecomment-991394558
-			onLoad={ ( event ) => {
-				const doc = event.currentTarget.contentDocument;
-				if ( doc ) {
-					setContainerNode( doc.body );
-				}
-			} }
-		>
-			{ containerNode && createPortal( children, containerNode ) }
-		</iframe>
-	);
-}
+		return (
+			<iframe
+				title="Iframe"
+				{ ...props }
+				ref={ mergedRef }
+				srcDoc="<!doctype html><html><body></body></html>"
+				// Waiting for the load event ensures that this works in Firefox.
+				// See https://github.com/facebook/react/issues/22847#issuecomment-991394558
+				onLoad={ ( event ) => {
+					const doc = event.currentTarget.contentDocument;
+					if ( doc ) {
+						setContainerNode( doc.body );
+					}
+				} }
+			>
+				{ containerNode && createPortal( children, containerNode ) }
+			</iframe>
+		);
+	}
+);
+
+type GenericIframeProps = React.ComponentProps< 'iframe' > & {
+	children: React.ReactNode;
+};
 
 /**
  * When the popover's trigger lives inside an iframe but the popover should
@@ -522,11 +543,14 @@ function GenericIframe( {
 export const CrossIframe: Story = {
 	render: function Render() {
 		const portalContainerRef = useRef< HTMLDivElement >( null );
+		const [ iframeBoundary, setIframeBoundary ] =
+			useState< HTMLIFrameElement | null >( null );
 
 		return (
 			<div>
 				<div ref={ portalContainerRef } />
 				<GenericIframe
+					ref={ setIframeBoundary }
 					style={ {
 						width: '100%',
 						height: 400,
@@ -559,6 +583,9 @@ export const CrossIframe: Story = {
 								<Popover.Popup
 									container={
 										portalContainerRef as React.RefObject< HTMLElement >
+									}
+									collisionBoundary={
+										iframeBoundary ?? undefined
 									}
 								>
 									<Popover.Arrow />
@@ -594,6 +621,8 @@ export const CrossIframeWithSlotFill: Story = {
 	name: 'Cross-Iframe (SlotFill)',
 	render: function Render() {
 		const slotRef = useRef< HTMLDivElement >( null );
+		const [ iframeBoundary, setIframeBoundary ] =
+			useState< HTMLIFrameElement | null >( null );
 
 		return (
 			<SlotFillProvider>
@@ -603,6 +632,7 @@ export const CrossIframeWithSlotFill: Story = {
 					ref={ slotRef }
 				/>
 				<GenericIframe
+					ref={ setIframeBoundary }
 					style={ {
 						width: '100%',
 						height: 400,
@@ -635,6 +665,9 @@ export const CrossIframeWithSlotFill: Story = {
 								<Popover.Popup
 									container={
 										slotRef as React.RefObject< HTMLElement >
+									}
+									collisionBoundary={
+										iframeBoundary ?? undefined
 									}
 								>
 									<Popover.Arrow />
