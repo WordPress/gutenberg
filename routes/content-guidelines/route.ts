@@ -10,5 +10,5 @@ import { bootstrapBlockRegistry } from './bootstrap-block-registry';
 
 export const route = {
 	beforeLoad: bootstrapBlockRegistry,
-	title: () => __( 'Content Guidelines' ),
+	title: () => __( 'Guidelines' ),
 };
