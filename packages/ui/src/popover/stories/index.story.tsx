@@ -1,5 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useId, useLayoutEffect, useRef, useState } from '@wordpress/element';
+import {
+	createPortal,
+	useId,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import type { RefCallback } from 'react';
 import { Popover } from '../..';
 
@@ -496,11 +502,7 @@ function GenericIframe( {
 				}
 			} }
 		>
-			{ containerNode &&
-				require( '@wordpress/element' ).createPortal(
-					children,
-					containerNode
-				) }
+			{ containerNode && createPortal( children, containerNode ) }
 		</iframe>
 	);
 }
