@@ -6,11 +6,9 @@
 import {
 	Button,
 	Icon,
-	Modal,
 	Notice,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
-	__experimentalText as Text,
 } from '@wordpress/components';
 import {
 	DataViews,
@@ -33,6 +31,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import BlockGuidelineModal from './block-guideline-modal';
+import RemoveGuidelineConfirmation from './remove-guideline-confirmation';
 import { saveContentGuidelines } from '../api';
 import { STORE_NAME } from '../store';
 import './block-guidelines.scss';
@@ -252,52 +251,23 @@ export default function BlockGuidelines() {
 				/>
 			) }
 			{ itemToDelete && (
-				<Modal
-					className="block-guidelines__remove-modal"
+				<RemoveGuidelineConfirmation
 					title={ __( 'Remove block guidelines' ) }
-					onRequestClose={ () => setItemToDelete( null ) }
-					size="small"
+					onClose={ () => setItemToDelete( null ) }
+					onConfirm={ handleDelete }
+					isBusy={ busy }
 				>
-					<VStack spacing={ 6 }>
-						<VStack spacing={ 4 }>
-							<Text size={ 13 } weight={ 400 }>
-								{ sprintf(
-									/* translators: %s: Block name. */
-									__(
-										'You are about to remove the block guidelines for the %s block.'
-									),
-									itemToDelete.label
-								) }
-							</Text>
-							<Text size={ 13 } weight={ 400 }>
-								{ __(
-									'This can be undone from revision history.'
-								) }
-							</Text>
-						</VStack>
-						<HStack justify="flex-end">
-							<Button
-								variant="tertiary"
-								onClick={ () => setItemToDelete( null ) }
-								disabled={ busy }
-								accessibleWhenDisabled
-							>
-								{ __( 'Cancel' ) }
-							</Button>
-							<Button
-								disabled={ busy }
-								accessibleWhenDisabled
-								isBusy={ busy }
-								variant="primary"
-								onClick={ handleDelete }
-								isDestructive
-								__next40pxDefaultSize
-							>
-								{ __( 'Remove' ) }
-							</Button>
-						</HStack>
-					</VStack>
-				</Modal>
+					{ sprintf(
+						/* translators: %s: Block name. */
+						__(
+							'You are about to remove the block guidelines for the %s block.'
+						),
+						itemToDelete.label
+					) }
+					<br />
+					<br />
+					{ __( 'This can be undone from revision history.' ) }
+				</RemoveGuidelineConfirmation>
 			) }
 		</VStack>
 	);
