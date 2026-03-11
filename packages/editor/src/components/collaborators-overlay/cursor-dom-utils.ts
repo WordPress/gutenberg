@@ -96,11 +96,10 @@ const getOffsetPositionInBlock = (
 
 	let cursorHeight = cursorRect.height;
 	if ( cursorHeight === 0 ) {
+		const view = editorDocument.defaultView ?? window;
 		cursorHeight =
-			parseInt(
-				window.getComputedStyle( blockElement ).lineHeight,
-				10
-			) || blockRect.height;
+			parseInt( view.getComputedStyle( blockElement ).lineHeight, 10 ) ||
+			blockRect.height;
 	}
 
 	return {
