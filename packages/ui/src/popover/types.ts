@@ -32,7 +32,12 @@ export interface PopupProps
 	children?: ReactNode;
 }
 
-export interface ArrowProps extends ComponentProps< 'div' > {}
+export interface ArrowProps extends ComponentProps< 'div' > {
+	/**
+	 * Custom arrow visuals to render inside the positioned container.
+	 */
+	children?: ReactNode;
+}
 
 export interface TitleProps extends ComponentProps< 'h2' > {
 	/**
