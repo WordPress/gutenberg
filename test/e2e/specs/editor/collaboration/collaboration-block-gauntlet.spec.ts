@@ -535,4 +535,258 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 				},
 			] );
 	} );
+
+	test( 'Media, embed, and utility blocks sync modifications between users', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		test.setTimeout( 60_000 );
+
+		const post = await requestUtils.createPost( {
+			title: 'Gauntlet - Media & Utility Blocks',
+			status: 'draft',
+			date_gmt: new Date().toISOString(),
+		} );
+		await collaborationUtils.openCollaborativeSession( post.id );
+
+		const { editor2, page2 } = collaborationUtils;
+
+		// User A inserts all media/utility blocks.
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				url: 'https://example.com/img.jpg',
+				alt: 'Test image',
+				caption: 'Caption A',
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: { caption: 'Gallery A' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/audio',
+			attributes: {
+				src: 'https://example.com/audio.mp3',
+				caption: 'Audio A',
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/video',
+			attributes: {
+				src: 'https://example.com/video.mp4',
+				caption: 'Video A',
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/file',
+			attributes: {
+				href: 'https://example.com/file.pdf',
+				fileName: 'File A',
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/embed',
+			attributes: {
+				url: 'https://example.com/embed',
+				caption: 'Embed A',
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/html',
+			attributes: { content: '<p>Hello HTML</p>' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/shortcode',
+			attributes: { text: '[gallery]' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/table',
+			attributes: {
+				caption: 'Table A',
+				body: [
+					{
+						cells: [
+							{ content: 'Cell 1', tag: 'td' },
+							{ content: 'Cell 2', tag: 'td' },
+						],
+					},
+				],
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/more',
+			attributes: { customText: 'Read more A' },
+		} );
+
+		// Wait for User B to see all 10 blocks.
+		await expect
+			.poll( () => editor2.getBlocks(), { timeout: 10_000 } )
+			.toHaveLength( 10 );
+
+		// User B modifies each block via keyboard/UI.
+
+		// Image: edit caption.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator( '[data-type="core/image"] figcaption' ),
+			'Caption B'
+		);
+		// Image: change alt text via sidebar.
+		await editor2.canvas.locator( '[data-type="core/image"]' ).click();
+		await editor2.openDocumentSettingsSidebar();
+		const altTextInput = page2.getByRole( 'textbox', {
+			name: /Alternative text/i,
+		} );
+		await altTextInput.fill( 'Alt by B' );
+
+		// Gallery: edit caption via data API (empty gallery has no visible figcaption).
+		await page2.evaluate( () => {
+			const blocks = window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks();
+			const gallery = blocks.find(
+				( b: { name: string } ) => b.name === 'core/gallery'
+			);
+			if ( gallery ) {
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.updateBlockAttributes( gallery.clientId, {
+						caption: 'Gallery edited by B',
+					} );
+			}
+		} );
+
+		// Audio: edit caption.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator( '[data-type="core/audio"] figcaption' ),
+			'Audio edited by B'
+		);
+
+		// Video: edit caption.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator( '[data-type="core/video"] figcaption' ),
+			'Video edited by B'
+		);
+
+		// File: edit file name (first contenteditable is the file name link).
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/file"] a[contenteditable="true"]'
+			),
+			'File edited by B'
+		);
+
+		// Embed: edit caption via data API (embed without valid URL has no figcaption).
+		await page2.evaluate( () => {
+			const blocks = window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks();
+			const embed = blocks.find(
+				( b: { name: string } ) => b.name === 'core/embed'
+			);
+			if ( embed ) {
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.updateBlockAttributes( embed.clientId, {
+						caption: 'Embed edited by B',
+					} );
+			}
+		} );
+
+		// HTML: edit via data API (HTML block uses a modal editor, not inline).
+		await page2.evaluate( () => {
+			const blocks = window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks();
+			const html = blocks.find(
+				( b: { name: string } ) => b.name === 'core/html'
+			);
+			if ( html ) {
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.updateBlockAttributes( html.clientId, {
+						content: '<div>Edited HTML</div>',
+					} );
+			}
+		} );
+
+		// Shortcode: edit content in PlainText textarea.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/shortcode"] [aria-label="Shortcode text"]'
+			),
+			'[audio]'
+		);
+
+		// Table: edit caption.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator( '[data-type="core/table"] figcaption' ),
+			'Table B'
+		);
+
+		// More: edit custom text (PlainText renders as a span with aria-label).
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/more"] [aria-label="\\"Read more\\" text"]'
+			),
+			'Read more B'
+		);
+
+		// User A verifies all modifications synced.
+		await expect
+			.poll( () => editor.getBlocks(), { timeout: 10_000 } )
+			.toMatchObject( [
+				{
+					name: 'core/image',
+					attributes: {
+						alt: 'Alt by B',
+						caption: 'Caption B',
+					},
+				},
+				{
+					name: 'core/gallery',
+					attributes: { caption: 'Gallery edited by B' },
+				},
+				{
+					name: 'core/audio',
+					attributes: { caption: 'Audio edited by B' },
+				},
+				{
+					name: 'core/video',
+					attributes: { caption: 'Video edited by B' },
+				},
+				{
+					name: 'core/file',
+					attributes: { fileName: 'File edited by B' },
+				},
+				{
+					name: 'core/embed',
+					attributes: { caption: 'Embed edited by B' },
+				},
+				{
+					name: 'core/html',
+					attributes: { content: '<div>Edited HTML</div>' },
+				},
+				{
+					name: 'core/shortcode',
+					attributes: { text: '[audio]' },
+				},
+				{
+					name: 'core/table',
+					attributes: { caption: 'Table B' },
+				},
+				{
+					name: 'core/more',
+					attributes: { customText: 'Read more B' },
+				},
+			] );
+	} );
 } );
