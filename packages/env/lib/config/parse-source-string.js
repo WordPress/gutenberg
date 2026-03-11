@@ -70,7 +70,7 @@ function parseSourceString( sourceString, { cacheDirectoryPath } ) {
 	if ( zipFields ) {
 		const rawBasename = path.basename( zipFields[ 1 ] );
 		const basename = encodeURIComponent(
-			rawBasename.replace( /\.(\d+\.)*\d+$/, '' )
+			rawBasename.replace( /(\.[^\s]*)$/, '' )
 		);
 
 		return {
