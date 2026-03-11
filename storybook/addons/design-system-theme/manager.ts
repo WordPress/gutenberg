@@ -30,6 +30,11 @@ const COLOR_OPTIONS: ThemeOption[] = [
 	{ id: 'dark', title: 'Dark' },
 ];
 
+const CURSOR_CONTROL_OPTIONS: ThemeOption[] = [
+	{ id: '', title: 'Default' },
+	{ id: 'pointer', title: 'Pointer' },
+];
+
 const DENSITY_OPTIONS: ThemeOption[] = [
 	{ id: 'compact', title: 'Compact' },
 	{ id: '', title: 'Default' },
@@ -72,6 +77,11 @@ const ThemeTool = () => {
 			title: 'Color',
 			globalName: 'dsColorTheme',
 			options: COLOR_OPTIONS,
+		} ),
+		createElement( ThemeTooltipMessage, {
+			title: 'Cursor control',
+			globalName: 'dsCursorControl',
+			options: CURSOR_CONTROL_OPTIONS,
 		} )
 	);
 

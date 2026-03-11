@@ -58,6 +58,7 @@ export const globalTypes = {
 		},
 	},
 	dsColorTheme: {},
+	dsCursorControl: {},
 	dsDensity: {},
 };
 

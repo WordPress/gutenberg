@@ -170,8 +170,10 @@ function generateStyles( {
 
 export function useThemeProviderStyles( {
 	color = {},
+	cursor,
 }: {
 	color?: ThemeProviderProps[ 'color' ];
+	cursor?: ThemeProviderProps[ 'cursor' ];
 } = {} ) {
 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
 
@@ -185,6 +187,7 @@ export function useThemeProviderStyles( {
 		DEFAULT_SEED_COLORS.primary;
 	const bg =
 		color.bg ?? inheritedSettings.color?.bg ?? DEFAULT_SEED_COLORS.bg;
+	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
 
 	const resolvedSettings = useMemo(
 		() => ( {
@@ -192,8 +195,9 @@ export function useThemeProviderStyles( {
 				primary,
 				bg,
 			},
+			cursor: cursorControl ? { control: cursorControl } : undefined,
 		} ),
-		[ primary, bg ]
+		[ primary, bg, cursorControl ]
 	);
 
 	const themeProviderStyles = useMemo( () => {
