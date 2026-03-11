@@ -3041,7 +3041,7 @@ class WP_Theme_JSON_Gutenberg {
 							 * default state (e.g. '.wp-block-button').
 							 */
 							$pseudo_feature_selectors = array();
-							foreach ( $feature_selectors as $feature => $feature_selector ) {
+							foreach ( $feature_selectors ?? array() as $feature => $feature_selector ) {
 								if ( is_array( $feature_selector ) ) {
 									$pseudo_feature_selectors[ $feature ] = array();
 									foreach ( $feature_selector as $subfeature => $subfeature_selector ) {
