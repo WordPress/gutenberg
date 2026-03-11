@@ -2,13 +2,7 @@
  * WordPress dependencies
  */
 import { decodeEntities } from '@wordpress/html-entities';
-import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	Modal,
-	SearchControl,
-} from '@wordpress/components';
+import { Modal, Button, SearchControl } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
@@ -38,21 +32,6 @@ export default function BlockThemeControlV2( { id } ) {
 	const { editEntityRecord } = useDispatch( coreStore );
 
 	const [ showModal, setShowModal ] = useState( false );
-	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
-	// Memoize popoverProps to avoid returning a new object every time.
-	const popoverProps = useMemo(
-		() => ( {
-			// Anchor the popover to the middle of the entire row so that it doesn't
-			// move around when the label changes.
-			anchor: popoverAnchor,
-			className: 'editor-post-template__dropdown',
-			placement: 'left-start',
-			offset: 36,
-			shift: true,
-		} ),
-		[ popoverAnchor ]
-	);
-
 	if ( ! hasResolved ) {
 		return null;
 	}
@@ -69,34 +48,21 @@ export default function BlockThemeControlV2( { id } ) {
 	};
 
 	return (
-		<PostPanelRow label={ __( 'Template' ) } ref={ setPopoverAnchor }>
-			<DropdownMenu
-				popoverProps={ popoverProps }
-				focusOnMount
-				toggleProps={ {
-					size: 'compact',
-					variant: 'tertiary',
-					tooltipPosition: 'middle left',
+		<PostPanelRow label={ __( 'Template' ) }>
+			<Button
+				__next40pxDefaultSize
+				disabled={ ! availableTemplates?.length }
+				accessibleWhenDisabled
+				label={ __( 'Change template' ) }
+				size="compact"
+				variant="tertiary"
+				tooltipPosition="middle left"
+				onClick={ () => {
+					setShowModal( true );
 				} }
-				label={ __( 'Template options' ) }
-				text={ decodeEntities( template.title ) }
-				icon={ null }
 			>
-				{ ( { onClose } ) => (
-					<MenuGroup>
-						<MenuItem
-							disabled={ ! availableTemplates?.length }
-							accessibleWhenDisabled
-							onClick={ () => {
-								setShowModal( true );
-								onClose();
-							} }
-						>
-							{ __( 'Change template' ) }
-						</MenuItem>
-					</MenuGroup>
-				) }
-			</DropdownMenu>
+				{ decodeEntities( template.title ) }
+			</Button>
 			{ showModal && (
 				<Modal
 					title={ __( 'Choose a template' ) }

@@ -158,7 +158,7 @@ export default function TemplateDropdown() {
 							size="compact"
 							showTooltip={ ! showIconLabels }
 							icon={ layout }
-							label={ __( 'Template' ) }
+							label={ __( 'Template options' ) }
 							className="editor-template-dropdown"
 						/>
 					}
