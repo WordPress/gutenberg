@@ -4,7 +4,7 @@
 import { Button } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { createInterpolateElement, useState } from '@wordpress/element';
+import { createInterpolateElement, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -19,58 +19,93 @@ const AI_PLUGIN_SLUG = 'ai';
 const AI_PLUGIN_ID = 'ai/ai';
 const AI_PLUGIN_URL = 'https://wordpress.org/plugins/ai/';
 
+const connectorDataValues = Object.values( getConnectorData() );
+const hasAiProviders = connectorDataValues.some(
+	( c ) => c.type === 'ai_provider'
+);
+const aiProviderSettingNames: string[] = [];
+for ( const c of connectorDataValues ) {
+	if ( c.type === 'ai_provider' && c.authentication.method === 'api_key' ) {
+		aiProviderSettingNames.push( c.authentication.settingName );
+	}
+}
+
 export function AiPluginCallout() {
 	const [ isBusy, setIsBusy ] = useState( false );
-	const [ completedAction, setCompletedAction ] = useState<
-		'installed' | 'activated' | null
-	>( null );
+	const [ justActivated, setJustActivated ] = useState( false );
 
-	const { pluginStatus, canInstallPlugins, canManagePlugins } = useSelect(
-		( select ) => {
-			const store = select( coreStore );
+	// Server-side initial state — true if any provider was already connected at page load.
+	const initialHasConnectedProvider = useRef(
+		connectorDataValues.some(
+			( c ) =>
+				c.type === 'ai_provider' &&
+				c.authentication.method === 'api_key' &&
+				c.authentication.isConnected
+		)
+	).current;
 
-			const canCreate = !! store.canUser( 'create', {
-				kind: 'root',
-				name: 'plugin',
-			} );
+	const {
+		pluginStatus,
+		canInstallPlugins,
+		canManagePlugins,
+		hasConnectedProvider,
+	} = useSelect( ( select ) => {
+		const store = select( coreStore );
 
-			const plugin = store.getEntityRecord(
-				'root',
-				'plugin',
-				AI_PLUGIN_ID
-			) as { plugin: string; status: string } | undefined;
+		const canCreate = !! store.canUser( 'create', {
+			kind: 'root',
+			name: 'plugin',
+		} );
 
-			const hasFinished = store.hasFinishedResolution(
-				'getEntityRecord',
-				[ 'root', 'plugin', AI_PLUGIN_ID ]
+		// Reactive check: any AI provider setting has a non-empty value.
+		const siteSettings = store.getEntityRecord( 'root', 'site' ) as
+			| Record< string, string >
+			| undefined;
+		const hasConnected =
+			initialHasConnectedProvider ||
+			aiProviderSettingNames.some(
+				( name ) => !! siteSettings?.[ name ]
 			);
 
-			if ( ! hasFinished ) {
-				return {
-					pluginStatus: 'checking' as PluginStatus,
-					canInstallPlugins: canCreate,
-					canManagePlugins: undefined as boolean | undefined,
-				};
-			}
+		const plugin = store.getEntityRecord(
+			'root',
+			'plugin',
+			AI_PLUGIN_ID
+		) as { plugin: string; status: string } | undefined;
 
-			if ( ! plugin ) {
-				return {
-					pluginStatus: 'not-installed' as PluginStatus,
-					canInstallPlugins: canCreate,
-					canManagePlugins: canCreate,
-				};
-			}
+		const hasFinished = store.hasFinishedResolution( 'getEntityRecord', [
+			'root',
+			'plugin',
+			AI_PLUGIN_ID,
+		] );
 
+		if ( ! hasFinished ) {
 			return {
-				pluginStatus: ( plugin.status === 'active'
-					? 'active'
-					: 'inactive' ) as PluginStatus,
+				pluginStatus: 'checking' as PluginStatus,
 				canInstallPlugins: canCreate,
-				canManagePlugins: true,
+				canManagePlugins: undefined as boolean | undefined,
+				hasConnectedProvider: hasConnected,
 			};
-		},
-		[]
-	);
+		}
+
+		if ( ! plugin ) {
+			return {
+				pluginStatus: 'not-installed' as PluginStatus,
+				canInstallPlugins: canCreate,
+				canManagePlugins: canCreate,
+				hasConnectedProvider: hasConnected,
+			};
+		}
+
+		return {
+			pluginStatus: ( plugin.status === 'active'
+				? 'active'
+				: 'inactive' ) as PluginStatus,
+			canInstallPlugins: canCreate,
+			canManagePlugins: true,
+			hasConnectedProvider: hasConnected,
+		};
+	}, [] );
 
 	const { saveEntityRecord } = useDispatch( coreStore );
 
@@ -83,7 +118,7 @@ export function AiPluginCallout() {
 				{ slug: AI_PLUGIN_SLUG, status: 'active' },
 				{ throwOnError: true }
 			);
-			setCompletedAction( 'installed' );
+			setJustActivated( true );
 		} catch {
 			// Handle error
 		} finally {
@@ -100,7 +135,7 @@ export function AiPluginCallout() {
 				{ plugin: AI_PLUGIN_ID, status: 'active' },
 				{ throwOnError: true }
 			);
-			setCompletedAction( 'activated' );
+			setJustActivated( true );
 		} catch {
 			// Handle error
 		} finally {
@@ -109,9 +144,6 @@ export function AiPluginCallout() {
 	};
 
 	// Only show when at least one AI provider connector is registered.
-	const hasAiProviders = Object.values( getConnectorData() ).some(
-		( connector ) => connector.type === 'ai_provider'
-	);
 	if ( ! hasAiProviders ) {
 		return null;
 	}
@@ -121,8 +153,12 @@ export function AiPluginCallout() {
 		return null;
 	}
 
-	// Already active and no completed action to show.
-	if ( pluginStatus === 'active' && ! completedAction ) {
+	// Already connected at page load — nothing to show.
+	if (
+		pluginStatus === 'active' &&
+		initialHasConnectedProvider &&
+		! justActivated
+	) {
 		return null;
 	}
 
@@ -136,21 +172,32 @@ export function AiPluginCallout() {
 		return null;
 	}
 
+	const isActiveNoProvider =
+		pluginStatus === 'active' && ! hasConnectedProvider;
+	const isJustConnected =
+		pluginStatus === 'active' &&
+		hasConnectedProvider &&
+		( ! initialHasConnectedProvider || justActivated );
+	const showInstallActivate =
+		pluginStatus === 'not-installed' || pluginStatus === 'inactive';
+
+	const getMessage = () => {
+		if ( isJustConnected ) {
+			return __(
+				'The <strong>AI plugin</strong> is ready to use. You can use it to generate featured images, alt text, titles, excerpts and more.'
+			);
+		}
+		if ( isActiveNoProvider ) {
+			return __(
+				'The <strong>AI plugin</strong> is installed. Connect a provider below to generate featured images, alt text, titles, excerpts, and more.'
+			);
+		}
+		return __(
+			'The <strong>AI plugin</strong> can use your connectors to generate featured images, alt text, titles, excerpts and more.'
+		);
+	};
+
 	const getPrimaryButtonProps = () => {
-		if ( completedAction === 'installed' ) {
-			return {
-				label: __( 'Installed' ),
-				disabled: true,
-				onClick: undefined,
-			};
-		}
-		if ( completedAction === 'activated' ) {
-			return {
-				label: __( 'Activated' ),
-				disabled: true,
-				onClick: undefined,
-			};
-		}
 		if ( pluginStatus === 'not-installed' ) {
 			return {
 				label: isBusy
@@ -170,31 +217,26 @@ export function AiPluginCallout() {
 		};
 	};
 
-	const primaryButton = getPrimaryButtonProps();
-
 	return (
 		<div className="ai-plugin-callout">
 			<div className="ai-plugin-callout__content">
 				<p>
-					{ createInterpolateElement(
-						__(
-							'The <strong>AI plugin</strong> can use your connectors to generate featured images, alt text, titles, excerpts and more.'
-						),
-						{
-							strong: <strong />,
-						}
-					) }
+					{ createInterpolateElement( getMessage(), {
+						strong: <strong />,
+					} ) }
 				</p>
 				<div className="ai-plugin-callout__actions">
-					<Button
-						variant="primary"
-						size="compact"
-						isBusy={ isBusy }
-						disabled={ primaryButton.disabled }
-						onClick={ primaryButton.onClick }
-					>
-						{ primaryButton.label }
-					</Button>
+					{ showInstallActivate && (
+						<Button
+							variant="primary"
+							size="compact"
+							isBusy={ isBusy }
+							disabled={ getPrimaryButtonProps().disabled }
+							onClick={ getPrimaryButtonProps().onClick }
+						>
+							{ getPrimaryButtonProps().label }
+						</Button>
+					) }
 					<Button
 						variant="tertiary"
 						href={ AI_PLUGIN_URL }
