@@ -11,6 +11,10 @@
 
 -   `DateCalendar`, `DateRangeCalendar`: Add `showOutsideDays` and `fixedWeeks` props and style outside-month days ([#76199](https://github.com/WordPress/gutenberg/pull/76199)).
 
+### Internal
+
+-   Remove `Avatar` and `AvatarGroup` from private APIs, moved to `@wordpress/editor` ([#75652](https://github.com/WordPress/gutenberg/pull/75652)).
+
 ## 32.3.0 (2026-03-04)
 
 ### Code Quality

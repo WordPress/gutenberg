@@ -133,6 +133,7 @@ export interface PostType {
 		comments?: string;
 		editor?: boolean | [ EditorSupport ];
 		trackbacks?: boolean;
+		'post-formats'?: boolean;
 	};
 }
 

@@ -25,11 +25,13 @@ export default function DisableNonPageContentBlocks() {
 	const disabledIds = useSelect(
 		( select ) => {
 			const { getBlockOrder } = select( blockEditorStore );
-			return templateParts.flatMap( ( clientId ) =>
-				getBlockOrder( clientId )
-			);
+			return templateParts
+				.flatMap( ( clientId ) => getBlockOrder( clientId ) )
+				.filter(
+					( clientId ) => ! contentOnlyIds.includes( clientId )
+				);
 		},
-		[ templateParts ]
+		[ templateParts, contentOnlyIds ]
 	);
 
 	const registry = useRegistry();

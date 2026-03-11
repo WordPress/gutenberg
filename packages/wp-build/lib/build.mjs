@@ -281,8 +281,11 @@ const wasmInlinePlugin = {
 				try {
 					const resolved = require.resolve( args.path );
 					return {
-						path: resolved,
+						path: normalizePath(
+							path.relative( ROOT_DIR, resolved )
+						),
 						namespace: 'wasm-inline',
+						pluginData: { resolvedPath: resolved },
 					};
 				} catch {
 					// If resolution fails, let other plugins handle it.
@@ -296,7 +299,9 @@ const wasmInlinePlugin = {
 		build.onLoad(
 			{ filter: /.*/, namespace: 'wasm-inline' },
 			async ( args ) => {
-				const wasmBuffer = await readFile( args.path );
+				const wasmBuffer = await readFile(
+					args.pluginData.resolvedPath
+				);
 				const base64 = wasmBuffer.toString( 'base64' );
 				const dataUrl = `data:application/wasm;base64,${ base64 }`;
 
@@ -1801,9 +1806,9 @@ async function buildAll( baseUrlExpression ) {
 	} );
 
 	// When building for WordPress Core, exclude experimental pages.
-	const isCoreBuild = Boolean(
-		process.env.npm_package_config_IS_WORDPRESS_CORE
-	);
+	const isCoreBuild =
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ||
+		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE );
 	const activePages = isCoreBuild
 		? normalizedPages.filter( ( page ) => ! page.experimental )
 		: normalizedPages;
@@ -1820,51 +1825,6 @@ async function buildAll( baseUrlExpression ) {
 			title: page.title,
 		};
 	} );
-
-	// Bundle boot, route, and theme packages from node_modules when pages exist
-	if ( pageData.length > 0 ) {
-		try {
-			const { createRequire } = await import( 'module' );
-			const require = createRequire( import.meta.url );
-
-			// Resolve the @wordpress packages directory from node_modules
-			const bootPackageJson = require.resolve(
-				'@wordpress/boot/package.json',
-				{ paths: [ ROOT_DIR ] }
-			);
-			const wordpressPackagesDir = path.dirname(
-				path.dirname( bootPackageJson )
-			);
-
-			// Bundle boot, route, theme, and private-apis packages
-			const externalPackages = [
-				'boot',
-				'route',
-				'theme',
-				'private-apis',
-			];
-			for ( const pkgName of externalPackages ) {
-				const result = await bundlePackage( pkgName, {
-					sourceDir: wordpressPackagesDir,
-					handlePrefix: 'wp',
-					scriptGlobal: 'wp',
-					packageNamespace: 'wordpress',
-				} );
-
-				if ( result && result.modules ) {
-					modules.push( ...result.modules );
-				}
-				if ( result && result.scripts ) {
-					scripts.push( ...result.scripts );
-				}
-			}
-		} catch ( error ) {
-			console.warn(
-				'\n⚠️  Warning: Could not bundle WordPress packages for pages:',
-				error.message
-			);
-		}
-	}
 
 	console.log( '\n📄 Generating PHP registration files...\n' );
 	const phpReplacements = await getPhpReplacements(

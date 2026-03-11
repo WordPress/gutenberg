@@ -1844,12 +1844,7 @@
 			}
 		},
 		"stylesBlocksPseudoSelectorsPropertyNames": {
-			"enum": [
-				":hover",
-				":focus",
-				":focus-visible",
-				":active"
-			]
+			"enum": [ ":hover", ":focus", ":focus-visible", ":active" ]
 		},
 		"stylesElementsPseudoSelectorsProperties": {
 			"type": "object",
@@ -1874,6 +1869,23 @@
 				},
 				":visited": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
+				}
+			}
+		},
+		"stylesBlocksCustomStatesProperties": {
+			"description": "Custom class-based block states using the '@' prefix. Each state supports style properties as well as the same pseudo-selectors available to the block.",
+			"type": "object",
+			"properties": {
+				"@current": {
+					"description": "Styles applied to the current/active item (e.g. .current-menu-item in navigation).",
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesPropertiesComplete"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+						}
+					]
 				}
 			}
 		},
@@ -2191,7 +2203,17 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/navigation-link": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksCustomStatesProperties"
+						}
+					]
 				},
 				"core/navigation-submenu": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"

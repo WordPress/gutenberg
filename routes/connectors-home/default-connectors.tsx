@@ -6,6 +6,7 @@ import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
 	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
+	type __experimentalApiKeySource as ApiKeySource,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
 import { __ } from '@wordpress/i18n';
@@ -15,15 +16,27 @@ import { Badge } from '@wordpress/ui';
  * Internal dependencies
  */
 import { useConnectorPlugin } from './use-connector-plugin';
-import { OpenAILogo, ClaudeLogo, GeminiLogo } from './logos';
+import {
+	OpenAILogo,
+	ClaudeLogo,
+	GeminiLogo,
+	DefaultConnectorLogo,
+} from './logos';
 
 type ConnectorAuthentication =
-	| { method: 'api_key'; settingName: string; credentialsUrl: string | null }
+	| {
+			method: 'api_key';
+			settingName: string;
+			credentialsUrl: string | null;
+			keySource?: ApiKeySource;
+			isConnected?: boolean;
+	  }
 	| { method: 'none' };
 
 interface ConnectorData {
 	name: string;
 	description: string;
+	logoUrl?: string;
 	type: 'ai_provider';
 	plugin?: {
 		slug: string;
@@ -55,6 +68,21 @@ const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
 	anthropic: ClaudeLogo,
 };
 
+function getConnectorLogo(
+	connectorId: string,
+	name: string,
+	logoUrl?: string
+): React.ReactNode {
+	if ( logoUrl ) {
+		return <img src={ logoUrl } alt={ name } width={ 40 } height={ 40 } />;
+	}
+	const Logo = CONNECTOR_LOGOS[ connectorId ];
+	if ( Logo ) {
+		return <Logo />;
+	}
+	return <DefaultConnectorLogo />;
+}
+
 const ConnectedBadge = () => (
 	<span
 		style={ {
@@ -77,9 +105,11 @@ interface ApiKeyConnectorConfig {
 	pluginSlug?: string;
 	settingName: string;
 	helpUrl?: string;
-	Logo?: React.ComponentType;
+	icon?: React.ReactNode;
 	isInstalled?: boolean;
 	isActivated?: boolean;
+	keySource?: ApiKeySource;
+	initialIsConnected?: boolean;
 }
 
 function ApiKeyConnector( {
@@ -88,9 +118,11 @@ function ApiKeyConnector( {
 	pluginSlug,
 	settingName,
 	helpUrl,
-	Logo,
+	icon,
 	isInstalled,
 	isActivated,
+	keySource: initialKeySource,
+	initialIsConnected,
 }: ConnectorRenderProps & ApiKeyConnectorConfig ) {
 	let helpLabel: string | undefined;
 	try {
@@ -110,6 +142,7 @@ function ApiKeyConnector( {
 		isBusy,
 		isConnected,
 		currentApiKey,
+		keySource,
 		handleButtonClick,
 		getButtonLabel,
 		saveApiKey,
@@ -119,7 +152,11 @@ function ApiKeyConnector( {
 		settingName,
 		isInstalled,
 		isActivated,
+		keySource: initialKeySource,
+		initialIsConnected,
 	} );
+	const isExternallyConfigured =
+		keySource === 'env' || keySource === 'constant';
 	const showUnavailableBadge =
 		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
 		( pluginStatus === 'inactive' && canActivatePlugins === false );
@@ -130,7 +167,7 @@ function ApiKeyConnector( {
 			className={
 				pluginSlug ? `connector-item--${ pluginSlug }` : undefined
 			}
-			icon={ Logo ? <Logo /> : undefined }
+			icon={ icon }
 			name={ label }
 			description={ description }
 			actionArea={
@@ -163,11 +200,18 @@ function ApiKeyConnector( {
 			{ isExpanded && pluginStatus === 'active' && (
 				<DefaultConnectorSettings
 					key={ isConnected ? 'connected' : 'setup' }
-					initialValue={ currentApiKey }
+					initialValue={
+						isExternallyConfigured
+							? '••••••••••••••••'
+							: currentApiKey
+					}
 					helpUrl={ helpUrl }
 					helpLabel={ helpLabel }
-					readOnly={ isConnected }
-					onRemove={ removeApiKey }
+					readOnly={ isConnected || isExternallyConfigured }
+					keySource={ keySource }
+					onRemove={
+						isExternallyConfigured ? undefined : removeApiKey
+					}
 					onSave={ async ( apiKey: string ) => {
 						await saveApiKey( apiKey );
 						setIsExpanded( false );
@@ -206,9 +250,15 @@ export function registerDefaultConnectors() {
 					pluginSlug={ data.plugin?.slug }
 					settingName={ authentication.settingName }
 					helpUrl={ authentication.credentialsUrl ?? undefined }
-					Logo={ CONNECTOR_LOGOS[ connectorId ] }
+					icon={ getConnectorLogo(
+						connectorId,
+						data.name,
+						data.logoUrl
+					) }
 					isInstalled={ data.plugin?.isInstalled }
 					isActivated={ data.plugin?.isActivated }
+					keySource={ authentication.keySource }
+					initialIsConnected={ authentication.isConnected }
 				/>
 			),
 		} );

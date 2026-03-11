@@ -70,7 +70,7 @@ test.describe( 'Page List', () => {
 			featuredImage: {
 				performEdit: async ( page ) => {
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose file',
+						name: 'Set featured image',
 					} );
 					await placeholder.click();
 					const mediaLibrary = page.getByRole( 'dialog' );
@@ -95,16 +95,16 @@ test.describe( 'Page List', () => {
 						.click();
 				},
 				assertInitialState: async ( page ) => {
-					const el = page.getByText( 'Choose file' );
+					const el = page.getByText( 'Set featured image' );
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose file',
+						name: 'Set featured image',
 					} );
 					await expect( el ).toBeVisible();
 					await expect( placeholder ).toBeVisible();
 				},
 				assertEditedState: async ( page ) => {
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose file',
+						name: 'Set featured image',
 					} );
 					await expect( placeholder ).toBeHidden();
 					const img = page.locator( '.fields__media-edit-thumbnail' );

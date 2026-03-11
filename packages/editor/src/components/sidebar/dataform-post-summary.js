@@ -31,6 +31,13 @@ const form = {
 			},
 		},
 		{
+			id: 'post-content-info',
+			layout: {
+				type: 'regular',
+				labelPosition: 'none',
+			},
+		},
+		{
 			id: 'status',
 			label: __( 'Status' ),
 			children: [
@@ -57,6 +64,7 @@ const form = {
 			],
 		},
 		'template',
+		'format',
 	],
 };
 

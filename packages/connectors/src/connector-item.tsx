@@ -59,6 +59,8 @@ export function ConnectorItem( {
 	);
 }
 
+export type ApiKeySource = 'env' | 'constant' | 'database' | 'none';
+
 export interface DefaultConnectorSettingsProps {
 	onSave?: ( apiKey: string ) => void | Promise< void >;
 	onRemove?: () => void;
@@ -66,6 +68,7 @@ export interface DefaultConnectorSettingsProps {
 	helpUrl?: string;
 	helpLabel?: string;
 	readOnly?: boolean;
+	keySource?: ApiKeySource;
 }
 
 /**
@@ -78,6 +81,7 @@ export interface DefaultConnectorSettingsProps {
  * @param props.helpUrl      - URL to documentation for obtaining an API key.
  * @param props.helpLabel    - Custom label for the help link. Defaults to the URL without protocol.
  * @param props.readOnly     - Whether the form is in read-only mode.
+ * @param props.keySource    - The source of the API key: 'env', 'constant', 'database', or 'none'.
  */
 export function DefaultConnectorSettings( {
 	onSave,
@@ -86,6 +90,7 @@ export function DefaultConnectorSettings( {
 	helpUrl,
 	helpLabel,
 	readOnly = false,
+	keySource,
 }: DefaultConnectorSettingsProps ) {
 	const [ apiKey, setApiKey ] = useState( initialValue );
 	const [ isSaving, setIsSaving ] = useState( false );
@@ -110,7 +115,20 @@ export function DefaultConnectorSettings( {
 		  )
 		: undefined;
 
+	const isExternallyConfigured =
+		keySource === 'env' || keySource === 'constant';
+
 	const getHelp = () => {
+		if ( isExternallyConfigured ) {
+			if ( keySource === 'env' ) {
+				return __(
+					'This API key is configured using an environment variable.'
+				);
+			}
+			if ( keySource === 'constant' ) {
+				return __( 'This API key is configured as a constant.' );
+			}
+		}
 		if ( readOnly ) {
 			return helpUrl
 				? createInterpolateElement(
@@ -182,9 +200,11 @@ export function DefaultConnectorSettings( {
 				help={ getHelp() }
 			/>
 			{ readOnly ? (
-				<Button variant="link" isDestructive onClick={ onRemove }>
-					{ __( 'Remove and replace' ) }
-				</Button>
+				onRemove && (
+					<Button variant="link" isDestructive onClick={ onRemove }>
+						{ __( 'Remove and replace' ) }
+					</Button>
+				)
 			) : (
 				<HStack justify="flex-start">
 					<Button
