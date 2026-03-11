@@ -68,10 +68,7 @@ export const Positioning: Story = {
 			>
 				{ sides.flatMap( ( side ) =>
 					aligns.map( ( align ) => (
-						<Popover.Root
-							key={ `${ side }-${ align }` }
-							defaultOpen
-						>
+						<Popover.Root key={ `${ side }-${ align }` } open>
 							<Popover.Trigger>
 								{ side } / { align }
 							</Popover.Trigger>
@@ -86,7 +83,7 @@ export const Positioning: Story = {
 							>
 								<Popover.Arrow />
 								<Popover.Description>
-									{ side } / { align }
+									{ side } side / { align } align
 								</Popover.Description>
 							</Popover.Popup>
 						</Popover.Root>
@@ -486,10 +483,12 @@ function GenericIframe( {
 	);
 
 	return (
-		// eslint-disable-next-line jsx-a11y/iframe-has-title
 		<iframe
+			title="Iframe"
 			{ ...props }
 			srcDoc="<!doctype html><html><body></body></html>"
+			// Waiting for the load event ensures that this works in Firefox.
+			// See https://github.com/facebook/react/issues/22847#issuecomment-991394558
 			onLoad={ ( event ) => {
 				const doc = event.currentTarget.contentDocument;
 				if ( doc ) {
@@ -513,6 +512,9 @@ function GenericIframe( {
  *
  * This technique is used in Gutenberg where the block editor canvas is an
  * iframe but toolbars and menus must appear outside it.
+ *
+ * Scroll inside the iframe to verify that the popover tracks the trigger
+ * position across document boundaries.
  */
 export const CrossIframe: Story = {
 	render: function Render() {
@@ -520,39 +522,55 @@ export const CrossIframe: Story = {
 
 		return (
 			<div>
-				<p>
-					The popover trigger is inside the purple-bordered iframe.
-					The popup renders in the parent document via the `container`
-					prop.
-				</p>
 				<div ref={ portalContainerRef } />
 				<GenericIframe
 					style={ {
 						width: '100%',
-						height: 300,
+						height: 400,
 						border: 0,
-						outline: '2px solid purple',
+						outline: '1px solid purple',
 					} }
 				>
-					<div style={ { padding: 32 } }>
-						<Popover.Root>
-							<Popover.Trigger>
-								Trigger (inside iframe)
-							</Popover.Trigger>
-							<Popover.Popup
-								container={
-									portalContainerRef as React.RefObject< HTMLElement >
-								}
-							>
-								<Popover.Title>
-									Cross-Iframe Popover
-								</Popover.Title>
-								<Popover.Description>
-									This popup is rendered in the parent
-									document, not inside the iframe.
-								</Popover.Description>
-							</Popover.Popup>
-						</Popover.Root>
+					<div
+						style={ {
+							height: '200vh',
+							paddingTop: '10vh',
+						} }
+					>
+						<div
+							style={ {
+								maxWidth: 200,
+								marginTop: 100,
+								marginInline: 'auto',
+							} }
+						>
+							<Popover.Root defaultOpen>
+								<Popover.Trigger
+									style={ {
+										padding: 8,
+										background: 'salmon',
+									} }
+								>
+									Popover&apos;s anchor (inside iframe)
+								</Popover.Trigger>
+								<Popover.Popup
+									container={
+										portalContainerRef as React.RefObject< HTMLElement >
+									}
+								>
+									<Popover.Arrow />
+									<Popover.Title>
+										Cross-Iframe Popover
+									</Popover.Title>
+									<Popover.Description>
+										This popup is rendered in the parent
+										document, not inside the iframe. Scroll
+										the iframe to see the popover track the
+										trigger.
+									</Popover.Description>
+								</Popover.Popup>
+							</Popover.Root>
+						</div>
 					</div>
 				</GenericIframe>
 			</div>
