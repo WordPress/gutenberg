@@ -30,7 +30,7 @@
 		// Match the z-index the footer normally has, since we take over sticky.
 		z-index: 2;
 
-		&.is-uploading .dataviews-bulk-actions-footer__item-count {
+		&.is-uploading .dataviews-picker-footer__bulk-selection {
 			visibility: hidden;
 		}
 
