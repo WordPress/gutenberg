@@ -89,7 +89,9 @@ export function useRenderCursors(
 			};
 			const userName = user.collaboratorInfo.name;
 			const clientId = user.clientId;
-			const color = getAvatarBorderColor( user.collaboratorInfo.id );
+			const color = user.isMe
+				? 'var(--wp-admin-theme-color)'
+				: getAvatarBorderColor( user.collaboratorInfo.id );
 			const avatarUrl = getAvatarUrl( user.collaboratorInfo.avatar_urls );
 
 			let coords: {
