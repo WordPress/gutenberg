@@ -1424,8 +1424,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		// writing-mode should be scoped to :hover, not the root block selector.
 		$this->assertStringContainsString( '.wp-block-button:hover', $css );
-		$this->assertStringNotContainsString( ':where(.wp-block-button){writing-mode', $css );
-		$this->assertStringNotContainsString( ':where(.wp-block-button) {writing-mode', $css );
 		$this->assertSameCSS( ':root :where(.wp-block-button:hover){writing-mode: vertical-rl;}', $css );
 	}
 
