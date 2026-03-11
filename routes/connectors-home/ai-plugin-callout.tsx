@@ -232,6 +232,7 @@ export function AiPluginCallout() {
 							size="compact"
 							isBusy={ isBusy }
 							disabled={ getPrimaryButtonProps().disabled }
+							accessibleWhenDisabled
 							onClick={ getPrimaryButtonProps().onClick }
 						>
 							{ getPrimaryButtonProps().label }
