@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef, SyntheticEvent, RefCallback } from 'react';
 import clsx from 'clsx';
 import {
@@ -15,15 +12,10 @@ import {
 } from '@floating-ui/react-dom';
 import type { HTMLMotionProps, MotionProps } from 'framer-motion';
 import { motion } from 'framer-motion';
-
-/**
- * WordPress dependencies
- */
 import {
 	useRef,
 	useLayoutEffect,
 	forwardRef,
-	createContext,
 	useContext,
 	useMemo,
 	useState,
@@ -40,10 +32,6 @@ import { close } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
 import { Path, SVG } from '@wordpress/primitives';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
@@ -101,8 +89,7 @@ const ArrowTriangle = () => (
 	</SVG>
 );
 
-const slotNameContext = createContext< string | undefined >( undefined );
-slotNameContext.displayName = '__unstableSlotNameContext';
+import { slotNameContext } from './context';
 
 const fallbackContainerClassname = 'components-popover__fallback-container';
 const getPopoverFallbackContainer = () => {

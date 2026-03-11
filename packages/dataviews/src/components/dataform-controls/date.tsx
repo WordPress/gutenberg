@@ -161,8 +161,8 @@ function ValidatedDateControl< Item >( {
 	field: NormalizedField< Item >;
 	validity?: FieldValidity;
 	inputRefs:
-		| React.RefObject< HTMLInputElement >
-		| React.RefObject< HTMLInputElement >[];
+		| React.RefObject< HTMLInputElement | null >
+		| React.RefObject< HTMLInputElement | null >[];
 	isTouched: boolean;
 	setIsTouched: ( touched: boolean ) => void;
 	children: React.ReactNode;
@@ -287,11 +287,13 @@ function CalendarDateControl< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
 	const {
 		id,
 		label,
+		description,
 		setValue,
 		getValue,
 		isValid,
@@ -365,9 +367,12 @@ function CalendarDateControl< Item >( {
 		timezone: { string: timezoneString },
 	} = getSettings();
 
-	const displayLabel = isValid?.required
-		? `${ label } (${ __( 'Required' ) })`
-		: label;
+	let displayLabel = label;
+	if ( isValid?.required && ! markWhenOptional ) {
+		displayLabel = `${ label } (${ __( 'Required' ) })`;
+	} else if ( ! isValid?.required && markWhenOptional ) {
+		displayLabel = `${ label } (${ __( 'Optional' ) })`;
+	}
 
 	return (
 		<ValidatedDateControl
@@ -381,13 +386,14 @@ function CalendarDateControl< Item >( {
 				id={ id }
 				className="dataviews-controls__date"
 				label={ displayLabel }
+				help={ description }
 				hideLabelFromVision={ hideLabelFromVision }
 			>
-				<Stack direction="column" gap="md">
+				<Stack direction="column" gap="lg">
 					{ /* Preset buttons */ }
 					<Stack
 						direction="row"
-						gap="xs"
+						gap="sm"
 						wrap="wrap"
 						justify="flex-start"
 					>
@@ -455,9 +461,17 @@ function CalendarDateRangeControl< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label, getValue, setValue, format: fieldFormat } = field;
+	const {
+		id,
+		label,
+		description,
+		getValue,
+		setValue,
+		format: fieldFormat,
+	} = field;
 	let value: DateRange;
 	const fieldValue = getValue( { item: data } );
 	if (
@@ -573,9 +587,12 @@ function CalendarDateRangeControl< Item >( {
 
 	const { timezone } = getSettings();
 
-	const displayLabel = field.isValid?.required
-		? `${ label } (${ __( 'Required' ) })`
-		: label;
+	let displayLabel = label;
+	if ( field.isValid?.required && ! markWhenOptional ) {
+		displayLabel = `${ label } (${ __( 'Required' ) })`;
+	} else if ( ! field.isValid?.required && markWhenOptional ) {
+		displayLabel = `${ label } (${ __( 'Optional' ) })`;
+	}
 
 	return (
 		<ValidatedDateControl
@@ -589,13 +606,14 @@ function CalendarDateRangeControl< Item >( {
 				id={ id }
 				className="dataviews-controls__date"
 				label={ displayLabel }
+				help={ description }
 				hideLabelFromVision={ hideLabelFromVision }
 			>
-				<Stack direction="column" gap="md">
+				<Stack direction="column" gap="lg">
 					{ /* Preset buttons */ }
 					<Stack
 						direction="row"
-						gap="xs"
+						gap="sm"
 						wrap="wrap"
 						justify="flex-start"
 					>
@@ -631,7 +649,7 @@ function CalendarDateRangeControl< Item >( {
 					{ /* Manual date range inputs */ }
 					<Stack
 						direction="row"
-						gap="xs"
+						gap="sm"
 						justify="space-between"
 						className="dataviews-controls__date-range-inputs"
 					>
@@ -681,6 +699,7 @@ export default function DateControl< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	operator,
 	validity,
 }: DataFormControlProps< Item > ) {
@@ -704,6 +723,7 @@ export default function DateControl< Item >( {
 				field={ field }
 				onChange={ onChange }
 				hideLabelFromVision={ hideLabelFromVision }
+				markWhenOptional={ markWhenOptional }
 				validity={ validity }
 			/>
 		);
@@ -715,6 +735,7 @@ export default function DateControl< Item >( {
 			field={ field }
 			onChange={ onChange }
 			hideLabelFromVision={ hideLabelFromVision }
+			markWhenOptional={ markWhenOptional }
 			validity={ validity }
 		/>
 	);

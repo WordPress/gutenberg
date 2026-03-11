@@ -1,51 +1,61 @@
 {
 	"wpds-dimension": {
 		"padding": {
-			"surface": {
-				"2xs": {
-					"$type": "dimension",
-					"$value": "{wpds-dimension.primitive.space.20}"
-				},
-				"xs": {
-					"$type": "dimension",
-					"$value": "{wpds-dimension.primitive.space.30}"
-				},
-				"sm": {
-					"$type": "dimension",
-					"$value": "{wpds-dimension.primitive.space.50}"
-				},
-				"md": {
-					"$type": "dimension",
-					"$value": "{wpds-dimension.primitive.space.70}"
-				},
-				"lg": {
-					"$type": "dimension",
-					"$value": "{wpds-dimension.primitive.space.80}"
-				}
-			}
-		},
-		"gap": {
-			"2xs": {
+			"xs": {
 				"$type": "dimension",
 				"$value": "{wpds-dimension.primitive.space.20}"
 			},
-			"xs": {
+			"sm": {
 				"$type": "dimension",
 				"$value": "{wpds-dimension.primitive.space.30}"
 			},
-			"sm": {
+			"md": {
 				"$type": "dimension",
 				"$value": "{wpds-dimension.primitive.space.40}"
 			},
-			"md": {
+			"lg": {
 				"$type": "dimension",
 				"$value": "{wpds-dimension.primitive.space.50}"
 			},
-			"lg": {
+			"xl": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.60}"
+			},
+			"2xl": {
 				"$type": "dimension",
 				"$value": "{wpds-dimension.primitive.space.70}"
 			},
+			"3xl": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.80}"
+			}
+		},
+		"gap": {
+			"xs": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.20}"
+			},
+			"sm": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.30}"
+			},
+			"md": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.40}"
+			},
+			"lg": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.50}"
+			},
 			"xl": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.70}"
+			},
+			"2xl": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.80}"
+			},
+			"3xl": {
 				"$type": "dimension",
 				"$value": "{wpds-dimension.primitive.space.90}"
 			}

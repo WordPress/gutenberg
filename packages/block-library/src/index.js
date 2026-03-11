@@ -74,6 +74,7 @@ import * as group from './group';
 import * as heading from './heading';
 import * as homeLink from './home-link';
 import * as html from './html';
+import * as icon from './icon';
 import * as image from './image';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
@@ -135,7 +136,7 @@ import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
 import * as tab from './tab';
-import * as tabPanels from './tab-panels';
+import * as tabPanel from './tab-panel';
 import * as table from './table';
 import * as tableOfContents from './table-of-contents';
 import * as tabs from './tabs';
@@ -265,7 +266,9 @@ const getAllBlocks = () => {
 		postCommentsForm,
 		tableOfContents,
 		homeLink,
+		icon,
 		logInOut,
+		navigationOverlayClose,
 		termCount,
 		termDescription,
 		termName,
@@ -276,14 +279,6 @@ const getAllBlocks = () => {
 		breadcrumbs,
 	];
 
-	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( tab );
-		blocks.push( tabs );
-		blocks.push( tabsMenu );
-		blocks.push( tabsMenuItem );
-		blocks.push( tabPanels );
-	}
-
 	if ( window?.__experimentalEnableFormBlocks ) {
 		blocks.push( form );
 		blocks.push( formInput );
@@ -291,11 +286,12 @@ const getAllBlocks = () => {
 		blocks.push( formSubmissionNotification );
 	}
 
-	if ( window?.__experimentalNavigationOverlays ) {
-		blocks.push( navigationOverlayClose );
-	}
-
 	if ( window?.__experimentalEnableBlockExperiments ) {
+		blocks.push( tab );
+		blocks.push( tabs );
+		blocks.push( tabsMenu );
+		blocks.push( tabsMenuItem );
+		blocks.push( tabPanel );
 		blocks.push( playlist );
 		blocks.push( playlistTrack );
 	}

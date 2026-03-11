@@ -1,0 +1,9 @@
+@use "@wordpress/base-styles/colors" as *;
+
+.editor-sync-connection-modal p {
+	margin: 0;
+}
+
+.editor-sync-connection-modal__retry-countdown {
+	color: $gray-700;
+}

@@ -101,19 +101,23 @@ const GridItem = forwardRef( function GridItem< Item >(
 	const id = getItemId( item );
 	const instanceId = useInstanceId( GridItem );
 	const isSelected = selection.includes( id );
-	const renderedMediaField = mediaField?.render ? (
+	const mediaPlaceholder = (
+		<span className="dataviews-view-grid__media-placeholder" />
+	);
+	const rendersMediaField = showMedia && mediaField?.render;
+	const renderedMediaField = rendersMediaField ? (
 		<mediaField.render
 			item={ item }
 			field={ mediaField }
 			config={ config }
 		/>
-	) : null;
+	) : (
+		mediaPlaceholder
+	);
 	const renderedTitleField =
 		showTitle && titleField?.render ? (
 			<titleField.render item={ item } field={ titleField } />
 		) : null;
-	const shouldRenderMedia = showMedia && renderedMediaField;
-
 	let mediaA11yProps;
 	let titleA11yProps;
 	if ( isItemClickable( item ) && onClickItem ) {
@@ -159,19 +163,20 @@ const GridItem = forwardRef( function GridItem< Item >(
 				}
 			} }
 		>
-			{ shouldRenderMedia && (
-				<ItemClickWrapper
-					item={ item }
-					isItemClickable={ isItemClickable }
-					onClickItem={ onClickItem }
-					renderItemLink={ renderItemLink }
-					className="dataviews-view-grid__media"
-					{ ...mediaA11yProps }
-				>
-					{ renderedMediaField }
-				</ItemClickWrapper>
-			) }
-			{ hasBulkActions && shouldRenderMedia && (
+			<ItemClickWrapper
+				item={ item }
+				isItemClickable={ isItemClickable }
+				onClickItem={ onClickItem }
+				renderItemLink={ renderItemLink }
+				className={ clsx( 'dataviews-view-grid__media', {
+					'dataviews-view-grid__media--placeholder':
+						! rendersMediaField,
+				} ) }
+				{ ...mediaA11yProps }
+			>
+				{ renderedMediaField }
+			</ItemClickWrapper>
+			{ hasBulkActions && (
 				<DataViewsSelectionCheckbox
 					item={ item }
 					selection={ selection }
@@ -181,17 +186,13 @@ const GridItem = forwardRef( function GridItem< Item >(
 					disabled={ ! hasBulkAction }
 				/>
 			) }
-			{ ! showTitle && shouldRenderMedia && !! actions?.length && (
+			{ !! actions?.length && (
 				<div className="dataviews-view-grid__media-actions">
 					<ItemActions item={ item } actions={ actions } isCompact />
 				</div>
 			) }
 			{ showTitle && (
-				<Stack
-					direction="row"
-					gap="xs"
-					className="dataviews-view-grid__title-actions"
-				>
+				<div className="dataviews-view-grid__title">
 					<ItemClickWrapper
 						item={ item }
 						isItemClickable={ isItemClickable }
@@ -208,16 +209,9 @@ const GridItem = forwardRef( function GridItem< Item >(
 					>
 						{ renderedTitleField }
 					</ItemClickWrapper>
-					{ !! actions?.length && (
-						<ItemActions
-							item={ item }
-							actions={ actions }
-							isCompact
-						/>
-					) }
-				</Stack>
+				</div>
 			) }
-			<Stack direction="column" gap="2xs">
+			<Stack direction="column" gap="xs">
 				{ showDescription && descriptionField?.render && (
 					<descriptionField.render
 						item={ item }
@@ -228,7 +222,7 @@ const GridItem = forwardRef( function GridItem< Item >(
 					<Stack
 						direction="row"
 						className="dataviews-view-grid__badge-fields"
-						gap="xs"
+						gap="sm"
 						wrap="wrap"
 						align="top"
 						justify="flex-start"
@@ -252,7 +246,7 @@ const GridItem = forwardRef( function GridItem< Item >(
 					<Stack
 						direction="column"
 						className="dataviews-view-grid__fields"
-						gap="2xs"
+						gap="xs"
 					>
 						{ regularFields.map( ( field ) => {
 							return (
@@ -293,12 +287,13 @@ const GridItem = forwardRef( function GridItem< Item >(
 	props: GridItemProps< Item > & {
 		ref?: React.ForwardedRef< HTMLDivElement >;
 	}
-) => JSX.Element;
+) => React.ReactNode;
 
 interface CompositeGridProps< Item > {
 	data: Item[];
 	isInfiniteScroll: boolean;
 	className?: string;
+	inert?: string;
 	isLoading?: boolean;
 	view: ViewGridType;
 	fields: NormalizedField< Item >[];
@@ -319,6 +314,7 @@ export default function CompositeGrid< Item >( {
 	data,
 	isInfiniteScroll,
 	className,
+	inert,
 	isLoading,
 	view,
 	fields,
@@ -376,11 +372,19 @@ export default function CompositeGrid< Item >( {
 	return (
 		<Composite
 			role={ isInfiniteScroll ? 'feed' : 'grid' }
-			className={ clsx( 'dataviews-view-grid', className ) }
+			className={ clsx( 'dataviews-view-grid', className, {
+				[ `has-${ view.layout?.density }-density` ]:
+					view.layout?.density &&
+					[ 'compact', 'comfortable' ].includes(
+						view.layout.density
+					),
+			} ) }
 			focusWrap
 			aria-busy={ isLoading }
 			aria-rowcount={ isInfiniteScroll ? undefined : totalRows }
 			ref={ resizeObserverRef }
+			// @ts-ignore
+			inert={ inert }
 		>
 			{ chunk( data, gridColumns ).map( ( row, i ) => (
 				<Composite.Row

@@ -13,7 +13,7 @@ import PageTemplates from '../page-templates';
 import PageTemplatesLegacy from '../page-templates/index-legacy';
 import {
 	DEFAULT_VIEW,
-	getActiveFiltersForTab,
+	getActiveViewOverridesForTab,
 } from '../page-templates/view-utils';
 
 async function isTemplateListView( query ) {
@@ -23,7 +23,7 @@ async function isTemplateListView( query ) {
 		name: 'wp_template',
 		slug: 'default',
 		defaultView: DEFAULT_VIEW,
-		activeFilters: getActiveFiltersForTab( activeView ),
+		activeViewOverrides: getActiveViewOverridesForTab( activeView ),
 	} );
 	return view.type === 'list';
 }

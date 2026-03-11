@@ -10,6 +10,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { BaseAwarenessState, baseEqualityFieldChecks } from './base-awareness';
+import { getBlockPathInYdoc, resolveBlockClientIdByPath } from './block-lookup';
 import {
 	AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS,
 	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
@@ -18,11 +19,13 @@ import { STORE_NAME as coreStore } from '../name';
 import {
 	areSelectionsStatesEqual,
 	getSelectionState,
+	SelectionType,
 } from '../utils/crdt-user-selections';
 
-import type { SelectionCursor, WPBlockSelection } from '../types';
+import type { SelectionState, WPBlockSelection } from '../types';
+import type { YBlocks } from '../utils/crdt-blocks';
 import type {
-	DebugUserData,
+	DebugCollaboratorData,
 	EditorState,
 	PostEditorState,
 	SerializableYItem,
@@ -47,13 +50,13 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	protected onSetUp(): void {
 		super.onSetUp();
 
-		this.subscribeToUserSelectionChanges();
+		this.subscribeToCollaboratorSelectionChanges();
 	}
 
 	/**
-	 * Subscribe to user selection changes and update the selection state.
+	 * Subscribe to collaborator selection changes and update the selection state.
 	 */
-	private subscribeToUserSelectionChanges(): void {
+	private subscribeToCollaboratorSelectionChanges(): void {
 		const {
 			getSelectionStart,
 			getSelectionEnd,
@@ -116,7 +119,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	}
 
 	/**
-	 * Update the entity record with the current user's selection.
+	 * Update the entity record with the current collaborator's selection.
 	 *
 	 * @param selectionStart  - The start position of the selection.
 	 * @param selectionEnd    - The end position of the selection.
@@ -172,20 +175,74 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	}
 
 	/**
-	 * Get the absolute position index from a selection cursor.
+	 * Resolve a selection state to a text index and block client ID.
 	 *
-	 * @param selection - The selection cursor.
-	 * @return The absolute position index, or null if not found.
+	 * For text-based selections, navigates up from the resolved Y.Text via
+	 * AbstractType.parent to find the containing block, then resolves the
+	 * local clientId via the block's tree path.
+	 * For WholeBlock selections, resolves the block's relative position and
+	 * then finds the local clientId via tree path.
+	 *
+	 * Tree-path resolution is used instead of reading the clientId directly
+	 * from the Yjs block because the local block-editor store may use different
+	 * clientIds (e.g. in "Show Template" mode where blocks are cloned).
+	 *
+	 * @param selection - The selection state.
+	 * @return The text index and block client ID, or nulls if not resolvable.
 	 */
-	public getAbsolutePositionIndex(
-		selection: SelectionCursor
-	): number | null {
-		return (
-			Y.createAbsolutePositionFromRelativePosition(
-				selection.cursorPosition.relativePosition,
+	public convertSelectionStateToAbsolute( selection: SelectionState ): {
+		textIndex: number | null;
+		localClientId: string | null;
+	} {
+		if ( selection.type === SelectionType.None ) {
+			return { textIndex: null, localClientId: null };
+		}
+
+		if ( selection.type === SelectionType.WholeBlock ) {
+			const absolutePos = Y.createAbsolutePositionFromRelativePosition(
+				selection.blockPosition,
 				this.doc
-			)?.index ?? null
+			);
+
+			let localClientId: string | null = null;
+
+			if ( absolutePos && absolutePos.type instanceof Y.Array ) {
+				const parentArray = absolutePos.type as YBlocks;
+				const block = parentArray.get( absolutePos.index );
+
+				if ( block instanceof Y.Map ) {
+					const path = getBlockPathInYdoc( block );
+					localClientId = path
+						? resolveBlockClientIdByPath( path )
+						: null;
+				}
+			}
+
+			return { textIndex: null, localClientId };
+		}
+
+		// Text-based selections: resolve cursor position and navigate up.
+		const cursorPos =
+			'cursorPosition' in selection
+				? selection.cursorPosition
+				: selection.cursorStartPosition;
+
+		const absolutePosition = Y.createAbsolutePositionFromRelativePosition(
+			cursorPos.relativePosition,
+			this.doc
 		);
+
+		if ( ! absolutePosition ) {
+			return { textIndex: null, localClientId: null };
+		}
+
+		// Navigate up: Y.Text -> attributes Y.Map -> block Y.Map
+		const yType = absolutePosition.type.parent?.parent;
+		const path =
+			yType instanceof Y.Map ? getBlockPathInYdoc( yType ) : null;
+		const localClientId = path ? resolveBlockClientIdByPath( path ) : null;
+
+		return { textIndex: absolutePosition.index, localClientId };
 	}
 
 	/**
@@ -213,14 +270,14 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			] )
 		);
 
-		// Build userMap from awareness store (all users seen this session)
-		const userMapData = new Map< string, DebugUserData >(
+		// Build collaboratorMap from awareness store (all collaborators seen this session)
+		const collaboratorMapData = new Map< string, DebugCollaboratorData >(
 			Array.from( this.getSeenStates().entries() ).map(
-				( [ clientId, userState ] ) => [
+				( [ clientId, collaboratorState ] ) => [
 					String( clientId ),
 					{
-						name: userState.userInfo.name,
-						wpUserId: userState.userInfo.id,
+						name: collaboratorState.collaboratorInfo.name,
+						wpUserId: collaboratorState.collaboratorInfo.id,
 					},
 				]
 			)
@@ -264,7 +321,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		return {
 			doc: docData,
 			clients: serializableClientItems,
-			userMap: Object.fromEntries( userMapData ),
+			collaboratorMap: Object.fromEntries( collaboratorMapData ),
 		};
 	}
 }

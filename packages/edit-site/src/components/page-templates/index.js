@@ -16,7 +16,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEvent } from '@wordpress/compose';
 import { useView } from '@wordpress/views';
-import { Button, Modal } from '@wordpress/components';
+import { Modal } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -40,7 +40,7 @@ import {
 import {
 	defaultLayouts,
 	DEFAULT_VIEW,
-	getActiveFiltersForTab,
+	getActiveViewOverridesForTab,
 } from './view-utils';
 
 const { usePostActions, usePostFields, templateTitleField } =
@@ -55,8 +55,8 @@ export default function PageTemplates() {
 	const [ selectedRegisteredTemplate, setSelectedRegisteredTemplate ] =
 		useState( false );
 	const defaultView = DEFAULT_VIEW;
-	const activeFilters = useMemo(
-		() => getActiveFiltersForTab( activeView ),
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverridesForTab( activeView ),
 		[ activeView ]
 	);
 	const { view, updateView, isModified, resetToDefault } = useView( {
@@ -64,7 +64,7 @@ export default function PageTemplates() {
 		name: TEMPLATE_POST_TYPE,
 		slug: 'default',
 		defaultView,
-		activeFilters,
+		activeViewOverrides,
 		queryParams: {
 			page: query.pageNumber,
 			search: query.search,
@@ -325,22 +325,7 @@ export default function PageTemplates() {
 		<Page
 			className="edit-site-page-templates"
 			title={ __( 'Templates' ) }
-			actions={
-				<>
-					{ isModified && (
-						<Button
-							__next40pxDefaultSize
-							onClick={ () => {
-								resetToDefault();
-								history.invalidate();
-							} }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
-					<AddNewTemplate />
-				</>
-			}
+			actions={ <AddNewTemplate /> }
 		>
 			<DataViews
 				key={ activeView }
@@ -364,6 +349,14 @@ export default function PageTemplates() {
 				} }
 				selection={ selection }
 				defaultLayouts={ defaultLayouts }
+				onReset={
+					isModified
+						? () => {
+								resetToDefault();
+								history.invalidate();
+						  }
+						: false
+				}
 			/>
 			{ selectedRegisteredTemplate && duplicateAction && (
 				<Modal

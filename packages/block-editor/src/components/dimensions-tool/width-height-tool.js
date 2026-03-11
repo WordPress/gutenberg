@@ -37,7 +37,7 @@ import { __ } from '@wordpress/i18n';
  *
  * @param {WidthHeightToolProps} props The component props.
  *
- * @return {import('react').ReactElement} The width and height tool.
+ * @return {React.ReactElement} The width and height tool.
  */
 export default function WidthHeightTool( {
 	panelId,

@@ -1,10 +1,15 @@
 export * from './badge';
-export * from './box';
 export * from './button';
+export * as Card from './card';
+export * as CollapsibleCard from './collapsible-card';
+export * as Dialog from './dialog';
 export * from './form/primitives';
 export * from './icon';
 export * from './icon-button';
+export * from './link';
+export * as Notice from './notice';
 export * from './stack';
 export * as Tabs from './tabs';
+export * from './text';
 export * as Tooltip from './tooltip';
 export * from './visually-hidden';

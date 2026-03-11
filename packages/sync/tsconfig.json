@@ -8,6 +8,7 @@
 	"references": [
 		{ "path": "../api-fetch" },
 		{ "path": "../hooks" },
+		{ "path": "../private-apis" },
 		{ "path": "../undo-manager" }
 	]
 }

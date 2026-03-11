@@ -22,11 +22,11 @@ import { getGlobalStyles } from './get-global-styles';
 /**
  * Initialize an editor for test assertions.
  *
- * @param {Object}                    props                  Properties passed to the editor component.
- * @param {string}                    props.initialHtml      String of block editor HTML to parse and render.
- * @param {string}                    props.withGlobalStyles Boolean to pass global styles data to the editor.
- * @param {Object}                    [options]              Configuration options for the editor.
- * @param {import('react').ReactNode} [options.component]    A specific editor component to render.
+ * @param {Object}          props                  Properties passed to the editor component.
+ * @param {string}          props.initialHtml      String of block editor HTML to parse and render.
+ * @param {string}          props.withGlobalStyles Boolean to pass global styles data to the editor.
+ * @param {Object}          [options]              Configuration options for the editor.
+ * @param {React.ReactNode} [options.component]    A specific editor component to render.
  * @return {import('@testing-library/react-native').RenderAPI} A Testing Library screen.
  */
 export async function initializeEditor( props, { component } = {} ) {

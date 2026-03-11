@@ -23,20 +23,7 @@ npm install @wordpress/views --save
 
 ### loadView
 
-Async function for loading view state in route loaders with optional URL parameters.
-
-_Usage_
-
-```typescript
-// In route loader
-const view = await loadView( {
-	kind: 'taxonomy',
-	name: 'category',
-	slug: 'all',
-	defaultView,
-	queryParams: { page: search.page, search: search.search },
-} );
-```
+Async function for loading view state in route loaders.
 
 _Parameters_
 
@@ -45,7 +32,7 @@ _Parameters_
 -   _config.name_ `ViewConfig`: Specific entity name.
 -   _config.slug_ `ViewConfig`: View identifier.
 -   _config.defaultView_ `ViewConfig`: Default view configuration.
--   _config.activeFilters_ `ViewConfig`: Filters applied on top but never persisted.
+-   _config.activeViewOverrides_ `ViewConfig`: View overrides applied on top but never persisted.
 -   _config.queryParams_ `ViewConfig`: Object with `page` and/or `search` from URL.
 
 _Returns_
@@ -59,13 +46,6 @@ Hook for managing DataViews view state with local persistence.
 _Parameters_
 
 -   _config_ `ViewConfig`: Configuration object for loading the view.
--   _config.kind_ `ViewConfig`: Entity kind (e.g., 'postType', 'taxonomy', 'root').
--   _config.name_ `ViewConfig`: Specific entity name.
--   _config.slug_ `ViewConfig`: View identifier.
--   _config.defaultView_ `ViewConfig`: Default view configuration.
--   _config.activeFilters_ `ViewConfig`: Filters applied on top of the view but never persisted.
--   _config.queryParams_ `ViewConfig`: Object with `page` and/or `search` from URL.
--   _config.onChangeQueryParams_ `ViewConfig`: Optional callback to update URL parameters.
 
 _Returns_
 

@@ -395,7 +395,10 @@ test.describe( 'Draggable block', () => {
 			await expect(
 				rowAppender,
 				'Dragging over the button block appender should show the blue background'
-			).toHaveCSS( 'background-color', 'rgb(0, 124, 186)' );
+			).toHaveCSS(
+				'background-color',
+				/rgb\(0, 124, 186\)|rgb\(56, 88, 233\)/
+			);
 
 			const { width: rowWidth } = await rowBlock.boundingBox();
 			await dragOver( rowBlock, { position: { x: rowWidth - 10 } } );
@@ -404,7 +407,10 @@ test.describe( 'Draggable block', () => {
 			await expect(
 				rowAppender,
 				'Dragging over the empty group block but outside the appender should still show the blue background'
-			).toHaveCSS( 'background-color', 'rgb(0, 124, 186)' );
+			).toHaveCSS(
+				'background-color',
+				/rgb\(0, 124, 186\)|rgb\(56, 88, 233\)/
+			);
 
 			await drop();
 			await expect( rowAppender ).toBeHidden();
@@ -435,7 +441,7 @@ test.describe( 'Draggable block', () => {
 			// This is technically an implementation detail but easier to test in this case.
 			await expect( columnAppender ).toHaveCSS(
 				'background-color',
-				'rgb(0, 124, 186)'
+				/rgb\(0, 124, 186\)|rgb\(56, 88, 233\)/
 			);
 
 			await drop();

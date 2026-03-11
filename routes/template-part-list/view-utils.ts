@@ -58,17 +58,26 @@ export const DEFAULT_VIEWS: {
 	},
 ];
 
-export function getActiveFiltersForTab( area: string ): Filter[] {
+type ActiveViewOverrides = {
+	filters?: Filter[];
+	sort?: View[ 'sort' ];
+};
+
+export function getActiveViewOverridesForTab(
+	area: string
+): ActiveViewOverrides {
 	if ( area === 'all' ) {
-		return [];
+		return {};
 	}
-	return [
-		{
-			field: 'area',
-			operator: 'is',
-			value: area,
-		},
-	];
+	return {
+		filters: [
+			{
+				field: 'area',
+				operator: 'is',
+				value: area,
+			},
+		],
+	};
 }
 
 export async function ensureView(
@@ -80,7 +89,7 @@ export async function ensureView(
 		name: 'wp_template_part',
 		slug: 'default-new',
 		defaultView: DEFAULT_VIEW,
-		activeFilters: getActiveFiltersForTab( area ?? 'all' ),
+		activeViewOverrides: getActiveViewOverridesForTab( area ?? 'all' ),
 		queryParams: search,
 	} );
 }

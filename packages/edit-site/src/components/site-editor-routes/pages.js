@@ -14,8 +14,10 @@ import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-uns
 import DataViewsSidebarContent from '../sidebar-dataviews';
 import PostList from '../post-list';
 import { unlock } from '../../lock-unlock';
-import { PostEdit } from '../post-edit';
-import { DEFAULT_VIEW, getActiveFiltersForTab } from '../post-list/view-utils';
+import {
+	DEFAULT_VIEW,
+	getActiveViewOverridesForTab,
+} from '../post-list/view-utils';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -26,7 +28,7 @@ async function isListView( query ) {
 		name: 'page',
 		slug: 'default',
 		defaultView: DEFAULT_VIEW,
-		activeFilters: getActiveFiltersForTab( activeView ),
+		activeViewOverrides: getActiveViewOverridesForTab( activeView ),
 	} );
 	return view.type === 'list';
 }
@@ -74,23 +76,11 @@ export const pagesRoute = {
 				<SidebarNavigationScreenUnsupported />
 			);
 		},
-		async edit( { query } ) {
-			const isList = await isListView( query );
-			const hasQuickEdit = ! isList && !! query.quickEdit;
-			return hasQuickEdit ? (
-				<PostEdit postType="page" postId={ query.postId } />
-			) : undefined;
-		},
 	},
 	widths: {
 		async content( { query } ) {
 			const isList = await isListView( query );
 			return isList ? 380 : undefined;
-		},
-		async edit( { query } ) {
-			const isList = await isListView( query );
-			const hasQuickEdit = ! isList && !! query.quickEdit;
-			return hasQuickEdit ? 380 : undefined;
 		},
 	},
 };

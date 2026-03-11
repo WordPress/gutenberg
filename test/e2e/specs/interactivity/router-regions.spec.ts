@@ -709,4 +709,30 @@ test.describe( 'Router regions', () => {
 			await expect( clientCounter ).toHaveText( '13' );
 		}
 	} );
+
+	// Regression test for https://github.com/WordPress/gutenberg/issues/70500.
+	test( 'should update content on back/forward navigation after a page reload', async ( {
+		page,
+	} ) => {
+		const region1Ssr = page.getByTestId( 'region-1-ssr' );
+
+		// Start on page 1.
+		await expect( region1Ssr ).toHaveText( 'content from page 1' );
+
+		// Client-side navigate to page 2.
+		await page.getByTestId( 'next' ).click();
+		await expect( region1Ssr ).toHaveText( 'content from page 2' );
+
+		// Reload the page.
+		await page.reload();
+		await expect( region1Ssr ).toHaveText( 'content from page 2' );
+
+		// Go back: content should update to page 1.
+		await page.goBack();
+		await expect( region1Ssr ).toHaveText( 'content from page 1' );
+
+		// Go forward: content should update back to page 2.
+		await page.goForward();
+		await expect( region1Ssr ).toHaveText( 'content from page 2' );
+	} );
 } );

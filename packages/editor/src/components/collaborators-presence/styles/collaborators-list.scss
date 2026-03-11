@@ -1,0 +1,103 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-collaborators-presence__list.components-popover {
+	// Popover wrapper styles
+	.components-popover__content {
+		border: $border-width solid $gray-300;
+		border-width: $border-width 0 0 $border-width;
+		border-radius: $radius-large;
+		background: $white;
+		box-shadow: $elevation-small;
+	}
+
+	.editor-collaborators-presence__list-content {
+		min-width: $sidebar-width;
+	}
+
+	// Header with title and action button
+	.editor-collaborators-presence__list-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: $grid-unit-10 $grid-unit-20;
+
+		&-title {
+			font-size: $font-size-medium;
+			font-weight: $font-weight-medium;
+			line-height: $font-line-height-small;
+			display: flex;
+			gap: $grid-unit-05;
+
+			span {
+				color: $gray-700;
+			}
+		}
+
+		&-action {
+			padding: 0;
+			button {
+				color: $gray-900;
+				height: $button-size-compact;
+				width: $button-size-compact;
+				padding: 0;
+			}
+		}
+	}
+
+	// List of collaborators
+	.editor-collaborators-presence__list-items {
+		display: flex;
+		flex-direction: column;
+		padding-bottom: $grid-unit-20;
+	}
+
+	.editor-collaborators-presence__list-item {
+		// Reset button styles
+		all: unset;
+		box-sizing: border-box;
+
+		// Layout styles
+		display: flex;
+		align-items: center;
+		padding: $grid-unit-15 $grid-unit-20;
+		gap: $grid-unit-10;
+		width: 100%;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+
+		&:hover:not(:disabled) {
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+		}
+
+		&:active:not(:disabled) {
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+		}
+
+		&:focus-visible {
+			outline: $border-width-focus-fallback solid var(--wp-admin-theme-color, #3858e9);
+			outline-offset: -$border-width-focus-fallback;
+		}
+
+		&:disabled {
+			cursor: default;
+		}
+
+		&-info {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			min-width: 0;
+		}
+
+		&-name {
+			font-size: $font-size-medium;
+			font-weight: $font-weight-medium;
+			line-height: $font-line-height-small;
+			color: $gray-900;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
+}

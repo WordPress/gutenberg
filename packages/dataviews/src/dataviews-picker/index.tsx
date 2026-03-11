@@ -86,18 +86,18 @@ function DefaultUI( {
 				align="top"
 				justify="space-between"
 				className="dataviews__view-actions"
-				gap="2xs"
+				gap="xs"
 			>
 				<Stack
 					direction="row"
-					gap="xs"
+					gap="sm"
 					justify="start"
 					className="dataviews__search"
 				>
 					{ search && <DataViewsSearch label={ searchLabel } /> }
 					<FiltersToggle />
 				</Stack>
-				<Stack direction="row" gap="2xs" style={ { flexShrink: 0 } }>
+				<Stack direction="row" gap="xs" style={ { flexShrink: 0 } }>
 					<DataViewsViewConfig />
 				</Stack>
 			</Stack>
@@ -128,7 +128,7 @@ function DataViewsPicker< Item >( {
 	empty,
 }: DataViewsPickerProps< Item > ) {
 	const { infiniteScrollHandler } = paginationInfo;
-	const containerRef = useRef< HTMLDivElement | null >( null );
+	const containerRef = useRef< HTMLDivElement >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver(
 		( resizeObserverEntries: any ) => {
@@ -237,6 +237,7 @@ function DataViewsPicker< Item >( {
 				config,
 				itemListLabel,
 				empty,
+				hasInitiallyLoaded: true,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
 			} }
 		>

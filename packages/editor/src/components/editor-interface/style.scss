@@ -12,3 +12,11 @@
 .editor-visual-editor {
 	flex: 1 0 auto;
 }
+
+.editor-notices__dismissible,
+.editor-notices__pinned {
+	position: relative;
+	left: 0;
+	top: 0;
+	right: 0;
+}

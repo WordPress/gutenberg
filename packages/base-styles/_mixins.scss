@@ -221,6 +221,22 @@
  * Styles that are reused verbatim in a few places
  */
 
+@mixin snackbar-container() {
+	position: fixed;
+	bottom: 24px;
+	left: 0;
+	right: 0;
+	padding-inline: 16px;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	pointer-events: none;
+
+	.components-snackbar {
+		margin-inline: auto;
+	}
+}
+
 // These are additional styles for all captions, when the theme opts in to block styles.
 @mixin caption-style() {
 	margin-top: 0.5em;
@@ -648,6 +664,23 @@
 		& {
 			scrollbar-color: $handle-color-hover transparent;
 		}
+	}
+}
+
+@mixin inserter-toggle() {
+	// Basic look
+	background: colors.$gray-900;
+	color: colors.$white;
+	padding: 0;
+
+	// TODO: Consider passing size="small" to the Inserter toggle instead.
+	// Special dimensions for this button.
+	min-width: variables.$button-size-small;
+	height: variables.$button-size-small;
+
+	&:hover {
+		color: colors.$white;
+		background: var(--wp-admin-theme-color);
 	}
 }
 

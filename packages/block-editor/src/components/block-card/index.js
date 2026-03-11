@@ -113,10 +113,10 @@ function BlockCard( {
 			const { getBlockParents, getBlockName } =
 				select( blockEditorStore );
 
-			// Find the closest parent block that is either:
+			// Find the top-most parent block that is either:
 			// 1. A navigation block (special case for ad-hoc list view support)
 			// 2. Any block with listView support
-			const parents = getBlockParents( clientId, true );
+			const parents = getBlockParents( clientId, false );
 			const foundParentId = parents.find( ( parentId ) => {
 				const parentName = getBlockName( parentId );
 				return (

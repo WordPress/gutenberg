@@ -8,9 +8,7 @@
 	"version": "1.0.0",
 	"category": "design",
 	"textdomain": "default",
-	"parent": [
-		"core/tabs-menu"
-	],
+	"parent": [ "core/tabs-menu" ],
 	"usesContext": [
 		"core/tabs-menu-item-index",
 		"core/tabs-menu-item-id",
@@ -20,32 +18,7 @@
 		"core/tabs-activeTabIndex",
 		"core/tabs-editorActiveTabIndex"
 	],
-	"attributes": {
-		"activeBackgroundColor": {
-			"type": "string"
-		},
-		"customActiveBackgroundColor": {
-			"type": "string"
-		},
-		"activeTextColor": {
-			"type": "string"
-		},
-		"customActiveTextColor": {
-			"type": "string"
-		},
-		"hoverBackgroundColor": {
-			"type": "string"
-		},
-		"customHoverBackgroundColor": {
-			"type": "string"
-		},
-		"hoverTextColor": {
-			"type": "string"
-		},
-		"customHoverTextColor": {
-			"type": "string"
-		}
-	},
+	"attributes": {},
 	"supports": {
 		"html": false,
 		"reusable": false,
@@ -68,16 +41,7 @@
 			}
 		},
 		"layout": {
-			"default": {
-				"type": "flex",
-				"orientation": "vertical",
-				"flexWrap": "nowrap"
-			},
-			"allowVerticalAlignment": true,
-			"allowJustification": true,
-			"allowSwitching": false,
-			"allowOrientation": false,
-			"allowWrap": false
+			"allowEditing": false
 		},
 		"spacing": {
 			"padding": true,

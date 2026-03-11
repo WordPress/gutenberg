@@ -9,20 +9,11 @@ import clsx from 'clsx';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useBlockProps,
-	withColors,
 	store as blockEditorStore,
 	RichText,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { decodeEntities } from '@wordpress/html-entities';
-import {
-	RawHTML,
-	useRef,
-	useCallback,
-	useState,
-	useEffect,
-	useMemo,
-} from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,40 +21,9 @@ import {
 import slugFromLabel from '../tab/slug-from-label';
 import Controls from './controls';
 
-const { requestAnimationFrame, cancelAnimationFrame } = window;
-
-function StaticLabel( { label, index } ) {
-	if ( label ) {
-		return (
-			<span>
-				<RawHTML>{ decodeEntities( label ) }</RawHTML>
-			</span>
-		);
-	}
-	return (
-		<span>
-			{ sprintf(
-				/* translators: %d is the tab index + 1 */
-				__( 'Tab %d' ),
-				index + 1
-			) }
-		</span>
-	);
-}
-
-function Edit( {
-	attributes,
-	setAttributes,
+export default function Edit( {
 	context,
 	clientId,
-	activeBackgroundColor,
-	setActiveBackgroundColor,
-	activeTextColor,
-	setActiveTextColor,
-	hoverBackgroundColor,
-	setHoverBackgroundColor,
-	hoverTextColor,
-	setHoverTextColor,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	// Context from tabs-menu (per-item context via BlockContextProvider)
@@ -90,10 +50,6 @@ function Edit( {
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-	const focusRef = useRef();
-	const labelElementRef = useRef( null );
-	const [ isEditing, setIsEditing ] = useState( false );
-	const [ editingLabel, setEditingLabel ] = useState( '' );
 
 	// Get parent tabs clientId for updating editorActiveTabIndex
 	const { tabsClientId, tabsMenuClientId, selectedTabClientId } = useSelect(
@@ -161,13 +117,8 @@ function Edit( {
 					editorActiveTabIndex: tabIndex,
 				} );
 			}
-
-			// Don't select block if we're editing this tab's label
-			if ( isEditing ) {
-			}
 		},
 		[
-			isEditing,
 			tabsClientId,
 			tabIndex,
 			effectiveActiveIndex,
@@ -175,72 +126,6 @@ function Edit( {
 			__unstableMarkNextChangeAsNotPersistent,
 		]
 	);
-
-	// Callback ref for label RichText
-	const labelRef = useCallback(
-		( node ) => {
-			labelElementRef.current = node;
-			if ( node && isEditing ) {
-				const animationId = requestAnimationFrame( () => {
-					if ( node ) {
-						node.focus();
-					}
-				} );
-				focusRef.current = animationId;
-			}
-		},
-		[ isEditing ]
-	);
-
-	// Cleanup animation frames
-	useEffect( () => {
-		return () => {
-			if ( focusRef.current ) {
-				cancelAnimationFrame( focusRef.current );
-			}
-		};
-	}, [] );
-
-	// Build CSS custom properties for active/hover color states
-	const customColorStyles = useMemo( () => {
-		const styles = {};
-
-		// Active/hover colors from custom attributes
-		const activeBg =
-			activeBackgroundColor?.color ||
-			attributes.customActiveBackgroundColor;
-		const activeText =
-			activeTextColor?.color || attributes.customActiveTextColor;
-		const hoverBg =
-			hoverBackgroundColor?.color ||
-			attributes.customHoverBackgroundColor;
-		const hoverText =
-			hoverTextColor?.color || attributes.customHoverTextColor;
-
-		if ( activeBg ) {
-			styles[ '--custom-tab-active-color' ] = activeBg;
-		}
-		if ( activeText ) {
-			styles[ '--custom-tab-active-text-color' ] = activeText;
-		}
-		if ( hoverBg ) {
-			styles[ '--custom-tab-hover-color' ] = hoverBg;
-		}
-		if ( hoverText ) {
-			styles[ '--custom-tab-hover-text-color' ] = hoverText;
-		}
-
-		return styles;
-	}, [
-		activeBackgroundColor?.color,
-		attributes.customActiveBackgroundColor,
-		activeTextColor?.color,
-		attributes.customActiveTextColor,
-		hoverBackgroundColor?.color,
-		attributes.customHoverBackgroundColor,
-		hoverTextColor?.color,
-		attributes.customHoverTextColor,
-	] );
 
 	const tabPanelId = tabId || `tab-${ tabIndex }`;
 	const tabLabelId = `${ tabPanelId }--tab`;
@@ -251,72 +136,36 @@ function Edit( {
 			'is-active': isActiveTab,
 			'is-selected': isSelectedTab,
 		} ),
-		style: customColorStyles,
 		'aria-controls': tabPanelId,
 		'aria-selected': isActiveTab,
 		id: tabLabelId,
 		role: 'tab',
-		tabIndex: isActiveTab ? 0 : -1,
+		tabIndex: -1,
 		onClick: handleTabClick,
-		onDoubleClick: () => {
-			setIsEditing( true );
-			setEditingLabel( tabLabel || '' );
-		},
 	} );
 
 	return (
 		<>
 			<Controls
-				{ ...{
-					attributes,
-					setAttributes,
-					clientId,
-					tabsClientId,
-					tabClientId,
-					tabIndex,
-					tabsCount: tabsList.length,
-					tabsMenuClientId,
-					activeBackgroundColor,
-					setActiveBackgroundColor,
-					activeTextColor,
-					setActiveTextColor,
-					hoverBackgroundColor,
-					setHoverBackgroundColor,
-					hoverTextColor,
-					setHoverTextColor,
-				} }
+				tabsClientId={ tabsClientId }
+				tabClientId={ tabClientId }
+				tabIndex={ tabIndex }
+				tabsCount={ tabsList.length }
+				tabsMenuClientId={ tabsMenuClientId }
 			/>
 			<div { ...blockProps }>
-				{ isEditing ? (
-					<RichText
-						ref={ labelRef }
-						tagName="span"
-						withoutInteractiveFormatting
-						placeholder={ sprintf(
-							/* translators: %d is the tab index + 1 */
-							__( 'Tab %d…' ),
-							tabIndex + 1
-						) }
-						value={ decodeEntities( editingLabel ) }
-						onChange={ ( value ) => {
-							setEditingLabel( value );
-							handleLabelChange( value );
-						} }
-						onBlur={ () => {
-							setIsEditing( false );
-						} }
-					/>
-				) : (
-					<StaticLabel label={ tabLabel } index={ tabIndex } />
-				) }
+				<RichText
+					tagName="span"
+					withoutInteractiveFormatting
+					placeholder={ sprintf(
+						/* translators: %d is the tab index + 1 */
+						__( 'Tab title %d' ),
+						tabIndex + 1
+					) }
+					value={ tabLabel || '' }
+					onChange={ handleLabelChange }
+				/>
 			</div>
 		</>
 	);
 }
-
-export default withColors(
-	'activeBackgroundColor',
-	'activeTextColor',
-	'hoverBackgroundColor',
-	'hoverTextColor'
-)( Edit );

@@ -17,6 +17,8 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 			className,
 			// Prevent accidental forwarding of `children`
 			children: _children,
+			disabled,
+			focusableWhenDisabled,
 			icon,
 			size,
 			shortcut,
@@ -31,19 +33,23 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 				<Tooltip.Root>
 					<Tooltip.Trigger
 						ref={ ref }
+						disabled={ disabled && ! focusableWhenDisabled }
 						render={
 							<Button
 								{ ...restProps }
 								size={ size }
 								aria-label={ label }
 								aria-keyshortcuts={ shortcut?.ariaKeyShortcut }
+								disabled={ disabled }
+								focusableWhenDisabled={ focusableWhenDisabled }
 							/>
 						}
 						className={ classes }
 					>
 						<Icon
 							icon={ icon }
-							size={ size === 'small' ? 22 : 24 }
+							size={ 24 }
+							className={ styles.icon }
 						/>
 					</Tooltip.Trigger>
 					<Tooltip.Popup>

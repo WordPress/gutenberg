@@ -47,6 +47,10 @@
 	top: 0;
 	left: 0;
 	right: 0;
+
+	.boot-layout--single-page & {
+		top: variables.$admin-bar-height-big;
+	}
 	z-index: 3;
 	background: var(--wpds-color-bg-surface-neutral, #fff);
 	padding: variables.$grid-unit-20;
@@ -96,6 +100,11 @@
 	border-radius: 0;
 	margin: 0;
 
+	.boot-layout--single-page & {
+		top: variables.$admin-bar-height-big;
+		height: calc(100vh - variables.$admin-bar-height-big);
+	}
+
 	// Desktop: restore original styles
 	@include mixins.break-medium {
 		position: static;
@@ -142,6 +151,11 @@
 	z-index: 1; // Lowest surface priority
 	border-radius: 0;
 	margin: 0;
+
+	.boot-layout--single-page & {
+		top: variables.$admin-bar-height-big;
+		height: calc(100vh - variables.$admin-bar-height-big);
+	}
 
 	// Desktop: restore original styles
 	@include mixins.break-medium {
@@ -190,4 +204,12 @@
 	border: none;
 	box-shadow: none;
 	overflow: hidden;
+
+	.boot-layout--single-page & {
+		top: variables.$admin-bar-height-big;
+
+		@include mixins.break-medium {
+			top: variables.$admin-bar-height;
+		}
+	}
 }

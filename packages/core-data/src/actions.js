@@ -19,8 +19,16 @@ import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
-import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
+import {
+	LOCAL_EDITOR_ORIGIN,
+	LOCAL_UNDO_IGNORED_ORIGIN,
+	getSyncManager,
+} from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
+
+function addTitleToAutoDraft( record ) {
+	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
+}
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -96,12 +104,9 @@ export function receiveEntityRecords(
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
 	if ( kind === 'postType' ) {
-		records = ( Array.isArray( records ) ? records : [ records ] ).map(
-			( record ) =>
-				record.status === 'auto-draft'
-					? { ...record, title: '' }
-					: record
-		);
+		records = Array.isArray( records )
+			? records.map( addTitleToAutoDraft )
+			: addTitleToAutoDraft( records );
 	}
 	let action;
 	if ( query ) {
@@ -340,13 +345,11 @@ export const deleteEntityRecord =
 
 				await dispatch( removeItems( kind, name, recordId, true ) );
 
-				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-					if ( entityConfig.syncConfig ) {
-						const objectType = `${ kind }/${ name }`;
-						const objectId = recordId;
+				if ( entityConfig.syncConfig ) {
+					const objectType = `${ kind }/${ name }`;
+					const objectId = recordId;
 
-						getSyncManager()?.unload( objectType, objectId );
-					}
+					getSyncManager()?.unload( objectType, objectId );
 				}
 			} catch ( _error ) {
 				hasError = true;
@@ -427,35 +430,40 @@ export const editEntityRecord =
 				return acc;
 			}, {} ),
 		};
-		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-			if ( entityConfig.syncConfig ) {
-				const objectType = `${ kind }/${ name }`;
-				const objectId = recordId;
+		if ( entityConfig.syncConfig ) {
+			const objectType = `${ kind }/${ name }`;
+			const objectId = recordId;
 
-				// Determine whether this edit should create a new undo level.
-				//
-				// In Gutenberg, block changes flow through two callbacks:
-				// - `onInput`: For transient/in-progress changes (e.g., typing each
-				//   character). These use `isCached: true` and get merged into
-				//   the current undo item.
-				// - `onChange`: For persistent/completed changes (e.g., formatting
-				//   transforms, block insertions). These use `isCached: false` and
-				//   should create a new undo level.
-				//
-				// Additionally, `undoIgnore: true` means the change should not
-				// affect the undo history at all (e.g., selection-only changes).
-				const isNewUndoLevel = options.undoIgnore
-					? false
-					: ! options.isCached;
+			// Determine whether this edit should create a new undo level.
+			//
+			// In Gutenberg, block changes flow through two callbacks:
+			// - `onInput`: For transient/in-progress changes (e.g., typing each
+			//   character). These use `isCached: true` and get merged into
+			//   the current undo item.
+			// - `onChange`: For persistent/completed changes (e.g., formatting
+			//   transforms, block insertions). These use `isCached: false` and
+			//   should create a new undo level.
+			//
+			// Additionally, `undoIgnore: true` means the change should not
+			// affect the undo history at all (e.g., selection-only changes).
+			const isNewUndoLevel = options.undoIgnore
+				? false
+				: ! options.isCached;
 
-				getSyncManager()?.update(
-					objectType,
-					objectId,
-					editsWithMerges,
-					LOCAL_EDITOR_ORIGIN,
-					{ isNewUndoLevel }
-				);
-			}
+			// Use an untracked origin for undoIgnore changes so the Yjs
+			// UndoManager does not capture them as undo levels, while
+			// still syncing them to the CRDT document and other peers.
+			const origin = options.undoIgnore
+				? LOCAL_UNDO_IGNORED_ORIGIN
+				: LOCAL_EDITOR_ORIGIN;
+
+			getSyncManager()?.update(
+				objectType,
+				objectId,
+				editsWithMerges,
+				origin,
+				{ isNewUndoLevel }
+			);
 		}
 		if ( ! options.undoIgnore ) {
 			select.getUndoManager().addRecord(
@@ -477,6 +485,55 @@ export const editEntityRecord =
 		dispatch( {
 			type: 'EDIT_ENTITY_RECORD',
 			...edit,
+		} );
+	};
+
+/**
+ * Action triggered to clear all edits from
+ * an entity record.
+ *
+ * @param {string}        kind     Kind of the entity.
+ * @param {string}        name     Name of the entity.
+ * @param {number|string} recordId Record ID of the entity record.
+ *
+ * @return {Object} Action object.
+ */
+export const clearEntityRecordEdits =
+	( kind, name, recordId ) =>
+	( { select, dispatch } ) => {
+		const entityConfig = select.getEntityConfig( kind, name );
+		logEntityDeprecation( kind, name, 'clearEntityRecordEdits' );
+		if ( ! entityConfig ) {
+			throw new Error(
+				`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
+			);
+		}
+
+		const currentEdits = select.getEntityRecordEdits(
+			kind,
+			name,
+			recordId
+		);
+		if ( ! currentEdits ) {
+			return;
+		}
+
+		// Build an edits object with all current edit keys set to undefined
+		// so the reducer removes them.
+		const clearedEdits = Object.keys( currentEdits ).reduce(
+			( acc, key ) => {
+				acc[ key ] = undefined;
+				return acc;
+			},
+			{}
+		);
+
+		dispatch( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind,
+			name,
+			recordId,
+			edits: clearedEdits,
 		} );
 	};
 
@@ -728,10 +785,10 @@ export const saveEntityRecord =
 					if ( entityConfig.__unstablePrePersist ) {
 						edits = {
 							...edits,
-							...entityConfig.__unstablePrePersist(
+							...( await entityConfig.__unstablePrePersist(
 								persistedRecord,
 								edits
-							),
+							) ),
 						};
 					}
 					updatedRecord = await __unstableFetch( {
@@ -747,16 +804,16 @@ export const saveEntityRecord =
 						true,
 						edits
 					);
-					if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-						if ( entityConfig.syncConfig ) {
-							getSyncManager()?.update(
-								`${ kind }/${ name }`,
-								recordId,
-								updatedRecord,
-								LOCAL_EDITOR_ORIGIN,
-								{ isSave: true }
-							);
-						}
+					if ( entityConfig.syncConfig ) {
+						// Use an untracked origin so that the save
+						// response does not create undo levels.
+						getSyncManager()?.update(
+							`${ kind }/${ name }`,
+							recordId,
+							updatedRecord,
+							LOCAL_UNDO_IGNORED_ORIGIN,
+							{ isSave: true }
+						);
 					}
 				}
 			} catch ( _error ) {
@@ -1065,7 +1122,7 @@ export const receiveRevisions =
 		dispatch( {
 			type: 'RECEIVE_ITEM_REVISIONS',
 			key,
-			items: Array.isArray( records ) ? records : [ records ],
+			items: records,
 			recordKey,
 			meta,
 			query,
@@ -1074,3 +1131,32 @@ export const receiveRevisions =
 			invalidateCache,
 		} );
 	};
+
+/**
+ * Returns an action object used to set the sync connection status for an entity or collection.
+ *
+ * @param {string}             kind   Kind of the entity.
+ * @param {string}             name   Name of the entity.
+ * @param {number|string|null} key    The entity key, or null for collections.
+ * @param {Object|null}        status The connection state object or null on unload.
+ *
+ * @return {Object} Action object.
+ */
+export function setSyncConnectionStatus( kind, name, key, status ) {
+	if ( ! status ) {
+		return {
+			type: 'CLEAR_SYNC_CONNECTION_STATUS',
+			kind,
+			name,
+			key,
+		};
+	}
+
+	return {
+		type: 'SET_SYNC_CONNECTION_STATUS',
+		kind,
+		name,
+		key,
+		status,
+	};
+}

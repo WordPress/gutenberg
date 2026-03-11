@@ -14,6 +14,7 @@ import { actions, data, fields, type SpaceObject } from './fixtures';
 
 export const LayoutTableComponent = ( {
 	backgroundColor,
+	fullWidth = false,
 	hasClickableItems = true,
 	groupBy = false,
 	groupByLabel = true,
@@ -21,6 +22,7 @@ export const LayoutTableComponent = ( {
 	showMedia = true,
 }: {
 	backgroundColor?: string;
+	fullWidth?: boolean;
 	hasClickableItems?: boolean;
 	groupBy?: boolean;
 	groupByLabel?: boolean;
@@ -63,6 +65,7 @@ export const LayoutTableComponent = ( {
 		<div
 			style={
 				{
+					maxWidth: fullWidth ? undefined : '400px',
 					'--wp-dataviews-color-background': backgroundColor,
 				} as React.CSSProperties
 			}

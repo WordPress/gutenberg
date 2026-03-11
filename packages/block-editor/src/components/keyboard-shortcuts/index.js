@@ -217,6 +217,16 @@ function KeyboardShortcutsRegister() {
 				character: 'h',
 			},
 		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/rename',
+			category: 'block',
+			description: __( 'Rename the selected block.' ),
+			keyCombination: {
+				modifier: 'primaryAlt',
+				character: 'r',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return null;

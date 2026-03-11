@@ -12,10 +12,7 @@ import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
 import type { View, Action } from '@wordpress/dataviews';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	Button,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
@@ -28,7 +25,7 @@ import { layout } from '@wordpress/icons';
 import { unlock } from '../lock-unlock';
 import {
 	DEFAULT_VIEW_LEGACY,
-	getActiveFiltersForTabLegacy,
+	getActiveViewOverridesForTabLegacy,
 	DEFAULT_LAYOUTS,
 } from './view-utils';
 import { previewField } from './fields/preview';
@@ -64,8 +61,8 @@ function TemplateListLegacy() {
 		[]
 	);
 	const defaultView = DEFAULT_VIEW_LEGACY;
-	const activeFilters = useMemo(
-		() => getActiveFiltersForTabLegacy( activeView ),
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverridesForTabLegacy( activeView ),
 		[ activeView ]
 	);
 
@@ -88,7 +85,7 @@ function TemplateListLegacy() {
 		name: 'wp_template',
 		slug: 'default-new',
 		defaultView,
-		activeFilters,
+		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );
@@ -276,20 +273,7 @@ function TemplateListLegacy() {
 		<Page
 			title={ __( 'Templates' ) }
 			className="template-page"
-			actions={
-				<>
-					{ isModified && (
-						<Button
-							variant="tertiary"
-							size="compact"
-							onClick={ onReset }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
-					<AddNewTemplate />
-				</>
-			}
+			actions={ <AddNewTemplate /> }
 			hasPadding={ false }
 		>
 			{ tabs.length > 1 && (
@@ -319,6 +303,7 @@ function TemplateListLegacy() {
 				defaultLayouts={ DEFAULT_LAYOUTS }
 				getItemId={ getItemId }
 				selection={ selection }
+				onReset={ isModified ? onReset : false }
 				onChangeSelection={ ( items: string[] ) => {
 					navigate( {
 						search: {

@@ -53,6 +53,19 @@ module.exports = {
 		{
 			files: [ '**/*.module.css' ],
 			rules: {
+				'function-no-unknown': [
+					true,
+					{
+						ignoreFunctions: [
+							// CSS stepped value math functions in Baseline 2024.
+							// This rule exception can likely be removed when
+							// updating to a more recent version of Stylelint.
+							'round',
+							'rem',
+							'mod',
+						],
+					},
+				],
 				'declaration-property-max-values': {
 					// Prevents left/right values with shorthand property names (unclear for RTL)
 					margin: 3,

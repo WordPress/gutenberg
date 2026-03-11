@@ -57,6 +57,7 @@ export default function EmbedVideoUrlInput( {
 					</Notice>
 				) }
 				<TextControl
+					type="url"
 					__next40pxDefaultSize
 					label={ __( 'Video URL' ) }
 					value={ url }

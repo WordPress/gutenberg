@@ -10,6 +10,7 @@ permissions: {}
 jobs:
     type-related-labels:
         runs-on: 'ubuntu-24.04'
+        if: ${{ github.event.pull_request.state == 'open' }}
         permissions:
             pull-requests: write
         steps:

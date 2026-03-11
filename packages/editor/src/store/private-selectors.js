@@ -196,28 +196,23 @@ export function getEntityFields( state, ...args ) {
  *
  * @return {Array} Block client IDs.
  */
-export const getPostBlocksByName = createRegistrySelector( ( select ) =>
-	createSelector(
-		( state, blockNames ) => {
-			blockNames = Array.isArray( blockNames )
-				? blockNames
-				: [ blockNames ];
-			const { getBlocksByName, getBlockParents, getBlockName } =
-				select( blockEditorStore );
-			return getBlocksByName( blockNames ).filter( ( clientId ) =>
-				getBlockParents( clientId ).every( ( parentClientId ) => {
-					const parentBlockName = getBlockName( parentClientId );
-					return (
-						// Ignore descendents of the query block.
-						parentBlockName !== 'core/query' &&
-						// Enable only the top-most block.
-						! blockNames.includes( parentBlockName )
-					);
-				} )
-			);
-		},
-		() => [ select( blockEditorStore ).getBlocks() ]
-	)
+export const getPostBlocksByName = createRegistrySelector(
+	( select ) => ( state, blockNames ) => {
+		blockNames = Array.isArray( blockNames ) ? blockNames : [ blockNames ];
+		const { getBlocksByName, getBlockParents, getBlockName } =
+			select( blockEditorStore );
+		return getBlocksByName( blockNames ).filter( ( clientId ) =>
+			getBlockParents( clientId ).every( ( parentClientId ) => {
+				const parentBlockName = getBlockName( parentClientId );
+				return (
+					// Ignore descendents of the query block.
+					parentBlockName !== 'core/query' &&
+					// Enable only the top-most block.
+					! blockNames.includes( parentBlockName )
+				);
+			} )
+		);
+	}
 );
 
 /**
@@ -361,6 +356,82 @@ export const getCurrentRevision = createRegistrySelector(
 		if ( ! revisions ) {
 			return null;
 		}
-		return revisions.find( ( r ) => r.id === revisionId ) ?? null;
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revKey = entityConfig?.revisionKey || 'id';
+		return revisions.find( ( r ) => r[ revKey ] === revisionId ) ?? null;
+	}
+);
+
+/**
+ * Returns the currently selected note ID.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {undefined|number|'new'} The selected note ID, 'new' for the new note form, or undefined if none.
+ */
+export function getSelectedNote( state ) {
+	return state.selectedNote?.noteId;
+}
+
+/**
+ * Returns whether the selected note should be focused.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the selected note should be focused.
+ */
+export function isNoteFocused( state ) {
+	return !! state.selectedNote?.options?.focus;
+}
+
+/**
+ * Returns the previous revision (the one before the current revision).
+ * Used for diffing between revisions.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object|null|undefined} The previous revision object, null if loading or no previous revision, or undefined if not in revisions mode.
+ */
+export const getPreviousRevision = createRegistrySelector(
+	( select ) => ( state ) => {
+		const currentRevisionId = getCurrentRevisionId( state );
+		if ( ! currentRevisionId ) {
+			return undefined;
+		}
+
+		const { type: postType, id: postId } = getCurrentPost( state );
+		const revisions = select( coreStore ).getRevisions(
+			'postType',
+			postType,
+			postId,
+			{ per_page: -1, context: 'edit' }
+		);
+		if ( ! revisions ) {
+			return null;
+		}
+
+		// Sort by date ascending (oldest first).
+		const sortedRevisions = [ ...revisions ].sort(
+			( a, b ) => new Date( a.date ) - new Date( b.date )
+		);
+
+		// Find current revision index.
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revKey = entityConfig?.revisionKey || 'id';
+		const currentIndex = sortedRevisions.findIndex(
+			( r ) => r[ revKey ] === currentRevisionId
+		);
+
+		// Return the previous revision (older one) if it exists.
+		if ( currentIndex > 0 ) {
+			return sortedRevisions[ currentIndex - 1 ];
+		}
+
+		return null;
 	}
 );

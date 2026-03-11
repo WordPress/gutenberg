@@ -9,10 +9,7 @@ import clsx from 'clsx';
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	BlockControls,
-	InspectorControls,
 	store as blockEditorStore,
-	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
-	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarItem, Button } from '@wordpress/components';
 import {
@@ -43,7 +40,7 @@ function TabBlockMover( {
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
-	const { tabPanelsClientId, orientation } = useSelect(
+	const { tabPanelClientId, orientation } = useSelect(
 		( select ) => {
 			const { getBlockRootClientId, getBlockAttributes } =
 				select( blockEditorStore );
@@ -53,7 +50,7 @@ function TabBlockMover( {
 				? getBlockAttributes( tabsMenuClientId )
 				: null;
 			return {
-				tabPanelsClientId: getBlockRootClientId( tabClientId ),
+				tabPanelClientId: getBlockRootClientId( tabClientId ),
 				orientation:
 					tabsMenuAttributes?.layout?.orientation || 'horizontal',
 			};
@@ -88,7 +85,7 @@ function TabBlockMover( {
 
 	// Handle moving tab and updating active index to follow the moved tab
 	const handleMoveUp = () => {
-		moveBlocksUp( [ tabClientId ], tabPanelsClientId );
+		moveBlocksUp( [ tabClientId ], tabPanelClientId );
 		// Update editorActiveTabIndex to follow the moved tab
 		if ( tabsClientId ) {
 			__unstableMarkNextChangeAsNotPersistent();
@@ -99,7 +96,7 @@ function TabBlockMover( {
 	};
 
 	const handleMoveDown = () => {
-		moveBlocksDown( [ tabClientId ], tabPanelsClientId );
+		moveBlocksDown( [ tabClientId ], tabPanelClientId );
 		// Update editorActiveTabIndex to follow the moved tab
 		if ( tabsClientId ) {
 			__unstableMarkNextChangeAsNotPersistent();
@@ -163,32 +160,12 @@ function TabBlockMover( {
 }
 
 export default function Controls( {
-	attributes,
-	setAttributes,
-	clientId,
 	tabsClientId,
 	tabClientId,
 	tabIndex,
 	tabsCount,
 	tabsMenuClientId,
-	activeBackgroundColor,
-	setActiveBackgroundColor,
-	activeTextColor,
-	setActiveTextColor,
-	hoverBackgroundColor,
-	setHoverBackgroundColor,
-	hoverTextColor,
-	setHoverTextColor,
 } ) {
-	const {
-		customActiveBackgroundColor,
-		customActiveTextColor,
-		customHoverBackgroundColor,
-		customHoverTextColor,
-	} = attributes;
-
-	const colorSettings = useMultipleOriginColorsAndGradients();
-
 	return (
 		<>
 			<TabBlockMover
@@ -200,63 +177,6 @@ export default function Controls( {
 			/>
 			<AddTabToolbarControl tabsClientId={ tabsClientId } />
 			<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
-			<InspectorControls group="color">
-				<ColorGradientSettingsDropdown
-					settings={ [
-						{
-							label: __( 'Active Background' ),
-							colorValue:
-								activeBackgroundColor?.color ??
-								customActiveBackgroundColor,
-							onColorChange: ( value ) => {
-								setActiveBackgroundColor( value );
-								setAttributes( {
-									customActiveBackgroundColor: value,
-								} );
-							},
-						},
-						{
-							label: __( 'Active Text' ),
-							colorValue:
-								activeTextColor?.color ?? customActiveTextColor,
-							onColorChange: ( value ) => {
-								setActiveTextColor( value );
-								setAttributes( {
-									customActiveTextColor: value,
-								} );
-							},
-						},
-						{
-							label: __( 'Hover Background' ),
-							colorValue:
-								hoverBackgroundColor?.color ??
-								customHoverBackgroundColor,
-							onColorChange: ( value ) => {
-								setHoverBackgroundColor( value );
-								setAttributes( {
-									customHoverBackgroundColor: value,
-								} );
-							},
-						},
-						{
-							label: __( 'Hover Text' ),
-							colorValue:
-								hoverTextColor?.color ?? customHoverTextColor,
-							onColorChange: ( value ) => {
-								setHoverTextColor( value );
-								setAttributes( {
-									customHoverTextColor: value,
-								} );
-							},
-						},
-					] }
-					panelId={ clientId }
-					disableCustomColors={ false }
-					__experimentalIsRenderedInSidebar
-					__next40pxDefaultSize
-					{ ...colorSettings }
-				/>
-			</InspectorControls>
 		</>
 	);
 }

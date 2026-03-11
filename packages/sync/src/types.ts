@@ -9,11 +9,12 @@ import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
 
-/**
- * Internal dependencies
- */
-import type { AwarenessState } from './awareness/awareness-state';
-import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
+/* globalThis */
+declare global {
+	interface Window {
+		_wpCollaborationEnabled?: string;
+	}
+}
 
 export type CRDTDoc = Y.Doc;
 export type AwarenessID = string;
@@ -27,20 +28,83 @@ export type ObjectType = string;
 // its origin.
 export type Origin = any;
 
-// Object data represents any entity record, post, term, user, site, etc. There
-// are not many expectations that can hold on its shape.
-export interface ObjectData extends Record< string, unknown > {
-	meta?: ObjectMeta;
+// Object data represents any entity record. There are not any expectations that
+// can hold on its shape, beyond a record with string keys and unknown values.
+export type ObjectData = Record< string, unknown >;
+
+/**
+ * Event map for provider events.
+ * Add new event types here as needed.
+ */
+export interface ProviderEventMap {
+	status: ConnectionStatus;
 }
 
-export interface ObjectMeta extends Record< string, unknown > {
-	[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]?: string;
-}
+/**
+ * Generic event listener type for providers.
+ * Providers should call registered callbacks when events occur like connection status changes.
+ * Providers are responsible for cleaning up listeners in their destroy() method.
+ */
+export type ProviderOn = < K extends keyof ProviderEventMap >(
+	event: K,
+	callback: ( data: ProviderEventMap[ K ] ) => void
+) => void;
 
 export interface ProviderCreatorResult {
 	destroy: () => void;
+	on: ProviderOn;
 }
 
+/**
+ * Error codes for connection errors that can occur in sync providers.
+ */
+export type ConnectionErrorCode =
+	| 'authentication-error'
+	| 'connection-expired'
+	| 'connection-limit-exceeded'
+	| 'unknown-error';
+
+/**
+ * Sync connection error object.
+ */
+export interface ConnectionError extends Error {
+	/**
+	 * Error code identifier for programmatic handling and default message lookup.
+	 */
+	code: ConnectionErrorCode;
+}
+
+/**
+ * Current connection status of a sync provider.
+ */
+export interface ConnectionStatusConnected {
+	status: 'connected';
+}
+
+export interface ConnectionStatusConnecting {
+	status: 'connecting';
+}
+
+export interface ConnectionStatusDisconnected {
+	status: 'disconnected';
+	/** Optional error information. */
+	error?: ConnectionError;
+	/** Milliseconds until the next automatic retry attempt. */
+	retryInMs?: number;
+}
+
+export type ConnectionStatus =
+	| ConnectionStatusConnected
+	| ConnectionStatusConnecting
+	| ConnectionStatusDisconnected;
+
+export type OnStatusChangeCallback = (
+	status: ConnectionStatus | null
+) => void;
+
+/**
+ * Options passed to a provider creator function when initializing a sync provider.
+ */
 export interface ProviderCreatorOptions {
 	objectType: ObjectType;
 	objectId: ObjectID | null;
@@ -53,6 +117,7 @@ export type ProviderCreator = (
 ) => Promise< ProviderCreatorResult >;
 
 export interface CollectionHandlers {
+	onStatusChange: OnStatusChangeCallback;
 	refetchRecords: () => Promise< void >;
 }
 
@@ -68,12 +133,13 @@ export interface RecordHandlers {
 		options?: { undoIgnore?: boolean }
 	) => void;
 	getEditedRecord: () => Promise< ObjectData >;
+	onStatusChange: OnStatusChangeCallback;
 	refetchRecord: () => Promise< void >;
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
-	saveRecord: () => Promise< void >;
+	saveRecord: () => void;
 }
 
-export interface SyncConfig< State extends object = {} > {
+export interface SyncConfig {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
 		changes: Partial< ObjectData >
@@ -81,20 +147,20 @@ export interface SyncConfig< State extends object = {} > {
 	createAwareness?: (
 		ydoc: Y.Doc,
 		objectId?: ObjectID
-	) => AwarenessState< State > | undefined;
+	) => Awareness | undefined;
 	getChangesFromCRDTDoc: (
 		ydoc: Y.Doc,
 		editedRecord: ObjectData
 	) => ObjectData;
-	supports?: Record< string, true >;
+	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
 }
 
 export interface SyncManager {
-	createMeta: (
+	createPersistedCRDTDoc: (
 		objectType: ObjectType,
 		objectId: ObjectID
-	) => Record< string, string >;
-	getAwareness: < State extends AwarenessState< any > >(
+	) => Promise< string | null >;
+	getAwareness: < State extends Awareness >(
 		objectType: ObjectType,
 		objectId: ObjectID
 	) => State | undefined;

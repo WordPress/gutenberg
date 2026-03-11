@@ -172,7 +172,7 @@ function getOverviewBlockExamples(
 		'core/image',
 		'core/separator',
 		'core/buttons',
-		'core/quote',
+		'core/pullquote',
 		'core/search',
 	];
 

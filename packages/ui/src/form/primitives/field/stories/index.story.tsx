@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId } from '@wordpress/element';
-import '@wordpress/theme/design-tokens.css';
 import { Field } from '../../../..';
 
 const meta: Meta< typeof Field.Root > = {
@@ -98,6 +97,23 @@ export const UsingAriaLabelledby: StoryObj< typeof Field.Root > = {
 				</Field.Description>{ ' ' }
 			</Field.Root>
 		);
+	},
+};
+
+/**
+ * When `hideFromVision` is set on `Field.Label`, the label is visually
+ * hidden but remains accessible to screen readers.
+ */
+export const HiddenLabel: StoryObj< typeof Field.Root > = {
+	args: {
+		children: (
+			<>
+				<Field.Label hideFromVision>Label</Field.Label>
+				<Field.Control
+					render={ <input type="text" placeholder="Placeholder" /> }
+				/>
+			</>
+		),
 	},
 };
 

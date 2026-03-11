@@ -43,7 +43,7 @@ function getWorkerAPI(): Remote< WorkerAPI > {
 			type: 'application/javascript',
 		} );
 		workerBlobUrl = URL.createObjectURL( blob );
-		worker = new Worker( workerBlobUrl );
+		worker = new Worker( workerBlobUrl, { type: 'module' } );
 		workerAPI = wrap< WorkerAPI >( worker );
 	}
 	return workerAPI;
@@ -108,6 +108,7 @@ export async function vipsCompressImage(
  * @param type      Mime type.
  * @param resize    Resize options.
  * @param smartCrop Whether to use smart cropping (i.e. saliency-aware).
+ * @param quality   Desired quality (0-1). Defaults to 0.82.
  * @return Processed file data plus the old and new dimensions.
  */
 export async function vipsResizeImage(
@@ -115,7 +116,8 @@ export async function vipsResizeImage(
 	buffer: ArrayBuffer,
 	type: string,
 	resize: ImageSizeCrop,
-	smartCrop = false
+	smartCrop = false,
+	quality = 0.82
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -124,7 +126,7 @@ export async function vipsResizeImage(
 	originalHeight: number;
 } > {
 	const api = getWorkerAPI();
-	return api.resizeImage( id, buffer, type, resize, smartCrop );
+	return api.resizeImage( id, buffer, type, resize, smartCrop, quality );
 }
 
 /**
@@ -138,6 +140,29 @@ export async function vipsHasTransparency(
 ): Promise< boolean > {
 	const api = getWorkerAPI();
 	return api.hasTransparency( buffer );
+}
+
+/**
+ * Rotates an image based on EXIF orientation using vips in a worker.
+ *
+ * @param id          Item ID.
+ * @param buffer      Original file buffer.
+ * @param type        Mime type.
+ * @param orientation EXIF orientation value (1-8).
+ * @return Rotated file data plus the new dimensions.
+ */
+export async function vipsRotateImage(
+	id: ItemId,
+	buffer: ArrayBuffer,
+	type: string,
+	orientation: number
+): Promise< {
+	buffer: ArrayBuffer | ArrayBufferLike;
+	width: number;
+	height: number;
+} > {
+	const api = getWorkerAPI();
+	return api.rotateImage( id, buffer, type, orientation );
 }
 
 /**

@@ -27,7 +27,7 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 	const pattern = useSelect(
 		( select ) =>
 			unlock( select( blockEditorStore ) ).getPatternBySlug(
-				'gutenberg/navigation-overlay'
+				'core/navigation-overlay'
 			),
 		[]
 	);
@@ -39,7 +39,7 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 			( templatePart ) => templatePart.title?.rendered
 		);
 		const uniqueTitle = getUniqueTemplatePartTitle(
-			__( 'Overlay' ),
+			__( 'Navigation Overlay' ),
 			templatePartsWithTitles
 		);
 		const cleanSlug = getCleanTemplatePartSlug( uniqueTitle );

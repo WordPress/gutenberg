@@ -19,11 +19,10 @@ import {
 import { createSyncManager } from '../manager';
 import {
 	CRDT_RECORD_MAP_KEY,
-	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_MAP_KEY,
-	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
-	CRDT_RECORD_METADATA_SAVED_BY_KEY as SAVED_BY_KEY,
+	CRDT_STATE_MAP_KEY,
+	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
+	CRDT_STATE_MAP_SAVED_BY_KEY as SAVED_BY_KEY,
 } from '../config';
-import { createPersistedCRDTDoc } from '../persistence';
 import { getProviderCreators } from '../providers';
 import type {
 	CRDTDoc,
@@ -33,18 +32,7 @@ import type {
 	RecordHandlers,
 	SyncConfig,
 } from '../types';
-import { AwarenessState } from '../awareness/awareness-state';
-
-/**
- * A minimal mock awareness class for testing.
- */
-class MockAwarenessState extends AwarenessState {
-	protected equalityFieldChecks = {};
-
-	protected onSetUp(): void {
-		// No-op for testing.
-	}
-}
+import { serializeCrdtDoc } from '../utils';
 
 // Mock dependencies.
 jest.mock( '../providers', () => ( {
@@ -70,6 +58,7 @@ describe( 'SyncManager', () => {
 
 		mockProviderResult = {
 			destroy: jest.fn(),
+			on: jest.fn(),
 		};
 		mockProviderCreator = jest.fn( () =>
 			Promise.resolve( mockProviderResult )
@@ -94,10 +83,10 @@ describe( 'SyncManager', () => {
 					);
 				}
 			),
-			supports: {},
 			createAwareness: jest.fn(
-				( ydoc: Y.Doc ) => new MockAwarenessState( ydoc )
+				( ydoc: Y.Doc ) => new Awareness( ydoc )
 			),
+			getPersistedCRDTDoc: jest.fn( () => null ),
 		};
 
 		mockHandlers = {
@@ -106,9 +95,10 @@ describe( 'SyncManager', () => {
 			getEditedRecord: jest.fn( async () =>
 				Promise.resolve( mockRecord )
 			),
+			onStatusChange: jest.fn(),
 			refetchRecord: jest.fn( async () => Promise.resolve() ),
 			restoreUndoMeta: jest.fn(),
-			saveRecord: jest.fn( async () => Promise.resolve() ),
+			saveRecord: jest.fn(),
 		};
 	} );
 
@@ -236,10 +226,9 @@ describe( 'SyncManager', () => {
 		} );
 
 		describe( 'persisted CRDT doc behavior', () => {
-			function createRecordWithPersistedCRDTDoc(
-				record: ObjectData,
-				persistedRecord: ObjectData = record
-			): ObjectData {
+			function createPersistedCRDTDoc(
+				persistedRecord: ObjectData
+			): string {
 				const persistedDoc = new Y.Doc();
 				const persistedRecordMap =
 					persistedDoc.getMap( CRDT_RECORD_MAP_KEY );
@@ -249,24 +238,10 @@ describe( 'SyncManager', () => {
 					}
 				);
 
-				const persistedMeta = createPersistedCRDTDoc( persistedDoc );
-				persistedDoc.destroy();
-
-				return {
-					...record,
-					meta: {
-						...record.meta,
-						...persistedMeta,
-					},
-				};
+				return serializeCrdtDoc( persistedDoc );
 			}
 
 			it( 'applies the current record when no persisted CRDT doc exists', async () => {
-				mockSyncConfig = {
-					...mockSyncConfig,
-					supports: { crdtPersistence: true },
-				};
-
 				const manager = createSyncManager();
 
 				await manager.load(
@@ -295,11 +270,11 @@ describe( 'SyncManager', () => {
 			} );
 
 			it( 'accepts a valid persisted CRDT doc without applying changes', async () => {
-				const record = createRecordWithPersistedCRDTDoc( mockRecord );
-
 				mockSyncConfig = {
 					...mockSyncConfig,
-					supports: { crdtPersistence: true },
+					getPersistedCRDTDoc: jest.fn( () =>
+						createPersistedCRDTDoc( mockRecord )
+					),
 				};
 
 				const manager = createSyncManager();
@@ -308,7 +283,7 @@ describe( 'SyncManager', () => {
 					mockSyncConfig,
 					'post',
 					'123',
-					record,
+					mockRecord,
 					mockHandlers
 				);
 
@@ -323,22 +298,22 @@ describe( 'SyncManager', () => {
 				).toHaveBeenCalledTimes( 1 );
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
-				).toHaveBeenCalledWith( expect.any( Y.Doc ), record );
+				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
 
 				// Verify no save operation occurred
 				expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
 				expect( mockHandlers.saveRecord ).not.toHaveBeenCalled();
 			} );
 
-			it( 'applies an invalid CRDT doc, then applies changes', async () => {
-				const record = createRecordWithPersistedCRDTDoc( mockRecord, {
-					...mockRecord,
-					title: 'Invalidated title from persisted CRDT doc',
-				} );
-
+			it( 'applies a persisted CRDT doc with invalidated fields, then applies changes', async () => {
 				mockSyncConfig = {
 					...mockSyncConfig,
-					supports: { crdtPersistence: true },
+					getPersistedCRDTDoc: jest.fn( () =>
+						createPersistedCRDTDoc( {
+							...mockRecord,
+							title: 'Invalidated title from persisted CRDT doc',
+						} )
+					),
 				};
 
 				const manager = createSyncManager();
@@ -347,7 +322,7 @@ describe( 'SyncManager', () => {
 					mockSyncConfig,
 					'post',
 					'123',
-					record,
+					mockRecord,
 					mockHandlers
 				);
 
@@ -369,43 +344,10 @@ describe( 'SyncManager', () => {
 				).toHaveBeenCalledTimes( 1 );
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
-				).toHaveBeenCalledWith( expect.any( Y.Doc ), record );
+				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
 
 				// Verify a save operation occurred.
 				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
-			} );
-
-			it( 'ignores a persisted CRDT doc when CRDT persistence is not supported', async () => {
-				const record = createRecordWithPersistedCRDTDoc( mockRecord, {
-					...mockRecord,
-					title: 'Persisted Title',
-				} );
-
-				const manager = createSyncManager();
-
-				await manager.load(
-					mockSyncConfig,
-					'post',
-					'123',
-					record,
-					mockHandlers
-				);
-
-				// Current record should be applied since the persisted doc does not exist.
-				expect(
-					mockSyncConfig.applyChangesToCRDTDoc
-				).toHaveBeenCalledTimes( 1 );
-				expect(
-					mockSyncConfig.applyChangesToCRDTDoc
-				).toHaveBeenCalledWith( expect.any( Y.Doc ), record );
-
-				// getChangesFromCRDTDoc should not be called since the persisted doc is igored.
-				expect(
-					mockSyncConfig.getChangesFromCRDTDoc
-				).not.toHaveBeenCalled();
-
-				// Verify no save operation occurred because persistence is not supported.
-				expect( mockHandlers.saveRecord ).not.toHaveBeenCalled();
 			} );
 		} );
 	} );
@@ -492,6 +434,9 @@ describe( 'SyncManager', () => {
 			jest.clearAllMocks();
 			manager.update( 'post', '456', { title: 'Updated' }, 'local' );
 
+			// Wait a tick for yieldToEventLoop.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalled();
 		} );
 	} );
@@ -520,6 +465,9 @@ describe( 'SyncManager', () => {
 			const changes = { title: 'Updated Title' };
 			manager.update( 'post', '123', changes, 'local-editor' );
 
+			// Wait a tick for yieldToEventLoop.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
 			// Verify that applyChangesToCRDTDoc was called with the changes.
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
 				expect.any( Y.Doc ),
@@ -528,16 +476,19 @@ describe( 'SyncManager', () => {
 
 			// Verify that the record metadata was not updated.
 			const ydoc = capturedDoc as unknown as Y.Doc;
-			const metadataMap = ydoc.getMap( RECORD_METADATA_MAP_KEY );
-			expect( metadataMap.get( SAVED_AT_KEY ) ).toBeUndefined();
-			expect( metadataMap.get( SAVED_BY_KEY ) ).toBeUndefined();
+			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+			expect( stateMap.get( SAVED_AT_KEY ) ).toBeUndefined();
+			expect( stateMap.get( SAVED_BY_KEY ) ).toBeUndefined();
 		} );
 
-		it( 'does not update when entity is not loaded', () => {
+		it( 'does not update when entity is not loaded', async () => {
 			const manager = createSyncManager();
 
 			const changes = { title: 'Updated Title' };
 			manager.update( 'post', '999', changes, 'local-editor' );
+
+			// Wait a tick for yieldToEventLoop.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			expect(
 				mockSyncConfig.applyChangesToCRDTDoc
@@ -576,6 +527,9 @@ describe( 'SyncManager', () => {
 
 			manager.update( 'post', '123', changes, customOrigin );
 
+			// Wait a tick for yieldToEventLoop.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
 			expect( transactSpy ).toHaveBeenCalledWith(
 				expect.any( Function ),
 				customOrigin
@@ -609,6 +563,9 @@ describe( 'SyncManager', () => {
 				isSave: true,
 			} );
 
+			// Wait a tick for yieldToEventLoop.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
 			// Verify that applyChangesToCRDTDoc was called with the changes.
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
 				expect.any( Y.Doc ),
@@ -617,11 +574,11 @@ describe( 'SyncManager', () => {
 
 			// Verify that the record metadata was updated.
 			const ydoc = capturedDoc as unknown as Y.Doc;
-			const metadataMap = ydoc.getMap( RECORD_METADATA_MAP_KEY );
-			expect( metadataMap.get( SAVED_AT_KEY ) ).toBeGreaterThanOrEqual(
+			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+			expect( stateMap.get( SAVED_AT_KEY ) ).toBeGreaterThanOrEqual(
 				now
 			);
-			expect( metadataMap.get( SAVED_BY_KEY ) ).toBe( ydoc.clientID );
+			expect( stateMap.get( SAVED_BY_KEY ) ).toBe( ydoc.clientID );
 		} );
 	} );
 
