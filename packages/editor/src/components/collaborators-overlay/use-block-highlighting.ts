@@ -6,9 +6,7 @@ import {
 	SelectionType,
 	type PostEditorAwarenessState as ActiveCollaborator,
 } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -51,12 +49,6 @@ export function useBlockHighlighting(
 	highlights: BlockHighlightData[];
 	rerenderHighlightsAfterDelay: () => () => void;
 } {
-	const showOwnCursor = useSelect(
-		( select ) =>
-			select( preferencesStore ).get( 'core', 'showCollaborationCursor' ),
-		[]
-	);
-
 	const highlightedBlockIds = useRef< Set< string > >( new Set() );
 	const userStates: ActiveCollaborator[] = useActiveCollaborators(
 		postId ?? null,
@@ -86,25 +78,16 @@ export function useBlockHighlighting(
 		// even if a later render replaces it.
 		const currentHighlightedIds = highlightedBlockIds.current;
 
-		// When there are no other collaborators, we shouldn't show the user's own
-		// selection unless the preference is enabled.
-		const hasOtherCollaborators = userStates.some(
-			( u: ActiveCollaborator ) => ! u.isMe
-		);
-
 		// Deduplicate by blockId — when multiple collaborators select the
 		// same block, only the first one gets the highlight and avatar label.
 		const seen = new Set< string >();
 		const blocksToHighlight = userStates
 			.filter( ( userState: ActiveCollaborator ) => {
-				const shouldDrawUser =
-					! userState.isMe ||
-					( showOwnCursor && hasOtherCollaborators );
 				const isWholeBlockSelected =
 					userState.editorState?.selection?.type ===
 					SelectionType.WholeBlock;
 
-				return shouldDrawUser && isWholeBlockSelected;
+				return ! userState.isMe && isWholeBlockSelected;
 			} )
 			.map( ( userState ) => {
 				let localClientId;
@@ -220,7 +203,6 @@ export function useBlockHighlighting(
 		overlayElement,
 		recomputeToken,
 		resolveSelection,
-		showOwnCursor,
 	] );
 
 	return { highlights, rerenderHighlightsAfterDelay };
