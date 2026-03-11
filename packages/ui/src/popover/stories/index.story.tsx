@@ -139,6 +139,11 @@ export const WithCloseButton: Story = {
 /**
  * Use the `open` and `onOpenChange` props on `Popover.Root` to control the
  * popover's visibility programmatically.
+ *
+ * Note: clicking outside an open popover dismisses it via `onOpenChange`.
+ * If an external button uses toggle logic (`!prev`), the dismiss and toggle
+ * can race — the popover closes then immediately reopens. Use explicit
+ * open/close actions on external controls to avoid this.
  */
 export const Controlled: Story = {
 	render: function Render() {
@@ -156,9 +161,13 @@ export const Controlled: Story = {
 						</Popover.Description>
 					</Popover.Popup>
 				</Popover.Root>
-				<button onClick={ () => setIsOpen( ( prev ) => ! prev ) }>
-					External toggle (open: { String( isOpen ) })
+				<button onClick={ () => setIsOpen( true ) }>
+					Open externally
 				</button>
+				<button onClick={ () => setIsOpen( false ) }>
+					Close externally
+				</button>
+				<span>open: { String( isOpen ) }</span>
 			</div>
 		);
 	},
