@@ -160,9 +160,25 @@ export const getSelectionRects = (
 		if ( rect.width === 0 && rect.height === 0 ) {
 			continue;
 		}
+		const x = rect.left - overlayRect.left;
+		const y = rect.top - overlayRect.top;
+
+		// Range.getClientRects() can return duplicate rects at inline
+		// formatting boundaries (e.g. <em>, <strong>). Skip exact matches.
+		const isDuplicate = rects.some(
+			( r ) =>
+				r.x === x &&
+				r.y === y &&
+				r.width === rect.width &&
+				r.height === rect.height
+		);
+		if ( isDuplicate ) {
+			continue;
+		}
+
 		rects.push( {
-			x: rect.left - overlayRect.left,
-			y: rect.top - overlayRect.top,
+			x,
+			y,
 			width: rect.width,
 			height: rect.height,
 		} );
