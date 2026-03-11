@@ -88,9 +88,19 @@ class DependencyExtractionWebpackPlugin {
 				typeof externalRequest === 'undefined' &&
 				this.options.useDefaults
 			) {
-				externalRequest = this.useModules
-					? defaultRequestToExternalModule( request )
-					: defaultRequestToExternal( request );
+				if ( this.useModules ) {
+					externalRequest = defaultRequestToExternalModule( request );
+				} else {
+					try {
+						externalRequest =
+							defaultRequestToExternalModule( request );
+					} catch {
+						// Not a script module, fall through.
+					}
+					if ( typeof externalRequest === 'undefined' ) {
+						externalRequest = defaultRequestToExternal( request );
+					}
+				}
 			}
 		} catch ( err ) {
 			return callback( err );
@@ -289,6 +299,10 @@ class DependencyExtractionWebpackPlugin {
 			const chunkStaticDeps = new Set();
 			/** @type {Set<string>} */
 			const chunkDynamicDeps = new Set();
+			/** @type {Set<string>} */
+			const chunkScriptModuleStaticDeps = new Set();
+			/** @type {Set<string>} */
+			const chunkScriptModuleDynamicDeps = new Set();
 
 			if ( injectPolyfill ) {
 				chunkStaticDeps.add( 'wp-polyfill' );
@@ -310,6 +324,17 @@ class DependencyExtractionWebpackPlugin {
 						( isStatic ? chunkStaticDeps : chunkDynamicDeps ).add(
 							m.request
 						);
+					} else if ( m.externalType === 'import' ) {
+						const isStatic =
+							DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
+								compilation,
+								m
+							);
+
+						( isStatic
+							? chunkScriptModuleStaticDeps
+							: chunkScriptModuleDynamicDeps
+						).add( userRequest );
 					} else {
 						chunkStaticDeps.add(
 							this.mapRequestToDependency( userRequest )
@@ -382,6 +407,18 @@ class DependencyExtractionWebpackPlugin {
 				],
 				version: contentHash,
 			};
+
+			if (
+				chunkScriptModuleStaticDeps.size ||
+				chunkScriptModuleDynamicDeps.size
+			) {
+				assetData.module_dependencies = [
+					...Array.from( chunkScriptModuleStaticDeps ).sort(),
+					...Array.from( chunkScriptModuleDynamicDeps )
+						.sort()
+						.map( ( id ) => ( { id, import: 'dynamic' } ) ),
+				];
+			}
 
 			if ( this.useModules ) {
 				assetData.type = 'module';
