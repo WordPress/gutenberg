@@ -1,5 +1,3 @@
-// @ts-expect-error No exported types
-import { useStyleOverride } from '@wordpress/block-editor';
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 
@@ -31,11 +29,6 @@ export function Overlay( {
 	postId,
 	postType,
 }: OverlayProps ) {
-	useStyleOverride( {
-		id: 'collaborators-overlay',
-		css: AVATAR_IFRAME_STYLES + OVERLAY_IFRAME_STYLES,
-	} );
-
 	// Use state for the overlay element so that the hook re-runs once the ref is attached.
 	const [ overlayElement, setOverlayElement ] =
 		useState< HTMLDivElement | null >( null );
@@ -84,32 +77,47 @@ export function Overlay( {
 	// scrollable elements like cursor indicators.
 	return (
 		<div className="collaborators-overlay-full" ref={ mergedRef }>
+			<style>{ AVATAR_IFRAME_STYLES + OVERLAY_IFRAME_STYLES }</style>
 			{ cursors.map( ( cursor ) => (
-				<div
-					key={ cursor.clientId }
-					className="collaborators-overlay-user"
-					style={ {
-						left: `${ cursor.x }px`,
-						top: `${ cursor.y }px`,
-					} }
-				>
-					{ ! cursor.isMe && (
+				<div key={ cursor.clientId }>
+					{ cursor.selectionRects?.map( ( rect, index ) => (
 						<div
-							className="collaborators-overlay-user-cursor"
+							key={ `${ cursor.clientId }-sel-${ index }` }
+							className="collaborators-overlay-selection-rect"
 							style={ {
+								left: `${ rect.x }px`,
+								top: `${ rect.y }px`,
+								width: `${ rect.width }px`,
+								height: `${ rect.height }px`,
 								backgroundColor: cursor.color,
-								height: `${ cursor.height }px`,
 							} }
 						/>
-					) }
-					<Avatar
-						className="collaborators-overlay-user-label"
-						variant="badge"
-						size="small"
-						src={ cursor.avatarUrl }
-						name={ cursor.userName }
-						borderColor={ cursor.color }
-					/>
+					) ) }
+					<div
+						className="collaborators-overlay-user"
+						style={ {
+							left: `${ cursor.x }px`,
+							top: `${ cursor.y }px`,
+						} }
+					>
+						{ ! cursor.isMe && (
+							<div
+								className="collaborators-overlay-user-cursor"
+								style={ {
+									backgroundColor: cursor.color,
+									height: `${ cursor.height }px`,
+								} }
+							/>
+						) }
+						<Avatar
+							className="collaborators-overlay-user-label"
+							variant="badge"
+							size="small"
+							src={ cursor.avatarUrl }
+							name={ cursor.userName }
+							borderColor={ cursor.color }
+						/>
+					</div>
 				</div>
 			) ) }
 			{ highlights.map( ( highlight ) => (
