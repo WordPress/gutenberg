@@ -29,9 +29,61 @@
 		text-align: center;
 	}
 
+	.ai-plugin-callout {
+		position: relative;
+		overflow: hidden;
+		border-radius: 8px;
+		padding: 24px;
+		padding-right: 220px;
+		background:
+			linear-gradient(90deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%),
+			linear-gradient(90deg, #89dcdc 0%, #c7eb5c 46.15%, #a920c1 100%);
+
+		&__content {
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+			padding-top: 2px;
+
+			p {
+				margin: 0;
+				font-size: 13px;
+				line-height: 20px;
+			}
+		}
+
+		&__actions {
+			display: flex;
+			gap: 12px;
+			align-items: center;
+		}
+
+		&__decoration {
+			position: absolute;
+			right: 8px;
+			top: -15px;
+			width: 248px;
+			height: 248px;
+		}
+	}
+
 	> p {
 		text-align: center;
 		color: $gray-600;
+	}
+
+	@media (max-width: 680px) {
+		.ai-plugin-callout {
+			padding: 12px;
+			padding-right: 84px;
+
+			&__decoration {
+				width: 134px;
+				height: 134px;
+				right: 4px;
+				top: -8px;
+			}
+		}
 	}
 
 	@media (max-width: 480px) {
