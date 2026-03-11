@@ -7,11 +7,20 @@ import type { InputProps } from './types';
 import { InputLayout } from '../input-layout';
 
 export const Input = forwardRef< HTMLElement, InputProps >( function Input(
-	{ className, size = 'default', prefix, suffix, style, ...restProps },
+	{
+		className,
+		size = 'default',
+		prefix,
+		suffix,
+		style,
+		rootRef,
+		...restProps
+	},
 	ref
 ) {
 	return (
 		<InputLayout
+			ref={ rootRef }
 			className={ clsx(
 				focusStyles[ 'outset-ring--focus-within' ],
 				className

@@ -11,6 +11,12 @@ export type InputProps = Omit<
 		 * Whether the field is disabled.
 		 */
 		disabled?: boolean;
+		/**
+		 * Ref to the root element. Useful for anchoring popups to the
+		 * full input container (including prefix/suffix) rather than
+		 * the inner `<input>`.
+		 */
+		rootRef?: React.Ref< HTMLDivElement >;
 	} & {
 		/**
 		 * The type of the input element.

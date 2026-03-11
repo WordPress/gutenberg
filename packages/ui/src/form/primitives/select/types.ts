@@ -27,7 +27,13 @@ export type SelectTriggerProps = Omit< _Select.Trigger.Props, 'children' > & {
 	children?: _Select.Value.Props[ 'children' ];
 };
 
-export type SelectPopupProps = _Select.Popup.Props;
+export type SelectPopupProps = _Select.Popup.Props & {
+	/**
+	 * An element to position the popup against.
+	 * By default, the popup is positioned against the trigger.
+	 */
+	anchor?: _Select.Positioner.Props[ 'anchor' ];
+};
 
 export type SelectItemProps = Omit<
 	_Select.Item.Props,

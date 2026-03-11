@@ -16,11 +16,15 @@ const ThemeProvider: typeof ThemeProviderType =
 	unlock( themePrivateApis ).ThemeProvider;
 
 export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
-	function Popup( { className, children, style, ...restProps }, ref ) {
+	function Popup(
+		{ anchor, className, children, style, ...restProps },
+		ref
+	) {
 		return (
 			<_Select.Portal>
 				<_Select.Positioner
 					{ ...ITEM_POPUP_POSITIONER_PROPS }
+					anchor={ anchor }
 					alignItemWithTrigger={ false }
 					style={ style }
 					className={ clsx(
