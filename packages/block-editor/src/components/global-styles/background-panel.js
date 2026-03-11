@@ -14,7 +14,7 @@ import { getValueFromVariable } from '@wordpress/global-styles-engine';
  */
 import BackgroundImageControl from '../background-image-control';
 import { ColorPanelDropdown } from './color-panel';
-import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
+import { useGradientsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 
@@ -138,9 +138,7 @@ export default function BackgroundImagePanel( {
 	defaultValues = {},
 	headerLabel = __( 'Background' ),
 } ) {
-	const colors = useColorsPerOrigin( settings );
 	const gradients = useGradientsPerOrigin( settings );
-	const areCustomSolidsEnabled = settings?.color?.custom;
 	const areCustomGradientsEnabled = settings?.color?.customGradient;
 	const hasGradientColors = gradients.length > 0 || areCustomGradientsEnabled;
 
@@ -255,8 +253,6 @@ export default function BackgroundImagePanel( {
 						},
 					] }
 					colorGradientControlSettings={ {
-						colors,
-						disableCustomColors: ! areCustomSolidsEnabled,
 						gradients,
 						disableCustomGradients: ! areCustomGradientsEnabled,
 					} }
