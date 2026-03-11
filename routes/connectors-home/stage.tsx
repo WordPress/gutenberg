@@ -78,7 +78,7 @@ function ConnectorsPage() {
 					</VStack>
 				) : (
 					<VStack spacing={ 3 }>
-					<AiPluginCallout />
+						<AiPluginCallout />
 						{ connectors.map( ( connector: ConnectorConfig ) => {
 							if ( connector.render ) {
 								return (
