@@ -23,6 +23,8 @@ export function NavigationLinkUI( {
 	insertedBlock,
 	setInsertedBlock,
 	anchor,
+	onSubmit,
+	onCancel,
 } ) {
 	const { updateBlockAttributes, removeBlock } =
 		useDispatch( blockEditorStore );
@@ -94,8 +96,8 @@ export function NavigationLinkUI( {
 			placement={ anchor ? 'bottom-start' : undefined }
 			onBlockInsert={ handleSetInsertedBlock }
 			onClose={ () => {
-				// Use cleanup function
 				cleanupInsertedBlock();
+				onCancel?.();
 			} }
 			onChange={ ( updatedValue ) => {
 				// updateAttributes determines the final state and returns metadata
@@ -116,6 +118,7 @@ export function NavigationLinkUI( {
 				}
 
 				setInsertedBlock( null );
+				onSubmit?.();
 			} }
 		/>
 	);

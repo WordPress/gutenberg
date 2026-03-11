@@ -99,6 +99,12 @@ export function BlockSettingsDropdown( {
 		ref: mergedToggleRef,
 	};
 
+	// Fills can hide the dropdown content (e.g. while showing a secondary UI)
+	// while keeping the dropdown mounted so focus can return to the fill's
+	// menu item on cancel.
+	const [ dropdownContentHidden, setDropdownContentHidden ] =
+		useState( false );
+
 	const {
 		firstParentClientId,
 		parentBlockType,
@@ -253,12 +259,23 @@ export function BlockSettingsDropdown( {
 					return null;
 				}
 
+				// When a fill hides the dropdown content (e.g. while
+				// showing LinkUI), prevent the dropdown from closing
+				// on outside focus so the fill stays mounted.
+				const popoverProps = dropdownContentHidden
+					? {
+							...POPOVER_PROPS,
+							style: { visibility: 'hidden' },
+							onFocusOutside() {},
+					  }
+					: POPOVER_PROPS;
+
 				return (
 					<DropdownMenu
 						icon={ moreVertical }
 						label={ __( 'Options' ) }
 						className="block-editor-block-settings-menu"
-						popoverProps={ POPOVER_PROPS }
+						popoverProps={ popoverProps }
 						noIcons
 						{ ...props }
 						toggleProps={ mergedToggleProps }
@@ -402,6 +419,7 @@ export function BlockSettingsDropdown( {
 										expandedState,
 										setInsertedBlock,
 										toggleElement,
+										setDropdownContentHidden,
 									} }
 									clientIds={ clientIds }
 								/>

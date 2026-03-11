@@ -5,7 +5,7 @@ import { createBlock } from '@wordpress/blocks';
 import { addSubmenu } from '@wordpress/icons';
 import { MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useCallback, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockSettingsMenuControls,
@@ -25,12 +25,12 @@ const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [
 
 function AddSubmenuItem( {
 	clientId,
-	onClose,
 	expand,
 	expandedState,
 	setInsertedBlock,
 	toggleElement,
-	setAnchorContext,
+	onAddSubmenuLink,
+	menuItemRef,
 } ) {
 	const { insertBlock, replaceBlock, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
@@ -42,6 +42,7 @@ function AddSubmenuItem( {
 
 	return (
 		<MenuItem
+			ref={ menuItemRef }
 			icon={ addSubmenu }
 			onClick={ () => {
 				const updateSelectionOnInsert = false;
@@ -98,17 +99,13 @@ function AddSubmenuItem( {
 
 				// When the block was converted to a submenu, the
 				// original toggleElement is unmounted. Pass the new
-				// block's clientId so the popover anchor and focus
-				// restoration can find the replacement row's button.
-				if ( setAnchorContext ) {
-					const wasConverted = expandClientId !== clientId;
-					setAnchorContext( {
-						toggleElement: wasConverted ? null : toggleElement,
-						clientId: expandClientId,
-					} );
-				}
-
-				onClose();
+				// block's clientId so the popover anchor can find the
+				// replacement row's button.
+				const wasConverted = expandClientId !== clientId;
+				onAddSubmenuLink( {
+					toggleElement: wasConverted ? null : toggleElement,
+					clientId: expandClientId,
+				} );
 			} }
 		>
 			{ __( 'Add submenu link' ) }
@@ -119,50 +116,63 @@ function AddSubmenuItem( {
 export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
-	const anchorContextRef = useRef( null );
+	const dropdownOnCloseRef = useRef( null );
+	const setDropdownContentHiddenRef = useRef( null );
+	const menuItemRef = useRef( null );
 
-	const setAnchorContext = ( context ) => {
-		anchorContextRef.current = context;
-	};
+	// Called when the "Add submenu link" menu item is clicked.
+	// Hides the dropdown content (keeps it mounted) and stores
+	// the anchor context so NavigationLinkUI can position itself.
+	const handleAddSubmenuLink = useCallback(
+		( { toggleElement, clientId, onClose, setDropdownContentHidden } ) => {
+			dropdownOnCloseRef.current = onClose;
+			setDropdownContentHiddenRef.current = setDropdownContentHidden;
 
-	// Resolve the popover anchor from the anchor context. When the
-	// block wasn't converted, toggleElement is the Options button
-	// we can use directly. When it was converted to a submenu, the
-	// original element is unmounted, so we look up the new block's
-	// Options button by clientId.
-	useEffect( () => {
-		if ( insertedBlock && anchorContextRef.current ) {
-			const { toggleElement, clientId } = anchorContextRef.current;
 			const anchor =
 				toggleElement ??
 				document.querySelector(
 					`[data-block="${ clientId }"] .block-editor-list-view-block__menu`
 				);
 			setPopoverAnchor( anchor );
+
+			// Hide the dropdown popover but keep it mounted so the
+			// "Add submenu link" menu item remains focusable on cancel.
+			setDropdownContentHidden( true );
+		},
+		[]
+	);
+
+	// Called when the user selects a link in NavigationLinkUI.
+	// Closes the dropdown entirely and returns focus to the
+	// Options toggle button.
+	const handleSubmit = useCallback( () => {
+		setPopoverAnchor( null );
+		if ( setDropdownContentHiddenRef.current ) {
+			setDropdownContentHiddenRef.current( false );
 		}
-	}, [ insertedBlock ] );
-
-	// When the link popover closes (insertedBlock becomes null),
-	// return focus to the anchor button.
-	//
-	// setTimeout( …, 0 ) is required because the Popover's
-	// useFocusReturn hook fires during the React commit phase
-	// (via a ref callback) and would move focus away from our
-	// target. Deferring to the next event loop tick ensures our
-	// focus() call runs after useFocusReturn has finished.
-	useEffect( () => {
-		if ( ! insertedBlock && popoverAnchor ) {
-			const element = popoverAnchor;
-			setPopoverAnchor( null );
-			anchorContextRef.current = null;
-
-			const timerId = window.setTimeout( () => {
-				element?.focus();
-			}, 0 );
-
-			return () => window.clearTimeout( timerId );
+		if ( dropdownOnCloseRef.current ) {
+			dropdownOnCloseRef.current();
 		}
-	}, [ insertedBlock, popoverAnchor ] );
+		dropdownOnCloseRef.current = null;
+		setDropdownContentHiddenRef.current = null;
+	}, [] );
+
+	// Called when the user presses Escape in NavigationLinkUI.
+	// Shows the dropdown again and focuses the "Add submenu link"
+	// menu item.
+	const handleCancel = useCallback( () => {
+		setPopoverAnchor( null );
+		if ( setDropdownContentHiddenRef.current ) {
+			setDropdownContentHiddenRef.current( false );
+		}
+		dropdownOnCloseRef.current = null;
+		setDropdownContentHiddenRef.current = null;
+
+		// Defer focus to let the dropdown re-render as visible first.
+		window.setTimeout( () => {
+			menuItemRef.current?.focus();
+		}, 0 );
+	}, [] );
 
 	return (
 		<>
@@ -172,7 +182,8 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 						navigationBlockClientId={ navigationBlockClientId }
 						{ ...fillProps }
 						setInsertedBlock={ setInsertedBlock }
-						setAnchorContext={ setAnchorContext }
+						onAddSubmenuLink={ handleAddSubmenuLink }
+						menuItemRef={ menuItemRef }
 					/>
 				) }
 			</BlockSettingsMenuControls>
@@ -182,6 +193,8 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 					insertedBlock={ insertedBlock }
 					setInsertedBlock={ setInsertedBlock }
 					anchor={ popoverAnchor }
+					onSubmit={ handleSubmit }
+					onCancel={ handleCancel }
 				/>
 			) }
 		</>
@@ -197,7 +210,9 @@ function AddSubmenuFillContent( {
 	expandedState,
 	setInsertedBlock,
 	toggleElement,
-	setAnchorContext,
+	setDropdownContentHidden,
+	onAddSubmenuLink,
+	menuItemRef,
 } ) {
 	const isChildOfThisNav = useSelect(
 		( select ) => {
@@ -230,12 +245,18 @@ function AddSubmenuFillContent( {
 	return (
 		<AddSubmenuItem
 			clientId={ selectedClientIds[ 0 ] }
-			onClose={ onClose }
 			expand={ expand }
 			expandedState={ expandedState }
 			setInsertedBlock={ setInsertedBlock }
 			toggleElement={ toggleElement }
-			setAnchorContext={ setAnchorContext }
+			onAddSubmenuLink={ ( anchorContext ) => {
+				onAddSubmenuLink( {
+					...anchorContext,
+					onClose,
+					setDropdownContentHidden,
+				} );
+			} }
+			menuItemRef={ menuItemRef }
 		/>
 	);
 }
