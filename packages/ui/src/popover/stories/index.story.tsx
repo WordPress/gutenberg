@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from '@wordpress/element';
+import { useLayoutEffect, useRef, useState } from '@wordpress/element';
+import type { RefCallback } from 'react';
 import { Popover } from '../..';
 
 const meta: Meta< typeof Popover.Root > = {
@@ -193,6 +194,321 @@ export const Modal: Story = {
 				</Popover.Popup>
 			</>
 		),
+	},
+};
+
+/**
+ * The `variant="unstyled"` option strips all visual styling from the popup,
+ * making it a blank positioning container for fully custom content.
+ */
+export const Unstyled: Story = {
+	args: {
+		children: (
+			<>
+				<Popover.Trigger>Open Unstyled</Popover.Trigger>
+				<Popover.Popup variant="unstyled">
+					<div
+						style={ {
+							padding: 16,
+							background: 'lightyellow',
+							border: '2px dashed orange',
+							borderRadius: 8,
+						} }
+					>
+						<strong>Custom content</strong>
+						<p style={ { margin: '8px 0 0' } }>
+							This popup has no default styling — the consumer
+							controls all visual appearance.
+						</p>
+					</div>
+				</Popover.Popup>
+			</>
+		),
+	},
+};
+
+function useMeasure< TRef extends HTMLElement >() {
+	const [ element, setElement ] = useState< TRef | null >( null );
+	const [ elementSize, setElementSize ] = useState( {
+		width: 0,
+		height: 0,
+	} );
+
+	useLayoutEffect( () => {
+		if ( ! element ) {
+			return;
+		}
+
+		function update() {
+			const bcr = element!.getBoundingClientRect();
+			setElementSize( {
+				width: bcr.width,
+				height: bcr.height,
+			} );
+		}
+
+		const resizeObserver = new ResizeObserver( () => {
+			update();
+		} );
+		resizeObserver.observe( element );
+		update();
+
+		return () => {
+			resizeObserver.disconnect();
+		};
+	}, [ element ] );
+
+	const elementRef: RefCallback< TRef > = ( node ) => {
+		setElement( node );
+	};
+
+	return [ elementRef, elementSize ] as const;
+}
+
+/**
+ * Overlay placement positions the popover centered on top of its trigger,
+ * effectively covering it. This is achieved by computing a negative
+ * `sideOffset` based on the measured sizes of the trigger and popup.
+ *
+ * This technique is useful when you want the popover to visually replace
+ * the trigger element in place.
+ */
+export const OverlayPlacement: Story = {
+	render: function Render() {
+		const [ popupRef, popupSize ] = useMeasure< HTMLDivElement >();
+		const [ triggerRef, triggerSize ] = useMeasure< HTMLButtonElement >();
+
+		return (
+			<div style={ { padding: '4rem', textAlign: 'center' } }>
+				<Popover.Root defaultOpen>
+					<Popover.Trigger ref={ triggerRef }>
+						Trigger (covered by popover)
+					</Popover.Trigger>
+					<Popover.Popup
+						ref={ popupRef }
+						side="bottom"
+						align="center"
+						sideOffset={
+							-1 *
+							( popupSize.height / 2 + triggerSize.height / 2 )
+						}
+						collisionAvoidance={ {
+							side: 'none',
+							align: 'none',
+						} }
+					>
+						<Popover.Title>Overlay</Popover.Title>
+						<Popover.Description>
+							This popover is centered over its trigger using a
+							negative sideOffset.
+						</Popover.Description>
+						<Popover.Description>
+							Try resizing the browser — collision avoidance is
+							disabled so the popover stays overlaid.
+						</Popover.Description>
+					</Popover.Popup>
+				</Popover.Root>
+			</div>
+		);
+	},
+};
+
+/**
+ * Base UI exposes a `data-instant` attribute on the popup that can be used
+ * in CSS to disable animations. Adding the following rule to your
+ * stylesheet will skip all transitions:
+ *
+ * ```css
+ * [data-instant] { transition: none !important; }
+ * ```
+ *
+ * In this example, we add the rule via a `<style>` tag scoped to the story
+ * wrapper. The popover opens and closes without any transition.
+ */
+export const DisabledAnimations: Story = {
+	render: () => (
+		<div className="no-popover-animation">
+			<style>{ `
+				.no-popover-animation [data-instant] {
+					transition: none !important;
+				}
+			` }</style>
+			<Popover.Root>
+				<Popover.Trigger>No Animation</Popover.Trigger>
+				<Popover.Popup>
+					<Popover.Arrow />
+					<Popover.Title>Instant</Popover.Title>
+					<Popover.Description>
+						This popover opens and closes without animation. The
+						`data-instant` attribute on the positioner is targeted
+						by a CSS rule that disables transitions.
+					</Popover.Description>
+				</Popover.Popup>
+			</Popover.Root>
+		</div>
+	),
+};
+
+/**
+ * When `inline` is set to `true`, the popup renders in place within the DOM
+ * hierarchy instead of being portaled to `document.body`. This can be
+ * useful when you need the popup to participate in the surrounding layout
+ * or inherit styles from a parent.
+ */
+export const Inline: Story = {
+	args: {
+		children: (
+			<>
+				<Popover.Trigger>Open Inline</Popover.Trigger>
+				<Popover.Popup inline>
+					<Popover.Arrow />
+					<Popover.Title>Inline Popover</Popover.Title>
+					<Popover.Description>
+						This popup is rendered in place — no portal is used.
+						Inspect the DOM to see it lives inside its parent.
+					</Popover.Description>
+				</Popover.Popup>
+			</>
+		),
+	},
+};
+
+/**
+ * Use the `collisionAvoidance` prop to control how the popover behaves when
+ * it collides with viewport edges.
+ *
+ * - `side: 'flip'` flips to the opposite side (default).
+ * - `side: 'shift'` shifts along the main axis.
+ * - `side: 'none'` disables collision handling.
+ *
+ * Scroll the container to see collision avoidance in action.
+ */
+export const CollisionAvoidance: Story = {
+	render: () => (
+		<div
+			style={ {
+				height: 300,
+				overflow: 'auto',
+				border: '1px solid #ccc',
+				padding: '200px 2rem',
+			} }
+		>
+			<div
+				style={ {
+					display: 'flex',
+					gap: '2rem',
+					justifyContent: 'center',
+				} }
+			>
+				<Popover.Root defaultOpen>
+					<Popover.Trigger>Flip (default)</Popover.Trigger>
+					<Popover.Popup side="top">
+						<Popover.Description>
+							Flips to bottom when clipped
+						</Popover.Description>
+					</Popover.Popup>
+				</Popover.Root>
+
+				<Popover.Root defaultOpen>
+					<Popover.Trigger>No collision</Popover.Trigger>
+					<Popover.Popup
+						side="top"
+						collisionAvoidance={ {
+							side: 'none',
+							align: 'none',
+						} }
+					>
+						<Popover.Description>
+							Stays on top even when clipped
+						</Popover.Description>
+					</Popover.Popup>
+				</Popover.Root>
+			</div>
+			<div style={ { height: 400 } } />
+		</div>
+	),
+};
+
+function GenericIframe( {
+	children,
+	...props
+}: React.ComponentProps< 'iframe' > & { children: React.ReactNode } ) {
+	const [ containerNode, setContainerNode ] = useState< HTMLElement | null >(
+		null
+	);
+
+	return (
+		// eslint-disable-next-line jsx-a11y/iframe-has-title
+		<iframe
+			{ ...props }
+			srcDoc="<!doctype html><html><body></body></html>"
+			onLoad={ ( event ) => {
+				const doc = event.currentTarget.contentDocument;
+				if ( doc ) {
+					setContainerNode( doc.body );
+				}
+			} }
+		>
+			{ containerNode &&
+				require( '@wordpress/element' ).createPortal(
+					children,
+					containerNode
+				) }
+		</iframe>
+	);
+}
+
+/**
+ * When the popover's trigger lives inside an iframe but the popover should
+ * render in the parent document, pass a parent-document element to the
+ * `container` prop on `Popover.Popup`.
+ *
+ * This technique is used in Gutenberg where the block editor canvas is an
+ * iframe but toolbars and menus must appear outside it.
+ */
+export const CrossIframe: Story = {
+	render: function Render() {
+		const portalContainerRef = useRef< HTMLDivElement >( null );
+
+		return (
+			<div>
+				<p>
+					The popover trigger is inside the purple-bordered iframe.
+					The popup renders in the parent document via the `container`
+					prop.
+				</p>
+				<div ref={ portalContainerRef } />
+				<GenericIframe
+					style={ {
+						width: '100%',
+						height: 300,
+						border: 0,
+						outline: '2px solid purple',
+					} }
+				>
+					<div style={ { padding: 32 } }>
+						<Popover.Root>
+							<Popover.Trigger>
+								Trigger (inside iframe)
+							</Popover.Trigger>
+							<Popover.Popup
+								container={
+									portalContainerRef as React.RefObject< HTMLElement >
+								}
+							>
+								<Popover.Title>
+									Cross-Iframe Popover
+								</Popover.Title>
+								<Popover.Description>
+									This popup is rendered in the parent
+									document, not inside the iframe.
+								</Popover.Description>
+							</Popover.Popup>
+						</Popover.Root>
+					</div>
+				</GenericIframe>
+			</div>
+		);
 	},
 };
 

@@ -1,6 +1,6 @@
 import { Popover as _Popover } from '@base-ui/react/popover';
 import clsx from 'clsx';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useRef } from '@wordpress/element';
 import {
 	type ThemeProvider as ThemeProviderType,
 	privateApis as themePrivateApis,
@@ -40,6 +40,8 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	},
 	ref
 ) {
+	const inlineContainerRef = useRef< HTMLSpanElement >( null );
+
 	const positioner = (
 		<_Popover.Positioner
 			align={ align }
@@ -74,7 +76,17 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	);
 
 	if ( inlineProp ) {
-		return positioner;
+		return (
+			<>
+				<span
+					ref={ inlineContainerRef }
+					style={ { display: 'contents' } }
+				/>
+				<_Popover.Portal container={ inlineContainerRef }>
+					{ positioner }
+				</_Popover.Portal>
+			</>
+		);
 	}
 
 	return (

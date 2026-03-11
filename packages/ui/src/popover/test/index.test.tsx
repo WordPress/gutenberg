@@ -362,4 +362,108 @@ describe( 'Popover', () => {
 			} );
 		} );
 	} );
+
+	describe( 'variant', () => {
+		it( 'should not apply popup styles when variant is unstyled', async () => {
+			const user = userEvent.setup();
+			const ref = createRef< HTMLDivElement >();
+
+			render(
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup ref={ ref } variant="unstyled">
+						Unstyled content
+					</Popover.Popup>
+				</Popover.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			await waitFor( () => {
+				expect( ref.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			expect( ref.current!.className ).toBe( '' );
+		} );
+	} );
+
+	describe( 'inline', () => {
+		it( 'should render without a portal when inline is true', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<div data-testid="inline-wrapper">
+					<Popover.Root>
+						<Popover.Trigger>Open</Popover.Trigger>
+						<Popover.Popup inline>Inline content</Popover.Popup>
+					</Popover.Root>
+				</div>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByText( 'Inline content' )
+				).toBeInTheDocument();
+			} );
+
+			const wrapper = screen.getByTestId( 'inline-wrapper' );
+			expect( wrapper ).toContainElement(
+				screen.getByText( 'Inline content' )
+			);
+		} );
+
+		it( 'should render with a portal by default', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<div data-testid="portal-wrapper">
+					<Popover.Root>
+						<Popover.Trigger>Open</Popover.Trigger>
+						<Popover.Popup>Portal content</Popover.Popup>
+					</Popover.Root>
+				</div>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByText( 'Portal content' )
+				).toBeInTheDocument();
+			} );
+
+			const wrapper = screen.getByTestId( 'portal-wrapper' );
+			expect( wrapper ).not.toContainElement(
+				screen.getByText( 'Portal content' )
+			);
+		} );
+	} );
+
+	describe( 'initialFocus', () => {
+		it( 'should not move focus when initialFocus is false', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup initialFocus={ false }>
+						<input placeholder="Input" />
+					</Popover.Popup>
+				</Popover.Root>
+			);
+
+			const trigger = screen.getByRole( 'button', { name: 'Open' } );
+			await user.click( trigger );
+
+			await waitFor( () => {
+				expect(
+					screen.getByPlaceholderText( 'Input' )
+				).toBeInTheDocument();
+			} );
+
+			expect( trigger ).toHaveFocus();
+		} );
+	} );
 } );
