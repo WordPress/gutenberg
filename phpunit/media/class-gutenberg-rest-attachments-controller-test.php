@@ -106,8 +106,6 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
 		$result     = $controller->create_item_permissions_check( $request );
 
-		remove_filter( 'wp_image_editors', '__return_empty_array' );
-
 		// Should pass because the bypass filter was applied (client handles processing).
 		$this->assertTrue( $result );
 	}
@@ -139,12 +137,8 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 				),
 			)
 		);
-		$request->set_param( 'generate_sub_sizes', true );
-
 		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
 		$result     = $controller->create_item_permissions_check( $request );
-
-		remove_filter( 'wp_image_editors', '__return_empty_array' );
 
 		// Should fail because the server needs to generate sub-sizes but can't.
 		$this->assertWPError( $result );
@@ -199,8 +193,6 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 
 		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
 		$response = rest_get_server()->dispatch( $request );
-
-		remove_filter( 'wp_generate_attachment_metadata', '__return_empty_array', 1 );
 
 		$this->assertSame( 201, $response->get_status() );
 
@@ -916,8 +908,6 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$request_server = new WP_REST_Request( 'POST', '/wp/v2/media' );
 		$request_server->set_header( 'Content-Type', 'image/jpeg' );
 		$request_server->set_header( 'Content-Disposition', 'attachment; filename=server-side-upload.jpg' );
-		$request_server->set_param( 'generate_sub_sizes', true );
-
 		$request_server->set_body( file_get_contents( DIR_TESTDATA . '/images/2004-07-22-DSC_0008.jpg' ) );
 		$response_server = rest_get_server()->dispatch( $request_server );
 		$data_server     = $response_server->get_data();
