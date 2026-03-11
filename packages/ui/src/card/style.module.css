@@ -1,0 +1,47 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.root {
+		--wp-ui-card-padding: var(--wpds-dimension-padding-xl);
+		--wp-ui-card-header-content-gap: var(--wpds-dimension-gap-lg);
+
+		display: flex;
+		flex-direction: column;
+		border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+		border-radius: var(--wpds-border-radius-lg);
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
+	}
+
+	/* Padding is applied to the individual header/content elements to enable
+	 * the higher-level `CollapsibleCard` component to be fully clickable
+	 * to expand/collapse the card.
+	*/
+	.header,
+	.content {
+		padding: var(--wp-ui-card-padding);
+
+		&:not(:first-child):not(:last-child) {
+			padding-block-end: 0;
+		}
+	}
+
+	/* Custom vertical gap between header and content */
+	.header + .content {
+		padding-block-start: 0;
+		margin-block-start: calc(var(--wp-ui-card-header-content-gap) - var(--wp-ui-card-padding));
+	}
+
+	.fullbleed {
+		margin-inline: calc(-1 * var(--wp-ui-card-padding));
+		width: calc(100% + 2 * var(--wp-ui-card-padding));
+	}
+
+	.title {
+		margin: 0;
+		font-family: var(--wpds-font-family-heading);
+		font-size: var(--wpds-font-size-lg);
+		font-weight: var(--wpds-font-weight-medium);
+		line-height: var(--wpds-font-line-height-sm);
+		color: var(--wpds-color-fg-content-neutral);
+	}
+}

@@ -102,7 +102,7 @@ describe( 'editMediaEntity', () => {
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'postType',
 			'attachment',
-			[ updatedRecord ],
+			updatedRecord,
 			undefined,
 			true,
 			undefined,

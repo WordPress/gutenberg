@@ -2,10 +2,18 @@
 
 ## Unreleased
 
+### Enhancements
+
+- DataForm: Reduce panel's dialog min-width. [#76345](https://github.com/WordPress/gutenberg/pull/76345)
+
 ### Bug Fixes
 
 - DataViews: Fix last column classname in table layout. [#76133](https://github.com/WordPress/gutenberg/pull/76133)
 - DataForm: Properly handle dates in datetime control. [#76193](https://github.com/WordPress/gutenberg/pull/76193)
+
+### Enhancements
+
+- DataViews: Add density option to Grid and PickerGrid layouts. [#75887](https://github.com/WordPress/gutenberg/pull/75887)
 
 ### Code Quality
 
@@ -19,6 +27,7 @@
 
 ### Bug Fixes
 
+- DataViews: Fix sort indicator not resetting across column menus. [#76041](https://github.com/WordPress/gutenberg/pull/76041)
 - DataForm: Fix label color of array control. [#75730](https://github.com/WordPress/gutenberg/pull/75730)
 - DataForm: Fix text overflow for long unhyphenated text in panel layout. [#76073](https://github.com/WordPress/gutenberg/pull/76073)
 - DataForm: Fix `card` layout's toggle button screen reader text. [#76039](https://github.com/WordPress/gutenberg/pull/76039)
@@ -34,6 +43,7 @@
 
 ### Enhancements
 
+- DataForm: Add `applyLabel` and `cancelLabel` options to `panel` layout's `openAs` modal config for customizing modal button labels. [#76099](https://github.com/WordPress/gutenberg/pull/76099)
 - Documentation: Update README.md. [#75881](https://github.com/WordPress/gutenberg/pull/75881)
 - DataViews: Improve UI in `list` layout when we render only title and/or media fields. [#76042](https://github.com/WordPress/gutenberg/pull/76042)
 - DataViews: Adjust column spacing in table layout when no titleField is provided. [#75410](https://github.com/WordPress/gutenberg/pull/75410)
