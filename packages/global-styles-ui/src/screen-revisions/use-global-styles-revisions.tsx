@@ -67,7 +67,6 @@ export default function useGlobalStylesRevisions( {
 				getRevisions,
 				__experimentalGetCurrentGlobalStylesId,
 				getEntityRecord,
-				// @ts-expect-error
 				isResolving,
 			} = select( coreStore );
 			const dirtyEntityRecords =

@@ -4,31 +4,53 @@
 import {
 	privateApis as coreDataPrivateApis,
 	SelectionType,
+	type PostEditorAwarenessState,
 } from '@wordpress/core-data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import { getAvatarUrl } from './get-avatar-url';
+import { useDebouncedRecompute } from './use-debounced-recompute';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
 
+export interface BlockHighlightData {
+	blockId: string;
+	userName: string;
+	avatarUrl?: string;
+	color: string;
+	x: number;
+	y: number;
+}
+
 /**
- * Custom hook for highlighting selected blocks in the editor
- * @param blockEditorDocument - Ref to the block editor document, used to directly style block elements.
- * @param postId              - The ID of the post
- * @param postType            - The type of the post
+ * Custom hook for highlighting selected blocks in the editor and computing
+ * their positions for rendering avatar labels in the overlay.
+ *
+ * @param overlayElement      - The overlay element used as position reference.
+ * @param blockEditorDocument - Ref to the block editor document.
+ * @param postId              - The ID of the post.
+ * @param postType            - The type of the post.
+ * @param delayMs             - Milliseconds to wait before recomputing highlight positions.
+ * @return Highlight data for rendering and a delayed recompute function.
  */
 export function useBlockHighlighting(
+	overlayElement: HTMLElement | null,
 	blockEditorDocument: Document | null,
 	postId: number | null,
-	postType: string | null
-) {
+	postType: string | null,
+	delayMs: number
+): {
+	highlights: BlockHighlightData[];
+	rerenderHighlightsAfterDelay: () => () => void;
+} {
 	const highlightedBlockIds = useRef< Set< string > >( new Set() );
-	const userStates = useActiveCollaborators(
+	const userStates: PostEditorAwarenessState[] = useActiveCollaborators(
 		postId ?? null,
 		postType ?? null
 	);
@@ -37,15 +59,78 @@ export function useBlockHighlighting(
 		postType ?? null
 	);
 
-	// Draw block highlights
+	const [ highlights, setHighlights ] = useState< BlockHighlightData[] >(
+		[]
+	);
+
+	// Bump this counter to force the effect to re-run (e.g. after a layout shift).
+	const [ recomputeToken, rerenderHighlightsAfterDelay ] =
+		useDebouncedRecompute( delayMs );
+
+	// All DOM mutations and position computations live inside useEffect.
 	useEffect( () => {
-		// Don't do anything if editor is not rendered yet.
-		if ( blockEditorDocument === null ) {
+		if ( ! blockEditorDocument ) {
+			setHighlights( [] );
 			return;
 		}
 
-		const unhighlightBlocks = ( blockIds: string[] ) => {
-			blockIds.forEach( ( blockId ) => {
+		// Capture the ref value so the cleanup closure sees the same Set
+		// even if a later render replaces it.
+		const currentHighlightedIds = highlightedBlockIds.current;
+
+		// Deduplicate by blockId — when multiple collaborators select the
+		// same block, only the first one gets the highlight and avatar label.
+		const seen = new Set< string >();
+		const blocksToHighlight = userStates
+			.filter(
+				( userState ) =>
+					! userState.isMe &&
+					userState.editorState?.selection?.type ===
+						SelectionType.WholeBlock
+			)
+			.map( ( userState ) => {
+				let localClientId;
+				try {
+					( { localClientId } = resolveSelection(
+						userState.editorState?.selection
+					) );
+				} catch {
+					return null;
+				}
+
+				if ( ! localClientId ) {
+					return null;
+				}
+
+				return {
+					blockId: localClientId,
+					color: getAvatarBorderColor(
+						userState.collaboratorInfo.id
+					),
+					userName: userState.collaboratorInfo.name,
+					avatarUrl: getAvatarUrl(
+						userState.collaboratorInfo.avatar_urls
+					),
+				};
+			} )
+			.filter( ( block ): block is NonNullable< typeof block > => {
+				if ( ! block ) {
+					return false;
+				}
+				if ( seen.has( block.blockId ) ) {
+					return false;
+				}
+				seen.add( block.blockId );
+				return true;
+			} );
+
+		// Unhighlight blocks that are no longer selected.
+		const selectedBlockIds = new Set(
+			blocksToHighlight.map( ( block ) => block.blockId )
+		);
+
+		for ( const blockId of currentHighlightedIds ) {
+			if ( ! selectedBlockIds.has( blockId ) ) {
 				const blockElement = getBlockElementById(
 					blockEditorDocument,
 					blockId
@@ -58,51 +143,16 @@ export function useBlockHighlighting(
 					);
 				}
 
-				highlightedBlockIds.current.delete( blockId );
-			} );
-		};
+				currentHighlightedIds.delete( blockId );
+			}
+		}
 
-		const blocksToHighlight = userStates
-			.map( ( userState: any ) => {
-				const isWholeBlockSelected =
-					userState.editorState?.selection?.type ===
-					SelectionType.WholeBlock;
-				const shouldDrawUser = ! userState.isMe;
+		// Highlight blocks and compute positions for avatar labels.
+		const results: BlockHighlightData[] = [];
+		const overlayRect = overlayElement?.getBoundingClientRect() ?? null;
 
-				if ( isWholeBlockSelected && shouldDrawUser ) {
-					const { localClientId } = resolveSelection(
-						userState.editorState?.selection
-					);
-
-					if ( ! localClientId ) {
-						return null;
-					}
-
-					return {
-						blockId: localClientId,
-						color: getAvatarBorderColor(
-							userState.collaboratorInfo.id
-						),
-					};
-				}
-
-				return null;
-			} )
-			.filter( ( block: any ) => block !== null );
-
-		// Unhighlight blocks that are no longer highlighted.
-		const selectedBlockIds = blocksToHighlight.map(
-			( block: any ) => block.blockId
-		);
-		const blocksIdsToUnhighlight = Array.from(
-			highlightedBlockIds.current
-		).filter( ( blockId ) => ! selectedBlockIds.includes( blockId ) );
-
-		unhighlightBlocks( blocksIdsToUnhighlight );
-
-		// Highlight blocks that are currently highlighted.
-		blocksToHighlight.forEach( ( blockColorPair: any ) => {
-			const { color, blockId } = blockColorPair;
+		blocksToHighlight.forEach( ( block ) => {
+			const { color, blockId, userName, avatarUrl } = block;
 			const blockElement = getBlockElementById(
 				blockEditorDocument,
 				blockId
@@ -112,16 +162,49 @@ export function useBlockHighlighting(
 				return;
 			}
 
-			if ( blockElement ) {
-				blockElement.classList.add( 'is-collaborator-selected' );
-				blockElement.style.setProperty(
-					'--collaborator-outline-color',
-					color
-				);
-				highlightedBlockIds.current.add( blockId );
+			blockElement.classList.add( 'is-collaborator-selected' );
+			blockElement.style.setProperty(
+				'--collaborator-outline-color',
+				color
+			);
+			currentHighlightedIds.add( blockId );
+
+			if ( overlayRect ) {
+				const blockRect = blockElement.getBoundingClientRect();
+
+				results.push( {
+					blockId,
+					userName,
+					avatarUrl,
+					color,
+					x: blockRect.left - overlayRect.left,
+					y: blockRect.top - overlayRect.top,
+				} );
 			}
 		} );
-	}, [ userStates, blockEditorDocument, resolveSelection ] );
+
+		setHighlights( results );
+
+		// Clean up all highlights on unmount.
+		return () => {
+			for ( const blockId of currentHighlightedIds ) {
+				const el = getBlockElementById( blockEditorDocument, blockId );
+				if ( el ) {
+					el.classList.remove( 'is-collaborator-selected' );
+					el.style.removeProperty( '--collaborator-outline-color' );
+				}
+			}
+			currentHighlightedIds.clear();
+		};
+	}, [
+		userStates,
+		blockEditorDocument,
+		overlayElement,
+		recomputeToken,
+		resolveSelection,
+	] );
+
+	return { highlights, rerenderHighlightsAfterDelay };
 }
 
 const getBlockElementById = (

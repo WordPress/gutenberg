@@ -128,11 +128,13 @@ export default function TemplatePartEdit( {
 		onNavigateToEntityRecord,
 		title,
 		canUserEdit,
+		canUserEditBlock,
 	} = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const { getBlockCount, getSettings } = select( blockEditorStore );
+			const { getBlockCount, getSettings, canEditBlock } =
+				select( blockEditorStore );
 
 			const getEntityArgs = [
 				'postType',
@@ -170,6 +172,7 @@ export default function TemplatePartEdit( {
 					getSettings().onNavigateToEntityRecord,
 				title: entityRecord?.title,
 				canUserEdit: !! _canUserEdit,
+				canUserEditBlock: canEditBlock( clientId ),
 			};
 		},
 		[ templatePartId, attributes.area, clientId ]
@@ -284,6 +287,7 @@ export default function TemplatePartEdit( {
 						// Only enable for single selection that matches the current block.
 						// Ensures menu item doesn't render multiple times.
 						if (
+							! canUserEditBlock ||
 							! (
 								selectedClientIds.length === 1 &&
 								clientId === selectedClientIds[ 0 ]
