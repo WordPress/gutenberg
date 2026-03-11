@@ -135,9 +135,7 @@ export default function BlockGuidelineModal( {
 		<Modal
 			className="block-guideline-modal"
 			title={
-				isEditing
-					? __( 'Edit block guidelines' )
-					: __( 'Add block guidelines' )
+				isEditing ? __( 'Edit guidelines' ) : __( 'Add guidelines' )
 			}
 			onRequestClose={ closeModal }
 		>

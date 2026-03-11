@@ -240,7 +240,7 @@ export default function BlockGuidelines() {
 			) }
 			<HStack>
 				<Button variant="primary" onClick={ openModal }>
-					{ __( 'Add block guidelines' ) }
+					{ __( 'Add guidelines' ) }
 				</Button>
 			</HStack>
 
