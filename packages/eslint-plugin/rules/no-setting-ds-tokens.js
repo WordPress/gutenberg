@@ -14,7 +14,7 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 	create( context ) {
 		return {
 			/** @param {import('estree').Property} node */
-			'Property[key.value=/^--wpds-/]'( node ) {
+			'ObjectExpression > Property[key.value=/^--wpds-/]'( node ) {
 				context.report( {
 					node: node.key,
 					messageId: 'disallowedSet',

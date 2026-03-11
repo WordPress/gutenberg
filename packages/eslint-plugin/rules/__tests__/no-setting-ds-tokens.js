@@ -30,6 +30,9 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 		{
 			code: `const styles = { color: 'var(--wpds-color-fg-content-neutral)' };`,
 		},
+		{
+			code: `const { '--wpds-color-fg-content-neutral': neutralColor } = styles;`,
+		},
 	],
 	invalid: [
 		{
@@ -58,6 +61,14 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 		},
 		{
 			code: `function getStyles() { return { '--wpds-font-size-md': '10px' }; }`,
+			errors: [
+				{
+					messageId: 'disallowedSet',
+				},
+			],
+		},
+		{
+			code: `const config = { inner: { '--wpds-color-fg-content-neutral': 'red' } };`,
 			errors: [
 				{
 					messageId: 'disallowedSet',
