@@ -25,6 +25,7 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
+import RemoveGuidelineConfirmation from './remove-guideline-confirmation';
 import { saveContentGuidelines } from '../api';
 import { STORE_NAME } from '../store';
 import { unlock } from '../../lock-unlock';
@@ -47,6 +48,8 @@ export default function BlockGuidelineModal( {
 
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ error, setError ] = useState< string | null >( null );
+	const [ showRemoveConfirmation, setShowRemoveConfirmation ] =
+		useState( false );
 
 	const blockGuidelines = useSelect(
 		// @ts-ignore
@@ -187,11 +190,10 @@ export default function BlockGuidelineModal( {
 						<Button
 							variant="tertiary"
 							isDestructive
-							// We need to pass an empty string to remove the guideline.
-							// This is because the API will only remove the guideline if the value is an empty string.
-							onClick={ () => handleSave( '' ) }
+							onClick={ () => setShowRemoveConfirmation( true ) }
 							disabled={ isSaving }
 							accessibleWhenDisabled
+							type="button"
 						>
 							{ __( 'Remove' ) }
 						</Button>
@@ -207,6 +209,28 @@ export default function BlockGuidelineModal( {
 					</Button>
 				</HStack>
 			</VStack>
+			{ showRemoveConfirmation && (
+				<RemoveGuidelineConfirmation
+					title={ __( 'Remove block guidelines' ) }
+					onClose={ () => setShowRemoveConfirmation( false ) }
+					onConfirm={ () => {
+						handleSave( '' );
+						setShowRemoveConfirmation( false );
+					} }
+					isBusy={ isSaving }
+				>
+					{ sprintf(
+						/* translators: %s: Block name. */
+						__(
+							'You are about to remove the block guidelines for the %s block.'
+						),
+						selectedBlockLabel
+					) }
+					<br />
+					<br />
+					{ __( 'This can be undone from revision history.' ) }
+				</RemoveGuidelineConfirmation>
+			) }
 		</Modal>
 	);
 }
