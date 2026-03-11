@@ -82,7 +82,7 @@ export function SiblingStyleSyncControl( { clientId, name } ) {
 			  );
 
 	return (
-		<InspectorControls group="advanced">
+		<InspectorControls group="styles">
 			{ isUnlinked ? (
 				<Notice status="warning" isDismissible={ false }>
 					{ sprintf(
