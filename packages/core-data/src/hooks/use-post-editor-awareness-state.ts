@@ -17,7 +17,7 @@ import type { SelectionState } from '../types';
 import type { PostEditorAwareness } from '../awareness/post-editor-awareness';
 
 interface ResolvedSelection {
-	textIndex: number | null;
+	richTextOffset: number | null;
 	localClientId: string | null;
 }
 
@@ -29,7 +29,7 @@ interface AwarenessState {
 }
 
 const defaultResolvedSelection: ResolvedSelection = {
-	textIndex: null,
+	richTextOffset: null,
 	localClientId: null,
 };
 

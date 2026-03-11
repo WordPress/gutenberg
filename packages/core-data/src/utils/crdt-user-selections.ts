@@ -12,7 +12,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { CRDT_RECORD_MAP_KEY } from '../sync';
 import type { YPostRecord } from './crdt';
 import type { YBlock, YBlocks } from './crdt-blocks';
-import { getRootMap } from './crdt-utils';
+import { getRootMap, richTextOffsetToHtmlIndex } from './crdt-utils';
 import type {
 	AbsoluteBlockIndexPath,
 	WPBlockSelection,
@@ -171,7 +171,7 @@ function getCursorPosition(
 
 	const relativePosition = Y.createRelativePositionFromTypeIndex(
 		currentYText,
-		selection.offset
+		richTextOffsetToHtmlIndex( currentYText.toString(), selection.offset )
 	);
 
 	return {

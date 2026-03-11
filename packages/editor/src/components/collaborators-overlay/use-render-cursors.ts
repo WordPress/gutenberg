@@ -84,11 +84,11 @@ export function useRenderCursors(
 				} else if ( selection.type === SelectionType.WholeBlock ) {
 					// Don't draw a cursor for a whole block selection.
 				} else if ( selection.type === SelectionType.Cursor ) {
-					const { textIndex, localClientId } =
+					const { richTextOffset, localClientId } =
 						resolveSelection( selection );
 					if ( localClientId ) {
 						coords = getCursorPosition(
-							textIndex,
+							richTextOffset,
 							localClientId,
 							blockEditorDocument,
 							overlayElement
@@ -98,13 +98,15 @@ export function useRenderCursors(
 					selection.type === SelectionType.SelectionInOneBlock ||
 					selection.type === SelectionType.SelectionInMultipleBlocks
 				) {
-					const { textIndex, localClientId } = resolveSelection( {
-						type: SelectionType.Cursor,
-						cursorPosition: selection.cursorStartPosition,
-					} );
+					const { richTextOffset, localClientId } = resolveSelection(
+						{
+							type: SelectionType.Cursor,
+							cursorPosition: selection.cursorStartPosition,
+						}
+					);
 					if ( localClientId ) {
 						coords = getCursorPosition(
-							textIndex,
+							richTextOffset,
 							localClientId,
 							blockEditorDocument,
 							overlayElement
@@ -144,19 +146,19 @@ export function useRenderCursors(
 /**
  * Given a selection, returns the coordinates of the cursor in the block.
  *
- * @param absolutePositionIndex - The absolute position index
- * @param blockId               - The block ID
- * @param editorDocument        - The editor document
- * @param overlay               - The overlay element
+ * @param richTextOffset - The absolute position index
+ * @param blockId        - The block ID
+ * @param editorDocument - The editor document
+ * @param overlay        - The overlay element
  * @return The position of the cursor
  */
 const getCursorPosition = (
-	absolutePositionIndex: number | null,
+	richTextOffset: number | null,
 	blockId: string,
 	editorDocument: Document,
 	overlay: HTMLElement
 ): { x: number; y: number; height: number } | null => {
-	if ( absolutePositionIndex === null ) {
+	if ( richTextOffset === null ) {
 		// An absolute position index can be null if a cursor was set in a block that
 		// has since been deleted.
 		// Return null so we don't try to draw it.
@@ -174,7 +176,7 @@ const getCursorPosition = (
 	return (
 		getOffsetPositionInBlock(
 			blockElement,
-			absolutePositionIndex,
+			richTextOffset,
 			editorDocument,
 			overlay
 		) ?? null

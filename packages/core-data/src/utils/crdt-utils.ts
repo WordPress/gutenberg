@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Y } from '@wordpress/sync';
+import { create, insert, toHTMLString } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -102,6 +103,125 @@ export function findBlockByClientIdInDoc(
 	}
 
 	return findBlockByClientIdInBlocks( blockId, blocks );
+}
+
+// Candidate markers for insertion. We try each in order and pick the first
+// one that does not already appear in the text, so existing content cannot
+// collide with the marker we search for after parsing.
+const MARKER_CANDIDATES = [ '\uFFFD', '\uFFFE', '\uFFFF' ] as const;
+
+/**
+ * Pick a marker character that does not appear in `text`. Returns the marker
+ * or `null` if all candidates are present (extremely unlikely in practice).
+ *
+ * @param text The string to check for existing marker characters.
+ */
+function pickMarker( text: string ): string | null {
+	for ( const candidate of MARKER_CANDIDATES ) {
+		if ( ! text.includes( candidate ) ) {
+			return candidate;
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Convert an HTML character index (counting tag characters) to a rich-text
+ * offset (counting only text characters). Used on read paths where Y.Text
+ * resolves to an HTML index but the block editor expects a text offset.
+ *
+ * @param html      The full HTML string from Y.Text.
+ * @param htmlIndex The HTML character index.
+ * @return The corresponding rich-text offset.
+ */
+export function htmlIndexToRichTextOffset(
+	html: string,
+	htmlIndex: number
+): number {
+	if ( ! html.includes( '<' ) && ! html.includes( '&' ) ) {
+		return htmlIndex;
+	}
+
+	const marker = pickMarker( html );
+	if ( ! marker ) {
+		return htmlIndex;
+	}
+
+	// Find a safe insertion point for the marker. If htmlIndex falls
+	// inside a tag or entity, back up to the boundary just before it
+	// so the marker doesn't break the HTML structure.
+	let safeIndex = htmlIndex;
+
+	const lastOpen = html.lastIndexOf( '<', htmlIndex - 1 );
+	if ( lastOpen !== -1 ) {
+		const nextClose = html.indexOf( '>', lastOpen );
+		if ( nextClose === -1 || nextClose >= htmlIndex ) {
+			safeIndex = lastOpen;
+		}
+	}
+
+	const lastAmp = html.lastIndexOf( '&', safeIndex - 1 );
+	if ( lastAmp !== -1 ) {
+		const nextSemi = html.indexOf( ';', lastAmp );
+		if (
+			nextSemi !== -1 &&
+			nextSemi >= safeIndex &&
+			nextSemi - lastAmp < 10
+		) {
+			safeIndex = lastAmp;
+		}
+	}
+
+	// Insert marker and let create() do the real parsing.
+	const withMarker =
+		html.slice( 0, safeIndex ) + marker + html.slice( safeIndex );
+	const value = create( { html: withMarker } );
+	const markerPos = value.text.indexOf( marker );
+
+	return markerPos === -1 ? htmlIndex : markerPos;
+}
+
+/**
+ * Convert a rich-text offset (counting only text characters) to an HTML
+ * character index (counting tag characters). Used on write paths where the
+ * block editor provides a text offset but Y.Text expects an HTML index.
+ *
+ * @param html           The full HTML string from Y.Text.
+ * @param richTextOffset The rich-text text offset.
+ * @return The corresponding HTML character index.
+ */
+export function richTextOffsetToHtmlIndex(
+	html: string,
+	richTextOffset: number
+): number {
+	if ( ! html.includes( '<' ) && ! html.includes( '&' ) ) {
+		return richTextOffset;
+	}
+
+	const marker = pickMarker( html );
+	if ( ! marker ) {
+		return richTextOffset;
+	}
+
+	const value = create( { html } );
+	const markerValue = create( { text: marker } );
+	// The marker must inherit the formatting at the insertion point so that
+	// toHTMLString does not split surrounding tags (e.g. <strong>) around it.
+	if ( value.formats[ richTextOffset ] ) {
+		markerValue.formats[ 0 ] = value.formats[ richTextOffset ];
+	}
+
+	const withMarker = insert(
+		value,
+		markerValue,
+		richTextOffset,
+		richTextOffset
+	);
+
+	const htmlWithMarker = toHTMLString( { value: withMarker } );
+	const markerIndex = htmlWithMarker.indexOf( marker );
+	return markerIndex === -1 ? richTextOffset : markerIndex;
 }
 
 function findBlockByClientIdInBlocks(
