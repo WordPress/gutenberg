@@ -336,7 +336,14 @@ function ViewPickerGrid< Item >( {
 						aria-multiselectable={ isMultiselect }
 						className={ clsx(
 							'dataviews-view-picker-grid',
-							className
+							className,
+							{
+								[ `has-${ view.layout?.density }-density` ]:
+									view.layout?.density &&
+									[ 'compact', 'comfortable' ].includes(
+										view.layout.density
+									),
+							}
 						) }
 						aria-label={ itemListLabel }
 						render={ ( { children, ...props } ) => (
@@ -421,7 +428,15 @@ function ViewPickerGrid< Item >( {
 							<GridItems
 								className={ clsx(
 									'dataviews-view-picker-grid',
-									className
+									className,
+									{
+										[ `has-${ view.layout?.density }-density` ]:
+											view.layout?.density &&
+											[
+												'compact',
+												'comfortable',
+											].includes( view.layout.density ),
+									}
 								) }
 								previewSize={ usedPreviewSize }
 								aria-busy={ isLoading }

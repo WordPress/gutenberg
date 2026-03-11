@@ -80,7 +80,7 @@ export default function GuidelineAccordionForm( {
 		saveContentGuidelines()
 			.then( () => {
 				setError( null );
-				createSuccessNotice( __( 'Guideline category saved.' ), {
+				createSuccessNotice( __( 'Guidelines saved.' ), {
 					type: 'snackbar',
 				} );
 			} )

@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
@@ -26,4 +27,115 @@
 	justify-content: center;
 	align-items: center;
 	margin-top: $grid-unit-20;
+}
+
+.content-guidelines__actions-notice {
+	border: none;
+	border-left: 4px solid $alert-yellow;
+	background-color: color.adjust($alert-yellow, $lightness: +35%);
+	border-radius: 0;
+}
+
+.content-guidelines__actions-notice-title {
+	font-size: 13px;
+	font-weight: 400;
+}
+
+.content-guidelines__actions {
+	width: min(680px, 100%);
+	margin: $grid-unit-20 auto 0;
+}
+
+.content-guidelines__actions-card {
+	padding: 0;
+	overflow: hidden;
+}
+
+.content-guidelines__actions-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.content-guidelines__action-list-item {
+	margin-bottom: 0;
+	position: relative;
+
+	&:not(:first-child)::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: $grid-unit-30;
+		right: $grid-unit-30;
+		height: 1px;
+		background-color: $gray-100;
+	}
+}
+
+.content-guidelines__action-row {
+	padding: $grid-unit-20 $grid-unit-30;
+	align-items: center;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.content-guidelines__actions-card .content-guidelines__action-button {
+	min-width: 100px;
+	justify-content: center;
+	font-size: 13px;
+	font-weight: 400;
+}
+
+.content-guidelines__action-title {
+	color: $gray-900;
+}
+
+.content-guidelines__action-description {
+	color: $gray-700;
+}
+
+.content-guidelines__revision-history {
+	padding: $grid-unit-30;
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-20;
+	.dataviews__view-actions,
+	.dataviews-filters__container {
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-10;
+	}
+
+	.dataviews-view-table {
+		td:first-child {
+			padding-left: $grid-unit-10;
+		}
+
+		td {
+			padding: $grid-unit-20 $grid-unit-10;
+		}
+
+		thead th:has(.dataviews-view-table-header-button):first-child {
+			padding-left: 0;
+		}
+
+		.dataviews-view-table__cell-content-wrapper {
+			max-width: 100%;
+		}
+	}
+}
+
+.content-guidelines__revision-history-back {
+	align-self: flex-start;
+	margin-left: -$grid-unit-10;
+	font-weight: 500;
+	color: $gray-900;
+}
+
+.content-guidelines__revision-description {
+	padding-left: $grid-unit-10;
+}
+
+.content-guidelines__restore-modal-actions,
+.content-guidelines__import-modal-actions {
+	margin-top: $grid-unit-30;
 }
