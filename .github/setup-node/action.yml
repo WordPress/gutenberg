@@ -9,6 +9,8 @@ inputs:
 runs:
     using: 'composite'
     steps:
+        # Configure the desired version of node with caching.
+        # Note: the node_modules directory is intentionally not cached.
         - name: Use desired version of Node.js
           uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
           with:
@@ -16,13 +18,11 @@ runs:
               node-version: ${{ inputs.node-version }}
               check-latest: true
               # Caching for npm dependencies is automatically enabled when package.json contains devEngines.packageManager field set to npm
+              # cache: npm
               cache-dependency-path: |
                   package-lock.json
                   patches/**
 
-        # We don't explicitly cache node_modules, we rely on actions/setup-node's `cache: npm` (above)
-        # to cache ~/.npm (the download cache), so cache can be reused between different Node.js versions.
-        # This skips network downloads while npm ci rebuilds the local node_modules.
         - name: Install npm dependencies
           run: |
               npm ci
