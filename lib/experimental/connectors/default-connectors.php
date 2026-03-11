@@ -70,7 +70,7 @@ function _gutenberg_connectors_init(): void {
 		$provider_class_name = $ai_registry->getProviderClassName( $connector_id );
 		$provider_metadata   = $provider_class_name::metadata();
 
-		$auth_method = $provider_metadata->getAuthenticationMethod();
+		$auth_method = method_exists( $provider_metadata, 'getAuthenticationMethod' ) ? $provider_metadata->getAuthenticationMethod() : null;
 		$is_api_key  = null !== $auth_method && $auth_method->isApiKey();
 
 		if ( $is_api_key ) {
@@ -84,7 +84,7 @@ function _gutenberg_connectors_init(): void {
 		}
 
 		$name        = $provider_metadata->getName();
-		$description = $provider_metadata->getDescription();
+		$description = method_exists( $provider_metadata, 'getDescription' ) ? $provider_metadata->getDescription() : null;
 		$logo_url    = method_exists( $provider_metadata, 'getLogoPath' ) && $provider_metadata->getLogoPath()
 			? _wp_connectors_resolve_ai_provider_logo_url( $provider_metadata->getLogoPath() )
 			: null;
