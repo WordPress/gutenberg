@@ -686,62 +686,61 @@ export const __experimentalUnlinkBlockStyleSync =
 export const __experimentalRelinkBlockStyleSync =
 	( clientId, blockName, scopeClientId ) =>
 	( { select, dispatch, registry } ) => {
-		dispatch( {
-			type: 'RELINK_SIBLING_STYLE_SYNC',
-			clientId,
-			blockName,
-			scopeClientId,
-		} );
-		dispatch.updateBlockAttributes( clientId, {
-			styleSyncUnlinked: false,
-		} );
-
 		const syncSupport =
 			getBlockType( blockName )?.supports?.__experimentalSiblingStyleSync;
-		if ( ! syncSupport ) {
-			return;
-		}
 
-		const privateSelect = unlock( registry.select( STORE_NAME ) );
-		const siblings = privateSelect.__experimentalGetSiblingStyleSyncBlocks(
-			clientId,
-			blockName
-		);
-		const canonicalSibling = siblings.find(
-			( s ) =>
-				! privateSelect.__experimentalIsBlockStyleSyncUnlinked(
-					s.clientId,
+		let canonicalStyleUpdate = null;
+		if ( syncSupport ) {
+			const privateSelect = unlock( registry.select( STORE_NAME ) );
+			const siblings =
+				privateSelect.__experimentalGetSiblingStyleSyncBlocks(
+					clientId,
 					blockName
-				)
-		);
-		if ( ! canonicalSibling ) {
-			return;
-		}
-
-		const canonicalAttrs = select.getBlockAttributes(
-			canonicalSibling.clientId
-		);
-		const { syncedAttributes } = partitionAttributesByGroups(
-			canonicalAttrs,
-			syncSupport.groups
-		);
-		if ( Object.keys( syncedAttributes ).length === 0 ) {
-			return;
-		}
-
-		if ( syncedAttributes.style ) {
-			const currentStyle =
-				select.getBlockAttributes( clientId )?.style ?? {};
-			const merged = mergeStyleByGroups(
-				currentStyle,
-				syncedAttributes.style,
-				syncSupport.groups
+				);
+			const canonicalSibling = siblings.find(
+				( s ) =>
+					! privateSelect.__experimentalIsBlockStyleSyncUnlinked(
+						s.clientId,
+						blockName
+					)
 			);
-			dispatch.updateBlockAttributes( clientId, {
-				...syncedAttributes,
-				style: merged,
-			} );
-		} else {
-			dispatch.updateBlockAttributes( clientId, syncedAttributes );
+			if ( canonicalSibling ) {
+				const canonicalAttrs = select.getBlockAttributes(
+					canonicalSibling.clientId
+				);
+				const { syncedAttributes } = partitionAttributesByGroups(
+					canonicalAttrs,
+					syncSupport.groups
+				);
+				if ( Object.keys( syncedAttributes ).length > 0 ) {
+					if ( syncedAttributes.style ) {
+						const currentStyle =
+							select.getBlockAttributes( clientId )?.style ?? {};
+						canonicalStyleUpdate = {
+							...syncedAttributes,
+							style: mergeStyleByGroups(
+								currentStyle,
+								syncedAttributes.style,
+								syncSupport.groups
+							),
+						};
+					} else {
+						canonicalStyleUpdate = syncedAttributes;
+					}
+				}
+			}
 		}
+
+		registry.batch( () => {
+			dispatch( {
+				type: 'RELINK_SIBLING_STYLE_SYNC',
+				clientId,
+				blockName,
+				scopeClientId,
+			} );
+			dispatch.updateBlockAttributes( clientId, {
+				styleSyncUnlinked: false,
+				...canonicalStyleUpdate,
+			} );
+		} );
 	};

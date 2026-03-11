@@ -221,20 +221,18 @@ describe( 'sibling style sync actions', () => {
 				'acc-1'
 			)( { select, dispatch, registry } );
 
-			// Should dispatch the RELINK action, clear the attribute, and copy styles.
+			// Should dispatch the RELINK action and a single combined attribute
+			// update all in one batch so it's a single undo entry.
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'RELINK_SIBLING_STYLE_SYNC',
 				clientId: 'head-1',
 				blockName: 'core/accordion-heading',
 				scopeClientId: 'acc-1',
 			} );
+			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledWith(
 				'head-1',
-				{ styleSyncUnlinked: false }
-			);
-			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledWith(
-				'head-1',
-				{ textColor: 'vivid-red' }
+				{ styleSyncUnlinked: false, textColor: 'vivid-red' }
 			);
 		} );
 	} );
