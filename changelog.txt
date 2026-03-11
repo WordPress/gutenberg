@@ -1,5 +1,26 @@
 == Changelog ==
 
+= 22.7.0-rc.4 =
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Editor
+- CI: Don't build release notes during plugin build workflow for WP Core sync ([76398](https://github.com/WordPress/gutenberg/pull/76398))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@ockham 
+
+
+
+
+
+
+
 = 22.7.0-rc.3 =
 
 ## Changelog
