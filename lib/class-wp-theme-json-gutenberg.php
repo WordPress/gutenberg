@@ -2098,6 +2098,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * creates the corresponding ruleset.
 	 *
 	 * @since 5.8.0
+	 * @since 7.1.0 Skip declarations whose value is not a plain string (booleans, arrays, objects, etc.).
 	 *
 	 * @param string $selector     CSS selector.
 	 * @param array  $declarations List of declarations.
@@ -2111,7 +2112,16 @@ class WP_Theme_JSON_Gutenberg {
 		$declaration_block = array_reduce(
 			$declarations,
 			static function ( $carry, $element ) {
-				return $carry .= $element['name'] . ': ' . $element['value'] . ';'; },
+				$value = $element['value'];
+				if ( is_numeric( $value ) ) {
+					$value = (string) $value;
+				}
+				// Skip declarations whose value is not a plain string (booleans, arrays, objects, etc.).
+				if ( ! is_string( $value ) ) {
+					return $carry;
+				}
+				return $carry .= $element['name'] . ': ' . $value . ';';
+			},
 			''
 		);
 
