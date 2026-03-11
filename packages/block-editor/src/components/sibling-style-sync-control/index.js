@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { Notice, Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
@@ -66,20 +66,12 @@ export function SiblingStyleSyncControl( { clientId, name } ) {
 	const privateDispatch = unlock( dispatch );
 	const blockTitle = getBlockType( name )?.title ?? name;
 	const count = siblings.length;
-	const label =
-		count === 1
-			? sprintf(
-					/* translators: 1: number of sibling blocks, 2: block type name */
-					__( '%1$d other %2$s block' ),
-					count,
-					blockTitle
-			  )
-			: sprintf(
-					/* translators: 1: number of sibling blocks, 2: block type name */
-					__( '%1$d other %2$s blocks' ),
-					count,
-					blockTitle
-			  );
+	const label = sprintf(
+		/* translators: 1: number of sibling blocks, 2: block type name */
+		_n( '%1$d other %2$s block', '%1$d other %2$s blocks', count ),
+		count,
+		blockTitle
+	);
 
 	return (
 		<InspectorControls group="styles">
