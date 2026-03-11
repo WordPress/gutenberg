@@ -80,19 +80,20 @@ export function Overlay( {
 			<style>{ AVATAR_IFRAME_STYLES + OVERLAY_IFRAME_STYLES }</style>
 			{ cursors.map( ( cursor ) => (
 				<div key={ cursor.clientId }>
-					{ cursor.selectionRects?.map( ( rect, index ) => (
-						<div
-							key={ `${ cursor.clientId }-sel-${ index }` }
-							className="collaborators-overlay-selection-rect"
-							style={ {
-								left: `${ rect.x }px`,
-								top: `${ rect.y }px`,
-								width: `${ rect.width }px`,
-								height: `${ rect.height }px`,
-								backgroundColor: cursor.color,
-							} }
-						/>
-					) ) }
+					{ ! cursor.isMe &&
+						cursor.selectionRects?.map( ( rect, index ) => (
+							<div
+								key={ `${ cursor.clientId }-sel-${ index }` }
+								className="collaborators-overlay-selection-rect"
+								style={ {
+									left: `${ rect.x }px`,
+									top: `${ rect.y }px`,
+									width: `${ rect.width }px`,
+									height: `${ rect.height }px`,
+									backgroundColor: cursor.color,
+								} }
+							/>
+						) ) }
 					<div
 						className="collaborators-overlay-user"
 						style={ {
