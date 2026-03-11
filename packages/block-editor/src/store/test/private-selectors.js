@@ -24,6 +24,8 @@ import {
 	getViewportModalClientIds,
 	isSectionBlock,
 	getParentSectionBlock,
+	__experimentalGetSiblingStyleSyncScopeClientId,
+	__experimentalIsBlockStyleSyncUnlinked,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -1651,6 +1653,192 @@ describe( 'private selectors', () => {
 			expect( getParentSectionBlock( state, 'inner-block' ) ).toBe(
 				'pattern-a'
 			);
+		} );
+	} );
+
+	describe( 'sibling style sync selectors', () => {
+		const makeState = ( blocks, siblingStyleSync = {} ) => ( {
+			blocks: {
+				byClientId: new Map(
+					blocks.map( ( b ) => [ b.clientId, { name: b.name } ] )
+				),
+				attributes: new Map(
+					blocks.map( ( b ) => [ b.clientId, b.attributes ?? {} ] )
+				),
+				parents: new Map(
+					blocks.map( ( b ) => [ b.clientId, b.parent ?? '' ] )
+				),
+				tree: new Map(
+					blocks.map( ( b ) => [
+						b.clientId,
+						{ innerBlocks: b.innerBlocks ?? [] },
+					] )
+				),
+			},
+			siblingStyleSync,
+		} );
+
+		beforeAll( () => {
+			registerBlockType( 'core/accordion', {
+				apiVersion: 3,
+				title: 'Accordion',
+				category: 'design',
+				edit: () => null,
+				save: () => null,
+				attributes: {},
+			} );
+			registerBlockType( 'core/accordion-item', {
+				apiVersion: 3,
+				title: 'Accordion Item',
+				category: 'design',
+				edit: () => null,
+				save: () => null,
+				attributes: {},
+			} );
+			registerBlockType( 'core/accordion-heading', {
+				apiVersion: 3,
+				title: 'Accordion Heading',
+				category: 'design',
+				edit: () => null,
+				save: () => null,
+				attributes: {},
+				supports: {
+					__experimentalSiblingStyleSync: {
+						scope: 'core/accordion',
+						groups: [ 'color', 'typography' ],
+					},
+				},
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( 'core/accordion' );
+			unregisterBlockType( 'core/accordion-item' );
+			unregisterBlockType( 'core/accordion-heading' );
+		} );
+
+		describe( '__experimentalGetSiblingStyleSyncScopeClientId', () => {
+			it( 'returns the accordion clientId for a nested accordion-heading', () => {
+				const state = makeState( [
+					{ clientId: 'acc-1', name: 'core/accordion', parent: '' },
+					{
+						clientId: 'item-1',
+						name: 'core/accordion-item',
+						parent: 'acc-1',
+					},
+					{
+						clientId: 'head-1',
+						name: 'core/accordion-heading',
+						parent: 'item-1',
+					},
+				] );
+
+				expect(
+					__experimentalGetSiblingStyleSyncScopeClientId(
+						state,
+						'head-1',
+						'core/accordion-heading'
+					)
+				).toBe( 'acc-1' );
+			} );
+
+			it( 'returns null for a block type with no sync support', () => {
+				const state = makeState( [
+					{ clientId: 'acc-1', name: 'core/accordion', parent: '' },
+					{
+						clientId: 'item-1',
+						name: 'core/accordion-item',
+						parent: 'acc-1',
+					},
+				] );
+
+				expect(
+					__experimentalGetSiblingStyleSyncScopeClientId(
+						state,
+						'item-1',
+						'core/accordion-item'
+					)
+				).toBeNull();
+			} );
+
+			it( 'returns null if the scope ancestor is not in the tree', () => {
+				const state = makeState( [
+					{
+						clientId: 'head-1',
+						name: 'core/accordion-heading',
+						parent: '',
+					},
+				] );
+
+				expect(
+					__experimentalGetSiblingStyleSyncScopeClientId(
+						state,
+						'head-1',
+						'core/accordion-heading'
+					)
+				).toBeNull();
+			} );
+		} );
+
+		describe( '__experimentalIsBlockStyleSyncUnlinked', () => {
+			it( 'returns false when block is not unlinked', () => {
+				const state = makeState( [
+					{ clientId: 'acc-1', name: 'core/accordion', parent: '' },
+					{
+						clientId: 'item-1',
+						name: 'core/accordion-item',
+						parent: 'acc-1',
+					},
+					{
+						clientId: 'head-1',
+						name: 'core/accordion-heading',
+						parent: 'item-1',
+					},
+				] );
+
+				expect(
+					__experimentalIsBlockStyleSyncUnlinked(
+						state,
+						'head-1',
+						'core/accordion-heading'
+					)
+				).toBe( false );
+			} );
+
+			it( 'returns true when block is unlinked', () => {
+				const state = makeState(
+					[
+						{
+							clientId: 'acc-1',
+							name: 'core/accordion',
+							parent: '',
+						},
+						{
+							clientId: 'item-1',
+							name: 'core/accordion-item',
+							parent: 'acc-1',
+						},
+						{
+							clientId: 'head-1',
+							name: 'core/accordion-heading',
+							parent: 'item-1',
+						},
+					],
+					{
+						'acc-1:core/accordion-heading': {
+							unlinkedIds: { 'head-1': true },
+						},
+					}
+				);
+
+				expect(
+					__experimentalIsBlockStyleSyncUnlinked(
+						state,
+						'head-1',
+						'core/accordion-heading'
+					)
+				).toBe( true );
+			} );
 		} );
 	} );
 } );

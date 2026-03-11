@@ -43,6 +43,7 @@ import {
 	editedContentOnlySection,
 	withDerivedBlockEditingModes,
 	viewportModalClientIds,
+	siblingStyleSync,
 } from '../reducer';
 
 import { unlock } from '../../lock-unlock';
@@ -5363,6 +5364,132 @@ describe( 'state', () => {
 				type: 'UNKNOWN_ACTION',
 			} );
 			expect( state ).toBe( currentState );
+		} );
+	} );
+
+	describe( 'siblingStyleSync', () => {
+		describe( 'UNLINK_SIBLING_STYLE_SYNC', () => {
+			it( 'should add a clientId to unlinkedIds', () => {
+				const state = siblingStyleSync(
+					{},
+					{
+						type: 'UNLINK_SIBLING_STYLE_SYNC',
+						clientId: 'block-1',
+						blockName: 'core/accordion-heading',
+						scopeClientId: 'scope-1',
+					}
+				);
+
+				expect(
+					state[ 'scope-1:core/accordion-heading' ].unlinkedIds
+				).toEqual( { 'block-1': true } );
+			} );
+
+			it( 'should accumulate multiple unlinked IDs', () => {
+				const after1 = siblingStyleSync(
+					{},
+					{
+						type: 'UNLINK_SIBLING_STYLE_SYNC',
+						clientId: 'block-1',
+						blockName: 'core/accordion-heading',
+						scopeClientId: 'scope-1',
+					}
+				);
+				const after2 = siblingStyleSync( after1, {
+					type: 'UNLINK_SIBLING_STYLE_SYNC',
+					clientId: 'block-2',
+					blockName: 'core/accordion-heading',
+					scopeClientId: 'scope-1',
+				} );
+
+				const unlinked =
+					after2[ 'scope-1:core/accordion-heading' ].unlinkedIds;
+				expect( unlinked ).toEqual( {
+					'block-1': true,
+					'block-2': true,
+				} );
+			} );
+		} );
+
+		describe( 'RELINK_SIBLING_STYLE_SYNC', () => {
+			it( 'should remove a clientId from unlinkedIds', () => {
+				const unlinked = siblingStyleSync(
+					{},
+					{
+						type: 'UNLINK_SIBLING_STYLE_SYNC',
+						clientId: 'block-1',
+						blockName: 'core/accordion-heading',
+						scopeClientId: 'scope-1',
+					}
+				);
+				const relinked = siblingStyleSync( unlinked, {
+					type: 'RELINK_SIBLING_STYLE_SYNC',
+					clientId: 'block-1',
+					blockName: 'core/accordion-heading',
+					scopeClientId: 'scope-1',
+				} );
+
+				expect(
+					relinked[ 'scope-1:core/accordion-heading' ].unlinkedIds
+				).toEqual( {} );
+			} );
+
+			it( 'should return current state if key does not exist', () => {
+				const state = {};
+				const result = siblingStyleSync( state, {
+					type: 'RELINK_SIBLING_STYLE_SYNC',
+					clientId: 'block-1',
+					blockName: 'core/accordion-heading',
+					scopeClientId: 'scope-1',
+				} );
+
+				expect( result ).toBe( state );
+			} );
+		} );
+
+		describe( 'REMOVE_BLOCKS', () => {
+			it( 'should remove the scope entry when the scope block is removed', () => {
+				const state = {
+					'scope-1:core/accordion-heading': {
+						unlinkedIds: { 'block-1': true },
+					},
+				};
+				const result = siblingStyleSync( state, {
+					type: 'REMOVE_BLOCKS',
+					clientIds: [ 'scope-1' ],
+				} );
+
+				expect( result ).toEqual( {} );
+			} );
+
+			it( 'should remove unlinked block IDs that were removed', () => {
+				const state = {
+					'scope-1:core/accordion-heading': {
+						unlinkedIds: { 'block-1': true, 'block-2': true },
+					},
+				};
+				const result = siblingStyleSync( state, {
+					type: 'REMOVE_BLOCKS',
+					clientIds: [ 'block-1' ],
+				} );
+
+				expect(
+					result[ 'scope-1:core/accordion-heading' ].unlinkedIds
+				).toEqual( { 'block-2': true } );
+			} );
+		} );
+
+		describe( 'RESET_BLOCKS', () => {
+			it( 'should return empty state', () => {
+				const state = {
+					'scope-1:core/accordion-heading': {
+						unlinkedIds: { 'block-1': true },
+					},
+				};
+				expect(
+					siblingStyleSync( state, { type: 'RESET_BLOCKS' } )
+				).toEqual( {} );
+			} );
 		} );
 	} );
 } );
