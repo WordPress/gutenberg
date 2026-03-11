@@ -85,6 +85,9 @@ function _gutenberg_connectors_init(): void {
 
 		$name        = $provider_metadata->getName();
 		$description = $provider_metadata->getDescription();
+		$logo_url    = method_exists( $provider_metadata, 'getLogoPath' ) && $provider_metadata->getLogoPath()
+			? _gutenberg_resolve_ai_provider_logo_url( $provider_metadata->getLogoPath() )
+			: null;
 
 		if ( isset( $defaults[ $connector_id ] ) ) {
 			// Override fields with non-empty registry values.
@@ -93,6 +96,9 @@ function _gutenberg_connectors_init(): void {
 			}
 			if ( $description ) {
 				$defaults[ $connector_id ]['description'] = $description;
+			}
+			if ( $logo_url ) {
+				$defaults[ $connector_id ]['logo_url'] = $logo_url;
 			}
 			// Always update auth method; keep existing credentials_url as fallback.
 			$defaults[ $connector_id ]['authentication']['method'] = $authentication['method'];
@@ -105,6 +111,7 @@ function _gutenberg_connectors_init(): void {
 				'description'    => $description ? $description : '',
 				'type'           => 'ai_provider',
 				'authentication' => $authentication,
+				'logo_url'       => $logo_url,
 			);
 		}
 	}
@@ -328,28 +335,6 @@ function _gutenberg_get_connector_settings(): array {
 
 	$connectors = wp_get_connectors();
 	ksort( $connectors );
-
-	// Enrich with logo URLs from AI Client registry.
-	if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
-		$ai_registry = \WordPress\AiClient\AiClient::defaultRegistry();
-
-		foreach ( $connectors as $connector_id => $connector ) {
-			if ( ! $ai_registry->hasProvider( $connector_id ) ) {
-				continue;
-			}
-
-			$provider_class_name = $ai_registry->getProviderClassName( $connector_id );
-			$provider_metadata   = $provider_class_name::metadata();
-
-			$logo_url = method_exists( $provider_metadata, 'getLogoPath' ) && $provider_metadata->getLogoPath()
-				? _gutenberg_resolve_ai_provider_logo_url( $provider_metadata->getLogoPath() )
-				: null;
-
-			if ( $logo_url ) {
-				$connectors[ $connector_id ]['logo_url'] = $logo_url;
-			}
-		}
-	}
 
 	// Add plugin installation and activation status.
 	// Build a slug-to-file map following the same pattern as WP_Plugin_Dependencies::get_plugin_dirnames().

@@ -18,6 +18,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 	 * @phpstan-type Connector array{
 	 *     name: string,
 	 *     description: string,
+	 *     logo_url?: string|null,
 	 *     type: string,
 	 *     authentication: array{
 	 *         method: string,
@@ -61,6 +62,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 *
 		 *     @type string $name           Required. The connector's display name.
 		 *     @type string $description    Optional. The connector's description. Default empty string.
+		 *     @type string|null $logo_url  Optional. URL to the connector's logo image. Default null.
 		 *     @type string $type           Required. The connector type. Currently, only 'ai_provider' is supported.
 		 *     @type array  $authentication {
 		 *         Required. Authentication configuration.
@@ -150,6 +152,10 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 					'method' => $args['authentication']['method'],
 				),
 			);
+
+			if ( ! empty( $args['logo_url'] ) && is_string( $args['logo_url'] ) ) {
+				$connector['logo_url'] = $args['logo_url'];
+			}
 
 			if ( 'api_key' === $args['authentication']['method'] ) {
 				$connector['authentication']['credentials_url'] = $args['authentication']['credentials_url'] ?? null;
