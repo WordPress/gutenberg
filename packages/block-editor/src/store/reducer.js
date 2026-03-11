@@ -2547,10 +2547,15 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 						state.blocks.attributes.get( clientId )?.metadata
 							?.patternName
 			  );
+	const disableContentOnlyForTemplateParts =
+		state.settings?.disableContentOnlyForTemplateParts;
+
 	const contentOnlyParents = [
 		...contentOnlyTemplateLockedClientIds,
 		...unsyncedPatternClientIds,
-		...( isIsolatedEditor ? [] : templatePartClientIds ),
+		...( isIsolatedEditor || disableContentOnlyForTemplateParts
+			? []
+			: templatePartClientIds ),
 	];
 
 	traverseBlockTree( state, treeClientId, ( block ) => {
@@ -3069,7 +3074,8 @@ export function withDerivedBlockEditingModes( reducer ) {
 			case 'UPDATE_SETTINGS': {
 				// Recompute the entire tree if the section root,
 				// the effective disableContentOnlyForUnsyncedPatterns value,
-				// or the isIsolatedEditor value changes.
+				// the isIsolatedEditor value, or the
+				// disableContentOnlyForTemplateParts value changes.
 				// These are all values that affect the computation.
 				if (
 					state?.settings?.[ sectionRootClientIdKey ] !==
@@ -3079,7 +3085,10 @@ export function withDerivedBlockEditingModes( reducer ) {
 						!! nextState?.settings
 							?.disableContentOnlyForUnsyncedPatterns ||
 					!! state?.settings?.[ isIsolatedEditorKey ] !==
-						!! nextState?.settings?.[ isIsolatedEditorKey ]
+						!! nextState?.settings?.[ isIsolatedEditorKey ] ||
+					!! state?.settings?.disableContentOnlyForTemplateParts !==
+						!! nextState?.settings
+							?.disableContentOnlyForTemplateParts
 				) {
 					return {
 						...nextState,

@@ -391,6 +391,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				'wp_block',
 				'wp_navigation',
 			].includes( postType ),
+			// When in template-locked mode (e.g., "Show Template" in the post editor),
+			// don't treat template parts as contentOnly sections.
+			disableContentOnlyForTemplateParts:
+				renderingMode === 'template-locked',
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
 		};
