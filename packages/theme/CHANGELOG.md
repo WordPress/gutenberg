@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `cursor` prop to `ThemeProvider` for configuring the `--wpds-cursor-control` design token ([#76410](https://github.com/WordPress/gutenberg/pull/76410)).
+
 ## 0.8.0 (2026-03-04)
 
 ### New Features
