@@ -36,17 +36,8 @@
 		padding: 24px;
 		padding-right: 220px;
 		background:
-			linear-gradient(
-				90deg,
-				rgba(255, 255, 255, 0.6) 0%,
-				rgba(255, 255, 255, 0.6) 100%
-			),
-			linear-gradient(
-				90deg,
-				#89dcdc 0%,
-				#c7eb5c 46.15%,
-				#a920c1 100%
-			);
+			linear-gradient(90deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%),
+			linear-gradient(90deg, #89dcdc 0%, #c7eb5c 46.15%, #a920c1 100%);
 
 		&__content {
 			display: flex;
