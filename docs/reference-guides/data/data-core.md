@@ -143,6 +143,10 @@ _Returns_
 
 -   `boolean | undefined`: Whether or not the user can edit, or `undefined` if the OPTIONS request is still being made.
 
+### getAllGuidelines
+
+Undocumented declaration.
+
 ### getAuthors
 
 > **Deprecated** since 11.3. Callers should use `select( 'core' ).getUsers({ who: 'authors' })` instead.
@@ -188,6 +192,14 @@ _Parameters_
 _Returns_
 
 -   `Array< any > | undefined`: An array of autosaves for the post, or undefined if there is none.
+
+### getBlockGuideline
+
+Undocumented declaration.
+
+### getBlockGuidelines
+
+Undocumented declaration.
 
 ### getBlockPatternCategories
 
@@ -443,6 +455,14 @@ _Returns_
 
 -   `number | null`: number | null.
 
+### getGuideline
+
+Undocumented declaration.
+
+### getId
+
+Undocumented declaration.
+
 ### getLastEntityDeleteError
 
 Returns the specified entity record's last delete error.
@@ -553,6 +573,10 @@ _Parameters_
 _Returns_
 
 -   `RevisionRecord[] | null`: Record.
+
+### getStatus
+
+Undocumented declaration.
 
 ### getSyncConnectionStatus
 
@@ -948,6 +972,18 @@ _Parameters_
 -   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
 -   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
+
+### setBlockGuideline
+
+Undocumented declaration.
+
+### setFromResponse
+
+Undocumented declaration.
+
+### setGuideline
+
+Undocumented declaration.
 
 ### setSyncConnectionStatus
 

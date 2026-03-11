@@ -27,6 +27,7 @@ import {
 } from './utils';
 import type * as ET from './entity-types';
 import logEntityDeprecation from './utils/log-entity-deprecation';
+import type { ContentGuidelinesState } from './types';
 
 // This is an incomplete, high-level approximation of the State type.
 // It makes the selectors slightly more safe, but is intended to evolve
@@ -55,6 +56,7 @@ export interface State {
 	editorAssets: Record< string, any > | null;
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
 	collaborationSupported: boolean;
+	contentGuidelines: ContentGuidelinesState;
 }
 
 type EntityRecordKey = string | number;
@@ -1629,4 +1631,31 @@ export function getSyncConnectionStatus(
 	}
 
 	return coalesced;
+}
+
+export function getGuideline(
+	state: State,
+	category: string
+): string | Record< string, string > {
+	return state.contentGuidelines.categories[ category ];
+}
+
+export function getAllGuidelines( state: State ): Categories {
+	return state.contentGuidelines.categories;
+}
+
+export function getBlockGuidelines( state: State ): Record< string, string > {
+	return state.contentGuidelines.categories.blocks;
+}
+
+export function getBlockGuideline( state: State, blockName: string ): string {
+	return state.contentGuidelines.categories.blocks[ blockName ] ?? '';
+}
+
+export function getId( state: State ): number | null {
+	return state.contentGuidelines.id;
+}
+
+export function getStatus( state: State ): string | null {
+	return state.contentGuidelines.status;
 }

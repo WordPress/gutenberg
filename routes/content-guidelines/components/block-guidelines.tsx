@@ -28,13 +28,13 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { blockDefault } from '@wordpress/icons';
 import { store as blocksStore } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import BlockGuidelineModal from './block-guideline-modal';
 import { saveContentGuidelines } from '../api';
-import { STORE_NAME } from '../store';
 import './block-guidelines.scss';
 
 const PER_PAGE = 5;
@@ -92,7 +92,7 @@ export default function BlockGuidelines() {
 
 	const blockGuidelines = useSelect(
 		// @ts-ignore
-		( select ) => select( STORE_NAME ).getBlockGuidelines(),
+		( select ) => select( coreStore ).getBlockGuidelines(),
 		[]
 	);
 
@@ -115,7 +115,7 @@ export default function BlockGuidelines() {
 		[ blockGuidelines, blockTypes ]
 	);
 
-	const { setBlockGuideline } = useDispatch( STORE_NAME );
+	const { setBlockGuideline } = useDispatch( coreStore );
 
 	const handleRowClick = ( id: string ) => {
 		setSelectedItem( id );

@@ -16,11 +16,10 @@ import {
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-
+import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { STORE_NAME } from '../store';
 import { saveContentGuidelines } from '../api';
 import type { GuidelineAccordionFormProps } from '../types';
 
@@ -31,7 +30,7 @@ export default function GuidelineAccordionForm( {
 	descriptionId,
 }: GuidelineAccordionFormProps ) {
 	// @ts-ignore
-	const { setGuideline } = useDispatch( STORE_NAME );
+	const { setGuideline } = useDispatch( coreStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const [ loading, setLoading ] = useState( false );
 	const [ error, setError ] = useState< string | null >( null );
@@ -39,7 +38,7 @@ export default function GuidelineAccordionForm( {
 	const { value } = useSelect(
 		( select ) => ( {
 			// @ts-ignore
-			value: select( STORE_NAME ).getGuideline( slug ) as string,
+			value: select( coreStore ).getGuideline( slug ) as string,
 		} ),
 		[ slug ]
 	);

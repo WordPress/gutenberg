@@ -1145,3 +1145,24 @@ export function setSyncConnectionStatus( kind, name, key, status ) {
 		status,
 	};
 }
+
+export function setFromResponse( response ) {
+	return {
+		type: 'SET_FROM_RESPONSE',
+		response,
+	};
+}
+export function setGuideline( category, value ) {
+	return {
+		type: 'SET_GUIDELINE',
+		category,
+		value,
+	};
+}
+export function setBlockGuideline( blockName, value ) {
+	return {
+		type: 'SET_BLOCK_GUIDELINE',
+		blockName,
+		value,
+	};
+}

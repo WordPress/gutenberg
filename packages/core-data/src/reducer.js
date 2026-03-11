@@ -13,11 +13,12 @@ import { createUndoManager } from '@wordpress/undo-manager';
 /**
  * Internal dependencies
  */
-import { ifMatchingAction, replaceAction } from './utils';
+import { ifMatchingAction, replaceAction, parseResponse } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 
 /** @typedef {import('./types').AnyFunction} AnyFunction */
+/** @typedef {import('./types').ContentGuidelinesState} ContentGuidelinesState */
 
 /**
  * Reducer managing authors state. Keyed by id.
@@ -710,6 +711,65 @@ export function collaborationSupported( state = true, action ) {
 	return state;
 }
 
+/**
+ * Reducer for managing content guidelines
+ *
+ * @param {ContentGuidelinesState} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {ContentGuidelinesState} Updated state.
+ */
+export function contentGuidelines(
+	state = {
+		id: null,
+		status: null,
+		categories: {
+			site: '',
+			copy: '',
+			images: '',
+			additional: '',
+			blocks: {},
+		},
+	},
+	action
+) {
+	switch ( action.type ) {
+		case 'SET_FROM_RESPONSE':
+			return {
+				...state,
+				...parseResponse( action.response ),
+			};
+		case 'SET_GUIDELINE':
+			return {
+				...state,
+				categories: {
+					...state.categories,
+					[ action.category ]: action.value,
+				},
+			};
+		case 'SET_BLOCK_GUIDELINE': {
+			const blocks = {
+				...state.categories.blocks,
+				[ action.blockName ]: action.value,
+			};
+
+			if ( action.value === undefined ) {
+				delete blocks[ action.blockName ];
+			}
+
+			return {
+				...state,
+				categories: {
+					...state.categories,
+					blocks,
+				},
+			};
+		}
+		default:
+			return state;
+	}
+}
+
 export default combineReducers( {
 	users,
 	currentTheme,
@@ -734,4 +794,5 @@ export default combineReducers( {
 	editorAssets,
 	syncConnectionStatuses,
 	collaborationSupported,
+	contentGuidelines,
 } );

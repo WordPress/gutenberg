@@ -6,11 +6,11 @@ import { downloadBlob } from '@wordpress/blob';
 import { dispatch, select } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import { STORE_NAME } from './store';
 import type {
 	Categories,
 	RestGuidelinesResponse,
@@ -34,7 +34,7 @@ function isValidGuidelinesImport(
 }
 
 export async function fetchContentGuidelines(): Promise< RestGuidelinesResponse > {
-	const { setFromResponse } = dispatch( STORE_NAME ) as {
+	const { setFromResponse } = dispatch( coreStore ) as {
 		setFromResponse: ( response: RestGuidelinesResponse ) => void;
 	};
 
@@ -49,9 +49,9 @@ export async function fetchContentGuidelines(): Promise< RestGuidelinesResponse 
 
 export async function saveContentGuidelines(): Promise< RestGuidelinesResponse > {
 	// @ts-ignore
-	const { setFromResponse } = dispatch( STORE_NAME );
+	const { setFromResponse } = dispatch( coreStore );
 
-	const guidelinesStore = select( STORE_NAME ) as unknown as {
+	const guidelinesStore = select( coreStore ) as unknown as {
 		getId: () => number | null;
 		getStatus: () => string | null;
 		getAllGuidelines: () => Categories;
@@ -113,7 +113,7 @@ export async function saveContentGuidelines(): Promise< RestGuidelinesResponse >
  */
 export async function importContentGuidelines( file: File ): Promise< void > {
 	// @ts-ignore
-	const { setGuideline, setBlockGuideline } = dispatch( STORE_NAME );
+	const { setGuideline, setBlockGuideline } = dispatch( coreStore );
 	const { createSuccessNotice } = dispatch( noticesStore );
 
 	const parsed: unknown = JSON.parse( await file.text() );
@@ -126,7 +126,7 @@ export async function importContentGuidelines( file: File ): Promise< void > {
 		);
 	}
 
-	const guidelinesStore = select( STORE_NAME ) as unknown as {
+	const guidelinesStore = select( coreStore ) as unknown as {
 		getAllGuidelines: () => Categories;
 		getBlockGuidelines: () => Record< string, string >;
 	};
@@ -180,7 +180,7 @@ export async function importContentGuidelines( file: File ): Promise< void > {
 export function exportContentGuidelines(): void {
 	const { createSuccessNotice } = dispatch( noticesStore );
 
-	const guidelinesStore = select( STORE_NAME ) as unknown as {
+	const guidelinesStore = select( coreStore ) as unknown as {
 		getAllGuidelines: () => Categories;
 		getBlockGuidelines: () => Record< string, string >;
 	};

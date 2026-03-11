@@ -17,11 +17,11 @@ import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { store as noticesStore } from '@wordpress/notices';
 import type { View, Field, Action } from '@wordpress/dataviews';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import { STORE_NAME } from '../store';
 import {
 	fetchContentGuidelinesRevisions,
 	restoreContentGuidelinesRevision,
@@ -59,7 +59,7 @@ export default function RevisionHistory() {
 	const guidelinesId = useSelect(
 		( select ) =>
 			(
-				select( STORE_NAME ) as unknown as {
+				select( coreStore ) as unknown as {
 					getId: () => number | null;
 				}
 			 ).getId(),
