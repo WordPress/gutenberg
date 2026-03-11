@@ -1,3 +1,5 @@
+/* @jsx createElement */
+
 /**
  * WordPress dependencies
  */
@@ -12,7 +14,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
+import { createElement, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies

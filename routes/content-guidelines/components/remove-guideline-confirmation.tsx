@@ -13,11 +13,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { createElement } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import './remove-guideline-confirmation.scss';
-
 interface RemoveGuidelineConfirmationProps {
 	title: string;
 	onClose: () => void;
@@ -36,12 +31,7 @@ export default function RemoveGuidelineConfirmation( {
 	actionLabel = __( 'Remove' ),
 }: RemoveGuidelineConfirmationProps ) {
 	return (
-		<Modal
-			className="remove-guideline-confirmation"
-			title={ title }
-			onRequestClose={ onClose }
-			size="small"
-		>
+		<Modal title={ title } onRequestClose={ onClose } size="small">
 			<VStack spacing={ 6 }>
 				<VStack spacing={ 4 }>
 					<Text size={ 13 } weight={ 400 }>
