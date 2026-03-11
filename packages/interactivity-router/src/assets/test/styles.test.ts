@@ -251,9 +251,10 @@ describe( 'Router styles management', () => {
 		 * different nodes; the SCS algorithm then drops the live element and
 		 * applyStyles() disables the activated sheet on the next navigation.
 		 *
-		 * The comparator uses clone + removeAttribute('media') + isEqualNode(),
-		 * which preserves all other attribute checks (integrity, crossorigin, etc.)
-		 * while ignoring media differences.
+		 * The fix is in normalizeMedia: both the live element (media="all") and
+		 * the server element (media="not all") are normalised to "all" before the
+		 * SCS comparison runs, so isEqualNode() correctly recognises them as the
+		 * same node without stripping media globally in areNodesEqual.
 		 *
 		 * Relates to #76031.
 		 */
