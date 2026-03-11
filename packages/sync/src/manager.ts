@@ -472,7 +472,11 @@ export function createSyncManager( debug = false ): SyncManager {
 			// via its pre-persist hook.)
 			targetDoc.transact( () => {
 				applyChangesToCRDTDoc( targetDoc, record );
-				handlers.saveRecord();
+				// Only trigger a save if the entity has meta support,
+				// as the CRDT document is persisted via post meta.
+				if ( record?.meta !== undefined ) {
+					handlers.saveRecord();
+				}
 			}, LOCAL_SYNC_MANAGER_ORIGIN );
 			return;
 		}

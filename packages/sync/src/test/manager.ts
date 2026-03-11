@@ -54,6 +54,7 @@ describe( 'SyncManager', () => {
 		mockRecord = {
 			id: '123',
 			title: 'Test Post',
+			meta: {},
 		};
 
 		mockProviderResult = {
