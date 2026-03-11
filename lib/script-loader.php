@@ -23,7 +23,7 @@ function gutenberg_enqueue_global_styles() {
 
 	/**
 	 * Global styles should be printed in the HEAD for block themes, or for classic themes when loading assets on
-	 * demand is disabled (which is no longer the default).
+	 * demand is disabled (which is no longer the default since WordPress 6.9).
 	 *
 	 * @link https://core.trac.wordpress.org/ticket/53494
 	 * @link https://core.trac.wordpress.org/ticket/61965
@@ -39,12 +39,12 @@ function gutenberg_enqueue_global_styles() {
 	}
 
 	/**
-	 * The footer should only be used for classic themes when loading assets on demand is enabled. This is now the
+	 * The footer should only be used for classic themes when loading assets on demand is enabled. In WP 6.9 this is the
 	 * default with the introduction of hoisting late-printed styles (via {@see wp_load_classic_theme_block_styles_on_demand()}).
 	 * So even though the main global styles are not printed here in the HEAD for classic themes with on-demand asset
 	 * loading, a placeholder for the global styles is still enqueued. Then when {@see wp_hoist_late_printed_styles()}
 	 * processes the output buffer, it can locate the placeholder and inject the global styles from the footer into the
-	 * HEAD.
+	 * HEAD, replacing the placeholder.
 	 *
 	 * @link https://core.trac.wordpress.org/ticket/64099
 	 */
