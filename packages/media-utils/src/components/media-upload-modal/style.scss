@@ -45,17 +45,12 @@
 		position: absolute;
 		display: flex;
 		align-items: center;
+		gap: $grid-unit-10;
 		// Match the footer's padding so the trigger aligns with the item count.
 		left: $grid-unit-30;
 		top: 0;
 		bottom: 0;
 		z-index: 1;
-	}
-
-	.media-upload-modal__upload-status__trigger {
-		display: flex;
-		align-items: center;
-		gap: $grid-unit-10;
 
 		.components-spinner {
 			width: $grid-unit-20;
