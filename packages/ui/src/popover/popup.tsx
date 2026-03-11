@@ -16,46 +16,70 @@ const ThemeProvider: typeof ThemeProviderType =
 
 /**
  * Renders the popover popup element that contains the popover content.
- * Uses a portal to render outside the DOM hierarchy.
+ * By default, uses a portal to render outside the DOM hierarchy.
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	{
 		align = 'center',
-		side = 'bottom',
-		sideOffset = 4,
 		alignOffset,
 		children,
 		className,
+		collisionAvoidance,
+		collisionBoundary,
+		collisionPadding,
+		container,
+		finalFocus,
+		initialFocus,
+		inline: inlineProp = false,
+		side = 'bottom',
+		sideOffset = 4,
+		sticky,
 		style,
+		variant = 'default',
 		...props
 	},
 	ref
 ) {
-	return (
-		<_Popover.Portal>
-			<_Popover.Positioner
-				align={ align }
-				side={ side }
-				sideOffset={ sideOffset }
-				alignOffset={ alignOffset }
-				style={ style }
-				className={ clsx(
-					resetStyles[ 'box-sizing' ],
+	const positioner = (
+		<_Popover.Positioner
+			align={ align }
+			alignOffset={ alignOffset }
+			collisionAvoidance={ collisionAvoidance }
+			collisionBoundary={ collisionBoundary }
+			collisionPadding={ collisionPadding }
+			side={ side }
+			sideOffset={ sideOffset }
+			sticky={ sticky }
+			style={ style }
+			className={ clsx(
+				resetStyles[ 'box-sizing' ],
+				variant !== 'unstyled' &&
 					dropdownMotionStyles[ 'dropdown-motion' ],
-					styles.positioner,
-					className
-				) }
-			>
-				<ThemeProvider>
-					<_Popover.Popup
-						ref={ ref }
-						className={ styles.popup }
-						{ ...props }
-					>
-						{ children }
-					</_Popover.Popup>
-				</ThemeProvider>
-			</_Popover.Positioner>
+				styles.positioner,
+				className
+			) }
+		>
+			<ThemeProvider>
+				<_Popover.Popup
+					ref={ ref }
+					initialFocus={ initialFocus }
+					finalFocus={ finalFocus }
+					className={ clsx( variant !== 'unstyled' && styles.popup ) }
+					{ ...props }
+				>
+					{ children }
+				</_Popover.Popup>
+			</ThemeProvider>
+		</_Popover.Positioner>
+	);
+
+	if ( inlineProp ) {
+		return positioner;
+	}
+
+	return (
+		<_Popover.Portal container={ container }>
+			{ positioner }
 		</_Popover.Portal>
 	);
 } );

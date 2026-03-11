@@ -24,12 +24,50 @@ export interface PopupProps
 	extends ComponentProps< 'div' >,
 		Pick<
 			_Popover.Positioner.Props,
-			'align' | 'side' | 'sideOffset' | 'alignOffset'
-		> {
+			| 'align'
+			| 'alignOffset'
+			| 'collisionAvoidance'
+			| 'collisionBoundary'
+			| 'collisionPadding'
+			| 'side'
+			| 'sideOffset'
+			| 'sticky'
+		>,
+		Pick< _Popover.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
+
+	/**
+	 * A parent element to render the portal into.
+	 *
+	 * Useful for cross-document rendering, such as rendering a popover
+	 * in a parent document when the trigger is inside an iframe.
+	 */
+	container?: _Popover.Portal.Props[ 'container' ];
+
+	/**
+	 * Whether to render the popup inline without a portal.
+	 *
+	 * When `true`, the popup is rendered in place within the DOM hierarchy
+	 * instead of being portaled to `document.body`.
+	 *
+	 * @default false
+	 */
+	inline?: boolean;
+
+	/**
+	 * The visual style variant of the popup.
+	 *
+	 * - `'default'` — standard surface styling with background, padding,
+	 *    border radius, and shadow.
+	 * - `'unstyled'` — no visual treatment; useful as a blank positioning
+	 *    container for fully custom content.
+	 *
+	 * @default 'default'
+	 */
+	variant?: 'default' | 'unstyled';
 }
 
 export interface ArrowProps extends ComponentProps< 'div' > {
