@@ -234,7 +234,7 @@ jobs:
                   path: ./gutenberg.zip
 
             - name: Build release notes draft
-              if: ${{ needs.bump-version.outputs.new_version }}
+              if: ${{ matrix.IS_GUTENBERG_PLUGIN && needs.bump-version.outputs.new_version }}
               env:
                   VERSION: ${{ needs.bump-version.outputs.new_version }}
               run: |
@@ -250,7 +250,7 @@ jobs:
                   fi
 
             - name: Upload release notes artifact
-              if: ${{ needs.bump-version.outputs.new_version }}
+              if: ${{ matrix.IS_GUTENBERG_PLUGIN && needs.bump-version.outputs.new_version }}
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               with:
                   name: release-notes
