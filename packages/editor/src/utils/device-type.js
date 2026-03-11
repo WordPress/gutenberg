@@ -31,19 +31,3 @@ export function getDeviceTypeByCanvasWidth( canvasWidth ) {
 export function getCanvasWidthByDeviceType( deviceType ) {
 	return DEVICE_TYPES[ deviceType ]?.canvasWidth;
 }
-
-/**
- * Gets the device type whose canvas width matches the given width, if any.
- *
- * @param {number} canvasWidth The canvas width in pixels.
- * @return {string|undefined} The matching device type, or undefined if none matches.
- */
-export function getMatchedDeviceTypeByCanvasWidth( canvasWidth ) {
-	if ( ! canvasWidth ) {
-		return 'Desktop';
-	}
-	const matched = Object.values( DEVICE_TYPES ).find(
-		( config ) => config.canvasWidth === canvasWidth
-	);
-	return matched ? matched.value : undefined;
-}

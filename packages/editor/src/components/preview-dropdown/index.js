@@ -28,10 +28,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import { store as editorStore } from '../../store';
 import PostPreviewButton from '../post-preview-button';
-import {
-	getDeviceTypeByCanvasWidth,
-	getMatchedDeviceTypeByCanvasWidth,
-} from '../../utils/device-type';
+import { getDeviceTypeByCanvasWidth } from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
 
 export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
@@ -79,7 +76,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	}
 
 	const deviceTypeByCanvasWidth = getDeviceTypeByCanvasWidth( canvasWidth );
-	const matchedDeviceType = getMatchedDeviceTypeByCanvasWidth( canvasWidth );
 
 	const popoverProps = {
 		placement: 'bottom-end',
@@ -145,7 +141,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 					<MenuGroup>
 						<MenuItemsChoice
 							choices={ choices }
-							value={ matchedDeviceType }
+							value={ deviceTypeByCanvasWidth }
 							onSelect={ handleDevicePreviewChange }
 						/>
 					</MenuGroup>
