@@ -10,11 +10,12 @@ import {
 	Flex,
 	Notice,
 	privateApis as componentsPrivateApis,
+	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
-	__experimentalGrid as Grid,
 } from '@wordpress/components';
 import { PlainText, store as blockEditorStore } from '@wordpress/block-editor';
 import { fullscreen, square } from '@wordpress/icons';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -39,6 +40,8 @@ export default function HTMLEditModal( {
 	const [ isDirty, setIsDirty ] = useState( false );
 	const [ showUnsavedWarning, setShowUnsavedWarning ] = useState( false );
 	const [ isFullscreen, setIsFullscreen ] = useState( false );
+
+	const isMobileViewport = useViewportMatch( 'small', '<' );
 
 	// Check if user has permission to save scripts and get editor styles
 	const { canUserUseUnfilteredHTML } = useSelect( ( select ) => {
@@ -121,12 +124,7 @@ export default function HTMLEditModal( {
 				__experimentalHideHeader
 			>
 				<Tabs orientation="horizontal" defaultTabId="html">
-					<Grid
-						columns={ 1 }
-						templateRows="auto 1fr auto"
-						gap={ 4 }
-						style={ { height: '100%' } }
-					>
+					<VStack expanded>
 						<HStack
 							justify="space-between"
 							className="block-library-html__modal-header"
@@ -144,15 +142,21 @@ export default function HTMLEditModal( {
 									) }
 								</Tabs.TabList>
 							</div>
-							<div>
-								<Button
-									__next40pxDefaultSize
-									icon={ isFullscreen ? square : fullscreen }
-									label={ __( 'Enable/disable fullscreen' ) }
-									onClick={ toggleFullscreen }
-									variant="tertiary"
-								/>
-							</div>
+							{ ! isMobileViewport && (
+								<div>
+									<Button
+										__next40pxDefaultSize
+										icon={
+											isFullscreen ? square : fullscreen
+										}
+										label={ __(
+											'Enable/disable fullscreen'
+										) }
+										onClick={ toggleFullscreen }
+										variant="tertiary"
+									/>
+								</div>
+							) }
 						</HStack>
 						{ hasRestrictedContent && (
 							<Notice
@@ -165,11 +169,11 @@ export default function HTMLEditModal( {
 								) }
 							</Notice>
 						) }
-						<HStack
-							alignment="stretch"
-							justify="flex-start"
-							spacing={ 4 }
+						<Flex
+							direction={ isMobileViewport ? 'column' : 'row' }
 							className="block-library-html__modal-tabs"
+							align="stretch"
+							gap={ 8 }
 						>
 							<div className="block-library-html__modal-content">
 								<Tabs.TabPanel
@@ -227,7 +231,7 @@ export default function HTMLEditModal( {
 									} ) }
 								/>
 							</div>
-						</HStack>
+						</Flex>
 						<HStack
 							alignment="center"
 							justify="flex-end"
@@ -249,7 +253,7 @@ export default function HTMLEditModal( {
 								{ __( 'Update' ) }
 							</Button>
 						</HStack>
-					</Grid>
+					</VStack>
 				</Tabs>
 			</Modal>
 

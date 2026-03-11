@@ -82,7 +82,12 @@ const { state, actions } = store(
 			},
 		},
 		actions: {
-			openMenuOnHover() {
+			openMenuOnHover( event ) {
+				// Pointer events from touch should not open the submenu on hover;
+				// touch devices toggle via the click action instead.
+				if ( event?.pointerType === 'touch' ) {
+					return;
+				}
 				const { type, overlayOpenedBy } = getContext();
 				if (
 					type === 'submenu' &&
@@ -93,7 +98,10 @@ const { state, actions } = store(
 					actions.openMenu( 'hover' );
 				}
 			},
-			closeMenuOnHover() {
+			closeMenuOnHover( event ) {
+				if ( event?.pointerType === 'touch' ) {
+					return;
+				}
 				const { type, overlayOpenedBy } = getContext();
 				if (
 					type === 'submenu' &&
@@ -128,6 +136,10 @@ const { state, actions } = store(
 				if ( menuOpenedBy.click || menuOpenedBy.focus ) {
 					actions.closeMenu( 'click' );
 					actions.closeMenu( 'focus' );
+					// Also clear hover in case it was set by a synthetic pointerenter
+					// on touch (e.g. the browser-fired mouseenter-equivalent before
+					// the click event), ensuring the submenu fully closes.
+					actions.closeMenu( 'hover' );
 				} else {
 					ctx.previousFocus = ref;
 					actions.openMenu( 'click' );

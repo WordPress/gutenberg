@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { usePrevious } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	privateApis,
 	type PostEditorAwarenessState,
+	type PostSaveEvent,
 } from '@wordpress/core-data';
 
 /**
@@ -17,7 +17,8 @@ import {
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
-const { useActiveCollaborators, useLastPostSave } = unlock( privateApis );
+const { useOnCollaboratorJoin, useOnCollaboratorLeave, useOnPostSave } =
+	unlock( privateApis );
 
 /**
  * Notice IDs for each notification type. Using stable IDs prevents duplicate
@@ -29,6 +30,10 @@ const NOTIFICATION_TYPE = {
 	COLLAB_USER_EXITED: 'collab-user-exited',
 } as const;
 
+/**
+ * Development kill-switches for each notification type. Flip to `false`
+ * to suppress a category during local testing without removing code.
+ */
 const NOTIFICATIONS_CONFIG = {
 	userEntered: true,
 	userExited: true,
@@ -72,13 +77,6 @@ export function useCollaboratorNotifications(
 	postId: number | null,
 	postType: string | null
 ): void {
-	const activeCollaborators = useActiveCollaborators(
-		postId,
-		postType
-	) as PostEditorAwarenessState[];
-
-	const lastPostSave = useLastPostSave( postId, postType );
-
 	const { postStatus, isCollaborationEnabled } = useSelect( ( select ) => {
 		const editorSel = select( editorStore );
 		return {
@@ -92,50 +90,21 @@ export function useCollaboratorNotifications(
 
 	const { createNotice } = useDispatch( noticesStore );
 
-	const prevCollaborators = usePrevious( activeCollaborators );
-	const prevPostSave = usePrevious( lastPostSave );
+	// Pass null when collaboration is disabled to prevent the hooks
+	// from subscribing to awareness state.
+	const effectivePostId = isCollaborationEnabled ? postId : null;
+	const effectivePostType = isCollaborationEnabled ? postType : null;
 
-	/*
-	 * Detect collaborator joins and leaves.
-	 */
-	useEffect( () => {
-		if ( ! isCollaborationEnabled ) {
-			return;
-		}
-
-		/*
-		 * On first render usePrevious returns undefined. On subsequent renders
-		 * the list may still be empty while the store hydrates. In both cases,
-		 * skip to avoid spurious "X joined" toasts for users already present.
-		 */
-		if ( ! prevCollaborators || prevCollaborators.length === 0 ) {
-			return;
-		}
-
-		function notify( noticeId: string, message: string ) {
-			void createNotice( 'info', message, {
-				id: noticeId,
-				type: 'snackbar',
-				isDismissible: false,
-			} );
-		}
-
-		const prevMap = new Map< number, PostEditorAwarenessState >(
-			prevCollaborators.map( ( c ) => [ c.clientId, c ] )
-		);
-		const newMap = new Map< number, PostEditorAwarenessState >(
-			activeCollaborators.map( ( c ) => [ c.clientId, c ] )
-		);
-
-		/*
-		 * Detect joins: new clientIds that weren't in the previous state.
-		 */
-		if ( NOTIFICATIONS_CONFIG.userEntered ) {
-			const me = activeCollaborators.find( ( c ) => c.isMe );
-
-			for ( const [ clientId, collaborator ] of newMap ) {
-				if ( prevMap.has( clientId ) || collaborator.isMe ) {
-					continue;
+	useOnCollaboratorJoin(
+		effectivePostId,
+		effectivePostType,
+		useCallback(
+			(
+				collaborator: PostEditorAwarenessState,
+				me?: PostEditorAwarenessState
+			) => {
+				if ( ! NOTIFICATIONS_CONFIG.userEntered ) {
+					return;
 				}
 
 				/*
@@ -148,111 +117,93 @@ export function useCollaboratorNotifications(
 					collaborator.collaboratorInfo.enteredAt <
 						me.collaboratorInfo.enteredAt
 				) {
-					continue;
+					return;
 				}
 
-				notify(
-					`${ NOTIFICATION_TYPE.COLLAB_USER_ENTERED }-${ collaborator.collaboratorInfo.id }`,
+				void createNotice(
+					'info',
 					sprintf(
 						/* translators: %s: collaborator display name */
 						__( '%s has joined the post.' ),
 						collaborator.collaboratorInfo.name
-					)
+					),
+					{
+						id: `${ NOTIFICATION_TYPE.COLLAB_USER_ENTERED }-${ collaborator.collaboratorInfo.id }`,
+						type: 'snackbar',
+						isDismissible: false,
+					}
 				);
-			}
-		}
+			},
+			[ createNotice ]
+		)
+	);
 
-		/*
-		 * Detect leaves by iterating the previous collaborator list. A leave
-		 * notification fires when a previously-connected collaborator either:
-		 *   - transitions to isConnected=false (greyed-out in the UI), or
-		 *   - disappears from the list entirely while still connected.
-		 * Already-disconnected collaborators that are later removed from the
-		 * list (after the 5 s delay) are silently ignored.
-		 */
-		if ( NOTIFICATIONS_CONFIG.userExited ) {
-			for ( const [ clientId, prevCollab ] of prevMap ) {
-				if ( prevCollab.isMe || ! prevCollab.isConnected ) {
-					continue;
+	useOnCollaboratorLeave(
+		effectivePostId,
+		effectivePostType,
+		useCallback(
+			( collaborator: PostEditorAwarenessState ) => {
+				if ( ! NOTIFICATIONS_CONFIG.userExited ) {
+					return;
 				}
 
-				const newCollab = newMap.get( clientId );
-				if ( newCollab?.isConnected ) {
-					continue;
-				}
-
-				notify(
-					`${ NOTIFICATION_TYPE.COLLAB_USER_EXITED }-${ prevCollab.collaboratorInfo.id }`,
+				void createNotice(
+					'info',
 					sprintf(
 						/* translators: %s: collaborator display name */
 						__( '%s has left the post.' ),
-						prevCollab.collaboratorInfo.name
-					)
+						collaborator.collaboratorInfo.name
+					),
+					{
+						id: `${ NOTIFICATION_TYPE.COLLAB_USER_EXITED }-${ collaborator.collaboratorInfo.id }`,
+						type: 'snackbar',
+						isDismissible: false,
+					}
 				);
-			}
-		}
-	}, [
-		activeCollaborators,
-		prevCollaborators,
-		isCollaborationEnabled,
-		createNotice,
-	] );
+			},
+			[ createNotice ]
+		)
+	);
 
-	/*
-	 * Detect remote save events via the CRDT state map. The savedByClientId
-	 * is a Y.Doc client ID which maps to a collaborator via clientId.
-	 */
-	useEffect( () => {
-		if (
-			! isCollaborationEnabled ||
-			! NOTIFICATIONS_CONFIG.postUpdated ||
-			! lastPostSave ||
-			! postStatus
-		) {
-			return;
-		}
+	useOnPostSave(
+		effectivePostId,
+		effectivePostType,
+		useCallback(
+			(
+				saveEvent: PostSaveEvent,
+				saver: PostEditorAwarenessState,
+				prevEvent: PostSaveEvent | null
+			) => {
+				if ( ! NOTIFICATIONS_CONFIG.postUpdated || ! postStatus ) {
+					return;
+				}
 
-		if ( prevPostSave && lastPostSave.savedAt === prevPostSave.savedAt ) {
-			return;
-		}
+				// Prefer the remote status from Y.Doc (accurate at save time)
+				// over the local Redux value, which may not have synced yet.
+				const effectiveStatus =
+					saveEvent.postStatus ?? postStatus ?? 'draft';
 
-		const saver = activeCollaborators.find(
-			( c ) => c.clientId === lastPostSave.savedByClientId && ! c.isMe
-		);
+				// Use the previous save event's status when available for
+				// accurate first-publish detection across rapid saves.
+				const prevStatus = prevEvent?.postStatus ?? postStatus;
+				const isFirstPublish =
+					! (
+						prevStatus && PUBLISHED_STATUSES.includes( prevStatus )
+					) && PUBLISHED_STATUSES.includes( effectiveStatus );
 
-		if ( ! saver ) {
-			return;
-		}
+				const message = getPostUpdatedMessage(
+					saver.collaboratorInfo.name,
+					effectiveStatus,
+					isFirstPublish
+				);
 
-		// Prefer the remote status from Y.Doc (accurate at save time) over
-		// the local Redux value, which may not have synced yet.
-		const effectiveStatus =
-			lastPostSave.postStatus ?? postStatus ?? 'draft';
-
-		// prevPostSave is null on the first save this session, so fall back
-		// to the Redux status (still pre-save when the notification fires).
-		const prevStatus = prevPostSave?.postStatus ?? postStatus;
-		const isFirstPublish =
-			! ( prevStatus && PUBLISHED_STATUSES.includes( prevStatus ) ) &&
-			PUBLISHED_STATUSES.includes( effectiveStatus );
-
-		const message = getPostUpdatedMessage(
-			saver.collaboratorInfo.name,
-			effectiveStatus,
-			isFirstPublish
-		);
-
-		void createNotice( 'info', message, {
-			id: `${ NOTIFICATION_TYPE.COLLAB_POST_UPDATED }-${ saver.collaboratorInfo.id }`,
-			type: 'snackbar',
-			isDismissible: false,
-		} );
-	}, [
-		lastPostSave,
-		prevPostSave,
-		activeCollaborators,
-		isCollaborationEnabled,
-		postStatus,
-		createNotice,
-	] );
+				void createNotice( 'info', message, {
+					id: `${ NOTIFICATION_TYPE.COLLAB_POST_UPDATED }-${ saver.collaboratorInfo.id }`,
+					type: 'snackbar',
+					isDismissible: false,
+				} );
+			},
+			[ createNotice, postStatus ]
+		)
+	);
 }

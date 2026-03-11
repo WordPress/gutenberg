@@ -1,19 +1,13 @@
 import { __ } from '@wordpress/i18n';
-import {
-	Popover,
-	Button,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
-import { close } from '@wordpress/icons';
+import { Popover, Button } from '@wordpress/components';
+import { closeSmall } from '@wordpress/icons';
 import { type PostEditorAwarenessState } from '@wordpress/core-data';
 
-import { unlock } from '../../lock-unlock';
+import Avatar from './avatar';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 import './styles/collaborators-list.scss';
-
-const { Avatar } = unlock( componentsPrivateApis );
 
 interface CollaboratorsListProps {
 	activeCollaborators: PostEditorAwarenessState[];
@@ -46,13 +40,13 @@ export function CollaboratorsList( {
 				<div className="editor-collaborators-presence__list-header">
 					<div className="editor-collaborators-presence__list-header-title">
 						{ __( 'Collaborators' ) }
-						<span> { activeCollaborators.length } </span>
+						<span>{ activeCollaborators.length }</span>
 					</div>
 					<div className="editor-collaborators-presence__list-header-action">
 						<Button
 							__next40pxDefaultSize
-							icon={ close }
-							iconSize={ 16 }
+							icon={ closeSmall }
+							iconSize={ 24 }
 							label={ __( 'Close Collaborators List' ) }
 							onClick={ () => setIsPopoverVisible( false ) }
 						/>
@@ -64,11 +58,6 @@ export function CollaboratorsList( {
 							key={ collaboratorState.clientId }
 							className="editor-collaborators-presence__list-item"
 							disabled
-							style={ {
-								opacity: collaboratorState.isConnected
-									? 1
-									: 0.5,
-							} }
 						>
 							<Avatar
 								src={ getAvatarUrl(
@@ -79,6 +68,7 @@ export function CollaboratorsList( {
 								borderColor={ getAvatarBorderColor(
 									collaboratorState.collaboratorInfo.id
 								) }
+								dimmed={ ! collaboratorState.isConnected }
 							/>
 							<div className="editor-collaborators-presence__list-item-info">
 								<div className="editor-collaborators-presence__list-item-name">

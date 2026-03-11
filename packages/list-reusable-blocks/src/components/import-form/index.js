@@ -29,7 +29,7 @@ function ImportForm( { instanceId, onUpload } ) {
 		if ( ! file ) {
 			return;
 		}
-		setIsLoading( { isLoading: true } );
+		setIsLoading( true );
 		importReusableBlock( file )
 			.then( ( reusableBlock ) => {
 				if ( ! formRef ) {

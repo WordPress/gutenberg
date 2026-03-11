@@ -32,5 +32,7 @@ export function dispatch<
 >(
 	storeNameOrDescriptor: StoreNameOrDescriptor
 ): DispatchReturn< StoreNameOrDescriptor > {
-	return defaultRegistry.dispatch( storeNameOrDescriptor );
+	return defaultRegistry.dispatch(
+		storeNameOrDescriptor
+	) as DispatchReturn< StoreNameOrDescriptor >;
 }
