@@ -183,15 +183,18 @@ describe( 'InputControl', () => {
 		} );
 
 		it( 'should update value if the parent transforms it on commit', async () => {
+			const onChange = jest.fn();
 			const user = await userEvent.setup();
 			const Example = () => {
 				const [ state, setState ] = useState( '50' );
 				return (
 					<InputControl
 						value={ state }
-						onChange={ ( v ) => {
-							// Simulate a parent that clamps the value.
-							setState( Number( v ) > 60 ? '60' : v );
+						onChange={ ( nextValue ) => {
+							const clampedValue =
+								Number( nextValue ) > 60 ? '60' : nextValue;
+							setState( clampedValue );
+							onChange( clampedValue );
 						} }
 						isPressEnterToChange
 					/>
@@ -204,6 +207,8 @@ describe( 'InputControl', () => {
 			await user.type( input, '99' );
 			await user.keyboard( '{Tab}' );
 
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			expect( onChange ).toHaveBeenCalledWith( '60' );
 			expect( input ).toHaveValue( '60' );
 		} );
 
