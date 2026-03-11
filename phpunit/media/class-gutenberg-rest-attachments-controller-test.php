@@ -137,6 +137,9 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 				),
 			)
 		);
+		// Explicitly set generate_sub_sizes since defaults aren't applied outside REST dispatch.
+		$request->set_param( 'generate_sub_sizes', true );
+
 		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
 		$result     = $controller->create_item_permissions_check( $request );
 
