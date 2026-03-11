@@ -93,13 +93,15 @@ export function Overlay( {
 						top: `${ cursor.y }px`,
 					} }
 				>
-					<div
-						className="collaborators-overlay-user-cursor"
-						style={ {
-							backgroundColor: cursor.color,
-							height: `${ cursor.height }px`,
-						} }
-					/>
+					{ ! cursor.isMe && (
+						<div
+							className="collaborators-overlay-user-cursor"
+							style={ {
+								backgroundColor: cursor.color,
+								height: `${ cursor.height }px`,
+							} }
+						/>
+					) }
 					<Avatar
 						className="collaborators-overlay-user-label"
 						variant="badge"
