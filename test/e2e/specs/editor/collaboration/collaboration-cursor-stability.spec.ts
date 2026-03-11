@@ -75,9 +75,11 @@ test.describe( 'Collaboration - Cursor Stability', () => {
 
 		// Allow the selection to be tracked in the CRDT selection history.
 		// The awareness layer subscribes to selection changes and creates
-		// a Y.RelativePosition asynchronously.
-		// eslint-disable-next-line playwright/no-wait-for-timeout
-		await page.waitForTimeout( 500 );
+		// a Y.RelativePosition via setTimeout(fn, 0), so we flush the
+		// queue before proceeding.
+		await page.evaluate(
+			() => new Promise( ( resolve ) => setTimeout( resolve, 0 ) )
+		);
 
 		// User 2 applies bold formatting to "purus" by updating the block
 		// content. This inserts <strong></strong> HTML tags before the cursor.
