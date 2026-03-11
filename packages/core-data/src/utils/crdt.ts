@@ -342,9 +342,6 @@ export function getPostChangesFromCRDTDoc(
 						);
 					}
 
-					// Consumers that serialize blocks (e.g. getEditedPostContent)
-					// must memoize on the blocks reference to avoid redundant calls
-					// to each block's save function.
 					return true;
 				}
 
