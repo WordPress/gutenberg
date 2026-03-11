@@ -196,4 +196,343 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 				},
 			] );
 	} );
+
+	test( 'Container blocks sync modifications between users', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		test.setTimeout( 60_000 );
+
+		const post = await requestUtils.createPost( {
+			title: 'Gauntlet - Container Blocks',
+			status: 'draft',
+			date_gmt: new Date().toISOString(),
+		} );
+		await collaborationUtils.openCollaborativeSession( post.id );
+
+		const { editor2, page2 } = collaborationUtils;
+
+		// User A inserts all container blocks with inner content.
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Group child' },
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'Column 1 text' },
+						},
+					],
+				},
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'Column 2 text' },
+						},
+					],
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: [
+				{
+					name: 'core/button',
+					attributes: {
+						text: 'Click me',
+						url: 'https://example.com',
+					},
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/details',
+			attributes: { summary: 'Details summary' },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Details body' },
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/quote',
+			attributes: { citation: 'Quote author' },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Quote text' },
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: 'Item one' },
+				},
+				{
+					name: 'core/list-item',
+					attributes: { content: 'Item two' },
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/cover',
+			attributes: { overlayColor: 'black', isDark: true },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Cover text' },
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/media-text',
+			attributes: {
+				mediaPosition: 'left',
+				mediaType: 'image',
+				mediaUrl: 'https://example.com/img.jpg',
+			},
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Media text content' },
+				},
+			],
+		} );
+
+		// Wait for User B to see all 8 top-level blocks.
+		await expect
+			.poll( () => editor2.getBlocks(), { timeout: 10_000 } )
+			.toHaveLength( 8 );
+
+		// User B modifies inner content of each container block via keyboard.
+
+		// Group > Paragraph.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/group"] [data-type="core/paragraph"]'
+			),
+			'Group child edited by B'
+		);
+
+		// Columns > Column 1 > Paragraph.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/columns"] [data-type="core/column"]:first-child [data-type="core/paragraph"]'
+			),
+			'Column 1 edited by B'
+		);
+
+		// Buttons > Button text.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/buttons"] [data-type="core/button"] [contenteditable="true"]'
+			),
+			'Click B'
+		);
+
+		// Details > Summary.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/details"] summary [contenteditable="true"]'
+			),
+			'Summary edited by B'
+		);
+		// Details > Inner paragraph.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/details"] [data-type="core/paragraph"]'
+			),
+			'Details body edited by B'
+		);
+
+		// Quote > Inner paragraph.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/quote"] [data-type="core/paragraph"]'
+			),
+			'Quote text edited by B'
+		);
+		// Quote > Citation.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/quote"] [aria-label="Quote citation"]'
+			),
+			'Author B'
+		);
+
+		// List > First list-item.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/list"] [data-type="core/list-item"]:first-child [contenteditable="true"]'
+			),
+			'Item one edited by B'
+		);
+		// List > Second list-item.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/list"] [data-type="core/list-item"]:nth-child(2) [contenteditable="true"]'
+			),
+			'Item two edited by B'
+		);
+
+		// Cover > Inner paragraph.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/cover"] [data-type="core/paragraph"]'
+			),
+			'Cover edited by B'
+		);
+
+		// Media-text > Inner paragraph.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/media-text"] [data-type="core/paragraph"]'
+			),
+			'Media text edited by B'
+		);
+
+		// User A verifies all modifications synced.
+		await expect
+			.poll( () => editor.getBlocks(), { timeout: 10_000 } )
+			.toMatchObject( [
+				{
+					name: 'core/group',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: {
+								content: 'Group child edited by B',
+							},
+						},
+					],
+				},
+				{
+					name: 'core/columns',
+					innerBlocks: [
+						{
+							name: 'core/column',
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: {
+										content: 'Column 1 edited by B',
+									},
+								},
+							],
+						},
+						{
+							name: 'core/column',
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: {
+										content: 'Column 2 text',
+									},
+								},
+							],
+						},
+					],
+				},
+				{
+					name: 'core/buttons',
+					innerBlocks: [
+						{
+							name: 'core/button',
+							attributes: { text: 'Click B' },
+						},
+					],
+				},
+				{
+					name: 'core/details',
+					attributes: { summary: 'Summary edited by B' },
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: {
+								content: 'Details body edited by B',
+							},
+						},
+					],
+				},
+				{
+					name: 'core/quote',
+					attributes: { citation: 'Author B' },
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: {
+								content: 'Quote text edited by B',
+							},
+						},
+					],
+				},
+				{
+					name: 'core/list',
+					innerBlocks: [
+						{
+							name: 'core/list-item',
+							attributes: {
+								content: 'Item one edited by B',
+							},
+						},
+						{
+							name: 'core/list-item',
+							attributes: {
+								content: 'Item two edited by B',
+							},
+						},
+					],
+				},
+				{
+					name: 'core/cover',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: {
+								content: 'Cover edited by B',
+							},
+						},
+					],
+				},
+				{
+					name: 'core/media-text',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: {
+								content: 'Media text edited by B',
+							},
+						},
+					],
+				},
+			] );
+	} );
 } );
