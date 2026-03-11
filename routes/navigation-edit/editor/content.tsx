@@ -7,7 +7,10 @@ import {
 	BlockList,
 	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+// @ts-expect-error - No type declarations available for @wordpress/blocks
+import { createBlock } from '@wordpress/blocks';
+import { useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -15,6 +18,12 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { unlock } from '../../lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
+
+type Block = {
+	clientId: string;
+	name: string;
+	attributes: Record< string, unknown >;
+};
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
@@ -95,6 +104,25 @@ export default function NavigationMenuContent( {
 		[ rootClientId ]
 	);
 
+	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
+	const offCanvasOnselect = useCallback(
+		( block: Block ) => {
+			if (
+				block.name === 'core/navigation-link' &&
+				! block.attributes.url
+			) {
+				__unstableMarkNextChangeAsNotPersistent();
+				replaceBlock(
+					block.clientId,
+					createBlock( 'core/navigation-link', block.attributes )
+				);
+			}
+		},
+		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
+	);
+
 	const NavigationLinkUI = getNavigationLinkUI();
 
 	// The hidden block is needed because it makes block edit side effects trigger.
@@ -104,6 +132,7 @@ export default function NavigationMenuContent( {
 			{ ! isLoading && (
 				<PrivateListView
 					rootClientId={ listViewRootClientId }
+					onSelect={ offCanvasOnselect }
 					blockSettingsMenu={ LeafMoreMenu }
 					additionalBlockContent={ NavigationLinkUI }
 					showAppender
