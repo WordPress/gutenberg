@@ -8,7 +8,8 @@
 
 ### Bug Fixes
 
--   `canUser` no longer returns `undefined` when the allow header is missing from the response.
+-   Fix `getEntityRecords` returning incomplete results for non-paginated entities by normalizing `per_page` in queries.
+-   `canUser` no longer returns `undefined` when the allow header is missing from the response ([#76307](https://github.com/WordPress/gutenberg/pull/70788)).
 
 ## 7.41.0 (2026-03-04)
 

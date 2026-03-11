@@ -485,12 +485,13 @@ describe( 'getEntityRecords', () => {
 			path: '/wp/v2/types?context=edit',
 		} );
 
-		// The record should have been received.
+		// The record should have been received. Non-paginated entities
+		// get per_page: -1 injected into the query automatically.
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			Object.values( POST_TYPES ),
-			{},
+			{ per_page: -1 },
 			false,
 			undefined,
 			{ totalItems: 2, totalPages: 1 }
