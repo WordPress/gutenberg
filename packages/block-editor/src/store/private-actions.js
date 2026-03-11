@@ -573,13 +573,24 @@ export const __experimentalUpdateSyncedBlockAttributes =
 		const hasUnsyncedAttrs = Object.keys( unsyncedAttributes ).length > 0;
 
 		const privateSelect = unlock( registry.select( STORE_NAME ) );
+
+		// Check if this block instance is individually unlinked.
+		if (
+			privateSelect.__experimentalIsBlockStyleSyncUnlinked(
+				clientId,
+				blockName
+			)
+		) {
+			dispatch.updateBlockAttributes( clientId, attributes );
+			return;
+		}
+
+		// Check if the parent scope has sync disabled for this block type.
 		const scopeClientId =
 			privateSelect.__experimentalGetSiblingStyleSyncScopeClientId(
 				clientId,
 				blockName
 			);
-
-		// Check if the parent scope has sync disabled for this block type.
 		const syncChildStyles =
 			select.getBlockAttributes( scopeClientId )?.syncChildStyles ?? {};
 		if ( syncChildStyles[ blockName ] === false ) {
@@ -661,8 +672,9 @@ export const __experimentalUnlinkBlockStyleSync =
 	};
 
 /**
- * Re-links a block to its sibling style sync group. On the next style change
- * by any linked sibling, the styles will propagate to this block again.
+ * Re-links a block to its sibling style sync group and immediately copies the
+ * canonical styles from the first linked sibling so the block matches its
+ * peers right away.
  *
  * Clears the `styleSyncUnlinked` attribute so the re-linked state persists
  * across page reloads.
@@ -673,7 +685,7 @@ export const __experimentalUnlinkBlockStyleSync =
  */
 export const __experimentalRelinkBlockStyleSync =
 	( clientId, blockName, scopeClientId ) =>
-	( { dispatch } ) => {
+	( { select, dispatch, registry } ) => {
 		dispatch( {
 			type: 'RELINK_SIBLING_STYLE_SYNC',
 			clientId,
@@ -683,4 +695,53 @@ export const __experimentalRelinkBlockStyleSync =
 		dispatch.updateBlockAttributes( clientId, {
 			styleSyncUnlinked: false,
 		} );
+
+		const syncSupport =
+			getBlockType( blockName )?.supports?.__experimentalSiblingStyleSync;
+		if ( ! syncSupport ) {
+			return;
+		}
+
+		const privateSelect = unlock( registry.select( STORE_NAME ) );
+		const siblings = privateSelect.__experimentalGetSiblingStyleSyncBlocks(
+			clientId,
+			blockName
+		);
+		const canonicalSibling = siblings.find(
+			( s ) =>
+				! privateSelect.__experimentalIsBlockStyleSyncUnlinked(
+					s.clientId,
+					blockName
+				)
+		);
+		if ( ! canonicalSibling ) {
+			return;
+		}
+
+		const canonicalAttrs = select.getBlockAttributes(
+			canonicalSibling.clientId
+		);
+		const { syncedAttributes } = partitionAttributesByGroups(
+			canonicalAttrs,
+			syncSupport.groups
+		);
+		if ( Object.keys( syncedAttributes ).length === 0 ) {
+			return;
+		}
+
+		if ( syncedAttributes.style ) {
+			const currentStyle =
+				select.getBlockAttributes( clientId )?.style ?? {};
+			const merged = mergeStyleByGroups(
+				currentStyle,
+				syncedAttributes.style,
+				syncSupport.groups
+			);
+			dispatch.updateBlockAttributes( clientId, {
+				...syncedAttributes,
+				style: merged,
+			} );
+		} else {
+			dispatch.updateBlockAttributes( clientId, syncedAttributes );
+		}
 	};
