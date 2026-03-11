@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useLayoutEffect, useRef, useState } from '@wordpress/element';
+import { useId, useLayoutEffect, useRef, useState } from '@wordpress/element';
 import type { RefCallback } from 'react';
 import { Popover } from '../..';
 
@@ -175,34 +175,84 @@ export const Controlled: Story = {
 
 /**
  * Set `modal` to `true` to trap focus inside the popover when it is open.
- * This is useful for complex popover content that requires user interaction.
+ * This is useful for complex popover content that requires user interaction,
+ * such as forms. Try tabbing through the fields — focus stays inside the
+ * popover until it is dismissed.
  */
 export const Modal: Story = {
-	args: {
-		modal: true,
-		children: (
-			<>
-				<Popover.Trigger>Open Modal Popover</Popover.Trigger>
+	render: function Render() {
+		const nameId = useId();
+		const emailId = useId();
+
+		return (
+			<Popover.Root modal>
+				<Popover.Trigger>Edit Settings</Popover.Trigger>
 				<Popover.Popup>
 					<Popover.Arrow />
-					<Popover.Title>Modal Popover</Popover.Title>
-					<Popover.Description>
-						Focus is trapped inside this popover. Press Escape to
-						close.
-					</Popover.Description>
-					<Popover.Close
+					<Popover.Title>Settings</Popover.Title>
+					<form
 						style={ {
-							all: 'unset',
-							cursor: 'pointer',
+							display: 'flex',
+							flexDirection: 'column',
+							gap: 8,
 							marginTop: 8,
-							display: 'inline-block',
 						} }
+						onSubmit={ ( e ) => e.preventDefault() }
 					>
-						Close
-					</Popover.Close>
+						<label
+							htmlFor={ nameId }
+							style={ {
+								display: 'flex',
+								flexDirection: 'column',
+								gap: 4,
+								fontSize: 'inherit',
+							} }
+						>
+							Name
+							<input
+								id={ nameId }
+								type="text"
+								placeholder="Enter your name"
+							/>
+						</label>
+						<label
+							htmlFor={ emailId }
+							style={ {
+								display: 'flex',
+								flexDirection: 'column',
+								gap: 4,
+								fontSize: 'inherit',
+							} }
+						>
+							Email
+							<input
+								id={ emailId }
+								type="email"
+								placeholder="Enter your email"
+							/>
+						</label>
+						<div
+							style={ {
+								display: 'flex',
+								justifyContent: 'flex-end',
+								gap: 8,
+								marginTop: 4,
+							} }
+						>
+							<Popover.Close
+								style={ {
+									all: 'unset',
+									cursor: 'pointer',
+								} }
+							>
+								Cancel
+							</Popover.Close>
+							<button type="submit">Save</button>
+						</div>
+					</form>
 				</Popover.Popup>
-			</>
-		),
+			</Popover.Root>
+		);
 	},
 };
 
