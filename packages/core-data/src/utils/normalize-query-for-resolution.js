@@ -13,10 +13,11 @@ export default function normalizeQueryForResolution( query ) {
 		return undefined;
 	}
 
-	const filtered = Object.fromEntries(
-		Object.entries( query ).filter(
-			( [ k, v ] ) => ( k === 'context' || k === '_fields' ) && !! v
-		)
+	const entries = Object.entries( query ).filter(
+		( [ k, v ] ) =>
+			( k === 'context' || k === '_fields' ) &&
+			v !== undefined &&
+			v !== null
 	);
-	return Object.keys( filtered ).length > 0 ? filtered : undefined;
+	return entries.length > 0 ? Object.fromEntries( entries ) : undefined;
 }
