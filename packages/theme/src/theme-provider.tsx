@@ -69,7 +69,7 @@ export const ThemeProvider = ( {
 	const cursorStyle = resolvedSettings.cursor?.control
 		? ( {
 				'--wpds-cursor-control': resolvedSettings.cursor.control,
-		  } as React.CSSProperties )
+		  } as CSSProperties )
 		: undefined;
 
 	return (
