@@ -140,18 +140,35 @@ export const WithCloseButton: Story = {
  * Use the `open` and `onOpenChange` props on `Popover.Root` to control the
  * popover's visibility programmatically.
  *
- * Note: clicking outside an open popover dismisses it via `onOpenChange`.
- * If an external button uses toggle logic (`!prev`), the dismiss and toggle
- * can race — the popover closes then immediately reopens. Use explicit
- * open/close actions on external controls to avoid this.
+ * When external controls live outside the popover, clicks on them trigger
+ * Base UI's click-outside dismiss before the button's own handler runs.
+ * To prevent the flicker, filter out dismiss events whose click landed on
+ * your external controls using the `event` in `onOpenChange`.
  */
 export const Controlled: Story = {
 	render: function Render() {
 		const [ isOpen, setIsOpen ] = useState( false );
+		const externalControlsRef = useRef< HTMLDivElement >( null );
+
+		const handleOpenChange: React.ComponentProps<
+			typeof Popover.Root
+		>[ 'onOpenChange' ] = ( nextOpen, event ) => {
+			if (
+				! nextOpen &&
+				event &&
+				'event' in event &&
+				event.event instanceof Event &&
+				event.event.target instanceof Node &&
+				externalControlsRef.current?.contains( event.event.target )
+			) {
+				return;
+			}
+			setIsOpen( nextOpen );
+		};
 
 		return (
 			<div style={ { display: 'flex', gap: '1rem' } }>
-				<Popover.Root open={ isOpen } onOpenChange={ setIsOpen }>
+				<Popover.Root open={ isOpen } onOpenChange={ handleOpenChange }>
 					<Popover.Trigger>Toggle Popover</Popover.Trigger>
 					<Popover.Popup>
 						<Popover.Arrow />
@@ -161,12 +178,17 @@ export const Controlled: Story = {
 						</Popover.Description>
 					</Popover.Popup>
 				</Popover.Root>
-				<button onClick={ () => setIsOpen( true ) }>
-					Open externally
-				</button>
-				<button onClick={ () => setIsOpen( false ) }>
-					Close externally
-				</button>
+				<div
+					ref={ externalControlsRef }
+					style={ { display: 'flex', gap: '1rem' } }
+				>
+					<button onClick={ () => setIsOpen( true ) }>
+						Open externally
+					</button>
+					<button onClick={ () => setIsOpen( false ) }>
+						Close externally
+					</button>
+				</div>
 				<span>open: { String( isOpen ) }</span>
 			</div>
 		);
