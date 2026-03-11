@@ -23,6 +23,11 @@ jest.mock( '@wordpress/data', () => ( {
 	select: jest.fn(),
 	subscribe: jest.fn(),
 	resolveSelect: jest.fn(),
+	// Needed because @wordpress/rich-text initialises its store at import time.
+	combineReducers: jest.fn( () => jest.fn( () => ( {} ) ) ),
+	createReduxStore: jest.fn( () => ( {} ) ),
+	register: jest.fn(),
+	createSelector: ( selector: Function ) => selector,
 } ) );
 
 jest.mock( '@wordpress/block-editor', () => ( {
