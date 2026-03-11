@@ -74,6 +74,57 @@ test.describe( 'Connectors', () => {
 		).toHaveAttribute( 'href', 'plugin-install.php' );
 	} );
 
+	test.describe( 'Empty state', () => {
+		const PLUGIN_SLUG = 'gutenberg-test-connectors-empty-state';
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin( PLUGIN_SLUG );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin( PLUGIN_SLUG );
+		} );
+
+		test( 'should display an empty state when no connectors are registered', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			// Verify the empty state heading is visible.
+			await expect(
+				page.getByRole( 'heading', { name: 'No connectors yet' } )
+			).toBeVisible();
+
+			// Verify the explanatory description is visible.
+			await expect(
+				page.getByText(
+					'Connectors appear here when you install plugins that use external services.'
+				)
+			).toBeVisible();
+
+			// Verify the "Learn more" button links to plugin directory.
+			const learnMoreButton = page.getByRole( 'link', {
+				name: 'Learn more',
+			} );
+			await expect( learnMoreButton ).toBeVisible();
+			await expect( learnMoreButton ).toHaveAttribute(
+				'href',
+				'plugin-install.php'
+			);
+
+			// Verify none of the default connector cards are shown.
+			for ( const { slug } of CONNECTORS ) {
+				await expect(
+					page.locator( `.connector-item--${ slug }` )
+				).toBeHidden();
+			}
+		} );
+	} );
+
 	test.describe( 'Connectors page capability checks', () => {
 		const PLUGIN_SLUG = 'gutenberg-test-connectors-capability-restriction';
 
