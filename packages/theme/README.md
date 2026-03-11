@@ -138,7 +138,7 @@ import { ThemeProvider } from '@wordpress/theme';
 
 function App() {
 	return (
-		<ThemeProvider color={ { primary: 'blue' } } density="compact">
+		<ThemeProvider color={ { primary: 'blue' } } cursor={ { control: 'pointer' } } density="compact">
 			{ /* Your app content */ }
 		</ThemeProvider>
 	);
@@ -152,6 +152,10 @@ The `color` prop accepts an object with the following optional properties:
 
 Both properties accept any valid CSS color value. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
 
+The `cursor` prop accepts an object with the following optional properties:
+
+-   `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'`.
+
 The `density` prop controls the spacing scale throughout the UI:
 
 -   `'default'`: Standard spacing for general use.
@@ -160,7 +164,7 @@ The `density` prop controls the spacing scale throughout the UI:
 
 The density setting adjusts dimension tokens like gaps and paddings to maintain consistent spacing throughout the UI. Changing the density automatically updates spacing of all components that use these tokens.
 
-When the `color` or `density` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
+When the `color`, `cursor`, or `density` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
 
 ### Nesting Providers
 
