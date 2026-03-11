@@ -8,8 +8,6 @@
  * evaluates.
  */
 
-/* eslint-disable react-compiler/react-compiler */
-
 /**
  * WordPress dependencies
  */
@@ -18,9 +16,10 @@ import {
 	store as blockEditorStore,
 	BlockList,
 } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useState, useLayoutEffect, useRef, useMemo } from '@wordpress/element';
+// @ts-expect-error - No type declarations available for @wordpress/blocks
+import { createBlock } from '@wordpress/blocks';
+import { useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -29,99 +28,30 @@ import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '../../lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
 
-// block-editor private APIs are safe at module level (loaded with boot).
+type Block = {
+	clientId: string;
+	name: string;
+	attributes: Record< string, unknown >;
+};
+
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
-// block-library private APIs must be accessed at render time because
-// wp-block-library is loaded lazily after useEditorAssets() resolves.
-function getBlockLibraryApis() {
-	return unlock( ( window as any ).wp.blockLibrary.privateApis );
-}
-
-const BLOCKS_WITH_LINK_UI_SUPPORT = [
-	'core/navigation-link',
-	'core/navigation-submenu',
-];
-
-function AdditionalBlockContent( {
-	block,
-	insertedBlock,
-	setInsertedBlock,
-	blockLibraryApis,
-} ) {
-	const { LinkUI, updateAttributes, useEntityBinding } = blockLibraryApis;
-
-	const {
-		updateBlockAttributes,
-		removeBlock,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
-	const supportsLinkControls = BLOCKS_WITH_LINK_UI_SUPPORT.includes(
-		insertedBlock?.name
-	);
-	const blockWasJustInserted = insertedBlock?.clientId === block.clientId;
-	const showLinkControls = supportsLinkControls && blockWasJustInserted;
-
-	const { createBinding, clearBinding } = useEntityBinding( {
-		clientId: insertedBlock?.clientId,
-		attributes: insertedBlock?.attributes || {},
-	} );
-
-	if ( ! showLinkControls ) {
+// block-library is loaded dynamically via useEditorAssets before this component renders.
+// Access NavigationLinkUI from its private-apis at runtime rather than via static import.
+function getNavigationLinkUI() {
+	const blockLibrary = (
+		window as Window & {
+			wp: {
+				blockLibrary: { privateApis: Parameters< typeof unlock >[ 0 ] };
+			};
+		}
+	 ).wp?.blockLibrary;
+	if ( ! blockLibrary ) {
 		return null;
 	}
+	const { NavigationLinkUI } = unlock( blockLibrary.privateApis );
 
-	const cleanupInsertedBlock = () => {
-		const shouldAutoSelectBlock = false;
-		if ( ! insertedBlock?.attributes?.url && insertedBlock?.clientId ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
-		}
-		setInsertedBlock( null );
-	};
-
-	const setInsertedBlockAttributes =
-		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
-			if ( ! _insertedBlockClientId ) {
-				return;
-			}
-			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
-		};
-
-	const handleSetInsertedBlock = ( newBlock ) => {
-		const shouldAutoSelectBlock = false;
-		if ( insertedBlock?.clientId && newBlock ) {
-			removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
-		}
-		setInsertedBlock( newBlock );
-	};
-
-	return (
-		<LinkUI
-			clientId={ insertedBlock?.clientId }
-			link={ insertedBlock?.attributes }
-			onBlockInsert={ handleSetInsertedBlock }
-			onClose={ () => {
-				cleanupInsertedBlock();
-			} }
-			onChange={ ( updatedValue ) => {
-				const { isEntityLink, attributes: updatedAttributes } =
-					updateAttributes(
-						updatedValue,
-						setInsertedBlockAttributes( insertedBlock?.clientId ),
-						insertedBlock?.attributes
-					);
-
-				if ( isEntityLink ) {
-					createBinding( updatedAttributes );
-				} else {
-					clearBinding();
-				}
-
-				setInsertedBlock( null );
-			} }
-		/>
-	);
+	return NavigationLinkUI as any;
 }
 
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
@@ -140,10 +70,11 @@ const PAGES_QUERY = [
 	},
 ];
 
-export default function NavigationMenuContent( { rootClientId } ) {
-	const blockLibraryApis = useMemo( () => getBlockLibraryApis(), [] );
-	const { NavigationLinkControls } = blockLibraryApis;
-
+export default function NavigationMenuContent( {
+	rootClientId,
+}: {
+	rootClientId: string;
+} ) {
 	const { listViewRootClientId, isLoading } = useSelect(
 		( select ) => {
 			const {
@@ -182,72 +113,38 @@ export default function NavigationMenuContent( { rootClientId } ) {
 		[ rootClientId ]
 	);
 
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
-	const [ editingBlock, setEditingBlock ] = useState( null );
-	const [ anchorElement, setAnchorElement ] = useState( null );
-	const listViewRef = useRef();
+	const offCanvasOnselect = useCallback(
+		( block: Block ) => {
+			if (
+				block.name === 'core/navigation-link' &&
+				! block.attributes.url
+			) {
+				__unstableMarkNextChangeAsNotPersistent();
+				replaceBlock(
+					block.clientId,
+					createBlock( 'core/navigation-link', block.attributes )
+				);
+			}
+		},
+		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
+	);
 
-	useLayoutEffect( () => {
-		if ( ! editingBlock?.clientId || ! listViewRef.current ) {
-			setAnchorElement( null );
-			return;
-		}
-		const element = listViewRef.current.querySelector(
-			`[data-block="${ editingBlock.clientId }"]`
-		);
-		setAnchorElement( element ?? null );
-	}, [ editingBlock?.clientId ] );
-
-	const handleSelect = ( block ) => {
-		if (
-			BLOCKS_WITH_LINK_UI_SUPPORT.includes( block?.name ) &&
-			block?.attributes?.url
-		) {
-			setEditingBlock( block );
-		}
-	};
+	const NavigationLinkUI = getNavigationLinkUI();
 
 	return (
 		<>
 			{ ! isLoading && (
-				<div ref={ listViewRef }>
-					<PrivateListView
-						rootClientId={ listViewRootClientId }
-						onSelect={ handleSelect }
-						blockSettingsMenu={ LeafMoreMenu }
-						showAppender
-						additionalBlockContent={ ( blockProps ) => (
-							<AdditionalBlockContent
-								{ ...blockProps }
-								blockLibraryApis={ blockLibraryApis }
-							/>
-						) }
-						isExpanded
-					/>
-				</div>
-			) }
-			{ editingBlock && anchorElement && (
-				<Popover
-					anchor={ anchorElement }
-					placement="right-start"
-					onClose={ () => setEditingBlock( null ) }
-					className="edit-site-sidebar-navigation-screen-navigation-menus__link-editor"
-				>
-					<div style={ { width: '280px' } }>
-						<NavigationLinkControls
-							attributes={ editingBlock.attributes }
-							setAttributes={ ( newAttrs ) => {
-								updateBlockAttributes(
-									editingBlock.clientId,
-									newAttrs
-								);
-							} }
-							clientId={ editingBlock.clientId }
-							contentOnly
-						/>
-					</div>
-				</Popover>
+				<PrivateListView
+					rootClientId={ listViewRootClientId }
+					onSelect={ offCanvasOnselect }
+					blockSettingsMenu={ LeafMoreMenu }
+					additionalBlockContent={ NavigationLinkUI }
+					showAppender
+					isExpanded
+				/>
 			) }
 			<div className="navigation-edit-editor__hidden-blocks">
 				<BlockList />
@@ -255,5 +152,3 @@ export default function NavigationMenuContent( { rootClientId } ) {
 		</>
 	);
 }
-
-/* eslint-enable react-compiler/react-compiler */
