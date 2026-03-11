@@ -124,11 +124,9 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									scope="core"
 									featureName="showCollaborationCursor"
 									help={ __(
-										'Show your own cursor and avatar during collaborative editing sessions.'
+										'Show your own avatar inside blocks during collaborative editing sessions.'
 									) }
-									label={ __(
-										'Show own collaboration cursor'
-									) }
+									label={ __( 'Show avatar in blocks' ) }
 								/>
 							</PreferencesModalSection>
 							<PreferencesModalSection
