@@ -49,6 +49,7 @@ function gutenberg_get_layout_definitions() {
 			'name'          => 'default',
 			'slug'          => 'flow',
 			'className'     => 'is-layout-flow',
+			'displayMode'   => 'flow-root',
 			'baseStyles'    => array(
 				array(
 					'selector' => ' > .alignleft',
@@ -100,6 +101,7 @@ function gutenberg_get_layout_definitions() {
 			'name'          => 'constrained',
 			'slug'          => 'constrained',
 			'className'     => 'is-layout-constrained',
+			'displayMode'   => 'flow-root',
 			'baseStyles'    => array(
 				array(
 					'selector' => ' > .alignleft',

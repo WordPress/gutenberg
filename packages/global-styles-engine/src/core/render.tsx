@@ -803,7 +803,7 @@ export function getLayoutStyles( {
 
 	// Output base styles
 	if ( selector === ROOT_BLOCK_SELECTOR && layoutDefinitions ) {
-		const validDisplayModes = [ 'block', 'flex', 'grid' ];
+		const validDisplayModes = [ 'block', 'flex', 'grid', 'flow-root' ];
 		Object.values( layoutDefinitions ).forEach(
 			( { className, displayMode, baseStyles }: LayoutDefinition ) => {
 				if (
