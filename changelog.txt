@@ -1,84 +1,14 @@
 == Changelog ==
 
-= 22.7.0-rc.4 =
-
-## Changelog
-
-### Bug Fixes
-
-#### Block Editor
-- CI: Don't build release notes during plugin build workflow for WP Core sync ([76398](https://github.com/WordPress/gutenberg/pull/76398))
-
-## Contributors
-
-The following contributors merged PRs in this release:
-
-@ockham 
-
-
-
-
-
-
-
-= 22.7.0-rc.3 =
-
-## Changelog
-
-### Bug Fixes
-
-#### Block Editor
-- Content Guidelines: Add block guidelines management ([76187](https://github.com/WordPress/gutenberg/pull/76187))
-- Content Guidelines: Add UX for site, copy, image, and additional guidelines ([75420](https://github.com/WordPress/gutenberg/pull/75420))
-- Guidelines: Add actions for Import, Export and Revisions of guidelines ([76155](https://github.com/WordPress/gutenberg/pull/76155))
-
-## Contributors
-
-The following contributors merged PRs in this release:
-
-@aswasif007 @iamchughmayank
-
-
-= 22.7.0-rc.2 =
-
-
-## Changelog
-
-### Bug Fixes
-
-#### Block Editor
-- RTC: Enable RTC by default ([75739](https://github.com/WordPress/gutenberg/pull/75739))
-- Interactivity: Fix crypto.randomUUID crash in non-secure contexts ([76151](https://github.com/WordPress/gutenberg/pull/76151))
-- Client-side media processing: Try plumbing invalidation to the block-editor's mediaUpload onSuccess callback ([76173](https://github.com/WordPress/gutenberg/pull/76173))
-- Client-side media processing: only use media upload provider when not in preview mode ([76124](https://github.com/WordPress/gutenberg/pull/76124))
-
-
-
-
-
-## Contributors
-
-The following contributors merged PRs in this release:
-
-@andrewserong @chriszarate @scruffian
-
-
-= 22.7.0-rc.1 =
-
+= 22.7.0 =
 
 ## Changelog
 
 ### Enhancements
-
 - Add phpMyAdmin support to wp-env Playground runtime. ([75532](https://github.com/WordPress/gutenberg/pull/75532))
-- Add: Connectors screen and API. ([75833](https://github.com/WordPress/gutenberg/pull/75833))
-- Connectors: Add `_ai_` prefix to connector setting names. ([75948](https://github.com/WordPress/gutenberg/pull/75948))
-- Connectors: Dynamically register providers from WP AI Client registry. ([76014](https://github.com/WordPress/gutenberg/pull/76014))
-- DataViews: Remove menu divider again. ([75893](https://github.com/WordPress/gutenberg/pull/75893))
 - Dialog: Add legacy z-index compatibility. ([75874](https://github.com/WordPress/gutenberg/pull/75874))
 - Env: Improve help screen. ([75783](https://github.com/WordPress/gutenberg/pull/75783))
 - InputLayout: Replace slot context with data attributes. ([76011](https://github.com/WordPress/gutenberg/pull/76011))
-- Sync connector PHP behavior with Core backport changes. ([75968](https://github.com/WordPress/gutenberg/pull/75968))
 - Theme: Add design token fallback generation. ([75586](https://github.com/WordPress/gutenberg/pull/75586))
 - Theme: Add design token for interactive non-link elements. ([75697](https://github.com/WordPress/gutenberg/pull/75697))
 - UI: Add Notice component. ([75981](https://github.com/WordPress/gutenberg/pull/75981))
@@ -97,10 +27,23 @@ The following contributors merged PRs in this release:
 - Tabs: Remove custom state styling. ([75731](https://github.com/WordPress/gutenberg/pull/75731))
 - Unify block settings dropdown menu items across list views. ([75979](https://github.com/WordPress/gutenberg/pull/75979))
 
+#### Connectors
+- Add: Connectors screen and API. ([75833](https://github.com/WordPress/gutenberg/pull/75833))
+- Connectors: Add `_ai_` prefix to connector setting names. ([75948](https://github.com/WordPress/gutenberg/pull/75948))
+- Connectors: Dynamically register providers from WP AI Client registry. ([76014](https://github.com/WordPress/gutenberg/pull/76014))
+- Sync connector PHP behavior with Core backport changes. ([75968](https://github.com/WordPress/gutenberg/pull/75968))
+
+#### Content Guidelines
+- Content Guidelines: Add block guidelines management ([76187](https://github.com/WordPress/gutenberg/pull/76187))
+- Content Guidelines: Add UX for site, copy, image, and additional guidelines ([75420](https://github.com/WordPress/gutenberg/pull/75420))
+- Guidelines: Add actions for Import, Export and Revisions of guidelines ([76155](https://github.com/WordPress/gutenberg/pull/76155))
+
 #### DataViews
 - Adjust column spacing in `table` layout when no titleField is provided. ([75410](https://github.com/WordPress/gutenberg/pull/75410))
 - Improve UI in `list` layout when we render only title and/or media fields. ([76042](https://github.com/WordPress/gutenberg/pull/76042))
 - MediaEdit: Auto-fill columns based on minimum item width. ([75509](https://github.com/WordPress/gutenberg/pull/75509))
+- DataViews: Remove menu divider again. ([75893](https://github.com/WordPress/gutenberg/pull/75893))
+- DataViews: Minimize padding for primary action buttons. ([75721](https://github.com/WordPress/gutenberg/pull/75721))
 
 #### Post Editor
 - Center navigation preview content in preview pane. ([75741](https://github.com/WordPress/gutenberg/pull/75741))
@@ -111,7 +54,6 @@ The following contributors merged PRs in this release:
 - Try enabling style variation transforms for blocks in contentOnly mode. ([75761](https://github.com/WordPress/gutenberg/pull/75761))
 
 #### Site Editor
-- DataViews: Minimize padding for primary action buttons. ([75721](https://github.com/WordPress/gutenberg/pull/75721))
 - QuickEdit: Rename status label and remove extra labels in popup. ([75824](https://github.com/WordPress/gutenberg/pull/75824))
 
 #### Components
@@ -137,6 +79,7 @@ The following contributors merged PRs in this release:
 - Theme: Add build plugins to inject design token fallbacks. ([75589](https://github.com/WordPress/gutenberg/pull/75589))
 - Theme: Remove global design tokens stylesheet. ([75879](https://github.com/WordPress/gutenberg/pull/75879))
 - wp-build: Deregister script modules before re-registering. ([75909](https://github.com/WordPress/gutenberg/pull/75909))
+- CI: Don't build release notes during plugin build workflow for WP Core sync ([76398](https://github.com/WordPress/gutenberg/pull/76398))
 
 #### Collaboration
 - Fix change-detection and new-post end-to-end tests after RTC enabled by default. ([75751](https://github.com/WordPress/gutenberg/pull/75751))
@@ -152,6 +95,7 @@ The following contributors merged PRs in this release:
 - Real-time collaboration: Remove ghost awareness state explicitly when refreshing. ([75883](https://github.com/WordPress/gutenberg/pull/75883))
 - [Real-time Collaboration] Fix sync issue on refresh. ([76017](https://github.com/WordPress/gutenberg/pull/76017))
 - Real-time collaboration: Improve disconnect dialog. ([75970](https://github.com/WordPress/gutenberg/pull/75970))
+- RTC: Enable RTC by default ([75739](https://github.com/WordPress/gutenberg/pull/75739))
 
 #### Block Library
 - Block Support: Fix custom CSS not saved when style schema is not defined. ([75797](https://github.com/WordPress/gutenberg/pull/75797))
@@ -212,12 +156,16 @@ The following contributors merged PRs in this release:
 
 #### Client Side Media
 - Fix: Skip scaled image sideload for images below big image threshold. ([75990](https://github.com/WordPress/gutenberg/pull/75990))
+- Client-side media processing: Try plumbing invalidation to the block-editor's mediaUpload onSuccess callback ([76173](https://github.com/WordPress/gutenberg/pull/76173))
+- Client-side media processing: only use media upload provider when not in preview mode ([76124](https://github.com/WordPress/gutenberg/pull/76124))
+
 
 #### Font Library
 - Fix: Use the same context for font library tabs translations. ([75930](https://github.com/WordPress/gutenberg/pull/75930))
 
 #### Interactivity API
 - Interactivity Router: Fix back and forward navigation after refresh. ([75927](https://github.com/WordPress/gutenberg/pull/75927))
+- Interactivity: Fix crypto.randomUUID crash in non-secure contexts ([76151](https://github.com/WordPress/gutenberg/pull/76151))
 
 #### Patterns
 - Unsynced patterns: Rename 'Disconnect pattern' to 'Detach pattern' in context menu. ([75807](https://github.com/WordPress/gutenberg/pull/75807))
@@ -345,7 +293,9 @@ The following PRs were merged by first-time contributors:
 
 The following contributors merged PRs in this release:
 
-@aagam-shah @aaronrobertshaw @adamsilverstein @aduth @alecgeatches @andrewserong @chriszarate @ciampo @DAreRodz @desrosj @dhasilva @dlind1 @ellatrix @fushar @gziolo @im3dabasia @ingeniumed @jasmussen @jeherve @jeryj @jorgefilipecosta @JosVelasco @jsnajdr @luisherranz @Mamaduka @manzoorwanijk @maxschmeling @Mayank-Tripathi32 @mcsf @mikachan @mikejolley @mirka @Mustafabharmal @namankhare @ntsekouras @oandregal @ockham @peterwilsoncc @prasadkarmalkar @ramonjd @scruffian @sgomes @shail-mehta @shekharnwagh @Soean @stokesman @t-hamano @talldan @tellthemachines @xristos3490 @youknowriad
+@aagam-shah @aaronrobertshaw @adamsilverstein @aduth @alecgeatches @andrewserong @aswasif007 @chriszarate @ciampo @DAreRodz @desrosj @dhasilva @dlind1 @ellatrix @fushar @gziolo @iamchughmayank @im3dabasia @ingeniumed @jasmussen @jeherve @jeryj @jorgefilipecosta @JosVelasco @jsnajdr @luisherranz @Mamaduka @manzoorwanijk @maxschmeling @Mayank-Tripathi32 @mcsf @mikachan @mikejolley @mirka @Mustafabharmal @namankhare @ntsekouras @oandregal @ockham @peterwilsoncc @prasadkarmalkar @ramonjd @scruffian @sgomes @shail-mehta @shekharnwagh @Soean @stokesman @t-hamano @talldan @tellthemachines @xristos3490 @youknowriad
+
+
 
 
 = 22.6.0 =
