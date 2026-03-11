@@ -789,4 +789,315 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 				},
 			] );
 	} );
+
+	test( 'Widget and dynamic blocks sync modifications between users', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		test.setTimeout( 60_000 );
+
+		const post = await requestUtils.createPost( {
+			title: 'Gauntlet - Widget Blocks',
+			status: 'draft',
+			date_gmt: new Date().toISOString(),
+		} );
+		await collaborationUtils.openCollaborativeSession( post.id );
+
+		const { editor2, page2 } = collaborationUtils;
+
+		// User A inserts all widget/dynamic blocks.
+		await editor.insertBlock( {
+			name: 'core/archives',
+			attributes: {
+				displayAsDropdown: false,
+				showPostCounts: false,
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/calendar',
+		} );
+		await editor.insertBlock( {
+			name: 'core/categories',
+			attributes: {
+				displayAsDropdown: false,
+				showHierarchy: false,
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/latest-posts',
+			attributes: { postsToShow: 5, displayPostDate: false },
+		} );
+		await editor.insertBlock( {
+			name: 'core/latest-comments',
+			attributes: { commentsToShow: 5, displayAvatar: true },
+		} );
+		await editor.insertBlock( {
+			name: 'core/rss',
+			attributes: {
+				feedURL: 'https://example.com/feed',
+				itemsToShow: 5,
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/search',
+			attributes: { label: 'Search', buttonText: 'Search' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/tag-cloud',
+			attributes: { numberOfTags: 45, showTagCounts: false },
+		} );
+		await editor.insertBlock( {
+			name: 'core/social-links',
+			innerBlocks: [
+				{
+					name: 'core/social-link',
+					attributes: {
+						service: 'wordpress',
+						url: 'https://wordpress.org',
+					},
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/separator',
+		} );
+		await editor.insertBlock( {
+			name: 'core/spacer',
+			attributes: { height: '100px' },
+		} );
+
+		// Wait for User B to see all 11 blocks.
+		await expect
+			.poll( () => editor2.getBlocks(), { timeout: 10_000 } )
+			.toHaveLength( 11 );
+
+		// User B modifies each block via sidebar controls.
+
+		// Helper to select a block and open the sidebar.
+		async function selectBlockAndOpenSidebar( blockType: string ) {
+			const blockLocator = editor2.canvas.locator(
+				`[data-type="${ blockType }"]`
+			);
+			await blockLocator.click();
+			await editor2.openDocumentSettingsSidebar();
+		}
+
+		// Archives: toggle "Display as dropdown" and "Show post counts".
+		await selectBlockAndOpenSidebar( 'core/archives' );
+		await page2
+			.getByRole( 'checkbox', { name: /Display as dropdown/i } )
+			.click();
+		await page2
+			.getByRole( 'checkbox', { name: /Show post counts/i } )
+			.click();
+
+		// Calendar: set month and year via sidebar.
+		// Calendar has limited sidebar controls; use data API.
+		await page2.evaluate( () => {
+			const blocks = window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks();
+			const calendar = blocks.find(
+				( b: { name: string } ) => b.name === 'core/calendar'
+			);
+			if ( calendar ) {
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.updateBlockAttributes( calendar.clientId, {
+						month: 6,
+						year: 2025,
+					} );
+			}
+		} );
+
+		// Categories: toggle "Display as dropdown" and "Show hierarchy".
+		await selectBlockAndOpenSidebar( 'core/categories' );
+		await page2
+			.getByRole( 'checkbox', { name: /Display as dropdown/i } )
+			.click();
+		await page2
+			.getByRole( 'checkbox', { name: /Show hierarchy/i } )
+			.click();
+
+		// Latest Posts: change number and toggle date.
+		await selectBlockAndOpenSidebar( 'core/latest-posts' );
+		const latestPostsNumber = page2.getByRole( 'spinbutton', {
+			name: /Number of items/i,
+		} );
+		await latestPostsNumber.fill( '3' );
+		await page2.getByRole( 'checkbox', { name: /Post date/i } ).click();
+
+		// Latest Comments: change number and uncheck avatar.
+		await selectBlockAndOpenSidebar( 'core/latest-comments' );
+		const latestCommentsNumber = page2.getByRole( 'spinbutton', {
+			name: /Number of comments/i,
+		} );
+		await latestCommentsNumber.fill( '3' );
+		await page2.getByRole( 'checkbox', { name: /Avatar/i } ).click();
+
+		// RSS: change number and toggle excerpt.
+		await selectBlockAndOpenSidebar( 'core/rss' );
+		const rssNumber = page2.getByRole( 'spinbutton', {
+			name: /Number of items/i,
+		} );
+		await rssNumber.fill( '3' );
+		await page2.getByRole( 'checkbox', { name: /Excerpt/i } ).click();
+
+		// Search: edit label and button text via keyboard.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/search"] [aria-label="Label text"]'
+			),
+			'Find'
+		);
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/search"] [aria-label="Button text"]'
+			),
+			'Go'
+		);
+
+		// Tag Cloud: change number and toggle counts.
+		await selectBlockAndOpenSidebar( 'core/tag-cloud' );
+		const tagCloudNumber = page2.getByRole( 'spinbutton', {
+			name: /Number of tags/i,
+		} );
+		await tagCloudNumber.fill( '20' );
+		await page2
+			.getByRole( 'checkbox', { name: /Show tag counts/i } )
+			.click();
+
+		// Social Links > Social Link: update URL via data API (link editor is complex).
+		await page2.evaluate( () => {
+			const blocks = window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks();
+			const socialLinks = blocks.find(
+				( b: { name: string } ) => b.name === 'core/social-links'
+			);
+			if ( socialLinks && socialLinks.innerBlocks[ 0 ] ) {
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.updateBlockAttributes(
+						socialLinks.innerBlocks[ 0 ].clientId,
+						{ url: 'https://edited.org' }
+					);
+			}
+		} );
+
+		// Separator: data API fallback (no direct UI for opacity).
+		await page2.evaluate( () => {
+			const blocks = window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks();
+			const separator = blocks.find(
+				( b: { name: string } ) => b.name === 'core/separator'
+			);
+			if ( separator ) {
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.updateBlockAttributes( separator.clientId, {
+						opacity: 'css',
+					} );
+			}
+		} );
+
+		// Spacer: data API fallback (resize handle is fragile).
+		await page2.evaluate( () => {
+			const blocks = window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks();
+			const spacer = blocks.find(
+				( b: { name: string } ) => b.name === 'core/spacer'
+			);
+			if ( spacer ) {
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.updateBlockAttributes( spacer.clientId, {
+						height: '200px',
+					} );
+			}
+		} );
+
+		// User A verifies all modifications synced.
+		await expect
+			.poll( () => editor.getBlocks(), { timeout: 10_000 } )
+			.toMatchObject( [
+				{
+					name: 'core/archives',
+					attributes: {
+						displayAsDropdown: true,
+						showPostCounts: true,
+					},
+				},
+				{
+					name: 'core/calendar',
+					attributes: { month: 6, year: 2025 },
+				},
+				{
+					name: 'core/categories',
+					attributes: {
+						displayAsDropdown: true,
+						showHierarchy: true,
+					},
+				},
+				{
+					name: 'core/latest-posts',
+					attributes: {
+						postsToShow: 3,
+						displayPostDate: true,
+					},
+				},
+				{
+					name: 'core/latest-comments',
+					attributes: {
+						commentsToShow: 3,
+						displayAvatar: false,
+					},
+				},
+				{
+					name: 'core/rss',
+					attributes: {
+						itemsToShow: 3,
+						displayExcerpt: true,
+					},
+				},
+				{
+					name: 'core/search',
+					attributes: {
+						label: 'Find',
+						buttonText: 'Go',
+					},
+				},
+				{
+					name: 'core/tag-cloud',
+					attributes: {
+						numberOfTags: 20,
+						showTagCounts: true,
+					},
+				},
+				{
+					name: 'core/social-links',
+					innerBlocks: [
+						{
+							name: 'core/social-link',
+							attributes: {
+								url: 'https://edited.org',
+							},
+						},
+					],
+				},
+				{
+					name: 'core/separator',
+					attributes: { opacity: 'css' },
+				},
+				{
+					name: 'core/spacer',
+					attributes: { height: '200px' },
+				},
+			] );
+	} );
 } );
