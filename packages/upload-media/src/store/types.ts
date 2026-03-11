@@ -178,6 +178,9 @@ export interface Settings {
 	pngInterlaced?: boolean;
 	// Whether to use interlaced encoding for GIF.
 	gifInterlaced?: boolean;
+	// Default image quality (0-1) for resize/crop operations.
+	// Default is 0.82 if not set.
+	imageQuality?: number;
 }
 
 // Matches the Attachment type from the media-utils package.

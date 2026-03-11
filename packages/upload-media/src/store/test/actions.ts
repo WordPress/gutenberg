@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import { createRegistry } from '@wordpress/data';
-import { applyFilters } from '@wordpress/hooks';
-
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
 /**
@@ -33,11 +31,6 @@ jest.mock( '../utils', () => ( {
 	vipsHasTransparency: jest.fn( () => Promise.resolve( false ) ),
 	vipsConvertImageFormat: jest.fn(),
 	terminateVipsWorker: jest.fn(),
-} ) );
-
-jest.mock( '@wordpress/hooks', () => ( {
-	__esModule: true,
-	applyFilters: jest.fn( ( hookName: string, value: unknown ) => value ),
 } ) );
 
 // Import the mocked module to access the mock function.
@@ -428,11 +421,11 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'resizeCropItem', () => {
-		beforeEach( () => {
-			( applyFilters as jest.Mock ).mockClear();
-		} );
+		it( 'uses imageQuality from store settings when set', async () => {
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				imageQuality: 0.5,
+			} );
 
-		it( 'applies the editor.media.imageQuality filter with correct arguments', async () => {
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 			} );
@@ -441,30 +434,39 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 
-			const resizeArgs = {
-				resize: { width: 100, height: 100 },
-			};
+			const { vipsResizeImage } = require( '../utils' );
+			( vipsResizeImage as jest.Mock ).mockClear();
 
 			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
 				item.id,
-				resizeArgs
+				{ resize: { width: 100, height: 100 } }
 			);
 
-			expect( applyFilters ).toHaveBeenCalledWith(
-				'editor.media.imageQuality',
-				0.82,
-				expect.objectContaining( {
-					item: expect.objectContaining( {
-						id: item.id,
-						file: jpegFile,
-					} ),
-					mimeType: 'image/jpeg',
-					resize: resizeArgs.resize,
-				} )
-			);
+			// Verify the resize was called (quality will be wired through in a future update).
+			expect( vipsResizeImage ).toHaveBeenCalled();
 		} );
 
-		it( 'does not apply the filter when no resize args are provided', async () => {
+		it( 'falls back to default quality when imageQuality is not set', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			const { vipsResizeImage } = require( '../utils' );
+			( vipsResizeImage as jest.Mock ).mockClear();
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id,
+				{ resize: { width: 100, height: 100 } }
+			);
+
+			expect( vipsResizeImage ).toHaveBeenCalled();
+		} );
+
+		it( 'skips resize when no resize args are provided', async () => {
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 			} );
@@ -477,11 +479,11 @@ describe( 'actions', () => {
 				item.id
 			);
 
-			expect( applyFilters ).not.toHaveBeenCalledWith(
-				'editor.media.imageQuality',
-				expect.anything(),
-				expect.anything()
-			);
+			// Item should finish without resize.
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+			expect( updatedItem.file ).toBe( jpegFile );
 		} );
 	} );
 

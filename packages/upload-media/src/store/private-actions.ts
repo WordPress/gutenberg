@@ -9,8 +9,6 @@ import { v4 as uuidv4 } from 'uuid';
 import apiFetch from '@wordpress/api-fetch';
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
-import { applyFilters } from '@wordpress/hooks';
-
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
 /**
@@ -888,22 +886,6 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		const addSuffix = Boolean( item.parentId );
 		// Add '-scaled' suffix for big image threshold resizing.
 		const scaledSuffix = Boolean( args.isThresholdResize );
-
-		/**
-		 * Filters the image quality setting for client side media processing.
-		 *
-		 * Allows plugins to control the quality (0-1) used when resizing images.
-		 * Note: Quality is not yet wired through to the vips worker but will
-		 * be in a future update. This hook is provided as an extension point.
-		 *
-		 * @param {number} quality Default quality (0-1).
-		 * @param {Object} context Context object containing item, mimeType, and resize args.
-		 */
-		applyFilters( 'editor.media.imageQuality', DEFAULT_OUTPUT_QUALITY, {
-			item,
-			mimeType: item.file.type,
-			resize: args?.resize,
-		} );
 
 		try {
 			const file = await vipsResizeImage(
