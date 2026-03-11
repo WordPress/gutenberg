@@ -92,7 +92,7 @@ export function TimePicker( {
 		{ value: '12', label: __( 'December' ) },
 	] as const;
 
-	const { day, month, year, minutes, hours } = useMemo(
+	const { day, month, year, minutes, hours, daysInMonth } = useMemo(
 		() => ( {
 			day: formatDate( 'd', date ),
 			month: formatDate(
@@ -102,6 +102,11 @@ export function TimePicker( {
 			year: formatDate( 'Y', date ),
 			minutes: formatDate( 'i', date ),
 			hours: formatDate( 'H', date ),
+			daysInMonth: new Date(
+				Number( formatDate( 'Y', date ) ),
+				Number( formatDate( 'n', date ) ),
+				0
+			).getDate(),
 		} ),
 		[ date ]
 	);
@@ -150,7 +155,7 @@ export function TimePicker( {
 			value={ day }
 			step={ 1 }
 			min={ 1 }
-			max={ 31 }
+			max={ daysInMonth }
 			required
 			spinControls="none"
 			isPressEnterToChange

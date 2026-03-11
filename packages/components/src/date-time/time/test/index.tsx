@@ -178,7 +178,29 @@ describe( 'TimePicker', () => {
 		await user.keyboard( '{Tab}' );
 
 		expect( onChangeSpy ).toHaveBeenCalledWith( '2026-02-28T00:00:00' );
-		// expect( dayInput ).toHaveValue( 28 ); // TODO: Enable after https://github.com/WordPress/gutenberg/pull/76399
+		expect( dayInput ).toHaveValue( 28 );
+	} );
+
+	it( 'should clamp day when switching months', async () => {
+		const user = userEvent.setup();
+
+		const onChangeSpy = jest.fn();
+
+		render(
+			<TimePicker
+				currentTime="2026-03-31T00:00:00"
+				onChange={ onChangeSpy }
+				is12Hour
+			/>
+		);
+
+		const monthSelect = screen.getByLabelText( 'Month' );
+		const dayInput = screen.getByLabelText( 'Day' );
+
+		await user.selectOptions( monthSelect, '02' );
+
+		expect( onChangeSpy ).toHaveBeenCalledWith( '2026-02-28T00:00:00' );
+		expect( dayInput ).toHaveValue( 28 );
 	} );
 
 	it( 'should switch to PM correctly', async () => {
