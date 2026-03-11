@@ -8,8 +8,9 @@ import { check, chevronDown } from '@wordpress/icons';
 
 export interface UploadingFile {
 	id: string;
+	batchId: string;
 	name: string;
-	status: 'uploading' | 'complete' | 'error';
+	status: 'uploading' | 'uploaded' | 'error';
 	error?: string;
 }
 
@@ -116,11 +117,11 @@ export function UploadStatusPopover( {
 								className="media-upload-modal__upload-status__item"
 							>
 								{ file.status === 'uploading' && <Spinner /> }
-								{ file.status === 'complete' && (
+								{ file.status === 'uploaded' && (
 									<Icon icon={ check } size={ 16 } />
 								) }
 								{ ( file.status === 'uploading' ||
-									file.status === 'complete' ) && (
+									file.status === 'uploaded' ) && (
 									<span
 										className="media-upload-modal__upload-status__filename"
 										title={ file.name }

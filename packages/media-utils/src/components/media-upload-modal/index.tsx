@@ -40,7 +40,6 @@ import {
 	mimeTypeField,
 } from '@wordpress/media-fields';
 import { store as noticesStore, SnackbarNotices } from '@wordpress/notices';
-import { isBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -48,17 +47,11 @@ import { isBlobURL } from '@wordpress/blob';
 import type { Attachment, RestAttachment } from '../../utils/types';
 import { transformAttachment } from '../../utils/transform-attachment';
 import { uploadMedia } from '../../utils/upload-media';
-import { UploadError } from '../../utils/upload-error';
 import { unlock } from '../../lock-unlock';
-import {
-	UploadStatusPopover,
-	type UploadingFile,
-} from './upload-status-popover';
+import { UploadStatusPopover } from './upload-status-popover';
+import { useUploadStatus } from './use-upload-status';
 
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
-
-// Module-level counter for generating unique IDs for upload status entries.
-let uploadIdCounter = 0;
 
 // Layout constants - matching the picker layout types
 const LAYOUT_PICKER_GRID = 'pickerGrid';
@@ -189,30 +182,24 @@ export function MediaUploadModal( {
 			: [ String( value ) ];
 	} );
 
-	const [ uploadingFiles, setUploadingFiles ] = useState< UploadingFile[] >(
-		[]
-	);
-	const completionTimeoutRef = useRef< ReturnType< typeof setTimeout > >();
+	const {
+		uploadingFiles,
+		registerBatch,
+		dismissError,
+		clearCompleted,
+		allComplete,
+	} = useUploadStatus();
+
 	const isPopoverOpenRef = useRef( false );
-
-	// Clear timeout on unmount.
-	useEffect( () => {
-		return () => {
-			if ( completionTimeoutRef.current ) {
-				clearTimeout( completionTimeoutRef.current );
+	const handlePopoverOpenChange = useCallback(
+		( open: boolean ) => {
+			isPopoverOpenRef.current = open;
+			if ( ! open ) {
+				clearCompleted();
 			}
-		};
-	}, [] );
-
-	const handlePopoverOpenChange = useCallback( ( open: boolean ) => {
-		isPopoverOpenRef.current = open;
-		// When the popover closes, clear completed files.
-		if ( ! open ) {
-			setUploadingFiles( ( prev ) =>
-				prev.filter( ( f ) => f.status !== 'complete' )
-			);
-		}
-	}, [] );
+		},
+		[ clearCompleted ]
+	);
 
 	const { createSuccessNotice, removeAllNotices } =
 		useDispatch( noticesStore );
@@ -359,11 +346,12 @@ export function MediaUploadModal( {
 						? transformedPosts
 						: transformedPosts?.[ 0 ];
 
+					removeAllNotices( 'snackbar', NOTICES_CONTEXT );
 					onSelect( selectedItems );
 				},
 			},
 		],
-		[ multiple, onSelect, selection ]
+		[ multiple, onSelect, selection, removeAllNotices ]
 	);
 
 	const handleModalClose = useCallback( () => {
@@ -374,47 +362,53 @@ export function MediaUploadModal( {
 	// Use onUpload if provided, otherwise fall back to uploadMedia
 	const handleUpload = onUpload || uploadMedia;
 
-	// Shared upload success handler
-	const handleUploadComplete = useCallback(
+	// Per-batch completion handler: auto-select uploaded items and refresh the grid.
+	const handleBatchComplete = useCallback(
 		( attachments: Partial< Attachment >[] ) => {
-			// Check if all uploads are complete (no blob URLs)
-			const allComplete = attachments.every(
-				( attachment ) =>
-					attachment.id &&
-					attachment.url &&
-					! isBlobURL( attachment.url )
-			);
+			const uploadedIds = attachments
+				.map( ( attachment ) => String( attachment.id ) )
+				.filter( Boolean );
 
-			if ( allComplete && attachments.length > 0 ) {
-				// Mark uploading files as complete
-				setUploadingFiles( ( prev ) =>
-					prev.map( ( f ) =>
-						f.status === 'uploading'
-							? { ...f, status: 'complete' as const }
-							: f
-					)
-				);
+			if ( multiple ) {
+				setSelection( ( prev ) => {
+					const existing = new Set( prev );
+					const newIds = uploadedIds.filter(
+						( id ) => ! existing.has( id )
+					);
+					return [ ...prev, ...newIds ];
+				} );
+			} else {
+				setSelection( uploadedIds.slice( 0, 1 ) );
+			}
 
-				// Clear completed entries after a delay, but only if the
-				// popover isn't open. If it is, they'll be cleared on close.
-				completionTimeoutRef.current = setTimeout( () => {
-					if ( ! isPopoverOpenRef.current ) {
-						setUploadingFiles( ( prev ) =>
-							prev.filter( ( f ) => f.status !== 'complete' )
-						);
-					}
-				}, 2000 );
+			// Invalidate immediately so newly uploaded files appear in the grid.
+			// The server has already returned 201 responses at this point.
+			invalidateResolution( 'getEntityRecords', [
+				'postType',
+				'attachment',
+				queryArgs,
+			] );
+		},
+		[ multiple, invalidateResolution, queryArgs ]
+	);
 
-				// Show success notice
+	// Show success notice and auto-clear completed entries when all batches finish.
+	const prevAllCompleteRef = useRef( false );
+	useEffect( () => {
+		if ( allComplete && ! prevAllCompleteRef.current ) {
+			const completeCount = uploadingFiles.filter(
+				( f ) => f.status === 'uploaded'
+			).length;
+			if ( completeCount > 0 ) {
 				createSuccessNotice(
 					sprintf(
 						// translators: %s: number of files
 						_n(
 							'Uploaded %s file',
 							'Uploaded %s files',
-							attachments.length
+							completeCount
 						),
-						attachments.length.toLocaleString()
+						completeCount.toLocaleString()
 					),
 					{
 						type: 'snackbar',
@@ -422,82 +416,35 @@ export function MediaUploadModal( {
 						id: NOTICE_ID_UPLOAD_PROGRESS,
 					}
 				);
-
-				// Auto-select the newly uploaded items
-				const uploadedIds = attachments
-					.map( ( attachment ) => String( attachment.id ) )
-					.filter( Boolean );
-
-				if ( multiple ) {
-					// In multiple mode, add to existing selection
-					setSelection( ( prev ) => [ ...prev, ...uploadedIds ] );
-				} else {
-					// In single mode, replace selection with the first uploaded item
-					setSelection( uploadedIds.slice( 0, 1 ) );
-				}
-
-				// Invalidate the entity records resolution to refresh the view
-				invalidateResolution( 'getEntityRecords', [
-					'postType',
-					'attachment',
-					queryArgs,
-				] );
 			}
-		},
-		[ createSuccessNotice, invalidateResolution, queryArgs, multiple ]
-	);
 
-	// Shared upload error handler
-	const handleUploadError = useCallback( ( error: Error ) => {
-		const fileName =
-			error instanceof UploadError ? error.file.name : undefined;
-
-		setUploadingFiles( ( prev ) => {
-			let matched = false;
-			return prev.map( ( f ) => {
-				if (
-					! matched &&
-					fileName &&
-					f.name === fileName &&
-					f.status === 'uploading'
-				) {
-					matched = true;
-					return {
-						...f,
-						status: 'error' as const,
-						error: error.message,
-					};
-				}
-				return f;
-			} );
-		} );
-	}, [] );
+			// Auto-clear completed entries, unless the popover is
+			// open — in that case, they'll be cleared on close.
+			if ( ! isPopoverOpenRef.current ) {
+				clearCompleted();
+			}
+		}
+		prevAllCompleteRef.current = allComplete;
+	}, [ allComplete, uploadingFiles, createSuccessNotice, clearCompleted ] );
 
 	const handleFileSelect = useCallback(
 		( event: React.ChangeEvent< HTMLInputElement > ) => {
 			const files = event.target.files;
 			if ( files && files.length > 0 ) {
 				const filesArray = Array.from( files );
-
-				// Track uploading files in popover
-				const newEntries: UploadingFile[] = filesArray.map(
-					( file ) => ( {
-						id: String( ++uploadIdCounter ),
-						name: file.name,
-						status: 'uploading' as const,
-					} )
-				);
-				setUploadingFiles( ( prev ) => [ ...prev, ...newEntries ] );
+				const { onFileChange, onError } = registerBatch( filesArray, {
+					onBatchComplete: handleBatchComplete,
+				} );
 
 				handleUpload( {
 					allowedTypes,
 					filesList: filesArray,
-					onFileChange: handleUploadComplete,
-					onError: handleUploadError,
+					onFileChange,
+					onError,
 				} );
 			}
 		},
-		[ allowedTypes, handleUpload, handleUploadComplete, handleUploadError ]
+		[ allowedTypes, handleUpload, registerBatch, handleBatchComplete ]
 	);
 
 	const paginationInfo = useMemo(
@@ -584,24 +531,16 @@ export function MediaUploadModal( {
 						);
 					}
 					if ( filteredFiles.length > 0 ) {
-						// Track uploading files in popover
-						const newEntries: UploadingFile[] = filteredFiles.map(
-							( file ) => ( {
-								id: String( ++uploadIdCounter ),
-								name: file.name,
-								status: 'uploading' as const,
-							} )
+						const { onFileChange, onError } = registerBatch(
+							filteredFiles,
+							{ onBatchComplete: handleBatchComplete }
 						);
-						setUploadingFiles( ( prev ) => [
-							...prev,
-							...newEntries,
-						] );
 
 						handleUpload( {
 							allowedTypes,
 							filesList: filteredFiles,
-							onFileChange: handleUploadComplete,
-							onError: handleUploadError,
+							onFileChange,
+							onError,
 						} );
 					}
 				} }
@@ -652,11 +591,7 @@ export function MediaUploadModal( {
 				>
 					<UploadStatusPopover
 						uploadingFiles={ uploadingFiles }
-						onDismissError={ ( fileId ) => {
-							setUploadingFiles( ( prev ) =>
-								prev.filter( ( f ) => f.id !== fileId )
-							);
-						} }
+						onDismissError={ dismissError }
 						onOpenChange={ handlePopoverOpenChange }
 					/>
 					<DataViewsPicker.BulkActionToolbar />
