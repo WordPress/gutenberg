@@ -61,6 +61,7 @@ export const Default: Story = {
  * shows an alignment (`start`, `center`, `end`).
  */
 export const Positioning: Story = {
+	parameters: { controls: { disable: true } },
 	render: function Render() {
 		const sides = [ 'top', 'right', 'bottom', 'left' ] as const;
 		const aligns = [ 'start', 'center', 'end' ] as const;
@@ -154,6 +155,11 @@ export const WithCloseButton: Story = {
  * `onOpenChange`, keeping everything in sync.
  */
 export const Controlled: Story = {
+	argTypes: {
+		open: { control: false },
+		onOpenChange: { control: false },
+		defaultOpen: { control: false },
+	},
 	render: function Render() {
 		const [ isOpen, setIsOpen ] = useState( false );
 		const checkboxId = useId();
@@ -197,12 +203,14 @@ export const Controlled: Story = {
  * popover until it is dismissed.
  */
 export const Modal: Story = {
-	render: function Render() {
+	args: { modal: true },
+	argTypes: { modal: { control: false } },
+	render: function Render( { modal: modalArg } ) {
 		const nameId = useId();
 		const emailId = useId();
 
 		return (
-			<Popover.Root modal>
+			<Popover.Root modal={ modalArg }>
 				<Popover.Trigger>Edit Settings</Popover.Trigger>
 				<Popover.Popup>
 					<Popover.Arrow />
@@ -341,13 +349,15 @@ function useMeasure< TRef extends HTMLElement >() {
  * the trigger element in place.
  */
 export const OverlayPlacement: Story = {
-	render: function Render() {
+	args: { defaultOpen: true },
+	argTypes: { defaultOpen: { control: false } },
+	render: function Render( { defaultOpen: defaultOpenArg } ) {
 		const [ popupRef, popupSize ] = useMeasure< HTMLDivElement >();
 		const [ triggerRef, triggerSize ] = useMeasure< HTMLButtonElement >();
 
 		return (
 			<div style={ { padding: '4rem', textAlign: 'center' } }>
-				<Popover.Root defaultOpen>
+				<Popover.Root defaultOpen={ defaultOpenArg }>
 					<Popover.Trigger ref={ triggerRef }>
 						Trigger (covered by popover)
 					</Popover.Trigger>
@@ -439,6 +449,7 @@ export const Inline: Story = {
  * Scroll the container to see collision avoidance in action.
  */
 export const CollisionAvoidance: Story = {
+	parameters: { controls: { disable: true } },
 	render: function Render() {
 		const [ boundary, setBoundary ] = useState< HTMLElement | null >(
 			null
@@ -541,7 +552,9 @@ type GenericIframeProps = React.ComponentProps< 'iframe' > & {
  * position across document boundaries.
  */
 export const CrossIframe: Story = {
-	render: function Render() {
+	args: { defaultOpen: true },
+	argTypes: { defaultOpen: { control: false } },
+	render: function Render( { defaultOpen: defaultOpenArg } ) {
 		const portalContainerRef = useRef< HTMLDivElement >( null );
 		const [ iframeBoundary, setIframeBoundary ] =
 			useState< HTMLIFrameElement | null >( null );
@@ -571,7 +584,7 @@ export const CrossIframe: Story = {
 								marginInline: 'auto',
 							} }
 						>
-							<Popover.Root defaultOpen>
+							<Popover.Root defaultOpen={ defaultOpenArg }>
 								<Popover.Trigger
 									style={ {
 										padding: 8,
@@ -619,7 +632,9 @@ export const CrossIframe: Story = {
  */
 export const CrossIframeWithSlotFill: Story = {
 	name: 'Cross-Iframe (SlotFill)',
-	render: function Render() {
+	args: { defaultOpen: true },
+	argTypes: { defaultOpen: { control: false } },
+	render: function Render( { defaultOpen: defaultOpenArg } ) {
 		const slotRef = useRef< HTMLDivElement >( null );
 		const [ iframeBoundary, setIframeBoundary ] =
 			useState< HTMLIFrameElement | null >( null );
@@ -653,7 +668,7 @@ export const CrossIframeWithSlotFill: Story = {
 								marginInline: 'auto',
 							} }
 						>
-							<Popover.Root defaultOpen>
+							<Popover.Root defaultOpen={ defaultOpenArg }>
 								<Popover.Trigger
 									style={ {
 										padding: 8,
