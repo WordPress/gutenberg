@@ -195,11 +195,11 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		/**
 		 * Retrieves the list of all registered connectors.
 		 *
-		 * Do not use this method directly. Instead, use the `gutenberg_get_connectors()` function.
+		 * Do not use this method directly. Instead, use the `wp_get_connectors()` function.
 		 *
 		 * @since 7.0.0
 		 *
-		 * @see gutenberg_get_connectors()
+		 * @see wp_get_connectors()
 		 *
 		 * @return array<string, array> The array of registered connectors keyed by connector ID.
 		 * @phpstan-return array<string, Connector>
@@ -211,11 +211,11 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		/**
 		 * Checks if a connector is registered.
 		 *
-		 * Do not use this method directly. Instead, use the `gutenberg_is_connector_registered()` function.
+		 * Do not use this method directly. Instead, use the `wp_is_connector_registered()` function.
 		 *
 		 * @since 7.0.0
 		 *
-		 * @see gutenberg_is_connector_registered()
+		 * @see wp_is_connector_registered()
 		 *
 		 * @param string $id The connector identifier.
 		 * @return bool True if the connector is registered, false otherwise.
@@ -227,11 +227,11 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		/**
 		 * Retrieves a registered connector.
 		 *
-		 * Do not use this method directly. Instead, use the `gutenberg_get_connector()` function.
+		 * Do not use this method directly. Instead, use the `wp_get_connector()` function.
 		 *
 		 * @since 7.0.0
 		 *
-		 * @see gutenberg_get_connector()
+		 * @see wp_get_connector()
 		 *
 		 * @param string $id The connector identifier.
 		 * @return array|null The registered connector data, or null if it is not registered.
