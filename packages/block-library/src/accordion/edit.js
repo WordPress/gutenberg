@@ -65,6 +65,7 @@ export default function Edit( {
 	} );
 
 	const addAccordionItemBlock = () => {
+		// When adding, set the header's level to current headingLevel
 		const newAccordionItem = createBlock( ACCORDION_BLOCK_NAME, {}, [
 			createBlock( ACCORDION_HEADING_BLOCK_NAME, {
 				level: headingLevel,
