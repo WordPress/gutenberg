@@ -2320,18 +2320,18 @@ function listViewExpandRevision( state = 0, action ) {
  *
  * @return {Object} Updated state.
  */
-function siblingStyleSync( state = {}, action ) {
+export function siblingStyleSync( state = {}, action ) {
 	switch ( action.type ) {
 		case 'UNLINK_SIBLING_STYLE_SYNC': {
 			const key = `${ action.scopeClientId }:${ action.blockName }`;
-			const existing = state[ key ] ?? { unlinkedIds: new Set() };
+			const existing = state[ key ] ?? { unlinkedIds: {} };
 			return {
 				...state,
 				[ key ]: {
-					unlinkedIds: new Set( [
+					unlinkedIds: {
 						...existing.unlinkedIds,
-						action.clientId,
-					] ),
+						[ action.clientId ]: true,
+					},
 				},
 			};
 		}
@@ -2341,9 +2341,9 @@ function siblingStyleSync( state = {}, action ) {
 			if ( ! existing ) {
 				return state;
 			}
-			const unlinkedIds = new Set( existing.unlinkedIds );
-			unlinkedIds.delete( action.clientId );
-			return { ...state, [ key ]: { unlinkedIds } };
+			const { [ action.clientId ]: _, ...nextUnlinkedIds } =
+				existing.unlinkedIds;
+			return { ...state, [ key ]: { unlinkedIds: nextUnlinkedIds } };
 		}
 		case 'REMOVE_BLOCKS':
 		case 'REPLACE_BLOCKS': {
@@ -2362,12 +2362,15 @@ function siblingStyleSync( state = {}, action ) {
 					continue;
 				}
 				// Remove any unlinked IDs that were removed.
-				const nextUnlinkedIds = new Set(
-					[ ...value.unlinkedIds ].filter(
-						( id ) => ! removedSet.has( id )
+				const nextUnlinkedIds = Object.fromEntries(
+					Object.entries( value.unlinkedIds ).filter(
+						( [ id ] ) => ! removedSet.has( id )
 					)
 				);
-				if ( nextUnlinkedIds.size !== value.unlinkedIds.size ) {
+				if (
+					Object.keys( nextUnlinkedIds ).length !==
+					Object.keys( value.unlinkedIds ).length
+				) {
 					changed = true;
 					nextState[ key ] = { unlinkedIds: nextUnlinkedIds };
 				} else {

@@ -1149,5 +1149,5 @@ export function __experimentalIsBlockStyleSyncUnlinked(
 		return false;
 	}
 	const key = `${ scopeId }:${ blockName }`;
-	return state.siblingStyleSync[ key ]?.unlinkedIds.has( clientId ) ?? false;
+	return !! state.siblingStyleSync[ key ]?.unlinkedIds?.[ clientId ];
 }
