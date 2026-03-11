@@ -214,6 +214,8 @@ export default function BlockGuidelineModal( {
 					title={ __( 'Remove block guidelines' ) }
 					onClose={ () => setShowRemoveConfirmation( false ) }
 					onConfirm={ () => {
+						// We need to pass an empty string to remove the guideline.
+						// This is because the API will only remove the guideline if the value is an empty string.
 						handleSave( '' );
 						setShowRemoveConfirmation( false );
 					} }
