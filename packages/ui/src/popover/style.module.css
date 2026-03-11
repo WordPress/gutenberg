@@ -1,0 +1,38 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.positioner {
+		z-index: var(--wp-ui-popover-z-index, initial);
+	}
+
+	.popup {
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		padding: var(--wpds-dimension-padding-md);
+		border-radius: var(--wpds-border-radius-md);
+		box-shadow: var(--wpds-elevation-md);
+		font-family: var(--wpds-font-family-body);
+		font-size: var(--wpds-font-size-md);
+		line-height: var(--wpds-font-line-height-md);
+		color: var(--wpds-color-fg-content-neutral);
+		outline: 0;
+	}
+
+	.arrow {
+		color: var(--wpds-color-bg-surface-neutral-strong);
+	}
+
+	.title {
+		margin: 0 0 var(--wpds-dimension-gap-xs);
+		font-size: var(--wpds-font-size-md);
+		font-weight: var(--wpds-font-weight-medium);
+		line-height: var(--wpds-font-line-height-md);
+		color: var(--wpds-color-fg-content-neutral);
+	}
+
+	.description {
+		margin: 0;
+		font-size: var(--wpds-font-size-sm);
+		line-height: var(--wpds-font-line-height-sm);
+		color: var(--wpds-color-fg-content-neutral-secondary);
+	}
+}
