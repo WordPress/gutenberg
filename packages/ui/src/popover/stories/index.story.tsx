@@ -282,11 +282,11 @@ export const Unstyled: Story = {
 							borderRadius: 8,
 						} }
 					>
-						<strong>Custom content</strong>
-						<p style={ { margin: '8px 0 0' } }>
+						<Popover.Title>Custom Styled</Popover.Title>
+						<Popover.Description>
 							This popup has no default styling — the consumer
 							controls all visual appearance.
-						</p>
+						</Popover.Description>
 					</div>
 				</Popover.Popup>
 			</>
@@ -470,6 +470,7 @@ export const CollisionAvoidance: Story = {
 				<Popover.Root defaultOpen>
 					<Popover.Trigger>Flip (default)</Popover.Trigger>
 					<Popover.Popup side="top">
+						<Popover.Title>Flip</Popover.Title>
 						<Popover.Description>
 							Flips to bottom when clipped
 						</Popover.Description>
@@ -485,6 +486,7 @@ export const CollisionAvoidance: Story = {
 							align: 'none',
 						} }
 					>
+						<Popover.Title>None</Popover.Title>
 						<Popover.Description>
 							Stays on top even when clipped
 						</Popover.Description>
