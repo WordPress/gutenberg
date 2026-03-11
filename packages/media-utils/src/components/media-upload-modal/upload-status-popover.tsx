@@ -92,6 +92,7 @@ export function UploadStatusPopover( {
 					placement="top-start"
 					offset={ 8 }
 					anchor={ triggerRef.current }
+					focusOnMount
 					onClose={ () => {
 						// Let the button's onClick handle toggling when
 						// the close was triggered by clicking the trigger.

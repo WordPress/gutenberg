@@ -214,7 +214,8 @@ export function MediaUploadModal( {
 		}
 	}, [] );
 
-	const { createSuccessNotice } = useDispatch( noticesStore );
+	const { createSuccessNotice, removeAllNotices } =
+		useDispatch( noticesStore );
 	const { invalidateResolution } = useDispatch( coreStore );
 
 	// DataViews configuration - allow view updates
@@ -366,8 +367,9 @@ export function MediaUploadModal( {
 	);
 
 	const handleModalClose = useCallback( () => {
+		removeAllNotices( 'snackbar', NOTICES_CONTEXT );
 		onClose?.();
-	}, [ onClose ] );
+	}, [ removeAllNotices, onClose ] );
 
 	// Use onUpload if provided, otherwise fall back to uploadMedia
 	const handleUpload = onUpload || uploadMedia;
