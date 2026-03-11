@@ -76,7 +76,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		$result = parent::create_item_permissions_check( $request );
 
-		if ( ! $request['generate_sub_sizes'] ) {
+		if ( false === $request['generate_sub_sizes'] ) {
 			remove_filter( 'wp_prevent_unsupported_mime_type_uploads', '__return_false' );
 		}
 
