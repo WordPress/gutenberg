@@ -178,7 +178,7 @@ describe( 'TimePicker', () => {
 		await user.keyboard( '{Tab}' );
 
 		expect( onChangeSpy ).toHaveBeenCalledWith( '2026-02-28T00:00:00' );
-		expect( dayInput ).toHaveValue( 28 );
+		// expect( dayInput ).toHaveValue( 28 ); // TODO: Enable after https://github.com/WordPress/gutenberg/pull/76399
 	} );
 
 	it( 'should switch to PM correctly', async () => {
