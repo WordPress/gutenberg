@@ -85,7 +85,7 @@
 		"memize": "^2.1.0"
 	},
 	"devDependencies": {
-		"@storybook/react-vite": "^10.1.11",
+		"@storybook/react-vite": "^10.2.8",
 		"@terrazzo/cli": "^0.10.2",
 		"@terrazzo/plugin-css": "^0.10.2",
 		"@terrazzo/token-tools": "^0.10.2",
@@ -94,7 +94,7 @@
 		"@types/node": "^20.17.10",
 		"esbuild": "^0.27.2",
 		"esbuild-esm-loader": "^0.3.3",
-		"storybook": "^10.1.11"
+		"storybook": "^10.2.8"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
