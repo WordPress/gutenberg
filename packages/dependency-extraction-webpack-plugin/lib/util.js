@@ -1,3 +1,7 @@
+const { readFileSync } = require( 'fs' );
+const { createRequire } = require( 'module' );
+const path = require( 'path' );
+
 const WORDPRESS_NAMESPACE = '@wordpress/';
 const BUNDLED_PACKAGES = [
 	'@wordpress/admin-ui',
@@ -155,9 +159,97 @@ function camelCaseDash( string ) {
 	return string.replace( /-([a-z])/g, ( _, letter ) => letter.toUpperCase() );
 }
 
+/**
+ * Cache for resolved package.json objects.
+ *
+ * @type {Map<string, Object|null>}
+ */
+const packageJsonCache = new Map();
+
+/**
+ * Resolve and read a package's package.json using Node's module resolution.
+ *
+ * @param {string} packageName Full package name (e.g., '@wordpress/abilities').
+ * @param {string} contextDir  Directory to resolve from (the importing file's directory).
+ * @return {Object|null} Parsed package.json object or null if not found.
+ */
+function getPackageInfo( packageName, contextDir ) {
+	const cacheKey = `${ packageName }@${ contextDir }`;
+	if ( packageJsonCache.has( cacheKey ) ) {
+		return packageJsonCache.get( cacheKey );
+	}
+
+	const resolveDirs = [ contextDir, __dirname ];
+	for ( const dir of resolveDirs ) {
+		try {
+			const dirRequire = createRequire(
+				path.join( dir, 'package.json' )
+			);
+			const packageJsonPath = dirRequire.resolve(
+				`${ packageName }/package.json`
+			);
+			const result = JSON.parse(
+				readFileSync( packageJsonPath, 'utf8' )
+			);
+			packageJsonCache.set( cacheKey, result );
+			return result;
+		} catch {
+			// Try next resolution path.
+		}
+	}
+
+	packageJsonCache.set( cacheKey, null );
+	return null;
+}
+
+/**
+ * Check if a package import is a script module.
+ * A package is considered a script module if it has wpScriptModuleExports
+ * and the specific import path (root or subpath) is declared in wpScriptModuleExports.
+ *
+ * Ported from packages/wp-build/lib/wordpress-externals-plugin.mjs.
+ *
+ * @param {Object}      packageJson Package.json object.
+ * @param {string|null} subpath     Subpath after package name, or null for root import.
+ * @return {boolean} True if the import is a script module.
+ */
+function isScriptModuleImport( packageJson, subpath ) {
+	const { wpScriptModuleExports } = packageJson;
+
+	if ( ! wpScriptModuleExports ) {
+		return false;
+	}
+
+	// Root import: @wordpress/package-name
+	if ( ! subpath ) {
+		if ( typeof wpScriptModuleExports === 'string' ) {
+			return true;
+		}
+		if (
+			typeof wpScriptModuleExports === 'object' &&
+			wpScriptModuleExports[ '.' ]
+		) {
+			return true;
+		}
+		return false;
+	}
+
+	// Subpath import: @wordpress/package-name/subpath
+	if (
+		typeof wpScriptModuleExports === 'object' &&
+		wpScriptModuleExports[ `./${ subpath }` ]
+	) {
+		return true;
+	}
+
+	return false;
+}
+
 module.exports = {
 	camelCaseDash,
 	defaultRequestToExternal,
 	defaultRequestToExternalModule,
 	defaultRequestToHandle,
+	getPackageInfo,
+	isScriptModuleImport,
 };

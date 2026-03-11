@@ -13,6 +13,8 @@ const {
 	defaultRequestToExternal,
 	defaultRequestToExternalModule,
 	defaultRequestToHandle,
+	getPackageInfo,
+	isScriptModuleImport,
 } = require( './util' );
 
 const { RawSource } = webpack.sources;
@@ -47,6 +49,16 @@ class DependencyExtractionWebpackPlugin {
 		this.externalizedDeps = new Set();
 
 		/**
+		 * Track requests that are script module externals.
+		 *
+		 * Script modules are externalized with `import` type instead of `window`
+		 * and emitted as `module_dependencies` in the asset file.
+		 *
+		 * @type {Set<string>}
+		 */
+		this.scriptModuleDeps = new Set();
+
+		/**
 		 * Should we use modules. This will be set later to match webpack's
 		 * output.module option.
 		 *
@@ -59,7 +71,7 @@ class DependencyExtractionWebpackPlugin {
 	 * @param {webpack.ExternalItemFunctionData}                             data
 	 * @param { ( err?: null | Error, result?: string | string[] ) => void } callback
 	 */
-	externalizeWpDeps( { request }, callback ) {
+	externalizeWpDeps( { request, context }, callback ) {
 		let externalRequest;
 
 		try {
@@ -88,9 +100,23 @@ class DependencyExtractionWebpackPlugin {
 				typeof externalRequest === 'undefined' &&
 				this.options.useDefaults
 			) {
-				externalRequest = this.useModules
-					? defaultRequestToExternalModule( request )
-					: defaultRequestToExternal( request );
+				if ( this.useModules ) {
+					externalRequest =
+						defaultRequestToExternalModule( request );
+				} else {
+					// Check if this is a script module package before
+					// treating it as a regular window-global script.
+					if ( this.isScriptModuleRequest( request, context ) ) {
+						this.externalizedDeps.add( request );
+						this.scriptModuleDeps.add( request );
+						return callback(
+							null,
+							`import ${ request }`
+						);
+					}
+
+					externalRequest = defaultRequestToExternal( request );
+				}
 			}
 		} catch ( err ) {
 			return callback( err );
@@ -103,6 +129,44 @@ class DependencyExtractionWebpackPlugin {
 		}
 
 		return callback();
+	}
+
+	/**
+	 * Check if a request maps to a script-module-only package.
+	 *
+	 * Resolves the package's package.json and checks for wpScriptModuleExports.
+	 * If the package is both a script and a script module, returns false so it
+	 * can be handled as a regular script in non-module builds.
+	 *
+	 * @param {string} request The module request.
+	 * @param {string} context The directory of the importing file.
+	 * @return {boolean} True if the request is a script module that should not
+	 *   be externalized as a window global.
+	 */
+	isScriptModuleRequest( request, context ) {
+		if ( ! request.startsWith( '@wordpress/' ) ) {
+			return false;
+		}
+
+		const parts = request.split( '/' );
+		const packageName = parts.slice( 0, 2 ).join( '/' );
+		const subpath = parts.length > 2 ? parts.slice( 2 ).join( '/' ) : null;
+
+		const packageJson = getPackageInfo( packageName, context );
+		if ( ! packageJson ) {
+			return false;
+		}
+
+		const isScriptModule = isScriptModuleImport( packageJson, subpath );
+		const isScript = !! packageJson.wpScript;
+
+		// If the package is both a script and a script module, treat it as a
+		// regular script in non-module builds (matching esbuild plugin logic).
+		if ( isScriptModule && isScript ) {
+			return false;
+		}
+
+		return isScriptModule;
 	}
 
 	/**
@@ -289,6 +353,10 @@ class DependencyExtractionWebpackPlugin {
 			const chunkStaticDeps = new Set();
 			/** @type {Set<string>} */
 			const chunkDynamicDeps = new Set();
+			/** @type {Set<string>} */
+			const chunkScriptModuleStaticDeps = new Set();
+			/** @type {Set<string>} */
+			const chunkScriptModuleDynamicDeps = new Set();
 
 			if ( injectPolyfill ) {
 				chunkStaticDeps.add( 'wp-polyfill' );
@@ -300,7 +368,19 @@ class DependencyExtractionWebpackPlugin {
 			const processModule = ( m ) => {
 				const { userRequest } = m;
 				if ( this.externalizedDeps.has( userRequest ) ) {
-					if ( this.useModules ) {
+					if ( this.scriptModuleDeps.has( userRequest ) ) {
+						const isStatic =
+							DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
+								compilation,
+								m
+							);
+
+						(
+							isStatic
+								? chunkScriptModuleStaticDeps
+								: chunkScriptModuleDynamicDeps
+						).add( userRequest );
+					} else if ( this.useModules ) {
 						const isStatic =
 							DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
 								compilation,
@@ -382,6 +462,18 @@ class DependencyExtractionWebpackPlugin {
 				],
 				version: contentHash,
 			};
+
+			if (
+				chunkScriptModuleStaticDeps.size ||
+				chunkScriptModuleDynamicDeps.size
+			) {
+				assetData.module_dependencies = [
+					...Array.from( chunkScriptModuleStaticDeps ).sort(),
+					...Array.from( chunkScriptModuleDynamicDeps )
+						.sort()
+						.map( ( id ) => ( { id, import: 'dynamic' } ) ),
+				];
+			}
 
 			if ( this.useModules ) {
 				assetData.type = 'module';
