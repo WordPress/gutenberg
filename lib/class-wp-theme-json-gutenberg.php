@@ -1812,10 +1812,15 @@ class WP_Theme_JSON_Gutenberg {
 								preg_match( $layout_selector_pattern, $spacing_rule['selector'] ) &&
 								! empty( $spacing_rule['rules'] )
 							) {
-								// Iterate over each of the styling rules and substitute non-string values such as `null` with the real `blockGap` value.
-								foreach ( $spacing_rule['rules'] as $css_property => $css_value ) {
-									$current_css_value = is_string( $css_value ) ? $css_value : $block_gap_value;
-									if ( static::is_safe_css_declaration( $css_property, $current_css_value ) ) {
+							// Iterate over each of the styling rules and substitute non-string values such as `null` with the real `blockGap` value.
+							foreach ( $spacing_rule['rules'] as $css_property => $css_value ) {
+								$current_css_value = is_string( $css_value ) ? $css_value : $block_gap_value;
+								// Boolean blockGap (a feature flag, not a CSS value) must be cast to string
+								// to match PHP's implicit coercion: true => '1', false => ''.
+								if ( is_bool( $current_css_value ) ) {
+									$current_css_value = $current_css_value ? '1' : '';
+								}
+								if ( static::is_safe_css_declaration( $css_property, $current_css_value ) ) {
 										$declarations[] = array(
 											'name'  => $css_property,
 											'value' => $current_css_value,
