@@ -8,6 +8,7 @@ describe( 'getSyncErrorMessages', () => {
 		'authentication-failed',
 		'connection-expired',
 		'connection-limit-exceeded',
+		'provider-limit-exceeded',
 		'unknown-error',
 	] )(
 		'should return title, description, and canRetry for "%s"',
@@ -23,12 +24,13 @@ describe( 'getSyncErrorMessages', () => {
 		}
 	);
 
-	it( 'should set canRetry to false for authentication-failed', () => {
-		const result = getSyncErrorMessages( {
-			code: 'authentication-failed',
-		} );
-		expect( result.canRetry ).toBe( false );
-	} );
+	it.each( [ 'authentication-failed', 'provider-limit-exceeded' ] )(
+		'should set canRetry to false for "%s"',
+		( code ) => {
+			const result = getSyncErrorMessages( { code } );
+			expect( result.canRetry ).toBe( false );
+		}
+	);
 
 	it( 'should set canRetry to true for retryable errors', () => {
 		expect(

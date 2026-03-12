@@ -11,6 +11,13 @@ import * as syncProtocol from 'y-protocols/sync';
 /**
  * Internal dependencies
  */
+import {
+	MAX_PROVIDER_SIZE_BYTES,
+	POLLING_INTERVAL_IN_MS,
+	POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS,
+	POLLING_INTERVAL_BACKGROUND_TAB_IN_MS,
+	MAX_ERROR_BACKOFF_IN_MS,
+} from './constants';
 import type { ConnectionError, ConnectionStatus } from '../../types';
 import {
 	type AwarenessState,
@@ -28,14 +35,7 @@ import {
 	postSyncUpdateNonBlocking,
 } from './utils';
 
-const POLLING_INTERVAL_IN_MS = 1000; // 1 second or 1000 milliseconds
-const POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS = 250; // 250 milliseconds
-// Must be less than the server-side AWARENESS_TIMEOUT (30 s) to avoid
-// false disconnects when the tab is in the background.
-const POLLING_INTERVAL_BACKGROUND_TAB_IN_MS = 25 * 1000; // 25 seconds
-const MAX_ERROR_BACKOFF_IN_MS = 30 * 1000; // 30 seconds
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
-const MAX_PROVIDER_SIZE_BYTES = 1 * 1024 * 1024; // 1 MB
 
 type LogFunction = ( message: string, debug?: object ) => void;
 
@@ -378,8 +378,7 @@ function poll(): void {
 			// compaction convention). The lowest client pauses its queue
 			// so it stops sending document updates but keeps polling for
 			// awareness, allowing it to remain connected without an
-			// error modal. Deleting from roomStates during forEach is
-			// safe per the Map spec.
+			// error modal.
 			const error: ConnectionError = {
 				name: 'ConnectionError',
 				message: 'Provider size limit exceeded',
@@ -396,7 +395,9 @@ function poll(): void {
 			const isLowestClient =
 				firstState.clientId === Math.min( ...peerIds );
 
-			roomStates.forEach( ( state, room ) => {
+			// Snapshot the entries to avoid mutation during iteration.
+			const rooms = Array.from( roomStates.entries() );
+			for ( const [ room, state ] of rooms ) {
 				state.log( 'Provider size limit exceeded', {
 					payloadSizeInBytes,
 					maxSizeInBytes: MAX_PROVIDER_SIZE_BYTES,
@@ -415,7 +416,7 @@ function poll(): void {
 					} );
 					unregisterRoom( room );
 				}
-			} );
+			}
 
 			// If all rooms were unregistered, stop polling.
 			if ( 0 === roomStates.size ) {

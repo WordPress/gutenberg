@@ -9,7 +9,7 @@ import {
 	it,
 	jest,
 } from '@jest/globals';
-import type { SyncResponse } from '../types';
+import { SyncUpdateType, type SyncResponse, type SyncUpdate } from '../types';
 
 // Mock all external dependencies before imports.
 jest.mock( 'yjs', () => ( {
@@ -34,6 +34,11 @@ jest.mock( 'y-protocols/sync', () => ( {
 
 jest.mock( 'y-protocols/awareness', () => ( {
 	removeAwarenessStates: jest.fn(),
+} ) );
+
+jest.mock( '../constants', () => ( {
+	...( jest.requireActual( '../constants' ) as object ),
+	MAX_PROVIDER_SIZE_BYTES: 10,
 } ) );
 
 jest.mock( '../utils', () => ( {
@@ -91,6 +96,19 @@ function createMockAwareness() {
 	};
 }
 
+function createMockQueue( getOverride?: () => SyncUpdate[] ) {
+	return {
+		add: jest.fn(),
+		addBulk: jest.fn(),
+		clear: jest.fn(),
+		get: jest.fn( getOverride ?? ( () => [] ) ),
+		pause: jest.fn(),
+		restore: jest.fn(),
+		resume: jest.fn(),
+		size: jest.fn( () => 0 ),
+	};
+}
+
 function simulateVisibilityChange( state: string ) {
 	Object.defineProperty( document, 'visibilityState', {
 		configurable: true,
@@ -115,6 +133,9 @@ describe( 'polling-manager', () => {
 	let mockPostSyncUpdate: jest.Mock<
 		typeof import('../utils').postSyncUpdate
 	>;
+	let mockCreateUpdateQueue: jest.Mock<
+		typeof import('../utils').createUpdateQueue
+	>;
 
 	beforeEach( () => {
 		jest.useFakeTimers();
@@ -124,6 +145,7 @@ describe( 'polling-manager', () => {
 		jest.isolateModules( () => {
 			pollingManager = require( '../polling-manager' ).pollingManager;
 			mockPostSyncUpdate = require( '../utils' ).postSyncUpdate;
+			mockCreateUpdateQueue = require( '../utils' ).createUpdateQueue;
 		} );
 	} );
 
@@ -133,6 +155,231 @@ describe( 'polling-manager', () => {
 		Object.defineProperty( document, 'visibilityState', {
 			configurable: true,
 			get: () => 'visible',
+		} );
+	} );
+
+	describe( 'provider size limit', () => {
+		// Exceeds mocked MAX_PROVIDER_SIZE_BYTES (10 bytes).
+		const oversizedData = 'x'.repeat( 11 );
+		const oversizedUpdates: SyncUpdate[] = [
+			{ data: oversizedData, type: SyncUpdateType.UPDATE },
+		];
+
+		it( 'does not send the request when payload exceeds the size limit', async () => {
+			mockCreateUpdateQueue.mockReturnValue(
+				createMockQueue( () => oversizedUpdates )
+			);
+
+			const onStatusChange = jest.fn();
+			const awareness = createMockAwareness();
+			// Two peers: clientID 1 (ours) and 2 (collaborator).
+			awareness.getStates.mockReturnValue(
+				new Map( [
+					[ 1, {} ],
+					[ 2, {} ],
+				] )
+			);
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness,
+				log: jest.fn(),
+				onStatusChange,
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			// The request should never have been sent.
+			expect( mockPostSyncUpdate ).not.toHaveBeenCalled();
+		} );
+
+		it( 'emits disconnected with provider-limit-exceeded for non-lowest client', async () => {
+			mockCreateUpdateQueue.mockReturnValue(
+				createMockQueue( () => oversizedUpdates )
+			);
+
+			const onStatusChange = jest.fn();
+			const awareness = createMockAwareness();
+			// Our client ID is 5, peer has lower ID 2 → we are NOT lowest.
+			awareness.getStates.mockReturnValue(
+				new Map( [
+					[ 2, {} ],
+					[ 5, {} ],
+				] )
+			);
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 5 ),
+				awareness,
+				log: jest.fn(),
+				onStatusChange,
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			expect( onStatusChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					status: 'disconnected',
+					error: expect.objectContaining( {
+						code: 'provider-limit-exceeded',
+					} ),
+				} )
+			);
+		} );
+
+		it( 'pauses the queue instead of disconnecting for the lowest client', async () => {
+			const mockQueue = createMockQueue( () => oversizedUpdates );
+			mockCreateUpdateQueue.mockReturnValue( mockQueue );
+
+			const onStatusChange = jest.fn();
+			const awareness = createMockAwareness();
+			// Our client ID is 1, peer has higher ID 5 → we ARE lowest.
+			awareness.getStates.mockReturnValue(
+				new Map( [
+					[ 1, {} ],
+					[ 5, {} ],
+				] )
+			);
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness,
+				log: jest.fn(),
+				onStatusChange,
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			// Should pause, not disconnect.
+			expect( mockQueue.pause ).toHaveBeenCalled();
+			expect( onStatusChange ).not.toHaveBeenCalledWith(
+				expect.objectContaining( {
+					status: 'disconnected',
+				} )
+			);
+			// Should not have sent the request.
+			expect( mockPostSyncUpdate ).not.toHaveBeenCalled();
+		} );
+
+		it( 'applies the same decision to all rooms for consistency', async () => {
+			let getCallCount = 0;
+
+			// First get() returns empty (first poll succeeds under the
+			// limit), subsequent calls return oversized data.
+			mockCreateUpdateQueue.mockReturnValue(
+				createMockQueue( () => {
+					getCallCount++;
+					return getCallCount <= 1 ? [] : oversizedUpdates;
+				} )
+			);
+
+			// First poll succeeds so the poll loop keeps running.
+			mockPostSyncUpdate.mockResolvedValue( {
+				rooms: [
+					{
+						room: 'room-a',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+				],
+			} );
+
+			const onStatusChangeA = jest.fn();
+			const onStatusChangeB = jest.fn();
+
+			// Client ID 5, peer has lower ID 2 → NOT lowest → disconnect.
+			const awareness = createMockAwareness();
+			awareness.getStates.mockReturnValue(
+				new Map( [
+					[ 2, {} ],
+					[ 5, {} ],
+				] )
+			);
+
+			// Room-a triggers poll(). start() runs until it hits
+			// await postSyncUpdate (suspends), giving room-b a
+			// chance to register before the poll completes.
+			pollingManager.registerRoom( {
+				room: 'room-a',
+				doc: createMockDoc( 5 ),
+				awareness,
+				log: jest.fn(),
+				onStatusChange: onStatusChangeA,
+				onSync: jest.fn(),
+			} );
+
+			pollingManager.registerRoom( {
+				room: 'room-b',
+				doc: createMockDoc( 5 ),
+				awareness,
+				log: jest.fn(),
+				onStatusChange: onStatusChangeB,
+				onSync: jest.fn(),
+			} );
+
+			// Flush first poll (resolves postSyncUpdate, schedules next).
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			// Advance to next poll cycle — both rooms are now in the
+			// payload and get() returns oversized data.
+			await jest.advanceTimersByTimeAsync( 1000 );
+
+			// Both rooms should be disconnected consistently.
+			expect( onStatusChangeA ).toHaveBeenCalledWith(
+				expect.objectContaining( { status: 'disconnected' } )
+			);
+			expect( onStatusChangeB ).toHaveBeenCalledWith(
+				expect.objectContaining( { status: 'disconnected' } )
+			);
+		} );
+
+		it( 'continues polling for awareness when lowest client is paused', async () => {
+			let callCount = 0;
+
+			// First call returns oversized, subsequent calls return empty
+			// (simulating the paused queue returning []).
+			mockCreateUpdateQueue.mockReturnValue(
+				createMockQueue( () => {
+					callCount++;
+					return callCount === 1 ? oversizedUpdates : [];
+				} )
+			);
+
+			mockPostSyncUpdate.mockResolvedValue( syncResponse );
+
+			const awareness = createMockAwareness();
+			// We are the lowest client.
+			awareness.getStates.mockReturnValue(
+				new Map( [
+					[ 1, {} ],
+					[ 5, {} ],
+				] )
+			);
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness,
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			// First poll: exceeds limit, pauses queue.
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).not.toHaveBeenCalled();
+
+			// Advance past the poll interval — should poll again
+			// with empty payload and send the request.
+			await jest.advanceTimersByTimeAsync( 1000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
