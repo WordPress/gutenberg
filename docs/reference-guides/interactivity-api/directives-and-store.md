@@ -540,7 +540,7 @@ store( "myPlugin", {
     logTimeInit: () => console.log( `Init at ` + new Date() ),
     focusFirstElement: () => {
       const { ref } = getElement();
-      ref.querySelector( 'input:first-child' ).focus(),
+      ref.querySelector( 'input:first-child' ).focus();
     },
   },
 } );
