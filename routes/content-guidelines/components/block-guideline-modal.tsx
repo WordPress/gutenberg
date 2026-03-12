@@ -127,11 +127,9 @@ export default function BlockGuidelineModal( {
 
 	const canSubmit = selectedBlock && guidelineText.trim().length > 0;
 
-	let submitButtonLabel: string = __( 'Add guideline' );
+	let submitButtonLabel: string = __( 'Save guidelines' );
 	if ( isSaving ) {
 		submitButtonLabel = __( 'Saving…' );
-	} else if ( isEditing ) {
-		submitButtonLabel = __( 'Update guideline' );
 	}
 
 	return (
