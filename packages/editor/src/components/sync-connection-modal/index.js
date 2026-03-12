@@ -146,7 +146,7 @@ export function SyncConnectionModal() {
 	return (
 		<BlockCanvasCover.Fill>
 			<Modal
-				className="editor-sync-connection-modal"
+				overlayClassName="editor-sync-connection-modal"
 				isDismissible={ false }
 				onRequestClose={ () => {} }
 				shouldCloseOnClickOutside={ false }
