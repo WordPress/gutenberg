@@ -195,31 +195,32 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	// that unmounts NavigationLinkUI. The useEffect runs after the
 	// popover's useFocusReturn hook (which fires during commit).
 	useEffect( () => {
-		if ( focusTarget ) {
-			const { element, blockPosition } = focusTarget;
+		if ( ! focusTarget ) {
+			return;
+		}
 
-			if ( element ) {
-				element.focus();
-			}
+		const { element, blockPosition } = focusTarget;
 
-			if ( blockPosition ) {
-				// In the conversion case, the submenu auto-reverts to
-				// a navigation-link after removeBlock empties it. This
-				// creates a new block with a new clientId, so the
-				// original DOM element is replaced. Use setTimeout to
-				// wait for the list view to re-render, then find the
-				// replacement block's Options button by position.
-				const { parentClientId, index } = blockPosition;
-				window.setTimeout( () => {
-					const button = findOptionsButtonByIndex(
-						parentClientId,
-						index
-					);
-					button?.focus();
-				}, 300 );
-			}
-
+		if ( element ) {
+			element.focus();
 			setFocusTarget( null );
+		} else if ( blockPosition ) {
+			// In the conversion case, the submenu auto-reverts to
+			// a navigation-link after removeBlock empties it. This
+			// creates a new block with a new clientId, so the
+			// original DOM element is replaced. Wait for the list
+			// view to re-render, then find the replacement block's
+			// Options button by position.
+			const { parentClientId, index } = blockPosition;
+			const timerId = window.setTimeout( () => {
+				const button = findOptionsButtonByIndex(
+					parentClientId,
+					index
+				);
+				button?.focus();
+				setFocusTarget( null );
+			}, 300 );
+			return () => clearTimeout( timerId );
 		}
 	}, [ focusTarget ] );
 
