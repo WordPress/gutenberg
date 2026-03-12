@@ -6,7 +6,6 @@ import type { MutableRefObject } from 'react';
 /**
  * WordPress dependencies
  */
-import { useDebounce } from '@wordpress/compose';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 
@@ -47,22 +46,18 @@ export function useScrollState( {
 		useState( false );
 	const [ isVerticallyScrolled, setIsVerticallyScrolled ] = useState( false );
 
-	const handleScroll = useDebounce(
-		useCallback( () => {
-			const scrollContainer = scrollContainerRef.current;
-			if ( ! scrollContainer ) {
-				return;
-			}
+	const handleScroll = useCallback( () => {
+		const scrollContainer = scrollContainerRef.current;
+		if ( ! scrollContainer ) {
+			return;
+		}
 
-			if ( enabledHorizontal ) {
-				setIsHorizontalScrollEnd( isScrolledToEnd( scrollContainer ) );
-			}
+		if ( enabledHorizontal ) {
+			setIsHorizontalScrollEnd( isScrolledToEnd( scrollContainer ) );
+		}
 
-			setIsVerticallyScrolled( scrollContainer.scrollTop > 0 );
-		}, [ scrollContainerRef, enabledHorizontal ] ),
-		200
-	);
-
+		setIsVerticallyScrolled( scrollContainer.scrollTop > 0 );
+	}, [ scrollContainerRef, enabledHorizontal ] );
 	useEffect( () => {
 		if ( typeof window === 'undefined' || ! scrollContainerRef.current ) {
 			return () => {};
