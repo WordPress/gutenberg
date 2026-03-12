@@ -94,7 +94,7 @@ The `wp-interactive` directive "activates" the interactivity for the DOM element
 ```
 
 <div class="callout callout-info">
-  The use of <code>data-wp-interactive</code> is a requirement for the Interactivity API "engine" to work. In the following examples the <code>data-wp-interactive</code> has not been added for the sake of simplicity. Also, the <code>data-wp-interactive</code> directive will be injected automatically in the future.
+  The use of <code>data-wp-interactive</code> is a requirement for the Interactivity API "engine" to work. In the following examples the <code>data-wp-interactive</code> has not been added for the sake of simplicity.
 </div>
 
 ### `wp-context`
