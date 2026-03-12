@@ -104,7 +104,7 @@ _Imperative code_
 
 _Declarative code_
 
-This is the same use case shared above but serves as an example of declarative code using this new system. The JavaScript logic is defined in the `view.js` file of the block, and add the directives to the markup in the `render.php`.
+This is the same use case shared above but serves as an example of declarative code using this new system. The JavaScript logic is defined in the `view.js` file of the block, and adds the directives to the markup in the `render.php`.
 
 ```js
 // view.js file
