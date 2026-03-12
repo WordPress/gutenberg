@@ -39,28 +39,26 @@ export function ConnectorItem( {
 	const headingId = useId();
 	return (
 		<Item className={ className }>
-			<div role="group" aria-labelledby={ headingId }>
-				<VStack spacing={ 4 }>
-					<HStack alignment="center" spacing={ 4 } wrap>
-						{ icon }
-						<FlexBlock>
-							<VStack spacing={ 0 }>
-								<h2
-									className="connector-item__heading"
-									id={ headingId }
-								>
-									{ name }
-								</h2>
-								<Text variant="muted" size={ 12 }>
-									{ description }
-								</Text>
-							</VStack>
-						</FlexBlock>
-						{ actionArea }
-					</HStack>
-					{ children }
-				</VStack>
-			</div>
+			<VStack spacing={ 4 } role="group" aria-labelledby={ headingId }>
+				<HStack alignment="center" spacing={ 4 } wrap>
+					{ icon }
+					<FlexBlock>
+						<VStack spacing={ 0 }>
+							<h2
+								className="connector-item__heading"
+								id={ headingId }
+							>
+								{ name }
+							</h2>
+							<Text variant="muted" size={ 12 }>
+								{ description }
+							</Text>
+						</VStack>
+					</FlexBlock>
+					{ actionArea }
+				</HStack>
+				{ children }
+			</VStack>
 		</Item>
 	);
 }
