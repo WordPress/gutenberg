@@ -55,17 +55,15 @@ export default function useTabMenuSync( {
 		const tabsInserted = currentTabs.length > prevTabs.length;
 		const menuItemsInserted = menuItems.length > prevMenuItems.length;
 
-		// Update snapshot to the current state.
-		prevSyncStateRef.current = {
-			tabs: currentTabs,
-			menuItems: [ ...menuItems ],
-		};
-
 		// Lists are already in sync.
 		if (
 			( tabsRemoved && menuItemsRemoved ) ||
 			( tabsInserted && menuItemsInserted )
 		) {
+			prevSyncStateRef.current = {
+				tabs: currentTabs,
+				menuItems: [ ...menuItems ],
+			};
 			return;
 		}
 
@@ -76,8 +74,27 @@ export default function useTabMenuSync( {
 			! tabsInserted &&
 			! menuItemsInserted
 		) {
+			prevSyncStateRef.current = {
+				tabs: currentTabs,
+				menuItems: [ ...menuItems ],
+			};
 			return;
 		}
+
+		// If the required container block isn't available yet, bail without
+		// updating the snapshot so the next render re-evaluates the same delta.
+		if ( tabsInserted && ! tabsMenuClientId ) {
+			return;
+		}
+		if ( menuItemsInserted && ! tabPanelClientId ) {
+			return;
+		}
+
+		// Update snapshot to the current state.
+		prevSyncStateRef.current = {
+			tabs: currentTabs,
+			menuItems: [ ...menuItems ],
+		};
 
 		const currentTabIds = new Set( currentTabs.map( ( t ) => t.clientId ) );
 		const currentMenuItemIds = new Set(
@@ -128,9 +145,6 @@ export default function useTabMenuSync( {
 			// A tab was pasted or duplicated — insert a matching menu item.
 			// If the tab's anchor conflicts with an existing menu item, generate
 			// a fresh unique anchor.
-			if ( ! tabsMenuClientId ) {
-				return;
-			}
 			const prevTabIds = new Set( prevTabs.map( ( t ) => t.clientId ) );
 			// Track anchors in use across both tabs and menu items to generate
 			// collision-free anchors when multiple tabs are inserted at once.
@@ -189,9 +203,6 @@ export default function useTabMenuSync( {
 			// A menu item was pasted or duplicated — insert a matching tab.
 			// If the menu item's anchor conflicts with an existing tab, generate
 			// a fresh unique anchor.
-			if ( ! tabPanelClientId ) {
-				return;
-			}
 			const prevMenuItemIds = new Set(
 				prevMenuItems.map( ( m ) => m.clientId )
 			);
