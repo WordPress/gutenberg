@@ -216,11 +216,18 @@ export const getPostBlocksByName = createRegistrySelector( ( select ) =>
 				} )
 			);
 		},
-		( state, blockNames ) => [
-			select( blockEditorStore ).getBlocksByName(
-				Array.isArray( blockNames ) ? blockNames : [ blockNames ]
-			),
-		]
+		( state, blockNames ) => {
+			blockNames = Array.isArray( blockNames )
+				? blockNames
+				: [ blockNames ];
+			const { getBlocksByName, getBlockParents } =
+				select( blockEditorStore );
+			const clientIds = getBlocksByName( blockNames );
+			const parentsOfClientIds = clientIds.map( ( id ) =>
+				getBlockParents( id )
+			);
+			return [ clientIds, ...parentsOfClientIds ];
+		}
 	)
 );
 
