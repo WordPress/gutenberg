@@ -21,7 +21,7 @@ Use the following links to locate the topic you're interested in. If you have ne
 -   **[Tutorial: A first look at the Interactivity API](https://developer.wordpress.org/news/2024/04/11/a-first-look-at-the-interactivity-api/):** This article from the [WordPress Developer Blog](https://developer.wordpress.org/news/) is a great way to get introduced to the Interactivity API.
 -   **[Core Concepts](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/):** Gain a better understanding of concepts and mental models related to Interactivity API development from this section.
 -   **[Directives and Store](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/):** To take a deep dive into how the API works internally, the list of Directives, and how the Store works.
--   **[Docs and Examples](#docs-examples):** Additional resources to learn/read more about the Interactivity API.
+-   **[Docs and Examples](#docs--examples):** Additional resources to learn/read more about the Interactivity API.
 
 To get a deeper understanding of what the Interactivity API is or find answers to questions you may have about this standard, check the following resources:
 
