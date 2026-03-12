@@ -33,13 +33,26 @@ import { useEntityBinding, useLinkPreview } from '../shared';
  * Given the Link block's type attribute, return the query params to give to
  * /wp/v2/search.
  *
- * @param {string} type Link block's type attribute.
- * @param {string} kind Link block's entity of kind (post-type|taxonomy)
- * @return {{ type?: string, subtype?: string }} Search query params.
+ * @param {string}  type                 Link block's type attribute.
+ * @param {string}  kind                 Link block's entity of kind (post-type|taxonomy)
+ * @param {boolean} allowAllContentTypes Whether to allow searching across all content types.
+ * @return {{ type?: string, subtype?: string, perPage?: number }} Search query params.
  */
-export function getSuggestionsQuery( type, kind ) {
+export function getSuggestionsQuery(
+	type,
+	kind,
+	allowAllContentTypes = false
+) {
 	// How many results to show initially and per search.
 	const perPage = 20;
+
+	// When allowAllContentTypes is true, don't restrict to specific post type/taxonomy
+	// This allows searching across all content types when editing an existing link
+	if ( allowAllContentTypes ) {
+		return {
+			perPage,
+		};
+	}
 
 	switch ( type ) {
 		case 'post':
@@ -71,7 +84,15 @@ export function getSuggestionsQuery( type, kind ) {
 }
 
 function UnforwardedLinkUI( props, ref ) {
-	const { label, url, opensInNewTab, type, kind, id } = props.link;
+	const {
+		label,
+		url,
+		opensInNewTab,
+		type,
+		kind,
+		id,
+		allowAllContentTypes = false,
+	} = props.link;
 
 	const { entityRecord, hasBinding, isEntityAvailable } = props.entity || {};
 
@@ -206,9 +227,13 @@ function UnforwardedLinkUI( props, ref ) {
 						value={ link }
 						showInitialSuggestions
 						withCreateSuggestion={ false }
-						noDirectEntry={ !! type }
-						noURLSuggestion={ !! type }
-						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
+						noDirectEntry={ !! type && ! allowAllContentTypes }
+						noURLSuggestion={ !! type && ! allowAllContentTypes }
+						suggestionsQuery={ getSuggestionsQuery(
+							type,
+							kind,
+							allowAllContentTypes
+						) }
 						onChange={ props.onChange }
 						onInputChange={ ( value ) => {
 							// Observe the input value so we can pass the value to the page creator

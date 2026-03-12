@@ -110,7 +110,12 @@ export function NavigationLinkUI( {
 	return (
 		<LinkUI
 			clientId={ activeBlock?.clientId }
-			link={ activeBlock?.attributes }
+			link={ {
+				...activeBlock?.attributes,
+				// When editing an existing link, allow searching all content types
+				// instead of restricting to the current link's type
+				allowAllContentTypes: isEditingExistingBlock,
+			} }
 			onBlockInsert={ handleSetActiveBlock }
 			onClose={ () => {
 				// Use cleanup function
