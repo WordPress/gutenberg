@@ -7,7 +7,7 @@
 - DataForm: Reduce panel's dialog min-width. [#76345](https://github.com/WordPress/gutenberg/pull/76345)
 - DataViews: Add border to sticky table headers. [#76396](https://github.com/WordPress/gutenberg/pull/76396)
 
-- DataViews: Fix scrolling so the scrollbar appears on the active layout when DataViews is rendered in a constrained-height container. This may slightly change the UI depending on the container height. [#76453](https://github.com/WordPress/gutenberg/pull/76453)
+- DataViews: Update scrolling so the scrollbar appears on the active layout when DataViews is rendered in a constrained-height container. This may slightly change the UI depending on the container height. [#76453](https://github.com/WordPress/gutenberg/pull/76453)
 
 ### Bug Fixes
 
