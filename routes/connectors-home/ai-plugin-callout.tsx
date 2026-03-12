@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, ExternalLink } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createInterpolateElement, useRef, useState } from '@wordpress/element';
@@ -238,14 +238,9 @@ export function AiPluginCallout() {
 							{ getPrimaryButtonProps().label }
 						</Button>
 					) }
-					<Button
-						variant="tertiary"
-						href={ AI_PLUGIN_URL }
-						target="_blank"
-						rel="noopener noreferrer"
-					>
+					<ExternalLink href={ AI_PLUGIN_URL }>
 						{ __( 'Learn more' ) }
-					</Button>
+					</ExternalLink>
 				</div>
 			</div>
 			<WpLogoDecoration />
