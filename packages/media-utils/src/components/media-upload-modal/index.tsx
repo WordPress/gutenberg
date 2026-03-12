@@ -579,6 +579,7 @@ export function MediaUploadModal( {
 						<DataViewsPicker.FiltersToggle />
 					</Stack>
 					<Stack direction="row" gap="xs" style={ { flexShrink: 0 } }>
+						<DataViewsPicker.LayoutSwitcher />
 						<DataViewsPicker.ViewConfig />
 					</Stack>
 				</Stack>
