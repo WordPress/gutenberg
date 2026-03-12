@@ -253,8 +253,6 @@ function _gutenberg_is_ai_api_key_valid( string $key, string $provider_id ): ?bo
 /**
  * Gets the registered connector settings.
  *
- * Enriches registry data with logo URLs and plugin installation status.
- *
  * @access private
  *
  * @return array {
@@ -282,42 +280,9 @@ function _gutenberg_is_ai_api_key_valid( string $key, string $provider_id ): ?bo
  * }
  */
 function _gutenberg_get_connector_settings(): array {
-	static $cached = null;
-	if ( null !== $cached ) {
-		return $cached;
-	}
-
 	$connectors = wp_get_connectors();
 	ksort( $connectors );
-
-	// Add plugin installation and activation status.
-	// Build a slug-to-file map following the same pattern as WP_Plugin_Dependencies::get_plugin_dirnames().
-	if ( ! function_exists( 'get_plugins' ) ) {
-		require_once ABSPATH . 'wp-admin/includes/plugin.php';
-	}
-	$plugin_files_by_slug = array();
-	foreach ( array_keys( get_plugins() ) as $plugin_file ) {
-		$slug                          = str_contains( $plugin_file, '/' ) ? dirname( $plugin_file ) : str_replace( '.php', '', $plugin_file );
-		$plugin_files_by_slug[ $slug ] = $plugin_file;
-	}
-
-	foreach ( $connectors as $connector_id => $connector ) {
-		if ( empty( $connector['plugin']['slug'] ) ) {
-			continue;
-		}
-
-		$plugin_slug = $connector['plugin']['slug'];
-		$plugin_file = $plugin_files_by_slug[ $plugin_slug ] ?? null;
-
-		$is_installed = null !== $plugin_file;
-		$is_activated = $is_installed && is_plugin_active( $plugin_file );
-
-		$connectors[ $connector_id ]['plugin']['is_installed'] = $is_installed;
-		$connectors[ $connector_id ]['plugin']['is_activated'] = $is_activated;
-	}
-
-	$cached = $connectors;
-	return $cached;
+	return $connectors;
 }
 
 /**
@@ -497,7 +462,18 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 		return $data;
 	}
 
-	$registry   = \WordPress\AiClient\AiClient::defaultRegistry();
+	$registry = \WordPress\AiClient\AiClient::defaultRegistry();
+
+	// Build a slug-to-file map for plugin installation status.
+	if ( ! function_exists( 'get_plugins' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+	$plugin_files_by_slug = array();
+	foreach ( array_keys( get_plugins() ) as $plugin_file ) {
+		$slug                          = str_contains( $plugin_file, '/' ) ? dirname( $plugin_file ) : str_replace( '.php', '', $plugin_file );
+		$plugin_files_by_slug[ $slug ] = $plugin_file;
+	}
+
 	$connectors = array();
 	foreach ( _gutenberg_get_connector_settings() as $connector_id => $connector_data ) {
 		$auth     = $connector_data['authentication'];
@@ -522,11 +498,17 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 			'authentication' => $auth_out,
 		);
 
-		if ( ! empty( $connector_data['plugin'] ) ) {
+		if ( ! empty( $connector_data['plugin']['slug'] ) ) {
+			$plugin_slug = $connector_data['plugin']['slug'];
+			$plugin_file = $plugin_files_by_slug[ $plugin_slug ] ?? null;
+
+			$is_installed = null !== $plugin_file;
+			$is_activated = $is_installed && is_plugin_active( $plugin_file );
+
 			$connector_out['plugin'] = array(
-				'slug'        => $connector_data['plugin']['slug'],
-				'isInstalled' => $connector_data['plugin']['is_installed'] ?? false,
-				'isActivated' => $connector_data['plugin']['is_activated'] ?? false,
+				'slug'        => $plugin_slug,
+				'isInstalled' => $is_installed,
+				'isActivated' => $is_activated,
 			);
 		}
 
