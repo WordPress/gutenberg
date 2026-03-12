@@ -367,7 +367,7 @@ This directive runs code on dispatched DOM events like `click` or `keyup`. The s
 ```js
 store( 'myPlugin', {
 	actions: {
-		logTime: ( event ) => {
+		logTime: () => {
 			console.log( new Date() );
 		},
 	},
