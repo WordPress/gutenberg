@@ -1070,9 +1070,9 @@ When WordPress renders a page with interactive elements, it embeds server-provid
 	{
 		"state": {
 			"myPlugin": {
-				"cartItemCount": 3,
+				"cartItemCount": 3
 			}
-		}
+		},
 		"config": {
 			"myPlugin": {
 				"userLoggedIn": true
