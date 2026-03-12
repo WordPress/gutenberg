@@ -44,9 +44,9 @@ export const Default: Story = {
 				<Popover.Trigger>Open Popover</Popover.Trigger>
 				<Popover.Popup>
 					<Popover.Arrow />
-					<Popover.Title>Notifications</Popover.Title>
+					<Popover.Title>Popover title</Popover.Title>
 					<Popover.Description>
-						You are all caught up. Good job!
+						Popover description
 					</Popover.Description>
 				</Popover.Popup>
 			</>
@@ -160,9 +160,25 @@ export const Controlled: Story = {
 		onOpenChange: { control: false },
 		defaultOpen: { control: false },
 	},
-	render: function Render() {
+	args: {
+		children: (
+			<>
+				<Popover.Trigger>Toggle Popover</Popover.Trigger>
+				<Popover.Popup>
+					<Popover.Arrow />
+					<Popover.Title>Controlled Popover</Popover.Title>
+					<Popover.Description>
+						This popover is controlled by external state.
+					</Popover.Description>
+				</Popover.Popup>
+			</>
+		),
+	},
+	render: function Render( args ) {
 		const [ isOpen, setIsOpen ] = useState( false );
 		const checkboxId = useId();
+		const checkboxRef = useRef< HTMLInputElement >( null );
+		const labelRef = useRef< HTMLLabelElement >( null );
 
 		return (
 			<div
@@ -172,23 +188,40 @@ export const Controlled: Story = {
 					alignItems: 'center',
 				} }
 			>
-				<Popover.Root open={ isOpen } onOpenChange={ setIsOpen }>
-					<Popover.Trigger>Toggle Popover</Popover.Trigger>
-					<Popover.Popup>
-						<Popover.Arrow />
-						<Popover.Title>Controlled Popover</Popover.Title>
-						<Popover.Description>
-							This popover is controlled by external state.
-						</Popover.Description>
-					</Popover.Popup>
-				</Popover.Root>
-				<label htmlFor={ checkboxId }>
+				<Popover.Root
+					{ ...args }
+					open={ isOpen }
+					onOpenChange={ ( nextOpen, eventDetails ) => {
+						// For the sake of demonstrating controlled updates, prevent the
+						// popover from auto-closing when detecting a click outside coming
+						// from the checkbox (used to trigger external, controlled updates).
+						if (
+							[ 'outside-press', 'focus-out' ].includes(
+								eventDetails.reason
+							) &&
+							!! eventDetails.event.target &&
+							(
+								[
+									checkboxRef.current,
+									labelRef.current,
+								].filter( Boolean ) as EventTarget[]
+							 ).includes( eventDetails.event.target )
+						) {
+							return;
+						}
+
+						setIsOpen( nextOpen );
+					} }
+				/>
+
+				<label htmlFor={ checkboxId } ref={ labelRef }>
 					<input
+						ref={ checkboxRef }
 						id={ checkboxId }
 						type="checkbox"
 						checked={ isOpen }
 						onChange={ ( e ) => setIsOpen( e.target.checked ) }
-					/>{ ' ' }
+					/>
 					Open
 				</label>
 			</div>
@@ -203,14 +236,11 @@ export const Controlled: Story = {
  * popover until it is dismissed.
  */
 export const Modal: Story = {
-	args: { modal: true },
 	argTypes: { modal: { control: false } },
-	render: function Render( { modal: modalArg } ) {
-		const nameId = useId();
-		const emailId = useId();
-
-		return (
-			<Popover.Root modal={ modalArg }>
+	args: {
+		modal: true,
+		children: (
+			<>
 				<Popover.Trigger>Edit Settings</Popover.Trigger>
 				<Popover.Popup>
 					<Popover.Arrow />
@@ -225,7 +255,7 @@ export const Modal: Story = {
 						onSubmit={ ( e ) => e.preventDefault() }
 					>
 						<label
-							htmlFor={ nameId }
+							htmlFor="popover-test-name-id"
 							style={ {
 								display: 'flex',
 								flexDirection: 'column',
@@ -235,13 +265,14 @@ export const Modal: Story = {
 						>
 							Name
 							<input
-								id={ nameId }
+								// eslint-disable-next-line no-restricted-syntax
+								id="popover-test-name-id"
 								type="text"
 								placeholder="Enter your name"
 							/>
 						</label>
 						<label
-							htmlFor={ emailId }
+							htmlFor="popover-test-email-id"
 							style={ {
 								display: 'flex',
 								flexDirection: 'column',
@@ -251,7 +282,8 @@ export const Modal: Story = {
 						>
 							Email
 							<input
-								id={ emailId }
+								// eslint-disable-next-line no-restricted-syntax
+								id="popover-test-email-id"
 								type="email"
 								placeholder="Enter your email"
 							/>
@@ -276,8 +308,8 @@ export const Modal: Story = {
 						</div>
 					</form>
 				</Popover.Popup>
-			</Popover.Root>
-		);
+			</>
+		),
 	},
 };
 
