@@ -109,6 +109,10 @@ function createMockQueue( getOverride?: () => SyncUpdate[] ) {
 	};
 }
 
+function createAwarenessState( enteredAt: number ) {
+	return { collaboratorInfo: { enteredAt } };
+}
+
 function simulateVisibilityChange( state: string ) {
 	Object.defineProperty( document, 'visibilityState', {
 		configurable: true,
@@ -172,11 +176,11 @@ describe( 'polling-manager', () => {
 
 			const onStatusChange = jest.fn();
 			const awareness = createMockAwareness();
-			// Two peers: clientID 1 (ours) and 2 (collaborator).
+			// Two peers: clientID 1 (ours, entered first) and 2.
 			awareness.getStates.mockReturnValue(
 				new Map( [
-					[ 1, {} ],
-					[ 2, {} ],
+					[ 1, createAwarenessState( 1000 ) ],
+					[ 2, createAwarenessState( 2000 ) ],
 				] )
 			);
 
@@ -195,18 +199,18 @@ describe( 'polling-manager', () => {
 			expect( mockPostSyncUpdate ).not.toHaveBeenCalled();
 		} );
 
-		it( 'emits disconnected with provider-limit-exceeded for non-lowest client', async () => {
+		it( 'emits disconnected with provider-limit-exceeded for non-earliest client', async () => {
 			mockCreateUpdateQueue.mockReturnValue(
 				createMockQueue( () => oversizedUpdates )
 			);
 
 			const onStatusChange = jest.fn();
 			const awareness = createMockAwareness();
-			// Our client ID is 5, peer has lower ID 2 → we are NOT lowest.
+			// Our client ID is 5 (entered later), peer 2 entered earlier.
 			awareness.getStates.mockReturnValue(
 				new Map( [
-					[ 2, {} ],
-					[ 5, {} ],
+					[ 2, createAwarenessState( 1000 ) ],
+					[ 5, createAwarenessState( 2000 ) ],
 				] )
 			);
 
@@ -231,17 +235,17 @@ describe( 'polling-manager', () => {
 			);
 		} );
 
-		it( 'pauses the queue instead of disconnecting for the lowest client', async () => {
+		it( 'pauses the queue instead of disconnecting for the earliest client', async () => {
 			const mockQueue = createMockQueue( () => oversizedUpdates );
 			mockCreateUpdateQueue.mockReturnValue( mockQueue );
 
 			const onStatusChange = jest.fn();
 			const awareness = createMockAwareness();
-			// Our client ID is 1, peer has higher ID 5 → we ARE lowest.
+			// Our client ID is 1 (entered first), peer 5 entered later.
 			awareness.getStates.mockReturnValue(
 				new Map( [
-					[ 1, {} ],
-					[ 5, {} ],
+					[ 1, createAwarenessState( 1000 ) ],
+					[ 5, createAwarenessState( 2000 ) ],
 				] )
 			);
 
@@ -294,12 +298,12 @@ describe( 'polling-manager', () => {
 			const onStatusChangeA = jest.fn();
 			const onStatusChangeB = jest.fn();
 
-			// Client ID 5, peer has lower ID 2 → NOT lowest → disconnect.
+			// Client ID 5 (entered later), peer 2 entered earlier → disconnect.
 			const awareness = createMockAwareness();
 			awareness.getStates.mockReturnValue(
 				new Map( [
-					[ 2, {} ],
-					[ 5, {} ],
+					[ 2, createAwarenessState( 1000 ) ],
+					[ 5, createAwarenessState( 2000 ) ],
 				] )
 			);
 
@@ -340,7 +344,7 @@ describe( 'polling-manager', () => {
 			);
 		} );
 
-		it( 'continues polling for awareness when lowest client is paused', async () => {
+		it( 'continues polling for awareness when earliest client is paused', async () => {
 			let callCount = 0;
 
 			// First call returns oversized, subsequent calls return empty
@@ -355,11 +359,11 @@ describe( 'polling-manager', () => {
 			mockPostSyncUpdate.mockResolvedValue( syncResponse );
 
 			const awareness = createMockAwareness();
-			// We are the lowest client.
+			// We are the earliest client (entered first).
 			awareness.getStates.mockReturnValue(
 				new Map( [
-					[ 1, {} ],
-					[ 5, {} ],
+					[ 1, createAwarenessState( 1000 ) ],
+					[ 5, createAwarenessState( 2000 ) ],
 				] )
 			);
 

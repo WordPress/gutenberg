@@ -32,10 +32,10 @@ const ERROR_MESSAGES = {
 		canRetry: true,
 	},
 	'provider-limit-exceeded': {
-		title: __( 'Post too large' ),
+		title: __( 'Collaboration limit reached' ),
 		description: __(
-			'The post is too large for real-time collaboration. ' +
-				'Please reduce the size of the post or contact your site administrator.'
+			'Real-time collaboration limit has been reached. ' +
+				'Editing is paused to prevent conflicts with other editors.'
 		),
 		canRetry: false,
 	},

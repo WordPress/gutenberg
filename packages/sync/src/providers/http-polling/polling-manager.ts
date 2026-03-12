@@ -55,7 +55,7 @@ interface RegisterRoomOptions {
 }
 
 interface RoomState {
-	awareness: Awareness;
+	awarenessStates: Map< number, AwarenessState >;
 	clientId: number;
 	createCompactionUpdate: () => SyncUpdate;
 	endCursor: number;
@@ -130,6 +130,29 @@ function createSyncStep2Update( doc: Y.Doc, step1: Uint8Array ): SyncUpdate {
 		encoding.toUint8Array( encoder ),
 		SyncUpdateType.SYNC_STEP_2
 	);
+}
+
+/**
+ * Return the client ID with the earliest `enteredAt` timestamp, or `null`
+ * if no state contains a valid timestamp.
+ *
+ * @param states Awareness states map from Yjs.
+ */
+function getEarliestClientId(
+	states: Map< number, AwarenessState >
+): number | null {
+	let earliestId: number | null = null;
+	let earliestTime = Infinity;
+	for ( const [ clientId, state ] of states.entries() ) {
+		const enteredAt = (
+			state as { collaboratorInfo?: { enteredAt?: number } }
+		 )?.collaboratorInfo?.enteredAt;
+		if ( enteredAt && enteredAt < earliestTime ) {
+			earliestTime = enteredAt;
+			earliestId = clientId;
+		}
+	}
+	return earliestId;
 }
 
 /**
@@ -374,9 +397,9 @@ function poll(): void {
 
 		if ( payloadSizeInBytes > MAX_PROVIDER_SIZE_BYTES ) {
 			// The payload is too large to send. Disconnect all clients
-			// except the one with the lowest client ID (similar to the
-			// compaction convention). The lowest client pauses its queue
-			// so it stops sending document updates but keeps polling for
+			// except the one that entered earliest (has the smallest
+			// enteredAt timestamp). That client pauses its queue so it
+			// stops sending document updates but keeps polling for
 			// awareness, allowing it to remain connected without an
 			// error modal.
 			const error: ConnectionError = {
@@ -389,11 +412,9 @@ function poll(): void {
 			// the first room's awareness. This ensures the decision
 			// is consistent across all rooms for this collaborator.
 			const firstState = roomStates.values().next().value!;
-			const peerIds = Array.from(
-				firstState.awareness.getStates().keys()
-			);
-			const isLowestClient =
-				firstState.clientId === Math.min( ...peerIds );
+			const isEarliestClient =
+				getEarliestClientId( firstState.awarenessStates ) ===
+				firstState.clientId;
 
 			// Snapshot the entries to avoid mutation during iteration.
 			const rooms = Array.from( roomStates.entries() );
@@ -403,11 +424,11 @@ function poll(): void {
 					maxSizeInBytes: MAX_PROVIDER_SIZE_BYTES,
 				} );
 
-				if ( isLowestClient ) {
+				if ( isEarliestClient ) {
 					// Pause the queue so we stop sending document
 					// updates but keep polling for awareness.
 					state.updateQueue.pause();
-					state.log( 'Lowest client ID, only pausing update queue' );
+					state.log( 'Earliest client, only pausing update queue' );
 				} else {
 					state.log( 'Disconnecting client, and unregistering room' );
 					state.onStatusChange( {
@@ -549,6 +570,7 @@ function registerRoom( {
 	const updateQueue = createUpdateQueue( [ createSyncStep1Update( doc ) ] );
 
 	function onAwarenessUpdate(): void {
+		roomState.awarenessStates = awareness.getStates();
 		roomState.localAwarenessState = awareness.getLocalState() ?? {};
 	}
 
@@ -568,7 +590,7 @@ function registerRoom( {
 	}
 
 	const roomState: RoomState = {
-		awareness,
+		awarenessStates: awareness.getStates(),
 		clientId: doc.clientID,
 		createCompactionUpdate: () =>
 			createSyncUpdate(
