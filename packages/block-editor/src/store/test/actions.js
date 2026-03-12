@@ -77,6 +77,7 @@ describe( 'actions', () => {
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'RESET_BLOCKS',
 				blocks,
+				isExternal: false,
 			} );
 		} );
 	} );
