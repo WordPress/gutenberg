@@ -252,11 +252,11 @@ const { state } = store( 'myArrayPlugin', {
 	},
 	actions: {
 		addItem() {
-			// Right:
+			// Preferred — direct mutation:
 			state.list.push( 'new item' );
 
-			// Wrong:
-			state.list = [ ...state.list, 'new item' ]; // Don't do this!
+			// Unnecessary — this works, but direct mutation is simpler:
+			state.list = [ ...state.list, 'new item' ];
 		},
 	},
 } );
