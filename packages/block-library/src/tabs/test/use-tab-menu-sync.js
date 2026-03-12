@@ -342,6 +342,58 @@ describe( 'useTabMenuSync', () => {
 			expect( insertBlock ).not.toHaveBeenCalled();
 		} );
 
+		it( 'syncs once (no duplicates) when tabs-menu clientId becomes available after a one-sided insertion', () => {
+			const tabs = [ makeTab( 't1', 'tab-1', 'Tab 1' ) ];
+			const menuItems = [ makeMenuItem( 'm1', 'tab-1-button' ) ];
+			const tabsWithNew = [ ...tabs, makeTab( 't2', 'tab-2', 'Tab 2' ) ];
+
+			// Render 1 — initial snapshot.
+			const { rerender } = renderSync( {
+				tabs,
+				menuItems,
+				tabPanelClientId: PANEL,
+				tabsMenuClientId: null,
+			} );
+
+			// Render 2 — tab inserted but container unavailable; snapshot must NOT advance.
+			rerender( {
+				tabs: tabsWithNew,
+				menuItems,
+				tabPanelClientId: PANEL,
+				tabsMenuClientId: null,
+			} );
+
+			expect( insertBlock ).not.toHaveBeenCalled();
+
+			// Render 3 — container now available; hook should sync exactly once.
+			rerender( {
+				tabs: tabsWithNew,
+				menuItems,
+				tabPanelClientId: PANEL,
+				tabsMenuClientId: MENU,
+			} );
+
+			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
+			expect( insertBlock ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					attributes: { anchor: 'tab-2-button' },
+				} ),
+				1,
+				MENU,
+				false
+			);
+
+			// Render 4 — same props; no further insertions.
+			rerender( {
+				tabs: tabsWithNew,
+				menuItems,
+				tabPanelClientId: PANEL,
+				tabsMenuClientId: MENU,
+			} );
+
+			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
+		} );
+
 		it( 'does nothing when both sides grow simultaneously (Add Tab toolbar)', () => {
 			const tabs = [
 				makeTab( 't1', 'tab-1', 'Tab 1' ),
@@ -528,6 +580,61 @@ describe( 'useTabMenuSync', () => {
 			} );
 
 			expect( insertBlock ).not.toHaveBeenCalled();
+		} );
+
+		it( 'syncs once (no duplicates) when tab-panel clientId becomes available after a one-sided insertion', () => {
+			const tabs = [ makeTab( 't1', 'tab-1', 'Tab 1' ) ];
+			const menuItems = [ makeMenuItem( 'm1', 'tab-1-button' ) ];
+			const menuItemsWithNew = [
+				...menuItems,
+				makeMenuItem( 'm2', 'tab-2-button' ),
+			];
+
+			// Render 1 — initial snapshot.
+			const { rerender } = renderSync( {
+				tabs,
+				menuItems,
+				tabPanelClientId: null,
+				tabsMenuClientId: MENU,
+			} );
+
+			// Render 2 — menu item inserted but container unavailable; snapshot must NOT advance.
+			rerender( {
+				tabs,
+				menuItems: menuItemsWithNew,
+				tabPanelClientId: null,
+				tabsMenuClientId: MENU,
+			} );
+
+			expect( insertBlock ).not.toHaveBeenCalled();
+
+			// Render 3 — container now available; hook should sync exactly once.
+			rerender( {
+				tabs,
+				menuItems: menuItemsWithNew,
+				tabPanelClientId: PANEL,
+				tabsMenuClientId: MENU,
+			} );
+
+			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
+			expect( insertBlock ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					attributes: { anchor: 'tab-2', label: '' },
+				} ),
+				1,
+				PANEL,
+				false
+			);
+
+			// Render 4 — same props; no further insertions.
+			rerender( {
+				tabs,
+				menuItems: menuItemsWithNew,
+				tabPanelClientId: PANEL,
+				tabsMenuClientId: MENU,
+			} );
+
+			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );
