@@ -765,7 +765,7 @@ When using region-based navigation, it's crucial to ensure that your interactive
 
 `getServerState()` allows you to subscribe to changes in the **global state** that occur during client-side navigation. This function is analogous to `getServerContext()`, but it works with the global state instead of the local context.
 
-The `getServerState()` function returns a read-only reactive object. This means that any [callbacks](/docs/reference-guides/interactivity-api/directives-and-store.md#accessing-data-in-callbacks) you have defined that watch the returned object will only trigger when the value returned by the function changes. If the value remains the same, the callback will not re-trigger.
+The `getServerState()` function returns a snapshot (deep clone) of the server-provided global state. This means that any [callbacks](/docs/reference-guides/interactivity-api/directives-and-store.md#accessing-data-in-callbacks) you have defined that watch the returned object will trigger on every client-side navigation event, regardless of whether the values have actually changed. Mutating the returned object has no effect on the actual server state, since it is a clone.
 
 Let's consider a quiz that has multiple questions. Each question is a separate page. When the user navigates to a new question, the server provides the new question and the time left to answer all the questions.
 
@@ -814,7 +814,7 @@ _Note: Actions that need to call synchronous event methods like `event.preventDe
 
 `getServerContext()` allows you to subscribe to changes in the **local context** that occur during client-side navigation. This function is analogous to `getServerState()`, but it works with the local context instead of the global state.
 
-The `getServerContext()` function returns a read-only reactive object. This means that any [callbacks](/docs/reference-guides/interactivity-api/directives-and-store.md#accessing-data-in-callbacks) you have defined that watch the returned object will only trigger when the value returned by the function changes. If the value remains the same, the callback will not re-trigger.
+The `getServerContext()` function returns a snapshot (deep clone) of the server-provided local context. This means that any [callbacks](/docs/reference-guides/interactivity-api/directives-and-store.md#accessing-data-in-callbacks) you have defined that watch the returned object will trigger on every client-side navigation event, regardless of whether the values have actually changed. Mutating the returned object has no effect on the actual server context, since it is a clone.
 
 Consider a quiz that has multiple questions. Each question is a separate page. When the user navigates to a new question, the server provides the new question and the time left to answer all the questions.
 
@@ -864,8 +864,8 @@ Whenever you have interactive blocks that rely on global state or local context 
 
 ### Best Practices for using `getServerState()` and `getServerContext()`
 
--   **Read-Only References:** Both `getServerState()` and `getServerContext()` return read-only objects. You can use those objects to update the global state or local context.
--   **Callback Integration:** Incorporate these functions within your store [callbacks](/docs/reference-guides/interactivity-api/directives-and-store.md#accessing-data-in-callbacks) to react to state and context changes. Both `getServerState()` and `getServerContext()` return reactive objects. This means that their watch callbacks will only trigger when the value of a property changes. If the value remains the same, the callback will not re-trigger.
+-   **Snapshot References:** Both `getServerState()` and `getServerContext()` return snapshot (deep clone) objects. Mutating them has no effect on the actual server state or context. You can read those objects to update the global state or local context.
+-   **Callback Integration:** Incorporate these functions within your store [callbacks](/docs/reference-guides/interactivity-api/directives-and-store.md#accessing-data-in-callbacks) to react to state and context changes. Note that callbacks watching `getServerState()` and `getServerContext()` will trigger on every client-side navigation event, regardless of whether the values have changed.
 
 ## Config
 
