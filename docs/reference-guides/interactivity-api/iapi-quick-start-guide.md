@@ -45,7 +45,7 @@ You should be able to insert the "My First Interactive Block" block into any pos
     <ul>
       <li><a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/#docs-examples">Docs & Examples</a></li>
       <li><a href="https://github.com/WordPress/gutenberg/discussions/52894">Getting Started - and other learning resources</a></li>
-      <li><a href="https://github.com/WordPress/gutenberg/discussions/55642#">Interactivity API showcase</a></li>
+      <li><a href="https://github.com/WordPress/gutenberg/discussions/55642">Interactivity API showcase</a></li>
     </ul>
 </div>
 
