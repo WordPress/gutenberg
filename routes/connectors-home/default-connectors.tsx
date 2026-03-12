@@ -74,7 +74,7 @@ function getConnectorLogo(
 	logoUrl?: string
 ): React.ReactNode {
 	if ( logoUrl ) {
-		return <img src={ logoUrl } alt={ name } width={ 40 } height={ 40 } />;
+		return <img src={ logoUrl } alt="" width={ 40 } height={ 40 } />;
 	}
 	const Logo = CONNECTOR_LOGOS[ connectorId ];
 	if ( Logo ) {
