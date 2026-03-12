@@ -126,7 +126,7 @@ store( 'wpmovies', {
 
 <div
   data-wp-interactive='wpmovies'
-  <?php echo wp_interactivity_data_wp_context( array( 'isOpen' => true ) ); ?>
+  <?php echo wp_interactivity_data_wp_context( array( 'isOpen' => false ) ); ?>
 >
   <button
     data-wp-on--click="actions.toggle"
