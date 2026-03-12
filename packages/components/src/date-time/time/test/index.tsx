@@ -203,6 +203,30 @@ describe( 'TimePicker', () => {
 		expect( dayInput ).toHaveValue( 28 );
 	} );
 
+	it( 'should clamp day when switching year from leap to non-leap', async () => {
+		const user = userEvent.setup();
+
+		const onChangeSpy = jest.fn();
+
+		render(
+			<TimePicker
+				currentTime="2028-02-29T00:00:00"
+				onChange={ onChangeSpy }
+				is12Hour
+			/>
+		);
+
+		const dayInput = screen.getByLabelText( 'Day' );
+		const yearInput = screen.getByLabelText( 'Year' );
+
+		await user.clear( yearInput );
+		await user.type( yearInput, '2026' );
+		await user.keyboard( '{Tab}' );
+
+		expect( onChangeSpy ).toHaveBeenCalledWith( '2026-02-28T00:00:00' );
+		expect( dayInput ).toHaveValue( 28 );
+	} );
+
 	it( 'should switch to PM correctly', async () => {
 		const user = userEvent.setup();
 
