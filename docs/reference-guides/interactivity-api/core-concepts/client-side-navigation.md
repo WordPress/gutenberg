@@ -975,11 +975,11 @@ This approach ensures that:
 
 When `navigate()` actually renders the new page, the router toggles style sheets on and off:
 
--   **Activating styles**: For each style sheet that belongs to the target page, the router removes the `media="preload"` override (or restores the original `media` attribute if one was specified). This causes the browser to apply those styles.
+-   **Activating styles**: For each style sheet that belongs to the target page, the router restores the original `media` attribute (reverting the `media="preload"` override set during prefetching) and sets `sheet.disabled = false`. This causes the browser to apply those styles.
 
--   **Deactivating styles**: For each style sheet that was in the current page but not the target page, the router sets `media="preload"`. This disables the styles without removing the element from the DOM.
+-   **Deactivating styles**: For each style sheet that was in the current page but not the target page, the router sets `sheet.disabled = true`. This disables the styles without removing the element from the DOM.
 
-By keeping deactivated style elements in the DOM (rather than removing them), the router can quickly reactivate them if the user navigates back. The styles are already loaded and parsed; they just need to be enabled.
+By keeping deactivated style elements in the DOM (rather than removing them), the router can quickly reactivate them if the user navigates back. The styles are already loaded and parsed; they just need to be re-enabled.
 
 ### Script module handling
 
