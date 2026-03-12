@@ -2,6 +2,10 @@
 
 This guide will help you build a basic block that demonstrates the Interactivity API in WordPress.
 
+## Prerequisites
+
+You will need a WordPress development environment to install and activate the plugin you build in this guide. Refer to the [Development Environment setup guide](https://developer.wordpress.org/block-editor/getting-started/devenv/) for details on how to get started.
+
 ## Scaffold an interactive block
 
 Start by ensuring you have Node.js and `npm` installed on your computer. Review the [Node.js development environment](https://developer.wordpress.org/block-editor/getting-started/devenv/nodejs-development-environment/) guide if not.
