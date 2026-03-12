@@ -15,6 +15,7 @@ export default function Header( {
 	subTitle,
 	actions,
 	showSidebarToggle = true,
+	headingLevel = 1,
 }: {
 	breadcrumbs?: React.ReactNode;
 	badges?: React.ReactNode;
@@ -22,7 +23,9 @@ export default function Header( {
 	subTitle: React.ReactNode;
 	actions?: React.ReactNode;
 	showSidebarToggle?: boolean;
+	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 } ) {
+	const HeadingTag = `h${ headingLevel }` as const;
 	return (
 		<Stack
 			direction="column"
@@ -38,9 +41,9 @@ export default function Header( {
 						/>
 					) }
 					{ title && (
-						<h2 className="admin-ui-page__header-title">
+						<HeadingTag className="admin-ui-page__header-title">
 							{ title }
-						</h2>
+						</HeadingTag>
 					) }
 					{ breadcrumbs }
 					{ badges }

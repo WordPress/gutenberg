@@ -21,6 +21,7 @@ function Page( {
 	ariaLabel,
 	hasPadding = false,
 	showSidebarToggle = true,
+	headingLevel,
 }: {
 	breadcrumbs?: React.ReactNode;
 	badges?: React.ReactNode;
@@ -32,6 +33,7 @@ function Page( {
 	ariaLabel?: string;
 	hasPadding?: boolean;
 	showSidebarToggle?: boolean;
+	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 } ) {
 	const classes = clsx( 'admin-ui-page', className );
 	const effectiveAriaLabel =
@@ -47,6 +49,7 @@ function Page( {
 					subTitle={ subTitle }
 					actions={ actions }
 					showSidebarToggle={ showSidebarToggle }
+					headingLevel={ headingLevel }
 				/>
 			) }
 			{ hasPadding ? (
