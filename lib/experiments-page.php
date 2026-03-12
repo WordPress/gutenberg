@@ -162,6 +162,18 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-dataform-inspector',
+		__( 'Editor Inspector: Use DataForm', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Replaces the bespoke editor inspector panels with a unified DataForm-based implementation for Pages and Posts, matching the QuickEdit experience.', 'gutenberg' ),
+			'id'    => 'gutenberg-dataform-inspector',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-workflow-palette',
 		__( 'Workflow Palette', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -199,12 +211,12 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-content-guidelines',
-		__( 'Content Guidelines', 'gutenberg' ),
+		__( 'Guidelines', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enables Content Guidelines feature for managing editorial voice and tone guidelines under Settings.', 'gutenberg' ),
+			'label' => __( 'Enables guidelines feature for managing editorial voice and tone guidelines under Settings.', 'gutenberg' ),
 			'id'    => 'gutenberg-content-guidelines',
 		)
 	);

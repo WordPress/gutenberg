@@ -54,6 +54,7 @@ export interface State {
 	editorSettings: Record< string, any > | null;
 	editorAssets: Record< string, any > | null;
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
+	collaborationSupported: boolean;
 }
 
 type EntityRecordKey = string | number;
@@ -1522,6 +1523,62 @@ export const getRevisions = (
 
 	return getQueriedItems( queriedStateRevisions, query );
 };
+
+/**
+ * Returns true if a revision has been received for the given set of parameters,
+ * or false otherwise.
+ *
+ * Note: This does not trigger a request for the revision from the API
+ * if it's not available in the local state.
+ *
+ * @param state       State tree
+ * @param kind        Entity kind.
+ * @param name        Entity name.
+ * @param recordKey   The key of the entity record whose revision you want to check.
+ * @param revisionKey The revision's key.
+ * @param query       Optional query.
+ *
+ * @return Whether a revision has been received.
+ */
+export function hasRevision(
+	state: State,
+	kind: string,
+	name: string,
+	recordKey: EntityRecordKey,
+	revisionKey: EntityRecordKey,
+	query?: GetRecordsHttpQuery
+): boolean {
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ];
+	if ( ! queriedState ) {
+		return false;
+	}
+	const context = query?.context ?? 'default';
+
+	if ( ! query || ! query._fields ) {
+		return !! queriedState.itemIsComplete[ context ]?.[ revisionKey ];
+	}
+
+	const item = queriedState.items[ context ]?.[ revisionKey ];
+	if ( ! item ) {
+		return false;
+	}
+
+	const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+	for ( let i = 0; i < fields.length; i++ ) {
+		const path = fields[ i ].split( '.' );
+		let value = item;
+		for ( let p = 0; p < path.length; p++ ) {
+			const part = path[ p ];
+			if ( ! value || ! Object.hasOwn( value, part ) ) {
+				return false;
+			}
+			value = value[ part ];
+		}
+	}
+
+	return true;
+}
 
 /**
  * Returns a single, specific revision of a parent entity.

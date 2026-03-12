@@ -226,6 +226,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'view' },
 		plural: 'fontCollections',
 		key: 'slug',
+		supportsPagination: true,
 	},
 	{
 		label: __( 'Icons' ),
@@ -275,9 +276,9 @@ export const additionalEntityConfigLoaders = [
  * @param {Object}  edits           Edits.
  * @param {string}  name            Post type name.
  * @param {boolean} isTemplate      Whether the post type is a template.
- * @return {Object} Updated edits.
+ * @return {Promise< Object >} Updated edits.
  */
-export const prePersistPostType = (
+export const prePersistPostType = async (
 	persistedRecord,
 	edits,
 	name,
@@ -306,7 +307,7 @@ export const prePersistPostType = (
 	if ( persistedRecord ) {
 		const objectType = `postType/${ name }`;
 		const objectId = persistedRecord.id;
-		const serializedDoc = getSyncManager()?.createPersistedCRDTDoc(
+		const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
 			objectType,
 			objectId
 		);

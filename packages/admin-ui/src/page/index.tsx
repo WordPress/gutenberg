@@ -18,6 +18,7 @@ function Page( {
 	children,
 	className,
 	actions,
+	ariaLabel,
 	hasPadding = false,
 	showSidebarToggle = true,
 }: {
@@ -28,13 +29,16 @@ function Page( {
 	children: React.ReactNode;
 	className?: string;
 	actions?: React.ReactNode;
+	ariaLabel?: string;
 	hasPadding?: boolean;
 	showSidebarToggle?: boolean;
 } ) {
 	const classes = clsx( 'admin-ui-page', className );
+	const effectiveAriaLabel =
+		ariaLabel ?? ( typeof title === 'string' ? title : '' );
 
 	return (
-		<NavigableRegion className={ classes } ariaLabel={ title }>
+		<NavigableRegion className={ classes } ariaLabel={ effectiveAriaLabel }>
 			{ ( title || breadcrumbs || badges ) && (
 				<Header
 					breadcrumbs={ breadcrumbs }

@@ -342,8 +342,6 @@ export function getPostChangesFromCRDTDoc(
 						);
 					}
 
-					// The consumers of blocks have memoization that renders optimization
-					// here unnecessary.
 					return true;
 				}
 
@@ -351,11 +349,8 @@ export function getPostChangesFromCRDTDoc(
 					// Do not overwrite a "floating" date. Borrowing logic from the
 					// isEditedPostDateFloating selector.
 					const currentDateIsFloating =
-						[ 'draft', 'auto-draft', 'pending' ].includes(
-							ymap.get( 'status' ) as string
-						) &&
-						( null === currentValue ||
-							editedRecord.modified === currentValue );
+						null === currentValue ||
+						editedRecord.modified === currentValue;
 
 					if ( currentDateIsFloating ) {
 						return false;

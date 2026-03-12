@@ -34,6 +34,26 @@ export const Default: Story = {
 };
 
 /**
+ * When `hideFromVision` is set on `Fieldset.Legend`, the legend is visually
+ * hidden but remains accessible to screen readers.
+ */
+export const HiddenLegend: Story = {
+	args: {
+		children: (
+			<>
+				<Fieldset.Legend hideFromVision>Legend</Fieldset.Legend>
+				{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
+					// eslint-disable-next-line jsx-a11y/label-has-associated-control
+					<label key={ fruit }>
+						<input type="checkbox" /> { fruit }
+					</label>
+				) ) }
+			</>
+		),
+	},
+};
+
+/**
  * To add rich content (such as links) to the description, use `Fieldset.Details`.
  *
  * Although this content is not associated with the fieldset using direct semantics,

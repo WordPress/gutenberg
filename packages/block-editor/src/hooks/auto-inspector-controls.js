@@ -1,11 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { DataForm } from '@wordpress/dataviews';
-import { useMemo } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -14,6 +14,8 @@ import { __ } from '@wordpress/i18n';
 import InspectorControls from '../components/inspector-controls';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
+import BlockContext from '../components/block-context';
 import { generateFieldsFromAttributes } from './generate-fields-from-attributes';
 
 /**
@@ -45,9 +47,34 @@ function hasAutoGenerateControl( blockTypeAttributes ) {
 function AutoRegisterControls( { name, clientId, setAttributes } ) {
 	const blockEditingMode = useBlockEditingMode();
 
+	const blockContext = useContext( BlockContext );
+
 	const attributes = useSelect(
-		( select ) => select( blockEditorStore ).getBlockAttributes( clientId ),
-		[ clientId ]
+		( select ) => {
+			const _attributes =
+				select( blockEditorStore ).getBlockAttributes( clientId );
+			if ( ! _attributes?.metadata?.bindings ) {
+				return _attributes;
+			}
+
+			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
+			return Object.entries( _attributes.metadata.bindings ).reduce(
+				( acc, [ attribute, binding ] ) => {
+					const source = getBlockBindingsSource( binding.source );
+					if ( ! source ) {
+						return acc;
+					}
+					const values = source.getValues( {
+						select,
+						context: blockContext,
+						bindings: { [ attribute ]: binding },
+					} );
+					return { ...acc, ...values };
+				},
+				_attributes
+			);
+		},
+		[ blockContext, clientId ]
 	);
 
 	const blockType = getBlockType( name );

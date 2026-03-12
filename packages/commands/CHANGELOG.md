@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.41.0 (2026-03-04)
+
 ## 1.40.0 (2026-02-18)
 
 -   Add `category` property to command config, used to visually differentiate commands in the Command Palette.

@@ -71,6 +71,10 @@ Export action as JSON for Pattern.
 
 Featured Image field for BasePostWithEmbeddedFeaturedMedia.
 
+### formatField
+
+Format field for BasePost.
+
 ### MediaEdit
 
 A media edit control component that provides a media picker UI with upload functionality for selecting WordPress media attachments. Supports both the traditional WordPress media library and the experimental DataViews media modal.
@@ -148,6 +152,10 @@ Delete action for PostWithPermissions.
 
 Ping status field for BasePost.
 
+### postContentInfoField
+
+Post content information field for BasePost.
+
 ### PostType
 
 Undocumented declaration.
@@ -167,6 +175,10 @@ Reset action for Template and TemplatePart.
 ### restorePost
 
 Restore action for PostWithPermissions.
+
+### scheduledDateField
+
+ScheduledDate Field.
 
 ### slugField
 
