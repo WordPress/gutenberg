@@ -104,7 +104,7 @@ The API has been designed with performance in mind, so it shouldn’t be a probl
 
 - **The runtime code needed for the directives is just ~10 KB**, and it only needs to be loaded once for all the blocks.
 - **All the script modules that belong to the Interactivity API (including the `view.js` files) will load without blocking the page rendering.**
-- There are [ongoing explorations](https://github.com/WordPress/gutenberg/discussions/52723) about the possibility of **delaying the scripts loading once the block is in the viewport**. This way, the initial load would be optimized without affecting the user experience.
+- See [discussion #52723](https://github.com/WordPress/gutenberg/discussions/52723) for context on the possibility of **delaying the scripts loading once the block is in the viewport**. This way, the initial load would be optimized without affecting the user experience.
 
 ## Does it work with the Core Translation API?
 
@@ -120,7 +120,7 @@ wp_interactivity_state( 'favoriteMovies', array(
 ) );
 ```
 
-A translation API compatible with script modules (needed for the Interactivity API) is currently being worked on. Check [#60234](https://core.trac.wordpress.org/ticket/60234) to follow the progress on this work.
+A translation API compatible with script modules is needed for the Interactivity API. See [#60234](https://core.trac.wordpress.org/ticket/60234) for context on this effort.
 
 ## I’m concerned about XSS; can JavaScript be injected into directives?
 
