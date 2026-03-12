@@ -18,41 +18,38 @@ import usePostContentBlockTypes from './use-post-content-block-types';
  */
 export default function DisableNonPageContentBlocks() {
 	const postContentBlockTypes = usePostContentBlockTypes();
-	const contentOnlyIds = useSelect(
+	const { contentOnlyIds, templateParts } = useSelect(
 		( select ) => {
 			const { getPostBlocksByName } = unlock( select( editorStore ) );
-			return getPostBlocksByName( postContentBlockTypes );
+			const { getBlocksByName } = select( blockEditorStore );
+			return {
+				contentOnlyIds: getPostBlocksByName( postContentBlockTypes ),
+				templateParts: getBlocksByName( 'core/template-part' ),
+			};
 		},
 		[ postContentBlockTypes ]
 	);
-	const { templateParts } = useSelect( ( select ) => {
-		const { getBlocksByName } = select( blockEditorStore );
-		return {
-			templateParts: getBlocksByName( 'core/template-part' ),
-		};
-	}, [] );
-	const disabledIds = useSelect(
+	// This is a separate `useSelect` because `templatePartChildren` is
+	// derived via flatMap, which always produces a new array. Keeping it in
+	// its own subscription with explicit deps avoids re-running the
+	// computation on every store change.
+	const templatePartChildren = useSelect(
 		( select ) => {
 			const { getBlockOrder } = select( blockEditorStore );
-			return templateParts
-				.flatMap( ( clientId ) => getBlockOrder( clientId ) )
-				.filter(
-					( clientId ) => ! contentOnlyIds.includes( clientId )
-				);
+			return templateParts.flatMap( ( clientId ) =>
+				getBlockOrder( clientId )
+			);
 		},
-		[ templateParts, contentOnlyIds ]
+		[ templateParts ]
 	);
 
 	const registry = useRegistry();
 
-	// The code here is split into multiple `useEffects` calls.
-	// This is done to avoid setting/unsetting block editing modes multiple times unnecessarily.
-	//
-	// For example, the block editing mode of the root block (clientId: '') only
-	// needs to be set once, not when `contentOnlyIds` or `disabledIds` change.
-	//
-	// It's also unlikely that these different types of blocks are being inserted
-	// or removed at the same time, so using different effects reflects that.
+	// The effects below are split so that changes to one group of blocks
+	// don't cause unnecessary set/unset cycles for the others. For example,
+	// the root block ('') editing mode only needs to be set once.
+	// This child blocks of templates and templateParts are also loaded separately,
+	// so these are kept in separate effects.
 	useEffect( () => {
 		const { setBlockEditingMode, unsetBlockEditingMode } =
 			registry.dispatch( blockEditorStore );
@@ -63,25 +60,6 @@ export default function DisableNonPageContentBlocks() {
 			unsetBlockEditingMode( '' );
 		};
 	}, [ registry ] );
-
-	useEffect( () => {
-		const { setBlockEditingMode, unsetBlockEditingMode } =
-			registry.dispatch( blockEditorStore );
-
-		registry.batch( () => {
-			for ( const clientId of contentOnlyIds ) {
-				setBlockEditingMode( clientId, 'contentOnly' );
-			}
-		} );
-
-		return () => {
-			registry.batch( () => {
-				for ( const clientId of contentOnlyIds ) {
-					unsetBlockEditingMode( clientId );
-				}
-			} );
-		};
-	}, [ contentOnlyIds, registry ] );
 
 	useEffect( () => {
 		const { setBlockEditingMode, unsetBlockEditingMode } =
@@ -106,20 +84,32 @@ export default function DisableNonPageContentBlocks() {
 		const { setBlockEditingMode, unsetBlockEditingMode } =
 			registry.dispatch( blockEditorStore );
 
+		const contentOnlySet = new Set( contentOnlyIds );
+
 		registry.batch( () => {
-			for ( const clientId of disabledIds ) {
-				setBlockEditingMode( clientId, 'disabled' );
+			for ( const clientId of contentOnlyIds ) {
+				setBlockEditingMode( clientId, 'contentOnly' );
+			}
+			for ( const clientId of templatePartChildren ) {
+				if ( ! contentOnlySet.has( clientId ) ) {
+					setBlockEditingMode( clientId, 'disabled' );
+				}
 			}
 		} );
 
 		return () => {
 			registry.batch( () => {
-				for ( const clientId of disabledIds ) {
+				for ( const clientId of contentOnlyIds ) {
 					unsetBlockEditingMode( clientId );
+				}
+				for ( const clientId of templatePartChildren ) {
+					if ( ! contentOnlySet.has( clientId ) ) {
+						unsetBlockEditingMode( clientId );
+					}
 				}
 			} );
 		};
-	}, [ disabledIds, registry ] );
+	}, [ contentOnlyIds, templatePartChildren, registry ] );
 
 	return null;
 }
