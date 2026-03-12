@@ -6,6 +6,10 @@
 	box-shadow: inset 0 0 0 $border-width $gray-400;
 	padding: $grid-unit-10;
 
+	&.components-button {
+		padding-right: $grid-unit-40;
+	}
+
 	&:focus:not(:disabled) {
 		// Allow smooth transition between focused and unfocused box-shadow states.
 		box-shadow: 0 0 0 currentColor inset, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
@@ -50,5 +54,32 @@
 		width: 100% !important;
 		height: 100% !important;
 		object-fit: cover;
+	}
+}
+
+.block-editor-content-only-controls {
+	position: relative;
+}
+
+.block-editor-content-only-controls__media-reset {
+	position: absolute;
+	right: 0;
+	top: $grid-unit;
+	margin: auto $grid-unit auto;
+	opacity: 0;
+	border-radius: $radius-small;
+	@media not ( prefers-reduced-motion ) {
+		transition: opacity 0.1s ease-in-out;
+	}
+
+	.block-editor-content-only-controls:hover &,
+	&:focus,
+	&:hover {
+		opacity: 1;
+	}
+
+	@media (hover: none) {
+		// Show reset button on devices that do not support hover.
+		opacity: 1;
 	}
 }
