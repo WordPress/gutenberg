@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack, Button } from '@wordpress/components';
+import { useEffect, useRef } from '@wordpress/element';
 import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
@@ -163,6 +164,24 @@ function ApiKeyConnector( {
 		( pluginStatus === 'inactive' && canActivatePlugins === false );
 	const showActionButton = ! showUnavailableBadge;
 
+	const actionButtonRef = useRef< HTMLButtonElement >( null );
+	const pendingFocusRef = useRef( false );
+
+	// Restore focus to the action button after async actions complete.
+	useEffect( () => {
+		if ( pendingFocusRef.current && ! isBusy ) {
+			pendingFocusRef.current = false;
+			actionButtonRef.current?.focus();
+		}
+	}, [ isBusy ] );
+
+	const handleActionClick = () => {
+		if ( pluginStatus === 'not-installed' || pluginStatus === 'inactive' ) {
+			pendingFocusRef.current = true;
+		}
+		handleButtonClick();
+	};
+
 	return (
 		<ConnectorItem
 			className={
@@ -177,6 +196,7 @@ function ApiKeyConnector( {
 					{ showUnavailableBadge && <UnavailableActionBadge /> }
 					{ showActionButton && (
 						<Button
+							ref={ actionButtonRef }
 							variant={
 								isExpanded || isConnected
 									? 'tertiary'
@@ -187,7 +207,7 @@ function ApiKeyConnector( {
 									? undefined
 									: 'compact'
 							}
-							onClick={ handleButtonClick }
+							onClick={ handleActionClick }
 							disabled={ pluginStatus === 'checking' || isBusy }
 							isBusy={ isBusy }
 							aria-expanded={
@@ -215,9 +235,15 @@ function ApiKeyConnector( {
 					readOnly={ isConnected || isExternallyConfigured }
 					keySource={ keySource }
 					onRemove={
-						isExternallyConfigured ? undefined : removeApiKey
+						isExternallyConfigured
+							? undefined
+							: () => {
+									pendingFocusRef.current = true;
+									removeApiKey();
+							  }
 					}
 					onSave={ async ( apiKey: string ) => {
+						pendingFocusRef.current = true;
 						await saveApiKey( apiKey );
 						setIsExpanded( false );
 					} }
