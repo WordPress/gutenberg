@@ -146,8 +146,8 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 				'<svg xmlns="http://www.w3.org/2000/svg"><switch><path d="M0 0h24v24H0z" /></switch></svg>',
 			),
 			'preserves view element'                      => array(
-				'<svg xmlns="http://www.w3.org/2000/svg"><defs><view id="v" viewBox="0 0 24 24" /></defs><path d="M0 0h24v24H0z" /></svg>',
-				'<svg xmlns="http://www.w3.org/2000/svg"><defs><view id="v" viewbox="0 0 24 24" /></defs><path d="M0 0h24v24H0z" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><view id="v" viewBox="0 0 24 24" /><path d="M0 0h24v24H0z" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><view id="v" viewbox="0 0 24 24" /><path d="M0 0h24v24H0z" /></svg>',
 			),
 			'preserves linking element'                   => array(
 				'<svg xmlns="http://www.w3.org/2000/svg"><a href="https://example.com"><path d="M0 0h24v24H0z" /></a></svg>',
@@ -155,23 +155,23 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 			),
 			// Gradient elements.
 			'preserves gradient elements'                 => array(
-				'<svg xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lin"><stop offset="0%" stop-color="red" /><stop offset="100%" stop-color="blue" /></linearGradient><radialGradient id="rad"><stop offset="0%" stop-color="red" /><stop offset="100%" stop-color="blue" /></radialGradient></defs><rect fill="url(#lin)" width="24" height="24" /></svg>',
-				'<svg xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lin"><stop offset="0%" stop-color="red" /><stop offset="100%" stop-color="blue" /></linearGradient><radialGradient id="rad"><stop offset="0%" stop-color="red" /><stop offset="100%" stop-color="blue" /></radialGradient></defs><rect fill="url(#lin)" width="24" height="24" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><linearGradient id="lin"><stop offset="0%" stop-color="red" /><stop offset="100%" stop-color="blue" /></linearGradient><radialGradient id="rad"><stop offset="0%" stop-color="red" /><stop offset="100%" stop-color="blue" /></radialGradient><rect fill="url(#lin)" width="24" height="24" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><linearGradient id="lin"><stop offset="0%" stop-color="red" /><stop offset="100%" stop-color="blue" /></linearGradient><radialGradient id="rad"><stop offset="0%" stop-color="red" /><stop offset="100%" stop-color="blue" /></radialGradient><rect fill="url(#lin)" width="24" height="24" /></svg>',
 			),
 			// Pattern element.
 			'preserves pattern element'                   => array(
-				'<svg xmlns="http://www.w3.org/2000/svg"><defs><pattern id="pat" width="4" height="4"><rect width="4" height="4" fill="currentColor" /></pattern></defs><rect fill="url(#pat)" width="24" height="24" /></svg>',
-				'<svg xmlns="http://www.w3.org/2000/svg"><defs><pattern id="pat" width="4" height="4"><rect width="4" height="4" fill="currentColor" /></pattern></defs><rect fill="url(#pat)" width="24" height="24" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><pattern id="pat" width="4" height="4"><rect width="4" height="4" fill="currentColor" /></pattern><rect fill="url(#pat)" width="24" height="24" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><pattern id="pat" width="4" height="4"><rect width="4" height="4" fill="currentColor" /></pattern><rect fill="url(#pat)" width="24" height="24" /></svg>',
 			),
 			// Filter elements.
 			'preserves filter elements'                   => array(
-				'<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="blur"><feGaussianBlur in="SourceGraphic" stdDeviation="1" /></filter></defs><rect filter="url(#blur)" width="24" height="24" /></svg>',
-				'<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="blur"><feGaussianBlur in="SourceGraphic" stddeviation="1" /></filter></defs><rect filter="url(#blur)" width="24" height="24" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><filter id="blur"><feGaussianBlur in="SourceGraphic" stdDeviation="1" /></filter><rect filter="url(#blur)" width="24" height="24" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><filter id="blur"><feGaussianBlur in="SourceGraphic" stddeviation="1" /></filter><rect filter="url(#blur)" width="24" height="24" /></svg>',
 			),
 			// Text elements.
 			'preserves text elements'                     => array(
-				'<svg xmlns="http://www.w3.org/2000/svg"><defs><path id="p" d="M0,20 Q12,0 24,20" /></defs><text x="12" y="16" text-anchor="middle">A<tspan font-weight="bold">B</tspan></text><text><textPath href="#p">path</textPath></text></svg>',
-				'<svg xmlns="http://www.w3.org/2000/svg"><defs><path id="p" d="M0,20 Q12,0 24,20" /></defs><text x="12" y="16" text-anchor="middle">A<tspan font-weight="bold">B</tspan></text><text><textPath href="#p">path</textPath></text></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><path id="p" d="M0,20 Q12,0 24,20" /><text x="12" y="16" text-anchor="middle">A<tspan font-weight="bold">B</tspan></text><text><textPath href="#p">path</textPath></text></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><path id="p" d="M0,20 Q12,0 24,20" /><text x="12" y="16" text-anchor="middle">A<tspan font-weight="bold">B</tspan></text><text><textPath href="#p">path</textPath></text></svg>',
 			),
 			// Descriptive elements.
 			'preserves descriptive elements'              => array(
