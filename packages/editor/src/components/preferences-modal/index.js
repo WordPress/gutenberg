@@ -132,7 +132,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									scope="core"
 									featureName="showCollaborationNotifications"
 									help={ __(
-										'Show snackbar notifications when collaborators join, leave, or save the post.'
+										'Show notifications when collaborators join, leave, or save the post.'
 									) }
 									label={ __(
 										'Show collaboration notifications'
