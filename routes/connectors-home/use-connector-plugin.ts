@@ -179,7 +179,14 @@ export function useConnectorPlugin( {
 				)
 			);
 		} catch {
-			// Handle error
+			speak(
+				sprintf(
+					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
+					__( 'Failed to install plugin for %s.' ),
+					connectorName
+				),
+				'assertive'
+			);
 		} finally {
 			setIsBusy( false );
 		}
@@ -209,7 +216,14 @@ export function useConnectorPlugin( {
 				)
 			);
 		} catch {
-			// Handle error
+			speak(
+				sprintf(
+					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
+					__( 'Failed to activate plugin for %s.' ),
+					connectorName
+				),
+				'assertive'
+			);
 		} finally {
 			setIsBusy( false );
 		}
@@ -293,12 +307,8 @@ export function useConnectorPlugin( {
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'Failed to save API key:', error );
-			speak(
-				error instanceof Error
-					? error.message
-					: __( 'Failed to save API key.' ),
-				'assertive'
-			);
+			// The error is rendered with role="alert" in the UI,
+			// which already announces it to screen readers.
 			throw error;
 		}
 	};
@@ -323,6 +333,14 @@ export function useConnectorPlugin( {
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'Failed to remove API key:', error );
+			speak(
+				sprintf(
+					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
+					__( 'Failed to disconnect %s.' ),
+					connectorName
+				),
+				'assertive'
+			);
 			throw error;
 		}
 	};

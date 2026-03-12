@@ -71,7 +71,6 @@ const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
 
 function getConnectorLogo(
 	connectorId: string,
-	name: string,
 	logoUrl?: string
 ): React.ReactNode {
 	if ( logoUrl ) {
@@ -243,8 +242,8 @@ function ApiKeyConnector( {
 							  }
 					}
 					onSave={ async ( apiKey: string ) => {
-						pendingFocusRef.current = true;
 						await saveApiKey( apiKey );
+						pendingFocusRef.current = true;
 						setIsExpanded( false );
 					} }
 				/>
@@ -281,11 +280,7 @@ export function registerDefaultConnectors() {
 					pluginSlug={ data.plugin?.slug }
 					settingName={ authentication.settingName }
 					helpUrl={ authentication.credentialsUrl ?? undefined }
-					icon={ getConnectorLogo(
-						connectorId,
-						data.name,
-						data.logoUrl
-					) }
+					icon={ getConnectorLogo( connectorId, data.logoUrl ) }
 					isInstalled={ data.plugin?.isInstalled }
 					isActivated={ data.plugin?.isActivated }
 					keySource={ authentication.keySource }
