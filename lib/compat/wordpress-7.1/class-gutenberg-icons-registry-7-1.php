@@ -127,9 +127,9 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 		);
 
 		/*
-		 * Allowed tags for wp_kses(). WP_HTML_Processor::normalize() with
-		 * constraints (similar structure to this array) is proposed to improve
-		 * HTML/SVG sanitization in the future.
+		 * Allowed tags for wp_kses(). Only SVG elements are permitted; foreignObject
+		 * and HTML tags (e.g. p, div) are intentionally excluded as they are not
+		 * valid in icon SVG content per the SVG specification.
 		 *
 		 * @see https://github.com/dmsnell/wordpress-develop/pull/20
 		 */
@@ -649,9 +649,10 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 
 		$svg   = $processor->serialize_token();
 		$depth = $processor->get_current_depth();
-		while ( $processor->next_token() && $processor->get_current_depth() >= $depth ) {
+		while ( $processor->next_token() && $processor->get_current_depth() > $depth ) {
 			$svg .= $processor->serialize_token();
 		}
+		$svg .= '</svg>';
 		return wp_kses( $svg, $allowed_tags );
 	}
 
