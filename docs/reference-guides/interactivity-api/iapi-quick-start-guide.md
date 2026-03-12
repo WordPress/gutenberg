@@ -18,7 +18,7 @@ The slug provided (`my-first-interactive-block`) defines the folder name for the
 
 ## Basic usage
 
-With the plugin activated, you can explore how the block works. Use the following command to move into the newly created plugin folder and start the development process.
+Once the plugin is scaffolded, navigate into the newly created plugin folder and start the development process with the following command:
 
 ```bash
 cd my-first-interactive-block && npm start
