@@ -187,5 +187,5 @@ _Complexities absorbed by the standard_
 
 With this absorption, less knowledge is required to create interactive blocks, and developers have fewer decisions to worry about.
 
-By adopting a standard, learning from other interactive blocks is simpler, and fosters collaboration and code reusability. As a result, the development process is leanier and friendlier to less experienced developers.
+By adopting a standard, learning from other interactive blocks is simpler, and fosters collaboration and code reusability. As a result, the development process is leaner and friendlier to less experienced developers.
 
