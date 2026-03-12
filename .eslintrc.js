@@ -480,6 +480,13 @@ module.exports = {
 		},
 		{
 			files: [ 'packages/ui/src/**' ],
+			excludedFiles: [ '**/@(test|stories)/**' ],
+			rules: {
+				'@wordpress/no-unmerged-classname': 'error',
+			},
+		},
+		{
+			files: [ 'packages/ui/src/**' ],
 			rules: {
 				'no-restricted-imports': [
 					'error',
