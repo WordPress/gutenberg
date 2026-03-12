@@ -87,3 +87,16 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 		return self::$instance;
 	}
 }
+
+/**
+ * Forces Gutenberg_Icons_Registry_7_1 instantiation and overrides WP_Icons_Registry
+ * so that all code using WP_Icons_Registry::get_instance() receives the Gutenberg
+ * registry.
+ */
+function gutenberg_override_wp_icons_registry_7_1() {
+	$reflection = new ReflectionClass( WP_Icons_Registry::class );
+	$property   = $reflection->getProperty( 'instance' );
+	$property->setAccessible( true );
+	$property->setValue( null, Gutenberg_Icons_Registry_7_1::get_instance() );
+}
+add_action( 'init', 'gutenberg_override_wp_icons_registry_7_1' );
