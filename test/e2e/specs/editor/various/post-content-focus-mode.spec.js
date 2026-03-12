@@ -124,6 +124,89 @@ test.describe( 'Post Content focus mode', () => {
 			} );
 		} );
 
+		// Regression test: when Post Content is selected and a block is
+		// inserted via the inserter, it should end up inside Post Content,
+		// not as a sibling in the template part.
+		test( 'inserting a block while Post Content is selected places it inside Post Content', async ( {
+			admin,
+			editor,
+			page,
+			postContentFocusMode,
+		} ) => {
+			await admin.createNewPost();
+
+			// Add initial content so we can verify the new paragraph
+			// is an additional child of Post Content.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Existing content' },
+			} );
+
+			await postContentFocusMode.enableShowTemplate();
+
+			// Select the Post Content block itself.
+			const postContent = editor.canvas.getByRole( 'document', {
+				name: 'Block: Content',
+				exact: true,
+			} );
+			await editor.selectBlocks( postContent );
+
+			// Open the global block inserter and insert a Paragraph.
+			await page
+				.getByRole( 'button', {
+					name: 'Block Inserter',
+					exact: true,
+				} )
+				.click();
+
+			const inserterPanel = page.getByRole( 'region', {
+				name: 'Block Library',
+			} );
+			await inserterPanel
+				.getByRole( 'tabpanel', { name: 'Blocks' } )
+				.getByRole( 'option', { name: 'Paragraph', exact: true } )
+				.click();
+
+			// Close the inserter.
+			await page
+				.getByRole( 'button', {
+					name: 'Block Inserter',
+					exact: true,
+				} )
+				.click();
+
+			// The inserted paragraph should be inside Post Content,
+			// not a sibling of it inside the template part.
+			const blocks = await page.evaluate( () => {
+				const { select } = window.wp.data;
+				const {
+					getBlocksByName,
+					getBlockOrder,
+					getBlockName,
+					getBlockRootClientId,
+				} = select( 'core/block-editor' );
+				const [ postContentId ] =
+					getBlocksByName( 'core/post-content' );
+				const templatePartId = getBlockRootClientId( postContentId );
+				return {
+					postContentChildCount:
+						getBlockOrder( postContentId ).length,
+					templatePartChildren: getBlockOrder( templatePartId ).map(
+						( id ) => getBlockName( id )
+					),
+				};
+			} );
+
+			// Post Content started with one paragraph; after insertion
+			// it should have two children.
+			expect( blocks.postContentChildCount ).toBe( 2 );
+			// The paragraph should not have been inserted as a sibling
+			// of Post Content inside the template part.
+			expect( blocks.templatePartChildren ).not.toContain(
+				'core/paragraph'
+			);
+		} );
+
 		test( 'template part blocks outside post content are not editable', async ( {
 			admin,
 			editor,
