@@ -206,6 +206,7 @@ const { state } = store( 'myInteractivePlugin', {
 	actions: {
 		toggleVisibility() {
 			state.isVisible = ! state.isVisible;
+			// Note: the full version also resets isActive when hiding.
 		},
 		// ... other actions
 	},
