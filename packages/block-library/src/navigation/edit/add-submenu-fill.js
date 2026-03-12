@@ -208,19 +208,52 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 			// In the conversion case, the submenu auto-reverts to
 			// a navigation-link after removeBlock empties it. This
 			// creates a new block with a new clientId, so the
-			// original DOM element is replaced. Wait for the list
-			// view to re-render, then find the replacement block's
-			// Options button by position.
+			// original DOM element is replaced. Watch the list view
+			// for the replacement row to appear, then focus its
+			// Options button.
 			const { parentClientId, index } = blockPosition;
-			const timerId = window.setTimeout( () => {
-				const button = findOptionsButtonByIndex(
-					parentClientId,
-					index
-				);
-				button?.focus();
+
+			// The button may already exist if the re-render beat us.
+			const button = findOptionsButtonByIndex( parentClientId, index );
+			if ( button ) {
+				button.focus();
 				setFocusTarget( null );
-			}, 300 );
-			return () => clearTimeout( timerId );
+				return;
+			}
+
+			const parentRow = document.querySelector(
+				`[data-block="${ parentClientId }"]`
+			);
+			const treegrid = parentRow?.closest( '[role="treegrid"]' );
+			if ( ! treegrid ) {
+				setFocusTarget( null );
+				return;
+			}
+
+			const observer = new window.MutationObserver( () => {
+				const btn = findOptionsButtonByIndex( parentClientId, index );
+				if ( btn ) {
+					btn.focus();
+					setFocusTarget( null );
+					observer.disconnect();
+					clearTimeout( safetyTimer );
+				}
+			} );
+			observer.observe( treegrid, {
+				childList: true,
+				subtree: true,
+			} );
+
+			// Safety fallback so the observer doesn't leak forever.
+			const safetyTimer = window.setTimeout( () => {
+				observer.disconnect();
+				setFocusTarget( null );
+			}, 2000 );
+
+			return () => {
+				observer.disconnect();
+				clearTimeout( safetyTimer );
+			};
 		}
 	}, [ focusTarget ] );
 
