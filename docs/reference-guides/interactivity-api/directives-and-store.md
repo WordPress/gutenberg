@@ -1365,7 +1365,7 @@ const unwatch = watch( () => {
 
 ## Server functions
 
-The Interactivity API comes with handy functions that allow you to initialize and reference configuration options on the server. This is necessary to feed the initial data that the Server Directive Processing will use to modify the HTML markup before it's send to the browser. It is also a great way to leverage many of WordPress's APIs, like nonces, AJAX, and translations.
+The Interactivity API comes with handy functions that allow you to initialize and reference configuration options on the server. This is necessary to feed the initial data that the Server Directive Processing will use to modify the HTML markup before it's sent to the browser. It is also a great way to leverage many of WordPress's APIs, like nonces, AJAX, and translations.
 
 ### wp_interactivity_config
 
