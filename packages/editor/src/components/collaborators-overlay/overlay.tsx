@@ -1,5 +1,6 @@
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
 import { useCallback, useEffect, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 import Avatar from '../collaborators-presence/avatar';
 import { AVATAR_IFRAME_STYLES } from './avatar-iframe-styles';
@@ -100,19 +101,22 @@ export function Overlay( {
 							top: `${ cursor.y }px`,
 						} }
 					>
-						<div
-							className="collaborators-overlay-user-cursor"
-							style={ {
-								backgroundColor: cursor.color,
-								height: `${ cursor.height }px`,
-							} }
-						/>
+						{ ! cursor.isMe && (
+							<div
+								className="collaborators-overlay-user-cursor"
+								style={ {
+									backgroundColor: cursor.color,
+									height: `${ cursor.height }px`,
+								} }
+							/>
+						) }
 						<Avatar
 							className="collaborators-overlay-user-label"
 							variant="badge"
 							size="small"
 							src={ cursor.avatarUrl }
 							name={ cursor.userName }
+							label={ cursor.isMe ? __( 'You' ) : undefined }
 							borderColor={ cursor.color }
 						/>
 					</div>

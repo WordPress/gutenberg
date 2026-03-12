@@ -28,8 +28,6 @@ export const AVATAR_IFRAME_STYLES = `
 	display: inline-flex;
 	align-items: center;
 	border-radius: ${ RADIUS_FULL };
-	overflow: hidden;
-	overflow: clip;
 	flex-shrink: 0;
 	box-shadow: 0 0 0 var(--wp-admin-border-width-focus, 2px) ${ WHITE }, ${ ELEVATION_X_SMALL };
 }
@@ -53,8 +51,16 @@ export const AVATAR_IFRAME_STYLES = `
 }
 .has-avatar-border-color > .editor-avatar__image {
 	border: var(--wp-admin-border-width-focus, 2px) solid var(--editor-avatar-outline-color);
-	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, 2px) ${ WHITE };
 	background-clip: padding-box;
+}
+.has-avatar-border-color > .editor-avatar__image::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, 2px) ${ WHITE };
+	pointer-events: none;
+	z-index: 1;
 }
 .editor-avatar__img {
 	position: absolute;
@@ -75,8 +81,10 @@ export const AVATAR_IFRAME_STYLES = `
 	font-size: ${ FONT_SIZE_X_SMALL };
 	font-weight: ${ FONT_WEIGHT_MEDIUM };
 	border: 0;
-	box-shadow: none;
 	background-clip: border-box;
+}
+.editor-avatar:not(.has-src) > .editor-avatar__image::after {
+	content: none;
 }
 .editor-avatar:not(.has-src).has-avatar-border-color > .editor-avatar__image {
 	background-color: var(--editor-avatar-outline-color);
