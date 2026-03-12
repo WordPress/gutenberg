@@ -50,6 +50,8 @@ export default function useEntityProp( kind, name, prop, _id ) {
 					{
 						per_page: -1,
 						context: 'edit',
+						_fields:
+							'id,date,author,meta,title.raw,excerpt.raw,content.raw',
 					}
 				);
 				const entityConfig = select( STORE_NAME ).getEntityConfig(

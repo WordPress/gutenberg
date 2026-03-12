@@ -341,7 +341,12 @@ export const getCurrentRevision = createRegistrySelector(
 			'postType',
 			postType,
 			postId,
-			{ per_page: -1, context: 'edit' }
+			{
+				per_page: -1,
+				context: 'edit',
+				_fields:
+					'id,date,author,meta,title.raw,excerpt.raw,content.raw',
+			}
 		);
 		if ( ! revisions ) {
 			return null;
@@ -396,7 +401,12 @@ export const getPreviousRevision = createRegistrySelector(
 			'postType',
 			postType,
 			postId,
-			{ per_page: -1, context: 'edit' }
+			{
+				per_page: -1,
+				context: 'edit',
+				_fields:
+					'id,date,author,meta,title.raw,excerpt.raw,content.raw',
+			}
 		);
 		if ( ! revisions ) {
 			return null;

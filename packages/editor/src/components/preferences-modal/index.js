@@ -120,6 +120,14 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									) }
 									label={ __( 'Show starter patterns' ) }
 								/>
+								<PreferenceToggleControl
+									scope="core"
+									featureName="showCollaborationCursor"
+									help={ __(
+										'Show your own avatar inside blocks during collaborative editing sessions.'
+									) }
+									label={ __( 'Show avatar in blocks' ) }
+								/>
 							</PreferencesModalSection>
 							<PreferencesModalSection
 								title={ __( 'Document settings' ) }

@@ -7,8 +7,8 @@ import {
 	BlockContextProvider,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useMemo, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,6 +23,10 @@ const TABS_TEMPLATE = [
 				remove: true,
 			},
 		},
+		[
+			[ 'core/tabs-menu-item', { anchor: 'tab-1-button' } ],
+			[ 'core/tabs-menu-item', { anchor: 'tab-2-button' } ],
+		],
 	],
 	[
 		'core/tab-panel',
@@ -37,6 +41,14 @@ const TABS_TEMPLATE = [
 				{
 					anchor: 'tab-1',
 					label: 'Tab 1',
+				},
+				[ [ 'core/paragraph' ] ],
+			],
+			[
+				'core/tab',
+				{
+					anchor: 'tab-2',
+					label: 'Tab 2',
 				},
 				[ [ 'core/paragraph' ] ],
 			],
@@ -62,29 +74,140 @@ function Edit( {
 		}
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
+	const { removeBlock } = useDispatch( blockEditorStore );
+
 	/**
 	 * Construct a list of core/tab blocks, used to create tabs-list context.
+	 * Also select menu items with their anchors for anchor-based deletion sync.
 	 */
-	const tabs = useSelect(
+	const { tabs, menuItems } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( blockEditorStore );
 			const innerBlocks = getBlocks( clientId );
 
-			// Find tab-panel block and extract tab data
+			// Find tab-panel block and extract tab data.
 			const tabPanel = innerBlocks.find(
 				( block ) => block.name === 'core/tab-panel'
 			);
 
-			if ( ! tabPanel ) {
-				return [];
-			}
-
-			return tabPanel.innerBlocks.filter(
-				( block ) => block.name === 'core/tab'
+			// Find tabs-menu block and get its children with their anchors.
+			const tabsMenu = innerBlocks.find(
+				( block ) => block.name === 'core/tabs-menu'
 			);
+
+			return {
+				tabs: tabPanel
+					? tabPanel.innerBlocks.filter(
+							( block ) => block.name === 'core/tab'
+					  )
+					: [],
+				menuItems: tabsMenu
+					? getBlocks( tabsMenu.clientId )
+							.filter( ( b ) => b.name === 'core/tabs-menu-item' )
+							.map( ( b ) => ( {
+								clientId: b.clientId,
+								anchor: b.attributes.anchor ?? '',
+							} ) )
+					: [],
+			};
 		},
 		[ clientId ]
 	);
+
+	/**
+	 * Keep tabs and menu items in sync when either is deleted directly (e.g.
+	 * via the Backspace key or List View).
+	 *
+	 * TODO: This effect only handles deletions. The two lists can get out of
+	 * sync in other cases: if a user pastes a core/tab block into the tab-panel
+	 * (or duplicates one), no corresponding tabs-menu-item is created; if a
+	 * user drags and drops a tabs-menu-item, the tab panel is not copied with
+	 * it. We should extend this effect to handle insertions, detecting when
+	 * tabs.length > menuItems.length and inserting the missing menu
+	 * item(s) at the correct index.
+	 */
+	const prevSyncStateRef = useRef( null );
+	useEffect( () => {
+		const currentTabs = tabs.map( ( tab ) => ( {
+			clientId: tab.clientId,
+			anchor: tab.attributes.anchor ?? '',
+		} ) );
+
+		if ( prevSyncStateRef.current === null ) {
+			prevSyncStateRef.current = {
+				tabs: currentTabs,
+				menuItems: [ ...menuItems ],
+			};
+			return;
+		}
+
+		const { tabs: prevTabs, menuItems: prevMenuItems } =
+			prevSyncStateRef.current;
+
+		const tabsRemoved = currentTabs.length < prevTabs.length;
+		const menuItemsRemoved = menuItems.length < prevMenuItems.length;
+
+		// Update snapshot to the current state.
+		// Snapshot is updated eagerly; post-removal mutations keep it consistent
+		// so the next effect invocation sees a stable baseline.
+		prevSyncStateRef.current = {
+			tabs: currentTabs,
+			menuItems: [ ...menuItems ],
+		};
+
+		// Lists are in sync, nothing changed, or toolbar already removed both.
+		if (
+			( ! tabsRemoved && ! menuItemsRemoved ) ||
+			( tabsRemoved && menuItemsRemoved )
+		) {
+			return;
+		}
+
+		const currentTabIds = new Set( currentTabs.map( ( t ) => t.clientId ) );
+		const currentMenuItemIds = new Set(
+			menuItems.map( ( m ) => m.clientId )
+		);
+
+		if ( tabsRemoved ) {
+			prevTabs.forEach( ( prevTab ) => {
+				if ( currentTabIds.has( prevTab.clientId ) ) {
+					return;
+				}
+				const expectedMenuAnchor = prevTab.anchor
+					? `${ prevTab.anchor }-button`
+					: null;
+				const menuItemToRemove = expectedMenuAnchor
+					? menuItems.find( ( m ) => m.anchor === expectedMenuAnchor )
+					: null;
+				if ( menuItemToRemove ) {
+					removeBlock( menuItemToRemove.clientId, false );
+					prevSyncStateRef.current.menuItems =
+						prevSyncStateRef.current.menuItems.filter(
+							( m ) => m.clientId !== menuItemToRemove.clientId
+						);
+				}
+			} );
+		} else {
+			prevMenuItems.forEach( ( prevItem ) => {
+				if ( currentMenuItemIds.has( prevItem.clientId ) ) {
+					return;
+				}
+				const expectedTabAnchor =
+					prevItem.anchor?.replace( /-button$/, '' ) ?? '';
+				const tabToRemove = tabs.find(
+					( tab ) =>
+						( tab.attributes.anchor ?? '' ) === expectedTabAnchor
+				);
+				if ( tabToRemove ) {
+					removeBlock( tabToRemove.clientId, false );
+					prevSyncStateRef.current.tabs =
+						prevSyncStateRef.current.tabs.filter(
+							( t ) => t.clientId !== tabToRemove.clientId
+						);
+				}
+			} );
+		}
+	}, [ tabs, menuItems, removeBlock ] );
 
 	/**
 	 * Memoize context value to prevent unnecessary re-renders.

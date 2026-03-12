@@ -134,6 +134,19 @@
 		z-index: z-index(".dataviews-view-table thead");
 		background-color: inherit;
 
+		&.dataviews-view-table__thead--stuck {
+			&::after {
+				display: block;
+				content: "";
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				height: 1px;
+				background-color: $gray-100;
+			}
+		}
+
 		tr {
 			border: 0;
 		}
