@@ -31,6 +31,14 @@ const ERROR_MESSAGES = {
 		),
 		canRetry: true,
 	},
+	'provider-limit-exceeded': {
+		title: __( 'Post too large' ),
+		description: __(
+			'The post is too large for real-time collaboration. ' +
+				'Please reduce the size of the post or contact your site administrator.'
+		),
+		canRetry: false,
+	},
 	'unknown-error': {
 		title: __( 'Connection lost' ),
 		description: __(

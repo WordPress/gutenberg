@@ -11,7 +11,7 @@ import * as syncProtocol from 'y-protocols/sync';
 /**
  * Internal dependencies
  */
-import type { ConnectionStatus } from '../../types';
+import type { ConnectionError, ConnectionStatus } from '../../types';
 import {
 	type AwarenessState,
 	type LocalAwarenessState,
@@ -35,6 +35,7 @@ const POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS = 250; // 250 milliseconds
 const POLLING_INTERVAL_BACKGROUND_TAB_IN_MS = 25 * 1000; // 25 seconds
 const MAX_ERROR_BACKOFF_IN_MS = 30 * 1000; // 30 seconds
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
+const MAX_PROVIDER_SIZE_BYTES = 1 * 1024 * 1024; // 1 MB
 
 type LogFunction = ( message: string, debug?: object ) => void;
 
@@ -243,6 +244,7 @@ function processDocUpdate(
 	}
 }
 
+let limitExceeded = false;
 let areListenersRegistered = false;
 let hasCollaborators = false;
 let isActiveBrowser = 'visible' === document.visibilityState;
@@ -323,7 +325,7 @@ function poll(): void {
 	pollingTimeoutId = null;
 
 	async function start(): Promise< void > {
-		if ( 0 === roomStates.size ) {
+		if ( 0 === roomStates.size || limitExceeded ) {
 			isPolling = false;
 			return;
 		}
@@ -353,6 +355,45 @@ function poll(): void {
 				} )
 			),
 		};
+
+		// Check if the payload size exceeds the provider limit before
+		// sending the request. Once the request goes out it's too late.
+		// Update data is base64-encoded, so string length equals byte size.
+		const payloadSizeInBytes = payload.rooms.reduce(
+			( total, room ) =>
+				total +
+				room.updates.reduce(
+					( sum, update ) => sum + update.data.length,
+					0
+				),
+			0
+		);
+
+		if ( payloadSizeInBytes > MAX_PROVIDER_SIZE_BYTES ) {
+			const error: ConnectionError = {
+				name: 'ConnectionError',
+				message: 'Provider size limit exceeded',
+				code: 'provider-limit-exceeded',
+			};
+
+			roomStates.forEach( ( state ) => {
+				state.updateQueue.pause();
+				state.log( 'Provider size limit exceeded', {
+					payloadSizeInBytes,
+					maxSizeInBytes: MAX_PROVIDER_SIZE_BYTES,
+				} );
+				state.onStatusChange( {
+					status: 'disconnected',
+					error,
+				} );
+			} );
+
+			limitExceeded = true;
+			return;
+		}
+
+		// Reset the limit exceeded flag.
+		limitExceeded = false;
 
 		try {
 			const { rooms } = await postSyncUpdate( payload );

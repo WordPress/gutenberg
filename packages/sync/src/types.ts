@@ -62,6 +62,7 @@ export type ConnectionErrorCode =
 	| 'authentication-error'
 	| 'connection-expired'
 	| 'connection-limit-exceeded'
+	| 'provider-limit-exceeded'
 	| 'unknown-error';
 
 /**
