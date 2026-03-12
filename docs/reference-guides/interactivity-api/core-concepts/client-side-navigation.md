@@ -1097,11 +1097,11 @@ Local context is embedded directly in the `data-wp-context` attribute of element
 
 When the router fetches a new page, it extracts these types of server data:
 
-1. **Global state**: The router finds the `<script type="application/json">` element with ID `wp-script-module-data-@wordpress/interactivity` and parses its JSON content to extrat its `state` property. This state comes from `wp_interactivity_state` is stored in the internal in-memory page cache entry.
+1. **Global state**: The router finds the `<script type="application/json">` element with ID `wp-script-module-data-@wordpress/interactivity` and parses its JSON content to extract its `state` property. This state comes from `wp_interactivity_state` is stored in the internal in-memory page cache entry.
 
 2. **Local context**: Context values are embedded in the virtual DOM representation of each router region. When a region's HTML is converted to vDOM, the `data-wp-context` attributes are preserved and will be processed during rendering.
 
-3. **Config**: The router finds the `<script type="application/json">` element with ID `wp-script-module-data-@wordpress/interactivity` and parses its JSON content to extrat its `config` property. This configuration comes from `wp_interactivity_config` and is stored in the internal in-memory page cache entry.
+3. **Config**: The router finds the `<script type="application/json">` element with ID `wp-script-module-data-@wordpress/interactivity` and parses its JSON content to extract its `config` property. This configuration comes from `wp_interactivity_config` and is stored in the internal in-memory page cache entry.
 
 **Merging server data during navigation**
 
