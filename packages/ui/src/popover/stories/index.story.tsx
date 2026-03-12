@@ -1,16 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import {
-	createPortal,
-	forwardRef,
-	useId,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
-import { useMergeRefs } from '@wordpress/compose';
+import { useId, useRef, useState } from '@wordpress/element';
 import { SlotFillProvider, Slot } from '@wordpress/components';
-import type { RefCallback } from 'react';
 import { Popover } from '../..';
+import { GenericIframe, useMeasure } from './utils';
 
 const meta: Meta< typeof Popover.Root > = {
 	title: 'Design System/Components/Popover',
@@ -22,6 +14,9 @@ const meta: Meta< typeof Popover.Root > = {
 		'Popover.Title': Popover.Title,
 		'Popover.Description': Popover.Description,
 		'Popover.Close': Popover.Close,
+	},
+	argTypes: {
+		children: { control: false },
 	},
 	parameters: {
 		docs: {
@@ -38,6 +33,9 @@ export default meta;
 type Story = StoryObj< typeof Popover.Root >;
 
 export const Default: Story = {
+	argTypes: {
+		children: { control: { type: 'text' } },
+	},
 	args: {
 		children: (
 			<>
@@ -192,9 +190,6 @@ export const Controlled: Story = {
 					{ ...args }
 					open={ isOpen }
 					onOpenChange={ ( nextOpen, eventDetails ) => {
-						// For the sake of demonstrating controlled updates, prevent the
-						// popover from auto-closing when detecting a click outside coming
-						// from the checkbox (used to trigger external, controlled updates).
 						if (
 							[ 'outside-press', 'focus-out' ].includes(
 								eventDetails.reason
@@ -334,44 +329,6 @@ export const Unstyled: Story = {
 	},
 };
 
-function useMeasure< TRef extends HTMLElement >() {
-	const [ element, setElement ] = useState< TRef | null >( null );
-	const [ elementSize, setElementSize ] = useState( {
-		width: 0,
-		height: 0,
-	} );
-
-	useLayoutEffect( () => {
-		if ( ! element ) {
-			return;
-		}
-
-		function update() {
-			const bcr = element!.getBoundingClientRect();
-			setElementSize( {
-				width: bcr.width,
-				height: bcr.height,
-			} );
-		}
-
-		const resizeObserver = new ResizeObserver( () => {
-			update();
-		} );
-		resizeObserver.observe( element );
-		update();
-
-		return () => {
-			resizeObserver.disconnect();
-		};
-	}, [ element ] );
-
-	const elementRef: RefCallback< TRef > = ( node ) => {
-		setElement( node );
-	};
-
-	return [ elementRef, elementSize ] as const;
-}
-
 /**
  * Overlay placement positions the popover centered on top of its trigger,
  * effectively covering it. This is achieved by computing a negative
@@ -383,13 +340,13 @@ function useMeasure< TRef extends HTMLElement >() {
 export const OverlayPlacement: Story = {
 	args: { defaultOpen: true },
 	argTypes: { defaultOpen: { control: false } },
-	render: function Render( { defaultOpen: defaultOpenArg } ) {
+	render: function Render( { children: _children, ...args } ) {
 		const [ popupRef, popupSize ] = useMeasure< HTMLDivElement >();
 		const [ triggerRef, triggerSize ] = useMeasure< HTMLButtonElement >();
 
 		return (
 			<div style={ { padding: '4rem', textAlign: 'center' } }>
-				<Popover.Root defaultOpen={ defaultOpenArg }>
+				<Popover.Root { ...args }>
 					<Popover.Trigger ref={ triggerRef }>
 						Trigger (covered by popover)
 					</Popover.Trigger>
@@ -540,38 +497,6 @@ export const CollisionAvoidance: Story = {
 	},
 };
 
-const GenericIframe = forwardRef< HTMLIFrameElement, GenericIframeProps >(
-	function GenericIframe( { children, ...props }, ref ) {
-		const [ containerNode, setContainerNode ] =
-			useState< HTMLElement | null >( null );
-		const iframeRef = useRef< HTMLIFrameElement >( null );
-		const mergedRef = useMergeRefs( [ ref, iframeRef ] );
-
-		return (
-			<iframe
-				title="Iframe"
-				{ ...props }
-				ref={ mergedRef }
-				srcDoc="<!doctype html><html><body></body></html>"
-				// Waiting for the load event ensures that this works in Firefox.
-				// See https://github.com/facebook/react/issues/22847#issuecomment-991394558
-				onLoad={ ( event ) => {
-					const doc = event.currentTarget.contentDocument;
-					if ( doc ) {
-						setContainerNode( doc.body );
-					}
-				} }
-			>
-				{ containerNode && createPortal( children, containerNode ) }
-			</iframe>
-		);
-	}
-);
-
-type GenericIframeProps = React.ComponentProps< 'iframe' > & {
-	children: React.ReactNode;
-};
-
 /**
  * When the popover's trigger lives inside an iframe but the popover should
  * render in the parent document, pass a parent-document element to the
@@ -586,7 +511,7 @@ type GenericIframeProps = React.ComponentProps< 'iframe' > & {
 export const CrossIframe: Story = {
 	args: { defaultOpen: true },
 	argTypes: { defaultOpen: { control: false } },
-	render: function Render( { defaultOpen: defaultOpenArg } ) {
+	render: function Render( { children: _children, ...args } ) {
 		const portalContainerRef = useRef< HTMLDivElement >( null );
 		const [ iframeBoundary, setIframeBoundary ] =
 			useState< HTMLIFrameElement | null >( null );
@@ -616,7 +541,7 @@ export const CrossIframe: Story = {
 								marginInline: 'auto',
 							} }
 						>
-							<Popover.Root defaultOpen={ defaultOpenArg }>
+							<Popover.Root { ...args }>
 								<Popover.Trigger
 									style={ {
 										padding: 8,
@@ -666,7 +591,7 @@ export const CrossIframeWithSlotFill: Story = {
 	name: 'Cross-Iframe (SlotFill)',
 	args: { defaultOpen: true },
 	argTypes: { defaultOpen: { control: false } },
-	render: function Render( { defaultOpen: defaultOpenArg } ) {
+	render: function Render( { children: _children, ...args } ) {
 		const slotRef = useRef< HTMLDivElement >( null );
 		const [ iframeBoundary, setIframeBoundary ] =
 			useState< HTMLIFrameElement | null >( null );
@@ -700,7 +625,7 @@ export const CrossIframeWithSlotFill: Story = {
 								marginInline: 'auto',
 							} }
 						>
-							<Popover.Root defaultOpen={ defaultOpenArg }>
+							<Popover.Root { ...args }>
 								<Popover.Trigger
 									style={ {
 										padding: 8,
@@ -737,11 +662,30 @@ export const CrossIframeWithSlotFill: Story = {
 };
 
 /**
- * The `--wp-ui-popover-z-index` CSS variable controls the z-index of the
- * popover positioner. It can be overridden globally or scoped to a
- * specific container.
+ * Override the `--wp-ui-popover-z-index` CSS custom property to control
+ * the z-index of the popover positioner. Useful when popovers need to
+ * stack above other overlays.
+ *
+ * Because the positioner renders via a portal, the variable must target
+ * the positioner directly (not a wrapper). Here a scoped `<style>` tag
+ * sets the value.
  */
 export const WithCustomZIndex: Story = {
-	...Default,
 	name: 'With Custom z-index',
+	args: {
+		children: (
+			<>
+				<style>{ `.custom-z-index-popover { --wp-ui-popover-z-index: 9999; }` }</style>
+				<Popover.Trigger>Open Popover</Popover.Trigger>
+				<Popover.Popup className="custom-z-index-popover">
+					<Popover.Arrow />
+					<Popover.Title>Custom z-index</Popover.Title>
+					<Popover.Description>
+						This popover&apos;s positioner has z-index: 9999 via the
+						`--wp-ui-popover-z-index` CSS custom property.
+					</Popover.Description>
+				</Popover.Popup>
+			</>
+		),
+	},
 };
