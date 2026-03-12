@@ -10,6 +10,7 @@ function gutenberg_enqueue_command_palette_assets() {
 
 	$command_palette_settings = array(
 		'is_network_admin' => is_network_admin(),
+		'logout_url'       => wp_logout_url(),
 	);
 
 	/**
