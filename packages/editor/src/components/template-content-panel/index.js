@@ -6,8 +6,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as interfaceStore } from '@wordpress/interface';
-import { applyFilters } from '@wordpress/hooks';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,26 +13,14 @@ import { useMemo } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import { store as editorStore } from '../../store';
+import usePostContentBlockTypes from '../provider/use-post-content-block-types';
 
 const { BlockQuickNavigation } = unlock( blockEditorPrivateApis );
-
-const POST_CONTENT_BLOCK_TYPES = [
-	'core/post-title',
-	'core/post-featured-image',
-	'core/post-content',
-];
 
 const TEMPLATE_PART_BLOCK = 'core/template-part';
 
 export default function TemplateContentPanel() {
-	const postContentBlockTypes = useMemo(
-		() =>
-			applyFilters(
-				'editor.postContentBlockTypes',
-				POST_CONTENT_BLOCK_TYPES
-			),
-		[]
-	);
+	const postContentBlockTypes = usePostContentBlockTypes();
 
 	const { clientIds, postType, renderingMode } = useSelect(
 		( select ) => {

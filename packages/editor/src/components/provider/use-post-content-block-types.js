@@ -1,15 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
-import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 const POST_CONTENT_BLOCK_TYPES = [
 	'core/post-title',
@@ -17,8 +10,15 @@ const POST_CONTENT_BLOCK_TYPES = [
 	'core/post-content',
 ];
 
-export default function usePostContentBlocks() {
-	const contentOnlyBlockTypes = useMemo(
+/**
+ * Returns the list of post content block types, including any added via the
+ * `editor.postContentBlockTypes` filter. The result is memoized so it can be
+ * used as a stable dependency in `useSelect` calls.
+ *
+ * @return {string[]} Block type names considered post content.
+ */
+export default function usePostContentBlockTypes() {
+	return useMemo(
 		() => [
 			...applyFilters(
 				'editor.postContentBlockTypes',
@@ -27,16 +27,4 @@ export default function usePostContentBlocks() {
 		],
 		[]
 	);
-
-	// Note that there are two separate subscriptions because the result for each
-	// returns a new array.
-	const contentOnlyIds = useSelect(
-		( select ) => {
-			const { getPostBlocksByName } = unlock( select( editorStore ) );
-			return getPostBlocksByName( contentOnlyBlockTypes );
-		},
-		[ contentOnlyBlockTypes ]
-	);
-
-	return contentOnlyIds;
 }

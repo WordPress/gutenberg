@@ -8,14 +8,23 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import usePostContentBlocks from './use-post-content-blocks';
+import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+import usePostContentBlockTypes from './use-post-content-block-types';
 
 /**
  * Component that when rendered, makes it so that the site editor allows only
  * page content to be edited.
  */
 export default function DisableNonPageContentBlocks() {
-	const contentOnlyIds = usePostContentBlocks();
+	const postContentBlockTypes = usePostContentBlockTypes();
+	const contentOnlyIds = useSelect(
+		( select ) => {
+			const { getPostBlocksByName } = unlock( select( editorStore ) );
+			return getPostBlocksByName( postContentBlockTypes );
+		},
+		[ postContentBlockTypes ]
+	);
 	const { templateParts } = useSelect( ( select ) => {
 		const { getBlocksByName } = select( blockEditorStore );
 		return {
