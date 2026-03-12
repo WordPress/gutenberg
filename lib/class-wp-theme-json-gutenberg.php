@@ -2105,13 +2105,15 @@ class WP_Theme_JSON_Gutenberg {
 			$declarations,
 			static function ( $carry, $element ) {
 				$value = $element['value'];
+
 				if ( is_numeric( $value ) ) {
 					$value = (string) $value;
 				}
-				// Skip declarations whose value is not a plain string (booleans, arrays, objects, etc.).
+
 				if ( ! is_string( $value ) ) {
 					return $carry;
 				}
+
 				return $carry .= $element['name'] . ': ' . $value . ';';
 			},
 			''
