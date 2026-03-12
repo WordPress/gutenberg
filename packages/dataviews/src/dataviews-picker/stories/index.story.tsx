@@ -88,7 +88,7 @@ const DataViewsPickerContent = ( {
 			return {
 				...baseView,
 				startPosition: 1,
-				endPosition: 10,
+				maxItems: 10,
 			};
 		}
 
@@ -117,7 +117,7 @@ const DataViewsPickerContent = ( {
 					...prevView,
 					...baseUpdates,
 					startPosition: 1,
-					endPosition: 15,
+					maxItems: 15,
 					page: undefined,
 					perPage: undefined,
 				} as View;
@@ -129,7 +129,7 @@ const DataViewsPickerContent = ( {
 				page: prevView.page ?? 1,
 				perPage: prevView.perPage ?? 10,
 				startPosition: undefined,
-				endPosition: undefined,
+				maxItems: undefined,
 			} as View;
 		} );
 	}, [ isGrouped, infiniteScrollEnabled ] );

@@ -197,7 +197,7 @@ export function MediaUploadModal( {
 		mediaField: 'media_thumbnail',
 		search: '',
 		startPosition: 1,
-		endPosition: 50,
+		maxItems: 50,
 		filters: [],
 		layout: {
 			previewSize: 170,
@@ -246,17 +246,10 @@ export function MediaUploadModal( {
 
 		// For infinite scroll, use offset-based pagination
 		// For regular pagination, use page-based pagination
-		if (
-			view.infiniteScrollEnabled &&
-			view.startPosition !== undefined &&
-			view.endPosition !== undefined
-		) {
-			// Use offset to fetch exact range needed for infinite scroll
-			const itemsNeeded = view.endPosition - view.startPosition + 1;
-
+		if ( view.infiniteScrollEnabled && view.startPosition !== undefined ) {
 			return {
-				offset: !! view.search ? 0 : view.startPosition - 1,
-				per_page: itemsNeeded,
+				offset: view.startPosition - 1,
+				per_page: view.maxItems,
 				status: 'inherit',
 				order: view.sort?.direction,
 				orderby: view.sort?.field,

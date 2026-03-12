@@ -211,10 +211,10 @@ interface ViewBase {
 	startPosition?: number;
 
 	/**
-	 * The end position for infinite scroll (1-indexed).
+	 * The maximum number of items to fetch per batch for infinite scroll.
 	 * Used when infiniteScrollEnabled is true.
 	 */
-	endPosition?: number;
+	maxItems?: number;
 }
 
 export interface ColumnStyle {

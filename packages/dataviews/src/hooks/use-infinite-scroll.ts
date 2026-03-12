@@ -90,8 +90,6 @@ export function useInfiniteScroll( {
 	containerRef,
 	setVisibleEntries,
 }: UseInfiniteScrollProps ): UseInfiniteScrollResult {
-	// Store the initial batch size calculated from the first startPosition and endPosition
-	const initialBatchSizeRef = useRef< number | null >( null );
 	// Track an anchor element for scroll position preservation
 	// This approach is robust even when items are added/removed from both ends simultaneously
 	const anchorElementRef = useRef< {
@@ -230,15 +228,11 @@ export function useInfiniteScroll( {
 			}
 
 			const currentStartPosition = view.startPosition || 1;
-			const currentEndPosition =
-				view.endPosition ||
-				currentStartPosition + ( view.perPage || 10 ) - 1;
-			// Calculate and store batch size from initial range (only once)
-			if ( initialBatchSizeRef.current === null ) {
-				initialBatchSizeRef.current =
-					currentEndPosition - currentStartPosition + 1;
-			}
-			const batchSize = initialBatchSizeRef.current;
+			const batchSize = view.maxItems || view.perPage || 10;
+			const currentEndPosition = Math.min(
+				currentStartPosition + batchSize,
+				paginationInfo.totalItems
+			);
 
 			// Check if user has scrolled near the bottom
 			if (
@@ -248,10 +242,6 @@ export function useInfiniteScroll( {
 				// Check if there's more data to load
 				if ( currentEndPosition < paginationInfo.totalItems ) {
 					const newStartPosition = currentEndPosition;
-					const newEndPosition = Math.min(
-						newStartPosition + batchSize,
-						paginationInfo.totalItems
-					);
 
 					// Capture anchor element for scroll position preservation
 					captureAnchorElement( target, anchorElementRef, 'down' );
@@ -259,7 +249,6 @@ export function useInfiniteScroll( {
 					onChangeView( {
 						...view,
 						startPosition: newStartPosition,
-						endPosition: newEndPosition,
 					} );
 				}
 			}
@@ -268,9 +257,9 @@ export function useInfiniteScroll( {
 			if ( scrollDirection === 'up' && scrollTop <= TOP_THRESHOLD ) {
 				// Check if there's more data to load
 				if ( currentStartPosition > 1 ) {
-					const newEndPosition = currentStartPosition;
 					// Round to 1 if we're close to the beginning to avoid tiny batches
-					const calculatedStartPosition = newEndPosition - batchSize;
+					const calculatedStartPosition =
+						currentStartPosition - batchSize;
 					const newStartPosition =
 						calculatedStartPosition < 6
 							? 1
@@ -282,7 +271,6 @@ export function useInfiniteScroll( {
 					onChangeView( {
 						...view,
 						startPosition: newStartPosition,
-						endPosition: newEndPosition,
 					} );
 				}
 			}
