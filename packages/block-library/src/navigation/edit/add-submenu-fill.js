@@ -4,7 +4,7 @@
 import { createBlock } from '@wordpress/blocks';
 import { addSubmenu } from '@wordpress/icons';
 import { MenuItem } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, select as dataSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -113,12 +113,61 @@ function AddSubmenuItem( {
 	);
 }
 
+/**
+ * Queries the list view for an Options button at the given block
+ * position. Used after cancel to focus the reverted block's button.
+ *
+ * @param {string} parentClientId The parent block's clientId.
+ * @param {number} blockIndex     The block's index among siblings.
+ * @return {HTMLElement|null} The Options button element, or null.
+ */
+function findOptionsButtonByIndex( parentClientId, blockIndex ) {
+	const parentRow = document.querySelector(
+		`[data-block="${ parentClientId }"]`
+	);
+	if ( ! parentRow ) {
+		return null;
+	}
+	// Find sibling rows that are direct children of this parent
+	// in the list view treegrid. Rows at the next nesting level
+	// follow the parent row in DOM order.
+	const treegrid = parentRow.closest( '[role="treegrid"]' );
+	if ( ! treegrid ) {
+		return null;
+	}
+	const allRows = treegrid.querySelectorAll( '[role="row"]' );
+	let childCount = 0;
+	const parentDepth = parseInt( parentRow.getAttribute( 'aria-level' ), 10 );
+	let foundParent = false;
+	for ( const row of allRows ) {
+		if ( row === parentRow ) {
+			foundParent = true;
+			continue;
+		}
+		if ( ! foundParent ) {
+			continue;
+		}
+		const level = parseInt( row.getAttribute( 'aria-level' ), 10 );
+		if ( level <= parentDepth ) {
+			break; // Past the parent's children.
+		}
+		if ( level === parentDepth + 1 ) {
+			if ( childCount === blockIndex ) {
+				return row.querySelector(
+					'.block-editor-list-view-block__menu'
+				);
+			}
+			childCount++;
+		}
+	}
+	return null;
+}
+
 export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
-	const anchorContextRef = useRef( null );
-	const dropdownOnCloseRef = useRef( null );
-	const setDropdownContentHiddenRef = useRef( null );
+	const [ focusTarget, setFocusTarget ] = useState( null );
+	const dropdownContextRef = useRef( null );
 	const menuItemRef = useRef( null );
 
 	// Called when the "Add submenu link" menu item is clicked.
@@ -128,9 +177,12 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	// updates from replaceBlock.
 	const handleAddSubmenuLink = useCallback(
 		( { toggleElement, clientId, onClose, setDropdownContentHidden } ) => {
-			anchorContextRef.current = { toggleElement, clientId };
-			dropdownOnCloseRef.current = onClose;
-			setDropdownContentHiddenRef.current = setDropdownContentHidden;
+			dropdownContextRef.current = {
+				toggleElement,
+				clientId,
+				onClose,
+				setDropdownContentHidden,
+			};
 
 			// Hide the dropdown popover but keep it mounted so the
 			// "Add submenu link" menu item remains focusable on cancel.
@@ -139,13 +191,45 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 		[]
 	);
 
+	// Focus the target element after React has flushed the render
+	// that unmounts NavigationLinkUI. The useEffect runs after the
+	// popover's useFocusReturn hook (which fires during commit).
+	useEffect( () => {
+		if ( focusTarget ) {
+			const { element, blockPosition } = focusTarget;
+
+			if ( element ) {
+				element.focus();
+			}
+
+			if ( blockPosition ) {
+				// In the conversion case, the submenu auto-reverts to
+				// a navigation-link after removeBlock empties it. This
+				// creates a new block with a new clientId, so the
+				// original DOM element is replaced. Use setTimeout to
+				// wait for the list view to re-render, then find the
+				// replacement block's Options button by position.
+				const { parentClientId, index } = blockPosition;
+				window.setTimeout( () => {
+					const button = findOptionsButtonByIndex(
+						parentClientId,
+						index
+					);
+					button?.focus();
+				}, 300 );
+			}
+
+			setFocusTarget( null );
+		}
+	}, [ focusTarget ] );
+
 	// Resolve the popover anchor after React has flushed DOM updates.
 	// When the block was converted to a submenu, the new row only
 	// exists in the DOM after the list view re-renders, so we must
 	// wait until the useEffect fires (post-render) to query for it.
 	useEffect( () => {
-		if ( insertedBlock && anchorContextRef.current && ! popoverAnchor ) {
-			const { toggleElement, clientId } = anchorContextRef.current;
+		if ( insertedBlock && dropdownContextRef.current && ! popoverAnchor ) {
+			const { toggleElement, clientId } = dropdownContextRef.current;
 			const anchor =
 				toggleElement ??
 				document.querySelector(
@@ -160,15 +244,12 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	// Options toggle button.
 	const handleSubmit = useCallback( () => {
 		setPopoverAnchor( null );
-		if ( setDropdownContentHiddenRef.current ) {
-			setDropdownContentHiddenRef.current( false );
+		const ctx = dropdownContextRef.current;
+		if ( ctx ) {
+			ctx.setDropdownContentHidden?.( false );
+			ctx.onClose?.();
 		}
-		if ( dropdownOnCloseRef.current ) {
-			dropdownOnCloseRef.current();
-		}
-		anchorContextRef.current = null;
-		dropdownOnCloseRef.current = null;
-		setDropdownContentHiddenRef.current = null;
+		dropdownContextRef.current = null;
 	}, [] );
 
 	// Called when the user presses Escape in NavigationLinkUI.
@@ -178,35 +259,31 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	// exists so we close the dropdown and focus the new block's
 	// Options button instead.
 	const handleCancel = useCallback( () => {
-		const anchor = popoverAnchor;
 		setPopoverAnchor( null );
+		const ctx = dropdownContextRef.current;
 
 		if ( menuItemRef.current ) {
 			// Non-conversion case: dropdown menu item still exists.
-			if ( setDropdownContentHiddenRef.current ) {
-				setDropdownContentHiddenRef.current( false );
-			}
-			window.setTimeout( () => {
-				menuItemRef.current?.focus();
-			}, 0 );
-		} else {
-			// Conversion case: block was replaced, close dropdown
-			// and focus the new block's Options button.
-			if ( setDropdownContentHiddenRef.current ) {
-				setDropdownContentHiddenRef.current( false );
-			}
-			if ( dropdownOnCloseRef.current ) {
-				dropdownOnCloseRef.current();
-			}
-			window.setTimeout( () => {
-				anchor?.focus();
-			}, 0 );
+			ctx?.setDropdownContentHidden?.( false );
+			setFocusTarget( { element: menuItemRef.current } );
+		} else if ( ctx?.clientId ) {
+			// Conversion case: the submenu will auto-revert to a
+			// navigation-link (with a new clientId) after
+			// removeBlock empties it. Store the block's position
+			// so we can find the replacement after re-render.
+			const { getBlockRootClientId, getBlockIndex } =
+				dataSelect( blockEditorStore );
+			const parentClientId = getBlockRootClientId( ctx.clientId );
+			const index = getBlockIndex( ctx.clientId );
+			ctx?.setDropdownContentHidden?.( false );
+			ctx?.onClose?.();
+			setFocusTarget( {
+				blockPosition: { parentClientId, index },
+			} );
 		}
 
-		anchorContextRef.current = null;
-		dropdownOnCloseRef.current = null;
-		setDropdownContentHiddenRef.current = null;
-	}, [ popoverAnchor ] );
+		dropdownContextRef.current = null;
+	}, [] );
 
 	return (
 		<>
