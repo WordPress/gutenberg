@@ -1814,15 +1814,7 @@ class WP_Theme_JSON_Gutenberg {
 							) {
 								// Iterate over each of the styling rules and substitute non-string values such as `null` with the real `blockGap` value.
 								foreach ( $spacing_rule['rules'] as $css_property => $css_value ) {
-									/*
-									* A null $css_value is a placeholder meaning "use the blockGap value here".
-									* Skip if blockGap is a boolean — it is a feature flag (enabled/disabled),
-									* not a CSS value, and should never be emitted as one.
-									*/
 									$current_css_value = is_string( $css_value ) ? $css_value : $block_gap_value;
-									if ( is_bool( $current_css_value ) ) {
-										continue;
-									}
 									if ( static::is_safe_css_declaration( $css_property, $current_css_value ) ) {
 										$declarations[] = array(
 											'name'  => $css_property,
