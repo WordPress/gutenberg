@@ -7262,15 +7262,30 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * @covers WP_Theme_JSON_Gutenberg::to_ruleset
 	 */
 	public function test_to_ruleset_skips_non_scalar_values_and_casts_numerics() {
-		$reflection = new ReflectionMethod( WP_Theme_JSON_Gutenberg::class, 'to_ruleset' );
+		$reflection   = new ReflectionMethod( WP_Theme_JSON_Gutenberg::class, 'to_ruleset' );
 		$declarations = array(
-			array( 'name' => 'color', 'value' => 'red' ),
-			array( 'name' => 'opacity', 'value' => true ),
-			array( 'name' => 'margin', 'value' => 0 ),
-			array( 'name' => 'padding', 'value' => false ),
-			array( 'name' => 'gap', 'value' => array() ),
+			array(
+				'name'  => 'color',
+				'value' => 'red',
+			),
+			array(
+				'name'  => 'opacity',
+				'value' => true,
+			),
+			array(
+				'name'  => 'margin',
+				'value' => 0,
+			),
+			array(
+				'name'  => 'padding',
+				'value' => false,
+			),
+			array(
+				'name'  => 'gap',
+				'value' => array(),
+			),
 		);
-		$result = $reflection->invoke( null, '.test', $declarations );
+		$result       = $reflection->invoke( null, '.test', $declarations );
 		$this->assertStringContainsString( 'color: red;', $result, 'Color declaration should be included' );
 		$this->assertStringContainsString( 'margin: 0;', $result, 'Numeric value should be cast to string' );
 		$this->assertStringNotContainsString( 'opacity', $result, 'Boolean value should be skipped' );
