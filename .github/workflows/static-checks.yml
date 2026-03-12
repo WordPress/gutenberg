@@ -58,8 +58,19 @@ jobs:
                   node-version: ${{ matrix.node }}
                   cache: npm
 
-            - name: Pin npm version for consistency
-              run: npm install -g npm@10
+            - name: Install custom npm with linked strategy fix
+              shell: bash
+              run: |
+                  git clone --depth 1 --branch v11-gb-test https://github.com/manzoorwanijk/npm-cli.git "$RUNNER_TEMP/npm-cli"
+                  cd "$RUNNER_TEMP/npm-cli" && node scripts/resetdeps.js
+                  NPM_GLOBAL_DIR="$(npm root -g)/npm"
+                  rm -rf "$NPM_GLOBAL_DIR"
+                  if [[ "$RUNNER_OS" == "Windows" ]]; then
+                      cp -r "$RUNNER_TEMP/npm-cli" "$NPM_GLOBAL_DIR"
+                  else
+                      ln -s "$RUNNER_TEMP/npm-cli" "$NPM_GLOBAL_DIR"
+                  fi
+                  npm --version
 
             - name: npm install
               # A "full" install is executed, since `npm ci` does not always exit

@@ -92,6 +92,15 @@ jobs:
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
 
+            - name: Install custom npm with linked strategy fix
+              run: |
+                  git clone --depth 1 --branch v11-gb-test https://github.com/manzoorwanijk/npm-cli.git /tmp/npm-cli
+                  cd /tmp/npm-cli && node scripts/resetdeps.js
+                  NPM_GLOBAL_DIR="$(npm root -g)/npm"
+                  rm -rf "$NPM_GLOBAL_DIR"
+                  ln -s /tmp/npm-cli "$NPM_GLOBAL_DIR"
+                  npm --version
+
             - name: Publish development packages to npm ("next" dist-tag)
               if: ${{ github.event.inputs.release_type == 'development' }}
               run: |

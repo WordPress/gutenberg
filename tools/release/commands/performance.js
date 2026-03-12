@@ -360,7 +360,7 @@ async function runPerformanceTests( branches, options ) {
 
 	logAtIndent( 2, 'Installing dependencies and building' );
 	await runShellScript(
-		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npm run build --workspace @wordpress/e2e-test-utils-playwright && npx playwright install chromium --with-deps"`,
+		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && if [ ! -d /tmp/npm-cli ]; then git clone --depth 1 --branch v11-gb-test https://github.com/manzoorwanijk/npm-cli.git /tmp/npm-cli && cd /tmp/npm-cli && node scripts/resetdeps.js; fi && NPM_GLOBAL_DIR=\\$(npm root -g)/npm && rm -rf \\$NPM_GLOBAL_DIR && ln -s /tmp/npm-cli \\$NPM_GLOBAL_DIR && npm ci && npm run build --workspace @wordpress/e2e-test-utils-playwright && npx playwright install chromium --with-deps"`,
 		testRunnerDir
 	);
 
@@ -403,7 +403,7 @@ async function runPerformanceTests( branches, options ) {
 
 		logAtIndent( 3, 'Installing dependencies and building' );
 		await runShellScript(
-			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && (npm run build -- --skip-types || npm run build)"`,
+			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && if [ ! -d /tmp/npm-cli ]; then git clone --depth 1 --branch v11-gb-test https://github.com/manzoorwanijk/npm-cli.git /tmp/npm-cli && cd /tmp/npm-cli && node scripts/resetdeps.js; fi && NPM_GLOBAL_DIR=\\$(npm root -g)/npm && rm -rf \\$NPM_GLOBAL_DIR && ln -s /tmp/npm-cli \\$NPM_GLOBAL_DIR && npm ci && (npm run build -- --skip-types || npm run build)"`,
 			buildDir
 		);
 

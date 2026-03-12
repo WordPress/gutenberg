@@ -250,6 +250,15 @@ jobs:
               if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
               run: jq --tab '.wpPlugin.name = "wp"' package.json > package.json.tmp && mv package.json.tmp package.json
 
+            - name: Install custom npm with linked strategy fix
+              run: |
+                  git clone --depth 1 --branch v11-gb-test https://github.com/manzoorwanijk/npm-cli.git /tmp/npm-cli
+                  cd /tmp/npm-cli && node scripts/resetdeps.js
+                  NPM_GLOBAL_DIR="$(npm root -g)/npm"
+                  rm -rf "$NPM_GLOBAL_DIR"
+                  ln -s /tmp/npm-cli "$NPM_GLOBAL_DIR"
+                  npm --version
+
             - name: Build Gutenberg plugin ZIP file
               run: ./bin/build-plugin-zip.sh
               env:
@@ -563,6 +572,15 @@ jobs:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
+
+            - name: Install custom npm with linked strategy fix
+              run: |
+                  git clone --depth 1 --branch v11-gb-test https://github.com/manzoorwanijk/npm-cli.git /tmp/npm-cli
+                  cd /tmp/npm-cli && node scripts/resetdeps.js
+                  NPM_GLOBAL_DIR="$(npm root -g)/npm"
+                  rm -rf "$NPM_GLOBAL_DIR"
+                  ln -s /tmp/npm-cli "$NPM_GLOBAL_DIR"
+                  npm --version
 
             - name: Publish packages to npm ("latest" dist-tag)
               run: |
