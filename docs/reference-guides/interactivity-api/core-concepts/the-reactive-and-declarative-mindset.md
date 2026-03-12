@@ -282,6 +282,8 @@ Here's an example of how you might use `data-wp-watch`:
 ```
 
 ```js
+import { store, getContext } from '@wordpress/interactivity';
+
 store( 'myCounterPlugin', {
 	actions: {
 		increment() {
