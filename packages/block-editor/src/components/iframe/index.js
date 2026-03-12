@@ -27,6 +27,20 @@ import { store as blockEditorStore } from '../../store';
 
 const ViewportWidthProvider = useViewportMatch.__experimentalWidthProvider;
 
+// Keep simulated viewport width stable at the same ranges as block visibility:
+// mobile < 480, tablet < 782, desktop => 782.
+const DEVICE_BREAKPOINTS = [ 480, 782 ]; // mobile, tablet, desktop
+
+function getBucketedViewportWidth( width ) {
+	for ( let i = 0; i < DEVICE_BREAKPOINTS.length; i++ ) {
+		if ( width < DEVICE_BREAKPOINTS[ i ] ) {
+			return DEVICE_BREAKPOINTS[ i ] - 1;
+		}
+	}
+
+	return DEVICE_BREAKPOINTS[ DEVICE_BREAKPOINTS.length - 1 ];
+}
+
 function bubbleEvent( event, Constructor, frame ) {
 	const init = {};
 
@@ -271,7 +285,6 @@ function Iframe( {
 	const {
 		contentResizeListener,
 		containerResizeListener,
-		containerWidth,
 		isZoomedOut,
 		scaleContainerWidth,
 	} = useScaleCanvas( {
@@ -279,7 +292,7 @@ function Iframe( {
 		frameSize: parseInt( frameSize ),
 		iframeDocument,
 	} );
-
+	const viewportMatchWidth = getBucketedViewportWidth( scaleContainerWidth );
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 
 	const unguardedBodyRef = useMergeRefs( [
@@ -368,7 +381,9 @@ function Iframe( {
 						>
 							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>
-								<ViewportWidthProvider value={ containerWidth }>
+								<ViewportWidthProvider
+									value={ viewportMatchWidth }
+								>
 									{ children }
 								</ViewportWidthProvider>
 							</StyleProvider>
