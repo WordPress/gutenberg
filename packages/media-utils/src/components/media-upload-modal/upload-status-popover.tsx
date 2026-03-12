@@ -75,7 +75,7 @@ export function UploadStatusPopover( {
 
 	return (
 		<div className="media-upload-modal__upload-status">
-			{ isUploading && <Spinner /> }
+			<Spinner />
 			<Button
 				className="media-upload-modal__upload-status__trigger"
 				size="compact"
