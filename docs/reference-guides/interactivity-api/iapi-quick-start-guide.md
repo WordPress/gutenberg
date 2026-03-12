@@ -10,7 +10,7 @@ Next, use the [`@wordpress/create-block`](https://developer.wordpress.org/block-
 
 Choose the folder where you want to create the plugin, and then execute the following command in the terminal from within that folder:
 
-```
+```bash
 npx @wordpress/create-block@latest my-first-interactive-block --template @wordpress/create-block-interactive-template
 ```
 
@@ -20,7 +20,7 @@ The slug provided (`my-first-interactive-block`) defines the folder name for the
 
 With the plugin activated, you can explore how the block works. Use the following command to move into the newly created plugin folder and start the development process.
 
-```
+```bash
 cd my-first-interactive-block && npm start
 ```
 
@@ -34,7 +34,7 @@ When you are finished making changes, run the `npm run build` command. This opti
 
 If you have a local WordPress installation already running, you can launch the commands above inside the `plugins` folder of that installation. If not, you can use [`@wp-playground/cli`](https://github.com/WordPress/wordpress-playground/tree/trunk/packages/playground/cli) to launch a WordPress site with the plugin installed by executing the following command from the plugin's folder (`my-first-interactive-block`).
 
-```
+```bash
 npx @wp-playground/cli server --auto-mount
 ```
 
