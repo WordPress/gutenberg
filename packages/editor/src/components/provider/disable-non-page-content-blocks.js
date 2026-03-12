@@ -49,7 +49,7 @@ export default function DisableNonPageContentBlocks() {
 	// The effects below are split so that changes to one group of blocks
 	// don't cause unnecessary set/unset cycles for the others. For example,
 	// the root block ('') editing mode only needs to be set once.
-	// This child blocks of templates and templateParts are also loaded separately,
+	// Child blocks of templates and templateParts are also loaded separately,
 	// so these are kept in separate effects.
 	useEffect( () => {
 		const { setBlockEditingMode, unsetBlockEditingMode } =
