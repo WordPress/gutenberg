@@ -60,8 +60,9 @@ import { store } from '@wordpress/interactivity';
 
 To indicate that the block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) the Interactivity API features, add `"interactivity": true` to the `supports` attribute of the block's `block.json` file.
 
+In `block.json`:
+
 ```json
-// block.json
 "supports": {
     "interactivity": true
 },
@@ -73,24 +74,25 @@ Refer to the [`interactivity` support property docs](https://developer.wordpress
 
 The Interactivity API provides the `@wordpress/interactivity` Script Module. JavaScript using the Interactivity API should be implemented as Script Modules so they can depend on `@wordpress/interactivity`. [Script Modules have been available since WordPress 6.5](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/). Blocks can use [`viewScriptModule` block metadata](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script-module) to enqueue their Script Modules easily:
 
+In `block.json`:
+
 ```json
-// block.json
 {
-   ...
    "viewScriptModule": "file:./view.js"
 }
 ```
 
 The use of `viewScriptModule` also requires the `--experimental-modules` flag for both the [`build`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#build) and [`start`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#start) scripts of `wp-scripts` to ensure a proper build of the Script Modules.
 
+In `package.json`:
+
 ```json
-// package.json
 {
     "scripts": {
-        ...
-		"build": "wp-scripts build --experimental-modules",
-		"start": "wp-scripts start --experimental-modules"
-	}
+        "build": "wp-scripts build --experimental-modules",
+        "start": "wp-scripts start --experimental-modules"
+    }
+}
 ```
 
 #### Add `wp-interactive` directive to a DOM element
