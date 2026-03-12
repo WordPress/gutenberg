@@ -128,6 +128,16 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									) }
 									label={ __( 'Show avatar in blocks' ) }
 								/>
+								<PreferenceToggleControl
+									scope="core"
+									featureName="showCollaborationNotifications"
+									help={ __(
+										'Show notifications when collaborators join, leave, or save the post.'
+									) }
+									label={ __(
+										'Show collaboration notifications'
+									) }
+								/>
 							</PreferencesModalSection>
 							<PreferencesModalSection
 								title={ __( 'Document settings' ) }
