@@ -38,6 +38,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		isItemClickable,
 		renderItemLink,
 		defaultLayouts,
+		containerRef,
 		empty = <p>{ __( 'No results' ) }</p>,
 	} = useContext( DataViewsContext );
 
@@ -50,7 +51,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 	)?.component as ComponentType< ViewBaseProps< any > >;
 
 	return (
-		<div className="dataviews-layout__container">
+		<div className="dataviews-layout__container" ref={ containerRef }>
 			<ViewComponent
 				className={ className }
 				actions={ actions }
