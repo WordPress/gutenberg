@@ -701,7 +701,7 @@ When `clientNavigationDisabled` is `true`:
 
 The Interactivity API router includes built-in feedback during navigation:
 
--   **Loading animation**: A progress bar that appears at the top of the page during navigation. The bar appears after a short delay (400ms) if navigation hasn't completed yet. This 400ms delay is introduced to avoid showing the animation if the page has been sucessfully prefetched or in very fast connections.
+-   **Loading animation**: A progress bar that appears at the top of the page during navigation. The bar appears after a short delay (400ms) if navigation hasn't completed yet. This 400ms delay is introduced to avoid showing the animation if the page has been successfully prefetched or in very fast connections.
 -   **Screen reader announcements**: Accessibility announcements for navigation progress.
 
 In some cases, you may want to disable these:
