@@ -8,7 +8,7 @@
 	}
 
 	.components-modal__frame.is-full-screen .components-modal__content {
-		margin-bottom: $grid-unit-20;
+		margin-bottom: 0;
 	}
 
 	.components-modal__content {
@@ -17,10 +17,6 @@
 
 	.dataviews-picker-wrapper > .dataviews__view-actions {
 		padding-top: $grid-unit-10;
-	}
-
-	.dataviews-footer {
-		padding-bottom: $grid-unit-10;
 	}
 
 	.media-upload-modal__footer {
