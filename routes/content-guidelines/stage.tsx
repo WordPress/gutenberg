@@ -10,8 +10,8 @@ import {
 	Spinner,
 	Navigator,
 	__experimentalVStack as VStack,
+	Notice,
 } from '@wordpress/components';
-import { Notice } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -85,20 +85,20 @@ function ContentGuidelinesPage() {
 		>
 			{ error && (
 				<div className="content-guidelines__content">
-					<Notice.Root intent="error">
-						<Notice.Title>
+					<Notice status="error" isDismissible={ false }>
+						<p>
 							{ sprintf(
 								/* translators: %s: Error message. */
 								__( 'Error loading guidelines: %s' ),
 								error
 							) }
-						</Notice.Title>
-						<Notice.Description>
+						</p>
+						<p>
 							{ __(
 								'Please try again. If the problem persists, contact support.'
 							) }
-						</Notice.Description>
-					</Notice.Root>
+						</p>
+					</Notice>
 				</div>
 			) }
 			{ loading ? (

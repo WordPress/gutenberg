@@ -10,10 +10,10 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
+	Notice,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useState } from '@wordpress/element';
-import { Notice } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -144,15 +144,13 @@ export default function ActionsSection() {
 				style={ { display: 'none' } }
 			/>
 			{ error && (
-				<Notice.Root
-					intent="warning"
-					className="content-guidelines__actions-notice"
+				<Notice
+					isDismissible
+					status="warning"
+					onRemove={ () => setError( null ) }
 				>
-					<Notice.Title className="content-guidelines__actions-notice-title">
-						{ error }
-					</Notice.Title>
-					<Notice.CloseIcon onClick={ () => setError( null ) } />
-				</Notice.Root>
+					{ error }
+				</Notice>
 			) }
 			<Card className="content-guidelines__actions-card">
 				{ /*
