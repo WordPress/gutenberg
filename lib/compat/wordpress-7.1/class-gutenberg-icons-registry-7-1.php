@@ -90,7 +90,7 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 
 /**
  * Forces Gutenberg_Icons_Registry_7_1 instantiation and overrides WP_Icons_Registry
- * so that all code using WP_Icons_Registry::get_instance() receives the Gutenberg
+ * so that all code using WP_Icons_Registry::{method_name}() receives the Gutenberg
  * registry.
  */
 function gutenberg_override_wp_icons_registry_7_1() {
