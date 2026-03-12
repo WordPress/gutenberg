@@ -11,7 +11,7 @@ import {
 	Button,
 	TextControl,
 } from '@wordpress/components';
-import { createInterpolateElement, useState } from '@wordpress/element';
+import { createInterpolateElement, useId, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -36,25 +36,31 @@ export function ConnectorItem( {
 	actionArea,
 	children,
 }: ConnectorItemProps ) {
+	const headingId = useId();
 	return (
 		<Item className={ className }>
-			<VStack spacing={ 4 }>
-				<HStack alignment="center" spacing={ 4 } wrap>
-					{ icon }
-					<FlexBlock>
-						<VStack spacing={ 0 }>
-							<Text weight={ 600 } size={ 15 }>
-								{ name }
-							</Text>
-							<Text variant="muted" size={ 12 }>
-								{ description }
-							</Text>
-						</VStack>
-					</FlexBlock>
-					{ actionArea }
-				</HStack>
-				{ children }
-			</VStack>
+			<div role="group" aria-labelledby={ headingId }>
+				<VStack spacing={ 4 }>
+					<HStack alignment="center" spacing={ 4 } wrap>
+						{ icon }
+						<FlexBlock>
+							<VStack spacing={ 0 }>
+								<h2
+									className="connector-item__heading"
+									id={ headingId }
+								>
+									{ name }
+								</h2>
+								<Text variant="muted" size={ 12 }>
+									{ description }
+								</Text>
+							</VStack>
+						</FlexBlock>
+						{ actionArea }
+					</HStack>
+					{ children }
+				</VStack>
+			</div>
 		</Item>
 	);
 }
