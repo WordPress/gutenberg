@@ -8,7 +8,7 @@ import { useContext, useMemo, useSyncExternalStore } from '@wordpress/element';
  */
 import { WindowContext } from '../..';
 
-const matchMediaCache = new Map();
+const perWindowCache = new WeakMap();
 
 /**
  * A new MediaQueryList object for the media query
@@ -22,11 +22,16 @@ function getMediaQueryList( win, query ) {
 		return null;
 	}
 
+	const matchMediaCache = perWindowCache.get( win ) ?? new Map();
+	if ( ! perWindowCache.has( win ) ) {
+		perWindowCache.set( win, matchMediaCache );
+	}
+
 	let match = matchMediaCache.get( query );
 
-	// if ( match ) {
-	// 	return match;
-	// }
+	if ( match ) {
+		return match;
+	}
 
 	if ( typeof win !== 'undefined' && typeof win.matchMedia === 'function' ) {
 		match = win.matchMedia( query );
@@ -45,10 +50,6 @@ function getMediaQueryList( win, query ) {
  */
 export default function useMediaQuery( query ) {
 	const win = useContext( WindowContext );
-
-	if ( ! win ) {
-		throw new TypeError( win );
-	}
 
 	const source = useMemo( () => {
 		const mediaQueryList = getMediaQueryList( win, query );
