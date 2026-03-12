@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -240,6 +240,47 @@ describe( 'DataViews component', () => {
 		expect( screen.getByText( 'TEST TITLE' ) ).toBeInTheDocument();
 	} );
 
+	it( 'should trigger infinite scroll when the layout container scrolls', () => {
+		const infiniteScrollHandler = jest.fn();
+		const { container } = render(
+			<DataViewWrapper
+				view={ {
+					type: LAYOUT_GRID,
+					infiniteScrollEnabled: true,
+					perPage: 1,
+				} }
+				paginationInfo={ {
+					totalItems: data.length,
+					totalPages: data.length,
+					infiniteScrollHandler,
+				} }
+			/>
+		);
+		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+		const layoutContainer = container.querySelector(
+			'.dataviews-layout__container'
+		) as HTMLDivElement;
+
+		Object.defineProperties( layoutContainer, {
+			scrollTop: {
+				configurable: true,
+				value: 500,
+			},
+			scrollHeight: {
+				configurable: true,
+				value: 1000,
+			},
+			clientHeight: {
+				configurable: true,
+				value: 500,
+			},
+		} );
+
+		fireEvent.scroll( layoutContainer );
+
+		expect( infiniteScrollHandler ).toHaveBeenCalledTimes( 1 );
+	} );
+
 	describe( 'in table view', () => {
 		it( 'should display columns for each field', () => {
 			render( <DataViewWrapper /> );
@@ -282,47 +323,6 @@ describe( 'DataViews component', () => {
 		it( 'should render actions column if actions are supported and passed in', () => {
 			render( <DataViewWrapper actions={ actions } /> );
 			expect( screen.getByText( 'Actions' ) ).toBeInTheDocument();
-		} );
-
-		it( 'should trigger infinite scroll when the layout container scrolls', () => {
-			const infiniteScrollHandler = jest.fn();
-			const { container } = render(
-				<DataViewWrapper
-					view={ {
-						type: LAYOUT_GRID,
-						infiniteScrollEnabled: true,
-						perPage: 1,
-					} }
-					paginationInfo={ {
-						totalItems: data.length,
-						totalPages: data.length,
-						infiniteScrollHandler,
-					} }
-				/>
-			);
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const layoutContainer = container.querySelector(
-				'.dataviews-layout__container'
-			) as HTMLDivElement;
-
-			Object.defineProperties( layoutContainer, {
-				scrollTop: {
-					configurable: true,
-					value: 500,
-				},
-				scrollHeight: {
-					configurable: true,
-					value: 1000,
-				},
-				clientHeight: {
-					configurable: true,
-					value: 500,
-				},
-			} );
-
-			fireEvent.scroll( layoutContainer );
-
-			expect( infiniteScrollHandler ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'should trigger the onClickItem callback if isItemClickable returns true and title field is clicked', async () => {
