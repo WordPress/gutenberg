@@ -367,10 +367,14 @@ You should use local context when:
 In this example, there is a single interactive block that shows a counter and can increment it. By using local context, each instance of this block will have its own independent counter, even if multiple blocks are added to the page.
 
 ```php
+<?php
+$context = array( 'counter' => 0 );
+?>
+
 <div
   data-wp-interactive="myCounterPlugin"
   <?php echo get_block_wrapper_attributes(); ?>
-  data-wp-context='{ "counter": 0 }'
+  <?php echo wp_interactivity_data_wp_context( $context ); ?>
 >
   <p>Counter: <span data-wp-text="context.counter"></span></p>
   <button data-wp-on--click="actions.increment">Increment</button>
