@@ -212,15 +212,6 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 			// for the replacement row to appear, then focus its
 			// Options button.
 			const { parentClientId, index } = blockPosition;
-
-			// The button may already exist if the re-render beat us.
-			const button = findOptionsButtonByIndex( parentClientId, index );
-			if ( button ) {
-				button.focus();
-				setFocusTarget( null );
-				return;
-			}
-
 			const parentRow = document.querySelector(
 				`[data-block="${ parentClientId }"]`
 			);
