@@ -1,32 +1,35 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useSyncExternalStore } from '@wordpress/element';
+import { useContext, useMemo, useSyncExternalStore } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { WindowContext } from '../..';
 
 const matchMediaCache = new Map();
 
 /**
  * A new MediaQueryList object for the media query
  *
+ * @param {Window} win     Window.
  * @param {string} [query] Media Query.
  * @return {MediaQueryList|null} A new object for the media query
  */
-function getMediaQueryList( query ) {
+function getMediaQueryList( win, query ) {
 	if ( ! query ) {
 		return null;
 	}
 
 	let match = matchMediaCache.get( query );
 
-	if ( match ) {
-		return match;
-	}
+	// if ( match ) {
+	// 	return match;
+	// }
 
-	if (
-		typeof window !== 'undefined' &&
-		typeof window.matchMedia === 'function'
-	) {
-		match = window.matchMedia( query );
+	if ( typeof win !== 'undefined' && typeof win.matchMedia === 'function' ) {
+		match = win.matchMedia( query );
 		matchMediaCache.set( query, match );
 		return match;
 	}
@@ -41,8 +44,14 @@ function getMediaQueryList( query ) {
  * @return {boolean} return value of the media query.
  */
 export default function useMediaQuery( query ) {
+	const win = useContext( WindowContext );
+
+	if ( ! win ) {
+		throw new TypeError( win );
+	}
+
 	const source = useMemo( () => {
-		const mediaQueryList = getMediaQueryList( query );
+		const mediaQueryList = getMediaQueryList( win, query );
 
 		return {
 			/** @type {(onStoreChange: () => void) => () => void} */
@@ -64,7 +73,7 @@ export default function useMediaQuery( query ) {
 				return mediaQueryList?.matches ?? false;
 			},
 		};
-	}, [ query ] );
+	}, [ win, query ] );
 
 	return useSyncExternalStore(
 		source.subscribe,

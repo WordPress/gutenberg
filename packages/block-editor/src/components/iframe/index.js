@@ -8,7 +8,12 @@ import clsx from 'clsx';
  */
 import { useState, createPortal, forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	useRefEffect,
+	useDisabled,
+	WindowContext,
+} from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
@@ -359,9 +364,13 @@ function Iframe( {
 							) }
 						>
 							{ contentResizeListener }
-							<StyleProvider document={ iframeDocument }>
-								{ children }
-							</StyleProvider>
+							<WindowContext.Provider
+								value={ iframeDocument.defaultView }
+							>
+								<StyleProvider document={ iframeDocument }>
+									{ children }
+								</StyleProvider>
+							</WindowContext.Provider>
 						</body>,
 						iframeDocument.documentElement
 					) }

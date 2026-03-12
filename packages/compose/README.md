@@ -616,6 +616,10 @@ _Parameters_
 -   _object_ `object`: Object which changes to compare.
 -   _prefix_ `string`: Just a prefix to show when console logging.
 
+### WindowContext
+
+Undocumented declaration.
+
 ### withGlobalEvents
 
 > **Deprecated**

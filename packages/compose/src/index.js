@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import { createContext } from '@wordpress/element';
+
 // The `createHigherOrderComponent` helper and helper types.
 export * from './utils/create-higher-order-component';
 // The `debounce` helper and its types.
@@ -50,3 +55,5 @@ export { default as __experimentalUseDropZone } from './hooks/use-drop-zone';
 export { default as useFocusableIframe } from './hooks/use-focusable-iframe';
 export { default as __experimentalUseFixedWindowList } from './hooks/use-fixed-window-list';
 export { default as useObservableValue } from './hooks/use-observable-value';
+
+export const WindowContext = createContext( window );
