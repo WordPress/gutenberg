@@ -1186,12 +1186,13 @@ When `navigate()` is called (for example, on link click):
 2. If not already prefetched, the fetch process from Phase 1 runs now.
 3. The router waits for the page to be ready (fetch complete, styles loaded).
 4. A loading indicator may appear if the wait exceeds a threshold (400ms).
-5. The rendering phase begins (wrapped in a batch for efficiency):
-    - Script modules for the new page are executed.
-    - Server state is merged with client state.
-    - Each router region is updated with its new virtual DOM.
-    - Regions with `attachTo` that don't exist are created and appended.
+5. The rendering phase begins:
     - Styles are activated/deactivated as needed.
+    - Script modules for the new page are executed.
+    - In a batch for efficiency:
+        - Server state is merged with client state.
+        - Each router region is updated with its new virtual DOM.
+        - Regions with `attachTo` that don't exist are created and appended.
     - The document title is updated.
 6. Browser history is updated (pushState or replaceState).
 7. Screen reader announcement is made for accessibility.
