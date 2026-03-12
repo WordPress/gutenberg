@@ -75,14 +75,16 @@ test.describe( 'Collaboration - Awareness Cursor Position', () => {
 							const iframe = document.querySelector(
 								'iframe[name="editor-canvas"]'
 							) as HTMLIFrameElement | null;
-							return iframe?.contentDocument?.querySelector(
-								'.collaborators-overlay-user'
-							);
+							const cursor =
+								iframe?.contentDocument?.querySelector(
+									'.collaborators-overlay-user'
+								);
+							return !! cursor;
 						} );
 					},
 					{ timeout: 5000 }
 				)
-				.not.toBeNull();
+				.toBe( true );
 
 			const cursorX = await page2.evaluate( () => {
 				const iframe = document.querySelector(
