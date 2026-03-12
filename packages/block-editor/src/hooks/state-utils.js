@@ -1,36 +1,61 @@
 /**
  * WordPress dependencies
  */
-import { __EXPERIMENTAL_ELEMENTS as ELEMENTS } from '@wordpress/blocks';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { scopeSelector } from '../components/global-styles/utils';
 
-export const STATES_ELEMENT_SUPPORT_KEY = '__experimentalStatesElement';
+/**
+ * Given a block's `selectors.root` value, returns the part of the selector
+ * that is relative to the block wrapper — i.e., everything after the first
+ * compound selector segment.
+ *
+ * Examples:
+ *   ".wp-block-button .wp-block-button__link" → ".wp-block-button__link"
+ *   ".wp-block-foo > .inner"                 → "> .inner"
+ *   ".wp-block-foo"                          → null (no descendant)
+ *
+ * @param {string} rootSelector The block's `selectors.root` value.
+ * @return {string|null} Relative selector, or null if rootSelector targets the wrapper itself.
+ */
+export function getRelativeRootSelector( rootSelector ) {
+	// Match everything after the first compound selector (up to the first
+	// whitespace or combinator character).
+	// Require at least one combinator character (space, >, +, ~) between the
+	// first compound selector and the rest. Without this anchor, a greedy
+	// quantifier would backtrack into the first token and produce false matches.
+	const match = rootSelector.trim().match( /^[^ >+~]+[ >+~](.*)$/ );
+	if ( ! match ) {
+		return null;
+	}
+	const rest = match[ 1 ].trim();
+	return rest || null;
+}
 
 /**
  * Builds the scoped CSS selector for a block state (e.g. :hover, :focus).
  *
- * When the block declares `__experimentalStatesElement` pointing to a known
- * ELEMENTS key (e.g. "button"), the pseudo-class is appended to each
- * comma-separated element selector part and the result is scoped under
- * `baseSelector`. Otherwise falls back to appending the state directly to
- * `baseSelector` (i.e. the block wrapper).
+ * Uses the block's `selectors.root` to determine which element the state
+ * pseudo-class should apply to. If `selectors.root` describes a descendant
+ * element (e.g. ".wp-block-button .wp-block-button__link"), the relative
+ * portion (".wp-block-button__link") is scoped under `baseSelector`. If no
+ * descendant is present, falls back to appending the state to `baseSelector`.
  *
- * @param {string}      baseSelector  The block-instance scoping class selector.
- * @param {string|null} statesElement Value of `__experimentalStatesElement` support, or null.
- * @param {string}      state         The pseudo-class string, e.g. ":hover".
+ * @param {string} baseSelector The block-instance scoping class selector.
+ * @param {string} name         The block name, used to look up selectors.
+ * @param {string} state        The pseudo-class string, e.g. ":hover".
  * @return {string} The fully-scoped CSS selector for this state.
  */
-export function buildStateSelector( baseSelector, statesElement, state ) {
-	if ( statesElement && ELEMENTS[ statesElement ] ) {
-		const elementParts = ELEMENTS[ statesElement ]
-			.split( ',' )
-			.map( ( part ) => part.trim() + state )
-			.join( ', ' );
-		return scopeSelector( baseSelector, elementParts );
+export function buildStateSelector( baseSelector, name, state ) {
+	const rootSelector = getBlockType( name )?.selectors?.root;
+	if ( rootSelector ) {
+		const relativeSelector = getRelativeRootSelector( rootSelector );
+		if ( relativeSelector ) {
+			return scopeSelector( baseSelector, relativeSelector + state );
+		}
 	}
 	return `${ baseSelector }${ state }`;
 }
