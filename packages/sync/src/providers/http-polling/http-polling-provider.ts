@@ -149,7 +149,7 @@ export function createHttpPollingProvider(): ProviderCreator {
 		const room = objectId ? `${ objectType }:${ objectId }` : objectType;
 		const provider = new HttpPollingProvider( {
 			awareness,
-			debug: true,
+			// debug: true,
 			room,
 			ydoc,
 		} );
