@@ -322,6 +322,7 @@ wp_interactivity_state( 'myFruitPlugin', array(
   'fruits'         => array( __( 'Apple' ), __( 'Banana' ), __( 'Cherry' ) ),
   'shoppingList'   => array( __( 'Apple' ), __( 'Cherry' ) ),
   // ...
+));
 ?>
 
 <div data-wp-interactive="myFruitPlugin">
