@@ -55,6 +55,7 @@ interface RegisterRoomOptions {
 }
 
 interface RoomState {
+	awareness: Awareness;
 	clientId: number;
 	createCompactionUpdate: () => SyncUpdate;
 	endCursor: number;
@@ -359,37 +360,75 @@ function poll(): void {
 		// Check if the payload size exceeds the provider limit before
 		// sending the request. Once the request goes out it's too late.
 		// Update data is base64-encoded, so string length equals byte size.
-		const payloadSizeInBytes = payload.rooms.reduce(
-			( total, room ) =>
-				total +
-				room.updates.reduce(
-					( sum, update ) => sum + update.data.length,
-					0
-				),
-			0
+		// Skip the check when all queues are paused (solo editing) since
+		// no updates are being sent yet.
+		const { payloadSizeInBytes, allQueuesPaused } = payload.rooms.reduce(
+			( acc, room ) => ( {
+				payloadSizeInBytes:
+					acc.payloadSizeInBytes +
+					room.updates.reduce(
+						( sum, update ) => sum + update.data.length,
+						0
+					),
+				allQueuesPaused:
+					acc.allQueuesPaused &&
+					( roomStates.get( room.room )?.updateQueue.isPaused() ??
+						true ),
+			} ),
+			{ payloadSizeInBytes: 0, allQueuesPaused: true }
 		);
 
-		if ( payloadSizeInBytes > MAX_PROVIDER_SIZE_BYTES ) {
+		if (
+			! allQueuesPaused &&
+			payloadSizeInBytes > MAX_PROVIDER_SIZE_BYTES
+		) {
 			const error: ConnectionError = {
 				name: 'ConnectionError',
 				message: 'Provider size limit exceeded',
 				code: 'provider-limit-exceeded',
 			};
 
-			roomStates.forEach( ( state ) => {
-				state.updateQueue.pause();
+			roomStates.forEach( ( state, room ) => {
+				// Allow the lowest client ID to remain connected
+				// without seeing an error, similar to compaction.
+				const peerIds = Array.from(
+					state.awareness.getStates().keys()
+				);
+				const lowestClientId = Math.min( ...peerIds );
+
 				state.log( 'Provider size limit exceeded', {
 					payloadSizeInBytes,
 					maxSizeInBytes: MAX_PROVIDER_SIZE_BYTES,
 				} );
-				state.onStatusChange( {
-					status: 'disconnected',
-					error,
-				} );
+
+				if ( state.clientId === lowestClientId ) {
+					// Pause the queue so we stop sending document
+					// updates but keep polling for awareness.
+					state.updateQueue.pause();
+				} else {
+					state.onStatusChange( {
+						status: 'disconnected',
+						error,
+					} );
+					unregisterRoom( room );
+				}
 			} );
 
-			limitExceeded = true;
+			// If all rooms were unregistered, stop polling.
+			// Otherwise the lowest client remains and keeps polling
+			// for awareness updates.
+			if ( 0 === roomStates.size ) {
+				limitExceeded = true;
+				return;
+			}
+
+			pollingTimeoutId = setTimeout( poll, pollInterval );
 			return;
+		}
+
+		if ( payloadSizeInBytes === 0 ) {
+			// eslint-disable-next-line no-console
+			console.warn( 'payloadSizeInBytes is 0', payloadSizeInBytes );
 		}
 
 		// Reset the limit exceeded flag.
@@ -535,6 +574,7 @@ function registerRoom( {
 	}
 
 	const roomState: RoomState = {
+		awareness,
 		clientId: doc.clientID,
 		createCompactionUpdate: () =>
 			createSyncUpdate(
