@@ -129,3 +129,24 @@ function gutenberg_override_autosaves_rest_controller( $args ) {
 }
 
 add_filter( 'register_post_type_args', 'gutenberg_override_autosaves_rest_controller', 10, 1 );
+
+/**
+ * Overrides the default REST controller for revisions to support nested
+ * _fields parameters (e.g. content.raw without content.rendered).
+ *
+ * The core WP_REST_Revisions_Controller uses in_array() checks for content,
+ * title, excerpt, and guid fields, which prevents sub-field filtering via
+ * the _fields parameter. The Gutenberg override uses rest_is_field_included()
+ * so that clients can avoid expensive server-side rendering when only raw
+ * data is needed.
+ *
+ * Only overrides when revisions_rest_controller_class is not explicitly set.
+ */
+function gutenberg_override_revisions_rest_controller( $args ) {
+	if ( empty( $args['revisions_rest_controller_class'] ) ) {
+		$args['revisions_rest_controller_class'] = 'Gutenberg_REST_Revisions_Controller';
+	}
+	return $args;
+}
+
+add_filter( 'register_post_type_args', 'gutenberg_override_revisions_rest_controller', 10, 1 );
