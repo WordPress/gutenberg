@@ -195,7 +195,7 @@ The `wp-bind` will do different things when the DOM element is applied, dependin
 
 -   If the value is `true`, the attribute is added: `<div attribute>`
 -   If the value is `false`, the attribute is removed: `<div>`
--   If the value is a string, the attribute is added with its value assigned: `<div attribute="value"`
+-   If the value is a string, the attribute is added with its value assigned: `<div attribute="value">`
 -   If the attribute name starts with `aria-` or `data-` and the value is boolean (either `true` or `false`), the attribute is added to the DOM with the boolean value assigned as a string: `<div aria-attribute="true">`
 
 ### `wp-class`
