@@ -245,6 +245,16 @@ export const MinimalUI = {
 
 export const FreeComposition = {
 	render: FreeCompositionComponent,
+	args: {
+		containerHeight: '80vh',
+	},
+	argTypes: {
+		containerHeight: {
+			control: 'select',
+			options: [ 'auto', '600px', '80vh' ],
+			description: 'Height of the container',
+		},
+	},
 };
 
 export const WithCard = {

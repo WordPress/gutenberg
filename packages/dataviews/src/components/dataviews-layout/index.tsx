@@ -50,23 +50,25 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 	)?.component as ComponentType< ViewBaseProps< any > >;
 
 	return (
-		<ViewComponent
-			className={ className }
-			actions={ actions }
-			data={ data }
-			fields={ fields }
-			getItemId={ getItemId }
-			getItemLevel={ getItemLevel }
-			isLoading={ isLoading }
-			onChangeView={ onChangeView }
-			onChangeSelection={ onChangeSelection }
-			selection={ selection }
-			setOpenedFilter={ setOpenedFilter }
-			onClickItem={ onClickItem }
-			renderItemLink={ renderItemLink }
-			isItemClickable={ isItemClickable }
-			view={ view }
-			empty={ empty }
-		/>
+		<div className="dataviews-layout__container">
+			<ViewComponent
+				className={ className }
+				actions={ actions }
+				data={ data }
+				fields={ fields }
+				getItemId={ getItemId }
+				getItemLevel={ getItemLevel }
+				isLoading={ isLoading }
+				onChangeView={ onChangeView }
+				onChangeSelection={ onChangeSelection }
+				selection={ selection }
+				setOpenedFilter={ setOpenedFilter }
+				onClickItem={ onClickItem }
+				renderItemLink={ renderItemLink }
+				isItemClickable={ isItemClickable }
+				view={ view }
+				empty={ empty }
+			/>
+		</div>
 	);
 }

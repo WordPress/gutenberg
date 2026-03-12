@@ -102,9 +102,9 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 							</Stack>
 						</CardBody>
 					</Card>
-					<DataViews.Layout className="free-composition-dataviews-layout" />
 				</Stack>
 			</div>
+			<DataViews.Layout className="free-composition-dataviews-layout" />
 		</>
 	);
 }
@@ -127,12 +127,16 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
  * This pattern is useful when you need full control over the UI layout
  * while still leveraging DataViews' data management and state handling.
  */
-export const FreeCompositionComponent = () => {
+export const FreeCompositionComponent = ( {
+	containerHeight = '600px',
+}: {
+	containerHeight?: string;
+} ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_TABLE,
 		search: '',
 		page: 1,
-		perPage: 10,
+		perPage: 20,
 		layout: {
 			enableMoving: false,
 		},
@@ -152,7 +156,7 @@ export const FreeCompositionComponent = () => {
 	);
 
 	return (
-		<div className="free-composition">
+		<div style={ { height: containerHeight } }>
 			<DataViews
 				getItemId={ ( item ) => item.id.toString() }
 				paginationInfo={ paginationInfo }
