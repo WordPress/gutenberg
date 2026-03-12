@@ -7262,7 +7262,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * @covers WP_Theme_JSON_Gutenberg::to_ruleset
 	 */
 	public function test_to_ruleset_skips_non_scalar_values_and_casts_numerics() {
-		$reflection   = new ReflectionMethod( WP_Theme_JSON_Gutenberg::class, 'to_ruleset' );
+		$reflection = new ReflectionMethod( WP_Theme_JSON_Gutenberg::class, 'to_ruleset' );
+		$reflection->setAccessible( true );
 		$declarations = array(
 			array(
 				'name'  => 'color',
