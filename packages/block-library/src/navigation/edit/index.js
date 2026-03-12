@@ -335,8 +335,10 @@ function Navigation( {
 			onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
 			// Needed to construct the template part ID for the overlay preview.
 			currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
-			// In preview mode or isolated editor, always show navigation expanded (no hamburger)
-			// so users can see and interact with all menu items.
+			// In preview mode or isolated editor, show navigation expanded (no hamburger)
+			// for 'mobile' overlay so users can see and interact with all menu items.
+			// This flag is intentionally ignored when overlayMenu is 'always', since that
+			// is an explicit user choice to always show the hamburger menu.
 			editorDisabledResponsive:
 				settings.isPreviewMode || !! settings?.[ isIsolatedEditorKey ],
 		};
@@ -612,7 +614,13 @@ function Navigation( {
 		setAttributes,
 	] );
 
-	const isResponsive = 'never' !== overlayMenu && ! editorDisabledResponsive;
+	// When overlayMenu is 'always', the user has explicitly chosen to always show
+	// the hamburger menu, so we respect that setting even in preview/isolated mode.
+	// For 'mobile', we still disable the responsive behavior in those modes so all
+	// menu items remain visible and accessible.
+	const isResponsive =
+		'never' !== overlayMenu &&
+		( 'always' === overlayMenu || ! editorDisabledResponsive );
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
