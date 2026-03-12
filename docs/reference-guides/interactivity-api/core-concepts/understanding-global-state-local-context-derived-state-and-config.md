@@ -299,6 +299,8 @@ You should use local context when:
     In JavaScript, you can access the local context values using the `getContext` function:
 
     ```js
+    import { store, getContext } from '@wordpress/interactivity';
+
     store( 'myPlugin', {
     	actions: {
     		sendAnalyticsEvent() {
@@ -322,6 +324,8 @@ You should use local context when:
     To update the local context values in JavaScript, you can modify the object returned by `getContext`:
 
     ```js
+    import { store, getContext } from '@wordpress/interactivity';
+
     store( 'myPlugin', {
     	actions: {
     		increment() {
@@ -374,6 +378,8 @@ In this example, there is a single interactive block that shows a counter and ca
 ```
 
 ```js
+import { store, getContext } from '@wordpress/interactivity';
+
 store( 'myCounterPlugin', {
 	actions: {
 		increment() {
@@ -495,6 +501,8 @@ You should use derived state:
     Derived state can depend on local context, or local context and global state at the same time.
 
     ```js
+    import { store, getContext } from '@wordpress/interactivity';
+
     const { state } = store( 'myCounterPlugin', {
     	state: {
     		get double() {
@@ -658,6 +666,8 @@ Let's consider a scenario where there is a counter and the double value needs to
 Let's now consider a scenario where there is a local context that initializes a counter.
 
 ```js
+import { store, getContext } from '@wordpress/interactivity';
+
 store( 'myCounterPlugin', {
 	state: {
 		get double() {
@@ -712,6 +722,8 @@ Let's now consider a scenario where there is a global tax rate and local product
 ```
 
 ```js
+import { store, getContext } from '@wordpress/interactivity';
+
 const { state } = store( 'myProductPlugin', {
 	state: {
 		taxRate: 0.21,
