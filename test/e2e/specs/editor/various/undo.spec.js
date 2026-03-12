@@ -177,6 +177,14 @@ test.describe( 'undo', () => {
 		await editor.canvas.locator( '[data-type="core/paragraph"]' ).click();
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '<strong>test</strong>',
+				},
+			},
+		] );
 		await pageUtils.pressKeys( 'primary+z' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
