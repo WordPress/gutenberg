@@ -30,9 +30,10 @@ export default function DisableNonPageContentBlocks() {
 		[ postContentBlockTypes ]
 	);
 	// This is a separate `useSelect` because `templatePartChildren` is
-	// derived via flatMap, which always produces a new array. Keeping it in
-	// its own subscription with explicit deps avoids re-running the
-	// computation on every store change.
+	// derived via flatMap, which always produces a new array. Combining it
+	// with the above subscription causes an infinite render loop: the new
+	// array fails useSelect's shallow equality check → re-render → effect
+	// fires setBlockEditingMode → store changes → useSelect re-runs → …
 	const templatePartChildren = useSelect(
 		( select ) => {
 			const { getBlockOrder } = select( blockEditorStore );
