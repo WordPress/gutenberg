@@ -73,7 +73,7 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 				'<svg xmlns="http://www.w3.org/2000/svg"><p>paragraph content</p><path d="M0 0h24v24H0z" /><div>div content</div></svg>',
 				'<svg xmlns="http://www.w3.org/2000/svg"></svg>',
 			),
-			'strips namespace attributes'                => array(
+			'strips namespace attributes'                 => array(
 				'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M0 0h24v24H0z" /></svg>',
 				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" /></svg>',
 			),
