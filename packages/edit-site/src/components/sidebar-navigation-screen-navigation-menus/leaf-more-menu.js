@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 
-import { chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
+import { chevronUp, chevronDown, moreVertical, pencil } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
@@ -15,6 +15,11 @@ const POPOVER_PROPS = {
 	placement: 'bottom-start',
 };
 
+const BLOCKS_WITH_LINK_EDIT_SUPPORT = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
+
 /**
  * Internal dependencies
  */
@@ -25,7 +30,7 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
 export default function LeafMoreMenu( props ) {
 	const history = useHistory();
 	const { path } = useLocation();
-	const { block } = props;
+	const { block, setEditingBlock } = props;
 	const { clientId } = block;
 	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
 		useDispatch( blockEditorStore );
@@ -41,6 +46,8 @@ export default function LeafMoreMenu( props ) {
 		__( 'Go to %s' ),
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
+
+	const canEditLink = BLOCKS_WITH_LINK_EDIT_SUPPORT.includes( block?.name );
 
 	const rootClientId = useSelect(
 		( select ) => {
@@ -88,6 +95,17 @@ export default function LeafMoreMenu( props ) {
 			{ ( { onClose } ) => (
 				<>
 					<MenuGroup>
+						{ canEditLink && (
+							<MenuItem
+								icon={ pencil }
+								onClick={ () => {
+									setEditingBlock( block );
+									onClose();
+								} }
+							>
+								{ __( 'Edit link' ) }
+							</MenuItem>
+						) }
 						<MenuItem
 							icon={ chevronUp }
 							onClick={ () => {
