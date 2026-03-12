@@ -53,6 +53,7 @@
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/priority-queue": "file:../priority-queue",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/undo-manager": "file:../undo-manager",
 		"change-case": "^4.1.2",
 		"mousetrap": "^1.6.5",

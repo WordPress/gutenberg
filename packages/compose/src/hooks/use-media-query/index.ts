@@ -6,7 +6,7 @@ import { useContext, useMemo, useSyncExternalStore } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { WindowContext } from '../..';
+import { WindowContext } from '../../private-apis';
 
 type MQLCache = Map< string, MediaQueryList >;
 

@@ -16,6 +16,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/blocks',
 	'@wordpress/boot',
 	'@wordpress/commands',
+	'@wordpress/compose',
 	'@wordpress/connectors',
 	'@wordpress/workflows',
 	'@wordpress/components',

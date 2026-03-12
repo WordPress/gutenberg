@@ -147,6 +147,10 @@ _Related_
 
 -   <https://lodash.com/docs/4#flow>
 
+### privateApis
+
+Undocumented declaration.
+
 ### pure
 
 > **Deprecated** Use `memo` or `PureComponent` instead.
@@ -615,10 +619,6 @@ _Parameters_
 
 -   _object_ `object`: Object which changes to compare.
 -   _prefix_ `string`: Just a prefix to show when console logging.
-
-### WindowContext
-
-Undocumented declaration.
 
 ### withGlobalEvents
 

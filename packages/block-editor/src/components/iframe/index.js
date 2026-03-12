@@ -12,7 +12,7 @@ import {
 	useMergeRefs,
 	useRefEffect,
 	useDisabled,
-	WindowContext,
+	privateApis as composePrivateApis,
 } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -24,6 +24,9 @@ import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { WindowContext } = unlock( composePrivateApis );
 
 function bubbleEvent( event, Constructor, frame ) {
 	const init = {};
