@@ -8,6 +8,14 @@ import { __ } from '@wordpress/i18n';
  */
 import { ATTACHMENT_POST_TYPE } from '../constants';
 
+const AUTO_SAVE_FAILURE_NOTICE = __(
+	'Auto-save failed. Your changes will be persisted locally to avoid content loss. We’ll retry automatically, or you can save manually.'
+);
+
+const AUTO_SAVE_OFFLINE_FAILURE_NOTICE = __(
+	'Auto-save failed because you were offline. Your changes will be persisted locally to avoid content loss. We’ll retry automatically, or you can save manually. Please verify your connection and try again.'
+);
+
 /**
  * Builds the arguments for a success notification dispatch.
  *
@@ -89,7 +97,7 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
  *                 notification should be sent.
  */
 export function getNotificationArgumentsForSaveFail( data ) {
-	const { post, edits, error } = data;
+	const { post, edits, error, options } = data;
 	if ( error && 'rest_autosave_no_changes' === error.code ) {
 		// Autosave requested a new autosave, but there were no changes. This shouldn't
 		// result in an error notice for the user.
@@ -115,10 +123,14 @@ export function getNotificationArgumentsForSaveFail( data ) {
 			),
 		};
 
-		const noticeMessage =
+		let noticeMessage =
 			! isPublished && edits.status in messages
 				? messages[ edits.status ]
 				: messages.default;
+
+		if ( options?.isAutosave ) {
+			noticeMessage = AUTO_SAVE_OFFLINE_FAILURE_NOTICE;
+		}
 
 		return [ noticeMessage, { id: 'editor-save' } ];
 	}
@@ -135,9 +147,17 @@ export function getNotificationArgumentsForSaveFail( data ) {
 			? messages[ edits.status ]
 			: messages.default;
 
+	if ( options?.isAutosave ) {
+		noticeMessage = AUTO_SAVE_FAILURE_NOTICE;
+	}
+
 	// Check if message string contains HTML. Notice text is currently only
 	// supported as plaintext, and stripping the tags may muddle the meaning.
-	if ( error.message && ! /<\/?[^>]*>/.test( error.message ) ) {
+	if (
+		! options?.isAutosave &&
+		error.message &&
+		! /<\/?[^>]*>/.test( error.message )
+	) {
 		noticeMessage = [ noticeMessage, error.message ].join( ' ' );
 	}
 	return [

@@ -148,12 +148,23 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			[ 'publish', 'publish' ],
 			[ 'Updating failed. Something went wrong.', defaultExpectedAction ],
 		],
+		[
+			'when the save is an autosave',
+			'',
+			[ 'publish', 'publish' ],
+			[
+				'Auto-save failed. Your changes will be persisted locally to avoid content loss. We’ll retry automatically, or you can save manually.',
+				defaultExpectedAction,
+			],
+			{ isAutosave: true },
+		],
 	].forEach(
 		( [
 			description,
 			errorCode,
 			[ postStatus, editsStatus ],
 			expectedValue,
+			options = {},
 		] ) => {
 			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
@@ -165,6 +176,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 						post,
 						edits,
 						error,
+						options,
 					} )
 				).toEqual( expectedValue );
 			} );
