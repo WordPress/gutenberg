@@ -173,7 +173,7 @@ function ApiKeyConnector( {
 			pendingFocusRef.current = false;
 			actionButtonRef.current?.focus();
 		}
-	}, [ isBusy ] );
+	}, [ isBusy, isExpanded, isConnected ] );
 
 	const handleActionClick = () => {
 		if ( pluginStatus === 'not-installed' || pluginStatus === 'inactive' ) {
