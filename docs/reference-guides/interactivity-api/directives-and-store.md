@@ -1227,7 +1227,7 @@ const { state } = store( 'myStore', {
 
 During navigation, the data returned by both `getServerContext()` and `getServerState()` is fully replaced with the values from the new page. In contrast, the related client data (context or state) is "soft merged"—existing client-side properties are preserved, and only new properties from the server are added. This ensures that new blocks or components introduced by navigation can initialize with server-provided values, while client-side changes made by users remain intact. If you need to update existing client properties with data from the server (i.e., overwrite values), call `getServerContext()` or `getServerState()` within your callbacks and manually overwrite the relevant properties.
 
-If you subscribe to any value returned by `getServerContext()` or `getServerState()` within a callback, that callback will be invoked on every navigation event—regardless of whether that value have changed. This makes it possible to reliably reset or update client-side data as needed whenever navigation occurs.
+If you subscribe to any value returned by `getServerContext()` or `getServerState()` within a callback, that callback will be invoked on every navigation event—regardless of whether that value has changed. This makes it possible to reliably reset or update client-side data as needed whenever navigation occurs.
 
 ### withScope()
 
