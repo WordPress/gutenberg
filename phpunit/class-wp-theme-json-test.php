@@ -7265,10 +7265,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$reflection = new ReflectionMethod( WP_Theme_JSON_Gutenberg::class, 'to_ruleset' );
 		$declarations = array(
 			array( 'name' => 'color', 'value' => 'red' ),
-			array( 'name' => 'opacity', 'value' => true ),   // boolean - should be skipped
-			array( 'name' => 'margin', 'value' => 0 ),       // numeric - should become '0'
-			array( 'name' => 'padding', 'value' => false ),   // boolean - should be skipped
-			array( 'name' => 'gap', 'value' => array() ),    // array - should be skipped
+			array( 'name' => 'opacity', 'value' => true ),
+			array( 'name' => 'margin', 'value' => 0 ),
+			array( 'name' => 'padding', 'value' => false ),
+			array( 'name' => 'gap', 'value' => array() ),
 		);
 		$result = $reflection->invoke( null, '.test', $declarations );
 		$this->assertStringContainsString( 'color: red;', $result, 'Color declaration should be included' );
