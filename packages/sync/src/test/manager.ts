@@ -97,9 +97,9 @@ describe( 'SyncManager', () => {
 				Promise.resolve( mockRecord )
 			),
 			onStatusChange: jest.fn(),
+			persistCRDTDoc: jest.fn(),
 			refetchRecord: jest.fn( async () => Promise.resolve() ),
 			restoreUndoMeta: jest.fn(),
-			saveRecord: jest.fn(),
 		};
 	} );
 
@@ -266,8 +266,10 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.getChangesFromCRDTDoc
 				).not.toHaveBeenCalled();
 
-				// Verify a save operation occurred.
-				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
+				// Verify that the CRDT doc was persisted.
+				expect( mockHandlers.persistCRDTDoc ).toHaveBeenCalledTimes(
+					1
+				);
 			} );
 
 			it( 'accepts a valid persisted CRDT doc without applying changes', async () => {
@@ -301,9 +303,9 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.getChangesFromCRDTDoc
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
 
-				// Verify no save operation occurred
+				// Verify that the CRDT doc was persisted.
 				expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
-				expect( mockHandlers.saveRecord ).not.toHaveBeenCalled();
+				expect( mockHandlers.persistCRDTDoc ).not.toHaveBeenCalled();
 			} );
 
 			it( 'applies a persisted CRDT doc with invalidated fields, then applies changes', async () => {
@@ -347,8 +349,10 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.getChangesFromCRDTDoc
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
 
-				// Verify a save operation occurred.
-				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
+				// Verify that the CRDT doc was persisted.
+				expect( mockHandlers.persistCRDTDoc ).toHaveBeenCalledTimes(
+					1
+				);
 			} );
 		} );
 	} );
