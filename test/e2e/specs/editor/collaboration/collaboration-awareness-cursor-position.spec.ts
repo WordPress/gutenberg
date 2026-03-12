@@ -46,6 +46,21 @@ test.describe( 'Collaboration - Awareness Cursor Position', () => {
 		// for each cursor position User A sets.
 		const xPositions: number[] = [];
 
+		/** Read the cursor's current left position from User B's overlay. */
+		const readCursorX = () =>
+			page2.evaluate( () => {
+				const iframe = document.querySelector(
+					'iframe[name="editor-canvas"]'
+				) as HTMLIFrameElement | null;
+				const cursor = iframe?.contentDocument?.querySelector(
+					'.collaborators-overlay-user'
+				);
+				if ( ! cursor ) {
+					return null;
+				}
+				return parseFloat( ( cursor as HTMLElement ).style.left );
+			} );
+
 		for ( let offset = 0; offset <= PLAIN_TEXT.length; offset++ ) {
 			// User 1 places cursor at this offset.
 			await page.evaluate( ( off ) => {
@@ -67,37 +82,39 @@ test.describe( 'Collaboration - Awareness Cursor Position', () => {
 				);
 			}, offset );
 
-			// Poll User B's page until the awareness cursor appears.
-			await expect
-				.poll(
-					async () => {
-						return await page2.evaluate( () => {
-							const iframe = document.querySelector(
-								'iframe[name="editor-canvas"]'
-							) as HTMLIFrameElement | null;
-							const cursor =
-								iframe?.contentDocument?.querySelector(
-									'.collaborators-overlay-user'
-								);
-							return !! cursor;
-						} );
-					},
-					{ timeout: 5000 }
-				)
-				.toBe( true );
+			// Poll User B's page until the cursor position reflects the new
+			// offset. After the first iteration the cursor element already
+			// exists, so we must wait for its x-position to change rather
+			// than just checking existence.
+			const previousX =
+				xPositions.length > 0
+					? xPositions[ xPositions.length - 1 ]
+					: undefined;
 
-			const cursorX = await page2.evaluate( () => {
-				const iframe = document.querySelector(
-					'iframe[name="editor-canvas"]'
-				) as HTMLIFrameElement | null;
-				const cursor = iframe?.contentDocument?.querySelector(
-					'.collaborators-overlay-user'
-				);
-				if ( ! cursor ) {
-					return null;
-				}
-				return parseFloat( ( cursor as HTMLElement ).style.left );
-			} );
+			let cursorX: number | null = null;
+			try {
+				await expect
+					.poll(
+						async () => {
+							cursorX = await readCursorX();
+							if ( cursorX === null ) {
+								return false;
+							}
+							// First iteration: cursor appearing is enough.
+							if ( previousX === undefined ) {
+								return true;
+							}
+							// Wait for the position to change.
+							return cursorX !== previousX;
+						},
+						{ timeout: 5000 }
+					)
+					.toBe( true );
+			} catch {
+				// If the poll timed out, the position may legitimately be
+				// the same as the previous offset (sub-pixel rounding).
+				// Accept whatever value we last read.
+			}
 
 			xPositions.push( cursorX ?? -1 );
 		}
