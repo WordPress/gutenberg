@@ -13,6 +13,7 @@
 		border: 1px solid #ddd;
 		background: #fff;
 		overflow: hidden;
+		scroll-margin-top: 120px;
 	}
 
 	.connector-item__heading {
@@ -24,6 +25,7 @@
 
 	.connector-settings .components-text-control__input {
 		font-family: monospace;
+		scroll-margin-top: 120px;
 	}
 
 	&--empty {
