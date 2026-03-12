@@ -182,6 +182,36 @@ describe( 'InputControl', () => {
 			expect( spy ).toHaveBeenCalledWith( 'that was then' );
 		} );
 
+		it( 'should update value if the parent transforms it on commit', async () => {
+			const onChange = jest.fn();
+			const user = await userEvent.setup();
+			const Example = () => {
+				const [ state, setState ] = useState( '50' );
+				return (
+					<InputControl
+						value={ state }
+						onChange={ ( nextValue ) => {
+							const clampedValue =
+								Number( nextValue ) > 60 ? '60' : nextValue;
+							setState( clampedValue );
+							onChange( clampedValue );
+						} }
+						isPressEnterToChange
+					/>
+				);
+			};
+			render( <Example /> );
+			const input = getInput();
+
+			await user.clear( input );
+			await user.type( input, '99' );
+			await user.keyboard( '{Tab}' );
+
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			expect( onChange ).toHaveBeenCalledWith( '60' );
+			expect( input ).toHaveValue( '60' );
+		} );
+
 		it( 'should commit value when blurred if value is invalid', async () => {
 			const user = await userEvent.setup();
 			const spyChange = jest.fn();

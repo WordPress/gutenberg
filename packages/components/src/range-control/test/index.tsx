@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { act, fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -102,7 +103,8 @@ describe( 'RangeControl', () => {
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should keep invalid values in number input until loss of focus', () => {
+		it( 'should keep invalid values in number input until loss of focus', async () => {
+			const user = userEvent.setup();
 			const onChange = jest.fn();
 			render(
 				<RangeControl onChange={ onChange } min={ -1 } max={ 1 } />
@@ -111,13 +113,13 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
 
-			act( () => numberInput.focus() );
-			fireChangeEvent( numberInput, '-1.1' );
+			await user.clear( numberInput );
+			await user.type( numberInput, '-1.1' );
 
 			expect( numberInput.value ).toBe( '-1.1' );
 			expect( rangeInput.value ).toBe( '-1' );
 
-			fireEvent.blur( numberInput );
+			await user.keyboard( '{Tab}' );
 			expect( onChange ).toHaveBeenCalledWith( -1 );
 			expect( numberInput.value ).toBe( '-1' );
 		} );

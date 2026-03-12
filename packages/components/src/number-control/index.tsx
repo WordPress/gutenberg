@@ -235,8 +235,7 @@ function UnforwardedNumberControl(
 			required={ required }
 			step={ step }
 			type={ typeProp }
-			// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
-			value={ valueProp }
+			value={ valueProp === undefined ? valueProp : String( valueProp ) }
 			__unstableStateReducer={ numberControlStateReducer }
 			size={ size }
 			__shouldNotWarnDeprecated36pxSize
