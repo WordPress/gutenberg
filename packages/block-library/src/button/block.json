@@ -138,7 +138,8 @@
 		"interactivity": {
 			"clientNavigation": true
 		},
-		"__experimentalStates": [ ":hover", ":focus", ":active" ]
+		"__experimentalStates": [ ":hover", ":focus", ":active" ],
+		"__experimentalStatesElement": "button"
 	},
 	"styles": [
 		{ "name": "fill", "label": "Fill", "isDefault": true },
