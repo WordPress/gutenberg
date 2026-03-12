@@ -173,13 +173,14 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 
 	// Focus the reverted block's Options button once the store
 	// reports that the block at the target position has changed.
-	// The list view renders non-selected blocks asynchronously
-	// (via AsyncModeProvider), so the new row may not exist in the
-	// DOM yet — defer the query by one frame.
 	useEffect( () => {
 		if ( ! revertedClientId ) {
 			return;
 		}
+		// The list view renders non-selected blocks
+		// asynchronously (AsyncModeProvider), so the reverted
+		// block's row may not be in the DOM yet. Deferring by
+		// one frame lets the async render complete first.
 		const rafId = window.requestAnimationFrame( () => {
 			const row = document.querySelector(
 				`[data-block="${ revertedClientId }"]`
