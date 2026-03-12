@@ -600,6 +600,109 @@ test.describe( 'Navigation block - List view editing', () => {
 			listViewPanel.getByRole( 'button', { name: 'Header Menu' } )
 		).toBeVisible();
 	} );
+
+	test.describe( 'Add submenu link focus management', () => {
+		test( 'returns focus to menu item on Escape for existing submenu', async ( {
+			page,
+			editor,
+			requestUtils,
+			pageUtils,
+		} ) => {
+			await requestUtils.createNavigationMenu( navMenuBlocksFixture );
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			// Open the document list view.
+			await pageUtils.pressKeys( 'access+o' );
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+
+			// Find the submenu item (Top Level Item 2 is already a submenu).
+			const submenuRow = listView.getByRole( 'row' ).filter( {
+				has: page.getByRole( 'gridcell', {
+					name: 'Top Level Item 2',
+				} ),
+			} );
+
+			// Open the Options dropdown for the submenu.
+			const optionsButton = submenuRow.getByRole( 'button', {
+				name: 'Options',
+			} );
+			await optionsButton.click();
+
+			// Click "Add submenu link".
+			const addSubmenuLink = page
+				.getByRole( 'menu', { name: 'Options' } )
+				.getByRole( 'menuitem', { name: 'Add submenu link' } );
+			await addSubmenuLink.click();
+
+			// The link UI should be visible with the search input focused.
+			await expect(
+				page.getByRole( 'combobox', { name: 'Search or type URL' } )
+			).toBeFocused();
+
+			// Press Escape to cancel without entering a URL.
+			await page.keyboard.press( 'Escape' );
+
+			// Focus should return to the "Add submenu link" menu item.
+			await expect( addSubmenuLink ).toBeFocused();
+		} );
+
+		test( 'returns focus to Options button on Escape after block conversion', async ( {
+			page,
+			editor,
+			requestUtils,
+			pageUtils,
+		} ) => {
+			await requestUtils.createNavigationMenu( navMenuBlocksFixture );
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			// Open the document list view.
+			await pageUtils.pressKeys( 'access+o' );
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+
+			// Find the navigation-link item (Top Level Item 1).
+			const linkRow = listView.getByRole( 'row' ).filter( {
+				has: page.getByRole( 'gridcell', {
+					name: 'Top Level Item 1',
+				} ),
+			} );
+
+			// Open the Options dropdown for the link.
+			const optionsButton = linkRow.getByRole( 'button', {
+				name: 'Options',
+			} );
+			await optionsButton.click();
+
+			// Click "Add submenu link" — this converts the link to a submenu.
+			await page
+				.getByRole( 'menu', { name: 'Options' } )
+				.getByRole( 'menuitem', { name: 'Add submenu link' } )
+				.click();
+
+			// The link UI should be visible.
+			await expect(
+				page.getByRole( 'combobox', { name: 'Search or type URL' } )
+			).toBeFocused();
+
+			// Press Escape to cancel — the submenu auto-reverts to a
+			// navigation-link because removeBlock empties it.
+			await page.keyboard.press( 'Escape' );
+
+			// Focus should return to the Options button for the
+			// reverted block (which now has a new clientId).
+			const revertedRow = listView.getByRole( 'row' ).filter( {
+				has: page.getByRole( 'gridcell', {
+					name: 'Top Level Item 1',
+				} ),
+			} );
+			await expect(
+				revertedRow.getByRole( 'button', { name: 'Options' } )
+			).toBeFocused();
+		} );
+	} );
 } );
 
 class LinkControl {
