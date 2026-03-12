@@ -69,9 +69,12 @@ test.describe( 'Connectors', () => {
 		// Verify the plugin directory search link is present.
 		await expect(
 			page.getByRole( 'link', {
-				name: 'the plugin directory',
+				name: 'search the plugin directory',
 			} )
-		).toHaveAttribute( 'href', 'plugin-install.php' );
+		).toHaveAttribute(
+			'href',
+			'plugin-install.php?s=connector&tab=search&type=tag'
+		);
 	} );
 
 	test.describe( 'Test provider setup flow', () => {
@@ -295,7 +298,7 @@ test.describe( 'Connectors', () => {
 				// Plugin directory link should be hidden.
 				await expect(
 					page.getByRole( 'link', {
-						name: 'the plugin directory',
+						name: 'search the plugin directory',
 					} )
 				).toBeHidden();
 			} );
