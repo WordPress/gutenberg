@@ -1170,7 +1170,7 @@ Note: The `attributes` object contains the standard HTML attributes of the eleme
 This function is analogous to `getContext()`, but with 2 key differences:
 
 1. Whenever [`actions.navigate()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#actions) from [`@wordpress/interactivity-router`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/) is called, the object returned by `getServerContext()` is updated. This is useful when you want to update the context of a block based on **new** context coming from the page loaded via `actions.navigate()`. This new context is embedded in the HTML of the page loaded via `actions.navigate()`.
-2. The object returned by `getServerContext()` is read-only.
+2. The object returned by `getServerContext()` is a deep clone (snapshot) of the server context, so modifying it will not affect the original server data.
 
 The server context cannot be directly used in directives, but you can use callbacks to subscribe to its changes.
 
@@ -1201,7 +1201,7 @@ Retrieves the server state of an interactive region.
 
 This function serves the same purpose as `getServerContext()`, but it returns the **state** instead of the **context**.
 
-The object returned is read-only, and includes the state defined in PHP with `wp_interactivity_state()`. When using [`actions.navigate()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#actions) from [`@wordpress/interactivity-router`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/), the object returned by `getServerState()` is updated to reflect the changes in its properties, without affecting the state returned by `store()`. Directives can subscribe to those changes to update the state if needed.
+The object returned is a deep clone (snapshot) of the server state, so modifying it will not affect the original server data. It includes the state defined in PHP with `wp_interactivity_state()`. When using [`actions.navigate()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#actions) from [`@wordpress/interactivity-router`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/), the object returned by `getServerState()` is updated to reflect the changes in its properties, without affecting the state returned by `store()`. Directives can subscribe to those changes to update the state if needed.
 
 ```js
 const serverState = getServerState( 'namespace' );
