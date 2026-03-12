@@ -208,7 +208,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 *
 		 * @see wp_get_connectors()
 		 *
-		 * @return array Connector settings keyed by connector ID.
+		 * @return array<string, array> The array of registered connectors keyed by connector ID.
 		 *
 		 * @phpstan-return array<string, Connector>
 		 */
