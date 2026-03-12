@@ -38,7 +38,7 @@ As directives are HTML attributes, they are perfect for dynamic blocks and PHP.
 _Dynamic block example_
 ```html
 <div
-  data-wp-interactive='wpmovies'
+  data-wp-interactive="wpmovies"
   <?php echo wp_interactivity_data_wp_context( array( 'isOpen' => false ) ); ?>
   data-wp-watch="callbacks.logIsOpen"
 >
@@ -125,7 +125,7 @@ store( 'wpmovies', {
 <?php // render.php ?>
 
 <div
-  data-wp-interactive='wpmovies'
+  data-wp-interactive="wpmovies"
   <?php echo wp_interactivity_data_wp_context( array( 'isOpen' => false ) ); ?>
 >
   <button
