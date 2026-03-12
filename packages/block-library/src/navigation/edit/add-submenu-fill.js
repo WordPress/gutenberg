@@ -113,56 +113,6 @@ function AddSubmenuItem( {
 	);
 }
 
-/**
- * Queries the list view for an Options button at the given block
- * position. Used after cancel to focus the reverted block's button.
- *
- * @param {string} parentClientId The parent block's clientId.
- * @param {number} blockIndex     The block's index among siblings.
- * @return {HTMLElement|null} The Options button element, or null.
- */
-function findOptionsButtonByIndex( parentClientId, blockIndex ) {
-	const parentRow = document.querySelector(
-		`[data-block="${ parentClientId }"]`
-	);
-	if ( ! parentRow ) {
-		return null;
-	}
-	// Find sibling rows that are direct children of this parent
-	// in the list view treegrid. Rows at the next nesting level
-	// follow the parent row in DOM order.
-	const treegrid = parentRow.closest( '[role="treegrid"]' );
-	if ( ! treegrid ) {
-		return null;
-	}
-	const allRows = treegrid.querySelectorAll( '[role="row"]' );
-	let childCount = 0;
-	const parentDepth = parseInt( parentRow.getAttribute( 'aria-level' ), 10 );
-	let foundParent = false;
-	for ( const row of allRows ) {
-		if ( row === parentRow ) {
-			foundParent = true;
-			continue;
-		}
-		if ( ! foundParent ) {
-			continue;
-		}
-		const level = parseInt( row.getAttribute( 'aria-level' ), 10 );
-		if ( level <= parentDepth ) {
-			break; // Past the parent's children.
-		}
-		if ( level === parentDepth + 1 ) {
-			if ( childCount === blockIndex ) {
-				return row.querySelector(
-					'.block-editor-list-view-block__menu'
-				);
-			}
-			childCount++;
-		}
-	}
-	return null;
-}
-
 export default function AddSubmenuFill( { navigationBlockClientId } ) {
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -191,65 +141,51 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 		[]
 	);
 
+	// In the conversion case, the submenu auto-reverts to a
+	// navigation-link (with a new clientId) after removeBlock empties
+	// it. Watch the store for the block at the target position to
+	// change, which tells us the auto-revert has completed and we
+	// can look up the replacement block's Options button by clientId.
+	const revertedClientId = useSelect(
+		( select ) => {
+			if ( ! focusTarget?.blockPosition ) {
+				return null;
+			}
+			const { parentClientId, index, originalClientId } =
+				focusTarget.blockPosition;
+			const children =
+				select( blockEditorStore ).getBlockOrder( parentClientId );
+			const current = children[ index ];
+			return current && current !== originalClientId ? current : null;
+		},
+		[ focusTarget ]
+	);
+
 	// Focus the target element after React has flushed the render
 	// that unmounts NavigationLinkUI. The useEffect runs after the
 	// popover's useFocusReturn hook (which fires during commit).
 	useEffect( () => {
-		if ( ! focusTarget ) {
-			return;
-		}
-
-		const { element, blockPosition } = focusTarget;
-
-		if ( element ) {
-			element.focus();
+		if ( focusTarget?.element ) {
+			focusTarget.element.focus();
 			setFocusTarget( null );
-		} else if ( blockPosition ) {
-			// In the conversion case, the submenu auto-reverts to
-			// a navigation-link after removeBlock empties it. This
-			// creates a new block with a new clientId, so the
-			// original DOM element is replaced. Watch the list view
-			// for the replacement row to appear, then focus its
-			// Options button.
-			const { parentClientId, index } = blockPosition;
-			const parentRow = document.querySelector(
-				`[data-block="${ parentClientId }"]`
-			);
-			const treegrid = parentRow?.closest( '[role="treegrid"]' );
-			if ( ! treegrid ) {
-				setFocusTarget( null );
-				return;
-			}
-
-			const observer = new window.MutationObserver( () => {
-				const button = findOptionsButtonByIndex(
-					parentClientId,
-					index
-				);
-				if ( button ) {
-					button.focus();
-					setFocusTarget( null );
-					observer.disconnect();
-					clearTimeout( safetyTimer );
-				}
-			} );
-			observer.observe( treegrid, {
-				childList: true,
-				subtree: true,
-			} );
-
-			// Safety fallback so the observer doesn't leak forever.
-			const safetyTimer = window.setTimeout( () => {
-				observer.disconnect();
-				setFocusTarget( null );
-			}, 2000 );
-
-			return () => {
-				observer.disconnect();
-				clearTimeout( safetyTimer );
-			};
 		}
 	}, [ focusTarget ] );
+
+	// Focus the reverted block's Options button once the store
+	// reports that the block at the target position has changed.
+	useEffect( () => {
+		if ( ! revertedClientId ) {
+			return;
+		}
+		const row = document.querySelector(
+			`[data-block="${ revertedClientId }"]`
+		);
+		const button = row?.querySelector(
+			'.block-editor-list-view-block__menu'
+		);
+		button?.focus();
+		setFocusTarget( null );
+	}, [ revertedClientId ] );
 
 	// Resolve the popover anchor after React has flushed DOM updates.
 	// When the block was converted to a submenu, the new row only
@@ -298,7 +234,8 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 			// Conversion case: the submenu will auto-revert to a
 			// navigation-link (with a new clientId) after
 			// removeBlock empties it. Store the block's position
-			// so we can find the replacement after re-render.
+			// and original clientId so the useSelect can detect
+			// when the auto-revert swaps the block.
 			const { getBlockRootClientId, getBlockIndex } =
 				dataSelect( blockEditorStore );
 			const parentClientId = getBlockRootClientId( ctx.clientId );
@@ -306,7 +243,11 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 			ctx?.setDropdownContentHidden?.( false );
 			ctx?.onClose?.();
 			setFocusTarget( {
-				blockPosition: { parentClientId, index },
+				blockPosition: {
+					parentClientId,
+					index,
+					originalClientId: ctx.clientId,
+				},
 			} );
 		}
 
