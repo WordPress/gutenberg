@@ -34,6 +34,7 @@ import {
 	useBlockSettings,
 } from './utils';
 import { BlockStatesControl, STATES_SUPPORT_KEY } from './states';
+import { buildStateSelector, STATES_ELEMENT_SUPPORT_KEY } from './state-utils';
 import StylesColorPanel from '../components/global-styles/color-panel';
 import StylesTypographyPanel from '../components/global-styles/typography-panel';
 import StylesBorderPanel from '../components/global-styles/border-panel';
@@ -525,12 +526,25 @@ function useBlockProps( { name, style } ) {
 		// Generate per-instance state CSS (e.g., :hover, :focus).
 		const validStates = getBlockSupport( name, STATES_SUPPORT_KEY );
 		if ( validStates ) {
+			const statesElement = getBlockSupport(
+				name,
+				STATES_ELEMENT_SUPPORT_KEY
+			);
 			validStates.forEach( ( state ) => {
 				const stateStyles = style?.[ state ];
 				if ( stateStyles ) {
-					const css = compileCSS( stateStyles, {
-						selector: `${ baseElementSelector }${ state }`,
-					} );
+					const selector = buildStateSelector(
+						baseElementSelector,
+						statesElement,
+						state
+					);
+					// State styles use !important to override utility classes
+					// like .has-accent-3-background-color which the block's
+					// default color support generates with !important.
+					const css = compileCSS( stateStyles, { selector } ).replace(
+						/;/g,
+						' !important;'
+					);
 					if ( css ) {
 						elementCSSRules.push( css );
 					}
