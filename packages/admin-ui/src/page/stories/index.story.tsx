@@ -4,6 +4,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 // eslint-disable-next-line @wordpress/use-recommended-components -- admin-ui is a bundled package that depends on @wordpress/ui
 import { Badge, Button, Text } from '@wordpress/ui';
+import { Icon, wordpress } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -33,18 +34,6 @@ const JetpackLogo = ( {
 			fill="#069e08"
 			d="M16,0C7.2,0,0,7.2,0,16s7.2,16,16,16s16-7.2,16-16S24.8,0,16,0z M15,19H7l8-16V19z M17,29V13h8L17,29z"
 		/>
-	</svg>
-);
-
-const GlobeLogo = () => (
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		viewBox="0 0 24 24"
-		fill="currentColor"
-		width={ 24 }
-		height={ 24 }
-	>
-		<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
 	</svg>
 );
 
@@ -106,7 +95,7 @@ export const WithBreadcrumbs: Story = {
 export const WithLogo: Story = {
 	args: {
 		title: 'Page title',
-		logo: <GlobeLogo />,
+		logo: <Icon icon={ wordpress } size={ 24 } />,
 		showSidebarToggle: false,
 		children: (
 			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
@@ -116,7 +105,7 @@ export const WithLogo: Story = {
 
 export const WithLogoAndBreadcrumbs: Story = {
 	args: {
-		logo: <GlobeLogo />,
+		logo: <Icon icon={ wordpress } size={ 24 } />,
 		showSidebarToggle: false,
 		breadcrumbs: (
 			<Breadcrumbs
