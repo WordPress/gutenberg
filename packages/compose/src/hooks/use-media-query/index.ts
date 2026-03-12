@@ -8,21 +8,26 @@ import { useContext, useMemo, useSyncExternalStore } from '@wordpress/element';
  */
 import { WindowContext } from '../..';
 
-const perWindowCache = new WeakMap();
+type MQLCache = Map< string, MediaQueryList >;
+
+const perWindowCache = new WeakMap< Window, MQLCache >();
 
 /**
  * A new MediaQueryList object for the media query
  *
- * @param {Window} win     Window.
- * @param {string} [query] Media Query.
- * @return {MediaQueryList|null} A new object for the media query
+ * @param win     Window.
+ * @param [query] Media Query.
  */
-function getMediaQueryList( win, query ) {
+function getMediaQueryList(
+	win: Window,
+	query?: string
+): MediaQueryList | null {
 	if ( ! query ) {
 		return null;
 	}
 
-	const matchMediaCache = perWindowCache.get( win ) ?? new Map();
+	const matchMediaCache: MQLCache = perWindowCache.get( win ) ?? new Map();
+
 	if ( ! perWindowCache.has( win ) ) {
 		perWindowCache.set( win, matchMediaCache );
 	}
@@ -33,7 +38,7 @@ function getMediaQueryList( win, query ) {
 		return match;
 	}
 
-	if ( typeof win !== 'undefined' && typeof win.matchMedia === 'function' ) {
+	if ( typeof win?.matchMedia === 'function' ) {
 		match = win.matchMedia( query );
 		matchMediaCache.set( query, match );
 		return match;
@@ -45,18 +50,17 @@ function getMediaQueryList( win, query ) {
 /**
  * Runs a media query and returns its value when it changes.
  *
- * @param {string} [query] Media Query.
- * @return {boolean} return value of the media query.
+ * @param [query] Media Query.
+ * @return return value of the media query.
  */
-export default function useMediaQuery( query ) {
+export default function useMediaQuery( query?: string ): boolean {
 	const win = useContext( WindowContext );
 
 	const source = useMemo( () => {
 		const mediaQueryList = getMediaQueryList( win, query );
 
 		return {
-			/** @type {(onStoreChange: () => void) => () => void} */
-			subscribe( onStoreChange ) {
+			subscribe( onStoreChange: any ) {
 				if ( ! mediaQueryList ) {
 					return () => {};
 				}
