@@ -127,9 +127,9 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 		);
 
 		/*
-		 * Allowed tags for wp_kses(). Only SVG elements are permitted; foreignObject
-		 * and HTML tags (e.g. p, div) are intentionally excluded as they are not
-		 * valid in icon SVG content per the SVG specification.
+		 * Allowed tags for wp_kses(). WP_HTML_Processor::normalize() with
+		 * constraints (similar structure to this array) is proposed to improve
+		 * HTML/SVG sanitization in the future.
 		 *
 		 * @see https://github.com/dmsnell/wordpress-develop/pull/20
 		 */
@@ -158,7 +158,7 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 				$marker_attributes,
 				array(
 					'd'          => true,
-					'pathLength' => true,
+					'pathlength' => true,
 				)
 			),
 			'circle'              => array_merge(
@@ -240,8 +240,8 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 				$aria_attributes,
 				$container_attributes,
 				array(
-					'viewBox'             => true,
-					'preserveAspectRatio' => true,
+					'viewbox'             => true,
+					'preserveaspectratio' => true,
 					'x'                   => true,
 					'y'                   => true,
 					'width'               => true,
@@ -261,40 +261,40 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 					'height'     => true,
 				)
 			),
-			'clipPath'            => array_merge(
+			'clippath'            => array_merge(
 				$core_attributes,
 				array(
-					'clipPathUnits' => true,
+					'clippathunits' => true,
 					'transform'     => true,
 				)
 			),
 			'mask'                => array_merge(
 				$core_attributes,
 				array(
-					'x'                => true,
-					'y'                => true,
-					'width'            => true,
-					'height'           => true,
-					'maskUnits'        => true,
-					'maskContentUnits' => true,
+					'x'                 => true,
+					'y'                 => true,
+					'width'             => true,
+					'height'            => true,
+					'maskunits'         => true,
+					'maskcontentunits'  => true,
 				)
 			),
 			// Gradient elements.
-			'linearGradient'      => array_merge(
+			'lineargradient'      => array_merge(
 				$core_attributes,
 				array(
 					'x1'                => true,
 					'x2'                => true,
 					'y1'                => true,
 					'y2'                => true,
-					'gradientUnits'     => true,
-					'gradientTransform' => true,
-					'spreadMethod'      => true,
+					'gradientunits'     => true,
+					'gradienttransform' => true,
+					'spreadmethod'      => true,
 					'href'              => true,
 					'xlink:href'        => true,
 				)
 			),
-			'radialGradient'      => array_merge(
+			'radialgradient'      => array_merge(
 				$core_attributes,
 				array(
 					'cx'                => true,
@@ -303,9 +303,9 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 					'fx'                => true,
 					'fy'                => true,
 					'fr'                => true,
-					'gradientUnits'     => true,
-					'gradientTransform' => true,
-					'spreadMethod'      => true,
+					'gradientunits'     => true,
+					'gradienttransform' => true,
+					'spreadmethod'      => true,
 					'href'              => true,
 					'xlink:href'        => true,
 				)
@@ -322,48 +322,48 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 			'pattern'             => array_merge(
 				$core_attributes,
 				array(
-					'x'                   => true,
-					'y'                   => true,
-					'width'               => true,
-					'height'              => true,
-					'patternUnits'        => true,
-					'patternContentUnits' => true,
-					'patternTransform'    => true,
-					'viewBox'             => true,
-					'preserveAspectRatio' => true,
-					'href'                => true,
-					'xlink:href'          => true,
+					'x'                    => true,
+					'y'                    => true,
+					'width'                => true,
+					'height'               => true,
+					'patternunits'         => true,
+					'patterncontentunits'  => true,
+					'patterntransform'     => true,
+					'viewbox'              => true,
+					'preserveaspectratio'  => true,
+					'href'                 => true,
+					'xlink:href'           => true,
 				)
 			),
 			// Filter elements.
 			'filter'              => array_merge(
 				$core_attributes,
 				array(
-					'x'              => true,
-					'y'              => true,
-					'width'          => true,
-					'height'         => true,
-					'filterUnits'    => true,
-					'primitiveUnits' => true,
+					'x'               => true,
+					'y'               => true,
+					'width'           => true,
+					'height'          => true,
+					'filterunits'     => true,
+					'primitiveunits'  => true,
 				)
 			),
-			'feBlend'             => array(
+			'feblend'             => array(
 				'in'     => true,
 				'in2'    => true,
 				'mode'   => true,
 				'result' => true,
 			),
-			'feColorMatrix'       => array(
+			'fecolormatrix'       => array(
 				'in'     => true,
 				'type'   => true,
 				'values' => true,
 				'result' => true,
 			),
-			'feComponentTransfer' => array(
+			'fecomponenttransfer' => array(
 				'in'     => true,
 				'result' => true,
 			),
-			'feComposite'         => array(
+			'fecomposite'         => array(
 				'in'       => true,
 				'in2'      => true,
 				'operator' => true,
@@ -373,135 +373,135 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 				'k4'       => true,
 				'result'   => true,
 			),
-			'feConvolveMatrix'    => array(
-				'in'            => true,
-				'order'         => true,
-				'kernelMatrix'  => true,
-				'divisor'       => true,
-				'bias'          => true,
-				'targetX'       => true,
-				'targetY'       => true,
-				'edgeMode'      => true,
-				'preserveAlpha' => true,
-				'result'        => true,
+			'feconvolvematrix'    => array(
+				'in'             => true,
+				'order'          => true,
+				'kernelmatrix'    => true,
+				'divisor'        => true,
+				'bias'           => true,
+				'targetx'        => true,
+				'targety'        => true,
+				'edgemode'       => true,
+				'preservealpha'  => true,
+				'result'         => true,
 			),
-			'feDiffuseLighting'   => array(
-				'in'              => true,
-				'surfaceScale'    => true,
-				'diffuseConstant' => true,
-				'result'          => true,
-			),
-			'feDisplacementMap'   => array(
+			'fediffuselighting'   => array(
 				'in'               => true,
-				'in2'              => true,
-				'scale'            => true,
-				'xChannelSelector' => true,
-				'yChannelSelector' => true,
+				'surfacescale'     => true,
+				'diffuseconstant'  => true,
 				'result'           => true,
 			),
-			'feDistantLight'      => array(
+			'fedisplacementmap'   => array(
+				'in'                => true,
+				'in2'               => true,
+				'scale'             => true,
+				'xchannelselector'  => true,
+				'ychannelselector'  => true,
+				'result'            => true,
+			),
+			'fedistantlight'      => array(
 				'azimuth'   => true,
 				'elevation' => true,
 			),
-			'feFlood'             => array(
+			'feflood'             => array(
 				'flood-color'   => true,
 				'flood-opacity' => true,
 				'result'        => true,
 			),
-			'feGaussianBlur'      => array(
-				'in'           => true,
-				'stdDeviation' => true,
-				'edgeMode'     => true,
-				'result'       => true,
+			'fegaussianblur'      => array(
+				'in'            => true,
+				'stddeviation'  => true,
+				'edgemode'      => true,
+				'result'        => true,
 			),
-			'feImage'             => array(
-				'href'                => true,
-				'xlink:href'          => true,
-				'preserveAspectRatio' => true,
-				'result'              => true,
+			'feimage'             => array(
+				'href'                 => true,
+				'xlink:href'           => true,
+				'preserveaspectratio'  => true,
+				'result'               => true,
 			),
-			'feMerge'             => array(
+			'femerge'             => array(
 				'result' => true,
 			),
-			'feMergeNode'         => array(
+			'femergenode'         => array(
 				'in' => true,
 			),
-			'feMorphology'        => array(
+			'femorphology'        => array(
 				'in'       => true,
 				'operator' => true,
 				'radius'   => true,
 				'result'   => true,
 			),
-			'feOffset'            => array(
+			'feoffset'            => array(
 				'in'     => true,
 				'dx'     => true,
 				'dy'     => true,
 				'result' => true,
 			),
-			'fePointLight'        => array(
+			'fepointlight'        => array(
 				'x' => true,
 				'y' => true,
 				'z' => true,
 			),
-			'feSpecularLighting'  => array(
-				'in'               => true,
-				'surfaceScale'     => true,
-				'specularConstant' => true,
-				'specularExponent' => true,
-				'result'           => true,
+			'fespecularlighting'  => array(
+				'in'                => true,
+				'surfacescale'      => true,
+				'specularconstant'  => true,
+				'specularexponent'  => true,
+				'result'            => true,
 			),
-			'feSpotLight'         => array(
-				'x'                 => true,
-				'y'                 => true,
-				'z'                 => true,
-				'pointsAtX'         => true,
-				'pointsAtY'         => true,
-				'pointsAtZ'         => true,
-				'specularExponent'  => true,
-				'limitingConeAngle' => true,
+			'fespotlight'         => array(
+				'x'                  => true,
+				'y'                  => true,
+				'z'                  => true,
+				'pointsatx'           => true,
+				'pointsaty'          => true,
+				'pointsatz'          => true,
+				'specularexponent'   => true,
+				'limitingconeangle'  => true,
 			),
-			'feTile'              => array(
+			'fetile'              => array(
 				'in'     => true,
 				'result' => true,
 			),
-			'feTurbulence'        => array(
-				'baseFrequency' => true,
-				'numOctaves'    => true,
+			'feturbulence'        => array(
+				'basefrequency' => true,
+				'numoctaves'    => true,
 				'seed'          => true,
-				'stitchTiles'   => true,
+				'stitchtiles'   => true,
 				'type'          => true,
 				'result'        => true,
 			),
-			'feFuncA'             => array(
+			'fefunca'             => array(
+				'type'         => true,
+				'tablevalues'  => true,
+				'slope'        => true,
+				'intercept'    => true,
+				'amplitude'    => true,
+				'exponent'     => true,
+				'offset'       => true,
+			),
+			'fefuncb'             => array(
 				'type'        => true,
-				'tableValues' => true,
+				'tablevalues' => true,
 				'slope'       => true,
 				'intercept'   => true,
 				'amplitude'   => true,
 				'exponent'    => true,
 				'offset'      => true,
 			),
-			'feFuncB'             => array(
+			'fefuncg'             => array(
 				'type'        => true,
-				'tableValues' => true,
+				'tablevalues' => true,
 				'slope'       => true,
 				'intercept'   => true,
 				'amplitude'   => true,
 				'exponent'    => true,
 				'offset'      => true,
 			),
-			'feFuncG'             => array(
+			'fefuncr'             => array(
 				'type'        => true,
-				'tableValues' => true,
-				'slope'       => true,
-				'intercept'   => true,
-				'amplitude'   => true,
-				'exponent'    => true,
-				'offset'      => true,
-			),
-			'feFuncR'             => array(
-				'type'        => true,
-				'tableValues' => true,
+				'tablevalues' => true,
 				'slope'       => true,
 				'intercept'   => true,
 				'amplitude'   => true,
@@ -514,26 +514,26 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				array(
-					'x'                  => true,
-					'y'                  => true,
-					'dx'                 => true,
-					'dy'                 => true,
-					'rotate'             => true,
-					'textLength'         => true,
-					'lengthAdjust'       => true,
-					'text-anchor'        => true,
-					'font-family'        => true,
-					'font-size'          => true,
-					'font-weight'        => true,
-					'font-style'         => true,
-					'font-variant'       => true,
-					'text-decoration'    => true,
-					'writing-mode'       => true,
+					'x'                   => true,
+					'y'                   => true,
+					'dx'                  => true,
+					'dy'                  => true,
+					'rotate'              => true,
+					'textlength'          => true,
+					'lengthadjust'        => true,
+					'text-anchor'         => true,
+					'font-family'         => true,
+					'font-size'           => true,
+					'font-weight'         => true,
+					'font-style'          => true,
+					'font-variant'        => true,
+					'text-decoration'     => true,
+					'writing-mode'        => true,
 					'letter-spacing'     => true,
-					'word-spacing'       => true,
-					'dominant-baseline'  => true,
-					'alignment-baseline' => true,
-					'baseline-shift'     => true,
+					'word-spacing'        => true,
+					'dominant-baseline'   => true,
+					'alignment-baseline'  => true,
+					'baseline-shift'      => true,
 				)
 			),
 			'tspan'               => array_merge(
@@ -546,8 +546,8 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 					'dx'              => true,
 					'dy'              => true,
 					'rotate'          => true,
-					'textLength'      => true,
-					'lengthAdjust'    => true,
+					'textlength'      => true,
+					'lengthadjust'    => true,
 					'text-anchor'     => true,
 					'font-family'     => true,
 					'font-size'       => true,
@@ -556,17 +556,17 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 					'text-decoration' => true,
 				)
 			),
-			'textPath'            => array_merge(
+			'textpath'            => array_merge(
 				$core_attributes,
 				$aria_attributes,
 				$presentation_attributes,
 				array(
-					'href'        => true,
-					'xlink:href'  => true,
-					'startOffset' => true,
-					'method'      => true,
-					'spacing'     => true,
-					'text-anchor' => true,
+					'href'         => true,
+					'xlink:href'   => true,
+					'startoffset'  => true,
+					'method'       => true,
+					'spacing'      => true,
+					'text-anchor'  => true,
 				)
 			),
 			// Descriptive elements.
@@ -579,65 +579,65 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				array(
-					'x'                   => true,
-					'y'                   => true,
-					'width'               => true,
-					'height'              => true,
-					'href'                => true,
-					'xlink:href'          => true,
-					'preserveAspectRatio' => true,
+					'x'                    => true,
+					'y'                    => true,
+					'width'                => true,
+					'height'               => true,
+					'href'                 => true,
+					'xlink:href'           => true,
+					'preserveaspectratio'  => true,
 				)
 			),
 			// Marker element.
 			'marker'              => array_merge(
 				$core_attributes,
 				array(
-					'markerUnits'         => true,
-					'refX'                => true,
-					'refY'                => true,
-					'markerWidth'         => true,
-					'markerHeight'        => true,
+					'markerunits'         => true,
+					'refx'                => true,
+					'refy'                => true,
+					'markerwidth'         => true,
+					'markerheight'        => true,
 					'orient'              => true,
-					'preserveAspectRatio' => true,
-					'viewBox'             => true,
+					'preserveaspectratio' => true,
+					'viewbox'             => true,
 				)
 			),
 			// Animation elements.
 			'animate'             => array_merge(
 				$core_attributes,
 				array(
-					'attributeName' => true,
+					'attributename' => true,
 					'from'          => true,
 					'to'            => true,
 					'dur'           => true,
-					'repeatCount'   => true,
+					'repeatcount'   => true,
 					'begin'         => true,
 					'end'           => true,
 					'values'        => true,
-					'keyTimes'      => true,
-					'keySplines'    => true,
-					'calcMode'      => true,
+					'keytimes'      => true,
+					'keysplines'    => true,
+					'calcmode'      => true,
 					'additive'      => true,
 					'accumulate'    => true,
 				)
 			),
-			'animateTransform'    => array_merge(
+			'animatetransform'    => array_merge(
 				$core_attributes,
 				array(
-					'attributeName' => true,
-					'type'          => true,
-					'from'          => true,
-					'to'            => true,
-					'dur'           => true,
-					'repeatCount'   => true,
-					'begin'         => true,
-					'end'           => true,
-					'values'        => true,
-					'keyTimes'      => true,
-					'keySplines'    => true,
-					'calcMode'      => true,
-					'additive'      => true,
-					'accumulate'    => true,
+					'attributename' => true,
+					'type'         => true,
+					'from'         => true,
+					'to'           => true,
+					'dur'          => true,
+					'repeatcount'  => true,
+					'begin'        => true,
+					'end'          => true,
+					'values'       => true,
+					'keytimes'     => true,
+					'keysplines'   => true,
+					'calcmode'     => true,
+					'additive'     => true,
+					'accumulate'   => true,
 				)
 			),
 		);
@@ -649,7 +649,7 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 
 		$svg   = $processor->serialize_token();
 		$depth = $processor->get_current_depth();
-		while ( $processor->next_token() && $processor->get_current_depth() > $depth ) {
+		while ( $processor->next_token() && $processor->get_current_depth() >= $depth ) {
 			$svg .= $processor->serialize_token();
 		}
 		$svg .= '</svg>';
