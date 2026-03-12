@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { check, chevronDown } from '@wordpress/icons';
+import { check, chevronDown, moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 
 /**
@@ -13,12 +13,14 @@ import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
  * @param {Array}    props.states   Array of available states with value and label.
  * @param {string}   props.value    Currently selected state value.
  * @param {Function} props.onChange Callback when selection changes.
+ * @param {boolean}  props.showText Whether to show text label on the toggle. Default true.
  * @return {Element|null} State control component.
  */
 export default function StateControl( {
 	states = [],
 	value = 'default',
 	onChange,
+	showText = true,
 } ) {
 	if ( ! states || states.length === 0 ) {
 		return null;
@@ -39,20 +41,21 @@ export default function StateControl( {
 		return currentOption?.label || __( 'Default' );
 	};
 
+	const icon = showText ? chevronDown : moreVertical;
+	const toggleProps = showText
+		? { size: 'compact', variant: 'tertiary', iconPosition: 'right' }
+		: { size: 'compact', variant: 'tertiary' };
+
 	return (
 		<DropdownMenu
-			icon={ chevronDown }
+			icon={ icon }
 			label={ sprintf(
 				/* translators: %s: Current state (e.g. "Hover", "Focus") */
 				__( 'State: %s' ),
 				getCurrentStateLabel()
 			) }
-			text={ getCurrentStateLabel() }
-			toggleProps={ {
-				size: 'compact',
-				variant: 'tertiary',
-				iconPosition: 'right',
-			} }
+			text={ showText ? getCurrentStateLabel() : undefined }
+			toggleProps={ toggleProps }
 		>
 			{ ( { onClose } ) => (
 				<MenuGroup label={ __( 'State' ) }>
