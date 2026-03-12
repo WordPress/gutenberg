@@ -156,7 +156,11 @@ export function DefaultConnectorSettings( {
 				: __( 'Your API key is stored securely.' );
 		}
 		if ( saveError ) {
-			return <span style={ { color: '#cc1818' } }>{ saveError }</span>;
+			return (
+				<span role="alert" style={ { color: '#cc1818' } }>
+					{ saveError }
+				</span>
+			);
 		}
 		return helpLink;
 	};
