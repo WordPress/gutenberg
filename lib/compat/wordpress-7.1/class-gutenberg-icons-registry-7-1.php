@@ -50,6 +50,13 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 		}
 	}
 
+	public function get_registered_icon( $icon_name ) {
+		return array(
+			'name'    => $icon_name,
+			'content' => 'Rendered via Gutenberg_Icons_Registry_7_1 class.',
+		);
+	}
+
 	/**
 	 * Modified to also search in icon labels
 	 */
