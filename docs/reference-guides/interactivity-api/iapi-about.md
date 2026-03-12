@@ -122,8 +122,8 @@ store( 'wpmovies', {
 ```
 
 ```php
-<!-- Render.php file -->
- 
+<?php // render.php ?>
+
 <div
   data-wp-interactive='wpmovies'
   <?php echo wp_interactivity_data_wp_context( array( 'isOpen' => true ) ); ?>
