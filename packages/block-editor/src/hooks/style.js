@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -28,12 +28,18 @@ import {
 	DimensionsPanel,
 } from './dimensions';
 import {
+	cleanEmptyObject,
 	shouldSkipSerialization,
 	useStyleOverride,
 	useBlockSettings,
 } from './utils';
+import { BlockStatesControl, STATES_SUPPORT_KEY } from './states';
+import StylesColorPanel from '../components/global-styles/color-panel';
+import StylesTypographyPanel from '../components/global-styles/typography-panel';
+import StylesBorderPanel from '../components/global-styles/border-panel';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import InspectorControls from '../components/inspector-controls';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -327,29 +333,88 @@ function BlockStyleControls( {
 	clientId,
 	name,
 	setAttributes,
+	style,
 	__unstableParentLayout,
 } ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const blockEditingMode = useBlockEditingMode();
+	const [ selectedState, setSelectedState ] = useState( 'default' );
+
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
+
+	const panelSettings = {
+		...settings,
+		typography: {
+			...settings.typography,
+			// The text alignment UI for individual blocks is rendered in
+			// the block toolbar, so disable it here.
+			textAlign: false,
+		},
+	};
+
+	const statesControl = (
+		<BlockStatesControl
+			name={ name }
+			value={ selectedState }
+			onChange={ setSelectedState }
+		/>
+	);
+
+	// For non-default states, use Global Styles panels which accept explicit
+	// value/onChange props so we can route saves to the state-specific sub-key.
+	if ( selectedState !== 'default' ) {
+		const stateValue = style?.[ selectedState ] || {};
+		const setStateStyle = ( newStyle ) =>
+			setAttributes( {
+				style: cleanEmptyObject( {
+					...style,
+					[ selectedState ]: newStyle,
+				} ),
+			} );
+
+		return (
+			<>
+				{ statesControl }
+				<InspectorControls>
+					<StylesColorPanel
+						value={ stateValue }
+						inheritedValue={ stateValue }
+						onChange={ setStateStyle }
+						settings={ panelSettings }
+						panelId={ clientId }
+					/>
+					<StylesTypographyPanel
+						value={ stateValue }
+						inheritedValue={ stateValue }
+						onChange={ setStateStyle }
+						settings={ panelSettings }
+						panelId={ clientId }
+					/>
+					<StylesBorderPanel
+						value={ stateValue }
+						inheritedValue={ stateValue }
+						onChange={ setStateStyle }
+						settings={ panelSettings }
+						panelId={ clientId }
+						name={ name }
+					/>
+				</InspectorControls>
+			</>
+		);
+	}
+
 	const passedProps = {
 		clientId,
 		name,
 		setAttributes,
-		settings: {
-			...settings,
-			typography: {
-				...settings.typography,
-				// The text alignment UI for individual blocks is rendered in
-				// the block toolbar, so disable it here.
-				textAlign: false,
-			},
-		},
+		settings: panelSettings,
 	};
-	if ( blockEditingMode !== 'default' ) {
-		return null;
-	}
+
 	return (
 		<>
+			{ statesControl }
 			<ColorEdit { ...passedProps } />
 			<BackgroundImagePanel { ...passedProps } />
 			<TypographyPanel { ...passedProps } />
@@ -392,74 +457,91 @@ function useBlockProps( { name, style } ) {
 	const blockElementStyles = style?.elements;
 
 	const styles = useMemo( () => {
-		if ( ! blockElementStyles ) {
-			return;
-		}
-
 		const elementCSSRules = [];
 
-		elementTypes.forEach( ( { elementType, pseudo, elements } ) => {
-			const skipSerialization = shouldSkipSerialization(
-				name,
-				COLOR_SUPPORT_KEY,
-				elementType
-			);
-
-			if ( skipSerialization ) {
-				return;
-			}
-
-			const elementStyles = blockElementStyles?.[ elementType ];
-
-			// Process primary element type styles.
-			if ( elementStyles ) {
-				const selector = scopeSelector(
-					baseElementSelector,
-					ELEMENTS[ elementType ]
+		if ( blockElementStyles ) {
+			elementTypes.forEach( ( { elementType, pseudo, elements } ) => {
+				const skipSerialization = shouldSkipSerialization(
+					name,
+					COLOR_SUPPORT_KEY,
+					elementType
 				);
 
-				elementCSSRules.push(
-					compileCSS( elementStyles, { selector } )
-				);
+				if ( skipSerialization ) {
+					return;
+				}
 
-				// Process any interactive states for the element type.
-				if ( pseudo ) {
-					pseudo.forEach( ( pseudoSelector ) => {
-						if ( elementStyles[ pseudoSelector ] ) {
+				const elementStyles = blockElementStyles?.[ elementType ];
+
+				// Process primary element type styles.
+				if ( elementStyles ) {
+					const selector = scopeSelector(
+						baseElementSelector,
+						ELEMENTS[ elementType ]
+					);
+
+					elementCSSRules.push(
+						compileCSS( elementStyles, { selector } )
+					);
+
+					// Process any interactive states for the element type.
+					if ( pseudo ) {
+						pseudo.forEach( ( pseudoSelector ) => {
+							if ( elementStyles[ pseudoSelector ] ) {
+								elementCSSRules.push(
+									compileCSS(
+										elementStyles[ pseudoSelector ],
+										{
+											selector: scopeSelector(
+												baseElementSelector,
+												`${ ELEMENTS[ elementType ] }${ pseudoSelector }`
+											),
+										}
+									)
+								);
+							}
+						} );
+					}
+				}
+
+				// Process related elements e.g. h1-h6 for headings
+				if ( elements ) {
+					elements.forEach( ( element ) => {
+						if ( blockElementStyles[ element ] ) {
 							elementCSSRules.push(
-								compileCSS( elementStyles[ pseudoSelector ], {
+								compileCSS( blockElementStyles[ element ], {
 									selector: scopeSelector(
 										baseElementSelector,
-										`${ ELEMENTS[ elementType ] }${ pseudoSelector }`
+										ELEMENTS[ element ]
 									),
 								} )
 							);
 						}
 					} );
 				}
-			}
+			} );
+		}
 
-			// Process related elements e.g. h1-h6 for headings
-			if ( elements ) {
-				elements.forEach( ( element ) => {
-					if ( blockElementStyles[ element ] ) {
-						elementCSSRules.push(
-							compileCSS( blockElementStyles[ element ], {
-								selector: scopeSelector(
-									baseElementSelector,
-									ELEMENTS[ element ]
-								),
-							} )
-						);
+		// Generate per-instance state CSS (e.g., :hover, :focus).
+		const validStates = getBlockSupport( name, STATES_SUPPORT_KEY );
+		if ( validStates ) {
+			validStates.forEach( ( state ) => {
+				const stateStyles = style?.[ state ];
+				if ( stateStyles ) {
+					const css = compileCSS( stateStyles, {
+						selector: `${ baseElementSelector }${ state }`,
+					} );
+					if ( css ) {
+						elementCSSRules.push( css );
 					}
-				} );
-			}
-		} );
+				}
+			} );
+		}
 
 		return elementCSSRules.length > 0
 			? elementCSSRules.join( '' )
 			: undefined;
-	}, [ baseElementSelector, blockElementStyles, name ] );
+	}, [ baseElementSelector, blockElementStyles, name, style ] );
 
 	useStyleOverride( { css: styles } );
 
