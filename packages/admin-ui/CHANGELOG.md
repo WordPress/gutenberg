@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Update Title and Breadcrumbs font size.
+
 ## 1.9.0 (2026-03-04)
 
 ### Bug Fixes
