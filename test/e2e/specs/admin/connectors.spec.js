@@ -205,6 +205,119 @@ test.describe( 'Connectors', () => {
 			// Focus should be on the Edit button after save.
 			await expect( editButton ).toBeFocused();
 		} );
+
+		test( 'should keep focus on the action button when toggling "Set up" / "Cancel"', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			// Focus the "Set up" button and activate with keyboard.
+			const setupButton = page.getByRole( 'button', {
+				name: 'Set up',
+			} );
+			await setupButton.focus();
+			await page.keyboard.press( 'Enter' );
+
+			// Focus should remain on the button, now labeled "Cancel".
+			const cancelButton = page.getByRole( 'button', {
+				name: 'Cancel',
+			} );
+			await expect( cancelButton ).toBeFocused();
+			await expect( cancelButton ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+
+			// Press Enter again to collapse.
+			await page.keyboard.press( 'Enter' );
+
+			// Focus should remain on the button, now labeled "Set up" again.
+			const setupButtonAgain = page.getByRole( 'button', {
+				name: 'Set up',
+			} );
+			await expect( setupButtonAgain ).toBeFocused();
+			await expect( setupButtonAgain ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+		} );
+
+		test( 'should complete the full setup flow using only the keyboard', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			// Focus and activate the "Set up" button with keyboard.
+			const setupButton = page.getByRole( 'button', {
+				name: 'Set up',
+			} );
+			await setupButton.focus();
+			await page.keyboard.press( 'Enter' );
+
+			// Tab into the API key input.
+			await page.keyboard.press( 'Tab' );
+			await expect(
+				page.getByPlaceholder( 'Enter your API key' )
+			).toBeFocused();
+
+			// Type a valid API key.
+			await page.keyboard.type( VALID_API_KEY );
+
+			// Tab to the Save button.
+			await page.keyboard.press( 'Tab' );
+			await expect(
+				page.getByRole( 'button', { name: 'Save' } )
+			).toBeFocused();
+
+			// Press Enter to save.
+			await page.keyboard.press( 'Enter' );
+
+			// Wait for the connected state.
+			await expect( page.getByText( 'Connected' ) ).toBeVisible();
+
+			// Focus should be on the "Edit" button.
+			await expect(
+				page.getByRole( 'button', { name: 'Edit' } )
+			).toBeFocused();
+		} );
+
+		test( 'should keep focus in the form after a failed save', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			await page.getByRole( 'button', { name: 'Set up' } ).click();
+
+			const apiKeyInput = page.getByPlaceholder( 'Enter your API key' );
+			await apiKeyInput.fill( 'wrong-key' );
+			await page.getByRole( 'button', { name: 'Save' } ).click();
+
+			// Error alert should be visible.
+			await expect( page.getByRole( 'alert' ) ).toBeVisible();
+
+			// The panel should still be expanded (Cancel button visible).
+			await expect(
+				page.getByRole( 'button', { name: 'Cancel' } )
+			).toBeVisible();
+
+			// Focus should NOT be on the action button — the form stays
+			// open so the user can correct their key.
+			await expect(
+				page.getByRole( 'button', { name: 'Cancel' } )
+			).not.toBeFocused();
+		} );
 	} );
 
 	test( 'should display the AI plugin callout banner with install button', async ( {
