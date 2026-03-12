@@ -484,6 +484,7 @@ export function useScaleCanvas( {
 	return {
 		isZoomedOut,
 		scaleContainerWidth,
+		containerWidth,
 		contentResizeListener,
 		containerResizeListener,
 	};
