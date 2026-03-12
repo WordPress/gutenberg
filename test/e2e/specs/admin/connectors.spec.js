@@ -193,6 +193,29 @@ test.describe( 'Connectors', () => {
 		} );
 	} );
 
+	test( 'should display the AI plugin callout banner with install button', async ( {
+		page,
+		admin,
+	} ) => {
+		await admin.visitAdminPage( SETTINGS_PAGE_PATH, CONNECTORS_PAGE_QUERY );
+
+		const banner = page.locator( '.ai-plugin-callout' );
+		await expect( banner ).toBeVisible();
+
+		// Verify the banner message mentions the AI plugin.
+		await expect( banner.getByText( 'AI plugin' ) ).toBeVisible();
+
+		// Verify the Install button is present.
+		await expect(
+			banner.getByRole( 'button', { name: 'Install AI Experiments' } )
+		).toBeVisible();
+
+		// Verify the Learn more link is present.
+		await expect(
+			banner.getByRole( 'link', { name: 'Learn more' } )
+		).toBeVisible();
+	} );
+
 	test.describe( 'Empty state', () => {
 		const PLUGIN_SLUG = 'gutenberg-test-connectors-empty-state';
 
@@ -234,6 +257,9 @@ test.describe( 'Connectors', () => {
 				'href',
 				'plugin-install.php'
 			);
+
+			// Verify the AI plugin callout banner is not shown.
+			await expect( page.locator( '.ai-plugin-callout' ) ).toBeHidden();
 
 			// Verify none of the default connector cards are shown.
 			for ( const { slug } of CONNECTORS ) {
@@ -283,6 +309,11 @@ test.describe( 'Connectors', () => {
 					SETTINGS_PAGE_PATH,
 					CONNECTORS_PAGE_QUERY
 				);
+
+				// AI plugin callout banner should be hidden when user lacks permissions.
+				await expect(
+					page.locator( '.ai-plugin-callout' )
+				).toBeHidden();
 
 				for ( const { slug } of CONNECTORS ) {
 					const card = page.locator( `.connector-item--${ slug }` );
