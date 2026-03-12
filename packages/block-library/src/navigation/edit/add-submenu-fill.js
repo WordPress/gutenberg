@@ -173,18 +173,24 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 
 	// Focus the reverted block's Options button once the store
 	// reports that the block at the target position has changed.
+	// The list view renders non-selected blocks asynchronously
+	// (via AsyncModeProvider), so the new row may not exist in the
+	// DOM yet — defer the query by one frame.
 	useEffect( () => {
 		if ( ! revertedClientId ) {
 			return;
 		}
-		const row = document.querySelector(
-			`[data-block="${ revertedClientId }"]`
-		);
-		const button = row?.querySelector(
-			'.block-editor-list-view-block__menu'
-		);
-		button?.focus();
+		const rafId = window.requestAnimationFrame( () => {
+			const row = document.querySelector(
+				`[data-block="${ revertedClientId }"]`
+			);
+			const button = row?.querySelector(
+				'.block-editor-list-view-block__menu'
+			);
+			button?.focus();
+		} );
 		setFocusTarget( null );
+		return () => window.cancelAnimationFrame( rafId );
 	}, [ revertedClientId ] );
 
 	// Resolve the popover anchor after React has flushed DOM updates.
