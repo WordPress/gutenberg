@@ -226,6 +226,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'view' },
 		plural: 'fontCollections',
 		key: 'slug',
+		supportsPagination: true,
 	},
 	{
 		label: __( 'Icons' ),

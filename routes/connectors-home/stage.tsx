@@ -21,6 +21,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import './style.scss';
+import { AiPluginCallout } from './ai-plugin-callout';
 import { registerDefaultConnectors } from './default-connectors';
 import { unlock } from '../lock-unlock';
 
@@ -77,6 +78,7 @@ function ConnectorsPage() {
 					</VStack>
 				) : (
 					<VStack spacing={ 3 }>
+						<AiPluginCallout />
 						{ connectors.map( ( connector: ConnectorConfig ) => {
 							if ( connector.render ) {
 								return (
