@@ -150,6 +150,7 @@ function ApiKeyConnector( {
 	} = useConnectorPlugin( {
 		pluginSlug,
 		settingName,
+		connectorName: label,
 		isInstalled,
 		isActivated,
 		keySource: initialKeySource,
