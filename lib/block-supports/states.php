@@ -52,11 +52,35 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		return $block_content;
 	}
 
+	// Map __experimentalStatesElement values to their CSS element selectors.
+	$element_selectors = array(
+		'button' => '.wp-element-button, .wp-block-button__link',
+		'link'   => 'a:where(:not(.wp-element-button))',
+	);
+
+	$states_element  = $block_type->supports['__experimentalStatesElement'] ?? null;
+	$element_css_sel = isset( $states_element ) ? ( $element_selectors[ $states_element ] ?? null ) : null;
+
 	$unique_class = 'wp-states-' . substr( md5( wp_json_encode( $css_rules ) ), 0, 8 );
 	$css          = '';
 
 	foreach ( $css_rules as $rule ) {
-		$css .= ".$unique_class$rule[state] { $rule[css] }\n";
+		if ( $element_css_sel ) {
+			// Append pseudo-class to each comma-separated element selector part
+			// and scope them to the unique wrapper class.
+			$parts    = explode( ',', $element_css_sel );
+			$scoped   = array();
+			foreach ( $parts as $part ) {
+				$scoped[] = '.' . $unique_class . ' ' . trim( $part ) . $rule['state'];
+			}
+			$selector = implode( ', ', $scoped );
+		} else {
+			$selector = '.' . $unique_class . $rule['state'];
+		}
+		// Use !important to override utility classes like
+		// .has-accent-3-background-color which are generated with !important.
+		$declarations = str_replace( ';', ' !important;', $rule['css'] );
+		$css         .= "$selector { $declarations }\n";
 	}
 
 	// Inject the unique class into the first element of the block content.
