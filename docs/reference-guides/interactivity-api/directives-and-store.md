@@ -355,7 +355,7 @@ The returned value is used to change the inner content of the element: `<div>val
 
 This directive runs code on dispatched DOM events like `click` or `keyup`. The syntax is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`).
 
-```php
+```html
 <button data-wp-on--click="actions.logTime" >
   Click Me!
 </button>
@@ -392,7 +392,7 @@ This directive allows you to attach global window events like `resize`, `copy`, 
 
 The syntax of this directive is `data-wp-on-window--[window-event]` (like `data-wp-on-window--resize` or `data-wp-on-window--languagechange`).
 
-```php
+```html
 <div data-wp-on-window--resize="callbacks.logWidth"></div>
 ```
 
@@ -425,7 +425,7 @@ This directive allows you to attach global document events like `scroll`, `mouse
 
 The syntax of this directive is `data-wp-on-document--[document-event]` (like `data-wp-on-document--keydown` or `data-wp-on-document--selectionchange`).
 
-```php
+```html
 <div data-wp-on-document--keydown="callbacks.logKeydown"></div>
 ```
 
