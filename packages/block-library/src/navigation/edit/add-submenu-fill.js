@@ -222,9 +222,12 @@ export default function AddSubmenuFill( { navigationBlockClientId } ) {
 			}
 
 			const observer = new window.MutationObserver( () => {
-				const btn = findOptionsButtonByIndex( parentClientId, index );
-				if ( btn ) {
-					btn.focus();
+				const button = findOptionsButtonByIndex(
+					parentClientId,
+					index
+				);
+				if ( button ) {
+					button.focus();
 					setFocusTarget( null );
 					observer.disconnect();
 					clearTimeout( safetyTimer );
