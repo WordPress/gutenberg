@@ -75,7 +75,8 @@ function Edit( {
 		}
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
-	const { removeBlock, insertBlock } = useDispatch( blockEditorStore );
+	const { removeBlock, insertBlock, updateBlockAttributes } =
+		useDispatch( blockEditorStore );
 
 	/**
 	 * Construct a list of core/tab blocks, used to create tabs-list context.
@@ -222,10 +223,17 @@ function Edit( {
 			} );
 		} else if ( tabsInserted ) {
 			// A tab was pasted or duplicated — insert a matching menu item.
+			// If the tab's anchor conflicts with an existing menu item, generate
+			// a fresh unique anchor.
 			if ( ! tabsMenuClientId ) {
 				return;
 			}
 			const prevTabIds = new Set( prevTabs.map( ( t ) => t.clientId ) );
+			// Track anchors in use across both tabs and menu items to generate
+			// collision-free anchors when multiple tabs are inserted at once.
+			const usedTabAnchors = new Set(
+				currentTabs.map( ( t ) => t.anchor ).filter( Boolean )
+			);
 			const existingMenuAnchors = new Set(
 				menuItems.map( ( m ) => m.anchor )
 			);
@@ -233,19 +241,34 @@ function Edit( {
 				if ( prevTabIds.has( newTab.clientId ) ) {
 					return;
 				}
-				const expectedMenuAnchor = newTab.anchor
-					? `${ newTab.anchor }-button`
-					: null;
-				if (
-					expectedMenuAnchor &&
-					existingMenuAnchors.has( expectedMenuAnchor )
-				) {
-					return;
+				let tabAnchor = newTab.anchor;
+				const menuAnchorConflicts =
+					tabAnchor &&
+					existingMenuAnchors.has( `${ tabAnchor }-button` );
+
+				if ( ! tabAnchor || menuAnchorConflicts ) {
+					// Find the next free tab-N slot.
+					let tabNumber = currentTabs.length + 1;
+					while ( usedTabAnchors.has( `tab-${ tabNumber }` ) ) {
+						tabNumber++;
+					}
+					tabAnchor = `tab-${ tabNumber }`;
+					// Reserve this anchor so subsequent new tabs don't collide.
+					usedTabAnchors.add( tabAnchor );
+					updateBlockAttributes( newTab.clientId, {
+						anchor: tabAnchor,
+					} );
+					// Keep the snapshot in sync with the new anchor value.
+					prevSyncStateRef.current.tabs[ tabIndex ] = {
+						...prevSyncStateRef.current.tabs[ tabIndex ],
+						anchor: tabAnchor,
+					};
 				}
-				const newMenuItemBlock = createBlock(
-					'core/tabs-menu-item',
-					expectedMenuAnchor ? { anchor: expectedMenuAnchor } : {}
-				);
+
+				const menuAnchor = `${ tabAnchor }-button`;
+				const newMenuItemBlock = createBlock( 'core/tabs-menu-item', {
+					anchor: menuAnchor,
+				} );
 				insertBlock(
 					newMenuItemBlock,
 					tabIndex,
@@ -255,17 +278,29 @@ function Edit( {
 				// Add a placeholder so the next render does not re-trigger insertion.
 				prevSyncStateRef.current.menuItems.splice( tabIndex, 0, {
 					clientId: newMenuItemBlock.clientId,
-					anchor: expectedMenuAnchor ?? '',
+					anchor: menuAnchor,
 				} );
+				existingMenuAnchors.add( menuAnchor );
 			} );
 		} else if ( menuItemsInserted ) {
-			// A menu item was pasted or dragged in — insert a matching tab.
+			// A menu item was pasted or duplicated: insert a matching tab.
+			// If the menu item's anchor conflicts with an existing tab, generate
+			// a fresh unique anchor.
 			if ( ! tabPanelClientId ) {
 				return;
 			}
 			const prevMenuItemIds = new Set(
 				prevMenuItems.map( ( m ) => m.clientId )
 			);
+			// Track base anchors (the tab-N part) already in use across both
+			// tabs and menu items to generate collision-free anchors when
+			// multiple menu items are inserted at once.
+			const usedBaseAnchors = new Set( [
+				...currentTabs.map( ( t ) => t.anchor ).filter( Boolean ),
+				...menuItems
+					.map( ( m ) => m.anchor.replace( /-button$/, '' ) )
+					.filter( Boolean ),
+			] );
 			const existingTabAnchors = new Set(
 				currentTabs.map( ( t ) => t.anchor )
 			);
@@ -273,18 +308,41 @@ function Edit( {
 				if ( prevMenuItemIds.has( newMenuItem.clientId ) ) {
 					return;
 				}
-				const expectedTabAnchor = newMenuItem.anchor
+				let baseAnchor = newMenuItem.anchor
 					? newMenuItem.anchor.replace( /-button$/, '' )
 					: '';
-				if (
-					expectedTabAnchor &&
-					existingTabAnchors.has( expectedTabAnchor )
-				) {
-					return;
+				const tabAnchorConflicts =
+					baseAnchor && existingTabAnchors.has( baseAnchor );
+
+				// Grab the original tab's label before potentially reassigning
+				// baseAnchor, so we can copy it to the new tab.
+				const originalTab = tabs.find(
+					( t ) => ( t.attributes.anchor ?? '' ) === baseAnchor
+				);
+				const label = originalTab?.attributes?.label ?? '';
+
+				if ( ! baseAnchor || tabAnchorConflicts ) {
+					// Find the next free tab-N slot.
+					let tabNumber = menuItems.length + 1;
+					while ( usedBaseAnchors.has( `tab-${ tabNumber }` ) ) {
+						tabNumber++;
+					}
+					baseAnchor = `tab-${ tabNumber }`;
+					// Reserve this anchor so subsequent new items don't collide.
+					usedBaseAnchors.add( baseAnchor );
+					updateBlockAttributes( newMenuItem.clientId, {
+						anchor: `${ baseAnchor }-button`,
+					} );
+					// Keep the snapshot in sync with the new anchor value.
+					prevSyncStateRef.current.menuItems[ menuItemIndex ] = {
+						...prevSyncStateRef.current.menuItems[ menuItemIndex ],
+						anchor: `${ baseAnchor }-button`,
+					};
 				}
+
 				const newTabBlock = createBlock( 'core/tab', {
-					anchor: expectedTabAnchor,
-					label: '',
+					anchor: baseAnchor,
+					label,
 				} );
 				insertBlock(
 					newTabBlock,
@@ -295,8 +353,9 @@ function Edit( {
 				// Add a placeholder so the next render does not re-trigger insertion.
 				prevSyncStateRef.current.tabs.splice( menuItemIndex, 0, {
 					clientId: newTabBlock.clientId,
-					anchor: expectedTabAnchor,
+					anchor: baseAnchor,
 				} );
+				existingTabAnchors.add( baseAnchor );
 			} );
 		}
 	}, [
@@ -304,6 +363,7 @@ function Edit( {
 		menuItems,
 		removeBlock,
 		insertBlock,
+		updateBlockAttributes,
 		tabsMenuClientId,
 		tabPanelClientId,
 	] );
