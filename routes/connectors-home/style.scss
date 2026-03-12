@@ -27,6 +27,10 @@ $sticky-header-clearance: 120px;
 		margin: 0;
 	}
 
+	.connector-settings__error {
+		color: $alert-red;
+	}
+
 	.connector-settings .components-text-control__input {
 		font-family: monospace;
 		scroll-margin-top: $sticky-header-clearance;

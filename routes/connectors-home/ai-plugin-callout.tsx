@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import { Button, ExternalLink } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -119,8 +120,9 @@ export function AiPluginCallout() {
 				{ throwOnError: true }
 			);
 			setJustActivated( true );
+			speak( __( 'AI plugin installed and activated successfully.' ) );
 		} catch {
-			// Handle error
+			speak( __( 'Failed to install the AI plugin.' ), 'assertive' );
 		} finally {
 			setIsBusy( false );
 		}
@@ -136,8 +138,9 @@ export function AiPluginCallout() {
 				{ throwOnError: true }
 			);
 			setJustActivated( true );
+			speak( __( 'AI plugin activated successfully.' ) );
 		} catch {
-			// Handle error
+			speak( __( 'Failed to activate the AI plugin.' ), 'assertive' );
 		} finally {
 			setIsBusy( false );
 		}

@@ -236,9 +236,13 @@ function ApiKeyConnector( {
 					onRemove={
 						isExternallyConfigured
 							? undefined
-							: () => {
+							: async () => {
 									pendingFocusRef.current = true;
-									removeApiKey();
+									try {
+										await removeApiKey();
+									} catch {
+										pendingFocusRef.current = false;
+									}
 							  }
 					}
 					onSave={ async ( apiKey: string ) => {

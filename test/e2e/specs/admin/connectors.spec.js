@@ -24,6 +24,17 @@ const CONNECTORS = [
 	},
 ];
 
+const TEST_PROVIDER_NAME = 'Test Provider';
+const TEST_PROVIDER_DESCRIPTION = 'A test AI provider for E2E testing.';
+
+const getConnectorCardByName = ( page, name ) =>
+	page
+		.locator( '.components-item' )
+		.filter( {
+			has: page.getByRole( 'heading', { name, level: 2 } ),
+		} )
+		.first();
+
 test.describe( 'Connectors', () => {
 	test( 'should show a Connectors link in the Settings menu', async ( {
 		page,
@@ -61,14 +72,19 @@ test.describe( 'Connectors', () => {
 			await expect( card ).toBeVisible();
 
 			// Connector name should be an h2 heading.
-			await expect(
-				card.getByRole( 'heading', { name, level: 2 } )
-			).toBeVisible();
+			const heading = card.getByRole( 'heading', { name, level: 2 } );
+			await expect( heading ).toBeVisible();
 			await expect( card.getByText( description ) ).toBeVisible();
 
 			// Connector should be wrapped in a group with the heading as label.
 			const group = card.getByRole( 'group' );
 			await expect( group ).toBeVisible();
+			const headingId = await heading.getAttribute( 'id' );
+			expect( headingId ).toBeTruthy();
+			await expect( group ).toHaveAttribute(
+				'aria-labelledby',
+				headingId
+			);
 
 			const button = card.getByRole( 'button', { name: 'Install' } );
 			await expect( button ).toBeVisible();
@@ -118,17 +134,18 @@ test.describe( 'Connectors', () => {
 				CONNECTORS_PAGE_QUERY
 			);
 
-			// Verify the test provider card is visible.
+			const testProviderCard = getConnectorCardByName(
+				page,
+				TEST_PROVIDER_NAME
+			);
+			await expect( testProviderCard ).toBeVisible();
 			await expect(
-				page.getByText( 'Test Provider', { exact: true } )
-			).toBeVisible();
-			await expect(
-				page.getByText( 'A test AI provider for E2E testing.' )
+				testProviderCard.getByText( TEST_PROVIDER_DESCRIPTION )
 			).toBeVisible();
 
 			// The test provider has no plugin dependency so it should show "Set up".
 			await expect(
-				page.getByRole( 'button', { name: 'Set up' } )
+				testProviderCard.getByRole( 'button', { name: 'Set up' } )
 			).toBeVisible();
 		} );
 
@@ -141,22 +158,26 @@ test.describe( 'Connectors', () => {
 				CONNECTORS_PAGE_QUERY
 			);
 
-			const setupButton = page.getByRole( 'button', {
+			const testProviderCard = getConnectorCardByName(
+				page,
+				TEST_PROVIDER_NAME
+			);
+			const setupButton = testProviderCard.getByRole( 'button', {
 				name: 'Set up',
 			} );
 			await setupButton.click();
 
 			// The form should now be visible with an API Key field and Save button.
 			await expect(
-				page.getByPlaceholder( 'Enter your API key' )
+				testProviderCard.getByPlaceholder( 'Enter your API key' )
 			).toBeVisible();
 			await expect(
-				page.getByRole( 'button', { name: 'Save' } )
+				testProviderCard.getByRole( 'button', { name: 'Save' } )
 			).toBeVisible();
 
 			// The button label should change to "Cancel".
 			await expect(
-				page.getByRole( 'button', { name: 'Cancel' } )
+				testProviderCard.getByRole( 'button', { name: 'Cancel' } )
 			).toBeVisible();
 		} );
 
@@ -166,14 +187,23 @@ test.describe( 'Connectors', () => {
 				CONNECTORS_PAGE_QUERY
 			);
 
-			await page.getByRole( 'button', { name: 'Set up' } ).click();
+			const testProviderCard = getConnectorCardByName(
+				page,
+				TEST_PROVIDER_NAME
+			);
+			await testProviderCard
+				.getByRole( 'button', { name: 'Set up' } )
+				.click();
 
-			const apiKeyInput = page.getByPlaceholder( 'Enter your API key' );
+			const apiKeyInput =
+				testProviderCard.getByPlaceholder( 'Enter your API key' );
 			await apiKeyInput.fill( 'wrong-key' );
-			await page.getByRole( 'button', { name: 'Save' } ).click();
+			await testProviderCard
+				.getByRole( 'button', { name: 'Save' } )
+				.click();
 
 			// Should show an error message with role="alert" for screen readers.
-			const errorAlert = page.getByRole( 'alert' );
+			const errorAlert = testProviderCard.getByRole( 'alert' );
 			await expect( errorAlert ).toBeVisible();
 			await expect( errorAlert ).toContainText(
 				'It was not possible to connect'
@@ -189,19 +219,30 @@ test.describe( 'Connectors', () => {
 				CONNECTORS_PAGE_QUERY
 			);
 
-			await page.getByRole( 'button', { name: 'Set up' } ).click();
+			const testProviderCard = getConnectorCardByName(
+				page,
+				TEST_PROVIDER_NAME
+			);
+			await testProviderCard
+				.getByRole( 'button', { name: 'Set up' } )
+				.click();
 
-			const apiKeyInput = page.getByPlaceholder( 'Enter your API key' );
+			const apiKeyInput =
+				testProviderCard.getByPlaceholder( 'Enter your API key' );
 			await apiKeyInput.fill( VALID_API_KEY );
-			await page.getByRole( 'button', { name: 'Save' } ).click();
+			await testProviderCard
+				.getByRole( 'button', { name: 'Save' } )
+				.click();
 
 			// The form should close and show the "Connected" badge.
 			await expect(
-				page.getByText( 'Connected', { exact: true } )
+				testProviderCard.getByText( 'Connected', { exact: true } )
 			).toBeVisible();
 
 			// The button should now show "Edit" instead of "Set up".
-			const editButton = page.getByRole( 'button', { name: 'Edit' } );
+			const editButton = testProviderCard.getByRole( 'button', {
+				name: 'Edit',
+			} );
 			await expect( editButton ).toBeVisible();
 
 			// Focus should be on the Edit button after save.
@@ -217,15 +258,20 @@ test.describe( 'Connectors', () => {
 				CONNECTORS_PAGE_QUERY
 			);
 
+			const testProviderCard = getConnectorCardByName(
+				page,
+				TEST_PROVIDER_NAME
+			);
+
 			// Focus the "Set up" button and activate with keyboard.
-			const setupButton = page.getByRole( 'button', {
+			const setupButton = testProviderCard.getByRole( 'button', {
 				name: 'Set up',
 			} );
 			await setupButton.focus();
 			await page.keyboard.press( 'Enter' );
 
 			// Focus should remain on the button, now labeled "Cancel".
-			const cancelButton = page.getByRole( 'button', {
+			const cancelButton = testProviderCard.getByRole( 'button', {
 				name: 'Cancel',
 			} );
 			await expect( cancelButton ).toBeFocused();
@@ -238,7 +284,7 @@ test.describe( 'Connectors', () => {
 			await page.keyboard.press( 'Enter' );
 
 			// Focus should remain on the button, now labeled "Set up" again.
-			const setupButtonAgain = page.getByRole( 'button', {
+			const setupButtonAgain = testProviderCard.getByRole( 'button', {
 				name: 'Set up',
 			} );
 			await expect( setupButtonAgain ).toBeFocused();
@@ -257,8 +303,13 @@ test.describe( 'Connectors', () => {
 				CONNECTORS_PAGE_QUERY
 			);
 
+			const testProviderCard = getConnectorCardByName(
+				page,
+				TEST_PROVIDER_NAME
+			);
+
 			// Focus and activate the "Set up" button with keyboard.
-			const setupButton = page.getByRole( 'button', {
+			const setupButton = testProviderCard.getByRole( 'button', {
 				name: 'Set up',
 			} );
 			await setupButton.focus();
@@ -267,7 +318,7 @@ test.describe( 'Connectors', () => {
 			// Tab into the API key input.
 			await page.keyboard.press( 'Tab' );
 			await expect(
-				page.getByPlaceholder( 'Enter your API key' )
+				testProviderCard.getByPlaceholder( 'Enter your API key' )
 			).toBeFocused();
 
 			// Type a valid API key.
@@ -276,7 +327,7 @@ test.describe( 'Connectors', () => {
 			// Tab to the Save button.
 			await page.keyboard.press( 'Tab' );
 			await expect(
-				page.getByRole( 'button', { name: 'Save' } )
+				testProviderCard.getByRole( 'button', { name: 'Save' } )
 			).toBeFocused();
 
 			// Press Enter to save.
@@ -284,12 +335,12 @@ test.describe( 'Connectors', () => {
 
 			// Wait for the connected state.
 			await expect(
-				page.getByText( 'Connected', { exact: true } )
+				testProviderCard.getByText( 'Connected', { exact: true } )
 			).toBeVisible();
 
 			// Focus should be on the "Edit" button.
 			await expect(
-				page.getByRole( 'button', { name: 'Edit' } )
+				testProviderCard.getByRole( 'button', { name: 'Edit' } )
 			).toBeFocused();
 		} );
 
@@ -302,24 +353,33 @@ test.describe( 'Connectors', () => {
 				CONNECTORS_PAGE_QUERY
 			);
 
-			await page.getByRole( 'button', { name: 'Set up' } ).click();
+			const testProviderCard = getConnectorCardByName(
+				page,
+				TEST_PROVIDER_NAME
+			);
+			await testProviderCard
+				.getByRole( 'button', { name: 'Set up' } )
+				.click();
 
-			const apiKeyInput = page.getByPlaceholder( 'Enter your API key' );
+			const apiKeyInput =
+				testProviderCard.getByPlaceholder( 'Enter your API key' );
 			await apiKeyInput.fill( 'wrong-key' );
-			await page.getByRole( 'button', { name: 'Save' } ).click();
+			await testProviderCard
+				.getByRole( 'button', { name: 'Save' } )
+				.click();
 
 			// Error alert should be visible.
-			await expect( page.getByRole( 'alert' ) ).toBeVisible();
+			await expect( testProviderCard.getByRole( 'alert' ) ).toBeVisible();
 
 			// The panel should still be expanded (Cancel button visible).
 			await expect(
-				page.getByRole( 'button', { name: 'Cancel' } )
+				testProviderCard.getByRole( 'button', { name: 'Cancel' } )
 			).toBeVisible();
 
 			// Focus should NOT be on the action button — the form stays
 			// open so the user can correct their key.
 			await expect(
-				page.getByRole( 'button', { name: 'Cancel' } )
+				testProviderCard.getByRole( 'button', { name: 'Cancel' } )
 			).not.toBeFocused();
 		} );
 	} );

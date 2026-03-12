@@ -155,7 +155,7 @@ export function DefaultConnectorSettings( {
 		}
 		if ( saveError ) {
 			return (
-				<span role="alert" style={ { color: '#cc1818' } }>
+				<span role="alert" className="connector-settings__error">
 					{ saveError }
 				</span>
 			);
