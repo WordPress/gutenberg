@@ -147,9 +147,7 @@ function BlockSettingsMenuControls( props ) {
 					if ( fillProps.isContentOnly && ! supportsContentOnly ) {
 						return null;
 					}
-					return typeof children === 'function'
-						? children( fillProps )
-						: children;
+					return children( fillProps );
 				} }
 			</Fill>
 		</StyleProvider>
