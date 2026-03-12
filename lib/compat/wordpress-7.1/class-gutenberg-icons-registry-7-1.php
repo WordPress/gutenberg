@@ -235,6 +235,15 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 				$container_attributes
 			),
 			'defs'                => $core_attributes,
+			'view'                => array_merge(
+				$core_attributes,
+				array(
+					'viewbox'             => true,
+					'preserveaspectratio' => true,
+					'zoomandpan'          => true,
+					'viewtarget'          => true,
+				)
+			),
 			'symbol'              => array_merge(
 				$core_attributes,
 				$aria_attributes,
@@ -259,6 +268,25 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 					'y'          => true,
 					'width'      => true,
 					'height'     => true,
+				)
+			),
+			'switch'              => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$container_attributes
+			),
+			// Linking element.
+			'a'                   => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$presentation_attributes,
+				$container_attributes,
+				array(
+					'href'       => true,
+					'xlink:href' => true,
+					'target'     => true,
+					'rel'        => true,
+					'type'       => true,
 				)
 			),
 			'clippath'            => array_merge(
@@ -621,6 +649,26 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 					'accumulate'    => true,
 				)
 			),
+			'animatemotion'       => array_merge(
+				$core_attributes,
+				array(
+					'path'        => true,
+					'keypoints'   => true,
+					'rotate'      => true,
+					'keytimes'    => true,
+					'keysplines'  => true,
+					'calcmode'    => true,
+					'from'        => true,
+					'to'          => true,
+					'values'      => true,
+					'dur'         => true,
+					'repeatcount' => true,
+					'begin'       => true,
+					'end'         => true,
+					'additive'    => true,
+					'accumulate'  => true,
+				)
+			),
 			'animatetransform'    => array_merge(
 				$core_attributes,
 				array(
@@ -638,6 +686,17 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 					'calcmode'      => true,
 					'additive'      => true,
 					'accumulate'    => true,
+				)
+			),
+			'set'                 => array_merge(
+				$core_attributes,
+				array(
+					'attributename' => true,
+					'to'            => true,
+					'begin'         => true,
+					'dur'           => true,
+					'end'           => true,
+					'repeatcount'   => true,
 				)
 			),
 		);

@@ -141,6 +141,18 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 				'<svg xmlns="http://www.w3.org/2000/svg"><defs><symbol id="icon" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" /></symbol><clipPath id="clip"><circle cx="12" cy="12" r="10" /></clipPath><mask id="m"><rect fill="white" width="24" height="24" /></mask></defs><g><use href="#icon" /><use href="https://example.com/icon.svg#symbol" /><use href="#symbol" /></g></svg>',
 				'<svg xmlns="http://www.w3.org/2000/svg"><defs><symbol id="icon" viewbox="0 0 24 24"><path d="M0 0h24v24H0z" /></symbol><clipPath id="clip"><circle cx="12" cy="12" r="10" /></clipPath><mask id="m"><rect fill="white" width="24" height="24" /></mask></defs><g><use href="#icon" /><use href="https://example.com/icon.svg#symbol" /><use href="#symbol" /></g></svg>',
 			),
+			'preserves switch element'                    => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><switch><path d="M0 0h24v24H0z" /></switch></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><switch><path d="M0 0h24v24H0z" /></switch></svg>',
+			),
+			'preserves view element'                      => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><defs><view id="v" viewBox="0 0 24 24" /></defs><path d="M0 0h24v24H0z" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><defs><view id="v" viewbox="0 0 24 24" /></defs><path d="M0 0h24v24H0z" /></svg>',
+			),
+			'preserves linking element'                   => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><a href="https://example.com"><path d="M0 0h24v24H0z" /></a></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><a href="https://example.com"><path d="M0 0h24v24H0z" /></a></svg>',
+			),
 			// Gradient elements.
 			'preserves gradient elements'                 => array(
 				'<svg xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lin"><stop offset="0%" stop-color="red" /><stop offset="100%" stop-color="blue" /></linearGradient><radialGradient id="rad"><stop offset="0%" stop-color="red" /><stop offset="100%" stop-color="blue" /></radialGradient></defs><rect fill="url(#lin)" width="24" height="24" /></svg>',
@@ -178,8 +190,8 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 			),
 			// Animation elements.
 			'preserves animation elements'                => array(
-				'<svg xmlns="http://www.w3.org/2000/svg"><animate attributeName="opacity" from="1" to="0.5" dur="1s" /><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="2s" /></svg>',
-				'<svg xmlns="http://www.w3.org/2000/svg"><animate attributename="opacity" from="1" to="0.5" dur="1s" /><animateTransform attributename="transform" type="rotate" from="0 12 12" to="360 12 12" dur="2s" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><animate attributeName="opacity" from="1" to="0.5" dur="1s" /><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="2s" /><path d="M0,0 L10,10"><animateMotion path="M0,0 L24,24" dur="1s" /></path><path d="M0 0"><set attributeName="opacity" to="0.5" begin="1s" /></path></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><animate attributename="opacity" from="1" to="0.5" dur="1s" /><animateTransform attributename="transform" type="rotate" from="0 12 12" to="360 12 12" dur="2s" /><path d="M0,0 L10,10"><animateMotion path="M0,0 L24,24" dur="1s" /></path><path d="M0 0"><set attributename="opacity" to="0.5" begin="1s" /></path></svg>',
 			),
 		);
 	}
