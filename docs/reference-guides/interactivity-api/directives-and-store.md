@@ -1369,7 +1369,7 @@ The Interactivity API comes with handy functions that allow you to initialize an
 
 ### wp_interactivity_config
 
-`wp_interactivity_config` allows to set or get a configuration array, referenced to a store namespace.
+`wp_interactivity_config` allows you to set or get a configuration array, referenced to a store namespace.
 The configuration is also available on the client, but it is static information.
 
 Consider it a global setting for interactions of a site, that won't be updated on user interactions.
