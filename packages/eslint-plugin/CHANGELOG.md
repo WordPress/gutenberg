@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added [`no-unmerged-classname`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unmerged-classname.md) rule to flag components that set an explicit `className` while spreading rest props without destructuring and merging the incoming `className` ([#76458](https://github.com/WordPress/gutenberg/pull/76458)).
+
 ## 24.3.0 (2026-03-04)
 
 ### New Features
