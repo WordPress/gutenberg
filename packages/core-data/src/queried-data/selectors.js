@@ -51,7 +51,7 @@ function getQueriedItemsUncached( state, query ) {
 	// null unless totalItems confirms we already have all available items.
 	if ( perPage !== -1 && itemIds.length < startOffset + perPage ) {
 		const totalItems =
-			state.queries[ context ][ stableKey ]?.meta?.totalItems;
+			state.queries[ context ][ stableKey ].meta?.totalItems;
 		if ( Number.isFinite( totalItems ) && itemIds.length < totalItems ) {
 			return null;
 		}
