@@ -52,7 +52,6 @@ export interface UpdateQueue {
 	clear: () => void;
 	get: () => SyncUpdate[];
 	pause: () => void;
-	isPaused: () => boolean;
 	restore: ( updates: SyncUpdate[] ) => void;
 	resume: () => void;
 	size: () => number;

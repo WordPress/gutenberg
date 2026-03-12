@@ -78,9 +78,6 @@ export function createUpdateQueue(
 		pause(): void {
 			isPaused = true;
 		},
-		isPaused(): boolean {
-			return isPaused;
-		},
 		restore( restoredUpdates: SyncUpdate[] ): void {
 			// Restore to front of the queue on failure. Remove compaction updates.
 			const filtered = restoredUpdates.filter(
