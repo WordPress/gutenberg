@@ -48,22 +48,32 @@ test.describe( 'Connectors', () => {
 	} ) => {
 		await admin.visitAdminPage( SETTINGS_PAGE_PATH, CONNECTORS_PAGE_QUERY );
 
-		// Verify the page title is visible.
-		await expect(
-			page.getByRole( 'heading', { name: 'Connectors' } )
-		).toBeVisible();
+		// Verify the page title is an h1 heading.
+		const pageTitle = page.getByRole( 'heading', {
+			name: 'Connectors',
+			level: 1,
+		} );
+		await expect( pageTitle ).toBeVisible();
 
-		// Verify each connector card shows name, description, and Install button.
+		// Verify each connector card shows name as heading, description, and Install button.
 		for ( const { slug, name, description } of CONNECTORS ) {
 			const card = page.locator( `.connector-item--${ slug }` );
 			await expect( card ).toBeVisible();
+
+			// Connector name should be an h2 heading.
 			await expect(
-				card.getByText( name, { exact: true } )
+				card.getByRole( 'heading', { name, level: 2 } )
 			).toBeVisible();
 			await expect( card.getByText( description ) ).toBeVisible();
-			await expect(
-				card.getByRole( 'button', { name: 'Install' } )
-			).toBeVisible();
+
+			// Connector should be wrapped in a group with the heading as label.
+			const group = card.getByRole( 'group' );
+			await expect( group ).toBeVisible();
+
+			const button = card.getByRole( 'button', { name: 'Install' } );
+			await expect( button ).toBeVisible();
+			// Install button should not have aria-expanded.
+			await expect( button ).not.toHaveAttribute( 'aria-expanded' );
 		}
 
 		// Verify the plugin directory search link is present.
@@ -162,10 +172,12 @@ test.describe( 'Connectors', () => {
 			await apiKeyInput.fill( 'wrong-key' );
 			await page.getByRole( 'button', { name: 'Save' } ).click();
 
-			// Should show an error message.
-			await expect(
-				page.getByText( 'It was not possible to connect' )
-			).toBeVisible();
+			// Should show an error message with role="alert" for screen readers.
+			const errorAlert = page.getByRole( 'alert' );
+			await expect( errorAlert ).toBeVisible();
+			await expect( errorAlert ).toContainText(
+				'It was not possible to connect'
+			);
 		} );
 
 		test( 'should accept a valid API key and show "Connected"', async ( {
@@ -187,9 +199,11 @@ test.describe( 'Connectors', () => {
 			await expect( page.getByText( 'Connected' ) ).toBeVisible();
 
 			// The button should now show "Edit" instead of "Set up".
-			await expect(
-				page.getByRole( 'button', { name: 'Edit' } )
-			).toBeVisible();
+			const editButton = page.getByRole( 'button', { name: 'Edit' } );
+			await expect( editButton ).toBeVisible();
+
+			// Focus should be on the Edit button after save.
+			await expect( editButton ).toBeFocused();
 		} );
 	} );
 
