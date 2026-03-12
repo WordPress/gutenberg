@@ -104,6 +104,7 @@ const {
 	isIsolatedEditorKey,
 	deviceTypeKey,
 	isNavigationOverlayContextKey,
+	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
 } = unlock( privateApis );
 
@@ -391,6 +392,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				'wp_block',
 				'wp_navigation',
 			].includes( postType ),
+			[ isNavigationPostEditorKey ]: postType === 'wp_navigation',
 			// When in template-locked mode (e.g., "Show Template" in the post editor),
 			// don't treat template parts as contentOnly sections.
 			disableContentOnlyForTemplateParts:
