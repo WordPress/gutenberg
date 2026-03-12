@@ -662,22 +662,21 @@ export const CrossIframeWithSlotFill: Story = {
 };
 
 /**
- * Override the `--wp-ui-popover-z-index` CSS custom property to control
- * the z-index of the popover positioner. Useful when popovers need to
- * stack above other overlays.
+ * Popovers in Gutenberg are managed with explicit z-index values, which can
+ * create situations where a popover renders below another popover, when you
+ * want it to be rendered above.
  *
- * Because the positioner renders via a portal, the variable must target
- * the positioner directly (not a wrapper). Here a scoped `<style>` tag
- * sets the value.
+ * The `--wp-ui-popover-z-index` CSS variable, available on the
+ * `Popover.Popup` component, is an escape hatch that can be used to override
+ * the z-index of a given popover on a case-by-case basis.
  */
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
 	args: {
 		children: (
 			<>
-				<style>{ `.custom-z-index-popover { --wp-ui-popover-z-index: 9999; }` }</style>
 				<Popover.Trigger>Open Popover</Popover.Trigger>
-				<Popover.Popup className="custom-z-index-popover">
+				<Popover.Popup style={ { '--wp-ui-popover-z-index': '9999' } }>
 					<Popover.Arrow />
 					<Popover.Title>Custom z-index</Popover.Title>
 					<Popover.Description>
