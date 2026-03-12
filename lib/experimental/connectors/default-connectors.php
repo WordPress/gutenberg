@@ -150,7 +150,7 @@ function _gutenberg_connectors_init(): void {
 	 */
 	do_action( 'wp_connectors_init', $registry );
 }
-remove_action( 'init', '_wp_connectors_init' );
+remove_action( 'init', '_wp_connectors_init', 15 );
 add_action( 'init', '_gutenberg_connectors_init', 15 );
 
 /**
