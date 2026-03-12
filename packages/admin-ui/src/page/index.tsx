@@ -14,6 +14,7 @@ function Page( {
 	headingLevel,
 	breadcrumbs,
 	badges,
+	logo,
 	title,
 	subTitle,
 	children,
@@ -26,6 +27,7 @@ function Page( {
 	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 	breadcrumbs?: React.ReactNode;
 	badges?: React.ReactNode;
+	logo?: React.ReactNode;
 	title?: React.ReactNode;
 	subTitle?: React.ReactNode;
 	children: React.ReactNode;
@@ -41,11 +43,12 @@ function Page( {
 
 	return (
 		<NavigableRegion className={ classes } ariaLabel={ effectiveAriaLabel }>
-			{ ( title || breadcrumbs || badges || actions ) && (
+			{ ( title || breadcrumbs || badges || actions || logo ) && (
 				<Header
 					headingLevel={ headingLevel }
 					breadcrumbs={ breadcrumbs }
 					badges={ badges }
+					logo={ logo }
 					title={ title }
 					subTitle={ subTitle }
 					actions={ actions }

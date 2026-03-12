@@ -30,6 +30,18 @@
 	white-space: nowrap;
 }
 
+.admin-ui-page__header-logo {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+
+	img,
+	svg {
+		display: block;
+		object-fit: contain;
+	}
+}
+
 .admin-ui-page__sidebar-toggle-slot:empty {
 	display: none;
 }
