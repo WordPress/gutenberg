@@ -7,6 +7,7 @@ import {
 	BlockContextProvider,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo, useEffect, useRef } from '@wordpress/element';
 
@@ -74,13 +75,13 @@ function Edit( {
 		}
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
-	const { removeBlock } = useDispatch( blockEditorStore );
+	const { removeBlock, insertBlock } = useDispatch( blockEditorStore );
 
 	/**
 	 * Construct a list of core/tab blocks, used to create tabs-list context.
 	 * Also select menu items with their anchors for anchor-based deletion sync.
 	 */
-	const { tabs, menuItems } = useSelect(
+	const { tabs, menuItems, tabPanelClientId, tabsMenuClientId } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( blockEditorStore );
 			const innerBlocks = getBlocks( clientId );
@@ -109,22 +110,23 @@ function Edit( {
 								anchor: b.attributes.anchor ?? '',
 							} ) )
 					: [],
+				tabPanelClientId: tabPanel?.clientId ?? null,
+				tabsMenuClientId: tabsMenu?.clientId ?? null,
 			};
 		},
 		[ clientId ]
 	);
 
 	/**
-	 * Keep tabs and menu items in sync when either is deleted directly (e.g.
-	 * via the Backspace key or List View).
+	 * Keep tabs and menu items in sync when the lists change due to direct
+	 * user actions (deletion, paste, duplicate, drag-and-drop).
 	 *
-	 * TODO: This effect only handles deletions. The two lists can get out of
-	 * sync in other cases: if a user pastes a core/tab block into the tab-panel
-	 * (or duplicates one), no corresponding tabs-menu-item is created; if a
-	 * user drags and drops a tabs-menu-item, the tab panel is not copied with
-	 * it. We should extend this effect to handle insertions, detecting when
-	 * tabs.length > menuItems.length and inserting the missing menu
-	 * item(s) at the correct index.
+	 * Deletion: when one side shrinks, remove the orphaned counterpart.
+	 * Insertion: when one side grows without the other, insert the missing
+	 * counterpart at the matching index.
+	 *
+	 * When both lists change simultaneously (e.g. the "Add Tab" toolbar button,
+	 * which inserts both at once), no action is needed and the effect exits early.
 	 */
 	const prevSyncStateRef = useRef( null );
 	useEffect( () => {
@@ -146,19 +148,29 @@ function Edit( {
 
 		const tabsRemoved = currentTabs.length < prevTabs.length;
 		const menuItemsRemoved = menuItems.length < prevMenuItems.length;
+		const tabsInserted = currentTabs.length > prevTabs.length;
+		const menuItemsInserted = menuItems.length > prevMenuItems.length;
 
 		// Update snapshot to the current state.
-		// Snapshot is updated eagerly; post-removal mutations keep it consistent
-		// so the next effect invocation sees a stable baseline.
 		prevSyncStateRef.current = {
 			tabs: currentTabs,
 			menuItems: [ ...menuItems ],
 		};
 
-		// Lists are in sync, nothing changed, or toolbar already removed both.
+		// Lists are already in sync.
 		if (
-			( ! tabsRemoved && ! menuItemsRemoved ) ||
-			( tabsRemoved && menuItemsRemoved )
+			( tabsRemoved && menuItemsRemoved ) ||
+			( tabsInserted && menuItemsInserted )
+		) {
+			return;
+		}
+
+		// Nothing changed.
+		if (
+			! tabsRemoved &&
+			! menuItemsRemoved &&
+			! tabsInserted &&
+			! menuItemsInserted
 		) {
 			return;
 		}
@@ -169,6 +181,7 @@ function Edit( {
 		);
 
 		if ( tabsRemoved ) {
+			// A tab was deleted — remove its corresponding menu item.
 			prevTabs.forEach( ( prevTab ) => {
 				if ( currentTabIds.has( prevTab.clientId ) ) {
 					return;
@@ -187,7 +200,8 @@ function Edit( {
 						);
 				}
 			} );
-		} else {
+		} else if ( menuItemsRemoved ) {
+			// A menu item was deleted — remove its corresponding tab.
 			prevMenuItems.forEach( ( prevItem ) => {
 				if ( currentMenuItemIds.has( prevItem.clientId ) ) {
 					return;
@@ -206,8 +220,93 @@ function Edit( {
 						);
 				}
 			} );
+		} else if ( tabsInserted ) {
+			// A tab was pasted or duplicated — insert a matching menu item.
+			if ( ! tabsMenuClientId ) {
+				return;
+			}
+			const prevTabIds = new Set( prevTabs.map( ( t ) => t.clientId ) );
+			const existingMenuAnchors = new Set(
+				menuItems.map( ( m ) => m.anchor )
+			);
+			currentTabs.forEach( ( newTab, tabIndex ) => {
+				if ( prevTabIds.has( newTab.clientId ) ) {
+					return;
+				}
+				const expectedMenuAnchor = newTab.anchor
+					? `${ newTab.anchor }-button`
+					: null;
+				if (
+					expectedMenuAnchor &&
+					existingMenuAnchors.has( expectedMenuAnchor )
+				) {
+					return;
+				}
+				const newMenuItemBlock = createBlock(
+					'core/tabs-menu-item',
+					expectedMenuAnchor ? { anchor: expectedMenuAnchor } : {}
+				);
+				insertBlock(
+					newMenuItemBlock,
+					tabIndex,
+					tabsMenuClientId,
+					false
+				);
+				// Add a placeholder so the next render does not re-trigger insertion.
+				prevSyncStateRef.current.menuItems.splice( tabIndex, 0, {
+					clientId: newMenuItemBlock.clientId,
+					anchor: expectedMenuAnchor ?? '',
+				} );
+			} );
+		} else if ( menuItemsInserted ) {
+			// A menu item was pasted or dragged in — insert a matching tab.
+			if ( ! tabPanelClientId ) {
+				return;
+			}
+			const prevMenuItemIds = new Set(
+				prevMenuItems.map( ( m ) => m.clientId )
+			);
+			const existingTabAnchors = new Set(
+				currentTabs.map( ( t ) => t.anchor )
+			);
+			menuItems.forEach( ( newMenuItem, menuItemIndex ) => {
+				if ( prevMenuItemIds.has( newMenuItem.clientId ) ) {
+					return;
+				}
+				const expectedTabAnchor = newMenuItem.anchor
+					? newMenuItem.anchor.replace( /-button$/, '' )
+					: '';
+				if (
+					expectedTabAnchor &&
+					existingTabAnchors.has( expectedTabAnchor )
+				) {
+					return;
+				}
+				const newTabBlock = createBlock( 'core/tab', {
+					anchor: expectedTabAnchor,
+					label: '',
+				} );
+				insertBlock(
+					newTabBlock,
+					menuItemIndex,
+					tabPanelClientId,
+					false
+				);
+				// Add a placeholder so the next render does not re-trigger insertion.
+				prevSyncStateRef.current.tabs.splice( menuItemIndex, 0, {
+					clientId: newTabBlock.clientId,
+					anchor: expectedTabAnchor,
+				} );
+			} );
 		}
-	}, [ tabs, menuItems, removeBlock ] );
+	}, [
+		tabs,
+		menuItems,
+		removeBlock,
+		insertBlock,
+		tabsMenuClientId,
+		tabPanelClientId,
+	] );
 
 	/**
 	 * Memoize context value to prevent unnecessary re-renders.
