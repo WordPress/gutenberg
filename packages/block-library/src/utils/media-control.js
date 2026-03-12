@@ -4,7 +4,7 @@
 import {
 	Button,
 	DropZone,
-	FlexItem,
+	FlexBlock,
 	Spinner,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
@@ -16,6 +16,8 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { reset as resetIcon } from '@wordpress/icons';
+import { getFilename } from '@wordpress/url';
 
 /**
  * MediaControlPreview - Preview component showing media thumbnail and filename
@@ -26,6 +28,7 @@ import { useSelect } from '@wordpress/data';
  * @param {string} props.filename       Filename to display
  * @param {Object} props.itemGroupProps Optional props to pass to ItemGroup
  * @param {string} props.className      Optional className for Truncate
+ * @param {string} props.label          Optional label for accessibility
  * @return {Element} Preview component
  */
 export function MediaControlPreview( {
@@ -34,16 +37,23 @@ export function MediaControlPreview( {
 	filename,
 	itemGroupProps,
 	className,
+	label,
 } ) {
 	return (
 		<ItemGroup { ...itemGroupProps } as="span">
-			<HStack justify="flex-start" as="span">
-				<img src={ url } alt={ alt } />
-				<FlexItem as="span">
+			<HStack justify="flex-start">
+				<span
+					className="block-library-utils__media-control__inspector-image-indicator"
+					aria-label={ alt }
+					style={ {
+						backgroundImage: url ? `url(${ url })` : undefined,
+					} }
+				/>
+				<FlexBlock>
 					<Truncate numberOfLines={ 1 } className={ className }>
-						{ filename }
+						{ filename ?? label }
 					</Truncate>
-				</FlexItem>
+				</FlexBlock>
 			</HStack>
 		</ItemGroup>
 	);
@@ -98,31 +108,47 @@ export function MediaControl( {
 
 	return (
 		<div className="block-library-utils__media-control">
-			<MediaReplaceFlow
-				mediaId={ mediaId }
-				mediaURL={ mediaUrl }
-				allowedTypes={ allowedTypes }
-				onSelect={ onSelect }
-				onSelectURL={ onSelectURL }
-				onError={ onError }
-				name={
-					mediaUrl ? (
+			<div className="block-library-utils__media-control__replace-flow">
+				<MediaReplaceFlow
+					mediaId={ mediaId }
+					mediaURL={ mediaUrl }
+					allowedTypes={ allowedTypes }
+					onSelect={ onSelect }
+					onSelectURL={ onSelectURL }
+					onError={ onError }
+					name={
 						<MediaControlPreview
-							url={ mediaUrl }
-							alt={ alt }
-							filename={ filename }
+							url={ mediaUrl ?? undefined }
+							alt={ mediaUrl ? alt : undefined }
+							filename={ mediaUrl ? filename : undefined }
+							className="block-library-utils__media-control__inspector-media-replace-title"
+							label={
+								mediaUrl ? getFilename( filename ) : emptyLabel
+							}
+							itemGroupProps={ {
+								className:
+									'block-library-utils__media-control__inspector-preview-inner',
+							} }
 						/>
-					) : (
-						emptyLabel
-					)
-				}
-				renderToggle={ ( props ) => (
-					<Button { ...props } __next40pxDefaultSize>
-						{ isUploading ? <Spinner /> : props.children }
-					</Button>
-				) }
-				onReset={ onReset }
-			/>
+					}
+					renderToggle={ ( props ) => (
+						<Button { ...props } __next40pxDefaultSize>
+							{ isUploading ? <Spinner /> : props.children }
+						</Button>
+					) }
+					onReset={ onReset }
+				/>
+			</div>
+			{ mediaUrl && onReset && (
+				<Button
+					__next40pxDefaultSize
+					label={ __( 'Reset' ) }
+					className="block-library-utils__media-control__reset"
+					size="small"
+					icon={ resetIcon }
+					onClick={ onReset }
+				/>
+			) }
 			<DropZone onFilesDrop={ onFilesDrop } />
 		</div>
 	);
