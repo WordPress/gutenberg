@@ -196,7 +196,9 @@ test.describe( 'Connectors', () => {
 			await page.getByRole( 'button', { name: 'Save' } ).click();
 
 			// The form should close and show the "Connected" badge.
-			await expect( page.getByText( 'Connected' ) ).toBeVisible();
+			await expect(
+				page.getByText( 'Connected', { exact: true } )
+			).toBeVisible();
 
 			// The button should now show "Edit" instead of "Set up".
 			const editButton = page.getByRole( 'button', { name: 'Edit' } );
@@ -281,7 +283,9 @@ test.describe( 'Connectors', () => {
 			await page.keyboard.press( 'Enter' );
 
 			// Wait for the connected state.
-			await expect( page.getByText( 'Connected' ) ).toBeVisible();
+			await expect(
+				page.getByText( 'Connected', { exact: true } )
+			).toBeVisible();
 
 			// Focus should be on the "Edit" button.
 			await expect(
