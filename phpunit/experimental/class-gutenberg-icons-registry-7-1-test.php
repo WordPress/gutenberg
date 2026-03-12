@@ -1,19 +1,19 @@
 <?php
 /**
- * Tests for WP_Icons_Registry.
+ * Tests for Gutenberg_Icons_Registry_7_1.
  *
- * @package WordPress
+ * @package Gutenberg
  * @subpackage Icons
- * @since 7.0.0
+ * @since 7.1.0
  *
  * @group icons
  */
-class Tests_Icons_WpIconsRegistry extends WP_UnitTestCase {
+class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 
 	/**
 	 * Icons registry.
 	 *
-	 * @var WP_Icons_Registry
+	 * @var Gutenberg_Icons_Registry_7_1
 	 */
 	private $registry = null;
 
@@ -22,7 +22,7 @@ class Tests_Icons_WpIconsRegistry extends WP_UnitTestCase {
 	 */
 	public function set_up() {
 		parent::set_up();
-		$this->registry = WP_Icons_Registry::get_instance();
+		$this->registry = Gutenberg_Icons_Registry_7_1::get_instance();
 	}
 
 	/**
@@ -41,7 +41,7 @@ class Tests_Icons_WpIconsRegistry extends WP_UnitTestCase {
 	 * @return bool True on success, false on failure.
 	 * @throws ReflectionException If the method does not exist.
 	 *
-	 * @expectedIncorrectUsage WP_Icons_Registry::register
+	 * @expectedIncorrectUsage Gutenberg_Icons_Registry_7_1::register
 	 */
 	private function register_icon( $name, $args = array() ) {
 		$method = new ReflectionMethod( $this->registry, 'register' );
@@ -52,7 +52,7 @@ class Tests_Icons_WpIconsRegistry extends WP_UnitTestCase {
 	/**
 	 * Should reject non-string names.
 	 *
-	 * @expectedIncorrectUsage WP_Icons_Registry::register
+	 * @expectedIncorrectUsage Gutenberg_Icons_Registry_7_1::register
 	 */
 	public function test_invalid_non_string_names() {
 		$result = $this->register_icon( 1, array() );
@@ -62,7 +62,7 @@ class Tests_Icons_WpIconsRegistry extends WP_UnitTestCase {
 	/**
 	 * Should reject icons without a namespace.
 	 *
-	 * @expectedIncorrectUsage WP_Icons_Registry::register
+	 * @expectedIncorrectUsage Gutenberg_Icons_Registry_7_1::register
 	 */
 	public function test_invalid_names_without_namespace() {
 		$result = $this->register_icon( 'plus', array() );
@@ -72,7 +72,7 @@ class Tests_Icons_WpIconsRegistry extends WP_UnitTestCase {
 	/**
 	 * Should reject icons with uppercase characters.
 	 *
-	 * @expectedIncorrectUsage WP_Icons_Registry::register
+	 * @expectedIncorrectUsage Gutenberg_Icons_Registry_7_1::register
 	 */
 	public function test_uppercase_characters() {
 		$result = $this->register_icon( 'Core/Plus', array() );
