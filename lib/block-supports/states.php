@@ -52,43 +52,46 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	// Map __experimentalStatesElement values to their CSS element selectors.
-	$element_selectors = array(
-		'button' => '.wp-element-button, .wp-block-button__link',
-		'link'   => 'a:where(:not(.wp-element-button))',
-	);
-
-	$states_element  = $block_type->supports['__experimentalStatesElement'] ?? null;
-	$element_css_sel = isset( $states_element ) ? ( $element_selectors[ $states_element ] ?? null ) : null;
-
 	$unique_class = 'wp-states-' . substr( md5( wp_json_encode( $css_rules ) ), 0, 8 );
 	$css          = '';
 
 	foreach ( $css_rules as $rule ) {
-		if ( $element_css_sel ) {
-			// Append pseudo-class to each comma-separated element selector part
-			// and scope them to the unique wrapper class.
-			$parts    = explode( ',', $element_css_sel );
-			$scoped   = array();
-			foreach ( $parts as $part ) {
-				$scoped[] = '.' . $unique_class . ' ' . trim( $part ) . $rule['state'];
-			}
-			$selector = implode( ', ', $scoped );
-		} else {
-			$selector = '.' . $unique_class . $rule['state'];
-		}
 		// Use !important to override utility classes like
 		// .has-accent-3-background-color which are generated with !important.
 		$declarations = str_replace( ';', ' !important;', $rule['css'] );
-		$css         .= "$selector { $declarations }\n";
+		$css         .= ".$unique_class$rule[state] { $declarations }\n";
 	}
 
-	// Inject the unique class into the first element of the block content.
-	$processor = new WP_HTML_Tag_Processor( $block_content );
-	if ( $processor->next_tag() ) {
-		$processor->add_class( $unique_class );
-		$block_content = $processor->get_updated_html();
+	// Add the unique class to the interactive element so that state selectors
+	// like `.$unique_class:hover` match directly without needing a descendant.
+	// If the block declares selectors.root with a descendant (e.g. the button
+	// block's ".wp-block-button .wp-block-button__link"), we extract the last
+	// class and walk to that element. Otherwise we fall back to the wrapper.
+	$root_selector = $block_type->selectors['root'] ?? null;
+	$target_class  = null;
+	if ( $root_selector && preg_match( '/\.([a-zA-Z0-9_-]+)\s*$/', $root_selector, $matches ) ) {
+		$target_class = $matches[1];
 	}
+
+	$processor = new WP_HTML_Tag_Processor( $block_content );
+	$found     = false;
+	if ( $target_class ) {
+		while ( $processor->next_tag() ) {
+			if ( $processor->has_class( $target_class ) ) {
+				$processor->add_class( $unique_class );
+				$found = true;
+				break;
+			}
+		}
+	}
+	if ( ! $found ) {
+		// No target class found or no selectors.root — add to the wrapper.
+		$processor = new WP_HTML_Tag_Processor( $block_content );
+		if ( $processor->next_tag() ) {
+			$processor->add_class( $unique_class );
+		}
+	}
+	$block_content = $processor->get_updated_html();
 
 	return '<style>' . $css . '</style>' . $block_content;
 }
