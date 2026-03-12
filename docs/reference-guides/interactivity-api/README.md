@@ -84,7 +84,9 @@ In `block.json`:
 
 The use of `viewScriptModule` also requires the `--experimental-modules` flag for both the [`build`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#build) and [`start`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#start) scripts of `wp-scripts` to ensure a proper build of the Script Modules.
 
-In `package.json`:
+> **Note:** If you scaffolded your block using the [`@wordpress/create-block-interactive-template`](https://www.npmjs.com/package/@wordpress/create-block-interactive-template), this flag is already included in your `package.json` scripts and no manual configuration is needed.
+
+If you need to add it manually, update your `package.json`:
 
 ```json
 {
