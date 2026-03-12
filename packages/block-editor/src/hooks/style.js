@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -28,12 +28,18 @@ import {
 	DimensionsPanel,
 } from './dimensions';
 import {
+	cleanEmptyObject,
 	shouldSkipSerialization,
 	useStyleOverride,
 	useBlockSettings,
 } from './utils';
+import { BlockStatesControl, STATES_SUPPORT_KEY } from './states';
+import StylesColorPanel from '../components/global-styles/color-panel';
+import StylesTypographyPanel from '../components/global-styles/typography-panel';
+import StylesBorderPanel from '../components/global-styles/border-panel';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import InspectorControls from '../components/inspector-controls';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -327,29 +333,88 @@ function BlockStyleControls( {
 	clientId,
 	name,
 	setAttributes,
+	style,
 	__unstableParentLayout,
 } ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const blockEditingMode = useBlockEditingMode();
+	const [ selectedState, setSelectedState ] = useState( 'default' );
+
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
+
+	const panelSettings = {
+		...settings,
+		typography: {
+			...settings.typography,
+			// The text alignment UI for individual blocks is rendered in
+			// the block toolbar, so disable it here.
+			textAlign: false,
+		},
+	};
+
+	const statesControl = (
+		<BlockStatesControl
+			name={ name }
+			value={ selectedState }
+			onChange={ setSelectedState }
+		/>
+	);
+
+	// For non-default states, use Global Styles panels which accept explicit
+	// value/onChange props so we can route saves to the state-specific sub-key.
+	if ( selectedState !== 'default' ) {
+		const stateValue = style?.[ selectedState ] || {};
+		const setStateStyle = ( newStyle ) =>
+			setAttributes( {
+				style: cleanEmptyObject( {
+					...style,
+					[ selectedState ]: newStyle,
+				} ),
+			} );
+
+		return (
+			<>
+				{ statesControl }
+				<InspectorControls>
+					<StylesColorPanel
+						value={ stateValue }
+						inheritedValue={ stateValue }
+						onChange={ setStateStyle }
+						settings={ panelSettings }
+						panelId={ clientId }
+					/>
+					<StylesTypographyPanel
+						value={ stateValue }
+						inheritedValue={ stateValue }
+						onChange={ setStateStyle }
+						settings={ panelSettings }
+						panelId={ clientId }
+					/>
+					<StylesBorderPanel
+						value={ stateValue }
+						inheritedValue={ stateValue }
+						onChange={ setStateStyle }
+						settings={ panelSettings }
+						panelId={ clientId }
+						name={ name }
+					/>
+				</InspectorControls>
+			</>
+		);
+	}
+
 	const passedProps = {
 		clientId,
 		name,
 		setAttributes,
-		settings: {
-			...settings,
-			typography: {
-				...settings.typography,
-				// The text alignment UI for individual blocks is rendered in
-				// the block toolbar, so disable it here.
-				textAlign: false,
-			},
-		},
+		settings: panelSettings,
 	};
-	if ( blockEditingMode !== 'default' ) {
-		return null;
-	}
+
 	return (
 		<>
+			{ statesControl }
 			<ColorEdit { ...passedProps } />
 			<BackgroundImagePanel { ...passedProps } />
 			<TypographyPanel { ...passedProps } />
@@ -469,11 +534,36 @@ function useBlockProps( { name, style } ) {
 	const baseElementSelector = `.${ blockElementsContainerIdentifier }`;
 	const blockElementStyles = style?.elements;
 
-	const styles = useMemo(
-		() =>
-			getElementCSSRules( blockElementStyles, name, baseElementSelector ),
-		[ baseElementSelector, blockElementStyles, name ]
-	);
+	const styles = useMemo( () => {
+		const cssRules = [];
+
+		const elementCSS = getElementCSSRules(
+			blockElementStyles,
+			name,
+			baseElementSelector
+		);
+		if ( elementCSS ) {
+			cssRules.push( elementCSS );
+		}
+
+		// Generate per-instance state CSS (e.g., :hover, :focus).
+		const validStates = getBlockSupport( name, STATES_SUPPORT_KEY );
+		if ( validStates ) {
+			validStates.forEach( ( state ) => {
+				const stateStyles = style?.[ state ];
+				if ( stateStyles ) {
+					const css = compileCSS( stateStyles, {
+						selector: `${ baseElementSelector }${ state }`,
+					} );
+					if ( css ) {
+						cssRules.push( css );
+					}
+				}
+			} );
+		}
+
+		return cssRules.length > 0 ? cssRules.join( '' ) : undefined;
+	}, [ baseElementSelector, blockElementStyles, name, style ] );
 
 	useStyleOverride( { css: styles } );
 
