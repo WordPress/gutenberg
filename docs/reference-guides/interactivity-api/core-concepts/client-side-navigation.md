@@ -792,7 +792,7 @@ const { actions } = store( 'myPlugin', {
 			} );
 			// Navigate to the same page, bypassing the cache
 			// to reflect the updated content.
-			yield navigate( window.location.href, { force: true } );
+			yield actions.navigate( window.location.href, { force: true } );
 		},
 	},
 } );
