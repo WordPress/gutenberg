@@ -34,6 +34,7 @@ import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
 import NavigationBlockEditingMode from './navigation-block-editing-mode';
 import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
+import { useRevisionBlocks } from './use-revision-blocks';
 import useCommands from '../commands';
 import useUploadSaveLock from './use-upload-save-lock';
 import BlockRemovalWarnings from '../block-removal-warnings';
@@ -178,6 +179,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			defaultMode,
 			postTypeEntities,
 			isInRevisionsMode,
+			currentRevisionId,
 		} = useSelect(
 			( select ) => {
 				const {
@@ -186,6 +188,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					__unstableIsEditorReady,
 					getDefaultRenderingMode,
 					isRevisionsMode: _isRevisionsMode,
+					getCurrentRevisionId: _getCurrentRevisionId,
 				} = unlock( select( editorStore ) );
 				const { getEntitiesConfig, getEntityRecordEdits } =
 					select( coreStore );
@@ -227,6 +230,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							? getEntitiesConfig( 'postType' )
 							: null,
 					isInRevisionsMode: _isRevisionsMode(),
+					currentRevisionId: _getCurrentRevisionId(),
 				};
 			},
 			[ post.type, post.id, hasTemplate ]
@@ -285,10 +289,20 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			id,
 			mode
 		);
-		const [ blocks, onInput, onChange ] = useBlockEditorProps(
+		const [ entityBlocks, onInput, onChange ] = useBlockEditorProps(
 			post,
 			template,
 			mode
+		);
+
+		const revisionBlocks = useRevisionBlocks();
+		const blocks = revisionBlocks !== null ? revisionBlocks : entityBlocks;
+		const finalSettings = useMemo(
+			() =>
+				isInRevisionsMode
+					? { ...blockEditorSettings, isPreviewMode: true }
+					: blockEditorSettings,
+			[ isInRevisionsMode, blockEditorSettings ]
 		);
 
 		const {
@@ -421,15 +435,20 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					kind="postType"
 					type={ post.type }
 					id={ post.id }
+					revisionId={ currentRevisionId ?? undefined }
 				>
 					<BlockContextProvider value={ defaultBlockContext }>
 						<BlockEditorProviderComponent
-							value={ isInRevisionsMode ? undefined : blocks }
+							value={ blocks }
 							onChange={ isInRevisionsMode ? noop : onChange }
 							onInput={ isInRevisionsMode ? noop : onInput }
-							selection={ selection }
-							onChangeSelection={ onChangeSelection }
-							settings={ blockEditorSettings }
+							selection={
+								isInRevisionsMode ? undefined : selection
+							}
+							onChangeSelection={
+								isInRevisionsMode ? noop : onChangeSelection
+							}
+							settings={ finalSettings }
 							useSubRegistry={ false }
 						>
 							{ children }
