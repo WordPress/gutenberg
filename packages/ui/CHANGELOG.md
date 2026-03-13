@@ -22,6 +22,7 @@
 -   `Card`, `CollapsibleCard`: update padding to match legacy `Card` component ([#76368](https://github.com/WordPress/gutenberg/pull/76368)).
 -   `CollapsibleCard`: move trigger to the header ([#76265](https://github.com/WordPress/gutenberg/pull/76265)).
 -   `CollapsibleCard`: add animations ([#76378](https://github.com/WordPress/gutenberg/pull/76378)).
+-   `CollapsibleCard`: make contents hidden until found ([#76498](https://github.com/WordPress/gutenberg/pull/76498)).
 
 ## 0.8.0 (2026-03-04)
 
