@@ -25,6 +25,12 @@ const focusableSelectors = [
 const SUBMENU_MIN_WIDTH = 200;
 
 /**
+ * Breakpoint above which submenus may open horizontally.
+ * This matches the break-medium SCSS mixin.
+ */
+const BREAK_MEDIUM = 782;
+
+/**
  * Gets all visible focusable elements within a container.
  * Filters out elements that are hidden.
  *
@@ -105,7 +111,9 @@ function checkSubmenuOverflow( submenuContainer ) {
 		return;
 	}
 
-	const isLargeScreen = window.matchMedia( '(min-width: 782px)' ).matches;
+	const isLargeScreen = window.matchMedia(
+		`(min-width: ${ BREAK_MEDIUM }px)`
+	).matches;
 	const hasClass = parentItem.classList.contains(
 		'submenu-opens-on-horizontal-hover'
 	);
