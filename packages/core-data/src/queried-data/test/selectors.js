@@ -239,4 +239,29 @@ describe( 'getQueriedItems', () => {
 
 		expect( result ).toBe( null );
 	} );
+
+	it( 'should return null when per_page exceeds stored itemIds and more items exist', () => {
+		const state = {
+			items: {
+				default: {
+					1: { id: 1 },
+					2: { id: 2 },
+				},
+			},
+			itemIsComplete: {
+				default: { 1: true, 2: true },
+			},
+			queries: {
+				default: {
+					'': {
+						itemIds: [ 1, 2 ],
+						meta: { totalItems: 5 },
+					},
+				},
+			},
+		};
+
+		const result = getQueriedItems( state, { per_page: 3 } );
+		expect( result ).toBe( null );
+	} );
 } );
