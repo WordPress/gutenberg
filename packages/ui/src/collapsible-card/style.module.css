@@ -41,7 +41,6 @@
 		flex-direction: row;
 		align-items: stretch;
 		gap: var(--wpds-dimension-gap-sm);
-		position: relative;
 		outline: none;
 
 		&:not([data-disabled]) {
