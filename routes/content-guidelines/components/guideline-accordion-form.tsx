@@ -8,6 +8,7 @@ import {
 	Notice,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
+	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
@@ -24,7 +25,6 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import RemoveGuidelineConfirmation from './remove-guideline-confirmation';
 import { STORE_NAME } from '../store';
 import { saveContentGuidelines } from '../api';
 import type { GuidelineAccordionFormProps } from '../types';
@@ -164,28 +164,29 @@ export default function GuidelineAccordionForm( {
 					</Button>
 				</HStack>
 			</VStack>
-			{ showClearConfirmation && (
-				<RemoveGuidelineConfirmation
-					title={ sprintf(
-						/* translators: %s: Guideline category. */
-						__( 'Clear %s guidelines' ),
-						slug
-					) }
-					onClose={ () => setShowClearConfirmation( false ) }
-					onConfirm={ handleClearConfirm }
-					isBusy={ loading }
-					actionLabel={ __( 'Clear guidelines' ) }
-				>
-					{ sprintf(
-						/* translators: %s: Guideline category slug. */
-						__( 'You are about to clear the %s guidelines.' ),
-						slug
-					) }
-					<br />
-					<br />
-					{ __( 'This can be undone from revision history.' ) }
-				</RemoveGuidelineConfirmation>
-			) }
+			<ConfirmDialog
+				isOpen={ showClearConfirmation }
+				title={ sprintf(
+					/* translators: %s: Guideline category. */
+					__( 'Clear %s guidelines' ),
+					slug
+				) }
+				__experimentalHideHeader={ false }
+				onConfirm={ handleClearConfirm }
+				onCancel={ () => setShowClearConfirmation( false ) }
+				confirmButtonText={ __( 'Clear guidelines' ) }
+				isBusy={ loading }
+				size="small"
+			>
+				{ sprintf(
+					/* translators: %s: Guideline category slug. */
+					__( 'You are about to clear the %s guidelines.' ),
+					slug
+				) }
+				<br />
+				<br />
+				{ __( 'This can be undone from revision history.' ) }
+			</ConfirmDialog>
 		</form>
 	);
 }

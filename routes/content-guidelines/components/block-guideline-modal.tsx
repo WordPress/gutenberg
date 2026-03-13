@@ -12,6 +12,7 @@ import {
 	TextareaControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { createElement, useMemo, useState } from '@wordpress/element';
@@ -25,7 +26,6 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import RemoveGuidelineConfirmation from './remove-guideline-confirmation';
 import { saveContentGuidelines } from '../api';
 import { STORE_NAME } from '../store';
 import { unlock } from '../../lock-unlock';
@@ -207,30 +207,32 @@ export default function BlockGuidelineModal( {
 					</Button>
 				</HStack>
 			</VStack>
-			{ showRemoveConfirmation && (
-				<RemoveGuidelineConfirmation
-					title={ __( 'Remove block guidelines' ) }
-					onClose={ () => setShowRemoveConfirmation( false ) }
-					onConfirm={ () => {
-						// We need to pass an empty string to remove the guideline.
-						// This is because the API will only remove the guideline if the value is an empty string.
-						handleSave( '' );
-						setShowRemoveConfirmation( false );
-					} }
-					isBusy={ isSaving }
-				>
-					{ sprintf(
-						/* translators: %s: Block name. */
-						__(
-							'You are about to remove the block guidelines for the %s block.'
-						),
-						selectedBlockLabel
-					) }
-					<br />
-					<br />
-					{ __( 'This can be undone from revision history.' ) }
-				</RemoveGuidelineConfirmation>
-			) }
+			<ConfirmDialog
+				isOpen={ showRemoveConfirmation }
+				title={ __( 'Remove block guidelines' ) }
+				__experimentalHideHeader={ false }
+				onConfirm={ () => {
+					// We need to pass an empty string to remove the guideline.
+					// This is because the API will only remove the guideline if the value is an empty string.
+					handleSave( '' );
+					setShowRemoveConfirmation( false );
+				} }
+				onCancel={ () => setShowRemoveConfirmation( false ) }
+				confirmButtonText={ __( 'Remove' ) }
+				isBusy={ isSaving }
+				size="small"
+			>
+				{ sprintf(
+					/* translators: %s: Block name. */
+					__(
+						'You are about to remove the block guidelines for the %s block.'
+					),
+					selectedBlockLabel
+				) }
+				<br />
+				<br />
+				{ __( 'This can be undone from revision history.' ) }
+			</ConfirmDialog>
 		</Modal>
 	);
 }

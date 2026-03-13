@@ -9,6 +9,7 @@ import {
 	Notice,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
+	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import {
 	DataViews,
@@ -31,7 +32,6 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import BlockGuidelineModal from './block-guideline-modal';
-import RemoveGuidelineConfirmation from './remove-guideline-confirmation';
 import { saveContentGuidelines } from '../api';
 import { STORE_NAME } from '../store';
 import './block-guidelines.scss';
@@ -250,25 +250,27 @@ export default function BlockGuidelines() {
 					initialBlock={ selectedItem }
 				/>
 			) }
-			{ itemToDelete && (
-				<RemoveGuidelineConfirmation
-					title={ __( 'Remove block guidelines' ) }
-					onClose={ () => setItemToDelete( null ) }
-					onConfirm={ handleDelete }
-					isBusy={ busy }
-				>
-					{ sprintf(
-						/* translators: %s: Block name. */
-						__(
-							'You are about to remove the block guidelines for the %s block.'
-						),
-						itemToDelete.label
-					) }
-					<br />
-					<br />
-					{ __( 'This can be undone from revision history.' ) }
-				</RemoveGuidelineConfirmation>
-			) }
+			<ConfirmDialog
+				isOpen={ !! itemToDelete }
+				title={ __( 'Remove block guidelines' ) }
+				__experimentalHideHeader={ false }
+				onConfirm={ handleDelete }
+				onCancel={ () => setItemToDelete( null ) }
+				confirmButtonText={ __( 'Remove' ) }
+				isBusy={ busy }
+				size="small"
+			>
+				{ sprintf(
+					/* translators: %s: Block name. */
+					__(
+						'You are about to remove the block guidelines for the %s block.'
+					),
+					itemToDelete?.label ?? ''
+				) }
+				<br />
+				<br />
+				{ __( 'This can be undone from revision history.' ) }
+			</ConfirmDialog>
 		</VStack>
 	);
 }
