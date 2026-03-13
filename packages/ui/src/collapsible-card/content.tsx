@@ -11,16 +11,22 @@ import type { ContentProps } from './types';
  */
 export const Content = forwardRef< HTMLDivElement, ContentProps >(
 	function CollapsibleCardContent(
-		{ className, render, ...restProps },
+		{ className, render, children, ...restProps },
 		ref
 	) {
 		return (
 			<Collapsible.Panel
 				ref={ ref }
 				className={ clsx( styles.content, className ) }
-				render={ <Card.Content render={ render } /> }
 				{ ...restProps }
-			/>
+			>
+				<Card.Content
+					className={ styles[ 'content-inner' ] }
+					render={ render }
+				>
+					{ children }
+				</Card.Content>
+			</Collapsible.Panel>
 		);
 	}
 );
