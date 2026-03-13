@@ -128,7 +128,7 @@ export function ColorToolsPanel( {
 
 	return (
 		<ToolsPanel
-			label={ label || __( 'Elements' ) }
+			label={ label || __( 'Foreground' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			hasInnerWrapper
@@ -342,6 +342,10 @@ export default function ColorPanel( {
 	const hasBackgroundGradientSupport = !! settings?.background?.gradient;
 	const showGradientColors =
 		hasGradientColors && ! hasBackgroundGradientSupport;
+	// When a block opts into background.color support, the solid color
+	// picker moves to the Background panel. Hide it here to avoid
+	// showing duplicate color controls.
+	const hasBackgroundColorSupport = !! settings?.background?.color;
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
 	const encodeColorValue = ( colorValue ) => {
@@ -509,30 +513,6 @@ export default function ColorPanel( {
 		);
 		onChange( newValue );
 	};
-	const resetTextAndGradient = () => {
-		let newValue = setImmutably( value, [ 'color', 'text' ], undefined );
-		if ( textColor === linkColor ) {
-			newValue = setImmutably(
-				newValue,
-				[ 'elements', 'link', 'color', 'text' ],
-				undefined
-			);
-		}
-		if ( hasTextGradientValue() ) {
-			newValue = setImmutably(
-				newValue,
-				[ 'background', 'gradient' ],
-				undefined
-			);
-			newValue = setImmutably(
-				newValue,
-				[ 'background', 'backgroundClip' ],
-				undefined
-			);
-		}
-		onChange( newValue );
-	};
-
 	// Elements
 	const showCaptionPanel = useHasCaptionPanel( settings );
 	const showButtonPanel = useHasButtonPanel( settings );
@@ -631,25 +611,57 @@ export default function ColorPanel( {
 	const items = [
 		showTextPanel && {
 			key: 'text',
-			label: __( 'Text' ),
-			hasValue: () => hasTextColor() || hasTextGradientValue(),
-			resetValue: resetTextAndGradient,
+			label: __( 'Color' ),
+			hasValue: hasTextColor,
+			resetValue: () => {
+				let newValue = setImmutably(
+					value,
+					[ 'color', 'text' ],
+					undefined
+				);
+				if ( textColor === linkColor ) {
+					newValue = setImmutably(
+						newValue,
+						[ 'elements', 'link', 'color', 'text' ],
+						undefined
+					);
+				}
+				onChange( newValue );
+			},
 			isShownByDefault: defaultControls.text,
-			indicators: [
-				hasTextGradientValue()
-					? userTextGradient ?? textGradient
-					: textColor,
-			],
+			indicators: [ textColor ],
 			tabs: [
 				{
 					key: 'text',
-					label: __( 'Text' ),
+					label: __( 'Color' ),
 					inheritedValue: textColor,
 					setValue: setTextColor,
 					userValue: userTextColor,
 				},
-				showTextGradient &&
-					hasGradientColors && {
+			],
+		},
+		showTextGradient &&
+			hasGradientColors && {
+				key: 'text-gradient',
+				label: __( 'Gradient' ),
+				hasValue: hasTextGradientValue,
+				resetValue: () => {
+					let newValue = setImmutably(
+						value,
+						[ 'background', 'gradient' ],
+						undefined
+					);
+					newValue = setImmutably(
+						newValue,
+						[ 'background', 'backgroundClip' ],
+						undefined
+					);
+					onChange( newValue );
+				},
+				isShownByDefault: false,
+				indicators: [ userTextGradient ?? textGradient ],
+				tabs: [
+					{
 						key: 'text-gradient',
 						label: __( 'Gradient' ),
 						inheritedValue: textGradient,
@@ -657,33 +669,34 @@ export default function ColorPanel( {
 						userValue: userTextGradient,
 						isGradient: true,
 					},
-			].filter( Boolean ),
-		},
-		showBackgroundPanel && {
-			key: 'background',
-			label: __( 'Background' ),
-			hasValue: hasBackground,
-			resetValue: resetBackground,
-			isShownByDefault: defaultControls.background,
-			indicators: [ gradient ?? backgroundColor ],
-			tabs: [
-				hasSolidColors && {
-					key: 'background',
-					label: __( 'Color' ),
-					inheritedValue: backgroundColor,
-					setValue: setBackgroundColor,
-					userValue: userBackgroundColor,
-				},
-				showGradientColors && {
-					key: 'gradient',
-					label: __( 'Gradient' ),
-					inheritedValue: gradient,
-					setValue: setGradient,
-					userValue: userGradient,
-					isGradient: true,
-				},
-			].filter( Boolean ),
-		},
+				],
+			},
+		showBackgroundPanel &&
+			! hasBackgroundColorSupport && {
+				key: 'background',
+				label: __( 'Background' ),
+				hasValue: hasBackground,
+				resetValue: resetBackground,
+				isShownByDefault: defaultControls.background,
+				indicators: [ gradient ?? backgroundColor ],
+				tabs: [
+					hasSolidColors && {
+						key: 'background',
+						label: __( 'Color' ),
+						inheritedValue: backgroundColor,
+						setValue: setBackgroundColor,
+						userValue: userBackgroundColor,
+					},
+					showGradientColors && {
+						key: 'gradient',
+						label: __( 'Gradient' ),
+						inheritedValue: gradient,
+						setValue: setGradient,
+						userValue: userGradient,
+						isGradient: true,
+					},
+				].filter( Boolean ),
+			},
 		showLinkPanel && {
 			key: 'link',
 			label: __( 'Link' ),

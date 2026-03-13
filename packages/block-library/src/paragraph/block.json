@@ -39,13 +39,17 @@
 		},
 		"background": {
 			"backgroundClip": true,
-			"gradient": true
+			"color": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"color": true
+			}
 		},
 		"color": {
+			"background": false,
 			"gradients": true,
 			"link": true,
 			"__experimentalDefaultControls": {
-				"background": true,
 				"text": true
 			}
 		},

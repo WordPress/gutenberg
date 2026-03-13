@@ -73,6 +73,18 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 					'path'          => array( 'background', 'backgroundAttachment' ),
 				),
+				'color'                => array(
+					'property_keys' => array(
+						'default' => 'background-color',
+					),
+					'css_vars'      => array(
+						'color' => '--wp--preset--color--$slug',
+					),
+					'path'          => array( 'background', 'color' ),
+					'classnames'    => array(
+						'has-background' => true,
+					),
+				),
 				'gradient'             => array(
 					'property_keys' => array(
 						'default' => 'background-image',

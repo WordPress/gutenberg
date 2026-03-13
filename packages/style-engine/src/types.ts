@@ -28,6 +28,7 @@ export interface Style {
 		backgroundPosition?: CSSProperties[ 'backgroundPosition' ];
 		backgroundRepeat?: CSSProperties[ 'backgroundRepeat' ];
 		backgroundSize?: CSSProperties[ 'backgroundSize' ];
+		color?: CSSProperties[ 'backgroundColor' ];
 		gradient?: CSSProperties[ 'backgroundImage' ];
 		backgroundClip?: CSSProperties[ 'backgroundClip' ];
 	};

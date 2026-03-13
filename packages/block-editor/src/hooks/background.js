@@ -15,6 +15,7 @@ import {
 	default as StylesBackgroundPanel,
 	useHasBackgroundPanel,
 	hasBackgroundImageValue,
+	hasBackgroundColorValue,
 	hasBackgroundGradientValue,
 } from '../components/global-styles/background-panel';
 import { globalStylesDataKey } from '../store/private-keys';
@@ -47,6 +48,7 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 			!! support?.backgroundImage ||
 			!! support?.backgroundSize ||
 			!! support?.backgroundRepeat ||
+			!! support?.color ||
 			!! support?.gradient ||
 			!! support?.backgroundClip
 		);
@@ -111,6 +113,7 @@ function useBlockProps( { name, style } ) {
  */
 export function getBackgroundImageClasses( style ) {
 	return hasBackgroundImageValue( style ) ||
+		hasBackgroundColorValue( style ) ||
 		hasBackgroundGradientValue( style )
 		? 'has-background'
 		: '';
@@ -190,6 +193,9 @@ export function BackgroundImagePanel( {
 			backgroundClip:
 				settings?.background?.backgroundClip &&
 				hasBackgroundSupport( name, 'backgroundClip' ),
+			color:
+				settings?.background?.color &&
+				hasBackgroundSupport( name, 'color' ),
 		},
 	};
 
