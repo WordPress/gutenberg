@@ -98,21 +98,27 @@ export default function GuidelineAccordionForm( {
 	const handleClearClick = () => setShowClearConfirmation( true );
 
 	const handleClearConfirm = () => {
+		const oldValue = draft;
+
 		// We need to pass an empty string to remove the guideline.
 		// This is because the API will only remove the guideline if the value is an empty string.
 		setGuideline( slug, '' );
-		setDraft( '' );
 		setLoading( true );
 		saveContentGuidelines()
 			.then( () => {
 				setError( null );
-				setShowClearConfirmation( false );
 				createSuccessNotice( __( 'Guidelines cleared.' ), {
 					type: 'snackbar',
 				} );
 			} )
-			.catch( ( e: Error ) => setError( e.message ) )
-			.finally( () => setLoading( false ) );
+			.catch( ( e: Error ) => {
+				setError( e.message );
+				setGuideline( slug, oldValue );
+			} )
+			.finally( () => {
+				setLoading( false );
+				setShowClearConfirmation( false );
+			} );
 	};
 
 	return (
