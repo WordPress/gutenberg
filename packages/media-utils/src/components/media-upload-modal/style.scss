@@ -123,12 +123,4 @@
 		font-size: 12px;
 	}
 
-	.media-upload-modal__upload-status__error {
-		color: $alert-red;
-		font-size: 12px;
-		flex-shrink: 0;
-		display: flex;
-		align-items: center;
-		gap: $grid-unit-05;
-	}
 }
