@@ -24,6 +24,62 @@ const CUSTOM_CSS_INSTANCE_REFERENCE = {};
 // Stable empty object reference for useSelect.
 const EMPTY_STYLE = {};
 
+/*
+ * CSS is base64-encoded before saving to protect it from wp_kses corruption
+ * (KSES treats the CSS string as HTML and mangles characters like `&`, `>`,
+ * and anything inside angle brackets).
+ *
+ * Migration path once a proper CSS sanitizer API lands in WordPress core:
+ *   - Remove the `encodeCSSAttribute` call in `onChange` — plain CSS can then
+ *     be stored directly.
+ *   - Keep `decodeCSSAttribute` as a read-time shim: if a stored value starts
+ *     with the prefix it was encoded by this code, decode it, sanitize it with
+ *     the new API, and let the next save write it back as plain CSS (lazy
+ *     migration). The shim can be removed once all encoded values have been
+ *     cycled through a save.
+ */
+const CSS_BASE64_PREFIX = 'data:text/css;base64,';
+
+/**
+ * Encodes a CSS string as a base64 data URI so it survives wp_kses intact.
+ *
+ * @param {string} css Raw CSS string.
+ * @return {string} Encoded value.
+ */
+function encodeCSSAttribute( css ) {
+	const bytes = new TextEncoder().encode( css );
+	let binary = '';
+	for ( const byte of bytes ) {
+		binary += String.fromCharCode( byte );
+	}
+	return CSS_BASE64_PREFIX + btoa( binary );
+}
+
+/**
+ * Decodes a value previously encoded by `encodeCSSAttribute`.
+ * Returns the value unchanged if it was never encoded (legacy content or
+ * content saved by users with `unfiltered_html` who bypass KSES).
+ *
+ * @param {string|undefined} value Stored attribute value.
+ * @return {string|undefined} Decoded CSS string, or the original value.
+ */
+function decodeCSSAttribute( value ) {
+	if (
+		typeof value !== 'string' ||
+		! value.startsWith( CSS_BASE64_PREFIX )
+	) {
+		return value;
+	}
+	try {
+		const binary = atob( value.slice( CSS_BASE64_PREFIX.length ) );
+		const bytes = Uint8Array.from( binary, ( c ) => c.charCodeAt( 0 ) );
+		return new TextDecoder().decode( bytes );
+	} catch {
+		// Malformed base64 — treat as plain CSS rather than silently dropping.
+		return value;
+	}
+}
+
 /**
  * Inspector control for custom CSS.
  *
@@ -35,9 +91,18 @@ const EMPTY_STYLE = {};
 function CustomCSSControl( { blockName, setAttributes, style } ) {
 	const blockType = getBlockType( blockName );
 
+	// Decode the stored CSS for display so the user always sees plain CSS,
+	// not the base64-encoded value that is stored to survive wp_kses.
+	const displayStyle = useMemo(
+		() => ( { ...style, css: decodeCSSAttribute( style?.css ) } ),
+		[ style ]
+	);
+
 	function onChange( newStyle ) {
 		// Normalize whitespace-only CSS to undefined so it gets cleaned up.
-		const css = newStyle?.css?.trim() ? newStyle.css : undefined;
+		const rawCSS = newStyle?.css?.trim() ? newStyle.css : undefined;
+		// Encode before storing so wp_kses cannot corrupt the CSS value.
+		const css = rawCSS ? encodeCSSAttribute( rawCSS ) : undefined;
 		setAttributes( {
 			style: cleanEmptyObject( { ...newStyle, css } ),
 		} );
@@ -54,9 +119,9 @@ function CustomCSSControl( { blockName, setAttributes, style } ) {
 	return (
 		<InspectorControls group="advanced">
 			<AdvancedPanel
-				value={ style }
+				value={ displayStyle }
 				onChange={ onChange }
-				inheritedValue={ style }
+				inheritedValue={ displayStyle }
 				help={ cssHelpText }
 			/>
 		</InspectorControls>
@@ -99,7 +164,9 @@ function CustomCSSEdit( { clientId, name, setAttributes } ) {
  * @return {Object} Block props including className for custom CSS scoping.
  */
 function useBlockProps( { style } ) {
-	const customCSS = style?.css;
+	// Decode before validation and processing — the stored value may be
+	// base64-encoded to survive wp_kses.
+	const customCSS = decodeCSSAttribute( style?.css );
 
 	// Validate CSS is non-empty and passes validation checks.
 	const isValidCSS =
