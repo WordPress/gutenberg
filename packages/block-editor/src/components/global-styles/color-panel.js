@@ -32,6 +32,7 @@ import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
 import { reset as resetIcon } from '@wordpress/icons';
+import ContrastChecker from '../contrast-checker';
 
 export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
@@ -728,6 +729,75 @@ export default function ColorPanel( {
 		} );
 	} );
 
+	const hasTextAndBackgroundColor =
+		textColor && ( backgroundColor || gradient );
+
+	const textBackgroundContrastChecker = hasTextAndBackgroundColor && (
+		<div className="block-editor-panel-color-gradient-settings__contrast-checker">
+			<ContrastChecker
+				textColor={ textColor }
+				backgroundColor={ backgroundColor || gradient }
+			/>
+		</div>
+	);
+
+	const hasLinkAndBackgroundColor =
+		linkColor && ( backgroundColor || gradient );
+
+	const linkBackgroundContrastChecker = hasLinkAndBackgroundColor && (
+		<div className="block-editor-panel-color-gradient-settings__contrast-checker">
+			<ContrastChecker
+				textColor={ linkColor }
+				backgroundColor={ backgroundColor || gradient }
+			/>
+		</div>
+	);
+
+	const hasHoverLinkAndBackgroundColor =
+		hoverLinkColor && ( backgroundColor || gradient );
+
+	const hoverLinkBackgroundContrastChecker =
+		hasHoverLinkAndBackgroundColor && (
+			<div className="block-editor-panel-color-gradient-settings__contrast-checker">
+				<ContrastChecker
+					textColor={ hoverLinkColor }
+					backgroundColor={ backgroundColor || gradient }
+				/>
+			</div>
+		);
+
+	const elementContrastCheckers = elements
+		.map( ( { name } ) => {
+			const elementTextColor = decodeValue(
+				inheritedValue?.elements?.[ name ]?.color?.text
+			);
+			const elementBackgroundColor = decodeValue(
+				inheritedValue?.elements?.[ name ]?.color?.background
+			);
+			const elementGradient = decodeValue(
+				inheritedValue?.elements?.[ name ]?.color?.gradient
+			);
+
+			const hasElementTextAndBackgroundColor =
+				elementTextColor &&
+				( elementBackgroundColor || elementGradient );
+
+			return hasElementTextAndBackgroundColor ? (
+				<div
+					key={ `contrast-checker-${ name }` }
+					className="block-editor-panel-color-gradient-settings__contrast-checker"
+				>
+					<ContrastChecker
+						textColor={ elementTextColor }
+						backgroundColor={
+							elementBackgroundColor || elementGradient
+						}
+					/>
+				</div>
+			) : null;
+		} )
+		.filter( Boolean );
+
 	return (
 		<Wrapper
 			resetAllFilter={ resetAllFilter }
@@ -752,6 +822,11 @@ export default function ColorPanel( {
 					/>
 				);
 			} ) }
+			{ textBackgroundContrastChecker }
+			{ linkBackgroundContrastChecker }
+			{ hoverLinkBackgroundContrastChecker }
+			{ elementContrastCheckers }
+
 			{ children }
 		</Wrapper>
 	);
