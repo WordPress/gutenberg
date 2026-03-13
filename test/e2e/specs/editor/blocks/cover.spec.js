@@ -395,6 +395,11 @@ test.describe( 'Cover', () => {
 			coverBlock.getByTestId( 'form-file-upload-input' )
 		);
 
+		// Wait for the image upload to complete and the image to appear.
+		await expect(
+			coverBlock.locator( 'img.wp-block-cover__image-background' )
+		).toBeVisible();
+
 		await editor.selectBlocks( coverBlock );
 
 		const focalPointLeft = page.getByRole( 'spinbutton', {

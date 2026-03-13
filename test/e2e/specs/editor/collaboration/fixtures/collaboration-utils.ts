@@ -51,51 +51,6 @@ export default class CollaborationUtils {
 	}
 
 	/**
-	 * Set the real-time collaboration WordPress setting.
-	 *
-	 * Uses the form-based approach (similar to setGutenbergExperiments)
-	 * because this setting is registered on admin_init in the "writing"
-	 * group and is not exposed via /wp/v2/settings.
-	 *
-	 * @param enabled Whether to enable or disable collaboration.
-	 */
-	async setCollaboration( enabled: boolean ) {
-		const response = await this.requestUtils.request.get(
-			'/wp-admin/options-writing.php'
-		);
-		const html = await response.text();
-		const nonce = html.match( /name="_wpnonce" value="([^"]+)"/ )![ 1 ];
-
-		// WordPress core (7.0+) uses 'enable_real_time_collaboration',
-		// while the Gutenberg plugin uses 'wp_enable_real_time_collaboration'.
-		// Detect which field name is present on the page.
-		const optionName = html.includes(
-			'name="enable_real_time_collaboration"'
-		)
-			? 'enable_real_time_collaboration'
-			: 'wp_enable_real_time_collaboration';
-
-		const formData: Record< string, string | number > = {
-			option_page: 'writing',
-			action: 'update',
-			_wpnonce: nonce,
-			_wp_http_referer: '/wp-admin/options-writing.php',
-			submit: 'Save Changes',
-			default_category: 1,
-			default_post_format: 0,
-		};
-
-		if ( enabled ) {
-			formData[ optionName ] = 1;
-		}
-
-		await this.requestUtils.request.post( '/wp-admin/options.php', {
-			form: formData,
-			failOnStatusCode: true,
-		} );
-	}
-
-	/**
 	 * Open a collaborative editing session where both the primary user (admin)
 	 * and the second user (collaborator) are editing the same post.
 	 *
@@ -355,7 +310,47 @@ export default class CollaborationUtils {
 			this.secondPage = null;
 			this.secondEditor = null;
 		}
-		await this.setCollaboration( false );
 		await this.requestUtils.deleteAllUsers();
 	}
+}
+
+/**
+ * Set the real-time collaboration WordPress setting.
+ *
+ * Uses the form-based approach (similar to setGutenbergExperiments)
+ * because this setting is registered on admin_init in the "writing"
+ * group and is not exposed via /wp/v2/settings.
+ *
+ * @param requestUtils An instance of RequestUtils for making HTTP requests.
+ * @param enabled      Whether to enable or disable collaboration.
+ */
+export async function setCollaboration(
+	requestUtils: RequestUtils,
+	enabled: boolean
+): Promise< void > {
+	const response = await requestUtils.request.get(
+		'/wp-admin/options-writing.php'
+	);
+	const html = await response.text();
+	const nonce = html.match( /name="_wpnonce" value="([^"]+)"/ )![ 1 ];
+
+	const optionName = 'wp_enable_real_time_collaboration';
+	const optionValue = enabled ? 1 : 0;
+
+	const formData: Record< string, string | number > = {
+		option_page: 'writing',
+		action: 'update',
+		_wpnonce: nonce,
+		_wp_http_referer: '/wp-admin/options-writing.php',
+		submit: 'Save Changes',
+		default_category: 1,
+		default_post_format: 0,
+	};
+
+	formData[ optionName ] = optionValue;
+
+	await requestUtils.request.post( '/wp-admin/options.php', {
+		form: formData,
+		failOnStatusCode: true,
+	} );
 }

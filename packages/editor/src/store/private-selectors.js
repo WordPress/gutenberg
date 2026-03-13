@@ -216,7 +216,18 @@ export const getPostBlocksByName = createRegistrySelector( ( select ) =>
 				} )
 			);
 		},
-		() => [ select( blockEditorStore ).getBlocks() ]
+		( state, blockNames ) => {
+			blockNames = Array.isArray( blockNames )
+				? blockNames
+				: [ blockNames ];
+			const { getBlocksByName, getBlockParents } =
+				select( blockEditorStore );
+			const clientIds = getBlocksByName( blockNames );
+			const parentsOfClientIds = clientIds.map( ( id ) =>
+				getBlockParents( id )
+			);
+			return [ clientIds, ...parentsOfClientIds ];
+		}
 	)
 );
 
@@ -346,7 +357,12 @@ export const getCurrentRevision = createRegistrySelector(
 			'postType',
 			postType,
 			postId,
-			{ per_page: -1, context: 'edit' }
+			{
+				per_page: -1,
+				context: 'edit',
+				_fields:
+					'id,date,author,meta,title.raw,excerpt.raw,content.raw',
+			}
 		);
 		if ( ! revisions ) {
 			return null;
@@ -401,7 +417,12 @@ export const getPreviousRevision = createRegistrySelector(
 			'postType',
 			postType,
 			postId,
-			{ per_page: -1, context: 'edit' }
+			{
+				per_page: -1,
+				context: 'edit',
+				_fields:
+					'id,date,author,meta,title.raw,excerpt.raw,content.raw',
+			}
 		);
 		if ( ! revisions ) {
 			return null;

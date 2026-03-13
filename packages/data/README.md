@@ -308,10 +308,6 @@ _Parameters_
 
 -   _props.value_ `boolean`: Enable Async Mode.
 
-_Returns_
-
--   `Component`: The component to be rendered.
-
 ### combineReducers
 
 The combineReducers helper function turns an object whose values are different reducing functions into a single reducing function you can pass to registerReducer.
@@ -379,11 +375,11 @@ const store = createReduxStore( 'demo', {
 _Parameters_
 
 -   _key_ `string`: Unique namespace identifier.
--   _options_ `ReduxStoreConfig<State,Actions,Selectors>`: Registered store options, with properties describing reducer, actions, selectors, and resolvers.
+-   _options_ `ReduxStoreConfig< State, Actions, Selectors >`: Registered store options, with properties describing reducer, actions, selectors, and resolvers.
 
 _Returns_
 
--   `StoreDescriptor<ReduxStoreConfig<State,Actions,Selectors>>`: Store Object.
+-   `StoreDescriptor< ReduxStoreConfig< State, Actions, Selectors > >`: Store Object.
 
 ### createRegistry
 
@@ -391,12 +387,12 @@ Creates a new store registry, given an optional object of initial store configur
 
 _Parameters_
 
--   _storeConfigs_ `Object`: Initial store configurations.
--   _parent_ `?Object`: Parent registry.
+-   _storeConfigs_ `Record< string, ReduxStoreConfig< any, any, any > >`: Initial store configurations.
+-   _parent_ `DataRegistry | null`: Parent registry.
 
 _Returns_
 
--   `WPDataRegistry`: Data registry.
+-   `DataRegistry`: Data registry.
 
 ### createRegistryControl
 
@@ -737,11 +733,11 @@ const SaleButton = ( { children } ) => {
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `[StoreNameOrDescriptor]`: Optionally provide the name of the store or its descriptor from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
+-   _storeNameOrDescriptor_ `StoreNameOrDescriptor`: Optionally provide the name of the store or its descriptor from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
 
 _Returns_
 
--   `UseDispatchReturn<StoreNameOrDescriptor>`: A custom react hook.
+-   `UseDispatchReturn< StoreNameOrDescriptor >`: The dispatch function or action creators for the store.
 
 ### useRegistry
 
@@ -776,7 +772,7 @@ const ParentProvidingRegistry = ( props ) => {
 
 _Returns_
 
--   `import('../../types').DataRegistry`: A custom react hook exposing the registry context value.
+-   `DataRegistry`: A custom react hook exposing the registry context value.
 
 ### useSelect
 
@@ -837,11 +833,11 @@ function Paste( { children } ) {
 _Parameters_
 
 -   _mapSelect_ `T`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument. When a store key is passed, all selectors for the store will be returned. This is only meant for usage of these selectors in event callbacks, not for data needed to create the element tree.
--   _deps_ `unknown[]=`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
+-   _deps_ `unknown[]`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
 
 _Returns_
 
--   `UseSelectReturn<T>`: A custom react hook.
+-   `UseSelectReturn< T >`: The selected data or store selectors.
 
 ### useSuspenseSelect
 
@@ -850,11 +846,11 @@ A variant of the `useSelect` hook that has the same API, but is a compatible Sus
 _Parameters_
 
 -   _mapSelect_ `T`: Function called on every state change. The returned value is exposed to the component using this hook. The function receives the `registry.suspendSelect` method as the first argument and the `registry` as the second one.
--   _deps_ `Array`: A dependency array used to memoize the `mapSelect` so that the same `mapSelect` is invoked on every state change unless the dependencies change.
+-   _deps_ `unknown[]`: A dependency array used to memoize the `mapSelect` so that the same `mapSelect` is invoked on every state change unless the dependencies change.
 
 _Returns_
 
--   `ReturnType<T>`: Data object returned by the `mapSelect` function.
+-   `ReturnType< T >`: Data object returned by the `mapSelect` function.
 
 ### withDispatch
 
@@ -938,23 +934,15 @@ conditions under which a different value would be returned.
 
 _Parameters_
 
--   _mapDispatchToProps_ `Function`: A function of returning an object of prop names where value is a dispatch-bound action creator, or a function to be called with the component's props and returning an action creator.
+-   _mapDispatchToProps_ `( dispatch: DataRegistry[ 'dispatch' ], ownProps: Record< string, unknown >, registry: DataRegistry ) => Record< string, ( , ...args: unknown[] ) => unknown >`: A function of returning an object of prop names where value is a dispatch-bound action creator, or a function to be called with the component's props and returning an action creator.
 
 _Returns_
 
--   `ComponentType`: Enhanced component with merged dispatcher props.
+-   Enhanced component with merged dispatcher props.
 
 ### withRegistry
 
 Higher-order component which renders the original component with the current registry context passed as its `registry` prop.
-
-_Parameters_
-
--   _OriginalComponent_ `Component`: Original component.
-
-_Returns_
-
--   `Component`: Enhanced component.
 
 ### withSelect
 
@@ -994,11 +982,11 @@ the store.
 
 _Parameters_
 
--   _mapSelectToProps_ `Function`: Function called on every state change, expected to return object of props to merge with the component's own props.
+-   _mapSelectToProps_ `( select: SelectFunction, ownProps: Record< string, unknown >, registry: DataRegistry ) => Record< string, unknown >`: Function called on every state change, expected to return object of props to merge with the component's own props.
 
 _Returns_
 
--   `ComponentType`: Enhanced component with merged state data props.
+-   Enhanced component with merged state data props.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 

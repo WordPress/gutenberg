@@ -138,6 +138,7 @@ register( store ); // Register store after unlocking private selectors to allow 
  * based on their values (they blur to string type).
  */
 export { SelectionType } from './utils/crdt-user-selections';
+export { SelectionDirection } from './types';
 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';

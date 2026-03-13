@@ -15,7 +15,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as patternsStore } from '../store';
 import { unlock } from '../lock-unlock';
 
-function PatternsManageButton( { clientId } ) {
+function PatternsManageButton( { clientId, onClose } ) {
 	const {
 		attributes,
 		canDetach,
@@ -103,6 +103,7 @@ function PatternsManageButton( { clientId } ) {
 								metadata: attributesWithoutPatternName,
 							} );
 						}
+						onClose?.();
 					} }
 				>
 					{ isSyncedPattern
