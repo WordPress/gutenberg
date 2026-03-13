@@ -28,6 +28,7 @@ import {
 	embedWolframIcon,
 	embedPocketCastsIcon,
 	embedBlueskyIcon,
+	embedThreadsIcon,
 } from './icons';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
@@ -360,6 +361,18 @@ const variations = [
 		description: __( 'Embed a Bluesky post.' ),
 		patterns: [ /^https?:\/\/bsky\.app\/profile\/.+\/post\/.+/i ],
 		attributes: { providerNameSlug: 'bluesky' },
+	},
+	{
+		name: 'threads',
+		title: getTitle( 'Threads' ),
+		icon: embedThreadsIcon,
+		keywords: [ __( 'social' ) ],
+		description: __( 'Embed a Threads post.' ),
+		patterns: [
+			/^https?:\/\/(www\.)?threads\.(com|net)\/@[^/]+\/post\/.+/i,
+			/^https?:\/\/(www\.)?threads\.(com|net)\/t\/.+/i,
+		],
+		attributes: { providerNameSlug: 'threads', responsive: true },
 	},
 ];
 
