@@ -95,6 +95,7 @@ interface BulkSelectionCheckboxProps< Item > {
 	data: Item[];
 	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
+	disableSelectAll?: boolean;
 }
 
 export function BulkSelectionCheckbox< Item >( {
@@ -103,6 +104,7 @@ export function BulkSelectionCheckbox< Item >( {
 	data,
 	actions,
 	getItemId,
+	disableSelectAll = false,
 }: BulkSelectionCheckboxProps< Item > ) {
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
@@ -118,7 +120,23 @@ export function BulkSelectionCheckbox< Item >( {
 			selection.includes( getItemId( item ) ) &&
 			selectableItems.includes( item )
 	);
+	const hasSelection = selection.length > 0;
 	const areAllSelected = selectedItems.length === selectableItems.length;
+
+	if ( disableSelectAll ) {
+		return (
+			<CheckboxControl
+				className="dataviews-view-table-selection-checkbox"
+				checked={ hasSelection }
+				disabled={ ! hasSelection }
+				onChange={ () => {
+					onChangeSelection( [] );
+				} }
+				aria-label={ __( 'Deselect all' ) }
+			/>
+		);
+	}
+
 	return (
 		<CheckboxControl
 			className="dataviews-view-table-selection-checkbox"
@@ -266,15 +284,14 @@ function renderFooterContent< Item >(
 			gap="md"
 			align="center"
 		>
-			{ ! isInfiniteScroll && (
-				<BulkSelectionCheckbox
-					selection={ selection }
-					onChangeSelection={ onChangeSelection }
-					data={ data }
-					actions={ actions }
-					getItemId={ getItemId }
-				/>
-			) }
+			<BulkSelectionCheckbox
+				selection={ selection }
+				onChangeSelection={ onChangeSelection }
+				data={ data }
+				actions={ actions }
+				getItemId={ getItemId }
+				disableSelectAll={ isInfiniteScroll }
+			/>
 			<span className="dataviews-bulk-actions-footer__item-count">
 				{ message }
 			</span>
