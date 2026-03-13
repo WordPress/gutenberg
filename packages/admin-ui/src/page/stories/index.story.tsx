@@ -9,24 +9,12 @@ import {
 	RouterContextProvider,
 } from '@tanstack/react-router';
 import { __experimentalText as Text } from '@wordpress/components';
-/**
- * WordPress dependencies
- */
-import { privateApis as themeApis } from '@wordpress/theme';
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 
 /**
  * Internal dependencies
  */
 import Page from '..';
 import Breadcrumbs from '../../breadcrumbs';
-
-const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
-	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
-	'@wordpress/theme'
-);
-
-const { ThemeProvider } = unlock( themeApis );
 
 const rootRoute = createRootRoute( {
 	notFoundComponent: () => null,
@@ -45,13 +33,11 @@ const meta: Meta< typeof Page > = {
 	},
 	decorators: [
 		( Story ) => (
-			<ThemeProvider isRoot>
-				<RouterContextProvider router={ router }>
-					<div style={ { height: '400px' } }>
-						<Story />
-					</div>
-				</RouterContextProvider>
-			</ThemeProvider>
+			<RouterContextProvider router={ router }>
+				<div style={ { height: '400px' } }>
+					<Story />
+				</div>
+			</RouterContextProvider>
 		),
 	],
 };

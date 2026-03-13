@@ -10,22 +10,9 @@ import {
 } from '@tanstack/react-router';
 
 /**
- * WordPress dependencies
- */
-import { privateApis as themeApis } from '@wordpress/theme';
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
-
-/**
  * Internal dependencies
  */
 import Breadcrumbs from '..';
-
-const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
-	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
-	'@wordpress/theme'
-);
-
-const { ThemeProvider } = unlock( themeApis );
 
 const rootRoute = createRootRoute( {
 	notFoundComponent: () => null,
@@ -41,11 +28,9 @@ const meta: Meta< typeof Breadcrumbs > = {
 	title: 'Admin UI/Breadcrumbs',
 	decorators: [
 		( Story ) => (
-			<ThemeProvider isRoot>
-				<RouterContextProvider router={ router }>
-					<Story />
-				</RouterContextProvider>
-			</ThemeProvider>
+			<RouterContextProvider router={ router }>
+				<Story />
+			</RouterContextProvider>
 		),
 	],
 };
