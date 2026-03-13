@@ -561,5 +561,11 @@ module.exports = {
 				'@wordpress/no-unknown-ds-tokens': 'off',
 			},
 		},
+		{
+			files: [ 'storybook/stories/**' ],
+			rules: {
+				'@wordpress/use-recommended-components': 'off',
+			},
+		},
 	],
 };
