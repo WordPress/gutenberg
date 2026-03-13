@@ -316,7 +316,7 @@ export function MediaUploadModal( {
 		() => [
 			{
 				id: 'select',
-				label: multiple ? __( 'Select' ) : __( 'Select' ),
+				label: __( 'Select' ),
 				isPrimary: true,
 				supportsBulk: multiple,
 				async callback() {
