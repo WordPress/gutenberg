@@ -97,6 +97,29 @@ function gutenberg_override_wp_icons_registry_7_1() {
 	$reflection = new ReflectionClass( WP_Icons_Registry::class );
 	$property   = $reflection->getProperty( 'instance' );
 	$property->setAccessible( true );
-	$property->setValue( null, Gutenberg_Icons_Registry_7_1::get_instance() );
+	$original_registry  = $property->getValue( null );
+	$gutenberg_registry = Gutenberg_Icons_Registry_7_1::get_instance();
+
+	// If the original registry was already instantiated, replay any icons outside
+	// the `core/` namespace onto the Gutenberg registry so they are not lost.
+	if ( null !== $original_registry ) {
+		$register_method = new ReflectionMethod( Gutenberg_Icons_Registry_7_1::class, 'register' );
+		$register_method->setAccessible( true );
+		foreach ( $original_registry->get_registered_icons() as $icon ) {
+			if ( strpos( $icon['name'], 'core/' ) === 0 ) {
+				continue;
+			}
+			$icon_properties = array( 'label' => $icon['label'] );
+			if ( ! empty( $icon['content'] ) ) {
+				$icon_properties['content'] = $icon['content'];
+			} elseif ( ! empty( $icon['filePath'] ) ) {
+				$icon_properties['filePath'] = $icon['filePath'];
+			} else {
+				continue;
+			}
+			$register_method->invoke( $gutenberg_registry, $icon['name'], $icon_properties );
+		}
+	}
+	$property->setValue( null, $gutenberg_registry );
 }
-add_action( 'init', 'gutenberg_override_wp_icons_registry_7_1' );
+add_action( 'init', 'gutenberg_override_wp_icons_registry_7_1', 1 );
