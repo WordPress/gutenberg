@@ -446,6 +446,9 @@ class WP_Theme_JSON_Gutenberg {
 			'fixed'  => null,
 			'sticky' => null,
 		),
+		'responsive'                    => array(
+			'viewports' => null,
+		),
 		'spacing'                       => array(
 			'customSpacingSize'   => null,
 			'defaultSpacingSizes' => null,
@@ -880,6 +883,15 @@ class WP_Theme_JSON_Gutenberg {
 			$spacing_scale_sizes  = static::compute_spacing_sizes( $spacing_scale );
 			$merged_spacing_sizes = static::merge_spacing_sizes( $spacing_scale_sizes, $spacing_sizes );
 			_wp_array_set( $this->theme_json, $sizes_path, $merged_spacing_sizes );
+		}
+
+		// Validate theme/user-defined viewports. If invalid, remove so consumers fall back to defaults.
+		if ( in_array( $origin, array( 'theme', 'custom' ), true ) ) {
+			$viewports_path = array( 'settings', 'responsive', 'viewports' );
+			$viewports      = _wp_array_get( $this->theme_json, $viewports_path, null );
+			if ( null !== $viewports && ! static::is_valid_viewports( $viewports ) ) {
+				_wp_array_set( $this->theme_json, $viewports_path, null );
+			}
 		}
 	}
 
@@ -5043,5 +5055,66 @@ class WP_Theme_JSON_Gutenberg {
 		if ( isset( $block_metadata['path'] ) ) {
 			return $block_metadata['path'][2];
 		}
+	}
+
+	/**
+	 * Validates theme-defined viewport definitions.
+	 *
+	 * @since 7.1
+	 *
+	 * @param mixed $viewports Value from settings.responsive.viewports.
+	 * @return bool Whether the viewports are valid.
+	 */
+	protected static function is_valid_viewports( $viewports ): bool {
+		if ( ! is_array( $viewports ) ) {
+			return false;
+		}
+
+		// MVP: only mobile and tablet sizes can be overridden (desktop has no size value).
+		$allowed_slugs = array( 'mobile', 'tablet' );
+		$count         = count( $viewports );
+		if ( $count < 1 || $count > 2 ) {
+			return false;
+		}
+
+		$seen_slugs    = array();
+		$previous_size = 0;
+
+		foreach ( $viewports as $viewport ) {
+			// Required fields.
+			if ( empty( $viewport['slug'] ) || ! is_string( $viewport['slug'] ) ) {
+				return false;
+			}
+
+			// Slug must be mobile or tablet.
+			if ( ! in_array( $viewport['slug'], $allowed_slugs, true ) ) {
+				return false;
+			}
+
+			// No duplicate slugs.
+			if ( in_array( $viewport['slug'], $seen_slugs, true ) ) {
+				return false;
+			}
+			$seen_slugs[] = $viewport['slug'];
+
+			// Size is required for both mobile and tablet.
+			if ( empty( $viewport['size'] ) ) {
+				return false;
+			}
+
+			// Only px values for now.
+			if ( ! preg_match( '/^(\d+)px$/', $viewport['size'], $matches ) ) {
+				return false;
+			}
+
+			// Ascending order (catches mobile >= tablet if both provided).
+			$size = (int) $matches[1];
+			if ( $size <= $previous_size ) {
+				return false;
+			}
+			$previous_size = $size;
+		}
+
+		return true;
 	}
 }

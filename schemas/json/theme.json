@@ -395,6 +395,45 @@
 				}
 			}
 		},
+		"settingsResponsiveProperties": {
+			"type": "object",
+			"properties": {
+				"responsive": {
+					"description": "Settings related to responsive behavior.",
+					"type": "object",
+					"properties": {
+						"viewports": {
+							"description": "Viewport size overrides for block visibility. Override the size of the mobile and/or tablet breakpoints. Desktop has no size value and cannot be overridden.",
+							"type": "array",
+							"minItems": 1,
+							"maxItems": 2,
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Human-readable label for the viewport.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Identifier for the viewport to override. Must be mobile or tablet.",
+										"type": "string",
+										"enum": [ "mobile", "tablet" ]
+									},
+									"size": {
+										"description": "Max width for the viewport in px (e.g. 480px).",
+										"type": "string",
+										"pattern": "^\\d+px$"
+									}
+								},
+								"required": [ "slug", "size" ],
+								"additionalProperties": false
+							}
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsShadowProperties": {
 			"type": "object",
 			"properties": {
@@ -867,6 +906,7 @@
 				{ "$ref": "#/definitions/settingsLayoutProperties" },
 				{ "$ref": "#/definitions/settingsLightboxProperties" },
 				{ "$ref": "#/definitions/settingsPositionProperties" },
+				{ "$ref": "#/definitions/settingsResponsiveProperties" },
 				{ "$ref": "#/definitions/settingsShadowProperties" },
 				{ "$ref": "#/definitions/settingsSpacingProperties" },
 				{ "$ref": "#/definitions/settingsTypographyProperties" },
@@ -883,6 +923,7 @@
 				"layout",
 				"lightbox",
 				"position",
+				"responsive",
 				"shadow",
 				"spacing",
 				"typography",
@@ -1288,8 +1329,12 @@
 						"backgroundPosition": {
 							"description": "Sets the `background-position` CSS property.",
 							"oneOf": [
-								{ "type": "string" },
-								{ "$ref": "#/definitions/refComplete" }
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
 							]
 						},
 						"backgroundRepeat": {

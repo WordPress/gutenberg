@@ -230,6 +230,13 @@
 				}
 			]
 		},
+		"responsive": {
+			"viewports": [
+				{ "name": "Mobile", "slug": "mobile", "size": "480px" },
+				{ "name": "Tablet", "slug": "tablet", "size": "782px" },
+				{ "name": "Desktop", "slug": "desktop" }
+			]
+		},
 		"shadow": {
 			"defaultPresets": true,
 			"presets": [

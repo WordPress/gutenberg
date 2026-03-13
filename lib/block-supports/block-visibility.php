@@ -67,6 +67,18 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 			),
 		);
 
+		// Allow theme/user-defined viewports to override default size values by slug.
+		$theme_viewports = gutenberg_get_global_settings()['responsive']['viewports'] ?? null;
+		if ( is_array( $theme_viewports ) ) {
+			$theme_sizes = array_column( $theme_viewports, 'size', 'slug' );
+			foreach ( $viewport_sizes as &$viewport ) {
+				if ( isset( $theme_sizes[ $viewport['slug'] ] ) ) {
+					$viewport['size'] = $theme_sizes[ $viewport['slug'] ];
+				}
+			}
+			unset( $viewport );
+		}
+
 		/*
 		 * Build media queries from viewport size definitions using the CSS range syntax.
 		 * Could be absorbed into the style engine,
