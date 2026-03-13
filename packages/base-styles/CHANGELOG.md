@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Align `$modal-width-*` variables with `--wpds-dimension-surface-width-*` design tokens ([#76494](https://github.com/WordPress/gutenberg/pull/76494)).
+
 ## 6.17.0 (2026-03-04)
 
 ## 6.16.0 (2026-02-18)

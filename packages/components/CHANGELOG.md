@@ -11,6 +11,7 @@
 ### Enhancements
 
 -   `DateCalendar`, `DateRangeCalendar`: Add `showOutsideDays` and `fixedWeeks` props and style outside-month days ([#76199](https://github.com/WordPress/gutenberg/pull/76199)).
+-   `Modal`: Align size presets with `--wpds-dimension-surface-width-*` design tokens ([#76494](https://github.com/WordPress/gutenberg/pull/76494)).
 
 ### Internal
 
