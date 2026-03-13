@@ -8,13 +8,7 @@ import type { ReactElement } from 'react';
  */
 import { Button, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	useMemo,
-	useState,
-	useRef,
-	useContext,
-	useCallback,
-} from '@wordpress/element';
+import { useMemo, useState, useRef, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
@@ -29,7 +23,6 @@ import type { Action, ActionModal as ActionModalType } from '../../types';
 import type { SetSelection } from '../../types/private';
 import type { ActionTriggerProps } from '../dataviews-item-actions';
 import getFooterMessage from '../../utils/get-footer-message';
-import useSelectedItems from '../../hooks/use-selected-items';
 
 interface ActionWithModalProps< Item > {
 	action: ActionModalType< Item >;
@@ -120,36 +113,24 @@ export function BulkSelectionCheckbox< Item >( {
 			);
 		} );
 	}, [ data, actions ] );
-
-	// Selected items are those in the selection array
-	const selectedItems = selectableItems.filter( ( item ) => {
-		return selection.includes( getItemId( item ) );
-	} );
-
-	// All are selected if all selectable items are in selection
-	const areAllSelected =
-		selectableItems.length > 0 &&
-		selectedItems.length === selectableItems.length;
-
-	// Has selection if any items are selected
-	const hasSelection = selectedItems.length > 0;
-
+	const selectedItems = data.filter(
+		( item ) =>
+			selection.includes( getItemId( item ) ) &&
+			selectableItems.includes( item )
+	);
+	const areAllSelected = selectedItems.length === selectableItems.length;
 	return (
 		<CheckboxControl
 			className="dataviews-view-table-selection-checkbox"
 			checked={ areAllSelected }
-			indeterminate={ ! areAllSelected && hasSelection }
+			indeterminate={ ! areAllSelected && !! selectedItems.length }
 			onChange={ () => {
 				if ( areAllSelected ) {
-					// Deselect all - clear entire selection
-					onChangeSelection( EMPTY_ARRAY );
+					onChangeSelection( [] );
 				} else {
-					// Select all - merge loaded selectable items into selection
-					const selectionSet = new Set( [
-						...selection,
-						...selectableItems.map( ( item ) => getItemId( item ) ),
-					] );
-					onChangeSelection( Array.from( selectionSet ) );
+					onChangeSelection(
+						selectableItems.map( ( item ) => getItemId( item ) )
+					);
 				}
 			} }
 			aria-label={
@@ -172,6 +153,7 @@ interface ToolbarContentProps< Item > {
 	data: Item[];
 	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
+	isInfiniteScroll: boolean;
 	paginationInfo: {
 		totalItems: number;
 		totalPages: number;
@@ -260,6 +242,7 @@ function renderFooterContent< Item >(
 	data: Item[],
 	actions: Action< Item >[],
 	getItemId: ( item: Item ) => string,
+	isInfiniteScroll: boolean,
 	selection: string[],
 	actionsToShow: Action< Item >[],
 	selectedItems: Item[],
@@ -269,16 +252,12 @@ function renderFooterContent< Item >(
 	paginationInfo: {
 		totalItems: number;
 		totalPages: number;
-	},
-	onlyTotalCount?: boolean
+	}
 ) {
-	// For bulk actions, use selectedItems.length (actual loaded items) instead of selection.length
-	// This accurately reflects items available for bulk actions
 	const message = getFooterMessage(
-		selectedItems.length,
+		selection.length,
 		data.length,
-		paginationInfo.totalItems,
-		onlyTotalCount
+		paginationInfo.totalItems
 	);
 	return (
 		<Stack
@@ -287,13 +266,15 @@ function renderFooterContent< Item >(
 			gap="md"
 			align="center"
 		>
-			<BulkSelectionCheckbox
-				selection={ selection }
-				onChangeSelection={ onChangeSelection }
-				data={ data }
-				actions={ actions }
-				getItemId={ getItemId }
-			/>
+			{ ! isInfiniteScroll && (
+				<BulkSelectionCheckbox
+					selection={ selection }
+					onChangeSelection={ onChangeSelection }
+					data={ data }
+					actions={ actions }
+					getItemId={ getItemId }
+				/>
+			) }
 			<span className="dataviews-bulk-actions-footer__item-count">
 				{ message }
 			</span>
@@ -338,9 +319,9 @@ function FooterContent< Item >( {
 	onChangeSelection,
 	data,
 	getItemId,
+	isInfiniteScroll,
 	paginationInfo,
 }: ToolbarContentProps< Item > ) {
-	const { view } = useContext( DataViewsContext );
 	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
 		null
 	);
@@ -351,23 +332,21 @@ function FooterContent< Item >( {
 		() => actions.filter( ( action ) => action.supportsBulk ),
 		[ actions ]
 	);
-
-	// Create a filter function to check if an item is selectable (eligible for at least one bulk action)
-	const selectableFilter = useCallback(
-		( item: Item ) =>
-			bulkActions.some(
+	const selectableItems = useMemo( () => {
+		return data.filter( ( item ) => {
+			return bulkActions.some(
 				( action ) => ! action.isEligible || action.isEligible( item )
-			),
-		[ bulkActions ]
-	);
+			);
+		} );
+	}, [ data, bulkActions ] );
 
-	const selectedItems = useSelectedItems(
-		view,
-		data,
-		selection,
-		getItemId,
-		selectableFilter
-	);
+	const selectedItems = useMemo( () => {
+		return data.filter(
+			( item ) =>
+				selection.includes( getItemId( item ) ) &&
+				selectableItems.includes( item )
+		);
+	}, [ selection, data, getItemId, selectableItems ] );
 
 	const actionsToShow = useMemo(
 		() =>
@@ -391,28 +370,28 @@ function FooterContent< Item >( {
 			data,
 			actions,
 			getItemId,
+			isInfiniteScroll,
 			selection,
 			actionsToShow,
 			selectedItems,
 			actionInProgress,
 			setActionInProgress,
 			onChangeSelection,
-			paginationInfo,
-			view.infiniteScrollEnabled // onlyTotalCount
+			paginationInfo
 		);
 	} else if ( ! footerContentRef.current ) {
 		footerContentRef.current = renderFooterContent(
 			data,
 			actions,
 			getItemId,
+			isInfiniteScroll,
 			selection,
 			actionsToShow,
 			selectedItems,
 			actionInProgress,
 			setActionInProgress,
 			onChangeSelection,
-			paginationInfo,
-			view.infiniteScrollEnabled // onlyTotalCount
+			paginationInfo
 		);
 	}
 	return footerContentRef.current;
@@ -426,6 +405,7 @@ export function BulkActionsFooter() {
 		onChangeSelection,
 		getItemId,
 		paginationInfo,
+		view,
 	} = useContext( DataViewsContext );
 	return (
 		<FooterContent
@@ -434,6 +414,7 @@ export function BulkActionsFooter() {
 			data={ data }
 			actions={ actions }
 			getItemId={ getItemId }
+			isInfiniteScroll={ !! view.infiniteScrollEnabled }
 			paginationInfo={ paginationInfo }
 		/>
 	);

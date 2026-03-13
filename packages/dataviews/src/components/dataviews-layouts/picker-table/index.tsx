@@ -325,7 +325,7 @@ function ViewPickerTable< Item >( {
 						role="presentation"
 					>
 						<th className="dataviews-view-table__checkbox-column">
-							{ isMultiselect && (
+							{ isMultiselect && ! isInfiniteScroll && (
 								<BulkSelectionCheckbox
 									selection={ selection }
 									onChangeSelection={ onChangeSelection }

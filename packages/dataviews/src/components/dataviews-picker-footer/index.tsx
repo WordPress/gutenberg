@@ -15,7 +15,6 @@ import DataViewsContext from '../dataviews-context';
 import type { SetSelection } from '../../types/private';
 import type { Action } from '../../types';
 import getFooterMessage from '../../utils/get-footer-message';
-import useSelectedItems from '../../hooks/use-selected-items';
 
 const EMPTY_ARRAY: [] = [];
 
@@ -29,41 +28,37 @@ export function useIsMultiselectPicker< Item >(
 
 function BulkSelectionCheckbox< Item >( {
 	selection,
+	selectedItems,
 	onChangeSelection,
 	data,
 	getItemId,
 }: {
 	selection: string[];
+	selectedItems: Item[];
 	onChangeSelection: SetSelection;
 	data: Item[];
 	getItemId: ( item: Item ) => string;
 } ) {
-	// Calculate selected items from current data directly (not from cache)
-	// This ensures areAllSelected correctly reflects the current visible items
-	const selectedItems = useMemo(
-		() =>
-			data.filter( ( item ) => selection.includes( getItemId( item ) ) ),
-		[ data, selection, getItemId ]
-	);
-
-	// All are selected if all loaded items are in selection
-	const areAllSelected =
-		data.length > 0 && selectedItems.length === data.length;
-
-	// Has selection if any items are selected
-	const hasSelection = selectedItems.length > 0;
+	const areAllSelected = selectedItems.length === data.length;
 
 	return (
 		<CheckboxControl
 			className="dataviews-view-table-selection-checkbox"
 			checked={ areAllSelected }
-			indeterminate={ ! areAllSelected && hasSelection }
+			indeterminate={ ! areAllSelected && !! selectedItems.length }
 			onChange={ () => {
 				if ( areAllSelected ) {
-					// Deselect all - clear entire selection
-					onChangeSelection( EMPTY_ARRAY );
+					// Deselect all - remove the current page from the total selection.
+					onChangeSelection(
+						selection.filter(
+							( id ) =>
+								! data.some(
+									( item ) => id === getItemId( item )
+								)
+						)
+					);
 				} else {
-					// Select all - merge loaded items into selection
+					// Select all - merge the current page into the total selection.
 					const selectionSet = new Set( [
 						...selection,
 						...data.map( ( item ) => getItemId( item ) ),
@@ -146,14 +141,16 @@ export function DataViewsPickerFooter() {
 
 	const isMultiselect = useIsMultiselectPicker( actions );
 
-	const selectedItems = useSelectedItems( view, data, selection, getItemId );
-
-	// Use selectedItems.length to accurately reflect items available for actions
 	const message = getFooterMessage(
-		selectedItems.length,
+		selection.length,
 		data.length,
-		paginationInfo.totalItems,
-		view.infiniteScrollEnabled // onlyTotalCount
+		paginationInfo.totalItems
+	);
+
+	const selectedItems = useMemo(
+		() =>
+			data.filter( ( item ) => selection.includes( getItemId( item ) ) ),
+		[ selection, getItemId, data ]
 	);
 
 	return (
@@ -170,9 +167,10 @@ export function DataViewsPickerFooter() {
 				gap="md"
 				align="center"
 			>
-				{ isMultiselect && (
+				{ isMultiselect && ! view.infiniteScrollEnabled && (
 					<BulkSelectionCheckbox
 						selection={ selection }
+						selectedItems={ selectedItems }
 						onChangeSelection={ onChangeSelection }
 						data={ data }
 						getItemId={ getItemId }
