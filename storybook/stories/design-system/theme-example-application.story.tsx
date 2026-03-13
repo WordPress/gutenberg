@@ -35,7 +35,6 @@ const meta: Meta< typeof ThemeProvider > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'hidden' } },
 	},
-	tags: [ 'status-experimental' ],
 };
 export default meta;
 
