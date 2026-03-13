@@ -23,12 +23,29 @@ import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
 function CollaborationContext() {
-	const isCollaborationSupported = useSelect( ( select ) => {
-		return unlock( select( coreStore ) ).isCollaborationSupported();
-	}, [] );
+	const { isCollaborationSupported, syncConnectionStatus } = useSelect(
+		( select ) => {
+			const selectors = unlock( select( coreStore ) );
+			return {
+				isCollaborationSupported: selectors.isCollaborationSupported(),
+				syncConnectionStatus: selectors.getSyncConnectionStatus(),
+			};
+		},
+		[]
+	);
 
 	if ( isCollaborationSupported ) {
 		return null;
+	}
+
+	if ( 'provider-limit-exceeded' === syncConnectionStatus.status ) {
+		return (
+			<p>
+				{ __(
+					'Because this post is too large for real-time collaboration, only one person can edit at a time.'
+				) }
+			</p>
+		);
 	}
 
 	return (

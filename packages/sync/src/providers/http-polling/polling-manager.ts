@@ -12,11 +12,11 @@ import * as syncProtocol from 'y-protocols/sync';
  * Internal dependencies
  */
 import {
-	MAX_PROVIDER_SIZE_BYTES,
+	MAX_ERROR_BACKOFF_IN_MS,
+	MAX_UPDATE_SIZE_IN_BYTES,
 	POLLING_INTERVAL_IN_MS,
 	POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS,
 	POLLING_INTERVAL_BACKGROUND_TAB_IN_MS,
-	MAX_ERROR_BACKOFF_IN_MS,
 } from './config';
 import type { ConnectionStatus } from '../../types';
 import {
@@ -358,63 +358,13 @@ function poll(): void {
 			),
 		};
 
-		// Check if the payload size exceeds the provider limit before
-		// sending the request. Once the request goes out it's too late.
-		// Update data is base64-encoded, so string length equals byte size.
-		const payloadSizeInBytes = payload.rooms.reduce(
-			( total, room ) =>
-				total +
-				room.updates.reduce(
-					( sum, update ) => sum + update.data.length,
-					0
-				),
-			0
-		);
-
-		const isLimitExceeded = payloadSizeInBytes > MAX_PROVIDER_SIZE_BYTES;
-
-		if ( isLimitExceeded ) {
-			// Pause all queues and strip the oversized updates from the
-			// payload. The request is still sent (with empty updates) so
-			// awareness continues to flow. The drained updates are
-			// discarded — when the queue is eventually resumed, the sync
-			// protocol (sync_step1/step2) will reconcile from the Y.Doc.
-			for ( const room of payload.rooms ) {
-				const state = roomStates.get( room.room );
-				if ( ! state ) {
-					continue;
-				}
-
-				state.log( 'Provider size limit exceeded', {
-					payloadSizeInBytes,
-					maxSizeInBytes: MAX_PROVIDER_SIZE_BYTES,
-				} );
-
-				state.onStatusChange( {
-					status: 'provider-limit-exceeded',
-					error: {
-						code: 'provider-limit-exceeded',
-						name: 'ProviderLimitExceededError',
-						message:
-							'Real-time collaboration limit has been reached due to the size of the post. Editing is paused to prevent conflicts with other editors.',
-					},
-				} );
-
-				state.updateQueue.pause();
-				room.updates = [];
-			}
-		}
-
 		try {
 			const { rooms } = await postSyncUpdate( payload );
 
-			// Emit 'connected' status (skip if limit was exceeded —
-			// we already emitted 'provider-limit-exceeded' above).
-			if ( ! isLimitExceeded ) {
-				roomStates.forEach( ( state ) => {
-					state.onStatusChange( { status: 'connected' } );
-				} );
-			}
+			// Emit 'connected' status.
+			roomStates.forEach( ( state ) => {
+				state.onStatusChange( { status: 'connected' } );
+			} );
 
 			rooms.forEach( ( room ) => {
 				if ( ! roomStates.has( room.room ) ) {
@@ -428,13 +378,10 @@ function poll(): void {
 				roomState.processAwarenessUpdate( room.awareness );
 
 				// If there is another collaborator, resume the queue for the next poll
-				// and increase polling frequency. Don't resume when the limit was
-				// exceeded — the queue must stay paused.
+				// and increase polling frequency.
 				if ( Object.keys( room.awareness ).length > 1 ) {
 					hasCollaborators = true;
-					if ( ! isLimitExceeded ) {
-						roomState.updateQueue.resume();
-					}
+					roomState.updateQueue.resume();
 				}
 
 				// Process each incoming update and collect any responses.
@@ -516,6 +463,7 @@ function poll(): void {
 	// Start polling.
 	void start();
 }
+
 function registerRoom( {
 	room,
 	doc,
@@ -539,6 +487,25 @@ function registerRoom( {
 	function onDocUpdate( update: Uint8Array, origin: unknown ): void {
 		if ( POLLING_MANAGER_ORIGIN === origin ) {
 			return;
+		}
+
+		if ( update.byteLength > MAX_UPDATE_SIZE_IN_BYTES ) {
+			const state = roomStates.get( room );
+			if ( ! state ) {
+				return;
+			}
+
+			state.log( 'Provider size limit exceeded', {
+				maxUpdatSizeInBytes: MAX_UPDATE_SIZE_IN_BYTES,
+				updateSizeInBytes: update.byteLength,
+			} );
+
+			state.onStatusChange( {
+				status: 'provider-limit-exceeded',
+			} );
+
+			// This is an unrecoverable error. Unregister the room to prevent syncing.
+			unregisterRoom( room );
 		}
 
 		// Tag local document changes as 'update' type.

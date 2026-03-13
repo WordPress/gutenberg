@@ -31,6 +31,8 @@ const ERROR_MESSAGES = {
 		),
 		canRetry: true,
 	},
+	// 'provider-limit-exceeded' is not included here because it results in
+	// collaboration being disabled entirely.
 	'unknown-error': {
 		title: __( 'Connection lost' ),
 		description: __(

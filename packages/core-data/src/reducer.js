@@ -706,6 +706,13 @@ export function collaborationSupported( state = true, action ) {
 	switch ( action.type ) {
 		case 'SET_COLLABORATION_SUPPORTED':
 			return action.supported;
+
+		case 'SET_SYNC_CONNECTION_STATUS':
+			if ( action.status.status === 'provider-limit-exceeded' ) {
+				return false;
+			}
+
+			return state;
 	}
 	return state;
 }
