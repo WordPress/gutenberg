@@ -1,6 +1,6 @@
 <?php
 
-class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
+class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Modified to point $manifest_path to Gutenberg packages
 	 */
@@ -89,21 +89,21 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 }
 
 /**
- * Forces Gutenberg_Icons_Registry_7_1 instantiation and overrides WP_Icons_Registry
+ * Forces WP_Icons_Registry_Gutenberg instantiation and overrides WP_Icons_Registry
  * so that all code using WP_Icons_Registry::{method_name}() receives the Gutenberg
  * registry.
  */
-function gutenberg_override_wp_icons_registry_7_1() {
+function gutenberg_override_wp_icons_registry() {
 	$reflection = new ReflectionClass( WP_Icons_Registry::class );
 	$property   = $reflection->getProperty( 'instance' );
 	$property->setAccessible( true );
 	$original_registry  = $property->getValue( null );
-	$gutenberg_registry = Gutenberg_Icons_Registry_7_1::get_instance();
+	$gutenberg_registry = WP_Icons_Registry_Gutenberg::get_instance();
 
 	// If the original registry was already instantiated, replay any icons outside
 	// the `core/` namespace onto the Gutenberg registry so they are not lost.
 	if ( null !== $original_registry ) {
-		$register_method = new ReflectionMethod( Gutenberg_Icons_Registry_7_1::class, 'register' );
+		$register_method = new ReflectionMethod( WP_Icons_Registry_Gutenberg::class, 'register' );
 		$register_method->setAccessible( true );
 		foreach ( $original_registry->get_registered_icons() as $icon ) {
 			if ( strpos( $icon['name'], 'core/' ) === 0 ) {
@@ -122,4 +122,4 @@ function gutenberg_override_wp_icons_registry_7_1() {
 	}
 	$property->setValue( null, $gutenberg_registry );
 }
-add_action( 'init', 'gutenberg_override_wp_icons_registry_7_1', 1 );
+add_action( 'init', 'gutenberg_override_wp_icons_registry', 1 );
