@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useViewportMatch } from '@wordpress/compose';
+import { useMediaQuery } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
+import { useBlockVisibilityViewports } from './use-block-visibility-viewports';
 
 /**
  * Returns information about the current block visibility state.
@@ -22,8 +23,15 @@ export default function useBlockVisibility( options = {} ) {
 		deviceType = BLOCK_VISIBILITY_VIEWPORTS.desktop.key,
 	} = options;
 
-	const isLargerThanMobile = useViewportMatch( 'mobile', '>=' ); // >= 480px
-	const isLargerThanTablet = useViewportMatch( 'medium', '>=' ); // >= 782px
+	const viewports = useBlockVisibilityViewports();
+	// @todo Consolidate default breakpoint values into a single source of truth
+	// shared between constants.js, use-block-visibility.js, and lib/theme.json.
+	// See https://github.com/WordPress/gutenberg/issues/75707.
+	const mobileSize = viewports.mobile.size ?? '480px';
+	const tabletSize = viewports.tablet.size ?? '782px';
+
+	const isLargerThanMobile = useMediaQuery( `(min-width: ${ mobileSize })` );
+	const isLargerThanTablet = useMediaQuery( `(min-width: ${ tabletSize })` );
 
 	/*
 	 * Priority:

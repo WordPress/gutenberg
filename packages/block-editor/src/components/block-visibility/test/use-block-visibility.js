@@ -6,30 +6,38 @@ import { renderHook } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { useViewportMatch } from '@wordpress/compose';
+import { useMediaQuery } from '@wordpress/compose';
 
-// Mock WordPress dependencies before importing the hook
 jest.mock( '@wordpress/compose', () => ( {
-	useViewportMatch: jest.fn(),
+	useMediaQuery: jest.fn(),
+} ) );
+
+jest.mock( '../use-block-visibility-viewports', () => ( {
+	useBlockVisibilityViewports: jest.fn(),
 } ) );
 
 /**
  * Internal dependencies
  */
 import useBlockVisibility from '../use-block-visibility';
+import { useBlockVisibilityViewports } from '../use-block-visibility-viewports';
+import { BLOCK_VISIBILITY_VIEWPORTS } from '../constants';
 
 describe( 'useBlockVisibility', () => {
 	// Helper function to set up viewport matches
 	const setupViewport = ( { isMobileOrLarger, isMediumOrLarger } ) => {
+		useBlockVisibilityViewports.mockReturnValue(
+			BLOCK_VISIBILITY_VIEWPORTS
+		);
 		if (
 			isMobileOrLarger !== undefined &&
 			isMediumOrLarger !== undefined
 		) {
-			useViewportMatch
+			useMediaQuery
 				.mockReturnValueOnce( isMobileOrLarger )
 				.mockReturnValueOnce( isMediumOrLarger );
 		} else {
-			useViewportMatch.mockReturnValue(
+			useMediaQuery.mockReturnValue(
 				isMobileOrLarger ?? isMediumOrLarger ?? true
 			);
 		}
@@ -312,6 +320,48 @@ describe( 'useBlockVisibility', () => {
 				} )
 			);
 
+			expect( result.current.isBlockCurrentlyHidden ).toBe( true );
+		} );
+	} );
+
+	describe( 'Theme breakpoint overrides', () => {
+		it( 'uses theme-defined mobile size for viewport detection', () => {
+			useBlockVisibilityViewports.mockReturnValue( {
+				...BLOCK_VISIBILITY_VIEWPORTS,
+				mobile: { ...BLOCK_VISIBILITY_VIEWPORTS.mobile, size: '600px' },
+			} );
+			useMediaQuery
+				.mockReturnValueOnce( false ) // not larger than mobile
+				.mockReturnValueOnce( false ); // not larger than tablet
+
+			const { result } = renderHook( () =>
+				useBlockVisibility( {
+					blockVisibility: { viewport: { mobile: false } },
+					deviceType: 'desktop',
+				} )
+			);
+
+			expect( result.current.currentViewport ).toBe( 'mobile' );
+			expect( result.current.isBlockCurrentlyHidden ).toBe( true );
+		} );
+
+		it( 'uses theme-defined tablet size for viewport detection', () => {
+			useBlockVisibilityViewports.mockReturnValue( {
+				...BLOCK_VISIBILITY_VIEWPORTS,
+				tablet: { ...BLOCK_VISIBILITY_VIEWPORTS.tablet, size: '900px' },
+			} );
+			useMediaQuery
+				.mockReturnValueOnce( true ) // larger than mobile
+				.mockReturnValueOnce( false ); // not larger than tablet
+
+			const { result } = renderHook( () =>
+				useBlockVisibility( {
+					blockVisibility: { viewport: { tablet: false } },
+					deviceType: 'desktop',
+				} )
+			);
+
+			expect( result.current.currentViewport ).toBe( 'tablet' );
 			expect( result.current.isBlockCurrentlyHidden ).toBe( true );
 		} );
 	} );

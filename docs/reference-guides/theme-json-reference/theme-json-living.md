@@ -152,6 +152,16 @@ Settings related to position.
 
 ---
 
+### responsive
+
+Settings related to responsive behavior.
+
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| viewports | Viewport size overrides for block visibility. Override the size of the mobile and/or tablet breakpoints. Desktop has no size value and cannot be overridden. | `[ { name, slug, size } ]` |  |
+
+---
+
 ### shadow
 
 Settings related to shadows.

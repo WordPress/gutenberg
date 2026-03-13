@@ -7257,4 +7257,154 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( 'string-value', $settings['appearanceTools'] );
 		$this->assertSame( array( 'nested' => 'value' ), $settings['custom'] );
 	}
+
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::is_valid_viewports
+	 */
+	public function test_theme_viewports_valid_mobile_override() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'responsive' => array(
+						'viewports' => array(
+							array( 'slug' => 'mobile', 'size' => '600px' ),
+						),
+					),
+				),
+			),
+			'theme'
+		);
+
+		$settings  = $theme_json->get_settings();
+		$viewports = $settings['responsive']['viewports'] ?? null;
+		$this->assertNotNull( $viewports, 'Valid mobile viewport override should be preserved.' );
+		$this->assertSame( '600px', $viewports[0]['size'] );
+	}
+
+	public function test_theme_viewports_valid_both_overrides() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'responsive' => array(
+						'viewports' => array(
+							array( 'slug' => 'mobile', 'size' => '600px' ),
+							array( 'slug' => 'tablet', 'size' => '900px' ),
+						),
+					),
+				),
+			),
+			'theme'
+		);
+
+		$settings  = $theme_json->get_settings();
+		$viewports = $settings['responsive']['viewports'] ?? null;
+		$this->assertNotNull( $viewports );
+		$this->assertCount( 2, $viewports );
+	}
+
+	public function test_theme_viewports_invalid_unknown_slug_is_rejected() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'responsive' => array(
+						'viewports' => array(
+							array( 'slug' => 'widescreen', 'size' => '1400px' ),
+						),
+					),
+				),
+			),
+			'theme'
+		);
+
+		$settings  = $theme_json->get_settings();
+		$viewports = $settings['responsive']['viewports'] ?? null;
+		$this->assertNull( $viewports, 'Unknown slug should cause viewports to be rejected.' );
+	}
+
+	public function test_theme_viewports_invalid_non_px_size_is_rejected() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'responsive' => array(
+						'viewports' => array(
+							array( 'slug' => 'mobile', 'size' => '30rem' ),
+						),
+					),
+				),
+			),
+			'theme'
+		);
+
+		$settings  = $theme_json->get_settings();
+		$viewports = $settings['responsive']['viewports'] ?? null;
+		$this->assertNull( $viewports, 'Non-px size should cause viewports to be rejected.' );
+	}
+
+	public function test_theme_viewports_invalid_descending_order_is_rejected() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'responsive' => array(
+						'viewports' => array(
+							array( 'slug' => 'mobile', 'size' => '900px' ),
+							array( 'slug' => 'tablet', 'size' => '480px' ),
+						),
+					),
+				),
+			),
+			'theme'
+		);
+
+		$settings  = $theme_json->get_settings();
+		$viewports = $settings['responsive']['viewports'] ?? null;
+		$this->assertNull( $viewports, 'Descending sizes should cause viewports to be rejected.' );
+	}
+
+	public function test_theme_viewports_invalid_duplicate_slug_is_rejected() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'responsive' => array(
+						'viewports' => array(
+							array( 'slug' => 'mobile', 'size' => '480px' ),
+							array( 'slug' => 'mobile', 'size' => '600px' ),
+						),
+					),
+				),
+			),
+			'theme'
+		);
+
+		$settings  = $theme_json->get_settings();
+		$viewports = $settings['responsive']['viewports'] ?? null;
+		$this->assertNull( $viewports, 'Duplicate slugs should cause viewports to be rejected.' );
+	}
+
+	public function test_default_origin_viewports_are_not_validated() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'responsive' => array(
+						'viewports' => array(
+							array( 'slug' => 'mobile', 'size' => '480px' ),
+							array( 'slug' => 'tablet', 'size' => '782px' ),
+							array( 'slug' => 'desktop' ),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$settings  = $theme_json->get_settings();
+		$viewports = $settings['responsive']['viewports'] ?? null;
+		$this->assertNotNull( $viewports, 'Default origin viewports should not be validated or removed.' );
+	}
 }
