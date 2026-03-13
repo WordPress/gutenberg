@@ -19,36 +19,24 @@ const { BlockQuickNavigation } = unlock( blockEditorPrivateApis );
 
 const TEMPLATE_PART_BLOCK = 'core/template-part';
 
-export default function TemplateContentPanel() {
+function TemplateContentPanelInner( { postType } ) {
 	const postContentBlockTypes = usePostContentBlockTypes();
 
-	const { clientIds, postType, renderingMode } = useSelect(
+	const clientIds = useSelect(
 		( select ) => {
-			const {
-				getCurrentPostType,
-				getPostBlocksByName,
-				getRenderingMode,
-			} = unlock( select( editorStore ) );
-			const _postType = getCurrentPostType();
-			return {
-				postType: _postType,
-				clientIds: getPostBlocksByName(
-					TEMPLATE_POST_TYPE === _postType
-						? TEMPLATE_PART_BLOCK
-						: postContentBlockTypes
-				),
-				renderingMode: getRenderingMode(),
-			};
+			const { getPostBlocksByName } = unlock( select( editorStore ) );
+			return getPostBlocksByName(
+				TEMPLATE_POST_TYPE === postType
+					? TEMPLATE_PART_BLOCK
+					: postContentBlockTypes
+			);
 		},
-		[ postContentBlockTypes ]
+		[ postType, postContentBlockTypes ]
 	);
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
-	if (
-		( renderingMode === 'post-only' && postType !== TEMPLATE_POST_TYPE ) ||
-		clientIds.length === 0
-	) {
+	if ( clientIds.length === 0 ) {
 		return null;
 	}
 
@@ -62,4 +50,22 @@ export default function TemplateContentPanel() {
 			/>
 		</PanelBody>
 	);
+}
+
+export default function TemplateContentPanel() {
+	const { postType, renderingMode } = useSelect( ( select ) => {
+		const { getCurrentPostType, getRenderingMode } = unlock(
+			select( editorStore )
+		);
+		return {
+			postType: getCurrentPostType(),
+			renderingMode: getRenderingMode(),
+		};
+	}, [] );
+
+	if ( renderingMode === 'post-only' && postType !== TEMPLATE_POST_TYPE ) {
+		return null;
+	}
+
+	return <TemplateContentPanelInner postType={ postType } />;
 }
