@@ -55,7 +55,6 @@ interface RegisterRoomOptions {
 }
 
 interface RoomState {
-	awarenessStates: Map< number, AwarenessState >;
 	clientId: number;
 	createCompactionUpdate: () => SyncUpdate;
 	endCursor: number;
@@ -480,7 +479,6 @@ function registerRoom( {
 	const updateQueue = createUpdateQueue( [ createSyncStep1Update( doc ) ] );
 
 	function onAwarenessUpdate(): void {
-		roomState.awarenessStates = awareness.getStates();
 		roomState.localAwarenessState = awareness.getLocalState() ?? {};
 	}
 
@@ -519,7 +517,6 @@ function registerRoom( {
 	}
 
 	const roomState: RoomState = {
-		awarenessStates: awareness.getStates(),
 		clientId: doc.clientID,
 		createCompactionUpdate: () =>
 			createSyncUpdate(
