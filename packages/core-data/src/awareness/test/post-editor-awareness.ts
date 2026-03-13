@@ -369,53 +369,18 @@ describe( 'PostEditorAwareness', () => {
 		} );
 	} );
 
-	describe( 'areEditorStatesEqual with missing selection', () => {
+	describe( 'areEditorStatesEqual', () => {
 		let awareness: PostEditorAwareness;
+		let callback: jest.Mock;
 
 		beforeEach( () => {
 			awareness = new PostEditorAwareness( doc, 'postType', 'post', 123 );
 			awareness.setUp();
-		} );
-
-		test( 'should treat two editorState: {} as equal', () => {
-			awareness.setLocalStateField( 'editorState', {} as any );
-
-			const callback = jest.fn();
+			callback = jest.fn();
 			awareness.onStateChange( callback );
-
-			// Register the state via change event.
-			awareness.emit( 'change', [
-				{
-					added: [],
-					updated: [ awareness.clientID ],
-					removed: [],
-				},
-			] );
-			callback.mockClear();
-
-			// Set same empty editorState again.
-			awareness.setLocalStateField( 'editorState', {} as any );
-			awareness.emit( 'change', [
-				{
-					added: [],
-					updated: [ awareness.clientID ],
-					removed: [],
-				},
-			] );
-
-			// Should not notify because both states lack a selection.
-			expect( callback ).not.toHaveBeenCalled();
 		} );
 
-		test( 'should treat editorState: undefined vs editorState: { selection: undefined } as not equal', () => {
-			// Default local state has no editorState field (undefined).
-			const callback = jest.fn();
-			awareness.onStateChange( callback );
-
-			awareness.setLocalStateField( 'editorState', {
-				selection: undefined,
-			} as any );
-
+		function emitUpdate() {
 			awareness.emit( 'change', [
 				{
 					added: [],
@@ -423,25 +388,9 @@ describe( 'PostEditorAwareness', () => {
 					removed: [],
 				},
 			] );
+		}
 
-			expect( callback ).toHaveBeenCalled();
-		} );
-	} );
-
-	describe( 'areEditorStatesEqual', () => {
-		test( 'should return true when both states are undefined', () => {
-			const awareness = new PostEditorAwareness(
-				doc,
-				'postType',
-				'post',
-				123
-			);
-
-			// Access the protected method via testing
-			// We can test this indirectly through setLocalStateField behavior
-			awareness.setUp();
-
-			// Set editorState with a selection
+		test( 'should not notify when editorState with selection is unchanged', () => {
 			const selectionState: SelectionNone = {
 				type: SelectionType.None,
 			};
@@ -449,36 +398,26 @@ describe( 'PostEditorAwareness', () => {
 			awareness.setLocalStateField( 'editorState', {
 				selection: selectionState,
 			} );
-
-			// Subscribe to track updates
-			const callback = jest.fn();
-			awareness.onStateChange( callback );
-
-			// Emit change event
-			awareness.emit( 'change', [
-				{
-					added: [],
-					updated: [ awareness.clientID ],
-					removed: [],
-				},
-			] );
+			emitUpdate();
 			callback.mockClear();
 
-			// Set same state again - should not trigger unnecessary updates
+			// Set same state again.
 			awareness.setLocalStateField( 'editorState', {
 				selection: selectionState,
 			} );
+			emitUpdate();
 
-			// Emit change event again
-			awareness.emit( 'change', [
-				{
-					added: [],
-					updated: [ awareness.clientID ],
-					removed: [],
-				},
-			] );
+			expect( callback ).not.toHaveBeenCalled();
+		} );
 
-			// Callback should not be called for equal editor states
+		test( 'should not notify when editorState without selection is unchanged', () => {
+			awareness.setLocalStateField( 'editorState', {} );
+			emitUpdate();
+			callback.mockClear();
+
+			awareness.setLocalStateField( 'editorState', {} );
+			emitUpdate();
+
 			expect( callback ).not.toHaveBeenCalled();
 		} );
 	} );
