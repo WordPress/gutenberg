@@ -56,8 +56,8 @@ function MediaThumbnail( { data, field, attachment, config } ) {
 			<div className="block-editor-content-only-controls__media-thumbnail">
 				<img
 					alt=""
-					width={ 24 }
-					height={ 24 }
+					width={ 20 }
+					height={ 20 }
 					src={
 						attachment.media_type === 'image'
 							? attachment.source_url
@@ -254,7 +254,6 @@ export default function Media( { data, field, onChange, config = {} } ) {
 				/>
 				{ url && (
 					<Button
-						__next40pxDefaultSize
 						label={ __( 'Reset' ) }
 						className="block-editor-content-only-controls__media-reset"
 						size="small"

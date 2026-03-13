@@ -137,7 +137,6 @@ export function MediaControl( {
 				name={
 					<MediaControlPreview
 						url={ mediaUrl }
-						alt={ undefined }
 						filename={ filename }
 						className="block-library-utils__media-control__inspector-media-replace-title"
 						label={
@@ -154,7 +153,6 @@ export function MediaControl( {
 			/>
 			{ mediaUrl && onReset && (
 				<Button
-					__next40pxDefaultSize
 					label={ __( 'Reset' ) }
 					className="block-library-utils__media-control__reset"
 					size="small"
