@@ -22,15 +22,14 @@
  * @param string $value Stored attribute value.
  * @return string Decoded CSS string, or the original value if not encoded.
  */
-function gutenberg_decode_css_attribute( $value ) {
+function gutenberg_decode_custom_css_attribute_for_display( $value ) {
 	$prefix = 'data:text/css;base64,';
 	if ( ! str_starts_with( $value, $prefix ) ) {
 		return $value;
 	}
 	// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 	$decoded = base64_decode( substr( $value, strlen( $prefix ) ), /* strict */ true );
-	// If the decoded string contains characters from outside the base64 alphabet or a null byte, set the CSS to an empty string.
-	return ( false === $decoded || str_contains( $decoded, "\0" ) ) ? '' : $decoded;
+	return false !== $decoded ? $decoded : '';
 }
 
 /**
@@ -58,7 +57,7 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 	// that wp_kses cannot corrupt characters like `&`, `>`, or nested selectors.
 	// Plain CSS (saved by users with `unfiltered_html`, or legacy content) is
 	// returned unchanged by this function.
-	$custom_css = gutenberg_decode_css_attribute( $custom_css );
+	$custom_css = gutenberg_decode_custom_css_attribute_for_display( $custom_css );
 
 	// Validate CSS doesn't contain HTML markup (same validation as global styles REST API).
 	if ( preg_match( '#</?\w+#', $custom_css ) ) {

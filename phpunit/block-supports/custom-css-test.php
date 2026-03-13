@@ -439,81 +439,71 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'className', $result['attrs'], 'Block should have className added for valid CSS.' );
 	}
 
-	// Tests for gutenberg_decode_css_attribute().
+	// Tests for gutenberg_decode_custom_css_attribute_for_display().
 
 	/**
 	 * Tests that plain CSS (no prefix) is returned unchanged.
 	 *
-	 * @covers ::gutenberg_decode_css_attribute
+	 * @covers ::gutenberg_decode_custom_css_attribute_for_display
 	 */
 	public function test_decode_css_attribute_returns_plain_css_unchanged() {
 		$css = 'color: red; font-size: 16px;';
-		$this->assertSame( $css, gutenberg_decode_css_attribute( $css ) );
+		$this->assertSame( $css, gutenberg_decode_custom_css_attribute_for_display( $css ) );
 	}
 
 	/**
 	 * Tests that a base64-encoded value is decoded correctly.
 	 *
-	 * @covers ::gutenberg_decode_css_attribute
+	 * @covers ::gutenberg_decode_custom_css_attribute_for_display
 	 */
 	public function test_decode_css_attribute_decodes_encoded_value() {
 		$css     = 'color: red;';
 		$encoded = 'data:text/css;base64,' . base64_encode( $css );
-		$this->assertSame( $css, gutenberg_decode_css_attribute( $encoded ) );
+		$this->assertSame( $css, gutenberg_decode_custom_css_attribute_for_display( $encoded ) );
 	}
 
 	/**
 	 * Tests that nested CSS selectors survive the encode/decode round-trip.
 	 * This is the primary bug being fixed: wp_kses corrupts `&` and `>` in CSS.
 	 *
-	 * @covers ::gutenberg_decode_css_attribute
+	 * @covers ::gutenberg_decode_custom_css_attribute_for_display
 	 */
 	public function test_decode_css_attribute_decodes_nested_css() {
 		$css     = 'background: green; & p { color: yellow; padding: 20px; }';
 		$encoded = 'data:text/css;base64,' . base64_encode( $css );
-		$this->assertSame( $css, gutenberg_decode_css_attribute( $encoded ) );
+		$this->assertSame( $css, gutenberg_decode_custom_css_attribute_for_display( $encoded ) );
 	}
 
 	/**
 	 * Tests that CSS with characters wp_kses would corrupt (`&`, `>`) round-trips correctly.
 	 *
-	 * @covers ::gutenberg_decode_css_attribute
+	 * @covers ::gutenberg_decode_custom_css_attribute_for_display
 	 */
 	public function test_decode_css_attribute_decodes_kses_sensitive_characters() {
 		$css     = '& > p { color: red; }';
 		$encoded = 'data:text/css;base64,' . base64_encode( $css );
-		$this->assertSame( $css, gutenberg_decode_css_attribute( $encoded ) );
+		$this->assertSame( $css, gutenberg_decode_custom_css_attribute_for_display( $encoded ) );
 	}
 
 	/**
 	 * Tests that non-ASCII characters (e.g. Unicode in content values) survive decoding.
 	 *
-	 * @covers ::gutenberg_decode_css_attribute
+	 * @covers ::gutenberg_decode_custom_css_attribute_for_display
 	 */
 	public function test_decode_css_attribute_decodes_unicode_characters() {
 		$css     = 'content: "→";';
 		$encoded = 'data:text/css;base64,' . base64_encode( $css );
-		$this->assertSame( $css, gutenberg_decode_css_attribute( $encoded ) );
+		$this->assertSame( $css, gutenberg_decode_custom_css_attribute_for_display( $encoded ) );
 	}
 
 	/**
 	 * Tests that an invalid base64 payload returns an empty string.
 	 *
-	 * @covers ::gutenberg_decode_css_attribute
+	 * @covers ::gutenberg_decode_custom_css_attribute_for_display
 	 */
 	public function test_decode_css_attribute_returns_empty_for_invalid_base64() {
 		$invalid = 'data:text/css;base64,!!!not-valid-base64!!!';
-		$this->assertSame( '', gutenberg_decode_css_attribute( $invalid ) );
-	}
-
-	/**
-	 * Tests that a payload containing a null byte after decoding returns an empty string.
-	 *
-	 * @covers ::gutenberg_decode_css_attribute
-	 */
-	public function test_decode_css_attribute_returns_empty_for_null_byte_in_decoded_value() {
-		$encoded = 'data:text/css;base64,' . base64_encode( "color: red;\0" );
-		$this->assertSame( '', gutenberg_decode_css_attribute( $encoded ) );
+		$this->assertSame( '', gutenberg_decode_custom_css_attribute_for_display( $invalid ) );
 	}
 
 	// Integration tests: encode/decode through the full render path.
@@ -524,7 +514,7 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	 * should render with the correct CSS, including nested selectors.
 	 *
 	 * @covers ::gutenberg_render_custom_css_support_styles
-	 * @covers ::gutenberg_decode_css_attribute
+	 * @covers ::gutenberg_decode_custom_css_attribute_for_display
 	 */
 	public function test_render_decodes_and_applies_base64_encoded_css() {
 		$this->register_custom_css_block_with_support(
@@ -554,7 +544,7 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	 * Encoding must not be used to bypass the HTML markup check.
 	 *
 	 * @covers ::gutenberg_render_custom_css_support_styles
-	 * @covers ::gutenberg_decode_css_attribute
+	 * @covers ::gutenberg_decode_custom_css_attribute_for_display
 	 */
 	public function test_render_rejects_base64_encoded_html_injection() {
 		$this->register_custom_css_block_with_support(
