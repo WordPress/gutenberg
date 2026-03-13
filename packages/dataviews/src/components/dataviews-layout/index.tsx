@@ -46,10 +46,15 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 	const isDelayedInitialLoading = useDelayedLoading( ! hasInitiallyLoaded, {
 		delay: 200,
 	} );
+	// Until the initial data load completes, show a spinner (or nothing if fast).
+	// After that, render the layout component which preserves previous data
+	// while loading subsequent requests.
 	if ( ! hasInitiallyLoaded ) {
+		// If the initial data load is fast, don't show the loading state at all.
 		if ( ! isDelayedInitialLoading ) {
 			return null;
 		}
+		// If the initial data load takes more than 200ms, show the loading state.
 		return (
 			<div className="dataviews-loading">
 				<p>
