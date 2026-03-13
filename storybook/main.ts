@@ -1,3 +1,4 @@
+import { existsSync } from 'fs';
 import { resolve } from 'path';
 import {
 	type InlineConfig,
@@ -196,10 +197,18 @@ const config: StorybookConfig = {
 			},
 			resolve: {
 				alias: {
-					'@cross-bundle-test/bundle-b': resolve(
-						import.meta.dirname,
-						'../packages/e2e-tests/plugins/overlay-dismiss-stress-test/build/bundle-b.esm.js'
-					),
+					'@cross-bundle-test/bundle-b': ( () => {
+						const bundlePath = resolve(
+							import.meta.dirname,
+							'../packages/e2e-tests/plugins/overlay-dismiss-stress-test/build/bundle-b.esm.js'
+						);
+						return existsSync( bundlePath )
+							? bundlePath
+							: resolve(
+									import.meta.dirname,
+									'stories/cross-bundle-dismiss/bundle-b-stub.js'
+							  );
+					} )(),
 				},
 			},
 		} satisfies InlineConfig );
