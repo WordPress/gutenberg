@@ -438,4 +438,144 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 
 		$this->assertArrayHasKey( 'className', $result['attrs'], 'Block should have className added for valid CSS.' );
 	}
+
+	// Tests for gutenberg_decode_css_attribute().
+
+	/**
+	 * Tests that plain CSS (no prefix) is returned unchanged.
+	 *
+	 * @covers ::gutenberg_decode_css_attribute
+	 */
+	public function test_decode_css_attribute_returns_plain_css_unchanged() {
+		$css = 'color: red; font-size: 16px;';
+		$this->assertSame( $css, gutenberg_decode_css_attribute( $css ) );
+	}
+
+	/**
+	 * Tests that a base64-encoded value is decoded correctly.
+	 *
+	 * @covers ::gutenberg_decode_css_attribute
+	 */
+	public function test_decode_css_attribute_decodes_encoded_value() {
+		$css     = 'color: red;';
+		$encoded = 'data:text/css;base64,' . base64_encode( $css );
+		$this->assertSame( $css, gutenberg_decode_css_attribute( $encoded ) );
+	}
+
+	/**
+	 * Tests that nested CSS selectors survive the encode/decode round-trip.
+	 * This is the primary bug being fixed: wp_kses corrupts `&` and `>` in CSS.
+	 *
+	 * @covers ::gutenberg_decode_css_attribute
+	 */
+	public function test_decode_css_attribute_decodes_nested_css() {
+		$css     = 'background: green; & p { color: yellow; padding: 20px; }';
+		$encoded = 'data:text/css;base64,' . base64_encode( $css );
+		$this->assertSame( $css, gutenberg_decode_css_attribute( $encoded ) );
+	}
+
+	/**
+	 * Tests that CSS with characters wp_kses would corrupt (`&`, `>`) round-trips correctly.
+	 *
+	 * @covers ::gutenberg_decode_css_attribute
+	 */
+	public function test_decode_css_attribute_decodes_kses_sensitive_characters() {
+		$css     = '& > p { color: red; }';
+		$encoded = 'data:text/css;base64,' . base64_encode( $css );
+		$this->assertSame( $css, gutenberg_decode_css_attribute( $encoded ) );
+	}
+
+	/**
+	 * Tests that non-ASCII characters (e.g. Unicode in content values) survive decoding.
+	 *
+	 * @covers ::gutenberg_decode_css_attribute
+	 */
+	public function test_decode_css_attribute_decodes_unicode_characters() {
+		$css     = 'content: "→";';
+		$encoded = 'data:text/css;base64,' . base64_encode( $css );
+		$this->assertSame( $css, gutenberg_decode_css_attribute( $encoded ) );
+	}
+
+	/**
+	 * Tests that an invalid base64 payload returns an empty string.
+	 *
+	 * @covers ::gutenberg_decode_css_attribute
+	 */
+	public function test_decode_css_attribute_returns_empty_for_invalid_base64() {
+		$invalid = 'data:text/css;base64,!!!not-valid-base64!!!';
+		$this->assertSame( '', gutenberg_decode_css_attribute( $invalid ) );
+	}
+
+	/**
+	 * Tests that a payload containing a null byte after decoding returns an empty string.
+	 *
+	 * @covers ::gutenberg_decode_css_attribute
+	 */
+	public function test_decode_css_attribute_returns_empty_for_null_byte_in_decoded_value() {
+		$encoded = 'data:text/css;base64,' . base64_encode( "color: red;\0" );
+		$this->assertSame( '', gutenberg_decode_css_attribute( $encoded ) );
+	}
+
+	// Integration tests: encode/decode through the full render path.
+
+	/**
+	 * Tests that base64-encoded CSS is decoded and applied correctly during render.
+	 * Verifies the primary bug fix: a block saved by a user without unfiltered_html
+	 * should render with the correct CSS, including nested selectors.
+	 *
+	 * @covers ::gutenberg_render_custom_css_support_styles
+	 * @covers ::gutenberg_decode_css_attribute
+	 */
+	public function test_render_decodes_and_applies_base64_encoded_css() {
+		$this->register_custom_css_block_with_support(
+			'test/custom-css-encoded',
+			array( 'customCSS' => true )
+		);
+
+		$css     = 'background: green; & p { color: yellow; }';
+		$encoded = 'data:text/css;base64,' . base64_encode( $css );
+
+		$parsed_block = array(
+			'blockName' => 'test/custom-css-encoded',
+			'attrs'     => array(
+				'style' => array(
+					'css' => $encoded,
+				),
+			),
+		);
+
+		$result = gutenberg_render_custom_css_support_styles( $parsed_block );
+
+		$this->assertArrayHasKey( 'className', $result['attrs'], 'Block should have className added for encoded CSS.' );
+	}
+
+	/**
+	 * Tests that a base64-encoded HTML injection payload is rejected after decoding.
+	 * Encoding must not be used to bypass the HTML markup check.
+	 *
+	 * @covers ::gutenberg_render_custom_css_support_styles
+	 * @covers ::gutenberg_decode_css_attribute
+	 */
+	public function test_render_rejects_base64_encoded_html_injection() {
+		$this->register_custom_css_block_with_support(
+			'test/custom-css-encoded-html',
+			array( 'customCSS' => true )
+		);
+
+		// Encode an HTML injection payload — should be caught after decoding.
+		$encoded = 'data:text/css;base64,' . base64_encode( 'color: red;</style><script>alert(1)</script>' );
+
+		$parsed_block = array(
+			'blockName' => 'test/custom-css-encoded-html',
+			'attrs'     => array(
+				'style' => array(
+					'css' => $encoded,
+				),
+			),
+		);
+
+		$result = gutenberg_render_custom_css_support_styles( $parsed_block );
+
+		$this->assertArrayNotHasKey( 'className', $result['attrs'], 'Block should not render when decoded CSS contains HTML markup.' );
+	}
 }

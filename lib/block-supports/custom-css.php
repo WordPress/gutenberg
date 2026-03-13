@@ -6,6 +6,34 @@
  */
 
 /**
+ * Decodes a CSS attribute value that was base64-encoded by the block editor
+ * to survive wp_kses processing. Returns the value unchanged if it was never
+ * encoded (legacy content, or content saved by users with `unfiltered_html`).
+ *
+ * Migration note: once a proper CSS sanitizer API lands in WordPress core,
+ * remove the encoding call in the JS `onChange` handler. Keep this function
+ * as a read-time shim — it will decode any previously encoded values and
+ * return plain CSS, which will then be stored as plain CSS on the next save
+ * (lazy migration). Remove the shim once all encoded values have been cycled
+ * through a save.
+ *
+ * @since 7.0.0
+ *
+ * @param string $value Stored attribute value.
+ * @return string Decoded CSS string, or the original value if not encoded.
+ */
+function gutenberg_decode_css_attribute( $value ) {
+	$prefix = 'data:text/css;base64,';
+	if ( ! str_starts_with( $value, $prefix ) ) {
+		return $value;
+	}
+	// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+	$decoded = base64_decode( substr( $value, strlen( $prefix ) ), /* strict */ true );
+	// If the decoded string contains characters from outside the base64 alphabet or a null byte, set the CSS to an empty string.
+	return ( false === $decoded || str_contains( $decoded, "\0" ) ) ? '' : $decoded;
+}
+
+/**
  * Render the custom CSS stylesheet and add class name to block as required.
  *
  * @since 7.0.0
@@ -25,6 +53,12 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 	if ( empty( $custom_css ) ) {
 		return $parsed_block;
 	}
+
+	// Decode base64-encoded CSS. The JS editor encodes CSS before saving so
+	// that wp_kses cannot corrupt characters like `&`, `>`, or nested selectors.
+	// Plain CSS (saved by users with `unfiltered_html`, or legacy content) is
+	// returned unchanged by this function.
+	$custom_css = gutenberg_decode_css_attribute( $custom_css );
 
 	// Validate CSS doesn't contain HTML markup (same validation as global styles REST API).
 	if ( preg_match( '#</?\w+#', $custom_css ) ) {
