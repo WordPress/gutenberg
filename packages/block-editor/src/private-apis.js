@@ -75,6 +75,7 @@ import {
 	isRelativePath,
 } from './components/link-control/is-url-like';
 import { BlockCardControlsFill } from './components/block-card';
+import { BlockInspectorPreTabsFill } from './components/block-inspector/inspector-pre-tabs-slot-fill';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -143,4 +144,5 @@ lock( privateApis, {
 	isHashLink,
 	isRelativePath,
 	BlockCardControlsFill,
+	BlockInspectorPreTabsFill,
 } );
