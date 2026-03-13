@@ -6,7 +6,8 @@
 			"openByDefault": false,
 			"title": "Accordion Title",
 			"iconPosition": "right",
-			"showIcon": true
+			"showIcon": true,
+			"styleSyncUnlinked": false
 		},
 		"innerBlocks": []
 	}

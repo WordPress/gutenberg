@@ -6,7 +6,8 @@
 			"iconPosition": "right",
 			"showIcon": true,
 			"autoclose": false,
-			"headingLevel": 3
+			"headingLevel": 3,
+			"syncChildStyles": {}
 		},
 		"innerBlocks": [
 			{
@@ -23,7 +24,8 @@
 							"openByDefault": false,
 							"title": "Accordion Title",
 							"iconPosition": "right",
-							"showIcon": true
+							"showIcon": true,
+							"styleSyncUnlinked": false
 						},
 						"innerBlocks": []
 					},
@@ -31,7 +33,8 @@
 						"name": "core/accordion-panel",
 						"isValid": true,
 						"attributes": {
-							"templateLock": false
+							"templateLock": false,
+							"styleSyncUnlinked": false
 						},
 						"innerBlocks": [
 							{
