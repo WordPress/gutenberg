@@ -33,7 +33,6 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 					/>
 				}
 				nativeButton={ false }
-				data-wp-ui-focus-parent
 			>
 				<div className={ styles[ 'header-content' ] }>{ children }</div>
 				<div className={ styles[ 'header-trigger-wrapper' ] }>
