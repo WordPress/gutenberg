@@ -205,36 +205,35 @@ $navigation-icon-size: 24px;
 		top: 100%;
 	}
 
-	// On medium+ breakpoints, submenus open horizontally when this class is present.
-	// JavaScript manages this class, removing it when overflow would occur to revert to downward opening.
+	// On medium+ breakpoints, nested submenus open horizontally when this class is present.
+	// JavaScript manages this class per-item, removing it when overflow would occur.
 	&.submenu-opens-on-horizontal-hover {
 		@include break-medium {
 			> .wp-block-navigation__submenu-container {
-				// Nested submenus (second-level and deeper) sit to the right on large breakpoints.
-				.wp-block-navigation__submenu-container {
-					left: 100%;
-					top: -1px; // Border width.
+				left: 100%;
+				top: -1px; // Border width.
 
-					// Prevent the menu from disappearing when the mouse is over the gap
-					&::before {
-						content: "";
-						position: absolute;
-						right: 100%;
-						height: 100%;
-						display: block;
-						width: 0.5em;
-						background: transparent;
-					}
+				// Prevent the menu from disappearing when the mouse is over the gap
+				&::before {
+					content: "";
+					position: absolute;
+					right: 100%;
+					height: 100%;
+					display: block;
+					width: 0.5em;
+					background: transparent;
 				}
 			}
 
-			// Push inwards from right edge of submenu.
-			.wp-block-navigation__submenu-icon {
+			// Rotate this item's submenu icon to indicate horizontal opening.
+			// Match the icon whether it's a direct child or inside the content/toggle element.
+			> .wp-block-navigation__submenu-icon,
+			> :not(.wp-block-navigation__submenu-container) > .wp-block-navigation__submenu-icon {
 				margin-right: 0.25em;
 			}
 
-			// Reset the submenu indicator for horizontal flyouts.
-			.wp-block-navigation__submenu-icon svg {
+			> .wp-block-navigation__submenu-icon svg,
+			> :not(.wp-block-navigation__submenu-container) > .wp-block-navigation__submenu-icon svg {
 				transform: rotate(-90deg);
 			}
 		}
@@ -323,13 +322,10 @@ $navigation-icon-size: 24px;
 
 // When the class is present, open horizontally on medium+ screens (with background)
 .wp-block-navigation.has-background
-.has-child.submenu-opens-on-horizontal-hover
-.wp-block-navigation__submenu-container {
+.has-child.submenu-opens-on-horizontal-hover > .wp-block-navigation__submenu-container {
 	@include break-medium {
-		.wp-block-navigation__submenu-container {
-			left: 100%;
-			top: 0;
-		}
+		left: 100%;
+		top: 0;
 	}
 }
 

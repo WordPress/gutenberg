@@ -49,9 +49,9 @@ function getFocusableElements( ref ) {
 /**
  * Temporarily applies styles to measure an element's dimensions.
  *
- * @param {HTMLElement} element - The element to measure
- * @param {Function}    callback - Function to call while styles are applied
- * @return {*} The callback's return value
+ * @param {HTMLElement} element  - The element to measure.
+ * @param {Function}    callback - Function to call while styles are applied.
+ * @return {*} The callback's return value.
  */
 function withMeasurementStyles( element, callback ) {
 	const inlineStyles = {
@@ -99,13 +99,16 @@ function checkSubmenuOverflow( submenuContainer ) {
 		return;
 	}
 
-	// Nested submenus always follow the default behavior
-	if ( parentItem.closest( '.wp-block-navigation__submenu-container' ) ) {
+	// Top-level submenus always open downward, no overflow check needed.
+	// Only nested items (inside a submenu container) need the horizontal check.
+	if ( ! parentItem.closest( '.wp-block-navigation__submenu-container' ) ) {
 		return;
 	}
 
 	const isLargeScreen = window.matchMedia( '(min-width: 782px)' ).matches;
-	const hasClass = parentItem.classList.contains( 'submenu-opens-on-horizontal-hover' );
+	const hasClass = parentItem.classList.contains(
+		'submenu-opens-on-horizontal-hover'
+	);
 
 	// On small screens, remove the class if present
 	if ( ! isLargeScreen ) {
@@ -133,10 +136,8 @@ function checkSubmenuOverflow( submenuContainer ) {
 		if ( hasClass ) {
 			parentItem.classList.remove( 'submenu-opens-on-horizontal-hover' );
 		}
-	} else {
-		if ( ! hasClass ) {
-			parentItem.classList.add( 'submenu-opens-on-horizontal-hover' );
-		}
+	} else if ( ! hasClass ) {
+		parentItem.classList.add( 'submenu-opens-on-horizontal-hover' );
 	}
 }
 
@@ -294,12 +295,17 @@ const { state, actions } = store(
 					// Add a `has-modal-open` class to the <html> root.
 					document.documentElement.classList.add( 'has-modal-open' );
 				}
-				// Check for submenu overflow when opening
+				// Check for submenu overflow when opening.
+				// Use closest() to find the parent <li> since ref may be
+				// the <li>, <button>, or <ul> depending on interaction type.
 				if ( type === 'submenu' && ref ) {
-					const submenuContainer = ref.querySelector(
-						'.wp-block-navigation__submenu-container'
-					);
-					checkSubmenuOverflow( submenuContainer );
+					const parentItem = ref.closest( '.has-child' );
+					if ( parentItem ) {
+						const submenuContainer = parentItem.querySelector(
+							'.wp-block-navigation__submenu-container'
+						);
+						checkSubmenuOverflow( submenuContainer );
+					}
 				}
 			},
 

@@ -524,6 +524,145 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 	} );
 
+	test.describe( 'Submenu overflow detection', () => {
+		test.describe( 'Hover mode', () => {
+			test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+				await admin.visitSiteEditor( {
+					postId: 'emptytheme//header',
+					postType: 'wp_template_part',
+					canvas: 'edit',
+				} );
+				await requestUtils.createNavigationMenu( {
+					title: 'Overflow test menu',
+					content: `
+						<!-- wp:navigation-link {"label":"Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- wp:navigation-submenu {"label":"Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+							<!-- wp:navigation-submenu {"label":"Nested Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+								<!-- wp:navigation-link {"label":"Deep Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+							<!-- /wp:navigation-submenu -->
+						<!-- /wp:navigation-submenu -->
+						`,
+				} );
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: { overlayMenu: 'off' },
+				} );
+				await editor.saveSiteEditorEntities( {
+					isOnlyCurrentEntityDirty: true,
+				} );
+			} );
+
+			test( 'adds horizontal-opening class on nested submenu hover when it fits viewport', async ( {
+				page,
+			} ) => {
+				await page.goto( '/' );
+				const topLevelParent = page.locator( '.has-child' ).first();
+
+				// Hover the top-level item to open its submenu
+				await topLevelParent.hover();
+
+				// Top-level items never get the class (they always open downward)
+				await expect( topLevelParent ).not.toHaveClass(
+					/submenu-opens-on-horizontal-hover/
+				);
+
+				// Now hover the nested submenu item inside the dropdown
+				const nestedParent = topLevelParent
+					.locator( '.has-child' )
+					.first();
+				await nestedParent.hover();
+
+				// Nested item should get the class since viewport (1280px) is wide enough
+				await expect( nestedParent ).toHaveClass(
+					/submenu-opens-on-horizontal-hover/
+				);
+			} );
+
+			test( 'does not add horizontal-opening class on small screens', async ( {
+				page,
+			} ) => {
+				await page.setViewportSize( { width: 600, height: 800 } );
+				await page.goto( '/' );
+
+				const topLevelParent = page.locator( '.has-child' ).first();
+
+				// Hover the top-level item
+				await topLevelParent.hover();
+
+				const nestedParent = topLevelParent
+					.locator( '.has-child' )
+					.first();
+				await nestedParent.hover();
+
+				// Class should NOT be added on screens below the 782px breakpoint
+				await expect( nestedParent ).not.toHaveClass(
+					/submenu-opens-on-horizontal-hover/
+				);
+			} );
+		} );
+
+		test.describe( 'Click mode', () => {
+			test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+				await admin.visitSiteEditor( {
+					postId: 'emptytheme//header',
+					postType: 'wp_template_part',
+					canvas: 'edit',
+				} );
+				await requestUtils.createNavigationMenu( {
+					title: 'Click overflow test menu',
+					content: `
+						<!-- wp:navigation-link {"label":"Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- wp:navigation-submenu {"label":"Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+							<!-- wp:navigation-submenu {"label":"Nested Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+								<!-- wp:navigation-link {"label":"Deep Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+							<!-- /wp:navigation-submenu -->
+						<!-- /wp:navigation-submenu -->
+						`,
+				} );
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: {
+						overlayMenu: 'off',
+						submenuVisibility: 'click',
+					},
+				} );
+				await editor.saveSiteEditorEntities( {
+					isOnlyCurrentEntityDirty: true,
+				} );
+			} );
+
+			test( 'adds horizontal-opening class on nested submenu click when it fits viewport', async ( {
+				page,
+			} ) => {
+				await page.goto( '/' );
+
+				const topLevelButton = page.getByRole( 'button', {
+					name: 'Submenu',
+				} );
+
+				// Open the top-level submenu
+				await topLevelButton.click();
+
+				// Click the nested submenu button inside the dropdown
+				const nestedButton = page.getByRole( 'button', {
+					name: 'Nested Submenu',
+				} );
+				await nestedButton.click();
+
+				// The nested .has-child should get the class
+				const nestedParent = page
+					.locator( '.has-child' )
+					.filter( {
+						has: page.locator( 'text="Nested Submenu"' ),
+					} )
+					.first();
+				await expect( nestedParent ).toHaveClass(
+					/submenu-opens-on-horizontal-hover/
+				);
+			} );
+		} );
+	} );
+
 	test.describe( 'Legacy openSubmenusOnClick backward compatibility', () => {
 		test( 'Should render and migrate legacy openSubmenusOnClick blocks', async ( {
 			page,
