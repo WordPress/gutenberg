@@ -14,13 +14,8 @@ import type {
 	PostSaveEvent,
 	YDocDebugData,
 } from '../awareness/types';
-import type { SelectionState } from '../types';
+import type { SelectionState, ResolvedSelection } from '../types';
 import type { PostEditorAwareness } from '../awareness/post-editor-awareness';
-
-interface ResolvedSelection {
-	textIndex: number | null;
-	localClientId: string | null;
-}
 
 interface AwarenessState {
 	activeCollaborators: ActiveCollaborator[];

@@ -69,9 +69,205 @@ test.describe( 'Connectors', () => {
 		// Verify the plugin directory search link is present.
 		await expect(
 			page.getByRole( 'link', {
-				name: 'the plugin directory',
+				name: 'search the plugin directory',
 			} )
-		).toHaveAttribute( 'href', 'plugin-install.php' );
+		).toHaveAttribute(
+			'href',
+			'plugin-install.php?s=connector&tab=search&type=tag'
+		);
+	} );
+
+	test.describe( 'Test provider setup flow', () => {
+		const PLUGIN_SLUG = 'gutenberg-test-connectors-provider';
+		const VALID_API_KEY = 'test-api-key-123';
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin( PLUGIN_SLUG );
+		} );
+
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.rest( {
+				path: '/wp/v2/settings',
+				method: 'POST',
+				data: {
+					connectors_ai_test_provider_api_key: '',
+				},
+			} );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin( PLUGIN_SLUG );
+		} );
+
+		test( 'should display the test provider with a "Set up" button', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			// Verify the test provider card is visible.
+			await expect(
+				page.getByText( 'Test Provider', { exact: true } )
+			).toBeVisible();
+			await expect(
+				page.getByText( 'A test AI provider for E2E testing.' )
+			).toBeVisible();
+
+			// The test provider has no plugin dependency so it should show "Set up".
+			await expect(
+				page.getByRole( 'button', { name: 'Set up' } )
+			).toBeVisible();
+		} );
+
+		test( 'should expand the API key form when clicking "Set up"', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			const setupButton = page.getByRole( 'button', {
+				name: 'Set up',
+			} );
+			await setupButton.click();
+
+			// The form should now be visible with an API Key field and Save button.
+			await expect(
+				page.getByPlaceholder( 'Enter your API key' )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'button', { name: 'Save' } )
+			).toBeVisible();
+
+			// The button label should change to "Cancel".
+			await expect(
+				page.getByRole( 'button', { name: 'Cancel' } )
+			).toBeVisible();
+		} );
+
+		test( 'should reject an invalid API key', async ( { page, admin } ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			await page.getByRole( 'button', { name: 'Set up' } ).click();
+
+			const apiKeyInput = page.getByPlaceholder( 'Enter your API key' );
+			await apiKeyInput.fill( 'wrong-key' );
+			await page.getByRole( 'button', { name: 'Save' } ).click();
+
+			// Should show an error message.
+			await expect(
+				page.getByText( 'It was not possible to connect' )
+			).toBeVisible();
+		} );
+
+		test( 'should accept a valid API key and show "Connected"', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			await page.getByRole( 'button', { name: 'Set up' } ).click();
+
+			const apiKeyInput = page.getByPlaceholder( 'Enter your API key' );
+			await apiKeyInput.fill( VALID_API_KEY );
+			await page.getByRole( 'button', { name: 'Save' } ).click();
+
+			// The form should close and show the "Connected" badge.
+			await expect( page.getByText( 'Connected' ) ).toBeVisible();
+
+			// The button should now show "Edit" instead of "Set up".
+			await expect(
+				page.getByRole( 'button', { name: 'Edit' } )
+			).toBeVisible();
+		} );
+	} );
+
+	test( 'should display the AI plugin callout banner with install button', async ( {
+		page,
+		admin,
+	} ) => {
+		await admin.visitAdminPage( SETTINGS_PAGE_PATH, CONNECTORS_PAGE_QUERY );
+
+		const banner = page.locator( '.ai-plugin-callout' );
+		await expect( banner ).toBeVisible();
+
+		// Verify the banner message mentions the AI plugin.
+		await expect( banner.getByText( 'AI plugin' ) ).toBeVisible();
+
+		// Verify the Install button is present.
+		await expect(
+			banner.getByRole( 'button', { name: 'Install AI Experiments' } )
+		).toBeVisible();
+
+		// Verify the Learn more link is present.
+		await expect(
+			banner.getByRole( 'link', { name: 'Learn more' } )
+		).toBeVisible();
+	} );
+
+	test.describe( 'Empty state', () => {
+		const PLUGIN_SLUG = 'gutenberg-test-connectors-empty-state';
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin( PLUGIN_SLUG );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin( PLUGIN_SLUG );
+		} );
+
+		test( 'should display an empty state when no connectors are registered', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			// Verify the empty state heading is visible.
+			await expect(
+				page.getByRole( 'heading', { name: 'No connectors yet' } )
+			).toBeVisible();
+
+			// Verify the explanatory description is visible.
+			await expect(
+				page.getByText(
+					'Connectors appear here when you install plugins that use external services.'
+				)
+			).toBeVisible();
+
+			// Verify the "Learn more" button links to plugin directory.
+			const learnMoreButton = page.getByRole( 'link', {
+				name: 'Learn more',
+			} );
+			await expect( learnMoreButton ).toBeVisible();
+			await expect( learnMoreButton ).toHaveAttribute(
+				'href',
+				'plugin-install.php'
+			);
+
+			// Verify the AI plugin callout banner is not shown.
+			await expect( page.locator( '.ai-plugin-callout' ) ).toBeHidden();
+
+			// Verify none of the default connector cards are shown.
+			for ( const { slug } of CONNECTORS ) {
+				await expect(
+					page.locator( `.connector-item--${ slug }` )
+				).toBeHidden();
+			}
+		} );
 	} );
 
 	test.describe( 'Connectors page capability checks', () => {
@@ -114,6 +310,11 @@ test.describe( 'Connectors', () => {
 					CONNECTORS_PAGE_QUERY
 				);
 
+				// AI plugin callout banner should be hidden when user lacks permissions.
+				await expect(
+					page.locator( '.ai-plugin-callout' )
+				).toBeHidden();
+
 				for ( const { slug } of CONNECTORS ) {
 					const card = page.locator( `.connector-item--${ slug }` );
 					await expect( card ).toBeVisible();
@@ -128,7 +329,7 @@ test.describe( 'Connectors', () => {
 				// Plugin directory link should be hidden.
 				await expect(
 					page.getByRole( 'link', {
-						name: 'the plugin directory',
+						name: 'search the plugin directory',
 					} )
 				).toBeHidden();
 			} );

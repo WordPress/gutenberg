@@ -86,7 +86,7 @@ import {
 	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 } from '../constants';
 
-const { isIsolatedEditorKey } = unlock( blockEditorPrivateApis );
+const { isNavigationPostEditorKey } = unlock( blockEditorPrivateApis );
 
 /**
  * Component that renders the Add page button for the Navigation block.
@@ -330,15 +330,17 @@ function Navigation( {
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const settings = getSettings();
+
 		return {
 			isPreviewMode: settings.isPreviewMode,
 			onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
 			// Needed to construct the template part ID for the overlay preview.
 			currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
-			// In preview mode or isolated editor, always show navigation expanded (no hamburger)
-			// so users can see and interact with all menu items.
+			// When editing a navigation post directly in an isolated editor,
+			// always show navigation expanded (no hamburger) so users can see
+			// and interact with all menu items.
 			editorDisabledResponsive:
-				settings.isPreviewMode || !! settings?.[ isIsolatedEditorKey ],
+				!! settings?.[ isNavigationPostEditorKey ],
 		};
 	}, [] );
 	const hasAlreadyRendered = isPreviewMode ? false : recursionDetected;
