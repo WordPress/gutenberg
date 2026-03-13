@@ -20,10 +20,6 @@ import {
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '..' );
 
-const ignored = [
-	// Nothing ignored for now
-];
-
 /*
  * This script checks licenses for production dependencies of packages that are
  * shipped with WordPress (those with wpScript or wpScriptModuleExports in package.json).
@@ -116,6 +112,5 @@ function getDependenciesToProcess() {
 const dependenciesToProcess = getDependenciesToProcess();
 
 checkDeps( dependenciesToProcess, {
-	ignored,
 	gpl2: true,
 } );
