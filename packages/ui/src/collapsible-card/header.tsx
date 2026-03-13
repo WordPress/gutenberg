@@ -1,11 +1,11 @@
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { chevronDown, chevronUp } from '@wordpress/icons';
+import { chevronDown } from '@wordpress/icons';
 import * as Card from '../card';
 import * as Collapsible from '../collapsible';
-import { IconButton } from '../icon-button';
+import { Icon } from '../icon';
 import styles from './style.module.css';
+import focusStyles from '../utils/css/focus.module.css';
 import type { HeaderProps } from './types';
 
 /**
@@ -33,37 +33,18 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 					/>
 				}
 				nativeButton={ false }
-				tabIndex={ -1 }
 			>
 				<div className={ styles[ 'header-content' ] }>{ children }</div>
 				<div className={ styles[ 'header-trigger-wrapper' ] }>
-					{ /* onClick/onKeyDown stop events from bubbling to the
-					     outer Collapsible.Trigger (the header), which would
-					     cause a double-toggle. */ }
-					<Collapsible.Trigger
-						render={ ( props ) => (
-							<IconButton
-								{ ...props }
-								label={ __( 'Expand or collapse card' ) }
-								// The Collapsible wrapper's `render` prop
-								// uses a single-argument callback (via the
-								// ComponentProps utility), so Base UI's
-								// second `state` argument isn't available
-								// here. We derive the open state from
-								// `aria-expanded` instead of `state.open`.
-								icon={
-									props[ 'aria-expanded' ] === true
-										? chevronUp
-										: chevronDown
-								}
-								variant="minimal"
-								tone="neutral"
-								size="compact"
-							/>
+					<Icon
+						icon={ chevronDown }
+						className={ clsx(
+							styles[ 'header-trigger' ],
+							// While the interactive trigger element is the whole header,
+							// the focus ring will be displayed only on the icon to visually
+							// emulate it being the button.
+							focusStyles[ 'outset-ring--focus-parent-visible' ]
 						) }
-						className={ styles[ 'header-trigger' ] }
-						onClick={ ( event ) => event.stopPropagation() }
-						onKeyDown={ ( event ) => event.stopPropagation() }
 					/>
 				</div>
 			</Collapsible.Trigger>
