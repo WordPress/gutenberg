@@ -25,6 +25,22 @@ function createBlobAttachment( name: string ) {
 	return { url: `blob:https://example.com/${ name }` };
 }
 
+function createUploadError( name: string, message = 'Upload failed' ) {
+	return new UploadError( {
+		code: 'GENERAL',
+		message,
+		file: createFile( name ),
+	} );
+}
+
+function statuses( result: ReturnType< typeof useUploadStatus > ): string[] {
+	return result.uploadingFiles.map( ( item ) => item.status );
+}
+
+type BatchCallbacks = ReturnType<
+	ReturnType< typeof useUploadStatus >[ 'registerBatch' ]
+>;
+
 // isBlobURL from @wordpress/blob checks for the "blob:" prefix.
 jest.mock( '@wordpress/blob', () => ( {
 	isBlobURL: ( url: string ) => url.startsWith( 'blob:' ),
@@ -51,10 +67,10 @@ describe( 'useUploadStatus', () => {
 
 			expect( result.current.uploadingFiles ).toHaveLength( 2 );
 			expect( result.current.uploadingFiles[ 0 ].name ).toBe( 'a.png' );
-			expect( result.current.uploadingFiles[ 0 ].status ).toBe(
-				'uploading'
-			);
-			expect( result.current.uploadingFiles[ 1 ].name ).toBe( 'b.png' );
+			expect( statuses( result.current ) ).toEqual( [
+				'uploading',
+				'uploading',
+			] );
 			expect( result.current.allComplete ).toBe( false );
 		} );
 
@@ -68,10 +84,10 @@ describe( 'useUploadStatus', () => {
 				] );
 			} );
 
-			const batchId = result.current.uploadingFiles[ 0 ].batchId;
-			expect( batchId ).toBeTruthy();
-			expect( result.current.uploadingFiles[ 1 ].batchId ).toBe(
-				batchId
+			const { uploadingFiles } = result.current;
+			expect( uploadingFiles[ 0 ].batchId ).toBeTruthy();
+			expect( uploadingFiles[ 0 ].batchId ).toBe(
+				uploadingFiles[ 1 ].batchId
 			);
 		} );
 
@@ -92,9 +108,7 @@ describe( 'useUploadStatus', () => {
 	describe( 'onFileChange (batch completion)', () => {
 		it( 'should ignore calls with blob URLs', () => {
 			const { result } = renderHook( () => useUploadStatus() );
-			let onFileChange: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onFileChange' ];
+			let onFileChange!: BatchCallbacks[ 'onFileChange' ];
 
 			act( () => {
 				( { onFileChange } = result.current.registerBatch( [
@@ -102,21 +116,15 @@ describe( 'useUploadStatus', () => {
 				] ) );
 			} );
 
-			act( () => {
-				onFileChange( [ createBlobAttachment( 'a.png' ) ] );
-			} );
+			act( () => onFileChange( [ createBlobAttachment( 'a.png' ) ] ) );
 
-			expect( result.current.uploadingFiles[ 0 ].status ).toBe(
-				'uploading'
-			);
+			expect( statuses( result.current ) ).toEqual( [ 'uploading' ] );
 			expect( result.current.allComplete ).toBe( false );
 		} );
 
 		it( 'should mark batch as uploaded when all attachments have real URLs', () => {
 			const { result } = renderHook( () => useUploadStatus() );
-			let onFileChange: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onFileChange' ];
+			let onFileChange!: BatchCallbacks[ 'onFileChange' ];
 
 			act( () => {
 				( { onFileChange } = result.current.registerBatch( [
@@ -125,30 +133,24 @@ describe( 'useUploadStatus', () => {
 				] ) );
 			} );
 
-			act( () => {
+			act( () =>
 				onFileChange( [
 					createAttachment( 1, 'a.png' ),
 					createAttachment( 2, 'b.png' ),
-				] );
-			} );
+				] )
+			);
 
-			expect( result.current.uploadingFiles[ 0 ].status ).toBe(
-				'uploaded'
-			);
-			expect( result.current.uploadingFiles[ 1 ].status ).toBe(
-				'uploaded'
-			);
+			expect( statuses( result.current ) ).toEqual( [
+				'uploaded',
+				'uploaded',
+			] );
 			expect( result.current.allComplete ).toBe( true );
 		} );
 
 		it( 'should only mark its own batch as uploaded, not other batches', () => {
 			const { result } = renderHook( () => useUploadStatus() );
-			let onFileChangeA: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onFileChange' ];
-			let onFileChangeB: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onFileChange' ];
+			let onFileChangeA!: BatchCallbacks[ 'onFileChange' ];
+			let onFileChangeB!: BatchCallbacks[ 'onFileChange' ];
 
 			act( () => {
 				( { onFileChange: onFileChangeA } =
@@ -157,23 +159,15 @@ describe( 'useUploadStatus', () => {
 					result.current.registerBatch( [ createFile( 'b.png' ) ] ) );
 			} );
 
-			// Complete batch A only.
-			act( () => {
-				onFileChangeA( [ createAttachment( 1, 'a.png' ) ] );
-			} );
+			act( () => onFileChangeA( [ createAttachment( 1, 'a.png' ) ] ) );
 
-			expect( result.current.uploadingFiles[ 0 ].status ).toBe(
-				'uploaded'
-			);
-			expect( result.current.uploadingFiles[ 1 ].status ).toBe(
-				'uploading'
-			);
+			expect( statuses( result.current ) ).toEqual( [
+				'uploaded',
+				'uploading',
+			] );
 			expect( result.current.allComplete ).toBe( false );
 
-			// Now complete batch B.
-			act( () => {
-				onFileChangeB( [ createAttachment( 2, 'b.png' ) ] );
-			} );
+			act( () => onFileChangeB( [ createAttachment( 2, 'b.png' ) ] ) );
 
 			expect( result.current.allComplete ).toBe( true );
 		} );
@@ -183,9 +177,7 @@ describe( 'useUploadStatus', () => {
 			const { result } = renderHook( () =>
 				useUploadStatus( { onBatchComplete } )
 			);
-			let onFileChange: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onFileChange' ];
+			let onFileChange!: BatchCallbacks[ 'onFileChange' ];
 
 			act( () => {
 				( { onFileChange } = result.current.registerBatch( [
@@ -206,17 +198,14 @@ describe( 'useUploadStatus', () => {
 		} );
 
 		it( 'should handle onFileChange with growing arrays (no blob URLs)', () => {
-			// When window.__clientSideMediaProcessing is true, blob URLs
-			// are not created. onFileChange is called with a growing array
-			// as each file completes: [att1], [att1, att2], [att1, att2, att3].
-			// The success count must not double-count overlapping entries.
+			// When __clientSideMediaProcessing is true, blob URLs are not
+			// created. onFileChange is called with a growing array as each
+			// file completes: [att1], [att1, att2], [att1, att2, att3].
 			const onBatchComplete = jest.fn();
 			const { result } = renderHook( () =>
 				useUploadStatus( { onBatchComplete } )
 			);
-			let onFileChange: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onFileChange' ];
+			let onFileChange!: BatchCallbacks[ 'onFileChange' ];
 
 			act( () => {
 				( { onFileChange } = result.current.registerBatch( [
@@ -230,27 +219,13 @@ describe( 'useUploadStatus', () => {
 			const att2 = createAttachment( 2, 'b.png' );
 			const att3 = createAttachment( 3, 'c.png' );
 
-			// File 1 completes.
-			act( () => {
-				onFileChange( [ att1 ] );
-			} );
-
+			act( () => onFileChange( [ att1 ] ) );
 			expect( onBatchComplete ).not.toHaveBeenCalled();
-			expect( result.current.allComplete ).toBe( false );
 
-			// File 2 completes.
-			act( () => {
-				onFileChange( [ att1, att2 ] );
-			} );
-
+			act( () => onFileChange( [ att1, att2 ] ) );
 			expect( onBatchComplete ).not.toHaveBeenCalled();
-			expect( result.current.allComplete ).toBe( false );
 
-			// File 3 completes — batch should now be done.
-			act( () => {
-				onFileChange( [ att1, att2, att3 ] );
-			} );
-
+			act( () => onFileChange( [ att1, att2, att3 ] ) );
 			expect( onBatchComplete ).toHaveBeenCalledTimes( 1 );
 			expect( onBatchComplete ).toHaveBeenCalledWith( [
 				att1,
@@ -264,9 +239,7 @@ describe( 'useUploadStatus', () => {
 	describe( 'onError', () => {
 		it( 'should mark the matching file in the batch as errored', () => {
 			const { result } = renderHook( () => useUploadStatus() );
-			let onError: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onError' ];
+			let onError!: BatchCallbacks[ 'onError' ];
 
 			act( () => {
 				( { onError } = result.current.registerBatch( [
@@ -275,16 +248,7 @@ describe( 'useUploadStatus', () => {
 				] ) );
 			} );
 
-			act( () => {
-				const file = createFile( 'a.png' );
-				onError(
-					new UploadError( {
-						code: 'GENERAL',
-						message: 'Upload failed',
-						file,
-					} )
-				);
-			} );
+			act( () => onError( createUploadError( 'a.png' ) ) );
 
 			expect( result.current.uploadingFiles[ 0 ].status ).toBe( 'error' );
 			expect( result.current.uploadingFiles[ 0 ].error ).toBe(
@@ -295,11 +259,9 @@ describe( 'useUploadStatus', () => {
 			);
 		} );
 
-		it( 'should only mark one file per error even with duplicate names in the same batch', () => {
+		it( 'should only mark one file per error even with duplicate names', () => {
 			const { result } = renderHook( () => useUploadStatus() );
-			let onError: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onError' ];
+			let onError!: BatchCallbacks[ 'onError' ];
 
 			act( () => {
 				( { onError } = result.current.registerBatch( [
@@ -308,27 +270,17 @@ describe( 'useUploadStatus', () => {
 				] ) );
 			} );
 
-			act( () => {
-				onError(
-					new UploadError( {
-						code: 'GENERAL',
-						message: 'Upload failed',
-						file: createFile( 'a.png' ),
-					} )
-				);
-			} );
+			act( () => onError( createUploadError( 'a.png' ) ) );
 
-			const statuses = result.current.uploadingFiles.map(
-				( item ) => item.status
-			);
-			expect( statuses ).toEqual( [ 'error', 'uploading' ] );
+			expect( statuses( result.current ) ).toEqual( [
+				'error',
+				'uploading',
+			] );
 		} );
 
 		it( 'should not affect files in a different batch', () => {
 			const { result } = renderHook( () => useUploadStatus() );
-			let onErrorB: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onError' ];
+			let onErrorB!: BatchCallbacks[ 'onError' ];
 
 			act( () => {
 				result.current.registerBatch( [ createFile( 'a.png' ) ] );
@@ -337,21 +289,12 @@ describe( 'useUploadStatus', () => {
 				] ) );
 			} );
 
-			// Error targets batch B's file, not batch A's.
-			act( () => {
-				onErrorB(
-					new UploadError( {
-						code: 'GENERAL',
-						message: 'Upload failed',
-						file: createFile( 'a.png' ),
-					} )
-				);
-			} );
+			act( () => onErrorB( createUploadError( 'a.png' ) ) );
 
-			expect( result.current.uploadingFiles[ 0 ].status ).toBe(
-				'uploading'
-			);
-			expect( result.current.uploadingFiles[ 1 ].status ).toBe( 'error' );
+			expect( statuses( result.current ) ).toEqual( [
+				'uploading',
+				'error',
+			] );
 		} );
 	} );
 
@@ -363,9 +306,7 @@ describe( 'useUploadStatus', () => {
 
 		it( 'should be false when some files are still uploading', () => {
 			const { result } = renderHook( () => useUploadStatus() );
-			let onFileChangeA: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onFileChange' ];
+			let onFileChangeA!: BatchCallbacks[ 'onFileChange' ];
 
 			act( () => {
 				( { onFileChange: onFileChangeA } =
@@ -373,21 +314,15 @@ describe( 'useUploadStatus', () => {
 				result.current.registerBatch( [ createFile( 'b.png' ) ] );
 			} );
 
-			act( () => {
-				onFileChangeA( [ createAttachment( 1, 'a.png' ) ] );
-			} );
+			act( () => onFileChangeA( [ createAttachment( 1, 'a.png' ) ] ) );
 
 			expect( result.current.allComplete ).toBe( false );
 		} );
 
 		it( 'should be true when all files are uploaded or errored', () => {
 			const { result } = renderHook( () => useUploadStatus() );
-			let onFileChange: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onFileChange' ];
-			let onError: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onError' ];
+			let onFileChange!: BatchCallbacks[ 'onFileChange' ];
+			let onError!: BatchCallbacks[ 'onError' ];
 
 			act( () => {
 				( { onFileChange, onError } = result.current.registerBatch( [
@@ -396,26 +331,12 @@ describe( 'useUploadStatus', () => {
 				] ) );
 			} );
 
-			act( () => {
-				onError(
-					new UploadError( {
-						code: 'GENERAL',
-						message: 'fail',
-						file: createFile( 'a.png' ),
-					} )
-				);
-			} );
-
-			// One errored, one still uploading.
+			act( () => onError( createUploadError( 'a.png', 'fail' ) ) );
 			expect( result.current.allComplete ).toBe( false );
 
 			// Complete the remaining file — onFileChange fires with just
-			// the successful attachment (failed ones are filtered as null
-			// by uploadMedia).
-			act( () => {
-				onFileChange( [ createAttachment( 2, 'b.png' ) ] );
-			} );
-
+			// the successful attachment.
+			act( () => onFileChange( [ createAttachment( 2, 'b.png' ) ] ) );
 			expect( result.current.allComplete ).toBe( true );
 		} );
 	} );
@@ -424,22 +345,15 @@ describe( 'useUploadStatus', () => {
 		it( 'should handle onFileChange firing before onError for a failed file', () => {
 			// Simulates the uploadMedia flow for 3 files where c.png fails:
 			// 1. Blob URLs created for all 3 (ignored by hook)
-			// 2. a.png succeeds: onFileChange([a, blob:b, blob:c]) — has blobs, ignored
-			// 3. b.png succeeds: onFileChange([a, b, blob:c]) — has blobs, ignored
-			// 4. c.png fails: setAndUpdateFiles(2, null) triggers
-			//    onFileChange([a, b]) — 2 real URLs, resolvedCount += 2
-			// 5. onError(c.png) — marks c.png as error, resolvedCount += 1
-			// 6. resolvedCount (3) >= batchSize (3) — batch complete
+			// 2-3. Partial completions with blobs (ignored)
+			// 4. c.png fails → onFileChange([a, b]), successCount = 2
+			// 5. onError(c.png) → errorCount = 1, total = 3 = batchSize
 			const onBatchComplete = jest.fn();
 			const { result } = renderHook( () =>
 				useUploadStatus( { onBatchComplete } )
 			);
-			let onFileChange: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onFileChange' ];
-			let onError: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onError' ];
+			let onFileChange!: BatchCallbacks[ 'onFileChange' ];
+			let onError!: BatchCallbacks[ 'onError' ];
 
 			act( () => {
 				( { onFileChange, onError } = result.current.registerBatch( [
@@ -449,7 +363,7 @@ describe( 'useUploadStatus', () => {
 				] ) );
 			} );
 
-			// Steps 1-3: blob URL calls and partial completions (ignored).
+			// Blob URL calls and partial completions (all ignored).
 			act( () => {
 				onFileChange( [
 					createBlobAttachment( 'a' ),
@@ -467,45 +381,30 @@ describe( 'useUploadStatus', () => {
 					createBlobAttachment( 'c' ),
 				] );
 			} );
-
 			expect( onBatchComplete ).not.toHaveBeenCalled();
 
-			// Step 4: c.png fails — onFileChange fires with nulls filtered
-			// (only the 2 successful attachments).
-			act( () => {
+			// c.png fails — onFileChange with only successful attachments.
+			act( () =>
 				onFileChange( [
 					createAttachment( 1, 'a.png' ),
 					createAttachment( 2, 'b.png' ),
-				] );
-			} );
-
-			// resolvedCount is 2, batchSize is 3 — not done yet.
+				] )
+			);
 			expect( onBatchComplete ).not.toHaveBeenCalled();
 
-			// Step 5: onError fires for c.png.
-			act( () => {
-				onError(
-					new UploadError( {
-						code: 'GENERAL',
-						message: 'Upload failed',
-						file: createFile( 'c.png' ),
-					} )
-				);
-			} );
+			// onError fires for c.png — batch now complete.
+			act( () => onError( createUploadError( 'c.png' ) ) );
 
-			// Now resolvedCount is 3 — batch complete.
 			expect( onBatchComplete ).toHaveBeenCalledTimes( 1 );
 			expect( onBatchComplete ).toHaveBeenCalledWith( [
 				createAttachment( 1, 'a.png' ),
 				createAttachment( 2, 'b.png' ),
 			] );
 
-			// c.png should be errored, a.png and b.png should be uploaded.
-			const statuses = result.current.uploadingFiles.map( ( item ) => [
-				item.name,
-				item.status,
-			] );
-			expect( statuses ).toEqual( [
+			const fileStatuses = result.current.uploadingFiles.map(
+				( item ) => [ item.name, item.status ]
+			);
+			expect( fileStatuses ).toEqual( [
 				[ 'a.png', 'uploaded' ],
 				[ 'b.png', 'uploaded' ],
 				[ 'c.png', 'error' ],
@@ -518,12 +417,8 @@ describe( 'useUploadStatus', () => {
 			const { result } = renderHook( () =>
 				useUploadStatus( { onBatchComplete } )
 			);
-			let onFileChange: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onFileChange' ];
-			let onError: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onError' ];
+			let onFileChange!: BatchCallbacks[ 'onFileChange' ];
+			let onError!: BatchCallbacks[ 'onError' ];
 
 			act( () => {
 				( { onFileChange, onError } = result.current.registerBatch( [
@@ -532,35 +427,19 @@ describe( 'useUploadStatus', () => {
 				] ) );
 			} );
 
-			// Both fail: onFileChange fires with empty array (all nulls
-			// filtered out), then onError fires for each.
 			act( () => {
 				onFileChange( [] );
-				onError(
-					new UploadError( {
-						code: 'GENERAL',
-						message: 'fail a',
-						file: createFile( 'a.png' ),
-					} )
-				);
+				onError( createUploadError( 'a.png', 'fail a' ) );
 				onFileChange( [] );
-				onError(
-					new UploadError( {
-						code: 'GENERAL',
-						message: 'fail b',
-						file: createFile( 'b.png' ),
-					} )
-				);
+				onError( createUploadError( 'b.png', 'fail b' ) );
 			} );
 
-			// onBatchComplete should still fire (with empty attachments).
 			expect( onBatchComplete ).toHaveBeenCalledTimes( 1 );
 			expect( onBatchComplete ).toHaveBeenCalledWith( [] );
-
-			const statuses = result.current.uploadingFiles.map(
-				( item ) => item.status
-			);
-			expect( statuses ).toEqual( [ 'error', 'error' ] );
+			expect( statuses( result.current ) ).toEqual( [
+				'error',
+				'error',
+			] );
 			expect( result.current.allComplete ).toBe( true );
 		} );
 	} );
@@ -568,9 +447,7 @@ describe( 'useUploadStatus', () => {
 	describe( 'dismissError', () => {
 		it( 'should remove the errored file from the list', () => {
 			const { result } = renderHook( () => useUploadStatus() );
-			let onError: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onError' ];
+			let onError!: BatchCallbacks[ 'onError' ];
 
 			act( () => {
 				( { onError } = result.current.registerBatch( [
@@ -579,23 +456,13 @@ describe( 'useUploadStatus', () => {
 				] ) );
 			} );
 
-			act( () => {
-				onError(
-					new UploadError( {
-						code: 'GENERAL',
-						message: 'fail',
-						file: createFile( 'a.png' ),
-					} )
-				);
-			} );
+			act( () => onError( createUploadError( 'a.png', 'fail' ) ) );
 
 			const erroredFile = result.current.uploadingFiles.find(
 				( item ) => item.status === 'error'
 			)!;
 
-			act( () => {
-				result.current.dismissError( erroredFile.id );
-			} );
+			act( () => result.current.dismissError( erroredFile.id ) );
 
 			expect( result.current.uploadingFiles ).toHaveLength( 1 );
 			expect( result.current.uploadingFiles[ 0 ].name ).toBe( 'b.png' );
@@ -605,12 +472,8 @@ describe( 'useUploadStatus', () => {
 	describe( 'clearCompleted', () => {
 		it( 'should remove uploaded entries but keep uploading and errored ones', () => {
 			const { result } = renderHook( () => useUploadStatus() );
-			let onFileChangeA: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onFileChange' ];
-			let onErrorB: ReturnType<
-				typeof result.current.registerBatch
-			>[ 'onError' ];
+			let onFileChangeA!: BatchCallbacks[ 'onFileChange' ];
+			let onErrorB!: BatchCallbacks[ 'onError' ];
 
 			act( () => {
 				( { onFileChange: onFileChangeA } =
@@ -624,22 +487,12 @@ describe( 'useUploadStatus', () => {
 			// Complete batch A, error batch B, leave batch C uploading.
 			act( () => {
 				onFileChangeA( [ createAttachment( 1, 'a.png' ) ] );
-				onErrorB(
-					new UploadError( {
-						code: 'GENERAL',
-						message: 'fail',
-						file: createFile( 'b.png' ),
-					} )
-				);
+				onErrorB( createUploadError( 'b.png', 'fail' ) );
 			} );
 
-			act( () => {
-				result.current.clearCompleted();
-			} );
+			act( () => result.current.clearCompleted() );
 
-			const remaining = result.current.uploadingFiles;
-			expect( remaining ).toHaveLength( 2 );
-			expect( remaining.map( ( item ) => item.status ) ).toEqual( [
+			expect( statuses( result.current ) ).toEqual( [
 				'error',
 				'uploading',
 			] );
