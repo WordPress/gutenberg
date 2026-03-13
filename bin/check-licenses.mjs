@@ -12,8 +12,7 @@ import { fileURLToPath } from 'url';
  */
 import {
 	checkDeps,
-	getLicenses,
-	resolvePackagePath,
+	collectDeps,
 	readPackageJson,
 } from '../packages/scripts/utils/license.js';
 
@@ -31,86 +30,25 @@ const ROOT_DIR = path.resolve( __dirname, '..' );
  * 4. Reading the license from each resolved package
  */
 
-/**
- * Get all production dependencies for packages with wpScript or wpScriptModuleExports.
- *
- * @return {Array} Array of dependency objects with name, version, path, and license
- */
-function getDependenciesToProcess() {
-	const packagesDir = path.join( ROOT_DIR, 'packages' );
-	const licenses = getLicenses( true );
-	const depsMap = new Map();
-	const visited = new Set();
+const packagesDir = path.join( ROOT_DIR, 'packages' );
+const depsMap = new Map();
+const visited = new Set();
 
-	/**
-	 * Recursively collect production dependencies.
-	 *
-	 * @param {Object} deps    - Dependencies object from package.json
-	 * @param {string} fromDir - Directory to resolve from
-	 */
-	function collectDeps( deps, fromDir ) {
-		if ( ! deps ) {
-			return;
-		}
+// Find all workspace packages with wpScript or wpScriptModuleExports
+for ( const dir of fs.readdirSync( packagesDir ) ) {
+	const pkgDir = path.join( packagesDir, dir );
+	const pkgJson = readPackageJson( pkgDir );
 
-		for ( const depName of Object.keys( deps ) ) {
-			// Skip workspace packages (they start with @wordpress/)
-			if ( depName.startsWith( '@wordpress/' ) ) {
-				continue;
-			}
-
-			const depPath = resolvePackagePath( depName, fromDir );
-			if ( ! depPath ) {
-				continue;
-			}
-
-			// Avoid infinite loops
-			if ( visited.has( depPath ) ) {
-				continue;
-			}
-			visited.add( depPath );
-
-			const depPkgJson = readPackageJson( depPath );
-			if ( ! depPkgJson ) {
-				continue;
-			}
-
-			const key = `${ depName }@${ depPkgJson.version }`;
-			if ( ! depsMap.has( key ) ) {
-				const license = depPkgJson.license;
-
-				// Skip if license is in the allowed list
-				if ( ! license || ! licenses.includes( license ) ) {
-					depsMap.set( key, {
-						name: depName,
-						version: depPkgJson.version,
-						path: depPath,
-						license,
-					} );
-				}
-			}
-
-			// Recursively check this package's dependencies
-			collectDeps( depPkgJson.dependencies, depPath );
-		}
+	if ( pkgJson?.wpScript || pkgJson?.wpScriptModuleExports ) {
+		collectDeps( pkgJson.dependencies, pkgDir, {
+			gpl2: true,
+			depsMap,
+			visited,
+			shouldSkip: ( depName ) => depName.startsWith( '@wordpress/' ),
+		} );
 	}
-
-	// Find all workspace packages with wpScript or wpScriptModuleExports
-	for ( const dir of fs.readdirSync( packagesDir ) ) {
-		const pkgDir = path.join( packagesDir, dir );
-		const pkgJson = readPackageJson( pkgDir );
-
-		if ( pkgJson?.wpScript || pkgJson?.wpScriptModuleExports ) {
-			// Collect production dependencies for this package
-			collectDeps( pkgJson.dependencies, pkgDir );
-		}
-	}
-
-	return Array.from( depsMap.values() );
 }
 
-const dependenciesToProcess = getDependenciesToProcess();
-
-checkDeps( dependenciesToProcess, {
+checkDeps( Array.from( depsMap.values() ), {
 	gpl2: true,
 } );
