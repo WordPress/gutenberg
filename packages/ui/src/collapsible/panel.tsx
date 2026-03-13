@@ -10,7 +10,7 @@ import type { PanelProps } from './types';
  * a collapsible panel controlled by a button.
  */
 export const Panel = forwardRef< HTMLDivElement, PanelProps >(
-	function CollapsiblePanel( { ...otherProps }, forwardedRef ) {
-		return <_Collapsible.Panel ref={ forwardedRef } { ...otherProps } />;
+	function CollapsiblePanel( props, forwardedRef ) {
+		return <_Collapsible.Panel ref={ forwardedRef } { ...props } />;
 	}
 );

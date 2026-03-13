@@ -9,7 +9,7 @@ import type { TriggerProps } from './types';
  * a collapsible panel controlled by a button.
  */
 export const Trigger = forwardRef< HTMLButtonElement, TriggerProps >(
-	function CollapsibleTrigger( { ...otherProps }, forwardedRef ) {
-		return <_Collapsible.Trigger ref={ forwardedRef } { ...otherProps } />;
+	function CollapsibleTrigger( props, forwardedRef ) {
+		return <_Collapsible.Trigger ref={ forwardedRef } { ...props } />;
 	}
 );

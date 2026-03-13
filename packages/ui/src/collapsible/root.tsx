@@ -9,7 +9,7 @@ import type { RootProps } from './types';
  * a collapsible panel controlled by a button.
  */
 export const Root = forwardRef< HTMLDivElement, RootProps >(
-	function CollapsibleRoot( { ...otherProps }, forwardedRef ) {
-		return <_Collapsible.Root ref={ forwardedRef } { ...otherProps } />;
+	function CollapsibleRoot( props, forwardedRef ) {
+		return <_Collapsible.Root ref={ forwardedRef } { ...props } />;
 	}
 );
