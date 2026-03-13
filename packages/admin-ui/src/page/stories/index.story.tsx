@@ -8,7 +8,7 @@ import {
 	createRouter,
 	RouterContextProvider,
 } from '@tanstack/react-router';
-
+import { __experimentalText as Text } from '@wordpress/components';
 /**
  * WordPress dependencies
  */
@@ -66,7 +66,7 @@ export const Default: Story = {
 		title: 'Page title',
 		showSidebarToggle: false,
 		children: (
-			<div style={ { padding: '24px 24px' } }>Page content here</div>
+			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
 		),
 	},
 };
@@ -77,7 +77,7 @@ export const WithSubtitle: Story = {
 		subTitle: 'All of the subtitle text you need goes here.',
 		showSidebarToggle: false,
 		children: (
-			<div style={ { padding: '24px 24px' } }>Page content here</div>
+			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
 		),
 	},
 };
@@ -94,10 +94,11 @@ export const WithBreadcrumbs: Story = {
 			/>
 		),
 		children: (
-			<div style={ { padding: '24px 24px' } }>Page content here</div>
+			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
 		),
 	},
 };
+
 export const WithBreadcrumbsAndSubtitle: Story = {
 	args: {
 		showSidebarToggle: false,
@@ -111,7 +112,7 @@ export const WithBreadcrumbsAndSubtitle: Story = {
 			/>
 		),
 		children: (
-			<div style={ { padding: '24px 24px' } }>Page content here</div>
+			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
 		),
 	},
 };
