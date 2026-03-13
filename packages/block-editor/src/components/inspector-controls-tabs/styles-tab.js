@@ -82,7 +82,7 @@ const StylesTab = ( {
 				<>
 					<InspectorControls.Slot
 						group="color"
-						label={ __( 'Color' ) }
+						label={ __( 'Foreground' ) }
 						className="color-block-support-panel__inner-wrapper"
 					/>
 					<InspectorControls.Slot

@@ -43,11 +43,12 @@ function gutenberg_render_background_support( $block_content, $block ) {
 	$block_type                      = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_attributes                = ( isset( $block['attrs'] ) && is_array( $block['attrs'] ) ) ? $block['attrs'] : array();
 	$has_background_image_support    = block_has_support( $block_type, array( 'background', 'backgroundImage' ), false );
+	$has_background_color_support    = block_has_support( $block_type, array( 'background', 'color' ), false );
 	$has_background_gradient_support = block_has_support( $block_type, array( 'background', 'gradient' ), false );
 	$has_background_clip_support     = block_has_support( $block_type, array( 'background', 'backgroundClip' ), false );
 
 	if (
-		( ! $has_background_image_support && ! $has_background_gradient_support && ! $has_background_clip_support ) ||
+		( ! $has_background_image_support && ! $has_background_color_support && ! $has_background_gradient_support && ! $has_background_clip_support ) ||
 		! isset( $block_attributes['style']['background'] )
 	) {
 		return $block_content;
@@ -55,10 +56,11 @@ function gutenberg_render_background_support( $block_content, $block ) {
 
 	// Check serialization skip for each feature individually.
 	$skip_background_image    = ! $has_background_image_support || wp_should_skip_block_supports_serialization( $block_type, 'background', 'backgroundImage' );
+	$skip_background_color    = ! $has_background_color_support || wp_should_skip_block_supports_serialization( $block_type, 'background', 'color' );
 	$skip_background_gradient = ! $has_background_gradient_support || wp_should_skip_block_supports_serialization( $block_type, 'background', 'gradient' );
 	$skip_background_clip     = ! $has_background_clip_support || wp_should_skip_block_supports_serialization( $block_type, 'background', 'backgroundClip' );
 
-	if ( $skip_background_image && $skip_background_gradient && $skip_background_clip ) {
+	if ( $skip_background_image && $skip_background_color && $skip_background_gradient && $skip_background_clip ) {
 		return $block_content;
 	}
 
@@ -77,6 +79,10 @@ function gutenberg_render_background_support( $block_content, $block ) {
 				$background_styles['backgroundPosition'] = '50% 50%';
 			}
 		}
+	}
+
+	if ( ! $skip_background_color ) {
+		$background_styles['color'] = $block_attributes['style']['background']['color'] ?? null;
 	}
 
 	if ( ! $skip_background_gradient ) {

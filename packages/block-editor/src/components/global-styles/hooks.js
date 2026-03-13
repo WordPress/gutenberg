@@ -191,6 +191,7 @@ export function useSettingsForBlockElement(
 		[
 			[ 'backgroundImage', 'backgroundImage' ],
 			[ 'backgroundSize', 'backgroundSize' ],
+			[ 'backgroundSolidColor', 'color' ],
 			[ 'backgroundGradient', 'gradient' ],
 			[ 'backgroundClip', 'backgroundClip' ],
 		].forEach( ( [ styleKey, settingKey ] ) => {
@@ -198,6 +199,16 @@ export function useSettingsForBlockElement(
 				updatedSettings.background = {
 					...updatedSettings.background,
 					[ settingKey ]: false,
+				};
+			} else if ( ! updatedSettings.background?.[ settingKey ] ) {
+				// Block supports like background.color and
+				// background.gradient may not have a corresponding
+				// global or theme setting. Explicitly enable them
+				// when the block declares support so that panels
+				// can detect the active feature.
+				updatedSettings.background = {
+					...updatedSettings.background,
+					[ settingKey ]: true,
 				};
 			}
 		} );

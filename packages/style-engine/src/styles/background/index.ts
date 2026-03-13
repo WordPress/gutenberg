@@ -85,6 +85,18 @@ const backgroundAttachment = {
 	},
 };
 
+const backgroundColor = {
+	name: 'backgroundColor',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'background', 'color' ],
+			'backgroundColor'
+		);
+	},
+};
+
 const VALID_BACKGROUND_CLIP_VALUES = [
 	'border-box',
 	'padding-box',
@@ -145,6 +157,7 @@ const backgroundClip = {
 };
 
 export default [
+	backgroundColor,
 	backgroundImage,
 	backgroundPosition,
 	backgroundRepeat,

@@ -56,6 +56,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'background', 'backgroundPosition' ],
 		useEngine: true,
 	},
+	backgroundSolidColor: {
+		value: [ 'background', 'color' ],
+		support: [ 'background', 'color' ],
+		useEngine: true,
+	},
 	backgroundGradient: {
 		value: [ 'background', 'gradient' ],
 		support: [ 'background', 'gradient' ],

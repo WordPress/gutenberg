@@ -23,6 +23,7 @@ import { setImmutably } from '../../utils/object';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
+	color: false,
 	gradient: false,
 };
 
@@ -49,11 +50,15 @@ export function useHasBackgroundControl(
  * @return {boolean}        Whether site settings has activated background panel.
  */
 export function useHasBackgroundPanel( settings ) {
-	const { backgroundImage, gradient, backgroundClip } =
-		settings?.background || {};
+	const {
+		backgroundImage,
+		color: bgColor,
+		gradient,
+		backgroundClip,
+	} = settings?.background || {};
 	return (
 		Platform.OS === 'web' &&
-		( backgroundImage || gradient || backgroundClip )
+		( backgroundImage || bgColor || gradient || backgroundClip )
 	);
 }
 
@@ -85,6 +90,20 @@ export function hasBackgroundImageValue( style ) {
 		// Supports url() string values in theme.json.
 		'string' === typeof style?.background?.backgroundImage ||
 		!! style?.background?.backgroundImage?.url
+	);
+}
+
+/**
+ * Checks if there is a current value in the background color block support
+ * attributes.
+ *
+ * @param {Object} style Style attribute.
+ * @return {boolean}     Whether the block has a background color value set.
+ */
+export function hasBackgroundColorValue( style ) {
+	return (
+		'string' === typeof style?.background?.color &&
+		style?.background?.color !== ''
 	);
 }
 
@@ -149,11 +168,18 @@ export default function BackgroundImagePanel( {
 	const gradients = useGradientsPerOrigin( settings );
 	const areCustomSolidsEnabled = settings?.color?.custom;
 	const areCustomGradientsEnabled = settings?.color?.customGradient;
+	const hasSolidColors = colors.length > 0 || areCustomSolidsEnabled;
 	const hasGradientColors = gradients.length > 0 || areCustomGradientsEnabled;
 
 	// Determine whether backgroundClip is currently set to text (text gradient).
 	const isTextGradient = value?.background?.backgroundClip === 'text';
 
+	const hasBackgroundColorControl = useHasBackgroundControl(
+		settings,
+		'color'
+	);
+	const showBackgroundColorControl =
+		hasSolidColors && hasBackgroundColorControl;
 	const hasBackgroundGradientControl = useHasBackgroundControl(
 		settings,
 		'gradient'
@@ -207,6 +233,7 @@ export default function BackgroundImagePanel( {
 	}, [] );
 
 	if (
+		! showBackgroundColorControl &&
 		! showBackgroundGradientControl &&
 		! showBackgroundImageControl &&
 		! showBackgroundClipControl
@@ -216,6 +243,17 @@ export default function BackgroundImagePanel( {
 
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
+	const encodeColorValue = ( colorValue ) => {
+		const allColors = colors.flatMap(
+			( { colors: originColors } ) => originColors
+		);
+		const colorObject = allColors.find(
+			( { color } ) => color === colorValue
+		);
+		return colorObject
+			? 'var:preset|color|' + colorObject.slug
+			: colorValue;
+	};
 	const encodeGradientValue = ( gradientValue ) => {
 		const allGradients = gradients.flatMap(
 			( { gradients: originGradients } ) => originGradients
@@ -236,6 +274,24 @@ export default function BackgroundImagePanel( {
 				undefined
 			)
 		);
+
+	// Background color logic.
+	const currentColor = decodeValue( value?.background?.color );
+	const inheritedColor = decodeValue( inheritedValue?.background?.color );
+
+	const setBackgroundColor = ( newColor ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'background', 'color' ],
+				encodeColorValue( newColor )
+			)
+		);
+	};
+
+	const resetBackgroundColor = () => {
+		onChange( setImmutably( value, [ 'background', 'color' ], undefined ) );
+	};
 
 	const resetGradient = () => {
 		let newValue = setImmutably(
@@ -298,6 +354,32 @@ export default function BackgroundImagePanel( {
 						defaultValues={ defaultValues }
 					/>
 				</ToolsPanelItem>
+			) }
+			{ showBackgroundColorControl && (
+				<ColorPanelDropdown
+					className="block-editor-background-panel__item"
+					label={ __( 'Color' ) }
+					hasValue={ () => hasBackgroundColorValue( value ) }
+					resetValue={ resetBackgroundColor }
+					isShownByDefault={ defaultControls.color }
+					indicators={ [ currentColor ] }
+					tabs={ [
+						{
+							key: 'color',
+							label: __( 'Color' ),
+							inheritedValue: currentColor ?? inheritedColor,
+							setValue: setBackgroundColor,
+							userValue: currentColor,
+						},
+					] }
+					colorGradientControlSettings={ {
+						colors,
+						disableCustomColors: ! areCustomSolidsEnabled,
+						gradients,
+						disableCustomGradients: ! areCustomGradientsEnabled,
+					} }
+					panelId={ panelId }
+				/>
 			) }
 			{ showBackgroundGradientControl && (
 				<ColorPanelDropdown
