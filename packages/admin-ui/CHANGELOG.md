@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Add documentation.
+- Add documentation. [#76484](https://github.com/WordPress/gutenberg/pull/76484)
 
 ## 1.9.0 (2026-03-04)
 
