@@ -53,10 +53,12 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 		return $parsed_block;
 	}
 
-	// Decode base64-encoded CSS. The JS editor encodes CSS before saving so
-	// that wp_kses cannot corrupt characters like `&`, `>`, or nested selectors.
-	// Plain CSS (saved by users with `unfiltered_html`, or legacy content) is
-	// returned unchanged by this function.
+	/*
+	 * Decode base64-encoded CSS. The JS editor encodes CSS before saving so
+	 * that wp_kses cannot corrupt characters like `&`, `>`, or nested selectors.
+	 * Plain CSS (saved by users with `unfiltered_html`, or legacy content) is
+	 * returned unchanged by this function.
+	 */
 	$custom_css = gutenberg_decode_custom_css_attribute_for_display( $custom_css );
 
 	// Validate CSS doesn't contain HTML markup (same validation as global styles REST API).
