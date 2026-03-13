@@ -83,11 +83,11 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 		self::$pages[] = self::$page;
 
-		self::$post = self::factory()->post->create_and_get(
+		self::$post    = self::factory()->post->create_and_get(
 			array(
-				'post_type'    => 'post',
-				'post_status'  => 'publish',
-				'post_title'   => 'Test Post',
+				'post_type'   => 'post',
+				'post_status' => 'publish',
+				'post_title'  => 'Test Post',
 			)
 		);
 		self::$pages[] = self::$post;
@@ -100,9 +100,9 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 				'description' => 'Cats Category',
 			)
 		);
-		self::$terms[] = self::$category;
+		self::$terms[]  = self::$category;
 
-		self::$tag = self::factory()->tag->create_and_get(
+		self::$tag     = self::factory()->tag->create_and_get(
 			array(
 				'name' => 'dogs',
 				'slug' => 'dogs',
