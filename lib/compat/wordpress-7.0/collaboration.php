@@ -189,7 +189,7 @@ function gutenberg_post_list_collaboration_ui() {
 	}
 
 	add_action( 'admin_head', 'gutenberg_post_list_collaboration_styles' );
-	add_action( 'admin_footer', 'gutenberg_post_list_collaboration_scripts' );
+	add_filter( 'gettext', 'gutenberg_filter_locked_post_text_for_rtc', 10, 3 );
 	add_filter( 'post_row_actions', 'gutenberg_post_list_collaboration_row_actions', 10, 2 );
 	add_filter( 'page_row_actions', 'gutenberg_post_list_collaboration_row_actions', 10, 2 );
 }
@@ -258,35 +258,25 @@ function gutenberg_post_list_collaboration_styles() {
 }
 
 /**
- * Outputs JavaScript to replace the user-specific lock text with a generic
- * "Currently being edited" message on initial page render.
+ * Filters the translation of the lock text to replace user-specific
+ * "%s is currently editing" with a generic "Currently being edited"
+ * message on initial page render.
  *
- * The heartbeat filter handles dynamic updates server-side, but the initial
- * page render contains user-specific text from WordPress core's PHP output
- * that must be replaced client-side.
+ * WordPress core outputs this text server-side in WP_Posts_List_Table.
+ * Using a gettext filter replaces it before it reaches the browser,
+ * avoiding a flash of the original text.
+ *
+ * @param string $translation Translated text.
+ * @param string $text        Original text to translate.
+ * @param string $domain      Text domain.
+ * @return string Modified translation.
  */
-function gutenberg_post_list_collaboration_scripts() {
-	$locked_text      = __( 'Currently being edited', 'gutenberg' );
-	$locked_text_json = wp_json_encode( $locked_text, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT );
-	?>
-	<script type="text/javascript">
-		( function() {
-			var lockedText = <?php echo $locked_text_json; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_json_encode with HEX flags is safe. ?>;
+function gutenberg_filter_locked_post_text_for_rtc( $translation, $text, $domain ) {
+	if ( 'default' === $domain && '%s is currently editing' === $text ) {
+		return __( 'Currently being edited', 'gutenberg' );
+	}
 
-			function updateLockedText() {
-				document.querySelectorAll( '.locked-text' ).forEach( function( el ) {
-					el.textContent = lockedText;
-				} );
-			}
-
-			if ( document.readyState === 'loading' ) {
-				document.addEventListener( 'DOMContentLoaded', updateLockedText );
-			} else {
-				updateLockedText();
-			}
-		} )();
-	</script>
-	<?php
+	return $translation;
 }
 
 /**
