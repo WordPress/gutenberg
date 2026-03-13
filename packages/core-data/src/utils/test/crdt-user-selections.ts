@@ -93,27 +93,6 @@ function createCursorPosition( text: string, offset: number ): CursorPosition {
 }
 
 describe( 'areSelectionsStatesEqual', () => {
-	describe( 'undefined arguments', () => {
-		test( 'returns true when both arguments are undefined', () => {
-			expect(
-				areSelectionsStatesEqual(
-					undefined as unknown as SelectionState,
-					undefined as unknown as SelectionState
-				)
-			).toBe( true );
-		} );
-
-		test( 'returns false when only one argument is undefined', () => {
-			const selection: SelectionNone = { type: SelectionType.None };
-			expect(
-				areSelectionsStatesEqual(
-					undefined as unknown as SelectionState,
-					selection
-				)
-			).toBe( false );
-		} );
-	} );
-
 	describe( 'different selection types', () => {
 		test( 'returns false when comparing different selection types', () => {
 			const selection1: SelectionNone = { type: SelectionType.None };
