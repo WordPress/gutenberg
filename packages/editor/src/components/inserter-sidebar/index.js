@@ -88,6 +88,7 @@ export default function InserterSidebar() {
 				rootClientId={
 					blockSectionRootClientId ?? inserter.rootClientId
 				}
+				__experimentalInsertionIndex={ inserter.insertionIndex }
 				onSelect={ inserter.onSelect }
 				__experimentalInitialTab={ inserter.tab }
 				__experimentalInitialCategory={ inserter.category }
