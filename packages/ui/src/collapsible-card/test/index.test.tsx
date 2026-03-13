@@ -92,17 +92,13 @@ describe( 'CollapsibleCard', () => {
 			).not.toBeInTheDocument();
 
 			await user.click(
-				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
-				} )
+				screen.getByRole( 'button', { name: 'Title' } )
 			);
 
 			expect( screen.getByText( 'Toggle content' ) ).toBeVisible();
 
 			await user.click(
-				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
-				} )
+				screen.getByRole( 'button', { name: 'Title' } )
 			);
 
 			expect(
@@ -151,9 +147,7 @@ describe( 'CollapsibleCard', () => {
 			);
 
 			await user.click(
-				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
-				} )
+				screen.getByRole( 'button', { name: 'Title' } )
 			);
 
 			expect( onOpenChange.mock.calls[ 0 ][ 0 ] ).toBe( true );
@@ -178,9 +172,7 @@ describe( 'CollapsibleCard', () => {
 			expect( screen.getByText( 'Should stay visible' ) ).toBeVisible();
 
 			await user.click(
-				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
-				} )
+				screen.getByRole( 'button', { name: 'Title' } )
 			);
 
 			expect( screen.getByText( 'Should stay visible' ) ).toBeVisible();
@@ -188,7 +180,7 @@ describe( 'CollapsibleCard', () => {
 	} );
 
 	describe( 'trigger', () => {
-		it( 'renders a toggle button', () => {
+		it( 'renders the header as a toggle button', () => {
 			render(
 				<CollapsibleCard.Root>
 					<CollapsibleCard.Header>
@@ -198,10 +190,9 @@ describe( 'CollapsibleCard', () => {
 			);
 
 			expect(
-				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
-				} )
+				screen.getByRole( 'button', { name: 'Title' } )
 			).toBeVisible();
 		} );
 	} );
+
 } );
