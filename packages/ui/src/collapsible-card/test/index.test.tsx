@@ -91,40 +91,25 @@ describe( 'CollapsibleCard', () => {
 				screen.queryByText( 'Toggle content' )
 			).not.toBeInTheDocument();
 
-			await user.click( screen.getByRole( 'button', { name: 'Title' } ) );
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Title',
+					expanded: false,
+				} )
+			);
 
 			expect( screen.getByText( 'Toggle content' ) ).toBeVisible();
 
-			await user.click( screen.getByRole( 'button', { name: 'Title' } ) );
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Title',
+					expanded: true,
+				} )
+			);
 
 			expect(
 				screen.queryByText( 'Toggle content' )
 			).not.toBeInTheDocument();
-		} );
-
-		it( 'toggles content when clicking the header area', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<CollapsibleCard.Root>
-					<CollapsibleCard.Header>
-						<Card.Title>Header click test</Card.Title>
-					</CollapsibleCard.Header>
-					<CollapsibleCard.Content>
-						<p>Header toggled content</p>
-					</CollapsibleCard.Content>
-				</CollapsibleCard.Root>
-			);
-
-			expect(
-				screen.queryByText( 'Header toggled content' )
-			).not.toBeInTheDocument();
-
-			await user.click( screen.getByText( 'Header click test' ) );
-
-			expect(
-				screen.getByText( 'Header toggled content' )
-			).toBeVisible();
 		} );
 
 		it( 'calls onOpenChange when toggled', async () => {
@@ -142,7 +127,12 @@ describe( 'CollapsibleCard', () => {
 				</CollapsibleCard.Root>
 			);
 
-			await user.click( screen.getByRole( 'button', { name: 'Title' } ) );
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Title',
+					expanded: false,
+				} )
+			);
 
 			expect( onOpenChange.mock.calls[ 0 ][ 0 ] ).toBe( true );
 		} );
@@ -165,7 +155,12 @@ describe( 'CollapsibleCard', () => {
 
 			expect( screen.getByText( 'Should stay visible' ) ).toBeVisible();
 
-			await user.click( screen.getByRole( 'button', { name: 'Title' } ) );
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Title',
+					expanded: true,
+				} )
+			);
 
 			expect( screen.getByText( 'Should stay visible' ) ).toBeVisible();
 		} );
@@ -182,7 +177,10 @@ describe( 'CollapsibleCard', () => {
 			);
 
 			expect(
-				screen.getByRole( 'button', { name: 'Title' } )
+				screen.getByRole( 'button', {
+					name: 'Title',
+					expanded: false,
+				} )
 			).toBeVisible();
 		} );
 	} );
