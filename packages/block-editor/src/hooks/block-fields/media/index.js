@@ -7,6 +7,8 @@ import {
 	__experimentalGrid as Grid,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { focus } from '@wordpress/dom';
+import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	audio as audioIcon,
@@ -24,6 +26,23 @@ import MediaUploadCheck from '../../../components/media-upload/check';
 import { useInspectorPopoverPlacement } from '../use-inspector-popover-placement';
 import { getMediaSelectKey } from '../../../store/private-keys';
 import { store as blockEditorStore } from '../../../store';
+
+/**
+ * Focuses the toggle button.
+ *
+ * @param {Object} containerRef - ref object containing current element
+ */
+const focusToggleButton = ( containerRef ) => {
+	// Use requestAnimationFrame to ensure DOM updates are complete.
+	window.requestAnimationFrame( () => {
+		const [ toggleButton ] = focus.tabbable.find( containerRef?.current );
+		if ( ! toggleButton ) {
+			return;
+		}
+
+		toggleButton.focus();
+	} );
+};
 
 function MediaThumbnail( { data, field, attachment, config } ) {
 	const { allowedTypes = [], multiple = false } = config || {};
@@ -117,122 +136,122 @@ export default function Media( { data, field, onChange, config = {} } ) {
 	if ( allowedTypes.length === 1 ) {
 		const allowedType = allowedTypes[ 0 ];
 		if ( allowedType === 'image' ) {
-			chooseItemLabel = __( 'Choose an image…' );
+			chooseItemLabel = __( 'Image' );
 		} else if ( allowedType === 'video' ) {
-			chooseItemLabel = __( 'Choose a video…' );
+			chooseItemLabel = __( 'Video' );
 		} else if ( allowedType === 'application' ) {
-			chooseItemLabel = __( 'Choose a file…' );
+			chooseItemLabel = __( 'File' );
 		} else {
-			chooseItemLabel = __( 'Choose a media item…' );
+			chooseItemLabel = __( 'Media' );
 		}
 	} else {
-		chooseItemLabel = __( 'Choose a media item…' );
+		chooseItemLabel = __( 'Media' );
 	}
+	const containerRef = useRef();
 
 	return (
 		<MediaUploadCheck>
-			<div className="block-editor-content-only-controls">
-				<div className="block-editor-content-only-controls__media-replace">
-					<MediaReplaceFlow
-						className="block-editor-content-only-controls__media-replace-flow"
-						allowedTypes={ allowedTypes }
-						mediaId={ id }
-						mediaURL={ url }
-						multiple={ multiple }
-						popoverProps={ popoverProps }
-						onReset={ () => {
+			<div
+				ref={ containerRef }
+				className="block-editor-content-only-controls"
+			>
+				<MediaReplaceFlow
+					className="block-editor-content-only-controls__media-replace-flow"
+					allowedTypes={ allowedTypes }
+					mediaId={ id }
+					mediaURL={ url }
+					multiple={ multiple }
+					popoverProps={ popoverProps }
+					onReset={ () => {
+						onChange(
+							field.setValue( {
+								item: data,
+								value: {},
+							} )
+						);
+					} }
+					{ ...( useFeaturedImage && {
+						useFeaturedImage: !! value?.featuredImage,
+						onToggleFeaturedImage: () => {
 							onChange(
 								field.setValue( {
 									item: data,
-									value: {},
+									value: {
+										featuredImage: ! value?.featuredImage,
+									},
 								} )
 							);
-						} }
-						{ ...( useFeaturedImage && {
-							useFeaturedImage: !! value?.featuredImage,
-							onToggleFeaturedImage: () => {
-								onChange(
-									field.setValue( {
-										item: data,
-										value: {
-											featuredImage:
-												! value?.featuredImage,
-										},
-									} )
-								);
-							},
-						} ) }
-						onSelect={ ( selectedMedia ) => {
-							if ( selectedMedia.id && selectedMedia.url ) {
-								const newValue = {
-									...selectedMedia,
-									mediaType: selectedMedia.media_type,
-								};
+						},
+					} ) }
+					onSelect={ ( selectedMedia ) => {
+						if ( selectedMedia.id && selectedMedia.url ) {
+							const newValue = {
+								...selectedMedia,
+								mediaType: selectedMedia.media_type,
+							};
 
-								// Turn off featured image when manually selecting media
-								if ( useFeaturedImage ) {
-									newValue.featuredImage = false;
-								}
-
-								onChange(
-									field.setValue( {
-										item: data,
-										value: newValue,
-									} )
-								);
+							// Turn off featured image when manually selecting media
+							if ( useFeaturedImage ) {
+								newValue.featuredImage = false;
 							}
-						} }
-						renderToggle={ ( buttonProps ) => (
-							<Button
-								__next40pxDefaultSize
-								className="block-editor-content-only-controls__media"
-								{ ...buttonProps }
+
+							onChange(
+								field.setValue( {
+									item: data,
+									value: newValue,
+								} )
+							);
+						}
+					} }
+					renderToggle={ ( buttonProps ) => (
+						<Button
+							__next40pxDefaultSize
+							className="block-editor-content-only-controls__media"
+							{ ...buttonProps }
+						>
+							<Grid
+								rowGap={ 0 }
+								columnGap={ 8 }
+								templateColumns="24px 1fr"
+								className="block-editor-content-only-controls__media-row"
 							>
-								<Grid
-									rowGap={ 0 }
-									columnGap={ 8 }
-									templateColumns="24px 1fr"
-									className="block-editor-content-only-controls__media-row"
-								>
-									{ url && (
-										<>
-											<MediaThumbnail
-												attachment={ attachment }
-												field={ field }
-												data={ data }
-												config={ config }
-											/>
-											<span className="block-editor-content-only-controls__media-title">
-												{
-													// TODO - truncate long titles or url smartly (e.g. show filename).
-													attachment?.title?.raw &&
-													attachment?.title?.raw !==
-														''
-														? attachment?.title?.raw
-														: url
-												}
-											</span>
-										</>
-									) }
-									{ ! url && (
-										<>
-											<span
-												className="block-editor-content-only-controls__media-placeholder"
-												style={ {
-													width: '24px',
-													height: '24px',
-												} }
-											/>
-											<span className="block-editor-content-only-controls__media-title">
-												{ chooseItemLabel }
-											</span>
-										</>
-									) }
-								</Grid>
-							</Button>
-						) }
-					/>
-				</div>
+								{ url && (
+									<>
+										<MediaThumbnail
+											attachment={ attachment }
+											field={ field }
+											data={ data }
+											config={ config }
+										/>
+										<span className="block-editor-content-only-controls__media-title">
+											{
+												// TODO - truncate long titles or url smartly (e.g. show filename).
+												attachment?.title?.raw &&
+												attachment?.title?.raw !== ''
+													? attachment?.title?.raw
+													: url
+											}
+										</span>
+									</>
+								) }
+								{ ! url && (
+									<>
+										<span
+											className="block-editor-content-only-controls__media-placeholder"
+											style={ {
+												width: '24px',
+												height: '24px',
+											} }
+										/>
+										<span className="block-editor-content-only-controls__media-title">
+											{ chooseItemLabel }
+										</span>
+									</>
+								) }
+							</Grid>
+						</Button>
+					) }
+				/>
 				{ url && (
 					<Button
 						__next40pxDefaultSize
@@ -247,6 +266,8 @@ export default function Media( { data, field, onChange, config = {} } ) {
 									value: {},
 								} )
 							);
+
+							focusToggleButton( containerRef );
 						} }
 					/>
 				) }

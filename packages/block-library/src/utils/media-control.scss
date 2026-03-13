@@ -12,6 +12,8 @@
 	}
 
 	.block-library-utils__media-control__replace-flow {
+		display: block;
+
 		button.components-button {
 			color: $gray-900;
 			box-shadow: inset 0 0 0 1px $gray-400;
@@ -27,10 +29,6 @@
 			&:focus {
 				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 			}
-		}
-
-		.components-dropdown {
-			display: block;
 		}
 	}
 }

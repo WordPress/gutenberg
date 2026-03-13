@@ -652,7 +652,7 @@ export default function LogoEdit( {
 							onError={ onUploadError }
 							onReset={ onRemoveLogo }
 							isUploading={ !! temporaryURL }
-							emptyLabel={ __( 'Choose logo' ) }
+							emptyLabel={ __( 'Logo' ) }
 						/>
 					</ToolsPanelItem>
 				) }
