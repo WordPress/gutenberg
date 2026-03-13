@@ -230,12 +230,11 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	 * storing it in the `type` attribute (see update-attributes.js). Map it back so that
 	 * `taxonomy_exists()` can find the registered taxonomy correctly.
 	 */
-	$stored_kind   = $attributes['kind'] ?? '';
-	$stored_type   = $attributes['type'] ?? '';
-	$resolved_type = 'tag' === $stored_type ? 'post_tag' : $stored_type;
-	$link_kind     = ! empty( $stored_kind )
-		? $stored_kind
-		: ( taxonomy_exists( $resolved_type ) ? 'taxonomy' : 'post-type' );
+	$stored_kind    = $attributes['kind'] ?? '';
+	$stored_type    = $attributes['type'] ?? '';
+	$resolved_type  = 'tag' === $stored_type ? 'post_tag' : $stored_type;
+	$kind_from_type = taxonomy_exists( $resolved_type ) ? 'taxonomy' : 'post-type';
+	$link_kind      = ! empty( $stored_kind ) ? $stored_kind : $kind_from_type;
 
 	/*
 	 * Mirrors classic menu behaviour (_wp_menu_item_classes_by_context(), Branch B):
@@ -250,7 +249,8 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	 * Historically, the `id` attribute could be set to a URL string rather than an integer
 	 * in some editor versions. `is_numeric()` ensures those values never produce a match.
 	 */
-	$link_id          = is_numeric( $attributes['id'] ?? null ) ? (int) $attributes['id'] : 0;
+	$raw_id           = $attributes['id'] ?? null;
+	$link_id          = is_numeric( $raw_id ) ? (int) $raw_id : 0;
 	$is_taxonomy_link = 'taxonomy' === $link_kind;
 	$queried_id       = get_queried_object_id();
 	$ids_match        = $link_id > 0 && $queried_id === $link_id;
