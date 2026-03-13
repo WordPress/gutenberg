@@ -145,9 +145,12 @@ Lower layers must not depend on higher ones. The z-index compatibility layer liv
 - **Pro**: No Core-level decision needed to register a new shared handle
 - **Pro**: Each package can update `@wordpress/ui` independently
 - **Con**: Multiple copies of `@base-ui/react` on the page
-- **Con**: React contexts (like `FloatingTree`) are not shared across bundles
+- **Con**: React contexts are not shared across bundles, affecting three distinct coordination mechanisms:
+  - **FloatingTree** (used by Popover, Menu): same-type nesting across bundles loses parent-child awareness
+  - **DialogRootContext counter** (used by Dialog, AlertDialog, Drawer): Dialog-in-Dialog nesting across bundles loses topmost tracking
+  - **No impact** on Select, Tooltip, PreviewCard, Combobox — these have no nesting coordination to break
 
-The dismiss coordination analysis shows this is acceptable for the primary use case (click-outside dismiss works across bundles). See [Cross-Bundle Dismiss Coordination](./cross-bundle-dismiss-coordination.md).
+The universal `insideReactTree` mechanism (click-outside dismiss) works across bundles because it relies on shared React synthetic events, not Base UI contexts. See [Cross-Bundle Dismiss Coordination](./cross-bundle-dismiss-coordination.md) for the full analysis.
 
 ### No breaking changes in `@wordpress/components`
 
@@ -168,12 +171,16 @@ Plugins use SlotFills to inject components into the editor UI. Two categories:
 
 ## Open Questions and Risks
 
-1. **Escape key coordination**: Base UI's Dialog and Select don't share `FloatingTree`, leading to potential double-dismiss on Escape when a Select is inside a Dialog. This exists within a single Base UI bundle. May need upstream fix or wrapper-level mitigation.
+1. **Escape key coordination — cross-type nesting**: Base UI's Dialog closes on Escape via a native `document` keydown listener that cannot be stopped by `stopPropagation()` from a child Select's synthetic handler. This means pressing Escape with a Select open inside a Dialog closes both. This is a single-bundle behavior (Dialog and Select never share FloatingTree), not a cross-bundle regression. May need upstream fix (e.g., Dialog respecting nested floating elements) or wrapper-level mitigation.
 
-2. **`@wordpress/ui` as shared handle**: If the multiple-bundle cost becomes unacceptable (bundle size, context isolation edge cases), `@wordpress/ui` could be promoted to `wpScript: true`. This would be a Core-level decision with backward-compatibility implications.
+2. **Escape key coordination — same-type cross-bundle nesting**: Popover-in-Popover and Menu-in-Menu across bundles lose FloatingTree nesting awareness. Escape on the inner overlay also dismisses the outer. This is uncommon (cross-package Popover nesting is rare), but should be documented as a known limitation.
 
-3. **Animation parity**: `@wordpress/components` Popover uses `framer-motion` for animations. WPDS uses CSS animations / `@starting-style`. Ensuring visual parity during migration may require careful CSS work.
+3. **Escape key coordination — Dialog-in-Dialog cross-bundle nesting**: Dialog uses a context counter (`ownNestedOpenDialogs` via `DialogRootContext`) for nesting awareness, not FloatingTree. Across bundles, this counter is isolated — both Dialogs think they are topmost and both close on Escape. Click-outside still works correctly. Cross-package Dialog nesting is uncommon.
 
-4. **iframe focus coordination**: When a WPDS popover portals from inside an iframe to the parent document, focus management across the iframe boundary needs testing.
+4. **`@wordpress/ui` as shared handle**: If the multiple-bundle cost becomes unacceptable (bundle size, context isolation edge cases), `@wordpress/ui` could be promoted to `wpScript: true`. This would eliminate all three context isolation concerns (FloatingTree, DialogRootContext, and any future coordination contexts). This is a Core-level decision that can be deferred.
 
-5. **Performance**: Multiple copies of `@base-ui/react` in different bundles increases total JavaScript size. The impact should be measured once migrations begin.
+5. **Animation parity**: `@wordpress/components` Popover uses `framer-motion` for animations. WPDS uses CSS animations / `@starting-style`. Ensuring visual parity during migration may require careful CSS work.
+
+6. **iframe focus coordination**: When a WPDS popover portals from inside an iframe to the parent document, focus management across the iframe boundary needs testing.
+
+7. **Performance**: Multiple copies of `@base-ui/react` in different bundles increases total JavaScript size. The impact should be measured once migrations begin.

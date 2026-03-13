@@ -15,18 +15,70 @@ The question: **Does dismiss coordination (click-outside, Escape key) break when
 | Behavior | Works across bundles? | Explanation |
 |---|---|---|
 | Click-outside dismiss | **Yes** | `insideReactTree` mechanism uses shared React synthetic events |
-| Escape key (cross-type, e.g., Select in Dialog) | **Same as single bundle** | Dialog and Select don't use FloatingTree regardless of bundling |
+| Escape key (cross-type, e.g., Select in Dialog) | **Same as single bundle** | Select uses `bubbles: false`; Dialog uses a context counter — neither depends on FloatingTree |
 | Escape key (same-type, e.g., Popover in Popover) | **Degraded** | FloatingTree context not shared; parent can't check children |
+| Escape key (Dialog in Dialog, cross-bundle) | **Degraded** | Nesting counter relies on `DialogRootContext`, which is not shared across bundles |
 | Modal dialog backdrop dismiss | **Yes** | Backdrop check is DOM-based, not context-based |
 | Visual stacking (DOM order) | **Yes** | No z-index means later-rendered elements are on top |
 
-**Conclusion**: The primary use case (click-outside dismiss) works correctly across bundles. This is not a hard blocker for the migration.
+**Conclusion**: The primary use case (click-outside dismiss) works correctly across bundles. This is not a hard blocker for the migration, but there are nuanced Escape key regressions to be aware of.
 
-## How Click-Outside Dismiss Works
+## Three Dismiss Strategies in Base UI
 
-Base UI's `useDismiss` hook (in `@base-ui/react`) has three dismiss coordination mechanisms. The most important one — `insideReactTree` — is universal and works across bundles.
+Base UI does **not** use a single unified dismiss strategy. There are three distinct mechanisms, each used by a different group of components. All three share the same `useDismiss` hook from `floating-ui-react/hooks/useDismiss.js`, but they configure it differently and layer additional coordination on top.
 
-### The `insideReactTree` mechanism
+### Strategy 1: FloatingTree (Menu, Popover, Menubar, NavigationMenu)
+
+These components render a `<FloatingTree>` / `<FloatingNode>` hierarchy and use `useFloatingNodeId` to track parent-child relationships at the DOM level.
+
+| Component | Renders `<FloatingTree>` | Uses `<FloatingNode>` | Uses `useFloatingNodeId` |
+|---|---|---|---|
+| Menu | Yes (top-level `MenuRoot`) | Yes (`MenuPositioner`) | Yes (`MenuRoot`, `MenuTrigger`) |
+| Popover | Yes (outermost `PopoverRoot`) | Yes (`PopoverPositioner`) | Yes (`PopoverPositioner`) |
+| Menubar | Yes (wraps all children) | Yes (`MenubarContent`) | Yes (`MenubarContent`) |
+| NavigationMenu | Yes (`NavigationMenuRoot`) | No | Yes (uses `useFloatingParentNodeId`) |
+
+**How it works**:
+
+- Menu: Each `MenuStore` creates a `FloatingTreeStore`. The top-level `MenuRoot` wraps children in `<FloatingTree externalTree={floatingTreeRoot}>`. Nested (submenu) roots skip the wrapper and join the existing tree. `useDismiss` is called with `externalTree` for nested menus, enabling tree-based child checks.
+- Popover: Simpler. Wraps in `<FloatingTree>` only when outermost (checks `usePopoverRootContext(true)`). `PopoverPositioner` registers via `<FloatingNode>`. Detects nesting via `useFloatingParentNodeId() != null`.
+
+**Cross-bundle impact**: FloatingTree relies on React context, so it **does not work across bundles**. A parent Popover from bundle A cannot see a child Popover from bundle B in its tree.
+
+### Strategy 2: React Context Counter (Dialog, AlertDialog, Drawer)
+
+These components use a **custom parent-child counter** propagated via React context (`DialogRootContext`), with no FloatingTree involvement at all.
+
+**How it works** (from `useDialogRoot.js`):
+
+- Each Dialog Root maintains an `ownNestedOpenDialogs` state counter.
+- When a child Dialog opens, it calls the parent's `onNestedDialogOpen` callback (received via `DialogRootContext`). The parent increments its counter.
+- When a child Dialog closes, it calls `onNestedDialogClose`. The parent decrements.
+- `isTopmost = ownNestedOpenDialogs === 0` — only the topmost (innermost) Dialog responds to Escape and outside-press.
+- `useDismiss` receives `escapeKey: isTopmost` and `outsidePress` gated by `isTopmost`.
+
+AlertDialog reuses `useDialogRoot` with `disablePointerDismissal: true` and `modal: true`. Drawer wraps `<Dialog.Root>` and delegates all dismiss logic to it.
+
+**Cross-bundle impact**: The counter propagates via `DialogRootContext`, which is **not shared across bundles**. If Dialog A (bundle A) nests Dialog B (bundle B), Dialog A's `onNestedDialogOpen` callback is never called. Both dialogs think they are topmost. Pressing Escape closes both. However, click-outside still works correctly thanks to `insideReactTree` (Strategy 0 below).
+
+### Strategy 3: No Nesting Awareness (Select, Tooltip, PreviewCard, Combobox)
+
+These components call `useDismiss` with no tree and no nesting context. They have no mechanism to coordinate with parent or child overlays beyond `insideReactTree`.
+
+| Component | `useDismiss` options | Notes |
+|---|---|---|
+| Select | `bubbles: false` | Escape only closes the Select, never bubbles to parent floating elements |
+| Tooltip | `referencePress: true` | Closes on trigger re-press; no nesting awareness |
+| PreviewCard | Default options | Simplest usage |
+| Combobox | (similar to Select) | No FloatingTree, no nesting |
+
+**Cross-bundle impact**: None — these components have no cross-component coordination to break. Select's `bubbles: false` means Escape only closes the Select regardless of bundling.
+
+### The Universal Safety Net: `insideReactTree`
+
+All components — regardless of which strategy they use — share the same `useDismiss` hook, which includes the `insideReactTree` mechanism. This is the universal safety net for click-outside dismiss and works across bundles.
+
+## How `insideReactTree` Works
 
 Every `useDismiss` instance sets up two layers of event handling:
 
@@ -83,44 +135,49 @@ Clicks on a portaled Select popup (which is not the backdrop) never satisfy this
 
 ### Cross-type nesting (Select inside Dialog)
 
-When Escape is pressed with a Select open inside a Dialog:
+Select uses `bubbles: false` in its `useDismiss` configuration. This means pressing Escape when a Select is open only closes the Select — the event does not propagate to parent floating elements via `useDismiss`.
 
-1. **React synthetic handlers**: Select.Popup's `onKeyDown` fires first (deeper in the React tree), closes the Select, and calls `event.stopPropagation()`. Dialog.Popup's `onKeyDown` does NOT fire (synthetic propagation stopped).
+However, Dialog also registers a native `keydown` listener on `document`. Since `stopPropagation()` on a native event listener attached to `document` does not prevent other listeners on the same target from firing, Dialog's native handler can still fire. Whether the Dialog closes depends on its `isTopmost` check.
 
-2. **Native document listeners**: Both Dialog and Select register native `keydown` listeners on `document`. `stopPropagation()` on one listener does not prevent other listeners on the **same target** from firing. The Dialog's native handler fires and closes the Dialog.
+Within a single bundle: if the Dialog has no nested Dialogs open, `isTopmost` is `true`, and Escape closes both Select and Dialog. This is an existing single-bundle behavior, not a cross-bundle regression.
 
-This means pressing Escape when a Select is open inside a Dialog closes **both** the Select and the Dialog.
-
-**This behavior exists even within a single bundle.** Dialog and Select do not participate in Base UI's `FloatingTree` context (only Popover and Menu do). There is no `FloatingTree` relationship between them regardless of bundling.
+Across bundles: the same behavior occurs, since Select and Dialog don't share any coordination context regardless of bundling.
 
 For comparison, the current `@wordpress/components` Modal uses only a React synthetic `onKeyDown` handler (not a native document listener), so Ariakit's `stopPropagation()` on the synthetic event successfully prevents the Modal from closing. This is a behavioral difference between Base UI's Dialog and the legacy Modal, unrelated to cross-bundle isolation.
 
-### Same-type nesting (Popover inside Popover)
+### Same-type nesting (Popover inside Popover, Menu inside Menu)
 
-Within a single bundle, Popover components share a `FloatingTree` context. When Escape is pressed on an inner Popover, the outer Popover's `useDismiss` checks FloatingTree children and finds the inner Popover — it skips dismissing.
+Within a single bundle, same-type components share a `FloatingTree` context. When Escape is pressed on an inner Popover, the outer Popover's `useDismiss` checks `getNodeChildren(tree.nodesRef.current, nodeId)` and finds the inner Popover is open — it skips dismissing.
 
 Across bundles, the `FloatingTree` context is not shared. The outer Popover's `useDismiss` finds no children in its FloatingTree and proceeds to dismiss. **This is a genuine cross-bundle regression for same-type nesting.**
 
-Mitigation: Popover-in-Popover nesting naturally occurs within the same package (e.g., a color picker popover with a nested palette popover). Cross-package Popover nesting is rare.
+Mitigation: Popover-in-Popover nesting naturally occurs within the same package (e.g., a color picker popover with a nested palette popover). Cross-package Popover nesting is rare. The same applies to nested menus.
 
-## Other Mechanisms
+### Dialog-in-Dialog nesting (cross-bundle)
 
-### `FloatingTree` (supplementary, not universal)
+Within a single bundle, Dialog's context counter (`ownNestedOpenDialogs`) tracks nested Dialogs. When a child Dialog is open, the parent knows it is not topmost and suppresses its Escape handler.
 
-`FloatingTree` is a React context-based tree that tracks parent-child relationships between floating elements. It is created by `Popover.Root` (for the outermost popover) and `Menu.Root` (for top-level menus). Nested instances register as children.
+Across bundles, the `DialogRootContext` is not shared. The parent Dialog from bundle A never receives the `onNestedDialogOpen` callback from the child Dialog in bundle B. Both dialogs have `isTopmost = true`. Pressing Escape closes both.
 
-`FloatingTree` provides:
-- DOM containment checks across child nodes (redundant with `insideReactTree` for click-outside)
-- The `bubbles` option for coordinating Escape key dismissal
-- Event emission for close coordination
+**This is a cross-bundle regression**, though `insideReactTree` still prevents click-outside from dismissing the parent when clicking inside the child Dialog.
 
-Since `FloatingTree` relies on React context, it **does not work across bundles**. However, `insideReactTree` (which does work across bundles) handles the critical click-outside case independently.
+Mitigation: Dialog-in-Dialog nesting across packages is uncommon. When it does occur, it's typically the same package rendering both (e.g., a settings dialog opening a confirmation dialog).
 
-### Dialog nesting protocol
+## Per-Component Summary
 
-Dialog has its own nesting mechanism via `DialogRootContext` parent-child communication. A parent Dialog tracks how many nested Dialogs are open (`ownNestedOpenDialogs`) and disables its own Escape/outside-press handlers when it's not the topmost Dialog.
-
-This protocol only tracks nested **Dialogs**, not other overlay types like Select or Popover.
+| Component | Dismiss strategy | FloatingTree? | Nesting context | `useDismiss` config | Cross-bundle risk |
+|---|---|---|---|---|---|
+| Menu | Strategy 1 | Yes | `FloatingTree` + `FloatingTreeStore` | `externalTree` for nested menus | Same-type nesting breaks |
+| Popover | Strategy 1 | Yes | `FloatingTree` | Default (tree via context) | Same-type nesting breaks |
+| Menubar | Strategy 1 | Yes | `FloatingTree` | (via Menu internals) | Same-type nesting breaks |
+| NavigationMenu | Strategy 1 | Yes | `FloatingTree` | (via Menu internals) | Same-type nesting breaks |
+| Dialog | Strategy 2 | No | `DialogRootContext` counter | `escapeKey: isTopmost` | Dialog-in-Dialog Escape breaks |
+| AlertDialog | Strategy 2 | No | (reuses Dialog) | `disablePointerDismissal: true` | Same as Dialog |
+| Drawer | Strategy 2 | No | (wraps Dialog.Root) | (delegated to Dialog) | Same as Dialog |
+| Select | Strategy 3 | No | None | `bubbles: false` | None |
+| Tooltip | Strategy 3 | No | None | `referencePress: true` | None |
+| PreviewCard | Strategy 3 | No | None | Default | None |
+| Combobox | Strategy 3 | No | None | (similar to Select) | None |
 
 ## Stress Test
 
@@ -133,10 +190,16 @@ The test covers 5 concerns with 23 scenarios: dismiss coordination, z-index stac
 
 ## Implications for the Migration
 
-1. **Phases 1–3 are unaffected**: WPDS overlays can be built and deployed alongside legacy overlays. Click-outside dismiss works correctly across bundles.
+1. **Click-outside dismiss works across bundles** — the `insideReactTree` mechanism is universal and relies only on shared React, not on Base UI contexts. This is not a hard blocker.
 
-2. **Phase 4 remains important**: Unifying all overlay internals on `@base-ui/react` eliminates the FloatingTree isolation issue and ensures consistent Escape key behavior.
+2. **Escape key has nuanced regressions** — same-type nesting (Popover-in-Popover, Menu-in-Menu) and Dialog-in-Dialog across bundles lose their nesting awareness. These are uncommon cross-package patterns, but should be documented as known limitations.
 
-3. **No strategy shift required**: The bundling model (multiple copies of `@base-ui/react`) does not create a hard blocker.
+3. **Select-in-Dialog is safe** — Select's `bubbles: false` means Escape only closes the Select. The Dialog's behavior on Escape is the same whether or not the Select shares a bundle. The double-dismiss issue (Dialog also closing) is a single-bundle behavior that exists today.
 
-4. **Long-term option**: Promoting `@wordpress/ui` to `wpScript: true` would eliminate all context isolation concerns by making it a shared script handle. This is a Core-level decision that can be deferred.
+4. **Phases 1–3 are unaffected**: WPDS overlays can be built and deployed alongside legacy overlays.
+
+5. **Phase 4 remains important**: Unifying all overlay internals on `@base-ui/react` within the same bundle eliminates FloatingTree isolation and Dialog context counter isolation.
+
+6. **No strategy shift required**: The bundling model (multiple copies of `@base-ui/react`) does not create a hard blocker.
+
+7. **Long-term option**: Promoting `@wordpress/ui` to `wpScript: true` would eliminate all context isolation concerns by making it a shared script handle. This is a Core-level decision that can be deferred.
