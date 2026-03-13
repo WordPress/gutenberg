@@ -60,15 +60,10 @@ function getFocusableElements( ref ) {
  * @return {*} The callback's return value.
  */
 function withMeasurementStyles( element, callback ) {
-	const inlineStyles = {
+	const saved = {
 		visibility: element.style.visibility,
 		display: element.style.display,
 		position: element.style.position,
-	};
-	const hadInlineStyles = {
-		visibility: inlineStyles.visibility !== '',
-		display: inlineStyles.display !== '',
-		position: inlineStyles.position !== '',
 	};
 
 	element.style.visibility = 'visible';
@@ -77,14 +72,13 @@ function withMeasurementStyles( element, callback ) {
 
 	const result = callback();
 
-	// Restore or remove inline styles
-	Object.keys( inlineStyles ).forEach( ( prop ) => {
-		if ( hadInlineStyles[ prop ] ) {
-			element.style[ prop ] = inlineStyles[ prop ];
+	for ( const [ prop, value ] of Object.entries( saved ) ) {
+		if ( value ) {
+			element.style[ prop ] = value;
 		} else {
 			element.style.removeProperty( prop );
 		}
-	} );
+	}
 
 	return result;
 }
