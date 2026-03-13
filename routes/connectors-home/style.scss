@@ -34,10 +34,16 @@
 		overflow: hidden;
 		border-radius: 8px;
 		padding: 24px;
-		padding-right: 220px;
+		padding-inline-end: 220px;
 		background:
 			linear-gradient(90deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%),
 			linear-gradient(90deg, #89dcdc 0%, #c7eb5c 46.15%, #a920c1 100%);
+
+		[dir="rtl"] & {
+			background:
+				linear-gradient(270deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%),
+				linear-gradient(270deg, #89dcdc 0%, #c7eb5c 46.15%, #a920c1 100%);
+		}
 
 		&__content {
 			display: flex;
@@ -60,7 +66,7 @@
 
 		&__decoration {
 			position: absolute;
-			right: 8px;
+			inset-inline-end: 8px;
 			top: -15px;
 			width: 248px;
 			height: 248px;
@@ -75,12 +81,12 @@
 	@media (max-width: 680px) {
 		.ai-plugin-callout {
 			padding: 12px;
-			padding-right: 84px;
+			padding-inline-end: 84px;
 
 			&__decoration {
 				width: 134px;
 				height: 134px;
-				right: 4px;
+				inset-inline-end: 4px;
 				top: -8px;
 			}
 		}
