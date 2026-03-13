@@ -105,13 +105,14 @@ $admin-bar-height-big: 46px;
 $admin-sidebar-width: 160px;
 $admin-sidebar-width-big: 190px;
 $admin-sidebar-width-collapsed: 36px;
-$modal-min-width: 350px;
-$modal-width-small: 384px;
-$modal-width-medium: 512px;
-$modal-width-large: 840px;
 $spinner-size: 16px;
 $canvas-padding: $grid-unit-20;
 $palette-max-height: 368px;
+// These values align with --wpds-dimension-surface-width-* design tokens from @wordpress/theme.
+$modal-min-width: 320px; // sm
+$modal-width-small: 400px; // md
+$modal-width-medium: 560px; // lg
+$modal-width-large: 960px; // 2xl
 
 /**
  * Mobile specific styles
