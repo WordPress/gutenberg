@@ -177,12 +177,13 @@ function block_core_navigation_link_maybe_urldecode( $url ) {
  * Determines whether a navigation link block should be marked as the active/current item
  * based on the current WordPress query context.
  *
- * Mirrors the two ID-based match branches of the classic menu system
+ * Mirrors the two ID-based active-state checks of the classic menu system
  * (`_wp_menu_item_classes_by_context()` in wp-includes/nav-menu-template.php):
  *
- * - Branch B: direct entity ID match, guarded by object-type check to prevent post/term
- *             ID collisions (posts and terms use independent auto-increment sequences).
- * - Branch C: post-type archive URL match, regardless of stored ID.
+ * - Entity ID match: the link's stored entity ID matches the current queried object ID,
+ *   with an object-type guard to prevent false positives from post/term ID collisions.
+ * - Post-type archive URL match: the link's URL matches the current archive permalink,
+ *   regardless of whether an entity ID is stored.
  *
  * @since 6.8.0
  *
@@ -215,7 +216,7 @@ function block_core_navigation_link_is_active( $attributes ) {
 	$link_kind      = ! empty( $stored_kind ) ? $stored_kind : $kind_from_type;
 
 	/*
-	 * Branch B: direct entity ID match.
+	 * Entity ID match.
 	 *
 	 * Backwards compatibility — numeric id guard:
 	 * Historically, the `id` attribute could be set to a URL string rather than an integer
@@ -241,7 +242,7 @@ function block_core_navigation_link_is_active( $attributes ) {
 	}
 
 	/*
-	 * Branch C: post-type archive URL match.
+	 * Post-type archive URL match.
 	 * Active when the current URL matches the archive permalink, regardless of stored ID.
 	 */
 	if ( is_post_type_archive() && ! empty( $attributes['url'] ) ) {
