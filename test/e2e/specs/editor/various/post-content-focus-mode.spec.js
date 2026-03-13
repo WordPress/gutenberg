@@ -67,7 +67,7 @@ test.describe( 'Post Content focus mode', () => {
 			).toEqual( [ 'core/paragraph', 'core/heading', 'core/heading' ] );
 		} );
 
-		await test.step( 'Inner block selected: inserts after selected block', async () => {
+		await test.step( 'Post content inner block selected: inserts after selected block', async () => {
 			// Select the first paragraph.
 			const paragraph = editor.canvas.getByText( 'Initial paragraph' );
 			await editor.selectBlocks( paragraph );
