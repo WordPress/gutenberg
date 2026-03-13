@@ -236,6 +236,26 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'aria-current="page"', $output );
 	}
 
+	/**
+	 * When kind is absent but type is "page", the link should still be treated as a post-type
+	 * link. Covers WP 6.7 blocks created via Custom Link variation where kind may be omitted
+	 * for built-in types.
+	 */
+	public function test_current_menu_item_for_page_type_without_kind() {
+		$this->go_to( get_permalink( self::$page->ID ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Page',
+				'type'  => 'page',
+				// No 'kind' — simulates older/custom-link-variation blocks.
+				'id'    => self::$page->ID,
+				'url'   => get_permalink( self::$page->ID ),
+			)
+		);
+		$this->assertStringContainsString( 'current-menu-item', $output );
+		$this->assertStringContainsString( 'aria-current="page"', $output );
+	}
+
 	// -------------------------------------------------------------------------
 	// Group 2: Active state — Taxonomy links
 	// -------------------------------------------------------------------------
@@ -262,6 +282,45 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 				'label' => 'Dogs',
 				'type'  => 'post_tag',
 				'kind'  => 'taxonomy',
+				'id'    => self::$tag->term_id,
+				'url'   => get_term_link( self::$tag ),
+			)
+		);
+		$this->assertStringContainsString( 'current-menu-item', $output );
+		$this->assertStringContainsString( 'aria-current="page"', $output );
+	}
+
+	/**
+	 * When kind is absent but type is "category", the link should be inferred as a taxonomy
+	 * link via taxonomy_exists(). Fails before fix because kind defaults to 'post-type' and
+	 * instanceof WP_Post check fails on a term archive page.
+	 */
+	public function test_current_menu_item_for_category_type_without_kind() {
+		$this->go_to( get_term_link( self::$category ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Cats',
+				'type'  => 'category',
+				// No 'kind' stored — JS omits kind when newKind is empty and type is built-in.
+				'id'    => self::$category->term_id,
+				'url'   => get_term_link( self::$category ),
+			)
+		);
+		$this->assertStringContainsString( 'current-menu-item', $output );
+		$this->assertStringContainsString( 'aria-current="page"', $output );
+	}
+
+	/**
+	 * Same as above but for tags. JS normalises 'post_tag' → 'tag' before storing in type,
+	 * so the fix must map 'tag' back to 'post_tag' for taxonomy_exists() to return true.
+	 */
+	public function test_current_menu_item_for_tag_type_without_kind() {
+		$this->go_to( get_term_link( self::$tag ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Dogs',
+				'type'  => 'tag', // stored as 'tag', not 'post_tag'.
+				// No 'kind' stored.
 				'id'    => self::$tag->term_id,
 				'url'   => get_term_link( self::$tag ),
 			)

@@ -211,7 +211,13 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	$css_classes         = trim( implode( ' ', $classes ) );
 	$queried_object      = get_queried_object();
-	$link_kind           = ! empty( $attributes['kind'] ) ? $attributes['kind'] : 'post-type';
+	$stored_kind         = $attributes['kind'] ?? '';
+	$stored_type         = $attributes['type'] ?? '';
+	// JS normalises 'post_tag' → 'tag' before storing. Map it back so taxonomy_exists() works.
+	$resolved_type       = 'tag' === $stored_type ? 'post_tag' : $stored_type;
+	// When kind is explicitly stored, trust it. Otherwise infer from type: if the stored
+	// type is a registered taxonomy slug, treat the link as a taxonomy link.
+	$link_kind           = ! empty( $stored_kind ) ? $stored_kind : ( taxonomy_exists( $resolved_type ) ? 'taxonomy' : 'post-type' );
 	$link_id             = is_numeric( $attributes['id'] ?? null ) ? (int) $attributes['id'] : 0;
 	$is_taxonomy_link    = 'taxonomy' === $link_kind;
 	$queried_id          = get_queried_object_id();
