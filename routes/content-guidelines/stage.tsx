@@ -11,6 +11,8 @@ import {
 	Navigator,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+// TODO: Revert to the `Notice` in `@wordpress/components` for now.
+// eslint-disable-next-line @wordpress/use-recommended-components
 import { Notice } from '@wordpress/ui';
 
 /**

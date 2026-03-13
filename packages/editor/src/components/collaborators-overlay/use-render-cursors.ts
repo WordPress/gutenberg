@@ -1,8 +1,11 @@
 import {
 	privateApis as coreDataPrivateApis,
 	SelectionType,
+	type PostEditorAwarenessState as ActiveCollaborator,
 } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
+import { store as preferencesStore } from '@wordpress/preferences';
 import type { ResolvedSelection } from '@wordpress/core-data';
 
 import { unlock } from '../../lock-unlock';
@@ -25,6 +28,7 @@ export interface CursorData {
 	x: number;
 	y: number;
 	height: number;
+	isMe?: boolean;
 	selectionRects?: SelectionRect[];
 }
 
@@ -54,6 +58,12 @@ export function useRenderCursors(
 		postType ?? null
 	);
 
+	const showOwnCursor = useSelect(
+		( select ) =>
+			select( preferencesStore ).get( 'core', 'showCollaborationCursor' ),
+		[]
+	);
+
 	const [ cursorPositions, setCursorPositions ] = useState< CursorData[] >(
 		[]
 	);
@@ -78,8 +88,12 @@ export function useRenderCursors(
 
 		const results: CursorData[] = [];
 
-		sortedUsers.forEach( ( user: any ) => {
-			if ( user.isMe ) {
+		const hasOtherCollaborators = sortedUsers.some(
+			( u: ActiveCollaborator ) => ! u.isMe
+		);
+
+		sortedUsers.forEach( ( user: ActiveCollaborator ) => {
+			if ( user.isMe && ( ! showOwnCursor || ! hasOtherCollaborators ) ) {
 				return;
 			}
 
@@ -122,7 +136,9 @@ export function useRenderCursors(
 
 			const userName = user.collaboratorInfo.name;
 			const clientId = user.clientId;
-			const color = getAvatarBorderColor( user.collaboratorInfo.id );
+			const color = user.isMe
+				? 'var(--wp-admin-theme-color)'
+				: getAvatarBorderColor( user.collaboratorInfo.id );
 			const avatarUrl = getAvatarUrl( user.collaboratorInfo.avatar_urls );
 
 			const selectionVisual = computeSelectionVisual(
@@ -138,6 +154,7 @@ export function useRenderCursors(
 					clientId,
 					color,
 					avatarUrl,
+					isMe: user.isMe,
 					...selectionVisual.coords,
 				};
 
@@ -155,6 +172,7 @@ export function useRenderCursors(
 		resolveSelection,
 		overlayElement,
 		sortedUsers,
+		showOwnCursor,
 		recomputeToken,
 	] );
 
