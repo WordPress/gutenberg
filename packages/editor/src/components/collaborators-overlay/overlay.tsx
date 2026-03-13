@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import Avatar from '../collaborators-presence/avatar';
 import { AVATAR_IFRAME_STYLES } from './avatar-iframe-styles';
 import { OVERLAY_IFRAME_STYLES } from './overlay-iframe-styles';
+import { setDelayedInterval } from './timing-utils';
 import { useBlockHighlighting } from './use-block-highlighting';
 import { useRenderCursors } from './use-render-cursors';
 
@@ -156,41 +157,4 @@ export function Overlay( {
 			) ) }
 		</div>
 	);
-}
-
-/**
- * Like setInterval but measures the delay between the end of one run and the
- * start of the next, so callbacks never stack up when the main thread is busy.
- *
- * @param callback The function to call repeatedly.
- * @param delayMs  Milliseconds between runs.
- * @return A cleanup function that stops the timer.
- */
-function setDelayedInterval( callback: () => void, delayMs: number ) {
-	let timerHandle: ReturnType< typeof setTimeout > | null = null;
-
-	const runner = () => {
-		callback();
-		timerHandle = setTimeout( runner, delayMs );
-	};
-
-	// Restart the runner if an exception killed it
-	const guardInterval = setInterval( () => {
-		if ( timerHandle ) {
-			return;
-		}
-
-		timerHandle = setTimeout( () => {
-			timerHandle = null;
-			runner();
-		}, 0 );
-	}, delayMs );
-
-	return () => {
-		if ( timerHandle ) {
-			clearTimeout( timerHandle );
-		}
-
-		clearInterval( guardInterval );
-	};
 }
