@@ -708,7 +708,7 @@ export function collaborationSupported( state = true, action ) {
 			return action.supported;
 
 		case 'SET_SYNC_CONNECTION_STATUS':
-			if ( action.status.status === 'provider-limit-exceeded' ) {
+			if ( 'document-size-limit-exceeded' === action.status.status ) {
 				return false;
 			}
 

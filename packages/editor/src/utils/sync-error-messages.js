@@ -3,11 +3,18 @@
  */
 import { __ } from '@wordpress/i18n';
 
+// These error codes are defined in the sync package.
+export const AUTHENTICATION_FAILED = 'authentication-failed';
+export const CONNECTION_EXPIRED = 'connection-expired';
+export const CONNECTION_LIMIT_EXCEEDED = 'connection-limit-exceeded';
+export const DOCUMENT_SIZE_LIMIT_EXCEEDED = 'document-size-limit-exceeded';
+export const UNKNOWN_ERROR = 'unknown-error';
+
 /**
  * Default error messages for known error codes.
  */
 const ERROR_MESSAGES = {
-	'authentication-failed': {
+	[ AUTHENTICATION_FAILED ]: {
 		title: __( 'Unable to connect' ),
 		description: __(
 			"Real-time collaboration couldn't verify your permissions. " +
@@ -15,7 +22,7 @@ const ERROR_MESSAGES = {
 		),
 		canRetry: false,
 	},
-	'connection-expired': {
+	[ CONNECTION_EXPIRED ]: {
 		title: __( 'Connection expired' ),
 		description: __(
 			'Your connection to real-time collaboration has timed out. ' +
@@ -23,7 +30,7 @@ const ERROR_MESSAGES = {
 		),
 		canRetry: true,
 	},
-	'connection-limit-exceeded': {
+	[ CONNECTION_LIMIT_EXCEEDED ]: {
 		title: __( 'Too many editors connected' ),
 		description: __(
 			'Real-time collaboration has reached its connection limit. ' +
@@ -31,9 +38,9 @@ const ERROR_MESSAGES = {
 		),
 		canRetry: true,
 	},
-	// 'provider-limit-exceeded' is not included here because it results in
+	// DOCUMENT_SIZE_LIMIT_EXCEEDED is not included here because it results in
 	// collaboration being disabled entirely.
-	'unknown-error': {
+	[ UNKNOWN_ERROR ]: {
 		title: __( 'Connection lost' ),
 		description: __(
 			'The connection to real-time collaboration was interrupted. ' +
@@ -56,5 +63,5 @@ export function getSyncErrorMessages( error ) {
 		return ERROR_MESSAGES[ error.code ];
 	}
 
-	return ERROR_MESSAGES[ 'unknown-error' ];
+	return ERROR_MESSAGES[ UNKNOWN_ERROR ];
 }

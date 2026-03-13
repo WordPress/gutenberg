@@ -16,6 +16,7 @@ import { addAction, removeAction } from '@wordpress/hooks';
 import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '../../lock-unlock';
+import { DOCUMENT_SIZE_LIMIT_EXCEEDED } from '../../utils/sync-error-messages';
 
 /**
  * Internal dependencies
@@ -38,7 +39,7 @@ function CollaborationContext() {
 		return null;
 	}
 
-	if ( 'provider-limit-exceeded' === syncConnectionStatus.status ) {
+	if ( DOCUMENT_SIZE_LIMIT_EXCEEDED === syncConnectionStatus.status ) {
 		return (
 			<p>
 				{ __(

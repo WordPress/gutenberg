@@ -62,7 +62,7 @@ export type ConnectionErrorCode =
 	| 'authentication-error'
 	| 'connection-expired'
 	| 'connection-limit-exceeded'
-	| 'provider-limit-exceeded'
+	| 'document-size-limit-exceeded'
 	| 'unknown-error';
 
 /**
@@ -94,8 +94,8 @@ export interface ConnectionStatusDisconnected {
 	retryInMs?: number;
 }
 
-export interface ConnectionStatusProviderLimitExceeded {
-	status: 'provider-limit-exceeded';
+export interface ConnectionStatusDocumentSizeLimitExceeded {
+	status: 'document-size-limit-exceeded';
 	/** Optional error information. */
 	error?: ConnectionError;
 }
@@ -104,7 +104,7 @@ export type ConnectionStatus =
 	| ConnectionStatusConnected
 	| ConnectionStatusConnecting
 	| ConnectionStatusDisconnected
-	| ConnectionStatusProviderLimitExceeded;
+	| ConnectionStatusDocumentSizeLimitExceeded;
 
 export type OnStatusChangeCallback = (
 	status: ConnectionStatus | null

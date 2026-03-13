@@ -501,7 +501,7 @@ function registerRoom( {
 			} );
 
 			state.onStatusChange( {
-				status: 'provider-limit-exceeded',
+				status: 'document-size-limit-exceeded',
 			} );
 
 			// This is an unrecoverable error. Unregister the room to prevent syncing.

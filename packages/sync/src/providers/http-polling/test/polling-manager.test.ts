@@ -158,7 +158,7 @@ describe( 'polling-manager', () => {
 			return call[ 1 ] as ( update: Uint8Array, origin: unknown ) => void;
 		}
 
-		it( 'emits provider-limit-exceeded status when an update exceeds the size limit', async () => {
+		it( 'emits document-size-limit-exceeded status when an update exceeds the size limit', async () => {
 			mockPostSyncUpdate.mockResolvedValue( syncResponse );
 
 			const onStatusChange = jest.fn();
@@ -178,7 +178,7 @@ describe( 'polling-manager', () => {
 			onDocUpdate( new Uint8Array( 11 ), 'some-origin' );
 
 			expect( onStatusChange ).toHaveBeenCalledWith( {
-				status: 'provider-limit-exceeded',
+				status: 'document-size-limit-exceeded',
 			} );
 		} );
 
@@ -243,7 +243,7 @@ describe( 'polling-manager', () => {
 
 			expect( onStatusChange ).not.toHaveBeenCalledWith(
 				expect.objectContaining( {
-					status: 'provider-limit-exceeded',
+					status: 'document-size-limit-exceeded',
 				} )
 			);
 		} );
