@@ -91,15 +91,11 @@ describe( 'CollapsibleCard', () => {
 				screen.queryByText( 'Toggle content' )
 			).not.toBeInTheDocument();
 
-			await user.click(
-				screen.getByRole( 'button', { name: 'Title' } )
-			);
+			await user.click( screen.getByRole( 'button', { name: 'Title' } ) );
 
 			expect( screen.getByText( 'Toggle content' ) ).toBeVisible();
 
-			await user.click(
-				screen.getByRole( 'button', { name: 'Title' } )
-			);
+			await user.click( screen.getByRole( 'button', { name: 'Title' } ) );
 
 			expect(
 				screen.queryByText( 'Toggle content' )
@@ -146,9 +142,7 @@ describe( 'CollapsibleCard', () => {
 				</CollapsibleCard.Root>
 			);
 
-			await user.click(
-				screen.getByRole( 'button', { name: 'Title' } )
-			);
+			await user.click( screen.getByRole( 'button', { name: 'Title' } ) );
 
 			expect( onOpenChange.mock.calls[ 0 ][ 0 ] ).toBe( true );
 		} );
@@ -171,9 +165,7 @@ describe( 'CollapsibleCard', () => {
 
 			expect( screen.getByText( 'Should stay visible' ) ).toBeVisible();
 
-			await user.click(
-				screen.getByRole( 'button', { name: 'Title' } )
-			);
+			await user.click( screen.getByRole( 'button', { name: 'Title' } ) );
 
 			expect( screen.getByText( 'Should stay visible' ) ).toBeVisible();
 		} );
@@ -194,5 +186,4 @@ describe( 'CollapsibleCard', () => {
 			).toBeVisible();
 		} );
 	} );
-
 } );
