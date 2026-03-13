@@ -34,7 +34,7 @@ function overlay_dismiss_stress_test_enqueue_scripts( $hook_suffix ) {
 		return;
 	}
 
-	$plugin_dir_url = plugin_dir_url( __FILE__ );
+	$plugin_dir_url  = plugin_dir_url( __FILE__ );
 	$plugin_dir_path = plugin_dir_path( __FILE__ );
 
 	// Bundle A — independent copy of @base-ui/react (IIFE, window.OverlayBundleA)
