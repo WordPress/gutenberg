@@ -11,7 +11,9 @@
  */
 class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	private static $category;
+	private static $tag;
 	private static $page;
+	private static $post;
 	private static $draft;
 	private static $custom_draft;
 	private static $custom_post;
@@ -24,6 +26,14 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	private $original_block_supports;
 
 	public static function wpSetUpBeforeClass() {
+		// Register "dogs" before creating posts of that type so go_to() can resolve them.
+		register_post_type(
+			'dogs',
+			array(
+				'public'             => true,
+				'publicly_queryable' => true,
+			)
+		);
 
 		self::$draft   = self::factory()->post->create_and_get(
 			array(
@@ -73,6 +83,15 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 		self::$pages[] = self::$page;
 
+		self::$post = self::factory()->post->create_and_get(
+			array(
+				'post_type'    => 'post',
+				'post_status'  => 'publish',
+				'post_title'   => 'Test Post',
+			)
+		);
+		self::$pages[] = self::$post;
+
 		self::$category = self::factory()->category->create_and_get(
 			array(
 				'taxonomy'    => 'category',
@@ -81,11 +100,19 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 				'description' => 'Cats Category',
 			)
 		);
-
 		self::$terms[] = self::$category;
+
+		self::$tag = self::factory()->tag->create_and_get(
+			array(
+				'name' => 'dogs',
+				'slug' => 'dogs',
+			)
+		);
+		self::$terms[] = self::$tag;
 	}
 
 	public static function wpTearDownAfterClass() {
+		unregister_post_type( 'dogs' );
 		foreach ( self::$pages as $page_to_delete ) {
 			wp_delete_post( $page_to_delete->ID );
 		}
@@ -107,6 +134,248 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	public function tear_down() {
 		WP_Block_Supports::$block_to_render = $this->original_block_supports;
 		parent::tear_down();
+	}
+
+	/**
+	 * Renders a navigation-link block with the given attributes and returns the HTML output.
+	 */
+	private function render_nav_link( array $attrs ): string {
+		$json          = wp_json_encode( $attrs );
+		$parsed_blocks = parse_blocks( "<!-- wp:navigation-link {$json} /-->" );
+		$block         = new WP_Block( $parsed_blocks[0], array() );
+		return gutenberg_render_block_core_navigation_link(
+			$block->attributes,
+			array(),
+			$block
+		);
+	}
+
+	// -------------------------------------------------------------------------
+	// Group 1: Active state — Post-type links
+	// -------------------------------------------------------------------------
+
+	public function test_current_menu_item_for_page_link() {
+		$this->go_to( get_permalink( self::$page->ID ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Page',
+				'type'  => 'page',
+				'kind'  => 'post-type',
+				'id'    => self::$page->ID,
+				'url'   => get_permalink( self::$page->ID ),
+			)
+		);
+		$this->assertStringContainsString( 'current-menu-item', $output );
+		$this->assertStringContainsString( 'aria-current="page"', $output );
+	}
+
+	public function test_current_menu_item_for_standard_post_link() {
+		$this->go_to( get_permalink( self::$post->ID ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Post',
+				'type'  => 'post',
+				'kind'  => 'post-type',
+				'id'    => self::$post->ID,
+				'url'   => get_permalink( self::$post->ID ),
+			)
+		);
+		$this->assertStringContainsString( 'current-menu-item', $output );
+		$this->assertStringContainsString( 'aria-current="page"', $output );
+	}
+
+	public function test_current_menu_item_for_custom_post_type_link() {
+		$this->go_to( get_permalink( self::$custom_post->ID ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Metal Dog',
+				'type'  => 'dogs',
+				'kind'  => 'post-type',
+				'id'    => self::$custom_post->ID,
+				'url'   => get_permalink( self::$custom_post->ID ),
+			)
+		);
+		$this->assertStringContainsString( 'current-menu-item', $output );
+		$this->assertStringContainsString( 'aria-current="page"', $output );
+	}
+
+	public function test_current_menu_item_for_legacy_link_without_kind() {
+		$this->go_to( get_permalink( self::$page->ID ) );
+		// Omit 'kind' entirely to simulate an older serialised block.
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Page',
+				'type'  => 'page',
+				'id'    => self::$page->ID,
+				'url'   => get_permalink( self::$page->ID ),
+			)
+		);
+		$this->assertStringContainsString( 'current-menu-item', $output );
+		$this->assertStringContainsString( 'aria-current="page"', $output );
+	}
+
+	/**
+	 * Confirmed failing test (TDD red): a link with kind "custom" and a numeric id
+	 * must receive current-menu-item when on the matching page.
+	 *
+	 * Fails before fix because $kind = "custom", get_queried_object()->custom
+	 * does not exist on any WP object, so ! empty(...) is always false.
+	 */
+	public function test_current_menu_item_for_custom_kind_link_with_id() {
+		$this->go_to( get_permalink( self::$page->ID ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Page',
+				'type'  => 'page',
+				'kind'  => 'custom',
+				'id'    => self::$page->ID,
+				'url'   => get_permalink( self::$page->ID ),
+			)
+		);
+		$this->assertStringContainsString( 'current-menu-item', $output );
+		$this->assertStringContainsString( 'aria-current="page"', $output );
+	}
+
+	// -------------------------------------------------------------------------
+	// Group 2: Active state — Taxonomy links
+	// -------------------------------------------------------------------------
+
+	public function test_current_menu_item_for_category_link() {
+		$this->go_to( get_term_link( self::$category ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Cats',
+				'type'  => 'category',
+				'kind'  => 'taxonomy',
+				'id'    => self::$category->term_id,
+				'url'   => get_term_link( self::$category ),
+			)
+		);
+		$this->assertStringContainsString( 'current-menu-item', $output );
+		$this->assertStringContainsString( 'aria-current="page"', $output );
+	}
+
+	public function test_current_menu_item_for_tag_link() {
+		$this->go_to( get_term_link( self::$tag ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Dogs',
+				'type'  => 'post_tag',
+				'kind'  => 'taxonomy',
+				'id'    => self::$tag->term_id,
+				'url'   => get_term_link( self::$tag ),
+			)
+		);
+		$this->assertStringContainsString( 'current-menu-item', $output );
+		$this->assertStringContainsString( 'aria-current="page"', $output );
+	}
+
+	// -------------------------------------------------------------------------
+	// Group 3: Not active — non-matching page (no go_to)
+	// -------------------------------------------------------------------------
+
+	public function test_no_current_menu_item_when_not_on_linked_page() {
+		// No go_to() — get_queried_object_id() returns 0, so no id can match.
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Page',
+				'type'  => 'page',
+				'kind'  => 'post-type',
+				'id'    => self::$page->ID,
+				'url'   => get_permalink( self::$page->ID ),
+			)
+		);
+		$this->assertStringNotContainsString( 'current-menu-item', $output );
+		$this->assertStringNotContainsString( 'aria-current', $output );
+	}
+
+	// -------------------------------------------------------------------------
+	// Group 4: Not active — ID edge cases
+	// -------------------------------------------------------------------------
+
+	public function test_no_current_menu_item_when_id_is_absent() {
+		$this->go_to( get_permalink( self::$page->ID ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Page',
+				'type'  => 'page',
+				'kind'  => 'post-type',
+				'url'   => get_permalink( self::$page->ID ),
+				// No 'id' attribute.
+			)
+		);
+		$this->assertStringNotContainsString( 'current-menu-item', $output );
+		$this->assertStringNotContainsString( 'aria-current', $output );
+	}
+
+	public function test_no_current_menu_item_when_id_is_zero() {
+		$this->go_to( get_permalink( self::$page->ID ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Page',
+				'type'  => 'page',
+				'kind'  => 'post-type',
+				'id'    => 0,
+				'url'   => get_permalink( self::$page->ID ),
+			)
+		);
+		$this->assertStringNotContainsString( 'current-menu-item', $output );
+		$this->assertStringNotContainsString( 'aria-current', $output );
+	}
+
+	public function test_no_current_menu_item_when_id_is_string_url() {
+		$this->go_to( get_permalink( self::$page->ID ) );
+		// Render with id set to a URL string — the historical bug scenario.
+		// is_numeric() must prevent this from ever matching.
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Page',
+				'type'  => 'page',
+				'kind'  => 'post-type',
+				'id'    => 'https://example.com',
+				'url'   => get_permalink( self::$page->ID ),
+			)
+		);
+		$this->assertStringNotContainsString( 'current-menu-item', $output );
+		$this->assertStringNotContainsString( 'aria-current', $output );
+	}
+
+	// -------------------------------------------------------------------------
+	// Group 5: Not active — post/term ID collision guards
+	// -------------------------------------------------------------------------
+
+	public function test_taxonomy_link_not_active_when_on_post_page_with_matching_id() {
+		// Simulate being on a post page. The taxonomy link carries the same integer
+		// id as the post — this must NOT produce a false positive.
+		$this->go_to( get_permalink( self::$page->ID ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Category',
+				'type'  => 'category',
+				'kind'  => 'taxonomy',
+				'id'    => self::$page->ID,
+				'url'   => get_term_link( self::$category ),
+			)
+		);
+		$this->assertStringNotContainsString( 'current-menu-item', $output );
+		$this->assertStringNotContainsString( 'aria-current', $output );
+	}
+
+	public function test_post_type_link_not_active_when_on_term_page_with_matching_id() {
+		// Simulate being on a term archive page. The post-type link carries the same
+		// integer id as the term — this must NOT produce a false positive.
+		$this->go_to( get_term_link( self::$category ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Page',
+				'type'  => 'page',
+				'kind'  => 'post-type',
+				'id'    => self::$category->term_id,
+				'url'   => get_permalink( self::$page->ID ),
+			)
+		);
+		$this->assertStringNotContainsString( 'current-menu-item', $output );
+		$this->assertStringNotContainsString( 'aria-current', $output );
 	}
 
 	public function test_returns_link_when_post_is_published() {

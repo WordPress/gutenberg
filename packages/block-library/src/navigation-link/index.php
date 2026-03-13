@@ -209,9 +209,17 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	}
 	$has_submenu = ! empty( trim( $inner_blocks_html ) );
 
-	$css_classes = trim( implode( ' ', $classes ) );
-	$kind        = empty( $attributes['kind'] ) ? 'post_type' : str_replace( '-', '_', $attributes['kind'] );
-	$is_active   = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
+	$css_classes         = trim( implode( ' ', $classes ) );
+	$queried_object      = get_queried_object();
+	$link_kind           = ! empty( $attributes['kind'] ) ? $attributes['kind'] : 'post-type';
+	$link_id             = is_numeric( $attributes['id'] ?? null ) ? (int) $attributes['id'] : 0;
+	$is_taxonomy_link    = 'taxonomy' === $link_kind;
+	$queried_id          = get_queried_object_id();
+	$ids_match           = $link_id > 0 && $queried_id === $link_id;
+	$object_type_matches = $is_taxonomy_link
+		? $queried_object instanceof WP_Term
+		: $queried_object instanceof WP_Post;
+	$is_active           = $ids_match && $object_type_matches;
 
 	if ( is_post_type_archive() && ! empty( $attributes['url'] ) ) {
 		$queried_archive_link = get_post_type_archive_link( get_queried_object()->name );
