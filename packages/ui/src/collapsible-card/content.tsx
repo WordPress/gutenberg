@@ -18,6 +18,7 @@ export const Content = forwardRef< HTMLDivElement, ContentProps >(
 			<Collapsible.Panel
 				ref={ ref }
 				className={ clsx( styles.content, className ) }
+				hiddenUntilFound
 				{ ...restProps }
 			>
 				<Card.Content
