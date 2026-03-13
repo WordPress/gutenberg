@@ -39,9 +39,6 @@ const rule = {
 			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/use-recommended-components.md',
 		},
 		schema: [],
-		messages: {
-			restricted: '{{ message }}',
-		},
 	},
 	create( context ) {
 		return {
@@ -73,28 +70,22 @@ const rule = {
 					) {
 						context.report( {
 							node: specifier,
-							messageId: 'restricted',
-							data: {
-								message: resolveMessage(
-									allowlistEntry.message,
-									name,
-									source
-								),
-							},
+							message: resolveMessage(
+								allowlistEntry.message,
+								name,
+								source
+							),
 						} );
 					}
 
-					if ( denylistEntry && name in denylistEntry ) {
+					if ( denylistEntry?.hasOwnProperty( name ) ) {
 						context.report( {
 							node: specifier,
-							messageId: 'restricted',
-							data: {
-								message: resolveMessage(
-									denylistEntry[ name ],
-									name,
-									source
-								),
-							},
+							message: resolveMessage(
+								denylistEntry[ name ],
+								name,
+								source
+							),
 						} );
 					}
 				} );
