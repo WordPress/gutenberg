@@ -36,6 +36,11 @@ jest.mock( 'client-zip', () => ( {
 
 global.ResizeObserver = require( 'resize-observer-polyfill' );
 
+// jsdom lacks Element.getAnimations (needed by Base UI ScrollArea ≥1.3)
+if ( ! global.HTMLElement.prototype.getAnimations ) {
+	global.HTMLElement.prototype.getAnimations = () => [];
+}
+
 /**
  * The following mock is for block integration tests that might render
  * components leveraging DOMRect. For example, the Cover block which now renders

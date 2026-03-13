@@ -9,7 +9,7 @@ const wrappedRender = (
 	render: NonNullable< TextareaProps[ 'render' ] >,
 	restProps: TextareaProps & { ref: React.Ref< HTMLTextAreaElement > }
 ) => {
-	return function Render(
+	return function textareaRender(
 		props: React.HTMLAttributes< HTMLTextAreaElement >
 	) {
 		return typeof render === 'function'
