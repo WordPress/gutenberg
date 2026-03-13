@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { useMemo, useState } from '@wordpress/element';
+import { ToggleControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -34,7 +36,11 @@ import {
 	useBlockSettings,
 } from './utils';
 import { BlockStatesControl, STATES_SUPPORT_KEY } from './states';
-import { buildStateSelector } from './state-utils';
+import { buildStateSelector, buildCanvasStateSelector } from './state-utils';
+import { unlock } from '../lock-unlock';
+import { privateApis as blockEditorPrivateApis } from '../private-apis';
+
+const { BlockInspectorPreTabsFill } = unlock( blockEditorPrivateApis );
 import StylesColorPanel from '../components/global-styles/color-panel';
 import StylesTypographyPanel from '../components/global-styles/typography-panel';
 import StylesBorderPanel from '../components/global-styles/border-panel';
@@ -340,6 +346,27 @@ function BlockStyleControls( {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const blockEditingMode = useBlockEditingMode();
 	const [ selectedState, setSelectedState ] = useState( 'default' );
+	const [ showStateOnCanvas, setShowStateOnCanvas ] = useState( true );
+
+	// Inject state styles onto the editor canvas so the selected state is
+	// visible while editing. Scoped to this block instance via data-block so
+	// other blocks of the same type are not affected. Must be called before
+	// any early returns because it is a hook.
+	const canvasStateCSS = useMemo( () => {
+		if ( ! showStateOnCanvas || selectedState === 'default' ) {
+			return undefined;
+		}
+		const stateValue = style?.[ selectedState ];
+		if ( ! stateValue ) {
+			return undefined;
+		}
+		const selector = buildCanvasStateSelector( clientId, name );
+		const css = compileCSS( stateValue, { selector } );
+		// Use !important to override utility classes (e.g. has-accent-3-color)
+		// that the block's default color support generates with !important.
+		return css ? css.replace( /;/g, ' !important;' ) : undefined;
+	}, [ showStateOnCanvas, selectedState, style, clientId, name ] );
+	useStyleOverride( { css: canvasStateCSS } );
 
 	if ( blockEditingMode !== 'default' ) {
 		return null;
@@ -378,6 +405,16 @@ function BlockStyleControls( {
 		return (
 			<>
 				{ statesControl }
+				<BlockInspectorPreTabsFill>
+					<div style={ { padding: '8px 16px' } }>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Show state on canvas' ) }
+							checked={ showStateOnCanvas }
+							onChange={ setShowStateOnCanvas }
+						/>
+					</div>
+				</BlockInspectorPreTabsFill>
 				<InspectorControls>
 					<StylesColorPanel
 						value={ stateValue }
