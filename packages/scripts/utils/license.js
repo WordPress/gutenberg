@@ -411,10 +411,17 @@ function resolvePackagePath( packageName, fromDir ) {
 		);
 		return realpathSync( path.dirname( resolved ) );
 	} catch {
+		// Some packages use `exports` in package.json without exporting
+		// `./package.json`. In that case, resolving `pkg/package.json` fails
+		// but resolving the main entry still works. Walk up from the resolved
+		// main entry to find the nearest package.json.
 		try {
 			const mainResolved = localRequire.resolve( packageName );
 			let dir = path.dirname( mainResolved );
 			while ( dir !== path.parse( dir ).root ) {
+				if ( path.basename( dir ) === 'node_modules' ) {
+					break;
+				}
 				if ( existsSync( path.join( dir, 'package.json' ) ) ) {
 					return realpathSync( dir );
 				}
@@ -434,21 +441,80 @@ function resolvePackagePath( packageName, fromDir ) {
  * @return {Object|null} Parsed package.json or null if not found
  */
 function readPackageJson( dir ) {
-	const pkgJsonPath = path.join( dir, 'package.json' );
-	if ( existsSync( pkgJsonPath ) ) {
-		try {
-			return JSON.parse( readFileSync( pkgJsonPath, 'utf8' ) );
-		} catch {
-			return null;
-		}
+	try {
+		return JSON.parse(
+			readFileSync( path.join( dir, 'package.json' ), 'utf8' )
+		);
+	} catch {
+		return null;
 	}
-	return null;
+}
+
+/**
+ * Recursively collect production dependencies using Node's module resolution.
+ *
+ * @param {Object}   deps                 - Dependencies object from package.json
+ * @param {string}   fromDir              - Directory to resolve from
+ * @param {Object}   options
+ * @param {boolean}  options.gpl2         - Only allow GPL2 compatible licenses
+ * @param {Map}      options.depsMap      - Map to accumulate discovered dependencies
+ * @param {Set}      options.visited      - Set of already-visited paths (prevents cycles)
+ * @param {Function} [options.shouldSkip] - Optional callback; return true to skip a dep by name
+ */
+function collectDeps( deps, fromDir, options ) {
+	if ( ! deps ) {
+		return;
+	}
+
+	const { gpl2, depsMap, visited, shouldSkip } = options;
+	const licenses = getLicenses( gpl2 );
+
+	for ( const depName of Object.keys( deps ) ) {
+		if ( shouldSkip && shouldSkip( depName ) ) {
+			continue;
+		}
+
+		const depPath = resolvePackagePath( depName, fromDir );
+		if ( ! depPath ) {
+			continue;
+		}
+
+		// Avoid infinite loops
+		if ( visited.has( depPath ) ) {
+			continue;
+		}
+		visited.add( depPath );
+
+		const depPkgJson = readPackageJson( depPath );
+		if ( ! depPkgJson ) {
+			continue;
+		}
+
+		const key = `${ depName }@${ depPkgJson.version }`;
+		if ( ! depsMap.has( key ) ) {
+			const license = depPkgJson.license;
+
+			// Skip if license is in the allowed list
+			if ( ! license || ! licenses.includes( license ) ) {
+				depsMap.set( key, {
+					name: depName,
+					version: depPkgJson.version,
+					path: depPath,
+					license,
+				} );
+			}
+		}
+
+		// Recursively check this package's dependencies
+		collectDeps( depPkgJson.dependencies, depPath, options );
+	}
 }
 
 module.exports = {
 	detectTypeFromLicenseText,
 	checkAllCompatible,
 	checkDeps,
+	collectDeps,
 	getLicenses,
 	resolvePackagePath,
 	readPackageJson,
