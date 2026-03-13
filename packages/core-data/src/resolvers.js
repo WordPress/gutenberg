@@ -230,18 +230,26 @@ export const getEntityRecord =
 								query
 							);
 						},
-						// Save the current entity record, whether or not it has unsaved
-						// edits. This is used to trigger a persisted CRDT document.
-						saveRecord: () => {
+						// Persist the CRDT document.
+						//
+						// TODO: Currently, persisted CRDT documents are stored in post meta.
+						// This effectively means that only post entities support CRDT
+						// persistence. As we add support for syncing additional entity,
+						// we'll need to revisit where persisted CRDT documents are stored.
+						persistCRDTDoc: () => {
 							resolveSelect
 								.getEditedEntityRecord( kind, name, key )
 								.then( ( editedRecord ) => {
-									// Don't trigger a save if the record is still an auto-draft.
-									const { status } = editedRecord;
-									if ( 'auto-draft' === status ) {
+									// Don't persist the CRDT document if the record is still an
+									// auto-draft or if the entity does not support meta.
+									const { meta, status } = editedRecord;
+									if ( 'auto-draft' === status || ! meta ) {
 										return;
 									}
 
+									// Trigger a save to persist the CRDT document. The entity's
+									// pre-persist hooks will create the persisted CRDT document
+									// and apply it to the record's meta.
 									dispatch.saveEntityRecord(
 										kind,
 										name,
