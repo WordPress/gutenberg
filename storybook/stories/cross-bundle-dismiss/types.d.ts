@@ -1,7 +1,12 @@
 declare module '@cross-bundle-test/bundle-b' {
-	export const Dialog: Record< string, React.ComponentType >;
-	export const Select: Record< string, React.ComponentType >;
-	export const Popover: Record< string, React.ComponentType >;
-	export const Menu: Record< string, React.ComponentType >;
-	export const Tooltip: Record< string, React.ComponentType >;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	export const Dialog: any;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	export const Select: any;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	export const Popover: any;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	export const Menu: any;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	export const Tooltip: any;
 }
