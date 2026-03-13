@@ -1820,7 +1820,10 @@ export function processCSSNesting(
 	try {
 		return ss.cssRules[
 			ss.insertRule( `:root :where(${ blockSelector }){${ css }}` )
-		].cssText;
+	try {
+		const cssRuleText = `:root :where(${ blockSelector }){${ css }}`;
+		new CSSStyleSheet().insertRule( cssRuleText, 0 );
+		return cssRuleText;
 	} catch {
 		return '';
 	}
