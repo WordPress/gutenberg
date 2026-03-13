@@ -7,6 +7,7 @@ import type { ComponentType } from 'react';
  * WordPress dependencies
  */
 import { useContext } from '@wordpress/element';
+import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -14,6 +15,7 @@ import { __ } from '@wordpress/i18n';
  */
 import DataViewsContext from '../dataviews-context';
 import { VIEW_LAYOUTS } from '../dataviews-layouts';
+import { useDelayedLoading } from '../../hooks/use-delayed-loading';
 import type { ViewBaseProps } from '../../types';
 
 type DataViewsLayoutProps = {
@@ -41,8 +43,20 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		empty = <p>{ __( 'No results' ) }</p>,
 	} = useContext( DataViewsContext );
 
+	const isDelayedInitialLoading = useDelayedLoading( ! hasInitiallyLoaded, {
+		delay: 200,
+	} );
 	if ( ! hasInitiallyLoaded ) {
-		return null;
+		if ( ! isDelayedInitialLoading ) {
+			return null;
+		}
+		return (
+			<div className="dataviews-loading">
+				<p>
+					<Spinner />
+				</p>
+			</div>
+		);
 	}
 
 	const ViewComponent = VIEW_LAYOUTS.find(
