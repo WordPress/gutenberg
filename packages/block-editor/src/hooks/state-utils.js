@@ -59,3 +59,27 @@ export function buildStateSelector( baseSelector, name, state ) {
 	}
 	return `${ baseSelector }${ state }`;
 }
+
+/**
+ * Builds the CSS selector used to preview a state on the editor canvas,
+ * scoped to a specific block instance via its `data-block` attribute.
+ *
+ * For blocks whose `selectors.root` targets a descendant element
+ * (e.g. ".wp-block-button .wp-block-button__link"), the selector targets
+ * that descendant inside the block wrapper. Otherwise it targets the wrapper
+ * itself.
+ *
+ * @param {string} clientId The block's clientId.
+ * @param {string} name     The block name, used to look up selectors.
+ * @return {string} CSS selector scoped to this block instance.
+ */
+export function buildCanvasStateSelector( clientId, name ) {
+	const rootSelector = getBlockType( name )?.selectors?.root;
+	if ( rootSelector ) {
+		const relativeSelector = getRelativeRootSelector( rootSelector );
+		if ( relativeSelector ) {
+			return `[data-block="${ clientId }"] ${ relativeSelector }`;
+		}
+	}
+	return `[data-block="${ clientId }"]`;
+}
