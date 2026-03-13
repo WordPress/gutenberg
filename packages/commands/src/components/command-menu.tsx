@@ -87,13 +87,13 @@ type SetLoader = ( name: string, isLoading: boolean ) => void;
 interface CommandMenuLoaderProps {
 	name: string;
 	search: string;
-	hook: ( props: { search: string } ) => {
+	hook: ( search: string ) => {
 		isLoading: boolean;
 		commands?: WPCommandConfig[];
 	};
 	setLoader: SetLoader;
 	close: () => void;
-	category: string;
+	category: string | undefined;
 }
 
 function CommandMenuLoader( {
@@ -104,7 +104,7 @@ function CommandMenuLoader( {
 	close,
 	category,
 }: CommandMenuLoaderProps ) {
-	const { isLoading, commands = [] } = hook( { search } ) ?? {};
+	const { isLoading, commands = [] } = hook( search ) ?? {};
 	useEffect( () => {
 		setLoader( name, isLoading );
 	}, [ setLoader, name, isLoading ] );
@@ -162,14 +162,14 @@ function CommandMenuLoader( {
 }
 
 interface CommandMenuLoaderWrapperProps {
-	hook: ( props: { search: string } ) => {
-		isLoading: boolean;
+	hook: ( search: string ) => {
+		isLoading?: boolean;
 		commands?: WPCommandConfig[];
 	};
 	search: string;
 	setLoader: SetLoader;
 	close: () => void;
-	category: string;
+	category: string | undefined;
 }
 
 export function CommandMenuLoaderWrapper( {
@@ -360,12 +360,13 @@ export function CommandMenu() {
 			}
 		} ),
 		{
+			// @ts-expect-error this isn't in the useShortcut type but might be in the future
 			bindGlobal: true,
 		}
 	);
 
 	const setLoader = useCallback(
-		( name, value ) =>
+		( name: string, value ) =>
 			setLoaders( ( current ) => ( {
 				...current,
 				[ name ]: value,
