@@ -27,11 +27,13 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 	public static function wpSetUpBeforeClass() {
 		// Register "dogs" before creating posts of that type so go_to() can resolve them.
+		// has_archive enables get_post_type_archive_link() for the archive branch tests.
 		register_post_type(
 			'dogs',
 			array(
 				'public'             => true,
 				'publicly_queryable' => true,
+				'has_archive'        => true,
 			)
 		);
 
@@ -435,6 +437,63 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 		$this->assertStringNotContainsString( 'current-menu-item', $output );
 		$this->assertStringNotContainsString( 'aria-current', $output );
+	}
+
+	// -------------------------------------------------------------------------
+	// Group 6: Active state — post type archive (Branch C, mirrors classic menu)
+	// -------------------------------------------------------------------------
+
+	/**
+	 * A post-type-archive link should receive current-menu-item when on the matching
+	 * archive page. Mirrors Branch C of _wp_menu_item_classes_by_context().
+	 */
+	public function test_current_menu_item_for_post_type_archive_link() {
+		$archive_url = get_post_type_archive_link( 'dogs' );
+		$this->go_to( $archive_url );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Dogs Archive',
+				'type'  => 'dogs',
+				'kind'  => 'post-type-archive',
+				'url'   => $archive_url,
+			)
+		);
+		$this->assertStringContainsString( 'current-menu-item', $output );
+	}
+
+	/**
+	 * A post-type-archive link should NOT be active when on a different post type's archive.
+	 */
+	public function test_no_current_menu_item_for_archive_link_on_wrong_archive() {
+		// Go to the dogs archive but render a link pointing to the posts archive.
+		$this->go_to( get_post_type_archive_link( 'dogs' ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Posts Archive',
+				'type'  => 'post',
+				'kind'  => 'post-type-archive',
+				'url'   => get_post_type_archive_link( 'post' ),
+			)
+		);
+		$this->assertStringNotContainsString( 'current-menu-item', $output );
+	}
+
+	/**
+	 * A post-type-archive link should NOT be active on a non-archive page even if the URL
+	 * happens to be set — is_post_type_archive() must be true for the branch to fire.
+	 */
+	public function test_no_current_menu_item_for_archive_link_on_singular_page() {
+		$archive_url = get_post_type_archive_link( 'dogs' );
+		$this->go_to( get_permalink( self::$page->ID ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Dogs Archive',
+				'type'  => 'dogs',
+				'kind'  => 'post-type-archive',
+				'url'   => $archive_url,
+			)
+		);
+		$this->assertStringNotContainsString( 'current-menu-item', $output );
 	}
 
 	public function test_returns_link_when_post_is_published() {
