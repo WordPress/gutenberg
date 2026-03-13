@@ -19,14 +19,8 @@
 }
 
 .admin-ui-page__header-title {
-	font-family: var(--wpds-font-family-heading);
-	font-size: var(--wpds-font-size-lg);
-	font-weight: var(--wpds-font-weight-medium);
-	line-height: var(--wpds-font-line-height-lg);
 	margin: 0;
 	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
 }
 
 .admin-ui-page__sidebar-toggle-slot:empty {
