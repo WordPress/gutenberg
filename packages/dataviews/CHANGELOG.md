@@ -10,6 +10,7 @@
 ### Bug Fixes
 
 - DataViews: Fix last column classname in table layout. [#76133](https://github.com/WordPress/gutenberg/pull/76133)
+- DataViews: Add spinner in DataViewsLayout in initial load of data. [#76486](https://github.com/WordPress/gutenberg/pull/76486)
 - DataForm: Properly handle dates in datetime control. [#76193](https://github.com/WordPress/gutenberg/pull/76193)
 
 ### Enhancements
