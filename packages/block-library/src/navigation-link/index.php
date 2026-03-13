@@ -174,6 +174,87 @@ function block_core_navigation_link_maybe_urldecode( $url ) {
 
 
 /**
+ * Determines whether a navigation link block should be marked as the active/current item
+ * based on the current WordPress query context.
+ *
+ * Mirrors the two ID-based match branches of the classic menu system
+ * (`_wp_menu_item_classes_by_context()` in wp-includes/nav-menu-template.php):
+ *
+ * - Branch B: direct entity ID match, guarded by object-type check to prevent post/term
+ *             ID collisions (posts and terms use independent auto-increment sequences).
+ * - Branch C: post-type archive URL match, regardless of stored ID.
+ *
+ * @since 6.8.0
+ *
+ * @param array $attributes The block attributes.
+ * @return bool Whether the link represents the current page/archive.
+ */
+function block_core_navigation_link_is_active( $attributes ) {
+	/*
+	 * Determine the effective "kind" of this link.
+	 *
+	 * Block-system specific: the block stores `kind` ("post-type" / "taxonomy" / "custom")
+	 * and `type` (e.g. "page", "post", "category", "tag") as separate attributes.
+	 *
+	 * Backwards compatibility — why `kind` may be absent:
+	 * The JS editor only writes `kind` to the block attributes when it is a non-empty string
+	 * (`...( kind && { kind } )` in update-attributes.js). For built-in types such as
+	 * "category" or "tag", older editor versions left `kind` unset. In those cases we fall
+	 * back to inspecting `type` via `taxonomy_exists()` to distinguish taxonomy links from
+	 * post-type links without relying on a stored `kind`.
+	 *
+	 * Backwards compatibility — the "tag" alias:
+	 * The JS editor normalises the WordPress taxonomy slug "post_tag" to "tag" before
+	 * storing it in the `type` attribute (see update-attributes.js). Map it back so that
+	 * `taxonomy_exists()` can find the registered taxonomy correctly.
+	 */
+	$stored_kind    = $attributes['kind'] ?? '';
+	$stored_type    = $attributes['type'] ?? '';
+	$resolved_type  = 'tag' === $stored_type ? 'post_tag' : $stored_type;
+	$kind_from_type = taxonomy_exists( $resolved_type ) ? 'taxonomy' : 'post-type';
+	$link_kind      = ! empty( $stored_kind ) ? $stored_kind : $kind_from_type;
+
+	/*
+	 * Branch B: direct entity ID match.
+	 *
+	 * Backwards compatibility — numeric id guard:
+	 * Historically, the `id` attribute could be set to a URL string rather than an integer
+	 * in some editor versions. `absint()` converts non-numeric values (including strings
+	 * and null) to 0, ensuring those values never produce a match.
+	 *
+	 * Post/term ID collision guard — mirrors classic menu's _menu_item_type + query-state check:
+	 * `instanceof` confirms the queried object is the correct PHP type before accepting the
+	 * ID match, preventing a taxonomy link from activating on a post page with the same
+	 * integer ID (and vice versa).
+	 */
+	$queried_object      = get_queried_object();
+	$link_id             = absint( $attributes['id'] ?? 0 );
+	$is_taxonomy_link    = 'taxonomy' === $link_kind;
+	$queried_id          = get_queried_object_id();
+	$ids_match           = $link_id > 0 && $queried_id === $link_id;
+	$object_type_matches = $is_taxonomy_link
+		? $queried_object instanceof WP_Term
+		: $queried_object instanceof WP_Post;
+
+	if ( $ids_match && $object_type_matches ) {
+		return true;
+	}
+
+	/*
+	 * Branch C: post-type archive URL match.
+	 * Active when the current URL matches the archive permalink, regardless of stored ID.
+	 */
+	if ( is_post_type_archive() && ! empty( $attributes['url'] ) ) {
+		$queried_archive_link = get_post_type_archive_link( get_queried_object()->name );
+		if ( $attributes['url'] === $queried_archive_link ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
  * Renders the `core/navigation-link` block.
  *
  * @since 5.9.0
@@ -209,68 +290,8 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	}
 	$has_submenu = ! empty( trim( $inner_blocks_html ) );
 
-	$css_classes    = trim( implode( ' ', $classes ) );
-	$queried_object = get_queried_object();
-
-	/*
-	 * Determine the effective "kind" of this link.
-	 *
-	 * Block-system specific: the block stores `kind` ("post-type" / "taxonomy" / "custom")
-	 * and `type` (e.g. "page", "post", "category", "tag") as separate attributes.
-	 *
-	 * Backwards compatibility — why `kind` may be absent:
-	 * The JS editor only writes `kind` to the block attributes when it is a non-empty string
-	 * (`...( kind && { kind } )` in update-attributes.js). For built-in types such as
-	 * "category" or "tag", older editor versions left `kind` unset. In those cases we fall
-	 * back to inspecting `type` via `taxonomy_exists()` to distinguish taxonomy links from
-	 * post-type links without relying on a stored `kind`.
-	 *
-	 * Backwards compatibility — the "tag" alias:
-	 * The JS editor normalises the WordPress taxonomy slug "post_tag" to "tag" before
-	 * storing it in the `type` attribute (see update-attributes.js). Map it back so that
-	 * `taxonomy_exists()` can find the registered taxonomy correctly.
-	 */
-	$stored_kind    = $attributes['kind'] ?? '';
-	$stored_type    = $attributes['type'] ?? '';
-	$resolved_type  = 'tag' === $stored_type ? 'post_tag' : $stored_type;
-	$kind_from_type = taxonomy_exists( $resolved_type ) ? 'taxonomy' : 'post-type';
-	$link_kind      = ! empty( $stored_kind ) ? $stored_kind : $kind_from_type;
-
-	/*
-	 * Mirrors classic menu behaviour (_wp_menu_item_classes_by_context(), Branch B):
-	 * A nav item is "active" when its stored entity ID matches the queried object ID AND
-	 * the object type agrees — posts live in wp_posts, terms in wp_terms/wp_term_taxonomy,
-	 * and both tables use independent auto-increment sequences so the same integer can
-	 * appear in both. The classic system guards against this collision via _menu_item_type
-	 * meta ("post_type" vs "taxonomy") combined with mutually exclusive query-state flags.
-	 * Here we use instanceof checks on the queried object as the equivalent guard.
-	 *
-	 * Backwards compatibility — numeric id guard:
-	 * Historically, the `id` attribute could be set to a URL string rather than an integer
-	 * in some editor versions. `absint()` converts non-numeric values (including strings
-	 * and null) to 0, ensuring those values never produce a match.
-	 */
-	$link_id          = absint( $attributes['id'] ?? 0 );
-	$is_taxonomy_link = 'taxonomy' === $link_kind;
-	$queried_id       = get_queried_object_id();
-	$ids_match        = $link_id > 0 && $queried_id === $link_id;
-	// Post/term ID collision guard — mirrors classic menu's type + query-state check.
-	$object_type_matches = $is_taxonomy_link
-		? $queried_object instanceof WP_Term
-		: $queried_object instanceof WP_Post;
-	$is_active           = $ids_match && $object_type_matches;
-
-	/*
-	 * Mirrors classic menu behaviour (_wp_menu_item_classes_by_context(), Branch C):
-	 * Post-type archive links become active when the current URL matches the archive
-	 * permalink, regardless of whether an entity ID is stored on the block.
-	 */
-	if ( is_post_type_archive() && ! empty( $attributes['url'] ) ) {
-		$queried_archive_link = get_post_type_archive_link( get_queried_object()->name );
-		if ( $attributes['url'] === $queried_archive_link ) {
-			$is_active = true;
-		}
-	}
+	$css_classes = trim( implode( ' ', $classes ) );
+	$is_active   = block_core_navigation_link_is_active( $attributes );
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
