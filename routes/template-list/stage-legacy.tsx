@@ -31,6 +31,7 @@ import {
 import { previewField } from './fields/preview';
 import { authorField } from './fields/author';
 import { descriptionField } from './fields/description';
+import { postTypesField } from './fields/post-types';
 import { useTemplatesLegacy } from './use-templates-legacy';
 import AddNewTemplate from './add-new-template';
 
@@ -126,6 +127,16 @@ function TemplateListLegacy() {
 		[ records ]
 	);
 
+	// Determine if any template has post_types defined.
+	const hasPostTypes = useMemo(
+		() =>
+			records.some(
+				( record: any ) =>
+					record.post_types && record.post_types.length > 0
+			),
+		[ records ]
+	);
+
 	// Build fields array with author elements (no activeField or slugField in legacy mode)
 	const fields = useMemo( () => {
 		const elements = [];
@@ -139,12 +150,13 @@ function TemplateListLegacy() {
 			previewField,
 			templateTitleField,
 			descriptionField,
+			...( hasPostTypes ? [ postTypesField ] : [] ),
 			{
 				...authorField,
 				elements,
 			},
 		];
-	}, [ users ] );
+	}, [ users, hasPostTypes ] );
 
 	// Apply filtering, sorting, and pagination on the client side
 	const { data: posts, paginationInfo } = useMemo( () => {

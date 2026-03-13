@@ -74,6 +74,15 @@ class Gutenberg_REST_Static_Templates_Controller extends Gutenberg_REST_Template
 			'readonly'    => true,
 			'context'     => array( 'view', 'edit', 'embed' ),
 		);
+		$schema['properties']['post_types'] = array(
+			'description' => __( 'The post types that can use this template.' ),
+			'type'        => 'array',
+			'items'       => array(
+				'type' => 'string',
+			),
+			'readonly'    => true,
+			'context'     => array( 'view', 'edit', 'embed' ),
+		);
 		return $schema;
 	}
 

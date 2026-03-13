@@ -36,6 +36,7 @@ import { authorField } from './fields/author';
 import { descriptionField } from './fields/description';
 import { activeField } from './fields/active';
 import { slugField } from './fields/slug';
+import { postTypesField } from './fields/post-types';
 import { useTemplates } from './use-templates';
 import { useSetActiveTemplateAction } from './actions/set-active-template';
 import AddNewTemplate from './add-new-template';
@@ -134,6 +135,16 @@ function TemplateListActivation() {
 		[ records ]
 	);
 
+	// Determine if any template has post_types defined.
+	const hasPostTypes = useMemo(
+		() =>
+			records.some(
+				( record: any ) =>
+					record.post_types && record.post_types.length > 0
+			),
+		[ records ]
+	);
+
 	// Build fields array with author elements
 	const fields = useMemo( () => {
 		const elements = [];
@@ -149,12 +160,13 @@ function TemplateListActivation() {
 			descriptionField,
 			activeField,
 			slugField,
+			...( hasPostTypes ? [ postTypesField ] : [] ),
 			{
 				...authorField,
 				elements,
 			},
 		];
-	}, [ users ] );
+	}, [ users, hasPostTypes ] );
 
 	// Apply filtering, sorting, and pagination on the client side
 	const { data: posts, paginationInfo } = useMemo( () => {

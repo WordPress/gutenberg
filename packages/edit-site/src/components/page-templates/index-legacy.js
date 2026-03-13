@@ -19,7 +19,12 @@ import AddNewTemplate from '../add-new-template-legacy';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
-import { authorField, descriptionField, previewField } from './fields';
+import {
+	authorField,
+	descriptionField,
+	previewField,
+	postTypesField,
+} from './fields';
 import {
 	defaultLayouts,
 	DEFAULT_VIEW,
@@ -94,17 +99,26 @@ export default function PageTemplates() {
 		} ) );
 	}, [ records ] );
 
+	const hasPostTypes = useMemo(
+		() =>
+			records?.some(
+				( record ) => record.post_types && record.post_types.length > 0
+			),
+		[ records ]
+	);
+
 	const fields = useMemo(
 		() => [
 			previewField,
 			templateTitleField,
 			descriptionField,
+			...( hasPostTypes ? [ postTypesField ] : [] ),
 			{
 				...authorField,
 				elements: authors,
 			},
 		],
-		[ authors ]
+		[ authors, hasPostTypes ]
 	);
 
 	const { data, paginationInfo } = useMemo( () => {
