@@ -247,10 +247,10 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	 *
 	 * Backwards compatibility — numeric id guard:
 	 * Historically, the `id` attribute could be set to a URL string rather than an integer
-	 * in some editor versions. `is_numeric()` ensures those values never produce a match.
+	 * in some editor versions. `absint()` converts non-numeric values (including strings
+	 * and null) to 0, ensuring those values never produce a match.
 	 */
-	$raw_id           = $attributes['id'] ?? null;
-	$link_id          = is_numeric( $raw_id ) ? (int) $raw_id : 0;
+	$link_id          = absint( $attributes['id'] ?? 0 );
 	$is_taxonomy_link = 'taxonomy' === $link_kind;
 	$queried_id       = get_queried_object_id();
 	$ids_match        = $link_id > 0 && $queried_id === $link_id;
