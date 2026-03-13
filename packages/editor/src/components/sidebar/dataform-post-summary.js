@@ -48,10 +48,10 @@ const form = {
 				'password',
 			],
 		},
-		'author',
 		'date',
 		'slug',
-		'parent',
+		'author',
+		'template',
 		{
 			id: 'discussion',
 			label: __( 'Discussion' ),
@@ -63,7 +63,7 @@ const form = {
 				'ping_status',
 			],
 		},
-		'template',
+		'parent',
 		'format',
 	],
 };
@@ -92,6 +92,27 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 		},
 		[ postType, postId ]
 	);
+
+	// Fetch classic theme templates from editor settings.
+	const availableTemplates = useSelect( ( select ) => {
+		if ( select( coreDataStore ).getCurrentTheme()?.is_block_theme ) {
+			return null;
+		}
+		return (
+			select( editorStore ).getEditorSettings().availableTemplates ?? {}
+		);
+	}, [] );
+
+	// Augment record only when needed(not a block theme with available templates).
+	const augmentedRecord = useMemo( () => {
+		if ( ! record || ! availableTemplates ) {
+			return record;
+		}
+		return {
+			...record,
+			available_templates: availableTemplates,
+		};
+	}, [ record, availableTemplates ] );
 
 	const { editEntityRecord } = useDispatch( coreDataStore );
 
@@ -137,7 +158,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					onActionPerformed={ onActionPerformed }
 				/>
 				<DataForm
-					data={ record }
+					data={ augmentedRecord }
 					fields={ fields }
 					form={ form }
 					onChange={ onChange }
