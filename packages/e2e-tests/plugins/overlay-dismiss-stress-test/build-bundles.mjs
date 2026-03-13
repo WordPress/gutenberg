@@ -11,6 +11,7 @@
  *   - ESM bundles (for Storybook): importable ES modules
  */
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 import * as esbuild from 'esbuild';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -33,7 +34,6 @@ async function build() {
 			`src/entry-${ entry.name }.ts`
 		);
 
-		// IIFE build for wp-env (exposes window.OverlayBundleA / B)
 		await esbuild.build( {
 			entryPoints: [ entryPoint ],
 			bundle: true,
@@ -44,28 +44,20 @@ async function build() {
 				`build/bundle-${ entry.name }.iife.js`
 			),
 			external: sharedExternal,
-			define: {
-				'process.env.NODE_ENV': '"production"',
-			},
+			define: { 'process.env.NODE_ENV': '"production"' },
 			platform: 'browser',
 			target: 'es2020',
 			minify: false,
 			sourcemap: true,
 		} );
 
-		// ESM build for Storybook (also lives in build/ — Storybook uses a Vite alias)
 		await esbuild.build( {
 			entryPoints: [ entryPoint ],
 			bundle: true,
 			format: 'esm',
-			outfile: path.resolve(
-				esmOutDir,
-				`bundle-${ entry.name }.esm.js`
-			),
+			outfile: path.resolve( esmOutDir, `bundle-${ entry.name }.esm.js` ),
 			external: sharedExternal,
-			define: {
-				'process.env.NODE_ENV': '"production"',
-			},
+			define: { 'process.env.NODE_ENV': '"production"' },
 			platform: 'browser',
 			target: 'es2020',
 			minify: false,
@@ -73,18 +65,13 @@ async function build() {
 		} );
 	}
 
-	// Playground IIFE build for wp-env admin page
 	await esbuild.build( {
-		entryPoints: [
-			path.resolve( __dirname, 'src/playground.tsx' ),
-		],
+		entryPoints: [ path.resolve( __dirname, 'src/playground.tsx' ) ],
 		bundle: true,
 		format: 'iife',
 		outfile: path.resolve( __dirname, 'build/playground.iife.js' ),
 		external: [ ...sharedExternal ],
-		define: {
-			'process.env.NODE_ENV': '"production"',
-		},
+		define: { 'process.env.NODE_ENV': '"production"' },
 		platform: 'browser',
 		target: 'es2020',
 		minify: false,
@@ -93,11 +80,12 @@ async function build() {
 		jsxImportSource: 'react',
 	} );
 
-	console.log( 'Built cross-bundle overlay stress test bundles:' );
-	console.log( '  IIFE + ESM: packages/e2e-tests/plugins/overlay-dismiss-stress-test/build/' );
+	// eslint-disable-next-line no-console
+	console.log( 'Built cross-bundle overlay stress test bundles.' );
 }
 
 build().catch( ( err ) => {
+	// eslint-disable-next-line no-console
 	console.error( err );
 	process.exit( 1 );
 } );
