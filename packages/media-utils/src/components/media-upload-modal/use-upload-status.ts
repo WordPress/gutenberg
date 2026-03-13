@@ -26,7 +26,7 @@ import type { UploadingFile } from './upload-status-popover';
 let idCounter = 0;
 let batchIdCounter = 0;
 
-interface RegisterBatchOptions {
+interface UseUploadStatusOptions {
 	onBatchComplete?: ( attachments: Partial< Attachment >[] ) => void;
 }
 
@@ -42,10 +42,7 @@ interface UseUploadStatusReturn {
 	 * Register a new batch of files for tracking.
 	 * Returns batch-scoped onFileChange and onError callbacks.
 	 */
-	registerBatch: (
-		files: File[],
-		options?: RegisterBatchOptions
-	) => RegisterBatchResult;
+	registerBatch: ( files: File[] ) => RegisterBatchResult;
 	/** Remove a single error entry by file id. */
 	dismissError: ( fileId: string ) => void;
 	/** Remove all uploaded (completed) entries from the list. */
@@ -54,28 +51,27 @@ interface UseUploadStatusReturn {
 	allComplete: boolean;
 }
 
-export function useUploadStatus(): UseUploadStatusReturn {
+export function useUploadStatus( {
+	onBatchComplete,
+}: UseUploadStatusOptions = {} ): UseUploadStatusReturn {
 	const [ uploadingFiles, setUploadingFiles ] = useState< UploadingFile[] >(
 		[]
 	);
 
 	const clearCompleted = useCallback( () => {
 		setUploadingFiles( ( prev ) =>
-			prev.filter( ( f ) => f.status !== 'uploaded' )
+			prev.filter( ( item ) => item.status !== 'uploaded' )
 		);
 	}, [] );
 
 	const dismissError = useCallback( ( fileId: string ) => {
 		setUploadingFiles( ( prev ) =>
-			prev.filter( ( f ) => f.id !== fileId )
+			prev.filter( ( item ) => item.id !== fileId )
 		);
 	}, [] );
 
 	const registerBatch = useCallback(
-		(
-			files: File[],
-			options?: RegisterBatchOptions
-		): RegisterBatchResult => {
+		( files: File[] ): RegisterBatchResult => {
 			const batchId = String( ++batchIdCounter );
 			const batchSize = files.length;
 
@@ -107,17 +103,17 @@ export function useUploadStatus(): UseUploadStatusReturn {
 				// Mark any remaining 'uploading' entries in this batch
 				// as 'uploaded' (these are the successful ones).
 				setUploadingFiles( ( prev ) =>
-					prev.map( ( f ) =>
-						f.batchId === batchId && f.status === 'uploading'
+					prev.map( ( item ) =>
+						item.batchId === batchId && item.status === 'uploading'
 							? {
-									...f,
+									...item,
 									status: 'uploaded' as const,
 							  }
-							: f
+							: item
 					)
 				);
 
-				options?.onBatchComplete?.( successAttachments );
+				onBatchComplete?.( successAttachments );
 			};
 
 			const onFileChange = ( attachments: Partial< Attachment >[] ) => {
@@ -148,27 +144,38 @@ export function useUploadStatus(): UseUploadStatusReturn {
 			};
 
 			const onError = ( error: Error ) => {
+				// uploadMedia always wraps errors in UploadError, which
+				// carries the originating File so we can match it back to
+				// the correct item. A custom onUpload prop could pass a
+				// plain Error instead — in that case fileName is undefined
+				// and no entry will be visually marked as errored, but the
+				// batch will still complete correctly via errorCount.
 				const fileName =
 					error instanceof UploadError ? error.file.name : undefined;
 
+				// Find the first still-uploading entry in this batch whose
+				// name matches the failed file and mark it as errored.
+				// Falls back to the first uploading entry in the batch
+				// when no filename is available. The `matched` flag
+				// ensures only one entry is updated even when duplicate
+				// filenames exist in the same batch.
 				setUploadingFiles( ( prev ) => {
 					let matched = false;
-					return prev.map( ( f ) => {
+					return prev.map( ( item ) => {
 						if (
 							! matched &&
-							f.batchId === batchId &&
-							fileName &&
-							f.name === fileName &&
-							f.status === 'uploading'
+							item.batchId === batchId &&
+							item.status === 'uploading' &&
+							( ! fileName || item.name === fileName )
 						) {
 							matched = true;
 							return {
-								...f,
+								...item,
 								status: 'error' as const,
 								error: error.message,
 							};
 						}
-						return f;
+						return item;
 					} );
 				} );
 
@@ -179,12 +186,12 @@ export function useUploadStatus(): UseUploadStatusReturn {
 
 			return { onFileChange, onError };
 		},
-		[]
+		[ onBatchComplete ]
 	);
 
 	const allComplete =
 		uploadingFiles.length > 0 &&
-		uploadingFiles.every( ( f ) => f.status !== 'uploading' );
+		uploadingFiles.every( ( item ) => item.status !== 'uploading' );
 
 	return {
 		uploadingFiles,

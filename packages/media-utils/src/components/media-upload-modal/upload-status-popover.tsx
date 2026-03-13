@@ -38,9 +38,11 @@ export function UploadStatusPopover( {
 	);
 
 	const activeFiles = uploadingFiles.filter(
-		( f ) => f.status === 'uploading'
+		( file ) => file.status === 'uploading'
 	);
-	const errorFiles = uploadingFiles.filter( ( f ) => f.status === 'error' );
+	const errorFiles = uploadingFiles.filter(
+		( file ) => file.status === 'error'
+	);
 	const hasErrors = errorFiles.length > 0;
 	const isUploading = activeFiles.length > 0;
 
