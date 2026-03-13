@@ -182,25 +182,6 @@ export function MediaUploadModal( {
 			: [ String( value ) ];
 	} );
 
-	const {
-		uploadingFiles,
-		registerBatch,
-		dismissError,
-		clearCompleted,
-		allComplete,
-	} = useUploadStatus();
-
-	const isPopoverOpenRef = useRef( false );
-	const handlePopoverOpenChange = useCallback(
-		( open: boolean ) => {
-			isPopoverOpenRef.current = open;
-			if ( ! open ) {
-				clearCompleted();
-			}
-		},
-		[ clearCompleted ]
-	);
-
 	const { createSuccessNotice, removeAllNotices } =
 		useDispatch( noticesStore );
 	const { invalidateResolution } = useDispatch( coreStore );
@@ -271,6 +252,55 @@ export function MediaUploadModal( {
 			...filters,
 		};
 	}, [ view, allowedTypes ] );
+
+	// Per-batch completion handler: auto-select uploaded items and refresh the grid.
+	const handleBatchComplete = useCallback(
+		( attachments: Partial< Attachment >[] ) => {
+			const uploadedIds = attachments
+				.map( ( attachment ) => String( attachment.id ) )
+				.filter( Boolean );
+
+			if ( multiple ) {
+				setSelection( ( prev ) => {
+					const existing = new Set( prev );
+					const newIds = uploadedIds.filter(
+						( id ) => ! existing.has( id )
+					);
+					return [ ...prev, ...newIds ];
+				} );
+			} else {
+				setSelection( uploadedIds.slice( 0, 1 ) );
+			}
+
+			// Invalidate immediately so newly uploaded files appear in the grid.
+			// The server has already returned 201 responses at this point.
+			invalidateResolution( 'getEntityRecords', [
+				'postType',
+				'attachment',
+				queryArgs,
+			] );
+		},
+		[ multiple, invalidateResolution, queryArgs ]
+	);
+
+	const {
+		uploadingFiles,
+		registerBatch,
+		dismissError,
+		clearCompleted,
+		allComplete,
+	} = useUploadStatus( { onBatchComplete: handleBatchComplete } );
+
+	const isPopoverOpenRef = useRef( false );
+	const handlePopoverOpenChange = useCallback(
+		( open: boolean ) => {
+			isPopoverOpenRef.current = open;
+			if ( ! open ) {
+				clearCompleted();
+			}
+		},
+		[ clearCompleted ]
+	);
 
 	// Fetch all media attachments using WordPress core data with permissions
 	const {
@@ -362,42 +392,12 @@ export function MediaUploadModal( {
 	// Use onUpload if provided, otherwise fall back to uploadMedia
 	const handleUpload = onUpload || uploadMedia;
 
-	// Per-batch completion handler: auto-select uploaded items and refresh the grid.
-	const handleBatchComplete = useCallback(
-		( attachments: Partial< Attachment >[] ) => {
-			const uploadedIds = attachments
-				.map( ( attachment ) => String( attachment.id ) )
-				.filter( Boolean );
-
-			if ( multiple ) {
-				setSelection( ( prev ) => {
-					const existing = new Set( prev );
-					const newIds = uploadedIds.filter(
-						( id ) => ! existing.has( id )
-					);
-					return [ ...prev, ...newIds ];
-				} );
-			} else {
-				setSelection( uploadedIds.slice( 0, 1 ) );
-			}
-
-			// Invalidate immediately so newly uploaded files appear in the grid.
-			// The server has already returned 201 responses at this point.
-			invalidateResolution( 'getEntityRecords', [
-				'postType',
-				'attachment',
-				queryArgs,
-			] );
-		},
-		[ multiple, invalidateResolution, queryArgs ]
-	);
-
 	// Show success notice and auto-clear completed entries when all batches finish.
 	const prevAllCompleteRef = useRef( false );
 	useEffect( () => {
 		if ( allComplete && ! prevAllCompleteRef.current ) {
 			const completeCount = uploadingFiles.filter(
-				( f ) => f.status === 'uploaded'
+				( file ) => file.status === 'uploaded'
 			).length;
 			if ( completeCount > 0 ) {
 				createSuccessNotice(
@@ -432,9 +432,7 @@ export function MediaUploadModal( {
 			const files = event.target.files;
 			if ( files && files.length > 0 ) {
 				const filesArray = Array.from( files );
-				const { onFileChange, onError } = registerBatch( filesArray, {
-					onBatchComplete: handleBatchComplete,
-				} );
+				const { onFileChange, onError } = registerBatch( filesArray );
 
 				handleUpload( {
 					allowedTypes,
@@ -444,7 +442,7 @@ export function MediaUploadModal( {
 				} );
 			}
 		},
-		[ allowedTypes, handleUpload, registerBatch, handleBatchComplete ]
+		[ allowedTypes, handleUpload, registerBatch ]
 	);
 
 	const paginationInfo = useMemo(
@@ -531,10 +529,8 @@ export function MediaUploadModal( {
 						);
 					}
 					if ( filteredFiles.length > 0 ) {
-						const { onFileChange, onError } = registerBatch(
-							filteredFiles,
-							{ onBatchComplete: handleBatchComplete }
-						);
+						const { onFileChange, onError } =
+							registerBatch( filteredFiles );
 
 						handleUpload( {
 							allowedTypes,

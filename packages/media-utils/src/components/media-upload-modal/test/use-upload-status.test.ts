@@ -179,17 +179,18 @@ describe( 'useUploadStatus', () => {
 		} );
 
 		it( 'should call onBatchComplete exactly once even if onFileChange fires multiple times', () => {
-			const { result } = renderHook( () => useUploadStatus() );
 			const onBatchComplete = jest.fn();
+			const { result } = renderHook( () =>
+				useUploadStatus( { onBatchComplete } )
+			);
 			let onFileChange: ReturnType<
 				typeof result.current.registerBatch
 			>[ 'onFileChange' ];
 
 			act( () => {
-				( { onFileChange } = result.current.registerBatch(
-					[ createFile( 'a.png' ) ],
-					{ onBatchComplete }
-				) );
+				( { onFileChange } = result.current.registerBatch( [
+					createFile( 'a.png' ),
+				] ) );
 			} );
 
 			const attachment = createAttachment( 1, 'a.png' );
@@ -209,21 +210,20 @@ describe( 'useUploadStatus', () => {
 			// are not created. onFileChange is called with a growing array
 			// as each file completes: [att1], [att1, att2], [att1, att2, att3].
 			// The success count must not double-count overlapping entries.
-			const { result } = renderHook( () => useUploadStatus() );
 			const onBatchComplete = jest.fn();
+			const { result } = renderHook( () =>
+				useUploadStatus( { onBatchComplete } )
+			);
 			let onFileChange: ReturnType<
 				typeof result.current.registerBatch
 			>[ 'onFileChange' ];
 
 			act( () => {
-				( { onFileChange } = result.current.registerBatch(
-					[
-						createFile( 'a.png' ),
-						createFile( 'b.png' ),
-						createFile( 'c.png' ),
-					],
-					{ onBatchComplete }
-				) );
+				( { onFileChange } = result.current.registerBatch( [
+					createFile( 'a.png' ),
+					createFile( 'b.png' ),
+					createFile( 'c.png' ),
+				] ) );
 			} );
 
 			const att1 = createAttachment( 1, 'a.png' );
@@ -319,7 +319,7 @@ describe( 'useUploadStatus', () => {
 			} );
 
 			const statuses = result.current.uploadingFiles.map(
-				( f ) => f.status
+				( item ) => item.status
 			);
 			expect( statuses ).toEqual( [ 'error', 'uploading' ] );
 		} );
@@ -430,8 +430,10 @@ describe( 'useUploadStatus', () => {
 			//    onFileChange([a, b]) — 2 real URLs, resolvedCount += 2
 			// 5. onError(c.png) — marks c.png as error, resolvedCount += 1
 			// 6. resolvedCount (3) >= batchSize (3) — batch complete
-			const { result } = renderHook( () => useUploadStatus() );
 			const onBatchComplete = jest.fn();
+			const { result } = renderHook( () =>
+				useUploadStatus( { onBatchComplete } )
+			);
 			let onFileChange: ReturnType<
 				typeof result.current.registerBatch
 			>[ 'onFileChange' ];
@@ -440,14 +442,11 @@ describe( 'useUploadStatus', () => {
 			>[ 'onError' ];
 
 			act( () => {
-				( { onFileChange, onError } = result.current.registerBatch(
-					[
-						createFile( 'a.png' ),
-						createFile( 'b.png' ),
-						createFile( 'c.png' ),
-					],
-					{ onBatchComplete }
-				) );
+				( { onFileChange, onError } = result.current.registerBatch( [
+					createFile( 'a.png' ),
+					createFile( 'b.png' ),
+					createFile( 'c.png' ),
+				] ) );
 			} );
 
 			// Steps 1-3: blob URL calls and partial completions (ignored).
@@ -502,9 +501,9 @@ describe( 'useUploadStatus', () => {
 			] );
 
 			// c.png should be errored, a.png and b.png should be uploaded.
-			const statuses = result.current.uploadingFiles.map( ( f ) => [
-				f.name,
-				f.status,
+			const statuses = result.current.uploadingFiles.map( ( item ) => [
+				item.name,
+				item.status,
 			] );
 			expect( statuses ).toEqual( [
 				[ 'a.png', 'uploaded' ],
@@ -515,8 +514,10 @@ describe( 'useUploadStatus', () => {
 		} );
 
 		it( 'should handle all files erroring', () => {
-			const { result } = renderHook( () => useUploadStatus() );
 			const onBatchComplete = jest.fn();
+			const { result } = renderHook( () =>
+				useUploadStatus( { onBatchComplete } )
+			);
 			let onFileChange: ReturnType<
 				typeof result.current.registerBatch
 			>[ 'onFileChange' ];
@@ -525,10 +526,10 @@ describe( 'useUploadStatus', () => {
 			>[ 'onError' ];
 
 			act( () => {
-				( { onFileChange, onError } = result.current.registerBatch(
-					[ createFile( 'a.png' ), createFile( 'b.png' ) ],
-					{ onBatchComplete }
-				) );
+				( { onFileChange, onError } = result.current.registerBatch( [
+					createFile( 'a.png' ),
+					createFile( 'b.png' ),
+				] ) );
 			} );
 
 			// Both fail: onFileChange fires with empty array (all nulls
@@ -557,7 +558,7 @@ describe( 'useUploadStatus', () => {
 			expect( onBatchComplete ).toHaveBeenCalledWith( [] );
 
 			const statuses = result.current.uploadingFiles.map(
-				( f ) => f.status
+				( item ) => item.status
 			);
 			expect( statuses ).toEqual( [ 'error', 'error' ] );
 			expect( result.current.allComplete ).toBe( true );
@@ -589,7 +590,7 @@ describe( 'useUploadStatus', () => {
 			} );
 
 			const erroredFile = result.current.uploadingFiles.find(
-				( f ) => f.status === 'error'
+				( item ) => item.status === 'error'
 			)!;
 
 			act( () => {
@@ -638,7 +639,7 @@ describe( 'useUploadStatus', () => {
 
 			const remaining = result.current.uploadingFiles;
 			expect( remaining ).toHaveLength( 2 );
-			expect( remaining.map( ( f ) => f.status ) ).toEqual( [
+			expect( remaining.map( ( item ) => item.status ) ).toEqual( [
 				'error',
 				'uploading',
 			] );
