@@ -163,3 +163,92 @@ function gutenberg_inject_real_time_collaboration_setting() {
 }
 add_action( 'admin_init', 'gutenberg_inject_real_time_collaboration_setting' );
 add_filter( 'default_option_wp_enable_real_time_collaboration', '__return_true' );
+
+/**
+ * Modifies the post list UI for real-time collaboration.
+ *
+ * When RTC is enabled, hides the lock icon and removes the user-specific
+ * lock text, replacing it with a generic "Currently being edited" message
+ * to reflect that collaborative editing is possible.
+ */
+function gutenberg_post_list_collaboration_ui() {
+	global $pagenow;
+
+	if ( ! get_option( 'wp_enable_real_time_collaboration' ) ) {
+		return;
+	}
+
+	// Only apply on the posts list page.
+	if ( 'edit.php' !== $pagenow ) {
+		return;
+	}
+
+	add_action( 'admin_head', 'gutenberg_post_list_collaboration_styles' );
+	add_action( 'admin_footer', 'gutenberg_post_list_collaboration_scripts' );
+}
+add_action( 'admin_init', 'gutenberg_post_list_collaboration_ui' );
+
+/**
+ * Outputs CSS to hide the post lock icon and user avatar in the post list
+ * when real-time collaboration is enabled.
+ */
+function gutenberg_post_list_collaboration_styles() {
+	?>
+	<style type="text/css">
+		/*
+		 * Hide the lock indicator icon in the checkbox column.
+		 * WordPress core shows it via .wp-locked .locked-indicator,
+		 * so we must match that specificity to override it.
+		 */
+		.wp-locked .locked-indicator {
+			display: none;
+		}
+		/* Hide the user avatar in the locked info area. */
+		.wp-locked .locked-info .locked-avatar {
+			display: none;
+		}
+	</style>
+	<?php
+}
+
+/**
+ * Outputs JavaScript to replace the user-specific lock text with a generic
+ * "Currently being edited" message in the post list when real-time
+ * collaboration is enabled.
+ */
+function gutenberg_post_list_collaboration_scripts() {
+	$locked_text = __( 'Currently being edited', 'gutenberg' );
+	// Use JSON_HEX_TAG to prevent script injection if a translation
+	// string contains characters like '<' or '>'.
+	$locked_text_json = wp_json_encode( $locked_text, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT );
+	?>
+	<script type="text/javascript">
+		( function () {
+			var lockedText = <?php echo $locked_text_json; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_json_encode with HEX flags is safe. ?>;
+
+			/**
+			 * Replaces user-specific lock text with a generic message.
+			 */
+			function updateLockedText() {
+				var elements = document.querySelectorAll( '.locked-text' );
+				elements.forEach( function ( el ) {
+					el.textContent = lockedText;
+				} );
+			}
+
+			if ( document.readyState === 'loading' ) {
+				document.addEventListener( 'DOMContentLoaded', updateLockedText );
+			} else {
+				updateLockedText();
+			}
+
+			// jQuery is always available on admin pages. Re-run after each
+			// heartbeat tick so that any dynamically refreshed lock text is
+			// also replaced with the generic message.
+			jQuery( document ).on( 'heartbeat-tick', function () {
+				updateLockedText();
+			} );
+		} )();
+	</script>
+	<?php
+}
