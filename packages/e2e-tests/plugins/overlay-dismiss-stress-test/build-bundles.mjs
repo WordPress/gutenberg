@@ -58,10 +58,24 @@ async function build() {
 			outfile: path.resolve( esmOutDir, `bundle-${ entry.name }.esm.js` ),
 			external: sharedExternal,
 			define: { 'process.env.NODE_ENV': '"production"' },
-			platform: 'browser',
+			platform: 'neutral',
+			mainFields: [ 'module', 'main' ],
 			target: 'es2020',
 			minify: false,
 			sourcemap: true,
+			banner: {
+				js: [
+					'import * as __react from "react";',
+					'import * as __reactDom from "react-dom";',
+					'import * as __reactJsx from "react/jsx-runtime";',
+					'var require = (m) => {',
+					'  if (m === "react") return __react;',
+					'  if (m === "react-dom") return __reactDom;',
+					'  if (m === "react/jsx-runtime") return __reactJsx;',
+					'  throw new Error("Unexpected require: " + m);',
+					'};',
+				].join( '\n' ),
+			},
 		} );
 	}
 
