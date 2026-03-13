@@ -1,3 +1,4 @@
+import { resolve } from 'path';
 import {
 	type InlineConfig,
 	type PluginOption,
@@ -20,6 +21,7 @@ const stories = [
 	NODE_ENV === 'test' ? '' : './stories/playground/**/*.story.@(jsx|tsx)',
 	NODE_ENV === 'test' ? '' : './stories/**/*.mdx',
 	'./stories/design-system/**/*.story.@(ts|tsx)',
+	'./stories/cross-bundle-dismiss/**/*.story.@(ts|tsx)',
 	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
@@ -190,6 +192,14 @@ const config: StorybookConfig = {
 					loader: {
 						'.js': 'tsx',
 					},
+				},
+			},
+			resolve: {
+				alias: {
+					'@cross-bundle-test/bundle-b': resolve(
+						import.meta.dirname,
+						'../packages/e2e-tests/plugins/overlay-dismiss-stress-test/build/bundle-b.esm.js'
+					),
 				},
 			},
 		} satisfies InlineConfig );

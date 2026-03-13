@@ -1,0 +1,8 @@
+/* Minimal styles for the cross-bundle overlay stress test playground */
+#overlay-dismiss-stress-test-root button {
+	cursor: pointer;
+}
+
+#overlay-dismiss-stress-test-root [data-base-ui-popup] {
+	outline: none;
+}
