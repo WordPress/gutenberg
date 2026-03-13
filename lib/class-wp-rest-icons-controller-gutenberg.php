@@ -9,10 +9,6 @@
  * @subpackage REST_API
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	die( 'Silence is golden.' );
-}
-
 /**
  * Gutenberg Icons REST API Controller.
  *
