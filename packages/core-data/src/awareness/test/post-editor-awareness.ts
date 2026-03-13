@@ -370,27 +370,19 @@ describe( 'PostEditorAwareness', () => {
 	} );
 
 	describe( 'areEditorStatesEqual', () => {
-		let awareness: PostEditorAwareness;
-		let callback: jest.Mock;
+		test( 'should return true when both states are undefined', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
 
-		beforeEach( () => {
-			awareness = new PostEditorAwareness( doc, 'postType', 'post', 123 );
+			// Access the protected method via testing
+			// We can test this indirectly through setLocalStateField behavior
 			awareness.setUp();
-			callback = jest.fn();
-			awareness.onStateChange( callback );
-		} );
 
-		function emitUpdate() {
-			awareness.emit( 'change', [
-				{
-					added: [],
-					updated: [ awareness.clientID ],
-					removed: [],
-				},
-			] );
-		}
-
-		test( 'should not notify when editorState with selection is unchanged', () => {
+			// Set editorState with a selection
 			const selectionState: SelectionNone = {
 				type: SelectionType.None,
 			};
@@ -398,25 +390,70 @@ describe( 'PostEditorAwareness', () => {
 			awareness.setLocalStateField( 'editorState', {
 				selection: selectionState,
 			} );
-			emitUpdate();
+
+			// Subscribe to track updates
+			const callback = jest.fn();
+			awareness.onStateChange( callback );
+
+			// Emit change event
+			awareness.emit( 'change', [
+				{
+					added: [],
+					updated: [ awareness.clientID ],
+					removed: [],
+				},
+			] );
 			callback.mockClear();
 
-			// Set same state again.
+			// Set same state again - should not trigger unnecessary updates
 			awareness.setLocalStateField( 'editorState', {
 				selection: selectionState,
 			} );
-			emitUpdate();
 
+			// Emit change event again
+			awareness.emit( 'change', [
+				{
+					added: [],
+					updated: [ awareness.clientID ],
+					removed: [],
+				},
+			] );
+
+			// Callback should not be called for equal editor states
 			expect( callback ).not.toHaveBeenCalled();
 		} );
 
 		test( 'should not notify when editorState without selection is unchanged', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+			awareness.setUp();
+
 			awareness.setLocalStateField( 'editorState', {} );
-			emitUpdate();
+
+			const callback = jest.fn();
+			awareness.onStateChange( callback );
+
+			awareness.emit( 'change', [
+				{
+					added: [],
+					updated: [ awareness.clientID ],
+					removed: [],
+				},
+			] );
 			callback.mockClear();
 
 			awareness.setLocalStateField( 'editorState', {} );
-			emitUpdate();
+			awareness.emit( 'change', [
+				{
+					added: [],
+					updated: [ awareness.clientID ],
+					removed: [],
+				},
+			] );
 
 			expect( callback ).not.toHaveBeenCalled();
 		} );
