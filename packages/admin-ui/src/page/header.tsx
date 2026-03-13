@@ -12,7 +12,7 @@ export default function Header( {
 	headingLevel = 2,
 	breadcrumbs,
 	badges,
-	logo,
+	icon,
 	title,
 	subTitle,
 	actions,
@@ -21,7 +21,7 @@ export default function Header( {
 	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 	breadcrumbs?: React.ReactNode;
 	badges?: React.ReactNode;
-	logo?: React.ReactNode;
+	icon?: React.ReactNode;
 	title?: React.ReactNode;
 	subTitle: React.ReactNode;
 	actions?: React.ReactNode;
@@ -42,9 +42,9 @@ export default function Header( {
 							className="admin-ui-page__sidebar-toggle-slot"
 						/>
 					) }
-					{ logo && (
-						<div className="admin-ui-page__header-logo">
-							{ logo }
+					{ icon && (
+						<div className="admin-ui-page__header-icon">
+							{ icon }
 						</div>
 					) }
 					{ title && (

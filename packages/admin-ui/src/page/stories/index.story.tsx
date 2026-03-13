@@ -13,30 +13,6 @@ import Page from '..';
 import Breadcrumbs from '../../breadcrumbs';
 import { withRouter } from '../../stories/with-router';
 
-const JetpackLogo = ( {
-	height = 32,
-	width = 32,
-}: {
-	height?: number;
-	width?: number;
-} ) => (
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		x="0px"
-		y="0px"
-		viewBox="0 0 32 32"
-		height={ height }
-		width={ width }
-		// role="img" is required to prevent VoiceOver on Safari reading the content of the SVG
-		role="img"
-	>
-		<path
-			fill="#069e08"
-			d="M16,0C7.2,0,0,7.2,0,16s7.2,16,16,16s16-7.2,16-16S24.8,0,16,0z M15,19H7l8-16V19z M17,29V13h8L17,29z"
-		/>
-	</svg>
-);
-
 const meta: Meta< typeof Page > = {
 	component: Page,
 	title: 'Admin UI/Page',
@@ -92,20 +68,19 @@ export const WithBreadcrumbs: Story = {
 	},
 };
 
-export const WithLogo: Story = {
+export const WithIcon: Story = {
 	args: {
 		title: 'Page title',
-		logo: <Icon icon={ wordpress } size={ 24 } />,
+		icon: <Icon icon={ wordpress } size={ 24 } />,
 		showSidebarToggle: false,
-		children: (
-			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
-		),
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
 	},
 };
 
-export const WithLogoAndBreadcrumbs: Story = {
+export const WithIconAndBreadcrumbs: Story = {
 	args: {
-		logo: <Icon icon={ wordpress } size={ 24 } />,
+		icon: <Icon icon={ wordpress } size={ 24 } />,
 		showSidebarToggle: false,
 		breadcrumbs: (
 			<Breadcrumbs
@@ -115,38 +90,8 @@ export const WithLogoAndBreadcrumbs: Story = {
 				] }
 			/>
 		),
-		children: (
-			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
-		),
-	},
-};
-
-export const WithJetpackLogo: Story = {
-	args: {
-		title: 'Jetpack',
-		logo: <JetpackLogo width={ 20 } />,
-		showSidebarToggle: false,
-		children: (
-			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
-		),
-	},
-};
-
-export const WithJetpackLogoAndBreadcrumbs: Story = {
-	args: {
-		logo: <JetpackLogo width={ 20 } />,
-		showSidebarToggle: false,
-		breadcrumbs: (
-			<Breadcrumbs
-				items={ [
-					{ label: 'Root breadcrumb', to: '/connectors' },
-					{ label: 'Level 1 breadcrumb' },
-				] }
-			/>
-		),
-		children: (
-			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
-		),
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
 	},
 };
 
