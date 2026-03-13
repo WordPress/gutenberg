@@ -1329,12 +1329,8 @@
 						"backgroundPosition": {
 							"description": "Sets the `background-position` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"backgroundRepeat": {
