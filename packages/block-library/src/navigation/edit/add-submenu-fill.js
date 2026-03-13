@@ -303,10 +303,7 @@ function AddSubmenuFillContent( {
 } ) {
 	const isChildOfThisNav = useSelect(
 		( select ) => {
-			if (
-				! selectedClientIds?.length ||
-				selectedClientIds.length !== 1
-			) {
+			if ( selectedClientIds?.length !== 1 ) {
 				return false;
 			}
 			const { getBlockParents } = select( blockEditorStore );
