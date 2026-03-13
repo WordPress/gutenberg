@@ -730,9 +730,12 @@ export const saveEntityRecord =
 							( acc, key ) => {
 								// These properties are persisted in autosaves.
 								if (
-									[ 'title', 'excerpt', 'content' ].includes(
-										key
-									)
+									[
+										'title',
+										'excerpt',
+										'content',
+										'meta',
+									].includes( key )
 								) {
 									acc[ key ] = newRecord[ key ];
 								} else if ( key === 'status' ) {

@@ -5,6 +5,7 @@
 ### Enhancements
 
 - DataForm: Reduce panel's dialog min-width. [#76345](https://github.com/WordPress/gutenberg/pull/76345)
+- DataViews: Add border to sticky table headers. [#76396](https://github.com/WordPress/gutenberg/pull/76396)
 
 ### Bug Fixes
 

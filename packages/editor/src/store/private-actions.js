@@ -614,10 +614,16 @@ export const restoreRevision =
 		const postType = select.getCurrentPostType();
 		const postId = select.getCurrentPostId();
 
-		const revision = registry
-			.select( coreStore )
+		// Use resolveSelect to ensure the revision is fetched if not yet
+		// in the store. The _fields parameter matches the query used by
+		// getRevisions so the result is served from cache without an
+		// extra API call.
+		const revision = await registry
+			.resolveSelect( coreStore )
 			.getRevision( 'postType', postType, postId, revisionId, {
 				context: 'edit',
+				_fields:
+					'id,date,author,meta,title.raw,excerpt.raw,content.raw',
 			} );
 
 		if ( ! revision ) {

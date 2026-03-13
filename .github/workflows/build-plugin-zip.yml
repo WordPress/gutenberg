@@ -179,7 +179,7 @@ jobs:
                   fi
 
     build:
-        name: ${{ matrix.IS_WORDPRESS_CORE && 'Build assets for wordpress-develop' || 'Build Release Artifact' }}
+        name: ${{ matrix.IS_GUTENBERG_PLUGIN && 'Build Release Artifact' || 'Build assets for wordpress-develop' }}
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
@@ -192,12 +192,7 @@ jobs:
             )
         strategy:
             matrix:
-                IS_GUTENBERG_PLUGIN: [true]
-                IS_WORDPRESS_CORE: [false]
-
-                include:
-                    - IS_GUTENBERG_PLUGIN: false
-                      IS_WORDPRESS_CORE: true
+                IS_GUTENBERG_PLUGIN: [true, false]
 
         outputs:
             job_status: ${{ job.status }}
@@ -217,7 +212,7 @@ jobs:
                   check-latest: true
 
             - name: Configure build for wordpress-develop
-              if: ${{ matrix.IS_WORDPRESS_CORE }}
+              if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
               run: jq --tab '.wpPlugin.name = "wp"' package.json > package.json.tmp && mv package.json.tmp package.json
 
             - name: Build Gutenberg plugin ZIP file
@@ -225,12 +220,12 @@ jobs:
               env:
                   NO_CHECKS: 'true'
                   IS_GUTENBERG_PLUGIN: ${{ matrix.IS_GUTENBERG_PLUGIN }}
-                  IS_WORDPRESS_CORE: ${{ matrix.IS_WORDPRESS_CORE }}
+                  IS_WORDPRESS_CORE: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
 
             - name: Upload artifact
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               with:
-                  name: gutenberg-${{ matrix.IS_WORDPRESS_CORE && 'wordpress-develop' || 'plugin' }}
+                  name: gutenberg-${{ ! matrix.IS_GUTENBERG_PLUGIN && 'wordpress-develop' || 'plugin' }}
                   path: ./gutenberg.zip
 
             - name: Build release notes draft

@@ -14,22 +14,73 @@ import { __ } from '@wordpress/i18n';
  */
 import { getItemTitle } from '../../actions/utils';
 import type { BasePost } from '../../types';
-import { useDefaultTemplateLabel } from './hooks';
+import { useDefaultTemplateLabel, useTemplateFieldMode } from './hooks';
 import { unlock } from '../../lock-unlock';
+
+type TemplateEditComponentProps = Omit<
+	DataFormControlProps< BasePost >,
+	'onChange'
+> & {
+	onChange: ( value: string ) => void;
+};
 
 const EMPTY_ARRAY: [] = [];
 
-export const TemplateEdit = ( {
+function ClassicTemplateEdit( {
 	data,
 	field,
 	onChange,
-}: DataFormControlProps< BasePost > ) => {
-	const { id } = field;
+}: TemplateEditComponentProps ) {
+	const postId =
+		typeof data.id === 'number' ? data.id : parseInt( data.id, 10 );
+	const value = field.getValue( { item: data } );
+	const options = useMemo(
+		() =>
+			Object.entries(
+				( ( data as Record< string, any > )?.available_templates ??
+					{} ) as Record< string, string >
+			).map( ( [ templateSlug, title ] ) => ( {
+				label: title,
+				value: templateSlug,
+			} ) ),
+		[ data ]
+	);
+	const canSwitchTemplate = useSelect(
+		( select ) => {
+			const { getHomePage, getPostsPageId } = unlock(
+				select( coreStore )
+			);
+			const singlePostId = String( postId );
+			const isPostsPage = getPostsPageId() === singlePostId;
+			const isFrontPage =
+				data.type === 'page' && getHomePage()?.postId === singlePostId;
+
+			return ! isPostsPage && ! isFrontPage;
+		},
+		[ postId, data.type ]
+	);
+	return (
+		<SelectControl
+			__next40pxDefaultSize
+			label={ __( 'Template' ) }
+			hideLabelFromVision
+			value={ value }
+			options={ options }
+			onChange={ onChange }
+			disabled={ ! canSwitchTemplate }
+		/>
+	);
+}
+
+function BlockThemeTemplateEdit( {
+	data,
+	field,
+	onChange,
+}: TemplateEditComponentProps ) {
 	const postType = data.type;
 	const postId =
 		typeof data.id === 'number' ? data.id : parseInt( data.id, 10 );
 	const slug = data.slug;
-
 	const { templates, canSwitchTemplate } = useSelect(
 		( select ) => {
 			const allTemplates =
@@ -46,12 +97,9 @@ export const TemplateEdit = ( {
 				select( coreStore )
 			);
 			const singlePostId = String( postId );
-			const isPostsPage =
-				singlePostId !== undefined && getPostsPageId() === singlePostId;
+			const isPostsPage = getPostsPageId() === singlePostId;
 			const isFrontPage =
-				singlePostId !== undefined &&
-				postType === 'page' &&
-				getHomePage()?.postId === singlePostId;
+				postType === 'page' && getHomePage()?.postId === singlePostId;
 
 			return {
 				templates: allTemplates,
@@ -60,23 +108,12 @@ export const TemplateEdit = ( {
 		},
 		[ postId, postType ]
 	);
-
 	const defaultTemplateLabel = useDefaultTemplateLabel(
 		postType,
 		postId,
 		slug
 	);
-
 	const value = field.getValue( { item: data } );
-
-	const onChangeControl = useCallback(
-		( newValue: string ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
-	);
-
 	const options = useMemo( () => {
 		const templateOptions = templates.map( ( template ) => ( {
 			label: getItemTitle( template ),
@@ -87,7 +124,6 @@ export const TemplateEdit = ( {
 			...templateOptions,
 		];
 	}, [ templates, defaultTemplateLabel ] );
-
 	return (
 		<SelectControl
 			__next40pxDefaultSize
@@ -95,8 +131,29 @@ export const TemplateEdit = ( {
 			hideLabelFromVision
 			value={ value }
 			options={ options }
-			onChange={ onChangeControl }
+			onChange={ onChange }
 			disabled={ ! canSwitchTemplate }
 		/>
 	);
+}
+
+export const TemplateEdit = ( {
+	data,
+	field,
+	onChange,
+}: DataFormControlProps< BasePost > ) => {
+	const onChangeControl = useCallback(
+		( newValue: string ) =>
+			onChange( {
+				[ field.id ]: newValue,
+			} ),
+		[ field.id, onChange ]
+	);
+	const mode = useTemplateFieldMode( data );
+	if ( ! mode || ! [ 'block-theme', 'classic' ].includes( mode ) ) {
+		return null;
+	}
+	const Edit =
+		mode === 'classic' ? ClassicTemplateEdit : BlockThemeTemplateEdit;
+	return <Edit data={ data } field={ field } onChange={ onChangeControl } />;
 };

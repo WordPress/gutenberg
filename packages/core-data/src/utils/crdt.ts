@@ -342,8 +342,6 @@ export function getPostChangesFromCRDTDoc(
 						);
 					}
 
-					// The consumers of blocks have memoization that renders optimization
-					// here unnecessary.
 					return true;
 				}
 

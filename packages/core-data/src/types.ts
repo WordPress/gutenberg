@@ -66,6 +66,16 @@ export type CursorPosition = {
 	absoluteOffset: number;
 };
 
+/**
+ * The direction of a text selection, indicating where the caret sits.
+ */
+export enum SelectionDirection {
+	/** The caret is at the end of the selection (default / left-to-right). */
+	Forward = 'f',
+	/** The caret is at the start of the selection (right-to-left). */
+	Backward = 'b',
+}
+
 export type SelectionNone = {
 	// The user has not made a selection.
 	type: SelectionType.None;
@@ -86,6 +96,8 @@ export type SelectionInOneBlock = {
 	type: SelectionType.SelectionInOneBlock;
 	cursorStartPosition: CursorPosition;
 	cursorEndPosition: CursorPosition;
+	// The direction of the selection, indicating where the caret sits.
+	selectionDirection?: SelectionDirection;
 };
 
 export type SelectionInMultipleBlocks = {
@@ -95,6 +107,8 @@ export type SelectionInMultipleBlocks = {
 	type: SelectionType.SelectionInMultipleBlocks;
 	cursorStartPosition: CursorPosition;
 	cursorEndPosition: CursorPosition;
+	// The direction of the selection, indicating where the caret sits.
+	selectionDirection?: SelectionDirection;
 };
 
 export type SelectionWholeBlock = {
@@ -111,3 +125,8 @@ export type SelectionState =
 	| SelectionInOneBlock
 	| SelectionInMultipleBlocks
 	| SelectionWholeBlock;
+
+export interface ResolvedSelection {
+	textIndex: number | null;
+	localClientId: string | null;
+}
