@@ -148,34 +148,9 @@ export function htmlIndexToRichTextOffset(
 		return htmlIndex;
 	}
 
-	// Find a safe insertion point for the marker. If htmlIndex falls
-	// inside a tag or entity, back up to the boundary just before it
-	// so the marker doesn't break the HTML structure.
-	let safeIndex = htmlIndex;
-
-	const lastOpen = html.lastIndexOf( '<', htmlIndex - 1 );
-	if ( lastOpen !== -1 ) {
-		const nextClose = html.indexOf( '>', lastOpen );
-		if ( nextClose === -1 || nextClose >= htmlIndex ) {
-			safeIndex = lastOpen;
-		}
-	}
-
-	const lastAmp = html.lastIndexOf( '&', safeIndex - 1 );
-	if ( lastAmp !== -1 ) {
-		const nextSemi = html.indexOf( ';', lastAmp );
-		if (
-			nextSemi !== -1 &&
-			nextSemi >= safeIndex &&
-			nextSemi - lastAmp < 10
-		) {
-			safeIndex = lastAmp;
-		}
-	}
-
-	// Insert marker and let create() do the real parsing.
+	// Insert marker and let create() do the parsing.
 	const withMarker =
-		html.slice( 0, safeIndex ) + marker + html.slice( safeIndex );
+		html.slice( 0, htmlIndex ) + marker + html.slice( htmlIndex );
 	const value = create( { html: withMarker } );
 	const markerPos = value.text.indexOf( marker );
 
