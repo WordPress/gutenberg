@@ -94,10 +94,17 @@ export interface ConnectionStatusDisconnected {
 	retryInMs?: number;
 }
 
+export interface ConnectionStatusProviderLimitExceeded {
+	status: 'provider-limit-exceeded';
+	/** Optional error information. */
+	error?: ConnectionError;
+}
+
 export type ConnectionStatus =
 	| ConnectionStatusConnected
 	| ConnectionStatusConnecting
-	| ConnectionStatusDisconnected;
+	| ConnectionStatusDisconnected
+	| ConnectionStatusProviderLimitExceeded;
 
 export type OnStatusChangeCallback = (
 	status: ConnectionStatus | null

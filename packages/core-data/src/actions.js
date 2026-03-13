@@ -1124,21 +1124,31 @@ export const receiveRevisions =
  *
  * @return {Object} Action object.
  */
-export function setSyncConnectionStatus( kind, name, key, status ) {
-	if ( ! status ) {
-		return {
-			type: 'CLEAR_SYNC_CONNECTION_STATUS',
+export const setSyncConnectionStatus =
+	( kind, name, key, status ) =>
+	async ( { dispatch } ) => {
+		if ( ! status ) {
+			dispatch( {
+				type: 'CLEAR_SYNC_CONNECTION_STATUS',
+				kind,
+				name,
+				key,
+			} );
+			return;
+		}
+
+		if ( status.status === 'provider-limit-exceeded' ) {
+			dispatch( {
+				type: 'SET_COLLABORATION_SUPPORTED',
+				supported: false,
+			} );
+		}
+
+		dispatch( {
+			type: 'SET_SYNC_CONNECTION_STATUS',
 			kind,
 			name,
 			key,
-		};
-	}
-
-	return {
-		type: 'SET_SYNC_CONNECTION_STATUS',
-		kind,
-		name,
-		key,
-		status,
+			status,
+		} );
 	};
-}

@@ -17,8 +17,8 @@ import {
 	POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS,
 	POLLING_INTERVAL_BACKGROUND_TAB_IN_MS,
 	MAX_ERROR_BACKOFF_IN_MS,
-} from './constants';
-import type { ConnectionError, ConnectionStatus } from '../../types';
+} from './config';
+import type { ConnectionStatus } from '../../types';
 import {
 	type AwarenessState,
 	type LocalAwarenessState,
@@ -133,29 +133,6 @@ function createSyncStep2Update( doc: Y.Doc, step1: Uint8Array ): SyncUpdate {
 }
 
 /**
- * Return the client ID with the earliest `enteredAt` timestamp, or `null`
- * if no state contains a valid timestamp.
- *
- * @param states Awareness states map from Yjs.
- */
-function getEarliestClientId(
-	states: Map< number, AwarenessState >
-): number | null {
-	let earliestId: number | null = null;
-	let earliestTime = Infinity;
-	for ( const [ clientId, state ] of states.entries() ) {
-		const enteredAt = (
-			state as { collaboratorInfo?: { enteredAt?: number } }
-		 )?.collaboratorInfo?.enteredAt;
-		if ( enteredAt && enteredAt < earliestTime ) {
-			earliestTime = enteredAt;
-			earliestId = clientId;
-		}
-	}
-	return earliestId;
-}
-
-/**
  * Process an incoming awareness update from the server.
  *
  * @param state     The awareness state received
@@ -171,7 +148,9 @@ function processAwarenessUpdate(
 
 	// Removed clients are missing from the server state.
 	const removed = new Set< number >(
-		currentStates.keys().filter( ( clientId ) => ! state[ clientId ] )
+		Array.from( currentStates.keys() ).filter(
+			( clientId ) => ! state[ clientId ]
+		)
 	);
 
 	Object.entries( state ).forEach( ( [ clientIdString, awarenessState ] ) => {
@@ -268,9 +247,6 @@ function processDocUpdate(
 	}
 }
 
-// Set when the provider size limit is exceeded and all rooms have been
-// unregistered. Prevents further polling until the page is reloaded.
-let limitExceeded = false;
 let areListenersRegistered = false;
 let hasCollaborators = false;
 let isActiveBrowser = 'visible' === document.visibilityState;
@@ -351,7 +327,7 @@ function poll(): void {
 	pollingTimeoutId = null;
 
 	async function start(): Promise< void > {
-		if ( 0 === roomStates.size || limitExceeded ) {
+		if ( 0 === roomStates.size ) {
 			isPolling = false;
 			return;
 		}
@@ -395,156 +371,142 @@ function poll(): void {
 			0
 		);
 
-		if ( payloadSizeInBytes > MAX_PROVIDER_SIZE_BYTES ) {
-			// The payload is too large to send. Disconnect all clients
-			// except the one that entered earliest (has the smallest
-			// enteredAt timestamp). That client pauses its queue so it
-			// stops sending document updates but keeps polling for
-			// awareness, allowing it to remain connected without an
-			// error modal.
-			const error: ConnectionError = {
-				name: 'ConnectionError',
-				message: 'Provider size limit exceeded',
-				code: 'provider-limit-exceeded',
-			};
+		const isLimitExceeded = payloadSizeInBytes > MAX_PROVIDER_SIZE_BYTES;
 
-			// Determine once whether this client should stay, using
-			// the first room's awareness. This ensures the decision
-			// is consistent across all rooms for this collaborator.
-			const firstState = roomStates.values().next().value!;
-			const isEarliestClient =
-				getEarliestClientId( firstState.awarenessStates ) ===
-				firstState.clientId;
+		if ( isLimitExceeded ) {
+			// Pause all queues and strip the oversized updates from the
+			// payload. The request is still sent (with empty updates) so
+			// awareness continues to flow. The drained updates are
+			// discarded — when the queue is eventually resumed, the sync
+			// protocol (sync_step1/step2) will reconcile from the Y.Doc.
+			for ( const room of payload.rooms ) {
+				const state = roomStates.get( room.room );
+				if ( ! state ) {
+					continue;
+				}
 
-			// Snapshot the entries to avoid mutation during iteration.
-			const rooms = Array.from( roomStates.entries() );
-			for ( const [ room, state ] of rooms ) {
 				state.log( 'Provider size limit exceeded', {
 					payloadSizeInBytes,
 					maxSizeInBytes: MAX_PROVIDER_SIZE_BYTES,
 				} );
 
-				if ( isEarliestClient ) {
-					// Pause the queue so we stop sending document
-					// updates but keep polling for awareness.
-					state.updateQueue.pause();
-					state.log( 'Earliest client, only pausing update queue' );
-				} else {
-					state.log( 'Disconnecting client, and unregistering room' );
-					state.onStatusChange( {
-						status: 'disconnected',
-						error,
-					} );
-					unregisterRoom( room );
-				}
-			}
+				state.onStatusChange( {
+					status: 'provider-limit-exceeded',
+					error: {
+						code: 'provider-limit-exceeded',
+						name: 'ProviderLimitExceededError',
+						message:
+							'Real-time collaboration limit has been reached due to the size of the post. Editing is paused to prevent conflicts with other editors.',
+					},
+				} );
 
-			// If all rooms were unregistered, stop polling.
-			if ( 0 === roomStates.size ) {
-				limitExceeded = true;
+				state.updateQueue.pause();
+				room.updates = [];
 			}
-		} else {
-			try {
-				const { rooms } = await postSyncUpdate( payload );
+		}
 
-				// Emit 'connected' status.
+		try {
+			const { rooms } = await postSyncUpdate( payload );
+
+			// Emit 'connected' status (skip if limit was exceeded —
+			// we already emitted 'provider-limit-exceeded' above).
+			if ( ! isLimitExceeded ) {
 				roomStates.forEach( ( state ) => {
 					state.onStatusChange( { status: 'connected' } );
 				} );
+			}
 
-				rooms.forEach( ( room ) => {
-					if ( ! roomStates.has( room.room ) ) {
-						return;
-					}
+			rooms.forEach( ( room ) => {
+				if ( ! roomStates.has( room.room ) ) {
+					return;
+				}
 
-					const roomState = roomStates.get( room.room )!;
-					roomState.endCursor = room.end_cursor;
+				const roomState = roomStates.get( room.room )!;
+				roomState.endCursor = room.end_cursor;
 
-					// Process awareness update.
-					roomState.processAwarenessUpdate( room.awareness );
+				// Process awareness update.
+				roomState.processAwarenessUpdate( room.awareness );
 
-					// If there is another collaborator, resume the queue for the next poll
-					// and increase polling frequency.
-					if ( Object.keys( room.awareness ).length > 1 ) {
-						hasCollaborators = true;
+				// If there is another collaborator, resume the queue for the next poll
+				// and increase polling frequency. Don't resume when the limit was
+				// exceeded — the queue must stay paused.
+				if ( Object.keys( room.awareness ).length > 1 ) {
+					hasCollaborators = true;
+					if ( ! isLimitExceeded ) {
 						roomState.updateQueue.resume();
 					}
-
-					// Process each incoming update and collect any responses.
-					const responseUpdates = room.updates
-						.map( ( update ) =>
-							roomState.processDocUpdate( update )
-						)
-						.filter( ( update ): update is SyncUpdate =>
-							Boolean( update )
-						);
-					roomState.updateQueue.addBulk( responseUpdates );
-
-					// Respond to compaction requests from server. The server asks only one
-					// client at a time to compact (lowest active client ID). We encode our
-					// full document state to replace all prior updates on the server.
-					if ( room.should_compact ) {
-						roomState.log( 'Server requested compaction update' );
-						roomState.updateQueue.clear();
-						roomState.updateQueue.add(
-							roomState.createCompactionUpdate()
-						);
-					} else if ( room.compaction_request ) {
-						// Deprecated
-						roomState.log(
-							'Server requested (old) compaction update'
-						);
-						roomState.updateQueue.add(
-							createDeprecatedCompactionUpdate(
-								room.compaction_request
-							)
-						);
-					}
-				} );
-
-				// Recalculate polling interval.
-				if ( isActiveBrowser && hasCollaborators ) {
-					pollInterval = POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS;
-				} else if ( isActiveBrowser ) {
-					pollInterval = POLLING_INTERVAL_IN_MS;
-				} else {
-					pollInterval = POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
 				}
-			} catch ( error ) {
-				// Exponential backoff on error: double the backoff time, up to max
-				pollInterval = Math.min(
-					pollInterval * 2,
-					MAX_ERROR_BACKOFF_IN_MS
-				);
 
-				// Restore updates to queues on failure so they can be retried.
-				for ( const room of payload.rooms ) {
-					if ( ! roomStates.has( room.room ) ) {
-						continue;
-					}
+				// Process each incoming update and collect any responses.
+				const responseUpdates = room.updates
+					.map( ( update ) => roomState.processDocUpdate( update ) )
+					.filter( ( update ): update is SyncUpdate =>
+						Boolean( update )
+					);
+				roomState.updateQueue.addBulk( responseUpdates );
 
-					const state = roomStates.get( room.room )!;
-					state.updateQueue.restore( room.updates );
-					state.log(
-						'Error posting sync update, will retry with backoff',
-						{
-							error,
-							nextPoll: pollInterval,
-						}
+				// Respond to compaction requests from server. The server asks only one
+				// client at a time to compact (lowest active client ID). We encode our
+				// full document state to replace all prior updates on the server.
+				if ( room.should_compact ) {
+					roomState.log( 'Server requested compaction update' );
+					roomState.updateQueue.clear();
+					roomState.updateQueue.add(
+						roomState.createCompactionUpdate()
+					);
+				} else if ( room.compaction_request ) {
+					// Deprecated
+					roomState.log( 'Server requested (old) compaction update' );
+					roomState.updateQueue.add(
+						createDeprecatedCompactionUpdate(
+							room.compaction_request
+						)
 					);
 				}
+			} );
 
-				// Don't report disconnected status when the request was aborted
-				// due to page unload (e.g. during a refresh) to avoid briefly
-				// flashing the disconnect dialog before the new page loads.
-				if ( ! isUnloadPending ) {
-					roomStates.forEach( ( state ) => {
-						state.onStatusChange( {
-							status: 'disconnected',
-							retryInMs: pollInterval,
-						} );
-					} );
+			// Recalculate polling interval.
+			if ( isActiveBrowser && hasCollaborators ) {
+				pollInterval = POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS;
+			} else if ( isActiveBrowser ) {
+				pollInterval = POLLING_INTERVAL_IN_MS;
+			} else {
+				pollInterval = POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
+			}
+		} catch ( error ) {
+			// Exponential backoff on error: double the backoff time, up to max
+			pollInterval = Math.min(
+				pollInterval * 2,
+				MAX_ERROR_BACKOFF_IN_MS
+			);
+
+			// Restore updates to queues on failure so they can be retried.
+			for ( const room of payload.rooms ) {
+				if ( ! roomStates.has( room.room ) ) {
+					continue;
 				}
+
+				const state = roomStates.get( room.room )!;
+				state.updateQueue.restore( room.updates );
+				state.log(
+					'Error posting sync update, will retry with backoff',
+					{
+						error,
+						nextPoll: pollInterval,
+					}
+				);
+			}
+
+			// Don't report disconnected status when the request was aborted
+			// due to page unload (e.g. during a refresh) to avoid briefly
+			// flashing the disconnect dialog before the new page loads.
+			if ( ! isUnloadPending ) {
+				roomStates.forEach( ( state ) => {
+					state.onStatusChange( {
+						status: 'disconnected',
+						retryInMs: pollInterval,
+					} );
+				} );
 			}
 		}
 

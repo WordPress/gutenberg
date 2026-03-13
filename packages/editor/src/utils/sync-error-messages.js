@@ -31,14 +31,6 @@ const ERROR_MESSAGES = {
 		),
 		canRetry: true,
 	},
-	'provider-limit-exceeded': {
-		title: __( 'Collaboration limit reached' ),
-		description: __(
-			'Real-time collaboration limit has been reached. ' +
-				'Editing is paused to prevent conflicts with other editors.'
-		),
-		canRetry: false,
-	},
 	'unknown-error': {
 		title: __( 'Connection lost' ),
 		description: __(
