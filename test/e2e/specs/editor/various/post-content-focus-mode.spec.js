@@ -46,12 +46,9 @@ test.describe( 'Post Content focus mode', () => {
 				'Heading'
 			);
 
-			const info =
-				await postContentFocusMode.getPostContentInsertionInfo();
-			expect( info.postContentChildNames ).toEqual( [
-				'core/paragraph',
-				'core/heading',
-			] );
+			expect(
+				await postContentFocusMode.getPostContentInnerBlockNames()
+			).toEqual( [ 'core/paragraph', 'core/heading' ] );
 		} );
 
 		await test.step( 'Post Content selected: inserts at end of Post Content', async () => {
@@ -65,13 +62,9 @@ test.describe( 'Post Content focus mode', () => {
 				'Heading'
 			);
 
-			const info =
-				await postContentFocusMode.getPostContentInsertionInfo();
-			expect( info.postContentChildNames ).toEqual( [
-				'core/paragraph',
-				'core/heading',
-				'core/heading',
-			] );
+			expect(
+				await postContentFocusMode.getPostContentInnerBlockNames()
+			).toEqual( [ 'core/paragraph', 'core/heading', 'core/heading' ] );
 		} );
 
 		await test.step( 'Inner block selected: inserts after selected block', async () => {
@@ -83,10 +76,10 @@ test.describe( 'Post Content focus mode', () => {
 				'Heading'
 			);
 
-			const info =
-				await postContentFocusMode.getPostContentInsertionInfo();
 			// The new heading is inserted after the selected paragraph.
-			expect( info.postContentChildNames ).toEqual( [
+			expect(
+				await postContentFocusMode.getPostContentInnerBlockNames()
+			).toEqual( [
 				'core/paragraph',
 				'core/heading',
 				'core/heading',
@@ -260,15 +253,12 @@ test.describe( 'Post Content focus mode', () => {
 					'Heading'
 				);
 
-				const info =
-					await postContentFocusMode.getPostContentInsertionInfo();
-				expect( info.postContentChildNames ).toEqual( [
-					'core/paragraph',
-					'core/heading',
-				] );
-				expect( info.templatePartChildren ).toEqual(
-					expectedTemplatePart
-				);
+				expect(
+					await postContentFocusMode.getPostContentInnerBlockNames()
+				).toEqual( [ 'core/paragraph', 'core/heading' ] );
+				expect(
+					await postContentFocusMode.getTemplatePartInnerBlockNames()
+				).toEqual( expectedTemplatePart );
 			} );
 
 			await test.step( 'Template part selected: inserts into Post Content', async () => {
@@ -290,16 +280,16 @@ test.describe( 'Post Content focus mode', () => {
 					'Heading'
 				);
 
-				const info =
-					await postContentFocusMode.getPostContentInsertionInfo();
-				expect( info.postContentChildNames ).toEqual( [
+				expect(
+					await postContentFocusMode.getPostContentInnerBlockNames()
+				).toEqual( [
 					'core/paragraph',
 					'core/heading',
 					'core/heading',
 				] );
-				expect( info.templatePartChildren ).toEqual(
-					expectedTemplatePart
-				);
+				expect(
+					await postContentFocusMode.getTemplatePartInnerBlockNames()
+				).toEqual( expectedTemplatePart );
 			} );
 
 			await test.step( 'Post Content selected: inserts at end of Post Content', async () => {
@@ -313,17 +303,17 @@ test.describe( 'Post Content focus mode', () => {
 					'Heading'
 				);
 
-				const info =
-					await postContentFocusMode.getPostContentInsertionInfo();
-				expect( info.postContentChildNames ).toEqual( [
+				expect(
+					await postContentFocusMode.getPostContentInnerBlockNames()
+				).toEqual( [
 					'core/paragraph',
 					'core/heading',
 					'core/heading',
 					'core/heading',
 				] );
-				expect( info.templatePartChildren ).toEqual(
-					expectedTemplatePart
-				);
+				expect(
+					await postContentFocusMode.getTemplatePartInnerBlockNames()
+				).toEqual( expectedTemplatePart );
 			} );
 
 			await test.step( 'Post content inner block selected: inserts after selected block', async () => {
@@ -336,19 +326,19 @@ test.describe( 'Post Content focus mode', () => {
 					'Heading'
 				);
 
-				const info =
-					await postContentFocusMode.getPostContentInsertionInfo();
 				// The new heading is inserted after the selected paragraph.
-				expect( info.postContentChildNames ).toEqual( [
+				expect(
+					await postContentFocusMode.getPostContentInnerBlockNames()
+				).toEqual( [
 					'core/paragraph',
 					'core/heading',
 					'core/heading',
 					'core/heading',
 					'core/heading',
 				] );
-				expect( info.templatePartChildren ).toEqual(
-					expectedTemplatePart
-				);
+				expect(
+					await postContentFocusMode.getTemplatePartInnerBlockNames()
+				).toEqual( expectedTemplatePart );
 			} );
 		} );
 	} );
@@ -396,42 +386,40 @@ class PostContentFocusMode {
 	}
 
 	/**
-	 * Returns information about the blocks inside Post Content and,
-	 * if Post Content is inside a template part, the template part's
-	 * direct children.
+	 * Returns the block names of Post Content's inner blocks.
 	 *
-	 * @return {Object} An object with:
-	 *   - postContentChildNames: array of block names inside Post Content
-	 *   - templatePartChildren:  array of block names that are direct
-	 *                            children of the template part (only
-	 *                            present when Post Content is inside one)
+	 * @return {string[]} Array of block names inside Post Content.
 	 */
-	async getPostContentInsertionInfo() {
+	async getPostContentInnerBlockNames() {
 		return await this.page.evaluate( () => {
-			const { select } = window.wp.data;
+			const { getBlocksByName, getBlockOrder, getBlockName } =
+				window.wp.data.select( 'core/block-editor' );
+			const [ postContentId ] = getBlocksByName( 'core/post-content' );
+			return getBlockOrder( postContentId ).map( ( id ) =>
+				getBlockName( id )
+			);
+		} );
+	}
+
+	/**
+	 * Returns the block names of the direct children of the template part
+	 * that contains Post Content.
+	 *
+	 * @return {string[]} Array of block names inside the template part.
+	 */
+	async getTemplatePartInnerBlockNames() {
+		return await this.page.evaluate( () => {
 			const {
 				getBlocksByName,
 				getBlockOrder,
 				getBlockName,
 				getBlockRootClientId,
-			} = select( 'core/block-editor' );
+			} = window.wp.data.select( 'core/block-editor' );
 			const [ postContentId ] = getBlocksByName( 'core/post-content' );
-			const result = {
-				postContentChildNames: getBlockOrder( postContentId ).map(
-					( id ) => getBlockName( id )
-				),
-			};
-			// Include template part children if Post Content is inside one.
-			const parentId = getBlockRootClientId( postContentId );
-			if (
-				parentId &&
-				getBlockName( parentId ) === 'core/template-part'
-			) {
-				result.templatePartChildren = getBlockOrder( parentId ).map(
-					( id ) => getBlockName( id )
-				);
-			}
-			return result;
+			const templatePartId = getBlockRootClientId( postContentId );
+			return getBlockOrder( templatePartId ).map( ( id ) =>
+				getBlockName( id )
+			);
 		} );
 	}
 
