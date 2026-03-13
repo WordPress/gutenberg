@@ -257,19 +257,43 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 * @return array[] Array of arrays containing the registered icon properties.
 		 */
 		public function get_registered_icons( $search = '' ) {
-			$icons = array();
+    $icons = array();
 
-			foreach ( $this->registered_icons as $icon ) {
-				if ( ! empty( $search ) && false === stripos( $icon['name'], $search ) ) {
-					continue;
-				}
+    foreach ( $this->registered_icons as $icon ) {
+        if ( ! empty( $search ) ) {
+            $match = false;
 
-				$icon['content'] = $icon['content'] ?? $this->get_content( $icon['name'] );
-				$icons[]         = $icon;
-			}
+            // Search in 'name' field.
+            if ( false !== stripos( $icon['name'], $search ) ) {
+                $match = true;
+            }
 
-			return $icons;
-		}
+            // Search in 'label' field.
+            if ( ! $match && ! empty( $icon['label'] ) && false !== stripos( $icon['label'], $search ) ) {
+                $match = true;
+            }
+
+            // Search in 'keywords' field.
+            if ( ! $match && ! empty( $icon['keywords'] ) && is_array( $icon['keywords'] ) ) {
+                foreach ( $icon['keywords'] as $keyword ) {
+                    if ( false !== stripos( $keyword, $search ) ) {
+                        $match = true;
+                        break;
+                    }
+                }
+            }
+
+            if ( ! $match ) {
+                continue;
+            }
+        }
+
+        $icon['content'] = $icon['content'] ?? $this->get_content( $icon['name'] );
+        $icons[]         = $icon;
+    }
+
+    return $icons;
+}
 
 		/**
 		 * Checks if an icon is registered.
