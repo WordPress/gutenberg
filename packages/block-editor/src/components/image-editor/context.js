@@ -21,12 +21,28 @@ export default function ImageEditingProvider( {
 	naturalHeight,
 	onFinishEditing,
 	onSaveImage,
+	cropToContentBounds,
 	children,
 } ) {
-	const transformImage = useTransformImage( {
+	const {
+		editedUrl,
+		setEditedUrl,
+		crop,
+		zoom,
+		setZoom,
+		rotation,
+		rotateClockwise,
+		aspect,
+		setAspect,
+		defaultAspect,
+		applyCropToContent,
+		hasCropToContentBounds,
+		cropToContentApplied,
+	} = useTransformImage( {
 		url,
 		naturalWidth,
 		naturalHeight,
+		cropToContentBounds,
 	} );
 
 	const saveImage = useSaveImage( {
@@ -34,15 +50,47 @@ export default function ImageEditingProvider( {
 		url,
 		onSaveImage,
 		onFinishEditing,
-		...transformImage,
+		editedUrl,
+		setEditedUrl,
+		crop,
+		zoom,
+		rotation,
+		aspect,
 	} );
 
 	const providerValue = useMemo(
 		() => ( {
-			...transformImage,
+			editedUrl,
+			setEditedUrl,
+			crop,
+			zoom,
+			setZoom,
+			rotation,
+			rotateClockwise,
+			aspect,
+			setAspect,
+			defaultAspect,
+			applyCropToContent,
+			hasCropToContentBounds,
+			cropToContentApplied,
 			...saveImage,
 		} ),
-		[ transformImage, saveImage ]
+		[
+			editedUrl,
+			setEditedUrl,
+			crop,
+			zoom,
+			setZoom,
+			rotation,
+			rotateClockwise,
+			aspect,
+			setAspect,
+			defaultAspect,
+			applyCropToContent,
+			hasCropToContentBounds,
+			cropToContentApplied,
+			saveImage,
+		]
 	);
 
 	return (

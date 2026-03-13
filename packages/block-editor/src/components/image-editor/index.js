@@ -14,6 +14,7 @@ import Cropper from './cropper';
 import ZoomDropdown from './zoom-dropdown';
 import RotationButton from './rotation-button';
 import FormControls from './form-controls';
+import CropToContentButton from './crop-to-content-button';
 
 export default function ImageEditor( {
 	id,
@@ -25,6 +26,7 @@ export default function ImageEditor( {
 	onSaveImage,
 	onFinishEditing,
 	borderProps,
+	cropToContentBounds,
 } ) {
 	return (
 		<ImageCropperProvider>
@@ -35,6 +37,7 @@ export default function ImageEditor( {
 				naturalHeight={ naturalHeight }
 				onSaveImage={ onSaveImage }
 				onFinishEditing={ onFinishEditing }
+				cropToContentBounds={ cropToContentBounds }
 			>
 				<Cropper
 					borderProps={ borderProps }
@@ -54,6 +57,7 @@ export default function ImageEditor( {
 								/>
 							) }
 						</ToolbarItem>
+						<CropToContentButton />
 						<RotationButton />
 					</ToolbarGroup>
 					<ToolbarGroup>

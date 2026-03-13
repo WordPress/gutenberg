@@ -9,8 +9,12 @@ export default function useTransformImage( {
 	url,
 	naturalWidth,
 	naturalHeight,
+	cropToContentBounds: initialCropBounds,
 } ) {
 	const [ editedUrl, setEditedUrl ] = useState();
+	const [ cropToContentBounds, setCropToContentBounds ] =
+		useState( initialCropBounds );
+	const [ cropApplied, setCropApplied ] = useState( false );
 	const { cropperState, setCropperState } = useImageCropper();
 	const { zoom, aspectRatio, crop, croppedArea } = cropperState;
 
@@ -36,10 +40,56 @@ export default function useTransformImage( {
 		setAspectRatio( defaultAspect );
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
+	// Update internal crop bounds when initial bounds change
+	useEffect( () => {
+		setCropToContentBounds( initialCropBounds );
+		setCropApplied( false );
+	}, [ initialCropBounds ] );
+
+	/**
+	 * Apply crop to content bounds with corrected positioning
+	 */
+	const applyCropToContent = useCallback( () => {
+		if ( ! cropToContentBounds?.bounds ) {
+			return;
+		}
+
+		const { bounds } = cropToContentBounds;
+
+		// Calculate the aspect ratio of the content area
+		const contentAspectRatio = bounds.width / bounds.height;
+
+		// Calculate zoom needed
+		const zoomX = naturalWidth / bounds.width;
+		const zoomY = naturalHeight / bounds.height;
+		const newZoom = Math.min( zoomX, zoomY ) * 0.985;
+
+		// Calculate where the content center is as a percentage of image dimensions
+		const contentCenterX = ( bounds.x + bounds.width / 2 ) / naturalWidth;
+		const contentCenterY = ( bounds.y + bounds.height / 2 ) / naturalHeight;
+
+		// Calculate crop offset with proper scaling
+		// Through testing, we found the multiplier needs to be ~6.5x
+		const cropX = ( 0.5 - contentCenterX ) * 100 * 6.5;
+		const cropY = ( 0.5 - contentCenterY ) * 100 * 6.5;
+
+		// Set everything at once
+		setCropperState( {
+			aspectRatio: contentAspectRatio,
+			zoom: newZoom,
+			crop: {
+				x: cropX,
+				y: cropY,
+			},
+		} );
+
+		setCropApplied( true );
+	}, [ cropToContentBounds, naturalWidth, naturalHeight, setCropperState ] );
+
 	/**
 	 * rotateClockwise rotates the image by 90° clockwise by drawing the original image onto a canvas with rotation applied,
 	 * then saves it as a new blob URL (editedUrl).
-	 * This creates a new rotated image file, bypassing the image-cropper’s CSS transform rotation.
+	 * This creates a new rotated image file, bypassing the image-cropper's CSS transform rotation.
 	 * It's a bespoke solution to ensure that the rotated image fills the content width.
 	 */
 	const [ internalRotation, setInternalRotation ] = useState( 0 );
@@ -151,6 +201,9 @@ export default function useTransformImage( {
 			aspect: aspectRatio,
 			setAspect: setAspectRatio,
 			defaultAspect,
+			applyCropToContent,
+			hasCropToContentBounds: !! cropToContentBounds && ! cropApplied,
+			cropToContentApplied: cropApplied,
 		} ),
 		[
 			editedUrl,
@@ -162,6 +215,9 @@ export default function useTransformImage( {
 			aspectRatio,
 			setAspectRatio,
 			defaultAspect,
+			applyCropToContent,
+			cropToContentBounds,
+			cropApplied,
 		]
 	);
 }

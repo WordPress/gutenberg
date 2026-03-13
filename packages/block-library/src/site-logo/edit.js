@@ -47,6 +47,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { MIN_SIZE } from '../image/constants';
 import { MediaControl, MediaControlPreview } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { useCropToContentAnalysis } from '../image/image-editor/use-crop-to-content-analysis';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -68,6 +69,14 @@ const SiteLogo = ( {
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
+
+	// Use shared hook for crop-to-content analysis
+	const { cropToContentBounds } = useCropToContentAnalysis(
+		logoUrl,
+		naturalWidth,
+		naturalHeight
+	);
+
 	const { toggleSelection } = useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -221,6 +230,7 @@ const SiteLogo = ( {
 				onFinishEditing={ () => {
 					setIsEditingImage( false );
 				} }
+				cropToContentBounds={ cropToContentBounds }
 			/>
 		);
 	} else {

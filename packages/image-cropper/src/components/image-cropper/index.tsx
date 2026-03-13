@@ -71,6 +71,7 @@ export default function ImageCropper( {
 				onLoad?.( loadedMediaSize );
 			} }
 			onRotationChange={ setRotation }
+			zoomWithScroll={ false }
 			transform={ [
 				`translate(${ crop.x }px, ${ crop.y }px)`,
 				`rotateZ(${ rotation }deg)`,
