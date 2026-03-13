@@ -11,11 +11,93 @@ test.use( {
 
 // Post content focus mode (aka the 'Show template' option when editing a post or page).
 test.describe( 'Post Content focus mode', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
+	test( 'inserts blocks into Post Content from different selection states', async ( {
+		admin,
+		editor,
+		page,
+		postContentFocusMode,
+	} ) => {
+		await admin.createNewPost();
+
+		// Add initial content.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Initial paragraph' },
+		} );
+
+		await postContentFocusMode.enableShowTemplate();
+
+		await test.step( 'No selection: inserts at end of Post Content', async () => {
+			await page.evaluate( () => {
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.clearSelectedBlock();
+			} );
+
+			await postContentFocusMode.insertBlockViaGlobalInserter(
+				'Heading'
+			);
+
+			const info =
+				await postContentFocusMode.getPostContentInsertionInfo();
+			expect( info.postContentChildNames ).toEqual( [
+				'core/paragraph',
+				'core/heading',
+			] );
+		} );
+
+		await test.step( 'Post Content selected: inserts at end of Post Content', async () => {
+			const postContent = editor.canvas.getByRole( 'document', {
+				name: 'Block: Content',
+				exact: true,
+			} );
+			await editor.selectBlocks( postContent );
+
+			await postContentFocusMode.insertBlockViaGlobalInserter(
+				'Heading'
+			);
+
+			const info =
+				await postContentFocusMode.getPostContentInsertionInfo();
+			expect( info.postContentChildNames ).toEqual( [
+				'core/paragraph',
+				'core/heading',
+				'core/heading',
+			] );
+		} );
+
+		await test.step( 'Inner block selected: inserts after selected block', async () => {
+			// Select the first paragraph.
+			const paragraph = editor.canvas.getByText( 'Initial paragraph' );
+			await editor.selectBlocks( paragraph );
+
+			await postContentFocusMode.insertBlockViaGlobalInserter(
+				'Heading'
+			);
+
+			const info =
+				await postContentFocusMode.getPostContentInsertionInfo();
+			// The new heading is inserted after the selected paragraph.
+			expect( info.postContentChildNames ).toEqual( [
+				'core/paragraph',
+				'core/heading',
+				'core/heading',
+				'core/heading',
+			] );
+		} );
+	} );
+
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/76101.
 	test.describe( 'post content inside a template part', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
-			await requestUtils.activateTheme( 'emptytheme' );
-
 			// Create a template part that contains post-title and post-content.
 			await requestUtils.createTemplate( 'wp_template_part', {
 				slug: 'content-area',
@@ -40,7 +122,6 @@ test.describe( 'Post Content focus mode', () => {
 		test.afterAll( async ( { requestUtils } ) => {
 			await requestUtils.deleteAllTemplates( 'wp_template' );
 			await requestUtils.deleteAllTemplates( 'wp_template_part' );
-			await requestUtils.activateTheme( 'twentytwentyone' );
 		} );
 
 		test( 'post title and content are editable and blocks can be inserted', async ( {
@@ -124,89 +205,6 @@ test.describe( 'Post Content focus mode', () => {
 			} );
 		} );
 
-		// Regression test: when Post Content is selected and a block is
-		// inserted via the inserter, it should end up inside Post Content,
-		// not as a sibling in the template part.
-		test( 'inserting a block while Post Content is selected places it inside Post Content', async ( {
-			admin,
-			editor,
-			page,
-			postContentFocusMode,
-		} ) => {
-			await admin.createNewPost();
-
-			// Add initial content so we can verify the new paragraph
-			// is an additional child of Post Content.
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Existing content' },
-			} );
-
-			await postContentFocusMode.enableShowTemplate();
-
-			// Select the Post Content block itself.
-			const postContent = editor.canvas.getByRole( 'document', {
-				name: 'Block: Content',
-				exact: true,
-			} );
-			await editor.selectBlocks( postContent );
-
-			// Open the global block inserter and insert a Paragraph.
-			await page
-				.getByRole( 'button', {
-					name: 'Block Inserter',
-					exact: true,
-				} )
-				.click();
-
-			const inserterPanel = page.getByRole( 'region', {
-				name: 'Block Library',
-			} );
-			await inserterPanel
-				.getByRole( 'tabpanel', { name: 'Blocks' } )
-				.getByRole( 'option', { name: 'Paragraph', exact: true } )
-				.click();
-
-			// Close the inserter.
-			await page
-				.getByRole( 'button', {
-					name: 'Block Inserter',
-					exact: true,
-				} )
-				.click();
-
-			// The inserted paragraph should be inside Post Content,
-			// not a sibling of it inside the template part.
-			const blocks = await page.evaluate( () => {
-				const { select } = window.wp.data;
-				const {
-					getBlocksByName,
-					getBlockOrder,
-					getBlockName,
-					getBlockRootClientId,
-				} = select( 'core/block-editor' );
-				const [ postContentId ] =
-					getBlocksByName( 'core/post-content' );
-				const templatePartId = getBlockRootClientId( postContentId );
-				return {
-					postContentChildCount:
-						getBlockOrder( postContentId ).length,
-					templatePartChildren: getBlockOrder( templatePartId ).map(
-						( id ) => getBlockName( id )
-					),
-				};
-			} );
-
-			// Post Content started with one paragraph; after insertion
-			// it should have two children.
-			expect( blocks.postContentChildCount ).toBe( 2 );
-			// The paragraph should not have been inserted as a sibling
-			// of Post Content inside the template part.
-			expect( blocks.templatePartChildren ).not.toContain(
-				'core/paragraph'
-			);
-		} );
-
 		test( 'template part blocks outside post content are not editable', async ( {
 			admin,
 			editor,
@@ -227,6 +225,132 @@ test.describe( 'Post Content focus mode', () => {
 			} );
 			await expect( siteTitle ).toHaveAttribute( 'inert', 'true' );
 		} );
+
+		test( 'inserts blocks into Post Content from different selection states', async ( {
+			admin,
+			editor,
+			page,
+			postContentFocusMode,
+		} ) => {
+			await admin.createNewPost();
+
+			// Add initial content.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Initial paragraph' },
+			} );
+
+			await postContentFocusMode.enableShowTemplate();
+
+			// The template part's direct children should remain unchanged
+			// throughout all steps (post-title and post-content only).
+			const expectedTemplatePart = [
+				'core/post-title',
+				'core/post-content',
+			];
+
+			await test.step( 'No selection: inserts at end of Post Content', async () => {
+				await page.evaluate( () => {
+					window.wp.data
+						.dispatch( 'core/block-editor' )
+						.clearSelectedBlock();
+				} );
+
+				await postContentFocusMode.insertBlockViaGlobalInserter(
+					'Heading'
+				);
+
+				const info =
+					await postContentFocusMode.getPostContentInsertionInfo();
+				expect( info.postContentChildNames ).toEqual( [
+					'core/paragraph',
+					'core/heading',
+				] );
+				expect( info.templatePartChildren ).toEqual(
+					expectedTemplatePart
+				);
+			} );
+
+			await test.step( 'Template part selected: inserts into Post Content', async () => {
+				// Select the template part that contains Post Content.
+				await page.evaluate( () => {
+					const { select, dispatch } = window.wp.data;
+					const { getBlocksByName, getBlockRootClientId } =
+						select( 'core/block-editor' );
+					const [ postContentId ] =
+						getBlocksByName( 'core/post-content' );
+					const templatePartId =
+						getBlockRootClientId( postContentId );
+					dispatch( 'core/block-editor' ).selectBlock(
+						templatePartId
+					);
+				} );
+
+				await postContentFocusMode.insertBlockViaGlobalInserter(
+					'Heading'
+				);
+
+				const info =
+					await postContentFocusMode.getPostContentInsertionInfo();
+				expect( info.postContentChildNames ).toEqual( [
+					'core/paragraph',
+					'core/heading',
+					'core/heading',
+				] );
+				expect( info.templatePartChildren ).toEqual(
+					expectedTemplatePart
+				);
+			} );
+
+			await test.step( 'Post Content selected: inserts at end of Post Content', async () => {
+				const postContent = editor.canvas.getByRole( 'document', {
+					name: 'Block: Content',
+					exact: true,
+				} );
+				await editor.selectBlocks( postContent );
+
+				await postContentFocusMode.insertBlockViaGlobalInserter(
+					'Heading'
+				);
+
+				const info =
+					await postContentFocusMode.getPostContentInsertionInfo();
+				expect( info.postContentChildNames ).toEqual( [
+					'core/paragraph',
+					'core/heading',
+					'core/heading',
+					'core/heading',
+				] );
+				expect( info.templatePartChildren ).toEqual(
+					expectedTemplatePart
+				);
+			} );
+
+			await test.step( 'Post content inner block selected: inserts after selected block', async () => {
+				// Select the first paragraph (the initial content).
+				const paragraph =
+					editor.canvas.getByText( 'Initial paragraph' );
+				await editor.selectBlocks( paragraph );
+
+				await postContentFocusMode.insertBlockViaGlobalInserter(
+					'Heading'
+				);
+
+				const info =
+					await postContentFocusMode.getPostContentInsertionInfo();
+				// The new heading is inserted after the selected paragraph.
+				expect( info.postContentChildNames ).toEqual( [
+					'core/paragraph',
+					'core/heading',
+					'core/heading',
+					'core/heading',
+					'core/heading',
+				] );
+				expect( info.templatePartChildren ).toEqual(
+					expectedTemplatePart
+				);
+			} );
+		} );
 	} );
 } );
 
@@ -234,6 +358,81 @@ class PostContentFocusMode {
 	constructor( { editor, page } ) {
 		this.editor = editor;
 		this.page = page;
+	}
+
+	/**
+	 * Opens the global block inserter, inserts a block by name, and closes
+	 * the inserter.
+	 *
+	 * @param {string} blockName The label of the block to insert (e.g. 'Heading').
+	 */
+	async insertBlockViaGlobalInserter( blockName ) {
+		await this.page
+			.getByRole( 'button', {
+				name: 'Block Inserter',
+				exact: true,
+			} )
+			.click();
+
+		const inserterPanel = this.page.getByRole( 'region', {
+			name: 'Block Library',
+		} );
+		const searchBox = inserterPanel.getByRole( 'searchbox', {
+			name: 'Search',
+		} );
+		await searchBox.fill( blockName );
+		await inserterPanel
+			.getByRole( 'tabpanel', { name: 'Blocks' } )
+			.getByRole( 'option', { name: blockName, exact: true } )
+			.click();
+
+		// Close the inserter.
+		await this.page
+			.getByRole( 'button', {
+				name: 'Block Inserter',
+				exact: true,
+			} )
+			.click();
+	}
+
+	/**
+	 * Returns information about the blocks inside Post Content and,
+	 * if Post Content is inside a template part, the template part's
+	 * direct children.
+	 *
+	 * @return {Object} An object with:
+	 *   - postContentChildNames: array of block names inside Post Content
+	 *   - templatePartChildren:  array of block names that are direct
+	 *                            children of the template part (only
+	 *                            present when Post Content is inside one)
+	 */
+	async getPostContentInsertionInfo() {
+		return await this.page.evaluate( () => {
+			const { select } = window.wp.data;
+			const {
+				getBlocksByName,
+				getBlockOrder,
+				getBlockName,
+				getBlockRootClientId,
+			} = select( 'core/block-editor' );
+			const [ postContentId ] = getBlocksByName( 'core/post-content' );
+			const result = {
+				postContentChildNames: getBlockOrder( postContentId ).map(
+					( id ) => getBlockName( id )
+				),
+			};
+			// Include template part children if Post Content is inside one.
+			const parentId = getBlockRootClientId( postContentId );
+			if (
+				parentId &&
+				getBlockName( parentId ) === 'core/template-part'
+			) {
+				result.templatePartChildren = getBlockOrder( parentId ).map(
+					( id ) => getBlockName( id )
+				);
+			}
+			return result;
+		} );
 	}
 
 	/**
