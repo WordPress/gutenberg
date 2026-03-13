@@ -108,7 +108,7 @@ export function findBlockByClientIdInDoc(
 // Candidate markers for insertion. We try each in order and pick the first
 // one that does not already appear in the text, so existing content cannot
 // collide with the marker we search for after parsing.
-const MARKER_CANDIDATES = [ '\uFFFD', '\uFFFE', '\uFFFF' ] as const;
+const MARKER_CANDIDATES = [ '\uE000', '\uE001', '\uE002' ] as const;
 
 /**
  * Pick a marker character that does not appear in `text`. Returns the marker
