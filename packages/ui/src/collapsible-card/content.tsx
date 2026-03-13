@@ -1,6 +1,6 @@
-import { Collapsible } from '@base-ui/react/collapsible';
 import { forwardRef } from '@wordpress/element';
 import * as Card from '../card';
+import * as Collapsible from '../collapsible';
 import type { ContentProps } from './types';
 
 /**
