@@ -105,10 +105,8 @@ export function findBlockByClientIdInDoc(
 	return findBlockByClientIdInBlocks( blockId, blocks );
 }
 
-// Candidate markers for insertion. We try each in order and pick the first
-// one that does not already appear in the text, so existing content cannot
-// collide with the marker we search for after parsing.
-const MARKER_CANDIDATES = [ '\uE000', '\uE001', '\uE002' ] as const;
+// Marker for insertion.
+const MARKER_START = 0xe000;
 
 /**
  * Pick a marker character that does not appear in `text`. Returns the marker
@@ -117,7 +115,13 @@ const MARKER_CANDIDATES = [ '\uE000', '\uE001', '\uE002' ] as const;
  * @param text The string to check for existing marker characters.
  */
 function pickMarker( text: string ): string | null {
-	for ( const candidate of MARKER_CANDIDATES ) {
+	const tryCount = 0x10;
+
+	// Scan the unicode private use area for the first code point not present
+	// in the text.
+	for ( let code = MARKER_START; code < MARKER_START + tryCount; code++ ) {
+		const candidate = String.fromCharCode( code );
+
 		if ( ! text.includes( candidate ) ) {
 			return candidate;
 		}
