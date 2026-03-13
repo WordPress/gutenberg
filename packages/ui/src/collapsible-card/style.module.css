@@ -57,12 +57,13 @@
 		}
 	}
 
-	.content-inner {
-		padding-block-start: 0;
-	}
 }
 
 @layer wp-ui-compositions {
+	.content-inner {
+		padding-block-start: 0;
+	}
+
 	.header {
 		display: flex;
 		flex-direction: row;
