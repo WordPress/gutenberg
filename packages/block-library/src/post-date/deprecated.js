@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * Internal dependencies
  */
 import migrateFontFamily from '../utils/migrate-font-family';
@@ -251,9 +256,10 @@ const v2 = {
 	migrate( { className, displayType, metadata, ...otherAttributes } ) {
 		if ( displayType === 'date' || displayType === 'modified' ) {
 			if ( displayType === 'modified' ) {
-				className = [ className, 'wp-block-post-date__modified-date' ]
-					.filter( Boolean )
-					.join( ' ' );
+				className = clsx(
+					className,
+					'wp-block-post-date__modified-date'
+				);
 			}
 
 			return {
@@ -274,8 +280,11 @@ const v2 = {
 	isEligible( attributes ) {
 		// If there's neither an explicit `datetime` attribute nor a block binding for that attribute,
 		// then we're dealing with an old version of the block.
+		// Exclude blocks with `textAlign`, as those are handled by the v4 deprecation.
 		return (
-			! attributes.datetime && ! attributes?.metadata?.bindings?.datetime
+			! attributes.textAlign &&
+			! attributes.datetime &&
+			! attributes?.metadata?.bindings?.datetime
 		);
 	},
 };

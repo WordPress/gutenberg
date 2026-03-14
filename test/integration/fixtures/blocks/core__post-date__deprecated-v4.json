@@ -3,16 +3,10 @@
 		"name": "core/post-date",
 		"isValid": true,
 		"attributes": {
-			"textAlign": "left",
 			"isLink": false,
-			"metadata": {
-				"bindings": {
-					"datetime": {
-						"source": "core/post-data",
-						"args": {
-							"field": "date"
-						}
-					}
+			"style": {
+				"typography": {
+					"textAlign": "left"
 				}
 			}
 		},
@@ -22,16 +16,10 @@
 		"name": "core/post-date",
 		"isValid": true,
 		"attributes": {
-			"textAlign": "center",
 			"isLink": false,
-			"metadata": {
-				"bindings": {
-					"datetime": {
-						"source": "core/post-data",
-						"args": {
-							"field": "date"
-						}
-					}
+			"style": {
+				"typography": {
+					"textAlign": "center"
 				}
 			}
 		},
@@ -41,16 +29,10 @@
 		"name": "core/post-date",
 		"isValid": true,
 		"attributes": {
-			"textAlign": "right",
 			"isLink": false,
-			"metadata": {
-				"bindings": {
-					"datetime": {
-						"source": "core/post-data",
-						"args": {
-							"field": "date"
-						}
-					}
+			"style": {
+				"typography": {
+					"textAlign": "right"
 				}
 			}
 		},
