@@ -208,13 +208,22 @@ function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 			from: filePath,
 			map: false,
 		} );
-
-		let cssModule = `if (typeof document !== 'undefined' && process.env.NODE_ENV !== 'test' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
-	const style = document.createElement("style");
-	style.setAttribute("data-wp-hash", "${ hash }");
-	style.appendChild(document.createTextNode(${ JSON.stringify( css ) }));
-	document.head.appendChild(style);
-}
+		const rtlResult = await postcss( [ rtlcss() ] ).process( css, {
+			from: undefined,
+		} );
+		let cssModule = `(function() {
+	var isRTL = (typeof window !== 'undefined' && window.wp?.i18n?.isRTL?.()) ||
+		(typeof document !== 'undefined' && document.documentElement?.getAttribute?.('dir') === 'rtl');
+	var css = isRTL
+		? ${ JSON.stringify( rtlResult.css ) }
+		: ${ JSON.stringify( css ) };
+	if (typeof document !== 'undefined' && process.env.NODE_ENV !== 'test' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
+		var style = document.createElement("style");
+		style.setAttribute("data-wp-hash", "${ hash }");
+		style.appendChild(document.createTextNode(css));
+		document.head.appendChild(style);
+	}
+})();
 `;
 
 		// The CSS modules transform produces an `exports` object with class name mappings.
@@ -1641,7 +1650,7 @@ async function buildRoute( routeName ) {
 					wordpressExternalsPlugin(
 						'content.min',
 						'esm',
-						[],
+						[ 'wp-i18n' ],
 						true // Generate asset file for minified build
 					),
 					...createStyleBundlingPlugins( routeDir ),
@@ -1659,7 +1668,7 @@ async function buildRoute( routeName ) {
 					wordpressExternalsPlugin(
 						'content.min',
 						'esm',
-						[],
+						[ 'wp-i18n' ],
 						false // Skip asset file for non-minified build
 					),
 					...createStyleBundlingPlugins( routeDir ),
