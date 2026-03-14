@@ -147,10 +147,6 @@ _Related_
 
 -   <https://lodash.com/docs/4#flow>
 
-### privateApis
-
-Undocumented declaration.
-
 ### pure
 
 > **Deprecated** Use `memo` or `PureComponent` instead.
