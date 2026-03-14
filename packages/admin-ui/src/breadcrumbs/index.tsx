@@ -11,38 +11,14 @@ import {
 /**
  * Internal dependencies
  */
-import type {
-	BreadcrumbsProps,
-	BreadcrumbItem as BreadcrumbItemType,
-} from './types';
-
-const BreadcrumbItem = ( {
-	item: { label, to },
-}: {
-	item: BreadcrumbItemType;
-} ) => {
-	if ( ! to ) {
-		return (
-			<li>
-				<Heading level={ 1 } truncate>
-					{ label }
-				</Heading>
-			</li>
-		);
-	}
-
-	return (
-		<li>
-			<Link to={ to }>{ label }</Link>
-		</li>
-	);
-};
+import type { BreadcrumbsProps } from './types';
 
 /**
  * Renders a breadcrumb navigation trail.
  *
  * All items except the last one must provide a `to` prop for navigation.
  * The last item represents the current page and its `to` prop is optional.
+ * Only the last item (when it has no `to` prop) is rendered as an `h1`.
  *
  * @param props
  * @param props.items The breadcrumb items to display.
@@ -63,6 +39,9 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 		return null;
 	}
 
+	const precedingItems = items.slice( 0, -1 );
+	const lastItem = items[ items.length - 1 ];
+
 	return (
 		<nav aria-label={ __( 'Breadcrumbs' ) }>
 			<HStack
@@ -72,9 +51,20 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 				justify="flex-start"
 				alignment="center"
 			>
-				{ items.map( ( item, index ) => (
-					<BreadcrumbItem key={ index } item={ item } />
+				{ precedingItems.map( ( item, index ) => (
+					<li key={ index }>
+						<Link to={ item.to }>{ item.label }</Link>
+					</li>
 				) ) }
+				<li key={ items.length - 1 }>
+					{ lastItem.to ? (
+						<Link to={ lastItem.to }>{ lastItem.label }</Link>
+					) : (
+						<Heading level={ 1 } truncate>
+							{ lastItem.label }
+						</Heading>
+					) }
+				</li>
 			</HStack>
 		</nav>
 	);
