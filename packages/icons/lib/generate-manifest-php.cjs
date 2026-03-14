@@ -45,10 +45,12 @@ function generatePHPArray( manifest ) {
 		const key = formatPHPKey( item.slug, maxKeyLength );
 		const label = escapePHPString( item.label );
 		const filePath = escapePHPString( item.filePath );
+		const category = escapePHPString( item.category );
 
 		return `${ key } => array(
 		'label'    => _x( '${ label }', 'icon label', 'gutenberg' ),
 		'filePath' => '${ filePath }',
+		'category' => '${ category }',
 	),`;
 	} );
 

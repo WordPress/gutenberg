@@ -2,1744 +2,2075 @@
 	{
 		"slug": "accordion",
 		"label": "Accordion",
-		"filePath": "library/accordion.svg"
+		"filePath": "library/accordion.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "accordion-heading",
 		"label": "Accordion Heading",
-		"filePath": "library/accordion-heading.svg"
+		"filePath": "library/accordion-heading.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "accordion-item",
 		"label": "Accordion Item",
-		"filePath": "library/accordion-item.svg"
+		"filePath": "library/accordion-item.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "add-card",
 		"label": "Add Card",
-		"filePath": "library/add-card.svg"
+		"filePath": "library/add-card.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "add-submenu",
 		"label": "Add Submenu",
-		"filePath": "library/add-submenu.svg"
+		"filePath": "library/add-submenu.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "add-template",
 		"label": "Add Template",
-		"filePath": "library/add-template.svg"
+		"filePath": "library/add-template.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "align-center",
 		"label": "Align Center",
-		"filePath": "library/align-center.svg"
+		"filePath": "library/align-center.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "align-justify",
 		"label": "Align Justify",
-		"filePath": "library/align-justify.svg"
+		"filePath": "library/align-justify.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "align-left",
 		"label": "Align Left",
-		"filePath": "library/align-left.svg"
+		"filePath": "library/align-left.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "align-none",
 		"label": "Align None",
-		"filePath": "library/align-none.svg"
+		"filePath": "library/align-none.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "align-right",
 		"label": "Align Right",
-		"filePath": "library/align-right.svg"
+		"filePath": "library/align-right.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "archive",
 		"label": "Archive",
-		"filePath": "library/archive.svg"
+		"filePath": "library/archive.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "arrow-down-left",
 		"label": "Arrow Down Left",
 		"filePath": "library/arrow-down-left.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "arrow-down-right",
 		"label": "Arrow Down Right",
 		"filePath": "library/arrow-down-right.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "arrow-down",
 		"label": "Arrow Down",
 		"filePath": "library/arrow-down.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "arrow-left",
 		"label": "Arrow Left",
 		"filePath": "library/arrow-left.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "arrow-right",
 		"label": "Arrow Right",
 		"filePath": "library/arrow-right.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "arrow-up-left",
 		"label": "Arrow Up Left",
 		"filePath": "library/arrow-up-left.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "arrow-up-right",
 		"label": "Arrow Up Right",
 		"filePath": "library/arrow-up-right.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "arrow-up",
 		"label": "Arrow Up",
 		"filePath": "library/arrow-up.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "aspect-ratio",
 		"label": "Aspect Ratio",
-		"filePath": "library/aspect-ratio.svg"
+		"filePath": "library/aspect-ratio.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "at-symbol",
 		"label": "At Symbol (@)",
 		"filePath": "library/at-symbol.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "audio",
 		"label": "Audio",
 		"filePath": "library/audio.svg",
-		"public": true
+		"public": true,
+		"category": "Content"
 	},
 	{
 		"slug": "background",
 		"label": "Background",
-		"filePath": "library/background.svg"
+		"filePath": "library/background.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "backup",
 		"label": "Backup",
-		"filePath": "library/backup.svg"
+		"filePath": "library/backup.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "bell",
 		"label": "Bell",
 		"filePath": "library/bell.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "bell-unread",
 		"label": "Bell Unread",
-		"filePath": "library/bell-unread.svg"
+		"filePath": "library/bell-unread.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "block-default",
 		"label": "Block Default",
 		"filePath": "library/block-default.svg",
-		"public": true
+		"public": true,
+		"category": "Content"
 	},
 	{
 		"slug": "block-meta",
 		"label": "Block Meta",
 		"filePath": "library/block-meta.svg",
-		"public": true
+		"public": true,
+		"category": "Content"
 	},
 	{
 		"slug": "block-table",
 		"label": "Block Table",
 		"filePath": "library/block-table.svg",
-		"public": true
+		"public": true,
+		"category": "Content"
 	},
 	{
 		"slug": "border",
 		"label": "Border",
-		"filePath": "library/border.svg"
+		"filePath": "library/border.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "box",
 		"label": "Box",
-		"filePath": "library/box.svg"
+		"filePath": "library/box.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "breadcrumbs",
 		"label": "Breadcrumbs",
-		"filePath": "library/breadcrumbs.svg"
+		"filePath": "library/breadcrumbs.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "brush",
 		"label": "Brush",
-		"filePath": "library/brush.svg"
+		"filePath": "library/brush.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "bug",
 		"label": "Bug",
-		"filePath": "library/bug.svg"
+		"filePath": "library/bug.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "button",
 		"label": "Button",
-		"filePath": "library/button.svg"
+		"filePath": "library/button.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "buttons",
 		"label": "Buttons",
-		"filePath": "library/buttons.svg"
+		"filePath": "library/buttons.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "calendar",
 		"label": "Calendar",
 		"filePath": "library/calendar.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "cancel-circle-filled",
 		"label": "Cancel Circle Filled",
-		"filePath": "library/cancel-circle-filled.svg"
+		"filePath": "library/cancel-circle-filled.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "caption",
 		"label": "Caption",
-		"filePath": "library/caption.svg"
+		"filePath": "library/caption.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "capture-photo",
 		"label": "Capture Photo",
 		"filePath": "library/capture-photo.svg",
-		"public": true
+		"public": true,
+		"category": "Actions"
 	},
 	{
 		"slug": "capture-video",
 		"label": "Capture Video",
 		"filePath": "library/capture-video.svg",
-		"public": true
+		"public": true,
+		"category": "Actions"
 	},
 	{
 		"slug": "cart",
 		"label": "Cart",
 		"filePath": "library/cart.svg",
-		"public": true
+		"public": true,
+		"category": "Commerce"
 	},
 	{
 		"slug": "category",
 		"label": "Category",
 		"filePath": "library/category.svg",
-		"public": true
+		"public": true,
+		"category": "Content"
 	},
 	{
 		"slug": "caution",
 		"label": "Caution",
 		"filePath": "library/caution.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "caution-filled",
 		"label": "Caution Filled",
-		"filePath": "library/caution-filled.svg"
+		"filePath": "library/caution-filled.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "chart-bar",
 		"label": "Chart Bar",
 		"filePath": "library/chart-bar.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "check",
 		"label": "Check",
 		"filePath": "library/check.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "chevron-down",
 		"label": "Chevron Down",
 		"filePath": "library/chevron-down.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "chevron-down-small",
 		"label": "Chevron Down Small",
 		"filePath": "library/chevron-down-small.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "chevron-left",
 		"label": "Chevron Left",
 		"filePath": "library/chevron-left.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "chevron-left-small",
 		"label": "Chevron Left Small",
 		"filePath": "library/chevron-left-small.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "chevron-right",
 		"label": "Chevron Right",
 		"filePath": "library/chevron-right.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "chevron-right-small",
 		"label": "Chevron Right Small",
 		"filePath": "library/chevron-right-small.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "chevron-up",
 		"label": "Chevron Up",
 		"filePath": "library/chevron-up.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "chevron-up-down",
 		"label": "Chevron Up Down",
 		"filePath": "library/chevron-up-down.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "chevron-up-small",
 		"label": "Chevron Up Small",
 		"filePath": "library/chevron-up-small.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "classic",
 		"label": "Classic",
-		"filePath": "library/classic.svg"
+		"filePath": "library/classic.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "close",
 		"label": "Close",
-		"filePath": "library/close.svg"
+		"filePath": "library/close.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "close-small",
 		"label": "Close Small",
-		"filePath": "library/close-small.svg"
+		"filePath": "library/close-small.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "cloud",
 		"label": "Cloud",
-		"filePath": "library/cloud.svg"
+		"filePath": "library/cloud.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "cloud-download",
 		"label": "Cloud Download",
-		"filePath": "library/cloud-download.svg"
+		"filePath": "library/cloud-download.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "cloud-upload",
 		"label": "Cloud Upload",
-		"filePath": "library/cloud-upload.svg"
+		"filePath": "library/cloud-upload.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "code",
 		"label": "Code",
-		"filePath": "library/code.svg"
+		"filePath": "library/code.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "cog",
 		"label": "Cog",
-		"filePath": "library/cog.svg"
+		"filePath": "library/cog.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "color",
 		"label": "Color",
-		"filePath": "library/color.svg"
+		"filePath": "library/color.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "column",
 		"label": "Column",
-		"filePath": "library/column.svg"
+		"filePath": "library/column.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "columns",
 		"label": "Columns",
-		"filePath": "library/columns.svg"
+		"filePath": "library/columns.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "comment",
 		"label": "Comment",
 		"filePath": "library/comment.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "comment-author-avatar",
 		"label": "Comment Author Avatar",
-		"filePath": "library/comment-author-avatar.svg"
+		"filePath": "library/comment-author-avatar.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "comment-author-name",
 		"label": "Comment Author Name",
-		"filePath": "library/comment-author-name.svg"
+		"filePath": "library/comment-author-name.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "comment-content",
 		"label": "Comment Content",
-		"filePath": "library/comment-content.svg"
+		"filePath": "library/comment-content.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "comment-edit-link",
 		"label": "Comment Edit Link",
-		"filePath": "library/comment-edit-link.svg"
+		"filePath": "library/comment-edit-link.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "comment-reply-link",
 		"label": "Comment Reply Link",
-		"filePath": "library/comment-reply-link.svg"
+		"filePath": "library/comment-reply-link.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "connection",
 		"label": "Connection",
-		"filePath": "library/connection.svg"
+		"filePath": "library/connection.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "copy",
 		"label": "Copy",
-		"filePath": "library/copy.svg"
+		"filePath": "library/copy.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "copy-small",
 		"label": "Copy Small",
-		"filePath": "library/copy-small.svg"
+		"filePath": "library/copy-small.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "corner-all",
 		"label": "Corner All",
-		"filePath": "library/corner-all.svg"
+		"filePath": "library/corner-all.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "corner-bottom-left",
 		"label": "Corner Bottom Left",
-		"filePath": "library/corner-bottom-left.svg"
+		"filePath": "library/corner-bottom-left.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "corner-bottom-right",
 		"label": "Corner Bottom Right",
-		"filePath": "library/corner-bottom-right.svg"
+		"filePath": "library/corner-bottom-right.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "corner-top-left",
 		"label": "Corner Top Left",
-		"filePath": "library/corner-top-left.svg"
+		"filePath": "library/corner-top-left.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "corner-top-right",
 		"label": "Corner Top Right",
-		"filePath": "library/corner-top-right.svg"
+		"filePath": "library/corner-top-right.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "cover",
 		"label": "Cover",
 		"filePath": "library/cover.svg",
-		"public": true
+		"public": true,
+		"category": "Content"
 	},
 	{
 		"slug": "create",
 		"label": "Create",
 		"filePath": "library/create.svg",
-		"public": true
+		"public": true,
+		"category": "Actions"
 	},
 	{
 		"slug": "contents",
 		"label": "Contents",
-		"filePath": "library/contents.svg"
+		"filePath": "library/contents.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "crop",
 		"label": "Crop",
-		"filePath": "library/crop.svg"
+		"filePath": "library/crop.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "currency-dollar",
 		"label": "Currency Dollar",
-		"filePath": "library/currency-dollar.svg"
+		"filePath": "library/currency-dollar.svg",
+		"category": "Commerce"
 	},
 	{
 		"slug": "currency-euro",
 		"label": "Currency Euro",
-		"filePath": "library/currency-euro.svg"
+		"filePath": "library/currency-euro.svg",
+		"category": "Commerce"
 	},
 	{
 		"slug": "currency-pound",
 		"label": "Currency Pound",
-		"filePath": "library/currency-pound.svg"
+		"filePath": "library/currency-pound.svg",
+		"category": "Commerce"
 	},
 	{
 		"slug": "custom-link",
 		"label": "Custom Link",
-		"filePath": "library/custom-link.svg"
+		"filePath": "library/custom-link.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "custom-post-type",
 		"label": "Custom Post Type",
-		"filePath": "library/custom-post-type.svg"
+		"filePath": "library/custom-post-type.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "dashboard",
 		"label": "Dashboard",
-		"filePath": "library/dashboard.svg"
+		"filePath": "library/dashboard.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "desktop",
 		"label": "Desktop",
 		"filePath": "library/desktop.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "details",
 		"label": "Details",
-		"filePath": "library/details.svg"
+		"filePath": "library/details.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "download",
 		"label": "Download",
 		"filePath": "library/download.svg",
-		"public": true
+		"public": true,
+		"category": "Actions"
 	},
 	{
 		"slug": "drafts",
 		"label": "Drafts",
-		"filePath": "library/drafts.svg"
+		"filePath": "library/drafts.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "drag-handle",
 		"label": "Drag Handle",
-		"filePath": "library/drag-handle.svg"
+		"filePath": "library/drag-handle.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "drawer-left",
 		"label": "Drawer Left",
 		"filePath": "library/drawer-left.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "drawer-right",
 		"label": "Drawer Right",
 		"filePath": "library/drawer-right.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "envelope",
 		"label": "Envelope",
 		"filePath": "library/envelope.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "error",
 		"label": "Error",
 		"filePath": "library/error.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "external",
 		"label": "External",
 		"filePath": "library/external.svg",
-		"public": true
+		"public": true,
+		"category": "Actions"
 	},
 	{
 		"slug": "file",
 		"label": "File",
 		"filePath": "library/file.svg",
-		"public": true
+		"public": true,
+		"category": "Content"
 	},
 	{
 		"slug": "filter",
 		"label": "Filter",
-		"filePath": "library/filter.svg"
+		"filePath": "library/filter.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "flip-horizontal",
 		"label": "Flip Horizontal",
-		"filePath": "library/flip-horizontal.svg"
+		"filePath": "library/flip-horizontal.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "flip-vertical",
 		"label": "Flip Vertical",
-		"filePath": "library/flip-vertical.svg"
+		"filePath": "library/flip-vertical.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "footer",
 		"label": "Footer",
-		"filePath": "library/footer.svg"
+		"filePath": "library/footer.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "format-bold",
 		"label": "Format Bold",
-		"filePath": "library/format-bold.svg"
+		"filePath": "library/format-bold.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "format-capitalize",
 		"label": "Format Capitalize",
-		"filePath": "library/format-capitalize.svg"
+		"filePath": "library/format-capitalize.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "format-indent",
 		"label": "Format Indent",
-		"filePath": "library/format-indent.svg"
+		"filePath": "library/format-indent.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "format-indent-rtl",
 		"label": "Format Indent Rtl",
-		"filePath": "library/format-indent-rtl.svg"
+		"filePath": "library/format-indent-rtl.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "format-italic",
 		"label": "Format Italic",
-		"filePath": "library/format-italic.svg"
+		"filePath": "library/format-italic.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "format-list-bullets",
 		"label": "Format List Bullets",
-		"filePath": "library/format-list-bullets.svg"
+		"filePath": "library/format-list-bullets.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "format-list-bullets-rtl",
 		"label": "Format List Bullets Rtl",
-		"filePath": "library/format-list-bullets-rtl.svg"
+		"filePath": "library/format-list-bullets-rtl.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "format-list-numbered",
 		"label": "Format List Numbered",
-		"filePath": "library/format-list-numbered.svg"
+		"filePath": "library/format-list-numbered.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "format-list-numbered-rtl",
 		"label": "Format List Numbered Rtl",
-		"filePath": "library/format-list-numbered-rtl.svg"
+		"filePath": "library/format-list-numbered-rtl.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "format-lowercase",
 		"label": "Format Lowercase",
-		"filePath": "library/format-lowercase.svg"
+		"filePath": "library/format-lowercase.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "format-ltr",
 		"label": "Format LTR",
-		"filePath": "library/format-ltr.svg"
+		"filePath": "library/format-ltr.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "format-outdent",
 		"label": "Format Outdent",
-		"filePath": "library/format-outdent.svg"
+		"filePath": "library/format-outdent.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "format-outdent-rtl",
 		"label": "Format Outdent RTL",
-		"filePath": "library/format-outdent-rtl.svg"
+		"filePath": "library/format-outdent-rtl.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "format-rtl",
 		"label": "Format RTL",
-		"filePath": "library/format-rtl.svg"
+		"filePath": "library/format-rtl.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "format-strikethrough",
 		"label": "Format Strikethrough",
-		"filePath": "library/format-strikethrough.svg"
+		"filePath": "library/format-strikethrough.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "format-underline",
 		"label": "Format Underline",
-		"filePath": "library/format-underline.svg"
+		"filePath": "library/format-underline.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "format-uppercase",
 		"label": "Format Uppercase",
-		"filePath": "library/format-uppercase.svg"
+		"filePath": "library/format-uppercase.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "full-height",
 		"label": "Full Height",
-		"filePath": "library/full-height.svg"
+		"filePath": "library/full-height.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "fullscreen",
 		"label": "Fullscreen",
-		"filePath": "library/fullscreen.svg"
+		"filePath": "library/fullscreen.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "funnel",
 		"label": "Funnel",
-		"filePath": "library/funnel.svg"
+		"filePath": "library/funnel.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "gallery",
 		"label": "Gallery",
 		"filePath": "library/gallery.svg",
-		"public": true
+		"public": true,
+		"category": "Content"
 	},
 	{
 		"slug": "gift",
 		"label": "Gift",
-		"filePath": "library/gift.svg"
+		"filePath": "library/gift.svg",
+		"category": "Commerce"
 	},
 	{
 		"slug": "globe",
 		"label": "Globe",
-		"filePath": "library/globe.svg"
+		"filePath": "library/globe.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "grid",
 		"label": "Grid",
-		"filePath": "library/grid.svg"
+		"filePath": "library/grid.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "group",
 		"label": "Group",
 		"filePath": "library/group.svg",
-		"public": true
+		"public": true,
+		"category": "Content"
 	},
 	{
 		"slug": "handle",
 		"label": "Handle",
-		"filePath": "library/handle.svg"
+		"filePath": "library/handle.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "header",
 		"label": "Header",
-		"filePath": "library/header.svg"
+		"filePath": "library/header.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "heading",
 		"label": "Heading",
 		"filePath": "library/heading.svg",
-		"public": true
+		"public": true,
+		"category": "Formatting"
 	},
 	{
 		"slug": "heading-level-1",
 		"label": "Heading Level 1",
-		"filePath": "library/heading-level-1.svg"
+		"filePath": "library/heading-level-1.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "heading-level-2",
 		"label": "Heading Level 2",
-		"filePath": "library/heading-level-2.svg"
+		"filePath": "library/heading-level-2.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "heading-level-3",
 		"label": "Heading Level 3",
-		"filePath": "library/heading-level-3.svg"
+		"filePath": "library/heading-level-3.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "heading-level-4",
 		"label": "Heading Level 4",
-		"filePath": "library/heading-level-4.svg"
+		"filePath": "library/heading-level-4.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "heading-level-5",
 		"label": "Heading Level 5",
-		"filePath": "library/heading-level-5.svg"
+		"filePath": "library/heading-level-5.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "heading-level-6",
 		"label": "Heading Level 6",
-		"filePath": "library/heading-level-6.svg"
+		"filePath": "library/heading-level-6.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "help",
 		"label": "Help",
 		"filePath": "library/help.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "help-filled",
 		"label": "Help Filled",
-		"filePath": "library/help-filled.svg"
+		"filePath": "library/help-filled.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "home",
 		"label": "Home",
 		"filePath": "library/home.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "home-button",
 		"label": "Home Button",
-		"filePath": "library/home-button.svg"
+		"filePath": "library/home-button.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "html",
 		"label": "HTML",
-		"filePath": "library/html.svg"
+		"filePath": "library/html.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "image",
 		"label": "Image",
 		"filePath": "library/image.svg",
-		"public": true
+		"public": true,
+		"category": "Content"
 	},
 	{
 		"slug": "inbox",
 		"label": "Inbox",
-		"filePath": "library/inbox.svg"
+		"filePath": "library/inbox.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "info",
 		"label": "Info",
 		"filePath": "library/info.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "insert-after",
 		"label": "Insert After",
-		"filePath": "library/insert-after.svg"
+		"filePath": "library/insert-after.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "insert-before",
 		"label": "Insert Before",
-		"filePath": "library/insert-before.svg"
+		"filePath": "library/insert-before.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "institution",
 		"label": "Institution",
-		"filePath": "library/institution.svg"
+		"filePath": "library/institution.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "justify-bottom",
 		"label": "Justify Bottom",
-		"filePath": "library/justify-bottom.svg"
+		"filePath": "library/justify-bottom.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "justify-center",
 		"label": "Justify Center",
-		"filePath": "library/justify-center.svg"
+		"filePath": "library/justify-center.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "justify-center-vertical",
 		"label": "Justify Center Vertical",
-		"filePath": "library/justify-center-vertical.svg"
+		"filePath": "library/justify-center-vertical.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "justify-left",
 		"label": "Justify Left",
-		"filePath": "library/justify-left.svg"
+		"filePath": "library/justify-left.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "justify-right",
 		"label": "Justify Right",
-		"filePath": "library/justify-right.svg"
+		"filePath": "library/justify-right.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "justify-space-between",
 		"label": "Justify Space Between",
-		"filePath": "library/justify-space-between.svg"
+		"filePath": "library/justify-space-between.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "justify-space-between-vertical",
 		"label": "Justify Space Between Vertical",
-		"filePath": "library/justify-space-between-vertical.svg"
+		"filePath": "library/justify-space-between-vertical.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "justify-stretch",
 		"label": "Justify Stretch",
-		"filePath": "library/justify-stretch.svg"
+		"filePath": "library/justify-stretch.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "justify-stretch-vertical",
 		"label": "Justify Stretch Vertical",
-		"filePath": "library/justify-stretch-vertical.svg"
+		"filePath": "library/justify-stretch-vertical.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "justify-top",
 		"label": "Justify Top",
-		"filePath": "library/justify-top.svg"
+		"filePath": "library/justify-top.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "key",
 		"label": "Key",
 		"filePath": "library/key.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "keyboard",
 		"label": "Keyboard",
-		"filePath": "library/keyboard.svg"
+		"filePath": "library/keyboard.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "keyboard-close",
 		"label": "Keyboard Close",
-		"filePath": "library/keyboard-close.svg"
+		"filePath": "library/keyboard-close.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "keyboard-return",
 		"label": "Keyboard Return",
-		"filePath": "library/keyboard-return.svg"
+		"filePath": "library/keyboard-return.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "language",
 		"label": "Language",
 		"filePath": "library/language.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "layout",
 		"label": "Layout",
-		"filePath": "library/layout.svg"
+		"filePath": "library/layout.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "level-up",
 		"label": "Level Up",
-		"filePath": "library/level-up.svg"
+		"filePath": "library/level-up.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "lifesaver",
 		"label": "Lifesaver",
-		"filePath": "library/lifesaver.svg"
+		"filePath": "library/lifesaver.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "line-dashed",
 		"label": "Line Dashed",
-		"filePath": "library/line-dashed.svg"
+		"filePath": "library/line-dashed.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "line-dotted",
 		"label": "Line Dotted",
-		"filePath": "library/line-dotted.svg"
+		"filePath": "library/line-dotted.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "line-solid",
 		"label": "Line Solid",
-		"filePath": "library/line-solid.svg"
+		"filePath": "library/line-solid.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "link",
 		"label": "Link",
-		"filePath": "library/link.svg"
+		"filePath": "library/link.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "link-off",
 		"label": "Link Off",
-		"filePath": "library/link-off.svg"
+		"filePath": "library/link-off.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "list",
 		"label": "List",
-		"filePath": "library/list.svg"
+		"filePath": "library/list.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "list-item",
 		"label": "List Item",
-		"filePath": "library/list-item.svg"
+		"filePath": "library/list-item.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "list-view",
 		"label": "List View",
-		"filePath": "library/list-view.svg"
+		"filePath": "library/list-view.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "lock",
 		"label": "Lock",
-		"filePath": "library/lock.svg"
+		"filePath": "library/lock.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "lock-outline",
 		"label": "Lock Outline",
-		"filePath": "library/lock-outline.svg"
+		"filePath": "library/lock-outline.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "lock-small",
 		"label": "Lock Small",
-		"filePath": "library/lock-small.svg"
+		"filePath": "library/lock-small.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "login",
 		"label": "Login",
-		"filePath": "library/login.svg"
+		"filePath": "library/login.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "loop",
 		"label": "Loop",
-		"filePath": "library/loop.svg"
+		"filePath": "library/loop.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "map-marker",
 		"label": "Map Marker",
 		"filePath": "library/map-marker.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "math",
 		"label": "Math",
-		"filePath": "library/math.svg"
+		"filePath": "library/math.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "media",
 		"label": "Media",
-		"filePath": "library/media.svg"
+		"filePath": "library/media.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "media-and-text",
 		"label": "Media And Text",
-		"filePath": "library/media-and-text.svg"
+		"filePath": "library/media-and-text.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "megaphone",
 		"label": "Megaphone",
-		"filePath": "library/megaphone.svg"
+		"filePath": "library/megaphone.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "menu",
 		"label": "Menu",
 		"filePath": "library/menu.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "mobile",
 		"label": "Mobile",
 		"filePath": "library/mobile.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "more",
 		"label": "More",
-		"filePath": "library/more.svg"
+		"filePath": "library/more.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "more-horizontal",
 		"label": "More Horizontal",
 		"filePath": "library/more-horizontal.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "more-vertical",
 		"label": "More Vertical",
 		"filePath": "library/more-vertical.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "move-to",
 		"label": "Move To",
-		"filePath": "library/move-to.svg"
+		"filePath": "library/move-to.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "navigation",
 		"label": "Navigation",
-		"filePath": "library/navigation.svg"
+		"filePath": "library/navigation.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "navigation-overlay",
 		"label": "Navigation Overlay",
-		"filePath": "library/navigation-overlay.svg"
+		"filePath": "library/navigation-overlay.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "next",
 		"label": "Next",
 		"filePath": "library/next.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "not-allowed",
 		"label": "Not Allowed",
-		"filePath": "library/not-allowed.svg"
+		"filePath": "library/not-allowed.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "not-found",
 		"label": "Not Found",
-		"filePath": "library/not-found.svg"
+		"filePath": "library/not-found.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "offline",
 		"label": "Offline",
-		"filePath": "library/offline.svg"
+		"filePath": "library/offline.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "overlay-text",
 		"label": "Overlay Text",
-		"filePath": "library/overlay-text.svg"
+		"filePath": "library/overlay-text.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "page",
 		"label": "Page",
-		"filePath": "library/page.svg"
+		"filePath": "library/page.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "page-break",
 		"label": "Page Break",
-		"filePath": "library/page-break.svg"
+		"filePath": "library/page-break.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "pages",
 		"label": "Pages",
-		"filePath": "library/pages.svg"
+		"filePath": "library/pages.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "paragraph",
 		"label": "Paragraph",
 		"filePath": "library/paragraph.svg",
-		"public": true
+		"public": true,
+		"category": "Formatting"
 	},
 	{
 		"slug": "payment",
 		"label": "Payment",
 		"filePath": "library/payment.svg",
-		"public": true
+		"public": true,
+		"category": "Commerce"
 	},
 	{
 		"slug": "pencil",
 		"label": "Pencil",
 		"filePath": "library/pencil.svg",
-		"public": true
+		"public": true,
+		"category": "Actions"
 	},
 	{
 		"slug": "pending",
 		"label": "Pending",
-		"filePath": "library/pending.svg"
+		"filePath": "library/pending.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "people",
 		"label": "People",
 		"filePath": "library/people.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "percent",
 		"label": "Percent",
-		"filePath": "library/percent.svg"
+		"filePath": "library/percent.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "pin",
 		"label": "Pin",
-		"filePath": "library/pin.svg"
+		"filePath": "library/pin.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "pin-small",
 		"label": "Pin Small",
-		"filePath": "library/pin-small.svg"
+		"filePath": "library/pin-small.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "plugins",
 		"label": "Plugins",
-		"filePath": "library/plugins.svg"
+		"filePath": "library/plugins.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "plus",
 		"label": "Plus",
 		"filePath": "library/plus.svg",
-		"public": true
+		"public": true,
+		"category": "Actions"
 	},
 	{
 		"slug": "plus-circle",
 		"label": "Plus Circle",
 		"filePath": "library/plus-circle.svg",
-		"public": true
+		"public": true,
+		"category": "Actions"
 	},
 	{
 		"slug": "plus-circle-filled",
 		"label": "Plus Circle Filled",
-		"filePath": "library/plus-circle-filled.svg"
+		"filePath": "library/plus-circle-filled.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "position-center",
 		"label": "Position Center",
-		"filePath": "library/position-center.svg"
+		"filePath": "library/position-center.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "position-left",
 		"label": "Position Left",
-		"filePath": "library/position-left.svg"
+		"filePath": "library/position-left.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "position-right",
 		"label": "Position Right",
-		"filePath": "library/position-right.svg"
+		"filePath": "library/position-right.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "post",
 		"label": "Post",
-		"filePath": "library/post.svg"
+		"filePath": "library/post.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "post-author",
 		"label": "Post Author",
-		"filePath": "library/post-author.svg"
+		"filePath": "library/post-author.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "post-categories",
 		"label": "Post Categories",
-		"filePath": "library/post-categories.svg"
+		"filePath": "library/post-categories.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "post-comments",
 		"label": "Post Comments",
-		"filePath": "library/post-comments.svg"
+		"filePath": "library/post-comments.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "post-comments-count",
 		"label": "Post Comments Count",
-		"filePath": "library/post-comments-count.svg"
+		"filePath": "library/post-comments-count.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "post-comments-form",
 		"label": "Post Comments Form",
-		"filePath": "library/post-comments-form.svg"
+		"filePath": "library/post-comments-form.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "post-content",
 		"label": "Post Content",
-		"filePath": "library/post-content.svg"
+		"filePath": "library/post-content.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "post-date",
 		"label": "Post Date",
-		"filePath": "library/post-date.svg"
+		"filePath": "library/post-date.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "post-excerpt",
 		"label": "Post Excerpt",
-		"filePath": "library/post-excerpt.svg"
+		"filePath": "library/post-excerpt.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "post-featured-image",
 		"label": "Post Featured Image",
-		"filePath": "library/post-featured-image.svg"
+		"filePath": "library/post-featured-image.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "post-list",
 		"label": "Post List",
-		"filePath": "library/post-list.svg"
+		"filePath": "library/post-list.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "post-terms",
 		"label": "Post Terms",
-		"filePath": "library/post-terms.svg"
+		"filePath": "library/post-terms.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "preformatted",
 		"label": "Preformatted",
-		"filePath": "library/preformatted.svg"
+		"filePath": "library/preformatted.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "previous",
 		"label": "Previous",
 		"filePath": "library/previous.svg",
-		"public": true
+		"public": true,
+		"category": "Navigation"
 	},
 	{
 		"slug": "published",
 		"label": "Published",
 		"filePath": "library/published.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "pull-left",
 		"label": "Pull Left",
-		"filePath": "library/pull-left.svg"
+		"filePath": "library/pull-left.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "pull-right",
 		"label": "Pull Right",
-		"filePath": "library/pull-right.svg"
+		"filePath": "library/pull-right.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "pullquote",
 		"label": "Pullquote",
-		"filePath": "library/pullquote.svg"
+		"filePath": "library/pullquote.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "query-pagination",
 		"label": "Query Pagination",
-		"filePath": "library/query-pagination.svg"
+		"filePath": "library/query-pagination.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "query-pagination-next",
 		"label": "Query Pagination Next",
-		"filePath": "library/query-pagination-next.svg"
+		"filePath": "library/query-pagination-next.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "query-pagination-numbers",
 		"label": "Query Pagination Numbers",
-		"filePath": "library/query-pagination-numbers.svg"
+		"filePath": "library/query-pagination-numbers.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "query-pagination-previous",
 		"label": "Query Pagination Previous",
-		"filePath": "library/query-pagination-previous.svg"
+		"filePath": "library/query-pagination-previous.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "quote",
 		"label": "Quote",
 		"filePath": "library/quote.svg",
-		"public": true
+		"public": true,
+		"category": "Content"
 	},
 	{
 		"slug": "receipt",
 		"label": "Receipt",
 		"filePath": "library/receipt.svg",
-		"public": true
+		"public": true,
+		"category": "Commerce"
 	},
 	{
 		"slug": "redo",
 		"label": "Redo",
-		"filePath": "library/redo.svg"
+		"filePath": "library/redo.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "remove-bug",
 		"label": "Remove Bug",
-		"filePath": "library/remove-bug.svg"
+		"filePath": "library/remove-bug.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "remove-submenu",
 		"label": "Remove Submenu",
-		"filePath": "library/remove-submenu.svg"
+		"filePath": "library/remove-submenu.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "replace",
 		"label": "Replace",
-		"filePath": "library/replace.svg"
+		"filePath": "library/replace.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "reset",
 		"label": "Reset",
-		"filePath": "library/reset.svg"
+		"filePath": "library/reset.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "resize-corner-ne",
 		"label": "Resize Corner NE",
-		"filePath": "library/resize-corner-ne.svg"
+		"filePath": "library/resize-corner-ne.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "reusable-block",
 		"label": "Reusable Block",
-		"filePath": "library/reusable-block.svg"
+		"filePath": "library/reusable-block.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "rotate-left",
 		"label": "Rotate Left",
-		"filePath": "library/rotate-left.svg"
+		"filePath": "library/rotate-left.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "rotate-right",
 		"label": "Rotate Right",
-		"filePath": "library/rotate-right.svg"
+		"filePath": "library/rotate-right.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "row",
 		"label": "Row",
-		"filePath": "library/row.svg"
+		"filePath": "library/row.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "rss",
 		"label": "RSS",
 		"filePath": "library/rss.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "scheduled",
 		"label": "Scheduled",
 		"filePath": "library/scheduled.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "search",
 		"label": "Search",
 		"filePath": "library/search.svg",
-		"public": true
+		"public": true,
+		"category": "Actions"
 	},
 	{
 		"slug": "seen",
 		"label": "Seen",
-		"filePath": "library/seen.svg"
+		"filePath": "library/seen.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "send",
 		"label": "Send",
-		"filePath": "library/send.svg"
+		"filePath": "library/send.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "separator",
 		"label": "Separator",
-		"filePath": "library/separator.svg"
+		"filePath": "library/separator.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "settings",
 		"label": "Settings",
 		"filePath": "library/settings.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "shadow",
 		"label": "Shadow",
 		"filePath": "library/shadow.svg",
-		"public": true
+		"public": true,
+		"category": "Layout"
 	},
 	{
 		"slug": "share",
 		"label": "Share",
 		"filePath": "library/share.svg",
-		"public": true
+		"public": true,
+		"category": "Actions"
 	},
 	{
 		"slug": "shield",
 		"label": "Shield",
 		"filePath": "library/shield.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "shipping",
 		"label": "Shipping",
-		"filePath": "library/shipping.svg"
+		"filePath": "library/shipping.svg",
+		"category": "Commerce"
 	},
 	{
 		"slug": "shortcode",
 		"label": "Shortcode",
-		"filePath": "library/shortcode.svg"
+		"filePath": "library/shortcode.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "shuffle",
 		"label": "Shuffle",
 		"filePath": "library/shuffle.svg",
-		"public": true
+		"public": true,
+		"category": "Actions"
 	},
 	{
 		"slug": "sidebar",
 		"label": "Sidebar",
-		"filePath": "library/sidebar.svg"
+		"filePath": "library/sidebar.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "sides-all",
 		"label": "Sides All",
-		"filePath": "library/sides-all.svg"
+		"filePath": "library/sides-all.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "sides-axial",
 		"label": "Sides Axial",
-		"filePath": "library/sides-axial.svg"
+		"filePath": "library/sides-axial.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "sides-bottom",
 		"label": "Sides Bottom",
-		"filePath": "library/sides-bottom.svg"
+		"filePath": "library/sides-bottom.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "sides-horizontal",
 		"label": "Sides Horizontal",
-		"filePath": "library/sides-horizontal.svg"
+		"filePath": "library/sides-horizontal.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "sides-left",
 		"label": "Sides Left",
-		"filePath": "library/sides-left.svg"
+		"filePath": "library/sides-left.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "sides-right",
 		"label": "Sides Right",
-		"filePath": "library/sides-right.svg"
+		"filePath": "library/sides-right.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "sides-top",
 		"label": "Sides Top",
-		"filePath": "library/sides-top.svg"
+		"filePath": "library/sides-top.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "sides-vertical",
 		"label": "Sides Vertical",
-		"filePath": "library/sides-vertical.svg"
+		"filePath": "library/sides-vertical.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "site-logo",
 		"label": "Site Logo",
-		"filePath": "library/site-logo.svg"
+		"filePath": "library/site-logo.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "square",
 		"label": "Square",
-		"filePath": "library/square.svg"
+		"filePath": "library/square.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "stack",
 		"label": "Stack",
-		"filePath": "library/stack.svg"
+		"filePath": "library/stack.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "star-empty",
 		"label": "Star Empty",
 		"filePath": "library/star-empty.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "star-filled",
 		"label": "Star Filled",
 		"filePath": "library/star-filled.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "star-half",
 		"label": "Star Half",
 		"filePath": "library/star-half.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "store",
 		"label": "Store",
 		"filePath": "library/store.svg",
-		"public": true
+		"public": true,
+		"category": "Commerce"
 	},
 	{
 		"slug": "stretch-full-width",
 		"label": "Stretch Full Width",
-		"filePath": "library/stretch-full-width.svg"
+		"filePath": "library/stretch-full-width.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "stretch-wide",
 		"label": "Stretch Wide",
-		"filePath": "library/stretch-wide.svg"
+		"filePath": "library/stretch-wide.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "styles",
 		"label": "Styles",
 		"filePath": "library/styles.svg",
-		"public": true
+		"public": true,
+		"category": "Formatting"
 	},
 	{
 		"slug": "subscript",
 		"label": "Subscript",
-		"filePath": "library/subscript.svg"
+		"filePath": "library/subscript.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "superscript",
 		"label": "Superscript",
-		"filePath": "library/superscript.svg"
+		"filePath": "library/superscript.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "swatch",
 		"label": "Swatch",
-		"filePath": "library/swatch.svg"
+		"filePath": "library/swatch.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "symbol",
 		"label": "Symbol",
 		"filePath": "library/symbol.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "symbol-filled",
 		"label": "Symbol Filled",
 		"filePath": "library/symbol-filled.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "table",
 		"label": "Table",
 		"filePath": "library/table.svg",
-		"public": true
+		"public": true,
+		"category": "Content"
 	},
 	{
 		"slug": "table-column-after",
 		"label": "Table Column After",
-		"filePath": "library/table-column-after.svg"
+		"filePath": "library/table-column-after.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "table-column-before",
 		"label": "Table Column Before",
-		"filePath": "library/table-column-before.svg"
+		"filePath": "library/table-column-before.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "table-column-delete",
 		"label": "Table Column Delete",
-		"filePath": "library/table-column-delete.svg"
+		"filePath": "library/table-column-delete.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "table-of-contents",
 		"label": "Table Of Contents",
-		"filePath": "library/table-of-contents.svg"
+		"filePath": "library/table-of-contents.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "table-row-after",
 		"label": "Table Row After",
-		"filePath": "library/table-row-after.svg"
+		"filePath": "library/table-row-after.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "table-row-before",
 		"label": "Table Row Before",
-		"filePath": "library/table-row-before.svg"
+		"filePath": "library/table-row-before.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "table-row-delete",
 		"label": "Table Row Delete",
-		"filePath": "library/table-row-delete.svg"
+		"filePath": "library/table-row-delete.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "tablet",
 		"label": "Tablet",
 		"filePath": "library/tablet.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "tab",
 		"label": "Tab",
-		"filePath": "library/tab.svg"
+		"filePath": "library/tab.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "tabs",
 		"label": "Tabs",
-		"filePath": "library/tabs.svg"
+		"filePath": "library/tabs.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "tabs-menu",
 		"label": "Tabs Menu",
-		"filePath": "library/tabs-menu.svg"
+		"filePath": "library/tabs-menu.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "tabs-menu-item",
 		"label": "Tabs Menu Item",
-		"filePath": "library/tabs-menu-item.svg"
+		"filePath": "library/tabs-menu-item.svg",
+		"category": "Navigation"
 	},
 	{
 		"slug": "tag",
 		"label": "Tag",
 		"filePath": "library/tag.svg",
-		"public": true
+		"public": true,
+		"category": "Content"
 	},
 	{
 		"slug": "term-count",
 		"label": "Term Count",
-		"filePath": "library/term-count.svg"
+		"filePath": "library/term-count.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "term-description",
 		"label": "Term Description",
-		"filePath": "library/term-description.svg"
+		"filePath": "library/term-description.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "term-name",
 		"label": "Term Name",
-		"filePath": "library/term-name.svg"
+		"filePath": "library/term-name.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "text-color",
 		"label": "Text Color",
-		"filePath": "library/text-color.svg"
+		"filePath": "library/text-color.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "text-horizontal",
 		"label": "Text Horizontal",
-		"filePath": "library/text-horizontal.svg"
+		"filePath": "library/text-horizontal.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "text-vertical",
 		"label": "Text Vertical",
-		"filePath": "library/text-vertical.svg"
+		"filePath": "library/text-vertical.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "thumbs-down",
 		"label": "Thumbs Down",
-		"filePath": "library/thumbs-down.svg"
+		"filePath": "library/thumbs-down.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "thumbs-up",
 		"label": "Thumbs Up",
-		"filePath": "library/thumbs-up.svg"
+		"filePath": "library/thumbs-up.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "time-to-read",
 		"label": "Time To Read",
-		"filePath": "library/time-to-read.svg"
+		"filePath": "library/time-to-read.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "tip",
 		"label": "Tip",
 		"filePath": "library/tip.svg",
-		"public": true
+		"public": true,
+		"category": "Interface"
 	},
 	{
 		"slug": "title",
 		"label": "Title",
-		"filePath": "library/title.svg"
+		"filePath": "library/title.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "tool",
 		"label": "Tool",
-		"filePath": "library/tool.svg"
+		"filePath": "library/tool.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "trash",
 		"label": "Trash",
-		"filePath": "library/trash.svg"
+		"filePath": "library/trash.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "trending-down",
 		"label": "Trending Down",
-		"filePath": "library/trending-down.svg"
+		"filePath": "library/trending-down.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "trending-up",
 		"label": "Trending Up",
-		"filePath": "library/trending-up.svg"
+		"filePath": "library/trending-up.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "typography",
 		"label": "Typography",
-		"filePath": "library/typography.svg"
+		"filePath": "library/typography.svg",
+		"category": "Formatting"
 	},
 	{
 		"slug": "undo",
 		"label": "Undo",
-		"filePath": "library/undo.svg"
+		"filePath": "library/undo.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "ungroup",
 		"label": "Ungroup",
-		"filePath": "library/ungroup.svg"
+		"filePath": "library/ungroup.svg",
+		"category": "Layout"
 	},
 	{
 		"slug": "unlock",
 		"label": "Unlock",
-		"filePath": "library/unlock.svg"
+		"filePath": "library/unlock.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "unseen",
 		"label": "Unseen",
-		"filePath": "library/unseen.svg"
+		"filePath": "library/unseen.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "update",
 		"label": "Update",
-		"filePath": "library/update.svg"
+		"filePath": "library/update.svg",
+		"category": "Actions"
 	},
 	{
 		"slug": "upload",
 		"label": "Upload",
 		"filePath": "library/upload.svg",
-		"public": true
+		"public": true,
+		"category": "Actions"
 	},
 	{
 		"slug": "verse",
 		"label": "Verse",
 		"filePath": "library/verse.svg",
-		"public": true
+		"public": true,
+		"category": "Content"
 	},
 	{
 		"slug": "video",
 		"label": "Video",
-		"filePath": "library/video.svg"
+		"filePath": "library/video.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "widget",
 		"label": "Widget",
-		"filePath": "library/widget.svg"
+		"filePath": "library/widget.svg",
+		"category": "Interface"
 	},
 	{
 		"slug": "word-count",
 		"label": "Word Count",
-		"filePath": "library/word-count.svg"
+		"filePath": "library/word-count.svg",
+		"category": "Content"
 	},
 	{
 		"slug": "wordpress",
 		"label": "WordPress",
-		"filePath": "library/wordpress.svg"
+		"filePath": "library/wordpress.svg",
+		"category": "Interface"
 	}
 ]
