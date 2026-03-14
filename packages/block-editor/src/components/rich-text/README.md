@@ -113,13 +113,36 @@ registerBlockType( /* ... */, {
 } );
 ```
 
+## RichText.isEmpty
+
+Helper function to test if supplied variable (e.g. content of RichText) is empty. Returns boolean, true if variable is empty.
+
+### Example
+
+```js
+// ...
+// set aria-label attribute differently if content of RichText is empty
+<RichText
+	value={ content }
+	onChange={ ( newContent ) =>
+		setAttributes( { content: newContent } )
+	}
+	aria-label={
+		RichText.isEmpty( content )
+			? __(
+				'Empty block; start writing or type forward slash to choose a block'
+			  )
+			: __( 'Block: Paragraph' )
+	}
+/>
+// ...
+```
 
 ## RichTextToolbarButton
 
 Slot to extend the format toolbar. Use it in the edit function of a `registerFormatType` call to surface the format to the UI.
 
 ### Example
-
 
 ```js
 import { registerFormatType } from '@wordpress/rich-text';
