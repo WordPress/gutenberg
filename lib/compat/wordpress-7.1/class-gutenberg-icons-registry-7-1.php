@@ -45,9 +45,93 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 				array(
 					'label'    => $icon_data['label'],
 					'filePath' => $icons_directory . $icon_data['filePath'],
+					'category' => ! empty( $icon_data['category'] ) && is_string( $icon_data['category'] )
+						? $icon_data['category']
+						: null,
 				)
 			);
 		}
+	}
+
+	/**
+	 * Modified to point $manifest_path to Gutenberg packages
+	 */
+	protected function register( $icon_name, $icon_properties ) {
+		if ( ! isset( $icon_name ) || ! is_string( $icon_name ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'Icon name must be a string.', 'gutenberg' ),
+					'7.0.0'
+				);
+				return false;
+		}
+
+				$allowed_keys = array_fill_keys( array( 'label', 'content', 'filePath', 'category' ), 1 );
+		foreach ( array_keys( $icon_properties ) as $key ) {
+			if ( ! array_key_exists( $key, $allowed_keys ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					sprintf(
+					// translators: %s is the name of any user-provided key
+						__( 'Invalid icon property: "%s".', 'gutenberg' ),
+						$key
+					),
+					'7.0.0'
+				);
+				return false;
+			}
+		}
+
+		if ( ! isset( $icon_properties['label'] ) || ! is_string( $icon_properties['label'] ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'Icon label must be a string.', 'gutenberg' ),
+				'7.0.0'
+			);
+			return false;
+		}
+
+		if (
+				( ! isset( $icon_properties['content'] ) && ! isset( $icon_properties['filePath'] ) ) ||
+				( isset( $icon_properties['content'] ) && isset( $icon_properties['filePath'] ) )
+				) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'Icons must provide either `content` or `filePath`.', 'gutenberg' ),
+				'7.0.0'
+			);
+			return false;
+		}
+
+		if ( isset( $icon_properties['content'] ) ) {
+			if ( ! is_string( $icon_properties['content'] ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'Icon content must be a string.', 'gutenberg' ),
+					'7.0.0'
+				);
+				return false;
+			}
+
+			$sanitized_icon_content = $this->sanitize_icon_content( $icon_properties['content'] );
+			if ( empty( $sanitized_icon_content ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'Icon content does not contain valid SVG markup.', 'gutenberg' ),
+					'7.0.0'
+				);
+				return false;
+			}
+		}
+
+				$icon = array_merge(
+					$icon_properties,
+					array( 'name' => $icon_name )
+				);
+
+		$this->registered_icons[ $icon_name ] = $icon;
+
+		return true;
 	}
 
 	/**
