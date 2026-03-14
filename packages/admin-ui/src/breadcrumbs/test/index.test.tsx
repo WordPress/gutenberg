@@ -10,13 +10,9 @@ import { Breadcrumbs } from '..';
 import type { BreadcrumbsProps } from '../types';
 
 jest.mock( '@wordpress/route', () => ( {
-	Link: ( {
-		to,
-		children,
-	}: {
-		to: string;
-		children: React.ReactNode;
-	} ) => <a href={ to }>{ children }</a>,
+	Link: ( { to, children }: { to: string; children: React.ReactNode } ) => (
+		<a href={ to }>{ children }</a>
+	),
 } ) );
 
 describe( 'Breadcrumbs', () => {
@@ -186,16 +182,12 @@ describe( 'Breadcrumbs', () => {
 		} );
 
 		it( 'should render a single item without `to` as an h1', () => {
-			render(
-				<Breadcrumbs items={ [ { label: 'Dashboard' } ] } />
-			);
+			render( <Breadcrumbs items={ [ { label: 'Dashboard' } ] } /> );
 
 			expect(
 				screen.getByRole( 'heading', { level: 1 } )
 			).toHaveTextContent( 'Dashboard' );
-			expect(
-				screen.queryByRole( 'link' )
-			).not.toBeInTheDocument();
+			expect( screen.queryByRole( 'link' ) ).not.toBeInTheDocument();
 		} );
 
 		it( 'should render preceding items as links even without `to`', () => {
@@ -223,11 +215,7 @@ describe( 'Breadcrumbs', () => {
 		} );
 
 		it( 'should render inside a nav with an accessible label', () => {
-			render(
-				<Breadcrumbs
-					items={ [ { label: 'Home', to: '/' } ] }
-				/>
-			);
+			render( <Breadcrumbs items={ [ { label: 'Home', to: '/' } ] } /> );
 
 			expect(
 				screen.getByRole( 'navigation', { name: 'Breadcrumbs' } )
