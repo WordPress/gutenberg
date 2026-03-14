@@ -119,64 +119,61 @@ export default function PostDateEdit( props ) {
 	}
 	return (
 		<>
-			{ ( blockEditingMode === 'default' ||
-				! isDescendentOfQueryLoop ) && (
-				<BlockControls group="block">
-					{ activeBlockVariationName !== 'post-date-modified' &&
-						( ! isDescendentOfQueryLoop ||
-							! activeBlockVariationName ) && (
-							<ToolbarGroup>
-								<Dropdown
-									popoverProps={ popoverProps }
-									renderContent={ ( { onClose } ) => (
-										<PublishDateTimePicker
-											title={
-												activeBlockVariationName ===
-												'post-date'
-													? __( 'Publish Date' )
-													: __( 'Date' )
-											}
-											currentDate={ datetime }
-											onChange={ ( newDatetime ) =>
-												setAttributes( {
-													datetime: newDatetime,
-												} )
-											}
-											is12Hour={ is12HourFormat(
-												siteTimeFormat
-											) }
-											onClose={ onClose }
-											dateOrder={
-												/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
-												_x( 'dmy', 'date order' )
-											}
+			{ ( blockEditingMode === 'default' || ! isDescendentOfQueryLoop ) &&
+				activeBlockVariationName !== 'post-date-modified' &&
+				( ! isDescendentOfQueryLoop || ! activeBlockVariationName ) && (
+					<BlockControls group="block">
+						<ToolbarGroup>
+							<Dropdown
+								popoverProps={ popoverProps }
+								renderContent={ ( { onClose } ) => (
+									<PublishDateTimePicker
+										title={
+											activeBlockVariationName ===
+											'post-date'
+												? __( 'Publish Date' )
+												: __( 'Date' )
+										}
+										currentDate={ datetime }
+										onChange={ ( newDatetime ) =>
+											setAttributes( {
+												datetime: newDatetime,
+											} )
+										}
+										is12Hour={ is12HourFormat(
+											siteTimeFormat
+										) }
+										onClose={ onClose }
+										dateOrder={
+											/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
+											_x( 'dmy', 'date order' )
+										}
+									/>
+								) }
+								renderToggle={ ( { isOpen, onToggle } ) => {
+									const openOnArrowDown = ( event ) => {
+										if (
+											! isOpen &&
+											event.keyCode === DOWN
+										) {
+											event.preventDefault();
+											onToggle();
+										}
+									};
+									return (
+										<ToolbarButton
+											aria-expanded={ isOpen }
+											icon={ pencil }
+											title={ __( 'Change Date' ) }
+											onClick={ onToggle }
+											onKeyDown={ openOnArrowDown }
 										/>
-									) }
-									renderToggle={ ( { isOpen, onToggle } ) => {
-										const openOnArrowDown = ( event ) => {
-											if (
-												! isOpen &&
-												event.keyCode === DOWN
-											) {
-												event.preventDefault();
-												onToggle();
-											}
-										};
-										return (
-											<ToolbarButton
-												aria-expanded={ isOpen }
-												icon={ pencil }
-												title={ __( 'Change Date' ) }
-												onClick={ onToggle }
-												onKeyDown={ openOnArrowDown }
-											/>
-										);
-									} }
-								/>
-							</ToolbarGroup>
-						) }
-				</BlockControls>
-			) }
+									);
+								} }
+							/>
+						</ToolbarGroup>
+					</BlockControls>
+				) }
 
 			<InspectorControls>
 				<ToolsPanel
