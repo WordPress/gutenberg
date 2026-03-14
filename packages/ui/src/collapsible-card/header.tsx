@@ -1,12 +1,11 @@
 import clsx from 'clsx';
-import type { MouseEvent } from 'react';
-import { forwardRef, useCallback, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { chevronDown, chevronUp } from '@wordpress/icons';
+import { forwardRef } from '@wordpress/element';
+import { chevronDown } from '@wordpress/icons';
 import * as Card from '../card';
 import * as Collapsible from '../collapsible';
-import { IconButton } from '../icon-button';
+import { Icon } from '../icon';
 import styles from './style.module.css';
+import focusStyles from '../utils/css/focus.module.css';
 import type { HeaderProps } from './types';
 
 /**
@@ -20,62 +19,35 @@ import type { HeaderProps } from './types';
  */
 export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 	function CollapsibleCardHeader(
-		{ children, className, onClick, ...restProps },
+		{ children, className, render, ...restProps },
 		ref
 	) {
-		const triggerRef = useRef< HTMLButtonElement >( null );
-
-		const handleHeaderClick = useCallback(
-			( event: MouseEvent< HTMLDivElement > ) => {
-				const trigger = triggerRef.current;
-				if (
-					trigger &&
-					event.target instanceof Node &&
-					! trigger.contains( event.target )
-				) {
-					trigger.click();
-				}
-
-				onClick?.( event );
-			},
-			[ onClick ]
-		);
-
 		return (
-			<Card.Header
-				ref={ ref }
+			<Collapsible.Trigger
 				className={ clsx( styles.header, className ) }
-				onClick={ handleHeaderClick }
-				{ ...restProps }
+				render={
+					<Card.Header
+						ref={ ref }
+						render={ render }
+						{ ...restProps }
+					/>
+				}
+				nativeButton={ false }
 			>
 				<div className={ styles[ 'header-content' ] }>{ children }</div>
 				<div className={ styles[ 'header-trigger-wrapper' ] }>
-					<Collapsible.Trigger
-						ref={ triggerRef }
-						render={ ( props ) => (
-							<IconButton
-								{ ...props }
-								label={ __( 'Expand or collapse card' ) }
-								// The Collapsible wrapper's `render` prop
-								// uses a single-argument callback (via the
-								// ComponentProps utility), so Base UI's
-								// second `state` argument isn't available
-								// here. We derive the open state from
-								// `aria-expanded` instead of `state.open`.
-								icon={
-									props[ 'aria-expanded' ] === true
-										? chevronUp
-										: chevronDown
-								}
-								variant="minimal"
-								tone="neutral"
-								size="compact"
-							/>
+					<Icon
+						icon={ chevronDown }
+						className={ clsx(
+							styles[ 'header-trigger' ],
+							// While the interactive trigger element is the whole header,
+							// the focus ring will be displayed only on the icon to visually
+							// emulate it being the button.
+							focusStyles[ 'outset-ring--focus-parent-visible' ]
 						) }
-						className={ styles[ 'header-trigger' ] }
 					/>
 				</div>
-			</Card.Header>
+			</Collapsible.Trigger>
 		);
 	}
 );
