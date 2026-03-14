@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useContext, useMemo, useSyncExternalStore } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { WindowContext } from '../../private-apis';
+import { useMemo, useSyncExternalStore } from '@wordpress/element';
 
 type MQLCache = Map< string, MediaQueryList >;
 
@@ -15,21 +10,21 @@ const perWindowCache = new WeakMap< Window, MQLCache >();
 /**
  * A new MediaQueryList object for the media query
  *
- * @param win     Window.
+ * @param view    Window.
  * @param [query] Media Query.
  */
 function getMediaQueryList(
-	win: Window,
+	view: Window,
 	query?: string
 ): MediaQueryList | null {
 	if ( ! query ) {
 		return null;
 	}
 
-	const matchMediaCache: MQLCache = perWindowCache.get( win ) ?? new Map();
+	const matchMediaCache: MQLCache = perWindowCache.get( view ) ?? new Map();
 
-	if ( ! perWindowCache.has( win ) ) {
-		perWindowCache.set( win, matchMediaCache );
+	if ( ! perWindowCache.has( view ) ) {
+		perWindowCache.set( view, matchMediaCache );
 	}
 
 	let match = matchMediaCache.get( query );
@@ -38,8 +33,8 @@ function getMediaQueryList(
 		return match;
 	}
 
-	if ( typeof win?.matchMedia === 'function' ) {
-		match = win.matchMedia( query );
+	if ( typeof view?.matchMedia === 'function' ) {
+		match = view.matchMedia( query );
 		matchMediaCache.set( query, match );
 		return match;
 	}
@@ -51,13 +46,15 @@ function getMediaQueryList(
  * Runs a media query and returns its value when it changes.
  *
  * @param [query] Media Query.
+ * @param [view]  Window instance, else default to global window
  * @return return value of the media query.
  */
-export default function useMediaQuery( query?: string ): boolean {
-	const win = useContext( WindowContext );
-
+export default function useMediaQuery(
+	query?: string,
+	view: Window = window
+): boolean {
 	const source = useMemo( () => {
-		const mediaQueryList = getMediaQueryList( win, query );
+		const mediaQueryList = getMediaQueryList( view, query );
 
 		return {
 			subscribe( onStoreChange: any ) {
@@ -78,7 +75,7 @@ export default function useMediaQuery( query?: string ): boolean {
 				return mediaQueryList?.matches ?? false;
 			},
 		};
-	}, [ win, query ] );
+	}, [ view, query ] );
 
 	return useSyncExternalStore(
 		source.subscribe,
