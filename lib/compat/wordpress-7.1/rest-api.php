@@ -12,5 +12,8 @@
 function gutenberg_register_icons_controller_endpoints() {
 	$icons_controller = new Gutenberg_REST_Icons_Controller_7_1();
 	$icons_controller->register_routes();
+
+	$icon_categories_controller = new Gutenberg_REST_Icons_Categories_Controller_7_1();
+	$icon_categories_controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_icons_controller_endpoints', PHP_INT_MAX );
