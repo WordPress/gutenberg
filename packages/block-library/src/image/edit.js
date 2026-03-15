@@ -166,6 +166,7 @@ export function ImageEdit( {
 			url: undefined,
 			blob: undefined,
 		} );
+		// Clear the temporary blob URL so the spinner is removed.
 		setTemporaryURL();
 	}
 
