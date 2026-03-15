@@ -755,6 +755,7 @@ export function prepareItem( id: QueueItemId ) {
 						additionalData: {
 							...item.additionalData,
 							generate_sub_sizes: true,
+							convert_format: true,
 						},
 				  }
 				: {};
