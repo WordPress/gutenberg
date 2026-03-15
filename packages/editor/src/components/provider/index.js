@@ -79,6 +79,7 @@ const NON_CONTEXTUAL_POST_TYPES = [
  * @return {Array} Block editor props.
  */
 function useBlockEditorProps( post, template, mode ) {
+	const revisionBlocks = useRevisionBlocks();
 	const rootLevelPost = mode === 'template-locked' ? 'template' : 'post';
 	const [ postBlocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
@@ -116,6 +117,11 @@ function useBlockEditorProps( post, template, mode ) {
 
 		return postBlocks;
 	}, [ maybeNavigationBlocks, rootLevelPost, templateBlocks, postBlocks ] );
+
+	// In revisions mode, use the revision blocks and disable editing.
+	if ( revisionBlocks !== null ) {
+		return [ revisionBlocks, noop, noop ];
+	}
 
 	// Handle fallback to postBlocks outside of the above useMemo, to ensure
 	// that constructed block templates that call `createBlock` are not generated
@@ -289,20 +295,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			id,
 			mode
 		);
-		const [ entityBlocks, onInput, onChange ] = useBlockEditorProps(
+		const [ blocks, onInput, onChange ] = useBlockEditorProps(
 			post,
 			template,
 			mode
-		);
-
-		const revisionBlocks = useRevisionBlocks();
-		const blocks = revisionBlocks !== null ? revisionBlocks : entityBlocks;
-		const finalSettings = useMemo(
-			() =>
-				isInRevisionsMode
-					? { ...blockEditorSettings, isPreviewMode: true }
-					: blockEditorSettings,
-			[ isInRevisionsMode, blockEditorSettings ]
 		);
 
 		const {
@@ -440,15 +436,15 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					<BlockContextProvider value={ defaultBlockContext }>
 						<BlockEditorProviderComponent
 							value={ blocks }
-							onChange={ isInRevisionsMode ? noop : onChange }
-							onInput={ isInRevisionsMode ? noop : onInput }
+							onChange={ onChange }
+							onInput={ onInput }
 							selection={
 								isInRevisionsMode ? undefined : selection
 							}
 							onChangeSelection={
 								isInRevisionsMode ? noop : onChangeSelection
 							}
-							settings={ finalSettings }
+							settings={ blockEditorSettings }
 							useSubRegistry={ false }
 						>
 							{ children }
