@@ -39,7 +39,7 @@ function CollaborationContext() {
 		return null;
 	}
 
-	if ( DOCUMENT_SIZE_LIMIT_EXCEEDED === syncConnectionStatus.status ) {
+	if ( DOCUMENT_SIZE_LIMIT_EXCEEDED === syncConnectionStatus?.status ) {
 		return (
 			<p>
 				{ __(
