@@ -166,6 +166,7 @@ export function ImageEdit( {
 			url: undefined,
 			blob: undefined,
 		} );
+		setTemporaryURL();
 	}
 
 	function onFilesPreUpload( files ) {
