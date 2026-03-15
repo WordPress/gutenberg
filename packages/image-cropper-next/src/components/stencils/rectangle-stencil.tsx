@@ -159,12 +159,20 @@ export function RectangleStencil( {
 			let h = edgeBottom - edgeTop;
 
 			// Apply aspect ratio constraint if specified.
+			// Compare in pixel space since normalized w/h are fractions of
+			// different dimensions (visualW vs visualH).
 			if ( aspectRatio && aspectRatio > 0 ) {
-				const currentRatio = w / h;
+				const pixelW = w * imageSize.width;
+				const pixelH = h * imageSize.height;
+				const currentRatio = pixelW / pixelH;
 				if ( currentRatio > aspectRatio ) {
-					w = h * aspectRatio;
+					w =
+						( h * aspectRatio * imageSize.height ) /
+						imageSize.width;
 				} else {
-					h = w / aspectRatio;
+					h =
+						( w * imageSize.width ) /
+						( aspectRatio * imageSize.height );
 				}
 			}
 

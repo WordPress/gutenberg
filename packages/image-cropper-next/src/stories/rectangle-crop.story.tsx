@@ -122,11 +122,20 @@ const WithControlsComponent = () => {
 			const ratio = parseFloat( value );
 			if ( ratio > 0 && state.image ) {
 				// Adjust the crop rect to match the selected aspect ratio.
+				// The crop rect is in visual-normalized space, so we need
+				// the visual (rotation-dependent) aspect ratio, not the
+				// natural one.
 				const currentWidth = state.cropRect.width;
 				const currentHeight = state.cropRect.height;
-				const imageAspect =
-					state.image.naturalWidth / state.image.naturalHeight;
-				const normalizedRatio = ratio / imageAspect;
+				const rad = ( state.rotation * Math.PI ) / 180;
+				const cosR = Math.abs( Math.cos( rad ) );
+				const sinR = Math.abs( Math.sin( rad ) );
+				const natW = state.image.naturalWidth;
+				const natH = state.image.naturalHeight;
+				const visualW = cosR * natW + sinR * natH;
+				const visualH = sinR * natW + cosR * natH;
+				const visualAspect = visualW / visualH;
+				const normalizedRatio = ratio / visualAspect;
 
 				let newWidth = currentWidth;
 				let newHeight = currentWidth / normalizedRatio;
@@ -147,7 +156,7 @@ const WithControlsComponent = () => {
 				} );
 			}
 		},
-		[ state.image, state.cropRect, setCropRect ]
+		[ state.image, state.cropRect, state.rotation, setCropRect ]
 	);
 
 	const handleReset = useCallback( () => {
