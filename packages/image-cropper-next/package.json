@@ -1,0 +1,61 @@
+{
+	"name": "@wordpress/image-cropper-next",
+	"version": "0.1.0",
+	"private": true,
+	"description": "An experimental, modular image cropper with rectangle and freeform polygon support.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"image cropper",
+		"cropper"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/image-cropper-next/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/image-cropper-next"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"types": "build-types",
+	"sideEffects": [
+		"src/**/*.scss",
+		"build-style/**"
+	],
+	"dependencies": {
+		"@wordpress/element": "file:../element",
+		"clsx": "^2.1.1",
+		"gl-matrix": "^3.4.3"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
