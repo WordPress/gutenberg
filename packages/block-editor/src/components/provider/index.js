@@ -121,8 +121,7 @@ function mediaUpload(
 			onSuccess?.( attachments );
 		},
 		onBatchSuccess,
-		onError: ( error ) =>
-			onError( typeof error === 'string' ? error : error?.message ),
+		onError: ( { message } ) => onError( message ),
 		additionalData,
 		allowedTypes,
 	} );
