@@ -47,6 +47,8 @@ export interface CropperProps {
 	minZoom?: number;
 	/** Maximum zoom level. */
 	maxZoom?: number;
+	/** Fixed aspect ratio (width / height) in pixel space for the crop area. */
+	aspectRatio?: number;
 	/** Callback fired when the image is loaded. */
 	onImageLoaded?: ( size: Size ) => void;
 	/** Additional className for the container. */
@@ -74,6 +76,7 @@ export const Cropper = forwardRef< HTMLDivElement, CropperProps >(
 			showDimming = true,
 			minZoom,
 			maxZoom,
+			aspectRatio,
 			onImageLoaded,
 			className,
 		}: CropperProps,
@@ -279,6 +282,7 @@ export const Cropper = forwardRef< HTMLDivElement, CropperProps >(
 					containerSize={ containerSize }
 					imageSize={ visualImageSize }
 					onCropChange={ handleCropChange }
+					aspectRatio={ aspectRatio }
 				/>
 
 				{ /* Rule-of-thirds grid */ }

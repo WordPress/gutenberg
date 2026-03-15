@@ -113,4 +113,6 @@ export interface StencilProps {
 	imageSize: Size;
 	/** Callback when the crop rectangle changes. */
 	onCropChange: ( rect: NormalizedRect ) => void;
+	/** Optional fixed aspect ratio (width / height) in pixel space. */
+	aspectRatio?: number;
 }

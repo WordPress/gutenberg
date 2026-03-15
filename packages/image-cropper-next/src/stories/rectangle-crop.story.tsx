@@ -235,6 +235,11 @@ const WithControlsComponent = () => {
 					dispatch={ dispatch }
 					showGrid
 					showDimming
+					aspectRatio={
+						parseFloat( aspectRatioValue ) > 0
+							? parseFloat( aspectRatioValue )
+							: undefined
+					}
 				/>
 			</div>
 

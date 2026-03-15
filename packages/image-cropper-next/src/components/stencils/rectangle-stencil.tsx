@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useEffect } from '@wordpress/element';
+import { useState, useCallback, useEffect, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,9 +14,14 @@ import type { StencilProps, NormalizedRect } from '../../core/types';
 type HandlePosition = 'n' | 's' | 'e' | 'w' | 'nw' | 'ne' | 'sw' | 'se';
 
 /**
+ * Corner handle positions only — used when aspect ratio is locked.
+ */
+const CORNER_POSITIONS: HandlePosition[] = [ 'nw', 'ne', 'sw', 'se' ];
+
+/**
  * All handle positions rendered by the stencil.
  */
-const HANDLE_POSITIONS: HandlePosition[] = [
+const ALL_POSITIONS: HandlePosition[] = [
 	'n',
 	's',
 	'e',
@@ -43,16 +48,17 @@ interface DragState {
 /**
  * Props for the RectangleStencil component.
  */
-interface RectangleStencilProps extends StencilProps {
-	/** Optional fixed aspect ratio (width / height). */
-	aspectRatio?: number;
-}
+type RectangleStencilProps = StencilProps;
 
 /**
- * A rectangular crop stencil with 8 resize handles.
+ * A rectangular crop stencil with resize handles.
  *
  * Renders a rectangle overlay positioned according to the normalized
- * crop rect, with draggable handles on corners and edges.
+ * crop rect, with draggable handles on corners and (when aspect ratio
+ * is unlocked) edges.
+ *
+ * When aspectRatio is set, only corner handles are shown and dragging
+ * preserves the ratio. The crop rect is clamped to [0,1] bounds.
  *
  * @param props               Component props implementing StencilProps.
  * @param props.cropRect      The crop rectangle in normalized coordinates.
@@ -70,6 +76,18 @@ export function RectangleStencil( {
 	aspectRatio,
 }: RectangleStencilProps ) {
 	const [ dragState, setDragState ] = useState< DragState | null >( null );
+	const hasLockedRatio = !! ( aspectRatio && aspectRatio > 0 );
+
+	// The normalized aspect ratio: the w/h ratio in normalized space that
+	// produces the desired pixel aspect ratio.
+	// pixelW = w * imageSize.width, pixelH = h * imageSize.height
+	// pixelW / pixelH = aspectRatio  =>  w / h = aspectRatio * imageSize.height / imageSize.width
+	const normalizedRatio = useMemo( () => {
+		if ( ! hasLockedRatio || imageSize.width === 0 ) {
+			return 0;
+		}
+		return ( aspectRatio * imageSize.height ) / imageSize.width;
+	}, [ aspectRatio, hasLockedRatio, imageSize.width, imageSize.height ] );
 
 	// Convert normalized crop rect to pixel bounds, accounting for the
 	// image offset within the container.
@@ -98,13 +116,9 @@ export function RectangleStencil( {
 	);
 
 	/**
-	 * Compute the new crop rect based on the drag delta and handle position.
-	 *
-	 * Each handle anchors the opposite edge(s) and only moves the dragged
-	 * edge(s). Edges are clamped to [0, 1] so dragging outside the image
-	 * boundary is a no-op — the crop never moves or resizes beyond bounds.
+	 * Compute the new crop rect for a free (no aspect ratio) resize.
 	 */
-	const computeNewRect = useCallback(
+	const computeFreeRect = useCallback(
 		(
 			drag: DragState,
 			clientX: number,
@@ -123,13 +137,11 @@ export function RectangleStencil( {
 			const handle = drag.handle;
 			const minSize = 0.05;
 
-			// Compute the four edges of the start rect.
 			let edgeTop = s.y;
 			let edgeBottom = s.y + s.height;
 			let edgeLeft = s.x;
 			let edgeRight = s.x + s.width;
 
-			// Move only the dragged edge(s); opposite edges stay anchored.
 			if ( handle === 'n' || handle === 'nw' || handle === 'ne' ) {
 				edgeTop = Math.max(
 					0,
@@ -155,30 +167,105 @@ export function RectangleStencil( {
 				);
 			}
 
-			let w = edgeRight - edgeLeft;
-			let h = edgeBottom - edgeTop;
+			return {
+				x: edgeLeft,
+				y: edgeTop,
+				width: edgeRight - edgeLeft,
+				height: edgeBottom - edgeTop,
+			};
+		},
+		[ imageSize.width, imageSize.height ]
+	);
 
-			// Apply aspect ratio constraint if specified.
-			// Compare in pixel space since normalized w/h are fractions of
-			// different dimensions (visualW vs visualH).
-			if ( aspectRatio && aspectRatio > 0 ) {
-				const pixelW = w * imageSize.width;
-				const pixelH = h * imageSize.height;
-				const currentRatio = pixelW / pixelH;
-				if ( currentRatio > aspectRatio ) {
-					w =
-						( h * aspectRatio * imageSize.height ) /
-						imageSize.width;
-				} else {
-					h =
-						( w * imageSize.width ) /
-						( aspectRatio * imageSize.height );
-				}
+	/**
+	 * Compute the new crop rect for a locked-aspect-ratio corner resize.
+	 *
+	 * The opposite corner is the anchor. The dragged corner moves freely
+	 * but the result is clamped to maintain the aspect ratio and stay
+	 * within [0, 1] bounds.
+	 */
+	const computeLockedRect = useCallback(
+		(
+			drag: DragState,
+			clientX: number,
+			clientY: number
+		): NormalizedRect => {
+			const dx =
+				imageSize.width > 0
+					? ( clientX - drag.startX ) / imageSize.width
+					: 0;
+			const dy =
+				imageSize.height > 0
+					? ( clientY - drag.startY ) / imageSize.height
+					: 0;
+
+			const s = drag.startRect;
+			const handle = drag.handle;
+			const minSize = 0.05;
+
+			// Determine the anchor corner (opposite to the dragged corner).
+			const anchorX =
+				handle === 'nw' || handle === 'sw' ? s.x + s.width : s.x;
+			const anchorY =
+				handle === 'nw' || handle === 'ne' ? s.y + s.height : s.y;
+
+			// Direction the crop grows from the anchor (+1 = right/down, -1 = left/up).
+			const dirX = handle === 'nw' || handle === 'sw' ? -1 : 1;
+			const dirY = handle === 'nw' || handle === 'ne' ? -1 : 1;
+
+			// Desired new position of the dragged corner.
+			const draggedX =
+				( handle === 'nw' || handle === 'sw' ? s.x : s.x + s.width ) +
+				dx;
+			const draggedY =
+				( handle === 'nw' || handle === 'ne' ? s.y : s.y + s.height ) +
+				dy;
+
+			// Raw distances from anchor to dragged corner.
+			let distW = ( draggedX - anchorX ) * dirX;
+			let distH = ( draggedY - anchorY ) * dirY;
+
+			// Enforce minimum size.
+			distW = Math.max( distW, minSize );
+			distH = Math.max( distH, minSize );
+
+			// Determine which axis "drives" — whichever the user moved more
+			// (in pixel space) determines the size, the other follows.
+			const pixelDistW = distW * imageSize.width;
+			const pixelDistH = distH * imageSize.height;
+			if ( pixelDistW / pixelDistH > normalizedRatio ) {
+				// Width is the driver — compute height from ratio.
+				distH = distW / normalizedRatio;
+			} else {
+				// Height is the driver — compute width from ratio.
+				distW = distH * normalizedRatio;
 			}
 
-			return { x: edgeLeft, y: edgeTop, width: w, height: h };
+			// Clamp to [0, 1] bounds. If the rect would exceed a boundary,
+			// shrink it (maintaining ratio) to fit.
+			const maxW = dirX > 0 ? 1 - anchorX : anchorX;
+			const maxH = dirY > 0 ? 1 - anchorY : anchorY;
+
+			if ( distW > maxW ) {
+				distW = maxW;
+				distH = distW / normalizedRatio;
+			}
+			if ( distH > maxH ) {
+				distH = maxH;
+				distW = distH * normalizedRatio;
+			}
+
+			// Enforce minimum after clamping.
+			distW = Math.max( distW, minSize );
+			distH = Math.max( distH, minSize );
+
+			// Compute the final rect position from the anchor.
+			const newX = dirX > 0 ? anchorX : anchorX - distW;
+			const newY = dirY > 0 ? anchorY : anchorY - distH;
+
+			return { x: newX, y: newY, width: distW, height: distH };
 		},
-		[ imageSize.width, imageSize.height, aspectRatio ]
+		[ imageSize.width, imageSize.height, normalizedRatio ]
 	);
 
 	useEffect( () => {
@@ -187,11 +274,9 @@ export function RectangleStencil( {
 		}
 
 		const handleMouseMove = ( event: MouseEvent ) => {
-			const newRect = computeNewRect(
-				dragState,
-				event.clientX,
-				event.clientY
-			);
+			const newRect = hasLockedRatio
+				? computeLockedRect( dragState, event.clientX, event.clientY )
+				: computeFreeRect( dragState, event.clientX, event.clientY );
 			onCropChange( newRect );
 		};
 
@@ -206,11 +291,19 @@ export function RectangleStencil( {
 			document.removeEventListener( 'mousemove', handleMouseMove );
 			document.removeEventListener( 'mouseup', handleMouseUp );
 		};
-	}, [ dragState, computeNewRect, onCropChange ] );
+	}, [
+		dragState,
+		hasLockedRatio,
+		computeLockedRect,
+		computeFreeRect,
+		onCropChange,
+	] );
 
 	if ( containerSize.width === 0 || containerSize.height === 0 ) {
 		return null;
 	}
+
+	const handles = hasLockedRatio ? CORNER_POSITIONS : ALL_POSITIONS;
 
 	return (
 		<div
@@ -233,7 +326,7 @@ export function RectangleStencil( {
 				} }
 			/>
 			{ /* Resize handles */ }
-			{ HANDLE_POSITIONS.map( ( pos ) => (
+			{ handles.map( ( pos ) => (
 				// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- resize handles need mouse events.
 				<div
 					key={ pos }
