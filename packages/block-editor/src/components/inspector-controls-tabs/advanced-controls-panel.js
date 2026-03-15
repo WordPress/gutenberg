@@ -6,6 +6,7 @@ import {
 	__experimentalUseSlotFills as useSlotFills,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,12 +16,22 @@ import {
 	InspectorAdvancedControls,
 } from '../inspector-controls';
 import { PrivateInspectorControlsAllowedBlocks } from '../inspector-controls/groups';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const AdvancedControls = ( { initialOpen = false } ) => {
 	const fills = useSlotFills( InspectorAdvancedControls.slotName );
 	const privateFills = useSlotFills(
 		PrivateInspectorControlsAllowedBlocks.name
 	);
+
+	const editedContentOnlySection = useSelect( ( select ) => {
+		const { getEditedContentOnlySection } = unlock(
+			select( blockEditorStore )
+		);
+		return getEditedContentOnlySection();
+	}, [] );
+
 	const hasFills = Boolean( fills && fills.length );
 	const hasPrivateFills = Boolean( privateFills && privateFills.length );
 
@@ -34,7 +45,9 @@ const AdvancedControls = ( { initialOpen = false } ) => {
 			title={ __( 'Advanced' ) }
 			initialOpen={ initialOpen }
 		>
-			<InspectorControls.Slot group="advanced" />
+			{ ! editedContentOnlySection && (
+				<InspectorControls.Slot group="advanced" />
+			) }
 			<PrivateInspectorControlsAllowedBlocks.Slot />
 		</PanelBody>
 	);
