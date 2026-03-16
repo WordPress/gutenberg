@@ -135,12 +135,21 @@ describe( 'prePersistPostType', () => {
 } );
 
 describe( 'loadPostTypeEntities', () => {
+	let originalCollaborationEnabled;
+
 	beforeEach( () => {
 		apiFetch.mockReset();
 		applyPostChangesToCRDTDoc.mockReset();
+		originalCollaborationEnabled = window._wpCollaborationEnabled;
 	} );
 
-	it( 'should include custom taxonomy rest_bases in synced properties', async () => {
+	afterEach( () => {
+		window._wpCollaborationEnabled = originalCollaborationEnabled;
+	} );
+
+	it( 'should include custom taxonomy rest_bases in synced properties when collaboration is enabled', async () => {
+		window._wpCollaborationEnabled = true;
+
 		const mockPostTypes = {
 			book: {
 				name: 'Books',
@@ -183,6 +192,122 @@ describe( 'loadPostTypeEntities', () => {
 		const syncedProperties = applyPostChangesToCRDTDoc.mock.calls[ 0 ][ 2 ];
 		expect( syncedProperties ).toContain( 'genres' );
 		expect( syncedProperties ).toContain( 'audiences' );
+	} );
+
+	it( 'should not fetch taxonomies when collaboration is disabled', async () => {
+		window._wpCollaborationEnabled = false;
+
+		const mockPostTypes = {
+			post: {
+				name: 'Posts',
+				rest_base: 'posts',
+				rest_namespace: 'wp/v2',
+				taxonomies: [ 'category', 'post_tag' ],
+			},
+		};
+
+		apiFetch.mockResolvedValueOnce( mockPostTypes );
+
+		const postTypeLoader = additionalEntityConfigLoaders.find(
+			( loader ) => loader.kind === 'postType'
+		);
+		const entities = await postTypeLoader.loadEntities();
+		const postEntity = entities.find( ( e ) => e.name === 'post' );
+
+		postEntity.syncConfig.applyChangesToCRDTDoc( {}, {} );
+
+		// Only one apiFetch call (post types), no taxonomy fetch.
+		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
+
+		const syncedProperties = applyPostChangesToCRDTDoc.mock.calls[ 0 ][ 2 ];
+		expect( syncedProperties ).not.toContain( 'categories' );
+		expect( syncedProperties ).not.toContain( 'tags' );
+	} );
+
+	it( 'should skip taxonomy rest_base when taxonomy is not found in fetched taxonomies', async () => {
+		window._wpCollaborationEnabled = true;
+
+		const mockPostTypes = {
+			book: {
+				name: 'Books',
+				rest_base: 'books',
+				rest_namespace: 'wp/v2',
+				taxonomies: [ 'genre', 'missing_taxonomy' ],
+			},
+		};
+		const mockTaxonomies = {
+			genre: {
+				name: 'Genres',
+				rest_base: 'genres',
+				rest_namespace: 'wp/v2',
+			},
+			// 'missing_taxonomy' is intentionally absent.
+		};
+
+		apiFetch
+			.mockResolvedValueOnce( mockPostTypes )
+			.mockResolvedValueOnce( mockTaxonomies );
+
+		const postTypeLoader = additionalEntityConfigLoaders.find(
+			( loader ) => loader.kind === 'postType'
+		);
+		const entities = await postTypeLoader.loadEntities();
+		const bookEntity = entities.find( ( e ) => e.name === 'book' );
+
+		bookEntity.syncConfig.applyChangesToCRDTDoc( {}, {} );
+
+		const syncedProperties = applyPostChangesToCRDTDoc.mock.calls[ 0 ][ 2 ];
+		expect( syncedProperties ).toContain( 'genres' );
+		// missing_taxonomy has no rest_base entry, so nothing should be added for it.
+		expect( syncedProperties.size ).toBe( 16 ); // 15 base + 1 taxonomy (genres)
+	} );
+
+	it( 'should include base synced properties regardless of taxonomies', async () => {
+		window._wpCollaborationEnabled = true;
+
+		const mockPostTypes = {
+			page: {
+				name: 'Pages',
+				rest_base: 'pages',
+				rest_namespace: 'wp/v2',
+				taxonomies: [],
+			},
+		};
+
+		apiFetch
+			.mockResolvedValueOnce( mockPostTypes )
+			.mockResolvedValueOnce( {} );
+
+		const postTypeLoader = additionalEntityConfigLoaders.find(
+			( loader ) => loader.kind === 'postType'
+		);
+		const entities = await postTypeLoader.loadEntities();
+		const pageEntity = entities.find( ( e ) => e.name === 'page' );
+
+		pageEntity.syncConfig.applyChangesToCRDTDoc( {}, {} );
+
+		const syncedProperties = applyPostChangesToCRDTDoc.mock.calls[ 0 ][ 2 ];
+		const expectedBase = [
+			'author',
+			'blocks',
+			'content',
+			'comment_status',
+			'date',
+			'excerpt',
+			'featured_media',
+			'format',
+			'meta',
+			'ping_status',
+			'slug',
+			'status',
+			'sticky',
+			'template',
+			'title',
+		];
+		for ( const prop of expectedBase ) {
+			expect( syncedProperties ).toContain( prop );
+		}
+		expect( syncedProperties.size ).toBe( 15 );
 	} );
 } );
 

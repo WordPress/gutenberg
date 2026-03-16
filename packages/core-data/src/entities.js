@@ -329,10 +329,15 @@ export const prePersistPostType = async (
  * @return {Promise} Entities promise
  */
 async function loadPostTypeEntities() {
+	const postTypesPromise = apiFetch( { path: '/wp/v2/types?context=view' } );
+	const taxonomiesPromise = window._wpCollaborationEnabled
+		? apiFetch( { path: '/wp/v2/taxonomies?context=view' } )
+		: Promise.resolve( {} );
 	const [ postTypes, taxonomies ] = await Promise.all( [
-		apiFetch( { path: '/wp/v2/types?context=view' } ),
-		apiFetch( { path: '/wp/v2/taxonomies?context=view' } ),
+		postTypesPromise,
+		taxonomiesPromise,
 	] );
+
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
@@ -355,9 +360,9 @@ async function loadPostTypeEntities() {
 			'sticky',
 			'template',
 			'title',
-			...( postType.taxonomies?.map(
-				( taxonomy ) => taxonomies[ taxonomy ].rest_base
-			) ?? [] ),
+			...( postType.taxonomies
+				?.map( ( taxonomy ) => taxonomies?.[ taxonomy ]?.rest_base )
+				?.filter( Boolean ) ?? [] ),
 		] );
 
 		const entity = {
