@@ -2,37 +2,17 @@
  * External dependencies
  */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import {
-	createMemoryHistory,
-	createRootRoute,
-	createRouter,
-	RouterContextProvider,
-} from '@tanstack/react-router';
 
 /**
  * Internal dependencies
  */
 import Breadcrumbs from '..';
-
-const rootRoute = createRootRoute( {
-	notFoundComponent: () => null,
-} );
-const router = createRouter( {
-	routeTree: rootRoute,
-	history: createMemoryHistory( { initialEntries: [ '/' ] } ),
-	defaultNotFoundComponent: () => null,
-} );
+import { withRouter } from '../../stories/with-router';
 
 const meta: Meta< typeof Breadcrumbs > = {
 	component: Breadcrumbs,
 	title: 'Admin UI/Breadcrumbs',
-	decorators: [
-		( Story ) => (
-			<RouterContextProvider router={ router }>
-				<Story />
-			</RouterContextProvider>
-		),
-	],
+	decorators: [ withRouter ],
 };
 
 export default meta;

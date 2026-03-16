@@ -2,12 +2,6 @@
  * External dependencies
  */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import {
-	createMemoryHistory,
-	createRootRoute,
-	createRouter,
-	RouterContextProvider,
-} from '@tanstack/react-router';
 import { __experimentalText as Text } from '@wordpress/components';
 
 /**
@@ -15,15 +9,7 @@ import { __experimentalText as Text } from '@wordpress/components';
  */
 import Page from '..';
 import Breadcrumbs from '../../breadcrumbs';
-
-const rootRoute = createRootRoute( {
-	notFoundComponent: () => null,
-} );
-const router = createRouter( {
-	routeTree: rootRoute,
-	history: createMemoryHistory( { initialEntries: [ '/' ] } ),
-	defaultNotFoundComponent: () => null,
-} );
+import { withRouter } from '../../stories/with-router';
 
 const meta: Meta< typeof Page > = {
 	component: Page,
@@ -31,15 +17,7 @@ const meta: Meta< typeof Page > = {
 	parameters: {
 		layout: 'fullscreen',
 	},
-	decorators: [
-		( Story ) => (
-			<RouterContextProvider router={ router }>
-				<div style={ { height: '400px' } }>
-					<Story />
-				</div>
-			</RouterContextProvider>
-		),
-	],
+	decorators: [ withRouter ],
 };
 
 export default meta;
