@@ -127,11 +127,7 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
  * This pattern is useful when you need full control over the UI layout
  * while still leveraging DataViews' data management and state handling.
  */
-export const FreeCompositionComponent = ( {
-	containerHeight = '600px',
-}: {
-	containerHeight?: string;
-} ) => {
+export const FreeCompositionComponent = () => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_TABLE,
 		search: '',
@@ -156,38 +152,36 @@ export const FreeCompositionComponent = ( {
 	);
 
 	return (
-		<div style={ { height: containerHeight } }>
-			<DataViews
-				getItemId={ ( item ) => item.id.toString() }
-				paginationInfo={ paginationInfo }
-				data={ processedData }
-				view={ view }
-				fields={ fields }
-				actions={ actions }
-				onChangeView={ setView }
-				defaultLayouts={ {
-					table: {},
-					grid: {},
-				} }
-				empty={
-					<Stack
-						direction="column"
-						gap="sm"
-						justify="space-around"
-						align="center"
-						className="free-composition-dataviews-empty"
-					>
-						<Text size={ 18 } as="p">
-							No planets
-						</Text>
-						<Text variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</Text>
-						<Button variant="secondary">Create new planet</Button>
-					</Stack>
-				}
-			>
-				<PlanetOverview planets={ planets } />
-			</DataViews>
-		</div>
+		<DataViews
+			getItemId={ ( item ) => item.id.toString() }
+			paginationInfo={ paginationInfo }
+			data={ processedData }
+			view={ view }
+			fields={ fields }
+			actions={ actions }
+			onChangeView={ setView }
+			defaultLayouts={ {
+				table: {},
+				grid: {},
+			} }
+			empty={
+				<Stack
+					direction="column"
+					gap="sm"
+					justify="space-around"
+					align="center"
+					className="free-composition-dataviews-empty"
+				>
+					<Text size={ 18 } as="p">
+						No planets
+					</Text>
+					<Text variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</Text>
+					<Button variant="secondary">Create new planet</Button>
+				</Stack>
+			}
+		>
+			<PlanetOverview planets={ planets } />
+		</DataViews>
 	);
 };
 
