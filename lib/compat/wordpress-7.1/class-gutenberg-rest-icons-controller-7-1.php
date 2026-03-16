@@ -88,15 +88,15 @@ class Gutenberg_REST_Icons_Controller_7_1 extends WP_REST_Icons_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function prepare_item_for_response( $item, $request ) {
-		$keys   = array(
+		$keys = array(
 			'name'     => 'name',
 			'label'    => 'label',
 			'content'  => 'content',
 			'category' => 'category',
 		);
-		$data   = array();
+		$data = array();
 		foreach ( $keys as $item_key => $rest_key ) {
-			if ( isset( $item[ $item_key ] )) {
+			if ( isset( $item[ $item_key ] ) ) {
 				$data[ $rest_key ] = $item[ $item_key ];
 			}
 		}
