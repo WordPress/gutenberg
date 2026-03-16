@@ -18,7 +18,7 @@ $block-editor-link-control-number-of-actions: 1;
 
 .block-editor-link-control {
 	position: relative;
-	// TODO: Replace with var(--wpds-dimension-surface-width-sm) once design tokens are available.
+	// TODO: Replace with a --wpds-dimension-surface-width-* token.
 	min-width: 350px;
 
 	.components-popover__content & {
