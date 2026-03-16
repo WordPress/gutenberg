@@ -102,13 +102,13 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 	);
 
 	if ( current_user_can( 'upload_files' ) ) {
-		$response->data['image_sizes']                       = gutenberg_get_all_image_sizes();
-		$response->data['image_size_threshold']              = $image_size_threshold;
-		$response->data['image_output_formats']              = (object) $default_image_output_formats;
-		$response->data['jpeg_interlaced']                   = $jpeg_interlaced;
-		$response->data['png_interlaced']                    = $png_interlaced;
-		$response->data['gif_interlaced']                    = $gif_interlaced;
-		$response->data['client_side_supported_mime_types']  = $client_side_supported_mime_types;
+		$response->data['image_sizes']                      = gutenberg_get_all_image_sizes();
+		$response->data['image_size_threshold']             = $image_size_threshold;
+		$response->data['image_output_formats']             = (object) $default_image_output_formats;
+		$response->data['jpeg_interlaced']                  = $jpeg_interlaced;
+		$response->data['png_interlaced']                   = $png_interlaced;
+		$response->data['gif_interlaced']                   = $gif_interlaced;
+		$response->data['client_side_supported_mime_types'] = $client_side_supported_mime_types;
 	}
 
 	return $response;
