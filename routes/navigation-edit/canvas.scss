@@ -1,0 +1,27 @@
+.navigation-canvas__dataviews {
+	flex: 1;
+	min-height: 0;
+}
+
+// When preview size is at maximum, override DataViews' inline gridTemplateColumns
+// to force a single full-width column. The !important is necessary because
+// DataViews sets grid-template-columns as an inline style.
+.navigation-canvas__dataviews--full-width .dataviews-view-grid__row {
+	/* stylelint-disable-next-line declaration-no-important -- DataViews sets grid-template-columns as an inline style, so !important is required to override it. */
+	grid-template-columns: 1fr !important;
+}
+
+// Remove the forced square aspect ratio so the preview fits its content height.
+// The !important overrides inline/specificity from dataviews grid styles.
+.navigation-canvas__dataviews--full-width .dataviews-view-grid__media {
+	/* stylelint-disable-next-line declaration-no-important -- Overrides aspect-ratio: 1/1 set by DataViews grid styles. */
+	aspect-ratio: unset !important;
+	/* stylelint-disable-next-line declaration-no-important -- Overrides height: 100% set by DataViews grid styles. */
+	height: auto !important;
+	max-height: 300px;
+}
+
+.navigation-canvas__dataviews--full-width .lazy-editor-block-preview__container,
+.navigation-canvas__dataviews--full-width .lazy-editor-block-preview__container .block-editor-block-preview__container {
+	height: auto;
+}

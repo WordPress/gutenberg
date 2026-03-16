@@ -17,11 +17,16 @@ import type { WpTemplatePart } from '@wordpress/core-data';
  */
 import useMenuUsedInTemplateParts from './use-menu-used-in-template-parts';
 import { unlock } from '../lock-unlock';
+import './canvas.scss';
 
 const { patternTitleField } = unlock( editorPrivateApis );
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 const LAYOUT_GRID = 'grid';
+// Max preview size from DataViews' imageSizes array. At this size,
+// repeat(auto-fill, minmax(430px, 1fr)) can still produce multiple columns,
+// so we override grid-template-columns to 1fr via CSS when this value is set.
+const MAX_PREVIEW_SIZE = 430;
 
 const DEFAULT_VIEW = {
 	type: LAYOUT_GRID as const,
@@ -29,6 +34,7 @@ const DEFAULT_VIEW = {
 	titleField: 'title',
 	mediaField: 'preview',
 	fields: [],
+	layout: { previewSize: MAX_PREVIEW_SIZE },
 };
 
 const DEFAULT_LAYOUTS = {
@@ -127,22 +133,31 @@ function Canvas() {
 					</p>
 				</div>
 			) : (
-				<DataViews
-					paginationInfo={ paginationInfo }
-					fields={ fields }
-					data={ data ?? [] }
-					isLoading={ isResolvingParts }
-					view={ view }
-					onChangeView={ setView }
-					defaultLayouts={ DEFAULT_LAYOUTS }
-					onClickItem={ ( item: WpTemplatePart ) => {
-						navigate( {
-							to: `/types/wp_template_part/edit/${ encodeURIComponent(
-								String( item.id )
-							) }`,
-						} );
-					} }
-				/>
+				<div
+					className={
+						( view.layout as { previewSize?: number } )
+							?.previewSize >= MAX_PREVIEW_SIZE
+							? 'navigation-canvas__dataviews navigation-canvas__dataviews--full-width'
+							: 'navigation-canvas__dataviews'
+					}
+				>
+					<DataViews
+						paginationInfo={ paginationInfo }
+						fields={ fields }
+						data={ data ?? [] }
+						isLoading={ isResolvingParts }
+						view={ view }
+						onChangeView={ setView }
+						defaultLayouts={ DEFAULT_LAYOUTS }
+						onClickItem={ ( item: WpTemplatePart ) => {
+							navigate( {
+								to: `/types/wp_template_part/edit/${ encodeURIComponent(
+									String( item.id )
+								) }`,
+							} );
+						} }
+					/>
+				</div>
 			) }
 		</div>
 	);
