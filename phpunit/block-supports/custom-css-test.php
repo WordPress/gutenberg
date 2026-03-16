@@ -591,12 +591,8 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 		$css     = 'color: red; font-size: 16px;';
 		$encoded = 'data:text/css;base64,' . base64_encode( $css );
 		$content = '<!-- wp:paragraph {"style":{"css":' . json_encode( $css, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '}} --><p>Test</p><!-- /wp:paragraph -->';
-		$result  = gutenberg_encode_custom_css_for_kses( $content );
-		$this->assertStringContainsString(
-			json_encode( $encoded, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ),
-			$result,
-			'All CSS should be encoded, including values with no KSES-sensitive characters.'
-		);
+		$result  = parse_blocks( gutenberg_encode_custom_css_for_kses( $content ) );
+		$this->assertSame( $encoded, $result[0]['attrs']['style']['css'], 'All CSS should be encoded, including values with no KSES-sensitive characters.' );
 	}
 
 	/**
@@ -606,10 +602,10 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	 */
 	public function test_encode_for_kses_encodes_css_with_ampersand() {
 		$css     = '& > p { color: red; }';
+		$encoded = 'data:text/css;base64,' . base64_encode( $css );
 		$content = '<!-- wp:paragraph {"style":{"css":' . json_encode( $css, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '}} --><p>Test</p><!-- /wp:paragraph -->';
-		$result  = gutenberg_encode_custom_css_for_kses( $content );
-		$this->assertStringNotContainsString( $css, $result, 'Original CSS should be replaced.' );
-		$this->assertStringContainsString( 'data:text/css;base64,', $result, 'Result should contain base64-encoded CSS.' );
+		$result  = parse_blocks( gutenberg_encode_custom_css_for_kses( $content ) );
+		$this->assertSame( $encoded, $result[0]['attrs']['style']['css'], 'CSS with ampersand should be base64-encoded.' );
 	}
 
 	/**
@@ -621,12 +617,8 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 		$css     = 'background: green; & p { color: yellow; padding: 20px; }';
 		$encoded = 'data:text/css;base64,' . base64_encode( $css );
 		$content = '<!-- wp:paragraph {"style":{"css":' . json_encode( $css, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '}} --><p>Test</p><!-- /wp:paragraph -->';
-		$result  = gutenberg_encode_custom_css_for_kses( $content );
-		$this->assertStringContainsString(
-			json_encode( $encoded, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ),
-			$result,
-			'CSS should be base64-encoded in the block comment.'
-		);
+		$result  = parse_blocks( gutenberg_encode_custom_css_for_kses( $content ) );
+		$this->assertSame( $encoded, $result[0]['attrs']['style']['css'], 'Nested CSS selectors should be base64-encoded.' );
 	}
 
 	/**
@@ -638,27 +630,24 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 		$css     = '& > p { color: red; }';
 		$encoded = 'data:text/css;base64,' . base64_encode( $css );
 		$content = '<!-- wp:paragraph {"style":{"css":' . json_encode( $encoded, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '}} --><p>Test</p><!-- /wp:paragraph -->';
-		$result  = gutenberg_encode_custom_css_for_kses( $content );
-		$this->assertSame( $content, $result, 'Already-encoded CSS should not be modified.' );
+		$result  = parse_blocks( gutenberg_encode_custom_css_for_kses( $content ) );
+		$this->assertSame( $encoded, $result[0]['attrs']['style']['css'], 'Already-encoded CSS should not be modified.' );
 	}
 
 	/**
 	 * Tests that CSS in inner blocks is also encoded.
 	 *
 	 * @covers ::gutenberg_encode_custom_css_for_kses
-	 * @covers ::gutenberg_collect_custom_css_values_for_encoding
+	 * @covers ::gutenberg_encode_block_custom_css
 	 */
 	public function test_encode_for_kses_encodes_inner_block_css() {
 		$inner_css = '& > span { color: blue; }';
 		$encoded   = 'data:text/css;base64,' . base64_encode( $inner_css );
 		// Simulate a group block with an inner paragraph that has custom CSS.
-		$content = '<!-- wp:group --><div class="wp-block-group"><!-- wp:paragraph {"style":{"css":' . json_encode( $inner_css, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '}} --><p>Test</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
-		$result  = gutenberg_encode_custom_css_for_kses( $content );
-		$this->assertStringContainsString(
-			json_encode( $encoded, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ),
-			$result,
-			'CSS in inner blocks should be base64-encoded.'
-		);
+		$content     = '<!-- wp:group --><div class="wp-block-group"><!-- wp:paragraph {"style":{"css":' . json_encode( $inner_css, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '}} --><p>Test</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
+		$result      = parse_blocks( gutenberg_encode_custom_css_for_kses( $content ) );
+		$inner_block = $result[0]['innerBlocks'][0];
+		$this->assertSame( $encoded, $inner_block['attrs']['style']['css'], 'CSS in inner blocks should be base64-encoded.' );
 	}
 
 	/**
