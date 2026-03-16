@@ -65,12 +65,20 @@ test.describe( 'Collaboration with large documents', () => {
 			{ timeout: 15000 }
 		);
 
-		// Verify the sync connection status is 'document-size-limit-exceeded'.
+		// Verify the sync connection status is 'disconnected' with
+		// a 'document-size-limit-exceeded' error code.
 		const syncStatus = await page.evaluate( () => {
-			return window.wp.data.select( 'core' ).getSyncConnectionStatus();
+			const status = window.wp.data
+				.select( 'core' )
+				.getSyncConnectionStatus();
+			return {
+				status: status?.status,
+				errorCode: status?.error?.code,
+			};
 		} );
 		expect( syncStatus ).toEqual( {
-			status: 'document-size-limit-exceeded',
+			status: 'disconnected',
+			errorCode: 'document-size-limit-exceeded',
 		} );
 
 		// Verify that the post's entity room is no longer included in
