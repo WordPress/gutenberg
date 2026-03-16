@@ -49,6 +49,7 @@ import { transformAttachment } from '../../utils/transform-attachment';
 import { uploadMedia } from '../../utils/upload-media';
 import { unlock } from '../../lock-unlock';
 import { UploadStatusPopover } from './upload-status-popover';
+import { useInvalidateAttachmentResolutions } from './use-invalidate-attachment-resolutions';
 import { useUploadStatus } from './use-upload-status';
 
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
@@ -184,7 +185,8 @@ export function MediaUploadModal( {
 
 	const { createSuccessNotice, removeAllNotices } =
 		useDispatch( noticesStore );
-	const { invalidateResolution } = useDispatch( coreStore );
+	const invalidateAttachmentResolutions =
+		useInvalidateAttachmentResolutions();
 
 	// DataViews configuration - allow view updates
 	const [ view, setView ] = useState< View >( () => ( {
@@ -272,15 +274,11 @@ export function MediaUploadModal( {
 				setSelection( uploadedIds.slice( 0, 1 ) );
 			}
 
-			// Invalidate immediately so newly uploaded files appear in the grid.
-			// The server has already returned 201 responses at this point.
-			invalidateResolution( 'getEntityRecords', [
-				'postType',
-				'attachment',
-				queryArgs,
-			] );
+			// Invalidate all cached attachment queries so every page of
+			// results refreshes — not just the page the user is viewing.
+			invalidateAttachmentResolutions();
 		},
-		[ multiple, invalidateResolution, queryArgs ]
+		[ multiple, invalidateAttachmentResolutions ]
 	);
 
 	const {
