@@ -3,61 +3,61 @@
 		"slug": "accordion",
 		"label": "Accordion",
 		"filePath": "library/accordion.svg",
-		"category": "Content"
+		"category": "content"
 	},
 	{
 		"slug": "accordion-heading",
 		"label": "Accordion Heading",
 		"filePath": "library/accordion-heading.svg",
-		"category": "Content"
+		"category": "content"
 	},
 	{
 		"slug": "accordion-item",
 		"label": "Accordion Item",
 		"filePath": "library/accordion-item.svg",
-		"category": "Content"
+		"category": "content"
 	},
 	{
 		"slug": "add-card",
 		"label": "Add Card",
 		"filePath": "library/add-card.svg",
-		"category": "Actions"
+		"category": "actions"
 	},
 	{
 		"slug": "add-submenu",
 		"label": "Add Submenu",
 		"filePath": "library/add-submenu.svg",
-		"category": "Navigation"
+		"category": "navigation"
 	},
 	{
 		"slug": "add-template",
 		"label": "Add Template",
 		"filePath": "library/add-template.svg",
-		"category": "Actions"
+		"category": "actions"
 	},
 	{
 		"slug": "align-center",
 		"label": "Align Center",
 		"filePath": "library/align-center.svg",
-		"category": "Formatting"
+		"category": "formatting"
 	},
 	{
 		"slug": "align-justify",
 		"label": "Align Justify",
 		"filePath": "library/align-justify.svg",
-		"category": "Formatting"
+		"category": "formatting"
 	},
 	{
 		"slug": "align-left",
 		"label": "Align Left",
 		"filePath": "library/align-left.svg",
-		"category": "Formatting"
+		"category": "formatting"
 	},
 	{
 		"slug": "align-none",
 		"label": "Align None",
 		"filePath": "library/align-none.svg",
-		"category": "Formatting"
+		"category": "formatting"
 	},
 	{
 		"slug": "align-right",
