@@ -30,6 +30,11 @@ ruleTester.run( 'no-dom-globals-in-module-scope', rule, {
 		{
 			code: 'function effect() { const el = document.createElement("div"); }',
 		},
+		{
+			// Function scope in a script file should not be flagged.
+			code: 'function foo() { window.scrollTo(0, 0); }',
+			parserOptions: { ecmaVersion: 2020, sourceType: 'script' },
+		},
 	],
 	invalid: [
 		{
