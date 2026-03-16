@@ -5,7 +5,12 @@
  */
 import { Page } from '@wordpress/admin-ui';
 import { __, sprintf } from '@wordpress/i18n';
-import { createElement, useEffect, useState } from '@wordpress/element';
+import {
+	createElement,
+	useEffect,
+	useState,
+	useSyncExternalStore,
+} from '@wordpress/element';
 import {
 	Spinner,
 	Navigator,
@@ -23,6 +28,8 @@ import { fetchContentGuidelines } from './api';
 import BlockGuidelines from './components/block-guidelines';
 import ActionsSection from './components/actions-section';
 import RevisionHistory from './components/revision-history';
+import { EXPLORATION_STORAGE_KEY } from './explorations';
+import ExplorationB from './components/exploration-b';
 
 const GUIDELINE_ITEMS = [
 	{
@@ -64,7 +71,28 @@ const GUIDELINE_ITEMS = [
 	},
 ];
 
-function ContentGuidelinesPage() {
+/**
+ * Hook to read the current exploration from localStorage.
+ * Uses useSyncExternalStore so changes from the admin bar
+ * dropdown are picked up instantly (no page reload).
+ */
+function useExploration(): string {
+	return useSyncExternalStore(
+		( callback ) => {
+			const handler = () => callback();
+			window.addEventListener( 'exploration-changed', handler );
+			window.addEventListener( 'storage', handler );
+			return () => {
+				window.removeEventListener( 'exploration-changed', handler );
+				window.removeEventListener( 'storage', handler );
+			};
+		},
+		() =>
+			window.localStorage.getItem( EXPLORATION_STORAGE_KEY ) || 'A'
+	);
+}
+
+function BaselineContentGuidelinesPage() {
 	const [ loading, setLoading ] = useState( true );
 	const [ error, setError ] = useState< string | null >( null );
 
@@ -178,6 +206,17 @@ function ContentGuidelinesPage() {
 			) }
 		</Page>
 	);
+}
+
+function ContentGuidelinesPage() {
+	const exploration = useExploration();
+
+	switch ( exploration ) {
+		case 'B':
+			return <ExplorationB />;
+		default:
+			return <BaselineContentGuidelinesPage />;
+	}
 }
 
 export const stage = ContentGuidelinesPage;

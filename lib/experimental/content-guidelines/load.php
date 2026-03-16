@@ -7,6 +7,7 @@
 
 add_action( 'admin_menu', 'gutenberg_register_content_guidelines_settings_submenu', 10 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_content_guidelines_enqueue_block_registry_scripts', 5 );
+add_action( 'admin_bar_menu', 'gutenberg_content_guidelines_admin_bar_explorations', 100 );
 
 /**
  * Registers the Content Guidelines submenu item under Settings.
@@ -40,4 +41,82 @@ function gutenberg_content_guidelines_enqueue_block_registry_scripts( $hook_suff
 	}
 
 	wp_enqueue_script( 'wp-block-library' );
+}
+
+/**
+ * Adds an "Explorations" dropdown to the admin bar on the Content Guidelines page.
+ * This allows toggling between different UI variations without changing code.
+ *
+ * @param WP_Admin_Bar $wp_admin_bar The admin bar instance.
+ */
+function gutenberg_content_guidelines_admin_bar_explorations( $wp_admin_bar ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	$screen = get_current_screen();
+	if ( ! $screen || 'settings_page_content-guidelines-wp-admin' !== $screen->id ) {
+		return;
+	}
+
+	$explorations = array(
+		'A' => 'Option A (Per-Section)',
+		'B' => 'Option B (Suggest All)',
+		'C' => 'Option C',
+		'D' => 'Option D',
+		'E' => 'Option E',
+		'F' => 'Option F',
+	);
+
+	$wp_admin_bar->add_node(
+		array(
+			'id'    => 'content-guidelines-explorations',
+			'title' => 'Explorations: <span id="cg-exploration-current">Current</span>',
+			'href'  => '#',
+		)
+	);
+
+	foreach ( $explorations as $key => $label ) {
+		$wp_admin_bar->add_node(
+			array(
+				'parent' => 'content-guidelines-explorations',
+				'id'     => 'cg-exploration-' . strtolower( $key ),
+				'title'  => $label,
+				'href'   => '#',
+				'meta'   => array(
+					'onclick' => "cgSetExploration('" . esc_js( $key ) . "'); return false;",
+				),
+			)
+		);
+	}
+
+	// Inline JS to handle clicks, localStorage, and custom event dispatch.
+	add_action(
+		'admin_footer',
+		function () {
+			?>
+			<script>
+			(function() {
+				var STORAGE_KEY = 'content-guidelines-exploration';
+				var currentEl = document.getElementById('cg-exploration-current');
+
+				function updateLabel() {
+					var val = localStorage.getItem(STORAGE_KEY) || 'A';
+					if (currentEl) {
+						currentEl.textContent = val;
+					}
+				}
+
+				window.cgSetExploration = function(key) {
+					localStorage.setItem(STORAGE_KEY, key);
+					updateLabel();
+					window.dispatchEvent(new CustomEvent('exploration-changed'));
+				};
+
+				updateLabel();
+			})();
+			</script>
+			<?php
+		}
+	);
 }

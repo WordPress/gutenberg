@@ -4,6 +4,7 @@
  * WordPress dependencies
  */
 import {
+	BaseControl,
 	Button,
 	ComboboxControl,
 	Modal,
@@ -14,7 +15,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Notice } from '@wordpress/ui';
-import { createElement, useMemo, useState } from '@wordpress/element';
+import { createElement, useMemo, useRef, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	privateApis as blocksPrivateApis,
@@ -28,6 +29,8 @@ import { store as noticesStore } from '@wordpress/notices';
 import { saveContentGuidelines } from '../api';
 import { STORE_NAME } from '../store';
 import { unlock } from '../../lock-unlock';
+import { useAiGuidelines } from '../ai/use-ai-guidelines';
+import DiffEditor from './diff-editor';
 import './block-guideline-modal.scss';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -58,6 +61,38 @@ export default function BlockGuidelineModal( {
 
 	const currentGuideline = blockGuidelines[ selectedBlock ] ?? '';
 	const [ guidelineText, setGuidelineText ] = useState( currentGuideline );
+
+	// AI generation
+	const {
+		blockSuggestions,
+		blockGeneratingState,
+		generateBlock,
+		acceptBlockSuggestion,
+		dismissBlockSuggestion,
+	} = useAiGuidelines();
+
+	const preImproveDraft = useRef< string >( '' );
+
+	const isBlockGenerating =
+		selectedBlock &&
+		( blockGeneratingState[ selectedBlock ] === 'requesting' ||
+			blockGeneratingState[ selectedBlock ] === 'streaming' );
+
+	const showDiff =
+		selectedBlock &&
+		blockGeneratingState[ selectedBlock ] === 'done' &&
+		blockSuggestions[ selectedBlock ] !== undefined;
+
+	// Sync streaming suggestion into guidelineText
+	const blockSuggestion = selectedBlock
+		? blockSuggestions[ selectedBlock ]
+		: undefined;
+	if ( blockSuggestion !== undefined && isBlockGenerating ) {
+		// During streaming, reflect the partial suggestion
+		if ( guidelineText !== blockSuggestion ) {
+			setGuidelineText( blockSuggestion );
+		}
+	}
 
 	const blockOptions = useSelect(
 		// @ts-ignore
@@ -122,7 +157,42 @@ export default function BlockGuidelineModal( {
 			.finally( () => setIsSaving( false ) );
 	};
 
+	const handleGenerate = ( e: React.MouseEvent< HTMLButtonElement > ) => {
+		e.preventDefault();
+		( e.target as HTMLButtonElement ).blur();
+		if ( ! selectedBlock ) {
+			return;
+		}
+		preImproveDraft.current = guidelineText;
+		generateBlock( selectedBlock );
+	};
+
+	const handleAcceptBlock = ( e: React.MouseEvent< HTMLButtonElement > ) => {
+		e.preventDefault();
+		if ( ! selectedBlock ) {
+			return;
+		}
+		// Keep the suggestion in guidelineText (already synced during streaming).
+		setGuidelineText( blockSuggestions[ selectedBlock ] || guidelineText );
+		acceptBlockSuggestion( selectedBlock );
+	};
+
+	const handleDismissBlock = ( e: React.MouseEvent< HTMLButtonElement > ) => {
+		e.preventDefault();
+		if ( ! selectedBlock ) {
+			return;
+		}
+		// Revert to pre-suggestion value.
+		setGuidelineText( preImproveDraft.current );
+		dismissBlockSuggestion( selectedBlock );
+	};
+
 	const canSubmit = selectedBlock && guidelineText.trim().length > 0;
+	const isActionDisabled = isSaving || !! showDiff || !! isBlockGenerating;
+
+	const generateLabel = guidelineText.trim().length > 0
+		? __( 'Improve guidelines' )
+		: __( 'Generate guidelines' );
 
 	let submitButtonLabel: string = __( 'Add guideline' );
 	if ( isSaving ) {
@@ -162,15 +232,57 @@ export default function BlockGuidelineModal( {
 						placeholder={ __( 'Search for a block…' ) }
 					/>
 				) }
-				<TextareaControl
+				<BaseControl
 					label={ __( 'Guideline text' ) }
-					value={ guidelineText }
-					onChange={ setGuidelineText }
-					placeholder={ __(
-						'Enter guidelines for how this block should be used…'
+					id="block-guideline-text"
+				>
+					{ showDiff ? (
+						<div className="content-guidelines__diff-wrapper has-suggestion">
+							<DiffEditor
+								original={ preImproveDraft.current }
+								suggested={
+									blockSuggestions[ selectedBlock! ] || ''
+								}
+							/>
+						</div>
+					) : (
+						<div
+							className={ `block-guideline-modal__textarea-wrapper${
+								isBlockGenerating ? ' is-streaming' : ''
+							}` }
+						>
+							<TextareaControl
+								label={ __( 'Guideline text' ) }
+								hideLabelFromVision
+								value={ guidelineText }
+								onChange={ setGuidelineText }
+								placeholder={ __(
+									'Enter guidelines for how this block should be used…'
+								) }
+								rows={ 6 }
+								disabled={ !! isBlockGenerating }
+							/>
+						</div>
 					) }
-					rows={ 6 }
-				/>
+				</BaseControl>
+				{ showDiff && (
+					<HStack spacing={ 3 } justify="flex-start" style={ { marginTop: '12px' } }>
+						<Button
+							variant="primary"
+							onClick={ handleAcceptBlock }
+							__next40pxDefaultSize
+						>
+							{ __( 'Accept' ) }
+						</Button>
+						<Button
+							variant="tertiary"
+							onClick={ handleDismissBlock }
+							__next40pxDefaultSize
+						>
+							{ __( 'Dismiss' ) }
+						</Button>
+					</HStack>
+				) }
 				{ error && (
 					<Notice.Root intent="error">
 						<Notice.Title>
@@ -183,32 +295,42 @@ export default function BlockGuidelineModal( {
 					</Notice.Root>
 				) }
 				<HStack
-					justify="flex-end"
+					justify="space-between"
 					spacing={ 2 }
 					className="block-guideline-modal__actions"
 				>
-					{ isEditing && (
+					<Button
+						variant="secondary"
+						onClick={ handleGenerate }
+						disabled={ ! selectedBlock || !! isBlockGenerating || !! showDiff }
+						accessibleWhenDisabled
+						isBusy={ !! isBlockGenerating }
+						__next40pxDefaultSize
+					>
+						{ generateLabel }
+					</Button>
+					<HStack spacing={ 2 } justify="flex-end">
+						{ isEditing && (
+							<Button
+								variant="tertiary"
+								isDestructive
+								onClick={ () => handleSave( '' ) }
+								disabled={ isActionDisabled }
+								accessibleWhenDisabled
+							>
+								{ __( 'Remove' ) }
+							</Button>
+						) }
 						<Button
-							variant="tertiary"
-							isDestructive
-							// We need to pass an empty string to remove the guideline.
-							// This is because the API will only remove the guideline if the value is an empty string.
-							onClick={ () => handleSave( '' ) }
-							disabled={ isSaving }
+							variant="primary"
+							onClick={ () => handleSave( guidelineText ) }
+							disabled={ ! canSubmit || isActionDisabled }
+							isBusy={ isSaving }
 							accessibleWhenDisabled
 						>
-							{ __( 'Remove' ) }
+							{ submitButtonLabel }
 						</Button>
-					) }
-					<Button
-						variant="primary"
-						onClick={ () => handleSave( guidelineText ) }
-						disabled={ ! canSubmit || isSaving }
-						isBusy={ isSaving }
-						accessibleWhenDisabled
-					>
-						{ submitButtonLabel }
-					</Button>
+					</HStack>
 				</HStack>
 			</VStack>
 		</Modal>

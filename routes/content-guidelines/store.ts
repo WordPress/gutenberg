@@ -158,6 +158,16 @@ const selectors = {
 	getStatus( state: ContentGuidelinesState ): string | null {
 		return state.status;
 	},
+	isGuidelinesEmpty( state: ContentGuidelinesState ): boolean {
+		const { site, copy, images, additional, blocks } = state.categories;
+		return (
+			! site.trim() &&
+			! copy.trim() &&
+			! images.trim() &&
+			! additional.trim() &&
+			Object.keys( blocks ).length === 0
+		);
+	},
 };
 
 export const store = createReduxStore( STORE_NAME, {
