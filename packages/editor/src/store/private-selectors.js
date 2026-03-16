@@ -323,6 +323,16 @@ export function isRevisionsMode( state ) {
 }
 
 /**
+ * Returns whether the revision diff highlighting is shown.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether revision diff is being shown.
+ */
+export function isShowingRevisionDiff( state ) {
+	return state.showRevisionDiff;
+}
+
+/**
  * Returns the current revision ID in revisions mode.
  *
  * @param {Object} state Global application state.

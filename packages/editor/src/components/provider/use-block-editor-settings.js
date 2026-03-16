@@ -140,6 +140,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		sectionRootClientId,
 		deviceType,
 		isNavigationOverlayContext,
+		isRevisionsMode,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -151,7 +152,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
-			const { getDeviceType } = unlock( select( editorStore ) );
+			const { getDeviceType, isRevisionsMode: _isRevisionsMode } = unlock(
+				select( editorStore )
+			);
 			const { getBlocksByName, getBlockAttributes } =
 				select( blockEditorStore );
 			const siteSettings = canUser( 'read', {
@@ -219,6 +222,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 								postId
 						  )?.area === 'navigation-overlay'
 						: false,
+				isRevisionsMode: _isRevisionsMode(),
 			};
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
@@ -401,8 +405,13 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
 		};
 
+		if ( isRevisionsMode ) {
+			blockEditorSettings.isPreviewMode = true;
+		}
+
 		return blockEditorSettings;
 	}, [
+		isRevisionsMode,
 		allowedBlockTypes,
 		allowRightClickOverrides,
 		focusMode,

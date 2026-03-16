@@ -1,6 +1,6 @@
 # Schemas
 
-The collection of schemas used in WordPress, including the `theme.json`, `block.json` and `font-collection.json` schemas.
+The collection of schemas used in WordPress, including the `theme.json`, `block.json`, `font-collection.json`, and `wp-env.json` schemas.
 
 JSON schemas are used by code editors to offer tooltips, autocomplete, and validation.
 
@@ -29,6 +29,14 @@ Or in your `font-collection.json`:
 ```json
 {
 	"$schema": "https://schemas.wp.org/trunk/font-collection.json"
+}
+```
+
+Or in your `.wp-env.json`:
+
+```json
+{
+	"$schema": "https://schemas.wp.org/trunk/wp-env.json"
 }
 ```
 
