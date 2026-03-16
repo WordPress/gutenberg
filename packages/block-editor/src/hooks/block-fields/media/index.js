@@ -75,7 +75,7 @@ function MediaThumbnail( { data, field, attachment, config } ) {
 		if ( allowedTypes[ 0 ] === 'image' && url ) {
 			return (
 				<div className="block-editor-content-only-controls__media-thumbnail">
-					<img alt="" width={ 24 } height={ 24 } src={ url } />
+					<img alt="" width={ 20 } height={ 20 } src={ url } />
 				</div>
 			);
 		}
@@ -92,11 +92,11 @@ function MediaThumbnail( { data, field, attachment, config } ) {
 		}
 
 		if ( icon ) {
-			return <Icon icon={ icon } size={ 24 } />;
+			return <Icon icon={ icon } size={ 20 } />;
 		}
 	}
 
-	return <Icon icon={ mediaIcon } size={ 24 } />;
+	return <Icon icon={ mediaIcon } size={ 20 } />;
 }
 
 export default function Media( { data, field, onChange, config = {} } ) {
@@ -212,7 +212,7 @@ export default function Media( { data, field, onChange, config = {} } ) {
 							<Grid
 								rowGap={ 0 }
 								columnGap={ 8 }
-								templateColumns="24px 1fr"
+								templateColumns="20px 1fr"
 								className="block-editor-content-only-controls__media-row"
 							>
 								{ url && (
@@ -239,8 +239,8 @@ export default function Media( { data, field, onChange, config = {} } ) {
 										<span
 											className="block-editor-content-only-controls__media-placeholder"
 											style={ {
-												width: '24px',
-												height: '24px',
+												width: '20px',
+												height: '20px',
 											} }
 										/>
 										<span className="block-editor-content-only-controls__media-title">
