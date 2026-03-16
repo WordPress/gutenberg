@@ -2,6 +2,7 @@ import { SelectionDirection, SelectionType } from '@wordpress/core-data';
 import type {
 	ResolvedSelection,
 	ResolvedBlockSelection,
+	SelectionInTitle,
 } from '@wordpress/core-data';
 
 import {
@@ -154,7 +155,7 @@ function computeTitleCursorOnly(
  * @param overlayContext
  */
 function computeTitleTextSelection(
-	selection: any,
+	selection: SelectionInTitle,
 	start: ResolvedSelection,
 	end: ResolvedSelection,
 	overlayContext: OverlayContext
