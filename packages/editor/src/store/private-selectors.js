@@ -55,14 +55,36 @@ export const getInserter = createRegistrySelector( ( select ) =>
 			}
 
 			if ( getRenderingMode( state ) === 'template-locked' ) {
+				const {
+					getBlocksByName,
+					getSelectedBlockClientId,
+					getBlockParents,
+					getBlockOrder,
+				} = select( blockEditorStore );
 				const [ postContentClientId ] =
-					select( blockEditorStore ).getBlocksByName(
-						'core/post-content'
-					);
+					getBlocksByName( 'core/post-content' );
 				if ( postContentClientId ) {
+					const selectedBlockClientId = getSelectedBlockClientId();
+
+					// If a block inside Post Content is selected,
+					// let the inserter use its default logic for determining the
+					// insertion position by returning an empty insertion point.
+					if (
+						selectedBlockClientId &&
+						selectedBlockClientId !== postContentClientId &&
+						getBlockParents( selectedBlockClientId ).includes(
+							postContentClientId
+						)
+					) {
+						return EMPTY_INSERTION_POINT;
+					}
+
+					// Otherwise (no selection, or Post Content itself
+					// is selected), insert at the end of Post Content.
 					return {
 						rootClientId: postContentClientId,
-						insertionIndex: undefined,
+						insertionIndex:
+							getBlockOrder( postContentClientId ).length,
 						filterValue: undefined,
 					};
 				}
@@ -71,14 +93,26 @@ export const getInserter = createRegistrySelector( ( select ) =>
 			return EMPTY_INSERTION_POINT;
 		},
 		( state ) => {
+			const {
+				getBlocksByName,
+				getSelectedBlockClientId,
+				getBlockParents,
+				getBlockOrder,
+			} = select( blockEditorStore );
 			const [ postContentClientId ] =
-				select( blockEditorStore ).getBlocksByName(
-					'core/post-content'
-				);
+				getBlocksByName( 'core/post-content' );
+			const selectedBlockClientId = getSelectedBlockClientId();
 			return [
 				state.blockInserterPanel,
 				getRenderingMode( state ),
 				postContentClientId,
+				selectedBlockClientId,
+				selectedBlockClientId
+					? getBlockParents( selectedBlockClientId )
+					: undefined,
+				postContentClientId
+					? getBlockOrder( postContentClientId ).length
+					: undefined,
 			];
 		}
 	)
