@@ -95,7 +95,7 @@ const REVISION_DIFF_STYLES = `
 function withRevisionDiffClasses( BlockListBlock ) {
 	return ( props ) => {
 		const { block, className } = props;
-		const diffStatus = block?.__revisionDiffStatus;
+		const diffStatus = block?.__revisionDiffStatus?.status;
 
 		const enhancedClassName = clsx( className, {
 			'is-revision-added': diffStatus === 'added',
