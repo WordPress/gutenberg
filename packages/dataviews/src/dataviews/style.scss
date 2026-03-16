@@ -15,7 +15,6 @@
 .dataviews-wrapper,
 .dataviews-picker-wrapper {
 	height: 100%;
-	overflow: auto;
 	box-sizing: border-box;
 	scroll-padding-bottom: $grid-unit-80;
 	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
