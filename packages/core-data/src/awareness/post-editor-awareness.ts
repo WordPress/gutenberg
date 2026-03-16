@@ -43,6 +43,11 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	protected onSetUp(): void {
 		super.onSetUp();
 
+		// Clean up any prior subscription before creating a new one.
+		if ( this.selectionSubscription ) {
+			this.selectionSubscription.unsubscribe();
+		}
+
 		this.selectionSubscription = createSelectionSubscription(
 			this.doc,
 			this.kind,
