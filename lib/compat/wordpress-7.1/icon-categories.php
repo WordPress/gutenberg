@@ -73,5 +73,6 @@ if ( ! function_exists( '_register_core_icon_categories' ) ) {
 			register_icon_category( $slug, $properties );
 		}
 	}
+
+	add_action( 'init', '_register_core_icon_categories' );
 }
-add_action( 'init', '_register_core_icon_categories' );
