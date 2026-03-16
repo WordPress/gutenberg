@@ -568,4 +568,116 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 
 		$this->assertArrayNotHasKey( 'className', $result['attrs'], 'Block should not render when decoded CSS contains HTML markup.' );
 	}
+
+	// Tests for gutenberg_encode_custom_css_for_kses().
+
+	/**
+	 * Tests that content without blocks is returned unchanged.
+	 *
+	 * @covers ::gutenberg_encode_custom_css_for_kses
+	 */
+	public function test_encode_for_kses_ignores_non_block_content() {
+		$content = '<p>Hello world</p>';
+		$this->assertSame( $content, gutenberg_encode_custom_css_for_kses( $content ) );
+	}
+
+	/**
+	 * Tests that CSS without KSES-sensitive characters is still encoded.
+	 * All CSS is encoded uniformly regardless of content, for consistent storage.
+	 *
+	 * @covers ::gutenberg_encode_custom_css_for_kses
+	 */
+	public function test_encode_for_kses_encodes_safe_css() {
+		$css     = 'color: red; font-size: 16px;';
+		$encoded = 'data:text/css;base64,' . base64_encode( $css );
+		$content = '<!-- wp:paragraph {"style":{"css":' . json_encode( $css, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '}} --><p>Test</p><!-- /wp:paragraph -->';
+		$result  = gutenberg_encode_custom_css_for_kses( $content );
+		$this->assertStringContainsString(
+			json_encode( $encoded, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ),
+			$result,
+			'All CSS should be encoded, including values with no KSES-sensitive characters.'
+		);
+	}
+
+	/**
+	 * Tests that CSS with `&` is encoded before KSES can corrupt it.
+	 *
+	 * @covers ::gutenberg_encode_custom_css_for_kses
+	 */
+	public function test_encode_for_kses_encodes_css_with_ampersand() {
+		$css     = '& > p { color: red; }';
+		$content = '<!-- wp:paragraph {"style":{"css":' . json_encode( $css, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '}} --><p>Test</p><!-- /wp:paragraph -->';
+		$result  = gutenberg_encode_custom_css_for_kses( $content );
+		$this->assertStringNotContainsString( $css, $result, 'Original CSS should be replaced.' );
+		$this->assertStringContainsString( 'data:text/css;base64,', $result, 'Result should contain base64-encoded CSS.' );
+	}
+
+	/**
+	 * Tests the primary bug scenario: nested CSS selectors survive encoding for KSES.
+	 *
+	 * @covers ::gutenberg_encode_custom_css_for_kses
+	 */
+	public function test_encode_for_kses_encodes_nested_css_selectors() {
+		$css     = 'background: green; & p { color: yellow; padding: 20px; }';
+		$encoded = 'data:text/css;base64,' . base64_encode( $css );
+		$content = '<!-- wp:paragraph {"style":{"css":' . json_encode( $css, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '}} --><p>Test</p><!-- /wp:paragraph -->';
+		$result  = gutenberg_encode_custom_css_for_kses( $content );
+		$this->assertStringContainsString(
+			json_encode( $encoded, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ),
+			$result,
+			'CSS should be base64-encoded in the block comment.'
+		);
+	}
+
+	/**
+	 * Tests that already-encoded CSS is not double-encoded.
+	 *
+	 * @covers ::gutenberg_encode_custom_css_for_kses
+	 */
+	public function test_encode_for_kses_does_not_double_encode() {
+		$css     = '& > p { color: red; }';
+		$encoded = 'data:text/css;base64,' . base64_encode( $css );
+		$content = '<!-- wp:paragraph {"style":{"css":' . json_encode( $encoded, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '}} --><p>Test</p><!-- /wp:paragraph -->';
+		$result  = gutenberg_encode_custom_css_for_kses( $content );
+		$this->assertSame( $content, $result, 'Already-encoded CSS should not be modified.' );
+	}
+
+	/**
+	 * Tests that CSS in inner blocks is also encoded.
+	 *
+	 * @covers ::gutenberg_encode_custom_css_for_kses
+	 * @covers ::gutenberg_collect_custom_css_values_for_encoding
+	 */
+	public function test_encode_for_kses_encodes_inner_block_css() {
+		$inner_css = '& > span { color: blue; }';
+		$encoded   = 'data:text/css;base64,' . base64_encode( $inner_css );
+		// Simulate a group block with an inner paragraph that has custom CSS.
+		$content = '<!-- wp:group --><div class="wp-block-group"><!-- wp:paragraph {"style":{"css":' . json_encode( $inner_css, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '}} --><p>Test</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
+		$result  = gutenberg_encode_custom_css_for_kses( $content );
+		$this->assertStringContainsString(
+			json_encode( $encoded, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ),
+			$result,
+			'CSS in inner blocks should be base64-encoded.'
+		);
+	}
+
+	/**
+	 * Tests that encoded CSS round-trips correctly: encode_for_kses + decode_for_display
+	 * restores the original CSS.
+	 *
+	 * @covers ::gutenberg_encode_custom_css_for_kses
+	 * @covers ::gutenberg_decode_custom_css_attribute_for_display
+	 */
+	public function test_encode_for_kses_round_trips_with_decode() {
+		$css     = 'background: green; & p { color: yellow; }';
+		$content = '<!-- wp:paragraph {"style":{"css":' . json_encode( $css, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '}} --><p>Test</p><!-- /wp:paragraph -->';
+		$encoded_content = gutenberg_encode_custom_css_for_kses( $content );
+
+		// Extract the encoded CSS value from the result.
+		$blocks      = parse_blocks( $encoded_content );
+		$stored_css  = $blocks[0]['attrs']['style']['css'];
+		$decoded_css = gutenberg_decode_custom_css_attribute_for_display( $stored_css );
+
+		$this->assertSame( $css, $decoded_css, 'CSS should survive the encode → store → decode round-trip.' );
+	}
 }

@@ -42,6 +42,7 @@ const CSS_BASE64_PREFIX = 'data:text/css;base64,';
 
 /**
  * Encodes a CSS string as a base64 data URI so it survives wp_kses intact.
+ * See: https://developer.mozilla.org/en-US/docs/Web/API/Window/btoa.
  *
  * @param {string} css Raw CSS string.
  * @return {string} Encoded value.
