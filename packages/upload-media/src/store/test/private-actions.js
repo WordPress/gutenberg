@@ -253,25 +253,25 @@ describe( 'private actions', () => {
 	} );
 
 	describe( 'finalizeItem', () => {
-		it( 'should call finalizeUpload with the attachment ID', async () => {
-			const finalizeUpload = jest.fn().mockResolvedValue( undefined );
+		it( 'should call mediaFinalize with the attachment ID', async () => {
+			const mediaFinalize = jest.fn().mockResolvedValue( undefined );
 			const finishOperation = jest.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: { id: 42 },
 				} ),
-				getSettings: () => ( { finalizeUpload } ),
+				getSettings: () => ( { mediaFinalize } ),
 			};
 			const dispatch = { finishOperation };
 
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
 
-			expect( finalizeUpload ).toHaveBeenCalledWith( 42 );
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42 );
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
 		} );
 
-		it( 'should not call finalizeUpload when no callback is provided', async () => {
+		it( 'should not call mediaFinalize when no callback is provided', async () => {
 			const finishOperation = jest.fn();
 			const select = {
 				getItem: () => ( {
@@ -287,26 +287,26 @@ describe( 'private actions', () => {
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
 		} );
 
-		it( 'should not call finalizeUpload when there is no attachment ID', async () => {
-			const finalizeUpload = jest.fn();
+		it( 'should not call mediaFinalize when there is no attachment ID', async () => {
+			const mediaFinalize = jest.fn();
 			const finishOperation = jest.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: {},
 				} ),
-				getSettings: () => ( { finalizeUpload } ),
+				getSettings: () => ( { mediaFinalize } ),
 			};
 			const dispatch = { finishOperation };
 
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
 
-			expect( finalizeUpload ).not.toHaveBeenCalled();
+			expect( mediaFinalize ).not.toHaveBeenCalled();
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
 		} );
 
-		it( 'should handle finalizeUpload errors gracefully', async () => {
-			const finalizeUpload = jest
+		it( 'should handle mediaFinalize errors gracefully', async () => {
+			const mediaFinalize = jest
 				.fn()
 				.mockRejectedValue( new Error( 'Network error' ) );
 			const finishOperation = jest.fn();
@@ -317,14 +317,14 @@ describe( 'private actions', () => {
 				getItem: () => ( {
 					attachment: { id: 42 },
 				} ),
-				getSettings: () => ( { finalizeUpload } ),
+				getSettings: () => ( { mediaFinalize } ),
 			};
 			const dispatch = { finishOperation };
 
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
 
-			expect( finalizeUpload ).toHaveBeenCalledWith( 42 );
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42 );
 			expect( warnSpy ).toHaveBeenCalledWith(
 				'Media finalization failed:',
 				expect.any( Error )

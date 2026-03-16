@@ -182,7 +182,7 @@ export interface Settings {
 	// Default is 0.82 if not set.
 	imageQuality?: number;
 	// Function for finalizing an upload after all client-side processing is complete.
-	finalizeUpload?: ( id: number ) => Promise< void >;
+	mediaFinalize?: ( id: number ) => Promise< void >;
 }
 
 // Matches the Attachment type from the media-utils package.

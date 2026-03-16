@@ -338,7 +338,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				: undefined,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			mediaSideload: hasUploadPermissions ? mediaSideload : undefined,
-			finalizeUpload: hasUploadPermissions ? mediaFinalize : undefined,
+			mediaFinalize: hasUploadPermissions ? mediaFinalize : undefined,
 			__experimentalBlockPatterns: blockPatterns,
 			[ selectBlockPatternsKey ]: ( select ) => {
 				const { hasFinishedResolution, getBlockPatternsForPostType } =

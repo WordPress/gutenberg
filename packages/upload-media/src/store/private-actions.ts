@@ -1297,12 +1297,12 @@ export function finalizeItem( id: QueueItemId ) {
 		}
 
 		const attachment = item.attachment;
-		const { finalizeUpload } = select.getSettings();
+		const { mediaFinalize } = select.getSettings();
 
-		// Only finalize if we have an attachment ID and a finalizeUpload callback.
-		if ( attachment?.id && finalizeUpload ) {
+		// Only finalize if we have an attachment ID and a mediaFinalize callback.
+		if ( attachment?.id && mediaFinalize ) {
 			try {
-				await finalizeUpload( attachment.id );
+				await mediaFinalize( attachment.id );
 			} catch ( error ) {
 				// Log but don't fail the upload if finalization fails.
 				// eslint-disable-next-line no-console
