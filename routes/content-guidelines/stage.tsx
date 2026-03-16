@@ -64,6 +64,17 @@ const GUIDELINE_ITEMS = [
 	},
 ];
 
+function getInitialNavigatorPath() {
+	let view = '';
+
+	if ( window?.location?.href ) {
+		const url = new URL( window.location.href );
+		view = url.searchParams.get( 'view' ) ?? '';
+	}
+
+	return `/${ view }`;
+}
+
 function ContentGuidelinesPage() {
 	const [ loading, setLoading ] = useState( true );
 	const [ error, setError ] = useState< string | null >( null );
@@ -107,7 +118,7 @@ function ContentGuidelinesPage() {
 				</div>
 			) : (
 				! error && (
-					<Navigator initialPath="/">
+					<Navigator initialPath={ getInitialNavigatorPath() }>
 						<Navigator.Screen path="/">
 							<VStack className="content-guidelines__content">
 								{ /*

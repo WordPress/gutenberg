@@ -1,3 +1,5 @@
+/* @jsx createElement */
+
 /**
  * WordPress dependencies
  */
@@ -11,7 +13,12 @@ import {
 } from '@wordpress/components';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	createElement,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
@@ -183,11 +190,20 @@ export default function RevisionHistory() {
 		}
 	}
 
+	const navigateToGuidelines = () => {
+		if ( window?.location?.href ) {
+			const url = new URL( window.location.href );
+			url.searchParams.delete( 'view' );
+			window.history.replaceState( {}, '', url.toString() );
+		}
+	};
+
 	return (
 		<div className="content-guidelines__revision-history">
 			<Navigator.BackButton
 				icon={ isRTL() ? chevronRight : chevronLeft }
 				className="content-guidelines__revision-history-back"
+				onClick={ navigateToGuidelines }
 			>
 				{ __( 'Revision history' ) }
 			</Navigator.BackButton>

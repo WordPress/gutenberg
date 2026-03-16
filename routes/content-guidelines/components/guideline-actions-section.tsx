@@ -84,6 +84,16 @@ export default function GuidelineActionsSection() {
 		}
 	}
 
+	function navigateToRevisionHistory() {
+		if ( window?.location?.href ) {
+			const url = new URL( window.location.href );
+			url.searchParams.set( 'view', 'revision-history' );
+			window.history.replaceState( {}, '', url.toString() );
+		}
+
+		goTo( '/revision-history' );
+	}
+
 	const ACTIONS = [
 		{
 			slug: 'import',
@@ -109,7 +119,7 @@ export default function GuidelineActionsSection() {
 			description: __( 'Use a previous version of your guidelines.' ),
 			buttonLabel: __( 'View history' ),
 			ariaLabel: __( 'View history of guidelines' ),
-			onClick: () => goTo( '/revision-history' ),
+			onClick: navigateToRevisionHistory,
 		},
 	];
 
