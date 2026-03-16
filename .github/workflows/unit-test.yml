@@ -229,7 +229,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2.36.0
+              uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -238,12 +238,12 @@ jobs:
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520 # v3.1.1
+              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # v4.0.0
               with:
                   custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
             - name: Download built JavaScript assets
-              uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
                   name: build-assets
                   path: build
@@ -324,7 +324,7 @@ jobs:
                   persist-credentials: false
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2.36.0
+              uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
               with:
                   php-version: '7.4'
                   coverage: none
@@ -345,7 +345,7 @@ jobs:
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520 # v3.1.1
+              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # v4.0.0
               with:
                   custom-cache-suffix: ${{ steps.get-date.outputs.date }}
 

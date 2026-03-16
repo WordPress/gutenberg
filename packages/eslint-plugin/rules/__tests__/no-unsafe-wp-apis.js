@@ -64,7 +64,6 @@ ruleTester.run( 'no-unsafe-wp-apis', rule, {
 				{
 					message: `Usage of \`__experimentalUnsafe\` from \`@wordpress/package\` is not allowed.
 See https://developer.wordpress.org/block-editor/contributors/develop/coding-guidelines/#experimental-and-unstable-apis for details.`,
-					type: 'ImportSpecifier',
 				},
 			],
 		},
@@ -75,7 +74,6 @@ See https://developer.wordpress.org/block-editor/contributors/develop/coding-gui
 				{
 					message: `Usage of \`__experimentalSafe\` from \`@wordpress/unsafe\` is not allowed.
 See https://developer.wordpress.org/block-editor/contributors/develop/coding-guidelines/#experimental-and-unstable-apis for details.`,
-					type: 'ImportSpecifier',
 				},
 			],
 		},
@@ -86,7 +84,6 @@ See https://developer.wordpress.org/block-editor/contributors/develop/coding-gui
 				{
 					message: `Usage of \`__experimentalSafe\` from \`@wordpress/unsafe\` is not allowed.
 See https://developer.wordpress.org/block-editor/contributors/develop/coding-guidelines/#experimental-and-unstable-apis for details.`,
-					type: 'ImportSpecifier',
 				},
 			],
 		},
@@ -97,7 +94,6 @@ See https://developer.wordpress.org/block-editor/contributors/develop/coding-gui
 				{
 					message: `Usage of \`__experimentalUnsafe\` from \`@wordpress/package\` is not allowed.
 See https://developer.wordpress.org/block-editor/contributors/develop/coding-guidelines/#experimental-and-unstable-apis for details.`,
-					type: 'ImportSpecifier',
 				},
 			],
 		},
@@ -108,7 +104,6 @@ See https://developer.wordpress.org/block-editor/contributors/develop/coding-gui
 				{
 					message: `Usage of \`__unstableFeature\` from \`@wordpress/package\` is not allowed.
 See https://developer.wordpress.org/block-editor/contributors/develop/coding-guidelines/#experimental-and-unstable-apis for details.`,
-					type: 'ImportSpecifier',
 				},
 			],
 		},
