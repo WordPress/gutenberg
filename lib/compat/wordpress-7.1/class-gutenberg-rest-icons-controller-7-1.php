@@ -88,7 +88,6 @@ class Gutenberg_REST_Icons_Controller_7_1 extends WP_REST_Icons_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function prepare_item_for_response( $item, $request ) {
-		$fields = $this->get_fields_for_response( $request );
 		$keys   = array(
 			'name'     => 'name',
 			'label'    => 'label',
