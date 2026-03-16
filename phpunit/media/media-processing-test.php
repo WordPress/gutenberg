@@ -121,6 +121,7 @@ class Media_Processing_Test extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'png_interlaced', $data );
 		$this->assertArrayNotHasKey( 'gif_interlaced', $data );
 		$this->assertArrayNotHasKey( 'image_sizes', $data );
+		$this->assertArrayNotHasKey( 'client_side_supported_mime_types', $data );
 	}
 
 	/**
@@ -141,6 +142,36 @@ class Media_Processing_Test extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'png_interlaced', $data );
 		$this->assertArrayHasKey( 'gif_interlaced', $data );
 		$this->assertArrayHasKey( 'image_sizes', $data );
+		$this->assertArrayHasKey( 'client_side_supported_mime_types', $data );
+		$this->assertSame(
+			array( 'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif' ),
+			$data['client_side_supported_mime_types']
+		);
+	}
+
+	/**
+	 * @covers ::gutenberg_media_processing_filter_rest_index
+	 */
+	public function test_client_side_supported_mime_types_filter() {
+		wp_set_current_user( self::$admin_id );
+
+		$filter_callback = static function () {
+			return array( 'image/jpeg', 'image/png' );
+		};
+		add_filter( 'client_side_supported_mime_types', $filter_callback );
+
+		$server = new WP_REST_Server();
+
+		$request = new WP_REST_Request( 'GET', '/' );
+		$index   = $server->dispatch( $request );
+		$data    = $index->get_data();
+
+		remove_filter( 'client_side_supported_mime_types', $filter_callback );
+
+		$this->assertSame(
+			array( 'image/jpeg', 'image/png' ),
+			$data['client_side_supported_mime_types']
+		);
 	}
 
 	/**
