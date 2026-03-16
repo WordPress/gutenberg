@@ -106,6 +106,57 @@ export const Disabled: Story = {
 };
 
 /**
+ * Multiple collapsible cards stacked vertically, simulating a typical
+ * settings-panel or FAQ-style layout.
+ */
+export const Stacked: Story = {
+	parameters: { controls: { disable: true } },
+	render: () => (
+		<div
+			style={ {
+				display: 'flex',
+				flexDirection: 'column',
+				gap: 'var(--wpds-dimension-gap-lg)',
+			} }
+		>
+			{ [
+				'General',
+				'Advanced',
+				'Accessibility',
+				'Performance',
+				'Privacy',
+				'Notifications',
+			].map( ( title ) => (
+				<CollapsibleCard.Root key={ title }>
+					<CollapsibleCard.Header>
+						<Card.Title>{ title }</Card.Title>
+					</CollapsibleCard.Header>
+					<CollapsibleCard.Content>
+						<Text>
+							Configure all { title.toLowerCase() } settings for
+							your site. Changes here affect how your site behaves
+							across all pages and posts.
+						</Text>
+						<Text>
+							Review each option carefully before saving. Some
+							changes may require a page reload to take effect.
+							Hover over individual options for more details about
+							what they control.
+						</Text>
+						<Text>
+							If you&apos;re unsure about a setting, you can
+							always reset to defaults using the button at the
+							bottom of this section. Your previous configuration
+							will be saved as a backup.
+						</Text>
+					</CollapsibleCard.Content>
+				</CollapsibleCard.Root>
+			) ) }
+		</div>
+	),
+};
+
+/**
  * Visual comparison: a `CollapsibleCard` (open) next to a regular `Card`
  * to verify identical spacing and layout.
  */
