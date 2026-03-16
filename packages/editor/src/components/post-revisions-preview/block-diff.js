@@ -526,6 +526,13 @@ function applyDiffRecursively( parsedBlock, rawBlock ) {
 	// Copy diff status from raw block to parsed block.
 	if ( rawBlock.__revisionDiffStatus ) {
 		parsedBlock.__revisionDiffStatus = rawBlock.__revisionDiffStatus;
+		// Store in attributes (as a new object to avoid frozen-object issues)
+		// so it survives store normalization and is accessible via
+		// getSelectedBlock() in the sidebar.
+		parsedBlock.attributes = {
+			...parsedBlock.attributes,
+			__revisionDiffStatus: rawBlock.__revisionDiffStatus,
+		};
 	}
 
 	// Apply rich text diff if this block is modified and has a previous raw block.
@@ -536,6 +543,12 @@ function applyDiffRecursively( parsedBlock, rawBlock ) {
 		const previousParsed = parseRawBlock( rawBlock.__previousRawBlock );
 		if ( previousParsed ) {
 			applyRichTextDiffToBlock( parsedBlock, previousParsed );
+			// Store previous attributes (as a new object) so they survive
+			// store normalization and are accessible via getSelectedBlock().
+			parsedBlock.attributes = {
+				...parsedBlock.attributes,
+				__previousAttributes: previousParsed.attributes,
+			};
 		}
 	}
 
