@@ -58,26 +58,29 @@ export function UploadStatusPopover( {
 		return null;
 	}
 
-	let buttonLabel: string;
+	let buttonLabel, popoverHeading: string;
 	if ( isUploading ) {
 		buttonLabel = sprintf(
 			// translators: %s: number of files being uploaded
 			_n( 'Uploading %s file', 'Uploading %s files', activeFiles.length ),
 			activeFiles.length.toLocaleString()
 		);
+		popoverHeading = __( 'Uploading' );
 	} else if ( hasErrors ) {
 		buttonLabel = sprintf(
 			// translators: %s: number of upload errors
 			_n( '%s upload error', '%s upload errors', errorFiles.length ),
 			errorFiles.length.toLocaleString()
 		);
+		popoverHeading = __( 'Upload errors' );
 	} else {
 		buttonLabel = __( 'Upload complete' );
+		popoverHeading = __( 'Upload complete' );
 	}
 
 	return (
 		<div className="media-upload-modal__upload-status">
-			<Spinner />
+			{ isUploading && <Spinner /> }
 			<Button
 				className="media-upload-modal__upload-status__trigger"
 				size="compact"
@@ -110,7 +113,7 @@ export function UploadStatusPopover( {
 					} }
 				>
 					<div className="media-upload-modal__upload-status__header">
-						<h3>{ __( 'Uploading' ) }</h3>
+						<h3>{ popoverHeading }</h3>
 					</div>
 					<ul className="media-upload-modal__upload-status__list">
 						{ uploadingFiles.map( ( file ) => (
