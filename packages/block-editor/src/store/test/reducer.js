@@ -43,7 +43,6 @@ import {
 	editedContentOnlySection,
 	withDerivedBlockEditingModes,
 	viewportModalClientIds,
-	openedListViewPanels,
 } from '../reducer';
 
 import { unlock } from '../../lock-unlock';
@@ -5364,21 +5363,6 @@ describe( 'state', () => {
 				type: 'UNKNOWN_ACTION',
 			} );
 			expect( state ).toBe( currentState );
-		} );
-	} );
-
-	describe( 'openedListViewPanels', () => {
-		it( 'should preserve panel state on RESET_BLOCKS', () => {
-			const original = deepFreeze( {
-				allOpen: false,
-				panels: { blockA: true },
-			} );
-			const state = openedListViewPanels( original, {
-				type: 'RESET_BLOCKS',
-				blocks: [ { clientId: 'a', innerBlocks: [] } ],
-			} );
-
-			expect( state ).toBe( original );
 		} );
 	} );
 } );

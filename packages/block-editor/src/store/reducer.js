@@ -2240,7 +2240,7 @@ export function insertionPoint( state = null, action ) {
  *
  * @return {Object} Updated state.
  */
-export function openedListViewPanels(
+function openedListViewPanels(
 	state = { allOpen: false, panels: {} },
 	action
 ) {
