@@ -60,6 +60,11 @@ export default function BlockActions( {
 					return (
 						!! block &&
 						hasBlockSupport( block.name, 'multiple', true ) &&
+						hasBlockSupport(
+							block.name,
+							'__experimentalDuplicate',
+							true
+						) &&
 						canInsertBlockType( block.name, rootClientId )
 					);
 				} ),

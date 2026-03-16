@@ -23,6 +23,7 @@
 		"anchor": true,
 		"html": false,
 		"reusable": false,
+		"__experimentalDuplicate": false,
 		"color": {
 			"background": true,
 			"text": true,

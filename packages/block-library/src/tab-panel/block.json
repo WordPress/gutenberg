@@ -16,6 +16,7 @@
 		"html": false,
 		"reusable": false,
 		"lock": false,
+		"__experimentalDuplicate": false,
 		"dimensions": {
 			"aspectRatio": false,
 			"height": false,
