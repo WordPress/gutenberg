@@ -618,12 +618,10 @@ export const __experimentalUpdateSyncedBlockAttributes =
 			}
 
 			if ( hasSyncedAttrs ) {
-				const allLinkedIds = [ clientId, ...linkedSiblingIds ];
-
 				if ( syncedAttributes.style ) {
 					// Per-sibling deep merge: preserve each sibling's
 					// unsynced style sub-keys.
-					allLinkedIds.forEach( ( sibId ) => {
+					[ clientId, ...linkedSiblingIds ].forEach( ( sibId ) => {
 						const currentStyle =
 							select.getBlockAttributes( sibId )?.style ?? {};
 						const merged = mergeStyleByGroups(
@@ -631,16 +629,27 @@ export const __experimentalUpdateSyncedBlockAttributes =
 							syncedAttributes.style,
 							syncSupport.groups
 						);
+						if ( sibId !== clientId ) {
+							dispatch.__unstableMarkNextChangeAsNotPersistent();
+						}
 						dispatch.updateBlockAttributes( sibId, {
 							...syncedAttributes,
 							style: merged,
 						} );
 					} );
 				} else {
+					// Update originating block persistently, siblings non-persistently.
 					dispatch.updateBlockAttributes(
-						allLinkedIds,
+						clientId,
 						syncedAttributes
 					);
+					linkedSiblingIds.forEach( ( sibId ) => {
+						dispatch.__unstableMarkNextChangeAsNotPersistent();
+						dispatch.updateBlockAttributes(
+							sibId,
+							syncedAttributes
+						);
+					} );
 				}
 			}
 		} );
