@@ -38,6 +38,12 @@ const meta: Meta< typeof ThemeProvider > = {
 };
 export default meta;
 
+/**
+ * A mock application page demonstrating how `ThemeProvider` affects multiple
+ * `@wordpress/ui` components in concert. Use the Storybook controls to adjust
+ * the `primary` seed color, `bg` seed color, and `density`, and observe how
+ * every surface, text element, and interactive control adapts accordingly.
+ */
 export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 	render: ( { primary, bg, density }: any ) => {
 		return (
