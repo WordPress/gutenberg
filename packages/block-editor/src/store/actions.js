@@ -46,15 +46,12 @@ const castArray = ( maybeArray ) =>
  * Action that resets blocks state to the specified array of blocks, taking precedence
  * over any other content reflected as an edit in state.
  *
- * @param {Array}   blocks             Array of blocks.
- * @param {Object}  options            Optional options.
- * @param {boolean} options.isExternal Whether this reset is from an external
- *                                     action (e.g. real-time collaboration).
+ * @param {Array} blocks Array of blocks.
  */
 export const resetBlocks =
-	( blocks, { isExternal = false } = {} ) =>
+	( blocks ) =>
 	( { dispatch } ) => {
-		dispatch( { type: 'RESET_BLOCKS', blocks, isExternal } );
+		dispatch( { type: 'RESET_BLOCKS', blocks } );
 		dispatch( validateBlocksToTemplate( blocks ) );
 	};
 

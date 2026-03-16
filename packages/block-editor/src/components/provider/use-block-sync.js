@@ -270,12 +270,8 @@ export default function useBlockSync( {
 			if ( subscribedRef.current ) {
 				pendingChangesRef.current.incoming = controlledBlocks;
 			}
-			// This reset is always from an external data source (real-time
-			// collaboration, undo/redo) pushing blocks into the editor,
-			// so mark it isExternal. The current user's edits are filtered out
-			// by the isOutgoing check above.
 			__unstableMarkNextChangeAsNotPersistent();
-			resetBlocks( controlledBlocks, { isExternal: true } );
+			resetBlocks( controlledBlocks );
 		}
 	};
 

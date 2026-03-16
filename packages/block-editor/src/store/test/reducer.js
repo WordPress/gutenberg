@@ -5368,7 +5368,7 @@ describe( 'state', () => {
 	} );
 
 	describe( 'openedListViewPanels', () => {
-		it( 'should preserve all panel state on external RESET_BLOCKS', () => {
+		it( 'should preserve panel state on RESET_BLOCKS', () => {
 			const original = deepFreeze( {
 				allOpen: false,
 				panels: { blockA: true },
@@ -5376,33 +5376,9 @@ describe( 'state', () => {
 			const state = openedListViewPanels( original, {
 				type: 'RESET_BLOCKS',
 				blocks: [ { clientId: 'a', innerBlocks: [] } ],
-				isExternal: true,
 			} );
 
 			expect( state ).toBe( original );
-		} );
-
-		it( 'should clear allOpen flag on local RESET_BLOCKS', () => {
-			const original = deepFreeze( { allOpen: true, panels: {} } );
-			const state = openedListViewPanels( original, {
-				type: 'RESET_BLOCKS',
-				blocks: [ { clientId: 'a', innerBlocks: [] } ],
-			} );
-
-			expect( state ).toEqual( { allOpen: false, panels: {} } );
-		} );
-
-		it( 'should clear panel state on local RESET_BLOCKS', () => {
-			const original = deepFreeze( {
-				allOpen: false,
-				panels: { blockA: true },
-			} );
-			const state = openedListViewPanels( original, {
-				type: 'RESET_BLOCKS',
-				blocks: [ { clientId: 'blockA', innerBlocks: [] } ],
-			} );
-
-			expect( state ).toEqual( { allOpen: false, panels: {} } );
 		} );
 	} );
 } );
