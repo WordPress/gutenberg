@@ -8,6 +8,10 @@ import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
 import { useEditorAssets } from '@wordpress/lazy-editor';
+import {
+	// @ts-expect-error - No type declarations available for this export
+	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
+} from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -28,6 +32,16 @@ export default function NavigationMenuEditor( { id }: { id: number } ) {
 		return [ createBlock( 'core/navigation', { ref: id } ) ];
 	}, [ assetsReady, id ] );
 
+	const settings = useMemo(
+		() => ( {
+			__experimentalFetchLinkSuggestions: (
+				search: string,
+				searchOptions: Record< string, unknown >
+			) => fetchLinkSuggestions( search, searchOptions, {} ),
+		} ),
+		[]
+	);
+
 	if ( ! assetsReady || ! blocks.length ) {
 		return (
 			<div
@@ -45,7 +59,7 @@ export default function NavigationMenuEditor( { id }: { id: number } ) {
 
 	return (
 		<BlockEditorProvider
-			settings={ {} }
+			settings={ settings }
 			value={ blocks }
 			onChange={ noop }
 			onInput={ noop }

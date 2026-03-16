@@ -16,10 +16,16 @@ import {
 	store as blockEditorStore,
 	BlockList,
 } from '@wordpress/block-editor';
+import { Popover } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 // @ts-expect-error - No type declarations available for @wordpress/blocks
 import { createBlock } from '@wordpress/blocks';
-import { useCallback } from '@wordpress/element';
+import {
+	useCallback,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -36,9 +42,14 @@ type Block = {
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
+const BLOCKS_WITH_LINK_UI_SUPPORT = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
+
 // block-library is loaded dynamically via useEditorAssets before this component renders.
-// Access NavigationLinkUI from its private-apis at runtime rather than via static import.
-function getNavigationLinkUI() {
+// Access private APIs at runtime rather than via static import.
+function getBlockLibraryApis() {
 	const blockLibrary = (
 		window as Window & {
 			wp: {
@@ -49,9 +60,10 @@ function getNavigationLinkUI() {
 	if ( ! blockLibrary ) {
 		return null;
 	}
-	const { NavigationLinkUI } = unlock( blockLibrary.privateApis );
-
-	return NavigationLinkUI as any;
+	return unlock( blockLibrary.privateApis ) as {
+		NavigationLinkUI: any;
+		NavigationLinkControls: any;
+	};
 }
 
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
@@ -113,8 +125,11 @@ export default function NavigationMenuContent( {
 		[ rootClientId ]
 	);
 
-	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const {
+		replaceBlock,
+		updateBlockAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 
 	const offCanvasOnselect = useCallback(
 		( block: Block ) => {
@@ -132,19 +147,79 @@ export default function NavigationMenuContent( {
 		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
 	);
 
-	const NavigationLinkUI = getNavigationLinkUI();
+	const [ editingBlock, setEditingBlock ] = useState< Block | null >( null );
+	const [ anchorElement, setAnchorElement ] = useState< Element | null >(
+		null
+	);
+	const listViewRef = useRef< HTMLDivElement >( null );
+
+	useLayoutEffect( () => {
+		if ( ! editingBlock?.clientId || ! listViewRef.current ) {
+			setAnchorElement( null );
+			return;
+		}
+		const element = listViewRef.current.querySelector(
+			`[data-block="${ editingBlock.clientId }"]`
+		);
+		setAnchorElement( element ?? null );
+	}, [ editingBlock?.clientId ] );
+
+	const handleSelect = useCallback(
+		( block: Block ) => {
+			if (
+				BLOCKS_WITH_LINK_UI_SUPPORT.includes( block?.name ) &&
+				block?.attributes?.url
+			) {
+				setEditingBlock( block );
+			} else {
+				offCanvasOnselect( block );
+			}
+		},
+		[ offCanvasOnselect ]
+	);
+
+	const blockLibraryApis = getBlockLibraryApis();
+	const NavigationLinkUI = blockLibraryApis?.NavigationLinkUI ?? null;
+	const NavigationLinkControls =
+		blockLibraryApis?.NavigationLinkControls ?? null;
 
 	return (
 		<>
 			{ ! isLoading && (
-				<PrivateListView
-					rootClientId={ listViewRootClientId }
-					onSelect={ offCanvasOnselect }
-					blockSettingsMenu={ LeafMoreMenu }
-					additionalBlockContent={ NavigationLinkUI }
-					showAppender
-					isExpanded
-				/>
+				<div ref={ listViewRef }>
+					<PrivateListView
+						rootClientId={ listViewRootClientId }
+						onSelect={ handleSelect }
+						blockSettingsMenu={ LeafMoreMenu }
+						additionalBlockContent={ NavigationLinkUI }
+						showAppender
+						isExpanded
+					/>
+				</div>
+			) }
+			{ editingBlock && anchorElement && NavigationLinkControls && (
+				<Popover
+					anchor={ anchorElement }
+					placement="right-start"
+					onClose={ () => setEditingBlock( null ) }
+					className="edit-site-sidebar-navigation-screen-navigation-menus__link-editor"
+				>
+					<div style={ { width: '280px' } }>
+						<NavigationLinkControls
+							attributes={ editingBlock.attributes }
+							setAttributes={ (
+								newAttrs: Record< string, unknown >
+							) => {
+								updateBlockAttributes(
+									editingBlock.clientId,
+									newAttrs
+								);
+							} }
+							clientId={ editingBlock.clientId }
+							contentOnly
+						/>
+					</div>
+				</Popover>
 			) }
 			<div className="navigation-edit-editor__hidden-blocks">
 				<BlockList />
