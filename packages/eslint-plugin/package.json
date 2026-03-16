@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "24.4.0-prerelease",
+	"version": "24.4.1-next.v.202603161435.0+ab4981c4f",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
