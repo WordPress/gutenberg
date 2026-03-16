@@ -14,7 +14,7 @@ import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useEvent, usePrevious } from '@wordpress/compose';
 import { addQueryArgs } from '@wordpress/url';
-import { useView } from '@wordpress/views';
+import { useView, useViewConfig } from '@wordpress/views';
 
 /**
  * Internal dependencies
@@ -33,11 +33,7 @@ import {
 	useEditPostAction,
 	useQuickEditPostAction,
 } from '../dataviews-actions';
-import {
-	defaultLayouts,
-	DEFAULT_VIEW,
-	getActiveViewOverridesForTab,
-} from './view-utils';
+import { defaultLayouts, getActiveViewOverridesForTab } from './view-utils';
 import useNotesCount from './use-notes-count';
 import { QuickEditModal } from './quick-edit-modal';
 
@@ -60,7 +56,10 @@ export default function PostList( { postType } ) {
 	const { path, query } = useLocation();
 	const { activeView = 'all', postId, quickEdit = false } = query;
 	const history = useHistory();
-	const defaultView = DEFAULT_VIEW;
+	const { defaultView } = useViewConfig( {
+		kind: 'postType',
+		name: postType,
+	} );
 	const activeViewOverrides = useMemo(
 		() => getActiveViewOverridesForTab( activeView ),
 		[ activeView ]

@@ -70,7 +70,7 @@ export function useView( config: ViewConfig ): UseViewReturn {
 	);
 	const { set } = useDispatch( preferencesStore );
 
-	const baseView: View = persistedView ?? defaultView;
+	const baseView: View = persistedView ?? defaultView ?? {};
 	const page = Number( queryParams?.page ?? baseView.page ?? 1 );
 	const search = queryParams?.search ?? baseView.search ?? '';
 

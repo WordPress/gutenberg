@@ -46,6 +46,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/upload-media',
 	'@wordpress/global-styles-ui',
 	'@wordpress/ui',
+	'@wordpress/views',
 ];
 
 /*

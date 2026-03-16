@@ -168,6 +168,24 @@ export function receiveEditorAssets( assets ) {
  *
  * @return {Object} Action object.
  */
+/**
+ * Returns an action object used to receive view config.
+ *
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ * @param {Object} config View config object.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveViewConfig( kind, name, config ) {
+	return {
+		type: 'RECEIVE_VIEW_CONFIG',
+		kind,
+		name,
+		config,
+	};
+}
+
 export const setCollaborationSupported =
 	( supported ) =>
 	( { dispatch } ) => {

@@ -721,6 +721,25 @@ export function collaborationSupported( state = true, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing view configs, keyed by `kind/name`.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function viewConfigs( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_VIEW_CONFIG':
+			return {
+				...state,
+				[ `${ action.kind }/${ action.name }` ]: action.config,
+			};
+	}
+	return state;
+}
+
 export default combineReducers( {
 	users,
 	currentTheme,
@@ -745,4 +764,5 @@ export default combineReducers( {
 	editorAssets,
 	syncConnectionStatuses,
 	collaborationSupported,
+	viewConfigs,
 } );
