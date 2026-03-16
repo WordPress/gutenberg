@@ -183,6 +183,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			return {
 				allImageSizes: baseData?.image_sizes,
 				bigImageSizeThreshold: baseData?.image_size_threshold,
+				clientSideSupportedMimeTypes:
+					baseData?.client_side_supported_mime_types,
 				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'

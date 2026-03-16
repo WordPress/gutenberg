@@ -711,9 +711,10 @@ export function prepareItem( id: QueueItemId ) {
 		const settings = select.getSettings();
 
 		const isImage = file.type.startsWith( 'image/' );
-		const isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
-			file.type
-		);
+		const supportedMimeTypes =
+			settings.clientSideSupportedMimeTypes ??
+			CLIENT_SIDE_SUPPORTED_MIME_TYPES;
+		const isVipsSupported = supportedMimeTypes.includes( file.type );
 
 		// For images that can be processed by vips, check if we need to scale down based on threshold.
 		if ( isImage && isVipsSupported ) {

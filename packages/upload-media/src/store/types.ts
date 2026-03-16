@@ -172,6 +172,9 @@ export interface Settings {
 	bigImageSizeThreshold?: number;
 	// Map of source MIME types to output MIME types for transcoding.
 	imageOutputFormats?: Record< string, string >;
+	// MIME types supported by client-side media processing.
+	// Overrides the default CLIENT_SIDE_SUPPORTED_MIME_TYPES constant.
+	clientSideSupportedMimeTypes?: readonly string[];
 	// Whether to use progressive/interlaced encoding for JPEG.
 	jpegInterlaced?: boolean;
 	// Whether to use interlaced encoding for PNG.

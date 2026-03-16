@@ -19,6 +19,7 @@ function useMediaUploadSettings( settings = {} ) {
 			allowedMimeTypes: settings.allowedMimeTypes,
 			allImageSizes: settings.allImageSizes,
 			bigImageSizeThreshold: settings.bigImageSizeThreshold,
+			clientSideSupportedMimeTypes: settings.clientSideSupportedMimeTypes,
 		} ),
 		[ settings ]
 	);
