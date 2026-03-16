@@ -1135,11 +1135,6 @@ export function generateThumbnails( id: QueueItemId ) {
 			const sizesToGenerate: string[] =
 				attachment.missing_image_sizes as string[];
 
-			if ( sizesToGenerate.length === 0 ) {
-				dispatch.finishOperation( id, {} );
-				return;
-			}
-
 			// Use sourceFile for thumbnail generation to preserve quality.
 			// WordPress core generates thumbnails from the original (unscaled) image.
 			// Vips will auto-rotate based on EXIF orientation during thumbnail generation.
