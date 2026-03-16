@@ -44,12 +44,14 @@ export function ConnectorItem( {
 					{ icon }
 					<FlexBlock>
 						<VStack spacing={ 0 }>
-							<h2
-								className="connector-item__heading"
+							<Text
+								weight={ 600 }
+								size={ 15 }
 								id={ headingId }
+								as="h2"
 							>
 								{ name }
-							</h2>
+							</Text>
 							<Text variant="muted" size={ 12 }>
 								{ description }
 							</Text>

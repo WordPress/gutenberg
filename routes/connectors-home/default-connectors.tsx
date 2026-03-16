@@ -209,11 +209,6 @@ function ApiKeyConnector( {
 							onClick={ handleActionClick }
 							disabled={ pluginStatus === 'checking' || isBusy }
 							isBusy={ isBusy }
-							aria-expanded={
-								pluginStatus === 'active'
-									? isExpanded
-									: undefined
-							}
 						>
 							{ getButtonLabel() }
 						</Button>

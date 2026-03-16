@@ -275,10 +275,6 @@ test.describe( 'Connectors', () => {
 				name: 'Cancel',
 			} );
 			await expect( cancelButton ).toBeFocused();
-			await expect( cancelButton ).toHaveAttribute(
-				'aria-expanded',
-				'true'
-			);
 
 			// Press Enter again to collapse.
 			await page.keyboard.press( 'Enter' );
@@ -288,10 +284,6 @@ test.describe( 'Connectors', () => {
 				name: 'Set up',
 			} );
 			await expect( setupButtonAgain ).toBeFocused();
-			await expect( setupButtonAgain ).toHaveAttribute(
-				'aria-expanded',
-				'false'
-			);
 		} );
 
 		test( 'should complete the full setup flow using only the keyboard', async ( {

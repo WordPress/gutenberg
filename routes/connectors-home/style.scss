@@ -20,14 +20,7 @@ $sticky-header-clearance: 120px;
 		scroll-margin-top: $sticky-header-clearance;
 	}
 
-	.connector-item__heading {
-		font-size: 15px;
-		font-weight: 600;
-		line-height: normal;
-		margin: 0;
-	}
-
-	.connector-settings__error {
+.connector-settings__error {
 		color: $alert-red;
 	}
 
