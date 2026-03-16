@@ -102,12 +102,26 @@ export function useRenderCursors(
 			};
 
 			let start: ResolvedSelection = {
+				type: 'block',
 				textIndex: null,
 				localClientId: null,
 			};
 			let end: ResolvedSelection | undefined;
 
-			if ( selection.type === SelectionType.Cursor ) {
+			if ( selection.type === SelectionType.Title ) {
+				try {
+					start = resolveSelection( selection );
+					if ( selection.cursorEndPosition ) {
+						end = resolveSelection( {
+							type: SelectionType.Title,
+							cursorPosition: selection.cursorEndPosition,
+						} );
+					}
+				} catch {
+					// Selection may reference a stale Yjs position.
+					return;
+				}
+			} else if ( selection.type === SelectionType.Cursor ) {
 				try {
 					start = resolveSelection( selection );
 				} catch {

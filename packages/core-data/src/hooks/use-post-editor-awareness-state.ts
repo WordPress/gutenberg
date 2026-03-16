@@ -25,6 +25,7 @@ interface AwarenessState {
 }
 
 const defaultResolvedSelection: ResolvedSelection = {
+	type: 'block',
 	textIndex: null,
 	localClientId: null,
 };

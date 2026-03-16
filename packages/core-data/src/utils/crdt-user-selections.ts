@@ -23,6 +23,7 @@ import {
 	type SelectionInOneBlock,
 	type SelectionInMultipleBlocks,
 	type SelectionWholeBlock,
+	type SelectionInTitle,
 	type CursorPosition,
 } from '../types';
 
@@ -35,6 +36,7 @@ export enum SelectionType {
 	SelectionInOneBlock = 'selection-in-one-block',
 	SelectionInMultipleBlocks = 'selection-in-multiple-blocks',
 	WholeBlock = 'whole-block',
+	Title = 'title',
 }
 
 /**
@@ -348,6 +350,30 @@ export function areSelectionsStatesEqual(
 				selection1.blockPosition,
 				( selection2 as SelectionWholeBlock ).blockPosition
 			);
+
+		case SelectionType.Title: {
+			const sel2Title = selection2 as SelectionInTitle;
+			const cursorEqual = areCursorPositionsEqual(
+				selection1.cursorPosition,
+				sel2Title.cursorPosition
+			);
+			if ( ! cursorEqual ) {
+				return false;
+			}
+			if ( selection1.cursorEndPosition && sel2Title.cursorEndPosition ) {
+				return (
+					areCursorPositionsEqual(
+						selection1.cursorEndPosition,
+						sel2Title.cursorEndPosition
+					) &&
+					selection1.selectionDirection ===
+						sel2Title.selectionDirection
+				);
+			}
+			return (
+				! selection1.cursorEndPosition && ! sel2Title.cursorEndPosition
+			);
+		}
 
 		default:
 			return false;
