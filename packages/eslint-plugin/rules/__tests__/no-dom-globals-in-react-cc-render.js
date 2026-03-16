@@ -10,7 +10,7 @@ import rule from '../no-dom-globals-in-react-cc-render';
 
 const ruleTester = new RuleTester( {
 	parserOptions: {
-		ecmaVersion: 6,
+		ecmaVersion: 2020,
 		sourceType: 'module',
 		ecmaFeatures: { jsx: true },
 	},

@@ -10,7 +10,7 @@ import rule from '../no-dom-globals-in-react-fc';
 
 const ruleTester = new RuleTester( {
 	parserOptions: {
-		ecmaVersion: 6,
+		ecmaVersion: 2020,
 		sourceType: 'module',
 		ecmaFeatures: { jsx: true },
 	},
@@ -28,6 +28,14 @@ ruleTester.run( 'no-dom-globals-in-react-fc', rule, {
 			code: `function Component() {
 				useEffect(() => { window.scrollTo(0, 0); });
 				return <div />;
+			}`,
+		},
+		{
+			// DOM global inside a nested callback (event handler) inside FC
+			// is allowed — the handler runs at event time, not render time.
+			code: `function Component() {
+				const onClick = () => { document.title = "clicked"; };
+				return <button onClick={onClick} />;
 			}`,
 		},
 	],
