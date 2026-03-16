@@ -126,10 +126,10 @@ window.history.replaceState(
 // the page content would remain stale because the interactivity router — which
 // handles client-side navigations — might not be loaded yet.
 //
-// Entries with `null` state are from anchor/fragment navigations (e.g.,
-// clicking `<a href="#section">`), which some browsers (Chrome) also dispatch
-// `popstate` for. These are same-document navigations and must NOT trigger a
-// reload — the browser should just scroll to the target element as normal.
+// Some `popstate` events (e.g., anchor/fragment navigations like
+// clicking `<a href="#section">`) have `null` state. These are
+// same-document navigations and must NOT trigger a reload — the browser
+// should just scroll to the target element as normal.
 window.addEventListener( 'popstate', ( event ) => {
 	if (
 		event.state !== null &&
