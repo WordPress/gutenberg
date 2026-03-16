@@ -16,12 +16,9 @@ import { parse } from '@wordpress/blocks';
 import { useAvailableTemplates, useEditedPostContext } from './hooks';
 import { searchTemplates } from '../../utils/search-templates';
 
-export default function SwapTemplateButton( { onClick } ) {
-	const [ showModal, setShowModal ] = useState( false );
+export function SwapTemplateModal( { onRequestClose, onSelect } ) {
 	const { postType, postId } = useEditedPostContext();
-	const availableTemplates = useAvailableTemplates( postType );
 	const { editEntityRecord } = useDispatch( coreStore );
-
 	const onTemplateSelect = async ( template ) => {
 		editEntityRecord(
 			'postType',
@@ -30,9 +27,31 @@ export default function SwapTemplateButton( { onClick } ) {
 			{ template: template.name },
 			{ undoIgnore: true }
 		);
-		setShowModal( false ); // Close the template suggestions modal first.
-		onClick();
+		onRequestClose();
+		onSelect?.();
 	};
+	return (
+		<Modal
+			title={ __( 'Choose a template' ) }
+			onRequestClose={ onRequestClose }
+			overlayClassName="editor-post-template__swap-template-modal"
+			isFullScreen
+		>
+			<div className="editor-post-template__swap-template-modal-content">
+				<TemplatesList
+					postType={ postType }
+					onSelect={ onTemplateSelect }
+				/>
+			</div>
+		</Modal>
+	);
+}
+
+export default function SwapTemplateButton( { onClick } ) {
+	const [ showModal, setShowModal ] = useState( false );
+	const { postType } = useEditedPostContext();
+	const availableTemplates = useAvailableTemplates( postType );
+
 	return (
 		<>
 			<MenuItem
@@ -43,19 +62,10 @@ export default function SwapTemplateButton( { onClick } ) {
 				{ __( 'Change template' ) }
 			</MenuItem>
 			{ showModal && (
-				<Modal
-					title={ __( 'Choose a template' ) }
+				<SwapTemplateModal
 					onRequestClose={ () => setShowModal( false ) }
-					overlayClassName="editor-post-template__swap-template-modal"
-					isFullScreen
-				>
-					<div className="editor-post-template__swap-template-modal-content">
-						<TemplatesList
-							postType={ postType }
-							onSelect={ onTemplateSelect }
-						/>
-					</div>
-				</Modal>
+					onSelect={ onClick }
+				/>
 			) }
 		</>
 	);

@@ -210,11 +210,6 @@ export const getPostsPageId = createRegistrySelector( ( select ) => () => {
 export const getTemplateId = createRegistrySelector(
 	( select ) => ( state, postType, postId ) => {
 		const homepage = unlock( select( STORE_NAME ) ).getHomePage();
-
-		if ( ! homepage ) {
-			return;
-		}
-
 		// For the front page, we always use the front page template if existing.
 		if (
 			postType === 'page' &&
