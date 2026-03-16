@@ -46,7 +46,7 @@ test.describe( 'Collaboration with large documents', () => {
 		// manager's onDocUpdate size check, which emits
 		// 'document-size-limit-exceeded' and unregisters the room.
 		await page.evaluate( () => {
-			const largeContent = 'x'.repeat( 1.1 * 1024 * 1024 );
+			const largeContent = 'x'.repeat( 1.01 * 1024 * 1024 );
 			window.wp.data.dispatch( 'core/block-editor' ).insertBlock(
 				window.wp.blocks.createBlock( 'core/paragraph', {
 					content: largeContent,
@@ -92,18 +92,12 @@ test.describe( 'Collaboration with large documents', () => {
 			expect( body ).not.toContain( postRoom );
 		}
 
-		// Save the large content to the database via the REST API so
-		// that User 2 loads the oversized post and independently
-		// triggers the size limit on their page.
-		const largeContentForDb =
-			'<!-- wp:paragraph -->\n<p>' +
-			'x'.repeat( 1.1 * 1024 * 1024 ) +
-			'</p>\n<!-- /wp:paragraph -->';
-		await requestUtils.rest( {
-			method: 'POST',
-			path: `/wp/v2/posts/${ post.id }`,
-			data: { content: largeContentForDb },
-		} );
+		// Save the large content to the database so User 2 loads it.
+		await editor.saveDraft();
+
+		// Navigate User 1 away to free up resources for User 2's
+		// heavy page load. The post lock persists in the database.
+		await page.goto( 'about:blank' );
 
 		// Set up second browser context for User 2.
 		const secondContext = await admin.browser.newContext( {
