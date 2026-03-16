@@ -140,11 +140,11 @@ export default function filterSortAndPaginate< Item >(
 	if (
 		view.infiniteScrollEnabled &&
 		view.startPosition !== undefined &&
-		view.maxItems !== undefined
+		view.perPage !== undefined
 	) {
 		// Convert 1-indexed positions to 0-indexed array indices
 		const start = view.startPosition - 1;
-		const end = Math.min( start + view.maxItems, totalItems );
+		const end = Math.min( start + view.perPage, totalItems );
 		filteredData = filteredData?.slice( start, end );
 	} else if ( view.page !== undefined && view.perPage !== undefined ) {
 		// Use traditional page-based pagination

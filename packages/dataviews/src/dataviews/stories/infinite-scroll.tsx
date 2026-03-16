@@ -22,7 +22,7 @@ const InfiniteScroll = () => {
 		type: LAYOUT_GRID,
 		search: '',
 		startPosition: 1,
-		maxItems: 15, // Start with a small number to demonstrate pagination
+		perPage: 15, // Start with a small number to demonstrate pagination
 		filters: [],
 		fields: [ 'satellites' ],
 		titleField: 'title',

@@ -228,7 +228,7 @@ export function useInfiniteScroll( {
 			}
 
 			const currentStartPosition = view.startPosition || 1;
-			const batchSize = view.maxItems || view.perPage || 10;
+			const batchSize = view.perPage || 10;
 			const currentEndPosition = Math.min(
 				currentStartPosition + batchSize,
 				paginationInfo.totalItems

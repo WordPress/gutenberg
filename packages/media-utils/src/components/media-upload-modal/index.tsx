@@ -197,7 +197,7 @@ export function MediaUploadModal( {
 		mediaField: 'media_thumbnail',
 		search: '',
 		startPosition: 1,
-		maxItems: 50,
+		perPage: 50,
 		filters: [],
 		layout: {
 			previewSize: 170,
@@ -249,7 +249,7 @@ export function MediaUploadModal( {
 		if ( view.infiniteScrollEnabled && view.startPosition !== undefined ) {
 			return {
 				offset: view.startPosition - 1,
-				per_page: view.maxItems,
+				per_page: view.perPage || 20,
 				status: 'inherit',
 				order: view.sort?.direction,
 				orderby: view.sort?.field,

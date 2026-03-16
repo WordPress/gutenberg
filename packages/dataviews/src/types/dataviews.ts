@@ -133,7 +133,8 @@ interface ViewBase {
 	page?: number;
 
 	/**
-	 * The number of items per page
+	 * The number of items per page.
+	 * Also used as the batch size when infinite scroll is enabled.
 	 */
 	perPage?: number;
 
@@ -209,12 +210,6 @@ interface ViewBase {
 	 * Used when infiniteScrollEnabled is true.
 	 */
 	startPosition?: number;
-
-	/**
-	 * The maximum number of items to fetch per batch for infinite scroll.
-	 * Used when infiniteScrollEnabled is true.
-	 */
-	maxItems?: number;
 }
 
 export interface ColumnStyle {
