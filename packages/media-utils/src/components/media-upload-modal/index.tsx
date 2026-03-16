@@ -186,10 +186,11 @@ export function MediaUploadModal( {
 		mediaField: 'media_thumbnail',
 		search: '',
 		page: 1,
-		perPage: 20,
+		perPage: 50,
 		filters: [],
 		layout: {
 			previewSize: 170,
+			density: 'compact',
 		},
 	} ) );
 

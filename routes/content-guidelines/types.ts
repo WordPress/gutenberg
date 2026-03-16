@@ -28,6 +28,16 @@ export interface RestGuidelinesResponse {
 	guideline_categories?: Record< string, BlockGuideline >;
 }
 
+export interface GuidelinesImportData {
+	guideline_categories: {
+		site?: { guidelines?: string };
+		copy?: { guidelines?: string };
+		images?: { guidelines?: string };
+		additional?: { guidelines?: string };
+		blocks?: Record< string, { guidelines?: string } >;
+	};
+}
+
 export interface GuidelineAccordionProps {
 	title: string;
 	description: string;
@@ -35,6 +45,15 @@ export interface GuidelineAccordionProps {
 	contentId?: string;
 	headingId?: string;
 	descriptionId?: string;
+}
+
+export interface ContentGuidelinesRevision {
+	id: number;
+	date: string;
+	author: number;
+	_embedded?: {
+		author: Array< { name: string } >;
+	};
 }
 
 export interface GuidelineAccordionFormProps {

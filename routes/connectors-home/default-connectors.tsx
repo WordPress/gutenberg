@@ -49,7 +49,7 @@ interface ConnectorData {
 /**
  * Reads connector data passed from PHP via the script module data mechanism.
  */
-function getConnectorData(): Record< string, ConnectorData > {
+export function getConnectorData(): Record< string, ConnectorData > {
 	try {
 		const parsed = JSON.parse(
 			document.getElementById(

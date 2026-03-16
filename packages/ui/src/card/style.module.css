@@ -2,8 +2,8 @@
 
 @layer wp-ui-components {
 	.root {
-		--wp-ui-card-padding: var(--wpds-dimension-padding-xl);
-		--wp-ui-card-header-content-gap: var(--wpds-dimension-gap-lg);
+		--wp-ui-card-padding: var(--wpds-dimension-padding-2xl);
+		--wp-ui-card-header-content-gap: var(--wpds-dimension-gap-xl);
 
 		display: flex;
 		flex-direction: column;

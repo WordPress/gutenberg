@@ -102,9 +102,9 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 							</Stack>
 						</CardBody>
 					</Card>
-					<DataViews.Layout className="free-composition-dataviews-layout" />
 				</Stack>
 			</div>
+			<DataViews.Layout className="free-composition-dataviews-layout" />
 		</>
 	);
 }
@@ -132,7 +132,7 @@ export const FreeCompositionComponent = () => {
 		type: LAYOUT_TABLE,
 		search: '',
 		page: 1,
-		perPage: 10,
+		perPage: 20,
 		layout: {
 			enableMoving: false,
 		},
@@ -152,38 +152,36 @@ export const FreeCompositionComponent = () => {
 	);
 
 	return (
-		<div className="free-composition">
-			<DataViews
-				getItemId={ ( item ) => item.id.toString() }
-				paginationInfo={ paginationInfo }
-				data={ processedData }
-				view={ view }
-				fields={ fields }
-				actions={ actions }
-				onChangeView={ setView }
-				defaultLayouts={ {
-					table: {},
-					grid: {},
-				} }
-				empty={
-					<Stack
-						direction="column"
-						gap="sm"
-						justify="space-around"
-						align="center"
-						className="free-composition-dataviews-empty"
-					>
-						<Text size={ 18 } as="p">
-							No planets
-						</Text>
-						<Text variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</Text>
-						<Button variant="secondary">Create new planet</Button>
-					</Stack>
-				}
-			>
-				<PlanetOverview planets={ planets } />
-			</DataViews>
-		</div>
+		<DataViews
+			getItemId={ ( item ) => item.id.toString() }
+			paginationInfo={ paginationInfo }
+			data={ processedData }
+			view={ view }
+			fields={ fields }
+			actions={ actions }
+			onChangeView={ setView }
+			defaultLayouts={ {
+				table: {},
+				grid: {},
+			} }
+			empty={
+				<Stack
+					direction="column"
+					gap="sm"
+					justify="space-around"
+					align="center"
+					className="free-composition-dataviews-empty"
+				>
+					<Text size={ 18 } as="p">
+						No planets
+					</Text>
+					<Text variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</Text>
+					<Button variant="secondary">Create new planet</Button>
+				</Stack>
+			}
+		>
+			<PlanetOverview planets={ planets } />
+		</DataViews>
 	);
 };
 

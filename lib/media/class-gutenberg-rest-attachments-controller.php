@@ -61,6 +61,29 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	}
 
 	/**
+	 * Checks if a given request has access to create an attachment.
+	 *
+	 * Skips the server-side image type support check when the client
+	 * will handle image processing (generate_sub_sizes is false).
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access to create items, WP_Error object otherwise.
+	 */
+	public function create_item_permissions_check( $request ) {
+		if ( false === $request['generate_sub_sizes'] ) {
+			add_filter( 'wp_prevent_unsupported_mime_type_uploads', '__return_false' );
+		}
+
+		$result = parent::create_item_permissions_check( $request );
+
+		if ( false === $request['generate_sub_sizes'] ) {
+			remove_filter( 'wp_prevent_unsupported_mime_type_uploads', '__return_false' );
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Retrieves an array of endpoint arguments from the item schema for the controller.
 	 *
 	 * @param string $method Optional. HTTP method of the request. The arguments for `CREATABLE` requests are

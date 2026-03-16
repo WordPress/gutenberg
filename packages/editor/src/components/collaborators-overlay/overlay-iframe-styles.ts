@@ -49,6 +49,12 @@ export const OVERLAY_IFRAME_STYLES = `
 	box-shadow: ${ ELEVATION_X_SMALL };
 	animation: collaborators-overlay-cursor-blink 1s infinite;
 }
+.collaborators-overlay-selection-rect {
+	position: absolute;
+	opacity: 0.15;
+	pointer-events: none;
+	border-radius: 2px;
+}
 
 /* Overlay-specific positioning applied to the Avatar cursor label. */
 .collaborators-overlay-user-label.editor-avatar {

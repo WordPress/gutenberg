@@ -678,40 +678,25 @@ export const saveEntityRecord =
 					? select.getRawEntityRecord( kind, name, recordId )
 					: {};
 
+				// Most of this autosave logic is very specific to posts.
+				// This is fine for now as it is the only supported autosave,
+				// but ideally this should all be handled in the back end,
+				// so the client just sends and receives objects.
 				if ( isAutosave ) {
-					// Most of this autosave logic is very specific to posts.
-					// This is fine for now as it is the only supported autosave,
-					// but ideally this should all be handled in the back end,
-					// so the client just sends and receives objects.
-					const currentUser = select.getCurrentUser();
-					const currentUserId = currentUser
-						? currentUser.id
-						: undefined;
-					const autosavePost = await resolveSelect.getAutosave(
-						persistedRecord.type,
-						persistedRecord.id,
-						currentUserId
-					);
-					// Autosaves need all expected fields to be present.
-					// So we fallback to the previous autosave and then
-					// to the actual persisted entity if the edits don't
-					// have a value.
-					let data = {
-						...persistedRecord,
-						...autosavePost,
-						...record,
-					};
-					data = Object.keys( data ).reduce(
+					// Build the autosave payload from the persisted
+					// record and the incoming edits. The previous autosave
+					// is intentionally excluded to avoid stale values
+					// overriding reverted fields.
+					const merged = { ...persistedRecord, ...record };
+					const data = [
+						'title',
+						'excerpt',
+						'content',
+						'meta',
+					].reduce(
 						( acc, key ) => {
-							if (
-								[
-									'title',
-									'excerpt',
-									'content',
-									'meta',
-								].includes( key )
-							) {
-								acc[ key ] = data[ key ];
+							if ( key in merged ) {
+								acc[ key ] = merged[ key ];
 							}
 							return acc;
 						},
@@ -721,7 +706,7 @@ export const saveEntityRecord =
 							// because it can lead to unexpected results. An example would be to
 							// have a draft post and change the status to publish.
 							status:
-								data.status === 'auto-draft'
+								merged.status === 'auto-draft'
 									? 'draft'
 									: undefined,
 						}
@@ -745,9 +730,12 @@ export const saveEntityRecord =
 							( acc, key ) => {
 								// These properties are persisted in autosaves.
 								if (
-									[ 'title', 'excerpt', 'content' ].includes(
-										key
-									)
+									[
+										'title',
+										'excerpt',
+										'content',
+										'meta',
+									].includes( key )
 								) {
 									acc[ key ] = newRecord[ key ];
 								} else if ( key === 'status' ) {
@@ -1114,10 +1102,7 @@ export const receiveRevisions =
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
-		const key =
-			entityConfig && entityConfig?.revisionKey
-				? entityConfig.revisionKey
-				: DEFAULT_ENTITY_KEY;
+		const key = entityConfig?.revisionKey ?? DEFAULT_ENTITY_KEY;
 
 		dispatch( {
 			type: 'RECEIVE_ITEM_REVISIONS',
