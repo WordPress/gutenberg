@@ -324,6 +324,113 @@ describe( 'actions', () => {
 				true
 			);
 		} );
+
+		it( 'should use custom clientSideSupportedMimeTypes when set', async () => {
+			// Exclude AVIF from supported types.
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				clientSideSupportedMimeTypes: [ 'image/jpeg', 'image/png' ],
+			} );
+
+			const avifFile = new File( [ 'avif' ], 'photo.avif', {
+				lastModified: 1234567891,
+				type: 'image/avif',
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: avifFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// AVIF is excluded from custom list, so no client-side processing.
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [ OperationType.Upload ] )
+			);
+			expect( updatedItem.operations ).not.toEqual(
+				expect.arrayContaining( [ OperationType.ThumbnailGeneration ] )
+			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				true
+			);
+		} );
+
+		it( 'should support normally-unsupported types via clientSideSupportedMimeTypes', async () => {
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				clientSideSupportedMimeTypes: [ 'image/jpeg', 'image/bmp' ],
+			} );
+
+			const bmpFile = new File( [ 'bmp' ], 'photo.bmp', {
+				lastModified: 1234567891,
+				type: 'image/bmp',
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: bmpFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// BMP is in custom list, so client-side processing applies.
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [
+					OperationType.Upload,
+					OperationType.ThumbnailGeneration,
+				] )
+			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				false
+			);
+		} );
+
+		it( 'should use default constant when clientSideSupportedMimeTypes is not set', async () => {
+			// No custom setting — defaults should apply.
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// JPEG is in default list, so client-side processing applies.
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [
+					OperationType.Upload,
+					OperationType.ThumbnailGeneration,
+				] )
+			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				false
+			);
+		} );
 	} );
 
 	describe( 'cancelItem', () => {
