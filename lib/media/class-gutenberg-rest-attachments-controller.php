@@ -45,11 +45,16 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 							'description' => __( 'Unique identifier for the attachment.', 'gutenberg' ),
 							'type'        => 'integer',
 						),
-						'image_size' => array(
+						'image_size'   => array(
 							'description' => __( 'Image size.', 'gutenberg' ),
 							'type'        => 'string',
 							'enum'        => $valid_image_sizes,
 							'required'    => true,
+						),
+						'replace_file' => array(
+							'description' => __( 'Whether to replace the main attached file and delete the old one.', 'gutenberg' ),
+							'type'        => 'boolean',
+							'default'     => false,
 						),
 					),
 				),
@@ -408,7 +413,32 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$metadata = array();
 		}
 
-		if ( 'original' === $image_size ) {
+		if ( ! empty( $request['replace_file'] ) ) {
+			// Replace the main attached file with the sideloaded one.
+			$old_path = get_attached_file( $attachment_id );
+
+			update_attached_file( $attachment_id, $path );
+
+			$metadata['file'] = _wp_relative_upload_path( $path );
+
+			// Store the new file as original_image if subsizes exist.
+			if ( ! empty( $metadata['sizes'] ) ) {
+				$metadata['original_image'] = wp_basename( $path );
+			}
+
+			// Update the post MIME type to match the new file.
+			wp_update_post(
+				array(
+					'ID'             => $attachment_id,
+					'post_mime_type' => $type,
+				)
+			);
+
+			// Delete the old main file if it differs from the new one.
+			if ( $old_path && $old_path !== $path && file_exists( $old_path ) ) {
+				wp_delete_file( $old_path );
+			}
+		} elseif ( 'original' === $image_size ) {
 			$metadata['original_image'] = wp_basename( $path );
 		} elseif ( 'scaled' === $image_size ) {
 			// The current attached file is the original; record it as original_image.
