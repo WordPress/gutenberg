@@ -92,19 +92,21 @@ export default function EditContents( { clientId } ) {
 		stopEditingContentOnlySection,
 	} = useContentOnlySectionEdit( clientId );
 
-	const { block, onNavigateToEntityRecord } = useSelect(
+	const { block, onNavigateToEntityRecord, canEdit } = useSelect(
 		( select ) => {
-			const { getBlock, getSettings } = select( blockEditorStore );
+			const { getBlock, getSettings, canEditBlock } =
+				select( blockEditorStore );
 			return {
 				block: getBlock( clientId ),
 				onNavigateToEntityRecord:
 					getSettings().onNavigateToEntityRecord,
+				canEdit: canEditBlock( clientId ),
 			};
 		},
 		[ clientId ]
 	);
 
-	if ( ! isWithinSection && ! isWithinEditedSection ) {
+	if ( ! canEdit || ( ! isWithinSection && ! isWithinEditedSection ) ) {
 		return null;
 	}
 
