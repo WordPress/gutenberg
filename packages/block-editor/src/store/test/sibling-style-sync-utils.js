@@ -59,6 +59,34 @@ describe( 'partitionAttributesByGroups', () => {
 		} );
 	} );
 
+	it( 'syncs all groups when "all" is passed', () => {
+		const { syncedAttributes, unsyncedAttributes } =
+			partitionAttributesByGroups(
+				{
+					textColor: 'vivid-red',
+					fontSize: 'large',
+					borderColor: 'black',
+					style: {
+						color: { text: '#f00' },
+						spacing: { padding: '1em' },
+					},
+					content: 'hello',
+				},
+				'all'
+			);
+
+		expect( syncedAttributes ).toEqual( {
+			textColor: 'vivid-red',
+			fontSize: 'large',
+			borderColor: 'black',
+			style: {
+				color: { text: '#f00' },
+				spacing: { padding: '1em' },
+			},
+		} );
+		expect( unsyncedAttributes ).toEqual( { content: 'hello' } );
+	} );
+
 	it( 'omits the style key entirely when all its sub-keys fall in one bucket', () => {
 		const allUnsynced = { style: { spacing: { padding: '1em' } } };
 		expect(
@@ -87,6 +115,25 @@ describe( 'mergeStyleByGroups', () => {
 		expect( result ).toEqual( {
 			color: { text: '#f00' },
 			spacing: { padding: '1em' },
+		} );
+	} );
+
+	it( 'merges all style sub-keys when "all" is passed', () => {
+		const current = {
+			color: { text: '#000' },
+			spacing: { padding: '1em' },
+		};
+		const incoming = {
+			color: { text: '#f00' },
+			typography: { fontSize: '2rem' },
+		};
+
+		const result = mergeStyleByGroups( current, incoming, 'all' );
+
+		expect( result ).toEqual( {
+			color: { text: '#f00' },
+			spacing: { padding: '1em' },
+			typography: { fontSize: '2rem' },
 		} );
 	} );
 

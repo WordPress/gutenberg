@@ -40,11 +40,15 @@ const STYLE_GROUP_MAP = {
  * @return {{ syncedAttributes: Object, unsyncedAttributes: Object }} Object with attributes split into synced and unsynced buckets.
  */
 export function partitionAttributesByGroups( attributes, groups ) {
+	const resolvedGroups =
+		groups === 'all' ? Object.keys( STYLE_GROUP_MAP ) : groups;
 	const syncedTopLevelKeys = new Set(
-		groups.flatMap( ( g ) => STYLE_GROUP_MAP[ g ]?.topLevel ?? [] )
+		resolvedGroups.flatMap( ( g ) => STYLE_GROUP_MAP[ g ]?.topLevel ?? [] )
 	);
 	const syncedStyleKeys = new Set(
-		groups.map( ( g ) => STYLE_GROUP_MAP[ g ]?.styleKey ).filter( Boolean )
+		resolvedGroups
+			.map( ( g ) => STYLE_GROUP_MAP[ g ]?.styleKey )
+			.filter( Boolean )
 	);
 
 	const synced = {};
@@ -92,8 +96,12 @@ export function partitionAttributesByGroups( attributes, groups ) {
  * @return {Object} Merged style object.
  */
 export function mergeStyleByGroups( currentStyle, incomingPartial, groups ) {
+	const resolvedGroups =
+		groups === 'all' ? Object.keys( STYLE_GROUP_MAP ) : groups;
 	const syncedStyleKeys = new Set(
-		groups.map( ( g ) => STYLE_GROUP_MAP[ g ]?.styleKey ).filter( Boolean )
+		resolvedGroups
+			.map( ( g ) => STYLE_GROUP_MAP[ g ]?.styleKey )
+			.filter( Boolean )
 	);
 	const merged = { ...currentStyle };
 	for ( const [ styleKey, styleValue ] of Object.entries(
