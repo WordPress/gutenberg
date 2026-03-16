@@ -137,8 +137,7 @@ register( store ); // Register store after unlocking private selectors to allow 
  * Enums cannot be exported private without losing the ability to narrow types
  * based on their values (they blur to string type).
  */
-export { SelectionType } from './utils/crdt-user-selections';
-export { SelectionDirection } from './types';
+export { SelectionType, SelectionDirection } from './types';
 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';
