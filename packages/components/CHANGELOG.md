@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 32.4.0-next.0 (2026-03-16)
-
 ### Bug Fixes
 
 -   Revert `word-break: break-word` addition ([#76230](https://github.com/WordPress/gutenberg/pull/76230)).

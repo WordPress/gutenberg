@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 12.0.0-next.0 (2026-03-16)
-
 ### Breaking Changes
 
 -   Rename `formatLtr` icon to `formatLTR`. ([#76074](https://github.com/WordPress/gutenberg/pull/76074))
