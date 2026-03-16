@@ -293,6 +293,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			};
 
 			expect( result.current( mockSelection ) ).toEqual( {
+				type: 'block',
 				textIndex: null,
 				localClientId: null,
 			} );
@@ -307,6 +308,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				},
 			};
 			mockAwareness.convertSelectionStateToAbsolute.mockReturnValue( {
+				type: 'block',
 				textIndex: 10,
 				localClientId: 'block-1',
 			} );
@@ -321,6 +323,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				mockAwareness.convertSelectionStateToAbsolute
 			).toHaveBeenCalledWith( mockSelection );
 			expect( position ).toEqual( {
+				type: 'block',
 				textIndex: 10,
 				localClientId: 'block-1',
 			} );
