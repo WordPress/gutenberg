@@ -146,7 +146,7 @@ describe( 'polling-manager', () => {
 		} );
 	} );
 
-	describe( 'provider size limit', () => {
+	describe( 'document size limit', () => {
 		// Helper to extract the onDocUpdate callback registered via doc.on('updateV2', ...).
 		function getOnDocUpdate( doc: ReturnType< typeof createMockDoc > ) {
 			const call = doc.on.mock.calls.find(

@@ -493,7 +493,7 @@ function registerRoom( {
 				return;
 			}
 
-			state.log( 'Provider size limit exceeded', {
+			state.log( 'Document size limit exceeded', {
 				maxUpdatSizeInBytes: MAX_UPDATE_SIZE_IN_BYTES,
 				updateSizeInBytes: update.byteLength,
 			} );
