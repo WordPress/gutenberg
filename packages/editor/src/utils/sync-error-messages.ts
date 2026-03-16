@@ -14,7 +14,7 @@ export const UNKNOWN_ERROR = 'unknown-error';
 /**
  * Default error messages for known error codes.
  */
-const ERROR_MESSAGES = {
+const ERROR_MESSAGES: Record< string, ConnectionErrorMessages > = {
 	[ AUTHENTICATION_FAILED ]: {
 		title: __( 'Unable to connect' ),
 		description: __(
@@ -51,16 +51,28 @@ const ERROR_MESSAGES = {
 	},
 };
 
+export interface ConnectionError extends Error {
+	code?: string;
+}
+
+export interface ConnectionErrorMessages {
+	title: string;
+	description: string;
+	canRetry: boolean;
+}
+
 /**
  * Get user-facing title and description from a sync connection error.
  *
  * Provides default messages based on error.code.
  *
- * @param {Object} error - Connection error object.
- * @return {Object} Object with title, description, and canRetry flag.
+ * @param error - Connection error.
+ * @return Object with title, description, and canRetry flag.
  */
-export function getSyncErrorMessages( error ) {
-	if ( ERROR_MESSAGES[ error?.code ] ) {
+export function getSyncErrorMessages(
+	error: ConnectionError
+): ConnectionErrorMessages {
+	if ( error?.code && ERROR_MESSAGES[ error?.code ] ) {
 		return ERROR_MESSAGES[ error.code ];
 	}
 

@@ -5,17 +5,17 @@ import { useState, useEffect, useRef } from '@wordpress/element';
 
 const MIN_RETRYING_DISPLAY_MS = 600;
 
-/**
- * Hook that computes a countdown in seconds from a retryInMs value.
- *
- * @param {number|undefined} retryInMs Milliseconds until next retry.
- * @param {string|undefined} status    Current connection status.
- * @return {Object} Object with `secondsRemaining` (number|null) and `markRetrying` callback.
- */
-export function useRetryCountdown( retryInMs, status ) {
-	const [ secondsRemaining, setSecondsRemaining ] = useState( null );
+type ConnectionStatus = 'connected' | 'disconnected' | 'connecting';
+
+export function useRetryCountdown(
+	retryInMs: number | undefined,
+	status: ConnectionStatus | undefined
+): { secondsRemaining: number | null; markRetrying: () => void } {
+	const [ secondsRemaining, setSecondsRemaining ] = useState< number | null >(
+		null
+	);
 	const [ isRetrying, setIsRetrying ] = useState( false );
-	const retryAtRef = useRef( null );
+	const retryAtRef = useRef< number | null >( null );
 
 	// Show "Retrying…" for a minimum duration when manually triggered.
 	const markRetrying = () => setIsRetrying( true );
@@ -51,9 +51,7 @@ export function useRetryCountdown( retryInMs, status ) {
 		setSecondsRemaining( Math.ceil( retryInMs / 1000 ) );
 
 		const intervalId = setInterval( () => {
-			const remaining = Math.ceil(
-				( retryAtRef.current - Date.now() ) / 1000
-			);
+			const remaining = Math.ceil( ( retryAt - Date.now() ) / 1000 );
 			setSecondsRemaining( Math.max( 0, remaining ) );
 			if ( remaining <= 0 ) {
 				clearInterval( intervalId );
