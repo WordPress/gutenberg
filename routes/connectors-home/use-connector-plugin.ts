@@ -3,7 +3,7 @@
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import type { __experimentalApiKeySource as ApiKeySource } from '@wordpress/connectors';
@@ -11,12 +11,12 @@ import type { __experimentalApiKeySource as ApiKeySource } from '@wordpress/conn
 export type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';
 
 interface UseConnectorPluginOptions {
+	connectorId: string;
 	pluginSlug?: string;
 	settingName: string;
 	isInstalled?: boolean;
 	isActivated?: boolean;
 	keySource?: ApiKeySource;
-	initialIsConnected?: boolean;
 }
 
 interface UseConnectorPluginReturn {
@@ -27,6 +27,7 @@ interface UseConnectorPluginReturn {
 	setIsExpanded: ( expanded: boolean ) => void;
 	isBusy: boolean;
 	isConnected: boolean;
+	isCheckingConnection: boolean;
 	currentApiKey: string;
 	keySource: ApiKeySource;
 	handleButtonClick: () => void;
@@ -36,17 +37,53 @@ interface UseConnectorPluginReturn {
 }
 
 export function useConnectorPlugin( {
+	connectorId,
 	pluginSlug,
 	settingName,
 	isInstalled,
 	isActivated,
 	keySource = 'none',
-	initialIsConnected = false,
 }: UseConnectorPluginOptions ): UseConnectorPluginReturn {
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ isBusy, setIsBusy ] = useState( false );
-	const [ connectedState, setConnectedState ] =
-		useState( initialIsConnected );
+	const [ connectedState, setConnectedState ] = useState< boolean | null >(
+		() => {
+			// Check if streaming already delivered the result before React mounted.
+			const streamed = (
+				window as unknown as {
+					__connectorStatuses?: Record< string, boolean >;
+				}
+			 ).__connectorStatuses?.[ connectorId ];
+			return streamed !== undefined ? streamed : null;
+		}
+	);
+
+	// Listen for streamed connector-status events from the server.
+	useEffect( () => {
+		if ( connectedState !== null ) {
+			return;
+		}
+		const handler = ( e: Event ) => {
+			const detail = ( e as CustomEvent ).detail;
+			if ( detail.id === connectorId ) {
+				setConnectedState( detail.connected );
+			}
+		};
+		document.addEventListener( 'connector-status', handler );
+
+		// Check again in case the event fired between initial state and effect registration.
+		const streamed = (
+			window as unknown as {
+				__connectorStatuses?: Record< string, boolean >;
+			}
+		 ).__connectorStatuses?.[ connectorId ];
+		if ( streamed !== undefined ) {
+			setConnectedState( streamed );
+		}
+
+		return () =>
+			document.removeEventListener( 'connector-status', handler );
+	}, [ connectorId, connectedState ] );
 	// Local override for immediate UI feedback after install/activate.
 	const [ pluginStatusOverride, setPluginStatusOverride ] =
 		useState< PluginStatus | null >( null );
@@ -144,8 +181,11 @@ export function useConnectorPlugin( {
 	// Use canManagePlugins (from plugin entity resolution) for activation capability.
 	const canActivatePlugins = canManagePlugins;
 
+	const isCheckingConnection =
+		pluginStatus === 'active' && connectedState === null;
+
 	const isConnected =
-		( pluginStatus === 'active' && connectedState ) ||
+		( pluginStatus === 'active' && connectedState === true ) ||
 		// After install/activate, if settings re-fetch reveals an existing key,
 		// update connected state (mirrors what the server would report on page load).
 		( pluginStatusOverride === 'active' && !! currentApiKey );
@@ -226,6 +266,9 @@ export function useConnectorPlugin( {
 		if ( isConnected ) {
 			return __( 'Edit' );
 		}
+		if ( isCheckingConnection ) {
+			return __( 'Checking…' );
+		}
 		switch ( pluginStatus ) {
 			case 'checking':
 				return __( 'Checking…' );
@@ -298,6 +341,7 @@ export function useConnectorPlugin( {
 		setIsExpanded,
 		isBusy,
 		isConnected,
+		isCheckingConnection,
 		currentApiKey,
 		keySource,
 		handleButtonClick,

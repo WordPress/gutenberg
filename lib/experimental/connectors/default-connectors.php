@@ -448,11 +448,6 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 			$auth_out['settingName']    = $auth['setting_name'] ?? '';
 			$auth_out['credentialsUrl'] = $auth['credentials_url'] ?? null;
 			$auth_out['keySource']      = _gutenberg_get_api_key_source( $connector_id, $auth['setting_name'] ?? '' );
-			try {
-				$auth_out['isConnected'] = $registry->hasProvider( $connector_id ) && $registry->isProviderConfigured( $connector_id );
-			} catch ( Exception $e ) {
-				$auth_out['isConnected'] = false;
-			}
 		}
 
 		$connector_out = array(
@@ -485,3 +480,59 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 }
 remove_filter( 'script_module_data_options-connectors-wp-admin', '_wp_connectors_get_connector_script_module_data' );
 add_filter( 'script_module_data_options-connectors-wp-admin', '_gutenberg_get_connector_script_module_data' );
+
+/**
+ * Streams connector connection-status checks to the browser after the page
+ * has been flushed, so the initial render is not blocked by slow HTTP
+ * validation requests.
+ *
+ * Each resolved status is delivered as an inline <script> that writes to
+ * window.__connectorStatuses and dispatches a CustomEvent so the React UI
+ * can update progressively.
+ *
+ * @access private
+ */
+function _gutenberg_stream_connector_statuses(): void {
+	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
+		return;
+	}
+
+	// Flush all output buffers so the browser receives the full page
+	// (including React bootstrap scripts) immediately.
+	while ( ob_get_level() ) {
+		ob_end_flush();
+	}
+	flush();
+
+	$registry = \WordPress\AiClient\AiClient::defaultRegistry();
+
+	foreach ( wp_get_connectors() as $connector_id => $connector_data ) {
+		$auth = $connector_data['authentication'];
+		if ( 'api_key' !== $auth['method'] ) {
+			continue;
+		}
+
+		try {
+			sleep( 3 ); // Simulate slow validation for demo purposes.
+			$is_connected = $registry->hasProvider( $connector_id )
+				&& $registry->isProviderConfigured( $connector_id );
+		} catch ( Exception $e ) {
+			$is_connected = false;
+		}
+
+		printf(
+			'<script>'
+			. '(window.__connectorStatuses=window.__connectorStatuses||{})[%s]=%s;'
+			. 'document.dispatchEvent(new CustomEvent("connector-status",{detail:{id:%s,connected:%s}}));'
+			. '</script>',
+			wp_json_encode( $connector_id ),
+			$is_connected ? 'true' : 'false',
+			wp_json_encode( $connector_id ),
+			$is_connected ? 'true' : 'false'
+		);
+
+		// Flush each result so the browser processes it immediately.
+		flush();
+	}
+}
+add_action( 'admin_footer-settings_page_options-connectors-wp-admin', '_gutenberg_stream_connector_statuses' );

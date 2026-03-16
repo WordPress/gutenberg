@@ -34,13 +34,13 @@ export function AiPluginCallout() {
 	const [ isBusy, setIsBusy ] = useState( false );
 	const [ justActivated, setJustActivated ] = useState( false );
 
-	// Server-side initial state — true if any provider was already connected at page load.
+	// Server-side initial state — true if any provider has a configured key at page load.
 	const initialHasConnectedProvider = useRef(
 		connectorDataValues.some(
 			( c ) =>
 				c.type === 'ai_provider' &&
 				c.authentication.method === 'api_key' &&
-				c.authentication.isConnected
+				c.authentication.keySource !== 'none'
 		)
 	).current;
 

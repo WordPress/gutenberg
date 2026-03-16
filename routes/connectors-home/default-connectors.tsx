@@ -29,7 +29,6 @@ type ConnectorAuthentication =
 			settingName: string;
 			credentialsUrl: string | null;
 			keySource?: ApiKeySource;
-			isConnected?: boolean;
 	  }
 	| { method: 'none' };
 
@@ -102,6 +101,7 @@ const ConnectedBadge = () => (
 const UnavailableActionBadge = () => <Badge>{ __( 'Not available' ) }</Badge>;
 
 interface ApiKeyConnectorConfig {
+	connectorId: string;
 	pluginSlug?: string;
 	settingName: string;
 	helpUrl?: string;
@@ -109,12 +109,12 @@ interface ApiKeyConnectorConfig {
 	isInstalled?: boolean;
 	isActivated?: boolean;
 	keySource?: ApiKeySource;
-	initialIsConnected?: boolean;
 }
 
 function ApiKeyConnector( {
 	label,
 	description,
+	connectorId,
 	pluginSlug,
 	settingName,
 	helpUrl,
@@ -122,7 +122,6 @@ function ApiKeyConnector( {
 	isInstalled,
 	isActivated,
 	keySource: initialKeySource,
-	initialIsConnected,
 }: ConnectorRenderProps & ApiKeyConnectorConfig ) {
 	let helpLabel: string | undefined;
 	try {
@@ -141,6 +140,7 @@ function ApiKeyConnector( {
 		setIsExpanded,
 		isBusy,
 		isConnected,
+		isCheckingConnection,
 		currentApiKey,
 		keySource,
 		handleButtonClick,
@@ -148,12 +148,12 @@ function ApiKeyConnector( {
 		saveApiKey,
 		removeApiKey,
 	} = useConnectorPlugin( {
+		connectorId,
 		pluginSlug,
 		settingName,
 		isInstalled,
 		isActivated,
 		keySource: initialKeySource,
-		initialIsConnected,
 	} );
 	const isExternallyConfigured =
 		keySource === 'env' || keySource === 'constant';
@@ -187,7 +187,11 @@ function ApiKeyConnector( {
 									: 'compact'
 							}
 							onClick={ handleButtonClick }
-							disabled={ pluginStatus === 'checking' || isBusy }
+							disabled={
+								pluginStatus === 'checking' ||
+								isCheckingConnection ||
+								isBusy
+							}
 							isBusy={ isBusy }
 							aria-expanded={ isExpanded }
 						>
@@ -247,6 +251,7 @@ export function registerDefaultConnectors() {
 			render: ( props ) => (
 				<ApiKeyConnector
 					{ ...props }
+					connectorId={ connectorId }
 					pluginSlug={ data.plugin?.slug }
 					settingName={ authentication.settingName }
 					helpUrl={ authentication.credentialsUrl ?? undefined }
@@ -258,7 +263,6 @@ export function registerDefaultConnectors() {
 					isInstalled={ data.plugin?.isInstalled }
 					isActivated={ data.plugin?.isActivated }
 					keySource={ authentication.keySource }
-					initialIsConnected={ authentication.isConnected }
 				/>
 			),
 		} );
