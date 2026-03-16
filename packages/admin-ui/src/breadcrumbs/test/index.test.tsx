@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -210,8 +210,12 @@ describe( 'Breadcrumbs', () => {
 			expect( listItems ).toHaveLength( 3 );
 			expect( listItems[ 0 ] ).not.toHaveTextContent( '' );
 			expect( listItems[ 0 ] ).toHaveTextContent( 'Home' );
-			expect( listItems[ 0 ].querySelector( 'a' ) ).toBeInTheDocument();
-			expect( listItems[ 1 ].querySelector( 'a' ) ).toBeInTheDocument();
+			expect( within( listItems[ 0 ] ).getByText( 'Home' ).tagName ).toBe(
+				'A'
+			);
+			expect(
+				within( listItems[ 1 ] ).getByText( 'Settings' ).tagName
+			).toBe( 'A' );
 		} );
 
 		it( 'should render inside a nav with an accessible label', () => {
