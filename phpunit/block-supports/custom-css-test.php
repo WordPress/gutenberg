@@ -658,8 +658,8 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_decode_custom_css_attribute_for_display
 	 */
 	public function test_encode_for_kses_round_trips_with_decode() {
-		$css     = 'background: green; & p { color: yellow; }';
-		$content = '<!-- wp:paragraph {"style":{"css":' . json_encode( $css, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '}} --><p>Test</p><!-- /wp:paragraph -->';
+		$css             = 'background: green; & p { color: yellow; }';
+		$content         = '<!-- wp:paragraph {"style":{"css":' . json_encode( $css, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '}} --><p>Test</p><!-- /wp:paragraph -->';
 		$encoded_content = gutenberg_encode_custom_css_for_kses( $content );
 
 		// Extract the encoded CSS value from the result.
