@@ -427,8 +427,6 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 		return $data;
 	}
 
-	$registry = \WordPress\AiClient\AiClient::defaultRegistry();
-
 	// Build a slug-to-file map for plugin installation status.
 	if ( ! function_exists( 'get_plugins' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
