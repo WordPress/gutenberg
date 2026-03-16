@@ -8,6 +8,8 @@ import type { Y } from '@wordpress/sync';
  */
 import type { SelectionType } from './utils/crdt-user-selections';
 
+export type { ConnectionError, ConnectionStatus } from '@wordpress/sync';
+
 export interface AnyFunction {
 	( ...args: any[] ): any;
 }

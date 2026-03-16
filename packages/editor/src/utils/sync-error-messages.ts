@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { type ConnectionError } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 
 // These error codes are defined in the sync package:
@@ -11,6 +12,11 @@ export const CONNECTION_LIMIT_EXCEEDED = 'connection-limit-exceeded';
 export const DOCUMENT_SIZE_LIMIT_EXCEEDED = 'document-size-limit-exceeded';
 export const UNKNOWN_ERROR = 'unknown-error';
 
+interface ConnectionErrorMessages {
+	description: string;
+	title: string;
+}
+
 /**
  * Default error messages for known error codes.
  */
@@ -19,9 +25,8 @@ const ERROR_MESSAGES: Record< string, ConnectionErrorMessages > = {
 		title: __( 'Unable to connect' ),
 		description: __(
 			"Real-time collaboration couldn't verify your permissions. " +
-				'Check that you have access to edit this post, or contact your site administrator.'
+				'Check that you have access to edit this post or contact your site administrator.'
 		),
-		canRetry: false,
 	},
 	[ CONNECTION_EXPIRED ]: {
 		title: __( 'Connection expired' ),
@@ -29,7 +34,6 @@ const ERROR_MESSAGES: Record< string, ConnectionErrorMessages > = {
 			'Your connection to real-time collaboration has timed out. ' +
 				'Editing is paused to prevent conflicts with other editors.'
 		),
-		canRetry: true,
 	},
 	[ CONNECTION_LIMIT_EXCEEDED ]: {
 		title: __( 'Too many editors connected' ),
@@ -37,7 +41,6 @@ const ERROR_MESSAGES: Record< string, ConnectionErrorMessages > = {
 			'Real-time collaboration has reached its connection limit. ' +
 				'Try again later or contact your site administrator.'
 		),
-		canRetry: true,
 	},
 	// DOCUMENT_SIZE_LIMIT_EXCEEDED is not included here because it results in
 	// collaboration being disabled entirely.
@@ -47,19 +50,8 @@ const ERROR_MESSAGES: Record< string, ConnectionErrorMessages > = {
 			'The connection to real-time collaboration was interrupted. ' +
 				'Editing is paused to prevent conflicts with other editors.'
 		),
-		canRetry: true,
 	},
 };
-
-export interface ConnectionError extends Error {
-	code?: string;
-}
-
-export interface ConnectionErrorMessages {
-	title: string;
-	description: string;
-	canRetry: boolean;
-}
 
 /**
  * Get user-facing title and description from a sync connection error.
@@ -70,7 +62,7 @@ export interface ConnectionErrorMessages {
  * @return Object with title, description, and canRetry flag.
  */
 export function getSyncErrorMessages(
-	error: ConnectionError
+	error?: ConnectionError
 ): ConnectionErrorMessages {
 	if ( error?.code && ERROR_MESSAGES[ error?.code ] ) {
 		return ERROR_MESSAGES[ error.code ];

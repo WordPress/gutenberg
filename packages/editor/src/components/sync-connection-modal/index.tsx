@@ -7,6 +7,7 @@ import { serialize } from '@wordpress/blocks';
 import {
 	store as coreDataStore,
 	privateApis as coreDataPrivateApis,
+	type ConnectionError,
 } from '@wordpress/core-data';
 import {
 	privateApis,
@@ -15,10 +16,11 @@ import {
 import {
 	Button,
 	Modal,
+	withFilters,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
 
 /**
@@ -39,19 +41,152 @@ const INITIAL_DISCONNECTED_DEBOUNCE_MS = 5000;
 // allowing brief network interruptions to resolve.
 const DISCONNECTED_DEBOUNCE_MS = 2000;
 
+export interface SyncConnectionModalProps {
+	description: string; // Modal description.
+	error?: ConnectionError; // Error object with a `code` property.
+	manualRetry?: () => void; // Callback for when the retry button is clicked.
+	postType?: { slug?: string; labels?: { name?: string } } | null; // Current post type object.
+	secondsRemainingUntilAutoRetry?: number; // Seconds remaining until the next automatic retry attempt, if applicable.
+	title: string; // Modal title.
+}
+
+/**
+ * Default sync connection modal component.
+ *
+ * Can be replaced or wrapped via the `editor.SyncConnectionModal` filter.
+ *
+ * @param props - SyncConnectionModalProps.
+ */
+function DefaultSyncConnectionModal( props: SyncConnectionModalProps ) {
+	const {
+		description,
+		manualRetry,
+		postType,
+		secondsRemainingUntilAutoRetry,
+		title,
+	} = props;
+	const copyButtonRef = useCopyToClipboard( () => {
+		const blocks = select( blockEditorStore ).getBlocks();
+		return serialize( blocks );
+	} );
+
+	let retryCountdownText: string = '';
+	let isRetrying = false;
+	if (
+		secondsRemainingUntilAutoRetry &&
+		secondsRemainingUntilAutoRetry > 0
+	) {
+		retryCountdownText = sprintf(
+			/* translators: %d: number of seconds until retry */
+			_n(
+				'Retrying connection in %d second\u2026',
+				'Retrying connection in %d seconds\u2026',
+				secondsRemainingUntilAutoRetry
+			),
+			secondsRemainingUntilAutoRetry
+		);
+	} else if ( 0 === secondsRemainingUntilAutoRetry ) {
+		isRetrying = true;
+		retryCountdownText = __( 'Retrying\u2026' );
+	}
+
+	let editPostHref = 'edit.php';
+	if ( postType?.slug ) {
+		editPostHref = `edit.php?post_type=${ postType.slug }`;
+	}
+
+	return (
+		<Modal
+			overlayClassName="editor-sync-connection-modal"
+			isDismissible={ false }
+			onRequestClose={ () => {} }
+			shouldCloseOnClickOutside={ false }
+			shouldCloseOnEsc={ false }
+			size="medium"
+			title={ title }
+		>
+			<VStack spacing={ 6 }>
+				<p>{ description }</p>
+				{ retryCountdownText && (
+					<p className="editor-sync-connection-modal__retry-countdown">
+						{ retryCountdownText }
+					</p>
+				) }
+				<HStack justify="right">
+					<Button
+						__next40pxDefaultSize
+						href={ editPostHref }
+						isDestructive
+						variant="tertiary"
+					>
+						{ sprintf(
+							/* translators: %s: Post type name (e.g., "Posts", "Pages"). */
+							__( 'Back to %s' ),
+							postType?.labels?.name ?? __( 'Posts' )
+						) }
+					</Button>
+					<Button
+						__next40pxDefaultSize
+						ref={ copyButtonRef }
+						variant={ manualRetry ? 'secondary' : 'primary' }
+					>
+						{ __( 'Copy Post Content' ) }
+					</Button>
+					{ manualRetry && (
+						<Button
+							__next40pxDefaultSize
+							accessibleWhenDisabled
+							aria-disabled={ isRetrying }
+							disabled={ isRetrying }
+							isBusy={ isRetrying }
+							variant="primary"
+							onClick={ manualRetry }
+						>
+							{ __( 'Retry' ) }
+						</Button>
+					) }
+				</HStack>
+			</VStack>
+		</Modal>
+	);
+}
+
+/**
+ * Filtered version of the sync connection modal, allowing third-party
+ * plugins to replace the default modal via:
+ *
+ * ```js
+ * wp.hooks.addFilter(
+ *     'editor.SyncConnectionModal',
+ *     'my-plugin/custom-sync-connection-modal',
+ *     ( OriginalComponent ) => ( props ) => {
+ *         // Return a custom component or wrap the original.
+ *         return <OriginalComponent { ...props } />;
+ *     }
+ * );
+ * ```
+ */
+const FilteredSyncConnectionModal = withFilters( 'editor.SyncConnectionModal' )(
+	DefaultSyncConnectionModal
+) as unknown as React.ComponentType< SyncConnectionModalProps >;
+
 /**
  * Sync connection modal that displays when any entity reports a disconnection.
  * Uses BlockCanvasCover.Fill to render in the block canvas.
  *
- * @return {Element|null} The modal component or null if not disconnected.
+ * @return The modal component or null if not disconnected.
  */
 export function SyncConnectionModal() {
-	const { connectionState, isCollaborationEnabled, postType } = useSelect(
+	const [ hasInitialized, setHasInitialized ] = useState( false );
+	const [ isManuallyRetrying, setIsManuallyRetrying ] = useState( false );
+	const [ showModal, setShowModal ] = useState( false );
+
+	const { connectionStatus, isCollaborationEnabled, postType } = useSelect(
 		( selectFn ) => {
 			const currentPostType =
 				selectFn( editorStore ).getCurrentPostType();
 			return {
-				connectionState:
+				connectionStatus:
 					selectFn( coreDataStore ).getSyncConnectionStatus() || null,
 				isCollaborationEnabled:
 					selectFn(
@@ -65,150 +200,63 @@ export function SyncConnectionModal() {
 		[]
 	);
 
-	const { secondsRemaining, markRetrying } = useRetryCountdown(
-		connectionState?.retryInMs,
-		connectionState?.status
-	);
+	const autoRetrySecondsRemaining = useRetryCountdown( connectionStatus );
 
-	const copyButtonRef = useCopyToClipboard( () => {
-		const blocks = select( blockEditorStore ).getBlocks();
-		return serialize( blocks );
-	} );
-	const [ syncConnectionMessage, setSyncConnectionMessage ] =
-		useState( null );
-	const debounceTimerRef = useRef( null );
-	// Track whether we've passed the initial load phase.
-	const hasInitializedRef = useRef( false );
+	const isConnected = 'connected' === connectionStatus?.status;
 
-	const connectionStatus = connectionState?.status;
-	const connectionErrorCode = connectionState?.error?.code;
+	// Set hasInitialized after a debounce to give extra time on initial load.
+	useEffect( () => {
+		const timeout = setTimeout( () => {
+			setHasInitialized( true );
+		}, INITIAL_DISCONNECTED_DEBOUNCE_MS );
+
+		return () => clearTimeout( timeout );
+	}, [] );
 
 	useEffect( () => {
-		// Clear any pending debounce timer when status changes.
-		if ( debounceTimerRef.current ) {
-			clearTimeout( debounceTimerRef.current );
-			debounceTimerRef.current = null;
+		if ( isConnected ) {
+			setShowModal( false );
+			return;
 		}
 
-		if ( connectionStatus === 'connected' ) {
-			hasInitializedRef.current = true;
-			setSyncConnectionMessage( null );
-		} else if ( connectionStatus === 'disconnected' ) {
-			const showModal = () => {
-				hasInitializedRef.current = true;
-				setSyncConnectionMessage(
-					getSyncErrorMessages( { code: connectionErrorCode } )
-				);
-			};
+		const timeout = setTimeout( () => {
+			setShowModal( true );
+		}, DISCONNECTED_DEBOUNCE_MS );
 
-			// Debounce on first load and after connection is established to allow
-			// brief network interruptions to resolve.
-			if ( hasInitializedRef.current ) {
-				debounceTimerRef.current = setTimeout(
-					showModal,
-					DISCONNECTED_DEBOUNCE_MS
-				);
-			} else {
-				debounceTimerRef.current = setTimeout(
-					showModal,
-					INITIAL_DISCONNECTED_DEBOUNCE_MS
-				);
-			}
-		}
+		return () => clearTimeout( timeout );
+	}, [ isConnected ] );
 
-		return () => {
-			if ( debounceTimerRef.current ) {
-				clearTimeout( debounceTimerRef.current );
-			}
-		};
-	}, [ connectionStatus, connectionErrorCode ] );
-
-	if ( ! syncConnectionMessage || ! isCollaborationEnabled ) {
+	if ( ! isCollaborationEnabled || ! hasInitialized || ! showModal ) {
 		return null;
 	}
 
-	const { title, description, canRetry } = syncConnectionMessage;
-
-	let retryCountdownText;
-	if ( secondsRemaining > 0 ) {
-		retryCountdownText = sprintf(
-			/* translators: %d: number of seconds until retry */
-			_n(
-				'Retrying connection in %d second\u2026',
-				'Retrying connection in %d seconds\u2026',
-				secondsRemaining
-			),
-			secondsRemaining
-		);
-	} else if ( secondsRemaining === 0 ) {
-		retryCountdownText = __( 'Retrying\u2026' );
-	}
-
-	let editPostHref = 'edit.php';
-	if ( postType?.slug ) {
-		editPostHref = `edit.php?post_type=${ postType.slug }`;
-	}
-
-	const isRetrying = secondsRemaining === 0;
+	const error =
+		connectionStatus && 'error' in connectionStatus
+			? connectionStatus?.error
+			: undefined;
+	const manualRetry =
+		connectionStatus &&
+		'canManuallyRetry' in connectionStatus &&
+		connectionStatus.canManuallyRetry
+			? () => {
+					setIsManuallyRetrying( true );
+					retrySyncConnection();
+			  }
+			: undefined;
+	const messages = getSyncErrorMessages( error );
 
 	return (
 		<BlockCanvasCover.Fill>
-			<Modal
-				overlayClassName="editor-sync-connection-modal"
-				isDismissible={ false }
-				onRequestClose={ () => {} }
-				shouldCloseOnClickOutside={ false }
-				shouldCloseOnEsc={ false }
-				size="medium"
-				title={ title }
-			>
-				<VStack spacing={ 6 }>
-					<p>{ description }</p>
-					{ retryCountdownText && (
-						<p className="editor-sync-connection-modal__retry-countdown">
-							{ retryCountdownText }
-						</p>
-					) }
-					<HStack justify="right">
-						<Button
-							__next40pxDefaultSize
-							href={ editPostHref }
-							isDestructive
-							variant="tertiary"
-						>
-							{ sprintf(
-								/* translators: %s: Post type name (e.g., "Posts", "Pages"). */
-								__( 'Back to %s' ),
-								postType?.labels?.name ?? __( 'Posts' )
-							) }
-						</Button>
-						<Button
-							__next40pxDefaultSize
-							ref={ copyButtonRef }
-							variant={ canRetry ? 'secondary' : 'primary' }
-						>
-							{ __( 'Copy Post Content' ) }
-						</Button>
-						{ canRetry && (
-							<Button
-								__next40pxDefaultSize
-								aria-disabled={ isRetrying }
-								isBusy={ isRetrying }
-								variant="primary"
-								onClick={ () => {
-									if ( isRetrying ) {
-										return;
-									}
-									markRetrying();
-									retrySyncConnection();
-								} }
-							>
-								{ __( 'Retry' ) }
-							</Button>
-						) }
-					</HStack>
-				</VStack>
-			</Modal>
+			<FilteredSyncConnectionModal
+				description={ messages.description }
+				error={ error }
+				manualRetry={ manualRetry }
+				postType={ postType }
+				secondsRemainingUntilAutoRetry={
+					isManuallyRetrying ? 0 : autoRetrySecondsRemaining
+				}
+				title={ messages.title }
+			/>
 		</BlockCanvasCover.Fill>
 	);
 }

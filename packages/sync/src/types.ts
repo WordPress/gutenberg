@@ -73,10 +73,15 @@ export interface ConnectionStatusConnecting {
 
 export interface ConnectionStatusDisconnected {
 	status: 'disconnected';
+
 	/** Optional error information. */
 	error?: ConnectionError;
-	/** Milliseconds until the next automatic retry attempt. */
-	retryInMs?: number;
+
+	/** Whether the error condition is retryable via user action. */
+	canManuallyRetry?: boolean;
+
+	/** Milliseconds until the next automatic retry attempt (triggered by the provider). */
+	willAutoRetryInMs?: number;
 }
 
 export type ConnectionStatus =

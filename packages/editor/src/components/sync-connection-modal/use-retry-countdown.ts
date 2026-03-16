@@ -3,38 +3,27 @@
  */
 import { useState, useEffect, useRef } from '@wordpress/element';
 
-const MIN_RETRYING_DISPLAY_MS = 600;
-
-type ConnectionStatus = 'connected' | 'disconnected' | 'connecting';
+interface ConnectionStatus {
+	status: string;
+	willAutoRetryInMs?: number;
+}
 
 export function useRetryCountdown(
-	retryInMs: number | undefined,
-	status: ConnectionStatus | undefined
-): { secondsRemaining: number | null; markRetrying: () => void } {
-	const [ secondsRemaining, setSecondsRemaining ] = useState< number | null >(
-		null
-	);
-	const [ isRetrying, setIsRetrying ] = useState( false );
+	connectionStatus?: ConnectionStatus | null
+): number | undefined {
+	const [ secondsRemaining, setSecondsRemaining ] = useState< number >();
 	const retryAtRef = useRef< number | null >( null );
 
-	// Show "Retrying…" for a minimum duration when manually triggered.
-	const markRetrying = () => setIsRetrying( true );
-
 	useEffect( () => {
-		if ( ! isRetrying ) {
+		if ( ! connectionStatus ) {
 			return;
 		}
-		const id = setTimeout(
-			() => setIsRetrying( false ),
-			MIN_RETRYING_DISPLAY_MS
-		);
-		return () => clearTimeout( id );
-	}, [ isRetrying ] );
 
-	useEffect( () => {
+		const { status, willAutoRetryInMs: retryInMs } = connectionStatus;
+
 		// Only clear countdown when explicitly connected.
 		if ( status === 'connected' ) {
-			setSecondsRemaining( null );
+			setSecondsRemaining( undefined );
 			retryAtRef.current = null;
 			return;
 		}
@@ -55,14 +44,11 @@ export function useRetryCountdown(
 			setSecondsRemaining( Math.max( 0, remaining ) );
 			if ( remaining <= 0 ) {
 				clearInterval( intervalId );
-				setIsRetrying( true );
 			}
 		}, 1000 );
 
 		return () => clearInterval( intervalId );
-	}, [ retryInMs, status ] );
+	}, [ connectionStatus ] );
 
-	const displaySeconds = isRetrying ? 0 : secondsRemaining;
-
-	return { secondsRemaining: displaySeconds, markRetrying };
+	return secondsRemaining;
 }
