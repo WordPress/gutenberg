@@ -250,6 +250,63 @@ This rule reports an error when a CSS declaration sets (defines) a custom proper
 }
 ```
 
+## Build Plugins
+
+This package provides build plugins that inject fallback values into bare `var(--wpds-*)` references at build time. This ensures components render correctly even when a `ThemeProvider` or design tokens stylesheet is not present — for example, `var(--wpds-color-fg-content-neutral)` becomes `var(--wpds-color-fg-content-neutral, #1e1e1e)`.
+
+`@wordpress/build` already applies these plugins automatically when `@wordpress/theme` is installed. You only need to configure them manually for custom build setups.
+
+Three plugin variants are available, covering common build tool setups:
+
+| Export                                                            | Tool    | Scope |
+| ----------------------------------------------------------------- | ------- | ----- |
+| `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks`     | PostCSS | CSS   |
+| `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`     | esbuild | JS/TS |
+| `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`           | Vite    | JS/TS |
+
+All three plugins skip files that don't contain `--wpds-` references, so there is zero overhead on unrelated modules.
+
+### PostCSS
+
+```js
+// postcss.config.mjs
+import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
+
+export default {
+	plugins: [ dsTokenFallbacks ],
+};
+```
+
+### esbuild
+
+```js
+import dsTokenFallbacks from '@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks';
+
+await esbuild.build( {
+	plugins: [ dsTokenFallbacks ],
+	// …
+} );
+```
+
+### Vite
+
+The Vite setup uses both the Vite plugin (for JS/TS) and the PostCSS plugin (for CSS):
+
+```ts
+// vite.config.ts
+import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
+import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
+
+export default defineConfig( {
+	plugins: [ dsTokenFallbacksJs() ],
+	css: {
+		postcss: {
+			plugins: [ dsTokenFallbacks ],
+		},
+	},
+} );
+```
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.

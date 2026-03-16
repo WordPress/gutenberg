@@ -90,7 +90,7 @@ function createDeprecatedCompactionUpdate( updates: SyncUpdate[] ): SyncUpdate {
 
 	// Merge all updates while preserving operation metadata.
 	return createSyncUpdate(
-		Y.mergeUpdates( mergeable ),
+		Y.mergeUpdatesV2( mergeable ),
 		SyncUpdateType.COMPACTION
 	);
 }
@@ -238,7 +238,7 @@ function processDocUpdate(
 		case SyncUpdateType.COMPACTION:
 		case SyncUpdateType.UPDATE: {
 			// Apply document update directly.
-			Y.applyUpdate( doc, data, POLLING_MANAGER_ORIGIN );
+			Y.applyUpdateV2( doc, data, POLLING_MANAGER_ORIGIN );
 		}
 	}
 }
@@ -488,7 +488,7 @@ function registerRoom( {
 	}
 
 	function unregister(): void {
-		doc.off( 'update', onDocUpdate );
+		doc.off( 'updateV2', onDocUpdate );
 		awareness.off( 'change', onAwarenessUpdate );
 		updateQueue.clear();
 	}
@@ -497,7 +497,7 @@ function registerRoom( {
 		clientId: doc.clientID,
 		createCompactionUpdate: () =>
 			createSyncUpdate(
-				Y.encodeStateAsUpdate( doc ),
+				Y.encodeStateAsUpdateV2( doc ),
 				SyncUpdateType.COMPACTION
 			),
 		endCursor: 0,
@@ -512,7 +512,7 @@ function registerRoom( {
 		updateQueue,
 	};
 
-	doc.on( 'update', onDocUpdate );
+	doc.on( 'updateV2', onDocUpdate );
 	awareness.on( 'change', onAwarenessUpdate );
 	roomStates.set( room, roomState );
 

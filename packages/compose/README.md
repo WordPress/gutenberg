@@ -220,9 +220,9 @@ Copies the text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _ref_ `React.RefObject<string | Element | NodeListOf<Element>>`: Reference with the element.
--   _text_ `string|Function`: The text to copy.
--   _timeout_ `[number]`: Optional timeout to reset the returned state. 4 seconds by default.
+-   _ref_ `RefObject< string | Element | NodeListOf< Element > >`: Reference with the element.
+-   _text_ `string | ( () => string )`: The text to copy.
+-   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
 
 _Returns_
 
@@ -234,12 +234,12 @@ Copies the given text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _text_ `string | (() => string)`: The text to copy. Use a function if not already available and expensive to compute.
--   _onSuccess_ `Function`: Called when to text is copied.
+-   _text_ `string | ( () => string )`: The text to copy. Use a function if not already available and expensive to compute.
+-   _onSuccess_ `() => void`: Called when to text is copied.
 
 _Returns_
 
--   `React.Ref<TElementType>`: A ref to assign to the target element.
+-   `RefCallback< T >`: A ref to assign to the target element.
 
 ### useDebounce
 

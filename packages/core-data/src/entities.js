@@ -226,6 +226,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'view' },
 		plural: 'fontCollections',
 		key: 'slug',
+		supportsPagination: true,
 	},
 	{
 		label: __( 'Icons' ),
@@ -445,7 +446,7 @@ async function loadPostTypeEntities() {
 			 */
 			getPersistedCRDTDoc: ( record ) => {
 				return (
-					record?.meta[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ] ||
+					record?.meta?.[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ] ||
 					null
 				);
 			},

@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalHeading as Heading,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -28,9 +24,13 @@ export default function Header( {
 	showSidebarToggle?: boolean;
 } ) {
 	return (
-		<VStack className="admin-ui-page__header" as="header">
-			<HStack justify="space-between" spacing={ 2 }>
-				<HStack spacing={ 2 } justify="left">
+		<Stack
+			direction="column"
+			className="admin-ui-page__header"
+			render={ <header /> }
+		>
+			<Stack direction="row" justify="space-between" gap="sm">
+				<Stack direction="row" gap="sm" align="center" justify="start">
 					{ showSidebarToggle && (
 						<SidebarToggleSlot
 							bubblesVirtually
@@ -38,24 +38,26 @@ export default function Header( {
 						/>
 					) }
 					{ title && (
-						<Heading as="h2" level={ 3 } weight={ 500 } truncate>
+						<h2 className="admin-ui-page__header-title">
 							{ title }
-						</Heading>
+						</h2>
 					) }
 					{ breadcrumbs }
 					{ badges }
-				</HStack>
-				<HStack
+				</Stack>
+				<Stack
+					direction="row"
+					gap="sm"
 					style={ { width: 'auto', flexShrink: 0 } }
-					spacing={ 2 }
 					className="admin-ui-page__header-actions"
+					align="center"
 				>
 					{ actions }
-				</HStack>
-			</HStack>
+				</Stack>
+			</Stack>
 			{ subTitle && (
 				<p className="admin-ui-page__header-subtitle">{ subTitle }</p>
 			) }
-		</VStack>
+		</Stack>
 	);
 }
