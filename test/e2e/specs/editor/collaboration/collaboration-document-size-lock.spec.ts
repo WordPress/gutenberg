@@ -14,6 +14,10 @@ test.describe( 'Collaboration with large documents', () => {
 		editor,
 		page,
 	} ) => {
+		// This test creates a 1 MB+ post to trigger the real size limit
+		// code path, which makes it inherently slow.
+		test.slow();
+
 		// Create a draft post with content exceeding MAX_UPDATE_SIZE_IN_BYTES (1 MB).
 		// When the editor loads this post, the Yjs document initialization
 		// produces an update larger than the limit, triggering the polling
