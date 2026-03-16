@@ -2353,6 +2353,28 @@ export function requestedInspectorTab( state = null, action ) {
 	return state;
 }
 
+/**
+ * Reducer tracking the local user's title selection.
+ *
+ * Only one post can be actively edited at a time, so a flat
+ * `{ start, end }` is sufficient.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function titleSelection( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_TITLE_SELECTION':
+			return {
+				start: action.start ?? null,
+				end: action.end ?? null,
+			};
+	}
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2360,6 +2382,7 @@ const combinedReducers = combineReducers( {
 	isBlockInterfaceHidden,
 	draggedBlocks,
 	selection,
+	titleSelection,
 	isMultiSelecting,
 	isSelectionEnabled,
 	initialPosition,

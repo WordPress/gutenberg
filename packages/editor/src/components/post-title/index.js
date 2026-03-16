@@ -57,8 +57,12 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 
 	const [ selection, setSelection ] = useState( {} );
 
-	const { clearSelectedBlock, insertBlocks, insertDefaultBlock } =
-		useDispatch( blockEditorStore );
+	const {
+		clearSelectedBlock,
+		insertBlocks,
+		insertDefaultBlock,
+		setTitleSelection,
+	} = useDispatch( blockEditorStore );
 
 	const decodedPlaceholder =
 		decodeEntities( placeholder ) || __( 'Add title' );
@@ -86,6 +90,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 					end: newEnd,
 				};
 			} );
+			setTitleSelection( newStart, newEnd );
 		},
 		__unstableDisableFormats: false,
 	} );
@@ -102,6 +107,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	function onUnselect() {
 		setIsSelected( false );
 		setSelection( {} );
+		setTitleSelection( null, null );
 	}
 
 	function onEnterPress() {
@@ -189,6 +195,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 			aria-label={ decodedPlaceholder }
 			role="textbox"
 			aria-multiline="true"
+			data-post-title=""
 			onFocus={ onSelect }
 			onBlur={ onUnselect }
 			onKeyDown={ onKeyDown }

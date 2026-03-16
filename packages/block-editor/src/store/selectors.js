@@ -464,6 +464,17 @@ export function getSelectionEnd( state ) {
 }
 
 /**
+ * Returns the current user's title selection offsets.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {{ start: number|null, end: number|null }} Title selection offsets.
+ */
+export function getTitleSelection( state ) {
+	return state.titleSelection;
+}
+
+/**
  * Returns the current block selection start. This value may be null, and it
  * may represent either a singular block selection or multi-selection start.
  * A selection is singular if its start and end match.
