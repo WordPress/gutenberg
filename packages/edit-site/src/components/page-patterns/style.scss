@@ -3,7 +3,7 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .edit-site-patterns__delete-modal {
-	width: $modal-width-small;
+	width: var(--wpds-dimension-surface-width-md);
 }
 
 .page-patterns-preview-field {
