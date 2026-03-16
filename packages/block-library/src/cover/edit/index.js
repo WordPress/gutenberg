@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import {
@@ -139,6 +139,10 @@ function CoverEdit( {
 		},
 		[ featuredImage, useFeaturedImage ]
 	);
+
+	// Local state for isDark when using featured images to avoid
+	// persisting to shared templates in Query Loops
+	const [ computedIsDark, setComputedIsDark ] = useState( isDark );
 	const mediaUrl =
 		media?.media_details?.sizes?.[ sizeSlug ]?.source_url ??
 		media?.source_url;
@@ -167,9 +171,11 @@ function CoverEdit( {
 				newOverlayColor,
 				averageBackgroundColor
 			);
+
+			setComputedIsDark( newIsDark );
+
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
-				isDark: newIsDark,
 				isUserOverlayColor: isUserOverlayColor || false,
 			} );
 		} )();
@@ -499,6 +505,10 @@ function CoverEdit( {
 			averageBackgroundColor
 		);
 
+		if ( newUseFeaturedImage ) {
+			setComputedIsDark( newIsDark );
+		}
+
 		setAttributes( {
 			id: undefined,
 			url: undefined,
@@ -507,7 +517,7 @@ function CoverEdit( {
 			backgroundType: useFeaturedImage
 				? IMAGE_BACKGROUND_TYPE
 				: undefined,
-			isDark: newIsDark,
+			isDark: newUseFeaturedImage ? isDark : newIsDark,
 		} );
 	};
 
@@ -601,8 +611,8 @@ function CoverEdit( {
 
 	const classes = clsx(
 		{
-			'is-dark-theme': isDark,
-			'is-light': ! isDark,
+			'is-dark-theme': useFeaturedImage ? computedIsDark : isDark,
+			'is-light': useFeaturedImage ? ! computedIsDark : ! isDark,
 			'is-transient': isUploadingMedia,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
