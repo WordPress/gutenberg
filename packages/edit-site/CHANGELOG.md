@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Enhancements
-
--   Use `--wpds-dimension-surface-width-*` design tokens for pattern delete modal width ([#76494](https://github.com/WordPress/gutenberg/pull/76494)).
-
 ## 6.41.0 (2026-03-04)
 
 ## 6.40.0 (2026-02-18)

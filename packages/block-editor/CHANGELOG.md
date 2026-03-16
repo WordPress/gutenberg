@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Enhancements
-
--   Use `--wpds-dimension-surface-width-*` design tokens for link-control and url-popover widths ([#76494](https://github.com/WordPress/gutenberg/pull/76494)).
-
 ## 15.14.0 (2026-03-04)
 
 ## 15.13.0 (2026-02-18)
