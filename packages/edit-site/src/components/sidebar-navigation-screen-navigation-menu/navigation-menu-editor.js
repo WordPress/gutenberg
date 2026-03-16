@@ -13,14 +13,10 @@ import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wor
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import NavigationMenuContent from '../sidebar-navigation-screen-navigation-menus/navigation-menu-content';
-import useNavigateToEntityRecord from '../block-editor/use-navigate-to-entity-record';
 
 const noop = () => {};
 
-export default function NavigationMenuEditor( {
-	navigationMenuId,
-	hasDarkBackground = true,
-} ) {
+export default function NavigationMenuEditor( { navigationMenuId } ) {
 	const { storedSettings } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
 
@@ -29,16 +25,13 @@ export default function NavigationMenuEditor( {
 		};
 	}, [] );
 
-	const onNavigateToEntityRecord = useNavigateToEntityRecord();
-
 	const settings = useMemo( () => {
 		return {
 			...storedSettings,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, storedSettings ),
-			onNavigateToEntityRecord,
 		};
-	}, [ storedSettings, onNavigateToEntityRecord ] );
+	}, [ storedSettings ] );
 
 	const blocks = useMemo( () => {
 		if ( ! navigationMenuId ) {
@@ -59,13 +52,7 @@ export default function NavigationMenuEditor( {
 			onChange={ noop }
 			onInput={ noop }
 		>
-			<div
-				className={
-					hasDarkBackground
-						? 'edit-site-sidebar-navigation-screen-navigation-menus__content'
-						: undefined
-				}
-			>
+			<div className="edit-site-sidebar-navigation-screen-navigation-menus__content">
 				<NavigationMenuContent rootClientId={ blocks[ 0 ].clientId } />
 			</div>
 		</BlockEditorProvider>

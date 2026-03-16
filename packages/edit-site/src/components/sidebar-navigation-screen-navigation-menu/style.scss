@@ -1,20 +1,5 @@
 @use "@wordpress/base-styles/colors" as *;
 
-.navigation-menu-template-areas {
-	overflow: scroll;
-
-	.dataviews-view-grid__row {
-		grid-template-columns: 1fr !important;
-	}
-
-	.dataviews-view-grid__media {
-		aspect-ratio: unset;
-		height: auto;
-		max-height: 300px;
-		overflow: hidden;
-	}
-}
-
 .sidebar-navigation__more-menu {
 	.components-button {
 		color: $gray-200;

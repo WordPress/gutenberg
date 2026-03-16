@@ -216,7 +216,7 @@ export default function NavigationMenuContent( {
 								);
 							} }
 							clientId={ editingBlock.clientId }
-							contentOnly
+							isContentOnly
 						/>
 					</div>
 				</Popover>

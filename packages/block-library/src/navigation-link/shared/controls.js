@@ -71,19 +71,19 @@ function getEntityTypeName( type, kind ) {
  * This component provides the inspector controls (ToolsPanel) that are identical
  * between both navigation blocks.
  *
- * @param {Object}   props                - Component props
- * @param {Object}   props.attributes     - Block attributes
- * @param {Function} props.setAttributes  - Function to update block attributes
- * @param {string}   props.clientId       - Block client ID
- * @param {boolean}  props.isLinkEditable - Whether link editing should be allowed
- * @param {boolean}  props.contentOnly    - Whether to hide non-content fields (description, rel)
+ * @param {Object}   props                 - Component props
+ * @param {Object}   props.attributes      - Block attributes
+ * @param {Function} props.setAttributes   - Function to update block attributes
+ * @param {string}   props.clientId        - Block client ID
+ * @param {boolean}  props.isLinkEditable  - Whether link editing should be allowed
+ * @param {boolean}  [props.isContentOnly] - Override for content-only mode; when omitted, derived from block editing mode in the store
  */
 export function Controls( {
 	attributes,
 	setAttributes,
 	clientId,
 	isLinkEditable = true,
-	contentOnly: forceContentOnly = false,
+	isContentOnly: isContentOnlyProp,
 } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -140,7 +140,9 @@ export function Controls( {
 	);
 
 	const isContentOnly =
-		forceContentOnly || blockEditingMode === 'contentOnly';
+		isContentOnlyProp !== undefined
+			? isContentOnlyProp
+			: blockEditingMode === 'contentOnly';
 
 	const preview = useLinkPreview( {
 		url,
