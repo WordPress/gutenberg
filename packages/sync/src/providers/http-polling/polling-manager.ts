@@ -18,6 +18,7 @@ import {
 	POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS,
 	POLLING_INTERVAL_BACKGROUND_TAB_IN_MS,
 } from './config';
+import { ConnectionError, ConnectionErrorCode } from '../../errors';
 import type { ConnectionStatus } from '../../types';
 import {
 	type AwarenessState,
@@ -494,12 +495,16 @@ function registerRoom( {
 			}
 
 			state.log( 'Document size limit exceeded', {
-				maxUpdatSizeInBytes: MAX_UPDATE_SIZE_IN_BYTES,
+				maxUpdateSizeInBytes: MAX_UPDATE_SIZE_IN_BYTES,
 				updateSizeInBytes: update.byteLength,
 			} );
 
 			state.onStatusChange( {
-				status: 'document-size-limit-exceeded',
+				status: 'disconnected',
+				error: new ConnectionError(
+					ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED,
+					'Document size limit exceeded'
+				),
 			} );
 
 			// This is an unrecoverable error. Unregister the room to prevent syncing.

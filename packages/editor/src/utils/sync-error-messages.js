@@ -3,7 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 
-// These error codes are defined in the sync package.
+// These error codes are defined in the sync package:
+// packages/sync/src/errors.ts
 export const AUTHENTICATION_FAILED = 'authentication-failed';
 export const CONNECTION_EXPIRED = 'connection-expired';
 export const CONNECTION_LIMIT_EXCEEDED = 'connection-limit-exceeded';

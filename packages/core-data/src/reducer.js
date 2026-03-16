@@ -16,6 +16,7 @@ import { createUndoManager } from '@wordpress/undo-manager';
 import { ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
+import { ConnectionErrorCode } from './sync';
 
 /** @typedef {import('./types').AnyFunction} AnyFunction */
 
@@ -708,7 +709,10 @@ export function collaborationSupported( state = true, action ) {
 			return action.supported;
 
 		case 'SET_SYNC_CONNECTION_STATUS':
-			if ( 'document-size-limit-exceeded' === action.status?.status ) {
+			if (
+				ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED ===
+				action.status?.error?.code
+			) {
 				return false;
 			}
 

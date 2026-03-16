@@ -7,6 +7,7 @@ import {
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_UNDO_IGNORED_ORIGIN,
 } from './config';
+import { ConnectionErrorCode } from './errors';
 import { lock } from './lock-unlock';
 import { createSyncManager } from './manager';
 import { pollingManager } from './providers/http-polling/polling-manager';
@@ -22,4 +23,5 @@ lock( privateApis, {
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_UNDO_IGNORED_ORIGIN,
 	retrySyncConnection: () => pollingManager.retryNow(),
+	ConnectionErrorCode,
 } );
