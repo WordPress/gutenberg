@@ -14,29 +14,21 @@ test.describe( 'Collaboration with large documents', () => {
 		editor,
 		page,
 	} ) => {
-		// This test creates a 1 MB+ post to trigger the real size limit
-		// code path, which makes it inherently slow.
+		// User 2 loads a 1 MB+ post which is slow to initialize.
 		test.slow();
 
-		// Create a draft post with content exceeding MAX_UPDATE_SIZE_IN_BYTES (1 MB).
-		// When the editor loads this post, the Yjs document initialization
-		// produces an update larger than the limit, triggering the polling
-		// manager to emit 'document-size-limit-exceeded' and unregister
-		// the room.
-		const largeContent =
-			'<!-- wp:paragraph -->\n<p>' +
-			'x'.repeat( 1.1 * 1024 * 1024 ) +
-			'</p>\n<!-- /wp:paragraph -->';
+		// Create a small draft post — the large content is inserted via
+		// the block editor API after the editor has loaded, so User 1's
+		// page renders quickly.
 		const post = await requestUtils.createPost( {
 			title: 'Document Size Lock Test',
-			content: largeContent,
 			status: 'draft',
 			date_gmt: new Date().toISOString(),
 		} );
 
 		const postRoom = `postType/post:${ post.id }`;
 
-		// User 1 (admin) opens the large post.
+		// User 1 (admin) opens the post.
 		await admin.visitAdminPage(
 			'post.php',
 			`post=${ post.id }&action=edit`
@@ -49,9 +41,22 @@ test.describe( 'Collaboration with large documents', () => {
 		// Wait for collaboration runtime and entity record to be ready.
 		await collaborationUtils.waitForEntityReady( page );
 
-		// Wait for collaboration to be disabled. The large content
-		// triggers the size check in onDocUpdate, which emits the
-		// 'document-size-limit-exceeded' status and unregisters the room.
+		// Insert a paragraph block with content exceeding 1 MB
+		// (MAX_UPDATE_SIZE_IN_BYTES). This triggers the polling
+		// manager's onDocUpdate size check, which emits
+		// 'document-size-limit-exceeded' and unregisters the room.
+		await page.evaluate( () => {
+			const largeContent = 'x'.repeat( 1.1 * 1024 * 1024 );
+			window.wp.data.dispatch( 'core/block-editor' ).insertBlock(
+				window.wp.blocks.createBlock( 'core/paragraph', {
+					content: largeContent,
+				} )
+			);
+		} );
+
+		// Wait for collaboration to be disabled. This confirms the full
+		// code path ran: onDocUpdate detected the oversized update,
+		// emitted the status, and unregistered the room.
 		await page.waitForFunction(
 			() =>
 				window?.wp?.data
@@ -87,6 +92,19 @@ test.describe( 'Collaboration with large documents', () => {
 			expect( body ).not.toContain( postRoom );
 		}
 
+		// Save the large content to the database via the REST API so
+		// that User 2 loads the oversized post and independently
+		// triggers the size limit on their page.
+		const largeContentForDb =
+			'<!-- wp:paragraph -->\n<p>' +
+			'x'.repeat( 1.1 * 1024 * 1024 ) +
+			'</p>\n<!-- /wp:paragraph -->';
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/posts/${ post.id }`,
+			data: { content: largeContentForDb },
+		} );
+
 		// Set up second browser context for User 2.
 		const secondContext = await admin.browser.newContext( {
 			baseURL: BASE_URL,
@@ -101,15 +119,11 @@ test.describe( 'Collaboration with large documents', () => {
 			await page2.getByRole( 'button', { name: 'Log In' } ).click();
 			await page2.waitForURL( '**/wp-admin/**' );
 
-			// User 2 navigates to the same post.
+			// User 2 navigates to the same post. The large content
+			// from the database triggers the size limit during Yjs
+			// initialization, disabling collaboration on their page too.
 			await page2.goto(
 				`/wp-admin/post.php?post=${ post.id }&action=edit`
-			);
-
-			// Wait for wp.data to be available on User 2's page.
-			await page2.waitForFunction(
-				() => window?.wp?.data && window?.wp?.blocks,
-				{ timeout: 15000 }
 			);
 
 			// Assert the post-locked modal appears.
@@ -119,7 +133,7 @@ test.describe( 'Collaboration with large documents', () => {
 			const modal = page2.getByRole( 'dialog', {
 				name: 'This post is already being edited',
 			} );
-			await expect( modal ).toBeVisible( { timeout: 15000 } );
+			await expect( modal ).toBeVisible( { timeout: 60000 } );
 
 			// Assert the explanation about document size limit.
 			await expect(
