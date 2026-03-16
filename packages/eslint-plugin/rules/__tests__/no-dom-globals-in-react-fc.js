@@ -56,5 +56,14 @@ ruleTester.run( 'no-dom-globals-in-react-fc', rule, {
 				},
 			],
 		},
+		{
+			code: `const Icon = ( { name } ) => <span className={ window.iconPrefix + name } />;`,
+			errors: [
+				{
+					messageId: 'defaultMessage',
+					data: { name: 'window' },
+				},
+			],
+		},
 	],
 } );

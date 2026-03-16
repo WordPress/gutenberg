@@ -26,20 +26,34 @@ function isDOMGlobal( name ) {
  * @return {boolean} Whether the scope returns JSX.
  */
 function isReturnValueJSX( scope ) {
-	const body = scope.block?.body?.body;
+	if ( scope.type !== 'function' ) {
+		return false;
+	}
+
+	const { block } = scope;
+
+	// Concise arrow function: const C = () => <div />
+	if (
+		block.type === 'ArrowFunctionExpression' &&
+		block.body.type !== 'BlockStatement'
+	) {
+		return (
+			block.body.type === 'JSXElement' ||
+			block.body.type === 'JSXFragment'
+		);
+	}
+
+	const body = block?.body?.body;
 	if ( ! body || typeof body.find !== 'function' ) {
 		return false;
 	}
 
-	return (
-		scope.type === 'function' &&
-		body.some(
-			( statement ) =>
-				statement?.type === 'ReturnStatement' &&
-				statement.argument &&
-				( statement.argument.type === 'JSXElement' ||
-					statement.argument.type === 'JSXFragment' )
-		)
+	return body.some(
+		( statement ) =>
+			statement?.type === 'ReturnStatement' &&
+			statement.argument &&
+			( statement.argument.type === 'JSXElement' ||
+				statement.argument.type === 'JSXFragment' )
 	);
 }
 
