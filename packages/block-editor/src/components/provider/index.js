@@ -122,7 +122,7 @@ function mediaUpload(
 		},
 		onBatchSuccess,
 		onError: ( error ) =>
-			onError( typeof error === 'string' ? error : ( error?.message ?? '' ) ),
+			onError( typeof error === 'string' ? error : error?.message ?? '' ),
 		additionalData,
 		allowedTypes,
 	} );
