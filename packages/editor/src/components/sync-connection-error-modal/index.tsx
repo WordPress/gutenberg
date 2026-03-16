@@ -41,7 +41,7 @@ const INITIAL_DISCONNECTED_DEBOUNCE_MS = 5000;
 // allowing brief network interruptions to resolve.
 const DISCONNECTED_DEBOUNCE_MS = 2000;
 
-export interface SyncConnectionModalProps {
+export interface SyncConnectionErrorModalProps {
 	description: string; // Modal description.
 	error?: ConnectionError; // Error object with a `code` property.
 	manualRetry?: () => void; // Callback for when the retry button is clicked.
@@ -53,11 +53,13 @@ export interface SyncConnectionModalProps {
 /**
  * Default sync connection modal component.
  *
- * Can be replaced or wrapped via the `editor.SyncConnectionModal` filter.
+ * Can be replaced or wrapped via the `editor.SyncConnectionErrorModal` filter.
  *
- * @param props - SyncConnectionModalProps.
+ * @param props - SyncConnectionErrorModalProps.
  */
-function DefaultSyncConnectionModal( props: SyncConnectionModalProps ) {
+function DefaultSyncConnectionErrorModal(
+	props: SyncConnectionErrorModalProps
+) {
 	const {
 		description,
 		manualRetry,
@@ -157,8 +159,8 @@ function DefaultSyncConnectionModal( props: SyncConnectionModalProps ) {
  *
  * ```js
  * wp.hooks.addFilter(
- *     'editor.SyncConnectionModal',
- *     'my-plugin/custom-sync-connection-modal',
+ *     'editor.SyncConnectionErrorModal',
+ *     'my-plugin/custom-sync-connection-error-modal',
  *     ( OriginalComponent ) => ( props ) => {
  *         // Return a custom component or wrap the original.
  *         return <OriginalComponent { ...props } />;
@@ -166,9 +168,11 @@ function DefaultSyncConnectionModal( props: SyncConnectionModalProps ) {
  * );
  * ```
  */
-const FilteredSyncConnectionModal = withFilters( 'editor.SyncConnectionModal' )(
-	DefaultSyncConnectionModal
-) as unknown as React.ComponentType< SyncConnectionModalProps >;
+const FilteredSyncConnectionErrorModal = withFilters(
+	'editor.SyncConnectionErrorModal'
+)(
+	DefaultSyncConnectionErrorModal
+) as unknown as React.ComponentType< SyncConnectionErrorModalProps >;
 
 /**
  * Sync connection modal that displays when any entity reports a disconnection.
@@ -176,7 +180,7 @@ const FilteredSyncConnectionModal = withFilters( 'editor.SyncConnectionModal' )(
  *
  * @return The modal component or null if not disconnected.
  */
-export function SyncConnectionModal() {
+export function SyncConnectionErrorModal() {
 	const [ hasInitialized, setHasInitialized ] = useState( false );
 	const [ isManuallyRetrying, setIsManuallyRetrying ] = useState( false );
 	const [ showModal, setShowModal ] = useState( false );
@@ -247,7 +251,7 @@ export function SyncConnectionModal() {
 
 	return (
 		<BlockCanvasCover.Fill>
-			<FilteredSyncConnectionModal
+			<FilteredSyncConnectionErrorModal
 				description={ messages.description }
 				error={ error }
 				manualRetry={ manualRetry }
