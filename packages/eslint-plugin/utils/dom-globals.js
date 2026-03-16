@@ -69,7 +69,8 @@ function shouldSkipReference( reference ) {
 	return (
 		( parent.type === 'UnaryExpression' && parent.operator === 'typeof' ) ||
 		parent.type === 'TSTypeReference' ||
-		parent.type === 'TSInterfaceHeritage'
+		parent.type === 'TSInterfaceHeritage' ||
+		parent.type === 'TSTypeQuery'
 	);
 }
 
