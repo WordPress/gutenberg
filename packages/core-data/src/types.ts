@@ -3,11 +3,6 @@
  */
 import type { Y } from '@wordpress/sync';
 
-/**
- * Internal dependencies
- */
-import type { SelectionType } from './utils/crdt-user-selections';
-
 export interface AnyFunction {
 	( ...args: any[] ): any;
 }
@@ -74,6 +69,18 @@ export enum SelectionDirection {
 	Forward = 'f',
 	/** The caret is at the start of the selection (right-to-left). */
 	Backward = 'b',
+}
+
+/**
+ * The type of selection.
+ */
+export enum SelectionType {
+	None = 'none',
+	Cursor = 'cursor',
+	SelectionInOneBlock = 'selection-in-one-block',
+	SelectionInMultipleBlocks = 'selection-in-multiple-blocks',
+	WholeBlock = 'whole-block',
+	Title = 'title',
 }
 
 export type SelectionNone = {

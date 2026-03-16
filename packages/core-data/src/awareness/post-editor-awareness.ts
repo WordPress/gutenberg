@@ -9,12 +9,10 @@ import { Y } from '@wordpress/sync';
 import { BaseAwarenessState, baseEqualityFieldChecks } from './base-awareness';
 import { getBlockPathInYdoc, resolveBlockClientIdByPath } from './block-lookup';
 import { AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS } from './config';
-import {
-	areSelectionsStatesEqual,
-	SelectionType,
-} from '../utils/crdt-user-selections';
+import { areSelectionsStatesEqual } from '../utils/crdt-user-selections';
 import { createSelectionSubscription } from './selection/create-selection-subscription';
 
+import { SelectionType } from '../types';
 import type { ResolvedSelection, SelectionState } from '../types';
 import type { YBlocks } from '../utils/crdt-blocks';
 import type {

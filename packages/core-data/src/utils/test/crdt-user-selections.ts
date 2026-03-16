@@ -10,8 +10,8 @@ import { select } from '@wordpress/data';
 import {
 	areSelectionsStatesEqual,
 	getSelectionState,
-	SelectionType,
 } from '../crdt-user-selections';
+import { SelectionType } from '../../types';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
 
 jest.mock( '@wordpress/data', () => ( {

@@ -16,7 +16,7 @@ import {
 	useOnPostSave,
 } from '../use-post-editor-awareness-state';
 import { getSyncManager } from '../../sync';
-import { SelectionType } from '../../utils/crdt-user-selections';
+import { SelectionType } from '../../types';
 import type {
 	PostEditorAwarenessState,
 	YDocDebugData,

@@ -8,7 +8,7 @@ import type { Y } from '@wordpress/sync';
  */
 import { createBlockSelectionSubscription } from './create-block-selection-subscription';
 import { createTitleSelectionSubscription } from './create-title-selection-subscription';
-import { SelectionType } from '../../utils/crdt-user-selections';
+import { SelectionType } from '../../types';
 import type { SelectionState } from '../../types';
 
 /**

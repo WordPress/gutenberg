@@ -11,10 +11,8 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import { LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS } from '../config';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
-import { SelectionType } from '../../utils/crdt-user-selections';
 import { getRootMap } from '../../utils/crdt-utils';
-
-import { SelectionDirection } from '../../types';
+import { SelectionDirection, SelectionType } from '../../types';
 import type { SelectionState } from '../../types';
 import type { YPostRecord } from '../../utils/crdt';
 
