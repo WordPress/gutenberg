@@ -123,14 +123,12 @@ jobs:
             - name: Comment on the PR
               if: env.cherry_pick == 'true' && env.conflict == 'false'
               uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
-              env:
-                  run_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
               with:
                   script: |
                       const prNumber = process.env.pr_number;
                       const cherryPickSha = process.env.cherry_pick_sha;
                       const targetBranch = `wp/${process.env.version}`;
-                      const runUrl = process.env.run_url;
+                      const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
                       console.log(`prNumber: ${prNumber}`);
                       console.log(`cherryPickSha: ${cherryPickSha}`);
                       console.log(`targetBranch: ${targetBranch}`);
@@ -138,20 +136,18 @@ jobs:
                         owner: context.repo.owner,
                         repo: context.repo.repo,
                         issue_number: prNumber,
-                        body: `I just cherry-picked this PR to the ${targetBranch} branch to get it included in the next release: ${cherryPickSha}\n\n[Workflow run](${runUrl})`
+                        body: `I just cherry-picked this PR to the ${targetBranch} branch to get it included in the next release: ${cherryPickSha}\n\nSee the [workflow run](${runUrl}) for more details.`
                       });
 
             - name: Comment on the PR about conflict
               if: env.cherry_pick == 'true' && env.conflict == 'true'
               uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
-              env:
-                  run_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
               with:
                   script: |
                       const prNumber = process.env.pr_number;
                       const commitSha = process.env.commit_sha;
                       const targetBranch = `wp/${process.env.version}`;
-                      const runUrl = process.env.run_url;
+                      const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
                       console.log(`prNumber: ${prNumber}`);
                       console.log(`targetBranch: ${targetBranch}`);
                       await github.rest.issues.createComment({
@@ -188,5 +184,5 @@ jobs:
                         # See https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-base-branch-of-a-pull-request.
                         \`\`\`
 
-                        [Workflow run](${runUrl})`
+                        See the [workflow run](${runUrl}) for more details.`
                       });
