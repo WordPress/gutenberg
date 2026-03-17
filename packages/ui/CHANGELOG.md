@@ -25,6 +25,10 @@
 -   `CollapsibleCard`: add animations ([#76378](https://github.com/WordPress/gutenberg/pull/76378)).
 -   `CollapsibleCard`: allows the browser page search to find and expand the panel contents via the `hiddenUntilFound` prop. ([#76498](https://github.com/WordPress/gutenberg/pull/76498)).
 
+### Internal
+
+-   Update `@base-ui/react` from 1.2.0 to [1.3.0](https://github.com/mui/base-ui/blob/master/CHANGELOG.md#v130) ([#76603](https://github.com/WordPress/gutenberg/pull/76603)).
+
 ## 0.8.0 (2026-03-04)
 
 ### Breaking Changes
