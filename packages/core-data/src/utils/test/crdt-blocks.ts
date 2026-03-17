@@ -38,8 +38,23 @@ jest.mock( '@wordpress/blocks', () => ( {
 				url: { type: 'string' },
 			},
 		},
+		{
+			name: 'core/table',
+			attributes: {
+				hasFixedLayout: { type: 'boolean' },
+				caption: { type: 'rich-text' },
+				head: { type: 'array' },
+				body: { type: 'array' },
+				foot: { type: 'array' },
+			},
+		},
 	],
 } ) );
+
+/**
+ * WordPress dependencies
+ */
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -1086,6 +1101,137 @@ describe( 'crdt-blocks', () => {
 			const attrs2 = block2.get( 'attributes' ) as YBlockAttributes;
 			expect( attrs2.has( 'content' ) ).toBe( true );
 			expect( attrs2.has( 'caption' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'table block', () => {
+		it( 'preserves table cell content through CRDT round-trip', () => {
+			const tableBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						hasFixedLayout: true,
+						body: [
+							{
+								cells: [
+									{
+										content:
+											RichTextData.fromPlainText( '1' ),
+										tag: 'td',
+									},
+									{
+										content:
+											RichTextData.fromPlainText( '2' ),
+										tag: 'td',
+									},
+								],
+							},
+							{
+								cells: [
+									{
+										content:
+											RichTextData.fromPlainText( '3' ),
+										tag: 'td',
+									},
+									{
+										content:
+											RichTextData.fromPlainText( '4' ),
+										tag: 'td',
+									},
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, tableBlocks, null );
+
+			// Simulate a CRDT encode/decode cycle (persistence or sync).
+			const encoded = Y.encodeStateAsUpdate( doc );
+			const doc2 = new Y.Doc();
+			Y.applyUpdate( doc2, encoded );
+
+			const yblocks2 = doc2.getArray< YBlock >();
+			expect( yblocks2.length ).toBe( 1 );
+
+			const block = yblocks2.get( 0 );
+			const attrs = block.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as {
+				cells: { content: string; tag: string }[];
+			}[];
+
+			expect( body ).toHaveLength( 2 );
+			expect( body[ 0 ].cells[ 0 ].content ).toBe( '1' );
+			expect( body[ 0 ].cells[ 1 ].content ).toBe( '2' );
+			expect( body[ 1 ].cells[ 0 ].content ).toBe( '3' );
+			expect( body[ 1 ].cells[ 1 ].content ).toBe( '4' );
+
+			doc2.destroy();
+		} );
+
+		it( 'preserves table cell content with HTML formatting', () => {
+			const tableBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						hasFixedLayout: true,
+						head: [
+							{
+								cells: [
+									{
+										content: RichTextData.fromHTMLString(
+											'<strong>Header</strong>'
+										),
+										tag: 'th',
+									},
+								],
+							},
+						],
+						body: [
+							{
+								cells: [
+									{
+										content: RichTextData.fromHTMLString(
+											'<a href="https://example.com">Link</a>'
+										),
+										tag: 'td',
+									},
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, tableBlocks, null );
+
+			// Round-trip through encode/decode.
+			const encoded = Y.encodeStateAsUpdate( doc );
+			const doc2 = new Y.Doc();
+			Y.applyUpdate( doc2, encoded );
+
+			const yblocks2 = doc2.getArray< YBlock >();
+			const block = yblocks2.get( 0 );
+			const attrs = block.get( 'attributes' ) as YBlockAttributes;
+
+			const head = attrs.get( 'head' ) as {
+				cells: { content: string }[];
+			}[];
+			expect( head[ 0 ].cells[ 0 ].content ).toBe(
+				'<strong>Header</strong>'
+			);
+
+			const body = attrs.get( 'body' ) as {
+				cells: { content: string }[];
+			}[];
+			expect( body[ 0 ].cells[ 0 ].content ).toBe(
+				'<a href="https://example.com">Link</a>'
+			);
+
+			doc2.destroy();
 		} );
 	} );
 
