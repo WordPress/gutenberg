@@ -1222,7 +1222,6 @@ export function generateThumbnails( id: QueueItemId ) {
 				} );
 			}
 
-
 			// Create and sideload the scaled version.
 			const { bigImageSizeThreshold } = settings;
 			if ( bigImageSizeThreshold && attachment.id ) {
@@ -1269,6 +1268,36 @@ export function generateThumbnails( id: QueueItemId ) {
 					},
 					operations: scaledOperations,
 				} );
+			}
+		}
+
+		dispatch.finishOperation( id, {} );
+	};
+}
+
+/**
+ * Finalizes an item after all client-side processing is complete.
+ *
+ * @param id Item ID.
+ */
+export function finalizeItem( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		const attachment = item.attachment;
+		const { mediaFinalize } = select.getSettings();
+
+		// Only finalize if we have an attachment ID and a mediaFinalize callback.
+		if ( attachment?.id && mediaFinalize ) {
+			try {
+				await mediaFinalize( attachment.id );
+			} catch ( error ) {
+				// Log but don't fail the upload if finalization fails.
+				// eslint-disable-next-line no-console
+				console.warn( 'Media finalization failed:', error );
 			}
 		}
 

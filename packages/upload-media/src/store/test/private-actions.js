@@ -251,5 +251,4 @@ describe( 'private actions', () => {
 			expect( result ).toBeNull();
 		} );
 	} );
-
 } );

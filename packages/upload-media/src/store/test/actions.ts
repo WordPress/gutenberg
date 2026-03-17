@@ -665,6 +665,5 @@ describe( 'actions', () => {
 			).getAllItems();
 			expect( allItems ).toHaveLength( 1 );
 		} );
-
 	} );
 } );
