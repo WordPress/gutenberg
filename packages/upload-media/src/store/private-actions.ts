@@ -1194,49 +1194,60 @@ export function generateThumbnails( id: QueueItemId ) {
 			// Create and sideload the scaled version.
 			const { bigImageSizeThreshold } = settings;
 			if ( bigImageSizeThreshold && attachment.id ) {
-				// Rename sourceFile to match the server attachment filename.
-				const sourceForScaled = attachment.filename
-					? renameFile( item.sourceFile, attachment.filename )
-					: item.sourceFile;
+				// Check if the image actually exceeds the threshold.
+				// Only create a scaled version for images larger than the threshold,
+				// matching WordPress core's wp_create_image_subsizes() behavior.
+				const bitmap = await createImageBitmap( item.sourceFile );
+				const needsScaling =
+					bitmap.width > bigImageSizeThreshold ||
+					bitmap.height > bigImageSizeThreshold;
+				bitmap.close();
 
-				// Add scaling to queue.
-				const scaledOperations: Operation[] = [
-					[
-						OperationType.ResizeCrop,
-						{
-							resize: {
-								width: bigImageSizeThreshold,
-								height: bigImageSizeThreshold,
+				if ( needsScaling ) {
+					// Rename sourceFile to match the server attachment filename.
+					const sourceForScaled = attachment.filename
+						? renameFile( item.sourceFile, attachment.filename )
+						: item.sourceFile;
+
+					// Add scaling to queue.
+					const scaledOperations: Operation[] = [
+						[
+							OperationType.ResizeCrop,
+							{
+								resize: {
+									width: bigImageSizeThreshold,
+									height: bigImageSizeThreshold,
+								},
+								isThresholdResize: true,
 							},
-							isThresholdResize: true,
+						],
+					];
+
+					// Add transcoding if format conversion is configured.
+					if ( thumbnailTranscodeOperation ) {
+						scaledOperations.push( thumbnailTranscodeOperation );
+					}
+
+					scaledOperations.push( OperationType.Upload );
+
+					dispatch.addSideloadItem( {
+						file: sourceForScaled,
+						onChange: ( [ updatedAttachment ] ) => {
+							if ( isBlobURL( updatedAttachment.url ) ) {
+								return;
+							}
+							item.onChange?.( [ updatedAttachment ] );
 						},
-					],
-				];
-
-				// Add transcoding if format conversion is configured.
-				if ( thumbnailTranscodeOperation ) {
-					scaledOperations.push( thumbnailTranscodeOperation );
+						batchId,
+						parentId: item.id,
+						additionalData: {
+							post: attachment.id,
+							image_size: 'scaled',
+							convert_format: false,
+						},
+						operations: scaledOperations,
+					} );
 				}
-
-				scaledOperations.push( OperationType.Upload );
-
-				dispatch.addSideloadItem( {
-					file: sourceForScaled,
-					onChange: ( [ updatedAttachment ] ) => {
-						if ( isBlobURL( updatedAttachment.url ) ) {
-							return;
-						}
-						item.onChange?.( [ updatedAttachment ] );
-					},
-					batchId,
-					parentId: item.id,
-					additionalData: {
-						post: attachment.id,
-						image_size: 'scaled',
-						convert_format: false,
-					},
-					operations: scaledOperations,
-				} );
 			}
 		}
 

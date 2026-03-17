@@ -7,6 +7,13 @@ export type FieldsetRootProps = ComponentProps< typeof _Fieldset.Root > & {
 
 export type FieldsetLegendProps = ComponentProps< typeof _Fieldset.Legend > & {
 	children?: React.ReactNode;
+	/**
+	 * Whether to visually hide the legend while keeping it accessible
+	 * to screen readers.
+	 *
+	 * @default false
+	 */
+	hideFromVision?: boolean;
 };
 
 export type FieldsetDescriptionProps = ComponentProps< 'p' > & {

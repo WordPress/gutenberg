@@ -138,7 +138,8 @@ function Layout() {
 										<SidebarNavigationProvider>
 											<SidebarContent
 												shouldAnimate={
-													routeKey !== 'styles'
+													routeKey !== 'styles' &&
+													routeKey !== 'identity'
 												}
 												routeKey={ routeKey }
 											>

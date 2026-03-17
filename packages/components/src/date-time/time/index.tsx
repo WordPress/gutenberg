@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { startOfMinute } from 'date-fns';
-
-/**
- * WordPress dependencies
- */
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { date as formatDate } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '../../base-control';
 import { VisuallyHidden } from '../../visually-hidden';
 import SelectControl from '../../select-control';
@@ -33,6 +22,7 @@ import {
 	buildPadInputStateReducer,
 	validateInputElementTarget,
 	setInConfiguredTimezone,
+	getDaysInMonth,
 } from '../utils';
 import { TIMEZONELESS_FORMAT } from '../constants';
 import { TimeInput } from './time-input';
@@ -150,7 +140,7 @@ export function TimePicker( {
 			value={ day }
 			step={ 1 }
 			min={ 1 }
-			max={ 31 }
+			max={ getDaysInMonth( Number( year ), Number( month ) - 1 ) }
 			required
 			spinControls="none"
 			isPressEnterToChange

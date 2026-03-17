@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import defaultRegistryUntyped from './default-registry';
+import defaultRegistry from './default-registry';
 import * as plugins from './plugins';
 import { combineReducers as combineReducersModule } from './redux-store';
 
@@ -12,12 +12,6 @@ import type {
 	AnyConfig,
 	CurriedSelectorsResolveOf,
 } from './types';
-
-// The runtime registry is created from the JavaScript implementation in `registry.js`.
-// Its JSDoc type (`WPDataRegistry`) doesn't include some newer methods like
-// `resolveSelect` or `suspendSelect`, so we widen the type here for the typed
-// exports in this module.
-const defaultRegistry: any = defaultRegistryUntyped;
 
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
@@ -115,7 +109,9 @@ export const combineReducers =
 export function resolveSelect< T extends StoreDescriptor< AnyConfig > >(
 	storeNameOrDescriptor: T | string
 ): CurriedSelectorsResolveOf< T > {
-	return defaultRegistry.resolveSelect( storeNameOrDescriptor );
+	return defaultRegistry.resolveSelect(
+		storeNameOrDescriptor
+	) as CurriedSelectorsResolveOf< T >;
 }
 
 /**

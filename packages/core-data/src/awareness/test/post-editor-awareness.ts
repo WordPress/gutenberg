@@ -422,6 +422,41 @@ describe( 'PostEditorAwareness', () => {
 			// Callback should not be called for equal editor states
 			expect( callback ).not.toHaveBeenCalled();
 		} );
+
+		test( 'should not notify when editorState without selection is unchanged', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+			awareness.setUp();
+
+			awareness.setLocalStateField( 'editorState', {} );
+
+			const callback = jest.fn();
+			awareness.onStateChange( callback );
+
+			awareness.emit( 'change', [
+				{
+					added: [],
+					updated: [ awareness.clientID ],
+					removed: [],
+				},
+			] );
+			callback.mockClear();
+
+			awareness.setLocalStateField( 'editorState', {} );
+			awareness.emit( 'change', [
+				{
+					added: [],
+					updated: [ awareness.clientID ],
+					removed: [],
+				},
+			] );
+
+			expect( callback ).not.toHaveBeenCalled();
+		} );
 	} );
 
 	describe( 'convertSelectionStateToAbsolute', () => {

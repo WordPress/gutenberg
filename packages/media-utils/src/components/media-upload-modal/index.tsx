@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useMemo } from '@wordpress/element';
+import {
+	createPortal,
+	useState,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	privateApis as coreDataPrivateApis,
@@ -170,7 +175,6 @@ export function MediaUploadModal( {
 
 	const { createSuccessNotice, createErrorNotice, createInfoNotice } =
 		useDispatch( noticesStore );
-	// @ts-expect-error - invalidateResolution is not in the typed actions but is available at runtime
 	const { invalidateResolution } = useDispatch( coreStore );
 
 	// DataViews configuration - allow view updates
@@ -182,10 +186,11 @@ export function MediaUploadModal( {
 		mediaField: 'media_thumbnail',
 		search: '',
 		page: 1,
-		perPage: 20,
+		perPage: 50,
 		filters: [],
 		layout: {
 			previewSize: 170,
+			density: 'compact',
 		},
 	} ) );
 
@@ -565,10 +570,13 @@ export function MediaUploadModal( {
 				searchLabel={ searchLabel }
 				itemListLabel={ __( 'Media items' ) }
 			/>
-			<SnackbarNotices
-				className="media-upload-modal__snackbar"
-				context={ NOTICES_CONTEXT }
-			/>
+			{ createPortal(
+				<SnackbarNotices
+					className="media-upload-modal__snackbar"
+					context={ NOTICES_CONTEXT }
+				/>,
+				document.body
+			) }
 		</Modal>
 	);
 }

@@ -96,6 +96,112 @@ function MyComponent() {
 }
 ```
 
+### Controlled and Uncontrolled Modes
+
+Interactive components that manage internal state (such as open/closed, selected value, etc.) follow a consistent prop naming convention that supports both **controlled** and **uncontrolled** usage.
+
+#### Prop naming pattern
+
+For a given state `x`, the convention is:
+
+| Prop | Purpose |
+| --- | --- |
+| `defaultX` | Sets the initial value in **uncontrolled** mode. The component manages subsequent state changes internally. |
+| `x` | Sets the current value in **controlled** mode. The consumer is responsible for updating the value in response to changes. |
+| `onXChange` | Callback invoked when the state changes. Receives the new value as its first argument. Works in both controlled and uncontrolled modes. |
+
+For example, a component with an open/closed state would expose:
+
+-   `defaultOpen` — initial open state (uncontrolled)
+-   `open` — current open state (controlled)
+-   `onOpenChange` — called when the open state changes
+
+And a component with a selectable value would expose:
+
+-   `defaultValue` — initial value (uncontrolled)
+-   `value` — current value (controlled)
+-   `onValueChange` — called when the value changes
+
+#### Uncontrolled usage
+
+In uncontrolled mode, the component manages its own state. Use `defaultX` to set the initial value, and optionally `onXChange` to react to changes:
+
+```tsx
+import { Tabs } from '@wordpress/ui';
+
+function MyTabs() {
+	return (
+		<Tabs.Root
+			defaultValue="tab1"
+			onValueChange={ ( value ) => console.log( value ) }
+		>
+			<Tabs.List>
+				<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
+				<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
+			</Tabs.List>
+			<Tabs.Panel value="tab1">Content 1</Tabs.Panel>
+			<Tabs.Panel value="tab2">Content 2</Tabs.Panel>
+		</Tabs.Root>
+	);
+}
+```
+
+#### Controlled usage
+
+In controlled mode, the consumer owns the state and passes it via `x`. State changes are handled through `onXChange`:
+
+```tsx
+import { useState } from '@wordpress/element';
+import { CollapsibleCard } from '@wordpress/ui';
+
+function MyCard() {
+	const [ isOpen, setIsOpen ] = useState( false );
+
+	return (
+		<CollapsibleCard.Root open={ isOpen } onOpenChange={ setIsOpen }>
+			<CollapsibleCard.Header>Details</CollapsibleCard.Header>
+			<CollapsibleCard.Content>
+				Collapsible content here.
+			</CollapsibleCard.Content>
+		</CollapsibleCard.Root>
+	);
+}
+```
+
+When both `x` and `defaultX` are provided, `x` takes precedence and the component behaves in controlled mode. When neither is provided, the component uses its own internal default (typically documented via a `@default` JSDoc tag on the `defaultX` prop).
+
+#### Difference from native `onChange`
+
+The `onXChange` callback is distinct from the native DOM `onChange` event handler. Native `onChange` fires a `React.ChangeEvent` tied to a specific DOM element, while `onXChange` provides the new **value** directly — making it simpler to use and consistent across all components, including compound and non-form components.
+
+Components that wrap native form elements may still support native event handlers (like `onChange`, `onInput`) for interoperability, but `onXChange` is the recommended approach within this package.
+
+#### Guidelines for component authors
+
+When designing props for a new component:
+
+-   Always offer both controlled and uncontrolled modes when the component has user-facing state.
+-   Name the uncontrolled prop `defaultX`, the controlled prop `x`, and the callback `onXChange`.
+-   In JSDoc comments, indicate which mode each prop is for and cross-reference the alternative:
+    ```ts
+    /**
+     * Whether the panel is currently open (controlled).
+     *
+     * To render an uncontrolled component, use the `defaultOpen` prop instead.
+     */
+    open?: boolean;
+    /**
+     * Whether the panel is initially open (uncontrolled).
+     * @default false
+     */
+    defaultOpen?: boolean;
+    /**
+     * Event handler called when the open state changes.
+     */
+    onOpenChange?: ( open: boolean ) => void;
+    ```
+-   Provide a `@default` JSDoc tag for the uncontrolled prop when there is a sensible default.
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.

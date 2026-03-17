@@ -47,11 +47,9 @@ const CustomEmptyComponent = () => (
 
 const EmptyComponent = ( {
 	customEmpty,
-	containerHeight,
 	isLoading,
 }: {
 	customEmpty?: boolean;
-	containerHeight?: 'auto' | '50vh' | '100vh';
 	isLoading?: boolean;
 } ) => {
 	const [ view, setView ] = useState< View >( {
@@ -59,13 +57,7 @@ const EmptyComponent = ( {
 		search: '',
 		page: 1,
 		perPage: 10,
-		layout: {
-			styles: {
-				satellites: {
-					align: 'end' as const,
-				},
-			},
-		},
+		layout: {},
 		filters: [],
 		fields: [ 'title', 'description', 'categories' ],
 	} );
@@ -75,7 +67,7 @@ const EmptyComponent = ( {
 			style={ {
 				display: 'flex',
 				flexDirection: 'column',
-				height: containerHeight,
+				height: '100%',
 			} }
 		>
 			<DataViews
