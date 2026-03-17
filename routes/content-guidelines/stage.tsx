@@ -86,17 +86,18 @@ function ContentGuidelinesPage() {
 			{ error && (
 				<div className="content-guidelines__content">
 					<Notice status="error" isDismissible={ false }>
-						<b>
+						<strong>
 							{ sprintf(
 								/* translators: %s: Error message. */
 								__( 'Error loading guidelines: %s' ),
 								error
 							) }
-						</b>
-						<br />
-						{ __(
-							'Please try again. If the problem persists, contact support.'
-						) }
+						</strong>
+						<p className="content-guidelines__error-description">
+							{ __(
+								'Please try again. If the problem persists, contact support.'
+							) }
+						</p>
 					</Notice>
 				</div>
 			) }
