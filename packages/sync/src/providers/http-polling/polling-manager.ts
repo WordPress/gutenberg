@@ -51,6 +51,8 @@ interface RegisterRoomOptions {
 	doc: Y.Doc;
 	awareness: Awareness;
 	log: LogFunction;
+	maxClientsPerUser?: number;
+	maxPeersPerRoom?: number;
 	onStatusChange: ( status: ConnectionStatus ) => void;
 	onSync: () => void;
 }
@@ -59,8 +61,11 @@ interface RoomState {
 	clientId: number;
 	createCompactionUpdate: () => SyncUpdate;
 	endCursor: number;
+	hasCompletedInitialSync: boolean;
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
+	maxClientsPerUser: number;
+	maxPeersPerRoom: number;
 	onStatusChange: ( status: ConnectionStatus ) => void;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
 	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
@@ -247,6 +252,60 @@ function processDocUpdate(
 	}
 }
 
+/**
+ * Check whether the awareness state exceeds the configured peer limits.
+ *
+ * Extracts WordPress user IDs from awareness entries to count unique users
+ * and per-user clients. A limit of 0 disables the corresponding check.
+ *
+ * @param awareness The awareness state from the server response.
+ * @param roomState The room state containing limits and local awareness.
+ * @return True if a peer limit has been exceeded.
+ */
+function checkPeerLimits(
+	awareness: AwarenessState,
+	roomState: RoomState
+): boolean {
+	const userClientCounts = new Map< number, number >();
+
+	for ( const state of Object.values( awareness ) ) {
+		const userId = (
+			state as { collaboratorInfo?: { id?: number } } | null
+		 )?.collaboratorInfo?.id;
+		if ( 'number' !== typeof userId ) {
+			continue;
+		}
+		userClientCounts.set(
+			userId,
+			( userClientCounts.get( userId ) ?? 0 ) + 1
+		);
+	}
+
+	if (
+		roomState.maxPeersPerRoom > 0 &&
+		userClientCounts.size > roomState.maxPeersPerRoom
+	) {
+		return true;
+	}
+
+	const currentUserId = (
+		roomState.localAwarenessState as {
+			collaboratorInfo?: { id?: number };
+		} | null
+	 )?.collaboratorInfo?.id;
+	if (
+		roomState.maxClientsPerUser > 0 &&
+		'number' === typeof currentUserId
+	) {
+		const clientCount = userClientCounts.get( currentUserId ) ?? 0;
+		if ( clientCount > roomState.maxClientsPerUser ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 let areListenersRegistered = false;
 let hasCollaborators = false;
 let isActiveBrowser = 'visible' === document.visibilityState;
@@ -377,6 +436,26 @@ function poll(): void {
 				// Process awareness update.
 				roomState.processAwarenessUpdate( room.awareness );
 
+				// Check peer limits on initial sync only. If the room is
+				// already at capacity when this client first connects, it
+				// is the excess peer and should disconnect.
+				if ( ! roomState.hasCompletedInitialSync ) {
+					roomState.hasCompletedInitialSync = true;
+
+					if ( checkPeerLimits( room.awareness, roomState ) ) {
+						roomState.log( 'Peer limit exceeded, disconnecting' );
+						roomState.onStatusChange( {
+							status: 'disconnected',
+							error: new ConnectionError(
+								ConnectionErrorCode.CONNECTION_LIMIT_EXCEEDED,
+								'Connection limit exceeded'
+							),
+						} );
+						unregisterRoom( room.room );
+						return;
+					}
+				}
+
 				// If there is another collaborator, resume the queue for the next poll
 				// and increase polling frequency.
 				if ( Object.keys( room.awareness ).length > 1 ) {
@@ -469,6 +548,8 @@ function registerRoom( {
 	doc,
 	awareness,
 	log,
+	maxClientsPerUser,
+	maxPeersPerRoom,
 	onSync,
 	onStatusChange,
 }: RegisterRoomOptions ): void {
@@ -529,8 +610,11 @@ function registerRoom( {
 				SyncUpdateType.COMPACTION
 			),
 		endCursor: 0,
+		hasCompletedInitialSync: false,
 		localAwarenessState: awareness.getLocalState() ?? {},
 		log,
+		maxClientsPerUser: maxClientsPerUser ?? 0,
+		maxPeersPerRoom: maxPeersPerRoom ?? 0,
 		onStatusChange,
 		processAwarenessUpdate: ( state: AwarenessState ) =>
 			processAwarenessUpdate( state, awareness ),

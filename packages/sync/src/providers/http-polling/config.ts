@@ -1,3 +1,5 @@
+export const DEFAULT_MAX_CLIENTS_PER_USER = 2;
+export const DEFAULT_MAX_PEERS_PER_ROOM = 2;
 export const MAX_ERROR_BACKOFF_IN_MS = 30 * 1000; // 30 seconds
 export const MAX_UPDATE_SIZE_IN_BYTES = 1 * 1024 * 1024; // 1 MB
 export const POLLING_INTERVAL_IN_MS = 1000; // 1 second or 1000 milliseconds
