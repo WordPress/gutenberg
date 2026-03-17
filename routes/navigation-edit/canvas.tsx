@@ -1,15 +1,23 @@
+/* @jsx createElement */
 /**
  * WordPress dependencies
  */
 import { useParams, useNavigate } from '@wordpress/route';
 import { useEntityRecord } from '@wordpress/core-data';
-import { useMemo, useState } from '@wordpress/element';
+import { createElement, useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Preview } from '@wordpress/lazy-editor';
-import { Spinner } from '@wordpress/components';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	__experimentalHStack as HStack,
+	Icon,
+	Spinner,
+} from '@wordpress/components';
+import {
+	privateApis as editorPrivateApis,
+	getTemplatePartIcon,
+} from '@wordpress/editor';
 import type { WpTemplatePart } from '@wordpress/core-data';
 
 /**
@@ -20,6 +28,18 @@ import { unlock } from '../lock-unlock';
 import './canvas.scss';
 
 const { patternTitleField } = unlock( editorPrivateApis );
+
+const PatternTitle = patternTitleField.render as ( props: any ) => JSX.Element;
+
+const titleField = {
+	...patternTitleField,
+	render: ( props: { item: WpTemplatePart } ) => (
+		<HStack justify="flex-start" spacing={ 1 }>
+			<Icon icon={ getTemplatePartIcon( props.item.area ) } size={ 24 } />
+			<PatternTitle { ...props } />
+		</HStack>
+	),
+};
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 const LAYOUT_GRID = 'grid';
@@ -69,7 +89,7 @@ function Canvas() {
 	const { templateParts, isResolving: isResolvingParts } =
 		useMenuUsedInTemplateParts( navigationId );
 
-	const fields = useMemo( () => [ previewField, patternTitleField ], [] );
+	const fields = useMemo( () => [ previewField, titleField ], [] );
 
 	const { data, paginationInfo } = useMemo(
 		() => filterSortAndPaginate( templateParts, view, fields ),
