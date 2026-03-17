@@ -172,7 +172,7 @@ export default function BlockGuidelineModal( {
 					rows={ 6 }
 				/>
 				{ error && (
-					<Notice status="error" onDismiss={ () => setError( null ) }>
+					<Notice status="error" onRemove={ () => setError( null ) }>
 						{ sprintf(
 							/* translators: %s: Error message. */
 							__( 'Error: %s' ),

@@ -205,7 +205,7 @@ export default function BlockGuidelines() {
 	return (
 		<VStack spacing={ 4 } className="block-guidelines">
 			{ error && (
-				<Notice status="error" onDismiss={ () => setError( null ) }>
+				<Notice status="error" onRemove={ () => setError( null ) }>
 					{ sprintf(
 						/* translators: %s: Error message. */
 						__( 'Error: %s' ),

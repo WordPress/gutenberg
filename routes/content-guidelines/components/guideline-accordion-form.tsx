@@ -109,7 +109,7 @@ export default function GuidelineAccordionForm( {
 					}
 				/>
 				{ error && (
-					<Notice status="error" onDismiss={ () => setError( null ) }>
+					<Notice status="error" onRemove={ () => setError( null ) }>
 						{ sprintf(
 							/* translators: %s: Error message. */
 							__( 'Error saving guidelines: %s' ),
