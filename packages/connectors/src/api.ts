@@ -17,6 +17,8 @@ import type { ConnectorConfig } from './types';
  *
  * @param slug   Unique identifier for the connector.
  * @param config Connector configuration (all fields optional when updating).
+ *               Omit keys you don't want to change — passing `undefined`
+ *               will overwrite the existing value.
  *
  * @example
  * ```js
@@ -26,9 +28,9 @@ import type { ConnectorConfig } from './types';
  *     label: 'OpenAI',
  *     description: 'Text, image, and code generation with GPT.',
  *     icon: <MyOpenAIIcon />,
- *     render: ( { slug, label, description } ) => (
+ *     render: ( { slug, label, description, icon } ) => (
  *         <ConnectorItem
- *             icon={ <MyOpenAIIcon /> }
+ *             icon={ icon }
  *             name={ label }
  *             description={ description }
  *         >
