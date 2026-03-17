@@ -4,6 +4,7 @@
 	.root {
 		--wp-ui-card-padding: var(--wpds-dimension-padding-2xl);
 		--wp-ui-card-header-content-gap: var(--wpds-dimension-gap-xl);
+		--wp-ui-card-header-content-margin: calc(var(--wp-ui-card-header-content-gap) - var(--wp-ui-card-padding));
 
 		display: flex;
 		flex-direction: column;
@@ -28,7 +29,7 @@
 	/* Custom vertical gap between header and content */
 	.header + .content {
 		padding-block-start: 0;
-		margin-block-start: calc(var(--wp-ui-card-header-content-gap) - var(--wp-ui-card-padding));
+		margin-block-start: var(--wp-ui-card-header-content-margin);
 	}
 
 	.fullbleed {

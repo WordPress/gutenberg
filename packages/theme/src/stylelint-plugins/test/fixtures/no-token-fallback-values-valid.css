@@ -1,0 +1,18 @@
+/* Valid: Using wpds tokens without fallbacks */
+.example {
+	color: var(--wpds-color-fg-content-neutral);
+	background-color: var(--wpds-color-bg-surface-neutral);
+	border-radius: var(--wpds-border-radius-sm);
+	padding: var(--wpds-dimension-padding-md);
+}
+
+/* Valid: Non-wpds custom properties with fallbacks are fine */
+.other-vars {
+	color: var(--my-custom-color, red);
+	background: var(--some-other-var, #fff);
+}
+
+/* Valid: A wpds token used as a fallback of a non-wpds var, with no comma after the wpds token */
+.nested-no-fallback {
+	color: var(--my-custom-color, var(--wpds-color-fg-content-neutral));
+}

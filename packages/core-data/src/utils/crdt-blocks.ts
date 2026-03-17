@@ -62,6 +62,37 @@ export type YBlockAttributes = Y.Map< Y.Text | unknown >;
 
 const serializableBlocksCache = new WeakMap< WeakKey, Block[] >();
 
+/**
+ * Recursively walk an attribute value and convert any RichTextData instances
+ * to their string (HTML) representation. This is necessary for array-type and
+ * object-type attributes, which can contain nested RichTextData.
+ *
+ * @param value The attribute value to serialize.
+ * @return The value with all RichTextData instances replaced by strings.
+ */
+function serializeAttributeValue( value: unknown ): unknown {
+	if ( value instanceof RichTextData ) {
+		return value.valueOf();
+	}
+
+	// e.g. core/table `body`: [ { cells: [ { content: RichTextData } ] } ]
+	if ( Array.isArray( value ) ) {
+		return value.map( serializeAttributeValue );
+	}
+
+	// e.g. a single row inside core/table `body`: { cells: [ ... ] }
+	if ( value && typeof value === 'object' ) {
+		const result: Record< string, unknown > = {};
+
+		for ( const [ k, v ] of Object.entries( value ) ) {
+			result[ k ] = serializeAttributeValue( v );
+		}
+		return result;
+	}
+
+	return value;
+}
+
 function makeBlockAttributesSerializable(
 	blockName: string,
 	attributes: BlockAttributes
@@ -73,9 +104,7 @@ function makeBlockAttributesSerializable(
 			continue;
 		}
 
-		if ( value instanceof RichTextData ) {
-			newAttributes[ key ] = value.valueOf();
-		}
+		newAttributes[ key ] = serializeAttributeValue( value );
 	}
 	return newAttributes;
 }

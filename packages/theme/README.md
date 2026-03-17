@@ -204,11 +204,13 @@ This package provides Stylelint plugins to help enforce consistent usage of desi
 {
 	"plugins": [
 		"@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens",
-		"@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties"
+		"@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties",
+		"@wordpress/theme/stylelint-plugins/no-token-fallback-values"
 	],
 	"rules": {
 		"plugin-wpds/no-unknown-ds-tokens": true,
-		"plugin-wpds/no-setting-wpds-custom-properties": true
+		"plugin-wpds/no-setting-wpds-custom-properties": true,
+		"plugin-wpds/no-token-fallback-values": true
 	}
 }
 ```
@@ -247,6 +249,27 @@ This rule reports an error when a CSS declaration sets (defines) a custom proper
 /* ✓ OK */
 .example {
 	--my-custom-token: red;
+}
+```
+
+### `plugin-wpds/no-token-fallback-values`
+
+This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. Fallback values for design tokens are injected automatically at build time by the [build plugins](#build-plugins), so manual fallbacks in source are redundant and can drift out of sync with the token definitions.
+
+```css
+/* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-fg-content-neutral' */
+.example {
+	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
+}
+
+/* ✓ OK */
+.example {
+	color: var(--wpds-color-fg-content-neutral);
+}
+
+/* ✓ OK: Non-wpds custom properties are not checked */
+.example {
+	color: var(--my-custom-color, red);
 }
 ```
 
