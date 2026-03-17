@@ -78,6 +78,20 @@ add_filter( 'image_save_progressive', function ( $interlaced, $mime_type ) {
 }, 10, 2 );
 ```
 
+## Customizing supported MIME types
+
+The `client_side_supported_mime_types` filter controls which MIME types are eligible for client-side processing. By default, JPEG, PNG, GIF, WebP, and AVIF are supported.
+
+```php
+// Add a custom image format to client-side processing.
+add_filter( 'client_side_supported_mime_types', function ( $mime_types ) {
+	$mime_types[] = 'image/x-custom';
+	return $mime_types;
+} );
+```
+
+When a MIME type is not in this list, the file is uploaded directly to the server without client-side processing.
+
 ## Working with the upload store (JavaScript)
 
 Client-side media processing is managed by the `core/upload-media` data store. Plugin developers can use its public API to monitor and interact with uploads.
@@ -160,7 +174,7 @@ wp.hooks.addFilter(
 );
 ```
 
-Note: The quality value is not yet wired through to the vips worker but the hook is provided as an extension point for future use.
+The quality value is passed through to the vips worker during resize and crop operations.
 
 ## Using the finalize endpoint
 
@@ -176,13 +190,12 @@ WordPress calls this endpoint automatically as part of the client-side upload pi
 
 ## Cross-origin isolation considerations
 
-Client-side media processing requires [cross-origin isolation](https://developer.mozilla.org/en-US/docs/Web/API/Window/crossOriginIsolated), which WordPress enables automatically on block editor screens. This has implications for plugins:
+Client-side media processing requires `SharedArrayBuffer` for WASM threading. WordPress enables this automatically on block editor screens using [`Document-Isolation-Policy`](https://github.com/nicolo-ribaudo/tc39-proposal-structs/blob/main/test262-filtering/isolation-explainer.md) (DIP), which provides per-document cross-origin isolation without affecting other iframes on the page.
 
 ### Impact on plugins
 
--   **Third-party embeds**: Some embeds (e.g., Facebook, SmugMug) may not work in cross-origin isolated contexts on browsers that don't support the `credentialless` iframe attribute. WordPress disables embed previews for known-incompatible providers.
--   **External scripts**: Scripts loaded from other origins will automatically get a `crossorigin="anonymous"` attribute added. This is handled by WordPress both server-side (via HTML processing) and client-side (via a MutationObserver).
--   **iframes**: Non-sandboxed iframes also get the `crossorigin` and `credentialless` attributes where supported.
+-   **External scripts**: Scripts loaded from other origins will automatically get a `crossorigin="anonymous"` attribute added, handled by WordPress server-side (via HTML processing) and client-side (via a MutationObserver).
+-   **Third-party page builders**: DIP is skipped on admin pages with an `action` parameter other than `edit`, to avoid conflicts with page builders that rely on same-origin iframe access.
 
 ### Content Security Policy (CSP) requirements
 
@@ -216,6 +229,7 @@ POST /wp/v2/media/{id}/sideload
 | --- | --- | --- | --- |
 | `image_size` | string | Yes | The image size name (e.g., `thumbnail`, `medium`, `large`, `scaled`, `original`). |
 | `convert_format` | boolean | No | Whether to apply server-side format conversion. Default `true`. |
+| `replace_file` | boolean | No | When `true`, replaces the attachment's main file with the uploaded file, updating the MIME type and metadata and deleting the old file. Default `false`. |
 
 ### Example
 
@@ -236,21 +250,23 @@ This endpoint requires both `edit_post` and `upload_files` capabilities.
 
 | Problem | Cause | Solution |
 | --- | --- | --- |
-| Client-side processing not activating | `SharedArrayBuffer` unavailable | Verify cross-origin isolation headers are being sent. Check `window.crossOriginIsolated` in the browser console. |
+| Client-side processing not activating | Browser lacks Document-Isolation-Policy support | Client-side processing requires Chrome/Edge 137+. Check `window.crossOriginIsolated` in the browser console. |
+| Client-side processing not activating on Chrome 137+ | `Document-Isolation-Policy` header not sent | Verify you're editing a post or page. Some third-party page builders may suppress the header. |
 | WASM module fails to load | Incorrect MIME type for `.wasm` files | Add `AddType application/wasm wasm` to your `.htaccess` or server configuration. WordPress does this automatically for Apache via `mod_rewrite_rules`. |
 | CSP blocks worker creation | `worker-src` directive too restrictive | Add `blob:` to the `worker-src` CSP directive: `worker-src 'self' blob:` |
-| Embed previews broken | Cross-origin isolation blocks third-party iframes | This is expected on browsers without `credentialless` iframe support (Firefox, Safari). Embed previews are automatically disabled for incompatible providers. |
 | Processing falls back on capable browser | Feature disabled server-side | Check that `wp_client_side_media_processing_enabled` filter is not returning `false`. |
 | Large images cause browser to slow down | Insufficient device memory | Devices with ≤ 2 GB RAM are automatically excluded. Consider reducing the big image size threshold for your site. |
-| Upload fails with "image transcoding error" | Unsupported format or corrupt file | Verify the file is a supported format (JPEG, PNG, WebP, AVIF, GIF). HEIC/HEIF is not supported. |
+| Upload fails with "image transcoding error" | Unsupported format or corrupt file | Verify the file is a supported format (JPEG, PNG, WebP, AVIF, GIF). HEIC/HEIF files are uploaded server-side. |
 
 ## Browser compatibility
 
+Client-side media processing requires `Document-Isolation-Policy` support, which is currently limited to Chromium-based browsers.
+
 | Browser | Minimum Version | Notes |
 | --- | --- | --- |
-| Chrome | 92+ | Full support. |
-| Edge | 92+ | Full support. |
-| Firefox | 79+ | Disabled by default (no `credentialless` iframe support). Can be re-enabled via the `wp_client_side_media_processing_enabled` filter. |
-| Safari | 15.2+ | Disabled by default (no `credentialless` iframe support). Uses `require-corp` COEP mode. |
+| Chrome | 137+ | Full support via Document-Isolation-Policy. |
+| Edge | 137+ | Full support via Document-Isolation-Policy. |
+| Firefox | — | Not supported (no Document-Isolation-Policy support). |
+| Safari | — | Not supported (no Document-Isolation-Policy support). |
 
 On unsupported browsers, WordPress automatically falls back to server-side processing with no user-facing changes.

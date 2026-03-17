@@ -138,7 +138,7 @@ wp.hooks.addFilter(
 );
 ```
 
-Note: The quality value is not yet wired through to the vips worker but the hook is provided as an extension point for future use.
+The quality value is passed through to the vips worker during resize and crop operations.
 
 ## WASM module loading
 
@@ -158,15 +158,22 @@ Client-side media processing requires `SharedArrayBuffer` for WASM threading, wh
 
 ### PHP headers
 
-WordPress sends two HTTP headers on block editor screens:
+WordPress sends the `Document-Isolation-Policy` (DIP) header on block editor screens for Chromium 137+:
 
 ```
-Cross-Origin-Opener-Policy: same-origin
-Cross-Origin-Embedder-Policy: credentialless   (Chrome/Edge)
-Cross-Origin-Embedder-Policy: require-corp      (Safari)
+Document-Isolation-Policy: isolate-and-credentialless
 ```
 
-These headers are set via `wp_start_cross_origin_isolation_output_buffer()` (in `lib/media/load.php`), which uses PHP output buffering on `load-post.php`, `load-post-new.php`, `load-site-editor.php`, and `load-widgets.php` screens.
+This header provides per-document cross-origin isolation without affecting other iframes on the page, avoiding the breakage that the older `Cross-Origin-Embedder-Policy` / `Cross-Origin-Opener-Policy` headers caused for third-party plugins and embeds.
+
+The header is set via `gutenberg_start_cross_origin_isolation_output_buffer()` (in `lib/media/load.php`), which uses PHP output buffering on `load-post.php`, `load-post-new.php`, `load-site-editor.php`, and `load-widgets.php` screens. DIP is skipped on admin pages with an `action` parameter other than `edit` to avoid conflicts with page builders that rely on same-origin iframe access.
+
+The `gutenberg_use_document_isolation_policy` filter can be used to control whether DIP is applied:
+
+```php
+// Force DIP on or off regardless of browser version.
+add_filter( 'gutenberg_use_document_isolation_policy', '__return_true' );
+```
 
 ### HTML attribute injection
 
@@ -174,18 +181,20 @@ Cross-origin isolation requires that cross-origin resources include proper CORS 
 
 **Server-side** (PHP output buffer): The `wp_add_crossorigin_attributes()` function uses `WP_HTML_Tag_Processor` to add `crossorigin="anonymous"` to `<audio>`, `<img>`, `<link>`, `<script>`, `<video>`, and `<source>` tags that load cross-origin URLs.
 
-**Client-side** (JavaScript MutationObserver): A MutationObserver in `packages/block-editor/src/hooks/cross-origin-isolation.js` monitors the DOM for dynamically added elements and adds `crossorigin="anonymous"` attributes at runtime. For iframes, it also sets the `credentialless` attribute where supported.
+**Client-side** (JavaScript MutationObserver): A MutationObserver in `packages/block-editor/src/hooks/cross-origin-isolation.js` monitors the DOM for dynamically added elements and adds `crossorigin="anonymous"` attributes at runtime.
 
-### Safari vs. Chrome differences
+### Browser support
 
-| Aspect | Chrome/Edge | Safari |
+Client-side media processing is limited to Chromium-based browsers that support `Document-Isolation-Policy`:
+
+| Browser | Minimum Version | Notes |
 | --- | --- | --- |
-| COEP mode | `credentialless` | `require-corp` |
-| Iframe `credentialless` attribute | Supported | Not supported |
-| Cross-origin resources | Load without explicit CORS | Must have CORS headers |
-| Embed previews | Supported (except Facebook, SmugMug) | May be blocked |
+| Chrome | 137+ | Full support via Document-Isolation-Policy. |
+| Edge | 137+ | Full support via Document-Isolation-Policy. |
+| Firefox | — | Not supported. |
+| Safari | — | Not supported. |
 
-Browsers that lack `credentialless` iframe support (currently Firefox and Safari) have client-side media processing disabled by default to avoid breaking third-party embeds. Developers can re-enable the feature via the `wp_client_side_media_processing_enabled` filter.
+Browsers that do not support DIP fall back automatically to server-side processing.
 
 ## Feature detection
 
@@ -194,14 +203,10 @@ Before enabling client-side processing, the browser's capabilities are checked (
 | Check | Reason |
 | --- | --- |
 | WebAssembly available | Required for wasm-vips |
-| SharedArrayBuffer available | Required for WASM threading (implies cross-origin isolation) |
+| SharedArrayBuffer available | Required for WASM threading (implies Document-Isolation-Policy is active) |
 | CSP allows `blob:` workers | Required for inline worker creation |
-| `credentialless` iframe support | Required to avoid breaking third-party embeds |
-| Device memory > 2 GB | WASM processing is memory-intensive |
-| Network not on data saver or 2g/slow-2g | Processing generates multiple uploads |
-| Web Worker support | Baseline requirement |
 
-The PHP-side feature flag (`wp_client_side_media_processing_enabled` filter) is also checked before any JavaScript feature detection runs.
+The PHP-side feature flag (`wp_client_side_media_processing_enabled` filter) is also checked before any JavaScript feature detection runs. Browser-level checks (device memory, network conditions, credentialless iframe support) are gated server-side by limiting DIP to Chromium 137+, which implies a modern, capable device.
 
 ## Supported formats
 
@@ -240,6 +245,7 @@ Client-side media processing extends the WordPress REST API in several ways:
 | --- | --- | --- | --- | --- |
 | `generate_sub_sizes` | `POST /wp/v2/media` | boolean | `true` | When `false`, the server skips thumbnail generation. The client will generate and sideload thumbnails. |
 | `convert_format` | `POST /wp/v2/media`, `POST /wp/v2/media/{id}/sideload` | boolean | `true` | When `false`, the server skips format conversion (via `image_editor_output_format` filter). |
+| `replace_file` | `POST /wp/v2/media/{id}/sideload` | boolean | `false` | When `true`, replaces the attachment's main file with the sideloaded file, updating the MIME type and metadata and deleting the old file. |
 
 When `generate_sub_sizes` is `false`, the following server-side filters are also temporarily disabled:
 -   `intermediate_image_sizes_advanced` — Prevents sub-size generation.
@@ -282,6 +288,7 @@ When client-side processing is enabled, the REST API root index (`GET /`) includ
 -   `image_size_threshold` — The big image size threshold value.
 -   `image_output_formats` — Format conversion map (respects `image_editor_output_format` filter).
 -   `jpeg_interlaced`, `png_interlaced`, `gif_interlaced` — Progressive/interlace settings (respects `image_save_progressive` filter).
+-   `clientSideSupportedMimeTypes` — Array of MIME types eligible for client-side processing (respects `client_side_supported_mime_types` filter).
 
 ## Concurrency
 
