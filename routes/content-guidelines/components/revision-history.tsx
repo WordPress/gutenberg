@@ -43,9 +43,6 @@ const DEFAULT_VIEW: View = {
 	perPage: 10,
 	layout: {
 		enableMoving: false,
-		styles: {
-			author: { align: 'end' },
-		},
 	},
 };
 
@@ -208,12 +205,7 @@ export default function RevisionHistory() {
 				{ __( 'Revision history' ) }
 			</Navigator.BackButton>
 
-			<Text
-				size={ 13 }
-				weight={ 400 }
-				variant="muted"
-				className="content-guidelines__revision-description"
-			>
+			<Text size={ 13 } weight={ 400 } variant="muted">
 				{ __( 'Use a previous version of your guidelines.' ) }
 			</Text>
 
