@@ -33,7 +33,7 @@ import {
 	useEditPostAction,
 	useQuickEditPostAction,
 } from '../dataviews-actions';
-import { getActiveViewOverridesForTab } from './view-utils';
+
 import useNotesCount from './use-notes-count';
 import { QuickEditModal } from './quick-edit-modal';
 
@@ -56,13 +56,13 @@ export default function PostList( { postType } ) {
 	const { path, query } = useLocation();
 	const { activeView = 'all', postId, quickEdit = false } = query;
 	const history = useHistory();
-	const { defaultView, defaultLayouts } = useViewConfig( {
+	const { defaultView, defaultLayouts, viewList } = useViewConfig( {
 		kind: 'postType',
 		name: postType,
 	} );
 	const activeViewOverrides = useMemo(
-		() => getActiveViewOverridesForTab( activeView, defaultLayouts ),
-		[ activeView, defaultLayouts ]
+		() => viewList?.find( ( v ) => v.slug === activeView )?.view ?? {},
+		[ viewList, activeView ]
 	);
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
