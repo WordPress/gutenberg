@@ -7,6 +7,7 @@ import {
 	Button,
 	Modal,
 	Navigator,
+	Spinner,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
@@ -17,6 +18,7 @@ import {
 	createElement,
 	useEffect,
 	useMemo,
+	useCallback,
 	useState,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -51,11 +53,12 @@ export default function RevisionHistory() {
 	const [ revisions, setRevisions ] = useState< ContentGuidelinesRevision[] >(
 		[]
 	);
+	const [ totalItems, setTotalItems ] = useState( 0 );
+	const [ totalPages, setTotalPages ] = useState( 0 );
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ revisionToRestore, setRevisionToRestore ] =
 		useState< ContentGuidelinesRevision | null >( null );
 	const [ isRestoring, setIsRestoring ] = useState( false );
-	const [ refetchKey, setRefetchKey ] = useState( 0 );
 
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
@@ -65,31 +68,34 @@ export default function RevisionHistory() {
 		[]
 	);
 
-	useEffect( () => {
+	const loadRevisions = useCallback( async () => {
 		if ( ! guidelinesId ) {
 			return;
 		}
 
-		async function loadRevisions() {
-			setIsLoading( true );
-			try {
-				const result = await fetchContentGuidelinesRevisions( {
-					guidelinesId: guidelinesId!,
-					perPage: 100,
-				} );
-				setRevisions( result.revisions );
-			} catch {
-				createErrorNotice(
-					__( 'Could not load revision history. Please try again.' ),
-					{ type: 'snackbar' }
-				);
-			} finally {
-				setIsLoading( false );
-			}
+		setIsLoading( true );
+		try {
+			const result = await fetchContentGuidelinesRevisions( {
+				guidelinesId: guidelinesId!,
+				page: view.page,
+				perPage: view.perPage,
+			} );
+			setRevisions( result.revisions );
+			setTotalItems( result.total );
+			setTotalPages( result.totalPages );
+		} catch {
+			createErrorNotice(
+				__( 'Could not load revision history. Please try again.' ),
+				{ type: 'snackbar' }
+			);
+		} finally {
+			setIsLoading( false );
 		}
+	}, [ guidelinesId, view.page, view.perPage, createErrorNotice ] );
 
+	useEffect( () => {
 		loadRevisions();
-	}, [ guidelinesId, refetchKey, createErrorNotice ] );
+	}, [ loadRevisions ] );
 
 	const authorElements = useMemo( () => {
 		return [
@@ -145,11 +151,6 @@ export default function RevisionHistory() {
 		[ authorElements ]
 	);
 
-	const { data: displayedRevisions, paginationInfo } = useMemo(
-		() => filterSortAndPaginate( revisions, view, fields ),
-		[ revisions, view, fields ]
-	);
-
 	const actions = useMemo< Action< ContentGuidelinesRevision >[] >(
 		() => [
 			{
@@ -160,6 +161,21 @@ export default function RevisionHistory() {
 		],
 		[ setRevisionToRestore ]
 	);
+
+	const hasActiveFilters = view.filters && view.filters.length > 0;
+
+	const { data: filteredRevisions, paginationInfo: filteredPaginationInfo } =
+		useMemo(
+			() => filterSortAndPaginate( revisions, view, fields ),
+			[ revisions, view, fields ]
+		);
+
+	const displayedRevisions = hasActiveFilters ? filteredRevisions : revisions;
+
+	// Todo: move filtering to the api level
+	const paginationToShow = hasActiveFilters
+		? filteredPaginationInfo
+		: { totalItems, totalPages };
 
 	async function handleRestore() {
 		if ( ! guidelinesId || ! revisionToRestore ) {
@@ -173,7 +189,7 @@ export default function RevisionHistory() {
 			);
 			await fetchContentGuidelines();
 			setRevisionToRestore( null );
-			setRefetchKey( ( k ) => k + 1 );
+			await loadRevisions();
 			createSuccessNotice( __( 'Revision restored.' ), {
 				type: 'snackbar',
 			} );
@@ -216,9 +232,16 @@ export default function RevisionHistory() {
 				onChangeView={ setView }
 				actions={ actions }
 				isLoading={ isLoading }
-				paginationInfo={ paginationInfo }
+				paginationInfo={ paginationToShow }
 				defaultLayouts={ { table: {} } }
 				getItemId={ ( item ) => String( item.id ) }
+				empty={
+					isLoading && displayedRevisions.length === 0 ? (
+						<Spinner />
+					) : (
+						__( 'No revisions found.' )
+					)
+				}
 			/>
 
 			{ revisionToRestore && (
