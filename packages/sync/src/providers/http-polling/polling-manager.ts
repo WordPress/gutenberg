@@ -275,7 +275,7 @@ function checkConnectionLimit(
 	roomState.enforceConnectionLimit = false;
 
 	const maxClientsPerRoom = applyFilters(
-		'collaboration.sync.maxClientsPerRoom',
+		'sync.pollingProvider.maxClientsPerRoom',
 		DEFAULT_CLIENT_LIMIT_PER_ROOM,
 		roomState.room
 	);
@@ -286,7 +286,17 @@ function checkConnectionLimit(
 		DEFAULT_CLIENT_LIMIT_PER_ROOM
 	);
 
-	return clientCount > validatedLimit;
+	if ( clientCount > validatedLimit ) {
+		roomState.log( 'Connection limit exceeded', {
+			clientCount,
+			maxClientsPerRoom: validatedLimit,
+			room: roomState.room,
+		} );
+
+		return true;
+	}
+
+	return false;
 }
 
 let areListenersRegistered = false;
@@ -418,7 +428,6 @@ function poll(): void {
 
 				// If a limit is exceeded, disconnect immediately without processing updates.
 				if ( checkConnectionLimit( room.awareness, roomState ) ) {
-					roomState.log( 'Peer limit exceeded, disconnecting' );
 					roomState.onStatusChange( {
 						status: 'disconnected',
 						error: new ConnectionError(

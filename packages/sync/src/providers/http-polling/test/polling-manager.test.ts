@@ -499,7 +499,7 @@ describe( 'polling-manager', () => {
 			await jest.advanceTimersByTimeAsync( 0 );
 
 			expect( mockApplyFilters ).toHaveBeenCalledWith(
-				'collaboration.sync.maxClientsPerRoom',
+				'sync.pollingProvider.maxClientsPerRoom',
 				3,
 				'my-custom-room'
 			);

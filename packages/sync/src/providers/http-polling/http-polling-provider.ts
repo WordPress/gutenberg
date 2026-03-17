@@ -18,8 +18,6 @@ import { pollingManager } from './polling-manager';
 export interface ProviderOptions {
 	awareness?: Awareness;
 	debug?: boolean;
-	maxClientsPerUser?: number;
-	maxPeersPerRoom?: number;
 	room: string;
 	ydoc: Y.Doc;
 }
@@ -149,7 +147,6 @@ export function createHttpPollingProvider(): ProviderCreator {
 	} ): Promise< ProviderCreatorResult > => {
 		// Generate room name from objectType and objectId
 		const room = objectId ? `${ objectType }:${ objectId }` : objectType;
-
 		const provider = new HttpPollingProvider( {
 			awareness,
 			// debug: true,
