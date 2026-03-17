@@ -161,7 +161,8 @@ export function DataViewsPickerFooter() {
 	const message = getFooterMessage(
 		selection.length,
 		data.length,
-		paginationInfo.totalItems
+		paginationInfo.totalItems,
+		!! view.infiniteScrollEnabled
 	);
 
 	const selectedItems = useMemo(

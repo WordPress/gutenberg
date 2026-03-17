@@ -275,7 +275,8 @@ function renderFooterContent< Item >(
 	const message = getFooterMessage(
 		selection.length,
 		data.length,
-		paginationInfo.totalItems
+		paginationInfo.totalItems,
+		isInfiniteScroll
 	);
 	return (
 		<Stack
