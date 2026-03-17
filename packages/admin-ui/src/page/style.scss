@@ -19,9 +19,13 @@
 }
 
 .admin-ui-page__header-title {
+	// @TODO: use Text component from UI when available.
+	font-family: var(--wpds-font-family-heading);
+	font-size: var(--wpds-font-size-lg);
+	font-weight: var(--wpds-font-weight-medium);
+	line-height: var(--wpds-font-line-height-lg);
 	margin: 0;
 	overflow: hidden;
-	font-size: var(--wpds-font-size-lg);
 }
 
 .admin-ui-page__sidebar-toggle-slot:empty {

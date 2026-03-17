@@ -3,8 +3,10 @@
  */
 import { Link } from '@wordpress/route';
 import { __ } from '@wordpress/i18n';
-import { Text } from '@wordpress/ui';
-import { __experimentalHStack as HStack } from '@wordpress/components';
+import {
+	__experimentalHeading as Heading,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,23 +24,16 @@ const BreadcrumbItem = ( {
 	if ( ! to ) {
 		return (
 			<li>
-				<Text
-					className="admin-ui-page__header-title"
-					// eslint-disable-next-line jsx-a11y/heading-has-content -- content provided via render prop
-					render={ <h1 /> }
-					variant="heading-lg"
-				>
+				<Heading level={ 1 } truncate>
 					{ label }
-				</Text>
+				</Heading>
 			</li>
 		);
 	}
 
 	return (
 		<li>
-			<Link to={ to }>
-				<Text variant="heading-lg">{ label }</Text>
-			</Link>
+			<Link to={ to }>{ label }</Link>
 		</li>
 	);
 };
