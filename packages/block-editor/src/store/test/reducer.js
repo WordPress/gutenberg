@@ -44,7 +44,7 @@ import {
 	withDerivedBlockEditingModes,
 	viewportModalClientIds,
 } from '../reducer';
-
+import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
 import { sectionRootClientIdKey, isIsolatedEditorKey } from '.././private-keys';
 
@@ -2476,6 +2476,73 @@ describe( 'state', () => {
 					} );
 
 					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+				} );
+
+				it( 'should not leave stale controlled tree entries after root replacement and reset', () => {
+					const chickenBlock = {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					};
+					const eggBlock = {
+						clientId: 'egg',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					};
+
+					// Initialize content, simulates root useBlockSync initialization.
+					let state = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [ chickenBlock ],
+					} );
+
+					// Give chicken a controlled child with two actions, simulates inner useBlockSync initialization.
+					state = blocks( state, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'chicken',
+						hasControlledInnerBlocks: true,
+					} );
+
+					state = blocks( state, {
+						type: 'REPLACE_INNER_BLOCKS',
+						rootClientId: 'chicken',
+						blocks: [ eggBlock ],
+					} );
+
+					// Reset blocks completely, simulates root useBlockSync cleanup.
+					state = blocks( state, {
+						type: 'RESET_BLOCKS',
+						blocks: [],
+					} );
+
+					// Unset controlled inner blocks, simulates inner useBlockSync cleanup.
+					state = blocks( state, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'chicken',
+						hasControlledInnerBlocks: false,
+					} );
+
+					// Initialize content again, simulates useBlockSync after navigation.
+					state = blocks( state, {
+						type: 'RESET_BLOCKS',
+						blocks: [ chickenBlock ],
+					} );
+
+					// Set controlled inner blocks again.
+					state = blocks( state, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'chicken',
+						hasControlledInnerBlocks: true,
+					} );
+
+					// At this point useInnerBlockTemplateSync would check if `getBlocks` is empty before applying the template.
+					const fullState = { blocks: state };
+					expect( getBlockOrder( fullState, 'chicken' ) ).toEqual(
+						[]
+					);
+					expect( getBlocks( fullState, 'chicken' ) ).toEqual( [] );
 				} );
 
 				it( 'should not create new state references when setting controlled inner blocks on a block with no inner blocks', () => {
