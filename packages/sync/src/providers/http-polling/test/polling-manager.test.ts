@@ -9,7 +9,7 @@ import {
 	it,
 	jest,
 } from '@jest/globals';
-import type { SyncResponse } from '../types';
+import { type SyncResponse } from '../types';
 
 // Mock all external dependencies before imports.
 jest.mock( 'yjs', () => ( {
@@ -34,6 +34,11 @@ jest.mock( 'y-protocols/sync', () => ( {
 
 jest.mock( 'y-protocols/awareness', () => ( {
 	removeAwarenessStates: jest.fn(),
+} ) );
+
+jest.mock( '../config', () => ( {
+	...( jest.requireActual( '../config' ) as object ),
+	MAX_UPDATE_SIZE_IN_BYTES: 10,
 } ) );
 
 jest.mock( '../utils', () => ( {
@@ -115,6 +120,9 @@ describe( 'polling-manager', () => {
 	let mockPostSyncUpdate: jest.Mock<
 		typeof import('../utils').postSyncUpdate
 	>;
+	let mockPostSyncUpdateNonBlocking: jest.Mock<
+		typeof import('../utils').postSyncUpdateNonBlocking
+	>;
 
 	beforeEach( () => {
 		jest.useFakeTimers();
@@ -124,6 +132,8 @@ describe( 'polling-manager', () => {
 		jest.isolateModules( () => {
 			pollingManager = require( '../polling-manager' ).pollingManager;
 			mockPostSyncUpdate = require( '../utils' ).postSyncUpdate;
+			mockPostSyncUpdateNonBlocking =
+				require( '../utils' ).postSyncUpdateNonBlocking;
 		} );
 	} );
 
@@ -133,6 +143,115 @@ describe( 'polling-manager', () => {
 		Object.defineProperty( document, 'visibilityState', {
 			configurable: true,
 			get: () => 'visible',
+		} );
+	} );
+
+	describe( 'document size limit', () => {
+		// Helper to extract the onDocUpdate callback registered via doc.on('updateV2', ...).
+		function getOnDocUpdate( doc: ReturnType< typeof createMockDoc > ) {
+			const call = doc.on.mock.calls.find(
+				( args: unknown[] ) => args[ 0 ] === 'updateV2'
+			);
+			if ( ! call ) {
+				throw new Error( 'onDocUpdate not registered' );
+			}
+			return call[ 1 ] as ( update: Uint8Array, origin: unknown ) => void;
+		}
+
+		it( 'emits document-size-limit-exceeded error when an update exceeds the size limit', async () => {
+			mockPostSyncUpdate.mockResolvedValue( syncResponse );
+
+			const onStatusChange = jest.fn();
+			const doc = createMockDoc( 1 );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange,
+				onSync: jest.fn(),
+			} );
+
+			// Simulate a doc update that exceeds the mocked MAX_UPDATE_SIZE_IN_BYTES (10).
+			const onDocUpdate = getOnDocUpdate( doc );
+			onDocUpdate( new Uint8Array( 11 ), 'some-origin' );
+
+			expect( onStatusChange ).toHaveBeenCalledWith( {
+				status: 'disconnected',
+				error: expect.objectContaining( {
+					code: 'document-size-limit-exceeded',
+				} ),
+			} );
+		} );
+
+		it( 'unregisters the room when the limit is exceeded', async () => {
+			mockPostSyncUpdate.mockResolvedValue( syncResponse );
+
+			const doc = createMockDoc( 1 );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			const onDocUpdate = getOnDocUpdate( doc );
+			onDocUpdate( new Uint8Array( 11 ), 'some-origin' );
+
+			// unregisterRoom sends a disconnect signal via postSyncUpdateNonBlocking.
+			expect( mockPostSyncUpdateNonBlocking ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					rooms: expect.arrayContaining( [
+						expect.objectContaining( {
+							room: 'test-room',
+							awareness: null,
+						} ),
+					] ),
+				} )
+			);
+
+			// The doc listener should be removed.
+			expect( doc.off ).toHaveBeenCalledWith(
+				'updateV2',
+				expect.any( Function )
+			);
+		} );
+
+		it( 'does not trigger for updates within the size limit', async () => {
+			mockPostSyncUpdate.mockResolvedValue( syncResponse );
+
+			const onStatusChange = jest.fn();
+			const doc = createMockDoc( 1 );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange,
+				onSync: jest.fn(),
+			} );
+
+			// Flush the initial poll so 'connected' status is emitted first.
+			await jest.advanceTimersByTimeAsync( 0 );
+			onStatusChange.mockClear();
+
+			// Send an update within the limit (10 bytes).
+			const onDocUpdate = getOnDocUpdate( doc );
+			onDocUpdate( new Uint8Array( 10 ), 'some-origin' );
+
+			expect( onStatusChange ).not.toHaveBeenCalledWith(
+				expect.objectContaining( {
+					status: 'disconnected',
+					error: expect.objectContaining( {
+						code: 'document-size-limit-exceeded',
+					} ),
+				} )
+			);
 		} );
 	} );
 

@@ -212,6 +212,10 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			return state1 === state2;
 		}
 
+		if ( ! state1.selection || ! state2.selection ) {
+			return state1.selection === state2.selection;
+		}
+
 		return areSelectionsStatesEqual( state1.selection, state2.selection );
 	}
 

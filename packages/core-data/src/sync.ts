@@ -12,6 +12,7 @@ import {
 import { unlock } from './lock-unlock';
 
 const {
+	ConnectionErrorCode,
 	createSyncManager,
 	Delta,
 	CRDT_DOC_META_PERSISTENCE_KEY,
@@ -22,6 +23,7 @@ const {
 } = unlock( syncPrivateApis );
 
 export {
+	ConnectionErrorCode,
 	Delta,
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_RECORD_MAP_KEY,

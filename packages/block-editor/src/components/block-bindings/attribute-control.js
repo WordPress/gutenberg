@@ -50,10 +50,15 @@ export default function BlockBindingsAttributeControl( {
 				getBlockType,
 			} = unlock( select( blocksStore ) );
 
-			const _attributeType =
-				getBlockType( blockName ).attributes?.[ attribute ]?.type;
+			const _attribute =
+				getBlockType( blockName ).attributes?.[ attribute ];
+
+			if ( _attribute?.enum ) {
+				return {};
+			}
+
 			const attributeType =
-				_attributeType === 'rich-text' ? 'string' : _attributeType;
+				_attribute?.type === 'rich-text' ? 'string' : _attribute?.type;
 
 			const sourceFields = {};
 			Object.entries( getAllBlockBindingsSources() ).forEach(

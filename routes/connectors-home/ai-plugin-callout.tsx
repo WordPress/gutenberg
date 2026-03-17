@@ -1,10 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { speak } from '@wordpress/a11y';
+import { Button, ExternalLink } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { createInterpolateElement, useRef, useState } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -33,6 +39,14 @@ for ( const c of connectorDataValues ) {
 export function AiPluginCallout() {
 	const [ isBusy, setIsBusy ] = useState( false );
 	const [ justActivated, setJustActivated ] = useState( false );
+	const actionButtonRef = useRef< HTMLButtonElement >( null );
+
+	// Restore focus to the button after install/activate completes.
+	useEffect( () => {
+		if ( justActivated ) {
+			actionButtonRef.current?.focus();
+		}
+	}, [ justActivated ] );
 
 	// Server-side initial state — true if any provider was already connected at page load.
 	const initialHasConnectedProvider = useRef(
@@ -119,8 +133,9 @@ export function AiPluginCallout() {
 				{ throwOnError: true }
 			);
 			setJustActivated( true );
+			speak( __( 'AI plugin installed and activated successfully.' ) );
 		} catch {
-			// Handle error
+			speak( __( 'Failed to install the AI plugin.' ), 'assertive' );
 		} finally {
 			setIsBusy( false );
 		}
@@ -136,8 +151,9 @@ export function AiPluginCallout() {
 				{ throwOnError: true }
 			);
 			setJustActivated( true );
+			speak( __( 'AI plugin activated successfully.' ) );
 		} catch {
-			// Handle error
+			speak( __( 'Failed to activate the AI plugin.' ), 'assertive' );
 		} finally {
 			setIsBusy( false );
 		}
@@ -226,8 +242,9 @@ export function AiPluginCallout() {
 					} ) }
 				</p>
 				<div className="ai-plugin-callout__actions">
-					{ showInstallActivate && (
+					{ showInstallActivate ? (
 						<Button
+							ref={ actionButtonRef }
 							variant="primary"
 							size="compact"
 							isBusy={ isBusy }
@@ -237,15 +254,22 @@ export function AiPluginCallout() {
 						>
 							{ getPrimaryButtonProps().label }
 						</Button>
+					) : (
+						justActivated && (
+							<Button
+								ref={ actionButtonRef }
+								variant="secondary"
+								size="compact"
+								disabled
+								accessibleWhenDisabled
+							>
+								{ __( 'AI Experiments enabled' ) }
+							</Button>
+						)
 					) }
-					<Button
-						variant="tertiary"
-						href={ AI_PLUGIN_URL }
-						target="_blank"
-						rel="noopener noreferrer"
-					>
+					<ExternalLink href={ AI_PLUGIN_URL }>
 						{ __( 'Learn more' ) }
-					</Button>
+					</ExternalLink>
 				</div>
 			</div>
 			<WpLogoDecoration />

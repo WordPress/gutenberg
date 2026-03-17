@@ -710,6 +710,36 @@ test.describe( 'Router regions', () => {
 		}
 	} );
 
+	// Regression test for https://github.com/WordPress/gutenberg/issues/76447.
+	test( 'should not reload the page when clicking a hash anchor link', async ( {
+		page,
+	} ) => {
+		const counter = page.getByTestId( 'state-counter' );
+
+		// Accumulate some in-memory state so a reload would be detectable.
+		await counter.click( { clickCount: 3, delay: 50 } );
+		await expect( counter ).toHaveText( '3' );
+
+		// Set up a listener for the `load` event before clicking. A full-page
+		// reload fires `load`; a same-document hash navigation does not.
+		const loadPromise = page
+			.waitForEvent( 'load', { timeout: 1000 } )
+			.then( () => 'reloaded' )
+			.catch( () => 'no-reload' );
+
+		// Click a plain hash anchor — this fires `popstate` with `state: null`.
+		await page.getByTestId( 'hash-link' ).click();
+
+		// The URL should now include the fragment.
+		await expect( page ).toHaveURL( /#hash-link-target$/ );
+
+		// A full-page reload should not have been triggered.
+		expect( await loadPromise ).toBe( 'no-reload' );
+
+		// In-memory state must be preserved.
+		await expect( counter ).toHaveText( '3' );
+	} );
+
 	// Regression test for https://github.com/WordPress/gutenberg/issues/70500.
 	test( 'should update content on back/forward navigation after a page reload', async ( {
 		page,

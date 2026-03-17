@@ -5,13 +5,14 @@
 // fallback matching the default WordPress admin blue.
 $-accent-color: var(--wp-admin-theme-color, #3858e9);
 
+// overflow: clip is intentionally omitted here — .editor-avatar__image handles
+// its own circular clip. Removing overflow from this container allows the inset
+// box-shadow on __image to render without being clipped by the parent.
 .editor-avatar {
 	position: relative;
 	display: inline-flex;
 	align-items: center;
 	border-radius: $radius-full;
-	overflow: hidden;
-	overflow: clip;
 	flex-shrink: 0;
 	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $white, $elevation-x-small;
 }
@@ -37,8 +38,20 @@ $-accent-color: var(--wp-admin-theme-color, #3858e9);
 
 	.has-avatar-border-color > & {
 		border: var(--wp-admin-border-width-focus) solid var(--editor-avatar-outline-color);
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
 		background-clip: padding-box;
+
+		// Inner contrast ring rendered as a pseudo-element so it paints above
+		// the absolutely-positioned <img>. An inset box-shadow would be
+		// covered by the image content layer.
+		&::after {
+			content: "";
+			position: absolute;
+			inset: 0;
+			border-radius: inherit;
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, 2px) $white;
+			pointer-events: none;
+			z-index: 1;
+		}
 	}
 }
 
@@ -66,8 +79,11 @@ $-accent-color: var(--wp-admin-theme-color, #3858e9);
 	font-size: $font-size-x-small;
 	font-weight: $font-weight-medium;
 	border: 0;
-	box-shadow: none;
 	background-clip: border-box;
+
+	&::after {
+		content: none;
+	}
 }
 
 .editor-avatar:not(.has-src).has-avatar-border-color > .editor-avatar__image {

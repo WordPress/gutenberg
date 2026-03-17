@@ -46,16 +46,24 @@ const DISCONNECTED_DEBOUNCE_MS = 2000;
  * @return {Element|null} The modal component or null if not disconnected.
  */
 export function SyncConnectionModal() {
-	const { connectionState, postType } = useSelect( ( selectFn ) => {
-		const currentPostType = selectFn( editorStore ).getCurrentPostType();
-		return {
-			connectionState:
-				selectFn( coreDataStore ).getSyncConnectionStatus() || null,
-			postType: currentPostType
-				? selectFn( coreDataStore ).getPostType( currentPostType )
-				: null,
-		};
-	}, [] );
+	const { connectionState, isCollaborationEnabled, postType } = useSelect(
+		( selectFn ) => {
+			const currentPostType =
+				selectFn( editorStore ).getCurrentPostType();
+			return {
+				connectionState:
+					selectFn( coreDataStore ).getSyncConnectionStatus() || null,
+				isCollaborationEnabled:
+					selectFn(
+						editorStore
+					).isCollaborationEnabledForCurrentPost(),
+				postType: currentPostType
+					? selectFn( coreDataStore ).getPostType( currentPostType )
+					: null,
+			};
+		},
+		[]
+	);
 
 	const { secondsRemaining, markRetrying } = useRetryCountdown(
 		connectionState?.retryInMs,
@@ -115,7 +123,7 @@ export function SyncConnectionModal() {
 		};
 	}, [ connectionStatus, connectionErrorCode ] );
 
-	if ( ! syncConnectionMessage ) {
+	if ( ! syncConnectionMessage || ! isCollaborationEnabled ) {
 		return null;
 	}
 
@@ -146,7 +154,7 @@ export function SyncConnectionModal() {
 	return (
 		<BlockCanvasCover.Fill>
 			<Modal
-				className="editor-sync-connection-modal"
+				overlayClassName="editor-sync-connection-modal"
 				isDismissible={ false }
 				onRequestClose={ () => {} }
 				shouldCloseOnClickOutside={ false }
