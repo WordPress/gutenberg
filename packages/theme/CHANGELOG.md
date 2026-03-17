@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `design-tokens.js` export now provides `tokens` (keyed by variable name, with description and group metadata) and `groups` (keyed by source file) named exports, replacing the previous flat array default export ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
+
 ### New Features
 
 -   Added `no-token-fallback-values` stylelint rule that disallows manual fallback values for `--wpds-*` design tokens. Available as `@wordpress/theme/stylelint-plugins/no-token-fallback-values` ([#76415](https://github.com/WordPress/gutenberg/pull/76415)).
