@@ -81,6 +81,48 @@ export function useAvailableTemplates( postType ) {
 	);
 }
 
+export function usePostTemplatePanelMode() {
+	return useSelect( ( select ) => {
+		const { getEditorSettings, getCurrentTemplateId, getCurrentPostType } =
+			select( editorStore );
+		const { getPostType, canUser } = select( coreStore );
+		const postTypeSlug = getCurrentPostType();
+		const postType = getPostType( postTypeSlug );
+		const settings = getEditorSettings();
+		const isBlockTheme = settings.__unstableIsBlockBasedTheme;
+		const hasTemplates =
+			!! settings.availableTemplates &&
+			Object.keys( settings.availableTemplates ).length > 0;
+		let isVisible;
+		if ( ! postType?.viewable ) {
+			isVisible = false;
+		} else if ( hasTemplates ) {
+			isVisible = true;
+		} else if ( ! settings.supportsTemplateMode ) {
+			isVisible = false;
+		} else {
+			isVisible =
+				canUser( 'create', {
+					kind: 'postType',
+					name: 'wp_template',
+				} ) ?? false;
+		}
+		const canViewTemplates = isVisible
+			? !! canUser( 'read', {
+					kind: 'postType',
+					name: 'wp_template',
+			  } )
+			: false;
+		if ( ( ! isBlockTheme || ! canViewTemplates ) && isVisible ) {
+			return 'classic';
+		}
+		if ( isBlockTheme && !! getCurrentTemplateId() ) {
+			return 'block-theme';
+		}
+		return null;
+	}, [] );
+}
+
 export function useCurrentTemplateSlug() {
 	const { postType, postId } = useEditedPostContext();
 	const templates = useTemplates( postType );
