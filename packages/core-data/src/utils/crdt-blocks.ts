@@ -123,6 +123,57 @@ function makeBlocksSerializable( blocks: Block[] ): Block[] {
 }
 
 /**
+ * Convert rich-text string attributes in a block back to RichTextData
+ * instances. This is the inverse of makeBlockAttributesSerializable and is
+ * needed when blocks are extracted from the CRDT document, where rich-text
+ * values are stored as Y.Text (which serializes to plain strings via
+ * toJSON()). Without this conversion, block edit components that rely on
+ * RichTextData methods (e.g. `.text`) will receive a raw string and
+ * malfunction.
+ *
+ * @param blockName  The block type name, e.g. 'core/code'.
+ * @param attributes The plain-object attributes from CRDT (toJSON).
+ * @return Attributes with rich-text strings replaced by RichTextData.
+ */
+function deserializeBlockAttributeValues(
+	blockName: string,
+	attributes: BlockAttributes
+): BlockAttributes {
+	const newAttributes = { ...attributes };
+
+	for ( const [ key, value ] of Object.entries( attributes ) ) {
+		if (
+			isRichTextAttribute( blockName, key ) &&
+			typeof value === 'string'
+		) {
+			newAttributes[ key ] = RichTextData.fromHTMLString( value );
+		}
+	}
+
+	return newAttributes;
+}
+
+/**
+ * Convert blocks from their CRDT-serialized form back to the runtime form
+ * expected by the block editor. This ensures that rich-text attributes are
+ * RichTextData instances rather than raw strings.
+ *
+ * @param blocks Blocks as extracted from the CRDT document via toJSON().
+ * @return Blocks with rich-text attributes restored to RichTextData.
+ */
+export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
+	return blocks.map( ( block: Block ) => {
+		const { name, innerBlocks, attributes, ...rest } = block;
+		return {
+			...rest,
+			name,
+			attributes: deserializeBlockAttributeValues( name, attributes ),
+			innerBlocks: deserializeBlockAttributes( innerBlocks ?? [] ),
+		};
+	} );
+}
+
+/**
  * @param {any}   gblock
  * @param {Y.Map} yblock
  */
