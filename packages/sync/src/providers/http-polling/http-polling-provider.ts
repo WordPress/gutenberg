@@ -6,11 +6,6 @@ import { ObservableV2 } from 'lib0/observable';
 import { Awareness } from 'y-protocols/awareness';
 
 /**
- * WordPress dependencies
- */
-import { applyFilters } from '@wordpress/hooks';
-
-/**
  * Internal dependencies
  */
 import type {
@@ -18,10 +13,6 @@ import type {
 	ProviderCreator,
 	ProviderCreatorResult,
 } from '../../types';
-import {
-	DEFAULT_MAX_CLIENTS_PER_USER,
-	DEFAULT_MAX_PEERS_PER_ROOM,
-} from './config';
 import { pollingManager } from './polling-manager';
 
 export interface ProviderOptions {
@@ -69,8 +60,6 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 			doc: this.options.ydoc,
 			awareness: this.awareness,
 			log: this.log,
-			maxClientsPerUser: this.options.maxClientsPerUser,
-			maxPeersPerRoom: this.options.maxPeersPerRoom,
 			onStatusChange: this.emitStatus,
 			onSync: this.onSync,
 		} );
@@ -160,22 +149,11 @@ export function createHttpPollingProvider(): ProviderCreator {
 	} ): Promise< ProviderCreatorResult > => {
 		// Generate room name from objectType and objectId
 		const room = objectId ? `${ objectType }:${ objectId }` : objectType;
-
-		const maxPeersPerRoom = applyFilters(
-			'sync.maxPeersPerRoom',
-			DEFAULT_MAX_PEERS_PER_ROOM
-		) as number;
-
-		const maxClientsPerUser = applyFilters(
-			'sync.maxClientsPerUser',
-			DEFAULT_MAX_CLIENTS_PER_USER
-		) as number;
+		console.log( { room, ydoc, awareness } );
 
 		const provider = new HttpPollingProvider( {
 			awareness,
 			// debug: true,
-			maxClientsPerUser,
-			maxPeersPerRoom,
 			room,
 			ydoc,
 		} );

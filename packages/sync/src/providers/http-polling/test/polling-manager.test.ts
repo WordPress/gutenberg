@@ -36,27 +36,19 @@ jest.mock( 'y-protocols/awareness', () => ( {
 	removeAwarenessStates: jest.fn(),
 } ) );
 
+jest.mock( '@wordpress/hooks', () => ( {
+	applyFilters: jest.fn(
+		( _hook: string, defaultValue: unknown ) => defaultValue
+	),
+} ) );
+
 jest.mock( '../config', () => ( {
 	...( jest.requireActual( '../config' ) as object ),
 	MAX_UPDATE_SIZE_IN_BYTES: 10,
 } ) );
 
 jest.mock( '../utils', () => ( {
-	base64ToUint8Array: jest.fn( () => new Uint8Array() ),
-	createSyncUpdate: jest.fn( ( _data: unknown, type: string ) => ( {
-		data: '',
-		type,
-	} ) ),
-	createUpdateQueue: jest.fn( () => ( {
-		add: jest.fn(),
-		addBulk: jest.fn(),
-		clear: jest.fn(),
-		get: jest.fn( () => [] ),
-		pause: jest.fn(),
-		restore: jest.fn(),
-		resume: jest.fn(),
-		size: jest.fn( () => 0 ),
-	} ) ),
+	...( jest.requireActual( '../utils' ) as object ),
 	postSyncUpdate: jest.fn(),
 	postSyncUpdateNonBlocking: jest.fn(),
 } ) );
@@ -67,8 +59,6 @@ interface PollingManager {
 		doc: unknown;
 		awareness: unknown;
 		log: () => void;
-		maxClientsPerUser?: number;
-		maxPeersPerRoom?: number;
 		onStatusChange: () => void;
 		onSync: () => void;
 	} ) => void;
@@ -125,6 +115,7 @@ describe( 'polling-manager', () => {
 	let mockPostSyncUpdateNonBlocking: jest.Mock<
 		typeof import('../utils').postSyncUpdateNonBlocking
 	>;
+	let mockApplyFilters: jest.Mock;
 
 	beforeEach( () => {
 		jest.useFakeTimers();
@@ -136,6 +127,7 @@ describe( 'polling-manager', () => {
 			mockPostSyncUpdate = require( '../utils' ).postSyncUpdate;
 			mockPostSyncUpdateNonBlocking =
 				require( '../utils' ).postSyncUpdateNonBlocking;
+			mockApplyFilters = require( '@wordpress/hooks' ).applyFilters;
 		} );
 	} );
 
@@ -257,52 +249,34 @@ describe( 'polling-manager', () => {
 		} );
 	} );
 
-	describe( 'peer limits', () => {
-		function makeAwareness(
-			entries: Array< { clientId: number; userId: number } >
-		) {
-			const awareness: Record<
-				string,
-				{ collaboratorInfo: { id: number } }
-			> = {};
-			for ( const { clientId, userId } of entries ) {
-				awareness[ clientId ] = {
-					collaboratorInfo: { id: userId },
-				};
-			}
-			return awareness;
-		}
-
-		it( 'disconnects when unique users exceed maxPeersPerRoom on first poll', async () => {
-			const awareness3Users = makeAwareness( [
-				{ clientId: 1, userId: 100 },
-				{ clientId: 2, userId: 200 },
-				{ clientId: 3, userId: 300 },
-			] );
+	describe( 'connection limits', () => {
+		it( 'disconnects when clients exceed limit on first poll of first room', async () => {
+			// DEFAULT_CLIENT_LIMIT_PER_ROOM is 3. 4 clients should exceed it.
+			const awareness = {
+				1: { collaboratorInfo: { id: 100 } },
+				2: { collaboratorInfo: { id: 200 } },
+				3: { collaboratorInfo: { id: 300 } },
+				4: { collaboratorInfo: { id: 400 } },
+			};
 
 			mockPostSyncUpdate.mockResolvedValue( {
 				rooms: [
 					{
 						room: 'test-room',
 						end_cursor: 1,
-						awareness: awareness3Users,
+						awareness,
 						updates: [],
 					},
 				],
 			} );
 
 			const onStatusChange = jest.fn();
-			const mockAwareness = createMockAwareness();
-			mockAwareness.getLocalState.mockReturnValue( {
-				collaboratorInfo: { id: 300 },
-			} );
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 3 ),
-				awareness: mockAwareness,
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
 				log: jest.fn(),
-				maxPeersPerRoom: 2,
 				onStatusChange,
 				onSync: jest.fn(),
 			} );
@@ -317,35 +291,32 @@ describe( 'polling-manager', () => {
 			} );
 		} );
 
-		it( 'allows connection when under the peer limit', async () => {
-			const awareness2Users = makeAwareness( [
-				{ clientId: 1, userId: 100 },
-				{ clientId: 2, userId: 200 },
-			] );
+		it( 'allows connection when clients are at or under the limit', async () => {
+			// DEFAULT_CLIENT_LIMIT_PER_ROOM is 3. 3 clients should be fine.
+			const awareness = {
+				1: { collaboratorInfo: { id: 100 } },
+				2: { collaboratorInfo: { id: 200 } },
+				3: { collaboratorInfo: { id: 300 } },
+			};
 
 			mockPostSyncUpdate.mockResolvedValue( {
 				rooms: [
 					{
 						room: 'test-room',
 						end_cursor: 1,
-						awareness: awareness2Users,
+						awareness,
 						updates: [],
 					},
 				],
 			} );
 
 			const onStatusChange = jest.fn();
-			const mockAwareness = createMockAwareness();
-			mockAwareness.getLocalState.mockReturnValue( {
-				collaboratorInfo: { id: 200 },
-			} );
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 2 ),
-				awareness: mockAwareness,
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
 				log: jest.fn(),
-				maxPeersPerRoom: 2,
 				onStatusChange,
 				onSync: jest.fn(),
 			} );
@@ -361,79 +332,103 @@ describe( 'polling-manager', () => {
 			);
 		} );
 
-		it( 'disconnects when same-user tabs exceed maxClientsPerUser', async () => {
-			const awareness3Tabs = makeAwareness( [
-				{ clientId: 1, userId: 100 },
-				{ clientId: 2, userId: 100 },
-				{ clientId: 3, userId: 100 },
-			] );
-
+		it( 'does not enforce limits on the second registered room', async () => {
+			// Register a first room (which consumes the enforceConnectionLimit flag).
 			mockPostSyncUpdate.mockResolvedValue( {
 				rooms: [
 					{
-						room: 'test-room',
+						room: 'first-room',
 						end_cursor: 1,
-						awareness: awareness3Tabs,
+						awareness: { 1: {} },
 						updates: [],
 					},
 				],
 			} );
 
-			const onStatusChange = jest.fn();
-			const mockAwareness = createMockAwareness();
-			mockAwareness.getLocalState.mockReturnValue( {
-				collaboratorInfo: { id: 100 },
-			} );
-
 			pollingManager.registerRoom( {
-				room: 'test-room',
-				doc: createMockDoc( 3 ),
-				awareness: mockAwareness,
+				room: 'first-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
 				log: jest.fn(),
-				maxClientsPerUser: 2,
-				onStatusChange,
+				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
 
-			expect( onStatusChange ).toHaveBeenCalledWith( {
-				status: 'disconnected',
-				error: expect.objectContaining( {
-					code: 'connection-limit-exceeded',
-				} ),
-			} );
-		} );
+			// Now register a second room with many clients — should not disconnect.
+			const awarenessMany = {
+				1: {},
+				2: {},
+				3: {},
+				4: {},
+				5: {},
+			};
 
-		it( 'does not re-check limits after initial sync', async () => {
-			// First poll: 2 users (at limit, passes).
-			const awareness2Users = makeAwareness( [
-				{ clientId: 1, userId: 100 },
-				{ clientId: 2, userId: 200 },
-			] );
 			mockPostSyncUpdate.mockResolvedValue( {
 				rooms: [
 					{
-						room: 'test-room',
+						room: 'first-room',
+						end_cursor: 2,
+						awareness: { 1: {} },
+						updates: [],
+					},
+					{
+						room: 'second-room',
 						end_cursor: 1,
-						awareness: awareness2Users,
+						awareness: awarenessMany,
 						updates: [],
 					},
 				],
 			} );
 
 			const onStatusChange = jest.fn();
-			const mockAwareness = createMockAwareness();
-			mockAwareness.getLocalState.mockReturnValue( {
-				collaboratorInfo: { id: 200 },
+
+			pollingManager.registerRoom( {
+				room: 'second-room',
+				doc: createMockDoc( 2 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange,
+				onSync: jest.fn(),
 			} );
+
+			await jest.advanceTimersByTimeAsync( 1000 );
+
+			expect( onStatusChange ).not.toHaveBeenCalledWith(
+				expect.objectContaining( {
+					error: expect.objectContaining( {
+						code: 'connection-limit-exceeded',
+					} ),
+				} )
+			);
+		} );
+
+		it( 'does not re-check limits after initial sync', async () => {
+			// First poll: 3 clients (at limit, passes).
+			const awareness3 = {
+				1: {},
+				2: {},
+				3: {},
+			};
+			mockPostSyncUpdate.mockResolvedValue( {
+				rooms: [
+					{
+						room: 'test-room',
+						end_cursor: 1,
+						awareness: awareness3,
+						updates: [],
+					},
+				],
+			} );
+
+			const onStatusChange = jest.fn();
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 2 ),
-				awareness: mockAwareness,
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
 				log: jest.fn(),
-				maxPeersPerRoom: 2,
 				onStatusChange,
 				onSync: jest.fn(),
 			} );
@@ -442,18 +437,20 @@ describe( 'polling-manager', () => {
 			await jest.advanceTimersByTimeAsync( 0 );
 			onStatusChange.mockClear();
 
-			// Second poll: 3 users (over limit).
-			const awareness3Users = makeAwareness( [
-				{ clientId: 1, userId: 100 },
-				{ clientId: 2, userId: 200 },
-				{ clientId: 3, userId: 300 },
-			] );
+			// Second poll: 5 clients (over limit).
+			const awareness5 = {
+				1: {},
+				2: {},
+				3: {},
+				4: {},
+				5: {},
+			};
 			mockPostSyncUpdate.mockResolvedValue( {
 				rooms: [
 					{
 						room: 'test-room',
 						end_cursor: 2,
-						awareness: awareness3Users,
+						awareness: awareness5,
 						updates: [],
 					},
 				],
@@ -471,12 +468,53 @@ describe( 'polling-manager', () => {
 			);
 		} );
 
-		it( 'skips awareness entries with null or missing collaboratorInfo', async () => {
-			const awarenessWithNulls: Record< string, object | null > = {
-				1: { collaboratorInfo: { id: 100 } },
-				2: null,
+		it( 'passes room name to applyFilters for per-room customization', async () => {
+			const awareness = {
+				1: {},
+				2: {},
 				3: {},
-				4: { collaboratorInfo: { id: 200 } },
+				4: {},
+			};
+
+			mockPostSyncUpdate.mockResolvedValue( {
+				rooms: [
+					{
+						room: 'my-custom-room',
+						end_cursor: 1,
+						awareness,
+						updates: [],
+					},
+				],
+			} );
+
+			pollingManager.registerRoom( {
+				room: 'my-custom-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			expect( mockApplyFilters ).toHaveBeenCalledWith(
+				'collaboration.sync.maxClientsPerRoom',
+				3,
+				'my-custom-room'
+			);
+		} );
+
+		it( 'respects a custom limit from applyFilters', async () => {
+			// Override the filter to allow up to 10 clients.
+			mockApplyFilters.mockReturnValue( 10 );
+
+			const awareness = {
+				1: {},
+				2: {},
+				3: {},
+				4: {},
+				5: {},
 			};
 
 			mockPostSyncUpdate.mockResolvedValue( {
@@ -484,74 +522,26 @@ describe( 'polling-manager', () => {
 					{
 						room: 'test-room',
 						end_cursor: 1,
-						awareness: awarenessWithNulls,
+						awareness,
 						updates: [],
 					},
 				],
 			} );
 
 			const onStatusChange = jest.fn();
-			const mockAwareness = createMockAwareness();
-			mockAwareness.getLocalState.mockReturnValue( {
-				collaboratorInfo: { id: 200 },
-			} );
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 4 ),
-				awareness: mockAwareness,
-				log: jest.fn(),
-				maxPeersPerRoom: 2,
-				onStatusChange,
-				onSync: jest.fn(),
-			} );
-
-			await jest.advanceTimersByTimeAsync( 0 );
-
-			// Only 2 valid users (100, 200) — should not disconnect.
-			expect( onStatusChange ).not.toHaveBeenCalledWith(
-				expect.objectContaining( {
-					error: expect.objectContaining( {
-						code: 'connection-limit-exceeded',
-					} ),
-				} )
-			);
-		} );
-
-		it( 'does not enforce limits when set to 0', async () => {
-			const awareness5Users = makeAwareness( [
-				{ clientId: 1, userId: 100 },
-				{ clientId: 2, userId: 200 },
-				{ clientId: 3, userId: 300 },
-				{ clientId: 4, userId: 400 },
-				{ clientId: 5, userId: 500 },
-			] );
-
-			mockPostSyncUpdate.mockResolvedValue( {
-				rooms: [
-					{
-						room: 'test-room',
-						end_cursor: 1,
-						awareness: awareness5Users,
-						updates: [],
-					},
-				],
-			} );
-
-			const onStatusChange = jest.fn();
-			pollingManager.registerRoom( {
-				room: 'test-room',
-				doc: createMockDoc( 5 ),
+				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
 				log: jest.fn(),
-				maxPeersPerRoom: 0,
-				maxClientsPerUser: 0,
 				onStatusChange,
 				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
 
+			// 5 clients under a limit of 10 — should not disconnect.
 			expect( onStatusChange ).not.toHaveBeenCalledWith(
 				expect.objectContaining( {
 					error: expect.objectContaining( {
