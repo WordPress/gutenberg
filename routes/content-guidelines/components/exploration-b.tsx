@@ -91,12 +91,34 @@ const GUIDELINE_ITEMS = [
 
 const BANNER_STORAGE_KEY = 'content-guidelines-banner-dismissed';
 
+const jetpackIcon = (
+	<svg
+		width="24"
+		height="24"
+		viewBox="0 0 24 24"
+		fill="none"
+		xmlns="http://www.w3.org/2000/svg"
+	>
+		<g transform="translate(3,3)">
+			<path
+				d="M9 18C13.9706 18 18 13.9706 18 9C18 4.02944 13.9706 0 9 0C4.02944 0 0 4.02944 0 9C0 13.9706 4.02944 18 9 18Z"
+				fill="#069E08"
+			/>
+			<path
+				d="M14.0335 7.48851L9.53353 16.2141V7.48851H14.0335ZM8.6224 10.4944H4.13997L8.6224 1.78636V10.4944Z"
+				fill="white"
+			/>
+		</g>
+	</svg>
+);
+
 interface AccordionWithAiProps {
 	title: string;
 	description: string;
 	slug: string;
 	suggestion: string | undefined;
 	sectionState: SectionState;
+	isTextStreaming: boolean;
 	onGenerateSection: ( slug: string ) => void;
 	onAccept: ( slug: string ) => void;
 	onDismiss: ( slug: string ) => void;
@@ -108,6 +130,7 @@ function AccordionWithAi( {
 	slug,
 	suggestion,
 	sectionState,
+	isTextStreaming,
 	onGenerateSection,
 	onAccept,
 	onDismiss,
@@ -136,6 +159,42 @@ function AccordionWithAi( {
 	const isStreaming = sectionState === 'streaming' || sectionState === 'requesting';
 	const showDiff = sectionState === 'done' && suggestion !== undefined;
 
+	// Height tethering: sync textarea and diff wrapper heights on user resize.
+	const fieldContainerRef = useRef< HTMLDivElement >( null );
+	const [ userFieldHeight, setUserFieldHeight ] = useState< number | null >( null );
+
+	useEffect( () => {
+		const container = fieldContainerRef.current;
+		if ( ! container ) {
+			return;
+		}
+
+		let tracking = false;
+
+		const onMouseDown = () => {
+			tracking = true;
+		};
+		const onMouseUp = () => {
+			if ( ! tracking ) {
+				return;
+			}
+			tracking = false;
+			const el = container.querySelector(
+				'textarea, .content-guidelines__diff-wrapper'
+			) as HTMLElement | null;
+			if ( el ) {
+				setUserFieldHeight( el.offsetHeight );
+			}
+		};
+
+		container.addEventListener( 'mousedown', onMouseDown );
+		document.addEventListener( 'mouseup', onMouseUp );
+		return () => {
+			container.removeEventListener( 'mousedown', onMouseDown );
+			document.removeEventListener( 'mouseup', onMouseUp );
+		};
+	}, [] );
+
 	const handleSave = () => {
 		setGuideline( slug, draft );
 		setSaving( true );
@@ -157,10 +216,13 @@ function AccordionWithAi( {
 		onGenerateSection( slug );
 	};
 
-	const handleAccept = ( e: React.MouseEvent< HTMLButtonElement > ) => {
-		e.preventDefault();
-		// Accept keeps the suggestion in the draft (already written by streaming).
-		// Does NOT save — user must explicitly save.
+	const handleAccept = ( e?: React.MouseEvent ) => {
+		e?.preventDefault();
+		// Explicitly set draft to the full suggestion text before clearing.
+		if ( suggestion ) {
+			setDraft( suggestion );
+			setGuideline( slug, suggestion );
+		}
 		onAccept( slug );
 	};
 
@@ -172,7 +234,9 @@ function AccordionWithAi( {
 		onDismiss( slug );
 	};
 
-	const generateLabel = draft.trim().length > 0
+	// Lock the label to the pre-generation state so it doesn't flip mid-generation.
+	const labelSource = isStreaming ? preImproveDraft.current : draft;
+	const generateLabel = labelSource.trim().length > 0
 		? __( 'Improve guidelines' )
 		: __( 'Generate guidelines' );
 
@@ -223,14 +287,26 @@ function AccordionWithAi( {
 							{ description }
 						</Text>
 					</VStack>
-					<Icon
-						icon={ chevronDown }
-						className={
-							isOpen
-								? 'content-guidelines__accordion-chevron-up'
-								: 'content-guidelines__accordion-chevron-down'
-						}
-					/>
+					<HStack spacing={ 2 } expanded={ false }>
+						{ isStreaming && ! isOpen && (
+							<Spinner
+								className="content-guidelines__accordion-spinner"
+							/>
+						) }
+						{ showDiff && ! isOpen && (
+							<span className="content-guidelines__suggestion-badge">
+								{ __( 'Suggestion' ) }
+							</span>
+						) }
+						<Icon
+							icon={ chevronDown }
+							className={
+								isOpen
+									? 'content-guidelines__accordion-chevron-up'
+									: 'content-guidelines__accordion-chevron-down'
+							}
+						/>
+					</HStack>
 				</HStack>
 			</Button>
 			<div hidden={ ! isOpen }>
@@ -245,27 +321,42 @@ function AccordionWithAi( {
 					className="content-guidelines__accordion-form"
 				>
 					<VStack spacing={ 4 }>
-						{ showDiff ? (
-							<div className="content-guidelines__diff-wrapper has-suggestion">
-								<DiffEditor
-									original={ preImproveDraft.current }
-									suggested={ suggestion || '' }
+						<div
+							ref={ fieldContainerRef }
+							className={ `content-guidelines__field-container${ isStreaming && ! isTextStreaming ? ' is-streaming' : '' }` }
+							style={
+								userFieldHeight
+									? ( {
+											'--cg-field-height': `${ userFieldHeight }px`,
+									  } as React.CSSProperties )
+									: undefined
+							}
+						>
+							{ showDiff ? (
+								/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
+								<div
+									className="content-guidelines__diff-wrapper has-suggestion"
+									onClick={ () => handleAccept() }
+								>
+									<DiffEditor
+										original={ preImproveDraft.current }
+										suggested={ suggestion || '' }
+									/>
+								</div>
+							) : (
+								<TextareaControl
+									label={ sprintf(
+										/* translators: %s: Guideline category. */
+										__( '%s guidelines' ),
+										slug
+									) }
+									hideLabelFromVision
+									value={ draft }
+									onChange={ setDraft }
+									rows={ 6 }
 								/>
-							</div>
-						) : (
-							<TextareaControl
-								label={ sprintf(
-									/* translators: %s: Guideline category. */
-									__( '%s guidelines' ),
-									slug
-								) }
-								hideLabelFromVision
-								value={ draft }
-								onChange={ setDraft }
-								rows={ 6 }
-								disabled={ isStreaming }
-							/>
-						) }
+							) }
+						</div>
 						{ error && (
 							<Notice.Root intent="error">
 								<Notice.Title>
@@ -284,7 +375,7 @@ function AccordionWithAi( {
 									onClick={ handleAccept }
 									__next40pxDefaultSize
 								>
-									{ __( 'Accept' ) }
+									{ __( 'Accept suggestion' ) }
 								</Button>
 								<Button
 									variant="tertiary"
@@ -311,7 +402,6 @@ function AccordionWithAi( {
 									onClick={ handleGenerate }
 									disabled={ isStreaming }
 									accessibleWhenDisabled
-									isBusy={ isStreaming }
 									__next40pxDefaultSize
 								>
 									{ generateLabel }
@@ -343,16 +433,27 @@ export default function ExplorationB() {
 	const {
 		suggestions,
 		sectionStates,
+		blockSuggestions,
+		blockGeneratingState,
+		textStreamingKeys,
 		generate,
 		generateSection,
+		generateBlock,
+		generateAllBlocks,
 		acceptSuggestion,
 		dismissSuggestion,
+		acceptBlockSuggestion,
+		dismissBlockSuggestion,
 		isGenerating,
 	} = useAiGuidelines();
 
-	const isEmpty = useSelect(
-		// @ts-ignore
-		( select ) => select( STORE_NAME ).isGuidelinesEmpty(),
+	const { isEmpty, blockGuidelineNames } = useSelect(
+		( select ) => ( {
+			// @ts-ignore
+			isEmpty: select( STORE_NAME ).isGuidelinesEmpty(),
+			// @ts-ignore
+			blockGuidelineNames: Object.keys( select( STORE_NAME ).getBlockGuidelines() || {} ),
+		} ),
 		[]
 	);
 
@@ -363,14 +464,33 @@ export default function ExplorationB() {
 			.finally( () => setPageLoading( false ) );
 	}, [] );
 
+	// Lock the label at click time so it doesn't flip mid-generation.
+	const headerLabelRef = useRef< string | null >( null );
+
+	const DEFAULT_BLOCKS = [
+		'core/paragraph',
+		'core/heading',
+		'core/image',
+	];
+
 	const handleHeaderGenerate = ( e: React.MouseEvent< HTMLButtonElement > ) => {
 		( e.target as HTMLButtonElement ).blur();
+		headerLabelRef.current = isEmpty
+			? __( 'Generate guidelines' )
+			: __( 'Improve guidelines' );
 		generate();
+		// Also generate block guidelines
+		const blockNames = blockGuidelineNames.length > 0
+			? blockGuidelineNames
+			: DEFAULT_BLOCKS;
+		generateAllBlocks( blockNames );
 	};
 
-	const headerButtonLabel = isEmpty
-		? __( 'Generate guidelines' )
-		: __( 'Improve guidelines' );
+	const headerButtonLabel = isGenerating && headerLabelRef.current
+		? headerLabelRef.current
+		: isEmpty
+			? __( 'Generate guidelines' )
+			: __( 'Improve guidelines' );
 
 	return (
 		<Page
@@ -382,6 +502,7 @@ export default function ExplorationB() {
 				bannerDismissed ? (
 					<Button
 						variant="primary"
+						icon={ jetpackIcon }
 						onClick={ handleHeaderGenerate }
 						disabled={ isGenerating }
 						accessibleWhenDisabled
@@ -447,6 +568,9 @@ export default function ExplorationB() {
 															true
 														);
 														generate();
+														generateAllBlocks(
+															DEFAULT_BLOCKS
+														);
 													} }
 													__next40pxDefaultSize
 												>
@@ -502,8 +626,24 @@ export default function ExplorationB() {
 														description={
 															item.description
 														}
+														isGenerating={
+															Object.values( blockGeneratingState ).some(
+																( s ) => s === 'requesting' || s === 'streaming'
+															)
+														}
+														hasSuggestion={
+															Object.keys( blockSuggestions ).length > 0
+														}
 													>
-														<BlockGuidelines />
+														<BlockGuidelines
+															blockSuggestions={ blockSuggestions }
+															blockGeneratingState={ blockGeneratingState }
+															textStreamingKeys={ textStreamingKeys }
+															generateBlock={ generateBlock }
+															generateAllBlocks={ generateAllBlocks }
+															acceptBlockSuggestion={ acceptBlockSuggestion }
+															dismissBlockSuggestion={ dismissBlockSuggestion }
+														/>
 													</GuidelineAccordion>
 												) : (
 													<AccordionWithAi
@@ -524,6 +664,11 @@ export default function ExplorationB() {
 														}
 														onGenerateSection={
 															generateSection
+														}
+														isTextStreaming={
+															!! textStreamingKeys[
+																item.slug
+															]
 														}
 														onAccept={
 															acceptSuggestion

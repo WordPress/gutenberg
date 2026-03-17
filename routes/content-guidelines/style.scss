@@ -3,6 +3,15 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/breakpoints" as *;
 
+// Remove focus ring on mouse click for tertiary buttons (keep for keyboard).
+.content-guidelines__content,
+.block-guidelines {
+	.components-button.is-tertiary:focus:not(:focus-visible) {
+		box-shadow: none;
+		outline: none;
+	}
+}
+
 .content-guidelines__content {
 	margin-top: 0;
 	padding: $grid-unit-30;
@@ -141,16 +150,77 @@
 	margin-top: $grid-unit-30;
 }
 
+// ── Suggestion badge ──
+
+.content-guidelines__suggestion-badge {
+	font-size: 11px;
+	font-weight: 500;
+	color: $alert-green;
+	background: color.adjust($alert-green, $lightness: +35%);
+	padding: 1px $grid-unit-10;
+	border-radius: $radius-block-ui;
+	white-space: nowrap;
+}
+
 // ── Diff styles ──
 
+// Same default height for textarea and diff wrapper.
+// Both share min-height, line-height, and read --cg-field-height for resize tethering.
+.content-guidelines__field-container .components-textarea-control__input,
+.content-guidelines__field-container .content-guidelines__diff-wrapper {
+	height: var(--cg-field-height, auto);
+	min-height: 140px;
+	box-sizing: border-box;
+	font-size: 13px;
+	line-height: 20px;
+}
+
+// Green shimmer overlay + green border during AI streaming.
+.content-guidelines__field-container.is-streaming {
+	position: relative;
+
+	.components-textarea-control__input {
+		border-color: $alert-green;
+		pointer-events: none;
+	}
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		pointer-events: none;
+		border-radius: $radius-block-ui;
+		background: linear-gradient(90deg, transparent 0%, rgba(0, 135, 0, 0.08) 50%, transparent 100%);
+		background-size: 200% 100%;
+		animation: cg-shimmer 1.5s infinite;
+		z-index: 1;
+	}
+}
+
+@keyframes cg-shimmer {
+	0% {
+		background-position: -200% 0;
+	}
+
+	100% {
+		background-position: 200% 0;
+	}
+}
+
 .content-guidelines__diff-wrapper {
-	padding: $grid-unit-20;
-	border: 1px solid $gray-300;
+	padding: 9px 11px;
+	border: 1px solid $gray-600;
 	border-radius: $radius-block-ui;
 	font-size: 13px;
 	line-height: 20px;
-	min-height: 120px;
+	overflow: auto;
 	cursor: text;
+	background: $white;
+	resize: vertical;
+	box-sizing: border-box;
 
 	&.has-suggestion {
 		border-color: $alert-green;

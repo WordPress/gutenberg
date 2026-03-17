@@ -1,7 +1,7 @@
 /**
  * Mock AI hook for Content Guidelines.
  *
- * Provides mock AI streaming for generating/improving guidelines.
+ * Provides mock AI generation for generating/improving guidelines.
  * Will be replaced with real Jetpack AI integration later.
  */
 
@@ -25,9 +25,11 @@ export interface AiGuidelinesState {
 	sectionStates: Record< string, SectionState >;
 	blockSuggestions: Record< string, string >;
 	blockGeneratingState: Record< string, BlockGeneratingState >;
+	textStreamingKeys: Record< string, boolean >;
 	generate: () => void;
 	generateSection: ( slug: string ) => void;
 	generateBlock: ( blockName: string ) => void;
+	generateAllBlocks: ( blockNames: string[] ) => void;
 	acceptSuggestion: ( slug: string ) => void;
 	dismissSuggestion: ( slug: string ) => void;
 	acceptBlockSuggestion: ( blockName: string ) => void;
@@ -40,6 +42,12 @@ const MOCK_SUGGESTIONS: Record< string, string > = {
 	copy: 'Write in a conversational, approachable tone that makes technical concepts accessible. Use active voice and second person ("you") to speak directly to the reader. Keep paragraphs short (2-3 sentences) and use headings, bullet points, and code examples to break up content. Avoid jargon unless necessary, and always explain technical terms on first use.',
 	images: 'Use high-quality images with a minimum resolution of 1200x800 pixels. Prefer clean, modern photography with good lighting and minimal clutter. Screenshots should be cropped to show only the relevant UI elements. Use PNG for screenshots and WebP for photos. Always include descriptive alt text for accessibility.',
 	additional: 'All content should be reviewed before publishing. Include a table of contents for posts longer than 1500 words. Use code syntax highlighting for all code examples. Link to official documentation when referencing external tools or libraries.',
+};
+
+const MOCK_BLOCK_SUGGESTIONS: Record< string, string > = {
+	'core/paragraph': 'Keep paragraphs concise at 2–3 sentences. Use a conversational yet professional tone consistent with the site\'s voice. Avoid walls of text — break long content into multiple paragraph blocks with clear transitions.',
+	'core/heading': 'Use headings to create a clear content hierarchy. H2 for main sections, H3 for subsections. Keep headings under 8 words when possible. Use sentence case, not title case. Never skip heading levels (e.g., don\'t jump from H2 to H4).',
+	'core/image': 'All images must include descriptive alt text for accessibility. Use WebP format where possible. Maintain a 16:9 or 4:3 aspect ratio for consistency. Compress images to under 200KB. Avoid text-heavy images that can\'t be read by screen readers.',
 };
 
 const SECTION_ORDER = [ 'site', 'copy', 'images', 'additional' ];
@@ -60,7 +68,6 @@ function simulateStreaming(
 			return;
 		}
 
-		// Add 2-4 words at a time for faster streaming feel
 		const chunkSize = Math.min( 2 + Math.floor( Math.random() * 3 ), words.length - i );
 		for ( let j = 0; j < chunkSize; j++ ) {
 			current += ( current ? ' ' : '' ) + words[ i ];
@@ -79,12 +86,56 @@ export function useAiGuidelines(): AiGuidelinesState {
 	const [ sectionStates, setSectionStates ] = useState< Record< string, SectionState > >( {} );
 	const [ blockSuggestions, setBlockSuggestions ] = useState< Record< string, string > >( {} );
 	const [ blockGeneratingState, setBlockGeneratingState ] = useState< Record< string, BlockGeneratingState > >( {} );
+	const [ textStreamingKeys, setTextStreamingKeys ] = useState< Record< string, boolean > >( {} );
 	const cleanupRef = useRef< ( () => void ) | null >( null );
+
+	/**
+	 * Finish a section: set suggestion, write to store, mark done.
+	 */
+	const finishSection = ( slug: string, mockText: string ) => {
+		setSuggestions( ( prev ) => ( {
+			...prev,
+			[ slug ]: mockText,
+		} ) );
+		const { setGuideline } = dispatch( STORE_NAME ) as {
+			setGuideline: ( category: string, value: string ) => void;
+		};
+		setGuideline( slug, mockText );
+		setSectionStates( ( prev ) => ( {
+			...prev,
+			[ slug ]: 'done',
+		} ) );
+		setTextStreamingKeys( ( prev ) => {
+			const next = { ...prev };
+			delete next[ slug ];
+			return next;
+		} );
+	};
+
+	/**
+	 * Stream text into an empty section, then finish.
+	 */
+	const streamIntoSection = ( slug: string, mockText: string, onComplete?: () => void ) => {
+		setTextStreamingKeys( ( prev ) => ( { ...prev, [ slug ]: true } ) );
+
+		cleanupRef.current = simulateStreaming(
+			mockText,
+			( partial ) => {
+				const { setGuideline } = dispatch( STORE_NAME ) as {
+					setGuideline: ( category: string, value: string ) => void;
+				};
+				setGuideline( slug, partial );
+			},
+			() => {
+				finishSection( slug, mockText );
+				onComplete?.();
+			}
+		);
+	};
 
 	const generate = useCallback( () => {
 		setState( 'generating' );
 
-		// Reset all section states to requesting
 		const initialStates: Record< string, SectionState > = {};
 		SECTION_ORDER.forEach( ( slug ) => {
 			initialStates[ slug ] = 'requesting';
@@ -92,10 +143,9 @@ export function useAiGuidelines(): AiGuidelinesState {
 		setSectionStates( initialStates );
 		setSuggestions( {} );
 
-		// Stream each section sequentially
 		let sectionIndex = 0;
 
-		const streamNextSection = () => {
+		const generateNextSection = () => {
 			if ( sectionIndex >= SECTION_ORDER.length ) {
 				setState( 'done' );
 				return;
@@ -104,40 +154,33 @@ export function useAiGuidelines(): AiGuidelinesState {
 			const slug = SECTION_ORDER[ sectionIndex ];
 			const mockText = MOCK_SUGGESTIONS[ slug ] || '';
 
-			// Mark section as streaming
 			setSectionStates( ( prev ) => ( {
 				...prev,
 				[ slug ]: 'streaming',
 			} ) );
 
-			// Also update the store with the suggestion as it streams
-			cleanupRef.current = simulateStreaming(
-				mockText,
-				( partial ) => {
-					setSuggestions( ( prev ) => ( {
-						...prev,
-						[ slug ]: partial,
-					} ) );
-					// Write partial suggestion into the store draft
-					const { setGuideline } = dispatch( STORE_NAME ) as {
-						setGuideline: ( category: string, value: string ) => void;
-					};
-					setGuideline( slug, partial );
-				},
-				() => {
-					setSectionStates( ( prev ) => ( {
-						...prev,
-						[ slug ]: 'done',
-					} ) );
+			// Check if the field is empty
+			const currentValue = ( select( STORE_NAME ) as {
+				getGuideline: ( s: string ) => string;
+			} ).getGuideline( slug );
+			const isEmpty = ! currentValue || currentValue.trim().length === 0;
+
+			// Shimmer phase, then either stream text (empty) or jump to diff (has content).
+			setTimeout( () => {
+				if ( isEmpty ) {
+					streamIntoSection( slug, mockText, () => {
+						sectionIndex++;
+						setTimeout( generateNextSection, 200 );
+					} );
+				} else {
+					finishSection( slug, mockText );
 					sectionIndex++;
-					// Small delay between sections
-					setTimeout( streamNextSection, 200 );
+					setTimeout( generateNextSection, 200 );
 				}
-			);
+			}, 1500 );
 		};
 
-		// Start with a small delay to show requesting state
-		setTimeout( streamNextSection, 300 );
+		setTimeout( generateNextSection, 300 );
 	}, [] );
 
 	const generateSection = useCallback( ( slug: string ) => {
@@ -148,36 +191,36 @@ export function useAiGuidelines(): AiGuidelinesState {
 			[ slug ]: 'requesting',
 		} ) );
 
+		const currentValue = ( select( STORE_NAME ) as {
+			getGuideline: ( s: string ) => string;
+		} ).getGuideline( slug );
+		const isEmpty = ! currentValue || currentValue.trim().length === 0;
+
 		setTimeout( () => {
 			setSectionStates( ( prev ) => ( {
 				...prev,
 				[ slug ]: 'streaming',
 			} ) );
 
-			cleanupRef.current = simulateStreaming(
-				mockText,
-				( partial ) => {
-					setSuggestions( ( prev ) => ( {
-						...prev,
-						[ slug ]: partial,
-					} ) );
-					const { setGuideline } = dispatch( STORE_NAME ) as {
-						setGuideline: ( category: string, value: string ) => void;
-					};
-					setGuideline( slug, partial );
-				},
-				() => {
-					setSectionStates( ( prev ) => ( {
-						...prev,
-						[ slug ]: 'done',
-					} ) );
+			setTimeout( () => {
+				if ( isEmpty ) {
+					streamIntoSection( slug, mockText );
+				} else {
+					finishSection( slug, mockText );
 				}
-			);
+			}, 1500 );
 		}, 300 );
 	}, [] );
 
 	const generateBlock = useCallback( ( blockName: string ) => {
-		const mockText = `Use the ${ blockName.replace( 'core/', '' ) } block to present content in a clear, structured way. Keep content concise and focused on a single topic. Use appropriate formatting and ensure accessibility standards are met.`;
+		const mockText = MOCK_BLOCK_SUGGESTIONS[ blockName ] ||
+			`Use the ${ blockName.replace( 'core/', '' ) } block to present content in a clear, structured way. Keep content concise and focused on a single topic. Use appropriate formatting and ensure accessibility standards are met.`;
+
+		const { setBlockGuideline } = dispatch( STORE_NAME ) as {
+			setBlockGuideline: ( name: string, value: string ) => void;
+		};
+		const currentValue = ( select( STORE_NAME ) as { getBlockGuidelines: () => Record< string, string > } ).getBlockGuidelines()[ blockName ];
+		const isEmpty = ! currentValue || currentValue.trim().length === 0;
 
 		setBlockGeneratingState( ( prev ) => ( {
 			...prev,
@@ -190,27 +233,50 @@ export function useAiGuidelines(): AiGuidelinesState {
 				[ blockName ]: 'streaming',
 			} ) );
 
-			cleanupRef.current = simulateStreaming(
-				mockText,
-				( partial ) => {
+			setTimeout( () => {
+				if ( isEmpty ) {
+					// Stream text into the block guideline
+					setTextStreamingKeys( ( prev ) => ( { ...prev, [ blockName ]: true } ) );
+
+					cleanupRef.current = simulateStreaming(
+						mockText,
+						( partial ) => {
+							setBlockSuggestions( ( prev ) => ( {
+								...prev,
+								[ blockName ]: partial,
+							} ) );
+						},
+						() => {
+							setBlockSuggestions( ( prev ) => ( {
+								...prev,
+								[ blockName ]: mockText,
+							} ) );
+							setBlockGeneratingState( ( prev ) => ( {
+								...prev,
+								[ blockName ]: 'done',
+							} ) );
+							setTextStreamingKeys( ( prev ) => {
+								const next = { ...prev };
+								delete next[ blockName ];
+								return next;
+							} );
+						}
+					);
+				} else {
 					setBlockSuggestions( ( prev ) => ( {
 						...prev,
-						[ blockName ]: partial,
+						[ blockName ]: mockText,
 					} ) );
-				},
-				() => {
 					setBlockGeneratingState( ( prev ) => ( {
 						...prev,
 						[ blockName ]: 'done',
 					} ) );
 				}
-			);
+			}, 1500 );
 		}, 300 );
 	}, [] );
 
 	const acceptSuggestion = useCallback( ( slug: string ) => {
-		// The suggestion is already in the store draft from streaming.
-		// Just clear the suggestion state.
 		setSuggestions( ( prev ) => {
 			const next = { ...prev };
 			delete next[ slug ];
@@ -223,7 +289,6 @@ export function useAiGuidelines(): AiGuidelinesState {
 	}, [] );
 
 	const dismissSuggestion = useCallback( ( slug: string ) => {
-		// Revert the store to the pre-suggestion value
 		setSuggestions( ( prev ) => {
 			const next = { ...prev };
 			delete next[ slug ];
@@ -259,6 +324,12 @@ export function useAiGuidelines(): AiGuidelinesState {
 		} ) );
 	}, [] );
 
+	const generateAllBlocks = useCallback( ( blockNames: string[] ) => {
+		blockNames.forEach( ( blockName, index ) => {
+			setTimeout( () => generateBlock( blockName ), index * 800 );
+		} );
+	}, [ generateBlock ] );
+
 	const isGenerating = state === 'generating' ||
 		Object.values( sectionStates ).some(
 			( s ) => s === 'requesting' || s === 'streaming'
@@ -270,9 +341,11 @@ export function useAiGuidelines(): AiGuidelinesState {
 		sectionStates,
 		blockSuggestions,
 		blockGeneratingState,
+		textStreamingKeys,
 		generate,
 		generateSection,
 		generateBlock,
+		generateAllBlocks,
 		acceptSuggestion,
 		dismissSuggestion,
 		acceptBlockSuggestion,

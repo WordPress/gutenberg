@@ -35,9 +35,20 @@ import { store as noticesStore } from '@wordpress/notices';
 import BlockGuidelineModal from './block-guideline-modal';
 import { saveContentGuidelines } from '../api';
 import { STORE_NAME } from '../store';
+import type { BlockGeneratingState } from '../ai/use-ai-guidelines';
 import './block-guidelines.scss';
 
 const PER_PAGE = 5;
+
+export interface BlockGuidelinesAiProps {
+	blockSuggestions: Record< string, string >;
+	blockGeneratingState: Record< string, BlockGeneratingState >;
+	textStreamingKeys: Record< string, boolean >;
+	generateBlock: ( blockName: string ) => void;
+	generateAllBlocks: ( blockNames: string[] ) => void;
+	acceptBlockSuggestion: ( blockName: string ) => void;
+	dismissBlockSuggestion: ( blockName: string ) => void;
+}
 
 const initialView: View = {
 	type: 'list',
@@ -75,11 +86,20 @@ const fields = [
 		type: 'text' as const,
 		enableGlobalSearch: true,
 		getValue: ( { item } ) => item.label,
-		render: ( { item } ) => item.label,
+		render: ( { item } ) => (
+			<span className="block-guidelines__label">
+				{ item.label }
+				{ item.hasSuggestion && (
+					<span className="content-guidelines__suggestion-badge">
+						{ __( 'Suggestion' ) }
+					</span>
+				) }
+			</span>
+		),
 	},
 ];
 
-export default function BlockGuidelines() {
+export default function BlockGuidelines( props: Partial< BlockGuidelinesAiProps > ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const [ view, setView ] = useState< View >( initialView );
 	const [ selectedItem, setSelectedItem ] = useState< string >();
@@ -105,14 +125,22 @@ export default function BlockGuidelines() {
 	const rows = useMemo(
 		() =>
 			blockTypes
-				.filter( ( blockType ) => blockGuidelines[ blockType.name ] )
+				.filter( ( blockType ) =>
+					blockGuidelines[ blockType.name ] ||
+					( props.blockSuggestions && props.blockSuggestions[ blockType.name ] !== undefined )
+				)
 				.map( ( blockType ) => ( {
 					id: blockType.name,
 					label: blockType.title,
 					guidelines: blockGuidelines[ blockType.name ] ?? '',
 					icon: blockType.icon?.src,
+					hasSuggestion: props.blockSuggestions
+						? props.blockSuggestions[ blockType.name ] !== undefined &&
+						  ! ( isOpen && selectedItem === blockType.name )
+						: false,
+					isSuggestionOnly: ! blockGuidelines[ blockType.name ],
 				} ) ),
-		[ blockGuidelines, blockTypes ]
+		[ blockGuidelines, blockTypes, props.blockSuggestions, isOpen, selectedItem ]
 	);
 
 	const { setBlockGuideline } = useDispatch( STORE_NAME );
@@ -133,15 +161,29 @@ export default function BlockGuidelines() {
 				},
 			},
 			{
+				id: 'dismiss-suggestion',
+				label: __( 'Dismiss suggestion' ),
+				isEligible: ( item: DataRow ) =>
+					!! props.blockSuggestions?.[ item.id ],
+				callback: ( items: DataRow[] ) => {
+					const item = items[ 0 ];
+					if ( props.dismissBlockSuggestion ) {
+						props.dismissBlockSuggestion( item.id );
+					}
+				},
+			},
+			{
 				id: 'remove',
 				label: __( 'Remove' ),
+				isEligible: ( item: DataRow ) =>
+					!! blockGuidelines[ item.id ],
 				callback: ( items: DataRow[] ) => {
 					const item = items[ 0 ];
 					setItemToDelete( item );
 				},
 			},
 		],
-		[ setItemToDelete ]
+		[ setItemToDelete, props.blockSuggestions, props.dismissBlockSuggestion, blockGuidelines ]
 	);
 
 	const handleDelete = () => {
@@ -156,6 +198,10 @@ export default function BlockGuidelines() {
 		saveContentGuidelines()
 			.then( () => {
 				setError( null );
+				// Also clear any pending suggestion for this block.
+				if ( props.dismissBlockSuggestion && props.blockSuggestions?.[ itemToDelete.id ] !== undefined ) {
+					props.dismissBlockSuggestion( itemToDelete.id );
+				}
 				createSuccessNotice( __( 'Guidelines removed.' ), {
 					type: 'snackbar',
 				} );
@@ -200,6 +246,23 @@ export default function BlockGuidelines() {
 		setIsOpen( true );
 	};
 
+	const handleImproveAll = () => {
+		if ( props.generateAllBlocks ) {
+			const blockNames = rows.map( ( row ) => row.id );
+			props.generateAllBlocks( blockNames );
+		}
+	};
+
+	const isAnyBlockGenerating = props.blockGeneratingState
+		? Object.values( props.blockGeneratingState ).some(
+				( s ) => s === 'requesting' || s === 'streaming'
+		  )
+		: false;
+
+	const hasBlockSuggestions = props.blockSuggestions
+		? rows.some( ( row ) => props.blockSuggestions![ row.id ] !== undefined )
+		: false;
+
 	const shouldShowDataViewControls = rows.length > PER_PAGE;
 
 	return (
@@ -241,16 +304,63 @@ export default function BlockGuidelines() {
 					</VStack>
 				</DataViews>
 			) }
-			<HStack>
+			<HStack spacing={ 3 } justify="flex-start">
 				<Button variant="primary" onClick={ openModal }>
 					{ __( 'Add block guidelines' ) }
 				</Button>
+				{ props.generateAllBlocks && ( rows.length === 0 || isAnyBlockGenerating ) && (
+					<Button
+						variant="tertiary"
+						onClick={ () => {
+							const defaults = [
+								'core/paragraph',
+								'core/heading',
+								'core/image',
+							];
+							props.generateAllBlocks!( defaults );
+						} }
+						disabled={ isAnyBlockGenerating }
+						accessibleWhenDisabled
+					>
+						{ __( 'Generate guidelines' ) }
+					</Button>
+				) }
+				{ props.generateAllBlocks && rows.length > 0 && ! isAnyBlockGenerating && (
+					hasBlockSuggestions && props.dismissBlockSuggestion ? (
+						<Button
+							variant="tertiary"
+							onClick={ () => {
+								Object.keys( props.blockSuggestions! ).forEach(
+									( blockName ) =>
+										props.dismissBlockSuggestion!( blockName )
+								);
+							} }
+						>
+							{ __( 'Dismiss all' ) }
+						</Button>
+					) : (
+						<Button
+							variant="tertiary"
+							onClick={ handleImproveAll }
+							disabled={ isAnyBlockGenerating }
+							accessibleWhenDisabled
+						>
+							{ __( 'Improve guidelines' ) }
+						</Button>
+					)
+				) }
 			</HStack>
 
 			{ isOpen && (
 				<BlockGuidelineModal
 					closeModal={ closeModal }
 					initialBlock={ selectedItem }
+					blockSuggestions={ props.blockSuggestions }
+					blockGeneratingState={ props.blockGeneratingState }
+					textStreamingKeys={ props.textStreamingKeys }
+					generateBlock={ props.generateBlock }
+					acceptBlockSuggestion={ props.acceptBlockSuggestion }
+					dismissBlockSuggestion={ props.dismissBlockSuggestion }
 				/>
 			) }
 			{ itemToDelete && (

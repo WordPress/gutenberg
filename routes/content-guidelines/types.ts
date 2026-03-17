@@ -45,6 +45,8 @@ export interface GuidelineAccordionProps {
 	contentId?: string;
 	headingId?: string;
 	descriptionId?: string;
+	isGenerating?: boolean;
+	hasSuggestion?: boolean;
 }
 
 export interface ContentGuidelinesRevision {

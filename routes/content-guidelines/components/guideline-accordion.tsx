@@ -3,6 +3,7 @@
  */
 import {
 	Icon,
+	Spinner,
 	__experimentalText as Text,
 	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
@@ -27,6 +28,8 @@ export default function GuidelineAccordion( {
 	contentId,
 	headingId,
 	descriptionId,
+	isGenerating,
+	hasSuggestion,
 }: GuidelineAccordionProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 
@@ -73,14 +76,26 @@ export default function GuidelineAccordion( {
 							{ description }
 						</Text>
 					</VStack>
-					<Icon
-						icon={ chevronDown }
-						className={
-							isOpen
-								? 'content-guidelines__accordion-chevron-up'
-								: 'content-guidelines__accordion-chevron-down'
-						}
-					/>
+					<HStack spacing={ 2 } expanded={ false }>
+						{ isGenerating && (
+							<Spinner
+								className="content-guidelines__accordion-spinner"
+							/>
+						) }
+						{ hasSuggestion && ! isGenerating && ! isOpen && (
+							<span className="content-guidelines__suggestion-badge">
+								{ __( 'Suggestion' ) }
+							</span>
+						) }
+						<Icon
+							icon={ chevronDown }
+							className={
+								isOpen
+									? 'content-guidelines__accordion-chevron-up'
+									: 'content-guidelines__accordion-chevron-down'
+							}
+						/>
+					</HStack>
 				</HStack>
 			</Button>
 			<div hidden={ ! isOpen }>{ children }</div>
