@@ -7,6 +7,7 @@ export interface ConnectorRenderProps {
 	slug: string;
 	label: string;
 	description: string;
+	icon?: ReactNode;
 }
 
 export interface ConnectorConfig {

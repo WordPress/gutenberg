@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { BlockBreadcrumb, BlockToolbar } from '@wordpress/block-editor';
@@ -82,6 +82,7 @@ export default function EditorInterface( {
 		stylesPath,
 		showStylebook,
 		isRevisionsMode,
+		showDiff,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const {
@@ -94,6 +95,7 @@ export default function EditorInterface( {
 			getStylesPath,
 			getShowStylebook,
 			isRevisionsMode: _isRevisionsMode,
+			isShowingRevisionDiff,
 		} = unlock( select( editorStore ) );
 		const editorSettings = getEditorSettings();
 
@@ -121,8 +123,11 @@ export default function EditorInterface( {
 				getCurrentPostType() === 'attachment' &&
 				window?.__experimentalMediaEditor,
 			isRevisionsMode: _isRevisionsMode(),
+			showDiff: isShowingRevisionDiff(),
 		};
 	}, [] );
+	const { setShowRevisionDiff } = unlock( useDispatch( editorStore ) );
+
 	// Runs unconditionally so join/leave/save notifications are dispatched
 	// regardless of viewport width or whether the header centre area is visible.
 	useCollaboratorNotifications( postId, postType );
@@ -152,9 +157,6 @@ export default function EditorInterface( {
 		[ entitiesSavedStatesCallback ]
 	);
 
-	// Local state for diff toggle in revisions mode.
-	const [ showDiff, setShowDiff ] = useState( true );
-
 	// When in revisions mode, render the revisions interface.
 	if ( isRevisionsMode ) {
 		return (
@@ -164,10 +166,10 @@ export default function EditorInterface( {
 				header={
 					<RevisionsHeader
 						showDiff={ showDiff }
-						onToggleDiff={ () => setShowDiff( ! showDiff ) }
+						onToggleDiff={ () => setShowRevisionDiff( ! showDiff ) }
 					/>
 				}
-				content={ <RevisionsCanvas showDiff={ showDiff } /> }
+				content={ <RevisionsCanvas /> }
 				sidebar={ <ComplementaryArea.Slot scope="core" /> }
 			/>
 		);

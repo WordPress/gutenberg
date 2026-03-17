@@ -8,7 +8,6 @@ import { v4 as uuidv4 } from 'uuid';
  */
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
-
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
 /**
@@ -74,6 +73,7 @@ type ActionCreators = {
 	rotateItem: typeof rotateItem;
 	transcodeImageItem: typeof transcodeImageItem;
 	generateThumbnails: typeof generateThumbnails;
+	finalizeItem: typeof finalizeItem;
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
 	< T = Record< string, unknown > >( args: T ): void;
@@ -380,6 +380,15 @@ export function processItem( id: QueueItemId ) {
 					return;
 				}
 
+				// If parent has pending operations (like Finalize), trigger them.
+				if (
+					parentItem.operations &&
+					parentItem.operations.length > 0
+				) {
+					dispatch.processItem( parentId );
+					return;
+				}
+
 				if ( attachment ) {
 					parentItem.onSuccess?.( [ attachment ] );
 				}
@@ -400,6 +409,14 @@ export function processItem( id: QueueItemId ) {
 			 Do nothing and let the removal happen once the last side-loaded item finishes.
 			 */
 
+			return;
+		}
+
+		// For Finalize, wait until all child sideloads are complete.
+		if (
+			operation === OperationType.Finalize &&
+			select.hasPendingItemsByParentId( id )
+		) {
 			return;
 		}
 
@@ -445,6 +462,10 @@ export function processItem( id: QueueItemId ) {
 
 			case OperationType.ThumbnailGeneration:
 				dispatch.generateThumbnails( id );
+				break;
+
+			case OperationType.Finalize:
+				dispatch.finalizeItem( id );
 				break;
 		}
 	};
@@ -735,7 +756,8 @@ export function prepareItem( id: QueueItemId ) {
 
 			operations.push(
 				OperationType.Upload,
-				OperationType.ThumbnailGeneration
+				OperationType.ThumbnailGeneration,
+				OperationType.Finalize
 			);
 		} else {
 			operations.push( OperationType.Upload );
@@ -1108,6 +1130,11 @@ export function generateThumbnails( id: QueueItemId ) {
 			attachment.missing_image_sizes &&
 			attachment.missing_image_sizes.length > 0
 		) {
+			const settings = select.getSettings();
+			const allImageSizes = settings.allImageSizes || {};
+			const sizesToGenerate: string[] =
+				attachment.missing_image_sizes as string[];
+
 			// Use sourceFile for thumbnail generation to preserve quality.
 			// WordPress core generates thumbnails from the original (unscaled) image.
 			// Vips will auto-rotate based on EXIF orientation during thumbnail generation.
@@ -1116,8 +1143,6 @@ export function generateThumbnails( id: QueueItemId ) {
 				: item.sourceFile;
 			const batchId = uuidv4();
 
-			const settings = select.getSettings();
-			const allImageSizes = settings.allImageSizes || {};
 			const { imageOutputFormats } = settings;
 
 			// Check if thumbnails should be transcoded to a different format.
@@ -1141,7 +1166,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				);
 			}
 
-			for ( const name of attachment.missing_image_sizes ) {
+			for ( const name of sizesToGenerate ) {
 				const imageSize = allImageSizes[ name ];
 				if ( ! imageSize ) {
 					// eslint-disable-next-line no-console
@@ -1248,6 +1273,40 @@ export function generateThumbnails( id: QueueItemId ) {
 						operations: scaledOperations,
 					} );
 				}
+			}
+		}
+
+		dispatch.finishOperation( id, {} );
+	};
+}
+
+/**
+ * Finalizes an uploaded item by calling the server's finalize endpoint.
+ *
+ * This triggers the wp_generate_attachment_metadata filter so that PHP
+ * plugins can process the attachment after all client-side operations
+ * (including thumbnail sideloads) are complete.
+ *
+ * @param id Item ID.
+ */
+export function finalizeItem( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		const attachment = item.attachment;
+		const { mediaFinalize } = select.getSettings();
+
+		// Only finalize if we have an attachment ID and a mediaFinalize callback.
+		if ( attachment?.id && mediaFinalize ) {
+			try {
+				await mediaFinalize( attachment.id );
+			} catch ( error ) {
+				// Log but don't fail the upload if finalization fails.
+				// eslint-disable-next-line no-console
+				console.warn( 'Media finalization failed:', error );
 			}
 		}
 
