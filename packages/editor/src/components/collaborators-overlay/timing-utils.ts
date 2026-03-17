@@ -11,27 +11,21 @@ export function setDelayedInterval( callback: () => void, delayMs: number ) {
 	let timerHandle: ReturnType< typeof setTimeout > | null = null;
 
 	const runner = () => {
-		callback();
+		try {
+			callback();
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( error );
+		}
+
 		timerHandle = setTimeout( runner, delayMs );
 	};
 
-	// Restart the runner if an exception killed it
-	const guardInterval = setInterval( () => {
-		if ( timerHandle ) {
-			return;
-		}
-
-		timerHandle = setTimeout( () => {
-			timerHandle = null;
-			runner();
-		}, 0 );
-	}, delayMs );
+	timerHandle = setTimeout( runner, delayMs );
 
 	return () => {
 		if ( timerHandle ) {
 			clearTimeout( timerHandle );
 		}
-
-		clearInterval( guardInterval );
 	};
 }
