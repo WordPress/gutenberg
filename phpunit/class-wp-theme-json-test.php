@@ -168,9 +168,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 			),
 		);
-		$sanitized  = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $theme_json_data );
-		$theme_json = new WP_Theme_JSON_Gutenberg( $sanitized );
-		$actual     = $theme_json->get_settings();
+		$sanitized       = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $theme_json_data );
+		$theme_json      = new WP_Theme_JSON_Gutenberg( $sanitized );
+		$actual          = $theme_json->get_settings();
 
 		$this->assertFalse( $actual['responsive']['blockVisibility'] );
 	}
