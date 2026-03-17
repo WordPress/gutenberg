@@ -3,7 +3,7 @@
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { __ } from '@wordpress/i18n';
-import { select } from '@wordpress/data';
+import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { loadView } from '@wordpress/views';
 
@@ -21,10 +21,9 @@ const { useLocation } = unlock( routerPrivateApis );
 
 async function isListView( query ) {
 	const { activeView = 'all' } = query;
-	const config = unlock( select( coreStore ) ).getEntityViewConfig(
-		'postType',
-		'page'
-	);
+	const config = await unlock(
+		resolveSelect( coreStore )
+	).getEntityViewConfig( 'postType', 'page' );
 	const defaultView = config?.default_view;
 	const viewEntry = config?.view_list?.find( ( v ) => v.slug === activeView );
 	const view = await loadView( {
