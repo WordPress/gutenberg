@@ -381,7 +381,7 @@ function VisualEditor( {
 						: ''
 				}${
 					isNavigationPreview
-						? `.block-editor-iframe__body{${ centerContentCSS }}`
+						? `.block-editor-iframe__body{${ centerContentCSS }padding:var(--wp--style--block-gap,2em);}`
 						: ''
 				}`,
 				// The CSS for enableResizing centers the body content vertically when resizing is enabled and applies a background

@@ -150,6 +150,7 @@ module.exports = {
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
 		'@wordpress/data-no-store-string-literals': 'error',
+		'@wordpress/use-recommended-components': 'error',
 		'eslint-comments/no-unused-disable': 'error',
 		'import/default': 'error',
 		'import/named': 'error',
@@ -557,7 +558,14 @@ module.exports = {
 		{
 			files: [ 'packages/eslint-plugin/**', 'packages/theme/**' ],
 			rules: {
+				'@wordpress/no-setting-ds-tokens': 'off',
 				'@wordpress/no-unknown-ds-tokens': 'off',
+			},
+		},
+		{
+			files: [ 'storybook/stories/**' ],
+			rules: {
+				'@wordpress/use-recommended-components': 'off',
 			},
 		},
 	],

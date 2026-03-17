@@ -31,6 +31,13 @@ jest.mock( '@wordpress/blocks', () => ( {
 			name: 'core/paragraph',
 			attributes: { content: { type: 'rich-text' } },
 		},
+		{
+			name: 'core/image',
+			attributes: {
+				blob: { type: 'string', role: 'local' },
+				url: { type: 'string' },
+			},
+		},
 	],
 } ) );
 
@@ -175,7 +182,29 @@ describe( 'crdt-blocks', () => {
 			expect( innerBlock.get( 'name' ) ).toBe( 'core/paragraph' );
 		} );
 
-		it( 'skips gallery blocks with unuploaded images (blob attributes)', () => {
+		it( 'strips local attributes when syncing blocks', () => {
+			const imageWithBlob: Block[] = [
+				{
+					name: 'core/image',
+					attributes: {
+						url: 'http://example.com/image.jpg',
+						blob: 'blob:...',
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, imageWithBlob, null );
+
+			expect( yblocks.length ).toBe( 1 );
+			const block = yblocks.get( 0 );
+			expect( block.get( 'name' ) ).toBe( 'core/image' );
+			const attrs = block.get( 'attributes' ) as YBlockAttributes;
+			expect( attrs.get( 'url' ) ).toBe( 'http://example.com/image.jpg' );
+			expect( attrs.has( 'blob' ) ).toBe( false );
+		} );
+
+		it( 'strips local attributes from inner blocks', () => {
 			const galleryWithBlobs: Block[] = [
 				{
 					name: 'core/gallery',
@@ -195,32 +224,15 @@ describe( 'crdt-blocks', () => {
 
 			mergeCrdtBlocks( yblocks, galleryWithBlobs, null );
 
-			// Gallery block should not be synced because it has blob attributes
-			expect( yblocks.length ).toBe( 0 );
-		} );
-
-		it( 'syncs gallery blocks without blob attributes', () => {
-			const galleryWithoutBlobs: Block[] = [
-				{
-					name: 'core/gallery',
-					attributes: {},
-					innerBlocks: [
-						{
-							name: 'core/image',
-							attributes: {
-								url: 'http://example.com/image.jpg',
-							},
-							innerBlocks: [],
-						},
-					],
-				},
-			];
-
-			mergeCrdtBlocks( yblocks, galleryWithoutBlobs, null );
-
 			expect( yblocks.length ).toBe( 1 );
-			const block = yblocks.get( 0 );
-			expect( block.get( 'name' ) ).toBe( 'core/gallery' );
+			const gallery = yblocks.get( 0 );
+			expect( gallery.get( 'name' ) ).toBe( 'core/gallery' );
+			const innerBlocks = gallery.get( 'innerBlocks' ) as YBlocks;
+			expect( innerBlocks.length ).toBe( 1 );
+			const image = innerBlocks.get( 0 );
+			const attrs = image.get( 'attributes' ) as YBlockAttributes;
+			expect( attrs.get( 'url' ) ).toBe( 'http://example.com/image.jpg' );
+			expect( attrs.has( 'blob' ) ).toBe( false );
 		} );
 
 		it( 'handles block reordering', () => {
@@ -522,7 +534,7 @@ describe( 'crdt-blocks', () => {
 			expect( content2.toString() ).toBe( 'Freeform content' );
 		} );
 
-		it( 'syncs nested blocks with blob attributes', () => {
+		it( 'strips local attributes from deeply nested blocks', () => {
 			const nestedGallery: Block[] = [
 				{
 					name: 'core/group',
@@ -554,7 +566,13 @@ describe( 'crdt-blocks', () => {
 
 			const innerBlocks = groupBlock.get( 'innerBlocks' ) as YBlocks;
 			expect( innerBlocks.length ).toBe( 1 );
-			expect( innerBlocks.get( 0 ).get( 'name' ) ).toBe( 'core/gallery' );
+			const gallery = innerBlocks.get( 0 );
+			const galleryInner = gallery.get( 'innerBlocks' ) as YBlocks;
+			expect( galleryInner.length ).toBe( 1 );
+			const image = galleryInner.get( 0 );
+			const attrs = image.get( 'attributes' ) as YBlockAttributes;
+			expect( attrs.get( 'url' ) ).toBe( 'http://example.com/image.jpg' );
+			expect( attrs.has( 'blob' ) ).toBe( false );
 		} );
 
 		it( 'handles complex block reordering', () => {

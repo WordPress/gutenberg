@@ -150,4 +150,79 @@ test.describe( 'Revisions', () => {
 		const clientIdAfter = await headingBlock.getAttribute( 'data-block' );
 		expect( clientIdAfter ).toBe( clientIdBefore );
 	} );
+
+	// Regression test for https://github.com/WordPress/gutenberg/issues/75926
+	// Global wp.data.select() calls should see blocks in revisions mode.
+	test( 'should expose blocks to global selectors in revisions mode', async ( {
+		editor,
+		page,
+	} ) => {
+		// Register a test block that renders its parent block name
+		// using the global wp.data.select() (not useSelect).
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/selectors-in-revisions', {
+				apiVersion: 3,
+				title: 'Test Selectors in Revisions',
+				edit: function Edit( { clientId } ) {
+					const [ parentName, setParentName ] =
+						window.wp.element.useState( 'none' );
+					window.wp.element.useEffect( () => {
+						const parents = window.wp.data
+							.select( 'core/block-editor' )
+							.getBlockParentsByBlockName(
+								clientId,
+								'core/group'
+							);
+						setParentName(
+							parents.length > 0
+								? 'has-group-parent'
+								: 'no-group-parent'
+						);
+					}, [ clientId ] );
+					return window.wp.element.createElement(
+						'p',
+						window.wp.blockEditor.useBlockProps(),
+						parentName
+					);
+				},
+				save: () => null,
+			} );
+		} );
+
+		// Insert a group with the test block inside.
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [ { name: 'test/selectors-in-revisions' } ],
+		} );
+
+		// Save draft to create first revision.
+		await editor.saveDraft();
+
+		// Add a paragraph after the group to create a second revision.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Extra paragraph' },
+		} );
+		await editor.saveDraft();
+
+		// Enter revisions mode.
+		await editor.openDocumentSettingsSidebar();
+		const settingsSidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
+		await settingsSidebar
+			.getByRole( 'button', { name: '2', exact: true } )
+			.click();
+
+		// Wait for revisions mode.
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+
+		// The test block should see its group parent via global select().
+		await expect(
+			editor.canvas.locator( '[data-type="test/selectors-in-revisions"]' )
+		).toHaveText( 'has-group-parent' );
+	} );
 } );

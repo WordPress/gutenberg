@@ -29,5 +29,7 @@ import defaultRegistry from './default-registry';
 export function select< T extends StoreDescriptor< AnyConfig > >(
 	storeNameOrDescriptor: string | T
 ): CurriedSelectorsOf< T > {
-	return defaultRegistry.select( storeNameOrDescriptor );
+	return defaultRegistry.select(
+		storeNameOrDescriptor
+	) as CurriedSelectorsOf< T >;
 }

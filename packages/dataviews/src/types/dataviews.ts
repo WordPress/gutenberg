@@ -285,6 +285,11 @@ export interface ViewGrid extends ViewBase {
 		 * The preview size of the grid.
 		 */
 		previewSize?: number;
+
+		/**
+		 * The density of the grid layout.
+		 */
+		density?: Density;
 	};
 }
 
@@ -301,6 +306,11 @@ export interface ViewPickerGrid extends ViewBase {
 		 * The preview size of the grid.
 		 */
 		previewSize?: number;
+
+		/**
+		 * The density of the grid layout.
+		 */
+		density?: Density;
 	};
 }
 

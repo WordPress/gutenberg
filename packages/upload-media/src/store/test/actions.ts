@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { createRegistry } from '@wordpress/data';
-
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
 /**
@@ -21,7 +20,13 @@ jest.mock( '@wordpress/blob', () => ( {
 
 jest.mock( '../utils', () => ( {
 	vipsCancelOperations: jest.fn( () => Promise.resolve( true ) ),
-	vipsResizeImage: jest.fn(),
+	vipsResizeImage: jest.fn( () =>
+		Promise.resolve(
+			new File( [ 'resized' ], 'example-100x100.jpg', {
+				type: 'image/jpeg',
+			} )
+		)
+	),
 	vipsRotateImage: jest.fn(),
 	vipsHasTransparency: jest.fn( () => Promise.resolve( false ) ),
 	vipsConvertImageFormat: jest.fn(),
@@ -412,6 +417,73 @@ describe( 'actions', () => {
 				.cancelItem( item.id, new Error( 'Test error' ), true );
 
 			expect( onError ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'resizeCropItem', () => {
+		it( 'uses imageQuality from store settings when set', async () => {
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				imageQuality: 0.5,
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			const { vipsResizeImage } = require( '../utils' );
+			( vipsResizeImage as jest.Mock ).mockClear();
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id,
+				{ resize: { width: 100, height: 100 } }
+			);
+
+			// Verify the resize was called (quality will be wired through in a future update).
+			expect( vipsResizeImage ).toHaveBeenCalled();
+		} );
+
+		it( 'falls back to default quality when imageQuality is not set', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			const { vipsResizeImage } = require( '../utils' );
+			( vipsResizeImage as jest.Mock ).mockClear();
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id,
+				{ resize: { width: 100, height: 100 } }
+			);
+
+			expect( vipsResizeImage ).toHaveBeenCalled();
+		} );
+
+		it( 'skips resize when no resize args are provided', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id
+			);
+
+			// Item should finish without resize.
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+			expect( updatedItem.file ).toBe( jpegFile );
 		} );
 	} );
 

@@ -22,9 +22,14 @@ interface BlockAttributes {
 	[ key: string ]: unknown;
 }
 
+interface BlockAttributeType {
+	role?: string;
+	type?: string;
+}
+
 interface BlockType {
+	attributes?: Record< string, BlockAttributeType >;
 	name: string;
-	attributes?: Record< string, { type?: string } >;
 }
 
 // A block as represented in Gutenberg's data store.
@@ -58,10 +63,16 @@ export type YBlockAttributes = Y.Map< Y.Text | unknown >;
 const serializableBlocksCache = new WeakMap< WeakKey, Block[] >();
 
 function makeBlockAttributesSerializable(
+	blockName: string,
 	attributes: BlockAttributes
 ): BlockAttributes {
 	const newAttributes = { ...attributes };
 	for ( const [ key, value ] of Object.entries( attributes ) ) {
+		if ( isLocalAttribute( blockName, key ) ) {
+			delete newAttributes[ key ];
+			continue;
+		}
+
 		if ( value instanceof RichTextData ) {
 			newAttributes[ key ] = value.valueOf();
 		}
@@ -76,7 +87,7 @@ function makeBlocksSerializable( blocks: Block[] ): Block[] {
 		return {
 			...rest,
 			name,
-			attributes: makeBlockAttributesSerializable( attributes ),
+			attributes: makeBlockAttributesSerializable( name, attributes ),
 			innerBlocks: makeBlocksSerializable( innerBlocks ),
 		};
 	} );
@@ -202,12 +213,7 @@ export function mergeCrdtBlocks(
 			makeBlocksSerializable( incomingBlocks )
 		);
 	}
-	const allBlocks = serializableBlocksCache.get( incomingBlocks ) ?? [];
-
-	// Ensure we skip blocks that we don't want to sync at the moment
-	const blocksToSync = allBlocks.filter( ( block ) =>
-		shouldBlockBeSynced( block )
-	);
+	const blocksToSync = serializableBlocksCache.get( incomingBlocks ) ?? [];
 
 	// This is a rudimentary diff implementation similar to the y-prosemirror diffing
 	// approach.
@@ -383,32 +389,6 @@ export function mergeCrdtBlocks(
 }
 
 /**
- * Determine if a block should be synced.
- *
- * Ex: A gallery block should not be synced until the images have been
- * uploaded to WordPress, and their url is available. Before that,
- * it's not possible to access the blobs on a client as those are
- * local.
- *
- * @param block The block to check.
- * @return True if the block should be synced, false otherwise.
- */
-function shouldBlockBeSynced( block: Block ): boolean {
-	// Verify that the gallery block is ready to be synced.
-	// This means that, all images have had their blobs converted to full URLs.
-	// Checking for only the blobs ensures that blocks that have just been inserted work as well.
-	if ( 'core/gallery' === block.name ) {
-		return ! block.innerBlocks.some(
-			( innerBlock ) =>
-				innerBlock.attributes && innerBlock.attributes.blob
-		);
-	}
-
-	// Allow all other blocks to be synced.
-	return true;
-}
-
-/**
  * Update a single attribute on a Yjs block attributes map (currentAttributes).
  *
  * For rich-text attributes that already exist as Y.Text instances, the update
@@ -448,38 +428,35 @@ function updateYBlockAttribute(
 	}
 }
 
-// Cached types for block attributes.
-let cachedBlockAttributeTypes: Map< string, Map< string, string > >;
+// Cached block attribute types, populated once from getBlockTypes().
+let cachedBlockAttributeTypes: Map< string, Map< string, BlockAttributeType > >;
 
 /**
- * Get the defined attribute type for a block attribute.
+ * Get the attribute type definition for a block attribute.
  *
  * @param blockName     The name of the block, e.g. 'core/paragraph'.
  * @param attributeName The name of the attribute, e.g. 'content'.
- * @return The type of the attribute, e.g. 'rich-text' or 'string'.
+ * @return The type definition of the attribute.
  */
 function getBlockAttributeType(
 	blockName: string,
 	attributeName: string
-): string | undefined {
+): BlockAttributeType | undefined {
 	if ( ! cachedBlockAttributeTypes ) {
 		// Parse the attributes for all blocks once.
-		cachedBlockAttributeTypes = new Map< string, Map< string, string > >();
+		cachedBlockAttributeTypes = new Map();
 
 		for ( const blockType of getBlockTypes() as BlockType[] ) {
-			const blockAttributeTypeMap = new Map< string, string >();
-
-			for ( const [ name, definition ] of Object.entries(
-				blockType.attributes ?? {}
-			) ) {
-				if ( definition.type ) {
-					blockAttributeTypeMap.set( name, definition.type );
-				}
-			}
-
 			cachedBlockAttributeTypes.set(
 				blockType.name,
-				blockAttributeTypeMap
+				new Map< string, BlockAttributeType >(
+					Object.entries( blockType.attributes ?? {} ).map(
+						( [ name, definition ] ) => {
+							const { role, type } = definition;
+							return [ name, { role, type } ];
+						}
+					)
+				)
 			);
 		}
 	}
@@ -503,16 +480,30 @@ function isExpectedAttributeType(
 	const expectedAttributeType = getBlockAttributeType(
 		blockName,
 		attributeName
-	);
+	)?.type;
 
 	if ( expectedAttributeType === 'rich-text' ) {
 		return attributeValue instanceof Y.Text;
-	} else if ( expectedAttributeType === 'string' ) {
+	}
+
+	if ( expectedAttributeType === 'string' ) {
 		return typeof attributeValue === 'string';
 	}
 
 	// No other types comparisons use special logic.
 	return true;
+}
+
+/**
+ * Given a block name and attribute key, return true if the attribute is local
+ * and should not be synced.
+ *
+ * @param blockName     The name of the block, e.g. 'core/image'.
+ * @param attributeName The name of the attribute to check, e.g. 'blob'.
+ * @return True if the attribute is local, false otherwise.
+ */
+function isLocalAttribute( blockName: string, attributeName: string ): boolean {
+	return 'local' === getBlockAttributeType( blockName, attributeName )?.role;
 }
 
 /**
@@ -526,7 +517,9 @@ function isRichTextAttribute(
 	blockName: string,
 	attributeName: string
 ): boolean {
-	return 'rich-text' === getBlockAttributeType( blockName, attributeName );
+	return (
+		'rich-text' === getBlockAttributeType( blockName, attributeName )?.type
+	);
 }
 
 let localDoc: Y.Doc;

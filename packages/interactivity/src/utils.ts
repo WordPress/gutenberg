@@ -24,7 +24,7 @@ interface Flusher {
 
 declare global {
 	interface Window {
-		scheduler?: {
+		scheduler: {
 			postTask: (
 				callback: () => unknown,
 				options?: object
