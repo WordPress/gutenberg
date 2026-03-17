@@ -16,37 +16,8 @@ const PRELOADED_NAVIGATION_MENUS_QUERY = {
 
 export const route = {
 	title: () => __( 'Navigation' ),
-	canvas: async ( {
-		search,
-	}: {
-		search: {
-			ids?: string[];
-			page?: number;
-			search?: string;
-		};
-	} ) => {
-		const [ firstNavigation ] = await resolveSelect(
-			coreStore
-		).getEntityRecords(
-			'postType',
-			NAVIGATION_POST_TYPE,
-			PRELOADED_NAVIGATION_MENUS_QUERY
-		);
-
-		if ( ! firstNavigation ) {
-			return { postType: NAVIGATION_POST_TYPE, isPreview: true };
-		}
-
-		const postId = search.ids
-			? parseInt( search.ids[ 0 ] )
-			: firstNavigation.id;
-
-		return {
-			postType: NAVIGATION_POST_TYPE,
-			postId,
-			isPreview: true,
-			editLink: `/types/wp_navigation/edit/${ postId }`,
-		};
+	canvas: async () => {
+		return null;
 	},
 	loader: async () => {
 		await Promise.all( [

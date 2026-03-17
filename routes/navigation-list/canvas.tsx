@@ -2,8 +2,8 @@
 /**
  * WordPress dependencies
  */
-import { useParams, useNavigate } from '@wordpress/route';
-import { useEntityRecord } from '@wordpress/core-data';
+import { useNavigate, useSearch } from '@wordpress/route';
+import { useEntityRecords } from '@wordpress/core-data';
 import { createElement, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
@@ -14,7 +14,6 @@ import {
 	Icon,
 	MenuGroup,
 	MenuItem,
-	Spinner,
 } from '@wordpress/components';
 import {
 	privateApis as editorPrivateApis,
@@ -28,7 +27,7 @@ import { chevronDown } from '@wordpress/icons';
  */
 import useMenuUsedInTemplateParts from '../navigation-shared/use-menu-used-in-template-parts';
 import { unlock } from '../lock-unlock';
-import './canvas.scss';
+import '../navigation-edit/canvas.scss';
 
 const { patternTitleField } = unlock( editorPrivateApis );
 
@@ -89,7 +88,7 @@ const previewField = {
 
 function NavigationPreview( { navigationId }: { navigationId: number } ) {
 	const navigate = useNavigate();
-	const editLink = `/types/wp_navigation/edit/${ navigationId }`;
+	const editLink = `/navigation/edit/${ navigationId }`;
 
 	return (
 		<div className="navigation-canvas__preview-wrap">
@@ -130,15 +129,25 @@ function NavigationPreview( { navigationId }: { navigationId: number } ) {
 }
 
 function Canvas() {
-	const { id } = useParams( { from: '/navigation/edit/$id' } );
+	const searchParams = useSearch( { strict: false } );
 	const navigate = useNavigate();
-	const navigationId = parseInt( id );
 
 	const [ canvasMode, setCanvasMode ] = useState( MODE_NAVIGATION );
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 
-	const { record: navigationMenu, isResolving: isResolvingMenu } =
-		useEntityRecord( 'postType', NAVIGATION_POST_TYPE, navigationId );
+	// Get the selected navigation ID from URL params, falling back to the first navigation.
+	const { records: navigationMenus } = useEntityRecords(
+		'postType',
+		NAVIGATION_POST_TYPE,
+		{ per_page: 100, status: [ 'publish', 'draft' ], order: 'desc', orderby: 'date' }
+	);
+
+	const navigationId = useMemo( () => {
+		if ( searchParams.ids?.[ 0 ] ) {
+			return searchParams.ids[ 0 ] as number;
+		}
+		return ( navigationMenus as any[] )?.[0]?.id ?? 0;
+	}, [ searchParams.ids, navigationMenus ] );
 
 	const { templateParts, isResolving: isResolvingParts } =
 		useMenuUsedInTemplateParts( navigationId );
@@ -179,20 +188,8 @@ function Canvas() {
 		[ visibleTemplateParts, view, fields ]
 	);
 
-	if ( isResolvingMenu ) {
-		return (
-			<div
-				style={ {
-					display: 'flex',
-					justifyContent: 'center',
-					alignItems: 'center',
-					height: '100%',
-					padding: '2rem',
-				} }
-			>
-				<Spinner />
-			</div>
-		);
+	if ( ! navigationId ) {
+		return null;
 	}
 
 	return (
