@@ -149,7 +149,6 @@ export function createHttpPollingProvider(): ProviderCreator {
 	} ): Promise< ProviderCreatorResult > => {
 		// Generate room name from objectType and objectId
 		const room = objectId ? `${ objectType }:${ objectId }` : objectType;
-		console.log( { room, ydoc, awareness } );
 
 		const provider = new HttpPollingProvider( {
 			awareness,
