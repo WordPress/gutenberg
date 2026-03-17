@@ -326,6 +326,59 @@ describe( 'useData', () => {
 		} );
 
 		describe( 'buffer and unloading', () => {
+			it( 'keeps selected items even when outside visible buffer', () => {
+				const initialData: TestItem[] = Array.from(
+					{ length: 30 },
+					( _, i ) => ( { id: i + 1 } )
+				);
+				const initialView = {
+					type: 'table',
+					infiniteScrollEnabled: true,
+					startPosition: 1,
+				} as View;
+
+				const { result, rerender } = renderHook(
+					( { view, data, selection } ) =>
+						useData( {
+							view,
+							data,
+							getItemId,
+							selection,
+							paginationInfo: defaultPaginationInfo,
+						} ),
+					{
+						initialProps: {
+							view: initialView,
+							data: initialData,
+							selection: [ '5' ],
+						},
+					}
+				);
+
+				act( () => {
+					result.current.setVisibleEntries?.( [ 50, 51 ] );
+				} );
+
+				const newData: TestItem[] = Array.from(
+					{ length: 10 },
+					( _, i ) => ( { id: 31 + i } )
+				);
+				const newView = { ...initialView, startPosition: 31 } as View;
+
+				rerender( {
+					view: newView,
+					data: newData,
+					selection: [ '5' ],
+				} );
+
+				expect(
+					result.current.data.some(
+						( item: TestItem & { position?: number } ) =>
+							item.id === 5
+					)
+				).toBe( true );
+			} );
+
 			it( 'keeps items within buffer range of visible entries', () => {
 				// Create a large dataset
 				const initialData: TestItem[] = Array.from(

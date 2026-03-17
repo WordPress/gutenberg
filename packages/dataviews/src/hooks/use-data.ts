@@ -19,6 +19,7 @@ interface UseDataParams< Item > {
 	getItemId: ( item: Item ) => string;
 	isLoading?: boolean;
 	paginationInfo: PaginationInfo;
+	selection?: string[];
 }
 
 interface UseDataResult< Item > {
@@ -47,6 +48,7 @@ interface UseDataResult< Item > {
  * @param params.getItemId      - Function to extract item ID
  * @param params.isLoading      - Whether data is currently loading
  * @param params.paginationInfo - Pagination info (totalItems, totalPages)
+ * @param params.selection      - Currently selected item IDs
  * @return Object containing data, paginationInfo, hasInitiallyLoaded,
  *         and optional setVisibleEntries callback
  */
@@ -56,6 +58,7 @@ export default function useData< Item >( {
 	getItemId,
 	isLoading,
 	paginationInfo,
+	selection,
 }: UseDataParams< Item > ): UseDataResult< Item > {
 	const isInfiniteScrollEnabled = view.infiniteScrollEnabled;
 
@@ -241,6 +244,13 @@ export default function useData< Item >( {
 
 			if ( hasOverlap ) {
 				result = allRecords.filter( ( record ) => {
+					const itemId = getItemId( record );
+					const isSelected = selection?.includes( itemId );
+					// Never unload selected items, even if outside visible range
+					if ( isSelected ) {
+						return true;
+					}
+
 					const itemPosition = (
 						record as Item & { position: number }
 					 ).position;
@@ -271,6 +281,7 @@ export default function useData< Item >( {
 		view.startPosition,
 		view.infiniteScrollEnabled,
 		visibleEntries,
+		selection,
 		getItemId,
 	] );
 

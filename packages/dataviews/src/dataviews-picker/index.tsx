@@ -145,6 +145,7 @@ function DataViewsPicker< Item >( {
 		view,
 		data: data as any,
 		getItemId: getItemId as any,
+		selection,
 		paginationInfo,
 	} ) as {
 		data: ( Item & { position?: number } )[];

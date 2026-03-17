@@ -156,6 +156,11 @@ function DataViews< Item >( {
 	empty,
 	onReset,
 }: DataViewsProps< Item > ) {
+	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
+	const isUncontrolled =
+		selectionProperty === undefined || onChangeSelection === undefined;
+	const selection = isUncontrolled ? selectionState : selectionProperty;
+
 	// useData handles both infinite scroll and standard pagination paths,
 	// preserving previous data while loading and tracking initial load state.
 	const {
@@ -168,6 +173,7 @@ function DataViews< Item >( {
 		data: data as any,
 		getItemId: getItemId as any,
 		isLoading,
+		selection,
 		paginationInfo,
 	} ) as {
 		data: ( Item & { position?: number } )[];
@@ -185,10 +191,6 @@ function DataViews< Item >( {
 		},
 		{ box: 'border-box' }
 	);
-	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
-	const isUncontrolled =
-		selectionProperty === undefined || onChangeSelection === undefined;
-	const selection = isUncontrolled ? selectionState : selectionProperty;
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
 		const newValue =
