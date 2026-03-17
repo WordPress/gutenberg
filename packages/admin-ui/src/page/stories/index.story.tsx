@@ -17,7 +17,14 @@ const meta: Meta< typeof Page > = {
 	parameters: {
 		layout: 'fullscreen',
 	},
-	decorators: [ withRouter ],
+	decorators: [
+		( Story ) => (
+			<div style={ { minHeight: '400px' } }>
+				<Story />
+			</div>
+		),
+		withRouter,
+	],
 };
 
 export default meta;
