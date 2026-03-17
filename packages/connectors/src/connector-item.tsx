@@ -11,7 +11,7 @@ import {
 	Button,
 	TextControl,
 } from '@wordpress/components';
-import { createInterpolateElement, useState } from '@wordpress/element';
+import { createInterpolateElement, useId, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -36,14 +36,20 @@ export function ConnectorItem( {
 	actionArea,
 	children,
 }: ConnectorItemProps ) {
+	const headingId = useId();
 	return (
 		<Item className={ className }>
-			<VStack spacing={ 4 }>
+			<VStack spacing={ 4 } role="group" aria-labelledby={ headingId }>
 				<HStack alignment="center" spacing={ 4 } wrap>
 					{ icon }
 					<FlexBlock>
 						<VStack spacing={ 0 }>
-							<Text weight={ 600 } size={ 15 }>
+							<Text
+								weight={ 600 }
+								size={ 15 }
+								id={ headingId }
+								as="h2"
+							>
 								{ name }
 							</Text>
 							<Text variant="muted" size={ 12 }>
@@ -150,7 +156,11 @@ export function DefaultConnectorSettings( {
 				: __( 'Your API key is stored securely.' );
 		}
 		if ( saveError ) {
-			return <span style={ { color: '#cc1818' } }>{ saveError }</span>;
+			return (
+				<span role="alert" className="connector-settings__error">
+					{ saveError }
+				</span>
+			);
 		}
 		return helpLink;
 	};

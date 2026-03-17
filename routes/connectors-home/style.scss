@@ -1,5 +1,9 @@
 @use "@wordpress/base-styles/colors" as *;
 
+// Approximate height of the sticky admin header so that
+// scroll-margin-top keeps focused elements visible at 150 % zoom.
+$sticky-header-clearance: 120px;
+
 .connectors-page {
 	box-sizing: border-box;
 	width: 100%;
@@ -13,10 +17,16 @@
 		border: 1px solid #ddd;
 		background: #fff;
 		overflow: hidden;
+		scroll-margin-top: $sticky-header-clearance;
+	}
+
+	.connector-settings__error {
+		color: $alert-red;
 	}
 
 	.connector-settings .components-text-control__input {
 		font-family: monospace;
+		scroll-margin-top: $sticky-header-clearance;
 	}
 
 	&--empty {
