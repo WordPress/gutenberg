@@ -163,6 +163,17 @@ export const WithSelectedRangeAndMonth: Story = {
 };
 
 /**
+ * Shows days from adjacent months in the grid. Outside days use a lighter style
+ * and are still interactive. Use `fixedWeeks` to keep the grid height constant.
+ */
+export const WithOutsideDays: Story = {
+	args: {
+		showOutsideDays: true,
+		fixedWeeks: true,
+	},
+};
+
+/**
  * When working with time zones, use the `TZDate` object exported by this package instead of the native `Date` object.
  */
 export const WithTimeZone: Story = {

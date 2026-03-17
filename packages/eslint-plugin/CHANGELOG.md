@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added [`use-recommended-components`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/use-recommended-components.md) rule to encourage the use of recommended UI components in a WordPress environment ([#76222](https://github.com/WordPress/gutenberg/pull/76222)).
+
 ### Enhancements
 
 -   The `no-setting-ds-tokens` rule now checks all object property keys, not just those inside JSX `style` attributes ([#76212](https://github.com/WordPress/gutenberg/pull/76212)).

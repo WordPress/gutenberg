@@ -6,6 +6,7 @@
 
 -   Fix `sessionId` generation crashing in non-secure (non-HTTPS) contexts. ([#76151](https://github.com/WordPress/gutenberg/pull/76151))
 -   Add `initialVdomPromise` synchronization promise to ensure the router waits for hydration to complete before initializing, fixing dead DOM on Safari and Firefox. ([#76053](https://github.com/WordPress/gutenberg/pull/76053))
+-   Fix unexpected full page reload on anchor links. ([#76520](https://github.com/WordPress/gutenberg/pull/76520))
 
 ## 6.41.0 (2026-03-04)
 

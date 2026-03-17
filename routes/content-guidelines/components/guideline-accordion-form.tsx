@@ -1,13 +1,23 @@
+/* @jsx createElement */
+
 /**
  * WordPress dependencies
  */
 import { Button, __experimentalVStack as VStack } from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
+// TODO: Revert to the `Notice` in `@wordpress/components` for now.
+// eslint-disable-next-line @wordpress/use-recommended-components
 import { Notice } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	createElement,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -24,6 +34,7 @@ export default function GuidelineAccordionForm( {
 }: GuidelineAccordionFormProps ) {
 	// @ts-ignore
 	const { setGuideline } = useDispatch( STORE_NAME );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 	const [ loading, setLoading ] = useState( false );
 	const [ error, setError ] = useState< string | null >( null );
 
@@ -69,7 +80,12 @@ export default function GuidelineAccordionForm( {
 		setGuideline( slug, draft );
 		setLoading( true );
 		saveContentGuidelines()
-			.then( () => setError( null ) )
+			.then( () => {
+				setError( null );
+				createSuccessNotice( __( 'Guidelines saved.' ), {
+					type: 'snackbar',
+				} );
+			} )
 			.catch( ( e: Error ) => setError( e.message ) )
 			.finally( () => setLoading( false ) );
 	};
@@ -107,6 +123,8 @@ export default function GuidelineAccordionForm( {
 					type="submit"
 					className="save-button"
 					disabled={ loading }
+					accessibleWhenDisabled
+					isBusy={ loading }
 				>
 					{ __( 'Save guidelines' ) }
 				</Button>

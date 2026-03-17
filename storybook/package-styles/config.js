@@ -59,6 +59,11 @@ const CONFIG = [
 		rtl: [ componentsRtl ],
 	},
 	{
+		componentIdMatcher: /^icons-/,
+		ltr: [ componentsLtr ],
+		rtl: [ componentsRtl ],
+	},
+	{
 		componentIdMatcher: /^dataviews-/,
 		ltr: [ designTokens, componentsLtr, dataviewsLtr ],
 		rtl: [ designTokens, componentsRtl, dataviewsRtl ],

@@ -16,6 +16,7 @@ import { addAction, removeAction } from '@wordpress/hooks';
 import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '../../lock-unlock';
+import { DOCUMENT_SIZE_LIMIT_EXCEEDED } from '../../utils/sync-error-messages';
 
 /**
  * Internal dependencies
@@ -23,12 +24,29 @@ import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
 function CollaborationContext() {
-	const isCollaborationSupported = useSelect( ( select ) => {
-		return unlock( select( coreStore ) ).isCollaborationSupported();
-	}, [] );
+	const { isCollaborationSupported, syncConnectionStatus } = useSelect(
+		( select ) => {
+			const selectors = unlock( select( coreStore ) );
+			return {
+				isCollaborationSupported: selectors.isCollaborationSupported(),
+				syncConnectionStatus: selectors.getSyncConnectionStatus(),
+			};
+		},
+		[]
+	);
 
 	if ( isCollaborationSupported ) {
 		return null;
+	}
+
+	if ( DOCUMENT_SIZE_LIMIT_EXCEEDED === syncConnectionStatus?.error?.code ) {
+		return (
+			<p>
+				{ __(
+					'Because this post is too large for real-time collaboration, only one person can edit at a time.'
+				) }
+			</p>
+		);
 	}
 
 	return (

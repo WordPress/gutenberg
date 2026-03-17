@@ -10,11 +10,12 @@ import {
 	Flex,
 	Notice,
 	privateApis as componentsPrivateApis,
+	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
-	__experimentalGrid as Grid,
 } from '@wordpress/components';
 import { PlainText, store as blockEditorStore } from '@wordpress/block-editor';
 import { fullscreen, square } from '@wordpress/icons';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -36,9 +37,9 @@ export default function HTMLEditModal( {
 	const [ editedHtml, setEditedHtml ] = useState( html );
 	const [ editedCss, setEditedCss ] = useState( css );
 	const [ editedJs, setEditedJs ] = useState( js );
-	const [ isDirty, setIsDirty ] = useState( false );
-	const [ showUnsavedWarning, setShowUnsavedWarning ] = useState( false );
 	const [ isFullscreen, setIsFullscreen ] = useState( false );
+
+	const isMobileViewport = useViewportMatch( 'small', '<' );
 
 	// Check if user has permission to save scripts and get editor styles
 	const { canUserUseUnfilteredHTML } = useSelect( ( select ) => {
@@ -57,18 +58,6 @@ export default function HTMLEditModal( {
 		return null;
 	}
 
-	const handleHtmlChange = ( value ) => {
-		setEditedHtml( value );
-		setIsDirty( true );
-	};
-	const handleCssChange = ( value ) => {
-		setEditedCss( value );
-		setIsDirty( true );
-	};
-	const handleJsChange = ( value ) => {
-		setEditedJs( value );
-		setIsDirty( true );
-	};
 	const handleUpdate = () => {
 		// For users without unfiltered_html capability, strip CSS and JS content
 		// to prevent kses from leaving broken content
@@ -79,25 +68,6 @@ export default function HTMLEditModal( {
 				js: canUserUseUnfilteredHTML ? editedJs : '',
 			} ),
 		} );
-		setIsDirty( false );
-	};
-	const handleCancel = () => {
-		setIsDirty( false );
-		onRequestClose();
-	};
-	const handleRequestClose = () => {
-		if ( isDirty ) {
-			setShowUnsavedWarning( true );
-		} else {
-			onRequestClose();
-		}
-	};
-	const handleDiscardChanges = () => {
-		setShowUnsavedWarning( false );
-		onRequestClose();
-	};
-	const handleContinueEditing = () => {
-		setShowUnsavedWarning( false );
 	};
 	const handleUpdateAndClose = () => {
 		handleUpdate();
@@ -111,22 +81,16 @@ export default function HTMLEditModal( {
 		<>
 			<Modal
 				title={ __( 'Edit HTML' ) }
-				onRequestClose={ handleRequestClose }
+				onRequestClose={ onRequestClose }
 				className="block-library-html__modal"
 				size="large"
 				isDismissible={ false }
-				shouldCloseOnClickOutside={ ! isDirty }
-				shouldCloseOnEsc={ ! isDirty }
+				shouldCloseOnClickOutside={ false }
 				isFullScreen={ isFullscreen }
 				__experimentalHideHeader
 			>
 				<Tabs orientation="horizontal" defaultTabId="html">
-					<Grid
-						columns={ 1 }
-						templateRows="auto 1fr auto"
-						gap={ 4 }
-						style={ { height: '100%' } }
-					>
+					<VStack expanded>
 						<HStack
 							justify="space-between"
 							className="block-library-html__modal-header"
@@ -144,15 +108,21 @@ export default function HTMLEditModal( {
 									) }
 								</Tabs.TabList>
 							</div>
-							<div>
-								<Button
-									__next40pxDefaultSize
-									icon={ isFullscreen ? square : fullscreen }
-									label={ __( 'Enable/disable fullscreen' ) }
-									onClick={ toggleFullscreen }
-									variant="tertiary"
-								/>
-							</div>
+							{ ! isMobileViewport && (
+								<div>
+									<Button
+										__next40pxDefaultSize
+										icon={
+											isFullscreen ? square : fullscreen
+										}
+										label={ __(
+											'Enable/disable fullscreen'
+										) }
+										onClick={ toggleFullscreen }
+										variant="tertiary"
+									/>
+								</div>
+							) }
 						</HStack>
 						{ hasRestrictedContent && (
 							<Notice
@@ -165,11 +135,11 @@ export default function HTMLEditModal( {
 								) }
 							</Notice>
 						) }
-						<HStack
-							alignment="stretch"
-							justify="flex-start"
-							spacing={ 4 }
+						<Flex
+							direction={ isMobileViewport ? 'column' : 'row' }
 							className="block-library-html__modal-tabs"
+							align="stretch"
+							gap={ 8 }
 						>
 							<div className="block-library-html__modal-content">
 								<Tabs.TabPanel
@@ -179,7 +149,7 @@ export default function HTMLEditModal( {
 								>
 									<PlainText
 										value={ editedHtml }
-										onChange={ handleHtmlChange }
+										onChange={ setEditedHtml }
 										placeholder={ __( 'Write HTML…' ) }
 										aria-label={ __( 'HTML' ) }
 										className="block-library-html__modal-editor"
@@ -193,7 +163,7 @@ export default function HTMLEditModal( {
 									>
 										<PlainText
 											value={ editedCss }
-											onChange={ handleCssChange }
+											onChange={ setEditedCss }
 											placeholder={ __( 'Write CSS…' ) }
 											aria-label={ __( 'CSS' ) }
 											className="block-library-html__modal-editor"
@@ -208,7 +178,7 @@ export default function HTMLEditModal( {
 									>
 										<PlainText
 											value={ editedJs }
-											onChange={ handleJsChange }
+											onChange={ setEditedJs }
 											placeholder={ __(
 												'Write JavaScript…'
 											) }
@@ -227,7 +197,7 @@ export default function HTMLEditModal( {
 									} ) }
 								/>
 							</div>
-						</HStack>
+						</Flex>
 						<HStack
 							alignment="center"
 							justify="flex-end"
@@ -237,7 +207,7 @@ export default function HTMLEditModal( {
 							<Button
 								__next40pxDefaultSize
 								variant="tertiary"
-								onClick={ handleCancel }
+								onClick={ onRequestClose }
 							>
 								{ __( 'Cancel' ) }
 							</Button>
@@ -249,46 +219,9 @@ export default function HTMLEditModal( {
 								{ __( 'Update' ) }
 							</Button>
 						</HStack>
-					</Grid>
+					</VStack>
 				</Tabs>
 			</Modal>
-
-			{ showUnsavedWarning && (
-				<Modal
-					title={ __( 'Unsaved changes' ) }
-					onRequestClose={ handleContinueEditing }
-					size="medium"
-				>
-					<p>
-						{ __(
-							'You have unsaved changes. What would you like to do?'
-						) }
-					</p>
-					<Flex direction="row" justify="flex-end" gap={ 2 }>
-						<Button
-							__next40pxDefaultSize
-							variant="secondary"
-							onClick={ handleDiscardChanges }
-						>
-							{ __( 'Discard unsaved changes' ) }
-						</Button>
-						<Button
-							__next40pxDefaultSize
-							variant="secondary"
-							onClick={ handleContinueEditing }
-						>
-							{ __( 'Continue editing' ) }
-						</Button>
-						<Button
-							__next40pxDefaultSize
-							variant="primary"
-							onClick={ handleUpdateAndClose }
-						>
-							{ __( 'Update and close' ) }
-						</Button>
-					</Flex>
-				</Modal>
-			) }
 		</>
 	);
 }

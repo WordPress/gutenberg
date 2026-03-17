@@ -27,6 +27,41 @@ function capitalize( str ) {
 }
 
 /**
+ * Check if a URL points to the site homepage.
+ * Handles protocol (http/https) and trailing slash variations.
+ * Does not match subdomains unless they are the site URL.
+ *
+ * @param {string} url     - The URL to check
+ * @param {string} homeUrl - The WordPress site URL
+ * @return {boolean} True if url is the homepage
+ */
+export function isHomepage( url, homeUrl ) {
+	if ( url === '/' ) {
+		return true;
+	}
+	if ( ! url || ! homeUrl ) {
+		return false;
+	}
+	try {
+		const urlParsed = new URL( url, homeUrl );
+		const homeParsed = new URL( homeUrl );
+
+		// Same host, i.e. sub.homepage.com or homepage.com
+		if ( urlParsed.hostname !== homeParsed.hostname ) {
+			return false;
+		}
+
+		// Path must match site root (normalize trailing slash)
+		const urlPath = urlParsed.pathname.replace( /\/$/, '' );
+		const homePath = homeParsed.pathname.replace( /\/$/, '' );
+
+		return urlPath === homePath;
+	} catch {
+		return false;
+	}
+}
+
+/**
  * Compute display URL - strips site URL if internal, shows full URL if external.
  *
  * @param {Object} options         - Parameters object
@@ -79,6 +114,7 @@ export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
  *
  * @param {Object}  options                   - Options object
  * @param {string}  options.url               - Link URL
+ * @param {string}  options.homeUrl           - WordPress site URL (for homepage detection)
  * @param {string}  options.type              - Entity type (page, post, etc.)
  * @param {boolean} options.isExternal        - Whether link is external
  * @param {string}  options.entityStatus      - Entity status (publish, draft, etc.)
@@ -88,6 +124,7 @@ export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
  */
 export function computeBadges( {
 	url,
+	homeUrl,
 	type,
 	isExternal,
 	entityStatus,
@@ -95,7 +132,6 @@ export function computeBadges( {
 	isEntityAvailable,
 } ) {
 	const badges = [];
-
 	// Kind badge
 	if ( url ) {
 		if ( isExternal ) {
@@ -108,6 +144,11 @@ export function computeBadges( {
 			// because they're not entity links even if type is set
 			badges.push( {
 				label: __( 'Internal link' ),
+				intent: 'default',
+			} );
+		} else if ( isHomepage( url, homeUrl ) ) {
+			badges.push( {
+				label: __( 'Homepage' ),
 				intent: 'default',
 			} );
 		} else if ( type && type !== 'custom' ) {
@@ -226,6 +267,7 @@ export function useLinkPreview( {
 	// Compute badges
 	const badges = computeBadges( {
 		url,
+		homeUrl,
 		type,
 		isExternal,
 		entityStatus: entityRecord?.status,

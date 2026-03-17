@@ -8,6 +8,7 @@ describe( 'getSyncErrorMessages', () => {
 		'authentication-failed',
 		'connection-expired',
 		'connection-limit-exceeded',
+		'document-size-limit-exceeded',
 		'unknown-error',
 	] )(
 		'should return title, description, and canRetry for "%s"',

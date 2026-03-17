@@ -16,6 +16,7 @@ import { createUndoManager } from '@wordpress/undo-manager';
 import { ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
+import { ConnectionErrorCode } from './sync';
 
 /** @typedef {import('./types').AnyFunction} AnyFunction */
 
@@ -214,8 +215,11 @@ function entity( entityConfig ) {
 						}
 
 						const nextState = { ...state };
+						const itemsList = Array.isArray( action.items )
+							? action.items
+							: [ action.items ];
 
-						for ( const record of action.items ) {
+						for ( const record of itemsList ) {
 							const recordId = record?.[ action.key ];
 							const edits = nextState[ recordId ];
 							if ( ! edits ) {
@@ -703,6 +707,16 @@ export function collaborationSupported( state = true, action ) {
 	switch ( action.type ) {
 		case 'SET_COLLABORATION_SUPPORTED':
 			return action.supported;
+
+		case 'SET_SYNC_CONNECTION_STATUS':
+			if (
+				ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED ===
+				action.status?.error?.code
+			) {
+				return false;
+			}
+
+			return state;
 	}
 	return state;
 }

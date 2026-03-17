@@ -241,7 +241,7 @@ function DataViewsPicker< Item >( {
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
 			} }
 		>
-			<div className="dataviews-picker-wrapper" ref={ containerRef }>
+			<div className="dataviews-picker-wrapper">
 				{ children ?? (
 					<DefaultUI search={ search } searchLabel={ searchLabel } />
 				) }
