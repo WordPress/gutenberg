@@ -58,8 +58,7 @@ const GUIDELINE_ITEMS = [
 	},
 	{
 		title: __( 'Additional' ),
-		description: __( 'Add additional guidelines for your team.' ),
-
+		description: __( 'Add additional guidelines.' ),
 		slug: 'additional',
 	},
 ];
