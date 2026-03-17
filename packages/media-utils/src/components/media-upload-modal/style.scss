@@ -45,8 +45,8 @@
 		background-color: var(--wp-dataviews-color-background, $white);
 		// Match the footer's padding so the trigger aligns with the item count.
 		left: $grid-unit-30;
-		top: 0;
-		bottom: 0;
+		top: 1px;
+		bottom: 1px;
 		z-index: 1;
 
 		.components-spinner {
