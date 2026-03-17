@@ -168,11 +168,12 @@ function DefaultSyncConnectionErrorModal(
  * );
  * ```
  */
-const FilteredSyncConnectionErrorModal = withFilters(
-	'editor.SyncConnectionErrorModal'
-)(
-	DefaultSyncConnectionErrorModal
-) as unknown as React.ComponentType< SyncConnectionErrorModalProps >;
+// @ts-ignore
+const FilteredSyncConnectionErrorModal = globalThis.IS_GUTENBERG_PLUGIN
+	? withFilters( 'editor.SyncConnectionErrorModal' )(
+			DefaultSyncConnectionErrorModal
+	  )
+	: DefaultSyncConnectionErrorModal;
 
 /**
  * Sync connection modal that displays when any entity reports a disconnection.
