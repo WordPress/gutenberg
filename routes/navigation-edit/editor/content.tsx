@@ -147,22 +147,38 @@ export default function NavigationMenuContent( {
 		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
 	);
 
-	const [ editingBlock, setEditingBlock ] = useState< Block | null >( null );
+	const [ editingBlockClientId, setEditingBlockClientId ] = useState<
+		string | null
+	>( null );
 	const [ anchorElement, setAnchorElement ] = useState< Element | null >(
 		null
 	);
 	const listViewRef = useRef< HTMLDivElement >( null );
 
+	// Read block attributes fresh from the store so the popover controls
+	// always reflect the latest state (e.g. after typing in the text field).
+	const editingBlockAttributes = useSelect(
+		( select ) => {
+			if ( ! editingBlockClientId ) {
+				return null;
+			}
+			return select( blockEditorStore ).getBlockAttributes(
+				editingBlockClientId
+			);
+		},
+		[ editingBlockClientId ]
+	);
+
 	useLayoutEffect( () => {
-		if ( ! editingBlock?.clientId || ! listViewRef.current ) {
+		if ( ! editingBlockClientId || ! listViewRef.current ) {
 			setAnchorElement( null );
 			return;
 		}
 		const element = listViewRef.current.querySelector(
-			`[data-block="${ editingBlock.clientId }"]`
+			`[data-block="${ editingBlockClientId }"]`
 		);
 		setAnchorElement( element ?? null );
-	}, [ editingBlock?.clientId ] );
+	}, [ editingBlockClientId ] );
 
 	const handleSelect = useCallback(
 		( block: Block ) => {
@@ -170,7 +186,7 @@ export default function NavigationMenuContent( {
 				BLOCKS_WITH_LINK_UI_SUPPORT.includes( block?.name ) &&
 				block?.attributes?.url
 			) {
-				setEditingBlock( block );
+				setEditingBlockClientId( block.clientId );
 			} else {
 				offCanvasOnselect( block );
 			}
@@ -197,30 +213,33 @@ export default function NavigationMenuContent( {
 					/>
 				</div>
 			) }
-			{ editingBlock && anchorElement && NavigationLinkControls && (
-				<Popover
-					anchor={ anchorElement }
-					placement="right-start"
-					onClose={ () => setEditingBlock( null ) }
-					className="edit-site-sidebar-navigation-screen-navigation-menus__link-editor"
-				>
-					<div style={ { width: '280px' } }>
-						<NavigationLinkControls
-							attributes={ editingBlock.attributes }
-							setAttributes={ (
-								newAttrs: Record< string, unknown >
-							) => {
-								updateBlockAttributes(
-									editingBlock.clientId,
-									newAttrs
-								);
-							} }
-							clientId={ editingBlock.clientId }
-							isContentOnly
-						/>
-					</div>
-				</Popover>
-			) }
+			{ editingBlockClientId &&
+				editingBlockAttributes &&
+				anchorElement &&
+				NavigationLinkControls && (
+					<Popover
+						anchor={ anchorElement }
+						placement="right-start"
+						onClose={ () => setEditingBlockClientId( null ) }
+						className="edit-site-sidebar-navigation-screen-navigation-menus__link-editor"
+					>
+						<div style={ { width: '280px' } }>
+							<NavigationLinkControls
+								attributes={ editingBlockAttributes }
+								setAttributes={ (
+									newAttrs: Record< string, unknown >
+								) => {
+									updateBlockAttributes(
+										editingBlockClientId,
+										newAttrs
+									);
+								} }
+								clientId={ editingBlockClientId }
+								isContentOnly
+							/>
+						</div>
+					</Popover>
+				) }
 			<div className="navigation-edit-editor__hidden-blocks">
 				<BlockList />
 			</div>
