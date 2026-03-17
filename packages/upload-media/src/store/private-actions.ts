@@ -777,6 +777,7 @@ export function prepareItem( id: QueueItemId ) {
 						additionalData: {
 							...item.additionalData,
 							generate_sub_sizes: true,
+							convert_format: true,
 						},
 				  }
 				: {};
@@ -802,7 +803,7 @@ export function uploadItem( id: QueueItemId ) {
 			additionalData: item.additionalData,
 			signal: item.abortController?.signal,
 			onFileChange: ( [ attachment ] ) => {
-				if ( ! isBlobURL( attachment.url ) ) {
+				if ( attachment && ! isBlobURL( attachment.url ) ) {
 					dispatch.finishOperation( id, {
 						attachment,
 					} );
