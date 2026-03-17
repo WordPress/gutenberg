@@ -12,6 +12,7 @@ import { CollaboratorsList } from './list';
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import { createCursorRegistry } from '../collaborators-overlay/cursor-registry';
 
 import './styles/collaborators-presence.scss';
 import { CollaboratorsOverlay } from '../collaborators-overlay';
@@ -56,6 +57,8 @@ export function CollaboratorsPresence( {
 			return 0;
 		} );
 	}, [ activeCollaborators ] );
+
+	const [ cursorRegistry ] = useState( createCursorRegistry );
 
 	const [ isPopoverVisible, setIsPopoverVisible ] = useState( false );
 	const [ popoverAnchor, setPopoverAnchor ] = useState< HTMLElement | null >(
@@ -123,10 +126,15 @@ export function CollaboratorsPresence( {
 						activeCollaborators={ collaboratorsForList }
 						popoverAnchor={ popoverAnchor }
 						setIsPopoverVisible={ setIsPopoverVisible }
+						cursorRegistry={ cursorRegistry }
 					/>
 				) }
 			</div>
-			<CollaboratorsOverlay postId={ postId } postType={ postType } />
+			<CollaboratorsOverlay
+				postId={ postId }
+				postType={ postType }
+				cursorRegistry={ cursorRegistry }
+			/>
 		</>
 	);
 }
