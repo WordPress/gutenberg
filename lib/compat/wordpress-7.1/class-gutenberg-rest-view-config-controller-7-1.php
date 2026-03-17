@@ -79,7 +79,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		$kind = $request->get_param( 'kind' );
 		$name = $request->get_param( 'name' );
 
-		// TODO: this data would come from a registry of view configs per entity.
+		// TODO: this data will come from a registry of view configs per entity.
 		$default_view = array(
 			'type'       => 'table',
 			'filters'    => array(),
@@ -90,6 +90,11 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			),
 			'titleField' => 'title',
 			'fields'     => array( 'author', 'status' ),
+		);
+		$default_layouts = array(
+			'table' => array(),
+			'grid'  => array(),
+			'list'  => array(),
 		);
 		if ( 'postType' === $kind && 'page' === $name ) {
 			$default_view = array(
@@ -105,12 +110,26 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 				'mediaField' => 'featured_media',
 				'fields'     => array( 'author', 'status' ),
 			);
+			$default_layouts = array(
+				'table' => array(
+					'layout' => array(
+						'styles' => array(
+							'author' => array(
+								'align' => 'start',
+							),
+						),
+					),
+				),
+				'grid'  => array(),
+				'list'  => array(),
+			);
 		}
 
 		$response = array(
-			'kind'         => $kind,
-			'name'         => $name,
-			'default_view' => $default_view,
+			'kind'            => $kind,
+			'name'            => $name,
+			'default_view'    => $default_view,
+			'default_layouts' => $default_layouts,
 		);
 
 		return rest_ensure_response( $response );
@@ -222,6 +241,14 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 						'infiniteScrollEnabled' => array(
 							'type' => 'boolean',
 						),
+					),
+				),
+				'default_layouts' => array(
+					'description'          => __( 'Default layout configurations.', 'gutenberg' ),
+					'type'                 => 'object',
+					'readonly'             => true,
+					'additionalProperties' => array(
+						'type' => 'object',
 					),
 				),
 			),

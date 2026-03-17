@@ -165,9 +165,9 @@ const SLUG_TO_STATUS = {
 	trash: 'trash',
 };
 
-export function getActiveViewOverridesForTab( activeView ) {
+export function getActiveViewOverridesForTab( activeView, layouts ) {
 	const base = {
-		...defaultLayouts.table,
+		...layouts?.table,
 	};
 	const status = SLUG_TO_STATUS[ activeView ];
 	if ( ! status ) {
