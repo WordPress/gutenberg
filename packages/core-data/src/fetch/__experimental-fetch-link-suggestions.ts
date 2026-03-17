@@ -131,65 +131,31 @@ export default async function fetchLinkSuggestions(
 	const queries: Promise< SearchResult[] >[] = [];
 
 	if ( ! type || type === 'post' ) {
-		const mapPostResults = ( results: SearchAPIResult[] ) =>
-			results.map( ( result ) => ( {
-				id: result.id,
-				url: result.url,
-				title:
-					decodeEntities( result.title || '' ) ||
-					__( '(no title)' ),
-				type: result.subtype || result.type,
-				kind: 'post-type' as const,
-			} ) );
-
-		// When fetching initial suggestions without a subtype filter, make
-		// separate queries for pages and other post types so that pages are
-		// guaranteed to appear regardless of how many other posts exist.
-		if (
-			searchOptions.isInitialSuggestions &&
-			! subtype
-		) {
-			queries.push(
-				apiFetch< SearchAPIResult[] >( {
-					path: addQueryArgs( '/wp/v2/search', {
-						search,
-						page,
-						per_page: perPage,
-						type: 'post',
-						subtype: 'page',
-					} ),
+		queries.push(
+			apiFetch< SearchAPIResult[] >( {
+				path: addQueryArgs( '/wp/v2/search', {
+					search,
+					page,
+					per_page: perPage,
+					type: 'post',
+					subtype,
+				} ),
+			} )
+				.then( ( results ) => {
+					return results.map( ( result ) => {
+						return {
+							id: result.id,
+							url: result.url,
+							title:
+								decodeEntities( result.title || '' ) ||
+								__( '(no title)' ),
+							type: result.subtype || result.type,
+							kind: 'post-type',
+						};
+					} );
 				} )
-					.then( mapPostResults )
-					.catch( () => [] )
-			);
-			queries.push(
-				apiFetch< SearchAPIResult[] >( {
-					path: addQueryArgs( '/wp/v2/search', {
-						search,
-						page,
-						per_page: perPage,
-						type: 'post',
-						subtype: 'post',
-					} ),
-				} )
-					.then( mapPostResults )
-					.catch( () => [] )
-			);
-		} else {
-			queries.push(
-				apiFetch< SearchAPIResult[] >( {
-					path: addQueryArgs( '/wp/v2/search', {
-						search,
-						page,
-						per_page: perPage,
-						type: 'post',
-						subtype,
-					} ),
-				} )
-					.then( mapPostResults )
-					.catch( () => [] )
-			);
-		}
+				.catch( () => [] ) // Fail by returning no results.
+		);
 	}
 
 	if ( ! type || type === 'term' ) {
