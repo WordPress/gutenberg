@@ -26,7 +26,6 @@ import type {
 	ObjectID,
 	ObjectData,
 	ObjectType,
-	ProviderCreator,
 	RecordHandlers,
 	SyncConfig,
 	SyncManager,
@@ -157,13 +156,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		record: ObjectData,
 		handlers: RecordHandlers
 	): Promise< void > {
-		const providerCreators = getProviderCreators();
 		const entityId = getEntityId( objectType, objectId );
-
-		if ( 0 === providerCreators.length ) {
-			log( 'loadEntity', 'no providers, skipping', entityId );
-			return; // No provider creators, so syncing is effectively disabled.
-		}
 
 		if ( entityStates.has( entityId ) ) {
 			log( 'loadEntity', 'already loaded', entityId );
@@ -263,10 +256,12 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		entityStates.set( entityId, entityState );
 
-		// Create providers for the given entity and its Yjs document.
+		// Create providers for the given entity and its Yjs document. When no
+		// providers are available (e.g. real-time collaboration is off), the
+		// transport layer is disabled but the sync engine remains active.
 		log( 'loadEntity', 'connecting', entityId );
 		const providerResults = await Promise.all(
-			providerCreators.map( async ( create ) => {
+			getProviderCreators().map( async ( create ) => {
 				const provider = await create( {
 					objectType,
 					objectId,
@@ -304,13 +299,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		objectType: ObjectType,
 		handlers: CollectionHandlers
 	): Promise< void > {
-		const providerCreators: ProviderCreator[] = getProviderCreators();
 		const entityId = getEntityId( objectType, null );
-
-		if ( 0 === providerCreators.length ) {
-			log( 'loadCollection', 'no providers, skipping', entityId );
-			return; // No provider creators, so syncing is effectively disabled.
-		}
 
 		if ( collectionStates.has( objectType ) ) {
 			log( 'loadCollection', 'already loaded', entityId );
@@ -368,10 +357,12 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		collectionStates.set( objectType, collectionState );
 
-		// Create providers for the given entity and its Yjs document.
+		// Create providers for the given entity and its Yjs document. When no
+		// providers are available, the transport layer is disabled but the
+		// sync engine remains active.
 		log( 'loadCollection', 'connecting', entityId );
 		const providerResults = await Promise.all(
-			providerCreators.map( async ( create ) => {
+			getProviderCreators().map( async ( create ) => {
 				const provider = await create( {
 					awareness,
 					objectType,
