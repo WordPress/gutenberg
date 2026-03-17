@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 interface ConnectionStatus {
 	status: string;
@@ -12,7 +12,6 @@ export function useRetryCountdown(
 	connectionStatus?: ConnectionStatus | null
 ): number | undefined {
 	const [ secondsRemaining, setSecondsRemaining ] = useState< number >();
-	const retryAtRef = useRef< number | null >( null );
 
 	useEffect( () => {
 		if ( ! connectionStatus ) {
@@ -24,7 +23,6 @@ export function useRetryCountdown(
 		// Only clear countdown when explicitly connected.
 		if ( status === 'connected' ) {
 			setSecondsRemaining( undefined );
-			retryAtRef.current = null;
 			return;
 		}
 
@@ -36,7 +34,6 @@ export function useRetryCountdown(
 		}
 
 		const retryAt = Date.now() + retryInMs;
-		retryAtRef.current = retryAt;
 		setSecondsRemaining( Math.ceil( retryInMs / 1000 ) );
 
 		const intervalId = setInterval( () => {

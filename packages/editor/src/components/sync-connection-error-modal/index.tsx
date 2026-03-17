@@ -10,11 +10,9 @@ import {
 	privateApis as coreDataPrivateApis,
 	type ConnectionError,
 } from '@wordpress/core-data';
-// @ts-ignore No exported types.
-import {
-	privateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { privateApis, store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	Button,
 	Modal,
@@ -101,7 +99,7 @@ function DefaultSyncConnectionErrorModal(
 
 	return (
 		<Modal
-			overlayClassName="editor-sync-connection-modal"
+			overlayClassName="editor-sync-connection-error-modal"
 			isDismissible={ false }
 			onRequestClose={ () => {} }
 			shouldCloseOnClickOutside={ false }
@@ -112,7 +110,7 @@ function DefaultSyncConnectionErrorModal(
 			<VStack spacing={ 6 }>
 				<p>{ description }</p>
 				{ retryCountdownText && (
-					<p className="editor-sync-connection-modal__retry-countdown">
+					<p className="editor-sync-connection-error-modal__retry-countdown">
 						{ retryCountdownText }
 					</p>
 				) }
