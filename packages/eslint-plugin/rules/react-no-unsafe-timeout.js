@@ -71,7 +71,7 @@ module.exports = {
 				// Consider whether `setTimeout` is a reference to the global
 				// by checking references to see if `setTimeout` resolves to a
 				// variable in scope.
-				const { references } = context.getScope();
+				const { references } = context.sourceCode.getScope( node );
 				const hasResolvedReference = references.some(
 					( reference ) =>
 						reference.identifier.name === 'setTimeout' &&

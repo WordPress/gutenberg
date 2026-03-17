@@ -19,18 +19,17 @@ export function sanitizeCommentString( str ) {
 export function noop() {}
 
 /**
- * These colors are picked from the WordPress.org design library.
- * @see https://www.figma.com/design/HOJTpCFfa3tR0EccUlu0CM/WordPress.org-Design-Library?node-id=1-2193&t=M6WdRvTpt0mh8n6T-1
+ * Avatar border colors chosen to be visually distinct from each other and from
+ * the editor's semantic UI colors (Delta E > 10 between all pairs).
  */
 const AVATAR_BORDER_COLORS = [
-	'#3858E9', // Blueberry
-	'#9fB1FF', // Blueberry 2
-	'#1D35B4', // Dark Blueberry
-	'#1A1919', // Charcoal 0
-	'#E26F56', // Pomegranate
-	'#33F078', // Acid Green
-	'#FFF972', // Lemon
-	'#7A00DF', // Purple
+	'#C36EFF', // Purple
+	'#FF51A8', // Pink
+	'#E4780A', // Orange
+	'#FF35EE', // Magenta
+	'#879F11', // Olive
+	'#46A494', // Teal
+	'#00A2C3', // Cyan
 ];
 
 /**

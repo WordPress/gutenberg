@@ -23,6 +23,16 @@ import './style.css';
 const meta = {
 	title: 'DataViews/DataViews',
 	component: DataViews,
+	args: {
+		containerHeight: 'auto',
+	},
+	argTypes: {
+		containerHeight: {
+			control: 'select',
+			options: [ 'auto', '600px', '80vh' ],
+			description: 'Height of the container',
+		},
+	},
 	// Use fullscreen layout and a wrapper div with padding to resolve conflicts
 	// between Ariakit's Dialog (usePreventBodyScroll) and Storybook's body padding
 	// (sb-main-padding class). This ensures consistent layout in DataViews stories
@@ -31,9 +41,11 @@ const meta = {
 		layout: 'fullscreen',
 	},
 	decorators: [
-		( Story ) => (
+		( Story, { args }: { args: any } ) => (
 			<div style={ { padding: '1rem' } }>
-				<Story />
+				<div style={ { height: args.containerHeight, minHeight: 0 } }>
+					<Story containerHeight={ args.containerHeight } />
+				</div>
 			</div>
 		),
 	],
@@ -212,18 +224,12 @@ export const Empty = {
 	render: EmptyComponent,
 	args: {
 		customEmpty: false,
-		containerHeight: '50vh',
 		isLoading: false,
 	},
 	argTypes: {
 		customEmpty: {
 			control: 'boolean',
 			description: 'Use custom empty state with planet illustration',
-		},
-		containerHeight: {
-			control: 'select',
-			options: [ 'auto', '50vh', '100vh' ],
-			description: 'Height of the container',
 		},
 		isLoading: {
 			control: 'boolean',

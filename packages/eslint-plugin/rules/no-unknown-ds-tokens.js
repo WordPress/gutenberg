@@ -36,7 +36,7 @@ function extractCSSVariables( value, prefix = '' ) {
 }
 
 const knownTokens = new Set( tokenList );
-const wpdsTokensRegex = new RegExp( `[^\\w]--${ DS_TOKEN_PREFIX }`, 'i' );
+const wpdsTokensRegex = new RegExp( `(?:^|[^\\w])--${ DS_TOKEN_PREFIX }`, 'i' );
 
 module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 	meta: {
@@ -48,13 +48,84 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 		messages: {
 			onlyKnownTokens:
 				'The following CSS variables are not valid Design System tokens: {{ tokenNames }}',
+			dynamicToken:
+				'Design System tokens must not be dynamically constructed, as they cannot be statically verified for correctness or processed automatically to inject fallbacks.',
 		},
 	},
 	create( context ) {
-		const disallowedTokensAST = `JSXAttribute[name.name="style"] :matches(Literal[value=${ wpdsTokensRegex }], TemplateLiteral TemplateElement[value.raw=${ wpdsTokensRegex }])`;
+		const dynamicTemplateLiteralAST = `TemplateLiteral[expressions.length>0]:has(TemplateElement[value.raw=${ wpdsTokensRegex }])`;
+		const staticTokensAST = `:matches(Literal[value=${ wpdsTokensRegex }], TemplateLiteral[expressions.length=0] TemplateElement[value.raw=${ wpdsTokensRegex }])`;
+		const dynamicTokenEndRegex = new RegExp(
+			`--${ DS_TOKEN_PREFIX }[\\w-]*$`
+		);
+
 		return {
+			/**
+			 * For template literals with expressions, check each quasi
+			 * individually: flag as dynamic only when a `--wpds-*` token
+			 * name is split across a quasi/expression boundary, and
+			 * validate any complete static tokens normally.
+			 *
+			 * @param {import('estree').TemplateLiteral} node
+			 */
+			[ dynamicTemplateLiteralAST ]( node ) {
+				let hasDynamic = false;
+				const unknownTokens = [];
+
+				for ( const quasi of node.quasis ) {
+					const raw = quasi.value.raw;
+					const value = quasi.value.cooked ?? raw;
+					const isFollowedByExpression = ! quasi.tail;
+
+					if (
+						isFollowedByExpression &&
+						dynamicTokenEndRegex.test( raw )
+					) {
+						hasDynamic = true;
+					}
+
+					const tokens = extractCSSVariables(
+						value,
+						DS_TOKEN_PREFIX
+					);
+
+					// Remove the trailing incomplete token — it's the one
+					// being dynamically constructed by the next expression.
+					if ( isFollowedByExpression ) {
+						const endMatch = value.match( /(--([\w-]+))$/ );
+						if ( endMatch ) {
+							tokens.delete( endMatch[ 1 ] );
+						}
+					}
+
+					for ( const token of tokens ) {
+						if ( ! knownTokens.has( token ) ) {
+							unknownTokens.push( token );
+						}
+					}
+				}
+
+				if ( hasDynamic ) {
+					context.report( {
+						node,
+						messageId: 'dynamicToken',
+					} );
+				}
+
+				if ( unknownTokens.length > 0 ) {
+					context.report( {
+						node,
+						messageId: 'onlyKnownTokens',
+						data: {
+							tokenNames: unknownTokens
+								.map( ( token ) => `'${ token }'` )
+								.join( ', ' ),
+						},
+					} );
+				}
+			},
 			/** @param {import('estree').Literal | import('estree').TemplateElement} node */
-			[ disallowedTokensAST ]( node ) {
+			[ staticTokensAST ]( node ) {
 				let computedValue;
 
 				if ( ! node.value ) {
@@ -62,13 +133,11 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 				}
 
 				if ( typeof node.value === 'string' ) {
-					// Get the node's value when it's a "string"
 					computedValue = node.value;
 				} else if (
 					typeof node.value === 'object' &&
 					'raw' in node.value
 				) {
-					// Get the node's value when it's a `template literal`
 					computedValue = node.value.cooked ?? node.value.raw;
 				}
 

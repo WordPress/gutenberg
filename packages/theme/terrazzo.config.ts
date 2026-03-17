@@ -117,6 +117,11 @@ export default defineConfig( {
 					patterns: [ /^wpds-dimension\.gap\.([^.]+)$/ ],
 				},
 				{
+					name: 'SurfaceWidthSize',
+					description: 'Size scale for surface width tokens.',
+					patterns: [ /^wpds-dimension\.surface-width\.([^.]+)$/ ],
+				},
+				{
 					name: 'BorderRadiusSize',
 					description: 'Size scale for border radius tokens.',
 					patterns: [ /^wpds-border\.radius\.([^.]+)$/ ],

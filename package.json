@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "22.6.0",
+	"version": "22.7.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -28,10 +28,12 @@
 				"id": "site-editor-v2",
 				"init": [
 					"@wordpress/edit-site-init"
-				]
+				],
+				"experimental": true
 			},
 			"font-library",
-			"connectors"
+			"options-connectors",
+			"content-guidelines"
 		]
 	},
 	"config": {

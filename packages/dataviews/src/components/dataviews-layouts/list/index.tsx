@@ -217,6 +217,10 @@ function ListItem< Item >( {
 			<titleField.render item={ item } field={ titleField } />
 		) : null;
 
+	const renderDescription = showDescription && descriptionField?.render;
+	// When we have only the media and title fields, we want to center them vertically in the list item.
+	const hasOnlyMediaAndTitle =
+		!! renderedMediaField && ! renderDescription && ! otherFields.length;
 	const usedActions = eligibleActions?.length > 0 && (
 		<Stack
 			direction="row"
@@ -315,7 +319,7 @@ function ListItem< Item >( {
 					direction="row"
 					gap="md"
 					justify="start"
-					align="flex-start"
+					align={ hasOnlyMediaAndTitle ? 'center' : 'flex-start' }
 					style={ { flex: 1, minWidth: 0 } }
 				>
 					{ renderedMediaField }
@@ -333,7 +337,7 @@ function ListItem< Item >( {
 							</div>
 							{ usedActions }
 						</Stack>
-						{ showDescription && descriptionField?.render && (
+						{ renderDescription && (
 							<div className="dataviews-view-list__field">
 								<descriptionField.render
 									item={ item }
@@ -427,6 +431,8 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		string | null | undefined
 	>( undefined );
 
+	const compositeRef = useRef< HTMLDivElement >( null );
+
 	// Update the active composite item when the selected item changes.
 	useEffect( () => {
 		if ( selectedItem ) {
@@ -465,7 +471,17 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			const targetCompositeItemId = generateCompositeId( itemIdPrefix );
 
 			setActiveCompositeId( targetCompositeItemId );
-			document.getElementById( targetCompositeItemId )?.focus();
+			// The active composite item is controlled state that
+			// can update without needing a focus move (e.g., searching
+			// can trigger an active ID update). Only move DOM focus
+			// when it's already within the list.
+			if (
+				compositeRef.current?.contains(
+					compositeRef.current.ownerDocument.activeElement
+				)
+			) {
+				document.getElementById( targetCompositeItemId )?.focus();
+			}
 		},
 		[ data, generateCompositeItemIdPrefix ]
 	);
@@ -536,6 +552,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	if ( hasData && groupField && dataByGroup ) {
 		return (
 			<Composite
+				ref={ compositeRef }
 				id={ `${ baseId }` }
 				render={ <div /> }
 				className="dataviews-view-list__group"
@@ -601,6 +618,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	return (
 		<>
 			<Composite
+				ref={ compositeRef }
 				id={ baseId }
 				render={ <div /> }
 				className={ clsx( 'dataviews-view-list', className, {

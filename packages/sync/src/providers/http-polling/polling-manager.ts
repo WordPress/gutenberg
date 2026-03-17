@@ -11,6 +11,14 @@ import * as syncProtocol from 'y-protocols/sync';
 /**
  * Internal dependencies
  */
+import {
+	MAX_ERROR_BACKOFF_IN_MS,
+	MAX_UPDATE_SIZE_IN_BYTES,
+	POLLING_INTERVAL_IN_MS,
+	POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS,
+	POLLING_INTERVAL_BACKGROUND_TAB_IN_MS,
+} from './config';
+import { ConnectionError, ConnectionErrorCode } from '../../errors';
 import type { ConnectionStatus } from '../../types';
 import {
 	type AwarenessState,
@@ -28,16 +36,13 @@ import {
 	postSyncUpdateNonBlocking,
 } from './utils';
 
-const POLLING_INTERVAL_IN_MS = 1000; // 1 second or 1000 milliseconds
-const POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS = 250; // 250 milliseconds
-const POLLING_INTERVAL_BACKGROUND_TAB_IN_MS = 30 * 1000; // 30 seconds
-const MAX_ERROR_BACKOFF_IN_MS = 30 * 1000; // 30 seconds
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
 
 type LogFunction = ( message: string, debug?: object ) => void;
 
 interface PollingManager {
 	registerRoom: ( options: RegisterRoomOptions ) => void;
+	retryNow: () => void;
 	unregisterRoom: ( room: string ) => void;
 }
 
@@ -87,7 +92,7 @@ function createDeprecatedCompactionUpdate( updates: SyncUpdate[] ): SyncUpdate {
 
 	// Merge all updates while preserving operation metadata.
 	return createSyncUpdate(
-		Y.mergeUpdates( mergeable ),
+		Y.mergeUpdatesV2( mergeable ),
 		SyncUpdateType.COMPACTION
 	);
 }
@@ -143,7 +148,9 @@ function processAwarenessUpdate(
 
 	// Removed clients are missing from the server state.
 	const removed = new Set< number >(
-		currentStates.keys().filter( ( clientId ) => ! state[ clientId ] )
+		Array.from( currentStates.keys() ).filter(
+			( clientId ) => ! state[ clientId ]
+		)
 	);
 
 	Object.entries( state ).forEach( ( [ clientIdString, awarenessState ] ) => {
@@ -235,7 +242,7 @@ function processDocUpdate(
 		case SyncUpdateType.COMPACTION:
 		case SyncUpdateType.UPDATE: {
 			// Apply document update directly.
-			Y.applyUpdate( doc, data, POLLING_MANAGER_ORIGIN );
+			Y.applyUpdateV2( doc, data, POLLING_MANAGER_ORIGIN );
 		}
 	}
 }
@@ -297,16 +304,19 @@ function handleVisibilityChange() {
 		/*
 		 * Remove scheduled polling and repoll immediately when reactivated.
 		 *
-		 * This ensures that any updates by collaborators are immediately reflected
-		 * in the document once the browser tab becomes active. Otherwise there would
-		 * be a delay of 30 seconds before the updates came through.
+		 * This ensures that any updates by collaborators are immediately
+		 * reflected in the document once the browser tab becomes active.
+		 * Otherwise there would be a delay of up to 30 seconds before the
+		 * updates came through.
+		 *
+		 * Only repoll if we cleared a pending timeout, meaning the poll loop
+		 * was idle between cycles. If no timeout is pending, a poll request
+		 * is already in-flight and will pick up the updated isActiveBrowser
+		 * value when it schedules the next cycle.
 		 */
 		if ( pollingTimeoutId ) {
 			clearTimeout( pollingTimeoutId );
 			pollingTimeoutId = null;
-		}
-
-		if ( isPolling ) {
 			poll();
 		}
 	}
@@ -314,6 +324,7 @@ function handleVisibilityChange() {
 
 function poll(): void {
 	isPolling = true;
+	pollingTimeoutId = null;
 
 	async function start(): Promise< void > {
 		if ( 0 === roomStates.size ) {
@@ -438,7 +449,10 @@ function poll(): void {
 			// flashing the disconnect dialog before the new page loads.
 			if ( ! isUnloadPending ) {
 				roomStates.forEach( ( state ) => {
-					state.onStatusChange( { status: 'disconnected' } );
+					state.onStatusChange( {
+						status: 'disconnected',
+						retryInMs: pollInterval,
+					} );
 				} );
 			}
 		}
@@ -449,6 +463,7 @@ function poll(): void {
 	// Start polling.
 	void start();
 }
+
 function registerRoom( {
 	room,
 	doc,
@@ -473,12 +488,35 @@ function registerRoom( {
 			return;
 		}
 
+		if ( update.byteLength > MAX_UPDATE_SIZE_IN_BYTES ) {
+			const state = roomStates.get( room );
+			if ( ! state ) {
+				return;
+			}
+
+			state.log( 'Document size limit exceeded', {
+				maxUpdateSizeInBytes: MAX_UPDATE_SIZE_IN_BYTES,
+				updateSizeInBytes: update.byteLength,
+			} );
+
+			state.onStatusChange( {
+				status: 'disconnected',
+				error: new ConnectionError(
+					ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED,
+					'Document size limit exceeded'
+				),
+			} );
+
+			// This is an unrecoverable error. Unregister the room to prevent syncing.
+			unregisterRoom( room );
+		}
+
 		// Tag local document changes as 'update' type.
 		updateQueue.add( createSyncUpdate( update, SyncUpdateType.UPDATE ) );
 	}
 
 	function unregister(): void {
-		doc.off( 'update', onDocUpdate );
+		doc.off( 'updateV2', onDocUpdate );
 		awareness.off( 'change', onAwarenessUpdate );
 		updateQueue.clear();
 	}
@@ -487,7 +525,7 @@ function registerRoom( {
 		clientId: doc.clientID,
 		createCompactionUpdate: () =>
 			createSyncUpdate(
-				Y.encodeStateAsUpdate( doc ),
+				Y.encodeStateAsUpdateV2( doc ),
 				SyncUpdateType.COMPACTION
 			),
 		endCursor: 0,
@@ -502,7 +540,7 @@ function registerRoom( {
 		updateQueue,
 	};
 
-	doc.on( 'update', onDocUpdate );
+	doc.on( 'updateV2', onDocUpdate );
 	awareness.on( 'change', onAwarenessUpdate );
 	roomStates.set( room, roomState );
 
@@ -549,7 +587,23 @@ function unregisterRoom( room: string ): void {
 	}
 }
 
+/**
+ * Immediately retry the sync connection by cancelling any pending backoff
+ * timeout and triggering a new poll. If a request is already in-flight,
+ * the backoff interval is reset so the next scheduled poll fires sooner.
+ */
+function retryNow(): void {
+	pollInterval = POLLING_INTERVAL_IN_MS * 2;
+
+	if ( pollingTimeoutId ) {
+		clearTimeout( pollingTimeoutId );
+		pollingTimeoutId = null;
+		poll();
+	}
+}
+
 export const pollingManager: PollingManager = {
 	registerRoom,
+	retryNow,
 	unregisterRoom,
 };

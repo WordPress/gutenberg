@@ -6,12 +6,12 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
-import { debounce, useViewportMatch } from '@wordpress/compose';
+import { useState, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { debounce } from '@wordpress/compose';
 import {
 	Button,
 	__experimentalTruncate as Truncate,
-	Popover,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -20,30 +20,55 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import BlockStylesPreviewPanel from './preview-panel';
+import PreviewBlockPopover from '../block-switcher/preview-block-popover';
 import useStylesForBlocks from './use-styles-for-block';
 import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
-import { getDefaultStyle } from './utils';
+import { getDefaultStyle, replaceActiveStyle } from './utils';
+import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
 
 // Block Styles component for the Settings Sidebar.
 function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
+	const canEdit = useSelect(
+		( select ) => select( blockEditorStore ).canEditBlock( clientId ),
+		[ clientId ]
+	);
 	const {
 		onSelect,
 		stylesToRender,
 		activeStyle,
 		genericPreviewBlock,
-		className: previewClassName,
+		className,
 	} = useStylesForBlocks( {
 		clientId,
 		onSwitch,
 	} );
 	const [ hoveredStyle, setHoveredStyle ] = useState( null );
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const [ blockStylesAnchor, setBlockStylesAnchor ] = useState( null );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	if ( ! stylesToRender || stylesToRender.length === 0 ) {
+	const previewBlocks = useMemo( () => {
+		if ( ! hoveredStyle || ! genericPreviewBlock ) {
+			return null;
+		}
+		const previewClassName = replaceActiveStyle(
+			className,
+			activeStyle,
+			hoveredStyle
+		);
+		return [
+			{
+				...genericPreviewBlock,
+				attributes: {
+					...( genericPreviewBlock.attributes || {} ),
+					className: previewClassName,
+				},
+			},
+		];
+	}, [ hoveredStyle, genericPreviewBlock, className, activeStyle ] );
+
+	if ( ! canEdit || ! stylesToRender || stylesToRender.length === 0 ) {
 		return null;
 	}
 
@@ -90,7 +115,10 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 				isShownByDefault
 				panelId={ clientId }
 			>
-				<div className="block-editor-block-styles">
+				<div
+					ref={ setBlockStylesAnchor }
+					className="block-editor-block-styles"
+				>
 					<div className="block-editor-block-styles__variants">
 						{ stylesToRender.map( ( style ) => {
 							const buttonText = style.label || style.name;
@@ -133,24 +161,13 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 							);
 						} ) }
 					</div>
-					{ hoveredStyle && ! isMobileViewport && (
-						<Popover
+					{ previewBlocks && (
+						<PreviewBlockPopover
+							blocks={ previewBlocks }
 							placement="left-start"
 							offset={ 34 }
-							focusOnMount={ false }
-						>
-							<div
-								className="block-editor-block-styles__preview-panel"
-								onMouseLeave={ () => styleItemHandler( null ) }
-							>
-								<BlockStylesPreviewPanel
-									activeStyle={ activeStyle }
-									className={ previewClassName }
-									genericPreviewBlock={ genericPreviewBlock }
-									style={ hoveredStyle }
-								/>
-							</div>
-						</Popover>
+							anchor={ blockStylesAnchor }
+						/>
 					) }
 				</div>
 			</ToolsPanelItem>

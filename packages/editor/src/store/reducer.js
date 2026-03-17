@@ -456,6 +456,24 @@ export function revisionId( state = null, action ) {
  * @param {Object} action Dispatched action.
  * @return {Object} Updated state.
  */
+/**
+ * Reducer for whether the revision diff is shown.
+ * Resets to true when entering/exiting revisions mode.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ * @return {boolean} Updated state.
+ */
+export function showRevisionDiff( state = true, action ) {
+	switch ( action.type ) {
+		case 'SET_SHOW_REVISION_DIFF':
+			return action.showDiff;
+		case 'SET_CURRENT_REVISION_ID':
+			return true; // reset on enter/exit revisions
+	}
+	return state;
+}
+
 export function selectedNote( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SELECT_NOTE':
@@ -487,6 +505,7 @@ export default combineReducers( {
 	showStylebook,
 	canvasMinHeight,
 	revisionId,
+	showRevisionDiff,
 	selectedNote,
 	dataviews: dataviewsReducer,
 } );
