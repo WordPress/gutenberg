@@ -127,6 +127,6 @@ export type SelectionState =
 	| SelectionWholeBlock;
 
 export interface ResolvedSelection {
-	textIndex: number | null;
+	richTextOffset: number | null;
 	localClientId: string | null;
 }

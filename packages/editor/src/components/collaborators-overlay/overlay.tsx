@@ -5,10 +5,18 @@ import { __ } from '@wordpress/i18n';
 import Avatar from '../collaborators-presence/avatar';
 import { AVATAR_IFRAME_STYLES } from './avatar-iframe-styles';
 import { OVERLAY_IFRAME_STYLES } from './overlay-iframe-styles';
+import { setDelayedInterval } from './timing-utils';
 import { useBlockHighlighting } from './use-block-highlighting';
 import { useRenderCursors } from './use-render-cursors';
 
+// Milliseconds to wait after a change before recomputing cursor positions.
 const RERENDER_DELAY_MS = 500;
+
+// Periodically recompute cursor positions to account for DOM layout
+// changes that don't trigger awareness state updates (e.g. a collaborator
+// applying formatting shifts text but the cursor's logical position is
+// unchanged). Only active when remote cursors are visible.
+const CURSOR_REDRAW_INTERVAL_MS = 10_000;
 
 interface OverlayProps {
 	blockEditorDocument?: Document;
@@ -67,6 +75,17 @@ export function Overlay( {
 			cleanupHighlights();
 		};
 	}, [ rerenderCursorsAfterDelay, rerenderHighlightsAfterDelay ] );
+
+	useEffect( () => {
+		if ( cursors.length === 0 ) {
+			return;
+		}
+
+		return setDelayedInterval(
+			rerenderCursorsAfterDelay,
+			CURSOR_REDRAW_INTERVAL_MS
+		);
+	}, [ cursors.length, rerenderCursorsAfterDelay ] );
 
 	// Merge the refs to use the same element for both overlay and resize observation
 	const mergedRef = useMergeRefs< HTMLDivElement | null >( [
