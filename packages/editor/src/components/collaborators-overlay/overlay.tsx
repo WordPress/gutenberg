@@ -9,7 +9,14 @@ import { setDelayedInterval } from './timing-utils';
 import { useBlockHighlighting } from './use-block-highlighting';
 import { useRenderCursors } from './use-render-cursors';
 
+// Milliseconds to wait after a change before recomputing cursor positions.
 const RERENDER_DELAY_MS = 500;
+
+// Periodically recompute cursor positions to account for DOM layout
+// changes that don't trigger awareness state updates (e.g. a collaborator
+// applying formatting shifts text but the cursor's logical position is
+// unchanged). Only active when remote cursors are visible.
+const CURSOR_REDRAW_INTERVAL_MS = 10_000;
 
 interface OverlayProps {
 	blockEditorDocument?: Document;
@@ -69,13 +76,8 @@ export function Overlay( {
 		};
 	}, [ rerenderCursorsAfterDelay, rerenderHighlightsAfterDelay ] );
 
-	// Periodically recompute cursor positions to account for DOM layout
-	// changes that don't trigger awareness state updates (e.g. a collaborator
-	// applying formatting shifts text but the cursor's logical position is
-	// unchanged). Only active when remote cursors are visible.
-	const CURSOR_REDRAW_INTERVAL_MS = 10_000;
 	useEffect( () => {
-		if ( ! cursors.length ) {
+		if ( cursors.length === 0 ) {
 			return;
 		}
 
