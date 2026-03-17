@@ -128,7 +128,7 @@ const boolConfigVal = ( value ) => {
 
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
-		boolConfigVal( process.env.IS_GUTENBERG_PLUGIN ) ||
+		boolConfigVal( process.env.IS_GUTENBERG_PLUGIN ) ??
 			boolConfigVal( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
 	),
 	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
