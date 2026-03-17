@@ -4,60 +4,41 @@ const tokenList = tokenListModule.default || tokenListModule;
 const DS_TOKEN_PREFIX = 'wpds-';
 
 /**
- * Extracts all unique CSS custom properties (variables) from a given CSS value string,
- * including those in fallback positions, optionally filtering by a specific prefix.
+ * Single-pass extraction that finds all `--prefix-*` tokens in a CSS value
+ * string and classifies each occurrence as `var()`-wrapped or bare.
  *
- * @param {string} value       - The CSS value string to search for variables.
+ * @param {string} value       - The CSS value string to search.
  * @param {string} [prefix=''] - Optional prefix to filter variables (e.g., 'wpds-').
- * @return {Set<string>} A Set of unique matched CSS variable names (e.g., Set { '--wpds-token' }).
+ * @return {{ tokens: Set<string>, bare: Set<string> }}
+ *   `tokens` — every unique matched token;
+ *   `bare`   — the subset that appeared at least once without a `var()` wrapper.
  *
  * @example
- * extractCSSVariables(
- *   'border: 1px solid var(--wpds-border-color, var(--wpds-border-fallback)); ' +
- *   'color: var(--wpds-color-fg, black); ' +
- *   'background: var(--unrelated-bg);',
- *   'wpds'
+ * classifyTokens(
+ *   'var(--wpds-color-fg) --wpds-color-bg',
+ *   'wpds-'
  * );
- * // → Set { '--wpds-border-color', '--wpds-border-fallback', '--wpds-color-fg' }
+ * // → { tokens: Set {'--wpds-color-fg','--wpds-color-bg'},
+ * //     bare:   Set {'--wpds-color-bg'} }
  */
-function extractCSSVariables( value, prefix = '' ) {
-	const regex = /--[\w-]+/g;
-	const variables = new Set();
+function classifyTokens( value, prefix = '' ) {
+	const regex = new RegExp(
+		`(?:^|[^\\w])(var\\(\\s*)?(--${ prefix }[\\w-]+)`,
+		'g'
+	);
+	const tokens = new Set();
+	const bare = new Set();
 
 	let match;
 	while ( ( match = regex.exec( value ) ) !== null ) {
-		const variableName = match[ 0 ];
-		if ( variableName.startsWith( `--${ prefix }` ) ) {
-			variables.add( variableName );
+		const token = match[ 2 ];
+		tokens.add( token );
+		if ( ! match[ 1 ] ) {
+			bare.add( token );
 		}
 	}
 
-	return variables;
-}
-
-/**
- * Extracts CSS custom properties that appear outside of `var()` calls,
- * optionally filtering by a specific prefix. Works by stripping `var()`-wrapped
- * tokens first, then searching the remainder for bare references.
- *
- * @param {string} value       - The CSS value string to search.
- * @param {string} [prefix=''] - Optional prefix to filter variables.
- * @return {Set<string>} Tokens that are NOT wrapped in `var()`.
- */
-function extractBareTokens( value, prefix = '' ) {
-	const stripped = value.replace( /var\(\s*--[\w-]+/g, '' );
-	const regex = /--[\w-]+/g;
-	const tokens = new Set();
-
-	let match;
-	while ( ( match = regex.exec( stripped ) ) !== null ) {
-		const variableName = match[ 0 ];
-		if ( variableName.startsWith( `--${ prefix }` ) ) {
-			tokens.add( variableName );
-		}
-	}
-
-	return tokens;
+	return { tokens, bare };
 }
 
 const knownTokens = new Set( tokenList );
@@ -112,7 +93,7 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 						hasDynamic = true;
 					}
 
-					const tokens = extractCSSVariables(
+					const { tokens, bare } = classifyTokens(
 						value,
 						DS_TOKEN_PREFIX
 					);
@@ -123,10 +104,9 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 						const endMatch = value.match( /(--([\w-]+))$/ );
 						if ( endMatch ) {
 							tokens.delete( endMatch[ 1 ] );
+							bare.delete( endMatch[ 1 ] );
 						}
 					}
-
-					const bare = extractBareTokens( value, DS_TOKEN_PREFIX );
 
 					for ( const token of tokens ) {
 						if ( ! knownTokens.has( token ) ) {
@@ -189,7 +169,7 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 					return;
 				}
 
-				const usedTokens = extractCSSVariables(
+				const { tokens: usedTokens, bare } = classifyTokens(
 					computedValue,
 					DS_TOKEN_PREFIX
 				);
@@ -212,15 +192,10 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 				// Skip bare-token check for property keys
 				// (e.g. `{ '--wpds-token': value }` declaring a custom property).
 				const isPropertyKey =
-					typeof node.value === 'string' &&
 					node.parent?.type === 'Property' &&
 					node.parent.key === node;
 
 				if ( ! isPropertyKey ) {
-					const bare = extractBareTokens(
-						computedValue,
-						DS_TOKEN_PREFIX
-					);
 					const bareTokens = [ ...usedTokens ].filter(
 						( token ) =>
 							knownTokens.has( token ) && bare.has( token )
