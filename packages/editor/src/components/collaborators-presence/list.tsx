@@ -35,18 +35,14 @@ export function CollaboratorsList( {
 	cursorRegistry,
 }: CollaboratorsListProps ) {
 	const handleCollaboratorClick = ( clientId: number ) => {
-		const userName = activeCollaborators.find(
-			( collaborator ) => collaborator.clientId === clientId
-		)?.collaboratorInfo.name;
-
 		const success = cursorRegistry.scrollToCursor( clientId, {
 			behavior: 'smooth',
 			block: 'center',
 			highlightDuration: 2000,
 		} );
 
-		if ( success && userName ) {
-			speak( `Scrolled to ${ userName }'s cursor`, 'polite' );
+		if ( success ) {
+			speak( __( 'Scrolled to cursor' ), 'polite' );
 		}
 
 		if ( success ) {
