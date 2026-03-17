@@ -1,6 +1,7 @@
 /**
- * Like setInterval but measures the delay between the end of one run and the
- * start of the next, so callbacks never stack up when the main thread is busy.
+ * Like setInterval but chains setTimeout calls, so the delay is measured from
+ * the end of one run to the start of the next. This prevents callbacks from
+ * stacking up when the main thread is busy.
  *
  * @param callback The function to call repeatedly.
  * @param delayMs  Milliseconds between runs.
