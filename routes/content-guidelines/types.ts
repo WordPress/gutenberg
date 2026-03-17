@@ -47,6 +47,9 @@ export interface GuidelineAccordionProps {
 	descriptionId?: string;
 	isGenerating?: boolean;
 	hasSuggestion?: boolean;
+	forceOpen?: boolean;
+	forceClose?: boolean;
+	showSpinnerOnlyWhenOpen?: boolean;
 }
 
 export interface ContentGuidelinesRevision {

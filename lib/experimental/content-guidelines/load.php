@@ -54,6 +54,10 @@ function gutenberg_content_guidelines_admin_bar_explorations( $wp_admin_bar ) {
 		return;
 	}
 
+	if ( ! function_exists( 'get_current_screen' ) ) {
+		return;
+	}
+
 	$screen = get_current_screen();
 	if ( ! $screen || 'settings_page_content-guidelines-wp-admin' !== $screen->id ) {
 		return;
@@ -62,7 +66,7 @@ function gutenberg_content_guidelines_admin_bar_explorations( $wp_admin_bar ) {
 	$explorations = array(
 		'A' => 'Option A (Current)',
 		'B' => 'Option B (Suggest All)',
-		'C' => 'Option C',
+		'C' => 'Option C (Proactive)',
 		'D' => 'Option D',
 		'E' => 'Option E',
 		'F' => 'Option F',

@@ -336,3 +336,125 @@
 		right: 70px;
 	}
 }
+
+// ── Proactive recommendations — two-column layout (Exploration C) ──
+
+// Override overflow on the content wrapper so sticky works inside the two-col layout.
+.content-guidelines__content--two-col {
+	overflow: visible !important;
+}
+
+.content-guidelines__two-col {
+	display: flex;
+	column-gap: $grid-unit-50;
+	align-items: flex-start;
+	max-width: 1000px;
+	margin: 0 auto;
+	overflow: visible;
+
+	@media (max-width: $break-large) {
+		flex-direction: column;
+	}
+}
+
+.content-guidelines__main-col {
+	flex: 1 1 0;
+	min-width: 0;
+
+	// Override centered list items — column width constrains them instead.
+	.content-guidelines__list-item {
+		width: 100%;
+		margin: 0;
+	}
+
+	.content-guidelines__actions {
+		width: 100%;
+		margin: $grid-unit-30 0 0;
+	}
+
+	// Hardcap diff, textarea, and shimmer container so they never push the column wider.
+	.content-guidelines__diff-wrapper,
+	.content-guidelines__field-container,
+	.components-textarea-control__input {
+		max-width: 567px;
+	}
+}
+
+.content-guidelines__sidebar-col {
+	flex: 0 0 280px;
+	min-width: 0;
+
+	@media (max-width: $break-large) {
+		flex-basis: 100%;
+	}
+}
+
+.content-guidelines__recommendations {
+	padding: $grid-unit-20 $grid-unit-30;
+
+	.components-spinner {
+		margin: 0;
+	}
+}
+
+.content-guidelines__recommendations-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.content-guidelines__recommendations-item {
+	position: relative;
+
+	&:not(:first-child)::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 1px;
+		background-color: $gray-100;
+	}
+}
+
+.content-guidelines__recommendations-button {
+	flex: 1;
+	min-width: 0;
+	padding: $grid-unit-15 0 !important;
+	height: auto !important;
+	text-align: left;
+	border: none;
+	background: none;
+	cursor: pointer;
+	border-radius: $radius-block-ui;
+
+	&:hover {
+		background: none;
+
+		.components-text {
+			color: var(--wp-admin-theme-color, #3858e9) !important;
+		}
+	}
+
+	&:focus:not(:focus-visible) {
+		box-shadow: none;
+		outline: none;
+	}
+
+	// Override WordPress button default styles.
+	&.components-button {
+		height: auto;
+		justify-content: stretch;
+	}
+}
+
+.content-guidelines__recommendations-kebab {
+	flex: 0 0 auto;
+	margin-top: $grid-unit-10;
+
+	.components-button {
+		padding: 0 !important;
+		min-width: 24px !important;
+		height: 24px !important;
+	}
+}

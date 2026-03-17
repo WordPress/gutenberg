@@ -30,6 +30,7 @@ import {
 	Navigator,
 	Spinner,
 	TextareaControl,
+	privateApis as componentsPrivateApis,
 	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
@@ -52,6 +53,9 @@ import BlockGuidelines from './block-guidelines';
 import GuidelineAccordion from './guideline-accordion';
 import RevisionHistory from './revision-history';
 import DiffEditor from './diff-editor';
+import { unlock } from '../../lock-unlock';
+
+const { Badge } = unlock( componentsPrivateApis );
 
 const GUIDELINE_ITEMS = [
 	{
@@ -294,9 +298,9 @@ function AccordionWithAi( {
 							/>
 						) }
 						{ showDiff && ! isOpen && (
-							<span className="content-guidelines__suggestion-badge">
+							<Badge intent="success">
 								{ __( 'Suggestion' ) }
-							</span>
+							</Badge>
 						) }
 						<Icon
 							icon={ chevronDown }

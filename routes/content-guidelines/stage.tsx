@@ -30,6 +30,7 @@ import ActionsSection from './components/actions-section';
 import RevisionHistory from './components/revision-history';
 import { EXPLORATION_STORAGE_KEY } from './explorations';
 import ExplorationB from './components/exploration-b';
+import ExplorationC from './components/exploration-c';
 
 const GUIDELINE_ITEMS = [
 	{
@@ -214,6 +215,8 @@ function ContentGuidelinesPage() {
 	switch ( exploration ) {
 		case 'B':
 			return <ExplorationB />;
+		case 'C':
+			return <ExplorationC />;
 		default:
 			return <BaselineContentGuidelinesPage />;
 	}

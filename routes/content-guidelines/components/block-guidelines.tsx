@@ -7,6 +7,7 @@ import {
 	Button,
 	Icon,
 	Modal,
+	privateApis as componentsPrivateApis,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
@@ -37,6 +38,9 @@ import { saveContentGuidelines } from '../api';
 import { STORE_NAME } from '../store';
 import type { BlockGeneratingState } from '../ai/use-ai-guidelines';
 import './block-guidelines.scss';
+import { unlock } from '../../lock-unlock';
+
+const { Badge } = unlock( componentsPrivateApis );
 
 const PER_PAGE = 5;
 
@@ -88,11 +92,11 @@ const fields = [
 		getValue: ( { item } ) => item.label,
 		render: ( { item } ) => (
 			<span className="block-guidelines__label">
-				{ item.label }
+				<span>{ item.label }</span>
 				{ item.hasSuggestion && (
-					<span className="content-guidelines__suggestion-badge">
+					<Badge intent="success">
 						{ __( 'Suggestion' ) }
-					</span>
+					</Badge>
 				) }
 			</span>
 		),

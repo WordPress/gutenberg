@@ -4,6 +4,7 @@
 import {
 	Icon,
 	Spinner,
+	privateApis as componentsPrivateApis,
 	__experimentalText as Text,
 	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
@@ -13,13 +14,16 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './guideline-accordion.scss';
 import type { GuidelineAccordionProps } from '../types';
+import { unlock } from '../../lock-unlock';
+
+const { Badge } = unlock( componentsPrivateApis );
 
 export default function GuidelineAccordion( {
 	title,
@@ -30,8 +34,25 @@ export default function GuidelineAccordion( {
 	descriptionId,
 	isGenerating,
 	hasSuggestion,
+	forceOpen,
+	forceClose,
+	showSpinnerOnlyWhenOpen,
 }: GuidelineAccordionProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
+
+	// Allow parent to force the accordion open (e.g. from a recommendation click).
+	useEffect( () => {
+		if ( forceOpen ) {
+			setIsOpen( true );
+		}
+	}, [ forceOpen ] );
+
+	// Allow parent to force the accordion closed.
+	useEffect( () => {
+		if ( forceClose ) {
+			setIsOpen( false );
+		}
+	}, [ forceClose ] );
 
 	return (
 		<Card className="content-guidelines__accordion">
@@ -77,15 +98,16 @@ export default function GuidelineAccordion( {
 						</Text>
 					</VStack>
 					<HStack spacing={ 2 } expanded={ false }>
-						{ isGenerating && (
+						{ isGenerating &&
+							( ! showSpinnerOnlyWhenOpen || isOpen ) && (
 							<Spinner
 								className="content-guidelines__accordion-spinner"
 							/>
 						) }
 						{ hasSuggestion && ! isGenerating && ! isOpen && (
-							<span className="content-guidelines__suggestion-badge">
+							<Badge intent="success">
 								{ __( 'Suggestion' ) }
-							</span>
+							</Badge>
 						) }
 						<Icon
 							icon={ chevronDown }
