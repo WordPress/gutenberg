@@ -992,10 +992,10 @@ export const getDefaultTemplateId =
 			? template?.wp_id || template?.id
 			: template?.id;
 		// Endpoint may return an empty object if no template is found.
+		dispatch.receiveDefaultTemplateId( query, id || '' );
 		if ( id ) {
 			template.id = id;
 			registry.batch( () => {
-				dispatch.receiveDefaultTemplateId( query, id );
 				dispatch.receiveEntityRecords(
 					'postType',
 					template.type,
