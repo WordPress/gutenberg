@@ -61,7 +61,6 @@ type ActionCreators = {
 	addItem: typeof addItem;
 	addSideloadItem: typeof addSideloadItem;
 	removeItem: typeof removeItem;
-	pauseItem: typeof pauseItem;
 	prepareItem: typeof prepareItem;
 	processItem: typeof processItem;
 	finishOperation: typeof finishOperation;

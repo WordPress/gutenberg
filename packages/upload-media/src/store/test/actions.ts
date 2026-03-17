@@ -343,24 +343,19 @@ describe( 'actions', () => {
 				mediaSideload: jest.fn(),
 			} );
 
-			// Add a parent item first.
-			unlock( registry.dispatch( uploadStore ) ).addItem( {
-				file: jpegFile,
-			} );
-			const parentItem = unlock(
-				registry.select( uploadStore )
-			).getAllItems()[ 0 ];
+			// Use a fake parentId so we only test sideload scheduling.
+			const fakeParentId = 'fake-parent-id';
 
 			// Add two sideload items targeting the same post.
 			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
 				file: jpegFile,
-				parentId: parentItem.id,
+				parentId: fakeParentId,
 				additionalData: { post: 100, image_size: 'thumbnail' },
 				operations: [ OperationType.Upload ],
 			} );
 			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
 				file: jpegFile,
-				parentId: parentItem.id,
+				parentId: fakeParentId,
 				additionalData: { post: 100, image_size: 'medium' },
 				operations: [ OperationType.Upload ],
 			} );
@@ -372,7 +367,7 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems();
 			const sideloadItems = items.filter(
-				( item ) => item.parentId === parentItem.id
+				( item ) => item.parentId === fakeParentId
 			);
 
 			// Neither sideload item should be paused.
