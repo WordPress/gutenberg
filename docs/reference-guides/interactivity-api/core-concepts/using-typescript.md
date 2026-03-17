@@ -166,8 +166,8 @@ const { state } = store( 'myCounterPlugin', {
 		product: 2,
 	} as State, // Casts the entire state manually.
 	actions: {
-		increment() {
-			state.counter += state.product;
+		multiply() {
+			state.counter *= state.product;
 		},
 	},
 } );
