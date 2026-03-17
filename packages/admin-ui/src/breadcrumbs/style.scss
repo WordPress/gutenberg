@@ -1,6 +1,7 @@
 @use "@wordpress/base-styles/variables";
 
 .admin-ui-breadcrumbs__list {
+	font-size: var(--wpds-font-size-lg);
 	list-style: none;
 	padding: 0;
 	margin: 0;
