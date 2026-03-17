@@ -339,9 +339,31 @@
 
 // ── Proactive recommendations — two-column layout (Exploration C) ──
 
+// Ensure the page header stays above sticky sidebar content when scrolling.
+.admin-ui-page__header {
+	z-index: 2;
+}
+
 // Override overflow on the content wrapper so sticky works inside the two-col layout.
 .content-guidelines__content--two-col {
 	overflow: visible !important;
+}
+
+// Navigator and Navigator.Screen apply overflow-x: clip / auto, which per CSS spec
+// causes overflow-y to compute to auto, creating scroll contexts that trap
+// position: sticky. Reset them so .admin-ui-page__content remains the scroll container.
+.content-guidelines__navigator-reset {
+	// Navigator wrapper: overflow-x: clip + contain: layout
+	> * {
+		overflow: visible !important;
+		contain: none !important;
+	}
+
+	// Navigator.Screen: overflow-x: auto, max-height: 100%
+	> * > * {
+		overflow: visible !important;
+		max-height: none !important;
+	}
 }
 
 .content-guidelines__two-col {
@@ -383,8 +405,12 @@
 .content-guidelines__sidebar-col {
 	flex: 0 0 280px;
 	min-width: 0;
+	position: sticky;
+	top: 116px;
+	align-self: flex-start;
 
 	@media (max-width: $break-large) {
+		position: static;
 		flex-basis: 100%;
 	}
 }

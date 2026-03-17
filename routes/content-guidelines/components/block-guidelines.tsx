@@ -312,7 +312,7 @@ export default function BlockGuidelines( props: Partial< BlockGuidelinesAiProps 
 				<Button variant="primary" onClick={ openModal }>
 					{ __( 'Add block guidelines' ) }
 				</Button>
-				{ props.generateAllBlocks && ( rows.length === 0 || isAnyBlockGenerating ) && (
+				{ props.generateAllBlocks && rows.length === 0 && ! isAnyBlockGenerating && (
 					<Button
 						variant="tertiary"
 						onClick={ () => {
@@ -329,8 +329,8 @@ export default function BlockGuidelines( props: Partial< BlockGuidelinesAiProps 
 						{ __( 'Generate guidelines' ) }
 					</Button>
 				) }
-				{ props.generateAllBlocks && rows.length > 0 && ! isAnyBlockGenerating && (
-					hasBlockSuggestions && props.dismissBlockSuggestion ? (
+				{ props.generateAllBlocks && ( rows.length > 0 || isAnyBlockGenerating ) && (
+					hasBlockSuggestions && ! isAnyBlockGenerating && props.dismissBlockSuggestion ? (
 						<Button
 							variant="tertiary"
 							onClick={ () => {

@@ -104,8 +104,9 @@ interface LocalGuidelineAccordionProps {
 	descriptionId?: string;
 	isGenerating?: boolean;
 	hasSuggestion?: boolean;
-	forceOpen?: boolean;
+	forceOpenCounter?: number;
 	showSpinnerOnlyWhenOpen?: boolean;
+	isHighlighted?: boolean;
 }
 
 function GuidelineAccordion( {
@@ -117,19 +118,25 @@ function GuidelineAccordion( {
 	descriptionId,
 	isGenerating,
 	hasSuggestion,
-	forceOpen,
+	forceOpenCounter,
 	showSpinnerOnlyWhenOpen,
+	isHighlighted,
 }: LocalGuidelineAccordionProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 
 	useEffect( () => {
-		if ( forceOpen ) {
+		if ( forceOpenCounter && forceOpenCounter > 0 ) {
 			setIsOpen( true );
 		}
-	}, [ forceOpen ] );
+	}, [ forceOpenCounter ] );
+
+	const cardClassName = [
+		'content-guidelines__accordion',
+		isHighlighted ? 'content-guidelines__accordion--highlighted' : '',
+	].filter( Boolean ).join( ' ' );
 
 	return (
-		<Card className="content-guidelines__accordion">
+		<Card className={ cardClassName }>
 			<Button
 				className="content-guidelines__accordion-trigger"
 				onClick={ () => setIsOpen( ! isOpen ) }
@@ -190,6 +197,9 @@ function GuidelineAccordion( {
 								{ __( 'Suggestion' ) }
 							</Badge>
 						</span>
+						{ isOpen && isGenerating && (
+							<Spinner />
+						) }
 						<Icon
 							icon={ chevronDown }
 							className={
@@ -250,6 +260,7 @@ interface RecommendationsPanelProps {
 	onClickItem: ( slug: string ) => void;
 	onDismissItem: ( slug: string ) => void;
 	onCheckAgain: () => void;
+	onCancel: () => void;
 }
 
 const STAGGER_DELAY = 300; // ms between each item reveal
@@ -260,6 +271,7 @@ function RecommendationsPanel( {
 	onClickItem,
 	onDismissItem,
 	onCheckAgain,
+	onCancel,
 }: RecommendationsPanelProps ) {
 	// Snapshot: captured once when scanning completes. Not affected by inline
 	// accepts/dismisses — only updated on initial scan or "Check again".
@@ -521,7 +533,9 @@ interface AccordionWithAiProps {
 	onAccept: ( slug: string ) => void;
 	onDismiss: ( slug: string ) => void;
 	accordionRef?: ( el: HTMLDivElement | null ) => void;
-	forceOpen?: boolean;
+	forceOpenCounter?: number;
+	isHighlighted?: boolean;
+	onClearHighlight?: () => void;
 }
 
 function AccordionWithAi( {
@@ -535,7 +549,9 @@ function AccordionWithAi( {
 	onAccept,
 	onDismiss,
 	accordionRef,
-	forceOpen,
+	forceOpenCounter,
+	isHighlighted,
+	onClearHighlight,
 }: AccordionWithAiProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	// @ts-ignore
@@ -557,12 +573,25 @@ function AccordionWithAi( {
 
 	// Force open when a recommendation is clicked.
 	useEffect( () => {
-		if ( forceOpen ) {
+		if ( forceOpenCounter && forceOpenCounter > 0 ) {
 			setIsOpen( true );
 		}
-	}, [ forceOpen ] );
+	}, [ forceOpenCounter ] );
 
-	const preImproveDraft = useRef< string >( '' );
+	const preImproveDraft = useRef< string >( draft );
+
+	// Capture the draft before generation starts — handles both button clicks
+	// and sidebar-triggered scans where handleGenerate isn't called.
+	const prevSectionState = useRef< string | undefined >( sectionState );
+	useEffect( () => {
+		if (
+			prevSectionState.current !== 'requesting' &&
+			sectionState === 'requesting'
+		) {
+			preImproveDraft.current = draft;
+		}
+		prevSectionState.current = sectionState;
+	}, [ sectionState, draft ] );
 
 	const isStreaming =
 		sectionState === 'streaming' || sectionState === 'requesting';
@@ -634,6 +663,7 @@ function AccordionWithAi( {
 			setGuideline( slug, suggestion );
 		}
 		onAccept( slug );
+		onClearHighlight?.();
 	};
 
 	const handleDismiss = ( e: React.MouseEvent< HTMLButtonElement > ) => {
@@ -641,6 +671,7 @@ function AccordionWithAi( {
 		setDraft( preImproveDraft.current );
 		setGuideline( slug, preImproveDraft.current );
 		onDismiss( slug );
+		onClearHighlight?.();
 	};
 
 	const labelSource = isStreaming ? preImproveDraft.current : draft;
@@ -653,9 +684,14 @@ function AccordionWithAi( {
 	const headingId = `content-guidelines-${ slug }-heading`;
 	const descriptionId = `content-guidelines-${ slug }-description`;
 
+	const cardClassName = [
+		'content-guidelines__accordion',
+		isHighlighted ? 'content-guidelines__accordion--highlighted' : '',
+	].filter( Boolean ).join( ' ' );
+
 	return (
 		<div ref={ accordionRef }>
-			<Card className="content-guidelines__accordion">
+			<Card className={ cardClassName }>
 				<Button
 					className="content-guidelines__accordion-trigger"
 					onClick={ () => setIsOpen( ! isOpen ) }
@@ -850,6 +886,7 @@ export default function ExplorationC() {
 	const [ pageError, setPageError ] = useState< string | null >( null );
 	const [ scanTriggered, setScanTriggered ] = useState( false );
 	const [ blocksLocalGenerate, setBlocksLocalGenerate ] = useState( false );
+	const [ localGenerateSlugs, setLocalGenerateSlugs ] = useState< Set< string > >( () => new Set() );
 	const [ isGlobalScanning, setIsGlobalScanning ] = useState( false );
 
 	const [ bannerDismissed, setBannerDismissedState ] = useState( () =>
@@ -877,6 +914,7 @@ export default function ExplorationC() {
 		dismissSuggestion,
 		acceptBlockSuggestion,
 		dismissBlockSuggestion,
+		cancelAll,
 		isGenerating,
 	} = useAiGuidelines();
 
@@ -897,9 +935,32 @@ export default function ExplorationC() {
 	const blocksAccordionRef = useRef< HTMLDivElement >( null );
 
 	// Track which sections have been force-opened by clicking a recommendation.
-	const [ forceOpenSlugs, setForceOpenSlugs ] = useState< Set< string > >(
-		() => new Set()
-	);
+	// Uses a counter so that clicking the same recommendation again re-triggers the effect.
+	const [ forceOpenCounters, setForceOpenCounters ] = useState< Record< string, number > >( {} );
+
+	// Track which accordion is highlighted after a sidebar click.
+	const [ highlightedSlug, setHighlightedSlug ] = useState< string | null >( null );
+	const mainColRef = useRef< HTMLDivElement >( null );
+
+	// Click-outside listener to clear the highlight.
+	useEffect( () => {
+		if ( ! highlightedSlug ) {
+			return;
+		}
+		const handleClickOutside = ( e: MouseEvent ) => {
+			const target = e.target as HTMLElement;
+			// If click is inside the highlighted accordion card, keep the highlight.
+			const highlightedCard = mainColRef.current?.querySelector(
+				'.content-guidelines__accordion--highlighted'
+			);
+			if ( highlightedCard?.contains( target ) ) {
+				return;
+			}
+			setHighlightedSlug( null );
+		};
+		document.addEventListener( 'mousedown', handleClickOutside );
+		return () => document.removeEventListener( 'mousedown', handleClickOutside );
+	}, [ highlightedSlug ] );
 
 	useEffect( () => {
 		fetchContentGuidelines()
@@ -940,9 +1001,10 @@ export default function ExplorationC() {
 	for ( const item of GUIDELINE_ITEMS ) {
 		if ( item.slug === 'blocks' ) {
 			// Show a single recommendation for blocks if any have suggestions.
+			// Only show if suggestions came from the auto-scan, not in-card generation.
 			const blockSuggestionCount =
 				Object.keys( blockSuggestions ).length;
-			if ( blockSuggestionCount > 0 ) {
+			if ( blockSuggestionCount > 0 && ! blocksLocalGenerate ) {
 				recommendationItems.push( {
 					slug: 'blocks',
 					title: item.title,
@@ -957,7 +1019,8 @@ export default function ExplorationC() {
 		}
 		if (
 			sectionStates[ item.slug ] === 'done' &&
-			suggestions[ item.slug ] !== undefined
+			suggestions[ item.slug ] !== undefined &&
+			! localGenerateSlugs.has( item.slug )
 		) {
 			recommendationItems.push( {
 				slug: item.slug,
@@ -970,7 +1033,11 @@ export default function ExplorationC() {
 	}
 
 	const handleRecommendationClick = useCallback( ( slug: string ) => {
-		setForceOpenSlugs( ( prev ) => new Set( prev ).add( slug ) );
+		setForceOpenCounters( ( prev ) => ( {
+			...prev,
+			[ slug ]: ( prev[ slug ] || 0 ) + 1,
+		} ) );
+		setHighlightedSlug( slug );
 
 		// Scroll to the section after a brief delay to allow accordion to open.
 		requestAnimationFrame( () => {
@@ -1025,6 +1092,7 @@ export default function ExplorationC() {
 				</div>
 			) : (
 				! pageError && (
+					<div className="content-guidelines__navigator-reset">
 					<Navigator initialPath="/">
 						<Navigator.Screen path="/">
 							<VStack className="content-guidelines__content content-guidelines__content--two-col">
@@ -1098,7 +1166,7 @@ export default function ExplorationC() {
 
 								<div className="content-guidelines__two-col">
 									{ /* Main content column */ }
-									<div className="content-guidelines__main-col">
+									<div className="content-guidelines__main-col" ref={ mainColRef }>
 										{ /*
 										 * Disable reason: The `list` ARIA role is redundant but
 										 * Safari+VoiceOver won't announce the list otherwise.
@@ -1142,10 +1210,11 @@ export default function ExplorationC() {
 																			blockSuggestions
 																		).length > 0
 																	}
-																	forceOpen={
-																		forceOpenSlugs.has(
-																			'blocks'
-																		)
+																	forceOpenCounter={
+																		forceOpenCounters[ 'blocks' ] || 0
+																	}
+																	isHighlighted={
+																		highlightedSlug === 'blocks'
 																	}
 																>
 																	<BlockGuidelines
@@ -1192,9 +1261,10 @@ export default function ExplorationC() {
 																		item.slug
 																	] || 'idle'
 																}
-																onGenerateSection={
-																	generateSection
-																}
+																onGenerateSection={ ( slug: string ) => {
+																	setLocalGenerateSlugs( ( prev ) => new Set( prev ).add( slug ) );
+																	generateSection( slug );
+																} }
 																isTextStreaming={
 																	!! textStreamingKeys[
 																		item.slug
@@ -1211,11 +1281,13 @@ export default function ExplorationC() {
 																		item.slug
 																	] = el;
 																} }
-																forceOpen={
-																	forceOpenSlugs.has(
-																		item.slug
-																	)
+																forceOpenCounter={
+																	forceOpenCounters[ item.slug ] || 0
 																}
+																isHighlighted={
+																	highlightedSlug === item.slug
+																}
+																onClearHighlight={ () => setHighlightedSlug( null ) }
 															/>
 														) }
 													</div>
@@ -1246,6 +1318,10 @@ export default function ExplorationC() {
 														: DEFAULT_BLOCKS;
 												generateAllBlocks( blockNames );
 											} }
+											onCancel={ () => {
+												cancelAll();
+												setIsGlobalScanning( false );
+											} }
 										/>
 									</div>
 								</div>
@@ -1255,6 +1331,7 @@ export default function ExplorationC() {
 							<RevisionHistory />
 						</Navigator.Screen>
 					</Navigator>
+					</div>
 				)
 			) }
 		</Page>
