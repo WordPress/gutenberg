@@ -405,6 +405,22 @@
 				}
 			}
 		},
+		"settingsResponsiveProperties": {
+			"type": "object",
+			"properties": {
+				"responsive": {
+					"description": "Settings related to responsive behavior.",
+					"type": "object",
+					"properties": {
+						"blockVisibility": {
+							"description": "Controls the block visibility feature. Set to `false` to disable all viewport visibility controls in the editor. Saved block visibility attributes are always rendered regardless of this setting.",
+							"type": "boolean"
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsShadowProperties": {
 			"type": "object",
 			"properties": {
@@ -901,6 +917,7 @@
 				{ "$ref": "#/definitions/settingsLayoutProperties" },
 				{ "$ref": "#/definitions/settingsLightboxProperties" },
 				{ "$ref": "#/definitions/settingsPositionProperties" },
+				{ "$ref": "#/definitions/settingsResponsiveProperties" },
 				{ "$ref": "#/definitions/settingsShadowProperties" },
 				{ "$ref": "#/definitions/settingsSpacingProperties" },
 				{ "$ref": "#/definitions/settingsTypographyProperties" },
@@ -934,6 +951,7 @@
 				"layout",
 				"lightbox",
 				"position",
+				"responsive",
 				"shadow",
 				"spacing",
 				"typography",

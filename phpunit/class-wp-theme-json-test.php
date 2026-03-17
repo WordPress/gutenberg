@@ -157,6 +157,24 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
+	public function test_get_settings_responsive_block_visibility() {
+		// Test that the value passes through the full sanitization pipeline,
+		// including remove_insecure_properties (called when saving global styles).
+		$theme_json_data = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'responsive' => array(
+					'blockVisibility' => false,
+				),
+			),
+		);
+		$sanitized  = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $theme_json_data );
+		$theme_json = new WP_Theme_JSON_Gutenberg( $sanitized );
+		$actual     = $theme_json->get_settings();
+
+		$this->assertFalse( $actual['responsive']['blockVisibility'] );
+	}
+
 	public function test_get_settings_presets_are_keyed_by_origin() {
 		$default_origin = new WP_Theme_JSON_Gutenberg(
 			array(

@@ -58,6 +58,9 @@ function selector( select ) {
 		isZoomOutMode: isZoomOut(),
 		isDragging: isDragging(),
 		viewportModalClientIds: getViewportModalClientIds(),
+		blockVisibilitySetting:
+			select( blockEditorStore ).getSettings().__experimentalFeatures
+				?.responsive?.blockVisibility,
 	};
 }
 
@@ -82,6 +85,7 @@ export default function BlockTools( {
 		isZoomOutMode,
 		isDragging,
 		viewportModalClientIds,
+		blockVisibilitySetting,
 	} = useSelect( selector, [] );
 	const isMatch = useShortcutEventMatch();
 	const {
@@ -273,6 +277,9 @@ export default function BlockTools( {
 				}
 
 				// Open the visibility breakpoints modal.
+				if ( blockVisibilitySetting === false ) {
+					return;
+				}
 				showViewportModal( clientIds );
 			}
 		}

@@ -133,6 +133,7 @@ function ListViewBlock( {
 		allowRightClickOverrides,
 		editedSection,
 		viewportSettings,
+		blockVisibilitySetting,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -151,6 +152,9 @@ function ListViewBlock( {
 				allowRightClickOverrides: settings.allowRightClickOverrides,
 				editedSection: getEditedContentOnlySection(),
 				viewportSettings: settings.__experimentalFeatures?.viewport,
+				blockVisibilitySetting:
+					settings.__experimentalFeatures?.responsive
+						?.blockVisibility,
 			};
 		},
 		[ clientId ]
@@ -412,6 +416,10 @@ function ListViewBlock( {
 					( id ) => getBlockEditingMode( id ) !== 'default'
 				)
 			) {
+				return;
+			}
+
+			if ( blockVisibilitySetting === false ) {
 				return;
 			}
 
