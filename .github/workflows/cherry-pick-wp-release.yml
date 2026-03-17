@@ -150,38 +150,43 @@ jobs:
                       const branchName = `cherry-pick/${prNumber}-to-${targetBranch.replace('/', '-')}`;
                       console.log(`prNumber: ${prNumber}`);
                       console.log(`targetBranch: ${targetBranch}`);
+
+                      const body = [
+                        `There was a conflict while trying to cherry-pick the commit to the \`${targetBranch}\` branch. Please resolve the conflict manually and create a PR to the \`${targetBranch}\` branch.`,
+                        '',
+                        `PRs to \`${targetBranch}\` are similar to PRs to trunk, but you should base your PR on the \`${targetBranch}\` branch instead of trunk. This can be done from the main repository or from your fork.`,
+                        '',
+                        '```bash',
+                        `# Checkout the ${targetBranch} branch instead of trunk.`,
+                        `git checkout ${targetBranch}`,
+                        '',
+                        '# Create a new branch for your cherry-pick PR.',
+                        `git checkout -b ${branchName}`,
+                        '',
+                        '# Cherry-pick the commit.',
+                        `git cherry-pick ${commitSha}`,
+                        '',
+                        '# If there are conflicts, resolve them, then continue:',
+                        '# git status',
+                        '# git add .',
+                        '# git cherry-pick --continue',
+                        '',
+                        '# Push the branch to the repository (or your fork).',
+                        `git push origin ${branchName}`,
+                        '```',
+                        '',
+                        `Then create a PR with the base set to \`${targetBranch}\`. You can use [GitHub CLI](https://cli.github.com/manual/gh_pr_create) to do this:`,
+                        '',
+                        '```bash',
+                        `gh pr create --base ${targetBranch} --title "Cherry-pick \`${shortSha}\` to \`${targetBranch}\`" --web`,
+                        '```',
+                        '',
+                        `Or manually set the base branch: [Changing the base branch of a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-base-branch-of-a-pull-request).`,
+                      ].join('\n');
+
                       await github.rest.issues.createComment({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
                         issue_number: prNumber,
-                        body: `There was a conflict while trying to cherry-pick the commit to the \`${targetBranch}\` branch. Please resolve the conflict manually and create a PR to the \`${targetBranch}\` branch.
-
-PRs to \`${targetBranch}\` are similar to PRs to trunk, but you should base your PR on the \`${targetBranch}\` branch instead of trunk. This can be done from the main repository or from your fork.
-
-\`\`\`bash
-# Checkout the ${targetBranch} branch instead of trunk.
-git checkout ${targetBranch}
-
-# Create a new branch for your cherry-pick PR.
-git checkout -b ${branchName}
-
-# Cherry-pick the commit.
-git cherry-pick ${commitSha}
-
-# If there are conflicts, resolve them, then continue:
-# git status
-# git add .
-# git cherry-pick --continue
-
-# Push the branch to the repository (or your fork).
-git push origin ${branchName}
-\`\`\`
-
-Then create a PR with the base set to \`${targetBranch}\`. You can use [GitHub CLI](https://cli.github.com/manual/gh_pr_create) to do this:
-
-\`\`\`bash
-gh pr create --base ${targetBranch} --title "Cherry-pick \\\`${shortSha}\\\` to \\\`${targetBranch}\\\`" --web
-\`\`\`
-
-Or manually set the base branch: [Changing the base branch of a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-base-branch-of-a-pull-request).`
+                        body,
                       });
