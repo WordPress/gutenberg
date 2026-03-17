@@ -35,6 +35,7 @@ export function useViewConfig( {
 			return {
 				defaultView: config?.default_view,
 				defaultLayouts: config?.default_layouts,
+				viewList: config?.view_list,
 			};
 		},
 		[ kind, name ]
