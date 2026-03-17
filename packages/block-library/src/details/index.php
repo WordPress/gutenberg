@@ -30,9 +30,15 @@ function render_block_core_details( $attributes, $content, $block ) {
 		return $content;
 	}
 
-	$title        = get_the_title( $post_id );
+	$title = get_the_title( $post_id );
 
-	// @since 6.9.0  Fetches the content for the post.
+	/**
+	 * Filters the post content.
+	 *
+	 * @since 6.9.0
+	 *
+	 * @param string $post_content The post content.
+	 */
 	$post_content = apply_filters( 'the_content', get_the_content( null, false, $post_id ) );
 
 	$show_content = isset( $attributes['showContent'] ) && $attributes['showContent'];
