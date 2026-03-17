@@ -9,6 +9,30 @@ import { Y } from '@wordpress/sync';
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
 /**
+ * Mock getBlockTypes so isRichTextAttribute can identify rich-text attrs.
+ */
+jest.mock( '@wordpress/blocks', () => {
+	const actual = jest.requireActual( '@wordpress/blocks' ) as Record<
+		string,
+		unknown
+	>;
+	return {
+		...actual,
+		getBlockTypes: () => [
+			{
+				name: 'core/paragraph',
+				attributes: { content: { type: 'rich-text' } },
+			},
+		],
+	};
+} );
+
+/**
+ * WordPress dependencies
+ */
+import { RichTextData } from '@wordpress/rich-text';
+
+/**
  * Internal dependencies
  */
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
@@ -515,6 +539,25 @@ describe( 'crdt', () => {
 			expect( changes ).toHaveProperty( 'blocks' );
 		} );
 
+		it( 'returns rich-text block attributes as RichTextData, not strings', () => {
+			// Simulate User A writing a paragraph block into the CRDT doc.
+			addBlockToDoc( map, 'block-1', 'Hello world' );
+
+			// Simulate User B reading the CRDT doc with no local blocks.
+			const editedRecord = { blocks: [] } as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			const block = ( changes.blocks as any[] )?.[ 0 ];
+			expect( block ).toBeDefined();
+			expect( block.attributes.content ).toBeInstanceOf( RichTextData );
+			expect( block.attributes.content.text ).toBe( 'Hello world' );
+		} );
+
 		it( 'includes undefined blocks in changes', () => {
 			map.set( 'blocks', undefined );
 
@@ -801,11 +844,13 @@ describe( 'crdt', () => {
  * @param map
  * @param clientId Block client ID.
  * @param content  Initial text content.
+ * @param name     Block name (default: 'core/paragraph').
  */
 function addBlockToDoc(
 	map: YMapWrap< YPostRecord >,
 	clientId: string,
-	content: string
+	content: string,
+	name = 'core/paragraph'
 ): Y.Text {
 	let blocks = map.get( 'blocks' );
 	if ( ! ( blocks instanceof Y.Array ) ) {
@@ -814,6 +859,7 @@ function addBlockToDoc(
 	}
 
 	const block = createYMap< YBlockRecord >();
+	block.set( 'name', name );
 	block.set( 'clientId', clientId );
 	const attrs = new Y.Map();
 	const ytext = new Y.Text( content );
