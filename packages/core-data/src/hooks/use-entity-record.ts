@@ -9,7 +9,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as coreStore } from '../';
-import type { Status } from './constants';
+import { Status } from './constants';
 
 export interface EntityRecordResolution< RecordType > {
 	/** The requested entity record */
@@ -193,17 +193,17 @@ export default function useEntityRecord< RecordType >(
 			let status: Status;
 			switch ( resolutionStatus ) {
 				case 'resolving':
-					status = 'RESOLVING' as Status;
+					status = Status.Resolving;
 					break;
 				case 'finished':
-					status = 'SUCCESS' as Status;
+					status = Status.Success;
 					break;
 				case 'error':
-					status = 'ERROR' as Status;
+					status = Status.Error;
 					break;
 				case undefined:
 				default:
-					status = 'IDLE' as Status;
+					status = Status.Idle;
 					break;
 			}
 
@@ -228,11 +228,10 @@ export default function useEntityRecord< RecordType >(
 					name,
 					recordId
 				),
-				isResolving: status === ( 'RESOLVING' as Status ),
-				hasStarted: status !== ( 'IDLE' as Status ),
+				isResolving: status === Status.Resolving,
+				hasStarted: status !== Status.Idle,
 				hasResolved:
-					status === ( 'SUCCESS' as Status ) ||
-					status === ( 'ERROR' as Status ),
+					status === Status.Success || status === Status.Error,
 				status,
 			};
 		},

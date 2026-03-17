@@ -11,7 +11,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { store as coreStore } from '../';
 import type { Options } from './use-entity-record';
-import type { Status } from './constants';
+import { Status } from './constants';
 import { unlock } from '../lock-unlock';
 import { getNormalizedCommaSeparable } from '../utils';
 
@@ -135,17 +135,17 @@ export default function useEntityRecords< RecordType >(
 			let status: Status;
 			switch ( resolutionStatus ) {
 				case 'resolving':
-					status = 'RESOLVING' as Status;
+					status = Status.Resolving;
 					break;
 				case 'finished':
-					status = 'SUCCESS' as Status;
+					status = Status.Success;
 					break;
 				case 'error':
-					status = 'ERROR' as Status;
+					status = Status.Error;
 					break;
 				case undefined:
 				default:
-					status = 'IDLE' as Status;
+					status = Status.Idle;
 					break;
 			}
 
@@ -165,11 +165,10 @@ export default function useEntityRecords< RecordType >(
 					name,
 					queryArgs
 				),
-				isResolving: status === ( 'RESOLVING' as Status ),
-				hasStarted: status !== ( 'IDLE' as Status ),
+				isResolving: status === Status.Resolving,
+				hasStarted: status !== Status.Idle,
 				hasResolved:
-					status === ( 'SUCCESS' as Status ) ||
-					status === ( 'ERROR' as Status ),
+					status === Status.Success || status === Status.Error,
 				status,
 			};
 		},

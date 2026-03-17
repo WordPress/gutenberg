@@ -155,7 +155,7 @@ function useResourcePermissions< IdType = void >(
 
 				const isResolving = create.isResolving || read.isResolving;
 				const hasResolved = create.hasResolved && read.hasResolved;
-				let status = Status.Idle;
+				let status: Status = Status.Idle;
 				if ( isResolving ) {
 					status = Status.Resolving;
 				} else if ( hasResolved ) {
@@ -185,7 +185,7 @@ function useResourcePermissions< IdType = void >(
 				update.hasResolved &&
 				_delete.hasResolved;
 
-			let status = Status.Idle;
+			let status: Status = Status.Idle;
 			if ( isResolving ) {
 				status = Status.Resolving;
 			} else if ( hasResolved ) {
