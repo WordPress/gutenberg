@@ -17,8 +17,13 @@ export function createUploadFormData(
 ): FormData {
 	const data = new FormData();
 
-	// Append the file with a fallback name based on MIME type if no name is set.
-	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
+	// Ensure the file has a name, falling back to a name derived from MIME type.
+	const fileName = file.name || file.type.replace( '/', '.' );
+	const fileToUpload =
+		file.name === fileName
+			? file
+			: new File( [ file ], fileName, { type: file.type } );
+	data.append( 'file', fileToUpload );
 
 	// Add any additional data using the flatten helper for nested objects.
 	for ( const [ key, value ] of Object.entries( additionalData ) ) {
@@ -45,8 +50,13 @@ export function createSideloadFormData(
 ): FormData {
 	const data = new FormData();
 
-	// Append the file with a fallback name based on MIME type if no name is set.
-	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
+	// Ensure the file has a name, falling back to a name derived from MIME type.
+	const fileName = file.name || file.type.replace( '/', '.' );
+	const fileToUpload =
+		file.name === fileName
+			? file
+			: new File( [ file ], fileName, { type: file.type } );
+	data.append( 'file', fileToUpload );
 
 	// Add any additional data using the flatten helper for nested objects.
 	for ( const [ key, value ] of Object.entries( additionalData ) ) {

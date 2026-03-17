@@ -114,13 +114,7 @@ describe( 'sideloadToServer', () => {
 			type: 'image/webp',
 		} );
 
-		const promise = sideloadToServer(
-			file,
-			42,
-			{},
-			undefined,
-			onProgress
-		);
+		const promise = sideloadToServer( file, 42, {}, undefined, onProgress );
 
 		mockXhrInstance.status = 200;
 		mockXhrInstance.responseText = makeResponse();
@@ -141,13 +135,7 @@ describe( 'sideloadToServer', () => {
 			type: 'image/webp',
 		} );
 
-		const promise = sideloadToServer(
-			file,
-			42,
-			{},
-			undefined,
-			onProgress
-		);
+		const promise = sideloadToServer( file, 42, {}, undefined, onProgress );
 
 		mockXhrInstance.upload.onprogress( {
 			lengthComputable: true,
@@ -170,13 +158,7 @@ describe( 'sideloadToServer', () => {
 			type: 'image/webp',
 		} );
 
-		const promise = sideloadToServer(
-			file,
-			42,
-			{},
-			undefined,
-			onProgress
-		);
+		const promise = sideloadToServer( file, 42, {}, undefined, onProgress );
 
 		mockXhrInstance.status = 200;
 		mockXhrInstance.responseText = makeResponse( 99 );
@@ -193,13 +175,7 @@ describe( 'sideloadToServer', () => {
 			type: 'image/webp',
 		} );
 
-		const promise = sideloadToServer(
-			file,
-			42,
-			{},
-			undefined,
-			onProgress
-		);
+		const promise = sideloadToServer( file, 42, {}, undefined, onProgress );
 
 		mockXhrInstance.onerror();
 
@@ -214,13 +190,7 @@ describe( 'sideloadToServer', () => {
 			type: 'image/webp',
 		} );
 
-		const promise = sideloadToServer(
-			file,
-			42,
-			{},
-			undefined,
-			onProgress
-		);
+		const promise = sideloadToServer( file, 42, {}, undefined, onProgress );
 
 		mockXhrInstance.status = 403;
 		mockXhrInstance.responseText = 'Forbidden';

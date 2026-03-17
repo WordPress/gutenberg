@@ -372,11 +372,8 @@ describe( 'uploadToServer', () => {
 		mockXhrInstance.onabort();
 
 		await expect( promise ).rejects.toThrow( 'Aborted' );
-		try {
-			await promise;
-		} catch ( error ) {
-			expect( ( error as DOMException ).name ).toBe( 'AbortError' );
-		}
+		const error = await promise.catch( ( e: unknown ) => e );
+		expect( ( error as DOMException ).name ).toBe( 'AbortError' );
 	} );
 
 	it( 'should reject immediately if signal is already aborted', async () => {

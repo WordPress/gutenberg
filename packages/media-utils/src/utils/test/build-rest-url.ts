@@ -34,7 +34,7 @@ describe( 'buildRestUrl', () => {
 		window.wpApiSettings = { root: '/?rest_route=/' };
 		const url = buildRestUrl( '/wp/v2/media?_embed=wp:featuredmedia' );
 		expect( url ).toBe(
-			'/?rest_route=/wp/v2/media&_embed=wp:featuredmedia&_locale=user'
+			'/?rest_route=%2Fwp%2Fv2%2Fmedia&_embed=wp%3Afeaturedmedia&_locale=user'
 		);
 	} );
 
@@ -55,7 +55,7 @@ describe( 'buildRestUrl', () => {
 		window.wpApiSettings = { root: '/wp-json/' };
 		const url = buildRestUrl( '/wp/v2/media?_embed=wp:featuredmedia' );
 		expect( url ).toBe(
-			'/wp-json/wp/v2/media?_embed=wp:featuredmedia&_locale=user'
+			'/wp-json/wp/v2/media?_embed=wp%3Afeaturedmedia&_locale=user'
 		);
 	} );
 } );

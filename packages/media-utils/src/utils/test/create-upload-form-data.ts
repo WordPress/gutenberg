@@ -7,25 +7,28 @@ import {
 } from '../create-upload-form-data';
 
 describe( 'createUploadFormData', () => {
-	it( 'should append file with correct name', () => {
+	it( 'should append file to form data', () => {
 		const file = new File( [ 'content' ], 'photo.jpg', {
 			type: 'image/jpeg',
 		} );
-		const formData = createUploadFormData( file );
+		const appendSpy = jest.spyOn( FormData.prototype, 'append' );
+		createUploadFormData( file );
 
-		expect( formData.get( 'file' ) ).toBeInstanceOf( File );
-		const result = formData.get( 'file' ) as File;
-		expect( result.name ).toBe( 'photo.jpg' );
+		expect( appendSpy ).toHaveBeenCalledWith( 'file', file );
+		appendSpy.mockRestore();
 	} );
 
 	it( 'should use MIME-type fallback when file has no name', () => {
 		const file = new File( [ 'content' ], '', {
 			type: 'image/jpeg',
 		} );
-		const formData = createUploadFormData( file );
+		const appendSpy = jest.spyOn( FormData.prototype, 'append' );
+		createUploadFormData( file );
 
-		const result = formData.get( 'file' ) as File;
-		expect( result.name ).toBe( 'image.jpeg' );
+		// When file has no name, a new File with a derived name is created.
+		const appendedFile = appendSpy.mock.calls[ 0 ][ 1 ] as File;
+		expect( appendedFile.name ).toBe( 'image.jpeg' );
+		appendSpy.mockRestore();
 	} );
 
 	it( 'should append additional data fields', () => {
@@ -56,25 +59,26 @@ describe( 'createUploadFormData', () => {
 		const file = new File( [ 'content' ], 'photo.jpg', {
 			type: 'image/jpeg',
 		} );
-		const formData = createUploadFormData( file, {} );
+		const appendSpy = jest.spyOn( FormData.prototype, 'append' );
+		createUploadFormData( file, {} );
 
-		expect( formData.get( 'file' ) ).toBeInstanceOf( File );
-		// Only the file field should be present.
-		const keys = Array.from( formData.keys() );
-		expect( keys ).toEqual( [ 'file' ] );
+		// Only the file field should be appended.
+		expect( appendSpy ).toHaveBeenCalledTimes( 1 );
+		expect( appendSpy ).toHaveBeenCalledWith( 'file', file );
+		appendSpy.mockRestore();
 	} );
 } );
 
 describe( 'createSideloadFormData', () => {
-	it( 'should create FormData with file for sideloading', () => {
+	it( 'should append file for sideloading', () => {
 		const file = new File( [ 'content' ], 'image.webp', {
 			type: 'image/webp',
 		} );
-		const formData = createSideloadFormData( file );
+		const appendSpy = jest.spyOn( FormData.prototype, 'append' );
+		createSideloadFormData( file );
 
-		const result = formData.get( 'file' ) as File;
-		expect( result ).toBeInstanceOf( File );
-		expect( result.name ).toBe( 'image.webp' );
+		expect( appendSpy ).toHaveBeenCalledWith( 'file', file );
+		appendSpy.mockRestore();
 	} );
 
 	it( 'should append sideload-specific additional data', () => {
