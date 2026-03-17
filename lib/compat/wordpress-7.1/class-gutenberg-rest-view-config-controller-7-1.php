@@ -142,9 +142,9 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					'slug'  => 'all',
 				),
 				array(
-					'title'        => __( 'Published', 'gutenberg' ),
-					'slug'         => 'published',
-					'view' => array(
+					'title' => __( 'Published', 'gutenberg' ),
+					'slug'  => 'published',
+					'view'  => array(
 						'filters' => array(
 							array(
 								'field'    => 'status',
@@ -156,9 +156,9 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					),
 				),
 				array(
-					'title'        => __( 'Scheduled', 'gutenberg' ),
-					'slug'         => 'future',
-					'view' => array(
+					'title' => __( 'Scheduled', 'gutenberg' ),
+					'slug'  => 'future',
+					'view'  => array(
 						'filters' => array(
 							array(
 								'field'    => 'status',
@@ -170,9 +170,9 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					),
 				),
 				array(
-					'title'        => __( 'Drafts', 'gutenberg' ),
-					'slug'         => 'drafts',
-					'view' => array(
+					'title' => __( 'Drafts', 'gutenberg' ),
+					'slug'  => 'drafts',
+					'view'  => array(
 						'filters' => array(
 							array(
 								'field'    => 'status',
@@ -184,9 +184,9 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					),
 				),
 				array(
-					'title'        => __( 'Pending', 'gutenberg' ),
-					'slug'         => 'pending',
-					'view' => array(
+					'title' => __( 'Pending', 'gutenberg' ),
+					'slug'  => 'pending',
+					'view'  => array(
 						'filters' => array(
 							array(
 								'field'    => 'status',
@@ -198,9 +198,9 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					),
 				),
 				array(
-					'title'        => __( 'Private', 'gutenberg' ),
-					'slug'         => 'private',
-					'view' => array(
+					'title' => __( 'Private', 'gutenberg' ),
+					'slug'  => 'private',
+					'view'  => array(
 						'filters' => array(
 							array(
 								'field'    => 'status',
@@ -212,9 +212,9 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					),
 				),
 				array(
-					'title'        => __( 'Trash', 'gutenberg' ),
-					'slug'         => 'trash',
-					'view' => array(
+					'title' => __( 'Trash', 'gutenberg' ),
+					'slug'  => 'trash',
+					'view'  => array(
 						'type'    => 'table',
 						'layout'  => isset( $default_layouts['table']['layout'] ) ? $default_layouts['table']['layout'] : array(),
 						'filters' => array(
@@ -364,13 +364,13 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					'items'       => array(
 						'type'       => 'object',
 						'properties' => array(
-							'title'        => array(
+							'title' => array(
 								'type' => 'string',
 							),
-							'slug'         => array(
+							'slug'  => array(
 								'type' => 'string',
 							),
-							'view' => array(
+							'view'  => array(
 								'type' => 'object',
 							),
 						),
