@@ -6,94 +6,188 @@
 /**
  * Size scale for padding tokens.
  */
-export type PaddingSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
+export type PaddingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 
 /**
  * Size scale for gap tokens.
  */
-export type GapSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
+export type GapSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 
 /**
  * Size scale for surface width tokens.
  */
-export type SurfaceWidthSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+export type SurfaceWidthSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
 /**
  * Size scale for duration tokens.
  */
-export type DurationSize = "xs" | "sm" | "md" | "lg" | "xl";
+export type DurationSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 /**
  * Easing curve variants.
  */
-export type Easing = "standard" | "decelerate" | "accelerate" | "emphasized-decelerate" | "emphasized-accelerate";
+export type Easing =
+	| 'standard'
+	| 'decelerate'
+	| 'accelerate'
+	| 'emphasized-decelerate'
+	| 'emphasized-accelerate';
 
 /**
  * Size scale for border radius tokens.
  */
-export type BorderRadiusSize = "xs" | "sm" | "md" | "lg";
+export type BorderRadiusSize = 'xs' | 'sm' | 'md' | 'lg';
 
 /**
  * Size scale for border width tokens.
  */
-export type BorderWidthSize = "xs" | "sm" | "md" | "lg" | "focus";
+export type BorderWidthSize = 'xs' | 'sm' | 'md' | 'lg' | 'focus';
 
 /**
  * Target elements that tokens can be applied to.
  */
-export type Target = "surface" | "interactive" | "track" | "thumb" | "content" | "focus";
+export type Target =
+	| 'surface'
+	| 'interactive'
+	| 'track'
+	| 'thumb'
+	| 'content'
+	| 'focus';
 
 /**
  * Background color variants for surface elements.
  */
-export type SurfaceBackgroundColor = "neutral" | "neutral-strong" | "neutral-weak" | "brand" | "success" | "success-weak" | "info" | "info-weak" | "warning" | "warning-weak" | "caution" | "caution-weak" | "error" | "error-weak";
+export type SurfaceBackgroundColor =
+	| 'neutral'
+	| 'neutral-strong'
+	| 'neutral-weak'
+	| 'brand'
+	| 'success'
+	| 'success-weak'
+	| 'info'
+	| 'info-weak'
+	| 'warning'
+	| 'warning-weak'
+	| 'caution'
+	| 'caution-weak'
+	| 'error'
+	| 'error-weak';
 
 /**
  * Background color variants for interactive elements.
  */
-export type InteractiveBackgroundColor = "neutral-strong" | "neutral-weak" | "brand-strong" | "brand-weak" | "error" | "error-strong" | "error-weak";
+export type InteractiveBackgroundColor =
+	| 'neutral-strong'
+	| 'neutral-weak'
+	| 'brand-strong'
+	| 'brand-weak'
+	| 'error'
+	| 'error-strong'
+	| 'error-weak';
 
 /**
  * Foreground color variants for content text and icons.
  */
-export type ContentForegroundColor = "neutral" | "neutral-weak" | "success" | "success-weak" | "info" | "info-weak" | "warning" | "warning-weak" | "caution" | "caution-weak" | "error" | "error-weak";
+export type ContentForegroundColor =
+	| 'neutral'
+	| 'neutral-weak'
+	| 'success'
+	| 'success-weak'
+	| 'info'
+	| 'info-weak'
+	| 'warning'
+	| 'warning-weak'
+	| 'caution'
+	| 'caution-weak'
+	| 'error'
+	| 'error-weak';
 
 /**
  * Foreground color variants for interactive element text and icons.
  */
-export type InteractiveForegroundColor = "neutral" | "neutral-strong" | "neutral-weak" | "brand" | "brand-strong" | "error" | "error-strong";
+export type InteractiveForegroundColor =
+	| 'neutral'
+	| 'neutral-strong'
+	| 'neutral-weak'
+	| 'brand'
+	| 'brand-strong'
+	| 'error'
+	| 'error-strong';
 
 /**
  * Stroke color variants for surface borders.
  */
-export type SurfaceStrokeColor = "neutral" | "neutral-weak" | "neutral-strong" | "brand" | "brand-strong" | "success" | "success-strong" | "info" | "info-strong" | "warning" | "warning-strong" | "error" | "error-strong";
+export type SurfaceStrokeColor =
+	| 'neutral'
+	| 'neutral-weak'
+	| 'neutral-strong'
+	| 'brand'
+	| 'brand-strong'
+	| 'success'
+	| 'success-strong'
+	| 'info'
+	| 'info-strong'
+	| 'warning'
+	| 'warning-strong'
+	| 'error'
+	| 'error-strong';
 
 /**
  * Stroke color variants for interactive element borders.
  */
-export type InteractiveStrokeColor = "neutral" | "neutral-strong" | "brand" | "error" | "error-strong";
+export type InteractiveStrokeColor =
+	| 'neutral'
+	| 'neutral-strong'
+	| 'brand'
+	| 'error'
+	| 'error-strong';
 
 /**
  * Foreground color variants for text elements.
  */
-export type ForegroundColor = "neutral" | "neutral-weak" | "success" | "success-weak" | "info" | "info-weak" | "warning" | "warning-weak" | "caution" | "caution-weak" | "error" | "error-weak" | "neutral-active" | "neutral-disabled" | "neutral-strong" | "neutral-strong-active" | "neutral-strong-disabled" | "neutral-weak-disabled" | "brand" | "brand-active" | "brand-strong" | "brand-strong-active" | "error-active" | "error-strong" | "error-strong-active";
+export type ForegroundColor =
+	| 'neutral'
+	| 'neutral-weak'
+	| 'success'
+	| 'success-weak'
+	| 'info'
+	| 'info-weak'
+	| 'warning'
+	| 'warning-weak'
+	| 'caution'
+	| 'caution-weak'
+	| 'error'
+	| 'error-weak'
+	| 'neutral-active'
+	| 'neutral-disabled'
+	| 'neutral-strong'
+	| 'neutral-strong-active'
+	| 'neutral-strong-disabled'
+	| 'neutral-weak-disabled'
+	| 'brand'
+	| 'brand-active'
+	| 'brand-strong'
+	| 'brand-strong-active'
+	| 'error-active'
+	| 'error-strong'
+	| 'error-strong-active';
 
 /**
  * Font family variants.
  */
-export type FontFamily = "heading" | "body" | "mono";
+export type FontFamily = 'heading' | 'body' | 'mono';
 
 /**
  * Font size scale.
  */
-export type FontSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
 /**
  * Font weight variants.
  */
-export type FontWeight = "regular" | "medium";
+export type FontWeight = 'regular' | 'medium';
 
 /**
  * Line height scale.
  */
-export type LineHeight = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+export type LineHeight = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
