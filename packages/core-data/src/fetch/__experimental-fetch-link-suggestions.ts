@@ -131,31 +131,65 @@ export default async function fetchLinkSuggestions(
 	const queries: Promise< SearchResult[] >[] = [];
 
 	if ( ! type || type === 'post' ) {
-		queries.push(
-			apiFetch< SearchAPIResult[] >( {
-				path: addQueryArgs( '/wp/v2/search', {
-					search,
-					page,
-					per_page: perPage,
-					type: 'post',
-					subtype,
-				} ),
-			} )
-				.then( ( results ) => {
-					return results.map( ( result ) => {
-						return {
-							id: result.id,
-							url: result.url,
-							title:
-								decodeEntities( result.title || '' ) ||
-								__( '(no title)' ),
-							type: result.subtype || result.type,
-							kind: 'post-type',
-						};
-					} );
+		const mapPostResults = ( results: SearchAPIResult[] ) =>
+			results.map( ( result ) => ( {
+				id: result.id,
+				url: result.url,
+				title:
+					decodeEntities( result.title || '' ) ||
+					__( '(no title)' ),
+				type: result.subtype || result.type,
+				kind: 'post-type' as const,
+			} ) );
+
+		// When fetching initial suggestions without a subtype filter, make
+		// separate queries for pages and other post types so that pages are
+		// guaranteed to appear regardless of how many other posts exist.
+		if (
+			searchOptions.isInitialSuggestions &&
+			! subtype
+		) {
+			queries.push(
+				apiFetch< SearchAPIResult[] >( {
+					path: addQueryArgs( '/wp/v2/search', {
+						search,
+						page,
+						per_page: perPage,
+						type: 'post',
+						subtype: 'page',
+					} ),
 				} )
-				.catch( () => [] ) // Fail by returning no results.
-		);
+					.then( mapPostResults )
+					.catch( () => [] )
+			);
+			queries.push(
+				apiFetch< SearchAPIResult[] >( {
+					path: addQueryArgs( '/wp/v2/search', {
+						search,
+						page,
+						per_page: perPage,
+						type: 'post',
+						subtype: 'post',
+					} ),
+				} )
+					.then( mapPostResults )
+					.catch( () => [] )
+			);
+		} else {
+			queries.push(
+				apiFetch< SearchAPIResult[] >( {
+					path: addQueryArgs( '/wp/v2/search', {
+						search,
+						page,
+						per_page: perPage,
+						type: 'post',
+						subtype,
+					} ),
+				} )
+					.then( mapPostResults )
+					.catch( () => [] )
+			);
+		}
 	}
 
 	if ( ! type || type === 'term' ) {
@@ -266,7 +300,7 @@ export default async function fetchLinkSuggestions(
 export function sortResults( results: SearchResult[], search: string ) {
 	const searchTokens = tokenize( search );
 
-	const scores = {};
+	const scores: Record< string, number > = {};
 	for ( const result of results ) {
 		if ( result.title ) {
 			const titleTokens = tokenize( result.title );
@@ -298,7 +332,44 @@ export function sortResults( results: SearchResult[], search: string ) {
 		}
 	}
 
-	return results.sort( ( a, b ) => scores[ b.id ] - scores[ a.id ] );
+	return results.sort( ( a, b ) => {
+		const scoreDiff = scores[ b.id ] - scores[ a.id ];
+		if ( scoreDiff !== 0 ) {
+			return scoreDiff;
+		}
+		// When scores are tied (e.g. initial suggestions with no search query),
+		// use content type priority: pages > posts > other post types > categories > tags > media.
+		return getTypePriority( a ) - getTypePriority( b );
+	} );
+}
+
+/**
+ * Returns a priority value for a search result based on its content type.
+ * Lower values indicate higher priority.
+ *
+ * @param result
+ */
+function getTypePriority( result: SearchResult ): number {
+	const { type, kind } = result;
+	if ( type === 'page' ) {
+		return 0;
+	}
+	if ( type === 'post' ) {
+		return 1;
+	}
+	// Other post types (custom post types).
+	if ( kind === 'post-type' ) {
+		return 2;
+	}
+	if ( type === 'category' ) {
+		return 3;
+	}
+	// Tags and other taxonomies.
+	if ( kind === 'taxonomy' ) {
+		return 4;
+	}
+	// Media/attachments and everything else.
+	return 5;
 }
 
 /**

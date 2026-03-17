@@ -1,13 +1,8 @@
 export const DEFAULT_BLOCK = {
 	name: 'core/navigation-link',
-	attributes: {
-		kind: 'post-type',
-		type: 'page',
-	},
 };
 
 export const PRIORITIZED_INSERTER_BLOCKS = [
-	'core/navigation-link/page',
 	'core/navigation-link',
 ];
 
