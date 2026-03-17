@@ -69,9 +69,6 @@ export default function HTMLEditModal( {
 			} ),
 		} );
 	};
-	const handleCancel = () => {
-		onRequestClose();
-	};
 	const handleUpdateAndClose = () => {
 		handleUpdate();
 		onRequestClose();
@@ -210,7 +207,7 @@ export default function HTMLEditModal( {
 							<Button
 								__next40pxDefaultSize
 								variant="tertiary"
-								onClick={ handleCancel }
+								onClick={ onRequestClose }
 							>
 								{ __( 'Cancel' ) }
 							</Button>
