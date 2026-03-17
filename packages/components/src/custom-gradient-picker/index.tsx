@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { type LinearGradientNode } from 'gradient-parser';
+import { type AngularNode, type LinearGradientNode } from 'gradient-parser';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,11 +24,7 @@ import {
 	getStopCssColor,
 } from './utils';
 import { serializeGradient } from './serializer';
-import {
-	DEFAULT_LINEAR_GRADIENT_ANGLE,
-	HORIZONTAL_GRADIENT_ORIENTATION,
-	GRADIENT_OPTIONS,
-} from './constants';
+import { DEFAULT_LINEAR_GRADIENT_ANGLE, GRADIENT_OPTIONS } from './constants';
 import {
 	AccessoryWrapper,
 	SelectWrapper,
@@ -70,14 +67,27 @@ const GradientTypePicker = ( {
 	onChange,
 }: GradientTypePickerProps ) => {
 	const { type } = gradientAST;
+	const lastLinearOrientation = useRef< AngularNode >(
+		( gradientAST.orientation as AngularNode ) ?? {
+			type: 'angular',
+			value: `${ DEFAULT_LINEAR_GRADIENT_ANGLE }`,
+		}
+	);
+
+	if ( type === 'linear-gradient' && gradientAST.orientation ) {
+		lastLinearOrientation.current = gradientAST.orientation as AngularNode;
+	}
 
 	const onSetLinearGradient = () => {
 		onChange(
 			serializeGradient( {
 				...gradientAST,
-				orientation: gradientAST.orientation
-					? undefined
-					: HORIZONTAL_GRADIENT_ORIENTATION,
+				orientation:
+					lastLinearOrientation.current ??
+					( {
+						type: 'angular',
+						value: `${ DEFAULT_LINEAR_GRADIENT_ANGLE }`,
+					} as const ),
 				type: 'linear-gradient',
 			} satisfies LinearGradientNode )
 		);
