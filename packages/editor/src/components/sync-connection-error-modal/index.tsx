@@ -182,7 +182,6 @@ const FilteredSyncConnectionErrorModal = withFilters(
  */
 export function SyncConnectionErrorModal() {
 	const [ hasInitialized, setHasInitialized ] = useState( false );
-	const [ isManuallyRetrying, setIsManuallyRetrying ] = useState( false );
 	const [ showModal, setShowModal ] = useState( false );
 
 	const { connectionStatus, isCollaborationEnabled, postType } = useSelect(
@@ -204,7 +203,8 @@ export function SyncConnectionErrorModal() {
 		[]
 	);
 
-	const autoRetrySecondsRemaining = useRetryCountdown( connectionStatus );
+	const { onManualRetry, secondsRemaining } =
+		useRetryCountdown( connectionStatus );
 
 	const isConnected = 'connected' === connectionStatus?.status;
 
@@ -243,7 +243,7 @@ export function SyncConnectionErrorModal() {
 		'canManuallyRetry' in connectionStatus &&
 		connectionStatus.canManuallyRetry
 			? () => {
-					setIsManuallyRetrying( true );
+					onManualRetry();
 					retrySyncConnection();
 			  }
 			: undefined;
@@ -256,9 +256,7 @@ export function SyncConnectionErrorModal() {
 				error={ error }
 				manualRetry={ manualRetry }
 				postType={ postType }
-				secondsRemainingUntilAutoRetry={
-					isManuallyRetrying ? 0 : autoRetrySecondsRemaining
-				}
+				secondsRemainingUntilAutoRetry={ secondsRemaining }
 				title={ messages.title }
 			/>
 		</BlockCanvasCover.Fill>

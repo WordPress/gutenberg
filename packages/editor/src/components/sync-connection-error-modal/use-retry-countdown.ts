@@ -8,9 +8,14 @@ interface ConnectionStatus {
 	willAutoRetryInMs?: number;
 }
 
+interface UseRetryCountdownResult {
+	onManualRetry: () => void;
+	secondsRemaining?: number;
+}
+
 export function useRetryCountdown(
 	connectionStatus?: ConnectionStatus | null
-): number | undefined {
+): UseRetryCountdownResult {
 	const [ secondsRemaining, setSecondsRemaining ] = useState< number >();
 
 	useEffect( () => {
@@ -47,5 +52,8 @@ export function useRetryCountdown(
 		return () => clearInterval( intervalId );
 	}, [ connectionStatus ] );
 
-	return secondsRemaining;
+	return {
+		onManualRetry: () => setSecondsRemaining( 0 ),
+		secondsRemaining,
+	};
 }
