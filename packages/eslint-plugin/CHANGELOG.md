@@ -9,6 +9,7 @@
 
 ### Enhancements
 
+-   The `no-unknown-ds-tokens` rule now reports bare `--wpds-*` tokens not wrapped in `var()`, which would silently miss build-time fallback injection.
 -   The `no-setting-ds-tokens` rule now checks all object property keys, not just those inside JSX `style` attributes ([#76212](https://github.com/WordPress/gutenberg/pull/76212)).
 
 ## 24.3.0 (2026-03-04)
@@ -45,7 +46,7 @@
 
 ### Enhancements
 
-- The `dependency-group` rule is not recommended anymore. ([#73616](https://github.com/WordPress/gutenberg/pull/73616))
+-   The `dependency-group` rule is not recommended anymore. ([#73616](https://github.com/WordPress/gutenberg/pull/73616))
 
 ## 22.22.0 (2025-11-26)
 
