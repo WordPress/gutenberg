@@ -1,12 +1,8 @@
 /**
  * WordPress dependencies
  */
+import type { ConnectionStatus } from '@wordpress/core-data';
 import { useState, useEffect } from '@wordpress/element';
-
-interface ConnectionStatus {
-	status: string;
-	willAutoRetryInMs?: number;
-}
 
 interface UseRetryCountdownResult {
 	onManualRetry: () => void;
@@ -23,10 +19,8 @@ export function useRetryCountdown(
 			return;
 		}
 
-		const { status, willAutoRetryInMs: retryInMs } = connectionStatus;
-
 		// Only clear countdown when explicitly connected.
-		if ( status === 'connected' ) {
+		if ( 'connected' === connectionStatus.status ) {
 			setSecondsRemaining( undefined );
 			return;
 		}
@@ -34,10 +28,14 @@ export function useRetryCountdown(
 		// For transient states (e.g. 'connecting' during a retry attempt)
 		// or when retryInMs is not yet available, keep the previous
 		// countdown value to avoid a brief flash.
-		if ( status !== 'disconnected' || ! retryInMs ) {
+		if (
+			'disconnected' !== connectionStatus.status ||
+			! connectionStatus.willAutoRetryInMs
+		) {
 			return;
 		}
 
+		const { willAutoRetryInMs: retryInMs } = connectionStatus;
 		const retryAt = Date.now() + retryInMs;
 		setSecondsRemaining( Math.ceil( retryInMs / 1000 ) );
 

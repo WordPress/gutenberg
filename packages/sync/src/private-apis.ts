@@ -16,6 +16,7 @@ import { default as Delta } from './quill-delta/Delta';
 export const privateApis = {};
 
 lock( privateApis, {
+	ConnectionErrorCode,
 	createSyncManager,
 	Delta,
 	CRDT_DOC_META_PERSISTENCE_KEY,
@@ -23,5 +24,4 @@ lock( privateApis, {
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_UNDO_IGNORED_ORIGIN,
 	retrySyncConnection: () => pollingManager.retryNow(),
-	ConnectionErrorCode,
 } );
