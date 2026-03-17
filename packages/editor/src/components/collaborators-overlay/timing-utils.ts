@@ -14,8 +14,7 @@ export function setDelayedInterval( callback: () => void, delayMs: number ) {
 		try {
 			callback();
 		} catch ( error ) {
-			// eslint-disable-next-line no-console
-			console.error( error );
+			// Do nothing
 		}
 
 		timerHandle = setTimeout( runner, delayMs );
