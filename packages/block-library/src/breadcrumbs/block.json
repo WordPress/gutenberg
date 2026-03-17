@@ -7,9 +7,10 @@
 	"description": "Display a breadcrumb trail showing the path to the current page.",
 	"textdomain": "default",
 	"attributes": {
-		"prefersTaxonomy": {
-			"type": "boolean",
-			"default": false
+		"breadcrumbStyle": {
+			"type": "string",
+			"default": "default",
+			"enum": [ "default", "date" ]
 		},
 		"separator": {
 			"type": "string",
