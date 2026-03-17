@@ -261,7 +261,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_block_core_navigation_overlay_html_has_close_block
 	 */
 	public function test_block_core_navigation_overlay_html_has_close_block_returns_true_when_close_button_present() {
-		$html  = '<div class="wp-block-group"><button class="wp-block-navigation-overlay-close" type="button">Close</button></div>';
+		$html   = '<div class="wp-block-group"><button class="wp-block-navigation-overlay-close" type="button">Close</button></div>';
 		$result = gutenberg_block_core_navigation_overlay_html_has_close_block( $html );
 		$this->assertTrue( $result );
 	}
@@ -327,7 +327,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
 		// Simulate overlay template part content: just a pattern block (unresolved in block tree).
 		$parsed_blocks = parse_blocks( '<!-- wp:pattern {"slug":"test/navigation-overlay-pattern"} /-->' );
-		$blocks       = new WP_Block_List( $parsed_blocks, array() );
+		$blocks        = new WP_Block_List( $parsed_blocks, array() );
 
 		// Render blocks (pattern block's render_callback outputs pattern content).
 		$html = '';
