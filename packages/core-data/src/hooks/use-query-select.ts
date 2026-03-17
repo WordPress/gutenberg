@@ -113,31 +113,16 @@ const enrichSelectors = memoize( ( ( selectors ) => {
 						selectorName,
 						args
 					)?.status;
-
-					let status;
-					switch ( resolutionStatus ) {
-						case 'resolving':
-							status = Status.Resolving;
-							break;
-						case 'finished':
-							status = Status.Success;
-							break;
-						case 'error':
-							status = Status.Error;
-							break;
-						case undefined:
-							status = Status.Idle;
-							break;
-					}
+					const status: Status = resolutionStatus ?? Status.idle;
 
 					return {
 						data,
 						status,
-						isResolving: status === Status.Resolving,
-						hasStarted: status !== Status.Idle,
+						isResolving: status === Status.resolving,
+						hasStarted: status !== Status.idle,
 						hasResolved:
-							status === Status.Success ||
-							status === Status.Error,
+							status === Status.finished ||
+							status === Status.error,
 					};
 				},
 		} );

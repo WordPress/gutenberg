@@ -1,8 +1,8 @@
 export const Status = {
-	Idle: 'IDLE',
-	Resolving: 'RESOLVING',
-	Error: 'ERROR',
-	Success: 'SUCCESS',
+	idle: 'idle',
+	resolving: 'resolving',
+	finished: 'finished',
+	error: 'error',
 } as const;
 
 export type Status = ( typeof Status )[ keyof typeof Status ];

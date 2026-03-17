@@ -131,23 +131,7 @@ export default function useEntityRecords< RecordType >(
 				name,
 				queryArgs,
 			] )?.status;
-
-			let status: Status;
-			switch ( resolutionStatus ) {
-				case 'resolving':
-					status = Status.Resolving;
-					break;
-				case 'finished':
-					status = Status.Success;
-					break;
-				case 'error':
-					status = Status.Error;
-					break;
-				case undefined:
-				default:
-					status = Status.Idle;
-					break;
-			}
+			const status: Status = resolutionStatus ?? Status.idle;
 
 			return {
 				records: storeSelectors.getEntityRecords(
@@ -165,10 +149,10 @@ export default function useEntityRecords< RecordType >(
 					name,
 					queryArgs
 				),
-				isResolving: status === Status.Resolving,
-				hasStarted: status !== Status.Idle,
+				isResolving: status === Status.resolving,
+				hasStarted: status !== Status.idle,
 				hasResolved:
-					status === Status.Success || status === Status.Error,
+					status === Status.finished || status === Status.error,
 				status,
 			};
 		},

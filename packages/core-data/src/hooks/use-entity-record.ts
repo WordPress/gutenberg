@@ -189,23 +189,7 @@ export default function useEntityRecord< RecordType >(
 				storeSelectors as any
 			 ).getResolutionState( 'getEntityRecord', [ kind, name, recordId ] )
 				?.status;
-
-			let status: Status;
-			switch ( resolutionStatus ) {
-				case 'resolving':
-					status = Status.Resolving;
-					break;
-				case 'finished':
-					status = Status.Success;
-					break;
-				case 'error':
-					status = Status.Error;
-					break;
-				case undefined:
-				default:
-					status = Status.Idle;
-					break;
-			}
+			const status: Status = resolutionStatus ?? Status.idle;
 
 			return {
 				record: storeSelectors.getEntityRecord(
@@ -228,10 +212,10 @@ export default function useEntityRecord< RecordType >(
 					name,
 					recordId
 				),
-				isResolving: status === Status.Resolving,
-				hasStarted: status !== Status.Idle,
+				isResolving: status === Status.resolving,
+				hasStarted: status !== Status.idle,
 				hasResolved:
-					status === Status.Success || status === Status.Error,
+					status === Status.finished || status === Status.error,
 				status,
 			};
 		},

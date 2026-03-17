@@ -54,7 +54,7 @@ describe( 'useEntityRecord', () => {
 			hasResolved: false,
 			hasStarted: false,
 			isResolving: false,
-			status: 'IDLE',
+			status: 'idle',
 		} );
 
 		// Fetch request should have been issued
@@ -75,7 +75,7 @@ describe( 'useEntityRecord', () => {
 			hasResolved: true,
 			hasStarted: true,
 			isResolving: false,
-			status: 'SUCCESS',
+			status: 'finished',
 		} );
 	} );
 
@@ -105,7 +105,7 @@ describe( 'useEntityRecord', () => {
 				hasResolved: true,
 				hasStarted: true,
 				isResolving: false,
-				status: 'SUCCESS',
+				status: 'finished',
 			} )
 		);
 
