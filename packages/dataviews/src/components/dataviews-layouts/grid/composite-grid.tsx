@@ -293,6 +293,7 @@ interface CompositeGridProps< Item > {
 	data: Item[];
 	isInfiniteScroll: boolean;
 	className?: string;
+	inert?: string;
 	isLoading?: boolean;
 	view: ViewGridType;
 	fields: NormalizedField< Item >[];
@@ -313,6 +314,7 @@ export default function CompositeGrid< Item >( {
 	data,
 	isInfiniteScroll,
 	className,
+	inert,
 	isLoading,
 	view,
 	fields,
@@ -370,11 +372,19 @@ export default function CompositeGrid< Item >( {
 	return (
 		<Composite
 			role={ isInfiniteScroll ? 'feed' : 'grid' }
-			className={ clsx( 'dataviews-view-grid', className ) }
+			className={ clsx( 'dataviews-view-grid', className, {
+				[ `has-${ view.layout?.density }-density` ]:
+					view.layout?.density &&
+					[ 'compact', 'comfortable' ].includes(
+						view.layout.density
+					),
+			} ) }
 			focusWrap
 			aria-busy={ isLoading }
 			aria-rowcount={ isInfiniteScroll ? undefined : totalRows }
 			ref={ resizeObserverRef }
+			// @ts-ignore
+			inert={ inert }
 		>
 			{ chunk( data, gridColumns ).map( ( row, i ) => (
 				<Composite.Row

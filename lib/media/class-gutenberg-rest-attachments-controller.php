@@ -20,41 +20,87 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	public function register_routes(): void {
 		parent::register_routes();
 
-		// Only register the sideload route if the parent class doesn't already have it.
-		if ( ! method_exists( get_parent_class( $this ), 'sideload_item' ) ) {
-			$valid_image_sizes = array_keys( wp_get_registered_image_subsizes() );
+		// Override the parent's sideload route so that 'scaled' is included
+		// in the image_size enum. Without the override, core's handler
+		// validates first and rejects 'scaled' before ours is tried.
+		$valid_image_sizes = array_keys( wp_get_registered_image_subsizes() );
 
-			// Special case to set 'original_image' in attachment metadata.
-			$valid_image_sizes[] = 'original';
-			// Used for PDF thumbnails.
-			$valid_image_sizes[] = 'full';
+		// Special case to set 'original_image' in attachment metadata.
+		$valid_image_sizes[] = 'original';
+		// Client-side big image threshold: sideload the scaled version.
+		$valid_image_sizes[] = 'scaled';
+		// Used for PDF thumbnails.
+		$valid_image_sizes[] = 'full';
 
-			register_rest_route(
-				$this->namespace,
-				'/' . $this->rest_base . '/(?P<id>[\d]+)/sideload',
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[\d]+)/sideload',
+			array(
 				array(
-					array(
-						'methods'             => WP_REST_Server::CREATABLE,
-						'callback'            => array( $this, 'sideload_item' ),
-						'permission_callback' => array( $this, 'sideload_item_permissions_check' ),
-						'args'                => array(
-							'id'         => array(
-								'description' => __( 'Unique identifier for the attachment.', 'gutenberg' ),
-								'type'        => 'integer',
-							),
-							'image_size' => array(
-								'description' => __( 'Image size.', 'gutenberg' ),
-								'type'        => 'string',
-								'enum'        => $valid_image_sizes,
-								'required'    => true,
-							),
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'sideload_item' ),
+					'permission_callback' => array( $this, 'sideload_item_permissions_check' ),
+					'args'                => array(
+						'id'         => array(
+							'description' => __( 'Unique identifier for the attachment.', 'gutenberg' ),
+							'type'        => 'integer',
+						),
+						'image_size' => array(
+							'description' => __( 'Image size.', 'gutenberg' ),
+							'type'        => 'string',
+							'enum'        => $valid_image_sizes,
+							'required'    => true,
 						),
 					),
-					'allow_batch' => $this->allow_batch,
-					'schema'      => array( $this, 'get_public_item_schema' ),
-				)
-			);
+				),
+				'allow_batch' => $this->allow_batch,
+				'schema'      => array( $this, 'get_public_item_schema' ),
+			),
+			true // Override core's route so 'scaled' is included in the enum.
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[\d]+)/finalize',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'finalize_item' ),
+					'permission_callback' => array( $this, 'edit_media_item_permissions_check' ),
+					'args'                => array(
+						'id' => array(
+							'description' => __( 'Unique identifier for the attachment.', 'gutenberg' ),
+							'type'        => 'integer',
+						),
+					),
+				),
+				'allow_batch' => $this->allow_batch,
+				'schema'      => array( $this, 'get_public_item_schema' ),
+			)
+		);
+	}
+
+	/**
+	 * Checks if a given request has access to create an attachment.
+	 *
+	 * Skips the server-side image type support check when the client
+	 * will handle image processing (generate_sub_sizes is false).
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access to create items, WP_Error object otherwise.
+	 */
+	public function create_item_permissions_check( $request ) {
+		if ( false === $request['generate_sub_sizes'] ) {
+			add_filter( 'wp_prevent_unsupported_mime_type_uploads', '__return_false' );
 		}
+
+		$result = parent::create_item_permissions_check( $request );
+
+		if ( false === $request['generate_sub_sizes'] ) {
+			remove_filter( 'wp_prevent_unsupported_mime_type_uploads', '__return_false' );
+		}
+
+		return $result;
 	}
 
 	/**
@@ -210,6 +256,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// Disable server-side EXIF rotation so the client can handle it.
 			// This preserves the original orientation value in the metadata.
 			add_filter( 'wp_image_maybe_exif_rotate', '__return_false', 100 );
+			// Disable server-side big image scaling since the client handles it.
+			add_filter( 'big_image_size_threshold', '__return_zero', 100 );
 		}
 
 		if ( ! $request['convert_format'] ) {
@@ -221,11 +269,66 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		remove_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 100 );
 		remove_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
 		remove_filter( 'wp_image_maybe_exif_rotate', '__return_false', 100 );
+		remove_filter( 'big_image_size_threshold', '__return_zero', 100 );
 		remove_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 
 		return $response;
 	}
 
+	/**
+	 * Finalizes an attachment after client-side media processing.
+	 *
+	 * Triggers the {@see 'wp_generate_attachment_metadata'} filter so that
+	 * server-side plugins can process the attachment after all client-side
+	 * operations (upload, thumbnail generation, sideloads) are complete.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
+	 */
+	public function finalize_item( WP_REST_Request $request ) {
+		$attachment_id = $request['id'];
+
+		$post = $this->get_post( $attachment_id );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		$metadata = wp_get_attachment_metadata( $attachment_id );
+
+		if ( ! is_array( $metadata ) ) {
+			$metadata = array();
+		}
+
+		/**
+		 * Filters the attachment metadata after client-side processing.
+		 *
+		 * This re-applies the wp_generate_attachment_metadata filter so that
+		 * server-side plugins (e.g. those adding custom image sizes or
+		 * processing metadata) can run after client-side uploads are complete.
+		 *
+		 * @param array  $metadata      Attachment metadata.
+		 * @param int    $attachment_id Attachment ID.
+		 * @param string $context       Context: 'create' or 'update'.
+		 */
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$metadata = apply_filters( 'wp_generate_attachment_metadata', $metadata, $attachment_id, 'update' );
+
+		wp_update_attachment_metadata( $attachment_id, $metadata );
+
+		$response_request = new WP_REST_Request(
+			WP_REST_Server::READABLE,
+			rest_get_route_for_post( $attachment_id )
+		);
+
+		$response_request['context'] = 'edit';
+
+		if ( isset( $request['_fields'] ) ) {
+			$response_request['_fields'] = $request['_fields'];
+		}
+
+		return $this->prepare_item_for_response( get_post( $attachment_id ), $response_request );
+	}
 
 	/**
 	 * Checks if a given request has access to sideload a file.
@@ -275,7 +378,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		$matches = array();
-		if ( preg_match( '/(.*)(-\d+x\d+)-' . $number . '$/', $name, $matches ) ) {
+		if ( preg_match( '/(.*)(-\d+x\d+|-scaled)-' . $number . '$/', $name, $matches ) ) {
 			$filename_without_suffix = $matches[1] . $matches[2] . ".$ext";
 			if ( $matches[1] === $orig_name && ! file_exists( "$dir/$filename_without_suffix" ) ) {
 				return $filename_without_suffix;
@@ -381,6 +484,20 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		if ( 'original' === $image_size ) {
 			$metadata['original_image'] = wp_basename( $path );
+		} elseif ( 'scaled' === $image_size ) {
+			// The current attached file is the original; record it as original_image.
+			$current_file               = get_attached_file( $attachment_id, true );
+			$metadata['original_image'] = wp_basename( $current_file );
+
+			// Update the attached file to point to the scaled version.
+			update_attached_file( $attachment_id, $path );
+
+			$size = wp_getimagesize( $path );
+
+			$metadata['width']    = $size ? $size[0] : 0;
+			$metadata['height']   = $size ? $size[1] : 0;
+			$metadata['filesize'] = wp_filesize( $path );
+			$metadata['file']     = _wp_relative_upload_path( $path );
 		} else {
 			$metadata['sizes'] = $metadata['sizes'] ?? array();
 

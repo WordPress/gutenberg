@@ -31,6 +31,7 @@ import DataViewsViewConfig, {
 	ViewTypeMenu,
 } from '../components/dataviews-view-config';
 import normalizeFields from '../field-types';
+import useData from '../hooks/use-data';
 import type { Action, Field, View, SupportedLayouts } from '../types';
 import type { SelectionOrUpdater } from '../types/private';
 type ItemWithId = { id: string };
@@ -194,9 +195,19 @@ function DataViews< Item >( {
 		}
 	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
 
+	const {
+		data: displayData,
+		paginationInfo: displayPaginationInfo,
+		hasInitiallyLoaded,
+	} = useData( data, isLoading, paginationInfo );
+
 	// Attach scroll event listener for infinite scroll
 	useEffect( () => {
-		if ( ! view.infiniteScrollEnabled || ! containerRef.current ) {
+		if (
+			! hasInitiallyLoaded ||
+			! view.infiniteScrollEnabled ||
+			! containerRef.current
+		) {
 			return;
 		}
 
@@ -219,7 +230,11 @@ function DataViews< Item >( {
 			container.removeEventListener( 'scroll', handleScroll );
 			handleScroll.cancel(); // Cancel any pending throttled calls
 		};
-	}, [ infiniteScrollHandler, view.infiniteScrollEnabled ] );
+	}, [
+		hasInitiallyLoaded,
+		infiniteScrollHandler,
+		view.infiniteScrollEnabled,
+	] );
 
 	// Filter out DataViewsPicker layouts.
 	const defaultLayouts = useMemo(
@@ -247,9 +262,9 @@ function DataViews< Item >( {
 				onChangeView,
 				fields: _fields,
 				actions,
-				data,
+				data: displayData,
 				isLoading,
-				paginationInfo,
+				paginationInfo: displayPaginationInfo,
 				selection: _selection,
 				onChangeSelection: setSelectionWithChange,
 				openedFilter,
@@ -268,11 +283,12 @@ function DataViews< Item >( {
 				setIsShowingFilter,
 				config,
 				empty,
+				hasInitiallyLoaded,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
 				onReset,
 			} }
 		>
-			<div className="dataviews-wrapper" ref={ containerRef }>
+			<div className="dataviews-wrapper">
 				{ children ?? (
 					<DefaultUI
 						header={ header }

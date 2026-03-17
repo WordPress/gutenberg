@@ -34,12 +34,8 @@ const queriedItemsCacheByState = new WeakMap();
 function getQueriedItemsUncached( state, query ) {
 	const { stableKey, page, perPage, include, fields, context } =
 		getQueryParts( query );
-	let itemIds;
 
-	if ( state.queries?.[ context ]?.[ stableKey ] ) {
-		itemIds = state.queries[ context ][ stableKey ].itemIds;
-	}
-
+	const itemIds = state.queries?.[ context ]?.[ stableKey ]?.itemIds;
 	if ( ! itemIds ) {
 		return null;
 	}
@@ -49,6 +45,17 @@ function getQueriedItemsUncached( state, query ) {
 		perPage === -1
 			? itemIds.length
 			: Math.min( startOffset + perPage, itemIds.length );
+
+	// If the requested page range exceeds the stored itemIds, the data for
+	// this specific pagination window may not have been fetched yet. Return
+	// null unless totalItems confirms we already have all available items.
+	if ( perPage !== -1 && itemIds.length < startOffset + perPage ) {
+		const totalItems =
+			state.queries[ context ][ stableKey ].meta?.totalItems;
+		if ( Number.isFinite( totalItems ) && itemIds.length < totalItems ) {
+			return null;
+		}
+	}
 
 	const items = [];
 	for ( let i = startOffset; i < endOffset; i++ ) {

@@ -8,8 +8,9 @@
 	align-items: flex-start !important;
 
 	.components-base-control__label,
-	.components-input-control__label {
-		color: $gray-700;
+	.components-input-control__label,
+	.components-form-token-field__label {
+		color: $gray-900;
 	}
 }
 

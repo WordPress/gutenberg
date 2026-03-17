@@ -39,9 +39,23 @@ import type {
 import type { SetSelection } from '../../../types/private';
 import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
-import { useIsHorizontalScrollEnd } from './use-is-horizontal-scroll-end';
+import { useScrollState } from './use-scroll-state';
 import getDataByGroup from '../utils/get-data-by-group';
 import { PropertiesSection } from '../../dataviews-view-config/properties-section';
+import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
+
+function getEffectiveAlign(
+	explicitAlign: 'start' | 'center' | 'end' | undefined,
+	fieldType: string | undefined
+): 'start' | 'center' | 'end' | undefined {
+	if ( explicitAlign ) {
+		return explicitAlign;
+	}
+	if ( fieldType === 'integer' || fieldType === 'number' ) {
+		return 'end';
+	}
+	return undefined;
+}
 
 interface TableColumnFieldProps< Item > {
 	fields: NormalizedField< Item >[];
@@ -225,6 +239,8 @@ function TableRow< Item >( {
 				// Explicit picks the supported styles.
 				const { width, maxWidth, minWidth, align } =
 					view.layout?.styles?.[ column ] ?? {};
+				const field = fields.find( ( f ) => f.id === column );
+				const effectiveAlign = getEffectiveAlign( align, field?.type );
 
 				return (
 					<td
@@ -239,7 +255,7 @@ function TableRow< Item >( {
 							fields={ fields }
 							item={ item }
 							column={ column }
-							align={ align }
+							align={ effectiveAlign }
 						/>
 					</td>
 				);
@@ -287,13 +303,13 @@ function ViewTable< Item >( {
 	empty,
 }: ViewTableProps< Item > ) {
 	const { containerRef } = useContext( DataViewsContext );
+	const isDelayedLoading = useDelayedLoading( isLoading );
 	const headerMenuRefs = useRef<
 		Map< string, { node: HTMLButtonElement; fallback: string } >
 	>( new Map() );
 	const headerMenuToFocusRef = useRef< HTMLButtonElement >( undefined );
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
-	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const [ contextMenuAnchor, setContextMenuAnchor ] = useState< {
 		getBoundingClientRect: () => DOMRect;
 	} | null >( null );
@@ -307,10 +323,12 @@ function ViewTable< Item >( {
 
 	const tableNoticeId = useId();
 
-	const isHorizontalScrollEnd = useIsHorizontalScrollEnd( {
+	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
 		scrollContainerRef: containerRef,
-		enabled: !! actions?.length,
+		enabledHorizontal: !! actions?.length,
 	} );
+
+	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 
 	if ( nextHeaderMenuToFocus ) {
 		// If we need to force focus, we short-circuit rendering here
@@ -382,6 +400,18 @@ function ViewTable< Item >( {
 		};
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 	const isRtl = isRTL();
+	if ( ! hasData ) {
+		return (
+			<div
+				className={ clsx( 'dataviews-no-results', {
+					'is-refreshing': isDelayedLoading,
+				} ) }
+				id={ tableNoticeId }
+			>
+				{ empty }
+			</div>
+		);
+	}
 
 	return (
 		<>
@@ -393,10 +423,13 @@ function ViewTable< Item >( {
 							view.layout.density
 						),
 					'has-bulk-actions': hasBulkActions,
+					'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 				} ) }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : undefined }
+				// @ts-ignore Reason: inert is a recent HTML attribute
+				inert={ ! isInfiniteScroll && isLoading ? 'true' : undefined }
 			>
 				<colgroup>
 					{ hasBulkActions && (
@@ -431,7 +464,13 @@ function ViewTable< Item >( {
 						<PropertiesSection showLabel={ false } />
 					</Popover>
 				) }
-				<thead onContextMenu={ handleHeaderContextMenu }>
+				<thead
+					className={ clsx( {
+						'dataviews-view-table__thead--stuck':
+							isVerticallyScrolled,
+					} ) }
+					onContextMenu={ handleHeaderContextMenu }
+				>
 					<tr className="dataviews-view-table__row">
 						{ hasBulkActions && (
 							<th
@@ -483,6 +522,13 @@ function ViewTable< Item >( {
 							// Explicit picks the supported styles.
 							const { width, maxWidth, minWidth, align } =
 								view.layout?.styles?.[ column ] ?? {};
+							const field = fields.find(
+								( f ) => f.id === column
+							);
+							const effectiveAlign = getEffectiveAlign(
+								align,
+								field?.type
+							);
 							const canInsertOrMove =
 								view.layout?.enableMoving ?? true;
 							return (
@@ -492,7 +538,7 @@ function ViewTable< Item >( {
 										width,
 										maxWidth,
 										minWidth,
-										textAlign: align,
+										textAlign: effectiveAlign,
 									} }
 									aria-sort={
 										view.sort?.direction &&
@@ -634,27 +680,13 @@ function ViewTable< Item >( {
 					</tbody>
 				) }
 			</table>
-			<div
-				className={ clsx( {
-					'dataviews-loading': isLoading,
-					'dataviews-no-results': ! hasData && ! isLoading,
-				} ) }
-				id={ tableNoticeId }
-			>
-				{ ! hasData &&
-					( isLoading ? (
-						<p>
-							<Spinner />
-						</p>
-					) : (
-						empty
-					) ) }
-				{ hasData && isLoading && (
+			{ isInfiniteScroll && isLoading && (
+				<div className="dataviews-loading" id={ tableNoticeId }>
 					<p className="dataviews-loading-more">
 						<Spinner />
 					</p>
-				) }
-			</div>
+				</div>
+			) }
 		</>
 	);
 }

@@ -189,6 +189,11 @@ export interface Settings {
 	pngInterlaced?: boolean;
 	// Whether to use interlaced encoding for GIF.
 	gifInterlaced?: boolean;
+	// Default image quality (0-1) for resize/crop operations.
+	// Default is 0.82 if not set.
+	imageQuality?: number;
+	// Function for finalizing an upload after all client-side processing is complete.
+	mediaFinalize?: ( id: number ) => Promise< void >;
 	// Retry settings for automatic retry on failure.
 	retry?: RetrySettings;
 }
@@ -206,7 +211,6 @@ export interface Attachment {
 	mime_type: string;
 	featured_media?: number;
 	missing_image_sizes?: string[];
-	media_filename?: string;
 	poster?: string;
 	/**
 	 * EXIF orientation value from the original image.
@@ -247,6 +251,7 @@ export enum OperationType {
 	Rotate = 'ROTATE',
 	TranscodeImage = 'TRANSCODE_IMAGE',
 	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
+	Finalize = 'FINALIZE',
 }
 
 /**

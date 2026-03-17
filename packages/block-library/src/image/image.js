@@ -323,20 +323,15 @@ export default function Image( {
 					  )
 					: null;
 
-			// Check edit permissions. When the media editor experiment is enabled,
-			// use getEntityRecordPermissions which checks via canUser API.
-			// Only check when the image is selected to avoid unnecessary API requests.
+			// Check edit permissions when the media editor experiment is enabled.
+			// Only check when imageRecord is available to avoid unnecessary API requests.
 			let canEdit = false;
-			if ( id && isSingleSelected && window?.__experimentalMediaEditor ) {
-				const { getEntityRecordPermissions } = unlock(
-					select( coreStore )
-				);
-				const permissions = getEntityRecordPermissions(
-					'postType',
-					'attachment',
-					id
-				);
-				canEdit = permissions?.update || false;
+			if ( imageRecord && window?.__experimentalMediaEditor ) {
+				canEdit = !! select( coreStore ).canUser( 'update', {
+					kind: 'postType',
+					name: 'attachment',
+					id,
+				} );
 			}
 
 			return {
@@ -1241,21 +1236,20 @@ export default function Image( {
 		} );
 	};
 
-	const featuredImageControl = (
-		<BlockSettingsMenuControls>
-			{ ( { selectedClientIds } ) =>
-				selectedClientIds.length === 1 &&
-				! isDescendentOfQueryLoop &&
-				postId &&
-				id &&
-				clientId === selectedClientIds[ 0 ] && (
-					<MenuItem onClick={ setPostFeatureImage }>
-						{ __( 'Set as featured image' ) }
-					</MenuItem>
-				)
-			}
-		</BlockSettingsMenuControls>
-	);
+	const featuredImageControl =
+		! isDescendentOfQueryLoop && postId && id ? (
+			<BlockSettingsMenuControls>
+				{ ( { canEdit, selectedClientIds } ) =>
+					canEdit &&
+					selectedClientIds.length === 1 &&
+					clientId === selectedClientIds[ 0 ] && (
+						<MenuItem onClick={ setPostFeatureImage }>
+							{ __( 'Set as featured image' ) }
+						</MenuItem>
+					)
+				}
+			</BlockSettingsMenuControls>
+		) : null;
 
 	return (
 		<>

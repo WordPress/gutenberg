@@ -522,15 +522,21 @@
 		"parent": "core-concepts"
 	},
 	{
-		"title": "Understanding global state, local context and derived state",
-		"slug": "undestanding-global-state-local-context-and-derived-state",
-		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md",
+		"title": "Understanding global state, local context, derived state and config",
+		"slug": "understanding-global-state-local-context-derived-state-and-config",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-derived-state-and-config.md",
 		"parent": "core-concepts"
 	},
 	{
 		"title": "Server-side rendering: Processing directives on the server",
 		"slug": "server-side-rendering",
 		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md",
+		"parent": "core-concepts"
+	},
+	{
+		"title": "Client-Side Navigation",
+		"slug": "client-side-navigation",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md",
 		"parent": "core-concepts"
 	},
 	{

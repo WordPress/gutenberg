@@ -1,11 +1,14 @@
 import { getStylelintResult } from './utils';
 
+const CONFIG = './.stylelintrc.no-unknown-ds-tokens.json';
+
 describe( 'flags no warnings with valid wpds tokens css', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
 	beforeEach( () => {
 		result = getStylelintResult(
-			'./fixtures/no-unknown-ds-tokens-valid.css'
+			'./fixtures/no-unknown-ds-tokens-valid.css',
+			CONFIG
 		);
 	} );
 
@@ -25,7 +28,8 @@ describe( 'flags warnings with invalid wpds tokens css', () => {
 
 	beforeEach( () => {
 		result = getStylelintResult(
-			'./fixtures/no-unknown-ds-tokens-invalid.css'
+			'./fixtures/no-unknown-ds-tokens-invalid.css',
+			CONFIG
 		);
 	} );
 

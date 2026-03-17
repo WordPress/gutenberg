@@ -213,7 +213,13 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 				)
 			);
 
-			$post_id = array_first( $posts );
+			/*
+			 * array_first() is a PHP 8.5 function. WordPress added
+			 * a polyfill in WP 6.9 (see https://core.trac.wordpress.org/ticket/63853).
+			 * Since Gutenberg must support the two most recent WordPress
+			 * versions (currently 6.8+), we cannot rely on it here.
+			 */
+			$post_id = $posts[0] ?? null;
 			if ( is_int( $post_id ) ) {
 				self::$storage_post_ids[ $room_hash ] = $post_id;
 				return $post_id;

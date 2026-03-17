@@ -21,6 +21,26 @@ import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
 import { NodePackageImporter } from 'sass-embedded';
 
+// Optional dependency: @wordpress/theme provides plugins that inject fallback
+// values for design system tokens. Fails gracefully when the package is not
+// installed (it is an optional peerDependency).
+let dsTokenFallbacks;
+let dsTokenFallbacksJs;
+try {
+	const { default: postcssPlugin } = await import(
+		// eslint-disable-next-line import/no-unresolved
+		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
+	);
+	const { default: esbuildPlugin } = await import(
+		// eslint-disable-next-line import/no-unresolved
+		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
+	);
+	dsTokenFallbacks = postcssPlugin;
+	dsTokenFallbacksJs = esbuildPlugin;
+} catch {
+	// @wordpress/theme is optional; skip token fallbacks if not available.
+}
+
 /**
  * Internal dependencies
  */
@@ -93,12 +113,27 @@ const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
 
+/**
+ * Interprets a configuration value as a boolean, where `"true"` and `"1"`
+ * are considered true while all other values are false.
+ *
+ * @param {string|undefined} value The configuration value to interpret.
+ * @return {boolean} Boolean interpretation of the given configuration value.
+ */
+const boolConfigVal = ( value ) => {
+	return (
+		value !== undefined && [ 'true', '1' ].includes( value.toLowerCase() )
+	);
+};
+
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
-		Boolean( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
+		boolConfigVal( process.env.IS_GUTENBERG_PLUGIN ) ||
+			boolConfigVal( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
 	),
 	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
-		Boolean( process.env.npm_package_config_IS_WORDPRESS_CORE )
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ||
+			boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE )
 	),
 };
 const getDefine = ( scriptDebug ) => ( {
@@ -150,8 +185,9 @@ function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 
 		let moduleExports = null;
 
-		// Transform the code: CSS modules and minification.
+		// Transform the code: token fallbacks, CSS modules and minification.
 		const plugins = [
+			dsTokenFallbacks,
 			cssModules &&
 				postcssModules( {
 					generateScopedName: '[contenthash]__[local]',
@@ -173,7 +209,7 @@ function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 			map: false,
 		} );
 
-		let cssModule = `if (typeof document !== 'undefined' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
+		let cssModule = `if (typeof document !== 'undefined' && process.env.NODE_ENV !== 'test' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
 	const style = document.createElement("style");
 	style.setAttribute("data-wp-hash", "${ hash }");
 	style.appendChild(document.createTextNode(${ JSON.stringify( css ) }));
@@ -207,6 +243,7 @@ function createStyleBundlingPlugins( workingDir ) {
 		// Handle CSS modules (.module.css and .module.scss)
 		sassPlugin( {
 			embedded: true,
+			sourceMap: false,
 			filter: /\.module\.(css|scss)$/,
 			transform: compileInlineStyle( { cssModules: true } ),
 			type: inlineStyle,
@@ -216,6 +253,7 @@ function createStyleBundlingPlugins( workingDir ) {
 		// Note: .module.css and .module.scss already handled by plugin above
 		sassPlugin( {
 			embedded: true,
+			sourceMap: false,
 			filter: /\.(css|scss)$/,
 			transform: compileInlineStyle(),
 			type: inlineStyle,
@@ -243,8 +281,11 @@ const wasmInlinePlugin = {
 				try {
 					const resolved = require.resolve( args.path );
 					return {
-						path: resolved,
+						path: normalizePath(
+							path.relative( ROOT_DIR, resolved )
+						),
 						namespace: 'wasm-inline',
+						pluginData: { resolvedPath: resolved },
 					};
 				} catch {
 					// If resolution fails, let other plugins handle it.
@@ -258,7 +299,9 @@ const wasmInlinePlugin = {
 		build.onLoad(
 			{ filter: /.*/, namespace: 'wasm-inline' },
 			async ( args ) => {
-				const wasmBuffer = await readFile( args.path );
+				const wasmBuffer = await readFile(
+					args.pluginData.resolvedPath
+				);
 				const base64 = wasmBuffer.toString( 'base64' );
 				const dataUrl = `data:application/wasm;base64,${ base64 }`;
 
@@ -291,6 +334,16 @@ function transformPhpContent( content, transforms ) {
 	} = transforms;
 
 	content = content.toString();
+
+	/*
+	 * Transforms are used to modify PHP files that are committed to version
+	 * control in their wordpress-develop state (`wp_` function prefixes, `WP_`
+	 * class prefixes, etc.). When building for WordPress Core, it's not
+	 * necessary to perform these steps.
+	 */
+	if ( boolConfigVal( process.env.IS_WORDPRESS_CORE ) ) {
+		return content;
+	}
 
 	if ( prefixFunctions.length ) {
 		content = content.replace(
@@ -1251,6 +1304,11 @@ async function transpilePackage( packageName ) {
 		},
 	};
 	const plugins = [
+		// Note: dsTokenFallbacksJs and emotionPlugin both use esbuild's onLoad
+		// hook, which is non-composable — the first to return contents wins. If a
+		// file contains --wpds-* tokens, the Emotion transform will be skipped.
+		// Avoid using design tokens in Emotion styles until Emotion is removed.
+		dsTokenFallbacksJs,
 		needsEmotionPlugin && emotionPlugin,
 		wasmInlinePlugin,
 		externalizeAllExceptCssPlugin,
@@ -1408,12 +1466,13 @@ async function compileStyles( packageName ) {
 						embedded: true,
 						...getSassOptions( packageDir ),
 						async transform( source ) {
-							// Process with autoprefixer for LTR version
-							const ltrResult = await postcss( [
-								autoprefixer( { grid: true } ),
-							] ).process( source, { from: undefined } );
+							const ltrResult = await postcss(
+								[
+									dsTokenFallbacks,
+									autoprefixer( { grid: true } ),
+								].filter( Boolean )
+							).process( source, { from: undefined } );
 
-							// Process with rtlcss for RTL version
 							const rtlResult = await postcss( [
 								rtlcss(),
 							] ).process( ltrResult.css, { from: undefined } );
@@ -1742,11 +1801,23 @@ async function buildAll( baseUrlExpression ) {
 			id: page.id,
 			init: page.init || [],
 			title: page.title || undefined,
+			experimental: page.experimental || false,
 		};
 	} );
 
-	const pageData = normalizedPages.map( ( page ) => {
-		const pageRoutes = routes.filter( ( r ) => r.page === page.id );
+	// When building for WordPress Core, exclude experimental pages.
+	const isCoreBuild =
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ||
+		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE );
+	const activePages = isCoreBuild
+		? normalizedPages.filter( ( page ) => ! page.experimental )
+		: normalizedPages;
+
+	const activePageIds = new Set( activePages.map( ( p ) => p.id ) );
+	const activeRoutes = routes.filter( ( r ) => activePageIds.has( r.page ) );
+
+	const pageData = activePages.map( ( page ) => {
+		const pageRoutes = activeRoutes.filter( ( r ) => r.page === page.id );
 		return {
 			slug: page.id,
 			routes: pageRoutes,
@@ -1754,51 +1825,6 @@ async function buildAll( baseUrlExpression ) {
 			title: page.title,
 		};
 	} );
-
-	// Bundle boot, route, and theme packages from node_modules when pages exist
-	if ( pageData.length > 0 ) {
-		try {
-			const { createRequire } = await import( 'module' );
-			const require = createRequire( import.meta.url );
-
-			// Resolve the @wordpress packages directory from node_modules
-			const bootPackageJson = require.resolve(
-				'@wordpress/boot/package.json',
-				{ paths: [ ROOT_DIR ] }
-			);
-			const wordpressPackagesDir = path.dirname(
-				path.dirname( bootPackageJson )
-			);
-
-			// Bundle boot, route, theme, and private-apis packages
-			const externalPackages = [
-				'boot',
-				'route',
-				'theme',
-				'private-apis',
-			];
-			for ( const pkgName of externalPackages ) {
-				const result = await bundlePackage( pkgName, {
-					sourceDir: wordpressPackagesDir,
-					handlePrefix: 'wp',
-					scriptGlobal: 'wp',
-					packageNamespace: 'wordpress',
-				} );
-
-				if ( result && result.modules ) {
-					modules.push( ...result.modules );
-				}
-				if ( result && result.scripts ) {
-					scripts.push( ...result.scripts );
-				}
-			}
-		} catch ( error ) {
-			console.warn(
-				'\n⚠️  Warning: Could not bundle WordPress packages for pages:',
-				error.message
-			);
-		}
-	}
 
 	console.log( '\n📄 Generating PHP registration files...\n' );
 	const phpReplacements = await getPhpReplacements(
@@ -1811,8 +1837,8 @@ async function buildAll( baseUrlExpression ) {
 		generateScriptRegistrationPhp( scripts, phpReplacements ),
 		generateStyleRegistrationPhp( styles, phpReplacements ),
 		generateConstantsPhp( phpReplacements ),
-		generateRoutesRegistry( routes, phpReplacements ),
-		generateRoutesPhp( routes, phpReplacements ),
+		generateRoutesRegistry( activeRoutes, phpReplacements ),
+		generateRoutesPhp( activeRoutes, phpReplacements ),
 		generatePagesPhp( pageData, phpReplacements ),
 	] );
 	console.log( '   ✔ Generated build/build.php' );
@@ -2101,7 +2127,9 @@ async function main() {
 			},
 			'base-url': {
 				type: 'string',
-				default: 'plugin_dir_url( __FILE__ )',
+				default: boolConfigVal( process.env.IS_WORDPRESS_CORE )
+					? "includes_url( 'build/' )"
+					: 'plugin_dir_url( __FILE__ )',
 			},
 		},
 		strict: false,

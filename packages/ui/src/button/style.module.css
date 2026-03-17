@@ -50,6 +50,7 @@
 		line-height: var(--wpds-font-line-height-sm);
 		text-decoration: none;
 		color: var(--wp-ui-button-foreground-color);
+		cursor: var(--wpds-cursor-control);
 
 		@media not ( prefers-reduced-motion ) {
 			transition: color 0.1s ease-out;
@@ -61,6 +62,7 @@
 
 		/* Use pointer cursor for buttons that are links */
 		&[href] {
+			/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Links should always use pointer. */
 			cursor: pointer;
 		}
 

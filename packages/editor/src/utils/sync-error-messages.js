@@ -3,36 +3,51 @@
  */
 import { __ } from '@wordpress/i18n';
 
+// These error codes are defined in the sync package:
+// packages/sync/src/errors.ts
+export const AUTHENTICATION_FAILED = 'authentication-failed';
+export const CONNECTION_EXPIRED = 'connection-expired';
+export const CONNECTION_LIMIT_EXCEEDED = 'connection-limit-exceeded';
+export const DOCUMENT_SIZE_LIMIT_EXCEEDED = 'document-size-limit-exceeded';
+export const UNKNOWN_ERROR = 'unknown-error';
+
 /**
  * Default error messages for known error codes.
  */
 const ERROR_MESSAGES = {
-	'authentication-failed': {
-		title: __( 'Authentication Failed' ),
+	[ AUTHENTICATION_FAILED ]: {
+		title: __( 'Unable to connect' ),
 		description: __(
-			'Authentication with the collaborative editing server failed. ' +
-				'Please verify that you have the necessary permissions.'
+			"Real-time collaboration couldn't verify your permissions. " +
+				'Check that you have access to edit this post, or contact your site administrator.'
 		),
+		canRetry: false,
 	},
-	'connection-expired': {
-		title: __( 'Connection Expired' ),
+	[ CONNECTION_EXPIRED ]: {
+		title: __( 'Connection expired' ),
 		description: __(
-			'The connection to the collaborative editing server has expired.'
+			'Your connection to real-time collaboration has timed out. ' +
+				'Editing is paused to prevent conflicts with other editors.'
 		),
+		canRetry: true,
 	},
-	'connection-limit-exceeded': {
-		title: __( 'Connection Limit Exceeded' ),
+	[ CONNECTION_LIMIT_EXCEEDED ]: {
+		title: __( 'Too many editors connected' ),
 		description: __(
-			'The collaborative editing server has reached its maximum connection capacity. ' +
-				'Please try again later or contact your site administrator.'
+			'Real-time collaboration has reached its connection limit. ' +
+				'Try again later or contact your site administrator.'
 		),
+		canRetry: true,
 	},
-	'unknown-error': {
-		title: __( 'Disconnected' ),
+	// DOCUMENT_SIZE_LIMIT_EXCEEDED is not included here because it results in
+	// collaboration being disabled entirely.
+	[ UNKNOWN_ERROR ]: {
+		title: __( 'Connection lost' ),
 		description: __(
-			'You are currently disconnected from the collaborative editing server. ' +
-				'Editing is temporarily disabled to prevent conflicts.'
+			'The connection to real-time collaboration was interrupted. ' +
+				'Editing is paused to prevent conflicts with other editors.'
 		),
+		canRetry: true,
 	},
 };
 
@@ -42,12 +57,12 @@ const ERROR_MESSAGES = {
  * Provides default messages based on error.code.
  *
  * @param {Object} error - Connection error object.
- * @return {Object} Object with title and description strings.
+ * @return {Object} Object with title, description, and canRetry flag.
  */
 export function getSyncErrorMessages( error ) {
 	if ( ERROR_MESSAGES[ error?.code ] ) {
 		return ERROR_MESSAGES[ error.code ];
 	}
 
-	return ERROR_MESSAGES[ 'unknown-error' ];
+	return ERROR_MESSAGES[ UNKNOWN_ERROR ];
 }

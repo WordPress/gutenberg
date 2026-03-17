@@ -620,7 +620,6 @@ export default function LogoEdit( {
 					>
 						<MediaControlPreview
 							url={ mediaItemData?.source_url }
-							alt={ mediaItemData?.alt_text }
 							filename={
 								mediaItemData?.media_details?.sizes?.full
 									?.file || mediaItemData?.slug
@@ -642,7 +641,6 @@ export default function LogoEdit( {
 						<MediaControl
 							mediaId={ siteLogoId }
 							mediaUrl={ logoUrl }
-							alt={ mediaItemData?.alt_text }
 							filename={
 								mediaItemData?.media_details?.sizes?.full
 									?.file || mediaItemData?.slug
@@ -652,7 +650,7 @@ export default function LogoEdit( {
 							onError={ onUploadError }
 							onReset={ onRemoveLogo }
 							isUploading={ !! temporaryURL }
-							emptyLabel={ __( 'Choose logo' ) }
+							emptyLabel={ __( 'Logo' ) }
 						/>
 					</ToolsPanelItem>
 				) }

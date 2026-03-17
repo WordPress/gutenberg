@@ -124,7 +124,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				),
 				'awareness' => array(
 					'required' => true,
-					'type'     => 'object',
+					'type'     => array( 'object', 'null' ),
 				),
 				'client_id' => array(
 					'minimum'  => 1,
@@ -183,10 +183,25 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				);
 			}
 
-			$rooms = $request['rooms'];
+			$rooms      = $request['rooms'];
+			$wp_user_id = get_current_user_id();
 
 			foreach ( $rooms as $room ) {
-				$room         = $room['room'];
+				$client_id = $room['client_id'];
+				$room      = $room['room'];
+
+				// Check that the client_id is not already owned by another user.
+				$existing_awareness = $this->storage->get_awareness_state( $room );
+				foreach ( $existing_awareness as $entry ) {
+					if ( $client_id === $entry['client_id'] && $wp_user_id !== $entry['wp_user_id'] ) {
+						return new WP_Error(
+							'forbidden',
+							__( 'Client ID is already in use by another user.', 'gutenberg' ),
+							array( 'status' => 403 )
+						);
+					}
+				}
+
 				$type_parts   = explode( '/', $room, 2 );
 				$object_parts = explode( ':', $type_parts[1] ?? '', 2 );
 
@@ -348,6 +363,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					'client_id'  => $client_id,
 					'state'      => $awareness_update,
 					'updated_at' => $current_time,
+					'wp_user_id' => get_current_user_id(),
 				);
 			}
 
@@ -409,7 +425,10 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 
 						return $this->add_update( $room, $client_id, $type, $data );
 					}
-					break;
+
+					// Reaching this point means there's a newer compaction, so we can
+					// silently ignore this one.
+					return true;
 
 				case self::UPDATE_TYPE_SYNC_STEP1:
 				case self::UPDATE_TYPE_SYNC_STEP2:

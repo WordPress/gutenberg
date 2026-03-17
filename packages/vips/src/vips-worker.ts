@@ -108,6 +108,7 @@ export async function vipsCompressImage(
  * @param type      Mime type.
  * @param resize    Resize options.
  * @param smartCrop Whether to use smart cropping (i.e. saliency-aware).
+ * @param quality   Desired quality (0-1). Defaults to 0.82.
  * @return Processed file data plus the old and new dimensions.
  */
 export async function vipsResizeImage(
@@ -115,7 +116,8 @@ export async function vipsResizeImage(
 	buffer: ArrayBuffer,
 	type: string,
 	resize: ImageSizeCrop,
-	smartCrop = false
+	smartCrop = false,
+	quality = 0.82
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -124,7 +126,7 @@ export async function vipsResizeImage(
 	originalHeight: number;
 } > {
 	const api = getWorkerAPI();
-	return api.resizeImage( id, buffer, type, resize, smartCrop );
+	return api.resizeImage( id, buffer, type, resize, smartCrop, quality );
 }
 
 /**

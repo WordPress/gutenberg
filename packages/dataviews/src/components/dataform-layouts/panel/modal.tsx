@@ -11,7 +11,7 @@ import {
 	Button,
 	Modal,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+
 import { useContext, useMemo, useRef, useState } from '@wordpress/element';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
@@ -23,6 +23,8 @@ import type {
 	Field,
 	NormalizedForm,
 	NormalizedFormField,
+	NormalizedPanelLayout,
+	PanelOpenAsModal,
 	FieldLayoutProps,
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
@@ -48,6 +50,8 @@ function ModalContent< Item >( {
 	fieldLabel: string;
 	touched: boolean;
 } ) {
+	const { openAs } = field.layout as NormalizedPanelLayout;
+	const { applyLabel, cancelLabel } = openAs as PanelOpenAsModal;
 	const { fields } = useContext( DataFormContext );
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
 	const modalData = useMemo( () => {
@@ -147,14 +151,14 @@ function ModalContent< Item >( {
 					onClick={ onClose }
 					__next40pxDefaultSize
 				>
-					{ __( 'Cancel' ) }
+					{ cancelLabel }
 				</Button>
 				<Button
 					variant="primary"
 					onClick={ onApply }
 					__next40pxDefaultSize
 				>
-					{ __( 'Apply' ) }
+					{ applyLabel }
 				</Button>
 			</Stack>
 		</Modal>
