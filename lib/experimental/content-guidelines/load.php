@@ -60,7 +60,7 @@ function gutenberg_content_guidelines_admin_bar_explorations( $wp_admin_bar ) {
 	}
 
 	$explorations = array(
-		'A' => 'Option A (Per-Section)',
+		'A' => 'Option A (Current)',
 		'B' => 'Option B (Suggest All)',
 		'C' => 'Option C',
 		'D' => 'Option D',
@@ -84,7 +84,7 @@ function gutenberg_content_guidelines_admin_bar_explorations( $wp_admin_bar ) {
 				'title'  => $label,
 				'href'   => '#',
 				'meta'   => array(
-					'onclick' => "cgSetExploration('" . esc_js( $key ) . "'); return false;",
+					'class' => 'cg-exploration-link',
 				),
 			)
 		);
@@ -93,12 +93,13 @@ function gutenberg_content_guidelines_admin_bar_explorations( $wp_admin_bar ) {
 	// Inline JS to handle clicks, localStorage, and custom event dispatch.
 	add_action(
 		'admin_footer',
-		function () {
+		function () use ( $explorations ) {
 			?>
 			<script>
 			(function() {
 				var STORAGE_KEY = 'content-guidelines-exploration';
 				var currentEl = document.getElementById('cg-exploration-current');
+				var keys = <?php echo wp_json_encode( array_keys( $explorations ) ); ?>;
 
 				function updateLabel() {
 					var val = localStorage.getItem(STORAGE_KEY) || 'A';
@@ -107,11 +108,18 @@ function gutenberg_content_guidelines_admin_bar_explorations( $wp_admin_bar ) {
 					}
 				}
 
-				window.cgSetExploration = function(key) {
-					localStorage.setItem(STORAGE_KEY, key);
-					updateLabel();
-					window.dispatchEvent(new CustomEvent('exploration-changed'));
-				};
+				// Event delegation on admin bar exploration links.
+				keys.forEach(function(key) {
+					var el = document.getElementById('wp-admin-bar-cg-exploration-' + key.toLowerCase());
+					if (el) {
+						el.addEventListener('click', function(e) {
+							e.preventDefault();
+							localStorage.setItem(STORAGE_KEY, key);
+							updateLabel();
+							window.dispatchEvent(new CustomEvent('exploration-changed'));
+						});
+					}
+				});
 
 				updateLabel();
 			})();
