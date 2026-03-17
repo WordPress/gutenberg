@@ -8,11 +8,12 @@ import { dispatch, select, subscribe, resolveSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { PostEditorAwareness } from '../post-editor-awareness';
-import { SelectionType } from '../../utils/crdt-user-selections';
+import { SelectionType } from '../../types';
 import type {
 	SelectionNone,
 	SelectionCursor,
 	SelectionWholeBlock,
+	ResolvedBlockSelection,
 } from '../../types';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import type { CollaboratorInfo } from '../types';
@@ -88,7 +89,7 @@ function mockBlockEditorStore( overrides: MockBlockEditorOverrides = {} ) {
 		overrides.getBlocks ??
 		jest.fn().mockReturnValue( overrides.blocks ?? defaultBlocks );
 
-	( select as jest.Mock ).mockReturnValue( {
+	const blockEditorSelectors = {
 		getSelectionStart:
 			overrides.getSelectionStart ?? jest.fn().mockReturnValue( {} ),
 		getSelectionEnd:
@@ -102,7 +103,10 @@ function mockBlockEditorStore( overrides: MockBlockEditorOverrides = {} ) {
 			.fn()
 			.mockReturnValue( overrides.getBlockName ?? 'core/paragraph' ),
 		getBlocks,
-	} );
+		getTitleSelection: jest.fn().mockReturnValue( undefined ),
+	};
+
+	( select as jest.Mock ).mockReturnValue( blockEditorSelectors );
 
 	return { getBlocks };
 }
@@ -168,6 +172,7 @@ function createTestDocWithBlocks( blocks?: Y.Map< any >[] ) {
 describe( 'PostEditorAwareness', () => {
 	let doc: Y.Doc;
 	let subscribeCallback: ( () => void ) | null = null;
+	let subscribeCallbacks: ( () => void )[] = [];
 	let mockEditEntityRecord: jest.Mock;
 
 	beforeEach( () => {
@@ -182,9 +187,15 @@ describe( 'PostEditorAwareness', () => {
 
 		mockBlockEditorStore();
 
-		// Mock subscribe to capture the callback
+		// Mock subscribe to capture callbacks.
+		// The first subscription is for block selections, the second for title.
+		subscribeCallbacks = [];
 		( subscribe as jest.Mock ).mockImplementation( ( callback ) => {
-			subscribeCallback = callback;
+			subscribeCallbacks.push( callback );
+			// Keep subscribeCallback pointing to the first (block) subscription.
+			if ( ! subscribeCallback ) {
+				subscribeCallback = callback;
+			}
 			return jest.fn(); // unsubscribe
 		} );
 
@@ -204,6 +215,7 @@ describe( 'PostEditorAwareness', () => {
 		jest.useRealTimers();
 		jest.restoreAllMocks();
 		subscribeCallback = null;
+		subscribeCallbacks = [];
 		doc.destroy();
 	} );
 
@@ -241,8 +253,9 @@ describe( 'PostEditorAwareness', () => {
 			awareness.setUp();
 			awareness.setUp();
 
-			// Subscribe should only be called once
-			expect( subscribe ).toHaveBeenCalledTimes( 1 );
+			// Subscribe should only be called once per subscription
+			// (block selection + title selection = 2 subscriptions)
+			expect( subscribe ).toHaveBeenCalledTimes( 2 );
 		} );
 
 		test( 'should subscribe to selection changes', () => {
@@ -492,7 +505,9 @@ describe( 'PostEditorAwareness', () => {
 
 			// Should return nulls when the relative position's type cannot be found
 			expect( result.textIndex ).toBeNull();
-			expect( result.localClientId ).toBeNull();
+			expect(
+				( result as ResolvedBlockSelection ).localClientId
+			).toBeNull();
 		} );
 
 		test( 'should return text index and block client ID for valid cursor selection', () => {
@@ -530,7 +545,9 @@ describe( 'PostEditorAwareness', () => {
 				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBe( 5 );
-			expect( result.localClientId ).toBe( 'block-1' );
+			expect( ( result as ResolvedBlockSelection ).localClientId ).toBe(
+				'block-1'
+			);
 		} );
 
 		test( 'should resolve WholeBlock selection to block client ID', () => {
@@ -562,7 +579,9 @@ describe( 'PostEditorAwareness', () => {
 				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBeNull();
-			expect( result.localClientId ).toBe( 'block-1' );
+			expect( ( result as ResolvedBlockSelection ).localClientId ).toBe(
+				'block-1'
+			);
 		} );
 	} );
 
@@ -768,7 +787,9 @@ describe( 'PostEditorAwareness', () => {
 				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBe( 2 );
-			expect( result.localClientId ).toBe( 'local-2' );
+			expect( ( result as ResolvedBlockSelection ).localClientId ).toBe(
+				'local-2'
+			);
 
 			nestedDoc.destroy();
 		} );
@@ -841,7 +862,9 @@ describe( 'PostEditorAwareness', () => {
 				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBe( 5 );
-			expect( result.localClientId ).toBe( 'local-inner-1' );
+			expect( ( result as ResolvedBlockSelection ).localClientId ).toBe(
+				'local-inner-1'
+			);
 
 			nestedDoc.destroy();
 		} );
@@ -896,7 +919,9 @@ describe( 'PostEditorAwareness', () => {
 				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBeNull();
-			expect( result.localClientId ).toBe( 'local-img' );
+			expect( ( result as ResolvedBlockSelection ).localClientId ).toBe(
+				'local-img'
+			);
 
 			nestedDoc.destroy();
 		} );
@@ -990,7 +1015,9 @@ describe( 'PostEditorAwareness', () => {
 				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBe( 7 );
-			expect( result.localClientId ).toBe( 'local-deep-1' );
+			expect( ( result as ResolvedBlockSelection ).localClientId ).toBe(
+				'local-deep-1'
+			);
 
 			nestedDoc.destroy();
 		} );
@@ -1092,7 +1119,9 @@ describe( 'PostEditorAwareness', () => {
 
 			expect( result.textIndex ).toBe( 4 );
 			// Should resolve to the post-content inner block, not a template block
-			expect( result.localClientId ).toBe( 'local-para-1' );
+			expect( ( result as ResolvedBlockSelection ).localClientId ).toBe(
+				'local-para-1'
+			);
 			// Verify getBlocks was called with the post-content clientId
 			expect( mockGetBlocks ).toHaveBeenCalledWith( postContentClientId );
 
@@ -1163,7 +1192,9 @@ describe( 'PostEditorAwareness', () => {
 				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBeNull();
-			expect( result.localClientId ).toBe( 'local-img' );
+			expect( ( result as ResolvedBlockSelection ).localClientId ).toBe(
+				'local-img'
+			);
 
 			templateDoc.destroy();
 		} );
@@ -1212,7 +1243,9 @@ describe( 'PostEditorAwareness', () => {
 				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBe( 3 );
-			expect( result.localClientId ).toBe( 'local-para' );
+			expect( ( result as ResolvedBlockSelection ).localClientId ).toBe(
+				'local-para'
+			);
 
 			normalDoc.destroy();
 		} );

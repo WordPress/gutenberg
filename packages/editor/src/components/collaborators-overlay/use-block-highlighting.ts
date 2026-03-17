@@ -90,11 +90,14 @@ export function useBlockHighlighting(
 				return ! userState.isMe && isWholeBlockSelected;
 			} )
 			.map( ( userState ) => {
-				let localClientId;
+				let localClientId: string | null = null;
 				try {
-					( { localClientId } = resolveSelection(
+					const resolved = resolveSelection(
 						userState.editorState?.selection
-					) );
+					);
+					if ( resolved.type === 'block' ) {
+						localClientId = resolved.localClientId;
+					}
 				} catch {
 					return null;
 				}

@@ -1,29 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { dispatch, select, subscribe } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
-// @ts-ignore No exported types for block editor store selectors.
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { BaseAwarenessState, baseEqualityFieldChecks } from './base-awareness';
 import { getBlockPathInYdoc, resolveBlockClientIdByPath } from './block-lookup';
-import {
-	AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS,
-	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
-} from './config';
-import { STORE_NAME as coreStore } from '../name';
-import {
-	areSelectionsStatesEqual,
-	getSelectionState,
-	SelectionType,
-} from '../utils/crdt-user-selections';
+import { AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS } from './config';
+import { areSelectionsStatesEqual } from '../utils/crdt-user-selections';
+import { createSelectionSubscription } from './selection/create-selection-subscription';
 
-import { SelectionDirection } from '../types';
-import type { SelectionState, WPBlockSelection } from '../types';
+import { SelectionType } from '../types';
+import type { ResolvedSelection, SelectionState } from '../types';
 import type { YBlocks } from '../utils/crdt-blocks';
 import type {
 	DebugCollaboratorData,
@@ -39,6 +29,8 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		editorState: this.areEditorStatesEqual,
 	};
 
+	private selectionSubscription: { unsubscribe: () => void } | null = null;
+
 	public constructor(
 		doc: Y.Doc,
 		private kind: string,
@@ -51,149 +43,23 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	protected onSetUp(): void {
 		super.onSetUp();
 
-		this.subscribeToCollaboratorSelectionChanges();
-	}
+		// Clean up any prior subscription before creating a new one.
+		if ( this.selectionSubscription ) {
+			this.selectionSubscription.unsubscribe();
+		}
 
-	/**
-	 * Subscribe to collaborator selection changes and update the selection state.
-	 */
-	private subscribeToCollaboratorSelectionChanges(): void {
-		const {
-			getSelectionStart,
-			getSelectionEnd,
-			getSelectedBlocksInitialCaretPosition,
-		} = select( blockEditorStore );
-
-		// Keep track of the current selection in the outer scope so we can compare
-		// in the subscription.
-		let selectionStart = getSelectionStart();
-		let selectionEnd = getSelectionEnd();
-		let localCursorTimeout: NodeJS.Timeout | null = null;
-
-		// During rapid selection changes (e.g. undo restoring content and
-		// selection), the debounce discards intermediate events. If we use the
-		// last intermediate state instead of the overall change it can produce
-		// the wrong direction.
-		// Use selectionBeforeDebounce to capture the selection state from
-		// before the debounce window so that direction is computed across the
-		// full window when it fires.
-		let selectionBeforeDebounce: {
-			start: WPBlockSelection;
-			end: WPBlockSelection;
-		} | null = null;
-
-		subscribe( () => {
-			const newSelectionStart = getSelectionStart();
-			const newSelectionEnd = getSelectionEnd();
-
-			if (
-				newSelectionStart === selectionStart &&
-				newSelectionEnd === selectionEnd
-			) {
-				return;
-			}
-
-			// On the first change of a debounce window, snapshot the state
-			// we're moving away from.
-			if ( ! selectionBeforeDebounce ) {
-				selectionBeforeDebounce = {
-					start: selectionStart,
-					end: selectionEnd,
-				};
-			}
-
-			selectionStart = newSelectionStart;
-			selectionEnd = newSelectionEnd;
-
-			// Typically selection position is only persisted after typing in a block, which
-			// can cause selection position to be reset by other users making block updates.
-			// Ensure we update the controlled selection right away, persisting our cursor position locally.
-			const initialPosition = getSelectedBlocksInitialCaretPosition();
-			void this.updateSelectionInEntityRecord(
-				selectionStart,
-				selectionEnd,
-				initialPosition
-			);
-
-			// We receive two selection changes in quick succession
-			// from local selection events:
-			//   { clientId: "123...", attributeKey: "content", offset: undefined }
-			//   { clientId: "123...", attributeKey: "content", offset: 554 }
-			// Add a short debounce to avoid sending the first selection change.
-			if ( localCursorTimeout ) {
-				clearTimeout( localCursorTimeout );
-			}
-
-			localCursorTimeout = setTimeout( () => {
-				// Compute direction across the full debounce window.
-				const selectionStateOptions: {
-					selectionDirection?: SelectionDirection;
-				} = {};
-
-				if ( selectionBeforeDebounce ) {
-					selectionStateOptions.selectionDirection =
-						detectSelectionDirection(
-							selectionBeforeDebounce.start,
-							selectionBeforeDebounce.end,
-							selectionStart,
-							selectionEnd
-						);
-
-					// Reset debounced selection state.
-					selectionBeforeDebounce = null;
-				}
-
-				const selectionState = getSelectionState(
-					selectionStart,
-					selectionEnd,
-					this.doc,
-					selectionStateOptions
-				);
-
+		this.selectionSubscription = createSelectionSubscription(
+			this.doc,
+			this.kind,
+			this.name,
+			this.postId,
+			( selectionState ) => {
 				this.setThrottledLocalStateField(
 					'editorState',
 					{ selection: selectionState },
 					AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS
 				);
-			}, LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS );
-		} );
-	}
-
-	/**
-	 * Update the entity record with the current collaborator's selection.
-	 *
-	 * @param selectionStart  - The start position of the selection.
-	 * @param selectionEnd    - The end position of the selection.
-	 * @param initialPosition - The initial position of the selection.
-	 */
-	private async updateSelectionInEntityRecord(
-		selectionStart: WPBlockSelection,
-		selectionEnd: WPBlockSelection,
-		initialPosition: number | null
-	): Promise< void > {
-		// Send an entityRecord `selection` update if we have a selection.
-		//
-		// Normally WordPress updates the `selection` property of the post when changes are made to blocks.
-		// In a multi-user setup, block changes can occur from other users. When an entity is updated from another
-		// user's changes, useBlockSync() in Gutenberg will reset the user's selection to the last saved selection.
-		//
-		// Manually adding an edit for each movement ensures that other user's changes to the document will
-		// not cause the local user's selection to reset to the last local change location.
-		const edits = {
-			selection: { selectionStart, selectionEnd, initialPosition },
-		};
-
-		const options = {
-			undoIgnore: true,
-		};
-
-		// @ts-ignore Types are not provided when using store name instead of store instance.
-		dispatch( coreStore ).editEntityRecord(
-			this.kind,
-			this.name,
-			this.postId,
-			edits,
-			options
+			}
 		);
 	}
 
@@ -220,27 +86,48 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	}
 
 	/**
-	 * Resolve a selection state to a text index and block client ID.
+	 * Resolve a SelectionState (which uses Y.RelativePositions) to absolute
+	 * positions that the rendering layer can use.
 	 *
-	 * For text-based selections, navigates up from the resolved Y.Text via
-	 * AbstractType.parent to find the containing block, then resolves the
-	 * local clientId via the block's tree path.
-	 * For WholeBlock selections, resolves the block's relative position and
-	 * then finds the local clientId via tree path.
+	 * - Title selections: resolves to a text index within the title Y.Text.
+	 * - WholeBlock selections: resolves the block's relative position and
+	 *   finds the local clientId via tree path.
+	 * - Text-based selections (Cursor, SelectionInOneBlock,
+	 *   SelectionInMultipleBlocks): navigates up from the resolved Y.Text
+	 *   via AbstractType.parent to find the containing block, then resolves
+	 *   the local clientId via the block's tree path.
 	 *
 	 * Tree-path resolution is used instead of reading the clientId directly
-	 * from the Yjs block because the local block-editor store may use different
-	 * clientIds (e.g. in "Show Template" mode where blocks are cloned).
+	 * from the Yjs block because the local block-editor store may use
+	 * different clientIds (e.g. in "Show Template" mode where blocks are
+	 * cloned).
 	 *
 	 * @param selection - The selection state.
-	 * @return The text index and block client ID, or nulls if not resolvable.
+	 * @return The resolved selection with absolute positions.
 	 */
-	public convertSelectionStateToAbsolute( selection: SelectionState ): {
-		textIndex: number | null;
-		localClientId: string | null;
-	} {
+	public convertSelectionStateToAbsolute(
+		selection: SelectionState
+	): ResolvedSelection {
 		if ( selection.type === SelectionType.None ) {
-			return { textIndex: null, localClientId: null };
+			return { type: 'block', textIndex: null, localClientId: null };
+		}
+
+		if ( selection.type === SelectionType.Title ) {
+			const cursorPos = selection.cursorPosition;
+			const absolutePosition =
+				Y.createAbsolutePositionFromRelativePosition(
+					cursorPos.relativePosition,
+					this.doc
+				);
+
+			if ( ! absolutePosition ) {
+				return { type: 'title', textIndex: null };
+			}
+
+			return {
+				type: 'title',
+				textIndex: absolutePosition.index,
+			};
 		}
 
 		if ( selection.type === SelectionType.WholeBlock ) {
@@ -263,7 +150,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				}
 			}
 
-			return { textIndex: null, localClientId };
+			return { type: 'block', textIndex: null, localClientId };
 		}
 
 		// Text-based selections: resolve cursor position and navigate up.
@@ -278,7 +165,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		);
 
 		if ( ! absolutePosition ) {
-			return { textIndex: null, localClientId: null };
+			return { type: 'block', textIndex: null, localClientId: null };
 		}
 
 		// Navigate up: Y.Text -> attributes Y.Map -> block Y.Map
@@ -287,7 +174,11 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			yType instanceof Y.Map ? getBlockPathInYdoc( yType ) : null;
 		const localClientId = path ? resolveBlockClientIdByPath( path ) : null;
 
-		return { textIndex: absolutePosition.index, localClientId };
+		return {
+			type: 'block',
+			textIndex: absolutePosition.index,
+			localClientId,
+		};
 	}
 
 	/**
@@ -369,51 +260,4 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			collaboratorMap: Object.fromEntries( collaboratorMapData ),
 		};
 	}
-}
-
-/**
- * Detect the direction of a selection change by comparing old and new edges.
- *
- * When the user extends a selection backward (e.g. Shift+Left), the
- * selectionStart edge moves while selectionEnd stays fixed, so the caret
- * is at the start.  The reverse is true for forward extension.
- *
- * @param prevStart - The previous selectionStart.
- * @param prevEnd   - The previous selectionEnd.
- * @param newStart  - The new selectionStart.
- * @param newEnd    - The new selectionEnd.
- * @return The detected direction, defaulting to Forward when indeterminate.
- */
-function detectSelectionDirection(
-	prevStart: WPBlockSelection,
-	prevEnd: WPBlockSelection,
-	newStart: WPBlockSelection,
-	newEnd: WPBlockSelection
-): SelectionDirection {
-	const startMoved = ! areBlockSelectionsEqual( prevStart, newStart );
-	const endMoved = ! areBlockSelectionsEqual( prevEnd, newEnd );
-
-	if ( startMoved && ! endMoved ) {
-		return SelectionDirection.Backward;
-	}
-
-	return SelectionDirection.Forward;
-}
-
-/**
- * Compare two WPBlockSelection objects by value.
- *
- * @param a - First selection.
- * @param b - Second selection.
- * @return True if all fields are equal.
- */
-function areBlockSelectionsEqual(
-	a: WPBlockSelection,
-	b: WPBlockSelection
-): boolean {
-	return (
-		a.clientId === b.clientId &&
-		a.attributeKey === b.attributeKey &&
-		a.offset === b.offset
-	);
 }

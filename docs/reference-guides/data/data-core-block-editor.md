@@ -882,6 +882,18 @@ _Returns_
 
 -   `string|false`: Block Template Lock
 
+### getTitleSelection
+
+Returns the current user's title selection offsets.
+
+_Parameters_
+
+-   _state_ `Object`: Block editor state.
+
+_Returns_
+
+-   `{ start: number|null, end: number|null }`: Title selection offsets.
+
 ### hasBlockMovingClientId
 
 > **Deprecated**
@@ -1698,6 +1710,19 @@ Action that resets the template validity.
 _Parameters_
 
 -   _isValid_ `boolean`: template validity flag.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setTitleSelection
+
+Sets the current user's title selection offsets.
+
+_Parameters_
+
+-   _start_ `number|null`: The start offset, or null to clear.
+-   _end_ `number|null`: The end offset, or null to clear.
 
 _Returns_
 

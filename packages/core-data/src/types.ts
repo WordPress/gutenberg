@@ -3,11 +3,6 @@
  */
 import type { Y } from '@wordpress/sync';
 
-/**
- * Internal dependencies
- */
-import type { SelectionType } from './utils/crdt-user-selections';
-
 export interface AnyFunction {
 	( ...args: any[] ): any;
 }
@@ -76,6 +71,18 @@ export enum SelectionDirection {
 	Backward = 'b',
 }
 
+/**
+ * The type of selection.
+ */
+export enum SelectionType {
+	None = 'none',
+	Cursor = 'cursor',
+	SelectionInOneBlock = 'selection-in-one-block',
+	SelectionInMultipleBlocks = 'selection-in-multiple-blocks',
+	WholeBlock = 'whole-block',
+	Title = 'title',
+}
+
 export type SelectionNone = {
 	// The user has not made a selection.
 	type: SelectionType.None;
@@ -119,14 +126,33 @@ export type SelectionWholeBlock = {
 	blockPosition: Y.RelativePosition;
 };
 
+export type SelectionInTitle = {
+	// The user has a cursor or text selection in the post title.
+	// The title Y.Text lives directly on the root YPostRecord map,
+	// not inside a block's attributes map.
+	type: SelectionType.Title;
+	cursorPosition: CursorPosition;
+	cursorEndPosition?: CursorPosition;
+	selectionDirection?: SelectionDirection;
+};
+
 export type SelectionState =
 	| SelectionNone
 	| SelectionCursor
 	| SelectionInOneBlock
 	| SelectionInMultipleBlocks
-	| SelectionWholeBlock;
+	| SelectionWholeBlock
+	| SelectionInTitle;
 
-export interface ResolvedSelection {
+export interface ResolvedBlockSelection {
+	type: 'block';
 	textIndex: number | null;
 	localClientId: string | null;
 }
+
+export interface ResolvedTitleSelection {
+	type: 'title';
+	textIndex: number | null;
+}
+
+export type ResolvedSelection = ResolvedBlockSelection | ResolvedTitleSelection;

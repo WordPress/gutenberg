@@ -345,6 +345,22 @@ export function clearSelectedBlock() {
 }
 
 /**
+ * Sets the current user's title selection offsets.
+ *
+ * @param {number|null} start The start offset, or null to clear.
+ * @param {number|null} end   The end offset, or null to clear.
+ *
+ * @return {Object} Action object.
+ */
+export function setTitleSelection( start, end ) {
+	return {
+		type: 'SET_TITLE_SELECTION',
+		start,
+		end,
+	};
+}
+
+/**
  * Action that enables or disables block selection.
  *
  * @param {boolean} [isSelectionEnabled=true] Whether block selection should

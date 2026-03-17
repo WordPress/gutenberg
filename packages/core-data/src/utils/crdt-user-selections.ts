@@ -13,29 +13,20 @@ import { CRDT_RECORD_MAP_KEY } from '../sync';
 import type { YPostRecord } from './crdt';
 import type { YBlock, YBlocks } from './crdt-blocks';
 import { getRootMap } from './crdt-utils';
-import type { SelectionDirection } from '../types';
 import {
+	SelectionType,
 	type AbsoluteBlockIndexPath,
-	type WPBlockSelection,
-	type SelectionState,
-	type SelectionNone,
-	type SelectionCursor,
-	type SelectionInOneBlock,
-	type SelectionInMultipleBlocks,
-	type SelectionWholeBlock,
 	type CursorPosition,
+	type SelectionCursor,
+	type SelectionDirection,
+	type SelectionInMultipleBlocks,
+	type SelectionInOneBlock,
+	type SelectionInTitle,
+	type SelectionNone,
+	type SelectionState,
+	type SelectionWholeBlock,
+	type WPBlockSelection,
 } from '../types';
-
-/**
- * The type of selection.
- */
-export enum SelectionType {
-	None = 'none',
-	Cursor = 'cursor',
-	SelectionInOneBlock = 'selection-in-one-block',
-	SelectionInMultipleBlocks = 'selection-in-multiple-blocks',
-	WholeBlock = 'whole-block',
-}
 
 /**
  * Converts WordPress block editor selection to a SelectionState.
@@ -348,6 +339,30 @@ export function areSelectionsStatesEqual(
 				selection1.blockPosition,
 				( selection2 as SelectionWholeBlock ).blockPosition
 			);
+
+		case SelectionType.Title: {
+			const sel2Title = selection2 as SelectionInTitle;
+			const cursorEqual = areCursorPositionsEqual(
+				selection1.cursorPosition,
+				sel2Title.cursorPosition
+			);
+			if ( ! cursorEqual ) {
+				return false;
+			}
+			if ( selection1.cursorEndPosition && sel2Title.cursorEndPosition ) {
+				return (
+					areCursorPositionsEqual(
+						selection1.cursorEndPosition,
+						sel2Title.cursorEndPosition
+					) &&
+					selection1.selectionDirection ===
+						sel2Title.selectionDirection
+				);
+			}
+			return (
+				! selection1.cursorEndPosition && ! sel2Title.cursorEndPosition
+			);
+		}
 
 		default:
 			return false;

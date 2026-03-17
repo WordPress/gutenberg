@@ -1,5 +1,9 @@
 import { SelectionDirection, SelectionType } from '@wordpress/core-data';
-import type { ResolvedSelection } from '@wordpress/core-data';
+import type {
+	ResolvedSelection,
+	ResolvedBlockSelection,
+	SelectionInTitle,
+} from '@wordpress/core-data';
 
 import {
 	getCursorPosition,
@@ -58,6 +62,20 @@ export function computeSelectionVisual(
 		return {};
 	}
 
+	if ( selection.type === SelectionType.Title ) {
+		if ( ! end ) {
+			// Cursor only in title.
+			return computeTitleCursorOnly( start, overlayContext );
+		}
+		// Text selection in title.
+		return computeTitleTextSelection(
+			selection,
+			start,
+			end,
+			overlayContext
+		);
+	}
+
 	if ( selection.type === SelectionType.Cursor ) {
 		return computeCursorOnly( start, overlayContext );
 	}
@@ -80,7 +98,7 @@ function computeCursorOnly(
 	start: ResolvedSelection,
 	overlayContext: OverlayContext
 ): SelectionVisual {
-	if ( ! start.localClientId ) {
+	if ( start.type !== 'block' || ! start.localClientId ) {
 		return {};
 	}
 	const blockElement =
@@ -91,6 +109,95 @@ function computeCursorOnly(
 		coords: getCursorPosition(
 			start.textIndex,
 			blockElement,
+			overlayContext.editorDocument,
+			overlayContext.overlayRect
+		),
+	};
+}
+
+/**
+ * Find the title DOM element in the editor document.
+ * @param overlayContext
+ */
+function findTitleElement(
+	overlayContext: OverlayContext
+): HTMLElement | null {
+	return overlayContext.editorDocument.querySelector< HTMLElement >(
+		'[data-post-title]'
+	);
+}
+
+/**
+ * Compute cursor coordinates for a cursor in the post title.
+ * @param start
+ * @param overlayContext
+ */
+function computeTitleCursorOnly(
+	start: ResolvedSelection,
+	overlayContext: OverlayContext
+): SelectionVisual {
+	const titleElement = findTitleElement( overlayContext );
+	return {
+		coords: getCursorPosition(
+			start.textIndex,
+			titleElement,
+			overlayContext.editorDocument,
+			overlayContext.overlayRect
+		),
+	};
+}
+
+/**
+ * Compute cursor coordinates and selection rects for a text selection in the title.
+ * @param selection
+ * @param start
+ * @param end
+ * @param overlayContext
+ */
+function computeTitleTextSelection(
+	selection: SelectionInTitle,
+	start: ResolvedSelection,
+	end: ResolvedSelection,
+	overlayContext: OverlayContext
+): SelectionVisual {
+	if ( start.textIndex === null || end.textIndex === null ) {
+		return {};
+	}
+
+	const titleElement = findTitleElement( overlayContext );
+	if ( ! titleElement ) {
+		return {};
+	}
+
+	const isReverse =
+		selection.selectionDirection === SelectionDirection.Backward;
+	const activeEnd = isReverse ? start : end;
+
+	const rects =
+		getSelectionRects(
+			titleElement,
+			start.textIndex,
+			end.textIndex,
+			overlayContext.editorDocument,
+			overlayContext.overlayRect
+		) ?? [];
+
+	if ( rects.length > 0 ) {
+		return {
+			coords: getCursorPosition(
+				activeEnd.textIndex,
+				titleElement,
+				overlayContext.editorDocument,
+				overlayContext.overlayRect
+			),
+			selectionRects: rects,
+		};
+	}
+
+	return {
+		coords: getCursorPosition(
+			start.textIndex,
+			titleElement,
 			overlayContext.editorDocument,
 			overlayContext.overlayRect
 		),
@@ -114,6 +221,8 @@ function computeTextSelection(
 	overlayContext: OverlayContext
 ): SelectionVisual {
 	if (
+		start.type !== 'block' ||
+		end.type !== 'block' ||
 		! start.localClientId ||
 		! end.localClientId ||
 		start.textIndex === null ||
@@ -181,8 +290,8 @@ function computeTextSelection(
  * @return Array of selection rectangles.
  */
 function computeSingleBlockRects(
-	start: ResolvedSelection,
-	end: ResolvedSelection,
+	start: ResolvedBlockSelection,
+	end: ResolvedBlockSelection,
 	overlayContext: OverlayContext
 ): SingleBlockResult {
 	const blockElement =
@@ -221,8 +330,8 @@ function computeSingleBlockRects(
  * @return Array of selection rectangles.
  */
 function computeMultiBlockRects(
-	start: ResolvedSelection,
-	end: ResolvedSelection,
+	start: ResolvedBlockSelection,
+	end: ResolvedBlockSelection,
 	overlayContext: OverlayContext
 ): MultiBlockResult {
 	let docFirst = start;
