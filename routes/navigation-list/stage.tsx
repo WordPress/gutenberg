@@ -7,13 +7,10 @@ import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import type { Post } from '@wordpress/core-data';
 import { Page } from '@wordpress/admin-ui';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useView } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
-import {
-	Button,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
@@ -33,7 +30,6 @@ import './style.scss';
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
-const { Badge } = unlock( componentsPrivateApis );
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
@@ -111,10 +107,10 @@ function NavigationList() {
 
 						const count = statusMap[ props.item.id ] || 0;
 						const isActive = count > 0;
-						const badgeText = isActive
+						const statusText = isActive
 							? sprintf(
-									/* translators: %d: number of locations */
-									__( 'Active (%d locations)' ),
+									/* translators: %d: number of template part locations */
+									_n( '%d location', '%d locations', count ),
 									count
 							  )
 							: __( 'Inactive' );
@@ -122,9 +118,9 @@ function NavigationList() {
 						return (
 							<>
 								{ originalRender }
-								<Badge intent={ isActive ? 'info' : 'default' }>
-									{ badgeText }
-								</Badge>
+								<span className="navigation-list__item-status">
+									{ statusText }
+								</span>
 							</>
 						);
 					},

@@ -4,3 +4,9 @@
 .navigation-page {
 	// Navigation list page styles can be added here
 }
+
+.navigation-list__item-status {
+	display: block;
+	color: $gray-600;
+	font-size: 12px;
+}
