@@ -9,6 +9,11 @@ import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
 
+/**
+ * Internal dependencies
+ */
+import type { ConnectionError } from './errors';
+
 /* globalThis */
 declare global {
 	interface Window {
@@ -53,25 +58,6 @@ export type ProviderOn = < K extends keyof ProviderEventMap >(
 export interface ProviderCreatorResult {
 	destroy: () => void;
 	on: ProviderOn;
-}
-
-/**
- * Error codes for connection errors that can occur in sync providers.
- */
-export type ConnectionErrorCode =
-	| 'authentication-error'
-	| 'connection-expired'
-	| 'connection-limit-exceeded'
-	| 'unknown-error';
-
-/**
- * Sync connection error object.
- */
-export interface ConnectionError extends Error {
-	/**
-	 * Error code identifier for programmatic handling and default message lookup.
-	 */
-	code: ConnectionErrorCode;
 }
 
 /**
