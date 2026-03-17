@@ -11,11 +11,12 @@ import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * "Remove Tab" button in the block toolbar for the tab block.
- * Removes the currently active tab from the tab-panels block.
+ * Removes the currently active core/tab and its corresponding
+ * core/tabs-menu-item, keeping both in sync.
  *
  * @param {Object} props
  * @param {string} props.tabsClientId The client ID of the parent tabs block.
- * @return {JSX.Element} The toolbar control element.
+ * @return {React.JSX.Element} The toolbar control element.
  */
 export default function RemoveTabToolbarControl( { tabsClientId } ) {
 	const {
@@ -25,12 +26,17 @@ export default function RemoveTabToolbarControl( { tabsClientId } ) {
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
-	// Find the tab-panels block, active tab, and tab count within the tabs block
-	const { activeTabClientId, tabCount, editorActiveTabIndex } = useSelect(
+	const {
+		activeTabClientId,
+		activeMenuItemClientId,
+		tabCount,
+		editorActiveTabIndex,
+	} = useSelect(
 		( select ) => {
 			if ( ! tabsClientId ) {
 				return {
 					activeTabClientId: null,
+					activeMenuItemClientId: null,
 					tabCount: 0,
 					editorActiveTabIndex: 0,
 				};
@@ -43,13 +49,27 @@ export default function RemoveTabToolbarControl( { tabsClientId } ) {
 				tabsAttributes?.activeTabIndex ??
 				0;
 			const innerBlocks = getBlocks( tabsClientId );
-			const tabPanels = innerBlocks.find(
-				( block ) => block.name === 'core/tab-panels'
+			const tabPanel = innerBlocks.find(
+				( block ) => block.name === 'core/tab-panel'
 			);
-			const tabs = tabPanels?.innerBlocks || [];
+			const tabsMenu = innerBlocks.find(
+				( block ) => block.name === 'core/tabs-menu'
+			);
+			const tabs = tabPanel?.innerBlocks || [];
+			const menuItems = tabsMenu?.innerBlocks || [];
 			const activeTab = tabs[ activeIndex ];
+			// Match menu item by anchor (e.g. "tab-1" → "tab-1-button").
+			const expectedMenuAnchor = activeTab?.attributes?.anchor
+				? `${ activeTab.attributes.anchor }-button`
+				: null;
+			const activeMenuItem = expectedMenuAnchor
+				? menuItems.find(
+						( m ) => m.attributes?.anchor === expectedMenuAnchor
+				  )
+				: menuItems[ activeIndex ];
 			return {
 				activeTabClientId: activeTab?.clientId || null,
+				activeMenuItemClientId: activeMenuItem?.clientId || null,
 				tabCount: tabs.length,
 				editorActiveTabIndex: activeIndex,
 			};
@@ -62,28 +82,28 @@ export default function RemoveTabToolbarControl( { tabsClientId } ) {
 			return;
 		}
 
-		// Calculate new active index after removal
+		// Calculate new active index after removal.
 		const newActiveIndex =
 			editorActiveTabIndex >= tabCount - 1
-				? tabCount - 2 // If removing last tab, select the previous one
-				: editorActiveTabIndex; // Otherwise keep the same index (next tab shifts into position)
+				? tabCount - 2
+				: editorActiveTabIndex;
 
-		// Update the active tab index before removing
 		__unstableMarkNextChangeAsNotPersistent();
 		updateBlockAttributes( tabsClientId, {
 			editorActiveTabIndex: newActiveIndex,
 		} );
 
-		// Remove the tab
+		// Remove the tab content block and the corresponding menu item.
 		removeBlock( activeTabClientId, false );
+		if ( activeMenuItemClientId ) {
+			removeBlock( activeMenuItemClientId, false );
+		}
 
-		// Select the tabs block after removal
 		if ( tabsClientId ) {
 			selectBlock( tabsClientId );
 		}
 	};
 
-	// Don't show the button if there's only one tab or no active tab
 	const isDisabled = tabCount <= 1 || ! activeTabClientId;
 
 	return (
@@ -91,10 +111,8 @@ export default function RemoveTabToolbarControl( { tabsClientId } ) {
 			<ToolbarGroup>
 				<ToolbarButton
 					className="components-toolbar__control"
-					label={ __( 'Remove the current tab' ) }
 					onClick={ removeTab }
-					showTooltip
-					text={ __( 'Remove Tab' ) }
+					text={ __( 'Remove tab' ) }
 					disabled={ isDisabled }
 				/>
 			</ToolbarGroup>

@@ -18,19 +18,17 @@ import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';
 import { actions, data, fields } from './fixtures';
 
-const WithCardComponent = () => {
+const WithCardComponent = ( {
+	containerHeight,
+}: {
+	containerHeight: string;
+} ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_TABLE,
 		search: '',
 		page: 1,
 		perPage: 10,
-		layout: {
-			styles: {
-				satellites: {
-					align: 'end' as const,
-				},
-			},
-		},
+		layout: {},
 		filters: [],
 		fields: [ 'categories' ],
 		titleField: 'title',
@@ -43,7 +41,7 @@ const WithCardComponent = () => {
 	return (
 		<Card>
 			<CardHeader>Header</CardHeader>
-			<CardBody>
+			<CardBody style={ { height: containerHeight, minHeight: 0 } }>
 				<DataViews
 					getItemId={ ( item ) => item.id.toString() }
 					paginationInfo={ paginationInfo }

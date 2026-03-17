@@ -18,6 +18,7 @@ export default function Email< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
 	return (
@@ -27,6 +28,7 @@ export default function Email< Item >( {
 				field,
 				onChange,
 				hideLabelFromVision,
+				markWhenOptional,
 				validity,
 				type: 'email',
 				prefix: (

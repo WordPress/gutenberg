@@ -92,6 +92,7 @@
 	position: absolute;
 	width: 1px;
 	word-wrap: normal !important;
+	word-break: normal !important;
 }
 
 .screen-reader-text:focus {
@@ -122,6 +123,9 @@
  * See: https://github.com/WordPress/gutenberg/pull/33743
  */
 html :where(.has-border-color) {
+	border-style: solid;
+}
+html :where([style*="border-color"]) {
 	border-style: solid;
 }
 html :where([style*="border-top-color"]) {

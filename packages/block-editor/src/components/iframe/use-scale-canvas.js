@@ -196,7 +196,7 @@ export function useScaleCanvas( {
 
 	/**
 	 * The starting transition state for the zoom out animation.
-	 * @type {import('react').RefObject<TransitionState>}
+	 * @type {React.RefObject<TransitionState>}
 	 */
 	const transitionFromRef = useRef( {
 		scaleValue,
@@ -208,7 +208,7 @@ export function useScaleCanvas( {
 
 	/**
 	 * The ending transition state for the zoom out animation.
-	 * @type {import('react').RefObject<TransitionState>}
+	 * @type {React.RefObject<TransitionState>}
 	 */
 	const transitionToRef = useRef( {
 		scaleValue,
@@ -484,6 +484,7 @@ export function useScaleCanvas( {
 	return {
 		isZoomedOut,
 		scaleContainerWidth,
+		containerWidth,
 		contentResizeListener,
 		containerResizeListener,
 	};

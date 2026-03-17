@@ -1,0 +1,85 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design System/Components/Tabs/Best Practices" />
+
+# Tabs
+
+## Usage
+
+### Uncontrolled Mode
+
+`Tabs` can be used in an uncontrolled mode, where the component manages its own state. In this mode, the `defaultValue` prop can be used to set the initially selected tab.
+
+```jsx
+import { Tabs } from '@wordpress/ui';
+
+const MyUncontrolledTabs = () => (
+	<Tabs.Root
+		onValueChange={ ( tab ) => console.log( 'New selected tab: ', tab ) }
+		defaultValue="tab2"
+	>
+		<Tabs.List>
+			<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
+			<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
+			<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
+		</Tabs.List>
+		<Tabs.Panel value="tab1">
+			<p>Selected tab: Tab 1</p>
+		</Tabs.Panel>
+		<Tabs.Panel value="tab2">
+			<p>Selected tab: Tab 2</p>
+		</Tabs.Panel>
+		<Tabs.Panel value="tab3">
+			<p>Selected tab: Tab 3</p>
+		</Tabs.Panel>
+	</Tabs.Root>
+);
+```
+
+### Controlled Mode
+
+Tabs can also be used in a controlled mode, where the parent component uses the `value` and `onValueChange` props to control tab selection. In this mode, the `defaultValue` prop will be ignored if it is provided. To indicate that no tabs are selected, pass `null` to the `value`.
+
+```tsx
+import { useState } from 'react';
+import { Tabs } from '@wordpress/ui';
+
+const MyControlledTabs = () => {
+	const [ selectedTabId, setSelectedTabId ] = useState<
+		string | undefined | null
+	>( null );
+
+	return (
+		<Tabs.Root
+			value={ selectedTabId }
+			onValueChange={ ( newSelectedTabId ) => {
+				setSelectedTabId( newSelectedTabId );
+				console.log( 'Selecting tab', newSelectedTabId );
+			} }
+		>
+			<Tabs.List>
+				<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
+				<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
+				<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
+			</Tabs.List>
+			<Tabs.Panel value="tab1">
+				<p>Selected tab: Tab 1</p>
+			</Tabs.Panel>
+			<Tabs.Panel value="tab2">
+				<p>Selected tab: Tab 2</p>
+			</Tabs.Panel>
+			<Tabs.Panel value="tab3">
+				<p>Selected tab: Tab 3</p>
+			</Tabs.Panel>
+		</Tabs.Root>
+	);
+};
+```
+
+### Using `Tabs` with links
+
+The semantics implemented by the `Tabs` component don't align well with the semantics needed by a list of links. Furthermore, end users usually expect every link to be tabbable, while `Tabs.List` is a [composite](https://w3c.github.io/aria/#composite) widget acting as a single tab stop.
+
+For these reasons, even if the `Tabs` component is fully extensible, we don't recommend using `Tabs` with links, and we don't currently provide any related Storybook example.
+
+We may provide a dedicated component for tabs-like links in the future based on the feedback received.

@@ -1,39 +1,24 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
-import {
-	AlignmentControl,
-	BlockControls,
-	useBlockProps,
-} from '@wordpress/block-editor';
+import { useBlockProps } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
-export default function PostCommentsCountEdit( {
-	attributes,
-	context,
-	setAttributes,
-} ) {
-	const { textAlign } = attributes;
+export default function PostCommentsCountEdit( { context } ) {
 	const { postId } = context;
 	const [ commentsCount, setCommentsCount ] = useState();
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+
+	const blockProps = useBlockProps();
 
 	useEffect( () => {
 		if ( ! postId ) {
 			return;
 		}
+
 		const currentPostId = postId;
+
 		apiFetch( {
 			path: addQueryArgs( '/wp/v2/comments', {
 				post: postId,
@@ -48,6 +33,7 @@ export default function PostCommentsCountEdit( {
 	}, [ postId ] );
 
 	const hasPostAndComments = postId && commentsCount !== undefined;
+
 	const blockStyles = {
 		...blockProps.style,
 		textDecoration: hasPostAndComments
@@ -56,18 +42,8 @@ export default function PostCommentsCountEdit( {
 	};
 
 	return (
-		<>
-			<BlockControls group="block">
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
-			<div { ...blockProps } style={ blockStyles }>
-				{ hasPostAndComments ? commentsCount : '0' }
-			</div>
-		</>
+		<div { ...blockProps } style={ blockStyles }>
+			{ hasPostAndComments ? commentsCount : '0' }
+		</div>
 	);
 }

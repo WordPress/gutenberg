@@ -1,6 +1,6 @@
 # Notices
 
-State management for notices.
+State management and UI components for notices.
 
 ## Installation
 
@@ -19,6 +19,79 @@ When imported, the notices module registers a data store on the `core/notices` n
 For more information about consuming from a data store, refer to [the `@wordpress/data` documentation on _Data Access and Manipulation_](https://github.com/WordPress/gutenberg/tree/HEAD/packages/data/README.md#data-access-and-manipulation).
 
 For a full list of actions and selectors available in the `core/notices` namespace, refer to the [_Notices Data_ Handbook page](https://github.com/WordPress/gutenberg/tree/HEAD/docs/reference-guides/data/data-core-notices.md).
+
+## Components
+
+The package also exports ready-to-use notice UI components powered by the `core/notices` store.
+
+### `InlineNotices`
+
+Renders notice lists for notices with type `default`:
+
+-   non-dismissible notices in a pinned list.
+-   dismissible notices in a removable list.
+
+`children` are rendered inside the dismissible list.
+
+_Props_
+
+-   `children: ReactNode` (optional): Additional content rendered in the dismissible notice list.
+-   `pinnedNoticesClassName: string` (optional): Extra class name added to the pinned list.
+-   `dismissibleNoticesClassName: string` (optional): Extra class name added to the dismissible list.
+-   `context: string` (optional): Notice context to read and remove notices from. Defaults to `default`.
+
+### `SnackbarNotices`
+
+Renders notices with type `snackbar` using `SnackbarList`.
+
+-   It renders the last three snackbar notices.
+-   Dismiss actions are wired to `removeNotice`.
+
+_Props_
+
+-   `className: string` (optional): Extra class name added to the snackbar list.
+-   `context: string` (optional): Notice context to read and remove notices from. Defaults to `default`.
+
+## Example
+
+```jsx
+import { useDispatch } from '@wordpress/data';
+import {
+	InlineNotices,
+	SnackbarNotices,
+	store as noticesStore,
+} from '@wordpress/notices';
+
+function AppNotices() {
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const noticeContext = 'my-plugin/screen';
+
+	return (
+		<>
+			<button
+				onClick={ () =>
+					createSuccessNotice( 'Saved successfully.', {
+						type: 'snackbar',
+						context: noticeContext,
+					} )
+				}
+			>
+				Create snackbar notice
+			</button>
+
+			<InlineNotices
+				pinnedNoticesClassName="my-plugin-notices__pinned"
+				dismissibleNoticesClassName="my-plugin-notices__dismissible"
+				context={ noticeContext }
+			/>
+			<SnackbarNotices
+				className="my-plugin-notices__snackbar"
+				context={ noticeContext }
+			/>
+		</>
+	);
+}
+```
 
 ## Contributing to this package
 

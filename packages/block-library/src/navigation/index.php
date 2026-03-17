@@ -9,11 +9,12 @@
  * Returns the submenu visibility value with backward compatibility
  * for the deprecated openSubmenusOnClick attribute.
  *
- * NOTE: Keep this function in sync with getSubmenuVisibility in
- * packages/block-library/src/navigation/utils/get-submenu-visibility.js
- *
  * This function centralizes the migration logic from the boolean
  * openSubmenusOnClick to the new submenuVisibility enum.
+ *
+ * Backward compatibility: WordPress applies default attribute values, so submenuVisibility
+ * will always have a value even for legacy blocks. We check the legacy openSubmenusOnClick
+ * attribute first to preserve original behavior for blocks saved before the migration.
  *
  * @since 6.9.0
  *
@@ -21,19 +22,22 @@
  * @return string The visibility mode: 'hover', 'click', or 'always'.
  */
 function block_core_navigation_get_submenu_visibility( $attributes ) {
-	$submenu_visibility     = isset( $attributes['submenuVisibility'] ) ? $attributes['submenuVisibility'] : null;
-	$open_submenus_on_click = isset( $attributes['openSubmenusOnClick'] ) ? $attributes['openSubmenusOnClick'] : null;
+	$deprecated_open_submenus_on_click = $attributes['openSubmenusOnClick'] ?? null;
 
-	// If new attribute is set, use it.
-	if ( null !== $submenu_visibility ) {
-		return $submenu_visibility;
+	// For backward compatibility, prioritize the legacy attribute if present.
+	// Legacy blocks have openSubmenusOnClick in the database. Since WordPress applies
+	// default values, submenuVisibility will also have a value, but we check the legacy
+	// attribute first to preserve the original behavior. If the block has been updated
+	// and saved in the editor, then the deprecated attribute will be replaced by submenuVisibility.
+	if ( null !== $deprecated_open_submenus_on_click ) {
+		// Convert boolean to string: true -> 'click', false -> 'hover'.
+		return ! empty( $deprecated_open_submenus_on_click ) ? 'click' : 'hover';
 	}
 
-	// Fall back to old attribute for backward compatibility.
-	// openSubmenusOnClick: true  -> 'click'
-	// openSubmenusOnClick: false -> 'hover'
-	// openSubmenusOnClick: null  -> 'hover' (default)
-	return ! empty( $open_submenus_on_click ) ? 'click' : 'hover';
+	$submenu_visibility = $attributes['submenuVisibility'] ?? null;
+
+	// Use submenuVisibility for migrated/new blocks (where openSubmenusOnClick is null).
+	return $submenu_visibility ?? 'hover';
 }
 
 /**
@@ -72,17 +76,6 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static $seen_menu_names = array();
 
-	/**
-	 * Returns whether the navigation overlay experiment is enabled.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return bool Returns whether the navigation overlay experiment is enabled.
-	 */
-	private static function is_overlay_experiment_enabled() {
-		$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-		return $gutenberg_experiments && array_key_exists( 'gutenberg-customizable-navigation-overlays', $gutenberg_experiments );
-	}
 
 	/**
 	 * Returns whether or not this is responsive navigation.
@@ -652,7 +645,6 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		if ( $has_custom_overlay ) {
-			// Only add the disable-default-overlay class if experiment is enabled AND overlay blocks actually rendered.
 			$responsive_container_classes[] = 'disable-default-overlay';
 		} else {
 			// Don't apply overlay color classes if using a custom overlay template part.
@@ -693,38 +685,40 @@ class WP_Navigation_Block_Renderer {
 
 		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
 
-		// Set-up variables for the custom overlay experiment.
-		// Values are set to "off" so they don't affect the default behavior.
-		$is_overlay_experiment_enabled  = static::is_overlay_experiment_enabled();
+		// Set-up variables for custom overlays.
 		$has_custom_overlay             = false;
 		$close_button_markup            = '';
 		$has_custom_overlay_close_block = false;
 		$overlay_blocks_html            = '';
 		$custom_overlay_markup          = '';
 
-		if ( $is_overlay_experiment_enabled ) {
-			// Check if an overlay template part is selected and render it.
-			// This needs to happen before building classes so we know if overlay blocks actually exist.
-			if ( ! empty( $attributes['overlay'] ) ) {
-				// Get blocks from the overlay template part.
-				$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
-				// Check if overlay contains a navigation-overlay-close block.
-				$has_custom_overlay_close_block = block_core_navigation_block_tree_has_block_type(
-					$overlay_blocks,
-					'core/navigation-overlay-close',
-					array( 'core/navigation' ) // Skip navigation blocks, as they cannot contain an overlay close block
-				);
-				// Render template part blocks directly without navigation container wrapper.
-				$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
-				// Add Interactivity API directives to the overlay close block if present.
-				if ( $has_custom_overlay_close_block && $is_interactive ) {
-					$tags                = new WP_HTML_Tag_Processor( $overlay_blocks_html );
-					$overlay_blocks_html = block_core_navigation_add_directives_to_overlay_close( $tags );
-				}
+		// Check if an overlay template part is selected and render it.
+		// This needs to happen before building classes so we know if overlay blocks actually exist.
+		if ( ! empty( $attributes['overlay'] ) ) {
+			// Get blocks from the overlay template part.
+			$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
+			// Check if overlay contains a navigation-overlay-close block.
+			$has_custom_overlay_close_block = block_core_navigation_block_tree_has_block_type(
+				$overlay_blocks,
+				'core/navigation-overlay-close',
+				array( 'core/navigation' ) // Skip navigation blocks, as they cannot contain an overlay close block
+			);
+			// Render template part blocks directly without navigation container wrapper.
+			$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
+			// Add Interactivity API directives to the overlay close block if present.
+			if ( $has_custom_overlay_close_block && $is_interactive ) {
+				$tags                = new WP_HTML_Tag_Processor( $overlay_blocks_html );
+				$overlay_blocks_html = block_core_navigation_add_directives_to_overlay_close( $tags );
 			}
-
-			$has_custom_overlay = ! empty( $overlay_blocks_html );
+			// Images in the overlay are hidden until the menu is opened. Pre-set
+			// fetchpriority="low" so that when wp_filter_content_tags() processes the
+			// parent template part, it sees the attribute already present and calls
+			// wp_get_loading_optimization_attributes() with fetchpriority="low", which both prevents
+			// fetchpriority="high" from being added and stops the LCP counter from being incremented.
+			$overlay_blocks_html = block_core_navigation_set_overlay_image_fetch_priority( $overlay_blocks_html );
 		}
+
+		$has_custom_overlay = ! empty( $overlay_blocks_html );
 
 		$responsive_container_classes = static::get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors );
 
@@ -1110,8 +1104,8 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
  * @return string Overlay close markup with the directives injected.
  */
 function block_core_navigation_add_directives_to_overlay_close( $tags ) {
-	// Find the navigation-overlay-close button.
-	if ( $tags->next_tag(
+	// Find all navigation-overlay-close buttons.
+	while ( $tags->next_tag(
 		array(
 			'tag_name'   => 'BUTTON',
 			'class_name' => 'wp-block-navigation-overlay-close',
@@ -1119,6 +1113,25 @@ function block_core_navigation_add_directives_to_overlay_close( $tags ) {
 	) ) {
 		// Add the same close directive as the default close button.
 		$tags->set_attribute( 'data-wp-on--click', 'actions.closeMenuOnClick' );
+	}
+	return $tags->get_updated_html();
+}
+
+/**
+ * Sets fetchpriority="low" on all IMG tags within the navigation overlay.
+ *
+ * Images in the overlay are hidden until the menu is opened, so they should
+ * not compete with any actual LCP element image on the page.
+ *
+ * @since 7.0.0
+ *
+ * @param string $overlay_blocks_html The rendered HTML of the overlay blocks.
+ * @return string Modified HTML with fetchpriority="low" on all IMG tags.
+ */
+function block_core_navigation_set_overlay_image_fetch_priority( string $overlay_blocks_html ): string {
+	$tags = new WP_HTML_Tag_Processor( $overlay_blocks_html );
+	while ( $tags->next_tag( 'IMG' ) ) {
+		$tags->set_attribute( 'fetchpriority', 'low' );
 	}
 	return $tags->get_updated_html();
 }
@@ -1158,8 +1171,8 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		$open_on_hover       = 'hover' === $computed_visibility;
 
 		if ( $open_on_hover ) {
-			$tags->set_attribute( 'data-wp-on--mouseenter', 'actions.openMenuOnHover' );
-			$tags->set_attribute( 'data-wp-on--mouseleave', 'actions.closeMenuOnHover' );
+			$tags->set_attribute( 'data-wp-on--pointerenter', 'actions.openMenuOnHover' );
+			$tags->set_attribute( 'data-wp-on--pointerleave', 'actions.closeMenuOnHover' );
 		}
 
 		// Add directives to the toggle submenu button.
@@ -1311,17 +1324,6 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
 	}
 
 	return $font_sizes;
-}
-
-/**
- * Returns the top-level submenu SVG chevron icon.
- *
- * @since 5.9.0
- *
- * @return string
- */
-function block_core_navigation_render_submenu_icon() {
-	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
 
 /**

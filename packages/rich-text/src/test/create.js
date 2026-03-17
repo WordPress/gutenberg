@@ -1,11 +1,12 @@
 /**
  * Internal dependencies
  */
-import { create, removeReservedCharacters } from '../create';
+import { create, removeReservedCharacters, RichTextData } from '../create';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from '../special-characters';
 import { createElement } from '../create-element';
 import { registerFormatType } from '../register-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
+import { toHTMLString } from '../to-html-string';
 import { getSparseArrayLength, spec, specWithRegistration } from './helpers';
 
 describe( 'create', () => {
@@ -102,6 +103,105 @@ describe( 'create', () => {
 
 		// Format arrays per index.
 		expect( value.formats[ 0 ] ).not.toBe( value.formats[ 1 ] );
+	} );
+
+	describe( 'collapseWhiteSpace', () => {
+		function fromHTML( html ) {
+			const element = createElement( document, html );
+			const richTextData = RichTextData.fromHTMLElement( element );
+			return {
+				text: richTextData.text,
+				html: toHTMLString( {
+					value: {
+						text: richTextData.text,
+						formats: richTextData.formats,
+						replacements: richTextData.replacements,
+					},
+				} ),
+			};
+		}
+
+		it( 'should strip leading space at root level', () => {
+			const result = fromHTML( ' test' );
+			expect( result.text ).toBe( 'test' );
+			expect( result.html ).toBe( 'test' );
+		} );
+
+		it( 'should strip trailing space at root level', () => {
+			const result = fromHTML( 'test ' );
+			expect( result.text ).toBe( 'test' );
+			expect( result.html ).toBe( 'test' );
+		} );
+
+		it( 'should collapse multiple spaces to single space', () => {
+			const result = fromHTML( 'hello    world' );
+			expect( result.text ).toBe( 'hello world' );
+			expect( result.html ).toBe( 'hello world' );
+		} );
+
+		it( 'should convert tabs and newlines to spaces', () => {
+			const result = fromHTML( 'hello\t\nworld' );
+			expect( result.text ).toBe( 'hello world' );
+			expect( result.html ).toBe( 'hello world' );
+		} );
+
+		it( 'should preserve leading space inside nested element without preceding space', () => {
+			const result = fromHTML( 'test<em> word</em>' );
+			expect( result.text ).toBe( 'test word' );
+			expect( result.html ).toBe( 'test<em> word</em>' );
+		} );
+
+		it( 'should preserve trailing space inside nested element without following space', () => {
+			const result = fromHTML( '<em>word </em>test' );
+			expect( result.text ).toBe( 'word test' );
+			expect( result.html ).toBe( '<em>word </em>test' );
+		} );
+
+		it( 'should collapse leading space inside nested element with preceding space', () => {
+			const result = fromHTML( 'test <em> word</em>' );
+			expect( result.text ).toBe( 'test word' );
+			expect( result.html ).toBe( 'test <em>word</em>' );
+		} );
+
+		it( 'should collapse trailing space inside nested element with following space', () => {
+			const result = fromHTML( '<em>word </em> test' );
+			expect( result.text ).toBe( 'word test' );
+			expect( result.html ).toBe( '<em>word</em> test' );
+		} );
+
+		it( 'should strip leading space inside first nested element at root', () => {
+			const result = fromHTML( '<em> test</em>' );
+			expect( result.text ).toBe( 'test' );
+			expect( result.html ).toBe( '<em>test</em>' );
+		} );
+
+		it( 'should strip trailing space inside last nested element at root', () => {
+			const result = fromHTML( '<em>test </em>' );
+			expect( result.text ).toBe( 'test' );
+			expect( result.html ).toBe( '<em>test</em>' );
+		} );
+
+		it( 'should handle deeply nested elements preserving internal spaces', () => {
+			const result = fromHTML( 'a<strong><em> b </em></strong>c' );
+			expect( result.text ).toBe( 'a b c' );
+			expect( result.html ).toBe( 'a<strong><em> b </em></strong>c' );
+		} );
+
+		it( 'should collapse spaces with deeply nested elements and adjacent whitespace', () => {
+			const result = fromHTML( 'a <strong><em> b </em></strong> c' );
+			expect( result.text ).toBe( 'a b c' );
+			expect( result.html ).toBe( 'a <strong><em>b</em></strong> c' );
+		} );
+
+		it( 'should collapse spaces between multiple sibling elements', () => {
+			const result = fromHTML(
+				'<em>a </em><strong> b </strong><em> c</em>'
+			);
+			expect( result.text ).toBe( 'a b c' );
+			expect( result.html ).toBe(
+				'<em>a</em><strong> b</strong><em> c</em>'
+			);
+		} );
 	} );
 
 	it( 'removeReservedCharacters should remove all reserved characters', () => {

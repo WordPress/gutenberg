@@ -12,6 +12,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
@@ -25,6 +26,16 @@ export default function PostContentInformation() {
 	const { postContent } = useSelect( ( select ) => {
 		const { getEditedPostAttribute, getCurrentPostType, getCurrentPostId } =
 			select( editorStore );
+		const { getCurrentRevision, isRevisionsMode } = unlock(
+			select( editorStore )
+		);
+
+		if ( isRevisionsMode() ) {
+			return {
+				postContent: getCurrentRevision()?.content?.raw,
+			};
+		}
+
 		const { canUser } = select( coreStore );
 		const { getEntityRecord } = select( coreStore );
 		const siteSettings = canUser( 'read', {

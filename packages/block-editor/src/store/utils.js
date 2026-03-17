@@ -10,7 +10,11 @@ import { parse as grammarParse } from '@wordpress/block-serialization-default-pa
 import { selectBlockPatternsKey } from './private-keys';
 import { unlock } from '../lock-unlock';
 import { STORE_NAME } from './constants';
-import { getSectionRootClientId, isSectionBlock } from './private-selectors';
+import {
+	getSectionRootClientId,
+	isSectionBlock,
+	getParentSectionBlock,
+} from './private-selectors';
 import { getBlockEditingMode } from './selectors';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 
@@ -136,10 +140,12 @@ export const getInsertBlockTypeDependants = () => ( state, rootClientId ) => {
 	return [
 		state.blockListSettings[ rootClientId ],
 		state.blocks.byClientId.get( rootClientId ),
+		state.blocks.order.get( rootClientId || '' ),
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		getBlockEditingMode( state, rootClientId ),
 		getSectionRootClientId( state ),
 		isSectionBlock( state, rootClientId ),
+		getParentSectionBlock( state, rootClientId ),
 	];
 };

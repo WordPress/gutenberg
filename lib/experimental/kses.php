@@ -81,6 +81,7 @@ if ( ! function_exists( 'allow_filter_in_styles' ) ) {
 	 *
 	 * @param bool   $allow_css Whether the CSS is allowed.
 	 * @param string $css_test_string The CSS to test.
+	 * @return bool Whether the CSS is allowed.
 	 */
 	function allow_filter_in_styles( $allow_css, $css_test_string ) {
 		if ( preg_match(

@@ -193,6 +193,7 @@ Settings related to typography.
 | fluid | Enables fluid typography and allows users to set global fluid typography parameters. | `boolean`, `{ minFontSize, maxViewportWidth, minViewportWidth }` | `false` |
 | letterSpacing | Allow users to set custom letter spacing. | `boolean` | `true` |
 | lineHeight | Allow users to set custom line height. | `boolean` | `false` |
+| textIndent | Allow users to set custom line indent. | `boolean`, `string` | `"subsequent"` |
 | textAlign | Allow users to set the text align. | `boolean` | `true` |
 | textColumns | Allow users to set the number of text columns. | `boolean` | `false` |
 | textDecoration | Allow users to set custom text decorations. | `boolean` | `true` |
@@ -329,6 +330,7 @@ Typography styles.
 | fontWeight | Sets the `font-weight` CSS property. | `string`, `{ ref }` |
 | letterSpacing | Sets the `letter-spacing` CSS property. | `string`, `{ ref }` |
 | lineHeight | Sets the `line-height` CSS property. | `string`, `{ ref }` |
+| textIndent | Sets the `text-indent` CSS property. | `string`, `{ ref }` |
 | textAlign | Sets the `text-align` CSS property. | `string`, `{ ref }` |
 | textColumns | Sets the `column-count` CSS property. | `string`, `{ ref }` |
 | textDecoration | Sets the `text-decoration` CSS property. | `string`, `{ ref }` |

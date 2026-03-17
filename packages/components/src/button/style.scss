@@ -46,8 +46,10 @@
 	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
 	&:focus:not(:active) {
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+	}
 
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	&:focus {
 		outline: 3px solid transparent;
 	}
 
@@ -378,8 +380,10 @@
 
 		&:focus:not(:active) {
 			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+		}
 
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		&:focus {
 			outline: 2px solid transparent;
 		}
 	}

@@ -261,7 +261,7 @@ function renderFooterContent< Item >(
 		<Stack
 			direction="row"
 			className="dataviews-bulk-actions-footer__container"
-			gap="sm"
+			gap="md"
 			align="center"
 		>
 			<BulkSelectionCheckbox
@@ -277,7 +277,7 @@ function renderFooterContent< Item >(
 			<Stack
 				direction="row"
 				className="dataviews-bulk-actions-footer__action-buttons"
-				gap="2xs"
+				gap="xs"
 			>
 				{ actionsToShow.map( ( action ) => {
 					return (
@@ -320,7 +320,7 @@ function FooterContent< Item >( {
 	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
 		null
 	);
-	const footerContentRef = useRef< JSX.Element | null >( null );
+	const footerContentRef = useRef< React.JSX.Element >( undefined );
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	const bulkActions = useMemo(
@@ -359,7 +359,7 @@ function FooterContent< Item >( {
 	);
 	if ( ! actionInProgress ) {
 		if ( footerContentRef.current ) {
-			footerContentRef.current = null;
+			footerContentRef.current = undefined;
 		}
 		return renderFooterContent(
 			data,

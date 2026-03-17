@@ -18,6 +18,7 @@ import {
 	useBlockProps,
 	RecursionProvider,
 	useHasRecursion,
+	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 	withColors,
 	ContrastChecker,
@@ -28,7 +29,11 @@ import {
 	useBlockEditingMode,
 	BlockControls,
 } from '@wordpress/block-editor';
-import { EntityProvider, store as coreStore } from '@wordpress/core-data';
+import {
+	EntityProvider,
+	store as coreStore,
+	useEntityRecords,
+} from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	__experimentalToolsPanel as ToolsPanel,
@@ -51,7 +56,6 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
-import useNavigationEntities from '../use-navigation-entities';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
@@ -61,8 +65,6 @@ import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 import useNavigationNotice from './use-navigation-notice';
 import OverlayMenuPreview from './overlay-menu-preview';
 import OverlayPanel from './overlay-panel';
-import OverlayVisibilityControl from './overlay-visibility-control';
-import OverlayMenuPreviewButton from './overlay-menu-preview-button';
 import useConvertClassicToBlockMenu, {
 	CLASSIC_MENU_CONVERSION_ERROR,
 	CLASSIC_MENU_CONVERSION_PENDING,
@@ -79,15 +81,19 @@ import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
-import { DEFAULT_BLOCK } from '../constants';
-import { getSubmenuVisibility } from '../utils/get-submenu-visibility';
+import {
+	DEFAULT_BLOCK,
+	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
+} from '../constants';
+
+const { isNavigationPostEditorKey } = unlock( blockEditorPrivateApis );
 
 /**
  * Component that renders the Add page button for the Navigation block.
  *
  * @param {Object} props          Component props.
  * @param {string} props.clientId Block client ID.
- * @return {JSX.Element|null} The Add page button component or null if not applicable.
+ * @return {React.JSX.Element} The Add page button component or null if not applicable.
  */
 function NavigationAddPageButton( { clientId } ) {
 	const { insertBlock } = useDispatch( blockEditorStore );
@@ -316,30 +322,37 @@ function Navigation( {
 
 	// Skip recursion check when in preview mode.
 	const recursionDetected = useHasRecursion( recursionId );
-	const { isPreviewMode, onNavigateToEntityRecord, currentTheme } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			const settings = getSettings();
-			return {
-				isPreviewMode: settings.isPreviewMode,
-				onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
-				// Needed to construct the template part ID for the overlay preview.
-				currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
-			};
-		},
-		[]
-	);
+	const {
+		isPreviewMode,
+		onNavigateToEntityRecord,
+		currentTheme,
+		editorDisabledResponsive,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+
+		return {
+			isPreviewMode: settings.isPreviewMode,
+			onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
+			// Needed to construct the template part ID for the overlay preview.
+			currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
+			// When editing a navigation post directly in an isolated editor,
+			// always show navigation expanded (no hamburger) so users can see
+			// and interact with all menu items.
+			editorDisabledResponsive:
+				!! settings?.[ isNavigationPostEditorKey ],
+		};
+	}, [] );
 	const hasAlreadyRendered = isPreviewMode ? false : recursionDetected;
 
 	const blockEditingMode = useBlockEditingMode();
 
-	const isOverlayExperimentEnabled =
-		typeof window !== 'undefined' &&
-		window.__experimentalNavigationOverlays === true;
-
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
-	const { menus: classicMenus } = useNavigationEntities();
+	const { records: classicMenus } = useEntityRecords( 'root', 'menu', {
+		per_page: -1,
+		context: 'view',
+	} );
 
 	const [ showNavigationMenuStatusNotice, hideNavigationMenuStatusNotice ] =
 		useNavigationNotice( {
@@ -379,9 +392,62 @@ function Navigation( {
 		innerBlocks,
 	} = useInnerBlocks( clientId );
 
-	const hasSubmenus = !! innerBlocks.find(
-		( block ) => block.name === 'core/navigation-submenu'
+	// Use a ref to store whether we've confirmed a page-list has submenus.
+	// Once confirmed, we don't need to keep checking the page-list blocks.
+	const hasPageListWithSubmenuRef = useRef( false );
+
+	// Check for submenus using getBlocks to include controlled innerBlocks
+	const hasSubmenus = useSelect(
+		( select ) => {
+			// First check for navigation-submenu (fast, no selector needed)
+			const hasNavigationSubmenu = innerBlocks.some(
+				( block ) => block.name === 'core/navigation-submenu'
+			);
+			if ( hasNavigationSubmenu ) {
+				return true;
+			}
+
+			// Only check page-list if we didn't find a submenu already
+			const pageList = innerBlocks.find(
+				( block ) => block.name === 'core/page-list'
+			);
+			if ( ! pageList ) {
+				hasPageListWithSubmenuRef.current = false;
+				return false;
+			}
+
+			// If we've already confirmed page-list has submenus, return early
+			if ( hasPageListWithSubmenuRef.current ) {
+				return true;
+			}
+
+			// Check if the page-list has controlled innerBlocks
+			const { getBlocks } = select( blockEditorStore );
+			const pageListBlocks = getBlocks( pageList.clientId );
+			if ( pageListBlocks.length > 0 ) {
+				hasPageListWithSubmenuRef.current = true;
+				return true;
+			}
+
+			// No pageList returned with confirmed submenus, so assume it will not have submenus
+			return false;
+		},
+		[ innerBlocks ]
 	);
+
+	// Check if any overlay template parts exist
+	const { records: overlayTemplateParts } = useEntityRecords(
+		'postType',
+		'wp_template_part',
+		{
+			per_page: -1,
+		}
+	);
+	const hasOverlays =
+		overlayTemplateParts?.some(
+			( templatePart ) =>
+				templatePart.area === NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
+		) ?? false;
 
 	const {
 		replaceInnerBlocks,
@@ -548,7 +614,8 @@ function Navigation( {
 		setAttributes,
 	] );
 
-	const isResponsive = 'never' !== overlayMenu;
+	const isResponsive = 'never' !== overlayMenu && ! editorDisabledResponsive;
+
 	const blockProps = useBlockProps( {
 		ref: navRef,
 		className: clsx(
@@ -705,12 +772,10 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
-	const computedSubmenuVisibility = getSubmenuVisibility( attributes );
-
 	const submenuAccessibilityNotice =
 		! showSubmenuIcon &&
-		computedSubmenuVisibility !== 'click' &&
-		computedSubmenuVisibility !== 'always'
+		submenuVisibility !== 'click' &&
+		submenuVisibility !== 'always'
 			? __(
 					'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
 			  )
@@ -734,7 +799,7 @@ function Navigation( {
 	const stylingInspectorControls = (
 		<>
 			<InspectorControls>
-				{ ( ! isOverlayExperimentEnabled || hasSubmenus ) && (
+				{ hasSubmenus && (
 					<ToolsPanel
 						label={ __( 'Display' ) }
 						resetAll={ () => {
@@ -748,50 +813,6 @@ function Navigation( {
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
-						{ ! isOverlayExperimentEnabled && (
-							<>
-								{ isResponsive && (
-									<OverlayMenuPreviewButton
-										isResponsive={ isResponsive }
-										overlayMenuPreview={
-											overlayMenuPreview
-										}
-										setOverlayMenuPreview={
-											setOverlayMenuPreview
-										}
-										hasIcon={ hasIcon }
-										icon={ icon }
-										setAttributes={ setAttributes }
-										overlayMenuPreviewClasses={
-											overlayMenuPreviewClasses
-										}
-										overlayMenuPreviewId={
-											overlayMenuPreviewId
-										}
-										containerStyle={ {
-											gridColumn: 'span 2',
-										} }
-									/>
-								) }
-
-								<ToolsPanelItem
-									hasValue={ () => overlayMenu !== 'mobile' }
-									label={ __( 'Overlay Visibility' ) }
-									onDeselect={ () =>
-										setAttributes( {
-											overlayMenu: 'mobile',
-										} )
-									}
-									isShownByDefault
-								>
-									<OverlayVisibilityControl
-										overlayMenu={ overlayMenu }
-										setAttributes={ setAttributes }
-									/>
-								</ToolsPanelItem>
-							</>
-						) }
-
 						{ hasSubmenus && (
 							<>
 								<h3 className="wp-block-navigation__submenu-header">
@@ -810,7 +831,6 @@ function Navigation( {
 									isShownByDefault
 								>
 									<ToggleGroupControl
-										__nextHasNoMarginBottom
 										__next40pxDefaultSize
 										label={ __( 'Submenu Visibility' ) }
 										value={ submenuVisibility }
@@ -862,8 +882,8 @@ function Navigation( {
 										} )
 									}
 									isDisabled={
-										computedSubmenuVisibility === 'click' ||
-										computedSubmenuVisibility === 'always'
+										submenuVisibility === 'click' ||
+										submenuVisibility === 'always'
 									}
 									isShownByDefault
 								>
@@ -875,10 +895,8 @@ function Navigation( {
 											} );
 										} }
 										disabled={
-											computedSubmenuVisibility ===
-												'click' ||
-											computedSubmenuVisibility ===
-												'always'
+											submenuVisibility === 'click' ||
+											submenuVisibility === 'always'
 										}
 										label={ __( 'Show arrow' ) }
 									/>
@@ -899,7 +917,7 @@ function Navigation( {
 					</ToolsPanel>
 				) }
 			</InspectorControls>
-			{ isOverlayExperimentEnabled && ! isWithinOverlay && (
+			{ ! isWithinOverlay && (
 				<InspectorControls>
 					<OverlayPanel
 						overlayMenu={ overlayMenu }
@@ -914,6 +932,7 @@ function Navigation( {
 						overlayMenuPreviewId={ overlayMenuPreviewId }
 						isResponsive={ isResponsive }
 						currentTheme={ currentTheme }
+						hasOverlays={ hasOverlays }
 					/>
 				</InspectorControls>
 			) }

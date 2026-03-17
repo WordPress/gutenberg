@@ -72,9 +72,11 @@ export function initializeEditor(
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
 		isPublishSidebarEnabled: true,
+		showCollaborationCursor: false,
+		showCollaborationNotifications: true,
 	} );
 
-	if ( window.__experimentalMediaProcessing ) {
+	if ( window.__clientSideMediaProcessing ) {
 		dispatch( preferencesStore ).setDefaults( 'core/media', {
 			requireApproval: true,
 			optimizeOnUpload: true,

@@ -8,7 +8,6 @@ import clsx from 'clsx';
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { RawHTML } from '@wordpress/element';
 import { safeHTML } from '@wordpress/dom';
 
 /**
@@ -40,6 +39,13 @@ export default function PageListItemEdit( { context, attributes } ) {
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const frontPageId = useFrontPageId();
 
+	// Get submenu visibility from context. The Navigation block handles
+	// backward compatibility by migrating openSubmenusOnClick to submenuVisibility
+	// via its deprecation handler before this context is received.
+	const submenuVisibility = context.submenuVisibility;
+
+	const openOnClick = submenuVisibility === 'click';
+
 	const innerBlocksColors = getColors( context, true );
 
 	const navigationChildBlockProps =
@@ -56,21 +62,25 @@ export default function PageListItemEdit( { context, attributes } ) {
 			className={ clsx( 'wp-block-pages-list__item', {
 				'has-child': hasChildren,
 				'wp-block-navigation-item': isNavigationChild,
-				'open-on-click': context.openSubmenusOnClick,
+				// Class assignment logic matches PHP rendering in page-list/index.php
+				'open-on-click': openOnClick,
+				'open-always': submenuVisibility === 'always',
+				// Must check hover mode explicitly to match PHP elseif structure (index.php:212)
 				'open-on-hover-click':
-					! context.openSubmenusOnClick && context.showSubmenuIcon,
+					submenuVisibility === 'hover' && context.showSubmenuIcon,
 				'menu-item-home': id === frontPageId,
 			} ) }
 		>
-			{ hasChildren && context.openSubmenusOnClick ? (
+			{ hasChildren && openOnClick ? (
 				<>
 					<button
 						type="button"
 						className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
 						aria-expanded="false"
-					>
-						<RawHTML>{ safeHTML( label ) }</RawHTML>
-					</button>
+						dangerouslySetInnerHTML={ {
+							__html: safeHTML( label ),
+						} }
+					/>
 					<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
 						<ItemSubmenuIcon />
 					</span>
@@ -81,22 +91,22 @@ export default function PageListItemEdit( { context, attributes } ) {
 						'wp-block-navigation-item__content': isNavigationChild,
 					} ) }
 					href={ link }
-				>
-					<RawHTML>{ safeHTML( title ) }</RawHTML>
-				</a>
+					dangerouslySetInnerHTML={ {
+						__html: safeHTML( title ),
+					} }
+				/>
 			) }
 			{ hasChildren && (
 				<>
-					{ ! context.openSubmenusOnClick &&
-						context.showSubmenuIcon && (
-							<button
-								className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"
-								aria-expanded="false"
-								type="button"
-							>
-								<ItemSubmenuIcon />
-							</button>
-						) }
+					{ ! openOnClick && context.showSubmenuIcon && (
+						<button
+							className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"
+							aria-expanded="false"
+							type="button"
+						>
+							<ItemSubmenuIcon />
+						</button>
+					) }
 					<ul { ...innerBlocksProps }></ul>
 				</>
 			) }

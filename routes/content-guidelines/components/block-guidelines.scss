@@ -1,0 +1,34 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.block-guidelines {
+	margin-top: $grid-unit-30;
+
+	.block-guidelines__icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+		width: 100%;
+	}
+
+	.dataviews-view-list__field-wrapper {
+		display: flex;
+		justify-content: center;
+	}
+
+	.dataviews-wrapper {
+		margin-right: -$grid-unit-30;
+		margin-left: -$grid-unit-30;
+	}
+
+	.dataviews-search {
+		margin-right: $grid-unit-30;
+		margin-left: $grid-unit-30;
+	}
+}
+
+.block-guidelines__remove-modal {
+	.components-modal__header-heading {
+		font-weight: 500;
+	}
+}

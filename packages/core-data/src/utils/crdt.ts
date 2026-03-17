@@ -19,22 +19,21 @@ import {
  * Internal dependencies
  */
 import { BaseAwareness } from '../awareness/base-awareness';
-import { type BaseState } from '../awareness/types';
 import {
 	mergeCrdtBlocks,
+	mergeRichTextUpdate,
 	type Block,
 	type YBlock,
 	type YBlocks,
 } from './crdt-blocks';
 import { type Post } from '../entity-types/post';
-import { type Type } from '../entity-types';
-import {
-	CRDT_DOC_META_PERSISTENCE_KEY,
-	CRDT_RECORD_MAP_KEY,
-	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-} from '../sync';
+import { CRDT_DOC_META_PERSISTENCE_KEY, CRDT_RECORD_MAP_KEY } from '../sync';
 import type { WPSelection } from '../types';
-import { updateSelectionHistory } from './crdt-selection';
+import {
+	getSelectionHistory,
+	getShiftedSelection,
+	updateSelectionHistory,
+} from './crdt-selection';
 import {
 	createYMap,
 	getRootMap,
@@ -46,6 +45,7 @@ import {
 // Changes that can be applied to a post entity record.
 export type PostChanges = Partial< Post > & {
 	blocks?: Block[];
+	content?: Post[ 'content' ] | string;
 	excerpt?: Post[ 'excerpt' ] | string;
 	selection?: WPSelection;
 	title?: Post[ 'title' ] | string;
@@ -54,11 +54,13 @@ export type PostChanges = Partial< Post > & {
 // A post record as represented in the CRDT document (Y.Map).
 export interface YPostRecord extends YMapRecord {
 	author: number;
-	blocks: YBlocks;
+	// Blocks are undefined when they need to be re-parsed from content.
+	blocks: YBlocks | undefined;
+	content: Y.Text;
 	categories: number[];
 	comment_status: string;
 	date: string | null;
-	excerpt: string;
+	excerpt: Y.Text;
 	featured_media: number;
 	format: string;
 	meta: YMapWrap< YMapRecord >;
@@ -68,32 +70,14 @@ export interface YPostRecord extends YMapRecord {
 	sticky: boolean;
 	tags: number[];
 	template: string;
-	title: string;
+	title: Y.Text;
 }
 
-// Properties that are allowed to be synced for a post.
-const allowedPostProperties = new Set< string >( [
-	'author',
-	'blocks',
-	'categories',
-	'comment_status',
-	'date',
-	'excerpt',
-	'featured_media',
-	'format',
-	'meta',
-	'ping_status',
-	'slug',
-	'status',
-	'sticky',
-	'tags',
-	'template',
-	'title',
-] );
+export const POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE = '_crdt_document';
 
 // Post meta keys that should *not* be synced.
 const disallowedPostMetaKeys = new Set< string >( [
-	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 ] );
 
 /**
@@ -133,18 +117,18 @@ function defaultApplyChangesToCRDTDoc(
  *
  * @param {CRDTDoc}     ydoc
  * @param {PostChanges} changes
- * @param {Type}        _postType
+ * @param {Set<string>} syncedProperties
  * @return {void}
  */
 export function applyPostChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: PostChanges,
-	_postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
+	syncedProperties: Set< string >
 ): void {
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
 	Object.keys( changes ).forEach( ( key ) => {
-		if ( ! allowedPostProperties.has( key ) ) {
+		if ( ! syncedProperties.has( key ) ) {
 			return;
 		}
 
@@ -157,6 +141,14 @@ export function applyPostChangesToCRDTDoc(
 
 		switch ( key ) {
 			case 'blocks': {
+				// Blocks are undefined when they need to be re-parsed from content.
+				if ( ! newValue ) {
+					// Set to undefined instead of deleting the key. This is important
+					// since we iterate over the Y.Map keys in getPostChangesFromCRDTDoc.
+					ymap.set( key, undefined );
+					break;
+				}
+
 				let currentBlocks = ymap.get( key );
 
 				// Initialize.
@@ -165,9 +157,6 @@ export function applyPostChangesToCRDTDoc(
 					ymap.set( key, currentBlocks );
 				}
 
-				// Block[] from local changes.
-				const newBlocks = ( newValue as PostChanges[ 'blocks' ] ) ?? [];
-
 				// Block changes from typing are bundled with a 'selection' update.
 				// Pass the resulting cursor position to the mergeCrdtBlocks function.
 				const cursorPosition =
@@ -175,15 +164,33 @@ export function applyPostChangesToCRDTDoc(
 
 				// Merge blocks does not need `setValue` because it is operating on a
 				// Yjs type that is already in the Y.Doc.
-				mergeCrdtBlocks( currentBlocks, newBlocks, cursorPosition );
+				mergeCrdtBlocks( currentBlocks, newValue, cursorPosition );
 				break;
 			}
 
-			case 'excerpt': {
-				const currentValue = ymap.get( 'excerpt' );
-				const rawNewValue = getRawValue( newValue );
+			case 'content':
+			case 'excerpt':
+			case 'title': {
+				const currentValue = ymap.get( key );
+				let rawValue = getRawValue( newValue );
 
-				updateMapValue( ymap, key, currentValue, rawNewValue );
+				// Copy logic from prePersistPostType to ensure that the "Auto
+				// Draft" template title is not synced.
+				if (
+					key === 'title' &&
+					! currentValue?.toString() &&
+					'Auto Draft' === rawValue
+				) {
+					rawValue = '';
+				}
+
+				if ( currentValue instanceof Y.Text ) {
+					mergeRichTextUpdate( currentValue, rawValue ?? '' );
+				} else {
+					const newYText = new Y.Text( rawValue ?? '' );
+					ymap.set( key, newYText );
+				}
+
 				break;
 			}
 
@@ -228,20 +235,6 @@ export function applyPostChangesToCRDTDoc(
 				break;
 			}
 
-			case 'title': {
-				const currentValue = ymap.get( key );
-
-				// Copy logic from prePersistPostType to ensure that the "Auto
-				// Draft" template title is not synced.
-				let rawNewValue = getRawValue( newValue );
-				if ( ! currentValue && 'Auto Draft' === rawNewValue ) {
-					rawNewValue = '';
-				}
-
-				updateMapValue( ymap, key, currentValue, rawNewValue );
-				break;
-			}
-
 			// Add support for additional properties here.
 
 			default: {
@@ -274,15 +267,15 @@ function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
  * against the local record and determine if there are changes (edits) we want
  * to dispatch.
  *
- * @param {CRDTDoc} ydoc
- * @param {Post}    editedRecord
- * @param {Type}    _postType
+ * @param {CRDTDoc}     ydoc
+ * @param {Post}        editedRecord
+ * @param {Set<string>} syncedProperties
  * @return {Partial<PostChanges>} The changes that should be applied to the local record.
  */
 export function getPostChangesFromCRDTDoc(
 	ydoc: CRDTDoc,
 	editedRecord: Post,
-	_postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
+	syncedProperties: Set< string >
 ): PostChanges {
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
@@ -290,7 +283,7 @@ export function getPostChangesFromCRDTDoc(
 
 	const changes = Object.fromEntries(
 		Object.entries( ymap.toJSON() ).filter( ( [ key, newValue ] ) => {
-			if ( ! allowedPostProperties.has( key ) ) {
+			if ( ! syncedProperties.has( key ) ) {
 				return false;
 			}
 
@@ -319,16 +312,14 @@ export function getPostChangesFromCRDTDoc(
 						ydoc.meta?.get( CRDT_DOC_META_PERSISTENCE_KEY ) &&
 						editedRecord.content
 					) {
-						const blocks = ymap.get( 'blocks' ) as YBlocks;
+						const blocksJson = ymap.get( 'blocks' )?.toJSON() ?? [];
+
 						return (
-							__unstableSerializeAndClean(
-								blocks.toJSON()
-							).trim() !== editedRecord.content.raw.trim()
+							__unstableSerializeAndClean( blocksJson ).trim() !==
+							getRawValue( editedRecord.content )
 						);
 					}
 
-					// The consumers of blocks have memoization that renders optimization
-					// here unnecessary.
 					return true;
 				}
 
@@ -336,11 +327,8 @@ export function getPostChangesFromCRDTDoc(
 					// Do not overwrite a "floating" date. Borrowing logic from the
 					// isEditedPostDateFloating selector.
 					const currentDateIsFloating =
-						[ 'draft', 'auto-draft', 'pending' ].includes(
-							ymap.get( 'status' ) as string
-						) &&
-						( null === currentValue ||
-							editedRecord.modified === currentValue );
+						null === currentValue ||
+						editedRecord.modified === currentValue;
 
 					if ( currentDateIsFloating ) {
 						return false;
@@ -376,6 +364,7 @@ export function getPostChangesFromCRDTDoc(
 					return haveValuesChanged( currentValue, newValue );
 				}
 
+				case 'content':
 				case 'excerpt':
 				case 'title': {
 					return haveValuesChanged(
@@ -402,6 +391,20 @@ export function getPostChangesFromCRDTDoc(
 		};
 	}
 
+	// When remote content changes are detected, recalculate the local user's
+	// selection using Y.RelativePosition to account for text shifts. The ydoc
+	// has already been updated with remote content at this point, so converting
+	// relative positions to absolute gives corrected offsets. Including the
+	// selection in PostChanges ensures it dispatches atomically with content.
+	const selectionHistory = getSelectionHistory( ydoc );
+	const shiftedSelection = getShiftedSelection( ydoc, selectionHistory );
+	if ( shiftedSelection ) {
+		changes.selection = {
+			...shiftedSelection,
+			initialPosition: 0,
+		};
+	}
+
 	return changes;
 }
 
@@ -409,7 +412,7 @@ export function getPostChangesFromCRDTDoc(
  * This default sync config can be used for entities that are flat maps of
  * primitive values and do not require custom logic to merge changes.
  */
-export const defaultSyncConfig: SyncConfig< BaseState > = {
+export const defaultSyncConfig: SyncConfig = {
 	applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
 	createAwareness: ( ydoc: CRDTDoc ) => new BaseAwareness( ydoc ),
 	getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,

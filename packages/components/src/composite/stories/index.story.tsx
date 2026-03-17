@@ -47,6 +47,10 @@ const meta: Meta< typeof Composite > = {
 		docs: {
 			canvas: { sourceState: 'shown' },
 		},
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+		},
 	},
 	decorators: [
 		( Story ) => {
@@ -235,7 +239,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
 
 				// Render all context providers forwarded by the Slot via fillProps.
 				return forwardedContext.reduce(
-					( inner: JSX.Element, [ Provider, props ] ) => (
+					( inner: React.JSX.Element, [ Provider, props ] ) => (
 						<Provider { ...props }>{ inner }</Provider>
 					),
 					innerMarkup

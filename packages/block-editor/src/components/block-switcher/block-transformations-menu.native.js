@@ -33,6 +33,7 @@ const BlockTransformationsMenu = ( {
 		const blocksThatSplitWhenTransformed = {
 			'core/list': [ 'core/paragraph', 'core/heading' ],
 			'core/quote': [ 'core/paragraph' ],
+			'core/pullquote': [ 'core/paragraph' ],
 		};
 
 		return possibleTransformations.map( ( item ) => {

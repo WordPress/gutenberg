@@ -32,7 +32,7 @@ import { ATTACHMENT_POST_TYPE } from '../../store/constants';
  * @param {Object}   props              Component props.
  * @param {?boolean} props.forceIsDirty Whether to force the post to be marked
  *                                      as dirty.
- * @return {import('react').ComponentType} The component.
+ * @return {React.ComponentType} The component.
  */
 export default function PostSavedState( { forceIsDirty } ) {
 	const [ forceSavedMessage, setForceSavedMessage ] = useState( false );

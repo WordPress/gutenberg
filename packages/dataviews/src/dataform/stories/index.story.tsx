@@ -62,6 +62,26 @@ export const LayoutPanel = {
 			description: 'Chooses how to open the panel.',
 			options: [ 'default', 'dropdown', 'modal' ],
 		},
+		editVisibility: {
+			control: { type: 'select' },
+			description: 'Chooses when the edit icon is visible.',
+			options: [ 'default', 'always', 'on-hover' ],
+		},
+		applyLabel: {
+			control: { type: 'text' },
+			description:
+				'Custom text for the modal apply button. Defaults to "Apply".',
+			if: { arg: 'openAs', eq: 'modal' },
+		},
+		cancelLabel: {
+			control: { type: 'text' },
+			description:
+				'Custom text for the modal cancel button. Defaults to "Cancel".',
+			if: { arg: 'openAs', eq: 'modal' },
+		},
+	},
+	args: {
+		openAs: 'default',
 	},
 };
 
@@ -102,7 +122,8 @@ export const Validation = {
 			description: 'Choose the form layout type.',
 			options: [
 				'regular',
-				'panel',
+				'panel-dropdown',
+				'panel-modal',
 				'card-collapsible',
 				'card-not-collapsible',
 				'details',
@@ -111,7 +132,7 @@ export const Validation = {
 		required: {
 			control: { type: 'boolean' },
 			description:
-				'Whether or not the required validation rule is active.',
+				'Whether or not the required validation rule is active (only applies when fieldDistribution is allSame).',
 		},
 		elements: {
 			control: { type: 'select' },

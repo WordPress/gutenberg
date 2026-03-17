@@ -263,6 +263,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'typography', '__experimentalLetterSpacing' ],
 		useEngine: true,
 	},
+	textIndent: {
+		value: [ 'typography', 'textIndent' ],
+		support: [ 'typography', 'textIndent' ],
+		useEngine: true,
+	},
 	writingMode: {
 		value: [ 'typography', 'writingMode' ],
 		support: [ 'typography', '__experimentalWritingMode' ],
