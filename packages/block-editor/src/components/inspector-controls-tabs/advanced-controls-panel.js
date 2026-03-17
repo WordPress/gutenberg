@@ -25,11 +25,18 @@ const AdvancedControls = ( { initialOpen = false } ) => {
 		PrivateInspectorControlsAllowedBlocks.name
 	);
 
-	const editedContentOnlySection = useSelect( ( select ) => {
-		const { getEditedContentOnlySection } = unlock(
+	const isContentOnlyMode = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, getBlockEditingMode } = unlock(
 			select( blockEditorStore )
 		);
-		return getEditedContentOnlySection();
+
+		const clientId = getSelectedBlockClientId();
+
+		if ( ! clientId ) {
+			return false;
+		}
+
+		return getBlockEditingMode( clientId ) === 'contentOnly';
 	}, [] );
 
 	const hasFills = Boolean( fills && fills.length );
@@ -45,7 +52,7 @@ const AdvancedControls = ( { initialOpen = false } ) => {
 			title={ __( 'Advanced' ) }
 			initialOpen={ initialOpen }
 		>
-			{ ! editedContentOnlySection && (
+			{ ! isContentOnlyMode && (
 				<InspectorControls.Slot group="advanced" />
 			) }
 			<PrivateInspectorControlsAllowedBlocks.Slot />
