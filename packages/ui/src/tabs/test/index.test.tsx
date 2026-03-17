@@ -2258,56 +2258,7 @@ describe( 'Tabs', () => {
 	} );
 
 	describe( 'Development mode validation', () => {
-		describe( 'components used outside of Root', () => {
-			// Suppress React's error boundary logging for these tests.
-			// We use manual mocking because @wordpress/jest-console's toHaveErrored()
-			// has issues when running in the full test suite context.
-			let originalConsoleError: typeof console.error;
-
-			beforeEach( () => {
-				// eslint-disable-next-line no-console
-				originalConsoleError = console.error;
-				// eslint-disable-next-line no-console
-				console.error = jest.fn();
-			} );
-
-			afterEach( () => {
-				// eslint-disable-next-line no-console
-				console.error = originalConsoleError;
-			} );
-
-			it( 'should throw when Tabs.Tab is used outside of Tabs.Root', () => {
-				expect( () => {
-					render( <Tabs.Tab value="orphan">Orphan Tab</Tabs.Tab> );
-				} ).toThrow(
-					'`Tabs.Tab` must be used within a `Tabs.Root` component.'
-				);
-			} );
-
-			it( 'should throw when Tabs.Panel is used outside of Tabs.Root', () => {
-				expect( () => {
-					render(
-						<Tabs.Panel value="orphan">Orphan Panel</Tabs.Panel>
-					);
-				} ).toThrow(
-					'`Tabs.Panel` must be used within a `Tabs.Root` component.'
-				);
-			} );
-
-			it( 'should throw when Tabs.List is used outside of Tabs.Root', () => {
-				expect( () => {
-					render(
-						<Tabs.List>
-							<Tabs.Tab value="one">One</Tabs.Tab>
-						</Tabs.List>
-					);
-				} ).toThrow(
-					'`Tabs.List` must be used within a `Tabs.Root` component.'
-				);
-			} );
-		} );
-
-		it( 'should warn when a Tab has no matching Panel', async () => {
+		it( 'should warn when there are more Tabs than Panels', async () => {
 			render(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
@@ -2317,24 +2268,21 @@ describe( 'Tabs', () => {
 					</Tabs.List>
 					<Tabs.Panel value="one">First panel</Tabs.Panel>
 					<Tabs.Panel value="two">Second panel</Tabs.Panel>
-					{ /* Missing panel for "three" */ }
 				</Tabs.Root>
 			);
 
 			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
 
-			// Wait for the validation to run (it's scheduled with setTimeout)
 			await waitFor( () => {
 				expect( console ).toHaveWarned();
 			} );
 
-			// Verify the warning mentions the orphan tab value
 			expect( console ).toHaveWarnedWith(
-				'Tabs: Found Tab(s) without matching Panel(s). Each Tab should have a corresponding Panel with the same `value` prop. Tab value(s) without panels: three'
+				'Tabs: Tab/Panel count mismatch. Found 3 Tab(s) and 2 Panel(s). Each Tab should have a corresponding Panel.'
 			);
 		} );
 
-		it( 'should warn when a Panel has no matching Tab', async () => {
+		it( 'should warn when there are more Panels than Tabs', async () => {
 			render(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
@@ -2343,70 +2291,22 @@ describe( 'Tabs', () => {
 					</Tabs.List>
 					<Tabs.Panel value="one">First panel</Tabs.Panel>
 					<Tabs.Panel value="two">Second panel</Tabs.Panel>
-					<Tabs.Panel value="orphan">Orphan panel</Tabs.Panel>
+					<Tabs.Panel value="three">Third panel</Tabs.Panel>
 				</Tabs.Root>
 			);
 
 			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
 
-			// Wait for the validation to run (it's scheduled with setTimeout)
 			await waitFor( () => {
 				expect( console ).toHaveWarned();
 			} );
 
-			// Verify the warning mentions the orphan panel value
 			expect( console ).toHaveWarnedWith(
-				'Tabs: Found Panel(s) without matching Tab(s). Each Panel should have a corresponding Tab with the same `value` prop. Panel value(s) without tabs: orphan'
+				'Tabs: Tab/Panel count mismatch. Found 2 Tab(s) and 3 Panel(s). Each Tab should have a corresponding Panel.'
 			);
 		} );
 
-		it( 'should handle dynamic value changes correctly', async () => {
-			const { rerender } = render(
-				<Tabs.Root defaultValue="one">
-					<Tabs.List>
-						<Tabs.Tab value="one">One</Tabs.Tab>
-						<Tabs.Tab value="two">Two</Tabs.Tab>
-					</Tabs.List>
-					<Tabs.Panel value="one">First panel</Tabs.Panel>
-					<Tabs.Panel value="two">Second panel</Tabs.Panel>
-				</Tabs.Root>
-			);
-
-			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
-
-			// Wait for validation
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
-
-			// No warnings since all values match
-			expect( console ).not.toHaveWarned();
-
-			// Change a tab's value to create a mismatch
-			rerender(
-				<Tabs.Root defaultValue="one">
-					<Tabs.List>
-						<Tabs.Tab value="one">One</Tabs.Tab>
-						<Tabs.Tab value="changed">Two</Tabs.Tab>
-					</Tabs.List>
-					<Tabs.Panel value="one">First panel</Tabs.Panel>
-					<Tabs.Panel value="two">Second panel</Tabs.Panel>
-				</Tabs.Root>
-			);
-
-			// Wait for validation to run after the value change
-			await waitFor( () => {
-				expect( console ).toHaveWarned();
-			} );
-
-			// Should warn about "changed" tab without panel AND "two" panel without tab
-			expect( console ).toHaveWarnedWith(
-				'Tabs: Found Tab(s) without matching Panel(s). Each Tab should have a corresponding Panel with the same `value` prop. Tab value(s) without panels: changed'
-			);
-			expect( console ).toHaveWarnedWith(
-				'Tabs: Found Panel(s) without matching Tab(s). Each Panel should have a corresponding Tab with the same `value` prop. Panel value(s) without tabs: two'
-			);
-		} );
-
-		it( 'should not warn when all Tabs and Panels match', async () => {
+		it( 'should not warn when Tab and Panel counts match', async () => {
 			render(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
@@ -2426,44 +2326,27 @@ describe( 'Tabs', () => {
 			expect( console ).not.toHaveWarned();
 		} );
 
-		it( 'should warn about multiple mismatches', async () => {
+		it( 'should warn when tabs are used without any panels', async () => {
 			render(
-				<Tabs.Root defaultValue="one">
+				<Tabs.Root>
 					<Tabs.List>
 						<Tabs.Tab value="one">One</Tabs.Tab>
-						<Tabs.Tab value="orphan-tab-1">Orphan Tab 1</Tabs.Tab>
-						<Tabs.Tab value="orphan-tab-2">Orphan Tab 2</Tabs.Tab>
+						<Tabs.Tab value="two">Two</Tabs.Tab>
 					</Tabs.List>
-					<Tabs.Panel value="one">First panel</Tabs.Panel>
-					<Tabs.Panel value="orphan-panel">Orphan panel</Tabs.Panel>
 				</Tabs.Root>
 			);
 
-			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
-
-			// Wait for the validation to run
 			await waitFor( () => {
 				expect( console ).toHaveWarned();
 			} );
 
-			// Check for tabs without panels warning (both orphan tabs in one message)
 			expect( console ).toHaveWarnedWith(
-				'Tabs: Found Tab(s) without matching Panel(s). Each Tab should have a corresponding Panel with the same `value` prop. Tab value(s) without panels: orphan-tab-1, orphan-tab-2'
-			);
-
-			// Check for panels without tabs warning
-			expect( console ).toHaveWarnedWith(
-				'Tabs: Found Panel(s) without matching Tab(s). Each Panel should have a corresponding Tab with the same `value` prop. Panel value(s) without tabs: orphan-panel'
+				'Tabs: Tab/Panel count mismatch. Found 2 Tab(s) and 0 Panel(s). Each Tab should have a corresponding Panel.'
 			);
 		} );
 
-		// Note: We cannot test duplicate Tab values directly because Base UI's
-		// internal state management breaks with "Maximum update depth exceeded"
-		// when duplicate tab values are present. The validation warning for
-		// duplicate tabs would help developers catch this before the error.
-
-		it( 'should warn when duplicate Panel values are detected', async () => {
-			render(
+		it( 'should detect count mismatch after dynamic changes', async () => {
+			const { rerender } = render(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
 						<Tabs.Tab value="one">One</Tabs.Tab>
@@ -2471,20 +2354,34 @@ describe( 'Tabs', () => {
 					</Tabs.List>
 					<Tabs.Panel value="one">First panel</Tabs.Panel>
 					<Tabs.Panel value="two">Second panel</Tabs.Panel>
-					<Tabs.Panel value="two">Second panel duplicate</Tabs.Panel>
 				</Tabs.Root>
 			);
 
 			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
 
-			// Wait for the validation to run
+			// Wait for validation
+			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+
+			// No warnings since counts match
+			expect( console ).not.toHaveWarned();
+
+			// Remove a panel to create a mismatch
+			rerender(
+				<Tabs.Root defaultValue="one">
+					<Tabs.List>
+						<Tabs.Tab value="one">One</Tabs.Tab>
+						<Tabs.Tab value="two">Two</Tabs.Tab>
+					</Tabs.List>
+					<Tabs.Panel value="one">First panel</Tabs.Panel>
+				</Tabs.Root>
+			);
+
 			await waitFor( () => {
 				expect( console ).toHaveWarned();
 			} );
 
-			// Verify the warning mentions the duplicate panel value
 			expect( console ).toHaveWarnedWith(
-				'Tabs: Found duplicate Panel value(s). Each Panel should have a unique `value` prop. Duplicate value(s): two'
+				'Tabs: Tab/Panel count mismatch. Found 2 Tab(s) and 1 Panel(s). Each Tab should have a corresponding Panel.'
 			);
 		} );
 	} );

@@ -8,16 +8,9 @@ import {
 } from '@wordpress/element';
 import warning from '@wordpress/warning';
 
-import type { TabProps } from './types';
-
-/**
- * The type for tab/panel value props, derived from the actual TabProps.
- */
-type TabValue = TabProps[ 'value' ];
-
 type TabsValidationContextType = {
-	registerTab: ( value: TabValue ) => () => void;
-	registerPanel: ( value: TabValue ) => () => void;
+	registerTab: () => () => void;
+	registerPanel: () => () => void;
 };
 
 /**
@@ -26,164 +19,84 @@ type TabsValidationContextType = {
  */
 const VALIDATION_ENABLED = process.env.NODE_ENV !== 'production';
 
-// Context is only created in development mode.
-// When VALIDATION_ENABLED is true, this is guaranteed to be a valid Context.
 const TabsValidationContext = VALIDATION_ENABLED
 	? createContext< TabsValidationContextType | null >( null )
 	: ( null as unknown as React.Context< TabsValidationContextType | null > );
 
-/**
- * Development-only hook to access the tabs validation context.
- */
-function useTabsValidationContextDev() {
-	return useContext( TabsValidationContext );
+function useRegisterTabDev() {
+	const context = useContext( TabsValidationContext );
+
+	useEffect( () => {
+		if ( context ) {
+			return context.registerTab();
+		}
+		return undefined;
+	}, [ context ] );
+}
+
+function useRegisterTabProd() {
+	// No-op in production.
 }
 
 /**
- * Production no-op hook.
+ * Hook that registers a Tab for count validation in development mode.
  */
-function useTabsValidationContextProd() {
-	return null;
+export const useRegisterTab = VALIDATION_ENABLED
+	? useRegisterTabDev
+	: useRegisterTabProd;
+
+function useRegisterPanelDev() {
+	const context = useContext( TabsValidationContext );
+
+	useEffect( () => {
+		if ( context ) {
+			return context.registerPanel();
+		}
+		return undefined;
+	}, [ context ] );
+}
+
+function useRegisterPanelProd() {
+	// No-op in production.
 }
 
 /**
- * Hook to access the tabs validation context.
- * Returns null in production or if not within a Tabs.Root.
+ * Hook that registers a Panel for count validation in development mode.
  */
-export const useTabsValidationContext = VALIDATION_ENABLED
-	? useTabsValidationContextDev
-	: useTabsValidationContextProd;
+export const useRegisterPanel = VALIDATION_ENABLED
+	? useRegisterPanelDev
+	: useRegisterPanelProd;
 
 /**
- * Development-only hook that throws if not within Tabs.Root.
- */
-function useRequireTabsRootDev( componentName: string ) {
-	const context = useTabsValidationContextDev();
-
-	if ( context === null ) {
-		throw new Error(
-			`\`${ componentName }\` must be used within a \`Tabs.Root\` component.`
-		);
-	}
-}
-
-/**
- * Production no-op hook.
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function useRequireTabsRootProd( componentName: string ) {
-	// No-op in production
-}
-
-/**
- * Hook that throws an error in development if the component
- * is not wrapped in a Tabs.Root.
- *
- * @param componentName The name of the component (for the error message).
- */
-export const useRequireTabsRoot = VALIDATION_ENABLED
-	? useRequireTabsRootDev
-	: useRequireTabsRootProd;
-
-/**
- * Development-only provider that tracks registered tabs and panels,
- * and validates that they match.
+ * Development-only provider that tracks the number of registered tabs and
+ * panels, and warns when the counts don't match.
  */
 function TabsValidationProviderDev( {
 	children,
 }: {
 	children: React.ReactNode;
 } ) {
-	// Use Map<TabValue, number> to track counts of each value.
-	// This correctly handles multiple instances with the same value.
-	const tabsRef = useRef< Map< TabValue, number > >( new Map() );
-	const panelsRef = useRef< Map< TabValue, number > >( new Map() );
+	const tabCountRef = useRef( 0 );
+	const panelCountRef = useRef( 0 );
 	const validationScheduledRef = useRef< ReturnType<
 		typeof setTimeout
 	> | null >( null );
 
 	const scheduleValidation = useCallback( () => {
-		// Clear any existing scheduled validation
 		if ( validationScheduledRef.current ) {
 			clearTimeout( validationScheduledRef.current );
 		}
 
-		// Schedule validation for the next tick to allow all registrations to complete
+		// Schedule validation for the next tick to allow all
+		// registrations/unregistrations to complete.
 		validationScheduledRef.current = setTimeout( () => {
-			const tabCounts = tabsRef.current;
-			const panelCounts = panelsRef.current;
+			const tabCount = tabCountRef.current;
+			const panelCount = panelCountRef.current;
 
-			// Find tabs without matching panels
-			const tabsWithoutPanels: TabValue[] = [];
-			tabCounts.forEach( ( _count, value ) => {
-				if ( ! panelCounts.has( value ) ) {
-					tabsWithoutPanels.push( value );
-				}
-			} );
-
-			// Find panels without matching tabs
-			const panelsWithoutTabs: TabValue[] = [];
-			panelCounts.forEach( ( _count, value ) => {
-				if ( ! tabCounts.has( value ) ) {
-					panelsWithoutTabs.push( value );
-				}
-			} );
-
-			// Find duplicate tabs (count > 1)
-			const duplicateTabs: TabValue[] = [];
-			tabCounts.forEach( ( count, value ) => {
-				if ( count > 1 ) {
-					duplicateTabs.push( value );
-				}
-			} );
-
-			// Find duplicate panels (count > 1)
-			const duplicatePanels: TabValue[] = [];
-			panelCounts.forEach( ( count, value ) => {
-				if ( count > 1 ) {
-					duplicatePanels.push( value );
-				}
-			} );
-
-			// Warn about mismatches
-			if ( tabsWithoutPanels.length > 0 ) {
+			if ( tabCount !== panelCount ) {
 				warning(
-					`Tabs: Found Tab(s) without matching Panel(s). ` +
-						`Each Tab should have a corresponding Panel with the same \`value\` prop. ` +
-						`Tab value(s) without panels: ${ tabsWithoutPanels
-							.map( String )
-							.join( ', ' ) }`
-				);
-			}
-
-			if ( panelsWithoutTabs.length > 0 ) {
-				warning(
-					`Tabs: Found Panel(s) without matching Tab(s). ` +
-						`Each Panel should have a corresponding Tab with the same \`value\` prop. ` +
-						`Panel value(s) without tabs: ${ panelsWithoutTabs
-							.map( String )
-							.join( ', ' ) }`
-				);
-			}
-
-			// Warn about duplicates
-			if ( duplicateTabs.length > 0 ) {
-				warning(
-					`Tabs: Found duplicate Tab value(s). ` +
-						`Each Tab should have a unique \`value\` prop. ` +
-						`Duplicate value(s): ${ duplicateTabs
-							.map( String )
-							.join( ', ' ) }`
-				);
-			}
-
-			if ( duplicatePanels.length > 0 ) {
-				warning(
-					`Tabs: Found duplicate Panel value(s). ` +
-						`Each Panel should have a unique \`value\` prop. ` +
-						`Duplicate value(s): ${ duplicatePanels
-							.map( String )
-							.join( ', ' ) }`
+					`Tabs: Tab/Panel count mismatch. Found ${ tabCount } Tab(s) and ${ panelCount } Panel(s). ` +
+						`Each Tab should have a corresponding Panel.`
 				);
 			}
 
@@ -191,47 +104,26 @@ function TabsValidationProviderDev( {
 		}, 0 );
 	}, [] );
 
-	const registerTab = useCallback(
-		( value: TabValue ) => {
-			const currentCount = tabsRef.current.get( value ) ?? 0;
-			tabsRef.current.set( value, currentCount + 1 );
+	const registerTab = useCallback( () => {
+		tabCountRef.current += 1;
+		scheduleValidation();
+
+		return () => {
+			tabCountRef.current -= 1;
 			scheduleValidation();
+		};
+	}, [ scheduleValidation ] );
 
-			// Return unregister function
-			return () => {
-				const count = tabsRef.current.get( value ) ?? 0;
-				if ( count <= 1 ) {
-					tabsRef.current.delete( value );
-				} else {
-					tabsRef.current.set( value, count - 1 );
-				}
-				scheduleValidation();
-			};
-		},
-		[ scheduleValidation ]
-	);
+	const registerPanel = useCallback( () => {
+		panelCountRef.current += 1;
+		scheduleValidation();
 
-	const registerPanel = useCallback(
-		( value: TabValue ) => {
-			const currentCount = panelsRef.current.get( value ) ?? 0;
-			panelsRef.current.set( value, currentCount + 1 );
+		return () => {
+			panelCountRef.current -= 1;
 			scheduleValidation();
+		};
+	}, [ scheduleValidation ] );
 
-			// Return unregister function
-			return () => {
-				const count = panelsRef.current.get( value ) ?? 0;
-				if ( count <= 1 ) {
-					panelsRef.current.delete( value );
-				} else {
-					panelsRef.current.set( value, count - 1 );
-				}
-				scheduleValidation();
-			};
-		},
-		[ scheduleValidation ]
-	);
-
-	// Cleanup scheduled validation on unmount
 	useEffect( () => {
 		return () => {
 			if ( validationScheduledRef.current ) {
@@ -267,8 +159,8 @@ function TabsValidationProviderProd( {
 }
 
 /**
- * Provider component that tracks registered tabs and panels,
- * and validates that they match in development mode.
+ * Provider component that validates the number of tabs matches the number
+ * of panels in development mode.
  *
  * In production, this component is a no-op and just renders children.
  */

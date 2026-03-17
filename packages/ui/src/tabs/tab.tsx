@@ -1,9 +1,9 @@
-import { forwardRef, useEffect } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
 import { Tabs as _Tabs } from '@base-ui/react/tabs';
 import { chevronRight } from '@wordpress/icons';
 import { Icon } from '../icon';
-import { useTabsValidationContext, useRequireTabsRoot } from './context';
+import { useRegisterTab } from './context';
 import styles from './style.module.css';
 import type { TabProps } from './types';
 
@@ -14,25 +14,15 @@ import type { TabProps } from './types';
  * an [ARIA-compliant tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
  */
 export const Tab = forwardRef< HTMLButtonElement, TabProps >( function Tab(
-	{ className, children, value, ...otherProps },
+	{ className, children, ...otherProps },
 	forwardedRef
 ) {
-	useRequireTabsRoot( 'Tabs.Tab' );
-	const validationContext = useTabsValidationContext();
-
-	// Register this tab's value for validation
-	useEffect( () => {
-		if ( validationContext && value !== undefined ) {
-			return validationContext.registerTab( value );
-		}
-		return undefined;
-	}, [ validationContext, value ] );
+	useRegisterTab();
 
 	return (
 		<_Tabs.Tab
 			ref={ forwardedRef }
 			className={ clsx( styles.tab, className ) }
-			value={ value }
 			{ ...otherProps }
 		>
 			<span className={ styles[ 'tab-children' ] }>{ children }</span>

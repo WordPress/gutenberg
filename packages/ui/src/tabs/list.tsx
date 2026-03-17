@@ -2,7 +2,6 @@ import { forwardRef, useEffect, useState } from '@wordpress/element';
 import clsx from 'clsx';
 import { Tabs as _Tabs } from '@base-ui/react/tabs';
 import { useMergeRefs } from '@wordpress/compose';
-import { useRequireTabsRoot } from './context';
 import styles from './style.module.css';
 import type { TabListProps } from './types';
 
@@ -27,7 +26,6 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 		},
 		forwardedRef
 	) {
-		useRequireTabsRoot( 'Tabs.List' );
 		const [ listEl, setListEl ] = useState< HTMLDivElement | null >( null );
 		const [ overflow, setOverflow ] = useState< {
 			first: boolean;
