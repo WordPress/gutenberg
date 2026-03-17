@@ -7,6 +7,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { processCSSNesting } from '@wordpress/global-styles-engine';
+import { useBlockEditingMode } from '../components/block-editing-mode';
 
 /**
  * Internal dependencies
@@ -33,6 +34,11 @@ const EMPTY_STYLE = {};
  * @param {Object}   props.style         Block style attribute.
  */
 function CustomCSSControl( { blockName, setAttributes, style } ) {
+	const blockEditingMode = useBlockEditingMode();
+
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
 	const blockType = getBlockType( blockName );
 
 	function onChange( newStyle ) {
