@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from '@wordpress/element';
 import { privateApis as themeApis } from '@wordpress/theme';
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 import {
@@ -40,285 +41,361 @@ export default meta;
 
 /**
  * A mock application page demonstrating how `ThemeProvider` affects multiple
- * `@wordpress/ui` components in concert. Use the Storybook controls to adjust
+ * `@wordpress/ui` components in concert. Use the inline controls to adjust
  * the `primary` seed color, `bg` seed color, and `density`, and observe how
  * every surface, text element, and interactive control adapts accordingly.
  */
 export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
-	render: ( { primary, bg, density }: any ) => {
+	render: () => {
+		const [ primary, setPrimary ] = useState< string | undefined >();
+		const [ bg, setBg ] = useState< string | undefined >();
+		const [ density, setDensity ] = useState<
+			'default' | 'compact' | 'comfortable' | undefined
+		>();
+
 		return (
-			<ThemeProvider color={ { primary, bg } } density={ density } isRoot>
+			<div>
 				<div
 					style={ {
-						display: 'grid',
-						gridTemplateColumns: '200px 1fr',
-						minHeight: '500px',
-						color: 'var(--wpds-color-fg-content-neutral)',
+						display: 'flex',
+						alignItems: 'center',
+						gap: '16px',
+						padding: '12px 16px',
+						marginBlockEnd: '16px',
+						borderRadius: '8px',
+						background: '#f0f0f0',
+						fontSize: '13px',
+						flexWrap: 'wrap',
 					} }
 				>
-					{ /* Sidebar */ }
-					<div
+					{ /* eslint-disable jsx-a11y/label-has-associated-control */ }
+					<label
 						style={ {
-							backgroundColor:
-								'var(--wpds-color-bg-surface-neutral-weak)',
-							padding:
-								'var(--wpds-dimension-padding-xl) var(--wpds-dimension-padding-lg)',
+							display: 'inline-flex',
+							alignItems: 'center',
+							gap: '6px',
 						} }
 					>
-						{ /* eslint-disable jsx-a11y/heading-has-content */ }
-						<Text
-							variant="heading-sm"
-							render={ <h2 /> }
-							style={ {
-								marginBlockEnd: 'var(--wpds-dimension-gap-xl)',
-							} }
+						Primary
+						<input
+							type="color"
+							value={ primary ?? '#3858e9' }
+							onChange={ ( e ) => setPrimary( e.target.value ) }
+						/>
+					</label>
+					<label
+						style={ {
+							display: 'inline-flex',
+							alignItems: 'center',
+							gap: '6px',
+						} }
+					>
+						Background
+						<input
+							type="color"
+							value={ bg ?? '#ffffff' }
+							onChange={ ( e ) => setBg( e.target.value ) }
+						/>
+					</label>
+					<label
+						style={ {
+							display: 'inline-flex',
+							alignItems: 'center',
+							gap: '6px',
+						} }
+					>
+						Density
+						<select
+							value={ density ?? '' }
+							onChange={ ( e ) =>
+								setDensity(
+									( e.target.value || undefined ) as
+										| 'default'
+										| 'compact'
+										| 'comfortable'
+										| undefined
+								)
+							}
 						>
-							My App
-						</Text>
-						{ /* eslint-enable jsx-a11y/heading-has-content */ }
-						<nav>
-							<Stack
-								direction="column"
-								gap="xs"
-								render={ <ul /> }
-								style={ {
-									listStyle: 'none',
-									margin: 0,
-									padding: 0,
-								} }
-							>
-								{ sidebarNavItems.map( ( item ) => (
-									<li key={ item }>
-										<Text variant="body-md">{ item }</Text>
-									</li>
-								) ) }
-							</Stack>
-						</nav>
-					</div>
-
-					{ /* Page content (header + content area) */ }
+							<option value="">Default</option>
+							<option value="compact">Compact</option>
+							<option value="comfortable">Comfortable</option>
+						</select>
+					</label>
+					{ /* eslint-enable jsx-a11y/label-has-associated-control */ }
+				</div>
+				<ThemeProvider
+					color={ { primary, bg } }
+					density={ density }
+					isRoot
+				>
 					<div
 						style={ {
-							backgroundColor:
-								'var(--wpds-color-bg-surface-neutral-weak)',
-							padding: 'var(--wpds-dimension-padding-lg)',
+							display: 'grid',
+							gridTemplateColumns: '200px 1fr',
+							minHeight: '500px',
+							color: 'var(--wpds-color-fg-content-neutral)',
 						} }
 					>
+						{ /* Sidebar */ }
 						<div
 							style={ {
-								display: 'flex',
-								flexDirection: 'column',
-								borderRadius: 'var(--wpds-border-radius-lg)',
-								border: '1px solid var(--wpds-color-stroke-surface-neutral-weak)',
-								overflow: 'hidden',
-								height: '100%',
+								backgroundColor:
+									'var(--wpds-color-bg-surface-neutral-weak)',
+								padding:
+									'var(--wpds-dimension-padding-xl) var(--wpds-dimension-padding-lg)',
 							} }
 						>
-							{ /* Header */ }
-							<div
+							{ /* eslint-disable jsx-a11y/heading-has-content */ }
+							<Text
+								variant="heading-sm"
+								render={ <h2 /> }
 								style={ {
-									backgroundColor:
-										'var(--wpds-color-bg-surface-neutral-strong)',
-									padding: 'var(--wpds-dimension-padding-xl)',
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'space-between',
-									gap: 'var(--wpds-dimension-gap-lg)',
-									borderBlockEnd:
-										'1px solid var(--wpds-color-stroke-surface-neutral-weak)',
+									marginBlockEnd:
+										'var(--wpds-dimension-gap-xl)',
 								} }
 							>
-								<div
-									style={ {
-										display: 'flex',
-										alignItems: 'center',
-										gap: 'var(--wpds-dimension-gap-md)',
-									} }
-								>
-									{ /* eslint-disable jsx-a11y/heading-has-content */ }
-									<Text
-										variant="heading-lg"
-										render={ <h1 /> }
-										style={ {
-											margin: 0,
-										} }
-									>
-										Settings
-									</Text>
-									{ /* eslint-enable jsx-a11y/heading-has-content */ }
-									<Badge intent="informational">Beta</Badge>
-								</div>
-								<Button
-									variant="solid"
-									tone="brand"
-									size="compact"
-								>
-									Save changes
-								</Button>
-							</div>
-
-							{ /* Content area */ }
-							<div
-								style={ {
-									backgroundColor:
-										'var(--wpds-color-bg-surface-neutral)',
-									padding: 'var(--wpds-dimension-padding-xl)',
-									flexGrow: 1,
-								} }
-							>
+								My App
+							</Text>
+							{ /* eslint-enable jsx-a11y/heading-has-content */ }
+							<nav>
 								<Stack
 									direction="column"
-									gap="xl"
+									gap="xs"
+									render={ <ul /> }
 									style={ {
-										maxWidth: '640px',
-										marginInline: 'auto',
+										listStyle: 'none',
+										margin: 0,
+										padding: 0,
 									} }
 								>
-									<Notice.Root intent="info">
-										<Notice.Title>
-											Welcome to your new site
-										</Notice.Title>
-										<Notice.Description>
-											Complete the steps below to finish
-											setting up.
-										</Notice.Description>
-									</Notice.Root>
+									{ sidebarNavItems.map( ( item ) => (
+										<li key={ item }>
+											<Text variant="body-md">
+												{ item }
+											</Text>
+										</li>
+									) ) }
+								</Stack>
+							</nav>
+						</div>
 
-									{ /* Card 1: General */ }
-									<Card.Root>
-										<Card.Header>
-											<Card.Title>General</Card.Title>
-										</Card.Header>
-										<Card.Content>
-											<Stack direction="column" gap="md">
-												<Text>
-													Configure the basic settings
-													for your site. You can
-													update your{ ' ' }
-													<Link href="#">
-														site title
-													</Link>
-													, tagline, and{ ' ' }
-													<Link href="#">
-														admin email address
-													</Link>{ ' ' }
-													at any time.
-												</Text>
-												<Text>
-													For more advanced options,
-													visit the{ ' ' }
-													<Link href="#">
-														developer documentation
-													</Link>
-													.
-												</Text>
-											</Stack>
-										</Card.Content>
-									</Card.Root>
+						{ /* Page content (header + content area) */ }
+						<div
+							style={ {
+								backgroundColor:
+									'var(--wpds-color-bg-surface-neutral-weak)',
+								padding: 'var(--wpds-dimension-padding-lg)',
+							} }
+						>
+							<div
+								style={ {
+									display: 'flex',
+									flexDirection: 'column',
+									borderRadius:
+										'var(--wpds-border-radius-lg)',
+									border: '1px solid var(--wpds-color-stroke-surface-neutral-weak)',
+									overflow: 'hidden',
+									height: '100%',
+								} }
+							>
+								{ /* Header */ }
+								<div
+									style={ {
+										backgroundColor:
+											'var(--wpds-color-bg-surface-neutral-strong)',
+										padding:
+											'var(--wpds-dimension-padding-xl)',
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'space-between',
+										gap: 'var(--wpds-dimension-gap-lg)',
+										borderBlockEnd:
+											'1px solid var(--wpds-color-stroke-surface-neutral-weak)',
+									} }
+								>
+									<div
+										style={ {
+											display: 'flex',
+											alignItems: 'center',
+											gap: 'var(--wpds-dimension-gap-md)',
+										} }
+									>
+										{ /* eslint-disable jsx-a11y/heading-has-content */ }
+										<Text
+											variant="heading-lg"
+											render={ <h1 /> }
+											style={ {
+												margin: 0,
+											} }
+										>
+											Settings
+										</Text>
+										{ /* eslint-enable jsx-a11y/heading-has-content */ }
+										<Badge intent="informational">
+											Beta
+										</Badge>
+									</div>
+									<Button
+										variant="solid"
+										tone="brand"
+										size="compact"
+									>
+										Save changes
+									</Button>
+								</div>
 
-									{ /* Card 2: Display */ }
-									<Card.Root>
-										<Card.Header>
-											<Card.Title>Display</Card.Title>
-										</Card.Header>
-										<Card.Content>
-											<Tabs.Root defaultValue="appearance">
-												<Tabs.List variant="minimal">
-													<Tabs.Tab value="appearance">
-														Appearance
-													</Tabs.Tab>
-													<Tabs.Tab value="layout">
-														Layout
-													</Tabs.Tab>
-													<Tabs.Tab value="accessibility">
-														Accessibility
-													</Tabs.Tab>
-												</Tabs.List>
-												<Tabs.Panel value="appearance">
-													<Text
-														style={ {
-															paddingBlockStart:
-																'var(--wpds-dimension-padding-lg)',
-														} }
-													>
-														Control how your site
-														looks to visitors.
-														Adjust{ ' ' }
+								{ /* Content area */ }
+								<div
+									style={ {
+										backgroundColor:
+											'var(--wpds-color-bg-surface-neutral)',
+										padding:
+											'var(--wpds-dimension-padding-xl)',
+										flexGrow: 1,
+									} }
+								>
+									<Stack
+										direction="column"
+										gap="xl"
+										style={ {
+											maxWidth: '640px',
+											marginInline: 'auto',
+										} }
+									>
+										<Notice.Root intent="info">
+											<Notice.Title>
+												Welcome to your new site
+											</Notice.Title>
+											<Notice.Description>
+												Complete the steps below to
+												finish setting up.
+											</Notice.Description>
+										</Notice.Root>
+
+										{ /* Card 1: General */ }
+										<Card.Root>
+											<Card.Header>
+												<Card.Title>General</Card.Title>
+											</Card.Header>
+											<Card.Content>
+												<Stack
+													direction="column"
+													gap="md"
+												>
+													<Text>
+														Configure the basic
+														settings for your site.
+														You can update your{ ' ' }
 														<Link href="#">
-															typography
+															site title
 														</Link>
-														,{ ' ' }
+														, tagline, and{ ' ' }
 														<Link href="#">
-															colors
-														</Link>
-														, and spacing to match
-														your brand.
+															admin email address
+														</Link>{ ' ' }
+														at any time.
 													</Text>
-												</Tabs.Panel>
-												<Tabs.Panel value="layout">
-													<Text
-														style={ {
-															paddingBlockStart:
-																'var(--wpds-dimension-padding-lg)',
-														} }
-													>
-														Choose a layout
-														structure for your
-														pages. Options include
-														full-width, boxed, and{ ' ' }
+													<Text>
+														For more advanced
+														options, visit the{ ' ' }
 														<Link href="#">
-															custom layouts
+															developer
+															documentation
 														</Link>
 														.
 													</Text>
-												</Tabs.Panel>
-												<Tabs.Panel value="accessibility">
-													<Text
-														style={ {
-															paddingBlockStart:
-																'var(--wpds-dimension-padding-lg)',
-														} }
-													>
-														Review your site&apos;s{ ' ' }
-														<Link href="#">
-															accessibility
-															settings
-														</Link>{ ' ' }
-														to ensure it meets WCAG
-														guidelines.
-													</Text>
-												</Tabs.Panel>
-											</Tabs.Root>
-										</Card.Content>
-									</Card.Root>
-								</Stack>
+												</Stack>
+											</Card.Content>
+										</Card.Root>
+
+										{ /* Card 2: Display */ }
+										<Card.Root>
+											<Card.Header>
+												<Card.Title>Display</Card.Title>
+											</Card.Header>
+											<Card.Content>
+												<Tabs.Root defaultValue="appearance">
+													<Tabs.List variant="minimal">
+														<Tabs.Tab value="appearance">
+															Appearance
+														</Tabs.Tab>
+														<Tabs.Tab value="layout">
+															Layout
+														</Tabs.Tab>
+														<Tabs.Tab value="accessibility">
+															Accessibility
+														</Tabs.Tab>
+													</Tabs.List>
+													<Tabs.Panel value="appearance">
+														<Text
+															style={ {
+																paddingBlockStart:
+																	'var(--wpds-dimension-padding-lg)',
+															} }
+														>
+															Control how your
+															site looks to
+															visitors. Adjust{ ' ' }
+															<Link href="#">
+																typography
+															</Link>
+															,{ ' ' }
+															<Link href="#">
+																colors
+															</Link>
+															, and spacing to
+															match your brand.
+														</Text>
+													</Tabs.Panel>
+													<Tabs.Panel value="layout">
+														<Text
+															style={ {
+																paddingBlockStart:
+																	'var(--wpds-dimension-padding-lg)',
+															} }
+														>
+															Choose a layout
+															structure for your
+															pages. Options
+															include full-width,
+															boxed, and{ ' ' }
+															<Link href="#">
+																custom layouts
+															</Link>
+															.
+														</Text>
+													</Tabs.Panel>
+													<Tabs.Panel value="accessibility">
+														<Text
+															style={ {
+																paddingBlockStart:
+																	'var(--wpds-dimension-padding-lg)',
+															} }
+														>
+															Review your
+															site&apos;s{ ' ' }
+															<Link href="#">
+																accessibility
+																settings
+															</Link>{ ' ' }
+															to ensure it meets
+															WCAG guidelines.
+														</Text>
+													</Tabs.Panel>
+												</Tabs.Root>
+											</Card.Content>
+										</Card.Root>
+									</Stack>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			</ThemeProvider>
+				</ThemeProvider>
+			</div>
 		);
 	},
-	argTypes: {
-		children: { table: { disable: true } },
-		isRoot: { table: { disable: true } },
-		color: { table: { disable: true } },
-		primary: {
-			control: { type: 'color' },
-			description: 'Primary seed color for the theme.',
-		},
-		bg: {
-			control: { type: 'color' },
-			description: 'Background seed color for the theme.',
-		},
-		density: {
-			control: { type: 'select' },
-			options: [ undefined, 'default', 'compact', 'comfortable' ],
-		},
-	} as any,
-	args: {
-		primary: undefined,
-		bg: undefined,
-		density: undefined,
-	} as any,
+	parameters: {
+		controls: { disable: true },
+	},
 };
