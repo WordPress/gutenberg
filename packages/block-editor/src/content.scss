@@ -1,0 +1,16 @@
+@use "@wordpress/base-styles/default-custom-properties";
+@use "@wordpress/base-styles/mixins" as *;
+@use "./components/block-icon/content.scss" as *;
+@use "./components/block-list/content.scss" as *;
+@use "./components/block-list-appender/content.scss" as *;
+@use "./components/block-content-overlay/content.scss" as *;
+@use "./components/block-draggable/content.scss" as *;
+@use "./components/block-preview/content.scss" as *;
+@use "./components/block-variation-picker/content.scss" as *;
+@use "./components/button-block-appender/content.scss" as *;
+@use "./components/default-block-appender/content.scss" as *;
+@use "./components/iframe/content.scss" as *;
+@use "./components/media-placeholder/content.scss" as *;
+@use "./components/plain-text/content.scss" as *;
+@use "./components/rich-text/content.scss" as *;
+@use "./components/warning/content.scss" as *;

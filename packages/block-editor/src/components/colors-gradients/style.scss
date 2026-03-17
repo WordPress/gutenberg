@@ -1,0 +1,164 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/breakpoints" as *;
+
+// Must equal $color-palette-circle-size from:
+// @wordpress/components/src/circular-option-picker/style.scss
+$swatch-size: 28px;
+$swatch-gap: 12px;
+
+.block-editor-color-gradient-control {
+	.block-editor-color-gradient-control__color-indicator {
+		margin-bottom: $grid-unit-15;
+	}
+}
+
+.block-editor-color-gradient-control__fieldset {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+
+	// Prevents the `fieldset` from growing beyond its parent's size
+	// in order to fit its content.
+	min-width: 0;
+}
+
+.block-editor-panel-color-gradient-settings.block-editor-panel-color-gradient-settings {
+	&,
+	& > div:not(:first-of-type) {
+		display: block;
+	}
+}
+
+.block-editor-panel-color-gradient-settings {
+	@media screen and (min-width: $break-medium) {
+		.components-circular-option-picker__swatches {
+			display: grid;
+			grid-template-columns: repeat(6, $swatch-size);
+		}
+	}
+
+	// This shouldn't be needed but there's a rule in the inspector controls
+	// overriding this causing too much spacing.
+	// That generic rule should ideally be removed.
+	.block-editor-block-inspector & .components-base-control {
+		margin-bottom: inherit;
+	}
+
+}
+
+.block-editor-panel-color-gradient-settings__dropdown-content {
+	// Set minimum height to prevent content from being squashed when
+	// the popover is triggered near the bottom of the page, and flip
+	// the position accordingly.
+	min-height: 160px;
+
+	.block-editor-color-gradient-control__panel {
+		$panelPadding: $grid-unit-20;
+
+		// Ensure the popover perfectly wraps the swatches.
+		width: ( $swatch-size * 6 ) + ( $swatch-gap * 5 ) + ( $panelPadding * 2 );
+		padding: $panelPadding;
+	}
+}
+
+.block-editor-panel-color-gradient-settings__color-indicator {
+	// Show a diagonal line (crossed out) for empty swatches.
+	background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+}
+
+/**
+* The following styles replicate the separated border of the
+* `ItemGroup` component but allows for hidden items. This is because
+* to maintain the order of `ToolsPanel` controls, each `ToolsPanelItem`
+* must at least render a placeholder which would otherwise interfere
+* with the `:last-child` styles.
+*/
+.block-editor-tools-panel-color-gradient-settings__item {
+	padding: 0;
+	max-width: 100%;
+	position: relative;
+
+	// Border styles.
+	border-left: 1px solid $gray-300;
+	border-right: 1px solid $gray-300;
+	border-bottom: 1px solid $gray-300;
+
+	// Identify the first visible instance as placeholder items will not have this class.
+	&:nth-child(1 of &) {
+		margin-top: $grid-unit-30;
+		border-top-left-radius: $radius-small;
+		border-top-right-radius: $radius-small;
+		border-top: 1px solid $gray-300;
+	}
+
+	// Identify the last visible instance as placeholder items will not have this class.
+	&:nth-last-child(1 of &) {
+		border-bottom-left-radius: $radius-small;
+		border-bottom-right-radius: $radius-small;
+	}
+
+	> div,
+	> div > button {
+		border-radius: inherit;
+	}
+}
+
+.block-editor-tools-panel-color-gradient-settings__dropdown {
+	display: block;
+	padding: 0;
+
+	> button {
+		height: auto;
+		padding-top: $grid-unit * 1.25;
+		padding-bottom: $grid-unit * 1.25;
+		text-align: left;
+
+		&.is-open {
+			background: $gray-100;
+			color: var(--wp-admin-theme-color);
+		}
+	}
+
+	.block-editor-panel-color-gradient-settings__color-name {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: calc(100% - ($button-size-next-default-40px + $grid-unit-05));
+	}
+}
+
+.block-editor-panel-color-gradient-settings__dropdown {
+	width: 100%;
+
+	.component-color-indicator {
+		flex-shrink: 0;
+	}
+}
+
+.block-editor-panel-color-gradient-settings__reset {
+	position: absolute;
+	right: 0;
+	top: $grid-unit;
+	margin: auto $grid-unit auto;
+	opacity: 0;
+	@media not ( prefers-reduced-motion ) {
+		transition: opacity 0.1s ease-in-out;
+	}
+
+	&.block-editor-panel-color-gradient-settings__reset {
+		border-radius: $radius-small;
+	}
+
+	.block-editor-panel-color-gradient-settings__dropdown:hover + &,
+	&:focus,
+	&:hover {
+		opacity: 1;
+	}
+
+	@media (hover: none) {
+		// Show reset button on devices that do not support hover.
+		opacity: 1;
+	}
+}

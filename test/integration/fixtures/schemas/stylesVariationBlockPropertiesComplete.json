@@ -1,0 +1,15 @@
+{
+	"$schema": "../../../../schemas/json/theme.json",
+	"version": 3,
+	"styles": {
+		"variations": {
+			"custom-variation": {
+				"blocks": {
+					"core/button": {
+						"invalidAdditionalProperty": true
+					}
+				}
+			}
+		}
+	}
+}

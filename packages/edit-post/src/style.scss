@@ -1,0 +1,51 @@
+@use "@wordpress/base-styles/default-custom-properties";
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/admin-ui/build-style/style.css" as *;
+@use "./components/back-button/style.scss" as *;
+@use "./components/layout/style.scss" as *;
+@use "./components/meta-boxes/meta-boxes-area/style.scss" as *;
+@use "./components/welcome-guide/style.scss" as *;
+
+body.js.block-editor-page {
+	@include wp-admin-reset( ".block-editor" );
+}
+
+// Fix issue with wp-admin menu not scrolling between 170% and 200% zoom.
+.block-editor-page #wpwrap {
+	overflow-y: auto;
+	@include break-medium() {
+		overflow-y: initial;
+	}
+}
+
+.edit-post-visual-editor.is-iframed {
+	@include reset;
+}
+
+.block-editor__container {
+	// On mobile the main content area has to scroll, otherwise you can invoke
+	// the overscroll bounce on the non-scrolling container, for a bad experience.
+	@include break-small {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		min-height: calc(100vh - #{$admin-bar-height-big});
+	}
+
+	// The WP header height changes at this breakpoint.
+	@include break-medium {
+		min-height: calc(100vh - #{$admin-bar-height});
+
+		body.is-fullscreen-mode & {
+			min-height: 100vh;
+		}
+	}
+
+	img {
+		max-width: 100%;
+		height: auto;
+	}
+}

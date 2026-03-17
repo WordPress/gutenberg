@@ -1,0 +1,21 @@
+[
+	{
+		"name": "core/social-links",
+		"isValid": true,
+		"attributes": {
+			"openInNewTab": false,
+			"showLabels": false
+		},
+		"innerBlocks": [
+			{
+				"name": "core/social-link",
+				"isValid": true,
+				"attributes": {
+					"url": "https://mastodon.social/@marcuskaz",
+					"service": "mastodon"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

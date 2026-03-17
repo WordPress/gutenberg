@@ -1,0 +1,16 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.block-editor-multi-selection-inspector__card {
+	padding: $grid-unit-20;
+}
+
+.block-editor-multi-selection-inspector__card-title {
+	font-weight: $font-weight-medium;
+}
+
+.block-editor-multi-selection-inspector__card .block-editor-block-icon {
+	margin-left: -2px;
+	padding: 0 3px;
+	width: $button-size;
+	height: $button-size-small;
+}

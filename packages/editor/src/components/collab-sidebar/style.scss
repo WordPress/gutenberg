@@ -1,0 +1,186 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.interface-interface-skeleton__sidebar:has(.editor-collab-sidebar) {
+	box-shadow: none;
+
+	.interface-complementary-area-header {
+		display: none;
+	}
+}
+
+.editor-collab-sidebar {
+	height: 100%;
+	overflow: hidden;
+}
+
+.editor-collab-sidebar-panel {
+	padding: $grid-unit-20 $grid-unit-20 $grid-unit-30;
+	height: 100%;
+	overflow: hidden;
+}
+
+.editor-collab-sidebar-panel__thread {
+	position: relative;
+	padding: $grid-unit-20;
+	border-radius: $radius-large;
+	border: $border-width solid $gray-300;
+	background-color: $gray-100;
+	overflow: hidden;
+	width: auto;
+
+	&.is-selected {
+		background-color: $white;
+		box-shadow: $elevation-medium;
+		z-index: 1;
+	}
+
+	&:focus {
+		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
+		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
+	}
+
+	&.is-floating {
+		left: $grid-unit-20;
+		right: $grid-unit-20;
+		position: absolute;
+		margin-top: $grid-unit-20;
+	}
+}
+
+.editor-collab-sidebar-panel__user-name {
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 16px;
+	text-align: left;
+	color: $gray-700;
+	text-transform: capitalize;
+}
+
+.editor-collab-sidebar-panel__user-time {
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 16px;
+	text-align: left;
+	color: $gray-700;
+}
+
+.editor-collab-sidebar-panel__user-comment {
+	p:last-child {
+		margin-bottom: 0;
+	}
+}
+
+.editor-collab-sidebar-panel__user-avatar {
+	border-radius: $radius-round;
+	flex-shrink: 0;
+	border-width: var(--wp-admin-border-width-focus);
+	border-style: solid;
+	padding: var(--wp-admin-border-width-focus);
+	background: $white;
+}
+
+.editor-collab-sidebar-panel__comment-status {
+	margin-left: auto;
+
+	button {
+		&.has-icon:not(.has-text) {
+			min-width: 24px;
+			padding: 0;
+			width: 24px;
+			height: 24px;
+			flex-shrink: 0;
+		}
+	}
+}
+
+.editor-collab-sidebar-panel__comment-dropdown-menu {
+	flex-shrink: 0;
+}
+
+.editor-collab-sidebar-panel__more-reply-separator {
+	&::before,
+	&::after {
+		content: "";
+		display: block;
+		width: 100%;
+		height: 1px;
+		background-color: $gray-300;
+		flex: 1;
+	}
+}
+
+.editor-collab-sidebar-panel__more-reply-button {
+	font-weight: $font-weight-medium;
+}
+
+.editor-collab-sidebar-panel__resolution-text {
+	font-style: italic;
+}
+
+.editor-collab-sidebar-panel__comment-form textarea {
+	@include input-control;
+	// Vertical padding is to match the standard 40px control height when rows=1,
+	// in conjunction with the 20px line-height.
+	// "Standard" metrics are 10px 12px, but subtracts 1px each to account for the border width.
+	padding: 9px 11px;
+	line-height: 20px !important;
+	display: block;
+}
+
+// Visually hidden until focused (skip link pattern)
+.editor-collab-sidebar-panel__skip-to-comment,
+.editor-collab-sidebar-panel__skip-to-block {
+	position: absolute;
+	top: -9999px;
+	right: -9999px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	background: $white !important;
+	z-index: -1;
+
+	&:focus {
+		overflow: visible;
+		clip-path: none;
+		z-index: 1;
+		right: $grid-unit-10;
+	}
+}
+.editor-collab-sidebar-panel__skip-to-comment:focus {
+	top: $grid-unit-10;
+}
+.editor-collab-sidebar-panel__skip-to-block:focus {
+	top: auto;
+	bottom: $grid-unit-10;
+}
+
+.comment-avatar {
+	width: $icon-size;
+	border-radius: $radius-round;
+	margin-left: -12px;
+	border-width: var(--wp-admin-border-width-focus);
+	border-style: solid;
+	padding: var(--wp-admin-border-width-focus);
+	background: $white;
+	box-sizing: border-box;
+
+	&:first-child {
+		margin-left: 0;
+	}
+}
+
+.show-icon-labels {
+	.comment-avatar-indicator {
+		width: auto;
+		// Hide the user avatars container when labels are set to display...
+		div {
+			display: none;
+		}
+		// ... and display labels.
+		&::after {
+			content: attr(aria-label);
+			font-size: $helptext-font-size;
+		}
+	}
+}

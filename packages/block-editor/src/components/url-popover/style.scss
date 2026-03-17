@@ -1,0 +1,96 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.block-editor-url-popover__additional-controls {
+	border-top: $border-width solid $gray-900;
+	padding: $grid-unit-10 $grid-unit-10;
+}
+
+.block-editor-url-popover__input-container {
+	padding: $grid-unit-10;
+}
+
+.block-editor-url-popover__row {
+	display: flex;
+	gap: $grid-unit-05;
+	align-items: center;
+}
+
+// Any children of the popover-row that are not the settings-toggle
+// should take up as much space as possible.
+.block-editor-url-popover__row > :not(.block-editor-url-popover__settings-toggle) {
+	flex-grow: 1;
+	gap: $grid-unit-10;
+}
+
+.block-editor-url-popover__additional-controls .components-button.has-icon {
+	padding-left: $grid-unit-10;
+	padding-right: $grid-unit-10;
+	height: auto;
+	text-align: left;
+
+	> svg {
+		margin-right: $grid-unit-10;
+	}
+}
+
+.block-editor-url-popover__settings-toggle {
+	flex-shrink: 0;
+
+	&[aria-expanded="true"] .dashicon {
+		transform: rotate(180deg);
+	}
+}
+
+.block-editor-url-popover__settings {
+	display: block;
+	padding: $grid-unit-20;
+	border-top: $border-width solid $gray-900;
+}
+
+.block-editor-url-popover__link-editor,
+.block-editor-url-popover__link-viewer {
+	display: flex;
+}
+
+.block-editor-url-popover__link-viewer-url {
+	display: flex;
+	align-items: center;
+	flex-grow: 1;
+	flex-shrink: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	margin-right: $grid-unit-10;
+	min-width: 150px;
+	// Avoids the popover from growing too wide when the URL is long.
+	// See https://github.com/WordPress/gutenberg/issues/58599
+	max-width: $modal-min-width;
+
+	&.has-invalid-link {
+		color: $alert-red;
+	}
+}
+
+.block-editor-url-popover__expand-on-click {
+	display: flex;
+	align-items: center;
+	min-width: $modal-min-width;
+	white-space: nowrap;
+
+	.text {
+		flex-grow: 1;
+
+		p {
+			margin: 0;
+			// This ensures the text and help text is 32px, which with
+			// padding makes the popover same height as the block toolbar.
+			line-height: $grid-unit-20;
+
+			&.description {
+				color: $gray-700;
+				font-size: $helptext-font-size;
+			}
+		}
+	}
+}

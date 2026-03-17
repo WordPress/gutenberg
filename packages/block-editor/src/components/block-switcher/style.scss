@@ -1,0 +1,94 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.components-popover.block-editor-block-switcher__popover .components-popover__content {
+	min-width: 300px;
+}
+
+.block-editor-block-switcher__popover-preview-container {
+	left: 0;
+	position: absolute;
+	top: -$border-width;
+	width: 100%;
+	bottom: 0;
+	pointer-events: none;
+}
+
+.block-editor-block-switcher__popover-preview {
+	overflow: hidden;
+
+	.components-popover__content {
+		width: 300px;
+		border: $border-width solid $gray-900;
+		background: $white;
+		border-radius: $radius-medium;
+		outline: none;
+		box-shadow: none;
+		overflow: auto;
+	}
+
+	.block-editor-block-switcher__preview {
+		// Subtract vertical margin from max-height.
+		max-height: calc(500px - #{$grid-unit-40});
+		margin: $grid-unit-20 0;
+		// Use padding to prevent the pattern previews focus style from being cut-off.
+		padding: 0 $grid-unit-20;
+		overflow: hidden;
+
+		&.is-pattern-list-preview {
+			overflow: unset;
+		}
+	}
+}
+
+.block-editor-block-switcher__preview-patterns-container {
+	padding-bottom: $grid-unit-20;
+
+	.block-editor-block-switcher__preview-patterns-container-list__list-item {
+		margin-top: $grid-unit-20;
+
+		.block-editor-block-preview__container {
+			cursor: pointer;
+		}
+
+		.block-editor-block-switcher__preview-patterns-container-list__item {
+			height: 100%;
+			border-radius: $radius-small;
+			@media not ( prefers-reduced-motion ) {
+				transition: all 0.05s ease-in-out;
+			}
+			position: relative;
+			border: $border-width solid transparent;
+
+			&:hover,
+			&:focus {
+				box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 2px solid transparent;
+			}
+
+			&:hover {
+				box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $gray-900;
+			}
+
+			.block-editor-block-switcher__preview-patterns-container-list__item-title {
+				padding: $grid-unit-05;
+				font-size: 12px;
+				text-align: center;
+				cursor: pointer;
+			}
+		}
+	}
+}
+
+.block-editor-block-switcher__no-transforms {
+	color: $gray-700;
+	padding: 6px $grid-unit;
+	margin: 0;
+}
+
+.block-editor-block-switcher__binding-indicator {
+	display: block;
+	padding: $grid-unit;
+}

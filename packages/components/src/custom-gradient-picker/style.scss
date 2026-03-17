@@ -1,0 +1,101 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
+$components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 16px handles inside, that leaves 32px padding, half of which is 1å6.
+
+.components-custom-gradient-picker__gradient-bar {
+	border-radius: $radius-small;
+	width: 100%;
+	height: $grid-unit-60;
+	position: relative;
+	z-index: 1;
+
+	&.has-gradient {
+		@include checkerboard-background( 12px );
+	}
+
+	.components-custom-gradient-picker__gradient-bar-background {
+		position: absolute;
+		inset: 0;
+	}
+
+	.components-custom-gradient-picker__markers-container {
+		position: relative;
+		width: calc(100% - #{ $grid-unit-60 });
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.components-custom-gradient-picker__control-point-dropdown {
+		position: absolute;
+		height: $grid-unit-20;
+		width: $grid-unit-20;
+		top: $components-custom-gradient-picker__padding;
+		// Trim any internal white spacing that would be cause d by inline positioned elements
+		display: flex;
+	}
+
+	.components-custom-gradient-picker__insert-point-dropdown {
+		position: relative;
+
+		// Same size as the .components-custom-gradient-picker__control-point-dropdown parent
+		height: inherit;
+		width: inherit;
+		min-width: $grid-unit-20 !important;
+		border-radius: $radius-round;
+
+		background: $white;
+		padding: 2px;
+
+		color: $gray-900;
+
+		svg {
+			height: 100%;
+			width: 100%;
+		}
+	}
+
+	.components-custom-gradient-picker__control-point-button {
+		// Same size as the .components-custom-gradient-picker__control-point-dropdown parent
+		height: inherit;
+		width: inherit;
+		border-radius: $radius-round;
+		padding: 0;
+
+		// Shadow and stroke.
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white, 0 0 $border-width-focus-fallback 0 rgba($black, 0.25);
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+
+		&:focus,
+		&.is-active {
+			box-shadow: inset 0 0 0 calc(var(--wp-admin-border-width-focus) * 2) $white, 0 0 $border-width-focus-fallback 0 rgba($black, 0.25);
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: $border-width-tab solid transparent;
+		}
+	}
+}
+
+.components-custom-gradient-picker__remove-control-point-wrapper {
+	padding-bottom: $grid-unit-10;
+}
+
+.components-custom-gradient-picker__inserter {
+	/*rtl:ignore*/
+	direction: ltr;
+}
+
+.components-custom-gradient-picker__liner-gradient-indicator {
+	display: inline-block;
+	flex: 0 auto;
+	width: 20px;
+	height: 20px;
+}
+
+.components-custom-gradient-picker__ui-line {
+	position: relative;
+	z-index: 0;
+}

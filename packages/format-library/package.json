@@ -1,0 +1,67 @@
+{
+	"name": "@wordpress/format-library",
+	"version": "5.41.0",
+	"description": "Format library for the WordPress editor.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"formats"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/format-library/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/format-library"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"react-native": "src/index",
+	"wpScript": true,
+	"dependencies": {
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/base-styles": "file:../base-styles",
+		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/html-entities": "file:../html-entities",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/latex-to-mathml": "file:../latex-to-mathml",
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/rich-text": "file:../rich-text",
+		"@wordpress/url": "file:../url"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

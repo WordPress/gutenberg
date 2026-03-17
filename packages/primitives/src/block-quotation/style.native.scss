@@ -1,0 +1,25 @@
+%wpBlockQuote-shared {
+	border-left-width: 4px;
+	border-left-style: solid;
+	padding-left: $block-edge-to-content;
+	margin-left: 0;
+}
+
+.wpBlockQuoteLight {
+	@extend %wpBlockQuote-shared;
+	border-left-color: $black;
+}
+
+.wpBlockQuoteDark {
+	@extend %wpBlockQuote-shared;
+	border-left-color: $white;
+}
+
+.wpBlockQuoteCitation {
+	margin-top: 16px;
+	font-size: 14px;
+}
+
+.paddingWithBackground {
+	padding-top: $block-edge-to-content - $block-selected-margin;
+}

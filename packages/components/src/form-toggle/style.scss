@@ -1,0 +1,137 @@
+@use "sass:math";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+@use "../utils/theme-variables" as *;
+
+$toggle-width: $grid-unit-40;
+$toggle-height: $grid-unit-20;
+$toggle-border-width: 1px;
+$toggle-thumb-size:  $grid-unit-15;
+
+$transition-duration: 0.2s;
+
+.components-form-toggle {
+	position: relative;
+	display: inline-block;
+	height: $toggle-height;
+
+	// Unchecked state.
+	.components-form-toggle__track {
+		position: relative;
+		content: "";
+		display: inline-block;
+		box-sizing: border-box;
+		vertical-align: top;
+		background-color: $white;
+		border: $toggle-border-width solid $gray-600;
+		width: $toggle-width;
+		height: $toggle-height;
+		border-radius: math.div($toggle-height, 2);
+
+		@media not (prefers-reduced-motion) {
+			transition:
+				$transition-duration background-color ease,
+				$transition-duration border-color ease;
+		}
+
+		overflow: hidden;
+
+		// Windows High Contrast Mode
+		&::after {
+			content: "";
+			position: absolute;
+			inset: 0;
+			box-sizing: border-box;
+			// Expand the border to fake a solid in Windows High Contrast Mode.
+			border-top: #{ $toggle-height } solid transparent;
+
+			@media not (prefers-reduced-motion) {
+				transition: $transition-duration opacity ease;
+			}
+
+			opacity: 0;
+		}
+	}
+
+	.components-form-toggle__thumb {
+		display: block;
+		position: absolute;
+		box-sizing: border-box;
+		top: math.div($toggle-thumb-size, 6);
+		left: math.div($toggle-thumb-size, 6);
+		width: $toggle-thumb-size;
+		height: $toggle-thumb-size;
+		border-radius: $radius-round;
+
+		@media not (prefers-reduced-motion) {
+			transition:
+				$transition-duration transform ease,
+				$transition-duration background-color ease-out;
+		}
+
+		background-color: $gray-900;
+		box-shadow: $elevation-x-small;
+
+		// Transparent border acts as a fill in Windows High Contrast Mode.
+		border: math.div($toggle-thumb-size, 2) solid transparent;
+	}
+
+	// Checked state.
+	&.is-checked .components-form-toggle__track {
+		background-color: $components-color-accent;
+		border-color: $components-color-accent;
+
+		// Windows High Contrast Mode
+		&::after {
+			opacity: 1;
+		}
+	}
+
+	.components-form-toggle__input:focus + .components-form-toggle__track {
+		@include button-style-outset__focus($components-color-accent);
+	}
+
+	&.is-checked {
+		.components-form-toggle__thumb {
+			background-color: $white;
+			border-width: 0; // Zero out the border color to make the thumb invisible in Windows High Contrast Mode.
+			transform: translateX($toggle-width - ($toggle-border-width * 4) - ($toggle-height - ($toggle-border-width * 4)));
+		}
+	}
+
+	// Disabled state:
+	&.is-disabled,
+	.components-disabled & {
+		opacity: 0.3;
+	}
+}
+
+// This needs specificity to override inherited checkbox styles.
+.components-form-toggle input.components-form-toggle__input[type="checkbox"] {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	margin: 0;
+	padding: 0;
+	z-index: z-index(".components-form-toggle__input");
+
+	// This overrides a border style that is inherited from parent checkbox styles.
+	border: none;
+	&:checked {
+		background: none;
+	}
+
+	// Don't show custom checkbox checkmark.
+	&::before {
+		content: "";
+	}
+
+	&:not(:disabled, [aria-disabled="true"]) {
+		cursor: pointer;
+	}
+}

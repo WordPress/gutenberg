@@ -1,0 +1,16 @@
+@use "@wordpress/base-styles/variables" as *;
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	&:where(.wp-block-heading).has-background {
+		padding: $block-bg-padding--v $block-bg-padding--h;
+	}
+	&.has-text-align-right[style*="writing-mode"]:where([style*="vertical-rl"]),
+	&.has-text-align-left[style*="writing-mode"]:where([style*="vertical-lr"]) {
+		rotate: 180deg;
+	}
+}

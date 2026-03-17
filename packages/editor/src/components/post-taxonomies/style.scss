@@ -1,0 +1,39 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-post-taxonomies__hierarchical-terms-list {
+	max-height: 14em;
+	overflow: auto;
+
+	// Extra left padding prevents checkbox focus borders from being cut off.
+	margin-left: -$border-width * 4 - $border-width-focus-fallback;
+	padding-left: $border-width * 4 + $border-width-focus-fallback;
+	margin-top: -$border-width * 4 - $border-width-focus-fallback;
+	padding-top: $border-width * 4 + $border-width-focus-fallback;
+}
+
+.editor-post-taxonomies__hierarchical-terms-choice {
+	margin-bottom: $grid-unit-10;
+	&:last-child {
+		margin-bottom: $grid-unit-05;
+	}
+}
+
+.editor-post-taxonomies__hierarchical-terms-subchoices {
+	margin-top: $grid-unit-10;
+	margin-left: $grid-unit-20;
+}
+
+.editor-post-taxonomies__flat-term-most-used {
+	.editor-post-taxonomies__flat-term-most-used-label {
+		margin-bottom: $grid-unit-05;
+	}
+}
+
+.editor-post-taxonomies__flat-term-most-used-list {
+	margin: 0;
+
+	li {
+		display: inline-block;
+		margin-right: $grid-unit-10;
+	}
+}

@@ -1,0 +1,143 @@
+@use "sass:math";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+$button-spacing-x: $grid-unit-10 + math.div($grid-unit-05, 2); // 10px
+$button-spacing-y: math.div($grid-unit-15, 2); // 6px
+
+.wp-block-search__button {
+	margin-left: $button-spacing-x;
+	word-break: normal;
+
+	&.has-icon {
+		line-height: 0;
+	}
+
+	svg {
+		min-width: $grid-unit-30;
+		min-height: $grid-unit-30;
+		width: 1.25em;
+		height: 1.25em;
+		fill: currentColor;
+		vertical-align: text-bottom;
+	}
+}
+
+// These rules are set to zero specificity to keep the default styles for search buttons.
+// They are needed for backwards compatibility.
+:where(.wp-block-search__button) {
+	border: 1px solid $gray-400;
+	padding: $button-spacing-y $button-spacing-x;
+}
+
+.wp-block-search__inside-wrapper {
+	display: flex;
+	flex: auto;
+	flex-wrap: nowrap;
+	max-width: 100%;
+}
+
+.wp-block-search__label {
+	width: 100%;
+}
+
+.wp-block-search.wp-block-search__button-only {
+	.wp-block-search__button {
+		margin-left: 0;
+		// Prevent unintended text wrapping.
+		flex-shrink: 0;
+		max-width: 100%;
+		box-sizing: border-box;
+		display: flex;
+		justify-content: center;
+	}
+
+	.wp-block-search__inside-wrapper {
+		transition-property: width;
+		min-width: 0 !important;
+	}
+
+	.wp-block-search__input {
+		transition-duration: 300ms;
+		flex-basis: 100%;
+	}
+
+	// !important here to override inline styles on button only deselected view.
+	&.wp-block-search__searchfield-hidden {
+		overflow: hidden;
+
+		.wp-block-search__inside-wrapper {
+			overflow: hidden;
+		}
+
+		.wp-block-search__input {
+			width: 0 !important;
+			min-width: 0 !important;
+			padding-left: 0 !important;
+			padding-right: 0 !important;
+			border-left-width: 0 !important;
+			border-right-width: 0 !important;
+			flex-grow: 0;
+			margin: 0;
+			flex-basis: 0;
+		}
+	}
+}
+
+// We are lowering the specificity so that the input element can override the rule for the input element inside the search block.
+:where(.wp-block-search__input) {
+	font-family: inherit;
+	font-weight: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	letter-spacing: inherit;
+	text-transform: inherit;
+	font-style: inherit;
+	padding: $grid-unit-10;
+	flex-grow: 1;
+	margin-left: 0;
+	margin-right: 0;
+	min-width: 3rem;
+	border: 1px solid $gray-600;
+	// !important used to forcibly prevent undesired application of
+	// text-decoration styles on the input field.
+	text-decoration: unset !important;
+
+	// Hides a redundant extra search icon on Mobile Safari.
+	appearance: initial;
+}
+
+// We are lowering the specificity so that the button element can override the rule for the button inside the search block.
+:where(.wp-block-search__button-inside .wp-block-search__inside-wrapper) {
+	padding: $grid-unit-05;
+	border-width: 1px;
+	border-style: solid;
+	border-color: $gray-600;
+	background-color: $white;
+	box-sizing: border-box;
+
+	.wp-block-search__input {
+		border-radius: 0;
+		border: none;
+		padding: 0 $grid-unit-05;
+
+		&:focus {
+			outline: none;
+		}
+	}
+
+	// For lower specificity.
+	:where(.wp-block-search__button) {
+		padding: $grid-unit-05 $grid-unit-10;
+	}
+}
+
+.wp-block-search.aligncenter .wp-block-search__inside-wrapper {
+	margin: auto;
+}
+
+.wp-block[data-align="right"] .wp-block-search.wp-block-search__button-only {
+	.wp-block-search__inside-wrapper {
+		float: right;
+	}
+}

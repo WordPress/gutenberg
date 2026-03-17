@@ -1,0 +1,79 @@
+.helpIconContainer {
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 48;
+	width: 48;
+	padding-top: 12;
+	padding-right: 12;
+	justify-content: flex-start;
+	align-items: flex-end;
+}
+
+.infoIcon {
+	size: 36;
+	height: 36;
+	padding-top: 8;
+	padding-bottom: 8;
+	color: $light-secondary;
+}
+
+.infoIconDark {
+	color: $dark-tertiary;
+}
+
+.unsupportedBlock {
+	height: 142;
+	background-color: #e0e0e0; // $light-dim
+	padding-top: 24;
+	padding-bottom: 24;
+	padding-left: 8;
+	padding-right: 8;
+	border-top-left-radius: 4;
+	border-top-right-radius: 4;
+	border-bottom-left-radius: 4;
+	border-bottom-right-radius: 4;
+	align-items: center;
+	justify-content: center;
+}
+
+.unsupportedBlockDark {
+	background-color: #1f1f1f; // $dark-dim
+}
+
+.unsupportedBlockHeader {
+	flex-direction: row;
+	align-items: center;
+	margin-top: 4;
+	margin-bottom: 8;
+}
+
+.unsupportedBlockIcon {
+	color: $light-secondary;
+}
+
+.unsupportedBlockIconDark {
+	color: $dark-tertiary;
+}
+
+.unsupportedBlockMessage {
+	text-align: center;
+	color: $light-secondary;
+	font-size: 16;
+	font-weight: 400;
+	margin-left: 6;
+}
+
+.unsupportedBlockMessageDark {
+	color: $dark-tertiary;
+}
+
+.unsupportedBlockSubtitle {
+	text-align: center;
+	color: $gray-darken-20;
+	font-size: 12;
+}
+
+.unsupportedBlockSubtitleDark {
+	color: $gray-20;
+}

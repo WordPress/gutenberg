@@ -1,0 +1,99 @@
+.searchBlockContainer {
+	flex: 1;
+	flex-direction: column;
+}
+
+.searchBarContainer {
+	flex: 1;
+	flex-direction: row;
+	justify-content: flex-start;
+	width: 100%;
+}
+
+.searchInputContainer {
+	flex: 1;
+	flex-grow: 1;
+	flex-shrink: 1;
+}
+
+.border {
+	border: $border-width solid $gray-5;
+	border-radius: $grid-unit-05;
+	padding: $grid-unit-05;
+}
+
+.borderDark {
+	border: $border-width solid $gray-80;
+}
+
+.buttonContainer {
+	background: $button-fallback-bg;
+	padding: $grid-unit-10;
+	border: $border-width solid $button-fallback-bg;
+	margin-left: $grid-unit-05;
+	border-radius: $grid-unit-05;
+	align-content: center;
+	align-items: center;
+}
+
+.buttonContainerWide {
+	margin-left: 0;
+	margin-top: $grid-unit-05;
+}
+
+.icon {
+	fill: $white;
+	background-color: transparent;
+}
+
+.richTextLabel {
+	background-color: transparent;
+	margin-top: $grid-unit-10;
+	margin-bottom: $grid-unit-10;
+	font-size: $editor-font-size;
+	font-weight: 400;
+	font-family: $default-regular-font;
+	width: 100%;
+}
+
+.richTextButton {
+	color: $white;
+	font-size: $editor-font-size;
+	font-weight: 400;
+	background-color: transparent;
+	font-family: $default-regular-font;
+	padding-left: $grid-unit-10;
+	padding-right: $grid-unit-10;
+	margin: 0;
+	text-align: center;
+	min-height: 24px;
+}
+
+.richTextButtonCursor {
+	color: #ddd;
+}
+
+.plainTextInput {
+	min-height: 42px;
+	padding: $grid-unit-05;
+	padding-left: $grid-unit-10;
+	font-family: $default-regular-font;
+	color: $gray-90;
+}
+
+.plainTextInputDark {
+	color: $gray-10;
+}
+
+.plainTextPlaceholder {
+	color: $gray;
+}
+
+.plainTextPlaceholderDark {
+	color: $gray-50;
+}
+
+.widthMargin {
+	margin: $grid-unit-20;
+	padding: $grid-unit-05;
+}

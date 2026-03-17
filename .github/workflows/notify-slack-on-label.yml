@@ -1,0 +1,30 @@
+name: Notify Slack on Needs Testing Label
+
+on:
+    issues:
+        types: [labeled]
+    pull_request:
+        types: [labeled]
+
+jobs:
+    notify:
+        if: ${{ github.event.label.name == 'Needs Testing' }}
+        runs-on: ubuntu-latest
+        permissions: {}
+        env:
+            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_NEEDS_TESTING_LABEL_ADDED_WEBHOOK_URL }}
+        steps:
+            - name: Skip when webhook is unavailable
+              if: ${{ env.SLACK_WEBHOOK_URL == '' }}
+              run: echo "SLACK_NEEDS_TESTING_LABEL_ADDED_WEBHOOK_URL is not available; skipping notification."
+
+            - name: Send custom HTTP request with testing data
+              if: ${{ env.SLACK_WEBHOOK_URL != '' }}
+              env:
+                  TARGET_URL: ${{ github.event_name == 'issues' && github.event.issue.html_url || github.event.pull_request.html_url }}
+                  TARGET_TYPE: ${{ github.event_name }}
+                  TARGET_TITLE: ${{ github.event_name == 'issues' && github.event.issue.title || github.event.pull_request.title }}
+              run: |
+                  payload=$(jq -n --arg url "$TARGET_URL" --arg type "$TARGET_TYPE" --arg title "$TARGET_TITLE" '{url:$url,type:$type,title:$title}')
+
+                  curl -X POST -H "Content-Type: application/json" -d "$payload" "$SLACK_WEBHOOK_URL"

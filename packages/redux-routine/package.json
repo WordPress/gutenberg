@@ -1,0 +1,60 @@
+{
+	"name": "@wordpress/redux-routine",
+	"version": "5.41.0",
+	"description": "Redux middleware for generator coroutines.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"redux",
+		"middleware",
+		"coroutine"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/redux-routine/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/redux-routine"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"react-native": "src/index",
+	"wpScript": true,
+	"wpScriptDefaultExport": true,
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"is-plain-object": "^5.0.0",
+		"is-promise": "^4.0.0",
+		"rungen": "^0.3.2"
+	},
+	"peerDependencies": {
+		"redux": ">=4"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

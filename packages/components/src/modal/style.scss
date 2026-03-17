@@ -1,0 +1,224 @@
+@use "@wordpress/base-styles/animations" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+@use "../utils/theme-variables" as *;
+
+// The scrim behind the modal window.
+.components-modal__screen-overlay {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-color: rgba($black, 0.35);
+	z-index: z-index(".components-modal__screen-overlay");
+	display: flex;
+	// This animates the appearance of the backdrop.
+	@include animation__fade-in();
+
+	&.is-animating-out {
+		// Note: it's important that the fade-out animation doesn't end after the
+		// modal frame's disappear animation, because the component will be removed
+		// from the DOM when that animation ends.
+		@include animation__fade-out($delay: 80ms);
+	}
+}
+
+// The modal window element.
+.components-modal__frame {
+	@include reset;
+	// Use the entire viewport on smaller screens.
+	margin: $grid-unit-50 0 0 0;
+	width: 100%;
+	background: $white;
+	box-shadow: $elevation-large;
+	border-radius: $radius-large $radius-large 0 0;
+	overflow: hidden;
+	// Have the content element fill the vertical space yet not overflow.
+	display: flex;
+	color: $gray-900;
+	// Animate the modal frame/contents appearing on the page.
+	animation-name: components-modal__appear-animation;
+	animation-fill-mode: forwards;
+	animation-timing-function: cubic-bezier(0.29, 0, 0, 1);
+
+	// Ensure all headings use the proper editor text color, overriding wp-admin common.css
+	h1,
+	h2,
+	h3 {
+		color: $gray-900;
+	}
+
+	@media not (prefers-reduced-motion) {
+		animation-duration: var(--modal-frame-animation-duration);
+	}
+
+	.components-modal__screen-overlay.is-animating-out & {
+		animation-name: components-modal__disappear-animation;
+		animation-timing-function: cubic-bezier(1, 0, 0.2, 1);
+	}
+
+	// Show a centered modal on bigger screens.
+	@include break-small() {
+		border-radius: $radius-large;
+		margin: auto;
+		width: auto;
+		min-width: $modal-min-width;
+		max-width: calc(100% - #{$grid-unit-20 * 2});
+		max-height: calc(100% - #{$header-height * 2});
+
+		&.is-full-screen {
+			@include break-small() {
+				width: calc(100% - #{ $grid-unit-20 * 2 });
+				height: calc(100% - #{ $grid-unit-20 * 2 });
+				max-height: none;
+			}
+			@include break-medium() {
+				width: calc(100% - #{ $grid-unit-50 * 2 });
+				height: calc(100% - #{ $grid-unit-50 * 2 });
+				max-width: none;
+			}
+		}
+
+		&.has-size-small,
+		&.has-size-medium,
+		&.has-size-large {
+			width: 100%;
+		}
+
+		// The following widths were selected to align with existing baselines
+		// found elsewhere in the editor.
+		// See https://github.com/WordPress/gutenberg/pull/54471#issuecomment-1723818809
+		&.has-size-small {
+			max-width: $modal-width-small;
+		}
+		&.has-size-medium {
+			max-width: $modal-width-medium;
+		}
+		&.has-size-large {
+			max-width: $modal-width-large;
+		}
+
+	}
+
+	@include break-large() {
+		max-height: 70%;
+	}
+
+	&.is-full-screen {
+		// When full screen, make sure the children container is full height.
+		:where(.components-modal__content) {
+			display: flex;
+			// If this container is scrollable, bottom padding won't apply so we use margin instead.
+			margin-bottom: $grid-unit-30;
+			padding-bottom: 0;
+
+			> :last-child {
+				flex: 1;
+			}
+		}
+	}
+}
+
+@keyframes components-modal__appear-animation {
+	from {
+		opacity: 0;
+		transform: scale(0.9);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+// Note: this animation is also used in the animationend JS event listener.
+// Make sure that the animation name is kept in sync across the two files.
+@keyframes components-modal__disappear-animation {
+	from {
+		opacity: 1;
+		transform: scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: scale(0.9);
+	}
+}
+
+// Fix header to the top so it is always there to provide context to the modal
+// if the content needs to be scrolled (for example, on the keyboard shortcuts
+// modal screen).
+.components-modal__header {
+	box-sizing: border-box;
+	border-bottom: $border-width solid transparent;
+	padding: $grid-unit-30;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	height: $header-height + $grid-unit-10; // 72px
+	width: 100%;
+	z-index: z-index(".components-modal__header");
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	.components-modal__header-heading {
+		font-size: $font-size-x-large;
+		font-weight: 600;
+	}
+
+	h1 {
+		line-height: 1;
+		margin: 0;
+	}
+
+	.components-modal__content.has-scrolled-content:not(.hide-header) & {
+		border-bottom-color: $gray-300;
+	}
+
+	& + p {
+		margin-top: 0;
+	}
+}
+
+.components-modal__header-heading-container {
+	align-items: center;
+	flex-grow: 1;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+}
+
+.components-modal__header-icon-container {
+	display: inline-block;
+
+	svg {
+		max-width: $button-size;
+		max-height: $button-size;
+		padding: $grid-unit-10;
+	}
+}
+
+// Modal contents.
+.components-modal__content {
+	flex: 1;
+	margin-top: $header-height + $grid-unit-10;
+	// Small top padding required to avoid cutting off the visible outline when the first child element is focusable.
+	padding: $grid-unit-05 $grid-unit-30 $grid-unit-30;
+	overflow: auto;
+
+	&.hide-header {
+		margin-top: 0;
+		padding-top: $grid-unit-30;
+	}
+
+	&.is-scrollable:focus-visible {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+		outline-offset: -2px;
+	}
+}

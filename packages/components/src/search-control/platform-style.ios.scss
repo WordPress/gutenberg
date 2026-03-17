@@ -1,0 +1,43 @@
+.search-control__container--active {
+	margin-right: 0;
+}
+
+.search-control__input-container {
+	background-color: $gray-light;
+}
+
+.search-control__input-container--dark {
+	background-color: $dark-ultra-dim;
+}
+
+.search-control__form-input--active {
+	flex: 1;
+}
+
+.search-control__input-button-left--active {
+	margin: 0 8px 0 12px;
+}
+
+.search-control__input-button-right--active {
+	margin: 0 12px 0 8px;
+}
+
+.search-control__cancel-button {
+	height: 100%;
+	justify-content: center;
+	flex: 1;
+	flex-basis: auto;
+	flex-grow: 0;
+}
+
+.search-control__cancel-button-text {
+	color: $blue-wordpress;
+	font-size: 17px;
+	padding-left: 8px;
+	padding-right: 16px;
+	align-self: flex-start;
+}
+
+.search-control__cancel-button-text--dark {
+	color: $blue-30;
+}

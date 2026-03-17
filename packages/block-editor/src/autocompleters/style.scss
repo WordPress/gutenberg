@@ -1,0 +1,21 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.block-editor-autocompleters__block {
+	white-space: nowrap;
+
+	.block-editor-block-icon {
+		margin-right: $grid-unit-10;
+	}
+
+	&[aria-selected="true"] .block-editor-block-icon {
+		color: inherit !important;
+	}
+}
+
+.block-editor-autocompleters__link {
+	white-space: nowrap;
+
+	.block-editor-block-icon {
+		margin-right: $grid-unit-10;
+	}
+}

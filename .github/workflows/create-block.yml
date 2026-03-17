@@ -1,0 +1,56 @@
+name: Create Block
+
+on:
+    pull_request:
+    push:
+        branches: [trunk, wp/latest]
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    checks:
+        name: Checks w/Node.js ${{ matrix.node }} on ${{ contains( matrix.os, 'macos-' ) && 'MacOS' || contains( matrix.os, 'windows-' ) && 'Windows' || 'Linux' }}
+        runs-on: ${{ matrix.os }}
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            fail-fast: false
+            matrix:
+                event: ['${{ github.event_name }}']
+                node: ['20', '22', '24']
+                os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
+                exclude:
+                    # On PRs: Only test Node 20 on Ubuntu
+                    - event: 'pull_request'
+                      node: '22'
+                    - event: 'pull_request'
+                      node: '24'
+                    - event: 'pull_request'
+                      os: 'macos-15'
+                    - event: 'pull_request'
+                      os: 'windows-2025'
+
+        steps:
+            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: ${{ matrix.node }}
+
+            - name: Create block
+              shell: bash
+              run: bash ./bin/test-create-block.sh

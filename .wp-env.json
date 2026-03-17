@@ -1,0 +1,8 @@
+{
+	"$schema": "./schemas/json/wp-env.json",
+	"testsEnvironment": false,
+	"core": "WordPress/WordPress",
+	"plugins": [ "." ],
+	"themes": [ "./test/emptytheme" ],
+	"phpmyadminPort": 9000
+}

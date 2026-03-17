@@ -1,0 +1,204 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+/**
+ * Insertion Point.
+ */
+.block-editor-block-list__insertion-point {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.block-editor-block-list__insertion-point-indicator {
+	position: absolute;
+	background: var(--wp-admin-theme-color);
+	border-radius: $radius-small;
+	transform-origin: center;
+	opacity: 0;
+	will-change: transform, opacity;
+
+	.block-editor-block-list__insertion-point.is-vertical > & {
+		top: calc(50% - 2px);
+		height: 4px;
+		width: 100%;
+	}
+
+	.block-editor-block-list__insertion-point.is-horizontal > & {
+		top: 0;
+		bottom: 0;
+		left: calc(50% - 2px);
+		width: 4px;
+	}
+}
+
+// This is the clickable plus.
+.block-editor-block-list__insertion-point-inserter {
+	// Don't show on mobile.
+	display: none;
+	position: absolute;
+	will-change: transform;
+
+	@include break-mobile() {
+		display: flex;
+	}
+
+	justify-content: center;
+
+	top: calc(50% - #{$button-size-small * 0.5});
+	left: calc(50% - #{$button-size-small * 0.5});
+}
+
+.block-editor-block-list__block-side-inserter-popover .components-popover__content > div {
+	pointer-events: none;
+
+	> * {
+		pointer-events: all;
+	}
+}
+
+// The black plus that shows up on the right side of an empty paragraph block.
+.block-editor-block-list__empty-block-inserter.block-editor-block-list__empty-block-inserter {
+	position: absolute;
+	top: 0;
+	right: 0;
+	line-height: 0;
+
+	&:disabled {
+		display: none;
+	}
+}
+
+// Sibling inserter / "inbetweenserter".
+.block-editor-block-list__empty-block-inserter,
+.block-editor-block-list__insertion-point-inserter {
+	.block-editor-inserter__toggle.components-button.has-icon {
+		@include inserter-toggle;
+	}
+}
+
+.block-editor-block-list__insertion-point-inserter .block-editor-inserter__toggle.components-button.has-icon {
+	background: var(--wp-admin-theme-color);
+	&:hover {
+		background: $gray-900;
+	}
+}
+
+// Hide the popover block editor list while dragging.
+// Using a hacky animation to delay hiding the element.
+// It's needed because if we hide the element immediately upon dragging,
+// the dragging will end immediately since there are no elements to be dragged anymore.
+// Fortunately, we only have to keep it visible for a frame immediately after dragging,
+// after that, we can safely hide it altogether.
+@keyframes hide-during-dragging {
+	to {
+		position: fixed;
+		transform: translate(9999px, 9999px);
+	}
+}
+
+.components-popover.block-editor-block-list__block-popover {
+
+	// Position the block toolbar.
+	.block-editor-block-contextual-toolbar {
+		pointer-events: all;
+		margin-top: $grid-unit-10;
+		margin-bottom: $grid-unit-10;
+		border: $border-width solid $gray-900;
+		border-radius: $radius-small;
+		overflow: visible; // allow the parent selector to be visible
+		position: static;
+		width: auto;
+
+		&.has-parent {
+			margin-left: calc(#{$grid-unit-60} + #{$grid-unit-10});
+			.show-icon-labels & {
+				margin-left: 0;
+			}
+		}
+	}
+
+	.block-editor-block-toolbar {
+		overflow: visible;
+	}
+
+	.block-editor-block-toolbar .components-toolbar-group,
+	.block-editor-block-toolbar .components-toolbar {
+		border-right-color: $gray-900;
+	}
+
+	// Hide the block toolbar if the insertion point is shown.
+	&.is-insertion-point-visible {
+		visibility: hidden;
+	}
+
+	.is-dragging-components-draggable & {
+		opacity: 0;
+		@media not ( prefers-reduced-motion ) {
+
+			// Use a minimal duration to delay hiding the element, see hide-during-dragging animation for more details.
+			// It's essential to hide the toolbar/popover so that `dragEnter` events can pass through them to the underlying elements.
+			animation: hide-during-dragging 1ms linear forwards;
+		}
+	}
+
+	.block-editor-block-parent-selector {
+		position: absolute;
+		left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
+
+		&::before {
+			content: "";
+		}
+
+		// Hide the dot divider since the parent selector is visually separated.
+		&::after {
+			display: none;
+		}
+
+		.block-editor-block-parent-selector__button {
+			border: $border-width solid $gray-900;
+			padding-right: 6px;
+			padding-left: 6px;
+			background-color: $white;
+
+			.show-icon-labels & {
+				padding-right: $grid-unit-15;
+				padding-left: $grid-unit-15;
+			}
+		}
+	}
+
+	// Show Icon Label Styles
+	.show-icon-labels & {
+
+		.block-editor-block-parent-selector {
+			position: relative;
+			left: auto;
+			margin-left: -$border-width;
+		}
+
+		.block-editor-block-mover__move-button-container,
+		.block-editor-block-toolbar__block-controls .block-editor-block-mover {
+			border-left: 1px solid $gray-900;
+		}
+	}
+}
+
+.is-dragging-components-draggable .components-tooltip {
+	display: none;
+}
+
+.components-popover.block-editor-block-popover__inbetween .block-editor-button-pattern-inserter__button {
+	pointer-events: all;
+	position: absolute;
+	transform: translateX(-50%) translateY(-50%);
+	top: 50%;
+	left: 50%;
+}
+
+.block-editor-block-tools--is-dragging > .popover-slot {
+	display: none;
+}

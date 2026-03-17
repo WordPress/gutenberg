@@ -1,0 +1,108 @@
+.media-placeholder__container {
+	flex: 1;
+	height: 142;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	background-color: #e0e0e0; // $light-dim
+	padding-left: 12;
+	padding-right: 12;
+	padding-top: 12;
+	padding-bottom: 12;
+	border-top-left-radius: 2;
+	border-top-right-radius: 2;
+	border-bottom-left-radius: 2;
+	border-bottom-right-radius: 2;
+}
+
+.media-placeholder__container--dark {
+	background-color: #1f1f1f; // $dark-dim
+}
+
+.media-placeholder__container-selected {
+	border-width: 2px;
+	border-color: $blue-40;
+}
+
+.media-placeholder__container-selected--dark {
+	border-color: $blue-50;
+}
+
+.emptyStateDescription {
+	text-align: center;
+	color: $white;
+	font-size: 16;
+	font-weight: 400;
+}
+
+.emptyStateDescriptionDark {
+	color: $black;
+}
+
+.media-placeholder__header-icon {
+	width: 24px;
+	height: 24px;
+	margin-right: $grid-unit;
+	fill: $light-secondary;
+}
+
+.media-placeholder__header-icon--dark {
+	fill: $dark-tertiary;
+}
+
+.media-placeholder__header-title {
+	text-align: center;
+	font-size: 16;
+	color: $light-secondary;
+}
+
+.media-placeholder__header-title--dark {
+	color: $dark-tertiary;
+}
+
+.appender {
+	height: auto;
+	background-color: $white;
+	border: $border-width solid $light-gray-500;
+	border-radius: 4px;
+}
+
+.appenderDark {
+	background-color: $background-dark-secondary;
+	border: $border-width solid $gray-70;
+}
+
+.addMediaButton {
+	color: $white;
+	background-color: $toolbar-button;
+	border-radius: $button-size-small * 0.5;
+	overflow: hidden;
+	size: $button-size-small;
+}
+
+.addMediaButtonDark {
+	color: $background-dark-secondary;
+	background-color: $gray-20;
+}
+
+.media-placeholder__button {
+	background-color: $light-primary;
+	border-radius: 3px;
+	padding: $grid-unit $grid-unit-20;
+}
+
+.media-placeholder__button--dark {
+	background-color: $dark-primary;
+}
+
+.media-placeholder__header {
+	flex-direction: row;
+	align-items: center;
+	margin-top: 4;
+	margin-bottom: 16;
+}
+
+.media-placeholder__appender {
+	width: 100%;
+	align-items: center;
+}

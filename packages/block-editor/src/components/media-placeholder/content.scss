@@ -1,0 +1,13 @@
+.block-editor-media-placeholder__cancel-button.is-link {
+	margin: 1em;
+	display: block;
+}
+
+.block-editor-media-placeholder.is-appender {
+	min-height: 0;
+
+	&:hover {
+		cursor: pointer;
+		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
+	}
+}

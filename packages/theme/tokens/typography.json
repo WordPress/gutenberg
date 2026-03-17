@@ -1,0 +1,113 @@
+{
+	"wpds-font": {
+		"family": {
+			"$type": "fontFamily",
+			"heading": {
+				"$value": [
+					"-apple-system",
+					"system-ui",
+					"Segoe UI",
+					"Roboto",
+					"Oxygen-Sans",
+					"Ubuntu",
+					"Cantarell",
+					"Helvetica Neue",
+					"sans-serif"
+				],
+				"$description": "Headings font family"
+			},
+			"body": {
+				"$value": [
+					"-apple-system",
+					"system-ui",
+					"Segoe UI",
+					"Roboto",
+					"Oxygen-Sans",
+					"Ubuntu",
+					"Cantarell",
+					"Helvetica Neue",
+					"sans-serif"
+				],
+				"$description": "Body font family"
+			},
+			"mono": {
+				"$value": [ "Menlo", "Consolas", "monaco", "monospace" ],
+				"$description": "Monospace font family"
+			}
+		},
+		"size": {
+			"$type": "dimension",
+			"xs": {
+				"$value": { "value": 11, "unit": "px" },
+				"$description": "Extra small font size"
+			},
+			"sm": {
+				"$value": { "value": 12, "unit": "px" },
+				"$description": "Small font size"
+			},
+			"md": {
+				"$value": { "value": 13, "unit": "px" },
+				"$description": "Medium font size"
+			},
+			"lg": {
+				"$value": { "value": 15, "unit": "px" },
+				"$description": "Large font size"
+			},
+			"xl": {
+				"$value": { "value": 20, "unit": "px" },
+				"$description": "Extra large font size"
+			},
+			"2xl": {
+				"$value": { "value": 32, "unit": "px" },
+				"$description": "2X large font size"
+			},
+			"$extensions": {
+				"com.figma.scopes": [ "FONT_SIZE" ]
+			}
+		},
+		"line-height": {
+			"$type": "dimension",
+			"xs": {
+				"$value": { "value": 16, "unit": "px" },
+				"$description": "Extra small line height"
+			},
+			"sm": {
+				"$value": { "value": 20, "unit": "px" },
+				"$description": "Small line height"
+			},
+			"md": {
+				"$value": { "value": 24, "unit": "px" },
+				"$description": "Medium line height"
+			},
+			"lg": {
+				"$value": { "value": 28, "unit": "px" },
+				"$description": "Large line height"
+			},
+			"xl": {
+				"$value": { "value": 32, "unit": "px" },
+				"$description": "Extra large line height"
+			},
+			"2xl": {
+				"$value": { "value": 40, "unit": "px" },
+				"$description": "2X large line height"
+			},
+			"$extensions": {
+				"com.figma.scopes": [ "LINE_HEIGHT" ]
+			}
+		},
+		"weight": {
+			"$type": "fontWeight",
+			"regular": {
+				"$value": 400,
+				"$description": "Regular font weight for body text"
+			},
+			"medium": {
+				"$value": 500,
+				"$description": "Medium font weight for emphasis and headings"
+			},
+			"$extensions": {
+				"com.figma.scopes": [ "FONT_WEIGHT" ]
+			}
+		}
+	}
+}

@@ -1,0 +1,161 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// Provide special styling for the placeholder.
+// @todo this particular minimal style of placeholder could be componentized further.
+.wp-block-image.wp-block-image {
+	.block-editor-media-placeholder.is-small {
+		min-height: 60px;
+	}
+}
+
+figure.wp-block-image:not(.wp-block) {
+	margin: 0;
+}
+
+.wp-block-image {
+	position: relative;
+
+	.is-applying img,
+	&.is-transient img {
+		opacity: 0.3;
+	}
+
+	figcaption img {
+		display: inline;
+	}
+
+	// Shown while image is being uploaded.
+	.components-spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		margin: 0;
+	}
+}
+
+// Shown while image is being uploaded but cannot be previewed.
+.wp-block-image__placeholder {
+	aspect-ratio: 4 / 3;
+
+	// Make placeholder background white so that you can see the spinner on top of it.
+	&.has-illustration::before {
+		background: $white;
+		opacity: 0.8;
+	}
+
+	// Reduce opacity of diagonal stroke so that it doesn't obscure the spinner.
+	.components-placeholder__illustration {
+		opacity: 0.1;
+	}
+}
+
+.block-editor-block-list__block[data-type="core/image"] .block-editor-block-toolbar .block-editor-url-input__button-modal {
+	position: absolute;
+	left: 0;
+	right: 0;
+	margin: -$border-width 0;
+
+	@include break-small() {
+		margin: -$border-width;
+	}
+}
+
+[data-align="wide"] > .wp-block-image,
+[data-align="full"] > .wp-block-image {
+	img {
+		height: auto;
+		width: 100%;
+	}
+}
+
+.wp-block[data-align="left"],
+.wp-block[data-align="center"],
+.wp-block[data-align="right"] {
+	> .wp-block-image {
+		display: table;
+
+		> figcaption {
+			display: table-caption;
+			caption-side: bottom;
+		}
+	}
+}
+
+.wp-block[data-align="left"] > .wp-block-image {
+	margin-right: 1em;
+	margin-left: 0;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.wp-block[data-align="right"] > .wp-block-image {
+	margin-left: 1em;
+	margin-right: 0;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.wp-block[data-align="center"] > .wp-block-image {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
+// Relatively position the alignment container to support the content resizer.
+.wp-block[data-align]:has(> .wp-block-image) {
+	position: relative;
+}
+
+.wp-block-image__crop-area {
+	position: relative;
+	max-width: 100%;
+	width: 100%;
+	overflow: hidden;
+
+	.reactEasyCrop_Container {
+		// The linked Image block has `pointer-events: none` applied. Override it
+		// here to enable the crop action.
+		pointer-events: auto;
+
+		// This removes the border from the img within the image cropper so it
+		// can be applied to the cropper itself. This then allows the image to be
+		// cropped within the visual border providing more accurate editing and
+		// smoother UX.
+		.reactEasyCrop_Image {
+			border: none;
+			border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
+		}
+	}
+}
+
+.wp-block-image__crop-icon {
+	padding: 0 8px;
+	min-width: 48px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	svg {
+		fill: currentColor;
+	}
+}
+
+.wp-block-image__zoom {
+	.components-popover__content {
+		min-width: 260px;
+		overflow: visible !important;
+	}
+}
+
+.wp-block-image__toolbar_content_textarea__container {
+	padding: $grid-unit;
+}
+
+.wp-block-image__toolbar_content_textarea {
+	// Corresponds to the size of the textarea in the block inspector.
+	width: 250px;
+}
+

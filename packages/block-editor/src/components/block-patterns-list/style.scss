@@ -1,0 +1,89 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.block-editor-block-patterns-list__list-item {
+	cursor: pointer;
+	margin-bottom: $grid-unit-20;
+
+	// The list item contains absolutely positioned visually hidden text,
+	// so make this container relative. This prevents the bug experienced in
+	// https://github.com/WordPress/gutenberg/issues/44842.
+	position: relative;
+
+	&.is-placeholder {
+		min-height: 100px;
+	}
+
+	&[draggable="true"] {
+		cursor: grab;
+	}
+}
+
+.block-editor-block-patterns-list__item {
+	height: 100%;
+	// This is derived from the top padding set on
+	// `.block-editor-block-patterns-explorer__list`
+	scroll-margin-top: $grid-unit-30;
+	// This is derived from the bottom padding set on
+	// `.block-editor-block-patterns-explorer__list` and
+	// the bottom margin set on `...__list-item` above
+	scroll-margin-bottom: ($grid-unit-40 + $grid-unit-30);
+
+	outline: 0;
+
+	.block-editor-block-patterns-list__item-title {
+		flex-grow: 1;
+		font-size: $helptext-font-size;
+		text-align: left;
+	}
+
+	.block-editor-block-preview__container {
+		display: flex;
+		align-items: center;
+		overflow: hidden;
+		border-radius: $radius-medium;
+
+		&::after {
+			outline: $border-width solid rgba($black, 0.1);
+			outline-offset: -$border-width;
+			border-radius: $radius-medium;
+			@media not ( prefers-reduced-motion ) {
+				transition: outline 0.1s linear;
+			}
+		}
+	}
+
+	// Selected
+	&.is-selected .block-editor-block-preview__container::after {
+		outline-color: $gray-900;
+		outline-width: var(--wp-admin-border-width-focus);
+		outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
+	}
+
+	// Hover state
+	&:hover .block-editor-block-preview__container::after {
+		outline-color: rgba($black, 0.3);
+	}
+
+	// Focused state
+	&[data-focus-visible] .block-editor-block-preview__container::after {
+		outline-color: var(--wp-admin-theme-color);
+		outline-width: var(--wp-admin-border-width-focus);
+		outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
+	}
+
+	.block-editor-patterns__pattern-details:not(:empty) {
+		align-items: center;
+		margin-top: $grid-unit-10;
+		padding-bottom: $grid-unit-05; // Add more space for labels on user-created patterns.
+	}
+
+	.block-editor-patterns__pattern-icon-wrapper {
+		min-width: 24px;
+		height: 24px;
+
+		.block-editor-patterns__pattern-icon {
+			fill: var(--wp-block-synced-color);
+		}
+	}
+}

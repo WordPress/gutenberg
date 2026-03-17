@@ -1,0 +1,24 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.color-block-support-panel {
+	.block-editor-contrast-checker {
+		grid-column: span 2;
+		margin-top: $grid-unit-20;
+	}
+
+	/* Increased specificity required to remove the slot wrapper's row gap */
+	&#{&} {
+		.color-block-support-panel__inner-wrapper {
+			row-gap: 0;
+		}
+	}
+
+	/**
+	 * After converting PanelColorGradientSettings to render as a ToolsPanel
+	 * we need to remove the top margin when wrapping inner content due to
+	 * rendering via SlotFills.
+	 */
+	.block-editor-tools-panel-color-gradient-settings__item.first {
+		margin-top: 0;
+	}
+}

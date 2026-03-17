@@ -1,0 +1,25 @@
+[
+	{
+		"blockName": "core/quote",
+		"attrs": {
+			"className": "is-style-large"
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<p>There is no greater agony than bearing an untold story inside you.</p>\n",
+				"innerContent": [
+					"\n<p>There is no greater agony than bearing an untold story inside you.</p>\n"
+				]
+			}
+		],
+		"innerHTML": "\n<blockquote class=\"wp-block-quote is-style-large\"><cite>Maya Angelou</cite></blockquote>\n",
+		"innerContent": [
+			"\n<blockquote class=\"wp-block-quote is-style-large\">",
+			null,
+			"<cite>Maya Angelou</cite></blockquote>\n"
+		]
+	}
+]

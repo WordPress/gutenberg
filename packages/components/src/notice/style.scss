@@ -1,0 +1,83 @@
+@use "sass:color";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
+.components-notice {
+	display: flex;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	background-color: $white;
+	border-left: 4px solid $components-color-accent;
+	padding: 8px 12px;
+	align-items: center;
+	color: $gray-900;
+
+	&.is-dismissible {
+		position: relative;
+
+		.components-notice__content {
+			margin-right: #{ $button-size-small + $border-width };
+		}
+	}
+
+	&.is-success {
+		border-left-color: $alert-green;
+		background-color: color.adjust($alert-green, $lightness: +45%);
+	}
+
+	&.is-warning {
+		border-left-color: $alert-yellow;
+		background-color: color.adjust($alert-yellow, $lightness: +35%);
+	}
+
+	&.is-error {
+		border-left-color: $alert-red;
+		background-color: color.adjust($alert-red, $lightness: +35%);
+	}
+}
+
+.components-notice__content {
+	flex-grow: 1;
+	margin-top: $grid-unit-05;
+	margin-bottom: $grid-unit-05;
+}
+
+.components-notice__actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: $grid-unit-15;
+	margin-top: $grid-unit-15;
+}
+
+.components-notice__dismiss {
+	color: $gray-700;
+
+	// Place the dismiss button at the top of the container, even when text wraps onto two lines.
+	align-self: flex-start;
+	flex-shrink: 0;
+
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
+	&:not(:disabled):not([aria-disabled="true"]):focus {
+		color: $gray-900;
+		background-color: transparent;
+	}
+
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
+		box-shadow: none;
+	}
+}
+
+.components-notice-list {
+	// The notice should never be wider than the viewport, or the close button might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
+	max-width: 100vw;
+	box-sizing: border-box;
+
+	.components-notice__content {
+		margin-top: $grid-unit-15;
+		margin-bottom: $grid-unit-15;
+		line-height: 2;
+	}
+}

@@ -1,0 +1,169 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AlignmentUI should allow custom alignment controls to be specified 1`] = `
+<div>
+  <div
+    class="components-toolbar"
+    icon="[object Object]"
+    label="Align text"
+  >
+    <div>
+      <button
+        align="custom-left"
+        aria-label="My custom left"
+        aria-pressed="false"
+        class="components-button components-toolbar__control is-compact has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M13 5.5H4V4h9v1.5Zm7 7H4V11h16v1.5Zm-7 7H4V18h9v1.5Z"
+          />
+        </svg>
+      </button>
+    </div>
+    <div>
+      <button
+        align="custom-right"
+        aria-label="My custom right"
+        aria-pressed="true"
+        class="components-button components-toolbar__control is-compact is-pressed has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M7.5 5.5h9V4h-9v1.5Zm-3.5 7h16V11H4v1.5Zm3.5 7h9V18h-9v1.5Z"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`AlignmentUI should match snapshot when controls are hidden 1`] = `
+<div>
+  <div
+    class="components-dropdown components-dropdown-menu components-toolbar"
+    tabindex="-1"
+  >
+    <button
+      aria-expanded="false"
+      aria-haspopup="true"
+      aria-label="Align text"
+      class="components-button components-dropdown-menu__toggle has-icon"
+      data-toolbar-item="true"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        height="24"
+        viewBox="0 0 24 24"
+        width="24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M13 5.5H4V4h9v1.5Zm7 7H4V11h16v1.5Zm-7 7H4V18h9v1.5Z"
+        />
+      </svg>
+    </button>
+  </div>
+</div>
+`;
+
+exports[`AlignmentUI should match snapshot when controls are visible 1`] = `
+<div>
+  <div
+    class="components-toolbar"
+    icon="[object Object]"
+    label="Align text"
+  >
+    <div>
+      <button
+        align="left"
+        aria-label="Align text left"
+        aria-pressed="true"
+        class="components-button components-toolbar__control is-compact is-pressed has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M13 5.5H4V4h9v1.5Zm7 7H4V11h16v1.5Zm-7 7H4V18h9v1.5Z"
+          />
+        </svg>
+      </button>
+    </div>
+    <div>
+      <button
+        align="center"
+        aria-label="Align text center"
+        aria-pressed="false"
+        class="components-button components-toolbar__control is-compact has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M7.5 5.5h9V4h-9v1.5Zm-3.5 7h16V11H4v1.5Zm3.5 7h9V18h-9v1.5Z"
+          />
+        </svg>
+      </button>
+    </div>
+    <div>
+      <button
+        align="right"
+        aria-label="Align text right"
+        aria-pressed="false"
+        class="components-button components-toolbar__control is-compact has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M11.111 5.5H20V4h-8.889v1.5ZM4 12.5h16V11H4v1.5Zm7.111 7H20V18h-8.889v1.5Z"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+`;

@@ -1,0 +1,7 @@
+.wp-block-post-comments-form * {
+	pointer-events: none;
+
+	&.block-editor-warning * {
+		pointer-events: auto;
+	}
+}

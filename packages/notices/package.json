@@ -1,0 +1,60 @@
+{
+	"name": "@wordpress/notices",
+	"version": "5.41.0",
+	"description": "State management for notices.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"notices"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/notices/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/notices"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"react-native": "src/index",
+	"wpScript": true,
+	"types": "build-types",
+	"dependencies": {
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/components": "file:../components",
+		"@wordpress/data": "file:../data",
+		"clsx": "^2.1.1"
+	},
+	"devDependencies": {
+		"deep-freeze": "0.0.1"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

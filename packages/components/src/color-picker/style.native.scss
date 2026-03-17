@@ -1,0 +1,87 @@
+.footer {
+	border-top-width: $border-width;
+	border-color: $light-gray-400;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: $grid-unit-20;
+	margin-top: $grid-unit-20;
+	flex-wrap: wrap;
+}
+
+.footerDark {
+	border-color: $gray-70;
+}
+
+.cancelButton {
+	color: #d63638;
+	font-size: 17px;
+}
+
+.cancelButtonDark {
+	color: #f86368;
+}
+
+.applyButton {
+	color: $blue-50;
+	font-size: 17px;
+}
+
+.applyButtonDark {
+	color: $blue-30;
+}
+
+.colorText {
+	font-family: $default-monospace-font;
+	color: $light-primary;
+	font-size: 16px;
+	font-weight: 400;
+}
+
+.colorTextDark {
+	color: $dark-primary;
+}
+
+.selectColorText {
+	text-align: center;
+	color: $gray;
+	font-size: 16px;
+	line-height: 24px;
+}
+
+.selectColorTextDark {
+	color: $dark-primary;
+}
+
+.picker {
+	padding: $grid-unit-20;
+	border-radius: $grid-unit-20 * 0.5;
+	height: 200px;
+}
+
+.pickerPointer {
+	height: 16px;
+}
+
+.hsv-container {
+	justify-content: center;
+	align-items: center;
+}
+
+.gradient-gontainer {
+	overflow: hidden;
+}
+
+.saturation-slider {
+	top: 0;
+	left: 0;
+	position: absolute;
+	border-color: $white;
+}
+
+.hue-slider {
+	position: absolute;
+	background-color: #fff;
+	box-shadow: 0 7px 10px rgba(0, 0, 0, 0.5);
+	z-index: 5;
+}

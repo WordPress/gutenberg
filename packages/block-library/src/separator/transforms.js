@@ -1,0 +1,37 @@
+/**
+ * WordPress dependencies
+ */
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+
+const transforms = {
+	from: [
+		{
+			type: 'input',
+			regExp: /^-{3,}$/,
+			transform: () => [
+				createBlock( 'core/separator' ),
+				createBlock( getDefaultBlockName() ),
+			],
+		},
+		{
+			type: 'raw',
+			selector: 'hr',
+			schema: {
+				hr: {},
+			},
+		},
+	],
+	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/spacer' ], // Transform to Spacer.
+			transform: ( { anchor } ) => {
+				return createBlock( 'core/spacer', {
+					anchor: anchor || undefined,
+				} );
+			},
+		},
+	],
+};
+
+export default transforms;

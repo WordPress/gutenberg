@@ -1,0 +1,7 @@
+.red-from-link {
+    color: rgb(255, 0, 0);
+}
+
+.background-from-link {
+    background-image: url('./assets/10x10_e2e_test_image_red.png');
+}

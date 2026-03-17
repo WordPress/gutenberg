@@ -1,0 +1,20 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.components-tooltip {
+	background: $black;
+	font-family: $default-font;
+	border-radius: $radius-small;
+	color: $gray-100;
+	text-align: center;
+	line-height: 1.4;
+	font-size: 12px;
+	padding: $grid-unit-05 $grid-unit-10;
+	z-index: z-index(".components-tooltip");
+	box-shadow: $elevation-small;
+}
+
+.components-tooltip__shortcut {
+	margin-left: $grid-unit-10;
+}

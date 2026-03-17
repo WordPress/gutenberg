@@ -1,0 +1,654 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+$block-inserter-preview-height: 350px;
+$block-quick-inserter-width: 350px;
+$block-inserter-tabs-height: 44px;
+
+.block-editor-inserter {
+	display: inline-block;
+	background: none;
+	border: none;
+	padding: 0;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	line-height: 0;
+
+	@include break-medium {
+		position: relative;
+	}
+}
+
+.block-editor-inserter__main-area {
+	height: 100%;
+	gap: $grid-unit-20;
+	position: relative;
+
+	&.show-as-tabs {
+		gap: 0;
+	}
+
+	.block-editor-tabbed-sidebar {
+		@include break-medium() {
+			width: $secondary-sidebar-width;
+		}
+	}
+}
+
+.block-editor-inserter__popover.is-quick {
+	.components-popover__content {
+		border: none;
+		outline: none;
+		box-shadow: $elevation-x-small;
+
+		.block-editor-inserter__quick-inserter > * {
+			border-left: $border-width solid $gray-400;
+			border-right: $border-width solid $gray-400;
+
+			&:first-child {
+				border-top: $border-width solid $gray-400;
+				border-radius: $radius-medium $radius-medium 0 0;
+			}
+
+			&:last-child {
+				border-bottom: $border-width solid $gray-400;
+				border-radius: 0 0 $radius-medium $radius-medium;
+			}
+
+			&.components-button {
+				border: $border-width solid $gray-900;
+			}
+		}
+	}
+}
+
+.block-editor-inserter__popover .block-editor-inserter__menu {
+	margin: -$grid-unit-15;
+
+	.block-editor-inserter__tablist {
+		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60 - $grid-unit-15;
+	}
+
+	.block-editor-inserter__main-area {
+		overflow: visible;
+		height: auto;
+	}
+
+	.block-editor-inserter__preview-container {
+		display: none;
+	}
+}
+
+.block-editor-inserter__toggle.components-button {
+	display: inline-flex;
+	align-items: center;
+	cursor: pointer;
+	border: none;
+	outline: none;
+	padding: 0;
+	@media not ( prefers-reduced-motion ) {
+		transition: color 0.2s ease;
+	}
+}
+
+.block-editor-inserter__menu {
+	height: 100%;
+	position: relative;
+	overflow: visible;
+
+	&.show-panel {
+		@include break-medium() {
+			width: $secondary-sidebar-width + $sidebar-width;
+		}
+	}
+}
+
+.block-editor-inserter__inline-elements {
+	margin-top: -1px;
+}
+
+.block-editor-inserter__menu.is-bottom::after {
+	border-bottom-color: $white;
+}
+
+.components-popover.block-editor-inserter__popover {
+	z-index: z-index(".components-popover.block-editor-inserter__popover");
+}
+
+.block-editor-inserter__search {
+	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
+}
+
+.block-editor-inserter__no-tab-container {
+	overflow-y: auto;
+	flex-grow: 1;
+	// Fixes the editor canvas scrolling on search results https://github.com/WordPress/gutenberg/issues/56811
+	position: relative;
+}
+
+.block-editor-inserter__panel-header {
+	// Use `position: relative` to ensure any absolute positioned child elements are
+	// positioned relative to the panel header.
+	// This makes the overflow rule of the panel work correctly, particularly when the
+	// `VisuallyHidden` component is used within the inserter UI.
+	position: relative;
+
+	display: inline-flex;
+	align-items: center;
+	padding: $grid-unit-20 $grid-unit-20 0;
+}
+
+.block-editor-inserter__panel-content {
+	padding: $grid-unit-20;
+}
+
+.block-editor-inserter__panel-title,
+.block-editor-inserter__panel-title button {
+	margin: 0 $grid-unit-15 0 0;
+	color: $gray-700;
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: $font-weight-medium;
+}
+
+.block-editor-inserter__panel-dropdown select.components-select-control__input.components-select-control__input.components-select-control__input {
+	height: 36px;
+	line-height: 36px;
+}
+
+.block-editor-inserter__panel-dropdown select {
+	border: none;
+}
+
+.block-editor-inserter__reusable-blocks-panel {
+	position: relative;
+	text-align: right;
+}
+
+.block-editor-inserter__no-results,
+.block-editor-inserter__patterns-loading {
+	padding: $grid-unit-40;
+	text-align: center;
+}
+
+.block-editor-inserter__child-blocks {
+	padding: 0 $grid-unit-20;
+}
+
+.block-editor-inserter__parent-block-header {
+	display: flex;
+	align-items: center;
+
+	h2 {
+		font-size: 13px;
+	}
+
+	.block-editor-block-icon {
+		margin-right: $grid-unit-10;
+	}
+}
+
+.block-editor-inserter__preview-container__popover {
+	top: $grid-unit-20 !important;
+}
+
+.block-editor-inserter__preview-container {
+	display: none;
+	width: $sidebar-width;
+	padding: $grid-unit-20;
+	max-height: calc(100% - #{$grid-unit-40});
+	overflow-y: hidden;
+
+	@include break-medium {
+		display: block;
+	}
+
+	.block-editor-inserter__media-list__list-item {
+		height: 100%;
+	}
+
+	.block-editor-block-card {
+		padding-left: 0;
+		padding-right: 0;
+		padding-bottom: $grid-unit-05;
+	}
+}
+
+.block-editor-inserter__insertable-blocks-at-selection {
+	border-bottom: $border-width solid $gray-200;
+}
+
+.block-editor-inserter__media-tabs-container,
+.block-editor-inserter__block-patterns-tabs-container {
+	flex-grow: 1;
+	padding: $grid-unit-20;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.block-editor-inserter__category-tablist {
+	margin-bottom: $grid-unit-10;
+}
+
+.block-editor-inserter__category-panel {
+	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
+	display: flex;
+	flex-direction: column;
+	padding: 0 $grid-unit-20;
+
+	@include break-medium {
+		border-left: $border-width solid $gray-200;
+		padding: 0;
+		left: $secondary-sidebar-width;
+		width: $sidebar-width;
+		position: absolute;
+		top: -$border-width;
+		height: calc(100% + #{$border-width});
+		background: $gray-100;
+		border-top: $border-width solid $gray-200;
+
+		.block-editor-inserter__media-list,
+		.block-editor-block-patterns-list {
+			padding: 0 $grid-unit-30 $grid-unit-20;
+		}
+	}
+}
+
+.block-editor-inserter__patterns-category-panel-header {
+	padding: $grid-unit-10 0;
+	@include break-medium {
+		padding: $grid-unit-10 $grid-unit-30;
+	}
+}
+
+.block-editor-inserter__patterns-category-no-results {
+	margin-top: $grid-unit-30;
+}
+
+.block-editor-inserter__patterns-filter-help {
+	padding: $grid-unit-20;
+	border-top: $border-width solid $gray-300;
+	color: $gray-700;
+	min-width: 280px;
+}
+
+.block-editor-inserter__media-list,
+.block-editor-block-patterns-list {
+	overflow-y: auto;
+	flex-grow: 1;
+	height: 100%;
+}
+
+.block-editor-inserter__preview-content {
+	background: $gray-100;
+	display: grid;
+	flex-grow: 1;
+	align-items: center;
+}
+
+.block-editor-inserter__preview-content-missing {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: $grid-unit-60 * 3;
+	color: $gray-700;
+	background: $gray-100;
+	border-radius: $radius-small;
+}
+
+.block-editor-inserter__tips {
+	border-top: $border-width solid $gray-300;
+	padding: $grid-unit-20;
+	flex-shrink: 0;
+	position: relative; // prevents overscroll when block library is open
+}
+
+.block-editor-inserter__quick-inserter {
+	width: 100%;
+
+	// Constrain to container. Avoids overflow bug on FF 79
+	// see https://github.com/WordPress/gutenberg/issues/24529.
+	max-width: 100%;
+
+	@include break-medium {
+		width: $block-quick-inserter-width;
+	}
+}
+
+.block-editor-inserter__quick-inserter-results .block-editor-inserter__panel-header {
+	height: 0;
+	padding: 0;
+	float: left;
+}
+
+.block-editor-inserter__quick-inserter.has-search .block-editor-inserter__panel-content,
+.block-editor-inserter__quick-inserter.has-expand .block-editor-inserter__panel-content {
+	padding: $grid-unit-20;
+}
+
+.block-editor-inserter__quick-inserter-patterns {
+	.block-editor-block-patterns-list {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-gap: $grid-unit-10;
+		.block-editor-block-patterns-list__list-item {
+			margin-bottom: 0;
+		}
+		.block-editor-inserter__media-list__list-item {
+			min-height: 100px;
+		}
+	}
+}
+
+.block-editor-inserter__quick-inserter-separator {
+	border-top: $border-width solid $gray-300;
+}
+
+.block-editor-inserter__popover.is-quick > .components-popover__content {
+	padding: 0;
+}
+
+.block-editor-inserter__quick-inserter-expand.components-button {
+	display: block;
+	background: $gray-900;
+	color: $white;
+	width: 100%;
+	border-radius: 0;
+
+	&:hover {
+		color: $white;
+	}
+
+	&:active {
+		color: $gray-400;
+	}
+
+	// Specificity is needed for the border color.
+	&.components-button:focus:not(:disabled) {
+		box-shadow: none;
+		background: var(--wp-admin-theme-color);
+		border-color: var(--wp-admin-theme-color);
+	}
+}
+
+.block-editor-block-patterns-explorer {
+	&__sidebar {
+		position: absolute;
+		top: $header-height + $grid-unit-10;
+		left: 0;
+		bottom: 0;
+		width: $sidebar-width;
+		padding: $grid-unit-30 $grid-unit-30 $grid-unit-30;
+		overflow-x: visible;
+		overflow-y: auto;
+
+		&__categories-list__item {
+			display: block;
+			width: 100%;
+			height: 48px;
+			text-align: left;
+		}
+	}
+
+	&__search {
+		margin-bottom: $grid-unit-40;
+	}
+
+	&__search-results-count {
+		padding-bottom: $grid-unit-40;
+	}
+
+	&__list {
+		margin-left: $sidebar-width;
+		padding: $grid-unit-30 0 $grid-unit-40;
+		.block-editor-patterns__sync-status-filter {
+			.components-input-control__container {
+				width: 380px;
+			}
+		}
+	}
+
+	.block-editor-block-patterns-list {
+		display: grid;
+		grid-gap: $grid-unit-40;
+		grid-template-columns: repeat(1, 1fr);
+		margin-bottom: $grid-unit-20;
+
+		@include break-xlarge() {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		@include break-huge() {
+			grid-template-columns: repeat(3, 1fr);
+		}
+
+		.block-editor-block-patterns-list__list-item {
+			min-height: 240px;
+		}
+
+		.block-editor-inserter__media-list__list-item {
+			height: inherit;
+			min-height: 100px;
+			max-height: 800px;
+		}
+	}
+}
+
+.components-heading.block-editor-inserter__patterns-category-panel-title {
+	font-weight: $font-weight-medium;
+}
+
+.block-editor-inserter__patterns-explore-button,
+.block-editor-inserter__media-library-button {
+	&.components-button {
+		padding: $grid-unit-20;
+		justify-content: center;
+		margin-top: $grid-unit-20;
+		width: 100%;
+	}
+}
+
+.block-editor-inserter__media-panel {
+	min-height: 100%;
+	padding: 0 $grid-unit-20;
+	display: flex;
+	flex-direction: column;
+
+	@include break-medium {
+		padding: 0;
+	}
+
+	.block-editor-inserter__media-panel-spinner {
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex: 1;
+	}
+
+	.block-editor-inserter__media-panel-search {
+		margin-bottom: $grid-unit-30;
+		@include break-medium() {
+			margin-bottom: 0;
+			padding: $grid-unit-20 $grid-unit-30 $grid-unit-20;
+		}
+	}
+}
+
+.block-editor-inserter__media-list__list-item {
+	position: relative;
+	cursor: pointer;
+	margin-bottom: $grid-unit-30;
+
+	&.is-placeholder {
+		min-height: 100px;
+	}
+
+	&[draggable="true"] .block-editor-inserter__media-list__list-item {
+		cursor: grab;
+	}
+
+	&.is-hovered {
+		.block-editor-inserter__media-list__item-preview > * {
+			outline-color: rgba($black, 0.3);
+		}
+
+		.block-editor-inserter__media-list__item-preview-options > button {
+			display: block;
+		}
+	}
+
+	.block-editor-inserter__media-list__item-preview-options {
+		position: absolute;
+		right: $grid-unit-10;
+		top: $grid-unit-10;
+
+		> button {
+			background: $white;
+			display: none;
+
+			// These styles are important so as focus isn't lost
+			// when the button is focused and we hover away.
+			&.is-opened,
+			&:focus {
+				display: block;
+			}
+
+			&:hover {
+				box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 2px solid transparent;
+			}
+		}
+	}
+}
+
+.block-editor-inserter__media-list__item {
+	height: 100%;
+
+	.block-editor-inserter__media-list__item-preview {
+		display: flex;
+		align-items: center;
+		overflow: hidden;
+		border-radius: $radius-small;
+
+		> * {
+			margin: 0 auto;
+			max-width: 100%;
+			outline: $border-width solid rgba($black, 0.1);
+			outline-offset: -$border-width;
+		}
+
+		.block-editor-inserter__media-list__item-preview-spinner {
+			display: flex;
+			height: 100%;
+			width: 100%;
+			position: absolute;
+			justify-content: center;
+			background: rgba($white, 0.7);
+			align-items: center;
+			pointer-events: none;
+		}
+	}
+
+	&:focus .block-editor-inserter__media-list__item-preview > * {
+		outline-color: var(--wp-admin-theme-color);
+		outline-width: var(--wp-admin-border-width-focus);
+		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
+		@media not ( prefers-reduced-motion ) {
+			transition: outline 0.1s linear;
+		}
+	}
+}
+
+.block-editor-inserter__media-list__item-preview-options__popover {
+	.components-menu-item__button .components-menu-item__item {
+		min-width: auto;
+	}
+}
+
+
+.block-editor-inserter__mobile-tab-navigation {
+	padding: $grid-unit-20;
+	height: 100%;
+
+	> * {
+		height: 100%;
+	}
+}
+
+
+.block-editor-inserter-media-tab-media-preview-inserter-external-image-modal {
+	@include break-small() {
+		max-width: $break-mobile;
+	}
+
+	p {
+		margin: 0;
+	}
+}
+
+.block-editor-inserter__hint {
+	margin: $grid-unit-20 $grid-unit-20 0;
+}
+
+.block-editor-patterns__sync-status-filter {
+	.components-input-control__container {
+		select.components-select-control__input {
+			height: 40px;
+		}
+	}
+}
+
+// Only relevant in zoom-out-mode
+.block-editor-inserter__pattern-panel-placeholder {
+	display: none;
+}
+
+.block-editor-inserter__menu.is-zoom-out {
+	display: flex;
+	&.show-panel::after {
+		// Makes space for the inserter flyout panel
+		@include break-medium {
+			content: "";
+			display: block;
+			width: 300px;
+			height: 100%;
+		}
+	}
+}
+
+.show-icon-labels {
+	@media (max-width: #{ ($break-large - 1) }) {
+		.block-editor-block-patterns-explorer .block-editor-patterns__grid-pagination {
+			flex-direction: column;
+			.block-editor-patterns__grid-pagination-previous,
+			.block-editor-patterns__grid-pagination-next {
+				flex-direction: column;
+			}
+		}
+	}
+
+	.block-editor-inserter__category-panel .block-editor-patterns__grid-pagination {
+		flex-direction: column;
+		.block-editor-patterns__grid-pagination-previous,
+		.block-editor-patterns__grid-pagination-next {
+			flex-direction: column;
+		}
+	}
+}
+
+.block-editor-tabbed-sidebar__tabpanel .block-editor-inserter__help-text {
+	display: none;
+	padding: 0 $grid-unit-30 $grid-unit-20;
+
+	@include break-mobile {
+		display: block;
+	}
+}

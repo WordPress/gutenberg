@@ -1,0 +1,39 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.components-dropdown {
+	display: inline-block;
+}
+
+.components-dropdown__content {
+	.components-popover__content {
+		padding: $grid-unit-10;
+
+		&:has(.components-menu-group) {
+			padding: 0;
+
+			.components-dropdown-menu__menu > .components-menu-item__button,
+			> .components-menu-item__button {
+				margin: $grid-unit-10;
+				width: auto;
+			}
+		}
+	}
+
+	[role="menuitem"] {
+		white-space: nowrap;
+	}
+
+	.components-menu-group {
+		padding: $grid-unit-10;
+	}
+
+	.components-menu-group + .components-menu-group {
+		border-top: $border-width solid $gray-400;
+		padding: $grid-unit-10;
+	}
+
+	&.is-alternate .components-menu-group + .components-menu-group {
+		border-color: $gray-900;
+	}
+}

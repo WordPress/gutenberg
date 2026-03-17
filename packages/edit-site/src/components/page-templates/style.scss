@@ -1,0 +1,49 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.page-templates-preview-field {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	height: 100%;
+	width: 100%;
+	border-radius: $radius-medium;
+
+	.dataviews-view-list & {
+		.block-editor-block-preview__container {
+			height: 120px;
+		}
+	}
+
+	.dataviews-view-grid & {
+		.block-editor-block-preview__container {
+			height: 100%;
+		}
+	}
+
+	.dataviews-view-table & {
+		position: relative;
+		width: 120px;
+		max-height: 160px;
+		text-wrap: balance; // Fallback for Safari.
+		text-wrap: pretty;
+	}
+}
+
+.edit-site-page-templates {
+	.dataviews-pagination {
+		z-index: z-index(".edit-site-templates__dataviews-list-pagination");
+	}
+}
+
+.edit-site-list__rename-modal {
+	// The rename dropdown popover is open at the same time as the rename modal. The latter has to be higher.
+	z-index: z-index(".edit-site-list__rename-modal");
+	.components-base-control {
+		@include break-medium() {
+			width: $grid-unit * 40;
+		}
+	}
+}

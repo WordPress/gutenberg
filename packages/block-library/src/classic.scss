@@ -1,0 +1,60 @@
+@use "@wordpress/base-styles/colors" as *;
+
+// These rules are needed for backwards compatibility.
+.wp-block-button__link {
+	color: $white;
+	background-color: #32373c;
+	border-radius: 9999px; // 100% causes an oval, but any explicit but really high value retains the pill shape.
+
+	// This needs a low specificity so it won't override the rules from the button element if defined in theme.json.
+	box-shadow: none;
+	text-decoration: none;
+
+	// The extra 2px are added to size solids the same as the outline versions.
+	padding: calc(0.667em + 2px) calc(1.333em + 2px);
+
+	font-size: 1.125em;
+}
+
+.wp-block-file__button {
+	background: #32373c;
+	color: $white;
+}
+
+// These rules are needed to enforce the default styling of
+// the Accordion Heading block in the classic theme.
+.wp-block-accordion-heading {
+	// Heading elements may have default margins applied, so those
+	// styles need to be reset.
+	margin: 0;
+}
+
+.wp-block-accordion-heading__toggle {
+	// Button elements can have colors applied with high CSS specificity,
+	// and since this specificity is impossible to predict, we use
+	// `!important` to reset the color.
+	background-color: inherit !important;
+	color: inherit !important;
+
+	&:not(:focus-visible) {
+		outline: none;
+	}
+
+	&:hover,
+	&:focus {
+		// Sometimes styles are applied when the button element is
+		// hovered over or focused. This isn't expected for accordion
+		// toggle buttons, so reset those styles here.
+		text-decoration: none;
+		background-color: inherit !important;
+		box-shadow: none;
+		color: inherit;
+		border: none;
+		padding: var(--wp--preset--spacing--20, 1em) 0;
+	}
+
+	&:focus-visible {
+		outline-offset: 0;
+		outline: auto;
+	}
+}

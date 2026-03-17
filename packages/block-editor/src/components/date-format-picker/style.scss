@@ -1,0 +1,12 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.block-editor-date-format-picker {
+	margin: 0 0 $grid-unit-20;
+	padding: 0;
+	border: none;
+}
+
+.block-editor-date-format-picker__custom-format-select-control__custom-option {
+	border-top: 1px solid $gray-300;
+}

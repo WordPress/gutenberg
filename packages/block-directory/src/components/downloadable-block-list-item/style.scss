@@ -1,0 +1,99 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.block-directory-downloadable-block-list-item {
+	& + & {
+		margin-top: $grid-unit-05;
+	}
+
+	display: grid;
+	grid-template-columns: auto 1fr;
+
+	width: 100%;
+	height: auto;
+	padding: $grid-unit-15;
+	margin: 0;
+
+	appearance: none;
+	background: none;
+	border: 0;
+	text-align: left;
+
+	@media not (prefers-reduced-motion) {
+		transition: box-shadow 0.1s linear;
+	}
+
+	// The item contains absolutely positioned items.
+	// Set `position: relative` on the parent to prevent overflow issues
+	// in scroll containers.
+	// See: https://github.com/WordPress/gutenberg/issues/63384
+	position: relative;
+
+
+	&:not([aria-disabled="true"]) {
+		cursor: pointer;
+	}
+
+	&:hover {
+		@include button-style__focus();
+	}
+
+	&[data-focus-visible] {
+		@include button-style__focus();
+	}
+
+	&.is-installing {
+		.block-directory-downloadable-block-list-item__author {
+			display: none;
+		}
+	}
+}
+
+.block-directory-downloadable-block-list-item__icon {
+	position: relative;
+	margin-right: $grid-unit-20;
+	align-self: flex-start;
+
+	.block-directory-downloadable-block-list-item__spinner {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background: rgba(255, 255, 255, 0.75);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.is-installing & {
+		// Adding an extra 6px to avoid the UI from jumping when the rating bar gets hidden
+		margin-right: $grid-unit-20 + 6px;
+	}
+}
+
+.block-directory-block-ratings {
+	display: block;
+	margin-top: $grid-unit-05;
+}
+
+.block-directory-downloadable-block-list-item__details {
+	color: $gray-900;
+}
+
+.block-directory-downloadable-block-list-item__title {
+	display: block;
+	font-weight: 600;
+}
+
+.block-directory-downloadable-block-list-item__author {
+	display: block;
+	margin-top: $grid-unit-05;
+	font-weight: normal;
+}
+
+.block-directory-downloadable-block-list-item__desc {
+	display: block;
+	margin-top: $grid-unit-10;
+}

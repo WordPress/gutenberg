@@ -1,0 +1,39 @@
+// Overwrite the inline style to make the height collapse when the paragraph editable gets focus.
+.block-editor-block-list__block[data-type="core/paragraph"].has-drop-cap:focus {
+	min-height: auto !important;
+}
+
+// Hide multiple sequential paragraphs, but don't hide placeholders if a custom placeholder is set.
+.block-editor-block-list__block[data-empty="true"] {
+	[data-rich-text-placeholder] {
+		opacity: 1;
+	}
+}
+
+.block-editor-block-list__block[data-empty="true"] + .block-editor-block-list__block[data-empty="true"] {
+	&:not([data-custom-placeholder="true"]) {
+		[data-rich-text-placeholder] {
+			opacity: 0;
+		}
+	}
+}
+
+.block-editor-block-list__block[data-type="core/paragraph"].has-text-align-right[style*="writing-mode: vertical-rl"],
+.block-editor-block-list__block[data-type="core/paragraph"].has-text-align-left[style*="writing-mode: vertical-lr"] {
+	rotate: 180deg;
+}
+
+// Hide the placeholder when the editor is in zoomed out mode.
+.is-zoomed-out .block-editor-block-list__block[data-empty="true"] {
+	[data-rich-text-placeholder] {
+		opacity: 0;
+	}
+}
+
+// This is the equivalent of the `body.rtl` style.scss rule for RTL,
+// but it's applied to the html element instead of the body element
+// since the `body.rtl` style is not applied to the iframe in the editor.
+html[dir="rtl"] .has-drop-cap:not(:focus)::first-letter {
+	float: initial;
+	margin-left: 0.1em;
+}

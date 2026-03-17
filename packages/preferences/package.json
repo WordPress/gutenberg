@@ -1,0 +1,73 @@
+{
+	"name": "@wordpress/preferences",
+	"version": "4.41.0",
+	"description": "Utilities for managing WordPress preferences.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"preferences",
+		"settings",
+		"options"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/preferences/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/preferences"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json",
+		"./build-style/": "./build-style/"
+	},
+	"react-native": "src/index",
+	"wpScript": true,
+	"types": "build-types",
+	"wpScriptExtraDependencies": [
+		"wp-preferences-persistence"
+	],
+	"sideEffects": false,
+	"dependencies": {
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/base-styles": "file:../base-styles",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/private-apis": "file:../private-apis",
+		"clsx": "^2.1.1"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

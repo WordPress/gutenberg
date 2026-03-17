@@ -1,0 +1,32 @@
+@unknown {
+	display: block;
+}
+
+a {
+
+	@debug 1;
+}
+
+@if $foo == block {
+	display: block;
+}
+
+@else{
+	display: inline-block;
+}
+
+b {
+
+	@include foo;
+
+	@include bar;
+}
+
+p {
+
+	/* Test `stylelint-config-recommended` inherited `no-extra-semicolons` rule */
+	@include foo;;
+
+	/* Test `@wordpress/stylelint-config` inherited `number-leading-zero` rule */
+	top: .2em;
+}

@@ -1,0 +1,130 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.block-editor-block-types-list__list-item {
+	display: block;
+	width: 33.33%;
+	padding: 0;
+	margin: 0;
+
+	&.is-synced {
+		.components-button.block-editor-block-types-list__item {
+			&:not(:disabled) {
+				.block-editor-block-icon.has-colors {
+					color: var(--wp-block-synced-color);
+				}
+
+				&:hover {
+					.block-editor-block-types-list__item-title {
+						color: var(--wp-block-synced-color) !important;
+						filter: brightness(0.95);
+					}
+
+					svg {
+						color: var(--wp-block-synced-color) !important;
+					}
+				}
+
+				&::after {
+					background: var(--wp-block-synced-color);
+				}
+			}
+		}
+	}
+}
+
+.components-button.block-editor-block-types-list__item {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	font-size: $default-font-size;
+	color: $gray-900;
+	padding: $grid-unit-10;
+	align-items: stretch;
+	justify-content: center;
+	cursor: pointer;
+	background: transparent;
+	word-break: break-word;
+	@media not ( prefers-reduced-motion ) {
+		transition: all 0.05s ease-in-out;
+	}
+	position: relative;
+	height: auto;
+
+	&:disabled,
+	&[aria-disabled="true"] {
+		opacity: 0.6;
+		cursor: default;
+	}
+
+	&:not(:disabled, [aria-disabled="true"]) {
+		&:hover {
+			.block-editor-block-types-list__item-title {
+				color: var(--wp-admin-theme-color) !important;
+				filter: brightness(0.95);
+			}
+
+			svg {
+				color: var(--wp-admin-theme-color) !important;
+			}
+
+			&::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				border-radius: $radius-small;
+				opacity: 0.04;
+				background: var(--wp-admin-theme-color);
+				// This fixes drag-and-drop in Firefox.
+				pointer-events: none;
+			}
+		}
+
+		&.is-active {
+			color: $white;
+			background: $gray-900;
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+			outline-offset: -2px;
+		}
+	}
+
+	&:not(:disabled) {
+		&:focus {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
+	}
+}
+
+.block-editor-block-types-list__item-icon {
+	padding: 12px 20px;
+	color: $gray-900;
+	@media not ( prefers-reduced-motion ) {
+		transition: all 0.05s ease-in-out;
+	}
+
+	.block-editor-block-icon {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	svg {
+		@media not ( prefers-reduced-motion ) {
+			transition: all 0.15s ease-out;
+		}
+	}
+
+	.block-editor-block-types-list__list-item[draggable="true"] & {
+		cursor: grab;
+	}
+}
+
+.block-editor-block-types-list__item-title {
+	padding: 4px 2px 8px;
+	font-size: 12px;
+	hyphens: auto;
+}

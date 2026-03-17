@@ -1,0 +1,165 @@
+@use "sass:math";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.edit-widgets-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: $header-height;
+	overflow: auto;
+	background: #fff;
+
+	@include break-small {
+		overflow: visible;
+	}
+
+	.selected-block-tools-wrapper {
+		overflow: hidden;
+		display: flex;
+		align-items: center;
+		height: $header-height;
+
+		.block-editor-block-contextual-toolbar {
+			border-bottom: 0;
+			height: 100%;
+		}
+
+		// These rules ensure that icons are always positioned in a way that lines up with the rest of the icons in the toolbar.
+		.block-editor-block-toolbar {
+			height: 100%;
+			// Push down so that buttons are centered vertically.
+			// It should be 16px (64px header height - 32px compact button height = 32 / 2),
+			// but there is a -1px top-margin down the stack that affects this.
+			padding-top: math.div($header-height - $button-size-compact, 2) + 1;
+
+			// Match the height of other buttons in the header toolbar.
+			.components-button:not(.block-editor-block-mover-button) {
+				height: $button-size-compact;
+			}
+		}
+
+		// Modified group borders.
+		.components-toolbar-group,
+		.components-toolbar {
+			border-right: none;
+
+			&::after {
+				content: "";
+				width: $border-width;
+				height: $grid-unit-30;
+				background-color: $gray-300;
+				margin-top: $grid-unit-05;
+				margin-left: $grid-unit;
+			}
+
+			& .components-toolbar-group.components-toolbar-group {
+				&::after {
+					display: none;
+				}
+			}
+		}
+
+		.block-editor-block-mover {
+			// Match the height of other buttons in the header toolbar.
+			&.is-horizontal .block-editor-block-mover-button {
+				height: $button-size-compact;
+				overflow: visible;
+			}
+
+			// Move up a little to prevent the toolbar shift when focus is on the vertical movers.
+			@include break-small() {
+				&:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+					position: relative;
+					top: -10px;
+				}
+			}
+		}
+	}
+}
+
+.edit-widgets-header__navigable-toolbar-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 2;
+	padding-right: $grid-unit-10;
+	padding-left: $grid-unit-20;
+	overflow: hidden;
+	height: $header-height;
+}
+
+.edit-widgets-header__title {
+	font-size: 20px;
+	padding: 0;
+	margin: 0 20px 0 0;
+}
+
+.edit-widgets-header__actions {
+	display: flex;
+	align-items: center;
+	padding-right: $grid-unit-05;
+
+	@include break-small() {
+		padding-right: $grid-unit-10;
+	}
+
+	gap: $grid-unit-10;
+}
+
+.edit-widgets-header-toolbar {
+	gap: $grid-unit-10;
+	// Some plugins add buttons here despite best practices.
+	// Push them a bit rightwards to fit the top toolbar.
+	margin-right: $grid-unit-10;
+
+	// The Toolbar component adds different styles to buttons, so we reset them
+	// here to the original button styles
+	// Specificity bump needed to offset https://github.com/WordPress/gutenberg/blob/8ea29cb04412c80c9adf7c1db0e816d6a0ac1232/packages/components/src/toolbar/style.scss#L76
+	> .components-button.has-icon.has-icon.has-icon,
+	> .components-dropdown > .components-button.has-icon.has-icon {
+		height: $button-size-compact;
+		min-width: $button-size-compact;
+		padding: 4px;
+
+		&.is-pressed {
+			background: $gray-900;
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 $border-width $white;
+			outline: 1px solid transparent;
+		}
+
+		&::before {
+			display: none;
+		}
+	}
+}
+
+.edit-widgets-header-toolbar__inserter-toggle.edit-widgets-header-toolbar__inserter-toggle {
+	padding-left: $grid-unit;
+	padding-right: $grid-unit;
+
+	@include break-small {
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-15;
+	}
+
+	&::after {
+		content: none;
+	}
+
+	svg {
+		@media not (prefers-reduced-motion) {
+			transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
+		}
+	}
+
+	&.is-pressed {
+		svg {
+			transform: rotate(45deg);
+		}
+	}
+}

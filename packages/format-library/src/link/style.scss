@@ -1,0 +1,22 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.block-editor-format-toolbar__link-container-content {
+	display: flex;
+	align-items: center;
+}
+
+.block-editor-format-toolbar__link-container-value {
+	margin: $grid-unit-10 - $border-width;
+	flex-grow: 1;
+	flex-shrink: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	min-width: 150px;
+	max-width: 500px;
+
+	&.has-invalid-link {
+		color: $alert-red;
+	}
+}

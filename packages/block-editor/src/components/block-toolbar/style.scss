@@ -1,0 +1,306 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+/**
+ * Block Toolbar
+ */
+.block-editor-block-toolbar {
+	display: flex;
+	flex-grow: 1;
+	width: 100%;
+	position: relative;
+
+	// Allow horizontal scrolling on mobile.
+	overflow-y: hidden;
+	overflow-x: auto;
+
+	@media not ( prefers-reduced-motion ) {
+
+		// Animation
+		transition: border-color 0.1s linear, box-shadow 0.1s linear;
+	}
+
+	@include break-small() {
+		overflow: inherit;
+	}
+
+	// Borders around toolbar segments.
+	.components-toolbar-group,
+	.components-toolbar {
+		background: none;
+
+		// These margins make the buttons themselves overlap the chrome of the toolbar.
+		// This helps make them square, and maximize the hit area.
+		margin-top: -$border-width;
+		margin-bottom: -$border-width;
+
+		// The component is born with a border, but we only need some of them.
+		border: 0;
+
+		// Add a border after item groups to show as separator in the block toolbar.
+		border-right: $border-width solid $gray-300;
+	}
+
+	&.is-connected {
+		.block-editor-block-switcher .components-button::before {
+			background: color-mix(in srgb, var(--wp-block-synced-color) 10%, transparent);
+			border-radius: $radius-small;
+		}
+	}
+
+	// Disabled block toolbar icon should have a fixed color.
+	.components-button.block-editor-block-toolbar__block-icon-button[aria-disabled="true"] {
+		color: $gray-900;
+
+		// Since it's not clickable, though, don't show a hover state.
+		&:hover {
+			color: $gray-900;
+		}
+	}
+
+	&.is-synced,
+	&.is-connected {
+		.block-editor-block-toolbar__block-icon {
+			color: var(--wp-block-synced-color);
+		}
+	}
+
+	> :last-child,
+	> :last-child .components-toolbar-group,
+	> :last-child .components-toolbar,
+	// If the last toolbar group is empty,
+	// we need to remove the double border from the penultimate one.
+	&:has(> :last-child:empty) > :nth-last-child(2),
+	&:has(> :last-child:empty) > :nth-last-child(2) .components-toolbar-group,
+	&:has(> :last-child:empty) > :nth-last-child(2) .components-toolbar {
+		border-right: none;
+	}
+
+	.components-toolbar-group:empty {
+		display: none;
+	}
+}
+
+.block-editor-block-contextual-toolbar {
+	position: sticky;
+	top: 0;
+	z-index: z-index(".block-editor-block-popover");
+	display: block;
+	width: 100%;
+	// Block UI appearance.
+	background-color: $white;
+	flex-shrink: 3;
+
+	// Raise the specificity.
+	&.components-accessible-toolbar {
+		border: none;
+		border-radius: 0;
+	}
+
+	&.is-unstyled {
+		box-shadow: 0 $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
+	}
+
+	.block-editor-block-toolbar {
+		overflow: auto;
+		overflow-y: hidden;
+		@include custom-scrollbars-on-hover($gray-200, $gray-600);
+
+		// Prevents padding from being applied to the left and right sides of the element.
+		scrollbar-gutter: auto;
+
+		> :last-child,
+		> :last-child .components-toolbar-group,
+		> :last-child .components-toolbar {
+			&::after {
+				display: none;
+			}
+		}
+	}
+
+	& > .block-editor-block-toolbar {
+		flex-grow: initial;
+		width: initial;
+	}
+
+	.block-editor-block-parent-selector {
+		position: relative;
+		// Must use the same negative margins of the .components-toolbar-group
+		// https://github.com/WordPress/gutenberg/blob/73a4716f429b5dce0190638049f5bd30f0b242f6/packages/block-editor/src/components/block-toolbar/style.scss#L32-L33
+		margin-top: -$border-width;
+		margin-bottom: -$border-width;
+
+		// Parent selector dot divider
+		&::after {
+			align-items: center;
+			background-color: $gray-900;
+			border-radius: 100%;
+			content: "";
+			display: inline-flex;
+			height: 2px;
+			position: absolute;
+			top: $grid-unit-20 - $border-width;
+			width: 2px;
+		}
+	}
+}
+
+
+// Block controls.
+.block-editor-block-toolbar__block-controls {
+	// @todo override toolbar group inherited paddings from components/block-tools/style.scss.
+	// This is best fixed by making the mover control area a proper single toolbar group.
+	.components-toolbar-group {
+		padding: 0;
+	}
+}
+
+// Pattern overrides indicator popover
+.block-editor-block-toolbar__pattern-overrides-popover .components-popover__content {
+	min-width: 260px;
+	padding: $grid-unit-20;
+}
+
+.block-editor-block-toolbar,
+.block-editor-rich-text__inline-format-toolbar-group {
+	// Override Toolbar buttons size.
+	.components-toolbar-group,
+	.components-toolbar {
+		display: flex;
+		flex-wrap: nowrap;
+	}
+}
+
+.block-editor-block-toolbar__slot {
+	display: inline-flex;
+}
+
+.show-icon-labels {
+	.block-editor-block-toolbar {
+		.components-button.has-icon:where(:not(.has-text)) {
+			width: auto;
+
+			// Hide the button icons when labels are set to display...
+			svg {
+				display: none;
+			}
+			// ... and display labels.
+			&::after {
+				content: attr(aria-label);
+				font-size: $helptext-font-size;
+			}
+		}
+
+		.block-editor-block-icon {
+			width: 0 !important;
+			height: 0 !important;
+			min-width: 0 !important;
+		}
+	}
+
+	// Padding overrides.
+	.components-accessible-toolbar .components-toolbar-group > div:first-child:last-child > .components-button.has-icon {
+		padding-left: 6px;
+		padding-right: 6px;
+	}
+
+	// Parent selector overrides
+	.block-editor-block-parent-selector .block-editor-block-parent-selector__button {
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-15;
+		text-wrap: nowrap;
+
+		.block-editor-block-icon {
+			width: 0;
+		}
+	}
+
+	.block-editor-block-mover {
+		.block-editor-block-mover__move-button-container {
+			width: auto;
+			position: relative;
+		}
+
+		&:not(.is-horizontal) .block-editor-block-mover__move-button-container::before {
+			@include break-small() {
+				content: "";
+				height: $border-width;
+				width: 100%;
+				background: $gray-200;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				// With Top toolbar enabled, this separator has a smaller width. Translating the
+				// X axis allows to make the separator always centered regardless of its width.
+				transform: translate(-50%, 0);
+				margin-top: -$border-width * 0.5;
+			}
+
+			@include break-medium {
+				background: $gray-900;
+			}
+		}
+	}
+
+	.block-editor-block-mover.is-horizontal {
+		.block-editor-block-mover__move-button-container,
+		.block-editor-block-mover-button {
+			padding-left: 6px;
+			padding-right: 6px;
+		}
+	}
+
+	.block-editor-block-mover:not(.is-horizontal) .block-editor-block-mover-button {
+		padding-left: $grid-unit;
+		padding-right: $grid-unit;
+	}
+
+	// Mover overrides.
+	.block-editor-block-toolbar__block-controls .block-editor-block-mover {
+		border-left: 1px solid $gray-300;
+		margin-left: 6px;
+		margin-right: -6px;
+		white-space: nowrap;
+	}
+
+	.block-editor-block-mover .block-editor-block-mover__drag-handle.has-icon {
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-15;
+	}
+
+	.block-editor-block-contextual-toolbar .block-editor-block-mover.is-horizontal .block-editor-block-mover-button.block-editor-block-mover-button {
+		width: auto;
+	}
+
+	// Mobile adjustments
+	.components-toolbar,
+	.components-toolbar-group {
+		flex-shrink: 1;
+	}
+
+	.block-editor-rich-text__inline-format-toolbar-group {
+		.components-button + .components-button {
+			margin-left: 6px;
+		}
+	}
+}
+
+.block-editor-block-toolbar-change-design-content-wrapper {
+	padding: $grid-unit-15;
+	width: 320px;
+	.block-editor-block-patterns-list {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-gap: $grid-unit-15;
+		.block-editor-block-patterns-list__list-item {
+			margin-bottom: 0;
+		}
+		.block-editor-inserter__media-list__list-item {
+			min-height: 100px;
+		}
+	}
+}

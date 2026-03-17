@@ -1,0 +1,37 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-post-last-revision__title {
+	width: 100%;
+	font-weight: $font-weight-medium;
+}
+
+.editor-post-last-revision__title.components-button.has-icon {
+	height: 100%;
+	justify-content: space-between;
+
+	&:hover,
+	&:active {
+		// Override the default button hover style
+		background: $gray-100;
+	}
+
+	&:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		border-radius: 0;
+	}
+}
+
+// Needs specificity, because this panel is just a button
+.components-panel__body.is-opened.editor-post-last-revision__panel {
+	padding: 0;
+	height: $grid-unit-60;
+
+	.editor-post-last-revision__title.components-button.components-button {
+		padding: $grid-unit-20;
+	}
+}
+
+.editor-private-post-last-revision__button {
+	display: inline-block;
+}

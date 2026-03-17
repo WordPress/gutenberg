@@ -1,0 +1,64 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.block-editor-block-inspector {
+	p:not(.components-base-control__help) {
+		margin-top: 0;
+	}
+
+	h2,
+	h3 {
+		font-size: $default-font-size;
+		color: $gray-900;
+		margin-bottom: 1.5em;
+	}
+
+	.components-base-control,
+	.components-radio-control,
+	.block-editor-html-element-control,
+	.block-editor-image-size-control {
+		&:where(:not(:last-child)) {
+			margin-bottom: $grid-unit-20;
+		}
+	}
+
+	// Reset unwanted margin-bottom from being applied to BaseControls within certain components.
+	.components-focal-point-picker-control,
+	.components-query-controls,
+	.components-range-control,
+	.block-editor-html-element-control,
+	.block-editor-image-size-control {
+		.components-base-control {
+			margin-bottom: 0;
+		}
+	}
+
+	.components-panel__body {
+		border: none;
+		border-top: $border-width solid $gray-200;
+
+		// Ensures this PanelBody is treated like the ToolsPanel, removing double borders.
+		margin-top: -$border-width;
+	}
+}
+
+.block-editor-block-inspector__no-blocks,
+.block-editor-block-inspector__no-block-tools {
+	display: block;
+	font-size: $default-font-size;
+	background: $white;
+	padding: ($grid-unit-20 * 2) $grid-unit-20;
+	text-align: center;
+}
+
+.block-editor-block-inspector__no-block-tools {
+	border-top: $border-width solid $gray-300;
+}
+
+.block-editor-block-inspector-edit-contents {
+	margin: 0 $grid-unit-20 $grid-unit-20 $grid-unit-20;
+
+	.block-editor-block-inspector-edit-contents__button {
+		justify-content: center;
+	}
+}

@@ -1,0 +1,4 @@
+<!-- wp:code -->
+<pre class="wp-block-code"><code>&lt;img />
+	&lt;br></code></pre>
+<!-- /wp:code -->

@@ -1,0 +1,33 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// Navigation item styles.
+// Contains styles only that are unique to the manually inserted menu item.
+// Styles in the Navigation block itself target both custom menu items, and
+// those from the Page List block.
+.wp-block-navigation {
+	// This wraps just the innermost text for custom menu items.
+	.wp-block-navigation-item__label {
+		overflow-wrap: break-word;
+	}
+
+	// Hide the description by default.
+	// If a theme opts-in to show descriptions, they will need to provide styles for them.
+	.wp-block-navigation-item__description {
+		display: none;
+	}
+}
+
+.link-ui-tools {
+	outline: 1px solid $gray-100;
+	padding: $grid-unit-10;
+}
+
+.link-ui-block-inserter {
+	padding-top: $grid-unit-10;
+}
+
+.link-ui-block-inserter__back {
+	margin-left: $grid-unit-10;
+	text-transform: uppercase;
+}

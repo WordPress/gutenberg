@@ -1,0 +1,70 @@
+{
+	"name": "@wordpress/compose",
+	"version": "7.41.0",
+	"description": "WordPress higher-order components (HOCs).",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"react",
+		"hoc",
+		"hooks"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/compose/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/compose"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"react-native": "src/index",
+	"wpScript": true,
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@types/mousetrap": "^1.6.8",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/dom": "file:../dom",
+		"@wordpress/element": "file:../element",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/priority-queue": "file:../priority-queue",
+		"@wordpress/undo-manager": "file:../undo-manager",
+		"change-case": "^4.1.2",
+		"mousetrap": "^1.6.5",
+		"use-memo-one": "^1.1.1"
+	},
+	"devDependencies": {
+		"mock-match-media": "0.4.2"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

@@ -1,0 +1,26 @@
+<phpunit
+	bootstrap="phpunit/bootstrap.php"
+	backupGlobals="false"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	convertDeprecationsToExceptions="true"
+	>
+	<php>
+		<env name="WORDPRESS_TABLE_PREFIX" value="wptests_" />
+	</php>
+	<testsuites>
+		<testsuite name="default">
+			<directory suffix="-test.php">./phpunit/</directory>
+			<directory suffix=".php">./phpunit/tests/</directory>
+			<directory suffix=".php">./phpunit/blocks/</directory>
+		</testsuite>
+	</testsuites>
+	<groups>
+		<exclude>
+			<group>ms-required</group>
+			<group>fontsapi</group>
+		</exclude>
+	</groups>
+</phpunit>

@@ -1,0 +1,39 @@
+@use "@wordpress/base-styles/colors" as *;
+
+.editor-autocompleters__user {
+	.editor-autocompleters__no-avatar::before {
+		/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- dashicons don't need a generic family keyword. */
+		font: normal 20px/1 dashicons;
+		content: "\f110";
+		margin-right: 5px;
+		vertical-align: middle;
+	}
+	.editor-autocompleters__user-avatar {
+		margin-right: 8px;
+		flex-grow: 0;
+		flex-shrink: 0;
+		max-width: none; // we must override the gutenberg default of 100%
+		width: 24px; // avoid jarring resize by setting the size upfront
+		height: 24px;
+	}
+	.editor-autocompleters__user-name {
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		max-width: 200px;
+		flex-shrink: 0;
+		flex-grow: 1;
+	}
+	.editor-autocompleters__user-slug {
+		margin-left: 8px;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: none;
+		max-width: 100px;
+		flex-grow: 0;
+		flex-shrink: 0;
+	}
+	&:not(.is-primary) .editor-autocompleters__user-slug {
+		color: $gray-700;
+	}
+}

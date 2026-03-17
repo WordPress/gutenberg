@@ -1,0 +1,66 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.block-library-query-pattern__selection-modal {
+	.block-editor-block-patterns-list {
+		column-count: 2;
+		column-gap: $grid-unit-30;
+
+		@include break-wide() {
+			column-count: 3;
+		}
+
+		.block-editor-block-patterns-list__list-item {
+			break-inside: avoid-column;
+		}
+	}
+
+	.block-library-query-pattern__selection-search {
+		background: $white;
+		position: sticky;
+		top: 0;
+		padding: $grid-unit-20 0;
+		transform: translateY(- $grid-unit-05); // Offsets the top padding on the modal content container
+		margin-bottom: - $grid-unit-05;
+		z-index: z-index(".block-library-query-pattern__selection-search");
+	}
+}
+
+.wp-block-query__enhanced-pagination-modal {
+	@include break-small() {
+		max-width: $break-mobile;
+	}
+}
+
+.block-editor-block-settings-menu__popover {
+	&.is-expanded {
+		overflow-y: scroll;
+	}
+	.block-library-query-pattern__selection-content {
+		height: 100%;
+	}
+	.block-editor-block-patterns-list {
+		display: grid;
+		grid-template-columns: 1fr;
+		@include break-small() {
+			grid-template-columns: 1fr 1fr;
+		}
+		grid-gap: $grid-unit-15;
+		min-width: $break-zoomed-in;
+		@include break-small() {
+			min-width: $break-mobile;
+		}
+	}
+	.block-editor-block-patterns-list__list-item {
+		margin-bottom: 0;
+	}
+}
+
+// Provide special styling for the placeholder.
+// @todo this particular minimal style of placeholder could be componentized further.
+.wp-block-query > .block-editor-media-placeholder.is-small {
+	min-height: 60px;
+}

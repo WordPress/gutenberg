@@ -1,0 +1,10 @@
+@use "@wordpress/base-styles/variables" as *;
+
+ol,
+ul {
+	box-sizing: border-box;
+}
+
+:root :where(.wp-block-list.has-background) {
+	padding: $block-bg-padding--v $block-bg-padding--h;
+}

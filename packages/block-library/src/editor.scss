@@ -1,0 +1,94 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "./utils/media-control.scss" as *;
+@use "./audio/editor.scss" as *;
+@use "./avatar/editor.scss" as *;
+@use "./button/editor.scss" as *;
+@use "./buttons/editor.scss" as *;
+@use "./categories/editor.scss" as *;
+@use "./code/editor.scss" as *;
+@use "./columns/editor.scss" as *;
+@use "./comments/editor.scss" as *;
+@use "./comment-author-avatar/editor.scss" as *;
+@use "./comments-pagination/editor.scss" as *;
+@use "./comments-pagination-numbers/editor.scss" as *;
+@use "./comments-title/editor.scss" as *;
+@use "./cover/editor.scss" as *;
+@use "./details/editor.scss" as *;
+@use "./embed/editor.scss" as *;
+@use "./file/editor.scss" as *;
+@use "./form-input/editor.scss" as *;
+@use "./form-submission-notification/editor.scss" as *;
+@use "./freeform/editor.scss" as *;
+@use "./gallery/editor.scss" as *;
+@use "./group/editor.scss" as *;
+@use "./html/editor.scss" as *;
+@use "./icon/editor.scss" as *;
+@use "./image/editor.scss" as *;
+@use "./latest-posts/editor.scss" as *;
+@use "./math/editor.scss" as *;
+@use "./media-text/editor.scss" as *;
+@use "./more/editor.scss" as *;
+@use "./navigation/editor.scss" as *;
+@use "./navigation-link/editor.scss" as *;
+@use "./navigation-submenu/editor.scss" as *;
+@use "./nextpage/editor.scss" as *;
+@use "./page-list/editor.scss" as *;
+@use "./paragraph/editor.scss" as *;
+@use "./post-author/editor.scss" as *;
+@use "./playlist/editor.scss" as *;
+@use "./post-excerpt/editor.scss" as *;
+@use "./pullquote/editor.scss" as *;
+@use "./rss/editor.scss" as *;
+@use "./search/editor.scss" as *;
+@use "./separator/editor.scss" as *;
+@use "./shortcode/editor.scss" as *;
+@use "./site-logo/editor.scss" as *;
+@use "./site-tagline/editor.scss" as *;
+@use "./site-title/editor.scss" as *;
+@use "./social-link/editor.scss" as *;
+@use "./social-links/editor.scss" as *;
+@use "./spacer/editor.scss" as *;
+@use "./table/editor.scss" as *;
+@use "./tabs-menu/editor.scss" as *;
+@use "./tabs-menu-item/editor.scss" as *;
+@use "./template-part/editor.scss" as *;
+@use "./term-template/editor.scss" as *;
+@use "./text-columns/editor.scss" as *;
+@use "./video/editor.scss" as *;
+@use "./query/editor.scss" as *;
+@use "./query-pagination/editor.scss" as *;
+@use "./query-pagination-numbers/editor.scss" as *;
+@use "./post-featured-image/editor.scss" as *;
+@use "./post-comments-form/editor.scss" as *;
+@use "./editor-elements.scss" as *;
+@use "./utils/poster-image.scss" as *;
+
+:root .editor-styles-wrapper {
+	@include background-colors-deprecated();
+	@include foreground-colors-deprecated();
+	@include gradient-colors-deprecated();
+}
+
+// Font sizes (not used now, kept because of backward compatibility).
+//
+// The reason we add the editor class wrapper here is
+// to avoid enqueuing the classes twice: here and in ./editor.scss
+:where(.editor-styles-wrapper) .has-regular-font-size {
+	font-size: 16px;
+}
+
+:where(.editor-styles-wrapper) .has-larger-font-size {
+	font-size: 42px;
+}
+
+/**
+ * Editor Normalization Styles
+ *
+ * These are only output in the editor, but styles here are NOT prefixed .editor-styles-wrapper.
+ * This allows us to create normalization styles that are easily overridden by editor styles.
+ */
+
+// Remove the browser default border for iframe in Custom HTML block, Embed block, etc.
+:where(.editor-styles-wrapper) iframe:not([frameborder]) {
+	border: 0;
+}

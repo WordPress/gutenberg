@@ -1,0 +1,73 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
+$border-as-box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
+
+.components-color-palette__custom-color-wrapper {
+	position: relative;
+	z-index: 0;
+}
+.components-color-palette__custom-color-button {
+	position: relative;
+	border: none;
+	background: none;
+	height: $grid-unit-80;
+	width: 100%;
+	box-sizing: border-box;
+	cursor: pointer;
+	// Show a thin outline in Windows high contrast mode.
+	outline: 1px solid transparent;
+	border-radius: $radius-medium $radius-medium 0 0;
+	box-shadow: $border-as-box-shadow;
+
+	&:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+		// Show a outline in Windows high contrast mode.
+		outline-width: 2px;
+	}
+
+	&::after {
+		content: "";
+		position: absolute;
+		inset: $border-width;
+		z-index: -1;
+		border-radius: $radius-medium - $border-width $radius-medium - $border-width 0 0;
+		@include checkerboard-background( 24px );
+	}
+}
+
+.components-color-palette__custom-color-text-wrapper {
+	padding: $grid-unit-15 $grid-unit-20;
+	border-radius: 0 0 $radius-medium $radius-medium;
+	position: relative;
+	font-size: $default-font-size;
+
+	// Add a border with the same technique as the button above,
+	// but only for left, bottom, and right sides.
+	box-shadow:
+		inset 0 -1 * $border-width 0 0 rgba(0, 0, 0, 0.2),
+		inset $border-width 0 0 0 rgba(0, 0, 0, 0.2),
+		inset -1 * $border-width 0 0 0 rgba(0, 0, 0, 0.2);
+}
+
+.components-color-palette__custom-color-name {
+	color: $components-color-foreground;
+	margin: 0 $border-width;
+}
+
+.components-color-palette__custom-color-value {
+	color: $gray-700;
+
+	&--is-hex {
+		text-transform: uppercase;
+	}
+
+	// Add a zero-width space when this element is empty to preserve
+	// a minimum height of 1 line of text, and avoid layout jumps.
+	&:empty::after {
+		content: "\200B";
+		visibility: hidden;
+	}
+}

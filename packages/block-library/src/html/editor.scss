@@ -1,0 +1,87 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.block-library-html__edit {
+	.block-library-html__preview-overlay {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+	}
+}
+
+// Modal styles
+.block-library-html__modal {
+
+	// On medium and large screens, the modal component sets a max-height.
+	// We want the modal to be as tall as possible also when the content is short.
+	@include break-small() {
+		&:not(.is-full-screen) {
+			height: 9999rem;
+		}
+	}
+
+	.components-modal__children-container {
+		height: 100%;
+	}
+}
+
+.block-library-html__modal-tabs {
+	flex: 1;
+}
+
+.block-library-html__modal-content {
+	flex: 1;
+}
+
+.block-library-html__modal-tab {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	box-sizing: border-box;
+	border: 1px solid $gray-200;
+	border-radius: 2px;
+	padding: $grid-unit-20;
+	font-family: $editor-html-font;
+}
+
+.block-library-html__modal-editor {
+	width: 100%;
+	height: 100%;
+	flex: 1;
+	// Reset textarea styles to inherit from pre
+	border: none;
+	background: transparent;
+	padding: 0;
+	font-family: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	color: inherit;
+	resize: none;
+	// HTML input is always LTR regardless of language.
+	/*rtl:ignore*/
+	direction: ltr;
+	overflow-x: auto;
+	box-sizing: border-box;
+
+	&:focus {
+		outline: none;
+		box-shadow: none;
+	}
+}
+
+.block-library-html__preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 0;
+	overflow-y: auto;
+	flex: 1;
+
+	iframe {
+		height: 100%;
+	}
+}

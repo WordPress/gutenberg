@@ -1,0 +1,40 @@
+diff --git a/node_modules/react-devtools-core/dist/backend.js b/node_modules/react-devtools-core/dist/backend.js
+index d5837ee..1530af4 100644
+--- a/node_modules/react-devtools-core/dist/backend.js
++++ b/node_modules/react-devtools-core/dist/backend.js
+@@ -4671,7 +4671,7 @@ var SHOW_DURATION = 2000;
+ var timeoutID = null;
+ var overlay = null;
+ function hideOverlay(agent) {
+-  if (window.document == null) {
++  if (window.document == null || window.document.__isJsdom) {
+     agent.emit('hideNativeHighlight');
+     return;
+   }
+@@ -4684,7 +4684,7 @@ function hideOverlay(agent) {
+   }
+ }
+ function showOverlay(elements, componentName, agent, hideAfterTimeout) {
+-  if (window.document == null) {
++  if (window.document == null || window.document.__isJsdom) {
+     if (elements != null && elements[0] != null) {
+       agent.emit('showNativeHighlight', elements[0]);
+     }
+@@ -4918,7 +4918,7 @@ var OUTLINE_COLOR = '#f0f0f0'; // Note these colors are in sync with DevTools Pr
+ var COLORS = ['#37afa9', '#63b19e', '#80b393', '#97b488', '#abb67d', '#beb771', '#cfb965', '#dfba57', '#efbb49', '#febc38'];
+ var canvas = null;
+ function draw(nodeToData, agent) {
+-  if (window.document == null) {
++  if (window.document == null || window.document.__isJsdom) {
+     var nodesToDraw = [];
+     iterateNodes(nodeToData, function (_, color, node) {
+       nodesToDraw.push({
+@@ -4978,7 +4978,7 @@ function drawBorder(context, rect, color) {
+ }
+ 
+ function destroy(agent) {
+-  if (window.document == null) {
++  if (window.document == null || window.document.__isJsdom) {
+     agent.emit('disableTraceUpdates');
+     return;
+   }

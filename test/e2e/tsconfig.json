@@ -1,0 +1,13 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"checkJs": false,
+		"noEmit": true,
+		"rootDir": ".",
+		"typeRoots": [ "../../typings", "../../node_modules/@types" ],
+		"types": [ "node" ]
+	},
+	"include": [ "." ],
+	"exclude": []
+}

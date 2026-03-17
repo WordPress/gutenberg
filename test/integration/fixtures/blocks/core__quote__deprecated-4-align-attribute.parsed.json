@@ -1,0 +1,25 @@
+[
+	{
+		"blockName": "core/quote",
+		"attrs": {
+			"align": "right"
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<p>Quote with the align attribute. Example: {\"align\":\"right\"}</p>\n",
+				"innerContent": [
+					"\n<p>Quote with the align attribute. Example: {\"align\":\"right\"}</p>\n"
+				]
+			}
+		],
+		"innerHTML": "\n<blockquote class=\"wp-block-quote has-text-align-right\"></blockquote>\n",
+		"innerContent": [
+			"\n<blockquote class=\"wp-block-quote has-text-align-right\">",
+			null,
+			"</blockquote>\n"
+		]
+	}
+]

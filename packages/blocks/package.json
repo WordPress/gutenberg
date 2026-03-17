@@ -1,0 +1,88 @@
+{
+	"name": "@wordpress/blocks",
+	"version": "15.14.0",
+	"description": "Block API for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"blocks"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/blocks/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/blocks"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"react-native": "src/index",
+	"wpScript": true,
+	"sideEffects": [
+		"src/index.js",
+		"src/store/index.js",
+		"build/index.cjs",
+		"build/store/index.cjs",
+		"build-module/index.mjs",
+		"build-module/store/index.mjs"
+	],
+	"dependencies": {
+		"@wordpress/autop": "file:../autop",
+		"@wordpress/blob": "file:../blob",
+		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
+		"@wordpress/data": "file:../data",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/dom": "file:../dom",
+		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/html-entities": "file:../html-entities",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/rich-text": "file:../rich-text",
+		"@wordpress/shortcode": "file:../shortcode",
+		"@wordpress/warning": "file:../warning",
+		"change-case": "^4.1.2",
+		"colord": "^2.7.0",
+		"fast-deep-equal": "^3.1.3",
+		"hpq": "^1.3.0",
+		"is-plain-object": "^5.0.0",
+		"memize": "^2.1.0",
+		"react-is": "^18.3.0",
+		"remove-accents": "^0.5.0",
+		"showdown": "^1.9.1",
+		"simple-html-tokenizer": "^0.5.7",
+		"uuid": "^9.0.1"
+	},
+	"devDependencies": {
+		"deep-freeze": "0.0.1"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/comment-date",
+		"isValid": true,
+		"attributes": {
+			"isLink": false,
+			"fontFamily": "cambria-georgia"
+		},
+		"innerBlocks": []
+	}
+]

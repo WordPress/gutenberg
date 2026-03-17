@@ -1,0 +1,721 @@
+/**
+ * Typography
+ */
+
+@use "sass:color";
+@use "sass:math";
+@use "./variables";
+@use "./colors";
+@use "./breakpoints";
+@use "./functions";
+@use "./long-content-fade";
+
+@mixin _text-heading() {
+	font-family: variables.$font-family-headings;
+	font-weight: variables.$font-weight-medium;
+}
+
+@mixin _text-body() {
+	font-family: variables.$font-family-body;
+	font-weight: variables.$font-weight-regular;
+}
+
+@mixin heading-small() {
+	@include _text-heading();
+	font-size: variables.$font-size-x-small;
+	line-height: variables.$font-line-height-x-small;
+}
+
+@mixin heading-medium() {
+	@include _text-heading();
+	font-size: variables.$font-size-medium;
+	line-height: variables.$font-line-height-small;
+}
+
+@mixin heading-large() {
+	@include _text-heading();
+	font-size: variables.$font-size-large;
+	line-height: variables.$font-line-height-small;
+}
+
+@mixin heading-x-large() {
+	@include _text-heading();
+	font-size: variables.$font-size-x-large;
+	line-height: variables.$font-line-height-medium;
+}
+
+@mixin heading-2x-large() {
+	@include _text-heading();
+	font-size: variables.$font-size-2x-large;
+	line-height: variables.$font-line-height-2x-large;
+}
+
+@mixin body-small() {
+	@include _text-body();
+	font-size: variables.$font-size-small;
+	line-height: variables.$font-line-height-x-small;
+}
+
+@mixin body-medium() {
+	@include _text-body();
+	font-size: variables.$font-size-medium;
+	line-height: variables.$font-line-height-small;
+}
+
+@mixin body-large() {
+	@include _text-body();
+	font-size: variables.$font-size-large;
+	line-height: variables.$font-line-height-medium;
+}
+
+@mixin body-x-large() {
+	@include _text-body();
+	font-size: variables.$font-size-x-large;
+	line-height: variables.$font-line-height-x-large;
+}
+
+/**
+ * Breakpoint mixins
+ */
+
+@mixin break-xhuge() {
+	@media (min-width: #{ (breakpoints.$break-xhuge) }) {
+		@content;
+	}
+}
+
+@mixin break-huge() {
+	@media (min-width: #{ (breakpoints.$break-huge) }) {
+		@content;
+	}
+}
+
+@mixin break-wide() {
+	@media (min-width: #{ (breakpoints.$break-wide) }) {
+		@content;
+	}
+}
+
+@mixin break-xlarge() {
+	@media (min-width: #{ (breakpoints.$break-xlarge) }) {
+		@content;
+	}
+}
+
+@mixin break-large() {
+	@media (min-width: #{ (breakpoints.$break-large) }) {
+		@content;
+	}
+}
+
+@mixin break-medium() {
+	@media (min-width: #{ (breakpoints.$break-medium) }) {
+		@content;
+	}
+}
+
+@mixin break-small() {
+	@media (min-width: #{ (breakpoints.$break-small) }) {
+		@content;
+	}
+}
+
+@mixin break-mobile() {
+	@media (min-width: #{ (breakpoints.$break-mobile) }) {
+		@content;
+	}
+}
+
+@mixin break-zoomed-in() {
+	@media (min-width: #{ (breakpoints.$break-zoomed-in) }) {
+		@content;
+	}
+}
+
+/**
+ * Focus styles.
+ */
+
+@mixin block-toolbar-button-style__focus() {
+	box-shadow: inset 0 0 0 variables.$border-width colors.$white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+}
+
+// Tabs, Inputs, Square buttons.
+@mixin input-style__neutral() {
+	box-shadow: 0 0 0 transparent;
+	border-radius: variables.$radius-small;
+	border: variables.$border-width solid colors.$gray-600;
+
+	@media not (prefers-reduced-motion) {
+		transition: box-shadow 0.1s linear;
+	}
+}
+
+
+@mixin input-style__focus($accent-color: var(--wp-admin-theme-color)) {
+	border-color: $accent-color;
+	// Expand the default border focus style by .5px to be a total of 1.5px.
+	box-shadow: 0 0 0 0.5px $accent-color;
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+}
+
+@mixin button-style__focus() {
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+}
+
+
+@mixin button-style-outset__focus($focus-color) {
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) colors.$white, 0 0 0 calc(2 * var(--wp-admin-border-width-focus)) $focus-color;
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+	outline-offset: 2px;
+}
+
+
+/**
+ * Applies editor left position to the selector passed as argument
+ */
+
+@mixin editor-left($selector) {
+	#{$selector} { /* Set left position when auto-fold is not on the body element. */
+		left: 0;
+
+		@media (min-width: #{ (breakpoints.$break-medium + 1) }) {
+			left: variables.$admin-sidebar-width;
+		}
+	}
+
+	.auto-fold #{$selector} { /* Auto fold is when on smaller breakpoints, nav menu auto collapses. */
+		@media (min-width: #{ (breakpoints.$break-medium + 1) }) {
+			left: variables.$admin-sidebar-width-collapsed;
+		}
+
+		@media (min-width: #{ (breakpoints.$break-large + 1) }) {
+			left: variables.$admin-sidebar-width;
+		}
+	}
+
+	/* Sidebar manually collapsed. */
+	.folded #{$selector} {
+		left: 0;
+
+		@media (min-width: #{ (breakpoints.$break-medium + 1) }) {
+			left: variables.$admin-sidebar-width-collapsed;
+		}
+	}
+
+	body.is-fullscreen-mode #{$selector} {
+		left: 0 !important;
+	}
+}
+
+/**
+ * Styles that are reused verbatim in a few places
+ */
+
+@mixin snackbar-container() {
+	position: fixed;
+	bottom: 24px;
+	left: 0;
+	right: 0;
+	padding-inline: 16px;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	pointer-events: none;
+
+	.components-snackbar {
+		margin-inline: auto;
+	}
+}
+
+// These are additional styles for all captions, when the theme opts in to block styles.
+@mixin caption-style() {
+	margin-top: 0.5em;
+	margin-bottom: 1em;
+}
+
+@mixin caption-style-theme() {
+	color: #555;
+	font-size: variables.$default-font-size;
+	text-align: center;
+
+	.is-dark-theme & {
+		color: colors.$light-gray-placeholder;
+	}
+}
+
+/**
+ * Allows users to opt-out of animations via OS-level preferences.
+ */
+
+@mixin reduce-motion($property: "") {
+
+	@if $property == "transition" {
+		@media (prefers-reduced-motion: reduce) {
+			transition-duration: 0s;
+			transition-delay: 0s;
+		}
+	} @else if $property == "animation" {
+		@media (prefers-reduced-motion: reduce) {
+			animation-duration: 1ms;
+			animation-delay: 0s;
+		}
+	} @else {
+		@media (prefers-reduced-motion: reduce) {
+			transition-duration: 0s;
+			transition-delay: 0s;
+			animation-duration: 1ms;
+			animation-delay: 0s;
+		}
+	}
+}
+
+@mixin input-control($accent-color: var(--wp-admin-theme-color)) {
+	font-family: variables.$default-font;
+	padding: 6px 8px;
+	/* Fonts smaller than 16px causes mobile safari to zoom. */
+	font-size: variables.$mobile-text-min-font-size;
+	/* Override core line-height. To be reviewed. */
+	line-height: normal;
+	@include input-style__neutral();
+
+	@include break-small {
+		font-size: variables.$default-font-size;
+		/* Override core line-height. To be reviewed. */
+		line-height: normal;
+	}
+
+	&:focus {
+		@include input-style__focus($accent-color);
+	}
+
+	// Use opacity to work in various editor styles.
+	&::placeholder {
+		color: colors.$dark-gray-placeholder;
+	}
+}
+
+@mixin checkbox-control {
+	border: variables.$border-width solid colors.$gray-900;
+	margin-right: variables.$grid-unit-15;
+	transition: none;
+	border-radius: variables.$radius-small;
+	@include input-control;
+
+	&:focus {
+		box-shadow: 0 0 0 (variables.$border-width * 2) colors.$white, 0 0 0 (variables.$border-width * 2 + variables.$border-width-focus-fallback) var(--wp-admin-theme-color);
+
+		// Only visible in Windows High Contrast mode.
+		outline: 2px solid transparent;
+	}
+
+	&:checked {
+		background: var(--wp-admin-theme-color);
+		border-color: var(--wp-admin-theme-color);
+	}
+
+	&:checked::before,
+	&[aria-checked="mixed"]::before {
+		margin: -3px -5px;
+		color: colors.$white;
+
+		@include break-medium() {
+			margin: -4px 0 0 -5px;
+		}
+	}
+
+	&[aria-checked="mixed"] {
+		background: var(--wp-admin-theme-color);
+		border-color: var(--wp-admin-theme-color);
+
+		&::before {
+			// Inherited from `forms.css`.
+			// See: https://github.com/WordPress/wordpress-develop/tree/5.1.1/src/wp-admin/css/forms.css#L122-L132
+			content: "\f460";
+			float: left;
+			display: inline-block;
+			vertical-align: middle;
+			width: 16px;
+			/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- dashicons don't need a generic family keyword. */
+			font: normal 30px/1 dashicons;
+			speak: none;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+
+			@include break-medium() {
+				float: none;
+				font-size: 21px;
+			}
+		}
+	}
+
+	&[aria-disabled="true"],
+	&:disabled {
+		background: colors.$gray-100;
+		border-color: colors.$gray-300;
+		cursor: default;
+
+		// Override style inherited from wp-admin. Required to avoid degraded appearance on different backgrounds.
+		opacity: 1;
+	}
+}
+
+@mixin radio-control {
+	border: variables.$border-width solid colors.$gray-900;
+	margin-right: variables.$grid-unit-15;
+	transition: none;
+	border-radius: variables.$radius-round;
+	width: variables.$radio-input-size-sm;
+	height: variables.$radio-input-size-sm;
+	min-width: variables.$radio-input-size-sm;
+	max-width: variables.$radio-input-size-sm;
+	position: relative;
+
+	@media not (prefers-reduced-motion) {
+		transition: box-shadow 0.1s linear;
+	}
+
+	@include break-small() {
+		height: variables.$radio-input-size;
+		width: variables.$radio-input-size;
+		min-width: variables.$radio-input-size;
+		max-width: variables.$radio-input-size;
+	}
+
+	&:checked::before {
+		box-sizing: inherit;
+		width: math.div(variables.$radio-input-size-sm, 2);
+		height: math.div(variables.$radio-input-size-sm, 2);
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		margin: 0;
+		background-color: colors.$white;
+
+		// This border serves as a background color in Windows High Contrast mode.
+		border: 4px solid colors.$white;
+
+		@include break-small() {
+			width: math.div(variables.$radio-input-size, 2);
+			height: math.div(variables.$radio-input-size, 2);
+		}
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 (variables.$border-width * 2) colors.$white, 0 0 0 (variables.$border-width * 2 + variables.$border-width-focus-fallback) var(--wp-admin-theme-color);
+
+		// Only visible in Windows High Contrast mode.
+		outline: 2px solid transparent;
+	}
+
+	&:checked {
+		background: var(--wp-admin-theme-color);
+		border: none;
+	}
+}
+
+/**
+ * Reset default styles for JavaScript UI based pages.
+ * This is a WP-admin agnostic reset
+ */
+
+@mixin reset {
+	box-sizing: border-box;
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: inherit;
+	}
+}
+
+@mixin link-reset {
+	&:focus {
+		color: var(--wp-admin-theme-color--rgb);
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color, #007cba);
+		border-radius: variables.$radius-small;
+	}
+}
+
+// The editor input reset with increased specificity to avoid theme styles bleeding in.
+@mixin editor-input-reset() {
+	font-family: variables.$editor-html-font !important;
+	color: colors.$gray-900 !important;
+	background: colors.$white !important;
+	padding: variables.$grid-unit-15 !important;
+	border: variables.$border-width solid colors.$gray-900 !important;
+	box-shadow: none !important;
+	border-radius: variables.$radius-small !important;
+
+	// Fonts smaller than 16px causes mobile safari to zoom.
+	font-size: variables.$mobile-text-min-font-size !important;
+	@include break-small {
+		font-size: variables.$default-font-size !important;
+	}
+
+	&:focus {
+		border-color: var(--wp-admin-theme-color) !important;
+		box-shadow: 0 0 0 (variables.$border-width-focus-fallback - variables.$border-width) var(--wp-admin-theme-color) !important;
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent !important;
+	}
+}
+
+/**
+ * Reset the WP Admin page styles for Gutenberg-like pages.
+ */
+
+@mixin wp-admin-reset( $content-container ) {
+	background: colors.$white;
+
+	#wpcontent {
+		padding-left: 0;
+	}
+
+	#wpbody-content {
+		padding-bottom: 0;
+	}
+
+	/* We hide legacy notices in Gutenberg Based Pages, because they were not designed in a way that scaled well.
+	   Plugins can use Gutenberg notices if they need to pass on information to the user when they are editing. */
+	#wpbody-content > div:not(#{ $content-container }):not(#screen-meta) {
+		display: none;
+	}
+
+	#wpfooter {
+		display: none;
+	}
+
+	.a11y-speak-region {
+		left: -1px;
+		top: -1px;
+	}
+
+	ul#adminmenu a.wp-has-current-submenu::after,
+	ul#adminmenu > li.current > a.current::after {
+		border-right-color: colors.$white;
+	}
+
+	.media-frame select.attachment-filters:last-of-type {
+		width: auto;
+		max-width: 100%;
+	}
+}
+
+@mixin admin-scheme($color-primary) {
+	// Define RGB equivalents for use in rgba function.
+	// Hexadecimal css vars do not work in the rgba function.
+	--wp-admin-theme-color: #{$color-primary};
+	--wp-admin-theme-color--rgb: #{functions.hex-to-rgb($color-primary)};
+	// Darker shades.
+	--wp-admin-theme-color-darker-10: #{color.adjust($color-primary, $lightness: -5%)};
+	--wp-admin-theme-color-darker-10--rgb: #{functions.hex-to-rgb(color.adjust($color-primary, $lightness: -5%))};
+	--wp-admin-theme-color-darker-20: #{color.adjust($color-primary, $lightness: -10%)};
+	--wp-admin-theme-color-darker-20--rgb: #{functions.hex-to-rgb(color.adjust($color-primary, $lightness: -10%))};
+
+	// Focus style width.
+	// Avoid rounding issues by showing a whole 2px for 1x screens, and 1.5px on high resolution screens.
+	--wp-admin-border-width-focus: 2px;
+	@media ( -webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+		--wp-admin-border-width-focus: 1.5px;
+	}
+}
+
+@mixin wordpress-admin-schemes() {
+	body.admin-color-light {
+		@include admin-scheme(#0085ba);
+	}
+
+	body.admin-color-modern {
+		@include admin-scheme(#3858e9);
+	}
+
+	body.admin-color-blue {
+		@include admin-scheme(#096484);
+	}
+
+	body.admin-color-coffee {
+		@include admin-scheme(#46403c);
+	}
+
+	body.admin-color-ectoplasm {
+		@include admin-scheme(#523f6d);
+	}
+
+	body.admin-color-midnight {
+		@include admin-scheme(#e14d43);
+	}
+
+	body.admin-color-ocean {
+		@include admin-scheme(#627c83);
+	}
+
+	body.admin-color-sunrise {
+		@include admin-scheme(#dd823b);
+	}
+}
+
+// Deprecated from UI, kept for back-compat.
+@mixin background-colors-deprecated() {
+	.has-very-light-gray-background-color {
+		background-color: #eee;
+	}
+
+	.has-very-dark-gray-background-color {
+		background-color: #313131;
+	}
+}
+
+// Deprecated from UI, kept for back-compat.
+@mixin foreground-colors-deprecated() {
+	.has-very-light-gray-color {
+		color: #eee;
+	}
+
+	.has-very-dark-gray-color {
+		color: #313131;
+	}
+}
+
+// Deprecated from UI, kept for back-compat.
+@mixin gradient-colors-deprecated() {
+	// Our classes uses the same values we set for gradient value attributes.
+
+	/* stylelint-disable @stylistic/function-comma-space-after -- We can not use spacing because of WP multi site kses rule. */
+	.has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background {
+		background: linear-gradient(135deg,rgba(0,208,132,1) 0%,rgba(6,147,227,1) 100%);
+	}
+
+	.has-purple-crush-gradient-background {
+		background: linear-gradient(135deg,rgb(52,226,228) 0%,rgb(71,33,251) 50%,rgb(171,29,254) 100%);
+	}
+
+	.has-hazy-dawn-gradient-background {
+		background: linear-gradient(135deg,rgb(250,172,168) 0%,rgb(218,208,236) 100%);
+	}
+
+	.has-subdued-olive-gradient-background {
+		background: linear-gradient(135deg,rgb(250,250,225) 0%,rgb(103,166,113) 100%);
+	}
+
+	.has-atomic-cream-gradient-background {
+		background: linear-gradient(135deg,rgb(253,215,154) 0%,rgb(0,74,89) 100%);
+	}
+
+	.has-nightshade-gradient-background {
+		background: linear-gradient(135deg,rgb(51,9,104) 0%,rgb(49,205,207) 100%);
+	}
+
+	.has-midnight-gradient-background {
+		background: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);
+	}
+	/* stylelint-enable @stylistic/function-comma-space-after */
+}
+
+@mixin custom-scrollbars-on-hover($handle-color, $handle-color-hover) {
+
+	// WebKit
+	&::-webkit-scrollbar {
+		width: 12px;
+		height: 12px;
+	}
+	&::-webkit-scrollbar-track {
+		background-color: transparent;
+	}
+	&::-webkit-scrollbar-thumb {
+		background-color: $handle-color;
+		border-radius: 8px;
+		border: 3px solid transparent;
+		background-clip: padding-box;
+	}
+	&:hover::-webkit-scrollbar-thumb, // This needs specificity.
+	&:focus::-webkit-scrollbar-thumb,
+	&:focus-within::-webkit-scrollbar-thumb {
+		background-color: $handle-color-hover;
+	}
+
+	// Firefox 109+ and Chrome 111+
+	scrollbar-width: thin;
+	scrollbar-gutter: stable both-edges;
+	scrollbar-color: $handle-color transparent; // Syntax, "dark", "light", or "#handle-color #track-color"
+
+	&:hover,
+	&:focus,
+	&:focus-within {
+		scrollbar-color: $handle-color-hover transparent;
+	}
+
+	// Needed to fix a Safari rendering issue.
+	will-change: transform;
+
+	// Always show scrollbar on Mobile devices.
+	@media (hover: none) {
+		& {
+			scrollbar-color: $handle-color-hover transparent;
+		}
+	}
+}
+
+@mixin inserter-toggle() {
+	// Basic look
+	background: colors.$gray-900;
+	color: colors.$white;
+	padding: 0;
+
+	// TODO: Consider passing size="small" to the Inserter toggle instead.
+	// Special dimensions for this button.
+	min-width: variables.$button-size-small;
+	height: variables.$button-size-small;
+
+	&:hover {
+		color: colors.$white;
+		background: var(--wp-admin-theme-color);
+	}
+}
+
+@mixin selected-block-outline($widthRatio: 1) {
+	outline-color: var(--wp-admin-theme-color);
+	outline-style: solid;
+	outline-width: calc(#{$widthRatio} * (var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
+	outline-offset: calc(#{$widthRatio} * ((-1 * var(--wp-admin-border-width-focus) ) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
+	box-shadow: inset 0 0 0 calc(var(--wp-admin-border-width-focus, #{variables.$border-width-focus-fallback}) + #{variables.$border-width}) colors.$white, 0 0 0 variables.$border-width colors.$white, variables.$elevation-x-small;
+}
+
+@mixin selected-block-focus($widthRatio: 1) {
+	content: "";
+	position: absolute;
+	pointer-events: none;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	@include selected-block-outline($widthRatio);
+}
+
+/**
+ * Creates a checkerboard pattern background to indicate transparency.
+ * @param {String} $size - The size of the squares in the checkerboard pattern. Default is 12px.
+ */
+@mixin checkerboard-background($size: 12px) {
+	// The background image creates a checkerboard pattern. Ignore rtlcss to
+	// make it work both in LTR and RTL.
+	// See https://github.com/WordPress/gutenberg/pull/42510
+	/*rtl:begin:ignore*/
+	background-image:
+		repeating-linear-gradient(45deg, colors.$gray-200 25%, transparent 25%, transparent 75%, colors.$gray-200 75%, colors.$gray-200),
+		repeating-linear-gradient(45deg, colors.$gray-200 25%, transparent 25%, transparent 75%, colors.$gray-200 75%, colors.$gray-200);
+	background-position: 0 0, $size $size;
+	/*rtl:end:ignore*/
+	background-size: calc(2 * $size) calc(2 * $size);
+}

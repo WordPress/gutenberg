@@ -1,0 +1,15 @@
+[
+	{
+		"name": "core/block",
+		"isValid": true,
+		"attributes": {
+			"ref": 123,
+			"content": {
+				"Nice paragraph": {
+					"content": "Some value"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

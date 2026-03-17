@@ -1,0 +1,108 @@
+/**
+ * The following styles get applied both on the front of your site
+ * and in the editor.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+
+.wp-block-{{namespace}}-{{slug}} {
+	font-family: sans-serif;
+	max-width: 480px;
+	padding: 1.5em;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+
+	// Timer — sits outside the router region.
+	&__timer {
+		font-size: 0.85em;
+		color: #666;
+		padding-bottom: 1em;
+		margin-bottom: 1em;
+		border-bottom: 1px solid #eee;
+		font-variant-numeric: tabular-nums;
+
+		span {
+			font-weight: 600;
+		}
+	}
+
+	// Quote card.
+	&__quote {
+		margin: 0 0 1.5em;
+
+		blockquote {
+			margin: 0;
+			font-size: 1.15em;
+			line-height: 1.6;
+		}
+
+		figcaption {
+			margin-top: 0.75em;
+			font-size: 0.9em;
+			color: #555;
+		}
+	}
+
+	// Prev / Next navigation.
+	&__nav {
+		display: flex;
+		justify-content: space-between;
+		gap: 1em;
+
+		a {
+			padding: 0.4em 1em;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			text-decoration: none;
+			color: inherit;
+			font-size: 0.9em;
+
+			&:hover {
+				background: #f5f5f5;
+			}
+		}
+	}
+
+	// Artificial delay checkbox.
+	&__delay {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		margin-bottom: 1em;
+		font-size: 0.85em;
+		color: #666;
+		cursor: pointer;
+	}
+
+	// Router region content wrapper.
+	&__content {
+		position: relative;
+	}
+
+	// Loading overlay — appears on top of the quote after 100ms.
+	&__loading {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(255, 255, 255, 0.8);
+		font-size: 0.9em;
+		color: #666;
+		animation: wp-block-create-block-loading-fade-in 0s 100ms both;
+
+		&[hidden] {
+			display: none;
+		}
+	}
+}
+
+@keyframes wp-block-create-block-loading-fade-in {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}

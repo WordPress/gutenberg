@@ -1,0 +1,17 @@
+[
+	{
+		"name": "core/heading",
+		"isValid": true,
+		"attributes": {
+			"content": "Text",
+			"level": 2,
+			"textColor": "primary",
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

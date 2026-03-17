@@ -1,0 +1,19 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.components-autocomplete__popover .components-popover__content {
+	padding: $grid-unit-10;
+	min-width: 200px;
+}
+
+.components-autocomplete__result.components-button {
+	display: flex;
+	height: auto;
+	min-height: $button-size;
+	text-align: left;
+	width: 100%;
+
+	&:focus:not(:disabled) {
+		@include block-toolbar-button-style__focus();
+	}
+}

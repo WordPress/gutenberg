@@ -1,0 +1,13 @@
+@use "@wordpress/base-styles/z-index" as *;
+
+.block-editor-skip-to-selected-block {
+	position: absolute;
+	top: -9999em;
+
+	&:focus {
+		font-size: 14px;
+		font-weight: 600;
+		background: #f1f1f1;
+		z-index: z-index(".skip-to-selected-block");
+	}
+}

@@ -1,0 +1,40 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.block-editor-block-list__block[data-type="core/more"] {
+	max-width: 100%;
+	text-align: center;
+	margin-top: $default-block-margin;
+	margin-bottom: $default-block-margin;
+}
+
+.wp-block-more {
+	display: block;
+	text-align: center;
+	white-space: nowrap;
+
+	// Label
+	.rich-text {
+		position: relative;
+		font-size: $default-font-size;
+		text-transform: uppercase;
+		font-weight: 600;
+		font-family: $default-font;
+		color: $gray-700;
+		display: inline-flex;
+		white-space: nowrap;
+		text-align: center;
+		background: $white;
+		padding: 10px 36px;
+	}
+
+	// Dashed line
+	&::before {
+		content: "";
+		position: absolute;
+		top: calc(50%);
+		left: 0;
+		right: 0;
+		border-top: 3px dashed $gray-400;
+	}
+}

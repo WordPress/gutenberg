@@ -1,0 +1,47 @@
+{
+	"name": "@wordpress/block-serialization-spec-parser",
+	"version": "5.41.0",
+	"description": "Block serialization specification parser for WordPress posts.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"block",
+		"spec",
+		"parser"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-serialization-spec-parser/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/block-serialization-spec-parser"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "parser.js",
+	"exports": {
+		".": "./parser.js",
+		"./shared-tests": "./shared-tests.js",
+		"./package.json": "./package.json"
+	},
+	"wpScript": true,
+	"sideEffects": false,
+	"dependencies": {
+		"pegjs": "^0.10.0",
+		"phpegjs": "^1.0.0-beta7"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "concurrently \"npm run build:js\" \"npm run build:php\"",
+		"build:js": "pegjs --format commonjs -o ./parser.js ./grammar.pegjs",
+		"build:php": "node bin/create-php-parser.js"
+	}
+}

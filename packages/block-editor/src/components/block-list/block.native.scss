@@ -1,0 +1,62 @@
+.blockHolder {
+	flex: 1 1 auto;
+}
+
+.solidBorderColor {
+	border-color: $blue-40;
+}
+
+.solidBorderColorDark {
+	border-color: $blue-50;
+}
+
+.dimmed {
+	opacity: $dimmed-opacity;
+}
+
+.blockTitle {
+	background-color: $gray;
+	padding-left: 8px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+.aztec_container {
+	flex: 1;
+}
+
+.blockCode {
+	font-family: $default-monospace-font;
+}
+
+.blockText {
+	min-height: 50px;
+}
+
+.solidBorder {
+	position: absolute;
+	top: -6px;
+	bottom: -6px;
+	left: -6px;
+	right: -6px;
+	border-width: 2px;
+	border-radius: 2px;
+	border-style: solid;
+	z-index: 1;
+}
+
+.solidBorderCompact {
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.solidBorderTextContent {
+	left: 0;
+	right: 0;
+}
+
+.fullWidthPadding {
+	padding: $block-selected-to-content;
+}

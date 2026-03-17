@@ -1,0 +1,40 @@
+{
+	"version": 3,
+	"title": "Variation: new font family",
+	"settings": {
+		"typography": {
+			"fontFamilies": [
+				{
+					"fontFamily": "\"Open Sans\", serif",
+					"name": "Open Sans",
+					"slug": "open-sans",
+					"fontFace": [
+						{
+							"fontFamily": "Open Sans",
+							"fontStretch": "normal",
+							"fontStyle": "normal",
+							"fontWeight": "400",
+							"src": [
+								"file:./assets/fonts/open-sans/OpenSans-VariableFont_wdth,wght.ttf"
+							]
+						},
+						{
+							"fontFamily": "Open Sans",
+							"fontStretch": "normal",
+							"fontStyle": "italic",
+							"fontWeight": "400",
+							"src": [
+								"file:./assets/fonts/open-sans/OpenSans-Italic-VariableFont_wdth,wght.ttf"
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	"styles": {
+		"typography": {
+			"fontFamily": "var(--wp--preset--font-family--open-sans)"
+		}
+	}
+}

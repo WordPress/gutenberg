@@ -1,0 +1,13 @@
+[
+	{
+		"name": "core/archives",
+		"isValid": true,
+		"attributes": {
+			"displayAsDropdown": false,
+			"showLabel": true,
+			"showPostCounts": false,
+			"type": "monthly"
+		},
+		"innerBlocks": []
+	}
+]

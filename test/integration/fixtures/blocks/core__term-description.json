@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/term-description",
+		"isValid": true,
+		"attributes": {
+			"align": "full"
+		},
+		"innerBlocks": []
+	}
+]

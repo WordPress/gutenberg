@@ -1,0 +1,15 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.components-color-list-picker,
+.components-color-list-picker__swatch-button {
+	width: 100%;
+}
+
+.components-color-list-picker__color-picker {
+	margin: $grid-unit-10 0;
+}
+
+.components-color-list-picker__swatch-color {
+	// Match the 24px size of the `swatch` icon (used when no color is set)
+	margin: 2px;
+}

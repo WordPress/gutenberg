@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`File block transformations to Columns block 1`] = `
+"<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"100%"} -->
+<div class="wp-block-column" style="flex-basis:100%"><!-- wp:file {"id":3,"href":"https://wordpress.org/latest.zip"} -->
+<div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button wp-element-button" download>Download</a></div>
+<!-- /wp:file --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->"
+`;
+
+exports[`File block transformations to Group block 1`] = `
+"<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:file {"id":3,"href":"https://wordpress.org/latest.zip"} -->
+<div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button wp-element-button" download>Download</a></div>
+<!-- /wp:file --></div>
+<!-- /wp:group -->"
+`;

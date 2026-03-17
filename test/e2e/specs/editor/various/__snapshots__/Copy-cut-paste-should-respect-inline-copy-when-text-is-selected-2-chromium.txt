@@ -1,0 +1,11 @@
+<!-- wp:paragraph -->
+<p>First block</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>ck</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second block</p>
+<!-- /wp:paragraph -->

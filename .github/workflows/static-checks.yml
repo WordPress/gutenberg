@@ -1,0 +1,97 @@
+name: Static Analysis (Linting, License, Type checks...)
+
+on:
+    pull_request:
+    push:
+        branches:
+            - trunk
+            - 'release/**'
+            - 'wp/**'
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    check:
+        name: All${{ (matrix.node != '20' || matrix.os != 'ubuntu-24.04') && format(' (Node.js {0} on {1})', matrix.node, contains(matrix.os, 'macos-') && 'MacOS' || contains(matrix.os, 'windows-') && 'Windows' || 'Linux') || '' }}
+        runs-on: ${{ matrix.os }}
+        env:
+            NODE_OPTIONS: --max-old-space-size=4096
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            matrix:
+                event: ['${{ github.event_name }}']
+                node: ['20', '22', '24']
+                os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
+
+                include:
+                    # Only generate annotations once.
+                    - node: '24'
+                      os: 'ubuntu-24.04'
+                      annotations: true
+                exclude:
+                    # On PRs: Only test Node 20 on Ubuntu and Windows
+                    - event: 'pull_request'
+                      node: '22'
+                    - event: 'pull_request'
+                      os: 'macos-15'
+
+        steps:
+            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+              with:
+                  node-version: ${{ matrix.node }}
+                  cache: npm
+
+            - name: Pin npm version for consistency
+              run: npm install -g npm@10
+
+            - name: npm install
+              # A "full" install is executed, since `npm ci` does not always exit
+              # with an error status code if the lock file is inaccurate. This also
+              # helps to catch dependencies not being installed with exact version.
+              #
+              # See: https://github.com/WordPress/gutenberg/issues/16157
+              # See: https://github.com/WordPress/gutenberg/pull/39865
+              run: npm install
+
+            - name: Lint package.json files
+              run: npm run lint:pkg-json
+
+            - name: Lint package-lock.json file
+              run: npm run lint:lockfile
+
+            - name: Validate TypeScript config
+              run: npm run lint:tsconfig
+
+            - name: Lint JavaScript
+              if: ${{ matrix.annotations }}
+              run: npm run lint:js -- --format compact
+
+            - name: Lint Styles
+              if: ${{ matrix.annotations }}
+              run: npm run lint:css -- --formatter compact
+
+            - name: Type checking
+              run: npm run build
+
+            - name: Check local changes
+              run: npm run other:check-local-changes
+
+            - name: License compatibility
+              run: npm run other:check-licenses

@@ -1,0 +1,44 @@
+.blockTitle {
+	font-weight: 500;
+	font-size: 10px;
+	color: $gray;
+	text-transform: uppercase;
+	letter-spacing: 0.4px;
+	padding-bottom: 4px;
+}
+
+.blockTitleDark {
+	color: $gray-50;
+}
+
+.blockShortcodeContainer {
+	padding: 12px;
+	border-radius: 4px;
+	background-color: $gray-light;
+}
+
+.blockShortcodeContainerDark {
+	background-color: $gray-100;
+}
+
+.blockShortcode {
+	font-family: $default-monospace-font;
+	font-weight: 400;
+	font-size: 14px;
+	color: $gray-900;
+}
+
+.blockShortcodeDark {
+	color: $white;
+}
+
+.placeholder {
+	font-family: $default-monospace-font;
+	font-weight: 400;
+	font-size: 14px;
+	color: $gray;
+}
+
+.placeholderDark {
+	color: $gray-50;
+}

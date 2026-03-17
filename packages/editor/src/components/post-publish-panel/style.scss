@@ -1,0 +1,243 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.editor-post-publish-panel__content {
+	// Ensure the post-publish panel accounts for the header and footer height.
+	min-height: calc(100% - #{$header-height + 84px});
+
+	> .components-spinner {
+		display: block;
+		margin: 100px auto 0;
+	}
+}
+
+.editor-post-publish-panel__header {
+	background: $white;
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
+	height: $header-height + $border-width;
+	border-bottom: $border-width solid $gray-300;
+	display: flex;
+	align-items: center;
+	align-content: space-between;
+
+	.components-button {
+		width: 100%;
+		justify-content: center;
+	}
+
+	.has-icon {
+		margin-left: auto;
+		width: auto;
+	}
+}
+
+.components-site-card {
+	display: flex;
+	align-items: center;
+	margin: $grid-unit-20 0;
+}
+
+.components-site-icon {
+	border: none;
+	border-radius: $radius-small;
+	margin-right: $grid-unit-15;
+	flex-shrink: 0;
+
+	// Same size as in the Site menu.
+	height: 36px;
+	width: 36px;
+}
+
+.components-site-name {
+	display: block;
+	font-size: 14px;
+}
+
+.components-site-home {
+	display: block;
+	color: $gray-700;
+	font-size: $helptext-font-size;
+	word-break: break-word;
+}
+
+.editor-post-publish-panel__header-publish-button,
+.editor-post-publish-panel__header-cancel-button {
+	flex: 1;
+
+	@include break-mobile() {
+		max-width: $admin-sidebar-width;
+	}
+}
+
+.editor-post-publish-panel__header-publish-button {
+	padding-left: $grid-unit-05;
+	justify-content: center;
+}
+
+.editor-post-publish-panel__header-cancel-button {
+	padding-right: $grid-unit-05;
+}
+
+.editor-post-publish-panel__header-published {
+	flex-grow: 1;
+}
+
+.editor-post-publish-panel__footer {
+	padding: $grid-unit-20;
+}
+
+.components-button.editor-post-publish-panel__toggle.is-primary {
+	display: inline-flex;
+	align-items: center;
+
+	&.is-busy .dashicon {
+		display: none;
+	}
+
+	.dashicon {
+		margin-right: -$grid-unit-05;
+	}
+}
+
+.editor-post-publish-panel__link {
+	font-weight: 400;
+	padding-left: $grid-unit-05;
+}
+
+.editor-post-publish-panel__prepublish {
+	padding: $grid-unit-20;
+
+	strong {
+		color: $gray-900;
+	}
+
+	.components-panel__body {
+		background: $white;
+		margin-left: -$grid-unit-20;
+		margin-right: -$grid-unit-20;
+	}
+
+	.editor-post-visibility__dialog-legend {
+		display: none;
+	}
+
+	.components-panel__body-title .components-button {
+		align-items: flex-start;
+		text-wrap: balance; // Fallback for Safari.
+		text-wrap: pretty;
+	}
+}
+
+.post-publish-panel__postpublish .components-panel__body {
+	border-bottom: $border-width solid $gray-200;
+	border-top: none;
+	word-break: break-word;
+}
+
+.post-publish-panel__postpublish-buttons {
+	display: flex;
+	align-content: space-between;
+	flex-wrap: wrap;
+	gap: $grid-unit-20;
+
+	.components-button,
+	.components-button.has-icon {
+		justify-content: center;
+		flex: 1;
+		min-width: unset;
+	}
+
+	.components-clipboard-button {
+		width: 100%;
+	}
+}
+
+.post-publish-panel__postpublish-post-address-container {
+	display: flex;
+	align-items: flex-end;
+	margin-bottom: $grid-unit-20;
+
+	.post-publish-panel__postpublish-post-address {
+		flex: 1;
+	}
+
+	input[readonly] {
+		// Do not increase top and bottom padding otherwise Firefox won't show the text overflow ellipsis.
+		// See https://github.com/WordPress/gutenberg/pull/57310
+		padding: $grid-unit-15;
+		background: $gray-100;
+		border-color: $gray-400;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		height: $button-size;
+	}
+}
+
+.post-publish-panel__postpublish-post-address__copy-button-wrap {
+	flex-shrink: 0;
+	margin-left: $grid-unit-20;
+}
+
+.post-publish-panel__postpublish-header {
+	font-weight: $font-weight-medium;
+}
+
+.post-publish-panel__postpublish-subheader {
+	margin: 0 0 $grid-unit-10;
+}
+
+.post-publish-panel__tip {
+	color: $alert-yellow;
+}
+
+@media screen and (max-width: 782px) {
+	.post-publish-panel__postpublish-post-address__button-wrap {
+		// match copy button height to the address field height in smaller screens
+		.components-button {
+			height: 40px;
+		}
+	}
+}
+
+.editor-post-publish-panel {
+	@include reset;
+	position: fixed;
+	z-index: z-index(".editor-post-publish-panel");
+	background: $white;
+	top: $admin-bar-height-big;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	overflow: auto;
+
+	@include break-medium() {
+		z-index: z-index(".editor-post-publish-panel {greater than small}");
+		top: $admin-bar-height;
+		left: auto;
+		width: $sidebar-width + $border-width;
+		border-left: $border-width solid $gray-300;
+
+		@media not (prefers-reduced-motion) {
+			transform: translateX(+100%);
+			animation: editor-post-publish-panel__slide-in-animation 0.1s forwards;
+		}
+
+		body.is-fullscreen-mode & {
+			top: 0;
+		}
+
+		// Keep it open on focus to avoid conflict with navigate-regions animation.
+		[role="region"]:focus & {
+			transform: translateX(0%);
+		}
+	}
+}
+
+@keyframes editor-post-publish-panel__slide-in-animation {
+	100% {
+		transform: translateX(0%);
+	}
+}

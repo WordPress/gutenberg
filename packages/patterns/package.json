@@ -1,0 +1,78 @@
+{
+	"name": "@wordpress/patterns",
+	"version": "2.41.0",
+	"description": "Management of user pattern editing.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"patterns"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/patterns/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/patterns"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"react-native": "src/index",
+	"wpScript": true,
+	"sideEffects": [
+		"build-style/**",
+		"src/**/*.scss",
+		"src/index.js",
+		"src/store/index.js",
+		"build/index.cjs",
+		"build/store/index.cjs",
+		"build-module/index.mjs",
+		"build-module/store/index.mjs"
+	],
+	"dependencies": {
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/base-styles": "file:../base-styles",
+		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/html-entities": "file:../html-entities",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/notices": "file:../notices",
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/url": "file:../url"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

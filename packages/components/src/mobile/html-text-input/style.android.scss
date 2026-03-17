@@ -1,0 +1,8 @@
+@import "./style.scss";
+
+.htmlViewTitle {
+	font-family: $htmlFont;
+	padding-left: $padding;
+	padding-right: $padding;
+	margin-top: $padding * 2;
+}

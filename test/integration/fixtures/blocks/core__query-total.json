@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/query-total",
+		"isValid": true,
+		"attributes": {
+			"displayType": "total-results"
+		},
+		"innerBlocks": []
+	}
+]

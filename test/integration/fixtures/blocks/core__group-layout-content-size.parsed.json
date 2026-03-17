@@ -1,0 +1,36 @@
+[
+	{
+		"blockName": "core/group",
+		"attrs": {
+			"align": "full",
+			"backgroundColor": "secondary",
+			"layout": {
+				"type": "constrained"
+			}
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<p>This is a group block.</p>\n\t",
+				"innerContent": [ "\n\t<p>This is a group block.</p>\n\t" ]
+			},
+			{
+				"blockName": "core/paragraph",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<p>Group block content.</p>\n\t",
+				"innerContent": [ "\n\t<p>Group block content.</p>\n\t" ]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t\n\n\t\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t",
+			null,
+			"\n\n\t",
+			null,
+			"\n</div>\n"
+		]
+	}
+]

@@ -1,0 +1,65 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
+	"apiVersion": 3,
+	"name": "core/tabs-menu-item",
+	"title": "Tab Menu Item",
+	"description": "A single tab button in the tabs menu.",
+	"version": "1.0.0",
+	"category": "design",
+	"textdomain": "default",
+	"parent": [ "core/tabs-menu" ],
+	"usesContext": [
+		"core/tabs-list",
+		"core/tabs-activeTabIndex",
+		"core/tabs-editorActiveTabIndex",
+		"core/tabs-menu-item-index",
+		"core/tabs-menu-item-id",
+		"core/tabs-menu-item-label"
+	],
+	"attributes": {
+		"anchor": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"lock": false,
+		"color": {
+			"background": true,
+			"text": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"__experimentalFontFamily": true,
+			"textAlign": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"spacing": {
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"padding": true
+			}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		},
+		"layout": {
+			"allowEditing": false
+		}
+	},
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style-index.css"
+}

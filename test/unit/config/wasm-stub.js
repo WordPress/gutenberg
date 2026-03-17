@@ -1,0 +1,1 @@
+// Stub file for Jest.

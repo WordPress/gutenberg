@@ -1,0 +1,73 @@
+{
+	"name": "@wordpress/style-engine",
+	"version": "2.41.0",
+	"description": "A suite of parsers and compilers for WordPress styles.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"styles",
+		"css",
+		"global styles"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/style-engine/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/style-engine"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"react-native": "src/index",
+	"wpScript": true,
+	"wpCopyFiles": {
+		"files": [
+			"src/*.php"
+		],
+		"transforms": {
+			"php": {
+				"functionPrefix": "gutenberg_",
+				"classSuffix": "_Gutenberg",
+				"suffixClasses": [
+					"WP_Style_Engine_CSS_Declarations",
+					"WP_Style_Engine_CSS_Rules_Store",
+					"WP_Style_Engine_CSS_Rule",
+					"WP_Style_Engine_Processor",
+					"WP_Style_Engine"
+				],
+				"filenameSuffix": "-gutenberg"
+			}
+		}
+	},
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"change-case": "^4.1.2"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

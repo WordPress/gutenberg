@@ -1,0 +1,3 @@
+<!-- wp:test/iframed-block -->
+<p class="wp-block-test-iframed-block">Iframed Block (saved)</p>
+<!-- /wp:test/iframed-block -->

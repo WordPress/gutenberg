@@ -1,0 +1,379 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.wp-block-cover-image,
+.wp-block-cover {
+	min-height: 430px;
+	padding: 1em;
+	position: relative;
+	background-position: center center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	// Prevent the `wp-block-cover__background` span from overflowing the container when border-radius is applied.
+	// `overflow: hidden` is provided as a fallback for browsers that don't support `overflow: clip`.
+	overflow: hidden;
+	// Use clip instead of overflow: hidden so that sticky position works on child elements.
+	overflow: clip;
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+	// Keep the flex layout direction to the physical direction (LTR) in RTL languages.
+	/*rtl:raw: direction: ltr; */
+
+	/**
+	 * Set a default background color for has-background-dim _unless_ it includes another
+	 * background-color class (e.g. has-green-background-color). The presence of another
+	 * background-color class implies that another style will provide the background color
+	 * for the overlay.
+	 *
+	 * See:
+	 *   - Issue with background color specificity: https://github.com/WordPress/gutenberg/issues/26545
+	 *   - Issue with alternative fix: https://github.com/WordPress/gutenberg/issues/26545
+	 */
+
+	// the first selector is required for old Cover markup
+	&.has-background-dim:not([class*="-background-color"]),
+	.has-background-dim:not([class*="-background-color"]) {
+		background-color: $black;
+	}
+
+	.has-background-dim.has-background-gradient {
+		background-color: transparent;
+	}
+
+	// the first selector is required for old Cover markup
+	&.has-background-dim::before {
+		content: "";
+		background-color: inherit;
+	}
+
+	// The first selector is required for old Cover markup/
+	// Keep .wp-block-cover__gradient-background for v8 deprecation.
+	&.has-background-dim:not(.has-background-gradient)::before,
+	.wp-block-cover__background,
+	.wp-block-cover__gradient-background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		opacity: 0.5;
+	}
+
+	// The following styles are needed to support legacy blocks added prior to the update
+	// that moved opacity to a nested span.
+	// https://github.com/WordPress/gutenberg/pull/35065
+	// https://github.com/WordPress/gutenberg/pull/38362
+	@for $i from 1 through 10 {
+		&.has-background-dim.has-background-dim-#{ $i * 10 } {
+			&:not(.has-background-gradient)::before,
+			.wp-block-cover__background,
+			.wp-block-cover__gradient-background {
+				opacity: $i * 0.1;
+			}
+		}
+	}
+
+	@for $i from 0 through 10 {
+		// Keep .wp-block-cover__gradient-background for v8 deprecation
+		.wp-block-cover__gradient-background.has-background-dim.has-background-dim-#{ $i * 10 },
+		.wp-block-cover__background.has-background-dim.has-background-dim-#{ $i * 10 } {
+			opacity: $i * 0.1;
+		}
+	}
+
+	// Apply max-width to floated items that have no intrinsic width
+	&.alignleft,
+	&.alignright {
+		max-width: $content-width * 0.5;
+		width: 100%;
+	}
+
+	// Aligned cover blocks should not use our global alignment rules
+	&.aligncenter,
+	&.alignleft,
+	&.alignright {
+		display: flex;
+	}
+
+	.wp-block-cover__inner-container {
+		position: relative; // Needed for the inner container to be positioned above other elements with absolute positioning.
+		width: 100%;
+		color: inherit;
+		// Reset the fixed LTR direction at the root of the block in RTL languages.
+		/*rtl:raw: direction: rtl; */
+	}
+
+	// Position: Top
+	&.is-position-top-left {
+		align-items: flex-start;
+		justify-content: flex-start;
+	}
+	&.is-position-top-center {
+		align-items: flex-start;
+		justify-content: center;
+	}
+	&.is-position-top-right {
+		align-items: flex-start;
+		justify-content: flex-end;
+	}
+	// Position: Center
+	&.is-position-center-left {
+		align-items: center;
+		justify-content: flex-start;
+	}
+	&.is-position-center-center {
+		align-items: center;
+		justify-content: center;
+	}
+	&.is-position-center-right {
+		align-items: center;
+		justify-content: flex-end;
+	}
+	// Position: Bottom
+	&.is-position-bottom-left {
+		align-items: flex-end;
+		justify-content: flex-start;
+	}
+	&.is-position-bottom-center {
+		align-items: flex-end;
+		justify-content: center;
+	}
+	&.is-position-bottom-right {
+		align-items: flex-end;
+		justify-content: flex-end;
+	}
+
+	&.has-custom-content-position.has-custom-content-position {
+		.wp-block-cover__inner-container {
+			margin: 0;
+		}
+		&.is-position-top-left,
+		&.is-position-top-right,
+		&.is-position-center-left,
+		&.is-position-center-right,
+		&.is-position-bottom-left,
+		&.is-position-bottom-right {
+			.wp-block-cover__inner-container {
+				margin: 0;
+				width: auto;
+			}
+		}
+
+	}
+
+	// Extra specificity for in edit mode where other styles would override it otherwise.
+	.wp-block-cover__image-background,
+	video.wp-block-cover__video-background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		height: 100%;
+		max-width: none;
+		max-height: none;
+		object-fit: cover;
+		outline: none;
+		border: none;
+		box-shadow: none;
+	}
+
+	.wp-block-cover__embed-background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		height: 100%;
+		max-width: none;
+		max-height: none;
+		outline: none;
+		border: none;
+		box-shadow: none;
+		pointer-events: none; // Prevent interaction with the iframe
+
+		.wp-block-embed__wrapper {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			height: 100%;
+		}
+
+		iframe,
+		.wp-block-embed__wrapper iframe {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 100vw;
+			height: 100vh;
+			min-width: 100%;
+			min-height: 100%;
+			transform: translate(-50%, -50%);
+			pointer-events: none; // Prevent interaction with the iframe
+		}
+	}
+}
+
+.wp-block-cover-image,
+.wp-block-cover,
+.wp-block-cover__image-background,
+video.wp-block-cover__video-background {
+	&.has-parallax {
+		background-attachment: fixed;
+		background-size: cover;
+		background-repeat: no-repeat;
+
+		// Mobile Safari does not support fixed background attachment properly.
+		// See also https://stackoverflow.com/questions/24154666/background-size-cover-not-working-on-ios
+		// Chrome on Android does not appear to support the attachment at all: https://issuetracker.google.com/issues/36908439
+		@supports (-webkit-touch-callout: inherit) {
+			background-attachment: scroll;
+		}
+
+		// Remove the appearance of scrolling based on OS-level animation preferences.
+		@media (prefers-reduced-motion: reduce) {
+			background-attachment: scroll;
+		}
+	}
+
+	&.is-repeated {
+		background-repeat: repeat;
+		background-size: auto;
+	}
+}
+
+// Styles below only exist to support older versions of the block.
+// Versions that not had inner blocks and used an h2 heading had a section (and not a div) with a class wp-block-cover-image (and not a wp-block-cover).
+// We are using the previous referred differences to target old versions.
+
+section.wp-block-cover-image h2,
+.wp-block-cover-image-text,
+.wp-block-cover-text {
+	color: $white;
+	a,
+	a:hover,
+	a:focus,
+	a:active {
+		color: $white;
+	}
+}
+
+.wp-block-cover-image
+.wp-block-cover {
+	&.has-left-content {
+		justify-content: flex-start;
+	}
+
+	&.has-right-content {
+		justify-content: flex-end;
+	}
+}
+
+section.wp-block-cover-image.has-left-content > h2,
+.wp-block-cover-image.has-left-content .wp-block-cover-image-text,
+.wp-block-cover.has-left-content .wp-block-cover-text {
+	margin-left: 0;
+	text-align: left;
+}
+
+section.wp-block-cover-image.has-right-content > h2,
+.wp-block-cover-image.has-right-content .wp-block-cover-image-text,
+.wp-block-cover.has-right-content .wp-block-cover-text {
+	margin-right: 0;
+	text-align: right;
+}
+
+section.wp-block-cover-image > h2,
+.wp-block-cover-image .wp-block-cover-image-text,
+.wp-block-cover .wp-block-cover-text {
+	font-size: 2em;
+	line-height: 1.25;
+	z-index: 1;
+	margin-bottom: 0;
+	max-width: $content-width;
+	padding: 0.44em;
+	text-align: center;
+}
+
+// If Cover block's text color has not been set adjust default color
+// based on if overlay is light or not. The following styles leverage
+// `:where` to allow for generic global styles that have a low specificity to
+// still take precedence.
+
+:where(.wp-block-cover:not(.has-text-color)),
+:where(.wp-block-cover-image:not(.has-text-color)) {
+	color: $white;
+}
+
+:where(.wp-block-cover.is-light:not(.has-text-color)),
+:where(.wp-block-cover-image.is-light:not(.has-text-color)) {
+	color: $black;
+}
+
+:root {
+	:where(.wp-block-cover p:not(.has-text-color)),
+	:where(.wp-block-cover h1:not(.has-text-color)),
+	:where(.wp-block-cover h2:not(.has-text-color)),
+	:where(.wp-block-cover h3:not(.has-text-color)),
+	:where(.wp-block-cover h4:not(.has-text-color)),
+	:where(.wp-block-cover h5:not(.has-text-color)),
+	:where(.wp-block-cover h6:not(.has-text-color)) {
+		color: inherit;
+	}
+}
+
+// Backward compatibility for v14 deprecation. Only applied to the frontend.
+// Regarding the `.wp-block-cover__background + .wp-block-cover__inner-container`
+// selector: When the `.wp-block-cover__inner-container` comes right after the
+// `.wp-block-cover__background` , it means that it's using the new HTML
+// structure or that it's using the color background or gradient (even in
+// the deprecated version). In the color background or gradient option we don't
+// need the z-index because the elements are in the expected order.
+body:not(.editor-styles-wrapper) .wp-block-cover:not(
+.wp-block-cover:has(
+	.wp-block-cover__background + .wp-block-cover__inner-container
+)
+) {
+	.wp-block-cover__video-background {
+		z-index: z-index(".wp-block-cover__video-background");
+	}
+
+	.wp-block-cover__embed-background {
+		z-index: z-index(".wp-block-cover__video-background");
+	}
+
+	.wp-block-cover__image-background {
+		z-index: z-index(".wp-block-cover__image-background");
+	}
+
+	// The first selector is required for old Cover markup/
+	// Keep .wp-block-cover__gradient-background for v8 deprecation.
+	&.has-background-dim:not(.has-background-gradient)::before,
+	.wp-block-cover__background,
+	.wp-block-cover__gradient-background {
+		z-index: z-index(".wp-block-cover.has-background-dim::before");
+	}
+
+	.wp-block-cover__inner-container {
+		z-index: z-index(".wp-block-cover__inner-container");
+
+		// Reset the z-index to auto when the body has a modal open. So when the
+		// modal is inside the cover, it doesn't create a stacking context.
+		@at-root .has-modal-open & {
+			z-index: auto;
+		}
+	}
+}

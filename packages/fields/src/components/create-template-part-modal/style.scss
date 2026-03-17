@@ -1,0 +1,99 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.fields-create-template-part-modal {
+	z-index: z-index(".fields-create-template-part-modal");
+}
+
+.fields-create-template-part-modal__area-fieldset {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+
+.fields-create-template-part-modal__area-radio-group {
+	border: $border-width solid $gray-600;
+	border-radius: $radius-small;
+}
+
+.fields-create-template-part-modal__area-radio-wrapper {
+	position: relative;
+	padding: $grid-unit-15;
+
+	display: grid;
+	align-items: center;
+	grid-template-columns: min-content 1fr min-content;
+	grid-gap: $grid-unit-05 $grid-unit-10;
+
+	color: $gray-900;
+
+	& + & {
+		border-top: $border-width solid $gray-600;
+	}
+
+	input[type="radio"] {
+		position: absolute;
+		opacity: 0;
+	}
+
+	&:has(input[type="radio"]:checked) {
+		// This is needed to make sure that the focus ring always renders on top
+		// of the sibling radio "wrapper"'s borders.
+		z-index: 1;
+	}
+
+	&:has(input[type="radio"]:not(:checked)):hover {
+		color: var(--wp-admin-theme-color);
+	}
+
+	// Pass-through pointer events, so that the corresponding radio input
+	// gets checked when clicking on the underlying label
+	> *:not(.fields-create-template-part-modal__area-radio-label) {
+		pointer-events: none;
+	}
+}
+
+.fields-create-template-part-modal__area-radio-label {
+	// Capture pointer clicks for the whole radio wrapper
+	&::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+	}
+
+	input[type="radio"]:not(:checked) ~ &::before {
+		cursor: pointer;
+	}
+
+	input[type="radio"]:focus-visible ~ &::before {
+		outline: 4px solid transparent;
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+}
+
+.fields-create-template-part-modal__area-radio-icon,
+.fields-create-template-part-modal__area-radio-checkmark {
+	fill: currentColor;
+}
+
+.fields-create-template-part-modal__area-radio-checkmark {
+	input[type="radio"]:not(:checked) ~ & {
+		opacity: 0;
+	}
+}
+
+.fields-create-template-part-modal__area-radio-description {
+	grid-column: 2 / 3;
+	margin: 0;
+
+	color: $gray-700;
+	font-size: $helptext-font-size;
+	line-height: normal;
+	text-wrap: pretty;
+
+	input[type="radio"]:not(:checked):hover ~ & {
+		color: inherit;
+	}
+}

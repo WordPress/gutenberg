@@ -1,0 +1,49 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.block-editor-template-part__selection-modal {
+	z-index: z-index(".block-editor-template-part__selection-modal");
+
+	.block-editor-block-patterns-list {
+		column-count: 2;
+		column-gap: $grid-unit-30;
+
+		@include break-wide() {
+			column-count: 3;
+		}
+
+		.block-editor-block-patterns-list__list-item {
+			break-inside: avoid-column;
+		}
+	}
+}
+
+.block-library-template-part__selection-search {
+	background: $white;
+	position: sticky;
+	top: 0;
+	padding: $grid-unit-20 0;
+	z-index: z-index(".block-library-template-part__selection-search");
+}
+
+// We don't use .is-outline-mode in this case so colors take effect properly in the block editor.
+.block-editor-block-list__block:not(.remove-outline).wp-block-template-part,
+.block-editor-block-list__block:not(.remove-outline).is-reusable {
+
+	&.is-highlighted::after,
+	&.is-selected::after {
+		outline-color: var(--wp-block-synced-color);
+	}
+
+	&.block-editor-block-list__block:not([contenteditable]):focus {
+		&::after {
+			outline-color: var(--wp-block-synced-color);
+		}
+	}
+}
+
+.is-outline-mode .block-editor-block-list__block:not(.remove-outline).wp-block-template-part.has-editable-outline::after {
+	border: none;
+}

@@ -1,0 +1,12 @@
+[
+	{
+		"name": "core/navigation-link",
+		"isValid": true,
+		"attributes": {
+			"label": "WordPress",
+			"opensInNewTab": false,
+			"url": "https://wordpress.org/"
+		},
+		"innerBlocks": []
+	}
+]

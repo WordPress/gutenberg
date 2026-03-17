@@ -1,0 +1,57 @@
+{
+	"name": "@wordpress/jest-console",
+	"version": "8.41.0",
+	"description": "Custom Jest matchers for the Console object.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"jest",
+		"matchers",
+		"console"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/jest-console/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/jest-console"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"build",
+		"build-module",
+		"declarations.d.ts"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./declarations.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"types": "declarations.d.ts",
+	"dependencies": {
+		"jest-matcher-utils": "^29.6.2",
+		"jest-mock": "^29.6.2"
+	},
+	"devDependencies": {
+		"@testing-library/jest-dom": "^6.9.1",
+		"@types/jest": "^29.5.14"
+	},
+	"peerDependencies": {
+		"jest": ">=29"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

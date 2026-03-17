@@ -1,0 +1,20 @@
+.wp-block-latest-posts {
+	// Apply overflow for post items, so any floated featured images won't crop the focus style.
+	> li {
+		overflow: hidden;
+	}
+}
+
+.wp-block-latest-posts li a > div {
+	display: inline;
+}
+
+:root :where(.wp-block-latest-posts) {
+	padding-left: 2.5em;
+}
+:root {
+	:where(.wp-block-latest-posts.is-grid),
+	:where(.wp-block-latest-posts__list) {
+		padding-left: 0;
+	}
+}

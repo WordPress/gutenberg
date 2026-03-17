@@ -1,0 +1,50 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "../utils/theme-variables" as *;
+
+.components-combobox-control {
+	width: 100%;
+}
+
+input.components-combobox-control__input[type="text"] {
+	width: 100%;
+	border: none;
+	box-shadow: none;
+	font-family: inherit;
+	font-size: 16px;
+	padding: 2px;
+	margin: 0;
+	line-height: inherit;
+	min-height: auto;
+	background: $components-color-background;
+	color: $components-color-foreground;
+
+	// Resolves Zooming on iOS devices
+	// https://github.com/WordPress/gutenberg/issues/27405
+	@include break-small() {
+		font-size: 13px;
+	}
+
+	&:focus {
+		outline: none;
+		box-shadow: none;
+	}
+}
+
+.components-combobox-control__suggestions-container {
+	@include input-control($components-color-accent);
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	width: 100%;
+	padding: 0;
+
+	&:focus-within {
+		@include input-style__focus($components-color-accent);
+	}
+
+	.components-spinner {
+		margin: 0;
+	}
+}

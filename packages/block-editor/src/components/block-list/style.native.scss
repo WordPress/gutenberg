@@ -1,0 +1,117 @@
+.container {
+	flex: 1;
+	justify-content: flex-start;
+	background-color: #fff;
+}
+
+.horizontalContentContainer {
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: stretch;
+	overflow: visible;
+	width: 100%;
+}
+
+.horizontalContentContainerStretch {
+	justify-content: space-evenly;
+}
+
+.horizontalContentContainerCenter {
+	justify-content: center;
+}
+
+.switch {
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+	margin: 10px;
+}
+
+.switchLabel {
+	margin-left: 10px;
+}
+
+.lineStyleAddHere {
+	flex: 1;
+	background-color: #0087be; // blue_wordpress
+	align-self: center;
+	height: 2px;
+}
+
+.lineStyleAddHereDark {
+	background-color: $gray-50;
+}
+
+.labelStyleAddHere {
+	flex: 1;
+	text-align: center;
+	font-family: $default-monospace-font;
+	font-size: 14px;
+	color: $gray;
+	margin: 0 8px;
+}
+
+.labelStyleAddHereDark {
+	color: $gray-20;
+}
+
+.containerStyleAddHere {
+	flex-direction: row;
+	padding-left: 12px;
+	padding-right: 12px;
+}
+
+.blockListFooter {
+	height: 80px;
+}
+
+.defaultBlock {
+	margin: $block-edge-to-content * 0.5 $block-edge-to-content;
+}
+
+.defaultAppender {
+	margin-top: $grid-unit;
+	margin-bottom: $grid-unit;
+	width: 100%;
+}
+
+.innerAppender {
+	margin: $block-edge-to-content * 0.5;
+}
+
+.blockBorder {
+	width: $block-selected-border-width;
+}
+
+.headerToolbar {
+	height: $mobile-header-toolbar-height;
+}
+
+.blockToolbar {
+	height: $mobile-block-toolbar-height;
+}
+
+.floatingToolbar {
+	height: $mobile-floating-toolbar-height + 2 * $mobile-floating-toolbar-margin;
+}
+
+.horizontal {
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.is-aligned-left {
+	justify-content: flex-start;
+}
+
+.is-aligned-center {
+	justify-content: center;
+}
+
+.is-aligned-right {
+	justify-content: flex-end;
+}
+
+.overflowVisible {
+	overflow: visible;
+}

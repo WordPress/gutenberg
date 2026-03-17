@@ -1,0 +1,94 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
+.components-checkbox-control {
+	// Careful, these CSS vars have experimental overrides in Data Views (packages/dataviews/src/style.scss).
+	--checkbox-input-size: 24px; // Width & height for small viewports.
+
+	@include break-small() {
+		--checkbox-input-size: 16px;
+	}
+
+	--checkbox-input-margin: #{$grid-unit-10};
+}
+
+.components-checkbox-control__label {
+	// Ensure label is aligned with checkbox along X axis
+	line-height: var(--checkbox-input-size);
+	cursor: pointer;
+}
+
+.components-checkbox-control__input[type="checkbox"] {
+	@include checkbox-control;
+	background: $white;
+	color: $gray-900;
+	clear: none;
+	cursor: pointer;
+	display: inline-block;
+	line-height: 0;
+	margin: 0 $grid-unit-05 0 0;
+	outline: 0;
+	padding: 0 !important;
+	text-align: center;
+	vertical-align: top;
+	width: var(--checkbox-input-size);
+	height: var(--checkbox-input-size);
+
+	appearance: none;
+
+	@media not (prefers-reduced-motion) {
+		transition: 0.1s border-color ease-in-out;
+	}
+
+	&:focus {
+		@include button-style-outset__focus(var(--wp-admin-theme-color));
+	}
+
+	&:checked,
+	&:indeterminate {
+		background: $components-color-accent;
+		border-color: $components-color-accent;
+	}
+
+	&:checked::before {
+		content: none;
+	}
+}
+
+.components-checkbox-control__input-container {
+	position: relative;
+	display: inline-block;
+	margin-right: var(--checkbox-input-margin);
+	vertical-align: middle;
+	width: var(--checkbox-input-size);
+	aspect-ratio: 1;
+	line-height: 1; // maintains proper height even with WP common.css
+	flex-shrink: 0;
+}
+
+svg.components-checkbox-control__checked,
+svg.components-checkbox-control__indeterminate {
+	--checkmark-size: var(--checkbox-input-size);
+
+	fill: $white;
+	cursor: pointer;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: var(--checkmark-size);
+	height: var(--checkmark-size);
+	user-select: none;
+	pointer-events: none;
+
+	@include break-small() {
+		--checkmark-size: calc(var(--checkbox-input-size) + 4px);
+	}
+}
+
+.components-checkbox-control__help {
+	display: inline-block;
+	margin-inline-start: calc(var(--checkbox-input-size) + var(--checkbox-input-margin));
+}

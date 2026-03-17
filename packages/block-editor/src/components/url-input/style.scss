@@ -1,0 +1,117 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+// Link input
+$input-padding: $grid-unit $grid-unit $grid-unit $grid-unit-15;
+$input-size: 300px;
+
+.block-editor-block-list__block .block-editor-url-input,
+.components-popover .block-editor-url-input,
+.block-editor-url-input {
+	flex-grow: 1;
+	position: relative;
+	padding: 1px;
+
+	@include break-small() {
+		min-width: $input-size;
+		width: auto;
+	}
+
+	&.is-full-width {
+		width: 100%;
+
+		&__suggestions {
+			width: 100%;
+		}
+	}
+
+	.components-spinner {
+		position: absolute;
+		margin: 0;
+		top: calc(50% - #{$spinner-size} / 2);
+		right: $grid-unit;
+	}
+}
+
+// Suggestions
+.block-editor-url-input__suggestions {
+	max-height: 200px;
+	@media not ( prefers-reduced-motion ) {
+		transition: all 0.15s ease-in-out;
+	}
+	padding: 4px 0;
+	// To match the url-input width: input width + padding + 2 buttons.
+	width: $input-size + 2;
+	overflow-y: auto;
+}
+
+// Hide suggestions on mobile until we @todo find a better way to show them
+.block-editor-url-input__suggestions,
+.block-editor-url-input .components-spinner {
+	display: none;
+	@include break-small() {
+		display: grid;
+	}
+}
+
+.block-editor-url-input__suggestion {
+	min-height: $button-size;
+	height: auto;
+	color: $gray-700;
+	display: block;
+	font-size: $default-font-size;
+	cursor: pointer;
+	background: $white;
+	width: 100%;
+	border: none;
+	text-align: left;
+	box-shadow: none;
+
+	&:hover {
+		background: $gray-300;
+	}
+
+	&:focus,
+	&.is-selected {
+		background: var(--wp-admin-theme-color-darker-20);
+		color: $white;
+		outline: none;
+	}
+}
+
+// Toolbar button
+.components-toolbar-group > .block-editor-url-input__button,
+.components-toolbar > .block-editor-url-input__button {
+	position: inherit; // Let the dialog position according to parent.
+}
+
+.block-editor-url-input__button .block-editor-url-input__back {
+	margin-right: 4px;
+	overflow: visible;
+
+	&::after {
+		content: "";
+		position: absolute;
+		display: block;
+		width: 1px;
+		height: 24px;
+		right: -1px;
+		background: $gray-300;
+	}
+}
+
+.block-editor-url-input__button-modal {
+	box-shadow: $elevation-x-small;
+	border: $border-width solid $gray-300;
+	background: $white;
+}
+
+.block-editor-url-input__button-modal-line {
+	display: flex;
+	flex-direction: row;
+	flex-grow: 1;
+	flex-shrink: 1;
+	min-width: 0;
+	align-items: flex-start;
+}
