@@ -165,7 +165,7 @@ const v3 = {
 		...otherAttributes
 	} ) {
 		// Change the block bindings source argument name from "key" to "field".
-		return {
+		return migrateTextAlign( {
 			metadata: {
 				bindings: {
 					datetime: {
@@ -177,7 +177,7 @@ const v3 = {
 				...otherMetadata,
 			},
 			...otherAttributes,
-		};
+		} );
 	},
 	isEligible( attributes ) {
 		return (
@@ -262,7 +262,7 @@ const v2 = {
 				);
 			}
 
-			return {
+			return migrateTextAlign( {
 				...otherAttributes,
 				className,
 				metadata: {
@@ -274,17 +274,14 @@ const v2 = {
 						},
 					},
 				},
-			};
+			} );
 		}
 	},
 	isEligible( attributes ) {
 		// If there's neither an explicit `datetime` attribute nor a block binding for that attribute,
 		// then we're dealing with an old version of the block.
-		// Exclude blocks with `textAlign`, as those are handled by the v4 deprecation.
 		return (
-			! attributes.textAlign &&
-			! attributes.datetime &&
-			! attributes?.metadata?.bindings?.datetime
+			! attributes.datetime && ! attributes?.metadata?.bindings?.datetime
 		);
 	},
 };
@@ -321,7 +318,9 @@ const v1 = {
 	save() {
 		return null;
 	},
-	migrate: migrateFontFamily,
+	migrate( attributes ) {
+		return migrateTextAlign( migrateFontFamily( attributes ) );
+	},
 	isEligible( { style } ) {
 		return style?.typography?.fontFamily;
 	},

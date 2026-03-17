@@ -8,6 +8,16 @@
 				"typography": {
 					"textAlign": "left"
 				}
+			},
+			"metadata": {
+				"bindings": {
+					"datetime": {
+						"source": "core/post-data",
+						"args": {
+							"field": "date"
+						}
+					}
+				}
 			}
 		},
 		"innerBlocks": []
@@ -21,6 +31,16 @@
 				"typography": {
 					"textAlign": "center"
 				}
+			},
+			"metadata": {
+				"bindings": {
+					"datetime": {
+						"source": "core/post-data",
+						"args": {
+							"field": "date"
+						}
+					}
+				}
 			}
 		},
 		"innerBlocks": []
@@ -33,6 +53,16 @@
 			"style": {
 				"typography": {
 					"textAlign": "right"
+				}
+			},
+			"metadata": {
+				"bindings": {
+					"datetime": {
+						"source": "core/post-data",
+						"args": {
+							"field": "date"
+						}
+					}
 				}
 			}
 		},
