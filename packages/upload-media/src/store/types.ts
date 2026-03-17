@@ -245,7 +245,6 @@ export enum OperationType {
 	Finalize = 'FINALIZE',
 	// UltraHDR operations
 	DetectUltraHdr = 'DETECT_ULTRAHDR',
-	ExtractSdr = 'EXTRACT_SDR',
 	CreateUltraHdr = 'CREATE_ULTRAHDR',
 }
 
