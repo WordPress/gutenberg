@@ -272,7 +272,7 @@ export function registerDefaultConnectors() {
 		registerConnector( connectorName, {
 			label: data.name,
 			description: data.description,
-			icon: getConnectorLogo( connectorId, data.name, data.logoUrl ),
+			icon: getConnectorLogo( connectorId, data.logoUrl ),
 			render: ( props ) => (
 				<ApiKeyConnector
 					{ ...props }
