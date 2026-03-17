@@ -132,7 +132,7 @@ const baseDefine = {
 			boolConfigVal( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
 	),
 	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
-		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ||
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
 			boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE )
 	),
 };
