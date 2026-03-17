@@ -39,6 +39,7 @@ const ruleFunction = ( primary ) => {
 				report( {
 					message: messages.rejected( match[ 1 ] ),
 					node: ruleNode,
+					word: match[ 0 ],
 					result,
 					ruleName,
 				} );

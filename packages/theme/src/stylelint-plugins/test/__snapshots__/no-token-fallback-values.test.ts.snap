@@ -3,8 +3,8 @@
 exports[`flags warnings with invalid css (wpds fallbacks) snapshot matches warnings 1`] = `
 [
   {
-    "column": 2,
-    "endColumn": 55,
+    "column": 9,
+    "endColumn": 45,
     "endLine": 3,
     "line": 3,
     "rule": "plugin-wpds/no-token-fallback-values",
@@ -12,8 +12,8 @@ exports[`flags warnings with invalid css (wpds fallbacks) snapshot matches warni
     "text": "Do not add a fallback value for Design System token '--wpds-color-fg-content-neutral'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
   },
   {
-    "column": 2,
-    "endColumn": 71,
+    "column": 20,
+    "endColumn": 61,
     "endLine": 4,
     "line": 4,
     "rule": "plugin-wpds/no-token-fallback-values",
@@ -21,8 +21,8 @@ exports[`flags warnings with invalid css (wpds fallbacks) snapshot matches warni
     "text": "Do not add a fallback value for Design System token '--wpds-color-bg-surface-neutral-weak'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
   },
   {
-    "column": 2,
-    "endColumn": 51,
+    "column": 17,
+    "endColumn": 45,
     "endLine": 5,
     "line": 5,
     "rule": "plugin-wpds/no-token-fallback-values",
@@ -30,8 +30,8 @@ exports[`flags warnings with invalid css (wpds fallbacks) snapshot matches warni
     "text": "Do not add a fallback value for Design System token '--wpds-border-radius-sm'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
   },
   {
-    "column": 2,
-    "endColumn": 99,
+    "column": 11,
+    "endColumn": 41,
     "endLine": 10,
     "line": 10,
     "rule": "plugin-wpds/no-token-fallback-values",
@@ -39,13 +39,22 @@ exports[`flags warnings with invalid css (wpds fallbacks) snapshot matches warni
     "text": "Do not add a fallback value for Design System token '--wpds-border-width-focus'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
   },
   {
-    "column": 2,
-    "endColumn": 99,
+    "column": 53,
+    "endColumn": 89,
     "endLine": 10,
     "line": 10,
     "rule": "plugin-wpds/no-token-fallback-values",
     "severity": "error",
     "text": "Do not add a fallback value for Design System token '--wpds-color-stroke-focus-brand'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
+  },
+  {
+    "column": 32,
+    "endColumn": 68,
+    "endLine": 15,
+    "line": 15,
+    "rule": "plugin-wpds/no-token-fallback-values",
+    "severity": "error",
+    "text": "Do not add a fallback value for Design System token '--wpds-color-fg-content-neutral'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
   },
 ]
 `;
