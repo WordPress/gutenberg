@@ -11,6 +11,7 @@ import NavigableRegion from '../navigable-region';
 import { SidebarToggleFill } from './sidebar-toggle-slot';
 
 function Page( {
+	headingLevel,
 	breadcrumbs,
 	badges,
 	title,
@@ -21,6 +22,7 @@ function Page( {
 	hasPadding = false,
 	showSidebarToggle = true,
 }: {
+	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 	breadcrumbs?: React.ReactNode;
 	badges?: React.ReactNode;
 	title?: React.ReactNode;
@@ -37,6 +39,7 @@ function Page( {
 		<NavigableRegion className={ classes } ariaLabel={ title }>
 			{ ( title || breadcrumbs || badges ) && (
 				<Header
+					headingLevel={ headingLevel }
 					breadcrumbs={ breadcrumbs }
 					badges={ badges }
 					title={ title }

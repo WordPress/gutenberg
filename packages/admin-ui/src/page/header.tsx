@@ -13,6 +13,7 @@ import {
 import { SidebarToggleSlot } from './sidebar-toggle-slot';
 
 export default function Header( {
+	headingLevel = 2,
 	breadcrumbs,
 	badges,
 	title,
@@ -20,6 +21,7 @@ export default function Header( {
 	actions,
 	showSidebarToggle = true,
 }: {
+	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 	breadcrumbs?: React.ReactNode;
 	badges?: React.ReactNode;
 	title?: React.ReactNode;
@@ -38,7 +40,12 @@ export default function Header( {
 						/>
 					) }
 					{ title && (
-						<Heading as="h2" level={ 3 } weight={ 500 } truncate>
+						<Heading
+							level={ headingLevel }
+							weight={ 500 }
+							truncate
+							size="20"
+						>
 							{ title }
 						</Heading>
 					) }
