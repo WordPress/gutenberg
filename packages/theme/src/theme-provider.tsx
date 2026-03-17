@@ -66,12 +66,6 @@ export const ThemeProvider = ( {
 		[ resolvedSettings ]
 	);
 
-	const cursorStyle = resolvedSettings.cursor?.control
-		? ( {
-				'--wpds-cursor-control': resolvedSettings.cursor.control,
-		  } as CSSProperties )
-		: undefined;
-
 	return (
 		<>
 			{ themeProviderStyles ? (
@@ -87,7 +81,6 @@ export const ThemeProvider = ( {
 				data-wpds-root-provider={ isRoot }
 				data-wpds-density={ density }
 				className={ styles.root }
-				style={ cursorStyle }
 			>
 				<ThemeContext.Provider value={ contextValue }>
 					{ children }

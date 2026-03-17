@@ -222,11 +222,16 @@ export function useThemeProviderStyles( {
 			}
 		} );
 
-		return generateStyles( {
-			primary: seeds.primary,
-			computedColorRamps,
-		} );
-	}, [ primary, bg ] );
+		return {
+			...generateStyles( {
+				primary: seeds.primary,
+				computedColorRamps,
+			} ),
+			...( cursorControl && {
+				'--wpds-cursor-control': cursorControl,
+			} ),
+		};
+	}, [ primary, bg, cursorControl ] );
 
 	return {
 		resolvedSettings,
