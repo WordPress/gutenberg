@@ -45,6 +45,7 @@ const LinkControlSearchInput = forwardRef(
 			hideLabelFromVision = false,
 			suffix,
 			isEntity = false,
+			customValidity: customValidityProp,
 		},
 		ref
 	) => {
@@ -146,6 +147,11 @@ const LinkControlSearchInput = forwardRef(
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}
+					customValidity={ customValidityProp }
+					// Validation is handled manually via onSubmit and handleSubmit. We may be able to rely
+					// on browser validation when enhancements land to base level components:
+					// https://github.com/WordPress/gutenberg/pull/75188#issuecomment-3861757260
+					required={ false }
 					onSubmit={ ( suggestion, event ) => {
 						const hasSuggestion = suggestion || focusedSuggestion;
 

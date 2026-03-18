@@ -37,14 +37,14 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 				{ __( 'Solar System numbers' ) }
 			</Heading>
 			<div className="free-composition-header">
-				<Stack direction="column" gap="md">
-					<Stack direction="row" justify="start" gap="xs">
+				<Stack direction="column" gap="lg">
+					<Stack direction="row" justify="start" gap="sm">
 						<DataViews.Search label={ __( 'Search content' ) } />
 						<DataViews.FiltersToggle />
 						<Stack
 							direction="row"
 							justify="end"
-							gap="xs"
+							gap="sm"
 							style={ { flex: 1 } }
 						>
 							<DataViews.ViewConfig />
@@ -54,7 +54,7 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 					<DataViews.FiltersToggled />
 					<Card variant="secondary">
 						<CardBody>
-							<Stack direction="column" gap="xs">
+							<Stack direction="column" gap="sm">
 								<Text size={ 18 } as="p">
 									{ createInterpolateElement(
 										_n(
@@ -95,16 +95,16 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 								direction="row"
 								justify="space-between"
 								align="center"
-								gap="xs"
+								gap="sm"
 							>
 								<DataViews.BulkActionToolbar />
 								<DataViews.Pagination />
 							</Stack>
 						</CardBody>
 					</Card>
-					<DataViews.Layout className="free-composition-dataviews-layout" />
 				</Stack>
 			</div>
+			<DataViews.Layout className="free-composition-dataviews-layout" />
 		</>
 	);
 }
@@ -132,13 +132,8 @@ export const FreeCompositionComponent = () => {
 		type: LAYOUT_TABLE,
 		search: '',
 		page: 1,
-		perPage: 10,
+		perPage: 20,
 		layout: {
-			styles: {
-				satellites: {
-					align: 'end' as const,
-				},
-			},
 			enableMoving: false,
 		},
 		filters: [],
@@ -157,38 +152,36 @@ export const FreeCompositionComponent = () => {
 	);
 
 	return (
-		<div className="free-composition">
-			<DataViews
-				getItemId={ ( item ) => item.id.toString() }
-				paginationInfo={ paginationInfo }
-				data={ processedData }
-				view={ view }
-				fields={ fields }
-				actions={ actions }
-				onChangeView={ setView }
-				defaultLayouts={ {
-					table: {},
-					grid: {},
-				} }
-				empty={
-					<Stack
-						direction="column"
-						gap="xs"
-						justify="space-around"
-						align="center"
-						className="free-composition-dataviews-empty"
-					>
-						<Text size={ 18 } as="p">
-							No planets
-						</Text>
-						<Text variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</Text>
-						<Button variant="secondary">Create new planet</Button>
-					</Stack>
-				}
-			>
-				<PlanetOverview planets={ planets } />
-			</DataViews>
-		</div>
+		<DataViews
+			getItemId={ ( item ) => item.id.toString() }
+			paginationInfo={ paginationInfo }
+			data={ processedData }
+			view={ view }
+			fields={ fields }
+			actions={ actions }
+			onChangeView={ setView }
+			defaultLayouts={ {
+				table: {},
+				grid: {},
+			} }
+			empty={
+				<Stack
+					direction="column"
+					gap="sm"
+					justify="space-around"
+					align="center"
+					className="free-composition-dataviews-empty"
+				>
+					<Text size={ 18 } as="p">
+						No planets
+					</Text>
+					<Text variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</Text>
+					<Button variant="secondary">Create new planet</Button>
+				</Stack>
+			}
+		>
+			<PlanetOverview planets={ planets } />
+		</DataViews>
 	);
 };
 

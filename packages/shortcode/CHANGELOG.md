@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 4.41.0 (2026-03-04)
+
+## 4.40.0 (2026-02-18)
+
+## 4.39.0 (2026-01-29)
+
+### Bug Fixes
+
+-   Fix non-string attribute values being silently dropped ([#74949](https://github.com/WordPress/gutenberg/pull/74949)).
+
 ## 4.38.0 (2026-01-16)
 
 ## 4.36.0 (2025-11-26)

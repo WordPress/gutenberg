@@ -31,9 +31,10 @@ const { state } = store( 'router-regions', {
 				);
 				yield actions.navigate( e.target.href );
 			} ),
-			back() {
+			back: withSyncEvent( function* ( e ) {
+				e.preventDefault();
 				history.back();
-			},
+			} ),
 		},
 		counter: {
 			increment() {

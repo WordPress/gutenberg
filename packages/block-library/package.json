@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "9.38.0",
+	"version": "9.41.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -51,6 +51,7 @@
 		"./form/view": "./build-module/form/view.mjs",
 		"./image/view": "./build-module/image/view.mjs",
 		"./navigation/view": "./build-module/navigation/view.mjs",
+		"./playlist/view": "./build-module/playlist/view.mjs",
 		"./query/view": "./build-module/query/view.mjs",
 		"./search/view": "./build-module/search/view.mjs",
 		"./tabs/view": "./build-module/tabs/view.mjs"
@@ -93,6 +94,7 @@
 		"build-module/*/init.mjs"
 	],
 	"dependencies": {
+		"@arraypress/waveform-player": "1.2.1",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
@@ -125,6 +127,7 @@
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
+		"@wordpress/upload-media": "file:../upload-media",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",

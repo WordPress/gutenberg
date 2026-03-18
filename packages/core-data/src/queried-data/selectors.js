@@ -32,14 +32,17 @@ const queriedItemsCacheByState = new WeakMap();
  * @return {?Array} Query items.
  */
 function getQueriedItemsUncached( state, query ) {
-	const { stableKey, page, perPage, include, fields, context } =
-		getQueryParts( query );
-	let itemIds;
+	const {
+		stableKey,
+		page,
+		perPage,
+		offset: queryOffset,
+		include,
+		fields,
+		context,
+	} = getQueryParts( query );
 
-	if ( state.queries?.[ context ]?.[ stableKey ] ) {
-		itemIds = state.queries[ context ][ stableKey ].itemIds;
-	}
-
+	const itemIds = state.queries?.[ context ]?.[ stableKey ]?.itemIds;
 	if ( ! itemIds ) {
 		return null;
 	}
@@ -49,6 +52,28 @@ function getQueriedItemsUncached( state, query ) {
 		perPage === -1
 			? itemIds.length
 			: Math.min( startOffset + perPage, itemIds.length );
+
+	// If the requested page range exceeds the stored itemIds, the data for
+	// this specific pagination window may not have been fetched yet. Return
+	// null unless totalItems confirms we already have all available items.
+	if ( perPage !== -1 && itemIds.length < startOffset + perPage ) {
+		const totalItems =
+			state.queries[ context ][ stableKey ].meta?.totalItems;
+		if ( Number.isFinite( totalItems ) ) {
+			// For offset-based queries, totalItems (from X-WP-Total)
+			// reflects the global count of all matching items, not the
+			// count remaining after the offset. The number of items
+			// available for this query is (totalItems - offset), so a
+			// partial last page is expected and valid.
+			const effectiveTotal =
+				queryOffset !== undefined
+					? totalItems - queryOffset
+					: totalItems;
+			if ( itemIds.length < effectiveTotal ) {
+				return null;
+			}
+		}
+	}
 
 	const items = [];
 	for ( let i = startOffset; i < endOffset; i++ ) {

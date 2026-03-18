@@ -21,6 +21,11 @@ const meta: Meta< typeof Icon > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Prefer this component over the `Icon` component from `@wordpress/icons`.',
+		},
 	},
 };
 export default meta;

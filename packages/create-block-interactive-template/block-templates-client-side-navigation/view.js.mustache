@@ -1,0 +1,63 @@
+/**
+ * WordPress dependencies
+ */
+import { getElement, store, withSyncEvent } from '@wordpress/interactivity';
+
+const { state } = store( '{{namespace}}', {
+	state: {
+		// Elapsed time in centiseconds, used to derive the formatted timer.
+		elapsed: 0,
+		get timer() {
+			const cs = state.elapsed % 100;
+			const s = Math.floor( state.elapsed / 100 ) % 60;
+			const m = Math.floor( state.elapsed / 6000 );
+			const pad = ( n, len = 2 ) => String( n ).padStart( len, '0' );
+			return `${ pad( m ) }:${ pad( s ) }.${ pad( cs ) }`;
+		},
+	},
+	actions: {
+		/**
+		 * Navigates to the clicked link using the Interactivity Router.
+		 * The router swaps only the router-region content — no full
+		 * page reload.
+		 */
+		navigateTo: withSyncEvent( function* ( event ) {
+			event.preventDefault();
+			// getElement() must be called synchronously, before any yield.
+			const { attributes } = getElement();
+			state.isNavigating = true;
+			if ( state.artificialDelay ) {
+				yield new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
+			}
+			const { actions } = yield import(
+				'@wordpress/interactivity-router'
+			);
+			yield actions.navigate( attributes.href );
+			state.isNavigating = false;
+		} ),
+		*prefetchTo() {
+			const { attributes } = getElement();
+			const { actions } = yield import(
+				'@wordpress/interactivity-router'
+			);
+			yield actions.prefetch( attributes.href );
+		},
+		toggleDelay() {
+			state.artificialDelay = ! state.artificialDelay;
+		},
+	},
+	callbacks: {
+		/**
+		 * Starts a stopwatch that ticks every 10 ms.
+		 * Because it lives outside the router region, the timer state
+		 * persists across client-side navigations — proving that no
+		 * full page reload happened.
+		 */
+		startTimer() {
+			const interval = setInterval( () => {
+				state.elapsed += 1;
+			}, 10 );
+			return () => clearInterval( interval );
+		},
+	},
+} );

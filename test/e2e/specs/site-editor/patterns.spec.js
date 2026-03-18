@@ -189,6 +189,63 @@ test.describe( 'Patterns', () => {
 		await expect( patterns.item ).toHaveCount( 1 );
 		await expect( patterns.item ).toContainText( 'Unsynced footer' );
 	} );
+
+	test( 'sort patterns', async ( {
+		admin,
+		requestUtils,
+		patterns,
+		page,
+	} ) => {
+		await Promise.all( [
+			requestUtils.createBlock( {
+				title: 'Animal',
+				status: 'publish',
+				content: `<!-- wp:paragraph -->\n<p>Animal</p>\n<!-- /wp:paragraph -->`,
+				wp_pattern_category: [],
+			} ),
+			requestUtils.createBlock( {
+				title: 'Berry',
+				status: 'publish',
+				content: `<!-- wp:paragraph -->\n<p>Berry</p>\n<!-- /wp:paragraph -->`,
+				wp_pattern_category: [],
+			} ),
+			requestUtils.createBlock( {
+				title: 'Starter',
+				status: 'publish',
+				content: `<!-- wp:paragraph -->\n<p>Starter</p>\n<!-- /wp:paragraph -->`,
+				wp_pattern_category: [],
+			} ),
+		] );
+
+		await admin.visitSiteEditor( { postType: 'wp_block' } );
+		await expect( patterns.item ).toHaveCount( 3 );
+
+		// Open view options and switch to descending sort.
+		await page.getByRole( 'button', { name: 'View options' } ).click();
+		await page.getByRole( 'radio', { name: 'Sort descending' } ).click();
+
+		// Close the view options.
+		await page.keyboard.press( 'Escape' );
+
+		expect( await patterns.itemTitle.allInnerTexts() ).toEqual( [
+			'Starter',
+			'Berry',
+			'Animal',
+		] );
+
+		// Open view options and switch back to ascending sort.
+		await page.getByRole( 'button', { name: 'View options' } ).click();
+		await page.getByRole( 'radio', { name: 'Sort ascending' } ).click();
+
+		// Close the view options.
+		await page.keyboard.press( 'Escape' );
+
+		expect( await patterns.itemTitle.allInnerTexts() ).toEqual( [
+			'Animal',
+			'Berry',
+			'Starter',
+		] );
+	} );
 } );
 
 class Patterns {
@@ -206,5 +263,8 @@ class Patterns {
 		} );
 		this.itemsList = this.content.locator( '.dataviews-view-grid' );
 		this.item = this.itemsList.locator( '.dataviews-view-grid__card' );
+		this.itemTitle = this.itemsList.locator(
+			'.dataviews-view-grid__title-field'
+		);
 	}
 }

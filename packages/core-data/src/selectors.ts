@@ -5,6 +5,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import type { UndoManager } from '@wordpress/undo-manager';
 import deprecated from '@wordpress/deprecated';
+import type { ConnectionStatus } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -52,6 +53,8 @@ export interface State {
 	registeredPostMeta: Record< string, Object >;
 	editorSettings: Record< string, any > | null;
 	editorAssets: Record< string, any > | null;
+	syncConnectionStatuses?: Record< string, ConnectionStatus >;
+	collaborationSupported: boolean;
 }
 
 type EntityRecordKey = string | number;
@@ -1522,6 +1525,62 @@ export const getRevisions = (
 };
 
 /**
+ * Returns true if a revision has been received for the given set of parameters,
+ * or false otherwise.
+ *
+ * Note: This does not trigger a request for the revision from the API
+ * if it's not available in the local state.
+ *
+ * @param state       State tree
+ * @param kind        Entity kind.
+ * @param name        Entity name.
+ * @param recordKey   The key of the entity record whose revision you want to check.
+ * @param revisionKey The revision's key.
+ * @param query       Optional query.
+ *
+ * @return Whether a revision has been received.
+ */
+export function hasRevision(
+	state: State,
+	kind: string,
+	name: string,
+	recordKey: EntityRecordKey,
+	revisionKey: EntityRecordKey,
+	query?: GetRecordsHttpQuery
+): boolean {
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ];
+	if ( ! queriedState ) {
+		return false;
+	}
+	const context = query?.context ?? 'default';
+
+	if ( ! query || ! query._fields ) {
+		return !! queriedState.itemIsComplete[ context ]?.[ revisionKey ];
+	}
+
+	const item = queriedState.items[ context ]?.[ revisionKey ];
+	if ( ! item ) {
+		return false;
+	}
+
+	const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+	for ( let i = 0; i < fields.length; i++ ) {
+		const path = fields[ i ].split( '.' );
+		let value = item;
+		for ( let p = 0; p < path.length; p++ ) {
+			const part = path[ p ];
+			if ( ! value || ! Object.hasOwn( value, part ) ) {
+				return false;
+			}
+			value = value[ part ];
+		}
+	}
+
+	return true;
+}
+
+/**
  * Returns a single, specific revision of a parent entity.
  *
  * @param state       State tree
@@ -1595,3 +1654,35 @@ export const getRevision = createSelector(
 		];
 	}
 );
+
+/**
+ * Returns the current sync connection status across all entities. Prioritizes
+ * disconnected states, then connecting, then connected.
+ *
+ * @param state Data state.
+ *
+ * @return The current sync connection state, prioritized by importance.
+ */
+export function getSyncConnectionStatus(
+	state: State
+): ConnectionStatus | undefined {
+	if ( ! state.syncConnectionStatuses ) {
+		return undefined;
+	}
+
+	const PRIORITIZED_STATUSES = [ 'disconnected', 'connecting', 'connected' ];
+
+	let coalesced: ConnectionStatus | undefined;
+
+	for ( const status of Object.values( state.syncConnectionStatuses ) ) {
+		if (
+			! coalesced ||
+			PRIORITIZED_STATUSES.indexOf( status.status ) <
+				PRIORITIZED_STATUSES.indexOf( coalesced.status )
+		) {
+			coalesced = status;
+		}
+	}
+
+	return coalesced;
+}

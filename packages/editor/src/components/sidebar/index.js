@@ -63,6 +63,9 @@ const SidebarContent = ( {
 	// underlying slot/fill.
 	const tabsContextValue = useContext( Tabs.Context );
 	const isAttachment = postType === ATTACHMENT_POST_TYPE;
+	const isRevisionsMode = useSelect( ( select ) => {
+		return unlock( select( editorStore ) ).isRevisionsMode();
+	} );
 
 	// This effect addresses a race condition caused by tabbing from the last
 	// block in the editor into the settings sidebar. Without this effect, the
@@ -124,13 +127,17 @@ const SidebarContent = ( {
 							<PostSummary
 								onActionPerformed={ onActionPerformed }
 							/>
-							<PluginDocumentSettingPanel.Slot />
-							<TemplateContentPanel />
-							<TemplatePartContentPanel />
-							<PostTransformPanel />
-							<PostTaxonomiesPanel />
-							<PatternOverridesPanel />
-							{ extraPanels }
+							{ ! isRevisionsMode && (
+								<>
+									<PluginDocumentSettingPanel.Slot />
+									<TemplateContentPanel />
+									<TemplatePartContentPanel />
+									<PostTransformPanel />
+									<PostTaxonomiesPanel />
+									<PatternOverridesPanel />
+									{ extraPanels }
+								</>
+							) }
 						</>
 					) }
 				</Tabs.TabPanel>

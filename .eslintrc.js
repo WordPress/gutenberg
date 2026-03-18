@@ -65,6 +65,11 @@ const restrictedImports = [
 		message:
 			"Please use `clsx` instead. It's a lighter and faster drop-in replacement for `classnames`.",
 	},
+	{
+		name: '@base-ui/react',
+		message:
+			'Avoid using Base UI directly. Consider a new `@wordpress/ui` component instead.',
+	},
 ];
 
 const restrictedSyntax = [
@@ -145,6 +150,7 @@ module.exports = {
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
 		'@wordpress/data-no-store-string-literals': 'error',
+		'@wordpress/use-recommended-components': 'error',
 		'eslint-comments/no-unused-disable': 'error',
 		'import/default': 'error',
 		'import/named': 'error',
@@ -428,8 +434,22 @@ module.exports = {
 		{
 			files: [ 'packages/components/src/**' ],
 			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
-			plugins: [ 'ssr-friendly' ],
-			extends: [ 'plugin:ssr-friendly/recommended' ],
+			rules: {
+				'@wordpress/no-dom-globals-in-module-scope': 'error',
+				'@wordpress/no-dom-globals-in-constructor': 'error',
+				'@wordpress/no-dom-globals-in-react-cc-render': 'error',
+				'@wordpress/no-dom-globals-in-react-fc': 'error',
+			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
+			rules: {
+				// Disallow usage of Design System token CSS custom properties (`--wpds-*`)
+				// because the fallback injection in the build process is not compatible with Emotion files.
+				// Can be removed when there are no more Emotion files in the package.
+				'@wordpress/no-ds-tokens': 'error',
+			},
 		},
 		{
 			files: [
@@ -445,13 +465,12 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'packages/components/src/**', 'packages/ui/src/**' ],
+			files: [ 'packages/components/src/**' ],
 			rules: {
 				'no-restricted-imports': [
 					'error',
-					// The `ariakit` and `framer-motion` APIs are meant to be consumed via
-					// the `@wordpress/components` and @wordpress/ui` packages, hence why
-					// importing those imports should be allowed only in those packages.
+					// The following dependencies are meant to be consumed directly in the
+					// @wordpress/components package, hence why their imports are allowed.
 					{
 						paths: restrictedImports.filter(
 							( { name } ) =>
@@ -459,6 +478,22 @@ module.exports = {
 									'@ariakit/react',
 									'framer-motion',
 								].includes( name )
+						),
+					},
+				],
+			},
+		},
+		{
+			files: [ 'packages/ui/src/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					// The following dependencies are meant to be consumed directly in the
+					// @wordpress/ui package, hence why their imports are allowed.
+					{
+						paths: restrictedImports.filter(
+							( { name } ) =>
+								! [ '@base-ui/react' ].includes( name )
 						),
 					},
 				],
@@ -506,10 +541,35 @@ module.exports = {
 			},
 		},
 		{
+			files: [ 'packages/block-library/src/*/save.[tj]s?(x)' ],
+			rules: {
+				'@wordpress/no-i18n-in-save': 'error',
+			},
+		},
+		{
 			files: [ 'packages/interactivity*/src/**' ],
 			rules: {
 				'react-compiler/react-compiler': 'off',
 				'react/react-in-jsx-scope': 'error',
+			},
+		},
+		{
+			files: [ 'packages/ui/src/**' ],
+			rules: {
+				'@wordpress/dependency-group': [ 'error', 'never' ],
+			},
+		},
+		{
+			files: [ 'packages/eslint-plugin/**', 'packages/theme/**' ],
+			rules: {
+				'@wordpress/no-setting-ds-tokens': 'off',
+				'@wordpress/no-unknown-ds-tokens': 'off',
+			},
+		},
+		{
+			files: [ 'storybook/stories/**' ],
+			rules: {
+				'@wordpress/use-recommended-components': 'off',
 			},
 		},
 	],

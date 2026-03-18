@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import * as Y from 'yjs';
+import { Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies

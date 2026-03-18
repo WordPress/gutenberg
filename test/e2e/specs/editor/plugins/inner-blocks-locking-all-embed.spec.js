@@ -47,13 +47,13 @@ test.describe( 'Embed block inside a locked all parent', () => {
 		await editor.insertBlock( {
 			name: 'test/test-inner-blocks-locking-all-embed',
 		} );
-		await page
+		await editor.canvas
 			.getByRole( 'textbox', { name: 'Embed URL' } )
 			.fill( 'https://twitter.com/wordpress' );
 		await page.keyboard.press( 'Enter' );
 
 		await expect(
-			page.getByRole( 'document', { name: 'Block: X' } )
+			editor.canvas.getByRole( 'document', { name: 'Block: X' } )
 		).toBeVisible();
 	} );
 } );

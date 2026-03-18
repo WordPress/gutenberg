@@ -35,6 +35,7 @@ const mergeConfigs = require( './merge-configs' );
  * @typedef WPRootConfigOptions
  * @property {number}                               port                          The port to use in the development environment.
  * @property {number}                               testsPort                     The port to use in the tests environment.
+ * @property {boolean}                              autoPort                      Whether to automatically select a nearby available HTTP port.
  * @property {Object.<string, string|null>}         lifecycleScripts              The scripts to run at certain points in the command lifecycle.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterStart   The script to run after the "start" command has completed.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterClean   The script to run after the "clean" command has completed.
@@ -51,7 +52,8 @@ const mergeConfigs = require( './merge-configs' );
  * @property {WPSource[]}                themeSources   Themes to load in the environment.
  * @property {number}                    port           The port to use.
  * @property {number}                    mysqlPort      The port to use for MySQL. Random if empty.
- * @property {number}                    phpmyadminPort The port to use for phpMyAdmin. If empty, disabled phpMyAdmin.
+ * @property {boolean}                   phpmyadmin     Whether to enable phpMyAdmin.
+ * @property {number}                    phpmyadminPort The port to use for phpMyAdmin. Random if empty.
  * @property {boolean}                   multisite      Whether to set up a multisite installation.
  * @property {Object}                    config         Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings       Mapping of WordPress directories to local directories which should be mounted.
@@ -88,7 +90,9 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	themes: [],
 	port: 8888,
 	testsPort: 8889,
+	autoPort: false,
 	mysqlPort: null,
+	phpmyadmin: false,
 	phpmyadminPort: null,
 	multisite: false,
 	mappings: {},
@@ -111,22 +115,27 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
  * constructs an object in the format used internally.
  *
  *
- * @param {string} configDirectoryPath A path to the directory we are parsing the config for.
- * @param {string} cacheDirectoryPath  Path to the work directory located in ~/.wp-env.
+ * @param {string}      configDirectoryPath A path to the directory we are parsing the config for.
+ * @param {string}      cacheDirectoryPath  Path to the work directory located in ~/.wp-env.
+ * @param {string|null} customConfigPath    Optional custom config file path.
  *
  * @return {Promise<WPRootConfig>} Parsed config.
  */
-async function parseConfig( configDirectoryPath, cacheDirectoryPath ) {
+async function parseConfig(
+	configDirectoryPath,
+	cacheDirectoryPath,
+	customConfigPath = null
+) {
 	// The local config will be used to override any defaults.
 	const localConfig = await parseConfigFile(
-		getConfigFilePath( configDirectoryPath ),
+		getConfigFilePath( configDirectoryPath, 'local', customConfigPath ),
 		{ cacheDirectoryPath }
 	);
 
 	// Any overrides that can be used in place
 	// of properties set by the local config.
 	const overrideConfig = await parseConfigFile(
-		getConfigFilePath( configDirectoryPath, 'override' ),
+		getConfigFilePath( configDirectoryPath, 'override', customConfigPath ),
 		{ cacheDirectoryPath }
 	);
 
@@ -161,27 +170,37 @@ async function parseConfig( configDirectoryPath, cacheDirectoryPath ) {
 /**
  * Gets the path to the config file.
  *
- * @param {string} configDirectoryPath The path to the directory containing config files.
- * @param {string} type                The type of config file we're interested in: 'local' or 'override'.
+ * @param {string}      configDirectoryPath The path to the directory containing config files.
+ * @param {string}      type                The type of config file we're interested in: 'local' or 'override'.
+ * @param {string|null} customConfigPath    Optional custom config file path (only used for 'local' type).
  *
  * @return {string} The path to the config file.
  */
-function getConfigFilePath( configDirectoryPath, type = 'local' ) {
-	let fileName;
-	switch ( type ) {
-		case 'local': {
-			fileName = '.wp-env.json';
-			break;
-		}
+function getConfigFilePath(
+	configDirectoryPath,
+	type = 'local',
+	customConfigPath = null
+) {
+	// If a custom config path is provided for the local config, use it.
+	if ( type === 'local' && customConfigPath ) {
+		return path.resolve( customConfigPath );
+	}
 
-		case 'override': {
-			fileName = '.wp-env.override.json';
-			break;
-		}
+	// For override, derive from custom config: staging.json -> staging.override.json
+	if ( type === 'override' && customConfigPath ) {
+		const resolved = path.resolve( customConfigPath );
+		const ext = path.extname( resolved );
+		const base = path.basename( resolved, ext );
+		const dir = path.dirname( resolved );
+		return path.join( dir, `${ base }.override${ ext }` );
+	}
 
-		default: {
-			throw new Error( `Invalid config file type "${ type }.` );
-		}
+	// Default behavior.
+	const fileName =
+		type === 'local' ? '.wp-env.json' : '.wp-env.override.json';
+
+	if ( type !== 'local' && type !== 'override' ) {
+		throw new Error( `Invalid config file type "${ type }.` );
 	}
 
 	return path.resolve( configDirectoryPath, fileName );
@@ -235,6 +254,8 @@ async function getDefaultConfig(
 		lifecycleScripts: {
 			afterStart: null,
 			afterClean: null,
+			afterReset: null,
+			afterCleanup: null,
 			afterDestroy: null,
 		},
 		env: {
@@ -289,6 +310,7 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 	if ( overrides.phpmyadminPort ) {
 		overrideConfig.env.development.phpmyadminPort =
 			overrides.phpmyadminPort;
+		overrideConfig.env.development.phpmyadmin = true;
 	}
 
 	if ( overrides.testsPort ) {
@@ -310,6 +332,12 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.phpVersion = overrides.phpVersion;
 		overrideConfig.env.development.phpVersion = overrides.phpVersion;
 		overrideConfig.env.tests.phpVersion = overrides.phpVersion;
+	}
+
+	if ( overrides.multisite ) {
+		overrideConfig.multisite = overrides.multisite;
+		overrideConfig.env.development.multisite = overrides.multisite;
+		overrideConfig.env.tests.multisite = overrides.multisite;
 	}
 
 	return overrideConfig;
@@ -358,6 +386,22 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 	if ( rawConfig.testsPort !== undefined ) {
 		checkPort( configFile, `testsPort`, rawConfig.testsPort );
 		parsedConfig.testsPort = rawConfig.testsPort;
+	}
+	if ( rawConfig.autoPort !== undefined ) {
+		if ( typeof rawConfig.autoPort !== 'boolean' ) {
+			throw new ValidationError(
+				`Invalid ${ configFile }: "autoPort" must be a boolean.`
+			);
+		}
+		parsedConfig.autoPort = rawConfig.autoPort;
+	}
+	if ( rawConfig.testsEnvironment !== undefined ) {
+		if ( typeof rawConfig.testsEnvironment !== 'boolean' ) {
+			throw new ValidationError(
+				`Invalid ${ configFile }: "testsEnvironment" must be a boolean.`
+			);
+		}
+		parsedConfig.testsEnvironment = rawConfig.testsEnvironment;
 	}
 	parsedConfig.lifecycleScripts = {};
 	if ( rawConfig.lifecycleScripts ) {
@@ -436,6 +480,8 @@ async function parseEnvironmentConfig(
 		// configuration options that we will parse.
 		switch ( key ) {
 			case 'testsPort':
+			case 'autoPort':
+			case 'testsEnvironment':
 			case 'lifecycleScripts':
 			case 'env': {
 				if ( options.rootConfig ) {
@@ -464,8 +510,17 @@ async function parseEnvironmentConfig(
 		parsedConfig.mysqlPort = config.mysqlPort;
 	}
 
+	if ( config.phpmyadmin !== undefined ) {
+		parsedConfig.phpmyadmin = config.phpmyadmin;
+	}
+
 	if ( config.phpmyadminPort !== undefined ) {
 		parsedConfig.phpmyadminPort = config.phpmyadminPort;
+		// Backward compat: setting phpmyadminPort implies phpmyadmin: true
+		// unless phpmyadmin was explicitly set.
+		if ( config.phpmyadmin === undefined ) {
+			parsedConfig.phpmyadmin = true;
+		}
 	}
 
 	if ( config.multisite !== undefined ) {

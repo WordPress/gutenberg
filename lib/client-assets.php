@@ -283,7 +283,7 @@ add_action( 'wp_default_styles', 'gutenberg_register_packages_styles', 15 );
  *
  * @since 6.1
  *
- * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/
+ * @link https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/
  *
  * @param array $options {
  *     Optional. An array of options to pass to gutenberg_style_engine_get_stylesheet_from_context(). Default empty array.
@@ -437,6 +437,20 @@ add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_latex_to_mathml_loader' );
 function gutenberg_enqueue_latex_to_mathml_loader() {
 	wp_enqueue_script_module( '@wordpress/latex-to-mathml/loader' );
+}
+
+/**
+ * Enqueue the vips loader script module in the block editor.
+ *
+ * This registers @wordpress/vips/worker as a dynamic dependency in the import map,
+ * enabling on-demand loading of the ~3.8MB WASM-based image processing module
+ * when client-side media processing is triggered via @wordpress/upload-media.
+ *
+ * @see packages/vips/src/loader.ts
+ */
+add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_vips_loader' );
+function gutenberg_enqueue_vips_loader() {
+	wp_enqueue_script_module( '@wordpress/vips/loader' );
 }
 
 add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_core_abilities' );

@@ -5,6 +5,9 @@
  * @package WordPress
  */
 
+require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
+require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
+
 /**
  * Returns the submenu visibility value with backward compatibility
  * for the deprecated openSubmenusOnClick attribute.
@@ -12,32 +15,38 @@
  * This function centralizes the migration logic from the boolean
  * openSubmenusOnClick to the new submenuVisibility enum.
  *
+ * Backward compatibility handling:
+ * - Legacy blocks (saved before migration, never opened in editor):
+ *   Have openSubmenusOnClick in database. Parent Navigation block passes it via context.
+ *   We prioritize openSubmenusOnClick to preserve the original behavior.
+ *
+ * - Migrated blocks (opened in editor after migration):
+ *   JavaScript deprecation removes openSubmenusOnClick and sets submenuVisibility.
+ *   We use submenuVisibility since openSubmenusOnClick is null.
+ *
+ * - New blocks (created after migration):
+ *   Only have submenuVisibility, openSubmenusOnClick is null.
+ *   We use submenuVisibility.
+ *
  * @since 6.9.0
  *
- * @param array $attributes Block attributes containing submenuVisibility and/or openSubmenusOnClick.
+ * @param array $context Block context from parent Navigation block.
  * @return string The visibility mode: 'hover', 'click', or 'always'.
  */
-function block_core_navigation_submenu_get_submenu_visibility( $attributes ) {
-	$submenu_visibility     = isset( $attributes['submenuVisibility'] ) ? $attributes['submenuVisibility'] : null;
-	$open_submenus_on_click = isset( $attributes['openSubmenusOnClick'] ) ? $attributes['openSubmenusOnClick'] : null;
+function block_core_navigation_submenu_get_submenu_visibility( $context ) {
+	$deprecated_open_submenus_on_click = $context['openSubmenusOnClick'] ?? null;
 
-	// If new attribute is set, use it.
-	if ( null !== $submenu_visibility ) {
-		return $submenu_visibility;
+	// For backward compatibility, prioritize the legacy attribute if present. If it has been loaded and saved in the editor, then
+	// the deprecated attribute will be replaced by submenuVisibility.
+	if ( null !== $deprecated_open_submenus_on_click ) {
+		// Convert boolean to string: true -> 'click', false -> 'hover'.
+		return ! empty( $deprecated_open_submenus_on_click ) ? 'click' : 'hover';
 	}
 
-	// Fall back to old attribute for backward compatibility.
-	// openSubmenusOnClick: true  -> 'click'
-	// openSubmenusOnClick: false -> 'hover'
-	// openSubmenusOnClick: null  -> 'hover' (default)
-	return ! empty( $open_submenus_on_click ) ? 'click' : 'hover';
-}
+	$submenu_visibility = $context['submenuVisibility'] ?? null;
 
-// Path differs between source and build: '../navigation-link/shared/helpers.php' in source, './navigation-link/shared/helpers.php' in build.
-if ( file_exists( __DIR__ . '/../navigation-link/shared/helpers.php' ) ) {
-	require_once __DIR__ . '/../navigation-link/shared/helpers.php';
-} else {
-	require_once __DIR__ . '/navigation-link/shared/helpers.php';
+	// Use submenuVisibility for migrated/new blocks.
+	return $submenu_visibility ?? 'hover';
 }
 
 /**
@@ -75,17 +84,6 @@ function block_core_navigation_submenu_build_css_font_sizes( $context ) {
 	}
 
 	return $font_sizes;
-}
-
-/**
- * Returns the top-level submenu SVG chevron icon.
- *
- * @since 5.9.0
- *
- * @return string
- */
-function block_core_navigation_submenu_render_submenu_icon() {
-	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
 
 /**
@@ -236,7 +234,13 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		if ( $show_submenu_indicators && $has_submenu ) {
 			// The submenu icon is rendered in a button here
 			// so that there's a clickable element to open the submenu.
-			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
+			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">';
+			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+				$html .= gutenberg_block_core_shared_navigation_render_submenu_icon();
+			} else {
+				$html .= block_core_shared_navigation_render_submenu_icon();
+			}
+			$html .= '</button>';
 		}
 	} else {
 		$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false">';
@@ -258,7 +262,13 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$html .= '</button>';
 
 		if ( $has_submenu ) {
-			$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_submenu_render_submenu_icon() . '</span>';
+			$html .= '<span class="wp-block-navigation__submenu-icon">';
+			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+				$html .= gutenberg_block_core_shared_navigation_render_submenu_icon();
+			} else {
+				$html .= block_core_shared_navigation_render_submenu_icon();
+			}
+			$html .= '</span>';
 		}
 	}
 

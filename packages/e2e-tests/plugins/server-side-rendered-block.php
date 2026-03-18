@@ -44,7 +44,7 @@ add_action(
 			)
 		);
 
-		// PHP-only block with auto_register flag, will be auto-registered without JS code
+		// PHP-only block with autoRegister flag, will be auto-registered without JS code
 		register_block_type(
 			'test/auto-register-block',
 			array(
@@ -67,8 +67,8 @@ add_action(
 					);
 				},
 				'supports'        => array(
-					'auto_register' => true,
-					'color'         => array(
+					'autoRegister' => true,
+					'color'        => array(
 						'background' => true,
 						'text'       => false,
 					),
@@ -76,7 +76,7 @@ add_action(
 			)
 		);
 
-		// PHP-only block WITHOUT auto_register flag, will NOT be auto-registered without JS code
+		// PHP-only block WITHOUT autoRegister flag, will NOT be auto-registered without JS code
 		register_block_type(
 			'test/php-only-no-auto-register',
 			array(
@@ -85,6 +85,14 @@ add_action(
 					return '<div>PHP-only block content</div>';
 				},
 			)
+		);
+
+		// Add binding support for the auto-register-with-controls block.
+		add_filter(
+			'block_bindings_supported_attributes_test/auto-register-with-controls',
+			static function () {
+				return array( 'title', 'count', 'spacing', 'showEmojis', 'emoji' );
+			}
 		);
 
 		// PHP-only block with auto-generated controls from various attribute types
@@ -162,7 +170,7 @@ add_action(
 					);
 				},
 				'supports'        => array(
-					'auto_register' => true,
+					'autoRegister' => true,
 				),
 			)
 		);

@@ -5,7 +5,7 @@ import { loadView } from '@wordpress/views';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { Type } from '@wordpress/core-data';
-import type { View } from '@wordpress/dataviews';
+import type { View, Filter } from '@wordpress/dataviews';
 
 const DEFAULT_VIEW: View = {
 	type: 'table' as const,
@@ -20,7 +20,15 @@ const DEFAULT_VIEW: View = {
 };
 
 export const DEFAULT_LAYOUTS = {
-	table: {},
+	table: {
+		layout: {
+			styles: {
+				author: {
+					align: 'start' as const,
+				},
+			},
+		},
+	},
 	grid: {},
 	list: {},
 };
@@ -28,99 +36,62 @@ export const DEFAULT_LAYOUTS = {
 export const DEFAULT_VIEWS: {
 	slug: string;
 	label: string;
-	view: View;
 }[] = [
 	{
 		slug: 'all',
 		label: 'All',
-		view: {
-			...DEFAULT_VIEW,
-		},
 	},
 	{
 		slug: 'publish',
 		label: 'Published',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'status',
-					operator: 'is',
-					value: 'publish',
-				},
-			],
-		},
 	},
 	{
 		slug: 'draft',
 		label: 'Draft',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'status',
-					operator: 'is',
-					value: 'draft',
-				},
-			],
-		},
 	},
 	{
 		slug: 'pending',
 		label: 'Pending',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'status',
-					operator: 'is',
-					value: 'pending',
-				},
-			],
-		},
 	},
 	{
 		slug: 'private',
 		label: 'Private',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'status',
-					operator: 'is',
-					value: 'private',
-				},
-			],
-		},
 	},
 	{
 		slug: 'trash',
 		label: 'Trash',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'status',
-					operator: 'is',
-					value: 'trash',
-				},
-			],
-		},
 	},
 ];
 
-export function getDefaultView(
-	postType: Type | undefined,
-	slug?: string
-): View {
-	// Find the view configuration by slug
-	const viewConfig = DEFAULT_VIEWS.find( ( v ) => v.slug === slug );
+type ActiveViewOverrides = {
+	filters?: Filter[];
+	sort?: View[ 'sort' ];
+	layout?: Record< string, unknown >;
+};
 
-	// Use the view from the config if found, otherwise use default
-	const baseView = viewConfig?.view || DEFAULT_VIEW;
-
+export function getActiveViewOverridesForTab(
+	slug: string
+): ActiveViewOverrides {
+	if ( slug === 'all' ) {
+		return {
+			...DEFAULT_LAYOUTS.table,
+		};
+	}
 	return {
-		...baseView,
+		...DEFAULT_LAYOUTS.table,
+		filters: [
+			{
+				field: 'status',
+				operator: 'is',
+				value: slug,
+			},
+		],
+	};
+}
+
+export function getDefaultView( postType: Type | undefined ): View {
+	return {
+		...DEFAULT_VIEW,
 		showLevels: postType?.hierarchical,
 	};
 }
@@ -131,18 +102,19 @@ export async function ensureView(
 	search?: { page?: number; search?: string }
 ) {
 	const postTypeObject = await resolveSelect( coreStore ).getPostType( type );
-	const defaultView = getDefaultView( postTypeObject, slug );
+	const defaultView = getDefaultView( postTypeObject );
 	return loadView( {
 		kind: 'postType',
 		name: type,
-		slug: slug ?? 'all',
+		slug: 'default-new',
 		defaultView,
+		activeViewOverrides: getActiveViewOverridesForTab( slug ?? 'all' ),
 		queryParams: search,
 	} );
 }
 
 export function viewToQuery( view: View, postType: string ) {
-	const result: Record< string, any > = {};
+	const result: Record< string, any > = { _embed: 'author,wp:featuredmedia' };
 
 	// Pagination, sorting, search.
 	if ( undefined !== view.perPage ) {

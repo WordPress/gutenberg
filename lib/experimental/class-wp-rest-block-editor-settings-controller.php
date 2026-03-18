@@ -437,6 +437,9 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 		 *
 		 * @since Gutenberg 5.8.0
 		 *
+		 * @global WP_Scripts $wp_scripts WordPress scripts objects.
+		 * @global WP_Styles  $wp_styles  WordPress styles objects.
+		 *
 		 * @param array $html_templates Optional. Array of HTML template strings.
 		 * @return array Structured asset data.
 		 */

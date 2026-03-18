@@ -26,7 +26,7 @@ This separation allows the design system to maintain consistency while providing
 
 Design tokens are the visual design atoms of a design system. They are named entities that store visual design attributes like colors, spacing, typography, and shadows. They serve as a single source of truth that bridges design and development, ensuring consistency across platforms and making it easy to maintain and evolve the visual language of an application.
 
-Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-bg-interactive-brand-strong` or `--wpds-dimension-padding-surface-md` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
+Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-bg-interactive-brand-strong` or `--wpds-dimension-padding-2xl` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
 
 #### Structure
 
@@ -89,7 +89,7 @@ Semantic tokens follow a consistent naming pattern:
 
 | Value                               | Description          |
 | ----------------------------------- | -------------------- |
-| `2xs`, `xs`, `sm`, `md`, `lg`, `xl` | Size scale modifiers |
+| `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl` | Size scale modifiers |
 
 #### Color Token Modifiers
 
@@ -204,11 +204,13 @@ This package provides Stylelint plugins to help enforce consistent usage of desi
 {
 	"plugins": [
 		"@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens",
-		"@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties"
+		"@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties",
+		"@wordpress/theme/stylelint-plugins/no-token-fallback-values"
 	],
 	"rules": {
 		"plugin-wpds/no-unknown-ds-tokens": true,
-		"plugin-wpds/no-setting-wpds-custom-properties": true
+		"plugin-wpds/no-setting-wpds-custom-properties": true,
+		"plugin-wpds/no-token-fallback-values": true
 	}
 }
 ```
@@ -248,6 +250,84 @@ This rule reports an error when a CSS declaration sets (defines) a custom proper
 .example {
 	--my-custom-token: red;
 }
+```
+
+### `plugin-wpds/no-token-fallback-values`
+
+This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. Fallback values for design tokens are injected automatically at build time by the [build plugins](#build-plugins), so manual fallbacks in source are redundant and can drift out of sync with the token definitions.
+
+```css
+/* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-fg-content-neutral' */
+.example {
+	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
+}
+
+/* ✓ OK */
+.example {
+	color: var(--wpds-color-fg-content-neutral);
+}
+
+/* ✓ OK: Non-wpds custom properties are not checked */
+.example {
+	color: var(--my-custom-color, red);
+}
+```
+
+## Build Plugins
+
+This package provides build plugins that inject fallback values into bare `var(--wpds-*)` references at build time. This ensures components render correctly even when a `ThemeProvider` or design tokens stylesheet is not present — for example, `var(--wpds-color-fg-content-neutral)` becomes `var(--wpds-color-fg-content-neutral, #1e1e1e)`.
+
+`@wordpress/build` already applies these plugins automatically when `@wordpress/theme` is installed. You only need to configure them manually for custom build setups.
+
+Three plugin variants are available, covering common build tool setups:
+
+| Export                                                            | Tool    | Scope |
+| ----------------------------------------------------------------- | ------- | ----- |
+| `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks`     | PostCSS | CSS   |
+| `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`     | esbuild | JS/TS |
+| `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`           | Vite    | JS/TS |
+
+All three plugins skip files that don't contain `--wpds-` references, so there is zero overhead on unrelated modules.
+
+### PostCSS
+
+```js
+// postcss.config.mjs
+import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
+
+export default {
+	plugins: [ dsTokenFallbacks ],
+};
+```
+
+### esbuild
+
+```js
+import dsTokenFallbacks from '@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks';
+
+await esbuild.build( {
+	plugins: [ dsTokenFallbacks ],
+	// …
+} );
+```
+
+### Vite
+
+The Vite setup uses both the Vite plugin (for JS/TS) and the PostCSS plugin (for CSS):
+
+```ts
+// vite.config.ts
+import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
+import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
+
+export default defineConfig( {
+	plugins: [ dsTokenFallbacksJs() ],
+	css: {
+		postcss: {
+			plugins: [ dsTokenFallbacks ],
+		},
+	},
+} );
 ```
 
 ## Contributing to this package

@@ -27,6 +27,21 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 		{
 			code: '<div style={ { color: `var(--wpds-color-fg-content-neutral)` } } />',
 		},
+		{
+			code: `const token = 'var(--wpds-color-fg-content-neutral)';`,
+		},
+		{
+			code: `const name = 'something--wpds-color';`,
+		},
+		{
+			code: '`${ prefix }: var(--wpds-color-fg-content-neutral)`',
+		},
+		{
+			code: '`var(--wpds-color-fg-content-neutral) ${ suffix }`',
+		},
+		{
+			code: `const style = { '--wpds-color-fg-content-neutral': 'red' };`,
+		},
 	],
 	invalid: [
 		{
@@ -34,6 +49,9 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 			errors: [
 				{
 					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames: "'--wpds-nonexistent-token'",
+					},
 				},
 			],
 		},
@@ -53,6 +71,132 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 			errors: [
 				{
 					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames: "'--wpds-nonexistent'",
+					},
+				},
+			],
+		},
+		{
+			code: `const token = 'var(--wpds-nonexistent-token)';`,
+			errors: [
+				{
+					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames: "'--wpds-nonexistent-token'",
+					},
+				},
+			],
+		},
+		{
+			code: 'const token = `var(--wpds-nonexistent-token)`;',
+			errors: [
+				{
+					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames: "'--wpds-nonexistent-token'",
+					},
+				},
+			],
+		},
+		{
+			code: 'const token = `var(--wpds-dimension-gap-${ size })`;',
+			errors: [
+				{
+					messageId: 'dynamicToken',
+				},
+			],
+		},
+		{
+			code: '<div style={ { gap: `var(--wpds-dimension-gap-${ size })` } } />',
+			errors: [
+				{
+					messageId: 'dynamicToken',
+				},
+			],
+		},
+		{
+			code: `const token = '--wpds-nonexistent-token';`,
+			errors: [
+				{
+					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames: "'--wpds-nonexistent-token'",
+					},
+				},
+			],
+		},
+		{
+			code: 'const style = `--wpds-dimension-gap-${ size }`;',
+			errors: [
+				{
+					messageId: 'dynamicToken',
+				},
+			],
+		},
+		{
+			code: '`${ prefix }: var(--wpds-nonexistent-token)`',
+			errors: [
+				{
+					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames: "'--wpds-nonexistent-token'",
+					},
+				},
+			],
+		},
+		{
+			code: `const token = '--wpds-color-fg-content-neutral';`,
+			errors: [
+				{
+					messageId: 'bareToken',
+					data: {
+						tokenNames: "'--wpds-color-fg-content-neutral'",
+					},
+				},
+			],
+		},
+		{
+			code: 'const token = `--wpds-color-fg-content-neutral`;',
+			errors: [
+				{
+					messageId: 'bareToken',
+					data: {
+						tokenNames: "'--wpds-color-fg-content-neutral'",
+					},
+				},
+			],
+		},
+		{
+			code: '<div style={ { gap: `--wpds-color-fg-content-neutral` } } />',
+			errors: [
+				{
+					messageId: 'bareToken',
+					data: {
+						tokenNames: "'--wpds-color-fg-content-neutral'",
+					},
+				},
+			],
+		},
+		{
+			code: '`${ prefix }: --wpds-color-fg-content-neutral`',
+			errors: [
+				{
+					messageId: 'bareToken',
+					data: {
+						tokenNames: "'--wpds-color-fg-content-neutral'",
+					},
+				},
+			],
+		},
+		{
+			code: '`var(--wpds-color-fg-content-neutral) --wpds-color-fg-content-neutral ${ x }`',
+			errors: [
+				{
+					messageId: 'bareToken',
+					data: {
+						tokenNames: "'--wpds-color-fg-content-neutral'",
+					},
 				},
 			],
 		},

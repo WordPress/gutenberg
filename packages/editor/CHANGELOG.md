@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fixed avatar contrast ring not displaying over loaded images by using a `::after` pseudo-element instead of an inset `box-shadow`.
+
+## 14.41.0 (2026-03-04)
+
+## 14.40.0 (2026-02-18)
+
+## 14.39.0 (2026-01-29)
+
 ## 14.38.0 (2026-01-16)
 
 ## 14.36.0 (2025-11-26)

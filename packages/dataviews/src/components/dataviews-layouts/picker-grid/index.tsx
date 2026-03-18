@@ -145,7 +145,7 @@ function GridItem< Item >( {
 					</div>
 				</Stack>
 			) }
-			<Stack direction="column" gap="2xs">
+			<Stack direction="column" gap="xs">
 				{ showDescription && descriptionField?.render && (
 					<descriptionField.render
 						item={ item }
@@ -156,7 +156,7 @@ function GridItem< Item >( {
 					<Stack
 						direction="row"
 						className="dataviews-view-picker-grid__badge-fields"
-						gap="xs"
+						gap="sm"
 						wrap="wrap"
 						align="top"
 						justify="flex-start"
@@ -180,7 +180,7 @@ function GridItem< Item >( {
 					<Stack
 						direction="column"
 						className="dataviews-view-picker-grid__fields"
-						gap="2xs"
+						gap="xs"
 					>
 						{ regularFields.map( ( field ) => {
 							return (
@@ -236,7 +236,7 @@ function GridGroup< Item >( {
 		<Stack
 			direction="column"
 			key={ groupName }
-			gap="xs"
+			gap="sm"
 			role="group"
 			aria-labelledby={ headerId }
 		>
@@ -336,13 +336,20 @@ function ViewPickerGrid< Item >( {
 						aria-multiselectable={ isMultiselect }
 						className={ clsx(
 							'dataviews-view-picker-grid',
-							className
+							className,
+							{
+								[ `has-${ view.layout?.density }-density` ]:
+									view.layout?.density &&
+									[ 'compact', 'comfortable' ].includes(
+										view.layout.density
+									),
+							}
 						) }
 						aria-label={ itemListLabel }
 						render={ ( { children, ...props } ) => (
 							<Stack
 								direction="column"
-								gap="md"
+								gap="lg"
 								children={ children }
 								{ ...props }
 							/>
@@ -421,7 +428,15 @@ function ViewPickerGrid< Item >( {
 							<GridItems
 								className={ clsx(
 									'dataviews-view-picker-grid',
-									className
+									className,
+									{
+										[ `has-${ view.layout?.density }-density` ]:
+											view.layout?.density &&
+											[
+												'compact',
+												'comfortable',
+											].includes( view.layout.density ),
+									}
 								) }
 								previewSize={ usedPreviewSize }
 								aria-busy={ isLoading }

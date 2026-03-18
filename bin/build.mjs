@@ -97,6 +97,13 @@ async function build() {
 			{ silent: true }
 		);
 
+		// Step 2.5: Generate worker placeholders
+		// This must happen before TypeScript compilation because some packages
+		// (like vips) have source files that import from generated worker-code.ts
+		await exec( 'node', [
+			'./bin/packages/generate-worker-placeholders.mjs',
+		] );
+
 		if ( ! skipTypes ) {
 			// Step 3: Validate TypeScript version
 			console.log( '\n🔍 Validating TypeScript version...' );

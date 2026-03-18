@@ -31,7 +31,7 @@ export const CustomSelectContext =
 CustomSelectContext.displayName = 'CustomSelectContext';
 
 function defaultRenderSelectedValue(
-	value: CustomSelectButtonProps[ 'value' ]
+	value: CustomSelectButtonProps[ 'defaultValue' ]
 ) {
 	const isValueEmpty = Array.isArray( value )
 		? value.length === 0

@@ -33,10 +33,9 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		// To do: run with iframe.
-		await editor.switchToLegacyCanvas();
-
-		await page.locator( 'role=button[name="Add default block"i]' ).click();
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'Cut - collapsed selection' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
@@ -44,7 +43,6 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+x' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
-		await pageUtils.pressKeys( 'Tab' );
 		await page.keyboard.press( 'ArrowDown' );
 		await pageUtils.pressKeys( 'primary+v' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();

@@ -14,6 +14,10 @@ process.env.TZ = 'UTC';
 module.exports = {
 	rootDir: '../../',
 	moduleNameMapper: {
+		// Mock @wordpress/vips/worker before the general pattern so it doesn't try to load the real file.
+		// The worker-code.ts file is auto-generated during full builds and is gitignored.
+		'@wordpress/vips/worker':
+			'<rootDir>/test/unit/config/vips-worker-code-stub.js',
 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
 			'packages/$1/src',
 		'@wordpress/theme/design-tokens.js':
@@ -49,7 +53,7 @@ module.exports = {
 		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	transformIgnorePatterns: [
-		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js)/)',
+		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx)/)',
 		'\\.pnp\\.[^\\/]+$',
 	],
 	snapshotSerializers: [

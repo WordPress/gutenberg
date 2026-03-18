@@ -25,6 +25,10 @@ const meta: Meta< typeof FormFileUpload > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

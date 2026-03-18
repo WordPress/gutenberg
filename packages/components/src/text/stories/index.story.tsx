@@ -30,6 +30,11 @@ const meta: Meta< typeof Text > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Values are not aligned with the current design system. Use [typography tokens](?path=/docs/tokens-typography--page) from `@wordpress/base-styles` instead.',
+		},
 	},
 };
 export default meta;

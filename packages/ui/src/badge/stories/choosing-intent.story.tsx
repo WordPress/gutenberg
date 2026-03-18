@@ -7,7 +7,7 @@ const meta: Meta< typeof Badge > = {
 	component: Badge,
 	decorators: [
 		( Story ) => (
-			<Stack direction="row" gap="xs" wrap="wrap">
+			<Stack direction="row" gap="sm" wrap="wrap">
 				<Story />
 			</Stack>
 		),
