@@ -4,6 +4,67 @@
 import { pipe } from '@wordpress/compose';
 
 /**
+ * Strips a leading `language-` prefix from a language identifier and removes
+ * any whitespace, normalising it to a plain class-token-safe string.
+ *
+ * @param {string} value Raw language input.
+ * @return {string} Sanitized language slug.
+ */
+export function sanitizeLanguage( value ) {
+	return value
+		.trim()
+		.replace( /^language-/i, '' )
+		.replace( /\s+/g, '' );
+}
+
+/**
+ * Returns the HTML string representation of a RichTextData object or plain
+ * string, preserving whitespace (newlines are kept as-is, not as <br>).
+ *
+ * @param {string|Object} value A plain string or RichTextData object.
+ * @return {string} HTML string.
+ */
+export function toHTMLStr( value ) {
+	if ( typeof value === 'string' ) {
+		return value;
+	}
+	return value?.toHTMLString?.( { preserveWhiteSpace: true } ) ?? '';
+}
+
+/**
+ * Parses a Markdown fenced code opening (3 backticks + language) from a
+ * content value.
+ * By default, this only matches a complete opening line ending in a newline.
+ *
+ * @param {string|Object} value                    RichTextData or plain string content.
+ * @param {Object}        options                  Parsing options.
+ * @param {boolean}       options.allowEndOfString Whether to accept end-of-string
+ *                                                 instead of a trailing newline.
+ * @return {Object|null} Parsed result with `content` and `language`, or null.
+ */
+export function parseFencedCode( value, { allowEndOfString = false } = {} ) {
+	const htmlString = toHTMLStr( value );
+	const openingFenceRegExp = allowEndOfString
+		? /^```([^\s`]+)[ \t]*(?:\r?\n|$)/
+		: /^```([^\s`]+)[ \t]*\r?\n/;
+	const openingFenceMatch = htmlString.match( openingFenceRegExp );
+	if ( ! openingFenceMatch ) {
+		return null;
+	}
+
+	const parsedLanguage = sanitizeLanguage( openingFenceMatch[ 1 ] );
+	let parsedContent = htmlString.slice( openingFenceMatch[ 0 ].length );
+
+	// Strip a trailing closing fence if present.
+	parsedContent = parsedContent.replace( /\r?\n```[ \t]*$/, '' );
+
+	return {
+		content: parsedContent,
+		language: parsedLanguage,
+	};
+}
+
+/**
  * Escapes ampersands, shortcodes, and links.
  *
  * @param {string} content The content of a code block.

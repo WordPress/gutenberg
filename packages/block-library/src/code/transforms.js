@@ -8,6 +8,7 @@ import { create, toHTMLString } from '@wordpress/rich-text';
  * Internal dependencies
  */
 import { getTransformedAttributes } from '../utils/get-transformed-attributes';
+import { parseFencedCode } from './utils';
 
 const transforms = {
 	from: [
@@ -21,6 +22,15 @@ const transforms = {
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) => {
 				const { content } = attributes;
+				const parsedFencedCode = parseFencedCode( content, {
+					allowEndOfString: true,
+				} );
+				if ( parsedFencedCode ) {
+					return createBlock( 'core/code', {
+						...getTransformedAttributes( attributes, 'core/code' ),
+						...parsedFencedCode,
+					} );
+				}
 				return createBlock( 'core/code', {
 					...attributes,
 					...getTransformedAttributes( attributes, 'core/code' ),
@@ -48,10 +58,29 @@ const transforms = {
 				node.nodeName === 'PRE' &&
 				node.children.length === 1 &&
 				node.firstChild.nodeName === 'CODE',
+			transform: ( node ) => {
+				const codeElement = node.firstChild;
+				const className = codeElement.getAttribute( 'class' ) || '';
+				const classNames = className.split( /\s+/ );
+				const languageClass = classNames.find( ( token ) =>
+					token.startsWith( 'language-' )
+				);
+				const language = languageClass
+					? languageClass.slice( 'language-'.length )
+					: '';
+
+				return createBlock( 'core/code', {
+					content: toHTMLString( {
+						value: create( { html: codeElement.innerHTML } ),
+					} ),
+					language,
+				} );
+			},
 			schema: {
 				pre: {
 					children: {
 						code: {
+							attributes: [ 'class' ],
 							children: {
 								'#text': {},
 							},
