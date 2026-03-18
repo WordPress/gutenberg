@@ -5,43 +5,61 @@
 	height: 100%;
 	display: flex;
 	flex-direction: column;
+	overflow: hidden;
 }
 
-.navigation-canvas__toolbar {
-	padding: 12px 24px;
-	width: 100%;
-	// HStack handles centering; ensure the toolbar row doesn't stretch the toggle.
-	flex-shrink: 0;
-}
+.navigation-canvas__frame {
+	overflow: hidden;
 
-// Make the dropdown trigger look compact and select-like rather than full-width.
-.navigation-canvas__mode-toggle.components-button {
-	min-width: 240px;
-	height: 36px;
-	border: 1px solid $gray-400;
-	border-radius: 2px;
-	padding: 0 8px;
-	background: #fff;
-	display: grid;
-	grid-template-columns: 1fr auto;
-	align-items: center;
-	text-align: left;
+	&--preview {
+		flex: 0 0 40%;
+		border-bottom: 1px solid $gray-900;
+	}
 
-	&:hover {
-		border-color: $gray-700;
+	&--dataviews {
+		flex: 1;
+		min-height: 0;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
 	}
 }
 
-.navigation-canvas__divider {
-	border: none;
-	border-top: 1px solid $gray-200;
-	margin: 0;
+.navigation-canvas__tabs {
+	display: flex;
+	flex-shrink: 0;
+	border-bottom: 1px solid $gray-200;
+	padding: 0 16px;
+	gap: 0;
+	margin-top: 16px;
 }
 
-.navigation-canvas__preview {
+.navigation-canvas__tab {
+	all: unset;
+	cursor: pointer;
+	padding: 12px 12px;
+	font-size: 13px;
+	color: $gray-700;
+	border-bottom: 2px solid transparent;
+	margin-bottom: -1px;
+	white-space: nowrap;
+
+	&:hover {
+		color: $gray-900;
+	}
+
+	&.is-active {
+		color: var(--wp-admin-theme-color, #3858e9);
+		border-bottom-color: var(--wp-admin-theme-color, #3858e9);
+		font-weight: 500;
+	}
+}
+
+.navigation-canvas__dataviews-scroll {
 	flex: 1;
 	min-height: 0;
-	padding-top: 24px;
+	overflow-y: auto;
+	padding-top: 16px;
 }
 
 .navigation-canvas__preview-wrap {
@@ -49,24 +67,17 @@
 	height: 100%;
 }
 
-
-.navigation-canvas__dataviews {
-	flex: 1;
-	min-height: 0;
-	padding-top: 24px;
-}
-
 // When preview size is at maximum, override DataViews' inline gridTemplateColumns
 // to force a single full-width column. The !important is necessary because
 // DataViews sets grid-template-columns as an inline style.
-.navigation-canvas__dataviews--full-width .dataviews-view-grid__row {
+.navigation-canvas__frame--full-width .dataviews-view-grid__row {
 	/* stylelint-disable-next-line declaration-no-important -- DataViews sets grid-template-columns as an inline style, so !important is required to override it. */
 	grid-template-columns: 1fr !important;
 }
 
 // Remove the forced square aspect ratio so the preview fits its content height.
 // The !important overrides inline/specificity from dataviews grid styles.
-.navigation-canvas__dataviews--full-width .dataviews-view-grid__media {
+.navigation-canvas__frame--full-width .dataviews-view-grid__media {
 	/* stylelint-disable-next-line declaration-no-important -- Overrides aspect-ratio: 1/1 set by DataViews grid styles. */
 	aspect-ratio: unset !important;
 	/* stylelint-disable-next-line declaration-no-important -- Overrides height: 100% set by DataViews grid styles. */
@@ -74,7 +85,7 @@
 	max-height: 300px;
 }
 
-.navigation-canvas__dataviews--full-width .lazy-editor-block-preview__container,
-.navigation-canvas__dataviews--full-width .lazy-editor-block-preview__container .block-editor-block-preview__container {
+.navigation-canvas__frame--full-width .lazy-editor-block-preview__container,
+.navigation-canvas__frame--full-width .lazy-editor-block-preview__container .block-editor-block-preview__container {
 	height: auto;
 }

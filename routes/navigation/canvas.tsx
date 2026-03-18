@@ -3,16 +3,13 @@
  * WordPress dependencies
  */
 import { useNavigate, useSearch } from '@wordpress/route';
-import { createElement, Fragment, useMemo, useState } from '@wordpress/element';
+import { createElement, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Preview, Editor, useEditorAssets } from '@wordpress/lazy-editor';
 import {
-	DropdownMenu,
 	__experimentalHStack as HStack,
 	Icon,
-	MenuGroup,
-	MenuItem,
 	Spinner,
 } from '@wordpress/components';
 import {
@@ -20,7 +17,6 @@ import {
 	getTemplatePartIcon,
 } from '@wordpress/editor';
 import type { WpTemplatePart } from '@wordpress/core-data';
-import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -47,6 +43,15 @@ const NAVIGATION_POST_TYPE = 'wp_navigation';
 const LAYOUT_GRID = 'grid';
 const MAX_PREVIEW_SIZE = 430;
 
+const AREA_TABS = [
+	{ id: 'all', label: __( 'All Template Parts' ) },
+	{ id: 'header', label: __( 'Headers' ) },
+	{ id: 'footer', label: __( 'Footers' ) },
+	{ id: 'sidebar', label: __( 'Sidebars' ) },
+	{ id: 'navigation-overlay', label: __( 'Overlays' ) },
+	{ id: 'uncategorized', label: __( 'General' ) },
+] as const;
+
 const DEFAULT_VIEW = {
 	type: LAYOUT_GRID as const,
 	perPage: 20,
@@ -60,29 +65,23 @@ const DEFAULT_LAYOUTS = {
 	[ LAYOUT_GRID ]: {},
 };
 
-const MODE_NAVIGATION = 'navigation';
-const MODE_ALL = 'all';
-
-const STATIC_AREAS = [
-	{ value: 'header', label: __( 'Header' ) },
-	{ value: 'footer', label: __( 'Footer' ) },
-	{ value: 'sidebar', label: __( 'Panel' ) },
-	{ value: 'navigation-overlay', label: __( 'Navigation Overlay' ) },
-	{ value: 'uncategorized', label: __( 'General' ) },
-] as const;
-
 const previewField = {
 	label: __( 'Preview' ),
 	id: 'preview',
-	render: ( { item }: { item: WpTemplatePart } ) => {
-		return (
-			<Preview
-				content={ item?.content?.raw }
-				blocks={ item?.blocks }
-				description={ item.description }
-			/>
-		);
-	},
+	render: ( { item }: { item: WpTemplatePart } ) => (
+		<Preview
+			content={ item?.content?.raw }
+			blocks={ item?.blocks }
+			description={ item.description }
+		/>
+	),
+	enableSorting: false,
+};
+
+const areaField = {
+	id: 'area',
+	label: __( 'Area' ),
+	getValue: ( { item }: { item: WpTemplatePart } ) => item.area,
 	enableSorting: false,
 };
 
@@ -149,7 +148,6 @@ function Canvas() {
 	const searchParams = useSearch( { strict: false } );
 	const navigate = useNavigate();
 
-	const canvasMode = ( searchParams as any ).canvas ?? MODE_ALL;
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 
 	const navigationId = useMemo( () => {
@@ -166,43 +164,35 @@ function Canvas() {
 	const { templateParts, isResolving: isResolvingParts } =
 		useMenuUsedInTemplateParts( navigationId );
 
-	// Track which areas have at least one matching template part.
-	const usedAreas = useMemo( () => {
-		const areas = new Set< string >();
-		for ( const part of templateParts as WpTemplatePart[] ) {
-			if ( part.area ) {
-				areas.add( part.area );
-			}
-		}
-		return areas;
-	}, [ templateParts ] );
+	const fields = useMemo( () => [ previewField, titleField, areaField ], [] );
 
-	let currentLabel: string;
-	if ( canvasMode === MODE_NAVIGATION ) {
-		currentLabel = __( 'Navigation Preview' );
-	} else if ( canvasMode === MODE_ALL ) {
-		currentLabel = __( 'All Template Parts' );
-	} else {
-		currentLabel =
-			STATIC_AREAS.find( ( a ) => a.value === canvasMode )?.label ??
-			canvasMode;
+	const activeTab = useMemo( () => {
+		const areaFilter = view.filters?.find(
+			( f: { field: string } ) => f.field === 'area'
+		) as { value?: string[] } | undefined;
+		return areaFilter?.value?.[ 0 ] ?? 'all';
+	}, [ view.filters ] );
+
+	function selectTab( tabId: string ) {
+		setView( ( prev ) => ( {
+			...prev,
+			page: 1,
+			filters:
+				tabId === 'all'
+					? []
+					: [
+							{
+								field: 'area',
+								operator: 'isAny',
+								value: [ tabId ],
+							},
+					  ],
+		} ) );
 	}
 
-	// Filter template parts for the DataViews based on the selected mode.
-	const visibleTemplateParts = useMemo( () => {
-		if ( canvasMode === MODE_ALL || canvasMode === MODE_NAVIGATION ) {
-			return templateParts;
-		}
-		return ( templateParts as WpTemplatePart[] ).filter(
-			( part ) => part.area === canvasMode
-		);
-	}, [ templateParts, canvasMode ] );
-
-	const fields = useMemo( () => [ previewField, titleField ], [] );
-
 	const { data, paginationInfo } = useMemo(
-		() => filterSortAndPaginate( visibleTemplateParts, view, fields ),
-		[ visibleTemplateParts, view, fields ]
+		() => filterSortAndPaginate( templateParts, view, fields ),
+		[ templateParts, view, fields ]
 	);
 
 	if ( ! navigationId ) {
@@ -211,96 +201,40 @@ function Canvas() {
 
 	return (
 		<div className="navigation-canvas">
-			<HStack
-				justify="center"
-				alignment="center"
-				className="navigation-canvas__toolbar"
+			<div className="navigation-canvas__frame navigation-canvas__frame--preview">
+				<NavigationPreview navigationId={ navigationId } />
+			</div>
+
+			<div
+				className={
+					( view.layout as { previewSize?: number } )?.previewSize >=
+					MAX_PREVIEW_SIZE
+						? 'navigation-canvas__frame navigation-canvas__frame--dataviews navigation-canvas__frame--full-width'
+						: 'navigation-canvas__frame navigation-canvas__frame--dataviews'
+				}
 			>
-				<DropdownMenu
-					label={ currentLabel }
-					text={ currentLabel }
-					icon={ chevronDown }
-					toggleProps={ {
-						iconPosition: 'right',
-						className: 'navigation-canvas__mode-toggle',
-						showTooltip: false,
-					} }
-				>
-					{ ( { onClose } ) => (
-						<Fragment>
-							<MenuGroup>
-								<MenuItem
-									isSelected={ canvasMode === MODE_ALL }
-									onClick={ () => {
-										navigate( {
-											search: {
-												...searchParams,
-												canvas: MODE_ALL,
-											},
-										} );
-										onClose();
-									} }
-								>
-									{ __( 'All Template Parts' ) }
-								</MenuItem>
-								{ STATIC_AREAS.map( ( { value, label } ) => (
-									<MenuItem
-										key={ value }
-										icon={ getTemplatePartIcon( value ) }
-										isSelected={ canvasMode === value }
-										disabled={ ! usedAreas.has( value ) }
-										onClick={ () => {
-											navigate( {
-												search: {
-													...searchParams,
-													canvas: value,
-												},
-											} );
-											onClose();
-										} }
-									>
-										{ label }
-									</MenuItem>
-								) ) }
-							</MenuGroup>
-							<MenuGroup>
-								<MenuItem
-									isSelected={
-										canvasMode === MODE_NAVIGATION
-									}
-									onClick={ () => {
-										navigate( {
-											search: {
-												...searchParams,
-												canvas: MODE_NAVIGATION,
-											},
-										} );
-										onClose();
-									} }
-								>
-									{ __( 'Navigation Preview' ) }
-								</MenuItem>
-							</MenuGroup>
-						</Fragment>
-					) }
-				</DropdownMenu>
-			</HStack>
-
-			<hr className="navigation-canvas__divider" />
-
-			{ canvasMode === MODE_NAVIGATION ? (
-				<div className="navigation-canvas__preview">
-					<NavigationPreview navigationId={ navigationId } />
-				</div>
-			) : (
 				<div
-					className={
-						( view.layout as { previewSize?: number } )
-							?.previewSize >= MAX_PREVIEW_SIZE
-							? 'navigation-canvas__dataviews navigation-canvas__dataviews--full-width'
-							: 'navigation-canvas__dataviews'
-					}
+					className="navigation-canvas__tabs"
+					role="tablist"
+					aria-label={ __( 'Filter template parts by area' ) }
 				>
+					{ AREA_TABS.map( ( tab ) => (
+						<button
+							key={ tab.id }
+							role="tab"
+							aria-selected={ activeTab === tab.id }
+							className={
+								activeTab === tab.id
+									? 'navigation-canvas__tab is-active'
+									: 'navigation-canvas__tab'
+							}
+							onClick={ () => selectTab( tab.id ) }
+						>
+							{ tab.label }
+						</button>
+					) ) }
+				</div>
+				<div className="navigation-canvas__dataviews-scroll">
 					<DataViews
 						paginationInfo={ paginationInfo }
 						fields={ fields }
@@ -321,7 +255,7 @@ function Canvas() {
 						<DataViews.Footer />
 					</DataViews>
 				</div>
-			) }
+			</div>
 		</div>
 	);
 }
