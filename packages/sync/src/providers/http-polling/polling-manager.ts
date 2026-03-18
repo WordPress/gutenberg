@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { applyFilters } from '@wordpress/hooks';
+
+/**
  * External dependencies
  */
 import * as Y from 'yjs';
@@ -12,6 +17,7 @@ import * as syncProtocol from 'y-protocols/sync';
  * Internal dependencies
  */
 import {
+	DEFAULT_CLIENT_LIMIT_PER_ROOM,
 	MAX_ERROR_BACKOFF_IN_MS,
 	MAX_UPDATE_SIZE_IN_BYTES,
 	POLLING_INTERVAL_IN_MS,
@@ -32,6 +38,7 @@ import {
 	base64ToUint8Array,
 	createSyncUpdate,
 	createUpdateQueue,
+	intValueOrDefault,
 	postSyncUpdate,
 	postSyncUpdateNonBlocking,
 } from './utils';
@@ -59,11 +66,13 @@ interface RoomState {
 	clientId: number;
 	createCompactionUpdate: () => SyncUpdate;
 	endCursor: number;
+	enforceConnectionLimit: boolean;
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
 	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
+	room: string;
 	unregister: () => void;
 	updateQueue: UpdateQueue;
 }
@@ -247,6 +256,49 @@ function processDocUpdate(
 	}
 }
 
+/**
+ * Check whether the awareness state exceeds the configured connection limit.
+ *
+ * @param awareness The awareness state from the server response.
+ * @param roomState The room state corresponding to the awareness state
+ * @return True if a peer limit has been exceeded.
+ */
+function checkConnectionLimit(
+	awareness: AwarenessState,
+	roomState: RoomState
+): boolean {
+	if ( ! roomState.enforceConnectionLimit ) {
+		return false;
+	}
+
+	// Limits are only enforced on the initial connection.
+	roomState.enforceConnectionLimit = false;
+
+	const maxClientsPerRoom = applyFilters(
+		'sync.pollingProvider.maxClientsPerRoom',
+		DEFAULT_CLIENT_LIMIT_PER_ROOM,
+		roomState.room
+	);
+
+	const clientCount = Object.keys( awareness ).length;
+	const validatedLimit = intValueOrDefault(
+		maxClientsPerRoom,
+		DEFAULT_CLIENT_LIMIT_PER_ROOM
+	);
+
+	if ( clientCount > validatedLimit ) {
+		roomState.log( 'Connection limit exceeded', {
+			clientCount,
+			maxClientsPerRoom: validatedLimit,
+			room: roomState.room,
+		} );
+
+		return true;
+	}
+
+	return false;
+}
+
 let areListenersRegistered = false;
 let hasCollaborators = false;
 let isActiveBrowser = 'visible' === document.visibilityState;
@@ -374,6 +426,19 @@ function poll(): void {
 				const roomState = roomStates.get( room.room )!;
 				roomState.endCursor = room.end_cursor;
 
+				// If a limit is exceeded, disconnect immediately without processing updates.
+				if ( checkConnectionLimit( room.awareness, roomState ) ) {
+					roomState.onStatusChange( {
+						status: 'disconnected',
+						error: new ConnectionError(
+							ConnectionErrorCode.CONNECTION_LIMIT_EXCEEDED,
+							'Connection limit exceeded'
+						),
+					} );
+					unregisterRoom( room.room );
+					return;
+				}
+
 				// Process awareness update.
 				roomState.processAwarenessUpdate( room.awareness );
 
@@ -480,6 +545,39 @@ function registerRoom( {
 	// Note: Queue is initially paused. Call .resume() to unpause.
 	const updateQueue = createUpdateQueue( [ createSyncStep1Update( doc ) ] );
 
+	/**
+	 * Connection limits are enforced on the first entity to be loaded for sync.
+	 * This is an inelegant solution to a hard problem: This sync provider and the
+	 * sync package in general intentionally have no knowledge of the individual
+	 * entities being synced.
+	 *
+	 * Let's say a user opens a document (Entity A) for editing. If you asked the
+	 * user what they are doing, they would reply "I'm editing Entity A." You might
+	 * say that Entity A is "primary."
+	 *
+	 * However, the action of editing Entity A also triggers the loading of a
+	 * collection of document categories (Entity B) and another document (Entity C)
+	 * that is embedded in Entity A. You might therefore say that Entity B and
+	 * Entity C are "secondary" in this session.
+	 *
+	 * Meanwhile, a different user opens Entity C for editing, which also triggers
+	 * the loading of Entity B. In this session, Entity C is "primary" and Entity B
+	 * is "secondary."
+	 *
+	 * How do we enforce limits? The intuitive answer is that we only want to count
+	 * connections when the entity is "primary." However, we have no ability to
+	 * detect this. A document might be loaded as a primary entity in one session
+	 * and a secondary entity in another.
+	 *
+	 * In practice, we can consider the first-loaded entity as "primary" and use it
+	 * to enforce our connection limit. This is an imperfect assumption of consumer
+	 * behavior.
+	 *
+	 * How might this approach be improved? We could develop some way to annotate
+	 * entity loading so that the consumer can indicate which entity is primary.
+	 */
+	const enforceConnectionLimit = 0 === roomStates.size;
+
 	function onAwarenessUpdate(): void {
 		roomState.localAwarenessState = awareness.getLocalState() ?? {};
 	}
@@ -530,6 +628,7 @@ function registerRoom( {
 				SyncUpdateType.COMPACTION
 			),
 		endCursor: 0,
+		enforceConnectionLimit,
 		localAwarenessState: awareness.getLocalState() ?? {},
 		log,
 		onStatusChange,
@@ -537,6 +636,7 @@ function registerRoom( {
 			processAwarenessUpdate( state, awareness ),
 		processDocUpdate: ( update: SyncUpdate ) =>
 			processDocUpdate( update, doc, onSync ),
+		room,
 		unregister,
 		updateQueue,
 	};
