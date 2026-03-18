@@ -17,7 +17,7 @@ import { unlock } from './lock-unlock';
  * @param {Object} params
  * @param {string} params.kind The kind of the entity.
  * @param {string} params.name The name of the entity.
- * @return {Object} An object containing the `defaultView` and `defaultLayouts` configuration for the entity.
+ * @return {Object} An object containing the `default_view`, `default_layouts`, and `view_list` configuration for the entity.
  */
 export function useViewConfig( {
 	kind,
@@ -25,18 +25,14 @@ export function useViewConfig( {
 }: {
 	kind: string;
 	name: string;
-} ): { defaultView: View; defaultLayouts: SupportedLayouts } {
+} ): {
+	default_view: View;
+	default_layouts: SupportedLayouts;
+	view_list: Array< any >;
+} {
 	return useSelect(
 		( select ) => {
-			const config = unlock( select( coreStore ) ).getViewConfig(
-				kind,
-				name
-			);
-			return {
-				defaultView: config?.default_view,
-				defaultLayouts: config?.default_layouts,
-				viewList: config?.view_list,
-			};
+			return unlock( select( coreStore ) ).getViewConfig( kind, name );
 		},
 		[ kind, name ]
 	);

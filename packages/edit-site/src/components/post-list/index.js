@@ -56,7 +56,11 @@ export default function PostList( { postType } ) {
 	const { path, query } = useLocation();
 	const { activeView = 'all', postId, quickEdit = false } = query;
 	const history = useHistory();
-	const { defaultView, defaultLayouts, viewList } = useViewConfig( {
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+	} = useViewConfig( {
 		kind: 'postType',
 		name: postType,
 	} );

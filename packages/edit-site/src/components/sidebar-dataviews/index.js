@@ -36,7 +36,7 @@ export default function DataViewsSidebarContent( { postType } ) {
 	const {
 		query: { activeView = 'all' },
 	} = useLocation();
-	const { defaultView, viewList } = useViewConfig( {
+	const { default_view: defaultView, view_list: viewList } = useViewConfig( {
 		kind: 'postType',
 		name: postType,
 	} );
