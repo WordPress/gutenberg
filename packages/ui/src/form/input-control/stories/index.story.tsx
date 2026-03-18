@@ -30,7 +30,7 @@ export const Default: Story = {
 	},
 };
 
-export const HiddenLabel: Story = {
+export const VisuallyHiddenLabel: Story = {
 	args: {
 		...Default.args,
 		hideLabelFromVision: true,
@@ -43,6 +43,7 @@ export const WithDetails: Story = {
 	},
 	args: {
 		...Default.args,
+		description: undefined,
 		details: DETAILS_EXAMPLE,
 	},
 };
@@ -91,6 +92,7 @@ export const Date: Story = {
 export const Number: Story = {
 	args: {
 		...Default.args,
+		placeholder: '0',
 		type: 'number',
 	},
 };
@@ -141,7 +143,7 @@ export const NumberWithSteppers: Story = {
 		);
 	},
 	args: {
-		...Default.args,
+		...Number.args,
 		type: 'number',
 	},
 };

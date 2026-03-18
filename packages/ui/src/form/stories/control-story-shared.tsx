@@ -5,7 +5,7 @@ Although this content is not associated with the field using direct semantics,
 it is made discoverable to screen reader users via a visually hidden description,
 alerting them to the presence of additional information below.
 
-If the content only includes plain text, use \`description\` instead,
+**Important:** If the content only includes plain text, use \`description\` instead,
 so the readout is not unnecessarily verbose for screen reader users.`;
 
 export const DETAILS_EXAMPLE = (
