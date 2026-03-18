@@ -36,7 +36,7 @@ const EMPTY_STYLE = {};
 function CustomCSSControl( { blockName, setAttributes, style } ) {
 	const blockEditingMode = useBlockEditingMode();
 
-	if ( blockEditingMode === 'contentOnly' ) {
+	if ( blockEditingMode !== 'default' ) {
 		return null;
 	}
 	const blockType = getBlockType( blockName );
