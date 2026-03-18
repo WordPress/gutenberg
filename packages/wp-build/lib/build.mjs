@@ -346,7 +346,10 @@ function transformPhpContent( content, transforms ) {
 	 * class prefixes, etc.). When building for WordPress Core, it's not
 	 * necessary to perform these steps.
 	 */
-	if ( boolConfigVal( process.env.IS_WORDPRESS_CORE ) ) {
+	if (
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE )
+	) {
 		return content;
 	}
 
@@ -2132,9 +2135,13 @@ async function main() {
 			},
 			'base-url': {
 				type: 'string',
-				default: boolConfigVal( process.env.IS_WORDPRESS_CORE )
-					? "includes_url( 'build/' )"
-					: 'plugin_dir_url( __FILE__ )',
+				default:
+					( boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+						boolConfigVal(
+							process.env.npm_package_config_IS_WORDPRESS_CORE
+						) )
+						? "includes_url( 'build/' )"
+						: 'plugin_dir_url( __FILE__ )',
 			},
 		},
 		strict: false,
