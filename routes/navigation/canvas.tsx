@@ -149,7 +149,7 @@ function Canvas() {
 	const searchParams = useSearch( { strict: false } );
 	const navigate = useNavigate();
 
-	const canvasMode = ( searchParams as any ).canvas ?? MODE_NAVIGATION;
+	const canvasMode = ( searchParams as any ).canvas ?? MODE_ALL;
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 
 	const navigationId = useMemo( () => {
@@ -230,24 +230,6 @@ function Canvas() {
 						<Fragment>
 							<MenuGroup>
 								<MenuItem
-									isSelected={
-										canvasMode === MODE_NAVIGATION
-									}
-									onClick={ () => {
-										navigate( {
-											search: {
-												...searchParams,
-												canvas: undefined,
-											},
-										} );
-										onClose();
-									} }
-								>
-									{ __( 'Navigation Preview' ) }
-								</MenuItem>
-							</MenuGroup>
-							<MenuGroup>
-								<MenuItem
 									isSelected={ canvasMode === MODE_ALL }
 									onClick={ () => {
 										navigate( {
@@ -280,6 +262,24 @@ function Canvas() {
 										{ label }
 									</MenuItem>
 								) ) }
+							</MenuGroup>
+							<MenuGroup>
+								<MenuItem
+									isSelected={
+										canvasMode === MODE_NAVIGATION
+									}
+									onClick={ () => {
+										navigate( {
+											search: {
+												...searchParams,
+												canvas: MODE_NAVIGATION,
+											},
+										} );
+										onClose();
+									} }
+								>
+									{ __( 'Navigation Preview' ) }
+								</MenuItem>
 							</MenuGroup>
 						</Fragment>
 					) }
