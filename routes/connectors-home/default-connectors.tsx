@@ -105,7 +105,6 @@ interface ApiKeyConnectorConfig {
 	pluginSlug?: string;
 	settingName: string;
 	helpUrl?: string;
-	icon?: React.ReactNode;
 	isInstalled?: boolean;
 	isActivated?: boolean;
 	keySource?: ApiKeySource;
@@ -273,13 +272,13 @@ export function registerDefaultConnectors() {
 		registerConnector( connectorName, {
 			label: data.name,
 			description: data.description,
+			icon: getConnectorLogo( connectorId, data.logoUrl ),
 			render: ( props ) => (
 				<ApiKeyConnector
 					{ ...props }
 					pluginSlug={ data.plugin?.slug }
 					settingName={ authentication.settingName }
 					helpUrl={ authentication.credentialsUrl ?? undefined }
-					icon={ getConnectorLogo( connectorId, data.logoUrl ) }
 					isInstalled={ data.plugin?.isInstalled }
 					isActivated={ data.plugin?.isActivated }
 					keySource={ authentication.keySource }

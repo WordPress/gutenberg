@@ -23,6 +23,11 @@ jest.mock( '@wordpress/data', () => ( {
 	select: jest.fn(),
 	subscribe: jest.fn(),
 	resolveSelect: jest.fn(),
+	// Needed because @wordpress/rich-text initialises its store at import time.
+	combineReducers: jest.fn( () => jest.fn( () => ( {} ) ) ),
+	createReduxStore: jest.fn( () => ( {} ) ),
+	register: jest.fn(),
+	createSelector: ( selector: Function ) => selector,
 } ) );
 
 jest.mock( '@wordpress/block-editor', () => ( {
@@ -491,7 +496,7 @@ describe( 'PostEditorAwareness', () => {
 				awareness.convertSelectionStateToAbsolute( selection );
 
 			// Should return nulls when the relative position's type cannot be found
-			expect( result.textIndex ).toBeNull();
+			expect( result.richTextOffset ).toBeNull();
 			expect( result.localClientId ).toBeNull();
 		} );
 
@@ -529,7 +534,7 @@ describe( 'PostEditorAwareness', () => {
 			const result =
 				awareness.convertSelectionStateToAbsolute( selection );
 
-			expect( result.textIndex ).toBe( 5 );
+			expect( result.richTextOffset ).toBe( 5 );
 			expect( result.localClientId ).toBe( 'block-1' );
 		} );
 
@@ -561,7 +566,7 @@ describe( 'PostEditorAwareness', () => {
 			const result =
 				awareness.convertSelectionStateToAbsolute( selection );
 
-			expect( result.textIndex ).toBeNull();
+			expect( result.richTextOffset ).toBeNull();
 			expect( result.localClientId ).toBe( 'block-1' );
 		} );
 	} );
@@ -767,7 +772,7 @@ describe( 'PostEditorAwareness', () => {
 			const result =
 				awareness.convertSelectionStateToAbsolute( selection );
 
-			expect( result.textIndex ).toBe( 2 );
+			expect( result.richTextOffset ).toBe( 2 );
 			expect( result.localClientId ).toBe( 'local-2' );
 
 			nestedDoc.destroy();
@@ -840,7 +845,7 @@ describe( 'PostEditorAwareness', () => {
 			const result =
 				awareness.convertSelectionStateToAbsolute( selection );
 
-			expect( result.textIndex ).toBe( 5 );
+			expect( result.richTextOffset ).toBe( 5 );
 			expect( result.localClientId ).toBe( 'local-inner-1' );
 
 			nestedDoc.destroy();
@@ -895,7 +900,7 @@ describe( 'PostEditorAwareness', () => {
 			const result =
 				awareness.convertSelectionStateToAbsolute( selection );
 
-			expect( result.textIndex ).toBeNull();
+			expect( result.richTextOffset ).toBeNull();
 			expect( result.localClientId ).toBe( 'local-img' );
 
 			nestedDoc.destroy();
@@ -989,7 +994,7 @@ describe( 'PostEditorAwareness', () => {
 			const result =
 				awareness.convertSelectionStateToAbsolute( selection );
 
-			expect( result.textIndex ).toBe( 7 );
+			expect( result.richTextOffset ).toBe( 7 );
 			expect( result.localClientId ).toBe( 'local-deep-1' );
 
 			nestedDoc.destroy();
@@ -1090,7 +1095,7 @@ describe( 'PostEditorAwareness', () => {
 			const result =
 				awareness.convertSelectionStateToAbsolute( selection );
 
-			expect( result.textIndex ).toBe( 4 );
+			expect( result.richTextOffset ).toBe( 4 );
 			// Should resolve to the post-content inner block, not a template block
 			expect( result.localClientId ).toBe( 'local-para-1' );
 			// Verify getBlocks was called with the post-content clientId
@@ -1162,7 +1167,7 @@ describe( 'PostEditorAwareness', () => {
 			const result =
 				awareness.convertSelectionStateToAbsolute( selection );
 
-			expect( result.textIndex ).toBeNull();
+			expect( result.richTextOffset ).toBeNull();
 			expect( result.localClientId ).toBe( 'local-img' );
 
 			templateDoc.destroy();
@@ -1211,7 +1216,7 @@ describe( 'PostEditorAwareness', () => {
 			const result =
 				awareness.convertSelectionStateToAbsolute( selection );
 
-			expect( result.textIndex ).toBe( 3 );
+			expect( result.richTextOffset ).toBe( 3 );
 			expect( result.localClientId ).toBe( 'local-para' );
 
 			normalDoc.destroy();
