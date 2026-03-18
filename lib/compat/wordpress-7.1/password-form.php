@@ -1,4 +1,3 @@
-
 <?php
 /**
  * Adds the wp-block-button__link wp-element-button classes to the password form submit button
