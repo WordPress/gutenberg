@@ -51,10 +51,6 @@ export default function RevisionDiffPanel( { title, entries, initialOpen } ) {
 		</PostPanelRow>
 	) );
 
-	if ( fields.length === 0 ) {
-		return null;
-	}
-
 	return (
 		<PanelBody title={ title } initialOpen={ initialOpen }>
 			{ fields }
