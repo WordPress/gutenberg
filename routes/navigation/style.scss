@@ -18,7 +18,7 @@
 	font-weight: var(--wpds-font-weight-medium);
 	font-family: var(--wpds-font-family-heading);
 	line-height: var(--wpds-line-height-xl);
-	color: var(--wpds-color-fg-content-neutral);
+	color: $black;
 }
 
 .navigation-breadcrumbs__link {
@@ -35,7 +35,7 @@
 }
 
 .navigation-breadcrumbs__separator {
-	color: var(--wpds-color-fg-content-neutral-faded);
+	color: $gray-400;
 	flex-shrink: 0;
 }
 
