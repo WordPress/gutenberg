@@ -11,7 +11,6 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { mediaEditKey } from '../../store/private-keys';
 
 const messages = {
 	crop: __( 'Image cropped.' ),
@@ -33,7 +32,7 @@ export default function useSaveImage( {
 	const { editMediaEntity } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		return {
-			editMediaEntity: settings?.[ mediaEditKey ],
+			editMediaEntity: settings?.editMedia,
 		};
 	}, [] );
 

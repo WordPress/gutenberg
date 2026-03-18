@@ -100,7 +100,6 @@ const {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
-	mediaEditKey,
 	getMediaSelectKey,
 	isIsolatedEditorKey,
 	deviceTypeKey,
@@ -336,9 +335,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					attachmentId
 				);
 			},
-			[ mediaEditKey ]: hasUploadPermissions
-				? editMediaEntity
-				: undefined,
+			editMedia: hasUploadPermissions ? editMediaEntity : undefined,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			[ mediaUploadOnSuccessKey ]: hasUploadPermissions
 				? mediaUploadOnSuccess

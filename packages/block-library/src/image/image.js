@@ -342,26 +342,31 @@ export default function Image( {
 		[ id, isSingleSelected ]
 	);
 
-	const { canInsertCover, imageEditing, imageSizes, maxWidth } = useSelect(
-		( select ) => {
-			const { getBlockRootClientId, canInsertBlockType, getSettings } =
-				select( blockEditorStore );
+	const { canInsertCover, imageEditing, imageSizes, maxWidth, editMedia } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockRootClientId,
+					canInsertBlockType,
+					getSettings,
+				} = select( blockEditorStore );
 
-			const rootClientId = getBlockRootClientId( clientId );
-			const settings = getSettings();
+				const rootClientId = getBlockRootClientId( clientId );
+				const settings = getSettings();
 
-			return {
-				imageEditing: settings.imageEditing,
-				imageSizes: settings.imageSizes,
-				maxWidth: settings.maxWidth,
-				canInsertCover: canInsertBlockType(
-					'core/cover',
-					rootClientId
-				),
-			};
-		},
-		[ clientId ]
-	);
+				return {
+					imageEditing: settings.imageEditing,
+					imageSizes: settings.imageSizes,
+					maxWidth: settings.maxWidth,
+					editMedia: settings.editMedia,
+					canInsertCover: canInsertBlockType(
+						'core/cover',
+						rootClientId
+					),
+				};
+			},
+			[ clientId ]
+		);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
 	const onNavigateToEntityRecord = getSettings().onNavigateToEntityRecord;
 
@@ -550,7 +555,8 @@ export default function Image( {
 		}
 	}, [ isSingleSelected ] );
 
-	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
+	const canEditImage =
+		id && naturalWidth && naturalHeight && imageEditing && !! editMedia;
 	const allowCrop =
 		isSingleSelected &&
 		canEditImage &&

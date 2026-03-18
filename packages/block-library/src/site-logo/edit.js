@@ -75,18 +75,22 @@ const SiteLogo = ( {
 	const blockEditingMode = useBlockEditingMode();
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 
-	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-		const siteEntities = select( coreStore ).getEntityRecord(
-			'root',
-			'__unstableBase'
-		);
-		return {
-			title: siteEntities?.name,
-			imageEditing: settings.imageEditing,
-			maxWidth: settings.maxWidth,
-		};
-	}, [] );
+	const { imageEditing, maxWidth, title, editMedia } = useSelect(
+		( select ) => {
+			const settings = select( blockEditorStore ).getSettings();
+			const siteEntities = select( coreStore ).getEntityRecord(
+				'root',
+				'__unstableBase'
+			);
+			return {
+				title: siteEntities?.name,
+				imageEditing: settings.imageEditing,
+				maxWidth: settings.maxWidth,
+				editMedia: settings.editMedia,
+			};
+		},
+		[]
+	);
 
 	useEffect( () => {
 		// Turn the `Use as site icon` toggle off if it is on but the logo and icon have
@@ -200,7 +204,7 @@ const SiteLogo = ( {
 	/* eslint-enable no-lonely-if */
 
 	const canEditImage =
-		logoId && naturalWidth && naturalHeight && imageEditing;
+		logoId && naturalWidth && naturalHeight && imageEditing && !! editMedia;
 
 	// Hide crop and dimensions editing in write mode
 	const shouldShowCropAndDimensions = ! isContentOnlyMode;
