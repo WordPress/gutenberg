@@ -171,9 +171,9 @@ describe( 'feature-detection', () => {
 			expect( result.supported ).toBe( true );
 		} );
 
-		it( 'returns not supported when hardware concurrency is less than 4', () => {
+		it( 'returns not supported when hardware concurrency is less than 2', () => {
 			Object.defineProperty( navigator, 'hardwareConcurrency', {
-				value: 2,
+				value: 1,
 				configurable: true,
 			} );
 
@@ -183,9 +183,9 @@ describe( 'feature-detection', () => {
 			expect( result.reason ).toContain( 'insufficient CPU cores' );
 		} );
 
-		it( 'returns supported when hardware concurrency is 4 or more', () => {
+		it( 'returns supported when hardware concurrency is 2 or more', () => {
 			Object.defineProperty( navigator, 'hardwareConcurrency', {
-				value: 4,
+				value: 2,
 				configurable: true,
 			} );
 
@@ -218,7 +218,7 @@ describe( 'feature-detection', () => {
 			expect( result.reason ).toContain( 'too slow' );
 		} );
 
-		it( 'returns not supported when connection is 3g', () => {
+		it( 'returns supported when connection is 3g', () => {
 			Object.defineProperty( navigator, 'connection', {
 				value: { saveData: false, effectiveType: '3g' },
 				configurable: true,
@@ -226,8 +226,7 @@ describe( 'feature-detection', () => {
 
 			const result = detectClientSideMediaSupport();
 
-			expect( result.supported ).toBe( false );
-			expect( result.reason ).toContain( 'too slow' );
+			expect( result.supported ).toBe( true );
 		} );
 
 		it( 'returns not supported when connection is slow-2g', () => {
