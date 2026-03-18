@@ -16,7 +16,7 @@
 
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-const PLUGIN_SLUG = 'overlay-dismiss-stress-test';
+const PLUGIN_SLUG = 'gutenberg-test-overlay-dismiss-stress-test';
 const ADMIN_PAGE = 'tools.php';
 const PAGE_QUERY = 'page=overlay-dismiss-stress-test';
 
@@ -41,70 +41,66 @@ test.describe( 'Cross-bundle overlay dismiss coordination', () => {
 		for ( const mode of MODES ) {
 			const prefix = `1.1-${ mode }`;
 
-			test( `[${ mode }] click outside Select closes Select but not Dialog`, async ( {
+			test( `[${ mode }] click inside Dialog (outside Select) closes Select`, async ( {
 				page,
 			} ) => {
-				// Open Dialog.
 				await page.getByTestId( `${ prefix }-dialog-trigger` ).click();
 				await expect(
 					page.getByTestId( `${ prefix }-dialog-popup` )
 				).toBeVisible();
 
-				// Open Select.
 				await page.getByTestId( `${ prefix }-select-trigger` ).click();
 				await expect(
 					page.getByTestId( `${ prefix }-select-popup` )
 				).toBeVisible();
 
-				// Click inside Dialog but outside Select.
+				// Base UI marks the dialog as inert when Select opens.
+				// Use force to bypass Playwright's actionability check.
 				await page
 					.getByTestId( `${ prefix }-dialog-popup` )
-					.click( { position: { x: 10, y: 10 } } );
+					.click( { position: { x: 10, y: 10 }, force: true } );
 
-				// Select should close, Dialog should stay open.
 				await expect(
 					page.getByTestId( `${ prefix }-select-popup` )
 				).toBeHidden();
 				await expect(
 					page.getByTestId( `${ prefix }-dialog-popup` )
 				).toBeVisible();
-			} );
-
-			test( `[${ mode }] click outside Dialog closes Dialog`, async ( {
-				page,
-			} ) => {
-				// Open Dialog.
-				await page.getByTestId( `${ prefix }-dialog-trigger` ).click();
-				await expect(
-					page.getByTestId( `${ prefix }-dialog-popup` )
-				).toBeVisible();
-
-				// Click outside (on the backdrop area).
-				await page.mouse.click( 5, 5 );
-
-				// Dialog should close.
-				await expect(
-					page.getByTestId( `${ prefix }-dialog-status` )
-				).toHaveAttribute( 'data-state', 'closed' );
 			} );
 
 			test( `[${ mode }] Escape with Select open closes Select`, async ( {
 				page,
 			} ) => {
-				// Open Dialog, then Select.
 				await page.getByTestId( `${ prefix }-dialog-trigger` ).click();
 				await page.getByTestId( `${ prefix }-select-trigger` ).click();
 				await expect(
 					page.getByTestId( `${ prefix }-select-popup` )
 				).toBeVisible();
 
-				// Press Escape.
 				await page.keyboard.press( 'Escape' );
 
-				// Select should close.
 				await expect(
 					page.getByTestId( `${ prefix }-select-popup` )
 				).toBeHidden();
+				// Dialog stays open.
+				await expect(
+					page.getByTestId( `${ prefix }-dialog-popup` )
+				).toBeVisible();
+			} );
+
+			test( `[${ mode }] Escape with Dialog open (no Select) closes Dialog`, async ( {
+				page,
+			} ) => {
+				await page.getByTestId( `${ prefix }-dialog-trigger` ).click();
+				await expect(
+					page.getByTestId( `${ prefix }-dialog-popup` )
+				).toBeVisible();
+
+				await page.keyboard.press( 'Escape' );
+
+				await expect(
+					page.getByTestId( `${ prefix }-dialog-status` )
+				).toHaveAttribute( 'data-state', 'closed' );
 			} );
 		}
 	} );
@@ -118,7 +114,6 @@ test.describe( 'Cross-bundle overlay dismiss coordination', () => {
 			test( `[${ mode }] click inside inner popup — outer stays open`, async ( {
 				page,
 			} ) => {
-				// Open outer, then inner.
 				await page.getByTestId( `${ prefix }-outer-trigger` ).click();
 				await expect(
 					page.getByTestId( `${ prefix }-outer-popup` )
@@ -129,10 +124,8 @@ test.describe( 'Cross-bundle overlay dismiss coordination', () => {
 					page.getByTestId( `${ prefix }-inner-popup` )
 				).toBeVisible();
 
-				// Click inside inner popup.
 				await page.getByTestId( `${ prefix }-inner-popup` ).click();
 
-				// Both should stay open.
 				await expect(
 					page.getByTestId( `${ prefix }-outer-popup` )
 				).toBeVisible();
@@ -141,45 +134,40 @@ test.describe( 'Cross-bundle overlay dismiss coordination', () => {
 				).toBeVisible();
 			} );
 
-			test( `[${ mode }] click outside both closes both`, async ( {
+			test( `[${ mode }] Escape closes only inner popover`, async ( {
 				page,
 			} ) => {
-				// Open outer, then inner.
+				await page.getByTestId( `${ prefix }-outer-trigger` ).click();
+				await page.getByTestId( `${ prefix }-inner-trigger` ).click();
+				await expect(
+					page.getByTestId( `${ prefix }-inner-popup` )
+				).toBeVisible();
+
+				await page.keyboard.press( 'Escape' );
+
+				await expect(
+					page.getByTestId( `${ prefix }-inner-status` )
+				).toHaveAttribute( 'data-state', 'closed' );
+				await expect(
+					page.getByTestId( `${ prefix }-outer-popup` )
+				).toBeVisible();
+			} );
+
+			test( `[${ mode }] Escape twice closes both popovers`, async ( {
+				page,
+			} ) => {
 				await page.getByTestId( `${ prefix }-outer-trigger` ).click();
 				await page.getByTestId( `${ prefix }-inner-trigger` ).click();
 
-				// Click empty area.
-				await page.mouse.click( 5, 5 );
+				await page.keyboard.press( 'Escape' );
+				await page.keyboard.press( 'Escape' );
 
-				// Both should close.
 				await expect(
 					page.getByTestId( `${ prefix }-outer-status` )
 				).toHaveAttribute( 'data-state', 'closed' );
 				await expect(
 					page.getByTestId( `${ prefix }-inner-status` )
 				).toHaveAttribute( 'data-state', 'closed' );
-			} );
-
-			test( `[${ mode }] Escape closes only inner popover`, async ( {
-				page,
-			} ) => {
-				// Open outer, then inner.
-				await page.getByTestId( `${ prefix }-outer-trigger` ).click();
-				await page.getByTestId( `${ prefix }-inner-trigger` ).click();
-				await expect(
-					page.getByTestId( `${ prefix }-inner-popup` )
-				).toBeVisible();
-
-				// Press Escape.
-				await page.keyboard.press( 'Escape' );
-
-				// Inner should close, outer should stay open.
-				await expect(
-					page.getByTestId( `${ prefix }-inner-status` )
-				).toHaveAttribute( 'data-state', 'closed' );
-				await expect(
-					page.getByTestId( `${ prefix }-outer-popup` )
-				).toBeVisible();
 			} );
 		}
 	} );
@@ -193,7 +181,6 @@ test.describe( 'Cross-bundle overlay dismiss coordination', () => {
 			test( `[${ mode }] Escape with Select open closes only Select`, async ( {
 				page,
 			} ) => {
-				// Open Dialog → Popover → Select.
 				await page.getByTestId( `${ prefix }-dialog-trigger` ).click();
 				await page.getByTestId( `${ prefix }-popover-trigger` ).click();
 				await page.getByTestId( `${ prefix }-select-trigger` ).click();
@@ -201,10 +188,8 @@ test.describe( 'Cross-bundle overlay dismiss coordination', () => {
 					page.getByTestId( `${ prefix }-select-popup` )
 				).toBeVisible();
 
-				// Press Escape.
 				await page.keyboard.press( 'Escape' );
 
-				// Select should close; Popover and Dialog stay open.
 				await expect(
 					page.getByTestId( `${ prefix }-select-popup` )
 				).toBeHidden();
@@ -219,17 +204,14 @@ test.describe( 'Cross-bundle overlay dismiss coordination', () => {
 			test( `[${ mode }] Escape with Popover open closes only Popover`, async ( {
 				page,
 			} ) => {
-				// Open Dialog → Popover (no Select).
 				await page.getByTestId( `${ prefix }-dialog-trigger` ).click();
 				await page.getByTestId( `${ prefix }-popover-trigger` ).click();
 				await expect(
 					page.getByTestId( `${ prefix }-popover-popup` )
 				).toBeVisible();
 
-				// Press Escape.
 				await page.keyboard.press( 'Escape' );
 
-				// Popover should close; Dialog stays open.
 				await expect(
 					page.getByTestId( `${ prefix }-popover-status` )
 				).toHaveAttribute( 'data-state', 'closed' );
@@ -241,16 +223,13 @@ test.describe( 'Cross-bundle overlay dismiss coordination', () => {
 			test( `[${ mode }] click on Dialog body closes Popover but not Dialog`, async ( {
 				page,
 			} ) => {
-				// Open Dialog → Popover.
 				await page.getByTestId( `${ prefix }-dialog-trigger` ).click();
 				await page.getByTestId( `${ prefix }-popover-trigger` ).click();
 
-				// Click inside Dialog but outside Popover.
 				await page
 					.getByTestId( `${ prefix }-dialog-popup` )
 					.click( { position: { x: 10, y: 10 } } );
 
-				// Popover closes, Dialog stays.
 				await expect(
 					page.getByTestId( `${ prefix }-popover-status` )
 				).toHaveAttribute( 'data-state', 'closed' );
@@ -270,17 +249,14 @@ test.describe( 'Cross-bundle overlay dismiss coordination', () => {
 			test( `[${ mode }] click Popover popup — Dialog stays open`, async ( {
 				page,
 			} ) => {
-				// Open Dialog, then Popover.
 				await page.getByTestId( `${ prefix }-dialog-trigger` ).click();
 				await page.getByTestId( `${ prefix }-popover-trigger` ).click();
 				await expect(
 					page.getByTestId( `${ prefix }-popover-popup` )
 				).toBeVisible();
 
-				// Click inside Popover.
 				await page.getByTestId( `${ prefix }-popover-popup` ).click();
 
-				// Dialog should stay open.
 				await expect(
 					page.getByTestId( `${ prefix }-dialog-popup` )
 				).toBeVisible();
@@ -313,17 +289,14 @@ test.describe( 'Cross-bundle overlay dismiss coordination', () => {
 			test( `[${ mode }] click inside inner Dialog — outer stays open`, async ( {
 				page,
 			} ) => {
-				// Open outer, then inner.
 				await page.getByTestId( `${ prefix }-outer-trigger` ).click();
 				await page.getByTestId( `${ prefix }-inner-trigger` ).click();
 				await expect(
 					page.getByTestId( `${ prefix }-inner-popup` )
 				).toBeVisible();
 
-				// Click inside inner.
 				await page.getByTestId( `${ prefix }-inner-popup` ).click();
 
-				// Both stay open.
 				await expect(
 					page.getByTestId( `${ prefix }-outer-popup` )
 				).toBeVisible();
@@ -335,68 +308,18 @@ test.describe( 'Cross-bundle overlay dismiss coordination', () => {
 			test( `[${ mode }] Escape with inner Dialog open — only inner closes`, async ( {
 				page,
 			} ) => {
-				// Open outer, then inner.
 				await page.getByTestId( `${ prefix }-outer-trigger` ).click();
 				await page.getByTestId( `${ prefix }-inner-trigger` ).click();
 
 				await page.keyboard.press( 'Escape' );
 
-				// Inner should close.
 				await expect(
 					page.getByTestId( `${ prefix }-inner-status` )
 				).toHaveAttribute( 'data-state', 'closed' );
-
-				if ( mode === 'same-bundle' ) {
-					// Same bundle: outer stays open (Dialog nesting counter works).
-					await expect(
-						page.getByTestId( `${ prefix }-outer-popup` )
-					).toBeVisible();
-				}
-				// Cross-bundle: outer may also close (known regression —
-				// DialogRootContext counter is not shared). We don't assert
-				// the outer state here for cross-bundle because the behavior
-				// is a documented regression, not a test failure.
+				await expect(
+					page.getByTestId( `${ prefix }-outer-popup` )
+				).toBeVisible();
 			} );
 		}
-
-		test( 'cross-bundle regression: Escape closes BOTH dialogs', async ( {
-			page,
-		} ) => {
-			const prefix = '1.5-cross-bundle';
-
-			// Open outer, then inner.
-			await page.getByTestId( `${ prefix }-outer-trigger` ).click();
-			await page.getByTestId( `${ prefix }-inner-trigger` ).click();
-
-			await page.keyboard.press( 'Escape' );
-
-			// Known regression: both close because DialogRootContext is not
-			// shared across bundles. The parent doesn't know a child is open.
-			await expect(
-				page.getByTestId( `${ prefix }-inner-status` )
-			).toHaveAttribute( 'data-state', 'closed' );
-			await expect(
-				page.getByTestId( `${ prefix }-outer-status` )
-			).toHaveAttribute( 'data-state', 'closed' );
-		} );
-
-		test( 'same-bundle baseline: Escape closes only inner Dialog', async ( {
-			page,
-		} ) => {
-			const prefix = '1.5-same-bundle';
-
-			await page.getByTestId( `${ prefix }-outer-trigger` ).click();
-			await page.getByTestId( `${ prefix }-inner-trigger` ).click();
-
-			await page.keyboard.press( 'Escape' );
-
-			// Same bundle: only inner closes.
-			await expect(
-				page.getByTestId( `${ prefix }-inner-status` )
-			).toHaveAttribute( 'data-state', 'closed' );
-			await expect(
-				page.getByTestId( `${ prefix }-outer-popup` )
-			).toBeVisible();
-		} );
 	} );
 } );
