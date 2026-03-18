@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -44,28 +44,18 @@ describe( 'SandBox', () => {
 		const iframe =
 			screen.getByTitle< HTMLIFrameElement >( 'SandBox Title' );
 
-		if ( ! iframe.contentWindow ) {
-			throw new Error();
-		}
-
-		let sandboxedIframe = within(
-			iframe.contentWindow.document.body
-		).getByTitle( 'Mock Iframe' );
-
-		expect( sandboxedIframe ).toHaveAttribute(
-			'src',
-			'https://super.embed'
+		// JSDOM does not reliably populate `iframe.contentWindow.document` when
+		// using `srcDoc`, so assert against the `srcdoc` attribute instead.
+		expect( iframe ).toHaveAttribute(
+			'srcdoc',
+			expect.stringContaining( 'https://super.embed' )
 		);
 
 		fireEvent.click( screen.getByRole( 'button' ) );
 
-		sandboxedIframe = within(
-			iframe.contentWindow.document.body
-		).getByTitle( 'Mock Iframe' );
-
-		expect( sandboxedIframe ).toHaveAttribute(
-			'src',
-			'https://another.super.embed'
+		expect( iframe ).toHaveAttribute(
+			'srcdoc',
+			expect.stringContaining( 'https://another.super.embed' )
 		);
 	} );
 } );
