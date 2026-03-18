@@ -124,7 +124,7 @@ $palette-header-height: 48px;
 	}
 
 	[cmdk-root] > [cmdk-list] {
-		height: min($palette-max-height - $palette-header-height, calc(70vh - $palette-header-height));
+		max-height: min($palette-max-height - $palette-header-height, calc(70vh - $palette-header-height));
 		overflow: auto;
 		scroll-padding-top: $grid-unit-10;
 		scroll-padding-bottom: $grid-unit-10;
