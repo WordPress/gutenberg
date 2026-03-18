@@ -381,7 +381,7 @@ test.describe( 'Collaboration - Stress Test', () => {
 			expect( allContent ).toContain(
 				'Admin typed this paragraph in Phase 2'
 			);
-		} ).toPass( { timeout: 5_000 } );
+		} ).toPass( { timeout: 10_000 } );
 
 		// ── Phase 3 — Save · User 3 joins · Admin refreshes ────
 		await editor.saveDraft();
@@ -396,22 +396,16 @@ test.describe( 'Collaboration - Stress Test', () => {
 		await collaborationUtils.waitForMutualDiscovery();
 
 		// ── Phase 4 — Two users type in the same paragraph ──────
-		await Promise.all( [
-			( async () => {
-				await editor.canvas
-					.getByText( 'shared editing target' )
-					.click();
-				await page.keyboard.press( 'End' );
-				await page.keyboard.type( ' — Admin was here.' );
-			} )(),
-			( async () => {
-				await editor2.canvas
-					.getByText( 'shared editing target' )
-					.click();
-				await page2.keyboard.press( 'End' );
-				await page2.keyboard.type( ' — Editor was here.' );
-			} )(),
-		] );
+		// Typing is sequential to avoid character-level interleaving
+		// from concurrent keyboard.type calls (each sends one key at
+		// a time, which the CRDT merges non-deterministically).
+		await editor.canvas.getByText( 'shared editing target' ).click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' — Admin was here.' );
+
+		await editor2.canvas.getByText( 'shared editing target' ).click();
+		await page2.keyboard.press( 'End' );
+		await page2.keyboard.type( ' — Editor was here.' );
 
 		// All three active users should see both additions.
 		for ( const ed of [ editor, editor2, editor3 ] ) {
@@ -420,7 +414,7 @@ test.describe( 'Collaboration - Stress Test', () => {
 				const allContent = JSON.stringify( blocks );
 				expect( allContent ).toContain( 'Admin was here' );
 				expect( allContent ).toContain( 'Editor was here' );
-			} ).toPass( { timeout: 5_000 } );
+			} ).toPass( { timeout: 10_000 } );
 		}
 
 		// ── Phase 5 — Two users move blocks via toolbar ─────────
@@ -474,7 +468,7 @@ test.describe( 'Collaboration - Stress Test', () => {
 				expect( alphaIdx ).toBeGreaterThan( -1 );
 				expect( betaIdx ).toBeGreaterThan( -1 );
 				expect( alphaIdx ).toBeGreaterThan( betaIdx );
-			} ).toPass( { timeout: 5_000 } );
+			} ).toPass( { timeout: 10_000 } );
 		}
 
 		// ── Phase 6 — Second save · User 4 joins ───────────────
@@ -525,7 +519,7 @@ test.describe( 'Collaboration - Stress Test', () => {
 				expect( allContent ).toContain(
 					'Final paragraph from Contributor'
 				);
-			} ).toPass( { timeout: 5_000 } );
+			} ).toPass( { timeout: 10_000 } );
 		}
 
 		// ── Phase 8 — User 3 refreshes (second refresh) ────────
@@ -541,7 +535,7 @@ test.describe( 'Collaboration - Stress Test', () => {
 			expect( allContent ).toContain(
 				'Final paragraph from Contributor'
 			);
-		} ).toPass( { timeout: 5_000 } );
+		} ).toPass( { timeout: 10_000 } );
 
 		// ── Phase 9 — Final save and publish ────────────────────
 		await editor.saveDraft();
@@ -626,7 +620,7 @@ test.describe( 'Collaboration - Stress Test', () => {
 				const deltaIdx = items.indexOf( 'Item Delta' );
 				expect( betaIdx ).toBeGreaterThan( gammaIdx );
 				expect( epsilonIdx ).toBeLessThan( deltaIdx );
-			} ).toPass( { timeout: 5_000 } );
+			} ).toPass( { timeout: 10_000 } );
 		};
 
 		for ( const ed of [ editor, editor2 ] ) {

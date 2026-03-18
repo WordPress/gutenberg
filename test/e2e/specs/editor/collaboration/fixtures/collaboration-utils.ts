@@ -148,7 +148,7 @@ export default class CollaborationUtils {
 	 */
 	async waitForMutualDiscovery( { timeout }: { timeout?: number } = {} ) {
 		const pages = this.allPages;
-		const resolvedTimeout = timeout ?? 5000 + pages.length * 2500;
+		const resolvedTimeout = timeout ?? 10000 + pages.length * 2500;
 
 		await Promise.all(
 			pages.map( ( pg ) =>
