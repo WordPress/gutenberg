@@ -322,4 +322,167 @@ test.describe( 'Cross-bundle overlay dismiss coordination', () => {
 			} );
 		}
 	} );
+
+	// ─── 2.1 Legacy Modal + Base UI Select ─────────────────────────────
+
+	test.describe( '2.1 Legacy Modal + Base UI Select', () => {
+		for ( const mode of MODES ) {
+			const prefix = `2.1-${ mode }`;
+
+			test( `[${ mode }] Escape with Select open closes Select, Modal stays`, async ( {
+				page,
+			} ) => {
+				await page.getByTestId( `${ prefix }-modal-trigger` ).click();
+				await expect(
+					page.getByTestId( `${ prefix }-modal-body` )
+				).toBeVisible();
+
+				await page.getByTestId( `${ prefix }-select-trigger` ).click();
+				await expect(
+					page.getByTestId( `${ prefix }-select-popup` )
+				).toBeVisible();
+
+				await page.keyboard.press( 'Escape' );
+
+				await expect(
+					page.getByTestId( `${ prefix }-select-popup` )
+				).toBeHidden();
+				await expect(
+					page.getByTestId( `${ prefix }-modal-status` )
+				).toHaveAttribute( 'data-state', 'open' );
+			} );
+
+			test( `[${ mode }] Escape with no Select closes Modal`, async ( {
+				page,
+			} ) => {
+				await page.getByTestId( `${ prefix }-modal-trigger` ).click();
+				await expect(
+					page.getByTestId( `${ prefix }-modal-body` )
+				).toBeVisible();
+
+				await page.keyboard.press( 'Escape' );
+
+				await expect(
+					page.getByTestId( `${ prefix }-modal-status` )
+				).toHaveAttribute( 'data-state', 'closed' );
+			} );
+		}
+	} );
+
+	// ─── 2.2 Base UI Dialog + Legacy Popover ───────────────────────────
+
+	test.describe( '2.2 Base UI Dialog + Legacy Popover', () => {
+		for ( const mode of MODES ) {
+			const prefix = `2.2-${ mode }`;
+
+			// INTEROP FINDING: Legacy Popover's Escape handler calls
+			// event.preventDefault() but NOT event.stopPropagation().
+			// The Escape event propagates to document where the Base UI
+			// Dialog also handles it, closing BOTH overlays.
+			test( `[${ mode }] Escape with Popover open closes both Popover and Dialog`, async ( {
+				page,
+			} ) => {
+				await page.getByTestId( `${ prefix }-dialog-trigger` ).click();
+				await expect(
+					page.getByTestId( `${ prefix }-dialog-popup` )
+				).toBeVisible();
+
+				await page.getByTestId( `${ prefix }-popover-trigger` ).click();
+				await expect(
+					page.getByTestId( `${ prefix }-popover-popup` )
+				).toBeVisible();
+
+				await expect(
+					page.getByTestId( `${ prefix }-popover-action` )
+				).toBeFocused();
+
+				await page.keyboard.press( 'Escape' );
+
+				// Both close — the Popover's Escape handler doesn't call
+				// stopPropagation, so the Dialog also receives the event.
+				await expect(
+					page.getByTestId( `${ prefix }-popover-status` )
+				).toHaveAttribute( 'data-state', 'closed' );
+				await expect(
+					page.getByTestId( `${ prefix }-dialog-status` )
+				).toHaveAttribute( 'data-state', 'closed' );
+			} );
+
+			test( `[${ mode }] Escape with Dialog only closes Dialog`, async ( {
+				page,
+			} ) => {
+				await page.getByTestId( `${ prefix }-dialog-trigger` ).click();
+				await expect(
+					page.getByTestId( `${ prefix }-dialog-popup` )
+				).toBeVisible();
+
+				await page.keyboard.press( 'Escape' );
+
+				await expect(
+					page.getByTestId( `${ prefix }-dialog-status` )
+				).toHaveAttribute( 'data-state', 'closed' );
+			} );
+		}
+	} );
+
+	// ─── 2.3 Legacy Modal + Base UI Dialog + Select ────────────────────
+
+	test.describe( '2.3 Legacy Modal + Base UI Dialog + Select', () => {
+		for ( const mode of MODES ) {
+			const prefix = `2.3-${ mode }`;
+
+			test( `[${ mode }] Escape with Select open closes only Select`, async ( {
+				page,
+			} ) => {
+				await page.getByTestId( `${ prefix }-modal-trigger` ).click();
+				await expect(
+					page.getByTestId( `${ prefix }-modal-body` )
+				).toBeVisible();
+
+				await page.getByTestId( `${ prefix }-dialog-trigger` ).click();
+				await expect(
+					page.getByTestId( `${ prefix }-dialog-popup` )
+				).toBeVisible();
+
+				// Focus the Select trigger and open via keyboard to avoid
+				// pointer-event interception from the inert Modal overlay.
+				await page.getByTestId( `${ prefix }-select-trigger` ).focus();
+				await page.keyboard.press( 'Space' );
+				await expect(
+					page.getByTestId( `${ prefix }-select-popup` )
+				).toBeVisible();
+
+				await page.keyboard.press( 'Escape' );
+
+				await expect(
+					page.getByTestId( `${ prefix }-select-popup` )
+				).toBeHidden();
+				await expect(
+					page.getByTestId( `${ prefix }-dialog-popup` )
+				).toBeVisible();
+				await expect(
+					page.getByTestId( `${ prefix }-modal-status` )
+				).toHaveAttribute( 'data-state', 'open' );
+			} );
+
+			test( `[${ mode }] Escape with Dialog open closes Dialog, Modal stays`, async ( {
+				page,
+			} ) => {
+				await page.getByTestId( `${ prefix }-modal-trigger` ).click();
+				await page.getByTestId( `${ prefix }-dialog-trigger` ).click();
+				await expect(
+					page.getByTestId( `${ prefix }-dialog-popup` )
+				).toBeVisible();
+
+				await page.keyboard.press( 'Escape' );
+
+				await expect(
+					page.getByTestId( `${ prefix }-dialog-status` )
+				).toHaveAttribute( 'data-state', 'closed' );
+				await expect(
+					page.getByTestId( `${ prefix }-modal-status` )
+				).toHaveAttribute( 'data-state', 'open' );
+			} );
+		}
+	} );
 } );

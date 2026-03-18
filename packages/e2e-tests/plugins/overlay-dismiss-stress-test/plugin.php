@@ -61,10 +61,16 @@ function overlay_dismiss_stress_test_enqueue_scripts( $hook_suffix ) {
 	wp_enqueue_script(
 		'overlay-dismiss-playground',
 		$plugin_dir_url . 'build/playground.iife.js',
-		array_merge( $react_deps, array( 'overlay-bundle-a', 'overlay-bundle-b' ) ),
+		array_merge(
+			$react_deps,
+			array( 'overlay-bundle-a', 'overlay-bundle-b', 'wp-components' )
+		),
 		filemtime( $plugin_dir_path . 'build/playground.iife.js' ),
 		true
 	);
+
+	// Also enqueue @wordpress/components styles for the interop scenarios
+	wp_enqueue_style( 'wp-components' );
 
 	// Basic styles for the playground
 	wp_enqueue_style(

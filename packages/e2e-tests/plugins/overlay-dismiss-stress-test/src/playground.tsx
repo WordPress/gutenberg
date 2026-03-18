@@ -16,6 +16,9 @@ const ReactDOM = ( window as any ).ReactDOM;
 const A = ( window as any ).OverlayBundleA;
 const B = ( window as any ).OverlayBundleB;
 
+const LegacyModal = ( window as any ).wp?.components?.Modal;
+const LegacyPopover = ( window as any ).wp?.components?.Popover;
+
 type BundleLib = typeof A;
 
 function StatusIndicator( {
@@ -806,6 +809,333 @@ function DialogInDialogScenario() {
 	);
 }
 
+// ─── 2.1 Legacy Modal + Base UI Select ──────────────────────────────
+
+function LegacyModalSelectVariant( {
+	lib,
+	prefix,
+}: {
+	lib: BundleLib;
+	prefix: string;
+} ) {
+	const [ modalOpen, setModalOpen ] = React.useState( false );
+	if ( ! LegacyModal ) {
+		return <p>wp.components.Modal not available</p>;
+	}
+	return (
+		<>
+			<div
+				style={ {
+					display: 'flex',
+					gap: '8px',
+					alignItems: 'center',
+					marginBottom: '8px',
+				} }
+			>
+				<StatusIndicator
+					label="Modal"
+					isOpen={ modalOpen }
+					testId={ `${ prefix }-modal-status` }
+				/>
+			</div>
+			<button
+				data-testid={ `${ prefix }-modal-trigger` }
+				onClick={ () => setModalOpen( true ) }
+				style={ { padding: '8px 16px' } }
+			>
+				Open Legacy Modal
+			</button>
+			{ modalOpen && (
+				<LegacyModal
+					title="Legacy Modal"
+					onRequestClose={ () => setModalOpen( false ) }
+				>
+					<div data-testid={ `${ prefix }-modal-body` }>
+						<p>
+							Select below is from Base UI (simulating
+							@wordpress/ui):
+						</p>
+						<lib.Select.Root defaultValue="Apple">
+							<lib.Select.Trigger
+								data-testid={ `${ prefix }-select-trigger` }
+								style={ selectTriggerStyle }
+							/>
+							<lib.Select.Portal>
+								<lib.Select.Positioner>
+									<lib.Select.Popup
+										data-testid={ `${ prefix }-select-popup` }
+										style={ selectPopupStyle }
+									>
+										<SelectItems lib={ lib } />
+									</lib.Select.Popup>
+								</lib.Select.Positioner>
+							</lib.Select.Portal>
+						</lib.Select.Root>
+					</div>
+				</LegacyModal>
+			) }
+		</>
+	);
+}
+
+function LegacyModalSelectScenario() {
+	return (
+		<ScenarioCard
+			scenarioId="2.1"
+			title="Legacy Modal + Base UI Select"
+			description="Open @wordpress/components Modal, open Base UI Select inside. Click Select — Modal stays. Escape with Select open — observe."
+		>
+			<VariantPanel
+				testId="2.1-same-bundle"
+				label="Both from Bundle A"
+				isCrossBundleVariant={ false }
+			>
+				<LegacyModalSelectVariant lib={ A } prefix="2.1-same-bundle" />
+			</VariantPanel>
+			<VariantPanel
+				testId="2.1-cross-bundle"
+				label="Modal=legacy, Select=Bundle B"
+				isCrossBundleVariant
+			>
+				<LegacyModalSelectVariant lib={ B } prefix="2.1-cross-bundle" />
+			</VariantPanel>
+		</ScenarioCard>
+	);
+}
+
+// ─── 2.2 Base UI Dialog + Legacy Popover ────────────────────────────
+
+function DialogLegacyPopoverVariant( {
+	D,
+	prefix,
+}: {
+	D: BundleLib;
+	prefix: string;
+} ) {
+	const [ dialogOpen, setDialogOpen ] = React.useState( false );
+	const [ popoverAnchor, setPopoverAnchor ] = React.useState( null );
+	const [ showPopover, setShowPopover ] = React.useState( false );
+	if ( ! LegacyPopover ) {
+		return <p>wp.components.Popover not available</p>;
+	}
+	return (
+		<>
+			<div
+				style={ {
+					display: 'flex',
+					gap: '8px',
+					alignItems: 'center',
+					marginBottom: '8px',
+				} }
+			>
+				<StatusIndicator
+					label="Dialog"
+					isOpen={ dialogOpen }
+					testId={ `${ prefix }-dialog-status` }
+				/>
+				<StatusIndicator
+					label="Popover"
+					isOpen={ showPopover }
+					testId={ `${ prefix }-popover-status` }
+				/>
+			</div>
+			<D.Dialog.Root open={ dialogOpen } onOpenChange={ setDialogOpen }>
+				<D.Dialog.Trigger
+					data-testid={ `${ prefix }-dialog-trigger` }
+					style={ { padding: '8px 16px' } }
+				>
+					Open Dialog
+				</D.Dialog.Trigger>
+				<D.Dialog.Portal>
+					<D.Dialog.Backdrop style={ backdropStyle } />
+					<D.Dialog.Popup
+						data-testid={ `${ prefix }-dialog-popup` }
+						style={ dialogPopupStyle }
+					>
+						<h4 style={ { margin: '0 0 12px' } }>Base UI Dialog</h4>
+						<button
+							ref={ setPopoverAnchor }
+							data-testid={ `${ prefix }-popover-trigger` }
+							onClick={ () => setShowPopover( ! showPopover ) }
+							style={ { padding: '6px 12px' } }
+						>
+							Toggle Legacy Popover
+						</button>
+						{ showPopover && (
+							<LegacyPopover
+								anchor={ popoverAnchor }
+								onClose={ () => setShowPopover( false ) }
+							>
+								<div
+									data-testid={ `${ prefix }-popover-popup` }
+									style={ { padding: '16px' } }
+								>
+									<p style={ { margin: '0 0 8px' } }>
+										Legacy Popover content.
+									</p>
+									<button
+										data-testid={ `${ prefix }-popover-action` }
+										style={ { padding: '4px 8px' } }
+									>
+										Focusable action
+									</button>
+								</div>
+							</LegacyPopover>
+						) }
+					</D.Dialog.Popup>
+				</D.Dialog.Portal>
+			</D.Dialog.Root>
+		</>
+	);
+}
+
+function DialogLegacyPopoverScenario() {
+	return (
+		<ScenarioCard
+			scenarioId="2.2"
+			title="Base UI Dialog + Legacy Popover"
+			description="Open Base UI Dialog, toggle @wordpress/components Popover inside. Click Popover — Dialog stays. Escape — observe."
+		>
+			<VariantPanel
+				testId="2.2-same-bundle"
+				label="Dialog from Bundle A"
+				isCrossBundleVariant={ false }
+			>
+				<DialogLegacyPopoverVariant D={ A } prefix="2.2-same-bundle" />
+			</VariantPanel>
+			<VariantPanel
+				testId="2.2-cross-bundle"
+				label="Dialog from Bundle B"
+				isCrossBundleVariant
+			>
+				<DialogLegacyPopoverVariant D={ B } prefix="2.2-cross-bundle" />
+			</VariantPanel>
+		</ScenarioCard>
+	);
+}
+
+// ─── 2.3 Legacy Modal + Base UI Dialog + Base UI Select ─────────────
+
+function ThreeLevelInteropVariant( {
+	D,
+	prefix,
+}: {
+	D: BundleLib;
+	prefix: string;
+} ) {
+	const [ modalOpen, setModalOpen ] = React.useState( false );
+	const [ dialogOpen, setDialogOpen ] = React.useState( false );
+	if ( ! LegacyModal ) {
+		return <p>wp.components.Modal not available</p>;
+	}
+	return (
+		<>
+			<div
+				style={ {
+					display: 'flex',
+					gap: '8px',
+					alignItems: 'center',
+					marginBottom: '8px',
+				} }
+			>
+				<StatusIndicator
+					label="Modal"
+					isOpen={ modalOpen }
+					testId={ `${ prefix }-modal-status` }
+				/>
+				<StatusIndicator
+					label="Dialog"
+					isOpen={ dialogOpen }
+					testId={ `${ prefix }-dialog-status` }
+				/>
+			</div>
+			<button
+				data-testid={ `${ prefix }-modal-trigger` }
+				onClick={ () => setModalOpen( true ) }
+				style={ { padding: '8px 16px' } }
+			>
+				Open Legacy Modal
+			</button>
+			{ modalOpen && (
+				<LegacyModal
+					title="Legacy Modal (outer)"
+					onRequestClose={ () => setModalOpen( false ) }
+				>
+					<div data-testid={ `${ prefix }-modal-body` }>
+						<D.Dialog.Root
+							open={ dialogOpen }
+							onOpenChange={ setDialogOpen }
+						>
+							<D.Dialog.Trigger
+								data-testid={ `${ prefix }-dialog-trigger` }
+								style={ { padding: '6px 12px' } }
+							>
+								Open Base UI Dialog (middle)
+							</D.Dialog.Trigger>
+							<D.Dialog.Portal>
+								<D.Dialog.Backdrop style={ backdropStyle } />
+								<D.Dialog.Popup
+									data-testid={ `${ prefix }-dialog-popup` }
+									style={ {
+										...dialogPopupStyle,
+										minWidth: '350px',
+									} }
+								>
+									<h4 style={ { margin: '0 0 12px' } }>
+										Base UI Dialog (middle)
+									</h4>
+									<p>Select below (innermost):</p>
+									<D.Select.Root defaultValue="Apple">
+										<D.Select.Trigger
+											data-testid={ `${ prefix }-select-trigger` }
+											style={ selectTriggerStyle }
+										/>
+										<D.Select.Portal>
+											<D.Select.Positioner>
+												<D.Select.Popup
+													data-testid={ `${ prefix }-select-popup` }
+													style={ selectPopupStyle }
+												>
+													<SelectItems lib={ D } />
+												</D.Select.Popup>
+											</D.Select.Positioner>
+										</D.Select.Portal>
+									</D.Select.Root>
+								</D.Dialog.Popup>
+							</D.Dialog.Portal>
+						</D.Dialog.Root>
+					</div>
+				</LegacyModal>
+			) }
+		</>
+	);
+}
+
+function ThreeLevelInteropScenario() {
+	return (
+		<ScenarioCard
+			scenarioId="2.3"
+			title="Legacy Modal + Base UI Dialog + Base UI Select"
+			description="Three levels mixing both systems. Open all three. Escape cascades correctly? Click-outside handled properly?"
+		>
+			<VariantPanel
+				testId="2.3-same-bundle"
+				label="All Base UI from Bundle A"
+				isCrossBundleVariant={ false }
+			>
+				<ThreeLevelInteropVariant D={ A } prefix="2.3-same-bundle" />
+			</VariantPanel>
+			<VariantPanel
+				testId="2.3-cross-bundle"
+				label="Base UI from Bundle B"
+				isCrossBundleVariant
+			>
+				<ThreeLevelInteropVariant D={ B } prefix="2.3-cross-bundle" />
+			</VariantPanel>
+		</ScenarioCard>
+	);
+}
+
 // ─── App ────────────────────────────────────────────────────────────
 
 function App() {
@@ -824,6 +1154,17 @@ function App() {
 			<ThreeLevelNestingScenario />
 			<ModalDialogPopoverScenario />
 			<DialogInDialogScenario />
+
+			<h2>Legacy Interop (@wordpress/components)</h2>
+			<p style={ { color: '#666' } }>
+				These scenarios mix <code>@wordpress/components</code> overlays
+				(Modal, Popover) with Base UI overlays (simulating{ ' ' }
+				<code>@wordpress/ui</code>). This tests the real migration
+				scenario where both systems coexist.
+			</p>
+			<LegacyModalSelectScenario />
+			<DialogLegacyPopoverScenario />
+			<ThreeLevelInteropScenario />
 
 			<h2>Focus Management</h2>
 			<p style={ { color: '#666' } }>
