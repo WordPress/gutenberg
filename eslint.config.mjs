@@ -10,6 +10,7 @@ import storybookPlugin from 'eslint-plugin-storybook';
 import reactCompilerPlugin from 'eslint-plugin-react-compiler';
 import rawJestDomPlugin from 'eslint-plugin-jest-dom';
 import rawTestingLibraryPlugin from 'eslint-plugin-testing-library';
+import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
 
 /**
@@ -229,7 +230,6 @@ export default dedupePlugins( [
 			),
 		},
 		rules: {
-			'jest/expect-expect': 'off',
 			'react/jsx-boolean-value': 'error',
 			'react/jsx-curly-brace-presence': [
 				'error',
@@ -413,8 +413,20 @@ export default dedupePlugins( [
 		],
 	},
 	{
-		...rawTestingLibraryPlugin.configs[ 'flat/react' ],
+		...testingLibraryPlugin.configs[ 'flat/react' ],
 		plugins: { 'testing-library': testingLibraryPlugin },
+		files: [ '**/test/**/*.[tj]s?(x)' ],
+		ignores: [
+			'**/*.@(android|ios|native).[tj]s?(x)',
+			'packages/react-native-*/**/*.[tj]s?(x)',
+			'test/native/**/*.[tj]s?(x)',
+			'test/e2e/**/*.[tj]s?(x)',
+			'test/performance/**/*.[tj]s?(x)',
+			'test/storybook-playwright/**/*.[tj]s?(x)',
+		],
+	},
+	{
+		...jestPlugin.configs[ 'flat/recommended' ],
 		files: [ '**/test/**/*.[tj]s?(x)' ],
 		ignores: [
 			'**/*.@(android|ios|native).[tj]s?(x)',
