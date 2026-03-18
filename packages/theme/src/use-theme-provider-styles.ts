@@ -200,7 +200,7 @@ export function useThemeProviderStyles( {
 		[ primary, bg, cursorControl ]
 	);
 
-	const themeProviderStyles = useMemo( () => {
+	const colorStyles = useMemo( () => {
 		// Determine which seeds are needed for generating ramps.
 		const seeds = {
 			...DEFAULT_SEED_COLORS,
@@ -222,16 +222,21 @@ export function useThemeProviderStyles( {
 			}
 		} );
 
-		return {
-			...generateStyles( {
-				primary: seeds.primary,
-				computedColorRamps,
-			} ),
+		return generateStyles( {
+			primary: seeds.primary,
+			computedColorRamps,
+		} );
+	}, [ primary, bg ] );
+
+	const themeProviderStyles = useMemo(
+		() => ( {
+			...colorStyles,
 			...( cursorControl && {
 				'--wpds-cursor-control': cursorControl,
 			} ),
-		};
-	}, [ primary, bg, cursorControl ] );
+		} ),
+		[ colorStyles, cursorControl ]
+	);
 
 	return {
 		resolvedSettings,
