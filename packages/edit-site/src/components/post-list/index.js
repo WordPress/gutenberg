@@ -73,6 +73,7 @@ export default function PostList( { postType } ) {
 		name: postType,
 		slug: 'default',
 		defaultView,
+		defaultLayouts,
 		activeViewOverrides,
 		queryParams: {
 			page: query.pageNumber,

@@ -26,12 +26,14 @@ async function isListView( query ) {
 		'page'
 	);
 	const defaultView = config?.default_view;
+	const defaultLayouts = config?.default_layouts;
 	const viewEntry = config?.view_list?.find( ( v ) => v.slug === activeView );
 	const view = await loadView( {
 		kind: 'postType',
 		name: 'page',
 		slug: 'default',
 		defaultView,
+		defaultLayouts,
 		activeViewOverrides: viewEntry?.view ?? {},
 	} );
 	return view.type === 'list';
