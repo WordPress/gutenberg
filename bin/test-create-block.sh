@@ -73,7 +73,9 @@ module.exports = [
 	...defaultConfig,
 	{
 		settings: {
-			'import/resolver': require.resolve( '../tools/eslint/import-resolver' ),
+			'import/resolver': require.resolve(
+				'../tools/eslint/import-resolver'
+			),
 		},
 	},
 ];
