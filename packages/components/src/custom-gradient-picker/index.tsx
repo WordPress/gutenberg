@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { type AngularNode, type LinearGradientNode } from 'gradient-parser';
+import { type LinearGradientNode } from 'gradient-parser';
 
 /**
  * WordPress dependencies
@@ -67,27 +67,22 @@ const GradientTypePicker = ( {
 	onChange,
 }: GradientTypePickerProps ) => {
 	const { type } = gradientAST;
-	const lastLinearOrientation = useRef< AngularNode >(
-		( gradientAST.orientation as AngularNode ) ?? {
-			type: 'angular',
-			value: `${ DEFAULT_LINEAR_GRADIENT_ANGLE }`,
-		}
-	);
+	const lastLinearOrientationAngle = useRef( DEFAULT_LINEAR_GRADIENT_ANGLE );
 
 	if ( type === 'linear-gradient' && gradientAST.orientation ) {
-		lastLinearOrientation.current = gradientAST.orientation as AngularNode;
+		lastLinearOrientationAngle.current = Number(
+			gradientAST.orientation.value
+		);
 	}
 
 	const onSetLinearGradient = () => {
 		onChange(
 			serializeGradient( {
 				...gradientAST,
-				orientation:
-					lastLinearOrientation.current ??
-					( {
-						type: 'angular',
-						value: `${ DEFAULT_LINEAR_GRADIENT_ANGLE }`,
-					} as const ),
+				orientation: {
+					type: 'angular',
+					value: `${ lastLinearOrientationAngle.current }`,
+				} as const,
 				type: 'linear-gradient',
 			} satisfies LinearGradientNode )
 		);
