@@ -89,6 +89,11 @@ const CONFIG = [
 		rtl: [ componentsRtl ],
 	},
 	{
+		componentIdMatcher: /^design-system-tokens-/,
+		ltr: [ designTokens, componentsLtr ],
+		rtl: [ designTokens, componentsRtl ],
+	},
+	{
 		componentIdMatcher: /^design-system-/,
 		ltr: [ designTokens ],
 		rtl: [ designTokens ],

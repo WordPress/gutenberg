@@ -1,37 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Button, SelectControl, TextControl } from '@wordpress/components';
+import { useState, useCallback } from '@wordpress/element';
+import { Stack } from '@wordpress/ui';
 
-/**
- * WordPress dependencies
- */
-import { useState, useCallback, useId } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { ThemeProvider } from '../theme-provider';
 import styles from './motion.story.module.css';
-
-const meta: Meta< typeof ThemeProvider > = {
-	title: 'Design System/Theme/Motion Tokens',
-	component: ThemeProvider,
-	args: {
-		isRoot: true,
-	},
-	argTypes: {
-		children: { table: { disable: true } },
-		isRoot: { table: { disable: true } },
-		color: { table: { disable: true } },
-		density: { table: { disable: true } },
-	},
-	parameters: {
-		controls: { hideNoControlsWarning: true },
-		docs: { canvas: { sourceState: 'shown' } },
-	},
-};
-export default meta;
 
 const EASING_TOKENS = [
 	{
@@ -91,6 +63,15 @@ const DURATION_TOKENS = [
 	},
 ];
 
+const DURATION_OPTIONS = [
+	{ label: 'xs (50ms)', value: '50ms' },
+	{ label: 'sm (100ms)', value: '100ms' },
+	{ label: 'md (200ms)', value: '200ms' },
+	{ label: 'lg (300ms)', value: '300ms' },
+	{ label: 'xl (400ms)', value: '400ms' },
+	{ label: 'Custom', value: 'custom' },
+];
+
 function AnimationRow( {
 	label,
 	description,
@@ -105,15 +86,19 @@ function AnimationRow( {
 	animKey: number;
 } ) {
 	return (
-		<div className={ styles.row }>
-			<div className={ styles.labelGroup }>
+		<Stack align="center" gap="lg">
+			<Stack
+				direction="column"
+				gap="xs"
+				style={ { width: '320px', flexShrink: 0 } }
+			>
 				<span className={ styles.label }>{ label }</span>
 				{ description && (
 					<span className={ styles.description }>
 						{ description }
 					</span>
 				) }
-			</div>
+			</Stack>
 			<div className={ styles.track }>
 				<div
 					key={ animKey }
@@ -124,26 +109,15 @@ function AnimationRow( {
 					} }
 				/>
 			</div>
-		</div>
+		</Stack>
 	);
 }
-
-const DURATION_OPTIONS = [
-	{ label: 'xs (50ms)', value: '50ms' },
-	{ label: 'sm (100ms)', value: '100ms' },
-	{ label: 'md (200ms)', value: '200ms' },
-	{ label: 'lg (300ms)', value: '300ms' },
-	{ label: 'xl (400ms)', value: '400ms' },
-	{ label: 'Custom', value: 'custom' },
-];
 
 function MotionDemo() {
 	const [ animKey, setAnimKey ] = useState( 0 );
 	const replay = useCallback( () => setAnimKey( ( k ) => k + 1 ), [] );
 	const [ selectedDuration, setSelectedDuration ] = useState( '400ms' );
 	const [ customDuration, setCustomDuration ] = useState( '600' );
-	const selectId = useId();
-	const customInputId = useId();
 
 	const easingDuration =
 		selectedDuration === 'custom'
@@ -151,61 +125,45 @@ function MotionDemo() {
 			: selectedDuration;
 
 	return (
-		<div className={ styles.wrapper }>
-			<button className={ styles.replayButton } onClick={ replay }>
-				Replay animations
-			</button>
-
+		<Stack direction="column" gap="xl">
 			<div>
-				<h3 className={ styles.sectionTitle }>Easing curves</h3>
-				<div className={ styles.controls }>
-					<label
-						className={ styles.controlLabel }
-						htmlFor={ selectId }
-					>
-						Duration:
-					</label>
-					<select
-						id={ selectId }
-						className={ styles.select }
+				<Button variant="secondary" onClick={ replay }>
+					Replay animations
+				</Button>
+			</div>
+
+			<Stack direction="column" gap="lg">
+				<h3>Easing curves</h3>
+				<Stack align="end" gap="md" wrap="wrap">
+					<SelectControl
+						__next40pxDefaultSize
+						label="Duration"
 						value={ selectedDuration }
-						onChange={ ( e ) => {
-							setSelectedDuration( e.target.value );
+						options={ DURATION_OPTIONS }
+						onChange={ ( value ) => {
+							setSelectedDuration( value );
 							setAnimKey( ( k ) => k + 1 );
 						} }
-					>
-						{ DURATION_OPTIONS.map( ( opt ) => (
-							<option key={ opt.value } value={ opt.value }>
-								{ opt.label }
-							</option>
-						) ) }
-					</select>
+						style={ { minWidth: '180px' } }
+					/>
 					{ selectedDuration === 'custom' && (
-						<>
-							<label
-								className={ styles.controlLabel }
-								htmlFor={ customInputId }
-							>
-								Value:
-							</label>
-							<input
-								id={ customInputId }
-								className={ styles.customInput }
-								type="number"
-								min="0"
-								max="5000"
-								step="50"
-								value={ customDuration }
-								onChange={ ( e ) => {
-									setCustomDuration( e.target.value );
-									setAnimKey( ( k ) => k + 1 );
-								} }
-							/>
-							<span className={ styles.controlLabel }>ms</span>
-						</>
+						<TextControl
+							__next40pxDefaultSize
+							label="Value (ms)"
+							type="number"
+							min={ 0 }
+							max={ 5000 }
+							step={ 50 }
+							value={ customDuration }
+							onChange={ ( value ) => {
+								setCustomDuration( value );
+								setAnimKey( ( k ) => k + 1 );
+							} }
+							style={ { width: '120px' } }
+						/>
 					) }
-				</div>
-				<div className={ styles.rows }>
+				</Stack>
+				<Stack direction="column" gap="md">
 					{ EASING_TOKENS.map( ( token ) => (
 						<AnimationRow
 							key={ token.name }
@@ -216,15 +174,13 @@ function MotionDemo() {
 							animKey={ animKey }
 						/>
 					) ) }
-				</div>
-			</div>
+				</Stack>
+			</Stack>
 
-			<div>
-				<h3 className={ styles.sectionTitle }>Durations</h3>
-				<p className={ styles.sectionDescription }>
-					All using easing-standard
-				</p>
-				<div className={ styles.rows }>
+			<Stack direction="column" gap="lg">
+				<h3>Durations</h3>
+				<p>All using easing-standard</p>
+				<Stack direction="column" gap="md">
 					{ DURATION_TOKENS.map( ( token ) => (
 						<AnimationRow
 							key={ token.name }
@@ -235,14 +191,20 @@ function MotionDemo() {
 							animKey={ animKey }
 						/>
 					) ) }
-				</div>
-			</div>
-		</div>
+				</Stack>
+			</Stack>
+		</Stack>
 	);
 }
 
-export const Default: StoryObj< typeof ThemeProvider > = {
-	args: {
-		children: <MotionDemo />,
+const meta: Meta< typeof MotionDemo > = {
+	title: 'Design System/Tokens/Motion',
+	component: MotionDemo,
+	parameters: {
+		controls: { hideNoControlsWarning: true },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
+export default meta;
+
+export const Default: StoryObj< typeof MotionDemo > = {};

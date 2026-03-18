@@ -4,7 +4,8 @@
 	"compilerOptions": {
 		"jsx": "react-jsx",
 		"rootDir": ".",
-		"noEmit": true
+		"noEmit": true,
+		"types": [ "css-modules" ]
 	},
 	"include": [ "**/*.tsx", "**/*.ts" ]
 }
