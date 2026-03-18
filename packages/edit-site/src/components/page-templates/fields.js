@@ -150,9 +150,6 @@ export const authorField = {
 	label: __( 'Author' ),
 	id: 'author',
 	getValue: ( { item } ) => item.author_text ?? item.author,
-	filterBy: {
-		operators: [ 'isAny', 'isNone' ],
-	},
 	render: AuthorField,
 };
 
