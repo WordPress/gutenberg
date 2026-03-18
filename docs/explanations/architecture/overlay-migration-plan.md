@@ -118,12 +118,14 @@ Constraints:
 
 ### Phase 5: Remove z-index overrides
 
-Once all overlays (both WPDS and legacy) use `@base-ui/react` under the hood:
+Once all overlays (both WPDS and legacy) use `@base-ui/react` under the hood, and the shared portal context (see below) ensures correct portal nesting across bundles:
 
 1. Remove `--wp-ui-*-z-index` overrides from the editor shells
 2. Remove `--wp-components-*-z-index` overrides
 3. Remove legacy SCSS z-index entries from `_z-index.scss`
 4. DOM order handles stacking correctly — no z-indexes needed
+
+Note: Phase 4 does **not** eliminate `PortalContext` isolation. `@wordpress/components` (`wpScript: true`) and the various consumers of `@wordpress/ui` (`wpScript: false`) still bundle separate copies of `@base-ui/react`. The shared portal context approach (see below) is needed to coordinate portal nesting across these bundles, regardless of whether `@wordpress/components` internals have been migrated.
 
 ---
 
@@ -146,7 +148,7 @@ Lower layers must not depend on higher ones. The z-index compatibility layer liv
 - **Pro**: Each package can update `@wordpress/ui` independently
 - **Con**: Multiple copies of `@base-ui/react` on the page
 - **Con**: React contexts are not shared across bundles. Empirical testing (38 automated E2E tests) shows dismiss coordination is **not affected** — all tests pass identically in same-bundle and cross-bundle modes. The only confirmed impact:
-  - **PortalContext** (used by all overlays): portal container nesting is isolated across bundles — in 3+ level nesting where bundles interleave (e.g., A→B→A: Dialog(A) → Popover(B) → Select(A)), the innermost overlay renders behind a middle-level overlay. **This only triggers when bundles alternate** in the nesting chain (A→B→A); if the inner two overlays share a bundle (A→B→B), stacking is correct. Mitigated by Phase 2 z-index overrides; potentially resolved earlier via a shared portal context at the `@wordpress/ui` level (see "Shared Portal Context" below); fully resolved in Phase 4.
+  - **PortalContext** (used by all overlays): portal container nesting is isolated across bundles — in 3+ level nesting where bundles interleave (e.g., A→B→A: Dialog(A) → Popover(B) → Select(A)), the innermost overlay renders behind a middle-level overlay. **This only triggers when bundles alternate** in the nesting chain (A→B→A); if the inner two overlays share a bundle (A→B→B), stacking is correct. Mitigated by Phase 2 z-index overrides; potentially resolved via a shared portal context at the `@wordpress/ui` level (see "Shared Portal Context" below).
 
 What does NOT break across bundles:
   - **FloatingTree** (Popover, Menu): Escape key coordination works correctly via shared React synthetic events
@@ -181,7 +183,7 @@ Based on empirical testing (38 automated E2E tests across 8 scenario groups):
 
 | Regression | Impact | Mitigation |
 |---|---|---|
-| **Visual stacking in 3+ level nesting with interleaved bundles (A→B→A)** | Select renders behind Popover when the nesting chain alternates bundles (e.g., Dialog(A) → Popover(B) → Select(A)). Caused by `PortalContext` isolation — the Select reads `PortalContext_A`, finds the Dialog's portal, and nests there instead of the Popover's. **Does not occur** when inner overlays share a bundle (A→B→B). | **Phase 2**: z-index overrides (`--wp-ui-select-z-index` > `--wp-ui-popover-z-index`). **Phase 1+ (tentative)**: shared portal context at `@wordpress/ui` level via `globalThis` pattern — see below. **Phase 4**: all overlays share a single Base UI bundle → `PortalContext` is shared natively. |
+| **Visual stacking in 3+ level nesting with interleaved bundles (A→B→A)** | Select renders behind Popover when the nesting chain alternates bundles (e.g., Dialog(A) → Popover(B) → Select(A)). Caused by `PortalContext` isolation — the Select reads `PortalContext_A`, finds the Dialog's portal, and nests there instead of the Popover's. **Does not occur** when inner overlays share a bundle (A→B→B). | **Phase 2**: z-index overrides (`--wp-ui-select-z-index` > `--wp-ui-popover-z-index`). **Phase 1+ (tentative)**: shared portal context at `@wordpress/ui` level via `globalThis` pattern — see below. |
 
 ### From `@wordpress/ui` + `@wordpress/components` coexisting
 
