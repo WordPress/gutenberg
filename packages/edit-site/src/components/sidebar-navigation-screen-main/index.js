@@ -10,6 +10,7 @@ import {
 	styles,
 	page,
 	siteLogo,
+	cog,
 } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -34,6 +35,14 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 					>
 						{ __( 'Styles' ) }
 					</SidebarNavigationItemGlobalStyles>
+					<SidebarNavigationItem
+						uid="customize-navigation-item"
+						to="/customize"
+						withChevron
+						icon={ cog }
+					>
+						{ __( 'Customize' ) }
+					</SidebarNavigationItem>
 					<SidebarNavigationItem
 						uid="navigation-navigation-item"
 						to="/navigation"

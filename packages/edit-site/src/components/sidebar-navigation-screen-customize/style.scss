@@ -1,0 +1,35 @@
+@use "@wordpress/base-styles/colors" as *;
+
+.edit-site-sidebar-navigation-screen-customize {
+	.components-panel__body {
+		border-top: 1px solid $gray-800;
+		border-bottom: none;
+
+		&:first-child {
+			border-top: none;
+		}
+	}
+
+	.components-panel__body-title {
+		margin: 0;
+
+		button {
+			padding: 12px 16px;
+		}
+	}
+
+	.components-item-group {
+		margin: 0 16px 12px;
+	}
+}
+
+.edit-site-sidebar-navigation-screen-customize__homepage-note {
+	padding: 12px 0;
+	color: $gray-400;
+	font-size: 13px;
+	line-height: 1.4;
+
+	p {
+		margin: 0;
+	}
+}

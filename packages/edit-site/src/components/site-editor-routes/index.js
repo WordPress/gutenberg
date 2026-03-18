@@ -12,6 +12,7 @@ import { store as siteEditorStore } from '../../store';
 import { homeRoute } from './home';
 import { identityRoute } from './identity';
 import { stylesRoute } from './styles';
+import { customizeRoute } from './customize';
 import { navigationRoute } from './navigation';
 import { navigationItemRoute } from './navigation-item';
 import { patternsRoute } from './patterns';
@@ -37,6 +38,7 @@ const routes = [
 	navigationItemRoute,
 	navigationRoute,
 	identityRoute,
+	customizeRoute,
 	stylesRoute,
 	homeRoute,
 	stylebookRoute,
