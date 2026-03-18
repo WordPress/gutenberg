@@ -7,9 +7,6 @@ import Vips from 'wasm-vips';
 import VipsModule from 'wasm-vips/vips.wasm';
 
 // @ts-expect-error - WASM files are inlined as base64 data URLs at build time
-import VipsJxlModule from 'wasm-vips/vips-jxl.wasm';
-
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
 import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
 
 /**
@@ -44,17 +41,16 @@ async function getVips(): Promise< typeof Vips > {
 	}
 
 	vipsInstance = await Vips( {
-		// Load JXL and HEIF dynamic modules for full format support.
-		// wasm-vips defaults to ["vips-jxl.wasm", "vips-heif.wasm"].
-		dynamicLibraries: [ 'vips-jxl.wasm', 'vips-heif.wasm' ],
+		// Load HEIF dynamic module for HEIF/HEIC and AVIF format support.
+		// JXL is omitted as WordPress Core does not currently support it.
+		// It can be re-added when Core adds JXL support.
+		dynamicLibraries: [ 'vips-heif.wasm' ],
 		locateFile: ( fileName: string ) => {
 			// WASM files are inlined as base64 data URLs at build time,
 			// eliminating the need for separate file downloads and avoiding
 			// issues with hosts not serving WASM files with correct MIME types.
 			if ( fileName.endsWith( 'vips.wasm' ) ) {
 				return VipsModule;
-			} else if ( fileName.endsWith( 'vips-jxl.wasm' ) ) {
-				return VipsJxlModule;
 			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
 				return VipsHeifModule;
 			}
