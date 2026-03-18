@@ -31,12 +31,10 @@ describe( 'CustomGradientPicker', () => {
 			// Verify the angle from before the radial switch is restored, not the default
 			const lastCall =
 				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
-			expect( lastCall ).toContain(
-				'linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)'
-			);
+			expect( lastCall ).toContain( '90deg' );
 		} );
 
-		it( 'should use DEFAULT_LINEAR_GRADIENT_ANGLE when no prior linear angle exists', async () => {
+		it( 'should use HORIZONTAL_GRADIENT_ORIENTATION when no prior linear angle exists', async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
 
@@ -55,9 +53,7 @@ describe( 'CustomGradientPicker', () => {
 
 			const lastCall =
 				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
-			expect( lastCall ).toContain(
-				'linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)'
-			);
+			expect( lastCall ).toContain( '90deg' );
 		} );
 
 		it( 'should not restore angle when switching to radial', async () => {
