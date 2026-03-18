@@ -12,6 +12,13 @@ import rawJestDomPlugin from 'eslint-plugin-jest-dom';
 import rawTestingLibraryPlugin from 'eslint-plugin-testing-library';
 import tseslint from 'typescript-eslint';
 
+/**
+ * Internal dependencies
+ */
+import reactNativeEditorConfig from './packages/react-native-editor/eslint.config.cjs';
+import wpBuildConfig from './packages/wp-build/eslint.config.cjs';
+import platformDocsConfig from './platform-docs/eslint.config.cjs';
+
 // Wrap plugins that don't yet support ESLint v10's rule context API.
 const jestDomPlugin = {
 	...rawJestDomPlugin,
@@ -773,103 +780,8 @@ export default dedupePlugins( [
 		},
 	},
 
-	// From packages/react-native-editor/.eslintrc.js:
-	// Additional react settings and restricted syntax for RN editor.
-	{
-		files: [ 'packages/react-native-editor/**/*.js' ],
-		settings: {
-			react: {
-				pragma: 'React',
-				version: 'detect',
-				flowVersion: '0.92.0',
-			},
-		},
-		languageOptions: {
-			globals: {
-				...globals.browser,
-				...globals.jest,
-				__DEV__: true,
-			},
-		},
-		rules: {
-			'no-restricted-syntax': [
-				'error',
-				{
-					selector:
-						'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
-					message:
-						'Use ellipsis character (\u2026) in place of three dots',
-				},
-				{
-					selector:
-						'ImportDeclaration[source.value="lodash"] Identifier.imported[name="memoize"]',
-					message:
-						"Use memize instead of Lodash\u2019s memoize",
-				},
-				{
-					selector:
-						'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
-					message: 'Prefer page.waitForSelector instead.',
-				},
-				{
-					selector:
-						'JSXAttribute[name.name="id"][value.type="Literal"]',
-					message:
-						'Do not use string literals for IDs; use useId hook instead.',
-				},
-				{
-					selector:
-						'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
-					message:
-						'withDispatch must return an object with consistent keys. Avoid performing logic in `mapDispatchToProps`.',
-				},
-			],
-			'import/no-unresolved': 'off',
-		},
-	},
-
-	// From packages/react-native-editor/__device-tests__/.eslintrc.js:
-	// Device test globals and rules.
-	{
-		files: [
-			'packages/react-native-editor/__device-tests__/**/*.js',
-		],
-		languageOptions: {
-			globals: {
-				editorPage: true,
-				e2eTestData: true,
-				e2eUtils: true,
-			},
-		},
-		rules: {
-			'jest/expect-expect': 'off',
-		},
-	},
-
-	// From packages/wp-build/.eslintrc.cjs:
-	// Build tool — allow console, disable wp-process-env and wp-global-usage.
-	{
-		files: [ 'packages/wp-build/**' ],
-		rules: {
-			'no-console': 'off',
-			'@wordpress/no-wp-process-env': 'off',
-			'@wordpress/wp-global-usage': 'off',
-		},
-	},
-
-	// From platform-docs/.eslintrc.js:
-	// React settings and import/no-unresolved off for platform docs.
-	{
-		files: [ 'platform-docs/**/*.js' ],
-		settings: {
-			react: {
-				pragma: 'React',
-				version: 'detect',
-				flowVersion: '0.92.0',
-			},
-		},
-		rules: {
-			'import/no-unresolved': 'off',
-		},
-	},
+	// Package-level configs (kept alongside the code they apply to).
+	...reactNativeEditorConfig,
+	...wpBuildConfig,
+	...platformDocsConfig,
 ] );
