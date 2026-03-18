@@ -19,9 +19,10 @@ The question: **Does dismiss coordination (click-outside, Escape key) break when
 | Escape key (same-type, e.g., Popover in Popover) | **Yes** | React synthetic `onKeyDown` + `stopPropagation()` prevents parent from receiving Escape; shared React makes this work across bundles |
 | Escape key (Dialog in Dialog, cross-bundle) | **Degraded** | Nesting counter relies on `DialogRootContext`, which is not shared across bundles |
 | Modal dialog backdrop dismiss | **Yes** | Backdrop check is DOM-based, not context-based |
-| Visual stacking (DOM order) | **Yes** | No z-index means later-rendered elements are on top |
+| Visual stacking (same-level nesting) | **Yes** | No z-index means later-rendered elements are on top |
+| Visual stacking (multi-level nesting) | **Degraded** | `PortalContext` isolation causes incorrect portal nesting across bundles — see "Portal Container Nesting" below |
 
-**Conclusion**: Both click-outside and Escape key dismiss work correctly across bundles for the most common overlay nesting patterns. Dialog-in-Dialog cross-bundle nesting is the only known Escape regression, and it is uncommon in practice. This is not a hard blocker for the migration.
+**Conclusion**: Both click-outside and Escape key dismiss work correctly across bundles for the most common overlay nesting patterns. Dialog-in-Dialog cross-bundle nesting is the only known Escape regression, and it is uncommon in practice. There is also a **visual stacking regression** in multi-level cross-bundle nesting caused by `PortalContext` isolation — see "Portal Container Nesting" below. Neither issue is a hard blocker for the migration.
 
 ## Three Dismiss Strategies in Base UI
 
@@ -205,6 +206,75 @@ Mitigation: Dialog-in-Dialog nesting across packages is uncommon. When it does o
 | PreviewCard | Strategy 3 | No | None | Default | None |
 | Combobox | Strategy 3 | No | None | (similar to Select) | None |
 
+## Portal Container Nesting and Visual Stacking
+
+> **Verdict: Visual stacking regression in multi-level cross-bundle nesting.** When overlays from different bundles are deeply nested (e.g., Dialog(A) → Popover(B) → Select(A)), the innermost overlay can render *behind* a middle-level overlay due to incorrect portal container nesting. **Confidence: high** — empirically verified in the stress test (scenario 1.6) and confirmed via DOM inspection. **Practical risk: medium** — affects any three-level nesting where the innermost and outermost overlays share a bundle but the middle one does not.
+
+### How Base UI portal nesting works
+
+Each Base UI overlay uses `FloatingPortal` to render its floating element into a portal container `<div>`. The portal container is appended to a **parent container**, determined by `PortalContext`:
+
+```javascript
+// From FloatingPortal.js (useFloatingPortalNode)
+const portalContext = usePortalContext();
+const parentPortalNode = portalContext?.portalNode;
+const resolvedContainer = containerProp ?? parentPortalNode ?? document.body;
+```
+
+- If a `PortalContext.Provider` ancestor exists, the portal nests inside the parent portal's container
+- Otherwise, the portal appends to `document.body`
+
+`FloatingPortal` also provides a `PortalContext.Provider` for its children, creating a chain: each overlay's portal becomes the container for the next nested overlay's portal.
+
+### Why this breaks across bundles
+
+`PortalContext` is created by `React.createContext()` inside each bundle's copy of `FloatingPortal.js`. Since each bundle has its own module scope, they create **separate** `PortalContext` objects:
+
+- Bundle A: `PortalContext_A`
+- Bundle B: `PortalContext_B`
+
+In the three-level nesting scenario **Dialog(A) → Popover(B) → Select(A)**:
+
+1. **Dialog(A)** opens — no parent in `PortalContext_A` → appends portal `div_1` to `document.body`
+2. **Popover(B)** opens (rendered inside Dialog's content) — no parent in `PortalContext_B` (Dialog set `PortalContext_A`, invisible to B) → appends portal `div_2` to `document.body`, *after* `div_1`
+3. **Select(A)** opens (rendered inside Popover's content) — reads `PortalContext_A`, finds Dialog's portal (`div_1`) as the nearest parent → appends portal `div_3` **inside** `div_1`
+
+Resulting DOM:
+
+```html
+<body>
+  <div data-base-ui-portal>          <!-- div_1: Dialog(A) portal -->
+    <div role="dialog" ...>           <!-- Dialog content -->
+    </div>
+    <div data-base-ui-portal>         <!-- div_3: Select(A) portal — NESTED inside div_1 -->
+      <div role="listbox" ...>        <!-- Select popup -->
+      </div>
+    </div>
+  </div>
+  <div data-base-ui-portal>          <!-- div_2: Popover(B) portal -->
+    <div role="dialog" ...>           <!-- Popover popup -->
+    </div>
+  </div>
+</body>
+```
+
+Since `div_2` (Popover B) comes **after** `div_1` (Dialog A + Select A) in DOM order, it paints on top of everything inside `div_1` — including the Select popup. The Select visually renders *behind* the Popover, even though it should be the topmost overlay.
+
+### Single-bundle comparison
+
+In a single bundle, all overlays share the same `PortalContext`. Select would find Popover's portal as its nearest parent (not Dialog's), and nest inside the Popover's portal container. This places it later in DOM order within the Popover's subtree, ensuring correct visual stacking.
+
+### Impact on dismiss coordination
+
+This is purely a **visual stacking** issue — dismiss coordination is unaffected. Click-outside and Escape key behavior work correctly regardless of portal nesting, because they rely on React synthetic events (which follow the React tree, not the DOM tree).
+
+### Mitigation strategies
+
+1. **Phase 2 z-index overrides**: Setting `--wp-ui-select-z-index` higher than `--wp-ui-popover-z-index` can force correct stacking during the transition period
+2. **Explicit `container` prop**: Consumers can pass an explicit container to `Select.Portal` to override the default `PortalContext` resolution
+3. **Phase 4 unification**: Once all overlays share a bundle (or `@wordpress/ui` becomes `wpScript: true`), `PortalContext` is shared and nesting resolves correctly
+4. **Long-term**: Promoting `@wordpress/ui` to `wpScript: true` eliminates the issue entirely
+
 ## Stress Test
 
 An empirical stress test accompanies this analysis. It builds two independent bundles from `@base-ui/react` (each with separate React contexts, sharing React itself) and provides interactive playgrounds:
@@ -224,10 +294,12 @@ The test covers 5 concerns with 23 scenarios: dismiss coordination, z-index stac
 
 4. **Select-in-Dialog is safe** — Select's `bubbles: false` means Escape only closes the Select. The Dialog's behavior on Escape is the same whether or not the Select shares a bundle. The double-dismiss issue (Dialog also closing) is a single-bundle behavior that exists today.
 
-5. **Phases 1–3 are unaffected**: WPDS overlays can be built and deployed alongside legacy overlays.
+5. **Portal nesting causes visual stacking regressions** — In multi-level cross-bundle nesting (e.g., Dialog(A) → Popover(B) → Select(A)), `PortalContext` isolation causes the innermost overlay to nest inside the outermost overlay's portal container instead of the middle one's, resulting in incorrect visual stacking. This is mitigated by Phase 2 z-index overrides and fully resolved in Phase 4. See "Portal Container Nesting" above.
 
-6. **Phase 4 remains valuable but less urgent**: The main cross-bundle concern (same-type overlay Escape nesting) turned out to work correctly. Phase 4 would still unify FloatingTree contexts and Dialog nesting counters, but the practical impact is limited to the uncommon Dialog-in-Dialog case.
+6. **Phases 1–3 are unaffected**: WPDS overlays can be built and deployed alongside legacy overlays. Phase 2 z-index overrides handle the portal stacking edge case during transition.
 
-7. **No strategy shift required**: The bundling model (multiple copies of `@base-ui/react`) does not create a hard blocker.
+7. **Phase 4 remains valuable**: It unifies FloatingTree contexts, Dialog nesting counters, and `PortalContext` — resolving the Dialog-in-Dialog Escape regression and the portal stacking regression. The practical impact is limited but real.
 
-8. **Long-term option**: Promoting `@wordpress/ui` to `wpScript: true` would eliminate all context isolation concerns by making it a shared script handle. This is a Core-level decision that can be deferred.
+8. **No strategy shift required**: The bundling model (multiple copies of `@base-ui/react`) does not create a hard blocker. The known regressions (Dialog-in-Dialog Escape, portal stacking in multi-level nesting) are manageable.
+
+9. **Long-term option**: Promoting `@wordpress/ui` to `wpScript: true` would eliminate all context isolation concerns — dismiss coordination, portal nesting, and bundle size — by making it a shared script handle. This is a Core-level decision that can be deferred.
