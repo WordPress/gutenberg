@@ -374,14 +374,10 @@ const PlaylistEdit = ( {
 					<WaveformPlayer
 						src={ currentTrackData?.src }
 						title={ decodeEntities(
-							stripHTML(
-								currentTrackData?.title ?? ''
-							)
+							stripHTML( currentTrackData?.title ?? '' )
 						) }
 						artist={ decodeEntities(
-							stripHTML(
-								currentTrackData?.artist ?? ''
-							)
+							stripHTML( currentTrackData?.artist ?? '' )
 						) }
 						image={ currentTrackData?.image }
 						onEnded={ onTrackEnded }
