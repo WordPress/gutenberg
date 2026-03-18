@@ -821,11 +821,20 @@ export function detectUltraHdr( id: QueueItemId ) {
 				// Mark attachment metadata with UltraHDR info.
 				// The original file is uploaded unmodified — UltraHDR JPEGs are
 				// already backwards compatible (SDR displays use the embedded base image).
+				// Skip any subsequent transcoding to preserve HDR gain map data.
+				const existingMeta = Array.isArray( item.attachment?.meta )
+					? {}
+					: item.attachment?.meta || {};
 				dispatch.finishOperation( id, {
+					operations: [
+						OperationType.Upload,
+						OperationType.ThumbnailGeneration,
+						OperationType.Finalize,
+					],
 					attachment: {
 						...item.attachment,
 						meta: {
-							...( item.attachment?.meta || {} ),
+							...existingMeta,
 							ultrahdr: true,
 							hdr_capacity: result.hdrCapacity,
 						},
