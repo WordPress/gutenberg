@@ -4,7 +4,7 @@
  */
 import { useNavigate, useSearch } from '@wordpress/route';
 import { useEntityRecords } from '@wordpress/core-data';
-import { createElement, useMemo, useState } from '@wordpress/element';
+import { createElement, Fragment, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Preview, Editor, useEditorAssets } from '@wordpress/lazy-editor';
@@ -240,7 +240,20 @@ function Canvas() {
 					} }
 				>
 					{ ( { onClose } ) => (
-						<>
+						<Fragment>
+							<MenuGroup>
+								<MenuItem
+									isSelected={
+										canvasMode === MODE_NAVIGATION
+									}
+									onClick={ () => {
+										setCanvasMode( MODE_NAVIGATION );
+										onClose();
+									} }
+								>
+									{ __( 'Navigation Preview' ) }
+								</MenuItem>
+							</MenuGroup>
 							<MenuGroup>
 								<MenuItem
 									isSelected={ canvasMode === MODE_ALL }
@@ -266,20 +279,7 @@ function Canvas() {
 									</MenuItem>
 								) ) }
 							</MenuGroup>
-							<MenuGroup>
-								<MenuItem
-									isSelected={
-										canvasMode === MODE_NAVIGATION
-									}
-									onClick={ () => {
-										setCanvasMode( MODE_NAVIGATION );
-										onClose();
-									} }
-								>
-									{ __( 'Navigation Preview' ) }
-								</MenuItem>
-							</MenuGroup>
-						</>
+						</Fragment>
 					) }
 				</DropdownMenu>
 			</HStack>

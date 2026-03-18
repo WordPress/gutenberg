@@ -238,6 +238,19 @@ function Canvas() {
 						<Fragment>
 							<MenuGroup>
 								<MenuItem
+									isSelected={
+										canvasMode === MODE_NAVIGATION
+									}
+									onClick={ () => {
+										setCanvasMode( MODE_NAVIGATION );
+										onClose();
+									} }
+								>
+									{ __( 'Navigation Preview' ) }
+								</MenuItem>
+							</MenuGroup>
+							<MenuGroup>
+								<MenuItem
 									isSelected={ canvasMode === MODE_ALL }
 									onClick={ () => {
 										setCanvasMode( MODE_ALL );
@@ -260,19 +273,6 @@ function Canvas() {
 										{ label }
 									</MenuItem>
 								) ) }
-							</MenuGroup>
-							<MenuGroup>
-								<MenuItem
-									isSelected={
-										canvasMode === MODE_NAVIGATION
-									}
-									onClick={ () => {
-										setCanvasMode( MODE_NAVIGATION );
-										onClose();
-									} }
-								>
-									{ __( 'Navigation Preview' ) }
-								</MenuItem>
 							</MenuGroup>
 						</Fragment>
 					) }
