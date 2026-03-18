@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useNavigate } from '@wordpress/route';
+import { useNavigate, useSearch } from '@wordpress/route';
 import type { Action } from '@wordpress/dataviews';
 import type { Post } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -9,6 +9,7 @@ import { pencil } from '@wordpress/icons';
 
 export function useEditNavigationAction(): Action< Post > {
 	const navigate = useNavigate();
+	const searchParams = useSearch( { strict: false } );
 
 	return {
 		id: 'edit',
@@ -18,7 +19,10 @@ export function useEditNavigationAction(): Action< Post > {
 		callback: ( items: Post[] ) => {
 			const item = items[ 0 ];
 			navigate( {
-				to: `/navigation/edit/${ item.id }`,
+				search: {
+					...searchParams,
+					editId: item.id,
+				},
 			} );
 		},
 		isEligible( item: Post ) {

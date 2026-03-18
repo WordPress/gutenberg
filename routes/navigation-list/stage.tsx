@@ -10,8 +10,10 @@ import { Page } from '@wordpress/admin-ui';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useView } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
-import { Button } from '@wordpress/components';
+import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { decodeEntities } from '@wordpress/html-entities';
+import { chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -21,6 +23,7 @@ import { getDefaultView } from './view-utils';
 import { useEditNavigationAction } from './actions/edit-navigation';
 import { AddNavigationModal } from './add-navigation';
 import useNavigationStatus from './use-navigation-status';
+import NavigationMenuEditor from '../navigation-edit/editor';
 
 /**
  * Style dependencies
@@ -47,6 +50,8 @@ function getItemId( item: Post ) {
 function NavigationList() {
 	const navigate = useNavigate();
 	const searchParams = useSearch( { from: '/navigation/list' } );
+
+	const editId = ( searchParams as any ).editId as number | undefined;
 
 	const defaultView: View = useMemo( () => {
 		return getDefaultView();
@@ -152,16 +157,54 @@ function NavigationList() {
 		];
 	}, [ editAction, postTypeActions ] );
 
-	const selection =
-		( searchParams.ids ?? [] ).map( ( id: number ) => id.toString() ) ?? [];
-
-	// Get the first navigation from the canvas loader if no selection
 	const firstNavigationId = useMemo( () => {
 		if ( navigationMenus && navigationMenus.length > 0 ) {
 			return navigationMenus[ 0 ].id.toString();
 		}
 		return null;
 	}, [ navigationMenus ] );
+
+	// Show the editor inline when editId is set in the URL.
+	if ( editId ) {
+		const navigationMenu = ( navigationMenus as Post[] | undefined )?.find(
+			( m ) => m.id === editId
+		);
+		const menuTitle = decodeEntities(
+			( navigationMenu as any )?.title?.rendered ||
+				( navigationMenu as any )?.title?.raw ||
+				''
+		);
+
+		return (
+			<Page
+				title={
+					<HStack spacing={ 2 } alignment="center">
+						<Button
+							icon={ chevronLeft }
+							label={ __( 'Back to Navigation' ) }
+							size="compact"
+							onClick={ () =>
+								navigate( {
+									search: {
+										...searchParams,
+										editId: undefined,
+									},
+								} )
+							}
+						/>
+						<span>{ menuTitle }</span>
+					</HStack>
+				}
+				subTitle={ __( 'Edit the navigation menu.' ) }
+				hasPadding
+			>
+				<NavigationMenuEditor id={ editId } />
+			</Page>
+		);
+	}
+
+	const selection =
+		( searchParams.ids ?? [] ).map( ( id: number ) => id.toString() ) ?? [];
 
 	if ( selection.length === 0 && firstNavigationId ) {
 		selection.push( firstNavigationId );

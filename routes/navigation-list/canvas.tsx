@@ -66,7 +66,7 @@ const MODE_ALL = 'all';
 const STATIC_AREAS = [
 	{ value: 'header', label: __( 'Header' ) },
 	{ value: 'footer', label: __( 'Footer' ) },
-	{ value: 'sidebar', label: __( 'Sidebar' ) },
+	{ value: 'sidebar', label: __( 'Panel' ) },
 	{ value: 'navigation-overlay', label: __( 'Navigation Overlay' ) },
 	{ value: 'uncategorized', label: __( 'General' ) },
 ] as const;
@@ -86,10 +86,13 @@ const previewField = {
 	enableSorting: false,
 };
 
-function NavigationPreview( { navigationId }: { navigationId: number } ) {
-	const navigate = useNavigate();
-	const editLink = `/navigation/edit/${ navigationId }`;
-
+function NavigationPreview( {
+	navigationId,
+	onEdit,
+}: {
+	navigationId: number;
+	onEdit: () => void;
+} ) {
 	return (
 		<div className="navigation-canvas__preview-wrap">
 			<div
@@ -107,11 +110,11 @@ function NavigationPreview( { navigationId }: { navigationId: number } ) {
 				/>
 			</div>
 			<div
-				onClick={ () => navigate( { to: editLink } ) }
+				onClick={ onEdit }
 				onKeyDown={ ( e ) => {
 					if ( e.key === 'Enter' || e.key === ' ' ) {
 						e.preventDefault();
-						navigate( { to: editLink } );
+						onEdit();
 					}
 				} }
 				style={ {
@@ -135,19 +138,28 @@ function Canvas() {
 	const [ canvasMode, setCanvasMode ] = useState( MODE_NAVIGATION );
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 
-	// Get the selected navigation ID from URL params, falling back to the first navigation.
+	// Get the selected navigation ID — editId takes priority, then ids[0], then first nav.
 	const { records: navigationMenus } = useEntityRecords(
 		'postType',
 		NAVIGATION_POST_TYPE,
-		{ per_page: 100, status: [ 'publish', 'draft' ], order: 'desc', orderby: 'date' }
+		{
+			per_page: 100,
+			status: [ 'publish', 'draft' ],
+			order: 'desc',
+			orderby: 'date',
+		}
 	);
 
 	const navigationId = useMemo( () => {
+		const editId = ( searchParams as any ).editId as number | undefined;
+		if ( editId ) {
+			return editId;
+		}
 		if ( searchParams.ids?.[ 0 ] ) {
 			return searchParams.ids[ 0 ] as number;
 		}
-		return ( navigationMenus as any[] )?.[0]?.id ?? 0;
-	}, [ searchParams.ids, navigationMenus ] );
+		return ( navigationMenus as any[] )?.[ 0 ]?.id ?? 0;
+	}, [ searchParams, navigationMenus ] );
 
 	const { templateParts, isResolving: isResolvingParts } =
 		useMenuUsedInTemplateParts( navigationId );
@@ -163,13 +175,16 @@ function Canvas() {
 		return areas;
 	}, [ templateParts ] );
 
-	const currentLabel =
-		canvasMode === MODE_NAVIGATION
-			? __( 'Navigation Preview' )
-			: canvasMode === MODE_ALL
-			? __( 'All Template Parts' )
-			: STATIC_AREAS.find( ( a ) => a.value === canvasMode )?.label ??
-			  canvasMode;
+	let currentLabel: string;
+	if ( canvasMode === MODE_NAVIGATION ) {
+		currentLabel = __( 'Navigation Preview' );
+	} else if ( canvasMode === MODE_ALL ) {
+		currentLabel = __( 'All Template Parts' );
+	} else {
+		currentLabel =
+			STATIC_AREAS.find( ( a ) => a.value === canvasMode )?.label ??
+			canvasMode;
+	}
 
 	// Filter template parts for the DataViews based on the selected mode.
 	const visibleTemplateParts = useMemo( () => {
@@ -194,7 +209,11 @@ function Canvas() {
 
 	return (
 		<div className="navigation-canvas">
-			<HStack justify="center" alignment="center" className="navigation-canvas__toolbar">
+			<HStack
+				justify="center"
+				alignment="center"
+				className="navigation-canvas__toolbar"
+			>
 				<DropdownMenu
 					label={ currentLabel }
 					text={ currentLabel }
@@ -254,7 +273,17 @@ function Canvas() {
 
 			{ canvasMode === MODE_NAVIGATION ? (
 				<div className="navigation-canvas__preview">
-					<NavigationPreview navigationId={ navigationId } />
+					<NavigationPreview
+						navigationId={ navigationId }
+						onEdit={ () =>
+							navigate( {
+								search: {
+									...searchParams,
+									editId: navigationId,
+								},
+							} )
+						}
+					/>
 				</div>
 			) : (
 				<div
