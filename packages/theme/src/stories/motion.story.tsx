@@ -30,7 +30,6 @@ const meta: Meta< typeof ThemeProvider > = {
 		controls: { hideNoControlsWarning: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
-	tags: [ 'status-experimental' ],
 };
 export default meta;
 
