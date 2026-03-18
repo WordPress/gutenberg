@@ -451,7 +451,8 @@ function poll(): void {
 				roomStates.forEach( ( state ) => {
 					state.onStatusChange( {
 						status: 'disconnected',
-						retryInMs: pollInterval,
+						canManuallyRetry: true,
+						willAutoRetryInMs: pollInterval,
 					} );
 				} );
 			}

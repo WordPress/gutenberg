@@ -1,12 +1,18 @@
 /**
  * WordPress dependencies
  */
-import type { Y } from '@wordpress/sync';
+import type { ConnectionStatusDisconnected, Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
 import type { SelectionType } from './utils/crdt-user-selections';
+
+export type { ConnectionStatus } from '@wordpress/sync';
+
+export type ConnectionError = NonNullable<
+	ConnectionStatusDisconnected[ 'error' ]
+>;
 
 export interface AnyFunction {
 	( ...args: any[] ): any;
