@@ -6,7 +6,7 @@ import { WithPrefix } from '../../primitives/input/stories/index.story';
 import {
 	WITH_DETAILS_DESCRIPTION,
 	DETAILS_EXAMPLE,
-} from '../../stories/control-story-shared';
+} from '../../stories/shared';
 
 const meta: Meta< typeof InputControl > = {
 	title: 'Design System/Components/Form/InputControl',
