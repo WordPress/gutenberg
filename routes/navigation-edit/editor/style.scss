@@ -1,3 +1,9 @@
 .navigation-edit-editor__hidden-blocks {
 	display: none;
 }
+
+.navigation-edit-editor__empty {
+	color: $gray-600;
+	padding: $grid-unit-20 $grid-unit-30;
+	margin: 0;
+}

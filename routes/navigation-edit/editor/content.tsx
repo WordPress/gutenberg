@@ -27,6 +27,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -87,7 +88,7 @@ export default function NavigationMenuContent( {
 }: {
 	rootClientId: string;
 } ) {
-	const { listViewRootClientId, isLoading } = useSelect(
+	const { listViewRootClientId, isLoading, isEmpty } = useSelect(
 		( select ) => {
 			const {
 				areInnerBlocksControlled,
@@ -111,15 +112,16 @@ export default function NavigationMenuContent( {
 				PAGES_QUERY
 			);
 
+			const isControlled = areInnerBlocksControlled( rootClientId );
+
 			return {
 				listViewRootClientId: pageListHasBlocks
 					? blockClientIds[ 0 ]
 					: rootClientId,
 				// This is a small hack to wait for the navigation block
 				// to actually load its inner blocks.
-				isLoading:
-					! areInnerBlocksControlled( rootClientId ) ||
-					isLoadingPages,
+				isLoading: ! isControlled || isLoadingPages,
+				isEmpty: isControlled && blockClientIds.length === 0,
 			};
 		},
 		[ rootClientId ]
@@ -201,6 +203,11 @@ export default function NavigationMenuContent( {
 
 	return (
 		<>
+			{ ! isLoading && isEmpty && (
+				<p className="navigation-edit-editor__empty">
+					{ __( 'This Navigation Menu is empty.' ) }
+				</p>
+			) }
 			{ ! isLoading && (
 				<div ref={ listViewRef }>
 					<PrivateListView
