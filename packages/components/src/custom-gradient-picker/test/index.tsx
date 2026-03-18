@@ -17,7 +17,7 @@ describe( 'CustomGradientPicker', () => {
 
 			render(
 				<CustomGradientPicker
-					value="linear-gradient(180deg, rgb(0,0,0) 0%, rgb(255,255,255) 100%)"
+					value="linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
 					onChange={ onChange }
 				/>
 			);
@@ -31,7 +31,9 @@ describe( 'CustomGradientPicker', () => {
 			// Verify the angle from before the radial switch is restored, not the default
 			const lastCall =
 				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
-			expect( lastCall ).toContain( '180deg' );
+			expect( lastCall ).toContain(
+				'linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)'
+			);
 		} );
 
 		it( 'should use DEFAULT_LINEAR_GRADIENT_ANGLE when no prior linear angle exists', async () => {
@@ -53,7 +55,9 @@ describe( 'CustomGradientPicker', () => {
 
 			const lastCall =
 				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
-			expect( lastCall ).toContain( '180deg' );
+			expect( lastCall ).toContain(
+				'linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)'
+			);
 		} );
 
 		it( 'should not restore angle when switching to radial', async () => {
