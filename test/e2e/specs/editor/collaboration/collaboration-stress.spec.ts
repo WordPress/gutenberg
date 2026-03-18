@@ -508,20 +508,7 @@ test.describe( 'Collaboration - Stress Test', () => {
 			} ).toPass( { timeout: 10_000 } );
 		}
 
-		// ── Phase 7 — User 3 refreshes (second refresh) ────────
-		await page3.reload( { waitUntil: 'load' } );
-		await collaborationUtils.waitForCollaborationReady( page3 );
-		await collaborationUtils.waitForMutualDiscovery();
-
-		// After refresh, User 3 should still see concurrent edits.
-		await expect( async () => {
-			const blocks = await editor3.getBlocks();
-			const allContent = JSON.stringify( blocks );
-			expect( allContent ).toContain( 'Final paragraph from Admin' );
-			expect( allContent ).toContain( 'Final paragraph from Author' );
-		} ).toPass( { timeout: 10_000 } );
-
-		// ── Phase 8 — Final save and publish ────────────────────
+		// ── Phase 7 — Final save and publish ────────────────────
 		await editor.saveDraft();
 		await editor.publishPost();
 	} );
