@@ -14,17 +14,15 @@ import { getBlockBindingsSource } from '@wordpress/blocks';
  * Builds entity binding configuration for navigation link URLs.
  * This function generates the structure used to bind navigation link URLs to their entity sources.
  *
- * The binding includes the entity ID and type in args to support the args-first resolution pattern,
- * which enables any registered binding source to work with navigation links (not just core/post-data
- * and core/term-data).
+ * For core binding sources (core/post-data and core/term-data), the entity ID and type are read
+ * from the block's `id` and `type` attributes, not from the binding args. Custom binding sources
+ * can implement their own resolution logic.
  *
- * @param {('post-type'|'taxonomy')} kind       - The kind of entity. Only 'post-type' and 'taxonomy' are supported.
- * @param {number}                   entityId   - The entity ID (post ID or term ID).
- * @param {string}                   entityType - The entity type (post type name or taxonomy name).
+ * @param {('post-type'|'taxonomy')} kind - The kind of entity. Only 'post-type' and 'taxonomy' are supported.
  * @return {Object} Entity binding configuration object
  * @throws {Error} If kind is not 'post-type' or 'taxonomy'
  */
-export function buildNavigationLinkEntityBinding( kind, entityId, entityType ) {
+export function buildNavigationLinkEntityBinding( kind ) {
 	// Validate kind parameter exists.
 	if ( kind === undefined ) {
 		throw new Error(
@@ -48,8 +46,6 @@ export function buildNavigationLinkEntityBinding( kind, entityId, entityType ) {
 			source,
 			args: {
 				field: 'link',
-				id: entityId,
-				type: entityType,
 			},
 		},
 	};
@@ -139,8 +135,6 @@ export function useEntityBinding( { clientId, attributes } ) {
 			// Use updated attributes if provided, otherwise fall back to closure attributes.
 			// updatedAttributes needed to access the most up-to-date data when called synchronously.
 			const kindToUse = updatedAttributes?.kind ?? kind;
-			const idToUse = updatedAttributes?.id ?? id;
-			const typeToUse = updatedAttributes?.type ?? type;
 
 			// Avoid creating binding if no kind is provided.
 			if ( ! kindToUse ) {
@@ -148,11 +142,7 @@ export function useEntityBinding( { clientId, attributes } ) {
 			}
 
 			try {
-				const binding = buildNavigationLinkEntityBinding(
-					kindToUse,
-					idToUse,
-					typeToUse
-				);
+				const binding = buildNavigationLinkEntityBinding( kindToUse );
 				updateBlockBindings( binding );
 			} catch ( error ) {
 				// eslint-disable-next-line no-console
@@ -163,7 +153,7 @@ export function useEntityBinding( { clientId, attributes } ) {
 				// Don't create binding if validation fails.
 			}
 		},
-		[ updateBlockBindings, kind, id, type ]
+		[ updateBlockBindings, kind ]
 	);
 
 	return {

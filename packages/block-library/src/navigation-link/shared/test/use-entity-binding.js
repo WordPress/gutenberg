@@ -341,45 +341,31 @@ describe( 'useEntityBinding', () => {
 				source: 'core/post-data',
 				args: {
 					field: 'link',
-					id: 42,
-					type: 'page',
 				},
 			},
 		} );
 	} );
 
 	describe( 'buildNavigationLinkEntityBinding', () => {
-		it( 'returns correct binding for post-type with new args format', () => {
-			const binding = buildNavigationLinkEntityBinding(
-				'post-type',
-				42,
-				'page'
-			);
+		it( 'returns correct binding for post-type', () => {
+			const binding = buildNavigationLinkEntityBinding( 'post-type' );
 			expect( binding ).toEqual( {
 				url: {
 					source: 'core/post-data',
 					args: {
 						field: 'link',
-						id: 42,
-						type: 'page',
 					},
 				},
 			} );
 		} );
 
-		it( 'returns correct binding for taxonomy with new args format', () => {
-			const binding = buildNavigationLinkEntityBinding(
-				'taxonomy',
-				123,
-				'category'
-			);
+		it( 'returns correct binding for taxonomy', () => {
+			const binding = buildNavigationLinkEntityBinding( 'taxonomy' );
 			expect( binding ).toEqual( {
 				url: {
 					source: 'core/term-data',
 					args: {
 						field: 'link',
-						id: 123,
-						type: 'category',
 					},
 				},
 			} );
@@ -395,19 +381,19 @@ describe( 'useEntityBinding', () => {
 
 		it( 'throws error for invalid kind', () => {
 			expect( () => {
-				buildNavigationLinkEntityBinding( 'invalid-kind', 42, 'page' );
+				buildNavigationLinkEntityBinding( 'invalid-kind' );
 			} ).toThrow( 'Invalid kind "invalid-kind"' );
 		} );
 
 		it( 'throws error for null kind', () => {
 			expect( () => {
-				buildNavigationLinkEntityBinding( null, 42, 'page' );
+				buildNavigationLinkEntityBinding( null );
 			} ).toThrow( 'Invalid kind "null"' );
 		} );
 
 		it( 'throws error for empty string', () => {
 			expect( () => {
-				buildNavigationLinkEntityBinding( '', 42, 'page' );
+				buildNavigationLinkEntityBinding( '' );
 			} ).toThrow( 'Invalid kind ""' );
 		} );
 

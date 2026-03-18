@@ -30,10 +30,9 @@ function gutenberg_block_bindings_post_data_get_value( array $source_args, $bloc
 	}
 
 	/*
-	 * Three-tier fallback for entity ID resolution:
-	 * 1. Args-first: Read from binding args (new WP 7.0+ navigation links)
-	 * 2. Backward compat: Read from block attributes (WP 6.9+ navigation links)
-	 * 3. Context: Read from block context (all other blocks)
+	 * Entity ID resolution:
+	 * - Navigation blocks: Read from block attributes (id)
+	 * - Other blocks: Read from block context (postId)
 	 */
 	$block_name          = $block_instance->name ?? '';
 	$is_navigation_block = in_array(
@@ -42,14 +41,11 @@ function gutenberg_block_bindings_post_data_get_value( array $source_args, $bloc
 		true
 	);
 
-	if ( isset( $source_args['id'] ) ) {
-		// Tier 1: Explicit args (new navigation links, WP 7.0+)
-		$post_id = $source_args['id'];
-	} elseif ( $is_navigation_block ) {
-		// Tier 2: Backward compat (existing navigation links without id in args)
+	if ( $is_navigation_block ) {
+		// Navigation links store entity data in block attributes
 		$post_id = $block_instance->attributes['id'] ?? null;
 	} else {
-		// Tier 3: Standard context (all other blocks)
+		// Standard blocks use block context
 		$post_id = $block_instance->context['postId'] ?? null;
 	}
 

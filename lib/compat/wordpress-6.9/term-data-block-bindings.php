@@ -24,10 +24,9 @@ function gutenberg_block_bindings_term_data_get_value( array $source_args, $bloc
 	}
 
 	/*
-	 * Three-tier fallback for entity ID resolution:
-	 * 1. Args-first: Read from binding args (new WP 7.0+ navigation links)
-	 * 2. Backward compat: Read from block attributes (WP 6.9+ navigation links)
-	 * 3. Context: Read from block context (all other blocks)
+	 * Entity ID resolution:
+	 * - Navigation blocks: Read from block attributes (id, type)
+	 * - Other blocks: Read from block context (termId, taxonomy)
 	 */
 	$block_name          = $block_instance->name ?? '';
 	$is_navigation_block = in_array(
@@ -36,18 +35,13 @@ function gutenberg_block_bindings_term_data_get_value( array $source_args, $bloc
 		true
 	);
 
-	if ( isset( $source_args['id'] ) ) {
-		// Tier 1: Explicit args (new navigation links, WP 7.0+)
-		$term_id  = $source_args['id'];
-		$type     = $source_args['type'] ?? '';
-		$taxonomy = ( 'tag' === $type ) ? 'post_tag' : $type;
-	} elseif ( $is_navigation_block ) {
-		// Tier 2: Backward compat (existing navigation links without id in args)
+	if ( $is_navigation_block ) {
+		// Navigation links store entity data in block attributes
 		$term_id  = $block_instance->attributes['id'] ?? null;
 		$type     = $block_instance->attributes['type'] ?? '';
 		$taxonomy = ( 'tag' === $type ) ? 'post_tag' : $type;
 	} else {
-		// Tier 3: Standard context (all other blocks)
+		// Standard blocks use block context
 		$term_id  = $block_instance->context['termId'] ?? null;
 		$taxonomy = $block_instance->context['taxonomy'] ?? '';
 	}
