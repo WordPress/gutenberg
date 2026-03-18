@@ -19,7 +19,4 @@ export const POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS = applyFilters(
 
 // Must be less than the server-side AWARENESS_TIMEOUT (30 s) to avoid
 // false disconnects when the tab is in the background.
-export const POLLING_INTERVAL_BACKGROUND_TAB_IN_MS = applyFilters(
-	'sync.pollingManager.pollingIntervalBackgroundTab',
-	25 * 1000 // 25 seconds
-) as number;
+export const POLLING_INTERVAL_BACKGROUND_TAB_IN_MS = 25 * 1000; // 25 seconds
