@@ -10,19 +10,55 @@ The key shared resource is **React itself** — `react` and `react-dom` are exte
 
 The question: **Does dismiss coordination (click-outside, Escape key) break when overlay components from different bundles are nested?**
 
-## Summary of Findings
+## What Breaks, How Bad Is It, and How to Fix It
+
+Two scenarios were tested empirically via automated E2E tests (38 tests total, all passing):
+
+### Scenario A: Two separate `@base-ui/react` bundles (simulating `@wordpress/ui` consumers)
+
+| What breaks | Severity | User-facing impact | Mitigation |
+|---|---|---|---|
+| **Visual stacking in 3+ level cross-bundle nesting** | Medium | In patterns like Dialog(bundle A) → Popover(bundle B) → Select(bundle A), the Select renders *behind* the Popover instead of on top. | **Phase 2**: set `--wp-ui-select-z-index` higher than `--wp-ui-popover-z-index`. **Phase 4**: unify all overlays in one bundle → `PortalContext` is shared → correct nesting. **Long-term**: promote `@wordpress/ui` to `wpScript: true`. |
+
+**What does NOT break** (confirmed by 26 automated E2E tests, all identical in same-bundle vs cross-bundle):
+- Click-outside dismiss — works for all overlay combinations
+- Escape key in Dialog + Select — Select closes first, Dialog stays
+- Escape key in Popover-in-Popover — inner closes, outer stays
+- Escape key in Dialog-in-Dialog — inner closes, outer stays (previously predicted to break, but empirically confirmed working)
+- Escape key in 3-level nesting (Dialog + Popover + Select) — correct cascading
+- Modal dialog backdrop dismiss — works (DOM-based check)
+
+### Scenario B: `@wordpress/ui` (Base UI) + `@wordpress/components` (legacy) coexisting
+
+| What breaks | Severity | User-facing impact | Mitigation |
+|---|---|---|---|
+| **Escape in legacy Popover inside Base UI Dialog closes both** | Medium | When a `@wordpress/components` Popover is open inside a Base UI Dialog, pressing Escape closes *both* instead of just the Popover. The legacy `useDialog` hook calls `event.preventDefault()` but not `stopPropagation()`, so the Escape event propagates to Base UI's document-level handler. | **Fix**: add `event.stopPropagation()` to `@wordpress/compose`'s `useDialog` Escape handler (`closeOnEscapeRef`). This is a one-line change with no behavioral side effects for the legacy system. |
+
+**What does NOT break** (confirmed by 12 automated E2E tests, all identical in same-bundle vs cross-bundle):
+- Legacy Modal + Base UI Select — Escape cascades correctly (Select closes first, Modal stays)
+- Legacy Modal + Base UI Dialog + Select — 3-level mixed nesting works, Escape cascades through all levels
+- Base UI Dialog on its own with Escape — works correctly
+
+### Summary
+
+| Scenario | Confirmed regressions | Hard blocker? |
+|---|---|---|
+| Two Base UI bundles | 1 visual stacking issue (3-level nesting only) | **No** — mitigated by z-index overrides |
+| Base UI + legacy `@wordpress/components` | 1 Escape propagation issue (legacy Popover in Dialog) | **No** — fixable with a one-line `stopPropagation()` change |
+
+## Detailed Analysis
+
+### Summary of dismiss behaviors
 
 | Behavior | Works across bundles? | Explanation |
 |---|---|---|
 | Click-outside dismiss | **Yes** | `insideReactTree` mechanism uses shared React synthetic events |
 | Escape key (cross-type, e.g., Select in Dialog) | **Same as single bundle** | Select uses `bubbles: false`; Dialog uses a context counter — neither depends on FloatingTree |
 | Escape key (same-type, e.g., Popover in Popover) | **Yes** | React synthetic `onKeyDown` + `stopPropagation()` prevents parent from receiving Escape; shared React makes this work across bundles |
-| Escape key (Dialog in Dialog, cross-bundle) | **Degraded** | Nesting counter relies on `DialogRootContext`, which is not shared across bundles |
+| Escape key (Dialog in Dialog, cross-bundle) | **Yes** | Empirical E2E testing shows Escape correctly closes only the inner dialog in both same-bundle and cross-bundle modes, despite `DialogRootContext` isolation |
 | Modal dialog backdrop dismiss | **Yes** | Backdrop check is DOM-based, not context-based |
 | Visual stacking (same-level nesting) | **Yes** | No z-index means later-rendered elements are on top |
 | Visual stacking (multi-level nesting) | **Degraded** | `PortalContext` isolation causes incorrect portal nesting across bundles — see "Portal Container Nesting" below |
-
-**Conclusion**: Both click-outside and Escape key dismiss work correctly across bundles for the most common overlay nesting patterns. Dialog-in-Dialog cross-bundle nesting is the only known Escape regression, and it is uncommon in practice. There is also a **visual stacking regression** in multi-level cross-bundle nesting caused by `PortalContext` isolation — see "Portal Container Nesting" below. Neither issue is a hard blocker for the migration.
 
 ## Three Dismiss Strategies in Base UI
 
@@ -50,7 +86,7 @@ These components render a `<FloatingTree>` / `<FloatingNode>` hierarchy and use 
 
 ### Strategy 2: React Context Counter (Dialog, AlertDialog, Drawer)
 
-> **Cross-bundle: click-outside works, Escape nesting breaks for Dialog-in-Dialog.** The `DialogRootContext` counter is isolated across bundles, so nested Dialogs from different bundles can't communicate their open state. Both think they're topmost and both close on Escape. Click-outside is unaffected. Cross-type nesting (e.g., Select inside Dialog) is also unaffected — Dialog's counter only tracks other Dialogs, not Selects. **Practical risk: low** — Dialog-in-Dialog across packages is uncommon.
+> **Cross-bundle: works correctly in practice.** Although `DialogRootContext` is isolated across bundles (preventing the nesting counter from propagating), automated E2E testing shows that Escape correctly closes only the inner dialog in cross-bundle mode. The likely explanation is that the inner Dialog's Escape handler fires first (the inner dialog has focus) and the event is consumed before the outer Dialog's handler runs. Click-outside is also unaffected. Cross-type nesting (e.g., Select inside Dialog) works correctly — Dialog's counter only tracks other Dialogs, not Selects. **Practical risk: none** — empirically verified.
 
 These components use a **custom parent-child counter** propagated via React context (`DialogRootContext`), with no FloatingTree involvement at all.
 
@@ -64,7 +100,7 @@ These components use a **custom parent-child counter** propagated via React cont
 
 AlertDialog reuses `useDialogRoot` with `disablePointerDismissal: true` and `modal: true`. Drawer wraps `<Dialog.Root>` and delegates all dismiss logic to it.
 
-**Cross-bundle impact**: The counter propagates via `DialogRootContext`, which is **not shared across bundles**. If Dialog A (bundle A) nests Dialog B (bundle B), Dialog A's `onNestedDialogOpen` callback is never called. Both dialogs think they are topmost. Pressing Escape closes both. However, click-outside still works correctly thanks to `insideReactTree` (Strategy 0 below).
+**Cross-bundle impact**: The counter propagates via `DialogRootContext`, which is **not shared across bundles**. If Dialog A (bundle A) nests Dialog B (bundle B), Dialog A's `onNestedDialogOpen` callback is never called. Both dialogs technically think they are topmost. However, automated E2E testing shows Escape still correctly closes only the inner dialog — the inner Dialog's `onKeyDown` handler fires first and stops propagation before the outer can react. Click-outside also works correctly via `insideReactTree`.
 
 ### Strategy 3: No Nesting Awareness (Select, Tooltip, PreviewCard, Combobox)
 
@@ -180,15 +216,13 @@ Note: within a single bundle, FloatingTree provides an additional layer of coord
 
 ### Dialog-in-Dialog nesting (cross-bundle)
 
-> **Verdict: Degraded across bundles — Escape dismisses both parent and child Dialogs.** The parent Dialog's nesting counter (`ownNestedOpenDialogs`) never increments because the child Dialog from a different bundle can't reach the parent's `DialogRootContext`. Both dialogs believe they are topmost. Click-outside still works correctly (via `insideReactTree`). **Confidence: high** — `DialogRootContext` is a React context, isolated by definition. **Practical risk: low** — Dialog-in-Dialog across different packages is uncommon; typically the same package renders both.
+> **Verdict: Works correctly across bundles.** Despite `DialogRootContext` being isolated (the parent's nesting counter never increments), automated E2E testing shows Escape correctly closes only the inner dialog in both same-bundle and cross-bundle modes. **Confidence: high** — empirically verified. **Practical risk: none.**
 
-Within a single bundle, Dialog's context counter (`ownNestedOpenDialogs`) tracks nested Dialogs. When a child Dialog is open, the parent knows it is not topmost and suppresses its Escape handler.
+Theoretical analysis predicted this would break: since `DialogRootContext` is not shared across bundles, the parent Dialog from bundle A should never receive the `onNestedDialogOpen` callback from the child Dialog in bundle B, meaning both would think they're topmost and both would close on Escape.
 
-Across bundles, the `DialogRootContext` is not shared. The parent Dialog from bundle A never receives the `onNestedDialogOpen` callback from the child Dialog in bundle B. Both dialogs have `isTopmost = true`. Pressing Escape closes both.
+However, **automated E2E tests disprove this prediction**. In both same-bundle and cross-bundle configurations, pressing Escape with the inner Dialog focused closes only the inner dialog. The likely explanation is that when focus is inside the inner Dialog, its Escape handler (which runs as a React synthetic `onKeyDown` handler on the dialog element) fires and calls `stopPropagation()` before the outer Dialog's handler receives the event.
 
-**This is a cross-bundle regression**, though `insideReactTree` still prevents click-outside from dismissing the parent when clicking inside the child Dialog.
-
-Mitigation: Dialog-in-Dialog nesting across packages is uncommon. When it does occur, it's typically the same package rendering both (e.g., a settings dialog opening a confirmation dialog).
+Click-outside also works correctly via `insideReactTree`.
 
 ## Per-Component Summary
 
@@ -198,9 +232,9 @@ Mitigation: Dialog-in-Dialog nesting across packages is uncommon. When it does o
 | Popover | Strategy 1 | Yes | `FloatingTree` | Default (tree via context) | None (empirically verified) |
 | Menubar | Strategy 1 | Yes | `FloatingTree` | (via Menu internals) | None (React synthetic `onKeyDown` handles Escape) |
 | NavigationMenu | Strategy 1 | Yes | `FloatingTree` | (via Menu internals) | None (React synthetic `onKeyDown` handles Escape) |
-| Dialog | Strategy 2 | No | `DialogRootContext` counter | `escapeKey: isTopmost` | Dialog-in-Dialog Escape breaks |
-| AlertDialog | Strategy 2 | No | (reuses Dialog) | `disablePointerDismissal: true` | Same as Dialog |
-| Drawer | Strategy 2 | No | (wraps Dialog.Root) | (delegated to Dialog) | Same as Dialog |
+| Dialog | Strategy 2 | No | `DialogRootContext` counter | `escapeKey: isTopmost` | None (empirically verified — Escape works correctly) |
+| AlertDialog | Strategy 2 | No | (reuses Dialog) | `disablePointerDismissal: true` | None (same as Dialog) |
+| Drawer | Strategy 2 | No | (wraps Dialog.Root) | (delegated to Dialog) | None (same as Dialog) |
 | Select | Strategy 3 | No | None | `bubbles: false` | None |
 | Tooltip | Strategy 3 | No | None | `referencePress: true` | None |
 | PreviewCard | Strategy 3 | No | None | Default | None |
@@ -282,24 +316,20 @@ An empirical stress test accompanies this analysis. It builds two independent bu
 - **wp-env admin page**: `Tools > Overlay Dismiss Test` (activate the `gutenberg-test-overlay-dismiss-stress-test` plugin)
 - **Storybook stories**: Under "Cross-Bundle Dismiss" in the story browser
 
-The test covers 5 concerns with 23 scenarios: dismiss coordination, z-index stacking, iframe rendering, focus management, and legacy `@wordpress/components` interop.
+The test covers dismiss coordination, visual stacking, focus management, and legacy `@wordpress/components` interop, with 38 automated E2E tests across 8 scenario groups (5 pure Base UI + 3 legacy interop).
 
 ## Implications for the Migration
 
-1. **Click-outside dismiss works across bundles** — the `insideReactTree` mechanism is universal and relies only on shared React, not on Base UI contexts.
+1. **Dismiss coordination works across bundles** — all 26 pure Base UI E2E tests pass identically in same-bundle and cross-bundle modes. Click-outside, Escape key, and modal backdrop dismiss all function correctly. There are **zero confirmed dismiss regressions** from having multiple `@base-ui/react` bundles.
 
-2. **Escape key works correctly for most nesting patterns** — Popover-in-Popover, Menu-in-Menu, and Select-in-Dialog all work correctly across bundles. The React synthetic `onKeyDown` handler + `stopPropagation()` mechanism is shared through the common React instance. Empirically verified in the stress test.
+2. **Visual stacking in 3-level cross-bundle nesting is the only confirmed issue** — `PortalContext` isolation causes incorrect portal nesting (see "Portal Container Nesting" above). Mitigated by Phase 2 z-index overrides; fully resolved in Phase 4.
 
-3. **Dialog-in-Dialog is the only known Escape regression** — Dialog uses a `DialogRootContext` counter for nesting awareness, which is isolated across bundles. Both Dialogs think they are topmost and both close on Escape. This is uncommon in practice (cross-package Dialog nesting is rare).
+3. **Legacy `@wordpress/components` interop has one fixable issue** — when a `@wordpress/components` Popover is inside a Base UI Dialog, pressing Escape closes both. This happens because `@wordpress/compose`'s `useDialog` hook calls `event.preventDefault()` but not `event.stopPropagation()` in its Escape handler. A one-line fix to add `stopPropagation()` resolves it with no side effects for the legacy system.
 
-4. **Select-in-Dialog is safe** — Select's `bubbles: false` means Escape only closes the Select. The Dialog's behavior on Escape is the same whether or not the Select shares a bundle. The double-dismiss issue (Dialog also closing) is a single-bundle behavior that exists today.
+4. **Phases 1–3 are unaffected**: WPDS overlays can be built and deployed alongside legacy overlays. Phase 2 z-index overrides handle the portal stacking edge case during transition.
 
-5. **Portal nesting causes visual stacking regressions** — In multi-level cross-bundle nesting (e.g., Dialog(A) → Popover(B) → Select(A)), `PortalContext` isolation causes the innermost overlay to nest inside the outermost overlay's portal container instead of the middle one's, resulting in incorrect visual stacking. This is mitigated by Phase 2 z-index overrides and fully resolved in Phase 4. See "Portal Container Nesting" above.
+5. **Phase 4 remains valuable**: It unifies `PortalContext` across all overlays, resolving the visual stacking regression completely. It also unifies `FloatingTree` and `DialogRootContext` (though these don't cause practical issues today).
 
-6. **Phases 1–3 are unaffected**: WPDS overlays can be built and deployed alongside legacy overlays. Phase 2 z-index overrides handle the portal stacking edge case during transition.
+6. **No strategy shift required**: The bundling model (multiple copies of `@base-ui/react`) does not create a hard blocker. The only confirmed regression (visual stacking) is manageable.
 
-7. **Phase 4 remains valuable**: It unifies FloatingTree contexts, Dialog nesting counters, and `PortalContext` — resolving the Dialog-in-Dialog Escape regression and the portal stacking regression. The practical impact is limited but real.
-
-8. **No strategy shift required**: The bundling model (multiple copies of `@base-ui/react`) does not create a hard blocker. The known regressions (Dialog-in-Dialog Escape, portal stacking in multi-level nesting) are manageable.
-
-9. **Long-term option**: Promoting `@wordpress/ui` to `wpScript: true` would eliminate all context isolation concerns — dismiss coordination, portal nesting, and bundle size — by making it a shared script handle. This is a Core-level decision that can be deferred.
+7. **Long-term option**: Promoting `@wordpress/ui` to `wpScript: true` would eliminate all context isolation concerns — portal nesting, bundle size, and any theoretical edge cases — by making it a shared script handle. This is a Core-level decision that can be deferred.
