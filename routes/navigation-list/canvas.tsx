@@ -115,6 +115,7 @@ function NavigationPreview( { navigationId }: { navigationId: number } ) {
 				inert="true"
 			>
 				<Editor
+					key={ navigationId }
 					postType={ NAVIGATION_POST_TYPE }
 					postId={ navigationId }
 					settings={ {

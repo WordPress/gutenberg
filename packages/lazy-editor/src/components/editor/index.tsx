@@ -88,13 +88,18 @@ export function Editor( {
 		stylesId,
 	} );
 	const { isReady: assetsReady } = useEditorAssets();
-	const finalSettings = useMemo(
-		() => ( {
+	const finalSettings = useMemo( () => {
+		const merged = {
 			...editorSettings,
 			...settings,
-		} ),
-		[ editorSettings, settings ]
-	);
+		};
+		// Merge styles arrays so that caller-provided styles are appended
+		// to global styles rather than replacing them.
+		if ( settings?.styles && editorSettings?.styles ) {
+			merged.styles = [ ...editorSettings.styles, ...settings.styles ];
+		}
+		return merged;
+	}, [ editorSettings, settings ] );
 
 	// Show loading spinner while assets or settings are loading
 	if ( ! settingsReady || ! assetsReady ) {
