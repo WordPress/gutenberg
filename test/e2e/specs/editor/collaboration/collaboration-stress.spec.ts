@@ -1,33 +1,32 @@
 /**
  * External dependencies
  */
-import type { Browser, BrowserContext, Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 /**
  * WordPress dependencies
  */
-import { Editor } from '@wordpress/e2e-test-utils-playwright';
+import type { Editor } from '@wordpress/e2e-test-utils-playwright';
 
 /**
  * Internal dependencies
  */
 import { test, expect } from './fixtures';
-
-const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
+import type { UserCredentials } from './fixtures/collaboration-utils';
 
 /*
  * All non-admin users need at minimum the 'editor' role so they can
  * edit a post created by the admin.  WordPress author / contributor
  * roles lack the `edit_others_posts` capability.
  */
-const STRESS_USERS = [
+const STRESS_USERS: UserCredentials[] = [
 	{
 		username: 'stress_editor',
 		email: 'stress_editor@example.com',
 		firstName: 'Alice',
 		lastName: 'Editor',
 		password: 'password',
-		roles: [ 'editor' ] as string[],
+		roles: [ 'editor' ],
 	},
 	{
 		username: 'stress_author',
@@ -35,7 +34,7 @@ const STRESS_USERS = [
 		firstName: 'Bob',
 		lastName: 'Author',
 		password: 'password',
-		roles: [ 'editor' ] as string[],
+		roles: [ 'editor' ],
 	},
 	{
 		username: 'stress_contrib',
@@ -43,7 +42,7 @@ const STRESS_USERS = [
 		firstName: 'Carol',
 		lastName: 'Contributor',
 		password: 'password',
-		roles: [ 'editor' ] as string[],
+		roles: [ 'editor' ],
 	},
 ];
 
@@ -302,79 +301,7 @@ function generateStressContent(): string {
 	return blocks.join( '\n\n' );
 }
 
-// ── Session helpers ─────────────────────────────────────────────────
-
-async function loginUser(
-	browser: Browser,
-	user: ( typeof STRESS_USERS )[ number ]
-): Promise< { context: BrowserContext; page: Page } > {
-	const context = await browser.newContext( { baseURL: BASE_URL } );
-	const newPage = await context.newPage();
-	await newPage.goto( '/wp-login.php' );
-	await newPage.locator( '#user_login' ).fill( user.username );
-	await newPage.locator( '#user_pass' ).fill( user.password );
-	await newPage.getByRole( 'button', { name: 'Log In' } ).click();
-	await newPage.waitForURL( '**/wp-admin/**' );
-	return { context, page: newPage };
-}
-
-async function openPostEditor(
-	targetPage: Page,
-	postId: number
-): Promise< Editor > {
-	await targetPage.goto( `/wp-admin/post.php?post=${ postId }&action=edit` );
-	await targetPage.waitForFunction(
-		() => window?.wp?.data && window?.wp?.blocks
-	);
-	await targetPage.evaluate( () => {
-		window.wp.data
-			.dispatch( 'core/preferences' )
-			.set( 'core/edit-post', 'welcomeGuide', false );
-		window.wp.data
-			.dispatch( 'core/preferences' )
-			.set( 'core/edit-post', 'fullscreenMode', false );
-	} );
-	await waitForCollabReady( targetPage );
-	return new Editor( { page: targetPage } );
-}
-
-async function waitForCollabReady( targetPage: Page ) {
-	await targetPage.waitForFunction(
-		() =>
-			( window as any )._wpCollaborationEnabled === true &&
-			window?.wp?.data &&
-			window?.wp?.blocks,
-		{ timeout: 5_000 }
-	);
-}
-
-async function waitForSyncCycle( targetPage: Page, cycles = 3 ) {
-	for ( let i = 0; i < cycles; i++ ) {
-		await targetPage.waitForResponse(
-			( response ) =>
-				response.url().includes( 'wp-sync' ) &&
-				response.status() === 200,
-			{ timeout: 5_000 }
-		);
-	}
-}
-
-/**
- * Wait for all pages to show the Collaborators button (mutual awareness)
- * and then wait for sync cycles to complete.
- *
- * @param pages The Playwright pages to wait on.
- */
-async function waitForMutualDiscovery( pages: Page[] ) {
-	await Promise.all(
-		pages.map( ( pg ) =>
-			pg
-				.getByRole( 'button', { name: /Collaborators list/ } )
-				.waitFor( { timeout: 5_000 } )
-		)
-	);
-	await Promise.all( pages.map( ( pg ) => waitForSyncCycle( pg ) ) );
-}
+// ── Test-specific helpers ───────────────────────────────────────────
 
 /**
  * Type a new paragraph after a heading identified by its visible text.
@@ -401,27 +328,12 @@ async function typeNewParagraphAfterHeading(
 // ── Tests ───────────────────────────────────────────────────────────
 
 test.describe( 'Collaboration - Stress Test', () => {
-	const contexts: BrowserContext[] = [];
-
-	test.afterEach( async () => {
-		for ( const ctx of contexts ) {
-			await ctx.close();
-		}
-		contexts.length = 0;
-	} );
-
 	test( 'four users concurrently edit a large post with diverse blocks', async ( {
 		collaborationUtils,
 		requestUtils,
 		editor,
 		page,
-		admin,
 	} ) => {
-		// The fixture enables collaboration and creates the default
-		// second user; we rely on the fixture for the collaboration
-		// setting toggle and teardown (user cleanup).
-		void collaborationUtils;
-
 		// Create the three additional test users.
 		for ( const user of STRESS_USERS ) {
 			await requestUtils.createUser( user );
@@ -437,29 +349,16 @@ test.describe( 'Collaboration - Stress Test', () => {
 		} );
 
 		// ── Phase 1 — Admin opens the post ──────────────────────
-		await admin.visitAdminPage(
-			'post.php',
-			`post=${ post.id }&action=edit`
-		);
-		await editor.setPreferences( 'core/edit-post', {
-			welcomeGuide: false,
-			fullscreenMode: false,
-		} );
-		await waitForCollabReady( page );
+		await collaborationUtils.openPost( post.id );
 
 		// Sanity-check: the large post loaded its blocks.
 		const initialBlocks = await editor.getBlocks();
 		expect( initialBlocks.length ).toBeGreaterThan( 40 );
 
 		// ── Phase 2 — User 2 (Editor) joins ─────────────────────
-		const session2 = await loginUser(
-			page.context().browser()!,
-			STRESS_USERS[ 0 ]
-		);
-		contexts.push( session2.context );
-		const page2 = session2.page;
-		const editor2 = await openPostEditor( page2, post.id );
-		await waitForMutualDiscovery( [ page, page2 ] );
+		const { page: page2, editor: editor2 } =
+			await collaborationUtils.joinUser( post.id, STRESS_USERS[ 0 ] );
+		await collaborationUtils.waitForMutualDiscovery();
 
 		// Admin types a new paragraph after the "Conclusion" heading.
 		await typeNewParagraphAfterHeading(
@@ -487,19 +386,14 @@ test.describe( 'Collaboration - Stress Test', () => {
 		// ── Phase 3 — Save · User 3 joins · Admin refreshes ────
 		await editor.saveDraft();
 
-		const session3 = await loginUser(
-			page.context().browser()!,
-			STRESS_USERS[ 1 ]
-		);
-		contexts.push( session3.context );
-		const page3 = session3.page;
-		const editor3 = await openPostEditor( page3, post.id );
+		const { page: page3, editor: editor3 } =
+			await collaborationUtils.joinUser( post.id, STRESS_USERS[ 1 ] );
 
 		// Admin refreshes (first refresh).
 		await page.reload( { waitUntil: 'load' } );
-		await waitForCollabReady( page );
+		await collaborationUtils.waitForCollaborationReady( page );
 
-		await waitForMutualDiscovery( [ page, page2, page3 ] );
+		await collaborationUtils.waitForMutualDiscovery();
 
 		// ── Phase 4 — Two users type in the same paragraph ──────
 		await Promise.all( [
@@ -559,7 +453,9 @@ test.describe( 'Collaboration - Stress Test', () => {
 
 		// Wait for block-movement changes to propagate.
 		await Promise.all(
-			[ page, page2, page3 ].map( ( pg ) => waitForSyncCycle( pg ) )
+			collaborationUtils.allPages.map( ( pg ) =>
+				collaborationUtils.waitForSyncCycle( pg )
+			)
 		);
 
 		// Verify Alpha moved below Beta on all users.
@@ -584,14 +480,9 @@ test.describe( 'Collaboration - Stress Test', () => {
 		// ── Phase 6 — Second save · User 4 joins ───────────────
 		await editor.saveDraft();
 
-		const session4 = await loginUser(
-			page.context().browser()!,
-			STRESS_USERS[ 2 ]
-		);
-		contexts.push( session4.context );
-		const page4 = session4.page;
-		const editor4 = await openPostEditor( page4, post.id );
-		await waitForMutualDiscovery( [ page, page2, page3, page4 ] );
+		const { page: page4, editor: editor4 } =
+			await collaborationUtils.joinUser( post.id, STRESS_USERS[ 2 ] );
+		await collaborationUtils.waitForMutualDiscovery();
 
 		// ── Phase 7 — All 4 users type new paragraphs concurrently ──
 		// Each user clicks on a different heading, presses Enter to
@@ -624,7 +515,7 @@ test.describe( 'Collaboration - Stress Test', () => {
 		] );
 
 		// All 4 users should see all 4 new paragraphs.
-		for ( const ed of [ editor, editor2, editor3, editor4 ] ) {
+		for ( const ed of collaborationUtils.allEditors ) {
 			await expect( async () => {
 				const blocks = await ed.getBlocks();
 				const allContent = JSON.stringify( blocks );
@@ -639,8 +530,8 @@ test.describe( 'Collaboration - Stress Test', () => {
 
 		// ── Phase 8 — User 3 refreshes (second refresh) ────────
 		await page3.reload( { waitUntil: 'load' } );
-		await waitForCollabReady( page3 );
-		await waitForMutualDiscovery( [ page, page2, page3, page4 ] );
+		await collaborationUtils.waitForCollaborationReady( page3 );
+		await collaborationUtils.waitForMutualDiscovery();
 
 		// After refresh, User 3 should still see concurrent edits.
 		await expect( async () => {
@@ -662,10 +553,7 @@ test.describe( 'Collaboration - Stress Test', () => {
 		requestUtils,
 		editor,
 		page,
-		admin,
 	} ) => {
-		void collaborationUtils;
-
 		await requestUtils.createUser( STRESS_USERS[ 0 ] );
 
 		// Create a post with a list of clearly identifiable items.
@@ -685,24 +573,11 @@ test.describe( 'Collaboration - Stress Test', () => {
 		} );
 
 		// ── Phase 1 — Both users open the post ──────────────────
-		await admin.visitAdminPage(
-			'post.php',
-			`post=${ post.id }&action=edit`
-		);
-		await editor.setPreferences( 'core/edit-post', {
-			welcomeGuide: false,
-			fullscreenMode: false,
-		} );
-		await waitForCollabReady( page );
+		await collaborationUtils.openPost( post.id );
 
-		const session2 = await loginUser(
-			page.context().browser()!,
-			STRESS_USERS[ 0 ]
-		);
-		contexts.push( session2.context );
-		const page2 = session2.page;
-		const editor2 = await openPostEditor( page2, post.id );
-		await waitForMutualDiscovery( [ page, page2 ] );
+		const { page: page2, editor: editor2 } =
+			await collaborationUtils.joinUser( post.id, STRESS_USERS[ 0 ] );
+		await collaborationUtils.waitForMutualDiscovery();
 
 		// ── Phase 2 — Concurrent list-item moves ────────────────
 		// User 1 moves "Item Beta" down; User 2 moves "Item Epsilon" up.
@@ -763,8 +638,8 @@ test.describe( 'Collaboration - Stress Test', () => {
 
 		// ── Phase 4 — User 1 refreshes ──────────────────────────
 		await page.reload( { waitUntil: 'load' } );
-		await waitForCollabReady( page );
-		await waitForMutualDiscovery( [ page, page2 ] );
+		await collaborationUtils.waitForCollaborationReady( page );
+		await collaborationUtils.waitForMutualDiscovery();
 
 		// After refresh, User 1 should still see 6 items in the
 		// moved order.
@@ -772,8 +647,8 @@ test.describe( 'Collaboration - Stress Test', () => {
 
 		// ── Phase 5 — User 2 refreshes ──────────────────────────
 		await page2.reload( { waitUntil: 'load' } );
-		await waitForCollabReady( page2 );
-		await waitForMutualDiscovery( [ page, page2 ] );
+		await collaborationUtils.waitForCollaborationReady( page2 );
+		await collaborationUtils.waitForMutualDiscovery();
 
 		// After refresh, User 2 should also see 6 items in the
 		// moved order.
