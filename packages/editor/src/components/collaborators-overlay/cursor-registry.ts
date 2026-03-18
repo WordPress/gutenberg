@@ -85,10 +85,9 @@ export function createCursorRegistry() {
 		},
 
 		/**
-		 * Remove all cursor elements from DOM and clear the registry.
+		 * Clear the registry.
 		 */
 		removeAll(): void {
-			cursorMap.forEach( ( element ) => element.remove() );
 			cursorMap.clear();
 		},
 	};

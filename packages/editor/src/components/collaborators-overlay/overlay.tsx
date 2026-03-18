@@ -102,11 +102,7 @@ export function Overlay( {
 			cursorRegistry.registerCursor( id, el );
 		}
 
-		return () => {
-			for ( const id of refs.keys() ) {
-				cursorRegistry.unregisterCursor( id );
-			}
-		};
+		return () => cursorRegistry.removeAll();
 	}, [ cursors, cursorRegistry ] );
 
 	// Callback ref factory to capture each cursor's DOM element.
