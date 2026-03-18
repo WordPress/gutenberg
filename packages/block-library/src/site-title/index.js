@@ -20,7 +20,11 @@ export const settings = {
 	example: {
 		viewportWidth: 350,
 		attributes: {
-			textAlign: 'center',
+			style: {
+				typography: {
+					textAlign: 'center',
+				},
+			},
 		},
 	},
 	edit,
