@@ -136,6 +136,116 @@ function gutenberg_register_custom_css_support( $block_type ) {
 	}
 }
 
+/**
+ * Strips `style.css` attributes from all blocks in post content.
+ *
+ * Parses the content into blocks, recursively walks all blocks
+ * (including inner blocks), removes `attrs.style.css`, and
+ * re-serializes the content.
+ *
+ * @since 21.2.0
+ *
+ * @param string $content Post content to filter.
+ * @return string Filtered post content with block custom CSS removed.
+ */
+function gutenberg_strip_custom_css_from_blocks( $content ) {
+	if ( ! has_blocks( $content ) ) {
+		return $content;
+	}
+
+	$blocks  = parse_blocks( $content );
+	$changed = false;
+
+	/**
+	 * Recursively strip style.css from blocks.
+	 *
+	 * @param array $blocks Blocks to process.
+	 * @return array Processed blocks.
+	 */
+	$strip = static function ( &$blocks ) use ( &$strip, &$changed ) {
+		foreach ( $blocks as &$block ) {
+			if ( isset( $block['attrs']['style']['css'] ) ) {
+				unset( $block['attrs']['style']['css'] );
+				// Clean up empty style object.
+				if ( empty( $block['attrs']['style'] ) ) {
+					unset( $block['attrs']['style'] );
+				}
+				$changed = true;
+			}
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$strip( $block['innerBlocks'] );
+			}
+		}
+	};
+
+	$strip( $blocks );
+
+	if ( ! $changed ) {
+		return $content;
+	}
+
+	return serialize_blocks( $blocks );
+}
+
+/**
+ * Adds the filters to strip custom CSS from block content on save.
+ *
+ * @since 21.2.0
+ * @access private
+ */
+function gutenberg_custom_css_kses_init_filters() {
+	add_filter( 'content_save_pre', 'gutenberg_strip_custom_css_from_blocks', 8 );
+	add_filter( 'content_filtered_save_pre', 'gutenberg_strip_custom_css_from_blocks', 8 );
+}
+
+/**
+ * Removes the filters that strip custom CSS from block content on save.
+ *
+ * @since 21.2.0
+ * @access private
+ */
+function gutenberg_custom_css_remove_filters() {
+	remove_filter( 'content_save_pre', 'gutenberg_strip_custom_css_from_blocks', 8 );
+	remove_filter( 'content_filtered_save_pre', 'gutenberg_strip_custom_css_from_blocks', 8 );
+}
+
+/**
+ * Registers the custom CSS content filters if the user does not have the edit_css capability.
+ *
+ * @since 21.2.0
+ * @access private
+ */
+function gutenberg_custom_css_kses_init() {
+	gutenberg_custom_css_remove_filters();
+	if ( ! current_user_can( 'edit_css' ) ) {
+		gutenberg_custom_css_kses_init_filters();
+	}
+}
+
+/**
+ * Initializes custom CSS content filters when imported data should be filtered.
+ *
+ * This filter is the last being executed on force_filtered_html_on_import.
+ * If the input of the filter is true it means we are in an import situation and should
+ * enable the custom CSS filters, independently of the user capabilities.
+ *
+ * @since 21.2.0
+ * @access private
+ *
+ * @param mixed $arg Input argument of the filter.
+ * @return mixed Input argument of the filter.
+ */
+function gutenberg_custom_css_force_filtered_html_on_import_filter( $arg ) {
+	if ( $arg ) {
+		gutenberg_custom_css_kses_init_filters();
+	}
+	return $arg;
+}
+
+add_action( 'init', 'gutenberg_custom_css_kses_init', 20 );
+add_action( 'set_current_user', 'gutenberg_custom_css_kses_init' );
+add_filter( 'force_filtered_html_on_import', 'gutenberg_custom_css_force_filtered_html_on_import_filter', 999 );
+
 // Register the block support.
 WP_Block_Supports::get_instance()->register(
 	'custom-css',

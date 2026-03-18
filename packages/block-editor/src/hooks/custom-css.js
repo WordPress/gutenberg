@@ -1,13 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useEffect, useMemo } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { processCSSNesting } from '@wordpress/global-styles-engine';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -69,6 +70,8 @@ function CustomCSSControl( { blockName, setAttributes, style } ) {
 	);
 }
 
+const CUSTOM_CSS_WARNING_NOTICE_ID = 'custom-css-edit-warning';
+
 function CustomCSSEdit( { clientId, name, setAttributes } ) {
 	const { style, canEditCSS } = useSelect(
 		( select ) => {
@@ -81,6 +84,23 @@ function CustomCSSEdit( { clientId, name, setAttributes } ) {
 		},
 		[ clientId ]
 	);
+
+	const { createWarningNotice } = useDispatch( noticesStore );
+
+	const hasCustomCSS = !! style?.css;
+	useEffect( () => {
+		if ( ! canEditCSS && hasCustomCSS ) {
+			createWarningNotice(
+				__(
+					'This post contains blocks with custom CSS. You do not have permission to edit CSS, so any custom CSS will be removed if you save this post.'
+				),
+				{
+					id: CUSTOM_CSS_WARNING_NOTICE_ID,
+					isDismissible: true,
+				}
+			);
+		}
+	}, [ canEditCSS, hasCustomCSS, createWarningNotice ] );
 
 	// Don't render the panel if user lacks edit_css capability.
 	if ( ! canEditCSS ) {
