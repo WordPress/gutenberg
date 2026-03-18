@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 13.1.0 (2026-03-18)
+
 ### Enhancements
 
 - DataForm: Reduce panel's dialog min-width. [#76345](https://github.com/WordPress/gutenberg/pull/76345)
