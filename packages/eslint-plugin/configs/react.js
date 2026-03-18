@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+const { fixupPluginRules } = require( '@eslint/compat' );
 const reactPlugin = require( 'eslint-plugin-react' );
 const reactHooksPlugin = require( 'eslint-plugin-react-hooks' );
 
@@ -11,8 +12,17 @@ const wpRules = require( '../rules' );
 
 const wpPlugin = { rules: wpRules };
 
+const fixedReactPlugin = fixupPluginRules( reactPlugin );
+
 module.exports = [
-	reactPlugin.configs.flat.recommended,
+	{
+		plugins: {
+			react: fixedReactPlugin,
+		},
+		rules: reactPlugin.configs.flat.recommended.rules,
+		languageOptions:
+			reactPlugin.configs.flat.recommended.languageOptions,
+	},
 	{
 		plugins: {
 			'@wordpress': wpPlugin,

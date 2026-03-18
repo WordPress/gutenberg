@@ -2,7 +2,7 @@
  * External dependencies
  */
 const { cosmiconfigSync } = require( 'cosmiconfig' );
-const babelParser = require( '@babel/eslint-parser' );
+const babelParser = require( './babel-parser-compat' );
 const globals = require( 'globals' );
 
 /**
