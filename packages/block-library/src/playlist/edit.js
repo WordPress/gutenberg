@@ -28,6 +28,7 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
@@ -373,10 +374,14 @@ const PlaylistEdit = ( {
 					<WaveformPlayer
 						src={ currentTrackData?.src }
 						title={ decodeEntities(
-							currentTrackData?.title
+							stripHTML(
+								currentTrackData?.title ?? ''
+							)
 						) }
 						artist={ decodeEntities(
-							currentTrackData?.artist
+							stripHTML(
+								currentTrackData?.artist ?? ''
+							)
 						) }
 						image={ currentTrackData?.image }
 						onEnded={ onTrackEnded }
