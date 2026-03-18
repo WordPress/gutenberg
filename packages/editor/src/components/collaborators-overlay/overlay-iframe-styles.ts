@@ -119,7 +119,7 @@ export const OVERLAY_IFRAME_STYLES = `
 	outline-style: solid;
 	outline-width: calc(var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
 	outline-offset: calc(-1 * var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
-	box-shadow: inset 0 0 0 calc(var(--wp-admin-border-width-focus, ${ BORDER_WIDTH_FOCUS_FALLBACK }) + ${ BORDER_WIDTH }) ${ WHITE }, 0 0 0 ${ BORDER_WIDTH } ${ WHITE }, ${ ELEVATION_X_SMALL };
+	box-shadow: inset 0 0 0 calc((var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1)) + 0.5px) rgba(${ WHITE }, 0.7);
 	z-index: 1;
 }
 @media (prefers-reduced-motion: reduce) {
