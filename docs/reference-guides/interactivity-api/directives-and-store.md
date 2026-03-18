@@ -356,9 +356,7 @@ The returned value is used to change the inner content of the element: `<div>val
 This directive runs code on dispatched DOM events like `click` or `keyup`. The syntax is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`).
 
 ```html
-<button data-wp-on--click="actions.logTime" >
-  Click Me!
-</button>
+<button data-wp-on--click="actions.logTime">Click Me!</button>
 ```
 
 <details>
@@ -539,14 +537,14 @@ Here's another example with several `wp-init` directives on the same DOM element
 ```js
 import { store, getElement } from '@wordpress/interactivity';
 
-store( "myPlugin", {
-  callbacks: {
-    logTimeInit: () => console.log( `Init at ` + new Date() ),
-    focusFirstElement: () => {
-      const { ref } = getElement();
-      ref.querySelector( 'input:first-child' ).focus();
-    },
-  },
+store( 'myPlugin', {
+	callbacks: {
+		logTimeInit: () => console.log( `Init at ` + new Date() ),
+		focusFirstElement: () => {
+			const { ref } = getElement();
+			ref.querySelector( 'input:first-child' ).focus();
+		},
+	},
 } );
 ```
 
@@ -1351,7 +1349,9 @@ The callback passed to `watch()` can also return a cleanup function. This cleanu
 
 ```js
 const unwatch = watch( () => {
-	const handler = () => { /* ... */ };
+	const handler = () => {
+		/* ... */
+	};
 	document.addEventListener( 'click', handler );
 
 	// This cleanup runs before the next re-execution, or when

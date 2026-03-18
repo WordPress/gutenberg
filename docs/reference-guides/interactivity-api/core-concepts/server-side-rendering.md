@@ -182,9 +182,7 @@ _Please, visit the [Understanding global state, local context, derived state and
 Let's imagine adding a button that can delete all fruits:
 
 ```html
-<button data-wp-on--click="actions.deleteFruits">
-	Delete all fruits
-</button>
+<button data-wp-on--click="actions.deleteFruits">Delete all fruits</button>
 ```
 
 ```javascript

@@ -78,7 +78,7 @@ In `block.json`:
 
 ```json
 {
-   "viewScriptModule": "file:./view.js"
+	"viewScriptModule": "file:./view.js"
 }
 ```
 
@@ -90,10 +90,10 @@ If you need to add it manually, update your `package.json`:
 
 ```json
 {
-    "scripts": {
-        "build": "wp-scripts build --experimental-modules",
-        "start": "wp-scripts start --experimental-modules"
-    }
+	"scripts": {
+		"build": "wp-scripts build --experimental-modules",
+		"start": "wp-scripts start --experimental-modules"
+	}
 }
 ```
 

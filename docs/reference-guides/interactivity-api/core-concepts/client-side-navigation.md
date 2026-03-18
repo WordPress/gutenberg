@@ -796,7 +796,7 @@ const { actions } = store( 'myPlugin', {
 				'@wordpress/interactivity-router'
 			);
 			yield routerActions.navigate( window.location.href, {
-				force: true
+				force: true,
 			} );
 		},
 	},
