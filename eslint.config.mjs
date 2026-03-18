@@ -814,6 +814,28 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: TypeScript declaration merging uses intentional shadowing
+	// in `declare module` blocks.
+	{
+		files: [
+			'packages/core-data/src/entity-types/*.ts',
+			'packages/data/src/types.ts',
+		],
+		rules: {
+			'@typescript-eslint/no-shadow': 'off',
+		},
+	},
+
+	// Override: typings — global type declarations require `var` and define
+	// the globals that wp-global-usage warns about.
+	{
+		files: [ 'typings/**/*.d.ts' ],
+		rules: {
+			'no-var': 'off',
+			'@wordpress/wp-global-usage': 'off',
+		},
+	},
+
 	// Package-level configs (kept alongside the code they apply to).
 	...reactNativeEditorConfig,
 	...wpBuildConfig,
