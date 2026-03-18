@@ -31,6 +31,28 @@ const hasLintConfig =
 	hasProjectFile( 'eslint.config.mts' ) ||
 	hasProjectFile( 'eslint.config.cts' );
 
+// Warn if the project still has a legacy eslintrc config file.
+if ( ! hasLintConfig ) {
+	const legacyConfigFiles = [
+		'.eslintrc',
+		'.eslintrc.js',
+		'.eslintrc.cjs',
+		'.eslintrc.json',
+		'.eslintrc.yml',
+		'.eslintrc.yaml',
+	];
+	const hasLegacyConfig = legacyConfigFiles.some( hasProjectFile );
+	if ( hasLegacyConfig ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			'Warning: Legacy eslintrc configuration detected. ' +
+				'ESLint v10 no longer supports eslintrc files. ' +
+				'Please migrate to eslint.config.js (flat config). ' +
+				'See https://eslint.org/docs/latest/use/configure/migration-guide for details.'
+		);
+	}
+}
+
 // When a configuration is not provided by the project, use the default
 // provided with the scripts module.
 const defaultConfigArgs = ! hasLintConfig

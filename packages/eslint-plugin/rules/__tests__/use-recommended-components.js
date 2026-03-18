@@ -1,5 +1,3 @@
-/* eslint-env jest */
-
 /**
  * External dependencies
  */

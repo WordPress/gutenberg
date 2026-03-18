@@ -394,7 +394,11 @@ export default dedupePlugins( [
 	// Override: Jest test files (unit tests).
 	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
 		...config,
-		files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
+		files: [
+			'packages/jest*/**/*.js',
+			'**/test/**/*.js',
+			'**/__tests__/**/*.js',
+		],
 		ignores: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
 	} ) ),
 
@@ -402,7 +406,7 @@ export default dedupePlugins( [
 	{
 		...rawJestDomPlugin.configs[ 'flat/recommended' ],
 		plugins: { 'jest-dom': jestDomPlugin },
-		files: [ '**/test/**/*.[tj]s?(x)' ],
+		files: [ '**/test/**/*.[tj]s?(x)', '**/__tests__/**/*.[tj]s?(x)' ],
 		ignores: [
 			'**/*.@(android|ios|native).[tj]s?(x)',
 			'packages/react-native-*/**/*.[tj]s?(x)',
@@ -415,7 +419,7 @@ export default dedupePlugins( [
 	{
 		...testingLibraryPlugin.configs[ 'flat/react' ],
 		plugins: { 'testing-library': testingLibraryPlugin },
-		files: [ '**/test/**/*.[tj]s?(x)' ],
+		files: [ '**/test/**/*.[tj]s?(x)', '**/__tests__/**/*.[tj]s?(x)' ],
 		ignores: [
 			'**/*.@(android|ios|native).[tj]s?(x)',
 			'packages/react-native-*/**/*.[tj]s?(x)',
@@ -427,7 +431,7 @@ export default dedupePlugins( [
 	},
 	{
 		...jestPlugin.configs[ 'flat/recommended' ],
-		files: [ '**/test/**/*.[tj]s?(x)' ],
+		files: [ '**/test/**/*.[tj]s?(x)', '**/__tests__/**/*.[tj]s?(x)' ],
 		ignores: [
 			'**/*.@(android|ios|native).[tj]s?(x)',
 			'packages/react-native-*/**/*.[tj]s?(x)',
