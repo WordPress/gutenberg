@@ -16,12 +16,12 @@ The question: **Does dismiss coordination (click-outside, Escape key) break when
 |---|---|---|
 | Click-outside dismiss | **Yes** | `insideReactTree` mechanism uses shared React synthetic events |
 | Escape key (cross-type, e.g., Select in Dialog) | **Same as single bundle** | Select uses `bubbles: false`; Dialog uses a context counter — neither depends on FloatingTree |
-| Escape key (same-type, e.g., Popover in Popover) | **Degraded** | FloatingTree context not shared; parent can't check children |
+| Escape key (same-type, e.g., Popover in Popover) | **Yes** | React synthetic `onKeyDown` + `stopPropagation()` prevents parent from receiving Escape; shared React makes this work across bundles |
 | Escape key (Dialog in Dialog, cross-bundle) | **Degraded** | Nesting counter relies on `DialogRootContext`, which is not shared across bundles |
 | Modal dialog backdrop dismiss | **Yes** | Backdrop check is DOM-based, not context-based |
 | Visual stacking (DOM order) | **Yes** | No z-index means later-rendered elements are on top |
 
-**Conclusion**: The primary use case (click-outside dismiss) works correctly across bundles. This is not a hard blocker for the migration, but there are nuanced Escape key regressions to be aware of.
+**Conclusion**: Both click-outside and Escape key dismiss work correctly across bundles for the most common overlay nesting patterns. Dialog-in-Dialog cross-bundle nesting is the only known Escape regression, and it is uncommon in practice. This is not a hard blocker for the migration.
 
 ## Three Dismiss Strategies in Base UI
 
@@ -29,7 +29,7 @@ Base UI does **not** use a single unified dismiss strategy. There are three dist
 
 ### Strategy 1: FloatingTree (Menu, Popover, Menubar, NavigationMenu)
 
-> **Cross-bundle: click-outside works, Escape nesting breaks.** FloatingTree is a React context — isolated across bundles. A parent Popover/Menu from bundle A cannot detect a child from bundle B in its tree, so Escape dismisses both. Click-outside is unaffected (`insideReactTree` handles it). **Practical risk: low** — same-type nesting across packages is rare.
+> **Cross-bundle: works correctly for both click-outside and Escape.** Although FloatingTree is a React context (isolated across bundles), Escape key coordination is handled by a separate mechanism: the React synthetic `onKeyDown` handler on the floating element. The inner overlay's handler calls `stopPropagation()`, preventing the outer from receiving the event through the shared React tree. Empirically verified with Popover-in-Popover cross-bundle nesting. **Confidence: high** — verified empirically in the stress test. **Practical risk: none.**
 
 These components render a `<FloatingTree>` / `<FloatingNode>` hierarchy and use `useFloatingNodeId` to track parent-child relationships at the DOM level.
 
@@ -45,7 +45,7 @@ These components render a `<FloatingTree>` / `<FloatingNode>` hierarchy and use 
 - Menu: Each `MenuStore` creates a `FloatingTreeStore`. The top-level `MenuRoot` wraps children in `<FloatingTree externalTree={floatingTreeRoot}>`. Nested (submenu) roots skip the wrapper and join the existing tree. `useDismiss` is called with `externalTree` for nested menus, enabling tree-based child checks.
 - Popover: Simpler. Wraps in `<FloatingTree>` only when outermost (checks `usePopoverRootContext(true)`). `PopoverPositioner` registers via `<FloatingNode>`. Detects nesting via `useFloatingParentNodeId() != null`.
 
-**Cross-bundle impact**: FloatingTree relies on React context, so it **does not work across bundles**. A parent Popover from bundle A cannot see a child Popover from bundle B in its tree.
+**Cross-bundle impact**: FloatingTree relies on React context, so the tree data structure itself **is not shared across bundles**. A parent Popover from bundle A cannot see a child Popover from bundle B in its tree. However, this does not cause a regression for Escape key behavior — see "Same-type nesting" below for details.
 
 ### Strategy 2: React Context Counter (Dialog, AlertDialog, Drawer)
 
@@ -159,13 +159,23 @@ For comparison, the current `@wordpress/components` Modal uses only a React synt
 
 ### Same-type nesting (Popover inside Popover, Menu inside Menu)
 
-> **Verdict: Degraded across bundles — Escape dismisses both parent and child.** Within a single bundle, FloatingTree lets the parent detect open children and suppress its own Escape handler. Across bundles, the FloatingTree context is isolated, so the parent sees no children and closes alongside the child. Click-outside still works correctly (via `insideReactTree`). **Confidence: high** — FloatingTree is a React context, and contexts are definitionally isolated across bundles. **Practical risk: low** — cross-package same-type overlay nesting is uncommon.
+> **Verdict: Works correctly across bundles — Escape only closes the inner overlay.** Although FloatingTree is isolated across bundles, Escape key coordination is handled by a different mechanism: the React synthetic `onKeyDown` handler attached to the floating element. The inner overlay's handler fires first and calls `stopPropagation()`, which prevents the outer from receiving the event through the shared React component tree. **Confidence: high** — empirically verified in the stress test (scenario 1.5). **Practical risk: none.**
 
-Within a single bundle, same-type components share a `FloatingTree` context. When Escape is pressed on an inner Popover, the outer Popover's `useDismiss` checks `getNodeChildren(tree.nodesRef.current, nodeId)` and finds the inner Popover is open — it skips dismissing.
+`useDismiss` attaches `closeOnEscapeKeyDown` in two places:
+1. As a **React synthetic `onKeyDown`** handler on the floating element (returned via `useInteractions`)
+2. As a **native `keydown`** listener on `document` (registered in a `useEffect`)
 
-Across bundles, the `FloatingTree` context is not shared. The outer Popover's `useDismiss` finds no children in its FloatingTree and proceeds to dismiss. **This is a genuine cross-bundle regression for same-type nesting.**
+When the inner Popover (from bundle B) is rendered inside the outer Popover's React tree (from bundle A) via `createPortal`, React's synthetic event system is shared (React is externalized). When the user presses Escape inside the inner Popover:
 
-Mitigation: Popover-in-Popover nesting naturally occurs within the same package (e.g., a color picker popover with a nested palette popover). Cross-package Popover nesting is rare. The same applies to nested menus.
+1. The native `keydown` event bubbles through the DOM
+2. React's event delegation intercepts it and dispatches synthetic `keydown` events through the React component tree
+3. The inner Popover's `onKeyDown` fires first (deeper in the React tree) → closes the inner → calls `event.stopPropagation()` (because `escapeKeyBubbles` defaults to `false`)
+4. React synthetic propagation is stopped — the outer Popover's `onKeyDown` never fires
+5. The outer Popover stays open
+
+This works because `stopPropagation()` on the React synthetic event prevents further bubbling through the React tree, and the outer Popover's primary Escape handler is the React synthetic one, not the native `document` listener.
+
+Note: within a single bundle, FloatingTree provides an additional layer of coordination (the outer checks for open children before dismissing). Across bundles, FloatingTree is isolated, but the React synthetic event mechanism described above handles the same-type nesting case correctly without it.
 
 ### Dialog-in-Dialog nesting (cross-bundle)
 
@@ -183,10 +193,10 @@ Mitigation: Dialog-in-Dialog nesting across packages is uncommon. When it does o
 
 | Component | Dismiss strategy | FloatingTree? | Nesting context | `useDismiss` config | Cross-bundle risk |
 |---|---|---|---|---|---|
-| Menu | Strategy 1 | Yes | `FloatingTree` + `FloatingTreeStore` | `externalTree` for nested menus | Same-type nesting breaks |
-| Popover | Strategy 1 | Yes | `FloatingTree` | Default (tree via context) | Same-type nesting breaks |
-| Menubar | Strategy 1 | Yes | `FloatingTree` | (via Menu internals) | Same-type nesting breaks |
-| NavigationMenu | Strategy 1 | Yes | `FloatingTree` | (via Menu internals) | Same-type nesting breaks |
+| Menu | Strategy 1 | Yes | `FloatingTree` + `FloatingTreeStore` | `externalTree` for nested menus | None (React synthetic `onKeyDown` handles Escape) |
+| Popover | Strategy 1 | Yes | `FloatingTree` | Default (tree via context) | None (empirically verified) |
+| Menubar | Strategy 1 | Yes | `FloatingTree` | (via Menu internals) | None (React synthetic `onKeyDown` handles Escape) |
+| NavigationMenu | Strategy 1 | Yes | `FloatingTree` | (via Menu internals) | None (React synthetic `onKeyDown` handles Escape) |
 | Dialog | Strategy 2 | No | `DialogRootContext` counter | `escapeKey: isTopmost` | Dialog-in-Dialog Escape breaks |
 | AlertDialog | Strategy 2 | No | (reuses Dialog) | `disablePointerDismissal: true` | Same as Dialog |
 | Drawer | Strategy 2 | No | (wraps Dialog.Root) | (delegated to Dialog) | Same as Dialog |
@@ -206,16 +216,18 @@ The test covers 5 concerns with 23 scenarios: dismiss coordination, z-index stac
 
 ## Implications for the Migration
 
-1. **Click-outside dismiss works across bundles** — the `insideReactTree` mechanism is universal and relies only on shared React, not on Base UI contexts. This is not a hard blocker.
+1. **Click-outside dismiss works across bundles** — the `insideReactTree` mechanism is universal and relies only on shared React, not on Base UI contexts.
 
-2. **Escape key has nuanced regressions** — same-type nesting (Popover-in-Popover, Menu-in-Menu) and Dialog-in-Dialog across bundles lose their nesting awareness. These are uncommon cross-package patterns, but should be documented as known limitations.
+2. **Escape key works correctly for most nesting patterns** — Popover-in-Popover, Menu-in-Menu, and Select-in-Dialog all work correctly across bundles. The React synthetic `onKeyDown` handler + `stopPropagation()` mechanism is shared through the common React instance. Empirically verified in the stress test.
 
-3. **Select-in-Dialog is safe** — Select's `bubbles: false` means Escape only closes the Select. The Dialog's behavior on Escape is the same whether or not the Select shares a bundle. The double-dismiss issue (Dialog also closing) is a single-bundle behavior that exists today.
+3. **Dialog-in-Dialog is the only known Escape regression** — Dialog uses a `DialogRootContext` counter for nesting awareness, which is isolated across bundles. Both Dialogs think they are topmost and both close on Escape. This is uncommon in practice (cross-package Dialog nesting is rare).
 
-4. **Phases 1–3 are unaffected**: WPDS overlays can be built and deployed alongside legacy overlays.
+4. **Select-in-Dialog is safe** — Select's `bubbles: false` means Escape only closes the Select. The Dialog's behavior on Escape is the same whether or not the Select shares a bundle. The double-dismiss issue (Dialog also closing) is a single-bundle behavior that exists today.
 
-5. **Phase 4 remains important**: Unifying all overlay internals on `@base-ui/react` within the same bundle eliminates FloatingTree isolation and Dialog context counter isolation.
+5. **Phases 1–3 are unaffected**: WPDS overlays can be built and deployed alongside legacy overlays.
 
-6. **No strategy shift required**: The bundling model (multiple copies of `@base-ui/react`) does not create a hard blocker.
+6. **Phase 4 remains valuable but less urgent**: The main cross-bundle concern (same-type overlay Escape nesting) turned out to work correctly. Phase 4 would still unify FloatingTree contexts and Dialog nesting counters, but the practical impact is limited to the uncommon Dialog-in-Dialog case.
 
-7. **Long-term option**: Promoting `@wordpress/ui` to `wpScript: true` would eliminate all context isolation concerns by making it a shared script handle. This is a Core-level decision that can be deferred.
+7. **No strategy shift required**: The bundling model (multiple copies of `@base-ui/react`) does not create a hard blocker.
+
+8. **Long-term option**: Promoting `@wordpress/ui` to `wpScript: true` would eliminate all context isolation concerns by making it a shared script handle. This is a Core-level decision that can be deferred.
