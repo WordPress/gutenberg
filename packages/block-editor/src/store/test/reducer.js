@@ -2478,6 +2478,129 @@ describe( 'state', () => {
 					expect( state.controlledInnerBlocks.chicken ).toBe( true );
 				} );
 
+				it( 'should preserve controlledInnerBlocks blocks across RESET_BLOCKS', () => {
+					const original = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							{
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					} );
+					const withControlled = blocks( original, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'chicken',
+						hasControlledInnerBlocks: true,
+					} );
+
+					const withControlledContent = blocks( withControlled, {
+						type: 'REPLACE_INNER_BLOCKS',
+						rootClientId: 'chicken',
+						blocks: [
+							{
+								clientId: 'content',
+								innerBlocks: [
+									{
+										clientId: 'content-inner',
+										innerBlocks: [],
+									},
+								],
+							},
+						],
+					} );
+
+					expect(
+						getBlocks(
+							{ blocks: withControlledContent },
+							'chicken'
+						).map( ( b ) => b.clientId )
+					).toEqual( [ 'content' ] );
+					expect(
+						getBlocks(
+							{ blocks: withControlledContent },
+							'content'
+						).map( ( b ) => b.clientId )
+					).toEqual( [ 'content-inner' ] );
+
+					const state = blocks( withControlledContent, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							{
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					} );
+
+					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					expect(
+						getBlocks( { blocks: state }, 'chicken' ).map(
+							( b ) => b.clientId
+						)
+					).toEqual( [ 'content' ] );
+					expect(
+						getBlocks( { blocks: state }, 'content' ).map(
+							( b ) => b.clientId
+						)
+					).toEqual( [ 'content-inner' ] );
+				} );
+
+				it( 'should forget controlledInnerBlocks during full RESET_BLOCKS', () => {
+					const templateBlock = {
+						clientId: 'template',
+						name: 'core/post-content',
+						attributes: {},
+						innerBlocks: [],
+					};
+					const contentBlock = {
+						clientId: 'content',
+						name: 'core/paragraph',
+						attributes: {},
+						innerBlocks: [],
+					};
+
+					let state = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [ templateBlock ],
+					} );
+
+					state = blocks( state, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'template',
+						hasControlledInnerBlocks: true,
+					} );
+
+					state = blocks( state, {
+						type: 'REPLACE_INNER_BLOCKS',
+						rootClientId: 'template',
+						blocks: [ contentBlock ],
+					} );
+
+					// Reset blocks completely, we expect that the controlled blocks are forgotten.
+					state = blocks( state, {
+						type: 'RESET_BLOCKS',
+						blocks: [],
+					} );
+
+					// Reset back to the template.
+					state = blocks( state, {
+						type: 'RESET_BLOCKS',
+						blocks: [ templateBlock ],
+					} );
+
+					// Expect that the `template`/`content` blocks are reconstructed.
+					const fullState = { blocks: state };
+					expect( getBlocks( fullState, 'template' ) ).toEqual( [] );
+					expect( getBlockOrder( fullState, 'template' ) ).toEqual(
+						[]
+					);
+				} );
+
 				it( 'should not leave stale controlled tree entries after root replacement and reset', () => {
 					const templateBlock = {
 						clientId: 'template',

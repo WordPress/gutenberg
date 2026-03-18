@@ -607,19 +607,22 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 		 * flags are cleaned up naturally by unsetControlledBlocks()
 		 * when useBlockSync unmounts.
 		 */
-		const preservedControlledInnerBlocks =
-			state?.controlledInnerBlocks ?? {};
 
 		const newState = {
-			...state,
 			byClientId: new Map(
 				getFlattenedBlocksWithoutAttributes( action.blocks )
 			),
 			attributes: new Map( getFlattenedBlockAttributes( action.blocks ) ),
 			order: mapBlockOrder( action.blocks ),
 			parents: new Map( mapBlockParents( action.blocks ) ),
-			controlledInnerBlocks: preservedControlledInnerBlocks,
+			controlledInnerBlocks: {},
+			tree: new Map(),
 		};
+
+		updateBlockTreeForBlocks( newState, action.blocks );
+
+		const preservedControlledInnerBlocks =
+			state?.controlledInnerBlocks ?? {};
 
 		// Preserve controlled inner blocks data from the old state.
 		// The maps above are rebuilt solely from action.blocks, but
@@ -637,23 +640,24 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 				if ( ! newState.byClientId.has( clientId ) ) {
 					continue;
 				}
+				newState.controlledInnerBlocks[ clientId ] = true;
 				const oldOrder = state.order.get( clientId );
 				if ( ! oldOrder?.length ) {
 					continue;
 				}
 				newState.order.set( clientId, oldOrder );
 				const preserveBlock = ( blockId, parentId ) => {
-					const blockData = state.byClientId?.get( blockId );
+					const blockData = state.byClientId.get( blockId );
 					if ( ! blockData ) {
 						return;
 					}
 					newState.byClientId.set( blockId, blockData );
 					newState.attributes.set(
 						blockId,
-						state.attributes?.get( blockId )
+						state.attributes.get( blockId )
 					);
 					newState.parents.set( blockId, parentId );
-					const childOrder = state.order?.get( blockId ) || [];
+					const childOrder = state.order.get( blockId ) || [];
 					newState.order.set( blockId, childOrder );
 					childOrder.forEach( ( childId ) =>
 						preserveBlock( childId, blockId )
@@ -663,18 +667,15 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 			}
 		}
 
-		newState.tree = new Map( state?.tree );
-		updateBlockTreeForBlocks( newState, action.blocks );
-
 		// Fix tree entries for controlled blocks. updateBlockTreeForBlocks
 		// built tree entries using action.blocks' inner block structure
 		// (entity-level IDs), but we need them to reference the preserved
 		// cloned inner blocks instead. Mutating the existing object
 		// preserves references held by ancestor tree entries.
 		for ( const clientId of Object.keys(
-			preservedControlledInnerBlocks
+			newState.controlledInnerBlocks
 		) ) {
-			if ( ! preservedControlledInnerBlocks[ clientId ] ) {
+			if ( ! newState.controlledInnerBlocks[ clientId ] ) {
 				continue;
 			}
 			if ( ! newState.byClientId.has( clientId ) ) {
@@ -685,13 +686,23 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 				continue;
 			}
 			const innerBlocks = controlledOrder.map( ( id ) =>
-				newState.tree.get( id )
+				state.tree.get( id )
 			);
 			const existingEntry = newState.tree.get( clientId );
 			if ( existingEntry ) {
 				existingEntry.innerBlocks = innerBlocks;
 			}
 			newState.tree.set( 'controlled||' + clientId, { innerBlocks } );
+			const preserveTreeEntry = ( blockId ) => {
+				const treeEntry = state.tree.get( blockId );
+				if ( ! treeEntry ) {
+					return;
+				}
+				newState.tree.set( blockId, treeEntry );
+				const childOrder = newState.order.get( blockId ) || [];
+				childOrder.forEach( preserveTreeEntry );
+			};
+			controlledOrder.forEach( preserveTreeEntry );
 		}
 
 		newState.tree.set( '', {
