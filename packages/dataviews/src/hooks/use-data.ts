@@ -62,7 +62,6 @@ export default function useData< Item >( {
 }: UseDataParams< Item > ): UseDataResult< Item > {
 	const isInfiniteScrollEnabled = view.infiniteScrollEnabled;
 
-	// --- hasInitiallyLoaded tracking (from trunk) ---
 	const [ hasInitiallyLoaded, setHasInitiallyLoaded ] = useState(
 		! isLoading
 	);
@@ -72,7 +71,6 @@ export default function useData< Item >( {
 		}
 	}, [ isLoading ] );
 
-	// --- Previous data / paginationInfo preservation while loading (from trunk) ---
 	const previousDataRef = useRef< Item[] >( shownData );
 	const previousPaginationInfoRef =
 		useRef< PaginationInfo >( paginationInfo );
@@ -83,7 +81,7 @@ export default function useData< Item >( {
 		}
 	}, [ shownData, isLoading, paginationInfo ] );
 
-	// --- Infinite scroll state ---
+	// Infinite scroll state.
 	const [ visibleEntries, setVisibleEntries ] = useState< number[] >( [] );
 
 	// Track the mapping of item IDs to their positions in the full dataset

@@ -59,7 +59,6 @@ type DataViewsContextType< Item > = {
 	hasInitiallyLoaded?: boolean;
 	itemListLabel?: string;
 	onReset?: ( () => void ) | false;
-	/** Shared IntersectionObserver instance created by the provider when infinite scroll is enabled. */
 	intersectionObserver?: IntersectionObserver | null;
 };
 
