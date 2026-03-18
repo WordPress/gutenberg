@@ -25,6 +25,7 @@
 	},
 	"files": [
 		"configs",
+		"eslintrc",
 		"rules",
 		"utils",
 		"index.js"
@@ -33,6 +34,9 @@
 	"exports": {
 		".": {
 			"default": "./index.js"
+		},
+		"./eslintrc": {
+			"default": "./eslintrc/index.js"
 		},
 		"./package.json": "./package.json"
 	},
@@ -63,7 +67,7 @@
 	},
 	"peerDependencies": {
 		"@babel/core": ">=7",
-		"eslint": "^10.0.0",
+		"eslint": "^9.0.0 || ^10.0.0",
 		"prettier": ">=3",
 		"typescript": ">=5"
 	},
