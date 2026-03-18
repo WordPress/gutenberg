@@ -9,11 +9,9 @@ import { createElement, useEffect, useState } from '@wordpress/element';
 import {
 	Spinner,
 	Navigator,
+	Notice,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-// TODO: Revert to the `Notice` in `@wordpress/components` for now.
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Notice } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -87,20 +85,20 @@ function ContentGuidelinesPage() {
 		>
 			{ error && (
 				<div className="content-guidelines__content">
-					<Notice.Root intent="error">
-						<Notice.Title>
+					<Notice status="error" isDismissible={ false }>
+						<strong>
 							{ sprintf(
 								/* translators: %s: Error message. */
 								__( 'Error loading guidelines: %s' ),
 								error
 							) }
-						</Notice.Title>
-						<Notice.Description>
+						</strong>
+						<p className="content-guidelines__error-description">
 							{ __(
 								'Please try again. If the problem persists, contact support.'
 							) }
-						</Notice.Description>
-					</Notice.Root>
+						</p>
+					</Notice>
 				</div>
 			) }
 			{ loading ? (

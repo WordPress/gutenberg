@@ -5,6 +5,7 @@
 		{ "path": "../components" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },
+		{ "path": "../private-apis" },
 		{ "path": "../route" },
 		{ "path": "../ui" }
 	]

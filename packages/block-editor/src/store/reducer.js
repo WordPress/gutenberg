@@ -2279,9 +2279,6 @@ function openedListViewPanels(
 			} );
 			return hasChanges ? { ...state, panels: newPanels } : state;
 		}
-		case 'RESET_BLOCKS':
-			// Clear all panel state when blocks are reset
-			return { allOpen: false, panels: {} };
 	}
 	return state;
 }

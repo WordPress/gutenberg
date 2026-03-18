@@ -3,7 +3,7 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 		type: 'problem',
 		docs: {
 			description:
-				'Disallow setting any CSS custom property beginning with --wpds- in inline styles',
+				'Disallow setting any CSS custom property beginning with --wpds-',
 		},
 		schema: [],
 		messages: {
@@ -14,9 +14,7 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 	create( context ) {
 		return {
 			/** @param {import('estree').Property} node */
-			'JSXAttribute[name.name="style"] ObjectExpression > Property[key.value=/^--wpds-/]'(
-				node
-			) {
+			'ObjectExpression > Property[key.value=/^--wpds-/]'( node ) {
 				context.report( {
 					node: node.key,
 					messageId: 'disallowedSet',

@@ -29,18 +29,6 @@
 	margin-top: $grid-unit-20;
 }
 
-.content-guidelines__actions-notice {
-	border: none;
-	border-left: 4px solid $alert-yellow;
-	background-color: color.adjust($alert-yellow, $lightness: +35%);
-	border-radius: 0;
-}
-
-.content-guidelines__actions-notice-title {
-	font-size: 13px;
-	font-weight: 400;
-}
-
 .content-guidelines__actions {
 	width: min(680px, 100%);
 	margin: $grid-unit-20 auto 0;
@@ -129,6 +117,11 @@
 	margin-left: -$grid-unit-10;
 	font-weight: 500;
 	color: $gray-900;
+}
+
+.content-guidelines__error-description {
+	margin: 0;
+	margin-top: $grid-unit-10;
 }
 
 .content-guidelines__revision-description {

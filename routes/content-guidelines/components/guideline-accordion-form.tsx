@@ -3,12 +3,13 @@
 /**
  * WordPress dependencies
  */
-import { Button, __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	Button,
+	Notice,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
-// TODO: Revert to the `Notice` in `@wordpress/components` for now.
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Notice } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	createElement,
@@ -108,15 +109,13 @@ export default function GuidelineAccordionForm( {
 					}
 				/>
 				{ error && (
-					<Notice.Root intent="error">
-						<Notice.Title>
-							{ sprintf(
-								/* translators: %s: Error message. */
-								__( 'Error saving guidelines: %s' ),
-								error
-							) }
-						</Notice.Title>
-					</Notice.Root>
+					<Notice status="error" onRemove={ () => setError( null ) }>
+						{ sprintf(
+							/* translators: %s: Error message. */
+							__( 'Error saving guidelines: %s' ),
+							error
+						) }
+					</Notice>
 				) }
 				<Button
 					variant="primary"

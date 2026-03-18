@@ -119,7 +119,7 @@
 		align-items: center;
 
 		/* Appearance */
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 
 		/* Typography */
 		font-family: var(--wpds-font-family-body);

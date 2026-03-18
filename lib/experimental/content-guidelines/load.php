@@ -18,8 +18,8 @@ function gutenberg_register_content_guidelines_settings_submenu() {
 		__( 'Guidelines', 'gutenberg' ),
 		__( 'Guidelines', 'gutenberg' ),
 		'manage_options',
-		'content-guidelines-wp-admin',
-		'gutenberg_content_guidelines_wp_admin_render_page'
+		'guidelines-wp-admin',
+		'gutenberg_guidelines_wp_admin_render_page'
 	);
 }
 
@@ -35,7 +35,7 @@ function gutenberg_content_guidelines_enqueue_block_registry_scripts( $hook_suff
 		return;
 	}
 
-	if ( 'settings_page_content-guidelines-wp-admin' !== $hook_suffix ) {
+	if ( 'settings_page_guidelines-wp-admin' !== $hook_suffix ) {
 		return;
 	}
 

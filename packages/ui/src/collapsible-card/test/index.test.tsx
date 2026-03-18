@@ -53,9 +53,7 @@ describe( 'CollapsibleCard', () => {
 				</CollapsibleCard.Root>
 			);
 
-			expect(
-				screen.queryByText( 'Hidden content' )
-			).not.toBeInTheDocument();
+			expect( screen.getByText( 'Hidden content' ) ).not.toBeVisible();
 		} );
 
 		it( 'shows content when defaultOpen is true', () => {
@@ -87,9 +85,7 @@ describe( 'CollapsibleCard', () => {
 				</CollapsibleCard.Root>
 			);
 
-			expect(
-				screen.queryByText( 'Toggle content' )
-			).not.toBeInTheDocument();
+			expect( screen.getByText( 'Toggle content' ) ).not.toBeVisible();
 
 			await user.click(
 				screen.getByRole( 'button', {
@@ -107,9 +103,7 @@ describe( 'CollapsibleCard', () => {
 				} )
 			);
 
-			expect(
-				screen.queryByText( 'Toggle content' )
-			).not.toBeInTheDocument();
+			expect( screen.getByText( 'Toggle content' ) ).not.toBeVisible();
 		} );
 
 		it( 'calls onOpenChange when toggled', async () => {

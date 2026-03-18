@@ -133,3 +133,19 @@ export function postSyncUpdateNonBlocking( payload: SyncPayload ): void {
 		keepalive: true,
 	} ).catch( () => {} );
 }
+
+/**
+ * Parse an integer from an unknown value, returning a default if parsing fails.
+ *
+ * @param value        The value to parse as an integer.
+ * @param defaultValue The default value to return if parsing fails.
+ * @return The parsed integer or the default value.
+ */
+export function intValueOrDefault(
+	value: unknown,
+	defaultValue: number
+): number {
+	const intValue = parseInt( String( value ), 10 );
+
+	return isNaN( intValue ) ? defaultValue : intValue;
+}

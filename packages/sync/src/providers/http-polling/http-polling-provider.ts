@@ -83,7 +83,7 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 
 	/**
 	 * Emit connection status, passing the full object through so that
-	 * additional fields (e.g. `retryInMs`) are preserved for consumers.
+	 * additional fields (e.g. `willAutoRetryInMs`) are preserved for consumers.
 	 *
 	 * @param connectionStatus The connection status object
 	 */
