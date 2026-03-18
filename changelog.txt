@@ -1,5 +1,21 @@
 == Changelog ==
 
+= 22.7.1 =
+
+## Changelog
+
+### Bug Fixes
+
+- Fix script module dequeue race condition. ([76170](https://github.com/WordPress/gutenberg/pull/76170))
+- Sync changes from `wp_enqueue_global_styles()` to Gutenberg override. ([76127](https://github.com/WordPress/gutenberg/pull/76127))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@adamsilverstein @westonruter
+
+
 = 22.7.0 =
 
 ## Changelog
