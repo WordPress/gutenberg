@@ -5,8 +5,15 @@ import { FORMAT_ID } from '@terrazzo/plugin-css';
 import type { Plugin } from '@terrazzo/parser';
 
 interface TokenMetadata {
-	description: string;
+	$description: string;
+	$type: string;
 	group: string;
+	modes?: {
+		default: {
+			$value: unknown;
+			css: string;
+		};
+	};
 }
 
 export default function pluginKnownWpdsCssVariables( {
@@ -18,6 +25,7 @@ export default function pluginKnownWpdsCssVariables( {
 			const tokens: Record< string, TokenMetadata > = {};
 			const groups: Record< string, string[] > = {};
 
+			// '.' is Terrazzo's identifier for the default (base) mode.
 			for ( const token of getTransforms( {
 				format: FORMAT_ID,
 				id: '*',
@@ -36,10 +44,24 @@ export default function pluginKnownWpdsCssVariables( {
 						.at( -1 )
 						?.split( '.json' )[ 0 ] ?? 'unknown';
 
-				tokens[ token.localID ] = {
-					description: token.token.$description ?? '',
+				const isBrandToken = token.localID.includes( 'brand' );
+
+				const tokenEntry: TokenMetadata = {
+					$description: token.token.$description ?? '',
+					$type: token.token.$type,
 					group,
 				};
+
+				if ( ! isBrandToken ) {
+					tokenEntry.modes = {
+						default: {
+							$value: token.token.$value,
+							css: token.value,
+						},
+					};
+				}
+
+				tokens[ token.localID ] = tokenEntry;
 
 				groups[ group ] ??= [];
 				groups[ group ].push( token.localID );

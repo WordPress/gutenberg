@@ -5,564 +5,2695 @@
 
 export const tokens = {
 	"--wpds-border-radius-xs": {
-		"description": "Extra small radius",
-		"group": "border"
+		"$description": "Extra small radius",
+		"$type": "dimension",
+		"group": "border",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 1,
+					"unit": "px"
+				},
+				"css": "1px"
+			}
+		}
 	},
 	"--wpds-border-radius-sm": {
-		"description": "Small radius",
-		"group": "border"
+		"$description": "Small radius",
+		"$type": "dimension",
+		"group": "border",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 2,
+					"unit": "px"
+				},
+				"css": "2px"
+			}
+		}
 	},
 	"--wpds-border-radius-md": {
-		"description": "Medium radius",
-		"group": "border"
+		"$description": "Medium radius",
+		"$type": "dimension",
+		"group": "border",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 4,
+					"unit": "px"
+				},
+				"css": "4px"
+			}
+		}
 	},
 	"--wpds-border-radius-lg": {
-		"description": "Large radius",
-		"group": "border"
+		"$description": "Large radius",
+		"$type": "dimension",
+		"group": "border",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 8,
+					"unit": "px"
+				},
+				"css": "8px"
+			}
+		}
 	},
 	"--wpds-border-width-xs": {
-		"description": "Extra small width",
-		"group": "border"
+		"$description": "Extra small width",
+		"$type": "dimension",
+		"group": "border",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 1,
+					"unit": "px"
+				},
+				"css": "1px"
+			}
+		}
 	},
 	"--wpds-border-width-sm": {
-		"description": "Small width",
-		"group": "border"
+		"$description": "Small width",
+		"$type": "dimension",
+		"group": "border",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 2,
+					"unit": "px"
+				},
+				"css": "2px"
+			}
+		}
 	},
 	"--wpds-border-width-md": {
-		"description": "Medium width",
-		"group": "border"
+		"$description": "Medium width",
+		"$type": "dimension",
+		"group": "border",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 4,
+					"unit": "px"
+				},
+				"css": "4px"
+			}
+		}
 	},
 	"--wpds-border-width-lg": {
-		"description": "Large width",
-		"group": "border"
+		"$description": "Large width",
+		"$type": "dimension",
+		"group": "border",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 8,
+					"unit": "px"
+				},
+				"css": "8px"
+			}
+		}
 	},
 	"--wpds-border-width-focus": {
-		"description": "Border width for focus ring",
-		"group": "border"
+		"$description": "Border width for focus ring",
+		"$type": "dimension",
+		"group": "border",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 2,
+					"unit": "px"
+				},
+				"css": "2px"
+			}
+		}
 	},
 	"--wpds-color-bg-surface-neutral": {
-		"description": "Background color for surfaces with normal emphasis.",
-		"group": "color"
+		"$description": "Background color for surfaces with normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.973,
+						0.973,
+						0.973
+					],
+					"alpha": 1,
+					"hex": "#f8f8f8"
+				},
+				"css": "#f8f8f8"
+			}
+		}
 	},
 	"--wpds-color-bg-surface-neutral-strong": {
-		"description": "Background color for surfaces with strong emphasis.",
-		"group": "color"
+		"$description": "Background color for surfaces with strong emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						1,
+						1,
+						1
+					],
+					"alpha": 1,
+					"hex": "#fff"
+				},
+				"css": "#ffffff"
+			}
+		}
 	},
 	"--wpds-color-bg-surface-neutral-weak": {
-		"description": "Background color for surfaces with weak emphasis.",
-		"group": "color"
+		"$description": "Background color for surfaces with weak emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.941,
+						0.941,
+						0.941
+					],
+					"alpha": 1,
+					"hex": "#f0f0f0"
+				},
+				"css": "#f0f0f0"
+			}
+		}
 	},
 	"--wpds-color-bg-surface-brand": {
-		"description": "Background color for surfaces with brand tone and normal emphasis.",
+		"$description": "Background color for surfaces with brand tone and normal emphasis.",
+		"$type": "color",
 		"group": "color"
 	},
 	"--wpds-color-bg-surface-success": {
-		"description": "Background color for surfaces with success tone and normal emphasis.",
-		"group": "color"
+		"$description": "Background color for surfaces with success tone and normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.773,
+						0.969,
+						0.8
+					],
+					"alpha": 1,
+					"hex": "#c5f7cc"
+				},
+				"css": "#c5f7cc"
+			}
+		}
 	},
 	"--wpds-color-bg-surface-success-weak": {
-		"description": "Background color for surfaces with success tone and weak emphasis.",
-		"group": "color"
+		"$description": "Background color for surfaces with success tone and weak emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.918,
+						1,
+						0.929
+					],
+					"alpha": 1,
+					"hex": "#eaffed"
+				},
+				"css": "#eaffed"
+			}
+		}
 	},
 	"--wpds-color-bg-surface-info": {
-		"description": "Background color for surfaces with info tone and normal emphasis.",
-		"group": "color"
+		"$description": "Background color for surfaces with info tone and normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.871,
+						0.922,
+						0.98
+					],
+					"alpha": 1,
+					"hex": "#deebfa"
+				},
+				"css": "#deebfa"
+			}
+		}
 	},
 	"--wpds-color-bg-surface-info-weak": {
-		"description": "Background color for surfaces with info tone and weak emphasis.",
-		"group": "color"
+		"$description": "Background color for surfaces with info tone and weak emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.949,
+						0.976,
+						1
+					],
+					"alpha": 1,
+					"hex": "#f2f9ff"
+				},
+				"css": "#f2f9ff"
+			}
+		}
 	},
 	"--wpds-color-bg-surface-warning": {
-		"description": "Background color for surfaces with warning tone and normal emphasis.",
-		"group": "color"
+		"$description": "Background color for surfaces with warning tone and normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.992,
+						0.902,
+						0.741
+					],
+					"alpha": 1,
+					"hex": "#fde6bd"
+				},
+				"css": "#fde6bd"
+			}
+		}
 	},
 	"--wpds-color-bg-surface-warning-weak": {
-		"description": "Background color for surfaces with warning tone and weak emphasis.",
-		"group": "color"
+		"$description": "Background color for surfaces with warning tone and weak emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						1,
+						0.969,
+						0.878
+					],
+					"alpha": 1,
+					"hex": "#fff7e0"
+				},
+				"css": "#fff7e0"
+			}
+		}
 	},
 	"--wpds-color-bg-surface-caution": {
-		"description": "Background color for surfaces with caution tone and normal emphasis.",
-		"group": "color"
+		"$description": "Background color for surfaces with caution tone and normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.996,
+						0.914,
+						0.58
+					],
+					"alpha": 1,
+					"hex": "#fee994"
+				},
+				"css": "#fee994"
+			}
+		}
 	},
 	"--wpds-color-bg-surface-caution-weak": {
-		"description": "Background color for surfaces with caution tone and weak emphasis.",
-		"group": "color"
+		"$description": "Background color for surfaces with caution tone and weak emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						1,
+						0.976,
+						0.788
+					],
+					"alpha": 1,
+					"hex": "#fff9c9"
+				},
+				"css": "#fff9c9"
+			}
+		}
 	},
 	"--wpds-color-bg-surface-error": {
-		"description": "Background color for surfaces with error tone and normal emphasis.",
-		"group": "color"
+		"$description": "Background color for surfaces with error tone and normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.965,
+						0.902,
+						0.89
+					],
+					"alpha": 1,
+					"hex": "#f6e6e3"
+				},
+				"css": "#f6e6e3"
+			}
+		}
 	},
 	"--wpds-color-bg-surface-error-weak": {
-		"description": "Background color for surfaces with error tone and weak emphasis.",
-		"group": "color"
+		"$description": "Background color for surfaces with error tone and weak emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						1,
+						0.965,
+						0.957
+					],
+					"alpha": 1,
+					"hex": "#fff6f4"
+				},
+				"css": "#fff6f4"
+			}
+		}
 	},
 	"--wpds-color-bg-interactive-neutral-strong": {
-		"description": "Background color for interactive elements with neutral tone and strong emphasis.",
-		"group": "color"
+		"$description": "Background color for interactive elements with neutral tone and strong emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.176,
+						0.176,
+						0.176
+					],
+					"alpha": 1,
+					"hex": "#2d2d2d"
+				},
+				"css": "#2d2d2d"
+			}
+		}
 	},
 	"--wpds-color-bg-interactive-neutral-strong-active": {
-		"description": "Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active.",
-		"group": "color"
+		"$description": "Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.118,
+						0.118,
+						0.118
+					],
+					"alpha": 1,
+					"hex": "#1e1e1e"
+				},
+				"css": "#1e1e1e"
+			}
+		}
 	},
 	"--wpds-color-bg-interactive-neutral-strong-disabled": {
-		"description": "Background color for interactive elements with neutral tone and strong emphasis, in their disabled state.",
-		"group": "color"
+		"$description": "Background color for interactive elements with neutral tone and strong emphasis, in their disabled state.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.886,
+						0.886,
+						0.886
+					],
+					"alpha": 1,
+					"hex": "#e2e2e2"
+				},
+				"css": "#e2e2e2"
+			}
+		}
 	},
 	"--wpds-color-bg-interactive-neutral-weak": {
-		"description": "Background color for interactive elements with neutral tone and weak emphasis.",
-		"group": "color"
+		"$description": "Background color for interactive elements with neutral tone and weak emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0,
+						0,
+						0
+					],
+					"alpha": 0
+				},
+				"css": "#00000000"
+			}
+		}
 	},
 	"--wpds-color-bg-interactive-neutral-weak-active": {
-		"description": "Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active.",
-		"group": "color"
+		"$description": "Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.918,
+						0.918,
+						0.918
+					],
+					"alpha": 1,
+					"hex": "#eaeaea"
+				},
+				"css": "#eaeaea"
+			}
+		}
 	},
 	"--wpds-color-bg-interactive-neutral-weak-disabled": {
-		"description": "Background color for interactive elements with weak emphasis, in their disabled state, regardless of the tone.",
-		"group": "color"
+		"$description": "Background color for interactive elements with weak emphasis, in their disabled state, regardless of the tone.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0,
+						0,
+						0
+					],
+					"alpha": 0
+				},
+				"css": "#00000000"
+			}
+		}
 	},
 	"--wpds-color-bg-interactive-brand-strong": {
-		"description": "Background color for interactive elements with brand tone and strong emphasis.",
+		"$description": "Background color for interactive elements with brand tone and strong emphasis.",
+		"$type": "color",
 		"group": "color"
 	},
 	"--wpds-color-bg-interactive-brand-strong-active": {
-		"description": "Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active.",
+		"$description": "Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active.",
+		"$type": "color",
 		"group": "color"
 	},
 	"--wpds-color-bg-interactive-brand-weak": {
-		"description": "Background color for interactive elements with brand tone and weak emphasis.",
+		"$description": "Background color for interactive elements with brand tone and weak emphasis.",
+		"$type": "color",
 		"group": "color"
 	},
 	"--wpds-color-bg-interactive-brand-weak-active": {
-		"description": "Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active.",
+		"$description": "Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active.",
+		"$type": "color",
 		"group": "color"
 	},
 	"--wpds-color-bg-interactive-error": {
-		"description": "Background color for interactive elements with error tone and normal emphasis.",
-		"group": "color"
+		"$description": "Background color for interactive elements with error tone and normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0,
+						0,
+						0
+					],
+					"alpha": 0
+				},
+				"css": "#00000000"
+			}
+		}
 	},
 	"--wpds-color-bg-interactive-error-active": {
-		"description": "Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active.",
-		"group": "color"
+		"$description": "Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						1,
+						0.965,
+						0.957
+					],
+					"alpha": 1,
+					"hex": "#fff6f4"
+				},
+				"css": "#fff6f4"
+			}
+		}
 	},
 	"--wpds-color-bg-interactive-error-strong": {
-		"description": "Background color for interactive elements with error tone and strong emphasis.",
-		"group": "color"
+		"$description": "Background color for interactive elements with error tone and strong emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.8,
+						0.094,
+						0.094
+					],
+					"alpha": 1,
+					"hex": "#cc1818"
+				},
+				"css": "#cc1818"
+			}
+		}
 	},
 	"--wpds-color-bg-interactive-error-strong-active": {
-		"description": "Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active.",
-		"group": "color"
+		"$description": "Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.725,
+						0,
+						0
+					],
+					"alpha": 1,
+					"hex": "#b90000"
+				},
+				"css": "#b90000"
+			}
+		}
 	},
 	"--wpds-color-bg-interactive-error-weak": {
-		"description": "Background color for interactive elements with error tone and weak emphasis.",
-		"group": "color"
+		"$description": "Background color for interactive elements with error tone and weak emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0,
+						0,
+						0
+					],
+					"alpha": 0
+				},
+				"css": "#00000000"
+			}
+		}
 	},
 	"--wpds-color-bg-interactive-error-weak-active": {
-		"description": "Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active.",
-		"group": "color"
+		"$description": "Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.965,
+						0.902,
+						0.89
+					],
+					"alpha": 1,
+					"hex": "#f6e6e3"
+				},
+				"css": "#f6e6e3"
+			}
+		}
 	},
 	"--wpds-color-bg-track-neutral-weak": {
-		"description": "Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track).",
-		"group": "color"
+		"$description": "Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track).",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.878,
+						0.878,
+						0.878
+					],
+					"alpha": 1,
+					"hex": "#e0e0e0"
+				},
+				"css": "#e0e0e0"
+			}
+		}
 	},
 	"--wpds-color-bg-track-neutral": {
-		"description": "Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track).",
-		"group": "color"
+		"$description": "Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track).",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.847,
+						0.847,
+						0.847
+					],
+					"alpha": 1,
+					"hex": "#d8d8d8"
+				},
+				"css": "#d8d8d8"
+			}
+		}
 	},
 	"--wpds-color-bg-thumb-neutral-weak": {
-		"description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb).",
-		"group": "color"
+		"$description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb).",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.541,
+						0.541,
+						0.541
+					],
+					"alpha": 1,
+					"hex": "#8a8a8a"
+				},
+				"css": "#8a8a8a"
+			}
+		}
 	},
 	"--wpds-color-bg-thumb-neutral-weak-active": {
-		"description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active.",
-		"group": "color"
+		"$description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.424,
+						0.424,
+						0.424
+					],
+					"alpha": 1,
+					"hex": "#6c6c6c"
+				},
+				"css": "#6c6c6c"
+			}
+		}
 	},
 	"--wpds-color-bg-thumb-brand": {
-		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track).",
+		"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track).",
+		"$type": "color",
 		"group": "color"
 	},
 	"--wpds-color-bg-thumb-brand-active": {
-		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active.",
+		"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active.",
+		"$type": "color",
 		"group": "color"
 	},
 	"--wpds-color-bg-thumb-neutral-disabled": {
-		"description": "Background color for thumbs with normal emphasis (eg. slider thumb and filled track), in their disabled state, regardless of the tone.",
-		"group": "color"
+		"$description": "Background color for thumbs with normal emphasis (eg. slider thumb and filled track), in their disabled state, regardless of the tone.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.847,
+						0.847,
+						0.847
+					],
+					"alpha": 1,
+					"hex": "#d8d8d8"
+				},
+				"css": "#d8d8d8"
+			}
+		}
 	},
 	"--wpds-color-fg-content-neutral": {
-		"description": "Foreground color for content like text with normal emphasis.",
-		"group": "color"
+		"$description": "Foreground color for content like text with normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.118,
+						0.118,
+						0.118
+					],
+					"alpha": 1,
+					"hex": "#1e1e1e"
+				},
+				"css": "#1e1e1e"
+			}
+		}
 	},
 	"--wpds-color-fg-content-neutral-weak": {
-		"description": "Foreground color for content like text with weak emphasis.",
-		"group": "color"
+		"$description": "Foreground color for content like text with weak emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.427,
+						0.427,
+						0.427
+					],
+					"alpha": 1,
+					"hex": "#6d6d6d"
+				},
+				"css": "#6d6d6d"
+			}
+		}
 	},
 	"--wpds-color-fg-content-success": {
-		"description": "Foreground color for content like text with success tone and normal emphasis.",
-		"group": "color"
+		"$description": "Foreground color for content like text with success tone and normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0,
+						0.161,
+						0
+					],
+					"alpha": 1,
+					"hex": "#002900"
+				},
+				"css": "#002900"
+			}
+		}
 	},
 	"--wpds-color-fg-content-success-weak": {
-		"description": "Foreground color for content like text with success tone and weak emphasis.",
-		"group": "color"
+		"$description": "Foreground color for content like text with success tone and weak emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0,
+						0.498,
+						0.188
+					],
+					"alpha": 1,
+					"hex": "#007f30"
+				},
+				"css": "#007f30"
+			}
+		}
 	},
 	"--wpds-color-fg-content-info": {
-		"description": "Foreground color for content like text with info tone and normal emphasis.",
-		"group": "color"
+		"$description": "Foreground color for content like text with info tone and normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0,
+						0.106,
+						0.31
+					],
+					"alpha": 1,
+					"hex": "#001b4f"
+				},
+				"css": "#001b4f"
+			}
+		}
 	},
 	"--wpds-color-fg-content-info-weak": {
-		"description": "Foreground color for content like text with info tone and weak emphasis.",
-		"group": "color"
+		"$description": "Foreground color for content like text with info tone and weak emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0,
+						0.42,
+						0.843
+					],
+					"alpha": 1,
+					"hex": "#006bd7"
+				},
+				"css": "#006bd7"
+			}
+		}
 	},
 	"--wpds-color-fg-content-warning": {
-		"description": "Foreground color for content like text with warning tone and normal emphasis.",
-		"group": "color"
+		"$description": "Foreground color for content like text with warning tone and normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.18,
+						0.098,
+						0
+					],
+					"alpha": 1,
+					"hex": "#2e1900"
+				},
+				"css": "#2e1900"
+			}
+		}
 	},
 	"--wpds-color-fg-content-warning-weak": {
-		"description": "Foreground color for content like text with warning tone and weak emphasis.",
-		"group": "color"
+		"$description": "Foreground color for content like text with warning tone and weak emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.573,
+						0.388,
+						0
+					],
+					"alpha": 1,
+					"hex": "#926300"
+				},
+				"css": "#926300"
+			}
+		}
 	},
 	"--wpds-color-fg-content-caution": {
-		"description": "Foreground color for content like text with caution tone and normal emphasis.",
-		"group": "color"
+		"$description": "Foreground color for content like text with caution tone and normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.157,
+						0.114,
+						0
+					],
+					"alpha": 1,
+					"hex": "#281d00"
+				},
+				"css": "#281d00"
+			}
+		}
 	},
 	"--wpds-color-fg-content-caution-weak": {
-		"description": "Foreground color for content like text with caution tone and weak emphasis.",
-		"group": "color"
+		"$description": "Foreground color for content like text with caution tone and weak emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.51,
+						0.416,
+						0
+					],
+					"alpha": 1,
+					"hex": "#826a00"
+				},
+				"css": "#826a00"
+			}
+		}
 	},
 	"--wpds-color-fg-content-error": {
-		"description": "Foreground color for content like text with error tone and normal emphasis.",
-		"group": "color"
+		"$description": "Foreground color for content like text with error tone and normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.278,
+						0,
+						0
+					],
+					"alpha": 1,
+					"hex": "#470000"
+				},
+				"css": "#470000"
+			}
+		}
 	},
 	"--wpds-color-fg-content-error-weak": {
-		"description": "Foreground color for content like text with error tone and weak emphasis.",
-		"group": "color"
+		"$description": "Foreground color for content like text with error tone and weak emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.8,
+						0.094,
+						0.094
+					],
+					"alpha": 1,
+					"hex": "#cc1818"
+				},
+				"css": "#cc1818"
+			}
+		}
 	},
 	"--wpds-color-fg-interactive-neutral": {
-		"description": "Foreground color for interactive elements with neutral tone and normal emphasis.",
-		"group": "color"
+		"$description": "Foreground color for interactive elements with neutral tone and normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.118,
+						0.118,
+						0.118
+					],
+					"alpha": 1,
+					"hex": "#1e1e1e"
+				},
+				"css": "#1e1e1e"
+			}
+		}
 	},
 	"--wpds-color-fg-interactive-neutral-active": {
-		"description": "Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active.",
-		"group": "color"
+		"$description": "Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.118,
+						0.118,
+						0.118
+					],
+					"alpha": 1,
+					"hex": "#1e1e1e"
+				},
+				"css": "#1e1e1e"
+			}
+		}
 	},
 	"--wpds-color-fg-interactive-neutral-disabled": {
-		"description": "Foreground color for interactive elements with normal emphasis, in their disabled state, regardless of the tone.",
-		"group": "color"
+		"$description": "Foreground color for interactive elements with normal emphasis, in their disabled state, regardless of the tone.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.541,
+						0.541,
+						0.541
+					],
+					"alpha": 1,
+					"hex": "#8a8a8a"
+				},
+				"css": "#8a8a8a"
+			}
+		}
 	},
 	"--wpds-color-fg-interactive-neutral-strong": {
-		"description": "Foreground color for interactive elements with neutral tone and strong emphasis.",
-		"group": "color"
+		"$description": "Foreground color for interactive elements with neutral tone and strong emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.941,
+						0.941,
+						0.941
+					],
+					"alpha": 1,
+					"hex": "#f0f0f0"
+				},
+				"css": "#f0f0f0"
+			}
+		}
 	},
 	"--wpds-color-fg-interactive-neutral-strong-active": {
-		"description": "Foreground color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active.",
-		"group": "color"
+		"$description": "Foreground color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.941,
+						0.941,
+						0.941
+					],
+					"alpha": 1,
+					"hex": "#f0f0f0"
+				},
+				"css": "#f0f0f0"
+			}
+		}
 	},
 	"--wpds-color-fg-interactive-neutral-strong-disabled": {
-		"description": "Foreground color for interactive elements with strong emphasis, in their disabled state, regardless of the tone.",
-		"group": "color"
+		"$description": "Foreground color for interactive elements with strong emphasis, in their disabled state, regardless of the tone.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.541,
+						0.541,
+						0.541
+					],
+					"alpha": 1,
+					"hex": "#8a8a8a"
+				},
+				"css": "#8a8a8a"
+			}
+		}
 	},
 	"--wpds-color-fg-interactive-neutral-weak": {
-		"description": "Foreground color for interactive elements with neutral tone and weak emphasis.",
-		"group": "color"
+		"$description": "Foreground color for interactive elements with neutral tone and weak emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.427,
+						0.427,
+						0.427
+					],
+					"alpha": 1,
+					"hex": "#6d6d6d"
+				},
+				"css": "#6d6d6d"
+			}
+		}
 	},
 	"--wpds-color-fg-interactive-neutral-weak-disabled": {
-		"description": "Foreground color for interactive elements with weak emphasis, in their disabled state, regardless of the tone.",
-		"group": "color"
+		"$description": "Foreground color for interactive elements with weak emphasis, in their disabled state, regardless of the tone.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.541,
+						0.541,
+						0.541
+					],
+					"alpha": 1,
+					"hex": "#8a8a8a"
+				},
+				"css": "#8a8a8a"
+			}
+		}
 	},
 	"--wpds-color-fg-interactive-brand": {
-		"description": "Foreground color for interactive elements with brand tone and normal emphasis.",
+		"$description": "Foreground color for interactive elements with brand tone and normal emphasis.",
+		"$type": "color",
 		"group": "color"
 	},
 	"--wpds-color-fg-interactive-brand-active": {
-		"description": "Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active.",
+		"$description": "Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active.",
+		"$type": "color",
 		"group": "color"
 	},
 	"--wpds-color-fg-interactive-brand-strong": {
-		"description": "Foreground color for interactive elements with brand tone and strong emphasis.",
+		"$description": "Foreground color for interactive elements with brand tone and strong emphasis.",
+		"$type": "color",
 		"group": "color"
 	},
 	"--wpds-color-fg-interactive-brand-strong-active": {
-		"description": "Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active.",
+		"$description": "Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active.",
+		"$type": "color",
 		"group": "color"
 	},
 	"--wpds-color-fg-interactive-error": {
-		"description": "Foreground color for interactive elements with error tone and normal emphasis.",
-		"group": "color"
+		"$description": "Foreground color for interactive elements with error tone and normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.8,
+						0.094,
+						0.094
+					],
+					"alpha": 1,
+					"hex": "#cc1818"
+				},
+				"css": "#cc1818"
+			}
+		}
 	},
 	"--wpds-color-fg-interactive-error-active": {
-		"description": "Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active.",
-		"group": "color"
+		"$description": "Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.8,
+						0.094,
+						0.094
+					],
+					"alpha": 1,
+					"hex": "#cc1818"
+				},
+				"css": "#cc1818"
+			}
+		}
 	},
 	"--wpds-color-fg-interactive-error-strong": {
-		"description": "Foreground color for interactive elements with error tone and strong emphasis.",
-		"group": "color"
+		"$description": "Foreground color for interactive elements with error tone and strong emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.949,
+						0.937,
+						0.937
+					],
+					"alpha": 1,
+					"hex": "#f2efef"
+				},
+				"css": "#f2efef"
+			}
+		}
 	},
 	"--wpds-color-fg-interactive-error-strong-active": {
-		"description": "Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active.",
-		"group": "color"
+		"$description": "Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.949,
+						0.937,
+						0.937
+					],
+					"alpha": 1,
+					"hex": "#f2efef"
+				},
+				"css": "#f2efef"
+			}
+		}
 	},
 	"--wpds-color-stroke-surface-neutral": {
-		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis.",
-		"group": "color"
+		"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.847,
+						0.847,
+						0.847
+					],
+					"alpha": 1,
+					"hex": "#d8d8d8"
+				},
+				"css": "#d8d8d8"
+			}
+		}
 	},
 	"--wpds-color-stroke-surface-neutral-weak": {
-		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis.",
-		"group": "color"
+		"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.878,
+						0.878,
+						0.878
+					],
+					"alpha": 1,
+					"hex": "#e0e0e0"
+				},
+				"css": "#e0e0e0"
+			}
+		}
 	},
 	"--wpds-color-stroke-surface-neutral-strong": {
-		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis.",
-		"group": "color"
+		"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.541,
+						0.541,
+						0.541
+					],
+					"alpha": 1,
+					"hex": "#8a8a8a"
+				},
+				"css": "#8a8a8a"
+			}
+		}
 	},
 	"--wpds-color-stroke-surface-brand": {
-		"description": "Decorative stroke color used to define brand-toned surface boundaries with normal emphasis.",
+		"$description": "Decorative stroke color used to define brand-toned surface boundaries with normal emphasis.",
+		"$type": "color",
 		"group": "color"
 	},
 	"--wpds-color-stroke-surface-brand-strong": {
-		"description": "Decorative stroke color used to define brand-toned surface boundaries with strong emphasis.",
+		"$description": "Decorative stroke color used to define brand-toned surface boundaries with strong emphasis.",
+		"$type": "color",
 		"group": "color"
 	},
 	"--wpds-color-stroke-surface-success": {
-		"description": "Decorative stroke color used to define success-toned surface boundaries with normal emphasis.",
-		"group": "color"
+		"$description": "Decorative stroke color used to define success-toned surface boundaries with normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.541,
+						0.784,
+						0.58
+					],
+					"alpha": 1,
+					"hex": "#8ac894"
+				},
+				"css": "#8ac894"
+			}
+		}
 	},
 	"--wpds-color-stroke-surface-success-strong": {
-		"description": "Decorative stroke color used to define success-toned surface boundaries with strong emphasis.",
-		"group": "color"
+		"$description": "Decorative stroke color used to define success-toned surface boundaries with strong emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0,
+						0.498,
+						0.188
+					],
+					"alpha": 1,
+					"hex": "#007f30"
+				},
+				"css": "#007f30"
+			}
+		}
 	},
 	"--wpds-color-stroke-surface-info": {
-		"description": "Decorative stroke color used to define info-toned surface boundaries with normal emphasis.",
-		"group": "color"
+		"$description": "Decorative stroke color used to define info-toned surface boundaries with normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.624,
+						0.737,
+						0.863
+					],
+					"alpha": 1,
+					"hex": "#9fbcdc"
+				},
+				"css": "#9fbcdc"
+			}
+		}
 	},
 	"--wpds-color-stroke-surface-info-strong": {
-		"description": "Decorative stroke color used to define info-toned surface boundaries with strong emphasis.",
-		"group": "color"
+		"$description": "Decorative stroke color used to define info-toned surface boundaries with strong emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0,
+						0.42,
+						0.843
+					],
+					"alpha": 1,
+					"hex": "#006bd7"
+				},
+				"css": "#006bd7"
+			}
+		}
 	},
 	"--wpds-color-stroke-surface-warning": {
-		"description": "Decorative stroke color used to define warning-toned surface boundaries with normal emphasis.",
-		"group": "color"
+		"$description": "Decorative stroke color used to define warning-toned surface boundaries with normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.816,
+						0.702,
+						0.506
+					],
+					"alpha": 1,
+					"hex": "#d0b381"
+				},
+				"css": "#d0b381"
+			}
+		}
 	},
 	"--wpds-color-stroke-surface-warning-strong": {
-		"description": "Decorative stroke color used to define warning-toned surface boundaries with strong emphasis.",
-		"group": "color"
+		"$description": "Decorative stroke color used to define warning-toned surface boundaries with strong emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.573,
+						0.388,
+						0
+					],
+					"alpha": 1,
+					"hex": "#926300"
+				},
+				"css": "#926300"
+			}
+		}
 	},
 	"--wpds-color-stroke-surface-error": {
-		"description": "Decorative stroke color used to define error-toned surface boundaries with normal emphasis.",
-		"group": "color"
+		"$description": "Decorative stroke color used to define error-toned surface boundaries with normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.855,
+						0.639,
+						0.608
+					],
+					"alpha": 1,
+					"hex": "#daa39b"
+				},
+				"css": "#daa39b"
+			}
+		}
 	},
 	"--wpds-color-stroke-surface-error-strong": {
-		"description": "Decorative stroke color used to define error-toned surface boundaries with strong emphasis.",
-		"group": "color"
+		"$description": "Decorative stroke color used to define error-toned surface boundaries with strong emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.8,
+						0.094,
+						0.094
+					],
+					"alpha": 1,
+					"hex": "#cc1818"
+				},
+				"css": "#cc1818"
+			}
+		}
 	},
 	"--wpds-color-stroke-interactive-neutral": {
-		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis.",
-		"group": "color"
+		"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.541,
+						0.541,
+						0.541
+					],
+					"alpha": 1,
+					"hex": "#8a8a8a"
+				},
+				"css": "#8a8a8a"
+			}
+		}
 	},
 	"--wpds-color-stroke-interactive-neutral-active": {
-		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active.",
-		"group": "color"
+		"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.424,
+						0.424,
+						0.424
+					],
+					"alpha": 1,
+					"hex": "#6c6c6c"
+				},
+				"css": "#6c6c6c"
+			}
+		}
 	},
 	"--wpds-color-stroke-interactive-neutral-disabled": {
-		"description": "Accessible stroke color used for interactive elements with normal emphasis, in their disabled state, regardless of the tone.",
-		"group": "color"
+		"$description": "Accessible stroke color used for interactive elements with normal emphasis, in their disabled state, regardless of the tone.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.847,
+						0.847,
+						0.847
+					],
+					"alpha": 1,
+					"hex": "#d8d8d8"
+				},
+				"css": "#d8d8d8"
+			}
+		}
 	},
 	"--wpds-color-stroke-interactive-neutral-strong": {
-		"description": "Accessible stroke color used for interactive neutrally-toned elements with strong emphasis.",
-		"group": "color"
+		"$description": "Accessible stroke color used for interactive neutrally-toned elements with strong emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.424,
+						0.424,
+						0.424
+					],
+					"alpha": 1,
+					"hex": "#6c6c6c"
+				},
+				"css": "#6c6c6c"
+			}
+		}
 	},
 	"--wpds-color-stroke-interactive-brand": {
-		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis.",
+		"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis.",
+		"$type": "color",
 		"group": "color"
 	},
 	"--wpds-color-stroke-interactive-brand-active": {
-		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active.",
+		"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active.",
+		"$type": "color",
 		"group": "color"
 	},
 	"--wpds-color-stroke-interactive-error": {
-		"description": "Accessible stroke color used for interactive error-toned elements with normal emphasis.",
-		"group": "color"
+		"$description": "Accessible stroke color used for interactive error-toned elements with normal emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.8,
+						0.094,
+						0.094
+					],
+					"alpha": 1,
+					"hex": "#cc1818"
+				},
+				"css": "#cc1818"
+			}
+		}
 	},
 	"--wpds-color-stroke-interactive-error-active": {
-		"description": "Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active.",
-		"group": "color"
+		"$description": "Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.616,
+						0,
+						0
+					],
+					"alpha": 1,
+					"hex": "#9d0000"
+				},
+				"css": "#9d0000"
+			}
+		}
 	},
 	"--wpds-color-stroke-interactive-error-strong": {
-		"description": "Accessible stroke color used for interactive error-toned elements with strong emphasis.",
-		"group": "color"
+		"$description": "Accessible stroke color used for interactive error-toned elements with strong emphasis.",
+		"$type": "color",
+		"group": "color",
+		"modes": {
+			"default": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [
+						0.8,
+						0.094,
+						0.094
+					],
+					"alpha": 1,
+					"hex": "#cc1818"
+				},
+				"css": "#cc1818"
+			}
+		}
 	},
 	"--wpds-color-stroke-focus-brand": {
-		"description": "Accessible stroke color applied to focus rings.",
+		"$description": "Accessible stroke color applied to focus rings.",
+		"$type": "color",
 		"group": "color"
 	},
 	"--wpds-cursor-control": {
-		"description": "Cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles).",
-		"group": "cursor"
+		"$description": "Cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles).",
+		"$type": "string",
+		"group": "cursor",
+		"modes": {
+			"default": {
+				"$value": "default",
+				"css": "default"
+			}
+		}
 	},
 	"--wpds-dimension-base": {
-		"description": "Base dimension unit",
-		"group": "dimension"
+		"$description": "Base dimension unit",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 4,
+					"unit": "px"
+				},
+				"css": "4px"
+			}
+		}
 	},
 	"--wpds-dimension-padding-xs": {
-		"description": "Extra small padding",
-		"group": "dimension"
+		"$description": "Extra small padding",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 4,
+					"unit": "px"
+				},
+				"css": "4px"
+			}
+		}
 	},
 	"--wpds-dimension-padding-sm": {
-		"description": "Small padding",
-		"group": "dimension"
+		"$description": "Small padding",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 8,
+					"unit": "px"
+				},
+				"css": "8px"
+			}
+		}
 	},
 	"--wpds-dimension-padding-md": {
-		"description": "Medium padding",
-		"group": "dimension"
+		"$description": "Medium padding",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 12,
+					"unit": "px"
+				},
+				"css": "12px"
+			}
+		}
 	},
 	"--wpds-dimension-padding-lg": {
-		"description": "Large padding",
-		"group": "dimension"
+		"$description": "Large padding",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 16,
+					"unit": "px"
+				},
+				"css": "16px"
+			}
+		}
 	},
 	"--wpds-dimension-padding-xl": {
-		"description": "Extra large padding",
-		"group": "dimension"
+		"$description": "Extra large padding",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 20,
+					"unit": "px"
+				},
+				"css": "20px"
+			}
+		}
 	},
 	"--wpds-dimension-padding-2xl": {
-		"description": "2x extra large padding",
-		"group": "dimension"
+		"$description": "2x extra large padding",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 24,
+					"unit": "px"
+				},
+				"css": "24px"
+			}
+		}
 	},
 	"--wpds-dimension-padding-3xl": {
-		"description": "3x extra large padding",
-		"group": "dimension"
+		"$description": "3x extra large padding",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 32,
+					"unit": "px"
+				},
+				"css": "32px"
+			}
+		}
 	},
 	"--wpds-dimension-gap-xs": {
-		"description": "Extra small gap",
-		"group": "dimension"
+		"$description": "Extra small gap",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 4,
+					"unit": "px"
+				},
+				"css": "4px"
+			}
+		}
 	},
 	"--wpds-dimension-gap-sm": {
-		"description": "Small gap",
-		"group": "dimension"
+		"$description": "Small gap",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 8,
+					"unit": "px"
+				},
+				"css": "8px"
+			}
+		}
 	},
 	"--wpds-dimension-gap-md": {
-		"description": "Medium gap",
-		"group": "dimension"
+		"$description": "Medium gap",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 12,
+					"unit": "px"
+				},
+				"css": "12px"
+			}
+		}
 	},
 	"--wpds-dimension-gap-lg": {
-		"description": "Large gap",
-		"group": "dimension"
+		"$description": "Large gap",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 16,
+					"unit": "px"
+				},
+				"css": "16px"
+			}
+		}
 	},
 	"--wpds-dimension-gap-xl": {
-		"description": "Extra large gap",
-		"group": "dimension"
+		"$description": "Extra large gap",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 24,
+					"unit": "px"
+				},
+				"css": "24px"
+			}
+		}
 	},
 	"--wpds-dimension-gap-2xl": {
-		"description": "2x extra large gap",
-		"group": "dimension"
+		"$description": "2x extra large gap",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 32,
+					"unit": "px"
+				},
+				"css": "32px"
+			}
+		}
 	},
 	"--wpds-dimension-gap-3xl": {
-		"description": "3x extra large gap",
-		"group": "dimension"
+		"$description": "3x extra large gap",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 40,
+					"unit": "px"
+				},
+				"css": "40px"
+			}
+		}
 	},
 	"--wpds-dimension-surface-width-xs": {
-		"description": "Extra small surface width",
-		"group": "dimension"
+		"$description": "Extra small surface width",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 240,
+					"unit": "px"
+				},
+				"css": "240px"
+			}
+		}
 	},
 	"--wpds-dimension-surface-width-sm": {
-		"description": "Small surface width",
-		"group": "dimension"
+		"$description": "Small surface width",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 320,
+					"unit": "px"
+				},
+				"css": "320px"
+			}
+		}
 	},
 	"--wpds-dimension-surface-width-md": {
-		"description": "Medium surface width",
-		"group": "dimension"
+		"$description": "Medium surface width",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 400,
+					"unit": "px"
+				},
+				"css": "400px"
+			}
+		}
 	},
 	"--wpds-dimension-surface-width-lg": {
-		"description": "Large surface width",
-		"group": "dimension"
+		"$description": "Large surface width",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 560,
+					"unit": "px"
+				},
+				"css": "560px"
+			}
+		}
 	},
 	"--wpds-dimension-surface-width-xl": {
-		"description": "Extra large surface width",
-		"group": "dimension"
+		"$description": "Extra large surface width",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 720,
+					"unit": "px"
+				},
+				"css": "720px"
+			}
+		}
 	},
 	"--wpds-dimension-surface-width-2xl": {
-		"description": "2x extra large surface width",
-		"group": "dimension"
+		"$description": "2x extra large surface width",
+		"$type": "dimension",
+		"group": "dimension",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 960,
+					"unit": "px"
+				},
+				"css": "960px"
+			}
+		}
 	},
 	"--wpds-elevation-xs": {
-		"description": "For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame.",
-		"group": "elevation"
+		"$description": "For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame.",
+		"$type": "shadow",
+		"group": "elevation",
+		"modes": {
+			"default": {
+				"$value": [
+					{
+						"color": {
+							"colorSpace": "srgb",
+							"components": [
+								0,
+								0,
+								0
+							],
+							"alpha": 0.03
+						},
+						"offsetX": {
+							"value": 0,
+							"unit": "px"
+						},
+						"offsetY": {
+							"value": 1,
+							"unit": "px"
+						},
+						"blur": {
+							"value": 1,
+							"unit": "px"
+						},
+						"spread": {
+							"value": 0,
+							"unit": "px"
+						},
+						"inset": false
+					},
+					{
+						"color": {
+							"colorSpace": "srgb",
+							"components": [
+								0,
+								0,
+								0
+							],
+							"alpha": 0.02
+						},
+						"offsetX": {
+							"value": 0,
+							"unit": "px"
+						},
+						"offsetY": {
+							"value": 1,
+							"unit": "px"
+						},
+						"blur": {
+							"value": 2,
+							"unit": "px"
+						},
+						"spread": {
+							"value": 0,
+							"unit": "px"
+						},
+						"inset": false
+					},
+					{
+						"color": {
+							"colorSpace": "srgb",
+							"components": [
+								0,
+								0,
+								0
+							],
+							"alpha": 0.02
+						},
+						"offsetX": {
+							"value": 0,
+							"unit": "px"
+						},
+						"offsetY": {
+							"value": 3,
+							"unit": "px"
+						},
+						"blur": {
+							"value": 3,
+							"unit": "px"
+						},
+						"spread": {
+							"value": 0,
+							"unit": "px"
+						},
+						"inset": false
+					},
+					{
+						"color": {
+							"colorSpace": "srgb",
+							"components": [
+								0,
+								0,
+								0
+							],
+							"alpha": 0.01
+						},
+						"offsetX": {
+							"value": 0,
+							"unit": "px"
+						},
+						"offsetY": {
+							"value": 4,
+							"unit": "px"
+						},
+						"blur": {
+							"value": 4,
+							"unit": "px"
+						},
+						"spread": {
+							"value": 0,
+							"unit": "px"
+						},
+						"inset": false
+					}
+				],
+				"css": "0 1px 1px 0 #00000008, 0 1px 2px 0 #00000005, 0 3px 3px 0 #00000005, 0 4px 4px 0 #00000003"
+			}
+		}
 	},
 	"--wpds-elevation-sm": {
-		"description": "For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar.",
-		"group": "elevation"
+		"$description": "For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar.",
+		"$type": "shadow",
+		"group": "elevation",
+		"modes": {
+			"default": {
+				"$value": [
+					{
+						"color": {
+							"colorSpace": "srgb",
+							"components": [
+								0,
+								0,
+								0
+							],
+							"alpha": 0.05
+						},
+						"offsetX": {
+							"value": 0,
+							"unit": "px"
+						},
+						"offsetY": {
+							"value": 1,
+							"unit": "px"
+						},
+						"blur": {
+							"value": 2,
+							"unit": "px"
+						},
+						"spread": {
+							"value": 0,
+							"unit": "px"
+						},
+						"inset": false
+					},
+					{
+						"color": {
+							"colorSpace": "srgb",
+							"components": [
+								0,
+								0,
+								0
+							],
+							"alpha": 0.04
+						},
+						"offsetX": {
+							"value": 0,
+							"unit": "px"
+						},
+						"offsetY": {
+							"value": 2,
+							"unit": "px"
+						},
+						"blur": {
+							"value": 3,
+							"unit": "px"
+						},
+						"spread": {
+							"value": 0,
+							"unit": "px"
+						},
+						"inset": false
+					},
+					{
+						"color": {
+							"colorSpace": "srgb",
+							"components": [
+								0,
+								0,
+								0
+							],
+							"alpha": 0.03
+						},
+						"offsetX": {
+							"value": 0,
+							"unit": "px"
+						},
+						"offsetY": {
+							"value": 6,
+							"unit": "px"
+						},
+						"blur": {
+							"value": 6,
+							"unit": "px"
+						},
+						"spread": {
+							"value": 0,
+							"unit": "px"
+						},
+						"inset": false
+					},
+					{
+						"color": {
+							"colorSpace": "srgb",
+							"components": [
+								0,
+								0,
+								0
+							],
+							"alpha": 0.02
+						},
+						"offsetX": {
+							"value": 0,
+							"unit": "px"
+						},
+						"offsetY": {
+							"value": 8,
+							"unit": "px"
+						},
+						"blur": {
+							"value": 8,
+							"unit": "px"
+						},
+						"spread": {
+							"value": 0,
+							"unit": "px"
+						},
+						"inset": false
+					}
+				],
+				"css": "0 1px 2px 0 #0000000d, 0 2px 3px 0 #0000000a, 0 6px 6px 0 #00000008, 0 8px 8px 0 #00000005"
+			}
+		}
 	},
 	"--wpds-elevation-md": {
-		"description": "For components that offer additional actions. Example: Menus, Command Palette",
-		"group": "elevation"
+		"$description": "For components that offer additional actions. Example: Menus, Command Palette",
+		"$type": "shadow",
+		"group": "elevation",
+		"modes": {
+			"default": {
+				"$value": [
+					{
+						"color": {
+							"colorSpace": "srgb",
+							"components": [
+								0,
+								0,
+								0
+							],
+							"alpha": 0.05
+						},
+						"offsetX": {
+							"value": 0,
+							"unit": "px"
+						},
+						"offsetY": {
+							"value": 2,
+							"unit": "px"
+						},
+						"blur": {
+							"value": 3,
+							"unit": "px"
+						},
+						"spread": {
+							"value": 0,
+							"unit": "px"
+						},
+						"inset": false
+					},
+					{
+						"color": {
+							"colorSpace": "srgb",
+							"components": [
+								0,
+								0,
+								0
+							],
+							"alpha": 0.04
+						},
+						"offsetX": {
+							"value": 0,
+							"unit": "px"
+						},
+						"offsetY": {
+							"value": 4,
+							"unit": "px"
+						},
+						"blur": {
+							"value": 5,
+							"unit": "px"
+						},
+						"spread": {
+							"value": 0,
+							"unit": "px"
+						},
+						"inset": false
+					},
+					{
+						"color": {
+							"colorSpace": "srgb",
+							"components": [
+								0,
+								0,
+								0
+							],
+							"alpha": 0.03
+						},
+						"offsetX": {
+							"value": 0,
+							"unit": "px"
+						},
+						"offsetY": {
+							"value": 12,
+							"unit": "px"
+						},
+						"blur": {
+							"value": 12,
+							"unit": "px"
+						},
+						"spread": {
+							"value": 0,
+							"unit": "px"
+						},
+						"inset": false
+					},
+					{
+						"color": {
+							"colorSpace": "srgb",
+							"components": [
+								0,
+								0,
+								0
+							],
+							"alpha": 0.02
+						},
+						"offsetX": {
+							"value": 0,
+							"unit": "px"
+						},
+						"offsetY": {
+							"value": 16,
+							"unit": "px"
+						},
+						"blur": {
+							"value": 16,
+							"unit": "px"
+						},
+						"spread": {
+							"value": 0,
+							"unit": "px"
+						},
+						"inset": false
+					}
+				],
+				"css": "0 2px 3px 0 #0000000d, 0 4px 5px 0 #0000000a, 0 12px 12px 0 #00000008, 0 16px 16px 0 #00000005"
+			}
+		}
 	},
 	"--wpds-elevation-lg": {
-		"description": "For components that confirm decisions or handle necessary interruptions. Example: Modals.",
-		"group": "elevation"
+		"$description": "For components that confirm decisions or handle necessary interruptions. Example: Modals.",
+		"$type": "shadow",
+		"group": "elevation",
+		"modes": {
+			"default": {
+				"$value": [
+					{
+						"color": {
+							"colorSpace": "srgb",
+							"components": [
+								0,
+								0,
+								0
+							],
+							"alpha": 0.08
+						},
+						"offsetX": {
+							"value": 0,
+							"unit": "px"
+						},
+						"offsetY": {
+							"value": 5,
+							"unit": "px"
+						},
+						"blur": {
+							"value": 15,
+							"unit": "px"
+						},
+						"spread": {
+							"value": 0,
+							"unit": "px"
+						},
+						"inset": false
+					},
+					{
+						"color": {
+							"colorSpace": "srgb",
+							"components": [
+								0,
+								0,
+								0
+							],
+							"alpha": 0.07
+						},
+						"offsetX": {
+							"value": 0,
+							"unit": "px"
+						},
+						"offsetY": {
+							"value": 15,
+							"unit": "px"
+						},
+						"blur": {
+							"value": 27,
+							"unit": "px"
+						},
+						"spread": {
+							"value": 0,
+							"unit": "px"
+						},
+						"inset": false
+					},
+					{
+						"color": {
+							"colorSpace": "srgb",
+							"components": [
+								0,
+								0,
+								0
+							],
+							"alpha": 0.04
+						},
+						"offsetX": {
+							"value": 0,
+							"unit": "px"
+						},
+						"offsetY": {
+							"value": 30,
+							"unit": "px"
+						},
+						"blur": {
+							"value": 36,
+							"unit": "px"
+						},
+						"spread": {
+							"value": 0,
+							"unit": "px"
+						},
+						"inset": false
+					},
+					{
+						"color": {
+							"colorSpace": "srgb",
+							"components": [
+								0,
+								0,
+								0
+							],
+							"alpha": 0.02
+						},
+						"offsetX": {
+							"value": 0,
+							"unit": "px"
+						},
+						"offsetY": {
+							"value": 50,
+							"unit": "px"
+						},
+						"blur": {
+							"value": 43,
+							"unit": "px"
+						},
+						"spread": {
+							"value": 0,
+							"unit": "px"
+						},
+						"inset": false
+					}
+				],
+				"css": "0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012, 0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005"
+			}
+		}
 	},
 	"--wpds-font-family-heading": {
-		"description": "Headings font family",
-		"group": "typography"
+		"$description": "Headings font family",
+		"$type": "fontFamily",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": [
+					"-apple-system",
+					"system-ui",
+					"Segoe UI",
+					"Roboto",
+					"Oxygen-Sans",
+					"Ubuntu",
+					"Cantarell",
+					"Helvetica Neue",
+					"sans-serif"
+				],
+				"css": "-apple-system, system-ui, \"Segoe UI\", \"Roboto\", \"Oxygen-Sans\", \"Ubuntu\", \"Cantarell\", \"Helvetica Neue\", sans-serif"
+			}
+		}
 	},
 	"--wpds-font-family-body": {
-		"description": "Body font family",
-		"group": "typography"
+		"$description": "Body font family",
+		"$type": "fontFamily",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": [
+					"-apple-system",
+					"system-ui",
+					"Segoe UI",
+					"Roboto",
+					"Oxygen-Sans",
+					"Ubuntu",
+					"Cantarell",
+					"Helvetica Neue",
+					"sans-serif"
+				],
+				"css": "-apple-system, system-ui, \"Segoe UI\", \"Roboto\", \"Oxygen-Sans\", \"Ubuntu\", \"Cantarell\", \"Helvetica Neue\", sans-serif"
+			}
+		}
 	},
 	"--wpds-font-family-mono": {
-		"description": "Monospace font family",
-		"group": "typography"
+		"$description": "Monospace font family",
+		"$type": "fontFamily",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": [
+					"Menlo",
+					"Consolas",
+					"monaco",
+					"monospace"
+				],
+				"css": "\"Menlo\", \"Consolas\", monaco, monospace"
+			}
+		}
 	},
 	"--wpds-font-size-xs": {
-		"description": "Extra small font size",
-		"group": "typography"
+		"$description": "Extra small font size",
+		"$type": "dimension",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 11,
+					"unit": "px"
+				},
+				"css": "11px"
+			}
+		}
 	},
 	"--wpds-font-size-sm": {
-		"description": "Small font size",
-		"group": "typography"
+		"$description": "Small font size",
+		"$type": "dimension",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 12,
+					"unit": "px"
+				},
+				"css": "12px"
+			}
+		}
 	},
 	"--wpds-font-size-md": {
-		"description": "Medium font size",
-		"group": "typography"
+		"$description": "Medium font size",
+		"$type": "dimension",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 13,
+					"unit": "px"
+				},
+				"css": "13px"
+			}
+		}
 	},
 	"--wpds-font-size-lg": {
-		"description": "Large font size",
-		"group": "typography"
+		"$description": "Large font size",
+		"$type": "dimension",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 15,
+					"unit": "px"
+				},
+				"css": "15px"
+			}
+		}
 	},
 	"--wpds-font-size-xl": {
-		"description": "Extra large font size",
-		"group": "typography"
+		"$description": "Extra large font size",
+		"$type": "dimension",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 20,
+					"unit": "px"
+				},
+				"css": "20px"
+			}
+		}
 	},
 	"--wpds-font-size-2xl": {
-		"description": "2X large font size",
-		"group": "typography"
+		"$description": "2X large font size",
+		"$type": "dimension",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 32,
+					"unit": "px"
+				},
+				"css": "32px"
+			}
+		}
 	},
 	"--wpds-font-line-height-xs": {
-		"description": "Extra small line height",
-		"group": "typography"
+		"$description": "Extra small line height",
+		"$type": "dimension",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 16,
+					"unit": "px"
+				},
+				"css": "16px"
+			}
+		}
 	},
 	"--wpds-font-line-height-sm": {
-		"description": "Small line height",
-		"group": "typography"
+		"$description": "Small line height",
+		"$type": "dimension",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 20,
+					"unit": "px"
+				},
+				"css": "20px"
+			}
+		}
 	},
 	"--wpds-font-line-height-md": {
-		"description": "Medium line height",
-		"group": "typography"
+		"$description": "Medium line height",
+		"$type": "dimension",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 24,
+					"unit": "px"
+				},
+				"css": "24px"
+			}
+		}
 	},
 	"--wpds-font-line-height-lg": {
-		"description": "Large line height",
-		"group": "typography"
+		"$description": "Large line height",
+		"$type": "dimension",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 28,
+					"unit": "px"
+				},
+				"css": "28px"
+			}
+		}
 	},
 	"--wpds-font-line-height-xl": {
-		"description": "Extra large line height",
-		"group": "typography"
+		"$description": "Extra large line height",
+		"$type": "dimension",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 32,
+					"unit": "px"
+				},
+				"css": "32px"
+			}
+		}
 	},
 	"--wpds-font-line-height-2xl": {
-		"description": "2X large line height",
-		"group": "typography"
+		"$description": "2X large line height",
+		"$type": "dimension",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": {
+					"value": 40,
+					"unit": "px"
+				},
+				"css": "40px"
+			}
+		}
 	},
 	"--wpds-font-weight-regular": {
-		"description": "Regular font weight for body text",
-		"group": "typography"
+		"$description": "Regular font weight for body text",
+		"$type": "fontWeight",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": 400,
+				"css": "400"
+			}
+		}
 	},
 	"--wpds-font-weight-medium": {
-		"description": "Medium font weight for emphasis and headings",
-		"group": "typography"
+		"$description": "Medium font weight for emphasis and headings. Uses 499 instead of 500 to work around a Chrome bug where 500 renders as 600 when the exact weight is unavailable. See: https://issues.chromium.org/issues/40552893",
+		"$type": "fontWeight",
+		"group": "typography",
+		"modes": {
+			"default": {
+				"$value": 499,
+				"css": "499"
+			}
+		}
 	}
 };
 
