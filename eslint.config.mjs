@@ -12,13 +12,9 @@ import rawJestDomPlugin from 'eslint-plugin-jest-dom';
 import rawTestingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
-
-/**
- * Internal dependencies
- */
-import reactNativeEditorConfig from './packages/react-native-editor/eslint.config.cjs';
-import wpBuildConfig from './packages/wp-build/eslint.config.cjs';
-import platformDocsConfig from './platform-docs/eslint.config.cjs';
+import reactNativeEditorConfig from './packages/react-native-editor/eslint-overrides.cjs';
+import wpBuildConfig from './packages/wp-build/eslint-overrides.cjs';
+import platformDocsConfig from './platform-docs/eslint-overrides.cjs';
 
 // Wrap plugins that don't yet support ESLint v10's rule context API.
 const jestDomPlugin = {
