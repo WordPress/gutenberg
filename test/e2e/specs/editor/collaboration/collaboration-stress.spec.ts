@@ -396,16 +396,24 @@ test.describe( 'Collaboration - Stress Test', () => {
 		await collaborationUtils.waitForMutualDiscovery();
 
 		// ── Phase 4 — Two users type in the same paragraph ──────
-		// Typing is sequential to avoid character-level interleaving
-		// from concurrent keyboard.type calls (each sends one key at
-		// a time, which the CRDT merges non-deterministically).
-		await editor.canvas.getByText( 'shared editing target' ).click();
-		await page.keyboard.press( 'End' );
-		await page.keyboard.type( ' — Admin was here.' );
-
-		await editor2.canvas.getByText( 'shared editing target' ).click();
-		await page2.keyboard.press( 'End' );
-		await page2.keyboard.type( ' — Editor was here.' );
+		// Uses insertText (single input event) instead of keyboard.type
+		// (character-by-character) to avoid CRDT character interleaving.
+		await Promise.all( [
+			( async () => {
+				await editor.canvas
+					.getByText( 'shared editing target' )
+					.click();
+				await page.keyboard.press( 'End' );
+				await page.keyboard.insertText( ' — Admin was here.' );
+			} )(),
+			( async () => {
+				await editor2.canvas
+					.getByText( 'shared editing target' )
+					.click();
+				await page2.keyboard.press( 'End' );
+				await page2.keyboard.insertText( ' — Editor was here.' );
+			} )(),
+		] );
 
 		// All three active users should see both additions.
 		for ( const ed of [ editor, editor2, editor3 ] ) {
