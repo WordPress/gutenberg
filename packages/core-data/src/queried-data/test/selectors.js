@@ -394,4 +394,32 @@ describe( 'getQueriedItems', () => {
 		} );
 		expect( result ).toBe( null );
 	} );
+
+	it( 'should return empty array when offset equals totalItems', () => {
+		// Edge case: offset lands exactly at the end (e.g. 84 items,
+		// per_page=7, offset=84). The API returns 0 items and that is
+		// a complete response — effectiveTotal is 0.
+		const state = {
+			items: {
+				default: {},
+			},
+			itemIsComplete: {
+				default: {},
+			},
+			queries: {
+				default: {
+					'offset=84': {
+						itemIds: [],
+						meta: { totalItems: 84 },
+					},
+				},
+			},
+		};
+
+		const result = getQueriedItems( state, {
+			per_page: 7,
+			offset: 84,
+		} );
+		expect( result ).toEqual( [] );
+	} );
 } );

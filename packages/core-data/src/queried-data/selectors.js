@@ -65,9 +65,10 @@ function getQueriedItemsUncached( state, query ) {
 			// count remaining after the offset. The number of items
 			// available for this query is (totalItems - offset), so a
 			// partial last page is expected and valid.
-			const effectiveTotal = Number.isFinite( queryOffset )
-				? totalItems - queryOffset
-				: totalItems;
+			const effectiveTotal =
+				queryOffset !== undefined
+					? totalItems - queryOffset
+					: totalItems;
 			if ( itemIds.length < effectiveTotal ) {
 				return null;
 			}

@@ -140,4 +140,13 @@ describe( 'getQueryParts', () => {
 			include: null,
 		} );
 	} );
+
+	it( 'ignores non-numeric offset values', () => {
+		const parts = getQueryParts( {
+			per_page: 10,
+			offset: 'abc',
+		} );
+
+		expect( parts.offset ).toBeUndefined();
+	} );
 } );

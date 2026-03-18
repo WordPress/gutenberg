@@ -74,7 +74,10 @@ export function getQueryParts( query ) {
 				// still including it in the stableKey (different offsets
 				// produce different result sets).
 				if ( key === 'offset' ) {
-					parts.offset = Number( value );
+					const numericOffset = Number( value );
+					if ( Number.isFinite( numericOffset ) ) {
+						parts.offset = numericOffset;
+					}
 				}
 
 				// While in theory, we could exclude "_fields" from the stableKey
