@@ -157,13 +157,6 @@ function NavigationList() {
 		];
 	}, [ editAction, postTypeActions ] );
 
-	const firstNavigationId = useMemo( () => {
-		if ( navigationMenus && navigationMenus.length > 0 ) {
-			return navigationMenus[ 0 ].id.toString();
-		}
-		return null;
-	}, [ navigationMenus ] );
-
 	// Show the editor inline when editId is set in the URL.
 	if ( editId ) {
 		const navigationMenu = ( navigationMenus as Post[] | undefined )?.find(
@@ -205,10 +198,6 @@ function NavigationList() {
 
 	const selection =
 		( searchParams.ids ?? [] ).map( ( id: number ) => id.toString() ) ?? [];
-
-	if ( selection.length === 0 && firstNavigationId ) {
-		selection.push( firstNavigationId );
-	}
 
 	if ( view.type === 'list' ) {
 		selection.splice( 1 );

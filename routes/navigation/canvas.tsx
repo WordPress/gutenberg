@@ -3,7 +3,6 @@
  * WordPress dependencies
  */
 import { useNavigate, useSearch } from '@wordpress/route';
-import { useEntityRecords } from '@wordpress/core-data';
 import { createElement, Fragment, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
@@ -153,18 +152,6 @@ function Canvas() {
 	const canvasMode = ( searchParams as any ).canvas ?? MODE_NAVIGATION;
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 
-	// Get the selected navigation ID — editId takes priority, then ids[0], then first nav.
-	const { records: navigationMenus } = useEntityRecords(
-		'postType',
-		NAVIGATION_POST_TYPE,
-		{
-			per_page: 100,
-			status: [ 'publish', 'draft' ],
-			order: 'desc',
-			orderby: 'date',
-		}
-	);
-
 	const navigationId = useMemo( () => {
 		const editId = ( searchParams as any ).editId as number | undefined;
 		if ( editId ) {
@@ -173,8 +160,8 @@ function Canvas() {
 		if ( searchParams.ids?.[ 0 ] ) {
 			return searchParams.ids[ 0 ] as number;
 		}
-		return ( navigationMenus as any[] )?.[ 0 ]?.id ?? 0;
-	}, [ searchParams, navigationMenus ] );
+		return 0;
+	}, [ searchParams ] );
 
 	const { templateParts, isResolving: isResolvingParts } =
 		useMenuUsedInTemplateParts( navigationId );

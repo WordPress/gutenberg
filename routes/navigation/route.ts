@@ -16,8 +16,14 @@ const PRELOADED_NAVIGATION_MENUS_QUERY = {
 
 export const route = {
 	title: () => __( 'Navigation' ),
-	canvas: async () => {
-		return null;
+	canvas: async ( context: { search: Record< string, any > } ) => {
+		const { search } = context;
+		// If a navigation is selected or being edited, use the custom canvas module.
+		if ( search.ids?.length > 0 || search.editId ) {
+			return null;
+		}
+		// No selection — show the homepage preview.
+		return { isPreview: true };
 	},
 	loader: async () => {
 		await Promise.all( [
