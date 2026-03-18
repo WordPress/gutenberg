@@ -14,22 +14,28 @@
 .navigation-breadcrumbs {
 	flex-wrap: nowrap;
 	min-width: 0;
+	font-size: var(--wpds-font-size-xl);
+	font-weight: var(--wpds-font-weight-medium);
+	font-family: var(--wpds-font-family-heading);
+	line-height: var(--wpds-line-height-xl);
+	color: var(--wpds-color-fg-content-neutral);
 }
 
 .navigation-breadcrumbs__link {
-	color: $gray-600;
+	font: inherit;
+	color: inherit;
 	text-decoration: none;
 	white-space: nowrap;
 	flex-shrink: 0;
 
 	&:hover,
 	&:focus {
-		color: $gray-900;
+		text-decoration: underline;
 	}
 }
 
 .navigation-breadcrumbs__separator {
-	color: $gray-400;
+	color: var(--wpds-color-fg-content-neutral-faded);
 	flex-shrink: 0;
 }
 
