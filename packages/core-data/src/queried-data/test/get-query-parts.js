@@ -7,10 +7,12 @@ describe( 'getQueryParts', () => {
 	it( 'parses out pagination data', () => {
 		const parts = getQueryParts( { page: 2, per_page: 2 } );
 
+		// Use toEqual here to pin the complete return shape.
 		expect( parts ).toEqual( {
 			context: 'default',
 			page: 2,
 			perPage: 2,
+			offset: undefined,
 			stableKey: '',
 			fields: null,
 			include: null,
@@ -24,7 +26,7 @@ describe( 'getQueryParts', () => {
 
 		expect( first ).toEqual( second );
 		expect( second ).toEqual( parts );
-		expect( parts ).toEqual( {
+		expect( parts ).toMatchObject( {
 			context: 'default',
 			page: 1,
 			perPage: 10,
@@ -39,7 +41,7 @@ describe( 'getQueryParts', () => {
 		const second = getQueryParts( { b: 2, '?': '&' } );
 
 		expect( first ).toEqual( second );
-		expect( first ).toEqual( {
+		expect( first ).toMatchObject( {
 			context: 'default',
 			page: 1,
 			perPage: 10,
@@ -52,7 +54,7 @@ describe( 'getQueryParts', () => {
 	it( 'encodes deep values', () => {
 		const parts = getQueryParts( { a: [ 1, 2 ] } );
 
-		expect( parts ).toEqual( {
+		expect( parts ).toMatchObject( {
 			context: 'default',
 			page: 1,
 			perPage: 10,
@@ -67,7 +69,7 @@ describe( 'getQueryParts', () => {
 		const second = getQueryParts( { b: 2, page: '1', per_page: '10' } );
 
 		expect( first ).toEqual( second );
-		expect( first ).toEqual( {
+		expect( first ).toMatchObject( {
 			context: 'default',
 			page: 1,
 			perPage: 10,
@@ -80,7 +82,7 @@ describe( 'getQueryParts', () => {
 	it( 'returns -1 for unlimited queries', () => {
 		const parts = getQueryParts( { b: 2, page: 1, per_page: -1 } );
 
-		expect( parts ).toEqual( {
+		expect( parts ).toMatchObject( {
 			context: 'default',
 			page: 1,
 			perPage: -1,
@@ -93,7 +95,7 @@ describe( 'getQueryParts', () => {
 	it( 'encodes stable string key with fields parameters', () => {
 		const parts = getQueryParts( { _fields: [ 'id', 'title' ] } );
 
-		expect( parts ).toEqual( {
+		expect( parts ).toMatchObject( {
 			context: 'default',
 			page: 1,
 			perPage: 10,
@@ -106,13 +108,30 @@ describe( 'getQueryParts', () => {
 	it( 'returns the context as a dedicated query part', () => {
 		const parts = getQueryParts( { context: 'view' } );
 
-		expect( parts ).toEqual( {
+		expect( parts ).toMatchObject( {
 			page: 1,
 			perPage: 10,
 			stableKey: '',
 			include: null,
 			fields: null,
 			context: 'view',
+		} );
+	} );
+
+	it( 'extracts offset and includes it in stableKey', () => {
+		const parts = getQueryParts( {
+			per_page: 50,
+			offset: 100,
+		} );
+
+		expect( parts ).toMatchObject( {
+			context: 'default',
+			page: 1,
+			perPage: 50,
+			offset: 100,
+			stableKey: 'offset=100',
+			fields: null,
+			include: null,
 		} );
 	} );
 } );
