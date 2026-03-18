@@ -796,6 +796,19 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: Files with __unstable/__experimental prefixed functions that use hooks.
+	// react-hooks v5 rejects hook calls in functions not matching useX or PascalCase naming.
+	// These are known legacy patterns being phased out.
+	{
+		files: [
+			'packages/block-editor/src/components/block-variation-transforms/index.js',
+			'packages/block-editor/src/components/gradients/use-gradient.js',
+		],
+		rules: {
+			'react-hooks/rules-of-hooks': 'off',
+		},
+	},
+
 	// Package-level configs (kept alongside the code they apply to).
 	...reactNativeEditorConfig,
 	...wpBuildConfig,
