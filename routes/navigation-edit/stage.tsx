@@ -19,9 +19,9 @@ import NavigationMenuEditor from './editor';
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
 function NavigationEditStage() {
-	const { id } = useParams( { from: '/navigation/edit/$id' } );
+	const { id } = useParams( { strict: false } );
 	const navigate = useNavigate();
-	const navigationId = parseInt( id );
+	const navigationId = id ? parseInt( id ) : 0;
 	const { navigationMenu } = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );

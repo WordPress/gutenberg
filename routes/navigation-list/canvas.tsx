@@ -7,13 +7,14 @@ import { useEntityRecords } from '@wordpress/core-data';
 import { createElement, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import { Preview, Editor } from '@wordpress/lazy-editor';
+import { Preview, Editor, useEditorAssets } from '@wordpress/lazy-editor';
 import {
 	DropdownMenu,
 	__experimentalHStack as HStack,
 	Icon,
 	MenuGroup,
 	MenuItem,
+	Spinner,
 } from '@wordpress/components';
 import {
 	privateApis as editorPrivateApis,
@@ -86,13 +87,26 @@ const previewField = {
 	enableSorting: false,
 };
 
-function NavigationPreview( {
-	navigationId,
-	onEdit,
-}: {
-	navigationId: number;
-	onEdit: () => void;
-} ) {
+function NavigationPreview( { navigationId }: { navigationId: number } ) {
+	const navigate = useNavigate();
+	const { isReady: assetsReady } = useEditorAssets();
+	const editLink = `/types/wp_navigation/edit/${ navigationId }`;
+
+	if ( ! assetsReady ) {
+		return (
+			<div
+				style={ {
+					display: 'flex',
+					justifyContent: 'center',
+					alignItems: 'center',
+					height: '100%',
+				} }
+			>
+				<Spinner />
+			</div>
+		);
+	}
+
 	return (
 		<div className="navigation-canvas__preview-wrap">
 			<div
@@ -110,18 +124,18 @@ function NavigationPreview( {
 				/>
 			</div>
 			<div
-				onClick={ onEdit }
+				onClick={ () => navigate( { to: editLink } ) }
 				onKeyDown={ ( e ) => {
 					if ( e.key === 'Enter' || e.key === ' ' ) {
 						e.preventDefault();
-						onEdit();
+						navigate( { to: editLink } );
 					}
 				} }
 				style={ {
 					position: 'absolute',
 					inset: 0,
 					cursor: 'pointer',
-					zIndex: 1,
+					zIndex: 9999,
 				} }
 				role="button"
 				tabIndex={ 0 }
@@ -273,17 +287,7 @@ function Canvas() {
 
 			{ canvasMode === MODE_NAVIGATION ? (
 				<div className="navigation-canvas__preview">
-					<NavigationPreview
-						navigationId={ navigationId }
-						onEdit={ () =>
-							navigate( {
-								search: {
-									...searchParams,
-									editId: navigationId,
-								},
-							} )
-						}
-					/>
+					<NavigationPreview navigationId={ navigationId } />
 				</div>
 			) : (
 				<div

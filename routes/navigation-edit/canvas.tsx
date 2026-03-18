@@ -7,7 +7,7 @@ import { useEntityRecord } from '@wordpress/core-data';
 import { createElement, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import { Preview, Editor } from '@wordpress/lazy-editor';
+import { Preview, Editor, useEditorAssets } from '@wordpress/lazy-editor';
 import {
 	DropdownMenu,
 	__experimentalHStack as HStack,
@@ -67,7 +67,7 @@ const MODE_ALL = 'all';
 const STATIC_AREAS = [
 	{ value: 'header', label: __( 'Header' ) },
 	{ value: 'footer', label: __( 'Footer' ) },
-	{ value: 'sidebar', label: __( 'Sidebar' ) },
+	{ value: 'sidebar', label: __( 'Panel' ) },
 	{ value: 'navigation-overlay', label: __( 'Navigation Overlay' ) },
 	{ value: 'uncategorized', label: __( 'General' ) },
 ] as const;
@@ -89,7 +89,23 @@ const previewField = {
 
 function NavigationPreview( { navigationId }: { navigationId: number } ) {
 	const navigate = useNavigate();
+	const { isReady: assetsReady } = useEditorAssets();
 	const editLink = `/types/wp_navigation/edit/${ navigationId }`;
+
+	if ( ! assetsReady ) {
+		return (
+			<div
+				style={ {
+					display: 'flex',
+					justifyContent: 'center',
+					alignItems: 'center',
+					height: '100%',
+				} }
+			>
+				<Spinner />
+			</div>
+		);
+	}
 
 	return (
 		<div className="navigation-canvas__preview-wrap">
@@ -119,7 +135,7 @@ function NavigationPreview( { navigationId }: { navigationId: number } ) {
 					position: 'absolute',
 					inset: 0,
 					cursor: 'pointer',
-					zIndex: 1,
+					zIndex: 9999,
 				} }
 				role="button"
 				tabIndex={ 0 }
@@ -130,15 +146,18 @@ function NavigationPreview( { navigationId }: { navigationId: number } ) {
 }
 
 function Canvas() {
-	const { id } = useParams( { from: '/navigation/edit/$id' } );
+	const { id } = useParams( { strict: false } );
 	const navigate = useNavigate();
-	const navigationId = parseInt( id );
+	const navigationId = id ? parseInt( id ) : 0;
 
 	const [ canvasMode, setCanvasMode ] = useState( MODE_NAVIGATION );
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 
-	const { record: navigationMenu, isResolving: isResolvingMenu } =
-		useEntityRecord( 'postType', NAVIGATION_POST_TYPE, navigationId );
+	const { isResolving: isResolvingMenu } = useEntityRecord(
+		'postType',
+		NAVIGATION_POST_TYPE,
+		navigationId
+	);
 
 	const { templateParts, isResolving: isResolvingParts } =
 		useMenuUsedInTemplateParts( navigationId );
@@ -154,13 +173,16 @@ function Canvas() {
 		return areas;
 	}, [ templateParts ] );
 
-	const currentLabel =
-		canvasMode === MODE_NAVIGATION
-			? __( 'Navigation Preview' )
-			: canvasMode === MODE_ALL
-			? __( 'All Template Parts' )
-			: STATIC_AREAS.find( ( a ) => a.value === canvasMode )?.label ??
-			  canvasMode;
+	let currentLabel: string;
+	if ( canvasMode === MODE_NAVIGATION ) {
+		currentLabel = __( 'Navigation Preview' );
+	} else if ( canvasMode === MODE_ALL ) {
+		currentLabel = __( 'All Template Parts' );
+	} else {
+		currentLabel =
+			STATIC_AREAS.find( ( a ) => a.value === canvasMode )?.label ??
+			canvasMode;
+	}
 
 	// Filter template parts for the DataViews based on the selected mode.
 	const visibleTemplateParts = useMemo( () => {
@@ -197,7 +219,11 @@ function Canvas() {
 
 	return (
 		<div className="navigation-canvas">
-			<HStack justify="center" alignment="center" className="navigation-canvas__toolbar">
+			<HStack
+				justify="center"
+				alignment="center"
+				className="navigation-canvas__toolbar"
+			>
 				<DropdownMenu
 					label={ currentLabel }
 					text={ currentLabel }
