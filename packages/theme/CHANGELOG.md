@@ -4,7 +4,8 @@
 
 ### Breaking Changes
 
--   The `design-tokens.js` export now provides `tokens` (keyed by variable name, with description and group metadata) and `groups` (keyed by source file) named exports, replacing the previous flat array default export ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
+-   The `design-tokens.js` export now provides `tokens` (keyed by variable name, with `$description`, `$type`, `group`, and `modes.default` containing `$value` and `css`) and `groups` (keyed by source file) named exports, replacing the previous flat array default export ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
+-   The `medium` font weight token value changed from `500` to `499` in the source definition. The CSS output is unchanged since the same workaround was previously applied at the CSS transform layer ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
 
 ### New Features
 
