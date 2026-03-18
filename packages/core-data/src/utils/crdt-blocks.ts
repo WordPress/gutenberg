@@ -25,6 +25,7 @@ interface BlockAttributes {
 interface BlockAttributeType {
 	role?: string;
 	type?: string;
+	query?: Record< string, BlockAttributeType >;
 }
 
 interface BlockType {
@@ -123,6 +124,49 @@ function makeBlocksSerializable( blocks: Block[] ): Block[] {
 }
 
 /**
+ * Recursively walk an attribute value and convert any strings that correspond
+ * to rich-text schema nodes into RichTextData instances. This is the inverse
+ * of serializeAttributeValue and handles nested structures like table cells.
+ *
+ * @param schema The attribute type definition for this value.
+ * @param value  The attribute value from CRDT (toJSON).
+ * @return The value with rich-text strings replaced by RichTextData.
+ */
+function deserializeAttributeValue(
+	schema: BlockAttributeType | undefined,
+	value: unknown
+): unknown {
+	if ( schema?.type === 'rich-text' && typeof value === 'string' ) {
+		return RichTextData.fromHTMLString( value );
+	}
+
+	// e.g. core/table `body`: [ { cells: [ { content: RichTextData } ] } ]
+	if ( Array.isArray( value ) ) {
+		return value.map( ( item ) =>
+			deserializeAttributeValue( schema, item )
+		);
+	}
+
+	// e.g. a single row inside core/table `body`: { cells: [ ... ] }
+	if ( value && typeof value === 'object' ) {
+		const result: Record< string, unknown > = {};
+
+		for ( const [ key, innerValue ] of Object.entries(
+			value as Record< string, unknown >
+		) ) {
+			result[ key ] = deserializeAttributeValue(
+				schema?.query?.[ key ],
+				innerValue
+			);
+		}
+
+		return result;
+	}
+
+	return value;
+}
+
+/**
  * Convert rich-text string attributes in a block back to RichTextData
  * instances. This is the inverse of makeBlockAttributesSerializable and is
  * needed when blocks are extracted from the CRDT document, where rich-text
@@ -142,11 +186,10 @@ function deserializeBlockAttributeValues(
 	const newAttributes = { ...attributes };
 
 	for ( const [ key, value ] of Object.entries( attributes ) ) {
-		if (
-			isRichTextAttribute( blockName, key ) &&
-			typeof value === 'string'
-		) {
-			newAttributes[ key ] = RichTextData.fromHTMLString( value );
+		const schema = getBlockAttributeType( blockName, key );
+
+		if ( schema ) {
+			newAttributes[ key ] = deserializeAttributeValue( schema, value );
 		}
 	}
 
@@ -532,8 +575,8 @@ function getBlockAttributeType(
 				new Map< string, BlockAttributeType >(
 					Object.entries( blockType.attributes ?? {} ).map(
 						( [ name, definition ] ) => {
-							const { role, type } = definition;
-							return [ name, { role, type } ];
+							const { role, type, query } = definition;
+							return [ name, { role, type, query } ];
 						}
 					)
 				)
