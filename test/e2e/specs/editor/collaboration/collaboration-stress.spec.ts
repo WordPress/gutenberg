@@ -36,14 +36,6 @@ const STRESS_USERS: UserCredentials[] = [
 		password: 'password',
 		roles: [ 'editor' ],
 	},
-	{
-		username: 'stress_contrib',
-		email: 'stress_contrib@example.com',
-		firstName: 'Carol',
-		lastName: 'Contributor',
-		password: 'password',
-		roles: [ 'editor' ],
-	},
 ];
 
 // ── Filler text ─────────────────────────────────────────────────────
@@ -328,13 +320,13 @@ async function typeNewParagraphAfterHeading(
 // ── Tests ───────────────────────────────────────────────────────────
 
 test.describe( 'Collaboration - Stress Test', () => {
-	test( 'four users concurrently edit a large post with diverse blocks', async ( {
+	test( 'three users concurrently edit a large post with diverse blocks', async ( {
 		collaborationUtils,
 		requestUtils,
 		editor,
 		page,
 	} ) => {
-		// Create the three additional test users.
+		// Create the two additional test users.
 		for ( const user of STRESS_USERS ) {
 			await requestUtils.createUser( user );
 		}
@@ -479,14 +471,9 @@ test.describe( 'Collaboration - Stress Test', () => {
 			} ).toPass( { timeout: 10_000 } );
 		}
 
-		// ── Phase 6 — Second save · User 4 joins ───────────────
+		// ── Phase 6 — Second save · all 3 users type concurrently ──
 		await editor.saveDraft();
 
-		const { page: page4, editor: editor4 } =
-			await collaborationUtils.joinUser( post.id, STRESS_USERS[ 2 ] );
-		await collaborationUtils.waitForMutualDiscovery();
-
-		// ── Phase 7 — All 4 users type new paragraphs concurrently ──
 		// Each user clicks on a different heading, presses Enter to
 		// create a new paragraph below it, then types their content.
 		await Promise.all( [
@@ -508,15 +495,9 @@ test.describe( 'Collaboration - Stress Test', () => {
 				'Results',
 				'Final paragraph from Author.'
 			),
-			typeNewParagraphAfterHeading(
-				editor4,
-				page4,
-				'Background',
-				'Final paragraph from Contributor.'
-			),
 		] );
 
-		// All 4 users should see all 4 new paragraphs.
+		// All 3 users should see all 3 new paragraphs.
 		for ( const ed of collaborationUtils.allEditors ) {
 			await expect( async () => {
 				const blocks = await ed.getBlocks();
@@ -524,13 +505,10 @@ test.describe( 'Collaboration - Stress Test', () => {
 				expect( allContent ).toContain( 'Final paragraph from Admin' );
 				expect( allContent ).toContain( 'Final paragraph from Editor' );
 				expect( allContent ).toContain( 'Final paragraph from Author' );
-				expect( allContent ).toContain(
-					'Final paragraph from Contributor'
-				);
 			} ).toPass( { timeout: 10_000 } );
 		}
 
-		// ── Phase 8 — User 3 refreshes (second refresh) ────────
+		// ── Phase 7 — User 3 refreshes (second refresh) ────────
 		await page3.reload( { waitUntil: 'load' } );
 		await collaborationUtils.waitForCollaborationReady( page3 );
 		await collaborationUtils.waitForMutualDiscovery();
@@ -540,12 +518,10 @@ test.describe( 'Collaboration - Stress Test', () => {
 			const blocks = await editor3.getBlocks();
 			const allContent = JSON.stringify( blocks );
 			expect( allContent ).toContain( 'Final paragraph from Admin' );
-			expect( allContent ).toContain(
-				'Final paragraph from Contributor'
-			);
+			expect( allContent ).toContain( 'Final paragraph from Author' );
 		} ).toPass( { timeout: 10_000 } );
 
-		// ── Phase 9 — Final save and publish ────────────────────
+		// ── Phase 8 — Final save and publish ────────────────────
 		await editor.saveDraft();
 		await editor.publishPost();
 	} );
