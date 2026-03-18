@@ -1,0 +1,62 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.block-guidelines {
+	margin-top: $grid-unit-30;
+
+	.block-guidelines__icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+		width: 100%;
+	}
+
+	.dataviews-view-list__field-wrapper {
+		display: flex;
+		justify-content: center;
+	}
+
+	.dataviews-wrapper {
+		margin-right: -$grid-unit-30;
+		margin-left: -$grid-unit-30;
+	}
+
+	.dataviews-search {
+		margin-right: $grid-unit-30;
+		margin-left: $grid-unit-30;
+	}
+}
+
+.block-guidelines__label {
+	display: flex;
+	align-items: center;
+	gap: $grid-unit-10;
+	width: 100%;
+
+	.components-badge,
+	.content-guidelines__badge {
+		margin-left: auto;
+	}
+}
+
+.block-guidelines__suggestion-badge {
+	font-size: 11px;
+	font-weight: 500;
+	color: var(--wp-admin-theme-color, #3858e9);
+	background: rgba(var(--wp-admin-theme-color--rgb, 56, 88, 233), 0.08);
+	padding: 1px $grid-unit-10;
+	border-radius: $radius-block-ui;
+	white-space: nowrap;
+
+	&--success {
+		color: $alert-green;
+		background: rgba(0, 135, 0, 0.08);
+	}
+}
+
+.block-guidelines__remove-modal {
+	.components-modal__header-heading {
+		font-weight: 500;
+	}
+}

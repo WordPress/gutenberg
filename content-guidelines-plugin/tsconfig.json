@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"target": "es2017",
+		"module": "esnext",
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"strict": false,
+		"skipLibCheck": true,
+		"outDir": "build",
+		"baseUrl": ".",
+		"paths": {
+			"@wordpress/*": ["node_modules/@wordpress/*"]
+		}
+	},
+	"include": ["src/**/*"]
+}

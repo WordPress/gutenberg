@@ -1,0 +1,12 @@
+{
+	"name": "content-guidelines",
+	"version": "1.0.0",
+	"description": "Content Guidelines for WordPress — define content standards that guide your team, inform plugins, and help AI tools.",
+	"scripts": {
+		"build": "wp-scripts build",
+		"start": "wp-scripts start"
+	},
+	"devDependencies": {
+		"@wordpress/scripts": "^30.0.0"
+	}
+}

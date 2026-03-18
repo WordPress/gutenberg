@@ -1,5 +1,3 @@
-/* @jsx createElement */
-
 /**
  * Exploration C — "Proactive Recommendations"
  *
@@ -12,7 +10,7 @@
 /**
  * WordPress dependencies
  */
-import { Page } from '@wordpress/admin-ui';
+import { Page } from '../shims/page';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	createElement,
@@ -31,13 +29,12 @@ import {
 	Navigator,
 	Spinner,
 	TextareaControl,
-	privateApis as componentsPrivateApis,
 	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { Notice } from '@wordpress/ui';
+import { Notice } from '../shims/notice';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { chevronDown, moreVertical } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -53,9 +50,6 @@ import ActionsSection from './actions-section';
 import BlockGuidelines from './block-guidelines';
 import RevisionHistory from './revision-history';
 import DiffEditor from './diff-editor';
-import { unlock } from '../../lock-unlock';
-
-const { Badge } = unlock( componentsPrivateApis );
 
 const GUIDELINE_ITEMS = [
 	{
@@ -193,9 +187,9 @@ function GuidelineAccordion( {
 										: 0,
 							} }
 						>
-							<Badge intent="success">
+							<span className="content-guidelines__badge">
 								{ __( 'Suggestion' ) }
-							</Badge>
+							</span>
 						</span>
 						{ isOpen && isGenerating && (
 							<Spinner />
@@ -704,9 +698,9 @@ function AccordionWithAi( {
 										showDiff && ! isOpen ? 1 : 0,
 								} }
 							>
-								<Badge intent="success">
+								<span className="content-guidelines__badge">
 									{ __( 'Suggestion' ) }
-								</Badge>
+								</span>
 							</span>
 							<Icon
 								icon={ chevronDown }
@@ -916,7 +910,6 @@ export default function ExplorationC() {
 	}, [] );
 
 	// Auto-scan: trigger generation once data is loaded.
-	// Always runs — even on empty guidelines (that's the proactive point).
 	useEffect( () => {
 		if ( pageLoading || pageError || scanTriggered ) {
 			return;
@@ -1002,6 +995,8 @@ export default function ExplorationC() {
 		}
 	}, [ blockSuggestions, dismissBlockSuggestion, dismissSuggestion ] );
 
+	// Banner removed from Exploration C — auto-scan always runs.
+
 	return (
 		<Page
 			title={ __( 'Guidelines' ) }
@@ -1037,7 +1032,7 @@ export default function ExplorationC() {
 					<Navigator initialPath="/">
 						<Navigator.Screen path="/">
 							<VStack className="content-guidelines__content content-guidelines__content--two-col">
-								<div className="content-guidelines__two-col">
+									<div className="content-guidelines__two-col">
 									{ /* Main content column */ }
 									<div className="content-guidelines__main-col" ref={ mainColRef }>
 										{ /*
