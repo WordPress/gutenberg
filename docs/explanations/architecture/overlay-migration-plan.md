@@ -146,7 +146,7 @@ Lower layers must not depend on higher ones. The z-index compatibility layer liv
 - **Pro**: Each package can update `@wordpress/ui` independently
 - **Con**: Multiple copies of `@base-ui/react` on the page
 - **Con**: React contexts are not shared across bundles. Empirical testing (38 automated E2E tests) shows dismiss coordination is **not affected** — all tests pass identically in same-bundle and cross-bundle modes. The only confirmed impact:
-  - **PortalContext** (used by all overlays): portal container nesting is isolated across bundles — in 3+ level nesting where bundles interleave (e.g., A→B→A: Dialog(A) → Popover(B) → Select(A)), the innermost overlay renders behind a middle-level overlay. **This only triggers when bundles alternate** in the nesting chain (A→B→A); if the inner two overlays share a bundle (A→B→B), stacking is correct. Mitigated by Phase 2 z-index overrides, fully resolved in Phase 4.
+  - **PortalContext** (used by all overlays): portal container nesting is isolated across bundles — in 3+ level nesting where bundles interleave (e.g., A→B→A: Dialog(A) → Popover(B) → Select(A)), the innermost overlay renders behind a middle-level overlay. **This only triggers when bundles alternate** in the nesting chain (A→B→A); if the inner two overlays share a bundle (A→B→B), stacking is correct. Mitigated by Phase 2 z-index overrides; potentially resolved earlier via a shared portal context at the `@wordpress/ui` level (see "Shared Portal Context" below); fully resolved in Phase 4.
 
 What does NOT break across bundles:
   - **FloatingTree** (Popover, Menu): Escape key coordination works correctly via shared React synthetic events
@@ -181,7 +181,7 @@ Based on empirical testing (38 automated E2E tests across 8 scenario groups):
 
 | Regression | Impact | Mitigation |
 |---|---|---|
-| **Visual stacking in 3+ level nesting with interleaved bundles (A→B→A)** | Select renders behind Popover when the nesting chain alternates bundles (e.g., Dialog(A) → Popover(B) → Select(A)). Caused by `PortalContext` isolation — the Select reads `PortalContext_A`, finds the Dialog's portal, and nests there instead of the Popover's. **Does not occur** when inner overlays share a bundle (A→B→B). | **Phase 2**: z-index overrides (`--wp-ui-select-z-index` > `--wp-ui-popover-z-index`). **Phase 4**: unify all overlays → shared `PortalContext`. **Long-term**: promote `@wordpress/ui` to `wpScript: true`. |
+| **Visual stacking in 3+ level nesting with interleaved bundles (A→B→A)** | Select renders behind Popover when the nesting chain alternates bundles (e.g., Dialog(A) → Popover(B) → Select(A)). Caused by `PortalContext` isolation — the Select reads `PortalContext_A`, finds the Dialog's portal, and nests there instead of the Popover's. **Does not occur** when inner overlays share a bundle (A→B→B). | **Phase 2**: z-index overrides (`--wp-ui-select-z-index` > `--wp-ui-popover-z-index`). **Phase 1+ (tentative)**: shared portal context at `@wordpress/ui` level via `globalThis` pattern — see below. **Phase 4**: all overlays share a single Base UI bundle → `PortalContext` is shared natively. |
 
 ### From `@wordpress/ui` + `@wordpress/components` coexisting
 
@@ -205,10 +205,43 @@ These were predicted regressions that **do not actually occur**:
 
 3. ~~**Escape key coordination — Dialog-in-Dialog cross-bundle nesting**~~: Despite theoretical analysis predicting this would break (isolated `DialogRootContext` counter), empirical E2E testing shows Escape correctly closes only the inner dialog. **Not a regression.**
 
-4. **`@wordpress/ui` as shared handle**: If the multiple-bundle cost becomes unacceptable (bundle size, visual stacking edge cases), `@wordpress/ui` could be promoted to `wpScript: true`. This would eliminate all context isolation concerns. This is a Core-level decision that can be deferred.
+4. **Shared portal context (tentative)**: A `globalThis`-based shared portal context at the `@wordpress/ui` level could resolve the visual stacking issue without requiring a single Base UI bundle. This needs validation with the Base UI team — see "Shared Portal Context" below.
 
 5. **Animation parity**: `@wordpress/components` Popover uses `framer-motion` for animations. WPDS uses CSS animations / `@starting-style`. Ensuring visual parity during migration may require careful CSS work.
 
 6. **iframe focus coordination**: When a WPDS popover portals from inside an iframe to the parent document, focus management across the iframe boundary needs testing.
 
 7. **Performance**: Multiple copies of `@base-ui/react` in different bundles increases total JavaScript size. The impact should be measured once migrations begin.
+
+---
+
+## Shared Portal Context (tentative — needs validation with Base UI team)
+
+The only confirmed visual regression from multiple `@base-ui/react` bundles is incorrect portal container nesting in 3+ level overlays with interleaved bundles (A→B→A). This is caused by `PortalContext` isolation — each bundle's copy of `FloatingPortal` creates its own `PortalContext`, so overlays from different bundles cannot find each other's portal containers.
+
+Base UI's internal `PortalContext` is private and unexported. However, every `*.Portal` component (Dialog.Portal, Select.Portal, Popover.Portal, etc.) accepts a public **`container` prop** that overrides the default portal target. This provides a clean integration point.
+
+### Proposed approach
+
+`@wordpress/ui` creates its own shared React context at the application level, stored on `globalThis` so all independently bundled copies reference the same instance:
+
+```javascript
+// In @wordpress/ui's portal infrastructure
+const WPUIPortalContext = (globalThis.__wpuiPortalContext ??= React.createContext(null));
+```
+
+Each `@wordpress/ui` overlay's Portal wrapper:
+1. Reads `WPUIPortalContext` to find the nearest parent overlay's portal container (a DOM element)
+2. Renders its own portal container, passing it as `container` to Base UI's `FloatingPortal`
+3. Provides that container via `WPUIPortalContext.Provider` for any child overlays
+
+### Key properties
+
+- **Uses the public `container` prop API** — stable, supported by Base UI
+- **Version-resilient**: the shared context communicates DOM element references, not Base UI internals. Different `@wordpress/ui` versions (with potentially different Base UI versions) can coexist safely
+- **Could ship as early as Phase 1**, as part of the initial `@wordpress/ui` overlay suite implementation
+- **Needs validation with the Base UI team** before committing — the approach should be reviewed against Base UI's roadmap and any planned changes to portal behavior
+
+### Risk assessment
+
+The main risk is forward compatibility: if a future Base UI version changes how `FloatingPortal` handles the `container` prop, the shared context may need updating. However, since the context only passes DOM element references (not Base UI internals), this risk is low. The `container` prop is a public API with clear semantics.
