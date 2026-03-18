@@ -168,7 +168,6 @@ ruleTester.run( 'i18n-text-domain', rule, {
 		},
 		{
 			code: `__( 'Hello World' )`,
-			output: `__( 'Hello World' )`,
 			options: [ { allowedTextDomain: [ 'foo', 'bar' ] } ],
 			errors: [ { messageId: 'missing' } ],
 		},

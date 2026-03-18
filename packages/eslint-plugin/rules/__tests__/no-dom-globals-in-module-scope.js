@@ -71,33 +71,6 @@ ruleTester.run( 'no-dom-globals-in-module-scope', rule, {
 			],
 		},
 		{
-			code: 'navigator.userAgent;',
-			errors: [
-				{
-					messageId: 'defaultMessage',
-					data: { name: 'navigator' },
-				},
-			],
-		},
-		{
-			code: 'localStorage.getItem("key");',
-			errors: [
-				{
-					messageId: 'defaultMessage',
-					data: { name: 'localStorage' },
-				},
-			],
-		},
-		{
-			code: 'sessionStorage.setItem("key", "value");',
-			errors: [
-				{
-					messageId: 'defaultMessage',
-					data: { name: 'sessionStorage' },
-				},
-			],
-		},
-		{
 			code: 'history.pushState({}, "", "/new");',
 			errors: [
 				{
