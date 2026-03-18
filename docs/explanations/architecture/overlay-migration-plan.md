@@ -146,7 +146,7 @@ Lower layers must not depend on higher ones. The z-index compatibility layer liv
 - **Pro**: Each package can update `@wordpress/ui` independently
 - **Con**: Multiple copies of `@base-ui/react` on the page
 - **Con**: React contexts are not shared across bundles. Empirical testing (38 automated E2E tests) shows dismiss coordination is **not affected** — all tests pass identically in same-bundle and cross-bundle modes. The only confirmed impact:
-  - **PortalContext** (used by all overlays): portal container nesting is isolated across bundles — in 3+ level cross-bundle nesting (e.g., Dialog(A) → Popover(B) → Select(A)), the innermost overlay can render behind a middle-level overlay due to incorrect portal nesting — **visual stacking regression** (mitigated by Phase 2 z-index overrides, fully resolved in Phase 4)
+  - **PortalContext** (used by all overlays): portal container nesting is isolated across bundles — in 3+ level nesting where bundles interleave (e.g., A→B→A: Dialog(A) → Popover(B) → Select(A)), the innermost overlay renders behind a middle-level overlay. **This only triggers when bundles alternate** in the nesting chain (A→B→A); if the inner two overlays share a bundle (A→B→B), stacking is correct. Mitigated by Phase 2 z-index overrides, fully resolved in Phase 4.
 
 What does NOT break across bundles:
   - **FloatingTree** (Popover, Menu): Escape key coordination works correctly via shared React synthetic events
@@ -181,7 +181,7 @@ Based on empirical testing (38 automated E2E tests across 8 scenario groups):
 
 | Regression | Impact | Mitigation |
 |---|---|---|
-| **Visual stacking in 3+ level cross-bundle nesting** | Select renders behind Popover when nesting crosses bundle boundaries (e.g., Dialog(A) → Popover(B) → Select(A)). Caused by `PortalContext` isolation — the Select's portal nests inside the Dialog's portal instead of the Popover's. | **Phase 2**: z-index overrides (`--wp-ui-select-z-index` > `--wp-ui-popover-z-index`). **Phase 4**: unify all overlays → shared `PortalContext`. **Long-term**: promote `@wordpress/ui` to `wpScript: true`. |
+| **Visual stacking in 3+ level nesting with interleaved bundles (A→B→A)** | Select renders behind Popover when the nesting chain alternates bundles (e.g., Dialog(A) → Popover(B) → Select(A)). Caused by `PortalContext` isolation — the Select reads `PortalContext_A`, finds the Dialog's portal, and nests there instead of the Popover's. **Does not occur** when inner overlays share a bundle (A→B→B). | **Phase 2**: z-index overrides (`--wp-ui-select-z-index` > `--wp-ui-popover-z-index`). **Phase 4**: unify all overlays → shared `PortalContext`. **Long-term**: promote `@wordpress/ui` to `wpScript: true`. |
 
 ### From `@wordpress/ui` + `@wordpress/components` coexisting
 

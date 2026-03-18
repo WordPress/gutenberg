@@ -18,7 +18,7 @@ Two scenarios were tested empirically via automated E2E tests (38 tests total, a
 
 | What breaks | Severity | User-facing impact | Mitigation |
 |---|---|---|---|
-| **Visual stacking in 3+ level cross-bundle nesting** | Medium | In patterns like Dialog(bundle A) → Popover(bundle B) → Select(bundle A), the Select renders *behind* the Popover instead of on top. | **Phase 2**: set `--wp-ui-select-z-index` higher than `--wp-ui-popover-z-index`. **Phase 4**: unify all overlays in one bundle → `PortalContext` is shared → correct nesting. **Long-term**: promote `@wordpress/ui` to `wpScript: true`. |
+| **Visual stacking in 3+ level cross-bundle nesting with interleaved bundles** | Medium | In patterns like Dialog(A) → Popover(B) → Select(A), the Select renders *behind* the Popover instead of on top. **This only happens when bundles interleave in the nesting chain** (A→B→A). If the inner overlays share a bundle (A→B→B), stacking is correct because they share `PortalContext`. | **Phase 2**: set `--wp-ui-select-z-index` higher than `--wp-ui-popover-z-index`. **Phase 4**: unify all overlays in one bundle → `PortalContext` is shared → correct nesting. **Long-term**: promote `@wordpress/ui` to `wpScript: true`. |
 
 **What does NOT break** (confirmed by 26 automated E2E tests, all identical in same-bundle vs cross-bundle):
 - Click-outside dismiss — works for all overlay combinations
@@ -242,7 +242,7 @@ Click-outside also works correctly via `insideReactTree`.
 
 ## Portal Container Nesting and Visual Stacking
 
-> **Verdict: Visual stacking regression in multi-level cross-bundle nesting.** When overlays from different bundles are deeply nested (e.g., Dialog(A) → Popover(B) → Select(A)), the innermost overlay can render *behind* a middle-level overlay due to incorrect portal container nesting. **Confidence: high** — empirically verified in the stress test (scenario 1.6) and confirmed via DOM inspection. **Practical risk: medium** — affects any three-level nesting where the innermost and outermost overlays share a bundle but the middle one does not.
+> **Verdict: Visual stacking regression in multi-level cross-bundle nesting, but only when bundles interleave.** When the nesting chain alternates bundles (e.g., A→B→A), the innermost overlay renders *behind* a middle-level overlay due to incorrect portal container nesting. **This does not occur when adjacent overlays share a bundle** (e.g., A→B→B) — in that case, the inner two share `PortalContext` and stacking is correct. **Confidence: high** — empirically verified in both wp-env playground (scenario 1.3) and Storybook (story 1.6a vs 1.6b). **Practical risk: medium** — affects three-level nesting where bundles interleave (the innermost and outermost overlays share a bundle but the middle one does not).
 
 ### How Base UI portal nesting works
 
@@ -293,6 +293,15 @@ Resulting DOM:
 ```
 
 Since `div_2` (Popover B) comes **after** `div_1` (Dialog A + Select A) in DOM order, it paints on top of everything inside `div_1` — including the Select popup. The Select visually renders *behind* the Popover, even though it should be the topmost overlay.
+
+### When does this happen?
+
+The regression requires **interleaved bundles** in the nesting chain (A→B→A). If the inner two overlays share a bundle (e.g., A→B→B), the Popover and Select share `PortalContext_B` and the Select correctly nests inside the Popover's portal. Stacking is correct.
+
+This means in practice:
+- **A→B→B** (e.g., Dialog from package X, Popover+Select from package Y): **stacking works**
+- **A→B→A** (e.g., Dialog+Select from package X, Popover from package Y): **stacking breaks**
+- **A→A→A** (single bundle): **stacking works** — all overlays share `PortalContext`
 
 ### Single-bundle comparison
 

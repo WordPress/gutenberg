@@ -15,7 +15,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import { Dialog as WPDialog, Select as WPSelect } from '@wordpress/ui';
 import { Modal, Popover as LegacyPopover } from '@wordpress/components';
-// Vite alias resolves this to the pre-built ESM bundle (see storybook/main.ts)
+// Vite aliases resolve these to pre-built ESM bundles (see storybook/main.ts).
+// Each bundle has its own copy of @base-ui/react with independent React contexts.
+import * as BundleA from '@cross-bundle-test/bundle-a';
 import * as BundleB from '@cross-bundle-test/bundle-b';
 
 const meta: Meta = {
@@ -83,20 +85,18 @@ function StatusBadge( { label, isOpen }: { label: string; isOpen: boolean } ) {
 	);
 }
 
-function BundleBSelectItems() {
+function SelectItems( { lib }: { lib: typeof BundleA } ) {
 	return (
 		<>
 			{ [ 'Apple', 'Banana', 'Cherry', 'Date', 'Elderberry' ].map(
 				( fruit ) => (
-					<BundleB.Select.Item
+					<lib.Select.Item
 						key={ fruit }
 						value={ fruit }
 						style={ selectItemStyle }
 					>
-						<BundleB.Select.ItemText>
-							{ fruit }
-						</BundleB.Select.ItemText>
-					</BundleB.Select.Item>
+						<lib.Select.ItemText>{ fruit }</lib.Select.ItemText>
+					</lib.Select.Item>
 				)
 			) }
 		</>
@@ -148,7 +148,7 @@ export const CrossBundleDialogSelect: Story = {
 									<BundleB.Select.Popup
 										style={ selectPopupStyle }
 									>
-										<BundleBSelectItems />
+										<SelectItems lib={ BundleB } />
 									</BundleB.Select.Popup>
 								</BundleB.Select.Positioner>
 							</BundleB.Select.Portal>
@@ -321,49 +321,74 @@ export const PopoverInPopover: Story = {
 	},
 };
 
-/**
- * Concern 1.6: Dialog(A) + Popover(B) + Select(B). Three levels of nesting.
- */
-export const ThreeLevelNesting: Story = {
-	name: '1.6 Three-level nesting',
-	render: () => {
-		const [ dialogOpen, setDialogOpen ] = useState( false );
-		const [ popoverOpen, setPopoverOpen ] = useState( false );
-		return (
-			<div>
-				<div
-					style={ {
-						display: 'flex',
-						gap: '8px',
-						marginBottom: '12px',
-					} }
-				>
-					<StatusBadge label="Dialog(A)" isOpen={ dialogOpen } />
-					<StatusBadge label="Popover(B)" isOpen={ popoverOpen } />
-				</div>
-				<WPDialog.Root
-					open={ dialogOpen }
-					onOpenChange={ setDialogOpen }
-				>
-					<WPDialog.Trigger>Open Dialog (A)</WPDialog.Trigger>
-					<WPDialog.Popup>
-						<WPDialog.Header>
-							<WPDialog.Title>
-								WPDS Dialog (Bundle A)
-							</WPDialog.Title>
-						</WPDialog.Header>
-						<BundleB.Popover.Root
+function ThreeLevelVariant( {
+	D,
+	P,
+	S,
+	labels,
+}: {
+	D: typeof BundleA;
+	P: typeof BundleA;
+	S: typeof BundleA;
+	labels: { d: string; p: string; s: string };
+} ) {
+	const [ dialogOpen, setDialogOpen ] = useState( false );
+	const [ popoverOpen, setPopoverOpen ] = useState( false );
+	return (
+		<div>
+			<div
+				style={ {
+					display: 'flex',
+					gap: '8px',
+					marginBottom: '12px',
+				} }
+			>
+				<StatusBadge
+					label={ `Dialog(${ labels.d })` }
+					isOpen={ dialogOpen }
+				/>
+				<StatusBadge
+					label={ `Popover(${ labels.p })` }
+					isOpen={ popoverOpen }
+				/>
+			</div>
+			<D.Dialog.Root open={ dialogOpen } onOpenChange={ setDialogOpen }>
+				<D.Dialog.Trigger style={ { padding: '8px 16px' } }>
+					Open Dialog ({ labels.d })
+				</D.Dialog.Trigger>
+				<D.Dialog.Portal>
+					<D.Dialog.Backdrop
+						style={ {
+							position: 'fixed',
+							inset: 0,
+							background: 'rgba(0,0,0,0.3)',
+						} }
+					/>
+					<D.Dialog.Popup
+						style={ {
+							...popupStyle,
+							position: 'fixed',
+							top: '50%',
+							left: '50%',
+							transform: 'translate(-50%, -50%)',
+							minWidth: '400px',
+						} }
+					>
+						<h4 style={ { margin: '0 0 12px' } }>
+							Dialog ({ labels.d })
+						</h4>
+						<P.Popover.Root
 							open={ popoverOpen }
 							onOpenChange={ setPopoverOpen }
 						>
-							<BundleB.Popover.Trigger
+							<P.Popover.Trigger
 								style={ { padding: '6px 12px' } }
 							>
-								Open Popover (B)
-							</BundleB.Popover.Trigger>
-							<BundleB.Popover.Portal>
-								<BundleB.Popover.Positioner>
-									<BundleB.Popover.Popup
+								Open Popover ({ labels.p })
+							</P.Popover.Trigger>
+							<P.Popover.Portal>
+								<P.Popover.Positioner>
+									<P.Popover.Popup
 										style={ {
 											...popupStyle,
 											background: '#f0f8ff',
@@ -374,34 +399,74 @@ export const ThreeLevelNesting: Story = {
 												margin: '0 0 8px',
 											} }
 										>
-											Popover (Bundle B)
+											Popover ({ labels.p })
 										</h4>
-										<p>Select from Bundle B:</p>
-										<BundleB.Select.Root defaultValue="Apple">
-											<BundleB.Select.Trigger
+										<p>
+											Select ({ labels.s }) below — should
+											appear ON TOP of this Popover:
+										</p>
+										<S.Select.Root defaultValue="Apple">
+											<S.Select.Trigger
 												style={ selectTriggerStyle }
 											/>
-											<BundleB.Select.Portal>
-												<BundleB.Select.Positioner>
-													<BundleB.Select.Popup
+											<S.Select.Portal>
+												<S.Select.Positioner>
+													<S.Select.Popup
 														style={
 															selectPopupStyle
 														}
 													>
-														<BundleBSelectItems />
-													</BundleB.Select.Popup>
-												</BundleB.Select.Positioner>
-											</BundleB.Select.Portal>
-										</BundleB.Select.Root>
-									</BundleB.Popover.Popup>
-								</BundleB.Popover.Positioner>
-							</BundleB.Popover.Portal>
-						</BundleB.Popover.Root>
-					</WPDialog.Popup>
-				</WPDialog.Root>
-			</div>
-		);
-	},
+														<SelectItems
+															lib={ S }
+														/>
+													</S.Select.Popup>
+												</S.Select.Positioner>
+											</S.Select.Portal>
+										</S.Select.Root>
+									</P.Popover.Popup>
+								</P.Popover.Positioner>
+							</P.Popover.Portal>
+						</P.Popover.Root>
+					</D.Dialog.Popup>
+				</D.Dialog.Portal>
+			</D.Dialog.Root>
+		</div>
+	);
+}
+
+/**
+ * Three-level nesting — same bundle (baseline). All components from Bundle A.
+ * PortalContext is shared, so the Select portal nests inside the Popover portal.
+ * Visual stacking is correct.
+ */
+export const ThreeLevelSameBundle: Story = {
+	name: '1.6a Three-level (same bundle — baseline)',
+	render: () => (
+		<ThreeLevelVariant
+			D={ BundleA }
+			P={ BundleA }
+			S={ BundleA }
+			labels={ { d: 'A', p: 'A', s: 'A' } }
+		/>
+	),
+};
+
+/**
+ * Three-level nesting — cross bundle with interleaved pattern: A→B→A.
+ * The Select (A) reads PortalContext_A and finds the Dialog's portal (A),
+ * skipping over the Popover's portal (B). The Select renders BEHIND the
+ * Popover — this is the visual stacking regression.
+ */
+export const ThreeLevelCrossBundle: Story = {
+	name: '1.6b Three-level (cross bundle A→B→A — REGRESSION)',
+	render: () => (
+		<ThreeLevelVariant
+			D={ BundleA }
+			P={ BundleB }
+			S={ BundleA }
+			labels={ { d: 'A', p: 'B', s: 'A' } }
+		/>
+	),
 };
 
 /**
