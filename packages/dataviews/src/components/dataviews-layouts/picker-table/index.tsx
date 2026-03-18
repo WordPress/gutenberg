@@ -158,6 +158,7 @@ function TableRow< Item >( {
 		>
 			<td
 				className="dataviews-view-table__checkbox-column"
+				// eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
 				role="presentation"
 			>
 				<div className="dataviews-view-table__cell-content-wrapper">
@@ -175,7 +176,10 @@ function TableRow< Item >( {
 			</td>
 
 			{ hasPrimaryColumn && (
-				<td role="presentation">
+				<td
+					// eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
+					role="presentation"
+				>
 					<ColumnPrimary
 						item={ item }
 						titleField={ showTitle ? titleField : undefined }
@@ -200,6 +204,7 @@ function TableRow< Item >( {
 							maxWidth,
 							minWidth,
 						} }
+						// eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
 						role="presentation"
 					>
 						<TableColumnField
@@ -410,6 +415,7 @@ function ViewPickerTable< Item >( {
 											1
 										}
 										className="dataviews-view-table__group-header-cell"
+										// eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
 										role="presentation"
 									>
 										{ view.groupBy?.showLabel === false

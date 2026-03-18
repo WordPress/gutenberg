@@ -90,6 +90,7 @@
 		"execa": "4.0.2",
 		"fast-glob": "^3.2.7",
 		"glob": "7.1.2",
+		"globals": "14.0.0",
 		"husky": "7.0.0",
 		"jest": "29.6.2",
 		"jest-environment-jsdom": "^30.2.0",
@@ -123,6 +124,7 @@
 		"style-loader": "3.2.1",
 		"stylelint-plugin-logical-css": "^1.2.3",
 		"typescript": "6.0.2",
+		"typescript-eslint": "8.57.1",
 		"uuid": "9.0.1",
 		"wait-on": "8.0.1"
 	},

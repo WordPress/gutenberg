@@ -1,3 +1,4 @@
+/* eslint-disable jsdoc/check-tag-names -- Package names containing @ are not JSDoc tags */
 /**
  * Wrapper around @babel/eslint-parser that ensures compatibility with
  * ESLint v10+. ESLint v10 expects `scopeManager.addGlobals()` which is
@@ -9,6 +10,7 @@
  * which adds native ESLint v10 support (requires @babel/core v8).
  * See https://github.com/babel/babel/issues/17791
  */
+/* eslint-enable jsdoc/check-tag-names */
 const babelParser = require( '@babel/eslint-parser' );
 
 module.exports = {

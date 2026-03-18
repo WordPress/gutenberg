@@ -79,8 +79,8 @@ test.describe( 'Connectors', () => {
 			// Connector should be wrapped in a group with the heading as label.
 			const group = card.getByRole( 'group' );
 			await expect( group ).toBeVisible();
+			await expect( heading ).toHaveAttribute( 'id', /\S/ );
 			const headingId = await heading.getAttribute( 'id' );
-			expect( headingId ).toBeTruthy();
 			await expect( group ).toHaveAttribute(
 				'aria-labelledby',
 				headingId

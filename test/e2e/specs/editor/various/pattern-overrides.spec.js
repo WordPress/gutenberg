@@ -7,9 +7,7 @@ test.describe( 'Pattern Overrides', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
-			await requestUtils.activatePlugin(
-				'gutenberg-test-block-bindings'
-			),
+			requestUtils.activatePlugin( 'gutenberg-test-block-bindings' ),
 			requestUtils.deleteAllBlocks(),
 		] );
 	} );
@@ -925,8 +923,7 @@ test.describe( 'Pattern Overrides', () => {
 		await nonEditableButton.click();
 		const initialText = await nonEditableButton.textContent();
 		await page.keyboard.type( 'Edited' );
-		const finalText = await nonEditableButton.textContent();
-		expect( initialText ).toBe( finalText );
+		await expect( nonEditableButton ).toHaveText( initialText );
 
 		await nonEditableButton.click();
 		await editor.showBlockToolbar();

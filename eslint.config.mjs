@@ -836,6 +836,15 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: Type declaration files intentionally augment third-party
+	// modules and must import from them directly.
+	{
+		files: [ 'packages/ui/src/types/*.d.ts' ],
+		rules: {
+			'@typescript-eslint/no-restricted-imports': 'off',
+		},
+	},
+
 	// Package-level configs (kept alongside the code they apply to).
 	...reactNativeEditorConfig,
 	...wpBuildConfig,
