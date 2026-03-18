@@ -143,19 +143,3 @@ export function close() {
 		type: 'CLOSE',
 	};
 }
-
-/**
- * Sets whether a command loader is currently loading.
- *
- * @param {string}  name      Command loader name.
- * @param {boolean} isLoading Whether the loader is loading.
- *
- * @return {Object} action.
- */
-export function setLoaderLoading( name, isLoading ) {
-	return {
-		type: 'SET_LOADER_LOADING',
-		name,
-		isLoading,
-	};
-}

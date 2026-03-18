@@ -14,6 +14,7 @@ import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as commandsStore } from '../store';
+import { unlock } from '../lock-unlock';
 
 const MAX_RECENTLY_SAVED = 30;
 const MAX_RECENTLY_DISPLAYED = 5;
@@ -33,7 +34,7 @@ export function recordUsage( name ) {
 }
 
 export function useLoaderCollector( hook, name, filterNames, onResolved ) {
-	const { setLoaderLoading } = useDispatch( commandsStore );
+	const { setLoaderLoading } = unlock( useDispatch( commandsStore ) );
 	const { isLoading: loading, commands = [] } = hook( { search: '' } ) ?? {};
 
 	useEffect( () => {

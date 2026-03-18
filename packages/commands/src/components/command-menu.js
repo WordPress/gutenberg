@@ -136,7 +136,7 @@ function CommandItem( { command, search, category, valuePrefix } ) {
 }
 
 function CommandMenuLoader( { name, search, hook, category, valuePrefix } ) {
-	const { setLoaderLoading } = useDispatch( commandsStore );
+	const { setLoaderLoading } = unlock( useDispatch( commandsStore ) );
 	const { isLoading: loading, commands = [] } = hook( { search } ) ?? {};
 	useEffect( () => {
 		setLoaderLoading( name, loading );
@@ -316,7 +316,7 @@ export function CommandMenu() {
 	const { isOpen: paletteIsOpen, loadersLoading } = useSelect(
 		( select ) => ( {
 			isOpen: select( commandsStore ).isOpen(),
-			loadersLoading: select( commandsStore ).isLoading(),
+			loadersLoading: unlock( select( commandsStore ) ).isLoading(),
 		} ),
 		[]
 	);
