@@ -153,14 +153,17 @@ function gutenberg_strip_custom_css_from_blocks( $content ) {
 		return $content;
 	}
 
-	$blocks  = parse_blocks( $content );
-	$changed = false;
+	// The content may be slashed (e.g. via content_save_pre),
+	// which breaks parse_blocks JSON parsing. Unslash first,
+	// then re-slash the result before returning.
+	$unslashed = wp_unslash( $content );
+	$blocks    = parse_blocks( $unslashed );
+	$changed   = false;
 
 	/**
 	 * Recursively strip style.css from blocks.
 	 *
 	 * @param array $blocks Blocks to process.
-	 * @return array Processed blocks.
 	 */
 	$strip = static function ( &$blocks ) use ( &$strip, &$changed ) {
 		foreach ( $blocks as &$block ) {
@@ -184,7 +187,7 @@ function gutenberg_strip_custom_css_from_blocks( $content ) {
 		return $content;
 	}
 
-	return serialize_blocks( $blocks );
+	return wp_slash( serialize_blocks( $blocks ) );
 }
 
 /**

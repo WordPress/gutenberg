@@ -447,7 +447,7 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	public function test_strip_custom_css_removes_css_from_block() {
 		$content = '<!-- wp:paragraph {"style":{"css":"color: red;"}} --><p>Hello</p><!-- /wp:paragraph -->';
 
-		$result = gutenberg_strip_custom_css_from_blocks( $content );
+		$result = wp_unslash( gutenberg_strip_custom_css_from_blocks( $content ) );
 		$blocks = parse_blocks( $result );
 
 		$this->assertArrayNotHasKey( 'css', $blocks[0]['attrs']['style'] ?? array(), 'style.css should be stripped from block attributes.' );
@@ -461,7 +461,7 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	public function test_strip_custom_css_removes_css_from_inner_blocks() {
 		$content = '<!-- wp:group --><div class="wp-block-group"><!-- wp:paragraph {"style":{"css":"color: red;"}} --><p>Hello</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
 
-		$result = gutenberg_strip_custom_css_from_blocks( $content );
+		$result = wp_unslash( gutenberg_strip_custom_css_from_blocks( $content ) );
 		$blocks = parse_blocks( $result );
 
 		$inner_block = $blocks[0]['innerBlocks'][0];
@@ -502,7 +502,7 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	public function test_strip_custom_css_preserves_other_style_properties() {
 		$content = '<!-- wp:paragraph {"style":{"css":"color: red;","color":{"text":"#ff0000"}}} --><p>Hello</p><!-- /wp:paragraph -->';
 
-		$result = gutenberg_strip_custom_css_from_blocks( $content );
+		$result = wp_unslash( gutenberg_strip_custom_css_from_blocks( $content ) );
 		$blocks = parse_blocks( $result );
 
 		$this->assertArrayNotHasKey( 'css', $blocks[0]['attrs']['style'], 'style.css should be stripped.' );
@@ -517,9 +517,24 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	public function test_strip_custom_css_cleans_up_empty_style_object() {
 		$content = '<!-- wp:paragraph {"style":{"css":"color: red;"}} --><p>Hello</p><!-- /wp:paragraph -->';
 
-		$result = gutenberg_strip_custom_css_from_blocks( $content );
+		$result = wp_unslash( gutenberg_strip_custom_css_from_blocks( $content ) );
 		$blocks = parse_blocks( $result );
 
 		$this->assertArrayNotHasKey( 'style', $blocks[0]['attrs'], 'Empty style object should be cleaned up after stripping css.' );
+	}
+
+	/**
+	 * Tests that slashed content is handled correctly.
+	 *
+	 * @covers ::gutenberg_strip_custom_css_from_blocks
+	 */
+	public function test_strip_custom_css_handles_slashed_content() {
+		$content = '<!-- wp:paragraph {"style":{"css":"color: red;"}} --><p>Hello</p><!-- /wp:paragraph -->';
+		$slashed = wp_slash( $content );
+
+		$result = gutenberg_strip_custom_css_from_blocks( $slashed );
+		$blocks = parse_blocks( wp_unslash( $result ) );
+
+		$this->assertArrayNotHasKey( 'css', $blocks[0]['attrs']['style'] ?? array(), 'style.css should be stripped even from slashed content.' );
 	}
 }
