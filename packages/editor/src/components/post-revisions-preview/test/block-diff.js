@@ -91,7 +91,7 @@ describe( 'diffRevisionContent', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'Hello',
-					__revisionDiffStatus: 'added',
+					__revisionDiffStatus: { status: 'added' },
 				},
 			},
 		] );
@@ -108,7 +108,7 @@ describe( 'diffRevisionContent', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'Hello',
-					__revisionDiffStatus: 'removed',
+					__revisionDiffStatus: { status: 'removed' },
 				},
 			},
 		] );
@@ -144,7 +144,9 @@ describe( 'diffRevisionContent', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					__revisionDiffStatus: 'modified',
+					__revisionDiffStatus: {
+						status: 'modified',
+					},
 				},
 			},
 		] );
@@ -167,7 +169,7 @@ describe( 'diffRevisionContent', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'NEW',
-					__revisionDiffStatus: 'added',
+					__revisionDiffStatus: { status: 'added' },
 				},
 			},
 			{
@@ -211,14 +213,14 @@ describe( 'diffRevisionContent', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'First new block',
-					__revisionDiffStatus: 'added',
+					__revisionDiffStatus: { status: 'added' },
 				},
 			},
 			{
 				name: 'core/paragraph',
 				attributes: {
 					content: 'Second new block',
-					__revisionDiffStatus: 'added',
+					__revisionDiffStatus: { status: 'added' },
 				},
 			},
 			{
@@ -227,7 +229,9 @@ describe( 'diffRevisionContent', () => {
 					// Inline diff: "existing" → "modified"
 					content:
 						'This is some <del title="Removed" class="revision-diff-removed">existing</del><ins title="Added" class="revision-diff-added">modified</ins> content',
-					__revisionDiffStatus: 'modified',
+					__revisionDiffStatus: {
+						status: 'modified',
+					},
 				},
 			},
 		] );
@@ -265,7 +269,7 @@ describe( 'diffRevisionContent', () => {
 						name: 'core/paragraph',
 						attributes: {
 							content: 'B',
-							__revisionDiffStatus: 'added',
+							__revisionDiffStatus: { status: 'added' },
 						},
 					},
 				],
@@ -305,7 +309,7 @@ describe( 'diffRevisionContent', () => {
 						name: 'core/paragraph',
 						attributes: {
 							content: 'B',
-							__revisionDiffStatus: 'removed',
+							__revisionDiffStatus: { status: 'removed' },
 						},
 					},
 				],
@@ -342,7 +346,7 @@ describe( 'diffRevisionContent', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'Second block content',
-					__revisionDiffStatus: 'added',
+					__revisionDiffStatus: { status: 'added' },
 				},
 			},
 			{
@@ -356,7 +360,7 @@ describe( 'diffRevisionContent', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'Second block content',
-					__revisionDiffStatus: 'removed',
+					__revisionDiffStatus: { status: 'removed' },
 				},
 			},
 		] );
@@ -381,7 +385,17 @@ describe( 'diffRevisionContent', () => {
 				attributes: {
 					content: 'Same content',
 					className: 'new-class',
-					__revisionDiffStatus: 'modified',
+					__revisionDiffStatus: {
+						status: 'modified',
+						changedAttributes: {
+							className: [
+								{
+									added: true,
+									value: 'new-class',
+								},
+							],
+						},
+					},
 				},
 			},
 		] );
@@ -410,7 +424,9 @@ describe( 'diffRevisionContent', () => {
 				attributes: {
 					content:
 						'Second block content<ins title="Added" class="revision-diff-added"> modified</ins>',
-					__revisionDiffStatus: 'modified',
+					__revisionDiffStatus: {
+						status: 'modified',
+					},
 				},
 			},
 			{
@@ -466,7 +482,9 @@ describe( 'diffRevisionContent', () => {
 									name: 'core/paragraph',
 									attributes: {
 										content: 'New',
-										__revisionDiffStatus: 'added',
+										__revisionDiffStatus: {
+											status: 'added',
+										},
 									},
 								},
 							],
@@ -490,7 +508,7 @@ describe( 'diffRevisionContent', () => {
 				{
 					name: 'core/group',
 					attributes: {
-						__revisionDiffStatus: 'added',
+						__revisionDiffStatus: { status: 'added' },
 					},
 					innerBlocks: [
 						{
@@ -526,7 +544,7 @@ describe( 'diffRevisionContent', () => {
 				{
 					name: 'core/group',
 					attributes: {
-						__revisionDiffStatus: 'removed',
+						__revisionDiffStatus: { status: 'removed' },
 					},
 					innerBlocks: [
 						{
@@ -577,7 +595,7 @@ describe( 'diffRevisionContent', () => {
 							name: 'core/paragraph',
 							attributes: {
 								content: 'NEW',
-								__revisionDiffStatus: 'added',
+								__revisionDiffStatus: { status: 'added' },
 							},
 						},
 						{
@@ -629,7 +647,9 @@ describe( 'diffRevisionContent', () => {
 						{
 							name: 'core/paragraph',
 							attributes: {
-								__revisionDiffStatus: 'modified',
+								__revisionDiffStatus: {
+									status: 'modified',
+								},
 							},
 						},
 					],
@@ -673,7 +693,7 @@ describe( 'diffRevisionContent', () => {
 							name: 'core/paragraph',
 							attributes: {
 								content: 'C',
-								__revisionDiffStatus: 'removed',
+								__revisionDiffStatus: { status: 'removed' },
 							},
 						},
 						{
@@ -682,7 +702,9 @@ describe( 'diffRevisionContent', () => {
 								// B→D modification with inline diff
 								content:
 									'<del title="Removed" class="revision-diff-removed">B</del><ins title="Added" class="revision-diff-added">D</ins>',
-								__revisionDiffStatus: 'modified',
+								__revisionDiffStatus: {
+									status: 'modified',
+								},
 							},
 						},
 					],
@@ -739,7 +761,7 @@ describe( 'diffRevisionContent', () => {
 							attributes: {
 								content:
 									'The quick brown fox jumps over the lazy dog near the riverbank',
-								__revisionDiffStatus: 'removed',
+								__revisionDiffStatus: { status: 'removed' },
 							},
 						},
 						{
@@ -747,7 +769,7 @@ describe( 'diffRevisionContent', () => {
 							attributes: {
 								content:
 									'Third paragraph also removed from this post',
-								__revisionDiffStatus: 'removed',
+								__revisionDiffStatus: { status: 'removed' },
 							},
 						},
 						{
@@ -755,7 +777,7 @@ describe( 'diffRevisionContent', () => {
 							attributes: {
 								content:
 									'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod',
-								__revisionDiffStatus: 'added',
+								__revisionDiffStatus: { status: 'added' },
 							},
 						},
 					],
@@ -803,7 +825,9 @@ describe( 'diffRevisionContent', () => {
 					attributes: {
 						content:
 							'Hello <strong><span title="1 format added" class="revision-diff-format-added">world</span></strong>',
-						__revisionDiffStatus: 'modified',
+						__revisionDiffStatus: {
+							status: 'modified',
+						},
 					},
 				},
 			] );
@@ -829,7 +853,9 @@ describe( 'diffRevisionContent', () => {
 					attributes: {
 						content:
 							'Hello <strong><del title="Removed" class="revision-diff-removed">world</del><ins title="Added" class="revision-diff-added">everyone</ins></strong>',
-						__revisionDiffStatus: 'modified',
+						__revisionDiffStatus: {
+							status: 'modified',
+						},
 					},
 				},
 			] );
@@ -879,7 +905,9 @@ describe( 'diffRevisionContent', () => {
 					attributes: {
 						content:
 							'Visit <a href="https://new-site.com"><span title="1 format changed" class="revision-diff-format-changed">our site</span></a> today',
-						__revisionDiffStatus: 'modified',
+						__revisionDiffStatus: {
+							status: 'modified',
+						},
 					},
 				},
 			] );
@@ -907,7 +935,9 @@ describe( 'diffRevisionContent', () => {
 					attributes: {
 						content:
 							'Visit <a href="https://example.com"><del title="Removed" class="revision-diff-removed">our</del><ins title="Added" class="revision-diff-added">the</ins> <del title="Removed" class="revision-diff-removed">site</del><ins title="Added" class="revision-diff-added">website</ins></a> today',
-						__revisionDiffStatus: 'modified',
+						__revisionDiffStatus: {
+							status: 'modified',
+						},
 					},
 				},
 			] );
@@ -955,7 +985,9 @@ describe( 'diffRevisionContent', () => {
 					attributes: {
 						content:
 							'<span title="1 format removed" class="revision-diff-format-removed">Bold</span> and <span title="1 format removed" class="revision-diff-format-removed">italic</span> text',
-						__revisionDiffStatus: 'modified',
+						__revisionDiffStatus: {
+							status: 'modified',
+						},
 					},
 				},
 			] );
@@ -981,7 +1013,9 @@ describe( 'diffRevisionContent', () => {
 					attributes: {
 						content:
 							'Hello <em><span title="1 format added, 1 format removed" class="revision-diff-format-changed">world</span></em>',
-						__revisionDiffStatus: 'modified',
+						__revisionDiffStatus: {
+							status: 'modified',
+						},
 					},
 				},
 			] );
@@ -1026,7 +1060,9 @@ describe( 'diffRevisionContent', () => {
 					attributes: {
 						content:
 							'<del title="Removed" class="revision-diff-removed">Hello</del><ins title="Added" class="revision-diff-added">Goodbye</ins> <strong>world</strong>!',
-						__revisionDiffStatus: 'modified',
+						__revisionDiffStatus: {
+							status: 'modified',
+						},
 					},
 				},
 			] );
@@ -1062,7 +1098,9 @@ describe( 'diffRevisionContent', () => {
 							attributes: {
 								content:
 									'<del title="Removed" class="revision-diff-removed">Hello</del><ins title="Added" class="revision-diff-added">Goodbye</ins> <strong><del title="Removed" class="revision-diff-removed">world</del><ins title="Added" class="revision-diff-added">everyone</ins></strong>',
-								__revisionDiffStatus: 'modified',
+								__revisionDiffStatus: {
+									status: 'modified',
+								},
 							},
 						},
 					],

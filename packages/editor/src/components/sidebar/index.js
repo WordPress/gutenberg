@@ -32,6 +32,7 @@ import SidebarHeader from './header';
 import TemplateContentPanel from '../template-content-panel';
 import TemplatePartContentPanel from '../template-part-content-panel';
 import { MediaMetadataPanel } from '../media';
+import RevisionBlockDiffPanel from '../revision-block-diff';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
 import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
@@ -144,6 +145,7 @@ const SidebarContent = ( {
 				{ ! isAttachment && (
 					<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
 						<BlockInspector />
+						{ isRevisionsMode && <RevisionBlockDiffPanel /> }
 					</Tabs.TabPanel>
 				) }
 			</Tabs.Context.Provider>
