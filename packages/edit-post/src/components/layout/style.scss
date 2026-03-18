@@ -22,7 +22,6 @@
 	position: relative;
 	z-index: 1;
 	height: $button-size-compact;
-	padding-inline: 0 $grid-unit-15;
 	// There’s no scrolling but in order to align horizontally with the meta box contents - a
 	// scrollable area - the gutter is forced.
 	scrollbar-gutter: stable;
@@ -50,7 +49,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding-inline: $grid-unit-30 $grid-unit-20;
+		padding-inline: $grid-unit-30 $grid-unit-15;
 
 		&:is(:hover, :focus-visible) {
 			color: var(--wp-admin-theme-color);
@@ -58,8 +57,7 @@
 		&:focus-visible::after {
 			content: "";
 			position: absolute;
-			inset: $grid-unit-05 $grid-unit-10;
-			border-radius: $radius-small;
+			inset: var(--wp-admin-border-width-focus);
 			@include button-style__focus();
 		}
 		> svg {
@@ -95,11 +93,6 @@
 			background-color: var(--wp-admin-theme-color);
 			width: $grid-unit-80 + $grid-unit-20;
 		}
-	}
-
-	// The preference toggle for enabling/disabling auto-resizing with the scroll wheel.
-	> .components-button {
-		align-self: center;
 	}
 }
 

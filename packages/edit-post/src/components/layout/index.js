@@ -42,11 +42,8 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	Button,
 	Icon,
-	Path,
 	SlotFillProvider,
-	SVG,
 	Tooltip,
 	VisuallyHidden,
 	__unstableUseNavigateRegions as useNavigateRegions,
@@ -139,27 +136,6 @@ function useEditorStyles( settings ) {
 	] );
 }
 
-const magnet = (
-	<SVG
-		xmlns="http://www.w3.org/2000/svg"
-		width="24"
-		height="24"
-		viewBox="0 0 24 24"
-		style={ {
-			stroke: 'currentColor',
-			transform: `scale(${ 16 / 24 })`,
-			strokeWidth: 1.5 / ( 16 / 24 ),
-			strokeLinecap: 'round',
-			strokeLinejoin: 'round',
-			fill: 'none',
-		} }
-	>
-		<Path d="m12 15 4 4" />
-		<Path d="M2.352 10.648a1.205 1.205 0 0 0 0 1.704l2.296 2.296a1.205 1.205 0 0 0 1.704 0l6.029-6.029a1 1 0 1 1 3 3l-6.029 6.029a1.205 1.205 0 0 0 0 1.704l2.296 2.296a1.205 1.205 0 0 0 1.704 0l6.365-6.367A1 1 0 0 0 8.716 4.282z" />
-		<Path d="m5 8 4 4" />
-	</SVG>
-);
-
 /**
  * @template T
  * @typedef { ReturnType< typeof useRefEffect< T > >} RefEffect
@@ -179,21 +155,17 @@ const magnet = (
 
 /** @type {ForwardRef< EffectWheelResizing, MetaBoxesMainProps>} */
 const MetaBoxesMain = forwardRef( ( { isLegacy }, ref ) => {
-	const [ isOpen, openHeight, isAutoResize, hasAnyVisible ] = useSelect(
-		( select ) => {
-			const { get } = select( preferencesStore );
-			const { isMetaBoxLocationVisible } = select( editPostStore );
-			return [
-				get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
-				get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
-				get( 'core/edit-post', 'metaBoxesMainIsAutoResize' ),
-				isMetaBoxLocationVisible( 'normal' ) ||
-					isMetaBoxLocationVisible( 'advanced' ) ||
-					isMetaBoxLocationVisible( 'side' ),
-			];
-		},
-		[]
-	);
+	const [ isOpen, openHeight, hasAnyVisible ] = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
+		const { isMetaBoxLocationVisible } = select( editPostStore );
+		return [
+			get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
+			get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
+			isMetaBoxLocationVisible( 'normal' ) ||
+				isMetaBoxLocationVisible( 'advanced' ) ||
+				isMetaBoxLocationVisible( 'side' ),
+		];
+	}, [] );
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const isShort = useMediaQuery( '(max-height: 549px)' );
@@ -333,7 +305,7 @@ const MetaBoxesMain = forwardRef( ( { isLegacy }, ref ) => {
 	/** @type { EffectWheelResizing } */
 	const effectWheel = useRefEffect(
 		( canvas ) => {
-			if ( ! hasAnyVisible || ! isAutoResize ) {
+			if ( ! hasAnyVisible ) {
 				return;
 			}
 			const iframe = canvas.ownerDocument.defaultView.frameElement;
@@ -449,7 +421,7 @@ const MetaBoxesMain = forwardRef( ( { isLegacy }, ref ) => {
 				pane.removeEventListener( 'wheel', onWheel );
 			};
 		},
-		[ hasAnyVisible, isAutoResize ]
+		[ hasAnyVisible ]
 	);
 	useImperativeHandle( ref, () => effectWheel, [ effectWheel ] );
 
@@ -561,20 +533,6 @@ const MetaBoxesMain = forwardRef( ( { isLegacy }, ref ) => {
 			<div className="edit-post-meta-boxes-main__presenter">
 				{ toggle }
 				{ separator }
-				<Button
-					label={ __( 'Enable auto-resizing' ) }
-					showTooltip
-					size="small"
-					icon={ magnet }
-					onClick={ () =>
-						setPreference(
-							'core/edit-post',
-							'metaBoxesMainIsAutoResize',
-							! isAutoResize
-						)
-					}
-					isPressed={ isAutoResize }
-				/>
 			</div>
 			{ contents }
 		</NavigableRegion>
