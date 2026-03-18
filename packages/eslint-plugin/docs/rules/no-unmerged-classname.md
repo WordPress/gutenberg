@@ -18,9 +18,9 @@ function Foo( { padding, ...restProps } ) {
 ```
 
 ```jsx
-// className destructured but not included in the className expression
-function Foo( { className, ...restProps } ) {
-	return <div className={ clsx( styles.foo ) } { ...restProps } />;
+// Props not destructured — spread of entire props object
+function Foo( props ) {
+	return <div className={ styles.foo } { ...props } />;
 }
 ```
 
@@ -37,5 +37,16 @@ function Foo( { className, ...restProps } ) {
 // No spread on the element — not flagged
 function Foo( { ...restProps } ) {
 	return <div className={ styles.foo } />;
+}
+```
+
+```jsx
+// className forwarded on a different element than the one with spread — not flagged
+function Foo( { className, style, ...props } ) {
+	return (
+		<Outer className={ clsx( styles.outer, className ) } style={ style }>
+			<Inner className={ styles.inner } { ...props } />
+		</Outer>
+	);
 }
 ```
