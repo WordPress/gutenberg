@@ -123,6 +123,36 @@ function makeBlocksSerializable( blocks: Block[] ): Block[] {
 	} );
 }
 
+const RICH_TEXT_CACHE_MAX_SIZE = 500;
+const richTextCache = new Map< string, RichTextData >();
+
+/**
+ * Returns a RichTextData instance for the given HTML string, using a cache to
+ * avoid re-parsing identical strings. Repeated calls with the same string
+ * (e.g. unchanged blocks on each remote CRDT update) return the cached instance
+ * without re-running the HTML parser and DOM traversal.
+ *
+ * @param value The HTML string to parse.
+ * @return The RichTextData instance.
+ */
+function cachedFromHTMLString( value: string ): RichTextData {
+	const cached = richTextCache.get( value );
+
+	if ( cached ) {
+		return cached;
+	}
+
+	const result = RichTextData.fromHTMLString( value );
+
+	if ( richTextCache.size >= RICH_TEXT_CACHE_MAX_SIZE ) {
+		// Evict the oldest entry (Map preserves insertion order).
+		richTextCache.delete( richTextCache.keys().next().value! );
+	}
+
+	richTextCache.set( value, result );
+	return result;
+}
+
 /**
  * Recursively walk an attribute value and convert any strings that correspond
  * to rich-text schema nodes into RichTextData instances. This is the inverse
@@ -137,7 +167,7 @@ function deserializeAttributeValue(
 	value: unknown
 ): unknown {
 	if ( schema?.type === 'rich-text' && typeof value === 'string' ) {
-		return RichTextData.fromHTMLString( value );
+		return cachedFromHTMLString( value );
 	}
 
 	// e.g. core/table `body`: [ { cells: [ { content: RichTextData } ] } ]
@@ -167,39 +197,11 @@ function deserializeAttributeValue(
 }
 
 /**
- * Convert rich-text string attributes in a block back to RichTextData
- * instances. This is the inverse of makeBlockAttributesSerializable and is
- * needed when blocks are extracted from the CRDT document, where rich-text
- * values are stored as Y.Text (which serializes to plain strings via
- * toJSON()). Without this conversion, block edit components that rely on
- * RichTextData methods (e.g. `.text`) will receive a raw string and
- * malfunction.
- *
- * @param blockName  The block type name, e.g. 'core/code'.
- * @param attributes The plain-object attributes from CRDT (toJSON).
- * @return Attributes with rich-text strings replaced by RichTextData.
- */
-function deserializeBlockAttributeValues(
-	blockName: string,
-	attributes: BlockAttributes
-): BlockAttributes {
-	const newAttributes = { ...attributes };
-
-	for ( const [ key, value ] of Object.entries( attributes ) ) {
-		const schema = getBlockAttributeType( blockName, key );
-
-		if ( schema ) {
-			newAttributes[ key ] = deserializeAttributeValue( schema, value );
-		}
-	}
-
-	return newAttributes;
-}
-
-/**
  * Convert blocks from their CRDT-serialized form back to the runtime form
- * expected by the block editor. This ensures that rich-text attributes are
- * RichTextData instances rather than raw strings.
+ * expected by the block editor. Rich-text attributes are stored as Y.Text in
+ * the CRDT document, which serializes to plain strings via toJSON(). This
+ * function restores them to RichTextData instances so that block edit
+ * components that rely on RichTextData methods (e.g. `.text`) work correctly.
  *
  * @param blocks Blocks as extracted from the CRDT document via toJSON().
  * @return Blocks with rich-text attributes restored to RichTextData.
@@ -207,10 +209,24 @@ function deserializeBlockAttributeValues(
 export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
 	return blocks.map( ( block: Block ) => {
 		const { name, innerBlocks, attributes, ...rest } = block;
+
+		const newAttributes = { ...attributes };
+
+		for ( const [ key, value ] of Object.entries( attributes ) ) {
+			const schema = getBlockAttributeType( name, key );
+
+			if ( schema ) {
+				newAttributes[ key ] = deserializeAttributeValue(
+					schema,
+					value
+				);
+			}
+		}
+
 		return {
 			...rest,
 			name,
-			attributes: deserializeBlockAttributeValues( name, attributes ),
+			attributes: newAttributes,
 			innerBlocks: deserializeBlockAttributes( innerBlocks ?? [] ),
 		};
 	} );
