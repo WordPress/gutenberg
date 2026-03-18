@@ -27,14 +27,14 @@ if ( window.crossOriginIsolated ) {
 						return;
 					}
 
-					el.querySelectorAll(
-						'img,source,script,video,link'
-					).forEach( ( v ) => {
-						addCrossOriginAttribute( v );
-					} );
+					el.querySelectorAll( 'source,script,video,link' ).forEach(
+						( v ) => {
+							addCrossOriginAttribute( v );
+						}
+					);
 
 					if (
-						[ 'IMG', 'SOURCE', 'SCRIPT', 'VIDEO', 'LINK' ].includes(
+						[ 'SOURCE', 'SCRIPT', 'VIDEO', 'LINK' ].includes(
 							el.nodeName
 						)
 					) {

@@ -345,7 +345,6 @@ function gutenberg_add_crossorigin_attributes( string $html ): string {
 	// See https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin.
 	$tags = array(
 		'AUDIO'  => 'src',
-		'IMG'    => 'src',
 		'LINK'   => 'href',
 		'SCRIPT' => 'src',
 		'VIDEO'  => 'src',
