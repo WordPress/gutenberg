@@ -171,9 +171,7 @@ function NavigationList() {
 			<Page
 				title={
 					<HStack spacing={ 1 } alignment="center" className="navigation-breadcrumbs">
-						<Button
-							variant="link"
-							size="compact"
+						<button type="button"
 							className="navigation-breadcrumbs__link"
 							onClick={ () =>
 								navigate( {
@@ -185,7 +183,7 @@ function NavigationList() {
 							}
 						>
 							{ __( 'Navigation' ) }
-						</Button>
+						</button>
 						<span className="navigation-breadcrumbs__separator">/</span>
 						<span className="navigation-breadcrumbs__current">{ menuTitle }</span>
 					</HStack>
