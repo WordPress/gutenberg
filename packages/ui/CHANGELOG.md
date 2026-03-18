@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.9.0 (2026-03-18)
+
 ### New Features
 
 -   Add `Text` primitive with predefined typographic variants (`heading-2xl` through `heading-sm`, `body-xl` through `body-sm`) built on design tokens ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).

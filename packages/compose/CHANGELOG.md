@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.42.0 (2026-03-18)
+
 ### New Features
 
 -   Hooks `useMediaQuery` and `useViewportMatch` accept a new optional `view` argument of type `Window`, which enables consumers to perform media queries in a window other than the global one (e.g. an iframe) ([#76446](https://github.com/WordPress/gutenberg/pull/76446)).
