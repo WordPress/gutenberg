@@ -16,6 +16,7 @@ import { Y } from '@wordpress/sync';
  * Internal dependencies
  */
 import { createYMap, type YMapRecord, type YMapWrap } from './crdt-utils';
+import { getCachedRichTextData } from './crdt-text';
 import { Delta } from '../sync';
 
 interface BlockAttributes {
@@ -123,36 +124,6 @@ function makeBlocksSerializable( blocks: Block[] ): Block[] {
 	} );
 }
 
-const RICH_TEXT_CACHE_MAX_SIZE = 500;
-const richTextCache = new Map< string, RichTextData >();
-
-/**
- * Returns a RichTextData instance for the given HTML string, using a cache to
- * avoid re-parsing identical strings. Repeated calls with the same string
- * (e.g. unchanged blocks on each remote CRDT update) return the cached instance
- * without re-running the HTML parser and DOM traversal.
- *
- * @param value The HTML string to parse.
- * @return The RichTextData instance.
- */
-function cachedFromHTMLString( value: string ): RichTextData {
-	const cached = richTextCache.get( value );
-
-	if ( cached ) {
-		return cached;
-	}
-
-	const result = RichTextData.fromHTMLString( value );
-
-	if ( richTextCache.size >= RICH_TEXT_CACHE_MAX_SIZE ) {
-		// Evict the oldest entry (Map preserves insertion order).
-		richTextCache.delete( richTextCache.keys().next().value! );
-	}
-
-	richTextCache.set( value, result );
-	return result;
-}
-
 /**
  * Recursively walk an attribute value and convert any strings that correspond
  * to rich-text schema nodes into RichTextData instances. This is the inverse
@@ -167,7 +138,7 @@ function deserializeAttributeValue(
 	value: unknown
 ): unknown {
 	if ( schema?.type === 'rich-text' && typeof value === 'string' ) {
-		return cachedFromHTMLString( value );
+		return getCachedRichTextData( value );
 	}
 
 	// e.g. core/table `body`: [ { cells: [ { content: RichTextData } ] } ]
