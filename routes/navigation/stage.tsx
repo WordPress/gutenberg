@@ -13,7 +13,6 @@ import { DataViews } from '@wordpress/dataviews';
 import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
-import { chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -171,11 +170,11 @@ function NavigationList() {
 		return (
 			<Page
 				title={
-					<HStack spacing={ 2 } alignment="center">
+					<HStack spacing={ 1 } alignment="center" className="navigation-breadcrumbs">
 						<Button
-							icon={ chevronLeft }
-							label={ __( 'Back to Navigation' ) }
+							variant="link"
 							size="compact"
+							className="navigation-breadcrumbs__link"
 							onClick={ () =>
 								navigate( {
 									search: {
@@ -184,11 +183,13 @@ function NavigationList() {
 									},
 								} )
 							}
-						/>
-						<span>{ menuTitle }</span>
+						>
+							{ __( 'Navigation' ) }
+						</Button>
+						<span className="navigation-breadcrumbs__separator">/</span>
+						<span className="navigation-breadcrumbs__current">{ menuTitle }</span>
 					</HStack>
 				}
-				subTitle={ __( 'Edit the navigation menu.' ) }
 				hasPadding
 			>
 				<NavigationMenuEditor id={ editId } />

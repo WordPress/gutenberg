@@ -10,3 +10,32 @@
 	color: $gray-600;
 	font-size: 12px;
 }
+
+.navigation-breadcrumbs {
+	flex-wrap: nowrap;
+	min-width: 0;
+}
+
+.navigation-breadcrumbs__link {
+	color: $gray-600;
+	text-decoration: none;
+	white-space: nowrap;
+	flex-shrink: 0;
+
+	&:hover,
+	&:focus {
+		color: $gray-900;
+	}
+}
+
+.navigation-breadcrumbs__separator {
+	color: $gray-400;
+	flex-shrink: 0;
+}
+
+.navigation-breadcrumbs__current {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	min-width: 0;
+}
