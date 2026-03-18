@@ -45,19 +45,6 @@ describe( 'feature-detection', () => {
 		);
 		global.URL.revokeObjectURL = jest.fn();
 
-		// Mock credentialless iframe support so the check passes by default.
-		if ( ! ( 'credentialless' in window.HTMLIFrameElement.prototype ) ) {
-			Object.defineProperty(
-				window.HTMLIFrameElement.prototype,
-				'credentialless',
-				{
-					value: false,
-					writable: true,
-					configurable: true,
-				}
-			);
-		}
-
 		// Remove navigator.deviceMemory and navigator.connection by default
 		// so they don't interfere with unrelated tests.
 		if ( 'deviceMemory' in navigator ) {
@@ -81,11 +68,6 @@ describe( 'feature-detection', () => {
 		global.Worker = originalWorker;
 		global.URL.createObjectURL = originalCreateObjectURL;
 		global.URL.revokeObjectURL = originalRevokeObjectURL;
-
-		// Restore credentialless property.
-		if ( 'credentialless' in window.HTMLIFrameElement.prototype ) {
-			delete ( window.HTMLIFrameElement.prototype as any ).credentialless;
-		}
 
 		// Restore navigator.deviceMemory.
 		if ( originalDeviceMemoryDescriptor ) {
@@ -166,23 +148,6 @@ describe( 'feature-detection', () => {
 			);
 		} );
 
-		it( 'returns not supported when credentialless iframes are not supported', () => {
-			// Remove credentialless from the prototype.
-			delete ( window.HTMLIFrameElement.prototype as any ).credentialless;
-
-			const result = detectClientSideMediaSupport();
-
-			expect( result.supported ).toBe( false );
-			expect( result.reason ).toContain( 'credentialless iframes' );
-		} );
-
-		it( 'returns supported when credentialless iframes are supported', () => {
-			// credentialless is already mocked in beforeEach.
-			const result = detectClientSideMediaSupport();
-
-			expect( result.supported ).toBe( true );
-		} );
-
 		it( 'returns not supported when device memory is 2 GB or less', () => {
 			Object.defineProperty( navigator, 'deviceMemory', {
 				value: 2,
@@ -206,9 +171,9 @@ describe( 'feature-detection', () => {
 			expect( result.supported ).toBe( true );
 		} );
 
-		it( 'returns not supported when hardware concurrency is less than 4', () => {
+		it( 'returns not supported when hardware concurrency is less than 2', () => {
 			Object.defineProperty( navigator, 'hardwareConcurrency', {
-				value: 2,
+				value: 1,
 				configurable: true,
 			} );
 
@@ -218,9 +183,9 @@ describe( 'feature-detection', () => {
 			expect( result.reason ).toContain( 'insufficient CPU cores' );
 		} );
 
-		it( 'returns supported when hardware concurrency is 4 or more', () => {
+		it( 'returns supported when hardware concurrency is 2 or more', () => {
 			Object.defineProperty( navigator, 'hardwareConcurrency', {
-				value: 4,
+				value: 2,
 				configurable: true,
 			} );
 
@@ -253,7 +218,7 @@ describe( 'feature-detection', () => {
 			expect( result.reason ).toContain( 'too slow' );
 		} );
 
-		it( 'returns not supported when connection is 3g', () => {
+		it( 'returns supported when connection is 3g', () => {
 			Object.defineProperty( navigator, 'connection', {
 				value: { saveData: false, effectiveType: '3g' },
 				configurable: true,
@@ -261,8 +226,7 @@ describe( 'feature-detection', () => {
 
 			const result = detectClientSideMediaSupport();
 
-			expect( result.supported ).toBe( false );
-			expect( result.reason ).toContain( 'too slow' );
+			expect( result.supported ).toBe( true );
 		} );
 
 		it( 'returns not supported when connection is slow-2g', () => {

@@ -62,23 +62,3 @@ function _gutenberg_migrate_remove_fse_drafts() {
 	delete_option( 'gutenberg_last_synchronize_theme_template_checks' );
 	delete_option( 'gutenberg_last_synchronize_theme_template-part_checks' );
 }
-
-/**
- * Replace unprefixed option enable_real_time_collaboration with prefixed version.
- *
- * Adds a `wp_` prefix to the option name to follow the convention for adding new
- * options to WordPress since WP 5.8.0.
- *
- * @since 22.6.0
- */
-function _gutenberg_migrate_enable_real_time_collaboration() {
-	$current_value = get_option( 'enable_real_time_collaboration', '0' );
-
-	update_option( 'wp_enable_real_time_collaboration', $current_value );
-	delete_option( 'enable_real_time_collaboration' );
-}
-
-// Deletion of the `_wp_file_based` term (in _gutenberg_migrate_remove_fse_drafts) must happen
-// after its taxonomy (`wp_theme`) is registered. This happens in `gutenberg_register_wp_theme_taxonomy`,
-// which is hooked into `init` (default priority, i.e. 10).
-add_action( 'init', '_gutenberg_migrate_database', 20 );

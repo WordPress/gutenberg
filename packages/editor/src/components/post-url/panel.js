@@ -90,6 +90,7 @@ function PostURLToggle( { isOpen, onClick } ) {
 	return (
 		<Button
 			size="compact"
+			className="editor-post-url__panel-toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }
 			aria-label={

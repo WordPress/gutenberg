@@ -106,6 +106,7 @@
 		"change-case": "^4.1.2",
 		"client-zip": "^2.4.5",
 		"clsx": "^2.1.1",
+		"colord": "^2.7.0",
 		"date-fns": "^3.6.0",
 		"diff": "^4.0.2",
 		"fast-deep-equal": "^3.1.3",

@@ -22,10 +22,6 @@ test.describe( 'Collaboration with meta boxes', () => {
 		editor,
 		page,
 	} ) => {
-		// Ensure collaboration is enabled (the fixture enables it, but
-		// be explicit to match the pattern of other collaboration tests).
-		await collaborationUtils.setCollaboration( true );
-
 		// Create a draft post.
 		const post = await requestUtils.createPost( {
 			title: 'Meta Box Lock Test',
@@ -42,6 +38,9 @@ test.describe( 'Collaboration with meta boxes', () => {
 			welcomeGuide: false,
 			fullscreenMode: false,
 		} );
+
+		// Wait for collaboration runtime and entity record to be ready.
+		await collaborationUtils.waitForEntityReady( page );
 
 		// Wait for meta boxes to initialize and disable collaboration.
 		// collaborationSupported starts as true, then the meta box hook

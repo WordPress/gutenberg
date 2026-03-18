@@ -9,7 +9,7 @@
 	padding: 0 $grid-unit-30 $grid-unit-30;
 	display: flex;
 	flex-direction: column;
-	gap: $grid-unit-40;
+	gap: $grid-unit-30;
 	container-type: inline-size;
 	margin-bottom: auto;
 
@@ -17,9 +17,25 @@
 		transition: padding ease-out 0.1s;
 	}
 
+	&.has-compact-density {
+		gap: $grid-unit-20;
+
+		.dataviews-view-grid__row {
+			gap: $grid-unit-20;
+		}
+	}
+
+	&.has-comfortable-density {
+		gap: $grid-unit-40;
+
+		.dataviews-view-grid__row {
+			gap: $grid-unit-40;
+		}
+	}
+
 	.dataviews-view-grid__row {
 		display: grid;
-		gap: $grid-unit-40;
+		gap: $grid-unit-30;
 
 		.dataviews-view-grid__row__gridcell {
 			border-radius: $radius-medium;

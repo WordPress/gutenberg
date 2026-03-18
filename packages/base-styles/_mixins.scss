@@ -689,6 +689,7 @@
 	outline-style: solid;
 	outline-width: calc(#{$widthRatio} * (var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
 	outline-offset: calc(#{$widthRatio} * ((-1 * var(--wp-admin-border-width-focus) ) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
+	box-shadow: inset 0 0 0 calc(var(--wp-admin-border-width-focus, #{variables.$border-width-focus-fallback}) + #{variables.$border-width}) colors.$white, 0 0 0 variables.$border-width colors.$white, variables.$elevation-x-small;
 }
 
 @mixin selected-block-focus($widthRatio: 1) {

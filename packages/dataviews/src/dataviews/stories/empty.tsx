@@ -47,11 +47,9 @@ const CustomEmptyComponent = () => (
 
 const EmptyComponent = ( {
 	customEmpty,
-	containerHeight,
 	isLoading,
 }: {
 	customEmpty?: boolean;
-	containerHeight?: 'auto' | '50vh' | '100vh';
 	isLoading?: boolean;
 } ) => {
 	const [ view, setView ] = useState< View >( {
@@ -69,7 +67,7 @@ const EmptyComponent = ( {
 			style={ {
 				display: 'flex',
 				flexDirection: 'column',
-				height: containerHeight,
+				height: '100%',
 			} }
 		>
 			<DataViews

@@ -68,15 +68,6 @@
 	}
 }
 
-.edit-site-post-list__status-icon {
-	height: $grid-unit-30;
-	width: $grid-unit-30;
-	svg {
-		fill: currentColor;
-		margin-left: -$grid-unit-05;
-	}
-}
-
 .fields-controls__password {
 	border-top: $border-width solid $gray-200;
 	padding-top: $grid-unit-20;

@@ -195,9 +195,19 @@ function DataViews< Item >( {
 		}
 	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
 
+	const {
+		data: displayData,
+		paginationInfo: displayPaginationInfo,
+		hasInitiallyLoaded,
+	} = useData( data, isLoading, paginationInfo );
+
 	// Attach scroll event listener for infinite scroll
 	useEffect( () => {
-		if ( ! view.infiniteScrollEnabled || ! containerRef.current ) {
+		if (
+			! hasInitiallyLoaded ||
+			! view.infiniteScrollEnabled ||
+			! containerRef.current
+		) {
 			return;
 		}
 
@@ -220,7 +230,11 @@ function DataViews< Item >( {
 			container.removeEventListener( 'scroll', handleScroll );
 			handleScroll.cancel(); // Cancel any pending throttled calls
 		};
-	}, [ infiniteScrollHandler, view.infiniteScrollEnabled ] );
+	}, [
+		hasInitiallyLoaded,
+		infiniteScrollHandler,
+		view.infiniteScrollEnabled,
+	] );
 
 	// Filter out DataViewsPicker layouts.
 	const defaultLayouts = useMemo(
@@ -236,12 +250,6 @@ function DataViews< Item >( {
 			),
 		[ defaultLayoutsProperty ]
 	);
-
-	const {
-		data: displayData,
-		paginationInfo: displayPaginationInfo,
-		hasInitiallyLoaded,
-	} = useData( data, isLoading, paginationInfo );
 
 	if ( ! defaultLayouts[ view.type ] ) {
 		return null;
@@ -280,7 +288,7 @@ function DataViews< Item >( {
 				onReset,
 			} }
 		>
-			<div className="dataviews-wrapper" ref={ containerRef }>
+			<div className="dataviews-wrapper">
 				{ children ?? (
 					<DefaultUI
 						header={ header }

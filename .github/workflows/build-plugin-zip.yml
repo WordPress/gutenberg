@@ -179,7 +179,7 @@ jobs:
                   fi
 
     build:
-        name: Build Release Artifact
+        name: ${{ matrix.IS_GUTENBERG_PLUGIN && 'Build Release Artifact' || 'Build assets for wordpress-develop' }}
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
@@ -190,6 +190,10 @@ jobs:
               github.event_name == 'workflow_dispatch' ||
               github.repository == 'WordPress/gutenberg'
             )
+        strategy:
+            matrix:
+                IS_GUTENBERG_PLUGIN: [true, false]
+
         outputs:
             job_status: ${{ job.status }}
 
@@ -202,24 +206,30 @@ jobs:
                   persist-credentials: false
 
             - name: Use desired version of Node.js
-              uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+              uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
               with:
                   node-version-file: '.nvmrc'
                   check-latest: true
+
+            - name: Configure build for wordpress-develop
+              if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
+              run: jq --tab '.wpPlugin.name = "wp"' package.json > package.json.tmp && mv package.json.tmp package.json
 
             - name: Build Gutenberg plugin ZIP file
               run: ./bin/build-plugin-zip.sh
               env:
                   NO_CHECKS: 'true'
+                  IS_GUTENBERG_PLUGIN: ${{ matrix.IS_GUTENBERG_PLUGIN }}
+                  IS_WORDPRESS_CORE: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
 
             - name: Upload artifact
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               with:
-                  name: gutenberg-plugin
+                  name: gutenberg-${{ ! matrix.IS_GUTENBERG_PLUGIN && 'wordpress-develop' || 'plugin' }}
                   path: ./gutenberg.zip
 
             - name: Build release notes draft
-              if: ${{ needs.bump-version.outputs.new_version }}
+              if: ${{ matrix.IS_GUTENBERG_PLUGIN && needs.bump-version.outputs.new_version }}
               env:
                   VERSION: ${{ needs.bump-version.outputs.new_version }}
               run: |
@@ -235,11 +245,64 @@ jobs:
                   fi
 
             - name: Upload release notes artifact
-              if: ${{ needs.bump-version.outputs.new_version }}
+              if: ${{ matrix.IS_GUTENBERG_PLUGIN && needs.bump-version.outputs.new_version }}
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               with:
                   name: release-notes
                   path: ./release-notes.txt
+
+    # Publishes the built plugin zip file to the GitHub Container registry.
+    publish-to-container-registry:
+        name: Publish to GitHub Container Registry
+        runs-on: 'ubuntu-24.04'
+        needs: ['bump-version', 'build']
+        permissions:
+            contents: read
+            packages: write
+        if: |
+            always() &&
+            needs.build.outputs.job_status == 'success' &&
+            github.repository == 'WordPress/gutenberg' &&
+            github.event_name == 'push'
+
+        steps:
+            - name: Download build artifact
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  name: gutenberg-wordpress-develop
+
+            - name: Unzip zip artifact
+              run: unzip gutenberg.zip && rm gutenberg.zip
+
+            # Noting the hash helps keep track of the commit the zip was built from.
+            - name: Add a file for tracking the SHA value used.
+              run: echo "${{ github.sha }}" > .gutenberg-hash
+
+            - name: Recompress as a .gz file
+              run: tar -czf ${{ runner.temp }}/gutenberg.tar.gz . && mv ${{ runner.temp }}/gutenberg.tar.gz .
+
+            - name: Login to GitHub Container Registry
+              uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            # OCI Registry As Storage (ORAS) provides a way to push and pull non-image, generic artifacts (.gz files,
+            # for example) to container registries such as GitHub Container Registry.
+            - name: Setup ORAS
+              uses: oras-project/setup-oras@22ce207df3b08e061f537244349aac6ae1d214f6 # v1.2.4
+
+            # The owner/repository is hard-coded because capital letters are not allowed when publishing to GitHub
+            # Container Registry. The organization name is WordPress, so ${{ github.repository }} causes an error.
+            # See https://github.com/orgs/community/discussions/27086 for more info.
+            - name: Push built plugin .tar.gz file to GitHub Container Registry
+              run: |
+                  oras push "ghcr.io/wordpress/gutenberg/gutenberg-wp-develop-build:${{ github.sha }}" \
+                  "gutenberg.tar.gz:application/gzip" \
+                  --annotation "org.opencontainers.image.description=Gutenberg plugin build for commit ${{ github.sha }}" \
+                  --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+                  --annotation "org.opencontainers.image.revision=${{ github.sha }}"
 
     revert-version-bump:
         name: Revert version bump if build failed
@@ -312,12 +375,12 @@ jobs:
               run: echo "version=$(echo "$VERSION" | cut -d / -f 3 | sed 's/-rc./ RC/' )" >> "$GITHUB_OUTPUT"
 
             - name: Download Plugin Zip Artifact
-              uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
                   name: gutenberg-plugin
 
             - name: Download Release Notes Artifact
-              uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
                   name: release-notes
 
@@ -379,7 +442,7 @@ jobs:
                   git config user.email gutenberg@wordpress.org
 
             - name: Setup Node.js
-              uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+              uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
               with:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'

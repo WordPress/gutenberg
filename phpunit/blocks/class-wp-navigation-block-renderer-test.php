@@ -254,6 +254,98 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that gutenberg_block_core_navigation_overlay_html_has_close_block returns true when HTML contains the close button element.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::gutenberg_block_core_navigation_overlay_html_has_close_block
+	 */
+	public function test_gutenberg_block_core_navigation_overlay_html_has_close_block_returns_true_when_close_button_present() {
+		$html   = '<div class="wp-block-group"><button class="wp-block-navigation-overlay-close" type="button">Close</button></div>';
+		$result = gutenberg_block_core_navigation_overlay_html_has_close_block( $html );
+		$this->assertTrue( $result );
+	}
+
+	/**
+	 * Test that gutenberg_block_core_navigation_overlay_html_has_close_block returns false when HTML does not contain the close button.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::gutenberg_block_core_navigation_overlay_html_has_close_block
+	 */
+	public function test_gutenberg_block_core_navigation_overlay_html_has_close_block_returns_false_when_absent() {
+		$html   = '<div class="wp-block-group"><p>No close button here</p></div>';
+		$result = gutenberg_block_core_navigation_overlay_html_has_close_block( $html );
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Test that gutenberg_block_core_navigation_overlay_html_has_close_block returns false when class string appears only in text content.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::gutenberg_block_core_navigation_overlay_html_has_close_block
+	 */
+	public function test_gutenberg_block_core_navigation_overlay_html_has_close_block_returns_false_when_class_in_text_only() {
+		$html   = '<p>Use the wp-block-navigation-overlay-close button to close</p>';
+		$result = gutenberg_block_core_navigation_overlay_html_has_close_block( $html );
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Test that gutenberg_block_core_navigation_overlay_html_has_close_block finds nested close button.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::gutenberg_block_core_navigation_overlay_html_has_close_block
+	 */
+	public function test_block_core_navigation_overlay_html_has_close_block_finds_nested_close_button() {
+		$html   = '<div class="wp-block-group"><div class="wp-block-group"><button class="wp-block-navigation-overlay-close" type="button" aria-label="Close"><svg>...</svg></button></div></div>';
+		$result = gutenberg_block_core_navigation_overlay_html_has_close_block( $html );
+		$this->assertTrue( $result );
+	}
+
+	/**
+	 * Test that gutenberg_block_core_navigation_overlay_html_has_close_block detects close block when overlay content is a pattern.
+	 *
+	 * Simulates the bug scenario: template part contains wp:pattern, pattern renders its content including the close block.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::gutenberg_block_core_navigation_overlay_html_has_close_block
+	 */
+	public function test_block_core_navigation_overlay_html_has_close_block_detects_close_in_pattern_output() {
+		register_block_pattern(
+			'test/navigation-overlay-pattern',
+			array(
+				'title'       => 'Navigation Overlay Pattern',
+				'content'     => '<!-- wp:group --><div class="wp-block-group"><!-- wp:navigation-overlay-close /--></div><!-- /wp:group -->',
+				'description' => 'Pattern containing navigation-overlay-close (simulates overlay template part using pattern).',
+				'categories'  => array( 'navigation' ),
+			)
+		);
+
+		try {
+			// Simulate overlay template part content: just a pattern block (unresolved in block tree).
+			$parsed_blocks = parse_blocks( '<!-- wp:pattern {"slug":"test/navigation-overlay-pattern"} /-->' );
+			$blocks        = new WP_Block_List( $parsed_blocks, array() );
+
+			// Render blocks (pattern block's render_callback outputs pattern content).
+			$html = '';
+			foreach ( $blocks as $block ) {
+				$html .= $block->render();
+			}
+
+			$this->assertTrue(
+				gutenberg_block_core_navigation_overlay_html_has_close_block( $html ),
+				'Close block should be detected in rendered pattern output (fixes #76567).'
+			);
+		} finally {
+			unregister_block_pattern( 'test/navigation-overlay-pattern' );
+		}
+	}
+
+	/**
 	 * Test that gutenberg_block_core_navigation_block_tree_has_block_type skips searching inside specified block types.
 	 *
 	 * @group navigation-renderer

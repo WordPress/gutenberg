@@ -90,7 +90,6 @@ function render() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -103,7 +102,6 @@ function save() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -116,7 +114,6 @@ const save = () => {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -129,7 +126,6 @@ const save = function() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -142,7 +138,6 @@ export default function save() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -157,7 +152,6 @@ const settings = {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -170,7 +164,6 @@ const settings = {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -183,7 +176,6 @@ function save() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -197,7 +189,6 @@ function save() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -211,7 +202,6 @@ function save() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -228,7 +218,6 @@ function save() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -243,11 +232,9 @@ function save() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -262,7 +249,6 @@ function save() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
