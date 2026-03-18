@@ -140,6 +140,10 @@ tsRuleTester.run( 'no-dom-globals-in-module-scope (TypeScript)', rule, {
 			// TSTypeQuery — typeof in type position.
 			code: 'type Win = typeof window;',
 		},
+		{
+			// TSQualifiedName — DOM global as left side of a qualified type name.
+			code: 'type DocType = typeof window.document;',
+		},
 	],
 	invalid: [
 		{
