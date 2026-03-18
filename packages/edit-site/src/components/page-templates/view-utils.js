@@ -43,6 +43,7 @@ export function getActiveViewOverridesForTab( activeView ) {
 				field: 'author',
 				operator: 'isAny',
 				value: [ activeView ],
+				isLocked: true,
 			},
 		],
 	};
