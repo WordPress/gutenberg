@@ -5,7 +5,8 @@
  * @babel/eslint-parser v7 uses an older eslint-scope that does not have
  * this method. This wrapper patches the scope manager when needed.
  *
- * TODO: Remove this wrapper when @babel/eslint-parser supports ESLint v10.
+ * TODO: Remove this wrapper when upgrading to @babel/eslint-parser v8+,
+ * which adds native ESLint v10 support (requires @babel/core v8).
  * See https://github.com/babel/babel/issues/17791
  */
 const babelParser = require( '@babel/eslint-parser' );
