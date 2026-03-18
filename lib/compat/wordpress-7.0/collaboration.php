@@ -142,7 +142,7 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 function gutenberg_inject_real_time_collaboration_setting() {
 	global $pagenow;
 
-	if ( ! get_option( 'wp_collaboration_enabled' ) ) {
+	if ( ! get_option( 'wp_collaboration_enabled' ) || ! get_option( 'wp_enable_real_time_collaboration' ) ) {
 		return;
 	}
 

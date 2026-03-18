@@ -349,9 +349,6 @@ export async function setCollaboration(
 
 	formData[ optionName ] = optionValue;
 
-	// Also set it for the previous option name until it is merged into Core.
-	formData.wp_enable_real_time_collaboration = optionValue;
-
 	await requestUtils.request.post( '/wp-admin/options.php', {
 		form: formData,
 		failOnStatusCode: true,
