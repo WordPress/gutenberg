@@ -7,7 +7,6 @@ describe( 'getQueryParts', () => {
 	it( 'parses out pagination data', () => {
 		const parts = getQueryParts( { page: 2, per_page: 2 } );
 
-		// Use toEqual here to pin the complete return shape.
 		expect( parts ).toEqual( {
 			context: 'default',
 			page: 2,
@@ -26,10 +25,11 @@ describe( 'getQueryParts', () => {
 
 		expect( first ).toEqual( second );
 		expect( second ).toEqual( parts );
-		expect( parts ).toMatchObject( {
+		expect( parts ).toEqual( {
 			context: 'default',
 			page: 1,
 			perPage: 10,
+			offset: undefined,
 			stableKey: 'include=1',
 			fields: null,
 			include: [ 1 ],
@@ -41,10 +41,11 @@ describe( 'getQueryParts', () => {
 		const second = getQueryParts( { b: 2, '?': '&' } );
 
 		expect( first ).toEqual( second );
-		expect( first ).toMatchObject( {
+		expect( first ).toEqual( {
 			context: 'default',
 			page: 1,
 			perPage: 10,
+			offset: undefined,
 			stableKey: '%3F=%26&b=2',
 			fields: null,
 			include: null,
@@ -54,10 +55,11 @@ describe( 'getQueryParts', () => {
 	it( 'encodes deep values', () => {
 		const parts = getQueryParts( { a: [ 1, 2 ] } );
 
-		expect( parts ).toMatchObject( {
+		expect( parts ).toEqual( {
 			context: 'default',
 			page: 1,
 			perPage: 10,
+			offset: undefined,
 			stableKey: 'a%5B0%5D=1&a%5B1%5D=2',
 			fields: null,
 			include: null,
@@ -69,10 +71,11 @@ describe( 'getQueryParts', () => {
 		const second = getQueryParts( { b: 2, page: '1', per_page: '10' } );
 
 		expect( first ).toEqual( second );
-		expect( first ).toMatchObject( {
+		expect( first ).toEqual( {
 			context: 'default',
 			page: 1,
 			perPage: 10,
+			offset: undefined,
 			stableKey: 'b=2',
 			fields: null,
 			include: null,
@@ -82,10 +85,11 @@ describe( 'getQueryParts', () => {
 	it( 'returns -1 for unlimited queries', () => {
 		const parts = getQueryParts( { b: 2, page: 1, per_page: -1 } );
 
-		expect( parts ).toMatchObject( {
+		expect( parts ).toEqual( {
 			context: 'default',
 			page: 1,
 			perPage: -1,
+			offset: undefined,
 			stableKey: 'b=2',
 			fields: null,
 			include: null,
@@ -95,10 +99,11 @@ describe( 'getQueryParts', () => {
 	it( 'encodes stable string key with fields parameters', () => {
 		const parts = getQueryParts( { _fields: [ 'id', 'title' ] } );
 
-		expect( parts ).toMatchObject( {
+		expect( parts ).toEqual( {
 			context: 'default',
 			page: 1,
 			perPage: 10,
+			offset: undefined,
 			stableKey: '_fields=id%2Ctitle',
 			fields: [ 'id', 'title' ],
 			include: null,
@@ -108,9 +113,10 @@ describe( 'getQueryParts', () => {
 	it( 'returns the context as a dedicated query part', () => {
 		const parts = getQueryParts( { context: 'view' } );
 
-		expect( parts ).toMatchObject( {
+		expect( parts ).toEqual( {
 			page: 1,
 			perPage: 10,
+			offset: undefined,
 			stableKey: '',
 			include: null,
 			fields: null,
@@ -124,7 +130,7 @@ describe( 'getQueryParts', () => {
 			offset: 100,
 		} );
 
-		expect( parts ).toMatchObject( {
+		expect( parts ).toEqual( {
 			context: 'default',
 			page: 1,
 			perPage: 50,
