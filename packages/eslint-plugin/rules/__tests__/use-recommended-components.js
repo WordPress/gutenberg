@@ -11,7 +11,7 @@ import { RuleTester } from 'eslint';
 import rule, { ALLOWLIST, DENYLIST } from '../use-recommended-components';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		sourceType: 'module',
 		ecmaVersion: 6,
 	},

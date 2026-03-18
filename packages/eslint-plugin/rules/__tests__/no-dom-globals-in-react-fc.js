@@ -9,10 +9,12 @@ import { RuleTester } from 'eslint';
 import rule from '../no-dom-globals-in-react-fc';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 2020,
 		sourceType: 'module',
-		ecmaFeatures: { jsx: true },
+		parserOptions: {
+			ecmaFeatures: { jsx: true },
+		},
 	},
 } );
 

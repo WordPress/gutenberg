@@ -9,10 +9,12 @@ import { RuleTester } from 'eslint';
 import rule from '../no-dom-globals-in-module-scope';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 2020,
 		sourceType: 'module',
-		ecmaFeatures: { jsx: true },
+		parserOptions: {
+			ecmaFeatures: { jsx: true },
+		},
 	},
 } );
 
@@ -33,7 +35,7 @@ ruleTester.run( 'no-dom-globals-in-module-scope', rule, {
 		{
 			// Function scope in a script file should not be flagged.
 			code: 'function foo() { window.scrollTo(0, 0); }',
-			parserOptions: { ecmaVersion: 2020, sourceType: 'script' },
+			languageOptions: { ecmaVersion: 2020, sourceType: 'script' },
 		},
 		// Shared globals (browser + node) should NOT be flagged.
 		{
