@@ -97,6 +97,17 @@ export function useInfiniteScroll( {
 		viewportOffset: number;
 		direction: 'up' | 'down' | null;
 	} | null >( null );
+	const viewRef = useRef( view );
+	const isLoadingRef = useRef( isLoading );
+	const onChangeViewRef = useRef( onChangeView );
+	const totalItemsRef = useRef( paginationInfo.totalItems );
+
+	useLayoutEffect( () => {
+		viewRef.current = view;
+		isLoadingRef.current = isLoading;
+		onChangeViewRef.current = onChangeView;
+		totalItemsRef.current = paginationInfo.totalItems;
+	}, [ view, isLoading, onChangeView, paginationInfo.totalItems ] );
 
 	const intersectionObserverCallback: IntersectionObserverCallback =
 		useCallback(
@@ -213,6 +224,8 @@ export function useInfiniteScroll( {
 		const TOP_THRESHOLD = 800; // px from top to trigger load
 
 		const handleScroll = throttle( ( event: unknown ) => {
+			const currentView = viewRef.current;
+			const totalItems = totalItemsRef.current;
 			const target = ( event as Event ).target as HTMLElement;
 			const scrollTop = target.scrollTop;
 			const scrollHeight = target.scrollHeight;
@@ -223,15 +236,15 @@ export function useInfiniteScroll( {
 			lastScrollTop = scrollTop;
 
 			// Don't trigger if already loading
-			if ( isLoading ) {
+			if ( isLoadingRef.current ) {
 				return;
 			}
 
-			const currentStartPosition = view.startPosition || 1;
-			const batchSize = view.perPage || 10;
+			const currentStartPosition = currentView.startPosition || 1;
+			const batchSize = currentView.perPage || 10;
 			const currentEndPosition = Math.min(
 				currentStartPosition + batchSize,
-				paginationInfo.totalItems
+				totalItems
 			);
 
 			// Check if user has scrolled near the bottom
@@ -240,14 +253,14 @@ export function useInfiniteScroll( {
 				scrollTop + clientHeight >= scrollHeight - BOTTOM_THRESHOLD
 			) {
 				// Check if there's more data to load
-				if ( currentEndPosition < paginationInfo.totalItems ) {
+				if ( currentEndPosition < totalItems ) {
 					const newStartPosition = currentEndPosition;
 
 					// Capture anchor element for scroll position preservation
 					captureAnchorElement( target, anchorElementRef, 'down' );
 
-					onChangeView( {
-						...view,
+					onChangeViewRef.current( {
+						...currentView,
 						startPosition: newStartPosition,
 					} );
 				}
@@ -268,8 +281,8 @@ export function useInfiniteScroll( {
 					// Capture anchor element for scroll position preservation
 					captureAnchorElement( target, anchorElementRef, 'up' );
 
-					onChangeView( {
-						...view,
+					onChangeViewRef.current( {
+						...currentView,
 						startPosition: newStartPosition,
 					} );
 				}
@@ -283,13 +296,7 @@ export function useInfiniteScroll( {
 			container.removeEventListener( 'scroll', handleScroll );
 			handleScroll.cancel(); // Cancel any pending throttled calls
 		};
-	}, [
-		containerRef,
-		isLoading,
-		onChangeView,
-		paginationInfo.totalItems,
-		view,
-	] );
+	}, [ containerRef, view.infiniteScrollEnabled ] );
 
 	return {
 		intersectionObserver: intersectionObserverRef.current,
