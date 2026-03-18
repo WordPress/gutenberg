@@ -255,7 +255,7 @@ function SuggestionsGroup() {
 
 	return (
 		<Command.Group heading={ __( 'Suggestions' ) }>
-			<CommandList commands={ commands } loaders={ loaders } />
+			<CommandList search="" commands={ commands } loaders={ loaders } />
 		</Command.Group>
 	);
 }
