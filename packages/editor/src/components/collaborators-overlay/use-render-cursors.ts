@@ -1,5 +1,4 @@
-import type {
-	ResolvedSelection,
+import {
 	privateApis as coreDataPrivateApis,
 	SelectionType,
 } from '@wordpress/core-data';
