@@ -254,6 +254,8 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			return $this->add_additional_fields_schema( $this->schema );
 		}
 
+		$view_base_properties = $this->get_view_base_schema();
+
 		$this->schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
 			'title'      => 'view-config',
@@ -273,91 +275,74 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					'description' => __( 'Default view configuration.', 'gutenberg' ),
 					'type'        => 'object',
 					'readonly'    => true,
-					'properties'  => array(
-						'type'                  => array(
-							'type' => 'string',
-						),
-						'search'                => array(
-							'type' => 'string',
-						),
-						'filters'               => array(
-							'type'  => 'array',
-							'items' => array(
-								'type' => 'object',
-							),
-						),
-						'sort'                  => array(
-							'type'       => 'object',
-							'properties' => array(
-								'field'     => array(
-									'type' => 'string',
-								),
-								'direction' => array(
-									'type' => 'string',
-									'enum' => array( 'asc', 'desc' ),
-								),
-							),
-						),
-						'page'                  => array(
-							'type' => 'integer',
-						),
-						'perPage'               => array(
-							'type' => 'integer',
-						),
-						'fields'                => array(
-							'type'  => 'array',
-							'items' => array(
+					'properties'  => array_merge(
+						array(
+							'type' => array(
 								'type' => 'string',
 							),
 						),
-						'titleField'            => array(
-							'type' => 'string',
-						),
-						'mediaField'            => array(
-							'type' => 'string',
-						),
-						'descriptionField'      => array(
-							'type' => 'string',
-						),
-						'showTitle'             => array(
-							'type' => 'boolean',
-						),
-						'showMedia'             => array(
-							'type' => 'boolean',
-						),
-						'showDescription'       => array(
-							'type' => 'boolean',
-						),
-						'showLevels'            => array(
-							'type' => 'boolean',
-						),
-						'groupBy'               => array(
-							'type'       => 'object',
-							'properties' => array(
-								'field'     => array(
-									'type' => 'string',
-								),
-								'direction' => array(
-									'type' => 'string',
-									'enum' => array( 'asc', 'desc' ),
-								),
-								'showLabel' => array(
-									'type'    => 'boolean',
-									'default' => true,
-								),
-							),
-						),
-						'infiniteScrollEnabled' => array(
-							'type' => 'boolean',
-						),
+						$view_base_properties
 					),
 				),
 				'default_layouts' => array(
-					'description'          => __( 'Default layout configurations.', 'gutenberg' ),
-					'type'                 => 'object',
-					'readonly'             => true,
-					'additionalProperties' => array(
-						'type' => 'object',
+					'description' => __( 'Default layout configurations.', 'gutenberg' ),
+					'type'        => 'object',
+					'readonly'    => true,
+					'properties'  => array(
+						'table'       => array(
+							'type'       => 'object',
+							'properties' => array_merge(
+								$view_base_properties,
+								array(
+									'layout' => $this->get_table_layout_schema(),
+								)
+							),
+						),
+						'list'        => array(
+							'type'       => 'object',
+							'properties' => array_merge(
+								$view_base_properties,
+								array(
+									'layout' => $this->get_list_layout_schema(),
+								)
+							),
+						),
+						'grid'        => array(
+							'type'       => 'object',
+							'properties' => array_merge(
+								$view_base_properties,
+								array(
+									'layout' => $this->get_grid_layout_schema(),
+								)
+							),
+						),
+						'activity'    => array(
+							'type'       => 'object',
+							'properties' => array_merge(
+								$view_base_properties,
+								array(
+									'layout' => $this->get_list_layout_schema(),
+								)
+							),
+						),
+						'pickerGrid'  => array(
+							'type'       => 'object',
+							'properties' => array_merge(
+								$view_base_properties,
+								array(
+									'layout' => $this->get_grid_layout_schema(),
+								)
+							),
+						),
+						'pickerTable' => array(
+							'type'       => 'object',
+							'properties' => array_merge(
+								$view_base_properties,
+								array(
+									'layout' => $this->get_table_layout_schema(),
+								)
+							),
+						),
 					),
 				),
 				'view_list'       => array(
@@ -374,7 +359,16 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 								'type' => 'string',
 							),
 							'view'  => array(
-								'type' => 'object',
+								'type'       => 'object',
+								'properties' => array_merge(
+									array(
+										'type'   => array(
+											'type' => 'string',
+										),
+										'layout' => $this->get_combined_layout_schema(),
+									),
+									$view_base_properties
+								),
 							),
 						),
 					),
@@ -383,5 +377,226 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		);
 
 		return $this->add_additional_fields_schema( $this->schema );
+	}
+
+	/**
+	 * Returns the schema properties shared by all view types (ViewBase), excluding 'type'.
+	 *
+	 * @return array Schema properties for the base view configuration.
+	 */
+	private function get_view_base_schema() {
+		return array(
+			'search'                => array(
+				'type' => 'string',
+			),
+			'filters'               => array(
+				'type'  => 'array',
+				'items' => array(
+					'type'       => 'object',
+					'properties' => array(
+						'field'    => array(
+							'type' => 'string',
+						),
+						'operator' => array(
+							'type' => 'string',
+							'enum' => array(
+								'is',
+								'isNot',
+								'isAny',
+								'isNone',
+								'isAll',
+								'isNotAll',
+								'lessThan',
+								'greaterThan',
+								'lessThanOrEqual',
+								'greaterThanOrEqual',
+								'before',
+								'after',
+							),
+						),
+						'value'    => array(),
+						'isLocked' => array(
+							'type' => 'boolean',
+						),
+					),
+				),
+			),
+			'sort'                  => array(
+				'type'       => 'object',
+				'properties' => array(
+					'field'     => array(
+						'type' => 'string',
+					),
+					'direction' => array(
+						'type' => 'string',
+						'enum' => array( 'asc', 'desc' ),
+					),
+				),
+			),
+			'page'                  => array(
+				'type' => 'integer',
+			),
+			'perPage'               => array(
+				'type' => 'integer',
+			),
+			'fields'                => array(
+				'type'  => 'array',
+				'items' => array(
+					'type' => 'string',
+				),
+			),
+			'titleField'            => array(
+				'type' => 'string',
+			),
+			'mediaField'            => array(
+				'type' => 'string',
+			),
+			'descriptionField'      => array(
+				'type' => 'string',
+			),
+			'showTitle'             => array(
+				'type' => 'boolean',
+			),
+			'showMedia'             => array(
+				'type' => 'boolean',
+			),
+			'showDescription'       => array(
+				'type' => 'boolean',
+			),
+			'showLevels'            => array(
+				'type' => 'boolean',
+			),
+			'groupBy'               => array(
+				'type'       => 'object',
+				'properties' => array(
+					'field'     => array(
+						'type' => 'string',
+					),
+					'direction' => array(
+						'type' => 'string',
+						'enum' => array( 'asc', 'desc' ),
+					),
+					'showLabel' => array(
+						'type'    => 'boolean',
+						'default' => true,
+					),
+				),
+			),
+			'infiniteScrollEnabled' => array(
+				'type' => 'boolean',
+			),
+		);
+	}
+
+	/**
+	 * Returns the schema for the ColumnStyle type.
+	 *
+	 * @return array Schema for a column style object.
+	 */
+	private function get_column_style_schema() {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'width'    => array(
+					'type' => array( 'string', 'number' ),
+				),
+				'maxWidth' => array(
+					'type' => array( 'string', 'number' ),
+				),
+				'minWidth' => array(
+					'type' => array( 'string', 'number' ),
+				),
+				'align'    => array(
+					'type' => 'string',
+					'enum' => array( 'start', 'center', 'end' ),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Returns the layout schema for table-type views (ViewTable, ViewPickerTable).
+	 *
+	 * @return array Schema for a table layout object.
+	 */
+	private function get_table_layout_schema() {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'styles'       => array(
+					'type'                 => 'object',
+					'additionalProperties' => $this->get_column_style_schema(),
+				),
+				'density'      => array(
+					'type' => 'string',
+					'enum' => array( 'compact', 'balanced', 'comfortable' ),
+				),
+				'enableMoving' => array(
+					'type' => 'boolean',
+				),
+			),
+		);
+	}
+
+	/**
+	 * Returns the layout schema for list-type views (ViewList, ViewActivity).
+	 *
+	 * @return array Schema for a list layout object.
+	 */
+	private function get_list_layout_schema() {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'density' => array(
+					'type' => 'string',
+					'enum' => array( 'compact', 'balanced', 'comfortable' ),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Returns a combined layout schema that accepts properties from all view types.
+	 *
+	 * This is useful for contexts where the view type is not known ahead of time
+	 * (e.g. the `view` override in a view list item), so all possible layout
+	 * properties must be accepted.
+	 *
+	 * @return array Schema for a combined layout object.
+	 */
+	private function get_combined_layout_schema() {
+		return array(
+			'type'       => 'object',
+			'properties' => array_merge(
+				$this->get_table_layout_schema()['properties'],
+				$this->get_grid_layout_schema()['properties']
+			),
+		);
+	}
+
+	/**
+	 * Returns the layout schema for grid-type views (ViewGrid, ViewPickerGrid).
+	 *
+	 * @return array Schema for a grid layout object.
+	 */
+	private function get_grid_layout_schema() {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'badgeFields' => array(
+					'type'  => 'array',
+					'items' => array(
+						'type' => 'string',
+					),
+				),
+				'previewSize' => array(
+					'type' => 'number',
+				),
+				'density'     => array(
+					'type' => 'string',
+					'enum' => array( 'compact', 'balanced', 'comfortable' ),
+				),
+			),
+		);
 	}
 }
