@@ -2,7 +2,8 @@
  * External dependencies
  */
 const globals = require( 'globals' );
-const importPlugin = require( 'eslint-plugin-import' );
+const { fixupPluginRules } = require( '@eslint/compat' );
+const importPlugin = fixupPluginRules( require( 'eslint-plugin-import' ) );
 
 /**
  * Internal dependencies

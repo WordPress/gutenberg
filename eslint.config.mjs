@@ -79,8 +79,7 @@ const developmentFiles = [
 const glob = require( 'glob' ).sync;
 const typedFiles = glob( 'packages/*/package.json' )
 	.filter(
-		( fileName ) =>
-			require( join( import.meta.dirname, fileName ) ).types
+		( fileName ) => require( join( import.meta.dirname, fileName ) ).types
 	)
 	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js' ) );
 
@@ -496,8 +495,7 @@ export default dedupePlugins( [
 				'error',
 				{
 					selector: 'CallExpression[callee.property.name="$"]',
-					message:
-						'`$` is discouraged, please use `locator` instead',
+					message: '`$` is discouraged, please use `locator` instead',
 				},
 				{
 					selector: 'CallExpression[callee.property.name="$$"]',
@@ -653,10 +651,9 @@ export default dedupePlugins( [
 				{
 					paths: restrictedImports.filter(
 						( { name } ) =>
-							! [
-								'@ariakit/react',
-								'framer-motion',
-							].includes( name )
+							! [ '@ariakit/react', 'framer-motion' ].includes(
+								name
+							)
 					),
 				},
 			],
@@ -671,8 +668,7 @@ export default dedupePlugins( [
 				'error',
 				{
 					paths: restrictedImports.filter(
-						( { name } ) =>
-							! [ '@base-ui/react' ].includes( name )
+						( { name } ) => ! [ '@base-ui/react' ].includes( name )
 					),
 				},
 			],
@@ -772,14 +768,10 @@ export default dedupePlugins( [
 	// Add test-unit config for shared-tests.js with jest/no-export off.
 	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
 		...config,
-		files: [
-			'packages/block-serialization-spec-parser/shared-tests.js',
-		],
+		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
 	} ) ),
 	{
-		files: [
-			'packages/block-serialization-spec-parser/shared-tests.js',
-		],
+		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
 		rules: {
 			'jest/no-export': 'off',
 		},
@@ -806,6 +798,21 @@ export default dedupePlugins( [
 		],
 		rules: {
 			'react-hooks/rules-of-hooks': 'off',
+		},
+	},
+
+	// Override: Files with pre-existing exhaustive-deps warnings that cannot use
+	// inline eslint-disable comments (react-compiler flags those as errors).
+	{
+		files: [
+			'packages/block-editor/src/components/inserter/media-tab/hooks.js',
+			'packages/block-editor/src/components/use-paste-styles/index.js',
+			'packages/block-library/src/pattern/edit.js',
+			'packages/components/src/sandbox/index.tsx',
+			'packages/components/src/sandbox/index.native.js',
+		],
+		rules: {
+			'react-hooks/exhaustive-deps': 'off',
 		},
 	},
 
