@@ -20,24 +20,21 @@ if ( isPackageInstalled( 'prettier' ) ) {
 	const defaultPrettierConfig = require( '@wordpress/prettier-config' );
 	const prettierConfig = { ...defaultPrettierConfig, ...localPrettierConfig };
 
-	config.push(
-		eslintConfigPrettier,
-		{
-			plugins: {
-				prettier: eslintPluginPrettier,
-			},
-			rules: {
-				...eslintConfigPrettier.rules,
-				'prettier/prettier': [ 'error', prettierConfig ],
-				// Prettier _disables_ this rule, but we want it!
-				// See https://github.com/prettier/eslint-config-prettier?tab=readme-ov-file#curly
-				// > This rule requires certain options.
-				// > …
-				// > If you like this rule, it can be used just fine with Prettier as long as you don't use the "multi-line" or "multi-or-nest" option.
-				curly: [ 'error', 'all' ],
-			},
-		}
-	);
+	config.push( eslintConfigPrettier, {
+		plugins: {
+			prettier: eslintPluginPrettier,
+		},
+		rules: {
+			...eslintConfigPrettier.rules,
+			'prettier/prettier': [ 'error', prettierConfig ],
+			// Prettier _disables_ this rule, but we want it!
+			// See https://github.com/prettier/eslint-config-prettier?tab=readme-ov-file#curly
+			// > This rule requires certain options.
+			// > …
+			// > If you like this rule, it can be used just fine with Prettier as long as you don't use the "multi-line" or "multi-or-nest" option.
+			curly: [ 'error', 'all' ],
+		},
+	} );
 }
 
 if ( isPackageInstalled( 'typescript' ) ) {

@@ -36,9 +36,7 @@ if ( ! hasBabelConfig() ) {
 				requireConfigFile: false,
 				babelOptions: {
 					presets: [
-						require.resolve(
-							'@wordpress/babel-preset-default'
-						),
+						require.resolve( '@wordpress/babel-preset-default' ),
 					],
 				},
 			},

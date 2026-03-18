@@ -30,8 +30,7 @@ module.exports = [
 				{
 					selector:
 						'ImportDeclaration[source.value="lodash"] Identifier.imported[name="memoize"]',
-					message:
-						"Use memize instead of Lodash\u2019s memoize",
+					message: 'Use memize instead of Lodash\u2019s memoize',
 				},
 				{
 					selector:
@@ -57,9 +56,7 @@ module.exports = [
 
 	// Device test globals and rules.
 	{
-		files: [
-			'packages/react-native-editor/__device-tests__/**/*.js',
-		],
+		files: [ 'packages/react-native-editor/__device-tests__/**/*.js' ],
 		languageOptions: {
 			globals: {
 				editorPage: true,

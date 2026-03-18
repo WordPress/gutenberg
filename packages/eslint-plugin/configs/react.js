@@ -20,8 +20,7 @@ module.exports = [
 			react: fixedReactPlugin,
 		},
 		rules: reactPlugin.configs.flat.recommended.rules,
-		languageOptions:
-			reactPlugin.configs.flat.recommended.languageOptions,
+		languageOptions: reactPlugin.configs.flat.recommended.languageOptions,
 	},
 	{
 		plugins: {
