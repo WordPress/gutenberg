@@ -66,10 +66,6 @@ export default function RevisionBlockDiffPanel() {
 		)
 	);
 
-	if ( fields.length === 0 ) {
-		return null;
-	}
-
 	return (
 		<PanelBody title={ __( 'Changed attributes' ) } initialOpen>
 			{ fields }
