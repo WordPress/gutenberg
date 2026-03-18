@@ -21,7 +21,6 @@ const AdvancedControls = ( { initialOpen = false } ) => {
 	const privateFills = useSlotFills(
 		PrivateInspectorControlsAllowedBlocks.name
 	);
-
 	const hasFills = Boolean( fills && fills.length );
 	const hasPrivateFills = Boolean( privateFills && privateFills.length );
 
