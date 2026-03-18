@@ -59,17 +59,29 @@ export default {
 		const { getEntityRecord } = select( coreDataStore );
 
 		/*
-		 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.
-		 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
+		 * Three-tier fallback for entity ID resolution:
+		 * 1. Args-first: Read from binding args (new WP 7.0+ navigation links)
+		 * 2. Backward compat: Read from block attributes (WP 6.9+ navigation links)
+		 * 3. Context: Read from block context (all other blocks)
 		 */
 		const { getBlockAttributes, getBlockName } = select( blockEditorStore );
 		const blockName = getBlockName( clientId );
 		const isNavigationBlock = NAVIGATION_BLOCK_TYPES.includes( blockName );
 
+		const firstBinding = Object.values( bindings )[ 0 ];
 		let termDataValues;
 
-		if ( isNavigationBlock ) {
-			// Navigation blocks: read from block attributes
+		if ( firstBinding?.args?.id !== undefined ) {
+			// Tier 1: Explicit args (new navigation links, WP 7.0+)
+			const type = firstBinding.args.type ?? '';
+			const taxonomy = type === 'tag' ? 'post_tag' : type;
+			termDataValues = getEntityRecord(
+				'taxonomy',
+				taxonomy,
+				firstBinding.args.id
+			);
+		} else if ( isNavigationBlock ) {
+			// Tier 2: Backward compat (existing navigation links without id in args)
 			const blockAttributes = getBlockAttributes( clientId );
 			const typeFromAttributes = blockAttributes?.type;
 			const taxonomy =
@@ -80,7 +92,7 @@ export default {
 				blockAttributes?.id
 			);
 		} else if ( context.termId && context.taxonomy ) {
-			// All other blocks: use context
+			// Tier 3: Standard context (all other blocks)
 			termDataValues = getEntityRecord(
 				'taxonomy',
 				context.taxonomy,

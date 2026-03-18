@@ -18,11 +18,13 @@ add_filter(
 		if ( 'core/post-date' === $block_type && ! in_array( 'datetime', $attributes, true ) ) {
 			$attributes[] = 'datetime';
 		}
-		if (
-			in_array( $block_type, array( 'core/navigation-link', 'core/navigation-submenu' ), true ) &&
-			! in_array( 'url', $attributes, true )
-		) {
-			$attributes[] = 'url';
+		if ( in_array( $block_type, array( 'core/navigation-link', 'core/navigation-submenu' ), true ) ) {
+			if ( ! in_array( 'url', $attributes, true ) ) {
+				$attributes[] = 'url';
+			}
+			if ( ! in_array( 'id', $attributes, true ) ) {
+				$attributes[] = 'id';
+			}
 		}
 		return $attributes;
 	},

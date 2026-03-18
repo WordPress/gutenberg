@@ -7,18 +7,15 @@
  */
 import { renderHook, act } from '@testing-library/react';
 
-/**
- * Internal dependencies
- */
-import {
-	useEntityBinding,
-	buildNavigationLinkEntityBinding,
-} from '../use-entity-binding';
-
 // Mock the entire @wordpress/block-editor module
 jest.mock( '@wordpress/block-editor', () => ( {
 	useBlockBindingsUtils: jest.fn(),
 	useBlockEditingMode: jest.fn(),
+} ) );
+
+// Mock getBlockBindingsSource from @wordpress/blocks
+jest.mock( '@wordpress/blocks', () => ( {
+	getBlockBindingsSource: jest.fn(),
 } ) );
 
 // Mock useSelect specifically to avoid needing to set up full data store
@@ -35,6 +32,15 @@ import {
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { getBlockBindingsSource } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import {
+	useEntityBinding,
+	buildNavigationLinkEntityBinding,
+} from '../use-entity-binding';
 
 describe( 'useEntityBinding', () => {
 	const mockUpdateBlockBindings = jest.fn();
@@ -46,6 +52,17 @@ describe( 'useEntityBinding', () => {
 		} );
 		useBlockEditingMode.mockReturnValue( 'default' );
 		useSelect.mockReturnValue( true );
+
+		// Mock getBlockBindingsSource to return truthy for core sources, falsy for others
+		getBlockBindingsSource.mockImplementation( ( sourceName ) => {
+			if (
+				sourceName === 'core/post-data' ||
+				sourceName === 'core/term-data'
+			) {
+				return { name: sourceName };
+			}
+			return null;
+		} );
 	} );
 
 	describe( 'hasUrlBinding', () => {
@@ -113,7 +130,7 @@ describe( 'useEntityBinding', () => {
 			expect( result.current.hasUrlBinding ).toBe( true );
 		} );
 
-		it( 'should return false when source is not core/post-data or core/term-data', () => {
+		it( 'should return false when source is not registered', () => {
 			const attributes = {
 				metadata: {
 					bindings: {
@@ -135,6 +152,42 @@ describe( 'useEntityBinding', () => {
 			);
 
 			expect( result.current.hasUrlBinding ).toBe( false );
+		} );
+
+		it( 'should return true when custom registered source is used', () => {
+			// Mock a custom registered source
+			getBlockBindingsSource.mockImplementation( ( sourceName ) => {
+				if (
+					sourceName === 'core/post-data' ||
+					sourceName === 'core/term-data' ||
+					sourceName === 'woocommerce/policy-pages'
+				) {
+					return { name: sourceName };
+				}
+				return null;
+			} );
+
+			const attributes = {
+				metadata: {
+					bindings: {
+						url: {
+							source: 'woocommerce/policy-pages',
+							args: { key: 'privacy' },
+						},
+					},
+				},
+				id: 123,
+				kind: 'post-type',
+			};
+
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes,
+				} )
+			);
+
+			expect( result.current.hasUrlBinding ).toBe( true );
 		} );
 
 		it( 'should return false when core/post-data binding exists but no id', () => {
@@ -267,7 +320,8 @@ describe( 'useEntityBinding', () => {
 	it( 'should create core/post-data binding when createBinding is called for post-type', () => {
 		const attributes = {
 			metadata: {},
-			id: null,
+			id: 42,
+			type: 'page',
 			kind: 'post-type',
 		};
 
@@ -287,28 +341,46 @@ describe( 'useEntityBinding', () => {
 				source: 'core/post-data',
 				args: {
 					field: 'link',
+					id: 42,
+					type: 'page',
 				},
 			},
 		} );
 	} );
 
 	describe( 'buildNavigationLinkEntityBinding', () => {
-		it( 'returns correct binding for post-type', () => {
-			const binding = buildNavigationLinkEntityBinding( 'post-type' );
+		it( 'returns correct binding for post-type with new args format', () => {
+			const binding = buildNavigationLinkEntityBinding(
+				'post-type',
+				42,
+				'page'
+			);
 			expect( binding ).toEqual( {
 				url: {
 					source: 'core/post-data',
-					args: { field: 'link' },
+					args: {
+						field: 'link',
+						id: 42,
+						type: 'page',
+					},
 				},
 			} );
 		} );
 
-		it( 'returns correct binding for taxonomy', () => {
-			const binding = buildNavigationLinkEntityBinding( 'taxonomy' );
+		it( 'returns correct binding for taxonomy with new args format', () => {
+			const binding = buildNavigationLinkEntityBinding(
+				'taxonomy',
+				123,
+				'category'
+			);
 			expect( binding ).toEqual( {
 				url: {
 					source: 'core/term-data',
-					args: { field: 'link' },
+					args: {
+						field: 'link',
+						id: 123,
+						type: 'category',
+					},
 				},
 			} );
 		} );
@@ -323,19 +395,19 @@ describe( 'useEntityBinding', () => {
 
 		it( 'throws error for invalid kind', () => {
 			expect( () => {
-				buildNavigationLinkEntityBinding( 'invalid-kind' );
+				buildNavigationLinkEntityBinding( 'invalid-kind', 42, 'page' );
 			} ).toThrow( 'Invalid kind "invalid-kind"' );
 		} );
 
 		it( 'throws error for null kind', () => {
 			expect( () => {
-				buildNavigationLinkEntityBinding( null );
+				buildNavigationLinkEntityBinding( null, 42, 'page' );
 			} ).toThrow( 'Invalid kind "null"' );
 		} );
 
 		it( 'throws error for empty string', () => {
 			expect( () => {
-				buildNavigationLinkEntityBinding( '' );
+				buildNavigationLinkEntityBinding( '', 42, 'page' );
 			} ).toThrow( 'Invalid kind ""' );
 		} );
 
@@ -346,7 +418,8 @@ describe( 'useEntityBinding', () => {
 
 			const attributes = {
 				metadata: {},
-				id: null,
+				id: 42,
+				type: 'page',
 				kind: 'invalid-kind',
 			};
 

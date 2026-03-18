@@ -17,6 +17,11 @@ jest.mock( '@wordpress/core-data', () => ( {
 	store: {},
 } ) );
 
+// Mock the @wordpress/blocks module (needed for getBlockBindingsSource in use-entity-binding)
+jest.mock( '@wordpress/blocks', () => ( {
+	getBlockBindingsSource: jest.fn(),
+} ) );
+
 // Mock useDispatch specifically to avoid needing to set up full data store
 jest.mock( '@wordpress/data', () => ( {
 	useDispatch: jest.fn(),

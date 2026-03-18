@@ -8,19 +8,23 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { getBlockBindingsSource } from '@wordpress/blocks';
 
 /**
  * Builds entity binding configuration for navigation link URLs.
  * This function generates the structure used to bind navigation link URLs to their entity sources.
  *
- * Using a function instead of a constant allows for future enhancements where the binding
- * might need dynamic data (e.g., entity ID, context-specific arguments).
+ * The binding includes the entity ID and type in args to support the args-first resolution pattern,
+ * which enables any registered binding source to work with navigation links (not just core/post-data
+ * and core/term-data).
  *
- * @param {('post-type'|'taxonomy')} kind - The kind of entity. Only 'post-type' and 'taxonomy' are supported.
+ * @param {('post-type'|'taxonomy')} kind       - The kind of entity. Only 'post-type' and 'taxonomy' are supported.
+ * @param {number}                   entityId   - The entity ID (post ID or term ID).
+ * @param {string}                   entityType - The entity type (post type name or taxonomy name).
  * @return {Object} Entity binding configuration object
  * @throws {Error} If kind is not 'post-type' or 'taxonomy'
  */
-export function buildNavigationLinkEntityBinding( kind ) {
+export function buildNavigationLinkEntityBinding( kind, entityId, entityType ) {
 	// Validate kind parameter exists.
 	if ( kind === undefined ) {
 		throw new Error(
@@ -44,6 +48,8 @@ export function buildNavigationLinkEntityBinding( kind ) {
 			source,
 			args: {
 				field: 'link',
+				id: entityId,
+				type: entityType,
 			},
 		},
 	};
@@ -66,10 +72,13 @@ export function useEntityBinding( { clientId, attributes } ) {
 	const blockEditingMode = useBlockEditingMode();
 
 	const hasUrlBinding = !! metadata?.bindings?.url && !! id;
-	const expectedSource =
-		kind === 'post-type' ? 'core/post-data' : 'core/term-data';
-	const hasCorrectBinding =
-		hasUrlBinding && metadata?.bindings?.url?.source === expectedSource;
+
+	// Check if the binding source is registered (allows any source, not just core/post-data and core/term-data).
+	const bindingSourceName = metadata?.bindings?.url?.source;
+	const bindingSource = bindingSourceName
+		? getBlockBindingsSource( bindingSourceName )
+		: null;
+	const hasCorrectBinding = hasUrlBinding && !! bindingSource;
 
 	// Check if the bound entity is available (not deleted) and return the entity record.
 	const { isBoundEntityAvailable, entityRecord } = useSelect(
@@ -130,6 +139,8 @@ export function useEntityBinding( { clientId, attributes } ) {
 			// Use updated attributes if provided, otherwise fall back to closure attributes.
 			// updatedAttributes needed to access the most up-to-date data when called synchronously.
 			const kindToUse = updatedAttributes?.kind ?? kind;
+			const idToUse = updatedAttributes?.id ?? id;
+			const typeToUse = updatedAttributes?.type ?? type;
 
 			// Avoid creating binding if no kind is provided.
 			if ( ! kindToUse ) {
@@ -137,7 +148,11 @@ export function useEntityBinding( { clientId, attributes } ) {
 			}
 
 			try {
-				const binding = buildNavigationLinkEntityBinding( kindToUse );
+				const binding = buildNavigationLinkEntityBinding(
+					kindToUse,
+					idToUse,
+					typeToUse
+				);
 				updateBlockBindings( binding );
 			} catch ( error ) {
 				// eslint-disable-next-line no-console
@@ -148,7 +163,7 @@ export function useEntityBinding( { clientId, attributes } ) {
 				// Don't create binding if validation fails.
 			}
 		},
-		[ updateBlockBindings, kind ]
+		[ updateBlockBindings, kind, id, type ]
 	);
 
 	return {
