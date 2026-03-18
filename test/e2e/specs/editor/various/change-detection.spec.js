@@ -501,6 +501,40 @@ test.describe( 'Change detection', () => {
 				.getByRole( 'button', { name: 'Save draft' } )
 		).toBeEnabled();
 	} );
+
+	// See: https://github.com/WordPress/gutenberg/issues/76143.
+	test( 'should not be dirty after autosaving content changes for draft post', async ( {
+		page,
+		editor,
+		changeDetectionUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello World' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'Paragraph' );
+
+		// Force autosave to occur immediately.
+		await Promise.all( [
+			page.evaluate( () =>
+				window.wp.data.dispatch( 'core/editor' ).autosave()
+			),
+			expect(
+				page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'saved' } )
+			).toBeDisabled(),
+		] );
+
+		// With RTC enabled, all autosaves target an autosave revision. Vary our
+		// expectation accordingly.
+		const isRTCEnabled = Boolean(
+			await page.evaluate( () => window._wpCollaborationEnabled )
+		);
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( isRTCEnabled );
+	} );
 } );
 
 class ChangeDetectionUtils {
