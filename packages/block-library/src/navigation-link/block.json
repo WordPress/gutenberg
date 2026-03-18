@@ -45,6 +45,10 @@
 		},
 		"isTopLevelLink": {
 			"type": "boolean"
+		},
+		"readOnly": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [

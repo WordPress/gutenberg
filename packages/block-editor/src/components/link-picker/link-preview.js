@@ -21,13 +21,14 @@ const { Badge } = unlock( componentsPrivateApis );
  * Link preview component that displays the current link information.
  * This is a presentational component meant to be wrapped in a button.
  *
- * @param {Object}        props        - Component props
- * @param {string}        props.title  - Display title for the link
- * @param {string}        props.url    - Display URL for the link
- * @param {string}        props.image  - Optional image URL for the link preview
- * @param {Array<Object>} props.badges - Optional array of badge objects with label and intent
+ * @param {Object}        props          - Component props
+ * @param {string}        props.title    - Display title for the link
+ * @param {string}        props.url      - Display URL for the link
+ * @param {string}        props.image    - Optional image URL for the link preview
+ * @param {Array<Object>} props.badges   - Optional array of badge objects with label and intent
+ * @param {boolean}       props.readOnly - Whether to hide the dropdown chevron icon
  */
-export function LinkPreview( { title, url, image, badges } ) {
+export function LinkPreview( { title, url, image, badges, readOnly = false } ) {
 	return (
 		<HStack justify="space-between" alignment="top">
 			<FlexItem className="link-preview-button__content">
@@ -78,7 +79,12 @@ export function LinkPreview( { title, url, image, badges } ) {
 					</VStack>
 				</HStack>
 			</FlexItem>
-			<Icon icon={ chevronDown } className="link-preview-button__icon" />
+			{ ! readOnly && (
+				<Icon
+					icon={ chevronDown }
+					className="link-preview-button__icon"
+				/>
+			) }
 		</HStack>
 	);
 }

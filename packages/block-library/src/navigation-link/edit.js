@@ -90,7 +90,8 @@ export default function NavigationLinkEdit( {
 	context,
 	clientId,
 } ) {
-	const { id, label, type, url, description, kind, metadata } = attributes;
+	const { id, label, type, url, description, kind, metadata, readOnly } =
+		attributes;
 	const { maxNestingLevel } = context;
 
 	const {
@@ -99,7 +100,10 @@ export default function NavigationLinkEdit( {
 		selectBlock,
 	} = useDispatch( blockEditorStore );
 	// Have the link editing ui open on mount when lacking a url and selected.
-	const [ isLinkOpen, setIsLinkOpen ] = useState( isSelected && ! url );
+	// Don't open if readOnly is true.
+	const [ isLinkOpen, setIsLinkOpen ] = useState(
+		isSelected && ! url && ! readOnly
+	);
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -356,7 +360,7 @@ export default function NavigationLinkEdit( {
 		isDraft ||
 		( hasUrlBinding && ! isBoundEntityAvailable );
 
-	if ( needsValidLink ) {
+	if ( needsValidLink && ! readOnly ) {
 		blockProps.onClick = () => {
 			setIsLinkOpen( true );
 		};
@@ -379,8 +383,11 @@ export default function NavigationLinkEdit( {
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
 						onClick={ () => {
-							setIsLinkOpen( true );
+							if ( ! readOnly ) {
+								setIsLinkOpen( true );
+							}
 						} }
+						disabled={ readOnly }
 					/>
 					{ ! isAtMaxNesting && (
 						<ToolbarButton
@@ -397,6 +404,7 @@ export default function NavigationLinkEdit( {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
+					isLinkEditable={ ! readOnly }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
