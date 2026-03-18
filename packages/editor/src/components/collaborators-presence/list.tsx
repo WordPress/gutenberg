@@ -43,9 +43,7 @@ export function CollaboratorsList( {
 
 		if ( success ) {
 			speak( __( 'Scrolled to cursor' ), 'polite' );
-		}
 
-		if ( success ) {
 			setIsPopoverVisible( false );
 		}
 	};
