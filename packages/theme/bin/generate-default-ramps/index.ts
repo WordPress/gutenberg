@@ -38,12 +38,10 @@ const content = `
  * Internal dependencies
  */
 import type { RampResult } from './types';
-import type { DEFAULT_SEED_COLORS } from './constants';
 
-export const DEFAULT_RAMPS: Record<
-	keyof typeof DEFAULT_SEED_COLORS,
-	RampResult
-> = ${ JSON.stringify( ramps ) };
+export const DEFAULT_RAMPS: Record< string, RampResult > = ${ JSON.stringify(
+	ramps
+) };
 `;
 
 await writeFile( outputPath, content );

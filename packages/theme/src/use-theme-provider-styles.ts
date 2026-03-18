@@ -27,6 +27,8 @@ import {
 	buildBgRamp,
 	buildAccentRamp,
 	DEFAULT_SEED_COLORS,
+	getQualitativeSeeds,
+	accentSeedsToRecord,
 	type RampResult,
 } from './color-ramps';
 import { getColorString } from './color-ramps/lib/color-utils';
@@ -185,23 +187,31 @@ export function useThemeProviderStyles( {
 		DEFAULT_SEED_COLORS.primary;
 	const bg =
 		color.bg ?? inheritedSettings.color?.bg ?? DEFAULT_SEED_COLORS.bg;
+	const accents = color.accents ?? inheritedSettings.color?.accents;
 
 	const resolvedSettings = useMemo(
 		() => ( {
 			color: {
 				primary,
 				bg,
+				accents,
 			},
 		} ),
-		[ primary, bg ]
+		[ primary, bg, accents ]
 	);
 
 	const themeProviderStyles = useMemo( () => {
 		// Determine which seeds are needed for generating ramps.
+		// Use manually-specified accent seeds if provided,
+		// otherwise derive them from the current primary color.
+		const resolvedAccents = accents
+			? accentSeedsToRecord( accents )
+			: getQualitativeSeeds( primary );
 		const seeds = {
 			...DEFAULT_SEED_COLORS,
 			bg,
 			primary,
+			...resolvedAccents,
 		};
 
 		// Generate ramps.
@@ -222,7 +232,7 @@ export function useThemeProviderStyles( {
 			primary: seeds.primary,
 			computedColorRamps,
 		} );
-	}, [ primary, bg ] );
+	}, [ primary, bg, accents ] );
 
 	return {
 		resolvedSettings,
