@@ -1,16 +1,9 @@
 name: Label Manual Cherry-Picks
-
 on:
     pull_request_target:
         types: [closed]
-        branches:
-            - 'wp/**'
-            - 'release/**'
-
-# Disable permissions for all available scopes by default.
-# Any needed permissions should be configured at the job level.
+        branches: ['wp/**', 'release/**']
 permissions: {}
-
 jobs:
     label-original-pr:
         runs-on: 'ubuntu-24.04'
@@ -25,44 +18,27 @@ jobs:
               with:
                   script: |
                       const pr = context.payload.pull_request;
-                      const body = pr.body || '';
-                      const title = pr.title || '';
-                      const text = `${title}\n${body}`;
-
+                      const text = `${pr.title || ''}\n${pr.body || ''}`;
                       const prNumbers = new Set();
                       const regex = /cherry[- ]?pick(?:ed)?(?:\s+(?:of|from))?\s+#(\d+)/gi;
                       let match;
                       while ((match = regex.exec(text)) !== null) {
-                          if (match[1]) {
-                              prNumbers.add(parseInt(match[1], 10));
-                          }
+                          if (match[1]) prNumbers.add(parseInt(match[1], 10));
                       }
-
                       if (prNumbers.size === 0) {
-                          console.log('No original PR references found in the PR body or title.');
+                          console.log('No original PR references found.');
                           return;
                       }
-
                       const label = 'Backported to WP Core';
+                      const { owner, repo } = context.repo;
                       for (const prNumber of prNumbers) {
                           try {
-                              const { data: originalPr } = await github.rest.pulls.get({
-                                  owner: context.repo.owner,
-                                  repo: context.repo.repo,
-                                  pull_number: prNumber,
-                              });
-
+                              const { data: originalPr } = await github.rest.pulls.get({ owner, repo, pull_number: prNumber });
                               if (originalPr.base.ref !== 'trunk') {
                                   console.log(`PR #${prNumber} does not target trunk, skipping.`);
                                   continue;
                               }
-
-                              await github.rest.issues.addLabels({
-                                  owner: context.repo.owner,
-                                  repo: context.repo.repo,
-                                  issue_number: prNumber,
-                                  labels: [label],
-                              });
+                              await github.rest.issues.addLabels({ owner, repo, issue_number: prNumber, labels: [label] });
                               console.log(`Added "${label}" label to PR #${prNumber}.`);
                           } catch (error) {
                               console.log(`Could not process PR #${prNumber}: ${error.message}`);
