@@ -115,7 +115,8 @@ const PAGES = WP_PLUGIN_CONFIG.pages || [];
 
 /**
  * Interprets a configuration value as a boolean, where `"true"` and `"1"`
- * are considered true while all other values are false.
+ * are considered true, all other values are false, and undefined when not
+ * explicitly set.
  *
  * @param {string|undefined} value The configuration value to interpret.
  * @return {boolean|undefined} Boolean interpretation of the given configuration value, or undefined if not set.
