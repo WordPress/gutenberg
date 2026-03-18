@@ -28,7 +28,7 @@ export function useViewConfig( {
 } ): { defaultView: View; defaultLayouts: SupportedLayouts } {
 	return useSelect(
 		( select ) => {
-			const config = unlock( select( coreStore ) ).getEntityViewConfig(
+			const config = unlock( select( coreStore ) ).getViewConfig(
 				kind,
 				name
 			);

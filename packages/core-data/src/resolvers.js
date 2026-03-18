@@ -1327,7 +1327,7 @@ export const getEditorAssets =
  * @param {string} kind Entity kind.
  * @param {string} name Entity name.
  */
-export const getEntityViewConfig =
+export const getViewConfig =
 	( kind, name ) =>
 	async ( { dispatch } ) => {
 		const config = await apiFetch( {

@@ -324,7 +324,7 @@ export function isCollaborationSupported( state: State ): boolean {
  *
  * @return The view configuration or undefined if not loaded.
  */
-export function getEntityViewConfig(
+export function getViewConfig(
 	state: State,
 	kind: string,
 	name: string

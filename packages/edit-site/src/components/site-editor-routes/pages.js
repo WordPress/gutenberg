@@ -21,9 +21,10 @@ const { useLocation } = unlock( routerPrivateApis );
 
 async function isListView( query ) {
 	const { activeView = 'all' } = query;
-	const config = await unlock(
-		resolveSelect( coreStore )
-	).getEntityViewConfig( 'postType', 'page' );
+	const config = await unlock( resolveSelect( coreStore ) ).getViewConfig(
+		'postType',
+		'page'
+	);
 	const defaultView = config?.default_view;
 	const viewEntry = config?.view_list?.find( ( v ) => v.slug === activeView );
 	const view = await loadView( {

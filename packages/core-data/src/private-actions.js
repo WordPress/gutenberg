@@ -168,6 +168,12 @@ export function receiveEditorAssets( assets ) {
  *
  * @return {Object} Action object.
  */
+export const setCollaborationSupported =
+	( supported ) =>
+	( { dispatch } ) => {
+		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
+	};
+
 /**
  * Returns an action object used to receive view config.
  *
@@ -185,9 +191,3 @@ export function receiveViewConfig( kind, name, config ) {
 		config,
 	};
 }
-
-export const setCollaborationSupported =
-	( supported ) =>
-	( { dispatch } ) => {
-		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
-	};
