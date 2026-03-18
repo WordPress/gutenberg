@@ -23,6 +23,25 @@ jest.mock( '@wordpress/blocks', () => {
 				name: 'core/paragraph',
 				attributes: { content: { type: 'rich-text' } },
 			},
+			{
+				name: 'core/table',
+				attributes: {
+					hasFixedLayout: { type: 'boolean' },
+					caption: { type: 'rich-text' },
+					body: {
+						type: 'array',
+						query: {
+							cells: {
+								type: 'array',
+								query: {
+									content: { type: 'rich-text' },
+									tag: { type: 'string' },
+								},
+							},
+						},
+					},
+				},
+			},
 		],
 	};
 } );
@@ -556,6 +575,49 @@ describe( 'crdt', () => {
 			expect( block ).toBeDefined();
 			expect( block.attributes.content ).toBeInstanceOf( RichTextData );
 			expect( block.attributes.content.text ).toBe( 'Hello world' );
+		} );
+
+		it( 'returns nested rich-text in array attributes as RichTextData', () => {
+			// Add a table block to the CRDT doc with nested cell content
+			// stored as plain strings.
+			let blocks = map.get( 'blocks' );
+			if ( ! ( blocks instanceof Y.Array ) ) {
+				blocks = new Y.Array< YBlock >();
+				map.set( 'blocks', blocks );
+			}
+
+			const tableBlock = createYMap< YBlockRecord >();
+			tableBlock.set( 'name', 'core/table' );
+			tableBlock.set( 'clientId', 'table-1' );
+			const attrs = new Y.Map();
+			attrs.set( 'body', [
+				{
+					cells: [
+						{ content: '<strong>Cell</strong>', tag: 'td' },
+						{ content: 'Plain', tag: 'td' },
+					],
+				},
+			] );
+			tableBlock.set( 'attributes', attrs );
+			tableBlock.set( 'innerBlocks', new Y.Array() );
+			( blocks as YBlocks ).push( [ tableBlock ] );
+
+			const editedRecord = { blocks: [] } as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			const block = ( changes.blocks as any[] )?.[ 0 ];
+			expect( block ).toBeDefined();
+
+			const cell = block.attributes.body[ 0 ].cells[ 0 ];
+			expect( cell.content ).toBeInstanceOf( RichTextData );
+			expect( ( cell.content as RichTextData ).toHTMLString() ).toBe(
+				'<strong>Cell</strong>'
+			);
 		} );
 
 		it( 'includes undefined blocks in changes', () => {
