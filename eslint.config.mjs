@@ -509,6 +509,8 @@ export default dedupePlugins( [
 				},
 			],
 			'playwright/no-conditional-in-test': 'off',
+			// Playwright fixtures use `use()` which is not a React hook.
+			'react-hooks/rules-of-hooks': 'off',
 			'@typescript-eslint/await-thenable': 'error',
 			'@typescript-eslint/no-floating-promises': 'error',
 			'@typescript-eslint/no-misused-promises': 'error',
