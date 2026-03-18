@@ -263,8 +263,6 @@ interface RecommendationsPanelProps {
 	onCancel: () => void;
 }
 
-const STAGGER_DELAY = 300; // ms between each item reveal
-
 function RecommendationsPanel( {
 	items,
 	isScanning,
@@ -273,59 +271,28 @@ function RecommendationsPanel( {
 	onCheckAgain,
 	onCancel,
 }: RecommendationsPanelProps ) {
-	// Snapshot: captured once when scanning completes. Not affected by inline
-	// accepts/dismisses — only updated on initial scan or "Check again".
-	const [ snapshotItems, setSnapshotItems ] = useState<
-		RecommendationItem[]
-	>( [] );
+	// Track slugs dismissed via the sidebar kebab menu.
 	const [ dismissedSlugs, setDismissedSlugs ] = useState< Set< string > >(
 		new Set()
 	);
-
-	// Track how many items to reveal (stagger one at a time).
-	const [ visibleCount, setVisibleCount ] = useState( 0 );
-	const [ revealStarted, setRevealStarted ] = useState( false );
 	const [ hasCompleted, setHasCompleted ] = useState( false );
 	const [ lastChecked, setLastChecked ] = useState< Date | null >( null );
 	const prevIsScanning = useRef( isScanning );
 
-	// Snapshot items when scanning transitions from true → false.
+	// Mark completion when scanning transitions from true → false.
 	useEffect( () => {
 		if ( prevIsScanning.current && ! isScanning ) {
-			setSnapshotItems( [ ...items ] );
-			setDismissedSlugs( new Set() );
 			setHasCompleted( true );
 			setLastChecked( new Date() );
-			if ( items.length > 0 ) {
-				setRevealStarted( true );
-				setVisibleCount( 0 );
-			}
 		}
 		prevIsScanning.current = isScanning;
-	}, [ isScanning, items ] );
+	}, [ isScanning ] );
 
-	// The displayed items are from the snapshot, minus locally dismissed ones
-	// and minus items that have been resolved (accepted/dismissed) in the main
-	// content area (i.e., no longer present in the live items prop).
-	const liveSlugs = new Set( items.map( ( item ) => item.slug ) );
-	const displayItems = snapshotItems.filter(
-		( item ) =>
-			! dismissedSlugs.has( item.slug ) && liveSlugs.has( item.slug )
+	// Show items from the live prop immediately as they arrive,
+	// minus any locally dismissed from the sidebar.
+	const displayItems = items.filter(
+		( item ) => ! dismissedSlugs.has( item.slug )
 	);
-
-	// Stagger items in one at a time.
-	useEffect( () => {
-		if ( ! revealStarted ) {
-			return;
-		}
-		if ( visibleCount >= displayItems.length ) {
-			return;
-		}
-		const timer = setTimeout( () => {
-			setVisibleCount( ( prev ) => prev + 1 );
-		}, STAGGER_DELAY );
-		return () => clearTimeout( timer );
-	}, [ revealStarted, visibleCount, displayItems.length ] );
 
 	const handleDismissItem = ( slug: string ) => {
 		setDismissedSlugs( ( prev ) => new Set( prev ).add( slug ) );
@@ -334,10 +301,9 @@ function RecommendationsPanel( {
 
 	const handleDismissAll = () => {
 		setDismissedSlugs(
-			new Set( snapshotItems.map( ( item ) => item.slug ) )
+			new Set( items.map( ( item ) => item.slug ) )
 		);
-		// Dismiss each item in the main content area too.
-		for ( const item of snapshotItems ) {
+		for ( const item of items ) {
 			if ( ! dismissedSlugs.has( item.slug ) ) {
 				onDismissItem( item.slug );
 			}
@@ -346,22 +312,14 @@ function RecommendationsPanel( {
 
 	const handleCheckAgain = () => {
 		setHasCompleted( false );
-		setRevealStarted( false );
-		setVisibleCount( 0 );
-		setSnapshotItems( [] );
 		setDismissedSlugs( new Set() );
 		onCheckAgain();
 	};
 
-	const showScanningMessage = isScanning && ! revealStarted;
-	const showReadyMessage = revealStarted && displayItems.length > 0;
+	const showScanningMessage = isScanning && displayItems.length === 0;
+	const showReadyMessage = displayItems.length > 0;
 	const showEmptyState =
 		hasCompleted && ! isScanning && displayItems.length === 0;
-	const visibleItems = revealStarted
-		? displayItems.slice( 0, visibleCount )
-		: [];
-	const allRevealed =
-		revealStarted && visibleCount >= displayItems.length;
 
 	const formatLastChecked = ( date: Date ) => {
 		return date.toLocaleTimeString( undefined, {
@@ -411,13 +369,13 @@ function RecommendationsPanel( {
 						) }
 					</Text>
 				) }
-				{ visibleItems.length > 0 && (
+				{ displayItems.length > 0 && (
 					/* eslint-disable jsx-a11y/no-redundant-roles */
 					<ul
 						role="list"
 						className="content-guidelines__recommendations-list"
 					>
-						{ visibleItems.map( ( item ) => (
+						{ displayItems.map( ( item ) => (
 							<li
 								key={ item.slug }
 								className="content-guidelines__recommendations-item"
@@ -483,7 +441,7 @@ function RecommendationsPanel( {
 					</ul>
 					/* eslint-enable jsx-a11y/no-redundant-roles */
 				) }
-				{ allRevealed && displayItems.length > 0 && (
+				{ ! isScanning && displayItems.length > 0 && (
 					<Button
 						variant="secondary"
 						size="small"

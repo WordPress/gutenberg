@@ -67,9 +67,6 @@ function gutenberg_content_guidelines_admin_bar_explorations( $wp_admin_bar ) {
 		'A' => 'Option A (Current)',
 		'B' => 'Option B (Suggest All)',
 		'C' => 'Option C (Proactive)',
-		'D' => 'Option D',
-		'E' => 'Option E',
-		'F' => 'Option F',
 	);
 
 	$wp_admin_bar->add_node(

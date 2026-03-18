@@ -16,7 +16,4 @@ export const EXPLORATIONS: Exploration[] = [
 	{ key: 'A', label: 'Option A (Per-Section)' },
 	{ key: 'B', label: 'Option B (Suggest All)' },
 	{ key: 'C', label: 'Option C (Proactive)' },
-	{ key: 'D', label: 'Option D' },
-	{ key: 'E', label: 'Option E' },
-	{ key: 'F', label: 'Option F' },
 ];

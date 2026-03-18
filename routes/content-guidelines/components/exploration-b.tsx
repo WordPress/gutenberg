@@ -157,8 +157,16 @@ function AccordionWithAi( {
 	const [ draft, setDraft ] = useState( value );
 	useEffect( () => setDraft( value ), [ value ] );
 
-	// Store the pre-suggestion value for revert on dismiss
-	const preImproveDraft = useRef< string >( '' );
+	// Store the pre-suggestion value for revert on dismiss.
+	// Initialized with draft so global generate (header button) has the right baseline.
+	const preImproveDraft = useRef< string >( draft );
+
+	// Auto-capture when sectionState transitions to 'requesting' (covers global generate).
+	useEffect( () => {
+		if ( sectionState === 'requesting' ) {
+			preImproveDraft.current = draft;
+		}
+	}, [ sectionState, draft ] );
 
 	const isStreaming = sectionState === 'streaming' || sectionState === 'requesting';
 	const showDiff = sectionState === 'done' && suggestion !== undefined;
