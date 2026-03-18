@@ -314,7 +314,7 @@ async function typeNewParagraphAfterHeading(
 	await ed.canvas.getByText( headingText, { exact: true } ).click();
 	await pg.keyboard.press( 'End' );
 	await pg.keyboard.press( 'Enter' );
-	await pg.keyboard.type( paragraphText );
+	await pg.keyboard.insertText( paragraphText );
 }
 
 // ── Tests ───────────────────────────────────────────────────────────
@@ -364,7 +364,7 @@ test.describe( 'Collaboration - Stress Test', () => {
 		await editor2.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.click( { clickCount: 3 } );
-		await page2.keyboard.type( 'RTC Stress Test — Edited by Editor' );
+		await page2.keyboard.insertText( 'RTC Stress Test — Edited by Editor' );
 
 		// Verify Admin's paragraph synced to Editor.
 		await expect( async () => {
