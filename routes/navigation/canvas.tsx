@@ -150,7 +150,7 @@ function Canvas() {
 	const searchParams = useSearch( { strict: false } );
 	const navigate = useNavigate();
 
-	const [ canvasMode, setCanvasMode ] = useState( MODE_NAVIGATION );
+	const canvasMode = ( searchParams as any ).canvas ?? MODE_NAVIGATION;
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 
 	// Get the selected navigation ID — editId takes priority, then ids[0], then first nav.
@@ -247,7 +247,12 @@ function Canvas() {
 										canvasMode === MODE_NAVIGATION
 									}
 									onClick={ () => {
-										setCanvasMode( MODE_NAVIGATION );
+										navigate( {
+											search: {
+												...searchParams,
+												canvas: undefined,
+											},
+										} );
 										onClose();
 									} }
 								>
@@ -258,7 +263,12 @@ function Canvas() {
 								<MenuItem
 									isSelected={ canvasMode === MODE_ALL }
 									onClick={ () => {
-										setCanvasMode( MODE_ALL );
+										navigate( {
+											search: {
+												...searchParams,
+												canvas: MODE_ALL,
+											},
+										} );
 										onClose();
 									} }
 								>
@@ -271,7 +281,12 @@ function Canvas() {
 										isSelected={ canvasMode === value }
 										disabled={ ! usedAreas.has( value ) }
 										onClick={ () => {
-											setCanvasMode( value );
+											navigate( {
+												search: {
+													...searchParams,
+													canvas: value,
+												},
+											} );
 											onClose();
 										} }
 									>
