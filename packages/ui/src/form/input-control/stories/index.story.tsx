@@ -2,7 +2,10 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import { plus, reset, seen, unseen } from '@wordpress/icons';
 import { IconButton, InputControl, InputLayout, Stack } from '../../..';
-import { WithPrefix } from '../../primitives/input/stories/index.story';
+import {
+	WithPrefix,
+	WithSuffixControl,
+} from '../../primitives/input/stories/index.story';
 import {
 	WITH_DETAILS_DESCRIPTION,
 	DETAILS_EXAMPLE,
@@ -52,7 +55,11 @@ WithPrefix.args = {
 	...WithPrefix.args,
 	...Default.args,
 };
-export { WithPrefix };
+WithSuffixControl.args = {
+	...WithSuffixControl.args,
+	...Default.args,
+};
+export { WithPrefix, WithSuffixControl };
 
 export const Password: Story = {
 	render: function Template( args ) {
