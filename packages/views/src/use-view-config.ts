@@ -11,7 +11,7 @@ import type { View, SupportedLayouts } from '@wordpress/dataviews';
 import { unlock } from './lock-unlock';
 
 /**
- * A custom hook that retrieves the view configuration for a given entity
+ * A hook that retrieves the view configuration for a given entity
  * from the core data store.
  *
  * @param {Object} params

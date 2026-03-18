@@ -53,7 +53,7 @@ _Returns_
 
 ### useViewConfig
 
-A custom hook that retrieves the view configuration for a given entity from the core data store.
+A hook that retrieves the view configuration for a given entity from the core data store.
 
 _Parameters_
 
