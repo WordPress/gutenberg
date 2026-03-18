@@ -24,7 +24,11 @@ import {
 	getStopCssColor,
 } from './utils';
 import { serializeGradient } from './serializer';
-import { DEFAULT_LINEAR_GRADIENT_ANGLE, GRADIENT_OPTIONS } from './constants';
+import {
+	DEFAULT_LINEAR_GRADIENT_ANGLE,
+	GRADIENT_OPTIONS,
+	HORIZONTAL_GRADIENT_ORIENTATION,
+} from './constants';
 import {
 	AccessoryWrapper,
 	SelectWrapper,
@@ -67,7 +71,9 @@ const GradientTypePicker = ( {
 	onChange,
 }: GradientTypePickerProps ) => {
 	const { type } = gradientAST;
-	const lastLinearOrientationAngle = useRef( DEFAULT_LINEAR_GRADIENT_ANGLE );
+	const lastLinearOrientationAngle = useRef(
+		Number( HORIZONTAL_GRADIENT_ORIENTATION.value )
+	);
 
 	if ( type === 'linear-gradient' && gradientAST.orientation ) {
 		lastLinearOrientationAngle.current = Number(
@@ -80,9 +86,9 @@ const GradientTypePicker = ( {
 			serializeGradient( {
 				...gradientAST,
 				orientation: {
-					type: 'angular',
+					type: 'angular' as const,
 					value: `${ lastLinearOrientationAngle.current }`,
-				} as const,
+				},
 				type: 'linear-gradient',
 			} satisfies LinearGradientNode )
 		);
