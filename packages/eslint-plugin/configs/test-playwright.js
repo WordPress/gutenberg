@@ -1,3 +1,8 @@
-module.exports = {
-	extends: [ 'plugin:playwright/recommended' ],
-};
+/**
+ * External dependencies
+ */
+const playwrightPlugin = require( 'eslint-plugin-playwright' );
+
+module.exports = [
+	playwrightPlugin.configs[ 'flat/recommended' ],
+];
