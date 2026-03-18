@@ -28,10 +28,11 @@
 	cursor: pointer;
 	white-space: nowrap;
 	flex-shrink: 0;
+	text-decoration: underline;
 
 	&:hover,
 	&:focus-visible {
-		text-decoration: underline;
+		text-decoration: none;
 	}
 }
 
