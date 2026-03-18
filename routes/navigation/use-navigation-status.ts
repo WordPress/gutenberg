@@ -6,7 +6,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useNavigationTemplateParts from '../navigation-shared/use-navigation-template-parts';
+import useNavigationTemplateParts from './use-navigation-template-parts';
 
 /**
  * Returns a map of navigation menu IDs to their usage count in template parts.

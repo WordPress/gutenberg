@@ -23,7 +23,7 @@ import { getDefaultView } from './view-utils';
 import { useEditNavigationAction } from './actions/edit-navigation';
 import { AddNavigationModal } from './add-navigation';
 import useNavigationStatus from './use-navigation-status';
-import NavigationMenuEditor from '../navigation-edit/editor';
+import NavigationMenuEditor from './editor';
 
 /**
  * Style dependencies
@@ -49,7 +49,7 @@ function getItemId( item: Post ) {
 
 function NavigationList() {
 	const navigate = useNavigate();
-	const searchParams = useSearch( { from: '/navigation/list' } );
+	const searchParams = useSearch( { from: '/navigation' } );
 
 	const editId = ( searchParams as any ).editId as number | undefined;
 

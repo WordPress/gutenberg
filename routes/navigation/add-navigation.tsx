@@ -59,12 +59,8 @@ export const AddNavigationModal = ( {
 					}
 				);
 
-				// Navigate to the newly created navigation menu
-				navigate( {
-					to: `/navigation/edit/${ encodeURIComponent(
-						savedRecord.id
-					) }`,
-				} );
+				// Open the newly created navigation menu for editing
+				navigate( { search: { editId: savedRecord.id } } );
 			}
 		} catch ( error ) {
 			const errorMessage =

@@ -26,9 +26,9 @@ import { chevronDown } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import useMenuUsedInTemplateParts from '../navigation-shared/use-menu-used-in-template-parts';
+import useMenuUsedInTemplateParts from './use-menu-used-in-template-parts';
 import { unlock } from '../lock-unlock';
-import '../navigation-edit/canvas.scss';
+import './canvas.scss';
 
 const { patternTitleField } = unlock( editorPrivateApis );
 
