@@ -1158,12 +1158,11 @@ The code will log:
 
 ```json
 {
-	"data-wp-on--click": "actions.log",
-	"class": "my-button"
+	"data-wp-on--click": 'actions.log',
+	"children": ['Log'],
+	"onclick": event => { evaluate(entry, event); }
 }
 ```
-
-Note: The `attributes` object contains the standard HTML attributes of the element. Internal properties used by the framework are not included.
 
 #### getServerContext()
 
