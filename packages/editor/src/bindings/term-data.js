@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
-// Navigation block types that use special handling for backwards compatibility
+// Navigation block types that store entity data in block attributes instead of context
 const NAVIGATION_BLOCK_TYPES = [
 	'core/navigation-link',
 	'core/navigation-submenu',
@@ -129,14 +129,13 @@ export default {
 	canUserEditValue( { select, context } ) {
 		const { getBlockName, getSelectedBlockClientId } =
 			select( blockEditorStore );
-
 		const clientId = getSelectedBlockClientId();
 		const blockName = getBlockName( clientId );
 
-		// Navigaton block types are read-only.
-		// See https://github.com/WordPress/gutenberg/pull/72165.
+		// Navigation blocks manage entity data through block attributes, not context.
+		// They should always be editable when bound to core/term-data.
 		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
-			return false;
+			return true;
 		}
 
 		// Terms are typically read-only when displayed.

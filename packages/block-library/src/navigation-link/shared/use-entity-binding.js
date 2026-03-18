@@ -141,6 +141,16 @@ export function useEntityBinding( { clientId, attributes } ) {
 				return;
 			}
 
+			// Don't override custom binding sources - only create core bindings for post-type/taxonomy
+			const currentSource = metadata?.bindings?.url?.source;
+			if (
+				currentSource &&
+				currentSource !== 'core/post-data' &&
+				currentSource !== 'core/term-data'
+			) {
+				return;
+			}
+
 			try {
 				const binding = buildNavigationLinkEntityBinding( kindToUse );
 				updateBlockBindings( binding );
@@ -153,7 +163,7 @@ export function useEntityBinding( { clientId, attributes } ) {
 				// Don't create binding if validation fails.
 			}
 		},
-		[ updateBlockBindings, kind ]
+		[ updateBlockBindings, kind, metadata?.bindings?.url?.source ]
 	);
 
 	return {
