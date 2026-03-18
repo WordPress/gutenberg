@@ -37,11 +37,13 @@ function overlay_dismiss_stress_test_enqueue_scripts( $hook_suffix ) {
 	$plugin_dir_url  = plugin_dir_url( __FILE__ );
 	$plugin_dir_path = plugin_dir_path( __FILE__ );
 
+	$react_deps = array( 'wp-element', 'react-jsx-runtime' );
+
 	// Bundle A — independent copy of @base-ui/react (IIFE, window.OverlayBundleA)
 	wp_enqueue_script(
 		'overlay-bundle-a',
 		$plugin_dir_url . 'build/bundle-a.iife.js',
-		array( 'wp-element' ),
+		$react_deps,
 		filemtime( $plugin_dir_path . 'build/bundle-a.iife.js' ),
 		true
 	);
@@ -50,7 +52,7 @@ function overlay_dismiss_stress_test_enqueue_scripts( $hook_suffix ) {
 	wp_enqueue_script(
 		'overlay-bundle-b',
 		$plugin_dir_url . 'build/bundle-b.iife.js',
-		array( 'wp-element' ),
+		$react_deps,
 		filemtime( $plugin_dir_path . 'build/bundle-b.iife.js' ),
 		true
 	);
@@ -59,7 +61,7 @@ function overlay_dismiss_stress_test_enqueue_scripts( $hook_suffix ) {
 	wp_enqueue_script(
 		'overlay-dismiss-playground',
 		$plugin_dir_url . 'build/playground.iife.js',
-		array( 'wp-element', 'overlay-bundle-a', 'overlay-bundle-b' ),
+		array_merge( $react_deps, array( 'overlay-bundle-a', 'overlay-bundle-b' ) ),
 		filemtime( $plugin_dir_path . 'build/playground.iife.js' ),
 		true
 	);

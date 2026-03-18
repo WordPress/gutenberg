@@ -20,6 +20,33 @@ const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 
 const sharedExternal = [ 'react', 'react-dom', 'react/jsx-runtime' ];
 
+/**
+ * CJS dependencies (e.g. use-sync-external-store) call require('react') at
+ * runtime. esbuild wraps these in a __require shim that throws in contexts
+ * where `require` is not defined. These banners provide a minimal require()
+ * that maps externalized packages to their runtime locations.
+ */
+const iifeBanner = [
+	'var require = (function(g) { return function(m) {',
+	'  if (m === "react") return g.React;',
+	'  if (m === "react-dom") return g.ReactDOM;',
+	'  if (m === "react/jsx-runtime") return g.ReactJSXRuntime;',
+	'  throw new Error("Unexpected require: " + m);',
+	'}; })(globalThis);',
+].join( '\n' );
+
+const esmBanner = [
+	'import * as __react from "react";',
+	'import * as __reactDom from "react-dom";',
+	'import * as __reactJsx from "react/jsx-runtime";',
+	'var require = (m) => {',
+	'  if (m === "react") return __react;',
+	'  if (m === "react-dom") return __reactDom;',
+	'  if (m === "react/jsx-runtime") return __reactJsx;',
+	'  throw new Error("Unexpected require: " + m);',
+	'};',
+].join( '\n' );
+
 const entries = [
 	{ name: 'a', globalName: 'OverlayBundleA' },
 	{ name: 'b', globalName: 'OverlayBundleB' },
@@ -49,6 +76,7 @@ async function build() {
 			target: 'es2020',
 			minify: false,
 			sourcemap: true,
+			banner: { js: iifeBanner },
 		} );
 
 		await esbuild.build( {
@@ -63,19 +91,7 @@ async function build() {
 			target: 'es2020',
 			minify: false,
 			sourcemap: true,
-			banner: {
-				js: [
-					'import * as __react from "react";',
-					'import * as __reactDom from "react-dom";',
-					'import * as __reactJsx from "react/jsx-runtime";',
-					'var require = (m) => {',
-					'  if (m === "react") return __react;',
-					'  if (m === "react-dom") return __reactDom;',
-					'  if (m === "react/jsx-runtime") return __reactJsx;',
-					'  throw new Error("Unexpected require: " + m);',
-					'};',
-				].join( '\n' ),
-			},
+			banner: { js: esmBanner },
 		} );
 	}
 
@@ -92,6 +108,7 @@ async function build() {
 		sourcemap: true,
 		jsx: 'automatic',
 		jsxImportSource: 'react',
+		banner: { js: iifeBanner },
 	} );
 
 	// eslint-disable-next-line no-console
