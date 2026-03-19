@@ -9,7 +9,7 @@ export const DROPDOWN_MOTION = Object.freeze( {
 		function: 'cubic-bezier',
 		args: [ 0, 0, 0, 1 ] as const,
 	},
-	FADE_DURATION: 80,
+	FADE_DURATION: 100,
 	FADE_EASING: {
 		function: 'linear',
 	},
