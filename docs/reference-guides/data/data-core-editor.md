@@ -183,6 +183,18 @@ _Related_
 
 -   getClientIdsWithDescendants in core/block-editor store.
 
+### getCollaborationUpgradeStatus
+
+Returns the collaboration upgrade handshake status.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Object`: The collaboration upgrade status object.
+
 ### getCurrentPost
 
 Returns the post currently being edited in its last known saved state, not including unsaved edits. Returns an object containing relevant default post values if the post has not yet been saved.
@@ -1730,6 +1742,18 @@ _Related_
 _Related_
 
 -   updateBlockListSettings in core/block-editor store.
+
+### updateCollaborationUpgrade
+
+Update the collaboration upgrade handshake state.
+
+_Parameters_
+
+-   _status_ `Object`: The collaboration upgrade status fields to merge.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### updateEditorSettings
 

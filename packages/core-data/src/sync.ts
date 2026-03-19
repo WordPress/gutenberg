@@ -19,6 +19,7 @@ const {
 	CRDT_RECORD_MAP_KEY,
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_UNDO_IGNORED_ORIGIN,
+	resetProviderCreators,
 	retrySyncConnection,
 } = unlock( syncPrivateApis );
 
@@ -29,6 +30,7 @@ export {
 	CRDT_RECORD_MAP_KEY,
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_UNDO_IGNORED_ORIGIN,
+	resetProviderCreators,
 	retrySyncConnection,
 };
 

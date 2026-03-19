@@ -482,6 +482,26 @@ export function selectedNote( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer for the collaboration upgrade state. Tracks whether a second user
+ * has requested to upgrade a locked editing session to collaborative editing,
+ * and the progress of that handshake.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function collaborationUpgrade( state = {}, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_COLLABORATION_UPGRADE':
+			return { ...state, ...action.status };
+		case 'RESET_COLLABORATION_UPGRADE':
+			return {};
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -507,5 +527,6 @@ export default combineReducers( {
 	revisionId,
 	showRevisionDiff,
 	selectedNote,
+	collaborationUpgrade,
 	dataviews: dataviewsReducer,
 } );

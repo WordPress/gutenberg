@@ -173,3 +173,24 @@ export const setCollaborationSupported =
 	( { dispatch } ) => {
 		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
 	};
+
+/**
+ * Dynamically activate collaboration providers for a post that was initially
+ * loaded without them. Sets `window._wpCollaborationEnabled`, resets the
+ * provider cache, and connects providers to the existing Yjs document.
+ *
+ * @param {string}        postType Post type (e.g. 'post', 'page').
+ * @param {string|number} postId   Post ID.
+ */
+export const activateCollaboration = ( postType, postId ) => async () => {
+	const { getSyncManager, resetProviderCreators } = await import( './sync' );
+
+	window._wpCollaborationEnabled = 'true';
+	resetProviderCreators();
+
+	const syncManager = getSyncManager();
+	if ( syncManager ) {
+		const objectType = `postType/${ postType }`;
+		await syncManager.activateProviders( objectType, String( postId ) );
+	}
+};

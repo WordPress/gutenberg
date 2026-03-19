@@ -153,7 +153,7 @@ describe( 'SyncManager', () => {
 			} );
 		} );
 
-		it( 'does not load entity when no providers are available', async () => {
+		it( 'loads entity without transport when no providers are available', async () => {
 			mockGetProviderCreators.mockReturnValue( [] );
 
 			const manager = createSyncManager();
@@ -166,9 +166,13 @@ describe( 'SyncManager', () => {
 				mockHandlers
 			);
 
-			expect(
-				mockSyncConfig.applyChangesToCRDTDoc
-			).not.toHaveBeenCalled();
+			// The sync engine should still initialize the CRDT document.
+			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
+				expect.any( Y.Doc ),
+				mockRecord
+			);
+
+			// No providers should be created (transport is disabled).
 			expect( mockProviderCreator ).not.toHaveBeenCalled();
 		} );
 
