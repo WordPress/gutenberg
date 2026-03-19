@@ -200,7 +200,7 @@ echo 'RewriteRule . index.php [L]'
 			'BLOG_ID_CURRENT_SITE',
 		];
 		removeMultisiteSed = multisiteConstants
-			.map( ( c ) => ` -e "/define.*'${ c }'/d"` )
+			.map( ( c ) => ` -e "/define *( *'${ c }'/d"` )
 			.join( '' );
 		multisiteTestConstant = `\\n\\tdefine( 'WP_TESTS_MULTISITE', true );`;
 	}

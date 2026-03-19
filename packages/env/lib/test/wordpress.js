@@ -111,7 +111,9 @@ describe( 'configureWordPress', () => {
 			];
 
 			for ( const constant of expectedConstants ) {
-				expect( sedCommand ).toContain( `/define.*'${ constant }'/d` );
+				expect( sedCommand ).toContain(
+					`/define *( *'${ constant }'/d`
+				);
 			}
 
 			// Should add WP_TESTS_MULTISITE.
@@ -260,7 +262,7 @@ describe( 'configureWordPress', () => {
 				'BLOG_ID_CURRENT_SITE',
 			];
 			const removeSed = constants
-				.map( ( c ) => `-e "/define.*'${ c }'/d"` )
+				.map( ( c ) => `-e "/define *( *'${ c }'/d"` )
 				.join( ' ' );
 			const abspathDef = `define( 'ABSPATH', __DIR__ . '\\/' );`;
 			const sedCmd = `sed -e "/^require.*wp-settings.php/d" ${ removeSed } -e "s/${ abspathDef }/define( 'ABSPATH', '\\/var\\/www\\/html\\/' );\\n\\tdefine( 'WP_DEFAULT_THEME', 'default' );\\n\\tdefine( 'WP_TESTS_MULTISITE', true );/" ${ wpConfigPath } > ${ outputPath }`;
