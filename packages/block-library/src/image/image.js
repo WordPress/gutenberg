@@ -776,6 +776,7 @@ export default function Image( {
 		id &&
 		isSingleSelected &&
 		canUserEdit &&
+		!! editMediaEntity &&
 		! isExternalImage( id, url ) &&
 		! isEditingImage &&
 		onNavigateToEntityRecord && (
