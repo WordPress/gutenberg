@@ -3,6 +3,7 @@
  */
 import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
+import { escapeHTML } from '@wordpress/escape-html';
 import deprecated from '@wordpress/deprecated';
 import {
 	parse,
@@ -297,6 +298,26 @@ export const savePost =
 				options,
 			} );
 			if ( args.length ) {
+				const [ noticeMessage ] = args;
+				if ( error.message && ! /<\/?[^>]*>/.test( error.message ) ) {
+					args[ 0 ] = `${ escapeHTML(
+						noticeMessage
+					) } <details class="editor-save-error-details"><summary>${ escapeHTML(
+						__( 'Show details' )
+					) }</summary><span class="editor-save-error-details__message">${ escapeHTML(
+						error.message
+					) }</span></details>`;
+					args[ 1 ] = {
+						...args[ 1 ],
+						__unstableHTML: true,
+						speak: false,
+					};
+					// The notices store doesn't support a separate spoken message
+					// when rendering raw HTML content, so announce the plain text
+					// manually to avoid reading the markup aloud.
+					speak( noticeMessage, 'assertive' );
+				}
+
 				registry.dispatch( noticesStore ).createErrorNotice( ...args );
 			}
 		} else {

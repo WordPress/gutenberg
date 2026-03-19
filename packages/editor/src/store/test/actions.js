@@ -1,12 +1,17 @@
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
+
+jest.mock( '@wordpress/a11y', () => ( {
+	speak: jest.fn(),
+} ) );
 
 /**
  * Internal dependencies
@@ -267,6 +272,74 @@ describe( 'Post actions', () => {
 					content: 'Draft saved.',
 				},
 			] );
+		} );
+
+		it( 'adds a details action for save failures with a plain-text error message', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				excerpt: 'crackers',
+				status: 'publish',
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path } = options;
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					throw {
+						code: 'test_save_failure',
+						message: 'Details from server.',
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+
+			await registry.dispatch( editorStore ).savePost();
+
+			const [ notice ] = registry.select( noticesStore ).getNotices();
+			expect( notice ).toMatchObject( {
+				status: 'error',
+				__unstableHTML: true,
+			} );
+			expect( notice.content ).toContain(
+				'Updating failed. Your content will be persisted locally to avoid content loss. Please try updating again.'
+			);
+			expect( notice.content ).toContain(
+				'<details class="editor-save-error-details">'
+			);
+			expect( notice.content ).toContain(
+				'<summary>Show details</summary>'
+			);
+			expect( notice.content ).toContain( 'Details from server.' );
+			expect( notice.actions ).toEqual( [] );
+			expect( notice.spokenMessage ).toBeNull();
+			expect( notice.content ).toContain(
+				'<span class="editor-save-error-details__message">Details from server.</span>'
+			);
+			expect( speak ).toHaveBeenCalledWith(
+				'Updating failed. Your content will be persisted locally to avoid content loss. Please try updating again.',
+				'assertive'
+			);
 		} );
 	} );
 

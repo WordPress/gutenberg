@@ -120,7 +120,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'draft', 'publish' ],
 			[
-				'Publishing failed. Something went wrong.',
+				'Publishing failed. Your content will be persisted locally to avoid content loss. Please try publishing again.',
 				defaultExpectedAction,
 			],
 		],
@@ -129,7 +129,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'draft', 'private' ],
 			[
-				'Publishing failed. Something went wrong.',
+				'Publishing failed. Your content will be persisted locally to avoid content loss. Please try publishing again.',
 				defaultExpectedAction,
 			],
 		],
@@ -138,7 +138,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'draft', 'future' ],
 			[
-				'Scheduling failed. Something went wrong.',
+				'Scheduling failed. Your content will be persisted locally to avoid content loss. Please try scheduling again.',
 				defaultExpectedAction,
 			],
 		],
@@ -146,7 +146,10 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'when post is published and edits is published',
 			'',
 			[ 'publish', 'publish' ],
-			[ 'Updating failed. Something went wrong.', defaultExpectedAction ],
+			[
+				'Updating failed. Your content will be persisted locally to avoid content loss. Please try updating again.',
+				defaultExpectedAction,
+			],
 		],
 		[
 			'when the save is an autosave',

@@ -136,10 +136,18 @@ export function getNotificationArgumentsForSaveFail( data ) {
 	}
 
 	const messages = {
-		publish: __( 'Publishing failed.' ),
-		private: __( 'Publishing failed.' ),
-		future: __( 'Scheduling failed.' ),
-		default: __( 'Updating failed.' ),
+		publish: __(
+			'Publishing failed. Your content will be persisted locally to avoid content loss. Please try publishing again.'
+		),
+		private: __(
+			'Publishing failed. Your content will be persisted locally to avoid content loss. Please try publishing again.'
+		),
+		future: __(
+			'Scheduling failed. Your content will be persisted locally to avoid content loss. Please try scheduling again.'
+		),
+		default: __(
+			'Updating failed. Your content will be persisted locally to avoid content loss. Please try updating again.'
+		),
 	};
 
 	let noticeMessage =
@@ -151,15 +159,6 @@ export function getNotificationArgumentsForSaveFail( data ) {
 		noticeMessage = AUTO_SAVE_FAILURE_NOTICE;
 	}
 
-	// Check if message string contains HTML. Notice text is currently only
-	// supported as plaintext, and stripping the tags may muddle the meaning.
-	if (
-		! options?.isAutosave &&
-		error.message &&
-		! /<\/?[^>]*>/.test( error.message )
-	) {
-		noticeMessage = [ noticeMessage, error.message ].join( ' ' );
-	}
 	return [
 		noticeMessage,
 		{
