@@ -114,6 +114,7 @@ class WP_Navigation_Block_Renderer {
 		$is_responsive_menu = static::is_responsive( $attributes );
 		// The build system prefixes this function with "gutenberg_" to avoid
 		// collisions with the core version. Use the prefixed name in the plugin.
+		// When this code is backported to core it will use the core functions.
 		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 			$computed_visibility = gutenberg_block_core_shared_get_submenu_visibility( $attributes );
 		} else {
@@ -1160,6 +1161,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 
 		// The build system prefixes this function with "gutenberg_" to avoid
 		// collisions with the core version. Use the prefixed name in the plugin.
+		// When this code is backported to core it will use the core functions.
 		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 			$computed_visibility = gutenberg_block_core_shared_get_submenu_visibility( $block_attributes );
 		} else {

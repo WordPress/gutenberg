@@ -93,6 +93,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$show_submenu_indicators = isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
 	// The build system prefixes this function with "gutenberg_" to avoid
 	// collisions with the core version. Use the prefixed name in the plugin.
+	// When this code is backported to core it will use the core functions.
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 		$computed_visibility = gutenberg_block_core_shared_get_submenu_visibility( $block->context );
 	} else {
