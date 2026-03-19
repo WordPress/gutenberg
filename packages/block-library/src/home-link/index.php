@@ -71,10 +71,9 @@ function block_core_home_link_build_css_colors( $context ) {
  */
 function block_core_home_link_build_li_wrapper_attributes( $context ) {
 	$colors = block_core_home_link_build_css_colors( $context );
-	// The gutenberg_ prefix is needed because Core already defines its own
-	// block_core_home_link_build_css_font_sizes, and redeclaring it would
-	// cause a fatal error. Once the shared helper is backported to Core,
-	// the else branch will call it directly.
+	// The gutenberg_ prefix is needed because Gutenberg automatically
+	// prefixes function definitions. Once the shared helper is backported to
+	// Core, the else branch will call it directly.
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 		$font_sizes = gutenberg_block_core_shared_navigation_build_css_font_sizes( $context );
 	} else {
