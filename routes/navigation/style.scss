@@ -11,13 +11,31 @@
 	font-size: 12px;
 }
 
+// The Page header has nested flex rows that don't grow by default.
+// Make both the inner Stack and the h2 expand so the breadcrumbs
+// can use margin-left: auto to push the kebab menu right.
+.admin-ui-page__header:has(.navigation-breadcrumbs) {
+	// The outer row's left-side Stack child.
+	> * > *:first-child {
+		flex: 1;
+		min-width: 0;
+	}
+}
+
+.admin-ui-page__header-title:has(.navigation-breadcrumbs) {
+	flex: 1;
+	min-width: 0;
+	overflow: visible;
+	white-space: normal;
+}
+
 .navigation-breadcrumbs {
 	flex-wrap: nowrap;
 	min-width: 0;
 	font-size: var(--wpds-font-size-xl);
 	font-weight: var(--wpds-font-weight-medium);
 	font-family: var(--wpds-font-family-heading);
-	line-height: var(--wpds-line-height-xl);
+	line-height: var(--wpds-font-line-height-xl);
 	color: var(--wpds-color-fg-content-neutral);
 }
 
@@ -37,7 +55,7 @@
 }
 
 .navigation-breadcrumbs__separator {
-	color: var(--wpds-color-fg-content-neutral-faded);
+	color: var(--wpds-color-fg-content-neutral-weak);
 	flex-shrink: 0;
 }
 

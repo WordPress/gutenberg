@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { useNavigate, useSearch } from '@wordpress/route';
-import type { View, Action } from '@wordpress/dataviews';
+import type {
+	View,
+	Action,
+	ActionModal as ActionModalType,
+} from '@wordpress/dataviews';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import type { Post } from '@wordpress/core-data';
@@ -20,7 +24,6 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
-import type { ActionModal as ActionModalType } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -57,10 +60,27 @@ function getItemId( item: Post ) {
 
 /**
  * Renders a kebab menu for a navigation menu item with Trash, Duplicate, and Rename actions.
+ *
+ * @param {Object}   root0                   Component props.
+ * @param {Post}     root0.item              The navigation menu post.
+ * @param {Action[]} root0.actions           Available actions.
+ * @param {Function} root0.onActionPerformed Callback after an action completes.
  */
-function NavigationMenuActions( { item, actions }: { item: Post; actions: Action< Post >[] } ) {
+function NavigationMenuActions( {
+	item,
+	actions,
+	onActionPerformed,
+}: {
+	item: Post;
+	actions: Action< Post >[];
+	onActionPerformed: (
+		action: ActionModalType< Post >,
+		items: Post[]
+	) => void;
+} ) {
 	const registry = useRegistry();
-	const [ activeModalAction, setActiveModalAction ] = useState< ActionModalType< Post > | null >( null );
+	const [ activeModalAction, setActiveModalAction ] =
+		useState< ActionModalType< Post > | null >( null );
 
 	const eligibleActions = useMemo( () => {
 		return actions.filter(
@@ -103,10 +123,14 @@ function NavigationMenuActions( { item, actions }: { item: Post; actions: Action
 									disabled={ action.disabled }
 									onClick={ () => {
 										if ( 'RenderModal' in action ) {
-											setActiveModalAction( action as ActionModalType< Post > );
+											setActiveModalAction(
+												action as ActionModalType< Post >
+											);
 											return;
 										}
-										action.callback( [ item ], { registry } );
+										action.callback( [ item ], {
+											registry,
+										} );
 									} }
 								>
 									<Menu.ItemLabel>{ label }</Menu.ItemLabel>
@@ -122,11 +146,13 @@ function NavigationMenuActions( { item, actions }: { item: Post; actions: Action
 						typeof activeModalAction.modalHeader === 'function'
 							? activeModalAction.modalHeader( [ item ] )
 							: activeModalAction.modalHeader ||
-								( typeof activeModalAction.label === 'string'
+							  ( typeof activeModalAction.label === 'string'
 									? activeModalAction.label
 									: activeModalAction.label( [ item ] ) )
 					}
-					__experimentalHideHeader={ !! activeModalAction.hideModalHeader }
+					__experimentalHideHeader={
+						!! activeModalAction.hideModalHeader
+					}
 					onRequestClose={ () => setActiveModalAction( null ) }
 					focusOnMount={ activeModalAction.modalFocusOnMount ?? true }
 					size={ activeModalAction.modalSize || 'medium' }
@@ -134,6 +160,9 @@ function NavigationMenuActions( { item, actions }: { item: Post; actions: Action
 					<activeModalAction.RenderModal
 						items={ [ item ] }
 						closeModal={ () => setActiveModalAction( null ) }
+						onActionPerformed={ ( items: Post[] ) => {
+							onActionPerformed( activeModalAction, items );
+						} }
 					/>
 				</Modal>
 			) }
@@ -265,8 +294,13 @@ function NavigationList() {
 		return (
 			<Page
 				title={
-					<HStack spacing={ 1 } alignment="center" className="navigation-breadcrumbs">
-						<button type="button"
+					<HStack
+						spacing={ 1 }
+						alignment="left"
+						className="navigation-breadcrumbs"
+					>
+						<button
+							type="button"
 							className="navigation-breadcrumbs__link"
 							onClick={ () =>
 								navigate( {
@@ -279,12 +313,35 @@ function NavigationList() {
 						>
 							{ __( 'Navigation' ) }
 						</button>
-						<span className="navigation-breadcrumbs__separator">/</span>
-						<span className="navigation-breadcrumbs__current">{ menuTitle }</span>
+						<span className="navigation-breadcrumbs__separator">
+							/
+						</span>
+						<span className="navigation-breadcrumbs__current">
+							{ menuTitle }
+						</span>
 						{ navigationMenu && (
 							<NavigationMenuActions
 								item={ navigationMenu }
 								actions={ actions }
+								onActionPerformed={ ( action, items ) => {
+									if ( action.id === 'move-to-trash' ) {
+										navigate( {
+											search: {
+												...searchParams,
+												editId: undefined,
+											},
+										} );
+									} else if (
+										action.id === 'duplicate-post'
+									) {
+										navigate( {
+											search: {
+												...searchParams,
+												editId: items[ 0 ]?.id,
+											},
+										} );
+									}
+								} }
 							/>
 						) }
 					</HStack>
