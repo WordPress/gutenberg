@@ -661,6 +661,7 @@ async function bundlePackage( packageName, options = {} ) {
 				id: scriptModuleId,
 				path: `${ packageName }/${ fileName }`,
 				asset: `${ packageName }/${ fileName }.min.asset.php`,
+				min_only: isWasmWorker,
 			} );
 		}
 	}
@@ -918,12 +919,19 @@ async function generateModuleRegistrationPhp( modules, replacements ) {
 	// Generate modules array for registry
 	const modulesArray = modules
 		.map(
-			( module ) =>
-				`\tarray(\n` +
-				`\t\t'id' => '${ module.id }',\n` +
-				`\t\t'path' => '${ module.path }',\n` +
-				`\t\t'asset' => '${ module.asset }',\n` +
-				`\t),`
+			( module ) => {
+				const minOnlyLine = module.min_only
+					? `\t\t'min_only' => true,\n`
+					: '';
+				return (
+					`\tarray(\n` +
+					`\t\t'id' => '${ module.id }',\n` +
+					`\t\t'path' => '${ module.path }',\n` +
+					`\t\t'asset' => '${ module.asset }',\n` +
+					minOnlyLine +
+					`\t),`
+				);
+			}
 		)
 		.join( '\n' );
 
