@@ -27,17 +27,13 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '../../store';
 import CreateNewTemplateModal from '../post-template/create-new-template-modal';
 import { SwapTemplateModal } from '../post-template/swap-template-button';
-import {
-	useAvailableTemplates,
-	useEditedPostContext,
-} from '../post-template/hooks';
+import { useAvailableTemplates } from '../post-template/hooks';
 
 export default function TemplateActionsPanelContent( { templateId } ) {
 	const [ isCreateModalOpen, setIsCreateModalOpen ] = useState( false );
 	const [ isSwapModalOpen, setIsSwapModalOpen ] = useState( false );
 
-	const { postType } = useEditedPostContext();
-	const availableTemplates = useAvailableTemplates( postType );
+	const availableTemplates = useAvailableTemplates();
 	const hasSwapTargets = !! availableTemplates?.length;
 
 	const {

@@ -4,7 +4,7 @@
 .editor-template-actions-panel__preview {
 	.block-editor-block-preview__container {
 		display: flex;
-		align-items: center;
+		aspect-ratio: 4/3;
 		overflow: hidden;
 		border-radius: $radius-medium;
 

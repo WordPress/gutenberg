@@ -135,7 +135,9 @@ const SidebarContent = ( {
 								<>
 									<PluginDocumentSettingPanel.Slot />
 									<TemplateContentPanel />
-									<TemplateActionsPanel />
+									{ window?.__experimentalDataFormInspector && (
+										<TemplateActionsPanel />
+									) }
 									<TemplatePartContentPanel />
 									<PostTransformPanel />
 									<PostTaxonomiesPanel />

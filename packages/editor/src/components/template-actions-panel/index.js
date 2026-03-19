@@ -13,10 +13,6 @@ import ClassicThemeContent from './classic-theme-content';
 
 export default function TemplateActionsPanel() {
 	const { templateId, isBlockTheme, isVisible } = useSelect( ( select ) => {
-		if ( ! window?.__experimentalDataFormInspector ) {
-			return { isVisible: false };
-		}
-
 		const { getCurrentTemplateId, getEditorSettings, getCurrentPostType } =
 			select( editorStore );
 		const postType = getCurrentPostType();

@@ -77,7 +77,9 @@ export default function ClassicThemeContent( { templateId } ) {
 				<PanelBody title={ __( 'Template' ) } initialOpen={ false }>
 					<VStack>
 						<Text>
-							{ __( 'This page uses a classic template.' ) }
+							{ __(
+								'This page uses a classic template. To edit this template with blocks, create a block template.'
+							) }
 						</Text>
 						<HStack>
 							<Button
@@ -86,7 +88,7 @@ export default function ClassicThemeContent( { templateId } ) {
 								variant="secondary"
 								onClick={ () => setIsCreateModalOpen( true ) }
 							>
-								{ __( 'Create new' ) }
+								{ __( 'Create block template' ) }
 							</Button>
 						</HStack>
 					</VStack>

@@ -24,7 +24,9 @@ export function SwapTemplateModal( { onRequestClose, onSelect } ) {
 			'postType',
 			postType,
 			postId,
-			{ template: template.name },
+			// Since we append the default template we need to properly
+			// update to an empty string.
+			{ template: template.isDefault ? '' : template.name },
 			{ undoIgnore: true }
 		);
 		onRequestClose();
@@ -38,10 +40,7 @@ export function SwapTemplateModal( { onRequestClose, onSelect } ) {
 			isFullScreen
 		>
 			<div className="editor-post-template__swap-template-modal-content">
-				<TemplatesList
-					postType={ postType }
-					onSelect={ onTemplateSelect }
-				/>
+				<TemplatesList onSelect={ onTemplateSelect } />
 			</div>
 		</Modal>
 	);
@@ -49,8 +48,7 @@ export function SwapTemplateModal( { onRequestClose, onSelect } ) {
 
 export default function SwapTemplateButton( { onClick } ) {
 	const [ showModal, setShowModal ] = useState( false );
-	const { postType } = useEditedPostContext();
-	const availableTemplates = useAvailableTemplates( postType );
+	const availableTemplates = useAvailableTemplates();
 
 	return (
 		<>
@@ -71,9 +69,9 @@ export default function SwapTemplateButton( { onClick } ) {
 	);
 }
 
-function TemplatesList( { postType, onSelect } ) {
+function TemplatesList( { onSelect } ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
-	const availableTemplates = useAvailableTemplates( postType );
+	const availableTemplates = useAvailableTemplates();
 	const templatesAsPatterns = useMemo(
 		() =>
 			availableTemplates.map( ( template ) => ( {
@@ -81,6 +79,7 @@ function TemplatesList( { postType, onSelect } ) {
 				blocks: parse( template.content.raw ),
 				title: decodeEntities( template.title.rendered ),
 				id: template.id,
+				isDefault: template.isDefault,
 			} ) ),
 		[ availableTemplates ]
 	);
