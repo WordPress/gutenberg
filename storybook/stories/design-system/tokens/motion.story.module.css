@@ -1,9 +1,9 @@
 @keyframes slideRight {
 	from {
-		left: 4px;
+		inset-inline-start: 4px;
 	}
 	to {
-		left: calc(100% - 36px);
+		inset-inline-start: calc(100% - 36px);
 	}
 }
 
@@ -31,7 +31,7 @@
 .dot {
 	position: absolute;
 	top: 4px;
-	left: 4px;
+	inset-inline-start: 4px;
 	width: 32px;
 	height: 32px;
 	border-radius: var(--wpds-border-radius-sm);
