@@ -919,19 +919,13 @@ async function generateModuleRegistrationPhp( modules, replacements ) {
 	// Generate modules array for registry
 	const modulesArray = modules
 		.map(
-			( module ) => {
-				const minOnlyLine = module.min_only
-					? `\t\t'min_only' => true,\n`
-					: '';
-				return (
-					`\tarray(\n` +
-					`\t\t'id' => '${ module.id }',\n` +
-					`\t\t'path' => '${ module.path }',\n` +
-					`\t\t'asset' => '${ module.asset }',\n` +
-					minOnlyLine +
-					`\t),`
-				);
-			}
+			( module ) =>
+				`\tarray(\n` +
+				`\t\t'id' => '${ module.id }',\n` +
+				`\t\t'path' => '${ module.path }',\n` +
+				`\t\t'asset' => '${ module.asset }',\n` +
+				( module.min_only ? `\t\t'min_only' => true,\n` : '' ) +
+				`\t),`
 		)
 		.join( '\n' );
 
