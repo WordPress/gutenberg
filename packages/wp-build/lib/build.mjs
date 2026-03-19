@@ -661,6 +661,7 @@ async function bundlePackage( packageName, options = {} ) {
 				id: scriptModuleId,
 				path: `${ packageName }/${ fileName }`,
 				asset: `${ packageName }/${ fileName }.min.asset.php`,
+				min_only: isWasmWorker,
 			} );
 		}
 	}
@@ -923,6 +924,7 @@ async function generateModuleRegistrationPhp( modules, replacements ) {
 				`\t\t'id' => '${ module.id }',\n` +
 				`\t\t'path' => '${ module.path }',\n` +
 				`\t\t'asset' => '${ module.asset }',\n` +
+				( module.min_only ? `\t\t'min_only' => true,\n` : '' ) +
 				`\t),`
 		)
 		.join( '\n' );
