@@ -5,50 +5,88 @@
  * @package gutenberg
  */
 
-if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
-	require_once __DIR__ . '/interface-wp-sync-storage.php';
-	require_once __DIR__ . '/class-wp-sync-post-meta-storage.php';
-	require_once __DIR__ . '/class-wp-http-polling-sync-server.php';
+if ( ! class_exists( 'WP_Collaboration_Table_Storage' ) ) {
+	require_once __DIR__ . '/class-wp-collaboration-table-storage.php';
+	require_once __DIR__ . '/class-wp-http-polling-collaboration-server.php';
 }
 
-if ( ! function_exists( 'gutenberg_register_sync_storage_post_type' ) ) {
+if ( ! function_exists( 'gutenberg_is_collaboration_enabled' ) ) {
 	/**
-	 * Registers the custom post type for sync storage.
+	 * Checks whether real-time collaboration is enabled.
+	 *
+	 * In the Gutenberg plugin context, this checks only the site option.
+	 * The dedicated database table is created by gutenberg_create_collaboration_table().
+	 *
+	 * @return bool True if collaboration is enabled, false otherwise.
 	 */
-	function gutenberg_register_sync_storage_post_type() {
-		register_post_type(
-			'wp_sync_storage',
-			array(
-				'labels'             => array(
-					'name'          => __( 'Sync Updates', 'gutenberg' ),
-					'singular_name' => __( 'Sync Update', 'gutenberg' ),
-				),
-				'public'             => false,
-				'hierarchical'       => false,
-				'capabilities'       => array(
-					'read'                   => 'do_not_allow',
-					'read_private_posts'     => 'do_not_allow',
-					'create_posts'           => 'do_not_allow',
-					'publish_posts'          => 'do_not_allow',
-					'edit_posts'             => 'do_not_allow',
-					'edit_others_posts'      => 'do_not_allow',
-					'edit_published_posts'   => 'do_not_allow',
-					'delete_posts'           => 'do_not_allow',
-					'delete_others_posts'    => 'do_not_allow',
-					'delete_published_posts' => 'do_not_allow',
-				),
-				'map_meta_cap'       => false,
-				'publicly_queryable' => false,
-				'query_var'          => false,
-				'rewrite'            => false,
-				'show_in_menu'       => false,
-				'show_in_rest'       => false,
-				'show_ui'            => false,
-				'supports'           => array( 'custom-fields' ),
-			)
-		);
+	function gutenberg_is_collaboration_enabled() {
+		return (bool) get_option( 'wp_collaboration_enabled' );
 	}
-	add_action( 'init', 'gutenberg_register_sync_storage_post_type' );
+}
+
+if ( ! function_exists( 'gutenberg_create_collaboration_table' ) ) {
+	/**
+	 * Creates the collaboration database table if it doesn't exist.
+	 *
+	 * Uses dbDelta() to create or update the table schema. This runs
+	 * on admin_init to ensure the table exists before collaboration
+	 * features attempt to use it.
+	 */
+	function gutenberg_create_collaboration_table() {
+		global $wpdb;
+
+		// Register the table name on $wpdb so it's available everywhere.
+		if ( ! isset( $wpdb->collaboration ) || empty( $wpdb->collaboration ) ) {
+			$wpdb->collaboration = $wpdb->prefix . 'collaboration';
+			$wpdb->tables[]      = 'collaboration';
+		}
+
+		if ( ! gutenberg_is_collaboration_enabled() ) {
+			return;
+		}
+
+		// Only run the table creation check once per request.
+		static $table_checked = false;
+		if ( $table_checked ) {
+			return;
+		}
+		$table_checked = true;
+
+		$charset_collate = $wpdb->get_charset_collate();
+		$max_index_length = 191;
+
+		$sql = "CREATE TABLE {$wpdb->collaboration} (
+	id bigint(20) unsigned NOT NULL auto_increment,
+	room varchar({$max_index_length}) NOT NULL default '',
+	type varchar(32) NOT NULL default '',
+	client_id varchar(32) NOT NULL default '',
+	user_id bigint(20) unsigned NOT NULL default '0',
+	data longtext NOT NULL,
+	date_gmt datetime NOT NULL default '0000-00-00 00:00:00',
+	PRIMARY KEY  (id),
+	KEY type_client_id (type,client_id),
+	KEY room (room,id),
+	KEY date_gmt (date_gmt)
+) $charset_collate;";
+
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		dbDelta( $sql );
+	}
+	add_action( 'admin_init', 'gutenberg_create_collaboration_table' );
+}
+
+if ( ! function_exists( 'gutenberg_register_collaboration_wpdb_table' ) ) {
+	/**
+	 * Registers the collaboration table on $wpdb so queries work outside admin context.
+	 */
+	function gutenberg_register_collaboration_wpdb_table() {
+		global $wpdb;
+		if ( ! isset( $wpdb->collaboration ) || empty( $wpdb->collaboration ) ) {
+			$wpdb->collaboration = $wpdb->prefix . 'collaboration';
+			$wpdb->tables[]      = 'collaboration';
+		}
+	}
+	add_action( 'init', 'gutenberg_register_collaboration_wpdb_table', 0 );
 }
 
 if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
@@ -56,9 +94,12 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 	 * Registers REST API routes for collaborative editing.
 	 */
 	function gutenberg_register_collaboration_rest_routes(): void {
-		$sync_storage = new WP_Sync_Post_Meta_Storage();
-		$sync_server  = new WP_HTTP_Polling_Sync_Server( $sync_storage );
-		$sync_server->register_routes();
+		if ( ! gutenberg_is_collaboration_enabled() ) {
+			return;
+		}
+		$collaboration_storage = new WP_Collaboration_Table_Storage();
+		$collaboration_server  = new WP_HTTP_Polling_Collaboration_Server( $collaboration_storage );
+		$collaboration_server->register_routes();
 	}
 	add_action( 'rest_api_init', 'gutenberg_register_collaboration_rest_routes' );
 }
@@ -142,13 +183,7 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 function gutenberg_inject_real_time_collaboration_setting() {
 	global $pagenow;
 
-	if ( ! get_option( 'wp_collaboration_enabled' ) ) {
-		return;
-	}
-
-	// Temporary check to bridge the short time when this is change is merged in
-	// Gutenberg but not in core.
-	if ( ! get_option( 'wp_enable_real_time_collaboration' ) ) {
+	if ( ! gutenberg_is_collaboration_enabled() ) {
 		return;
 	}
 
@@ -168,11 +203,6 @@ function gutenberg_inject_real_time_collaboration_setting() {
 	);
 }
 add_action( 'admin_init', 'gutenberg_inject_real_time_collaboration_setting' );
-
-/**
- * Core filters the default value, so hook with a higher priority to ensure the
- * setting is enabled by default when the Gutenberg plugin is active.
- */
 add_filter( 'default_option_wp_collaboration_enabled', '__return_true', 500 );
 
 /**
@@ -186,7 +216,7 @@ add_filter( 'default_option_wp_collaboration_enabled', '__return_true', 500 );
 function gutenberg_post_list_collaboration_ui() {
 	global $pagenow;
 
-	if ( ! get_option( 'wp_collaboration_enabled' ) ) {
+	if ( ! gutenberg_is_collaboration_enabled() ) {
 		return;
 	}
 
@@ -317,4 +347,77 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 	}
 
 	return $actions;
+}
+
+if ( ! function_exists( 'gutenberg_delete_old_collaboration_data' ) ) {
+	/**
+	 * Deletes stale collaboration data from the collaboration table.
+	 *
+	 * Removes non-awareness rows older than 7 days and awareness rows older
+	 * than 60 seconds. Rows left behind by abandoned collaborative editing
+	 * sessions are cleaned up to prevent unbounded table growth.
+	 */
+	function gutenberg_delete_old_collaboration_data() {
+		global $wpdb;
+
+		if ( ! isset( $wpdb->collaboration ) || empty( $wpdb->collaboration ) ) {
+			return;
+		}
+
+		if ( ! gutenberg_is_collaboration_enabled() ) {
+			/*
+			 * Collaboration was enabled in the past but has since been disabled.
+			 * Clean up any remaining stale data and unschedule the cron job
+			 * so this callback does not continue to run.
+			 */
+			$wpdb->query(
+				$wpdb->prepare(
+					"DELETE FROM {$wpdb->collaboration} WHERE date_gmt < %s",
+					gmdate( 'Y-m-d H:i:s', time() - WEEK_IN_SECONDS )
+				)
+			);
+
+			$wpdb->query(
+				$wpdb->prepare(
+					"DELETE FROM {$wpdb->collaboration} WHERE type = 'awareness' AND date_gmt < %s",
+					gmdate( 'Y-m-d H:i:s', time() - 60 )
+				)
+			);
+
+			wp_clear_scheduled_hook( 'gutenberg_delete_old_collaboration_data' );
+			return;
+		}
+
+		/* Clean up rows older than 7 days. */
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->collaboration} WHERE date_gmt < %s",
+				gmdate( 'Y-m-d H:i:s', time() - WEEK_IN_SECONDS )
+			)
+		);
+
+		// Clean up awareness rows older than 60 seconds.
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->collaboration} WHERE type = 'awareness' AND date_gmt < %s",
+				gmdate( 'Y-m-d H:i:s', time() - 60 )
+			)
+		);
+	}
+	add_action( 'gutenberg_delete_old_collaboration_data', 'gutenberg_delete_old_collaboration_data' );
+}
+
+if ( ! function_exists( 'gutenberg_schedule_collaboration_cleanup' ) ) {
+	/**
+	 * Schedules the collaboration data cleanup cron job.
+	 */
+	function gutenberg_schedule_collaboration_cleanup() {
+		if ( gutenberg_is_collaboration_enabled()
+			&& ! wp_next_scheduled( 'gutenberg_delete_old_collaboration_data' )
+			&& ! wp_installing()
+		) {
+			wp_schedule_event( time(), 'daily', 'gutenberg_delete_old_collaboration_data' );
+		}
+	}
+	add_action( 'admin_init', 'gutenberg_schedule_collaboration_cleanup' );
 }
