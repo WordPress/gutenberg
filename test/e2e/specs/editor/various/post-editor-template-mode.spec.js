@@ -23,13 +23,6 @@ test.use( {
 test.describe( 'Post Editor Template mode', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin( 'gutenberg-test-block-templates' );
-		// Document-Isolation-Policy places the editor in its own agent cluster.
-		// Template creation involves page reload and preview opens frontend
-		// pages without the DIP header, creating an agent cluster mismatch
-		// that breaks cross-window communication.
-		await requestUtils.activatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
@@ -42,9 +35,6 @@ test.describe( 'Post Editor Template mode', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-templates' );
-		await requestUtils.deactivatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
 	} );
 
 	test( 'Allow to switch to template mode, edit the template and check the result', async ( {

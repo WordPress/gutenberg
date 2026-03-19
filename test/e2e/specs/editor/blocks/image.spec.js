@@ -1089,12 +1089,6 @@ test.describe( 'Image - Site editor', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 		await requestUtils.activateTheme( 'emptytheme' );
-		// Client-side media processing is not yet fully supported in the
-		// site editor context (upload pipeline gets stuck). Disable it
-		// so the test can use the traditional server-side upload path.
-		await requestUtils.activatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -1110,9 +1104,6 @@ test.describe( 'Image - Site editor', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deactivatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
