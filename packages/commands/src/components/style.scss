@@ -135,15 +135,8 @@ $palette-header-height: 48px;
 			border-top: $border-width solid $gray-300;
 		}
 
-		// Ensures there is always padding bottom on the last group, when there are commands.
-		&
-		[cmdk-list-sizer] > [cmdk-group]:last-child
-		[cmdk-group-items]:not(:empty) {
-			padding-bottom: $grid-unit-10;
-		}
-
 		& [cmdk-list-sizer] > [cmdk-group] > [cmdk-group-items]:not(:empty) {
-			padding: 0 $grid-unit-10;
+			padding: 0 $grid-unit-10 $grid-unit-05;
 		}
 
 		[cmdk-group-heading] {
