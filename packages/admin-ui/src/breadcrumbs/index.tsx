@@ -56,7 +56,7 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 						<Link to={ item.to }>{ item.label }</Link>
 					</li>
 				) ) }
-				<li key={ items.length - 1 }>
+				<li>
 					{ lastItem.to ? (
 						<Link to={ lastItem.to }>{ lastItem.label }</Link>
 					) : (
