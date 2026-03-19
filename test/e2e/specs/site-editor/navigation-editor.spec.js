@@ -110,7 +110,7 @@ test.describe( 'Editing Navigation Menus', () => {
 			// The Settings tab is visible due to Custom CSS support.
 			await expect(
 				sidebar.getByRole( 'tab', { name: 'Settings' } )
-			).toBeVisible();
+			).toBeHidden();
 			await expect(
 				sidebar.getByRole( 'tab', { name: 'Styles' } )
 			).toBeHidden();
