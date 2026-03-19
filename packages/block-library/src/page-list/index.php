@@ -5,12 +5,7 @@
  * @package WordPress
  */
 
-// Path differs between source and build: '../navigation/shared/' in source, './navigation/shared/' in build.
-if ( file_exists( __DIR__ . '/../navigation/shared/get-submenu-visibility.php' ) ) {
-	require_once __DIR__ . '/../navigation/shared/get-submenu-visibility.php';
-} else {
-	require_once __DIR__ . '/navigation/shared/get-submenu-visibility.php';
-}
+require_once __DIR__ . '/navigation/shared/get-submenu-visibility.php';
 
 /**
  * Build an array with CSS classes and inline styles defining the colors
