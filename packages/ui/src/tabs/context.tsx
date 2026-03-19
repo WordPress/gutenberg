@@ -6,7 +6,6 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
-import warning from '@wordpress/warning';
 
 type TabsValidationContextType = {
 	registerTab: () => () => void;
@@ -94,9 +93,11 @@ function TabsValidationProviderDev( {
 			const panelCount = panelCountRef.current;
 
 			if ( tabCount !== panelCount ) {
-				warning(
-					`Tabs: Tab/Panel count mismatch. Found ${ tabCount } Tab(s) and ${ panelCount } Panel(s). ` +
-						`Each Tab should have a corresponding Panel.`
+				throw new Error(
+					`Tabs: Tab/Panel count mismatch (${ tabCount } Tabs, ${ panelCount } Panels). ` +
+						`Each Tab must be associated with exactly one Panel. ` +
+						`Mismatched or missing associations can break screen reader navigation ` +
+						`and violate WAI-ARIA Tabs pattern requirements.`
 				);
 			}
 

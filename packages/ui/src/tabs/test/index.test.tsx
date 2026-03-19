@@ -2258,7 +2258,22 @@ describe( 'Tabs', () => {
 	} );
 
 	describe( 'Development mode validation', () => {
-		it( 'should warn when there are more Tabs than Panels', async () => {
+		function collectUncaughtErrors() {
+			const errors: Error[] = [];
+			const handler = ( event: ErrorEvent ) => {
+				event.preventDefault();
+				errors.push( event.error );
+			};
+			window.addEventListener( 'error', handler );
+			return {
+				errors,
+				cleanup: () => window.removeEventListener( 'error', handler ),
+			};
+		}
+
+		it( 'should throw when there are more Tabs than Panels', async () => {
+			const { errors, cleanup } = collectUncaughtErrors();
+
 			render(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
@@ -2274,15 +2289,19 @@ describe( 'Tabs', () => {
 			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
 
 			await waitFor( () => {
-				expect( console ).toHaveWarned();
+				expect( errors.length ).toBeGreaterThan( 0 );
 			} );
 
-			expect( console ).toHaveWarnedWith(
-				'Tabs: Tab/Panel count mismatch. Found 3 Tab(s) and 2 Panel(s). Each Tab should have a corresponding Panel.'
+			expect( errors[ 0 ].message ).toBe(
+				'Tabs: Tab/Panel count mismatch (3 Tabs, 2 Panels). Each Tab must be associated with exactly one Panel. Mismatched or missing associations can break screen reader navigation and violate WAI-ARIA Tabs pattern requirements.'
 			);
+
+			cleanup();
 		} );
 
-		it( 'should warn when there are more Panels than Tabs', async () => {
+		it( 'should throw when there are more Panels than Tabs', async () => {
+			const { errors, cleanup } = collectUncaughtErrors();
+
 			render(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
@@ -2298,15 +2317,19 @@ describe( 'Tabs', () => {
 			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
 
 			await waitFor( () => {
-				expect( console ).toHaveWarned();
+				expect( errors.length ).toBeGreaterThan( 0 );
 			} );
 
-			expect( console ).toHaveWarnedWith(
-				'Tabs: Tab/Panel count mismatch. Found 2 Tab(s) and 3 Panel(s). Each Tab should have a corresponding Panel.'
+			expect( errors[ 0 ].message ).toBe(
+				'Tabs: Tab/Panel count mismatch (2 Tabs, 3 Panels). Each Tab must be associated with exactly one Panel. Mismatched or missing associations can break screen reader navigation and violate WAI-ARIA Tabs pattern requirements.'
 			);
+
+			cleanup();
 		} );
 
-		it( 'should not warn when Tab and Panel counts match', async () => {
+		it( 'should not throw when Tab and Panel counts match', async () => {
+			const { errors, cleanup } = collectUncaughtErrors();
+
 			render(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
@@ -2323,10 +2346,14 @@ describe( 'Tabs', () => {
 			// Wait a bit to ensure validation has run
 			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
 
-			expect( console ).not.toHaveWarned();
+			expect( errors ).toHaveLength( 0 );
+
+			cleanup();
 		} );
 
-		it( 'should warn when tabs are used without any panels', async () => {
+		it( 'should throw when tabs are used without any panels', async () => {
+			const { errors, cleanup } = collectUncaughtErrors();
+
 			render(
 				<Tabs.Root>
 					<Tabs.List>
@@ -2337,15 +2364,19 @@ describe( 'Tabs', () => {
 			);
 
 			await waitFor( () => {
-				expect( console ).toHaveWarned();
+				expect( errors.length ).toBeGreaterThan( 0 );
 			} );
 
-			expect( console ).toHaveWarnedWith(
-				'Tabs: Tab/Panel count mismatch. Found 2 Tab(s) and 0 Panel(s). Each Tab should have a corresponding Panel.'
+			expect( errors[ 0 ].message ).toBe(
+				'Tabs: Tab/Panel count mismatch (2 Tabs, 0 Panels). Each Tab must be associated with exactly one Panel. Mismatched or missing associations can break screen reader navigation and violate WAI-ARIA Tabs pattern requirements.'
 			);
+
+			cleanup();
 		} );
 
 		it( 'should detect count mismatch after dynamic changes', async () => {
+			const { errors, cleanup } = collectUncaughtErrors();
+
 			const { rerender } = render(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
@@ -2362,8 +2393,8 @@ describe( 'Tabs', () => {
 			// Wait for validation
 			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
 
-			// No warnings since counts match
-			expect( console ).not.toHaveWarned();
+			// No errors since counts match
+			expect( errors ).toHaveLength( 0 );
 
 			// Remove a panel to create a mismatch
 			rerender(
@@ -2377,12 +2408,14 @@ describe( 'Tabs', () => {
 			);
 
 			await waitFor( () => {
-				expect( console ).toHaveWarned();
+				expect( errors.length ).toBeGreaterThan( 0 );
 			} );
 
-			expect( console ).toHaveWarnedWith(
-				'Tabs: Tab/Panel count mismatch. Found 2 Tab(s) and 1 Panel(s). Each Tab should have a corresponding Panel.'
+			expect( errors[ 0 ].message ).toBe(
+				'Tabs: Tab/Panel count mismatch (2 Tabs, 1 Panels). Each Tab must be associated with exactly one Panel. Mismatched or missing associations can break screen reader navigation and violate WAI-ARIA Tabs pattern requirements.'
 			);
+
+			cleanup();
 		} );
 	} );
 } );
