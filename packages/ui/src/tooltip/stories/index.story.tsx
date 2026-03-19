@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Tooltip } from '../..';
+import { formatBold, formatItalic } from '@wordpress/icons';
+import { Icon, Tooltip } from '../..';
 
 const meta: Meta< typeof Tooltip.Root > = {
 	title: 'Design System/Components/Tooltip',
@@ -83,12 +84,16 @@ export const WithProvider: StoryObj< typeof Tooltip.Root > = {
 		<Tooltip.Provider delay={ 0 }>
 			<div style={ { display: 'flex', gap: '1rem' } }>
 				<Tooltip.Root>
-					<Tooltip.Trigger aria-label="Bold">𝐁</Tooltip.Trigger>
+					<Tooltip.Trigger aria-label="Bold">
+						<Icon icon={ formatBold } />
+					</Tooltip.Trigger>
 					<Tooltip.Popup>Bold</Tooltip.Popup>
 				</Tooltip.Root>
 
 				<Tooltip.Root>
-					<Tooltip.Trigger aria-label="Italic">𝐼</Tooltip.Trigger>
+					<Tooltip.Trigger aria-label="Italic">
+						<Icon icon={ formatItalic } />
+					</Tooltip.Trigger>
 					<Tooltip.Popup>Italic</Tooltip.Popup>
 				</Tooltip.Root>
 			</div>
