@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { Icon as IconComponent } from '../icon';
+import { Icon as _Icon } from '../icon';
 import { Visual } from './visual';
 import type { EmptyStateIconProps } from './types';
 import styles from './style.module.css';
@@ -17,7 +17,7 @@ export const Icon = forwardRef< HTMLDivElement, EmptyStateIconProps >(
 				className={ clsx( styles.icon, className ) }
 				{ ...restProps }
 			>
-				<IconComponent icon={ icon } />
+				<_Icon icon={ icon } />
 			</Visual>
 		);
 	}
