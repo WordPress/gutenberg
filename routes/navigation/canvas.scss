@@ -32,6 +32,44 @@
 	}
 }
 
+.navigation-canvas__toolbar-message {
+	font-size: 13px;
+	color: $gray-700;
+}
+
+.navigation-canvas__template-part-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.navigation-canvas__template-part-card {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid $gray-300;
+	border-radius: 4px;
+	overflow: hidden;
+	cursor: pointer;
+	transition: border-color 0.1s;
+
+	&:hover {
+		border-color: $gray-700;
+	}
+}
+
+.navigation-canvas__template-part-preview {
+	overflow: hidden;
+	background: $white;
+	pointer-events: none;
+	max-height: 300px;
+}
+
+.navigation-canvas__template-part-footer {
+	padding: 8px 12px;
+	border-top: 1px solid $gray-200;
+	font-size: 13px;
+}
+
 .navigation-canvas__divider {
 	border: none;
 	border-top: 1px solid $gray-200;

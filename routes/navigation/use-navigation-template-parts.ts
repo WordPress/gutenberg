@@ -3,6 +3,7 @@
  */
 import { useMemo } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 // @ts-expect-error - No type declarations available for @wordpress/blocks
 import { parse } from '@wordpress/blocks';
 import { useEditorAssets } from '@wordpress/lazy-editor';
@@ -55,6 +56,9 @@ export type PartMenuRef = { part: any; menuIds: number[] };
  * Waits for editor assets to be ready before parsing so that block types are
  * registered and parse() returns correct results.
  *
+ * Reads edited entity content (unsaved local edits) for matching, but returns
+ * the original entity records so downstream consumers get the expected shape.
+ *
  * @return {Object} Object with partMenuRefs array and isResolving boolean.
  *                  partMenuRefs contains only parts that reference at least one
  *                  navigation menu.
@@ -81,6 +85,37 @@ export default function useNavigationTemplateParts(): {
 
 	const fallbackMenuId = ( fallbackMenus as any )?.[ 0 ]?.id;
 
+	// Read any pending (unsaved) edits for each template part so we can
+	// detect newly-assigned navigation refs immediately after
+	// editEntityRecord is called.
+	const templatePartIds = useMemo(
+		() => ( templateParts as any[] )?.map( ( p ) => p.id ) ?? [],
+		[ templateParts ]
+	);
+
+	const editsMap = useSelect(
+		( select ) => {
+			if ( ! templatePartIds.length ) {
+				return {};
+			}
+			// @ts-expect-error - getEntityRecordEdits types
+			const { getEntityRecordEdits } = select( 'core' );
+			const map: Record< string, any > = {};
+			for ( const id of templatePartIds ) {
+				const edits = getEntityRecordEdits(
+					'postType',
+					TEMPLATE_PART_POST_TYPE,
+					id
+				);
+				if ( edits?.content ) {
+					map[ id ] = edits.content;
+				}
+			}
+			return map;
+		},
+		[ templatePartIds ]
+	);
+
 	const partMenuRefs = useMemo( () => {
 		if ( ! assetsReady || ! templateParts ) {
 			return [];
@@ -88,10 +123,24 @@ export default function useNavigationTemplateParts(): {
 
 		return ( templateParts as any[] ).reduce(
 			( acc: PartMenuRef[], part ) => {
-				if ( ! part?.content?.raw ) {
+				// Prefer edited content (unsaved local edits) over the
+				// server version so that the UI updates immediately after
+				// assigning a navigation menu via editEntityRecord.
+				const editedContent = editsMap[ part.id ];
+				let rawContent: string | undefined;
+				if ( editedContent ) {
+					rawContent =
+						typeof editedContent === 'string'
+							? editedContent
+							: editedContent?.raw;
+				}
+				if ( ! rawContent ) {
+					rawContent = part?.content?.raw;
+				}
+				if ( ! rawContent || typeof rawContent !== 'string' ) {
 					return acc;
 				}
-				const blocks = parse( part.content.raw );
+				const blocks = parse( rawContent );
 				const menuIds = getReferencedMenuIds( blocks, fallbackMenuId );
 				if ( menuIds.length > 0 ) {
 					acc.push( { part, menuIds } );
@@ -100,7 +149,7 @@ export default function useNavigationTemplateParts(): {
 			},
 			[]
 		);
-	}, [ assetsReady, templateParts, fallbackMenuId ] );
+	}, [ assetsReady, templateParts, editsMap, fallbackMenuId ] );
 
 	return {
 		partMenuRefs,
