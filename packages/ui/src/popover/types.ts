@@ -26,6 +26,7 @@ export interface PopupProps
 			_Popover.Positioner.Props,
 			| 'align'
 			| 'alignOffset'
+			| 'anchor'
 			| 'collisionAvoidance'
 			| 'collisionBoundary'
 			| 'collisionPadding'

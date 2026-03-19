@@ -22,6 +22,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	{
 		align = 'center',
 		alignOffset,
+		anchor,
 		animated = true,
 		children,
 		className,
@@ -47,6 +48,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		<_Popover.Positioner
 			align={ align }
 			alignOffset={ alignOffset }
+			anchor={ anchor }
 			collisionAvoidance={ collisionAvoidance }
 			collisionBoundary={ collisionBoundary }
 			collisionPadding={ collisionPadding }

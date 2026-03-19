@@ -464,6 +464,35 @@ describe( 'Popover', () => {
 		} );
 	} );
 
+	describe( 'anchor', () => {
+		it( 'should render the popup when an anchor element is provided without a trigger', async () => {
+			function AnchorTest() {
+				const [ anchorEl, setAnchorEl ] =
+					useState< HTMLDivElement | null >( null );
+				return (
+					<>
+						<div ref={ setAnchorEl } data-testid="anchor">
+							Anchor element
+						</div>
+						<Popover.Root defaultOpen>
+							<Popover.Popup anchor={ anchorEl ?? undefined }>
+								Anchored content
+							</Popover.Popup>
+						</Popover.Root>
+					</>
+				);
+			}
+
+			render( <AnchorTest /> );
+
+			await waitFor( () => {
+				expect(
+					screen.getByText( 'Anchored content' )
+				).toBeInTheDocument();
+			} );
+		} );
+	} );
+
 	describe( 'initialFocus', () => {
 		it( 'should not move focus when initialFocus is false', async () => {
 			const user = userEvent.setup();
