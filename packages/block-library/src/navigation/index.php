@@ -110,8 +110,8 @@ class WP_Navigation_Block_Renderer {
 	 * @return bool Returns whether or not to load the view script.
 	 */
 	private static function is_interactive( $attributes, $inner_blocks ) {
-		$has_submenus        = static::has_submenus( $inner_blocks );
-		$is_responsive_menu  = static::is_responsive( $attributes );
+		$has_submenus       = static::has_submenus( $inner_blocks );
+		$is_responsive_menu = static::is_responsive( $attributes );
 		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 			$computed_visibility = gutenberg_block_core_shared_get_submenu_visibility( $attributes );
 		} else {
