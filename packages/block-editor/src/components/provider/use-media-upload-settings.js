@@ -20,6 +20,7 @@ function useMediaUploadSettings( settings = {} ) {
 			allowedMimeTypes: settings.allowedMimeTypes,
 			allImageSizes: settings.allImageSizes,
 			bigImageSizeThreshold: settings.bigImageSizeThreshold,
+			onHeicPluginRequired: settings.onHeicPluginRequired,
 		} ),
 		[ settings ]
 	);

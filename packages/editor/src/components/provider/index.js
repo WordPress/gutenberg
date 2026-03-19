@@ -45,6 +45,8 @@ import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
+import HeicUploadPrompt from '../heic-upload-prompt';
+import useHeicUploadPrompt from './use-heic-upload-prompt';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -289,11 +291,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			postTypeEntities,
 		] );
 		const { id, type } = rootLevelPost;
+		const { heicPromptState, onHeicPluginRequired, dismissHeicPrompt } =
+			useHeicUploadPrompt();
 		const blockEditorSettings = useBlockEditorSettings(
 			editorSettings,
 			type,
 			id,
-			mode
+			mode,
+			{ onHeicPluginRequired }
 		);
 		const [ blocks, onInput, onChange ] = useBlockEditorProps(
 			post,
@@ -465,6 +470,16 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									<StartTemplateOptions />
 									<PatternRenameModal />
 									<PatternDuplicateModal />
+									{ heicPromptState && (
+										<HeicUploadPrompt
+											files={ heicPromptState.files }
+											onRetry={ () => {
+												heicPromptState.retry();
+												dismissHeicPrompt();
+											} }
+											onDismiss={ dismissHeicPrompt }
+										/>
+									) }
 								</>
 							) }
 						</BlockEditorProviderComponent>

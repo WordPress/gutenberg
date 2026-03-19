@@ -119,7 +119,13 @@ const {
  *
  * @return {Object} Block Editor Settings.
  */
-function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
+function useBlockEditorSettings(
+	settings,
+	postType,
+	postId,
+	renderingMode,
+	{ onHeicPluginRequired } = {}
+) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		allImageSizes,
@@ -340,6 +346,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				? editMediaEntity
 				: undefined,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
+			onHeicPluginRequired: hasUploadPermissions
+				? onHeicPluginRequired
+				: undefined,
 			[ mediaUploadOnSuccessKey ]: hasUploadPermissions
 				? mediaUploadOnSuccess
 				: undefined,
@@ -440,6 +449,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		allImageSizes,
 		bigImageSizeThreshold,
 		isNavigationOverlayContext,
+		onHeicPluginRequired,
 	] );
 }
 

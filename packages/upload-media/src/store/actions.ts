@@ -35,6 +35,7 @@ import { vipsCancelOperations } from './utils';
 import { validateMimeType } from '../validate-mime-type';
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
 import { validateFileSize } from '../validate-file-size';
+import { isHeicFile } from '../is-heic-file';
 
 type ActionCreators = {
 	addItem: typeof addItem;
@@ -95,6 +96,7 @@ export function addItems( {
 }: AddItemsArgs ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
 		const batchId = uuidv4();
+		let heicPromptShown = false;
 		for ( const file of files ) {
 			/*
 			 Check if the caller (e.g. a block) supports this mime type.
@@ -108,6 +110,33 @@ export function addItems( {
 					select.getSettings().allowedMimeTypes
 				);
 			} catch ( error: unknown ) {
+				// If a HEIC file fails MIME validation and a handler is registered,
+				// prompt for plugin installation instead of showing an error.
+				const settings = select.getSettings();
+				if (
+					! heicPromptShown &&
+					isHeicFile( file ) &&
+					settings.onHeicPluginRequired
+				) {
+					heicPromptShown = true;
+					const heicFiles = files.filter( isHeicFile );
+					settings.onHeicPluginRequired( heicFiles, () => {
+						dispatch.addItems( {
+							files: heicFiles,
+							onChange,
+							onSuccess,
+							onBatchSuccess,
+							onError,
+							additionalData,
+							allowedTypes,
+						} );
+					} );
+					continue;
+				}
+				if ( heicPromptShown && isHeicFile( file ) ) {
+					// Already prompted for this batch, skip remaining HEIC files.
+					continue;
+				}
 				onError?.( error as Error );
 				continue;
 			}

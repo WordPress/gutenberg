@@ -183,6 +183,12 @@ export interface Settings {
 	imageQuality?: number;
 	// Function for finalizing an upload after all client-side processing is complete.
 	mediaFinalize?: ( id: number ) => Promise< void >;
+	// Callback invoked when HEIC files need a plugin to be uploaded.
+	// Receives the pending files and a retry function to re-attempt the upload.
+	onHeicPluginRequired?: (
+		files: File[],
+		retry: () => void
+	) => void;
 }
 
 // Matches the Attachment type from the media-utils package.

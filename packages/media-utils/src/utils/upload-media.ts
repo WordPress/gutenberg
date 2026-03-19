@@ -25,6 +25,21 @@ declare global {
 	}
 }
 
+/**
+ * Checks whether a file is HEIC or HEIF format.
+ *
+ * @param file The file to check.
+ * @return True if the file is HEIC/HEIF.
+ */
+function isHeicFile( file: File ): boolean {
+	const heicTypes = [ 'image/heic', 'image/heif' ];
+	if ( heicTypes.includes( file.type ) ) {
+		return true;
+	}
+	const ext = file.name.split( '.' ).pop()?.toLowerCase();
+	return ext === 'heic' || ext === 'heif';
+}
+
 interface UploadMediaArgs {
 	// Additional data to include in the request.
 	additionalData?: AdditionalData;
@@ -44,6 +59,8 @@ interface UploadMediaArgs {
 	signal?: AbortSignal;
 	// Whether to allow multiple files to be uploaded.
 	multiple?: boolean;
+	// Callback invoked when HEIC files need a plugin to be uploaded.
+	onHeicPluginRequired?: ( files: File[], retry: () => void ) => void;
 }
 
 /**
@@ -71,6 +88,7 @@ export function uploadMedia( {
 	onFileChange,
 	signal,
 	multiple = true,
+	onHeicPluginRequired,
 }: UploadMediaArgs ) {
 	if ( ! multiple && filesList.length > 1 ) {
 		onError?.( new Error( __( 'Only one file can be used here.' ) ) );
@@ -93,12 +111,40 @@ export function uploadMedia( {
 		);
 	};
 
+	let heicPromptShown = false;
 	for ( const mediaFile of filesList ) {
 		// Verify if user is allowed to upload this mime type.
 		// Defer to the server when type not detected.
 		try {
 			validateMimeTypeForUser( mediaFile, wpAllowedMimeTypes );
 		} catch ( error: unknown ) {
+			// If a HEIC file fails MIME validation and a handler is registered,
+			// prompt for plugin installation instead of showing an error.
+			if (
+				! heicPromptShown &&
+				isHeicFile( mediaFile ) &&
+				onHeicPluginRequired
+			) {
+				heicPromptShown = true;
+				const heicFiles = Array.from( filesList ).filter( isHeicFile );
+				onHeicPluginRequired( heicFiles, () => {
+					uploadMedia( {
+						wpAllowedMimeTypes,
+						allowedTypes,
+						additionalData,
+						filesList: heicFiles,
+						maxUploadFileSize,
+						onError,
+						onFileChange,
+						signal,
+						multiple,
+					} );
+				} );
+				continue;
+			}
+			if ( heicPromptShown && isHeicFile( mediaFile ) ) {
+				continue;
+			}
 			onError?.( error as Error );
 			continue;
 		}
