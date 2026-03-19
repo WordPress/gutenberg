@@ -27,7 +27,7 @@ function getErrorMessage( error: unknown ): string {
 	if ( error instanceof Error ) {
 		return error.message;
 	}
-	
+
 	if ( typeof error === 'object' && error !== null && 'message' in error ) {
 		return String( ( error as { message: unknown } ).message );
 	}
@@ -93,6 +93,35 @@ export default function ActionsSection() {
 		}
 	}
 
+	const ACTIONS = [
+		{
+			slug: 'import',
+			title: __( 'Import' ),
+			description: __( 'Upload a JSON file to import your guidelines.' ),
+			buttonLabel: __( 'Upload' ),
+			ariaLabel: __( 'Import guidelines' ),
+			onClick: handleImportClick,
+			isBusy: isImporting,
+			disabled: isImporting || !! pendingImport,
+		},
+		{
+			slug: 'export',
+			title: __( 'Export' ),
+			description: __( 'Export your guidelines to a JSON file.' ),
+			buttonLabel: __( 'Download' ),
+			ariaLabel: __( 'Export guidelines' ),
+			onClick: handleExportClick,
+		},
+		{
+			slug: 'revert',
+			title: __( 'Revert' ),
+			description: __( 'Use a previous version of your guidelines.' ),
+			buttonLabel: __( 'View history' ),
+			ariaLabel: __( 'View history of guidelines' ),
+			onClick: () => goTo( '/revision-history' ),
+		},
+	];
+
 	return (
 		<VStack spacing={ 4 } className="content-guidelines__actions">
 			<Heading level={ 3 } size={ 15 } weight={ 500 }>
@@ -121,38 +150,9 @@ export default function ActionsSection() {
 				 */
 				/* eslint-disable jsx-a11y/no-redundant-roles */ }
 				<ul role="list" className="content-guidelines__actions-list">
-					<ActionItem
-						slug="import"
-						title={ __( 'Import' ) }
-						description={ __(
-							'Upload a JSON file to import your guidelines.'
-						) }
-						buttonLabel={ __( 'Upload' ) }
-						ariaLabel={ __( 'Import guidelines' ) }
-						onClick={ handleImportClick }
-						isBusy={ isImporting }
-						disabled={ isImporting || !! pendingImport }
-					/>
-					<ActionItem
-						slug="export"
-						title={ __( 'Export' ) }
-						description={ __(
-							'Export your guidelines to a JSON file.'
-						) }
-						buttonLabel={ __( 'Download' ) }
-						ariaLabel={ __( 'Export guidelines' ) }
-						onClick={ handleExportClick }
-					/>
-					<ActionItem
-						slug="revert"
-						title={ __( 'Revert' ) }
-						description={ __(
-							'Use a previous version of your guidelines.'
-						) }
-						buttonLabel={ __( 'View history' ) }
-						ariaLabel={ __( 'View history of guidelines' ) }
-						onClick={ () => goTo( '/revision-history' ) }
-					/>
+					{ ACTIONS.map( ( action ) => (
+						<ActionItem key={ action.slug } { ...action } />
+					) ) }
 				</ul>
 				{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 			</Card>
