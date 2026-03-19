@@ -100,6 +100,7 @@
 ### Internal
 
 -   `Autocomplete`: Extract matching logic into a standalone pure function ([#76957](https://github.com/WordPress/gutenberg/pull/76957)).
+-   `Modal`, `Menu`: Use `--wpds-motion-*` design tokens for animation duration and easing ([#76097](https://github.com/WordPress/gutenberg/pull/76097)).
 
 ## 32.4.0 (2026-03-18)
 
