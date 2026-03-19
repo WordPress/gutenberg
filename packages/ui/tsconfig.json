@@ -13,8 +13,7 @@
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
-		{ "path": "../theme" },
-		{ "path": "../warning" }
+		{ "path": "../theme" }
 	],
 	"files": [ "global.d.ts" ],
 	"exclude": []
