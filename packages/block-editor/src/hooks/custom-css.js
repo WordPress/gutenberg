@@ -85,23 +85,6 @@ function CustomCSSEdit( { clientId, name, setAttributes } ) {
 		[ clientId ]
 	);
 
-	const { createWarningNotice } = useDispatch( noticesStore );
-
-	const hasCustomCSS = !! style?.css;
-	useEffect( () => {
-		if ( ! canEditCSS && hasCustomCSS ) {
-			createWarningNotice(
-				__(
-					'This post contains blocks with custom CSS. You do not have permission to edit CSS, so any custom CSS will be removed if you save this post.'
-				),
-				{
-					id: CUSTOM_CSS_WARNING_NOTICE_ID,
-					isDismissible: true,
-				}
-			);
-		}
-	}, [ canEditCSS, hasCustomCSS, createWarningNotice ] );
-
 	// Don't render the panel if user lacks edit_css capability.
 	if ( ! canEditCSS ) {
 		return null;
@@ -132,6 +115,31 @@ function useBlockProps( { style } ) {
 		typeof customCSS === 'string' &&
 		customCSS.trim().length > 0 &&
 		validateCSS( customCSS );
+
+	const canEditCSS = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().canEditCSS,
+		[]
+	);
+
+	const { createWarningNotice } = useDispatch( noticesStore );
+
+	// Show a warning notice when the user lacks edit_css and a block has
+	// custom CSS. The fixed notice ID ensures only one notice is shown
+	// regardless of how many blocks have CSS.
+	const hasCustomCSS = !! customCSS;
+	useEffect( () => {
+		if ( ! canEditCSS && hasCustomCSS ) {
+			createWarningNotice(
+				__(
+					'This post contains blocks with custom CSS. You do not have permission to edit CSS, so any custom CSS will be removed if you save this post.'
+				),
+				{
+					id: CUSTOM_CSS_WARNING_NOTICE_ID,
+					isDismissible: true,
+				}
+			);
+		}
+	}, [ canEditCSS, hasCustomCSS, createWarningNotice ] );
 
 	const customCSSIdentifier = useInstanceId(
 		CUSTOM_CSS_INSTANCE_REFERENCE,
