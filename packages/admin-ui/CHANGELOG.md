@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Small spacing adjustments between title, subtitle and action elements in the header. [#76683](https://github.com/WordPress/gutenberg/pull/76683)
+
 ### Breaking Changes
 
 -   Change default `headingLevel` for the `Page` component's header from `2` to `1`, meaning from `h2` to `h1`. If you need to keep previous behaviour, use `<Page title="Example" headingLevel={ 2 }>` [#77617](https://github.com/WordPress/gutenberg/pull/77617)

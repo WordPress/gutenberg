@@ -35,12 +35,12 @@ export default function Header( {
 			className={ styles.header }
 			render={ <header /> }
 		>
-		<Stack
-			className={ styles[ 'header-content' ] }
-			direction="row"
-			gap="sm"
-			justify="space-between"
-		>
+			<Stack
+				className={ styles[ 'header-content' ] }
+				direction="row"
+				gap="sm"
+				justify="space-between"
+			>
 				<Stack direction="row" gap="sm" align="center" justify="start">
 					{ showSidebarToggle && (
 						<SidebarToggleSlot
@@ -72,7 +72,6 @@ export default function Header( {
 					<Stack
 						direction="row"
 						gap="sm"
-						style={ { width: 'auto', flexShrink: 0 } }
 						className={ styles[ 'header-actions' ] }
 						align="center"
 					>
