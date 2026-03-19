@@ -347,8 +347,9 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	// Get submenu visibility with backward compatibility for openSubmenusOnClick.
 	if ( $is_navigation_child ) {
 		// The build system prefixes this function with "gutenberg_" to avoid
-		// collisions with the core version. Use the prefixed name in the plugin.
-		// When this code is backported to core it will use the core functions.
+		// collisions with the core version. Until this function is backported to
+		// core, we need to guard its use and only call the prefixed name in
+		// the plugin.
 		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 			$submenu_visibility = gutenberg_block_core_shared_get_submenu_visibility( $block->context );
 		} else {
