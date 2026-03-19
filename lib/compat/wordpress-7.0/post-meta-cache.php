@@ -63,7 +63,7 @@ if ( ! function_exists( 'wp_post_meta_invalidates_query_cache' ) ) {
 	 *                          but included for API compatibility with Core.
 	 * @return bool True if the meta key invalidates query caches, false otherwise.
 	 */
-	function wp_post_meta_invalidates_query_cache( $meta_key, $post_type = '' ) {
+	function wp_post_meta_invalidates_query_cache( $meta_key, $post_type = '' ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- $post_type kept for API compatibility with Core.
 		$non_cacheable = gutenberg_non_cacheable_post_meta_keys();
 		return ! in_array( $meta_key, $non_cacheable, true );
 	}
