@@ -389,8 +389,10 @@ function gutenberg_inject_meta_box_plugin_names() {
 		'unknownMetaBoxPluginsCount' => $unknown_meta_box_plugin_count,
 	);
 
-	wp_print_inline_script_tag(
-		'window._wpMetaBoxPluginNames = ' . wp_json_encode( $data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ';'
+	wp_add_inline_script(
+		'wp-edit-post',
+		'window._wpMetaBoxPluginNames = ' . wp_json_encode( $data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ';',
+		'before'
 	);
 }
 add_action( 'admin_footer', 'gutenberg_inject_meta_box_plugin_names' );
