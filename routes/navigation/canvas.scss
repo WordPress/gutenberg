@@ -37,6 +37,23 @@
 	color: $gray-700;
 }
 
+.navigation-canvas__modal-content {
+	display: flex;
+	flex-direction: column;
+}
+
+.navigation-canvas__modal-scroll {
+	overflow-y: auto;
+	max-height: 50vh;
+}
+
+.navigation-canvas__modal-footer {
+	flex-shrink: 0;
+	border-top: 1px solid $gray-200;
+	padding-top: 16px;
+	margin-top: 16px;
+}
+
 .navigation-canvas__template-part-grid {
 	display: flex;
 	flex-direction: column;

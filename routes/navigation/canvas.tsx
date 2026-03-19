@@ -210,63 +210,68 @@ function AddToTemplatePartModal( {
 					<Spinner />
 				</div>
 			) : (
-				<VStack spacing={ 4 }>
-					<div className="navigation-canvas__template-part-grid">
-						{ ( templateParts as WpTemplatePart[] )?.filter(
-							( part ) => ! excludeIds.has( String( part.id ) )
-						).map(
-							( part ) => {
-								const id = String( part.id );
-								const title =
-									part.title?.rendered ||
-									part.slug ||
-									id;
-								return (
-									<label
-										key={ id }
-										className="navigation-canvas__template-part-card"
-									>
-										<div className="navigation-canvas__template-part-preview">
-											<Preview
-												blocks={
-													setFirstNavigationRef(
-														part?.content?.raw || '',
-														navigationId
-													)
-												}
-												description={
-													part.description
-												}
-											/>
-										</div>
-										<HStack
-											className="navigation-canvas__template-part-footer"
-											justify="flex-start"
-											spacing={ 2 }
+				<div className="navigation-canvas__modal-content">
+					<div className="navigation-canvas__modal-scroll">
+						<div className="navigation-canvas__template-part-grid">
+							{ ( templateParts as WpTemplatePart[] )?.filter(
+								( part ) => ! excludeIds.has( String( part.id ) )
+							).map(
+								( part ) => {
+									const id = String( part.id );
+									const title =
+										part.title?.rendered ||
+										part.slug ||
+										id;
+									return (
+										<label
+											key={ id }
+											className="navigation-canvas__template-part-card"
 										>
-											<CheckboxControl
-												__nextHasNoMarginBottom
-												checked={ selectedIds.has(
-													id
-												) }
-												onChange={ () =>
-													toggleSelection( id )
-												}
-											/>
-											<Icon
-												icon={ getTemplatePartIcon(
-													part.area
-												) }
-												size={ 24 }
-											/>
-											<span>{ title }</span>
-										</HStack>
-									</label>
-								);
-							}
-						) }
+											<div className="navigation-canvas__template-part-preview">
+												<Preview
+													blocks={
+														setFirstNavigationRef(
+															part?.content?.raw || '',
+															navigationId
+														)
+													}
+													description={
+														part.description
+													}
+												/>
+											</div>
+											<HStack
+												className="navigation-canvas__template-part-footer"
+												justify="flex-start"
+												spacing={ 2 }
+											>
+												<CheckboxControl
+													__nextHasNoMarginBottom
+													checked={ selectedIds.has(
+														id
+													) }
+													onChange={ () =>
+														toggleSelection( id )
+													}
+												/>
+												<Icon
+													icon={ getTemplatePartIcon(
+														part.area
+													) }
+													size={ 24 }
+												/>
+												<span>{ title }</span>
+											</HStack>
+										</label>
+									);
+								}
+							) }
+						</div>
 					</div>
-					<HStack justify="flex-end">
+					<HStack
+						className="navigation-canvas__modal-footer"
+						justify="flex-end"
+					>
 						<Button
 							variant="tertiary"
 							onClick={ onClose }
@@ -281,7 +286,7 @@ function AddToTemplatePartModal( {
 							{ __( 'Apply' ) }
 						</Button>
 					</HStack>
-				</VStack>
+				</div>
 			) }
 		</Modal>
 	);
