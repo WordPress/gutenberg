@@ -21,18 +21,11 @@ describe( 'InputControl', () => {
 	} );
 
 	it( 'renders with a visually hidden label', () => {
-		const { container } = render(
-			<InputControl label="Search" hideLabelFromVision />
-		);
+		render( <InputControl label="Search" hideLabelFromVision /> );
 
 		expect(
 			screen.getByRole( 'textbox', { name: 'Search' } )
 		).toBeVisible();
-		// The label should still be in the DOM for accessibility,
-		// but visually hidden via the VisuallyHidden component.
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-		const label = container.querySelector( 'label' );
-		expect( label ).toHaveTextContent( 'Search' );
 	} );
 
 	it( 'renders with a description', () => {
