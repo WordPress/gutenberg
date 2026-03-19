@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `Card`: Add `overflow: clip` to `Card.Root` to prevent child content from overflowing rounded corners ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   `Card`: Add `overflow: clip` to `Card.Root` to prevent child content from overflowing rounded corners ([#76678](https://github.com/WordPress/gutenberg/pull/76678)).
 
 ### Internal
 
