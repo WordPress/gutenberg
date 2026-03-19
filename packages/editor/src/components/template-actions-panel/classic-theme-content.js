@@ -29,7 +29,6 @@ import CreateNewTemplateModal from '../post-template/create-new-template-modal';
 
 export default function ClassicThemeContent( { templateId } ) {
 	const [ isCreateModalOpen, setIsCreateModalOpen ] = useState( false );
-
 	const {
 		onNavigateToEntityRecord,
 		canCreateTemplate,
@@ -51,58 +50,19 @@ export default function ClassicThemeContent( { templateId } ) {
 			getEditorSettings: _getEditorSettings,
 		};
 	}, [] );
-
 	const { get: getPreference } = useSelect( preferencesStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
-
 	const { editedRecord: template } = useEntityRecord(
 		'postType',
 		'wp_template',
 		templateId
 	);
-
 	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_template', {
 		id: templateId,
 	} );
 
 	// Path A: No block template and cannot create templates.
 	if ( ! templateId && ! canCreateTemplate ) {
-		return null;
-	}
-
-	// Path B: No block template but can create templates.
-	if ( ! templateId ) {
-		return (
-			<>
-				<PanelBody title={ __( 'Template' ) } initialOpen={ false }>
-					<VStack>
-						<Text>
-							{ __(
-								'This page uses a classic template. To edit this template with blocks, create a block template.'
-							) }
-						</Text>
-						<HStack>
-							<Button
-								className="editor-template-actions-panel__action"
-								__next40pxDefaultSize
-								variant="secondary"
-								onClick={ () => setIsCreateModalOpen( true ) }
-							>
-								{ __( 'Create block template' ) }
-							</Button>
-						</HStack>
-					</VStack>
-				</PanelBody>
-				{ isCreateModalOpen && (
-					<CreateNewTemplateModal
-						onClose={ () => setIsCreateModalOpen( false ) }
-					/>
-				) }
-			</>
-		);
-	}
-
-	if ( ! template ) {
 		return null;
 	}
 
@@ -127,7 +87,9 @@ export default function ClassicThemeContent( { templateId } ) {
 		}
 	};
 
-	const templateName = decodeEntities( template.title );
+	const templateName = template
+		? decodeEntities( template.title )
+		: undefined;
 
 	const previewContent = !! blocks?.length && (
 		<BlockPreview.Async>
@@ -138,21 +100,32 @@ export default function ClassicThemeContent( { templateId } ) {
 	return (
 		<>
 			<PanelBody
-				title={ sprintf(
-					/* translators: %s: template name */
-					__( 'Template: %s' ),
-					templateName
-				) }
+				title={
+					template
+						? sprintf(
+								/* translators: %s: template name */
+								__( 'Template: %s' ),
+								templateName
+						  )
+						: __( 'Template' )
+				}
 				initialOpen={ false }
 			>
 				<VStack>
-					{ previewContent && (
+					{ ! templateId && (
+						<Text>
+							{ __(
+								'This page uses a classic template. To edit this template with blocks, create a block template.'
+							) }
+						</Text>
+					) }
+					{ template && previewContent && (
 						<div className="editor-template-actions-panel__preview">
 							{ previewContent }
 						</div>
 					) }
 					<HStack>
-						{ onNavigateToEntityRecord && (
+						{ template && onNavigateToEntityRecord && (
 							<Button
 								className="editor-template-actions-panel__action"
 								__next40pxDefaultSize
@@ -175,7 +148,9 @@ export default function ClassicThemeContent( { templateId } ) {
 								variant="secondary"
 								onClick={ () => setIsCreateModalOpen( true ) }
 							>
-								{ __( 'Create new' ) }
+								{ ! templateId
+									? __( 'Create block template' )
+									: __( 'Create new' ) }
 							</Button>
 						) }
 					</HStack>
