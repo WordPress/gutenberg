@@ -55,9 +55,9 @@ const MODE_ALL = 'all';
 
 const STATIC_AREAS = [
 	{ value: 'header', label: __( 'Header' ) },
+	{ value: 'navigation-overlay', label: __( 'Navigation Overlay' ) },
 	{ value: 'footer', label: __( 'Footer' ) },
 	{ value: 'sidebar', label: __( 'Panel' ) },
-	{ value: 'navigation-overlay', label: __( 'Navigation Overlay' ) },
 	{ value: 'uncategorized', label: __( 'General' ) },
 ] as const;
 
@@ -158,12 +158,30 @@ function Canvas() {
 	const searchParams = useSearch( { strict: false } );
 	const navigate = useNavigate();
 
-	// showPreview: Navigation Preview checkbox (on/off).
-	// templateArea: zero or one area selected (null = none).
-	const [ showPreview, setShowPreview ] = useState( true );
-	const [ templateArea, setTemplateArea ] = useState< string | null >(
-		MODE_ALL
-	);
+	// showPreview: absent or '1' = shown (default), '0' = hidden.
+	// canvas: absent = MODE_ALL (default), 'none' = hidden, otherwise area value.
+	const showPreview = ( searchParams as any ).preview !== '0';
+	const canvasParam = ( searchParams as any ).canvas as string | undefined;
+	const templateArea: string | null =
+		canvasParam === 'none' ? null : ( canvasParam ?? MODE_ALL );
+
+	function setShowPreview( next: boolean ) {
+		navigate( {
+			search: { ...searchParams, preview: next ? undefined : '0' },
+			replace: true,
+		} );
+	}
+
+	function setTemplateArea( next: string | null ) {
+		navigate( {
+			search: {
+				...searchParams,
+				canvas: next === null ? 'none' : next === MODE_ALL ? undefined : next,
+			},
+			replace: true,
+		} );
+	}
+
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 
 	const navigationId = useMemo( () => {
@@ -198,14 +216,26 @@ function Canvas() {
 			.filter( Boolean )
 			.join( ', ' ) || __( 'None' );
 
+	const areaOrder = useMemo(
+		() =>
+			Object.fromEntries(
+				STATIC_AREAS.map( ( { value }, index ) => [ value, index ] )
+			),
+		[]
+	);
+
 	const visibleTemplateParts = useMemo( () => {
-		if ( ! templateArea || templateArea === MODE_ALL ) {
-			return templateParts;
-		}
-		return ( templateParts as WpTemplatePart[] ).filter(
-			( part ) => part.area === templateArea
+		const filtered =
+			! templateArea || templateArea === MODE_ALL
+				? ( templateParts as WpTemplatePart[] )
+				: ( templateParts as WpTemplatePart[] ).filter(
+						( part ) => part.area === templateArea
+				  );
+		return [ ...filtered ].sort(
+			( a, b ) =>
+				( areaOrder[ a.area ] ?? 99 ) - ( areaOrder[ b.area ] ?? 99 )
 		);
-	}, [ templateParts, templateArea ] );
+	}, [ templateParts, templateArea, areaOrder ] );
 
 	const fields = useMemo( () => [ previewField, titleField ], [] );
 
@@ -245,7 +275,7 @@ function Canvas() {
 									role="menuitemcheckbox"
 									isSelected={ showPreview }
 									onClick={ () =>
-										setShowPreview( ( v ) => ! v )
+										setShowPreview( ! showPreview )
 									}
 								>
 									{ __( 'Navigation Preview' ) }
@@ -261,8 +291,10 @@ function Canvas() {
 									role="menuitemradio"
 									isSelected={ templateArea === MODE_ALL }
 									onClick={ () =>
-										setTemplateArea( ( v ) =>
-											v === MODE_ALL ? null : MODE_ALL
+										setTemplateArea(
+											templateArea === MODE_ALL
+												? null
+												: MODE_ALL
 										)
 									}
 								>
@@ -280,8 +312,10 @@ function Canvas() {
 										isSelected={ templateArea === value }
 										disabled={ ! usedAreas.has( value ) }
 										onClick={ () =>
-											setTemplateArea( ( v ) =>
-												v === value ? null : value
+											setTemplateArea(
+												templateArea === value
+													? null
+													: value
 											)
 										}
 									>
