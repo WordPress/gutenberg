@@ -28,6 +28,7 @@ import {
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
+import { stripServerManagedMeta } from './utils/crdt';
 
 /**
  * Requests authors from the REST API.
@@ -247,13 +248,25 @@ export const getEntityRecord =
 										return;
 									}
 
+									// Shallow-clone the record and its meta so we
+									// don't mutate the cached selector result.
+									// Strip server-managed meta keys before saving —
+									// sending their (possibly stale) client values
+									// can overwrite what the server calculates
+									// during save (e.g. _wp_ignored_hooked_blocks).
+									const recordToSave = {
+										...editedRecord,
+										meta: { ...meta },
+									};
+									stripServerManagedMeta( recordToSave );
+
 									// Trigger a save to persist the CRDT document. The entity's
 									// pre-persist hooks will create the persisted CRDT document
 									// and apply it to the record's meta.
 									dispatch.saveEntityRecord(
 										kind,
 										name,
-										editedRecord
+										recordToSave
 									);
 								} );
 						},
