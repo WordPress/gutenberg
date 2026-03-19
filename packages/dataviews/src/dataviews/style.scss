@@ -89,7 +89,10 @@
 
 	a,
 	&:is(a) {
-		text-decoration: none;
+		text-decoration: underline;
+		text-decoration-thickness: 0.5px;
+		text-decoration-color: $gray-600;
+		text-underline-offset: 2px;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		overflow: hidden;
@@ -99,6 +102,7 @@
 
 		&:hover {
 			color: var(--wp-admin-theme-color);
+			text-decoration-color: var(--wp-admin-theme-color);
 		}
 		@include link-reset();
 	}
