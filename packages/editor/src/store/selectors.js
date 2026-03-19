@@ -1881,6 +1881,17 @@ export function isPublishSidebarOpened( state ) {
 }
 
 /**
+ * Returns the collaboration upgrade handshake status.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The collaboration upgrade status object.
+ */
+export function getCollaborationUpgradeStatus( state ) {
+	return state.collaborationUpgrade;
+}
+
+/**
  * Returns whether the collaboration is enabled for the current post.
  *
  * @return {boolean} Whether collaboration is enabled.

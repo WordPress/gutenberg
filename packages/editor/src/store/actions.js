@@ -544,6 +544,19 @@ export function updatePostLock( lock ) {
 }
 
 /**
+ * Update the collaboration upgrade handshake state.
+ *
+ * @param {Object} status The collaboration upgrade status fields to merge.
+ * @return {Object} Action object.
+ */
+export function updateCollaborationUpgrade( status ) {
+	return {
+		type: 'UPDATE_COLLABORATION_UPGRADE',
+		status,
+	};
+}
+
+/**
  * Enable the publish sidebar.
  */
 export const enablePublishSidebar =

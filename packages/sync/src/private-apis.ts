@@ -11,6 +11,7 @@ import { ConnectionErrorCode } from './errors';
 import { lock } from './lock-unlock';
 import { createSyncManager } from './manager';
 import { pollingManager } from './providers/http-polling/polling-manager';
+import { resetProviderCreators } from './providers';
 import { default as Delta } from './quill-delta/Delta';
 
 export const privateApis = {};
@@ -23,5 +24,6 @@ lock( privateApis, {
 	CRDT_RECORD_MAP_KEY,
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_UNDO_IGNORED_ORIGIN,
+	resetProviderCreators,
 	retrySyncConnection: () => pollingManager.retryNow(),
 } );

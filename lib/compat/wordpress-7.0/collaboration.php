@@ -291,6 +291,78 @@ function gutenberg_filter_locked_post_text_for_rtc( $translation, $text, $domain
 }
 
 /**
+ * Handles the collaboration upgrade handshake via heartbeat.
+ *
+ * When a second user wants to upgrade a locked editing session to real-time
+ * collaboration, this handler manages the request/acceptance flow:
+ *
+ * 1. User B sends 'wp-request-collaboration' → stored as a transient.
+ * 2. User A's heartbeat (via 'wp-refresh-post-lock') checks for pending
+ *    requests and returns them.
+ * 3. User A sends 'wp-accept-collaboration' → stored as a transient.
+ * 4. User B polls 'wp-check-collaboration-status' → receives acceptance.
+ *
+ * @param array $response The heartbeat response.
+ * @param array $data     The heartbeat request data.
+ * @return array Modified heartbeat response.
+ */
+function gutenberg_handle_collaboration_upgrade_heartbeat( $response, $data ) {
+	// User B is requesting to collaborate on a locked post.
+	if ( ! empty( $data['wp-request-collaboration'] ) ) {
+		$post_id = absint( $data['wp-request-collaboration']['post_id'] );
+		if ( $post_id && current_user_can( 'edit_post', $post_id ) ) {
+			$user    = wp_get_current_user();
+			$request = array(
+				'user_id'    => $user->ID,
+				'name'       => $user->display_name,
+				'avatar_src' => get_avatar_url( $user->ID, array( 'size' => 128 ) ),
+				'time'       => time(),
+			);
+			set_transient( 'wp_collab_request_' . $post_id, wp_json_encode( $request ), 120 );
+			$response['wp-request-collaboration'] = array( 'status' => 'pending' );
+		}
+	}
+
+	// Piggyback on the lock owner's heartbeat to check for pending collaboration requests.
+	if ( ! empty( $data['wp-refresh-post-lock'] ) ) {
+		$post_id = absint( $data['wp-refresh-post-lock']['post_id'] );
+		if ( $post_id ) {
+			$request_json = get_transient( 'wp_collab_request_' . $post_id );
+			if ( $request_json ) {
+				$request = json_decode( $request_json, true );
+				if ( $request ) {
+					$response['wp-collaboration-request'] = $request;
+				}
+			}
+		}
+	}
+
+	// User A (lock owner) accepts the collaboration request.
+	if ( ! empty( $data['wp-accept-collaboration'] ) ) {
+		$post_id = absint( $data['wp-accept-collaboration']['post_id'] );
+		if ( $post_id ) {
+			set_transient( 'wp_collab_accepted_' . $post_id, '1', 300 );
+			delete_transient( 'wp_collab_request_' . $post_id );
+			$response['wp-accept-collaboration'] = array( 'status' => 'accepted' );
+		}
+	}
+
+	// User B polls for the lock owner's acceptance.
+	if ( ! empty( $data['wp-check-collaboration-status'] ) ) {
+		$post_id = absint( $data['wp-check-collaboration-status']['post_id'] );
+		if ( $post_id ) {
+			$accepted = get_transient( 'wp_collab_accepted_' . $post_id );
+			$response['wp-collaboration-status'] = array(
+				'status' => $accepted ? 'accepted' : 'pending',
+			);
+		}
+	}
+
+	return $response;
+}
+add_filter( 'heartbeat_received', 'gutenberg_handle_collaboration_upgrade_heartbeat', 15, 2 );
+
+/**
  * Filters post row actions to change "Edit" to "Join" for locked posts
  * when real-time collaboration is enabled.
  *

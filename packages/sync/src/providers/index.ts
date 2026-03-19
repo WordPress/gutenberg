@@ -12,6 +12,14 @@ import type { ProviderCreator } from '../types';
 let providerCreators: ProviderCreator[] | null = null;
 
 /**
+ * Reset the cached provider creators so they are re-evaluated on next access.
+ * Used when collaboration is activated dynamically at runtime.
+ */
+export function resetProviderCreators(): void {
+	providerCreators = null;
+}
+
+/**
  * Returns the defeault provider creators. HTTP polling is the current default
  * provider.
  *

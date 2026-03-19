@@ -147,6 +147,10 @@ export interface SyncConfig {
 }
 
 export interface SyncManager {
+	activateProviders: (
+		objectType: ObjectType,
+		objectId: ObjectID
+	) => Promise< void >;
 	createPersistedCRDTDoc: (
 		objectType: ObjectType,
 		objectId: ObjectID

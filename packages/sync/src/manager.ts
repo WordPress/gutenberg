@@ -26,6 +26,7 @@ import type {
 	ObjectID,
 	ObjectData,
 	ObjectType,
+	ProviderCreatorResult,
 	RecordHandlers,
 	SyncConfig,
 	SyncManager,
@@ -54,6 +55,7 @@ interface EntityState {
 	handlers: RecordHandlers;
 	objectId: ObjectID;
 	objectType: ObjectType;
+	providers: ProviderCreatorResult[];
 	syncConfig: SyncConfig;
 	unload: () => void;
 	ydoc: CRDTDoc;
@@ -183,7 +185,8 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
 			log( 'loadEntity', 'unloading', entityId );
-			providerResults.forEach( ( result ) => result.destroy() );
+			const state = entityStates.get( entityId );
+			state?.providers.forEach( ( result ) => result.destroy() );
 			handlers.onStatusChange( null );
 			recordMap.unobserveDeep( onRecordUpdate );
 			stateMap.unobserve( onStateMapUpdate );
@@ -249,6 +252,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			handlers,
 			objectId,
 			objectType,
+			providers: [],
 			syncConfig,
 			unload,
 			ydoc,
@@ -260,7 +264,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		// providers are available (e.g. real-time collaboration is off), the
 		// transport layer is disabled but the sync engine remains active.
 		log( 'loadEntity', 'connecting', entityId );
-		const providerResults = await Promise.all(
+		entityState.providers = await Promise.all(
 			getProviderCreators().map( async ( create ) => {
 				const provider = await create( {
 					objectType,
@@ -396,6 +400,54 @@ export function createSyncManager( debug = false ): SyncManager {
 		log( 'unloadEntity', 'unloading', entityId );
 		entityStates.get( entityId )?.unload();
 		updateCRDTDoc( objectType, null, {}, origin, { isSave: true } );
+	}
+
+	/**
+	 * Activate providers for an already-loaded entity. This connects the Yjs
+	 * document to the sync transport layer at runtime, enabling collaborative
+	 * editing for a session that was initially loaded without providers.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 */
+	async function _activateProviders(
+		objectType: ObjectType,
+		objectId: ObjectID
+	): Promise< void > {
+		const entityId = getEntityId( objectType, objectId );
+		const entityState = entityStates.get( entityId );
+
+		if ( ! entityState ) {
+			log( 'activateProviders', 'no entity state', entityId );
+			return;
+		}
+
+		if ( entityState.providers.length > 0 ) {
+			log( 'activateProviders', 'already has providers', entityId );
+			return;
+		}
+
+		const creators = getProviderCreators();
+		if ( creators.length === 0 ) {
+			log( 'activateProviders', 'no provider creators', entityId );
+			return;
+		}
+
+		const { ydoc, awareness, handlers } = entityState;
+
+		log( 'activateProviders', 'connecting providers', entityId );
+		entityState.providers = await Promise.all(
+			creators.map( async ( create ) => {
+				const provider = await create( {
+					objectType,
+					objectId,
+					ydoc,
+					awareness,
+				} );
+				provider.on( 'status', handlers.onStatusChange );
+				return provider;
+			} )
+		);
 	}
 
 	/**
@@ -651,6 +703,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 	// Wrap and return the public API.
 	return {
+		activateProviders: debugWrap( _activateProviders ),
 		createPersistedCRDTDoc: debugWrap( createPersistedCRDTDoc ),
 		getAwareness,
 		load: debugWrap( loadEntity ),
