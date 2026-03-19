@@ -162,17 +162,17 @@ export function receiveEditorAssets( assets ) {
 }
 
 /**
- * Returns an action object used to set whether collaboration is supported.
+ * Returns an action object used to set collaboration support errors.
+ * Each key in the errors object represents a reason collaboration is
+ * unsupported (e.g., 'metaBox' with plugin names).
  *
- * @param {boolean} supported Whether collaboration is supported.
+ * @param {Object} errors Errors to merge into the collaboration support errors state.
  *
  * @return {Object} Action object.
  */
-export const setCollaborationSupported =
-	( supported ) =>
-	( { dispatch } ) => {
-		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
-	};
+export function setCollaborationSupportErrors( errors ) {
+	return { type: 'SET_COLLABORATION_SUPPORT_ERRORS', errors };
+}
 
 /**
  * Returns an action object used to receive view config.

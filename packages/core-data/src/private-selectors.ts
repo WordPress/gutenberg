@@ -307,12 +307,27 @@ export function getEditorAssets( state: State ): Record< string, any > | null {
 
 /**
  * Returns whether collaboration is supported.
+ * Collaboration is supported when there are no support errors.
  *
  * @param state Data state.
  * @return Whether collaboration is supported.
  */
 export function isCollaborationSupported( state: State ): boolean {
-	return state.collaborationSupported;
+	return Object.keys( state.collaborationSupportErrors ).length === 0;
+}
+
+/**
+ * Returns the collaboration support errors object.
+ * An empty object means collaboration is supported. Each key represents
+ * a reason collaboration is unsupported.
+ *
+ * @param state Data state.
+ * @return The collaboration support errors.
+ */
+export function getCollaborationSupportErrors(
+	state: State
+): Record< string, any > {
+	return state.collaborationSupportErrors;
 }
 
 /**
