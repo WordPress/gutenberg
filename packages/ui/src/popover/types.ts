@@ -5,7 +5,13 @@ import type { ComponentProps } from '../utils/types';
 export interface RootProps
 	extends Pick<
 		_Popover.Root.Props,
-		'open' | 'onOpenChange' | 'defaultOpen' | 'modal'
+		| 'open'
+		| 'onOpenChange'
+		| 'defaultOpen'
+		| 'modal'
+		| 'openOnHover'
+		| 'delay'
+		| 'closeDelay'
 	> {
 	/**
 	 * The content to be rendered inside the component.
