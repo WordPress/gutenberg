@@ -418,6 +418,9 @@ function poll(): void {
 				state.onStatusChange( { status: 'connected' } );
 			} );
 
+			// Reset before checking each room
+			hasCollaborators = false;
+
 			rooms.forEach( ( room ) => {
 				if ( ! roomStates.has( room.room ) ) {
 					return;
