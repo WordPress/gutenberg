@@ -250,4 +250,30 @@ HTML;
 
 		$this->assertSame( array(), $result );
 	}
+
+	/**
+	 * @covers ::gutenberg_set_up_cross_origin_isolation_for_preview
+	 */
+	public function test_preview_returns_early_when_not_preview() {
+		add_filter( 'wp_client_side_media_processing_enabled', '__return_true' );
+
+		$level_before = ob_get_level();
+		gutenberg_set_up_cross_origin_isolation_for_preview();
+		$level_after = ob_get_level();
+
+		$this->assertSame( $level_before, $level_after, 'Output buffer should not start on non-preview pages.' );
+	}
+
+	/**
+	 * @covers ::gutenberg_set_up_cross_origin_isolation_for_preview
+	 */
+	public function test_preview_returns_early_when_processing_disabled() {
+		add_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
+
+		$level_before = ob_get_level();
+		gutenberg_set_up_cross_origin_isolation_for_preview();
+		$level_after = ob_get_level();
+
+		$this->assertSame( $level_before, $level_after, 'Output buffer should not start when client-side processing is disabled.' );
+	}
 }
