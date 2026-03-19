@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `InputControl` component ([#76653](https://github.com/WordPress/gutenberg/pull/76653)).
+
 ## 0.9.0 (2026-03-18)
 
 ### New Features
