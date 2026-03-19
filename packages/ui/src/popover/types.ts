@@ -111,3 +111,16 @@ export interface CloseProps extends ComponentProps< 'button' > {
 	 */
 	children?: ReactNode;
 }
+
+export interface BackdropProps extends ComponentProps< 'div' > {
+	/**
+	 * The visual style variant of the backdrop.
+	 *
+	 * - `'default'` — semi-transparent dark overlay.
+	 * - `'unstyled'` — fully transparent; blocks interaction without
+	 *    any visual dimming.
+	 *
+	 * @default 'default'
+	 */
+	variant?: 'default' | 'unstyled';
+}
