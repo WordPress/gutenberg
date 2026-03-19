@@ -63,15 +63,17 @@ export default function Header( {
 					{ breadcrumbs }
 					{ badges }
 				</Stack>
-				<Stack
-					direction="row"
-					gap="sm"
-					style={ { width: 'auto', flexShrink: 0 } }
-					className={ styles[ 'header-actions' ] }
-					align="center"
-				>
-					{ actions }
-				</Stack>
+				{ actions && (
+					<Stack
+						direction="row"
+						gap="sm"
+						style={ { width: 'auto', flexShrink: 0 } }
+						className={ styles[ 'header-actions' ] }
+						align="center"
+					>
+						{ actions }
+					</Stack>
+				) }
 			</Stack>
 			{ subTitle && (
 				<Text
