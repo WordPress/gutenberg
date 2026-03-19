@@ -179,12 +179,38 @@ echo 'RewriteRule . index.php [L]'
 	// WordPress' PHPUnit suite expects a `wp-tests-config.php` in
 	// the directory that the test suite is contained within.
 	// Make sure ABSPATH points to the WordPress install.
+
+	// When multisite is enabled, `wp core multisite-install` adds constants
+	// like MULTISITE and DOMAIN_CURRENT_SITE to wp-config.php. These must
+	// be removed from wp-tests-config.php because the WordPress PHPUnit
+	// test framework manages multisite setup through WP_TESTS_MULTISITE
+	// and WP_TESTS_DOMAIN. Keeping DOMAIN_CURRENT_SITE (set without port)
+	// causes a mismatch with WP_TESTS_DOMAIN (set with port), preventing
+	// tests from finding the site in the database.
+	let removeMultisiteSed = '';
+	let multisiteTestConstant = '';
+	if ( isMultisite ) {
+		const multisiteConstants = [
+			'MULTISITE',
+			'WP_ALLOW_MULTISITE',
+			'SUBDOMAIN_INSTALL',
+			'DOMAIN_CURRENT_SITE',
+			'PATH_CURRENT_SITE',
+			'SITE_ID_CURRENT_SITE',
+			'BLOG_ID_CURRENT_SITE',
+		];
+		removeMultisiteSed = multisiteConstants
+			.map( ( c ) => ` -e "/define.*'${ c }'/d"` )
+			.join( '' );
+		multisiteTestConstant = `\\n\\tdefine( 'WP_TESTS_MULTISITE', true );`;
+	}
+
 	await dockerCompose.exec(
 		environment === 'development' ? 'wordpress' : 'tests-wordpress',
 		[
 			'sh',
 			'-c',
-			`sed -e "/^require.*wp-settings.php/d" -e "s/${ abspathDef }/define( 'ABSPATH', '\\/var\\/www\\/html\\/' );\\n\\tdefine( 'WP_DEFAULT_THEME', 'default' );/" /var/www/html/wp-config.php > /wordpress-phpunit/wp-tests-config.php`,
+			`sed -e "/^require.*wp-settings.php/d"${ removeMultisiteSed } -e "s/${ abspathDef }/define( 'ABSPATH', '\\/var\\/www\\/html\\/' );\\n\\tdefine( 'WP_DEFAULT_THEME', 'default' );${ multisiteTestConstant }/" /var/www/html/wp-config.php > /wordpress-phpunit/wp-tests-config.php`,
 		],
 		{
 			config: config.dockerComposeConfigPath,
