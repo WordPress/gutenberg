@@ -35,11 +35,11 @@ const { BlockCanvasCover } = unlock( privateApis );
 const { retrySyncConnection } = unlock( coreDataPrivateApis );
 
 // Debounce time for initial disconnected status to allow connection to establish.
-const INITIAL_DISCONNECTED_DEBOUNCE_MS = 5000;
+const INITIAL_DISCONNECTED_DEBOUNCE_MS = 20000;
 
 // Debounce time for showing the disconnect dialog after the intial connection,
 // allowing brief network interruptions to resolve.
-const DISCONNECTED_DEBOUNCE_MS = 2000;
+const DISCONNECTED_DEBOUNCE_MS = 8000;
 
 export interface SyncConnectionErrorModalProps {
 	description: string; // Modal description.
