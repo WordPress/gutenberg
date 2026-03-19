@@ -136,9 +136,11 @@ function setFirstNavigationRef(
 
 function AddToTemplatePartModal( {
 	navigationId,
+	excludeIds,
 	onClose,
 }: {
 	navigationId: number;
+	excludeIds: Set< string >;
 	onClose: () => void;
 } ) {
 	const { records: templateParts, isResolving } = useEntityRecords(
@@ -210,7 +212,9 @@ function AddToTemplatePartModal( {
 			) : (
 				<VStack spacing={ 4 }>
 					<div className="navigation-canvas__template-part-grid">
-						{ ( templateParts as WpTemplatePart[] )?.map(
+						{ ( templateParts as WpTemplatePart[] )?.filter(
+							( part ) => ! excludeIds.has( String( part.id ) )
+						).map(
 							( part ) => {
 								const id = String( part.id );
 								const title =
@@ -364,6 +368,15 @@ function Canvas() {
 	const { templateParts, isResolving: isResolvingParts } =
 		useMenuUsedInTemplateParts( navigationId );
 
+	// IDs of template parts already using this navigation menu.
+	const usedTemplatePartIds = useMemo( () => {
+		const ids = new Set< string >();
+		for ( const part of templateParts as WpTemplatePart[] ) {
+			ids.add( String( part.id ) );
+		}
+		return ids;
+	}, [ templateParts ] );
+
 	// Track which areas have at least one matching template part.
 	const usedAreas = useMemo( () => {
 		const areas = new Set< string >();
@@ -419,17 +432,9 @@ function Canvas() {
 				className="navigation-canvas__toolbar"
 			>
 				{ hasNoTemplateParts ? (
-					<Fragment>
-						<span className="navigation-canvas__toolbar-message">
-							{ __( "This navigation menu isn't used anywhere yet" ) }
-						</span>
-						<Button
-							variant="link"
-							onClick={ () => setShowAddModal( true ) }
-						>
-							{ __( 'Add to template part' ) }
-						</Button>
-					</Fragment>
+					<span className="navigation-canvas__toolbar-message">
+						{ __( "This navigation menu isn't used anywhere yet" ) }
+					</span>
 				) : (
 					<DropdownMenu
 						label={ currentLabel }
@@ -500,6 +505,12 @@ function Canvas() {
 						) }
 					</DropdownMenu>
 				) }
+				<Button
+					variant="link"
+					onClick={ () => setShowAddModal( true ) }
+				>
+					{ __( 'Add to template part' ) }
+				</Button>
 			</HStack>
 
 			<hr className="navigation-canvas__divider" />
@@ -542,6 +553,7 @@ function Canvas() {
 		{ showAddModal && (
 			<AddToTemplatePartModal
 				navigationId={ navigationId }
+				excludeIds={ usedTemplatePartIds }
 				onClose={ () => setShowAddModal( false ) }
 			/>
 		) }
