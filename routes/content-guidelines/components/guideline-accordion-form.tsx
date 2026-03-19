@@ -86,7 +86,15 @@ export default function GuidelineAccordionForm( {
 					type: 'snackbar',
 				} );
 			} )
-			.catch( ( e: Error ) => setError( e.message ) )
+			.catch( ( e: Error ) =>
+				setError(
+					sprintf(
+						/* translators: %s: Error message. */
+						__( 'Error saving guidelines: %s' ),
+						e.message
+					)
+				)
+			)
 			.finally( () => setLoading( false ) );
 	};
 
@@ -107,7 +115,13 @@ export default function GuidelineAccordionForm( {
 				} );
 			} )
 			.catch( ( e: Error ) => {
-				setError( e.message );
+				setError(
+					sprintf(
+						/* translators: %s: Error message. */
+						__( 'Error clearing guidelines: %s' ),
+						e.message
+					)
+				);
 				setGuideline( slug, oldValue );
 			} )
 			.finally( () => {
@@ -135,11 +149,7 @@ export default function GuidelineAccordionForm( {
 				/>
 				{ error && (
 					<Notice status="error" onRemove={ () => setError( null ) }>
-						{ sprintf(
-							/* translators: %s: Error message. */
-							__( 'Error saving guidelines: %s' ),
-							error
-						) }
+						{ error }
 					</Notice>
 				) }
 				<HStack spacing={ 4 } alignment="left">
