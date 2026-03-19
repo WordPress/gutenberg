@@ -1,4 +1,4 @@
-/* @jsx createElement */
+/* @jsxRuntime automatic */
 
 /**
  * WordPress dependencies
@@ -13,12 +13,7 @@ import {
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	createElement,
-	useEffect,
-	useMemo,
-	useState,
-} from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 

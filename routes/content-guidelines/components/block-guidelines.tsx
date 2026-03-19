@@ -1,4 +1,4 @@
-/* @jsx createElement */
+/* @jsxRuntime automatic */
 
 /**
  * WordPress dependencies
@@ -17,12 +17,7 @@ import {
 	type View,
 } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	createElement,
-	useEffect,
-	useMemo,
-	useState,
-} from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { blockDefault } from '@wordpress/icons';
 import { store as blocksStore } from '@wordpress/blocks';
