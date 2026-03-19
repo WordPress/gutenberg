@@ -1105,23 +1105,20 @@ export const TrapFocus: Story = {
 };
 
 /**
- * Set `openOnHover` on `Popover.Root` to open the popover when the trigger is
- * hovered. The `delay` and `closeDelay` props control the timing (in ms).
+ * Set `openOnHover` on `Popover.Trigger` to open the popover when the trigger
+ * is hovered. The `delay` and `closeDelay` props control the timing (in ms).
  *
  * This is a capability the legacy Popover does not have natively — consumers
  * would need to wire up `mouseenter`/`mouseleave` handlers manually.
  */
 export const HoverTrigger: Story = {
-	argTypes: {
-		openOnHover: { control: false },
-	},
-	args: {
-		openOnHover: true,
-		delay: 200,
-		closeDelay: 150,
-		children: (
-			<>
-				<Popover.Trigger>Hover me</Popover.Trigger>
+	parameters: { controls: { disable: true } },
+	render: function Render( args ) {
+		return (
+			<Popover.Root { ...args }>
+				<Popover.Trigger openOnHover delay={ 200 } closeDelay={ 150 }>
+					Hover me
+				</Popover.Trigger>
 				<Popover.Popup>
 					<Popover.Arrow />
 					<Popover.Title>Hover Popover</Popover.Title>
@@ -1130,7 +1127,7 @@ export const HoverTrigger: Story = {
 						closes 150ms after the pointer leaves.
 					</Popover.Description>
 				</Popover.Popup>
-			</>
-		),
+			</Popover.Root>
+		);
 	},
 };

@@ -5,13 +5,7 @@ import type { ComponentProps } from '../utils/types';
 export interface RootProps
 	extends Pick<
 		_Popover.Root.Props,
-		| 'open'
-		| 'onOpenChange'
-		| 'defaultOpen'
-		| 'modal'
-		| 'openOnHover'
-		| 'delay'
-		| 'closeDelay'
+		'open' | 'onOpenChange' | 'defaultOpen' | 'modal'
 	> {
 	/**
 	 * The content to be rendered inside the component.
@@ -19,7 +13,9 @@ export interface RootProps
 	children?: ReactNode;
 }
 
-export interface TriggerProps extends ComponentProps< 'button' > {
+export interface TriggerProps
+	extends ComponentProps< 'button' >,
+		Pick< _Popover.Trigger.Props, 'openOnHover' | 'delay' | 'closeDelay' > {
 	/**
 	 * The content to be rendered inside the component.
 	 */
