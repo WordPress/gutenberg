@@ -371,6 +371,10 @@ function transformPhpContent( content, transforms ) {
 		content = Array.from(
 			content.matchAll( /^\s*function ([^\(]+)/gm )
 		).reduce( ( result, [ , functionName ] ) => {
+			// Skip functions already prefixed (e.g., by the prefixFunctions step above).
+			if ( functionName.startsWith( functionPrefix ) ) {
+				return result;
+			}
 			return result.replace(
 				new RegExp( functionName + '(?![a-zA-Z0-9_])', 'g' ),
 				( match ) => functionPrefix + match.replace( /^wp_/, '' )
