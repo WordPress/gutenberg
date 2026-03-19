@@ -243,7 +243,7 @@ function useFitText( { fitText, name, clientId } ) {
  */
 export function FitTextControl( {
 	clientId,
-	fitText = false,
+	fitText,
 	setAttributes,
 	name,
 	fontSize,
@@ -256,7 +256,7 @@ export function FitTextControl( {
 	return (
 		<InspectorControls group="typography">
 			<ToolsPanelItem
-				hasValue={ () => fitText }
+				hasValue={ () => fitText === true || fitText === false }
 				label={ __( 'Fit text' ) }
 				onDeselect={ () => setAttributes( { fitText: undefined } ) }
 				resetAllFilter={ () => ( { fitText: undefined } ) }
@@ -264,9 +264,9 @@ export function FitTextControl( {
 			>
 				<ToggleControl
 					label={ __( 'Fit text' ) }
-					checked={ fitText }
+					checked={ fitText === true }
 					onChange={ () => {
-						const newFitText = ! fitText || undefined;
+						const newFitText = fitText ? false : true;
 						const updates = { fitText: newFitText };
 
 						// When enabling fit text, clear font size if it has a value
@@ -288,7 +288,7 @@ export function FitTextControl( {
 						setAttributes( updates );
 					} }
 					help={
-						fitText
+						fitText === true
 							? __( 'Text will resize to fit its container.' )
 							: __(
 									'The text will resize to fit its container, resetting other font size settings.'
