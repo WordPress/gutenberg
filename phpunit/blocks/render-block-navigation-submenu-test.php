@@ -123,7 +123,7 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 		$navigation_submenu_block = new WP_Block( $block, $context );
 
 		$this->assertStringContainsString(
-			'<ul style="color:' . $context['customOverlayTextColor'] . ';background-color:' . $context['customOverlayBackgroundColor'] . ';" class="wp-block-navigation__submenu-container has-text-color has-background">',
+			'<ul style="color:' . $context['customOverlayTextColor'] . ';background-color:' . $context['customOverlayBackgroundColor'] . '" class="wp-block-navigation__submenu-container has-text-color has-background">',
 			gutenberg_render_block_core_navigation_submenu(
 				$navigation_submenu_block->attributes,
 				array(),
@@ -159,7 +159,7 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 		$navigation_submenu_block = new WP_Block( $block, $context );
 
 		$this->assertStringContainsString(
-			'<ul style="background-color:' . $context['customOverlayBackgroundColor'] . ';" class="wp-block-navigation__submenu-container has-text-color has-' . $context['overlayTextColor'] . '-color has-background">',
+			'<ul style="background-color:' . $context['customOverlayBackgroundColor'] . '" class="wp-block-navigation__submenu-container has-text-color has-' . $context['overlayTextColor'] . '-color has-background">',
 			gutenberg_render_block_core_navigation_submenu(
 				$navigation_submenu_block->attributes,
 				array(),
