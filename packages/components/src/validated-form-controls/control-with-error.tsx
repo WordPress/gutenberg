@@ -6,6 +6,7 @@ import {
 	cloneElement,
 	forwardRef,
 	useEffect,
+	useId,
 	useState,
 } from '@wordpress/element';
 
@@ -238,26 +239,41 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		}
 	};
 
-	const message = () => {
+	const messageId = useId();
+
+	const message = ( () => {
 		if ( errorMessage ) {
 			return (
-				<ValidityIndicator type="invalid" message={ errorMessage } />
+				<ValidityIndicator
+					id={ messageId }
+					type="invalid"
+					message={ errorMessage }
+				/>
 			);
 		}
 		if ( statusMessage?.type ) {
 			return (
 				<ValidityIndicator
+					id={ messageId }
 					type={ statusMessage.type }
 					message={ statusMessage.message }
 				/>
 			);
 		}
 		return null;
-	};
+	} )();
+
+	const visibleMessage = showMessage ? message : null;
+
+	const describedBy =
+		[ children.props[ 'aria-describedby' ], visibleMessage && messageId ]
+			.filter( Boolean )
+			.join( ' ' ) || undefined;
 
 	return (
 		<div className={ className } ref={ forwardedRef } onBlur={ onBlur }>
 			{ cloneElement( children, {
+				'aria-describedby': describedBy,
 				label: appendRequiredIndicator(
 					children.props.label,
 					required,
@@ -265,7 +281,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 				),
 				required,
 			} ) }
-			<div aria-live="polite">{ showMessage && message() }</div>
+			<div aria-live="polite">{ visibleMessage }</div>
 		</div>
 	);
 }
