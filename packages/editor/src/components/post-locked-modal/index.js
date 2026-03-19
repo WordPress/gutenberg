@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	Modal,
 	Button,
@@ -16,7 +16,6 @@ import { addAction, removeAction } from '@wordpress/hooks';
 import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '../../lock-unlock';
-import { DOCUMENT_SIZE_LIMIT_EXCEEDED } from '../../utils/sync-error-messages';
 
 /**
  * Internal dependencies
@@ -24,12 +23,13 @@ import { DOCUMENT_SIZE_LIMIT_EXCEEDED } from '../../utils/sync-error-messages';
 import { store as editorStore } from '../../store';
 
 function CollaborationContext() {
-	const { isCollaborationSupported, syncConnectionStatus } = useSelect(
+	const { isCollaborationSupported, collaborationSupportErrors } = useSelect(
 		( select ) => {
 			const selectors = unlock( select( coreStore ) );
 			return {
 				isCollaborationSupported: selectors.isCollaborationSupported(),
-				syncConnectionStatus: selectors.getSyncConnectionStatus(),
+				collaborationSupportErrors:
+					selectors.getCollaborationSupportErrors(),
 			};
 		},
 		[]
@@ -39,7 +39,7 @@ function CollaborationContext() {
 		return null;
 	}
 
-	if ( DOCUMENT_SIZE_LIMIT_EXCEEDED === syncConnectionStatus?.error?.code ) {
+	if ( collaborationSupportErrors.documentSizeLimitExceeded ) {
 		return (
 			<p>
 				{ __(
@@ -49,10 +49,50 @@ function CollaborationContext() {
 		);
 	}
 
+	if ( collaborationSupportErrors.metaBox ) {
+		const { pluginNames, unknownMetaBoxPluginsCount } =
+			collaborationSupportErrors.metaBox;
+
+		if ( pluginNames.length > 0 ) {
+			return (
+				<>
+					<p>
+						{ __(
+							"The following plugins aren't compatible with real-time collaboration. Only one person can edit at a time."
+						) }
+					</p>
+					<ul
+						style={ {
+							listStyleType: 'disc',
+							paddingLeft: '1.5em',
+						} }
+					>
+						{ pluginNames.map( ( name ) => (
+							<li key={ name }>{ name }</li>
+						) ) }
+						{ unknownMetaBoxPluginsCount > 0 && (
+							<li>
+								{ sprintf(
+									/* translators: %d: Number of additional unknown plugins. */
+									_n(
+										'%d additional plugin',
+										'%d additional plugins',
+										unknownMetaBoxPluginsCount
+									),
+									unknownMetaBoxPluginsCount
+								) }
+							</li>
+						) }
+					</ul>
+				</>
+			);
+		}
+	}
+
 	return (
 		<p>
 			{ __(
-				'Because this post uses plugins that aren’t compatible with real-time collaboration, only one person can edit at a time.'
+				"Because this post uses plugins that aren't compatible with real-time collaboration, only one person can edit at a time."
 			) }
 		</p>
 	);
@@ -241,12 +281,12 @@ function PostLockedModal() {
 										? sprintf(
 												/* translators: %s: user's display name */
 												__(
-													'<strong>%s</strong> now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
+													"<strong>%s</strong> now has editing control of this post (<PreviewLink />). Don't worry, your changes up to this moment have been saved."
 												),
 												userDisplayName
 										  )
 										: __(
-												'Another user now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
+												"Another user now has editing control of this post (<PreviewLink />). Don't worry, your changes up to this moment have been saved."
 										  ),
 									{
 										strong: <strong />,
