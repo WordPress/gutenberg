@@ -126,7 +126,7 @@ function useBlockProps( { style } ) {
 	// Show a warning notice when the user lacks edit_css and a block has
 	// custom CSS. The fixed notice ID ensures only one notice is shown
 	// regardless of how many blocks have CSS.
-	const hasCustomCSS = !! customCSS;
+	const hasCustomCSS = !! customCSS?.trim();
 	useEffect( () => {
 		if ( ! canEditCSS && hasCustomCSS ) {
 			createWarningNotice(
