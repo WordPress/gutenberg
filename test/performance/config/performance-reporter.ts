@@ -42,6 +42,10 @@ export interface WPRawPerformanceResults {
 	wpTotal: number[];
 	wpMemoryUsage: number[];
 	wpDbQueries: number[];
+	jpegUploadProcessing: number[];
+	pngUploadProcessing: number[];
+	largeJpegUploadProcessing: number[];
+	multipleImageUploadProcessing: number[];
 }
 
 type PerformanceStats = {
@@ -78,6 +82,10 @@ export interface WPPerformanceResults {
 	wpTotal?: PerformanceStats;
 	wpMemoryUsage?: PerformanceStats;
 	wpDbQueries?: PerformanceStats;
+	jpegUploadProcessing?: PerformanceStats;
+	pngUploadProcessing?: PerformanceStats;
+	largeJpegUploadProcessing?: PerformanceStats;
+	multipleImageUploadProcessing?: PerformanceStats;
 }
 
 /**
@@ -116,6 +124,12 @@ export function curateResults(
 		wpTotal: stats( results.wpTotal ),
 		wpMemoryUsage: stats( results.wpMemoryUsage ),
 		wpDbQueries: stats( results.wpDbQueries ),
+		jpegUploadProcessing: stats( results.jpegUploadProcessing ),
+		pngUploadProcessing: stats( results.pngUploadProcessing ),
+		largeJpegUploadProcessing: stats( results.largeJpegUploadProcessing ),
+		multipleImageUploadProcessing: stats(
+			results.multipleImageUploadProcessing
+		),
 	};
 
 	return Object.fromEntries(
