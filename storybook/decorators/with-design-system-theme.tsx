@@ -35,6 +35,7 @@ export function WithDesignSystemTheme(
 	}
 
 	const colorTheme = context.globals.dsColorTheme;
+	const cursorControl = context.globals.dsCursorControl || undefined;
 	const density = context.globals.dsDensity;
 
 	let color;
@@ -43,7 +44,12 @@ export function WithDesignSystemTheme(
 	}
 
 	return (
-		<ThemeProvider color={ color } density={ density } isRoot>
+		<ThemeProvider
+			color={ color }
+			cursor={ cursorControl ? { control: cursorControl } : undefined }
+			density={ density }
+			isRoot
+		>
 			<div
 				style={
 					color?.bg

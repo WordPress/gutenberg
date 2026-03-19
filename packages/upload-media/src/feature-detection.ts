@@ -35,8 +35,8 @@ let cachedResult: FeatureDetectionResult | null = null;
  * 2. SharedArrayBuffer support (required for WASM threading)
  * 3. CSP compatibility for blob URL workers (required for inline worker creation)
  * 4. Device memory (disables on devices with ≤2 GB RAM)
- * 5. Hardware concurrency (disables on devices with fewer than 4 CPU cores)
- * 6. Network conditions (disables when data saver / reduced data mode is on or connection is 3g/2g/slow-2g)
+ * 5. Hardware concurrency (disables on devices with fewer than 2 CPU cores)
+ * 6. Network conditions (disables when data saver / reduced data mode is on or connection is 2g/slow-2g)
  * 7. Web Worker support (baseline requirement)
  *
  * Results are cached after the first call. Use `clearFeatureDetectionCache()` to reset.
@@ -93,7 +93,7 @@ export function detectClientSideMediaSupport(): FeatureDetectionResult {
 	if (
 		typeof navigator !== 'undefined' &&
 		'hardwareConcurrency' in navigator &&
-		navigator.hardwareConcurrency < 4
+		navigator.hardwareConcurrency < 2
 	) {
 		cachedResult = {
 			supported: false,
@@ -115,8 +115,7 @@ export function detectClientSideMediaSupport(): FeatureDetectionResult {
 			}
 			if (
 				connection.effectiveType === 'slow-2g' ||
-				connection.effectiveType === '2g' ||
-				connection.effectiveType === '3g'
+				connection.effectiveType === '2g'
 			) {
 				cachedResult = {
 					supported: false,

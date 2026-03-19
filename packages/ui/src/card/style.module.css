@@ -39,10 +39,6 @@
 
 	.title {
 		margin: 0;
-		font-family: var(--wpds-font-family-heading);
-		font-size: var(--wpds-font-size-lg);
-		font-weight: var(--wpds-font-weight-medium);
-		line-height: var(--wpds-font-line-height-sm);
 		color: var(--wpds-color-fg-content-neutral);
 	}
 }

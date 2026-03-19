@@ -118,22 +118,27 @@ const PAGES = WP_PLUGIN_CONFIG.pages || [];
  * are considered true while all other values are false.
  *
  * @param {string|undefined} value The configuration value to interpret.
- * @return {boolean} Boolean interpretation of the given configuration value.
+ * @return {boolean|undefined} Boolean interpretation of the given configuration value, or undefined if not set.
  */
 const boolConfigVal = ( value ) => {
-	return (
-		value !== undefined && [ 'true', '1' ].includes( value.toLowerCase() )
-	);
+	if ( value === undefined ) {
+		return undefined;
+	}
+	return [ 'true', '1' ].includes( value.toLowerCase() );
 };
 
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
-		boolConfigVal( process.env.IS_GUTENBERG_PLUGIN ) ||
-			boolConfigVal( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
+		boolConfigVal( process.env.IS_GUTENBERG_PLUGIN ) ??
+			boolConfigVal(
+				process.env.npm_package_config_IS_GUTENBERG_PLUGIN
+			) ??
+			false
 	),
 	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
-		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ||
-			boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE )
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+			boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE ) ??
+			false
 	),
 };
 const getDefine = ( scriptDebug ) => ( {
@@ -341,7 +346,10 @@ function transformPhpContent( content, transforms ) {
 	 * class prefixes, etc.). When building for WordPress Core, it's not
 	 * necessary to perform these steps.
 	 */
-	if ( boolConfigVal( process.env.IS_WORDPRESS_CORE ) ) {
+	if (
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE )
+	) {
 		return content;
 	}
 
@@ -1807,7 +1815,7 @@ async function buildAll( baseUrlExpression ) {
 
 	// When building for WordPress Core, exclude experimental pages.
 	const isCoreBuild =
-		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ||
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
 		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE );
 	const activePages = isCoreBuild
 		? normalizedPages.filter( ( page ) => ! page.experimental )
@@ -2127,9 +2135,13 @@ async function main() {
 			},
 			'base-url': {
 				type: 'string',
-				default: boolConfigVal( process.env.IS_WORDPRESS_CORE )
-					? "includes_url( 'build/' )"
-					: 'plugin_dir_url( __FILE__ )',
+				default:
+					boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+					boolConfigVal(
+						process.env.npm_package_config_IS_WORDPRESS_CORE
+					)
+						? "includes_url( 'build/' )"
+						: 'plugin_dir_url( __FILE__ )',
 			},
 		},
 		strict: false,

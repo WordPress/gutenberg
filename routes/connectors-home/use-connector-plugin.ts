@@ -87,54 +87,52 @@ export function useConnectorPlugin( {
 				};
 			}
 
-			const plugins = store.getEntityRecords(
+			const pluginId = `${ pluginSlug }/plugin`;
+
+			const plugin = store.getEntityRecord(
 				'root',
-				'plugin'
-			) as Array< { plugin: string; status: string } > | null;
+				'plugin',
+				pluginId
+			) as { plugin: string; status: string } | undefined;
 
-			// plugins is null before resolution completes and when
-			// the resolver fails (e.g. 403 — no permissions).
-			if ( plugins === null ) {
-				const hasFinished = store.hasFinishedResolution(
-					'getEntityRecords',
-					[ 'root', 'plugin' ]
-				);
+			const hasFinished = store.hasFinishedResolution(
+				'getEntityRecord',
+				[ 'root', 'plugin', pluginId ]
+			);
 
-				if ( ! hasFinished ) {
-					return {
-						derivedPluginStatus: 'checking' as PluginStatus,
-						canManagePlugins: undefined as boolean | undefined,
-						currentApiKey: apiKey,
-						canInstallPlugins: canCreate,
-					};
-				}
-
-				// Resolution finished but returned null — fallback to server-provided status.
-				let status: PluginStatus = 'not-installed';
-				if ( isActivated ) {
-					status = 'active';
-				} else if ( isInstalled ) {
-					status = 'inactive';
-				}
+			if ( ! hasFinished ) {
 				return {
-					derivedPluginStatus: status,
-					canManagePlugins: false,
+					derivedPluginStatus: 'checking' as PluginStatus,
+					canManagePlugins: undefined as boolean | undefined,
 					currentApiKey: apiKey,
 					canInstallPlugins: canCreate,
 				};
 			}
 
-			const plugin = plugins.find(
-				( p ) => p.plugin === `${ pluginSlug }/plugin`
-			);
-			let status: PluginStatus = 'not-installed';
+			// Plugin data resolved — user has API permissions.
 			if ( plugin ) {
-				status = plugin.status === 'active' ? 'active' : 'inactive';
+				return {
+					derivedPluginStatus: ( plugin.status === 'active'
+						? 'active'
+						: 'inactive' ) as PluginStatus,
+					canManagePlugins: true,
+					currentApiKey: apiKey,
+					canInstallPlugins: canCreate,
+				};
 			}
 
+			// Resolution finished but plugin is undefined — either not
+			// installed or a 403 (no permissions). Fall back to the
+			// server-provided status.
+			let status: PluginStatus = 'not-installed';
+			if ( isActivated ) {
+				status = 'active';
+			} else if ( isInstalled ) {
+				status = 'inactive';
+			}
 			return {
 				derivedPluginStatus: status,
-				canManagePlugins: true,
+				canManagePlugins: false,
 				currentApiKey: apiKey,
 				canInstallPlugins: canCreate,
 			};

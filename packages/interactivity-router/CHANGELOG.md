@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.42.0 (2026-03-18)
+
 ### Bug Fixes
 -   Preserve runtime-activated deferred stylesheets (`media="not all"` → `"all"`) across client-side navigations. Previously, `areNodesEqual()` used `isEqualNode()` which compared the `media` attribute, causing `applyStyles()` to disable the activated sheet on the next navigation. ([#76289](https://github.com/WordPress/gutenberg/pull/76289))
 -   Preserve dynamically-injected stylesheets (e.g. Complianz GDPR consent CSS) across client-side navigations. Previously, `applyStyles()` disabled every stylesheet absent from the fetched page, including elements injected at runtime via `document.head.appendChild()` which carry no `id` attribute. ([#76289](https://github.com/WordPress/gutenberg/pull/76289))

@@ -10,6 +10,16 @@
  * Register all script modules.
  */
 function {{PREFIX}}_register_script_modules() {
+	// Ensure this only runs once. wp_default_scripts can fire multiple times,
+	// and each wp_deregister_script_module() call also dequeues the module.
+	// If a module was enqueued between calls, repeated deregister/register
+	// cycles would lose the enqueue state.
+	static $already_registered = false;
+	if ( $already_registered ) {
+		return;
+	}
+	$already_registered = true;
+
 	// Load build constants
 	$build_constants = require __DIR__ . '/constants.php';
 	$modules_dir     = __DIR__ . '/modules';

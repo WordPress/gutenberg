@@ -15,6 +15,8 @@ import { withWeakMapCache, getNormalizedCommaSeparable } from '../utils';
  *
  * @property {number}      page      The query page (1-based index, default 1).
  * @property {number}      perPage   Items per page for query (default 10).
+ * @property {number}      offset    Absolute item offset (default undefined).
+ *                                   When present, also encoded into stableKey.
  * @property {string}      stableKey An encoded stable string of all non-
  *                                   pagination, non-fields query parameters.
  * @property {?(string[])} fields    Target subset of fields to derive from
@@ -41,6 +43,7 @@ export function getQueryParts( query ) {
 		stableKey: '',
 		page: 1,
 		perPage: 10,
+		offset: undefined,
 		fields: null,
 		include: null,
 		context: 'default',
@@ -67,6 +70,16 @@ export function getQueryParts( query ) {
 				break;
 
 			default:
+				// Extract offset for use in pagination calculations while
+				// still including it in the stableKey (different offsets
+				// produce different result sets).
+				if ( key === 'offset' ) {
+					const numericOffset = Number( value );
+					if ( Number.isFinite( numericOffset ) ) {
+						parts.offset = numericOffset;
+					}
+				}
+
 				// While in theory, we could exclude "_fields" from the stableKey
 				// because two request with different fields have the same results
 				// We're not able to ensure that because the server can decide to omit

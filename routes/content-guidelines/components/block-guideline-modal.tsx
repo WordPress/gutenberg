@@ -7,15 +7,13 @@ import {
 	Button,
 	ComboboxControl,
 	Modal,
+	Notice,
 	TextControl,
 	TextareaControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-// TODO: Revert to the `Notice` in `@wordpress/components` for now.
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Notice } from '@wordpress/ui';
 import { createElement, useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -174,15 +172,13 @@ export default function BlockGuidelineModal( {
 					rows={ 6 }
 				/>
 				{ error && (
-					<Notice.Root intent="error">
-						<Notice.Title>
-							{ sprintf(
-								/* translators: %s: Error message. */
-								__( 'Error: %s' ),
-								error
-							) }
-						</Notice.Title>
-					</Notice.Root>
+					<Notice status="error" onRemove={ () => setError( null ) }>
+						{ sprintf(
+							/* translators: %s: Error message. */
+							__( 'Error: %s' ),
+							error
+						) }
+					</Notice>
 				) }
 				<HStack
 					justify="flex-end"
