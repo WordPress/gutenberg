@@ -131,7 +131,7 @@ function useBlockProps( { style } ) {
 		if ( ! canEditCSS && hasCustomCSS ) {
 			createWarningNotice(
 				__(
-					'This post contains blocks with custom CSS. You do not have permission to edit CSS, so any custom CSS will be removed if you save this post.'
+					'This post contains blocks with custom CSS. You do not have permission to edit CSS. If you save this post, the custom CSS will be removed.'
 				),
 				{
 					id: CUSTOM_CSS_WARNING_NOTICE_ID,
