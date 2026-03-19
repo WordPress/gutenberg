@@ -307,6 +307,10 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	}
 
 	$colors = block_core_page_list_build_css_colors( $attributes, $block->context );
+	// The gutenberg_ prefix is needed because Core already defines its own
+	// block_core_page_list_build_css_font_sizes, and redeclaring it would
+	// cause a fatal error. Once the shared helper is backported to Core,
+	// the else branch will call it directly.
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 		$font_sizes = gutenberg_block_core_shared_navigation_build_css_font_sizes( $block->context );
 	} else {
