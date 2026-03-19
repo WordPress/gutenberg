@@ -16,8 +16,8 @@ export const Default: StoryObj< typeof Tooltip.Root > = {
 	args: {
 		children: (
 			<>
-				<Tooltip.Trigger>Hover me</Tooltip.Trigger>
-				<Tooltip.Popup>Tooltip text</Tooltip.Popup>
+				<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
+				<Tooltip.Popup>Save</Tooltip.Popup>
 			</>
 		),
 	},
@@ -51,23 +51,23 @@ export const Positioning: StoryObj< typeof Tooltip.Root > = {
 			} }
 		>
 			<Tooltip.Root>
-				<Tooltip.Trigger>Top</Tooltip.Trigger>
-				<Tooltip.Popup side="top">Tooltip on top</Tooltip.Popup>
+				<Tooltip.Trigger aria-label="Up">⬆️</Tooltip.Trigger>
+				<Tooltip.Popup side="top">Up</Tooltip.Popup>
 			</Tooltip.Root>
 
 			<Tooltip.Root>
-				<Tooltip.Trigger>Right</Tooltip.Trigger>
-				<Tooltip.Popup side="right">Tooltip on right</Tooltip.Popup>
+				<Tooltip.Trigger aria-label="Forward">➡️</Tooltip.Trigger>
+				<Tooltip.Popup side="right">Forward</Tooltip.Popup>
 			</Tooltip.Root>
 
 			<Tooltip.Root>
-				<Tooltip.Trigger>Bottom</Tooltip.Trigger>
-				<Tooltip.Popup side="bottom">Tooltip on bottom</Tooltip.Popup>
+				<Tooltip.Trigger aria-label="Down">⬇️</Tooltip.Trigger>
+				<Tooltip.Popup side="bottom">Down</Tooltip.Popup>
 			</Tooltip.Root>
 
 			<Tooltip.Root>
-				<Tooltip.Trigger>Left</Tooltip.Trigger>
-				<Tooltip.Popup side="left">Tooltip on left</Tooltip.Popup>
+				<Tooltip.Trigger aria-label="Back">⬅️</Tooltip.Trigger>
+				<Tooltip.Popup side="left">Back</Tooltip.Popup>
 			</Tooltip.Root>
 		</div>
 	),
@@ -83,13 +83,13 @@ export const WithProvider: StoryObj< typeof Tooltip.Root > = {
 		<Tooltip.Provider delay={ 0 }>
 			<div style={ { display: 'flex', gap: '1rem' } }>
 				<Tooltip.Root>
-					<Tooltip.Trigger>First</Tooltip.Trigger>
-					<Tooltip.Popup>First tooltip</Tooltip.Popup>
+					<Tooltip.Trigger aria-label="Bold">𝐁</Tooltip.Trigger>
+					<Tooltip.Popup>Bold</Tooltip.Popup>
 				</Tooltip.Root>
 
 				<Tooltip.Root>
-					<Tooltip.Trigger>Second</Tooltip.Trigger>
-					<Tooltip.Popup>Second tooltip</Tooltip.Popup>
+					<Tooltip.Trigger aria-label="Italic">𝐼</Tooltip.Trigger>
+					<Tooltip.Popup>Italic</Tooltip.Popup>
 				</Tooltip.Root>
 			</div>
 		</Tooltip.Provider>
