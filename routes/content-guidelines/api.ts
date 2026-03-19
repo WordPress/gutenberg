@@ -45,7 +45,6 @@ export async function fetchContentGuidelines(): Promise< RestGuidelinesResponse 
 }
 
 export async function saveContentGuidelines(): Promise< RestGuidelinesResponse > {
-	// @ts-ignore
 	const { setFromResponse } = dispatch( coreContentGuidelinesStore );
 
 	const guidelinesStore = select( coreContentGuidelinesStore );
@@ -103,7 +102,6 @@ export async function saveContentGuidelines(): Promise< RestGuidelinesResponse >
  * @param file Content Guidelines JSON file
  */
 export async function importContentGuidelines( file: File ): Promise< void > {
-	// @ts-ignore
 	const { setGuideline, setBlockGuideline } = dispatch(
 		coreContentGuidelinesStore
 	);

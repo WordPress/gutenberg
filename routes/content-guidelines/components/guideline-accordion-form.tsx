@@ -30,7 +30,6 @@ export default function GuidelineAccordionForm( {
 	headingId,
 	descriptionId,
 }: GuidelineAccordionFormProps ) {
-	// @ts-ignore
 	const { setGuideline } = useDispatch( coreContentGuidelinesStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const [ loading, setLoading ] = useState( false );
@@ -40,7 +39,6 @@ export default function GuidelineAccordionForm( {
 
 	const { value } = useSelect(
 		( select ) => ( {
-			// @ts-ignore
 			value: select( coreContentGuidelinesStore ).getGuideline( slug ),
 		} ),
 		[ slug ]
