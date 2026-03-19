@@ -66,7 +66,7 @@ function NavigationMenuActions( { item, actions }: { item: Post; actions: Action
 		return actions.filter(
 			( action ) =>
 				// Skip the edit action — we're already in an edit context.
-				action.id !== 'edit-navigation' &&
+				action.id !== 'edit' &&
 				// Skip revisions.
 				action.id !== 'view-post-revisions' &&
 				( ! action.isEligible || action.isEligible( item ) )
