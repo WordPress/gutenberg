@@ -45,8 +45,8 @@ export function toHTMLStr( value ) {
 export function parseFencedCode( value, { allowEndOfString = false } = {} ) {
 	const htmlString = toHTMLStr( value );
 	const openingFenceRegExp = allowEndOfString
-		? /^```([^\s`]+)[ \t]*(?:\r?\n|$)/
-		: /^```([^\s`]+)[ \t]*\r?\n/;
+		? /^```[ \t]*([^\s`]+)[ \t]*(?:\r?\n|$)/
+		: /^```[ \t]*([^\s`]+)[ \t]*\r?\n/;
 	const openingFenceMatch = htmlString.match( openingFenceRegExp );
 	if ( ! openingFenceMatch ) {
 		return null;
