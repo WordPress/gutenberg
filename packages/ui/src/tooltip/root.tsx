@@ -11,7 +11,7 @@ import type { RootProps } from './types';
  * The tooltip itself does not provide any accessible labeling, so when using the
  * `Tooltip` primitive you must ensure that the trigger is accessibly labeled (e.g. with an `aria-label`).
  *
- * See also: [`IconButton`](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-iconbutton--docs)
+ * See also: [IconButton](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-iconbutton--docs)
  */
 function Root( props: RootProps ) {
 	return <Tooltip.Root { ...props } />;
