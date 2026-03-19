@@ -10,9 +10,17 @@ import { Page } from '@wordpress/admin-ui';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useView } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
-import { Button, __experimentalHStack as HStack } from '@wordpress/components';
+import {
+	Button,
+	Modal,
+	__experimentalHStack as HStack,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
+import { moreVertical } from '@wordpress/icons';
+import { useRegistry } from '@wordpress/data';
+import type { ActionModal as ActionModalType } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -32,6 +40,7 @@ import './style.scss';
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { Menu } = unlock( componentsPrivateApis );
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
@@ -44,6 +53,92 @@ const PRELOADED_NAVIGATION_MENUS_QUERY = {
 
 function getItemId( item: Post ) {
 	return item.id.toString();
+}
+
+/**
+ * Renders a kebab menu for a navigation menu item with Trash, Duplicate, and Rename actions.
+ */
+function NavigationMenuActions( { item, actions }: { item: Post; actions: Action< Post >[] } ) {
+	const registry = useRegistry();
+	const [ activeModalAction, setActiveModalAction ] = useState< ActionModalType< Post > | null >( null );
+
+	const eligibleActions = useMemo( () => {
+		return actions.filter(
+			( action ) =>
+				// Skip the edit action — we're already in an edit context.
+				action.id !== 'edit-navigation' &&
+				// Skip revisions.
+				action.id !== 'view-post-revisions' &&
+				( ! action.isEligible || action.isEligible( item ) )
+		);
+	}, [ actions, item ] );
+
+	if ( ! eligibleActions.length ) {
+		return null;
+	}
+
+	return (
+		<>
+			<Menu placement="bottom-end">
+				<Menu.TriggerButton
+					render={
+						<Button
+							size="small"
+							icon={ moreVertical }
+							label={ __( 'Actions' ) }
+							className="navigation-breadcrumbs__actions"
+						/>
+					}
+				/>
+				<Menu.Popover>
+					<Menu.Group>
+						{ eligibleActions.map( ( action ) => {
+							const label =
+								typeof action.label === 'string'
+									? action.label
+									: action.label( [ item ] );
+							return (
+								<Menu.Item
+									key={ action.id }
+									disabled={ action.disabled }
+									onClick={ () => {
+										if ( 'RenderModal' in action ) {
+											setActiveModalAction( action as ActionModalType< Post > );
+											return;
+										}
+										action.callback( [ item ], { registry } );
+									} }
+								>
+									<Menu.ItemLabel>{ label }</Menu.ItemLabel>
+								</Menu.Item>
+							);
+						} ) }
+					</Menu.Group>
+				</Menu.Popover>
+			</Menu>
+			{ !! activeModalAction && (
+				<Modal
+					title={
+						typeof activeModalAction.modalHeader === 'function'
+							? activeModalAction.modalHeader( [ item ] )
+							: activeModalAction.modalHeader ||
+								( typeof activeModalAction.label === 'string'
+									? activeModalAction.label
+									: activeModalAction.label( [ item ] ) )
+					}
+					__experimentalHideHeader={ !! activeModalAction.hideModalHeader }
+					onRequestClose={ () => setActiveModalAction( null ) }
+					focusOnMount={ activeModalAction.modalFocusOnMount ?? true }
+					size={ activeModalAction.modalSize || 'medium' }
+				>
+					<activeModalAction.RenderModal
+						items={ [ item ] }
+						closeModal={ () => setActiveModalAction( null ) }
+					/>
+				</Modal>
+			) }
+		</>
+	);
 }
 
 function NavigationList() {
@@ -186,6 +281,12 @@ function NavigationList() {
 						</button>
 						<span className="navigation-breadcrumbs__separator">/</span>
 						<span className="navigation-breadcrumbs__current">{ menuTitle }</span>
+						{ navigationMenu && (
+							<NavigationMenuActions
+								item={ navigationMenu }
+								actions={ actions }
+							/>
+						) }
 					</HStack>
 				}
 				hasPadding
