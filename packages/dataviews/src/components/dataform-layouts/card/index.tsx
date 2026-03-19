@@ -34,6 +34,7 @@ function isSummaryFieldVisible< Item >(
 	summaryConfig: NormalizedCardLayout[ 'summary' ],
 	isOpen: boolean
 ) {
+	// If no summary config, dont't show any fields
 	if (
 		! summaryConfig ||
 		( Array.isArray( summaryConfig ) && summaryConfig.length === 0 )
@@ -41,10 +42,12 @@ function isSummaryFieldVisible< Item >(
 		return false;
 	}
 
+	// Convert to array for consistent handling
 	const summaryConfigArray = Array.isArray( summaryConfig )
 		? summaryConfig
 		: [ summaryConfig ];
 
+	// Find the config for this specific field
 	const fieldConfig = summaryConfigArray.find( ( config ) => {
 		if ( typeof config === 'string' ) {
 			return config === summaryField.id;
@@ -55,14 +58,17 @@ function isSummaryFieldVisible< Item >(
 		return false;
 	} );
 
+	// If field is not in summary config, don't show it
 	if ( ! fieldConfig ) {
 		return false;
 	}
 
+	// If it's a string, always show it
 	if ( typeof fieldConfig === 'string' ) {
 		return true;
 	}
 
+	// If it has visibility rules, respect them
 	if ( typeof fieldConfig === 'object' && 'visibility' in fieldConfig ) {
 		return (
 			fieldConfig.visibility === 'always' ||
@@ -70,6 +76,7 @@ function isSummaryFieldVisible< Item >(
 		);
 	}
 
+	// Default to always show
 	return true;
 }
 
@@ -194,21 +201,28 @@ export default function FormCardField< Item >( {
 	const [ isOpen, setIsOpen ] = useState( isOpened );
 	const [ touched, setTouched ] = useState( false );
 
+	// Sync internal state when the isOpened prop changes.
+	// This is unlikely to happen in production, but it helps with storybook controls.
 	useEffect( () => {
 		setIsOpen( isOpened );
 	}, [ isOpened ] );
 
 	const handleOpenChange = useCallback( ( open: boolean ) => {
+		// Mark as touched when collapsing (going from open to closed)
 		if ( ! open ) {
 			setTouched( true );
 		}
 		setIsOpen( open );
 	}, [] );
 
+	// Mark the card as touched when any field inside it is blurred.
+	// This aligns with how validated controls show errors on blur.
 	const handleBlur = useCallback( () => {
 		setTouched( true );
 	}, [] );
 
+	// When the card is expanded after being touched (collapsed with errors),
+	// trigger reportValidity to show field-level errors.
 	useReportValidity(
 		contentRef,
 		( isCollapsible ? isOpen : true ) && touched
