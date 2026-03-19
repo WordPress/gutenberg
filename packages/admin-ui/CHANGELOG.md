@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Breadcrumbs`: improve `items` prop types to clarify that only the last item can omit the `to` property [#76493](https://github.com/WordPress/gutenberg/pull/76493/)
+
 ## 1.10.0 (2026-03-18)
 
 - Update Title and Breadcrumbs font sizes. [#76452](https://github.com/WordPress/gutenberg/pull/76452)
