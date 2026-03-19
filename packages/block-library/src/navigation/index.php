@@ -112,9 +112,13 @@ class WP_Navigation_Block_Renderer {
 	private static function is_interactive( $attributes, $inner_blocks ) {
 		$has_submenus        = static::has_submenus( $inner_blocks );
 		$is_responsive_menu  = static::is_responsive( $attributes );
-		$computed_visibility = gutenberg_block_core_shared_get_submenu_visibility( $attributes );
-		$open_on_click       = 'click' === $computed_visibility;
-		$show_submenu_icon   = ! empty( $attributes['showSubmenuIcon'] );
+		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+			$computed_visibility = gutenberg_block_core_shared_get_submenu_visibility( $attributes );
+		} else {
+			$computed_visibility = block_core_shared_get_submenu_visibility( $attributes );
+		}
+		$open_on_click     = 'click' === $computed_visibility;
+		$show_submenu_icon = ! empty( $attributes['showSubmenuIcon'] );
 		return ( $has_submenus && ( $open_on_click || $show_submenu_icon ) ) || $is_responsive_menu;
 	}
 
@@ -1152,8 +1156,12 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		// event.
 		$tags->set_attribute( 'tabindex', '-1' );
 
-		$computed_visibility = gutenberg_block_core_shared_get_submenu_visibility( $block_attributes );
-		$open_on_hover       = 'hover' === $computed_visibility;
+		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+			$computed_visibility = gutenberg_block_core_shared_get_submenu_visibility( $block_attributes );
+		} else {
+			$computed_visibility = block_core_shared_get_submenu_visibility( $block_attributes );
+		}
+		$open_on_hover = 'hover' === $computed_visibility;
 
 		if ( $open_on_hover ) {
 			$tags->set_attribute( 'data-wp-on--pointerenter', 'actions.openMenuOnHover' );

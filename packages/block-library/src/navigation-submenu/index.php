@@ -91,7 +91,11 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	}
 
 	$show_submenu_indicators = isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
-	$computed_visibility     = gutenberg_block_core_shared_get_submenu_visibility( $block->context );
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		$computed_visibility = gutenberg_block_core_shared_get_submenu_visibility( $block->context );
+	} else {
+		$computed_visibility = block_core_shared_get_submenu_visibility( $block->context );
+	}
 	$open_on_click           = 'click' === $computed_visibility;
 	$open_on_hover           = 'hover' === $computed_visibility;
 	$open_on_hover_and_click = $open_on_hover && $show_submenu_indicators;

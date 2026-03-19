@@ -345,7 +345,15 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$is_navigation_child = array_key_exists( 'showSubmenuIcon', $block->context );
 
 	// Get submenu visibility with backward compatibility for openSubmenusOnClick.
-	$submenu_visibility = $is_navigation_child ? gutenberg_block_core_shared_get_submenu_visibility( $block->context ) : 'hover';
+	if ( $is_navigation_child ) {
+		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+			$submenu_visibility = gutenberg_block_core_shared_get_submenu_visibility( $block->context );
+		} else {
+			$submenu_visibility = block_core_shared_get_submenu_visibility( $block->context );
+		}
+	} else {
+		$submenu_visibility = 'hover';
+	}
 
 	$show_submenu_icons = array_key_exists( 'showSubmenuIcon', $block->context ) ? $block->context['showSubmenuIcon'] : false;
 
