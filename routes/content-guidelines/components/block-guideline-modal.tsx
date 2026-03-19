@@ -225,13 +225,10 @@ export default function BlockGuidelineModal( {
 				{ sprintf(
 					/* translators: %s: Block name. */
 					__(
-						'You are about to remove the block guidelines for the %s block.'
+						'You are about to remove the block guidelines for the %s block. This can be undone from revision history.'
 					),
 					selectedBlockLabel
 				) }
-				<br />
-				<br />
-				{ __( 'This can be undone from revision history.' ) }
 			</ConfirmDialog>
 		</Modal>
 	);

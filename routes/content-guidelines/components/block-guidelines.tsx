@@ -258,13 +258,10 @@ export default function BlockGuidelines() {
 				{ sprintf(
 					/* translators: %s: Block name. */
 					__(
-						'You are about to remove the block guidelines for the %s block.'
+						'You are about to remove the block guidelines for the %s block. This can be undone from revision history.'
 					),
 					itemToDelete?.label ?? ''
 				) }
-				<br />
-				<br />
-				{ __( 'This can be undone from revision history.' ) }
 			</ConfirmDialog>
 		</VStack>
 	);
