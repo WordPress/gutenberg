@@ -117,7 +117,7 @@ const {
  * @param {string}   postId                       Editor root level post ID.
  * @param {string}   renderingMode                Editor rendering mode.
  * @param {Object}   options                      Additional options.
- * @param {Function} options.onHeicPluginRequired  Callback when HEIC plugin installation is needed.
+ * @param {Function} options.onHeicPluginRequired Callback when HEIC plugin installation is needed.
  *
  * @return {Object} Block Editor Settings.
  */
