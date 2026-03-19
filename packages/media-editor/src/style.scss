@@ -1,2 +1,7 @@
 // Import component styles
 @use "./components/media-preview/style.scss" as *;
+@use "./components/media-editor-canvas/style.scss" as *;
+@use "./components/media-edit-form/style.scss" as *;
+@use "./components/image-cropper/style.scss" as *;
+@use "./components/cropping-toolbar/style.scss" as *;
+@use "./components/cropping-panel/style.scss" as *;

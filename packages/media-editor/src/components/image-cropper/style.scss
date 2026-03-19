@@ -1,0 +1,13 @@
+.media-editor-image-cropper {
+	position: relative;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	// Override image-cropper defaults to fit within media-editor
+	.image-cropper {
+		width: 100%;
+		height: 100%;
+	}
+}

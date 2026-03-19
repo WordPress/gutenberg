@@ -1,0 +1,5 @@
+// Zero out padding from PostPanelSection for crop panel
+// ToolsPanel and action buttons provide their own padding
+.editor-media-crop-panel.editor-post-panel__section {
+	padding: 0;
+}

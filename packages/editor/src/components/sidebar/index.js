@@ -5,6 +5,8 @@ import {
 	BlockInspector,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Platform,
@@ -15,9 +17,8 @@ import {
 } from '@wordpress/element';
 import { isRTL, __, _x } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -32,7 +33,7 @@ import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
 import TemplateContentPanel from '../template-content-panel';
 import TemplatePartContentPanel from '../template-part-content-panel';
-import { MediaMetadataPanel } from '../media';
+import { MediaMetadataPanel, MediaCropPanel } from '../media';
 import RevisionBlockDiffPanel from '../revision-block-diff';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
 import { sidebars } from './constants';
@@ -68,6 +69,25 @@ const SidebarContent = ( {
 	const isRevisionsMode = useSelect( ( select ) => {
 		return unlock( select( editorStore ) ).isRevisionsMode();
 	} );
+
+	const { isImageAttachment } = useSelect(
+		( select ) => {
+			if ( ! isAttachment ) {
+				return { isImageAttachment: false };
+			}
+
+			const media = select( coreStore ).getEditedEntityRecord(
+				'postType',
+				postType,
+				select( editorStore ).getCurrentPostId()
+			);
+			return {
+				isImageAttachment:
+					media?.mime_type?.split( '/' )[ 0 ] === 'image',
+			};
+		},
+		[ isAttachment, postType ]
+	);
 
 	// This effect addresses a race condition caused by tabbing from the last
 	// block in the editor into the settings sidebar. Without this effect, the
@@ -144,6 +164,11 @@ const SidebarContent = ( {
 						</>
 					) }
 				</Tabs.TabPanel>
+				{ isImageAttachment && (
+					<Tabs.TabPanel tabId={ sidebars.crop } focusable={ false }>
+						<MediaCropPanel />
+					</Tabs.TabPanel>
+				) }
 				{ ! isAttachment && (
 					<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
 						<BlockInspector />
@@ -168,6 +193,7 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 			const _isEditorSidebarOpened = [
 				sidebars.block,
 				sidebars.document,
+				sidebars.crop,
 			].includes( sidebar );
 			let _tabName = sidebar;
 			if ( ! _isEditorSidebarOpened ) {
