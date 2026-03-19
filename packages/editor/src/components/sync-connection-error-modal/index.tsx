@@ -67,10 +67,17 @@ function DefaultSyncConnectionErrorModal(
 		secondsRemainingUntilAutoRetry,
 		title,
 	} = props;
-	const copyButtonRef = useCopyToClipboard( () => {
-		const blocks = select( blockEditorStore ).getBlocks();
-		return serialize( blocks );
-	} );
+	const copyButtonRef = useCopyToClipboard(
+		() => {
+			const blocks = select( blockEditorStore ).getBlocks();
+			return serialize( blocks );
+		},
+		/*
+		 * This no-op isn't required after https://github.com/WordPress/gutenberg/pull/75723,
+		 * but is kept for backwards compatibility with WordPress 7.0 and earlier.
+		 */
+		() => {}
+	);
 
 	let retryCountdownText: string = '';
 	let isRetrying = false;
