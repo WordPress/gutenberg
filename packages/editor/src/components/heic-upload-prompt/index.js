@@ -49,8 +49,7 @@ export default function HeicUploadPrompt( { files, onRetry, onDismiss } ) {
 	}, [] );
 
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const { createInfoNotice, createErrorNotice } =
-		useDispatch( noticesStore );
+	const { createInfoNotice } = useDispatch( noticesStore );
 
 	// If the user has previously dismissed the prompt, silently dismiss.
 	if ( isDismissed ) {
@@ -97,14 +96,11 @@ export default function HeicUploadPrompt( { files, onRetry, onDismiss } ) {
 						data: { status: 'active' },
 					} );
 
-					createInfoNotice(
-						__( 'HEIC support plugin activated.' ),
-						{
-							type: 'snackbar',
-							speak: true,
-							isDismissible: true,
-						}
-					);
+					createInfoNotice( __( 'HEIC support plugin activated.' ), {
+						type: 'snackbar',
+						speak: true,
+						isDismissible: true,
+					} );
 
 					onRetry();
 					return;
@@ -176,6 +172,8 @@ export default function HeicUploadPrompt( { files, onRetry, onDismiss } ) {
 					} }
 				>
 					<Button
+						__next40pxDefaultSize
+						accessibleWhenDisabled
 						variant="tertiary"
 						onClick={ handleDismiss }
 						disabled={ isInstalling }
@@ -187,6 +185,8 @@ export default function HeicUploadPrompt( { files, onRetry, onDismiss } ) {
 
 					{ canInstallPlugins !== false && (
 						<Button
+							__next40pxDefaultSize
+							accessibleWhenDisabled
 							variant="primary"
 							onClick={ handleInstall }
 							disabled={ isInstalling }

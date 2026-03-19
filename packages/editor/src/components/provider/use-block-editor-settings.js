@@ -112,10 +112,12 @@ const {
 /**
  * React hook used to compute the block editor settings to use for the post editor.
  *
- * @param {Object} settings      EditorProvider settings prop.
- * @param {string} postType      Editor root level post type.
- * @param {string} postId        Editor root level post ID.
- * @param {string} renderingMode Editor rendering mode.
+ * @param {Object}   settings                          EditorProvider settings prop.
+ * @param {string}   postType                          Editor root level post type.
+ * @param {string}   postId                            Editor root level post ID.
+ * @param {string}   renderingMode                     Editor rendering mode.
+ * @param {Object}   options                           Additional options.
+ * @param {Function} options.onHeicPluginRequired       Callback when HEIC plugin installation is needed.
  *
  * @return {Object} Block Editor Settings.
  */

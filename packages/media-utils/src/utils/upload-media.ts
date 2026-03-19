@@ -75,8 +75,9 @@ interface UploadMediaArgs {
  * @param $0.onError            Function called when an error happens.
  * @param $0.onFileChange       Function called each time a file or a temporary representation of the file is available.
  * @param $0.wpAllowedMimeTypes List of allowed mime types and file extensions.
- * @param $0.signal             Abort signal.
- * @param $0.multiple           Whether to allow multiple files to be uploaded.
+ * @param $0.signal                 Abort signal.
+ * @param $0.multiple               Whether to allow multiple files to be uploaded.
+ * @param $0.onHeicPluginRequired   Callback when HEIC plugin installation is needed.
  */
 export function uploadMedia( {
 	wpAllowedMimeTypes,
