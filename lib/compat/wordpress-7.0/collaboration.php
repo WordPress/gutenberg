@@ -318,3 +318,79 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 
 	return $actions;
 }
+
+/**
+ * Detects which plugins registered meta boxes and exposes the plugin names
+ * to the editor via an inline script global. This allows the editor UI to
+ * show which specific plugins are incompatible with real-time collaboration.
+ *
+ * Uses _get_plugin_from_callback() (WordPress core) to resolve meta box
+ * callbacks to their source plugin via PHP Reflection.
+ */
+function gutenberg_inject_meta_box_plugin_names() {
+	global $wp_meta_boxes;
+
+	$screen = get_current_screen();
+
+	if ( ! $screen || ! $screen->is_block_editor ) {
+		return;
+	}
+
+	if ( ! get_option( 'wp_collaboration_enabled' ) ) {
+		return;
+	}
+
+	if ( ! function_exists( '_get_plugin_from_callback' ) ) {
+		return;
+	}
+
+	if ( ! isset( $wp_meta_boxes[ $screen->id ] ) ) {
+		return;
+	}
+
+	$plugin_names                  = array();
+	$unknown_meta_box_plugin_count = 0;
+
+	foreach ( $wp_meta_boxes[ $screen->id ] as $location_boxes ) {
+		foreach ( $location_boxes as $priority_boxes ) {
+			foreach ( $priority_boxes as $meta_box ) {
+				if ( false === $meta_box || ! $meta_box['title'] ) {
+					continue;
+				}
+
+				// Skip back-compat meta boxes. These are core meta boxes
+				// (categories, tags, etc.) that are reimplemented as block
+				// editor panels and don't actually render in the editor.
+				if ( isset( $meta_box['args']['__back_compat_meta_box'] ) && $meta_box['args']['__back_compat_meta_box'] ) {
+					continue;
+				}
+
+				$plugin = _get_plugin_from_callback( $meta_box['callback'] );
+
+				if ( $plugin && ! empty( $plugin['Name'] ) ) {
+					$plugin_names[] = $plugin['Name'];
+				} else {
+					$unknown_meta_box_plugin_count += 1;
+				}
+			}
+		}
+	}
+
+	// Deduplicate plugin names if a plugin has multiple boxes
+	$plugin_names = array_values( array_unique( $plugin_names ) );
+
+	// Only output when there are meta boxes to report.
+	if ( empty( $plugin_names ) && 0 === $unknown_meta_box_plugin_count ) {
+		return;
+	}
+
+	$data = array(
+		'pluginNames'              => $plugin_names,
+		'unknownMetaBoxPluginsCount' => $unknown_meta_box_plugin_count,
+	);
+
+	wp_print_inline_script_tag(
+		'window._wpMetaBoxPluginNames = ' . wp_json_encode( $data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ';'
+	);
+}
+add_action( 'admin_footer', 'gutenberg_inject_meta_box_plugin_names' );
