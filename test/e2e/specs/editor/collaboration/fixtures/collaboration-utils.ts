@@ -334,7 +334,7 @@ export async function setCollaboration(
 	const html = await response.text();
 	const nonce = html.match( /name="_wpnonce" value="([^"]+)"/ )![ 1 ];
 
-	const optionName = 'wp_enable_real_time_collaboration';
+	const optionName = 'wp_collaboration_enabled';
 	const optionValue = enabled ? 1 : 0;
 
 	const formData: Record< string, string | number > = {
@@ -348,6 +348,10 @@ export async function setCollaboration(
 	};
 
 	formData[ optionName ] = optionValue;
+
+	// Temporary addition to bridge the short time when this is change is merged in
+	// Gutenberg but not in core.
+	formData.wp_enable_real_time_collaboration = optionValue;
 
 	await requestUtils.request.post( '/wp-admin/options.php', {
 		form: formData,

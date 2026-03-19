@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.10.0 (2026-03-18)
+
 ### Breaking Changes
 
 - `@wordpress/boot`, `@wordpress/route`, `@wordpress/theme`, and `@wordpress/private-apis` are no longer bundled. They are now expected to be provided by WordPress Core (7.0+) or the Gutenberg plugin.

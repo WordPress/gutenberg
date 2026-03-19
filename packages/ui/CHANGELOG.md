@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.9.0 (2026-03-18)
+
 ### New Features
 
 -   Add `Text` primitive with predefined typographic variants (`heading-2xl` through `heading-sm`, `body-xl` through `body-sm`) built on design tokens ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).
@@ -11,15 +13,24 @@
 
 ### Bug Fixes
 
+-   `InputLayout.Slot`: Forward the incoming `className` prop instead of letting it be silently overwritten by the rest spread ([#76459](https://github.com/WordPress/gutenberg/pull/76459)).
 -   `VisuallyHidden`: Add `word-break: normal` to prevent text wrapping issues in screen reader content ([#75539](https://github.com/WordPress/gutenberg/pull/75539)).
 
 ### Enhancements
 
 -   `Badge`: Add border, update text color, and apply `neutral-strong` background to `none` intent for better contrast against neutral surfaces ([#76356](https://github.com/WordPress/gutenberg/pull/76356)).
+-   `Dialog`: Use `--wpds-dimension-surface-width-*` design tokens for width constraints ([#76494](https://github.com/WordPress/gutenberg/pull/76494)).
 -   `Notice`: Improve narrow layout by letting description and actions span the icon column when a title is present ([#76202](https://github.com/WordPress/gutenberg/pull/76202)).
 -   `Notice`: Use `Text` component for `Title` and `Description` typography ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).
+-   `Card`: Use `Text` component for `Title` typography ([#76642](https://github.com/WordPress/gutenberg/pull/76642)).
 -   `Card`, `CollapsibleCard`: update padding to match legacy `Card` component ([#76368](https://github.com/WordPress/gutenberg/pull/76368)).
 -   `CollapsibleCard`: move trigger to the header ([#76265](https://github.com/WordPress/gutenberg/pull/76265)).
+-   `CollapsibleCard`: add animations ([#76378](https://github.com/WordPress/gutenberg/pull/76378)).
+-   `CollapsibleCard`: allows the browser page search to find and expand the panel contents via the `hiddenUntilFound` prop. ([#76498](https://github.com/WordPress/gutenberg/pull/76498)).
+
+### Internal
+
+-   Update `@base-ui/react` from 1.2.0 to [1.3.0](https://github.com/mui/base-ui/blob/master/CHANGELOG.md#v130) ([#76603](https://github.com/WordPress/gutenberg/pull/76603)).
 
 ## 0.8.0 (2026-03-04)
 

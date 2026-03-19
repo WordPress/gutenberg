@@ -1,8 +1,8 @@
 # Disallow setting Design System token CSS custom properties (no-setting-ds-tokens)
 
-Design System tokens (CSS custom properties beginning with `--wpds-`) are meant to be consumed, not set. Setting these properties in inline styles can lead to unexpected behavior and breaks the Design System's theming capabilities.
+Design System tokens (CSS custom properties beginning with `--wpds-`) are meant to be consumed, not set. Setting these properties can lead to unexpected behavior and breaks the Design System's theming capabilities.
 
-This rule lints JSX inline styles. For CSS files, use the [corresponding Stylelint rule](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-theme/#stylelint-plugins) from the `@wordpress/theme` package.
+This rule lints all object property keys in JavaScript/TypeScript files. For CSS files, use the [corresponding Stylelint rule](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-theme/#stylelint-plugins) from the `@wordpress/theme` package.
 
 ## Rule details
 
@@ -12,8 +12,8 @@ Examples of **incorrect** code for this rule:
 <div style={ { '--wpds-color-fg-content-neutral': 'red' } } />
 ```
 
-```jsx
-<div style={ { '--wpds-font-size-md': '10px', color: 'blue' } } />
+```js
+const styles = { '--wpds-color-fg-content-neutral': 'red' };
 ```
 
 Examples of **correct** code for this rule:

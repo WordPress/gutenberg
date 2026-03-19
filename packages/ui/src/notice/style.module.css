@@ -115,7 +115,7 @@
 		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-error-weak);
 	}
 
-	/* TODO: Replace 320px with a measure token from the Theme package. */
+	/* Matches --wpds-dimension-surface-width-sm (container queries don't support custom properties). */
 	@container (max-width: 320px) {
 		.notice:has(.title) .description,
 		.notice:has(.title) .actions {
