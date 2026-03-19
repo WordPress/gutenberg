@@ -9,9 +9,9 @@
 		display: grid;
 		grid-template-rows: auto minmax(0, 1fr);
 		grid-template-areas: "header" "main";
-		max-height: min(var(--available-height), 480px, 60dvh);
-		min-width: var(--anchor-width);
-		max-width: var(--available-width);
+		max-height: min(var(--wp-ui-popover-available-height, var(--available-height)), 480px, 60dvh);
+		min-width: var(--wp-ui-popover-anchor-width, var(--anchor-width));
+		max-width: var(--wp-ui-popover-available-width, var(--available-width));
 		border-radius: var(--wpds-border-radius-md);
 		border: 1px solid var(--wpds-color-stroke-surface-neutral);
 		box-shadow: var(--wpds-elevation-md);

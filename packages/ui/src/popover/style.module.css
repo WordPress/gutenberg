@@ -3,6 +3,15 @@
 @layer wp-ui-components {
 	.positioner {
 		z-index: var(--wp-ui-popover-z-index, initial);
+
+		/* Alias Base UI's Positioner CSS variables with a --wp-ui-popover-* prefix. */
+		--wp-ui-popover-anchor-height: var(--anchor-height);
+		--wp-ui-popover-anchor-width: var(--anchor-width);
+		--wp-ui-popover-available-height: var(--available-height);
+		--wp-ui-popover-available-width: var(--available-width);
+		--wp-ui-popover-positioner-height: var(--positioner-height);
+		--wp-ui-popover-positioner-width: var(--positioner-width);
+		--wp-ui-popover-transform-origin: var(--transform-origin);
 	}
 
 	.popup {
