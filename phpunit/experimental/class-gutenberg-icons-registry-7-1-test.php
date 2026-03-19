@@ -26,7 +26,9 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 	 */
 	public function tear_down() {
 		$instance_property = new ReflectionProperty( Gutenberg_Icons_Registry_7_1::class, 'instance' );
-		$instance_property->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$instance_property->setAccessible( true );
+		}
 		$instance_property->setValue( null, null );
 
 		$this->registry = null;
@@ -42,37 +44,27 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 	 */
 	private function register( $icon_name, $icon_properties ) {
 		$method = new ReflectionMethod( $this->registry, 'register' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$instance_property->setAccessible( true );
+		}
 		return $method->invoke( $this->registry, $icon_name, $icon_properties );
 	}
 
 	/**
-	 * Should reject non-string names.
+	 * Should reject invalid icon names.
 	 *
+	 * @dataProvider data_invalid_icon_names
 	 * @expectedIncorrectUsage Gutenberg_Icons_Registry_7_1::register
+	 *
+	 * @param mixed $icon_name Icon name to test.
 	 */
-	public function test_invalid_non_string_names() {
-		$result = $this->register( 1, array() );
-		$this->assertFalse( $result );
-	}
+	public function test_invalid_icon_names( $icon_name ) {
+		$settings = array(
+			'label'   => 'Icon',
+			'content' => '<svg></svg>',
+		);
 
-	/**
-	 * Should reject icons without a namespace.
-	 *
-	 * @expectedIncorrectUsage Gutenberg_Icons_Registry_7_1::register
-	 */
-	public function test_invalid_names_without_namespace() {
-		$result = $this->register( 'plus', array() );
-		$this->assertFalse( $result );
-	}
-
-	/**
-	 * Should reject icons with uppercase characters.
-	 *
-	 * @expectedIncorrectUsage Gutenberg_Icons_Registry_7_1::register
-	 */
-	public function test_uppercase_characters() {
-		$result = $this->register( 'Core/Plus', array() );
+		$result = $this->register( $icon_name, $settings );
 		$this->assertFalse( $result );
 	}
 
@@ -89,6 +81,20 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 		$result = $this->register( $name, $settings );
 		$this->assertTrue( $result );
 		$this->assertTrue( $this->registry->is_registered( $name ) );
+	}
+
+	/**
+	 * Provides invalid icon names.
+	 *
+	 * @return array[]
+	 */
+	public function data_invalid_icon_names() {
+		return array(
+			'non-string name'      => array( 1 ),
+			'no namespace'         => array( 'plus' ),
+			'uppercase characters' => array( 'Core/Plus' ),
+			'invalid characters'   => array( 'test/_doing_it_wrong' ),
+		);
 	}
 
 	/**
