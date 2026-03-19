@@ -55,8 +55,8 @@ export function parseFencedCode( value, { allowEndOfString = false } = {} ) {
 	const parsedLanguage = sanitizeLanguage( openingFenceMatch[ 1 ] );
 	let parsedContent = htmlString.slice( openingFenceMatch[ 0 ].length );
 
-	// Strip a trailing closing fence if present.
-	parsedContent = parsedContent.replace( /\r?\n```[ \t]*$/, '' );
+	// Strip a trailing closing fence if present, allowing an optional final newline.
+	parsedContent = parsedContent.replace( /\r?\n```[ \t]*(?:\r?\n[ \t]*)?$/, '' );
 
 	return {
 		content: parsedContent,
