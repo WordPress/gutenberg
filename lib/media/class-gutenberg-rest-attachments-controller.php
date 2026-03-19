@@ -58,6 +58,26 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			),
 			true // Override core's route so 'scaled' is included in the enum.
 		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[\d]+)/finalize',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'finalize_item' ),
+					'permission_callback' => array( $this, 'edit_media_item_permissions_check' ),
+					'args'                => array(
+						'id' => array(
+							'description' => __( 'Unique identifier for the attachment.', 'gutenberg' ),
+							'type'        => 'integer',
+						),
+					),
+				),
+				'allow_batch' => $this->allow_batch,
+				'schema'      => array( $this, 'get_public_item_schema' ),
+			)
+		);
 	}
 
 	/**
@@ -255,6 +275,60 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		return $response;
 	}
 
+	/**
+	 * Finalizes an attachment after client-side media processing.
+	 *
+	 * Triggers the {@see 'wp_generate_attachment_metadata'} filter so that
+	 * server-side plugins can process the attachment after all client-side
+	 * operations (upload, thumbnail generation, sideloads) are complete.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
+	 */
+	public function finalize_item( WP_REST_Request $request ) {
+		$attachment_id = $request['id'];
+
+		$post = $this->get_post( $attachment_id );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		$metadata = wp_get_attachment_metadata( $attachment_id );
+
+		if ( ! is_array( $metadata ) ) {
+			$metadata = array();
+		}
+
+		/**
+		 * Filters the attachment metadata after client-side processing.
+		 *
+		 * This re-applies the wp_generate_attachment_metadata filter so that
+		 * server-side plugins (e.g. those adding custom image sizes or
+		 * processing metadata) can run after client-side uploads are complete.
+		 *
+		 * @param array  $metadata      Attachment metadata.
+		 * @param int    $attachment_id Attachment ID.
+		 * @param string $context       Context: 'create' or 'update'.
+		 */
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$metadata = apply_filters( 'wp_generate_attachment_metadata', $metadata, $attachment_id, 'update' );
+
+		wp_update_attachment_metadata( $attachment_id, $metadata );
+
+		$response_request = new WP_REST_Request(
+			WP_REST_Server::READABLE,
+			rest_get_route_for_post( $attachment_id )
+		);
+
+		$response_request['context'] = 'edit';
+
+		if ( isset( $request['_fields'] ) ) {
+			$response_request['_fields'] = $request['_fields'];
+		}
+
+		return $this->prepare_item_for_response( get_post( $attachment_id ), $response_request );
+	}
 
 	/**
 	 * Checks if a given request has access to sideload a file.

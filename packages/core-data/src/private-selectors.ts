@@ -314,3 +314,20 @@ export function getEditorAssets( state: State ): Record< string, any > | null {
 export function isCollaborationSupported( state: State ): boolean {
 	return state.collaborationSupported;
 }
+
+/**
+ * Returns the view configuration for the given entity type.
+ *
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ *
+ * @return The view configuration or undefined if not loaded.
+ */
+export function getViewConfig(
+	state: State,
+	kind: string,
+	name: string
+): Record< string, any > | undefined {
+	return state.viewConfigs?.[ `${ kind }/${ name }` ];
+}

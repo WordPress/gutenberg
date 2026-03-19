@@ -65,6 +65,7 @@ export const LayoutTableComponent = ( {
 		<div
 			style={
 				{
+					height: '100%',
 					maxWidth: fullWidth ? undefined : '400px',
 					'--wp-dataviews-color-background': backgroundColor,
 				} as React.CSSProperties

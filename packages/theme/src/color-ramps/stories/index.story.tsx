@@ -36,7 +36,6 @@ const meta: Meta< typeof ColorGen > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
-	tags: [ 'status-experimental' ],
 };
 export default meta;
 

@@ -32,9 +32,9 @@ export interface PopupProps extends ComponentProps< 'div' > {
 	 * Renders the dialog at a preset width (excluding additional padding from
 	 * the viewport edges).
 	 *
-	 * - `'small'` — max-width of 384px.
-	 * - `'medium'` — max-width of 512px.
-	 * - `'large'` — max-width of 840px.
+	 * - `'small'` — narrow max-width.
+	 * - `'medium'` — moderate max-width.
+	 * - `'large'` — wide max-width.
 	 * - `'stretch'` — no max-width, stretches to fill available space.
 	 * - `'full'` — stretches to fill available width and height.
 	 *

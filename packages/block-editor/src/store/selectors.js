@@ -1705,9 +1705,21 @@ const canInsertBlockTypeUnmemoized = (
 	}
 
 	const blockEditingMode = getBlockEditingMode( state, rootClientId ?? '' );
+
+	// Compute section context early so the disabled check below can use it.
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const sectionClientId = isParentSectionBlock
+		? rootClientId
+		: getParentSectionBlock( state, rootClientId );
+	const isWithinSection = !! sectionClientId;
+
+	// Disabled containers reject all blocks, with one exception: within a
+	// section, the default block (paragraph) is allowed through so it can
+	// reach the content-insertion logic further down (lines 1748-1772)
+	// which conditionally permits it where a sibling paragraph exists.
 	if (
 		blockEditingMode === 'disabled' &&
-		blockName !== getDefaultBlockName()
+		( ! isWithinSection || blockName !== getDefaultBlockName() )
 	) {
 		return false;
 	}
@@ -1723,11 +1735,6 @@ const canInsertBlockTypeUnmemoized = (
 	// It shouldn't be possible to insert inside a section block unless in
 	// some cases when the block is a content block.
 	const isContentRoleBlock = isContentBlock( blockName );
-	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
-	const sectionClientId = isParentSectionBlock
-		? rootClientId
-		: getParentSectionBlock( state, rootClientId );
-	const isWithinSection = !! sectionClientId;
 	if ( isWithinSection && ! isContentRoleBlock ) {
 		return false;
 	}

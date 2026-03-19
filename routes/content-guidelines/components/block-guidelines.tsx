@@ -7,11 +7,11 @@ import {
 	Button,
 	Icon,
 	Modal,
+	Notice,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { Notice } from '@wordpress/ui';
 import {
 	DataViews,
 	filterSortAndPaginate,
@@ -205,15 +205,13 @@ export default function BlockGuidelines() {
 	return (
 		<VStack spacing={ 4 } className="block-guidelines">
 			{ error && (
-				<Notice.Root intent="error">
-					<Notice.Title>
-						{ sprintf(
-							/* translators: %s: Error message. */
-							__( 'Error: %s' ),
-							error
-						) }
-					</Notice.Title>
-				</Notice.Root>
+				<Notice status="error" onRemove={ () => setError( null ) }>
+					{ sprintf(
+						/* translators: %s: Error message. */
+						__( 'Error: %s' ),
+						error
+					) }
+				</Notice>
 			) }
 			{ rows.length > 0 && (
 				<DataViews

@@ -53,9 +53,7 @@ describe( 'CollapsibleCard', () => {
 				</CollapsibleCard.Root>
 			);
 
-			expect(
-				screen.queryByText( 'Hidden content' )
-			).not.toBeInTheDocument();
+			expect( screen.getByText( 'Hidden content' ) ).not.toBeVisible();
 		} );
 
 		it( 'shows content when defaultOpen is true', () => {
@@ -87,13 +85,12 @@ describe( 'CollapsibleCard', () => {
 				</CollapsibleCard.Root>
 			);
 
-			expect(
-				screen.queryByText( 'Toggle content' )
-			).not.toBeInTheDocument();
+			expect( screen.getByText( 'Toggle content' ) ).not.toBeVisible();
 
 			await user.click(
 				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
+					name: 'Title',
+					expanded: false,
 				} )
 			);
 
@@ -101,38 +98,12 @@ describe( 'CollapsibleCard', () => {
 
 			await user.click(
 				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
+					name: 'Title',
+					expanded: true,
 				} )
 			);
 
-			expect(
-				screen.queryByText( 'Toggle content' )
-			).not.toBeInTheDocument();
-		} );
-
-		it( 'toggles content when clicking the header area', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<CollapsibleCard.Root>
-					<CollapsibleCard.Header>
-						<Card.Title>Header click test</Card.Title>
-					</CollapsibleCard.Header>
-					<CollapsibleCard.Content>
-						<p>Header toggled content</p>
-					</CollapsibleCard.Content>
-				</CollapsibleCard.Root>
-			);
-
-			expect(
-				screen.queryByText( 'Header toggled content' )
-			).not.toBeInTheDocument();
-
-			await user.click( screen.getByText( 'Header click test' ) );
-
-			expect(
-				screen.getByText( 'Header toggled content' )
-			).toBeVisible();
+			expect( screen.getByText( 'Toggle content' ) ).not.toBeVisible();
 		} );
 
 		it( 'calls onOpenChange when toggled', async () => {
@@ -152,7 +123,8 @@ describe( 'CollapsibleCard', () => {
 
 			await user.click(
 				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
+					name: 'Title',
+					expanded: false,
 				} )
 			);
 
@@ -179,7 +151,8 @@ describe( 'CollapsibleCard', () => {
 
 			await user.click(
 				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
+					name: 'Title',
+					expanded: true,
 				} )
 			);
 
@@ -188,7 +161,7 @@ describe( 'CollapsibleCard', () => {
 	} );
 
 	describe( 'trigger', () => {
-		it( 'renders a toggle button', () => {
+		it( 'renders the header as a toggle button', () => {
 			render(
 				<CollapsibleCard.Root>
 					<CollapsibleCard.Header>
@@ -199,7 +172,8 @@ describe( 'CollapsibleCard', () => {
 
 			expect(
 				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
+					name: 'Title',
+					expanded: false,
 				} )
 			).toBeVisible();
 		} );

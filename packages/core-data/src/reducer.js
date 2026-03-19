@@ -16,6 +16,7 @@ import { createUndoManager } from '@wordpress/undo-manager';
 import { ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
+import { ConnectionErrorCode } from './sync';
 
 /** @typedef {import('./types').AnyFunction} AnyFunction */
 
@@ -706,6 +707,35 @@ export function collaborationSupported( state = true, action ) {
 	switch ( action.type ) {
 		case 'SET_COLLABORATION_SUPPORTED':
 			return action.supported;
+
+		case 'SET_SYNC_CONNECTION_STATUS':
+			if (
+				ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED ===
+				action.status?.error?.code
+			) {
+				return false;
+			}
+
+			return state;
+	}
+	return state;
+}
+
+/**
+ * Reducer managing view configs, keyed by `kind/name`.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function viewConfigs( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_VIEW_CONFIG':
+			return {
+				...state,
+				[ `${ action.kind }/${ action.name }` ]: action.config,
+			};
 	}
 	return state;
 }
@@ -734,4 +764,5 @@ export default combineReducers( {
 	editorAssets,
 	syncConnectionStatuses,
 	collaborationSupported,
+	viewConfigs,
 } );

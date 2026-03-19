@@ -716,8 +716,8 @@ Display a custom date. ([Source](https://github.com/WordPress/gutenberg/tree/tru
 
 -	**Name:** core/post-date
 -	**Category:** theme
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** datetime, format, isLink, textAlign
+-	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Attributes:** datetime, format, isLink
 
 ## Excerpt
 

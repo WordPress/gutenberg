@@ -102,7 +102,7 @@ export function useRenderCursors(
 			};
 
 			let start: ResolvedSelection = {
-				textIndex: null,
+				richTextOffset: null,
 				localClientId: null,
 			};
 			let end: ResolvedSelection | undefined;

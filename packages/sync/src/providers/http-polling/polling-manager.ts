@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { applyFilters } from '@wordpress/hooks';
+
+/**
  * External dependencies
  */
 import * as Y from 'yjs';
@@ -11,6 +16,15 @@ import * as syncProtocol from 'y-protocols/sync';
 /**
  * Internal dependencies
  */
+import {
+	DEFAULT_CLIENT_LIMIT_PER_ROOM,
+	MAX_ERROR_BACKOFF_IN_MS,
+	MAX_UPDATE_SIZE_IN_BYTES,
+	POLLING_INTERVAL_IN_MS,
+	POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS,
+	POLLING_INTERVAL_BACKGROUND_TAB_IN_MS,
+} from './config';
+import { ConnectionError, ConnectionErrorCode } from '../../errors';
 import type { ConnectionStatus } from '../../types';
 import {
 	type AwarenessState,
@@ -24,16 +38,11 @@ import {
 	base64ToUint8Array,
 	createSyncUpdate,
 	createUpdateQueue,
+	intValueOrDefault,
 	postSyncUpdate,
 	postSyncUpdateNonBlocking,
 } from './utils';
 
-const POLLING_INTERVAL_IN_MS = 1000; // 1 second or 1000 milliseconds
-const POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS = 250; // 250 milliseconds
-// Must be less than the server-side AWARENESS_TIMEOUT (30 s) to avoid
-// false disconnects when the tab is in the background.
-const POLLING_INTERVAL_BACKGROUND_TAB_IN_MS = 25 * 1000; // 25 seconds
-const MAX_ERROR_BACKOFF_IN_MS = 30 * 1000; // 30 seconds
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
 
 type LogFunction = ( message: string, debug?: object ) => void;
@@ -57,11 +66,13 @@ interface RoomState {
 	clientId: number;
 	createCompactionUpdate: () => SyncUpdate;
 	endCursor: number;
+	enforceConnectionLimit: boolean;
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
 	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
+	room: string;
 	unregister: () => void;
 	updateQueue: UpdateQueue;
 }
@@ -146,7 +157,9 @@ function processAwarenessUpdate(
 
 	// Removed clients are missing from the server state.
 	const removed = new Set< number >(
-		currentStates.keys().filter( ( clientId ) => ! state[ clientId ] )
+		Array.from( currentStates.keys() ).filter(
+			( clientId ) => ! state[ clientId ]
+		)
 	);
 
 	Object.entries( state ).forEach( ( [ clientIdString, awarenessState ] ) => {
@@ -241,6 +254,49 @@ function processDocUpdate(
 			Y.applyUpdateV2( doc, data, POLLING_MANAGER_ORIGIN );
 		}
 	}
+}
+
+/**
+ * Check whether the awareness state exceeds the configured connection limit.
+ *
+ * @param awareness The awareness state from the server response.
+ * @param roomState The room state corresponding to the awareness state
+ * @return True if a peer limit has been exceeded.
+ */
+function checkConnectionLimit(
+	awareness: AwarenessState,
+	roomState: RoomState
+): boolean {
+	if ( ! roomState.enforceConnectionLimit ) {
+		return false;
+	}
+
+	// Limits are only enforced on the initial connection.
+	roomState.enforceConnectionLimit = false;
+
+	const maxClientsPerRoom = applyFilters(
+		'sync.pollingProvider.maxClientsPerRoom',
+		DEFAULT_CLIENT_LIMIT_PER_ROOM,
+		roomState.room
+	);
+
+	const clientCount = Object.keys( awareness ).length;
+	const validatedLimit = intValueOrDefault(
+		maxClientsPerRoom,
+		DEFAULT_CLIENT_LIMIT_PER_ROOM
+	);
+
+	if ( clientCount > validatedLimit ) {
+		roomState.log( 'Connection limit exceeded', {
+			clientCount,
+			maxClientsPerRoom: validatedLimit,
+			room: roomState.room,
+		} );
+
+		return true;
+	}
+
+	return false;
 }
 
 let areListenersRegistered = false;
@@ -370,6 +426,19 @@ function poll(): void {
 				const roomState = roomStates.get( room.room )!;
 				roomState.endCursor = room.end_cursor;
 
+				// If a limit is exceeded, disconnect immediately without processing updates.
+				if ( checkConnectionLimit( room.awareness, roomState ) ) {
+					roomState.onStatusChange( {
+						status: 'disconnected',
+						error: new ConnectionError(
+							ConnectionErrorCode.CONNECTION_LIMIT_EXCEEDED,
+							'Connection limit exceeded'
+						),
+					} );
+					unregisterRoom( room.room );
+					return;
+				}
+
 				// Process awareness update.
 				roomState.processAwarenessUpdate( room.awareness );
 
@@ -447,7 +516,8 @@ function poll(): void {
 				roomStates.forEach( ( state ) => {
 					state.onStatusChange( {
 						status: 'disconnected',
-						retryInMs: pollInterval,
+						canManuallyRetry: true,
+						willAutoRetryInMs: pollInterval,
 					} );
 				} );
 			}
@@ -459,6 +529,7 @@ function poll(): void {
 	// Start polling.
 	void start();
 }
+
 function registerRoom( {
 	room,
 	doc,
@@ -474,6 +545,39 @@ function registerRoom( {
 	// Note: Queue is initially paused. Call .resume() to unpause.
 	const updateQueue = createUpdateQueue( [ createSyncStep1Update( doc ) ] );
 
+	/**
+	 * Connection limits are enforced on the first entity to be loaded for sync.
+	 * This is an inelegant solution to a hard problem: This sync provider and the
+	 * sync package in general intentionally have no knowledge of the individual
+	 * entities being synced.
+	 *
+	 * Let's say a user opens a document (Entity A) for editing. If you asked the
+	 * user what they are doing, they would reply "I'm editing Entity A." You might
+	 * say that Entity A is "primary."
+	 *
+	 * However, the action of editing Entity A also triggers the loading of a
+	 * collection of document categories (Entity B) and another document (Entity C)
+	 * that is embedded in Entity A. You might therefore say that Entity B and
+	 * Entity C are "secondary" in this session.
+	 *
+	 * Meanwhile, a different user opens Entity C for editing, which also triggers
+	 * the loading of Entity B. In this session, Entity C is "primary" and Entity B
+	 * is "secondary."
+	 *
+	 * How do we enforce limits? The intuitive answer is that we only want to count
+	 * connections when the entity is "primary." However, we have no ability to
+	 * detect this. A document might be loaded as a primary entity in one session
+	 * and a secondary entity in another.
+	 *
+	 * In practice, we can consider the first-loaded entity as "primary" and use it
+	 * to enforce our connection limit. This is an imperfect assumption of consumer
+	 * behavior.
+	 *
+	 * How might this approach be improved? We could develop some way to annotate
+	 * entity loading so that the consumer can indicate which entity is primary.
+	 */
+	const enforceConnectionLimit = 0 === roomStates.size;
+
 	function onAwarenessUpdate(): void {
 		roomState.localAwarenessState = awareness.getLocalState() ?? {};
 	}
@@ -481,6 +585,29 @@ function registerRoom( {
 	function onDocUpdate( update: Uint8Array, origin: unknown ): void {
 		if ( POLLING_MANAGER_ORIGIN === origin ) {
 			return;
+		}
+
+		if ( update.byteLength > MAX_UPDATE_SIZE_IN_BYTES ) {
+			const state = roomStates.get( room );
+			if ( ! state ) {
+				return;
+			}
+
+			state.log( 'Document size limit exceeded', {
+				maxUpdateSizeInBytes: MAX_UPDATE_SIZE_IN_BYTES,
+				updateSizeInBytes: update.byteLength,
+			} );
+
+			state.onStatusChange( {
+				status: 'disconnected',
+				error: new ConnectionError(
+					ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED,
+					'Document size limit exceeded'
+				),
+			} );
+
+			// This is an unrecoverable error. Unregister the room to prevent syncing.
+			unregisterRoom( room );
 		}
 
 		// Tag local document changes as 'update' type.
@@ -501,6 +628,7 @@ function registerRoom( {
 				SyncUpdateType.COMPACTION
 			),
 		endCursor: 0,
+		enforceConnectionLimit,
 		localAwarenessState: awareness.getLocalState() ?? {},
 		log,
 		onStatusChange,
@@ -508,6 +636,7 @@ function registerRoom( {
 			processAwarenessUpdate( state, awareness ),
 		processDocUpdate: ( update: SyncUpdate ) =>
 			processDocUpdate( update, doc, onSync ),
+		room,
 		unregister,
 		updateQueue,
 	};

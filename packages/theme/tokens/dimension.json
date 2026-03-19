@@ -206,6 +206,50 @@
 					"com.figma.scopes": [ "GAP" ]
 				}
 			}
+		},
+		"surface-width": {
+			"xs": {
+				"$value": { "value": 240, "unit": "px" },
+				"$description": "Extra small surface width",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+				}
+			},
+			"sm": {
+				"$value": { "value": 320, "unit": "px" },
+				"$description": "Small surface width",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+				}
+			},
+			"md": {
+				"$value": { "value": 400, "unit": "px" },
+				"$description": "Medium surface width",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+				}
+			},
+			"lg": {
+				"$value": { "value": 560, "unit": "px" },
+				"$description": "Large surface width",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+				}
+			},
+			"xl": {
+				"$value": { "value": 720, "unit": "px" },
+				"$description": "Extra large surface width",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+				}
+			},
+			"2xl": {
+				"$value": { "value": 960, "unit": "px" },
+				"$description": "2x extra large surface width",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+				}
+			}
 		}
 	}
 }
