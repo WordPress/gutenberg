@@ -191,12 +191,11 @@ export default function GuidelineAccordionForm( {
 			>
 				{ sprintf(
 					/* translators: %s: Guideline category slug. */
-					__( 'You are about to clear the %s guidelines.' ),
+					__(
+						'You are about to clear the %s guidelines. This can be undone from revision history.'
+					),
 					slug
 				) }
-				<br />
-				<br />
-				{ __( 'This can be undone from revision history.' ) }
 			</ConfirmDialog>
 		</form>
 	);
