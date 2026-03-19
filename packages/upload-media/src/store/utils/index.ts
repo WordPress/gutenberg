@@ -279,4 +279,9 @@ export function terminateVipsWorker(): void {
 	if ( vipsModule ) {
 		vipsModule.terminateVipsWorker();
 	}
+	// Clear cached module references so the worker is lazily recreated
+	// on the next operation. This is essential for worker recycling to
+	// reclaim WASM memory.
+	vipsModulePromise = undefined;
+	vipsModule = undefined;
 }

@@ -21,6 +21,14 @@ import type {
 } from './types';
 import { supportsAnimation, supportsInterlace, supportsQuality } from './utils';
 
+/**
+ * Input MIME types that are known to crash wasm-vips.
+ * These should be handled server-side instead.
+ * This is a defense-in-depth guard; prepareItem() should already
+ * route these types to server-side processing.
+ */
+const UNSUPPORTED_INPUT_TYPES = [ 'image/heic', 'image/heif' ];
+
 interface EmscriptenModule {
 	setAutoDeleteLater: ( autoDelete: boolean ) => void;
 	setDelayFunction: ( fn: ( fn: () => void ) => void ) => void;
@@ -62,6 +70,15 @@ async function getVips(): Promise< typeof Vips > {
 			module.setDelayFunction( ( fn: () => void ) => {
 				cleanup = fn;
 			} );
+		},
+		// Redirect wasm-vips internal stdout/stderr to prevent console errors
+		// (e.g. AVIF codec warnings that are not actionable for users).
+		// Set globalThis.__vipsDebug to a function to capture this output during development.
+		print: ( text: string ) => {
+			( globalThis as any ).__vipsDebug?.( text );
+		},
+		printErr: ( text: string ) => {
+			( globalThis as any ).__vipsDebug?.( text );
 		},
 	} );
 
@@ -107,6 +124,12 @@ export async function convertImageFormat(
 	quality = 0.82,
 	interlaced = false
 ): Promise< ArrayBuffer | ArrayBufferLike > {
+	if ( UNSUPPORTED_INPUT_TYPES.includes( inputType ) ) {
+		throw new Error(
+			`Input type ${ inputType } is not supported for client-side processing`
+		);
+	}
+
 	const ext = outputType.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
@@ -211,6 +234,12 @@ export async function resizeImage(
 	originalWidth: number;
 	originalHeight: number;
 } > {
+	if ( UNSUPPORTED_INPUT_TYPES.includes( type ) ) {
+		throw new Error(
+			`Input type ${ type } is not supported for client-side processing`
+		);
+	}
+
 	const ext = type.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
