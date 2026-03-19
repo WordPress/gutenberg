@@ -24,7 +24,7 @@ import {
 	getTemplatePartIcon,
 } from '@wordpress/editor';
 import { useEntityRecords } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import type { WpTemplatePart } from '@wordpress/core-data';
 import { chevronDown } from '@wordpress/icons';
 // @ts-expect-error - No type declarations available for @wordpress/blocks
@@ -377,6 +377,33 @@ function Canvas() {
 		return ids;
 	}, [ templateParts ] );
 
+	// Read edited (unsaved) content for each template part so previews
+	// reflect newly-assigned navigation refs immediately.
+	const editedTemplateParts = useSelect(
+		( select ) => {
+			if ( ! ( templateParts as WpTemplatePart[] )?.length ) {
+				return templateParts as WpTemplatePart[];
+			}
+			// @ts-expect-error - getEditedEntityRecord types
+			const { getEditedEntityRecord } = select( 'core' );
+			return ( templateParts as WpTemplatePart[] ).map( ( part ) => {
+				const edited = getEditedEntityRecord(
+					'postType',
+					'wp_template_part',
+					part.id
+				);
+				if ( edited?.content?.raw !== part?.content?.raw ) {
+					return {
+						...part,
+						content: edited.content,
+					};
+				}
+				return part;
+			} );
+		},
+		[ templateParts ]
+	);
+
 	// Track which areas have at least one matching template part.
 	const usedAreas = useMemo( () => {
 		const areas = new Set< string >();
@@ -400,14 +427,15 @@ function Canvas() {
 	}
 
 	// Filter template parts for the DataViews based on the selected mode.
+	// Use editedTemplateParts so previews reflect pending edits.
 	const visibleTemplateParts = useMemo( () => {
 		if ( canvasMode === MODE_ALL || canvasMode === MODE_NAVIGATION ) {
-			return templateParts;
+			return editedTemplateParts;
 		}
-		return ( templateParts as WpTemplatePart[] ).filter(
+		return ( editedTemplateParts as WpTemplatePart[] ).filter(
 			( part ) => part.area === canvasMode
 		);
-	}, [ templateParts, canvasMode ] );
+	}, [ editedTemplateParts, canvasMode ] );
 
 	const hasNoTemplateParts =
 		! isResolvingParts && ( templateParts as WpTemplatePart[] ).length === 0;
