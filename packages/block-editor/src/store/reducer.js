@@ -601,25 +601,19 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 	if ( action.type === 'RESET_BLOCKS' ) {
 		/**
 		 * Preserve controlled inner block flags across RESET_BLOCKS.
-		 * Previously this was cleared to `{}`, which caused nested
-		 * controllers (e.g. post-content, patterns) to lose their
-		 * controlled status and unnecessarily re-clone blocks. Stale
-		 * flags are cleaned up naturally by unsetControlledBlocks()
-		 * when useBlockSync unmounts.
+		 * If there are old and new blocks that:
+		 * - have the same `clientId`
+		 * - have the `controlledInnerBlocks` flag
+		 * - don't have any own, uncontrolled children
+		 * then we preserve the `controlledInnerBlocks` flag and the controlled sub-trees.
+		 * Nested controllers (e.g., `post-content`, patterns) don't lose their
+		 * controlled status and don't unnecessarily re-clone blocks.
 		 */
-
-		const newState = {
-			byClientId: new Map(
-				getFlattenedBlocksWithoutAttributes( action.blocks )
-			),
-			attributes: new Map( getFlattenedBlockAttributes( action.blocks ) ),
-			order: mapBlockOrder( action.blocks ),
-			parents: new Map( mapBlockParents( action.blocks ) ),
-			controlledInnerBlocks: {},
-			tree: new Map(),
-		};
-
-		updateBlockTreeForBlocks( newState, action.blocks );
+		const newState = reducer( undefined, {
+			type: 'INSERT_BLOCKS',
+			rootClientId: '',
+			blocks: action.blocks,
+		} );
 
 		const preservedControlledInnerBlocks =
 			state?.controlledInnerBlocks ?? {};
@@ -675,12 +669,6 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 		for ( const clientId of Object.keys(
 			newState.controlledInnerBlocks
 		) ) {
-			if ( ! newState.controlledInnerBlocks[ clientId ] ) {
-				continue;
-			}
-			if ( ! newState.byClientId.has( clientId ) ) {
-				continue;
-			}
 			const controlledOrder = newState.order.get( clientId );
 			if ( ! controlledOrder?.length ) {
 				continue;
@@ -704,12 +692,6 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 			};
 			controlledOrder.forEach( preserveTreeEntry );
 		}
-
-		newState.tree.set( '', {
-			innerBlocks: action.blocks.map( ( subBlock ) =>
-				newState.tree.get( subBlock.clientId )
-			),
-		} );
 
 		return newState;
 	}
