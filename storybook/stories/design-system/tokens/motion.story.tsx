@@ -36,27 +36,27 @@ const EASING_TOKENS = [
 
 const DURATION_TOKENS = [
 	{
-		name: 'xs (50ms)',
+		name: 'xs',
 		variable: 'var(--wpds-motion-duration-xs)',
 		description: 'Micro-delays and transition offsets.',
 	},
 	{
-		name: 'sm (100ms)',
+		name: 'sm',
 		variable: 'var(--wpds-motion-duration-sm)',
 		description: 'Micro-interactions like focus rings and state changes.',
 	},
 	{
-		name: 'md (200ms)',
+		name: 'md',
 		variable: 'var(--wpds-motion-duration-md)',
 		description: 'Standard transitions like menus and popovers.',
 	},
 	{
-		name: 'lg (300ms)',
+		name: 'lg',
 		variable: 'var(--wpds-motion-duration-lg)',
 		description: 'Deliberate animations like slides and reveals.',
 	},
 	{
-		name: 'xl (400ms)',
+		name: 'xl',
 		variable: 'var(--wpds-motion-duration-xl)',
 		description:
 			'Extended animations like complex or multi-step transitions.',
@@ -64,11 +64,11 @@ const DURATION_TOKENS = [
 ];
 
 const DURATION_OPTIONS = [
-	{ label: 'xs (50ms)', value: '50ms' },
-	{ label: 'sm (100ms)', value: '100ms' },
-	{ label: 'md (200ms)', value: '200ms' },
-	{ label: 'lg (300ms)', value: '300ms' },
-	{ label: 'xl (400ms)', value: '400ms' },
+	{ label: 'xs', value: 'var(--wpds-motion-duration-xs)' },
+	{ label: 'sm', value: 'var(--wpds-motion-duration-sm)' },
+	{ label: 'md', value: 'var(--wpds-motion-duration-md)' },
+	{ label: 'lg', value: 'var(--wpds-motion-duration-lg)' },
+	{ label: 'xl', value: 'var(--wpds-motion-duration-xl)' },
 	{ label: 'Custom', value: 'custom' },
 ];
 
@@ -116,7 +116,9 @@ function AnimationRow( {
 function MotionDemo() {
 	const [ animKey, setAnimKey ] = useState( 0 );
 	const replay = useCallback( () => setAnimKey( ( k ) => k + 1 ), [] );
-	const [ selectedDuration, setSelectedDuration ] = useState( '400ms' );
+	const [ selectedDuration, setSelectedDuration ] = useState(
+		'var(--wpds-motion-duration-xl)'
+	);
 	const [ customDuration, setCustomDuration ] = useState( '600' );
 
 	const easingDuration =
