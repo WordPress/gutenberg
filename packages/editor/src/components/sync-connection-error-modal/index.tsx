@@ -73,10 +73,10 @@ function DefaultSyncConnectionErrorModal(
 			return serialize( blocks );
 		},
 		/*
-		 * This no-op isn't required after https://github.com/WordPress/gutenberg/pull/75723,
+		 * This "no callback" value isn't required after https://github.com/WordPress/gutenberg/pull/75723,
 		 * but is kept for backwards compatibility with WordPress 7.0 and earlier.
 		 */
-		() => {}
+		undefined
 	);
 
 	let retryCountdownText: string = '';
