@@ -27,6 +27,7 @@ const transforms = {
 				} );
 				if ( parsedFencedCode ) {
 					return createBlock( 'core/code', {
+						...attributes,
 						...getTransformedAttributes( attributes, 'core/code' ),
 						...parsedFencedCode,
 					} );
