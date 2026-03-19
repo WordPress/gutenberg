@@ -18,7 +18,14 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 	'core/navigation-submenu',
 ];
 
-export function NavigationLinkUI( { block, insertedBlock, setInsertedBlock } ) {
+export function NavigationLinkUI( {
+	block,
+	insertedBlock,
+	setInsertedBlock,
+	anchor,
+	onSubmit,
+	onCancel,
+} ) {
 	const { updateBlockAttributes, removeBlock } =
 		useDispatch( blockEditorStore );
 
@@ -85,10 +92,12 @@ export function NavigationLinkUI( { block, insertedBlock, setInsertedBlock } ) {
 		<LinkUI
 			clientId={ insertedBlock?.clientId }
 			link={ insertedBlock?.attributes }
+			anchor={ anchor }
+			placement={ anchor ? 'bottom-start' : undefined }
 			onBlockInsert={ handleSetInsertedBlock }
 			onClose={ () => {
-				// Use cleanup function
 				cleanupInsertedBlock();
+				onCancel?.();
 			} }
 			onChange={ ( updatedValue ) => {
 				// updateAttributes determines the final state and returns metadata
@@ -109,6 +118,7 @@ export function NavigationLinkUI( { block, insertedBlock, setInsertedBlock } ) {
 				}
 
 				setInsertedBlock( null );
+				onSubmit?.();
 			} }
 		/>
 	);

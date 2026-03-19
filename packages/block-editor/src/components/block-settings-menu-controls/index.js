@@ -138,10 +138,21 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
  * @param {Object} props Fill props.
  * @return {Element} Element.
  */
-function BlockSettingsMenuControls( { ...props } ) {
+function BlockSettingsMenuControls( props ) {
+	const { supportsContentOnly, children, ...restProps } = props;
+
 	return (
 		<StyleProvider document={ document }>
-			<Fill { ...props } />
+			<Fill { ...restProps }>
+				{ ( fillProps ) => {
+					if ( fillProps.isContentOnly && ! supportsContentOnly ) {
+						return null;
+					}
+					return typeof children === 'function'
+						? children( fillProps )
+						: children;
+				} }
+			</Fill>
 		</StyleProvider>
 	);
 }

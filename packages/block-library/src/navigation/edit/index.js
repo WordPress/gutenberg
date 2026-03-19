@@ -75,6 +75,7 @@ import { useInnerBlocks } from './use-inner-blocks';
 import { detectColors } from './utils';
 import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
+import AddSubmenuFill from './add-submenu-fill';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
@@ -1105,6 +1106,7 @@ function Navigation( {
 					isLoading={ isLoading }
 					blockEditingMode={ blockEditingMode }
 				/>
+				<AddSubmenuFill navigationBlockClientId={ clientId } />
 				{ blockEditingMode === 'default' && stylingInspectorControls }
 				{ blockEditingMode === 'contentOnly' && isEntityAvailable && (
 					<NavigationAddPageButton clientId={ clientId } />

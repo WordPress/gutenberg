@@ -9,10 +9,15 @@ import {
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
-import { Children, cloneElement } from '@wordpress/element';
+import {
+	Children,
+	cloneElement,
+	useCallback,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { pipe, useCopyToClipboard } from '@wordpress/compose';
+import { pipe, useCopyToClipboard, useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -75,11 +80,31 @@ export function BlockSettingsDropdown( {
 	children,
 	__experimentalSelectBlock,
 	isContentOnlyListView,
+	expand,
+	expandedState,
+	setInsertedBlock,
+	toggleProps,
+	popoverProps: callerPopoverProps,
 	...props
 } ) {
 	// Get the client id of the current block for this menu, if one is set.
 	const count = clientIds.length;
 	const firstBlockClientId = clientIds[ 0 ];
+
+	// Capture the toggle button element so fills can use it as a popover anchor.
+	const [ toggleElement, setToggleElement ] = useState( null );
+	const toggleRef = useCallback( ( node ) => setToggleElement( node ), [] );
+	const mergedToggleRef = useMergeRefs( [ toggleRef, toggleProps?.ref ] );
+	const mergedToggleProps = {
+		...toggleProps,
+		ref: mergedToggleRef,
+	};
+
+	// Fills can hide the dropdown content (e.g. while showing a secondary UI)
+	// while keeping the dropdown mounted so focus can return to the fill's
+	// menu item on cancel.
+	const [ dropdownContentHidden, setDropdownContentHidden ] =
+		useState( false );
 
 	const {
 		firstParentClientId,
@@ -220,9 +245,10 @@ export function BlockSettingsDropdown( {
 				onCopy,
 				onPasteStyles,
 			} ) => {
-				// It is possible that some plugins register fills for this menu
-				// even if Core doesn't render anything in the block settings menu.
-				// in which case, we may want to render the menu anyway.
+				// Hide the dropdown when there are no actions.
+				// It is possible that some plugins register fills
+				// for this menu even if Core doesn't render anything,
+				// in which case we may want to render the menu anyway.
 				// That said for now, we can start more conservative.
 				const isEmpty =
 					! canRemove &&
@@ -234,14 +260,30 @@ export function BlockSettingsDropdown( {
 					return null;
 				}
 
+				// When a fill hides the dropdown content (e.g. while
+				// showing LinkUI), prevent the dropdown from closing
+				// on outside focus so the fill stays mounted.
+				const popoverProps = dropdownContentHidden
+					? {
+							...POPOVER_PROPS,
+							...callerPopoverProps,
+							style: { visibility: 'hidden' },
+							onFocusOutside() {},
+					  }
+					: {
+							...POPOVER_PROPS,
+							...callerPopoverProps,
+					  };
+
 				return (
 					<DropdownMenu
 						icon={ moreVertical }
 						label={ __( 'Options' ) }
 						className="block-editor-block-settings-menu"
-						popoverProps={ POPOVER_PROPS }
+						popoverProps={ popoverProps }
 						noIcons
 						{ ...props }
+						toggleProps={ mergedToggleProps }
 					>
 						{ ( { onClose } ) => (
 							<>
@@ -372,16 +414,20 @@ export function BlockSettingsDropdown( {
 										) }
 									</MenuGroup>
 								) }
-								{ ! isContentOnly && (
-									<BlockSettingsMenuControls.Slot
-										fillProps={ {
-											onClose,
-											count,
-											firstBlockClientId,
-										} }
-										clientIds={ clientIds }
-									/>
-								) }
+								<BlockSettingsMenuControls.Slot
+									fillProps={ {
+										onClose,
+										count,
+										firstBlockClientId,
+										isContentOnly,
+										expand,
+										expandedState,
+										setInsertedBlock,
+										toggleElement,
+										setDropdownContentHidden,
+									} }
+									clientIds={ clientIds }
+								/>
 								{ typeof children === 'function'
 									? children( { onClose } )
 									: Children.map( ( child ) =>
