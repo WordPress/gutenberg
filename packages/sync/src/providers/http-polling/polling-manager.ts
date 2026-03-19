@@ -306,6 +306,7 @@ let isPolling = false;
 let isUnloadPending = false;
 let pollInterval = POLLING_INTERVAL_IN_MS;
 let pollingTimeoutId: ReturnType< typeof setTimeout > | null = null;
+let primaryRoom: string | null = null;
 
 /**
  * Mark that a page unload has been requested. This fires on
@@ -445,9 +446,14 @@ function poll(): void {
 				// Process awareness update.
 				roomState.processAwarenessUpdate( room.awareness );
 
-				// If there is another collaborator, resume the queue for the next poll
-				// and increase polling frequency.
-				if ( Object.keys( room.awareness ).length > 1 ) {
+				// If there is another collaborator on the primary entity,
+				// resume the queue for the next poll and increase polling
+				// frequency. We only check the primary room to avoid false
+				// positives from shared collection rooms (e.g. taxonomy/category).
+				if (
+					room.room === primaryRoom &&
+					Object.keys( room.awareness ).length > 1
+				) {
 					hasCollaborators = true;
 					roomState.updateQueue.resume();
 				}
@@ -581,6 +587,13 @@ function registerRoom( {
 	 */
 	const enforceConnectionLimit = 0 === roomStates.size;
 
+	// The first room registered is treated as the "primary" entity.
+	// Used to scope the collaborator check to only this room, avoiding
+	// awareness results from shared collection rooms (e.g. taxonomy/category).
+	if ( ! primaryRoom ) {
+		primaryRoom = room;
+	}
+
 	function onAwarenessUpdate(): void {
 		roomState.localAwarenessState = awareness.getLocalState() ?? {};
 	}
@@ -678,6 +691,10 @@ function unregisterRoom( room: string ): void {
 		postSyncUpdateNonBlocking( { rooms } );
 		state.unregister();
 		roomStates.delete( room );
+
+		if ( room === primaryRoom ) {
+			primaryRoom = null;
+		}
 	}
 
 	if ( 0 === roomStates.size && areListenersRegistered ) {
