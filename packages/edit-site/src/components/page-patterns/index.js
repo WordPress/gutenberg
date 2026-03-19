@@ -19,6 +19,7 @@ import { addQueryArgs } from '@wordpress/url';
 import {
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
+	LAYOUT_LIST,
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_DEFAULT_CATEGORY,
@@ -53,6 +54,15 @@ const defaultLayouts = {
 	[ LAYOUT_GRID ]: {
 		layout: {
 			badgeFields: [ 'sync-status' ],
+		},
+	},
+	[ LAYOUT_LIST ]: {
+		layout: {
+			styles: {
+				author: {
+					width: '1%',
+				},
+			},
 		},
 	},
 };
