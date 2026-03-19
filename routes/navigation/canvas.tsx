@@ -20,7 +20,11 @@ import {
 	getTemplatePartIcon,
 } from '@wordpress/editor';
 import type { WpTemplatePart } from '@wordpress/core-data';
-import { chevronDown } from '@wordpress/icons';
+import {
+	check,
+	chevronDown,
+	navigation as navigationIcon,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -83,61 +87,69 @@ const previewField = {
 	enableSorting: false,
 };
 
+function getAreaLabel( area: string ): string {
+	if ( area === MODE_ALL ) {
+		return __( 'All Template Parts' );
+	}
+	return STATIC_AREAS.find( ( a ) => a.value === area )?.label ?? area;
+}
+
 function NavigationPreview( { navigationId }: { navigationId: number } ) {
 	const navigate = useNavigate();
 	const { isReady: assetsReady } = useEditorAssets();
 	const editLink = `/types/wp_navigation/edit/${ navigationId }`;
 
-	if ( ! assetsReady ) {
-		return (
-			<div
-				style={ {
-					display: 'flex',
-					justifyContent: 'center',
-					alignItems: 'center',
-					height: '100%',
-				} }
-			>
-				<Spinner />
-			</div>
-		);
-	}
-
 	return (
-		<div className="navigation-canvas__preview-wrap">
-			<div
-				style={ { height: '100%' } }
-				// @ts-expect-error inert not typed properly
-				inert="true"
-			>
-				<Editor
-					key={ navigationId }
-					postType={ NAVIGATION_POST_TYPE }
-					postId={ navigationId }
-					settings={ {
-						isPreviewMode: true,
-						styles: [ { css: 'body{min-height:100vh;}' } ],
-					} }
-				/>
+		<div className="navigation-canvas__nav-card">
+			<div className="navigation-canvas__nav-card__media">
+				{ ! assetsReady ? (
+					<div className="navigation-canvas__nav-card__spinner">
+						<Spinner />
+					</div>
+				) : (
+					<>
+						<div
+							style={ { height: '100%' } }
+							// @ts-expect-error inert not typed properly
+							inert="true"
+						>
+							<Editor
+								key={ navigationId }
+								postType={ NAVIGATION_POST_TYPE }
+								postId={ navigationId }
+								settings={ {
+									isPreviewMode: true,
+									styles: [
+										{ css: 'body{min-height:100vh;}' },
+									],
+								} }
+							/>
+						</div>
+						<div
+							onClick={ () => navigate( { to: editLink } ) }
+							onKeyDown={ ( e ) => {
+								if ( e.key === 'Enter' || e.key === ' ' ) {
+									e.preventDefault();
+									navigate( { to: editLink } );
+								}
+							} }
+							style={ {
+								position: 'absolute',
+								inset: 0,
+								cursor: 'pointer',
+								zIndex: 9999,
+							} }
+							role="button"
+							tabIndex={ 0 }
+							aria-label={ __( 'Edit navigation menu' ) }
+						/>
+					</>
+				) }
 			</div>
-			<div
-				onClick={ () => navigate( { to: editLink } ) }
-				onKeyDown={ ( e ) => {
-					if ( e.key === 'Enter' || e.key === ' ' ) {
-						e.preventDefault();
-						navigate( { to: editLink } );
-					}
-				} }
-				style={ {
-					position: 'absolute',
-					inset: 0,
-					cursor: 'pointer',
-					zIndex: 9999,
-				} }
-				role="button"
-				tabIndex={ 0 }
-				aria-label={ __( 'Edit navigation menu' ) }
-			/>
+			<div className="navigation-canvas__nav-card__title">
+				<Icon icon={ navigationIcon } size={ 24 } />
+				<span>{ __( 'Navigation Block Editor' ) }</span>
+			</div>
 		</div>
 	);
 }
@@ -146,7 +158,12 @@ function Canvas() {
 	const searchParams = useSearch( { strict: false } );
 	const navigate = useNavigate();
 
-	const canvasMode = ( searchParams as any ).canvas ?? MODE_ALL;
+	// showPreview: Navigation Preview checkbox (on/off).
+	// templateArea: zero or one area selected (null = none).
+	const [ showPreview, setShowPreview ] = useState( true );
+	const [ templateArea, setTemplateArea ] = useState< string | null >(
+		MODE_ALL
+	);
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 
 	const navigationId = useMemo( () => {
@@ -174,19 +191,21 @@ function Canvas() {
 	}, [ templateParts ] );
 
 	const currentLabel =
-		canvasMode === MODE_ALL
-			? __( 'All Template Parts' )
-			: STATIC_AREAS.find( ( a ) => a.value === canvasMode )?.label ??
-			  canvasMode;
+		[
+			showPreview ? __( 'Navigation Preview' ) : null,
+			templateArea ? getAreaLabel( templateArea ) : null,
+		]
+			.filter( Boolean )
+			.join( ', ' ) || __( 'None' );
 
 	const visibleTemplateParts = useMemo( () => {
-		if ( canvasMode === MODE_ALL ) {
+		if ( ! templateArea || templateArea === MODE_ALL ) {
 			return templateParts;
 		}
 		return ( templateParts as WpTemplatePart[] ).filter(
-			( part ) => part.area === canvasMode
+			( part ) => part.area === templateArea
 		);
-	}, [ templateParts, canvasMode ] );
+	}, [ templateParts, templateArea ] );
 
 	const fields = useMemo( () => [ previewField, titleField ], [] );
 
@@ -195,84 +214,95 @@ function Canvas() {
 		[ visibleTemplateParts, view, fields ]
 	);
 
+	const showTemplateParts = !! templateArea;
+
 	if ( ! navigationId ) {
 		return null;
 	}
 
 	return (
 		<div className="navigation-canvas">
-			<div className="navigation-canvas__frame navigation-canvas__frame--preview">
-				<NavigationPreview navigationId={ navigationId } />
-			</div>
-
-			<div className="navigation-canvas__frame navigation-canvas__frame--dataviews">
-				<HStack
-					justify="center"
-					alignment="center"
-					className="navigation-canvas__toolbar"
+			<HStack
+				justify="center"
+				alignment="center"
+				className="navigation-canvas__toolbar"
+			>
+				<DropdownMenu
+					label={ currentLabel }
+					text={ currentLabel }
+					icon={ chevronDown }
+					toggleProps={ {
+						iconPosition: 'right',
+						className: 'navigation-canvas__mode-toggle',
+						showTooltip: false,
+					} }
 				>
-					<DropdownMenu
-						label={ currentLabel }
-						text={ currentLabel }
-						icon={ chevronDown }
-						toggleProps={ {
-							iconPosition: 'right',
-							className: 'navigation-canvas__mode-toggle',
-							showTooltip: false,
-						} }
-					>
-						{ ( { onClose } ) => (
-							<Fragment>
-								<MenuGroup>
-									<MenuItem
-										isSelected={ canvasMode === MODE_ALL }
-										onClick={ () => {
-											navigate( {
-												search: {
-													...searchParams,
-													canvas: MODE_ALL,
-												},
-											} );
-											onClose();
-										} }
-									>
-										{ __( 'All Template Parts' ) }
-									</MenuItem>
-									{ STATIC_AREAS.map(
-										( { value, label } ) => (
-											<MenuItem
-												key={ value }
-												icon={ getTemplatePartIcon(
-													value
-												) }
-												isSelected={
-													canvasMode === value
-												}
-												disabled={
-													! usedAreas.has( value )
-												}
-												onClick={ () => {
-													navigate( {
-														search: {
-															...searchParams,
-															canvas: value,
-														},
-													} );
-													onClose();
-												} }
-											>
-												{ label }
-											</MenuItem>
+					{ () => (
+						<Fragment>
+							<MenuGroup>
+								<MenuItem
+									icon={ showPreview ? check : undefined }
+									role="menuitemcheckbox"
+									isSelected={ showPreview }
+									onClick={ () =>
+										setShowPreview( ( v ) => ! v )
+									}
+								>
+									{ __( 'Navigation Preview' ) }
+								</MenuItem>
+							</MenuGroup>
+							<MenuGroup>
+								<MenuItem
+									icon={
+										templateArea === MODE_ALL
+											? check
+											: undefined
+									}
+									role="menuitemradio"
+									isSelected={ templateArea === MODE_ALL }
+									onClick={ () =>
+										setTemplateArea( ( v ) =>
+											v === MODE_ALL ? null : MODE_ALL
 										)
-									) }
-								</MenuGroup>
-							</Fragment>
-						) }
-					</DropdownMenu>
-				</HStack>
+									}
+								>
+									{ __( 'All Template Parts' ) }
+								</MenuItem>
+								{ STATIC_AREAS.map( ( { value, label } ) => (
+									<MenuItem
+										key={ value }
+										icon={
+											templateArea === value
+												? check
+												: undefined
+										}
+										role="menuitemradio"
+										isSelected={ templateArea === value }
+										disabled={ ! usedAreas.has( value ) }
+										onClick={ () =>
+											setTemplateArea( ( v ) =>
+												v === value ? null : value
+											)
+										}
+									>
+										{ label }
+									</MenuItem>
+								) ) }
+							</MenuGroup>
+						</Fragment>
+					) }
+				</DropdownMenu>
+			</HStack>
 
-				<hr className="navigation-canvas__divider" />
+			<hr className="navigation-canvas__divider" />
 
+			{ showPreview && (
+				<div className="navigation-canvas__preview">
+					<NavigationPreview navigationId={ navigationId } />
+				</div>
+			) }
+
+			{ showTemplateParts && (
 				<div
 					className={
 						( view.layout as { previewSize?: number } )
@@ -301,7 +331,7 @@ function Canvas() {
 						<DataViews.Footer />
 					</DataViews>
 				</div>
-			</div>
+			) }
 		</div>
 	);
 }
