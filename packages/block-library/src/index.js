@@ -296,6 +296,11 @@ const getAllBlocks = () => {
 		blocks.push( playlistTrack );
 	}
 
+	if ( window?.__experimentalEnableBlockExperiments ) {
+		blocks.push( playlist );
+		blocks.push( playlistTrack );
+	}
+
 	// When in a WordPress context, conditionally
 	// add the classic block and TinyMCE editor
 	// under any of the following conditions:

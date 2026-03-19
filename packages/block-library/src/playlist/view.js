@@ -6,121 +6,238 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
 /**
  * Internal dependencies
  */
-import { initWaveformPlayer, logPlayError } from '../utils/waveform-utils';
+import {
+	TRACK_CHANGE_DELAY_MS,
+	getPlayerWaveSurferConfig,
+	getHoverWaveSurferConfig,
+} from './wavesurfer-utils';
 
-/**
- * Store player state for each element.
- */
-const playerState = new WeakMap();
+// Get WaveSurfer from window - it will be loaded via wp_enqueue_script
+const getWaveSurfer = () => window.WaveSurfer;
 
-const { state } = store(
-	'core/playlist',
-	{
-		state: {
-			playlists: {},
-			get isCurrentTrack() {
-				const { currentId, uniqueId } = getContext();
-				return currentId === uniqueId;
-			},
+const { state } = store( 'core/playlist', {
+	state: {
+		playlists: {},
+		players: {},
+		get currentTrack() {
+			const { currentId, playlistId } = getContext();
+			if ( ! currentId || ! playlistId ) {
+				return {};
+			}
+			const playlist = this.playlists[ playlistId ];
+			if ( ! playlist ) {
+				return {};
+			}
+			return playlist.tracks[ currentId ] || {};
 		},
-		actions: {
-			changeTrack() {
-				const context = getContext();
-				context.currentId = context.uniqueId;
-			},
-		},
-		callbacks: {
-			initWaveformPlayer() {
-				const context = getContext();
-				const { ref } = getElement();
-
-				if ( ! context.currentId || ! ref ) {
-					return;
-				}
-
-				const track =
-					state.playlists[ context.playlistId ]?.tracks[
-						context.currentId
-					];
-				if ( ! track?.url ) {
-					return;
-				}
-
-				const existing = playerState.get( ref );
-
-				// Skip if we already initialized with this exact URL.
-				if ( existing?.url === track.url ) {
-					return;
-				}
-
-				// Autoplay if we're switching from a different track (user action),
-				// but not on initial page load (when existing has no URL).
-				const shouldAutoPlay = !! existing?.url;
-
-				initPlayer( ref, track, shouldAutoPlay, context );
-			},
+		get isCurrentTrack() {
+			const { currentId, uniqueId } = getContext();
+			return currentId === uniqueId;
 		},
 	},
-	{ lock: true }
-);
-
-/**
- * Initialize the waveform player for a given element.
- *
- * @param {Element} ref            - The container element.
- * @param {Object}  track          - The track data.
- * @param {boolean} shouldAutoPlay - Whether to auto-play after initialization.
- * @param {Object}  context        - The Interactivity API context.
- */
-function initPlayer( ref, track, shouldAutoPlay, context ) {
-	const existing = playerState.get( ref );
-
-	// If a player already exists, load the new track without recreating.
-	if ( existing?.instance ) {
-		existing.instance
-			.loadTrack( track.url, track.title, track.artist, {
-				artwork: track.image,
-			} )
-			.then( () => {
-				existing.url = track.url;
-				if ( shouldAutoPlay ) {
-					existing.instance.play()?.catch( logPlayError );
-				}
-			} )
-			.catch( logPlayError );
-		return;
-	}
-
-	// Read translated labels from server-rendered data attributes.
-	const labels = {
-		play: ref.dataset.labelPlay,
-		pause: ref.dataset.labelPause,
-	};
-
-	// Initialize using the shared core.
-	const player = initWaveformPlayer( ref, {
-		src: track.url,
-		title: track.title,
-		artist: track.artist,
-		image: track.image,
-		autoPlay: shouldAutoPlay,
-		labels,
-		onEnded: () => {
-			// Advance to next track (autoPlay handles playback).
+	actions: {
+		changeTrack() {
+			const context = getContext();
+			context.currentId = context.uniqueId;
+			context.isPlaying = true;
+		},
+		togglePlayPause() {
+			const context = getContext();
+			const player = state.players[ context.playlistId ];
+			if ( player ) {
+				player.playPause();
+			}
+		},
+		nextSong() {
+			const context = getContext();
 			const currentIndex = context.tracks.findIndex(
 				( uniqueId ) => uniqueId === context.currentId
 			);
 			const nextTrack = context.tracks[ currentIndex + 1 ];
 			if ( nextTrack ) {
 				context.currentId = nextTrack;
+				const player = state.players[ context.playlistId ];
+				// Waits a moment before changing the track, since
+				// immediately changing the track can be jarring.
+				setTimeout( () => {
+					if ( player ) {
+						player.play();
+					}
+				}, TRACK_CHANGE_DELAY_MS );
 			}
 		},
-	} );
+	},
+	callbacks: {
+		initWaveSurfer() {
+			const context = getContext();
 
-	// Store state for cleanup, including instance for loadTrack reuse.
-	playerState.set( ref, {
-		url: track.url,
-		instance: player.instance,
-		destroy: player.destroy,
-	} );
-}
+			// Only initialize if not already done
+			if ( state.players[ context.playlistId ] ) {
+				return;
+			}
+
+			const WaveSurfer = getWaveSurfer();
+			if ( ! WaveSurfer ) {
+				// eslint-disable-next-line no-console
+				console.error( 'WaveSurfer is not loaded' );
+				return;
+			}
+
+			const { ref } = getElement();
+
+			// Get the computed colors from the container
+			const containerStyles = window.getComputedStyle( ref );
+			const color = containerStyles.getPropertyValue( 'color' );
+
+			// Get background color - try CSS custom property first, then computed style
+			// Fall back to traversing up the DOM to find non-transparent background
+			let backgroundColor =
+				containerStyles.getPropertyValue(
+					'--wp--preset--color--base'
+				) || containerStyles.getPropertyValue( 'background-color' );
+
+			// If background is transparent, traverse up to find actual background
+			if (
+				! backgroundColor ||
+				backgroundColor === 'transparent' ||
+				backgroundColor === 'rgba(0, 0, 0, 0)'
+			) {
+				let element = ref.parentElement;
+				while ( element ) {
+					const bgColor =
+						window.getComputedStyle( element ).backgroundColor;
+					if (
+						bgColor &&
+						bgColor !== 'transparent' &&
+						bgColor !== 'rgba(0, 0, 0, 0)'
+					) {
+						backgroundColor = bgColor;
+						break;
+					}
+					element = element.parentElement;
+				}
+			}
+
+			// Create progress background layer (solid color behind played portion)
+			const progressBg = document.createElement( 'div' );
+			progressBg.className = 'wp-block-playlist__waveform-progress';
+			ref.appendChild( progressBg );
+
+			// Create container for the base waveform (reduced opacity)
+			const baseContainer = document.createElement( 'div' );
+			baseContainer.className = 'wp-block-playlist__waveform-base';
+			ref.appendChild( baseContainer );
+
+			// Create container for the hover waveform (full opacity)
+			const hoverContainer = document.createElement( 'div' );
+			hoverContainer.className = 'wp-block-playlist__waveform-hover';
+			ref.appendChild( hoverContainer );
+
+			// Create base waveform (reduced opacity bars, shows progress)
+			const wavesurfer = WaveSurfer.create(
+				getPlayerWaveSurferConfig(
+					baseContainer,
+					color,
+					backgroundColor
+				)
+			);
+
+			// Create hover waveform (full opacity bars, no cursor)
+			const hoverWavesurfer = WaveSurfer.create(
+				getHoverWaveSurferConfig(
+					hoverContainer,
+					color,
+					backgroundColor
+				)
+			);
+
+			state.players[ context.playlistId ] = wavesurfer;
+			state.players[ context.playlistId + '-hover' ] = hoverWavesurfer;
+
+			// Handle hover events to show/hide the hover waveform
+			const handleMouseLeave = () => {
+				hoverContainer.style.clipPath = 'inset(0 100% 0 0)';
+			};
+			const handleMouseMove = ( event ) => {
+				const rect = ref.getBoundingClientRect();
+				const hoverProgress =
+					( ( event.clientX - rect.left ) / rect.width ) * 100;
+				const clipRight =
+					100 - Math.max( 0, Math.min( 100, hoverProgress ) );
+				hoverContainer.style.clipPath = `inset(0 ${ clipRight }% 0 0)`;
+			};
+
+			ref.addEventListener( 'mouseleave', handleMouseLeave );
+			ref.addEventListener( 'mousemove', handleMouseMove );
+
+			// Wire up WaveSurfer events to Interactivity API
+			wavesurfer.on( 'play', () => {
+				context.isPlaying = true;
+			} );
+
+			wavesurfer.on( 'pause', () => {
+				context.isPlaying = false;
+			} );
+
+			// Update progress background on timeupdate
+			wavesurfer.on( 'timeupdate', ( currentTime ) => {
+				const duration = wavesurfer.getDuration();
+				if ( duration > 0 ) {
+					const progress = ( currentTime / duration ) * 100;
+					progressBg.style.width = `${ progress }%`;
+				}
+			} );
+
+			// Reset progress background when seeking
+			wavesurfer.on( 'seeking', ( progress ) => {
+				progressBg.style.width = `${ progress * 100 }%`;
+			} );
+
+			wavesurfer.on( 'finish', () => {
+				// Reset progress background
+				progressBg.style.width = '0%';
+				// Trigger next song
+				const currentIndex = context.tracks.findIndex(
+					( uniqueId ) => uniqueId === context.currentId
+				);
+				const nextTrack = context.tracks[ currentIndex + 1 ];
+				if ( nextTrack ) {
+					context.currentId = nextTrack;
+					setTimeout( () => {
+						wavesurfer.play();
+					}, TRACK_CHANGE_DELAY_MS );
+				}
+			} );
+
+			// Cleanup function for when the element is removed
+			return () => {
+				ref.removeEventListener( 'mouseleave', handleMouseLeave );
+				ref.removeEventListener( 'mousemove', handleMouseMove );
+				wavesurfer.destroy();
+				hoverWavesurfer.destroy();
+				delete state.players[ context.playlistId ];
+				delete state.players[ context.playlistId + '-hover' ];
+			};
+		},
+		loadTrack() {
+			const context = getContext();
+			const player = state.players[ context.playlistId ];
+			const hoverPlayer = state.players[ context.playlistId + '-hover' ];
+			const trackUrl = state.currentTrack.url;
+
+			if ( player && trackUrl ) {
+				player.load( trackUrl );
+			}
+			if ( hoverPlayer && trackUrl ) {
+				hoverPlayer.load( trackUrl );
+			}
+		},
+		autoPlay() {
+			const context = getContext();
+			const player = state.players[ context.playlistId ];
+			if ( context.currentId && context.isPlaying && player ) {
+				player.play();
+			}
+		},
+	},
+} );

@@ -51,5 +51,6 @@
 		},
 		"reusable": false
 	},
+	"editorStyle": "wp-block-playlist-track-editor",
 	"style": "wp-block-playlist-track"
 }

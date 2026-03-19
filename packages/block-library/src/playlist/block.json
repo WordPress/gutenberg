@@ -19,7 +19,7 @@
 		},
 		"order": {
 			"type": "string",
-			"default": "asc"
+			"default": "ASC"
 		},
 		"showTracklist": {
 			"type": "boolean",
@@ -74,6 +74,8 @@
 			"padding": true
 		}
 	},
+	"editorScript": "file:./index.js",
 	"editorStyle": "wp-block-playlist-editor",
-	"style": "wp-block-playlist"
+	"style": "wp-block-playlist",
+	"viewScriptModule": "@wordpress/block-library/playlist/view"
 }

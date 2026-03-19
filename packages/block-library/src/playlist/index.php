@@ -22,7 +22,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	}
 
 	$current_media_id  = $attributes['currentTrack'];
-	$playlist_id       = wp_unique_id( 'playlist-' );
+	$playlist_id       = 'playlist-' . wp_generate_uuid4();
 	$playlist_tracks   = array();
 	$tracks_data       = array();
 	$current_unique_id = null;
@@ -35,17 +35,17 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				$inner_block->context['playlistId'] = $playlist_id;
 
 				$track_attributes  = $inner_block->attributes;
-				$unique_id         = $track_attributes['uniqueId'] ?? wp_unique_id( 'playlist-track-' );
+				$unique_id         = isset( $track_attributes['uniqueId'] ) ? $track_attributes['uniqueId'] : wp_generate_uuid4();
 				$playlist_tracks[] = $unique_id;
 
 				$inner_block->attributes['uniqueId'] = $unique_id;
 
 				// Extract track metadata from block attributes.
 				$title      = isset( $track_attributes['title'] ) && ! empty( $track_attributes['title'] ) ? $track_attributes['title'] : __( 'Unknown title' );
-				$artist     = $track_attributes['artist'] ?? '';
-				$album      = $track_attributes['album'] ?? '';
-				$image      = $track_attributes['image'] ?? '';
-				$url        = $track_attributes['src'] ?? '';
+				$artist     = isset( $track_attributes['artist'] ) ? $track_attributes['artist'] : '';
+				$album      = isset( $track_attributes['album'] ) ? $track_attributes['album'] : '';
+				$image      = isset( $track_attributes['image'] ) ? $track_attributes['image'] : '';
+				$url        = isset( $track_attributes['src'] ) ? $track_attributes['src'] : '';
 				$aria_label = $title;
 
 				if ( $title && $artist && $album ) {
@@ -58,16 +58,13 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					);
 				}
 
-				// Data is passed to wp_interactivity_state() which JSON-encodes it,
-				// so we use wp_strip_all_tags() instead of esc_html() to prevent
-				// HTML injection without double-encoding. URLs still use esc_url().
 				$tracks_data[ $unique_id ] = array(
-					'url'       => esc_url( $url ),
-					'title'     => wp_strip_all_tags( $title ),
-					'artist'    => wp_strip_all_tags( $artist ),
-					'album'     => wp_strip_all_tags( $album ),
-					'image'     => esc_url( $image ),
-					'ariaLabel' => wp_strip_all_tags( $aria_label ),
+					'url'       => $url,
+					'title'     => $title,
+					'artist'    => $artist,
+					'album'     => $album,
+					'image'     => $image,
+					'ariaLabel' => $aria_label,
 				);
 
 				if ( $unique_id === $current_media_id ) {
@@ -84,6 +81,8 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 		return '';
 	}
 
+	// Enqueue WaveSurfer only when this block is rendered
+	wp_enqueue_script( 'wavesurfer' );
 	wp_enqueue_script_module( '@wordpress/block-library/playlist/view' );
 
 	// Add the playlist tracks to the global state,
@@ -99,14 +98,61 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 		)
 	);
 
-	// Add waveform player container with translated button labels.
-	$label_play  = esc_attr__( 'Play' );
-	$label_pause = esc_attr__( 'Pause' );
-	$html        = '<div class="wp-block-playlist__waveform-player"
-		data-wp-watch="callbacks.initWaveformPlayer"
-		data-label-play="' . $label_play . '"
-		data-label-pause="' . $label_pause . '"
-	></div>';
+	// Create the HTML for the player and current track info.
+	// Player comes first, then current track info below it.
+	$html = '
+	<div class="wp-block-playlist__player">
+		<button
+			class="wp-block-playlist__play-button"
+			data-wp-on--click="actions.togglePlayPause"
+			data-wp-bind--aria-label="context.isPlaying ? \'Pause\' : \'Play\'"
+		>
+			<span class="wp-block-playlist__play-icon" data-wp-bind--hidden="context.isPlaying">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path d="M8 5v14l11-7z"/>
+				</svg>
+			</span>
+			<span class="wp-block-playlist__pause-icon" data-wp-bind--hidden="!context.isPlaying">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+				</svg>
+			</span>
+		</button>
+		<div
+			class="wp-block-playlist__waveform"
+			data-wp-init="callbacks.initWaveSurfer"
+			data-wp-watch="callbacks.loadTrack"
+			data-wp-on--click="actions.togglePlayPause"
+			role="button"
+			tabindex="0"
+			data-wp-bind--aria-label="state.currentTrack.ariaLabel"
+		></div>
+	</div>
+	<div class="wp-block-playlist__current-item">';
+
+	// The alt attribute is intentionally left empty, as the image is decorative.
+	if ( isset( $attributes['showImages'] ) ? $attributes['showImages'] : false ) {
+		$html .=
+		'<img
+			class="wp-block-playlist__item-image"
+			alt=""
+			width="70"
+			height="70"
+			data-wp-bind--src="state.currentTrack.image"
+			data-wp-bind--hidden="!state.currentTrack.image"
+		/>';
+	}
+
+	$html .= '
+		<div>
+			<span class="wp-block-playlist__item-title" data-wp-text="state.currentTrack.title"></span>
+			<div class="wp-block-playlist__current-item-artist-album">
+				<span class="wp-block-playlist__item-artist" data-wp-text="state.currentTrack.artist"></span>
+				<span class="wp-block-playlist__item-album" data-wp-text="state.currentTrack.album"></span>
+			</div>
+		</div>
+	</div>
+	';
 
 	// Add the HTML for the current track inside the figure.
 	$figure = null;
@@ -125,6 +171,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				'playlistId' => $playlist_id,
 				'currentId'  => $current_unique_id,
 				'tracks'     => $playlist_tracks,
+				'isPlaying'  => false,
 			)
 		)
 	);
@@ -146,3 +193,30 @@ function register_block_core_playlist() {
 	);
 }
 add_action( 'init', 'register_block_core_playlist' );
+
+/**
+ * Enqueue WaveSurfer script for the playlist block editor.
+ * This ensures WaveSurfer is available in the editor iframe.
+ *
+ * @since 6.9.0
+ */
+function block_core_playlist_enqueue_editor_assets() {
+	// Only enqueue in the block editor
+	if ( ! is_admin() ) {
+		return;
+	}
+
+	wp_enqueue_script( 'wavesurfer' );
+
+	// Expose the WaveSurfer script URL to the editor
+	$wavesurfer_src = wp_scripts()->registered['wavesurfer']->src;
+	wp_add_inline_script(
+		'wp-block-editor',
+		sprintf(
+			'window.wpPlaylistWaveSurferUrl = %s;',
+			wp_json_encode( $wavesurfer_src )
+		),
+		'before'
+	);
+}
+add_action( 'enqueue_block_editor_assets', 'block_core_playlist_enqueue_editor_assets' );

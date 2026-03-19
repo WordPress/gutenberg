@@ -7,7 +7,8 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect } from '@wordpress/element';
+import { useState, useCallback, useEffect, useRef } from '@wordpress/element';
+import { SVG, Path } from '@wordpress/primitives';
 import {
 	store as blockEditorStore,
 	MediaPlaceholder,
@@ -20,27 +21,236 @@ import {
 	InnerBlocks,
 } from '@wordpress/block-editor';
 import {
+	PanelBody,
 	ToggleControl,
 	Disabled,
 	SelectControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
+	Spinner,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
+import { safeHTML } from '@wordpress/dom';
 import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { Caption } from '../utils/caption';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { WaveformPlayer } from '../utils/waveform-player';
-import { getTrackAttributes } from './utils';
+import { getPlayerWaveSurferConfig } from './wavesurfer-utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+
+const WaveSurferPlayer = ( { trackUrl, onEnded } ) => {
+	const containerRef = useRef( null );
+	const wavesurferRef = useRef( null );
+	const initializedRef = useRef( false );
+	const [ isPlaying, setIsPlaying ] = useState( false );
+	const [ isReady, setIsReady ] = useState( false );
+
+	// Initialize WaveSurfer when component mounts
+
+	useEffect( () => {
+		if ( ! containerRef.current || initializedRef.current ) {
+			return;
+		}
+
+		initializedRef.current = true;
+		let wavesurfer = null;
+
+		// Initialize WaveSurfer in the iframe's context
+		const initWaveSurfer = async () => {
+			const container = containerRef.current;
+			if ( ! container ) {
+				return;
+			}
+
+			const iframeWindow = container.ownerDocument.defaultView;
+			const iframeDocument = container.ownerDocument;
+
+			try {
+				// Check if WaveSurfer is already loaded in the iframe
+				if ( ! iframeWindow.WaveSurfer ) {
+					// Get the WaveSurfer script URL from the main window
+					const wavesurferUrl = window.wpPlaylistWaveSurferUrl;
+
+					if ( ! wavesurferUrl ) {
+						throw new Error( 'WaveSurfer script URL not found' );
+					}
+
+					// Inject WaveSurfer script into the iframe
+					const script = iframeDocument.createElement( 'script' );
+					script.src = wavesurferUrl;
+
+					// Wait for the script to load
+					await new Promise( ( resolve, reject ) => {
+						script.onload = () => {
+							// Give it a moment to initialize
+							setTimeout( resolve, 50 );
+						};
+						script.onerror = () =>
+							reject(
+								new Error( 'Failed to load WaveSurfer script' )
+							);
+						iframeDocument.head.appendChild( script );
+					} );
+
+					// Verify WaveSurfer is available
+					if ( ! iframeWindow.WaveSurfer ) {
+						throw new Error(
+							'WaveSurfer not available after loading script'
+						);
+					}
+				}
+
+				// Get the computed colors from the container
+				const containerStyles =
+					iframeWindow.getComputedStyle( container );
+				const color = containerStyles.getPropertyValue( 'color' );
+				const backgroundColor =
+					containerStyles.getPropertyValue( 'background-color' );
+
+				// Create WaveSurfer instance using the iframe's WaveSurfer
+				wavesurfer = iframeWindow.WaveSurfer.create(
+					getPlayerWaveSurferConfig(
+						container,
+						color,
+						backgroundColor
+					)
+				);
+
+				wavesurferRef.current = wavesurfer;
+				setIsReady( true );
+
+				// Wire up events
+				wavesurfer.on( 'play', () => setIsPlaying( true ) );
+				wavesurfer.on( 'pause', () => setIsPlaying( false ) );
+				wavesurfer.on( 'finish', () => {
+					setIsPlaying( false );
+					if ( onEnded ) {
+						onEnded();
+					}
+				} );
+			} catch ( error ) {
+				// eslint-disable-next-line no-console
+				console.error( 'Failed to initialize WaveSurfer:', error );
+			}
+		};
+
+		initWaveSurfer();
+
+		// Cleanup
+		return () => {
+			if ( wavesurfer ) {
+				wavesurfer.destroy();
+			}
+		};
+	}, [ onEnded ] );
+
+	// Load track when URL changes
+	useEffect( () => {
+		if ( isReady && wavesurferRef.current && trackUrl ) {
+			wavesurferRef.current.load( trackUrl );
+		}
+	}, [ trackUrl, isReady ] );
+
+	const handlePlayPause = () => {
+		if ( wavesurferRef.current ) {
+			wavesurferRef.current.playPause();
+		}
+	};
+
+	return (
+		<div className="wp-block-playlist__player">
+			<button
+				className="wp-block-playlist__play-button"
+				onClick={ handlePlayPause }
+				aria-label={ isPlaying ? __( 'Pause' ) : __( 'Play' ) }
+			>
+				<span
+					className="wp-block-playlist__play-icon"
+					hidden={ isPlaying }
+				>
+					<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<Path d="M6.5 5.5v13l11-6.5z" />
+					</SVG>
+				</span>
+				<span
+					className="wp-block-playlist__pause-icon"
+					hidden={ ! isPlaying }
+				>
+					<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<Path d="M6 5.5h4v13H6v-13zm8 0h4v13h-4v-13z" />
+					</SVG>
+				</span>
+			</button>
+			<div ref={ containerRef } className="wp-block-playlist__waveform" />
+		</div>
+	);
+};
+
+const CurrentTrack = ( { track, showImages } ) => {
+	/**
+	 * dangerouslySetInnerHTML and safeHTML are used because
+	 * the media library allows using some HTML tags in the title, artist, and album fields.
+	 */
+	const trackTitle = {
+		dangerouslySetInnerHTML: {
+			__html: safeHTML( track?.title ? track.title : __( 'Untitled' ) ),
+		},
+	};
+	const trackArtist = {
+		dangerouslySetInnerHTML: {
+			__html: safeHTML(
+				track?.artist ? track.artist : __( 'Unknown artist' )
+			),
+		},
+	};
+	const trackAlbum = {
+		dangerouslySetInnerHTML: {
+			__html: safeHTML(
+				track?.album ? track.album : __( 'Unknown album' )
+			),
+		},
+	};
+
+	return (
+		<div className="wp-block-playlist__current-item">
+			{ showImages && track?.image && (
+				<img
+					className="wp-block-playlist__item-image"
+					src={ track.image }
+					alt=""
+					width="70"
+					height="70"
+				/>
+			) }
+			<div>
+				{ ! track?.title ? (
+					<span className="wp-block-playlist__item-title">
+						<Spinner />
+					</span>
+				) : (
+					<span
+						className="wp-block-playlist__item-title"
+						{ ...trackTitle }
+					/>
+				) }
+				<div className="wp-block-playlist__current-item-artist-album">
+					<span
+						className="wp-block-playlist__item-artist"
+						{ ...trackArtist }
+					/>
+					<span
+						className="wp-block-playlist__item-album"
+						{ ...trackAlbum }
+					/>
+				</div>
+			</div>
+		</div>
+	);
+};
 
 const PlaylistEdit = ( {
 	attributes,
@@ -56,12 +266,13 @@ const PlaylistEdit = ( {
 		showImages,
 		showArtists,
 		currentTrack,
+		tagName: TagName = showNumbers ? 'ol' : 'ul',
 	} = attributes;
+	const [ trackListIndex, setTrackListIndex ] = useState( 0 );
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
@@ -143,7 +354,33 @@ const PlaylistEdit = ( {
 				media = [ media ];
 			}
 
-			const trackList = media.map( getTrackAttributes );
+			const trackAttributes = ( track ) => ( {
+				id: track.id || track.url, // Attachment ID or URL.
+				uniqueId: uuid(), // Unique ID for the track.
+				src: track.url,
+				title: track.title,
+				artist:
+					track.artist ||
+					track?.meta?.artist ||
+					track?.media_details?.artist ||
+					__( 'Unknown artist' ),
+				album:
+					track.album ||
+					track?.meta?.album ||
+					track?.media_details?.album ||
+					__( 'Unknown album' ),
+				length:
+					track?.fileLength || track?.media_details?.length_formatted,
+				// Prevent using the default media attachment icon as the track image.
+				// Note: Image is not available when a new track is uploaded.
+				image:
+					track?.image?.src &&
+					track?.image?.src.endsWith( '/images/media/audio.svg' )
+						? ''
+						: track?.image?.src,
+			} );
+
+			const trackList = media.map( trackAttributes );
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				currentTrack:
@@ -164,40 +401,52 @@ const PlaylistEdit = ( {
 		]
 	);
 
-	// Get current track data by finding the track with matching uniqueId.
-	const currentTrackData = tracks.find(
-		( track ) => track.uniqueId === currentTrack
-	);
-
-	// Handle track end - advance to next track or loop to first.
-	const onTrackEnded = useCallback( () => {
-		const currentIndex = tracks.findIndex(
-			( track ) => track.uniqueId === currentTrack
-		);
-		const nextTrack = tracks[ currentIndex + 1 ] || tracks[ 0 ];
-		if ( nextTrack?.uniqueId ) {
-			setAttributes( { currentTrack: nextTrack.uniqueId } );
+	const onTrackEnd = useCallback( () => {
+		/* If there are tracks left, play the next track */
+		if ( trackListIndex < tracks.length - 1 ) {
+			if ( tracks[ trackListIndex + 1 ]?.uniqueId ) {
+				setTrackListIndex( trackListIndex + 1 );
+				setAttributes( {
+					currentTrack: tracks[ trackListIndex + 1 ].uniqueId,
+				} );
+			}
+		} else {
+			setTrackListIndex( 0 );
+			if ( tracks[ 0 ].uniqueId ) {
+				setAttributes( { currentTrack: tracks[ 0 ].uniqueId } );
+			} else if ( tracks.length > 0 ) {
+				const validTrack = tracks.find(
+					( track ) => track.uniqueId !== undefined
+				);
+				if ( validTrack ) {
+					setAttributes( { currentTrack: validTrack.uniqueId } );
+				}
+			}
 		}
-	}, [ currentTrack, tracks, setAttributes ] );
+	}, [ setAttributes, trackListIndex, tracks ] );
 
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
 			const sortedBlocks = [ ...innerBlockTracks ].sort( ( a, b ) => {
-				const titleA = a.attributes.title || '';
-				const titleB = b.attributes.title || '';
-
-				if ( trackOrder === 'asc' ) {
-					return titleA.localeCompare( titleB );
+				if ( trackOrder === 'ASC' ) {
+					return a.attributes.uniqueId.localeCompare(
+						b.attributes.uniqueId
+					);
 				}
-				return titleB.localeCompare( titleA );
+				return b.attributes.uniqueId.localeCompare(
+					a.attributes.uniqueId
+				);
 			} );
-			const firstUniqueId = sortedBlocks[ 0 ]?.attributes?.uniqueId;
+			const sortedTracks = sortedBlocks.map(
+				( block ) => block.attributes
+			);
 			replaceInnerBlocks( clientId, sortedBlocks );
 			setAttributes( {
 				order: trackOrder,
 				currentTrack:
-					firstUniqueId && firstUniqueId !== currentTrack
-						? firstUniqueId
+					sortedTracks.length > 0 &&
+					sortedTracks[ 0 ].uniqueId !== currentTrack
+						? sortedTracks[ 0 ].uniqueId
 						: currentTrack,
 			} );
 		},
@@ -229,7 +478,7 @@ const PlaylistEdit = ( {
 		renderAppender: hasAnySelected && InnerBlocks.ButtonBlockAppender,
 	} );
 
-	if ( tracks.length === 0 ) {
+	if ( ! tracks || ( Array.isArray( tracks ) && tracks.length === 0 ) ) {
 		return (
 			<div
 				{ ...blockProps }
@@ -269,123 +518,63 @@ const PlaylistEdit = ( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						setAttributes( {
-							showTracklist: true,
-							showArtists: true,
-							showNumbers: true,
-							showImages: true,
-							order: 'asc',
-						} );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					<ToolsPanelItem
+				<PanelBody title={ __( 'Settings' ) }>
+					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show Tracklist' ) }
-						isShownByDefault
-						hasValue={ () => showTracklist !== true }
-						onDeselect={ () =>
-							setAttributes( { showTracklist: true } )
-						}
-					>
-						<ToggleControl
-							label={ __( 'Show Tracklist' ) }
-							onChange={ toggleAttribute( 'showTracklist' ) }
-							checked={ showTracklist }
-						/>
-					</ToolsPanelItem>
+						onChange={ toggleAttribute( 'showTracklist' ) }
+						checked={ showTracklist }
+					/>
 					{ showTracklist && (
 						<>
-							<ToolsPanelItem
+							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Show artist name in Tracklist' ) }
-								isShownByDefault
-								hasValue={ () => showArtists !== true }
-								onDeselect={ () =>
-									setAttributes( { showArtists: true } )
-								}
-							>
-								<ToggleControl
-									label={ __(
-										'Show artist name in Tracklist'
-									) }
-									onChange={ toggleAttribute(
-										'showArtists'
-									) }
-									checked={ showArtists }
-								/>
-							</ToolsPanelItem>
-							<ToolsPanelItem
+								onChange={ toggleAttribute( 'showArtists' ) }
+								checked={ showArtists }
+							/>
+							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Show number in Tracklist' ) }
-								isShownByDefault
-								hasValue={ () => showNumbers !== true }
-								onDeselect={ () =>
-									setAttributes( { showNumbers: true } )
-								}
-							>
-								<ToggleControl
-									label={ __( 'Show number in Tracklist' ) }
-									onChange={ toggleAttribute(
-										'showNumbers'
-									) }
-									checked={ showNumbers }
-								/>
-							</ToolsPanelItem>
+								onChange={ toggleAttribute( 'showNumbers' ) }
+								checked={ showNumbers }
+							/>
 						</>
 					) }
-					<ToolsPanelItem
+					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show images' ) }
-						isShownByDefault
-						hasValue={ () => showImages !== true }
-						onDeselect={ () =>
-							setAttributes( { showImages: true } )
-						}
-					>
-						<ToggleControl
-							label={ __( 'Show images' ) }
-							onChange={ toggleAttribute( 'showImages' ) }
-							checked={ showImages }
-						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
+						onChange={ toggleAttribute( 'showImages' ) }
+						checked={ showImages }
+					/>
+					<SelectControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={ __( 'Order' ) }
-						isShownByDefault
-						hasValue={ () => order !== 'asc' }
-						onDeselect={ () => setAttributes( { order: 'asc' } ) }
-					>
-						<SelectControl
-							__next40pxDefaultSize
-							label={ __( 'Order' ) }
-							value={ order }
-							options={ [
-								{ label: __( 'Descending' ), value: 'desc' },
-								{ label: __( 'Ascending' ), value: 'asc' },
-							] }
-							onChange={ ( value ) => onChangeOrder( value ) }
-						/>
-					</ToolsPanelItem>
-				</ToolsPanel>
+						value={ order }
+						options={ [
+							{ label: __( 'Descending' ), value: 'DESC' },
+							{ label: __( 'Ascending' ), value: 'ASC' },
+						] }
+						onChange={ ( value ) => onChangeOrder( value ) }
+					/>
+				</PanelBody>
 			</InspectorControls>
 			<figure { ...blockProps }>
+				<WaveSurferPlayer
+					trackUrl={ tracks[ trackListIndex ]?.src || '' }
+					onEnded={ onTrackEnd }
+				/>
 				<Disabled isDisabled={ ! isSelected }>
-					<WaveformPlayer
-						src={ currentTrackData?.src }
-						title={ currentTrackData?.title }
-						artist={ currentTrackData?.artist }
-						image={ currentTrackData?.image }
-						onEnded={ onTrackEnded }
+					<CurrentTrack
+						track={ tracks[ trackListIndex ] }
+						showImages={ showImages }
 					/>
 				</Disabled>
 				{ showTracklist && (
-					<ol
-						className={ clsx( 'wp-block-playlist__tracklist', {
-							'wp-block-playlist__tracklist-show-numbers':
-								showNumbers,
-						} ) }
-					>
+					<TagName className="wp-block-playlist__tracklist">
 						{ innerBlocksProps.children }
-					</ol>
+					</TagName>
 				) }
 				<Caption
 					attributes={ attributes }
@@ -394,7 +583,6 @@ const PlaylistEdit = ( {
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Playlist caption text' ) }
 					showToolbarButton={ isSelected }
-					style={ { marginTop: 16 } }
 				/>
 			</figure>
 		</>
