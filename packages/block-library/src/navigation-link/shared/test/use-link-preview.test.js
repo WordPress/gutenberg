@@ -211,6 +211,18 @@ describe( 'isHomepage', () => {
 	] )( 'should return false for non-homepage "%s"', ( url, homeUrlParam ) => {
 		expect( isHomepage( url, homeUrlParam ) ).toBe( false );
 	} );
+
+	test.each( [
+		[ `https://${ host }/?p=123`, homeUrl ],
+		[ `https://${ host }/?p=456`, homeUrl ],
+		[ `https://${ host }/?page_id=99`, homeUrl ],
+		[ '/?p=123', homeUrl ],
+	] )(
+		'should return false for URLs with query params "%s"',
+		( url, homeUrlParam ) => {
+			expect( isHomepage( url, homeUrlParam ) ).toBe( false );
+		}
+	);
 } );
 
 describe( 'computeBadges', () => {
@@ -321,6 +333,29 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Page',
+				intent: 'default',
+			} );
+		} );
+
+		it( 'should show Page and Draft badges for draft page with ?p= URL, not Homepage', () => {
+			const badges = computeBadges( {
+				url: 'https://example.com/?p=123',
+				homeUrl: 'https://example.com',
+				type: 'page',
+				entityStatus: 'draft',
+				isExternal: false,
+			} );
+
+			expect( badges ).toContainEqual( {
+				label: 'Page',
+				intent: 'default',
+			} );
+			expect( badges ).toContainEqual( {
+				label: 'Draft',
+				intent: 'warning',
+			} );
+			expect( badges ).not.toContainEqual( {
+				label: 'Homepage',
 				intent: 'default',
 			} );
 		} );
