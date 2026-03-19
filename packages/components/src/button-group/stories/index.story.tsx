@@ -16,7 +16,7 @@ import Button from '../../button';
  * This component is deprecated. Use `ToggleGroupControl` instead.
  */
 const meta: Meta< typeof ButtonGroup > = {
-	title: 'Components (Deprecated)/ButtonGroup',
+	title: 'Components/Deprecated/ButtonGroup',
 	id: 'components-buttongroup',
 	component: ButtonGroup,
 	argTypes: {

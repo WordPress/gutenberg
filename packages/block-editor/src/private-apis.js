@@ -48,6 +48,8 @@ import {
 	deviceTypeKey,
 	isIsolatedEditorKey,
 	isNavigationOverlayContextKey,
+	isNavigationPostEditorKey,
+	mediaUploadOnSuccessKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
@@ -129,6 +131,8 @@ lock( privateApis, {
 	deviceTypeKey,
 	isIsolatedEditorKey,
 	isNavigationOverlayContextKey,
+	isNavigationPostEditorKey,
+	mediaUploadOnSuccessKey,
 	useBlockElement,
 	useBlockElementRef,
 	LinkPicker,

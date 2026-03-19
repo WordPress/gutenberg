@@ -5,6 +5,16 @@
 @use "../utils/grid-items.scss" as *;
 
 .dataviews-view-picker-grid {
+	// When grouped, the density class is on the parent Composite,
+	// and the gap is on child .dataviews-view-grid-items elements.
+	&.has-compact-density .dataviews-view-grid-items {
+		gap: $grid-unit-20;
+	}
+
+	&.has-comfortable-density .dataviews-view-grid-items {
+		gap: $grid-unit-40;
+	}
+
 	.dataviews-view-picker-grid__card {
 		height: 100%;
 		justify-content: flex-start;

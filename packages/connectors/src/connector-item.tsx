@@ -11,8 +11,8 @@ import {
 	Button,
 	TextControl,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { createInterpolateElement, useId, useState } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -36,14 +36,20 @@ export function ConnectorItem( {
 	actionArea,
 	children,
 }: ConnectorItemProps ) {
+	const headingId = useId();
 	return (
 		<Item className={ className }>
-			<VStack spacing={ 4 }>
-				<HStack alignment="center" spacing={ 4 }>
+			<VStack spacing={ 4 } role="group" aria-labelledby={ headingId }>
+				<HStack alignment="center" spacing={ 4 } wrap>
 					{ icon }
 					<FlexBlock>
 						<VStack spacing={ 0 }>
-							<Text weight={ 600 } size={ 15 }>
+							<Text
+								weight={ 600 }
+								size={ 15 }
+								id={ headingId }
+								as="h2"
+							>
 								{ name }
 							</Text>
 							<Text variant="muted" size={ 12 }>
@@ -59,6 +65,8 @@ export function ConnectorItem( {
 	);
 }
 
+export type ApiKeySource = 'env' | 'constant' | 'database' | 'none';
+
 export interface DefaultConnectorSettingsProps {
 	onSave?: ( apiKey: string ) => void | Promise< void >;
 	onRemove?: () => void;
@@ -66,6 +74,7 @@ export interface DefaultConnectorSettingsProps {
 	helpUrl?: string;
 	helpLabel?: string;
 	readOnly?: boolean;
+	keySource?: ApiKeySource;
 }
 
 /**
@@ -78,6 +87,7 @@ export interface DefaultConnectorSettingsProps {
  * @param props.helpUrl      - URL to documentation for obtaining an API key.
  * @param props.helpLabel    - Custom label for the help link. Defaults to the URL without protocol.
  * @param props.readOnly     - Whether the form is in read-only mode.
+ * @param props.keySource    - The source of the API key: 'env', 'constant', 'database', or 'none'.
  */
 export function DefaultConnectorSettings( {
 	onSave,
@@ -86,6 +96,7 @@ export function DefaultConnectorSettings( {
 	helpUrl,
 	helpLabel,
 	readOnly = false,
+	keySource,
 }: DefaultConnectorSettingsProps ) {
 	const [ apiKey, setApiKey ] = useState( initialValue );
 	const [ isSaving, setIsSaving ] = useState( false );
@@ -93,30 +104,63 @@ export function DefaultConnectorSettings( {
 
 	const helpLinkLabel = helpLabel || helpUrl?.replace( /^https?:\/\//, '' );
 
-	const helpLink = helpUrl ? (
-		<>
-			{ __( 'Get your API key at' ) }{ ' ' }
-			<ExternalLink href={ helpUrl }>{ helpLinkLabel }</ExternalLink>
-		</>
-	) : undefined;
-
-	const getHelp = () => {
-		if ( readOnly ) {
-			return (
-				<>
-					{ __(
-						'Your API key is stored securely. You can reset it at'
-					) }{ ' ' }
-					{ helpUrl ? (
+	const helpLink = helpUrl
+		? createInterpolateElement(
+				sprintf(
+					/* translators: %s: Link to provider settings. */
+					__( 'Get your API key at %s' ),
+					'<a></a>'
+				),
+				{
+					a: (
 						<ExternalLink href={ helpUrl }>
 							{ helpLinkLabel }
 						</ExternalLink>
-					) : undefined }
-				</>
-			);
+					),
+				}
+		  )
+		: undefined;
+
+	const isExternallyConfigured =
+		keySource === 'env' || keySource === 'constant';
+
+	const getHelp = () => {
+		if ( isExternallyConfigured ) {
+			if ( keySource === 'env' ) {
+				return __(
+					'This API key is configured using an environment variable.'
+				);
+			}
+			if ( keySource === 'constant' ) {
+				return __( 'This API key is configured as a constant.' );
+			}
+		}
+		if ( readOnly ) {
+			return helpUrl
+				? createInterpolateElement(
+						sprintf(
+							/* translators: %s: Link to provider settings. */
+							__(
+								'Your API key is stored securely. You can reset it at %s'
+							),
+							'<a></a>'
+						),
+						{
+							a: (
+								<ExternalLink href={ helpUrl }>
+									{ helpLinkLabel }
+								</ExternalLink>
+							),
+						}
+				  )
+				: __( 'Your API key is stored securely.' );
 		}
 		if ( saveError ) {
-			return <span style={ { color: '#cc1818' } }>{ saveError }</span>;
+			return (
+				<span role="alert" className="connector-settings__error">
+					{ saveError }
+				</span>
+			);
 		}
 		return helpLink;
 	};
@@ -152,7 +196,6 @@ export function DefaultConnectorSettings( {
 			}
 		>
 			<TextControl
-				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				label={ __( 'API Key' ) }
 				value={ apiKey }
@@ -162,14 +205,16 @@ export function DefaultConnectorSettings( {
 						setApiKey( value );
 					}
 				} }
-				placeholder="YOUR_API_KEY"
+				placeholder={ __( 'Enter your API key' ) }
 				disabled={ readOnly || isSaving }
 				help={ getHelp() }
 			/>
 			{ readOnly ? (
-				<Button variant="link" isDestructive onClick={ onRemove }>
-					{ __( 'Remove and replace' ) }
-				</Button>
+				onRemove && (
+					<Button variant="link" isDestructive onClick={ onRemove }>
+						{ __( 'Remove and replace' ) }
+					</Button>
+				)
 			) : (
 				<HStack justify="flex-start">
 					<Button

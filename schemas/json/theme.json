@@ -1826,6 +1826,26 @@
 				}
 			]
 		},
+		"stylesBlocksPseudoSelectorsProperties": {
+			"type": "object",
+			"properties": {
+				":hover": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":focus": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":focus-visible": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":active": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				}
+			}
+		},
+		"stylesBlocksPseudoSelectorsPropertyNames": {
+			"enum": [ ":hover", ":focus", ":focus-visible", ":active" ]
+		},
 		"stylesElementsPseudoSelectorsProperties": {
 			"type": "object",
 			"properties": {
@@ -1852,20 +1872,20 @@
 				}
 			}
 		},
-		"stylesBlocksPseudoSelectorsProperties": {
+		"stylesBlocksCustomStatesProperties": {
+			"description": "Custom class-based block states using the '@' prefix. Each state supports style properties as well as the same pseudo-selectors available to the block.",
 			"type": "object",
 			"properties": {
-				":hover": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				},
-				":focus": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				},
-				":focus-visible": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				},
-				":active": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+				"@current": {
+					"description": "Styles applied to the current/active item (e.g. .current-menu-item in navigation).",
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesPropertiesComplete"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+						}
+					]
 				}
 			}
 		},
@@ -2000,10 +2020,59 @@
 				"core/button": {
 					"allOf": [
 						{
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+							"$ref": "#/definitions/stylesProperties"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"variations": {
+									"type": "object",
+									"patternProperties": {
+										"^[a-z][a-z0-9-]*$": {
+											"allOf": [
+												{
+													"$ref": "#/definitions/stylesProperties"
+												},
+												{
+													"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+												},
+												{
+													"type": "object",
+													"propertyNames": {
+														"anyOf": [
+															{
+																"$ref": "#/definitions/stylesPropertyNames"
+															},
+															{
+																"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+															}
+														]
+													}
+												}
+											]
+										}
+									}
+								}
+							}
 						},
 						{
 							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+						},
+						{
+							"type": "object",
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"enum": [ "variations" ]
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+									}
+								]
+							}
 						}
 					]
 				},
@@ -2134,7 +2203,17 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/navigation-link": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksCustomStatesProperties"
+						}
+					]
 				},
 				"core/navigation-submenu": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
@@ -2455,7 +2534,27 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/button": {
-					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesProperties"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+						},
+						{
+							"type": "object",
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+									}
+								]
+							}
+						}
+					]
 				},
 				"core/buttons": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"

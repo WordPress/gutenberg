@@ -35,7 +35,12 @@ function RevisionsSlider() {
 			}
 
 			const entityConfig = getEntityConfig( 'postType', postType );
-			const query = { per_page: -1, context: 'edit' };
+			const query = {
+				per_page: -1,
+				context: 'edit',
+				_fields:
+					'id,date,author,meta,title.raw,excerpt.raw,content.raw',
+			};
 			return {
 				revisions: getRevisions( 'postType', postType, postId, query ),
 				isLoading: isResolving( 'getRevisions', [

@@ -281,6 +281,7 @@ export default function PostList( { postType } ) {
 							<Button
 								variant="primary"
 								onClick={ openModal }
+								size="compact"
 								__next40pxDefaultSize
 							>
 								{ labels.add_new_item }

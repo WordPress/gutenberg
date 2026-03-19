@@ -18,6 +18,7 @@ import {
 	useBlockProps,
 	RecursionProvider,
 	useHasRecursion,
+	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 	withColors,
 	ContrastChecker,
@@ -55,7 +56,6 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
-import useNavigationEntities from '../use-navigation-entities';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
@@ -85,6 +85,8 @@ import {
 	DEFAULT_BLOCK,
 	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 } from '../constants';
+
+const { isNavigationPostEditorKey } = unlock( blockEditorPrivateApis );
 
 /**
  * Component that renders the Add page button for the Navigation block.
@@ -320,26 +322,37 @@ function Navigation( {
 
 	// Skip recursion check when in preview mode.
 	const recursionDetected = useHasRecursion( recursionId );
-	const { isPreviewMode, onNavigateToEntityRecord, currentTheme } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			const settings = getSettings();
-			return {
-				isPreviewMode: settings.isPreviewMode,
-				onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
-				// Needed to construct the template part ID for the overlay preview.
-				currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
-			};
-		},
-		[]
-	);
+	const {
+		isPreviewMode,
+		onNavigateToEntityRecord,
+		currentTheme,
+		editorDisabledResponsive,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+
+		return {
+			isPreviewMode: settings.isPreviewMode,
+			onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
+			// Needed to construct the template part ID for the overlay preview.
+			currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
+			// When editing a navigation post directly in an isolated editor,
+			// always show navigation expanded (no hamburger) so users can see
+			// and interact with all menu items.
+			editorDisabledResponsive:
+				!! settings?.[ isNavigationPostEditorKey ],
+		};
+	}, [] );
 	const hasAlreadyRendered = isPreviewMode ? false : recursionDetected;
 
 	const blockEditingMode = useBlockEditingMode();
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
-	const { menus: classicMenus } = useNavigationEntities();
+	const { records: classicMenus } = useEntityRecords( 'root', 'menu', {
+		per_page: -1,
+		context: 'view',
+	} );
 
 	const [ showNavigationMenuStatusNotice, hideNavigationMenuStatusNotice ] =
 		useNavigationNotice( {
@@ -601,7 +614,8 @@ function Navigation( {
 		setAttributes,
 	] );
 
-	const isResponsive = 'never' !== overlayMenu;
+	const isResponsive = 'never' !== overlayMenu && ! editorDisabledResponsive;
+
 	const blockProps = useBlockProps( {
 		ref: navRef,
 		className: clsx(

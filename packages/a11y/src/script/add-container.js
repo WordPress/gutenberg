@@ -20,7 +20,8 @@ export default function addContainer( ariaLive = 'polite' ) {
 			'overflow:hidden;' +
 			'clip-path:inset(50%);' +
 			'border:0;' +
-			'word-wrap:normal !important;'
+			'word-wrap:normal !important;' +
+			'word-break:normal !important;'
 	);
 	container.setAttribute( 'aria-live', ariaLive );
 	container.setAttribute( 'aria-relevant', 'additions text' );

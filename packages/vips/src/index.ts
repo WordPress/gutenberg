@@ -9,6 +9,9 @@ import VipsModule from 'wasm-vips/vips.wasm';
 // @ts-expect-error - WASM files are inlined as base64 data URLs at build time
 import VipsJxlModule from 'wasm-vips/vips-jxl.wasm';
 
+// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
+
 /**
  * Internal dependencies
  */
@@ -41,9 +44,9 @@ async function getVips(): Promise< typeof Vips > {
 	}
 
 	vipsInstance = await Vips( {
-		// Only load JXL module, skip HEIF due to trademark issues.
+		// Load JXL and HEIF dynamic modules for full format support.
 		// wasm-vips defaults to ["vips-jxl.wasm", "vips-heif.wasm"].
-		dynamicLibraries: [ 'vips-jxl.wasm' ],
+		dynamicLibraries: [ 'vips-jxl.wasm', 'vips-heif.wasm' ],
 		locateFile: ( fileName: string ) => {
 			// WASM files are inlined as base64 data URLs at build time,
 			// eliminating the need for separate file downloads and avoiding
@@ -52,6 +55,8 @@ async function getVips(): Promise< typeof Vips > {
 				return VipsModule;
 			} else if ( fileName.endsWith( 'vips-jxl.wasm' ) ) {
 				return VipsJxlModule;
+			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
+				return VipsHeifModule;
 			}
 			return fileName;
 		},
@@ -134,7 +139,11 @@ export async function convertImageFormat(
 			}
 		};
 
-		const saveOptions: SaveOptions< typeof outputType > = {};
+		const saveOptions: SaveOptions< typeof outputType > = {
+			// Strip metadata except ICC color profiles,
+			// matching WordPress core's behavior.
+			keep: 'icc',
+		};
 
 		if ( supportsQuality( outputType ) ) {
 			saveOptions.Q = quality * 100;
@@ -189,6 +198,7 @@ export async function compressImage(
  * @param type      Mime type.
  * @param resize    Resize options.
  * @param smartCrop Whether to use smart cropping (i.e. saliency-aware).
+ * @param quality   Desired quality (0-1).
  * @return Processed file data plus the old and new dimensions.
  */
 export async function resizeImage(
@@ -196,7 +206,8 @@ export async function resizeImage(
 	buffer: ArrayBuffer,
 	type: string,
 	resize: ImageSizeCrop,
-	smartCrop = false
+	smartCrop = false,
+	quality = 0.82
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -321,8 +332,16 @@ export async function resizeImage(
 			image.onProgress = onProgress;
 		}
 
-		// TODO: Allow passing quality?
-		const saveOptions: SaveOptions< typeof type > = {};
+		const saveOptions: SaveOptions< typeof type > = {
+			// Strip metadata except ICC color profiles,
+			// matching WordPress core's behavior.
+			keep: 'icc',
+		};
+
+		if ( supportsQuality( type ) ) {
+			saveOptions.Q = quality * 100;
+		}
+
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {

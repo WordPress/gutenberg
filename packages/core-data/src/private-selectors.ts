@@ -304,3 +304,13 @@ export function getEditorSettings(
 export function getEditorAssets( state: State ): Record< string, any > | null {
 	return state.editorAssets;
 }
+
+/**
+ * Returns whether collaboration is supported.
+ *
+ * @param state Data state.
+ * @return Whether collaboration is supported.
+ */
+export function isCollaborationSupported( state: State ): boolean {
+	return state.collaborationSupported;
+}

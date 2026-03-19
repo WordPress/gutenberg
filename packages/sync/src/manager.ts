@@ -37,6 +37,7 @@ import { createUndoManager } from './undo-manager';
 import {
 	createYjsDoc,
 	deserializeCrdtDoc,
+	initializeYjsDoc,
 	markEntityAsSaved,
 	serializeCrdtDoc,
 } from './utils';
@@ -176,9 +177,9 @@ export function createSyncManager( debug = false ): SyncManager {
 			editRecord: debugWrap( handlers.editRecord ),
 			getEditedRecord: debugWrap( handlers.getEditedRecord ),
 			onStatusChange: debugWrap( handlers.onStatusChange ),
+			persistCRDTDoc: debugWrap( handlers.persistCRDTDoc ),
 			refetchRecord: debugWrap( handlers.refetchRecord ),
 			restoreUndoMeta: debugWrap( handlers.restoreUndoMeta ),
-			saveRecord: debugWrap( handlers.saveRecord ),
 		};
 
 		const ydoc = createYjsDoc( { objectType } );
@@ -284,6 +285,9 @@ export function createSyncManager( debug = false ): SyncManager {
 		recordMap.observeDeep( onRecordUpdate );
 		stateMap.observe( onStateMapUpdate );
 
+		// Initialize the Yjs document with the necessary CRDT state.
+		initializeYjsDoc( ydoc );
+
 		// Get and apply the persisted CRDT document, if it exists.
 		internal.applyPersistedCrdtDoc( objectType, objectId, record );
 	}
@@ -384,6 +388,9 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Attach observers.
 		stateMap.observe( onStateMapUpdate );
+
+		// Initialize the Yjs document with the necessary CRDT state.
+		initializeYjsDoc( ydoc );
 	}
 
 	/**
@@ -460,12 +467,12 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		if ( ! tempDoc ) {
 			log( 'applyPersistedCrdtDoc', 'no persisted doc', entityId );
-			// Apply the current record as changes and trigger a save, which will
-			// persist the CRDT document. (The entity should call `createPersistedCRDTDoc`
-			// via its pre-persist hook.)
+			// Apply the current record as changes and request that the CRDT doc be
+			// persisted with the entity. The persisted CRDT doc can be created by
+			// calling `syncManager.createPersistedCRDTDoc`.
 			targetDoc.transact( () => {
 				applyChangesToCRDTDoc( targetDoc, record );
-				handlers.saveRecord();
+				handlers.persistCRDTDoc();
 			}, LOCAL_SYNC_MANAGER_ORIGIN );
 			return;
 		}
@@ -517,12 +524,12 @@ export function createSyncManager( debug = false ): SyncManager {
 			{}
 		);
 
-		// Apply the changes and trigger a save, which will persist the CRDT
-		// document. (The entity should call `createPersistedCRDTDoc` via its
-		// pre-persist hook.)
+		// Apply the changes and request that the updated CRDT doc be persisted with
+		// the entity. The persisted CRDT doc can be created by calling
+		// `syncManager.createPersistedCRDTDoc`.
 		targetDoc.transact( () => {
 			applyChangesToCRDTDoc( targetDoc, changes );
-			handlers.saveRecord();
+			handlers.persistCRDTDoc();
 		}, LOCAL_SYNC_MANAGER_ORIGIN );
 	}
 
@@ -626,16 +633,21 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * @param {ObjectType} objectType Object type.
 	 * @param {ObjectID}   objectId   Object ID.
 	 */
-	function createPersistedCRDTDoc(
+	async function createPersistedCRDTDoc(
 		objectType: ObjectType,
 		objectId: ObjectID
-	): string | null {
+	): Promise< string | null > {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
 		if ( ! entityState?.ydoc ) {
 			return null;
 		}
+
+		// Y.Doc updates are deferred via yieldToEventLoop. Await a promise that
+		// resolves on the next tick of the event loop so pending updates are flushed
+		// before we serialize the document.
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 		return serializeCrdtDoc( entityState.ydoc );
 	}

@@ -72,6 +72,8 @@ export function initializeEditor(
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
 		isPublishSidebarEnabled: true,
+		showCollaborationCursor: false,
+		showCollaborationNotifications: true,
 	} );
 
 	if ( window.__clientSideMediaProcessing ) {

@@ -48,6 +48,7 @@ function generateCSSSelector( {
 export const ThemeProvider = ( {
 	children,
 	color = {},
+	cursor,
 	isRoot = false,
 	density,
 }: ThemeProviderProps ) => {
@@ -55,6 +56,7 @@ export const ThemeProvider = ( {
 
 	const { themeProviderStyles, resolvedSettings } = useThemeProviderStyles( {
 		color,
+		cursor,
 	} );
 
 	const contextValue = useMemo(

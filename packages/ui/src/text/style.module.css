@@ -1,0 +1,67 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.heading-2xl {
+		font-family: var(--wpds-font-family-heading);
+		font-size: var(--wpds-font-size-2xl);
+		line-height: var(--wpds-font-line-height-2xl);
+		font-weight: var(--wpds-font-weight-medium);
+	}
+
+	.heading-xl {
+		font-family: var(--wpds-font-family-heading);
+		font-size: var(--wpds-font-size-xl);
+		line-height: var(--wpds-font-line-height-md);
+		font-weight: var(--wpds-font-weight-medium);
+	}
+
+	.heading-lg {
+		font-family: var(--wpds-font-family-heading);
+		font-size: var(--wpds-font-size-lg);
+		line-height: var(--wpds-font-line-height-sm);
+		font-weight: var(--wpds-font-weight-medium);
+	}
+
+	.heading-md {
+		font-family: var(--wpds-font-family-heading);
+		font-size: var(--wpds-font-size-md);
+		line-height: var(--wpds-font-line-height-sm);
+		font-weight: var(--wpds-font-weight-medium);
+	}
+
+	.heading-sm {
+		font-family: var(--wpds-font-family-heading);
+		font-size: var(--wpds-font-size-xs);
+		line-height: var(--wpds-font-line-height-xs);
+		font-weight: var(--wpds-font-weight-medium);
+		text-transform: uppercase;
+	}
+
+	.body-xl {
+		font-family: var(--wpds-font-family-body);
+		font-size: var(--wpds-font-size-xl);
+		line-height: var(--wpds-font-line-height-xl);
+		font-weight: var(--wpds-font-weight-regular);
+	}
+
+	.body-lg {
+		font-family: var(--wpds-font-family-body);
+		font-size: var(--wpds-font-size-lg);
+		line-height: var(--wpds-font-line-height-md);
+		font-weight: var(--wpds-font-weight-regular);
+	}
+
+	.body-md {
+		font-family: var(--wpds-font-family-body);
+		font-size: var(--wpds-font-size-md);
+		line-height: var(--wpds-font-line-height-sm);
+		font-weight: var(--wpds-font-weight-regular);
+	}
+
+	.body-sm {
+		font-family: var(--wpds-font-family-body);
+		font-size: var(--wpds-font-size-sm);
+		line-height: var(--wpds-font-line-height-xs);
+		font-weight: var(--wpds-font-weight-regular);
+	}
+}

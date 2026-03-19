@@ -20,6 +20,7 @@ import {
  */
 import { BaseAwareness } from '../awareness/base-awareness';
 import {
+	deserializeBlockAttributes,
 	mergeCrdtBlocks,
 	mergeRichTextUpdate,
 	type Block,
@@ -27,7 +28,6 @@ import {
 	type YBlocks,
 } from './crdt-blocks';
 import { type Post } from '../entity-types/post';
-import { type Type } from '../entity-types';
 import { CRDT_DOC_META_PERSISTENCE_KEY, CRDT_RECORD_MAP_KEY } from '../sync';
 import type { WPSelection } from '../types';
 import {
@@ -76,27 +76,6 @@ export interface YPostRecord extends YMapRecord {
 
 export const POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE = '_crdt_document';
 
-// Properties that are allowed to be synced for a post.
-const allowedPostProperties = new Set< string >( [
-	'author',
-	'blocks',
-	'content',
-	'categories',
-	'comment_status',
-	'date',
-	'excerpt',
-	'featured_media',
-	'format',
-	'meta',
-	'ping_status',
-	'slug',
-	'status',
-	'sticky',
-	'tags',
-	'template',
-	'title',
-] );
-
 // Post meta keys that should *not* be synced.
 const disallowedPostMetaKeys = new Set< string >( [
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
@@ -139,18 +118,18 @@ function defaultApplyChangesToCRDTDoc(
  *
  * @param {CRDTDoc}     ydoc
  * @param {PostChanges} changes
- * @param {Type}        _postType
+ * @param {Set<string>} syncedProperties
  * @return {void}
  */
 export function applyPostChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: PostChanges,
-	_postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
+	syncedProperties: Set< string >
 ): void {
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
 	Object.keys( changes ).forEach( ( key ) => {
-		if ( ! allowedPostProperties.has( key ) ) {
+		if ( ! syncedProperties.has( key ) ) {
 			return;
 		}
 
@@ -289,15 +268,15 @@ function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
  * against the local record and determine if there are changes (edits) we want
  * to dispatch.
  *
- * @param {CRDTDoc} ydoc
- * @param {Post}    editedRecord
- * @param {Type}    _postType
+ * @param {CRDTDoc}     ydoc
+ * @param {Post}        editedRecord
+ * @param {Set<string>} syncedProperties
  * @return {Partial<PostChanges>} The changes that should be applied to the local record.
  */
 export function getPostChangesFromCRDTDoc(
 	ydoc: CRDTDoc,
 	editedRecord: Post,
-	_postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
+	syncedProperties: Set< string >
 ): PostChanges {
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
@@ -305,7 +284,7 @@ export function getPostChangesFromCRDTDoc(
 
 	const changes = Object.fromEntries(
 		Object.entries( ymap.toJSON() ).filter( ( [ key, newValue ] ) => {
-			if ( ! allowedPostProperties.has( key ) ) {
+			if ( ! syncedProperties.has( key ) ) {
 				return false;
 			}
 
@@ -342,8 +321,6 @@ export function getPostChangesFromCRDTDoc(
 						);
 					}
 
-					// The consumers of blocks have memoization that renders optimization
-					// here unnecessary.
 					return true;
 				}
 
@@ -351,11 +328,8 @@ export function getPostChangesFromCRDTDoc(
 					// Do not overwrite a "floating" date. Borrowing logic from the
 					// isEditedPostDateFloating selector.
 					const currentDateIsFloating =
-						[ 'draft', 'auto-draft', 'pending' ].includes(
-							ymap.get( 'status' ) as string
-						) &&
-						( null === currentValue ||
-							editedRecord.modified === currentValue );
+						null === currentValue ||
+						editedRecord.modified === currentValue;
 
 					if ( currentDateIsFloating ) {
 						return false;
@@ -408,6 +382,15 @@ export function getPostChangesFromCRDTDoc(
 			}
 		} )
 	);
+
+	// Blocks extracted from the CRDT document have rich-text attributes as
+	// plain strings (from Y.Text.toJSON()). Convert them back to RichTextData
+	// so block edit components receive the same types as locally-created blocks.
+	if ( changes.blocks ) {
+		changes.blocks = deserializeBlockAttributes(
+			changes.blocks as Block[]
+		);
+	}
 
 	// Meta changes must be merged with the edited record since not all meta
 	// properties are synced.

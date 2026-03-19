@@ -539,6 +539,31 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	// Regression test for https://github.com/WordPress/gutenberg/issues/72053.
+	test( 'should navigate contenteditable with border radius', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await editor.canvas.locator( ':root' ).evaluate( () => {
+			document.activeElement.style.borderRadius = '50px';
+		} );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( '1' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+		] );
+	} );
+
 	test( 'should not prematurely multi-select', async ( {
 		editor,
 		page,

@@ -1,0 +1,13 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.block-guideline-modal {
+	width: min(100%, 660px);
+
+	.components-modal__header-heading {
+		font-weight: 500;
+	}
+
+	&__actions {
+		margin-top: $grid-unit-10;
+	}
+}

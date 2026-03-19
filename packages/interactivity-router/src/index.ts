@@ -16,7 +16,7 @@ import {
 
 const {
 	getRegionRootFragment,
-	initialVdom,
+	initialVdomPromise,
 	toVdom,
 	render,
 	parseServerData,
@@ -50,7 +50,7 @@ export interface PrefetchOptions {
 }
 
 interface VdomParams {
-	vdom?: typeof initialVdom;
+	vdom?: WeakMap< Element, any >;
 }
 
 interface Page {
@@ -361,14 +361,19 @@ document.querySelectorAll( regionsSelector ).forEach( ( region ) => {
 window.document
 	.querySelectorAll< HTMLScriptElement >( 'script[type=module][src]' )
 	.forEach( ( { src } ) => markScriptModuleAsResolved( src ) );
-pages.set(
-	getPagePath( window.location.href ),
-	Promise.resolve(
-		preparePage( getPagePath( window.location.href ), document, {
-			vdom: initialVdom,
-		} )
-	)
-);
+
+// Await hydration completion before setting the initial page to ensure initialVdom is populated.
+( async () => {
+	const initialVdomMap = await initialVdomPromise;
+	pages.set(
+		getPagePath( window.location.href ),
+		Promise.resolve(
+			preparePage( getPagePath( window.location.href ), document, {
+				vdom: initialVdomMap,
+			} )
+		)
+	);
+} )();
 
 // Variable to store the current navigation.
 let navigatingTo = '';

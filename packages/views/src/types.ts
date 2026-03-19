@@ -1,7 +1,24 @@
 /**
  * WordPress dependencies
  */
-import type { View, Filter } from '@wordpress/dataviews';
+import type { View } from '@wordpress/dataviews';
+
+export type ActiveViewOverrides = {
+	// scalar values
+	titleField?: View[ 'titleField' ];
+	showTitle?: View[ 'showTitle' ];
+	mediaField?: View[ 'mediaField' ];
+	showMedia?: View[ 'showMedia' ];
+	descriptionField?: View[ 'descriptionField' ];
+	showDescription?: View[ 'showDescription' ];
+	showLevels?: View[ 'showLevels' ];
+	infiniteScrollEnabled?: View[ 'infiniteScrollEnabled' ];
+	// array & object values
+	filters?: View[ 'filters' ];
+	sort?: View[ 'sort' ];
+	groupBy?: View[ 'groupBy' ];
+	layout?: Record< string, unknown >;
+};
 
 export interface ViewConfig {
 	/**
@@ -28,13 +45,11 @@ export interface ViewConfig {
 
 	/**
 	 * View overrides applied on top of the persisted view but never persisted.
-	 * These represent tab-specific configuration (filters, sort) that should
-	 * override the persisted view settings.
+	 * These represent tab-specific configuration (filters, sort) and
+	 * developer-defined view defaults that should override the persisted
+	 * view settings.
 	 */
-	activeViewOverrides?: {
-		filters?: Filter[];
-		sort?: View[ 'sort' ];
-	};
+	activeViewOverrides?: ActiveViewOverrides;
 
 	/**
 	 * Optional query parameters from URL (page, search)

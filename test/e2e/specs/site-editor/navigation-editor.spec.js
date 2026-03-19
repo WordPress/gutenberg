@@ -93,8 +93,8 @@ test.describe( 'Editing Navigation Menus', () => {
 
 			await expect( sidebar ).toBeVisible();
 
-			// Check that the `Navigation` control is visible.
-			// This is effectively the contents of the "List View" tab.
+			// Check that the `Navigation` heading is visible.
+			// This is the BlockCard title in the sidebar.
 			await expect(
 				sidebar.getByRole( 'heading', {
 					name: 'Navigation',
