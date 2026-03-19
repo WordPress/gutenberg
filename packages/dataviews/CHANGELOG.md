@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- DataViews: Use intersectionObserver to improve performance by unloading invisible items. Change how infinite scroll is enabled to require only 2 view properties: `infiniteScrollEnabled` and `startPosition`. [#74378](https://github.com/WordPress/gutenberg/pull/74378)
+
+## 13.1.0 (2026-03-18)
+
 ### Enhancements
 
 - DataForm: Reduce panel's dialog min-width. [#76345](https://github.com/WordPress/gutenberg/pull/76345)
