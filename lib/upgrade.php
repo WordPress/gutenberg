@@ -7,7 +7,7 @@
 
 if ( ! defined( '_GUTENBERG_VERSION_MIGRATION' ) ) {
 	// It's necessary to update this version every time a new migration is needed.
-	define( '_GUTENBERG_VERSION_MIGRATION', '22.6.0' );
+	define( '_GUTENBERG_VERSION_MIGRATION', '22.8.0' );
 }
 
 /**
