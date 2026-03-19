@@ -200,11 +200,7 @@ function ApiKeyConnector( {
 									? 'tertiary'
 									: 'secondary'
 							}
-							size={
-								isExpanded || isConnected
-									? undefined
-									: 'compact'
-							}
+							size="compact"
 							onClick={ handleActionClick }
 							disabled={ pluginStatus === 'checking' || isBusy }
 							isBusy={ isBusy }
