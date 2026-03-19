@@ -8,7 +8,7 @@
  */
 const ALLOWLIST = {
 	'@wordpress/ui': {
-		allowed: [ 'Badge', 'Card', 'Stack' ],
+		allowed: [ 'Badge', 'CollapsibleCard', 'Card', 'Stack' ],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
 	},
