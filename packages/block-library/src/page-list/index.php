@@ -306,16 +306,17 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 		}
 	}
 
-	$colors          = block_core_page_list_build_css_colors( $attributes, $block->context );
+	$colors = block_core_page_list_build_css_colors( $attributes, $block->context );
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 		$font_sizes = gutenberg_block_core_shared_navigation_build_css_font_sizes( $block->context );
 	} else {
 		$font_sizes = block_core_shared_navigation_build_css_font_sizes( $block->context );
 	}
-	$classes         = array_merge(
+	$classes = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes']
 	);
+
 	$style_attribute = ( $colors['inline_styles'] . $font_sizes['inline_styles'] );
 	$css_classes     = trim( implode( ' ', $classes ) );
 
