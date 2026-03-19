@@ -29,7 +29,11 @@ import CreateNewTemplateModal from '../post-template/create-new-template-modal';
 import { SwapTemplateModal } from '../post-template/swap-template-button';
 import { useAvailableTemplates } from '../post-template/hooks';
 
-export default function TemplateActionsPanelContent( { templateId } ) {
+export default function TemplateActionsPanelContent() {
+	const templateId = useSelect(
+		( select ) => select( editorStore ).getCurrentTemplateId(),
+		[]
+	);
 	const [ isCreateModalOpen, setIsCreateModalOpen ] = useState( false );
 	const [ isSwapModalOpen, setIsSwapModalOpen ] = useState( false );
 

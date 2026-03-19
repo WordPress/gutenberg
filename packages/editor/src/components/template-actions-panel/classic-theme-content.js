@@ -27,7 +27,11 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '../../store';
 import CreateNewTemplateModal from '../post-template/create-new-template-modal';
 
-export default function ClassicThemeContent( { templateId } ) {
+export default function ClassicThemeContent() {
+	const templateId = useSelect(
+		( select ) => select( editorStore ).getCurrentTemplateId(),
+		[]
+	);
 	const [ isCreateModalOpen, setIsCreateModalOpen ] = useState( false );
 	const {
 		onNavigateToEntityRecord,
