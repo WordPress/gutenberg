@@ -59,6 +59,7 @@ import {
 	applyPostChangesToCRDTDoc,
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	stripServerManagedMeta,
 	type PostChanges,
 	type YPostRecord,
 } from '../crdt';
@@ -932,3 +933,34 @@ function addBlockToDoc(
 
 	return ytext;
 }
+
+describe( 'stripServerManagedMeta', () => {
+	it( 'should remove _wp_ignored_hooked_blocks from meta', () => {
+		const record = {
+			meta: {
+				_wp_ignored_hooked_blocks: '',
+				footnotes: '',
+			},
+		};
+		stripServerManagedMeta( record );
+		expect( record.meta ).toEqual( { footnotes: '' } );
+	} );
+
+	it( 'should be a no-op when the key is not present', () => {
+		const record = { meta: { footnotes: '' } };
+		stripServerManagedMeta( record );
+		expect( record.meta ).toEqual( { footnotes: '' } );
+	} );
+
+	it( 'should be a no-op when meta is null', () => {
+		const record = { meta: null };
+		stripServerManagedMeta( record );
+		expect( record.meta ).toBeNull();
+	} );
+
+	it( 'should be a no-op when meta is undefined', () => {
+		const record = {};
+		stripServerManagedMeta( record );
+		expect( record ).toEqual( {} );
+	} );
+} );

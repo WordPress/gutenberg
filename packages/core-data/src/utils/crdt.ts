@@ -76,10 +76,36 @@ export interface YPostRecord extends YMapRecord {
 
 export const POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE = '_crdt_document';
 
-// Post meta keys that should *not* be synced.
+// Post meta keys that should *not* be synced between peers via the CRDT doc.
 const disallowedPostMetaKeys = new Set< string >( [
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 ] );
+
+// Post meta keys that are server-managed and must not be sent by the client
+// during saves. Sending stale client values for these keys overwrites the
+// server's calculations (e.g. update_ignored_hooked_blocks_postmeta).
+const serverManagedPostMetaKeys = new Set< string >( [
+	'_wp_ignored_hooked_blocks',
+] );
+
+/**
+ * Remove server-managed meta keys from a record's meta object in place.
+ * These keys are calculated by the server during save and must not be
+ * overwritten by possibly stale client values.
+ *
+ * @param {Object} record An entity record with an optional `meta` property.
+ */
+export function stripServerManagedMeta(
+	record: Record< string, unknown >
+): void {
+	const meta = record.meta;
+	if ( ! meta || typeof meta !== 'object' ) {
+		return;
+	}
+	serverManagedPostMetaKeys.forEach( ( metaKey ) => {
+		delete ( meta as Record< string, unknown > )[ metaKey ];
+	} );
+}
 
 /**
  * Given a set of local changes to a generic entity record, apply those changes
