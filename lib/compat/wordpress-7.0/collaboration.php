@@ -385,7 +385,7 @@ function gutenberg_inject_meta_box_plugin_names() {
 	}
 
 	$data = array(
-		'pluginNames'              => $plugin_names,
+		'pluginNames'                => $plugin_names,
 		'unknownMetaBoxPluginsCount' => $unknown_meta_box_plugin_count,
 	);
 
