@@ -10,6 +10,7 @@
 		flex-direction: column;
 		border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 		border-radius: var(--wpds-border-radius-lg);
+		overflow: clip;
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 	}
 
