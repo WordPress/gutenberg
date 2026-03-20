@@ -24,7 +24,6 @@ import { unlock } from '../../lock-unlock';
 const { useLocation } = unlock( routerPrivateApis );
 
 const SOURCE_TO_ICON = {
-	all: layout,
 	user: commentAuthorAvatar,
 	theme: layout,
 	plugin: pluginIcon,
@@ -73,7 +72,9 @@ export default function DataviewsTemplatesSidebarContent() {
 									activeView: item.slug,
 							  } )
 					}
-					icon={ SOURCE_TO_ICON[ authorSourceMap[ item.slug ] ] }
+					icon={
+						SOURCE_TO_ICON[ authorSourceMap[ item.slug ] ] ?? layout
+					}
 					aria-current={ activeView === item.slug }
 				>
 					{ item.title }
