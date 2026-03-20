@@ -23,7 +23,7 @@ async function isTemplateListView( query ) {
 	);
 	const defaultView = config?.default_view;
 	const activeViewOverrides =
-		config?.view_list?.find( ( v ) => v.slug === activeView ).view ?? {};
+		config?.view_list?.find( ( v ) => v.slug === activeView )?.view ?? {};
 	const view = await loadView( {
 		kind: 'postType',
 		name: 'wp_template',
