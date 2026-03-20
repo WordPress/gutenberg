@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix basename parsing for ZIP URLs with non-numeric version suffixes ([#76393](https://github.com/WordPress/gutenberg/pull/76393)).
+
 ## 11.2.0 (2026-03-18)
 
 ## 11.1.0 (2026-03-04)
