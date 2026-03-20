@@ -754,6 +754,7 @@ Contains the block elements used to render a post, like the title, date, feature
 -	**Category:** theme
 -	**Ancestor:** core/query
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** hasOptionalResponsiveGrid
 
 ## Post Terms
 

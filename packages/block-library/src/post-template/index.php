@@ -93,6 +93,10 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	// Ensure backwards compatibility by flagging the number of columns via classname when using grid layout.
 	if ( isset( $attributes['layout']['type'] ) && 'grid' === $attributes['layout']['type'] && ! empty( $attributes['layout']['columnCount'] ) ) {
 		$classnames .= ' ' . sanitize_title( 'columns-' . $attributes['layout']['columnCount'] );
+
+		if ( ! empty( $attributes['hasOptionalResponsiveGrid'] ) ) {
+			$classnames .= ' has-optional-responsive-grid';
+		}
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => trim( $classnames ) ) );

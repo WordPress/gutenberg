@@ -32,6 +32,13 @@
 	}
 }
 
+// Legacy fallback for older grid layouts before responsive behaviour was implemented.
+@media (max-width: $break-small) {
+	.wp-block-post-template-is-layout-grid[class*="columns-"]:not(.has-optional-responsive-grid) {
+		grid-template-columns: 1fr;
+	}
+}
+
 .wp-block-post-template-is-layout-constrained > li > .alignright,
 .wp-block-post-template-is-layout-flow > li > .alignright {
 	float: right;
@@ -51,3 +58,4 @@
 	margin-inline-start: auto;
 	margin-inline-end: auto;
 }
+

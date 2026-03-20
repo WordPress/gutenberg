@@ -16,6 +16,11 @@
 		"enhancedPagination",
 		"postType"
 	],
+	"attributes": {
+		"hasOptionalResponsiveGrid": {
+			"type": "boolean"
+		}
+	},
 	"supports": {
 		"anchor": true,
 		"reusable": false,

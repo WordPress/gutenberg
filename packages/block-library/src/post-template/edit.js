@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { memo, useMemo, useState } from '@wordpress/element';
+import { memo, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import {
@@ -113,10 +113,12 @@ export default function PostTemplateEdit( {
 		templateSlug,
 		previewPostType,
 	},
-	attributes: { layout },
+	attributes: { layout, hasOptionalResponsiveGrid },
 	__unstableLayoutClassNames,
 } ) {
 	const { type: layoutType, columnCount = 3 } = layout || {};
+	const previousLayoutRef = useRef( layout );
+	const isFirstRenderRef = useRef( true );
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
 	const { posts, blocks } = useSelect(
 		( select ) => {
@@ -281,8 +283,40 @@ export default function PostTemplateEdit( {
 		className: clsx( __unstableLayoutClassNames, {
 			[ `columns-${ columnCount }` ]:
 				layoutType === 'grid' && columnCount, // Ensure column count is flagged via classname for backwards compatibility.
+			'has-optional-responsive-grid':
+				layoutType === 'grid' && hasOptionalResponsiveGrid,
 		} ),
 	} );
+
+	useEffect( () => {
+		if ( isFirstRenderRef.current ) {
+			isFirstRenderRef.current = false;
+			previousLayoutRef.current = layout;
+
+			return;
+		}
+
+		const hasLayoutChanged =
+			JSON.stringify( previousLayoutRef.current ) !==
+			JSON.stringify( layout );
+
+		if (
+			hasLayoutChanged &&
+			layoutType === 'grid' &&
+			layout?.columnCount &&
+			! hasOptionalResponsiveGrid
+		) {
+			setAttributes( { hasOptionalResponsiveGrid: true } );
+		} else if (
+			hasLayoutChanged &&
+			( layoutType !== 'grid' || ! layout?.columnCount ) &&
+			hasOptionalResponsiveGrid
+		) {
+			setAttributes( { hasOptionalResponsiveGrid: undefined } );
+		}
+
+		previousLayoutRef.current = layout;
+	}, [ hasOptionalResponsiveGrid, layout, layoutType, setAttributes ] );
 
 	if ( ! posts ) {
 		return (
