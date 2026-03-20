@@ -65,13 +65,15 @@ export function createWordpressExternalsPlugin(
 	 * @param {string}        buildFormat       Build format: 'iife' for classic scripts, 'esm' for modules.
 	 * @param {Array<string>} extraDependencies Additional dependencies to include in the asset file.
 	 * @param {boolean}       generateAssetFile Whether to generate the .asset.php file. Default true.
+	 * @param {Object|null}   resultContainer   Optional object to populate with { dependencies, module_dependencies, version }.
 	 * @return {Object} esbuild plugin object.
 	 */
 	return function wordpressExternalsPlugin(
 		assetName = 'index.min',
 		buildFormat = 'iife',
 		extraDependencies = [],
-		generateAssetFile = true
+		generateAssetFile = true,
+		resultContainer = null
 	) {
 		return {
 			name: 'wordpress-externals',
@@ -317,36 +319,26 @@ export function createWordpressExternalsPlugin(
 							return;
 						}
 
-						// Format module dependencies as array of arrays with 'id' and 'import' keys
-						const moduleDependenciesArray = Array.from(
-							moduleDependencies.entries()
-						)
-							.sort( ( [ a ], [ b ] ) => a.localeCompare( b ) )
-							.map(
-								( [ dep, kind ] ) =>
-									`array('id' => '${ dep }', 'import' => '${ kind }')`
-							);
-
-						const moduleDependenciesString =
-							moduleDependenciesArray.length > 0
-								? moduleDependenciesArray.join( ', ' )
-								: '';
-
-						// Only generate asset file if requested
-						if ( ! generateAssetFile ) {
+						// Skip if there's nothing to do.
+						if ( ! generateAssetFile && ! resultContainer ) {
 							return;
 						}
 
-						// Merge discovered dependencies with extra dependencies
+						// Merge discovered dependencies with extra dependencies.
 						const allDependencies = new Set( [
 							...dependencies,
 							...extraDependencies,
 						] );
 
-						const dependenciesString = Array.from( allDependencies )
-							.sort()
-							.map( ( dep ) => `'${ dep }'` )
-							.join( ', ' );
+						// Build sorted module dependencies as raw objects.
+						const moduleDependenciesObjects = Array.from(
+							moduleDependencies.entries()
+						)
+							.sort( ( [ a ], [ b ] ) => a.localeCompare( b ) )
+							.map( ( [ id, importType ] ) => ( {
+								id,
+								import: importType,
+							} ) );
 
 						// Determine output file path from build config
 						let outputFilePath;
@@ -370,6 +362,34 @@ export function createWordpressExternalsPlugin(
 						// Generate content-based version hash
 						const version =
 							await generateContentHash( filesToHash );
+
+						// Populate result container if provided.
+						if ( resultContainer ) {
+							resultContainer.dependencies = Array.from(
+								allDependencies
+							).sort();
+							resultContainer.module_dependencies =
+								moduleDependenciesObjects;
+							resultContainer.version = version;
+						}
+
+						// Only generate asset file if requested.
+						if ( ! generateAssetFile ) {
+							return;
+						}
+
+						const dependenciesString = Array.from( allDependencies )
+							.sort()
+							.map( ( dep ) => `'${ dep }'` )
+							.join( ', ' );
+
+						const moduleDependenciesString =
+							moduleDependenciesObjects
+								.map(
+									( { id, import: importType } ) =>
+										`array('id' => '${ id }', 'import' => '${ importType }')`
+								)
+								.join( ', ' );
 
 						const parts = [
 							`'dependencies' => array(${ dependenciesString })`,

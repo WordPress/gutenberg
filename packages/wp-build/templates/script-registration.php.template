@@ -55,21 +55,17 @@ function {{PREFIX}}_register_package_scripts( $scripts ) {
 	$default_version = ! SCRIPT_DEBUG ? $build_constants['version'] : time();
 	$extension       = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
 
-	$scripts_dir  = __DIR__ . '/scripts';
-	$scripts_file = $scripts_dir . '/registry.php';
+	$scripts_file = __DIR__ . '/scripts/registry.php';
 
 	if ( ! file_exists( $scripts_file ) ) {
 		return;
 	}
 
 	$scripts_data = require $scripts_file;
-	$plugin_dir   = dirname( __FILE__ );
 
 	foreach ( $scripts_data as $script_data ) {
-		$asset_file   = $scripts_dir . '/' . $script_data['asset'];
-		$asset        = file_exists( $asset_file ) ? require $asset_file : array();
-		$dependencies = $asset['dependencies'] ?? array();
-		$version      = $asset['version'] ?? $default_version;
+		$dependencies = $script_data['dependencies'] ?? array();
+		$version      = SCRIPT_DEBUG ? $default_version : ( $script_data['version'] ?? $default_version );
 
 		{{PREFIX}}_override_script(
 			$scripts,

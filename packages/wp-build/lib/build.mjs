@@ -488,6 +488,8 @@ async function bundlePackage( packageName, options = {} ) {
 	const builtModules = [];
 	const builtScripts = [];
 	const builtStyles = [];
+	const scriptAssetResult = {};
+	const moduleAssetResultEntries = [];
 	const packageDir = path.join( sourceDir, packageName );
 	const packageJson = getPackageInfoFromFile(
 		path.join( sourceDir, packageName, 'package.json' )
@@ -542,7 +544,8 @@ async function bundlePackage( packageName, options = {} ) {
 						'index.min',
 						'iife',
 						packageJson.wpScriptExtraDependencies || [],
-						true // Generate asset file for minified build
+						false, // Do not generate asset file; data goes into registry.php
+						scriptAssetResult
 					),
 				],
 			} ),
@@ -557,17 +560,12 @@ async function bundlePackage( packageName, options = {} ) {
 						'index.min',
 						'iife',
 						packageJson.wpScriptExtraDependencies || [],
-						false // Skip asset file for non-minified build
+						false
 					),
 				],
 			} )
 		);
-
-		builtScripts.push( {
-			handle: `${ handlePrefix }-${ packageName }`,
-			path: `${ packageName }/index`,
-			asset: `${ packageName }/index.min.asset.php`,
-		} );
+		// builtScripts is populated after Promise.all( builds ) below.
 	}
 
 	if ( packageJson.wpScriptModuleExports ) {
@@ -600,6 +598,8 @@ async function bundlePackage( packageName, options = {} ) {
 					( key ) => key.replace( /^\.\//, '' ) === fileName
 				);
 
+			const moduleAssetResult = {};
+
 			builds.push(
 				esbuild.build( {
 					entryPoints: [ entryPoint ],
@@ -619,7 +619,8 @@ async function bundlePackage( packageName, options = {} ) {
 							`${ baseFileName }.min`,
 							'esm',
 							[],
-							true // Generate asset file for minified build
+							false, // Do not generate asset file; data goes into registry.php
+							moduleAssetResult
 						),
 					],
 				} )
@@ -645,7 +646,7 @@ async function bundlePackage( packageName, options = {} ) {
 								`${ baseFileName }.min`,
 								'esm',
 								[],
-								false // Skip asset file for non-minified build
+								false
 							),
 						],
 					} )
@@ -657,12 +658,13 @@ async function bundlePackage( packageName, options = {} ) {
 					? `@${ packageNamespace }/${ packageName }`
 					: `@${ packageNamespace }/${ packageName }/${ fileName }`;
 
-			builtModules.push( {
+			moduleAssetResultEntries.push( {
 				id: scriptModuleId,
 				path: `${ packageName }/${ fileName }`,
-				asset: `${ packageName }/${ fileName }.min.asset.php`,
 				min_only: isWasmWorker,
+				result: moduleAssetResult,
 			} );
+			// builtModules is populated after Promise.all( builds ) below.
 		}
 	}
 
@@ -799,30 +801,34 @@ async function bundlePackage( packageName, options = {} ) {
 
 	await Promise.all( builds );
 
-	// Collect style metadata after builds complete (so asset files exist)
+	// Populate builtScripts from the result container captured during the build.
+	if ( packageJson.wpScript ) {
+		builtScripts.push( {
+			handle: `${ handlePrefix }-${ packageName }`,
+			path: `${ packageName }/index`,
+			dependencies: scriptAssetResult.dependencies ?? [],
+			module_dependencies: scriptAssetResult.module_dependencies ?? [],
+			version: scriptAssetResult.version,
+		} );
+	}
+
+	// Populate builtModules from the per-export result containers captured during the build.
+	for ( const entry of moduleAssetResultEntries ) {
+		builtModules.push( {
+			id: entry.id,
+			path: entry.path,
+			min_only: entry.min_only,
+			dependencies: entry.result.dependencies ?? [],
+			module_dependencies: entry.result.module_dependencies ?? [],
+			version: entry.result.version,
+		} );
+	}
+
+	// Collect style metadata after builds complete.
 	// Only register the main style.css file - complex cases handled manually in lib/client-assets.php
 	if ( hasMainStyle ) {
-		// Read script asset file to get dependencies
-		const scriptAssetPath = path.join(
-			BUILD_DIR,
-			'scripts',
-			packageName,
-			'index.min.asset.php'
-		);
-
-		const assetContent = await readFile( scriptAssetPath, 'utf8' );
-		const depsMatch = assetContent.match(
-			/'dependencies' => array\((.*?)\)/s
-		);
-
-		let scriptDependencies = [];
-		if ( depsMatch ) {
-			const depsString = depsMatch[ 1 ];
-			scriptDependencies =
-				depsString
-					.match( /'([^']+)'/g )
-					?.map( ( d ) => d.replace( /'/g, '' ) ) || [];
-		}
+		// Use in-memory script dependencies from the build result.
+		const scriptDependencies = scriptAssetResult.dependencies ?? [];
 
 		const styleDeps = await inferStyleDependencies(
 			scriptDependencies,
@@ -918,15 +924,29 @@ async function generateModuleRegistrationPhp( modules, replacements ) {
 
 	// Generate modules array for registry
 	const modulesArray = modules
-		.map(
-			( module ) =>
+		.map( ( module ) => {
+			const depsPhp = ( module.dependencies || [] )
+				.map( ( d ) => `'${ d }'` )
+				.join( ', ' );
+			const moduleDepsPhp = ( module.module_dependencies || [] )
+				.map(
+					( { id, import: importType } ) =>
+						`array('id' => '${ id }', 'import' => '${ importType }')`
+				)
+				.join( ', ' );
+			let entry =
 				`\tarray(\n` +
 				`\t\t'id' => '${ module.id }',\n` +
 				`\t\t'path' => '${ module.path }',\n` +
-				`\t\t'asset' => '${ module.asset }',\n` +
-				( module.min_only ? `\t\t'min_only' => true,\n` : '' ) +
-				`\t),`
-		)
+				`\t\t'dependencies' => array(${ depsPhp }),\n` +
+				`\t\t'module_dependencies' => array(${ moduleDepsPhp }),\n` +
+				`\t\t'version' => '${ module.version }',\n`;
+			if ( module.min_only ) {
+				entry += `\t\t'min_only' => true,\n`;
+			}
+			entry += `\t),`;
+			return entry;
+		} )
 		.join( '\n' );
 
 	await Promise.all( [
@@ -955,14 +975,27 @@ async function generateScriptRegistrationPhp( scripts, replacements ) {
 
 	// Generate scripts array for registry
 	const scriptsArray = scripts
-		.map(
-			( script ) =>
+		.map( ( script ) => {
+			const depsPhp = ( script.dependencies || [] )
+				.map( ( d ) => `'${ d }'` )
+				.join( ', ' );
+			const moduleDepsPhp = ( script.module_dependencies || [] )
+				.map(
+					( { id, import: importType } ) =>
+						`array('id' => '${ id }', 'import' => '${ importType }')`
+				)
+				.join( ', ' );
+			let entry =
 				`\tarray(\n` +
 				`\t\t'handle' => '${ script.handle }',\n` +
 				`\t\t'path' => '${ script.path }',\n` +
-				`\t\t'asset' => '${ script.asset }',\n` +
-				`\t),`
-		)
+				`\t\t'dependencies' => array(${ depsPhp }),\n`;
+			if ( moduleDepsPhp ) {
+				entry += `\t\t'module_dependencies' => array(${ moduleDepsPhp }),\n`;
+			}
+			entry += `\t\t'version' => '${ script.version }',\n` + `\t),`;
+			return entry;
+		} )
 		.join( '\n' );
 
 	await Promise.all( [
