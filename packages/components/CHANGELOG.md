@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   `RadioControl`: Add `role="radiogroup"` to the wrapping `fieldset` element ([#76745](https://github.com/WordPress/gutenberg/pull/76745)).
+-   `ControlWithError`: Connect validation error messages to controls via `aria-describedby` ([#76742](https://github.com/WordPress/gutenberg/pull/76742)).
 -   `CustomGradientPicker`: Add state persistence when switching between Linear and Radial Gradient ([#76595](https://github.com/WordPress/gutenberg/pull/76595)).
 -   `Button`: fix focus styles in High Contrast (forced colors) mode ([#76719](https://github.com/WordPress/gutenberg/pull/76719)).
 
