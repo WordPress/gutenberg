@@ -940,7 +940,7 @@ async function generateModuleRegistrationPhp( modules, replacements ) {
 				`\t\t'path' => '${ module.path }',\n` +
 				`\t\t'dependencies' => array(${ depsPhp }),\n` +
 				`\t\t'module_dependencies' => array(${ moduleDepsPhp }),\n` +
-				`\t\t'version' => '${ module.version }',\n`;
+				`\t\t'version' => '${ module.version ?? '' }',\n`;
 			if ( module.min_only ) {
 				entry += `\t\t'min_only' => true,\n`;
 			}
@@ -993,7 +993,7 @@ async function generateScriptRegistrationPhp( scripts, replacements ) {
 			if ( moduleDepsPhp ) {
 				entry += `\t\t'module_dependencies' => array(${ moduleDepsPhp }),\n`;
 			}
-			entry += `\t\t'version' => '${ script.version }',\n` + `\t),`;
+			entry += `\t\t'version' => '${ script.version ?? '' }',\n` + `\t),`;
 			return entry;
 		} )
 		.join( '\n' );
@@ -1042,7 +1042,7 @@ async function generateStyleRegistrationPhp( styles, replacements ) {
 				`\tarray(\n` +
 				`\t\t'handle' => '${ style.handle }',\n` +
 				`\t\t'path' => '${ style.path }',\n` +
-				`\t\t'dependencies' => array(${ style.dependencies
+				`\t\t'dependencies' => array(${ ( style.dependencies || [] )
 					.map( ( dep ) => `'${ dep }'` )
 					.join( ', ' ) }),\n` +
 				`\t),`
