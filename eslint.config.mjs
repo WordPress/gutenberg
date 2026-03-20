@@ -745,6 +745,15 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: UI package — enforce no-unmerged-classname.
+	{
+		files: [ 'packages/ui/src/**' ],
+		ignores: [ '**/@(test|stories)/**' ],
+		rules: {
+			'@wordpress/no-unmerged-classname': 'error',
+		},
+	},
+
 	// Override: eslint-plugin and theme — disable DS token rules.
 	{
 		files: [ 'packages/eslint-plugin/**', 'packages/theme/**' ],
