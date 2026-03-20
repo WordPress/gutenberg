@@ -6,6 +6,154 @@
  */
 
 /**
+ * Initializes the connector registry with default connectors and fires the registration action.
+ *
+ * Creates the registry instance, registers built-in connectors (which cannot be unhooked),
+ * and then fires the `wp_connectors_init` action for plugins to register their own connectors.
+ *
+ * @access private
+ * @since 7.0.0
+ */
+function _gutenberg_connectors_init(): void {
+	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
+		return;
+	}
+
+	$registry = new WP_Connector_Registry();
+	WP_Connector_Registry::set_instance( $registry );
+
+	// Built-in connectors.
+	$defaults = array(
+		'anthropic' => array(
+			'name'           => 'Anthropic',
+			'description'    => __( 'Text generation with Claude.', 'gutenberg' ),
+			'type'           => 'ai_provider',
+			'plugin'         => array(
+				'slug' => 'ai-provider-for-anthropic',
+			),
+			'authentication' => array(
+				'method'          => 'api_key',
+				'credentials_url' => 'https://platform.claude.com/settings/keys',
+			),
+		),
+		'google'    => array(
+			'name'           => 'Google',
+			'description'    => __( 'Text and image generation with Gemini and Imagen.', 'gutenberg' ),
+			'type'           => 'ai_provider',
+			'plugin'         => array(
+				'slug' => 'ai-provider-for-google',
+			),
+			'authentication' => array(
+				'method'          => 'api_key',
+				'credentials_url' => 'https://aistudio.google.com/api-keys',
+			),
+		),
+		'openai'    => array(
+			'name'           => 'OpenAI',
+			'description'    => __( 'Text and image generation with GPT and Dall-E.', 'gutenberg' ),
+			'type'           => 'ai_provider',
+			'plugin'         => array(
+				'slug' => 'ai-provider-for-openai',
+			),
+			'authentication' => array(
+				'method'          => 'api_key',
+				'credentials_url' => 'https://platform.openai.com/api-keys',
+			),
+		),
+	);
+
+	// Merge AI Client registry data on top of defaults.
+	// Registry values (from provider plugins) take precedence over hardcoded fallbacks.
+	$ai_registry = \WordPress\AiClient\AiClient::defaultRegistry();
+
+	foreach ( $ai_registry->getRegisteredProviderIds() as $connector_id ) {
+		$provider_class_name = $ai_registry->getProviderClassName( $connector_id );
+		$provider_metadata   = $provider_class_name::metadata();
+
+		$auth_method = method_exists( $provider_metadata, 'getAuthenticationMethod' ) ? $provider_metadata->getAuthenticationMethod() : null;
+		$is_api_key  = null !== $auth_method && $auth_method->isApiKey();
+
+		if ( $is_api_key ) {
+			$credentials_url = $provider_metadata->getCredentialsUrl();
+			$authentication  = array(
+				'method'          => 'api_key',
+				'credentials_url' => $credentials_url ? $credentials_url : null,
+			);
+		} else {
+			$authentication = array( 'method' => 'none' );
+		}
+
+		$name        = $provider_metadata->getName();
+		$description = method_exists( $provider_metadata, 'getDescription' ) ? $provider_metadata->getDescription() : null;
+		$logo_url    = method_exists( $provider_metadata, 'getLogoPath' ) && $provider_metadata->getLogoPath()
+			? _wp_connectors_resolve_ai_provider_logo_url( $provider_metadata->getLogoPath() )
+			: null;
+
+		if ( isset( $defaults[ $connector_id ] ) ) {
+			// Override fields with non-empty registry values.
+			if ( $name ) {
+				$defaults[ $connector_id ]['name'] = $name;
+			}
+			if ( $description ) {
+				$defaults[ $connector_id ]['description'] = $description;
+			}
+			if ( $logo_url ) {
+				$defaults[ $connector_id ]['logo_url'] = $logo_url;
+			}
+			// Always update auth method; keep existing credentials_url as fallback.
+			$defaults[ $connector_id ]['authentication']['method'] = $authentication['method'];
+			if ( ! empty( $authentication['credentials_url'] ) ) {
+				$defaults[ $connector_id ]['authentication']['credentials_url'] = $authentication['credentials_url'];
+			}
+		} else {
+			$defaults[ $connector_id ] = array(
+				'name'           => $name ? $name : ucwords( $connector_id ),
+				'description'    => $description ? $description : '',
+				'type'           => 'ai_provider',
+				'authentication' => $authentication,
+				'logo_url'       => $logo_url,
+			);
+		}
+	}
+
+	// Register all default connectors directly on the registry.
+	foreach ( $defaults as $id => $args ) {
+		$registry->register( $id, $args );
+	}
+
+	/**
+	 * Fires when the connector registry is ready for plugins to register connectors.
+	 *
+	 * Default connectors have already been registered at this point and cannot be
+	 * unhooked. Use `$registry->register()` within this action to add new connectors.
+	 *
+	 * Example usage:
+	 *
+	 *     add_action( 'wp_connectors_init', function ( WP_Connector_Registry $registry ) {
+	 *         $registry->register(
+	 *             'my_custom_ai',
+	 *             array(
+	 *                 'name'           => __( 'My Custom AI', 'my-plugin' ),
+	 *                 'description'    => __( 'Custom AI provider integration.', 'my-plugin' ),
+	 *                 'type'           => 'ai_provider',
+	 *                 'authentication' => array(
+	 *                     'method'          => 'api_key',
+	 *                     'credentials_url' => 'https://example.com/api-keys',
+	 *                 ),
+	 *             )
+	 *         );
+	 *     } );
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param WP_Connector_Registry $registry Connector registry instance.
+	 */
+	do_action( 'wp_connectors_init', $registry );
+}
+remove_action( 'init', '_wp_connectors_init', 15 );
+add_action( 'init', '_gutenberg_connectors_init', 15 );
+
+/**
  * Determines the source of an API key for a given provider.
  *
  * Checks in order: environment variable, PHP constant, database.
@@ -13,10 +161,11 @@
  *
  * @access private
  *
- * @param string $provider_id The provider ID (e.g., 'openai', 'anthropic', 'google').
+ * @param string $provider_id  The provider ID (e.g., 'openai', 'anthropic', 'google').
+ * @param string $setting_name The option name for the API key (e.g., 'connectors_ai_openai_api_key').
  * @return string The key source: 'env', 'constant', 'database', or 'none'.
  */
-function _gutenberg_get_api_key_source( string $provider_id ): string {
+function _gutenberg_get_api_key_source( string $provider_id, string $setting_name ): string {
 	// Convert provider ID to CONSTANT_CASE for env var name.
 	// e.g., 'openai' -> 'OPENAI', 'anthropic' -> 'ANTHROPIC'.
 	$constant_case_id = strtoupper(
@@ -39,8 +188,7 @@ function _gutenberg_get_api_key_source( string $provider_id ): string {
 	}
 
 	// Check database.
-	$setting_name = "connectors_ai_{$provider_id}_api_key";
-	$db_value     = get_option( $setting_name, '' );
+	$db_value = get_option( $setting_name, '' );
 	if ( '' !== $db_value ) {
 		return 'database';
 	}
@@ -103,215 +251,6 @@ function _gutenberg_is_ai_api_key_valid( string $key, string $provider_id ): ?bo
 }
 
 /**
- * Resolves an AI provider logo file path to a URL.
- *
- * The AI Client library returns absolute file paths (not URLs) for logo files
- * since it is not WordPress-specific. This function converts a path within
- * the plugins or must-use plugins directory to the corresponding URL.
- *
- * @access private
- * @since 7.0.0
- *
- * @param string $path Absolute file path to the logo. Must be within
- *                     WP_PLUGIN_DIR or WPMU_PLUGIN_DIR; triggers
- *                     _doing_it_wrong() otherwise.
- * @return string|null The logo URL, or null if the path is empty or
- *                     outside the supported directories.
- */
-function _gutenberg_resolve_ai_provider_logo_url( string $path ): ?string {
-	if ( ! $path ) {
-		return null;
-	}
-
-	$path = wp_normalize_path( $path );
-
-	if ( ! file_exists( $path ) ) {
-		return null;
-	}
-
-	$mu_plugin_dir = wp_normalize_path( WPMU_PLUGIN_DIR );
-	if ( str_starts_with( $path, $mu_plugin_dir . '/' ) ) {
-		return plugins_url( substr( $path, strlen( $mu_plugin_dir ) ), WPMU_PLUGIN_DIR . '/.' );
-	}
-
-	$plugin_dir = wp_normalize_path( WP_PLUGIN_DIR );
-	if ( str_starts_with( $path, $plugin_dir . '/' ) ) {
-		return plugins_url( substr( $path, strlen( $plugin_dir ) ) );
-	}
-
-	_doing_it_wrong(
-		__FUNCTION__,
-		__( 'Provider logo path must be located within the plugins or must-use plugins directory.', 'gutenberg' ),
-		'7.0.0'
-	);
-
-	return null;
-}
-
-/**
- * Gets the registered connector settings.
- *
- * @access private
- *
- * @return array {
- *     Connector settings keyed by connector ID.
- *
- *     @type array ...$0 {
- *         Data for a single connector.
- *
- *         @type string $name           The connector's display name.
- *         @type string $description    The connector's description.
- *         @type string $type           The connector type. Currently, only 'ai_provider' is supported.
- *         @type array  $plugin         Optional. Plugin data for install/activate UI.
- *             @type string $slug       The WordPress.org plugin slug.
- *         }
- *         @type string $logo_url       Optional. URL to the connector's logo image.
- *         @type array  $authentication {
- *             Authentication configuration. When method is 'api_key', includes
- *             credentials_url and setting_name. When 'none', only method is present.
- *
- *             @type string      $method          The authentication method: 'api_key' or 'none'.
- *             @type string|null $credentials_url Optional. URL where users can obtain API credentials.
- *             @type string      $setting_name    Optional. The setting name for the API key.
- *         }
- *     }
- * }
- */
-function _gutenberg_get_connector_settings(): array {
-	static $cached = null;
-	if ( null !== $cached ) {
-		return $cached;
-	}
-
-	$connectors = array(
-		'google'    => array(
-			'name'           => 'Google',
-			'description'    => __( 'Text and image generation with Gemini and Imagen.', 'gutenberg' ),
-			'type'           => 'ai_provider',
-			'plugin'         => array(
-				'slug' => 'ai-provider-for-google',
-			),
-			'authentication' => array(
-				'method'          => 'api_key',
-				'credentials_url' => 'https://aistudio.google.com/api-keys',
-			),
-		),
-		'openai'    => array(
-			'name'           => 'OpenAI',
-			'description'    => __( 'Text and image generation with GPT and Dall-E.', 'gutenberg' ),
-			'type'           => 'ai_provider',
-			'plugin'         => array(
-				'slug' => 'ai-provider-for-openai',
-			),
-			'authentication' => array(
-				'method'          => 'api_key',
-				'credentials_url' => 'https://platform.openai.com/api-keys',
-			),
-		),
-		'anthropic' => array(
-			'name'           => 'Anthropic',
-			'description'    => __( 'Text generation with Claude.', 'gutenberg' ),
-			'type'           => 'ai_provider',
-			'plugin'         => array(
-				'slug' => 'ai-provider-for-anthropic',
-			),
-			'authentication' => array(
-				'method'          => 'api_key',
-				'credentials_url' => 'https://platform.claude.com/settings/keys',
-			),
-		),
-	);
-
-	$registry = \WordPress\AiClient\AiClient::defaultRegistry();
-
-	foreach ( $registry->getRegisteredProviderIds() as $connector_id ) {
-		$provider_class = $registry->getProviderClassName( $connector_id );
-		$metadata       = $provider_class::metadata();
-
-		$auth_method = $metadata->getAuthenticationMethod();
-		$is_api_key  = null !== $auth_method && $auth_method->isApiKey();
-
-		if ( $is_api_key ) {
-			$credentials_url = $metadata->getCredentialsUrl();
-			$authentication  = array(
-				'method'          => 'api_key',
-				'credentials_url' => $credentials_url ? $credentials_url : null,
-			);
-		} else {
-			$authentication = array( 'method' => 'none' );
-		}
-
-		$name        = $metadata->getName();
-		$description = method_exists( $metadata, 'getDescription' ) ? $metadata->getDescription() : null;
-		$logo_url    = method_exists( $metadata, 'getLogoPath' ) && $metadata->getLogoPath()
-			? _gutenberg_resolve_ai_provider_logo_url( $metadata->getLogoPath() )
-			: null;
-
-		if ( isset( $connectors[ $connector_id ] ) ) {
-			// Override fields with non-empty registry values.
-			if ( $name ) {
-				$connectors[ $connector_id ]['name'] = $name;
-			}
-			if ( $description ) {
-				$connectors[ $connector_id ]['description'] = $description;
-			}
-			if ( $logo_url ) {
-				$connectors[ $connector_id ]['logo_url'] = $logo_url;
-			}
-			// Always update auth method; keep existing credentials_url as fallback.
-			$connectors[ $connector_id ]['authentication']['method'] = $authentication['method'];
-			if ( ! empty( $authentication['credentials_url'] ) ) {
-				$connectors[ $connector_id ]['authentication']['credentials_url'] = $authentication['credentials_url'];
-			}
-		} else {
-			$connectors[ $connector_id ] = array(
-				'name'           => $name ? $name : ucwords( $connector_id ),
-				'description'    => $description ? $description : '',
-				'logo_url'       => $logo_url,
-				'type'           => 'ai_provider',
-				'authentication' => $authentication,
-			);
-		}
-	}
-
-	// Add setting_name for connectors that use API key authentication.
-	foreach ( $connectors as $connector_id => $connector ) {
-		if ( 'api_key' === $connector['authentication']['method'] ) {
-			$connectors[ $connector_id ]['authentication']['setting_name'] = "connectors_ai_{$connector_id}_api_key";
-		}
-	}
-
-	// Add plugin installation and activation status.
-	// Build a slug-to-file map following the same pattern as WP_Plugin_Dependencies::get_plugin_dirnames().
-	if ( ! function_exists( 'get_plugins' ) ) {
-		require_once ABSPATH . 'wp-admin/includes/plugin.php';
-	}
-	$plugin_files_by_slug = array();
-	foreach ( array_keys( get_plugins() ) as $plugin_file ) {
-		$slug                          = str_contains( $plugin_file, '/' ) ? dirname( $plugin_file ) : str_replace( '.php', '', $plugin_file );
-		$plugin_files_by_slug[ $slug ] = $plugin_file;
-	}
-
-	foreach ( $connectors as $connector_id => $connector ) {
-		if ( empty( $connector['plugin']['slug'] ) ) {
-			continue;
-		}
-
-		$plugin_slug = $connector['plugin']['slug'];
-		$plugin_file = $plugin_files_by_slug[ $plugin_slug ] ?? null;
-
-		$is_installed = null !== $plugin_file;
-		$is_activated = $is_installed && is_plugin_active( $plugin_file );
-
-		$connectors[ $connector_id ]['plugin']['is_installed'] = $is_installed;
-		$connectors[ $connector_id ]['plugin']['is_activated'] = $is_activated;
-	}
-
-	$cached = $connectors;
-	return $cached;
-}
-
-/**
  * Masks and validates connector API keys in REST responses.
  *
  * On every `/wp/v2/settings` response, masks connector API key values so raw
@@ -343,9 +282,9 @@ function _gutenberg_connectors_rest_settings_dispatch( WP_REST_Response $respons
 
 	$is_update = 'POST' === $request->get_method() || 'PUT' === $request->get_method();
 
-	foreach ( _gutenberg_get_connector_settings() as $connector_id => $connector_data ) {
+	foreach ( wp_get_connectors() as $connector_id => $connector_data ) {
 		$auth = $connector_data['authentication'];
-		if ( 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
+		if ( 'ai_provider' !== $connector_data['type'] || 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
 			continue;
 		}
 
@@ -388,9 +327,16 @@ function _gutenberg_register_default_connector_settings(): void {
 		return;
 	}
 
-	foreach ( _gutenberg_get_connector_settings() as $connector_data ) {
+	$ai_registry = \WordPress\AiClient\AiClient::defaultRegistry();
+
+	foreach ( wp_get_connectors() as $connector_id => $connector_data ) {
 		$auth = $connector_data['authentication'];
-		if ( 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
+		if ( 'ai_provider' !== $connector_data['type'] || 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
+			continue;
+		}
+
+		// Skip registering the setting if the provider is not in the registry.
+		if ( ! $ai_registry->hasProvider( $connector_id ) ) {
 			continue;
 		}
 
@@ -430,8 +376,8 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 	}
 
 	try {
-		$registry = \WordPress\AiClient\AiClient::defaultRegistry();
-		foreach ( _gutenberg_get_connector_settings() as $connector_id => $connector_data ) {
+		$ai_registry = \WordPress\AiClient\AiClient::defaultRegistry();
+		foreach ( wp_get_connectors() as $connector_id => $connector_data ) {
 			if ( 'ai_provider' !== $connector_data['type'] ) {
 				continue;
 			}
@@ -441,18 +387,22 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 				continue;
 			}
 
+			if ( ! $ai_registry->hasProvider( $connector_id ) ) {
+				continue;
+			}
+
 			// Skip if the key is already provided via env var or constant.
-			$key_source = _gutenberg_get_api_key_source( $connector_id );
+			$key_source = _gutenberg_get_api_key_source( $connector_id, $auth['setting_name'] );
 			if ( 'env' === $key_source || 'constant' === $key_source ) {
 				continue;
 			}
 
 			$api_key = get_option( $auth['setting_name'], '' );
-			if ( '' === $api_key || ! $registry->hasProvider( $connector_id ) ) {
+			if ( '' === $api_key ) {
 				continue;
 			}
 
-			$registry->setProviderRequestAuthentication(
+			$ai_registry->setProviderRequestAuthentication(
 				$connector_id,
 				new \WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication( $api_key )
 			);
@@ -477,16 +427,27 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 		return $data;
 	}
 
-	$registry   = \WordPress\AiClient\AiClient::defaultRegistry();
+	$registry = \WordPress\AiClient\AiClient::defaultRegistry();
+
+	// Build a slug-to-file map for plugin installation status.
+	if ( ! function_exists( 'get_plugins' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+	$plugin_files_by_slug = array();
+	foreach ( array_keys( get_plugins() ) as $plugin_file ) {
+		$slug                          = str_contains( $plugin_file, '/' ) ? dirname( $plugin_file ) : str_replace( '.php', '', $plugin_file );
+		$plugin_files_by_slug[ $slug ] = $plugin_file;
+	}
+
 	$connectors = array();
-	foreach ( _gutenberg_get_connector_settings() as $connector_id => $connector_data ) {
+	foreach ( wp_get_connectors() as $connector_id => $connector_data ) {
 		$auth     = $connector_data['authentication'];
 		$auth_out = array( 'method' => $auth['method'] );
 
 		if ( 'api_key' === $auth['method'] ) {
 			$auth_out['settingName']    = $auth['setting_name'] ?? '';
 			$auth_out['credentialsUrl'] = $auth['credentials_url'] ?? null;
-			$auth_out['keySource']      = _gutenberg_get_api_key_source( $connector_id );
+			$auth_out['keySource']      = _gutenberg_get_api_key_source( $connector_id, $auth['setting_name'] ?? '' );
 			try {
 				$auth_out['isConnected'] = $registry->hasProvider( $connector_id ) && $registry->isProviderConfigured( $connector_id );
 			} catch ( Exception $e ) {
@@ -502,16 +463,23 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 			'authentication' => $auth_out,
 		);
 
-		if ( ! empty( $connector_data['plugin'] ) ) {
+		if ( ! empty( $connector_data['plugin']['slug'] ) ) {
+			$plugin_slug = $connector_data['plugin']['slug'];
+			$plugin_file = $plugin_files_by_slug[ $plugin_slug ] ?? null;
+
+			$is_installed = null !== $plugin_file;
+			$is_activated = $is_installed && is_plugin_active( $plugin_file );
+
 			$connector_out['plugin'] = array(
-				'slug'        => $connector_data['plugin']['slug'],
-				'isInstalled' => $connector_data['plugin']['is_installed'] ?? false,
-				'isActivated' => $connector_data['plugin']['is_activated'] ?? false,
+				'slug'        => $plugin_slug,
+				'isInstalled' => $is_installed,
+				'isActivated' => $is_activated,
 			);
 		}
 
 		$connectors[ $connector_id ] = $connector_out;
 	}
+	ksort( $connectors );
 	$data['connectors'] = $connectors;
 	return $data;
 }

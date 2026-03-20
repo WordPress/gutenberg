@@ -4,7 +4,7 @@
 import {
 	Button,
 	DropZone,
-	FlexItem,
+	FlexBlock,
 	Spinner,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
@@ -14,36 +14,62 @@ import {
 	MediaReplaceFlow,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { focus } from '@wordpress/dom';
+import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { reset as resetIcon } from '@wordpress/icons';
+import { getFilename } from '@wordpress/url';
+
+/**
+ * Focuses the toggle button.
+ *
+ * @param {Object} containerRef - ref object containing current element
+ */
+const focusToggleButton = ( containerRef ) => {
+	// Use requestAnimationFrame to ensure DOM updates are complete.
+	window.requestAnimationFrame( () => {
+		const [ toggleButton ] = focus.tabbable.find( containerRef?.current );
+		if ( ! toggleButton ) {
+			return;
+		}
+
+		toggleButton.focus();
+	} );
+};
 
 /**
  * MediaControlPreview - Preview component showing media thumbnail and filename
  *
  * @param {Object} props
  * @param {string} props.url            Media URL for thumbnail
- * @param {string} props.alt            Alt text for image
  * @param {string} props.filename       Filename to display
  * @param {Object} props.itemGroupProps Optional props to pass to ItemGroup
  * @param {string} props.className      Optional className for Truncate
+ * @param {string} props.label          Optional label for accessibility
  * @return {Element} Preview component
  */
 export function MediaControlPreview( {
 	url,
-	alt,
 	filename,
 	itemGroupProps,
 	className,
+	label,
 } ) {
 	return (
 		<ItemGroup { ...itemGroupProps } as="span">
-			<HStack justify="flex-start" as="span">
-				<img src={ url } alt={ alt } />
-				<FlexItem as="span">
+			<HStack justify="flex-start">
+				<span
+					className="block-library-utils__media-control__inspector-image-indicator"
+					style={ {
+						backgroundImage: url ? `url(${ url })` : undefined,
+					} }
+				/>
+				<FlexBlock>
 					<Truncate numberOfLines={ 1 } className={ className }>
-						{ filename }
+						{ filename ?? label }
 					</Truncate>
-				</FlexItem>
+				</FlexBlock>
 			</HStack>
 		</ItemGroup>
 	);
@@ -55,7 +81,6 @@ export function MediaControlPreview( {
  * @param {Object}   props
  * @param {number}   props.mediaId      Media attachment ID
  * @param {string}   props.mediaUrl     Media URL
- * @param {string}   props.alt          Alt text for preview
  * @param {string}   props.filename     Filename to display
  * @param {Array}    props.allowedTypes Allowed media types
  * @param {Function} props.onSelect     Callback when media selected
@@ -69,7 +94,6 @@ export function MediaControlPreview( {
 export function MediaControl( {
 	mediaId,
 	mediaUrl,
-	alt = '',
 	filename,
 	allowedTypes,
 	onSelect,
@@ -77,7 +101,7 @@ export function MediaControl( {
 	onError,
 	onReset,
 	isUploading = false,
-	emptyLabel = __( 'Add media' ),
+	emptyLabel = __( 'Media' ),
 } ) {
 	const { getSettings } = useSelect( blockEditorStore );
 	const onFilesDrop = ( filesList ) => {
@@ -95,10 +119,15 @@ export function MediaControl( {
 			multiple: false,
 		} );
 	};
+	const containerRef = useRef();
 
 	return (
-		<div className="block-library-utils__media-control">
+		<div
+			ref={ containerRef }
+			className="block-library-utils__media-control"
+		>
 			<MediaReplaceFlow
+				className="block-library-utils__media-control__replace-flow"
 				mediaId={ mediaId }
 				mediaURL={ mediaUrl }
 				allowedTypes={ allowedTypes }
@@ -106,15 +135,14 @@ export function MediaControl( {
 				onSelectURL={ onSelectURL }
 				onError={ onError }
 				name={
-					mediaUrl ? (
-						<MediaControlPreview
-							url={ mediaUrl }
-							alt={ alt }
-							filename={ filename }
-						/>
-					) : (
-						emptyLabel
-					)
+					<MediaControlPreview
+						url={ mediaUrl }
+						filename={ filename }
+						className="block-library-utils__media-control__inspector-media-replace-title"
+						label={
+							mediaUrl ? getFilename( filename ) : emptyLabel
+						}
+					/>
 				}
 				renderToggle={ ( props ) => (
 					<Button { ...props } __next40pxDefaultSize>
@@ -123,6 +151,18 @@ export function MediaControl( {
 				) }
 				onReset={ onReset }
 			/>
+			{ mediaUrl && onReset && (
+				<Button
+					label={ __( 'Reset' ) }
+					className="block-library-utils__media-control__reset"
+					size="small"
+					icon={ resetIcon }
+					onClick={ () => {
+						onReset();
+						focusToggleButton( containerRef );
+					} }
+				/>
+			) }
 			<DropZone onFilesDrop={ onFilesDrop } />
 		</div>
 	);

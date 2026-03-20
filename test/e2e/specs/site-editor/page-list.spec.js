@@ -485,4 +485,70 @@ test.describe( 'Page List', () => {
 			await requestUtils.deleteAllUsers();
 		} );
 	} );
+
+	test.describe( 'Quick Edit Date Timezone Consistency', () => {
+		const PAGE_DATE_GMT = '2026-02-15T17:30:00';
+		// UTC-5 offset means the displayed time should be 5 hours earlier.
+		const EXPECTED_LOCAL_VALUE = '2026-02-15T12:30';
+		const PAGE_TITLE = 'Timezone Test Page';
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.updateSiteSettings( {
+				timezone: 'Etc/GMT+5',
+			} );
+			await requestUtils.createPage( {
+				title: PAGE_TITLE,
+				status: 'publish',
+				date_gmt: PAGE_DATE_GMT,
+			} );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.updateSiteSettings( {
+				timezone: '',
+			} );
+			await requestUtils.deleteAllPages();
+			await createPages( requestUtils );
+		} );
+
+		test( 'should display and edit dates in the WP timezone', async ( {
+			admin,
+			page,
+		} ) => {
+			await admin.visitSiteEditor();
+			await page.getByRole( 'button', { name: 'Pages' } ).click();
+			await page.getByRole( 'button', { name: 'Layout' } ).click();
+			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+
+			// Open Quick Edit for the timezone test page.
+			const row = page.getByRole( 'row', {
+				name: new RegExp( PAGE_TITLE ),
+			} );
+			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
+
+			// Open the date field for editing.
+			const editButton = page.getByRole( 'button', {
+				name: 'Edit Date',
+			} );
+			await editButton.locator( '..' ).hover();
+			await editButton.click();
+
+			const datetimeInput = page.locator(
+				'input[type="datetime-local"]'
+			);
+			await datetimeInput.waitFor( { state: 'visible' } );
+
+			// The input value should reflect the WP timezone (UTC-5),
+			// not the browser/system timezone.
+			await expect( datetimeInput ).toHaveValue( EXPECTED_LOCAL_VALUE );
+
+			// Change only the date via the input, preserving time.
+			await datetimeInput.fill( '2026-03-20T12:30' );
+			await expect( datetimeInput ).toHaveValue( '2026-03-20T12:30' );
+
+			// Change the time portion, verify it updates correctly.
+			await datetimeInput.fill( '2026-03-20T09:45' );
+			await expect( datetimeInput ).toHaveValue( '2026-03-20T09:45' );
+		} );
+	} );
 } );

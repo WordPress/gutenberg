@@ -697,14 +697,10 @@ class WP_Navigation_Block_Renderer {
 		if ( ! empty( $attributes['overlay'] ) ) {
 			// Get blocks from the overlay template part.
 			$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
-			// Check if overlay contains a navigation-overlay-close block.
-			$has_custom_overlay_close_block = block_core_navigation_block_tree_has_block_type(
-				$overlay_blocks,
-				'core/navigation-overlay-close',
-				array( 'core/navigation' ) // Skip navigation blocks, as they cannot contain an overlay close block
-			);
 			// Render template part blocks directly without navigation container wrapper.
 			$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
+			// Check if overlay contains a navigation-overlay-close block (detect in rendered HTML so it works with patterns).
+			$has_custom_overlay_close_block = block_core_navigation_overlay_html_has_close_block( $overlay_blocks_html );
 			// Add Interactivity API directives to the overlay close block if present.
 			if ( $has_custom_overlay_close_block && $is_interactive ) {
 				$tags                = new WP_HTML_Tag_Processor( $overlay_blocks_html );
@@ -1095,6 +1091,28 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 }
 
 /**
+ * Checks if the overlay HTML contains a navigation-overlay-close block.
+ *
+ * Uses WP_HTML_Tag_Processor to detect the close button in rendered output,
+ * so it works when the overlay uses patterns (pattern content is rendered at
+ * output time, not in the block tree).
+ *
+ * @since 7.0.0
+ *
+ * @param string $html The rendered overlay HTML.
+ * @return bool True if a close button element is found.
+ */
+function block_core_navigation_overlay_html_has_close_block( $html ) {
+	$tags = new WP_HTML_Tag_Processor( $html );
+	return $tags->next_tag(
+		array(
+			'tag_name'   => 'BUTTON',
+			'class_name' => 'wp-block-navigation-overlay-close',
+		)
+	);
+}
+
+/**
  * Add Interactivity API directives to the navigation-overlay-close block
  * markup using the Tag Processor.
  *
@@ -1324,17 +1342,6 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
 	}
 
 	return $font_sizes;
-}
-
-/**
- * Returns the top-level submenu SVG chevron icon.
- *
- * @since 5.9.0
- *
- * @return string
- */
-function block_core_navigation_render_submenu_icon() {
-	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
 
 /**

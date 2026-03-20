@@ -138,7 +138,7 @@ import { ThemeProvider } from '@wordpress/theme';
 
 function App() {
 	return (
-		<ThemeProvider color={ { primary: 'blue' } } density="compact">
+		<ThemeProvider color={ { primary: 'blue' } } cursor={ { control: 'pointer' } } density="compact">
 			{ /* Your app content */ }
 		</ThemeProvider>
 	);
@@ -152,6 +152,10 @@ The `color` prop accepts an object with the following optional properties:
 
 Both properties accept any valid CSS color value. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
 
+The `cursor` prop accepts an object with the following optional properties:
+
+-   `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'`.
+
 The `density` prop controls the spacing scale throughout the UI:
 
 -   `'default'`: Standard spacing for general use.
@@ -160,7 +164,7 @@ The `density` prop controls the spacing scale throughout the UI:
 
 The density setting adjusts dimension tokens like gaps and paddings to maintain consistent spacing throughout the UI. Changing the density automatically updates spacing of all components that use these tokens.
 
-When the `color` or `density` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
+When the `color`, `cursor`, or `density` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
 
 ### Nesting Providers
 
@@ -204,11 +208,13 @@ This package provides Stylelint plugins to help enforce consistent usage of desi
 {
 	"plugins": [
 		"@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens",
-		"@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties"
+		"@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties",
+		"@wordpress/theme/stylelint-plugins/no-token-fallback-values"
 	],
 	"rules": {
 		"plugin-wpds/no-unknown-ds-tokens": true,
-		"plugin-wpds/no-setting-wpds-custom-properties": true
+		"plugin-wpds/no-setting-wpds-custom-properties": true,
+		"plugin-wpds/no-token-fallback-values": true
 	}
 }
 ```
@@ -247,6 +253,27 @@ This rule reports an error when a CSS declaration sets (defines) a custom proper
 /* ✓ OK */
 .example {
 	--my-custom-token: red;
+}
+```
+
+### `plugin-wpds/no-token-fallback-values`
+
+This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. Fallback values for design tokens are injected automatically at build time by the [build plugins](#build-plugins), so manual fallbacks in source are redundant and can drift out of sync with the token definitions.
+
+```css
+/* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-fg-content-neutral' */
+.example {
+	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
+}
+
+/* ✓ OK */
+.example {
+	color: var(--wpds-color-fg-content-neutral);
+}
+
+/* ✓ OK: Non-wpds custom properties are not checked */
+.example {
+	color: var(--my-custom-color, red);
 }
 ```
 

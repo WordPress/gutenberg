@@ -1,4 +1,7 @@
-export { registerConnector as __experimentalRegisterConnector } from './api';
+export {
+	registerConnector as __experimentalRegisterConnector,
+	unregisterConnector as __experimentalUnregisterConnector,
+} from './api';
 export {
 	ConnectorItem as __experimentalConnectorItem,
 	DefaultConnectorSettings as __experimentalDefaultConnectorSettings,

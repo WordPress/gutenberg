@@ -7,7 +7,7 @@
 
 if ( ! defined( '_GUTENBERG_VERSION_MIGRATION' ) ) {
 	// It's necessary to update this version every time a new migration is needed.
-	define( '_GUTENBERG_VERSION_MIGRATION', '22.6.0' );
+	define( '_GUTENBERG_VERSION_MIGRATION', '22.8.0' );
 }
 
 /**
@@ -25,7 +25,7 @@ function _gutenberg_migrate_database() {
 			_gutenberg_migrate_remove_fse_drafts();
 		}
 
-		if ( version_compare( $gutenberg_installed_version, '22.6.0', '<' ) ) {
+		if ( version_compare( $gutenberg_installed_version, '22.8.0', '<' ) ) {
 			_gutenberg_migrate_enable_real_time_collaboration();
 		}
 
@@ -62,3 +62,27 @@ function _gutenberg_migrate_remove_fse_drafts() {
 	delete_option( 'gutenberg_last_synchronize_theme_template_checks' );
 	delete_option( 'gutenberg_last_synchronize_theme_template-part_checks' );
 }
+
+/**
+ * Update RTC option name.
+ *
+ * @since 22.8.0
+ */
+function _gutenberg_migrate_enable_real_time_collaboration() {
+	$value1 = get_option( 'enable_real_time_collaboration', '1' );
+	$value2 = get_option( 'wp_enable_real_time_collaboration', '1' );
+
+	// RTC is enabled by default in the plugin, so only set the value if it was
+	// previously disabled. Otherwise rely on the default value.
+	if ( ! $value1 || ! $value2 ) {
+		update_option( 'wp_collaboration_enabled', '0' );
+	}
+
+	delete_option( 'enable_real_time_collaboration' );
+	delete_option( 'wp_enable_real_time_collaboration' );
+}
+
+// Deletion of the `_wp_file_based` term (in _gutenberg_migrate_remove_fse_drafts) must happen
+// after its taxonomy (`wp_theme`) is registered. This happens in `gutenberg_register_wp_theme_taxonomy`,
+// which is hooked into `init` (default priority, i.e. 10).
+add_action( 'init', '_gutenberg_migrate_database', 20 );

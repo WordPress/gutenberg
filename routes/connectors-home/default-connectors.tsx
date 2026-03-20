@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack, Button } from '@wordpress/components';
+import { useEffect, useRef } from '@wordpress/element';
 import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
@@ -49,7 +50,7 @@ interface ConnectorData {
 /**
  * Reads connector data passed from PHP via the script module data mechanism.
  */
-function getConnectorData(): Record< string, ConnectorData > {
+export function getConnectorData(): Record< string, ConnectorData > {
 	try {
 		const parsed = JSON.parse(
 			document.getElementById(
@@ -70,11 +71,10 @@ const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
 
 function getConnectorLogo(
 	connectorId: string,
-	name: string,
 	logoUrl?: string
 ): React.ReactNode {
 	if ( logoUrl ) {
-		return <img src={ logoUrl } alt={ name } width={ 40 } height={ 40 } />;
+		return <img src={ logoUrl } alt="" width={ 40 } height={ 40 } />;
 	}
 	const Logo = CONNECTOR_LOGOS[ connectorId ];
 	if ( Logo ) {
@@ -105,7 +105,6 @@ interface ApiKeyConnectorConfig {
 	pluginSlug?: string;
 	settingName: string;
 	helpUrl?: string;
-	icon?: React.ReactNode;
 	isInstalled?: boolean;
 	isActivated?: boolean;
 	keySource?: ApiKeySource;
@@ -150,6 +149,7 @@ function ApiKeyConnector( {
 	} = useConnectorPlugin( {
 		pluginSlug,
 		settingName,
+		connectorName: label,
 		isInstalled,
 		isActivated,
 		keySource: initialKeySource,
@@ -161,6 +161,24 @@ function ApiKeyConnector( {
 		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
 		( pluginStatus === 'inactive' && canActivatePlugins === false );
 	const showActionButton = ! showUnavailableBadge;
+
+	const actionButtonRef = useRef< HTMLButtonElement >( null );
+	const pendingFocusRef = useRef( false );
+
+	// Restore focus to the action button after async actions complete.
+	useEffect( () => {
+		if ( pendingFocusRef.current && ! isBusy ) {
+			pendingFocusRef.current = false;
+			actionButtonRef.current?.focus();
+		}
+	}, [ isBusy, isExpanded, isConnected ] );
+
+	const handleActionClick = () => {
+		if ( pluginStatus === 'not-installed' || pluginStatus === 'inactive' ) {
+			pendingFocusRef.current = true;
+		}
+		handleButtonClick();
+	};
 
 	return (
 		<ConnectorItem
@@ -176,20 +194,16 @@ function ApiKeyConnector( {
 					{ showUnavailableBadge && <UnavailableActionBadge /> }
 					{ showActionButton && (
 						<Button
+							ref={ actionButtonRef }
 							variant={
 								isExpanded || isConnected
 									? 'tertiary'
 									: 'secondary'
 							}
-							size={
-								isExpanded || isConnected
-									? undefined
-									: 'compact'
-							}
-							onClick={ handleButtonClick }
+							size="compact"
+							onClick={ handleActionClick }
 							disabled={ pluginStatus === 'checking' || isBusy }
 							isBusy={ isBusy }
-							aria-expanded={ isExpanded }
 						>
 							{ getButtonLabel() }
 						</Button>
@@ -210,10 +224,20 @@ function ApiKeyConnector( {
 					readOnly={ isConnected || isExternallyConfigured }
 					keySource={ keySource }
 					onRemove={
-						isExternallyConfigured ? undefined : removeApiKey
+						isExternallyConfigured
+							? undefined
+							: async () => {
+									pendingFocusRef.current = true;
+									try {
+										await removeApiKey();
+									} catch {
+										pendingFocusRef.current = false;
+									}
+							  }
 					}
 					onSave={ async ( apiKey: string ) => {
 						await saveApiKey( apiKey );
+						pendingFocusRef.current = true;
 						setIsExpanded( false );
 					} }
 				/>
@@ -244,17 +268,13 @@ export function registerDefaultConnectors() {
 		registerConnector( connectorName, {
 			label: data.name,
 			description: data.description,
+			icon: getConnectorLogo( connectorId, data.logoUrl ),
 			render: ( props ) => (
 				<ApiKeyConnector
 					{ ...props }
 					pluginSlug={ data.plugin?.slug }
 					settingName={ authentication.settingName }
 					helpUrl={ authentication.credentialsUrl ?? undefined }
-					icon={ getConnectorLogo(
-						connectorId,
-						data.name,
-						data.logoUrl
-					) }
 					isInstalled={ data.plugin?.isInstalled }
 					isActivated={ data.plugin?.isActivated }
 					keySource={ authentication.keySource }

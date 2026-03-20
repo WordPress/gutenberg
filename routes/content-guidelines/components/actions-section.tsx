@@ -1,3 +1,5 @@
+/* @jsxRuntime automatic */
+
 /**
  * WordPress dependencies
  */
@@ -5,6 +7,7 @@ import {
 	Button,
 	Card,
 	Modal,
+	Notice,
 	useNavigator,
 	__experimentalText as Text,
 	__experimentalHeading as Heading,
@@ -13,7 +16,6 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useState } from '@wordpress/element';
-import { Notice } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -144,15 +146,13 @@ export default function ActionsSection() {
 				style={ { display: 'none' } }
 			/>
 			{ error && (
-				<Notice.Root
-					intent="warning"
-					className="content-guidelines__actions-notice"
+				<Notice
+					status="error"
+					onRemove={ () => setError( null ) }
+					isDismissible
 				>
-					<Notice.Title className="content-guidelines__actions-notice-title">
-						{ error }
-					</Notice.Title>
-					<Notice.CloseIcon onClick={ () => setError( null ) } />
-				</Notice.Root>
+					{ error }
+				</Notice>
 			) }
 			<Card className="content-guidelines__actions-card">
 				{ /*

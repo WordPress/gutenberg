@@ -10,7 +10,7 @@
 }
 
 .admin-ui-page__header {
-	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
+	padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-2xl);
 	border-bottom: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 	background: var(--wpds-color-bg-surface-neutral-strong);
 	position: sticky;
@@ -19,10 +19,11 @@
 }
 
 .admin-ui-page__header-title {
+	// @TODO: use Text component from UI when available.
 	font-family: var(--wpds-font-family-heading);
-	font-size: var(--wpds-font-size-xl);
+	font-size: var(--wpds-font-size-lg);
 	font-weight: var(--wpds-font-weight-medium);
-	line-height: var(--wpds-font-line-height-xl);
+	line-height: var(--wpds-font-line-height-lg);
 	margin: 0;
 	overflow: hidden;
 	text-overflow: ellipsis;

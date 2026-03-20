@@ -144,6 +144,48 @@ test.describe( 'Preview', () => {
 		await previewPage.close();
 	} );
 
+	// See: https://github.com/WordPress/gutenberg/issues/33758.
+	test( 'should not use stale autosave data after reverting title', async ( {
+		editor,
+		page,
+		previewUtils,
+	} ) => {
+		const editorPage = page;
+
+		// Create and publish a post.
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.fill( 'Sample Page' );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'original content' },
+		} );
+		await editor.publishPost();
+
+		// Close the panel.
+		await page.click( 'role=button[name="Close panel"i]' );
+
+		// Change the title and preview to trigger an autosave.
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.fill( 'Sample Page 2' );
+		const previewPage = await editor.openPreviewPage( editorPage );
+		const previewTitle = previewPage.locator( 'role=heading[level=1]' );
+		await expect( previewTitle ).toHaveText( 'Sample Page 2' );
+
+		// Return to editor, revert the title, and preview again.
+		await editorPage.bringToFront();
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.fill( 'Sample Page' );
+		await previewUtils.waitForPreviewNavigation( previewPage );
+
+		// Preview should show the reverted title, not the stale autosave.
+		await expect( previewTitle ).toHaveText( 'Sample Page' );
+
+		await previewPage.close();
+	} );
+
 	// Verify correct preview. See: https://github.com/WordPress/gutenberg/issues/33616
 	test( 'should display the correct preview when switching between published and draft statuses', async ( {
 		editor,

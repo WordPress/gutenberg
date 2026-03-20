@@ -1,12 +1,12 @@
 /**
- * WordPress dependencies
- */
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-/**
  * External dependencies
  */
 const path = require( 'path' );
+
+/**
+ * WordPress dependencies
+ */
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Pattern Overrides', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -699,6 +699,10 @@ test.describe( 'Pattern Overrides', () => {
 		);
 		await editor.showBlockToolbar();
 		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Disconnect' } )
+			.click();
 
 		// Check that the overrides remain.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -714,6 +718,7 @@ test.describe( 'Pattern Overrides', () => {
 
 	// See https://github.com/WordPress/gutenberg/pull/62014.
 	test( 'can convert a pattern block to regular blocks when the pattern supports overrides but not override values', async ( {
+		page,
 		admin,
 		requestUtils,
 		editor,
@@ -740,6 +745,10 @@ test.describe( 'Pattern Overrides', () => {
 		);
 		await editor.showBlockToolbar();
 		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Disconnect' } )
+			.click();
 
 		// Check that the overrides remain.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
