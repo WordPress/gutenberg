@@ -13,7 +13,6 @@ import {
 	ProgressBar,
 } from '@wordpress/components';
 import { useContext, useState } from '@wordpress/element';
-import type { FontFace } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -23,6 +22,20 @@ import { FontLibraryContext } from './context';
 import { Font } from './lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
 import { loadFontFaceInBrowser, normalizeCSSFontFaceFontFamily } from './utils';
+
+export interface FontFaceMetadata {
+	/*
+	 * Font name for display
+	 */
+	name: string;
+
+	/**
+	 * CSS @font-face font-family value.
+	 */
+	fontFamily: string;
+	fontStyle: 'italic' | 'normal';
+	fontWeight: string | number | undefined;
+}
 
 function UploadFonts() {
 	const { installFonts } = useContext( FontLibraryContext );
@@ -108,11 +121,7 @@ function UploadFonts() {
 		const fontFacesLoaded = await Promise.all(
 			files.map( async ( fontFile: File ) => {
 				const fontFaceData = await getFontFaceMetadata( fontFile );
-				await loadFontFaceInBrowser(
-					fontFaceData,
-					fontFaceData.file,
-					'all'
-				);
+				await loadFontFaceInBrowser( fontFaceData, fontFile, 'all' );
 				return fontFaceData;
 			} )
 		);
@@ -146,7 +155,9 @@ function UploadFonts() {
 		} );
 	}
 
-	const getFontFaceMetadata = async ( fontFile: File ) => {
+	const getFontFaceMetadata = async (
+		fontFile: File
+	): Promise< FontFaceMetadata > => {
 		const buffer = await readFileAsArrayBuffer( fontFile );
 		const fontObj: Font & {
 			onload?: ( val: { detail: { font: any } } ) => void;
@@ -175,7 +186,7 @@ function UploadFonts() {
 		const cssFontFamily = normalizeCSSFontFaceFontFamily( fontName );
 
 		return {
-			file: fontFile,
+			name: fontName,
 			fontFamily: cssFontFamily,
 			fontStyle: isItalic ? 'italic' : 'normal',
 			fontWeight: weightRange || fontWeight,
@@ -188,7 +199,7 @@ function UploadFonts() {
 	 * @param {Array} fontFaces The font faces to be installed
 	 * @return {void}
 	 */
-	const handleInstall = async ( fontFaces: FontFace[] ) => {
+	const handleInstall = async ( fontFaces: FontFaceMetadata[] ) => {
 		const fontFamilies = makeFamiliesFromFaces( fontFaces );
 
 		try {
