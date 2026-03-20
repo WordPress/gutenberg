@@ -37,7 +37,6 @@ import {
 	settings,
 	lastBlockAttributesChange,
 	lastBlockInserted,
-	blockEditingModes,
 	expandedBlock,
 	zoomLevel,
 	editedContentOnlySection,
@@ -287,6 +286,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: {},
+					blockEditingModes: new Map(),
 				} );
 
 				const newChildBlock = createBlock( 'core/test-child-block', {
@@ -345,6 +345,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: {},
+					blockEditingModes: new Map(),
 				} );
 				expect( state.tree.get( 'chicken' ) ).not.toBe(
 					existingState.tree.get( 'chicken' )
@@ -387,6 +388,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: {},
+					blockEditingModes: new Map(),
 				} );
 
 				const newChildBlock = createBlock( 'core/test-child-block', {
@@ -445,6 +447,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: {},
+					blockEditingModes: new Map(),
 				} );
 				expect( state.tree.get( 'chicken' ) ).not.toBe(
 					existingState.tree.get( 'chicken' )
@@ -516,6 +519,7 @@ describe( 'state', () => {
 					),
 					tree: new Map(),
 					controlledInnerBlocks: {},
+					blockEditingModes: new Map(),
 				} );
 
 				const newChildBlock1 = createBlock( 'core/test-child-block', {
@@ -610,6 +614,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: {},
+					blockEditingModes: new Map(),
 				} );
 
 				expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
@@ -685,6 +690,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: {},
+					blockEditingModes: new Map(),
 				} );
 
 				const newChildBlock = createBlock( 'core/test-block' );
@@ -737,6 +743,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: {},
+					blockEditingModes: new Map(),
 				} );
 
 				// The block object of the parent should be updated.
@@ -758,6 +765,7 @@ describe( 'state', () => {
 				isIgnoredChange: false,
 				tree: new Map(),
 				controlledInnerBlocks: {},
+				blockEditingModes: new Map(),
 			} );
 		} );
 
@@ -3776,17 +3784,18 @@ describe( 'state', () => {
 
 	describe( 'blockEditingModes', () => {
 		it( 'should return an empty map by default', () => {
-			expect( blockEditingModes( undefined, {} ) ).toEqual( new Map() );
+			const state = blocks( undefined, {} );
+			expect( state.blockEditingModes ).toEqual( new Map() );
 		} );
 
 		it( 'should set the editing mode for a block', () => {
-			const state = new Map();
-			const newState = blockEditingModes( state, {
+			const state = blocks( undefined, {} );
+			const newState = blocks( state, {
 				type: 'SET_BLOCK_EDITING_MODE',
 				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
 				mode: 'default',
 			} );
-			expect( newState ).toEqual(
+			expect( newState.blockEditingModes ).toEqual(
 				new Map( [
 					[ '14501cc2-90a6-4f52-aa36-ab6e896135d1', 'default' ],
 				] )
@@ -3794,30 +3803,36 @@ describe( 'state', () => {
 		} );
 
 		it( 'should clear the editing mode for a block', () => {
-			const state = new Map( [
-				[ '14501cc2-90a6-4f52-aa36-ab6e896135d1', 'default' ],
-			] );
-			const newState = blockEditingModes( state, {
+			let state = blocks( undefined, {} );
+			state = blocks( state, {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+				mode: 'default',
+			} );
+			const newState = blocks( state, {
 				type: 'UNSET_BLOCK_EDITING_MODE',
 				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
 			} );
-			expect( newState ).toEqual( new Map() );
+			expect( newState.blockEditingModes ).toEqual( new Map() );
 		} );
 
 		it( 'should clear editing modes when blocks are reset', () => {
-			const state = new Map( [
-				[ '', 'disabled' ],
-				[ '14501cc2-90a6-4f52-aa36-ab6e896135d1', 'default' ],
-			] );
-			const newState = blockEditingModes( state, {
-				type: 'RESET_BLOCKS',
+			let state = blocks( undefined, {} );
+			state = blocks( state, {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: '',
+				mode: 'disabled',
 			} );
-			expect( newState ).toEqual(
-				new Map( [
-					// Root mode should be maintained.
-					[ '', 'disabled' ],
-				] )
-			);
+			state = blocks( state, {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+				mode: 'contentOnly',
+			} );
+			const newState = blocks( state, {
+				type: 'RESET_BLOCKS',
+				blocks: [],
+			} );
+			expect( newState.blockEditingModes ).toEqual( new Map() );
 		} );
 	} );
 
@@ -4001,7 +4016,6 @@ describe( 'state', () => {
 				settings,
 				zoomLevel,
 				blockListSettings,
-				blockEditingModes,
 				editedContentOnlySection,
 			} )
 		);

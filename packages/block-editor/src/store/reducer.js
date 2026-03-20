@@ -1283,6 +1283,25 @@ export const blocks = pipe(
 		}
 		return state;
 	},
+
+	blockEditingModes( state = new Map(), action ) {
+		switch ( action.type ) {
+			case 'SET_BLOCK_EDITING_MODE':
+				if ( state.get( action.clientId ) === action.mode ) {
+					return state;
+				}
+				return new Map( state ).set( action.clientId, action.mode );
+			case 'UNSET_BLOCK_EDITING_MODE': {
+				if ( ! state.has( action.clientId ) ) {
+					return state;
+				}
+				const newState = new Map( state );
+				newState.delete( action.clientId );
+				return newState;
+			}
+		}
+		return state;
+	},
 } );
 
 /**
@@ -2128,38 +2147,6 @@ export function editedContentOnlySection( state, action ) {
 }
 
 /**
- * Reducer returning a map of block client IDs to block editing modes.
- *
- * @param {Map}    state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Map} Updated state.
- */
-export function blockEditingModes( state = new Map(), action ) {
-	switch ( action.type ) {
-		case 'SET_BLOCK_EDITING_MODE':
-			if ( state.get( action.clientId ) === action.mode ) {
-				return state;
-			}
-			return new Map( state ).set( action.clientId, action.mode );
-		case 'UNSET_BLOCK_EDITING_MODE': {
-			if ( ! state.has( action.clientId ) ) {
-				return state;
-			}
-			const newState = new Map( state );
-			newState.delete( action.clientId );
-			return newState;
-		}
-		case 'RESET_BLOCKS': {
-			return state.has( '' )
-				? new Map().set( '', state.get( '' ) )
-				: state;
-		}
-	}
-	return state;
-}
-
-/**
  * Reducer returning a map of style IDs to style overrides.
  *
  * @param {Map}    state  Current state.
@@ -2395,7 +2382,6 @@ const combinedReducers = combineReducers( {
 	editedContentOnlySection,
 	blockVisibility,
 	viewportModalClientIds,
-	blockEditingModes,
 	styleOverrides,
 	removalPromptData,
 	blockRemovalRules,
@@ -2526,7 +2512,7 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	// so the default block editing mode is set to disabled.
 	const sectionRootClientId = state.settings?.[ sectionRootClientIdKey ];
 	const sectionClientIds = state.blocks.order.get( sectionRootClientId );
-	const hasDisabledBlocks = Array.from( state.blockEditingModes ).some(
+	const hasDisabledBlocks = Array.from( state.blocks.blockEditingModes ).some(
 		( [ , mode ] ) => mode === 'disabled'
 	);
 	const templatePartClientIds = [];
@@ -2602,7 +2588,7 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 
 		// If the block already has an explicit block editing mode set,
 		// don't override it.
-		if ( state.blockEditingModes.has( clientId ) ) {
+		if ( state.blocks.blockEditingModes.has( clientId ) ) {
 			return;
 		}
 
@@ -2613,12 +2599,12 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			let ancestorBlockEditingMode;
 			let parent = state.blocks.parents.get( clientId );
 			while ( parent !== undefined ) {
-				if ( state.blockEditingModes.has( parent ) ) {
+				if ( state.blocks.blockEditingModes.has( parent ) ) {
 					// Checking the explicit block editing mode will be slower,
 					// as the block editing mode is more likely to be set on a
 					// distant ancestor.
 					ancestorBlockEditingMode =
-						state.blockEditingModes.get( parent );
+						state.blocks.blockEditingModes.get( parent );
 				}
 				if ( ancestorBlockEditingMode ) {
 					break;
