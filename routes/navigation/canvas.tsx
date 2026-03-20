@@ -85,7 +85,7 @@ const previewField = {
 	render: ( { item }: { item: WpTemplatePart } ) => {
 		return (
 			<Preview
-				content={ item?.content?.raw }
+				content={ item?.content?.raw || '' }
 				blocks={ item?.blocks }
 				description={ item.description }
 			/>

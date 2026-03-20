@@ -236,7 +236,7 @@ function UnforwardedLinkUI( props, ref ) {
 									} }
 									canAddPage={
 										permissions?.canCreate &&
-										type === 'page'
+										( ! type || type === 'page' )
 									}
 									canAddBlock={
 										blockEditingMode === 'default'
