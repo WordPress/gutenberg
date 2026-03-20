@@ -52,12 +52,6 @@
 	}
 }
 
-.editor-post-template__create-form {
-	@include break-medium() {
-		width: $grid-unit * 40;
-	}
-}
-
 .editor-post-template__classic-theme-dropdown {
 	padding: $grid-unit-10;
 }

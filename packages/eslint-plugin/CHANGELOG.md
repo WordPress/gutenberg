@@ -8,6 +8,7 @@
 
 -   Added [`no-dom-globals-in-module-scope`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-module-scope.md), [`no-dom-globals-in-constructor`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-constructor.md), [`no-dom-globals-in-react-cc-render`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-react-cc-render.md), and [`no-dom-globals-in-react-fc`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-react-fc.md) rules to prevent DOM global usage in SSR-unsafe contexts, replacing the unmaintained `eslint-plugin-ssr-friendly` package ([#76508](https://github.com/WordPress/gutenberg/pull/76508)).
 -   Added [`use-recommended-components`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/use-recommended-components.md) rule to encourage the use of recommended UI components in a WordPress environment ([#76222](https://github.com/WordPress/gutenberg/pull/76222)).
+-   Added [`no-unmerged-classname`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unmerged-classname.md) rule to flag components that set an explicit `className` while spreading rest props without destructuring and merging the incoming `className` ([#76458](https://github.com/WordPress/gutenberg/pull/76458)).
 
 ### Enhancements
 

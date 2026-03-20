@@ -1,11 +1,11 @@
-/* @jsx createElement */
+/* @jsxRuntime automatic */
 
 /**
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
 import { __, sprintf } from '@wordpress/i18n';
-import { createElement, useEffect, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	Spinner,
 	Navigator,

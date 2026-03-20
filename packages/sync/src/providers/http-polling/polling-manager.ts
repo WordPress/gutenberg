@@ -66,7 +66,7 @@ interface RoomState {
 	clientId: number;
 	createCompactionUpdate: () => SyncUpdate;
 	endCursor: number;
-	enforceConnectionLimit: boolean;
+	isPrimaryRoom: boolean;
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
@@ -267,12 +267,12 @@ function checkConnectionLimit(
 	awareness: AwarenessState,
 	roomState: RoomState
 ): boolean {
-	if ( ! roomState.enforceConnectionLimit ) {
+	if ( ! roomState.isPrimaryRoom || hasCheckedConnectionLimit ) {
 		return false;
 	}
 
 	// Limits are only enforced on the initial connection.
-	roomState.enforceConnectionLimit = false;
+	hasCheckedConnectionLimit = true;
 
 	const maxClientsPerRoom = applyFilters(
 		'sync.pollingProvider.maxClientsPerRoom',
@@ -300,6 +300,7 @@ function checkConnectionLimit(
 }
 
 let areListenersRegistered = false;
+let hasCheckedConnectionLimit = false;
 let hasCollaborators = false;
 let isActiveBrowser = 'visible' === document.visibilityState;
 let isPolling = false;
@@ -418,6 +419,9 @@ function poll(): void {
 				state.onStatusChange( { status: 'connected' } );
 			} );
 
+			// Reset before checking each room
+			hasCollaborators = false;
+
 			rooms.forEach( ( room ) => {
 				if ( ! roomStates.has( room.room ) ) {
 					return;
@@ -442,9 +446,14 @@ function poll(): void {
 				// Process awareness update.
 				roomState.processAwarenessUpdate( room.awareness );
 
-				// If there is another collaborator, resume the queue for the next poll
-				// and increase polling frequency.
-				if ( Object.keys( room.awareness ).length > 1 ) {
+				// If there is another collaborator on the primary entity,
+				// resume the queue for the next poll and increase polling
+				// frequency. We only check the primary room to avoid false
+				// positives from shared collection rooms (e.g. taxonomy/category).
+				if (
+					roomState.isPrimaryRoom &&
+					Object.keys( room.awareness ).length > 1
+				) {
 					hasCollaborators = true;
 					roomState.updateQueue.resume();
 				}
@@ -576,7 +585,7 @@ function registerRoom( {
 	 * How might this approach be improved? We could develop some way to annotate
 	 * entity loading so that the consumer can indicate which entity is primary.
 	 */
-	const enforceConnectionLimit = 0 === roomStates.size;
+	const isPrimaryRoom = 0 === roomStates.size;
 
 	function onAwarenessUpdate(): void {
 		roomState.localAwarenessState = awareness.getLocalState() ?? {};
@@ -628,7 +637,7 @@ function registerRoom( {
 				SyncUpdateType.COMPACTION
 			),
 		endCursor: 0,
-		enforceConnectionLimit,
+		isPrimaryRoom,
 		localAwarenessState: awareness.getLocalState() ?? {},
 		log,
 		onStatusChange,
@@ -685,6 +694,7 @@ function unregisterRoom( room: string ): void {
 			handleVisibilityChange
 		);
 		areListenersRegistered = false;
+		hasCheckedConnectionLimit = false;
 	}
 }
 

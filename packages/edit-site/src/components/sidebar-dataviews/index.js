@@ -3,34 +3,43 @@
  */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
+import {
+	trash,
+	pages,
+	drafts,
+	published,
+	scheduled,
+	pending,
+	notAllowed,
+} from '@wordpress/icons';
+import { useViewConfig } from '@wordpress/views';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 import DataViewItem from './dataview-item';
-import { getDefaultViews } from '../post-list/view-utils';
 
 const { useLocation } = unlock( routerPrivateApis );
+
+const SLUG_TO_ICON = {
+	all: pages,
+	published,
+	future: scheduled,
+	drafts,
+	pending,
+	private: notAllowed,
+	trash,
+};
 
 export default function DataViewsSidebarContent( { postType } ) {
 	const {
 		query: { activeView = 'all' },
 	} = useLocation();
-	const postTypeObject = useSelect(
-		( select ) => {
-			const { getPostType } = select( coreStore );
-			return getPostType( postType );
-		},
-		[ postType ]
-	);
-	const defaultViews = useMemo(
-		() => getDefaultViews( postTypeObject ),
-		[ postTypeObject ]
-	);
+	const { default_view: defaultView, view_list: viewList } = useViewConfig( {
+		kind: 'postType',
+		name: postType,
+	} );
 	if ( ! postType ) {
 		return null;
 	}
@@ -38,15 +47,15 @@ export default function DataViewsSidebarContent( { postType } ) {
 	return (
 		<>
 			<ItemGroup className="edit-site-sidebar-dataviews">
-				{ defaultViews.map( ( dataview ) => {
+				{ viewList?.map( ( view ) => {
 					return (
 						<DataViewItem
-							key={ dataview.slug }
-							slug={ dataview.slug }
-							title={ dataview.title }
-							icon={ dataview.icon }
-							type={ dataview.view.type }
-							isActive={ dataview.slug === activeView }
+							key={ view.slug }
+							slug={ view.slug }
+							title={ view.title }
+							icon={ SLUG_TO_ICON[ view.slug ] }
+							type={ view.view?.type ?? defaultView.type }
+							isActive={ view.slug === activeView }
 						/>
 					);
 				} ) }

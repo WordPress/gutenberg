@@ -1,4 +1,4 @@
-/* @jsx createElement */
+/* @jsxRuntime automatic */
 
 /**
  * WordPress dependencies
@@ -6,11 +6,10 @@
 import {
 	Button,
 	Icon,
-	Modal,
 	Notice,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
-	__experimentalText as Text,
+	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import {
 	DataViews,
@@ -18,12 +17,7 @@ import {
 	type View,
 } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	createElement,
-	useEffect,
-	useMemo,
-	useState,
-} from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { blockDefault } from '@wordpress/icons';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -241,7 +235,7 @@ export default function BlockGuidelines() {
 			) }
 			<HStack>
 				<Button variant="primary" onClick={ openModal }>
-					{ __( 'Add block guidelines' ) }
+					{ __( 'Add guidelines' ) }
 				</Button>
 			</HStack>
 
@@ -251,54 +245,24 @@ export default function BlockGuidelines() {
 					initialBlock={ selectedItem }
 				/>
 			) }
-			{ itemToDelete && (
-				<Modal
-					className="block-guidelines__remove-modal"
-					title={ __( 'Remove block guidelines' ) }
-					onRequestClose={ () => setItemToDelete( null ) }
-					size="small"
-				>
-					<VStack spacing={ 6 }>
-						<VStack spacing={ 4 }>
-							<Text size={ 13 } weight={ 400 }>
-								{ sprintf(
-									/* translators: %s: Block name. */
-									__(
-										'You are about to remove the block guidelines for the %s block.'
-									),
-									itemToDelete.label
-								) }
-							</Text>
-							<Text size={ 13 } weight={ 400 }>
-								{ __(
-									'This can be undone from revision history.'
-								) }
-							</Text>
-						</VStack>
-						<HStack justify="flex-end">
-							<Button
-								variant="tertiary"
-								onClick={ () => setItemToDelete( null ) }
-								disabled={ busy }
-								accessibleWhenDisabled
-							>
-								{ __( 'Cancel' ) }
-							</Button>
-							<Button
-								disabled={ busy }
-								accessibleWhenDisabled
-								isBusy={ busy }
-								variant="primary"
-								onClick={ handleDelete }
-								isDestructive
-								__next40pxDefaultSize
-							>
-								{ __( 'Remove' ) }
-							</Button>
-						</HStack>
-					</VStack>
-				</Modal>
-			) }
+			<ConfirmDialog
+				isOpen={ !! itemToDelete }
+				title={ __( 'Remove block guidelines' ) }
+				__experimentalHideHeader={ false }
+				onConfirm={ handleDelete }
+				onCancel={ () => setItemToDelete( null ) }
+				confirmButtonText={ __( 'Remove' ) }
+				isBusy={ busy }
+				size="small"
+			>
+				{ sprintf(
+					/* translators: %s: Block name. */
+					__(
+						'You are about to remove the block guidelines for the %s block. This can be undone from revision history.'
+					),
+					itemToDelete?.label ?? ''
+				) }
+			</ConfirmDialog>
 		</VStack>
 	);
 }

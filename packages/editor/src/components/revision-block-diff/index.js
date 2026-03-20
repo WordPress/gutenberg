@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { PanelBody } from '@wordpress/components';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -9,7 +8,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import PostPanelRow from '../post-panel-row';
+import RevisionDiffPanel from '../revision-diff-panel';
 
 /**
  * Panel that shows changed block attributes for the selected block
@@ -27,48 +26,14 @@ export default function RevisionBlockDiffPanel() {
 		return null;
 	}
 
-	const diffInfo = block.attributes?.__revisionDiffStatus;
-	const changedAttributes = diffInfo?.changedAttributes;
-
-	if ( ! changedAttributes ) {
-		return null;
-	}
-
-	const fields = Object.entries( changedAttributes ).map(
-		( [ key, parts ] ) => (
-			<PostPanelRow key={ key } label={ key }>
-				<span className="editor-revision-fields-diff__value">
-					{ parts.map( ( part, index ) => {
-						if ( part.added ) {
-							return (
-								<ins
-									key={ index }
-									className="editor-revision-fields-diff__added"
-								>
-									{ part.value }
-								</ins>
-							);
-						}
-						if ( part.removed ) {
-							return (
-								<del
-									key={ index }
-									className="editor-revision-fields-diff__removed"
-								>
-									{ part.value }
-								</del>
-							);
-						}
-						return <span key={ index }>{ part.value }</span>;
-					} ) }
-				</span>
-			</PostPanelRow>
-		)
-	);
+	const changedAttributes =
+		block.attributes?.__revisionDiffStatus?.changedAttributes;
 
 	return (
-		<PanelBody title={ __( 'Changed attributes' ) } initialOpen>
-			{ fields }
-		</PanelBody>
+		<RevisionDiffPanel
+			title={ __( 'Changed attributes' ) }
+			entries={ changedAttributes }
+			initialOpen
+		/>
 	);
 }
