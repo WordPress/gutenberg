@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { test, expect } from './fixtures';
+import { SECOND_USER } from './fixtures/collaboration-utils';
 
 /**
  * Helper: click into a content area, select all, and type replacement text.
@@ -32,9 +33,7 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			status: 'draft',
 			date_gmt: new Date().toISOString(),
 		} );
-		await collaborationUtils.openCollaborativeSession( post.id );
-
-		const { editor2, page2 } = collaborationUtils;
+		await collaborationUtils.openPost( post.id );
 
 		// User A inserts all text blocks.
 		await editor.insertBlock( {
@@ -61,6 +60,10 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			name: 'core/pullquote',
 			attributes: { value: 'A great quote', citation: 'Author A' },
 		} );
+
+		// User B joins after User A has inserted blocks.
+		await collaborationUtils.joinUser( post.id, SECOND_USER );
+		const { editor2, page2 } = collaborationUtils;
 
 		// Wait for User B to see all 6 blocks.
 		await expect
@@ -209,9 +212,7 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			status: 'draft',
 			date_gmt: new Date().toISOString(),
 		} );
-		await collaborationUtils.openCollaborativeSession( post.id );
-
-		const { editor2, page2 } = collaborationUtils;
+		await collaborationUtils.openPost( post.id );
 
 		// User A inserts all container blocks with inner content.
 		await editor.insertBlock( {
@@ -315,6 +316,10 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 				},
 			],
 		} );
+
+		// User B joins after User A has inserted blocks.
+		await collaborationUtils.joinUser( post.id, SECOND_USER );
+		const { editor2, page2 } = collaborationUtils;
 
 		// Wait for User B to see all 8 top-level blocks.
 		await expect
@@ -548,9 +553,7 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			status: 'draft',
 			date_gmt: new Date().toISOString(),
 		} );
-		await collaborationUtils.openCollaborativeSession( post.id );
-
-		const { editor2, page2 } = collaborationUtils;
+		await collaborationUtils.openPost( post.id );
 
 		// User A inserts all media/utility blocks.
 		await editor.insertBlock( {
@@ -619,6 +622,10 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			name: 'core/more',
 			attributes: { customText: 'Read more A' },
 		} );
+
+		// User B joins after User A has inserted blocks.
+		await collaborationUtils.joinUser( post.id, SECOND_USER );
+		const { editor2, page2 } = collaborationUtils;
 
 		// Wait for User B to see all 10 blocks.
 		await expect
@@ -802,9 +809,7 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			status: 'draft',
 			date_gmt: new Date().toISOString(),
 		} );
-		await collaborationUtils.openCollaborativeSession( post.id );
-
-		const { editor2, page2 } = collaborationUtils;
+		await collaborationUtils.openPost( post.id );
 
 		// User A inserts all widget/dynamic blocks.
 		await editor.insertBlock( {
@@ -866,6 +871,10 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			name: 'core/spacer',
 			attributes: { height: '100px' },
 		} );
+
+		// User B joins after User A has inserted blocks.
+		await collaborationUtils.joinUser( post.id, SECOND_USER );
+		const { editor2, page2 } = collaborationUtils;
 
 		// Wait for User B to see all 11 blocks.
 		await expect
