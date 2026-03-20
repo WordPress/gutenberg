@@ -32,13 +32,6 @@
 	}
 }
 
-@media ( max-width: $break-small ) {
-	// Temporary specificity bump until "wp-container" layout specificity is revisited.
-	.wp-block-post-template-is-layout-grid.wp-block-post-template-is-layout-grid.wp-block-post-template-is-layout-grid.wp-block-post-template-is-layout-grid {
-		grid-template-columns: 1fr;
-	}
-}
-
 .wp-block-post-template-is-layout-constrained > li > .alignright,
 .wp-block-post-template-is-layout-flow > li > .alignright {
 	float: right;

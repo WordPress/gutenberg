@@ -315,6 +315,7 @@ export default function PostTemplateEdit( {
 				setDisplayLayout( {
 					type: 'grid',
 					columnCount,
+					minimumColumnWidth: '12rem',
 				} ),
 			isActive: layoutType === 'grid',
 		},
