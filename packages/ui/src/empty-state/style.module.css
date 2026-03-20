@@ -22,10 +22,10 @@
 	}
 
 	.icon {
-		padding: var(--wpds-dimension-padding-surface-xs);
+		padding: var(--wpds-dimension-padding-xs);
 		border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 		border-radius: 50%;
-		background-color: var(--wpds-color-bg-surface-neutral);
+		background-color: var(--wpds-color-bg-surface-neutral-weak);
 	}
 
 	.title {
