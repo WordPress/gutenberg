@@ -231,6 +231,54 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					),
 				),
 			);
+		} else if ( 'postType' === $kind && 'wp_block' === $name ) {
+			$default_layouts = array(
+				'table' => array(
+					'layout' => array(
+						'styles' => array(
+							'author' => array(
+								'width' => '1%',
+							),
+						),
+					),
+				),
+				'grid' => array(
+					'layout' => array(
+						'badgeFields' => array( 'sync-status' ),
+					),
+				),
+			);
+			$default_view = array(
+				'type'       => 'grid',
+				'perPage'    => 20,
+				'titleField' => 'title',
+				'mediaField' => 'preview',
+				'fields'  => array( 'sync-status' ),
+				'filters' => array(),
+				'layout'  => isset( $default_layouts['grid']['layout'] ) ? $default_layouts['grid']['layout'] : array(),
+			);
+		} else if ( 'postType' === $kind && 'wp_template_part' === $name ) {
+			$default_layouts = array(
+				'table' => array(
+					'layout' => array(
+						'styles' => array(
+							'author' => array(
+								'width' => '1%',
+							),
+						),
+					),
+				),
+				'grid' => array(),
+			);
+			$default_view = array(
+				'type'       => 'grid',
+				'perPage'    => 20,
+				'titleField' => 'title',
+				'mediaField' => 'preview',
+				'fields'  => array( 'author' ),
+				'filters' => array(),
+				'layout'  => isset( $default_layouts['grid']['layout'] ) ? $default_layouts['grid']['layout'] : array(),
+			);
 		}
 
 		$response = array(

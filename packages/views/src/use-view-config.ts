@@ -32,7 +32,13 @@ export function useViewConfig( {
 } {
 	return useSelect(
 		( select ) => {
-			return unlock( select( coreStore ) ).getViewConfig( kind, name );
+			return (
+				unlock( select( coreStore ) ).getViewConfig( kind, name ) ?? {
+					default_view: undefined,
+					default_layouts: undefined,
+					view_list: undefined,
+				}
+			);
 		},
 		[ kind, name ]
 	);
