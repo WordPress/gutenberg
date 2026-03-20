@@ -136,13 +136,34 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 	add_action( 'admin_init', 'gutenberg_register_real_time_collaboration_setting' );
 }
 
+if ( ! function_exists( 'wp_is_collaboration_enabled' ) ) {
+	/**
+	 * Determines whether real-time collaboration is enabled.
+	 *
+	 * If the WP_ALLOW_COLLABORATION constant is false,
+	 * collaboration is always disabled regardless of the database option.
+	 * Otherwise, falls back to the 'wp_collaboration_enabled' option.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @return bool Whether real-time collaboration is enabled.
+	 */
+	function wp_is_collaboration_enabled() {
+		if ( ! defined( 'WP_ALLOW_COLLABORATION' ) || ! WP_ALLOW_COLLABORATION ) {
+			return false;
+		}
+
+		return (bool) get_option( 'wp_collaboration_enabled' );
+	}
+}
+
 /**
  * Injects the real-time collaboration setting into a global variable.
  */
 function gutenberg_inject_real_time_collaboration_setting() {
 	global $pagenow;
 
-	if ( ! get_option( 'wp_collaboration_enabled' ) ) {
+	if ( ! wp_is_collaboration_enabled() ) {
 		return;
 	}
 
