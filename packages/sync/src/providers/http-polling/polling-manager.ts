@@ -66,7 +66,7 @@ interface RoomState {
 	clientId: number;
 	createCompactionUpdate: () => SyncUpdate;
 	endCursor: number;
-	enforceConnectionLimit: boolean;
+	isPrimaryRoom: boolean;
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
@@ -267,12 +267,12 @@ function checkConnectionLimit(
 	awareness: AwarenessState,
 	roomState: RoomState
 ): boolean {
-	if ( ! roomState.enforceConnectionLimit ) {
+	if ( ! roomState.isPrimaryRoom || hasCheckedConnectionLimit ) {
 		return false;
 	}
 
 	// Limits are only enforced on the initial connection.
-	roomState.enforceConnectionLimit = false;
+	hasCheckedConnectionLimit = true;
 
 	const maxClientsPerRoom = applyFilters(
 		'sync.pollingProvider.maxClientsPerRoom',
@@ -300,13 +300,13 @@ function checkConnectionLimit(
 }
 
 let areListenersRegistered = false;
+let hasCheckedConnectionLimit = false;
 let hasCollaborators = false;
 let isActiveBrowser = 'visible' === document.visibilityState;
 let isPolling = false;
 let isUnloadPending = false;
 let pollInterval = POLLING_INTERVAL_IN_MS;
 let pollingTimeoutId: ReturnType< typeof setTimeout > | null = null;
-let primaryRoom: string | null = null;
 
 /**
  * Mark that a page unload has been requested. This fires on
@@ -451,7 +451,7 @@ function poll(): void {
 				// frequency. We only check the primary room to avoid false
 				// positives from shared collection rooms (e.g. taxonomy/category).
 				if (
-					room.room === primaryRoom &&
+					roomState.isPrimaryRoom &&
 					Object.keys( room.awareness ).length > 1
 				) {
 					hasCollaborators = true;
@@ -585,14 +585,7 @@ function registerRoom( {
 	 * How might this approach be improved? We could develop some way to annotate
 	 * entity loading so that the consumer can indicate which entity is primary.
 	 */
-	const enforceConnectionLimit = 0 === roomStates.size;
-
-	// The first room registered is treated as the "primary" entity.
-	// Used to scope the collaborator check to only this room, avoiding
-	// awareness results from shared collection rooms (e.g. taxonomy/category).
-	if ( ! primaryRoom ) {
-		primaryRoom = room;
-	}
+	const isPrimaryRoom = 0 === roomStates.size;
 
 	function onAwarenessUpdate(): void {
 		roomState.localAwarenessState = awareness.getLocalState() ?? {};
@@ -644,7 +637,7 @@ function registerRoom( {
 				SyncUpdateType.COMPACTION
 			),
 		endCursor: 0,
-		enforceConnectionLimit,
+		isPrimaryRoom,
 		localAwarenessState: awareness.getLocalState() ?? {},
 		log,
 		onStatusChange,
@@ -691,10 +684,6 @@ function unregisterRoom( room: string ): void {
 		postSyncUpdateNonBlocking( { rooms } );
 		state.unregister();
 		roomStates.delete( room );
-
-		if ( room === primaryRoom ) {
-			primaryRoom = null;
-		}
 	}
 
 	if ( 0 === roomStates.size && areListenersRegistered ) {
@@ -705,6 +694,7 @@ function unregisterRoom( room: string ): void {
 			handleVisibilityChange
 		);
 		areListenersRegistered = false;
+		hasCheckedConnectionLimit = false;
 	}
 }
 
