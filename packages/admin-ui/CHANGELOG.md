@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `Breadcrumbs`: improve `items` prop types to clarify that only the last item can omit the `to` property [#76493](https://github.com/WordPress/gutenberg/pull/76493/)
+-   `Breadcrumbs`: throw a runtime error when non-last items are missing a `to` prop [#76493](https://github.com/WordPress/gutenberg/pull/76493/)
 
 ## 1.10.0 (2026-03-18)
 

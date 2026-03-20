@@ -17,6 +17,7 @@ import type { BreadcrumbsProps } from './types';
  * Renders a breadcrumb navigation trail.
  *
  * All items except the last one must provide a `to` prop for navigation.
+ * In development mode, an error is thrown when a non-last item is missing `to`.
  * The last item represents the current page and its `to` prop is optional.
  * Only the last item (when it has no `to` prop) is rendered as an `h1`.
  *
@@ -41,6 +42,16 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 
 	const precedingItems = items.slice( 0, -1 );
 	const lastItem = items[ items.length - 1 ];
+
+	if ( process.env.NODE_ENV !== 'production' ) {
+		for ( let i = 0; i < precedingItems.length; i++ ) {
+			if ( ! precedingItems[ i ].to ) {
+				throw new Error(
+					`Breadcrumbs: item at index ${ i } ("${ precedingItems[ i ].label }") is missing a \`to\` prop. All items except the last one must have a \`to\` prop.`
+				);
+			}
+		}
+	}
 
 	return (
 		<nav aria-label={ __( 'Breadcrumbs' ) }>

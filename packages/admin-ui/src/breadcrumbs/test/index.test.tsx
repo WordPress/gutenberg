@@ -7,7 +7,6 @@ import { render, screen, within } from '@testing-library/react';
  * Internal dependencies
  */
 import { Breadcrumbs } from '..';
-import type { BreadcrumbsProps } from '../types';
 
 jest.mock( '@wordpress/route', () => ( {
 	Link: ( { to, children }: { to: string; children: React.ReactNode } ) => (
@@ -16,92 +15,63 @@ jest.mock( '@wordpress/route', () => ( {
 } ) );
 
 describe( 'Breadcrumbs', () => {
-	describe( 'types', () => {
-		it( 'dummy test', () => {
-			expect( true ).toBe( true );
+	describe( 'validation', () => {
+		it( 'should throw when a preceding item is missing `to`', () => {
+			expect( () =>
+				render(
+					<Breadcrumbs
+						items={ [
+							{ label: 'Home' },
+							{ label: 'Settings', to: '/settings' },
+							{ label: 'General' },
+						] }
+					/>
+				)
+			).toThrow( /item at index 0/ );
+			expect( console ).toHaveErrored();
 		} );
 
-		describe( 'should accept a single item without `to`', () => {
-			// eslint-disable-next-line no-unused-expressions
-			() => {
-				const props: BreadcrumbsProps = {
-					items: [ { label: 'Home' } ],
-				};
-				props satisfies BreadcrumbsProps;
-			};
+		it( 'should throw for the first preceding item missing `to`', () => {
+			expect( () =>
+				render(
+					<Breadcrumbs
+						items={ [
+							{ label: 'Home' },
+							{ label: 'Settings' },
+							{ label: 'General' },
+						] }
+					/>
+				)
+			).toThrow( /item at index 0 \("Home"\)/ );
+			expect( console ).toHaveErrored();
 		} );
 
-		describe( 'should accept a single item with `to`', () => {
-			// eslint-disable-next-line no-unused-expressions
-			() => {
-				const props: BreadcrumbsProps = {
-					items: [ { label: 'Home', to: '/' } ],
-				};
-				props satisfies BreadcrumbsProps;
-			};
+		it( 'should not throw when all preceding items have `to`', () => {
+			expect( () =>
+				render(
+					<Breadcrumbs
+						items={ [
+							{ label: 'Home', to: '/' },
+							{ label: 'Settings', to: '/settings' },
+							{ label: 'General' },
+						] }
+					/>
+				)
+			).not.toThrow();
 		} );
 
-		describe( 'should accept multiple items where all preceding items have `to`', () => {
-			// eslint-disable-next-line no-unused-expressions
-			() => {
-				const props: BreadcrumbsProps = {
-					items: [
-						{ label: 'Home', to: '/' },
-						{ label: 'Settings', to: '/settings' },
-						{ label: 'General' },
-					],
-				};
-				props satisfies BreadcrumbsProps;
-			};
+		it( 'should not throw when there is only one item without `to`', () => {
+			expect( () =>
+				render(
+					<Breadcrumbs items={ [ { label: 'Dashboard' } ] } />
+				)
+			).not.toThrow();
 		} );
 
-		describe( 'should accept multiple items where the last item also has `to`', () => {
-			// eslint-disable-next-line no-unused-expressions
-			() => {
-				const props: BreadcrumbsProps = {
-					items: [
-						{ label: 'Home', to: '/' },
-						{ label: 'Settings', to: '/settings' },
-					],
-				};
-				props satisfies BreadcrumbsProps;
-			};
-		} );
-
-		describe( 'should accept an empty items array', () => {
-			// eslint-disable-next-line no-unused-expressions
-			() => {
-				const props: BreadcrumbsProps = {
-					items: [],
-				};
-				props satisfies BreadcrumbsProps;
-			};
-		} );
-
-		describe( 'should reject a preceding item without `to`', () => {
-			// eslint-disable-next-line no-unused-expressions
-			() => {
-				const props: BreadcrumbsProps = {
-					// @ts-expect-error preceding items must have `to`.
-					items: [
-						{ label: 'Home' },
-						{ label: 'Settings', to: '/settings' },
-						{ label: 'General' },
-					],
-				};
-				props satisfies BreadcrumbsProps;
-			};
-		} );
-
-		describe( 'should reject items without a `label`', () => {
-			// eslint-disable-next-line no-unused-expressions
-			() => {
-				const props: BreadcrumbsProps = {
-					// @ts-expect-error items must have a `label`.
-					items: [ { to: '/' } ],
-				};
-				props satisfies BreadcrumbsProps;
-			};
+		it( 'should not throw when items is empty', () => {
+			expect( () =>
+				render( <Breadcrumbs items={ [] } /> )
+			).not.toThrow();
 		} );
 	} );
 
@@ -188,34 +158,6 @@ describe( 'Breadcrumbs', () => {
 				screen.getByRole( 'heading', { level: 1 } )
 			).toHaveTextContent( 'Dashboard' );
 			expect( screen.queryByRole( 'link' ) ).not.toBeInTheDocument();
-		} );
-
-		it( 'should render preceding items as links even without `to`', () => {
-			render(
-				<Breadcrumbs
-					// @ts-expect-error testing runtime behavior with invalid props
-					items={ [
-						{ label: 'Home' },
-						{ label: 'Settings' },
-						{ label: 'General' },
-					] }
-				/>
-			);
-
-			expect(
-				screen.queryByRole( 'heading', { level: 1 } )
-			).toHaveTextContent( 'General' );
-
-			const listItems = screen.getAllByRole( 'listitem' );
-			expect( listItems ).toHaveLength( 3 );
-			expect( listItems[ 0 ] ).not.toHaveTextContent( '' );
-			expect( listItems[ 0 ] ).toHaveTextContent( 'Home' );
-			expect( within( listItems[ 0 ] ).getByText( 'Home' ).tagName ).toBe(
-				'A'
-			);
-			expect(
-				within( listItems[ 1 ] ).getByText( 'Settings' ).tagName
-			).toBe( 'A' );
 		} );
 
 		it( 'should render inside a nav with an accessible label', () => {
