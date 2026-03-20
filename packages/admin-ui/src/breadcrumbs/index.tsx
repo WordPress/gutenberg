@@ -44,12 +44,11 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 	const lastItem = items[ items.length - 1 ];
 
 	if ( process.env.NODE_ENV !== 'production' ) {
-		for ( let i = 0; i < precedingItems.length; i++ ) {
-			if ( ! precedingItems[ i ].to ) {
-				throw new Error(
-					`Breadcrumbs: item at index ${ i } ("${ precedingItems[ i ].label }") is missing a \`to\` prop. All items except the last one must have a \`to\` prop.`
-				);
-			}
+		const invalidItem = precedingItems.find( ( item ) => ! item.to );
+		if ( invalidItem ) {
+			throw new Error(
+				`Breadcrumbs: item "${ invalidItem.label }" is missing a \`to\` prop. All items except the last one must have a \`to\` prop.`
+			);
 		}
 	}
 

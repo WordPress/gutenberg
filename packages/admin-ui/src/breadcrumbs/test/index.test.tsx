@@ -27,7 +27,7 @@ describe( 'Breadcrumbs', () => {
 						] }
 					/>
 				)
-			).toThrow( /item at index 0/ );
+			).toThrow( /item "Home" is missing a `to` prop/ );
 			expect( console ).toHaveErrored();
 		} );
 
@@ -42,7 +42,7 @@ describe( 'Breadcrumbs', () => {
 						] }
 					/>
 				)
-			).toThrow( /item at index 0 \("Home"\)/ );
+			).toThrow( /item "Home" is missing a `to` prop/ );
 			expect( console ).toHaveErrored();
 		} );
 
