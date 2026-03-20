@@ -57,6 +57,7 @@ _Parameters_
 -   _$0.wpAllowedMimeTypes_ `UploadMediaArgs[ 'wpAllowedMimeTypes' ]`: List of allowed mime types and file extensions.
 -   _$0.signal_ `UploadMediaArgs[ 'signal' ]`: Abort signal.
 -   _$0.multiple_ `UploadMediaArgs[ 'multiple' ]`: Whether to allow multiple files to be uploaded.
+-   _$0.onHeicPluginRequired_ `UploadMediaArgs[ 'onHeicPluginRequired' ]`: Callback when HEIC plugin installation is needed.
 
 ### validateFileSize
 
