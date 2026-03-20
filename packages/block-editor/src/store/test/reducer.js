@@ -3649,6 +3649,119 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'editedContentOnlySection', () => {
+		it( 'returns undefined by default', () => {
+			expect(
+				editedContentOnlySection( undefined, { type: 'UNKNOWN' } )
+			).toBeUndefined();
+		} );
+
+		it( 'sets the clientId on EDIT_CONTENT_ONLY_SECTION', () => {
+			const state = editedContentOnlySection( undefined, {
+				type: 'EDIT_CONTENT_ONLY_SECTION',
+				clientId: 'block-1',
+			} );
+			expect( state ).toBe( 'block-1' );
+		} );
+
+		it( 'clears the clientId when EDIT_CONTENT_ONLY_SECTION has no clientId', () => {
+			const state = editedContentOnlySection( 'block-1', {
+				type: 'EDIT_CONTENT_ONLY_SECTION',
+			} );
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'clears when the edited section is directly removed via REMOVE_BLOCKS', () => {
+			const state = editedContentOnlySection( 'block-1', {
+				type: 'REMOVE_BLOCKS',
+				clientIds: [ 'block-1' ],
+			} );
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'keeps state when REMOVE_BLOCKS targets other blocks', () => {
+			const state = editedContentOnlySection( 'block-1', {
+				type: 'REMOVE_BLOCKS',
+				clientIds: [ 'block-2', 'block-3' ],
+			} );
+			expect( state ).toBe( 'block-1' );
+		} );
+
+		it( 'clears when the edited section is directly replaced via REPLACE_BLOCKS', () => {
+			const state = editedContentOnlySection( 'block-1', {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'block-1' ],
+				blocks: [ { clientId: 'block-new', innerBlocks: [] } ],
+			} );
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'keeps state when REPLACE_BLOCKS targets other blocks', () => {
+			const state = editedContentOnlySection( 'block-1', {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'block-2' ],
+				blocks: [ { clientId: 'block-new', innerBlocks: [] } ],
+			} );
+			expect( state ).toBe( 'block-1' );
+		} );
+
+		it( 'clears when RESET_BLOCKS does not include the edited section', () => {
+			const state = editedContentOnlySection( 'block-1', {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{ clientId: 'block-2', innerBlocks: [] },
+					{ clientId: 'block-3', innerBlocks: [] },
+				],
+			} );
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'keeps state when RESET_BLOCKS includes the edited section at the top level', () => {
+			const state = editedContentOnlySection( 'block-1', {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{ clientId: 'block-1', innerBlocks: [] },
+					{ clientId: 'block-2', innerBlocks: [] },
+				],
+			} );
+			expect( state ).toBe( 'block-1' );
+		} );
+
+		it( 'keeps state when RESET_BLOCKS includes the edited section nested in innerBlocks', () => {
+			const state = editedContentOnlySection( 'block-1', {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'block-parent',
+						innerBlocks: [
+							{
+								clientId: 'block-1',
+								innerBlocks: [],
+							},
+						],
+					},
+				],
+			} );
+			expect( state ).toBe( 'block-1' );
+		} );
+
+		it( 'does not clear on unrelated actions when state is set', () => {
+			const state = editedContentOnlySection( 'block-1', {
+				type: 'SELECT_BLOCK',
+				clientId: 'block-2',
+			} );
+			expect( state ).toBe( 'block-1' );
+		} );
+
+		it( 'does not run cleanup logic when state is already empty', () => {
+			const state = editedContentOnlySection( undefined, {
+				type: 'REMOVE_BLOCKS',
+				clientIds: [ 'block-1' ],
+			} );
+			expect( state ).toBeUndefined();
+		} );
+	} );
+
 	describe( 'insertionPoint', () => {
 		it( 'should default to null', () => {
 			const state = insertionPoint( undefined, {} );

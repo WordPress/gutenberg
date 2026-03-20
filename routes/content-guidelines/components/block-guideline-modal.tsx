@@ -1,4 +1,4 @@
-/* @jsx createElement */
+/* @jsxRuntime automatic */
 
 /**
  * WordPress dependencies
@@ -12,9 +12,10 @@ import {
 	TextareaControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { createElement, useMemo, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	privateApis as blocksPrivateApis,
@@ -47,6 +48,8 @@ export default function BlockGuidelineModal( {
 
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ error, setError ] = useState< string | null >( null );
+	const [ showRemoveConfirmation, setShowRemoveConfirmation ] =
+		useState( false );
 
 	const blockGuidelines = useSelect(
 		// @ts-ignore
@@ -124,20 +127,16 @@ export default function BlockGuidelineModal( {
 
 	const canSubmit = selectedBlock && guidelineText.trim().length > 0;
 
-	let submitButtonLabel: string = __( 'Add guideline' );
+	let submitButtonLabel: string = __( 'Save guidelines' );
 	if ( isSaving ) {
 		submitButtonLabel = __( 'Saving…' );
-	} else if ( isEditing ) {
-		submitButtonLabel = __( 'Update guideline' );
 	}
 
 	return (
 		<Modal
 			className="block-guideline-modal"
 			title={
-				isEditing
-					? __( 'Edit block guidelines' )
-					: __( 'Add block guidelines' )
+				isEditing ? __( 'Edit guidelines' ) : __( 'Add guidelines' )
 			}
 			onRequestClose={ closeModal }
 		>
@@ -189,11 +188,10 @@ export default function BlockGuidelineModal( {
 						<Button
 							variant="tertiary"
 							isDestructive
-							// We need to pass an empty string to remove the guideline.
-							// This is because the API will only remove the guideline if the value is an empty string.
-							onClick={ () => handleSave( '' ) }
+							onClick={ () => setShowRemoveConfirmation( true ) }
 							disabled={ isSaving }
 							accessibleWhenDisabled
+							type="button"
 						>
 							{ __( 'Remove' ) }
 						</Button>
@@ -209,6 +207,29 @@ export default function BlockGuidelineModal( {
 					</Button>
 				</HStack>
 			</VStack>
+			<ConfirmDialog
+				isOpen={ showRemoveConfirmation }
+				title={ __( 'Remove block guidelines' ) }
+				__experimentalHideHeader={ false }
+				onConfirm={ () => {
+					// We need to pass an empty string to remove the guideline.
+					// This is because the API will only remove the guideline if the value is an empty string.
+					handleSave( '' );
+					setShowRemoveConfirmation( false );
+				} }
+				onCancel={ () => setShowRemoveConfirmation( false ) }
+				confirmButtonText={ __( 'Remove' ) }
+				isBusy={ isSaving }
+				size="small"
+			>
+				{ sprintf(
+					/* translators: %s: Block name. */
+					__(
+						'You are about to remove the block guidelines for the %s block. This can be undone from revision history.'
+					),
+					selectedBlockLabel
+				) }
+			</ConfirmDialog>
 		</Modal>
 	);
 }
