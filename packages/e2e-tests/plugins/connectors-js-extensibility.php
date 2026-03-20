@@ -4,9 +4,13 @@
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Author: Gutenberg Team
  *
- * Registers a custom-type connector on the server and enqueues a script module
- * that registers it client-side using the merging strategy (two registerConnector
- * calls with the same slug: one providing the render function, the other metadata).
+ * Registers two custom-type connectors on the server:
+ *
+ * 1. test_custom_service — also registered client-side via a script module using
+ *    the merging strategy (two registerConnector calls with the same slug: one
+ *    providing the render function, the other metadata).
+ * 2. test_server_only_service — server-only, with no client-side render function,
+ *    so it should not display a card in the UI.
  *
  * @package gutenberg-test-connectors-js-extensibility
  */
