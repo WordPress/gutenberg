@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { addQueryArgs } from '@wordpress/url';
 import { useViewConfig } from '@wordpress/views';
@@ -21,7 +23,7 @@ import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
 
-const SLUG_TO_ICON = {
+const SOURCE_TO_ICON = {
 	all: layout,
 	user: commentAuthorAvatar,
 	theme: layout,
@@ -37,6 +39,27 @@ export default function DataviewsTemplatesSidebarContent() {
 		kind: 'postType',
 		name: TEMPLATE_POST_TYPE,
 	} );
+	const authorSourceMap = useSelect( ( select ) => {
+		const templates = select( coreStore ).getEntityRecords(
+			'postType',
+			TEMPLATE_POST_TYPE,
+			{ per_page: -1 }
+		);
+		if ( ! templates ) {
+			return {};
+		}
+		const map = {};
+		for ( const template of templates ) {
+			if (
+				template.author_text &&
+				template.original_source &&
+				! map[ template.author_text ]
+			) {
+				map[ template.author_text ] = template.original_source;
+			}
+		}
+		return map;
+	}, [] );
 
 	return (
 		<ItemGroup className="edit-site-sidebar-navigation-screen-templates-browse">
@@ -50,9 +73,7 @@ export default function DataviewsTemplatesSidebarContent() {
 									activeView: item.slug,
 							  } )
 					}
-					icon={
-						SLUG_TO_ICON[ item.icon ] || SLUG_TO_ICON[ item.slug ]
-					}
+					icon={ SOURCE_TO_ICON[ authorSourceMap[ item.slug ] ] }
 					aria-current={ activeView === item.slug }
 				>
 					{ item.title }

@@ -160,7 +160,6 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					$view_list[]                  = array(
 						'title' => $author_text,
 						'slug'  => $author_text,
-						'icon'  => $original_source,
 						'view'  => array(
 							'filters' => array(
 								array(
@@ -185,7 +184,6 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					$view_list[]                  = array(
 						'title' => $author_text,
 						'slug'  => $author_text,
-						'icon'  => $original_source,
 						'view'  => array(
 							'filters' => array(
 								array(
@@ -324,9 +322,6 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 								'type' => 'string',
 							),
 							'slug'  => array(
-								'type' => 'string',
-							),
-							'icon'  => array(
 								'type' => 'string',
 							),
 							'view'  => array(
