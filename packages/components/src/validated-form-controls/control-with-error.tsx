@@ -265,15 +265,39 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 
 	const visibleMessage = showMessage ? message : null;
 
-	const describedBy =
-		[ children.props[ 'aria-describedby' ], visibleMessage && messageId ]
-			.filter( Boolean )
-			.join( ' ' ) || undefined;
+	// Imperatively manage `aria-describedby` on the validity target so we
+	// merge with any value the child control sets internally (e.g. from a
+	// `help` prop), rather than competing with it at the props level.
+	useEffect( () => {
+		const target = getValidityTarget();
+		if ( ! target ) {
+			return;
+		}
+
+		function setDescribedBy( shouldAdd: boolean ) {
+			const ids = ( target.getAttribute( 'aria-describedby' ) ?? '' )
+				.split( ' ' )
+				.filter( ( id ) => id && id !== messageId );
+
+			if ( shouldAdd ) {
+				ids.push( messageId );
+			}
+
+			if ( ids.length ) {
+				target.setAttribute( 'aria-describedby', ids.join( ' ' ) );
+			} else {
+				target.removeAttribute( 'aria-describedby' );
+			}
+		}
+
+		setDescribedBy( !! visibleMessage );
+
+		return () => setDescribedBy( false );
+	}, [ visibleMessage, messageId, getValidityTarget ] );
 
 	return (
 		<div className={ className } ref={ forwardedRef } onBlur={ onBlur }>
 			{ cloneElement( children, {
-				'aria-describedby': describedBy,
 				label: appendRequiredIndicator(
 					children.props.label,
 					required,
