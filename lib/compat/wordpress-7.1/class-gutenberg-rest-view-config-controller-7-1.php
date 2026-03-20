@@ -122,6 +122,83 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		} elseif ( 'postType' === $kind && 'wp_template_part' === $name ) {
 			$default_layouts = $this->get_default_layouts_for_wp_template_part();
 			$default_view    = $this->get_default_view_for_wp_template_part( $default_layouts );
+		} elseif ( 'postType' === $kind && 'wp_template' === $name ) {
+			$default_view    = array(
+				'type'             => 'grid',
+				'perPage'          => 20,
+				'sort'             => array(
+					'field'     => 'title',
+					'direction' => 'asc',
+				),
+				'titleField'       => 'title',
+				'descriptionField' => 'description',
+				'mediaField'       => 'preview',
+				'fields'           => array( 'author', 'active', 'slug', 'theme' ),
+				'filters'          => array(),
+				'showMedia'        => true,
+			);
+			$default_layouts = array(
+				'table' => array( 'showMedia' => false ),
+				'grid'  => array( 'showMedia' => true ),
+				'list'  => array( 'showMedia' => false ),
+			);
+			$view_list       = array(
+				array(
+					'title' => __( 'All templates', 'gutenberg' ),
+					'slug'  => 'all',
+				),
+			);
+
+			// Add unique author-based items from registered templates.
+			$registered_templates = gutenberg_get_registered_block_templates( array() );
+			$seen_authors         = array();
+			foreach ( $registered_templates as $template ) {
+				$original_source = self::get_template_original_source( $template );
+				$author_text     = self::get_template_author_text( $template, $original_source );
+				if ( ! empty( $author_text ) && ! isset( $seen_authors[ $author_text ] ) ) {
+					$seen_authors[ $author_text ] = true;
+					$view_list[]                  = array(
+						'title' => $author_text,
+						'slug'  => $author_text,
+						'icon'  => $original_source,
+						'view'  => array(
+							'filters' => array(
+								array(
+									'field'    => 'author',
+									'operator' => 'is',
+									'value'    => $author_text,
+									'isLocked' => true,
+								),
+							),
+						),
+					);
+				}
+			}
+
+			// User-created DB templates.
+			$db_templates = get_block_templates( array(), 'wp_template' );
+			foreach ( $db_templates as $template ) {
+				$original_source = self::get_template_original_source( $template );
+				$author_text     = self::get_template_author_text( $template, $original_source );
+				if ( ! empty( $author_text ) && ! isset( $seen_authors[ $author_text ] ) ) {
+					$seen_authors[ $author_text ] = true;
+					$view_list[]                  = array(
+						'title' => $author_text,
+						'slug'  => $author_text,
+						'icon'  => $original_source,
+						'view'  => array(
+							'filters' => array(
+								array(
+									'field'    => 'author',
+									'operator' => 'is',
+									'value'    => $author_text,
+									'isLocked' => true,
+								),
+							),
+						),
+					);
+				}
+			}
 		}
 
 		$response = array(
@@ -247,6 +324,9 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 								'type' => 'string',
 							),
 							'slug'  => array(
+								'type' => 'string',
+							),
+							'icon'  => array(
 								'type' => 'string',
 							),
 							'view'  => array(
@@ -674,5 +754,94 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			'filters'    => array(),
 			'layout'     => $default_layouts['grid']['layout'],
 		);
+	}
+
+	/**
+	 * Returns the original source of a template.
+	 *
+	 * @param WP_Block_Template $template_object Template instance.
+	 * @return string The original source ('theme', 'plugin', 'site', or 'user').
+	 */
+	private static function get_template_original_source( $template_object ) {
+		if ( 'wp_template' === $template_object->type || 'wp_template_part' === $template_object->type ) {
+			if ( $template_object->has_theme_file &&
+				( 'theme' === $template_object->origin || (
+					empty( $template_object->origin ) && in_array(
+						$template_object->source,
+						array(
+							'theme',
+							'custom',
+						),
+						true
+					) )
+				)
+			) {
+				return 'theme';
+			}
+
+			if ( 'plugin' === $template_object->origin ) {
+				return 'plugin';
+			}
+
+			if ( empty( $template_object->has_theme_file ) && 'custom' === $template_object->source && empty( $template_object->author ) ) {
+				return 'site';
+			}
+		}
+
+		return 'user';
+	}
+
+	/**
+	 * Returns a human readable text for the author of a template.
+	 *
+	 * @param WP_Block_Template $template_object Template instance.
+	 * @param string            $original_source The original source of the template.
+	 * @return string Human readable text for the author.
+	 */
+	private static function get_template_author_text( $template_object, $original_source ) {
+		switch ( $original_source ) {
+			case 'theme':
+				$theme_name = wp_get_theme( $template_object->theme )->get( 'Name' );
+				return empty( $theme_name ) ? $template_object->theme : $theme_name;
+			case 'plugin':
+				if ( ! function_exists( 'get_plugins' ) ) {
+					require_once ABSPATH . 'wp-admin/includes/plugin.php';
+				}
+				if ( isset( $template_object->plugin ) ) {
+					$plugins = wp_get_active_and_valid_plugins();
+
+					foreach ( $plugins as $plugin_file ) {
+						$plugin_basename      = plugin_basename( $plugin_file );
+						list( $plugin_slug, ) = explode( '/', $plugin_basename );
+
+						if ( $plugin_slug === $template_object->plugin ) {
+							$plugin_data = get_plugin_data( $plugin_file );
+
+							if ( ! empty( $plugin_data['Name'] ) ) {
+								return $plugin_data['Name'];
+							}
+
+							break;
+						}
+					}
+				}
+
+				$plugins         = get_plugins();
+				$plugin_basename = plugin_basename( sanitize_text_field( $template_object->theme . '.php' ) );
+				if ( isset( $plugins[ $plugin_basename ] ) && isset( $plugins[ $plugin_basename ]['Name'] ) ) {
+					return $plugins[ $plugin_basename ]['Name'];
+				}
+				return $template_object->plugin ?? $template_object->theme;
+			case 'site':
+				return get_bloginfo( 'name' );
+			case 'user':
+				$author = get_user_by( 'id', $template_object->author );
+				if ( ! $author ) {
+					return __( 'Unknown author', 'gutenberg' );
+				}
+				return $author->get( 'display_name' );
+		}
+
+		return '';
 	}
 }
