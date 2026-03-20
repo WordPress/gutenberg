@@ -434,8 +434,12 @@ module.exports = {
 		{
 			files: [ 'packages/components/src/**' ],
 			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
-			plugins: [ 'ssr-friendly' ],
-			extends: [ 'plugin:ssr-friendly/recommended' ],
+			rules: {
+				'@wordpress/no-dom-globals-in-module-scope': 'error',
+				'@wordpress/no-dom-globals-in-constructor': 'error',
+				'@wordpress/no-dom-globals-in-react-cc-render': 'error',
+				'@wordpress/no-dom-globals-in-react-fc': 'error',
+			},
 		},
 		{
 			files: [ 'packages/components/src/**' ],
@@ -477,6 +481,13 @@ module.exports = {
 						),
 					},
 				],
+			},
+		},
+		{
+			files: [ 'packages/ui/src/**' ],
+			excludedFiles: [ '**/@(test|stories)/**' ],
+			rules: {
+				'@wordpress/no-unmerged-classname': 'error',
 			},
 		},
 		{
@@ -558,7 +569,14 @@ module.exports = {
 		{
 			files: [ 'packages/eslint-plugin/**', 'packages/theme/**' ],
 			rules: {
+				'@wordpress/no-setting-ds-tokens': 'off',
 				'@wordpress/no-unknown-ds-tokens': 'off',
+			},
+		},
+		{
+			files: [ 'storybook/stories/**' ],
+			rules: {
+				'@wordpress/use-recommended-components': 'off',
 			},
 		},
 	],

@@ -23,6 +23,10 @@
 
 		/* For an outline that looks like `IconButton`'s */
 		border-radius: var(--wpds-border-radius-sm);
+
+		@media not (prefers-reduced-motion) {
+			transition: rotate 0.15s ease-out;
+		}
 	}
 
 	.header[data-panel-open] .header-trigger {
@@ -33,9 +37,33 @@
 	.header[data-disabled] .header-trigger {
 		color: var(--wpds-color-fg-interactive-neutral-disabled);
 	}
+
+	.content {
+		height: var(--collapsible-panel-height);
+		overflow: hidden;
+		margin-block-start: var(--wp-ui-card-header-content-margin);
+
+		&[hidden]:not([hidden="until-found"]) {
+			display: none;
+		}
+
+		&[data-starting-style],
+		&[data-ending-style] {
+			height: 0;
+		}
+
+		@media not (prefers-reduced-motion) {
+			transition: all 150ms ease-out;
+		}
+	}
+
 }
 
 @layer wp-ui-compositions {
+	.content-inner {
+		padding-block-start: 0;
+	}
+
 	.header {
 		display: flex;
 		flex-direction: row;

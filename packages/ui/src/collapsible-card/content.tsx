@@ -1,6 +1,8 @@
 import { forwardRef } from '@wordpress/element';
+import clsx from 'clsx';
 import * as Card from '../card';
 import * as Collapsible from '../collapsible';
+import styles from './style.module.css';
 import type { ContentProps } from './types';
 
 /**
@@ -8,13 +10,24 @@ import type { ContentProps } from './types';
  * visible when expanded.
  */
 export const Content = forwardRef< HTMLDivElement, ContentProps >(
-	function CollapsibleCardContent( { render, ...restProps }, ref ) {
+	function CollapsibleCardContent(
+		{ className, render, children, hiddenUntilFound = true, ...restProps },
+		ref
+	) {
 		return (
 			<Collapsible.Panel
 				ref={ ref }
-				render={ <Card.Content render={ render } /> }
+				className={ clsx( styles.content, className ) }
+				hiddenUntilFound={ hiddenUntilFound }
 				{ ...restProps }
-			/>
+			>
+				<Card.Content
+					className={ styles[ 'content-inner' ] }
+					render={ render }
+				>
+					{ children }
+				</Card.Content>
+			</Collapsible.Panel>
 		);
 	}
 );

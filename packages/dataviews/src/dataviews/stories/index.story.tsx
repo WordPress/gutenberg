@@ -41,9 +41,15 @@ const meta = {
 		layout: 'fullscreen',
 	},
 	decorators: [
-		( Story, { args }: { args: any } ) => (
+		( Story, { args, parameters }: { args: any; parameters: any } ) => (
 			<div style={ { padding: '1rem' } }>
-				<div style={ { height: args.containerHeight, minHeight: 0 } }>
+				<div
+					style={ {
+						height:
+							parameters.containerHeight ?? args.containerHeight,
+						minHeight: 0,
+					} }
+				>
 					<Story containerHeight={ args.containerHeight } />
 				</div>
 			</div>
@@ -259,4 +265,15 @@ export const WithCard = {
 
 export const InfiniteScroll = {
 	render: InfiniteScrollComponent,
+	parameters: {
+		containerHeight: '600px',
+	},
+	argTypes: {
+		containerHeight: {
+			control: false,
+			table: {
+				disable: true,
+			},
+		},
+	},
 };

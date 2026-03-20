@@ -88,6 +88,7 @@ function ConnectorsPage() {
 										slug={ connector.slug }
 										label={ connector.label }
 										description={ connector.description }
+										icon={ connector.icon }
 									/>
 								);
 							}
