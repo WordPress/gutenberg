@@ -13,9 +13,15 @@ import { parseFencedCode } from './utils';
 const transforms = {
 	from: [
 		{
-			type: 'input',
-			regExp: /^```$/,
-			transform: () => createBlock( 'core/code' ),
+			type: 'enter',
+			regExp: /^```(?:[ \t]*[^\s`]+)?[ \t]*$/,
+			transform: ( { content } ) => {
+				const parsedFencedCode = parseFencedCode( content, {
+					allowEndOfString: true,
+				} );
+
+				return createBlock( 'core/code', parsedFencedCode || {} );
+			},
 		},
 		{
 			type: 'block',
