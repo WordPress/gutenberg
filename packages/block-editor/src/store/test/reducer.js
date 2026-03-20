@@ -44,7 +44,7 @@ import {
 	withDerivedBlockEditingModes,
 	viewportModalClientIds,
 } from '../reducer';
-
+import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
 import { sectionRootClientIdKey, isIsolatedEditorKey } from '.././private-keys';
 
@@ -2476,6 +2476,203 @@ describe( 'state', () => {
 					} );
 
 					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+				} );
+
+				it( 'should preserve controlledInnerBlocks blocks across RESET_BLOCKS', () => {
+					const original = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							{
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					} );
+					const withControlled = blocks( original, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'chicken',
+						hasControlledInnerBlocks: true,
+					} );
+
+					const withControlledContent = blocks( withControlled, {
+						type: 'REPLACE_INNER_BLOCKS',
+						rootClientId: 'chicken',
+						blocks: [
+							{
+								clientId: 'content',
+								innerBlocks: [
+									{
+										clientId: 'content-inner',
+										innerBlocks: [],
+									},
+								],
+							},
+						],
+					} );
+
+					expect(
+						getBlocks(
+							{ blocks: withControlledContent },
+							'chicken'
+						).map( ( b ) => b.clientId )
+					).toEqual( [ 'content' ] );
+					expect(
+						getBlocks(
+							{ blocks: withControlledContent },
+							'content'
+						).map( ( b ) => b.clientId )
+					).toEqual( [ 'content-inner' ] );
+
+					const state = blocks( withControlledContent, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							{
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					} );
+
+					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					expect(
+						getBlocks( { blocks: state }, 'chicken' ).map(
+							( b ) => b.clientId
+						)
+					).toEqual( [ 'content' ] );
+					expect(
+						getBlocks( { blocks: state }, 'content' ).map(
+							( b ) => b.clientId
+						)
+					).toEqual( [ 'content-inner' ] );
+				} );
+
+				it( 'should forget controlledInnerBlocks during full RESET_BLOCKS', () => {
+					const templateBlock = {
+						clientId: 'template',
+						name: 'core/post-content',
+						attributes: {},
+						innerBlocks: [],
+					};
+					const contentBlock = {
+						clientId: 'content',
+						name: 'core/paragraph',
+						attributes: {},
+						innerBlocks: [],
+					};
+
+					let state = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [ templateBlock ],
+					} );
+
+					state = blocks( state, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'template',
+						hasControlledInnerBlocks: true,
+					} );
+
+					state = blocks( state, {
+						type: 'REPLACE_INNER_BLOCKS',
+						rootClientId: 'template',
+						blocks: [ contentBlock ],
+					} );
+
+					// Reset blocks completely, we expect that the controlled blocks are forgotten.
+					state = blocks( state, {
+						type: 'RESET_BLOCKS',
+						blocks: [],
+					} );
+
+					// Reset back to the template.
+					state = blocks( state, {
+						type: 'RESET_BLOCKS',
+						blocks: [ templateBlock ],
+					} );
+
+					// Expect that the `template`/`content` blocks are reconstructed.
+					const fullState = { blocks: state };
+					expect( getBlocks( fullState, 'template' ) ).toEqual( [] );
+					expect( getBlockOrder( fullState, 'template' ) ).toEqual(
+						[]
+					);
+				} );
+
+				it( 'should not leave stale controlled tree entries after root replacement and reset', () => {
+					const templateBlock = {
+						clientId: 'template',
+						name: 'core/post-content',
+						attributes: {},
+						innerBlocks: [],
+					};
+					const contentBlock = {
+						clientId: 'content',
+						name: 'core/paragraph',
+						attributes: {},
+						innerBlocks: [],
+					};
+
+					// Initialize template, simulates root `useBlockSync` initialization.
+					let state = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [ templateBlock ],
+					} );
+
+					// Add a controlled child to the template using two actions, simulates inner `useBlockSync` initialization.
+					state = blocks( state, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'template',
+						hasControlledInnerBlocks: true,
+					} );
+
+					state = blocks( state, {
+						type: 'REPLACE_INNER_BLOCKS',
+						rootClientId: 'template',
+						blocks: [ contentBlock ],
+					} );
+
+					// Reset blocks completely, simulates root `useBlockSync` cleanup.
+					state = blocks( state, {
+						type: 'RESET_BLOCKS',
+						blocks: [],
+					} );
+
+					// Unset controlled inner blocks, simulates inner `useBlockSync` cleanup.
+					state = blocks( state, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'template',
+						hasControlledInnerBlocks: false,
+					} );
+
+					// Initialize template again, simulates `useBlockSync` after navigation.
+					state = blocks( state, {
+						type: 'RESET_BLOCKS',
+						blocks: [ templateBlock ],
+					} );
+
+					// Set controlled inner blocks again, this time to empty.
+					state = blocks( state, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'template',
+						hasControlledInnerBlocks: true,
+					} );
+
+					state = blocks( state, {
+						type: 'REPLACE_INNER_BLOCKS',
+						rootClientId: 'template',
+						blocks: [],
+					} );
+
+					// At this point the template has empty content, and `useInnerBlockTemplateSync` should apply
+					// its template content. It will check if `getBlocks` is empty before applying the template.
+					const fullState = { blocks: state };
+					expect( getBlockOrder( fullState, 'template' ) ).toEqual(
+						[]
+					);
+					expect( getBlocks( fullState, 'template' ) ).toEqual( [] );
 				} );
 
 				it( 'should not create new state references when setting controlled inner blocks on a block with no inner blocks', () => {
