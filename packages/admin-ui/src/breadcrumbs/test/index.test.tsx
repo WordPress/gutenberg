@@ -62,9 +62,7 @@ describe( 'Breadcrumbs', () => {
 
 		it( 'should not throw when there is only one item without `to`', () => {
 			expect( () =>
-				render(
-					<Breadcrumbs items={ [ { label: 'Dashboard' } ] } />
-				)
+				render( <Breadcrumbs items={ [ { label: 'Dashboard' } ] } /> )
 			).not.toThrow();
 		} );
 
