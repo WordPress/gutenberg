@@ -18,7 +18,12 @@ import PostTrash from '../post-trash';
 import usePostFields from '../post-fields';
 import { unlock } from '../../lock-unlock';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
+import RevisionAuthorPanel from '../revision-author-panel';
+import RevisionCreatedPanel from '../revision-created-panel';
+import PostContentInformation from '../post-content-information';
+import { OpenRevisionsClassicScreen } from './post-summary';
 
+const EMPTY_ARRAY = [];
 const form = {
 	layout: {
 		type: 'panel',
@@ -71,16 +76,25 @@ const form = {
 };
 
 export default function DataFormPostSummary( { onActionPerformed } ) {
-	const { postType, postId } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPostId } = unlock(
-			select( editorStore )
-		);
-		return {
-			postType: getCurrentPostType(),
-			postId: getCurrentPostId(),
-		};
-	}, [] );
-
+	const { postType, postId, revisionId, isPostStatusPanelRemoved } =
+		useSelect( ( select ) => {
+			// We use isEditorPanelRemoved to hide the panel if it was programmatically removed. We do
+			// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
+			const {
+				isEditorPanelRemoved,
+				getCurrentPostType,
+				getCurrentPostId,
+				getCurrentRevisionId,
+			} = unlock( select( editorStore ) );
+			return {
+				postType: getCurrentPostType(),
+				postId: getCurrentPostId(),
+				revisionId: getCurrentRevisionId(),
+				isPostStatusPanelRemoved: isEditorPanelRemoved( 'post-status' ),
+			};
+		}, [] );
+	const shouldShowPostStatusPanel =
+		! isPostStatusPanelRemoved && ! revisionId;
 	const record = useSelect(
 		( select ) => {
 			if ( ! postType || ! postId ) {
@@ -120,43 +134,49 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 	const { editEntityRecord } = useDispatch( coreDataStore );
 
 	const _fields = usePostFields( { postType } );
-	const fields = useMemo(
-		() =>
-			_fields
-				?.map( ( field ) => {
-					if ( field.id === 'status' ) {
+	const fields = useMemo( () => {
+		if ( ! shouldShowPostStatusPanel ) {
+			return EMPTY_ARRAY;
+		}
+		return _fields
+			?.map( ( field ) => {
+				if ( field.id === 'status' ) {
+					return {
+						...field,
+						elements: field.elements.filter(
+							( element ) => element.value !== 'trash'
+						),
+					};
+				}
+				if ( field.id === 'template' ) {
+					// `usePostTemplatePanelMode` is reused in the Post Template panel to match
+					// the existing behavior. If the panel rendered nothing we should exclude the
+					// template field from the form.
+					if ( ! templatePanelMode ) {
+						return null;
+					}
+					// In classic themes without available templates we need to make the field read-only.
+					if (
+						templatePanelMode === 'classic' &&
+						Object.keys( availableTemplates ?? {} ).length === 0
+					) {
 						return {
 							...field,
-							elements: field.elements.filter(
-								( element ) => element.value !== 'trash'
-							),
+							readOnly: true,
+							render: () => __( 'Default template' ),
 						};
 					}
-					if ( field.id === 'template' ) {
-						// `usePostTemplatePanelMode` is reused in the Post Template panel to match
-						// the existing behavior. If the panel rendered nothing we should exclude the
-						// template field from the form.
-						if ( ! templatePanelMode ) {
-							return null;
-						}
-						// In classic themes without available templates we need to make the field read-only.
-						if (
-							templatePanelMode === 'classic' &&
-							Object.keys( availableTemplates ?? {} ).length === 0
-						) {
-							return {
-								...field,
-								readOnly: true,
-								render: () => __( 'Default template' ),
-							};
-						}
-						return field;
-					}
 					return field;
-				} )
-				.filter( Boolean ),
-		[ _fields, templatePanelMode, availableTemplates ]
-	);
+				}
+				return field;
+			} )
+			.filter( Boolean );
+	}, [
+		_fields,
+		templatePanelMode,
+		availableTemplates,
+		shouldShowPostStatusPanel,
+	] );
 
 	const onChange = ( edits ) => {
 		if (
@@ -173,7 +193,6 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 
 		editEntityRecord( 'postType', postType, postId, edits );
 	};
-
 	return (
 		<PostPanelSection className="editor-post-summary">
 			<VStack spacing={ 4 }>
@@ -182,13 +201,27 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					postId={ postId }
 					onActionPerformed={ onActionPerformed }
 				/>
-				<DataForm
-					data={ augmentedRecord }
-					fields={ fields }
-					form={ form }
-					onChange={ onChange }
-				/>
-				<PostTrash onActionPerformed={ onActionPerformed } />
+				{ shouldShowPostStatusPanel && (
+					<>
+						<DataForm
+							data={ augmentedRecord }
+							fields={ fields }
+							form={ form }
+							onChange={ onChange }
+						/>
+						<PostTrash onActionPerformed={ onActionPerformed } />
+					</>
+				) }
+				{ !! revisionId && (
+					<>
+						<VStack spacing={ 1 }>
+							<PostContentInformation />
+							<RevisionCreatedPanel />
+						</VStack>
+						<OpenRevisionsClassicScreen revisionId={ revisionId } />
+						<RevisionAuthorPanel />
+					</>
+				) }
 			</VStack>
 		</PostPanelSection>
 	);

@@ -44,6 +44,18 @@ import { unlock } from '../../lock-unlock';
  */
 const PANEL_NAME = 'post-status';
 
+export function OpenRevisionsClassicScreen( { revisionId } ) {
+	return (
+		<ExternalLink
+			href={ addQueryArgs( 'revision.php', {
+				revision: revisionId,
+			} ) }
+		>
+			{ __( 'Open classic revisions screen' ) }
+		</ExternalLink>
+	);
+}
+
 export default function PostSummary( { onActionPerformed } ) {
 	const postType = useSelect(
 		( select ) => select( editorStore ).getCurrentPostType(),
@@ -108,15 +120,9 @@ function ClassicPostSummary( { onActionPerformed } ) {
 							</VStack>
 							{ isRevisionsMode && revisionId && (
 								<>
-									<ExternalLink
-										href={ addQueryArgs( 'revision.php', {
-											revision: revisionId,
-										} ) }
-									>
-										{ __(
-											'Open classic revisions screen'
-										) }
-									</ExternalLink>
+									<OpenRevisionsClassicScreen
+										revisionId={ revisionId }
+									/>
 									<RevisionAuthorPanel />
 								</>
 							) }
