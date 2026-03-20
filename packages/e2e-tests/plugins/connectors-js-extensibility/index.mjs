@@ -7,6 +7,7 @@
  * combines the render function from JS with the metadata from PHP.
  */
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
