@@ -787,8 +787,10 @@ export function prepareItem( id: QueueItemId ) {
 
 		// If the file is not processed by vips, tell the server to
 		// generate sub-sizes since they won't be created client-side.
+		// Exception: HEIC images — the client handles sub-sizes via
+		// canvas fallback, so tell the server NOT to generate them.
 		const updates =
-			! isVipsSupported || ! isImage
+			( ! isVipsSupported && ! isHeic ) || ! isImage
 				? {
 						additionalData: {
 							...item.additionalData,
@@ -1105,6 +1107,18 @@ export function generateThumbnails( id: QueueItemId ) {
 		// using the browser's native decoder for sub-size generation.
 		const isHeicSource = HEIC_MIME_TYPES.includes( item.sourceFile.type );
 		let jpegConversion: File | null = null;
+
+		// The server can't read HEIC files, so missing_image_sizes will be
+		// empty even though no sub-sizes were generated. Derive the list
+		// from the registered image sizes in settings instead.
+		if (
+			isHeicSource &&
+			( ! attachment.missing_image_sizes ||
+				attachment.missing_image_sizes.length === 0 )
+		) {
+			const allImageSizes = settings.allImageSizes || {};
+			attachment.missing_image_sizes = Object.keys( allImageSizes );
+		}
 
 		if ( isHeicSource && attachment.id ) {
 			// Sideload the original HEIC to ensure it's tracked in metadata
