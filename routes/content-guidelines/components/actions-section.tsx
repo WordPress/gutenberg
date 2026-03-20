@@ -1,4 +1,4 @@
-/* @jsx createElement */
+/* @jsxRuntime automatic */
 
 /**
  * WordPress dependencies
@@ -15,7 +15,7 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { createElement, useRef, useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies

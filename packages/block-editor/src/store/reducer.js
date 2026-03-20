@@ -2104,6 +2104,33 @@ export function editedContentOnlySection( state, action ) {
 	if ( action.type === 'EDIT_CONTENT_ONLY_SECTION' ) {
 		return action.clientId;
 	}
+
+	// Early return if there's no section being edited.
+	if ( ! state ) {
+		return state;
+	}
+
+	switch ( action.type ) {
+		case 'REMOVE_BLOCKS':
+		case 'REPLACE_BLOCKS':
+			// Clear if the edited section is directly among the removed/replaced blocks.
+			// Note: this doesn't catch the case where a parent of the edited section
+			// is removed, since action.clientIds only contains the top-level IDs.
+			// That edge case is handled by the StopEditingContentOnlySectionOnOutsideSelect
+			// component in block-list/index.js.
+			if ( action.clientIds.includes( state ) ) {
+				return undefined;
+			}
+			break;
+		case 'RESET_BLOCKS':
+			// When all blocks are reset (e.g. navigating to a different post),
+			// check whether the edited section still exists in the new block tree.
+			if ( ! getFlattenedClientIds( action.blocks )[ state ] ) {
+				return undefined;
+			}
+			break;
+	}
+
 	return state;
 }
 
