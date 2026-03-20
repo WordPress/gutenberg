@@ -530,6 +530,26 @@ test.describe( 'Connectors', () => {
 			await requestUtils.deactivatePlugin( PLUGIN_SLUG );
 		} );
 
+		test( 'should not display a card for a server-only connector without a JS render function', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			// The server registers test_server_only_service but no JS
+			// registerConnector call provides a render function for it,
+			// so no card should appear in the UI.
+			await expect(
+				page.getByRole( 'heading', {
+					name: 'Test Server Only Service',
+					level: 2,
+				} )
+			).toBeHidden();
+		} );
+
 		test( 'should display a custom connector registered via JS with merging strategy', async ( {
 			page,
 			admin,

@@ -26,6 +26,18 @@ add_action(
 				),
 			)
 		);
+
+		$registry->register(
+			'test_server_only_service',
+			array(
+				'name'           => 'Test Server Only Service',
+				'description'    => 'A server-only service with no JS render.',
+				'type'           => 'custom_service',
+				'authentication' => array(
+					'method' => 'none',
+				),
+			)
+		);
 	}
 );
 
