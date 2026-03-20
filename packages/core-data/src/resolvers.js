@@ -1320,3 +1320,18 @@ export const getEditorAssets =
 		} );
 		dispatch.receiveEditorAssets( assets );
 	};
+
+/**
+ * Requests view config for a given entity type from the REST API.
+ *
+ * @param {string} kind Entity kind.
+ * @param {string} name Entity name.
+ */
+export const getViewConfig =
+	( kind, name ) =>
+	async ( { dispatch } ) => {
+		const config = await apiFetch( {
+			path: addQueryArgs( '/wp/v2/view-config', { kind, name } ),
+		} );
+		dispatch.receiveViewConfig( kind, name, config );
+	};

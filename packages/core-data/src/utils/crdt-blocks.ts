@@ -16,6 +16,7 @@ import { Y } from '@wordpress/sync';
  * Internal dependencies
  */
 import { createYMap, type YMapRecord, type YMapWrap } from './crdt-utils';
+import { getCachedRichTextData } from './crdt-text';
 import { Delta } from '../sync';
 
 interface BlockAttributes {
@@ -25,6 +26,7 @@ interface BlockAttributes {
 interface BlockAttributeType {
 	role?: string;
 	type?: string;
+	query?: Record< string, BlockAttributeType >;
 }
 
 interface BlockType {
@@ -118,6 +120,85 @@ function makeBlocksSerializable( blocks: Block[] ): Block[] {
 			name,
 			attributes: makeBlockAttributesSerializable( name, attributes ),
 			innerBlocks: makeBlocksSerializable( innerBlocks ),
+		};
+	} );
+}
+
+/**
+ * Recursively walk an attribute value and convert any strings that correspond
+ * to rich-text schema nodes into RichTextData instances. This is the inverse
+ * of serializeAttributeValue and handles nested structures like table cells.
+ *
+ * @param schema The attribute type definition for this value.
+ * @param value  The attribute value from CRDT (toJSON).
+ * @return The value with rich-text strings replaced by RichTextData.
+ */
+function deserializeAttributeValue(
+	schema: BlockAttributeType | undefined,
+	value: unknown
+): unknown {
+	if ( schema?.type === 'rich-text' && typeof value === 'string' ) {
+		return getCachedRichTextData( value );
+	}
+
+	// e.g. core/table `body`: [ { cells: [ { content: RichTextData } ] } ]
+	if ( Array.isArray( value ) ) {
+		return value.map( ( item ) =>
+			deserializeAttributeValue( schema, item )
+		);
+	}
+
+	// e.g. a single row inside core/table `body`: { cells: [ ... ] }
+	if ( value && typeof value === 'object' ) {
+		const result: Record< string, unknown > = {};
+
+		for ( const [ key, innerValue ] of Object.entries(
+			value as Record< string, unknown >
+		) ) {
+			result[ key ] = deserializeAttributeValue(
+				schema?.query?.[ key ],
+				innerValue
+			);
+		}
+
+		return result;
+	}
+
+	return value;
+}
+
+/**
+ * Convert blocks from their CRDT-serialized form back to the runtime form
+ * expected by the block editor. Rich-text attributes are stored as Y.Text in
+ * the CRDT document, which serializes to plain strings via toJSON(). This
+ * function restores them to RichTextData instances so that block edit
+ * components that rely on RichTextData methods (e.g. `.text`) work correctly.
+ *
+ * @param blocks Blocks as extracted from the CRDT document via toJSON().
+ * @return Blocks with rich-text attributes restored to RichTextData.
+ */
+export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
+	return blocks.map( ( block: Block ) => {
+		const { name, innerBlocks, attributes, ...rest } = block;
+
+		const newAttributes = { ...attributes };
+
+		for ( const [ key, value ] of Object.entries( attributes ) ) {
+			const schema = getBlockAttributeType( name, key );
+
+			if ( schema ) {
+				newAttributes[ key ] = deserializeAttributeValue(
+					schema,
+					value
+				);
+			}
+		}
+
+		return {
+			...rest,
+			name,
+			attributes: newAttributes,
+			innerBlocks: deserializeBlockAttributes( innerBlocks ?? [] ),
 		};
 	} );
 }
@@ -481,8 +562,8 @@ function getBlockAttributeType(
 				new Map< string, BlockAttributeType >(
 					Object.entries( blockType.attributes ?? {} ).map(
 						( [ name, definition ] ) => {
-							const { role, type } = definition;
-							return [ name, { role, type } ];
+							const { role, type, query } = definition;
+							return [ name, { role, type, query } ];
 						}
 					)
 				)

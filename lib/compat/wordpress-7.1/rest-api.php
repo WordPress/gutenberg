@@ -14,3 +14,12 @@ function gutenberg_register_icons_controller_endpoints() {
 	$icons_controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_icons_controller_endpoints', PHP_INT_MAX );
+
+/**
+ * Registers the View Config REST API routes.
+ */
+function gutenberg_register_view_config_controller_endpoints() {
+	$view_config_controller = new Gutenberg_REST_View_Config_Controller_7_1();
+	$view_config_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_view_config_controller_endpoints', PHP_INT_MAX );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -240,8 +240,17 @@ describe( 'DataViews component', () => {
 		expect( screen.getByText( 'TEST TITLE' ) ).toBeInTheDocument();
 	} );
 
-	it( 'should trigger infinite scroll when the layout container scrolls', () => {
-		const infiniteScrollHandler = jest.fn();
+	it( 'should trigger infinite scroll when the layout container scrolls', async () => {
+		const onChangeView = jest.fn();
+
+		if ( typeof global.IntersectionObserver === 'undefined' ) {
+			( global as any ).IntersectionObserver = jest.fn( () => ( {
+				observe: jest.fn(),
+				unobserve: jest.fn(),
+				disconnect: jest.fn(),
+			} ) );
+		}
+
 		const { container } = render(
 			<DataViewWrapper
 				view={ {
@@ -249,11 +258,7 @@ describe( 'DataViews component', () => {
 					infiniteScrollEnabled: true,
 					perPage: 1,
 				} }
-				paginationInfo={ {
-					totalItems: data.length,
-					totalPages: data.length,
-					infiniteScrollHandler,
-				} }
+				onChangeView={ onChangeView }
 			/>
 		);
 		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
@@ -278,7 +283,14 @@ describe( 'DataViews component', () => {
 
 		fireEvent.scroll( layoutContainer );
 
-		expect( infiniteScrollHandler ).toHaveBeenCalledTimes( 1 );
+		await waitFor( () => {
+			expect( onChangeView ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					infiniteScrollEnabled: true,
+					startPosition: 2,
+				} )
+			);
+		} );
 	} );
 
 	describe( 'in table view', () => {

@@ -9,6 +9,49 @@ import { Y } from '@wordpress/sync';
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
 /**
+ * Mock getBlockTypes so isRichTextAttribute can identify rich-text attrs.
+ */
+jest.mock( '@wordpress/blocks', () => {
+	const actual = jest.requireActual( '@wordpress/blocks' ) as Record<
+		string,
+		unknown
+	>;
+	return {
+		...actual,
+		getBlockTypes: () => [
+			{
+				name: 'core/paragraph',
+				attributes: { content: { type: 'rich-text' } },
+			},
+			{
+				name: 'core/table',
+				attributes: {
+					hasFixedLayout: { type: 'boolean' },
+					caption: { type: 'rich-text' },
+					body: {
+						type: 'array',
+						query: {
+							cells: {
+								type: 'array',
+								query: {
+									content: { type: 'rich-text' },
+									tag: { type: 'string' },
+								},
+							},
+						},
+					},
+				},
+			},
+		],
+	};
+} );
+
+/**
+ * WordPress dependencies
+ */
+import { RichTextData } from '@wordpress/rich-text';
+
+/**
  * Internal dependencies
  */
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
@@ -515,6 +558,68 @@ describe( 'crdt', () => {
 			expect( changes ).toHaveProperty( 'blocks' );
 		} );
 
+		it( 'returns rich-text block attributes as RichTextData, not strings', () => {
+			// Simulate User A writing a paragraph block into the CRDT doc.
+			addBlockToDoc( map, 'block-1', 'Hello world' );
+
+			// Simulate User B reading the CRDT doc with no local blocks.
+			const editedRecord = { blocks: [] } as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			const block = ( changes.blocks as any[] )?.[ 0 ];
+			expect( block ).toBeDefined();
+			expect( block.attributes.content ).toBeInstanceOf( RichTextData );
+			expect( block.attributes.content.text ).toBe( 'Hello world' );
+		} );
+
+		it( 'returns nested rich-text in array attributes as RichTextData', () => {
+			// Add a table block to the CRDT doc with nested cell content
+			// stored as plain strings.
+			let blocks = map.get( 'blocks' );
+			if ( ! ( blocks instanceof Y.Array ) ) {
+				blocks = new Y.Array< YBlock >();
+				map.set( 'blocks', blocks );
+			}
+
+			const tableBlock = createYMap< YBlockRecord >();
+			tableBlock.set( 'name', 'core/table' );
+			tableBlock.set( 'clientId', 'table-1' );
+			const attrs = new Y.Map();
+			attrs.set( 'body', [
+				{
+					cells: [
+						{ content: '<strong>Cell</strong>', tag: 'td' },
+						{ content: 'Plain', tag: 'td' },
+					],
+				},
+			] );
+			tableBlock.set( 'attributes', attrs );
+			tableBlock.set( 'innerBlocks', new Y.Array() );
+			( blocks as YBlocks ).push( [ tableBlock ] );
+
+			const editedRecord = { blocks: [] } as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			const block = ( changes.blocks as any[] )?.[ 0 ];
+			expect( block ).toBeDefined();
+
+			const cell = block.attributes.body[ 0 ].cells[ 0 ];
+			expect( cell.content ).toBeInstanceOf( RichTextData );
+			expect( ( cell.content as RichTextData ).toHTMLString() ).toBe(
+				'<strong>Cell</strong>'
+			);
+		} );
+
 		it( 'includes undefined blocks in changes', () => {
 			map.set( 'blocks', undefined );
 
@@ -801,11 +906,13 @@ describe( 'crdt', () => {
  * @param map
  * @param clientId Block client ID.
  * @param content  Initial text content.
+ * @param name     Block name (default: 'core/paragraph').
  */
 function addBlockToDoc(
 	map: YMapWrap< YPostRecord >,
 	clientId: string,
-	content: string
+	content: string,
+	name = 'core/paragraph'
 ): Y.Text {
 	let blocks = map.get( 'blocks' );
 	if ( ! ( blocks instanceof Y.Array ) ) {
@@ -814,6 +921,7 @@ function addBlockToDoc(
 	}
 
 	const block = createYMap< YBlockRecord >();
+	block.set( 'name', name );
 	block.set( 'clientId', clientId );
 	const attrs = new Y.Map();
 	const ytext = new Y.Text( content );
