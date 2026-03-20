@@ -6,7 +6,7 @@
 
 -   Upgraded to ESLint v10 with flat config format. The plugin now exports flat config arrays instead of eslintrc objects. Consumers must migrate from `.eslintrc.*` files to `eslint.config.mjs`. See the [migration guide](https://eslint.org/docs/latest/use/configure/migration-guide) for details.
 -   The minimum required ESLint version is now `^9.0.0 || ^10.0.0`.
--   Replaced `eslint-plugin-import` with `eslint-plugin-import-x`.
+-   Upgraded `eslint-plugin-import` to v2.31+ (wrapped with `fixupPluginRules` for flat config compatibility).
 -   Upgraded `@typescript-eslint/*` from v6 to v8 (via the unified `typescript-eslint` package).
 -   Replaced `eslint-plugin-eslint-comments` with `@eslint-community/eslint-plugin-eslint-comments`. Rule prefixes changed from `eslint-comments/*` to `@eslint-community/eslint-comments/*`.
 

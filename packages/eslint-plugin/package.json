@@ -42,6 +42,7 @@
 	},
 	"dependencies": {
 		"@babel/eslint-parser": "^7.28.6",
+		"@eslint-community/eslint-plugin-eslint-comments": "^4.4.0",
 		"@eslint/compat": "^2.0.0",
 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
 		"@wordpress/prettier-config": "file:../prettier-config",

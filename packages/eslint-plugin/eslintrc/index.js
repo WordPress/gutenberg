@@ -13,11 +13,11 @@
  * removed in the next major version.
  */
 
-// eslint-disable-next-line no-console
-console.warn(
+process.emitWarning(
 	'@wordpress/eslint-plugin/eslintrc is deprecated. ' +
 		'Please migrate to flat config (eslint.config.mjs). ' +
-		'See https://developer.wordpress.org/block-editor/reference-guides/packages/packages-eslint-plugin/ for migration instructions.'
+		'See https://developer.wordpress.org/block-editor/reference-guides/packages/packages-eslint-plugin/ for migration instructions.',
+	'DeprecationWarning'
 );
 
 const plugin = require( '../' );
@@ -63,6 +63,7 @@ function flatToEslintrc( flatConfigs ) {
 	const pluginNames = new Set();
 	const settings = {};
 	const overrides = [];
+	const globals = {};
 	let parserOptions = {};
 	let parser;
 
@@ -112,6 +113,9 @@ function flatToEslintrc( flatConfigs ) {
 			if ( config.settings ) {
 				Object.assign( settings, config.settings );
 			}
+			if ( config.languageOptions?.globals ) {
+				Object.assign( globals, config.languageOptions.globals );
+			}
 			if ( config.languageOptions?.parser && ! parser ) {
 				const parserMeta = config.languageOptions.parser.meta;
 				if ( parserMeta?.name ) {
@@ -134,6 +138,9 @@ function flatToEslintrc( flatConfigs ) {
 		rules,
 	};
 
+	if ( Object.keys( globals ).length > 0 ) {
+		result.globals = globals;
+	}
 	if ( Object.keys( settings ).length > 0 ) {
 		result.settings = settings;
 	}
