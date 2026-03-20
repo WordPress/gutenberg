@@ -176,7 +176,7 @@ add_action( 'admin_init', 'gutenberg_inject_real_time_collaboration_setting' );
 function gutenberg_set_collaboration_option_on_activation() {
 	update_option( 'wp_collaboration_enabled', '1' );
 }
-register_activation_hook( __FILE__, 'gutenberg_set_collaboration_option_on_activation' );
+register_activation_hook( dirname( __DIR__, 3 ) . '/gutenberg.php', 'gutenberg_set_collaboration_option_on_activation' );
 
 /**
  * Modifies the post list UI and heartbeat responses for real-time collaboration.
