@@ -15,7 +15,7 @@
  * @package gutenberg-test-connectors-js-extensibility
  */
 
-// Register a non Ai provider connector which does not have UI component wired.
+// Register two custom-type connectors for E2E testing.
 add_action(
 	'wp_connectors_init',
 	static function ( WP_Connector_Registry $registry ) {

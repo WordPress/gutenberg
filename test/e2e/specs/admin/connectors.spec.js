@@ -567,8 +567,8 @@ test.describe( 'Connectors', () => {
 				card.getByText( 'Custom rendered content for testing.' )
 			).toBeVisible();
 
-			// Verify label and description provided via a separate registerConnector
-			// call are merged into the same connector (upsert).
+			// Verify label and description from the server-side PHP registration
+			// are merged with the client-side JS render function.
 			await expect(
 				card.getByRole( 'heading', {
 					name: 'Test Custom Service',

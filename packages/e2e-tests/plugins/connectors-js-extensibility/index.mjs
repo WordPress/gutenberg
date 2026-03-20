@@ -1,10 +1,10 @@
 /**
- * Script module that demonstrates client-side connector registration
- * using the merging (upsert) strategy.
+ * Script module that demonstrates client-side connector registration.
  *
- * Two registerConnector() calls target the same slug. The store
- * shallow-merges each call, so the final connector combines the
- * render function from one call with label/description from the other.
+ * The server registers test_custom_service with its name and description.
+ * This module calls registerConnector() with the same slug to add a render
+ * function. The store merges both registrations, so the final connector
+ * combines the render function from JS with the metadata from PHP.
  */
 
 import {
