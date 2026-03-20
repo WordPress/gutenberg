@@ -14,13 +14,17 @@ const transforms = {
 	from: [
 		{
 			type: 'enter',
-			regExp: /^```(?:[ \t]*[^\s`]+)?[ \t]*$/,
+			regExp: /^```(?:[ \t]*[^\s`]+)?(?:[ \t]*(?:\r?\n|<br\s*\/?\s*>))?[ \t]*$/,
 			transform: ( { content } ) => {
 				const parsedFencedCode = parseFencedCode( content, {
 					allowEndOfString: true,
 				} );
 
-				return createBlock( 'core/code', parsedFencedCode || {} );
+				if ( parsedFencedCode ) {
+					return createBlock( 'core/code', parsedFencedCode );
+				}
+
+				return createBlock( 'core/code' );
 			},
 		},
 		{
