@@ -182,9 +182,11 @@ function getSassOptions( workingDir ) {
 
 function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 	return async function styleType( cssText, _dirname, filePath ) {
-		// Always hash the untransformed code.
+		// Always hash the untransformed code. The salt ensures that different
+		// build pipelines (which may produce different CSS module class names
+		// from the same source) never collide on the same data-wp-hash value.
 		const hash = createHash( 'sha1' )
-			.update( cssText )
+			.update( '@wordpress/wp-build' + cssText )
 			.digest( 'hex' )
 			.slice( 0, 10 );
 
