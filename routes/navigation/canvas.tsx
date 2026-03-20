@@ -397,7 +397,10 @@ function Canvas() {
 					'wp_template_part',
 					part.id
 				);
-				if ( edited?.content?.raw !== part?.content?.raw ) {
+				if (
+					edited?.content?.raw !== undefined &&
+					edited?.content?.raw !== part?.content?.raw
+				) {
 					return {
 						...part,
 						content: edited.content,
