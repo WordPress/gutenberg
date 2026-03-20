@@ -33,8 +33,8 @@ export interface FontFaceMetadata {
 	 * CSS @font-face font-family value.
 	 */
 	fontFamily: string;
-	fontStyle: 'italic' | 'normal';
-	fontWeight: string | number | undefined;
+	fontStyle?: string | undefined;
+	fontWeight?: string | number | undefined;
 }
 
 function UploadFonts() {

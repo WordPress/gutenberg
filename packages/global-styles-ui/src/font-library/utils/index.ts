@@ -10,10 +10,8 @@ import type { DataRegistry } from '@wordpress/data';
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
 import { fetchInstallFontFace } from '../api';
-import { formatFontFaceName } from './preview-styles';
 import type { FontFamilyToUpload, FontUploadResult } from '../types';
 import { unlock } from '../../lock-unlock';
-import type { FontFaceMetadata } from '../upload-fonts';
 
 /**
  * Browser dependencies
@@ -101,7 +99,7 @@ export function mergeFontFamilies(
  * It also adds it to the iframe document.
  */
 export async function loadFontFaceInBrowser(
-	fontFace: FontFaceMetadata,
+	fontFace: FontFace,
 	source: string | File,
 	addTo: 'all' | 'document' | 'iframe' = 'all'
 ): Promise< void > {
@@ -115,14 +113,10 @@ export async function loadFontFaceInBrowser(
 		return;
 	}
 
-	const newFont = new window.FontFace(
-		formatFontFaceName( fontFace.fontFamily ),
-		dataSource,
-		{
-			style: fontFace.fontStyle,
-			weight: String( fontFace.fontWeight ),
-		}
-	);
+	const newFont = new window.FontFace( fontFace.fontFamily, dataSource, {
+		style: fontFace.fontStyle,
+		weight: String( fontFace.fontWeight ),
+	} );
 
 	const loadedFace = await newFont.load();
 
@@ -156,7 +150,7 @@ export function unloadFontFaceInBrowser(
 	const unloadFontFace = ( fonts: FontFaceSet ) => {
 		fonts.forEach( ( f ) => {
 			if (
-				f.family === formatFontFaceName( fontFace?.fontFamily ) &&
+				f.family === fontFace?.fontFamily &&
 				f.weight === fontFace?.fontWeight &&
 				f.style === fontFace?.fontStyle
 			) {

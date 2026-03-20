@@ -82,44 +82,6 @@ export function formatFontFamily( input: string ) {
 	return formatItem( output );
 }
 
-/*
- * Format the font face name to use in the font-family property of a font face.
- *
- * The input can be a string with the font face name or a string with multiple font face names separated by commas.
- * It removes the leading and trailing quotes from the font face name.
- *
- * @param {string} input - The font face name.
- * @return {string} The formatted font face name.
- *
- * Example:
- * formatFontFaceName("Open Sans") => "Open Sans"
- * formatFontFaceName("'Open Sans', sans-serif") => "Open Sans"
- * formatFontFaceName(", 'Open Sans', 'Helvetica Neue', sans-serif") => "Open Sans"
- */
-export function formatFontFaceName( input: string ) {
-	if ( ! input ) {
-		return '';
-	}
-
-	let output = input.trim();
-	if ( output.includes( ',' ) ) {
-		output = (
-			output
-				.split( ',' )
-				// finds the first item that is not an empty string.
-				.find( ( item ) => item.trim() !== '' ) ?? ''
-		).trim();
-	}
-	// removes leading and trailing quotes.
-	output = output.replace( /^["']|["']$/g, '' );
-
-	// Firefox needs the font name to be wrapped in double quotes meanwhile other browsers don't.
-	if ( window.navigator.userAgent.toLowerCase().includes( 'firefox' ) ) {
-		output = `"${ output }"`;
-	}
-	return output;
-}
-
 export function getFamilyPreviewStyle(
 	family: FontFamily | FontFace
 ): CSSProperties {
