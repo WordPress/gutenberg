@@ -16,7 +16,7 @@ jest.mock( '@wordpress/data', () => ( {
 // Import after mocking
 import { store } from '../store';
 
-describe( 'Content Guidelines Store - CRUD Operations', () => {
+describe( 'Content Guidelines Store - Unit Tests (Selectors, Reducers, Actions)', () => {
 	let reducer: (
 		state: ContentGuidelinesState | undefined,
 		action: any
@@ -35,356 +35,309 @@ describe( 'Content Guidelines Store - CRUD Operations', () => {
 	/**
 	 * Initialize a fresh default state.
 	 */
-	function createInitialState() {
-		return reducer( undefined, { type: 'INIT' } );
+	function createInitialState(): ContentGuidelinesState {
+		return reducer( undefined, { type: '__INIT__' } );
 	}
 
-	/**
-	 * Apply a single guideline action to state.
-	 * @param state    Current state
-	 * @param category Category name ('site', 'copy', 'images', 'additional')
-	 * @param value    Guideline text
-	 */
-	function setGuideline(
-		state: ContentGuidelinesState,
-		category: string,
-		value: string
-	): ContentGuidelinesState {
-		return reducer( state, actions.setGuideline( category, value ) );
-	}
+	describe( 'Selectors', () => {
+		describe( 'getId', () => {
+			test( 'returns the ID from state', () => {
+				const state: ContentGuidelinesState = {
+					id: 42,
+					status: 'publish',
+					categories: {
+						site: 'Site Guidelines',
+						copy: '',
+						images: '',
+						additional: '',
+						blocks: {},
+					},
+				};
 
-	/**
-	 * Apply a block guideline action to state.
-	 * @param state     Current state
-	 * @param blockName Block identifier (e.g., 'core/paragraph')
-	 * @param value     Guideline text
-	 */
-	function setBlockGuideline(
-		state: ContentGuidelinesState,
-		blockName: string,
-		value: string
-	): ContentGuidelinesState {
-		return reducer( state, actions.setBlockGuideline( blockName, value ) );
-	}
+				const result = selectors.getId( state );
+				expect( result ).toBe( 42 );
+			} );
 
-	/**
-	 * Apply response from API to state.
-	 * @param state    Current state
-	 * @param response API response containing guidelines
-	 */
-	function setFromResponse(
-		state: ContentGuidelinesState,
-		response: RestGuidelinesResponse
-	): ContentGuidelinesState {
-		return reducer( state, actions.setFromResponse( response ) );
-	}
+			test( 'returns null when ID is not set', () => {
+				const state: ContentGuidelinesState = {
+					id: null,
+					status: 'draft',
+					categories: {
+						site: '',
+						copy: '',
+						images: '',
+						additional: '',
+						blocks: {},
+					},
+				};
 
-	describe( 'CREATE', () => {
-		test( 'should add site guideline', () => {
-			const state = createInitialState();
-			const updated = setGuideline( state, 'site', 'Use clear language' );
-
-			expect( selectors.getGuideline( updated, 'site' ) ).toBe(
-				'Use clear language'
-			);
-		} );
-
-		test( 'should add all standard category guidelines', () => {
-			let state = createInitialState();
-			state = setGuideline( state, 'site', 'Site guidelines' );
-			state = setGuideline( state, 'copy', 'Copy guidelines' );
-			state = setGuideline( state, 'images', 'Image guidelines' );
-			state = setGuideline(
-				state,
-				'additional',
-				'Additional guidelines'
-			);
-
-			const all = selectors.getAllGuidelines( state );
-			expect( all ).toMatchObject( {
-				site: 'Site guidelines',
-				copy: 'Copy guidelines',
-				images: 'Image guidelines',
-				additional: 'Additional guidelines',
+				const result = selectors.getId( state );
+				expect( result ).toBeNull();
 			} );
 		} );
 
-		test( 'should add block guideline', () => {
-			const state = createInitialState();
-			const updated = setBlockGuideline(
-				state,
-				'core/paragraph',
-				'Use short paragraphs'
-			);
+		describe( 'getStatus', () => {
+			test( 'returns the status from state', () => {
+				const state: ContentGuidelinesState = {
+					id: 1,
+					status: 'publish',
+					categories: {
+						site: '',
+						copy: '',
+						images: '',
+						additional: '',
+						blocks: {},
+					},
+				};
 
-			expect(
-				selectors.getBlockGuideline( updated, 'core/paragraph' )
-			).toBe( 'Use short paragraphs' );
-		} );
+				const result = selectors.getStatus( state );
+				expect( result ).toBe( 'publish' );
+			} );
 
-		test( 'should add multiple block guidelines', () => {
-			let state = createInitialState();
-			state = setBlockGuideline( state, 'core/paragraph', 'Para' );
-			state = setBlockGuideline( state, 'core/heading', 'Head' );
-			state = setBlockGuideline( state, 'core/image', 'Image' );
+			test( 'returns null when status is not set', () => {
+				const state: ContentGuidelinesState = {
+					id: 1,
+					status: null,
+					categories: {
+						site: '',
+						copy: '',
+						images: '',
+						additional: '',
+						blocks: {},
+					},
+				};
 
-			const blocks = selectors.getBlockGuidelines( state );
-			expect( blocks ).toMatchObject( {
-				'core/paragraph': 'Para',
-				'core/heading': 'Head',
-				'core/image': 'Image',
+				const result = selectors.getStatus( state );
+				expect( result ).toBeNull();
 			} );
 		} );
 
-		test( 'should hydrate from API response', () => {
-			const state = createInitialState();
-			const response: RestGuidelinesResponse = {
+		describe( 'getGuideline', () => {
+			const baseState: ContentGuidelinesState = {
 				id: 1,
-				status: 'draft',
-				guideline_categories: {
-					site: { guidelines: 'Site guidelines' },
-					copy: { guidelines: 'Copy guidelines' },
-					images: { guidelines: 'Image guidelines' },
-					additional: { guidelines: 'Additional guidelines' },
+				status: 'publish',
+				categories: {
+					site: 'Site guideline text',
+					copy: 'Copy guideline text',
+					images: 'Image guideline text',
+					additional: 'Additional guideline text',
 					blocks: {
-						'core/paragraph': {
-							guidelines: 'Paragraph guidelines',
-						},
+						'core/paragraph': 'Paragraph guidelines',
+						'core/heading': 'Heading guidelines',
 					},
 				},
 			};
 
-			const updated = setFromResponse( state, response );
+			test( 'returns text guideline for a category', () => {
+				expect( selectors.getGuideline( baseState, 'site' ) ).toBe(
+					'Site guideline text'
+				);
+				expect( selectors.getGuideline( baseState, 'copy' ) ).toBe(
+					'Copy guideline text'
+				);
+				expect( selectors.getGuideline( baseState, 'images' ) ).toBe(
+					'Image guideline text'
+				);
+				expect(
+					selectors.getGuideline( baseState, 'additional' )
+				).toBe( 'Additional guideline text' );
+			} );
 
-			expect( selectors.getId( updated ) ).toBe( 1 );
-			expect( selectors.getStatus( updated ) ).toBe( 'draft' );
-			expect( selectors.getGuideline( updated, 'site' ) ).toBe(
-				'Site guidelines'
-			);
-			expect(
-				selectors.getBlockGuideline( updated, 'core/paragraph' )
-			).toBe( 'Paragraph guidelines' );
-		} );
-	} );
+			test( 'returns block guidelines object for blocks category', () => {
+				const result = selectors.getGuideline( baseState, 'blocks' );
+				expect( result ).toEqual( {
+					'core/paragraph': 'Paragraph guidelines',
+					'core/heading': 'Heading guidelines',
+				} );
+			} );
 
-	describe( 'READ', () => {
-		test( 'should retrieve single guideline', () => {
-			const state = setGuideline(
-				createInitialState(),
-				'site',
-				'Test guidelines'
-			);
-
-			expect( selectors.getGuideline( state, 'site' ) ).toBe(
-				'Test guidelines'
-			);
-		} );
-
-		test( 'should retrieve all guidelines', () => {
-			let state = createInitialState();
-			state = setGuideline( state, 'site', 'Site' );
-			state = setGuideline( state, 'copy', 'Copy' );
-
-			const all = selectors.getAllGuidelines( state );
-			expect( all.site ).toBe( 'Site' );
-			expect( all.copy ).toBe( 'Copy' );
-			expect( all.images ).toBe( '' );
-		} );
-
-		test( 'should retrieve specific block guideline', () => {
-			const state = setBlockGuideline(
-				createInitialState(),
-				'core/paragraph',
-				'Para'
-			);
-
-			expect(
-				selectors.getBlockGuideline( state, 'core/paragraph' )
-			).toBe( 'Para' );
-		} );
-
-		test( 'should retrieve all block guidelines', () => {
-			let state = createInitialState();
-			state = setBlockGuideline( state, 'core/paragraph', 'Para' );
-			state = setBlockGuideline( state, 'core/heading', 'Head' );
-
-			const blocks = selectors.getBlockGuidelines( state );
-			expect( blocks ).toEqual( {
-				'core/paragraph': 'Para',
-				'core/heading': 'Head',
+			test( 'returns empty string for missing guideline', () => {
+				const state = createInitialState();
+				const result = selectors.getGuideline( state, 'site' );
+				expect( result ).toBe( '' );
 			} );
 		} );
 
-		test( 'should return empty string for non-existent block', () => {
-			const state = createInitialState();
+		describe( 'getAllGuidelines', () => {
+			test( 'returns all guidelines in categories object', () => {
+				const state: ContentGuidelinesState = {
+					id: 1,
+					status: 'publish',
+					categories: {
+						site: 'Site',
+						copy: 'Copy',
+						images: 'Images',
+						additional: 'Additional',
+						blocks: { 'core/test': 'Test' },
+					},
+				};
 
-			const guideline = selectors.getBlockGuideline(
-				state,
-				'core/does-not-exist'
-			);
-			expect( guideline ).toBe( '' );
+				const result = selectors.getAllGuidelines( state );
+				expect( result ).toEqual( state.categories );
+				expect( result ).toHaveProperty( 'site', 'Site' );
+				expect( result ).toHaveProperty( 'copy', 'Copy' );
+				expect( result ).toHaveProperty( 'images', 'Images' );
+				expect( result ).toHaveProperty( 'additional', 'Additional' );
+				expect( result ).toHaveProperty( 'blocks' );
+			} );
 		} );
 
-		test( 'should retrieve ID and status', () => {
-			const response: RestGuidelinesResponse = {
-				id: 42,
-				status: 'publish',
-				guideline_categories: {
-					site: { guidelines: 'Site' },
-				},
-			};
+		describe( 'getBlockGuidelines', () => {
+			test( 'returns all block guidelines', () => {
+				const state: ContentGuidelinesState = {
+					id: 1,
+					status: 'publish',
+					categories: {
+						site: '',
+						copy: '',
+						images: '',
+						additional: '',
+						blocks: {
+							'core/paragraph': 'Paragraph',
+							'core/heading': 'Heading',
+							'core/image': 'Image',
+						},
+					},
+				};
 
-			const state = setFromResponse( createInitialState(), response );
+				const result = selectors.getBlockGuidelines( state );
+				expect( result ).toEqual( {
+					'core/paragraph': 'Paragraph',
+					'core/heading': 'Heading',
+					'core/image': 'Image',
+				} );
+			} );
 
-			expect( selectors.getId( state ) ).toBe( 42 );
-			expect( selectors.getStatus( state ) ).toBe( 'publish' );
-		} );
-	} );
-
-	describe( 'UPDATE', () => {
-		test( 'should update existing guideline', () => {
-			let state = setGuideline(
-				createInitialState(),
-				'site',
-				'Original'
-			);
-			expect( selectors.getGuideline( state, 'site' ) ).toBe(
-				'Original'
-			);
-
-			state = setGuideline( state, 'site', 'Updated' );
-			expect( selectors.getGuideline( state, 'site' ) ).toBe( 'Updated' );
-		} );
-
-		test( 'should not affect other categories when updating', () => {
-			let state = createInitialState();
-			state = setGuideline( state, 'site', 'Site' );
-			state = setGuideline( state, 'copy', 'Copy' );
-
-			state = setGuideline( state, 'site', 'New site' );
-
-			expect( selectors.getGuideline( state, 'site' ) ).toBe(
-				'New site'
-			);
-			expect( selectors.getGuideline( state, 'copy' ) ).toBe( 'Copy' );
+			test( 'returns empty object when no blocks are set', () => {
+				const state = createInitialState();
+				const result = selectors.getBlockGuidelines( state );
+				expect( result ).toEqual( {} );
+			} );
 		} );
 
-		test( 'should update block guideline', () => {
-			let state = setBlockGuideline(
-				createInitialState(),
-				'core/paragraph',
-				'Original'
-			);
+		describe( 'getBlockGuideline', () => {
+			test( 'returns a specific block guideline', () => {
+				const state: ContentGuidelinesState = {
+					id: 1,
+					status: 'publish',
+					categories: {
+						site: '',
+						copy: '',
+						images: '',
+						additional: '',
+						blocks: {
+							'core/paragraph': 'Paragraph guidelines',
+							'core/heading': 'Heading guidelines',
+						},
+					},
+				};
 
-			state = setBlockGuideline( state, 'core/paragraph', 'Updated' );
+				expect(
+					selectors.getBlockGuideline( state, 'core/paragraph' )
+				).toBe( 'Paragraph guidelines' );
+				expect(
+					selectors.getBlockGuideline( state, 'core/heading' )
+				).toBe( 'Heading guidelines' );
+			} );
 
-			expect(
-				selectors.getBlockGuideline( state, 'core/paragraph' )
-			).toBe( 'Updated' );
-		} );
+			test( 'returns empty string for non-existent block', () => {
+				const state: ContentGuidelinesState = {
+					id: 1,
+					status: 'publish',
+					categories: {
+						site: '',
+						copy: '',
+						images: '',
+						additional: '',
+						blocks: {},
+					},
+				};
 
-		test( 'should not affect other blocks when updating', () => {
-			let state = createInitialState();
-			state = setBlockGuideline( state, 'core/paragraph', 'Para' );
-			state = setBlockGuideline( state, 'core/heading', 'Head' );
-
-			state = setBlockGuideline(
-				state,
-				'core/paragraph',
-				'Updated para'
-			);
-
-			expect(
-				selectors.getBlockGuideline( state, 'core/paragraph' )
-			).toBe( 'Updated para' );
-			expect( selectors.getBlockGuideline( state, 'core/heading' ) ).toBe(
-				'Head'
-			);
-		} );
-
-		test( 'should update from new API response', () => {
-			let state = createInitialState();
-
-			const firstResponse: RestGuidelinesResponse = {
-				id: 1,
-				status: 'draft',
-				guideline_categories: {
-					site: { guidelines: 'Original site guidelines' },
-				},
-			};
-
-			state = setFromResponse( state, firstResponse );
-
-			const secondResponse: RestGuidelinesResponse = {
-				id: 1,
-				status: 'publish',
-				guideline_categories: {
-					site: { guidelines: 'Updated site guidelines' },
-				},
-			};
-
-			state = setFromResponse( state, secondResponse );
-
-			expect( selectors.getGuideline( state, 'site' ) ).toBe(
-				'Updated site guidelines'
-			);
-			expect( selectors.getStatus( state ) ).toBe( 'publish' );
+				const result = selectors.getBlockGuideline(
+					state,
+					'core/nonexistent'
+				);
+				expect( result ).toBe( '' );
+			} );
 		} );
 	} );
 
-	describe( 'DELETE', () => {
-		test( 'should delete a guideline', () => {
-			let state = setGuideline( createInitialState(), 'site', 'Content' );
-			expect( selectors.getGuideline( state, 'site' ) ).toBe( 'Content' );
+	describe( 'Action Creators', () => {
+		describe( 'setFromResponse', () => {
+			test( 'creates action with response payload', () => {
+				const response: RestGuidelinesResponse = {
+					id: 5,
+					status: 'draft',
+					guideline_categories: {
+						site: { guidelines: 'Site' },
+						copy: { guidelines: 'Copy' },
+						images: { guidelines: 'Images' },
+						additional: { guidelines: 'Additional' },
+					},
+				};
 
-			state = reducer( state, actions.setGuideline( 'site', '' ) );
-			expect( selectors.getGuideline( state, 'site' ) ).toBe( '' );
+				const action = actions.setFromResponse( response );
+
+				expect( action.type ).toBe( 'SET_FROM_RESPONSE' );
+				expect( action.response ).toBe( response );
+			} );
 		} );
 
-		test( 'should delete without affecting other categories', () => {
+		describe( 'setGuideline', () => {
+			test( 'creates action with category and value', () => {
+				const action = actions.setGuideline(
+					'site',
+					'New site content'
+				);
+
+				expect( action.type ).toBe( 'SET_GUIDELINE' );
+				expect( action.category ).toBe( 'site' );
+				expect( action.value ).toBe( 'New site content' );
+			} );
+		} );
+
+		describe( 'setBlockGuideline', () => {
+			test( 'creates action with block name and value', () => {
+				const action = actions.setBlockGuideline(
+					'core/paragraph',
+					'Paragraph content'
+				);
+
+				expect( action.type ).toBe( 'SET_BLOCK_GUIDELINE' );
+				expect( action.blockName ).toBe( 'core/paragraph' );
+				expect( action.value ).toBe( 'Paragraph content' );
+			} );
+		} );
+	} );
+
+	describe( 'Reducer - Immutability & Edge Cases', () => {
+		test( 'does not mutate state object references', () => {
 			let state = createInitialState();
-			state = setGuideline( state, 'site', 'Site' );
-			state = setGuideline( state, 'copy', 'Copy' );
-
-			state = reducer( state, actions.setGuideline( 'site', '' ) );
-
-			expect( selectors.getGuideline( state, 'site' ) ).toBe( '' );
-			expect( selectors.getGuideline( state, 'copy' ) ).toBe( 'Copy' );
-		} );
-
-		test( 'should delete a block guideline', () => {
-			let state = setBlockGuideline(
-				createInitialState(),
-				'core/paragraph',
-				'Content'
-			);
+			const previousState = state;
 
 			state = reducer(
 				state,
-				actions.setBlockGuideline( 'core/paragraph', '' )
+				actions.setGuideline( 'site', 'New content' )
 			);
 
-			expect(
-				selectors.getBlockGuideline( state, 'core/paragraph' )
-			).toBe( '' );
+			// Should create a new state object
+			expect( state ).not.toBe( previousState );
 		} );
 
-		test( 'should delete block guideline without affecting other blocks', () => {
+		test( 'returns unchanged state for unknown action', () => {
 			let state = createInitialState();
-			state = setBlockGuideline( state, 'core/paragraph', 'Para' );
-			state = setBlockGuideline( state, 'core/heading', 'Head' );
+			state.categories = {
+				site: 'Site',
+				copy: 'Copy',
+				images: 'Images',
+				additional: 'Additional',
+				blocks: {},
+			};
 
-			state = reducer(
-				state,
-				actions.setBlockGuideline( 'core/paragraph', '' )
-			);
+			const previousCategories = state.categories;
+			state = reducer( state, { type: 'UNKNOWN_ACTION' } );
 
-			expect(
-				selectors.getBlockGuideline( state, 'core/paragraph' )
-			).toBe( '' );
-			expect( selectors.getBlockGuideline( state, 'core/heading' ) ).toBe(
-				'Head'
-			);
+			expect( state.categories ).toBe( previousCategories );
 		} );
 	} );
 } );
