@@ -31,8 +31,14 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $navigation_link_block );
 
-		$expected = '<li class="wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
-		$this->assertEquals( $expected, $result );
+		if ( is_wp_version_compatible( '7.0' ) ) {
+			$expected = '<li class="wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
+		} else {
+			// Block markup for WP 6.9 (space before wp-block-navigation-item class)
+			// TODO: Remove the second expected markup after WP 6.9 support is dropped and the old markup is no longer generated.
+			$expected = '<li class=" wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
+			$this->assertEquals( $expected, $result );
+		}
 	}
 
 	/**
