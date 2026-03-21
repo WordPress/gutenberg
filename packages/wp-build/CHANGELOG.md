@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Salt `data-wp-hash` with a build-tool identifier to prevent CSS module class name mismatches when multiple build pipelines process the same source file ([#76743](https://github.com/WordPress/gutenberg/pull/76743)).
+
 ## 0.10.0 (2026-03-18)
 
 ### Breaking Changes
