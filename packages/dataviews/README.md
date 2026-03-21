@@ -216,6 +216,7 @@ Properties:
     -   `isLocked`: whether the filter is locked (cannot be edited by the user).
 -   `perPage`: number of records to show per page.
 -   `page`: the page that is visible.
+-   `startPosition`: the first item to load when infinite scroll is enabled. Used instead of `page`.
 -   `sort`:
     -   `field`: the field used for sorting the dataset.
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
@@ -389,7 +390,6 @@ const actions = [
 
 -   `totalItems`: the total number of items in the datasets.
 -   `totalPages`: the total number of pages, taking into account the total items in the dataset and the number of items per page provided by the user.
--   `infiniteScrollHandler`: a function that handles infinite scrolling. This function should be called when the user scrolls to the bottom of the page. See [example in storybook](https://wordpress.github.io/gutenberg/?path=/story/dataviews-dataviews--infinite-scroll).
 
 #### `search`: `boolean`
 
@@ -690,7 +690,7 @@ A list of actions that can be performed on the dataset. See "Actions API" for mo
 
 #### `paginationInfo`: `Object`
 
-Same as `DataViews`. Contains `totalItems` and `totalPages` properties, and optionally `infiniteScrollHandler`.
+Same as `DataViews`. Contains `totalItems` and `totalPages` properties.
 
 #### `search`: `boolean`
 

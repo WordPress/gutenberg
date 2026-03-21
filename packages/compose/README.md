@@ -431,6 +431,7 @@ Runs a media query and returns its value when it changes.
 _Parameters_
 
 -   _query_ `[string]`: Media Query.
+-   _view_ `[Window]`: Window instance, else default to global window
 
 _Returns_
 
@@ -592,6 +593,7 @@ _Parameters_
 
 -   _breakpoint_ `WPBreakpoint`: Breakpoint size name.
 -   _operator_ `[WPViewportOperator]`: Viewport operator.
+-   _view_ `[Window]`: Window instance in which to perform viewport matching.
 
 _Returns_
 

@@ -1,5 +1,6 @@
-import { mergeProps, useRender } from '@base-ui/react';
 import { forwardRef } from '@wordpress/element';
+import clsx from 'clsx';
+import { Text } from '../text';
 import styles from './style.module.css';
 import type { TitleProps } from './types';
 
@@ -8,15 +9,15 @@ import type { TitleProps } from './types';
  * prop to swap in a semantic heading element when appropriate.
  */
 export const Title = forwardRef< HTMLDivElement, TitleProps >(
-	function CardTitle( { render, ...props }, ref ) {
-		const element = useRender( {
-			defaultTagName: 'div',
-			render,
-			ref,
-			// TODO: use `Text` component instead, when ready
-			props: mergeProps< 'div' >( { className: styles.title }, props ),
-		} );
-
-		return element;
+	function CardTitle( { className, render, children, ...props }, ref ) {
+		return (
+			<Text
+				variant="heading-lg"
+				render={ render ?? <div ref={ ref } { ...props } /> }
+				className={ clsx( styles.title, className ) }
+			>
+				{ children }
+			</Text>
+		);
 	}
 );
