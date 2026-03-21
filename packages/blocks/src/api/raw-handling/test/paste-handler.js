@@ -292,24 +292,12 @@ describe( 'pasteHandler', () => {
 		expect( result.isValid ).toBeTruthy();
 	} );
 
-	it( 'creates an image block when pasting a direct image URL', () => {
-		const [ result ] = pasteHandler( {
-			HTML: '<p>https://example.com/image.jpg</p>',
-			plainText: 'https://example.com/image.jpg',
-			mode: 'BLOCKS',
-		} );
-
-		expect( console ).toHaveLogged();
-		expect( result.name ).toEqual( 'core/image' );
-		expect( result.attributes.url ).toEqual(
-			'https://example.com/image.jpg'
-		);
-	} );
-
-	it( 'creates an image block for various image extensions', () => {
+	it( 'creates an image block for various image extensions and query parameters', () => {
 		const extensions = [ 'jpg', 'jpeg', 'png', 'gif', 'webp', 'avif' ];
+		const extensionsWithQuery = [ 'jpg?size=large&quality=80' ];
+		const allExtensions = [ ...extensions, ...extensionsWithQuery ];
 
-		for ( const ext of extensions ) {
+		for ( const ext of allExtensions ) {
 			const url = `https://example.com/image.${ ext }`;
 			const [ result ] = pasteHandler( {
 				HTML: `<p>${ url }</p>`,
@@ -322,19 +310,6 @@ describe( 'pasteHandler', () => {
 		}
 
 		expect( console ).toHaveLogged();
-	} );
-
-	it( 'creates an image block for image URLs with query parameters', () => {
-		const url = 'https://example.com/image.jpg?size=large&quality=80';
-		const [ result ] = pasteHandler( {
-			HTML: `<p>${ url }</p>`,
-			plainText: url,
-			mode: 'BLOCKS',
-		} );
-
-		expect( console ).toHaveLogged();
-		expect( result.name ).toEqual( 'core/image' );
-		expect( result.attributes.url ).toEqual( url );
 	} );
 
 	it( 'creates an embed block for non-image URLs', () => {

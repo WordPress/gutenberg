@@ -72,8 +72,7 @@ const schema = ( { phrasingContentSchema } ) => ( {
 /**
  * Image file extensions that indicate a URL points directly to an image.
  */
-const IMAGE_EXTENSIONS =
-	/\.(?:jpe?g|png|gif|webp|avif|ico|bmp|tiff?)(?:\?.*)?$/i;
+const IMAGE_EXTENSIONS = /\.(?:jpe?g|png|gif|webp|avif|ico|bmp)(?:\?.*)?$/i;
 
 const transforms = {
 	from: [
