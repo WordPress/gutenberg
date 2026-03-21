@@ -200,6 +200,8 @@ interface ItemExtent {
 }
 
 interface ItemLocation {
+	/** 0 = file offset (mdat), 1 = idat offset. */
+	constructionMethod: number;
 	extents: ItemExtent[];
 }
 
@@ -228,8 +230,10 @@ function parseIloc( r: Reader, box: BoxInfo ): Map< number, ItemLocation > {
 	for ( let i = 0; i < itemCount; i++ ) {
 		const itemId = version < 2 ? r.u16() : r.u32();
 
+		let constructionMethod = 0;
 		if ( version === 1 || version === 2 ) {
-			r.u16(); // construction_method + reserved
+			const cm = r.u16();
+			constructionMethod = cm & 0xf; // lower 4 bits
 		}
 
 		r.u16(); // data_reference_index
@@ -249,7 +253,7 @@ function parseIloc( r: Reader, box: BoxInfo ): Map< number, ItemLocation > {
 			} );
 		}
 
-		items.set( itemId, { extents } );
+		items.set( itemId, { constructionMethod, extents } );
 	}
 
 	return items;
@@ -466,15 +470,24 @@ function buildCodecString( r: Reader, recordOffset: number ): string {
 /**
  * Read item data by concatenating all extents for a given item location.
  *
- * @param buffer File ArrayBuffer.
- * @param loc    Item location with extents.
+ * For construction_method 0, offsets are absolute file positions.
+ * For construction_method 1, offsets are relative to the idat box data.
+ *
+ * @param buffer     File ArrayBuffer.
+ * @param loc        Item location with extents.
+ * @param idatOffset Byte offset of the idat box's data within the file.
  */
-function readItemData( buffer: ArrayBuffer, loc: ItemLocation ): Uint8Array {
+function readItemData(
+	buffer: ArrayBuffer,
+	loc: ItemLocation,
+	idatOffset: number
+): Uint8Array {
+	const baseOffset = loc.constructionMethod === 1 ? idatOffset : 0;
+
 	if ( loc.extents.length === 1 ) {
 		const ext = loc.extents[ 0 ];
-		return new Uint8Array(
-			buffer.slice( ext.offset, ext.offset + ext.length )
-		);
+		const start = baseOffset + ext.offset;
+		return new Uint8Array( buffer.slice( start, start + ext.length ) );
 	}
 	let totalLength = 0;
 	for ( const ext of loc.extents ) {
@@ -483,10 +496,9 @@ function readItemData( buffer: ArrayBuffer, loc: ItemLocation ): Uint8Array {
 	const data = new Uint8Array( totalLength );
 	let pos = 0;
 	for ( const ext of loc.extents ) {
+		const start = baseOffset + ext.offset;
 		data.set(
-			new Uint8Array(
-				buffer.slice( ext.offset, ext.offset + ext.length )
-			),
+			new Uint8Array( buffer.slice( start, start + ext.length ) ),
 			pos
 		);
 		pos += ext.length;
@@ -565,6 +577,10 @@ export function parseHeic( buffer: ArrayBuffer ): HeicImageData {
 	const iprpBox = children.find( ( b ) => b.type === 'iprp' );
 	const iinfBox = children.find( ( b ) => b.type === 'iinf' );
 	const irefBox = children.find( ( b ) => b.type === 'iref' );
+	const idatBox = children.find( ( b ) => b.type === 'idat' );
+
+	// idat data offset (for construction_method 1 items).
+	const idatOffset = idatBox ? idatBox.offset + idatBox.headerSize : 0;
 
 	if ( ! pitmBox || ! ilocBox || ! iprpBox ) {
 		throw new Error( 'Missing required boxes (pitm, iloc, iprp) in HEIC' );
@@ -613,7 +629,8 @@ export function parseHeic( buffer: ArrayBuffer ): HeicImageData {
 			locations,
 			allAssoc,
 			properties,
-			irefBox
+			irefBox,
+			idatOffset
 		);
 	}
 
@@ -644,7 +661,13 @@ export function parseHeic( buffer: ArrayBuffer ): HeicImageData {
 	return {
 		codecString,
 		description,
-		tiles: [ { data: readItemData( buffer, primaryLoc ), x: 0, y: 0 } ],
+		tiles: [
+			{
+				data: readItemData( buffer, primaryLoc, idatOffset ),
+				x: 0,
+				y: 0,
+			},
+		],
 		tileWidth: width,
 		tileHeight: height,
 		outputWidth: width,
@@ -662,6 +685,7 @@ export function parseHeic( buffer: ArrayBuffer ): HeicImageData {
  * @param allAssoc   Parsed ipma data.
  * @param properties ipco property boxes.
  * @param irefBox    iref box (required for grid).
+ * @param idatOffset Byte offset of idat box data (for construction_method 1).
  */
 function parseGridImage(
 	r: Reader,
@@ -670,14 +694,15 @@ function parseGridImage(
 	locations: Map< number, ItemLocation >,
 	allAssoc: Map< number, number[] >,
 	properties: BoxInfo[],
-	irefBox: BoxInfo | undefined
+	irefBox: BoxInfo | undefined,
+	idatOffset: number
 ): HeicImageData {
 	// Parse grid descriptor from the grid item's data.
 	const gridLoc = locations.get( gridItemId );
 	if ( ! gridLoc || gridLoc.extents.length === 0 ) {
 		throw new Error( 'No location data for grid item' );
 	}
-	const gridData = readItemData( buffer, gridLoc );
+	const gridData = readItemData( buffer, gridLoc, idatOffset );
 
 	// Grid descriptor format:
 	// version (1 byte), flags (1 byte),
@@ -709,11 +734,12 @@ function parseGridImage(
 		throw new Error( 'No tile references found for grid item' );
 	}
 
-	if ( tileItemIds.length !== rows * columns ) {
+	// The iref may include extra references (alpha planes, thumbnails).
+	// Use at least rows * columns tiles; ignore any surplus.
+	const expectedTiles = rows * columns;
+	if ( tileItemIds.length < expectedTiles ) {
 		throw new Error(
-			`Grid expects ${ rows * columns } tiles but found ${
-				tileItemIds.length
-			}`
+			`Grid expects ${ expectedTiles } tiles but found ${ tileItemIds.length }`
 		);
 	}
 
@@ -748,7 +774,7 @@ function parseGridImage(
 				throw new Error( `No location data for tile item ${ tileId }` );
 			}
 			tiles.push( {
-				data: readItemData( buffer, tileLoc ),
+				data: readItemData( buffer, tileLoc, idatOffset ),
 				x: col * tileWidth,
 				y: row * tileHeight,
 			} );

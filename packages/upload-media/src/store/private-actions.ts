@@ -734,6 +734,16 @@ export function prepareItem( id: QueueItemId ) {
 		}
 		const { file } = item;
 
+		// eslint-disable-next-line no-console
+		console.warn(
+			'[HEIC DEBUG] prepareItem START:',
+			file.name,
+			file.type,
+			'sourceFile:',
+			item.sourceFile?.name,
+			item.sourceFile?.type
+		);
+
 		const operations: Operation[] = [];
 		const settings = select.getSettings();
 
@@ -742,6 +752,17 @@ export function prepareItem( id: QueueItemId ) {
 			file.type
 		);
 		const isHeic = HEIC_MIME_TYPES.includes( file.type );
+
+		// eslint-disable-next-line no-console
+		console.warn(
+			'[HEIC DEBUG] prepareItem:',
+			'isImage=',
+			isImage,
+			'isVipsSupported=',
+			isVipsSupported,
+			'isHeic=',
+			isHeic
+		);
 
 		// For images that can be processed by vips, check if we need to scale down based on threshold.
 		if ( isImage && isVipsSupported ) {
@@ -788,17 +809,30 @@ export function prepareItem( id: QueueItemId ) {
 		// If the file is not processed by vips, tell the server to
 		// generate sub-sizes since they won't be created client-side.
 		// Exception: HEIC images — the client handles sub-sizes via
-		// canvas fallback, so tell the server NOT to generate them.
-		const updates =
-			( ! isVipsSupported && ! isHeic ) || ! isImage
-				? {
-						additionalData: {
-							...item.additionalData,
-							generate_sub_sizes: true,
-							convert_format: true,
-						},
-				  }
-				: {};
+		// canvas fallback, so tell the server NOT to generate them
+		// (and disable format conversion to prevent a duplicate JPEG).
+		let updates = {};
+		if ( isHeic ) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				'[HEIC DEBUG] prepareItem: setting generate_sub_sizes=false, convert_format=false for HEIC upload'
+			);
+			updates = {
+				additionalData: {
+					...item.additionalData,
+					generate_sub_sizes: false,
+					convert_format: false,
+				},
+			};
+		} else if ( ! isVipsSupported || ! isImage ) {
+			updates = {
+				additionalData: {
+					...item.additionalData,
+					generate_sub_sizes: true,
+					convert_format: true,
+				},
+			};
+		}
 
 		dispatch.finishOperation( id, updates );
 	};
@@ -816,18 +850,44 @@ export function uploadItem( id: QueueItemId ) {
 			return;
 		}
 
+		// eslint-disable-next-line no-console
+		console.warn(
+			'[HEIC DEBUG] uploadItem:',
+			item.file.name,
+			item.file.type,
+			'additionalData:',
+			JSON.stringify( item.additionalData )
+		);
 		select.getSettings().mediaUpload( {
 			filesList: [ item.file ],
 			additionalData: item.additionalData,
 			signal: item.abortController?.signal,
 			onFileChange: ( [ attachment ] ) => {
 				if ( attachment && ! isBlobURL( attachment.url ) ) {
+					// eslint-disable-next-line no-console
+					console.warn(
+						'[HEIC DEBUG] uploadItem onFileChange:',
+						attachment.url,
+						'mime:',
+						attachment.mime_type,
+						'filename:',
+						attachment.filename
+					);
 					dispatch.finishOperation( id, {
 						attachment,
 					} );
 				}
 			},
 			onSuccess: ( [ attachment ] ) => {
+				// eslint-disable-next-line no-console
+				console.warn(
+					'[HEIC DEBUG] uploadItem onSuccess:',
+					attachment.url,
+					'mime:',
+					attachment.mime_type,
+					'filename:',
+					attachment.filename
+				);
 				dispatch.finishOperation( id, {
 					attachment,
 				} );
@@ -1102,6 +1162,17 @@ export function generateThumbnails( id: QueueItemId ) {
 		const attachment = item.attachment;
 		const settings = select.getSettings();
 
+		// eslint-disable-next-line no-console
+		console.warn(
+			'[HEIC DEBUG] generateThumbnails:',
+			item.sourceFile.name,
+			item.sourceFile.type,
+			'attachment.filename=',
+			attachment.filename,
+			'missing_image_sizes=',
+			attachment.missing_image_sizes
+		);
+
 		// HEIC/HEIF canvas fallback handling.
 		// When the source is HEIC, sideload the original and convert to JPEG
 		// using the browser's native decoder for sub-size generation.
@@ -1111,6 +1182,12 @@ export function generateThumbnails( id: QueueItemId ) {
 		if ( isHeicSource && attachment.id ) {
 			// Sideload the original HEIC to ensure it's tracked in metadata
 			// as original_image. The sideload response includes missing_image_sizes.
+			// eslint-disable-next-line no-console
+			console.warn(
+				'[HEIC DEBUG] Sideloading original HEIC:',
+				item.sourceFile.name,
+				'image_size=original'
+			);
 			dispatch.addSideloadItem( {
 				file: item.sourceFile,
 				batchId: uuidv4(),
@@ -1161,6 +1238,14 @@ export function generateThumbnails( id: QueueItemId ) {
 					  )
 					: jpegConversion;
 
+				// eslint-disable-next-line no-console
+				console.warn(
+					'[HEIC DEBUG] Sideloading scaled JPEG:',
+					scaledFile.name,
+					'image_size=scaled',
+					'attachment.filename=',
+					attachment.filename
+				);
 				dispatch.addSideloadItem( {
 					file: scaledFile,
 					onChange: ( [ updatedAttachment ] ) => {

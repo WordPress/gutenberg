@@ -121,6 +121,24 @@ function gutenberg_filter_attachment_post_type_args( array $args, string $post_t
 
 add_filter( 'register_post_type_args', 'gutenberg_filter_attachment_post_type_args', 10, 2 );
 
+/**
+ * Registers HEIC/HEIF as allowed upload MIME types.
+ *
+ * When client-side media processing is enabled, HEIC images can be
+ * decoded in the browser (via canvas/VideoDecoder). Registering these
+ * MIME types ensures the file picker's accept attribute includes them,
+ * preventing macOS from silently converting HEIC to JPEG on selection.
+ *
+ * @param array $mimes Allowed MIME types (extension => type).
+ * @return array Modified MIME types.
+ */
+function gutenberg_add_heic_upload_mimes( array $mimes ): array {
+	$mimes['heic'] = 'image/heic';
+	$mimes['heif'] = 'image/heif';
+	return $mimes;
+}
+
+add_filter( 'upload_mimes', 'gutenberg_add_heic_upload_mimes' );
 
 /**
  * Registers additional REST fields for attachments.
