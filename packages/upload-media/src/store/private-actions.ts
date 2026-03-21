@@ -1179,27 +1179,9 @@ export function generateThumbnails( id: QueueItemId ) {
 		const isHeicSource = HEIC_MIME_TYPES.includes( item.sourceFile.type );
 		let jpegConversion: File | null = null;
 
-		if ( isHeicSource && attachment.id ) {
-			// Sideload the original HEIC to ensure it's tracked in metadata
-			// as original_image. The sideload response includes missing_image_sizes.
-			// eslint-disable-next-line no-console
-			console.warn(
-				'[HEIC DEBUG] Sideloading original HEIC:',
-				item.sourceFile.name,
-				'image_size=original'
-			);
-			dispatch.addSideloadItem( {
-				file: item.sourceFile,
-				batchId: uuidv4(),
-				parentId: item.id,
-				additionalData: {
-					post: attachment.id,
-					image_size: 'original',
-					convert_format: false,
-				},
-				operations: [ OperationType.Upload ],
-			} );
-		}
+		// The initial upload already saved the HEIC file on the server.
+		// The 'scaled' sideload handler records it as original_image
+		// in attachment metadata, so no separate original sideload is needed.
 
 		if (
 			isHeicSource &&
