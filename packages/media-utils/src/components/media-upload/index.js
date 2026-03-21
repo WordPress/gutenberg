@@ -294,9 +294,10 @@ class MediaUpload extends Component {
 			value = DEFAULT_EMPTY_GALLERY,
 		} = this.props;
 
-		// If the value did not change there is no need to rebuild the frame,
+		const isFrameAttached = !! this.frame?.el?.isConnected;
+		// If the value did not change and the existing frame is still attached,
 		// we can continue to use the existing one.
-		if ( value === this.lastGalleryValue ) {
+		if ( value === this.lastGalleryValue && isFrameAttached ) {
 			return;
 		}
 
