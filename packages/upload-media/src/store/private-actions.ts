@@ -1108,18 +1108,6 @@ export function generateThumbnails( id: QueueItemId ) {
 		const isHeicSource = HEIC_MIME_TYPES.includes( item.sourceFile.type );
 		let jpegConversion: File | null = null;
 
-		// The server can't read HEIC files, so missing_image_sizes will be
-		// empty even though no sub-sizes were generated. Derive the list
-		// from the registered image sizes in settings instead.
-		if (
-			isHeicSource &&
-			( ! attachment.missing_image_sizes ||
-				attachment.missing_image_sizes.length === 0 )
-		) {
-			const allImageSizes = settings.allImageSizes || {};
-			attachment.missing_image_sizes = Object.keys( allImageSizes );
-		}
-
 		if ( isHeicSource && attachment.id ) {
 			// Sideload the original HEIC to ensure it's tracked in metadata
 			// as original_image. The sideload response includes missing_image_sizes.

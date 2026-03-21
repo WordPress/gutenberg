@@ -241,6 +241,24 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				$missing_image_sizes         = array_diff( $merged_sizes, array_keys( $metadata['sizes'] ) );
 				$data['missing_image_sizes'] = $missing_image_sizes;
 			}
+
+			// HEIC/HEIF: the server's image editor cannot read these files,
+			// so missing_image_sizes is empty even though no sub-sizes were
+			// generated. Report all registered sizes as missing so the
+			// client-side canvas fallback can generate them.
+			if ( in_array( $mime_type, array( 'image/heic', 'image/heif' ), true ) ) {
+				$metadata = wp_get_attachment_metadata( $item->ID, true );
+
+				if ( ! is_array( $metadata ) ) {
+					$metadata = array();
+				}
+
+				$metadata['sizes'] = $metadata['sizes'] ?? array();
+
+				$registered_sizes            = wp_get_registered_image_subsizes();
+				$missing_image_sizes         = array_diff( array_keys( $registered_sizes ), array_keys( $metadata['sizes'] ) );
+				$data['missing_image_sizes'] = array_values( $missing_image_sizes );
+			}
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';

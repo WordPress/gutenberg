@@ -2,15 +2,19 @@
  * Internal dependencies
  */
 import { getFileBasename } from './utils';
+import { parseHeic } from './heic-parser';
 
 /**
  * Converts an image file to JPEG using the browser's native decoder and canvas.
  *
- * Tries two decoding strategies:
+ * Tries three decoding strategies:
  * 1. createImageBitmap() + OffscreenCanvas (works in Safari, future Chrome).
- * 2. <img> element + HTMLCanvasElement (works in Chrome on macOS, which
- *    exposes OS-level HEIC decoding through the <img> rendering pipeline
- *    but not through createImageBitmap).
+ * 2. WebCodecs ImageDecoder API (uses platform codecs; may work in future
+ *    Chrome if HEIC is added to its image decoder pipeline).
+ * 3. HEIC container parsing + WebCodecs VideoDecoder (Chrome 107+ on macOS).
+ *    Parses the HEIC/ISOBMFF container to extract the HEVC bitstream, then
+ *    decodes it using Chrome's platform HEVC video decoder (hardware-
+ *    accelerated via macOS VideoToolbox).
  *
  * This avoids shipping our own HEVC decoder, sidestepping patent/licensing concerns.
  *
@@ -53,53 +57,156 @@ export async function canvasConvertToJpeg(
 		// Fall through to strategy 2.
 	}
 
-	// Strategy 2: <img> element + HTMLCanvasElement.
-	// Chrome on macOS can decode HEIC via the <img> rendering pipeline
-	// using OS-level codecs, even though createImageBitmap cannot.
-	const blobUrl = URL.createObjectURL( file );
+	// Strategy 2: WebCodecs ImageDecoder API.
+	// Uses platform codecs (e.g., macOS HEIC support) that may not be
+	// exposed through createImageBitmap or <img> elements.
+	if ( typeof ImageDecoder !== 'undefined' ) {
+		const supported = await ImageDecoder.isTypeSupported( file.type );
+		if ( supported ) {
+			const decoder = new ImageDecoder( {
+				type: file.type,
+				data: file.stream(),
+			} );
+			const { image: videoFrame } = await decoder.decode();
 
-	try {
-		const img = await new Promise< HTMLImageElement >(
-			( resolve, reject ) => {
-				const image = new Image();
-				image.onload = () => resolve( image );
-				image.onerror = () =>
-					reject(
-						new Error( 'Image element could not decode the file' )
-					);
-				image.src = blobUrl;
+			const canvas = new OffscreenCanvas(
+				videoFrame.displayWidth,
+				videoFrame.displayHeight
+			);
+			const ctx = canvas.getContext( '2d' );
+
+			if ( ! ctx ) {
+				videoFrame.close();
+				decoder.close();
+				throw new Error( 'Could not get canvas 2d context' );
 			}
+
+			ctx.drawImage( videoFrame, 0, 0 );
+			videoFrame.close();
+			decoder.close();
+
+			const jpegBlob = await canvas.convertToBlob( {
+				type: 'image/jpeg',
+				quality,
+			} );
+
+			return new File( [ jpegBlob ], `${ baseName }.jpeg`, {
+				type: 'image/jpeg',
+			} );
+		}
+	}
+
+	// Strategy 3: HEIC container parsing + WebCodecs VideoDecoder.
+	// Chrome 107+ on macOS supports HEVC *video* decoding via platform codecs
+	// (macOS VideoToolbox), even though it doesn't support HEIC through image
+	// APIs.  A HEIC file is an ISOBMFF container with HEVC-encoded tiles —
+	// we parse the container and decode each tile via VideoDecoder.
+	if ( typeof VideoDecoder !== 'undefined' ) {
+		try {
+			const heicData = parseHeic( await file.arrayBuffer() );
+
+			const support = await VideoDecoder.isConfigSupported( {
+				codec: heicData.codecString,
+			} );
+
+			if ( support.supported ) {
+				const canvas = new OffscreenCanvas(
+					heicData.outputWidth,
+					heicData.outputHeight
+				);
+				const ctx = canvas.getContext( '2d' );
+
+				if ( ! ctx ) {
+					throw new Error( 'Could not get canvas 2d context' );
+				}
+
+				// Decode each tile and draw it at its grid position.
+				for ( const tile of heicData.tiles ) {
+					const frame = await decodeHevcFrame(
+						heicData.codecString,
+						heicData.description,
+						heicData.tileWidth,
+						heicData.tileHeight,
+						tile.data
+					);
+					try {
+						ctx.drawImage( frame, tile.x, tile.y );
+					} finally {
+						frame.close();
+					}
+				}
+
+				const jpegBlob = await canvas.convertToBlob( {
+					type: 'image/jpeg',
+					quality,
+				} );
+
+				return new File( [ jpegBlob ], `${ baseName }.jpeg`, {
+					type: 'image/jpeg',
+				} );
+			}
+		} catch {
+			// VideoDecoder HEVC not available or HEIC parsing failed.
+			// Fall through to error.
+		}
+	}
+
+	throw new Error(
+		'This browser cannot decode HEIC images. Please use Safari or convert to JPEG before uploading.'
+	);
+}
+
+/**
+ * Decode a single HEVC key frame using the WebCodecs VideoDecoder API.
+ *
+ * @param codec       HEVC codec string (e.g. 'hvc1.1.6.L93.B0').
+ * @param description HEVCDecoderConfigurationRecord bytes.
+ * @param width       Coded width of the frame.
+ * @param height      Coded height of the frame.
+ * @param data        Raw HEVC bitstream (IDR frame).
+ * @return Decoded VideoFrame. Caller must call frame.close().
+ */
+function decodeHevcFrame(
+	codec: string,
+	description: Uint8Array,
+	width: number,
+	height: number,
+	data: Uint8Array
+): Promise< VideoFrame > {
+	return new Promise< VideoFrame >( ( resolve, reject ) => {
+		const decoder = new VideoDecoder( {
+			output: ( frame ) => {
+				decoder.close();
+				resolve( frame );
+			},
+			error: ( e ) => {
+				if ( decoder.state !== 'closed' ) {
+					decoder.close();
+				}
+				reject( e );
+			},
+		} );
+
+		decoder.configure( {
+			codec,
+			codedWidth: width,
+			codedHeight: height,
+			description,
+		} );
+
+		decoder.decode(
+			new EncodedVideoChunk( {
+				type: 'key',
+				timestamp: 0,
+				data,
+			} )
 		);
 
-		const canvas = document.createElement( 'canvas' );
-		canvas.width = img.naturalWidth;
-		canvas.height = img.naturalHeight;
-
-		const ctx = canvas.getContext( '2d' );
-		if ( ! ctx ) {
-			throw new Error( 'Could not get canvas 2d context' );
-		}
-
-		ctx.drawImage( img, 0, 0 );
-
-		const jpegBlob = await new Promise< Blob >( ( resolve, reject ) => {
-			canvas.toBlob(
-				( blob ) => {
-					if ( blob ) {
-						resolve( blob );
-					} else {
-						reject( new Error( 'Canvas toBlob returned null' ) );
-					}
-				},
-				'image/jpeg',
-				quality
-			);
+		decoder.flush().catch( ( e ) => {
+			if ( decoder.state !== 'closed' ) {
+				decoder.close();
+			}
+			reject( e );
 		} );
-
-		return new File( [ jpegBlob ], `${ baseName }.jpeg`, {
-			type: 'image/jpeg',
-		} );
-	} finally {
-		URL.revokeObjectURL( blobUrl );
-	}
+	} );
 }
