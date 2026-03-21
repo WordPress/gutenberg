@@ -52,12 +52,9 @@ export async function canvasConvertToJpeg(
 		} finally {
 			bitmap.close();
 		}
-	} catch ( e ) {
-		// eslint-disable-next-line no-console
-		console.warn(
-			'[HEIC DEBUG] Strategy 1 (createImageBitmap) failed:',
-			e
-		);
+	} catch {
+		// createImageBitmap doesn't support HEIC in this browser.
+		// Fall through to strategy 2.
 	}
 
 	// Strategy 2: WebCodecs ImageDecoder API.
@@ -99,11 +96,6 @@ export async function canvasConvertToJpeg(
 		}
 	}
 
-	// eslint-disable-next-line no-console
-	console.warn(
-		'[HEIC DEBUG] Strategy 2 (ImageDecoder) skipped or unsupported'
-	);
-
 	// Strategy 3: HEIC container parsing + WebCodecs VideoDecoder.
 	// Chrome 107+ on macOS supports HEVC *video* decoding via platform codecs
 	// (macOS VideoToolbox), even though it doesn't support HEIC through image
@@ -111,29 +103,12 @@ export async function canvasConvertToJpeg(
 	// we parse the container and decode each tile via VideoDecoder.
 	if ( typeof VideoDecoder !== 'undefined' ) {
 		try {
-			// eslint-disable-next-line no-console
-			console.warn(
-				'[HEIC DEBUG] Strategy 3: parsing HEIC container...'
-			);
 			const heicData = parseHeic( await file.arrayBuffer() );
 
 			const support = await VideoDecoder.isConfigSupported( {
 				codec: heicData.codecString,
 			} );
 
-			// eslint-disable-next-line no-console
-			console.warn(
-				'[HEIC DEBUG] Strategy 3: parsed OK, codec=',
-				heicData.codecString,
-				'tiles=',
-				heicData.tiles.length,
-				'output=',
-				heicData.outputWidth,
-				'x',
-				heicData.outputHeight,
-				'supported=',
-				support.supported
-			);
 			if ( support.supported ) {
 				const canvas = new OffscreenCanvas(
 					heicData.outputWidth,
@@ -170,9 +145,9 @@ export async function canvasConvertToJpeg(
 					type: 'image/jpeg',
 				} );
 			}
-		} catch ( e ) {
-			// eslint-disable-next-line no-console
-			console.warn( '[HEIC DEBUG] Strategy 3 (VideoDecoder) failed:', e );
+		} catch {
+			// VideoDecoder HEVC not available or HEIC parsing failed.
+			// Fall through to error.
 		}
 	}
 

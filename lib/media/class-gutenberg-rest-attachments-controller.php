@@ -285,12 +285,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
-		$files = $request->get_file_params();
-		$file_type = ! empty( $files['file']['type'] ) ? $files['file']['type'] : 'unknown';
-		$file_name = ! empty( $files['file']['name'] ) ? $files['file']['name'] : 'unknown';
-		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-		error_log( "[HEIC DEBUG] create_item: file={$file_name} type={$file_type} generate_sub_sizes=" . var_export( $request['generate_sub_sizes'], true ) . " convert_format=" . var_export( $request['convert_format'], true ) );
-
 		if ( ! $request['generate_sub_sizes'] ) {
 			add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 100 );
 			add_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
