@@ -4,7 +4,14 @@ import { ValidatedTextareaControl } from '../components';
 
 describe( 'ValidatedTextareaControl', () => {
 	it( 'should preserve the help description', () => {
-		render( <ValidatedTextareaControl label="Bio" help="A short bio" /> );
+		render(
+			<ValidatedTextareaControl
+				label="Bio"
+				help="A short bio"
+				onChange={ () => {} }
+				value=""
+			/>
+		);
 
 		expect(
 			screen.getByRole( 'textbox', { name: 'Bio' } )
@@ -18,6 +25,8 @@ describe( 'ValidatedTextareaControl', () => {
 				<ValidatedTextareaControl
 					label="Bio"
 					help="A short bio"
+					onChange={ () => {} }
+					value=""
 					required
 				/>
 				<button type="submit">Submit</button>

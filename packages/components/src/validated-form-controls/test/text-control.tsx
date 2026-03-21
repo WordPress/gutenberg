@@ -5,7 +5,12 @@ import { ValidatedTextControl } from '../components';
 describe( 'ValidatedTextControl', () => {
 	it( 'should preserve the help description', () => {
 		render(
-			<ValidatedTextControl label="Name" help="Enter your full name" />
+			<ValidatedTextControl
+				label="Name"
+				help="Enter your full name"
+				onChange={ () => {} }
+				value=""
+			/>
 		);
 
 		expect(
@@ -20,6 +25,8 @@ describe( 'ValidatedTextControl', () => {
 				<ValidatedTextControl
 					label="Name"
 					help="Enter your full name"
+					onChange={ () => {} }
+					value=""
 					required
 				/>
 				<button type="submit">Submit</button>

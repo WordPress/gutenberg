@@ -274,8 +274,8 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 			return;
 		}
 
-		function setDescribedBy( shouldAdd: boolean ) {
-			const ids = ( target.getAttribute( 'aria-describedby' ) ?? '' )
+		function setDescribedBy( el: Element, shouldAdd: boolean ) {
+			const ids = ( el.getAttribute( 'aria-describedby' ) ?? '' )
 				.split( ' ' )
 				.filter( ( id ) => id && id !== messageId );
 
@@ -284,15 +284,15 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 			}
 
 			if ( ids.length ) {
-				target.setAttribute( 'aria-describedby', ids.join( ' ' ) );
+				el.setAttribute( 'aria-describedby', ids.join( ' ' ) );
 			} else {
-				target.removeAttribute( 'aria-describedby' );
+				el.removeAttribute( 'aria-describedby' );
 			}
 		}
 
-		setDescribedBy( !! visibleMessage );
+		setDescribedBy( target, !! visibleMessage );
 
-		return () => setDescribedBy( false );
+		return () => setDescribedBy( target, false );
 	}, [ visibleMessage, messageId, getValidityTarget ] );
 
 	return (

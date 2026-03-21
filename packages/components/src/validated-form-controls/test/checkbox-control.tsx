@@ -8,6 +8,7 @@ describe( 'ValidatedCheckboxControl', () => {
 			<ValidatedCheckboxControl
 				label="Agree"
 				help="You must agree to continue"
+				onChange={ () => {} }
 			/>
 		);
 
@@ -23,6 +24,7 @@ describe( 'ValidatedCheckboxControl', () => {
 				<ValidatedCheckboxControl
 					label="Agree"
 					help="You must agree to continue"
+					onChange={ () => {} }
 					required
 				/>
 				<button type="submit">Submit</button>

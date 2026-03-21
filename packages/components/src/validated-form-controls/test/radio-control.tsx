@@ -15,6 +15,7 @@ describe( 'ValidatedRadioControl', () => {
 				label="Size"
 				help="Choose a size"
 				options={ options }
+				onChange={ () => {} }
 			/>
 		);
 
@@ -31,6 +32,7 @@ describe( 'ValidatedRadioControl', () => {
 					label="Size"
 					help="Choose a size"
 					options={ options }
+					onChange={ () => {} }
 					required
 				/>
 				<button type="submit">Submit</button>
