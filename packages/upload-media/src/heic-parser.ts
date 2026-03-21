@@ -708,10 +708,16 @@ function parseGridImage(
 	// version (1 byte), flags (1 byte),
 	// rows_minus_one (1 byte), columns_minus_one (1 byte),
 	// output_width (2 or 4 bytes), output_height (2 or 4 bytes)
-	const gridFlags = gridData[ 1 ];
+	const largeFields = gridData.length > 1 && ( gridData[ 1 ] & 1 ) !== 0;
+	const minGridSize = largeFields ? 12 : 8;
+	if ( gridData.length < minGridSize ) {
+		throw new Error(
+			`Grid descriptor too short: ${ gridData.length } bytes`
+		);
+	}
+
 	const rows = gridData[ 2 ] + 1;
 	const columns = gridData[ 3 ] + 1;
-	const largeFields = ( gridFlags & 1 ) !== 0;
 
 	const gv = new DataView( gridData.buffer, gridData.byteOffset );
 	let outputWidth: number;
