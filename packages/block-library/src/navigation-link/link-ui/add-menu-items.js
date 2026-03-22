@@ -17,7 +17,11 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	useEntityRecords,
+	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
+} from '@wordpress/core-data';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 
 /**
@@ -29,9 +33,18 @@ const { Tabs } = unlock( componentsPrivateApis );
 
 const PER_PAGE = 20;
 
-const TAB_PAGE = 'page';
-const TAB_POST = 'post';
-const TAB_CATEGORY = 'category';
+/** Pixels inset so checkbox focus rings are not clipped by the scroll container. */
+const CHECKBOX_FOCUS_INSET = 2;
+
+/** Only these four WordPress types use tabs; everything else is under “More types…”. */
+const MAIN_TABS = [
+	{ id: 'page', kind: 'postType', label: __( 'Pages' ) },
+	{ id: 'post', kind: 'postType', label: __( 'Posts' ) },
+	{ id: 'category', kind: 'taxonomy', label: __( 'Categories' ) },
+	{ id: 'post_tag', kind: 'taxonomy', label: __( 'Tags' ) },
+];
+
+const MAIN_TAB_SLUGS = new Set( MAIN_TABS.map( ( t ) => t.id ) );
 
 /**
  * @param {string} taxonomySlug REST taxonomy slug (e.g. post_tag).
@@ -80,6 +93,29 @@ export function recordToNavigationLinkAttributes(
 
 export function selectionKey( entityKind, entityName, id ) {
 	return `${ entityKind }:${ entityName }:${ id }`;
+}
+
+/**
+ * Maps a link search API result to a minimal post/term REST-like record for
+ * `recordToNavigationLinkAttributes` and list rendering.
+ *
+ * @param {{ id: number, url: string, title: string }} result
+ * @param {'postType'|'taxonomy'}                      entityKind
+ * @return {Object} REST-shaped post or term used by list rendering and block attributes.
+ */
+function searchResultToPseudoRecord( result, entityKind ) {
+	if ( entityKind === 'postType' ) {
+		return {
+			id: result.id,
+			link: result.url,
+			title: { rendered: result.title },
+		};
+	}
+	return {
+		id: result.id,
+		link: result.url,
+		name: result.title,
+	};
 }
 
 /**
@@ -196,12 +232,15 @@ export default function LinkUIAddMenuItems( {
 	onBack,
 	onBulkComplete,
 } ) {
-	const [ tab, setTab ] = useState( TAB_PAGE );
+	const [ tab, setTab ] = useState( 'page' );
 	/** @type {{ type: 'postType'|'taxonomy', slug: string }|null} */
 	const [ extraSource, setExtraSource ] = useState( null );
 	const [ searchInput, setSearchInput ] = useState( '' );
 	const [ debouncedSearch, setDebouncedSearch ] = useState( '' );
 	const [ listPage, setListPage ] = useState( 1 );
+	/** @type {[ Array<Object>|null, Function ]} Pseudo-records from link search API, or null when not searching. */
+	const [ searchRecords, setSearchRecords ] = useState( null );
+	const [ isSearchResolving, setIsSearchResolving ] = useState( false );
 	/** @type {[ Map<string, Object>, Function ]} key -> block attributes */
 	const [ selectedByKey, setSelectedByKey ] = useState( () => new Map() );
 
@@ -215,6 +254,25 @@ export default function LinkUIAddMenuItems( {
 		[]
 	);
 
+	/** @type {undefined | ((search: string, searchOptions: Object) => Promise<Array>)} */
+	const settingsFetchLinkSuggestions = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()
+				?.__experimentalFetchLinkSuggestions,
+		[]
+	);
+
+	const { postTypes, taxonomies } = useSelect( ( select ) => {
+		const { getEntityRecords } = select( coreStore );
+		const pt = getEntityRecords( 'root', 'postType', {
+			per_page: -1,
+		} );
+		const tx = getEntityRecords( 'root', 'taxonomy', {
+			per_page: -1,
+		} );
+		return { postTypes: pt, taxonomies: tx };
+	}, [] );
+
 	const resolved = useMemo( () => {
 		if ( extraSource ) {
 			return {
@@ -223,10 +281,11 @@ export default function LinkUIAddMenuItems( {
 				entityName: extraSource.slug,
 			};
 		}
-		if ( tab === TAB_CATEGORY ) {
-			return { entityKind: 'taxonomy', entityName: 'category' };
+		const main = MAIN_TABS.find( ( t ) => t.id === tab );
+		if ( main ) {
+			return { entityKind: main.kind, entityName: tab };
 		}
-		return { entityKind: 'postType', entityName: tab };
+		return { entityKind: 'postType', entityName: 'page' };
 	}, [ tab, extraSource ] );
 
 	const isHierarchical = useSelect(
@@ -267,13 +326,12 @@ export default function LinkUIAddMenuItems( {
 		setListPage( 1 );
 	}, [ debouncedSearch, resolved.entityKind, resolved.entityName ] );
 
+	const isSearchActive = debouncedSearch.trim().length > 0;
+
 	const listQuery = useMemo( () => {
 		const q = {
 			page: listPage,
 			per_page: PER_PAGE,
-			...( debouncedSearch.trim()
-				? { search: debouncedSearch.trim() }
-				: {} ),
 			...( resolved.entityKind === 'postType'
 				? { status: 'publish' }
 				: {} ),
@@ -286,33 +344,76 @@ export default function LinkUIAddMenuItems( {
 			q.order = 'asc';
 		}
 		return q;
-	}, [ listPage, debouncedSearch, resolved.entityKind, isHierarchical ] );
+	}, [ listPage, resolved.entityKind, isHierarchical ] );
 
 	const { records, isResolving, totalPages } = useEntityRecords(
 		resolved.entityKind,
 		resolved.entityName,
-		listQuery
+		listQuery,
+		{ enabled: ! isSearchActive }
 	);
 
-	const { postTypes, taxonomies } = useSelect( ( select ) => {
-		const { getEntityRecords } = select( coreStore );
-		const pt = getEntityRecords( 'root', 'postType', {
-			per_page: -1,
-		} );
-		const tx = getEntityRecords( 'root', 'taxonomy', {
-			per_page: -1,
-		} );
-		return { postTypes: pt, taxonomies: tx };
-	}, [] );
+	useEffect( () => {
+		const q = debouncedSearch.trim();
+		if ( ! q ) {
+			setSearchRecords( null );
+			setIsSearchResolving( false );
+			return;
+		}
+
+		let cancelled = false;
+		setIsSearchResolving( true );
+		setSearchRecords( null );
+
+		const searchType = resolved.entityKind === 'postType' ? 'post' : 'term';
+
+		const searchFn =
+			settingsFetchLinkSuggestions ||
+			( ( term, opts ) => fetchLinkSuggestions( term, opts, {} ) );
+
+		searchFn( q, {
+			type: searchType,
+			subtype: resolved.entityName,
+			page: listPage,
+			perPage: PER_PAGE,
+		} )
+			.then( ( results ) => {
+				if ( cancelled ) {
+					return;
+				}
+				setSearchRecords(
+					results.map( ( r ) =>
+						searchResultToPseudoRecord( r, resolved.entityKind )
+					)
+				);
+				setIsSearchResolving( false );
+			} )
+			.catch( () => {
+				if ( ! cancelled ) {
+					setSearchRecords( [] );
+					setIsSearchResolving( false );
+				}
+			} );
+
+		return () => {
+			cancelled = true;
+		};
+	}, [
+		debouncedSearch,
+		resolved.entityKind,
+		resolved.entityName,
+		listPage,
+		settingsFetchLinkSuggestions,
+	] );
 
 	const dropdownOptions = useMemo( () => {
 		const opts = [ { label: __( 'More types…' ), value: '' } ];
 		if ( Array.isArray( postTypes ) ) {
 			postTypes.forEach( ( pt ) => {
-				if ( ! pt?.slug || pt.slug === 'attachment' ) {
+				if ( ! pt?.slug ) {
 					return;
 				}
-				if ( pt.slug === TAB_PAGE || pt.slug === TAB_POST ) {
+				if ( MAIN_TAB_SLUGS.has( pt.slug ) ) {
 					return;
 				}
 				if ( pt.viewable === false ) {
@@ -326,7 +427,10 @@ export default function LinkUIAddMenuItems( {
 		}
 		if ( Array.isArray( taxonomies ) ) {
 			taxonomies.forEach( ( tax ) => {
-				if ( ! tax?.slug || tax.slug === 'category' ) {
+				if ( ! tax?.slug ) {
+					return;
+				}
+				if ( MAIN_TAB_SLUGS.has( tax.slug ) ) {
 					return;
 				}
 				if ( tax.visibility?.public === false ) {
@@ -455,14 +559,49 @@ export default function LinkUIAddMenuItems( {
 	};
 
 	const count = selectedByKey.size;
-	const list = useMemo( () => records || [], [ records ] );
+
+	const list = useMemo( () => {
+		if ( isSearchActive ) {
+			return searchRecords ?? [];
+		}
+		return records || [];
+	}, [ isSearchActive, searchRecords, records ] );
+
+	const listLoading = isSearchActive ? isSearchResolving : isResolving;
+
+	const searchHasNextPage =
+		isSearchActive &&
+		Array.isArray( searchRecords ) &&
+		searchRecords.length === PER_PAGE;
 
 	const displayRows = useMemo( () => {
-		if ( ! isHierarchical || list.length === 0 ) {
+		if ( isSearchActive || ! isHierarchical || list.length === 0 ) {
 			return list.map( ( record ) => ( { record, depth: 0 } ) );
 		}
 		return flattenRecordsWithDepth( list, resolved.entityKind );
-	}, [ list, isHierarchical, resolved.entityKind ] );
+	}, [ list, isHierarchical, resolved.entityKind, isSearchActive ] );
+
+	let pageIndicator;
+	if ( isSearchActive ) {
+		pageIndicator = sprintf(
+			// translators: %d: current page number (search has no total page count from API).
+			__( 'Page %d' ),
+			listPage
+		);
+	} else if ( totalPages ) {
+		pageIndicator = sprintf(
+			// translators: %1$d current page, %2$d total pages.
+			__( 'Page %1$d of %2$d' ),
+			listPage,
+			totalPages
+		);
+	} else {
+		pageIndicator = `${ listPage }`;
+	}
+
+	const nextPageDisabled = isSearchActive
+		? ! searchHasNextPage
+		: ! totalPages || listPage >= ( totalPages || 0 );
 
 	const extraSourcePanelLabel = useMemo( () => {
 		if ( ! extraSource ) {
@@ -479,10 +618,16 @@ export default function LinkUIAddMenuItems( {
 	}, [ extraSource, dropdownOptions ] );
 
 	const renderListSection = () => (
-		<VStack spacing={ 4 } className="link-ui-add-menu-items__panel-inner">
+		<VStack
+			expanded
+			justify="flex-start"
+			spacing={ 4 }
+			className="link-ui-add-menu-items__panel-inner"
+		>
 			<TextControl
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
+				hideLabelFromVision
 				label={ __( 'Search' ) }
 				value={ searchInput }
 				onChange={ setSearchInput }
@@ -490,7 +635,7 @@ export default function LinkUIAddMenuItems( {
 			/>
 
 			<div className="link-ui-add-menu-items__list">
-				{ isResolving && ! list.length ? (
+				{ listLoading && ! list.length ? (
 					<Spinner />
 				) : (
 					<VStack spacing={ 3 }>
@@ -498,13 +643,10 @@ export default function LinkUIAddMenuItems( {
 							<div
 								key={ record.id }
 								className="link-ui-add-menu-items__row"
-								style={
-									depth
-										? {
-												paddingInlineStart: depth * 24,
-										  }
-										: undefined
-								}
+								style={ {
+									paddingInlineStart:
+										CHECKBOX_FOCUS_INSET + depth * 24,
+								} }
 							>
 								<CheckboxControl
 									__nextHasNoMarginBottom
@@ -524,7 +666,7 @@ export default function LinkUIAddMenuItems( {
 								/>
 							</div>
 						) ) }
-						{ ! list.length && ! isResolving ? (
+						{ ! list.length && ! listLoading ? (
 							<p className="link-ui-add-menu-items__empty">
 								{ __( 'No items found.' ) }
 							</p>
@@ -546,20 +688,13 @@ export default function LinkUIAddMenuItems( {
 					{ __( 'Previous page' ) }
 				</Button>
 				<span className="link-ui-add-menu-items__page">
-					{ totalPages
-						? sprintf(
-								// translators: %1$d current page, %2$d total pages.
-								__( 'Page %1$d of %2$d' ),
-								listPage,
-								totalPages
-						  )
-						: `${ listPage }` }
+					{ pageIndicator }
 				</span>
 				<Button
 					__next40pxDefaultSize
 					variant="tertiary"
 					onClick={ () => setListPage( ( p ) => p + 1 ) }
-					disabled={ ! totalPages || listPage >= ( totalPages || 0 ) }
+					disabled={ nextPageDisabled }
 					accessibleWhenDisabled
 				>
 					{ __( 'Next page' ) }
@@ -571,6 +706,8 @@ export default function LinkUIAddMenuItems( {
 					__next40pxDefaultSize
 					variant="secondary"
 					onClick={ clearSelection }
+					disabled={ count === 0 }
+					accessibleWhenDisabled
 				>
 					{ __( 'Clear selection' ) }
 				</Button>
@@ -604,27 +741,24 @@ export default function LinkUIAddMenuItems( {
 			<div className="link-ui-add-menu-items__tabs-shell">
 				<Tabs
 					orientation="horizontal"
-					defaultTabId={ TAB_PAGE }
+					defaultTabId="page"
 					selectedTabId={ extraSource ? null : tab }
 					onSelect={ onTabsSelect }
 				>
 					<div className="link-ui-add-menu-items__tab-row-inner">
 						<Tabs.TabList className="link-ui-add-menu-items__tab-list">
-							<Tabs.Tab tabId={ TAB_PAGE }>
-								{ __( 'Pages' ) }
-							</Tabs.Tab>
-							<Tabs.Tab tabId={ TAB_POST }>
-								{ __( 'Posts' ) }
-							</Tabs.Tab>
-							<Tabs.Tab tabId={ TAB_CATEGORY }>
-								{ __( 'Categories' ) }
-							</Tabs.Tab>
+							{ MAIN_TABS.map( ( t ) => (
+								<Tabs.Tab key={ t.id } tabId={ t.id }>
+									{ t.label }
+								</Tabs.Tab>
+							) ) }
 						</Tabs.TabList>
 						<SelectControl
 							__next40pxDefaultSize
 							__nextHasNoMarginBottom
 							className="link-ui-add-menu-items__type-dropdown"
 							variant="minimal"
+							hideLabelFromVision
 							value={ dropdownValue }
 							options={ dropdownOptions }
 							onChange={ onDropdownChange }
@@ -649,10 +783,10 @@ export default function LinkUIAddMenuItems( {
 							{ renderListSection() }
 						</div>
 					) : (
-						[ TAB_PAGE, TAB_POST, TAB_CATEGORY ].map( ( tid ) => (
+						MAIN_TABS.map( ( t ) => (
 							<Tabs.TabPanel
-								key={ tid }
-								tabId={ tid }
+								key={ t.id }
+								tabId={ t.id }
 								focusable={ false }
 							>
 								{ renderListSection() }

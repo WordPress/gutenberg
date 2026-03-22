@@ -26,19 +26,43 @@
 // Bulk "Add menu items" uses `Modal` (portaled to `document.body`), not the Link popover.
 // Tab row follows Components/Tabs "Insert custom elements" pattern: flex row + trailing control.
 .link-ui-add-menu-items-modal.components-modal__frame {
+	// Column flex so the modal fills max-height and inner panels can shrink (`min-height: 0`).
+	flex-direction: column;
 	min-height: min(65vh, 680px);
 
+	// Core modal styles use `overflow: auto` here, which stacks with the list scrollbar.
 	.components-modal__content {
 		display: flex;
+		flex: 1 1 auto;
 		flex-direction: column;
 		min-height: 0;
+		overflow: hidden;
+	}
+
+	.components-modal__children-container {
+		display: flex;
+		flex: 1 1 auto;
+		flex-direction: column;
+		min-height: 0;
+		overflow: hidden;
 	}
 
 	.link-ui-add-menu-items__tabs-shell {
 		display: flex;
-		flex: 1;
+		flex: 1 1 auto;
 		flex-direction: column;
 		min-height: 0;
+		overflow: hidden;
+
+		// `Tabs` is a fragment: tab row + tabpanels are direct children of this shell.
+		> [role="tabpanel"],
+		> .link-ui-add-menu-items__panel--extra {
+			display: flex;
+			flex: 1 1 auto;
+			flex-direction: column;
+			min-height: 0;
+			overflow: hidden;
+		}
 	}
 
 	.link-ui-add-menu-items__tab-row-inner {
@@ -53,8 +77,15 @@
 	}
 
 	.link-ui-add-menu-items__tab-list {
-		flex: 1 1 auto;
+		flex: 0 1 auto;
+		width: fit-content;
+		max-width: 100%;
 		min-width: 0;
+
+		// Components `Tabs.Tab` defaults to `flex: 1 0 auto`, stretching each label.
+		[role="tab"] {
+			flex: 0 0 auto;
+		}
 	}
 
 	.link-ui-add-menu-items__type-dropdown {
@@ -64,24 +95,28 @@
 	}
 
 	.link-ui-add-menu-items__panel-inner {
-		flex: 1;
+		box-sizing: border-box;
+		flex: 1 1 auto;
+		flex-direction: column;
 		min-height: 0;
+		overflow: hidden;
+		// Keep footer actions inside the modal padding; avoid bottom clipping.
+		padding-bottom: $grid-unit-10;
 	}
 
+	// Single scroll container: search + pagination stay visible; only results scroll.
 	.link-ui-add-menu-items__list {
-		flex: 1;
-		min-height: min(42vh, 360px);
-		max-height: min(52vh, 560px);
-		overflow: auto;
+		flex: 1 1 auto;
+		min-height: 0;
+		overflow-x: hidden;
+		overflow-y: auto;
+		// Breathing room so rows do not sit flush against the filter or pagination.
+		padding-block: $grid-unit-15;
 	}
 
 	.link-ui-add-menu-items__row {
 		padding-block: $grid-unit-05;
 	}
-}
-
-.link-ui-add-menu-items__list {
-	overflow: auto;
 }
 
 .link-ui-add-menu-items__empty {
