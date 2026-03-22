@@ -26,7 +26,7 @@ import { isURL } from '@wordpress/url';
  * Internal dependencies
  */
 import { LinkUIPageCreator } from './page-creator';
-import LinkUIBlockInserter from './block-inserter';
+import LinkUIAddMenuItems from './add-menu-items';
 import { useEntityBinding, useLinkPreview } from '../shared';
 
 /**
@@ -86,7 +86,7 @@ function UnforwardedLinkUI( props, ref ) {
 	const { clientId } = props;
 	const postType = type || 'page';
 
-	const [ addingBlock, setAddingBlock ] = useState( false );
+	const [ addingMenuItems, setAddingMenuItems ] = useState( false );
 	const [ addingPage, setAddingPage ] = useState( false );
 	const [ shouldFocusPane, setShouldFocusPane ] = useState( null );
 	// Stable initial value for LinkControl's uncontrolled inputValue prop.
@@ -105,7 +105,7 @@ function UnforwardedLinkUI( props, ref ) {
 	};
 	const linkControlWrapperRef = useRef();
 	const addPageButtonRef = useRef();
-	const addBlockButtonRef = useRef();
+	const addMenuItemButtonRef = useRef();
 	const permissions = useResourcePermissions( {
 		kind: 'postType',
 		name: postType,
@@ -177,109 +177,122 @@ function UnforwardedLinkUI( props, ref ) {
 	const blockEditingMode = useBlockEditingMode();
 
 	return (
-		<Popover
-			ref={ ref }
-			placement="bottom"
-			onClose={ props.onClose }
-			anchor={ props.anchor }
-			shift
-		>
-			{ ! addingBlock && ! addingPage && (
-				<div
-					ref={ linkControlWrapperRef }
-					role="dialog"
-					aria-labelledby={ dialogTitleId }
-					aria-describedby={ dialogDescriptionId }
-				>
+		<>
+			<Popover
+				ref={ ref }
+				placement="bottom"
+				onClose={ props.onClose }
+				anchor={ props.anchor }
+				shift
+			>
+				{ addingMenuItems && ! addingPage && (
 					<VisuallyHidden>
-						<h2 id={ dialogTitleId }>{ __( 'Add link' ) }</h2>
-
-						<p id={ dialogDescriptionId }>
-							{ __(
-								'Search for and add a link to your Navigation.'
-							) }
-						</p>
+						{ __( 'Add menu items dialog is open.' ) }
 					</VisuallyHidden>
-					<LinkControl
-						hasTextControl
-						hasRichPreviews
-						value={ link }
-						showInitialSuggestions
-						withCreateSuggestion={ false }
-						noDirectEntry={ !! type }
-						noURLSuggestion={ !! type }
-						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
-						onChange={ props.onChange }
-						onInputChange={ ( value ) => {
-							// Observe the input value so we can pass the value to the page creator
-							// and restore it on back button click
-							searchInputValueRef.current = value;
-						} }
-						inputValue={ initialSearchValue }
-						onRemove={ props.onRemove }
-						onCancel={ props.onCancel }
-						handleEntities={ isBoundEntityAvailable }
-						forceIsEditingLink={ link?.url ? false : undefined }
-						renderControlBottom={ () => {
-							// Don't show the tools when there is submitted link (preview state).
-							if ( link?.url?.length ) {
-								return null;
-							}
+				) }
+				{ ! addingMenuItems && ! addingPage && (
+					<div
+						ref={ linkControlWrapperRef }
+						role="dialog"
+						aria-labelledby={ dialogTitleId }
+						aria-describedby={ dialogDescriptionId }
+					>
+						<VisuallyHidden>
+							<h2 id={ dialogTitleId }>{ __( 'Add link' ) }</h2>
 
-							return (
-								<LinkUITools
-									addPageButtonRef={ addPageButtonRef }
-									addBlockButtonRef={ addBlockButtonRef }
-									setAddingBlock={ () => {
-										setAddingBlock( true );
-									} }
-									setAddingPage={ () => {
-										setAddingPage( true );
-									} }
-									canAddPage={
-										permissions?.canCreate &&
-										type === 'page'
-									}
-									canAddBlock={
-										blockEditingMode === 'default'
-									}
-								/>
-							);
+							<p id={ dialogDescriptionId }>
+								{ __(
+									'Search for and add a link to your Navigation.'
+								) }
+							</p>
+						</VisuallyHidden>
+						<LinkControl
+							hasTextControl
+							hasRichPreviews
+							value={ link }
+							showInitialSuggestions
+							withCreateSuggestion={ false }
+							noDirectEntry={ !! type }
+							noURLSuggestion={ !! type }
+							suggestionsQuery={ getSuggestionsQuery(
+								type,
+								kind
+							) }
+							onChange={ props.onChange }
+							onInputChange={ ( value ) => {
+								// Observe the input value so we can pass the value to the page creator
+								// and restore it on back button click
+								searchInputValueRef.current = value;
+							} }
+							inputValue={ initialSearchValue }
+							onRemove={ props.onRemove }
+							onCancel={ props.onCancel }
+							handleEntities={ isBoundEntityAvailable }
+							forceIsEditingLink={ link?.url ? false : undefined }
+							renderControlBottom={ () => {
+								// Don't show the tools when there is submitted link (preview state).
+								if ( link?.url?.length ) {
+									return null;
+								}
+
+								return (
+									<LinkUITools
+										addPageButtonRef={ addPageButtonRef }
+										addMenuItemButtonRef={
+											addMenuItemButtonRef
+										}
+										setAddingMenuItems={ () => {
+											setAddingMenuItems( true );
+										} }
+										setAddingPage={ () => {
+											setAddingPage( true );
+										} }
+										canAddPage={
+											permissions?.canCreate &&
+											type === 'page'
+										}
+										canAddMenuItem={
+											blockEditingMode === 'default'
+										}
+									/>
+								);
+							} }
+						/>
+					</div>
+				) }
+
+				{ addingPage && (
+					<LinkUIPageCreator
+						postType={ postType }
+						onBack={ () => {
+							setAddingPage( false );
+							setShouldFocusPane( addPageButtonRef );
+							updateSearchValue( searchInputValueRef.current );
 						} }
+						onPageCreated={ handlePageCreated }
+						initialTitle={
+							searchInputValueRef.current &&
+							! isURL( searchInputValueRef.current )
+								? searchInputValueRef.current
+								: ''
+						}
 					/>
-				</div>
-			) }
+				) }
+			</Popover>
 
-			{ addingBlock && (
-				<LinkUIBlockInserter
+			{ /* `Modal` portals to `document.body` — render outside `Popover` so the link popover is not an empty shell. */ }
+			{ addingMenuItems && (
+				<LinkUIAddMenuItems
 					clientId={ props.clientId }
 					onBack={ () => {
-						setAddingBlock( false );
-						setShouldFocusPane( addBlockButtonRef );
+						setAddingMenuItems( false );
+						setShouldFocusPane( addMenuItemButtonRef );
 						updateSearchValue( searchInputValueRef.current );
 					} }
-					onBlockInsert={ props?.onBlockInsert }
+					onBulkComplete={ props?.onBulkMenuItemsComplete }
 				/>
 			) }
-
-			{ addingPage && (
-				<LinkUIPageCreator
-					postType={ postType }
-					onBack={ () => {
-						setAddingPage( false );
-						setShouldFocusPane( addPageButtonRef );
-						updateSearchValue( searchInputValueRef.current );
-					} }
-					onPageCreated={ handlePageCreated }
-					initialTitle={
-						searchInputValueRef.current &&
-						! isURL( searchInputValueRef.current )
-							? searchInputValueRef.current
-							: ''
-					}
-				/>
-			) }
-		</Popover>
+		</>
 	);
 }
 
@@ -287,16 +300,16 @@ export const LinkUI = forwardRef( UnforwardedLinkUI );
 
 const LinkUITools = ( {
 	addPageButtonRef,
-	addBlockButtonRef,
-	setAddingBlock,
+	addMenuItemButtonRef,
+	setAddingMenuItems,
 	setAddingPage,
 	canAddPage,
-	canAddBlock,
+	canAddMenuItem,
 } ) => {
 	const blockInserterAriaRole = 'listbox';
 
 	// Don't render anything if neither button should be shown
-	if ( ! canAddPage && ! canAddBlock ) {
+	if ( ! canAddPage && ! canAddMenuItem ) {
 		return null;
 	}
 
@@ -316,18 +329,18 @@ const LinkUITools = ( {
 					{ __( 'Create page' ) }
 				</Button>
 			) }
-			{ canAddBlock && (
+			{ canAddMenuItem && (
 				<Button
 					__next40pxDefaultSize
-					ref={ addBlockButtonRef }
+					ref={ addMenuItemButtonRef }
 					icon={ plus }
 					onClick={ ( e ) => {
 						e.preventDefault();
-						setAddingBlock( true );
+						setAddingMenuItems( true );
 					} }
 					aria-haspopup={ blockInserterAriaRole }
 				>
-					{ __( 'Add block' ) }
+					{ __( 'Add menu item' ) }
 				</Button>
 			) }
 		</VStack>
