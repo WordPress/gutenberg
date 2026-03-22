@@ -409,7 +409,7 @@ export async function batchResizeImage(
 		);
 		if ( hasNonCroppedAnimated ) {
 			strOptions = '[n=-1]';
-			( loadOptions as LoadOptions< typeof type > ).n = -1;
+			( loadOptions as LoadOptions< 'image/gif' > ).n = -1;
 		}
 
 		const onProgress = () => {
