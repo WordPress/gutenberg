@@ -164,7 +164,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
                 class="components-visually-hidden emotion-6 emotion-7"
                 data-wp-c16t="true"
                 data-wp-component="VisuallyHidden"
-                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal;"
+                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
               >
                 (opens in a new tab)
               </span>
@@ -391,7 +391,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
                 class="components-visually-hidden emotion-6 emotion-7"
                 data-wp-c16t="true"
                 data-wp-component="VisuallyHidden"
-                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal;"
+                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
               >
                 (opens in a new tab)
               </span>

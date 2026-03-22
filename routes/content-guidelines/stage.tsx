@@ -1,11 +1,17 @@
+/* @jsxRuntime automatic */
+
 /**
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
-import { Spinner } from '@wordpress/components';
-import { Notice } from '@wordpress/ui';
+import {
+	Spinner,
+	Navigator,
+	Notice,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -14,6 +20,9 @@ import './style.scss';
 import GuidelineAccordion from './components/guideline-accordion';
 import GuidelineAccordionForm from './components/guideline-accordion-form';
 import { fetchContentGuidelines } from './api';
+import BlockGuidelines from './components/block-guidelines';
+import ActionsSection from './components/actions-section';
+import RevisionHistory from './components/revision-history';
 
 const GUIDELINE_ITEMS = [
 	{
@@ -41,6 +50,13 @@ const GUIDELINE_ITEMS = [
 		slug: 'images',
 	},
 	{
+		title: __( 'Blocks' ),
+		description: __(
+			'Create tailored guidelines for specific block types.'
+		),
+		slug: 'blocks',
+	},
+	{
 		title: __( 'Additional' ),
 		description: __( 'Add additional guidelines for your team.' ),
 
@@ -62,27 +78,27 @@ function ContentGuidelinesPage() {
 
 	return (
 		<Page
-			title={ __( 'Content guidelines' ) }
+			title={ __( 'Guidelines' ) }
 			subTitle={ __(
 				"Set content standards that guide your team, inform plugins, and help AI tools generate content that matches your site's voice and requirements."
 			) }
 		>
 			{ error && (
 				<div className="content-guidelines__content">
-					<Notice.Root intent="error">
-						<Notice.Title>
+					<Notice status="error" isDismissible={ false }>
+						<strong>
 							{ sprintf(
 								/* translators: %s: Error message. */
-								__( 'Error loading content guidelines: %s' ),
+								__( 'Error loading guidelines: %s' ),
 								error
 							) }
-						</Notice.Title>
-						<Notice.Description>
+						</strong>
+						<p className="content-guidelines__error-description">
 							{ __(
 								'Please try again. If the problem persists, contact support.'
 							) }
-						</Notice.Description>
-					</Notice.Root>
+						</p>
+					</Notice>
 				</div>
 			) }
 			{ loading ? (
@@ -91,47 +107,73 @@ function ContentGuidelinesPage() {
 				</div>
 			) : (
 				! error && (
-					<div className="content-guidelines__content">
-						{ /*
-						 * Disable reason: The `list` ARIA role is redundant but
-						 * Safari+VoiceOver won't announce the list otherwise.
-						 */
-						/* eslint-disable jsx-a11y/no-redundant-roles */ }
-						<ul role="list" className="content-guidelines__list">
-							{ GUIDELINE_ITEMS.map( ( item ) => {
-								const contentId = `content-guidelines-${ item.slug }`;
-								const headingId = `content-guidelines-${ item.slug }-heading`;
-								const descriptionId = `content-guidelines-${ item.slug }-description`;
+					<Navigator initialPath="/">
+						<Navigator.Screen path="/">
+							<VStack className="content-guidelines__content">
+								{ /*
+								 * Disable reason: The `list` ARIA role is redundant but
+								 * Safari+VoiceOver won't announce the list otherwise.
+								 */
+								/* eslint-disable jsx-a11y/no-redundant-roles */ }
+								<ul
+									role="list"
+									className="content-guidelines__list"
+								>
+									{ GUIDELINE_ITEMS.map( ( item ) => {
+										const contentId = `content-guidelines-${ item.slug }`;
+										const headingId = `content-guidelines-${ item.slug }-heading`;
+										const descriptionId = `content-guidelines-${ item.slug }-description`;
 
-								return (
-									<li
-										key={ item.slug }
-										className="content-guidelines__list-item"
-									>
-										<div className="content-guidelines__accordion-item">
-											<GuidelineAccordion
-												title={ item.title }
-												description={ item.description }
-												contentId={ contentId }
-												headingId={ headingId }
-												descriptionId={ descriptionId }
+										return (
+											<li
+												key={ item.slug }
+												className="content-guidelines__list-item"
 											>
-												<GuidelineAccordionForm
-													slug={ item.slug }
-													contentId={ contentId }
-													headingId={ headingId }
-													descriptionId={
-														descriptionId
-													}
-												/>
-											</GuidelineAccordion>
-										</div>
-									</li>
-								);
-							} ) }
-						</ul>
-						{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
-					</div>
+												<div className="content-guidelines__accordion-item">
+													<GuidelineAccordion
+														title={ item.title }
+														description={
+															item.description
+														}
+														contentId={ contentId }
+														headingId={ headingId }
+														descriptionId={
+															descriptionId
+														}
+													>
+														{ item.slug ===
+														'blocks' ? (
+															<BlockGuidelines />
+														) : (
+															<GuidelineAccordionForm
+																slug={
+																	item.slug
+																}
+																contentId={
+																	contentId
+																}
+																headingId={
+																	headingId
+																}
+																descriptionId={
+																	descriptionId
+																}
+															/>
+														) }
+													</GuidelineAccordion>
+												</div>
+											</li>
+										);
+									} ) }
+								</ul>
+								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+								<ActionsSection />
+							</VStack>
+						</Navigator.Screen>
+						<Navigator.Screen path="/revision-history">
+							<RevisionHistory />
+						</Navigator.Screen>
+					</Navigator>
 				)
 			) }
 		</Page>

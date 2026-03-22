@@ -12,7 +12,8 @@ import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * "Add tab" button in the block toolbar for the tab block.
- * Inserts new tabs into the tab-panel block.
+ * Inserts a new core/tab into the tab-panel and a new core/tabs-menu-item
+ * into the tabs-menu, keeping both in sync.
  *
  * @param {Object} props
  * @param {string} props.tabsClientId The client ID of the parent tabs block.
@@ -21,39 +22,63 @@ import { useDispatch, useSelect } from '@wordpress/data';
 export default function AddTabToolbarControl( { tabsClientId } ) {
 	const { insertBlock } = useDispatch( blockEditorStore );
 
-	// Find the tab-panel block within the tabs block
-	const { tabPanelClientId, nextTabIndex } = useSelect(
-		( select ) => {
-			if ( ! tabsClientId ) {
+	const { tabPanelClientId, tabsMenuClientId, tabCount, existingAnchors } =
+		useSelect(
+			( select ) => {
+				if ( ! tabsClientId ) {
+					return {
+						tabPanelClientId: null,
+						tabsMenuClientId: null,
+						existingAnchors: [],
+					};
+				}
+				const { getBlocks } = select( blockEditorStore );
+				const innerBlocks = getBlocks( tabsClientId );
+				const tabPanel = innerBlocks.find(
+					( block ) => block.name === 'core/tab-panel'
+				);
+				const tabsMenu = innerBlocks.find(
+					( block ) => block.name === 'core/tabs-menu'
+				);
 				return {
-					tabPanelClientId: null,
-					nextTabIndex: 0,
+					tabPanelClientId: tabPanel?.clientId || null,
+					tabsMenuClientId: tabsMenu?.clientId || null,
+					tabCount: tabPanel?.innerBlocks?.length || 0,
+					existingAnchors: ( tabPanel?.innerBlocks || [] )
+						.map( ( block ) => block.attributes.anchor )
+						.filter( Boolean ),
 				};
-			}
-			const { getBlocks } = select( blockEditorStore );
-			const innerBlocks = getBlocks( tabsClientId );
-			const tabPanel = innerBlocks.find(
-				( block ) => block.name === 'core/tab-panel'
-			);
-			return {
-				tabPanelClientId: tabPanel?.clientId || null,
-				nextTabIndex: ( tabPanel?.innerBlocks.length || 0 ) + 1,
-			};
-		},
-		[ tabsClientId ]
-	);
+			},
+			[ tabsClientId ]
+		);
 
 	const addTab = () => {
 		if ( ! tabPanelClientId ) {
 			return;
 		}
+
+		// Start from count + 1 so the label stays sequential, then increment
+		// until the anchor slot is free.
+		const existingAnchorSet = new Set( existingAnchors );
+		let tabNumber = tabCount + 1;
+		while ( existingAnchorSet.has( `tab-${ tabNumber }` ) ) {
+			tabNumber++;
+		}
+
 		const newTabBlock = createBlock( 'core/tab', {
-			anchor: 'tab-' + nextTabIndex,
+			anchor: `tab-${ tabNumber }`,
 			/* translators: %d: tab number */
-			label: sprintf( __( 'Tab %d' ), nextTabIndex ),
+			label: sprintf( __( 'Tab %d' ), tabNumber ),
 		} );
 		insertBlock( newTabBlock, undefined, tabPanelClientId );
-		// @TODO: Possible select and focus the tabs-menu-item active tab RichText editor?
+
+		// Insert a corresponding menu item into the tabs-menu.
+		if ( tabsMenuClientId ) {
+			const newMenuItemBlock = createBlock( 'core/tabs-menu-item', {
+				anchor: `tab-${ tabNumber }-button`,
+			} );
+			insertBlock( newMenuItemBlock, undefined, tabsMenuClientId );
+		}
 	};
 
 	return (

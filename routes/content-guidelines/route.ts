@@ -3,6 +3,12 @@
  */
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { bootstrapBlockRegistry } from './bootstrap-block-registry';
+
 export const route = {
-	title: () => __( 'Content Guidelines' ),
+	beforeLoad: bootstrapBlockRegistry,
+	title: () => __( 'Guidelines' ),
 };

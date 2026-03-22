@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { PanelProps } from '../collapsible/types';
 import type { ComponentProps } from '../utils/types';
 
 export interface RootProps extends ComponentProps< 'div' > {
@@ -41,4 +42,13 @@ export interface ContentProps extends ComponentProps< 'div' > {
 	 * The content to be rendered inside the collapsible content area.
 	 */
 	children?: ReactNode;
+	/**
+	 * Allows the browser’s built-in page search to find and expand the panel contents.
+	 *
+	 * Overrides the `keepMounted` prop and uses `hidden="until-found"`
+	 * to hide the element without removing it from the DOM.
+	 *
+	 * @default true
+	 */
+	hiddenUntilFound?: PanelProps[ 'hiddenUntilFound' ];
 }

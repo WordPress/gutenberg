@@ -5,6 +5,11 @@
  * @package gutenberg
  */
 
+// Client-side media processing is currently plugin-only while the feature matures.
+if ( ! defined( 'IS_GUTENBERG_PLUGIN' ) || ! IS_GUTENBERG_PLUGIN ) {
+	return;
+}
+
 if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
 	return;
 }
@@ -345,7 +350,6 @@ function gutenberg_add_crossorigin_attributes( string $html ): string {
 	// See https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin.
 	$tags = array(
 		'AUDIO'  => 'src',
-		'IMG'    => 'src',
 		'LINK'   => 'href',
 		'SCRIPT' => 'src',
 		'VIDEO'  => 'src',

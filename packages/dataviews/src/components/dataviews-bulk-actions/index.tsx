@@ -95,6 +95,7 @@ interface BulkSelectionCheckboxProps< Item > {
 	data: Item[];
 	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
+	disableSelectAll?: boolean;
 }
 
 export function BulkSelectionCheckbox< Item >( {
@@ -103,6 +104,7 @@ export function BulkSelectionCheckbox< Item >( {
 	data,
 	actions,
 	getItemId,
+	disableSelectAll = false,
 }: BulkSelectionCheckboxProps< Item > ) {
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
@@ -118,7 +120,23 @@ export function BulkSelectionCheckbox< Item >( {
 			selection.includes( getItemId( item ) ) &&
 			selectableItems.includes( item )
 	);
+	const hasSelection = selection.length > 0;
 	const areAllSelected = selectedItems.length === selectableItems.length;
+
+	if ( disableSelectAll ) {
+		return (
+			<CheckboxControl
+				className="dataviews-view-table-selection-checkbox"
+				checked={ hasSelection }
+				disabled={ ! hasSelection }
+				onChange={ () => {
+					onChangeSelection( [] );
+				} }
+				aria-label={ __( 'Deselect all' ) }
+			/>
+		);
+	}
+
 	return (
 		<CheckboxControl
 			className="dataviews-view-table-selection-checkbox"
@@ -153,6 +171,7 @@ interface ToolbarContentProps< Item > {
 	data: Item[];
 	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
+	isInfiniteScroll: boolean;
 	paginationInfo: {
 		totalItems: number;
 		totalPages: number;
@@ -241,6 +260,7 @@ function renderFooterContent< Item >(
 	data: Item[],
 	actions: Action< Item >[],
 	getItemId: ( item: Item ) => string,
+	isInfiniteScroll: boolean,
 	selection: string[],
 	actionsToShow: Action< Item >[],
 	selectedItems: Item[],
@@ -255,7 +275,8 @@ function renderFooterContent< Item >(
 	const message = getFooterMessage(
 		selection.length,
 		data.length,
-		paginationInfo.totalItems
+		paginationInfo.totalItems,
+		isInfiniteScroll
 	);
 	return (
 		<Stack
@@ -270,6 +291,7 @@ function renderFooterContent< Item >(
 				data={ data }
 				actions={ actions }
 				getItemId={ getItemId }
+				disableSelectAll={ isInfiniteScroll }
 			/>
 			<span className="dataviews-bulk-actions-footer__item-count">
 				{ message }
@@ -315,6 +337,7 @@ function FooterContent< Item >( {
 	onChangeSelection,
 	data,
 	getItemId,
+	isInfiniteScroll,
 	paginationInfo,
 }: ToolbarContentProps< Item > ) {
 	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
@@ -365,6 +388,7 @@ function FooterContent< Item >( {
 			data,
 			actions,
 			getItemId,
+			isInfiniteScroll,
 			selection,
 			actionsToShow,
 			selectedItems,
@@ -378,6 +402,7 @@ function FooterContent< Item >( {
 			data,
 			actions,
 			getItemId,
+			isInfiniteScroll,
 			selection,
 			actionsToShow,
 			selectedItems,
@@ -398,6 +423,7 @@ export function BulkActionsFooter() {
 		onChangeSelection,
 		getItemId,
 		paginationInfo,
+		view,
 	} = useContext( DataViewsContext );
 	return (
 		<FooterContent
@@ -406,6 +432,7 @@ export function BulkActionsFooter() {
 			data={ data }
 			actions={ actions }
 			getItemId={ getItemId }
+			isInfiniteScroll={ !! view.infiniteScrollEnabled }
 			paginationInfo={ paginationInfo }
 		/>
 	);

@@ -71,8 +71,8 @@ class Gutenberg_Content_Guidelines_Post_Type {
 	public static function register() {
 		$args = array(
 			'labels'                          => array(
-				'name'          => __( 'Content Guidelines', 'gutenberg' ),
-				'singular_name' => __( 'Content Guidelines', 'gutenberg' ),
+				'name'          => __( 'Guidelines', 'gutenberg' ),
+				'singular_name' => __( 'Guidelines', 'gutenberg' ),
 			),
 			'public'                          => false,
 			'publicly_queryable'              => false,

@@ -9,6 +9,7 @@ import { Stack } from '@wordpress/ui';
 import { SidebarToggleSlot } from './sidebar-toggle-slot';
 
 export default function Header( {
+	headingLevel = 2,
 	breadcrumbs,
 	badges,
 	title,
@@ -16,6 +17,7 @@ export default function Header( {
 	actions,
 	showSidebarToggle = true,
 }: {
+	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 	breadcrumbs?: React.ReactNode;
 	badges?: React.ReactNode;
 	title?: React.ReactNode;
@@ -23,6 +25,7 @@ export default function Header( {
 	actions?: React.ReactNode;
 	showSidebarToggle?: boolean;
 } ) {
+	const HeadingTag = `h${ headingLevel }` as const;
 	return (
 		<Stack
 			direction="column"
@@ -38,9 +41,9 @@ export default function Header( {
 						/>
 					) }
 					{ title && (
-						<h2 className="admin-ui-page__header-title">
+						<HeadingTag className="admin-ui-page__header-title">
 							{ title }
-						</h2>
+						</HeadingTag>
 					) }
 					{ breadcrumbs }
 					{ badges }
