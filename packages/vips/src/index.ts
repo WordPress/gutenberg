@@ -357,6 +357,199 @@ export async function resizeImage(
 	}
 }
 
+interface BatchResizeSize {
+	name: string;
+	resize: ImageSizeCrop;
+	smartCrop?: boolean;
+}
+
+interface BatchResizeResult {
+	buffer: ArrayBuffer | ArrayBufferLike;
+	width: number;
+	height: number;
+	originalWidth: number;
+	originalHeight: number;
+}
+
+/**
+ * Resizes an image to multiple sizes using a single decode step.
+ *
+ * This is significantly faster than calling resizeImage() for each size,
+ * because decoding compressed formats like AVIF is expensive.
+ * By decoding once and using thumbnailImage() for each size,
+ * we avoid redundant decode work.
+ *
+ * @param id      Item ID.
+ * @param buffer  Original file buffer.
+ * @param type    Mime type.
+ * @param sizes   Array of sizes to generate, each with a name and resize options.
+ * @param quality Desired quality (0-1).
+ * @return Map of size names to processed file data plus dimensions.
+ */
+export async function batchResizeImage(
+	id: ItemId,
+	buffer: ArrayBuffer,
+	type: string,
+	sizes: BatchResizeSize[],
+	quality = 0.82
+): Promise< Record< string, BatchResizeResult > > {
+	const ext = type.split( '/' )[ 1 ];
+
+	inProgressOperations.add( id );
+
+	try {
+		const vips = await getVips();
+
+		let strOptions = '';
+		const loadOptions: LoadOptions< typeof type > = {};
+
+		// Check if any sizes need animation support (non-cropped).
+		const hasNonCroppedAnimated = sizes.some(
+			( s ) => supportsAnimation( type ) && ! s.resize.crop
+		);
+		if ( hasNonCroppedAnimated ) {
+			strOptions = '[n=-1]';
+			( loadOptions as LoadOptions< typeof type > ).n = -1;
+		}
+
+		const onProgress = () => {
+			if ( ! inProgressOperations.has( id ) ) {
+				sourceImage.kill = true;
+			}
+		};
+
+		// Decode once — this is the expensive step we want to avoid repeating.
+		const sourceImage = vips.Image.newFromBuffer(
+			buffer,
+			strOptions,
+			loadOptions
+		);
+
+		sourceImage.onProgress = onProgress;
+
+		const originalWidth = sourceImage.width;
+		const originalHeight = sourceImage.pageHeight;
+
+		const results: Record< string, BatchResizeResult > = {};
+
+		for ( const sizeSpec of sizes ) {
+			// Check cancellation before each size.
+			if ( ! inProgressOperations.has( id ) ) {
+				break;
+			}
+
+			// Clone resize options to avoid mutating the original.
+			const resize = { ...sizeSpec.resize };
+			const smartCrop = sizeSpec.smartCrop ?? false;
+
+			const thumbnailOptions: ThumbnailOptions = {
+				size: 'down',
+			};
+
+			if ( hasNonCroppedAnimated && ! resize.crop ) {
+				thumbnailOptions.option_string = strOptions;
+			}
+
+			// If resize.height is zero.
+			resize.height =
+				resize.height ||
+				( originalHeight / originalWidth ) * resize.width;
+
+			let resizeWidth = resize.width;
+			thumbnailOptions.height = resize.height;
+
+			let image: InstanceType< typeof Vips.Image >;
+
+			if ( ! resize.crop ) {
+				image = sourceImage.thumbnailImage( resizeWidth, {
+					...thumbnailOptions,
+				} );
+				image.onProgress = onProgress;
+			} else if ( true === resize.crop ) {
+				thumbnailOptions.crop = smartCrop ? 'attention' : 'centre';
+				image = sourceImage.thumbnailImage( resizeWidth, {
+					...thumbnailOptions,
+				} );
+				image.onProgress = onProgress;
+			} else {
+				// First resize, then do the cropping.
+				if ( originalWidth < originalHeight ) {
+					resizeWidth =
+						resize.width >= resize.height
+							? resize.width
+							: ( originalWidth / originalHeight ) *
+							  resize.height;
+					thumbnailOptions.height =
+						resize.width >= resize.height
+							? ( originalHeight / originalWidth ) * resizeWidth
+							: resize.height;
+				} else {
+					resizeWidth =
+						resize.width >= resize.height
+							? ( originalWidth / originalHeight ) * resize.height
+							: resize.width;
+					thumbnailOptions.height =
+						resize.width >= resize.height
+							? resize.height
+							: ( originalHeight / originalWidth ) * resizeWidth;
+				}
+
+				image = sourceImage.thumbnailImage( resizeWidth, {
+					...thumbnailOptions,
+				} );
+				image.onProgress = onProgress;
+
+				let left = 0;
+				if ( 'center' === resize.crop[ 0 ] ) {
+					left = ( image.width - resize.width ) / 2;
+				} else if ( 'right' === resize.crop[ 0 ] ) {
+					left = image.width - resize.width;
+				}
+
+				let top = 0;
+				if ( 'center' === resize.crop[ 1 ] ) {
+					top = ( image.height - resize.height ) / 2;
+				} else if ( 'bottom' === resize.crop[ 1 ] ) {
+					top = image.height - resize.height;
+				}
+
+				left = Math.max( 0, left );
+				top = Math.max( 0, top );
+				resize.width = Math.min( image.width, resize.width );
+				resize.height = Math.min( image.height, resize.height );
+
+				image = image.crop( left, top, resize.width, resize.height );
+				image.onProgress = onProgress;
+			}
+
+			const saveOptions: SaveOptions< typeof type > = {
+				keep: 'icc',
+			};
+
+			if ( supportsQuality( type ) ) {
+				saveOptions.Q = quality * 100;
+			}
+
+			const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
+
+			results[ sizeSpec.name ] = {
+				buffer: outBuffer.buffer,
+				width: image.width,
+				height: image.pageHeight,
+				originalWidth,
+				originalHeight,
+			};
+		}
+
+		// Only call after all images are no longer being used.
+		cleanup?.();
+
+		return results;
+	} finally {
+		inProgressOperations.delete( id );
+	}
+}
+
 /**
  * Rotates an image based on EXIF orientation value.
  *
@@ -486,6 +679,7 @@ export {
 	convertImageFormat as vipsConvertImageFormat,
 	compressImage as vipsCompressImage,
 	resizeImage as vipsResizeImage,
+	batchResizeImage as vipsBatchResizeImage,
 	rotateImage as vipsRotateImage,
 	hasTransparency as vipsHasTransparency,
 	cancelOperations as vipsCancelOperations,

@@ -130,6 +130,42 @@ export async function vipsResizeImage(
 }
 
 /**
+ * Resizes an image to multiple sizes using a single decode step in a worker.
+ *
+ * @param id      Item ID.
+ * @param buffer  Original file buffer.
+ * @param type    Mime type.
+ * @param sizes   Array of sizes to generate.
+ * @param quality Desired quality (0-1).
+ * @return Map of size names to processed file data plus dimensions.
+ */
+export async function vipsBatchResizeImage(
+	id: ItemId,
+	buffer: ArrayBuffer,
+	type: string,
+	sizes: Array< {
+		name: string;
+		resize: ImageSizeCrop;
+		smartCrop?: boolean;
+	} >,
+	quality = 0.82
+): Promise<
+	Record<
+		string,
+		{
+			buffer: ArrayBuffer | ArrayBufferLike;
+			width: number;
+			height: number;
+			originalWidth: number;
+			originalHeight: number;
+		}
+	>
+> {
+	const api = getWorkerAPI();
+	return api.batchResizeImage( id, buffer, type, sizes, quality );
+}
+
+/**
  * Determines whether an image has an alpha channel using vips in a worker.
  *
  * @param buffer Original file buffer.
