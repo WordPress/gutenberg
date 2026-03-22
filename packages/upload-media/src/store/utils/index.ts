@@ -199,6 +199,80 @@ export async function vipsResizeImage(
 }
 
 /**
+ * Resizes an image to multiple sizes using a single decode step in a web worker.
+ *
+ * This is significantly faster than calling vipsResizeImage() for each size,
+ * because the source image is only decoded once from its compressed format.
+ *
+ * @param id      Queue item ID.
+ * @param file    File object.
+ * @param sizes   Array of sizes to generate, each with name, resize options, and optional smartCrop.
+ * @param signal  Optional abort signal to cancel the operation.
+ * @param quality Desired quality (0-1).
+ * @return Map of size names to resized ImageFile objects with dimension metadata.
+ */
+export async function vipsBatchResizeImage(
+	id: QueueItemId,
+	file: File,
+	sizes: Array< {
+		name: string;
+		resize: ImageSizeCrop;
+		smartCrop?: boolean;
+	} >,
+	signal?: AbortSignal,
+	quality?: number
+): Promise< Record< string, ImageFile > > {
+	if ( signal?.aborted ) {
+		throw new Error( 'Operation aborted' );
+	}
+
+	const { vipsBatchResizeImage: batchResize } = await loadVipsModule();
+	const results = await batchResize(
+		id,
+		await file.arrayBuffer(),
+		file.type,
+		sizes,
+		quality
+	);
+
+	const imageFiles: Record< string, ImageFile > = {};
+	const basename = getFileBasename( file.name );
+
+	for ( const [ name, result ] of Object.entries( results ) ) {
+		const { buffer, width, height, originalWidth, originalHeight } = result;
+		const wasResized = originalWidth > width || originalHeight > height;
+
+		let fileName = file.name;
+		if ( wasResized ) {
+			fileName = file.name.replace(
+				basename,
+				`${ basename }-${ width }x${ height }`
+			);
+		}
+
+		imageFiles[ name ] = new ImageFile(
+			new File(
+				[
+					new Blob( [ buffer as ArrayBuffer ], {
+						type: file.type,
+					} ),
+				],
+				fileName,
+				{
+					type: file.type,
+				}
+			),
+			width,
+			height,
+			originalWidth,
+			originalHeight
+		);
+	}
+
+	return imageFiles;
+}
+
+/**
  * Rotates an image based on EXIF orientation using vips in a web worker.
  *
  * This applies the correct rotation/flip transformation based on the EXIF

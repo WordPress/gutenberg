@@ -19,6 +19,7 @@ import { StubFile } from '../stub-file';
 import { UploadError } from '../upload-error';
 import {
 	vipsResizeImage,
+	vipsBatchResizeImage,
 	vipsRotateImage,
 	vipsConvertImageFormat,
 	vipsHasTransparency,
@@ -70,6 +71,7 @@ type ActionCreators = {
 	uploadItem: typeof uploadItem;
 	sideloadItem: typeof sideloadItem;
 	resizeCropItem: typeof resizeCropItem;
+	batchResizeCropItem: typeof batchResizeCropItem;
 	rotateItem: typeof rotateItem;
 	transcodeImageItem: typeof transcodeImageItem;
 	generateThumbnails: typeof generateThumbnails;
@@ -337,7 +339,8 @@ export function processItem( id: QueueItemId ) {
 		 */
 		if (
 			operation === OperationType.ResizeCrop ||
-			operation === OperationType.Rotate
+			operation === OperationType.Rotate ||
+			operation === OperationType.BatchResizeCrop
 		) {
 			const settings = select.getSettings();
 			const activeCount = select.getActiveImageProcessingCount();
@@ -442,6 +445,13 @@ export function processItem( id: QueueItemId ) {
 				dispatch.rotateItem(
 					item.id,
 					operationArgs as OperationArgs[ OperationType.Rotate ]
+				);
+				break;
+
+			case OperationType.BatchResizeCrop:
+				dispatch.batchResizeCropItem(
+					item.id,
+					operationArgs as OperationArgs[ OperationType.BatchResizeCrop ]
 				);
 				break;
 
@@ -605,7 +615,8 @@ export function finishOperation(
 		 */
 		if (
 			previousOperation === OperationType.ResizeCrop ||
-			previousOperation === OperationType.Rotate
+			previousOperation === OperationType.Rotate ||
+			previousOperation === OperationType.BatchResizeCrop
 		) {
 			const pendingItems = select.getPendingImageProcessing();
 			for ( const pendingItem of pendingItems ) {
@@ -925,6 +936,82 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 	};
 }
 
+type BatchResizeCropItemArgs = OperationArgs[ OperationType.BatchResizeCrop ];
+
+/**
+ * Resizes an image to multiple sizes in a single decode pass,
+ * then creates individual sideload items for upload.
+ *
+ * @param id   Item ID.
+ * @param args Batch resize arguments.
+ */
+export function batchResizeCropItem(
+	id: QueueItemId,
+	args?: BatchResizeCropItemArgs
+) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item || ! args ) {
+			return;
+		}
+
+		try {
+			const results = await vipsBatchResizeImage(
+				item.id,
+				item.file,
+				args.sizes.map( ( s ) => ( {
+					name: s.name,
+					resize: s.resize,
+				} ) ),
+				item.abortController?.signal
+			);
+
+			for ( const sizeSpec of args.sizes ) {
+				const result = results[ sizeSpec.name ];
+				if ( ! result ) {
+					continue;
+				}
+
+				const operations: Operation[] = [];
+				if ( args.transcodeOperation ) {
+					operations.push( args.transcodeOperation );
+				}
+				operations.push( OperationType.Upload );
+
+				dispatch.addSideloadItem( {
+					file: result,
+					onChange: ( [ updatedAttachment ] ) => {
+						if ( isBlobURL( updatedAttachment.url ) ) {
+							return;
+						}
+						item.onChange?.( [ updatedAttachment ] );
+					},
+					batchId: args.batchId,
+					parentId: item.parentId ?? item.id,
+					additionalData: {
+						post: args.attachmentId,
+						image_size: sizeSpec.name,
+						convert_format: false,
+					},
+					operations,
+				} );
+			}
+
+			dispatch.finishOperation( id, {} );
+		} catch ( error ) {
+			dispatch.cancelItem(
+				id,
+				new UploadError( {
+					code: 'IMAGE_TRANSCODING_ERROR',
+					message: 'Batch resize failed',
+					file: item.file,
+					cause: error instanceof Error ? error : undefined,
+				} )
+			);
+		}
+	};
+}
+
 type RotateItemArgs = OperationArgs[ OperationType.Rotate ];
 
 /**
@@ -1167,6 +1254,11 @@ export function generateThumbnails( id: QueueItemId ) {
 				);
 			}
 
+			// Build the list of valid sizes for batch processing.
+			const batchSizes: Array< {
+				name: string;
+				resize: ( typeof allImageSizes )[ string ];
+			} > = [];
 			for ( const name of sizesToGenerate ) {
 				const imageSize = allImageSizes[ name ];
 				if ( ! imageSize ) {
@@ -1176,44 +1268,33 @@ export function generateThumbnails( id: QueueItemId ) {
 					);
 					continue;
 				}
+				batchSizes.push( { name, resize: imageSize } );
+			}
 
-				// Build operations list for this thumbnail.
-				const thumbnailOperations: Operation[] = [
-					[ OperationType.ResizeCrop, { resize: imageSize } ],
-				];
-
-				// Add transcoding if format conversion is configured and
-				// the transparency check passed.
-				if ( thumbnailTranscodeOperation ) {
-					thumbnailOperations.push( thumbnailTranscodeOperation );
-				}
-
-				thumbnailOperations.push( OperationType.Upload );
-
+			// Use a single batch resize operation to decode the source
+			// image once and generate all sub-sizes, instead of decoding
+			// for each size individually.
+			if ( batchSizes.length > 0 && attachment.id ) {
 				dispatch.addSideloadItem( {
 					file,
-					onChange: ( [ updatedAttachment ] ) => {
-						// If the sub-size is still being generated, there is no need
-						// to invoke the callback below. It would just override
-						// the main image in the editor with the sub-size.
-						if ( isBlobURL( updatedAttachment.url ) ) {
-							return;
-						}
-
-						// This might be confusing, but the idea is to update the original
-						// image item in the editor with the new one with the added sub-size.
-						item.onChange?.( [ updatedAttachment ] );
-					},
 					batchId,
 					parentId: item.id,
 					additionalData: {
-						// Sideloading does not use the parent post ID but the
-						// attachment ID as the image sizes need to be added to it.
 						post: attachment.id,
-						image_size: name,
+						image_size: 'batch',
 						convert_format: false,
 					},
-					operations: thumbnailOperations,
+					operations: [
+						[
+							OperationType.BatchResizeCrop,
+							{
+								sizes: batchSizes,
+								transcodeOperation: thumbnailTranscodeOperation,
+								attachmentId: attachment.id,
+								batchId,
+							},
+						],
+					],
 				} );
 			}
 

@@ -158,7 +158,8 @@ export function getActiveImageProcessingCount( state: State ): number {
 	return state.queue.filter(
 		( item ) =>
 			item.currentOperation === OperationType.ResizeCrop ||
-			item.currentOperation === OperationType.Rotate
+			item.currentOperation === OperationType.Rotate ||
+			item.currentOperation === OperationType.BatchResizeCrop
 	).length;
 }
 
@@ -177,9 +178,11 @@ export function getPendingImageProcessing( state: State ): QueueItem[] {
 			: item.operations?.[ 0 ];
 		return (
 			( nextOperation === OperationType.ResizeCrop ||
-				nextOperation === OperationType.Rotate ) &&
+				nextOperation === OperationType.Rotate ||
+				nextOperation === OperationType.BatchResizeCrop ) &&
 			item.currentOperation !== OperationType.ResizeCrop &&
-			item.currentOperation !== OperationType.Rotate
+			item.currentOperation !== OperationType.Rotate &&
+			item.currentOperation !== OperationType.BatchResizeCrop
 		);
 	} );
 }

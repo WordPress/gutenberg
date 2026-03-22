@@ -236,6 +236,7 @@ export enum OperationType {
 	ResizeCrop = 'RESIZE_CROP',
 	Rotate = 'ROTATE',
 	TranscodeImage = 'TRANSCODE_IMAGE',
+	BatchResizeCrop = 'BATCH_RESIZE_CROP',
 	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
 	Finalize = 'FINALIZE',
 }
@@ -284,6 +285,21 @@ export interface OperationArgs {
 		outputQuality: number;
 		/** Whether to use interlaced encoding. */
 		interlaced: boolean;
+	};
+	[ OperationType.BatchResizeCrop ]: {
+		/** Array of sizes to generate in a single decode pass. */
+		sizes: Array< { name: string; resize: ImageSizeCrop } >;
+		/** Optional transcode operation to apply to each resized sub-size. */
+		transcodeOperation:
+			| [
+					OperationType.TranscodeImage,
+					OperationArgs[ OperationType.TranscodeImage ],
+			  ]
+			| null;
+		/** Attachment ID to sideload sub-sizes to. */
+		attachmentId: number;
+		/** Batch ID for coordinating uploads. */
+		batchId: string;
 	};
 }
 
