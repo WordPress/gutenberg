@@ -1,8 +1,4 @@
-/** @typedef {import('@wordpress/keycodes').WPKeycodeModifier} WPKeycodeModifier */
-
-/**
- * @typedef {'command'|'view'|'edit'|'workflow'|'action'} WPCommandCategory
- */
+type WPCommandCategory = 'command' | 'view' | 'edit' | 'workflow' | 'action';
 
 /**
  * Command categories allowed via registerCommand.
@@ -11,7 +7,7 @@
  *
  * @type {Set<WPCommandCategory>}
  */
-const REGISTERABLE_CATEGORIES = new Set( [
+const REGISTERABLE_CATEGORIES = new Set< WPCommandCategory >( [
 	'command',
 	'view',
 	'edit',
@@ -34,9 +30,24 @@ const REGISTERABLE_CATEGORIES = new Set( [
  * @property {string[]=}          keywords    Command keywords for search matching.
  */
 
-/**
- * @typedef {(search: string) => WPCommandConfig[]} WPCommandLoaderHook hoo
- */
+export interface WPCommandConfig {
+	/**
+	 * Command name
+	 *
+	 * @type {string}
+	 */
+	name: string;
+	label: string;
+	searchLabel?: string;
+	context?: string;
+	category: WPCommandCategory;
+	icon: JSX.Element;
+	callback: ( props: { close: () => void } ) => void;
+	disabled?: boolean;
+	keywords?: string[];
+}
+
+type WPCommandLoaderHook = ( search: string ) => WPCommandConfig[];
 
 /**
  * Command loader config.
@@ -50,6 +61,14 @@ const REGISTERABLE_CATEGORIES = new Set( [
  * @property {boolean}             disabled Whether to disable the command loader.
  */
 
+export interface WPCommandLoaderConfig {
+	name: string;
+	context?: string;
+	category?: WPCommandCategory;
+	hook: WPCommandLoaderHook;
+	disabled?: boolean;
+}
+
 /**
  * Returns an action object used to register a new command.
  *
@@ -57,7 +76,7 @@ const REGISTERABLE_CATEGORIES = new Set( [
  *
  * @return {Object} action.
  */
-export function registerCommand( config ) {
+export function registerCommand( config: WPCommandConfig ) {
 	let { category } = config;
 
 	// Defaults to 'action' if no category is provided or if the category is invalid. Future versions will emit a warning.
@@ -66,7 +85,7 @@ export function registerCommand( config ) {
 	}
 
 	return {
-		type: 'REGISTER_COMMAND',
+		type: 'REGISTER_COMMAND' as const,
 		...config,
 		category,
 	};
@@ -79,9 +98,9 @@ export function registerCommand( config ) {
  *
  * @return {Object} action.
  */
-export function unregisterCommand( name ) {
+export function unregisterCommand( name: string ) {
 	return {
-		type: 'UNREGISTER_COMMAND',
+		type: 'UNREGISTER_COMMAND' as const,
 		name,
 	};
 }
@@ -93,7 +112,7 @@ export function unregisterCommand( name ) {
  *
  * @return {Object} action.
  */
-export function registerCommandLoader( config ) {
+export function registerCommandLoader( config: WPCommandLoaderConfig ) {
 	let { category } = config;
 
 	// Defaults to 'action' if no category is provided or if the category is invalid. Future versions will emit a warning.
@@ -102,7 +121,7 @@ export function registerCommandLoader( config ) {
 	}
 
 	return {
-		type: 'REGISTER_COMMAND_LOADER',
+		type: 'REGISTER_COMMAND_LOADER' as const,
 		...config,
 		category,
 	};
@@ -115,9 +134,9 @@ export function registerCommandLoader( config ) {
  *
  * @return {Object} action.
  */
-export function unregisterCommandLoader( name ) {
+export function unregisterCommandLoader( name: string ) {
 	return {
-		type: 'UNREGISTER_COMMAND_LOADER',
+		type: 'UNREGISTER_COMMAND_LOADER' as const,
 		name,
 	};
 }
@@ -129,7 +148,7 @@ export function unregisterCommandLoader( name ) {
  */
 export function open() {
 	return {
-		type: 'OPEN',
+		type: 'OPEN' as const,
 	};
 }
 
@@ -140,6 +159,14 @@ export function open() {
  */
 export function close() {
 	return {
-		type: 'CLOSE',
+		type: 'CLOSE' as const,
 	};
 }
+
+export type Action =
+	| ReturnType< typeof registerCommand >
+	| ReturnType< typeof unregisterCommand >
+	| ReturnType< typeof registerCommandLoader >
+	| ReturnType< typeof unregisterCommandLoader >
+	| ReturnType< typeof open >
+	| ReturnType< typeof close >;

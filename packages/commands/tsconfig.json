@@ -1,0 +1,19 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"types": [ "gutenberg-env" ],
+		"strictNullChecks": true
+	},
+	"references": [
+		{ "path": "../components" },
+		{ "path": "../data" },
+		{ "path": "../element" },
+		{ "path": "../keyboard-shortcuts" },
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../private-apis" },
+		{ "path": "../warning" }
+	],
+	"include": [ "src/**/*.ts", "src/**/*.tsx" ]
+}

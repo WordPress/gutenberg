@@ -7,6 +7,7 @@
 	"references": [
 		{ "path": "../a11y" },
 		{ "path": "../admin-ui" },
+		{ "path": "../commands" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../core-data" },
@@ -16,6 +17,7 @@
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../keycodes" },
 		{ "path": "../lazy-editor" },
 		{ "path": "../notices" },

@@ -15,7 +15,7 @@ import { unlock } from '../lock-unlock';
  *
  * @param {string} context Context to set.
  */
-export default function useCommandContext( context ) {
+export default function useCommandContext( context: string ) {
 	const { getContext } = useSelect( commandsStore );
 	const initialContext = useRef( getContext() );
 	const { setContext } = unlock( useDispatch( commandsStore ) );

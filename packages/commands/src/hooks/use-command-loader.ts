@@ -8,11 +8,12 @@ import { useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as commandsStore } from '../store';
+import type { WPCommandLoaderConfig } from '../store/actions';
 
 /**
  * Attach a command loader to the command palette. Used for dynamic commands.
  *
- * @param {import('../store/actions').WPCommandLoaderConfig} loader command loader config.
+ * @param loader command loader config.
  *
  * @example
  * ```js
@@ -79,7 +80,7 @@ import { store as commandsStore } from '../store';
  * } );
  * ```
  */
-export default function useCommandLoader( loader ) {
+export default function useCommandLoader( loader: WPCommandLoaderConfig ) {
 	const { registerCommandLoader, unregisterCommandLoader } =
 		useDispatch( commandsStore );
 	useEffect( () => {

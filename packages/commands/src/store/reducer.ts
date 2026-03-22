@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
+import type { Action } from './actions';
+import type { State } from './types';
+import type { PrivateActions } from './private-actions';
 
 /**
  * Reducer returning the registered commands
@@ -11,7 +14,10 @@ import { combineReducers } from '@wordpress/data';
  *
  * @return {Object} Updated state.
  */
-function commands( state = {}, action ) {
+function commands(
+	state: State[ 'commands' ] = {},
+	action: Action
+): State[ 'commands' ] {
 	switch ( action.type ) {
 		case 'REGISTER_COMMAND':
 			return {
@@ -44,7 +50,10 @@ function commands( state = {}, action ) {
  *
  * @return {Object} Updated state.
  */
-function commandLoaders( state = {}, action ) {
+function commandLoaders(
+	state: State[ 'commandLoaders' ] = {},
+	action: Action
+): State[ 'commandLoaders' ] {
 	switch ( action.type ) {
 		case 'REGISTER_COMMAND_LOADER':
 			return {
@@ -73,7 +82,10 @@ function commandLoaders( state = {}, action ) {
  *
  * @return {boolean} Updated state.
  */
-function isOpen( state = false, action ) {
+function isOpen(
+	state: State[ 'isOpen' ] = false,
+	action: Action
+): State[ 'isOpen' ] {
 	switch ( action.type ) {
 		case 'OPEN':
 			return true;
@@ -89,10 +101,11 @@ function isOpen( state = false, action ) {
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
- *
- * @return {boolean} Updated state.
  */
-function context( state = 'root', action ) {
+function context(
+	state: State[ 'context' ] = 'root',
+	action: PrivateActions
+): State[ 'context' ] {
 	switch ( action.type ) {
 		case 'SET_CONTEXT':
 			return action.context;

@@ -18,6 +18,7 @@ import {
 	Component,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import type { TranslatableText } from '@wordpress/i18n';
 import {
 	Modal,
 	TextHighlight,
@@ -35,6 +36,7 @@ import { Icon, search as inputIcon, arrowRight } from '@wordpress/icons';
  */
 import { store as commandsStore } from '../store';
 import { unlock } from '../lock-unlock';
+import type { WPCommandConfig } from '../store/actions';
 
 const { withIgnoreIMEEvents } = unlock( componentsPrivateApis );
 
@@ -45,14 +47,14 @@ const inputLabel = __( 'Search commands and settings' );
  * Categories listed here will always use the specified icon,
  * ignoring whatever icon the command itself provides.
  */
-const CATEGORY_ICONS = {
+const CATEGORY_ICONS: Record< string, JSX.Element > = {
 	view: arrowRight,
 };
 
 /**
  * Translatable labels for command categories.
  */
-const CATEGORY_LABELS = {
+const CATEGORY_LABELS: Record< string, TranslatableText< string > > = {
 	command: __( 'Command' ),
 	view: __( 'View' ),
 	edit: __( 'Edit' ),
@@ -70,7 +72,7 @@ const CATEGORY_LABELS = {
  * @return {boolean} True if the parameter is a valid icon and false otherwise.
  */
 
-export function isValidIcon( icon ) {
+export function isValidIcon( icon: unknown ) {
 	return (
 		!! icon &&
 		( typeof icon === 'string' ||
@@ -80,6 +82,20 @@ export function isValidIcon( icon ) {
 	);
 }
 
+type SetLoader = ( name: string, isLoading: boolean ) => void;
+
+interface CommandMenuLoaderProps {
+	name: string;
+	search: string;
+	hook: ( search: string ) => {
+		isLoading: boolean;
+		commands?: WPCommandConfig[];
+	};
+	setLoader: SetLoader;
+	close: () => void;
+	category: string | undefined;
+}
+
 function CommandMenuLoader( {
 	name,
 	search,
@@ -87,8 +103,8 @@ function CommandMenuLoader( {
 	setLoader,
 	close,
 	category,
-} ) {
-	const { isLoading, commands = [] } = hook( { search } ) ?? {};
+}: CommandMenuLoaderProps ) {
+	const { isLoading, commands = [] } = hook( search ) ?? {};
 	useEffect( () => {
 		setLoader( name, isLoading );
 	}, [ setLoader, name, isLoading ] );
@@ -145,13 +161,24 @@ function CommandMenuLoader( {
 	);
 }
 
+interface CommandMenuLoaderWrapperProps {
+	hook: ( search: string ) => {
+		isLoading?: boolean;
+		commands?: WPCommandConfig[];
+	};
+	search: string;
+	setLoader: SetLoader;
+	close: () => void;
+	category: string | undefined;
+}
+
 export function CommandMenuLoaderWrapper( {
 	hook,
 	search,
 	setLoader,
 	close,
 	category,
-} ) {
+}: CommandMenuLoaderWrapperProps ) {
 	// The "hook" prop is actually a custom React hook
 	// so to avoid breaking the rules of hooks
 	// the CommandMenuLoaderWrapper component need to be
@@ -178,7 +205,19 @@ export function CommandMenuLoaderWrapper( {
 	);
 }
 
-export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
+interface CommandMenuGroupProps {
+	isContextual?: any;
+	search: string;
+	setLoader: SetLoader;
+	close: () => void;
+}
+
+export function CommandMenuGroup( {
+	isContextual,
+	search,
+	setLoader,
+	close,
+}: CommandMenuGroupProps ) {
 	const { commands, loaders } = useSelect(
 		( select ) => {
 			const { getCommands, getCommandLoaders } = select( commandsStore );
@@ -245,8 +284,14 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 	);
 }
 
-function CommandInput( { isOpen, search, setSearch } ) {
-	const commandMenuInput = useRef();
+interface CommandInputProps {
+	isOpen: boolean;
+	search: string;
+	setSearch: ( search: string ) => void;
+}
+
+function CommandInput( { isOpen, search, setSearch }: CommandInputProps ) {
+	const commandMenuInput = useRef< HTMLInputElement >( null );
 	const _value = useCommandState( ( state ) => state.value );
 	const selectedItemId = useMemo( () => {
 		const item = document.querySelector(
@@ -257,7 +302,7 @@ function CommandInput( { isOpen, search, setSearch } ) {
 	useEffect( () => {
 		// Focus the command palette input when mounting the modal.
 		if ( isOpen ) {
-			commandMenuInput.current.focus();
+			commandMenuInput.current?.focus();
 		}
 	}, [ isOpen ] );
 	return (
@@ -266,7 +311,9 @@ function CommandInput( { isOpen, search, setSearch } ) {
 			value={ search }
 			onValueChange={ setSearch }
 			placeholder={ inputLabel }
-			aria-activedescendant={ selectedItemId }
+			aria-activedescendant={
+				selectedItemId ? selectedItemId : undefined
+			}
 		/>
 	);
 }
@@ -282,7 +329,7 @@ export function CommandMenu() {
 		[]
 	);
 	const { open, close } = useDispatch( commandsStore );
-	const [ loaders, setLoaders ] = useState( {} );
+	const [ loaders, setLoaders ] = useState< SetLoader >( {} );
 
 	useEffect( () => {
 		registerShortcut( {
@@ -299,7 +346,7 @@ export function CommandMenu() {
 	useShortcut(
 		'core/commands',
 		/** @type {React.KeyboardEventHandler} */
-		withIgnoreIMEEvents( ( event ) => {
+		withIgnoreIMEEvents( ( event: KeyboardEvent ) => {
 			// Bails to avoid obscuring the effect of the preceding handler(s).
 			if ( event.defaultPrevented ) {
 				return;
@@ -313,12 +360,13 @@ export function CommandMenu() {
 			}
 		} ),
 		{
+			// @ts-expect-error this isn't in the useShortcut type but might be in the future
 			bindGlobal: true,
 		}
 	);
 
 	const setLoader = useCallback(
-		( name, value ) =>
+		( name: string, value ) =>
 			setLoaders( ( current ) => ( {
 				...current,
 				[ name ]: value,
