@@ -34,7 +34,7 @@ const { Tabs } = unlock( componentsPrivateApis );
 const PER_PAGE = 20;
 
 /** Pixels inset so checkbox focus rings are not clipped by the scroll container. */
-const CHECKBOX_FOCUS_INSET = 2;
+const CHECKBOX_FOCUS_INSET = 8;
 
 /** Only these four WordPress types use tabs; everything else is under “More types…”. */
 const MAIN_TABS = [
@@ -574,6 +574,14 @@ export default function LinkUIAddMenuItems( {
 		Array.isArray( searchRecords ) &&
 		searchRecords.length === PER_PAGE;
 
+	/** When core-data has not stored X-WP-Total yet, `totalPages` is null; use a full page as “maybe more”. */
+	const browseHasNextPage =
+		! isSearchActive &&
+		Array.isArray( records ) &&
+		( typeof totalPages === 'number' && totalPages > 0
+			? listPage < totalPages
+			: records.length === PER_PAGE );
+
 	const displayRows = useMemo( () => {
 		if ( isSearchActive || ! isHierarchical || list.length === 0 ) {
 			return list.map( ( record ) => ( { record, depth: 0 } ) );
@@ -601,7 +609,7 @@ export default function LinkUIAddMenuItems( {
 
 	const nextPageDisabled = isSearchActive
 		? ! searchHasNextPage
-		: ! totalPages || listPage >= ( totalPages || 0 );
+		: ! browseHasNextPage;
 
 	const extraSourcePanelLabel = useMemo( () => {
 		if ( ! extraSource ) {
