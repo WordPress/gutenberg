@@ -104,13 +104,13 @@
 		padding-bottom: $grid-unit-10;
 	}
 
-	// Single scroll container: search + pagination stay visible; only results scroll.
+	// Single scroll container: search + footer actions stay visible; only results scroll.
 	.link-ui-add-menu-items__list {
 		flex: 1 1 auto;
 		min-height: 0;
 		overflow-x: hidden;
 		overflow-y: auto;
-		// Breathing room so rows do not sit flush against the filter or pagination.
+		// Breathing room so rows do not sit flush against the filter or footer.
 		padding-block: $grid-unit-15;
 	}
 
@@ -121,10 +121,5 @@
 
 .link-ui-add-menu-items__empty {
 	margin: 0;
-	color: $gray-700;
-}
-
-.link-ui-add-menu-items__page {
-	font-size: 12px;
 	color: $gray-700;
 }

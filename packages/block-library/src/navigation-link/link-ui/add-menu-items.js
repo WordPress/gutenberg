@@ -31,7 +31,8 @@ import { unlock } from '../../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
-const PER_PAGE = 20;
+/** Single search request size; WP REST search commonly caps at 100 per page. */
+const SEARCH_PER_PAGE = 100;
 
 /** Pixels inset so checkbox focus rings are not clipped by the scroll container. */
 const CHECKBOX_FOCUS_INSET = 8;
@@ -156,7 +157,7 @@ function sortHierarchySiblings( a, b, entityKind ) {
  * Depth-first list with depth for indentation. Uses `parent` from REST (pages, hierarchical CPTs, categories).
  * Items whose parent is not in the current result set appear as roots of their own subtree.
  *
- * @param {Object[]|null|undefined} records    Current page of REST entities.
+ * @param {Object[]|null|undefined} records    REST entities (full list or search slice).
  * @param {'postType'|'taxonomy'}   entityKind
  * @return {{ record: Object, depth: number }[]} Ordered rows with nesting depth.
  */
@@ -204,7 +205,7 @@ export function flattenRecordsWithDepth( records, entityKind ) {
 
 	walkFromParent( 0, 0 );
 
-	// Subtrees whose parent is not in this page (parent missing from `records`).
+	// Subtrees whose parent is not in `records` (parent missing from the set).
 	const sortedRest = records
 		.filter( ( r ) => ! visited.has( r.id ) )
 		.sort( ( a, b ) => sortHierarchySiblings( a, b, entityKind ) );
@@ -237,7 +238,6 @@ export default function LinkUIAddMenuItems( {
 	const [ extraSource, setExtraSource ] = useState( null );
 	const [ searchInput, setSearchInput ] = useState( '' );
 	const [ debouncedSearch, setDebouncedSearch ] = useState( '' );
-	const [ listPage, setListPage ] = useState( 1 );
 	/** @type {[ Array<Object>|null, Function ]} Pseudo-records from link search API, or null when not searching. */
 	const [ searchRecords, setSearchRecords ] = useState( null );
 	const [ isSearchResolving, setIsSearchResolving ] = useState( false );
@@ -322,16 +322,11 @@ export default function LinkUIAddMenuItems( {
 		return () => clearTimeout( id );
 	}, [ searchInput ] );
 
-	useEffect( () => {
-		setListPage( 1 );
-	}, [ debouncedSearch, resolved.entityKind, resolved.entityName ] );
-
 	const isSearchActive = debouncedSearch.trim().length > 0;
 
 	const listQuery = useMemo( () => {
 		const q = {
-			page: listPage,
-			per_page: PER_PAGE,
+			per_page: -1,
 			...( resolved.entityKind === 'postType'
 				? { status: 'publish' }
 				: {} ),
@@ -344,9 +339,9 @@ export default function LinkUIAddMenuItems( {
 			q.order = 'asc';
 		}
 		return q;
-	}, [ listPage, resolved.entityKind, isHierarchical ] );
+	}, [ resolved.entityKind, isHierarchical ] );
 
-	const { records, isResolving, totalPages } = useEntityRecords(
+	const { records, isResolving } = useEntityRecords(
 		resolved.entityKind,
 		resolved.entityName,
 		listQuery,
@@ -374,8 +369,7 @@ export default function LinkUIAddMenuItems( {
 		searchFn( q, {
 			type: searchType,
 			subtype: resolved.entityName,
-			page: listPage,
-			perPage: PER_PAGE,
+			perPage: SEARCH_PER_PAGE,
 		} )
 			.then( ( results ) => {
 				if ( cancelled ) {
@@ -402,7 +396,6 @@ export default function LinkUIAddMenuItems( {
 		debouncedSearch,
 		resolved.entityKind,
 		resolved.entityName,
-		listPage,
 		settingsFetchLinkSuggestions,
 	] );
 
@@ -569,47 +562,12 @@ export default function LinkUIAddMenuItems( {
 
 	const listLoading = isSearchActive ? isSearchResolving : isResolving;
 
-	const searchHasNextPage =
-		isSearchActive &&
-		Array.isArray( searchRecords ) &&
-		searchRecords.length === PER_PAGE;
-
-	/** When core-data has not stored X-WP-Total yet, `totalPages` is null; use a full page as “maybe more”. */
-	const browseHasNextPage =
-		! isSearchActive &&
-		Array.isArray( records ) &&
-		( typeof totalPages === 'number' && totalPages > 0
-			? listPage < totalPages
-			: records.length === PER_PAGE );
-
 	const displayRows = useMemo( () => {
 		if ( isSearchActive || ! isHierarchical || list.length === 0 ) {
 			return list.map( ( record ) => ( { record, depth: 0 } ) );
 		}
 		return flattenRecordsWithDepth( list, resolved.entityKind );
 	}, [ list, isHierarchical, resolved.entityKind, isSearchActive ] );
-
-	let pageIndicator;
-	if ( isSearchActive ) {
-		pageIndicator = sprintf(
-			// translators: %d: current page number (search has no total page count from API).
-			__( 'Page %d' ),
-			listPage
-		);
-	} else if ( totalPages ) {
-		pageIndicator = sprintf(
-			// translators: %1$d current page, %2$d total pages.
-			__( 'Page %1$d of %2$d' ),
-			listPage,
-			totalPages
-		);
-	} else {
-		pageIndicator = `${ listPage }`;
-	}
-
-	const nextPageDisabled = isSearchActive
-		? ! searchHasNextPage
-		: ! browseHasNextPage;
 
 	const extraSourcePanelLabel = useMemo( () => {
 		if ( ! extraSource ) {
@@ -682,32 +640,6 @@ export default function LinkUIAddMenuItems( {
 					</VStack>
 				) }
 			</div>
-
-			<HStack justify="space-between">
-				<Button
-					__next40pxDefaultSize
-					variant="tertiary"
-					onClick={ () =>
-						setListPage( ( p ) => Math.max( 1, p - 1 ) )
-					}
-					disabled={ listPage <= 1 }
-					accessibleWhenDisabled
-				>
-					{ __( 'Previous page' ) }
-				</Button>
-				<span className="link-ui-add-menu-items__page">
-					{ pageIndicator }
-				</span>
-				<Button
-					__next40pxDefaultSize
-					variant="tertiary"
-					onClick={ () => setListPage( ( p ) => p + 1 ) }
-					disabled={ nextPageDisabled }
-					accessibleWhenDisabled
-				>
-					{ __( 'Next page' ) }
-				</Button>
-			</HStack>
 
 			<HStack justify="space-between">
 				<Button
