@@ -8,7 +8,7 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
  * Internal dependencies
  */
 import { store as uploadStore } from '..';
-import { ItemStatus, OperationType } from '../types';
+import { ItemStatus, OperationType, type OperationArgs } from '../types';
 import { unlock } from '../../lock-unlock';
 
 jest.mock( '@wordpress/blob', () => ( {
@@ -714,15 +714,25 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems();
 
-			// Should have the original item plus 2 sideload items for thumbnail and medium.
-			const thumbnailItems = allItems.filter(
-				( i ) => i.additionalData?.image_size === 'thumbnail'
+			// Should have the original item plus a single batch resize sideload item.
+			const batchItems = allItems.filter(
+				( i ) => i.additionalData?.image_size === 'batch'
 			);
-			const mediumItems = allItems.filter(
-				( i ) => i.additionalData?.image_size === 'medium'
+			expect( batchItems ).toHaveLength( 1 );
+
+			// The batch item should have a BatchResizeCrop operation
+			// containing both thumbnail and medium sizes.
+			const batchOp = batchItems[ 0 ].operations?.[ 0 ];
+			expect( Array.isArray( batchOp ) ).toBe( true );
+			const [ opType, opArgs ] = batchOp as [
+				OperationType.BatchResizeCrop,
+				OperationArgs[ OperationType.BatchResizeCrop ],
+			];
+			expect( opType ).toBe( OperationType.BatchResizeCrop );
+			expect( opArgs.sizes ).toHaveLength( 2 );
+			expect( opArgs.sizes.map( ( s ) => s.name ) ).toEqual(
+				expect.arrayContaining( [ 'thumbnail', 'medium' ] )
 			);
-			expect( thumbnailItems ).toHaveLength( 1 );
-			expect( mediumItems ).toHaveLength( 1 );
 		} );
 
 		it( 'should skip thumbnail generation when item has no attachment', async () => {
