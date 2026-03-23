@@ -566,9 +566,11 @@ class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Contr
 
 		// Embedding children for notes and reactions requires `type` and `status` inheritance.
 		if ( isset( $links['children'] ) && $this->is_note_or_reaction( $comment->comment_type ) ) {
-			$args = array(
+			// Notes have reaction children; reactions don't have children.
+			$child_type = 'note' === $comment->comment_type ? 'reaction' : $comment->comment_type;
+			$args       = array(
 				'parent' => $comment->comment_ID,
-				'type'   => $comment->comment_type,
+				'type'   => $child_type,
 				'status' => 'all',
 			);
 
