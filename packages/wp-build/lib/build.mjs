@@ -546,10 +546,7 @@ async function bundlePackage( packageName, options = {} ) {
 						true // Generate asset file for minified build
 					),
 				],
-			} )
-		);
-
-		builds.push(
+			} ),
 			esbuild.build( {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.js' ),
@@ -692,15 +689,18 @@ async function bundlePackage( packageName, options = {} ) {
 			// Generate minified path: style.css -> style.min.css, style-rtl.css -> style-rtl.min.css
 			const minifiedPath = destPath.replace( /\.css$/, '.min.css' );
 
+			// Always produce both versions (like JavaScript does):
+			// 1. Non-minified version (for SCRIPT_DEBUG=true)
+			// 2. Minified version (for SCRIPT_DEBUG=false)
 			builds.push(
 				( async () => {
 					await mkdir( destDir, { recursive: true } );
 					const content = await readFile( cssFile, 'utf8' );
 
-					// Write non-minified version (for SCRIPT_DEBUG=true)
+					// Write non-minified version
 					await writeFile( destPath, content );
 
-					// Write minified version (for SCRIPT_DEBUG=false)
+					// Write minified version
 					const result = await postcss( [
 						cssnano( {
 							preset: [
