@@ -693,6 +693,16 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 			controlledOrder.forEach( preserveTreeEntry );
 		}
 
+		// Preserve block editing modes for blocks that are not removed.
+		const preservedBlockEditingModes =
+			state?.blockEditingModes ?? new Map();
+		for ( const [ clientId, mode ] of preservedBlockEditingModes ) {
+			if ( ! newState.tree.has( clientId ) ) {
+				continue;
+			}
+			newState.blockEditingModes.set( clientId, mode );
+		}
+
 		return newState;
 	}
 
