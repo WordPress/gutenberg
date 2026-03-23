@@ -42,20 +42,13 @@ function render_block_core_loginout( $attributes ) {
 		if ( wp_is_block_theme() ) {
 			$processor = new WP_HTML_Tag_Processor( $contents );
 
-			if (
-				$processor->next_tag( array( 'class_name' => 'login-submit' ) ) &&
-				$processor->next_tag( 'input' )
-			) {
-				do {
-					if ( 'submit' !== strtolower( (string) $processor->get_attribute( 'type' ) ) ) {
-						continue;
-					}
-
+			while ( $processor->next_tag( 'input' ) ) {
+				if ( 'submit' === $processor->get_attribute( 'type' ) && 'wp-submit' === $processor->get_attribute( 'name' ) ) {
 					$processor->add_class( 'wp-block-button__link' );
 					$processor->add_class( wp_theme_get_element_class_name( 'button' ) );
 					$contents = $processor->get_updated_html();
 					break;
-				} while ( $processor->next_tag( 'input' ) );
+				}
 			}
 		}
 	}
