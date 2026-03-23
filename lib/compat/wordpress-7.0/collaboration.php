@@ -123,12 +123,17 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 			function () use ( $option_name ) {
 				$option_value = get_option( $option_name );
 
+				if ( ! defined( 'WP_ALLOW_COLLABORATION' ) || false === WP_ALLOW_COLLABORATION ) :
 				?>
-				<label for="wp_collaboration_enabled">
-					<input name="wp_collaboration_enabled" type="checkbox" id="wp_collaboration_enabled" value="1" <?php checked( '1', $option_value ); ?>/>
-					<?php _e( 'Enable real-time collaboration', 'gutenberg' ); ?>
-				</label>
-				<?php
+					<div class="notice notice-warning inline">
+						<p><?php _e( '<strong>Note:</strong> Real-time collaboration has been disabled.' ); ?></p>
+					</div>
+				<?php else : ?>
+					<label for="wp_collaboration_enabled">
+						<input name="wp_collaboration_enabled" type="checkbox" id="wp_collaboration_enabled" value="1" <?php checked( '1', $option_value ); ?>/>
+						<?php _e( 'Enable real-time collaboration' ); ?>
+					</label>
+				<?php endif;
 			},
 			'writing'
 		);
@@ -184,7 +189,7 @@ function gutenberg_inject_real_time_collaboration_setting() {
 
 	wp_add_inline_script(
 		'wp-core-data',
-		'window._wpCollaborationEnabled = ' . ( $enabled ? 'true' : 'false' ) . ';',
+		'window._wpCollaborationEnabled = ' . wp_json_encode( $enabled ) . ';',
 		'after'
 	);
 }
