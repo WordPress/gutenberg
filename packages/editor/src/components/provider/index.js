@@ -37,7 +37,7 @@ import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
 import { useRevisionBlocks } from './use-revision-blocks';
 import useCommands from '../commands';
 import useUploadSaveLock from './use-upload-save-lock';
-import useMissingSizesCheck from './use-missing-sizes-check';
+import useNetworkReconnect from './use-network-reconnect';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
@@ -397,8 +397,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Lock post saving when media uploads are in progress (experimental feature).
 		useUploadSaveLock();
 
-		// Check for images with missing sub-sizes and queue generation (experimental feature).
-		useMissingSizesCheck();
+		// Pause/resume media upload queue on network disconnect/reconnect.
+		useNetworkReconnect();
 
 		if ( ! isReady || ! mode ) {
 			return null;

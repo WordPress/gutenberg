@@ -3,8 +3,10 @@
  */
 import { isBlobURL } from '@wordpress/blob';
 import {
+	Button,
 	ExternalLink,
 	FocalPointPicker,
+	Icon,
 	ResizableBox,
 	Spinner,
 	TextareaControl,
@@ -25,7 +27,7 @@ import {
 	useResizeObserver,
 	useViewportMatch,
 } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
@@ -49,7 +51,8 @@ import {
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
-import { crop, overlayText, upload, chevronDown } from '@wordpress/icons';
+import { crop, overlayText, upload, chevronDown, info } from '@wordpress/icons';
+import { store as uploadStore } from '@wordpress/upload-media';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -90,6 +93,81 @@ const scaleOptions = [
 const WRITEMODE_POPOVER_PROPS = {
 	placement: 'bottom-start',
 };
+
+/**
+ * Indicator overlay shown on images with missing sub-sizes.
+ * Displays an info icon that opens a popover with a "Generate" action.
+ *
+ * @param {Object}   root0              Component props.
+ * @param {number}   root0.attachmentId The attachment ID.
+ * @param {string}   root0.sourceUrl    The original image URL.
+ * @param {string[]} root0.missingSizes Array of missing size names.
+ */
+function MissingSizesIndicator( { attachmentId, sourceUrl, missingSizes } ) {
+	const [ showPopover, setShowPopover ] = useState( false );
+	const [ isGenerating, setIsGenerating ] = useState( false );
+	const registry = useRegistry();
+	const { invalidateResolution } = useDispatch( coreStore );
+
+	async function handleGenerate() {
+		setIsGenerating( true );
+		setShowPopover( false );
+		unlock( registry.dispatch( uploadStore ) ).queueMissingSizeGeneration( {
+			attachmentId,
+			sourceUrl,
+			missingSizes,
+		} );
+
+		// Poll for completion by checking if the attachment still has missing sizes.
+		const checkInterval = setInterval( async () => {
+			await invalidateResolution( 'getEntityRecord', [
+				'postType',
+				'attachment',
+				attachmentId,
+				{ context: 'edit' },
+			] );
+			const attachment = registry
+				.select( coreStore )
+				.getEntityRecord( 'postType', 'attachment', attachmentId, {
+					context: 'edit',
+				} );
+			if ( ! attachment?.missing_image_sizes?.length ) {
+				clearInterval( checkInterval );
+				setIsGenerating( false );
+			}
+		}, 3000 );
+	}
+
+	return (
+		<div className="wp-block-image__missing-sizes-indicator">
+			<button
+				className="wp-block-image__missing-sizes-button"
+				onClick={ () => setShowPopover( ! showPopover ) }
+				aria-label={ __( 'Missing image sizes' ) }
+			>
+				{ isGenerating ? (
+					<Spinner />
+				) : (
+					<Icon icon={ info } size={ 24 } />
+				) }
+			</button>
+			{ showPopover && (
+				<Popover
+					className="wp-block-image__missing-sizes-popover"
+					onClose={ () => setShowPopover( false ) }
+					placement="bottom-end"
+				>
+					<div className="wp-block-image__missing-sizes-content">
+						<p>{ __( 'Some image sizes are missing.' ) }</p>
+						<Button variant="link" onClick={ handleGenerate }>
+							{ __( 'Generate' ) }
+						</Button>
+					</div>
+				</Popover>
+			) }
+		</div>
+	);
+}
 
 // If the image has a href, wrap in an <a /> tag to trigger any inherited link element styles.
 const ImageWrapper = ( { href, children } ) => {
@@ -313,7 +391,7 @@ export default function Image( {
 	const setRefs = useMergeRefs( [ setImageElement, setResizeObserved ] );
 	const { allowResize = true } = context;
 
-	const { image, canUserEdit } = useSelect(
+	const { image, canUserEdit, missingSizes } = useSelect(
 		( select ) => {
 			const imageRecord =
 				id && isSingleSelected
@@ -321,7 +399,7 @@ export default function Image( {
 							'postType',
 							'attachment',
 							id,
-							{ context: 'view' }
+							{ context: 'edit' }
 					  )
 					: null;
 
@@ -339,6 +417,7 @@ export default function Image( {
 			return {
 				image: imageRecord,
 				canUserEdit: canEdit,
+				missingSizes: imageRecord?.missing_image_sizes || [],
 			};
 		},
 		[ id, isSingleSelected ]
@@ -1273,6 +1352,15 @@ export default function Image( {
 			{ controls }
 			{ featuredImageControl }
 			{ img }
+			{ isSingleSelected &&
+				missingSizes.length > 0 &&
+				window.__clientSideMediaProcessing && (
+					<MissingSizesIndicator
+						attachmentId={ id }
+						sourceUrl={ image?.source_url }
+						missingSizes={ missingSizes }
+					/>
+				) }
 			{ resizableBox }
 
 			<Caption
