@@ -124,7 +124,7 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 				$option_value = get_option( $option_name );
 
 				if ( ! defined( 'WP_ALLOW_COLLABORATION' ) || false === WP_ALLOW_COLLABORATION ) :
-				?>
+					?>
 					<div class="notice notice-warning inline">
 						<p><?php _e( '<strong>Note:</strong> Real-time collaboration has been disabled.' ); ?></p>
 					</div>
@@ -133,7 +133,8 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 						<input name="wp_collaboration_enabled" type="checkbox" id="wp_collaboration_enabled" value="1" <?php checked( '1', $option_value ); ?>/>
 						<?php _e( 'Enable real-time collaboration' ); ?>
 					</label>
-				<?php endif;
+					<?php
+				endif;
 			},
 			'writing'
 		);
