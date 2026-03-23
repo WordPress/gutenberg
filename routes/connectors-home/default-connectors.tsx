@@ -7,7 +7,7 @@ import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
 	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
-	type __experimentalApiKeySource as ApiKeySource,
+	type ConnectorConfig,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
 import { __ } from '@wordpress/i18n';
@@ -24,16 +24,6 @@ import {
 	DefaultConnectorLogo,
 } from './logos';
 
-type ConnectorAuthentication =
-	| {
-			method: 'api_key';
-			settingName: string;
-			credentialsUrl: string | null;
-			keySource?: ApiKeySource;
-			isConnected?: boolean;
-	  }
-	| { method: 'none' };
-
 interface ConnectorData {
 	name: string;
 	description: string;
@@ -44,7 +34,7 @@ interface ConnectorData {
 		isInstalled: boolean;
 		isActivated: boolean;
 	};
-	authentication: ConnectorAuthentication;
+	authentication: NonNullable< ConnectorConfig[ 'authentication' ] >;
 }
 
 /**
@@ -101,28 +91,19 @@ const ConnectedBadge = () => (
 
 const UnavailableActionBadge = () => <Badge>{ __( 'Not available' ) }</Badge>;
 
-interface ApiKeyConnectorConfig {
-	pluginSlug?: string;
-	settingName: string;
-	helpUrl?: string;
-	isInstalled?: boolean;
-	isActivated?: boolean;
-	keySource?: ApiKeySource;
-	initialIsConnected?: boolean;
-}
-
 function ApiKeyConnector( {
-	label,
+	name,
 	description,
-	pluginSlug,
-	settingName,
-	helpUrl,
-	icon,
-	isInstalled,
-	isActivated,
-	keySource: initialKeySource,
-	initialIsConnected,
-}: ConnectorRenderProps & ApiKeyConnectorConfig ) {
+	logo,
+	authentication,
+	plugin,
+}: ConnectorRenderProps ) {
+	const auth =
+		authentication?.method === 'api_key' ? authentication : undefined;
+	const settingName = auth?.settingName ?? '';
+	const helpUrl = auth?.credentialsUrl ?? undefined;
+	const pluginSlug = plugin?.slug;
+
 	let helpLabel: string | undefined;
 	try {
 		if ( helpUrl ) {
@@ -149,11 +130,11 @@ function ApiKeyConnector( {
 	} = useConnectorPlugin( {
 		pluginSlug,
 		settingName,
-		connectorName: label,
-		isInstalled,
-		isActivated,
-		keySource: initialKeySource,
-		initialIsConnected,
+		connectorName: name,
+		isInstalled: plugin?.isInstalled,
+		isActivated: plugin?.isActivated,
+		keySource: auth?.keySource,
+		initialIsConnected: auth?.isConnected,
 	} );
 	const isExternallyConfigured =
 		keySource === 'env' || keySource === 'constant';
@@ -185,8 +166,8 @@ function ApiKeyConnector( {
 			className={
 				pluginSlug ? `connector-item--${ pluginSlug }` : undefined
 			}
-			icon={ icon }
-			name={ label }
+			logo={ logo }
+			name={ name }
 			description={ description }
 			actionArea={
 				<HStack spacing={ 3 } expanded={ false }>
@@ -266,21 +247,12 @@ export function registerDefaultConnectors() {
 			connectorId
 		) }`;
 		registerConnector( connectorName, {
-			label: data.name,
+			name: data.name,
 			description: data.description,
-			icon: getConnectorLogo( connectorId, data.logoUrl ),
-			render: ( props ) => (
-				<ApiKeyConnector
-					{ ...props }
-					pluginSlug={ data.plugin?.slug }
-					settingName={ authentication.settingName }
-					helpUrl={ authentication.credentialsUrl ?? undefined }
-					isInstalled={ data.plugin?.isInstalled }
-					isActivated={ data.plugin?.isActivated }
-					keySource={ authentication.keySource }
-					initialIsConnected={ authentication.isConnected }
-				/>
-			),
+			logo: getConnectorLogo( connectorId, data.logoUrl ),
+			authentication,
+			plugin: data.plugin,
+			render: ApiKeyConnector,
 		} );
 	}
 }
