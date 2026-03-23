@@ -22,9 +22,9 @@ registerConnector( 'test_custom_service', {
 			ConnectorItem,
 			{
 				className: 'connector-item--test_custom_service',
-				name: props.label,
+				name: props.name,
 				description: props.description,
-				icon: props.icon,
+				logo: props.logo,
 			},
 			h(
 				'p',
