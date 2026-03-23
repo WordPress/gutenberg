@@ -13,7 +13,7 @@ const packageJsonCache = new Map();
 const packagePathCache = new Map();
 
 /**
- * @typedef  {Object}                 PackageJson
+ * @typedef  {Object} PackageJson
  *
  * @property {string}                 name                    Package name.
  * @property {string}                 version                 Package version.
