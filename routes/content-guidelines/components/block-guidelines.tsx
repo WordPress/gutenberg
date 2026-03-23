@@ -28,7 +28,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import BlockGuidelineModal from './block-guideline-modal';
 import { saveContentGuidelines } from '../api';
-import { STORE_NAME } from '../store';
+import { store as coreContentGuidelinesStore } from '../store';
 import './block-guidelines.scss';
 
 const PER_PAGE = 5;
@@ -85,8 +85,7 @@ export default function BlockGuidelines() {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const blockGuidelines = useSelect(
-		// @ts-ignore
-		( select ) => select( STORE_NAME ).getBlockGuidelines(),
+		( select ) => select( coreContentGuidelinesStore ).getBlockGuidelines(),
 		[]
 	);
 
@@ -109,7 +108,7 @@ export default function BlockGuidelines() {
 		[ blockGuidelines, blockTypes ]
 	);
 
-	const { setBlockGuideline } = useDispatch( STORE_NAME );
+	const { setBlockGuideline } = useDispatch( coreContentGuidelinesStore );
 
 	const handleRowClick = ( id: string ) => {
 		setSelectedItem( id );

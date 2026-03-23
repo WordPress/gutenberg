@@ -86,9 +86,13 @@ function ConnectorsPage() {
 									<connector.render
 										key={ connector.slug }
 										slug={ connector.slug }
-										label={ connector.label }
+										name={ connector.name }
 										description={ connector.description }
-										icon={ connector.icon }
+										logo={ connector.logo }
+										authentication={
+											connector.authentication
+										}
+										plugin={ connector.plugin }
 									/>
 								);
 							}
