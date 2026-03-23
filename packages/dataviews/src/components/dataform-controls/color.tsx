@@ -7,11 +7,16 @@ import { colord } from 'colord';
  * WordPress dependencies
  */
 import {
+	Button,
+	ColorIndicator,
+	ColorPicker,
 	Dropdown,
 	privateApis,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -20,51 +25,37 @@ import type { DataFormControlProps } from '../../types';
 import { unlock } from '../../lock-unlock';
 import getCustomValidity from './utils/get-custom-validity';
 
-const { ValidatedInputControl, Picker } = unlock( privateApis );
+const { ValidatedInputControl } = unlock( privateApis );
 
-const ColorPicker = ( {
+const ColorPickerDropdown = ( {
 	color,
 	onColorChange,
 }: {
 	color: string;
-	onColorChange: ( colorObject: any ) => void;
+	onColorChange: ( newColor: string ) => void;
 } ) => {
 	const validColor = color && colord( color ).isValid() ? color : '#ffffff';
 
 	return (
 		<Dropdown
-			renderToggle={ ( { onToggle, isOpen } ) => (
-				<InputControlPrefixWrapper variant="icon">
-					<button
-						type="button"
-						onClick={ onToggle }
-						style={ {
-							width: '24px',
-							height: '24px',
-							borderRadius: '50%',
-							backgroundColor: validColor,
-							border: '1px solid #ddd',
-							cursor: 'pointer',
-							outline: isOpen ? '2px solid #007cba' : 'none',
-							outlineOffset: '2px',
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							padding: 0,
-							margin: 0,
-						} }
-						aria-label="Open color picker"
-					/>
-				</InputControlPrefixWrapper>
+			className="dataviews-controls__color-picker-dropdown"
+			popoverProps={ { resize: false } }
+			renderToggle={ ( { onToggle } ) => (
+				<Button
+					onClick={ onToggle }
+					aria-label={ __( 'Open color picker' ) }
+					size="small"
+					icon={ () => <ColorIndicator colorValue={ validColor } /> }
+				/>
 			) }
 			renderContent={ () => (
-				<div style={ { padding: '16px' } }>
-					<Picker
-						color={ colord( validColor ) }
+				<DropdownContentWrapper paddingSize="none">
+					<ColorPicker
+						color={ validColor }
 						onChange={ onColorChange }
 						enableAlpha
 					/>
-				</div>
+				</DropdownContentWrapper>
 			) }
 		/>
 	);
@@ -82,8 +73,8 @@ export default function Color< Item >( {
 	const value = field.getValue( { item: data } ) || '';
 
 	const handleColorChange = useCallback(
-		( colorObject: any ) => {
-			onChange( setValue( { item: data, value: colorObject.toHex() } ) );
+		( newColor: string ) => {
+			onChange( setValue( { item: data, value: newColor } ) );
 		},
 		[ data, onChange, setValue ]
 	);
@@ -108,10 +99,12 @@ export default function Color< Item >( {
 			hideLabelFromVision={ hideLabelFromVision }
 			type="text"
 			prefix={
-				<ColorPicker
-					color={ value }
-					onColorChange={ handleColorChange }
-				/>
+				<InputControlPrefixWrapper variant="control">
+					<ColorPickerDropdown
+						color={ value }
+						onColorChange={ handleColorChange }
+					/>
+				</InputControlPrefixWrapper>
 			}
 		/>
 	);

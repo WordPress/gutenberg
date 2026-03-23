@@ -15,9 +15,6 @@
 	&:empty {
 		display: none !important;
 	}
-	&:not(.wp-block):focus {
-		outline: none;
-	}
 }
 
 .wp-block-tab.wp-block.has-background,

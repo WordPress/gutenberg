@@ -522,15 +522,21 @@
 		"parent": "core-concepts"
 	},
 	{
-		"title": "Understanding global state, local context and derived state",
-		"slug": "undestanding-global-state-local-context-and-derived-state",
-		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md",
+		"title": "Understanding global state, local context, derived state and config",
+		"slug": "understanding-global-state-local-context-derived-state-and-config",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-derived-state-and-config.md",
 		"parent": "core-concepts"
 	},
 	{
 		"title": "Server-side rendering: Processing directives on the server",
 		"slug": "server-side-rendering",
 		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md",
+		"parent": "core-concepts"
+	},
+	{
+		"title": "Client-Side Navigation",
+		"slug": "client-side-navigation",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md",
 		"parent": "core-concepts"
 	},
 	{
@@ -546,9 +552,9 @@
 		"parent": "interactivity-api"
 	},
 	{
-		"title": "API Reference",
-		"slug": "api-reference",
-		"markdown_source": "../docs/reference-guides/interactivity-api/api-reference.md",
+		"title": "Directives and Store",
+		"slug": "directives-and-store",
+		"markdown_source": "../docs/reference-guides/interactivity-api/directives-and-store.md",
 		"parent": "interactivity-api"
 	},
 	{
@@ -2088,6 +2094,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/vips",
+		"slug": "packages-vips",
+		"markdown_source": "../packages/vips/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/warning",
 		"slug": "packages-warning",
 		"markdown_source": "../packages/warning/README.md",
@@ -2103,6 +2115,12 @@
 		"title": "@wordpress/wordcount",
 		"slug": "packages-wordcount",
 		"markdown_source": "../packages/wordcount/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/worker-threads",
+		"slug": "packages-worker-threads",
+		"markdown_source": "../packages/worker-threads/README.md",
 		"parent": "packages"
 	},
 	{

@@ -18,6 +18,7 @@
 	.components-modal__content {
 		margin: 0;
 		padding: 0;
+		overflow: hidden;
 	}
 }
 
@@ -29,6 +30,7 @@
 .commands-command-menu__header {
 	display: flex;
 	align-items: center;
+	gap: $grid-unit-10;
 	padding: 0 $grid-unit-20;
 
 	.components-button {
@@ -64,7 +66,7 @@
 		color: $gray-900;
 		margin: 0;
 		font-size: 15px;
-		line-height: 28px;
+		line-height: 24px;
 		border-radius: 0;
 
 		&::placeholder {
@@ -108,6 +110,7 @@
 			min-height: $button-size-next-default-40px;
 			padding: $grid-unit-05;
 			padding-left: $grid-unit-50; // Account for commands without icons.
+			padding-right: $grid-unit-20; // Accounts for the command category.
 		}
 
 		> .has-icon {
@@ -118,6 +121,19 @@
 	[cmdk-root] > [cmdk-list] {
 		max-height: $palette-max-height; // Specific to not have commands overflow oddly.
 		overflow: auto;
+		scroll-padding-top: $grid-unit-10;
+		scroll-padding-bottom: $grid-unit-10;
+
+		// Show border when there are commands or "nothing found" message.
+		&:has([cmdk-group-items]:not(:empty)),
+		&:has([cmdk-empty]) {
+			border-top: $border-width solid $gray-300;
+		}
+
+		// Only add vertical padding when there are commands to show.
+		&:has([cmdk-group-items]:not(:empty)) {
+			padding-top: $grid-unit-10;
+		}
 
 		// Ensures there is always padding bottom on the last group, when there are commands.
 		&
@@ -149,13 +165,29 @@
 	}
 }
 
-.commands-command-menu__item span {
+.commands-command-menu__item-label {
 	// Ensure commands do not run off the edge (great for post titles).
 	display: inline-block;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	flex: 1;
+	min-width: 0;
+}
+
+.commands-command-menu__item-category {
+	flex: 0 0 auto;
+	margin-left: auto;
+	padding-left: $grid-unit-30;
+	color: $gray-700;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+	text-align: right;
+
+	[aria-selected="true"] &,
+	[cmdk-item]:active & {
+		color: rgba($white, 0.8);
+	}
 }
 
 .commands-command-menu__item mark {

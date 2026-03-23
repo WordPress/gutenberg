@@ -61,7 +61,7 @@ export function registerAbility( ability: Ability ) {
 		// Validate name format matches server implementation
 		if ( ! ABILITY_NAME_PATTERN.test( ability.name ) ) {
 			throw new Error(
-				'Ability name must be a string containing a namespace prefix, i.e. "my-plugin/my-ability". It can only contain lowercase alphanumeric characters, dashes and the forward slash.'
+				'Ability name must be a string containing a namespace prefix with 2-4 segments, e.g. "my-plugin/my-ability" or "core/posts/find". It can only contain lowercase alphanumeric characters, dashes and the forward slash.'
 			);
 		}
 

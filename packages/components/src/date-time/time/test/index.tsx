@@ -158,6 +158,75 @@ describe( 'TimePicker', () => {
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T11:59:00' );
 	} );
 
+	it( 'should call onChange with a bounded day if out of bounds', async () => {
+		const user = userEvent.setup();
+
+		const onChangeSpy = jest.fn();
+
+		render(
+			<TimePicker
+				currentTime="2026-02-05T00:00:00"
+				onChange={ onChangeSpy }
+				is12Hour
+			/>
+		);
+
+		const dayInput = screen.getByLabelText( 'Day' );
+
+		await user.clear( dayInput );
+		await user.type( dayInput, '30' );
+		await user.keyboard( '{Tab}' );
+
+		expect( onChangeSpy ).toHaveBeenCalledWith( '2026-02-28T00:00:00' );
+		expect( dayInput ).toHaveValue( 28 );
+	} );
+
+	it( 'should clamp day when switching months', async () => {
+		const user = userEvent.setup();
+
+		const onChangeSpy = jest.fn();
+
+		render(
+			<TimePicker
+				currentTime="2026-03-31T00:00:00"
+				onChange={ onChangeSpy }
+				is12Hour
+			/>
+		);
+
+		const monthSelect = screen.getByLabelText( 'Month' );
+		const dayInput = screen.getByLabelText( 'Day' );
+
+		await user.selectOptions( monthSelect, '02' );
+
+		expect( onChangeSpy ).toHaveBeenCalledWith( '2026-02-28T00:00:00' );
+		expect( dayInput ).toHaveValue( 28 );
+	} );
+
+	it( 'should clamp day when switching year from leap to non-leap', async () => {
+		const user = userEvent.setup();
+
+		const onChangeSpy = jest.fn();
+
+		render(
+			<TimePicker
+				currentTime="2028-02-29T00:00:00"
+				onChange={ onChangeSpy }
+				is12Hour
+			/>
+		);
+
+		const dayInput = screen.getByLabelText( 'Day' );
+		const yearInput = screen.getByLabelText( 'Year' );
+
+		await user.clear( yearInput );
+		await user.type( yearInput, '2026' );
+		await user.keyboard( '{Tab}' );
+
+		expect( onChangeSpy ).toHaveBeenCalledWith( '2026-02-28T00:00:00' );
+		expect( dayInput ).toHaveValue( 28 );
+	} );
+
 	it( 'should switch to PM correctly', async () => {
 		const user = userEvent.setup();
 
@@ -589,6 +658,48 @@ describe( 'TimePicker', () => {
 					expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 18 );
 				} );
 			} );
+		} );
+	} );
+
+	describe( 'ISO 8601 compliance', () => {
+		it( 'should handle years below 1000 with zero-padded output', async () => {
+			const user = userEvent.setup();
+			const onChangeSpy = jest.fn();
+
+			render(
+				<TimePicker
+					currentTime="0999-10-18T11:00:00"
+					onChange={ onChangeSpy }
+					is12Hour
+				/>
+			);
+
+			const yearInput = screen.getByLabelText( 'Year' );
+
+			// Verify initial input displays correctly
+			expect( yearInput ).toHaveValue( 999 );
+
+			// Change to year 500
+			await user.clear( yearInput );
+			await user.type( yearInput, '500' );
+			await user.keyboard( '{Tab}' );
+
+			// Verify input field value after change (human-readable, not zero-padded)
+			expect( yearInput ).toHaveValue( 500 );
+
+			// Verify onChange emits zero-padded ISO 8601 format
+			expect( onChangeSpy ).toHaveBeenCalled();
+			const lastCall =
+				onChangeSpy.mock.calls[ onChangeSpy.mock.calls.length - 1 ];
+			const outputDate = lastCall[ 0 ];
+
+			// Extract year from output and verify it's zero-padded to 4 digits
+			const yearMatch = outputDate.match( /^(\d{4})-/ );
+			expect( yearMatch ).not.toBeNull();
+			expect( yearMatch[ 1 ] ).toBe( '0500' ); // Explicitly verify zero-padded year
+
+			expect( outputDate ).not.toContain( 'NaN' );
+			expect( outputDate ).not.toContain( 'Invalid' );
 		} );
 	} );
 } );

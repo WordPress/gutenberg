@@ -18,6 +18,7 @@
 		{ "path": "../icons" },
 		{ "path": "../keycodes" },
 		{ "path": "../lazy-editor" },
+		{ "path": "../notices" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../route" },

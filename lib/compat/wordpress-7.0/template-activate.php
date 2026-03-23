@@ -83,7 +83,7 @@ function gutenberg_maintain_templates_routes() {
 	global $wp_post_types;
 	// Register the old templates endpoints. The WP_REST_Templates_Controller
 	// and sub-controllers used to be linked to the wp_template post type, but
-	// are no longer. They still require a post type object when contructing the
+	// are no longer. They still require a post type object when constructing the
 	// class. To maintain backward and changes to these controller classes, we
 	// make use that the wp_template post type has the right information it
 	// needs.
@@ -162,9 +162,6 @@ function gutenberg_maintain_templates_routes() {
 //    EditorProvider assumes templates are posts.
 add_action( 'init', 'gutenberg_setup_static_template' );
 
-/**
- * @global array $wp_post_types List of post types.
- */
 function gutenberg_setup_static_template() {
 	register_setting(
 		'reading',

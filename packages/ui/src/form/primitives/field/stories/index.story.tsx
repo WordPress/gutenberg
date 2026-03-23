@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId } from '@wordpress/element';
 import { Field } from '../../../..';
+import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Field.Root > = {
 	title: 'Design System/Components/Form/Primitives/Field',
@@ -101,6 +102,23 @@ export const UsingAriaLabelledby: StoryObj< typeof Field.Root > = {
 };
 
 /**
+ * When `hideFromVision` is set on `Field.Label`, the label is visually
+ * hidden but remains accessible to screen readers.
+ */
+export const HiddenLabel: StoryObj< typeof Field.Root > = {
+	args: {
+		children: (
+			<>
+				<Field.Label hideFromVision>Label</Field.Label>
+				<Field.Control
+					render={ <input type="text" placeholder="Placeholder" /> }
+				/>
+			</>
+		),
+	},
+};
+
+/**
  * To add rich content (such as links) to the description, use `Field.Details`.
  *
  * Although this content is not associated with the field using direct semantics,
@@ -118,13 +136,7 @@ export const WithDetails: StoryObj< typeof Field.Root > = {
 				<Field.Control
 					render={ <input type="text" placeholder="Placeholder" /> }
 				/>
-				<Field.Details>
-					Details can include{ '	' }
-					<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
-						links to more information
-					</a>{ ' ' }
-					and other semantic elements.
-				</Field.Details>
+				<Field.Details>{ DETAILS_EXAMPLE }</Field.Details>
 			</>
 		),
 	},

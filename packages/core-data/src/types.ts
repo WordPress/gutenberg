@@ -1,16 +1,35 @@
 /**
  * WordPress dependencies
  */
-import type { Y } from '@wordpress/sync';
+import type { ConnectionStatusDisconnected, Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
 import type { SelectionType } from './utils/crdt-user-selections';
 
+export type { ConnectionStatus } from '@wordpress/sync';
+
+export type ConnectionError = NonNullable<
+	ConnectionStatusDisconnected[ 'error' ]
+>;
+
 export interface AnyFunction {
 	( ...args: any[] ): any;
 }
+
+/**
+ * An index path from the root of the block tree to a specific block.
+ *
+ * For example, `[0, 1]` refers to `blocks[0].innerBlocks[1]`.
+ *
+ * These paths are "absolute" in that they start from the post content root
+ * (not from the template root when "Show Template" mode is active).
+ * Both the Yjs document and the block-editor store share the same tree
+ * structure for post content blocks, so the same path can be used to
+ * navigate either tree.
+ */
+export type AbsoluteBlockIndexPath = number[];
 
 /**
  * Avoid a circular dependency with @wordpress/editor
@@ -31,6 +50,7 @@ export interface WPBlockSelection {
 export interface WPSelection {
 	selectionEnd: WPBlockSelection;
 	selectionStart: WPBlockSelection;
+	initialPosition?: number | null;
 }
 
 /**
@@ -52,6 +72,16 @@ export type CursorPosition = {
 	absoluteOffset: number;
 };
 
+/**
+ * The direction of a text selection, indicating where the caret sits.
+ */
+export enum SelectionDirection {
+	/** The caret is at the end of the selection (default / left-to-right). */
+	Forward = 'f',
+	/** The caret is at the start of the selection (right-to-left). */
+	Backward = 'b',
+}
+
 export type SelectionNone = {
 	// The user has not made a selection.
 	type: SelectionType.None;
@@ -59,32 +89,40 @@ export type SelectionNone = {
 
 export type SelectionCursor = {
 	// The user has a cursor position in a block with no text highlighted.
+	// The block is derived on the receiver side by navigating up from the
+	// resolved cursorPosition via Y.AbstractType.parent.
 	type: SelectionType.Cursor;
-	blockId: string;
 	cursorPosition: CursorPosition;
 };
 
 export type SelectionInOneBlock = {
 	// The user has highlighted text in a single block.
+	// The block is derived on the receiver side by navigating up from the
+	// resolved cursorStartPosition via Y.AbstractType.parent.
 	type: SelectionType.SelectionInOneBlock;
-	blockId: string;
 	cursorStartPosition: CursorPosition;
 	cursorEndPosition: CursorPosition;
+	// The direction of the selection, indicating where the caret sits.
+	selectionDirection?: SelectionDirection;
 };
 
 export type SelectionInMultipleBlocks = {
 	// The user has highlighted text over multiple blocks.
+	// The blocks are derived on the receiver side by navigating up from the
+	// resolved cursor positions via Y.AbstractType.parent.
 	type: SelectionType.SelectionInMultipleBlocks;
-	blockStartId: string;
-	blockEndId: string;
 	cursorStartPosition: CursorPosition;
 	cursorEndPosition: CursorPosition;
+	// The direction of the selection, indicating where the caret sits.
+	selectionDirection?: SelectionDirection;
 };
 
 export type SelectionWholeBlock = {
 	// The user has a non-text block selected, like an image block.
+	// Uses a Y.RelativePosition pointing to the block in its parent Y.Array,
+	// since there is no text cursor to navigate up from.
 	type: SelectionType.WholeBlock;
-	blockId: string;
+	blockPosition: Y.RelativePosition;
 };
 
 export type SelectionState =
@@ -93,3 +131,8 @@ export type SelectionState =
 	| SelectionInOneBlock
 	| SelectionInMultipleBlocks
 	| SelectionWholeBlock;
+
+export interface ResolvedSelection {
+	richTextOffset: number | null;
+	localClientId: string | null;
+}

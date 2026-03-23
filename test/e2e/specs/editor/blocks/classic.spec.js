@@ -18,12 +18,12 @@ test.use( {
 } );
 
 test.describe( 'Classic', () => {
-	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
-	} );
-
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
+	} );
+
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
 	} );
 
 	test( 'should be inserted', async ( { editor, page } ) => {
@@ -70,10 +70,10 @@ test.describe( 'Classic', () => {
 			page.locator( '.media-modal .moxie-shim input[type=file]' )
 		);
 
-		// Wait for upload
+		// Wait for upload (increased timeout for client-side media processing).
 		await expect(
 			page.getByRole( 'checkbox', { name: fileName } )
-		).toBeChecked();
+		).toBeChecked( { timeout: 30_000 } );
 
 		const createGallery = page.getByRole( 'button', {
 			name: 'Create a new gallery',

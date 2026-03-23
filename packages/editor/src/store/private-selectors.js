@@ -55,14 +55,36 @@ export const getInserter = createRegistrySelector( ( select ) =>
 			}
 
 			if ( getRenderingMode( state ) === 'template-locked' ) {
+				const {
+					getBlocksByName,
+					getSelectedBlockClientId,
+					getBlockParents,
+					getBlockOrder,
+				} = select( blockEditorStore );
 				const [ postContentClientId ] =
-					select( blockEditorStore ).getBlocksByName(
-						'core/post-content'
-					);
+					getBlocksByName( 'core/post-content' );
 				if ( postContentClientId ) {
+					const selectedBlockClientId = getSelectedBlockClientId();
+
+					// If a block inside Post Content is selected,
+					// let the inserter use its default logic for determining the
+					// insertion position by returning an empty insertion point.
+					if (
+						selectedBlockClientId &&
+						selectedBlockClientId !== postContentClientId &&
+						getBlockParents( selectedBlockClientId ).includes(
+							postContentClientId
+						)
+					) {
+						return EMPTY_INSERTION_POINT;
+					}
+
+					// Otherwise (no selection, or Post Content itself
+					// is selected), insert at the end of Post Content.
 					return {
 						rootClientId: postContentClientId,
-						insertionIndex: undefined,
+						insertionIndex:
+							getBlockOrder( postContentClientId ).length,
 						filterValue: undefined,
 					};
 				}
@@ -71,14 +93,26 @@ export const getInserter = createRegistrySelector( ( select ) =>
 			return EMPTY_INSERTION_POINT;
 		},
 		( state ) => {
+			const {
+				getBlocksByName,
+				getSelectedBlockClientId,
+				getBlockParents,
+				getBlockOrder,
+			} = select( blockEditorStore );
 			const [ postContentClientId ] =
-				select( blockEditorStore ).getBlocksByName(
-					'core/post-content'
-				);
+				getBlocksByName( 'core/post-content' );
+			const selectedBlockClientId = getSelectedBlockClientId();
 			return [
 				state.blockInserterPanel,
 				getRenderingMode( state ),
 				postContentClientId,
+				selectedBlockClientId,
+				selectedBlockClientId
+					? getBlockParents( selectedBlockClientId )
+					: undefined,
+				postContentClientId
+					? getBlockOrder( postContentClientId ).length
+					: undefined,
 			];
 		}
 	)
@@ -216,7 +250,18 @@ export const getPostBlocksByName = createRegistrySelector( ( select ) =>
 				} )
 			);
 		},
-		() => [ select( blockEditorStore ).getBlocks() ]
+		( state, blockNames ) => {
+			blockNames = Array.isArray( blockNames )
+				? blockNames
+				: [ blockNames ];
+			const { getBlocksByName, getBlockParents } =
+				select( blockEditorStore );
+			const clientIds = getBlocksByName( blockNames );
+			const parentsOfClientIds = clientIds.map( ( id ) =>
+				getBlockParents( id )
+			);
+			return [ clientIds, ...parentsOfClientIds ];
+		}
 	)
 );
 
@@ -312,6 +357,16 @@ export function isRevisionsMode( state ) {
 }
 
 /**
+ * Returns whether the revision diff highlighting is shown.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether revision diff is being shown.
+ */
+export function isShowingRevisionDiff( state ) {
+	return state.showRevisionDiff;
+}
+
+/**
  * Returns the current revision ID in revisions mode.
  *
  * @param {Object} state Global application state.
@@ -346,12 +401,22 @@ export const getCurrentRevision = createRegistrySelector(
 			'postType',
 			postType,
 			postId,
-			{ per_page: -1, context: 'edit' }
+			{
+				per_page: -1,
+				context: 'edit',
+				_fields:
+					'id,date,author,meta,title.raw,excerpt.raw,content.raw',
+			}
 		);
 		if ( ! revisions ) {
 			return null;
 		}
-		return revisions.find( ( r ) => r.id === revisionId ) ?? null;
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revKey = entityConfig?.revisionKey || 'id';
+		return revisions.find( ( r ) => r[ revKey ] === revisionId ) ?? null;
 	}
 );
 
@@ -376,3 +441,57 @@ export function getSelectedNote( state ) {
 export function isNoteFocused( state ) {
 	return !! state.selectedNote?.options?.focus;
 }
+
+/**
+ * Returns the previous revision (the one before the current revision).
+ * Used for diffing between revisions.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object|null|undefined} The previous revision object, null if loading or no previous revision, or undefined if not in revisions mode.
+ */
+export const getPreviousRevision = createRegistrySelector(
+	( select ) => ( state ) => {
+		const currentRevisionId = getCurrentRevisionId( state );
+		if ( ! currentRevisionId ) {
+			return undefined;
+		}
+
+		const { type: postType, id: postId } = getCurrentPost( state );
+		const revisions = select( coreStore ).getRevisions(
+			'postType',
+			postType,
+			postId,
+			{
+				per_page: -1,
+				context: 'edit',
+				_fields:
+					'id,date,author,meta,title.raw,excerpt.raw,content.raw',
+			}
+		);
+		if ( ! revisions ) {
+			return null;
+		}
+
+		// Sort by date ascending (oldest first).
+		const sortedRevisions = [ ...revisions ].sort(
+			( a, b ) => new Date( a.date ) - new Date( b.date )
+		);
+
+		// Find current revision index.
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revKey = entityConfig?.revisionKey || 'id';
+		const currentIndex = sortedRevisions.findIndex(
+			( r ) => r[ revKey ] === currentRevisionId
+		);
+
+		// Return the previous revision (older one) if it exists.
+		if ( currentIndex > 0 ) {
+			return sortedRevisions[ currentIndex - 1 ];
+		}
+
+		return null;
+	}
+);

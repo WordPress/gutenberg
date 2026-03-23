@@ -214,4 +214,68 @@ describe( 'buildDockerComposeConfig', () => {
 			'tests-mysql': { condition: 'service_healthy' },
 		} );
 	} );
+
+	describe( 'testsEnvironment', () => {
+		it( 'should omit tests services when testsEnvironment is false', () => {
+			const dockerConfig = buildDockerComposeConfig( {
+				testsEnvironment: false,
+				workDirectoryPath: '/path',
+				env: {
+					development: CONFIG,
+					tests: CONFIG,
+				},
+			} );
+
+			// Development services should exist.
+			expect( dockerConfig.services.mysql ).toBeDefined();
+			expect( dockerConfig.services.wordpress ).toBeDefined();
+			expect( dockerConfig.services.cli ).toBeDefined();
+			expect( dockerConfig.services.phpmyadmin ).toBeDefined();
+
+			// Tests services should not exist.
+			expect( dockerConfig.services[ 'tests-mysql' ] ).toBeUndefined();
+			expect(
+				dockerConfig.services[ 'tests-wordpress' ]
+			).toBeUndefined();
+			expect( dockerConfig.services[ 'tests-cli' ] ).toBeUndefined();
+			expect(
+				dockerConfig.services[ 'tests-phpmyadmin' ]
+			).toBeUndefined();
+		} );
+
+		it( 'should omit tests volumes when testsEnvironment is false', () => {
+			const dockerConfig = buildDockerComposeConfig( {
+				testsEnvironment: false,
+				workDirectoryPath: '/path',
+				env: {
+					development: CONFIG,
+					tests: CONFIG,
+				},
+			} );
+
+			// Development volumes should exist.
+			expect( dockerConfig.volumes.wordpress ).toBeDefined();
+			expect( dockerConfig.volumes.mysql ).toBeDefined();
+			expect( dockerConfig.volumes[ 'user-home' ] ).toBeDefined();
+
+			// Tests volumes should not exist.
+			expect( dockerConfig.volumes[ 'tests-wordpress' ] ).toBeUndefined();
+			expect( dockerConfig.volumes[ 'mysql-test' ] ).toBeUndefined();
+			expect( dockerConfig.volumes[ 'tests-user-home' ] ).toBeUndefined();
+		} );
+
+		it( 'should include tests services by default', () => {
+			const dockerConfig = buildDockerComposeConfig( {
+				workDirectoryPath: '/path',
+				env: {
+					development: CONFIG,
+					tests: CONFIG,
+				},
+			} );
+
+			expect( dockerConfig.services[ 'tests-mysql' ] ).toBeDefined();
+			expect( dockerConfig.services[ 'tests-wordpress' ] ).toBeDefined();
+			expect( dockerConfig.services[ 'tests-cli' ] ).toBeDefined();
+		} );
+	} );
 } );

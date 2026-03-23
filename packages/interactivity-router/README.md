@@ -7,6 +7,10 @@ The package defines an Interactivity API store with the `core/router` namespace,
 The `@wordpress/interactivity-router` package was [introduced in WordPress Core in v6.5](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/). This means this package is already bundled in Core in any version of WordPress higher than v6.5.
 
 <div class="callout callout-info">
+    For a comprehensive guide on how client-side navigation works, including getting started, block compatibility, and advanced use cases, see the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation/">Client-Side Navigation guide</a>.
+</div>
+
+<div class="callout callout-info">
     Check the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/">Interactivity API Reference docs in the Block Editor handbook</a> to learn more about the Interactivity API.
 </div>
 
@@ -45,15 +49,6 @@ When loaded, this package [adds the following state and actions](https://github.
 const { state, actions } = store( 'core/router', {
 	state: {
 		url: window.location.href,
-		navigation: {
-			hasStarted: false,
-			hasFinished: false,
-			texts: {
-				loading: '',
-				loaded: '',
-			},
-			message: '',
-		},
 	},
 	actions: {
 		*navigate(href, options) {...},
@@ -157,7 +152,6 @@ prefetch( url: string, options: PrefetchOptions = {} )
 ### State
 
 `state.url` is a reactive property synchronized with the current URL.
-Properties under `state.navigation` are meant for loading bar animations.
 
 ## Installation
 

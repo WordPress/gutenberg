@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __, sprintf } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import { BLOCK_VISIBILITY_VIEWPORT_ENTRIES } from './constants';
@@ -100,4 +105,39 @@ export function getHideEverywhereCheckboxState( blocks ) {
 	}
 
 	return null; // Indeterminate: some but not all
+}
+
+/**
+ * Get a human-readable label describing which viewports a block is hidden on.
+ *
+ * @param {boolean|Object} blockVisibility The block's visibility metadata.
+ * @return {string|null} A descriptive label, or null if the block is not hidden.
+ */
+export function getBlockVisibilityLabel( blockVisibility ) {
+	// Not hidden at all
+	if ( ! blockVisibility && blockVisibility !== false ) {
+		return null;
+	}
+
+	if ( blockVisibility === false ) {
+		// Hidden on all viewports
+		return __( 'Block is hidden' );
+	}
+
+	if ( blockVisibility?.viewport ) {
+		// Hidden on specific viewports - list them
+		const hiddenViewports = BLOCK_VISIBILITY_VIEWPORT_ENTRIES.filter(
+			( [ key ] ) => blockVisibility.viewport?.[ key ] === false
+		).map( ( [ , viewport ] ) => viewport.label );
+
+		if ( hiddenViewports.length > 0 ) {
+			return sprintf(
+				/* translators: %s: comma-separated list of viewport names (Desktop, Tablet, Mobile) */
+				__( 'Block is hidden on %s' ),
+				hiddenViewports.join( ', ' )
+			);
+		}
+	}
+
+	return null;
 }

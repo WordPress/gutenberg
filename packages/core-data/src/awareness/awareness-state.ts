@@ -122,12 +122,12 @@ export abstract class AwarenessState<
 	/**
 	 * We keep track of all seen states during the current session for two reasons:
 	 *
-	 * 1. So that we can represent recently disconnected users in our UI, even
+	 * 1. So that we can represent recently disconnected collaborators in our UI, even
 	 *    after they have been removed from the awareness document.
-	 * 2. So that we can provide debug information about all users seen during
+	 * 2. So that we can provide debug information about all collaborators seen during
 	 *    the session.
 	 */
-	private disconnectedUsers: Set< number > = new Set();
+	private disconnectedCollaborators: Set< number > = new Set();
 	private seenStates: Map< number, State > = new Map();
 
 	/**
@@ -165,18 +165,20 @@ export abstract class AwarenessState<
 
 		this.hasSetupRun = true;
 
+		this.onSetUp();
+
 		this.on(
 			'change',
 			( { added, removed, updated }: AwarenessStateChange ) => {
 				[ ...added, ...updated ].forEach( ( id ) => {
-					this.disconnectedUsers.delete( id );
+					this.disconnectedCollaborators.delete( id );
 				} );
 
 				removed.forEach( ( id ) => {
-					this.disconnectedUsers.add( id );
+					this.disconnectedCollaborators.add( id );
 
 					setTimeout( () => {
-						this.disconnectedUsers.delete( id );
+						this.disconnectedCollaborators.delete( id );
 						this.updateSubscribers( true /* force update */ );
 					}, REMOVAL_DELAY_IN_MS );
 				} );
@@ -186,8 +188,6 @@ export abstract class AwarenessState<
 				this.updateSubscribers();
 			}
 		);
-
-		this.onSetUp();
 	};
 
 	/**
@@ -259,14 +259,14 @@ export abstract class AwarenessState<
 	}
 
 	/**
-	 * Set the current user's connection status as awareness state.
+	 * Set the current collaborator's connection status as awareness state.
 	 * @param isConnected - The connection status.
 	 */
 	public setConnectionStatus( isConnected: boolean ): void {
 		if ( isConnected ) {
-			this.disconnectedUsers.delete( this.clientID );
+			this.disconnectedCollaborators.delete( this.clientID );
 		} else {
-			this.disconnectedUsers.add( this.clientID );
+			this.disconnectedCollaborators.add( this.clientID );
 		}
 
 		this.updateSubscribers( true /* force update */ );
@@ -289,9 +289,9 @@ export abstract class AwarenessState<
 		] );
 
 		const updatedStates = new Map< number, EnhancedState< State > >(
-			[ ...this.disconnectedUsers, ...states.keys() ]
+			[ ...this.disconnectedCollaborators, ...states.keys() ]
 				.filter( ( clientId ) => {
-					// Exclude any users with empty awareness state. This can happen from
+					// Exclude any collaborators with empty awareness state. This can happen from
 					// the Yjs inspector.
 					return (
 						Object.keys( this.seenStates.get( clientId ) ?? {} )
@@ -303,7 +303,7 @@ export abstract class AwarenessState<
 					const rawState: State = this.seenStates.get( clientId )!;
 
 					const isConnected =
-						! this.disconnectedUsers.has( clientId );
+						! this.disconnectedCollaborators.has( clientId );
 					const isMe = clientId === this.clientID;
 					const myState: Partial< State > = isMe
 						? this.myThrottledState

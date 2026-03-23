@@ -114,6 +114,7 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 	test( 'correctly applies dynamic allowed blocks restrictions', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await editor.canvas
 			.locator( 'role=button[name="Add default block"i]' )
@@ -139,8 +140,8 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 
 		// Insert list block.
 		await blockListBox.getByRole( 'option', { name: 'List' } ).click();
-		// Select the list wrapper and then parent block.
-		await page.keyboard.press( 'ArrowUp' );
+		// Use primary+a to select up to list, then click parent selector.
+		await pageUtils.pressKeys( 'primary+a' );
 		await editor.clickBlockToolbarButton(
 			'Select parent block: Allowed Blocks Dynamic'
 		);

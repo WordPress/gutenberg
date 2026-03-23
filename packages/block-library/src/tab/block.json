@@ -31,14 +31,7 @@
 				"text": true
 			}
 		},
-		"layout": {
-			"allowSwitching": true,
-			"allowInheriting": false,
-			"allowVerticalAlignment": true,
-			"allowJustification": true,
-			"allowOrientation": true,
-			"allowSizingOnChildren": true
-		},
+		"layout": true,
 		"spacing": {
 			"blockGap": true,
 			"padding": true,

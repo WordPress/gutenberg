@@ -216,7 +216,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 }
 
 function useOnClickOutside(
-	ref: React.RefObject< HTMLElement >,
+	ref: React.RefObject< HTMLElement | null >,
 	handler: AutocompleterUIProps[ 'reset' ]
 ) {
 	useEffect( () => {

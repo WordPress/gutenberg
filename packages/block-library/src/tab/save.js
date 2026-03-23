@@ -8,7 +8,9 @@ export default function save( { attributes } ) {
 
 	const tabPanelId = anchor;
 
-	const blockProps = useBlockProps.save();
+	const blockProps = useBlockProps.save( {
+		role: 'tabpanel',
+	} );
 	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
 
 	return <section { ...innerBlocksProps } id={ tabPanelId } />;

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -55,9 +55,17 @@ function getPostType( name ) {
 }
 
 export function useResolveEditedEntity() {
+	const { editEntityRecord } = useDispatch( coreDataStore );
+	const { hasEntityRecord } = useSelect( coreDataStore );
 	const { name, params = {}, query } = useLocation();
 	const { postId = query?.postId } = params; // Fallback to query param for postId for list view routes.
 	const postType = getPostType( name, postId ) ?? query?.postType;
+	// Extract selectedBlock from URL for selection restoration on navigation back.
+	const { selectedBlock } = query;
+
+	// Track which selection we've applied to avoid re-applying the same one,
+	// but allow applying a new one if the URL changes.
+	const appliedSelectionRef = useRef( null );
 
 	const homePage = useSelect( ( select ) => {
 		const { getHomePage } = unlock( select( coreDataStore ) );
@@ -127,20 +135,59 @@ export function useResolveEditedEntity() {
 		return {};
 	}, [ homePage, postType, postId ] );
 
+	// Compute entity info based on conditions
+	let entity;
 	if ( postTypesWithoutParentTemplate.includes( postType ) && postId ) {
-		return { isReady: true, postType, postId, context };
-	}
-
-	if ( !! homePage ) {
-		return {
+		entity = { isReady: true, postType, postId, context };
+	} else if ( !! homePage ) {
+		entity = {
 			isReady: resolvedTemplateId !== undefined,
 			postType: TEMPLATE_POST_TYPE,
 			postId: resolvedTemplateId,
 			context,
 		};
+	} else {
+		entity = { isReady: false };
 	}
 
-	return { isReady: false };
+	// Restore selection from URL synchronously, before EditorProvider renders.
+	// This ensures the selection is available when blocks are reset.
+	// When editing a page with a template, EditorProvider reads selection from
+	// the page entity (context), not the template entity.
+	if (
+		selectedBlock &&
+		entity.isReady &&
+		appliedSelectionRef.current !== selectedBlock
+	) {
+		const selectionPostType = entity.context?.postId
+			? entity.context.postType
+			: entity.postType;
+		const selectionPostId = entity.context?.postId
+			? entity.context.postId
+			: entity.postId;
+
+		// Only apply selection if the entity record is loaded,
+		// otherwise editEntityRecord will throw.
+		if (
+			hasEntityRecord( 'postType', selectionPostType, selectionPostId )
+		) {
+			editEntityRecord(
+				'postType',
+				selectionPostType,
+				selectionPostId,
+				{
+					selection: {
+						selectionStart: { clientId: selectedBlock },
+						selectionEnd: { clientId: selectedBlock },
+					},
+				},
+				{ undoIgnore: true }
+			);
+			appliedSelectionRef.current = selectedBlock;
+		}
+	}
+
+	return entity;
 }
 
 export function useSyncDeprecatedEntityIntoState( {

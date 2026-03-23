@@ -30,7 +30,6 @@ import {
 	ValidatedToggleGroupControl,
 } from './validated-form-controls';
 import { ValidatedFormTokenField } from './validated-form-controls/components/form-token-field';
-import { Picker } from './color-picker/picker';
 
 export const privateApis = {};
 lock( privateApis, {
@@ -46,7 +45,6 @@ lock( privateApis, {
 	DateCalendar,
 	DateRangeCalendar,
 	TZDate,
-	Picker,
 	useDrag,
 	ValidatedInputControl,
 	ValidatedCheckboxControl,

@@ -133,12 +133,14 @@ Private exports:
 Private actions:
 - `__experimentalUpdateSettings`: version of public `updateSettings` action that filters out some private/experimental settings.
 - `clearBlockRemovalPrompt`
+- `clearRequestedInspectorTab`
 - `deleteStyleOverride`
 - `ensureDefaultBlock`
 - `expandBlock`
 - `hideBlockInterface`
 - `modifyContentLockBlock`
 - `privateRemoveBlocks`
+- `requestInspectorTab`
 - `resetZoomLevel`
 - `setBlockRemovalRules`
 - `setInsertionPoint`
@@ -172,6 +174,7 @@ Private selectors:
 - `getPatternBySlug`
 - `getRegisteredInserterMediaCategories`
 - `getRemovalPromptData`
+- `getRequestedInspectorTab`
 - `getReusableBlocks`
 - `getSectionRootClientId`
 - `getStyleOverrides`

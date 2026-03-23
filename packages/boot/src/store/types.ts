@@ -10,7 +10,7 @@ import type { ReactNode, ComponentType } from 'react';
  * - SVG icons from @wordpress/icons
  * - Data URLs for images
  */
-export type IconType = string | JSX.Element | ReactNode;
+export type IconType = string | React.JSX.Element | ReactNode;
 
 export interface MenuItem {
 	id: string;

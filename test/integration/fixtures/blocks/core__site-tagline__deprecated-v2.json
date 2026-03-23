@@ -1,0 +1,41 @@
+[
+	{
+		"name": "core/site-tagline",
+		"isValid": true,
+		"attributes": {
+			"levelOptions": [ 0, 1, 2, 3, 4, 5, 6 ],
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/site-tagline",
+		"isValid": true,
+		"attributes": {
+			"levelOptions": [ 0, 1, 2, 3, 4, 5, 6 ],
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/site-tagline",
+		"isValid": true,
+		"attributes": {
+			"levelOptions": [ 0, 1, 2, 3, 4, 5, 6 ],
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

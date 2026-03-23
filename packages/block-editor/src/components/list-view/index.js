@@ -65,8 +65,8 @@ const expanded = ( state, action ) => {
 
 export const BLOCK_LIST_ITEM_HEIGHT = 32;
 
-/** @typedef {import('react').ComponentType} ComponentType */
-/** @typedef {import('react').Ref<HTMLElement>} Ref */
+/** @typedef {React.ComponentType} ComponentType */
+/** @typedef {React.Ref<HTMLElement>} Ref */
 
 /**
  * Show a hierarchical list of blocks.

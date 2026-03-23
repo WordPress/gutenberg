@@ -2,6 +2,75 @@
  * Internal dependencies
  */
 import migrateFontFamily from '../utils/migrate-font-family';
+import migrateTextAlign from '../utils/migrate-text-align';
+
+const v2 = {
+	attributes: {
+		textAlign: {
+			type: 'string',
+		},
+		level: {
+			type: 'number',
+		},
+		levelOptions: {
+			type: 'array',
+			default: [ 0, 1, 2, 3, 4, 5, 6 ],
+		},
+	},
+	supports: {
+		anchor: true,
+		reusable: false,
+		html: false,
+		color: {
+			gradients: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
+		},
+		spacing: {
+			margin: true,
+			padding: true,
+			__experimentalDefaultControls: {
+				margin: false,
+				padding: false,
+			},
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalFontStyle: true,
+			__experimentalFontWeight: true,
+			__experimentalLetterSpacing: true,
+			__experimentalWritingMode: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		interactivity: {
+			clientNavigation: true,
+		},
+		__experimentalBorder: {
+			radius: true,
+			color: true,
+			width: true,
+			style: true,
+		},
+	},
+	migrate: migrateTextAlign,
+	isEligible( attributes ) {
+		return (
+			!! attributes.textAlign ||
+			!! attributes.className?.match(
+				/\bhas-text-align-(left|center|right)\b/
+			)
+		);
+	},
+	save: () => null,
+};
 
 const v1 = {
 	attributes: {
@@ -46,4 +115,4 @@ const v1 = {
  *
  * See block-deprecation.md
  */
-export default [ v1 ];
+export default [ v2, v1 ];

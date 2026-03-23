@@ -33,6 +33,39 @@ describe( 'IconButton', () => {
 		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
+	describe( 'tooltip with disabled state', () => {
+		it( 'does not show tooltip when truly disabled', async () => {
+			const user = userEvent.setup();
+
+			render( <IconButton label="Save" icon={ <svg /> } disabled /> );
+
+			const button = screen.getByRole( 'button', { name: 'Save' } );
+			await user.hover( button );
+
+			expect( screen.queryByText( 'Save' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'shows tooltip when focusably disabled', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<IconButton
+					label="Save"
+					icon={ <svg /> }
+					disabled
+					focusableWhenDisabled
+				/>
+			);
+
+			const button = screen.getByRole( 'button', { name: 'Save' } );
+			await user.hover( button );
+
+			await waitFor( () => {
+				expect( screen.getByText( 'Save' ) ).toBeVisible();
+			} );
+		} );
+	} );
+
 	describe( 'shortcut', () => {
 		it( 'sets aria-keyshortcuts attribute on the button', () => {
 			const { rerender } = render(

@@ -148,11 +148,10 @@ const LinkControlSearchInput = forwardRef(
 						showInitialSuggestions
 					}
 					customValidity={ customValidityProp }
-					// Suppress the "(Required)" indicator that appears when validation
-					// is triggered. The field is still required for validation purposes,
-					// but we don't want to show the indicator as it looks cluttered
-					// in the link control UI.
-					markWhenOptional
+					// Validation is handled manually via onSubmit and handleSubmit. We may be able to rely
+					// on browser validation when enhancements land to base level components:
+					// https://github.com/WordPress/gutenberg/pull/75188#issuecomment-3861757260
+					required={ false }
 					onSubmit={ ( suggestion, event ) => {
 						const hasSuggestion = suggestion || focusedSuggestion;
 

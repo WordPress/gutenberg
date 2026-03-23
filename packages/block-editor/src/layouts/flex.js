@@ -138,16 +138,32 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
+		globalBlockGapValue,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
 		const { orientation = 'horizontal' } = layout;
+
+		// Determine the fallback gap value using global styles (theme.json),
+		// falling back to '0.5em' for backwards compatibility.
+		let fallbackGapValue = '0.5em';
+		if ( globalBlockGapValue ) {
+			// Process the global gap value to handle preset values
+			const processedGlobalGap = getGapCSSValue(
+				globalBlockGapValue,
+				'0.5em'
+			);
+			// Use the column gap value (second value if two values exist)
+			const gapParts = processedGlobalGap.split( ' ' );
+			fallbackGapValue =
+				gapParts.length > 1 ? gapParts[ 1 ] : gapParts[ 0 ];
+		}
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
 		const blockGapValue =
 			style?.spacing?.blockGap &&
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
-				? getGapCSSValue( style?.spacing?.blockGap, '0.5em' )
+				? getGapCSSValue( style?.spacing?.blockGap, fallbackGapValue )
 				: undefined;
 		const justifyContent = justifyContentMap[ layout.justifyContent ];
 		const flexWrap = flexWrapOptions.includes( layout.flexWrap )

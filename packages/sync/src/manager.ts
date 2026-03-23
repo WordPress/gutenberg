@@ -8,12 +8,16 @@ import type { Awareness } from 'y-protocols/awareness';
  * Internal dependencies
  */
 import {
-	CRDT_RECORD_MAP_KEY as RECORD_KEY,
+	CRDT_RECORD_MAP_KEY,
+	CRDT_STATE_MAP_KEY,
+	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	LOCAL_SYNC_MANAGER_ORIGIN,
-	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_KEY,
-	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
 } from './config';
-import { createPersistedCRDTDoc, getPersistedCrdtDoc } from './persistence';
+import {
+	logPerformanceTiming,
+	passThru,
+	yieldToEventLoop,
+} from './performance';
 import { getProviderCreators } from './providers';
 import type {
 	CollectionHandlers,
@@ -30,7 +34,13 @@ import type {
 	SyncUndoManager,
 } from './types';
 import { createUndoManager } from './undo-manager';
-import { createYjsDoc, markEntityAsSaved } from './utils';
+import {
+	createYjsDoc,
+	deserializeCrdtDoc,
+	initializeYjsDoc,
+	markEntityAsSaved,
+	serializeCrdtDoc,
+} from './utils';
 
 interface CollectionState {
 	awareness?: Awareness;
@@ -51,11 +61,27 @@ interface EntityState {
 }
 
 /**
+ * Get the entity ID for the given object type and object ID.
+ *
+ * @param {ObjectType}    objectType Object type.
+ * @param {ObjectID|null} objectId   Object ID.
+ */
+function getEntityId(
+	objectType: ObjectType,
+	objectId: ObjectID | null
+): EntityID {
+	return `${ objectType }_${ objectId }`;
+}
+
+/**
  * The sync manager orchestrates the lifecycle of syncing entity records. It
  * creates Yjs documents, connects to providers, creates awareness instances,
  * and coordinates with the `core-data` store.
+ *
+ * @param debug Whether to enable performance and debug logging.
  */
-export function createSyncManager(): SyncManager {
+export function createSyncManager( debug = false ): SyncManager {
+	const debugWrap = debug ? logPerformanceTiming : passThru;
 	const collectionStates: Map< ObjectType, CollectionState > = new Map();
 	const entityStates: Map< EntityID, EntityState > = new Map();
 
@@ -91,6 +117,31 @@ export function createSyncManager(): SyncManager {
 	let undoManager: SyncUndoManager | undefined;
 
 	/**
+	 * Log debug messages if debugging is enabled.
+	 *
+	 * @param component The component or context related to the log message
+	 * @param message   The debug message
+	 * @param entityId  The entity ID related to the log message
+	 * @param context   Additional debug context
+	 */
+	function log(
+		component: string,
+		message: string,
+		entityId: string,
+		context: object = {}
+	): void {
+		if ( ! debug ) {
+			return;
+		}
+
+		// eslint-disable-next-line no-console
+		console.log( `[SyncManager][${ component }]: ${ message }`, {
+			...context,
+			entityId,
+		} );
+	}
+
+	/**
 	 * Load an entity for syncing and manage its lifecycle.
 	 *
 	 * @param {SyncConfig}     syncConfig Sync configuration for the object type.
@@ -107,27 +158,42 @@ export function createSyncManager(): SyncManager {
 		handlers: RecordHandlers
 	): Promise< void > {
 		const providerCreators = getProviderCreators();
+		const entityId = getEntityId( objectType, objectId );
 
 		if ( 0 === providerCreators.length ) {
+			log( 'loadEntity', 'no providers, skipping', entityId );
 			return; // No provider creators, so syncing is effectively disabled.
 		}
 
-		const entityId = getEntityId( objectType, objectId );
-
 		if ( entityStates.has( entityId ) ) {
+			log( 'loadEntity', 'already loaded', entityId );
 			return; // Already bootstrapped.
 		}
 
+		log( 'loadEntity', 'loading', entityId );
+
+		handlers = {
+			addUndoMeta: debugWrap( handlers.addUndoMeta ),
+			editRecord: debugWrap( handlers.editRecord ),
+			getEditedRecord: debugWrap( handlers.getEditedRecord ),
+			onStatusChange: debugWrap( handlers.onStatusChange ),
+			persistCRDTDoc: debugWrap( handlers.persistCRDTDoc ),
+			refetchRecord: debugWrap( handlers.refetchRecord ),
+			restoreUndoMeta: debugWrap( handlers.restoreUndoMeta ),
+		};
+
 		const ydoc = createYjsDoc( { objectType } );
-		const recordMap = ydoc.getMap( RECORD_KEY );
-		const recordMetaMap = ydoc.getMap( RECORD_METADATA_KEY );
+		const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+		const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
 		const now = Date.now();
 
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
+			log( 'loadEntity', 'unloading', entityId );
 			providerResults.forEach( ( result ) => result.destroy() );
+			handlers.onStatusChange( null );
 			recordMap.unobserveDeep( onRecordUpdate );
-			recordMetaMap.unobserve( onRecordMetaUpdate );
+			stateMap.unobserve( onStateMapUpdate );
 			ydoc.destroy();
 			entityStates.delete( entityId );
 		};
@@ -148,10 +214,10 @@ export function createSyncManager(): SyncManager {
 				return;
 			}
 
-			void updateEntityRecord( objectType, objectId );
+			void internal.updateEntityRecord( objectType, objectId );
 		};
 
-		const onRecordMetaUpdate = (
+		const onStateMapUpdate = (
 			event: Y.YMapEvent< unknown >,
 			transaction: Y.Transaction
 		) => {
@@ -162,10 +228,11 @@ export function createSyncManager(): SyncManager {
 			event.keysChanged.forEach( ( key ) => {
 				switch ( key ) {
 					case SAVED_AT_KEY:
-						const newValue = recordMetaMap.get( SAVED_AT_KEY );
+						const newValue = stateMap.get( SAVED_AT_KEY );
 						if ( 'number' === typeof newValue && newValue > now ) {
 							// Another peer has saved the record. Refetch it so that we have
 							// a correct understanding of our own unsaved edits.
+							log( 'loadEntity', 'refetching record', entityId );
 							void handlers.refetchRecord().catch( () => {} );
 						}
 						break;
@@ -197,18 +264,32 @@ export function createSyncManager(): SyncManager {
 		entityStates.set( entityId, entityState );
 
 		// Create providers for the given entity and its Yjs document.
+		log( 'loadEntity', 'connecting', entityId );
 		const providerResults = await Promise.all(
-			providerCreators.map( ( create ) =>
-				create( { objectType, objectId, ydoc, awareness } )
-			)
+			providerCreators.map( async ( create ) => {
+				const provider = await create( {
+					objectType,
+					objectId,
+					ydoc,
+					awareness,
+				} );
+
+				// Attach status listener after provider creation.
+				provider.on( 'status', handlers.onStatusChange );
+
+				return provider;
+			} )
 		);
 
 		// Attach observers.
 		recordMap.observeDeep( onRecordUpdate );
-		recordMetaMap.observe( onRecordMetaUpdate );
+		stateMap.observe( onStateMapUpdate );
+
+		// Initialize the Yjs document with the necessary CRDT state.
+		initializeYjsDoc( ydoc );
 
 		// Get and apply the persisted CRDT document, if it exists.
-		applyPersistedCrdtDoc( objectType, objectId, record );
+		internal.applyPersistedCrdtDoc( objectType, objectId, record );
 	}
 
 	/**
@@ -224,28 +305,35 @@ export function createSyncManager(): SyncManager {
 		handlers: CollectionHandlers
 	): Promise< void > {
 		const providerCreators: ProviderCreator[] = getProviderCreators();
+		const entityId = getEntityId( objectType, null );
 
 		if ( 0 === providerCreators.length ) {
+			log( 'loadCollection', 'no providers, skipping', entityId );
 			return; // No provider creators, so syncing is effectively disabled.
 		}
 
 		if ( collectionStates.has( objectType ) ) {
+			log( 'loadCollection', 'already loaded', entityId );
 			return; // Already loaded.
 		}
 
+		log( 'loadCollection', 'loading', entityId );
+
 		const ydoc = createYjsDoc( { collection: true, objectType } );
-		const recordMetaMap = ydoc.getMap( RECORD_METADATA_KEY );
+		const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
 		const now = Date.now();
 
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
+			log( 'loadCollection', 'unloading', entityId );
 			providerResults.forEach( ( result ) => result.destroy() );
-			recordMetaMap.unobserve( onRecordMetaUpdate );
+			handlers.onStatusChange( null );
+			stateMap.unobserve( onStateMapUpdate );
 			ydoc.destroy();
 			collectionStates.delete( objectType );
 		};
 
-		const onRecordMetaUpdate = (
+		const onStateMapUpdate = (
 			event: Y.YMapEvent< unknown >,
 			transaction: Y.Transaction
 		) => {
@@ -256,7 +344,7 @@ export function createSyncManager(): SyncManager {
 			event.keysChanged.forEach( ( key ) => {
 				switch ( key ) {
 					case SAVED_AT_KEY:
-						const newValue = recordMetaMap.get( SAVED_AT_KEY );
+						const newValue = stateMap.get( SAVED_AT_KEY );
 						if ( 'number' === typeof newValue && newValue > now ) {
 							// Another peer has mutated the collection. Refetch it so that we
 							// obtain the updated records.
@@ -281,19 +369,28 @@ export function createSyncManager(): SyncManager {
 		collectionStates.set( objectType, collectionState );
 
 		// Create providers for the given entity and its Yjs document.
+		log( 'loadCollection', 'connecting', entityId );
 		const providerResults = await Promise.all(
-			providerCreators.map( ( create ) => {
-				return create( {
+			providerCreators.map( async ( create ) => {
+				const provider = await create( {
 					awareness,
 					objectType,
 					objectId: null,
 					ydoc,
 				} );
+
+				// Attach status listener after provider creation.
+				provider.on( 'status', handlers.onStatusChange );
+
+				return provider;
 			} )
 		);
 
 		// Attach observers.
-		recordMetaMap.observe( onRecordMetaUpdate );
+		stateMap.observe( onStateMapUpdate );
+
+		// Initialize the Yjs document with the necessary CRDT state.
+		initializeYjsDoc( ydoc );
 	}
 
 	/**
@@ -304,21 +401,10 @@ export function createSyncManager(): SyncManager {
 	 * @param {ObjectID}   objectId   Object ID to discard, or null for collections.
 	 */
 	function unloadEntity( objectType: ObjectType, objectId: ObjectID ): void {
-		entityStates.get( getEntityId( objectType, objectId ) )?.unload();
+		const entityId = getEntityId( objectType, objectId );
+		log( 'unloadEntity', 'unloading', entityId );
+		entityStates.get( entityId )?.unload();
 		updateCRDTDoc( objectType, null, {}, origin, { isSave: true } );
-	}
-
-	/**
-	 * Get the entity ID for the given object type and object ID.
-	 *
-	 * @param {ObjectType}    objectType Object type.
-	 * @param {ObjectID|null} objectId   Object ID.
-	 */
-	function getEntityId(
-		objectType: ObjectType,
-		objectId: ObjectID | null
-	): EntityID {
-		return `${ objectType }_${ objectId }`;
 	}
 
 	/**
@@ -352,7 +438,7 @@ export function createSyncManager(): SyncManager {
 	 * @param {ObjectID}   objectId   Object ID.
 	 * @param {ObjectData} record     Entity record representing this object type.
 	 */
-	function applyPersistedCrdtDoc(
+	function _applyPersistedCrdtDoc(
 		objectType: ObjectType,
 		objectId: ObjectID,
 		record: ObjectData
@@ -361,6 +447,7 @@ export function createSyncManager(): SyncManager {
 		const entityState = entityStates.get( entityId );
 
 		if ( ! entityState ) {
+			log( 'applyPersistedCrdtDoc', 'no entity state', entityId );
 			return;
 		}
 
@@ -369,29 +456,23 @@ export function createSyncManager(): SyncManager {
 			syncConfig: {
 				applyChangesToCRDTDoc,
 				getChangesFromCRDTDoc,
-				supports,
+				getPersistedCRDTDoc,
 			},
 			ydoc: targetDoc,
 		} = entityState;
 
-		if ( ! supports?.crdtPersistence ) {
-			// Apply the current record as changes.
-			targetDoc.transact( () => {
-				applyChangesToCRDTDoc( targetDoc, record );
-			}, LOCAL_SYNC_MANAGER_ORIGIN );
-			return;
-		}
-
 		// Get the persisted CRDT document, if it exists.
-		const tempDoc = getPersistedCrdtDoc( record );
+		const serialized = getPersistedCRDTDoc?.( record );
+		const tempDoc = serialized ? deserializeCrdtDoc( serialized ) : null;
 
 		if ( ! tempDoc ) {
-			// Apply the current record as changes and trigger a save, which will
-			// persist the CRDT document. (The entity should call `createEntityMeta`
-			// via its pre-persist hook.)
+			log( 'applyPersistedCrdtDoc', 'no persisted doc', entityId );
+			// Apply the current record as changes and request that the CRDT doc be
+			// persisted with the entity. The persisted CRDT doc can be created by
+			// calling `syncManager.createPersistedCRDTDoc`.
 			targetDoc.transact( () => {
 				applyChangesToCRDTDoc( targetDoc, record );
-				handlers.saveRecord();
+				handlers.persistCRDTDoc();
 			}, LOCAL_SYNC_MANAGER_ORIGIN );
 			return;
 		}
@@ -425,9 +506,14 @@ export function createSyncManager(): SyncManager {
 		tempDoc.destroy();
 
 		if ( 0 === invalidatedKeys.length ) {
+			log( 'applyPersistedCrdtDoc', 'valid persisted doc', entityId );
 			// The persisted CRDT document is valid. There are no updates to apply.
 			return;
 		}
+
+		log( 'applyPersistedCrdtDoc', 'invalidated keys', entityId, {
+			invalidatedKeys,
+		} );
 
 		// Use the invalidated keys to get the updated values from the entity.
 		const changes = invalidatedKeys.reduce(
@@ -438,12 +524,12 @@ export function createSyncManager(): SyncManager {
 			{}
 		);
 
-		// Apply the changes and trigger a save, which will persist the CRDT
-		// document. (The entity should call `createEntityMeta` via its pre-persist
-		// hook.)
+		// Apply the changes and request that the updated CRDT doc be persisted with
+		// the entity. The persisted CRDT doc can be created by calling
+		// `syncManager.createPersistedCRDTDoc`.
 		targetDoc.transact( () => {
 			applyChangesToCRDTDoc( targetDoc, changes );
-			handlers.saveRecord();
+			handlers.persistCRDTDoc();
 		}, LOCAL_SYNC_MANAGER_ORIGIN );
 	}
 
@@ -483,6 +569,9 @@ export function createSyncManager(): SyncManager {
 			}
 
 			ydoc.transact( () => {
+				log( 'updateCRDTDoc', 'applying changes', entityId, {
+					changedKeys: Object.keys( changes ),
+				} );
 				syncConfig.applyChangesToCRDTDoc( ydoc, changes );
 
 				if ( isSave ) {
@@ -505,7 +594,7 @@ export function createSyncManager(): SyncManager {
 	 * @param {ObjectType} objectType Object type of record to update.
 	 * @param {ObjectID}   objectId   Object ID of record to update.
 	 */
-	async function updateEntityRecord(
+	async function _updateEntityRecord(
 		objectType: ObjectType,
 		objectId: ObjectID
 	): Promise< void > {
@@ -513,6 +602,7 @@ export function createSyncManager(): SyncManager {
 		const entityState = entityStates.get( entityId );
 
 		if ( ! entityState ) {
+			log( 'updateEntityRecord', 'no entity state', entityId );
 			return;
 		}
 
@@ -525,14 +615,15 @@ export function createSyncManager(): SyncManager {
 			await handlers.getEditedRecord()
 		);
 
-		if ( 0 === Object.keys( changes ).length ) {
+		const changedKeys = Object.keys( changes );
+
+		if ( 0 === changedKeys.length ) {
 			return;
 		}
 
-		// This is a good spot to debug to see which changes are being synced. Note
-		// that `blocks` will always appear in the changes, but will only result
-		// in an update to the store if the blocks have changed.
-
+		log( 'updateEntityRecord', 'changes', entityId, {
+			changedKeys,
+		} );
 		handlers.editRecord( changes );
 	}
 
@@ -542,30 +633,42 @@ export function createSyncManager(): SyncManager {
 	 * @param {ObjectType} objectType Object type.
 	 * @param {ObjectID}   objectId   Object ID.
 	 */
-	function createEntityMeta(
+	async function createPersistedCRDTDoc(
 		objectType: ObjectType,
 		objectId: ObjectID
-	): Record< string, string > {
+	): Promise< string | null > {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
-		if ( ! entityState?.syncConfig.supports?.crdtPersistence ) {
-			return {};
+		if ( ! entityState?.ydoc ) {
+			return null;
 		}
 
-		return createPersistedCRDTDoc( entityState.ydoc );
+		// Y.Doc updates are deferred via yieldToEventLoop. Await a promise that
+		// resolves on the next tick of the event loop so pending updates are flushed
+		// before we serialize the document.
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+		return serializeCrdtDoc( entityState.ydoc );
 	}
 
+	// Collect internal functions so that they can be wrapped before calling.
+	const internal = {
+		applyPersistedCrdtDoc: debugWrap( _applyPersistedCrdtDoc ),
+		updateEntityRecord: debugWrap( _updateEntityRecord ),
+	};
+
+	// Wrap and return the public API.
 	return {
-		createMeta: createEntityMeta,
+		createPersistedCRDTDoc: debugWrap( createPersistedCRDTDoc ),
 		getAwareness,
-		load: loadEntity,
-		loadCollection,
+		load: debugWrap( loadEntity ),
+		loadCollection: debugWrap( loadCollection ),
 		// Use getter to ensure we always return the current value of `undoManager`.
 		get undoManager(): SyncUndoManager | undefined {
 			return undoManager;
 		},
-		unload: unloadEntity,
-		update: updateCRDTDoc,
+		unload: debugWrap( unloadEntity ),
+		update: debugWrap( yieldToEventLoop( updateCRDTDoc ) ),
 	};
 }

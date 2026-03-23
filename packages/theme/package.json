@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/theme",
-	"version": "0.6.0",
+	"version": "0.9.0",
 	"description": "Theme and context provider for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -43,6 +43,21 @@
 			"import": "./build-module/prebuilt/js/design-tokens.mjs",
 			"default": "./build/prebuilt/js/design-tokens.cjs"
 		},
+		"./postcss-plugins/postcss-ds-token-fallbacks": {
+			"types": "./src/postcss-plugins/postcss-ds-token-fallbacks.d.mts",
+			"import": "./src/postcss-plugins/postcss-ds-token-fallbacks.mjs",
+			"default": "./src/postcss-plugins/postcss-ds-token-fallbacks.mjs"
+		},
+		"./esbuild-plugins/esbuild-ds-token-fallbacks": {
+			"types": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.d.mts",
+			"import": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.mjs",
+			"default": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.mjs"
+		},
+		"./vite-plugins/vite-ds-token-fallbacks": {
+			"types": "./src/vite-plugins/vite-ds-token-fallbacks.d.mts",
+			"import": "./src/vite-plugins/vite-ds-token-fallbacks.mjs",
+			"default": "./src/vite-plugins/vite-ds-token-fallbacks.mjs"
+		},
 		"./stylelint-plugins/no-unknown-ds-tokens": {
 			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.ts",
 			"import": "./src/stylelint-plugins/no-unknown-ds-tokens.mjs",
@@ -52,6 +67,11 @@
 			"types": "./build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.ts",
 			"import": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs",
 			"default": "./build/stylelint-plugins/no-setting-wpds-custom-properties.cjs"
+		},
+		"./stylelint-plugins/no-token-fallback-values": {
+			"types": "./build-types/stylelint-plugins/no-token-fallback-values.d.ts",
+			"import": "./src/stylelint-plugins/no-token-fallback-values.mjs",
+			"default": "./build/stylelint-plugins/no-token-fallback-values.cjs"
 		},
 		"./package.json": "./package.json"
 	},
@@ -70,16 +90,16 @@
 		"memize": "^2.1.0"
 	},
 	"devDependencies": {
-		"@storybook/react-vite": "^10.1.11",
+		"@storybook/react-vite": "^10.2.8",
 		"@terrazzo/cli": "^0.10.2",
 		"@terrazzo/plugin-css": "^0.10.2",
 		"@terrazzo/token-tools": "^0.10.2",
-		"@testing-library/jest-dom": "^6.6.3",
+		"@testing-library/jest-dom": "^6.9.1",
 		"@types/jest": "^29.5.14",
 		"@types/node": "^20.17.10",
 		"esbuild": "^0.27.2",
 		"esbuild-esm-loader": "^0.3.3",
-		"storybook": "^10.1.11"
+		"storybook": "^10.2.8"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

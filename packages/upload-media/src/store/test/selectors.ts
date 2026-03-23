@@ -9,9 +9,12 @@ import {
 } from '../selectors';
 import {
 	getActiveUploadCount,
+	getActiveImageProcessingCount,
 	getFailedItems,
 	getItemProgress,
 	getPendingUploads,
+	getPendingImageProcessing,
+	hasPendingItemsByParentId,
 } from '../private-selectors';
 import {
 	ItemStatus,
@@ -145,6 +148,61 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getActiveImageProcessingCount', () => {
+		it( 'should return the count of items currently doing image processing', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						currentOperation: OperationType.ResizeCrop,
+					},
+					{
+						id: '2',
+						status: ItemStatus.Processing,
+						currentOperation: OperationType.Upload,
+					},
+					{
+						id: '3',
+						status: ItemStatus.Processing,
+						currentOperation: OperationType.Rotate,
+					},
+					{
+						id: '4',
+						status: ItemStatus.Processing,
+						currentOperation: OperationType.Prepare,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( getActiveImageProcessingCount( state ) ).toBe( 2 );
+		} );
+
+		it( 'should return 0 when no image processing is active', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						currentOperation: OperationType.Upload,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( getActiveImageProcessingCount( state ) ).toBe( 0 );
+		} );
+	} );
+
 	describe( 'getPendingUploads', () => {
 		it( 'should return items waiting for upload', () => {
 			const state: State = {
@@ -170,6 +228,86 @@ describe( 'selectors', () => {
 			};
 
 			const pending = getPendingUploads( state );
+			expect( pending ).toHaveLength( 1 );
+			expect( pending[ 0 ].id ).toBe( '1' );
+		} );
+	} );
+
+	describe( 'getPendingImageProcessing', () => {
+		it( 'should return items waiting for image processing', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						operations: [
+							[
+								OperationType.ResizeCrop,
+								{
+									resize: {
+										width: 150,
+										height: 150,
+									},
+								},
+							],
+						],
+						currentOperation: undefined,
+					},
+					{
+						id: '2',
+						status: ItemStatus.Processing,
+						operations: [
+							[
+								OperationType.ResizeCrop,
+								{
+									resize: {
+										width: 300,
+										height: 300,
+									},
+								},
+							],
+						],
+						currentOperation: OperationType.ResizeCrop,
+					},
+					{
+						id: '3',
+						status: ItemStatus.Processing,
+						operations: [ OperationType.Upload ],
+						currentOperation: undefined,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			const pending = getPendingImageProcessing( state );
+			expect( pending ).toHaveLength( 1 );
+			expect( pending[ 0 ].id ).toBe( '1' );
+		} );
+
+		it( 'should include items pending Rotate operations', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						operations: [
+							[ OperationType.Rotate, { orientation: 6 } ],
+						],
+						currentOperation: undefined,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			const pending = getPendingImageProcessing( state );
 			expect( pending ).toHaveLength( 1 );
 			expect( pending[ 0 ].id ).toBe( '1' );
 		} );
@@ -233,6 +371,56 @@ describe( 'selectors', () => {
 			expect( getItemProgress( state, '1' ) ).toBe( 50 );
 			expect( getItemProgress( state, '2' ) ).toBe( 75 );
 			expect( getItemProgress( state, '999' ) ).toBeUndefined();
+		} );
+	} );
+
+	describe( 'hasPendingItemsByParentId', () => {
+		it( 'should return true if there are items with matching parent ID', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						parentId: 'parent-1',
+						status: ItemStatus.Processing,
+					},
+					{
+						id: '2',
+						status: ItemStatus.Processing,
+					},
+				] as QueueItem[],
+				queueStatus: 'paused',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( hasPendingItemsByParentId( state, 'parent-1' ) ).toBe(
+				true
+			);
+			expect( hasPendingItemsByParentId( state, 'parent-2' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should return false if no items have a parent ID', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+					},
+				] as QueueItem[],
+				queueStatus: 'paused',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( hasPendingItemsByParentId( state, 'parent-1' ) ).toBe(
+				false
+			);
 		} );
 	} );
 } );

@@ -10,6 +10,7 @@ jest.mock( '@wordpress/api-fetch' );
  */
 import {
 	editEntityRecord,
+	clearEntityRecordEdits,
 	saveEntityRecord,
 	saveEditedEntityRecord,
 	deleteEntityRecord,
@@ -450,6 +451,84 @@ describe( 'editEntityRecord', () => {
 
 			// Verify SyncManager#update was NOT called
 			expect( syncManager.update ).not.toHaveBeenCalled();
+		} );
+	} );
+} );
+
+describe( 'clearEntityRecordEdits', () => {
+	it( 'throws when the entity does not have a loaded config.', async () => {
+		const select = {
+			getEntityConfig: jest.fn(),
+		};
+		const fulfillment = async () =>
+			clearEntityRecordEdits(
+				'someKind',
+				'someName',
+				'someId'
+			)( { select } );
+		await expect( fulfillment ).rejects.toThrow(
+			`The entity being edited (someKind, someName) does not have a loaded config.`
+		);
+	} );
+
+	it( 'does nothing when there are no edits', () => {
+		const dispatch = jest.fn();
+		const select = {
+			getEntityConfig: () => ( {
+				kind: 'postType',
+				name: 'post',
+			} ),
+			getEntityRecordEdits: () => undefined,
+		};
+
+		clearEntityRecordEdits(
+			'postType',
+			'post',
+			1
+		)( {
+			select,
+			dispatch,
+		} );
+
+		expect( dispatch ).not.toHaveBeenCalled();
+	} );
+
+	it( 'clears all edits for an entity record', () => {
+		const dispatch = jest.fn();
+		const select = {
+			getEntityConfig: () => ( {
+				kind: 'postType',
+				name: 'post',
+			} ),
+			getEntityRecordEdits: () => ( {
+				title: 'New Title',
+				content: 'New Content',
+			} ),
+			getEditedEntityRecord: () => ( {
+				id: 1,
+				title: 'New Title',
+				content: 'New Content',
+			} ),
+		};
+
+		clearEntityRecordEdits(
+			'postType',
+			'post',
+			1
+		)( {
+			select,
+			dispatch,
+		} );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: {
+				title: undefined,
+				content: undefined,
+			},
 		} );
 	} );
 } );

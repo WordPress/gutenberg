@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/media-fields",
-	"version": "0.4.0",
+	"version": "0.7.0",
 	"description": "Reusable field definitions for displaying and editing media attachment properties in WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -64,7 +64,7 @@
 		"clsx": "2.1.1"
 	},
 	"devDependencies": {
-		"@testing-library/jest-dom": "^6.6.3",
+		"@testing-library/jest-dom": "^6.9.1",
 		"@types/jest": "^29.5.14"
 	},
 	"peerDependencies": {

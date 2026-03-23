@@ -161,6 +161,7 @@ export function Comments( {
 			focusCommentThread( prevThread.id, commentSidebarRef.current );
 		} else {
 			selectNote( undefined );
+			toggleBlockSpotlight( comment.blockClientId, false );
 			// Move focus to the related block.
 			relatedBlockElement?.focus();
 		}
@@ -501,6 +502,11 @@ function Thread( {
 	};
 
 	const onBlur = ( event ) => {
+		// Don't deselect notes when the browser window/tab loses focus.
+		if ( ! document.hasFocus() ) {
+			return;
+		}
+
 		const isNoteFocused = event.relatedTarget?.closest(
 			'.editor-collab-sidebar-panel__thread'
 		);

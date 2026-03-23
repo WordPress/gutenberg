@@ -132,6 +132,42 @@ Files to copy with optional PHP transformations:
 }
 ```
 
+### `wpWorkers`
+
+Worker bundle definitions for packages that need self-contained Web Worker files.
+Workers are bundled with all dependencies included and can be loaded via Blob URLs.
+
+**String shorthand** — entry path only:
+
+```json
+{
+	"wpWorkers": {
+		"./worker": "./src/worker.ts"
+	}
+}
+```
+
+**Object format** — entry path with module resolve redirects:
+
+```json
+{
+	"wpWorkers": {
+		"./worker": {
+			"entry": "./src/worker.ts",
+			"resolve": {
+				"vips-es6.js": "vips.js"
+			}
+		}
+	}
+}
+```
+
+The `resolve` map redirects module loads during bundling. Keys are filename
+patterns to match; values are replacement filenames in the same directory.
+This is useful when a dependency's ES module entry point uses `import.meta.url`,
+which fails in Blob URL Worker contexts. By redirecting to an alternative
+entry point (e.g., a CommonJS version), the issue is avoided.
+
 ## Root Configuration
 
 Configure your root `package.json` with a `wpPlugin` object to control global namespace and externalization behavior:

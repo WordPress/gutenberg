@@ -11,6 +11,7 @@ import checkbox from './checkbox';
 import combobox from './combobox';
 import datetime from './datetime';
 import date from './date';
+import adaptiveSelect from './adaptive-select';
 import email from './email';
 import telephone from './telephone';
 import url from './url';
@@ -32,6 +33,7 @@ interface FormControls {
 }
 
 const FORM_CONTROLS: FormControls = {
+	adaptiveSelect,
 	array,
 	checkbox,
 	color,
@@ -89,7 +91,7 @@ export function getControl< Item >(
 	}
 
 	if ( hasElements( field ) && field.type !== 'array' ) {
-		return getControlByType( 'select' );
+		return getControlByType( 'adaptiveSelect' );
 	}
 
 	if ( fallback === null ) {

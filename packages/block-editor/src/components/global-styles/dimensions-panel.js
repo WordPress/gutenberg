@@ -735,6 +735,7 @@ export default function DimensionsPanel( {
 						label={ __( 'Minimum height' ) }
 						value={ minHeightValue }
 						onChange={ setMinHeightValue }
+						dimensionSizes={ dimensions?.dimensionSizes }
 					/>
 				</ToolsPanelItem>
 			) }
@@ -752,6 +753,7 @@ export default function DimensionsPanel( {
 						label={ __( 'Height' ) }
 						value={ heightValue }
 						onChange={ setHeightValue }
+						dimensionSizes={ dimensions?.dimensionSizes }
 					/>
 				</ToolsPanelItem>
 			) }
@@ -769,6 +771,7 @@ export default function DimensionsPanel( {
 						label={ __( 'Width' ) }
 						value={ widthValue }
 						onChange={ setWidthValue }
+						dimensionSizes={ dimensions?.dimensionSizes }
 					/>
 				</ToolsPanelItem>
 			) }

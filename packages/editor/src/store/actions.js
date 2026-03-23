@@ -189,10 +189,7 @@ export const savePost =
 		}
 
 		const content = select.getEditedPostContent();
-
-		if ( ! options.isAutosave ) {
-			dispatch.editPost( { content }, { undoIgnore: true } );
-		}
+		dispatch.editPost( { content }, { undoIgnore: true } );
 
 		const previousRecord = select.getCurrentPost();
 		let edits = {
@@ -743,9 +740,7 @@ export const setRenderingMode =
 			select.__unstableIsEditorReady() &&
 			! select.getEditorSettings().isPreviewMode
 		) {
-			// We clear the block selection but we also need to clear the selection from the core store.
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
-			dispatch.editPost( { selection: undefined }, { undoIgnore: true } );
 		}
 
 		dispatch( {

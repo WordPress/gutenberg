@@ -17,14 +17,15 @@ import { unlock } from '../../lock-unlock';
 /**
  * Slider component for navigating revisions.
  *
- * @return {JSX.Element} The revisions slider component.
+ * @return {React.JSX.Element} The revisions slider component.
  */
 function RevisionsSlider() {
-	const { revisions, isLoading, currentRevisionId } = useSelect(
+	const { revisions, isLoading, currentRevisionId, revisionKey } = useSelect(
 		( select ) => {
 			const { getCurrentPostId, getCurrentPostType } =
 				select( editorStore );
-			const { getRevisions, isResolving } = select( coreStore );
+			const { getRevisions, isResolving, getEntityConfig } =
+				select( coreStore );
 
 			const postId = getCurrentPostId();
 			const postType = getCurrentPostType();
@@ -33,7 +34,13 @@ function RevisionsSlider() {
 				return {};
 			}
 
-			const query = { per_page: -1, context: 'edit' };
+			const entityConfig = getEntityConfig( 'postType', postType );
+			const query = {
+				per_page: -1,
+				context: 'edit',
+				_fields:
+					'id,date,author,meta,title.raw,excerpt.raw,content.raw',
+			};
 			return {
 				revisions: getRevisions( 'postType', postType, postId, query ),
 				isLoading: isResolving( 'getRevisions', [
@@ -45,6 +52,7 @@ function RevisionsSlider() {
 				currentRevisionId: unlock(
 					select( editorStore )
 				).getCurrentRevisionId(),
+				revisionKey: entityConfig?.revisionKey || 'id',
 			};
 		},
 		[]
@@ -62,13 +70,13 @@ function RevisionsSlider() {
 	}, [ revisions ] );
 
 	const selectedIndex = sortedRevisions.findIndex(
-		( r ) => r.id === currentRevisionId
+		( r ) => r[ revisionKey ] === currentRevisionId
 	);
 
 	const handleSliderChange = ( index ) => {
 		const revision = sortedRevisions[ index ];
 		if ( revision ) {
-			setCurrentRevisionId( revision.id );
+			setCurrentRevisionId( revision[ revisionKey ] );
 		}
 	};
 

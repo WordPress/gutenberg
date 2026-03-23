@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "22.5.0",
+	"version": "22.8.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -28,9 +28,12 @@
 				"id": "site-editor-v2",
 				"init": [
 					"@wordpress/edit-site-init"
-				]
+				],
+				"experimental": true
 			},
-			"font-library"
+			"font-library",
+			"options-connectors",
+			"guidelines"
 		]
 	},
 	"config": {
@@ -39,15 +42,18 @@
 	"devDependencies": {
 		"@apidevtools/json-schema-ref-parser": "11.6.4",
 		"@babel/core": "7.25.7",
-		"@emotion/is-prop-valid": "1.2.2",
-		"@emotion/jest": "11.7.1",
-		"@emotion/native": "11.0.0",
+		"@emotion/babel-plugin": "11.13.5",
+		"@emotion/is-prop-valid": "1.4.0",
+		"@emotion/jest": "11.14.2",
+		"@emotion/native": "11.11.0",
+		"@emotion/react": "11.14.0",
+		"@emotion/styled": "11.14.1",
 		"@inquirer/prompts": "7.2.0",
 		"@octokit/rest": "16.26.0",
-		"@playwright/test": "1.57.0",
-		"@testing-library/jest-dom": "^6.6.3",
-		"@testing-library/react": "14.3.0",
-		"@testing-library/user-event": "14.4.3",
+		"@playwright/test": "1.58.2",
+		"@testing-library/jest-dom": "6.9.1",
+		"@testing-library/react": "16.3.2",
+		"@testing-library/user-event": "14.6.1",
 		"@types/node": "^20.17.10",
 		"@types/prettier": "2.4.4",
 		"@types/react": "^18.3.27",
@@ -57,6 +63,7 @@
 		"@types/uuid": "8.3.1",
 		"@vitejs/plugin-react": "5.1.2",
 		"@wordpress/build": "file:./packages/wp-build",
+		"@wordpress/vips": "file:./packages/vips",
 		"ajv": "8.17.1",
 		"babel-jest": "29.7.0",
 		"babel-loader": "9.2.1",
@@ -77,8 +84,7 @@
 		"eslint-plugin-jest-dom": "5.0.2",
 		"eslint-plugin-prettier": "5.0.0",
 		"eslint-plugin-react-compiler": "19.0.0-beta-0dec889-20241115",
-		"eslint-plugin-ssr-friendly": "1.0.6",
-		"eslint-plugin-storybook": "10.1.11",
+		"eslint-plugin-storybook": "10.2.17",
 		"eslint-plugin-testing-library": "6.0.2",
 		"execa": "4.0.2",
 		"fast-glob": "^3.2.7",
@@ -130,7 +136,7 @@
 		"build:profile-types": "rimraf ./ts-traces && npm run clean:package-types && node ./bin/packages/validate-typescript-version.js && ( tsc --build --extendedDiagnostics --generateTrace ./ts-traces || ( echo 'tsc failed.'; exit 1 ) ) && node ./bin/packages/check-build-type-declaration-files.js && npx --yes @typescript/analyze-trace ts-traces > ts-traces/analysis.txt && node -p \"'\\n\\nDone! Build traces saved to ts-traces/ directory.\\nTrace analysis saved to ts-traces/analysis.txt.'\"",
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
 		"clean:package-types": "tsc --build --clean && rimraf --glob \"./packages/*/build-types\"",
-		"clean:packages": "rimraf --glob \"./packages/*/{build,build-module,build-wp,build-style}\"",
+		"clean:packages": "rimraf --glob \"./packages/*/{build,build-module,build-wp,build-style}\" \"./build\"",
 		"component-usage-stats": "node ./node_modules/react-scanner/bin/react-scanner -c ./react-scanner.config.js",
 		"dev": "node ./bin/dev.mjs",
 		"distclean": "git clean --force -d -X",
@@ -193,22 +199,23 @@
 		"test:performance": "wp-scripts test-playwright --config test/performance/playwright.config.ts",
 		"test:performance:debug": "wp-scripts test-playwright --config test/performance/playwright.config.ts --debug",
 		"test:php": "npm-run-all lint:php test:unit:php",
-		"test:php:watch": "wp-env run --env-cwd='wp-content/plugins/gutenberg' tests-cli composer run-script test:watch",
+		"test:php:watch": "wp-env --config .wp-env.test.json run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script test:watch",
 		"test:unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
 		"test:unit:date": "bash ./bin/unit-test-date.sh",
 		"test:unit:debug": "wp-scripts --inspect-brk test-unit-js --runInBand --no-cache --verbose --config test/unit/jest.config.js ",
 		"test:unit:profile": "wp-scripts --cpu-prof test-unit-js --runInBand --no-cache --verbose --config test/unit/jest.config.js ",
-		"test:unit:php:setup": "wp-env start",
-		"test:unit:php:setup:debug": "wp-env start --xdebug",
-		"test:unit:php:base": "wp-env run --env-cwd='wp-content/plugins/gutenberg' tests-wordpress vendor/bin/phpunit -c phpunit.xml.dist --verbose",
+		"test:unit:php:setup": "wp-env --config .wp-env.test.json start",
+		"test:unit:php:setup:debug": "wp-env --config .wp-env.test.json start --xdebug",
+		"test:unit:php:base": "wp-env --config .wp-env.test.json run --env-cwd='wp-content/plugins/gutenberg' wordpress vendor/bin/phpunit -c phpunit.xml.dist --verbose",
 		"test:unit:php": "npm-run-all test:unit:php:setup test:unit:php:base",
 		"test:unit:php:debug": "npm-run-all test:unit:php:setup:debug test:unit:php:base",
-		"test:unit:php:multisite:base": "wp-env run --env-cwd='wp-content/plugins/gutenberg' tests-wordpress vendor/bin/phpunit -c phpunit/multisite.xml --verbose",
+		"test:unit:php:multisite:base": "wp-env --config .wp-env.test.json run --env-cwd='wp-content/plugins/gutenberg' wordpress vendor/bin/phpunit -c phpunit/multisite.xml --verbose",
 		"test:unit:php:multisite": "npm-run-all test:unit:php:setup test:unit:php:multisite:base",
 		"test:unit:php:multisite:debug": "npm-run-all test:unit:php:setup:debug test:unit:php:multisite:base",
 		"test:unit:update": "npm run test:unit -- --updateSnapshot",
 		"test:unit:watch": "npm run test:unit -- --watch",
-		"wp-env": "wp-env"
+		"wp-env": "wp-env",
+		"wp-env-test": "wp-env --config .wp-env.test.json"
 	},
 	"lint-staged": {
 		"*.{js,json,ts,tsx,yml,yaml}": [

@@ -14,9 +14,12 @@ process.env.TZ = 'UTC';
 module.exports = {
 	rootDir: '../../',
 	moduleNameMapper: {
+		// Mock @wordpress/vips/worker before the general pattern so it doesn't try to load the real file.
+		// The worker-code.ts file is auto-generated during full builds and is gitignored.
+		'@wordpress/vips/worker':
+			'<rootDir>/test/unit/config/vips-worker-code-stub.js',
 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
 			'packages/$1/src',
-		'@wordpress/vips/worker': '<rootDir>/packages/vips/src/vips-worker.ts',
 		'@wordpress/theme/design-tokens.js':
 			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',

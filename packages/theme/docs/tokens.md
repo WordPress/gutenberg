@@ -114,25 +114,37 @@ Do not edit directly.
 | `--wpds-color-stroke-interactive-error-strong`        | Accessible stroke color used for interactive error-toned elements with strong emphasis.                                                     |
 | `--wpds-color-stroke-focus-brand`                     | Accessible stroke color applied to focus rings.                                                                                             |
 
+### Cursor
+
+| Variable name           | Description                                                                                       |
+| ----------------------- | ------------------------------------------------------------------------------------------------- |
+| `--wpds-cursor-control` | Cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). |
+
 ### Dimension
 
-| Variable name                  | Description            |
-| ------------------------------ | ---------------------- |
-| `--wpds-dimension-base`        | Base dimension unit    |
-| `--wpds-dimension-padding-xs`  | Extra small padding    |
-| `--wpds-dimension-padding-sm`  | Small padding          |
-| `--wpds-dimension-padding-md`  | Medium padding         |
-| `--wpds-dimension-padding-lg`  | Large padding          |
-| `--wpds-dimension-padding-xl`  | Extra large padding    |
-| `--wpds-dimension-padding-2xl` | 2x extra large padding |
-| `--wpds-dimension-padding-3xl` | 3x extra large padding |
-| `--wpds-dimension-gap-xs`      | Extra small gap        |
-| `--wpds-dimension-gap-sm`      | Small gap              |
-| `--wpds-dimension-gap-md`      | Medium gap             |
-| `--wpds-dimension-gap-lg`      | Large gap              |
-| `--wpds-dimension-gap-xl`      | Extra large gap        |
-| `--wpds-dimension-gap-2xl`     | 2x extra large gap     |
-| `--wpds-dimension-gap-3xl`     | 3x extra large gap     |
+| Variable name                        | Description                  |
+| ------------------------------------ | ---------------------------- |
+| `--wpds-dimension-base`              | Base dimension unit          |
+| `--wpds-dimension-padding-xs`        | Extra small padding          |
+| `--wpds-dimension-padding-sm`        | Small padding                |
+| `--wpds-dimension-padding-md`        | Medium padding               |
+| `--wpds-dimension-padding-lg`        | Large padding                |
+| `--wpds-dimension-padding-xl`        | Extra large padding          |
+| `--wpds-dimension-padding-2xl`       | 2x extra large padding       |
+| `--wpds-dimension-padding-3xl`       | 3x extra large padding       |
+| `--wpds-dimension-gap-xs`            | Extra small gap              |
+| `--wpds-dimension-gap-sm`            | Small gap                    |
+| `--wpds-dimension-gap-md`            | Medium gap                   |
+| `--wpds-dimension-gap-lg`            | Large gap                    |
+| `--wpds-dimension-gap-xl`            | Extra large gap              |
+| `--wpds-dimension-gap-2xl`           | 2x extra large gap           |
+| `--wpds-dimension-gap-3xl`           | 3x extra large gap           |
+| `--wpds-dimension-surface-width-xs`  | Extra small surface width    |
+| `--wpds-dimension-surface-width-sm`  | Small surface width          |
+| `--wpds-dimension-surface-width-md`  | Medium surface width         |
+| `--wpds-dimension-surface-width-lg`  | Large surface width          |
+| `--wpds-dimension-surface-width-xl`  | Extra large surface width    |
+| `--wpds-dimension-surface-width-2xl` | 2x extra large surface width |
 
 ### Elevation
 

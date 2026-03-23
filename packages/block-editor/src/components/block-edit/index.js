@@ -17,6 +17,7 @@ import {
 	blockEditingModeKey,
 	blockBindingsKey,
 	isPreviewModeKey,
+	isInListViewBlockSupportTreeKey,
 } from './context';
 import { MultipleUsageWarning } from './multiple-usage-warning';
 import { PrivateBlockContext } from '../block-list/private-block-context';
@@ -53,6 +54,11 @@ export default function BlockEdit( {
 	const layoutSupport =
 		hasBlockSupport( name, 'layout', false ) ||
 		hasBlockSupport( name, '__experimentalLayout', false );
+	const parentBlockEditContext = useBlockEditContext();
+	const isInListViewBlockSupportTree =
+		!! parentBlockEditContext[ isInListViewBlockSupportTreeKey ] ||
+		hasBlockSupport( name, 'listView' ) ||
+		name === 'core/navigation';
 	const { originalBlockClientId } = useContext( PrivateBlockContext );
 
 	return (
@@ -77,6 +83,8 @@ export default function BlockEdit( {
 					[ blockEditingModeKey ]: blockEditingMode,
 					[ blockBindingsKey ]: bindings,
 					[ isPreviewModeKey ]: isPreviewMode,
+					[ isInListViewBlockSupportTreeKey ]:
+						isInListViewBlockSupportTree,
 				} ),
 				[
 					name,
@@ -91,6 +99,7 @@ export default function BlockEdit( {
 					blockEditingMode,
 					bindings,
 					isPreviewMode,
+					isInListViewBlockSupportTree,
 				]
 			) }
 		>

@@ -10,7 +10,7 @@ import {
 /**
  * Internal dependencies
  */
-import autoInspectorControls from '../auto-inspector-controls';
+import AutoRegisterControls from '../auto-inspector-controls';
 
 describe( 'auto-inspector-controls', () => {
 	const blockName = 'test/auto-inspector-controls-block';
@@ -22,7 +22,7 @@ describe( 'auto-inspector-controls', () => {
 	} );
 
 	describe( 'hasSupport()', () => {
-		it( 'should return false for blocks without __experimentalAutoInspectorControl markers', () => {
+		it( 'should return false for blocks without autoGenerateControl markers', () => {
 			registerBlockType( blockName, {
 				apiVersion: 3,
 				title: 'Test Block',
@@ -36,12 +36,12 @@ describe( 'auto-inspector-controls', () => {
 				save: () => null,
 			} );
 
-			expect( autoInspectorControls.hasSupport( blockName ) ).toBe(
+			expect( AutoRegisterControls.hasSupport( blockName ) ).toBe(
 				false
 			);
 		} );
 
-		it( 'should return true for blocks with __experimentalAutoInspectorControl markers', () => {
+		it( 'should return true for blocks with autoGenerateControl markers', () => {
 			registerBlockType( blockName, {
 				apiVersion: 3,
 				title: 'Test Block',
@@ -49,25 +49,23 @@ describe( 'auto-inspector-controls', () => {
 				attributes: {
 					title: {
 						type: 'string',
-						__experimentalAutoInspectorControl: true,
+						autoGenerateControl: true,
 					},
 					count: {
 						type: 'integer',
-						__experimentalAutoInspectorControl: true,
+						autoGenerateControl: true,
 					},
 				},
 				edit: () => null,
 				save: () => null,
 			} );
 
-			expect( autoInspectorControls.hasSupport( blockName ) ).toBe(
-				true
-			);
+			expect( AutoRegisterControls.hasSupport( blockName ) ).toBe( true );
 		} );
 
 		it( 'should return false for unregistered blocks', () => {
 			expect(
-				autoInspectorControls.hasSupport( 'non/existent-block' )
+				AutoRegisterControls.hasSupport( 'non/existent-block' )
 			).toBe( false );
 		} );
 
@@ -80,12 +78,12 @@ describe( 'auto-inspector-controls', () => {
 				save: () => null,
 			} );
 
-			expect( autoInspectorControls.hasSupport( blockName ) ).toBe(
+			expect( AutoRegisterControls.hasSupport( blockName ) ).toBe(
 				false
 			);
 		} );
 
-		it( 'should return true when at least one attribute has __experimentalAutoInspectorControl', () => {
+		it( 'should return true when at least one attribute has autoGenerateControl', () => {
 			registerBlockType( blockName, {
 				apiVersion: 3,
 				title: 'Test Block',
@@ -94,7 +92,7 @@ describe( 'auto-inspector-controls', () => {
 					// This one has the marker
 					title: {
 						type: 'string',
-						__experimentalAutoInspectorControl: true,
+						autoGenerateControl: true,
 					},
 					// This one doesn't (e.g., added by block supports)
 					className: {
@@ -105,15 +103,13 @@ describe( 'auto-inspector-controls', () => {
 				save: () => null,
 			} );
 
-			expect( autoInspectorControls.hasSupport( blockName ) ).toBe(
-				true
-			);
+			expect( AutoRegisterControls.hasSupport( blockName ) ).toBe( true );
 		} );
 	} );
 
 	describe( 'attributeKeys', () => {
 		it( 'should be an empty array', () => {
-			expect( autoInspectorControls.attributeKeys ).toEqual( [] );
+			expect( AutoRegisterControls.attributeKeys ).toEqual( [] );
 		} );
 	} );
 } );

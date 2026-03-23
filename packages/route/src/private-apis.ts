@@ -6,12 +6,14 @@ import {
 	createBrowserHistory,
 	createLazyRoute,
 	createLink,
+	createMemoryHistory,
 	createRootRoute,
 	createRoute,
 	createRouter,
 	Outlet,
 	redirect,
 	RouterProvider,
+	useBlocker,
 	useCanGoBack,
 	useLoaderData,
 	useLocation,
@@ -37,6 +39,7 @@ lock( privateApis, {
 	// Router creation and setup
 	createBrowserHistory,
 	createLazyRoute,
+	createMemoryHistory,
 	createRouter,
 	createRootRoute,
 	createRoute,
@@ -52,6 +55,7 @@ lock( privateApis, {
 	useMatches,
 	useRouter,
 	useRouterState,
+	useBlocker,
 
 	// History utilities
 	parseHref,

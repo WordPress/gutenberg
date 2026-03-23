@@ -40,7 +40,7 @@ function getVariationMatches( className ) {
  *
  * @return {string|null} The name of the first registered variation.
  */
-function getVariationNameFromClass( className, registeredStyles = [] ) {
+export function getVariationNameFromClass( className, registeredStyles = [] ) {
 	// The global flag affects how capturing groups work in JS. So the regex
 	// below will only return full CSS classes not just the variation name.
 	const matches = getVariationMatches( className );
@@ -71,7 +71,7 @@ function OverrideStyles( { override } ) {
  *
  * @param {Object} props        Props.
  * @param {Object} props.config A global styles object, containing settings and styles.
- * @return {JSX.Element|undefined} An array of new block variation overrides.
+ * @return {React.JSX.Element}  An array of new block variation overrides.
  */
 export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
 	const { getBlockStyles, overrides } = useSelect(
@@ -164,7 +164,7 @@ export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
 	}, [ config, overrides, getBlockStyles, getBlockName ] );
 
 	if ( ! overridesWithConfig || ! overridesWithConfig.length ) {
-		return;
+		return null;
 	}
 
 	return (

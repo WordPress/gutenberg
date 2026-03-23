@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	Button,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	CheckboxControl,
@@ -10,9 +11,13 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -25,7 +30,9 @@ import { useLinkPreview } from './use-link-preview';
 import { useIsInvalidLink } from './use-is-invalid-link';
 import { unlock } from '../../lock-unlock';
 
-const { LinkPicker } = unlock( blockEditorPrivateApis );
+const { LinkPicker, isHashLink, isRelativePath } = unlock(
+	blockEditorPrivateApis
+);
 
 /**
  * Get a human-readable entity type name.
@@ -64,12 +71,18 @@ function getEntityTypeName( type, kind ) {
  * This component provides the inspector controls (ToolsPanel) that are identical
  * between both navigation blocks.
  *
- * @param {Object}   props               - Component props
- * @param {Object}   props.attributes    - Block attributes
- * @param {Function} props.setAttributes - Function to update block attributes
- * @param {string}   props.clientId      - Block client ID
+ * @param {Object}   props                - Component props
+ * @param {Object}   props.attributes     - Block attributes
+ * @param {Function} props.setAttributes  - Function to update block attributes
+ * @param {string}   props.clientId       - Block client ID
+ * @param {boolean}  props.isLinkEditable - Whether link editing should be allowed
  */
-export function Controls( { attributes, setAttributes, clientId } ) {
+export function Controls( {
+	attributes,
+	setAttributes,
+	clientId,
+	isLinkEditable = true,
+} ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -107,47 +120,42 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		setAttributes,
 	} );
 
-	const linkTitle =
-		entityRecord?.title?.rendered ||
-		entityRecord?.title ||
-		entityRecord?.name;
-
-	const linkImage = useSelect(
-		( select ) => {
-			// Only fetch for post-type entities with featured media
-			if ( ! entityRecord?.featured_media ) {
-				return null;
-			}
-
-			const { getEntityRecord } = select( coreStore );
-
-			// Get the media entity to fetch the image URL
-			const media = getEntityRecord(
-				'postType',
-				'attachment',
-				entityRecord.featured_media
-			);
-
-			// Return the thumbnail or medium size URL, fallback to source_url
-			return (
-				media?.media_details?.sizes?.thumbnail?.source_url ||
-				media?.media_details?.sizes?.medium?.source_url ||
-				media?.source_url ||
-				null
-			);
-		},
-		[ entityRecord?.featured_media ]
+	const onNavigateToEntityRecord = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().onNavigateToEntityRecord,
+		[]
 	);
+
+	const homeUrl = useSelect( ( select ) => {
+		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
+			?.home;
+	}, [] );
+
+	const blockEditingMode = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockEditingMode( clientId ),
+		[ clientId ]
+	);
+
+	const isContentOnly = blockEditingMode === 'contentOnly';
 
 	const preview = useLinkPreview( {
 		url,
-		title: linkTitle,
-		image: linkImage,
+		entityRecord,
 		type: attributes.type,
-		entityStatus: entityRecord?.status,
 		hasBinding: hasUrlBinding,
 		isEntityAvailable: isBoundEntityAvailable,
 	} );
+
+	// Check if URL is viewable (not hash link or other relative path like ./ or ../)
+	const isViewableUrl =
+		!! url &&
+		( ! isHashLink( url ) ||
+			( isRelativePath( url ) && ! url.startsWith( '/' ) ) );
+
+	// Construct full URL for viewing (prepend home URL for absolute paths starting with /)
+	const viewUrl =
+		isViewableUrl && url.startsWith( '/' ) && homeUrl ? homeUrl + url : url;
 
 	return (
 		<ToolsPanel
@@ -180,44 +188,90 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				/>
 			</ToolsPanelItem>
 
-			<ToolsPanelItem
-				hasValue={ () => !! url }
-				label={ __( 'Link to' ) }
-				onDeselect={ () => setAttributes( { url: '' } ) }
-				isShownByDefault
-			>
-				<LinkPicker
-					preview={ preview }
-					onSelect={ handleLinkChange }
-					suggestionsQuery={ getSuggestionsQuery(
-						attributes.type,
-						attributes.kind
-					) }
-					label={ __( 'Link to' ) }
-					help={ helpText ? helpText : undefined }
-				/>
-			</ToolsPanelItem>
+			{ isLinkEditable && (
+				<>
+					<ToolsPanelItem
+						hasValue={ () => !! url }
+						label={ __( 'Link to' ) }
+						onDeselect={ () =>
+							setAttributes( {
+								url: undefined,
+								id: undefined,
+								kind: undefined,
+								type: undefined,
+							} )
+						}
+						isShownByDefault
+					>
+						<LinkPicker
+							preview={ preview }
+							onSelect={ handleLinkChange }
+							suggestionsQuery={ getSuggestionsQuery(
+								attributes.type,
+								attributes.kind
+							) }
+							label={ __( 'Link to' ) }
+							help={ helpText ? helpText : undefined }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => !! opensInNewTab }
+						label={ __( 'Open in new tab' ) }
+						onDeselect={ () =>
+							setAttributes( { opensInNewTab: false } )
+						}
+						isShownByDefault
+					>
+						<CheckboxControl
+							label={ __( 'Open in new tab' ) }
+							checked={ opensInNewTab }
+							onChange={ ( value ) =>
+								setAttributes( { opensInNewTab: value } )
+							}
+						/>
+					</ToolsPanelItem>
 
-			<ToolsPanelItem
-				hasValue={ () => !! opensInNewTab }
-				label={ __( 'Open in new tab' ) }
-				onDeselect={ () => setAttributes( { opensInNewTab: false } ) }
-				isShownByDefault
-			>
-				<CheckboxControl
-					label={ __( 'Open in new tab' ) }
-					checked={ opensInNewTab }
-					onChange={ ( value ) =>
-						setAttributes( { opensInNewTab: value } )
-					}
-				/>
-			</ToolsPanelItem>
+					{ !! url &&
+						hasUrlBinding &&
+						isBoundEntityAvailable &&
+						entityRecord?.id &&
+						attributes.kind === 'post-type' &&
+						onNavigateToEntityRecord && (
+							<Button
+								variant="secondary"
+								onClick={ () => {
+									onNavigateToEntityRecord( {
+										postId: entityRecord.id,
+										postType: attributes.type,
+									} );
+								} }
+								__next40pxDefaultSize
+								className="navigation-link-to__action-button"
+							>
+								{ __( 'Edit' ) }
+							</Button>
+						) }
+					{ isViewableUrl && (
+						<Button
+							variant="secondary"
+							href={ viewUrl }
+							target="_blank"
+							icon={ external }
+							iconPosition="right"
+							__next40pxDefaultSize
+							className="navigation-link-to__action-button"
+						>
+							{ __( 'View' ) }
+						</Button>
+					) }
+				</>
+			) }
 
 			<ToolsPanelItem
 				hasValue={ () => !! description }
 				label={ __( 'Description' ) }
 				onDeselect={ () => setAttributes( { description: '' } ) }
-				isShownByDefault
+				isShownByDefault={ ! isContentOnly }
 			>
 				<TextareaControl
 					label={ __( 'Description' ) }
@@ -235,7 +289,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				hasValue={ () => !! rel }
 				label={ __( 'Rel attribute' ) }
 				onDeselect={ () => setAttributes( { rel: '' } ) }
-				isShownByDefault
+				isShownByDefault={ ! isContentOnly }
 			>
 				<TextControl
 					__next40pxDefaultSize

@@ -62,6 +62,26 @@ export const LayoutPanel = {
 			description: 'Chooses how to open the panel.',
 			options: [ 'default', 'dropdown', 'modal' ],
 		},
+		editVisibility: {
+			control: { type: 'select' },
+			description: 'Chooses when the edit icon is visible.',
+			options: [ 'default', 'always', 'on-hover' ],
+		},
+		applyLabel: {
+			control: { type: 'text' },
+			description:
+				'Custom text for the modal apply button. Defaults to "Apply".',
+			if: { arg: 'openAs', eq: 'modal' },
+		},
+		cancelLabel: {
+			control: { type: 'text' },
+			description:
+				'Custom text for the modal cancel button. Defaults to "Cancel".',
+			if: { arg: 'openAs', eq: 'modal' },
+		},
+	},
+	args: {
+		openAs: 'default',
 	},
 };
 

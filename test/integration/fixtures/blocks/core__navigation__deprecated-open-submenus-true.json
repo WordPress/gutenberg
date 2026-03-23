@@ -3,11 +3,11 @@
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
-			"hasIcon": true,
-			"icon": "handle",
-			"maxNestingLevel": 5,
 			"showSubmenuIcon": true,
 			"overlayMenu": "mobile",
+			"icon": "handle",
+			"hasIcon": true,
+			"maxNestingLevel": 5,
 			"submenuVisibility": "click"
 		},
 		"innerBlocks": [

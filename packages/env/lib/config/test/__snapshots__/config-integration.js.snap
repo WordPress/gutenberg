@@ -3,6 +3,7 @@
 exports[`Config Integration should load local and override configuration files 1`] = `
 {
   "configDirectoryPath": "/test/gutenberg",
+  "customConfigPath": null,
   "detectedLocalConfig": true,
   "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
   "env": {
@@ -32,6 +33,7 @@ exports[`Config Integration should load local and override configuration files 1
       "multisite": false,
       "mysqlPort": 23306,
       "phpVersion": null,
+      "phpmyadmin": false,
       "phpmyadminPort": null,
       "pluginSources": [],
       "port": 999,
@@ -63,6 +65,7 @@ exports[`Config Integration should load local and override configuration files 1
       "multisite": false,
       "mysqlPort": 23307,
       "phpVersion": null,
+      "phpmyadmin": false,
       "phpmyadminPort": null,
       "pluginSources": [],
       "port": 456,
@@ -77,6 +80,7 @@ exports[`Config Integration should load local and override configuration files 1
     "afterStart": null,
   },
   "name": "gutenberg",
+  "testsEnvironment": true,
   "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",
 }
 `;
@@ -84,6 +88,7 @@ exports[`Config Integration should load local and override configuration files 1
 exports[`Config Integration should load local configuration file 1`] = `
 {
   "configDirectoryPath": "/test/gutenberg",
+  "customConfigPath": null,
   "detectedLocalConfig": true,
   "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
   "env": {
@@ -113,6 +118,7 @@ exports[`Config Integration should load local configuration file 1`] = `
       "multisite": false,
       "mysqlPort": 13306,
       "phpVersion": null,
+      "phpmyadmin": false,
       "phpmyadminPort": null,
       "pluginSources": [],
       "port": 123,
@@ -144,6 +150,7 @@ exports[`Config Integration should load local configuration file 1`] = `
       "multisite": false,
       "mysqlPort": 23307,
       "phpVersion": null,
+      "phpmyadmin": false,
       "phpmyadminPort": null,
       "pluginSources": [],
       "port": 8889,
@@ -158,6 +165,7 @@ exports[`Config Integration should load local configuration file 1`] = `
     "afterStart": "test",
   },
   "name": "gutenberg",
+  "testsEnvironment": true,
   "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",
 }
 `;
@@ -165,6 +173,7 @@ exports[`Config Integration should load local configuration file 1`] = `
 exports[`Config Integration should use default configuration 1`] = `
 {
   "configDirectoryPath": "/test/gutenberg",
+  "customConfigPath": null,
   "detectedLocalConfig": true,
   "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
   "env": {
@@ -194,6 +203,7 @@ exports[`Config Integration should use default configuration 1`] = `
       "multisite": false,
       "mysqlPort": null,
       "phpVersion": null,
+      "phpmyadmin": false,
       "phpmyadminPort": null,
       "pluginSources": [],
       "port": 8888,
@@ -225,6 +235,7 @@ exports[`Config Integration should use default configuration 1`] = `
       "multisite": false,
       "mysqlPort": null,
       "phpVersion": null,
+      "phpmyadmin": false,
       "phpmyadminPort": null,
       "pluginSources": [],
       "port": 8889,
@@ -239,6 +250,7 @@ exports[`Config Integration should use default configuration 1`] = `
     "afterStart": null,
   },
   "name": "gutenberg",
+  "testsEnvironment": true,
   "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",
 }
 `;
@@ -246,6 +258,7 @@ exports[`Config Integration should use default configuration 1`] = `
 exports[`Config Integration should use environment variables over local and override configuration files 1`] = `
 {
   "configDirectoryPath": "/test/gutenberg",
+  "customConfigPath": null,
   "detectedLocalConfig": true,
   "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
   "env": {
@@ -275,6 +288,7 @@ exports[`Config Integration should use environment variables over local and over
       "multisite": false,
       "mysqlPort": 23306,
       "phpVersion": null,
+      "phpmyadmin": false,
       "phpmyadminPort": null,
       "pluginSources": [],
       "port": 12345,
@@ -307,6 +321,7 @@ exports[`Config Integration should use environment variables over local and over
       "multisite": false,
       "mysqlPort": 23307,
       "phpVersion": null,
+      "phpmyadmin": false,
       "phpmyadminPort": null,
       "pluginSources": [],
       "port": 61234,
@@ -322,6 +337,7 @@ exports[`Config Integration should use environment variables over local and over
     "afterStart": "test",
   },
   "name": "gutenberg",
+  "testsEnvironment": true,
   "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",
 }
 `;

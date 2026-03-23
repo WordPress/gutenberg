@@ -98,16 +98,21 @@ test.describe( 'Gallery', () => {
 		);
 		await expect( galleryBlock ).toBeVisible();
 
-		const fileName = await galleryBlockUtils.upload(
+		await galleryBlockUtils.upload(
 			galleryBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
 		const image = galleryBlock.locator( 'role=img' );
 		await expect( image ).toBeVisible();
-		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
+		// Wait for upload to complete (includes client-side media processing time).
+		// With client-side processing, the filename may be changed by the server.
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
 
+		// Check that content has a valid gallery with an image.
 		const regex = new RegExp(
-			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"(?:full|large)\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image (?:size-full|size-large)\\"><img src=\\"[^"]+\/${ fileName }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
+			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"(?:full|large)\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image (?:size-full|size-large)\\"><img src=\\"[^"]+\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
 		);
 		await expect.poll( editor.getEditedPostContent ).toMatch( regex );
 	} );

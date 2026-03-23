@@ -33,7 +33,11 @@ export const settings = {
 		attributes: {
 			content: __( 'Code is Poetry' ),
 			level: 2,
-			textAlign: 'center',
+			style: {
+				typography: {
+					textAlign: 'center',
+				},
+			},
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {

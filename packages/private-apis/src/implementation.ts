@@ -10,12 +10,14 @@
  * The list of core modules allowed to opt-in to the private APIs.
  */
 const CORE_MODULES_USING_PRIVATE_APIS = [
+	'@wordpress/admin-ui',
 	'@wordpress/block-directory',
 	'@wordpress/block-editor',
 	'@wordpress/block-library',
 	'@wordpress/blocks',
 	'@wordpress/boot',
 	'@wordpress/commands',
+	'@wordpress/connectors',
 	'@wordpress/workflows',
 	'@wordpress/components',
 	'@wordpress/core-commands',
@@ -31,6 +33,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/patterns',
 	'@wordpress/preferences',
 	'@wordpress/reusable-blocks',
+	'@wordpress/rich-text',
 	'@wordpress/route',
 	'@wordpress/router',
 	'@wordpress/routes',
@@ -43,6 +46,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/upload-media',
 	'@wordpress/global-styles-ui',
 	'@wordpress/ui',
+	'@wordpress/views',
 ];
 
 /*

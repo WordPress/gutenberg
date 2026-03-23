@@ -39,9 +39,9 @@ test.describe( 'Search', () => {
 			},
 		} );
 
-		const navBlockInserter = editor.canvas.getByRole( 'button', {
-			name: 'Add block',
-		} );
+		const navBlockInserter = editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.getByRole( 'button', { name: 'Add page' } );
 		await navBlockInserter.click();
 
 		await page

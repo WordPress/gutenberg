@@ -118,7 +118,7 @@ const DimensionControls = ( {
 				<SelectControl
 					__next40pxDefaultSize
 					label={ __( 'Aspect ratio' ) }
-					value={ aspectRatio }
+					value={ aspectRatio || 'auto' }
 					options={ aspectRatioOptions }
 					onChange={ ( nextAspectRatio ) =>
 						setAttributes( { aspectRatio: nextAspectRatio } )

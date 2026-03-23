@@ -2144,3 +2144,58 @@ export function unsetBlockEditingMode( clientId = '' ) {
 		clientId,
 	};
 }
+
+/**
+ * Sets which List View panel should be opened.
+ *
+ * @param {string|null} clientId The client ID of the panel to open, or null to close all.
+ * @return {Object} Action object.
+ */
+export function __unstableSetOpenListViewPanel( clientId ) {
+	return {
+		type: 'SET_OPEN_LIST_VIEW_PANEL',
+		clientId,
+	};
+}
+
+/**
+ * Sets all List View panels to be opened.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableSetAllListViewPanelsOpen() {
+	return {
+		type: 'SET_ALL_LIST_VIEW_PANELS_OPEN',
+	};
+}
+
+/**
+ * Toggles a List View panel open/closed state.
+ *
+ * @param {string}  clientId The client ID of the panel to toggle.
+ * @param {boolean} isOpen   Whether the panel should be open.
+ * @return {Object} Action object.
+ */
+export function __unstableToggleListViewPanel( clientId, isOpen ) {
+	return {
+		type: 'TOGGLE_LIST_VIEW_PANEL',
+		clientId,
+		isOpen,
+	};
+}
+
+/**
+ * Increments the List View expand revision to force re-render.
+ *
+ * This action increments a counter that is used in the ListView component's key prop.
+ * When the key changes, the component will remount with a fresh expanded state,
+ * ensuring parent blocks show their children. For example, after click-through
+ * navigation.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableIncrementListViewExpandRevision() {
+	return {
+		type: 'INCREMENT_LIST_VIEW_EXPAND_REVISION',
+	};
+}

@@ -3,6 +3,8 @@
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { __ } from '@wordpress/i18n';
+import { resolveSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { loadView } from '@wordpress/views';
 
 /**
@@ -14,22 +16,25 @@ import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-uns
 import DataViewsSidebarContent from '../sidebar-dataviews';
 import PostList from '../post-list';
 import { unlock } from '../../lock-unlock';
-import { PostEdit } from '../post-edit';
-import {
-	DEFAULT_VIEW,
-	getActiveViewOverridesForTab,
-} from '../post-list/view-utils';
 
 const { useLocation } = unlock( routerPrivateApis );
 
 async function isListView( query ) {
 	const { activeView = 'all' } = query;
+	const config = await unlock( resolveSelect( coreStore ) ).getViewConfig(
+		'postType',
+		'page'
+	);
+	const defaultView = config?.default_view;
+	const defaultLayouts = config?.default_layouts;
+	const viewEntry = config?.view_list?.find( ( v ) => v.slug === activeView );
 	const view = await loadView( {
 		kind: 'postType',
 		name: 'page',
 		slug: 'default',
-		defaultView: DEFAULT_VIEW,
-		activeViewOverrides: getActiveViewOverridesForTab( activeView ),
+		defaultView,
+		defaultLayouts,
+		activeViewOverrides: viewEntry?.view ?? {},
 	} );
 	return view.type === 'list';
 }
@@ -77,23 +82,11 @@ export const pagesRoute = {
 				<SidebarNavigationScreenUnsupported />
 			);
 		},
-		async edit( { query } ) {
-			const isList = await isListView( query );
-			const hasQuickEdit = ! isList && !! query.quickEdit;
-			return hasQuickEdit ? (
-				<PostEdit postType="page" postId={ query.postId } />
-			) : undefined;
-		},
 	},
 	widths: {
 		async content( { query } ) {
 			const isList = await isListView( query );
 			return isList ? 380 : undefined;
-		},
-		async edit( { query } ) {
-			const isList = await isListView( query );
-			const hasQuickEdit = ! isList && !! query.quickEdit;
-			return hasQuickEdit ? 380 : undefined;
 		},
 	},
 };

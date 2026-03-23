@@ -17,7 +17,7 @@ export type BlockExample = {
 	name: string;
 	title: string;
 	category: string;
-	content?: JSX.Element;
+	content?: React.JSX.Element;
 	blocks?: Block | Block[];
 };
 

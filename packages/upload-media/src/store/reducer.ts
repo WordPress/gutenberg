@@ -23,7 +23,10 @@ import {
 	type UpdateProgressAction,
 	type UpdateSettingsAction,
 } from './types';
-import { DEFAULT_MAX_CONCURRENT_UPLOADS } from './constants';
+import {
+	DEFAULT_MAX_CONCURRENT_UPLOADS,
+	DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
+} from './constants';
 
 const noop = () => {};
 
@@ -34,6 +37,7 @@ const DEFAULT_STATE: State = {
 	settings: {
 		mediaUpload: noop,
 		maxConcurrentUploads: DEFAULT_MAX_CONCURRENT_UPLOADS,
+		maxConcurrentImageProcessing: DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
 	},
 };
 
