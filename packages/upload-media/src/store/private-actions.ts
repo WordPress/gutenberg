@@ -20,6 +20,7 @@ import {
 	renameFile,
 } from '../utils';
 import { canvasConvertToJpeg } from '../canvas-utils';
+import { isClientSideMediaSupported } from '../feature-detection';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
 import { StubFile } from '../stub-file';
 import { UploadError } from '../upload-error';
@@ -1165,6 +1166,10 @@ export function generateThumbnails( id: QueueItemId ) {
 					  )
 					: jpegConversion;
 
+				// When VIPS is not available (e.g. Safari), tell the server
+				// to generate all sub-sizes from the sideloaded JPEG.
+				const vipsAvailable = isClientSideMediaSupported();
+
 				dispatch.addSideloadItem( {
 					file: scaledFile,
 					onChange: ( [ updatedAttachment ] ) => {
@@ -1179,9 +1184,20 @@ export function generateThumbnails( id: QueueItemId ) {
 						post: attachment.id,
 						image_size: 'scaled',
 						convert_format: false,
+						...( ! vipsAvailable && {
+							generate_sub_sizes: true,
+						} ),
 					},
 					operations: [ OperationType.Upload ],
 				} );
+
+				// When VIPS is not available, the server generates sub-sizes
+				// from the sideloaded JPEG, so skip client-side thumbnail
+				// generation entirely.
+				if ( ! vipsAvailable ) {
+					dispatch.finishOperation( id, {} );
+					return;
+				}
 			}
 		}
 

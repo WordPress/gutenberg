@@ -2,6 +2,16 @@
 /**
  * Adds media-related functionality for client-side media processing.
  *
+ * This file is structured in two tiers:
+ *
+ * 1. HEIC infrastructure — loaded whenever the feature filter is enabled.
+ *    Browsers like Safari can decode HEIC via createImageBitmap() even
+ *    without VIPS/SharedArrayBuffer, so HEIC MIME types, the custom REST
+ *    controller, and REST field/index registrations are always needed.
+ *
+ * 2. Full VIPS/WASM processing — loaded only when the feature filter is
+ *    enabled AND requires cross-origin isolation (DIP) at runtime.
+ *
  * @package gutenberg
  */
 
@@ -9,16 +19,125 @@ if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
 	return;
 }
 
+// ── Tier 1: HEIC infrastructure (always loaded) ─────────────────────
+
 /**
- * Sets a global JS variable to indicate that client-side media processing is enabled.
+ * Registers HEIC/HEIF as allowed upload MIME types.
+ *
+ * HEIC images can be decoded in the browser (via canvas/VideoDecoder).
+ * Registering these MIME types ensures the file picker's accept attribute
+ * includes them, preventing macOS from silently converting HEIC to JPEG
+ * on selection.
+ *
+ * @param array $mimes Allowed MIME types (extension => type).
+ * @return array Modified MIME types.
  */
-function gutenberg_set_client_side_media_processing_flag() {
-	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
-		return;
-	}
-	wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
+function gutenberg_add_heic_upload_mimes( array $mimes ): array {
+	$mimes['heic'] = 'image/heic';
+	$mimes['heif'] = 'image/heif';
+	return $mimes;
 }
-add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
+
+add_filter( 'upload_mimes', 'gutenberg_add_heic_upload_mimes' );
+
+/**
+ * Overrides the REST controller for the attachment post type.
+ *
+ * @param array  $args      Array of arguments for registering a post type.
+ *                          See the register_post_type() function for accepted arguments.
+ * @param string $post_type Post type key.
+ */
+function gutenberg_filter_attachment_post_type_args( array $args, string $post_type ): array {
+	if ( 'attachment' === $post_type ) {
+		require_once __DIR__ . '/class-gutenberg-rest-attachments-controller.php';
+
+		$args['rest_controller_class'] = Gutenberg_REST_Attachments_Controller::class;
+	}
+
+	return $args;
+}
+
+add_filter( 'register_post_type_args', 'gutenberg_filter_attachment_post_type_args', 10, 2 );
+
+/**
+ * Registers additional REST fields for attachments.
+ */
+function gutenberg_media_processing_register_rest_fields(): void {
+	register_rest_field(
+		'attachment',
+		'filename',
+		array(
+			'schema'       => array(
+				'description' => __( 'Original attachment file name', 'gutenberg' ),
+				'type'        => 'string',
+				'context'     => array( 'view', 'edit' ),
+			),
+			'get_callback' => 'gutenberg_rest_get_attachment_filename',
+		)
+	);
+
+	register_rest_field(
+		'attachment',
+		'filesize',
+		array(
+			'schema'       => array(
+				'description' => __( 'Attachment file size', 'gutenberg' ),
+				'type'        => 'number',
+				'context'     => array( 'view', 'edit' ),
+			),
+			'get_callback' => 'gutenberg_rest_get_attachment_filesize',
+		)
+	);
+}
+
+add_action( 'rest_api_init', 'gutenberg_media_processing_register_rest_fields' );
+
+/**
+ * Returns the attachment's original file name.
+ *
+ * @param array $post Post data.
+ * @return string|null Attachment file name.
+ */
+function gutenberg_rest_get_attachment_filename( array $post ): ?string {
+	$path = wp_get_original_image_path( $post['id'] );
+
+	if ( $path ) {
+		return basename( $path );
+	}
+
+	$path = get_attached_file( $post['id'] );
+
+	if ( $path ) {
+		return basename( $path );
+	}
+
+	return null;
+}
+
+/**
+ * Returns the attachment's file size in bytes.
+ *
+ * @param array $post Post data.
+ * @return int|null Attachment file size.
+ */
+function gutenberg_rest_get_attachment_filesize( array $post ): ?int {
+	$attachment_id = $post['id'];
+
+	$meta = wp_get_attachment_metadata( $attachment_id );
+
+	if ( isset( $meta['filesize'] ) ) {
+		return $meta['filesize'];
+	}
+
+	$original_path = wp_get_original_image_path( $attachment_id );
+	$attached_file = $original_path ? $original_path : get_attached_file( $attachment_id );
+
+	if ( is_string( $attached_file ) && file_exists( $attached_file ) ) {
+		return wp_filesize( $attached_file );
+	}
+
+	return null;
+}
 
 /**
  * Returns a list of all available image sizes.
@@ -101,124 +220,33 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 
 add_filter( 'rest_index', 'gutenberg_media_processing_filter_rest_index' );
 
+/**
+ * Sets a global JS variable to indicate that HEIC canvas-based upload support is available.
+ *
+ * This flag is set whenever the media processing feature is enabled,
+ * regardless of whether the browser supports full VIPS-based processing.
+ * Browsers like Safari can use createImageBitmap() to decode HEIC images
+ * and convert them to JPEG for server-side sub-size generation.
+ */
+function gutenberg_set_heic_upload_support_flag() {
+	wp_add_inline_script( 'wp-block-editor', 'window.__heicUploadSupport = true', 'before' );
+}
+add_action( 'admin_init', 'gutenberg_set_heic_upload_support_flag' );
+
+// ── Tier 2: Full client-side processing (VIPS/WASM) ─────────────────
+// Everything below requires cross-origin isolation (Document-Isolation-Policy)
+// and SharedArrayBuffer support, which is only available in Chromium 137+.
 
 /**
- * Overrides the REST controller for the attachment post type.
- *
- * @param array  $args      Array of arguments for registering a post type.
- *                          See the register_post_type() function for accepted arguments.
- * @param string $post_type Post type key.
+ * Sets a global JS variable to indicate that client-side media processing is enabled.
  */
-function gutenberg_filter_attachment_post_type_args( array $args, string $post_type ): array {
-	if ( 'attachment' === $post_type ) {
-		require_once __DIR__ . '/class-gutenberg-rest-attachments-controller.php';
-
-		$args['rest_controller_class'] = Gutenberg_REST_Attachments_Controller::class;
+function gutenberg_set_client_side_media_processing_flag() {
+	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
+		return;
 	}
-
-	return $args;
+	wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
 }
-
-add_filter( 'register_post_type_args', 'gutenberg_filter_attachment_post_type_args', 10, 2 );
-
-/**
- * Registers HEIC/HEIF as allowed upload MIME types.
- *
- * When client-side media processing is enabled, HEIC images can be
- * decoded in the browser (via canvas/VideoDecoder). Registering these
- * MIME types ensures the file picker's accept attribute includes them,
- * preventing macOS from silently converting HEIC to JPEG on selection.
- *
- * @param array $mimes Allowed MIME types (extension => type).
- * @return array Modified MIME types.
- */
-function gutenberg_add_heic_upload_mimes( array $mimes ): array {
-	$mimes['heic'] = 'image/heic';
-	$mimes['heif'] = 'image/heif';
-	return $mimes;
-}
-
-add_filter( 'upload_mimes', 'gutenberg_add_heic_upload_mimes' );
-
-/**
- * Registers additional REST fields for attachments.
- */
-function gutenberg_media_processing_register_rest_fields(): void {
-	register_rest_field(
-		'attachment',
-		'filename',
-		array(
-			'schema'       => array(
-				'description' => __( 'Original attachment file name', 'gutenberg' ),
-				'type'        => 'string',
-				'context'     => array( 'view', 'edit' ),
-			),
-			'get_callback' => 'gutenberg_rest_get_attachment_filename',
-		)
-	);
-
-	register_rest_field(
-		'attachment',
-		'filesize',
-		array(
-			'schema'       => array(
-				'description' => __( 'Attachment file size', 'gutenberg' ),
-				'type'        => 'number',
-				'context'     => array( 'view', 'edit' ),
-			),
-			'get_callback' => 'gutenberg_rest_get_attachment_filesize',
-		)
-	);
-}
-
-add_action( 'rest_api_init', 'gutenberg_media_processing_register_rest_fields' );
-
-/**
- * Returns the attachment's original file name.
- *
- * @param array $post Post data.
- * @return string|null Attachment file name.
- */
-function gutenberg_rest_get_attachment_filename( array $post ): ?string {
-	$path = wp_get_original_image_path( $post['id'] );
-
-	if ( $path ) {
-		return basename( $path );
-	}
-
-	$path = get_attached_file( $post['id'] );
-
-	if ( $path ) {
-		return basename( $path );
-	}
-
-	return null;
-}
-
-/**
- * Returns the attachment's file size in bytes.
- *
- * @param array $post Post data.
- * @return int|null Attachment file size.
- */
-function gutenberg_rest_get_attachment_filesize( array $post ): ?int {
-	$attachment_id = $post['id'];
-
-	$meta = wp_get_attachment_metadata( $attachment_id );
-
-	if ( isset( $meta['filesize'] ) ) {
-		return $meta['filesize'];
-	}
-
-	$original_path = wp_get_original_image_path( $attachment_id );
-	$attached_file = $original_path ? $original_path : get_attached_file( $attachment_id );
-
-	if ( is_string( $attached_file ) && file_exists( $attached_file ) ) {
-		return wp_filesize( $attached_file );
-	}
-
-	return null;
-}
+add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
 
 /**
  * Filters the list of rewrite rules formatted for output to an .htaccess file.

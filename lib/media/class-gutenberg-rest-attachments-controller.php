@@ -41,15 +41,20 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					'callback'            => array( $this, 'sideload_item' ),
 					'permission_callback' => array( $this, 'sideload_item_permissions_check' ),
 					'args'                => array(
-						'id'         => array(
+						'id'                 => array(
 							'description' => __( 'Unique identifier for the attachment.', 'gutenberg' ),
 							'type'        => 'integer',
 						),
-						'image_size' => array(
+						'image_size'         => array(
 							'description' => __( 'Image size.', 'gutenberg' ),
 							'type'        => 'string',
 							'enum'        => $valid_image_sizes,
 							'required'    => true,
+						),
+						'generate_sub_sizes' => array(
+							'description' => __( 'Whether to generate image sub sizes from the sideloaded file.', 'gutenberg' ),
+							'type'        => 'boolean',
+							'default'     => false,
 						),
 					),
 				),
@@ -548,6 +553,25 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		wp_update_attachment_metadata( $attachment_id, $metadata );
+
+		// When generate_sub_sizes is true (e.g. HEIC-only mode on Safari),
+		// generate all image sub-sizes server-side from the sideloaded JPEG.
+		// This handles the case where the client converted HEIC to JPEG via
+		// canvas but lacks VIPS/WASM for client-side thumbnail generation.
+		if ( $request['generate_sub_sizes'] && 'scaled' === $image_size ) {
+			// Use wp_create_image_subsizes which generates all registered
+			// sub-sizes and updates the attachment metadata.
+			$new_metadata = wp_create_image_subsizes( $path, $attachment_id );
+
+			if ( ! is_wp_error( $new_metadata ) ) {
+				// Preserve the original_image reference from HEIC.
+				if ( ! empty( $metadata['original_image'] ) ) {
+					$new_metadata['original_image'] = $metadata['original_image'];
+				}
+
+				wp_update_attachment_metadata( $attachment_id, $new_metadata );
+			}
+		}
 
 		$response_request = new WP_REST_Request(
 			WP_REST_Server::READABLE,
