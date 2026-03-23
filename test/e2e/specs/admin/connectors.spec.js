@@ -390,7 +390,7 @@ test.describe( 'Connectors', () => {
 
 		// Verify the Install button is present.
 		await expect(
-			banner.getByRole( 'button', { name: 'Install AI Experiments' } )
+			banner.getByRole( 'button', { name: 'Install the AI plugin' } )
 		).toBeVisible();
 
 		// Verify the Learn more link is present.

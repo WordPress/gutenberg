@@ -5,13 +5,9 @@ import { speak } from '@wordpress/a11y';
 import { Button, ExternalLink } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	createInterpolateElement,
-	useEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { createInterpolateElement, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -39,14 +35,6 @@ for ( const c of connectorDataValues ) {
 export function AiPluginCallout() {
 	const [ isBusy, setIsBusy ] = useState( false );
 	const [ justActivated, setJustActivated ] = useState( false );
-	const actionButtonRef = useRef< HTMLButtonElement >( null );
-
-	// Restore focus to the button after install/activate completes.
-	useEffect( () => {
-		if ( justActivated ) {
-			actionButtonRef.current?.focus();
-		}
-	}, [ justActivated ] );
 
 	// Server-side initial state — true if any provider was already connected at page load.
 	const initialHasConnectedProvider = useRef(
@@ -218,7 +206,7 @@ export function AiPluginCallout() {
 			return {
 				label: isBusy
 					? __( 'Installing…' )
-					: __( 'Install AI Experiments' ),
+					: __( 'Install the AI plugin' ),
 				disabled: isBusy,
 				onClick: isBusy ? undefined : installPlugin,
 			};
@@ -227,7 +215,7 @@ export function AiPluginCallout() {
 		return {
 			label: isBusy
 				? __( 'Activating…' )
-				: __( 'Activate AI Experiments' ),
+				: __( 'Activate the AI plugin' ),
 			disabled: isBusy,
 			onClick: isBusy ? undefined : activatePlugin,
 		};
@@ -244,7 +232,6 @@ export function AiPluginCallout() {
 				<div className="ai-plugin-callout__actions">
 					{ showInstallActivate ? (
 						<Button
-							ref={ actionButtonRef }
 							variant="primary"
 							size="compact"
 							isBusy={ isBusy }
@@ -255,17 +242,15 @@ export function AiPluginCallout() {
 							{ getPrimaryButtonProps().label }
 						</Button>
 					) : (
-						justActivated && (
-							<Button
-								ref={ actionButtonRef }
-								variant="secondary"
-								size="compact"
-								disabled
-								accessibleWhenDisabled
-							>
-								{ __( 'AI Experiments enabled' ) }
-							</Button>
-						)
+						<Button
+							variant="secondary"
+							size="compact"
+							href={ addQueryArgs( 'options-general.php', {
+								page: AI_PLUGIN_SLUG,
+							} ) }
+						>
+							{ __( 'Enable features in the AI plugin' ) }
+						</Button>
 					) }
 					<ExternalLink href={ AI_PLUGIN_URL }>
 						{ __( 'Learn more' ) }
