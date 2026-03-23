@@ -34,10 +34,14 @@
 	display: flex;
 	align-items: center;
 	flex-shrink: 0;
+	width: 24px;
+	height: 24px;
 
 	img,
 	svg {
 		display: block;
+		width: 24px;
+		height: 24px;
 		object-fit: contain;
 	}
 }
