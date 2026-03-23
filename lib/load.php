@@ -9,11 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
-// Gutenberg should have RTC enabled by default, unlike in core.
-if ( ! defined( 'WP_ALLOW_COLLABORATION' ) ) {
-	define( 'WP_ALLOW_COLLABORATION', true );
-}
-
 define( 'IS_GUTENBERG_PLUGIN', true );
 
 require_once __DIR__ . '/init.php';

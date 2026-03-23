@@ -123,7 +123,7 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 			function () use ( $option_name ) {
 				$option_value = get_option( $option_name );
 
-				if ( ! defined( 'WP_ALLOW_COLLABORATION' ) || false === WP_ALLOW_COLLABORATION ) :
+				if ( wp_is_collaboration_allowed() ) :
 					?>
 					<div class="notice notice-warning inline">
 						<p><?php _e( '<strong>Note:</strong> Real-time collaboration has been disabled.' ); ?></p>
@@ -155,11 +155,40 @@ if ( ! function_exists( 'wp_is_collaboration_enabled' ) ) {
 	 * @return bool Whether real-time collaboration is enabled.
 	 */
 	function wp_is_collaboration_enabled() {
-		if ( ! defined( 'WP_ALLOW_COLLABORATION' ) || ! WP_ALLOW_COLLABORATION ) {
-			return false;
+		return ( wp_is_collaboration_allowed() && (bool) get_option( 'wp_collaboration_enabled' ) );
+	}
+}
+
+if ( ! function_exists( 'wp_is_collaboration_allowed' ) ) {
+	/**
+	 * Determines whether real-time collaboration is allowed.
+	 *
+	 * If the WP_ALLOW_COLLABORATION constant is false,
+	 * collaboration is not allowed and cannot be enabled.
+	 * The constant defaults to true, unless the WP_ALLOW_COLLABORATION
+	 * environment variable is set to string "false".
+	 *
+	 * @since 7.0.0
+	 *
+	 * @return bool Whether real-time collaboration is enabled.
+	 */
+	function wp_is_collaboration_allowed() {
+		if ( ! defined( 'WP_ALLOW_COLLABORATION' ) ) {
+			$env_value = getenv( 'WP_ALLOW_COLLABORATION' );
+			if ( false === $env_value ) {
+				// Environment variable is not defined, default to allowing collaboration.
+				define( 'WP_ALLOW_COLLABORATION', true );
+			} else {
+				/*
+				* Environment variable is defined, let's confirm it is actually set to
+				* "true" as it may still have a string value "false" – the preceeding
+				* `if` branch only tests for the boolean `false`.
+				*/
+				define( 'WP_ALLOW_COLLABORATION', 'true' === $env_value );
+			}
 		}
 
-		return (bool) get_option( 'wp_collaboration_enabled' );
+		return WP_ALLOW_COLLABORATION;
 	}
 }
 
