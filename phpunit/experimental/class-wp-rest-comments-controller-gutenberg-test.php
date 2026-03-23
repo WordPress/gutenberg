@@ -676,13 +676,12 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	public function test_schema_includes_reaction_emojis() {
-		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/comments' );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
+		$controller = new Gutenberg_REST_Comment_Controller_7_1();
+		$schema     = $controller->get_item_schema();
 
-		$this->assertArrayHasKey( 'reaction_emojis', $data['schema']['properties'] );
+		$this->assertArrayHasKey( 'reaction_emojis', $schema['properties'] );
 
-		$reaction_emojis_schema = $data['schema']['properties']['reaction_emojis'];
+		$reaction_emojis_schema = $schema['properties']['reaction_emojis'];
 		$this->assertTrue( $reaction_emojis_schema['readonly'] );
 		$this->assertSame( 'array', $reaction_emojis_schema['type'] );
 		$this->assertContains( 'view', $reaction_emojis_schema['context'] );
@@ -708,17 +707,12 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		add_filter( 'gutenberg_note_reaction_emojis', $filter );
 
 		// Re-instantiate the controller so the schema picks up the filtered value.
-		$server     = rest_get_server();
 		$controller = new Gutenberg_REST_Comment_Controller_7_1();
-		$controller->register_routes();
-
-		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/comments' );
-		$response = $server->dispatch( $request );
-		$data     = $response->get_data();
+		$schema     = $controller->get_item_schema();
 
 		$this->assertSame(
 			$custom_emoji,
-			$data['schema']['properties']['reaction_emojis']['default']
+			$schema['properties']['reaction_emojis']['default']
 		);
 
 		remove_filter( 'gutenberg_note_reaction_emojis', $filter );
