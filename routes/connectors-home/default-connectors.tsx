@@ -28,7 +28,7 @@ interface ConnectorData {
 	name: string;
 	description: string;
 	logoUrl?: string;
-	type: 'ai_provider';
+	type: string;
 	plugin?: {
 		slug: string;
 		isInstalled: boolean;
