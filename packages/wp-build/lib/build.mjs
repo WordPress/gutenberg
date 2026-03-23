@@ -593,7 +593,7 @@ async function bundlePackage( packageName, options = {} ) {
 			const baseFileName = path.basename( fileName );
 
 			// Skip non-minified build and sourcemaps for WASM-inlined workers
-			// (e.g., vips). These are ~13MB of base64-encoded WASM with no
+			// (e.g., vips). These are mostly base64-encoded WASM with no
 			// debugging value over the minified version.
 			const isWasmWorker =
 				packageJson.wpWorkers &&
