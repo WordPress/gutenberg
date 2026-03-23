@@ -5,7 +5,12 @@ import { speak } from '@wordpress/a11y';
 import { Button, ExternalLink } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { createInterpolateElement, useRef, useState } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -35,6 +40,14 @@ for ( const c of connectorDataValues ) {
 export function AiPluginCallout() {
 	const [ isBusy, setIsBusy ] = useState( false );
 	const [ justActivated, setJustActivated ] = useState( false );
+	const actionButtonRef = useRef< HTMLButtonElement >( null );
+
+	// Restore focus to the button after install/activate completes.
+	useEffect( () => {
+		if ( justActivated ) {
+			actionButtonRef.current?.focus();
+		}
+	}, [ justActivated ] );
 
 	// Server-side initial state — true if any provider was already connected at page load.
 	const initialHasConnectedProvider = useRef(
@@ -248,6 +261,7 @@ export function AiPluginCallout() {
 						</Button>
 					) : (
 						<Button
+							ref={ actionButtonRef }
 							variant="secondary"
 							size="compact"
 							href={ addQueryArgs( 'options-general.php', {
