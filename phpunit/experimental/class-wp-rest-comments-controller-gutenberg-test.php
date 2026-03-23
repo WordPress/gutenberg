@@ -708,7 +708,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		add_filter( 'gutenberg_note_reaction_emojis', $filter );
 
 		// Re-instantiate the controller so the schema picks up the filtered value.
-		$server = rest_get_server();
+		$server     = rest_get_server();
 		$controller = new Gutenberg_REST_Comment_Controller_7_1();
 		$controller->register_routes();
 
