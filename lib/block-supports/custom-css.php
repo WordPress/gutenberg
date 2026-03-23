@@ -133,7 +133,7 @@ function gutenberg_register_custom_css_support( $block_type ) {
 /**
  * Strips `style.css` attributes from all blocks in post content.
  *
- * Parses the content into blocks, recursively walks all blocks
+ * Parses the content into blocks, iteratively walks all blocks
  * (including inner blocks), removes `attrs.style.css`, and
  * re-serializes the content.
  *
@@ -152,28 +152,30 @@ function gutenberg_strip_custom_css_from_blocks( $content ) {
 	$blocks    = parse_blocks( $unslashed );
 	$changed   = false;
 
-	/**
-	 * Recursively strip style.css from blocks.
-	 *
-	 * @param array $blocks Blocks to process.
-	 */
-	$strip = static function ( &$blocks ) use ( &$strip, &$changed ) {
-		foreach ( $blocks as &$block ) {
-			if ( isset( $block['attrs']['style']['css'] ) ) {
-				unset( $block['attrs']['style']['css'] );
-				// Clean up empty style object.
-				if ( empty( $block['attrs']['style'] ) ) {
-					unset( $block['attrs']['style'] );
-				}
-				$changed = true;
-			}
-			if ( ! empty( $block['innerBlocks'] ) ) {
-				$strip( $block['innerBlocks'] );
-			}
-		}
-	};
+	// Stack-based traversal — avoids recursive function call overhead.
+	$stack = array();
+	foreach ( $blocks as &$block ) {
+		$stack[] = &$block;
+	}
+	unset( $block );
 
-	$strip( $blocks );
+	while ( ! empty( $stack ) ) {
+		$block = &$stack[ count( $stack ) - 1 ];
+		array_pop( $stack );
+
+		if ( isset( $block['attrs']['style']['css'] ) ) {
+			unset( $block['attrs']['style']['css'] );
+			if ( empty( $block['attrs']['style'] ) ) {
+				unset( $block['attrs']['style'] );
+			}
+			$changed = true;
+		}
+
+		foreach ( $block['innerBlocks'] as &$inner_block ) {
+			$stack[] = &$inner_block;
+		}
+		unset( $inner_block, $block );
+	}
 
 	if ( ! $changed ) {
 		return $content;
