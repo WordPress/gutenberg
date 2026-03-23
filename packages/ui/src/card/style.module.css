@@ -10,6 +10,7 @@
 		flex-direction: column;
 		border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 		border-radius: var(--wpds-border-radius-lg);
+		overflow: clip;
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 	}
 
@@ -39,10 +40,6 @@
 
 	.title {
 		margin: 0;
-		font-family: var(--wpds-font-family-heading);
-		font-size: var(--wpds-font-size-lg);
-		font-weight: var(--wpds-font-weight-medium);
-		line-height: var(--wpds-font-line-height-sm);
 		color: var(--wpds-color-fg-content-neutral);
 	}
 }

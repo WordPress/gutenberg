@@ -32,8 +32,15 @@ const queriedItemsCacheByState = new WeakMap();
  * @return {?Array} Query items.
  */
 function getQueriedItemsUncached( state, query ) {
-	const { stableKey, page, perPage, include, fields, context } =
-		getQueryParts( query );
+	const {
+		stableKey,
+		page,
+		perPage,
+		offset: queryOffset,
+		include,
+		fields,
+		context,
+	} = getQueryParts( query );
 
 	const itemIds = state.queries?.[ context ]?.[ stableKey ]?.itemIds;
 	if ( ! itemIds ) {
@@ -52,8 +59,19 @@ function getQueriedItemsUncached( state, query ) {
 	if ( perPage !== -1 && itemIds.length < startOffset + perPage ) {
 		const totalItems =
 			state.queries[ context ][ stableKey ].meta?.totalItems;
-		if ( Number.isFinite( totalItems ) && itemIds.length < totalItems ) {
-			return null;
+		if ( Number.isFinite( totalItems ) ) {
+			// For offset-based queries, totalItems (from X-WP-Total)
+			// reflects the global count of all matching items, not the
+			// count remaining after the offset. The number of items
+			// available for this query is (totalItems - offset), so a
+			// partial last page is expected and valid.
+			const effectiveTotal =
+				queryOffset !== undefined
+					? totalItems - queryOffset
+					: totalItems;
+			if ( itemIds.length < effectiveTotal ) {
+				return null;
+			}
 		}
 	}
 

@@ -991,11 +991,12 @@ export const getDefaultTemplateId =
 		const id = window?.__experimentalTemplateActivate
 			? template?.wp_id || template?.id
 			: template?.id;
-		// Endpoint may return an empty object if no template is found.
-		if ( id ) {
-			template.id = id;
-			registry.batch( () => {
-				dispatch.receiveDefaultTemplateId( query, id );
+
+		registry.batch( () => {
+			dispatch.receiveDefaultTemplateId( query, id || '' );
+			// Endpoint may return an empty object if no template is found.
+			if ( id ) {
+				template.id = id;
 				dispatch.receiveEntityRecords(
 					'postType',
 					template.type,
@@ -1007,8 +1008,8 @@ export const getDefaultTemplateId =
 					template.type,
 					id,
 				] );
-			} );
-		}
+			}
+		} );
 	};
 
 getDefaultTemplateId.shouldInvalidate = ( action ) => {
@@ -1319,4 +1320,19 @@ export const getEditorAssets =
 			path: '/wp-block-editor/v1/assets',
 		} );
 		dispatch.receiveEditorAssets( assets );
+	};
+
+/**
+ * Requests view config for a given entity type from the REST API.
+ *
+ * @param {string} kind Entity kind.
+ * @param {string} name Entity name.
+ */
+export const getViewConfig =
+	( kind, name ) =>
+	async ( { dispatch } ) => {
+		const config = await apiFetch( {
+			path: addQueryArgs( '/wp/v2/view-config', { kind, name } ),
+		} );
+		dispatch.receiveViewConfig( kind, name, config );
 	};

@@ -35,9 +35,8 @@ export const Default: Story = {
 	args: {
 		title: 'Page title',
 		showSidebarToggle: false,
-		children: (
-			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
-		),
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
 	},
 };
 
@@ -46,9 +45,8 @@ export const WithSubtitle: Story = {
 		title: 'Page title',
 		subTitle: 'All of the subtitle text you need goes here.',
 		showSidebarToggle: false,
-		children: (
-			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
-		),
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
 	},
 };
 
@@ -63,9 +61,8 @@ export const WithBreadcrumbs: Story = {
 				] }
 			/>
 		),
-		children: (
-			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
-		),
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
 	},
 };
 
@@ -81,8 +78,7 @@ export const WithBreadcrumbsAndSubtitle: Story = {
 				] }
 			/>
 		),
-		children: (
-			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
-		),
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
 	},
 };

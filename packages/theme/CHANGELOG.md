@@ -5,10 +5,12 @@
 ### Breaking Changes
 
 -   The `design-tokens.js` export now provides `tokens` (keyed by variable name, with `$description`, `$type`, `group`, and `modes.default` containing `$value` and `css`) and `groups` (keyed by source file) named exports, replacing the previous flat array default export ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
--   The `medium` font weight token value changed from `500` to `499` in the source definition. The CSS output is unchanged since the same workaround was previously applied at the CSS transform layer ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
+
+## 0.9.0 (2026-03-18)
 
 ### New Features
 
+-   Add `cursor` prop to `ThemeProvider` for configuring the `--wpds-cursor-control` design token ([#76410](https://github.com/WordPress/gutenberg/pull/76410)).
 -   Added `no-token-fallback-values` stylelint rule that disallows manual fallback values for `--wpds-*` design tokens. Available as `@wordpress/theme/stylelint-plugins/no-token-fallback-values` ([#76415](https://github.com/WordPress/gutenberg/pull/76415)).
 
 ## 0.8.0 (2026-03-04)
