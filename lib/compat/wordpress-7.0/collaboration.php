@@ -112,7 +112,7 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 				'type'              => 'boolean',
 				'description'       => __( 'Enable Real-Time Collaboration', 'gutenberg' ),
 				'sanitize_callback' => 'rest_sanitize_boolean',
-				'default'           => false,
+				'default'           => true,
 				'show_in_rest'      => true,
 			)
 		);
