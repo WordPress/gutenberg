@@ -240,11 +240,8 @@ export function AiPluginCallout() {
 				<p>
 					{ createInterpolateElement( getMessage(), {
 						strong: <strong />,
-						a: (
-							<ExternalLink href={ AI_PLUGIN_URL }>
-								{ __( 'Learn more' ) }
-							</ExternalLink>
-						),
+						// @ts-ignore children are injected by createInterpolateElement at runtime.
+						a: <ExternalLink href={ AI_PLUGIN_URL } />,
 					} ) }
 				</p>
 				{ showInstallActivate ? (
