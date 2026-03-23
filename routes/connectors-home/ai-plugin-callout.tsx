@@ -247,31 +247,29 @@ export function AiPluginCallout() {
 						),
 					} ) }
 				</p>
-				<div className="ai-plugin-callout__actions">
-					{ showInstallActivate ? (
-						<Button
-							variant="primary"
-							size="compact"
-							isBusy={ isBusy }
-							disabled={ getPrimaryButtonProps().disabled }
-							accessibleWhenDisabled
-							onClick={ getPrimaryButtonProps().onClick }
-						>
-							{ getPrimaryButtonProps().label }
-						</Button>
-					) : (
-						<Button
-							ref={ actionButtonRef }
-							variant="secondary"
-							size="compact"
-							href={ addQueryArgs( 'options-general.php', {
-								page: AI_PLUGIN_SLUG,
-							} ) }
-						>
-							{ __( 'Enable features in the AI plugin' ) }
-						</Button>
-					) }
-				</div>
+				{ showInstallActivate ? (
+					<Button
+						variant="primary"
+						size="compact"
+						isBusy={ isBusy }
+						disabled={ getPrimaryButtonProps().disabled }
+						accessibleWhenDisabled
+						onClick={ getPrimaryButtonProps().onClick }
+					>
+						{ getPrimaryButtonProps().label }
+					</Button>
+				) : (
+					<Button
+						ref={ actionButtonRef }
+						variant="secondary"
+						size="compact"
+						href={ addQueryArgs( 'options-general.php', {
+							page: AI_PLUGIN_SLUG,
+						} ) }
+					>
+						{ __( 'Enable features in the AI plugin' ) }
+					</Button>
+				) }
 			</div>
 			<WpLogoDecoration />
 		</div>
