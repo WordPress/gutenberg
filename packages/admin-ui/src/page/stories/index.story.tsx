@@ -119,20 +119,6 @@ export const WithBreadcrumbsAndBadges: Story = {
 	},
 };
 
-export const OnlyBadges: Story = {
-	args: {
-		showSidebarToggle: false,
-		badges: (
-			<>
-				<Badge intent="none">Published</Badge>
-				<Badge intent="stable">Active</Badge>
-			</>
-		),
-		hasPadding: true,
-		children: <Text>Page content here</Text>,
-	},
-};
-
 export const WithActions: Story = {
 	args: {
 		title: 'Page title',
@@ -152,27 +138,8 @@ export const WithActions: Story = {
 	},
 };
 
-export const OnlyActions: Story = {
-	args: {
-		showSidebarToggle: false,
-		actions: (
-			<>
-				<Button size="compact" variant="tertiary">
-					Cancel
-				</Button>
-				<Button size="compact" variant="primary">
-					Save
-				</Button>
-			</>
-		),
-		hasPadding: true,
-		children: <Text>Page content here</Text>,
-	},
-};
-
 export const FullHeader: Story = {
 	args: {
-		title: 'Page title',
 		subTitle: 'All of the subtitle text you need goes here.',
 		breadcrumbs: (
 			<Breadcrumbs
