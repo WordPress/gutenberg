@@ -22,9 +22,16 @@ import type {
 	OnSuccessHandler,
 	QueueItemId,
 	RetryItemAction,
+	ScheduleRetryAction,
 	State,
 } from './types';
-import { Type } from './types';
+import { ItemStatus, Type } from './types';
+import {
+	calculateRetryDelay,
+	clearRetryTimer,
+	retryTimers,
+	shouldRetryError,
+} from './utils/retry';
 import type {
 	addItem,
 	processItem,
@@ -43,6 +50,8 @@ type ActionCreators = {
 	processItem: typeof processItem;
 	cancelItem: typeof cancelItem;
 	retryItem: typeof retryItem;
+	scheduleRetry: typeof scheduleRetry;
+	executeRetry: typeof executeRetry;
 	revokeBlobUrls: typeof revokeBlobUrls;
 	< T = Record< string, unknown > >( args: T ): void;
 };
@@ -138,6 +147,10 @@ export function addItems( {
 /**
  * Cancels an item in the queue based on an error.
  *
+ * If the error is retryable and the item hasn't exceeded the maximum
+ * retry attempts, it will be scheduled for automatic retry instead
+ * of being cancelled.
+ *
  * @param id     Item ID.
  * @param error  Error instance.
  * @param silent Whether to cancel the item silently,
@@ -156,6 +169,25 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 			 * by the error handler in optimizeImageItem().
 			 */
 			return;
+		}
+
+		// Clear any pending retry timer for this item.
+		clearRetryTimer( id );
+
+		// Check if we should automatically retry instead of cancelling.
+		if ( ! silent && error ) {
+			const settings = select.getSettings();
+			const retrySettings = settings.retry;
+
+			if ( retrySettings ) {
+				const retryCount = item.retryCount ?? 0;
+				const maxRetries = retrySettings.maxRetryAttempts;
+
+				if ( shouldRetryError( error, retryCount, maxRetries ) ) {
+					dispatch.scheduleRetry( id, error );
+					return;
+				}
+			}
 		}
 
 		item.abortController?.abort();
@@ -211,6 +243,87 @@ export function retryItem( id: QueueItemId ) {
 			id,
 		} );
 
+		dispatch.processItem( id );
+	};
+}
+
+/**
+ * Schedules an automatic retry for a failed item.
+ *
+ * Uses exponential backoff with jitter to determine the retry delay.
+ * The item will be placed in PendingRetry status and automatically
+ * retried after the calculated delay.
+ *
+ * @param id    Item ID.
+ * @param error The error that caused the failure.
+ */
+export function scheduleRetry( id: QueueItemId, error: Error ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		const settings = select.getSettings();
+		const retrySettings = settings.retry;
+
+		if ( ! retrySettings ) {
+			return;
+		}
+
+		const currentRetryCount = item.retryCount ?? 0;
+
+		const delay = calculateRetryDelay( {
+			attempt: currentRetryCount + 1,
+			initialDelay: retrySettings.initialRetryDelayMs,
+			maxDelay: retrySettings.maxRetryDelayMs,
+			multiplier: retrySettings.backoffMultiplier,
+			jitter: retrySettings.retryJitter,
+		} );
+
+		// Schedule the retry execution and store timer ID for cleanup.
+		const timerId = setTimeout( () => {
+			retryTimers.delete( id );
+			dispatch.executeRetry( id );
+		}, delay );
+		retryTimers.set( id, timerId );
+
+		dispatch< ScheduleRetryAction >( {
+			type: Type.ScheduleRetry,
+			id,
+			error,
+			retryCount: currentRetryCount,
+			nextRetryTimestamp: Date.now() + delay,
+		} );
+	};
+}
+
+/**
+ * Executes a scheduled retry for an item.
+ *
+ * This is called by the timer set in scheduleRetry.
+ * It verifies the item is still in PendingRetry status before
+ * proceeding with the retry.
+ *
+ * @param id Item ID.
+ */
+export function executeRetry( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+
+		// Verify item exists and is still pending retry
+		// (user may have manually cancelled or retried)
+		if ( ! item || item.status !== ItemStatus.PendingRetry ) {
+			return;
+		}
+
+		// Reset the item to Processing status and clear the error
+		dispatch< RetryItemAction >( {
+			type: Type.RetryItem,
+			id,
+		} );
+
+		// Re-process the item
 		dispatch.processItem( id );
 	};
 }

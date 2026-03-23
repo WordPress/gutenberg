@@ -225,3 +225,62 @@ export function getItemProgress(
 	const item = state.queue.find( ( i ) => i.id === id );
 	return item?.progress;
 }
+
+/**
+ * Returns all items that are pending automatic retry.
+ *
+ * @param state Upload state.
+ *
+ * @return Items waiting for retry.
+ */
+export function getPendingRetryItems( state: State ): QueueItem[] {
+	return state.queue.filter(
+		( item ) => item.status === ItemStatus.PendingRetry
+	);
+}
+
+/**
+ * Returns the timestamp when the next retry will be attempted for an item.
+ *
+ * @param state Upload state.
+ * @param id    Item ID.
+ *
+ * @return Timestamp in milliseconds, or undefined if not scheduled.
+ */
+export function getItemNextRetryTimestamp(
+	state: State,
+	id: QueueItemId
+): number | undefined {
+	return state.queue.find( ( i ) => i.id === id )?.nextRetryTimestamp;
+}
+
+/**
+ * Returns the current retry count for an item.
+ *
+ * @param state Upload state.
+ * @param id    Item ID.
+ *
+ * @return Number of retry attempts made (0 if no retries).
+ */
+export function getItemRetryCount( state: State, id: QueueItemId ): number {
+	return state.queue.find( ( i ) => i.id === id )?.retryCount ?? 0;
+}
+
+/**
+ * Determines whether an item has exceeded the maximum retry attempts.
+ *
+ * @param state Upload state.
+ * @param id    Item ID.
+ *
+ * @return Whether max retries have been exceeded.
+ */
+export function hasExceededMaxRetries(
+	state: State,
+	id: QueueItemId
+): boolean {
+	if ( ! state.settings.retry ) {
+		return true;
+	}
+	const item = state.queue.find( ( i ) => i.id === id );
+	return ( item?.retryCount ?? 0 ) >= state.settings.retry.maxRetryAttempts;
+}

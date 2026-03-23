@@ -54,6 +54,7 @@ import type {
 } from './types';
 import { ItemStatus, OperationType, Type } from './types';
 import type { cancelItem } from './actions';
+import { clearRetryTimer } from './utils/retry';
 
 const DEFAULT_OUTPUT_QUALITY = 0.82;
 
@@ -76,6 +77,7 @@ type ActionCreators = {
 	finalizeItem: typeof finalizeItem;
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
+	queueMissingSizeGeneration: typeof queueMissingSizeGeneration;
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
@@ -549,6 +551,9 @@ export function removeItem( id: QueueItemId ) {
 		if ( ! item ) {
 			return;
 		}
+
+		// Clear any pending retry timer for this item.
+		clearRetryTimer( id );
 
 		dispatch( {
 			type: Type.Remove,
@@ -1348,6 +1353,144 @@ export function updateItemProgress( id: QueueItemId, progress: number ) {
 			id,
 			progress,
 		} );
+	};
+}
+
+interface QueueMissingSizeGenerationArgs {
+	attachmentId: number;
+	sourceUrl: string;
+	missingSizes: string[];
+}
+
+/**
+ * Queues client-side generation of missing image sub-sizes for an existing attachment.
+ *
+ * This is used when the editor opens with images that have incomplete sub-sizes
+ * from a prior interrupted upload.
+ *
+ * @param $0
+ * @param $0.attachmentId Attachment ID.
+ * @param $0.sourceUrl    URL of the original image.
+ * @param $0.missingSizes Array of missing image size names.
+ */
+export function queueMissingSizeGeneration( {
+	attachmentId,
+	sourceUrl,
+	missingSizes,
+}: QueueMissingSizeGenerationArgs ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		// Skip if already processing this attachment.
+		if ( select.isUploadingById( attachmentId ) ) {
+			return;
+		}
+
+		const settings = select.getSettings();
+		const allImageSizes = settings.allImageSizes || {};
+
+		// Fetch the original image file from the server.
+		let response;
+		try {
+			response = await window.fetch( sourceUrl );
+		} catch {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Failed to fetch image for missing sizes: ${ sourceUrl }`
+			);
+			return;
+		}
+
+		if ( ! response.ok ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Failed to fetch image for missing sizes: ${ sourceUrl } (${ response.status })`
+			);
+			return;
+		}
+
+		const blob = await response.blob();
+		const fileName =
+			sourceUrl.split( '/' ).pop()?.split( '?' )[ 0 ] || 'image';
+		const file = new File( [ blob ], fileName, { type: blob.type } );
+
+		// Create a parent queue item to track the batch.
+		// This keeps the queue non-empty (and the save lock active)
+		// until all sideload children complete.
+		const parentId = uuidv4();
+		dispatch< AddAction >( {
+			type: Type.Add,
+			item: {
+				id: parentId,
+				status: ItemStatus.Processing,
+				sourceFile: cloneFile( file ),
+				file,
+				attachment: {
+					id: attachmentId,
+					url: sourceUrl,
+				},
+				additionalData: {},
+				abortController: new AbortController(),
+				sourceAttachmentId: attachmentId,
+				operations: [],
+			},
+		} );
+
+		const { imageOutputFormats } = settings;
+		const sourceType = file.type;
+		const outputMimeType = imageOutputFormats?.[ sourceType ];
+
+		let thumbnailTranscodeOperation:
+			| [
+					OperationType.TranscodeImage,
+					OperationArgs[ OperationType.TranscodeImage ],
+			  ]
+			| null = null;
+
+		if ( outputMimeType && outputMimeType !== sourceType ) {
+			thumbnailTranscodeOperation = await getTranscodeImageOperation(
+				file,
+				outputMimeType,
+				settings
+			);
+		}
+
+		const batchId = uuidv4();
+
+		for ( const name of missingSizes ) {
+			const imageSize = allImageSizes[ name ];
+			if ( ! imageSize ) {
+				// eslint-disable-next-line no-console
+				console.warn(
+					`Image size "${ name }" not found in configuration`
+				);
+				continue;
+			}
+
+			const thumbnailOperations: Operation[] = [
+				[ OperationType.ResizeCrop, { resize: imageSize } ],
+			];
+
+			if ( thumbnailTranscodeOperation ) {
+				thumbnailOperations.push( thumbnailTranscodeOperation );
+			}
+
+			thumbnailOperations.push( OperationType.Upload );
+
+			dispatch.addSideloadItem( {
+				file,
+				batchId,
+				parentId,
+				additionalData: {
+					post: attachmentId,
+					image_size: name,
+					convert_format: false,
+				},
+				operations: thumbnailOperations,
+			} );
+		}
+
+		// Finish the parent's (empty) operation list so it can be
+		// cleaned up once all sideload children complete.
+		dispatch.finishOperation( parentId, {} );
 	};
 }
 

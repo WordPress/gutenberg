@@ -11,9 +11,13 @@ import {
 	getActiveUploadCount,
 	getActiveImageProcessingCount,
 	getFailedItems,
+	getItemNextRetryTimestamp,
 	getItemProgress,
+	getItemRetryCount,
+	getPendingRetryItems,
 	getPendingUploads,
 	getPendingImageProcessing,
+	hasExceededMaxRetries,
 	hasPendingItemsByParentId,
 } from '../private-selectors';
 import {
@@ -421,6 +425,207 @@ describe( 'selectors', () => {
 			expect( hasPendingItemsByParentId( state, 'parent-1' ) ).toBe(
 				false
 			);
+		} );
+	} );
+
+	describe( 'getPendingRetryItems', () => {
+		it( 'should return items with PendingRetry status', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.PendingRetry,
+					},
+					{
+						id: '2',
+						status: ItemStatus.Processing,
+					},
+					{
+						id: '3',
+						status: ItemStatus.PendingRetry,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			const pending = getPendingRetryItems( state );
+			expect( pending ).toHaveLength( 2 );
+			expect( pending[ 0 ].id ).toBe( '1' );
+			expect( pending[ 1 ].id ).toBe( '3' );
+		} );
+
+		it( 'should return empty array when no items are pending retry', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( getPendingRetryItems( state ) ).toHaveLength( 0 );
+		} );
+	} );
+
+	describe( 'getItemRetryCount', () => {
+		it( 'should return the retry count for an item', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						retryCount: 3,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( getItemRetryCount( state, '1' ) ).toBe( 3 );
+		} );
+
+		it( 'should return 0 when retryCount is undefined', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( getItemRetryCount( state, '1' ) ).toBe( 0 );
+		} );
+	} );
+
+	describe( 'getItemNextRetryTimestamp', () => {
+		it( 'should return the timestamp for a scheduled retry', () => {
+			const timestamp = Date.now() + 5000;
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.PendingRetry,
+						nextRetryTimestamp: timestamp,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( getItemNextRetryTimestamp( state, '1' ) ).toBe( timestamp );
+		} );
+
+		it( 'should return undefined for item without scheduled retry', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( getItemNextRetryTimestamp( state, '1' ) ).toBeUndefined();
+		} );
+	} );
+
+	describe( 'hasExceededMaxRetries', () => {
+		it( 'should return true when retry count equals max retries', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						retryCount: 3,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+					retry: {
+						maxRetryAttempts: 3,
+						initialRetryDelayMs: 1000,
+						maxRetryDelayMs: 30000,
+						backoffMultiplier: 2,
+						retryJitter: 0.1,
+					},
+				},
+			};
+
+			expect( hasExceededMaxRetries( state, '1' ) ).toBe( true );
+		} );
+
+		it( 'should return false when retry count is below max retries', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						retryCount: 1,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+					retry: {
+						maxRetryAttempts: 3,
+						initialRetryDelayMs: 1000,
+						maxRetryDelayMs: 30000,
+						backoffMultiplier: 2,
+						retryJitter: 0.1,
+					},
+				},
+			};
+
+			expect( hasExceededMaxRetries( state, '1' ) ).toBe( false );
+		} );
+
+		it( 'should return true when retry settings are not configured', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						retryCount: 3,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( hasExceededMaxRetries( state, '1' ) ).toBe( true );
 		} );
 	} );
 } );

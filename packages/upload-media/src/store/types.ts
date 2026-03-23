@@ -20,6 +20,7 @@ export interface QueueItem {
 	operations?: Operation[];
 	error?: Error;
 	retryCount?: number;
+	nextRetryTimestamp?: number;
 	progress?: number;
 	batchId?: string;
 	sourceUrl?: string;
@@ -42,6 +43,7 @@ export enum Type {
 	Cancel = 'CANCEL_ITEM',
 	Remove = 'REMOVE_ITEM',
 	RetryItem = 'RETRY_ITEM',
+	ScheduleRetry = 'SCHEDULE_RETRY',
 	PauseItem = 'PAUSE_ITEM',
 	ResumeItem = 'RESUME_ITEM',
 	PauseQueue = 'PAUSE_QUEUE',
@@ -87,6 +89,15 @@ export type CancelAction = Action<
 	{ id: QueueItemId; error: Error }
 >;
 export type RetryItemAction = Action< Type.RetryItem, { id: QueueItemId } >;
+export type ScheduleRetryAction = Action<
+	Type.ScheduleRetry,
+	{
+		id: QueueItemId;
+		error: Error;
+		retryCount: number;
+		nextRetryTimestamp: number;
+	}
+>;
 export type PauseItemAction = Action< Type.PauseItem, { id: QueueItemId } >;
 export type ResumeItemAction = Action< Type.ResumeItem, { id: QueueItemId } >;
 export type PauseQueueAction = Action< Type.PauseQueue >;
@@ -183,6 +194,8 @@ export interface Settings {
 	imageQuality?: number;
 	// Function for finalizing an upload after all client-side processing is complete.
 	mediaFinalize?: ( id: number ) => Promise< void >;
+	// Retry settings for automatic retry on failure.
+	retry?: RetrySettings;
 }
 
 // Matches the Attachment type from the media-utils package.
@@ -226,6 +239,7 @@ export enum ItemStatus {
 	Queued = 'QUEUED',
 	Processing = 'PROCESSING',
 	Paused = 'PAUSED',
+	PendingRetry = 'PENDING_RETRY',
 	Uploaded = 'UPLOADED',
 	Error = 'ERROR',
 }
@@ -308,3 +322,19 @@ export interface SideloadAdditionalData extends AdditionalData {
 }
 
 export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif';
+
+/**
+ * Configuration for automatic retry behavior on upload failures.
+ */
+export interface RetrySettings {
+	/** Maximum number of retry attempts before giving up. */
+	maxRetryAttempts: number;
+	/** Initial delay in milliseconds before the first retry. */
+	initialRetryDelayMs: number;
+	/** Maximum delay in milliseconds (cap for exponential growth). */
+	maxRetryDelayMs: number;
+	/** Multiplier for exponential backoff (e.g., 2 means double each time). */
+	backoffMultiplier: number;
+	/** Jitter factor (0-1) to add randomness and prevent thundering herd. */
+	retryJitter: number;
+}
