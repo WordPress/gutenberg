@@ -234,12 +234,6 @@ test.describe( 'Contrast Checker', () => {
 			name: 'Editor settings',
 		} );
 
-		await editorSettings
-			.getByRole( 'tab', {
-				name: 'Styles',
-			} )
-			.click();
-
 		// Set text color to black
 		const textButton = editorSettings.getByRole( 'button', {
 			name: 'Text',
@@ -279,12 +273,6 @@ test.describe( 'Contrast Checker', () => {
 		const editorSettings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-
-		await editorSettings
-			.getByRole( 'tab', {
-				name: 'Styles',
-			} )
-			.click();
 
 		// Set text color to black
 		const textButton = editorSettings.getByRole( 'button', {

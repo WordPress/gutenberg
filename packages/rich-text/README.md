@@ -460,13 +460,13 @@ This hook, to be used in a format type's Edit component, returns the active elem
 
 _Parameters_
 
--   _$1_ `Object`: Named parameters.
--   _$1.editableContentElement_ `HTMLElement|null`: The element containing the editable content.
--   _$1.settings_ `WPFormat=`: The format type's settings.
+-   _obj_ `{ editableContentElement: HTMLElement | null; settings?: WPFormat; }`: Named parameters.
+-   _obj.editableContentElement_ `HTMLElement | null`: The element containing the editable content.
+-   _obj.settings_ `WPFormat`: The format type's settings.
 
 _Returns_
 
--   `Element|VirtualAnchorElement|undefined|null`: The active element or selection range.
+-   `Element | VirtualAnchorElement | undefined | null`: The active element or selection range.
 
 ### useAnchorRef
 

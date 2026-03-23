@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 6.18.0 (2026-03-18)
+
+### Deprecations
+
+-   Deprecate `$modal-min-width`, `$modal-width-small`, `$modal-width-medium`, and `$modal-width-large` SCSS variables in favor of `--wpds-dimension-surface-width-*` design tokens. Variable values have been updated to align with the token scale ([#76494](https://github.com/WordPress/gutenberg/pull/76494)).
+
+## 6.17.0 (2026-03-04)
+
 ## 6.16.0 (2026-02-18)
 
 ## 6.15.0 (2026-01-29)

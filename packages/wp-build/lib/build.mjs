@@ -113,12 +113,32 @@ const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
 
+/**
+ * Interprets a configuration value as a boolean, where `"true"` and `"1"`
+ * are considered true while all other values are false.
+ *
+ * @param {string|undefined} value The configuration value to interpret.
+ * @return {boolean|undefined} Boolean interpretation of the given configuration value, or undefined if not set.
+ */
+const boolConfigVal = ( value ) => {
+	if ( value === undefined ) {
+		return undefined;
+	}
+	return [ 'true', '1' ].includes( value.toLowerCase() );
+};
+
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
-		Boolean( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
+		boolConfigVal( process.env.IS_GUTENBERG_PLUGIN ) ??
+			boolConfigVal(
+				process.env.npm_package_config_IS_GUTENBERG_PLUGIN
+			) ??
+			false
 	),
 	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
-		Boolean( process.env.npm_package_config_IS_WORDPRESS_CORE )
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+			boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE ) ??
+			false
 	),
 };
 const getDefine = ( scriptDebug ) => ( {
@@ -162,12 +182,6 @@ function getSassOptions( workingDir ) {
 
 function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 	return async function styleType( cssText, _dirname, filePath ) {
-		// Always hash the untransformed code.
-		const hash = createHash( 'sha1' )
-			.update( cssText )
-			.digest( 'hex' )
-			.slice( 0, 10 );
-
 		let moduleExports = null;
 
 		// Transform the code: token fallbacks, CSS modules and minification.
@@ -193,6 +207,13 @@ function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 			from: filePath,
 			map: false,
 		} );
+
+		// Hash the transformed CSS so that the dedup key reflects the actual
+		// injected content, including mangled CSS module class names.
+		const hash = createHash( 'sha1' )
+			.update( css )
+			.digest( 'hex' )
+			.slice( 0, 10 );
 
 		let cssModule = `if (typeof document !== 'undefined' && process.env.NODE_ENV !== 'test' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
 	const style = document.createElement("style");
@@ -228,6 +249,7 @@ function createStyleBundlingPlugins( workingDir ) {
 		// Handle CSS modules (.module.css and .module.scss)
 		sassPlugin( {
 			embedded: true,
+			sourceMap: false,
 			filter: /\.module\.(css|scss)$/,
 			transform: compileInlineStyle( { cssModules: true } ),
 			type: inlineStyle,
@@ -237,6 +259,7 @@ function createStyleBundlingPlugins( workingDir ) {
 		// Note: .module.css and .module.scss already handled by plugin above
 		sassPlugin( {
 			embedded: true,
+			sourceMap: false,
 			filter: /\.(css|scss)$/,
 			transform: compileInlineStyle(),
 			type: inlineStyle,
@@ -264,8 +287,11 @@ const wasmInlinePlugin = {
 				try {
 					const resolved = require.resolve( args.path );
 					return {
-						path: resolved,
+						path: normalizePath(
+							path.relative( ROOT_DIR, resolved )
+						),
 						namespace: 'wasm-inline',
+						pluginData: { resolvedPath: resolved },
 					};
 				} catch {
 					// If resolution fails, let other plugins handle it.
@@ -279,7 +305,9 @@ const wasmInlinePlugin = {
 		build.onLoad(
 			{ filter: /.*/, namespace: 'wasm-inline' },
 			async ( args ) => {
-				const wasmBuffer = await readFile( args.path );
+				const wasmBuffer = await readFile(
+					args.pluginData.resolvedPath
+				);
 				const base64 = wasmBuffer.toString( 'base64' );
 				const dataUrl = `data:application/wasm;base64,${ base64 }`;
 
@@ -312,6 +340,19 @@ function transformPhpContent( content, transforms ) {
 	} = transforms;
 
 	content = content.toString();
+
+	/*
+	 * Transforms are used to modify PHP files that are committed to version
+	 * control in their wordpress-develop state (`wp_` function prefixes, `WP_`
+	 * class prefixes, etc.). When building for WordPress Core, it's not
+	 * necessary to perform these steps.
+	 */
+	if (
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE )
+	) {
+		return content;
+	}
 
 	if ( prefixFunctions.length ) {
 		content = content.replace(
@@ -460,10 +501,6 @@ async function bundlePackage( packageName, options = {} ) {
 		const outputDir = path.join( BUILD_DIR, 'scripts', packageName );
 		const target = browserslistToEsbuild();
 
-		// When wpScriptDebugSupport is false, skip sourcemaps and
-		// unminified builds to reduce output size.
-		const skipDebugBuilds = packageJson.wpScriptDebugSupport === false;
-
 		// Check if package matches the namespace and should expose a global
 		const packageFullName = packageJson.name;
 		const matchesNamespace = packageFullName.startsWith(
@@ -478,7 +515,7 @@ async function bundlePackage( packageName, options = {} ) {
 		const baseConfig = {
 			entryPoints: [ entryPoint ],
 			bundle: true,
-			sourcemap: ! skipDebugBuilds,
+			sourcemap: true,
 			format: 'iife',
 			target,
 			platform: 'browser',
@@ -512,26 +549,23 @@ async function bundlePackage( packageName, options = {} ) {
 			} )
 		);
 
-		// Skip the unminified build when debug support is disabled.
-		if ( ! skipDebugBuilds ) {
-			builds.push(
-				esbuild.build( {
-					...baseConfig,
-					outfile: path.join( outputDir, 'index.js' ),
-					minify: false,
-					define: getDefine( true ),
-					plugins: [
-						...baseBundlePlugins,
-						wordpressExternalsPlugin(
-							'index.min',
-							'iife',
-							packageJson.wpScriptExtraDependencies || [],
-							false // Skip asset file for non-minified build
-						),
-					],
-				} )
-			);
-		}
+		builds.push(
+			esbuild.build( {
+				...baseConfig,
+				outfile: path.join( outputDir, 'index.js' ),
+				minify: false,
+				define: getDefine( true ),
+				plugins: [
+					...baseBundlePlugins,
+					wordpressExternalsPlugin(
+						'index.min',
+						'iife',
+						packageJson.wpScriptExtraDependencies || [],
+						false // Skip asset file for non-minified build
+					),
+				],
+			} )
+		);
 
 		builtScripts.push( {
 			handle: `${ handlePrefix }-${ packageName }`,
@@ -561,10 +595,14 @@ async function bundlePackage( packageName, options = {} ) {
 			const entryPoint = path.join( packageDir, exportPath );
 			const baseFileName = path.basename( fileName );
 
-			// When wpScriptDebugSupport is false, skip sourcemaps and
-			// unminified builds to reduce output size (e.g. for packages
-			// that inline large WASM binaries).
-			const skipDebugBuilds = packageJson.wpScriptDebugSupport === false;
+			// Skip non-minified build and sourcemaps for WASM-inlined workers
+			// (e.g., vips). These are ~13MB of base64-encoded WASM with no
+			// debugging value over the minified version.
+			const isWasmWorker =
+				packageJson.wpWorkers &&
+				Object.keys( packageJson.wpWorkers ).some(
+					( key ) => key.replace( /^\.\//, '' ) === fileName
+				);
 
 			builds.push(
 				esbuild.build( {
@@ -574,7 +612,7 @@ async function bundlePackage( packageName, options = {} ) {
 						`${ fileName }.min.js`
 					),
 					bundle: true,
-					sourcemap: ! skipDebugBuilds,
+					sourcemap: ! isWasmWorker,
 					format: 'esm',
 					target,
 					platform: 'browser',
@@ -591,8 +629,7 @@ async function bundlePackage( packageName, options = {} ) {
 				} )
 			);
 
-			// Skip the unminified build when debug support is disabled.
-			if ( ! skipDebugBuilds ) {
+			if ( ! isWasmWorker ) {
 				builds.push(
 					esbuild.build( {
 						entryPoints: [ entryPoint ],
@@ -628,6 +665,7 @@ async function bundlePackage( packageName, options = {} ) {
 				id: scriptModuleId,
 				path: `${ packageName }/${ fileName }`,
 				asset: `${ packageName }/${ fileName }.min.asset.php`,
+				min_only: isWasmWorker,
 			} );
 		}
 	}
@@ -654,19 +692,13 @@ async function bundlePackage( packageName, options = {} ) {
 			// Generate minified path: style.css -> style.min.css, style-rtl.css -> style-rtl.min.css
 			const minifiedPath = destPath.replace( /\.css$/, '.min.css' );
 
-			// When wpScriptDebugSupport is false, skip the non-minified
-			// CSS version to reduce output size.
-			const skipDebugBuilds = packageJson.wpScriptDebugSupport === false;
-
 			builds.push(
 				( async () => {
 					await mkdir( destDir, { recursive: true } );
 					const content = await readFile( cssFile, 'utf8' );
 
 					// Write non-minified version (for SCRIPT_DEBUG=true)
-					if ( ! skipDebugBuilds ) {
-						await writeFile( destPath, content );
-					}
+					await writeFile( destPath, content );
 
 					// Write minified version (for SCRIPT_DEBUG=false)
 					const result = await postcss( [
@@ -887,14 +919,15 @@ async function generateModuleRegistrationPhp( modules, replacements ) {
 
 	// Generate modules array for registry
 	const modulesArray = modules
-		.map( ( module ) => {
-			const lines = [
-				`\t\t'id' => '${ module.id }'`,
-				`\t\t'path' => '${ module.path }'`,
-				`\t\t'asset' => '${ module.asset }'`,
-			];
-			return `\tarray(\n${ lines.join( ',\n' ) },\n\t),`;
-		} )
+		.map(
+			( module ) =>
+				`\tarray(\n` +
+				`\t\t'id' => '${ module.id }',\n` +
+				`\t\t'path' => '${ module.path }',\n` +
+				`\t\t'asset' => '${ module.asset }',\n` +
+				( module.min_only ? `\t\t'min_only' => true,\n` : '' ) +
+				`\t),`
+		)
 		.join( '\n' );
 
 	await Promise.all( [
@@ -1793,11 +1826,23 @@ async function buildAll( baseUrlExpression ) {
 			id: page.id,
 			init: page.init || [],
 			title: page.title || undefined,
+			experimental: page.experimental || false,
 		};
 	} );
 
-	const pageData = normalizedPages.map( ( page ) => {
-		const pageRoutes = routes.filter( ( r ) => r.page === page.id );
+	// When building for WordPress Core, exclude experimental pages.
+	const isCoreBuild =
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE );
+	const activePages = isCoreBuild
+		? normalizedPages.filter( ( page ) => ! page.experimental )
+		: normalizedPages;
+
+	const activePageIds = new Set( activePages.map( ( p ) => p.id ) );
+	const activeRoutes = routes.filter( ( r ) => activePageIds.has( r.page ) );
+
+	const pageData = activePages.map( ( page ) => {
+		const pageRoutes = activeRoutes.filter( ( r ) => r.page === page.id );
 		return {
 			slug: page.id,
 			routes: pageRoutes,
@@ -1805,51 +1850,6 @@ async function buildAll( baseUrlExpression ) {
 			title: page.title,
 		};
 	} );
-
-	// Bundle boot, route, and theme packages from node_modules when pages exist
-	if ( pageData.length > 0 ) {
-		try {
-			const { createRequire } = await import( 'module' );
-			const require = createRequire( import.meta.url );
-
-			// Resolve the @wordpress packages directory from node_modules
-			const bootPackageJson = require.resolve(
-				'@wordpress/boot/package.json',
-				{ paths: [ ROOT_DIR ] }
-			);
-			const wordpressPackagesDir = path.dirname(
-				path.dirname( bootPackageJson )
-			);
-
-			// Bundle boot, route, theme, and private-apis packages
-			const externalPackages = [
-				'boot',
-				'route',
-				'theme',
-				'private-apis',
-			];
-			for ( const pkgName of externalPackages ) {
-				const result = await bundlePackage( pkgName, {
-					sourceDir: wordpressPackagesDir,
-					handlePrefix: 'wp',
-					scriptGlobal: 'wp',
-					packageNamespace: 'wordpress',
-				} );
-
-				if ( result && result.modules ) {
-					modules.push( ...result.modules );
-				}
-				if ( result && result.scripts ) {
-					scripts.push( ...result.scripts );
-				}
-			}
-		} catch ( error ) {
-			console.warn(
-				'\n⚠️  Warning: Could not bundle WordPress packages for pages:',
-				error.message
-			);
-		}
-	}
 
 	console.log( '\n📄 Generating PHP registration files...\n' );
 	const phpReplacements = await getPhpReplacements(
@@ -1862,8 +1862,8 @@ async function buildAll( baseUrlExpression ) {
 		generateScriptRegistrationPhp( scripts, phpReplacements ),
 		generateStyleRegistrationPhp( styles, phpReplacements ),
 		generateConstantsPhp( phpReplacements ),
-		generateRoutesRegistry( routes, phpReplacements ),
-		generateRoutesPhp( routes, phpReplacements ),
+		generateRoutesRegistry( activeRoutes, phpReplacements ),
+		generateRoutesPhp( activeRoutes, phpReplacements ),
 		generatePagesPhp( pageData, phpReplacements ),
 	] );
 	console.log( '   ✔ Generated build/build.php' );
@@ -2152,7 +2152,13 @@ async function main() {
 			},
 			'base-url': {
 				type: 'string',
-				default: 'plugin_dir_url( __FILE__ )',
+				default:
+					boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+					boolConfigVal(
+						process.env.npm_package_config_IS_WORDPRESS_CORE
+					)
+						? "includes_url( 'build/' )"
+						: 'plugin_dir_url( __FILE__ )',
 			},
 		},
 		strict: false,

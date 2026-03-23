@@ -501,10 +501,13 @@ function isSectionBlockCandidate( state, clientId ) {
 	const disableContentOnlyForUnsyncedPatterns =
 		state.settings?.disableContentOnlyForUnsyncedPatterns;
 
+	const disableContentOnlyForTemplateParts =
+		state.settings?.disableContentOnlyForTemplateParts;
+
 	if (
 		( ( ! disableContentOnlyForUnsyncedPatterns &&
 			attributes?.metadata?.patternName ) ||
-			isTemplatePart ) &&
+			( isTemplatePart && ! disableContentOnlyForTemplateParts ) ) &&
 		! isIsolatedEditor
 	) {
 		return true;

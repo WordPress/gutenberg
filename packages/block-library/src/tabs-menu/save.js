@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-
-/**
  * WordPress dependencies
  */
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';

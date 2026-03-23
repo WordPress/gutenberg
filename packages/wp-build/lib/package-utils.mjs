@@ -28,7 +28,6 @@ const packagePathCache = new Map();
  * @property {Record<string, string>} [peerDependencies]      Peer dependencies.
  * @property {string[]}               [wpScript]              WordPress script handles for dependency extraction.
  * @property {Record<string, string>} [wpScriptModuleExports] WordPress script module exports.
- * @property {boolean}                [wpScriptDebugSupport]  When false, skip unminified builds and sourcemaps for all outputs (scripts, script modules, styles).
  * @property {Object}                 [sideEffects]           Side effects configuration for tree shaking.
  * @property {string}                 [publishConfig]         NPM publish configuration.
  * @property {Record<string, string>} [scripts]               NPM scripts.

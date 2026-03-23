@@ -4,17 +4,20 @@ import childProcess from 'node:child_process';
 
 const execute = util.promisify( childProcess.exec );
 
-const generateStylelintCommand = ( filename: string ): string =>
+const generateStylelintCommand = (
+	filename: string,
+	configFile: string
+): string =>
 	'npx stylelint ' +
 	path.resolve( __dirname, '../', filename ) +
 	' -c ' +
-	path.resolve( __dirname, '../', './.stylelintrc.json' ) +
+	path.resolve( __dirname, '../', configFile ) +
 	' --formatter json' +
 	' --ignore-path ' +
 	path.resolve( __dirname, '../', './.stylelintignore' );
 
-export const getStylelintResult = ( filename: string ) =>
-	execute( generateStylelintCommand( filename ) )
+export const getStylelintResult = ( filename: string, configFile: string ) =>
+	execute( generateStylelintCommand( filename, configFile ) )
 		.then( ( { stderr } ) => {
 			return {
 				errored: false,

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
@@ -50,14 +50,14 @@ function FontLibraryPage() {
 	}[] = [
 		{
 			id: 'installed-fonts',
-			title: __( 'Library' ),
+			title: _x( 'Library', 'Font library' ),
 		},
 	];
 
 	if ( canUserCreate ) {
 		tabs.push( {
 			id: 'upload-fonts',
-			title: __( 'Upload' ),
+			title: _x( 'Upload', 'noun' ),
 		} );
 		tabs.push(
 			...( collections || [] ).map( ( { slug, name } ) => ( {

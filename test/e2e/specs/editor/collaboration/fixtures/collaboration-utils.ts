@@ -51,42 +51,6 @@ export default class CollaborationUtils {
 	}
 
 	/**
-	 * Set the real-time collaboration WordPress setting.
-	 *
-	 * Uses the form-based approach (similar to setGutenbergExperiments)
-	 * because this setting is registered on admin_init in the "writing"
-	 * group and is not exposed via /wp/v2/settings.
-	 *
-	 * @param enabled Whether to enable or disable collaboration.
-	 */
-	async setCollaboration( enabled: boolean ) {
-		const response = await this.requestUtils.request.get(
-			'/wp-admin/options-writing.php'
-		);
-		const html = await response.text();
-		const nonce = html.match( /name="_wpnonce" value="([^"]+)"/ )![ 1 ];
-
-		const formData: Record< string, string | number > = {
-			option_page: 'writing',
-			action: 'update',
-			_wpnonce: nonce,
-			_wp_http_referer: '/wp-admin/options-writing.php',
-			submit: 'Save Changes',
-			default_category: 1,
-			default_post_format: 0,
-		};
-
-		if ( enabled ) {
-			formData.wp_enable_real_time_collaboration = 1;
-		}
-
-		await this.requestUtils.request.post( '/wp-admin/options.php', {
-			form: formData,
-			failOnStatusCode: true,
-		} );
-	}
-
-	/**
 	 * Open a collaborative editing session where both the primary user (admin)
 	 * and the second user (collaborator) are editing the same post.
 	 *
@@ -168,6 +132,114 @@ export default class CollaborationUtils {
 	}
 
 	/**
+	 * Wait for the editor to be fully ready: collaboration runtime enabled and
+	 * the entity record resolver finished. Optionally skips the collaboration
+	 * check (e.g. for the auto-draft test which checks collaboration separately).
+	 *
+	 * @param page                           The Playwright page to wait on.
+	 * @param [options]                      Optional settings.
+	 * @param [options.requireCollaboration] Whether to require _wpCollaborationEnabled (default true).
+	 * @param [options.timeout]              Maximum wait time in ms (default 10000).
+	 */
+	async waitForEntityReady(
+		page: Page,
+		{
+			requireCollaboration = true,
+			timeout = 10000,
+		}: { requireCollaboration?: boolean; timeout?: number } = {}
+	) {
+		await page.waitForFunction(
+			( { requireCollab } ) => {
+				const postId = ( window as any ).wp?.data
+					?.select( 'core/editor' )
+					?.getCurrentPostId();
+				if ( ! postId ) {
+					return false;
+				}
+				if (
+					requireCollab &&
+					( window as any )._wpCollaborationEnabled !== true
+				) {
+					return false;
+				}
+				return ( window as any ).wp.data
+					.select( 'core' )
+					.hasFinishedResolution( 'getEntityRecord', [
+						'postType',
+						'post',
+						postId,
+					] );
+			},
+			{ requireCollab: requireCollaboration },
+			{ timeout }
+		);
+	}
+
+	/**
+	 * Wait for entity resolution AND for any triggered reconciliation save to
+	 * settle. Use this after a page reload when a reconciliation save may be
+	 * initiated synchronously upon entity resolution.
+	 *
+	 * @param page              The Playwright page to wait on.
+	 * @param [options]         Optional settings.
+	 * @param [options.timeout] Maximum wait time in ms (default 15000).
+	 */
+	async waitForEntityReadyAndSaveSettled(
+		page: Page,
+		{ timeout = 15000 }: { timeout?: number } = {}
+	) {
+		await page.waitForFunction(
+			() => {
+				const postId = ( window as any ).wp?.data
+					?.select( 'core/editor' )
+					?.getCurrentPostId();
+				if ( ! postId ) {
+					return false;
+				}
+				if ( ( window as any )._wpCollaborationEnabled !== true ) {
+					return false;
+				}
+				if (
+					! ( window as any ).wp.data
+						.select( 'core' )
+						.hasFinishedResolution( 'getEntityRecord', [
+							'postType',
+							'post',
+							postId,
+						] )
+				) {
+					return false;
+				}
+				// Entity is resolved; wait for any triggered reconciliation
+				// save to settle before we read store values.
+				return ! ( window as any ).wp.data
+					.select( 'core/editor' )
+					.isSavingPost();
+			},
+			{ timeout }
+		);
+	}
+
+	/**
+	 * Read the _crdt_document meta value from the currently loaded entity record.
+	 *
+	 * @param page The Playwright page to evaluate on.
+	 */
+	async getCrdtDocument( page: Page ): Promise< string | null > {
+		return page.evaluate( () => {
+			const postId = ( window as any ).wp.data
+				.select( 'core/editor' )
+				.getCurrentPostId();
+			return (
+				( window as any ).wp.data
+					.select( 'core' )
+					.getEntityRecord( 'postType', 'post', postId )?.meta
+					?._crdt_document ?? null
+			);
+		} );
+	}
+
+	/**
 	 * Wait for the collaboration runtime to be ready on a page.
 	 * Checks that `window._wpCollaborationEnabled` is true and wp.data is loaded.
 	 *
@@ -238,7 +310,51 @@ export default class CollaborationUtils {
 			this.secondPage = null;
 			this.secondEditor = null;
 		}
-		await this.setCollaboration( false );
 		await this.requestUtils.deleteAllUsers();
 	}
+}
+
+/**
+ * Set the real-time collaboration WordPress setting.
+ *
+ * Uses the form-based approach (similar to setGutenbergExperiments)
+ * because this setting is registered on admin_init in the "writing"
+ * group and is not exposed via /wp/v2/settings.
+ *
+ * @param requestUtils An instance of RequestUtils for making HTTP requests.
+ * @param enabled      Whether to enable or disable collaboration.
+ */
+export async function setCollaboration(
+	requestUtils: RequestUtils,
+	enabled: boolean
+): Promise< void > {
+	const response = await requestUtils.request.get(
+		'/wp-admin/options-writing.php'
+	);
+	const html = await response.text();
+	const nonce = html.match( /name="_wpnonce" value="([^"]+)"/ )![ 1 ];
+
+	const optionName = 'wp_collaboration_enabled';
+	const optionValue = enabled ? 1 : 0;
+
+	const formData: Record< string, string | number > = {
+		option_page: 'writing',
+		action: 'update',
+		_wpnonce: nonce,
+		_wp_http_referer: '/wp-admin/options-writing.php',
+		submit: 'Save Changes',
+		default_category: 1,
+		default_post_format: 0,
+	};
+
+	formData[ optionName ] = optionValue;
+
+	// Temporary addition to bridge the short time when this is change is merged in
+	// Gutenberg but not in core.
+	formData.wp_enable_real_time_collaboration = optionValue;
+
+	await requestUtils.request.post( '/wp-admin/options.php', {
+		form: formData,
+		failOnStatusCode: true,
+	} );
 }

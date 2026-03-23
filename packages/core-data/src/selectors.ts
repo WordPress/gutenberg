@@ -54,6 +54,8 @@ export interface State {
 	editorSettings: Record< string, any > | null;
 	editorAssets: Record< string, any > | null;
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
+	collaborationSupported: boolean;
+	viewConfigs: Record< string, Record< string, any > >;
 }
 
 type EntityRecordKey = string | number;
@@ -522,25 +524,26 @@ export const getRawEntityRecord = createSelector(
 			name,
 			key
 		);
-		return (
-			record &&
-			Object.keys( record ).reduce( ( accumulator, _key ) => {
-				if (
-					isRawAttribute( getEntityConfig( state, kind, name ), _key )
-				) {
-					// Because edits are the "raw" attribute values,
-					// we return those from record selectors to make rendering,
-					// comparisons, and joins with edits easier.
-					accumulator[ _key ] =
-						record[ _key ]?.raw !== undefined
-							? record[ _key ]?.raw
-							: record[ _key ];
-				} else {
-					accumulator[ _key ] = record[ _key ];
+		const config = getEntityConfig( state, kind, name );
+		if ( ! record || ! config?.rawAttributes?.length ) {
+			return record;
+		}
+
+		// Because edits are the "raw" attribute values,
+		// we return those from record selectors to make rendering,
+		// comparisons, and joins with edits easier.
+		return Object.fromEntries(
+			Object.keys( record ).map( ( _key ) => {
+				if ( isRawAttribute( config, _key ) ) {
+					const rawValue = record[ _key ]?.raw;
+					return [
+						_key,
+						rawValue !== undefined ? rawValue : record[ _key ],
+					];
 				}
-				return accumulator;
-			}, {} as any )
-		);
+				return [ _key, record[ _key ] ];
+			} )
+		) as EntityRecord;
 	},
 	(
 		state: State,
@@ -1522,6 +1525,62 @@ export const getRevisions = (
 
 	return getQueriedItems( queriedStateRevisions, query );
 };
+
+/**
+ * Returns true if a revision has been received for the given set of parameters,
+ * or false otherwise.
+ *
+ * Note: This does not trigger a request for the revision from the API
+ * if it's not available in the local state.
+ *
+ * @param state       State tree
+ * @param kind        Entity kind.
+ * @param name        Entity name.
+ * @param recordKey   The key of the entity record whose revision you want to check.
+ * @param revisionKey The revision's key.
+ * @param query       Optional query.
+ *
+ * @return Whether a revision has been received.
+ */
+export function hasRevision(
+	state: State,
+	kind: string,
+	name: string,
+	recordKey: EntityRecordKey,
+	revisionKey: EntityRecordKey,
+	query?: GetRecordsHttpQuery
+): boolean {
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ];
+	if ( ! queriedState ) {
+		return false;
+	}
+	const context = query?.context ?? 'default';
+
+	if ( ! query || ! query._fields ) {
+		return !! queriedState.itemIsComplete[ context ]?.[ revisionKey ];
+	}
+
+	const item = queriedState.items[ context ]?.[ revisionKey ];
+	if ( ! item ) {
+		return false;
+	}
+
+	const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+	for ( let i = 0; i < fields.length; i++ ) {
+		const path = fields[ i ].split( '.' );
+		let value = item;
+		for ( let p = 0; p < path.length; p++ ) {
+			const part = path[ p ];
+			if ( ! value || ! Object.hasOwn( value, part ) ) {
+				return false;
+			}
+			value = value[ part ];
+		}
+	}
+
+	return true;
+}
 
 /**
  * Returns a single, specific revision of a parent entity.

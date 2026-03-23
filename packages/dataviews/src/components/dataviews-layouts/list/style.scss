@@ -170,7 +170,6 @@ div.dataviews-view-list {
 	}
 
 	.dataviews-view-list__field-wrapper {
-		min-height: $grid-unit-05 * 13; // Ensures title is centrally aligned when all fields are hidden
 		flex-grow: 1;
 		min-width: 0;
 	}
@@ -225,10 +224,6 @@ div.dataviews-view-list {
 				height: $grid-unit-05 * 8;
 			}
 
-			.dataviews-view-list__field-wrapper {
-				min-height: $grid-unit-05 * 8;
-			}
-
 			.dataviews-view-list__fields {
 				gap: $grid-unit-10;
 				row-gap: $grid-unit-05;
@@ -255,10 +250,6 @@ div.dataviews-view-list {
 			.dataviews-view-list__media-wrapper {
 				width: $grid-unit-05 * 16;
 				height: $grid-unit-05 * 16;
-			}
-
-			.dataviews-view-list__field-wrapper {
-				min-height: $grid-unit-05 * 16;
 			}
 
 			.dataviews-view-list__fields {

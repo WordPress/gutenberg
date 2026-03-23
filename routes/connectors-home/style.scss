@@ -1,6 +1,11 @@
 @use "@wordpress/base-styles/colors" as *;
 
+// Approximate height of the sticky admin header so that
+// scroll-margin-top keeps focused elements visible at 150 % zoom.
+$sticky-header-clearance: 120px;
+
 .connectors-page {
+	box-sizing: border-box;
 	width: 100%;
 	max-width: 680px;
 	margin: 0 auto;
@@ -12,14 +17,109 @@
 		border: 1px solid #ddd;
 		background: #fff;
 		overflow: hidden;
+		scroll-margin-top: $sticky-header-clearance;
+	}
+
+	.connector-settings__error {
+		color: $alert-red;
 	}
 
 	.connector-settings .components-text-control__input {
 		font-family: monospace;
+		scroll-margin-top: $sticky-header-clearance;
+	}
+
+	&--empty {
+		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 32px;
+		text-align: center;
+	}
+
+	.ai-plugin-callout {
+		position: relative;
+		overflow: hidden;
+		border-radius: 8px;
+		padding: 24px;
+		padding-inline-end: 220px;
+		background:
+			linear-gradient(90deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%),
+			linear-gradient(90deg, #89dcdc 0%, #c7eb5c 46.15%, #a920c1 100%);
+
+		[dir="rtl"] & {
+			background:
+				linear-gradient(270deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%),
+				linear-gradient(270deg, #89dcdc 0%, #c7eb5c 46.15%, #a920c1 100%);
+		}
+
+		&__content {
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+			padding-top: 2px;
+
+			p {
+				margin: 0;
+				font-size: 13px;
+				line-height: 20px;
+			}
+		}
+
+		&__actions {
+			display: flex;
+			gap: 12px;
+			align-items: center;
+		}
+
+		&__decoration {
+			position: absolute;
+			inset-inline-end: 8px;
+			top: -15px;
+			width: 248px;
+			height: 248px;
+		}
 	}
 
 	> p {
 		text-align: center;
 		color: $gray-600;
+	}
+
+	@media (max-width: 680px) {
+		.ai-plugin-callout {
+			padding: 12px;
+			padding-inline-end: 84px;
+
+			&__decoration {
+				width: 134px;
+				height: 134px;
+				inset-inline-end: 4px;
+				top: -8px;
+			}
+		}
+	}
+
+	@media (max-width: 480px) {
+		padding: 8px;
+
+		.components-item {
+			padding: 12px;
+
+			> .components-v-stack > .components-h-stack:first-child {
+				svg {
+					width: 32px;
+					height: 32px;
+				}
+
+				// Stack badge and action button vertically on small screens.
+				> .components-h-stack:last-child {
+					flex-direction: column;
+					align-items: flex-end;
+				}
+			}
+		}
 	}
 }

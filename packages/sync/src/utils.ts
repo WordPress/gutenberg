@@ -21,7 +21,13 @@ import type { CRDTDoc } from './types';
 type DocumentMeta = Record< string, DocumentMetaValue >;
 type DocumentMetaValue = boolean | number | string;
 
-export function createYjsDoc( documentMeta: DocumentMeta = {} ): Y.Doc {
+/**
+ * Creates a new Y.Doc instance with the given document metadata.
+ *
+ * @param {DocumentMeta} documentMeta Optional metadata to associate with the
+ *                                    document. Metadata is not persisted.
+ */
+export function createYjsDoc( documentMeta: DocumentMeta = {} ): CRDTDoc {
 	// Convert the object representation of CRDT document metadata to a map.
 	// Document metadata is passed to the Y.Doc constructor and stored in its
 	// `meta` property. It is not synced to peers or persisted with the document.
@@ -30,12 +36,19 @@ export function createYjsDoc( documentMeta: DocumentMeta = {} ): Y.Doc {
 		Object.entries( documentMeta )
 	);
 
-	const ydoc = new Y.Doc( { meta: metaMap } );
+	// IMPORTANT: Do not add update the document itself to avoid generating updates
+	// before observers are attached. Add initial updates in `initializeYjsDoc`.
+	return new Y.Doc( { meta: metaMap } );
+}
+
+/**
+ * Initializes a Y.Doc instance with the necessary CRDT state for our use case.
+ *
+ * @param {Y.Doc} ydoc Y.Doc instance to initialize.
+ */
+export function initializeYjsDoc( ydoc: CRDTDoc ): void {
 	const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-
 	stateMap.set( VERSION_KEY, CRDT_DOC_VERSION );
-
-	return ydoc;
 }
 
 /**

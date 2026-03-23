@@ -29,6 +29,20 @@ describe( 'Fieldset', () => {
 		expect( detailsRef.current ).toBeInstanceOf( HTMLDivElement );
 	} );
 
+	it( 'keeps the accessible name when the legend is visually hidden', () => {
+		render(
+			<Fieldset.Root>
+				<Fieldset.Legend hideFromVision>
+					Choose your options
+				</Fieldset.Legend>
+			</Fieldset.Root>
+		);
+
+		expect(
+			screen.getByRole( 'group', { name: 'Choose your options' } )
+		).toBeVisible();
+	} );
+
 	it( 'accessibly associates description when Fieldset.Description is present', () => {
 		render(
 			<Fieldset.Root>

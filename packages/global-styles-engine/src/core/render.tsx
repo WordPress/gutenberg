@@ -38,7 +38,6 @@ import type {
 	BlockStyleVariation,
 	BlockType,
 	GlobalStylesConfig,
-	GlobalStylesSettings,
 	GlobalStylesStyles,
 } from '../types';
 
@@ -159,56 +158,6 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	spacing: 'spacing',
 	typography: 'typography',
 };
-
-/**
- * Transform given preset tree into a set of style declarations.
- *
- * @param blockPresets   Block presets object
- * @param mergedSettings Merged theme.json settings
- * @return An array of style declarations
- */
-function getPresetsDeclarations(
-	blockPresets: Record< string, any > = {},
-	mergedSettings: GlobalStylesSettings
-): string[] {
-	return PRESET_METADATA.reduce(
-		(
-			declarations: string[],
-			{ path, valueKey, valueFunc, cssVarInfix }: PresetMetadata
-		) => {
-			const presetByOrigin = getValueFromObjectPath(
-				blockPresets,
-				path,
-				[]
-			) as PresetsByOrigin;
-			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
-				if ( presetByOrigin[ origin ] ) {
-					presetByOrigin[ origin ].forEach( ( value: any ) => {
-						if ( valueKey && ! valueFunc ) {
-							declarations.push(
-								`--wp--preset--${ cssVarInfix }--${ kebabCase(
-									value.slug
-								) }: ${ value[ valueKey ] }`
-							);
-						} else if (
-							valueFunc &&
-							typeof valueFunc === 'function'
-						) {
-							declarations.push(
-								`--wp--preset--${ cssVarInfix }--${ kebabCase(
-									value.slug
-								) }: ${ valueFunc( value, mergedSettings ) }`
-							);
-						}
-					} );
-				}
-			} );
-
-			return declarations;
-		},
-		[] as string[]
-	);
-}
 
 /**
  * Transform given preset tree into a set of preset class declarations.
@@ -382,6 +331,102 @@ const updateParagraphTextIndentSelector = (
 	}
 
 	return featureDeclarations;
+};
+
+/**
+ * Updates button width declarations to use a calc() formula for percentage values.
+ *
+ * When a percentage width is set on the Button block via Global Styles, the
+ * resulting CSS needs to account for block gap spacing so that buttons tile
+ * correctly on a row (e.g. 4 buttons at 25% width all fit on one row).
+ *
+ * This mirrors the dynamic calc() formula applied at the block instance level
+ * in the button block's stylesheet (style.scss).
+ *
+ * @param featureDeclarations Feature declarations keyed by selector.
+ * @param settings            The theme.json settings.
+ * @return Updated feature declarations.
+ */
+const updateButtonWidthDeclarations = (
+	featureDeclarations: Record< string, string[] >,
+	settings: Record< string, any > | undefined
+): Record< string, string[] > => {
+	const buttonSelector = '.wp-block-button';
+	if ( ! ( buttonSelector in featureDeclarations ) ) {
+		return featureDeclarations;
+	}
+
+	const updated = { ...featureDeclarations };
+	updated[ buttonSelector ] = updated[ buttonSelector ].map(
+		( declaration ) => {
+			// Match "width: <value>" declarations.
+			const match = declaration.match( /^width:\s*(.+)$/ );
+			if ( ! match ) {
+				return declaration;
+			}
+
+			const value = match[ 1 ];
+			let percentage: number | null = null;
+
+			// Case 1: Direct percentage value e.g. "25%".
+			if ( value.endsWith( '%' ) ) {
+				percentage = parseFloat( value );
+			}
+
+			// Case 2: Preset CSS var e.g. "var(--wp--preset--dimension--50)".
+			const presetPrefix = 'var(--wp--preset--dimension--';
+			if (
+				percentage === null &&
+				value.startsWith( presetPrefix ) &&
+				value.endsWith( ')' )
+			) {
+				const slug = value.slice( presetPrefix.length, -1 );
+
+				/*
+				 * Look up the preset size across all origins.
+				 * Check block-level settings first (core/button), then top-level settings.
+				 * Spread block-level entries first so they take precedence.
+				 */
+				const dimensionSizes = {
+					...( settings?.dimensions?.dimensionSizes ?? {} ),
+					...( settings?.blocks?.[ 'core/button' ]?.dimensions
+						?.dimensionSizes ?? {} ),
+				};
+				for ( const origin of Object.values( dimensionSizes ) ) {
+					if ( ! Array.isArray( origin ) ) {
+						continue;
+					}
+					for ( const preset of origin ) {
+						if (
+							preset.slug === slug &&
+							typeof preset.size === 'string' &&
+							preset.size.endsWith( '%' )
+						) {
+							percentage = parseFloat( preset.size );
+							break;
+						}
+					}
+					if ( percentage !== null ) {
+						break;
+					}
+				}
+			}
+
+			if ( percentage === null || isNaN( percentage ) ) {
+				return declaration;
+			}
+
+			/*
+			 * Apply the same calc() formula as the block instance level (style.scss).
+			 * The numeric percentage value is used as a unitless number:
+			 * - Multiplied by 1% to get the percentage width.
+			 * - Divided by 100 to calculate the gap adjustment proportion.
+			 */
+			return `width: calc(${ percentage } * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - ${ percentage } / 100)))`;
+		}
+	);
+
+	return updated;
 };
 
 /**
@@ -1083,7 +1128,9 @@ export const getNodesWithSettings = (
 		duotoneSelector?: string;
 		fallbackGapValue?: string;
 		hasLayoutSupport?: boolean;
-		featureSelectors?: Record< string, string >;
+		featureSelectors?:
+			| string
+			| Record< string, string | Record< string, string > >;
 		styleVariationSelectors?: Record< string, string >;
 	}[] = [];
 
@@ -1129,6 +1176,8 @@ export const getNodesWithSettings = (
 					presets: blockPresets,
 					custom: blockCustom,
 					selector: blockSelectors[ blockName ]?.selector,
+					featureSelectors:
+						blockSelectors[ blockName ]?.featureSelectors,
 				} );
 			}
 		}
@@ -1137,25 +1186,140 @@ export const getNodesWithSettings = (
 	return nodes;
 };
 
+/**
+ * Resolves the selector for a given block support feature.
+ *
+ * If the block defines a feature-level selector (as a string or an object
+ * with a `root` key), that selector is returned. Otherwise the fallback
+ * selector is used.
+ *
+ * @param {string|Record<string,string|Record<string,string>>|undefined} featureSelectors The block's feature selectors.
+ * @param {string}                                                       featureKey       The feature key to resolve.
+ * @param {string}                                                       fallback         The default selector.
+ * @return {string} The resolved selector.
+ */
+function resolveFeatureSelector(
+	featureSelectors:
+		| string
+		| Record< string, string | Record< string, string > >
+		| undefined,
+	featureKey: string,
+	fallback: string
+): string {
+	if ( ! featureSelectors || typeof featureSelectors === 'string' ) {
+		return fallback;
+	}
+
+	const feature = featureSelectors[ featureKey ];
+	if ( typeof feature === 'string' ) {
+		return feature;
+	}
+	if ( typeof feature === 'object' && feature.root ) {
+		return feature.root;
+	}
+	return fallback;
+}
+
+/**
+ * Collects CSS variable declarations for a single preset metadata entry
+ * across all origins.
+ *
+ * @param {Record<string,any>}             presets        The preset values keyed by origin.
+ * @param {GlobalStylesConfig['settings']} mergedSettings The merged global styles settings.
+ * @param {PresetMetadata}                 presetMetadata The preset metadata.
+ * @return {string[]} The CSS variable declarations.
+ */
+function getPresetVarDeclarations(
+	presets: Record< string, any >,
+	mergedSettings: GlobalStylesConfig[ 'settings' ],
+	{ path, valueKey, valueFunc, cssVarInfix }: PresetMetadata
+): string[] {
+	const presetByOrigin = getValueFromObjectPath(
+		presets,
+		path,
+		[]
+	) as PresetsByOrigin;
+
+	const declarations: string[] = [];
+	for ( const origin of [ 'default', 'theme', 'custom' ] ) {
+		if ( ! presetByOrigin[ origin ] ) {
+			continue;
+		}
+		for ( const value of presetByOrigin[ origin ] ) {
+			const slug = kebabCase( value.slug );
+			if ( valueKey && ! valueFunc ) {
+				declarations.push(
+					`--wp--preset--${ cssVarInfix }--${ slug }: ${ value[ valueKey ] }`
+				);
+			} else if ( valueFunc && typeof valueFunc === 'function' ) {
+				declarations.push(
+					`--wp--preset--${ cssVarInfix }--${ slug }: ${ valueFunc(
+						value,
+						mergedSettings
+					) }`
+				);
+			}
+		}
+	}
+	return declarations;
+}
+
 export const generateCustomProperties = (
 	tree: GlobalStylesConfig,
 	blockSelectors: BlockSelectors
 ): string => {
-	const settings = getNodesWithSettings( tree, blockSelectors );
+	const nodes = getNodesWithSettings( tree, blockSelectors );
 	let ruleset = '';
-	settings.forEach( ( { presets, custom, selector } ) => {
-		const declarations = tree?.settings
-			? getPresetsDeclarations( presets, tree?.settings )
-			: [];
-		const customProps = flattenTree( custom, '--wp--custom--', '--' );
-		if ( customProps.length > 0 ) {
-			declarations.push( ...customProps );
+
+	for ( const { presets, custom, selector, featureSelectors } of nodes ) {
+		const defaultSelector = selector as string;
+
+		/*
+		 * Group preset declarations by selector. Blocks that define
+		 * feature-level selectors need their preset CSS variables output
+		 * under that feature selector instead of the block's root selector.
+		 */
+		const varsBySelector: Record< string, string[] > = {
+			[ defaultSelector ]: [],
+		};
+
+		if ( tree?.settings ) {
+			for ( const metadata of PRESET_METADATA ) {
+				const declarations = getPresetVarDeclarations(
+					presets,
+					tree.settings,
+					metadata
+				);
+				if ( declarations.length === 0 ) {
+					continue;
+				}
+
+				const target = resolveFeatureSelector(
+					featureSelectors,
+					metadata.path[ 0 ],
+					defaultSelector
+				);
+				if ( ! varsBySelector[ target ] ) {
+					varsBySelector[ target ] = [];
+				}
+				varsBySelector[ target ].push( ...declarations );
+			}
 		}
 
-		if ( declarations.length > 0 ) {
-			ruleset += `${ selector }{${ declarations.join( ';' ) };}`;
+		// Custom properties always use the block's default selector.
+		const customProps = flattenTree( custom, '--wp--custom--', '--' );
+		if ( customProps.length > 0 ) {
+			varsBySelector[ defaultSelector ].push( ...customProps );
 		}
-	} );
+
+		for ( const [ ruleSelector, declarations ] of Object.entries(
+			varsBySelector
+		) ) {
+			if ( declarations.length > 0 ) {
+				ruleset += `${ ruleSelector }{${ declarations.join( ';' ) };}`;
+			}
+		}
+	}
 
 	return ruleset;
 };
@@ -1256,6 +1420,12 @@ export const transformToStyles = (
 						name
 					);
 
+					// Update button width declarations for percentage values to use calc() with block gap.
+					featureDeclarations = updateButtonWidthDeclarations(
+						featureDeclarations,
+						tree.settings
+					);
+
 					Object.entries( featureDeclarations ).forEach(
 						( [ cssSelector, declarations ] ) => {
 							if ( declarations.length ) {
@@ -1339,6 +1509,13 @@ export const transformToStyles = (
 											featureDeclarations,
 											tree.settings,
 											name
+										);
+
+									// Update button width declarations for percentage values to use calc() with block gap.
+									featureDeclarations =
+										updateButtonWidthDeclarations(
+											featureDeclarations,
+											tree.settings
 										);
 
 									Object.entries(

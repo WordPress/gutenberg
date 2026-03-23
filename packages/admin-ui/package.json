@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/admin-ui",
-	"version": "1.8.0",
+	"version": "1.10.0",
 	"description": "Generic components to be used in the Admin UI.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -49,7 +49,9 @@
 		"@wordpress/components": "file:../components",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/route": "file:../route",
+		"@wordpress/ui": "file:../ui",
 		"clsx": "^2.1.1"
 	},
 	"peerDependencies": {

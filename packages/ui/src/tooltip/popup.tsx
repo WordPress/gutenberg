@@ -16,7 +16,7 @@ const ThemeProvider: typeof ThemeProviderType =
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
 	{
 		align = 'center',
-		side = 'bottom',
+		side = 'top',
 		sideOffset = 4,
 		children,
 		className,

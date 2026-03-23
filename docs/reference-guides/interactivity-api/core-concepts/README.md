@@ -9,3 +9,5 @@ This section provides some guides on important concepts and mental models relate
 3. **[Server-side rendering: Processing directives on the server](/docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md):** The Interactivity API allows WordPress to use server-side rendering to create interactive and state-aware HTML, smoothly connected with client-side features while maintaining performance and SEO benefits.
 
 4. **[Using TypeScript](/docs/reference-guides/interactivity-api/core-concepts/using-typescript.md):** This guide will walk you through the process of using TypeScript with Interactivity API stores, covering everything from basic type definitions to advanced techniques for handling complex store structures.
+
+5. **[Client-Side Navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md):** This guide explains how to use the `@wordpress/interactivity-router` package to implement client-side navigation, enabling faster page transitions by updating only the parts of the page that change.

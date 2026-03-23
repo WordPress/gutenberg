@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Fieldset } from '../../../..';
+import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Fieldset.Root > = {
 	title: 'Design System/Components/Form/Primitives/Fieldset',
@@ -34,6 +35,26 @@ export const Default: Story = {
 };
 
 /**
+ * When `hideFromVision` is set on `Fieldset.Legend`, the legend is visually
+ * hidden but remains accessible to screen readers.
+ */
+export const HiddenLegend: Story = {
+	args: {
+		children: (
+			<>
+				<Fieldset.Legend hideFromVision>Legend</Fieldset.Legend>
+				{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
+					// eslint-disable-next-line jsx-a11y/label-has-associated-control
+					<label key={ fruit }>
+						<input type="checkbox" /> { fruit }
+					</label>
+				) ) }
+			</>
+		),
+	},
+};
+
+/**
  * To add rich content (such as links) to the description, use `Fieldset.Details`.
  *
  * Although this content is not associated with the fieldset using direct semantics,
@@ -54,13 +75,7 @@ export const WithDetails: Story = {
 						<input type="checkbox" /> { fruit }
 					</label>
 				) ) }
-				<Fieldset.Details>
-					Details can include{ ' ' }
-					<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
-						links to more information
-					</a>{ ' ' }
-					and other semantic elements.
-				</Fieldset.Details>
+				<Fieldset.Details>{ DETAILS_EXAMPLE }</Fieldset.Details>
 			</>
 		),
 	},

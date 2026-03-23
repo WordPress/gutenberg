@@ -116,6 +116,12 @@
 	--wpds-dimension-padding-sm: 8px; /* Small padding */
 	--wpds-dimension-padding-xl: 20px; /* Extra large padding */
 	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
+	--wpds-dimension-surface-width-2xl: 960px; /* 2x extra large surface width */
+	--wpds-dimension-surface-width-lg: 560px; /* Large surface width */
+	--wpds-dimension-surface-width-md: 400px; /* Medium surface width */
+	--wpds-dimension-surface-width-sm: 320px; /* Small surface width */
+	--wpds-dimension-surface-width-xl: 720px; /* Extra large surface width */
+	--wpds-dimension-surface-width-xs: 240px; /* Extra small surface width */
 	--wpds-elevation-lg: 0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012,
 		0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005; /* For components that confirm decisions or handle necessary interruptions. Example: Modals. */
 	--wpds-elevation-md: 0 2px 3px 0 #0000000d, 0 4px 5px 0 #0000000a,
@@ -195,6 +201,12 @@
 	--wpds-dimension-padding-sm: 8px; /* Small padding */
 	--wpds-dimension-padding-xl: 20px; /* Extra large padding */
 	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
+	--wpds-dimension-surface-width-2xl: 960px; /* 2x extra large surface width */
+	--wpds-dimension-surface-width-lg: 560px; /* Large surface width */
+	--wpds-dimension-surface-width-md: 400px; /* Medium surface width */
+	--wpds-dimension-surface-width-sm: 320px; /* Small surface width */
+	--wpds-dimension-surface-width-xl: 720px; /* Extra large surface width */
+	--wpds-dimension-surface-width-xs: 240px; /* Extra small surface width */
 }
 
 @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {

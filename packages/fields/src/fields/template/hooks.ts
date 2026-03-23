@@ -10,6 +10,54 @@ import type { WpTemplate } from '@wordpress/core-data';
  */
 import { getItemTitle } from '../../actions/utils';
 import { unlock } from '../../lock-unlock';
+import type { BasePost } from '../../types';
+
+/**
+ * Hook that determines the template field rendering mode for a post.
+ *
+ * @param record The post record.
+ * @return 'block-theme' | 'classic' | null
+ */
+export function useTemplateFieldMode(
+	record: BasePost
+): 'block-theme' | 'classic' | null {
+	const postType = record.type;
+	const availableTemplates = ( ( record as Record< string, any > )
+		?.available_templates ?? {} ) as Record< string, string >;
+	const hasAvailableTemplates = Object.keys( availableTemplates ).length > 0;
+	return useSelect(
+		( select ) => {
+			const isBlockTheme =
+				!! select( coreStore ).getCurrentTheme()?.is_block_theme;
+			const postTypeObj = select( coreStore ).getPostType( postType );
+			if ( ! postTypeObj?.viewable ) {
+				return null;
+			}
+			const canCreateTemplates =
+				isBlockTheme &&
+				( select( coreStore ).canUser( 'create', {
+					kind: 'postType',
+					name: 'wp_template',
+				} ) ??
+					false );
+			const isVisible = hasAvailableTemplates || canCreateTemplates;
+			const canViewTemplates = isVisible
+				? !! select( coreStore ).canUser( 'read', {
+						kind: 'postType',
+						name: 'wp_template',
+				  } )
+				: false;
+			if ( ( ! isBlockTheme || ! canViewTemplates ) && isVisible ) {
+				return 'classic';
+			}
+			if ( isBlockTheme && canViewTemplates ) {
+				return 'block-theme';
+			}
+			return null;
+		},
+		[ postType, hasAvailableTemplates ]
+	);
+}
 
 /**
  * Compute the template slug to look up in the template hierarchy.

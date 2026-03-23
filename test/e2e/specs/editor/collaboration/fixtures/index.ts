@@ -7,7 +7,10 @@ export { expect } from '@wordpress/e2e-test-utils-playwright';
 /**
  * Internal dependencies
  */
-import CollaborationUtils, { SECOND_USER } from './collaboration-utils';
+import CollaborationUtils, {
+	SECOND_USER,
+	setCollaboration,
+} from './collaboration-utils';
 
 type Fixtures = {
 	collaborationUtils: CollaborationUtils;
@@ -24,9 +27,12 @@ export const test = base.extend< Fixtures >( {
 			requestUtils,
 			page,
 		} );
-		await utils.setCollaboration( true );
+		// Clean up any leftover users from previous runs before creating.
+		await requestUtils.deleteAllUsers();
 		await requestUtils.createUser( SECOND_USER );
+		await setCollaboration( requestUtils, true );
 		await use( utils );
 		await utils.teardown();
+		await setCollaboration( requestUtils, false );
 	},
 } );

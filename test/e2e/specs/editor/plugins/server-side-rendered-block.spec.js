@@ -263,4 +263,61 @@ test.describe( 'PHP-only auto-register blocks', () => {
 			page.getByLabel( 'Emoji', { exact: true } )
 		).toBeVisible();
 	} );
+
+	test.describe( 'with block bindings', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
+
+		test( 'generated inspector controls should reflect bound attribute values', async ( {
+			editor,
+			page,
+		} ) => {
+			// Insert the block with bindings on multiple attributes.
+			await editor.insertBlock( {
+				name: 'test/auto-register-with-controls',
+				attributes: {
+					metadata: {
+						bindings: {
+							title: {
+								source: 'core/post-meta',
+								args: { key: 'text_custom_field' },
+							},
+							count: {
+								source: 'core/post-meta',
+								args: { key: 'integer' },
+							},
+							spacing: {
+								source: 'core/post-meta',
+								args: { key: 'number_custom_field' },
+							},
+							showEmojis: {
+								source: 'core/post-meta',
+								args: { key: 'boolean' },
+							},
+						},
+					},
+				},
+			} );
+
+			await editor.openDocumentSettingsSidebar();
+
+			// Controls should show bound values from the source,
+			// not the block attribute defaults.
+			await expect( page.getByLabel( 'Title' ) ).toHaveValue(
+				'Value of the text custom field'
+			);
+			await expect( page.getByLabel( 'Count' ) ).toHaveValue( '3' );
+			await expect( page.getByLabel( 'Spacing' ) ).toHaveValue( '0.5' );
+			await expect( page.getByLabel( 'Show Emojis' ) ).toBeChecked();
+		} );
+	} );
 } );

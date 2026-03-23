@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { BaseControl, Icon, Tooltip } from '@wordpress/components';
+import { Icon, Tooltip } from '@wordpress/components';
 import { error as errorIcon } from '@wordpress/icons';
 
 function getLabelContent(
@@ -13,13 +13,11 @@ function getLabelContent(
 		<Tooltip text={ errorMessage } placement="top">
 			<span className="dataforms-layouts-panel__field-label-error-content">
 				<Icon icon={ errorIcon } size={ 16 } />
-				<BaseControl.VisualLabel>
-					{ fieldLabel }
-				</BaseControl.VisualLabel>
+				{ fieldLabel }
 			</span>
 		</Tooltip>
 	) : (
-		<BaseControl.VisualLabel>{ fieldLabel }</BaseControl.VisualLabel>
+		fieldLabel
 	);
 }
 
