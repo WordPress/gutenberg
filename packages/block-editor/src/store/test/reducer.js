@@ -3816,8 +3816,67 @@ describe( 'state', () => {
 			expect( newState.blockEditingModes ).toEqual( new Map() );
 		} );
 
-		it( 'should clear editing modes when blocks are reset', () => {
+		it( 'should preserve editing modes when blocks are reset', () => {
+			// Add a template with two template parts.
 			let state = blocks( undefined, {} );
+			state = blocks( state, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						name: 'core/template-part',
+						clientId: 'template-part-1',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						name: 'core/template-part',
+						clientId: 'template-part-2',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+
+			// In each of the template parts add a controlled content (a paragraph block).
+			state = blocks( state, {
+				type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+				clientId: 'template-part-1',
+				hasControlledInnerBlocks: true,
+			} );
+			state = blocks( state, {
+				type: 'REPLACE_INNER_BLOCKS',
+				rootClientId: 'template-part-1',
+				blocks: [
+					{
+						name: 'core/paragraph',
+						clientId: 'paragraph-1',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+			state = blocks( state, {
+				type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+				clientId: 'template-part-2',
+				hasControlledInnerBlocks: true,
+			} );
+			state = blocks( state, {
+				type: 'REPLACE_INNER_BLOCKS',
+				rootClientId: 'template-part-2',
+				blocks: [
+					{
+						name: 'core/paragraph',
+						clientId: 'paragraph-2',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+
+			// Set block editing modes, just like `DisableNonPageContentBlocks` would do:
+			// - the root block to 'disabled'
+			// - the template parts to 'contentOnly'
+			// - the template part children to 'disabled'
 			state = blocks( state, {
 				type: 'SET_BLOCK_EDITING_MODE',
 				clientId: '',
@@ -3825,14 +3884,47 @@ describe( 'state', () => {
 			} );
 			state = blocks( state, {
 				type: 'SET_BLOCK_EDITING_MODE',
-				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+				clientId: 'template-part-1',
 				mode: 'contentOnly',
 			} );
-			const newState = blocks( state, {
-				type: 'RESET_BLOCKS',
-				blocks: [],
+			state = blocks( state, {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: 'template-part-2',
+				mode: 'contentOnly',
 			} );
-			expect( newState.blockEditingModes ).toEqual( new Map() );
+			state = blocks( state, {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: 'paragraph-1',
+				mode: 'disabled',
+			} );
+			state = blocks( state, {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: 'paragraph-2',
+				mode: 'disabled',
+			} );
+
+			// Reset the template, keeping only one of the template parts.
+			state = blocks( state, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						name: 'core/template-part',
+						clientId: 'template-part-1',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+
+			// Check that the editing modes for valid blocks are preserved, and the
+			// editing modes for removed blocks are cleared.
+			expect( state.blockEditingModes ).toEqual(
+				new Map( [
+					[ '', 'disabled' ],
+					[ 'template-part-1', 'contentOnly' ],
+					[ 'paragraph-1', 'disabled' ],
+				] )
+			);
 		} );
 	} );
 
