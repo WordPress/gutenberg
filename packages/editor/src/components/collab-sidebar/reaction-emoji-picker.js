@@ -40,6 +40,8 @@ export function useReactionEmojis() {
 			return;
 		}
 
+		let isMounted = true;
+
 		if ( ! fetchPromise ) {
 			fetchPromise = apiFetch( {
 				path: '/wp/v2/comments',
@@ -61,8 +63,14 @@ export function useReactionEmojis() {
 		}
 
 		fetchPromise.then( () => {
-			setEmojis( cachedEmojis );
+			if ( isMounted ) {
+				setEmojis( cachedEmojis );
+			}
 		} );
+
+		return () => {
+			isMounted = false;
+		};
 	}, [] );
 
 	return emojis;

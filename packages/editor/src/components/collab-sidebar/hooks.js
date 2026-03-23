@@ -539,58 +539,68 @@ export function useNoteActions( reactionsMap = {} ) {
 		}
 	};
 
-	const onToggleReaction = async ( { commentId, emoji } ) => {
-		try {
-			// Get current user from the store.
-			const currentUser =
-				registry.select( coreStore ).getCurrentUser() || {};
-			const userId = currentUser.id;
+	const onToggleReaction = useCallback(
+		async ( { commentId, emoji } ) => {
+			try {
+				// Get current user from the store.
+				const currentUser =
+					registry.select( coreStore ).getCurrentUser() || {};
+				const userId = currentUser.id;
 
-			// Check if the user already reacted with this emoji.
-			const noteReactions = reactionsMap[ commentId ] || {};
-			const emojiReactions = noteReactions[ emoji ] || [];
-			const existingReaction = emojiReactions.find(
-				( reaction ) => reaction.userId === userId
-			);
-
-			if ( existingReaction ) {
-				// Remove the reaction by deleting the comment record.
-				await deleteEntityRecord(
-					'root',
-					'comment',
-					existingReaction.reactionId,
-					undefined,
-					{ throwOnError: true }
+				// Check if the user already reacted with this emoji.
+				const noteReactions = reactionsMap[ commentId ] || {};
+				const emojiReactions = noteReactions[ emoji ] || [];
+				const existingReaction = emojiReactions.find(
+					( reaction ) => reaction.userId === userId
 				);
 
-				createNotice( 'snackbar', __( 'Reaction removed.' ), {
-					type: 'snackbar',
-					isDismissible: true,
-				} );
-			} else {
-				// Add a new reaction as a comment record.
-				await saveEntityRecord(
-					'root',
-					'comment',
-					{
-						post: getCurrentPostId(),
-						type: 'reaction',
-						parent: commentId,
-						content: emoji,
-						status: 'approve',
-					},
-					{ throwOnError: true }
-				);
+				if ( existingReaction ) {
+					// Remove the reaction by deleting the comment record.
+					await deleteEntityRecord(
+						'root',
+						'comment',
+						existingReaction.reactionId,
+						undefined,
+						{ throwOnError: true }
+					);
 
-				createNotice( 'snackbar', __( 'Reaction added.' ), {
-					type: 'snackbar',
-					isDismissible: true,
-				} );
+					createNotice( 'snackbar', __( 'Reaction removed.' ), {
+						type: 'snackbar',
+						isDismissible: true,
+					} );
+				} else {
+					// Add a new reaction as a comment record.
+					await saveEntityRecord(
+						'root',
+						'comment',
+						{
+							post: getCurrentPostId(),
+							type: 'reaction',
+							parent: commentId,
+							content: emoji,
+							status: 'approve',
+						},
+						{ throwOnError: true }
+					);
+
+					createNotice( 'snackbar', __( 'Reaction added.' ), {
+						type: 'snackbar',
+						isDismissible: true,
+					} );
+				}
+			} catch ( error ) {
+				onError( error );
 			}
-		} catch ( error ) {
-			onError( error );
-		}
-	};
+		},
+		[
+			reactionsMap,
+			registry,
+			deleteEntityRecord,
+			saveEntityRecord,
+			getCurrentPostId,
+			createNotice,
+		]
+	);
 
 	return {
 		onCreate,
