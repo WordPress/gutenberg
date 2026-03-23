@@ -42,7 +42,10 @@ function ConnectorsPage() {
 		[]
 	);
 
-	const isEmpty = connectors.length === 0;
+	const renderableConnectors = connectors.filter(
+		( connector: ConnectorConfig ) => connector.render
+	);
+	const isEmpty = renderableConnectors.length === 0;
 
 	return (
 		<Page

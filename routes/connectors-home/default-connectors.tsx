@@ -28,7 +28,7 @@ interface ConnectorData {
 	name: string;
 	description: string;
 	logoUrl?: string;
-	type: 'ai_provider';
+	type: string;
 	plugin?: {
 		slug: string;
 		isInstalled: boolean;
@@ -231,28 +231,26 @@ function ApiKeyConnector( {
 export function registerDefaultConnectors() {
 	const connectors = getConnectorData();
 
-	const sanitize = ( s: string ) => s.replace( /[^a-z0-9-]/gi, '-' );
+	const sanitize = ( s: string ) => s.replace( /[^a-z0-9-_]/gi, '-' );
 
 	for ( const [ connectorId, data ] of Object.entries( connectors ) ) {
 		const { authentication } = data;
 
-		if (
-			data.type !== 'ai_provider' ||
-			authentication.method !== 'api_key'
-		) {
-			continue;
-		}
-
-		const connectorName = `${ sanitize( data.type ) }/${ sanitize(
-			connectorId
-		) }`;
-		registerConnector( connectorName, {
+		const connectorName = sanitize( connectorId );
+		const args: Partial< Omit< ConnectorConfig, 'slug' > > = {
 			name: data.name,
 			description: data.description,
 			logo: getConnectorLogo( connectorId, data.logoUrl ),
 			authentication,
 			plugin: data.plugin,
-			render: ApiKeyConnector,
-		} );
+		};
+		if (
+			data.type === 'ai_provider' &&
+			authentication.method === 'api_key'
+		) {
+			args.render = ApiKeyConnector;
+		}
+
+		registerConnector( connectorName, args );
 	}
 }

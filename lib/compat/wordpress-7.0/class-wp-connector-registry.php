@@ -56,7 +56,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 * @since 7.0.0
 		 *
 		 * @param string $id   The unique connector identifier. Must contain only lowercase
-		 *                     alphanumeric characters and underscores.
+		 *                     alphanumeric characters, hyphens, and underscores.
 		 * @param array  $args {
 		 *     An associative array of arguments for the connector.
 		 *
@@ -82,11 +82,11 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 * @phpstan-return Connector|null
 		 */
 		public function register( string $id, array $args ): ?array {
-			if ( ! preg_match( '/^[a-z0-9_]+$/', $id ) ) {
+			if ( ! preg_match( '/^[a-z0-9_-]+$/', $id ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					__(
-						'Connector ID must contain only lowercase alphanumeric characters and underscores.'
+						'Connector ID must contain only lowercase alphanumeric characters, hyphens, and underscores.'
 					),
 					'7.0.0'
 				);
@@ -161,7 +161,8 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				if ( ! empty( $args['authentication']['credentials_url'] ) && is_string( $args['authentication']['credentials_url'] ) ) {
 					$connector['authentication']['credentials_url'] = $args['authentication']['credentials_url'];
 				}
-				$connector['authentication']['setting_name'] = "connectors_ai_{$id}_api_key";
+				$sanitized_id                                = str_replace( '-', '_', $id );
+				$connector['authentication']['setting_name'] = "connectors_ai_{$sanitized_id}_api_key";
 			}
 
 			if ( ! empty( $args['plugin'] ) && is_array( $args['plugin'] ) ) {
