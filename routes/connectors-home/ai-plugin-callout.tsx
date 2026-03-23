@@ -188,16 +188,16 @@ export function AiPluginCallout() {
 	const getMessage = () => {
 		if ( isJustConnected ) {
 			return __(
-				'The <strong>AI plugin</strong> is ready to use. You can use it to generate featured images, alt text, titles, excerpts and more.'
+				'The <strong>AI plugin</strong> is ready to use. You can use it to generate featured images, alt text, titles, excerpts and more. <a>Learn more</a>'
 			);
 		}
 		if ( isActiveNoProvider ) {
 			return __(
-				'The <strong>AI plugin</strong> is installed. Connect a provider below to generate featured images, alt text, titles, excerpts, and more.'
+				'The <strong>AI plugin</strong> is installed. Connect a provider below to generate featured images, alt text, titles, excerpts, and more. <a>Learn more</a>'
 			);
 		}
 		return __(
-			'The <strong>AI plugin</strong> can use your connectors to generate featured images, alt text, titles, excerpts and more.'
+			'The <strong>AI plugin</strong> can use your connectors to generate featured images, alt text, titles, excerpts and more. <a>Learn more</a>'
 		);
 	};
 
@@ -227,6 +227,11 @@ export function AiPluginCallout() {
 				<p>
 					{ createInterpolateElement( getMessage(), {
 						strong: <strong />,
+						a: (
+							<ExternalLink href={ AI_PLUGIN_URL }>
+								{ __( 'Learn more' ) }
+							</ExternalLink>
+						),
 					} ) }
 				</p>
 				<div className="ai-plugin-callout__actions">
@@ -252,9 +257,6 @@ export function AiPluginCallout() {
 							{ __( 'Enable features in the AI plugin' ) }
 						</Button>
 					) }
-					<ExternalLink href={ AI_PLUGIN_URL }>
-						{ __( 'Learn more' ) }
-					</ExternalLink>
 				</div>
 			</div>
 			<WpLogoDecoration />
