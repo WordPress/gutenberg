@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `ComboboxControl`: Fix accessible association of `help` text with the combobox input ([#76761](https://github.com/WordPress/gutenberg/pull/76761)).
 -   `CustomGradientPicker`: Add state persistence when switching between Linear and Radial Gradient ([#76595](https://github.com/WordPress/gutenberg/pull/76595)).
 
 ## 32.4.0 (2026-03-18)
