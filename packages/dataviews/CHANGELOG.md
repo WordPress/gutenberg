@@ -42,6 +42,10 @@
 - DataViews: Field's description can accept ReactElements. [#76829](https://github.com/WordPress/gutenberg/pull/76829)
 - DataForm: Use `CollapsibleCard.HeaderDescription` for card layout header descriptions instead of manual `aria-describedby`. [#76867](https://github.com/WordPress/gutenberg/pull/76867)
 
+### Bug Fixes
+
+- DataViews: Fix link styling in table layout when the title field itself is a link element. [#73489](https://github.com/WordPress/gutenberg/pull/73489)
+
 ## 13.1.0 (2026-03-18)
 
 ### Enhancements
@@ -53,7 +57,6 @@
 
 ### Bug Fixes
 
-- DataViews: Fix link styling in table layout when the title field itself is a link element. [#73489](https://github.com/WordPress/gutenberg/pull/73489)
 - DataViews: Fix last column classname in table layout. [#76133](https://github.com/WordPress/gutenberg/pull/76133)
 - DataViews: Add spinner in DataViewsLayout in initial load of data. [#76486](https://github.com/WordPress/gutenberg/pull/76486)
 - DataForm: Properly handle dates in datetime control. [#76193](https://github.com/WordPress/gutenberg/pull/76193)
