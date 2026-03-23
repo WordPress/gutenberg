@@ -24,7 +24,7 @@ import { closeSmall } from '@wordpress/icons';
 import { InputWrapperFlex } from './styles';
 import TokenInput from '../form-token-field/token-input';
 import SuggestionsList from '../form-token-field/suggestions-list';
-import BaseControl from '../base-control';
+import BaseControl, { useBaseControlProps } from '../base-control';
 import Button from '../button';
 import { FlexBlock } from '../flex';
 import withFocusOutside from '../higher-order/with-focus-outside';
@@ -145,6 +145,16 @@ function ComboboxControl( props: ComboboxControlProps ) {
 	// duplicate input IDs when rendering this component and `FormTokenField`
 	// in the same page (see https://github.com/WordPress/gutenberg/issues/42112).
 	const instanceId = useInstanceId( ComboboxControl, 'combobox-control' );
+	const {
+		baseControlProps,
+		controlProps: { 'aria-describedby': helpDescriptionId },
+	} = useBaseControlProps( {
+		id: `components-form-token-input-${ instanceId }`,
+		label,
+		hideLabelFromVision,
+		help,
+		className: clsx( className, 'components-combobox-control' ),
+	} );
 	const [ selectedSuggestion, setSelectedSuggestion ] = useState(
 		currentOption || null
 	);
@@ -327,13 +337,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<DetectOutside onFocusOutside={ onFocusOutside }>
-			<BaseControl
-				className={ clsx( className, 'components-combobox-control' ) }
-				label={ label }
-				id={ `components-form-token-input-${ instanceId }` }
-				hideLabelFromVision={ hideLabelFromVision }
-				help={ help }
-			>
+			<BaseControl { ...baseControlProps }>
 				<div
 					className="components-combobox-control__suggestions-container"
 					tabIndex={ -1 }
@@ -358,6 +362,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 									matchingSuggestions
 								) }
 								onChange={ onInputChange }
+								aria-describedby={ helpDescriptionId }
 							/>
 						</FlexBlock>
 						{ isLoading && <Spinner /> }

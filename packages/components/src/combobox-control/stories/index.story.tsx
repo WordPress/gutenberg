@@ -90,6 +90,7 @@ Default.args = {
 	__next40pxDefaultSize: true,
 	label: 'Select a country',
 	options: countryOptions,
+	help: 'Select the country you currently reside in.',
 };
 
 /**
