@@ -74,7 +74,15 @@ async function getVips(): Promise< typeof Vips > {
 		},
 	} );
 
-	return await vipsPromise;
+	const vipsInstance = await vipsPromise;
+
+	// Disable the operation cache to prevent out-of-memory crashes
+	// during repeated image processing. libvips caches results from
+	// previous operations which accumulates WASM memory over time.
+	// See https://github.com/WordPress/gutenberg/issues/76706
+	vipsInstance.Cache.max( 0 );
+
+	return vipsInstance;
 }
 
 /**
