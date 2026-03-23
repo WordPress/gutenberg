@@ -264,7 +264,7 @@ export function AiPluginCallout() {
 							page: AI_PLUGIN_SLUG,
 						} ) }
 					>
-						{ __( 'Enable features in the AI plugin' ) }
+						{ __( 'Control features in the AI plugin' ) }
 					</Button>
 				) }
 			</div>
