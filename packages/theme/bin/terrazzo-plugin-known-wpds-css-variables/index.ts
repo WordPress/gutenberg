@@ -56,7 +56,7 @@ export default function pluginKnownWpdsCssVariables( {
 					tokenEntry.modes = {
 						default: {
 							$value: token.token.$value,
-							css: token.value,
+							css: token.value as string,
 						},
 					};
 				}
