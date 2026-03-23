@@ -49,9 +49,11 @@ export function useReactionEmojis() {
 			} )
 				.then( ( response ) => {
 					const schemaEmojis =
-						response?.schema?.properties?.reaction_emojis
-							?.default;
-					if ( Array.isArray( schemaEmojis ) && schemaEmojis.length ) {
+						response?.schema?.properties?.reaction_emojis?.default;
+					if (
+						Array.isArray( schemaEmojis ) &&
+						schemaEmojis.length
+					) {
 						cachedEmojis = schemaEmojis;
 					} else {
 						cachedEmojis = REACTION_EMOJIS;
