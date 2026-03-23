@@ -26,6 +26,7 @@ import type {
 	ObjectID,
 	ObjectData,
 	ObjectType,
+	MapEvent,
 	ProviderCreator,
 	RecordHandlers,
 	SyncConfig,
@@ -183,8 +184,8 @@ export function createSyncManager( debug = false ): SyncManager {
 		};
 
 		const ydoc = createYjsDoc( { objectType } );
-		const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
-		const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+		const recordMap = ydoc.get( CRDT_RECORD_MAP_KEY );
+		const stateMap = ydoc.get( CRDT_STATE_MAP_KEY );
 		const now = Date.now();
 
 		// Clean up providers and in-memory state when the entity is unloaded.
@@ -204,7 +205,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		// When the CRDT document is updated by an UndoManager or a connection (not
 		// a local origin), update the local store.
 		const onRecordUpdate = (
-			_events: Y.YEvent< any >[],
+			_event: MapEvent,
 			transaction: Y.Transaction
 		): void => {
 			if (
@@ -218,17 +219,17 @@ export function createSyncManager( debug = false ): SyncManager {
 		};
 
 		const onStateMapUpdate = (
-			event: Y.YMapEvent< unknown >,
+			event: MapEvent,
 			transaction: Y.Transaction
 		) => {
 			if ( transaction.local ) {
 				return;
 			}
 
-			event.keysChanged.forEach( ( key ) => {
+			event.keysChanged.forEach( ( key: string ) => {
 				switch ( key ) {
 					case SAVED_AT_KEY:
-						const newValue = stateMap.get( SAVED_AT_KEY );
+						const newValue = stateMap.getAttr( SAVED_AT_KEY );
 						if ( 'number' === typeof newValue && newValue > now ) {
 							// Another peer has saved the record. Refetch it so that we have
 							// a correct understanding of our own unsaved edits.
@@ -320,7 +321,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		log( 'loadCollection', 'loading', entityId );
 
 		const ydoc = createYjsDoc( { collection: true, objectType } );
-		const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+		const stateMap = ydoc.get( CRDT_STATE_MAP_KEY );
 		const now = Date.now();
 
 		// Clean up providers and in-memory state when the entity is unloaded.
@@ -334,7 +335,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		};
 
 		const onStateMapUpdate = (
-			event: Y.YMapEvent< unknown >,
+			event: MapEvent,
 			transaction: Y.Transaction
 		) => {
 			if ( transaction.local ) {
@@ -344,7 +345,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			event.keysChanged.forEach( ( key ) => {
 				switch ( key ) {
 					case SAVED_AT_KEY:
-						const newValue = stateMap.get( SAVED_AT_KEY );
+						const newValue = stateMap.getAttr( SAVED_AT_KEY );
 						if ( 'number' === typeof newValue && newValue > now ) {
 							// Another peer has mutated the collection. Refetch it so that we
 							// obtain the updated records.

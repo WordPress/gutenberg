@@ -61,11 +61,11 @@ describe( 'utils', () => {
 	describe( 'initializeYjsDoc', () => {
 		it( 'sets the CRDT document version in the state map', () => {
 			const ydoc = new Y.Doc( {} );
-			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+			const stateMap = ydoc.get( CRDT_STATE_MAP_KEY );
 
 			initializeYjsDoc( ydoc );
 
-			expect( stateMap.get( VERSION_KEY ) ).toBe( CRDT_DOC_VERSION );
+			expect( stateMap.getAttr( VERSION_KEY ) ).toBe( CRDT_DOC_VERSION );
 		} );
 
 		it( 'advances the state vector when setting the version key', () => {
@@ -102,9 +102,9 @@ describe( 'utils', () => {
 
 			markEntityAsSaved( ydoc );
 
-			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-			const savedAt = stateMap.get( SAVED_AT_KEY ) as number;
-			const savedBy = stateMap.get( SAVED_BY_KEY );
+			const stateMap = ydoc.get( CRDT_STATE_MAP_KEY );
+			const savedAt = stateMap.getAttr( SAVED_AT_KEY ) as number;
+			const savedBy = stateMap.getAttr( SAVED_BY_KEY );
 
 			expect( savedAt ).toBeGreaterThanOrEqual( before );
 			expect( savedAt ).toBeLessThanOrEqual( Date.now() );
@@ -115,12 +115,12 @@ describe( 'utils', () => {
 			const ydoc = createYjsDoc();
 
 			markEntityAsSaved( ydoc );
-			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-			const firstSavedAt = stateMap.get( SAVED_AT_KEY ) as number;
+			const stateMap = ydoc.get( CRDT_STATE_MAP_KEY );
+			const firstSavedAt = stateMap.getAttr( SAVED_AT_KEY ) as number;
 
 			// Small delay to ensure timestamp changes.
 			markEntityAsSaved( ydoc );
-			const secondSavedAt = stateMap.get( SAVED_AT_KEY ) as number;
+			const secondSavedAt = stateMap.getAttr( SAVED_AT_KEY ) as number;
 
 			expect( secondSavedAt ).toBeGreaterThanOrEqual( firstSavedAt );
 		} );
@@ -134,9 +134,9 @@ describe( 'utils', () => {
 		} );
 
 		it( 'serializes a CRDT doc with data', () => {
-			const ymap = testDoc.getMap( 'testMap' );
-			ymap.set( 'title', 'Test Title' );
-			ymap.set( 'content', 'Test Content' );
+			const ymap = testDoc.get( 'testMap' );
+			ymap.setAttr( 'title', 'Test Title' );
+			ymap.setAttr( 'content', 'Test Content' );
 
 			const serialized = serializeCrdtDoc( testDoc );
 			const parsed = JSON.parse( serialized );
@@ -155,9 +155,9 @@ describe( 'utils', () => {
 			originalDoc = createYjsDoc();
 			initializeYjsDoc( originalDoc );
 
-			const ymap = originalDoc.getMap( 'testMap' );
-			ymap.set( 'title', 'Test Title' );
-			ymap.set( 'count', 42 );
+			const ymap = originalDoc.get( 'testMap' );
+			ymap.setAttr( 'title', 'Test Title' );
+			ymap.setAttr( 'count', 42 );
 			serialized = serializeCrdtDoc( originalDoc );
 		} );
 
@@ -166,9 +166,9 @@ describe( 'utils', () => {
 
 			expect( deserialized ).toBeInstanceOf( Y.Doc );
 
-			const ymap = deserialized!.getMap( 'testMap' );
-			expect( ymap.get( 'title' ) ).toBe( 'Test Title' );
-			expect( ymap.get( 'count' ) ).toBe( 42 );
+			const ymap = deserialized!.get( 'testMap' );
+			expect( ymap.getAttr( 'title' ) ).toBe( 'Test Title' );
+			expect( ymap.getAttr( 'count' ) ).toBe( 42 );
 		} );
 
 		it( 'marks the document as from persistence', () => {
@@ -219,33 +219,33 @@ describe( 'utils', () => {
 
 			expect( deserialized ).toBeInstanceOf( Y.Doc );
 
-			const stateMap = deserialized!.getMap( CRDT_STATE_MAP_KEY );
-			expect( stateMap.get( VERSION_KEY ) ).toBe( CRDT_DOC_VERSION );
+			const stateMap = deserialized!.get( CRDT_STATE_MAP_KEY );
+			expect( stateMap.getAttr( VERSION_KEY ) ).toBe( CRDT_DOC_VERSION );
 		} );
 	} );
 
 	describe( 'serialization round-trip', () => {
 		it( 'maintains data integrity through serialize/deserialize cycle', () => {
 			const originalDoc = createYjsDoc( {} );
-			const ymap = originalDoc.getMap( 'data' );
-			ymap.set( 'string', 'value' );
-			ymap.set( 'number', 123 );
-			ymap.set( 'boolean', true );
+			const ymap = originalDoc.get( 'data' );
+			ymap.setAttr( 'string', 'value' );
+			ymap.setAttr( 'number', 123 );
+			ymap.setAttr( 'boolean', true );
 
 			const serialized = serializeCrdtDoc( originalDoc );
 			const deserialized = deserializeCrdtDoc( serialized );
 
 			expect( deserialized ).not.toBeNull();
 
-			const deserializedMap = deserialized!.getMap( 'data' );
-			expect( deserializedMap.get( 'string' ) ).toBe( 'value' );
-			expect( deserializedMap.get( 'number' ) ).toBe( 123 );
-			expect( deserializedMap.get( 'boolean' ) ).toBe( true );
+			const deserializedMap = deserialized!.get( 'data' );
+			expect( deserializedMap.getAttr( 'string' ) ).toBe( 'value' );
+			expect( deserializedMap.getAttr( 'number' ) ).toBe( 123 );
+			expect( deserializedMap.getAttr( 'boolean' ) ).toBe( true );
 		} );
 
 		it( 'handles multiple serialize/deserialize cycles', () => {
 			const doc = createYjsDoc();
-			doc.getMap( 'test' ).set( 'value', 'original' );
+			doc.get( 'test' ).setAttr( 'value', 'original' );
 
 			// Cycle 1
 			let serialized = serializeCrdtDoc( doc );
@@ -258,7 +258,7 @@ describe( 'utils', () => {
 			expect( deserialized ).not.toBeNull();
 
 			// Verify data is still intact
-			expect( deserialized!.getMap( 'test' ).get( 'value' ) ).toBe(
+			expect( deserialized!.get( 'test' ).getAttr( 'value' ) ).toBe(
 				'original'
 			);
 		} );

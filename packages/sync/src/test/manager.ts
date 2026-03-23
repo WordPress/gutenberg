@@ -70,11 +70,11 @@ describe( 'SyncManager', () => {
 			applyChangesToCRDTDoc: jest.fn(),
 			getChangesFromCRDTDoc: jest.fn(
 				( ydoc: CRDTDoc, editedRecord: ObjectData ) => {
-					const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+					const ymap = ydoc.get( CRDT_RECORD_MAP_KEY );
 
 					// Simple deep equality check.
 					return Object.fromEntries(
-						Object.entries( ymap.toJSON() ).filter(
+						Object.entries( ymap.getAttrs() ).filter(
 							( [ key, newValue ] ) =>
 								! fun.equalityDeep(
 									editedRecord[ key ],
@@ -232,10 +232,10 @@ describe( 'SyncManager', () => {
 			): string {
 				const persistedDoc = new Y.Doc();
 				const persistedRecordMap =
-					persistedDoc.getMap( CRDT_RECORD_MAP_KEY );
+					persistedDoc.get( CRDT_RECORD_MAP_KEY );
 				Object.entries( persistedRecord ).forEach(
 					( [ key, value ] ) => {
-						persistedRecordMap.set( key, value );
+						persistedRecordMap.setAttr( key, value );
 					}
 				);
 
@@ -481,9 +481,9 @@ describe( 'SyncManager', () => {
 
 			// Verify that the record metadata was not updated.
 			const ydoc = capturedDoc as unknown as Y.Doc;
-			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-			expect( stateMap.get( SAVED_AT_KEY ) ).toBeUndefined();
-			expect( stateMap.get( SAVED_BY_KEY ) ).toBeUndefined();
+			const stateMap = ydoc.get( CRDT_STATE_MAP_KEY );
+			expect( stateMap.getAttr( SAVED_AT_KEY ) ).toBeUndefined();
+			expect( stateMap.getAttr( SAVED_BY_KEY ) ).toBeUndefined();
 		} );
 
 		it( 'does not update when entity is not loaded', async () => {
@@ -579,11 +579,11 @@ describe( 'SyncManager', () => {
 
 			// Verify that the record metadata was updated.
 			const ydoc = capturedDoc as unknown as Y.Doc;
-			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-			expect( stateMap.get( SAVED_AT_KEY ) ).toBeGreaterThanOrEqual(
+			const stateMap = ydoc.get( CRDT_STATE_MAP_KEY );
+			expect( stateMap.getAttr( SAVED_AT_KEY ) ).toBeGreaterThanOrEqual(
 				now
 			);
-			expect( stateMap.get( SAVED_BY_KEY ) ).toBe( ydoc.clientID );
+			expect( stateMap.getAttr( SAVED_BY_KEY ) ).toBe( ydoc.clientID );
 		} );
 	} );
 
@@ -614,8 +614,8 @@ describe( 'SyncManager', () => {
 			// Simulate a remote change.
 			const remoteDoc = new Y.Doc();
 			remoteDoc
-				.getMap( CRDT_RECORD_MAP_KEY )
-				.set( 'title', 'Title from remote peer' );
+				.get( CRDT_RECORD_MAP_KEY )
+				.setAttr( 'title', 'Title from remote peer' );
 			Y.applyUpdateV2(
 				capturedDoc as unknown as Y.Doc,
 				Y.encodeStateAsUpdateV2( remoteDoc )
@@ -655,14 +655,14 @@ describe( 'SyncManager', () => {
 			expect( capturedDoc ).not.toBeNull();
 			const ydoc = capturedDoc as unknown as Y.Doc;
 
-			const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+			const recordMap = ydoc.get( CRDT_RECORD_MAP_KEY );
 
 			// Clear previous calls
 			jest.clearAllMocks();
 
 			// Simulate a local update with sync manager origin
 			ydoc.transact( () => {
-				recordMap.set( 'title', 'Local Update' );
+				recordMap.setAttr( 'title', 'Local Update' );
 			} );
 
 			// Wait a tick.

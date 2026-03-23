@@ -19,7 +19,6 @@ interface StackItemEvent {
 	stackItem: { meta: Map< any, any > };
 	origin: any;
 	type: 'undo' | 'redo';
-	changedParentTypes: Map< Y.AbstractType< any >, Y.YEvent< any >[] >;
 	ydoc: Y.Doc;
 }
 
@@ -60,13 +59,13 @@ export function createUndoManager(): SyncUndoManager {
 		/**
 		 * Add a Yjs map to the scope of the undo manager.
 		 *
-		 * @param {Y.Map< any >} ymap                     The Yjs map to add to the scope.
-		 * @param                handlers
-		 * @param                handlers.addUndoMeta
-		 * @param                handlers.restoreUndoMeta
+		 * @param {Y.Type} ymap                     The Yjs map to add to the scope.
+		 * @param          handlers
+		 * @param          handlers.addUndoMeta
+		 * @param          handlers.restoreUndoMeta
 		 */
 		addToScope(
-			ymap: Y.Map< any >,
+			ymap: Y.Type,
 			handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
 		): void {
 			if ( ymap.doc === null ) {

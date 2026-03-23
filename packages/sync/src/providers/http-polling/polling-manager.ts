@@ -206,6 +206,7 @@ function processAwarenessUpdate(
 				// Left blank on purpose, as the removal of clients is handled in the if condition below.
 				removed: [],
 			},
+			POLLING_MANAGER_ORIGIN,
 		] );
 	}
 
