@@ -14,7 +14,7 @@ function gutenberg_password_form_7_1( $content ) {
 	$processor = new WP_HTML_Tag_Processor( $content );
 
 	while ( $processor->next_tag( 'input' ) ) {
-		if ( 'submit' === $processor->get_attribute( 'type' )) {
+		if ( 'submit' === $processor->get_attribute( 'type' ) ) {
 			$processor->add_class( 'wp-block-button__link' );
 			$processor->add_class( wp_theme_get_element_class_name( 'button' ) );
 			$content = $processor->get_updated_html();
