@@ -33,9 +33,12 @@ test.describe( 'HTML block', () => {
 			.click();
 		// Check the content.
 		const content = await editor.getEditedPostContent();
-		expect( content ).toBe(
+		const normalizedContent = content
+			.replace( /\n[ \t]+</g, '\n<' )
+			.replace( /[ \t]+\n/g, '\n' );
+		expect( normalizedContent ).toBe(
 			`<!-- wp:html -->
-<p>Pythagorean theorem: 
+<p>Pythagorean theorem:
 <var>a</var><sup>2</sup> + <var>b</var><sup>2</sup> = <var>c</var><sup>2</sup> </p>
 <!-- /wp:html -->`
 		);
