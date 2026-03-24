@@ -85,7 +85,7 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			editor2.canvas.locator( '[data-type="core/heading"]' ),
 			'Heading edited by B'
 		);
-		// Change heading level to H3 via data API (toolbar is unreliable in iframe context).
+		// Change heading level to H3 via data API
 		await page2.evaluate( () => {
 			const blocks = window.wp.data
 				.select( 'core/block-editor' )
@@ -111,57 +111,37 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			'const y = 2;'
 		);
 
-		// Preformatted: use data API (RichText contenteditable not reliably selectable in iframe).
-		await page2.evaluate( () => {
-			const blocks = window.wp.data
-				.select( 'core/block-editor' )
-				.getBlocks();
-			const pre = blocks.find(
-				( b: { name: string } ) => b.name === 'core/preformatted'
-			);
-			if ( pre ) {
-				window.wp.data
-					.dispatch( 'core/block-editor' )
-					.updateBlockAttributes( pre.clientId, {
-						content: 'preformatted edited by B',
-					} );
-			}
-		} );
+		// Preformatted: click, select all, type.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator( '[data-type="core/preformatted"]' ),
+			'preformatted edited by B'
+		);
 
-		// Verse: use data API (blocks below fold not reliably clickable in iframe).
-		await page2.evaluate( () => {
-			const blocks = window.wp.data
-				.select( 'core/block-editor' )
-				.getBlocks();
-			const verse = blocks.find(
-				( b: { name: string } ) => b.name === 'core/verse'
-			);
-			if ( verse ) {
-				window.wp.data
-					.dispatch( 'core/block-editor' )
-					.updateBlockAttributes( verse.clientId, {
-						content: 'violets are blue',
-					} );
-			}
-		} );
+		// Verse: click, select all, type.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator( '[data-type="core/verse"]' ),
+			'violets are blue'
+		);
 
-		// Pullquote: use data API for both value and citation.
-		await page2.evaluate( () => {
-			const blocks = window.wp.data
-				.select( 'core/block-editor' )
-				.getBlocks();
-			const pullquote = blocks.find(
-				( b: { name: string } ) => b.name === 'core/pullquote'
-			);
-			if ( pullquote ) {
-				window.wp.data
-					.dispatch( 'core/block-editor' )
-					.updateBlockAttributes( pullquote.clientId, {
-						value: 'Edited quote',
-						citation: 'Author B',
-					} );
-			}
-		} );
+		// Pullquote: click into quote text, select all, type.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/pullquote"] blockquote p'
+			),
+			'Edited quote'
+		);
+
+		// Pullquote: click into citation, select all, type.
+		await clearAndType(
+			page2,
+			editor2.canvas.locator(
+				'[data-type="core/pullquote"] .wp-block-pullquote__citation'
+			),
+			'Author B'
+		);
 
 		// User A verifies all modifications synced.
 		await expect
@@ -198,6 +178,13 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 					},
 				},
 			] );
+
+		// Verify both users have identical final block state.
+		const blocksA = await editor.getBlocks();
+		const blocksB = await editor2.getBlocks();
+		expect( stripClientIds( blocksA ) ).toEqual(
+			stripClientIds( blocksB )
+		);
 	} );
 
 	test( 'Container blocks sync modifications between users', async ( {
@@ -539,6 +526,13 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 					],
 				},
 			] );
+
+		// Verify both users have identical final block state.
+		const blocksA = await editor.getBlocks();
+		const blocksB = await editor2.getBlocks();
+		expect( stripClientIds( blocksA ) ).toEqual(
+			stripClientIds( blocksB )
+		);
 	} );
 
 	test( 'Media, embed, and utility blocks sync modifications between users', async ( {
@@ -705,7 +699,7 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			}
 		} );
 
-		// HTML: edit via data API (HTML block uses a modal editor, not inline).
+		// HTML: edit via data API
 		await page2.evaluate( () => {
 			const blocks = window.wp.data
 				.select( 'core/block-editor' )
@@ -795,6 +789,13 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 					attributes: { customText: 'Read more B' },
 				},
 			] );
+
+		// Verify both users have identical final block state.
+		const blocksA = await editor.getBlocks();
+		const blocksB = await editor2.getBlocks();
+		expect( stripClientIds( blocksA ) ).toEqual(
+			stripClientIds( blocksB )
+		);
 	} );
 
 	test( 'Widget and dynamic blocks sync modifications between users', async ( {
@@ -1108,5 +1109,28 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 					attributes: { height: '200px' },
 				},
 			] );
+
+		// Verify both users have identical final block state.
+		const blocksA = await editor.getBlocks();
+		const blocksB = await editor2.getBlocks();
+		expect( stripClientIds( blocksA ) ).toEqual(
+			stripClientIds( blocksB )
+		);
 	} );
 } );
+
+/**
+ * Strip clientIds from block trees so two editors' blocks can be compared
+ * structurally, ignoring the per-session identifiers.
+ *
+ * @param blocks
+ */
+function stripClientIds(
+	blocks: Record< string, unknown >[]
+): Record< string, unknown >[] {
+	return JSON.parse(
+		JSON.stringify( blocks, ( key, value ) =>
+			key === 'clientId' ? undefined : value
+		)
+	);
+}
