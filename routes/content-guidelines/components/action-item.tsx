@@ -12,7 +12,7 @@ import {
 } from '@wordpress/components';
 
 interface ActionProps {
-	slug: string;
+	slug: 'import' | 'export' | 'revert';
 	title: string;
 	description: string;
 	buttonLabel: string;
@@ -21,6 +21,7 @@ interface ActionProps {
 	disabled?: boolean;
 	isBusy?: boolean;
 }
+
 export default function ActionItem( {
 	slug,
 	title,
