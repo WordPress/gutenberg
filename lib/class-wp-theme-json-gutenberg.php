@@ -278,6 +278,7 @@ class WP_Theme_JSON_Gutenberg {
 		'color'                             => array( 'color', 'text' ),
 		'text-align'                        => array( 'typography', 'textAlign' ),
 		'column-count'                      => array( 'typography', 'textColumns' ),
+		'column-width'                      => array( 'typography', 'textColumnMinWidth' ),
 		'font-family'                       => array( 'typography', 'fontFamily' ),
 		'font-size'                         => array( 'typography', 'fontSize' ),
 		'font-style'                        => array( 'typography', 'fontStyle' ),

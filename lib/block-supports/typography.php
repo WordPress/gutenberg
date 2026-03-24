@@ -159,6 +159,10 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		$typography_block_styles['textColumns'] = $block_attributes['style']['typography']['textColumns'] ?? null;
 	}
 
+	if ( $has_text_columns_support && ! $should_skip_text_columns && isset( $block_attributes['style']['typography']['textColumnMinWidth'] ) ) {
+		$typography_block_styles['textColumnMinWidth'] = $block_attributes['style']['typography']['textColumnMinWidth'] ?? null;
+	}
+
 	if ( $has_text_decoration_support && ! $should_skip_text_decoration && isset( $block_attributes['style']['typography']['textDecoration'] ) ) {
 		$typography_block_styles['textDecoration'] =
 			gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['textDecoration'], 'text-decoration' );
