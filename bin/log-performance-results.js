@@ -24,6 +24,10 @@ const resultsFiles = [
 		file: 'front-end-classic-theme.performance-results.json',
 		metricsPrefix: 'classic-theme-',
 	},
+	{
+		file: 'media-processing.performance-results.json',
+		metricsPrefix: 'media-',
+	},
 ];
 
 const performanceResults = resultsFiles.map( ( { file } ) =>
