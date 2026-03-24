@@ -151,7 +151,7 @@ function gutenberg_strip_custom_css_from_blocks( $content ) {
 	$unslashed = wp_unslash( $content );
 
 	// Fast check: if no "css" key anywhere, skip parsing entirely.
-	if ( false === strpos( $unslashed, '"css"' ) ) {
+	if ( ! str_contains( $unslashed, '"css"' ) ) {
 		return $content;
 	}
 
@@ -189,10 +189,6 @@ function gutenberg_strip_custom_css_from_blocks( $content ) {
 		$token_string   = substr( $unslashed, $start_offset, $token_length );
 		$json_rel_start = strcspn( $token_string, '{' );
 		$json_rel_end   = strrpos( $token_string, '}' );
-
-		if ( false === $json_rel_end || $json_rel_start >= $json_rel_end ) {
-			continue;
-		}
 
 		$json_start  = $start_offset + $json_rel_start;
 		$json_length = $json_rel_end - $json_rel_start + 1;
