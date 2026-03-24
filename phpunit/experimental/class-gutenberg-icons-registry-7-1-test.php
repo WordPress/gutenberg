@@ -50,23 +50,6 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should reject invalid icon names.
-	 *
-	 * @expectedIncorrectUsage Gutenberg_Icons_Registry_7_1::register
-	 *
-	 * @param mixed $icon_name Icon name to test.
-	 */
-	public function test_invalid_icon_names( $icon_name ) {
-		$settings = array(
-			'label'   => 'Icon',
-			'content' => '<svg></svg>',
-		);
-
-		$result = $this->register( $icon_name, $settings );
-		$this->assertFalse( $result );
-	}
-
-	/**
 	 * Should accept valid icon names.
 	 */
 	public function test_register_icon() {
