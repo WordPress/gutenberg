@@ -107,8 +107,8 @@ function UploadFonts() {
 	const loadFiles = async ( files: File[] ) => {
 		const fontFacesLoaded = await Promise.all(
 			files.map( async ( fontFile: File ) => {
-				const { fontDisplayName, ...metadata } =
-					await getFontFaceMetadata( fontFile );
+				const fontFaceMetadata = await getFontFaceMetadata( fontFile );
+				const { fontDisplayName, ...metadata } = fontFaceMetadata;
 				await loadFontFaceInBrowser(
 					{
 						...metadata,
@@ -118,7 +118,7 @@ function UploadFonts() {
 					fontFile,
 					'all'
 				);
-				return metadata;
+				return fontFaceMetadata;
 			} )
 		);
 		handleInstall( fontFacesLoaded );
