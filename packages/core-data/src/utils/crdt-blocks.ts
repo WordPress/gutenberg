@@ -30,7 +30,7 @@ import {
 	type YText,
 } from './crdt-utils';
 import { getCachedRichTextData } from './crdt-text';
-import { Delta } from '../sync';
+import { diffStringsToLib0Delta } from '../sync';
 
 interface BlockAttributes {
 	[ key: string ]: unknown;
@@ -869,29 +869,12 @@ export function mergeRichTextUpdate(
 	// string updates; we get the new full string value on each change, even when
 	// only a single character changed.
 	//
-	// The code below allows us to compute a delta between the current and new
-	// value, then apply it to the Y.Type.
-
-	const currentValueAsDelta = new Delta().insert(
-		yTextToString( blockYText )
-	);
-	const updatedValueAsDelta = new Delta().insert( updatedValue );
-	const deltaDiff = currentValueAsDelta.diffWithCursor(
-		updatedValueAsDelta,
+	// diffStringsToLib0Delta computes a cursor-aware delta between the current
+	// and new value.  Y.Type.applyDelta natively accepts lib0 deltas.
+	const diffDelta = diffStringsToLib0Delta(
+		yTextToString( blockYText ),
+		updatedValue,
 		cursorPosition
 	);
-
-	// Apply the quill-delta ops using Y.Type's insert/delete methods directly,
-	// since v14's applyDelta expects lib0 delta format, not quill-delta ops.
-	let index = 0;
-	for ( const op of deltaDiff.ops ) {
-		if ( op.retain !== undefined ) {
-			index += op.retain;
-		} else if ( typeof op.insert === 'string' ) {
-			blockYText.insert( index, op.insert );
-			index += op.insert.length;
-		} else if ( op.delete !== undefined ) {
-			blockYText.delete( index, op.delete );
-		}
-	}
+	blockYText.applyDelta( diffDelta );
 }

@@ -14,7 +14,7 @@ import { unlock } from './lock-unlock';
 const {
 	ConnectionErrorCode,
 	createSyncManager,
-	Delta,
+	diffStringsToLib0Delta,
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_RECORD_MAP_KEY,
 	LOCAL_EDITOR_ORIGIN,
@@ -24,7 +24,7 @@ const {
 
 export {
 	ConnectionErrorCode,
-	Delta,
+	diffStringsToLib0Delta,
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_RECORD_MAP_KEY,
 	LOCAL_EDITOR_ORIGIN,
