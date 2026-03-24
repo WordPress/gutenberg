@@ -90,10 +90,19 @@
 	outline: var(--_gcd-div-outline, 0);
 }
 
-.p {
+/* Narrowed down to p elements only, to support element multiplicity of Text component. */
+p.p {
 	font-size: var(--_gcd-p-font-size, 13px);
 	line-height: var(--_gcd-p-line-height, 1.5);
 	margin: var(--_gcd-p-margin, 1em 0);
+}
+
+/* Narrowed down to h[1-6] elements only, to support element multiplicity of Text component. */
+:is(h1, h2, h3, h4, h5, h6).heading {
+	color: var(--_gcd-heading-color, var(--wpds-color-fg-content-neutral));
+	font-size: var(--_gcd-heading-font-size, inherit);
+	font-weight: var(--_gcd-heading-font-weight, var(--wpds-font-weight-medium));
+	margin: var(--_gcd-heading-margin, 0);
 }
 
 .a,

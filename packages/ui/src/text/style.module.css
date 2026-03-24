@@ -2,6 +2,8 @@
 
 @layer wp-ui-components {
 	.heading-2xl {
+		--_gcd-heading-font-size: var(--wpds-font-size-2xl);
+
 		font-family: var(--wpds-font-family-heading);
 		font-size: var(--wpds-font-size-2xl);
 		line-height: var(--wpds-font-line-height-2xl);
@@ -9,6 +11,8 @@
 	}
 
 	.heading-xl {
+		--_gcd-heading-font-size: var(--wpds-font-size-xl);
+
 		font-family: var(--wpds-font-family-heading);
 		font-size: var(--wpds-font-size-xl);
 		line-height: var(--wpds-font-line-height-md);
@@ -16,6 +20,8 @@
 	}
 
 	.heading-lg {
+		--_gcd-heading-font-size: var(--wpds-font-size-lg);
+
 		font-family: var(--wpds-font-family-heading);
 		font-size: var(--wpds-font-size-lg);
 		line-height: var(--wpds-font-line-height-sm);
@@ -23,6 +29,8 @@
 	}
 
 	.heading-md {
+		--_gcd-heading-font-size: var(--wpds-font-size-md);
+
 		font-family: var(--wpds-font-family-heading);
 		font-size: var(--wpds-font-size-md);
 		line-height: var(--wpds-font-line-height-sm);
@@ -30,6 +38,8 @@
 	}
 
 	.heading-sm {
+		--_gcd-heading-font-size: var(--wpds-font-size-xs);
+
 		font-family: var(--wpds-font-family-heading);
 		font-size: var(--wpds-font-size-xs);
 		line-height: var(--wpds-font-line-height-xs);
@@ -38,6 +48,9 @@
 	}
 
 	.body-xl {
+		--_gcd-p-font-size: var(--wpds-font-size-xl);
+		--_gcd-p-line-height: var(--wpds-font-line-height-xl);
+
 		font-family: var(--wpds-font-family-body);
 		font-size: var(--wpds-font-size-xl);
 		line-height: var(--wpds-font-line-height-xl);
@@ -45,6 +58,9 @@
 	}
 
 	.body-lg {
+		--_gcd-p-font-size: var(--wpds-font-size-lg);
+		--_gcd-p-line-height: var(--wpds-font-line-height-md);
+
 		font-family: var(--wpds-font-family-body);
 		font-size: var(--wpds-font-size-lg);
 		line-height: var(--wpds-font-line-height-md);
@@ -52,6 +68,9 @@
 	}
 
 	.body-md {
+		--_gcd-p-font-size: var(--wpds-font-size-md);
+		--_gcd-p-line-height: var(--wpds-font-line-height-sm);
+
 		font-family: var(--wpds-font-family-body);
 		font-size: var(--wpds-font-size-md);
 		line-height: var(--wpds-font-line-height-sm);
@@ -59,6 +78,9 @@
 	}
 
 	.body-sm {
+		--_gcd-p-font-size: var(--wpds-font-size-sm);
+		--_gcd-p-line-height: var(--wpds-font-line-height-xs);
+
 		font-family: var(--wpds-font-family-body);
 		font-size: var(--wpds-font-size-sm);
 		line-height: var(--wpds-font-line-height-xs);
