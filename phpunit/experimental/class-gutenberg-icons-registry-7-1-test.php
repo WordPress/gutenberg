@@ -97,7 +97,7 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 		return array(
 			'non-string name'      => array( 1 ),
 			'no namespace'         => array( 'plus' ),
-			'uppercase characters' => array( 'Core/Plus' ),
+			'uppercase characters' => array( 'Test/Plus' ),
 			'invalid characters'   => array( 'test/_doing_it_wrong' ),
 		);
 	}
