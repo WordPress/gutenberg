@@ -26,9 +26,17 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 	 */
 	public function tear_down() {
 		$instance_property = new ReflectionProperty( Gutenberg_Icons_Registry_7_1::class, 'instance' );
+
+		/*
+		 * ReflectionProperty::setAccessible is:
+		 * - redundant as of 8.1.0, which made all properties accessible
+		 * - deprecated as of 8.5.0
+		 * - needed until 8.1.0, as property `instance` is private
+		 */
 		if ( PHP_VERSION_ID < 80100 ) {
 			$instance_property->setAccessible( true );
 		}
+
 		$instance_property->setValue( null, null );
 
 		$this->registry = null;
@@ -44,9 +52,6 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 	 */
 	private function register( $icon_name, $icon_properties ) {
 		$method = new ReflectionMethod( $this->registry, 'register' );
-		if ( PHP_VERSION_ID < 80100 ) {
-			$instance_property->setAccessible( true );
-		}
 		return $method->invoke( $this->registry, $icon_name, $icon_properties );
 	}
 
