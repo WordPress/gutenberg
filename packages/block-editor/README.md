@@ -337,6 +337,10 @@ _Related_
 
 Use `ButtonBlockAppender` instead.
 
+### CodeEditor
+
+Undocumented declaration.
+
 ### ColorPalette
 
 Undocumented declaration.

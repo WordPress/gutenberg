@@ -1,0 +1,23 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.block-editor-code-editor__codemirror {
+	min-height: 120px;
+	border: $border-width solid $gray-600;
+	border-radius: $radius-small;
+	overflow: hidden;
+
+	.cm-editor {
+		height: 100%;
+	}
+
+	.cm-scroller {
+		font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+		line-height: 1.4;
+	}
+
+	.cm-focused {
+		outline: 2px solid var(--wp-admin-theme-color, #3858e9);
+		outline-offset: -2px;
+	}
+}
