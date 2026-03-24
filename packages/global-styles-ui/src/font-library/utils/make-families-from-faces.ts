@@ -2,33 +2,44 @@
  * WordPress dependencies
  */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
-import type { FontFamily, FontFace } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { normalizeCSSFontFaceFontFamily } from './index';
+import type { FontFileMetadata, FontFamilyToUpload } from '../types';
 
 const { kebabCase } = unlock( componentsPrivateApis );
 
 export default function makeFamiliesFromFaces(
-	fontFaces: FontFace[]
-): FontFamily[] {
-	const fontFamiliesObject = fontFaces.reduce(
-		( acc: Record< string, FontFamily >, item: FontFace ) => {
-			if ( ! acc[ item.fontFamily ] ) {
-				acc[ item.fontFamily ] = {
-					name: item.fontFamily,
-					fontFamily: item.fontFamily,
-					slug: kebabCase( item.fontFamily.toLowerCase() ),
+	faces: FontFileMetadata[]
+): FontFamilyToUpload[] {
+	const fontFamiliesObject = faces.reduce(
+		(
+			acc: Record< string, FontFamilyToUpload >,
+			item: FontFileMetadata
+		) => {
+			const cssFontFamily = normalizeCSSFontFaceFontFamily(
+				item.fontDisplayName
+			);
+			if ( ! acc[ item.fontDisplayName ] ) {
+				acc[ item.fontDisplayName ] = {
+					name: item.fontDisplayName,
+					fontFamily: cssFontFamily,
+					slug: kebabCase( item.fontDisplayName.toLowerCase() ),
 					fontFace: [],
 				};
 			}
-			// @ts-expect-error
-			acc[ item.fontFamily ].fontFace.push( item );
+			acc[ item.fontDisplayName ].fontFace!.push( {
+				fontFamily: cssFontFamily,
+				fontStyle: item.fontStyle,
+				fontWeight: item.fontWeight,
+				file: item.file,
+			} );
 			return acc;
 		},
 		{}
 	);
-	return Object.values( fontFamiliesObject ) as FontFamily[];
+	return Object.values( fontFamiliesObject );
 }

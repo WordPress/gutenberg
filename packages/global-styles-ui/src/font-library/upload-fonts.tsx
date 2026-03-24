@@ -13,7 +13,6 @@ import {
 	ProgressBar,
 } from '@wordpress/components';
 import { useContext, useState } from '@wordpress/element';
-import type { FontFace } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -22,7 +21,8 @@ import { ALLOWED_FILE_EXTENSIONS } from './utils/constants';
 import { FontLibraryContext } from './context';
 import { Font } from './lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
-import { loadFontFaceInBrowser } from './utils';
+import { loadFontFaceInBrowser, normalizeCSSFontFaceFontFamily } from './utils';
+import type { FontFileMetadata } from './types';
 
 function UploadFonts() {
 	const { installFonts } = useContext( FontLibraryContext );
@@ -107,13 +107,18 @@ function UploadFonts() {
 	const loadFiles = async ( files: File[] ) => {
 		const fontFacesLoaded = await Promise.all(
 			files.map( async ( fontFile: File ) => {
-				const fontFaceData = await getFontFaceMetadata( fontFile );
+				const { fontDisplayName, ...metadata } =
+					await getFontFaceMetadata( fontFile );
 				await loadFontFaceInBrowser(
-					fontFaceData,
-					fontFaceData.file,
+					{
+						...metadata,
+						fontFamily:
+							normalizeCSSFontFaceFontFamily( fontDisplayName ),
+					},
+					fontFile,
 					'all'
 				);
-				return fontFaceData;
+				return metadata;
 			} )
 		);
 		handleInstall( fontFacesLoaded );
@@ -146,7 +151,9 @@ function UploadFonts() {
 		} );
 	}
 
-	const getFontFaceMetadata = async ( fontFile: File ) => {
+	const getFontFaceMetadata = async (
+		fontFile: File
+	): Promise< FontFileMetadata > => {
 		const buffer = await readFileAsArrayBuffer( fontFile );
 		const fontObj: Font & {
 			onload?: ( val: { detail: { font: any } } ) => void;
@@ -158,7 +165,7 @@ function UploadFonts() {
 		);
 		const font = onloadEvent.detail.font;
 		const { name } = font.opentype.tables;
-		const fontName = name.get( 16 ) || name.get( 1 );
+		const fontDisplayName = name.get( 16 ) || name.get( 1 );
 		const isItalic = name.get( 2 ).toLowerCase().includes( 'italic' );
 		const fontWeight =
 			font.opentype.tables[ 'OS/2' ].usWeightClass || 'normal';
@@ -171,9 +178,10 @@ function UploadFonts() {
 		const weightRange = weightAxis
 			? `${ weightAxis.minValue } ${ weightAxis.maxValue }`
 			: null;
+
 		return {
 			file: fontFile,
-			fontFamily: fontName,
+			fontDisplayName,
 			fontStyle: isItalic ? 'italic' : 'normal',
 			fontWeight: weightRange || fontWeight,
 		};
@@ -185,7 +193,7 @@ function UploadFonts() {
 	 * @param {Array} fontFaces The font faces to be installed
 	 * @return {void}
 	 */
-	const handleInstall = async ( fontFaces: FontFace[] ) => {
+	const handleInstall = async ( fontFaces: FontFileMetadata[] ) => {
 		const fontFamilies = makeFamiliesFromFaces( fontFaces );
 
 		try {

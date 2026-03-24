@@ -8,6 +8,13 @@ export type FontFaceToUpload = FontFace & {
 	file?: File | File[];
 };
 
+export interface FontFileMetadata {
+	file: File;
+	fontDisplayName: string;
+	fontStyle: string;
+	fontWeight: string | number;
+}
+
 export type FontFamilyToUpload = Omit< FontFamily, 'fontFace' > & {
 	fontFace?: FontFaceToUpload[];
 };
