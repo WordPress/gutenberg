@@ -87,6 +87,15 @@ export default function CodeEditor( {
 					return;
 				}
 
+				const contentAttributes = {};
+				if ( ariaLabel ) {
+					contentAttributes[ 'aria-label' ] = ariaLabel;
+				}
+				if ( editorInstructionsText ) {
+					contentAttributes[ 'aria-describedby' ] =
+						String( instructionsId );
+				}
+
 				const view = new EditorView( {
 					state: EditorState.create( {
 						doc: valueRef.current,
@@ -95,6 +104,9 @@ export default function CodeEditor( {
 							history(),
 							lineNumbers(),
 							EditorView.lineWrapping,
+							EditorView.contentAttributes.of(
+								contentAttributes
+							),
 							syntaxHighlighting( defaultHighlightStyle ),
 							keymap.of( [
 								{
@@ -145,7 +157,7 @@ export default function CodeEditor( {
 			editorViewRef.current?.destroy();
 			editorViewRef.current = null;
 		};
-	}, [ mode ] );
+	}, [ mode, ariaLabel, editorInstructionsText, instructionsId ] );
 
 	useEffect( () => {
 		const view = editorViewRef.current;
@@ -191,10 +203,6 @@ export default function CodeEditor( {
 				ref={ containerRef }
 				id={ editorId }
 				className={ editorClassName }
-				aria-label={ ariaLabel }
-				aria-describedby={
-					editorInstructionsText ? instructionsId : undefined
-				}
 			/>
 		</>
 	);

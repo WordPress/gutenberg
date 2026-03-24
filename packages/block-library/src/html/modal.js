@@ -153,6 +153,9 @@ export default function HTMLEditModal( {
 										onChange={ setEditedHtml }
 										placeholder={ __( 'Write HTML…' ) }
 										aria-label={ __( 'HTML' ) }
+										editorInstructionsText={ __(
+											'Use this editor to write HTML.'
+										) }
 										className="block-library-html__modal-editor"
 									/>
 								</Tabs.TabPanel>
@@ -168,6 +171,9 @@ export default function HTMLEditModal( {
 											onChange={ setEditedCss }
 											placeholder={ __( 'Write CSS…' ) }
 											aria-label={ __( 'CSS' ) }
+											editorInstructionsText={ __(
+												'Use this editor to write CSS.'
+											) }
 											className="block-library-html__modal-editor"
 										/>
 									</Tabs.TabPanel>
@@ -186,6 +192,9 @@ export default function HTMLEditModal( {
 												'Write JavaScript…'
 											) }
 											aria-label={ __( 'JavaScript' ) }
+											editorInstructionsText={ __(
+												'Use this editor to write JavaScript.'
+											) }
 											className="block-library-html__modal-editor"
 										/>
 									</Tabs.TabPanel>
