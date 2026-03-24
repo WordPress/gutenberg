@@ -41,7 +41,7 @@ export * as Y from '@y/y';
  * can be used by third-party code to ensure that they are targeting a compatible
  * version of Yjs.
  */
-export const YJS_VERSION = '13';
+export const YJS_VERSION = '14';
 
 /**
  * The Awareness protocol should not be considered a public API. It is a
