@@ -60,6 +60,13 @@
 		"build-module/hooks/**"
 	],
 	"dependencies": {
+		"@codemirror/commands": "^6.10.3",
+		"@codemirror/lang-css": "^6.3.1",
+		"@codemirror/lang-html": "^6.4.11",
+		"@codemirror/lang-javascript": "^6.2.5",
+		"@codemirror/language": "^6.12.2",
+		"@codemirror/state": "^6.6.0",
+		"@codemirror/view": "^6.40.0",
 		"@react-spring/web": "^9.4.5",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
@@ -100,6 +107,7 @@
 		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",
 		"clsx": "^2.1.1",
+		"codemirror": "^6.0.2",
 		"colord": "^2.7.0",
 		"deepmerge": "^4.3.0",
 		"diff": "^4.0.2",

@@ -16,7 +16,7 @@ const DEFAULT_STYLES = `
 	html,body,:root {
 		margin: 0 !important;
 		padding: 0 !important;
-		overflow: visible !important;
+		overflow: hidden !important;
 		min-height: auto !important;
 	}
 `;
