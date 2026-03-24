@@ -119,4 +119,21 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 		$result2 = $this->register( $name, $settings );
 		$this->assertFalse( $result2 );
 	}
+
+	/**
+	 * Should fail to register icon with invalid names.
+	 *
+	 * @expectedIncorrectUsage Gutenberg_Icons_Registry_7_1::register
+	 */
+	public function test_register_invalid_name() {
+		foreach ( $this->data_invalid_icon_names() as $name ) {
+			$settings = array(
+				'label'   => 'Icon',
+				'content' => '<svg></svg>',
+			);
+
+			$result = $this->register( $name, $settings );
+			$this->assertFalse( $result );
+		}
+	}
 }
