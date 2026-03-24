@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import * as Y from 'yjs';
-import { Awareness } from 'y-protocols/awareness';
+import * as Y from '@y/y';
+import { Awareness } from '@y/protocols/awareness';
 import * as fun from 'lib0/function';
 import {
 	describe,

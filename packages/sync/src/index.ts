@@ -34,7 +34,7 @@
  * },
  * ```
  */
-export * as Y from 'yjs';
+export * as Y from '@y/y';
 
 /**
  * The major version of Yjs that is bundled and exported by this package. This
@@ -52,7 +52,7 @@ export const YJS_VERSION = '13';
  * implementation. However, it may be desirable for custom entities to have a
  * custom awareness implementation.
  */
-export { Awareness } from 'y-protocols/awareness';
+export { Awareness } from '@y/protocols/awareness';
 
 /**
  * Private @wordpress/sync APIs.

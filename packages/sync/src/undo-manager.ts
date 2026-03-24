@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type * as Y from 'yjs';
+import type * as Y from '@y/y';
 
 /**
  * WordPress dependencies

@@ -8,7 +8,7 @@
 import * as array from 'lib0/array';
 import * as map from 'lib0/map';
 import { Observable } from 'lib0/observable';
-import * as Y from 'yjs';
+import * as Y from '@y/y';
 
 /**
  * @param {YMultiDocUndoManager} mum

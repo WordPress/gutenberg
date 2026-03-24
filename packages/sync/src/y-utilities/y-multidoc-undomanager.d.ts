@@ -1,5 +1,5 @@
 import { type Observable } from 'lib0/observable';
-import { type UndoManager, type Doc, type Type } from 'yjs';
+import { type UndoManager, type Doc, type Type } from '@y/y';
 
 export class YMultiDocUndoManager extends Observable< string > {
 	docs: Map< Doc, UndoManager >;

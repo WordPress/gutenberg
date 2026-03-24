@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import * as Y from 'yjs';
+import * as Y from '@y/y';
 import * as buffer from 'lib0/buffer';
 import { describe, expect, it, beforeEach } from '@jest/globals';
 

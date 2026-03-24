@@ -6,12 +6,12 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * External dependencies
  */
-import * as Y from 'yjs';
+import * as Y from '@y/y';
 import * as encoding from 'lib0/encoding';
 import * as decoding from 'lib0/decoding';
-import type { Awareness } from 'y-protocols/awareness';
-import { removeAwarenessStates } from 'y-protocols/awareness';
-import * as syncProtocol from 'y-protocols/sync';
+import type { Awareness } from '@y/protocols/awareness';
+import { removeAwarenessStates } from '@y/protocols/awareness';
+import * as syncProtocol from '@y/protocols/sync';
 
 /**
  * Internal dependencies

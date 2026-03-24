@@ -12,7 +12,7 @@ import {
 import { type SyncResponse } from '../types';
 
 // Mock all external dependencies before imports.
-jest.mock( 'yjs', () => ( {
+jest.mock( '@y/y', () => ( {
 	mergeUpdatesV2: jest.fn( () => new Uint8Array() ),
 	applyUpdateV2: jest.fn(),
 	encodeStateAsUpdateV2: jest.fn( () => new Uint8Array() ),
@@ -27,12 +27,12 @@ jest.mock( 'lib0/decoding', () => ( {
 	createDecoder: jest.fn( () => ( {} ) ),
 } ) );
 
-jest.mock( 'y-protocols/sync', () => ( {
+jest.mock( '@y/protocols/sync', () => ( {
 	writeSyncStep1: jest.fn(),
 	readSyncMessage: jest.fn(),
 } ) );
 
-jest.mock( 'y-protocols/awareness', () => ( {
+jest.mock( '@y/protocols/awareness', () => ( {
 	removeAwarenessStates: jest.fn(),
 } ) );
 

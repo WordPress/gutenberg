@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
-import type * as Y from 'yjs';
+import type * as Y from '@y/y';
 import { ObservableV2 } from 'lib0/observable';
-import { Awareness } from 'y-protocols/awareness';
+import { Awareness } from '@y/protocols/awareness';
 
 /**
  * Internal dependencies

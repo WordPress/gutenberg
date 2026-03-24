@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import * as Y from 'yjs';
-import type { Awareness } from 'y-protocols/awareness';
+import * as Y from '@y/y';
+import type { Awareness } from '@y/protocols/awareness';
 
 /**
  * Internal dependencies
