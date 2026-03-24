@@ -31,7 +31,7 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$style = $block['attrs']['style'] ?? array();
+	$style     = $block['attrs']['style'] ?? array();
 	$css_rules = array();
 
 	foreach ( $supported_states as $state ) {
