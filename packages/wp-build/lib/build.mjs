@@ -182,12 +182,6 @@ function getSassOptions( workingDir ) {
 
 function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 	return async function styleType( cssText, _dirname, filePath ) {
-		// Always hash the untransformed code.
-		const hash = createHash( 'sha1' )
-			.update( cssText )
-			.digest( 'hex' )
-			.slice( 0, 10 );
-
 		let moduleExports = null;
 
 		// Transform the code: token fallbacks, CSS modules and minification.
@@ -213,6 +207,13 @@ function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 			from: filePath,
 			map: false,
 		} );
+
+		// Hash the transformed CSS so that the dedup key reflects the actual
+		// injected content, including mangled CSS module class names.
+		const hash = createHash( 'sha1' )
+			.update( css )
+			.digest( 'hex' )
+			.slice( 0, 10 );
 
 		let cssModule = `if (typeof document !== 'undefined' && process.env.NODE_ENV !== 'test' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
 	const style = document.createElement("style");
@@ -667,6 +668,7 @@ async function bundlePackage( packageName, options = {} ) {
 				id: scriptModuleId,
 				path: `${ packageName }/${ fileName }`,
 				asset: `${ packageName }/${ fileName }.min.asset.php`,
+				min_only: isWasmWorker,
 			} );
 		}
 	}
@@ -928,6 +930,7 @@ async function generateModuleRegistrationPhp( modules, replacements ) {
 				`\t\t'id' => '${ module.id }',\n` +
 				`\t\t'path' => '${ module.path }',\n` +
 				`\t\t'asset' => '${ module.asset }',\n` +
+				( module.min_only ? `\t\t'min_only' => true,\n` : '' ) +
 				`\t),`
 		)
 		.join( '\n' );

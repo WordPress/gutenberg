@@ -1,5 +1,6 @@
 import { forwardRef } from '@wordpress/element';
 import { Tabs as _Tabs } from '@base-ui/react/tabs';
+import { TabsValidationProvider } from './context';
 import type { TabRootProps } from './types';
 
 /**
@@ -10,6 +11,10 @@ import type { TabRootProps } from './types';
  */
 export const Root = forwardRef< HTMLDivElement, TabRootProps >(
 	function TabsRoot( { ...otherProps }, forwardedRef ) {
-		return <_Tabs.Root ref={ forwardedRef } { ...otherProps } />;
+		return (
+			<TabsValidationProvider>
+				<_Tabs.Root ref={ forwardedRef } { ...otherProps } />
+			</TabsValidationProvider>
+		);
 	}
 );

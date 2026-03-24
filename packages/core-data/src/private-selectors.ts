@@ -14,6 +14,8 @@ import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
 
+const EMPTY_OBJECT = {};
+
 /**
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
@@ -170,11 +172,18 @@ export const getHomePage = createRegistrySelector( ( select ) =>
 			).getDefaultTemplateId( {
 				slug: 'front-page',
 			} );
-			// Still resolving getDefaultTemplateId.
-			if ( ! frontPageTemplateId ) {
-				return null;
+			if ( frontPageTemplateId ) {
+				return {
+					postType: 'wp_template',
+					postId: frontPageTemplateId,
+				};
 			}
-			return { postType: 'wp_template', postId: frontPageTemplateId };
+			// Resolution is finished and no front-page template exists.
+			if ( frontPageTemplateId === '' ) {
+				return EMPTY_OBJECT;
+			}
+			// Still resolving getDefaultTemplateId.
+			return null;
 		},
 		( state ) => [
 			// Even though getDefaultTemplateId.shouldInvalidate returns true when root/site changes,
@@ -313,4 +322,27 @@ export function getEditorAssets( state: State ): Record< string, any > | null {
  */
 export function isCollaborationSupported( state: State ): boolean {
 	return state.collaborationSupported;
+}
+
+/**
+ * Returns the view configuration for the given entity type.
+ *
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ *
+ * @return The view configuration or undefined if not loaded.
+ */
+export function getViewConfig(
+	state: State,
+	kind: string,
+	name: string
+): Record< string, any > | undefined {
+	return (
+		state.viewConfigs?.[ `${ kind }/${ name }` ] ?? {
+			default_view: undefined,
+			default_layouts: undefined,
+			view_list: undefined,
+		}
+	);
 }

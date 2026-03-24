@@ -27,8 +27,10 @@ import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebar from '../plugin-sidebar';
 import PostSummary from './post-summary';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
+import RevisionFieldsDiffPanel from '../revision-fields-diff';
 import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
+import TemplateActionsPanel from '../template-actions-panel';
 import TemplateContentPanel from '../template-content-panel';
 import TemplatePartContentPanel from '../template-part-content-panel';
 import { MediaMetadataPanel } from '../media';
@@ -128,10 +130,14 @@ const SidebarContent = ( {
 							<PostSummary
 								onActionPerformed={ onActionPerformed }
 							/>
+							{ isRevisionsMode && <RevisionFieldsDiffPanel /> }
 							{ ! isRevisionsMode && (
 								<>
 									<PluginDocumentSettingPanel.Slot />
 									<TemplateContentPanel />
+									{ window?.__experimentalDataFormInspector && (
+										<TemplateActionsPanel />
+									) }
 									<TemplatePartContentPanel />
 									<PostTransformPanel />
 									<PostTaxonomiesPanel />
