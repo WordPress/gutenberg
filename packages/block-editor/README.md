@@ -651,6 +651,10 @@ _Returns_
 
 -   `Component`: The component to be rendered.
 
+### IconPickerModal
+
+Undocumented declaration.
+
 ### InnerBlocks
 
 _Related_

@@ -169,6 +169,7 @@ export { default as __experimentalPublishDateTimePicker } from './publish-date-t
 export { default as __experimentalInspectorPopoverHeader } from './inspector-popover-header';
 export { default as BlockPopover } from './block-popover';
 export { useBlockEditingMode } from './block-editing-mode';
+export { default as IconPickerModal } from './icon-picker-modal';
 
 /*
  * State Related Components

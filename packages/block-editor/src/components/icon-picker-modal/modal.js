@@ -10,7 +10,7 @@ import { useDebounce } from '@wordpress/compose';
  * Internal dependencies
  */
 import IconGrid from './icon-grid';
-import { normalizeSearchInput } from '../../../utils/search-patterns';
+import normalizeSearchInput from './normalize-search-input';
 
 export default function CustomInserterModal( {
 	icons = [],

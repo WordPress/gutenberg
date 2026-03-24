@@ -3,11 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import HtmlRenderer from '../../../utils/html-renderer';
+import { safeHTML } from '@wordpress/dom';
 
 export default function IconGrid( { icons, onChange, attributes } ) {
 	return (
@@ -35,10 +31,10 @@ export default function IconGrid( { icons, onChange, attributes } ) {
 								__next40pxDefaultSize
 							>
 								<span className="wp-block-icon__inserter-grid-icons-list-item-icon">
-									<HtmlRenderer
-										html={ icon.content }
-										wrapperProps={ {
-											style: { width: '24px' },
+									<span
+										className="wp-block-icon__inserter-grid-icons-list-item-svg"
+										dangerouslySetInnerHTML={ {
+											__html: safeHTML( icon.content ),
 										} }
 									/>
 								</span>
