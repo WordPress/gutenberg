@@ -323,12 +323,64 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 }
 
 /**
+ * Resolves a callback to its source plugin data.
+ *
+ * WordPress core's _get_plugin_from_callback() matches by directory prefix,
+ * which is ambiguous when multiple single-file plugins share the same parent
+ * directory (e.g. test plugins). This wrapper tries an exact file match first,
+ * then falls back to core's directory-based matching.
+ *
+ * @param callable $callback The callback to resolve.
+ * @return array|null Plugin data array on success, null on failure.
+ */
+function gutenberg_get_plugin_from_callback( $callback ) {
+	try {
+		if ( is_array( $callback ) ) {
+			$reflection = new ReflectionMethod( $callback[0], $callback[1] );
+		} elseif ( is_string( $callback ) && str_contains( $callback, '::' ) ) {
+			$reflection = new ReflectionMethod( $callback );
+		} else {
+			$reflection = new ReflectionFunction( $callback );
+		}
+	} catch ( ReflectionException $exception ) {
+		return null;
+	}
+
+	if ( $reflection->isInternal() ) {
+		return null;
+	}
+
+	$filename   = wp_normalize_path( $reflection->getFileName() );
+	$plugin_dir = wp_normalize_path( WP_PLUGIN_DIR );
+
+	if ( ! str_starts_with( $filename, $plugin_dir ) ) {
+		return null;
+	}
+
+	// Get the path relative to the plugins directory.
+	$relative_path = ltrim( str_replace( $plugin_dir, '', $filename ), '/' );
+
+	$plugins = get_plugins();
+
+	// Try exact file match first. This correctly identifies single-file
+	// plugins that share a parent directory with other plugins.
+	if ( isset( $plugins[ $relative_path ] ) ) {
+		return $plugins[ $relative_path ];
+	}
+
+	// Fall back to core's directory-based matching for callbacks
+	// defined in plugin subdirectories.
+	if ( function_exists( '_get_plugin_from_callback' ) ) {
+		return _get_plugin_from_callback( $callback );
+	}
+
+	return null;
+}
+
+/**
  * Detects which plugins registered meta boxes and exposes the plugin names
  * to the editor via an inline script global. This allows the editor UI to
  * show which specific plugins are incompatible with real-time collaboration.
- *
- * Uses _get_plugin_from_callback() (WordPress core) to resolve meta box
- * callbacks to their source plugin via PHP Reflection.
  */
 function gutenberg_inject_meta_box_plugin_names() {
 	global $wp_meta_boxes;
@@ -368,7 +420,7 @@ function gutenberg_inject_meta_box_plugin_names() {
 					continue;
 				}
 
-				$plugin = _get_plugin_from_callback( $meta_box['callback'] );
+				$plugin = gutenberg_get_plugin_from_callback( $meta_box['callback'] );
 
 				if ( $plugin && ! empty( $plugin['Name'] ) ) {
 					$plugin_names[] = $plugin['Name'];
