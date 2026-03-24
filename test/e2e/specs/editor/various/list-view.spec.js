@@ -1395,6 +1395,48 @@ test.describe( 'List View', () => {
 			'The dropdown menu should also be visible'
 		).toBeVisible();
 	} );
+
+	test( 'should place the caret at the end of the block when selecting from List View', async ( {
+		editor,
+		page,
+		pageUtils,
+		listViewUtils,
+	} ) => {
+		// Insert a paragraph with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second paragraph' },
+		} );
+
+		// Open List View.
+		const listView = await listViewUtils.openListView();
+
+		// Click the first paragraph in List View.
+		await listView
+			.getByRole( 'gridcell', { name: 'Paragraph' } )
+			.first()
+			.click();
+
+		// Press Enter to split the block at the caret position.
+		// If the caret is at the end, this creates a new block after the first paragraph.
+		// If the caret is at the start, this creates a new block before the first paragraph.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.press( 'Enter' );
+
+		// Verify the block order: if the caret was at the end, the new empty
+		// block should be after the first paragraph, not before it.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First paragraph' } },
+			{ name: 'core/paragraph', attributes: { content: '' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second paragraph' } },
+		] );
+	} );
 } );
 
 /** @typedef {import('@playwright/test').Locator} Locator */
