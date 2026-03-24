@@ -71,7 +71,13 @@ export default function CodeEditor( {
 				const [
 					{ EditorView, keymap, lineNumbers },
 					{ EditorState },
-					{ history, defaultKeymap, historyKeymap, indentWithTab },
+					{
+						history,
+						defaultKeymap,
+						historyKeymap,
+						indentWithTab,
+						insertNewlineKeepIndent,
+					},
 					{ syntaxHighlighting, defaultHighlightStyle },
 					languageExtension,
 				] = await Promise.all( [
@@ -108,6 +114,11 @@ export default function CodeEditor( {
 							),
 							syntaxHighlighting( defaultHighlightStyle ),
 							keymap.of( [
+								{
+									key: 'Enter',
+									run: insertNewlineKeepIndent,
+									shift: insertNewlineKeepIndent,
+								},
 								{
 									key: 'Escape',
 									run: ( editorView ) => {
