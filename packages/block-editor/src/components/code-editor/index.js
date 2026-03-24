@@ -11,22 +11,21 @@ import { __ } from '@wordpress/i18n';
  */
 import PlainText from '../plain-text';
 
-function importLanguageSupport( mode ) {
+async function importLanguageSupport( mode ) {
 	switch ( mode ) {
 		case 'css':
-			return import( '@codemirror/lang-css' ).then( ( { css } ) =>
-				css()
-			);
+			const { css } = await import( '@codemirror/lang-css' );
+			return css();
 		case 'javascript':
 		case 'js':
-			return import( '@codemirror/lang-javascript' ).then(
-				( { javascript } ) => javascript()
+			const { javascript } = await import(
+				'@codemirror/lang-javascript'
 			);
+			return javascript();
 		case 'html':
 		default:
-			return import( '@codemirror/lang-html' ).then( ( { html } ) =>
-				html( { autoCloseTags: false } )
-			);
+			const { html } = await import( '@codemirror/lang-html' );
+			return html( { autoCloseTags: false } );
 	}
 }
 
