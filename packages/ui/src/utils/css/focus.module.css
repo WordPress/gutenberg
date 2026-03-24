@@ -14,9 +14,7 @@
 
 		/* Outline width must be kept at 0 even with a transparent color,
 		or else the outline will be visible in forced-colors mode. */
-		outline-width: 0;
-		outline-style: solid;
-		outline-color: transparent;
+		outline: 0 solid transparent;
 		outline-offset: 1px;
 	}
 
@@ -27,7 +25,8 @@
 	.outset-ring--focus-within-except-active:focus-within:not(:has(:active)),
 	.outset-ring--focus-within-visible:focus-within:has(:focus-visible),
 	:focus-visible .outset-ring--focus-parent-visible {
-		outline-width: var(--wpds-border-width-focus);
-		outline-color: var(--wpds-color-stroke-focus-brand);
+		--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
+
+		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
 	}
 }
