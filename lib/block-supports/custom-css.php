@@ -133,9 +133,9 @@ function gutenberg_register_custom_css_support( $block_type ) {
 /**
  * Strips `style.css` attributes from all blocks in post content.
  *
- * Parses the content into blocks, iteratively walks all blocks
- * (including inner blocks), removes `attrs.style.css`, and
- * re-serializes the content.
+ * Uses WP_Block_Parser::next_token() to scan block tokens and surgically
+ * replace only the attribute JSON that changed — no parse_blocks() +
+ * serialize_blocks() round-trip needed.
  *
  * @param string $content Post content to filter.
  * @return string Filtered post content with block custom CSS removed.
@@ -146,42 +146,85 @@ function gutenberg_strip_custom_css_from_blocks( $content ) {
 	}
 
 	// The content may be slashed (e.g. via content_save_pre),
-	// which breaks parse_blocks JSON parsing. Unslash first,
+	// which breaks JSON parsing. Unslash first,
 	// then re-slash the result before returning.
 	$unslashed = wp_unslash( $content );
-	$blocks    = parse_blocks( $unslashed );
-	$changed   = false;
 
-	// Stack-based traversal — avoids recursive function call overhead.
-	$stack = array();
-	foreach ( $blocks as &$block ) {
-		$stack[] = &$block;
-	}
-	unset( $block );
-
-	while ( ! empty( $stack ) ) {
-		$block = &$stack[ count( $stack ) - 1 ];
-		array_pop( $stack );
-
-		if ( isset( $block['attrs']['style']['css'] ) ) {
-			unset( $block['attrs']['style']['css'] );
-			if ( empty( $block['attrs']['style'] ) ) {
-				unset( $block['attrs']['style'] );
-			}
-			$changed = true;
-		}
-
-		foreach ( $block['innerBlocks'] as &$inner_block ) {
-			$stack[] = &$inner_block;
-		}
-		unset( $inner_block, $block );
-	}
-
-	if ( ! $changed ) {
+	// Fast check: if no "css" key anywhere, skip parsing entirely.
+	if ( false === strpos( $unslashed, '"css"' ) ) {
 		return $content;
 	}
 
-	return wp_slash( serialize_blocks( $blocks ) );
+	$parser           = new WP_Block_Parser();
+	$parser->document = $unslashed;
+	$parser->offset   = 0;
+	$end              = strlen( $unslashed );
+	$replacements     = array();
+
+	while ( $parser->offset < $end ) {
+		$next_token = $parser->next_token();
+		list( $token_type, $block_name, $attrs, $start_offset, $token_length ) = $next_token;
+
+		if ( 'no-more-tokens' === $token_type ) {
+			break;
+		}
+
+		$parser->offset = $start_offset + $token_length;
+
+		if ( 'block-opener' !== $token_type && 'void-block' !== $token_type ) {
+			continue;
+		}
+
+		if ( ! isset( $attrs['style']['css'] ) ) {
+			continue;
+		}
+
+		// Remove css and clean up empty style.
+		unset( $attrs['style']['css'] );
+		if ( empty( $attrs['style'] ) ) {
+			unset( $attrs['style'] );
+		}
+
+		// Locate the JSON portion within the token.
+		$token_string   = substr( $unslashed, $start_offset, $token_length );
+		$json_rel_start = strcspn( $token_string, '{' );
+		$json_rel_end   = strrpos( $token_string, '}' );
+
+		if ( false === $json_rel_end || $json_rel_start >= $json_rel_end ) {
+			continue;
+		}
+
+		$json_start  = $start_offset + $json_rel_start;
+		$json_length = $json_rel_end - $json_rel_start + 1;
+
+		// Re-encode attributes. If attrs is now empty, remove JSON and trailing space.
+		if ( empty( $attrs ) ) {
+			// Remove the trailing space after JSON: `{"style":{"css":"x"}} ` → ``
+			$replacements[] = array( $json_start, $json_length + 1, '' );
+		} else {
+			$replacements[] = array( $json_start, $json_length, serialize_block_attributes( $attrs ) );
+		}
+	}
+
+	if ( empty( $replacements ) ) {
+		return $content;
+	}
+
+	// Build the result by splicing replacements into the original string.
+	$result = '';
+	$was_at = 0;
+
+	foreach ( $replacements as $replacement ) {
+		list( $offset, $length, $new_json ) = $replacement;
+		$result .= substr( $unslashed, $was_at, $offset - $was_at ) . $new_json;
+		$was_at  = $offset + $length;
+	}
+
+	if ( $was_at < $end ) {
+		$result .= substr( $unslashed, $was_at );
+	}
+
+	return wp_slash( $result );
 }
 
 /**
