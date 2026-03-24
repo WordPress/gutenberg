@@ -131,11 +131,12 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 					</label>
 				<?php else : ?>
 					<div class="notice notice-warning inline">
-						<?php printf(
+						<?php
+						printf(
 								/* translators: %s: Prefix "Note:". */
-								'<p>' . __( '%s Real-time collaboration has been disabled.', 'gutenberg' ) . '</p>',
-								'<strong>' . __( 'Note:', 'gutenberg' ) . '</strong>'
-							);
+							'<p>' . __( '%s Real-time collaboration has been disabled.', 'gutenberg' ) . '</p>',
+							'<strong>' . __( 'Note:', 'gutenberg' ) . '</strong>'
+						);
 						?>
 					</div>
 					<?php
