@@ -155,7 +155,7 @@ function gutenberg_strip_custom_css_from_blocks( $content ) {
 
 	while ( $parser->offset < $end ) {
 		$next_token = $parser->next_token();
-		list( $token_type, $block_name, $attrs, $start_offset, $token_length ) = $next_token;
+		list( $token_type, , $attrs, $start_offset, $token_length ) = $next_token;
 
 		if ( 'no-more-tokens' === $token_type ) {
 			break;
