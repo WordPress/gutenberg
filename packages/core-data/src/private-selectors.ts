@@ -329,5 +329,11 @@ export function getViewConfig(
 	kind: string,
 	name: string
 ): Record< string, any > | undefined {
-	return state.viewConfigs?.[ `${ kind }/${ name }` ];
+	return (
+		state.viewConfigs?.[ `${ kind }/${ name }` ] ?? {
+			default_view: undefined,
+			default_layouts: undefined,
+			view_list: undefined,
+		}
+	);
 }
