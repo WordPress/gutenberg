@@ -28,6 +28,13 @@
  * ==========================================================================
  */
 
+.button {
+	box-sizing: var(--_gcd-button-box-sizing, border-box);
+	font-family: var(--_gcd-button-font-family, inherit);
+	font-size: var(--_gcd-button-font-size, inherit);
+	font-weight: var(--_gcd-button-font-weight, inherit);
+}
+
 .input {
 	box-sizing: var(--_gcd-input-box-sizing, border-box);
 	font-family: var(--_gcd-input-font-family, inherit);
