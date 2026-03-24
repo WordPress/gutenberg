@@ -12,13 +12,29 @@ import {
 	type RequestUtils,
 } from '@wordpress/e2e-test-utils-playwright';
 
-export const SECOND_USER = {
+export interface UserCredentials {
+	username: string;
+	email: string;
+	firstName: string;
+	lastName: string;
+	password: string;
+	roles: string[];
+}
+
+interface UserSession {
+	user: UserCredentials;
+	context: BrowserContext;
+	page: Page;
+	editor: Editor;
+}
+
+export const SECOND_USER: UserCredentials = {
 	username: 'collaborator',
 	email: 'collaborator@example.com',
 	firstName: 'Test',
 	lastName: 'Collaborator',
 	password: 'password',
-	roles: [ 'editor' ] as string[],
+	roles: [ 'editor' ],
 };
 
 const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
@@ -28,10 +44,7 @@ export default class CollaborationUtils {
 	private editor: Editor;
 	private requestUtils: RequestUtils;
 	private primaryPage: Page;
-
-	private secondContext: BrowserContext | null = null;
-	private secondPage: Page | null = null;
-	private secondEditor: Editor | null = null;
+	private sessions: UserSession[] = [];
 
 	constructor( {
 		admin,
@@ -51,30 +64,12 @@ export default class CollaborationUtils {
 	}
 
 	/**
-	 * Open a collaborative editing session where both the primary user (admin)
-	 * and the second user (collaborator) are editing the same post.
+	 * Navigate the primary user (admin) to a post and wait for
+	 * collaboration to be ready.
 	 *
-	 * @param postId The post ID to collaboratively edit.
+	 * @param postId The post ID to open.
 	 */
-	async openCollaborativeSession( postId: number ) {
-		// Create a second browser context with the same baseURL.
-		this.secondContext = await this.admin.browser.newContext( {
-			baseURL: BASE_URL,
-		} );
-		this.secondPage = await this.secondContext.newPage();
-
-		// Login the second user via the WordPress login form.
-		await this.secondPage.goto( '/wp-login.php' );
-		await this.secondPage
-			.locator( '#user_login' )
-			.fill( SECOND_USER.username );
-		await this.secondPage
-			.locator( '#user_pass' )
-			.fill( SECOND_USER.password );
-		await this.secondPage.getByRole( 'button', { name: 'Log In' } ).click();
-		await this.secondPage.waitForURL( '**/wp-admin/**' );
-
-		// Navigate User 1 (admin) to the post editor.
+	async openPost( postId: number ) {
 		await this.admin.visitAdminPage(
 			'post.php',
 			`post=${ postId }&action=edit`
@@ -83,20 +78,43 @@ export default class CollaborationUtils {
 			welcomeGuide: false,
 			fullscreenMode: false,
 		} );
-
-		// Wait for collaboration to be enabled on User 1's page.
 		await this.waitForCollaborationReady( this.primaryPage );
+	}
 
-		// Navigate User 2 to the same post editor.
-		await this.secondPage.goto(
-			`/wp-admin/post.php?post=${ postId }&action=edit`
-		);
+	/**
+	 * Log in an additional user and open the same post in a new
+	 * browser context. Returns the new user's page and editor.
+	 *
+	 * Can be called multiple times to add N users to a session.
+	 *
+	 * @param postId The post ID to open.
+	 * @param user   Credentials for the user to join.
+	 * @return The joined user's page and editor.
+	 */
+	async joinUser(
+		postId: number,
+		user: UserCredentials
+	): Promise< { page: Page; editor: Editor } > {
+		const context = await this.admin.browser.newContext( {
+			baseURL: BASE_URL,
+		} );
+		const newPage = await context.newPage();
 
-		// Dismiss welcome guide for User 2.
-		await this.secondPage.waitForFunction(
+		// Log in via the WordPress login form.
+		await newPage.goto( '/wp-login.php' );
+		await newPage.locator( '#user_login' ).fill( user.username );
+		await newPage.locator( '#user_pass' ).fill( user.password );
+		await newPage.getByRole( 'button', { name: 'Log In' } ).click();
+		await newPage.waitForURL( '**/wp-admin/**' );
+
+		// Navigate to the post editor.
+		await newPage.goto( `/wp-admin/post.php?post=${ postId }&action=edit` );
+
+		// Dismiss welcome guide.
+		await newPage.waitForFunction(
 			() => window?.wp?.data && window?.wp?.blocks
 		);
-		await this.secondPage.evaluate( () => {
+		await newPage.evaluate( () => {
 			window.wp.data
 				.dispatch( 'core/preferences' )
 				.set( 'core/edit-post', 'welcomeGuide', false );
@@ -105,30 +123,56 @@ export default class CollaborationUtils {
 				.set( 'core/edit-post', 'fullscreenMode', false );
 		} );
 
-		// Create an Editor instance for the second page.
-		this.secondEditor = new Editor( { page: this.secondPage } );
+		const newEditor = new Editor( { page: newPage } );
 
-		// Wait for collaboration to be enabled on User 2's page.
-		await this.waitForCollaborationReady( this.secondPage );
+		await this.waitForCollaborationReady( newPage );
 
-		// Wait for both users to discover each other via awareness.
-		// The collaborator count button appears when another user is
-		// detected through the sync polling.
-		await Promise.all( [
-			this.primaryPage
-				.getByRole( 'button', { name: /Collaborators list/ } )
-				.waitFor( { timeout: 15000 } ),
-			this.secondPage
-				.getByRole( 'button', { name: /Collaborators list/ } )
-				.waitFor( { timeout: 15000 } ),
-		] );
+		this.sessions.push( {
+			user,
+			context,
+			page: newPage,
+			editor: newEditor,
+		} );
 
-		// Allow a full round of polling after awareness is established
-		// so both CRDT docs are synchronized.
-		await Promise.all( [
-			this.waitForSyncCycle( this.primaryPage ),
-			this.waitForSyncCycle( this.secondPage ),
-		] );
+		return { page: newPage, editor: newEditor };
+	}
+
+	/**
+	 * Wait for all current participants (primary + joined users) to
+	 * discover each other via the awareness protocol, then wait for
+	 * sync cycles to complete.
+	 *
+	 * @param [options]         Optional settings.
+	 * @param [options.timeout] Maximum wait time in ms. Defaults to a
+	 *                          value that scales with the number of users.
+	 */
+	async waitForMutualDiscovery( { timeout }: { timeout?: number } = {} ) {
+		const pages = this.allPages;
+		const resolvedTimeout = timeout ?? 10000 + pages.length * 2500;
+
+		await Promise.all(
+			pages.map( ( pg ) =>
+				pg
+					.getByRole( 'button', { name: /Collaborators list/ } )
+					.waitFor( { timeout: resolvedTimeout } )
+			)
+		);
+
+		await Promise.all( pages.map( ( pg ) => this.waitForSyncCycle( pg ) ) );
+	}
+
+	/**
+	 * Convenience method: open a two-user collaborative session.
+	 *
+	 * Equivalent to calling `openPost`, `joinUser` with SECOND_USER,
+	 * and `waitForMutualDiscovery` in sequence.
+	 *
+	 * @param postId The post ID to collaboratively edit.
+	 */
+	async openCollaborativeSession( postId: number ) {
+		await this.openPost( postId );
+		await this.joinUser( postId, SECOND_USER );
+		await this.waitForMutualDiscovery();
 	}
 
 	/**
@@ -243,15 +287,20 @@ export default class CollaborationUtils {
 	 * Wait for the collaboration runtime to be ready on a page.
 	 * Checks that `window._wpCollaborationEnabled` is true and wp.data is loaded.
 	 *
-	 * @param page The Playwright page to wait on.
+	 * @param page              The Playwright page to wait on.
+	 * @param [options]         Optional settings.
+	 * @param [options.timeout] Maximum wait time in ms (default 15000).
 	 */
-	private async waitForCollaborationReady( page: Page ) {
+	async waitForCollaborationReady(
+		page: Page,
+		{ timeout = 15000 }: { timeout?: number } = {}
+	) {
 		await page.waitForFunction(
 			() =>
 				( window as any )._wpCollaborationEnabled === true &&
 				window?.wp?.data &&
 				window?.wp?.blocks,
-			{ timeout: 15000 }
+			{ timeout }
 		);
 	}
 
@@ -262,54 +311,104 @@ export default class CollaborationUtils {
 	 * (rest_route=%2Fwp-sync%2Fv1%2Fupdates), so we match the
 	 * encoded form.
 	 *
-	 * @param page   The Playwright page to wait on.
-	 * @param cycles Number of sync responses to wait for (default 3).
+	 * @param page              The Playwright page to wait on.
+	 * @param cycles            Number of sync responses to wait for (default 3).
+	 * @param [options]         Optional settings.
+	 * @param [options.timeout] Maximum wait time per cycle in ms (default 10000).
 	 */
-	private async waitForSyncCycle( page: Page, cycles = 3 ) {
+	async waitForSyncCycle(
+		page: Page,
+		cycles = 3,
+		{ timeout = 10000 }: { timeout?: number } = {}
+	) {
 		for ( let i = 0; i < cycles; i++ ) {
 			await page.waitForResponse(
 				( response ) =>
 					response.url().includes( 'wp-sync' ) &&
 					response.status() === 200,
-				{ timeout: 10000 }
+				{ timeout }
 			);
 		}
+	}
+
+	/**
+	 * All pages in the session: primary user followed by joined users
+	 * in the order they joined.
+	 */
+	get allPages(): Page[] {
+		return [ this.primaryPage, ...this.sessions.map( ( s ) => s.page ) ];
+	}
+
+	/**
+	 * All editors in the session: primary user followed by joined users
+	 * in the order they joined.
+	 */
+	get allEditors(): Editor[] {
+		return [ this.editor, ...this.sessions.map( ( s ) => s.editor ) ];
+	}
+
+	/**
+	 * Get a joined user's page by index (0-based, in join order).
+	 *
+	 * @param index Index of the joined user.
+	 */
+	getPage( index: number ): Page {
+		if ( index < 0 || index >= this.sessions.length ) {
+			throw new Error(
+				`No session at index ${ index }. ${ this.sessions.length } user(s) have joined.`
+			);
+		}
+		return this.sessions[ index ].page;
+	}
+
+	/**
+	 * Get a joined user's editor by index (0-based, in join order).
+	 *
+	 * @param index Index of the joined user.
+	 */
+	getEditor( index: number ): Editor {
+		if ( index < 0 || index >= this.sessions.length ) {
+			throw new Error(
+				`No session at index ${ index }. ${ this.sessions.length } user(s) have joined.`
+			);
+		}
+		return this.sessions[ index ].editor;
 	}
 
 	/**
 	 * Get the second user's Page instance.
+	 * Backward-compatible accessor for two-user tests.
 	 */
 	get page2(): Page {
-		if ( ! this.secondPage ) {
+		if ( this.sessions.length === 0 ) {
 			throw new Error(
-				'Second page not available. Call openCollaborativeSession() first.'
+				'Second page not available. Call openCollaborativeSession() or joinUser() first.'
 			);
 		}
-		return this.secondPage;
+		return this.sessions[ 0 ].page;
 	}
 
 	/**
 	 * Get the second user's Editor instance.
+	 * Backward-compatible accessor for two-user tests.
 	 */
 	get editor2(): Editor {
-		if ( ! this.secondEditor ) {
+		if ( this.sessions.length === 0 ) {
 			throw new Error(
-				'Second editor not available. Call openCollaborativeSession() first.'
+				'Second editor not available. Call openCollaborativeSession() or joinUser() first.'
 			);
 		}
-		return this.secondEditor;
+		return this.sessions[ 0 ].editor;
 	}
 
 	/**
-	 * Clean up: close second browser context, disable collaboration, delete test users.
+	 * Clean up: close all secondary browser contexts and delete test users.
 	 */
 	async teardown() {
-		if ( this.secondContext ) {
-			await this.secondContext.close();
-			this.secondContext = null;
-			this.secondPage = null;
-			this.secondEditor = null;
+		for ( const session of this.sessions ) {
+			await session.context.close();
 		}
+		this.sessions = [];
 		await this.requestUtils.deleteAllUsers();
 	}
 }
