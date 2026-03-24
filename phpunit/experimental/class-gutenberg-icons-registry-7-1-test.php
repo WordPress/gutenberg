@@ -13,17 +13,11 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 	 */
 	private $registry;
 
-	/**
-	 * Sets up the test fixture.
-	 */
 	public function set_up() {
 		parent::set_up();
 		$this->registry = Gutenberg_Icons_Registry_7_1::get_instance();
 	}
 
-	/**
-	 * Tear down each test method.
-	 */
 	public function tear_down() {
 		$instance_property = new ReflectionProperty( Gutenberg_Icons_Registry_7_1::class, 'instance' );
 
@@ -44,7 +38,7 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Invokes the Gutenberg_Icons_Registry_7_1::register method on the registry instance.
+	 * Invokes Gutenberg_Icons_Registry_7_1::register despite it being private
 	 *
 	 * @param string $icon_name       Icon name including namespace.
 	 * @param array  $icon_properties Icon properties (label, content, filePath).
@@ -58,7 +52,6 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 	/**
 	 * Should reject invalid icon names.
 	 *
-	 * @dataProvider data_invalid_icon_names
 	 * @expectedIncorrectUsage Gutenberg_Icons_Registry_7_1::register
 	 *
 	 * @param mixed $icon_name Icon name to test.
@@ -123,6 +116,7 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 	/**
 	 * Should fail to register icon with invalid names.
 	 *
+	 * @dataProvider data_invalid_icon_names
 	 * @expectedIncorrectUsage Gutenberg_Icons_Registry_7_1::register
 	 */
 	public function test_register_invalid_name() {
