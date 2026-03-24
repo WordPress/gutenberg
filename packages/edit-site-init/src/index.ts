@@ -9,6 +9,7 @@ import {
 	symbol,
 	symbolFilled,
 	layout,
+	siteLogo,
 } from '@wordpress/icons';
 import { dispatch } from '@wordpress/data';
 import { store as bootStore } from '@wordpress/boot';
@@ -27,6 +28,7 @@ export async function init() {
 		templateParts: { icon: symbolFilled },
 		patterns: { icon: symbol },
 		templates: { icon: layout },
+		siteIdentity: { icon: siteLogo },
 	};
 
 	// Update each menu item with its icon
