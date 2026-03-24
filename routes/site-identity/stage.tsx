@@ -3,46 +3,68 @@
  */
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
-import { useEditorSettings } from '@wordpress/lazy-editor';
+import { DataForm } from '@wordpress/dataviews';
+import { MediaEdit } from '@wordpress/fields';
 
-const noop = () => {};
+const fields = [
+	{
+		id: 'site_logo',
+		type: 'media',
+		label: __( 'Site Logo' ),
+		description: __(
+			"Displays in your site's layout via the Site Logo block."
+		),
+		placeholder: __( 'Choose logo' ),
+		Edit: MediaEdit,
+		setValue: ( { value }: { value: number | null } ) => ( {
+			site_logo: value ?? 0,
+		} ),
+	},
+	{
+		id: 'title',
+		type: 'text',
+		label: __( 'Site Title' ),
+	},
+	{
+		id: 'description',
+		type: 'text',
+		label: __( 'Tagline' ),
+	},
+];
+
+const form = {
+	layout: {
+		type: 'regular' as const,
+		labelPosition: 'top' as const,
+	},
+	fields: [ 'site_logo', 'title', 'description' ],
+};
 
 function Stage() {
-	const globalStylesId = useSelect(
+	const data = useSelect(
 		( select ) =>
-			(
-				select( coreStore ) as any
-			).__experimentalGetCurrentGlobalStylesId(),
+			( select( coreStore ) as any ).getEditedEntityRecord(
+				'root',
+				'site'
+			),
 		[]
 	);
-	const { editorSettings } = useEditorSettings( {
-		stylesId: globalStylesId,
-	} );
+	const { editEntityRecord } = useDispatch( coreStore );
 
-	const blocks = useMemo(
-		() => [
-			createBlock( 'core/site-logo' ),
-			createBlock( 'core/site-title' ),
-			createBlock( 'core/site-tagline' ),
-		],
-		[]
-	);
+	const onChange = ( edits: Record< string, any > ) => {
+		editEntityRecord( 'root', 'site', undefined, edits );
+	};
 
 	return (
-		<Page title={ __( 'Site Identity' ) }>
-			<BlockEditorProvider
-				settings={ editorSettings }
-				value={ blocks }
-				onChange={ noop }
-				onInput={ noop }
-			>
-				<BlockList />
-			</BlockEditorProvider>
+		<Page title={ __( 'Site Identity' ) } hasPadding>
+			<DataForm
+				data={ data }
+				fields={ fields }
+				form={ form }
+				onChange={ onChange }
+			/>
 		</Page>
 	);
 }

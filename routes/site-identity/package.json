@@ -12,7 +12,9 @@
 		"@wordpress/blocks": "file:../../packages/blocks",
 		"@wordpress/core-data": "file:../../packages/core-data",
 		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/dataviews": "file:../../packages/dataviews",
 		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/fields": "file:../../packages/fields",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/lazy-editor": "file:../../packages/lazy-editor"
 	}
