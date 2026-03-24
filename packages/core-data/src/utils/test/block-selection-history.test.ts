@@ -12,6 +12,7 @@ import {
 	type YRelativeSelection,
 	type BlockSelectionHistory,
 } from '../block-selection-history';
+import { createYArray, createYMap, createYText } from '../crdt-utils';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import type { WPSelection } from '../../types';
 
@@ -20,35 +21,34 @@ import type { WPSelection } from '../../types';
  */
 function createTestDoc() {
 	const ydoc = new Y.Doc();
-	const documentMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
-	const blocks = new Y.Array();
-	documentMap.set( 'blocks', blocks );
+	const documentMap = ydoc.get( CRDT_RECORD_MAP_KEY );
+	const blocks = createYArray();
+	documentMap.setAttr( 'blocks', blocks );
 
 	// Create block 1 with a content attribute
-	const block1 = new Y.Map();
-	block1.set( 'clientId', 'block-1' );
-	const block1Attrs = new Y.Map();
-	block1Attrs.set( 'content', new Y.Text( 'Hello world' ) );
-	block1.set( 'attributes', block1Attrs );
-	block1.set( 'innerBlocks', new Y.Array() );
+	const block1 = createYMap( {
+		clientId: 'block-1',
+		attributes: createYMap( { content: createYText( 'Hello world' ) } ),
+		innerBlocks: createYArray(),
+	} );
 	blocks.push( [ block1 ] );
 
 	// Create block 2 with a content attribute
-	const block2 = new Y.Map();
-	block2.set( 'clientId', 'block-2' );
-	const block2Attrs = new Y.Map();
-	block2Attrs.set( 'content', new Y.Text( 'Second block' ) );
-	block2.set( 'attributes', block2Attrs );
-	block2.set( 'innerBlocks', new Y.Array() );
+	const block2 = createYMap( {
+		clientId: 'block-2',
+		attributes: createYMap( { content: createYText( 'Second block' ) } ),
+		innerBlocks: createYArray(),
+	} );
 	blocks.push( [ block2 ] );
 
 	// Create block 3 with a different attribute key
-	const block3 = new Y.Map();
-	block3.set( 'clientId', 'block-3' );
-	const block3Attrs = new Y.Map();
-	block3Attrs.set( 'value', new Y.Text( 'Third block with value attr' ) );
-	block3.set( 'attributes', block3Attrs );
-	block3.set( 'innerBlocks', new Y.Array() );
+	const block3 = createYMap( {
+		clientId: 'block-3',
+		attributes: createYMap( {
+			value: createYText( 'Third block with value attr' ),
+		} ),
+		innerBlocks: createYArray(),
+	} );
 	blocks.push( [ block3 ] );
 
 	return ydoc;
@@ -458,11 +458,11 @@ describe( 'BlockSelectionHistory', () => {
 			);
 			const startPosition = fullSelection.start as YRelativeSelection;
 			// Get the Y.Text and insert text before the position
-			const documentMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
-			const blocks = documentMap.get( 'blocks' ) as Y.Array< any >;
-			const block1 = blocks.get( 0 ) as Y.Map< any >;
-			const attrs = block1.get( 'attributes' ) as Y.Map< Y.Text >;
-			const ytext = attrs.get( 'content' );
+			const documentMap = ydoc.get( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.getAttr( 'blocks' ) as Y.Type;
+			const block1 = blocks.get( 0 ) as Y.Type;
+			const attrs = block1.getAttr( 'attributes' ) as Y.Type;
+			const ytext = attrs.getAttr( 'content' );
 			if ( ! ytext ) {
 				throw new Error( 'Y.Text not found' );
 			}
@@ -496,11 +496,11 @@ describe( 'BlockSelectionHistory', () => {
 			);
 			const startPosition = fullSelection.start as YRelativeSelection;
 			// Delete text before the position
-			const documentMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
-			const blocks = documentMap.get( 'blocks' ) as Y.Array< any >;
-			const block1 = blocks.get( 0 ) as Y.Map< any >;
-			const attrs = block1.get( 'attributes' ) as Y.Map< Y.Text >;
-			const ytext = attrs.get( 'content' );
+			const documentMap = ydoc.get( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.getAttr( 'blocks' ) as Y.Type;
+			const block1 = blocks.get( 0 ) as Y.Type;
+			const attrs = block1.getAttr( 'attributes' ) as Y.Type;
+			const ytext = attrs.getAttr( 'content' );
 			if ( ! ytext ) {
 				throw new Error( 'Y.Text not found' );
 			}

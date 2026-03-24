@@ -21,6 +21,7 @@ import {
 import {
 	findBlockByClientIdInDoc,
 	htmlIndexToRichTextOffset,
+	yTextToString,
 } from './crdt-utils';
 import type { WPBlockSelection, WPSelection } from '../types';
 
@@ -78,7 +79,7 @@ function convertYSelectionToBlockSelection(
 				clientId,
 				attributeKey,
 				offset: htmlIndexToRichTextOffset(
-					absolutePosition.type.toString(),
+					yTextToString( absolutePosition.type ),
 					absolutePosition.index
 				),
 			};

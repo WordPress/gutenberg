@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
-import { Y } from '@wordpress/sync';
 // @ts-ignore No exported types for block editor store selectors.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -10,6 +9,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import type { AbsoluteBlockIndexPath } from '../types';
+import { isYArray, isYMap, type YMap } from '../utils/crdt-utils';
 
 /**
  * A block as represented in the block-editor store (from `getBlocks()`).
@@ -32,15 +32,15 @@ interface EditorStoreBlock {
  * @return The index path from root, or null if traversal fails.
  */
 export function getBlockPathInYdoc(
-	yType: Y.Map< unknown >
+	yType?: YMap< any >
 ): AbsoluteBlockIndexPath | null {
 	const path: AbsoluteBlockIndexPath = [];
-	let current: Y.Map< unknown > = yType;
+	let current: YMap< any > | undefined = yType;
 
 	while ( current ) {
 		const parentArray = current.parent;
 
-		if ( ! parentArray || ! ( parentArray instanceof Y.Array ) ) {
+		if ( ! parentArray || ! isYArray( parentArray ) ) {
 			return null;
 		}
 
@@ -62,8 +62,8 @@ export function getBlockPathInYdoc(
 		// Walk up: is the parent array's parent a block Y.Map or the root?
 		const grandparent = parentArray.parent;
 		if (
-			grandparent instanceof Y.Map &&
-			grandparent.get( 'clientId' ) !== undefined
+			isYMap( grandparent ) &&
+			grandparent.getAttr( 'clientId' ) !== undefined
 		) {
 			current = grandparent; // It's a block, keep going.
 		} else {

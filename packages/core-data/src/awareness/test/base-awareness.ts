@@ -264,6 +264,7 @@ describe( 'BaseAwarenessState', () => {
 					updated: [ awareness.clientID ],
 					removed: [],
 				},
+				'test-origin',
 			] );
 
 			// Callback should not be called for equal values
@@ -287,6 +288,7 @@ describe( 'BaseAwarenessState', () => {
 					updated: [ awareness.clientID ],
 					removed: [],
 				},
+				'test-origin',
 			] );
 
 			expect( callback ).toHaveBeenCalled();
@@ -310,6 +312,7 @@ describe( 'BaseAwarenessState', () => {
 					updated: [ awareness.clientID ],
 					removed: [],
 				},
+				'test-origin',
 			] );
 
 			expect( receivedStates.length ).toBeGreaterThan( 0 );
