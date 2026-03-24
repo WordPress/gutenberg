@@ -123,80 +123,9 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			$default_layouts = $this->get_default_layouts_for_wp_template_part();
 			$default_view    = $this->get_default_view_for_wp_template_part( $default_layouts );
 		} elseif ( 'postType' === $kind && 'wp_template' === $name ) {
-			$default_view    = array(
-				'type'             => 'grid',
-				'perPage'          => 20,
-				'sort'             => array(
-					'field'     => 'title',
-					'direction' => 'asc',
-				),
-				'titleField'       => 'title',
-				'descriptionField' => 'description',
-				'mediaField'       => 'preview',
-				'fields'           => array( 'author', 'active', 'slug', 'theme' ),
-				'filters'          => array(),
-				'showMedia'        => true,
-			);
-			$default_layouts = array(
-				'table' => array( 'showMedia' => false ),
-				'grid'  => array( 'showMedia' => true ),
-				'list'  => array( 'showMedia' => false ),
-			);
-			$view_list       = array(
-				array(
-					'title' => __( 'All templates', 'gutenberg' ),
-					'slug'  => 'all',
-				),
-			);
-
-			// Add unique author-based items from registered templates.
-			$registered_templates = gutenberg_get_registered_block_templates( array() );
-			$seen_authors         = array();
-			foreach ( $registered_templates as $template ) {
-				$original_source = self::get_template_original_source( $template );
-				$author_text     = self::get_template_author_text( $template, $original_source );
-				if ( ! empty( $author_text ) && ! isset( $seen_authors[ $author_text ] ) ) {
-					$seen_authors[ $author_text ] = true;
-					$view_list[]                  = array(
-						'title' => $author_text,
-						'slug'  => $author_text,
-						'view'  => array(
-							'filters' => array(
-								array(
-									'field'    => 'author',
-									'operator' => 'is',
-									'value'    => $author_text,
-									'isLocked' => true,
-								),
-							),
-						),
-					);
-				}
-			}
-
-			// User-created DB templates.
-			$db_templates = get_block_templates( array(), 'wp_template' );
-			foreach ( $db_templates as $template ) {
-				$original_source = self::get_template_original_source( $template );
-				$author_text     = self::get_template_author_text( $template, $original_source );
-				if ( ! empty( $author_text ) && ! isset( $seen_authors[ $author_text ] ) ) {
-					$seen_authors[ $author_text ] = true;
-					$view_list[]                  = array(
-						'title' => $author_text,
-						'slug'  => $author_text,
-						'view'  => array(
-							'filters' => array(
-								array(
-									'field'    => 'author',
-									'operator' => 'is',
-									'value'    => $author_text,
-									'isLocked' => true,
-								),
-							),
-						),
-					);
-				}
-			}
+			$default_view    = $this->get_default_view_for_wp_template();
+			$default_layouts = $this->get_default_layouts_for_wp_template();
+			$view_list       = $this->get_view_list_for_wp_template();
 		}
 
 		$response = array(
@@ -838,5 +767,90 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		}
 
 		return '';
+	}
+
+	private function get_default_view_for_wp_template() {
+		return array(
+			'type'             => 'grid',
+			'perPage'          => 20,
+			'sort'             => array(
+				'field'     => 'title',
+				'direction' => 'asc',
+			),
+			'titleField'       => 'title',
+			'descriptionField' => 'description',
+			'mediaField'       => 'preview',
+			'fields'           => array( 'author', 'active', 'slug', 'theme' ),
+			'filters'          => array(),
+			'showMedia'        => true,
+		);
+	}
+
+	private function get_default_layouts_for_wp_template() {
+		return array(
+			'table' => array( 'showMedia' => false ),
+			'grid'  => array( 'showMedia' => true ),
+			'list'  => array( 'showMedia' => false ),
+		);
+	}
+
+	private function get_view_list_for_wp_template() {
+		$view_list = array(
+			array(
+				'title' => __( 'All templates', 'gutenberg' ),
+				'slug'  => 'all',
+			),
+		);
+
+		// Add unique author-based items from registered templates.
+		$registered_templates = gutenberg_get_registered_block_templates( array() );
+		$seen_authors         = array();
+		foreach ( $registered_templates as $template ) {
+			$original_source = self::get_template_original_source( $template );
+			$author_text     = self::get_template_author_text( $template, $original_source );
+			if ( ! empty( $author_text ) && ! isset( $seen_authors[ $author_text ] ) ) {
+				$seen_authors[ $author_text ] = true;
+				$view_list[]                  = array(
+					'title' => $author_text,
+					'slug'  => $author_text,
+					'view'  => array(
+						'filters' => array(
+							array(
+								'field'    => 'author',
+								'operator' => 'is',
+								'value'    => $author_text,
+								'isLocked' => true,
+							),
+						),
+					),
+				);
+			}
+		}
+
+		// User-created DB templates.
+		$db_templates = get_block_templates( array(), 'wp_template' );
+		foreach ( $db_templates as $template ) {
+			$original_source = self::get_template_original_source( $template );
+			$author_text     = self::get_template_author_text( $template, $original_source );
+			if ( ! empty( $author_text ) && ! isset( $seen_authors[ $author_text ] ) ) {
+				$seen_authors[ $author_text ] = true;
+				$view_list[]                  = array(
+					'title' => $author_text,
+					'slug'  => $author_text,
+					'view'  => array(
+						'filters' => array(
+							array(
+								'field'    => 'author',
+								'operator' => 'is',
+								'value'    => $author_text,
+								'isLocked' => true,
+							),
+						),
+					),
+				);
+			}
+		}
+
+		return $view_list;
 	}
 }
