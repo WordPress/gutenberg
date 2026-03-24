@@ -79,7 +79,9 @@ It's slow to set states manually before or after tests, especially when they're 
 
 ### Avoid global variables
 
-In the previous E2E test setup, `page` and `browser` were exposed as global variables. This made it harder to work with when having multiple pages/tabs in the same test, or when running multiple tests in parallel. `@playwright/test` has the concept of [fixtures](https://playwright.dev/docs/test-fixtures) which allows us to inject `page`, `browser`, and other parameters into the tests.
+In the previous E2E setup, `page` and `browser` were global variables, which made working with multiple pages or parallel tests harder.
+
+`@playwright/test` uses fixtures to inject `page`, `browser`, and other parameters into tests.
 
 ### Make explicit assertions
 
