@@ -10,7 +10,6 @@ import type { DataRegistry } from '@wordpress/data';
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
 import { fetchInstallFontFace } from '../api';
-import { formatFontFaceName } from './preview-styles';
 import type { FontFamilyToUpload, FontUploadResult } from '../types';
 import { unlock } from '../../lock-unlock';
 
@@ -140,8 +139,51 @@ export function normalizeCSSFontFaceFontFamily( fontName: string ): string {
 		.replaceAll( '&', '\\26 ' ) }"`;
 }
 
+const documentSheet = new CSSStyleSheet();
+const iframeSheet = new CSSStyleSheet();
+
+function getTargetSheets(
+	target: 'all' | 'document' | 'iframe'
+): CSSStyleSheet[] {
+	const sheets: CSSStyleSheet[] = [];
+	if ( target === 'document' || target === 'all' ) {
+		sheets.push( documentSheet );
+	}
+	if ( target === 'iframe' || target === 'all' ) {
+		sheets.push( iframeSheet );
+	}
+	return sheets;
+}
+
+function ensureSheetsAdopted( target: 'all' | 'document' | 'iframe' ) {
+	if ( target === 'document' || target === 'all' ) {
+		if ( ! document.adoptedStyleSheets.includes( documentSheet ) ) {
+			document.adoptedStyleSheets = [
+				...document.adoptedStyleSheets,
+				documentSheet,
+			];
+		}
+	}
+	if ( target === 'iframe' || target === 'all' ) {
+		const iframe = document.querySelector(
+			'iframe[name="editor-canvas"]'
+		) as HTMLIFrameElement;
+		const iframeDoc = iframe?.contentDocument;
+		if (
+			iframeDoc &&
+			! iframeDoc.adoptedStyleSheets.includes( iframeSheet )
+		) {
+			iframeDoc.adoptedStyleSheets = [
+				...iframeDoc.adoptedStyleSheets,
+				iframeSheet,
+			];
+		}
+	}
+}
+
 /*
- * Loads the font face from a URL and adds it to the browser.
+ * Loads the font face from a URL and adds it to the browser
+ * via a managed CSSStyleSheet with @font-face rules.
  * It also adds it to the iframe document.
  */
 export async function loadFontFaceInBrowser(
@@ -149,76 +191,63 @@ export async function loadFontFaceInBrowser(
 	source: string | File,
 	addTo: 'all' | 'document' | 'iframe' = 'all'
 ): Promise< void > {
-	let dataSource;
-
+	let src: string;
 	if ( typeof source === 'string' ) {
-		dataSource = `url(${ source })`;
+		src = source;
 	} else if ( source instanceof File ) {
-		dataSource = await source.arrayBuffer();
+		src = URL.createObjectURL( source );
 	} else {
 		return;
 	}
 
-	const newFont = new window.FontFace(
-		formatFontFaceName( fontFace.fontFamily ),
-		dataSource,
-		{
-			style: fontFace.fontStyle,
-			weight: String( fontFace.fontWeight ),
-		}
-	);
-
-	const loadedFace = await newFont.load();
-
-	if ( addTo === 'document' || addTo === 'all' ) {
-		document.fonts.add( loadedFace );
+	const descriptors = [
+		`font-family: ${ fontFace.fontFamily }`,
+		`src: url("${ src }")`,
+		`font-style: ${ fontFace.fontStyle ?? 'normal' }`,
+		`font-weight: ${ fontFace.fontWeight ?? 'normal' }`,
+	];
+	if ( fontFace.fontDisplay ) {
+		descriptors.push( `font-display: ${ fontFace.fontDisplay }` );
 	}
+	const rule = `@font-face { ${ descriptors.join( '; ' ) } }`;
 
-	if ( addTo === 'iframe' || addTo === 'all' ) {
-		const iframe = document.querySelector(
-			'iframe[name="editor-canvas"]'
-		) as HTMLIFrameElement;
-		if ( iframe?.contentDocument ) {
-			iframe.contentDocument.fonts.add( loadedFace );
-		}
+	ensureSheetsAdopted( addTo );
+	for ( const sheet of getTargetSheets( addTo ) ) {
+		sheet.insertRule( rule, sheet.cssRules.length );
 	}
 }
 
 /*
- * Unloads the font face and remove it from the browser.
- * It also removes it from the iframe document.
- *
- * Note that Font faces that were added to the set using the CSS @font-face rule
- * remain connected to the corresponding CSS, and cannot be deleted.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/API/FontFaceSet/delete.
+ * Unloads the font face and removes it from the browser
+ * by deleting matching @font-face rules from the managed CSSStyleSheets.
  */
 export function unloadFontFaceInBrowser(
 	fontFace: FontFace,
 	removeFrom: 'all' | 'document' | 'iframe' = 'all'
 ): void {
-	const unloadFontFace = ( fonts: FontFaceSet ) => {
-		fonts.forEach( ( f ) => {
-			if (
-				f.family === formatFontFaceName( fontFace?.fontFamily ) &&
-				f.weight === fontFace?.fontWeight &&
-				f.style === fontFace?.fontStyle
-			) {
-				fonts.delete( f );
+	// Use a temp sheet to get the browser-normalized fontFamily for matching.
+	const tempSheet = new CSSStyleSheet();
+	const refIdx = tempSheet.insertRule(
+		`@font-face { font-family: ${ fontFace.fontFamily } }`
+	);
+	const refFamily = ( tempSheet.cssRules[ refIdx ] as CSSFontFaceRule ).style
+		.fontFamily;
+
+	for ( const sheet of getTargetSheets( removeFrom ) ) {
+		// Walk rules in reverse to safely delete by index.
+		for ( let i = sheet.cssRules.length - 1; i >= 0; i-- ) {
+			const rule = sheet.cssRules[ i ];
+			if ( rule instanceof CSSFontFaceRule ) {
+				const match =
+					rule.style.fontFamily === refFamily &&
+					( rule.style.fontWeight || 'normal' ) ===
+						String( fontFace.fontWeight ?? 'normal' ) &&
+					( rule.style.fontStyle || 'normal' ) ===
+						( fontFace.fontStyle ?? 'normal' );
+				if ( match ) {
+					sheet.deleteRule( i );
+				}
 			}
-		} );
-	};
-
-	if ( removeFrom === 'document' || removeFrom === 'all' ) {
-		unloadFontFace( document.fonts );
-	}
-
-	if ( removeFrom === 'iframe' || removeFrom === 'all' ) {
-		const iframe = document.querySelector(
-			'iframe[name="editor-canvas"]'
-		) as HTMLIFrameElement;
-		if ( iframe?.contentDocument ) {
-			unloadFontFace( iframe.contentDocument.fonts );
 		}
 	}
 }
