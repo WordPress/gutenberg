@@ -113,124 +113,15 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			),
 		);
 		if ( 'postType' === $kind && 'page' === $name ) {
-			$default_view    = array(
-				'type'       => 'list',
-				'filters'    => array(),
-				'perPage'    => 20,
-				'sort'       => array(
-					'field'     => 'title',
-					'direction' => 'asc',
-				),
-				'showLevels' => true,
-				'titleField' => 'title',
-				'mediaField' => 'featured_media',
-				'fields'     => array( 'author', 'status' ),
-			);
-			$default_layouts = array(
-				'table' => array(
-					'layout' => array(
-						'styles' => array(
-							'author' => array(
-								'align' => 'start',
-							),
-						),
-					),
-				),
-				'grid'  => array(),
-				'list'  => array(),
-			);
-			$view_list       = array(
-				array(
-					'title' => $all_items_title,
-					'slug'  => 'all',
-				),
-				array(
-					'title' => __( 'Published', 'gutenberg' ),
-					'slug'  => 'published',
-					'view'  => array(
-						'filters' => array(
-							array(
-								'field'    => 'status',
-								'operator' => 'isAny',
-								'value'    => 'publish',
-								'isLocked' => true,
-							),
-						),
-					),
-				),
-				array(
-					'title' => __( 'Scheduled', 'gutenberg' ),
-					'slug'  => 'future',
-					'view'  => array(
-						'filters' => array(
-							array(
-								'field'    => 'status',
-								'operator' => 'isAny',
-								'value'    => 'future',
-								'isLocked' => true,
-							),
-						),
-					),
-				),
-				array(
-					'title' => __( 'Drafts', 'gutenberg' ),
-					'slug'  => 'drafts',
-					'view'  => array(
-						'filters' => array(
-							array(
-								'field'    => 'status',
-								'operator' => 'isAny',
-								'value'    => 'draft',
-								'isLocked' => true,
-							),
-						),
-					),
-				),
-				array(
-					'title' => __( 'Pending', 'gutenberg' ),
-					'slug'  => 'pending',
-					'view'  => array(
-						'filters' => array(
-							array(
-								'field'    => 'status',
-								'operator' => 'isAny',
-								'value'    => 'pending',
-								'isLocked' => true,
-							),
-						),
-					),
-				),
-				array(
-					'title' => __( 'Private', 'gutenberg' ),
-					'slug'  => 'private',
-					'view'  => array(
-						'filters' => array(
-							array(
-								'field'    => 'status',
-								'operator' => 'isAny',
-								'value'    => 'private',
-								'isLocked' => true,
-							),
-						),
-					),
-				),
-				array(
-					'title' => __( 'Trash', 'gutenberg' ),
-					'slug'  => 'trash',
-					'view'  => array(
-						'type'    => 'table',
-						'layout'  => isset( $default_layouts['table']['layout'] ) ? $default_layouts['table']['layout'] : array(),
-						'filters' => array(
-							array(
-								'field'    => 'status',
-								'operator' => 'isAny',
-								'value'    => 'trash',
-								'isLocked' => true,
-							),
-						),
-					),
-				),
-			);
+			$default_layouts = $this->get_default_layouts_for_page();
+			$default_view    = $this->get_default_view_for_page();
+			$view_list       = $this->get_view_list_for_page( $all_items_title, $default_layouts );
+		} elseif ( 'postType' === $kind && 'wp_block' === $name ) {
+			$default_layouts = $this->get_default_layouts_for_wp_block();
+			$default_view    = $this->get_default_view_for_wp_block( $default_layouts );
+		} elseif ( 'postType' === $kind && 'wp_template_part' === $name ) {
+			$default_layouts = $this->get_default_layouts_for_wp_template_part();
+			$default_view    = $this->get_default_view_for_wp_template_part( $default_layouts );
 		}
 
 		$response = array(
@@ -597,6 +488,191 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					'enum' => array( 'compact', 'balanced', 'comfortable' ),
 				),
 			),
+		);
+	}
+
+	private function get_default_view_for_page() {
+		return array(
+			'type'       => 'list',
+			'filters'    => array(),
+			'perPage'    => 20,
+			'sort'       => array(
+				'field'     => 'title',
+				'direction' => 'asc',
+			),
+			'showLevels' => true,
+			'titleField' => 'title',
+			'mediaField' => 'featured_media',
+			'fields'     => array( 'author', 'status' ),
+		);
+	}
+
+	private function get_default_layouts_for_page() {
+		return array(
+			'table' => array(
+				'layout' => array(
+					'styles' => array(
+						'author' => array(
+							'align' => 'start',
+						),
+					),
+				),
+			),
+			'grid'  => array(),
+			'list'  => array(),
+		);
+	}
+
+	private function get_view_list_for_page( $all_items_title, $default_layouts ) {
+		return array(
+			array(
+				'title' => $all_items_title,
+				'slug'  => 'all',
+			),
+			array(
+				'title' => __( 'Published', 'gutenberg' ),
+				'slug'  => 'published',
+				'view'  => array(
+					'filters' => array(
+						array(
+							'field'    => 'status',
+							'operator' => 'isAny',
+							'value'    => 'publish',
+							'isLocked' => true,
+						),
+					),
+				),
+			),
+			array(
+				'title' => __( 'Scheduled', 'gutenberg' ),
+				'slug'  => 'future',
+				'view'  => array(
+					'filters' => array(
+						array(
+							'field'    => 'status',
+							'operator' => 'isAny',
+							'value'    => 'future',
+							'isLocked' => true,
+						),
+					),
+				),
+			),
+			array(
+				'title' => __( 'Drafts', 'gutenberg' ),
+				'slug'  => 'drafts',
+				'view'  => array(
+					'filters' => array(
+						array(
+							'field'    => 'status',
+							'operator' => 'isAny',
+							'value'    => 'draft',
+							'isLocked' => true,
+						),
+					),
+				),
+			),
+			array(
+				'title' => __( 'Pending', 'gutenberg' ),
+				'slug'  => 'pending',
+				'view'  => array(
+					'filters' => array(
+						array(
+							'field'    => 'status',
+							'operator' => 'isAny',
+							'value'    => 'pending',
+							'isLocked' => true,
+						),
+					),
+				),
+			),
+			array(
+				'title' => __( 'Private', 'gutenberg' ),
+				'slug'  => 'private',
+				'view'  => array(
+					'filters' => array(
+						array(
+							'field'    => 'status',
+							'operator' => 'isAny',
+							'value'    => 'private',
+							'isLocked' => true,
+						),
+					),
+				),
+			),
+			array(
+				'title' => __( 'Trash', 'gutenberg' ),
+				'slug'  => 'trash',
+				'view'  => array(
+					'type'    => 'table',
+					'layout'  => $default_layouts['table']['layout'],
+					'filters' => array(
+						array(
+							'field'    => 'status',
+							'operator' => 'isAny',
+							'value'    => 'trash',
+							'isLocked' => true,
+						),
+					),
+				),
+			),
+		);
+	}
+
+	private function get_default_layouts_for_wp_block() {
+		return array(
+			'table' => array(
+				'layout' => array(
+					'styles' => array(
+						'author' => array(
+							'width' => '1%',
+						),
+					),
+				),
+			),
+			'grid'  => array(
+				'layout' => array(
+					'badgeFields' => array( 'sync-status' ),
+				),
+			),
+		);
+	}
+
+	private function get_default_view_for_wp_block( $default_layouts ) {
+		return array(
+			'type'       => 'grid',
+			'perPage'    => 20,
+			'titleField' => 'title',
+			'mediaField' => 'preview',
+			'fields'     => array( 'sync-status' ),
+			'filters'    => array(),
+			'layout'     => $default_layouts['grid']['layout'],
+		);
+	}
+
+	private function get_default_layouts_for_wp_template_part() {
+		return array(
+			'table' => array(
+				'layout' => array(
+					'styles' => array(
+						'author' => array(
+							'width' => '1%',
+						),
+					),
+				),
+			),
+			'grid'  => array(),
+		);
+	}
+
+	private function get_default_view_for_wp_template_part( $default_layouts ) {
+		return array(
+			'type'       => 'grid',
+			'perPage'    => 20,
+			'titleField' => 'title',
+			'mediaField' => 'preview',
+			'fields'     => array( 'author' ),
+			'filters'    => array(),
+			'layout'     => $default_layouts['grid']['layout'],
 		);
 	}
 }
