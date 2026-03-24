@@ -37,10 +37,7 @@ import {
 } from './utils';
 import { BlockStatesControl, STATES_SUPPORT_KEY } from './states';
 import { buildStateSelector, buildCanvasStateSelector } from './state-utils';
-import { unlock } from '../lock-unlock';
-import { privateApis as blockEditorPrivateApis } from '../private-apis';
-
-const { BlockInspectorPreTabsFill } = unlock( blockEditorPrivateApis );
+import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspector-pre-tabs-slot-fill';
 import StylesColorPanel from '../components/global-styles/color-panel';
 import StylesTypographyPanel from '../components/global-styles/typography-panel';
 import StylesBorderPanel from '../components/global-styles/border-panel';
