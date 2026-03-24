@@ -802,8 +802,41 @@ Note that for layout to work correctly, the block it applies to should have a cl
 
 -   Type: `Object`
 -   Default value: null
+-   Subproperties:
+    -   `type`: type `string`, allowed values `"constrained"`, `"grid"`, `"flex"`
+    -   `contentSize`: type `string` (used with `constrained` layout — sets the content size applied to all children)
+    -   `wideSize`: type `string` (used with `constrained` layout — sets the wide size applied to alignwide children)
+    -   `justifyContent`: type `string`, allowed values `"right"`, `"center"`, `"space-between"`, `"left"`, `"stretch"` (used with `flex` and `constrained` layouts)
+    -   `orientation`: type `string`, allowed values `"horizontal"`, `"vertical"` (used with `flex` layout)
+    -   `flexWrap`: type `string`, allowed values `"wrap"`, `"nowrap"` (used with `flex` layout)
+    -   `verticalAlignment`: type `string`, allowed values `"top"`, `"center"`, `"bottom"`, `"space-between"`, `"stretch"` (used with `flex` layout)
+    -   `minimumColumnWidth`: type `string` (used with `grid` layout — sets the minimum column width)
+    -   `columnCount`: type `number` (used with `grid` layout — sets the column count)
 
-Allows setting the `type` property to define what layout type is default for the block, and also default values for any properties inherent to that layout type. For example, for a `flex` layout, a default value can be set for `flexWrap`.
+Allows setting the `type` property to define what layout type is default for the block, and also default values for any properties inherent to that layout type.
+
+```js
+supports: {
+    layout: {
+        // Set a default flex layout with nowrap.
+        default: {
+            type: 'flex',
+            flexWrap: 'nowrap',
+        },
+    },
+}
+
+supports: {
+    layout: {
+        // Set a default constrained layout with content and wide sizes.
+        default: {
+            type: 'constrained',
+            contentSize: '800px',
+            wideSize: '1200px',
+        },
+    },
+}
+```
 
 ### layout.allowSwitching
 
