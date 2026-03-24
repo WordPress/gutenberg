@@ -13,7 +13,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { PlainText, store as blockEditorStore } from '@wordpress/block-editor';
+import { CodeEditor, store as blockEditorStore } from '@wordpress/block-editor';
 import { fullscreen, square } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 
@@ -147,7 +147,8 @@ export default function HTMLEditModal( {
 									focusable={ false }
 									className="block-library-html__modal-tab"
 								>
-									<PlainText
+									<CodeEditor
+										mode="html"
 										value={ editedHtml }
 										onChange={ setEditedHtml }
 										placeholder={ __( 'Write HTML…' ) }
@@ -161,7 +162,8 @@ export default function HTMLEditModal( {
 										focusable={ false }
 										className="block-library-html__modal-tab"
 									>
-										<PlainText
+										<CodeEditor
+											mode="css"
 											value={ editedCss }
 											onChange={ setEditedCss }
 											placeholder={ __( 'Write CSS…' ) }
@@ -176,7 +178,8 @@ export default function HTMLEditModal( {
 										focusable={ false }
 										className="block-library-html__modal-tab"
 									>
-										<PlainText
+										<CodeEditor
+											mode="javascript"
 											value={ editedJs }
 											onChange={ setEditedJs }
 											placeholder={ __(
