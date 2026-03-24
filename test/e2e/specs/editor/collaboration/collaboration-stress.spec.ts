@@ -452,7 +452,8 @@ test.describe( 'Collaboration - Stress Test', () => {
 			)
 		);
 
-		// Verify Alpha moved below Beta on all users.
+		// Verify Alpha moved below Beta and Gamma moved above the
+		// "Analysis Team" blockquote on all users.
 		for ( const ed of [ editor, editor2, editor3 ] ) {
 			await expect( async () => {
 				const blocks = await ed.getBlocks();
@@ -468,6 +469,20 @@ test.describe( 'Collaboration - Stress Test', () => {
 				expect( alphaIdx ).toBeGreaterThan( -1 );
 				expect( betaIdx ).toBeGreaterThan( -1 );
 				expect( alphaIdx ).toBeGreaterThan( betaIdx );
+
+				// Gamma was moved up, so it should now be above the
+				// "Analysis Team" blockquote that was previously above it.
+				const gammaIdx = texts.findIndex( ( t ) =>
+					t.includes( 'Gamma section content' )
+				);
+				const quoteIdx = blocks.findIndex( ( b ) =>
+					String( b.attributes.citation ?? '' ).includes(
+						'Analysis Team'
+					)
+				);
+				expect( gammaIdx ).toBeGreaterThan( -1 );
+				expect( quoteIdx ).toBeGreaterThan( -1 );
+				expect( gammaIdx ).toBeLessThan( quoteIdx );
 			} ).toPass( { timeout: 10_000 } );
 		}
 
