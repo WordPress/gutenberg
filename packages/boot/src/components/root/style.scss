@@ -51,6 +51,7 @@
 	.boot-layout--single-page & {
 		top: variables.$admin-bar-height-big;
 	}
+
 	z-index: 3;
 	background: var(--wpds-color-bg-surface-neutral);
 	padding: variables.$grid-unit-20;
@@ -114,7 +115,6 @@
 		margin: 0;
 
 		.boot-layout--single-page & {
-			top: auto;
 			height: auto;
 		}
 	}
@@ -171,7 +171,6 @@
 		z-index: auto;
 
 		.boot-layout--single-page & {
-			top: auto;
 			height: auto;
 		}
 	}
