@@ -409,6 +409,12 @@ export default function LinkUIAddMenuItems( {
 				if ( MAIN_TAB_SLUGS.has( pt.slug ) ) {
 					return;
 				}
+
+				// Exclude Media
+				if ( pt.slug === 'attachment' ) {
+					return;
+				}
+
 				if ( pt.viewable === false ) {
 					return;
 				}
