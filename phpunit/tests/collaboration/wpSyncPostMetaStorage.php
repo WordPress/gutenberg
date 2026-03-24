@@ -477,7 +477,7 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 
 		$this->assertTrue( $storage->add_update( $room, $seed_update ) );
 
-		$initial_updates = $storage->get_updates_after_cursor( $room, 0 );
+		$storage->get_updates_after_cursor( $room, 0 );
 		$baseline_cursor = $storage->get_cursor( $room );
 
 		// The seed from create_storage_post() plus the one we just added.
