@@ -195,7 +195,7 @@ export default function CodeEditor( {
 				<VisuallyHidden id={ instructionsId }>
 					{ editorInstructionsText }
 					{ __(
-						'Press Escape then Tab to move focus out of the editor.'
+						'In the editing area, the Tab key enters a tab character. Press Escape then Tab to move focus out of the editor.'
 					) }
 				</VisuallyHidden>
 			) }
