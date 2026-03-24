@@ -25,6 +25,7 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 		collaborationUtils,
 		requestUtils,
 		editor,
+		page,
 	} ) => {
 		test.setTimeout( 60_000 );
 
@@ -35,31 +36,63 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 		} );
 		await collaborationUtils.openPost( post.id );
 
-		// User A inserts all text blocks.
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'Gauntlet paragraph' },
-		} );
-		await editor.insertBlock( {
-			name: 'core/heading',
-			attributes: { content: 'Gauntlet heading', level: 2 },
-		} );
-		await editor.insertBlock( {
-			name: 'core/code',
-			attributes: { content: 'const x = 1;' },
-		} );
-		await editor.insertBlock( {
-			name: 'core/preformatted',
-			attributes: { content: 'preformatted text' },
-		} );
-		await editor.insertBlock( {
-			name: 'core/verse',
-			attributes: { content: 'roses are red' },
-		} );
-		await editor.insertBlock( {
-			name: 'core/pullquote',
-			attributes: { value: 'A great quote', citation: 'Author A' },
-		} );
+		// User A inserts all text blocks via slash commands.
+		// For blocks where Enter creates a new paragraph (paragraph,
+		// heading), we chain naturally. For blocks where Enter adds a
+		// newline within (code, preformatted, verse), we press Escape
+		// to deselect and then click the appender for a fresh paragraph.
+
+		// Helper: insert a new default block (paragraph) after the
+		// currently focused block using the editor keyboard shortcut.
+		async function openFreshParagraph() {
+			await page.keyboard.press( 'ControlOrMeta+Alt+y' );
+		}
+
+		// Helper: type a slash command in the current empty paragraph,
+		// wait for the autocomplete, and confirm.
+		async function slashInsert( command: string ) {
+			await page.keyboard.type( '/' + command );
+			await expect( page.locator( '[role="listbox"]' ) ).toBeVisible();
+			await page.keyboard.press( 'Enter' );
+		}
+
+		// Paragraph: click the default block appender and type.
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'Gauntlet paragraph' );
+
+		// Heading: Enter from paragraph creates a new paragraph for
+		// the slash command.
+		await page.keyboard.press( 'Enter' );
+		await slashInsert( 'heading' );
+		await page.keyboard.type( 'Gauntlet heading' );
+
+		// Code: Enter from heading creates a new paragraph.
+		await page.keyboard.press( 'Enter' );
+		await slashInsert( 'code' );
+		await page.keyboard.type( 'const x = 1;' );
+
+		// Preformatted: Escape out of code, then appender.
+		await openFreshParagraph();
+		await slashInsert( 'preformatted' );
+		await page.keyboard.type( 'preformatted text' );
+
+		// Verse: Escape out of preformatted, then appender.
+		await openFreshParagraph();
+		await slashInsert( 'verse' );
+		await page.keyboard.type( 'roses are red' );
+
+		// Pullquote: Escape out of verse, then appender.
+		await openFreshParagraph();
+		await slashInsert( 'pullquote' );
+		await page.keyboard.type( 'A great quote' );
+		await editor.canvas
+			.locator(
+				'[data-type="core/pullquote"] .wp-block-pullquote__citation'
+			)
+			.click();
+		await page.keyboard.type( 'Author A' );
 
 		// User B joins after User A has inserted blocks.
 		await collaborationUtils.joinUser( post.id, SECOND_USER );
