@@ -137,7 +137,7 @@ function gutenberg_register_custom_css_support( $block_type ) {
  * replace only the attribute JSON that changed — no parse_blocks() +
  * serialize_blocks() round-trip needed.
  *
- * @param string $content Post content to filter.
+ * @param string $content Post content to filter, expected to be escaped with slashes.
  * @return string Filtered post content with block custom CSS removed.
  */
 function gutenberg_strip_custom_css_from_blocks( $content ) {
@@ -145,15 +145,7 @@ function gutenberg_strip_custom_css_from_blocks( $content ) {
 		return $content;
 	}
 
-	// The content may be slashed (e.g. via content_save_pre),
-	// which breaks JSON parsing. Unslash first,
-	// then re-slash the result before returning.
-	$unslashed = wp_unslash( $content );
-
-	// Fast check: if no "css" key anywhere, skip parsing entirely.
-	if ( ! str_contains( $unslashed, '"css"' ) ) {
-		return $content;
-	}
+	$unslashed = stripslashes( $content );
 
 	$parser           = new WP_Block_Parser();
 	$parser->document = $unslashed;
@@ -212,15 +204,15 @@ function gutenberg_strip_custom_css_from_blocks( $content ) {
 
 	foreach ( $replacements as $replacement ) {
 		list( $offset, $length, $new_json ) = $replacement;
-		$result .= substr( $unslashed, $was_at, $offset - $was_at ) . $new_json;
-		$was_at  = $offset + $length;
+		$result                            .= substr( $unslashed, $was_at, $offset - $was_at ) . $new_json;
+		$was_at                             = $offset + $length;
 	}
 
 	if ( $was_at < $end ) {
 		$result .= substr( $unslashed, $was_at );
 	}
 
-	return wp_slash( $result );
+	return addslashes( $result );
 }
 
 /**
