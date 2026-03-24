@@ -815,6 +815,8 @@ Note that for layout to work correctly, the block it applies to should have a cl
 
 Allows setting the `type` property to define what layout type is default for the block, and also default values for any properties inherent to that layout type.
 
+Flex layout example:
+
 ```js
 supports: {
     layout: {
@@ -825,7 +827,11 @@ supports: {
         },
     },
 }
+```
 
+Constrained layout example:
+
+```
 supports: {
     layout: {
         // Set a default constrained layout with content and wide sizes.
