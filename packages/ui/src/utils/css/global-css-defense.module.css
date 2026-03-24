@@ -88,3 +88,12 @@
 	line-height: var(--_gcd-p-line-height, 1.5);
 	margin: var(--_gcd-p-margin, 1em 0);
 }
+
+.a,
+.a:is(:hover, :focus, :active) {
+	outline: var(--_gcd-a-outline, 0);
+	color: var(--_gcd-a-color, inherit);
+	box-shadow: var(--_gcd-a-box-shadow, none);
+	border-radius: var(--_gcd-a-border-radius, 0);
+	transition: none;
+}
