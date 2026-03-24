@@ -167,7 +167,7 @@ export async function importContentGuidelines( file: File ): Promise< void > {
 
 	const response = await saveGuidelinesBypassingStore(
 		guidelinesStore.getId(),
-		'draft',
+		guidelinesStore.getStatus() || 'draft',
 		newGuidelines
 	);
 
