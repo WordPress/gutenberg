@@ -332,6 +332,282 @@ describe( 'heic-parser', () => {
 		} );
 	} );
 
+	describe( 'parseHeic – grid/tiled image', () => {
+		/**
+		 * Build a grid HEIC file with multiple tiles (like iPhone photos).
+		 *
+		 * The structure is: ftyp, meta (hdlr, pitm, iinf, iref, iloc, iprp), mdat.
+		 * The primary item is type 'grid' referencing tile items of type 'hvc1'.
+		 */
+		function buildGridHeic( {
+			rows = 2,
+			columns = 2,
+			tileWidth = 512,
+			tileHeight = 512,
+			outputWidth = 1024,
+			outputHeight = 1024,
+			tileData = new Uint8Array( [ 0xca, 0xfe ] ),
+		}: {
+			rows?: number;
+			columns?: number;
+			tileWidth?: number;
+			tileHeight?: number;
+			outputWidth?: number;
+			outputHeight?: number;
+			tileData?: Uint8Array;
+		} = {} ): ArrayBuffer {
+			const gridItemId = 1;
+			const tileCount = rows * columns;
+			// Tile item IDs start at 2.
+			const tileItemIds = Array.from(
+				{ length: tileCount },
+				( _, i ) => i + 2
+			);
+
+			// Grid descriptor: version(1), flags(1), rows_minus_one(1), columns_minus_one(1),
+			// output_width(2), output_height(2) = 8 bytes (small fields).
+			const gridDescriptor = new Uint8Array( 8 );
+			gridDescriptor[ 0 ] = 0; // version
+			gridDescriptor[ 1 ] = 0; // flags (no large fields)
+			gridDescriptor[ 2 ] = rows - 1;
+			gridDescriptor[ 3 ] = columns - 1;
+			const gdv = new DataView( gridDescriptor.buffer );
+			gdv.setUint16( 4, outputWidth );
+			gdv.setUint16( 6, outputHeight );
+
+			// Build property boxes (1=hvcC, 2=ispe)
+			const hvcC = buildHvcC();
+			const ispe = buildIspe( tileWidth, tileHeight );
+			const ipco = buildIpco( hvcC, ispe );
+
+			// ipma: each tile item → [1, 2] (hvcC at index 1, ispe at index 2)
+			const associations: Array< [ number, number[] ] > = tileItemIds.map(
+				( id ) => [ id, [ 1, 2 ] ] as [ number, number[] ]
+			);
+			const ipma = buildIpma( associations );
+			const iprp = buildIprp( ipco, ipma );
+
+			// iinf: grid item type 'grid', tile items type 'hvc1'.
+			const iinf = buildIinf( [
+				[ gridItemId, 'grid' ],
+				...tileItemIds.map(
+					( id ) => [ id, 'hvc1' ] as [ number, string ]
+				),
+			] );
+
+			// iref: dimg reference from grid to tiles.
+			const iref = buildIref( gridItemId, tileItemIds );
+
+			// Build everything except iloc and mdat first to calculate offsets.
+			const ftyp = buildBox(
+				'ftyp',
+				new Uint8Array( [ 0x68, 0x65, 0x69, 0x63 ] )
+			);
+			const hdlr = buildHdlr();
+			const pitm = buildPitm( gridItemId );
+
+			// We need iloc for grid item + all tile items.
+			// First, build a placeholder iloc to calculate meta size.
+			const placeholderItems: Array<
+				[ number, Array< [ number, number ] > ]
+			> = [
+				[ gridItemId, [ [ 0, gridDescriptor.length ] ] ],
+				...tileItemIds.map(
+					( id ) =>
+						[ id, [ [ 0, tileData.length ] ] ] as [
+							number,
+							Array< [ number, number ] >,
+						]
+				),
+			];
+			const placeholderIloc = buildIloc( placeholderItems );
+
+			const metaChildren = concat(
+				hdlr,
+				pitm,
+				iinf,
+				iref,
+				placeholderIloc,
+				iprp
+			);
+			const metaSize = 8 + 4 + metaChildren.length; // box header + fullbox
+			const mdatHeaderSize = 8;
+			const mdatDataStart = ftyp.length + metaSize + mdatHeaderSize;
+
+			// Grid descriptor is at the start of mdat, tiles follow.
+			const gridOffset = mdatDataStart;
+			let currentOffset = gridOffset + gridDescriptor.length;
+			const tileOffsets: number[] = [];
+			for ( let i = 0; i < tileCount; i++ ) {
+				tileOffsets.push( currentOffset );
+				currentOffset += tileData.length;
+			}
+
+			// Build real iloc.
+			const realItems: Array< [ number, Array< [ number, number ] > ] > =
+				[
+					[ gridItemId, [ [ gridOffset, gridDescriptor.length ] ] ],
+					...tileItemIds.map(
+						( id, i ) =>
+							[
+								id,
+								[ [ tileOffsets[ i ], tileData.length ] ],
+							] as [ number, Array< [ number, number ] > ]
+					),
+				];
+			const iloc = buildIloc( realItems );
+
+			const realMetaChildren = concat(
+				hdlr,
+				pitm,
+				iinf,
+				iref,
+				iloc,
+				iprp
+			);
+			const meta = buildFullBox( 'meta', 0, 0, realMetaChildren );
+
+			// Build mdat: grid descriptor + tile data.
+			const mdatPayload = concat(
+				gridDescriptor,
+				...Array( tileCount ).fill( tileData )
+			);
+			const mdat = buildBox( 'mdat', mdatPayload );
+
+			return concat( ftyp, meta, mdat ).buffer;
+		}
+
+		/** Build an iinf box with infe entries. */
+		function buildIinf( items: Array< [ number, string ] > ): Uint8Array {
+			// Each infe: version=2, flags=0, itemId(u16), protection_index(u16), item_type(4 bytes)
+			const infeBoxes = items.map( ( [ itemId, itemType ] ) => {
+				const infeData = new Uint8Array( 8 );
+				const idv = new DataView( infeData.buffer );
+				idv.setUint16( 0, itemId );
+				idv.setUint16( 2, 0 ); // protection index
+				for ( let k = 0; k < 4; k++ ) {
+					infeData[ 4 + k ] = itemType.charCodeAt( k );
+				}
+				return buildFullBox( 'infe', 2, 0, infeData );
+			} );
+
+			// iinf: version=0, entry_count(u16), then infe boxes.
+			const countData = new Uint8Array( 2 );
+			new DataView( countData.buffer ).setUint16( 0, items.length );
+			return buildFullBox(
+				'iinf',
+				0,
+				0,
+				concat( countData, ...infeBoxes )
+			);
+		}
+
+		/** Build an iref box with a single dimg reference. */
+		function buildIref( fromId: number, toIds: number[] ): Uint8Array {
+			// dimg reference box: fromId(u16), refCount(u16), toIds(u16 each)
+			const dimgData = new Uint8Array( 4 + toIds.length * 2 );
+			const dv = new DataView( dimgData.buffer );
+			dv.setUint16( 0, fromId );
+			dv.setUint16( 2, toIds.length );
+			for ( let i = 0; i < toIds.length; i++ ) {
+				dv.setUint16( 4 + i * 2, toIds[ i ] );
+			}
+			const dimgBox = buildBox( 'dimg', dimgData );
+
+			// iref is a FullBox (version=0).
+			return buildFullBox( 'iref', 0, 0, dimgBox );
+		}
+
+		it( 'should parse a 2x2 grid HEIC', () => {
+			const tileData = new Uint8Array( [ 0x11, 0x22, 0x33 ] );
+			const buffer = buildGridHeic( {
+				rows: 2,
+				columns: 2,
+				tileWidth: 512,
+				tileHeight: 512,
+				outputWidth: 1024,
+				outputHeight: 1024,
+				tileData,
+			} );
+
+			const result = parseHeic( buffer );
+
+			expect( result.outputWidth ).toBe( 1024 );
+			expect( result.outputHeight ).toBe( 1024 );
+			expect( result.tileWidth ).toBe( 512 );
+			expect( result.tileHeight ).toBe( 512 );
+			expect( result.tiles ).toHaveLength( 4 );
+		} );
+
+		it( 'should place tiles in correct grid positions', () => {
+			const buffer = buildGridHeic( {
+				rows: 2,
+				columns: 2,
+				tileWidth: 256,
+				tileHeight: 256,
+			} );
+
+			const result = parseHeic( buffer );
+
+			expect( result.tiles[ 0 ].x ).toBe( 0 );
+			expect( result.tiles[ 0 ].y ).toBe( 0 );
+			expect( result.tiles[ 1 ].x ).toBe( 256 );
+			expect( result.tiles[ 1 ].y ).toBe( 0 );
+			expect( result.tiles[ 2 ].x ).toBe( 0 );
+			expect( result.tiles[ 2 ].y ).toBe( 256 );
+			expect( result.tiles[ 3 ].x ).toBe( 256 );
+			expect( result.tiles[ 3 ].y ).toBe( 256 );
+		} );
+
+		it( 'should extract tile data for each tile', () => {
+			const tileData = new Uint8Array( [ 0xaa, 0xbb ] );
+			const buffer = buildGridHeic( { tileData } );
+
+			const result = parseHeic( buffer );
+
+			for ( const tile of result.tiles ) {
+				expect( tile.data ).toEqual( tileData );
+			}
+		} );
+
+		it( 'should extract codec string from grid tiles', () => {
+			const buffer = buildGridHeic();
+			const result = parseHeic( buffer );
+
+			// Same hvcC as single image tests.
+			expect( result.codecString ).toBe( 'hvc1.1.6.L93.B0' );
+		} );
+
+		it( 'should parse a 1x3 grid', () => {
+			const buffer = buildGridHeic( {
+				rows: 1,
+				columns: 3,
+				tileWidth: 100,
+				tileHeight: 300,
+				outputWidth: 300,
+				outputHeight: 300,
+			} );
+
+			const result = parseHeic( buffer );
+
+			expect( result.tiles ).toHaveLength( 3 );
+			expect( result.tiles[ 0 ].x ).toBe( 0 );
+			expect( result.tiles[ 1 ].x ).toBe( 100 );
+			expect( result.tiles[ 2 ].x ).toBe( 200 );
+			expect( result.outputWidth ).toBe( 300 );
+			expect( result.outputHeight ).toBe( 300 );
+		} );
+
+		it( 'should extract the HEVCDecoderConfigurationRecord from grid', () => {
+			const buffer = buildGridHeic();
+			const result = parseHeic( buffer );
+
+			expect( result.description ).toBeInstanceOf( Uint8Array );
+			expect( result.description.length ).toBe( 23 );
+			expect( result.description[ 0 ] ).toBe( 1 ); // configurationVersion
+		} );
+	} );
+
 	describe( 'parseHeic – error cases', () => {
 		it( 'should throw for empty buffer', () => {
 			expect( () => parseHeic( new ArrayBuffer( 0 ) ) ).toThrow(
@@ -355,6 +631,65 @@ describe( 'heic-parser', () => {
 			const meta = buildFullBox( 'meta', 0, 0, hdlr );
 			expect( () => parseHeic( meta.buffer ) ).toThrow(
 				'Missing required boxes'
+			);
+		} );
+
+		it( 'should throw for missing ipco or ipma inside iprp', () => {
+			// meta with pitm, iloc, iprp but iprp is empty (no ipco/ipma)
+			const hdlr = buildHdlr();
+			const pitm = buildPitm( 1 );
+			const iloc = buildIloc( [ [ 1, [ [ 0, 4 ] ] ] ] );
+			const emptyIprp = buildBox( 'iprp', new Uint8Array( 0 ) );
+			const meta = buildFullBox(
+				'meta',
+				0,
+				0,
+				concat( hdlr, pitm, iloc, emptyIprp )
+			);
+			expect( () => parseHeic( meta.buffer ) ).toThrow(
+				'Missing ipco or ipma'
+			);
+		} );
+
+		it( 'should throw when primary item has no location data', () => {
+			// iloc with item ID 99, but pitm says primary is 1
+			const hdlr = buildHdlr();
+			const pitm = buildPitm( 1 );
+			const iloc = buildIloc( [ [ 99, [ [ 0, 4 ] ] ] ] );
+			const hvcC = buildHvcC();
+			const ispe = buildIspe( 100, 100 );
+			const ipco = buildIpco( hvcC, ispe );
+			const ipma = buildIpma( [ [ 1, [ 1, 2 ] ] ] );
+			const iprp = buildIprp( ipco, ipma );
+			const meta = buildFullBox(
+				'meta',
+				0,
+				0,
+				concat( hdlr, pitm, iloc, iprp )
+			);
+			expect( () => parseHeic( meta.buffer ) ).toThrow(
+				'No location data for primary item'
+			);
+		} );
+
+		it( 'should throw when primary item has no property associations', () => {
+			const hdlr = buildHdlr();
+			const pitm = buildPitm( 1 );
+			const iloc = buildIloc( [ [ 1, [ [ 0, 4 ] ] ] ] );
+			const hvcC = buildHvcC();
+			const ispe = buildIspe( 100, 100 );
+			const ipco = buildIpco( hvcC, ispe );
+			// ipma associates item 99, not item 1
+			const ipma = buildIpma( [ [ 99, [ 1, 2 ] ] ] );
+			const iprp = buildIprp( ipco, ipma );
+			const meta = buildFullBox(
+				'meta',
+				0,
+				0,
+				concat( hdlr, pitm, iloc, iprp )
+			);
+			expect( () => parseHeic( meta.buffer ) ).toThrow(
+				'No property associations'
 			);
 		} );
 	} );
