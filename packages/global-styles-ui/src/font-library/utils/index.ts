@@ -95,6 +95,51 @@ export function mergeFontFamilies(
 	return Array.from( map.values() );
 }
 
+/**
+ * Normalize a font display name into a valid CSS `@font-face` `font-family` value.
+ *
+ * @param fontName The font's display name.
+ * @return A quoted, CSS-safe font-family string.
+ */
+export function normalizeCSSFontFaceFontFamily( fontName: string ): string {
+	return `"${ fontName
+		.trim()
+
+		/*
+		 * CSS Unicode escaping for problematic characters.
+		 * https://www.w3.org/TR/css-syntax-3/#escaping
+		 *
+		 * These characters are not required by CSS but may be problematic in WordPress:
+		 *
+		 * - Normalize and replace newlines. https://www.w3.org/TR/css-syntax-3/#input-preprocessing
+		 * - "<", ">", and "&" are replaced to prevent issues with KSES and other sanitization that
+		 *   is confused by HTML-like text.
+		 * - `,`, `"` and `'` are replaced to prevent issues where font families may be processed later.
+		 *
+		 * Note that the Unicode escape sequences are used rather than backslash-escaping so the
+		 * problematic characters are removed completely.
+		 */
+		// Escape existing backslashes before any other processing
+		.replaceAll( '\\', '\\5C ' )
+
+		// Pre-processing replaces NULLs and some newlines. Replace and escape as necessary.
+		.replaceAll( '\0', '\uFFFD' )
+
+		// Carriage return + line feed must be the first newline replacement.
+		.replaceAll( '\r\n', '\\A ' )
+		.replaceAll( '\r', '\\A ' )
+		.replaceAll( '\f', '\\A ' )
+
+		// General character escaping.
+		.replaceAll( '\n', '\\A ' )
+		.replaceAll( ',', '\\2C ' )
+		.replaceAll( '"', '\\22 ' )
+		.replaceAll( "'", '\\27 ' )
+		.replaceAll( '<', '\\3C ' )
+		.replaceAll( '>', '\\3E ' )
+		.replaceAll( '&', '\\26 ' ) }"`;
+}
+
 /*
  * Loads the font face from a URL and adds it to the browser.
  * It also adds it to the iframe document.
