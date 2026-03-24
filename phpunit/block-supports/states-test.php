@@ -484,7 +484,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 				),
 			),
 		);
-		$block         = array(
+		$block = array(
 			'blockName' => 'test/states-button-full',
 			'attrs'     => array( 'style' => $state_styles ),
 		);
