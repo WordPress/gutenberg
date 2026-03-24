@@ -88,6 +88,18 @@ const textColumns = {
 	},
 };
 
+const textColumnMinWidth = {
+	name: 'textColumnMinWidth',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'textColumnMinWidth' ],
+			'columnWidth'
+		);
+	},
+};
+
 const textDecoration = {
 	name: 'textDecoration',
 	generate: ( style: Style, options: StyleOptions ) => {
@@ -144,6 +156,7 @@ export default [
 	letterSpacing,
 	lineHeight,
 	textColumns,
+	textColumnMinWidth,
 	textDecoration,
 	textIndent,
 	textTransform,
