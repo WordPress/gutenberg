@@ -7,8 +7,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
-import { privateApis as blockEditorPrivateApis } from '../private-apis';
+import StateControl from '../components/global-styles/state-control';
+import { BlockCardControlsFill } from '../components/block-card';
 
 export const STATES_SUPPORT_KEY = '__experimentalStates';
 
@@ -17,10 +17,6 @@ export const STATE_LABELS = {
 	':focus': __( 'Focus' ),
 	':active': __( 'Active' ),
 };
-
-const { StateControl, BlockCardControlsFill } = unlock(
-	blockEditorPrivateApis
-);
 
 /**
  * Renders a state selector (hover, focus, active) in the block card header.
