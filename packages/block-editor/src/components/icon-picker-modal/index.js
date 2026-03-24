@@ -1,3 +1,3 @@
-import CustomInserterModal from './modal.js';
+import IconPickerModal from './modal.js';
 
-export default CustomInserterModal;
+export default IconPickerModal;

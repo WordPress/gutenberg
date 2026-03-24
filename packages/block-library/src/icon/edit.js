@@ -213,9 +213,12 @@ export function Edit( { attributes, setAttributes } ) {
 			{ isInserterOpen && (
 				<IconPickerModal
 					icons={ allIcons }
-					setInserterOpen={ setInserterOpen }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
+					value={ icon }
+					onSelect={ ( name ) => {
+						setAttributes( { icon: name } );
+						setInserterOpen( false );
+					} }
+					onRequestClose={ () => setInserterOpen( false ) }
 				/>
 			) }
 		</>

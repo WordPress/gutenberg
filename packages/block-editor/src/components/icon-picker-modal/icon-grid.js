@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { safeHTML } from '@wordpress/dom';
 
-export default function IconGrid( { icons, onChange, attributes } ) {
+export default function IconGrid( { icons, onSelect, value } ) {
 	return (
 		<div className="wp-block-icon__inserter-grid">
 			{ ! icons?.length ? (
@@ -22,11 +22,9 @@ export default function IconGrid( { icons, onChange, attributes } ) {
 							<Button
 								key={ icon.name }
 								className="wp-block-icon__inserter-grid-icons-list-item"
-								onClick={ () => onChange( icon.name ) }
+								onClick={ () => onSelect?.( icon.name ) }
 								variant={
-									icon.name === attributes?.icon
-										? 'primary'
-										: undefined
+									icon.name === value ? 'primary' : undefined
 								}
 								__next40pxDefaultSize
 							>
