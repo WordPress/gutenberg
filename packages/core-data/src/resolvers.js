@@ -991,11 +991,12 @@ export const getDefaultTemplateId =
 		const id = window?.__experimentalTemplateActivate
 			? template?.wp_id || template?.id
 			: template?.id;
-		// Endpoint may return an empty object if no template is found.
-		if ( id ) {
-			template.id = id;
-			registry.batch( () => {
-				dispatch.receiveDefaultTemplateId( query, id );
+
+		registry.batch( () => {
+			dispatch.receiveDefaultTemplateId( query, id || '' );
+			// Endpoint may return an empty object if no template is found.
+			if ( id ) {
+				template.id = id;
 				dispatch.receiveEntityRecords(
 					'postType',
 					template.type,
@@ -1007,8 +1008,8 @@ export const getDefaultTemplateId =
 					template.type,
 					id,
 				] );
-			} );
-		}
+			}
+		} );
 	};
 
 getDefaultTemplateId.shouldInvalidate = ( action ) => {

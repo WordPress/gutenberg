@@ -170,10 +170,13 @@ function gutenberg_inject_real_time_collaboration_setting() {
 add_action( 'admin_init', 'gutenberg_inject_real_time_collaboration_setting' );
 
 /**
- * Core filters the default value, so hook with a higher priority to ensure the
- * setting is enabled by default when the Gutenberg plugin is active.
+ * Core adds an option with the default value, so we need to set the option to
+ * our intended default when the Gutenberg plugin is activated.
  */
-add_filter( 'default_option_wp_collaboration_enabled', '__return_true', 500 );
+function gutenberg_set_collaboration_option_on_activation() {
+	update_option( 'wp_collaboration_enabled', '1' );
+}
+add_action( 'activate_gutenberg/gutenberg.php', 'gutenberg_set_collaboration_option_on_activation' );
 
 /**
  * Modifies the post list UI and heartbeat responses for real-time collaboration.

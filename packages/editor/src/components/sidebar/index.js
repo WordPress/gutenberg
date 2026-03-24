@@ -30,6 +30,7 @@ import PostTaxonomiesPanel from '../post-taxonomies/panel';
 import RevisionFieldsDiffPanel from '../revision-fields-diff';
 import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
+import TemplateActionsPanel from '../template-actions-panel';
 import TemplateContentPanel from '../template-content-panel';
 import TemplatePartContentPanel from '../template-part-content-panel';
 import { MediaMetadataPanel } from '../media';
@@ -134,6 +135,9 @@ const SidebarContent = ( {
 								<>
 									<PluginDocumentSettingPanel.Slot />
 									<TemplateContentPanel />
+									{ window?.__experimentalDataFormInspector && (
+										<TemplateActionsPanel />
+									) }
 									<TemplatePartContentPanel />
 									<PostTransformPanel />
 									<PostTaxonomiesPanel />

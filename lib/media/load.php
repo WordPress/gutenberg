@@ -5,6 +5,11 @@
  * @package gutenberg
  */
 
+// Client-side media processing is currently plugin-only while the feature matures.
+if ( ! defined( 'IS_GUTENBERG_PLUGIN' ) || ! IS_GUTENBERG_PLUGIN ) {
+	return;
+}
+
 if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
 	return;
 }

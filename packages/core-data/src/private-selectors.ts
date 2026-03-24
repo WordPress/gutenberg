@@ -14,6 +14,8 @@ import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
 
+const EMPTY_OBJECT = {};
+
 /**
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
@@ -170,11 +172,18 @@ export const getHomePage = createRegistrySelector( ( select ) =>
 			).getDefaultTemplateId( {
 				slug: 'front-page',
 			} );
-			// Still resolving getDefaultTemplateId.
-			if ( ! frontPageTemplateId ) {
-				return null;
+			if ( frontPageTemplateId ) {
+				return {
+					postType: 'wp_template',
+					postId: frontPageTemplateId,
+				};
 			}
-			return { postType: 'wp_template', postId: frontPageTemplateId };
+			// Resolution is finished and no front-page template exists.
+			if ( frontPageTemplateId === '' ) {
+				return EMPTY_OBJECT;
+			}
+			// Still resolving getDefaultTemplateId.
+			return null;
 		},
 		( state ) => [
 			// Even though getDefaultTemplateId.shouldInvalidate returns true when root/site changes,
