@@ -29,6 +29,7 @@
  */
 
 .input {
+	box-sizing: var(--_gcd-input-box-sizing, border-box);
 	font-family: var(--_gcd-input-font-family, inherit);
 	font-size: var(--_gcd-input-font-size, inherit);
 	font-weight: var(--_gcd-input-font-weight, inherit);
@@ -64,6 +65,12 @@
 		line-height: var(--_gcd-input-line-height, inherit);
 		min-height: var(--_gcd-input-min-height, auto);
 	}
+}
+
+.textarea {
+	box-sizing: var(--_gcd-textarea-box-sizing, border-box);
+	overflow: var(--_gcd-textarea-overflow, auto);
+	resize: var(--_gcd-textarea-resize, block);
 }
 
 /*
