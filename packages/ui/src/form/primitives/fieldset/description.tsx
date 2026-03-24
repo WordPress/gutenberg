@@ -4,6 +4,7 @@ import { forwardRef, useEffect, useId } from '@wordpress/element';
 import fieldStyles from '../../../utils/css/field.module.css';
 import { useFieldsetContext } from './context';
 import type { FieldsetDescriptionProps } from './types';
+import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 
 export const FieldsetDescription = forwardRef<
 	HTMLParagraphElement,
@@ -27,7 +28,14 @@ export const FieldsetDescription = forwardRef<
 		render,
 		ref,
 		props: mergeProps< 'p' >(
-			{ className: clsx( fieldStyles.description, className ), id },
+			{
+				className: clsx(
+					defenseStyles.p,
+					fieldStyles.description,
+					className
+				),
+				id,
+			},
 			restProps
 		),
 	} );
