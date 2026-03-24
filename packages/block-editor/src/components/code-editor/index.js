@@ -25,7 +25,7 @@ function importLanguageSupport( mode ) {
 		case 'html':
 		default:
 			return import( '@codemirror/lang-html' ).then( ( { html } ) =>
-				html()
+				html( { autoCloseTags: false } )
 			);
 	}
 }
