@@ -196,7 +196,7 @@ export function exportContentGuidelines(): void {
 	};
 
 	downloadBlob(
-		'guidelines.json',
+		`guidelines-${ exportDate }.json`,
 		JSON.stringify( data, null, 2 ),
 		'application/json'
 	);
