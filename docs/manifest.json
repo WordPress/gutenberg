@@ -546,6 +546,18 @@
 		"parent": "core-concepts"
 	},
 	{
+		"title": "Client-Side Navigation",
+		"slug": "client-side-navigation",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md",
+		"parent": "core-concepts"
+	},
+	{
+		"title": "Client-Side Navigation Compatibility",
+		"slug": "client-side-navigation-compatibility",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility.md",
+		"parent": "core-concepts"
+	},
+	{
 		"title": "Quick start guide",
 		"slug": "iapi-quick-start-guide",
 		"markdown_source": "../docs/reference-guides/interactivity-api/iapi-quick-start-guide.md",
