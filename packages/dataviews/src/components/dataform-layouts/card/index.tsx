@@ -86,6 +86,7 @@ function isSummaryFieldVisible< Item >(
 
 function HeaderContent< Item >( {
 	data,
+	fields,
 	descriptionId,
 	label,
 	layout,
@@ -94,6 +95,7 @@ function HeaderContent< Item >( {
 	validity,
 }: {
 	data: Item;
+	fields: NormalizedField< Item >[];
 	descriptionId: string;
 	label: string | undefined;
 	layout: NormalizedCardLayout;
@@ -101,7 +103,6 @@ function HeaderContent< Item >( {
 	touched: boolean;
 	validity: FieldLayoutProps< Item >[ 'validity' ];
 } ) {
-	const { fields } = useContext( DataFormContext );
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
 
 	const visibleSummaryFields = summaryFields.filter( ( summaryField ) =>
@@ -282,6 +283,7 @@ export default function FormCardField< Item >( {
 	const headerContent = (
 		<HeaderContent
 			data={ data }
+			fields={ fields }
 			descriptionId={ descriptionId }
 			label={ label }
 			layout={ layout }
