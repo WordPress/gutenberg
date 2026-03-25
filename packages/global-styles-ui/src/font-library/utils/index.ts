@@ -139,46 +139,56 @@ export function createCSSString( value: string ): string {
 		.replaceAll( '&', '\\26 ' ) }"`;
 }
 
-const documentSheet = new CSSStyleSheet();
-const iframeSheet = new CSSStyleSheet();
+let documentSheet: CSSStyleSheet | undefined;
+let iframeSheetDoc: Document | undefined;
+let iframeSheetInstance: CSSStyleSheet | undefined;
 
-function getTargetSheets(
+function ensureTargetSheets(
 	target: 'all' | 'document' | 'iframe'
 ): CSSStyleSheet[] {
 	const sheets: CSSStyleSheet[] = [];
-	if ( target === 'document' || target === 'all' ) {
-		sheets.push( documentSheet );
-	}
-	if ( target === 'iframe' || target === 'all' ) {
-		sheets.push( iframeSheet );
-	}
-	return sheets;
-}
 
-function ensureSheetsAdopted( target: 'all' | 'document' | 'iframe' ) {
 	if ( target === 'document' || target === 'all' ) {
+		if ( ! documentSheet ) {
+			documentSheet = new CSSStyleSheet();
+		}
 		if ( ! document.adoptedStyleSheets.includes( documentSheet ) ) {
 			document.adoptedStyleSheets = [
 				...document.adoptedStyleSheets,
 				documentSheet,
 			];
 		}
+		sheets.push( documentSheet );
 	}
+
 	if ( target === 'iframe' || target === 'all' ) {
-		const iframe = document.querySelector(
+		const iframe = document.querySelector< HTMLIFrameElement >(
 			'iframe[name="editor-canvas"]'
-		) as HTMLIFrameElement;
+		);
 		const iframeDoc = iframe?.contentDocument;
-		if (
-			iframeDoc &&
-			! iframeDoc.adoptedStyleSheets.includes( iframeSheet )
-		) {
-			iframeDoc.adoptedStyleSheets = [
-				...iframeDoc.adoptedStyleSheets,
-				iframeSheet,
-			];
+		const iframeGlobal = iframeDoc?.defaultView;
+
+		if ( iframeDoc && iframeGlobal ) {
+			// Recreate sheet when iframe document changes (e.g. navigation).
+			// Use the iframe's own CSSStyleSheet constructor so the sheet
+			// belongs to the iframe's document realm (spec requirement).
+			if ( iframeDoc !== iframeSheetDoc || ! iframeSheetInstance ) {
+				iframeSheetInstance = new iframeGlobal.CSSStyleSheet();
+				iframeSheetDoc = iframeDoc;
+			}
+			if (
+				! iframeDoc.adoptedStyleSheets.includes( iframeSheetInstance )
+			) {
+				iframeDoc.adoptedStyleSheets = [
+					...iframeDoc.adoptedStyleSheets,
+					iframeSheetInstance,
+				];
+			}
+			sheets.push( iframeSheetInstance );
 		}
 	}
+
+	return sheets;
 }
 
 function getCssFontFaceRule(
@@ -257,8 +267,7 @@ export async function loadFontFaceInBrowser(
 
 	const rule = getCssFontFaceRule( fontFace, src );
 
-	ensureSheetsAdopted( addTo );
-	for ( const sheet of getTargetSheets( addTo ) ) {
+	for ( const sheet of ensureTargetSheets( addTo ) ) {
 		sheet.insertRule( rule.cssText, sheet.cssRules.length );
 	}
 }
@@ -273,17 +282,17 @@ export function unloadFontFaceInBrowser(
 ): void {
 	const fontFaceRule = getCssFontFaceRule( fontFace );
 
-	sheetLoop: for ( const sheet of getTargetSheets( removeFrom ) ) {
+	sheetLoop: for ( const sheet of ensureTargetSheets( removeFrom ) ) {
 		// Walk rules in reverse to safely delete by index.
-		rulesLoop: for ( let i = sheet.cssRules.length - 1; i >= 0; i-- ) {
+		ruleLoop: for ( let i = sheet.cssRules.length - 1; i >= 0; i-- ) {
 			const rule = sheet.cssRules[ i ];
 			if ( rule instanceof CSSFontFaceRule ) {
 				// Check for a match
 				for ( const [ descriptor, value ] of Object.entries(
 					fontFaceRule.style
 				) ) {
-					if ( value && rule.style[ descriptor ] !== value ) {
-						break rulesLoop;
+					if ( value && rule.style[ descriptor as any ] !== value ) {
+						break ruleLoop;
 					}
 				}
 				sheet.deleteRule( i );
