@@ -5,6 +5,7 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
+	useId,
 	useMemo,
 	useRef,
 	useState,
@@ -85,6 +86,7 @@ function isSummaryFieldVisible< Item >(
 
 function HeaderContent< Item >( {
 	data,
+	descriptionId,
 	label,
 	layout,
 	isOpen,
@@ -92,6 +94,7 @@ function HeaderContent< Item >( {
 	validity,
 }: {
 	data: Item;
+	descriptionId: string;
 	label: string | undefined;
 	layout: NormalizedCardLayout;
 	isOpen: boolean;
@@ -105,6 +108,9 @@ function HeaderContent< Item >( {
 		isSummaryFieldVisible( summaryField, layout.summary, isOpen )
 	);
 
+	const hasBadge = touched && layout.isCollapsible;
+	const hasSummary = visibleSummaryFields.length > 0 && layout.withHeader;
+
 	return (
 		<Stack
 			align="center"
@@ -112,18 +118,24 @@ function HeaderContent< Item >( {
 			className="dataforms-layouts-card__field-header-content"
 		>
 			<Card.Title>{ label }</Card.Title>
-			{ touched && layout.isCollapsible && (
-				<ValidationBadge validity={ validity } />
-			) }
-			{ visibleSummaryFields.length > 0 && layout.withHeader && (
-				<div className="dataforms-layouts-card__field-summary">
-					{ visibleSummaryFields.map( ( summaryField ) => (
-						<summaryField.render
-							key={ summaryField.id }
-							item={ data }
-							field={ summaryField }
-						/>
-					) ) }
+			{ ( hasBadge || hasSummary ) && (
+				<div
+					id={ descriptionId }
+					aria-hidden="true"
+					className="dataforms-layouts-card__field-header-content-description"
+				>
+					{ hasBadge && <ValidationBadge validity={ validity } /> }
+					{ hasSummary && (
+						<div className="dataforms-layouts-card__field-summary">
+							{ visibleSummaryFields.map( ( summaryField ) => (
+								<summaryField.render
+									key={ summaryField.id }
+									item={ data }
+									field={ summaryField }
+								/>
+							) ) }
+						</div>
+					) }
 				</div>
 			) }
 		</Stack>
@@ -195,6 +207,7 @@ export default function FormCardField< Item >( {
 	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedCardLayout;
 	const contentRef = useRef< HTMLDivElement >( null );
+	const descriptionId = useId();
 
 	const form: NormalizedForm = useMemo(
 		() => ( {
@@ -269,6 +282,7 @@ export default function FormCardField< Item >( {
 	const headerContent = (
 		<HeaderContent
 			data={ data }
+			descriptionId={ descriptionId }
 			label={ label }
 			layout={ layout }
 			isOpen={ isCollapsible ? !! isOpen : true }
@@ -284,7 +298,7 @@ export default function FormCardField< Item >( {
 				open={ isOpen }
 				onOpenChange={ handleOpenChange }
 			>
-				<CollapsibleCard.Header>
+				<CollapsibleCard.Header aria-describedby={ descriptionId }>
 					{ headerContent }
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content
