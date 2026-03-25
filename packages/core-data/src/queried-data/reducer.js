@@ -30,19 +30,26 @@ function getContextFromAction( action ) {
  * Returns a merged array of item IDs, given details of the received paginated
  * items. The array is sparse-like with `undefined` entries where holes exist.
  *
- * @param {?Array<number>} itemIds     Original item IDs (default empty array).
- * @param {number[]}       nextItemIds Item IDs to merge.
- * @param {number}         page        Page of items merged.
- * @param {number}         perPage     Number of items per page.
+ * @param {?Array<number>}   itemIds     Original item IDs (default empty array).
+ * @param {number[]}         nextItemIds Item IDs to merge.
+ * @param {number}           page        Page of items merged.
+ * @param {number|undefined} offset      Offset of items merged.
+ * @param {number}           perPage     Number of items per page.
  *
  * @return {number[]} Merged array of item IDs.
  */
-export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
-	const receivedAllIds = page === 1 && perPage === -1;
+export function getMergedItemIds(
+	itemIds,
+	nextItemIds,
+	page,
+	offset,
+	perPage
+) {
+	const receivedAllIds = ( page === 1 || offset === 0 ) && perPage === -1;
 	if ( receivedAllIds ) {
 		return nextItemIds;
 	}
-	const nextItemIdsStartIndex = ( page - 1 ) * perPage;
+	const nextItemIdsStartIndex = offset ?? ( page - 1 ) * perPage;
 
 	// If later page has already been received, default to the larger known
 	// size of the existing array, else calculate as extending the existing.
@@ -247,6 +254,7 @@ const receiveQueries = compose( [
 			state?.itemIds || [],
 			action.items.map( ( item ) => item?.[ key ] ).filter( Boolean ),
 			action.page,
+			action.offset,
 			action.perPage
 		),
 		meta: action.meta,

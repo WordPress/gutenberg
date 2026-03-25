@@ -124,7 +124,7 @@ describe( 'getQueryParts', () => {
 		} );
 	} );
 
-	it( 'extracts offset and includes it in stableKey', () => {
+	it( 'extracts offset and excludes it from stableKey', () => {
 		const parts = getQueryParts( {
 			per_page: 50,
 			offset: 100,
@@ -135,7 +135,7 @@ describe( 'getQueryParts', () => {
 			page: 1,
 			perPage: 50,
 			offset: 100,
-			stableKey: 'offset=100',
+			stableKey: '',
 			fields: null,
 			include: null,
 		} );

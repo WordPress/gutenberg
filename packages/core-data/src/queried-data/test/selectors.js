@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { getQueriedItems } from '../selectors';
+import { getMergedItemIds } from '../reducer';
 
 describe( 'getQueriedItems', () => {
 	it( 'should return null if requesting but no item IDs', () => {
@@ -284,8 +285,14 @@ describe( 'getQueriedItems', () => {
 			},
 			queries: {
 				default: {
-					'offset=100': {
-						itemIds: [ 101, 102, 103 ],
+					'': {
+						itemIds: getMergedItemIds(
+							[],
+							[ 101, 102, 103 ],
+							undefined,
+							100,
+							50
+						),
 						meta: { totalItems: 103 },
 					},
 				},
@@ -314,8 +321,14 @@ describe( 'getQueriedItems', () => {
 			},
 			queries: {
 				default: {
-					'offset=50': {
-						itemIds: [ 51, 52 ],
+					'': {
+						itemIds: getMergedItemIds(
+							[],
+							[ 51, 52 ],
+							undefined,
+							50,
+							50
+						),
 						meta: { totalItems: 200 },
 					},
 				},
@@ -348,8 +361,14 @@ describe( 'getQueriedItems', () => {
 			},
 			queries: {
 				default: {
-					'offset=3': {
-						itemIds: [ 4, 5, 6, 7, 8 ],
+					'': {
+						itemIds: getMergedItemIds(
+							[],
+							[ 4, 5, 6, 7, 8 ],
+							undefined,
+							3,
+							10
+						),
 						meta: { totalItems: 50 },
 					},
 				},
@@ -379,7 +398,7 @@ describe( 'getQueriedItems', () => {
 			},
 			queries: {
 				default: {
-					'offset=0': {
+					'': {
 						itemIds: [ 1, 2 ],
 						meta: { totalItems: 5 },
 					},
@@ -408,8 +427,8 @@ describe( 'getQueriedItems', () => {
 			},
 			queries: {
 				default: {
-					'offset=84': {
-						itemIds: [],
+					'': {
+						itemIds: getMergedItemIds( [], [], undefined, 84, 7 ),
 						meta: { totalItems: 84 },
 					},
 				},
