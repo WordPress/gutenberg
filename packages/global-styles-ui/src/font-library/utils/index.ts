@@ -266,7 +266,7 @@ export function unloadFontFaceInBrowser(
 ): void {
 	const fontFaceRule = getCssFontFaceRule( fontFace );
 
-	sheetLoop: for ( const sheet of ensureTargetSheets( removeFrom ) ) {
+	for ( const sheet of ensureTargetSheets( removeFrom ) ) {
 		// Walk rules in reverse to safely delete by index.
 		ruleLoop: for ( let i = sheet.cssRules.length - 1; i >= 0; i-- ) {
 			const rule = sheet.cssRules[ i ];
@@ -280,7 +280,7 @@ export function unloadFontFaceInBrowser(
 					}
 				}
 				sheet.deleteRule( i );
-				break sheetLoop;
+				break;
 			}
 		}
 	}
