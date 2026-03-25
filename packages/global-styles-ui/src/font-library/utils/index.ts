@@ -153,6 +153,14 @@ let documentSheet: CSSStyleSheet | undefined;
 let iframeSheetDoc: Document | undefined;
 let iframeSheetInstance: CSSStyleSheet | undefined;
 
+/**
+ * Returns managed CSSStyleSheets for the requested targets, lazily creating
+ * and adopting them as needed. Uses the iframe's own CSSStyleSheet constructor
+ * so the sheet belongs to the correct document realm.
+ *
+ * @param target Which documents to provide sheets for.
+ * @return The managed stylesheets for the requested targets.
+ */
 function ensureTargetSheets(
 	target: 'all' | 'document' | 'iframe'
 ): CSSStyleSheet[] {
@@ -195,6 +203,14 @@ function ensureTargetSheets(
 	return sheets;
 }
 
+/**
+ * Builds a CSSFontFaceRule from a FontFace descriptor by inserting into
+ * a temporary stylesheet. Returns null if the CSS is invalid.
+ *
+ * @param fontFace The font face descriptor to convert.
+ * @param src      Optional URL to use as the font source.
+ * @return The constructed rule, or null on invalid CSS.
+ */
 function getCssFontFaceRule(
 	fontFace: FontFace,
 	src?: string
