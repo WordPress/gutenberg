@@ -195,47 +195,44 @@ function getCssFontFaceRule(
 	fontFace: FontFace,
 	src?: string
 ): CSSFontFaceRule {
-	const ss = new CSSStyleSheet();
-	const rule = ss.cssRules[ ss.insertRule( '@font-face {}' ) ];
-	if ( ! ( rule instanceof CSSFontFaceRule ) ) {
-		throw new Error( 'Failed to create CSSFontFaceRule' );
-	}
-
-	rule.style.setProperty( 'font-family', fontFace.fontFamily );
-	rule.style.setProperty( 'font-style', fontFace.fontStyle || 'normal' );
-	rule.style.setProperty(
-		'font-weight',
-		String( fontFace.fontWeight || '400' )
-	);
+	const declarations = [
+		`font-family: ${ fontFace.fontFamily }`,
+		`font-style: ${ fontFace.fontStyle || 'normal' }`,
+		`font-weight: ${ fontFace.fontWeight || '400' }`,
+	];
 
 	if ( src ) {
-		rule.style.setProperty( 'src', `url( ${ createCSSString( src ) } )` );
+		declarations.push( `src: url( ${ createCSSString( src ) } )` );
 	}
 	if ( fontFace.fontDisplay ) {
-		rule.style.setProperty( 'font-display', fontFace.fontDisplay );
+		declarations.push( `font-display: ${ fontFace.fontDisplay }` );
 	}
 	if ( fontFace.fontStretch ) {
-		rule.style.setProperty( 'font-stretch', fontFace.fontStretch );
+		declarations.push( `font-stretch: ${ fontFace.fontStretch }` );
 	}
 	if ( fontFace.fontVariant ) {
-		rule.style.setProperty( 'font-variant', fontFace.fontVariant );
+		declarations.push( `font-variant: ${ fontFace.fontVariant }` );
 	}
 	if ( fontFace.fontFeatureSettings ) {
-		rule.style.setProperty(
-			'font-feature-settings',
-			fontFace.fontFeatureSettings
+		declarations.push(
+			`font-feature-settings: ${ fontFace.fontFeatureSettings }`
 		);
 	}
 	if ( fontFace.fontVariationSettings ) {
-		rule.style.setProperty(
-			'font-variation-settings',
-			fontFace.fontVariationSettings
+		declarations.push(
+			`font-variation-settings: ${ fontFace.fontVariationSettings }`
 		);
 	}
 	if ( fontFace.unicodeRange ) {
-		rule.style.setProperty( 'unicode-range', fontFace.unicodeRange );
+		declarations.push( `unicode-range: ${ fontFace.unicodeRange }` );
 	}
 
+	const cssText = `@font-face { ${ declarations.join( '; ' ) } }`;
+	const ss = new CSSStyleSheet();
+	const rule = ss.cssRules[ ss.insertRule( cssText ) ];
+	if ( ! ( rule instanceof CSSFontFaceRule ) ) {
+		throw new Error( 'Failed to create CSSFontFaceRule' );
+	}
 	return rule;
 }
 
