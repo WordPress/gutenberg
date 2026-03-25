@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
