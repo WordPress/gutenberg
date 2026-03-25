@@ -170,6 +170,56 @@ test.describe( 'Background gradient block support', () => {
 			);
 		} );
 
+		test( 'removes has-background class when gradient is reset after migration', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/group',
+				attributes: {
+					style: {
+						color: {
+							gradient: LEGACY_GRADIENT,
+						},
+					},
+				},
+			} );
+
+			await editor.openDocumentSettingsSidebar();
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
+
+			// First, trigger migration by selecting a preset gradient.
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Gradient' } )
+				.click();
+			await page
+				.getByRole( 'option', { name: /Gradient: Vivid cyan blue/i } )
+				.click();
+
+			// Verify has-background was added during migration.
+			const [ blockAfterMigration ] = await editor.getBlocks();
+			expect( blockAfterMigration.attributes.className ).toContain(
+				'has-background'
+			);
+
+			// Now clear the gradient — has-background must be removed.
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Gradient' } )
+				.click();
+			await page.getByRole( 'button', { name: 'Clear' } ).click();
+
+			const [ block ] = await editor.getBlocks();
+
+			expect(
+				block.attributes.style?.background?.gradient
+			).toBeUndefined();
+			expect( block.attributes.className ?? '' ).not.toContain(
+				'has-background'
+			);
+		} );
+
 		test( 'block remains valid after migration and re-save', async ( {
 			editor,
 			page,

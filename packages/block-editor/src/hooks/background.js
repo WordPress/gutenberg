@@ -126,8 +126,17 @@ function BackgroundInspectorControl( {
 } ) {
 	const resetAllFilter = useCallback(
 		( attributes ) => {
+			const updatedClassName = attributes.className?.includes(
+				'has-background'
+			)
+				? attributes.className
+						.split( ' ' )
+						.filter( ( c ) => c !== 'has-background' )
+						.join( ' ' ) || undefined
+				: attributes.className;
 			return {
 				...attributes,
+				className: updatedClassName,
 				style: cleanEmptyObject( {
 					...attributes.style,
 					background: undefined,
@@ -225,8 +234,19 @@ export function BackgroundImagePanel( {
 		// the has-background class so existing styles relying on it (e.g.
 		// theme padding) are not silently broken. Only add the class when a
 		// gradient value is being set — not when it is being cleared/reset.
+		// Conversely, if the gradient is cleared and has-background was added
+		// during a previous migration, remove it so it does not linger.
 		if ( isMigrating && !! newStyle?.background?.gradient ) {
 			newAttributes.className = clsx( className, 'has-background' );
+		} else if (
+			! newStyle?.background?.gradient &&
+			className?.includes( 'has-background' )
+		) {
+			newAttributes.className =
+				className
+					.split( ' ' )
+					.filter( ( c ) => c !== 'has-background' )
+					.join( ' ' ) || undefined;
 		}
 
 		setAttributes( newAttributes );
