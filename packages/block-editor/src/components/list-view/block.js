@@ -415,7 +415,8 @@ function ListViewBlock( {
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
-			selectBlock( event, clientId, -1 );
+			const focusAtEnd = -1;
+			selectBlock( event, clientId, focusAtEnd );
 			event.preventDefault();
 		},
 		[ clientId, selectBlock ]
