@@ -1398,8 +1398,6 @@ test.describe( 'List View', () => {
 
 	test( 'should place the caret at the end of the block when selecting from List View', async ( {
 		editor,
-		page,
-		pageUtils,
 		listViewUtils,
 	} ) => {
 		// Insert a paragraph with some text.
@@ -1432,9 +1430,15 @@ test.describe( 'List View', () => {
 		// Verify the block order: if the caret was at the end, the new empty
 		// block should be after the first paragraph, not before it.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{ name: 'core/paragraph', attributes: { content: 'First paragraph' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First paragraph' },
+			},
 			{ name: 'core/paragraph', attributes: { content: '' } },
-			{ name: 'core/paragraph', attributes: { content: 'Second paragraph' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Second paragraph' },
+			},
 		] );
 	} );
 } );
