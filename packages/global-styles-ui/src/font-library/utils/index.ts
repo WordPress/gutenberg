@@ -292,7 +292,7 @@ export function unloadFontFaceInBrowser(
 					fontFaceRule.style
 				) ) {
 					if ( value && rule.style[ descriptor as any ] !== value ) {
-						break ruleLoop;
+						continue ruleLoop;
 					}
 				}
 				sheet.deleteRule( i );
