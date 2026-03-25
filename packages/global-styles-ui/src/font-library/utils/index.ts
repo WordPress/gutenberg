@@ -95,13 +95,13 @@ export function mergeFontFamilies(
 }
 
 /**
- * Normalize a font display name into a valid CSS `@font-face` `font-family` value.
+ * Construct a quoted CSS String from a plain JavaScript value.
  *
- * @param fontName The font's display name.
+ * @param value The JavaScript string to serialize as a quoted CSS string.
  * @return A quoted, CSS-safe font-family string.
  */
-export function normalizeCSSFontFaceFontFamily( fontName: string ): string {
-	return `"${ fontName
+export function createCSSString( value: string ): string {
+	return `"${ value
 		.trim()
 
 		/*
@@ -181,6 +181,61 @@ function ensureSheetsAdopted( target: 'all' | 'document' | 'iframe' ) {
 	}
 }
 
+function getCssFontFaceRule(
+	fontFace: FontFace,
+	src?: string
+): CSSFontFaceRule {
+	const ss = new CSSStyleSheet();
+	const rule = ss.cssRules[ ss.insertRule( '@font-face {}' ) ];
+	if ( ! ( rule instanceof CSSFontFaceRule ) ) {
+		throw new Error( 'Failed to create CSSFontFaceRule' );
+	}
+
+	rule.style.setProperty( 'font-family', fontFace.fontFamily );
+	rule.style.setProperty( 'font-style', fontFace.fontStyle || 'normal' );
+	rule.style.setProperty(
+		'font-weight',
+		String( fontFace.fontWeight || '400' )
+	);
+
+	if ( src ) {
+		rule.style.setProperty( 'src', `url( ${ createCSSString( src ) } )` );
+	}
+
+	if ( fontFace.fontDisplay ) {
+		rule.style.setProperty( 'font-display', fontFace.fontDisplay );
+	}
+
+	// fontStretch?: string;
+	if ( fontFace.fontStretch ) {
+		rule.style.setProperty( 'font-stretch', fontFace.fontStretch );
+	}
+	// fontVariant?: string;
+	if ( fontFace.fontVariant ) {
+		rule.style.setProperty( 'font-variant', fontFace.fontVariant );
+	}
+	// fontFeatureSettings?: string;
+	if ( fontFace.fontFeatureSettings ) {
+		rule.style.setProperty(
+			'font-feature-settings',
+			fontFace.fontFeatureSettings
+		);
+	}
+	// fontVariationSettings?: string;
+	if ( fontFace.fontVariationSettings ) {
+		rule.style.setProperty(
+			'font-variation-settings',
+			fontFace.fontVariationSettings
+		);
+	}
+	// unicodeRange?: string;
+	if ( fontFace.unicodeRange ) {
+		rule.style.setProperty( 'font-unicode-range', fontFace.unicodeRange );
+	}
+
+	return rule;
+}
+
 /*
  * Loads the font face from a URL and adds it to the browser
  * via a managed CSSStyleSheet with @font-face rules.
@@ -200,20 +255,11 @@ export async function loadFontFaceInBrowser(
 		return;
 	}
 
-	const descriptors = [
-		`font-family: ${ fontFace.fontFamily }`,
-		`src: url("${ src }")`,
-		`font-style: ${ fontFace.fontStyle ?? 'normal' }`,
-		`font-weight: ${ fontFace.fontWeight ?? 'normal' }`,
-	];
-	if ( fontFace.fontDisplay ) {
-		descriptors.push( `font-display: ${ fontFace.fontDisplay }` );
-	}
-	const rule = `@font-face { ${ descriptors.join( '; ' ) } }`;
+	const rule = getCssFontFaceRule( fontFace, src );
 
 	ensureSheetsAdopted( addTo );
 	for ( const sheet of getTargetSheets( addTo ) ) {
-		sheet.insertRule( rule, sheet.cssRules.length );
+		sheet.insertRule( rule.cssText, sheet.cssRules.length );
 	}
 }
 
@@ -225,28 +271,23 @@ export function unloadFontFaceInBrowser(
 	fontFace: FontFace,
 	removeFrom: 'all' | 'document' | 'iframe' = 'all'
 ): void {
-	// Use a temp sheet to get the browser-normalized fontFamily for matching.
-	const tempSheet = new CSSStyleSheet();
-	const refIdx = tempSheet.insertRule(
-		`@font-face { font-family: ${ fontFace.fontFamily } }`
-	);
-	const refFamily = ( tempSheet.cssRules[ refIdx ] as CSSFontFaceRule ).style
-		.fontFamily;
+	const fontFaceRule = getCssFontFaceRule( fontFace );
 
-	for ( const sheet of getTargetSheets( removeFrom ) ) {
+	sheetLoop: for ( const sheet of getTargetSheets( removeFrom ) ) {
 		// Walk rules in reverse to safely delete by index.
-		for ( let i = sheet.cssRules.length - 1; i >= 0; i-- ) {
+		rulesLoop: for ( let i = sheet.cssRules.length - 1; i >= 0; i-- ) {
 			const rule = sheet.cssRules[ i ];
 			if ( rule instanceof CSSFontFaceRule ) {
-				const match =
-					rule.style.fontFamily === refFamily &&
-					( rule.style.fontWeight || 'normal' ) ===
-						String( fontFace.fontWeight ?? 'normal' ) &&
-					( rule.style.fontStyle || 'normal' ) ===
-						( fontFace.fontStyle ?? 'normal' );
-				if ( match ) {
-					sheet.deleteRule( i );
+				// Check for a match
+				for ( const [ descriptor, value ] of Object.entries(
+					fontFaceRule.style
+				) ) {
+					if ( value && rule.style[ descriptor ] !== value ) {
+						break rulesLoop;
+					}
 				}
+				sheet.deleteRule( i );
+				break sheetLoop;
 			}
 		}
 	}
