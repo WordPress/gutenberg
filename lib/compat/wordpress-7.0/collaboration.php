@@ -254,12 +254,14 @@ function gutenberg_post_list_collaboration_styles() {
 		/*
 		 * Re-enable controls that core hides for locked posts,
 		 * since RTC allows collaborative editing.
+		 * Must use `tr.wp-locked` to match core's specificity in
+		 * list-tables.css and actually override its `display: none`.
 		 */
-		.wp-locked .check-column label,
-		.wp-locked .check-column input[type="checkbox"] {
+		tr.wp-locked .check-column label,
+		tr.wp-locked .check-column input[type="checkbox"] {
 			display: revert;
 		}
-		.wp-locked .row-actions .inline {
+		tr.wp-locked .row-actions .inline {
 			display: revert;
 		}
 		/*
