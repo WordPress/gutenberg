@@ -221,15 +221,26 @@ function getCssFontFaceRule(
 		declarations.push( `unicode-range: ${ fontFace.unicodeRange }` );
 	}
 
-	const cssText = `@font-face { ${ declarations.join( '; ' ) } }`;
+	const ss = new CSSStyleSheet();
+
+	const cssText = `@font-face {\n\t${ declarations.join( ';\n\t' ) }\n}`;
+	let ruleIndex: number;
 	try {
-		const ss = new CSSStyleSheet();
-		const rule = ss.cssRules[ ss.insertRule( cssText ) ];
-		if ( rule instanceof CSSFontFaceRule ) {
-			return rule;
-		}
+		ruleIndex = ss.insertRule( cssText );
 	} catch {
-		// Invalid CSS syntax — caller treats as no-op.
+		// Invalid CSS, cannot produce a valid rule.
+		if ( globalThis.SCRIPT_DEBUG ) {
+			console.error( 'Failed to insert rule:\n%s', cssText );
+		}
+		return null;
+	}
+	const rule = ss.cssRules[ ruleIndex ];
+	if ( rule instanceof CSSFontFaceRule ) {
+		return rule;
+	}
+	// Unexpected rule
+	if ( globalThis.SCRIPT_DEBUG ) {
+		console.error( 'Unexpected rule type:\n%o', rule );
 	}
 	return null;
 }

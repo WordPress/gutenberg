@@ -3,7 +3,8 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"checkJs": false
+		"checkJs": false,
+		"types": [ "gutenberg-env" ]
 	},
 	"references": [
 		{ "path": "../a11y" },
