@@ -240,6 +240,7 @@ export async function loadFontFaceInBrowser(
 	source: string | File,
 	addTo: 'all' | 'document' | 'iframe' = 'all'
 ): Promise< void > {
+	console.log( 'Loading %o in browser', fontFace );
 	let src: string;
 	if ( typeof source === 'string' ) {
 		src = source;
@@ -252,6 +253,7 @@ export async function loadFontFaceInBrowser(
 	const rule = getCssFontFaceRule( fontFace, src );
 
 	for ( const sheet of ensureTargetSheets( addTo ) ) {
+		console.log( 'Inserting rule rule %o to %o', rule, sheet );
 		sheet.insertRule( rule.cssText, sheet.cssRules.length );
 	}
 }
@@ -264,6 +266,7 @@ export function unloadFontFaceInBrowser(
 	fontFace: FontFace,
 	removeFrom: 'all' | 'document' | 'iframe' = 'all'
 ): void {
+	console.log( 'Unloading %o in browser', fontFace );
 	const fontFaceRule = getCssFontFaceRule( fontFace );
 
 	sheetLoop: for ( const sheet of ensureTargetSheets( removeFrom ) ) {
@@ -279,10 +282,16 @@ export function unloadFontFaceInBrowser(
 						continue ruleLoop;
 					}
 				}
+				console.log(
+					'Removing rule %o from %o',
+					sheet.cssRules[ i ],
+					sheet
+				);
 				sheet.deleteRule( i );
 				break sheetLoop;
 			}
 		}
+		console.log( 'Failed to remove %o from %o', fontFaceRule, sheet );
 	}
 }
 
