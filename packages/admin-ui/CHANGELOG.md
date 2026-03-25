@@ -2,21 +2,25 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Breadcrumbs`: throw a runtime error when non-last items are missing a `to` prop [#76493](https://github.com/WordPress/gutenberg/pull/76493/)
+
 ## 1.10.0 (2026-03-18)
 
-- Update Title and Breadcrumbs font sizes. [#76452](https://github.com/WordPress/gutenberg/pull/76452)
+-   Update Title and Breadcrumbs font sizes. [#76452](https://github.com/WordPress/gutenberg/pull/76452)
 
 ## 1.9.0 (2026-03-04)
 
 ### Bug Fixes
 
-- Fix type mismatch between Page `title` (ReactNode) and NavigableRegion `ariaLabel` (string) by adding an optional `ariaLabel` prop to Page that falls back to `title` when it is a string. [#75899](https://github.com/WordPress/gutenberg/pull/75899/)
+-   Fix type mismatch between Page `title` (ReactNode) and NavigableRegion `ariaLabel` (string) by adding an optional `ariaLabel` prop to Page that falls back to `title` when it is a string. [#75899](https://github.com/WordPress/gutenberg/pull/75899/)
 
 ## 1.8.0 (2026-02-18)
 
 ### Enhancements
 
-- Apply `text-wrap: pretty` for more balanced text in Page component [#74907](https://github.com/WordPress/gutenberg/pull/74907)
+-   Apply `text-wrap: pretty` for more balanced text in Page component [#74907](https://github.com/WordPress/gutenberg/pull/74907)
 
 ## 1.7.0 (2026-01-29)
 
