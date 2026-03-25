@@ -124,11 +124,6 @@ test.describe( 'Collaboration - Code editor performance', () => {
 
 		const elapsed = performance.now() - startTime;
 
-		// eslint-disable-next-line no-console
-		console.log(
-			`Code editor paste + reparse took ${ elapsed }ms (threshold: ${ RESPONSE_TIMEOUT_MS }ms)`
-		);
-
 		// The actual performance assertion: the entire paste-to-blocks
 		// cycle must complete within the threshold.
 		expect( elapsed ).toBeLessThan( RESPONSE_TIMEOUT_MS );
