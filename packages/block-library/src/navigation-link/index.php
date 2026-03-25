@@ -214,6 +214,7 @@ function block_core_navigation_link_is_active( $attributes ) {
 	$resolved_type  = 'tag' === $stored_type ? 'post_tag' : $stored_type;
 	$kind_from_type = taxonomy_exists( $resolved_type ) ? 'taxonomy' : 'post-type';
 	$link_kind      = ! empty( $stored_kind ) ? $stored_kind : $kind_from_type;
+	$enable_id_match = 'post-type-archive' !== $link_kind;
 
 	/*
 	 * Entity ID match.
@@ -237,7 +238,7 @@ function block_core_navigation_link_is_active( $attributes ) {
 		? $queried_object instanceof WP_Term
 		: $queried_object instanceof WP_Post;
 
-	if ( $ids_match && $object_type_matches ) {
+	if ( $enable_id_match && $ids_match && $object_type_matches ) {
 		return true;
 	}
 
