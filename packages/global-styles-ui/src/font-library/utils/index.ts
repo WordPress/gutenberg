@@ -273,10 +273,13 @@ function getCssFontFaceRule(
 	return null;
 }
 
-/*
- * Loads the font face from a URL and adds it to the browser
- * via a managed CSSStyleSheet with @font-face rules.
- * It also adds it to the iframe document.
+/**
+ * Loads a font face into the browser by inserting an @font-face rule
+ * into managed CSSStyleSheets, including the editor iframe.
+ *
+ * @param fontFace The font face descriptor to load.
+ * @param source   URL string or File to use as the font source.
+ * @param addTo    Which documents to add the font to.
  */
 export function loadFontFaceInBrowser(
 	fontFace: FontFace,
@@ -302,9 +305,12 @@ export function loadFontFaceInBrowser(
 	}
 }
 
-/*
- * Unloads the font face and removes it from the browser
- * by deleting matching @font-face rules from the managed CSSStyleSheets.
+/**
+ * Unloads a font face by deleting matching @font-face rules
+ * from the managed CSSStyleSheets.
+ *
+ * @param fontFace   The font face descriptor to unload.
+ * @param removeFrom Which documents to remove the font from.
  */
 export function unloadFontFaceInBrowser(
 	fontFace: FontFace,
