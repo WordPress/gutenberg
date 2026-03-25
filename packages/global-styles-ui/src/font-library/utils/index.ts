@@ -256,6 +256,7 @@ function getCssFontFaceRule(
 	} catch {
 		// Invalid CSS, cannot produce a valid rule.
 		if ( globalThis.SCRIPT_DEBUG ) {
+			// eslint-disable-next-line no-console
 			console.error( 'Failed to insert rule:\n%s', cssText );
 		}
 		return null;
@@ -266,6 +267,7 @@ function getCssFontFaceRule(
 	}
 	// Unexpected rule
 	if ( globalThis.SCRIPT_DEBUG ) {
+		// eslint-disable-next-line no-console
 		console.error( 'Unexpected rule type:\n%o', rule );
 	}
 	return null;
