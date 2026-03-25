@@ -233,7 +233,8 @@ function gutenberg_filter_locked_posts_heartbeat_for_rtc( $response ) {
  *
  * Also re-enables checkboxes and row actions that WordPress core hides for
  * locked posts, since collaborative editing means the post is not exclusively
- * locked.
+ * locked. Toggles "Edit" / "Join" action link text via the
+ * `.wp-collaborative-editing` class that the heartbeat already manages.
  */
 function gutenberg_post_list_collaboration_styles() {
 	?>
@@ -260,6 +261,20 @@ function gutenberg_post_list_collaboration_styles() {
 		}
 		.wp-locked .row-actions .inline {
 			display: revert;
+		}
+		/*
+		 * Toggle "Edit" / "Join" action link text based on lock state.
+		 * The heartbeat adds/removes .wp-collaborative-editing on the row,
+		 * so CSS handles the swap without needing JS to rewrite link text.
+		 */
+		.join-action-text {
+			display: none;
+		}
+		.wp-collaborative-editing .edit-action-text {
+			display: none;
+		}
+		.wp-collaborative-editing .join-action-text {
+			display: inline;
 		}
 	</style>
 	<?php
@@ -288,30 +303,42 @@ function gutenberg_filter_locked_post_text_for_rtc( $translation, $text, $domain
 }
 
 /**
- * Filters post row actions to change "Edit" to "Join" for locked posts
+ * Filters post row actions to render both "Edit" and "Join" link text
  * when real-time collaboration is enabled.
+ *
+ * Both labels are always present in the markup; CSS toggles visibility
+ * based on the `.wp-collaborative-editing` class the heartbeat manages.
+ * This ensures the link text updates when the lock state changes without
+ * requiring a page reload.
  *
  * @param string[] $actions An array of row action links.
  * @param WP_Post  $post    The post object.
  * @return string[] Modified row action links.
  */
 function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
-	if ( ! function_exists( 'wp_check_post_lock' ) ) {
-		require_once ABSPATH . 'wp-admin/includes/post.php';
-	}
-
-	$lock_holder = wp_check_post_lock( $post->ID );
-	if ( ! $lock_holder ) {
+	if ( ! isset( $actions['edit'] ) ) {
 		return $actions;
 	}
 
-	if ( isset( $actions['edit'] ) ) {
-		$actions['edit'] = preg_replace(
-			'/>Edit</',
-			'>' . esc_html__( 'Join', 'gutenberg' ) . '<',
-			$actions['edit']
-		);
-	}
+	$title = _draft_or_post_title( $post->ID );
+
+	$link_text  = '<span class="edit-action-text">';
+	$link_text .= '<span aria-hidden="true">' . __( 'Edit' ) . '</span>';
+	/* translators: %s: Post title. */
+	$link_text .= '<span class="screen-reader-text">' . sprintf( __( 'Edit &#8220;%s&#8221;' ), $title ) . '</span>';
+	$link_text .= '</span>';
+	$link_text .= '<span class="join-action-text">';
+	/* translators: Action link text for a singular post in the post list. Can be any type of post. */
+	$link_text .= '<span aria-hidden="true">' . _x( 'Join', 'post list', 'gutenberg' ) . '</span>';
+	/* translators: %s: Post title. */
+	$link_text .= '<span class="screen-reader-text">' . sprintf( __( 'Join editing &#8220;%s&#8221;', 'gutenberg' ), $title ) . '</span>';
+	$link_text .= '</span>';
+
+	$actions['edit'] = sprintf(
+		'<a href="%s">%s</a>',
+		get_edit_post_link( $post->ID ),
+		$link_text
+	);
 
 	return $actions;
 }
