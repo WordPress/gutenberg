@@ -211,34 +211,27 @@ function getCssFontFaceRule(
 	if ( src ) {
 		rule.style.setProperty( 'src', `url( ${ createCSSString( src ) } )` );
 	}
-
 	if ( fontFace.fontDisplay ) {
 		rule.style.setProperty( 'font-display', fontFace.fontDisplay );
 	}
-
-	// fontStretch?: string;
 	if ( fontFace.fontStretch ) {
 		rule.style.setProperty( 'font-stretch', fontFace.fontStretch );
 	}
-	// fontVariant?: string;
 	if ( fontFace.fontVariant ) {
 		rule.style.setProperty( 'font-variant', fontFace.fontVariant );
 	}
-	// fontFeatureSettings?: string;
 	if ( fontFace.fontFeatureSettings ) {
 		rule.style.setProperty(
 			'font-feature-settings',
 			fontFace.fontFeatureSettings
 		);
 	}
-	// fontVariationSettings?: string;
 	if ( fontFace.fontVariationSettings ) {
 		rule.style.setProperty(
 			'font-variation-settings',
 			fontFace.fontVariationSettings
 		);
 	}
-	// unicodeRange?: string;
 	if ( fontFace.unicodeRange ) {
 		rule.style.setProperty( 'unicode-range', fontFace.unicodeRange );
 	}
