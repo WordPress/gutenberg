@@ -29,11 +29,54 @@ const IMAGE_SUB_SIZES = [
 
 const ASSETS_PATH = process.env.ASSETS_PATH;
 
+/**
+ * Decode a base64 string to an ArrayBuffer, run vipsResizeImage
+ * for each sub-size, and return the total elapsed time in ms.
+ *
+ * Runs inside page.evaluate().
+ *
+ * @param {Object}   args
+ * @param {string}   args.base64   Base64-encoded image data.
+ * @param {string}   args.mimeType MIME type of the image.
+ * @param {Object[]} args.sizes    Array of { width, height, crop? } sub-sizes.
+ * @return {Promise<number>} Elapsed time in milliseconds.
+ */
+async function measureProcessing( { base64, mimeType, sizes } ) {
+	const { vipsResizeImage } = await import( '@wordpress/vips/worker' );
+	const bytes = Uint8Array.from( atob( base64 ), ( c ) => c.charCodeAt( 0 ) );
+
+	const start = performance.now();
+	for ( const resize of sizes ) {
+		// Create a fresh buffer copy for each resize because
+		// the worker transfers (detaches) the ArrayBuffer.
+		const buffer = bytes.slice().buffer;
+		await vipsResizeImage(
+			`perf-${ resize.width }`,
+			buffer,
+			mimeType,
+			resize,
+			false,
+			0.82
+		);
+	}
+	return performance.now() - start;
+}
+
 test.describe( 'Media Processing Performance', () => {
-	// Shared state across tests.
-	let jpegBase64;
-	let webpBase64;
-	let avifBase64;
+	// Read test images once at module level — these don't change.
+	const jpegBase64 = readFileSync(
+		path.join( ASSETS_PATH, 'test-image-3000x2000.jpeg' )
+	).toString( 'base64' );
+
+	const webpBase64 = readFileSync(
+		path.join( ASSETS_PATH, 'test-image-3000x2000.webp' )
+	).toString( 'base64' );
+
+	const avifBase64 = readFileSync(
+		path.join( ASSETS_PATH, 'test-image-3000x2000.avif' )
+	).toString( 'base64' );
+
+	let draftId = null;
 
 	test.afterAll( async ( {}, testInfo ) => {
 		await testInfo.attach( 'results', {
@@ -45,47 +88,31 @@ test.describe( 'Media Processing Performance', () => {
 	test( 'Setup', async ( { admin, page } ) => {
 		await admin.createNewPost();
 
-		// Skip if cross-origin isolation is not enabled.
-		// The vips library requires SharedArrayBuffer which needs cross-origin isolation.
-		const isCrossOriginIsolated = await page.evaluate(
-			() => window.crossOriginIsolated
+		// Skip if SharedArrayBuffer is not available.
+		// The vips library requires SharedArrayBuffer for WebAssembly-based
+		// image processing. This is enabled via cross-origin isolation headers
+		// (Document-Isolation-Policy or COOP/COEP).
+		const hasSharedArrayBuffer = await page.evaluate(
+			() => typeof SharedArrayBuffer !== 'undefined'
 		);
 		// eslint-disable-next-line playwright/no-skipped-test
 		test.skip(
-			! isCrossOriginIsolated,
-			'Cross-origin isolation headers not configured on server'
+			! hasSharedArrayBuffer,
+			'SharedArrayBuffer not available (cross-origin isolation not configured)'
 		);
 
-		// Read test images from disk.
-		jpegBase64 = readFileSync(
-			path.join( ASSETS_PATH, 'test-image-3000x2000.jpeg' )
-		).toString( 'base64' );
-
-		webpBase64 = readFileSync(
-			path.join( ASSETS_PATH, 'test-image-3000x2000.webp' )
-		).toString( 'base64' );
-
-		avifBase64 = readFileSync(
-			path.join( ASSETS_PATH, 'test-image-3000x2000.avif' )
-		).toString( 'base64' );
-
 		// Warm up the vips WASM module by running a single resize.
-		await page.evaluate( async ( base64 ) => {
-			const { vipsResizeImage } = await import(
-				'@wordpress/vips/worker'
-			);
-			const buffer = Uint8Array.from( atob( base64 ), ( c ) =>
-				c.charCodeAt( 0 )
-			).buffer;
-			await vipsResizeImage(
-				'warmup',
-				buffer,
-				'image/jpeg',
-				{ width: 150, height: 150, crop: true },
-				false,
-				0.82
-			);
-		}, jpegBase64 );
+		await page.evaluate( measureProcessing, {
+			base64: jpegBase64,
+			mimeType: 'image/jpeg',
+			sizes: [ { width: 150, height: 150, crop: true } ],
+		} );
+
+		// Save the draft so iteration tests can navigate to it.
+		// This ensures the import map for @wordpress/vips/worker is available.
+		draftId = await page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).getCurrentPostId()
+		);
 	} );
 
 	const samples = 10;
@@ -93,111 +120,41 @@ test.describe( 'Media Processing Performance', () => {
 	const iterations = samples + throwaway;
 
 	for ( let i = 1; i <= iterations; i++ ) {
-		test( `JPEG processing (${ i } of ${ iterations })`, async ( {
+		test( `Run the test (${ i } of ${ iterations })`, async ( {
+			admin,
 			page,
 		} ) => {
 			// eslint-disable-next-line playwright/no-skipped-test
-			test.skip( ! jpegBase64, 'Setup did not complete' );
+			test.skip( ! draftId, 'Setup did not complete' );
 
-			const elapsed = await page.evaluate(
-				async ( { base64, sizes } ) => {
-					const { vipsResizeImage } = await import(
-						'@wordpress/vips/worker'
-					);
-					const buffer = Uint8Array.from( atob( base64 ), ( c ) =>
-						c.charCodeAt( 0 )
-					).buffer;
+			// Navigate to the editor to get the import map.
+			await admin.editPost( draftId );
 
-					const start = performance.now();
-					for ( const resize of sizes ) {
-						await vipsResizeImage(
-							`perf-jpeg-${ resize.width }`,
-							buffer,
-							'image/jpeg',
-							resize,
-							false,
-							0.82
-						);
-					}
-					return performance.now() - start;
-				},
-				{ base64: jpegBase64, sizes: IMAGE_SUB_SIZES }
-			);
+			// JPEG
+			const jpegElapsed = await page.evaluate( measureProcessing, {
+				base64: jpegBase64,
+				mimeType: 'image/jpeg',
+				sizes: IMAGE_SUB_SIZES,
+			} );
 
-			if ( i > throwaway ) {
-				results.mediaProcessingJpeg.push( elapsed );
-			}
-		} );
+			// WebP
+			const webpElapsed = await page.evaluate( measureProcessing, {
+				base64: webpBase64,
+				mimeType: 'image/webp',
+				sizes: IMAGE_SUB_SIZES,
+			} );
 
-		test( `WebP processing (${ i } of ${ iterations })`, async ( {
-			page,
-		} ) => {
-			// eslint-disable-next-line playwright/no-skipped-test
-			test.skip( ! webpBase64, 'Setup did not complete' );
-
-			const elapsed = await page.evaluate(
-				async ( { base64, sizes } ) => {
-					const { vipsResizeImage } = await import(
-						'@wordpress/vips/worker'
-					);
-					const buffer = Uint8Array.from( atob( base64 ), ( c ) =>
-						c.charCodeAt( 0 )
-					).buffer;
-
-					const start = performance.now();
-					for ( const resize of sizes ) {
-						await vipsResizeImage(
-							`perf-webp-${ resize.width }`,
-							buffer,
-							'image/webp',
-							resize,
-							false,
-							0.82
-						);
-					}
-					return performance.now() - start;
-				},
-				{ base64: webpBase64, sizes: IMAGE_SUB_SIZES }
-			);
+			// AVIF
+			const avifElapsed = await page.evaluate( measureProcessing, {
+				base64: avifBase64,
+				mimeType: 'image/avif',
+				sizes: IMAGE_SUB_SIZES,
+			} );
 
 			if ( i > throwaway ) {
-				results.mediaProcessingWebp.push( elapsed );
-			}
-		} );
-
-		test( `AVIF processing (${ i } of ${ iterations })`, async ( {
-			page,
-		} ) => {
-			// eslint-disable-next-line playwright/no-skipped-test
-			test.skip( ! avifBase64, 'Setup did not complete' );
-
-			const elapsed = await page.evaluate(
-				async ( { base64, sizes } ) => {
-					const { vipsResizeImage } = await import(
-						'@wordpress/vips/worker'
-					);
-					const buffer = Uint8Array.from( atob( base64 ), ( c ) =>
-						c.charCodeAt( 0 )
-					).buffer;
-
-					const start = performance.now();
-					for ( const resize of sizes ) {
-						await vipsResizeImage(
-							`perf-avif-${ resize.width }`,
-							buffer,
-							'image/avif',
-							resize,
-							false,
-							0.82
-						);
-					}
-					return performance.now() - start;
-				},
-				{ base64: avifBase64, sizes: IMAGE_SUB_SIZES }
-			);
-
-			if ( i > throwaway ) {
-				results.mediaProcessingAvif.push( elapsed );
+				results.mediaProcessingJpeg.push( jpegElapsed );
+				results.mediaProcessingWebp.push( webpElapsed );
+				results.mediaProcessingAvif.push( avifElapsed );
 			}
 		} );
 	}
