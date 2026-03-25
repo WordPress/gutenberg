@@ -26,10 +26,10 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	private $original_block_supports;
 
 	public static function wpSetUpBeforeClass() {
-		// Register "dogs" before creating posts of that type so go_to() can resolve them.
+		// Register a unique CPT before creating posts of that type so go_to() can resolve them.
 		// has_archive enables get_post_type_archive_link() for the archive branch tests.
 		register_post_type(
-			'dogs',
+			'gutenberg_test_nav_cpt',
 			array(
 				'public'             => true,
 				'publicly_queryable' => true,
@@ -63,7 +63,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 		self::$custom_post = self::factory()->post->create_and_get(
 			array(
-				'post_type'    => 'dogs',
+				'post_type'    => 'gutenberg_test_nav_cpt',
 				'post_status'  => 'publish',
 				'post_name'    => 'metaldog',
 				'post_title'   => 'Metal Dog',
@@ -114,7 +114,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	}
 
 	public static function wpTearDownAfterClass() {
-		unregister_post_type( 'dogs' );
+		unregister_post_type( 'gutenberg_test_nav_cpt' );
 		foreach ( self::$pages as $page_to_delete ) {
 			wp_delete_post( $page_to_delete->ID );
 		}
@@ -191,7 +191,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$output = $this->render_nav_link(
 			array(
 				'label' => 'Metal Dog',
-				'type'  => 'dogs',
+				'type'  => 'gutenberg_test_nav_cpt',
 				'kind'  => 'post-type',
 				'id'    => self::$custom_post->ID,
 				'url'   => get_permalink( self::$custom_post->ID ),
@@ -448,12 +448,12 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	 * archive page. Mirrors Branch C of _wp_menu_item_classes_by_context().
 	 */
 	public function test_current_menu_item_for_post_type_archive_link() {
-		$archive_url = get_post_type_archive_link( 'dogs' );
+		$archive_url = get_post_type_archive_link( 'gutenberg_test_nav_cpt' );
 		$this->go_to( $archive_url );
 		$output = $this->render_nav_link(
 			array(
-				'label' => 'Dogs Archive',
-				'type'  => 'dogs',
+				'label' => 'Custom CPT Archive',
+				'type'  => 'gutenberg_test_nav_cpt',
 				'kind'  => 'post-type-archive',
 				'url'   => $archive_url,
 			)
@@ -465,8 +465,8 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	 * A post-type-archive link should NOT be active when on a different post type's archive.
 	 */
 	public function test_no_current_menu_item_for_archive_link_on_wrong_archive() {
-		// Go to the dogs archive but render a link pointing to the posts archive.
-		$this->go_to( get_post_type_archive_link( 'dogs' ) );
+		// Go to the custom CPT archive but render a link pointing to the posts archive.
+		$this->go_to( get_post_type_archive_link( 'gutenberg_test_nav_cpt' ) );
 		$output = $this->render_nav_link(
 			array(
 				'label' => 'Posts Archive',
@@ -483,12 +483,12 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	 * happens to be set — is_post_type_archive() must be true for the branch to fire.
 	 */
 	public function test_no_current_menu_item_for_archive_link_on_singular_page() {
-		$archive_url = get_post_type_archive_link( 'dogs' );
+		$archive_url = get_post_type_archive_link( 'gutenberg_test_nav_cpt' );
 		$this->go_to( get_permalink( self::$page->ID ) );
 		$output = $this->render_nav_link(
 			array(
-				'label' => 'Dogs Archive',
-				'type'  => 'dogs',
+				'label' => 'Custom CPT Archive',
+				'type'  => 'gutenberg_test_nav_cpt',
 				'kind'  => 'post-type-archive',
 				'url'   => $archive_url,
 			)
@@ -664,7 +664,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$url     = 'http://' . WP_TESTS_DOMAIN;
 
 		$parsed_blocks = parse_blocks(
-			"<!-- wp:navigation-link {\"label\":\"Metal Dogs\",\"type\":\"dogs\",\"kind\":\"post-type\",\"id\":{$page_id},\"url\":\"{$url}/?page_id={$page_id}\"} /-->"
+			"<!-- wp:navigation-link {\"label\":\"Metal Dogs\",\"type\":\"gutenberg_test_nav_cpt\",\"kind\":\"post-type\",\"id\":{$page_id},\"url\":\"{$url}/?page_id={$page_id}\"} /-->"
 		);
 		$this->assertEquals( 1, count( $parsed_blocks ) );
 

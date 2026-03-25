@@ -212,8 +212,9 @@ function block_core_navigation_link_is_active( $attributes ) {
 	$stored_kind    = $attributes['kind'] ?? '';
 	$stored_type    = $attributes['type'] ?? '';
 	$resolved_type  = 'tag' === $stored_type ? 'post_tag' : $stored_type;
-	$kind_from_type = taxonomy_exists( $resolved_type ) ? 'taxonomy' : 'post-type';
-	$link_kind      = ! empty( $stored_kind ) ? $stored_kind : $kind_from_type;
+	$kind_from_type  = taxonomy_exists( $resolved_type ) ? 'taxonomy' : 'post-type';
+	$link_kind       = ! empty( $stored_kind ) ? $stored_kind : $kind_from_type;
+	// Archive links match by URL (via is_post_type_archive()), not by entity ID, so skip ID matching.
 	$enable_id_match = 'post-type-archive' !== $link_kind;
 
 	/*
