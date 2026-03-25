@@ -103,15 +103,19 @@ For **blocks**, this attribute is added automatically when the block declares in
 }
 ```
 
-If your block's `block.json` already includes one of these, no additional setup is needed — WordPress handles the rest. To understand what makes a block compatible and how to verify compatibility, see the [Client-Side Navigation Compatibility](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility.md) guide.
+If your block's `block.json` already includes one of these, no additional setup is needed — WordPress handles the rest.
 
-For **classic themes** and other script modules registered outside of `block.json`, the attribute is not added automatically. You must register your script module for client-side navigation explicitly using `add_client_navigation_support_to_script_module()`:
+For **classic PHP themes** and other script modules registered outside of `block.json`, the attribute is not added automatically. You must register your script module for client-side navigation explicitly using `add_client_navigation_support_to_script_module()`:
 
 ```php
 wp_interactivity()->add_client_navigation_support_to_script_module(
     'my-theme/navigation'
 );
 ```
+
+<div class="callout callout-info">
+To understand what makes a block (or interactive elements in a classic PHP theme) compatible with client-side navigation, see the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility/">Client-Side Navigation Compatibility</a> guide.
+</div>
 
 Without this, the router will not load your script module when navigating to a page that needs it.
 
