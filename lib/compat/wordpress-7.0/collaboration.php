@@ -146,12 +146,6 @@ function gutenberg_inject_real_time_collaboration_setting() {
 		return;
 	}
 
-	// Temporary check to bridge the short time when this is change is merged in
-	// Gutenberg but not in core.
-	if ( ! get_option( 'wp_enable_real_time_collaboration' ) ) {
-		return;
-	}
-
 	// Disable real-time collaboration on the site editor.
 	$enabled = true;
 	if (
