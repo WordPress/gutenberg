@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
@@ -115,16 +120,28 @@ export function getBackgroundImageClasses( style ) {
 		: '';
 }
 
-function BackgroundInspectorControl( { children } ) {
-	const resetAllFilter = useCallback( ( attributes ) => {
-		return {
-			...attributes,
-			style: {
-				...attributes.style,
-				background: undefined,
-			},
-		};
-	}, [] );
+function BackgroundInspectorControl( {
+	children,
+	backgroundGradientSupported = false,
+} ) {
+	const resetAllFilter = useCallback(
+		( attributes ) => {
+			return {
+				...attributes,
+				style: cleanEmptyObject( {
+					...attributes.style,
+					background: undefined,
+					color: backgroundGradientSupported
+						? {
+								...attributes.style?.color,
+								gradient: undefined,
+						  }
+						: attributes.style?.color,
+				} ),
+			};
+		},
+		[ backgroundGradientSupported ]
+	);
 	return (
 		<InspectorControls group="background" resetAllFilter={ resetAllFilter }>
 			{ children }
@@ -138,13 +155,15 @@ export function BackgroundImagePanel( {
 	setAttributes,
 	settings,
 } ) {
-	const { style, inheritedValue } = useSelect(
+	const { style, className, inheritedValue } = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getSettings } =
 				select( blockEditorStore );
 			const _settings = getSettings();
+			const blockAttributes = getBlockAttributes( clientId );
 			return {
-				style: getBlockAttributes( clientId )?.style,
+				style: blockAttributes?.style,
+				className: blockAttributes?.className,
 				/*
 				 * To ensure we pass down the right inherited values:
 				 * @TODO 1. Pass inherited value down to all block style controls,
@@ -159,6 +178,25 @@ export function BackgroundImagePanel( {
 		[ clientId, name ]
 	);
 
+	const backgroundGradientSupported = hasBackgroundSupport(
+		name,
+		'gradient'
+	);
+
+	// Must be declared before the early return to follow Rules of Hooks.
+	// Passes backgroundGradientSupported so that "Reset All" also clears
+	// the legacy color.gradient value when background.gradient is supported.
+	const as = useCallback(
+		( { children } ) => (
+			<BackgroundInspectorControl
+				backgroundGradientSupported={ backgroundGradientSupported }
+			>
+				{ children }
+			</BackgroundInspectorControl>
+		),
+		[ backgroundGradientSupported ]
+	);
+
 	if (
 		! useHasBackgroundPanel( settings ) ||
 		! hasBackgroundSupport( name )
@@ -167,10 +205,48 @@ export function BackgroundImagePanel( {
 	}
 
 	const onChange = ( newStyle ) => {
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
+		const isMigrating =
+			backgroundGradientSupported && !! style?.color?.gradient;
+		const newAttributes = {
+			style: cleanEmptyObject(
+				backgroundGradientSupported
+					? {
+							...newStyle,
+							color: {
+								...newStyle?.color,
+								gradient: undefined,
+							},
+					  }
+					: newStyle
+			),
+		};
+
+		// When migrating from color.gradient to background.gradient, preserve
+		// the has-background class so existing styles relying on it (e.g.
+		// theme padding) are not silently broken. Only add the class when a
+		// gradient value is being set — not when it is being cleared/reset.
+		if ( isMigrating && !! newStyle?.background?.gradient ) {
+			newAttributes.className = clsx( className, 'has-background' );
+		}
+
+		setAttributes( newAttributes );
 	};
+
+	// When background.gradient is supported but not yet explicitly set, fall
+	// back to color.gradient for display. Any write from this panel migrates
+	// the value to background.gradient and clears color.gradient atomically.
+	const styleValue =
+		backgroundGradientSupported &&
+		! style?.background?.gradient &&
+		style?.color?.gradient
+			? {
+					...style,
+					background: {
+						...style?.background,
+						gradient: style?.color?.gradient,
+					},
+			  }
+			: style;
 
 	const updatedSettings = {
 		...settings,
@@ -190,13 +266,13 @@ export function BackgroundImagePanel( {
 	return (
 		<StylesBackgroundPanel
 			inheritedValue={ inheritedValue }
-			as={ BackgroundInspectorControl }
+			as={ as }
 			panelId={ clientId }
 			defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
 			settings={ updatedSettings }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
-			value={ style }
+			value={ styleValue }
 		/>
 	);
 }
