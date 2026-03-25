@@ -91,8 +91,8 @@ test.describe( 'Collaboration - Code editor performance', () => {
 		// being fully parsed. This captures any main-thread freeze.
 		const startTime = performance.now();
 
-		await pageUtils.pressKeys( 'primary+a' );
-		await pageUtils.pressKeys( 'primary+v' );
+		await page.keyboard.press( 'Meta+a' );
+		await page.keyboard.press( 'Meta+v' );
 
 		// Step 4: Switch to visual mode. The editor must process the
 		// pasted content before it can handle this shortcut.
