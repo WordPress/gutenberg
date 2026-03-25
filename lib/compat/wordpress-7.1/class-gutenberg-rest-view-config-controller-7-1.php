@@ -686,7 +686,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 * @param WP_Block_Template $template_object Template instance.
 	 * @return string The original source ('theme', 'plugin', 'site', or 'user').
 	 */
-	private static function get_template_original_source( $template_object ) {
+	private static function get_wp_templates_original_source_field( $template_object ) {
 		if ( 'wp_template' === $template_object->type || 'wp_template_part' === $template_object->type ) {
 			if ( $template_object->has_theme_file &&
 				( 'theme' === $template_object->origin || (
@@ -722,7 +722,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 * @param string            $original_source The original source of the template.
 	 * @return string Human readable text for the author.
 	 */
-	private static function get_template_author_text( $template_object, $original_source ) {
+	private static function get_wp_templates_author_text_field( $template_object, $original_source ) {
 		switch ( $original_source ) {
 			case 'theme':
 				$theme_name = wp_get_theme( $template_object->theme )->get( 'Name' );
@@ -806,8 +806,8 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		$registered_templates = gutenberg_get_registered_block_templates( array() );
 		$seen_authors         = array();
 		foreach ( $registered_templates as $template ) {
-			$original_source = self::get_template_original_source( $template );
-			$author_text     = self::get_template_author_text( $template, $original_source );
+			$original_source = self::get_wp_templates_original_source_field( $template );
+			$author_text     = self::get_wp_templates_author_text_field( $template, $original_source );
 			if ( ! empty( $author_text ) && ! isset( $seen_authors[ $author_text ] ) ) {
 				$seen_authors[ $author_text ] = true;
 				$view_list[]                  = array(
@@ -830,8 +830,8 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		// User-created DB templates.
 		$db_templates = get_block_templates( array(), 'wp_template' );
 		foreach ( $db_templates as $template ) {
-			$original_source = self::get_template_original_source( $template );
-			$author_text     = self::get_template_author_text( $template, $original_source );
+			$original_source = self::get_wp_templates_original_source_field( $template );
+			$author_text     = self::get_wp_templates_author_text_field( $template, $original_source );
 			if ( ! empty( $author_text ) && ! isset( $seen_authors[ $author_text ] ) ) {
 				$seen_authors[ $author_text ] = true;
 				$view_list[]                  = array(
