@@ -8,7 +8,7 @@
  * External dependencies
  */
 import type { Change } from 'diff';
-import { diffChars } from 'diff';
+import { diffChars, diffLines } from 'diff';
 import { default as isEqual } from 'fast-deep-equal/es6';
 
 /**
@@ -23,6 +23,7 @@ function cloneDeep< T >( value: T ): T {
 }
 
 const NULL_CHARACTER = String.fromCharCode( 0 ); // Placeholder char for embed in diff()
+const STRING_TOO_LARGE_THRESHOLD = 10000; // If either string is larger than this, use a less precise diff algorithm optimized for large strings
 
 /**
  * Normalize diff changes so that `count` reflects UTF-16 code-unit length
@@ -414,9 +415,26 @@ class Delta {
 			return new Delta();
 		}
 		const strings = this.deltasToStrings( other );
-		const diffResult = normalizeChangeCounts(
-			diffChars( strings[ 0 ], strings[ 1 ] )
+		const maxStringLength = Math.max(
+			...strings.map( ( str ) => str.length )
 		);
+
+		let rawDiff;
+		if ( maxStringLength > STRING_TOO_LARGE_THRESHOLD ) {
+			// When large changes are pasted into the code editor, this can
+			// result in very long strings as a result of comparing the
+			// `content` of the code editor before and after the change.
+			// In this case, diffChars() can take a very long time to complete,
+			// which causes the editor to freeze.
+			// When we detect strings that are too long, use a less-precise diff
+			// method that is optimized for large inputs, at the cost of less
+			// accurate diffing.
+			rawDiff = diffLines( strings[ 0 ], strings[ 1 ] );
+		} else {
+			rawDiff = diffChars( strings[ 0 ], strings[ 1 ] );
+		}
+
+		const diffResult = normalizeChangeCounts( rawDiff );
 		const thisIter = new OpIterator( this.ops );
 		const otherIter = new OpIterator( other.ops );
 		const retDelta = this.convertChangesToDelta(
