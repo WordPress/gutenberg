@@ -245,6 +245,28 @@ export function applyPostChangesToCRDTDoc(
 		}
 	} );
 
+	// Process content changes when it's passed as a function, using the changed blocks.
+	if (
+		changes.content &&
+		'function' === typeof changes.content &&
+		changes.blocks &&
+		'function' !== typeof changes.blocks
+	) {
+		const contentFunction = changes.content;
+
+		// @ts-ignore - the content function is passed in with blocks as an argument.
+		const contentValue = contentFunction( { blocks: changes.blocks } );
+
+		const currentValue = ymap.get( 'content' );
+
+		if ( currentValue instanceof Y.Text ) {
+			mergeRichTextUpdate( currentValue, contentValue );
+		} else {
+			const newYText = new Y.Text( contentValue ?? '' );
+			ymap.set( 'content', newYText );
+		}
+	}
+
 	// Process changes that we don't want to persist to the CRDT document.
 	if ( changes.selection ) {
 		const selection = changes.selection;
