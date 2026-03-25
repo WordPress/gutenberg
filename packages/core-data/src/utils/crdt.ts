@@ -43,10 +43,17 @@ import {
 	type YMapWrap,
 } from './crdt-utils';
 
+// A function that derives content from blocks (used by useEntityBlockEditor).
+type ContentFromBlocksFn = ( args: { blocks: Block[] } ) => string;
+
+function isContentFromBlocksFn( value: unknown ): value is ContentFromBlocksFn {
+	return typeof value === 'function' && value.length === 1;
+}
+
 // Changes that can be applied to a post entity record.
 export type PostChanges = Partial< Post > & {
 	blocks?: Block[];
-	content?: Post[ 'content' ] | string;
+	content?: Post[ 'content' ] | string | ContentFromBlocksFn;
 	excerpt?: Post[ 'excerpt' ] | string;
 	selection?: WPSelection;
 	title?: Post[ 'title' ] | string;
@@ -247,15 +254,11 @@ export function applyPostChangesToCRDTDoc(
 
 	// Process content changes when it's passed as a function, using the changed blocks.
 	if (
-		changes.content &&
-		'function' === typeof changes.content &&
+		isContentFromBlocksFn( changes.content ) &&
 		changes.blocks &&
 		'function' !== typeof changes.blocks
 	) {
-		const contentFunction = changes.content;
-
-		// @ts-ignore - the content function is passed in with blocks as an argument.
-		const contentValue = contentFunction( { blocks: changes.blocks } );
+		const contentValue = changes.content( { blocks: changes.blocks } );
 
 		const currentValue = ymap.get( 'content' );
 

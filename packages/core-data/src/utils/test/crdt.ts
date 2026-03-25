@@ -401,6 +401,101 @@ describe( 'crdt', () => {
 			expect( metaMap?.get( 'custom_field' ) ).toBe( 'value' );
 		} );
 
+		it( 'syncs content from a content function when no existing Y.Text', () => {
+			const changes = {
+				blocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Hello' },
+						innerBlocks: [],
+					},
+				],
+				content: ( { blocks: blocksForSerialization = [] } ) =>
+					blocksForSerialization
+						.map( ( b ) => b.attributes.content )
+						.join( '' ),
+			} as unknown as PostChanges;
+
+			applyPostChangesToCRDTDoc( doc, changes, defaultSyncedProperties );
+
+			const content = map.get( 'content' );
+			expect( content ).toBeInstanceOf( Y.Text );
+			expect( content?.toString() ).toBe( 'Hello' );
+		} );
+
+		it( 'updates existing Y.Text content in place from a content function', () => {
+			// Pre-populate content as Y.Text to hit the mergeRichTextUpdate branch.
+			map.set( 'content', new Y.Text( 'Old content' ) );
+			const contentRef = map.get( 'content' );
+
+			const changes = {
+				blocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'New content' },
+						innerBlocks: [],
+					},
+				],
+				content: ( { blocks: blocksForSerialization = [] } ) =>
+					blocksForSerialization
+						.map( ( b ) => b.attributes.content )
+						.join( '' ),
+			} as unknown as PostChanges;
+
+			applyPostChangesToCRDTDoc( doc, changes, defaultSyncedProperties );
+
+			// Should update in place, not replace the Y.Text instance.
+			expect( map.get( 'content' ) ).toBe( contentRef );
+			expect( map.get( 'content' )?.toString() ).toBe( 'New content' );
+		} );
+
+		it( 'does not call content function when it has wrong arity', () => {
+			const wrongFunction = ( a: unknown, b: unknown ) => `${ a }${ b }`;
+
+			const changes = {
+				blocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Hello' },
+						innerBlocks: [],
+					},
+				],
+				content: wrongFunction,
+			} as unknown as PostChanges;
+
+			applyPostChangesToCRDTDoc( doc, changes, defaultSyncedProperties );
+
+			// Content should not have been set because the function has wrong arity.
+			expect( map.has( 'content' ) ).toBe( false );
+		} );
+
+		it( 'does not call content function when blocks are not provided', () => {
+			const changes = {
+				content: ( { blocks: blocksForSerialization = [] } ) =>
+					blocksForSerialization
+						.map( ( b ) => b.attributes.content )
+						.join( '' ),
+			} as unknown as PostChanges;
+
+			applyPostChangesToCRDTDoc( doc, changes, defaultSyncedProperties );
+
+			expect( map.has( 'content' ) ).toBe( false );
+		} );
+
+		it( 'does not call content function when blocks is a function', () => {
+			const changes = {
+				blocks: () => [],
+				content: ( { blocks: blocksForSerialization = [] } ) =>
+					blocksForSerialization
+						.map( ( b ) => b.attributes.content )
+						.join( '' ),
+			} as unknown as PostChanges;
+
+			applyPostChangesToCRDTDoc( doc, changes, defaultSyncedProperties );
+
+			expect( map.has( 'content' ) ).toBe( false );
+		} );
+
 		it( 'syncs taxonomy rest_base values included in syncedProperties', () => {
 			const changes = {
 				categories: [ 1, 2, 3 ],
