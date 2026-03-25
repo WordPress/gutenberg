@@ -27,7 +27,7 @@ const STEP2_CONTENT = readFileSync(
 // Maximum time (ms) the editor should take to become responsive after
 // pasting new content into the code editor. If this threshold is exceeded
 // the test fails, indicating a performance regression.
-const RESPONSE_TIMEOUT_MS = 5_000;
+const RESPONSE_TIMEOUT_MS = 3_000;
 
 type Fixtures = {
 	collaborationEnabled: boolean;
@@ -91,8 +91,14 @@ test.describe( 'Collaboration - Code editor performance', () => {
 		// being fully parsed. This captures any main-thread freeze.
 		const startTime = performance.now();
 
-		await page.keyboard.press( 'Meta+a' );
-		await page.keyboard.press( 'Meta+v' );
+		// Use pressKeys for select-all (maps to correct modifier per
+		// platform). We can't use pressKeys for paste because it emulates
+		// the ClipboardEvent instead of doing a real keyboard paste, so we
+		// use page.keyboard.press directly with the platform modifier.
+		await pageUtils.pressKeys( 'primary+a' );
+		const pasteModifier =
+			process.platform === 'darwin' ? 'Meta' : 'Control';
+		await page.keyboard.press( `${ pasteModifier }+v` );
 
 		// Step 4: Switch to visual mode. The editor must process the
 		// pasted content before it can handle this shortcut.
@@ -112,7 +118,7 @@ test.describe( 'Collaboration - Code editor performance', () => {
 							)
 					);
 				},
-				{ timeout: 60_000 }
+				{ timeout: 20_000 }
 			)
 			.toBe( true );
 
