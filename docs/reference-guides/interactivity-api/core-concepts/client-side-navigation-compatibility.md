@@ -202,11 +202,9 @@ Block hydration and initialization code should not depend on DOM ready events su
 For code that needs to run on every navigation — such as analytics page-view tracking — use `data-wp-watch` with a reactive value that changes on each navigation, like the current URL from the global state:
 
 ```js
-import { store, getConfig } from '@wordpress/interactivity';
+import { store } from '@wordpress/interactivity';
 
-const { namespace } = getConfig();
-
-store( namespace, {
+store( 'myPlugin', {
 	callbacks: {
 		logPageView() {
 			// Re-runs on every navigation because state.url changes.
