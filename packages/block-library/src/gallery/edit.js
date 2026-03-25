@@ -165,6 +165,7 @@ export default function GalleryEdit( props ) {
 		replaceInnerBlocks,
 		updateBlockAttributes,
 		selectBlock,
+		moveBlocksToPosition,
 	} = useDispatch( blockEditorStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
@@ -438,6 +439,36 @@ export default function GalleryEdit( props ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
+	function onBlocksDrop( dropData ) {
+		const { blocks, srcClientIds, srcRootClientId } = dropData;
+		const imageBlocks = blocks.filter(
+			( block ) => block.name === 'core/image'
+		);
+		if ( ! imageBlocks.length ) {
+			return;
+		}
+
+		// If blocks are from the editor canvas (srcClientIds), move them instead of copying
+		if ( srcClientIds?.length && srcRootClientId !== clientId ) {
+			const galleryInnerBlockCount = innerBlockImages?.length ?? 0;
+			moveBlocksToPosition(
+				srcClientIds,
+				srcRootClientId,
+				clientId,
+				galleryInnerBlockCount
+			);
+			return;
+		}
+
+		// Otherwise, create new blocks from attributes (e.g., from media library)
+		updateImages(
+			imageBlocks.map( ( block ) => ( {
+				...block.attributes,
+				type: block.attributes.type || 'image',
+			} ) )
+		);
+	}
+
 	function setLinkTo( value ) {
 		setAttributes( { linkTo: value } );
 		const changedAttributes = {};
@@ -628,6 +659,7 @@ export default function GalleryEdit( props ) {
 			onSelect={ updateImages }
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			multiple
+			onBlocksDrop={ onBlocksDrop }
 			onError={ onUploadError }
 			{ ...mediaPlaceholderProps }
 		/>
