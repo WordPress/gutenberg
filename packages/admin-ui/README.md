@@ -18,7 +18,7 @@ npm install @wordpress/admin-ui --save
 
 Renders a breadcrumb navigation trail.
 
-All items except the last one must provide a `to` prop for navigation. The last item represents the current page and its `to` prop is optional. Only the last item (when it has no `to` prop) is rendered as an `h1`.
+All items except the last one must provide a `to` prop for navigation. In development mode, an error is thrown when a non-last item is missing `to`. The last item represents the current page and its `to` prop is optional. Only the last item (when it has no `to` prop) is rendered as an `h1`.
 
 _Usage_
 
