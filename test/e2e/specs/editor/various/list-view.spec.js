@@ -553,15 +553,17 @@ test.describe( 'List View', () => {
 		// Open List View.
 		const listView = await listViewUtils.openListView();
 
-		// Click the newly inserted Group block List View item to ensure it is focused.
-		await listView
-			.getByRole( 'link', {
-				name: 'Group',
-				expanded: false,
-			} )
-			.click();
+		// Click the Group block to select it in the editor, then refocus the
+		// list view. Clicking transfers focus to the canvas (caret at end),
+		// so we refocus the list view for keyboard navigation.
+		const copyTestGroupLink = listView.getByRole( 'link', {
+			name: 'Group',
+			expanded: false,
+		} );
+		await copyTestGroupLink.click();
+		await copyTestGroupLink.focus();
 
-		// Move down to group block, expand, and then move to the paragraph block.
+		// Expand the group block, and then move to the pullquote block.
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowDown' );
@@ -697,13 +699,15 @@ test.describe( 'List View', () => {
 		// Open List View.
 		const listView = await listViewUtils.openListView();
 
-		// Click the newly inserted Group block List View item to ensure it is focused.
-		await listView
-			.getByRole( 'link', {
-				name: 'Group',
-				expanded: false,
-			} )
-			.click();
+		// Click the Group block to select it in the editor, then refocus the
+		// list view. Clicking transfers focus to the canvas (caret at end),
+		// so we refocus the list view for keyboard operations.
+		const cutTestGroupLink = listView.getByRole( 'link', {
+			name: 'Group',
+			expanded: false,
+		} );
+		await cutTestGroupLink.click();
+		await cutTestGroupLink.focus();
 
 		// Cut the block.
 		await pageUtils.pressKeys( 'primary+x' );
