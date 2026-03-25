@@ -12,7 +12,7 @@ import {
 // TODO: enable in the ESlint rule once we complete
 // https://github.com/WordPress/gutenberg/issues/76135.
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Card, CollapsibleCard } from '@wordpress/ui';
+import { Card, CollapsibleCard, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -106,7 +106,11 @@ function HeaderContent< Item >( {
 	);
 
 	return (
-		<div className="dataforms-layouts-card__field-header-content">
+		<Stack
+			align="center"
+			justify="space-between"
+			className="dataforms-layouts-card__field-header-content"
+		>
 			<Card.Title>{ label }</Card.Title>
 			{ touched && layout.isCollapsible && (
 				<ValidationBadge validity={ validity } />
@@ -122,7 +126,7 @@ function HeaderContent< Item >( {
 					) ) }
 				</div>
 			) }
-		</div>
+		</Stack>
 	);
 }
 
