@@ -235,11 +235,11 @@ function getCssFontFaceRule(
  * via a managed CSSStyleSheet with @font-face rules.
  * It also adds it to the iframe document.
  */
-export async function loadFontFaceInBrowser(
+export function loadFontFaceInBrowser(
 	fontFace: FontFace,
 	source: string | File,
 	addTo: 'all' | 'document' | 'iframe' = 'all'
-): Promise< void > {
+): void {
 	let src: string;
 	if ( typeof source === 'string' ) {
 		src = source;
