@@ -387,7 +387,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	public function test_no_current_menu_item_when_id_is_string_url() {
 		$this->go_to( get_permalink( self::$page->ID ) );
 		// Render with id set to a URL string — the historical bug scenario.
-		// is_numeric() must prevent this from ever matching.
+		// absint() must prevent this from ever matching.
 		$output = $this->render_nav_link(
 			array(
 				'label' => 'Page',
