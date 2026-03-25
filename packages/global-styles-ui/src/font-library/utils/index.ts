@@ -100,7 +100,7 @@ export function mergeFontFamilies(
  * @param value The JavaScript string to serialize as a quoted CSS string.
  * @return A quoted, CSS-safe font-family string.
  */
-export function createCSSString( value: string ): string {
+export function createCssString( value: string ): string {
 	return `"${ value
 		.trim()
 
@@ -196,7 +196,7 @@ function getCssFontFaceRule(
 	];
 
 	if ( src ) {
-		declarations.push( `src: url( ${ createCSSString( src ) } )` );
+		declarations.push( `src: url( ${ createCssString( src ) } )` );
 	}
 	if ( fontFace.fontDisplay ) {
 		declarations.push( `font-display: ${ fontFace.fontDisplay }` );

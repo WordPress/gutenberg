@@ -7,7 +7,7 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { createCSSString } from './index';
+import { createCssString } from './index';
 import type { FontFileMetadata, FontFamilyToUpload } from '../types';
 
 const { kebabCase } = unlock( componentsPrivateApis );
@@ -20,7 +20,7 @@ export default function makeFamiliesFromFaces(
 			acc: Record< string, FontFamilyToUpload >,
 			item: FontFileMetadata
 		) => {
-			const cssFontFamily = createCSSString( item.fontDisplayName );
+			const cssFontFamily = createCssString( item.fontDisplayName );
 			if ( ! acc[ item.fontDisplayName ] ) {
 				acc[ item.fontDisplayName ] = {
 					name: item.fontDisplayName,

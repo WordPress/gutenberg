@@ -21,7 +21,7 @@ import { ALLOWED_FILE_EXTENSIONS } from './utils/constants';
 import { FontLibraryContext } from './context';
 import { Font } from './lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
-import { loadFontFaceInBrowser, createCSSString } from './utils';
+import { loadFontFaceInBrowser, createCssString } from './utils';
 import type { FontFileMetadata } from './types';
 
 function UploadFonts() {
@@ -112,7 +112,7 @@ function UploadFonts() {
 				await loadFontFaceInBrowser(
 					{
 						...metadata,
-						fontFamily: createCSSString( fontDisplayName ),
+						fontFamily: createCssString( fontDisplayName ),
 					},
 					fontFile,
 					'all'
