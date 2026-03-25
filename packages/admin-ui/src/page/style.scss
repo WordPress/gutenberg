@@ -1,7 +1,10 @@
 .admin-ui-page {
 	display: flex;
 	height: 100%;
-	background-color: var(--wpds-color-bg-surface-neutral);
+	// @TODO: Revisit page background color. Consider using
+	// --wpds-color-bg-surface-neutral once existing pages (e.g. Styles)
+	// are updated to handle the contrast change.
+	background-color: var(--wpds-color-bg-surface-neutral-strong);
 	color: var(--wpds-color-fg-content-neutral);
 	position: relative;
 	z-index: 1;
