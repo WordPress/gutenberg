@@ -240,7 +240,7 @@ function getCssFontFaceRule(
 	}
 	// unicodeRange?: string;
 	if ( fontFace.unicodeRange ) {
-		rule.style.setProperty( 'font-unicode-range', fontFace.unicodeRange );
+		rule.style.setProperty( 'unicode-range', fontFace.unicodeRange );
 	}
 
 	return rule;
