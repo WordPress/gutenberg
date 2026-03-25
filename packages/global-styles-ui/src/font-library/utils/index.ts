@@ -153,10 +153,7 @@ function ensureTargetSheets(
 			documentSheet = new CSSStyleSheet();
 		}
 		if ( ! document.adoptedStyleSheets.includes( documentSheet ) ) {
-			document.adoptedStyleSheets = [
-				...document.adoptedStyleSheets,
-				documentSheet,
-			];
+			document.adoptedStyleSheets.push( documentSheet );
 		}
 		sheets.push( documentSheet );
 	}
@@ -179,10 +176,7 @@ function ensureTargetSheets(
 			if (
 				! iframeDoc.adoptedStyleSheets.includes( iframeSheetInstance )
 			) {
-				iframeDoc.adoptedStyleSheets = [
-					...iframeDoc.adoptedStyleSheets,
-					iframeSheetInstance,
-				];
+				iframeDoc.adoptedStyleSheets.push( iframeSheetInstance );
 			}
 			sheets.push( iframeSheetInstance );
 		}
