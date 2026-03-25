@@ -1,5 +1,11 @@
 == Changelog ==
 
+= Unreleased =
+
+### Bug Fixes
+
+- Register vendor React scripts with a version derived from the root `package.json` React pin (via generated `build/constants.php`) so browsers refetch when the bundled React build changes.
+
 = 22.8.0-rc.1 =
 
 ## Changelog

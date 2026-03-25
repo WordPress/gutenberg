@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Include `react_version` in generated `constants.php`, sourced from the root `package.json` `react` entry (dependencies or devDependencies), for consumers that need to align script versions with the bundled React build.
+
 ### Bug Fixes
 
 -   Derive `data-wp-hash` from the transformed CSS instead of the raw source to prevent style mismatches when multiple build pipelines process the same source file ([#76743](https://github.com/WordPress/gutenberg/pull/76743)).

@@ -369,6 +369,9 @@ function gutenberg_enqueue_stored_styles( $options = array() ) {
 function gutenberg_register_vendor_scripts( $scripts ) {
 	$extension = SCRIPT_DEBUG ? '.js' : '.min.js';
 
+	// Bust browser caches when the bundled React version changes (see build/constants.php, generated from package.json).
+	$react_vendor_version = defined( 'GUTENBERG_REACT_VENDOR_VERSION' ) ? GUTENBERG_REACT_VENDOR_VERSION : '18';
+
 	gutenberg_override_script(
 		$scripts,
 		'react',
@@ -376,14 +379,14 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		// WordPress Core in `wp_register_development_scripts` sets `wp-react-refresh-entry` as a dependency to `react` when `SCRIPT_DEBUG` is true.
 		// We need to preserve that here.
 		SCRIPT_DEBUG ? array( 'wp-react-refresh-entry', 'wp-polyfill' ) : array( 'wp-polyfill' ),
-		'18'
+		$react_vendor_version
 	);
 	gutenberg_override_script(
 		$scripts,
 		'react-dom',
 		gutenberg_url( 'build/scripts/vendors/react-dom' . $extension ),
 		array( 'react' ),
-		'18'
+		$react_vendor_version
 	);
 
 	gutenberg_override_script(
@@ -391,7 +394,7 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		'react-jsx-runtime',
 		gutenberg_url( 'build/scripts/vendors/react-jsx-runtime' . $extension ),
 		array( 'react' ),
-		'18'
+		$react_vendor_version
 	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );

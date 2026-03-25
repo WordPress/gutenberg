@@ -17,7 +17,7 @@ const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
  *
  * @param {string} rootDir           Root directory path.
  * @param {string} baseUrlExpression PHP expression for base URL (e.g. "includes_url( 'build' )").
- * @return {Promise<Record<string, string>>} Replacements object with {{PREFIX}}, {{VERSION}}, {{BASE_URL}}.
+ * @return {Promise<Record<string, string>>} Replacements object with {{PREFIX}}, {{VERSION}}, {{BASE_URL}}, {{REACT_VERSION}}.
  */
 export async function getPhpReplacements( rootDir, baseUrlExpression ) {
 	const rootPackageJson = getPackageInfoFromFile(
@@ -31,10 +31,17 @@ export async function getPhpReplacements( rootDir, baseUrlExpression ) {
 	const name = rootPackageJson.wpPlugin?.name || 'gutenberg';
 	const version = rootPackageJson.version;
 
+	// Used to cache-bust vendor React bundles when the React pin changes independently of WordPress.
+	const reactVersion =
+		rootPackageJson.devDependencies?.react ??
+		rootPackageJson.dependencies?.react ??
+		'';
+
 	return {
 		'{{PREFIX}}': name,
 		'{{VERSION}}': version,
 		'{{BASE_URL}}': baseUrlExpression,
+		'{{REACT_VERSION}}': reactVersion,
 	};
 }
 

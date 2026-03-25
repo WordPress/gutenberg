@@ -26,6 +26,10 @@ $constants_file = plugin_dir_path( __DIR__ ) . 'build/constants.php';
 if ( file_exists( $constants_file ) && ! defined( 'GUTENBERG_VERSION' ) ) {
 	$build_constants = require_once $constants_file;
 	define( 'GUTENBERG_VERSION', $build_constants['version'] );
+	$react_vendor_version = $build_constants['react_version'] ?? '';
+	if ( $react_vendor_version && ! defined( 'GUTENBERG_REACT_VENDOR_VERSION' ) ) {
+		define( 'GUTENBERG_REACT_VENDOR_VERSION', $react_vendor_version );
+	}
 }
 
 /**

@@ -11,4 +11,5 @@
 return array(
 	'version' => '{{VERSION}}',
 	'build_url' => {{BASE_URL}},
+	'react_version' => '{{REACT_VERSION}}',
 );
