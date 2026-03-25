@@ -62,7 +62,7 @@ import {
 	type PostChanges,
 	type YPostRecord,
 } from '../crdt';
-import type { YBlock, YBlockRecord, YBlocks } from '../crdt-blocks';
+import type { Block, YBlock, YBlockRecord, YBlocks } from '../crdt-blocks';
 import { updateSelectionHistory } from '../crdt-selection';
 import { createYMap, getRootMap, type YMapWrap } from '../crdt-utils';
 import type { Post } from '../../entity-types';
@@ -410,7 +410,11 @@ describe( 'crdt', () => {
 						innerBlocks: [],
 					},
 				],
-				content: ( { blocks: blocksForSerialization = [] } ) =>
+				content: ( {
+					blocks: blocksForSerialization = [],
+				}: {
+					blocks: Block[];
+				} ) =>
 					blocksForSerialization
 						.map( ( b ) => b.attributes.content )
 						.join( '' ),
@@ -436,7 +440,11 @@ describe( 'crdt', () => {
 						innerBlocks: [],
 					},
 				],
-				content: ( { blocks: blocksForSerialization = [] } ) =>
+				content: ( {
+					blocks: blocksForSerialization = [],
+				}: {
+					blocks: Block[];
+				} ) =>
 					blocksForSerialization
 						.map( ( b ) => b.attributes.content )
 						.join( '' ),
@@ -471,7 +479,11 @@ describe( 'crdt', () => {
 
 		it( 'does not call content function when blocks are not provided', () => {
 			const changes = {
-				content: ( { blocks: blocksForSerialization = [] } ) =>
+				content: ( {
+					blocks: blocksForSerialization = [],
+				}: {
+					blocks: Block[];
+				} ) =>
 					blocksForSerialization
 						.map( ( b ) => b.attributes.content )
 						.join( '' ),
@@ -485,7 +497,11 @@ describe( 'crdt', () => {
 		it( 'does not call content function when blocks is a function', () => {
 			const changes = {
 				blocks: () => [],
-				content: ( { blocks: blocksForSerialization = [] } ) =>
+				content: ( {
+					blocks: blocksForSerialization = [],
+				}: {
+					blocks: Block[];
+				} ) =>
 					blocksForSerialization
 						.map( ( b ) => b.attributes.content )
 						.join( '' ),
