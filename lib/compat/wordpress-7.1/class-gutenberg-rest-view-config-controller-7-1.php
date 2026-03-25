@@ -715,20 +715,26 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 
 		// Fetch all templates via the REST API to get computed author_text values.
 		$request = new WP_REST_Request( 'GET', '/wp/v2/templates' );
-		$request->set_param( '_fields', 'author_text' );
+		$request->set_param( '_fields', 'author_text,original_source' );
 		$response = rest_do_request( $request );
 
 		if ( $response->is_error() ) {
 			return $view_list;
 		}
 
-		$templates    = $response->get_data();
-		$seen_authors = array();
+		$templates = $response->get_data();
+
+		// Collect unique authors, tracking whether they come from a registered
+		// source (theme, plugin, site) so we can sort those before user ones.
+		$seen_authors       = array();
+		$registered_authors = array();
+		$user_authors       = array();
 		foreach ( $templates as $template ) {
-			$author_text = $template['author_text'] ?? '';
+			$author_text     = $template['author_text'] ?? '';
+			$original_source = $template['original_source'] ?? 'user';
 			if ( ! empty( $author_text ) && ! isset( $seen_authors[ $author_text ] ) ) {
 				$seen_authors[ $author_text ] = true;
-				$view_list[]                  = array(
+				$entry                        = array(
 					'title' => $author_text,
 					'slug'  => $author_text,
 					'view'  => array(
@@ -742,8 +748,16 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 						),
 					),
 				);
+				if ( 'user' === $original_source ) {
+					$user_authors[] = $entry;
+				} else {
+					$registered_authors[] = $entry;
+				}
 			}
 		}
+
+		// Registered sources (theme, plugin, site) first, then user-created.
+		$view_list = array_merge( $view_list, $registered_authors, $user_authors );
 
 		return $view_list;
 	}
