@@ -188,7 +188,7 @@ function ensureTargetSheets(
 function getCssFontFaceRule(
 	fontFace: FontFace,
 	src?: string
-): CSSFontFaceRule {
+): CSSFontFaceRule | null {
 	const declarations = [
 		`font-family: ${ fontFace.fontFamily }`,
 		`font-style: ${ fontFace.fontStyle || 'normal' }`,
@@ -222,12 +222,16 @@ function getCssFontFaceRule(
 	}
 
 	const cssText = `@font-face { ${ declarations.join( '; ' ) } }`;
-	const ss = new CSSStyleSheet();
-	const rule = ss.cssRules[ ss.insertRule( cssText ) ];
-	if ( ! ( rule instanceof CSSFontFaceRule ) ) {
-		throw new Error( 'Failed to create CSSFontFaceRule' );
+	try {
+		const ss = new CSSStyleSheet();
+		const rule = ss.cssRules[ ss.insertRule( cssText ) ];
+		if ( rule instanceof CSSFontFaceRule ) {
+			return rule;
+		}
+	} catch {
+		// Invalid CSS syntax — caller treats as no-op.
 	}
-	return rule;
+	return null;
 }
 
 /*
@@ -250,6 +254,9 @@ export function loadFontFaceInBrowser(
 	}
 
 	const rule = getCssFontFaceRule( fontFace, src );
+	if ( ! rule ) {
+		return;
+	}
 
 	for ( const sheet of ensureTargetSheets( addTo ) ) {
 		sheet.insertRule( rule.cssText, sheet.cssRules.length );
@@ -265,6 +272,9 @@ export function unloadFontFaceInBrowser(
 	removeFrom: 'all' | 'document' | 'iframe' = 'all'
 ): void {
 	const fontFaceRule = getCssFontFaceRule( fontFace );
+	if ( ! fontFaceRule ) {
+		return;
+	}
 
 	for ( const sheet of ensureTargetSheets( removeFrom ) ) {
 		// Walk rules in reverse to safely delete by index.
