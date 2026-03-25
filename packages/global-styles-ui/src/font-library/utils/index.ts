@@ -113,12 +113,15 @@ export function createCssString( value: string ): string {
 		 * - Normalize and replace newlines. https://www.w3.org/TR/css-syntax-3/#input-preprocessing
 		 * - "<", ">", and "&" are replaced to prevent issues with KSES and other sanitization that
 		 *   is confused by HTML-like text.
-		 * - `,`, `"` and `'` are replaced to prevent issues where font families may be processed later.
+		 * - CSS syntax characters are replaced to prevent issues where CSS may be processed by simple
+		 *   string splits or search and replaces: "',;{}
 		 *
 		 * Note that the Unicode escape sequences are used rather than backslash-escaping so the
-		 * problematic characters are removed completely.
+		 * problematic characters are removed completely. CSS Unicode escapes are formed by a
+		 * "\" followed by the the character code in hexadecimal. The escape may be terminated by
+		 * whitespace which is ignored.
 		 */
-		// Escape existing backslashes before any other processing
+		// Escape existing backslashes before any other processing.
 		.replaceAll( '\\', '\\5C ' )
 
 		// Pre-processing replaces NULLs and some newlines. Replace and escape as necessary.
@@ -129,14 +132,21 @@ export function createCssString( value: string ): string {
 		.replaceAll( '\r', '\\A ' )
 		.replaceAll( '\f', '\\A ' )
 
-		// General character escaping.
+		// Newlines must be escaped.
 		.replaceAll( '\n', '\\A ' )
-		.replaceAll( ',', '\\2C ' )
-		.replaceAll( '"', '\\22 ' )
-		.replaceAll( "'", '\\27 ' )
+
+		// HTML syntax may be problematic.
 		.replaceAll( '<', '\\3C ' )
 		.replaceAll( '>', '\\3E ' )
-		.replaceAll( '&', '\\26 ' ) }"`;
+		.replaceAll( '&', '\\26 ' )
+
+		// CSS syntax may be problematic.
+		.replaceAll( ',', '\\2C ' )
+		.replaceAll( ';', '\\3B ' )
+		.replaceAll( '{', '\\7B ' )
+		.replaceAll( '}', '\\7D ' )
+		.replaceAll( '"', '\\22 ' )
+		.replaceAll( "'", '\\27 ' ) }"`;
 }
 
 let documentSheet: CSSStyleSheet | undefined;
