@@ -370,7 +370,7 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 	$extension = SCRIPT_DEBUG ? '.js' : '.min.js';
 
 	// Bust browser caches when the bundled React version changes (see build/constants.php, generated from package.json).
-	$react_vendor_version = defined( 'GUTENBERG_REACT_VENDOR_VERSION' ) ? GUTENBERG_REACT_VENDOR_VERSION : '18';
+	$react_vendor_version = defined( 'GUTENBERG_REACT_VENDOR_VERSION' ) ? GUTENBERG_REACT_VENDOR_VERSION : '18.3.1';
 
 	gutenberg_override_script(
 		$scripts,
