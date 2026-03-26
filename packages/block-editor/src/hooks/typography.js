@@ -116,8 +116,15 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
+export function TypographyPanel( {
+	clientId,
+	name,
+	setAttributes,
+	settings,
+	selectedState = 'default',
+} ) {
 	const isEnabled = useHasTypographyPanel( settings );
+	const isStateMode = !! ( selectedState && selectedState !== 'default' );
 
 	const { style, fontFamily, fontSize, fitText } = useSelect(
 		( select ) => {
@@ -140,23 +147,34 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 		},
 		[ clientId, isEnabled ]
 	);
-	const value = useMemo(
-		() => attributesToStyle( { style, fontFamily, fontSize } ),
-		[ style, fontSize, fontFamily ]
-	);
-
-	const onChange = ( newStyle ) => {
-		const newAttributes = styleToAttributes( newStyle );
-
-		// If setting a font size and fitText is currently enabled, disable it
-		const hasFontSize =
-			newAttributes.fontSize || newAttributes.style?.typography?.fontSize;
-		if ( hasFontSize && fitText ) {
-			newAttributes.fitText = undefined;
+	const value = useMemo( () => {
+		if ( isStateMode ) {
+			return style?.[ selectedState ];
 		}
+		return attributesToStyle( { style, fontFamily, fontSize } );
+	}, [ isStateMode, selectedState, style, fontSize, fontFamily ] );
 
-		setAttributes( newAttributes );
-	};
+	const onChange = isStateMode
+		? ( newStateStyle ) =>
+				setAttributes( {
+					style: cleanEmptyObject( {
+						...style,
+						[ selectedState ]: newStateStyle,
+					} ),
+				} )
+		: ( newStyle ) => {
+				const newAttributes = styleToAttributes( newStyle );
+
+				// If setting a font size and fitText is currently enabled, disable it
+				const hasFontSize =
+					newAttributes.fontSize ||
+					newAttributes.style?.typography?.fontSize;
+				if ( hasFontSize && fitText ) {
+					newAttributes.fitText = undefined;
+				}
+
+				setAttributes( newAttributes );
+		  };
 
 	if ( ! isEnabled ) {
 		return null;

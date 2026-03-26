@@ -68,9 +68,16 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
+export function DimensionsPanel( {
+	clientId,
+	name,
+	setAttributes,
+	settings,
+	selectedState = 'default',
+} ) {
 	const isEnabled = useHasDimensionsPanel( settings );
-	const value = useSelect(
+	const isStateMode = !! ( selectedState && selectedState !== 'default' );
+	const style = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
@@ -83,11 +90,20 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	);
 
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
-	const onChange = ( newStyle ) => {
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
+
+	const value = isStateMode ? style?.[ selectedState ] : style;
+	const onChange = isStateMode
+		? ( newStateStyle ) =>
+				setAttributes( {
+					style: cleanEmptyObject( {
+						...style,
+						[ selectedState ]: newStateStyle,
+					} ),
+				} )
+		: ( newStyle ) =>
+				setAttributes( {
+					style: cleanEmptyObject( newStyle ),
+				} );
 
 	if ( ! isEnabled ) {
 		return null;
@@ -119,9 +135,10 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				value={ value }
 				onChange={ onChange }
 				defaultControls={ defaultControls }
-				onVisualize={ setVisualizedProperty }
+				onVisualize={ isStateMode ? undefined : setVisualizedProperty }
 			/>
-			{ !! settings?.spacing?.padding &&
+			{ ! isStateMode &&
+				!! settings?.spacing?.padding &&
 				visualizedProperty === 'padding' && (
 					<PaddingVisualizer
 						forceShow={ visualizedProperty === 'padding' }
@@ -129,7 +146,8 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 						value={ value }
 					/>
 				) }
-			{ !! settings?.spacing?.margin &&
+			{ ! isStateMode &&
+				!! settings?.spacing?.margin &&
 				visualizedProperty === 'margin' && (
 					<MarginVisualizer
 						forceShow={ visualizedProperty === 'margin' }
