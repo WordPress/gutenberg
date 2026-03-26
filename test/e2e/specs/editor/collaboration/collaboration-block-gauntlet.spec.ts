@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import path from 'path';
+
+/**
  * Internal dependencies
  */
 import { test, expect } from './fixtures';
@@ -27,7 +32,7 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 		editor,
 		page,
 	} ) => {
-		test.setTimeout( 60_000 );
+		test.setTimeout( 30_000 );
 
 		const post = await requestUtils.createPost( {
 			title: 'Gauntlet - Text Blocks',
@@ -226,7 +231,14 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 		requestUtils,
 		editor,
 	} ) => {
-		test.setTimeout( 60_000 );
+		test.setTimeout( 30_000 );
+
+		const uploadedMedia = await requestUtils.uploadMedia(
+			path.resolve(
+				process.cwd(),
+				'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
+			)
+		);
 
 		const post = await requestUtils.createPost( {
 			title: 'Gauntlet - Container Blocks',
@@ -328,7 +340,7 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			attributes: {
 				mediaPosition: 'left',
 				mediaType: 'image',
-				mediaUrl: 'https://example.com/img.jpg',
+				mediaUrl: uploadedMedia.source_url,
 			},
 			innerBlocks: [
 				{
@@ -574,7 +586,14 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 		requestUtils,
 		editor,
 	} ) => {
-		test.setTimeout( 60_000 );
+		test.setTimeout( 30_000 );
+
+		const uploadedMedia = await requestUtils.uploadMedia(
+			path.resolve(
+				process.cwd(),
+				'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
+			)
+		);
 
 		const post = await requestUtils.createPost( {
 			title: 'Gauntlet - Media & Utility Blocks',
@@ -587,7 +606,8 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 		await editor.insertBlock( {
 			name: 'core/image',
 			attributes: {
-				url: 'https://example.com/img.jpg',
+				id: uploadedMedia.id,
+				url: uploadedMedia.source_url,
 				alt: 'Test image',
 				caption: 'Caption A',
 			},
@@ -598,31 +618,22 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 		} );
 		await editor.insertBlock( {
 			name: 'core/audio',
-			attributes: {
-				src: 'https://example.com/audio.mp3',
-				caption: 'Audio A',
-			},
+			attributes: { caption: 'Audio A' },
 		} );
 		await editor.insertBlock( {
 			name: 'core/video',
-			attributes: {
-				src: 'https://example.com/video.mp4',
-				caption: 'Video A',
-			},
+			attributes: { caption: 'Video A' },
 		} );
 		await editor.insertBlock( {
 			name: 'core/file',
 			attributes: {
-				href: 'https://example.com/file.pdf',
+				href: uploadedMedia.source_url,
 				fileName: 'File A',
 			},
 		} );
 		await editor.insertBlock( {
 			name: 'core/embed',
-			attributes: {
-				url: 'https://example.com/embed',
-				caption: 'Embed A',
-			},
+			attributes: { caption: 'Embed A' },
 		} );
 		await editor.insertBlock( {
 			name: 'core/html',
@@ -694,19 +705,41 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 				} );
 		} );
 
-		// Audio: edit caption.
-		await clearAndType(
-			page2,
-			editor2.canvas.locator( '[data-type="core/audio"] figcaption' ),
-			'Audio edited by B'
-		);
+		// Audio: edit caption via data API (no src means no figcaption in the DOM).
+		await page2.evaluate( () => {
+			const blocks = window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks();
+			const audio = blocks.find(
+				( b: { name: string } ) => b.name === 'core/audio'
+			);
+			if ( ! audio ) {
+				throw new Error( 'Audio block not found on User B' );
+			}
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( audio.clientId, {
+					caption: 'Audio edited by B',
+				} );
+		} );
 
-		// Video: edit caption.
-		await clearAndType(
-			page2,
-			editor2.canvas.locator( '[data-type="core/video"] figcaption' ),
-			'Video edited by B'
-		);
+		// Video: edit caption via data API (no src means no figcaption in the DOM).
+		await page2.evaluate( () => {
+			const blocks = window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks();
+			const video = blocks.find(
+				( b: { name: string } ) => b.name === 'core/video'
+			);
+			if ( ! video ) {
+				throw new Error( 'Video block not found on User B' );
+			}
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( video.clientId, {
+					caption: 'Video edited by B',
+				} );
+		} );
 
 		// File: edit file name (first contenteditable is the file name link).
 		await clearAndType(
@@ -839,8 +872,9 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 		collaborationUtils,
 		requestUtils,
 		editor,
+		page,
 	} ) => {
-		test.setTimeout( 60_000 );
+		test.setTimeout( 30_000 );
 
 		const post = await requestUtils.createPost( {
 			title: 'Gauntlet - Widget Blocks',
@@ -875,10 +909,11 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			name: 'core/latest-comments',
 			attributes: { commentsToShow: 5, displayAvatar: true },
 		} );
+		const siteUrl = new URL( page.url() ).origin;
 		await editor.insertBlock( {
 			name: 'core/rss',
 			attributes: {
-				feedURL: 'https://example.com/feed',
+				feedURL: `${ siteUrl }/?feed=rss2`,
 				itemsToShow: 5,
 			},
 		} );
