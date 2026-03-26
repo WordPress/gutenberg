@@ -6,15 +6,16 @@ import deepMerge from 'deepmerge';
 /**
  * WordPress dependencies
  */
+import { Button } from '@wordpress/components';
 import {
-	__experimentalSpacer as Spacer,
-	Button,
-	Modal,
-} from '@wordpress/components';
-
-import { useContext, useMemo, useRef, useState } from '@wordpress/element';
-import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
-import { Stack } from '@wordpress/ui';
+	useCallback,
+	useContext,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -99,69 +100,85 @@ function ModalContent< Item >( {
 		);
 	};
 
-	const focusOnMountRef = useFocusOnMount( 'firstInputElement' );
 	const contentRef = useRef< HTMLDivElement >( null );
-	const mergedRef = useMergeRefs( [ focusOnMountRef, contentRef ] );
+
+	const initialFocus = useCallback( () => {
+		if ( contentRef.current ) {
+			const input = contentRef.current.querySelector< HTMLElement >(
+				'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
+			);
+			if ( input ) {
+				return input;
+			}
+		}
+		return true as const;
+	}, [] );
 
 	// When the modal is opened after being previously closed (touched),
 	// trigger reportValidity to show field-level errors.
 	useReportValidity( contentRef, touched );
 
 	return (
-		<Modal
-			className="dataforms-layouts-panel__modal"
-			onRequestClose={ onClose }
-			isFullScreen={ false }
-			title={ fieldLabel }
-			size="medium"
+		<Dialog.Root
+			open
+			onOpenChange={ ( open ) => {
+				if ( ! open ) {
+					onClose();
+				}
+			} }
 		>
-			<div ref={ mergedRef }>
-				<DataFormLayout
-					data={ modalData }
-					form={ form }
-					onChange={ handleOnChange }
-					validity={ validity }
-				>
-					{ (
-						FieldLayout,
-						childField,
-						childFieldValidity,
-						markWhenOptional
-					) => (
-						<FieldLayout
-							key={ childField.id }
-							data={ modalData }
-							field={ childField }
-							onChange={ handleOnChange }
-							hideLabelFromVision={ form.fields.length < 2 }
-							markWhenOptional={ markWhenOptional }
-							validity={ childFieldValidity }
-						/>
-					) }
-				</DataFormLayout>
-			</div>
-			<Stack
-				direction="row"
-				className="dataforms-layouts-panel__modal-footer"
-				gap="md"
+			<Dialog.Popup
+				size="medium"
+				className="dataforms-layouts-panel__modal"
+				initialFocus={ initialFocus }
 			>
-				<Spacer style={ { flex: 1 } } />
-				<Button
-					variant="tertiary"
-					onClick={ onClose }
-					__next40pxDefaultSize
-				>
-					{ cancelLabel }
-				</Button>
-				<Button
-					variant="primary"
-					onClick={ onApply }
-					__next40pxDefaultSize
-				>
-					{ applyLabel }
-				</Button>
-			</Stack>
-		</Modal>
+				<Dialog.Header>
+					<Dialog.Title>{ fieldLabel }</Dialog.Title>
+					<Dialog.CloseIcon />
+				</Dialog.Header>
+				<div ref={ contentRef }>
+					<DataFormLayout
+						data={ modalData }
+						form={ form }
+						onChange={ handleOnChange }
+						validity={ validity }
+					>
+						{ (
+							FieldLayout,
+							childField,
+							childFieldValidity,
+							markWhenOptional
+						) => (
+							<FieldLayout
+								key={ childField.id }
+								data={ modalData }
+								field={ childField }
+								onChange={ handleOnChange }
+								hideLabelFromVision={ form.fields.length < 2 }
+								markWhenOptional={ markWhenOptional }
+								validity={ childFieldValidity }
+							/>
+						) }
+					</DataFormLayout>
+				</div>
+				<Dialog.Footer>
+					<Button
+						variant="tertiary"
+						onClick={ onClose }
+						__next40pxDefaultSize
+					>
+						{ cancelLabel }
+					</Button>
+					<Button
+						variant="primary"
+						onClick={ onApply }
+						__next40pxDefaultSize
+					>
+						{ applyLabel }
+					</Button>
+				</Dialog.Footer>
+			</Dialog.Popup>
+		</Dialog.Root>
 	);
 }
 

@@ -8,15 +8,16 @@ import type { MouseEventHandler } from 'react';
  */
 import {
 	Button,
-	Modal,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
-import { Stack } from '@wordpress/ui';
+import deprecated from '@wordpress/deprecated';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { AlertDialog, Dialog, Stack, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -102,6 +103,59 @@ function MenuItemTrigger< Item >( {
 	);
 }
 
+function mapModalSize(
+	size: ActionModalType< unknown >[ 'modalSize' ]
+): 'small' | 'medium' | 'large' | 'stretch' | 'full' {
+	if ( size === 'fill' ) {
+		deprecated( "modalSize: 'fill'", {
+			since: '7.8',
+			alternative: "'stretch'",
+		} );
+		return 'stretch';
+	}
+	return (
+		( size as 'small' | 'medium' | 'large' | 'stretch' | 'full' ) ??
+		'medium'
+	);
+}
+
+const FIRST_TABBABLE_SELECTOR =
+	'a[href], button:not([disabled]), input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+const FIRST_INPUT_SELECTOR =
+	'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])';
+
+function useInitialFocus(
+	focusOnMount: ActionModalType< unknown >[ 'modalFocusOnMount' ],
+	contentRef: React.RefObject< HTMLElement | null >
+) {
+	const callback = useCallback( () => {
+		if ( contentRef.current ) {
+			const selector =
+				focusOnMount === 'firstInputElement'
+					? FIRST_INPUT_SELECTOR
+					: FIRST_TABBABLE_SELECTOR;
+			const target =
+				contentRef.current.querySelector< HTMLElement >( selector );
+			if ( target ) {
+				return target;
+			}
+		}
+		return true as const;
+	}, [ focusOnMount, contentRef ] );
+
+	if ( focusOnMount === false ) {
+		return false;
+	}
+	if (
+		focusOnMount === 'firstContentElement' ||
+		focusOnMount === 'firstInputElement'
+	) {
+		return callback;
+	}
+	return true;
+}
+
 export function ActionModal< Item >( {
 	action,
 	items,
@@ -114,19 +168,50 @@ export function ActionModal< Item >( {
 		typeof action.modalHeader === 'function'
 			? action.modalHeader( items )
 			: action.modalHeader;
+
+	const title = modalHeader || label;
+	const contentRef = useRef< HTMLDivElement >( null );
+	const initialFocus = useInitialFocus(
+		action.modalFocusOnMount ?? true,
+		contentRef
+	);
+
+	const DialogRoot = action.hideModalHeader ? AlertDialog.Root : Dialog.Root;
+
 	return (
-		<Modal
-			title={ modalHeader || label }
-			__experimentalHideHeader={ !! action.hideModalHeader }
-			onRequestClose={ closeModal }
-			focusOnMount={ action.modalFocusOnMount ?? true }
-			size={ action.modalSize || 'medium' }
-			overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
-				action.id
-			) }` }
+		<DialogRoot
+			open
+			onOpenChange={ ( open ) => {
+				if ( ! open ) {
+					closeModal();
+				}
+			} }
 		>
-			<action.RenderModal items={ items } closeModal={ closeModal } />
-		</Modal>
+			<Dialog.Popup
+				size={ mapModalSize( action.modalSize ) }
+				className={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
+					action.id
+				) }` }
+				initialFocus={ initialFocus }
+			>
+				{ action.hideModalHeader ? (
+					<VisuallyHidden>
+						<Dialog.Title>{ title }</Dialog.Title>
+					</VisuallyHidden>
+				) : (
+					<Dialog.Header>
+						<Dialog.Title>{ title }</Dialog.Title>
+						<Dialog.CloseIcon />
+					</Dialog.Header>
+				) }
+				<div ref={ contentRef }>
+					<action.RenderModal
+						items={ items }
+						closeModal={ closeModal }
+					/>
+				</div>
+			</Dialog.Popup>
+		</DialogRoot>
 	);
 }
 
