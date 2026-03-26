@@ -1,10 +1,15 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, test } from '@jest/globals';
+
+/**
  * Internal dependencies
  */
 import { createCssString } from '../create-css-string';
 
 describe( 'createCssString', () => {
-	it.each`
+	test.each`
 		description                    | input              | expected
 		${ 'simple name' }             | ${ 'Arial' }       | ${ '"Arial"' }
 		${ 'leading/trailing spaces' } | ${ '  Arial  ' }   | ${ '"  Arial  "' }
@@ -22,10 +27,7 @@ describe( 'createCssString', () => {
 		${ 'empty string' }            | ${ '' }            | ${ '""' }
 		${ 'whitespace-only' }         | ${ '   ' }         | ${ '"   "' }
 		${ 'spaces are not escaped' }  | ${ 'Exo 2' }       | ${ '"Exo 2"' }
-	`(
-		'$description',
-		( { input, expected }: { input: string; expected: string } ) => {
-			expect( createCssString( input ) ).toBe( expected );
-		}
-	);
+	`( '$description', ( { input, expected } ) => {
+		expect( createCssString( input ) ).toBe( expected );
+	} );
 } );
