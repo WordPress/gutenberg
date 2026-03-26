@@ -131,10 +131,16 @@ function UnforwardedLinkUI( props, ref ) {
 	const { insertBlock } = useDispatch( blockEditorStore );
 
 	// Build block suggestions from inserter items for the parent navigation block.
+	// Filter out navigation-link and navigation-submenu (and their variations) since
+	// those are content links already covered by the API search results.
 	const blockSuggestions = useMemo(
 		() =>
 			inserterItems
-				.filter( ( item ) => ! item.isDisabled )
+				.filter(
+					( item ) =>
+						! item.isDisabled &&
+						! item.id.startsWith( 'core/navigation-link' )
+				)
 				.map( ( item ) => ( {
 					id: `block-${ item.name }`,
 					title: item.title,
