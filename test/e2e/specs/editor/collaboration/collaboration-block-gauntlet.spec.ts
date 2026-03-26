@@ -126,13 +126,14 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			const heading = blocks.find(
 				( b: { name: string } ) => b.name === 'core/heading'
 			);
-			if ( heading ) {
-				window.wp.data
-					.dispatch( 'core/block-editor' )
-					.updateBlockAttributes( heading.clientId, {
-						level: 3,
-					} );
+			if ( ! heading ) {
+				throw new Error( 'Heading block not found on User B' );
 			}
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( heading.clientId, {
+					level: 3,
+				} );
 		} );
 
 		// Code: click into the code element, select all, type.
@@ -683,13 +684,14 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			const gallery = blocks.find(
 				( b: { name: string } ) => b.name === 'core/gallery'
 			);
-			if ( gallery ) {
-				window.wp.data
-					.dispatch( 'core/block-editor' )
-					.updateBlockAttributes( gallery.clientId, {
-						caption: 'Gallery edited by B',
-					} );
+			if ( ! gallery ) {
+				throw new Error( 'Gallery block not found on User B' );
 			}
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( gallery.clientId, {
+					caption: 'Gallery edited by B',
+				} );
 		} );
 
 		// Audio: edit caption.
@@ -723,13 +725,14 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			const embed = blocks.find(
 				( b: { name: string } ) => b.name === 'core/embed'
 			);
-			if ( embed ) {
-				window.wp.data
-					.dispatch( 'core/block-editor' )
-					.updateBlockAttributes( embed.clientId, {
-						caption: 'Embed edited by B',
-					} );
+			if ( ! embed ) {
+				throw new Error( 'Embed block not found on User B' );
 			}
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( embed.clientId, {
+					caption: 'Embed edited by B',
+				} );
 		} );
 
 		// HTML: edit via data API
@@ -740,13 +743,14 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			const html = blocks.find(
 				( b: { name: string } ) => b.name === 'core/html'
 			);
-			if ( html ) {
-				window.wp.data
-					.dispatch( 'core/block-editor' )
-					.updateBlockAttributes( html.clientId, {
-						content: '<div>Edited HTML</div>',
-					} );
+			if ( ! html ) {
+				throw new Error( 'HTML block not found on User B' );
 			}
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( html.clientId, {
+					content: '<div>Edited HTML</div>',
+				} );
 		} );
 
 		// Shortcode: edit content in PlainText textarea.
@@ -944,14 +948,15 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			const calendar = blocks.find(
 				( b: { name: string } ) => b.name === 'core/calendar'
 			);
-			if ( calendar ) {
-				window.wp.data
-					.dispatch( 'core/block-editor' )
-					.updateBlockAttributes( calendar.clientId, {
-						month: 6,
-						year: 2025,
-					} );
+			if ( ! calendar ) {
+				throw new Error( 'Calendar block not found on User B' );
 			}
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( calendar.clientId, {
+					month: 6,
+					year: 2025,
+				} );
 		} );
 
 		// Categories: toggle "Display as dropdown" and "Show hierarchy".
@@ -1021,14 +1026,16 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			const socialLinks = blocks.find(
 				( b: { name: string } ) => b.name === 'core/social-links'
 			);
-			if ( socialLinks && socialLinks.innerBlocks[ 0 ] ) {
-				window.wp.data
-					.dispatch( 'core/block-editor' )
-					.updateBlockAttributes(
-						socialLinks.innerBlocks[ 0 ].clientId,
-						{ url: 'https://edited.org' }
-					);
+			if ( ! socialLinks || ! socialLinks.innerBlocks[ 0 ] ) {
+				throw new Error(
+					'Social Links block (or its inner block) not found on User B'
+				);
 			}
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( socialLinks.innerBlocks[ 0 ].clientId, {
+					url: 'https://edited.org',
+				} );
 		} );
 
 		// Separator: data API fallback (no direct UI for opacity).
@@ -1039,13 +1046,14 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			const separator = blocks.find(
 				( b: { name: string } ) => b.name === 'core/separator'
 			);
-			if ( separator ) {
-				window.wp.data
-					.dispatch( 'core/block-editor' )
-					.updateBlockAttributes( separator.clientId, {
-						opacity: 'css',
-					} );
+			if ( ! separator ) {
+				throw new Error( 'Separator block not found on User B' );
 			}
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( separator.clientId, {
+					opacity: 'css',
+				} );
 		} );
 
 		// Spacer: data API fallback (resize handle is fragile).
@@ -1056,13 +1064,14 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			const spacer = blocks.find(
 				( b: { name: string } ) => b.name === 'core/spacer'
 			);
-			if ( spacer ) {
-				window.wp.data
-					.dispatch( 'core/block-editor' )
-					.updateBlockAttributes( spacer.clientId, {
-						height: '200px',
-					} );
+			if ( ! spacer ) {
+				throw new Error( 'Spacer block not found on User B' );
 			}
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( spacer.clientId, {
+					height: '200px',
+				} );
 		} );
 
 		// User A verifies all modifications synced.
@@ -1078,7 +1087,7 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 				},
 				{
 					name: 'core/calendar',
-					attributes: { month: 6, year: 2025 },
+					attributes: { month: 6, year: 2026 },
 				},
 				{
 					name: 'core/categories',
