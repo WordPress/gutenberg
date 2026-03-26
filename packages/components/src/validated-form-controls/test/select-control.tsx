@@ -13,7 +13,7 @@ describe( 'ValidatedSelectControl', () => {
 		render(
 			<ValidatedSelectControl
 				label="Color"
-				help="Pick a color"
+				help="Pick a color."
 				options={ options }
 				onChange={ () => {} }
 			/>
@@ -21,7 +21,7 @@ describe( 'ValidatedSelectControl', () => {
 
 		expect(
 			screen.getByRole( 'combobox', { name: 'Color' } )
-		).toHaveAccessibleDescription( 'Pick a color' );
+		).toHaveAccessibleDescription( 'Pick a color.' );
 	} );
 
 	it( 'should append the validation error alongside the help description', async () => {
@@ -30,7 +30,7 @@ describe( 'ValidatedSelectControl', () => {
 			<form>
 				<ValidatedSelectControl
 					label="Color"
-					help="Pick a color"
+					help="Pick a color."
 					options={ options }
 					onChange={ () => {} }
 					required
@@ -51,7 +51,7 @@ describe( 'ValidatedSelectControl', () => {
 			);
 		} );
 		expect( select ).toHaveAccessibleDescription(
-			expect.stringContaining( 'Pick a color' )
+			expect.stringContaining( 'Pick a color.' )
 		);
 	} );
 } );

@@ -15,7 +15,7 @@ describe( 'ValidatedFormTokenField', () => {
 		expect(
 			screen.getByRole( 'combobox', { name: 'Tags' } )
 		).toHaveAccessibleDescription(
-			expect.stringContaining( 'Separate with commas' )
+			expect.stringContaining( 'Separate with commas or the Enter key.' )
 		);
 	} );
 
@@ -46,7 +46,7 @@ describe( 'ValidatedFormTokenField', () => {
 			).toBeVisible();
 		} );
 		expect( input ).toHaveAccessibleDescription(
-			expect.stringContaining( 'Separate with commas' )
+			expect.stringContaining( 'Separate with commas or the Enter key.' )
 		);
 	} );
 } );

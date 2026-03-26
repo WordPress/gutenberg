@@ -7,14 +7,14 @@ describe( 'ValidatedToggleControl', () => {
 		render(
 			<ValidatedToggleControl
 				label="Dark mode"
-				help="Enable dark mode"
+				help="Enable dark mode."
 				onChange={ () => {} }
 			/>
 		);
 
 		expect(
 			screen.getByRole( 'checkbox', { name: 'Dark mode' } )
-		).toHaveAccessibleDescription( 'Enable dark mode' );
+		).toHaveAccessibleDescription( 'Enable dark mode.' );
 	} );
 
 	it( 'should append the validation error alongside the help description', async () => {
@@ -23,7 +23,7 @@ describe( 'ValidatedToggleControl', () => {
 			<form>
 				<ValidatedToggleControl
 					label="Dark mode"
-					help="Enable dark mode"
+					help="Enable dark mode."
 					onChange={ () => {} }
 					required
 				/>
@@ -43,7 +43,7 @@ describe( 'ValidatedToggleControl', () => {
 			);
 		} );
 		expect( toggle ).toHaveAccessibleDescription(
-			expect.stringContaining( 'Enable dark mode' )
+			expect.stringContaining( 'Enable dark mode.' )
 		);
 	} );
 } );

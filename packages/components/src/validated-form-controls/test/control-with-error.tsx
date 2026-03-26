@@ -320,7 +320,7 @@ describe( 'ControlWithError', () => {
 							required
 							aria-describedby={ hintId }
 						/>
-						<p id={ hintId }>Enter a full URL</p>
+						<p id={ hintId }>Enter a full URL.</p>
 						<button type="submit">Submit</button>
 					</form>
 				);
@@ -330,7 +330,7 @@ describe( 'ControlWithError', () => {
 
 			const input = screen.getByRole( 'textbox', { name: /^URL/ } );
 
-			expect( input ).toHaveAccessibleDescription( 'Enter a full URL' );
+			expect( input ).toHaveAccessibleDescription( 'Enter a full URL.' );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Submit' } )
@@ -342,7 +342,7 @@ describe( 'ControlWithError', () => {
 				);
 			} );
 			expect( input ).toHaveAccessibleDescription(
-				expect.stringContaining( 'Enter a full URL' )
+				expect.stringContaining( 'Enter a full URL.' )
 			);
 		} );
 

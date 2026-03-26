@@ -12,7 +12,7 @@ describe( 'ValidatedToggleGroupControl', () => {
 		render(
 			<ValidatedToggleGroupControl
 				label="Alignment"
-				help="Choose text alignment"
+				help="Choose text alignment."
 				value="left"
 				onChange={ () => {} }
 			>
@@ -23,6 +23,6 @@ describe( 'ValidatedToggleGroupControl', () => {
 
 		expect(
 			screen.getByRole( 'radiogroup', { name: 'Alignment' } )
-		).toHaveAccessibleDescription( 'Choose text alignment' );
+		).toHaveAccessibleDescription( 'Choose text alignment.' );
 	} );
 } );

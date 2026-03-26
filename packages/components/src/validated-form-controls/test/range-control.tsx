@@ -6,12 +6,12 @@ import { ValidatedRangeControl } from '../components';
 describe( 'ValidatedRangeControl', () => {
 	it( 'should preserve the help description', () => {
 		render(
-			<ValidatedRangeControl label="Opacity" help="Set the opacity" />
+			<ValidatedRangeControl label="Opacity" help="Set the opacity." />
 		);
 
 		expect(
 			screen.getByRole( 'slider', { name: 'Opacity' } )
-		).toHaveAccessibleDescription( 'Set the opacity' );
+		).toHaveAccessibleDescription( 'Set the opacity.' );
 	} );
 
 	// Range inputs always have a value, so `required` never fails constraint
@@ -33,7 +33,7 @@ describe( 'ValidatedRangeControl', () => {
 					<ValidatedRangeControl
 						ref={ ref }
 						label="Opacity"
-						help="Set the opacity"
+						help="Set the opacity."
 						customValidity={ customValidity }
 					/>
 					<button
@@ -57,7 +57,7 @@ describe( 'ValidatedRangeControl', () => {
 		render( <TestComponent /> );
 
 		const slider = screen.getByRole( 'slider', { name: 'Opacity' } );
-		expect( slider ).toHaveAccessibleDescription( 'Set the opacity' );
+		expect( slider ).toHaveAccessibleDescription( 'Set the opacity.' );
 
 		await user.click( screen.getByRole( 'button', { name: 'Validate' } ) );
 
@@ -67,7 +67,7 @@ describe( 'ValidatedRangeControl', () => {
 			);
 		} );
 		expect( slider ).toHaveAccessibleDescription(
-			expect.stringContaining( 'Set the opacity' )
+			expect.stringContaining( 'Set the opacity.' )
 		);
 	} );
 } );

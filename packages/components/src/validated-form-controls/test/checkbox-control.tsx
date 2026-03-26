@@ -7,14 +7,14 @@ describe( 'ValidatedCheckboxControl', () => {
 		render(
 			<ValidatedCheckboxControl
 				label="Agree"
-				help="You must agree to continue"
+				help="You must agree to continue."
 				onChange={ () => {} }
 			/>
 		);
 
 		expect(
 			screen.getByRole( 'checkbox', { name: 'Agree' } )
-		).toHaveAccessibleDescription( 'You must agree to continue' );
+		).toHaveAccessibleDescription( 'You must agree to continue.' );
 	} );
 
 	it( 'should append the validation error alongside the help description', async () => {
@@ -23,7 +23,7 @@ describe( 'ValidatedCheckboxControl', () => {
 			<form>
 				<ValidatedCheckboxControl
 					label="Agree"
-					help="You must agree to continue"
+					help="You must agree to continue."
 					onChange={ () => {} }
 					required
 				/>
@@ -43,7 +43,7 @@ describe( 'ValidatedCheckboxControl', () => {
 			);
 		} );
 		expect( checkbox ).toHaveAccessibleDescription(
-			expect.stringContaining( 'You must agree to continue' )
+			expect.stringContaining( 'You must agree to continue.' )
 		);
 	} );
 } );

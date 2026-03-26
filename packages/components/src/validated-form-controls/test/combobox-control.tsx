@@ -16,7 +16,7 @@ describe( 'ValidatedComboboxControl', () => {
 		render(
 			<ValidatedComboboxControl
 				label="Fruit"
-				help="Pick a fruit"
+				help="Pick a fruit."
 				options={ options }
 				onChange={ () => {} }
 			/>
@@ -24,7 +24,7 @@ describe( 'ValidatedComboboxControl', () => {
 
 		expect(
 			screen.getByRole( 'combobox', { name: 'Fruit' } )
-		).toHaveAccessibleDescription( 'Pick a fruit' );
+		).toHaveAccessibleDescription( 'Pick a fruit.' );
 	} );
 
 	// eslint-disable-next-line jest/no-disabled-tests
@@ -34,7 +34,7 @@ describe( 'ValidatedComboboxControl', () => {
 			<form>
 				<ValidatedComboboxControl
 					label="Fruit"
-					help="Pick a fruit"
+					help="Pick a fruit."
 					options={ options }
 					onChange={ () => {} }
 					required
@@ -55,7 +55,7 @@ describe( 'ValidatedComboboxControl', () => {
 			);
 		} );
 		expect( combobox ).toHaveAccessibleDescription(
-			expect.stringContaining( 'Pick a fruit' )
+			expect.stringContaining( 'Pick a fruit.' )
 		);
 	} );
 } );

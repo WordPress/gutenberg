@@ -7,7 +7,7 @@ describe( 'ValidatedTextControl', () => {
 		render(
 			<ValidatedTextControl
 				label="Name"
-				help="Enter your full name"
+				help="Enter your full name."
 				onChange={ () => {} }
 				value=""
 			/>
@@ -15,7 +15,7 @@ describe( 'ValidatedTextControl', () => {
 
 		expect(
 			screen.getByRole( 'textbox', { name: 'Name' } )
-		).toHaveAccessibleDescription( 'Enter your full name' );
+		).toHaveAccessibleDescription( 'Enter your full name.' );
 	} );
 
 	it( 'should append the validation error alongside the help description', async () => {
@@ -24,7 +24,7 @@ describe( 'ValidatedTextControl', () => {
 			<form>
 				<ValidatedTextControl
 					label="Name"
-					help="Enter your full name"
+					help="Enter your full name."
 					onChange={ () => {} }
 					value=""
 					required
@@ -43,7 +43,7 @@ describe( 'ValidatedTextControl', () => {
 			);
 		} );
 		expect( input ).toHaveAccessibleDescription(
-			expect.stringContaining( 'Enter your full name' )
+			expect.stringContaining( 'Enter your full name.' )
 		);
 	} );
 } );

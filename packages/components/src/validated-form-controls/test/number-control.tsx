@@ -5,12 +5,12 @@ import { ValidatedNumberControl } from '../components';
 describe( 'ValidatedNumberControl', () => {
 	it( 'should preserve the help description', () => {
 		render(
-			<ValidatedNumberControl label="Quantity" help="Enter a quantity" />
+			<ValidatedNumberControl label="Quantity" help="Enter a quantity." />
 		);
 
 		expect(
 			screen.getByRole( 'spinbutton', { name: 'Quantity' } )
-		).toHaveAccessibleDescription( 'Enter a quantity' );
+		).toHaveAccessibleDescription( 'Enter a quantity.' );
 	} );
 
 	it( 'should append the validation error alongside the help description', async () => {
@@ -19,7 +19,7 @@ describe( 'ValidatedNumberControl', () => {
 			<form>
 				<ValidatedNumberControl
 					label="Quantity"
-					help="Enter a quantity"
+					help="Enter a quantity."
 					required
 				/>
 				<button type="submit">Submit</button>
@@ -38,7 +38,7 @@ describe( 'ValidatedNumberControl', () => {
 			);
 		} );
 		expect( input ).toHaveAccessibleDescription(
-			expect.stringContaining( 'Enter a quantity' )
+			expect.stringContaining( 'Enter a quantity.' )
 		);
 	} );
 } );

@@ -7,7 +7,7 @@ describe( 'ValidatedTextareaControl', () => {
 		render(
 			<ValidatedTextareaControl
 				label="Bio"
-				help="A short bio"
+				help="A short bio."
 				onChange={ () => {} }
 				value=""
 			/>
@@ -15,7 +15,7 @@ describe( 'ValidatedTextareaControl', () => {
 
 		expect(
 			screen.getByRole( 'textbox', { name: 'Bio' } )
-		).toHaveAccessibleDescription( 'A short bio' );
+		).toHaveAccessibleDescription( 'A short bio.' );
 	} );
 
 	it( 'should append the validation error alongside the help description', async () => {
@@ -24,7 +24,7 @@ describe( 'ValidatedTextareaControl', () => {
 			<form>
 				<ValidatedTextareaControl
 					label="Bio"
-					help="A short bio"
+					help="A short bio."
 					onChange={ () => {} }
 					value=""
 					required
@@ -45,7 +45,7 @@ describe( 'ValidatedTextareaControl', () => {
 			);
 		} );
 		expect( textarea ).toHaveAccessibleDescription(
-			expect.stringContaining( 'A short bio' )
+			expect.stringContaining( 'A short bio.' )
 		);
 	} );
 } );

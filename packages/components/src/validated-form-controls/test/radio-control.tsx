@@ -13,7 +13,7 @@ describe( 'ValidatedRadioControl', () => {
 		render(
 			<ValidatedRadioControl
 				label="Size"
-				help="Choose a size"
+				help="Choose a size."
 				options={ options }
 				onChange={ () => {} }
 			/>
@@ -21,7 +21,7 @@ describe( 'ValidatedRadioControl', () => {
 
 		expect(
 			screen.getByRole( 'group', { name: 'Size' } )
-		).toHaveAccessibleDescription( 'Choose a size' );
+		).toHaveAccessibleDescription( 'Choose a size.' );
 	} );
 
 	it( 'should append the validation error to the first radio input', async () => {
@@ -30,7 +30,7 @@ describe( 'ValidatedRadioControl', () => {
 			<form>
 				<ValidatedRadioControl
 					label="Size"
-					help="Choose a size"
+					help="Choose a size."
 					options={ options }
 					onChange={ () => {} }
 					required
@@ -55,7 +55,7 @@ describe( 'ValidatedRadioControl', () => {
 		expect(
 			screen.getByRole( 'group', { name: /^Size/ } )
 		).toHaveAccessibleDescription(
-			expect.stringContaining( 'Choose a size' )
+			expect.stringContaining( 'Choose a size.' )
 		);
 	} );
 } );

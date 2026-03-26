@@ -4,11 +4,13 @@ import { ValidatedInputControl } from '../components';
 
 describe( 'ValidatedInputControl', () => {
 	it( 'should preserve the help description', () => {
-		render( <ValidatedInputControl label="URL" help="Enter a full URL" /> );
+		render(
+			<ValidatedInputControl label="URL" help="Enter a full URL." />
+		);
 
 		expect(
 			screen.getByRole( 'textbox', { name: 'URL' } )
-		).toHaveAccessibleDescription( 'Enter a full URL' );
+		).toHaveAccessibleDescription( 'Enter a full URL.' );
 	} );
 
 	it( 'should append the validation error alongside the help description', async () => {
@@ -17,7 +19,7 @@ describe( 'ValidatedInputControl', () => {
 			<form>
 				<ValidatedInputControl
 					label="URL"
-					help="Enter a full URL"
+					help="Enter a full URL."
 					required
 				/>
 				<button type="submit">Submit</button>
@@ -34,7 +36,7 @@ describe( 'ValidatedInputControl', () => {
 			);
 		} );
 		expect( input ).toHaveAccessibleDescription(
-			expect.stringContaining( 'Enter a full URL' )
+			expect.stringContaining( 'Enter a full URL.' )
 		);
 	} );
 } );
