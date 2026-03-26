@@ -267,6 +267,8 @@ export function unloadFontFaceInBrowser(
 		return;
 	}
 
+	const blobUrls = new Set< string >();
+
 	for ( const sheet of ensureTargetSheets( removeFrom ) ) {
 		// Walk rules in reverse to safely delete by index.
 		ruleLoop: for ( let i = sheet.cssRules.length - 1; i >= 0; i-- ) {
@@ -280,10 +282,18 @@ export function unloadFontFaceInBrowser(
 						continue ruleLoop;
 					}
 				}
+				const srcValue = rule.style.getPropertyValue( 'src' );
+				const match = srcValue?.match( /\b(blob:[^\s'")]+)/ );
+				if ( match ) {
+					blobUrls.add( match[ 1 ] );
+				}
 				sheet.deleteRule( i );
-				break;
 			}
 		}
+	}
+
+	for ( const blobUrl of blobUrls ) {
+		URL.revokeObjectURL( blobUrl );
 	}
 }
 
