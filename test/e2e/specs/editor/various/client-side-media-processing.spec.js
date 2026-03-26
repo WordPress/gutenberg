@@ -276,6 +276,88 @@ test.describe( 'Client-side media processing', () => {
 		expect( media.mime_type ).toBe( 'image/gif' );
 	} );
 
+	test( 'should upload and process a WebP image', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		await mediaProcessingUtils.skipIfNotCrossOriginIsolated( test );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'200x150_e2e_test_image_decode.webp'
+		);
+
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toBeVisible();
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+
+		await mediaProcessingUtils.waitForUploadQueueEmpty();
+
+		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
+		expect( imageId ).toBeDefined();
+
+		const media = await mediaProcessingUtils.getMediaDetails(
+			requestUtils,
+			imageId
+		);
+
+		// WebP decoded client-side by wasm-vips; output may be WebP or JPEG.
+		expect( [ 'image/webp', 'image/jpeg' ] ).toContain( media.mime_type );
+	} );
+
+	test( 'should upload and process an AVIF image', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		await mediaProcessingUtils.skipIfNotCrossOriginIsolated( test );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'200x150_e2e_test_image_decode.avif'
+		);
+
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toBeVisible();
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+
+		await mediaProcessingUtils.waitForUploadQueueEmpty();
+
+		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
+		expect( imageId ).toBeDefined();
+
+		const media = await mediaProcessingUtils.getMediaDetails(
+			requestUtils,
+			imageId
+		);
+
+		// AVIF decoded client-side by wasm-vips; output format depends on config.
+		expect( [ 'image/avif', 'image/jpeg', 'image/webp' ] ).toContain(
+			media.mime_type
+		);
+	} );
+
 	test( 'should generate sub-sizes and scale large images', async ( {
 		editor,
 		mediaProcessingUtils,
