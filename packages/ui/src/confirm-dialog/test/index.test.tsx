@@ -349,6 +349,63 @@ describe( 'ConfirmDialog', () => {
 		);
 	} );
 
+	it( 'disables both buttons when loading', async () => {
+		render(
+			<ConfirmDialog.Root
+				title="Loading Test"
+				open
+				onOpenChange={ jest.fn() }
+			>
+				<ConfirmDialog.Popup onConfirm={ jest.fn() } loading>
+					Content
+				</ConfirmDialog.Popup>
+			</ConfirmDialog.Root>
+		);
+
+		await waitFor( () => {
+			expect(
+				screen.getByRole( 'button', { name: 'OK' } )
+			).toBeVisible();
+		} );
+
+		expect( screen.getByRole( 'button', { name: 'OK' } ) ).toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Cancel' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'does not disable buttons when loading is false', async () => {
+		render(
+			<ConfirmDialog.Root
+				title="No Loading"
+				open
+				onOpenChange={ jest.fn() }
+			>
+				<ConfirmDialog.Popup onConfirm={ jest.fn() } loading={ false }>
+					Content
+				</ConfirmDialog.Popup>
+			</ConfirmDialog.Root>
+		);
+
+		await waitFor( () => {
+			expect(
+				screen.getByRole( 'button', { name: 'OK' } )
+			).toBeVisible();
+		} );
+
+		expect(
+			screen.getByRole( 'button', { name: 'OK' } )
+		).not.toHaveAttribute( 'aria-disabled', 'true' );
+
+		expect(
+			screen.getByRole( 'button', { name: 'Cancel' } )
+		).not.toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
 	it( 'uses custom button text when provided', async () => {
 		render(
 			<ConfirmDialog.Root

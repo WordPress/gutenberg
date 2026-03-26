@@ -13,6 +13,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 			onConfirm,
 			confirmButtonText = __( 'OK' ),
 			cancelButtonText = __( 'Cancel' ),
+			loading = false,
 		},
 		ref
 	) {
@@ -26,7 +27,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 				</Dialog.Header>
 				{ children }
 				<Dialog.Footer>
-					<Dialog.Action variant="minimal">
+					<Dialog.Action
+						variant="minimal"
+						disabled={ loading || undefined }
+					>
 						{ cancelButtonText }
 					</Dialog.Action>
 					<Dialog.Action
@@ -36,6 +40,13 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 								: undefined
 						}
 						onClick={ onConfirm }
+						loading={ loading }
+						// `disabled` must be set explicitly alongside `loading`
+						// because Dialog.Action wraps Base UI's Dialog.Close,
+						// which defaults `disabled` to `false` internally —
+						// overriding the `aria-disabled` that Button would
+						// normally derive from the `loading` prop.
+						disabled={ loading || undefined }
 					>
 						{ confirmButtonText }
 					</Dialog.Action>

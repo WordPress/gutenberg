@@ -63,4 +63,18 @@ export interface PopupProps {
 	 * @default 'Cancel'
 	 */
 	cancelButtonText?: string;
+
+	/**
+	 * Whether the confirm action is in a loading state (e.g. an async
+	 * operation is in progress). When `true`, the confirm button shows a
+	 * spinner and the cancel button is disabled.
+	 *
+	 * To implement an async confirm flow, use controlled mode
+	 * (`open` / `onOpenChange`) and manage the loading state externally:
+	 * prevent closing in `onOpenChange` while loading, and set
+	 * `open={false}` once the operation completes.
+	 *
+	 * @default false
+	 */
+	loading?: boolean;
 }

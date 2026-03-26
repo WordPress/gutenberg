@@ -170,6 +170,57 @@ export const MenuTrigger: Story = {
 };
 
 /**
+ * Consumer-driven async confirm flow. The consumer uses controlled mode to
+ * keep the dialog open while the async operation is in progress, and passes
+ * `loading` to show a spinner on the confirm button and disable the cancel
+ * button.
+ */
+export const AsyncConfirm: Story = {
+	render: function AsyncConfirm( args ) {
+		const [ isOpen, setIsOpen ] = useState( false );
+		const [ isLoading, setIsLoading ] = useState( false );
+
+		return (
+			<>
+				<button onClick={ () => setIsOpen( true ) }>
+					Delete permanently
+				</button>
+				<ConfirmDialog.Root
+					{ ...args }
+					open={ isOpen }
+					onOpenChange={ ( open, eventDetails ) => {
+						if ( ! isLoading ) {
+							setIsOpen( open );
+						}
+						args.onOpenChange?.( open, eventDetails );
+					} }
+				>
+					<ConfirmDialog.Popup
+						loading={ isLoading }
+						onConfirm={ () => {
+							setIsLoading( true );
+							new Promise< void >( ( resolve ) =>
+								setTimeout( resolve, 2000 )
+							).then( () => {
+								setIsLoading( false );
+								setIsOpen( false );
+							} );
+						} }
+						confirmButtonText="Delete permanently"
+					>
+						This action cannot be undone. All data will be lost.
+					</ConfirmDialog.Popup>
+				</ConfirmDialog.Root>
+			</>
+		);
+	},
+	args: {
+		title: 'Delete permanently?',
+		intent: 'irreversible',
+	},
+};
+
+/**
  * The `ConfirmDialog.Trigger` element is not necessary when the open state is
  * controlled externally. This is useful when the dialog needs to be opened
  * from code or from a non-standard trigger element.
