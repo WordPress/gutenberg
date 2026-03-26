@@ -63,7 +63,7 @@ Even if a block appears to work fine with client-side navigation, the compatibil
 
 ### Non-interactive blocks
 
-Blocks that render HTML without any client-side interactivity — no JavaScript, no event listeners, no dynamic behavior — are generally compatible with client-side navigation. Since they don't rely on scripts to function, client-side navigation can safely replace their HTML without breaking anything.
+Blocks that render HTML without any client-side interactivity — no JavaScript, no event listeners, no dynamic behavior — are compatible with client-side navigation. Since they don't rely on scripts to function, client-side navigation can safely replace their HTML without breaking anything.
 
 However, compatibility must still be declared explicitly in `block.json`. The Interactivity API cannot infer compatibility on its own.
 
