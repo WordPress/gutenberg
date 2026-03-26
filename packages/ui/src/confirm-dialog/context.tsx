@@ -6,12 +6,10 @@ type Intent = NonNullable< RootProps[ 'intent' ] >;
 
 interface ConfirmDialogContextValue {
 	intent: Intent;
-	title: string;
 }
 
 const ConfirmDialogContext = createContext< ConfirmDialogContextValue >( {
 	intent: 'default',
-	title: '',
 } );
 
 /**

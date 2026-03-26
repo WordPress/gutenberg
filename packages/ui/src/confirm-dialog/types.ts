@@ -29,17 +29,17 @@ export interface RootProps
 	 * @default 'default'
 	 */
 	intent?: 'default' | 'irreversible';
-
-	/**
-	 * The title displayed in the dialog header. This serves as both the
-	 * visible heading and the accessible label for the dialog.
-	 */
-	title: string;
 }
 
 export type TriggerProps = DialogTriggerProps;
 
 export interface PopupProps {
+	/**
+	 * The title displayed in the dialog header. This serves as both the
+	 * visible heading and the accessible label for the dialog.
+	 */
+	title: string;
+
 	/**
 	 * The message content displayed in the dialog body.
 	 */

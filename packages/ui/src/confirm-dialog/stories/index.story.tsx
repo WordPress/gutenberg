@@ -28,11 +28,13 @@ type Story = StoryObj< typeof ConfirmDialog.Root >;
  */
 export const Default: Story = {
 	args: {
-		title: 'Move to trash?',
 		children: (
 			<>
 				<ConfirmDialog.Trigger>Move to trash</ConfirmDialog.Trigger>
-				<ConfirmDialog.Popup onConfirm={ action( 'onConfirm' ) }>
+				<ConfirmDialog.Popup
+					title="Move to trash?"
+					onConfirm={ action( 'onConfirm' ) }
+				>
 					This post will be moved to trash. You can restore it later.
 				</ConfirmDialog.Popup>
 			</>
@@ -48,7 +50,6 @@ export const Default: Story = {
  */
 export const Irreversible: Story = {
 	args: {
-		title: 'Delete permanently?',
 		intent: 'irreversible',
 		children: (
 			<>
@@ -56,6 +57,7 @@ export const Irreversible: Story = {
 					Delete permanently
 				</ConfirmDialog.Trigger>
 				<ConfirmDialog.Popup
+					title="Delete permanently?"
 					onConfirm={ action( 'onConfirm' ) }
 					confirmButtonText="Delete permanently"
 				>
@@ -71,11 +73,11 @@ export const Irreversible: Story = {
  */
 export const CustomButtonText: Story = {
 	args: {
-		title: 'Send feedback?',
 		children: (
 			<>
 				<ConfirmDialog.Trigger>Send feedback</ConfirmDialog.Trigger>
 				<ConfirmDialog.Popup
+					title="Send feedback?"
 					onConfirm={ action( 'onConfirm' ) }
 					confirmButtonText="Send feedback"
 					cancelButtonText="Not now"
@@ -120,7 +122,6 @@ const menuItemStyles: React.CSSProperties = {
  */
 export const MenuTrigger: Story = {
 	args: {
-		title: 'Delete permanently?',
 		intent: 'irreversible',
 	},
 	render: ( args ) => {
@@ -150,6 +151,7 @@ export const MenuTrigger: Story = {
 									>
 										Delete...
 										<ConfirmDialog.Popup
+											title="Delete permanently?"
 											onConfirm={ () => {
 												setMenuOpen( false );
 											} }
@@ -196,6 +198,7 @@ export const AsyncConfirm: Story = {
 					} }
 				>
 					<ConfirmDialog.Popup
+						title="Delete permanently?"
 						loading={ isLoading }
 						onConfirm={ () => {
 							setIsLoading( true );
@@ -215,7 +218,6 @@ export const AsyncConfirm: Story = {
 		);
 	},
 	args: {
-		title: 'Delete permanently?',
 		intent: 'irreversible',
 	},
 };
@@ -240,15 +242,15 @@ export const Controlled: Story = {
 						args.onOpenChange?.( open, eventDetails );
 					} }
 				>
-					<ConfirmDialog.Popup onConfirm={ action( 'onConfirm' ) }>
+					<ConfirmDialog.Popup
+						title="Move to trash?"
+						onConfirm={ action( 'onConfirm' ) }
+					>
 						This post will be moved to trash. You can restore it
 						later.
 					</ConfirmDialog.Popup>
 				</ConfirmDialog.Root>
 			</>
 		);
-	},
-	args: {
-		title: 'Move to trash?',
 	},
 };

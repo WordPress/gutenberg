@@ -10,11 +10,15 @@ describe( 'ConfirmDialog', () => {
 		const popupRef = createRef< HTMLDivElement >();
 
 		render(
-			<ConfirmDialog.Root title="Test Title" defaultOpen>
+			<ConfirmDialog.Root defaultOpen>
 				<ConfirmDialog.Trigger ref={ triggerRef }>
 					Open
 				</ConfirmDialog.Trigger>
-				<ConfirmDialog.Popup ref={ popupRef } onConfirm={ jest.fn() }>
+				<ConfirmDialog.Popup
+					ref={ popupRef }
+					title="Test Title"
+					onConfirm={ jest.fn() }
+				>
 					Test message content
 				</ConfirmDialog.Popup>
 			</ConfirmDialog.Root>
@@ -26,12 +30,8 @@ describe( 'ConfirmDialog', () => {
 
 	it( 'renders with title, message, and default buttons', async () => {
 		render(
-			<ConfirmDialog.Root
-				title="Test Title"
-				open
-				onOpenChange={ jest.fn() }
-			>
-				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
+			<ConfirmDialog.Root open onOpenChange={ jest.fn() }>
+				<ConfirmDialog.Popup title="Test Title" onConfirm={ jest.fn() }>
 					Test message content
 				</ConfirmDialog.Popup>
 			</ConfirmDialog.Root>
@@ -53,12 +53,11 @@ describe( 'ConfirmDialog', () => {
 
 	it( 'renders with role="dialog" for default intent', async () => {
 		render(
-			<ConfirmDialog.Root
-				title="Default Dialog"
-				open
-				onOpenChange={ jest.fn() }
-			>
-				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
+			<ConfirmDialog.Root open onOpenChange={ jest.fn() }>
+				<ConfirmDialog.Popup
+					title="Default Dialog"
+					onConfirm={ jest.fn() }
+				>
 					Content
 				</ConfirmDialog.Popup>
 			</ConfirmDialog.Root>
@@ -72,12 +71,14 @@ describe( 'ConfirmDialog', () => {
 	it( 'renders with role="alertdialog" for irreversible intent', async () => {
 		render(
 			<ConfirmDialog.Root
-				title="Irreversible Dialog"
 				intent="irreversible"
 				open
 				onOpenChange={ jest.fn() }
 			>
-				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
+				<ConfirmDialog.Popup
+					title="Irreversible Dialog"
+					onConfirm={ jest.fn() }
+				>
 					Content
 				</ConfirmDialog.Popup>
 			</ConfirmDialog.Root>
@@ -93,12 +94,11 @@ describe( 'ConfirmDialog', () => {
 		const onOpenChange = jest.fn();
 
 		render(
-			<ConfirmDialog.Root
-				title="Confirm Action"
-				open
-				onOpenChange={ onOpenChange }
-			>
-				<ConfirmDialog.Popup onConfirm={ onConfirm }>
+			<ConfirmDialog.Root open onOpenChange={ onOpenChange }>
+				<ConfirmDialog.Popup
+					title="Confirm Action"
+					onConfirm={ onConfirm }
+				>
 					Are you sure?
 				</ConfirmDialog.Popup>
 			</ConfirmDialog.Root>
@@ -124,12 +124,11 @@ describe( 'ConfirmDialog', () => {
 		const onOpenChange = jest.fn();
 
 		render(
-			<ConfirmDialog.Root
-				title="Confirm Action"
-				open
-				onOpenChange={ onOpenChange }
-			>
-				<ConfirmDialog.Popup onConfirm={ onConfirm }>
+			<ConfirmDialog.Root open onOpenChange={ onOpenChange }>
+				<ConfirmDialog.Popup
+					title="Confirm Action"
+					onConfirm={ onConfirm }
+				>
 					Are you sure?
 				</ConfirmDialog.Popup>
 			</ConfirmDialog.Root>
@@ -156,12 +155,11 @@ describe( 'ConfirmDialog', () => {
 		const onOpenChange = jest.fn();
 
 		render(
-			<ConfirmDialog.Root
-				title="Default Dialog"
-				open
-				onOpenChange={ onOpenChange }
-			>
-				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
+			<ConfirmDialog.Root open onOpenChange={ onOpenChange }>
+				<ConfirmDialog.Popup
+					title="Default Dialog"
+					onConfirm={ jest.fn() }
+				>
 					Content
 				</ConfirmDialog.Popup>
 			</ConfirmDialog.Root>
@@ -183,12 +181,11 @@ describe( 'ConfirmDialog', () => {
 		const onOpenChange = jest.fn();
 
 		render(
-			<ConfirmDialog.Root
-				title="Default Dialog"
-				open
-				onOpenChange={ onOpenChange }
-			>
-				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
+			<ConfirmDialog.Root open onOpenChange={ onOpenChange }>
+				<ConfirmDialog.Popup
+					title="Default Dialog"
+					onConfirm={ jest.fn() }
+				>
 					Content
 				</ConfirmDialog.Popup>
 			</ConfirmDialog.Root>
@@ -206,12 +203,14 @@ describe( 'ConfirmDialog', () => {
 	it( 'renders with title, message, and default buttons for irreversible intent', async () => {
 		render(
 			<ConfirmDialog.Root
-				title="Irreversible Dialog"
 				intent="irreversible"
 				open
 				onOpenChange={ jest.fn() }
 			>
-				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
+				<ConfirmDialog.Popup
+					title="Irreversible Dialog"
+					onConfirm={ jest.fn() }
+				>
 					Irreversible message content
 				</ConfirmDialog.Popup>
 			</ConfirmDialog.Root>
@@ -238,12 +237,14 @@ describe( 'ConfirmDialog', () => {
 
 		render(
 			<ConfirmDialog.Root
-				title="Irreversible Dialog"
 				intent="irreversible"
 				open
 				onOpenChange={ onOpenChange }
 			>
-				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
+				<ConfirmDialog.Popup
+					title="Irreversible Dialog"
+					onConfirm={ jest.fn() }
+				>
 					Content
 				</ConfirmDialog.Popup>
 			</ConfirmDialog.Root>
@@ -263,12 +264,14 @@ describe( 'ConfirmDialog', () => {
 
 		render(
 			<ConfirmDialog.Root
-				title="Irreversible Dialog"
 				intent="irreversible"
 				open
 				onOpenChange={ onOpenChange }
 			>
-				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
+				<ConfirmDialog.Popup
+					title="Irreversible Dialog"
+					onConfirm={ jest.fn() }
+				>
 					Content
 				</ConfirmDialog.Popup>
 			</ConfirmDialog.Root>
@@ -289,12 +292,14 @@ describe( 'ConfirmDialog', () => {
 
 		render(
 			<ConfirmDialog.Root
-				title="Irreversible Dialog"
 				intent="irreversible"
 				open
 				onOpenChange={ onOpenChange }
 			>
-				<ConfirmDialog.Popup onConfirm={ onConfirm }>
+				<ConfirmDialog.Popup
+					title="Irreversible Dialog"
+					onConfirm={ onConfirm }
+				>
 					Content
 				</ConfirmDialog.Popup>
 			</ConfirmDialog.Root>
@@ -323,12 +328,14 @@ describe( 'ConfirmDialog', () => {
 
 		render(
 			<ConfirmDialog.Root
-				title="Irreversible Dialog"
 				intent="irreversible"
 				open
 				onOpenChange={ onOpenChange }
 			>
-				<ConfirmDialog.Popup onConfirm={ onConfirm }>
+				<ConfirmDialog.Popup
+					title="Irreversible Dialog"
+					onConfirm={ onConfirm }
+				>
 					Content
 				</ConfirmDialog.Popup>
 			</ConfirmDialog.Root>
@@ -351,12 +358,12 @@ describe( 'ConfirmDialog', () => {
 
 	it( 'disables both buttons when loading', async () => {
 		render(
-			<ConfirmDialog.Root
-				title="Loading Test"
-				open
-				onOpenChange={ jest.fn() }
-			>
-				<ConfirmDialog.Popup onConfirm={ jest.fn() } loading>
+			<ConfirmDialog.Root open onOpenChange={ jest.fn() }>
+				<ConfirmDialog.Popup
+					title="Loading Test"
+					onConfirm={ jest.fn() }
+					loading
+				>
 					Content
 				</ConfirmDialog.Popup>
 			</ConfirmDialog.Root>
@@ -380,12 +387,12 @@ describe( 'ConfirmDialog', () => {
 
 	it( 'does not disable buttons when loading is false', async () => {
 		render(
-			<ConfirmDialog.Root
-				title="No Loading"
-				open
-				onOpenChange={ jest.fn() }
-			>
-				<ConfirmDialog.Popup onConfirm={ jest.fn() } loading={ false }>
+			<ConfirmDialog.Root open onOpenChange={ jest.fn() }>
+				<ConfirmDialog.Popup
+					title="No Loading"
+					onConfirm={ jest.fn() }
+					loading={ false }
+				>
 					Content
 				</ConfirmDialog.Popup>
 			</ConfirmDialog.Root>
@@ -408,12 +415,9 @@ describe( 'ConfirmDialog', () => {
 
 	it( 'uses custom button text when provided', async () => {
 		render(
-			<ConfirmDialog.Root
-				title="Custom Text"
-				open
-				onOpenChange={ jest.fn() }
-			>
+			<ConfirmDialog.Root open onOpenChange={ jest.fn() }>
 				<ConfirmDialog.Popup
+					title="Custom Text"
 					onConfirm={ jest.fn() }
 					confirmButtonText="Yes, do it"
 					cancelButtonText="No, go back"
@@ -436,9 +440,12 @@ describe( 'ConfirmDialog', () => {
 
 	it( 'opens dialog when Trigger is clicked', async () => {
 		render(
-			<ConfirmDialog.Root title="Trigger Test">
+			<ConfirmDialog.Root>
 				<ConfirmDialog.Trigger>Open</ConfirmDialog.Trigger>
-				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
+				<ConfirmDialog.Popup
+					title="Trigger Test"
+					onConfirm={ jest.fn() }
+				>
 					Dialog content
 				</ConfirmDialog.Popup>
 			</ConfirmDialog.Root>

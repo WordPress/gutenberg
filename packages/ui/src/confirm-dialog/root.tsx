@@ -32,7 +32,6 @@ import type { RootProps } from './types';
  */
 function Root( {
 	intent = 'default',
-	title,
 	children,
 	open,
 	onOpenChange,
@@ -53,10 +52,7 @@ function Root( {
 		}
 	};
 
-	const contextValue = useMemo(
-		() => ( { intent, title } ),
-		[ intent, title ]
-	);
+	const contextValue = useMemo( () => ( { intent } ), [ intent ] );
 
 	return (
 		<Dialog.Root

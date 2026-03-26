@@ -9,6 +9,7 @@ import type { PopupProps } from './types';
 const Popup = forwardRef< HTMLDivElement, PopupProps >(
 	function ConfirmDialogPopup(
 		{
+			title,
 			children,
 			onConfirm,
 			confirmButtonText = __( 'OK' ),
@@ -17,7 +18,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 		},
 		ref
 	) {
-		const { intent, title } = useContext( ConfirmDialogContext );
+		const { intent } = useContext( ConfirmDialogContext );
 		const { popupRole } = getIntentConfig( intent );
 
 		return (
