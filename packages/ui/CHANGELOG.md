@@ -4,6 +4,7 @@
 
 ### New Features
 
+-   Add `ConfirmDialog` primitive ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
 -   Add `InputControl` component ([#76653](https://github.com/WordPress/gutenberg/pull/76653)).
 -   `Dialog`: Expose `initialFocus` and `finalFocus` props on `Dialog.Popup` for custom focus management ([#76860](https://github.com/WordPress/gutenberg/pull/76860)).
 
