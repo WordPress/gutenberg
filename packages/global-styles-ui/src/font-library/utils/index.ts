@@ -248,6 +248,8 @@ export function loadFontFaceInBrowser(
 
 	for ( const sheet of ensureTargetSheets( addTo ) ) {
 		sheet.insertRule( rule.cssText, sheet.cssRules.length );
+		// eslint-disable-next-line no-console
+		console.log( '[font-load] added rule', { src, rule: rule.cssText } );
 	}
 }
 
@@ -290,6 +292,11 @@ export function unloadFontFaceInBrowser(
 				sheet.deleteRule( i );
 			}
 		}
+		// eslint-disable-next-line no-console
+		console.log( '[font-unload] deleted rule', {
+			src: srcValue,
+			rule: rule.cssText,
+		} );
 	}
 
 	for ( const blobUrl of blobUrls ) {
@@ -297,6 +304,8 @@ export function unloadFontFaceInBrowser(
 	}
 }
 
+// eslint-disable-next-line no-console
+console.log( '[font-unload] revoked blob URL', blobUrl );
 /**
  * Retrieves the display source from a font face src.
  *
