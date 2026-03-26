@@ -1087,7 +1087,7 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 				},
 				{
 					name: 'core/calendar',
-					attributes: { month: 6, year: 2026 },
+					attributes: { month: 6, year: 2025 },
 				},
 				{
 					name: 'core/categories',
