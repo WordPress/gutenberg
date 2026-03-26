@@ -339,7 +339,8 @@ function LinkControl( {
 			const inputElement = searchInputRef.current;
 			if (
 				inputElement &&
-				typeof inputElement.reportValidity === 'function'
+				typeof inputElement.reportValidity === 'function' &&
+				inputElement.ownerDocument.activeElement === inputElement
 			) {
 				inputElement.reportValidity();
 			}
