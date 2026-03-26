@@ -409,7 +409,7 @@ async function loadPostTypeEntities() {
 			 *
 			 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
 			 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
-			 * @return {void|import('@wordpress/sync').DeferredCRDTOp[]} Deferred operations to execute outside the undo-tracked transaction.
+			 * @return {void}
 			 */
 			applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
 				applyPostChangesToCRDTDoc( crdtDoc, changes, syncedProperties ),

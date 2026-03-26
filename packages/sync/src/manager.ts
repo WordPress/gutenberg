@@ -12,7 +12,6 @@ import {
 	CRDT_STATE_MAP_KEY,
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	LOCAL_SYNC_MANAGER_ORIGIN,
-	LOCAL_UNDO_IGNORED_ORIGIN,
 } from './config';
 import {
 	logPerformanceTiming,
@@ -23,7 +22,6 @@ import { getProviderCreators } from './providers';
 import type {
 	CollectionHandlers,
 	CRDTDoc,
-	DeferredCRDTOp,
 	EntityID,
 	ObjectID,
 	ObjectData,
@@ -141,30 +139,6 @@ export function createSyncManager( debug = false ): SyncManager {
 			...context,
 			entityId,
 		} );
-	}
-
-	/**
-	 * Execute deferred CRDT operations in a separate transaction with the
-	 * given origin.
-	 *
-	 * @param {CRDTDoc}                      ydoc   The CRDT document.
-	 * @param {DeferredCRDTOp[] | undefined} ops    Deferred operations to execute.
-	 * @param {string}                       origin The transaction origin.
-	 */
-	function executeDeferredOps(
-		ydoc: CRDTDoc,
-		ops: DeferredCRDTOp[] | undefined,
-		origin: string
-	): void {
-		if ( ! ops || ! ops.length ) {
-			return;
-		}
-
-		ydoc.transact( () => {
-			for ( const op of ops ) {
-				op( ydoc );
-			}
-		}, origin );
 	}
 
 	/**
@@ -496,21 +470,10 @@ export function createSyncManager( debug = false ): SyncManager {
 			// Apply the current record as changes and request that the CRDT doc be
 			// persisted with the entity. The persisted CRDT doc can be created by
 			// calling `syncManager.createPersistedCRDTDoc`.
-			let deferred: DeferredCRDTOp[] | undefined;
 			targetDoc.transact( () => {
-				const result = applyChangesToCRDTDoc( targetDoc, record );
-				if ( result ) {
-					deferred = result;
-				}
+				applyChangesToCRDTDoc( targetDoc, record );
 				handlers.persistCRDTDoc();
 			}, LOCAL_SYNC_MANAGER_ORIGIN );
-
-			executeDeferredOps(
-				targetDoc,
-				deferred,
-				LOCAL_UNDO_IGNORED_ORIGIN
-			);
-
 			return;
 		}
 
@@ -564,20 +527,10 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Apply the changes and request that the updated CRDT doc be persisted with
 		// the entity. The persisted CRDT doc can be created by calling
 		// `syncManager.createPersistedCRDTDoc`.
-		let persistDeferred: DeferredCRDTOp[] | undefined;
 		targetDoc.transact( () => {
-			const result = applyChangesToCRDTDoc( targetDoc, changes );
-			if ( result ) {
-				persistDeferred = result;
-			}
+			applyChangesToCRDTDoc( targetDoc, changes );
 			handlers.persistCRDTDoc();
 		}, LOCAL_SYNC_MANAGER_ORIGIN );
-
-		executeDeferredOps(
-			targetDoc,
-			persistDeferred,
-			LOCAL_UNDO_IGNORED_ORIGIN
-		);
 	}
 
 	/**
@@ -615,26 +568,16 @@ export function createSyncManager( debug = false ): SyncManager {
 				undoManager.stopCapturing?.();
 			}
 
-			let deferredOps: DeferredCRDTOp[] | undefined;
-
 			ydoc.transact( () => {
 				log( 'updateCRDTDoc', 'applying changes', entityId, {
 					changedKeys: Object.keys( changes ),
 				} );
-				const result = syncConfig.applyChangesToCRDTDoc(
-					ydoc,
-					changes
-				);
-				if ( result ) {
-					deferredOps = result;
-				}
+				syncConfig.applyChangesToCRDTDoc( ydoc, changes );
 
 				if ( isSave ) {
 					markEntityAsSaved( ydoc );
 				}
 			}, origin );
-
-			executeDeferredOps( ydoc, deferredOps, LOCAL_UNDO_IGNORED_ORIGIN );
 		}
 
 		if ( collectionState && isSave ) {

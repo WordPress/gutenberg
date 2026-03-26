@@ -404,121 +404,8 @@ describe( 'crdt', () => {
 			expect( metaMap?.get( 'custom_field' ) ).toBe( 'value' );
 		} );
 
-		it( 'syncs content from a content function when no existing Y.Text', () => {
+		it( 'skips function-valued content in changes', () => {
 			const changes = {
-				blocks: [
-					{
-						name: 'core/paragraph',
-						attributes: { content: 'Hello' },
-						innerBlocks: [],
-					},
-				],
-				content: ( {
-					blocks: blocksForSerialization = [],
-				}: {
-					blocks: Block[];
-				} ) =>
-					blocksForSerialization
-						.map( ( b ) => b.attributes.content )
-						.join( '' ),
-			} as unknown as PostChanges;
-
-			const deferredOps = applyPostChangesToCRDTDoc(
-				doc,
-				changes,
-				defaultSyncedProperties
-			);
-
-			// Content is not set yet; it's returned as a deferred op.
-			expect( map.has( 'content' ) ).toBe( false );
-			expect( deferredOps ).toHaveLength( 1 );
-
-			// Execute the deferred op.
-			deferredOps!.forEach( ( op ) => op( doc ) );
-
-			const content = map.get( 'content' );
-			expect( content ).toBeInstanceOf( Y.Text );
-			expect( content?.toString() ).toBe( 'Hello' );
-		} );
-
-		it( 'updates existing Y.Text content in place from a content function', () => {
-			// Pre-populate content as Y.Text to hit the mergeRichTextUpdate branch.
-			map.set( 'content', new Y.Text( 'Old content' ) );
-			const contentRef = map.get( 'content' );
-
-			const changes = {
-				blocks: [
-					{
-						name: 'core/paragraph',
-						attributes: { content: 'New content' },
-						innerBlocks: [],
-					},
-				],
-				content: ( {
-					blocks: blocksForSerialization = [],
-				}: {
-					blocks: Block[];
-				} ) =>
-					blocksForSerialization
-						.map( ( b ) => b.attributes.content )
-						.join( '' ),
-			} as unknown as PostChanges;
-
-			const deferredOps = applyPostChangesToCRDTDoc(
-				doc,
-				changes,
-				defaultSyncedProperties
-			);
-
-			// Execute the deferred op.
-			expect( deferredOps ).toHaveLength( 1 );
-			deferredOps!.forEach( ( op ) => op( doc ) );
-
-			// Should update in place, not replace the Y.Text instance.
-			expect( map.get( 'content' ) ).toBe( contentRef );
-			expect( map.get( 'content' )?.toString() ).toBe( 'New content' );
-		} );
-
-		it( 'does not call content function when it has wrong arity', () => {
-			const wrongFunction = ( a: unknown, b: unknown ) => `${ a }${ b }`;
-
-			const changes = {
-				blocks: [
-					{
-						name: 'core/paragraph',
-						attributes: { content: 'Hello' },
-						innerBlocks: [],
-					},
-				],
-				content: wrongFunction,
-			} as unknown as PostChanges;
-
-			applyPostChangesToCRDTDoc( doc, changes, defaultSyncedProperties );
-
-			// Content should not have been set because the function has wrong arity.
-			expect( map.has( 'content' ) ).toBe( false );
-		} );
-
-		it( 'does not call content function when blocks are not provided', () => {
-			const changes = {
-				content: ( {
-					blocks: blocksForSerialization = [],
-				}: {
-					blocks: Block[];
-				} ) =>
-					blocksForSerialization
-						.map( ( b ) => b.attributes.content )
-						.join( '' ),
-			} as unknown as PostChanges;
-
-			applyPostChangesToCRDTDoc( doc, changes, defaultSyncedProperties );
-
-			expect( map.has( 'content' ) ).toBe( false );
-		} );
-
-		it( 'does not call content function when blocks is a function', () => {
-			const changes = {
-				blocks: () => [],
 				content: ( {
 					blocks: blocksForSerialization = [],
 				}: {
@@ -1028,6 +915,68 @@ describe( 'crdt', () => {
 
 				expect( changes.selection ).toBeUndefined();
 			} );
+		} );
+
+		it( 'injects a content function when blocks changed but content did not', () => {
+			addBlockToDoc( map, 'block-1', 'Hello world' );
+
+			const editedRecord = {
+				title: 'CRDT Title',
+				status: 'draft',
+				content: { raw: 'Same content', rendered: 'Same content' },
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			// Blocks changed, content didn't, so a lazy content function is injected.
+			expect( changes.blocks ).toBeDefined();
+			expect( typeof changes.content ).toBe( 'function' );
+		} );
+
+		it( 'does not inject a content function when content also changed', () => {
+			addBlockToDoc( map, 'block-1', 'Hello world' );
+			map.set( 'content', new Y.Text( 'New content' ) );
+
+			const editedRecord = {
+				title: 'CRDT Title',
+				status: 'draft',
+				content: { raw: 'Old content', rendered: 'Old content' },
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			// Content changed directly, so it should be a string, not a function.
+			expect( changes.blocks ).toBeDefined();
+			expect( typeof changes.content ).toBe( 'string' );
+		} );
+
+		it( 'does not inject a content function when blocks did not change', () => {
+			map.set( 'content', new Y.Text( 'Same content' ) );
+
+			const editedRecord = {
+				title: 'CRDT Title',
+				status: 'draft',
+				content: { raw: 'Same content', rendered: 'Same content' },
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			expect( changes.blocks ).toBeUndefined();
+			expect( changes.content ).toBeUndefined();
 		} );
 	} );
 } );
