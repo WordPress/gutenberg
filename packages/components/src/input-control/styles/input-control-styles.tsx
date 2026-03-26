@@ -285,7 +285,15 @@ export const Input = styled.input< InputProps >`
 		${ customPaddings }
 
 		&::-webkit-input-placeholder {
-			line-height: normal;
+			color: ${ COLORS.ui.darkGrayPlaceholder };
+		}
+
+		&::-moz-placeholder {
+			color: ${ COLORS.ui.darkGrayPlaceholder };
+		}
+
+		&:-ms-input-placeholder {
+			color: ${ COLORS.ui.darkGrayPlaceholder };
 		}
 
 		&[type='email'],
@@ -306,10 +314,6 @@ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 		padding-bottom: 0;
 		max-width: 100%;
 		z-index: 1;
-
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
 	}
 `;
 

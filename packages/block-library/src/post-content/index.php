@@ -46,43 +46,27 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 		$content .= wp_link_pages( array( 'echo' => 0 ) );
 	}
 
-	$ignored_hooked_blocks = get_post_meta( $post_id, '_wp_ignored_hooked_blocks', true );
-	if ( ! empty( $ignored_hooked_blocks ) ) {
-		$ignored_hooked_blocks  = json_decode( $ignored_hooked_blocks, true );
-		$attributes['metadata'] = array(
-			'ignoredHookedBlocks' => $ignored_hooked_blocks,
-		);
-	}
-
-	// Wrap in Post Content block so the Block Hooks algorithm can insert blocks
-	// that are hooked as first or last child of `core/post-content`.
-	$content = get_comment_delimited_block_content(
-		'core/post-content',
-		$attributes,
-		$content
-	);
-
-	// We need to remove the `core/post-content` block wrapper after the Block Hooks algorithm,
-	// but before `do_blocks` runs, as it would otherwise attempt to render the same block again --
-	// thus recursing infinitely.
-	add_filter( 'the_content', 'remove_serialized_parent_block', 8 );
-
 	/** This filter is documented in wp-includes/post-template.php */
 	$content = apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) );
 	unset( $seen_ids[ $post_id ] );
-
-	remove_filter( 'the_content', 'remove_serialized_parent_block', 8 );
 
 	if ( empty( $content ) ) {
 		return '';
 	}
 
+	$tag_name = 'div';
+
+	if ( ! empty( $attributes['tagName'] ) && tag_escape( $attributes['tagName'] ) === $attributes['tagName'] ) {
+		$tag_name = $attributes['tagName'];
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content' ) );
 
-	return (
-		'<div ' . $wrapper_attributes . '>' .
-			$content .
-		'</div>'
+	return sprintf(
+		'<%1$s %2$s>%3$s</%1$s>',
+		$tag_name,
+		$wrapper_attributes,
+		$content
 	);
 }
 

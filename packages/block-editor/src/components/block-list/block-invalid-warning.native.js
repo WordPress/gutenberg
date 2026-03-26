@@ -36,7 +36,7 @@ export default function BlockInvalidWarning( { clientId } ) {
 	const { block, blockTitle, icon } = useSelect( selector, [ clientId ] );
 
 	const accessibilityLabel = sprintf(
-		/* translators: accessibility text for blocks with invalid content. %d: localized block title */
+		/* translators: accessibility text for blocks with invalid content. %s: localized block title */
 		__( '%s block. This block has invalid content' ),
 		blockTitle
 	);

@@ -3,54 +3,63 @@
  */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import {
+	trash,
+	pages,
+	drafts,
+	published,
+	scheduled,
+	pending,
+	notAllowed,
+} from '@wordpress/icons';
+import { useViewConfig } from '@wordpress/views';
 
 /**
  * Internal dependencies
  */
-import { useDefaultViews } from './default-views';
 import { unlock } from '../../lock-unlock';
 import DataViewItem from './dataview-item';
-import CustomDataViewsList from './custom-dataviews-list';
 
 const { useLocation } = unlock( routerPrivateApis );
 
+const SLUG_TO_ICON = {
+	all: pages,
+	published,
+	future: scheduled,
+	drafts,
+	pending,
+	private: notAllowed,
+	trash,
+};
+
 export default function DataViewsSidebarContent( { postType } ) {
 	const {
-		query: { activeView = 'all', isCustom = 'false' },
+		query: { activeView = 'all' },
 	} = useLocation();
-	const defaultViews = useDefaultViews( { postType } );
+	const { default_view: defaultView, view_list: viewList } = useViewConfig( {
+		kind: 'postType',
+		name: postType,
+	} );
 	if ( ! postType ) {
 		return null;
 	}
-	const isCustomBoolean = isCustom === 'true';
 
 	return (
 		<>
 			<ItemGroup className="edit-site-sidebar-dataviews">
-				{ defaultViews.map( ( dataview ) => {
+				{ viewList?.map( ( view ) => {
 					return (
 						<DataViewItem
-							key={ dataview.slug }
-							slug={ dataview.slug }
-							title={ dataview.title }
-							icon={ dataview.icon }
-							type={ dataview.view.type }
-							isActive={
-								! isCustomBoolean &&
-								dataview.slug === activeView
-							}
-							isCustom={ false }
+							key={ view.slug }
+							slug={ view.slug }
+							title={ view.title }
+							icon={ SLUG_TO_ICON[ view.slug ] }
+							type={ view.view?.type ?? defaultView.type }
+							isActive={ view.slug === activeView }
 						/>
 					);
 				} ) }
 			</ItemGroup>
-			{ window?.__experimentalCustomViews && (
-				<CustomDataViewsList
-					activeView={ activeView }
-					type={ postType }
-					isCustom
-				/>
-			) }
 		</>
 	);
 }

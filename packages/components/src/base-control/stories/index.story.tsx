@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -14,7 +14,6 @@ const meta: Meta< typeof BaseControl > = {
 	id: 'components-basecontrol',
 	component: BaseControl,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'BaseControl.VisualLabel': BaseControl.VisualLabel,
 	},
 	argTypes: {
@@ -25,6 +24,11 @@ const meta: Meta< typeof BaseControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `Field` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -42,7 +46,6 @@ const BaseControlWithTextarea: StoryFn< typeof BaseControl > = ( props ) => {
 export const Default: StoryFn< typeof BaseControl > =
 	BaseControlWithTextarea.bind( {} );
 Default.args = {
-	__nextHasNoMarginBottom: true,
 	label: 'Label text',
 };
 
@@ -66,7 +69,9 @@ export const WithVisualLabel: StoryFn< typeof BaseControl > = ( props ) => {
 		<BaseControl { ...props }>
 			<BaseControl.VisualLabel>Visual label</BaseControl.VisualLabel>
 			<div>
-				<Button variant="secondary">Select an author</Button>
+				<Button __next40pxDefaultSize variant="secondary">
+					Select an author
+				</Button>
 			</div>
 		</BaseControl>
 	);

@@ -2,6 +2,66 @@
 
 ## Unreleased
 
+## 7.42.0 (2026-03-18)
+
+### New Features
+
+-   Hooks `useMediaQuery` and `useViewportMatch` accept a new optional `view` argument of type `Window`, which enables consumers to perform media queries in a window other than the global one (e.g. an iframe) ([#76446](https://github.com/WordPress/gutenberg/pull/76446)).
+
+## 7.41.0 (2026-03-04)
+
+## 7.40.0 (2026-02-18)
+
+## 7.39.0 (2026-01-29)
+
+## 7.38.0 (2026-01-16)
+
+## 7.36.0 (2025-11-26)
+
+### New Features
+
+-   `useFocusOnMount`: Now the hook supports `firstInputElement` option which when enabled focuses the first input element and not the first tabbable element (as happens on default mode) ([#72322](https://github.com/WordPress/gutenberg/pull/72322)).
+
+## 7.35.0 (2025-11-12)
+
+## 7.34.0 (2025-10-29)
+
+## 7.33.0 (2025-10-17)
+
+## 7.32.0 (2025-10-01)
+
+## 7.31.0 (2025-09-17)
+
+## 7.30.0 (2025-09-03)
+
+## 7.29.0 (2025-08-20)
+
+## 7.28.0 (2025-08-07)
+
+## 7.27.0 (2025-07-23)
+
+## 7.26.0 (2025-06-25)
+
+## 7.25.0 (2025-06-04)
+
+## 7.24.0 (2025-05-22)
+
+## 7.23.0 (2025-05-07)
+
+## 7.22.0 (2025-04-11)
+
+## 7.21.0 (2025-03-27)
+
+## 7.20.0 (2025-03-13)
+
+## 7.19.0 (2025-02-28)
+
+## 7.18.0 (2025-02-12)
+
+## 7.17.0 (2025-01-29)
+
+## 7.16.0 (2025-01-15)
+
 ## 7.15.0 (2025-01-02)
 
 ## 7.14.0 (2024-12-11)

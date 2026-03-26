@@ -28,13 +28,7 @@ const hoverOutside = async () => {
 };
 
 const ToggleGroupControl = ( props: ToggleGroupControlProps ) => {
-	return (
-		<_ToggleGroupControl
-			{ ...props }
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
-		/>
-	);
+	return <_ToggleGroupControl { ...props } __next40pxDefaultSize />;
 };
 
 const ControlledToggleGroupControl = ( {

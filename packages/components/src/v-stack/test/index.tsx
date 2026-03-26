@@ -41,7 +41,7 @@ describe( 'props', () => {
 	} );
 
 	test( 'should not pass through invalid props to the `as` component', () => {
-		const AsComponent = ( props: JSX.IntrinsicElements[ 'div' ] ) => {
+		const AsComponent = ( props: React.JSX.IntrinsicElements[ 'div' ] ) => {
 			return <div { ...props } />;
 		};
 

@@ -118,11 +118,9 @@ const EmbedEdit = ( props ) => {
 			responsive
 		);
 
-	const toggleResponsive = () => {
-		const { allowResponsive, className } = attributes;
+	function toggleResponsive( newAllowResponsive ) {
+		const { className } = attributes;
 		const { html } = preview;
-		const newAllowResponsive = ! allowResponsive;
-
 		setAttributes( {
 			allowResponsive: newAllowResponsive,
 			className: getClassNames(
@@ -131,7 +129,7 @@ const EmbedEdit = ( props ) => {
 				responsive && newAllowResponsive
 			),
 		} );
-	};
+	}
 
 	useEffect( () => {
 		if ( preview?.html || ! cannotEmbed || ! hasResolved ) {
@@ -172,7 +170,13 @@ const EmbedEdit = ( props ) => {
 			// When obtaining an incoming preview,
 			// we set the attributes derived from the preview data.
 			const mergedAttributes = getMergedAttributes();
-			setAttributes( mergedAttributes );
+			const hasChanges = Object.keys( mergedAttributes ).some(
+				( key ) => mergedAttributes[ key ] !== attributes[ key ]
+			);
+
+			if ( hasChanges ) {
+				setAttributes( mergedAttributes );
+			}
 
 			if ( onReplace ) {
 				const upgradedBlock = createUpgradedEmbedBlock(

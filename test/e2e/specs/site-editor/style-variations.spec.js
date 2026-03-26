@@ -45,9 +45,7 @@ test.describe( 'Global styles variations', () => {
 		// TODO: instead of locating these elements by class,
 		//  we could update the source code to group them in a <section> or other container,
 		//  then add `aria-labelledby` and `aria-describedby` etc to provide accessible information,
-		const variations = page.locator(
-			'.edit-site-global-styles-variations_item'
-		);
+		const variations = page.locator( '.global-styles-ui-variations_item' );
 
 		await expect( variations ).toHaveCount( 3 );
 
@@ -97,8 +95,8 @@ test.describe( 'Global styles variations', () => {
 		await page.click( 'role=button[name="Text"i]' );
 
 		await expect(
-			page.locator( 'css=.components-font-size-picker__header__hint' )
-		).toHaveText( 'Medium' );
+			page.locator( 'role=radio[name="Medium"i]' )
+		).toHaveAttribute( 'aria-checked', 'true' );
 	} );
 
 	test( 'should apply custom colors and font sizes in a variation', async ( {
@@ -132,14 +130,8 @@ test.describe( 'Global styles variations', () => {
 		await page.click( 'role=button[name="Typography"i]' );
 		await page.click( 'role=button[name="Text"i]' );
 
-		// TODO: to avoid use classnames to locate these elements,
-		//  we could provide accessible attributes to the source code in packages/components/src/font-size-picker/index.js.
 		await expect(
-			page.locator( 'css=.components-font-size-picker__header__hint' )
-		).toHaveText( 'Custom' );
-
-		await expect(
-			page.locator( 'role=spinbutton[name="Custom"i]' )
+			page.locator( 'role=spinbutton[name="Font size"i]' )
 		).toHaveValue( '15' );
 	} );
 
@@ -160,15 +152,15 @@ test.describe( 'Global styles variations', () => {
 		await page.click( 'role=button[name="Edit palette"i]' );
 
 		await expect(
-			page.locator( 'role=option[name="Color: Foreground"i]' )
+			page.locator( 'role=option[name="Foreground"i]' )
 		).toHaveCSS( 'background-color', 'rgb(74, 7, 74)' );
 
 		await expect(
-			page.locator( 'role=option[name="Color: Background"i]' )
+			page.locator( 'role=option[name="Background"i]' )
 		).toHaveCSS( 'background-color', 'rgb(202, 105, 211)' );
 
 		await expect(
-			page.locator( 'role=option[name="Color: Awesome pink"i]' )
+			page.locator( 'role=option[name="Awesome pink"i]' )
 		).toHaveCSS( 'background-color', 'rgba(204, 0, 255, 0.77)' );
 	} );
 

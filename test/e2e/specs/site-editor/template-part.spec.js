@@ -348,6 +348,7 @@ test.describe( 'Template Part', () => {
 
 		// Go to Block Inspector -> Advanced.
 		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'tab', { name: 'Settings' } ).click();
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
 
 		// Verify that the widget area import button is not there.
@@ -375,7 +376,7 @@ test.describe( 'Template Part', () => {
 		await editor.selectBlocks( siteTitle );
 
 		// Remove the default site title block.
-		await pageUtils.pressKeys( 'shift+Backspace' );
+		await pageUtils.pressKeys( 'access+z' );
 
 		// Insert a group block with a Site Title block inside.
 		await editor.insertBlock( {
@@ -409,6 +410,6 @@ test.describe( 'Template Part', () => {
 		// Undo the change.
 		await pageUtils.pressKeys( 'primary+z' );
 
-		await expect( paragraph ).toBeFocused();
+		await expect( siteTitleInGroup ).toHaveClass( /is-selected/ );
 	} );
 } );

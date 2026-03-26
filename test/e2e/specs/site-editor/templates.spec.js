@@ -14,7 +14,7 @@ test.describe( 'Templates', () => {
 		const templateName = 'demo';
 		await admin.visitSiteEditor();
 		await page.getByRole( 'button', { name: 'Templates' } ).click();
-		await page.getByRole( 'button', { name: 'Add New Template' } ).click();
+		await page.getByRole( 'button', { name: 'Add template' } ).click();
 		await page
 			.getByRole( 'button', {
 				name: 'A custom template can be manually applied to any post or page.',

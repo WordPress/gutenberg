@@ -51,7 +51,7 @@ describe( 'Editor History', () => {
 		const screen = await initializeEditor();
 
 		// Act
-		await addBlock( screen, 'Verse' );
+		await addBlock( screen, 'Poetry' );
 		await addBlock( screen, 'Image' );
 		await addBlock( screen, 'Paragraph' );
 

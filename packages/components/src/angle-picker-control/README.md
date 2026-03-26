@@ -19,7 +19,7 @@ function Example() {
     <AnglePickerControl
       value={ angle }
       onChange={ setAngle }
-    </>
+    />
   );
 }
 ```

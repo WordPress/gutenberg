@@ -39,12 +39,16 @@ test.describe( 'Search', () => {
 			},
 		} );
 
-		const navBlockInserter = editor.canvas.getByRole( 'button', {
-			name: 'Add block',
-		} );
+		const navBlockInserter = editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.getByRole( 'button', { name: 'Add page' } );
 		await navBlockInserter.click();
 
-		await page.getByRole( 'button', { name: 'Add block' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Add block' } )
+			.filter( { hasText: 'Add block' } )
+			.first()
+			.click();
 
 		// Click on the Search block option.
 		await page.getByRole( 'option', { name: 'Search' } ).click();

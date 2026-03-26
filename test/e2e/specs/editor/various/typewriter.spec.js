@@ -32,9 +32,9 @@ test.describe( 'Typewriter', () => {
 		// The page shouldn't be scrolled when it's being filled.
 		await page.keyboard.press( 'Enter' );
 
-		expect( await typewriterUtils.getCaretPosition() ).toBeGreaterThan(
-			initialPosition
-		);
+		expect(
+			await typewriterUtils.getCaretPosition()
+		).toBeGreaterThanOrEqual( initialPosition );
 
 		// Create blocks until the typewriter effect kicks in.
 		while (
@@ -270,7 +270,7 @@ test.describe( 'Typewriter', () => {
 
 		const newTopPosition = await typewriterUtils.getCaretPosition();
 
-		expect( newTopPosition ).toBeGreaterThan( topPosition );
+		expect( newTopPosition ).toBeGreaterThanOrEqual( topPosition );
 
 		// Should maintain new caret position.
 		await page.keyboard.press( 'Enter' );

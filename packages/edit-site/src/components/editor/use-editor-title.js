@@ -19,8 +19,11 @@ const { getTemplateInfo } = unlock( editorPrivateApis );
 function useEditorTitle( postType, postId ) {
 	const { title, isLoaded } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } =
-				select( coreStore );
+			const {
+				getEditedEntityRecord,
+				getCurrentTheme,
+				hasFinishedResolution,
+			} = select( coreStore );
 
 			if ( ! postId ) {
 				return { isLoaded: false };
@@ -33,10 +36,7 @@ function useEditorTitle( postType, postId ) {
 			);
 
 			const { default_template_types: templateTypes = [] } =
-				select( coreStore ).getEntityRecord(
-					'root',
-					'__unstableBase'
-				) ?? {};
+				getCurrentTheme() ?? {};
 
 			const templateInfo = getTemplateInfo( {
 				template: _record,

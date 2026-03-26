@@ -1,0 +1,9 @@
+{
+	"wpds-cursor": {
+		"$type": "string",
+		"control": {
+			"$value": "default",
+			"$description": "Cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles)."
+		}
+	}
+}

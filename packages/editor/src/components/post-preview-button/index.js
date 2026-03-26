@@ -129,13 +129,17 @@ export default function PostPreviewButton( {
 			const postType = core.getPostType(
 				editor.getCurrentPostType( 'type' )
 			);
+			const canView = postType?.viewable ?? false;
+			if ( ! canView ) {
+				return { isViewable: canView };
+			}
 
 			return {
 				postId: editor.getCurrentPostId(),
 				currentPostLink: editor.getCurrentPostAttribute( 'link' ),
 				previewLink: editor.getEditedPostPreviewLink(),
 				isSaveable: editor.isEditedPostSaveable(),
-				isViewable: postType?.viewable ?? false,
+				isViewable: canView,
 			};
 		}, [] );
 

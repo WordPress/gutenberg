@@ -21,11 +21,9 @@ const { useLocation } = unlock( routerPrivateApis );
 export default function DataViewItem( {
 	title,
 	slug,
-	customViewId,
 	type,
 	icon,
 	isActive,
-	isCustom,
 	suffix,
 } ) {
 	const { path } = useLocation();
@@ -33,15 +31,9 @@ export default function DataViewItem( {
 	const iconToUse =
 		icon || VIEW_LAYOUTS.find( ( v ) => v.type === type ).icon;
 
-	let activeView = isCustom ? customViewId : slug;
-	if ( activeView === 'all' ) {
-		activeView = undefined;
+	if ( slug === 'all' ) {
+		slug = undefined;
 	}
-	const query = {
-		layout: type,
-		activeView,
-		isCustom: isCustom ? 'true' : undefined,
-	};
 	return (
 		<HStack
 			justify="flex-start"
@@ -51,7 +43,9 @@ export default function DataViewItem( {
 		>
 			<SidebarNavigationItem
 				icon={ iconToUse }
-				to={ addQueryArgs( path, query ) }
+				to={ addQueryArgs( path, {
+					activeView: slug,
+				} ) }
 				aria-current={ isActive ? 'true' : undefined }
 			>
 				{ title }

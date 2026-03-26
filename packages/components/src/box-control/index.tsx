@@ -4,6 +4,7 @@
 import { useInstanceId } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -166,6 +167,14 @@ function BoxControl( {
 	} );
 	const sidesToRender = getAllowedSides( sides );
 
+	if ( ( presets && ! presetKey ) || ( ! presets && presetKey ) ) {
+		const definedProp = presets ? 'presets' : 'presetKey';
+		const missingProp = presets ? 'presetKey' : 'presets';
+		warning(
+			`wp.components.BoxControl: the '${ missingProp }' prop is required when the '${ definedProp }' prop is defined.`
+		);
+	}
+
 	return (
 		<Grid
 			id={ id }
@@ -179,6 +188,8 @@ function BoxControl( {
 			</BaseControl.VisualLabel>
 			{ isLinked && (
 				<InputWrapper>
+					{ /* Disable reason: the parent component is handling the __next40pxDefaultSize prop */ }
+					{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
 					<InputControl side="all" { ...inputControlProps } />
 				</InputWrapper>
 			) }
@@ -194,6 +205,8 @@ function BoxControl( {
 			{ ! isLinked &&
 				splitOnAxis &&
 				[ 'vertical', 'horizontal' ].map( ( axis ) => (
+					// Disable reason: the parent component is handling the __next40pxDefaultSize prop
+					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
 					<InputControl
 						key={ axis }
 						side={ axis as 'horizontal' | 'vertical' }
@@ -203,6 +216,8 @@ function BoxControl( {
 			{ ! isLinked &&
 				! splitOnAxis &&
 				Array.from( sidesToRender ).map( ( axis ) => (
+					// Disable reason: the parent component is handling the __next40pxDefaultSize prop
+					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
 					<InputControl
 						key={ axis }
 						side={ axis }

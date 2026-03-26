@@ -47,6 +47,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
+	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 		const isResetting = items.every(
@@ -93,7 +94,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 										getMessage: ( item ) => {
 											return isResetting
 												? sprintf(
-														/* translators: The template/part's name. */
+														/* translators: %s: The template/part's name. */
 														__( '"%s" reset.' ),
 														decodeEntities(
 															getItemTitle( item )

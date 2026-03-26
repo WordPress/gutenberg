@@ -32,6 +32,9 @@ import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 import slackParagraphCorrector from './slack-paragraph-corrector';
+import isLatexMathMode from './latex-to-math';
+import { createBlock } from '../factory';
+import headingTransformer from './heading-transformer';
 
 const log = ( ...args ) => window?.console?.log?.( ...args );
 
@@ -82,6 +85,10 @@ export function pasteHandler( {
 	mode = 'AUTO',
 	tagName,
 } ) {
+	// Allows us to ask for this information when we get a report.
+	log( 'Received HTML (pasteHandler):\n\n', HTML );
+	log( 'Received plain text (pasteHandler):\n\n', plainText );
+
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/g, '' );
 	// Strip Windows markers.
@@ -127,6 +134,10 @@ export function pasteHandler( {
 	// * There is a plain text version.
 	// * There is no HTML version, or it has no formatting.
 	const isPlainText = plainText && ( ! HTML || isPlain( HTML ) );
+
+	if ( isPlainText && isLatexMathMode( plainText ) ) {
+		return [ createBlock( 'core/math', { latex: plainText } ) ];
+	}
 
 	// Parse Markdown (and encoded HTML) if it's considered plain text.
 	if ( isPlainText ) {
@@ -198,6 +209,7 @@ export function pasteHandler( {
 				figureContentReducer,
 				blockquoteNormaliser(),
 				divNormaliser,
+				headingTransformer,
 			];
 
 			const schema = {

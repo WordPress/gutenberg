@@ -13,10 +13,10 @@ import { GLOBAL_POST_TYPES } from '../../store/constants';
 /**
  * Wrapper component that renders its children only if the post can be trashed.
  *
- * @param {Object}             props          The component props.
- * @param {React.ReactElement} props.children The child components.
+ * @param {Object}          props          The component props.
+ * @param {React.ReactNode} props.children The child components.
  *
- * @return {React.ReactElement | null} The rendered child components or null if the post can't be trashed.
+ * @return {React.ReactNode} The rendered child components or null if the post can't be trashed.
  */
 export default function PostTrashCheck( { children } ) {
 	const { canTrashPost } = useSelect( ( select ) => {

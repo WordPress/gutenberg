@@ -18,10 +18,16 @@
 			"default": "none"
 		}
 	},
+	"example": {
+		"attributes": {
+			"paginationArrow": "none"
+		}
+	},
 	"providesContext": {
 		"comments/paginationArrow": "paginationArrow"
 	},
 	"supports": {
+		"anchor": true,
 		"align": true,
 		"reusable": false,
 		"html": false,

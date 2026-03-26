@@ -69,9 +69,16 @@ async function getCurrentThemeGlobalStylesPostId( this: RequestUtils ) {
 		const globalStylesURL =
 			currentTheme?._links?.[ 'wp:user-global-styles' ]?.[ 0 ]?.href;
 		if ( globalStylesURL ) {
-			themeGlobalStylesId = globalStylesURL?.split(
-				'rest_route=/wp/v2/global-styles/'
-			)[ 1 ];
+			// Extract the ID from the URL. The URL format depends on
+			// the permalink structure:
+			// - Plain: ?rest_route=/wp/v2/global-styles/123
+			// - Pretty: /wp-json/wp/v2/global-styles/123
+			const idMatch = globalStylesURL.match(
+				/\/wp\/v2\/global-styles\/(\d+)/
+			);
+			if ( idMatch ) {
+				themeGlobalStylesId = idMatch[ 1 ];
+			}
 		}
 	}
 	return themeGlobalStylesId;

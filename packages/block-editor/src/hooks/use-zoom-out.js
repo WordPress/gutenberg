@@ -2,14 +2,13 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef, useContext } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
-import BlockContext from '../components/block-context';
 
 /**
  * A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
@@ -20,7 +19,6 @@ import BlockContext from '../components/block-context';
  * @param {boolean} enabled If we should enter into zoomOut mode or not
  */
 export function useZoomOut( enabled = true ) {
-	const { postId } = useContext( BlockContext );
 	const { setZoomLevel, resetZoomLevel } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -39,7 +37,6 @@ export function useZoomOut( enabled = true ) {
 
 	const controlZoomLevelRef = useRef( false );
 	const isEnabledRef = useRef( enabled );
-	const postIdRef = useRef( postId );
 
 	/**
 	 * This hook tracks if the zoom state was changed manually by the user via clicking
@@ -58,11 +55,6 @@ export function useZoomOut( enabled = true ) {
 	useEffect( () => {
 		isEnabledRef.current = enabled;
 
-		// If the user created a new post/page, we should take control of the zoom level.
-		if ( postIdRef.current !== postId ) {
-			controlZoomLevelRef.current = true;
-		}
-
 		if ( enabled !== isZoomOut() ) {
 			controlZoomLevelRef.current = true;
 
@@ -79,5 +71,5 @@ export function useZoomOut( enabled = true ) {
 				resetZoomLevel();
 			}
 		};
-	}, [ enabled, isZoomOut, postId, resetZoomLevel, setZoomLevel ] );
+	}, [ enabled, isZoomOut, resetZoomLevel, setZoomLevel ] );
 }

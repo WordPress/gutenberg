@@ -54,15 +54,17 @@ function InserterMenu(
 	},
 	ref
 ) {
-	const isZoomOutMode = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).isZoomOut(),
-		[]
-	);
-	const hasSectionRootClientId = useSelect(
-		( select ) =>
-			!! unlock( select( blockEditorStore ) ).getSectionRootClientId(),
-		[]
-	);
+	const { isZoomOutMode, hasSectionRootClientId } = useSelect( ( select ) => {
+		const { isZoomOut, getSectionRootClientId } = unlock(
+			select( blockEditorStore )
+		);
+
+		return {
+			isZoomOutMode: isZoomOut(),
+			hasSectionRootClientId: !! getSectionRootClientId(),
+		};
+	}, [] );
+
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
 		useDebouncedInput( __experimentalFilterValue );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
@@ -73,6 +75,8 @@ function InserterMenu(
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
 	const isLargeViewport = useViewportMatch( 'large' );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const maybeCloseInserter = isMobileViewport ? onClose : NOOP;
 
 	function getInitialTab() {
 		if ( __experimentalInitialTab ) {
@@ -112,6 +116,7 @@ function InserterMenu(
 				_rootClientId
 			);
 			onSelect( blocks );
+			maybeCloseInserter();
 
 			// Check for focus loss due to filtering blocks by selected block type
 			window.requestAnimationFrame( () => {
@@ -126,7 +131,7 @@ function InserterMenu(
 				}
 			} );
 		},
-		[ onInsertBlocks, onSelect, shouldFocusBlock ]
+		[ onInsertBlocks, maybeCloseInserter, onSelect, ref, shouldFocusBlock ]
 	);
 
 	const onInsertPattern = useCallback(
@@ -134,8 +139,9 @@ function InserterMenu(
 			onToggleInsertionPoint( false );
 			onInsertBlocks( blocks, { patternName }, ...args );
 			onSelect();
+			maybeCloseInserter();
 		},
-		[ onInsertBlocks, onSelect ]
+		[ onInsertBlocks, maybeCloseInserter, onSelect, onToggleInsertionPoint ]
 	);
 
 	const onHover = useCallback(
@@ -170,7 +176,6 @@ function InserterMenu(
 		return (
 			<>
 				<SearchControl
-					__nextHasNoMarginBottom
 					className="block-editor-inserter__search"
 					onChange={ ( value ) => {
 						if ( hoveredItem ) {

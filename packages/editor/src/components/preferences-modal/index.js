@@ -18,7 +18,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import EnablePanelOption from './enable-panel';
 import EnablePluginDocumentSettingPanelOption from './enable-plugin-document-setting-panel';
 import EnablePublishSidebarOption from './enable-publish-sidebar';
-import BlockVisibility from './block-visibility';
+import BlockVisibility from '../block-visibility';
 import PostTaxonomies from '../post-taxonomies';
 import PostFeaturedImageCheck from '../post-featured-image/check';
 import PostExcerptCheck from '../post-excerpt/check';
@@ -88,7 +88,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									scope="core"
 									featureName="showListViewByDefault"
 									help={ __(
-										'Opens the List View sidebar by default.'
+										'Opens the List View panel by default.'
 									) }
 									label={ __( 'Always open List View' ) }
 								/>
@@ -116,9 +116,27 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									scope="core"
 									featureName="enableChoosePatternModal"
 									help={ __(
-										'Shows starter patterns when creating a new page.'
+										'Pick from starter content when creating a new page.'
 									) }
 									label={ __( 'Show starter patterns' ) }
+								/>
+								<PreferenceToggleControl
+									scope="core"
+									featureName="showCollaborationCursor"
+									help={ __(
+										'Show your own avatar inside blocks during collaborative editing sessions.'
+									) }
+									label={ __( 'Show avatar in blocks' ) }
+								/>
+								<PreferenceToggleControl
+									scope="core"
+									featureName="showCollaborationNotifications"
+									help={ __(
+										'Show notifications when collaborators join, leave, or save the post.'
+									) }
+									label={ __(
+										'Show collaboration notifications'
+									) }
 								/>
 							</PreferencesModalSection>
 							<PreferencesModalSection
@@ -250,7 +268,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									scope="core"
 									featureName="keepCaretInsideBlock"
 									help={ __(
-										'Keeps the text cursor within the block boundaries, aiding users with screen readers by preventing unintentional cursor movement outside the block.'
+										'Keeps the text cursor within blocks while navigating with arrow keys, preventing it from moving to other blocks and enhancing accessibility for keyboard users.'
 									) }
 									label={ __(
 										'Contain text cursor inside block'
@@ -298,7 +316,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 						</>
 					),
 				},
-				window.__experimentalMediaProcessing && {
+				window.__clientSideMediaProcessing && {
 					name: 'media',
 					tabLabel: __( 'Media' ),
 					content: (

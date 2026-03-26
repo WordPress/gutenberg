@@ -50,7 +50,6 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 	}
 
 	// Convert Post Comment blocks in existing content to Comment blocks.
-	// TODO: Remove these checks when WordPress 6.0 is released.
 	if ( name === 'core/post-comment-author' ) {
 		name = 'core/comment-author-name';
 	}
@@ -115,53 +114,5 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 		};
 	}
 
-	// The following code is only relevant for the Gutenberg plugin.
-	// It's a stand-alone if statement for dead-code elimination.
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		// Convert pattern overrides added during experimental phase.
-		// Only four blocks were supported initially.
-		// These checks can be removed in WordPress 6.6.
-		if (
-			newAttributes.metadata?.bindings &&
-			( name === 'core/paragraph' ||
-				name === 'core/heading' ||
-				name === 'core/image' ||
-				name === 'core/button' ) &&
-			newAttributes.metadata.bindings.__default?.source !==
-				'core/pattern-overrides'
-		) {
-			const bindings = [
-				'content',
-				'url',
-				'title',
-				'id',
-				'alt',
-				'text',
-				'linkTarget',
-			];
-			// Delete any existing individual bindings and add a default binding.
-			// It was only possible to add all the default attributes through the UI,
-			// So as soon as we find an attribute, we can assume all default attributes are overridable.
-			let hasPatternOverrides = false;
-			bindings.forEach( ( binding ) => {
-				if (
-					newAttributes.metadata.bindings[ binding ]?.source ===
-					'core/pattern-overrides'
-				) {
-					hasPatternOverrides = true;
-					newAttributes.metadata = {
-						...newAttributes.metadata,
-						bindings: { ...newAttributes.metadata.bindings },
-					};
-					delete newAttributes.metadata.bindings[ binding ];
-				}
-			} );
-			if ( hasPatternOverrides ) {
-				newAttributes.metadata.bindings.__default = {
-					source: 'core/pattern-overrides',
-				};
-			}
-		}
-	}
 	return [ name, newAttributes ];
 }
