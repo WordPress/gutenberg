@@ -20,7 +20,7 @@ describe( 'ValidatedRadioControl', () => {
 		);
 
 		expect(
-			screen.getByRole( 'group', { name: 'Size' } )
+			screen.getByRole( 'radiogroup', { name: 'Size' } )
 		).toHaveAccessibleDescription( 'Choose a size.' );
 	} );
 
@@ -53,7 +53,7 @@ describe( 'ValidatedRadioControl', () => {
 		} );
 
 		expect(
-			screen.getByRole( 'group', { name: /^Size/ } )
+			screen.getByRole( 'radiogroup', { name: /^Size/ } )
 		).toHaveAccessibleDescription(
 			expect.stringContaining( 'Choose a size.' )
 		);
