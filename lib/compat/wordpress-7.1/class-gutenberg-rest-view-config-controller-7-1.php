@@ -863,30 +863,16 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		);
 
 		// Gather categories from the block pattern categories registry.
-		$categories = array();
-		$seen_names = array();
 		$registry   = WP_Block_Pattern_Categories_Registry::get_instance();
-		$registered = $registry->get_all_registered();
+		$categories = array();
 
-		foreach ( $registered as $category ) {
-			if ( ! isset( $seen_names[ $category['name'] ] ) ) {
-				$categories[]                    = array(
-					'name'  => $category['name'],
-					'label' => $category['label'],
-				);
-				$seen_names[ $category['name'] ] = true;
-			}
+		foreach ( $registry->get_all_registered() as $category ) {
+			$categories[ $category['name'] ] = $category['label'];
 		}
 
 		// Ensure "Uncategorized" is always included for patterns
 		// that have no category assigned.
-		if ( ! isset( $seen_names['uncategorized'] ) ) {
-			$categories[]                = array(
-				'name'  => 'uncategorized',
-				'label' => __( 'Uncategorized', 'gutenberg' ),
-			);
-			$seen_names['uncategorized'] = true;
-		}
+		$categories['uncategorized'] ??= __( 'Uncategorized', 'gutenberg' );
 
 		// Also gather user-created pattern categories (wp_pattern_category taxonomy).
 		$user_terms = get_terms(
@@ -898,28 +884,17 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 
 		if ( ! is_wp_error( $user_terms ) ) {
 			foreach ( $user_terms as $term ) {
-				if ( ! isset( $seen_names[ $term->slug ] ) ) {
-					$categories[]              = array(
-						'name'  => $term->slug,
-						'label' => $term->name,
-					);
-					$seen_names[ $term->slug ] = true;
-				}
+				$categories[ $term->slug ] = $term->name;
 			}
 		}
 
 		// Sort categories alphabetically by label.
-		usort(
-			$categories,
-			function ( $a, $b ) {
-				return strnatcasecmp( $a['label'], $b['label'] );
-			}
-		);
+		asort( $categories, SORT_NATURAL | SORT_FLAG_CASE );
 
-		foreach ( $categories as $category ) {
+		foreach ( $categories as $name => $label ) {
 			$view_list[] = array(
-				'title' => $category['label'],
-				'slug'  => $category['name'],
+				'title' => $label,
+				'slug'  => $name,
 			);
 		}
 
