@@ -423,10 +423,18 @@ describe( 'crdt', () => {
 						.join( '' ),
 			} as unknown as PostChanges;
 
-			applyPostChangesToCRDTDoc( doc, changes, defaultSyncedProperties );
+			const deferredOps = applyPostChangesToCRDTDoc(
+				doc,
+				changes,
+				defaultSyncedProperties
+			);
 
-			// Content function processing is deferred via setTimeout.
-			jest.runAllTimers();
+			// Content is not set yet; it's returned as a deferred op.
+			expect( map.has( 'content' ) ).toBe( false );
+			expect( deferredOps ).toHaveLength( 1 );
+
+			// Execute the deferred op.
+			deferredOps!.forEach( ( op ) => op( doc ) );
 
 			const content = map.get( 'content' );
 			expect( content ).toBeInstanceOf( Y.Text );
@@ -456,10 +464,15 @@ describe( 'crdt', () => {
 						.join( '' ),
 			} as unknown as PostChanges;
 
-			applyPostChangesToCRDTDoc( doc, changes, defaultSyncedProperties );
+			const deferredOps = applyPostChangesToCRDTDoc(
+				doc,
+				changes,
+				defaultSyncedProperties
+			);
 
-			// Content function processing is deferred via setTimeout.
-			jest.runAllTimers();
+			// Execute the deferred op.
+			expect( deferredOps ).toHaveLength( 1 );
+			deferredOps!.forEach( ( op ) => op( doc ) );
 
 			// Should update in place, not replace the Y.Text instance.
 			expect( map.get( 'content' ) ).toBe( contentRef );

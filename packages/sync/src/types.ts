@@ -130,11 +130,19 @@ export interface RecordHandlers {
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 }
 
+/**
+ * A callback to be executed after the main applyChangesToCRDTDoc transaction,
+ * in a separate transaction with a non-undo-tracked origin. This allows
+ * derived changes (e.g. content computed from blocks) to be synced to peers
+ * without creating extra undo levels.
+ */
+export type DeferredCRDTOp = ( ydoc: Y.Doc ) => void;
+
 export interface SyncConfig {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
 		changes: Partial< ObjectData >
-	) => void;
+	) => void | DeferredCRDTOp[];
 	createAwareness?: (
 		ydoc: Y.Doc,
 		objectId?: ObjectID

@@ -10,6 +10,7 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import {
 	type CRDTDoc,
+	type DeferredCRDTOp,
 	type ObjectData,
 	type SyncConfig,
 	Y,
@@ -132,7 +133,7 @@ export function applyPostChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: PostChanges,
 	syncedProperties: Set< string >
-): void {
+): void | DeferredCRDTOp[] {
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
 	Object.keys( changes ).forEach( ( key ) => {
@@ -253,24 +254,29 @@ export function applyPostChangesToCRDTDoc(
 	} );
 
 	// Process content changes when it's passed as a function, using the changed blocks.
+	// Return this as a deferred op so the sync manager can execute it in a
+	// separate transaction with a non-undo-tracked origin. This avoids creating
+	// an extra undo level for a derived value (content computed from blocks).
+	let deferredOps: DeferredCRDTOp[] | undefined;
+
 	if (
 		isContentFromBlocksFn( changes.content ) &&
 		changes.blocks &&
 		'function' !== typeof changes.blocks
 	) {
 		const contentValue = changes.content( { blocks: changes.blocks } );
-
 		const currentValue = ymap.get( 'content' );
 
-		// Do it in a timeout to ensure that a new undo level is not created for this change.
-		setTimeout( () => {
-			if ( currentValue instanceof Y.Text ) {
-				mergeRichTextUpdate( currentValue, contentValue );
-			} else {
-				const newYText = new Y.Text( contentValue ?? '' );
-				ymap.set( 'content', newYText );
-			}
-		}, 0 );
+		deferredOps = [
+			() => {
+				if ( currentValue instanceof Y.Text ) {
+					mergeRichTextUpdate( currentValue, contentValue );
+				} else {
+					const newYText = new Y.Text( contentValue ?? '' );
+					ymap.set( 'content', newYText );
+				}
+			},
+		];
 	}
 
 	// Process changes that we don't want to persist to the CRDT document.
@@ -285,6 +291,8 @@ export function applyPostChangesToCRDTDoc(
 			updateSelectionHistory( ydoc, selection );
 		}, 0 );
 	}
+
+	return deferredOps;
 }
 
 function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
