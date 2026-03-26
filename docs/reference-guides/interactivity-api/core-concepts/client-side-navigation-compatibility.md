@@ -55,7 +55,7 @@ Setting `supports.interactivity` to `true` is a shorthand equivalent to setting 
 
 <div class="callout callout-info">
 
-Even if a block appears to work fine with client-side navigation, the compatibility must always be explicitly declared in `block.json`. The Interactivity API checks this property for every block on the page to decide whether client-side navigation can be used.
+Even if a block appears to work fine with client-side navigation, the compatibility must always be explicitly declared in `block.json`. Right now, this property is the only way WordPress — other blocks, plugins, and themes — can determine whether your block is compatible with client-side navigation and, if it is not, disable it. For example, the `core/query` block checks this property on all its descendant blocks and falls back to full-page reloads when any of them are incompatible. In the future, this check may be automatically incorporated into the Interactivity API itself.
 
 </div>
 
