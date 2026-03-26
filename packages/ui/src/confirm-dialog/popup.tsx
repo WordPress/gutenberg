@@ -42,12 +42,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 						}
 						onClick={ onConfirm }
 						loading={ loading }
-						// `disabled` must be set explicitly alongside `loading`
-						// because Dialog.Action wraps Base UI's Dialog.Close,
-						// which defaults `disabled` to `false` internally —
-						// overriding the `aria-disabled` that Button would
-						// normally derive from the `loading` prop.
-						disabled={ loading || undefined }
 					>
 						{ confirmButtonText }
 					</Dialog.Action>
