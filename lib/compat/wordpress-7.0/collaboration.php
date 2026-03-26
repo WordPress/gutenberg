@@ -103,7 +103,7 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 	 * Registers the real-time collaboration setting.
 	 */
 	function gutenberg_register_real_time_collaboration_setting() {
-		$option_name = 'wp_enable_real_time_collaboration';
+		$option_name = 'wp_collaboration_enabled';
 
 		register_setting(
 			'writing',
@@ -124,8 +124,8 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 				$option_value = get_option( $option_name );
 
 				?>
-				<label for="wp_enable_real_time_collaboration">
-					<input name="wp_enable_real_time_collaboration" type="checkbox" id="wp_enable_real_time_collaboration" value="1" <?php checked( '1', $option_value ); ?>/>
+				<label for="wp_collaboration_enabled">
+					<input name="wp_collaboration_enabled" type="checkbox" id="wp_collaboration_enabled" value="1" <?php checked( '1', $option_value ); ?>/>
 					<?php _e( 'Enable real-time collaboration', 'gutenberg' ); ?>
 				</label>
 				<?php
@@ -142,7 +142,7 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 function gutenberg_inject_real_time_collaboration_setting() {
 	global $pagenow;
 
-	if ( ! get_option( 'wp_enable_real_time_collaboration' ) ) {
+	if ( ! get_option( 'wp_collaboration_enabled' ) ) {
 		return;
 	}
 
@@ -162,7 +162,15 @@ function gutenberg_inject_real_time_collaboration_setting() {
 	);
 }
 add_action( 'admin_init', 'gutenberg_inject_real_time_collaboration_setting' );
-add_filter( 'default_option_wp_enable_real_time_collaboration', '__return_true' );
+
+/**
+ * Core adds an option with the default value, so we need to set the option to
+ * our intended default when the Gutenberg plugin is activated.
+ */
+function gutenberg_set_collaboration_option_on_activation() {
+	update_option( 'wp_collaboration_enabled', '1' );
+}
+add_action( 'activate_gutenberg/gutenberg.php', 'gutenberg_set_collaboration_option_on_activation' );
 
 /**
  * Modifies the post list UI and heartbeat responses for real-time collaboration.
@@ -175,7 +183,7 @@ add_filter( 'default_option_wp_enable_real_time_collaboration', '__return_true' 
 function gutenberg_post_list_collaboration_ui() {
 	global $pagenow;
 
-	if ( ! get_option( 'wp_enable_real_time_collaboration' ) ) {
+	if ( ! get_option( 'wp_collaboration_enabled' ) ) {
 		return;
 	}
 

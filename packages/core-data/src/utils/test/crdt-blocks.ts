@@ -67,6 +67,7 @@ import {
 	type YBlocks,
 	type YBlockAttributes,
 } from '../crdt-blocks';
+import { getCachedRichTextData, createRichTextDataCache } from '../crdt-text';
 
 describe( 'crdt-blocks', () => {
 	let doc: Y.Doc;
@@ -1579,5 +1580,57 @@ describe( 'crdt-blocks', () => {
 				expect( yText.toString() ).toBe( 'a𝄞xb' );
 			} );
 		} );
+	} );
+} );
+
+describe( 'getCachedRichTextData', () => {
+	let spy: ReturnType< typeof jest.spyOn >;
+
+	beforeEach( () => {
+		spy = jest.spyOn( RichTextData, 'fromHTMLString' );
+	} );
+
+	afterEach( () => {
+		spy.mockRestore();
+	} );
+
+	it( 'does not call fromHTMLString again for the same HTML string', () => {
+		getCachedRichTextData( '<strong>cached-hit</strong>' );
+		getCachedRichTextData( '<strong>cached-hit</strong>' );
+
+		expect( spy ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'calls fromHTMLString for each unique HTML string', () => {
+		getCachedRichTextData( '<strong>cached-miss-a</strong>' );
+		getCachedRichTextData( '<em>cached-miss-b</em>' );
+
+		expect( spy ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'calls fromHTMLString again for an evicted entry', () => {
+		const cacheSize = 10;
+		const getCachedValue = createRichTextDataCache( cacheSize );
+
+		const firstString = 'eviction-test-first';
+
+		getCachedValue( firstString );
+
+		for ( let i = 1; i < cacheSize; i++ ) {
+			getCachedValue( `eviction-test-${ i }` );
+		}
+
+		// This should push firstString out of the cache.
+		getCachedValue( 'eviction-test-overflow' );
+
+		spy.mockClear();
+
+		// firstString was evicted, so fromHTMLString should be called again.
+		getCachedValue( firstString );
+		expect( spy ).toHaveBeenCalledTimes( 1 );
+
+		// The overflow entry is still cached, so fromHTMLString should not be called.
+		getCachedValue( 'eviction-test-overflow' );
+		expect( spy ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
