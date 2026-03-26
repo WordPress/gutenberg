@@ -324,22 +324,31 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 
 	$title = _draft_or_post_title( $post->ID );
 
-	$link_text  = '<span class="edit-action-text">';
-	$link_text .= '<span aria-hidden="true">' . __( 'Edit' ) . '</span>';
-	/* translators: %s: Post title. */
-	$link_text .= '<span class="screen-reader-text">' . sprintf( __( 'Edit &#8220;%s&#8221;' ), $title ) . '</span>';
-	$link_text .= '</span>';
-	$link_text .= '<span class="join-action-text">';
-	/* translators: Action link text for a singular post in the post list. Can be any type of post. */
-	$link_text .= '<span aria-hidden="true">' . _x( 'Join', 'post list', 'gutenberg' ) . '</span>';
-	/* translators: %s: Post title. */
-	$link_text .= '<span class="screen-reader-text">' . sprintf( __( 'Join editing &#8220;%s&#8221;', 'gutenberg' ), $title ) . '</span>';
-	$link_text .= '</span>';
-
+	/*
+	 * Both "Edit" and "Join" labels are rendered. The visible label is
+	 * toggled by CSS based on the row's `wp-collaborative-editing` class,
+	 * which is added or removed by inline-edit-post.js in response to
+	 * heartbeat ticks.
+	 */
 	$actions['edit'] = sprintf(
-		'<a href="%s">%s</a>',
+		'<a href="%1$s">'
+		. '<span class="edit-action-text">'
+		. '<span aria-hidden="true">%2$s</span>'
+		. '<span class="screen-reader-text">%3$s</span>'
+		. '</span>'
+		. '<span class="join-action-text">'
+		. '<span aria-hidden="true">%4$s</span>'
+		. '<span class="screen-reader-text">%5$s</span>'
+		. '</span>'
+		. '</a>',
 		get_edit_post_link( $post->ID ),
-		$link_text
+		__( 'Edit' ),
+		/* translators: %s: Post title. */
+		sprintf( __( 'Edit &#8220;%s&#8221;' ), $title ),
+		/* translators: Action link text for a singular post in the post list. Can be any type of post. */
+		_x( 'Join', 'post list', 'gutenberg' ),
+		/* translators: %s: Post title. */
+		sprintf( __( 'Join editing &#8220;%s&#8221;', 'gutenberg' ), $title )
 	);
 
 	return $actions;
