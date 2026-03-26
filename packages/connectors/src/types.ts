@@ -17,6 +17,7 @@ export type ConnectorAuthentication =
 
 export interface ConnectorPlugin {
 	slug: string;
+	pluginFile?: string | null;
 	isInstalled: boolean;
 	isActivated: boolean;
 }

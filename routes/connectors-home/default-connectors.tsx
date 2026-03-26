@@ -131,6 +131,7 @@ function ApiKeyConnector( {
 		removeApiKey,
 	} = useConnectorPlugin( {
 		pluginSlug,
+		pluginFile: plugin?.pluginFile,
 		settingName,
 		connectorName: name,
 		isInstalled: plugin?.isInstalled,

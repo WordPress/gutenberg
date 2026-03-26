@@ -500,6 +500,7 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 
 			$connector_out['plugin'] = array(
 				'slug'        => $plugin_slug,
+				'pluginFile'  => $is_installed ? str_replace( '.php', '', $plugin_file ) : null,
 				'isInstalled' => $is_installed,
 				'isActivated' => $is_activated,
 			);
