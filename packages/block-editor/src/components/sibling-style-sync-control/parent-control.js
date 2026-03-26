@@ -48,7 +48,7 @@ export function SiblingStyleSyncParentControl( {
 
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Style syncing' ) } initialOpen>
+			<PanelBody title={ __( 'Copy styles' ) } initialOpen>
 				{ syncedChildTypes.map( ( childType ) => {
 					const isEnabled =
 						syncChildStyles[ childType.name ] !== false;
@@ -60,7 +60,7 @@ export function SiblingStyleSyncParentControl( {
 							__nextHasNoMarginBottom
 							label={ sprintf(
 								/* translators: %s: block type name e.g. "Accordion Heading" */
-								__( 'Sync %s styles' ),
+								__( 'Copy styles to all %s blocks' ),
 								blockTitle
 							) }
 							help={
@@ -68,14 +68,14 @@ export function SiblingStyleSyncParentControl( {
 									? sprintf(
 											/* translators: %s: block type name */
 											__(
-												'Style changes apply to all %s blocks in this group.'
+												'Style changes will be copied to all %s blocks in this group.'
 											),
 											blockTitle
 									  )
 									: sprintf(
 											/* translators: %s: block type name */
 											__(
-												'Each %s block can be styled independently.'
+												'Each %s block will have its own styles.'
 											),
 											blockTitle
 									  )

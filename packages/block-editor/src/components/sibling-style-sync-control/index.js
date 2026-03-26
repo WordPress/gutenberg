@@ -92,14 +92,14 @@ export function SiblingStyleSyncControl( { clientId, name } ) {
 							)
 						}
 					>
-						{ __( 'Re-sync styles' ) }
+						{ __( 'Re-copy styles' ) }
 					</Button>
 				</Notice>
 			) : (
 				<Notice status="info" isDismissible={ false }>
 					{ sprintf(
 						/* translators: %s: description of sibling blocks e.g. "3 other Accordion Heading blocks" */
-						__( 'Styles synced with %s.' ),
+						__( 'Styles copied to %s.' ),
 						label
 					) }{ ' ' }
 					<Button
