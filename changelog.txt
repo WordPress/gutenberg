@@ -1,5 +1,48 @@
 == Changelog ==
 
+= 22.8.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Collaboration
+- RTC: Fix editor freeze when replacing code editor content. ([76815](https://github.com/WordPress/gutenberg/pull/76815))
+- RTC: Remove stale wp_enable_real_time_collaboration option check. ([76810](https://github.com/WordPress/gutenberg/pull/76810))
+- RTC: Fix RichTextData deserialization ([76607](https://github.com/WordPress/gutenberg/pull/76607))
+- RTC: Change RTC option name ([76643](https://github.com/WordPress/gutenberg/pull/76643))
+- RTC: Backport race condition fix ([76649](https://github.com/WordPress/gutenberg/pull/76649))
+- RTC: Use activation hook to enable RTC by default ([76736](https://github.com/WordPress/gutenberg/pull/76736))
+- RTC: Remove stale wp_enable_real_time_collaboration option check ([76810](https://github.com/WordPress/gutenberg/pull/76810))
+- Preferences: Hide collaboration options when RTC is not enabled. ([76819](https://github.com/WordPress/gutenberg/pull/76819))
+
+#### Post Editor
+
+
+### Enhancements
+
+#### Collaboration
+ - Real Time Collaboration: Introduce filters for the polling intervals. ([76518](https://github.com/WordPress/gutenberg/pull/76518))
+ - RTC: Scroll to collaborator on click ([76561](https://github.com/WordPress/gutenberg/pull/76561))
+ - RTC: Increase polling intervals, increase polling on primary room only ([76704](https://github.com/WordPress/gutenberg/pull/76704))
+ - RTC: Use prepared queries instead of *_post_meta functions ([76779](https://github.com/WordPress/gutenberg/pull/76779))
+
+### Tests
+
+#### Collaboration
+ - RTC: Add E2E "stress test" with complex interactions ([76055](https://github.com/WordPress/gutenberg/pull/76055))
+ - Fix navigation block rendering unit test ([76685](https://github.com/WordPress/gutenberg/pull/76685))
+ - Fix navigation block unit test and e2e test ([76692](https://github.com/WordPress/gutenberg/pull/76692))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@alecgeatches @shekharnwagh @t-hamano @peterwilsoncc @maxschmeling @chriszarate 
+
+
 = 22.8.0 =
 
 ## Changelog
