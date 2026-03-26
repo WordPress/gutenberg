@@ -32,6 +32,22 @@ jobs:
                   script: |
                       const prNumber = context.payload.pull_request.number;
 
+                      // Files to ignore — these always overlap and conflicts are trivial.
+                      const IGNORED_PATTERNS = [
+                        'package-lock.json',
+                        'composer.lock',
+                        '**/CHANGELOG.md',
+                      ];
+
+                      function isIgnored( filename ) {
+                        return IGNORED_PATTERNS.some( ( pattern ) => {
+                          if ( pattern.startsWith( '**/' ) ) {
+                            return filename.endsWith( pattern.slice( 2 ) );
+                          }
+                          return filename === pattern;
+                        } );
+                      }
+
                       // Parse hunk headers from a patch string.
                       // Returns an array of { start, end } line ranges (base side).
                       function parseHunks( patch ) {
@@ -75,7 +91,9 @@ jobs:
                         }
                       ) ) {
                         for ( const file of response.data ) {
-                          changedFiles.set( file.filename, parseHunks( file.patch ) );
+                          if ( ! isIgnored( file.filename ) ) {
+                            changedFiles.set( file.filename, parseHunks( file.patch ) );
+                          }
                         }
                       }
 
