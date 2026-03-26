@@ -11,6 +11,7 @@ import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
  * Internal dependencies
  */
 import initBlock from '../utils/init-block';
+import { FieldLinkPreview } from './shared/use-link-preview';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
@@ -121,7 +122,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'link',
 			label: __( 'Link' ),
 			type: 'url',
-			Edit: 'link',
+			Edit: { control: 'link', Preview: FieldLinkPreview },
 			getValue: ( { item } ) => ( {
 				url: item.url,
 				id: item.id,

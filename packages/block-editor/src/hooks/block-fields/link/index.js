@@ -44,44 +44,64 @@ function normalizeType( type ) {
 	return type.replace( '-', '_' );
 }
 
-export default function Link( { data, field, onChange } ) {
-	const value = field.getValue( { item: data } );
+/**
+ * Default preview component used when no Preview is provided via config.
+ * Returns a basic preview with just the URL as the title.
+ *
+ * @param {Object}   props          Component props.
+ * @param {Object}   props.value    The link field value.
+ * @param {Function} props.children Render prop receiving the preview object.
+ * @return {Object} Rendered children with preview data.
+ */
+function DefaultFieldLinkPreview( { value, children } ) {
 	const url = value?.url;
-
-	const preview = {
+	return children( {
 		title: url || __( 'Add link' ),
 		url: url || '',
-	};
+	} );
+}
+
+export default function Link( { data, field, onChange, config } ) {
+	const value = field.getValue( { item: data } );
+	const PreviewProvider = config?.Preview || DefaultFieldLinkPreview;
 
 	return (
-		<LinkPicker
-			preview={ preview }
-			onSelect={ ( suggestion ) => {
-				if ( ! suggestion ) {
-					return;
-				}
+		<PreviewProvider value={ value }>
+			{ ( preview ) => (
+				<LinkPicker
+					preview={ preview }
+					onSelect={ ( suggestion ) => {
+						if ( ! suggestion ) {
+							return;
+						}
 
-				const isEntityLink =
-					!! suggestion.id && suggestion.kind !== 'custom';
+						const isEntityLink =
+							!! suggestion.id && suggestion.kind !== 'custom';
 
-				onChange(
-					field.setValue( {
-						item: data,
-						value: {
-							url: suggestion.url,
-							id: isEntityLink ? suggestion.id : undefined,
-							kind: isEntityLink ? suggestion.kind : 'custom',
-							type: isEntityLink
-								? normalizeType( suggestion.type )
-								: 'custom',
-							binding: isEntityLink
-								? getBinding( suggestion.kind )
-								: undefined,
-						},
-					} )
-				);
-			} }
-			label={ field.label }
-		/>
+						onChange(
+							field.setValue( {
+								item: data,
+								value: {
+									url: suggestion.url,
+									id: isEntityLink
+										? suggestion.id
+										: undefined,
+									kind: isEntityLink
+										? suggestion.kind
+										: 'custom',
+									type: isEntityLink
+										? normalizeType( suggestion.type )
+										: 'custom',
+									binding: isEntityLink
+										? getBinding( suggestion.kind )
+										: undefined,
+								},
+							} )
+						);
+					} }
+					label={ field.label }
+				/>
+			) }
+		</PreviewProvider>
 	);
 }
