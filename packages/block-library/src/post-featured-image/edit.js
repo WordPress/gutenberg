@@ -245,7 +245,10 @@ export default function PostFeaturedImageEdit( {
 					media={ media }
 				/>
 			</InspectorControls>
-			{ ( featuredImage || isDescendentOfQueryLoop || ! postId || ! storedFeaturedImage ) && (
+			{ ( featuredImage || 
+                isDescendentOfQueryLoop || 
+                ! postId || 
+                ! storedFeaturedImage ) && (
 				<InspectorControls>
 					<ToolsPanel
 						label={ __( 'Settings' ) }
