@@ -7,7 +7,7 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { createCssString } from './index';
+import { createCssString } from './create-css-string';
 import type { FontFileMetadata, FontFamilyToUpload } from '../types';
 
 const { kebabCase } = unlock( componentsPrivateApis );
