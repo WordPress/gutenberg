@@ -258,6 +258,7 @@ export default function PostFeaturedImageEdit( {
 								linkTarget: '_self',
 								rel: '',
 								sizeSlug: DEFAULT_MEDIA_SIZE_SLUG,
+								useFirstImageFromPost: false,
 							} );
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
