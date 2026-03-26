@@ -134,15 +134,15 @@ const SidebarContent = ( {
 							{ isRevisionsMode && <RevisionFieldsDiffPanel /> }
 							{ ! isRevisionsMode && (
 								<>
-									{ window?.__experimentalDataFormInspector &&
-										[ 'post', 'page' ].includes(
-											postType
-										) && <PostRevisionsPanel /> }
 									<PluginDocumentSettingPanel.Slot />
 									<TemplateContentPanel />
 									{ window?.__experimentalDataFormInspector && (
 										<TemplateActionsPanel />
 									) }
+									{ window?.__experimentalDataFormInspector &&
+										[ 'post', 'page' ].includes(
+											postType
+										) && <PostRevisionsPanel /> }
 									<TemplatePartContentPanel />
 									<PostTransformPanel />
 									<PostTaxonomiesPanel />

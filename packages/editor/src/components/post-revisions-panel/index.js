@@ -10,14 +10,10 @@ import {
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { DataViews } from '@wordpress/dataviews';
-import {
-	humanTimeDiff,
-	dateI18n,
-	getSettings as getDateSettings,
-} from '@wordpress/date';
+import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { authorField } from '@wordpress/fields';
 
 /**
  * Internal dependencies
@@ -27,6 +23,8 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { Badge } = unlock( componentsPrivateApis );
+const DAY_IN_MILLISECONDS = 86400000;
+const EMPTY_ARRAY = [];
 
 const REVISIONS_QUERY = {
 	per_page: 3,
@@ -39,12 +37,7 @@ const defaultLayouts = { activity: {} };
 const view = {
 	type: 'activity',
 	titleField: 'date',
-	descriptionField: 'authorName',
-	groupBy: {
-		field: 'day',
-		direction: 'desc',
-		showLabel: false,
-	},
+	fields: [ 'author' ],
 	layout: {
 		density: 'compact',
 	},
@@ -53,98 +46,68 @@ const fields = [
 	{
 		id: 'date',
 		label: __( 'Date' ),
-		render: ( { item } ) => humanTimeDiff( item.date ),
+		render: ( { item } ) => {
+			const dateNowInMs = getDate( null ).getTime();
+			const date = getDate( item.date ?? null );
+			const displayDate =
+				dateNowInMs - date.getTime() > DAY_IN_MILLISECONDS
+					? dateI18n(
+							getSettings().formats.datetimeAbbreviated,
+							date
+					  )
+					: humanTimeDiff( date );
+			return (
+				<time
+					className="editor-post-revisions-panel__revision-date"
+					dateTime={ item.date }
+				>
+					{ displayDate }
+				</time>
+			);
+		},
 		enableSorting: false,
 		enableHiding: false,
 	},
-	{
-		id: 'authorName',
-		label: __( 'Author' ),
-		enableSorting: false,
-		enableHiding: false,
-	},
-	{
-		id: 'day',
-		label: __( 'Day' ),
-		getValue: ( { item } ) => dateI18n( 'Y-m-d', item.date ),
-		render: ( { item } ) =>
-			dateI18n( getDateSettings().formats.date, item.date ),
-		enableSorting: false,
-		enableHiding: false,
-	},
+	authorField,
 ];
 const noop = () => {};
 const paginationInfo = {};
 
 function PostRevisionsPanelContent() {
 	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
-	const { revisionsCount, revisions, isLoading, authors, lastRevisionId } =
-		useSelect( ( select ) => {
+	const { revisionsCount, revisions, isLoading, lastRevisionId } = useSelect(
+		( select ) => {
 			const { getCurrentPostId, getCurrentPostType } =
 				select( editorStore );
 			const {
 				getCurrentPostRevisionsCount,
 				getCurrentPostLastRevisionId,
 			} = select( editorStore );
-			const { getRevisions, isResolving, getUsers } = select( coreStore );
-			const _postId = getCurrentPostId();
-			const _postType = getCurrentPostType();
-			const _revisions =
-				_postId && _postType
-					? getRevisions(
-							'postType',
-							_postType,
-							_postId,
-							REVISIONS_QUERY
-					  )
-					: null;
-			// Collect unique author IDs from revisions.
-			const authorIds = _revisions
-				? [ ...new Set( _revisions.map( ( r ) => r.author ) ) ]
-				: [];
-			const _authors =
-				authorIds.length > 0
-					? getUsers( {
-							include: authorIds,
-							per_page: authorIds.length,
-							context: 'view',
-					  } )
-					: null;
+			const { getRevisions, isResolving } = select( coreStore );
+			const query = [
+				'postType',
+				getCurrentPostType(),
+				getCurrentPostId(),
+				REVISIONS_QUERY,
+			];
+			const _revisions = getRevisions( ...query );
 			return {
 				revisionsCount: getCurrentPostRevisionsCount(),
 				lastRevisionId: getCurrentPostLastRevisionId(),
 				revisions: _revisions,
-				isLoading: isResolving( 'getRevisions', [
-					'postType',
-					_postType,
-					_postId,
-					REVISIONS_QUERY,
-				] ),
-				authors: _authors,
+				isLoading: isResolving( 'getRevisions', query ),
 			};
-		}, [] );
-	const data = useMemo( () => {
-		if ( ! revisions ) {
-			return [];
-		}
-		const authorsMap = Object.fromEntries(
-			authors?.map( ( a ) => [ a.id, a ] ) ?? []
-		);
-		return revisions.map( ( revision ) => ( {
-			id: String( revision.id ),
-			revisionId: revision.id,
-			authorName: authorsMap[ revision.author ]?.name,
-			date: revision.date,
-			content: revision.content,
-			modified: revision.modified,
-		} ) );
-	}, [ revisions, authors ] );
+		},
+		[]
+	);
 	return (
 		<PanelBody
 			title={
 				<HStack justify="space-between" align="center" as="span">
 					<span>{ __( 'Revisions' ) }</span>
-					<Badge>{ revisionsCount }</Badge>
+					<Badge className="editor-post-revisions-panel__revisions-count">
+						{ revisionsCount }
+					</Badge>
 				</HStack>
 			}
 			initialOpen={ false }
@@ -154,14 +117,14 @@ function PostRevisionsPanelContent() {
 					view={ view }
 					onChangeView={ noop }
 					fields={ fields }
-					data={ data }
+					data={ revisions || EMPTY_ARRAY }
 					isLoading={ isLoading }
 					paginationInfo={ paginationInfo }
 					defaultLayouts={ defaultLayouts }
 					getItemId={ ( item ) => item.id }
 					isItemClickable={ () => true }
 					onClickItem={ ( item ) => {
-						setCurrentRevisionId( item.revisionId );
+						setCurrentRevisionId( item.id );
 					} }
 				>
 					<DataViews.Layout />
