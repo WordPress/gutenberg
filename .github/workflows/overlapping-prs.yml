@@ -24,7 +24,7 @@ jobs:
             contents: read
         timeout-minutes: 10
         steps:
-            - name: Find PRs touching the same files
+            - name: Find PRs touching the same lines
               uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
               with:
                   retries: 2
@@ -32,8 +32,39 @@ jobs:
                   script: |
                       const prNumber = context.payload.pull_request.number;
 
-                      // Get files changed in this PR.
-                      const changedFiles = [];
+                      // Parse hunk headers from a patch string.
+                      // Returns an array of { start, end } line ranges (base side).
+                      function parseHunks( patch ) {
+                        if ( ! patch ) {
+                          return [];
+                        }
+                        const hunks = [];
+                        const regex = /^@@ -(\d+)(?:,(\d+))? /gm;
+                        let match;
+                        while ( ( match = regex.exec( patch ) ) !== null ) {
+                          const start = parseInt( match[ 1 ], 10 );
+                          const count = match[ 2 ] !== undefined ? parseInt( match[ 2 ], 10 ) : 1;
+                          if ( count > 0 ) {
+                            hunks.push( { start, end: start + count - 1 } );
+                          }
+                        }
+                        return hunks;
+                      }
+
+                      // Check if two sets of line ranges overlap.
+                      function rangesOverlap( rangesA, rangesB ) {
+                        for ( const a of rangesA ) {
+                          for ( const b of rangesB ) {
+                            if ( a.start <= b.end && b.start <= a.end ) {
+                              return true;
+                            }
+                          }
+                        }
+                        return false;
+                      }
+
+                      // Get files changed in this PR with their patches.
+                      const changedFiles = new Map();
                       for await ( const response of github.paginate.iterator(
                         github.rest.pulls.listFiles,
                         {
@@ -44,16 +75,16 @@ jobs:
                         }
                       ) ) {
                         for ( const file of response.data ) {
-                          changedFiles.push( file.filename );
+                          changedFiles.set( file.filename, parseHunks( file.patch ) );
                         }
                       }
 
-                      if ( changedFiles.length === 0 ) {
+                      if ( changedFiles.size === 0 ) {
                         core.info( 'No changed files found.' );
                         return;
                       }
 
-                      core.info( `This PR touches ${ changedFiles.length } file(s).` );
+                      core.info( `This PR touches ${ changedFiles.size } file(s).` );
 
                       // Get all open PRs (including drafts).
                       const openPRs = [];
@@ -75,8 +106,7 @@ jobs:
 
                       core.info( `Found ${ openPRs.length } other open PR(s) to check.` );
 
-                      // For each open PR, get its changed files and find overlaps.
-                      const changedFilesSet = new Set( changedFiles );
+                      // For each open PR, get its changed files and check for line overlaps.
                       const overlapping = [];
 
                       for ( const pr of openPRs ) {
@@ -91,19 +121,31 @@ jobs:
                           }
                         ) ) {
                           for ( const file of response.data ) {
-                            prFiles.push( file.filename );
+                            prFiles.push( file );
                           }
                         }
 
-                        const shared = prFiles.filter( ( f ) => changedFilesSet.has( f ) );
-                        if ( shared.length > 0 ) {
+                        const filesWithOverlap = [];
+                        for ( const file of prFiles ) {
+                          const ourHunks = changedFiles.get( file.filename );
+                          if ( ! ourHunks ) {
+                            continue;
+                          }
+                          const theirHunks = parseHunks( file.patch );
+                          // If either side has no hunks (e.g. binary file), fall back to file-level match.
+                          if ( ourHunks.length === 0 || theirHunks.length === 0 || rangesOverlap( ourHunks, theirHunks ) ) {
+                            filesWithOverlap.push( file.filename );
+                          }
+                        }
+
+                        if ( filesWithOverlap.length > 0 ) {
                           overlapping.push( {
                             number: pr.number,
                             title: pr.title,
                             url: pr.html_url,
                             draft: pr.draft,
                             author: pr.user.login,
-                            sharedFiles: shared,
+                            sharedFiles: filesWithOverlap,
                           } );
                         }
                       }
@@ -138,13 +180,13 @@ jobs:
 
                       body = `${ marker }\n`;
                       body += `## Overlapping PRs\n\n`;
-                      body += `The following open PRs touch some of the same files as this PR:\n\n`;
+                      body += `The following open PRs modify the same lines of code as this PR:\n\n`;
 
                       for ( const pr of overlapping ) {
                         const draftLabel = pr.draft ? ' (draft)' : '';
                         body += `### #${ pr.number }${ draftLabel } — ${ pr.title }\n`;
                         body += `by @${ pr.author }\n\n`;
-                        body += `<details>\n<summary>Shared files (${ pr.sharedFiles.length })</summary>\n\n`;
+                        body += `<details>\n<summary>Overlapping files (${ pr.sharedFiles.length })</summary>\n\n`;
                         for ( const file of pr.sharedFiles ) {
                           body += `- \`${ file }\`\n`;
                         }
