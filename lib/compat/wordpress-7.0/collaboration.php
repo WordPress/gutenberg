@@ -266,16 +266,17 @@ function gutenberg_post_list_collaboration_styles() {
 		}
 		/*
 		 * Toggle "Edit" / "Join" action link text based on lock state.
-		 * The heartbeat adds/removes .wp-collaborative-editing on the row,
-		 * so CSS handles the swap without needing JS to rewrite link text.
+		 * The heartbeat adds/removes .wp-locked on locked rows. This
+		 * CSS only runs when RTC is enabled, so .wp-locked here always
+		 * means collaborative editing, not exclusive locking.
 		 */
 		.join-action-text {
 			display: none;
 		}
-		.wp-collaborative-editing .edit-action-text {
+		.wp-locked .edit-action-text {
 			display: none;
 		}
-		.wp-collaborative-editing .join-action-text {
+		.wp-locked .join-action-text {
 			display: inline;
 		}
 	</style>
