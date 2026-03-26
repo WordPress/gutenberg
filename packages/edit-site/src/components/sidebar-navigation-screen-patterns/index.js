@@ -5,10 +5,13 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 } from '@wordpress/components';
+import { useEntityRecords } from '@wordpress/core-data';
 import { getTemplatePartIcon } from '@wordpress/editor';
+import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { file } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useViewConfig } from '@wordpress/views';
 
 /**
  * Internal dependencies
@@ -20,78 +23,127 @@ import {
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_PART_ALL_AREAS_CATEGORY,
+	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 } from '../../utils/constants';
-import usePatternCategories from './use-pattern-categories';
-import useTemplatePartAreas from './use-template-part-areas';
+import useThemePatterns from './use-theme-patterns';
+import usePatterns from '../page-patterns/use-patterns';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
 
+function useTemplatePartCounts() {
+	const { records: templateParts, isResolving: isLoading } = useEntityRecords(
+		'postType',
+		TEMPLATE_PART_POST_TYPE,
+		{
+			per_page: -1,
+		}
+	);
+
+	const counts = useMemo( () => {
+		if ( ! templateParts ) {
+			return {};
+		}
+		const result = { [ TEMPLATE_PART_ALL_AREAS_CATEGORY ]: 0 };
+		templateParts.forEach( ( part ) => {
+			const area = part.area || TEMPLATE_PART_AREA_DEFAULT_CATEGORY;
+			result[ area ] = ( result[ area ] || 0 ) + 1;
+			result[ TEMPLATE_PART_ALL_AREAS_CATEGORY ] += 1;
+		} );
+		return result;
+	}, [ templateParts ] );
+
+	return { counts, isLoading };
+}
+
+function usePatternCounts() {
+	const themePatterns = useThemePatterns();
+	const { patterns: userPatterns, categories: userPatternCategories } =
+		usePatterns( PATTERN_TYPES.user );
+
+	const counts = useMemo( () => {
+		const result = {
+			[ PATTERN_DEFAULT_CATEGORY ]:
+				themePatterns.length + userPatterns.length,
+			'my-patterns': userPatterns.length,
+		};
+
+		// Count theme patterns per category.
+		themePatterns.forEach( ( pattern ) => {
+			pattern.categories?.forEach( ( cat ) => {
+				result[ cat ] = ( result[ cat ] || 0 ) + 1;
+			} );
+			if ( ! pattern.categories?.length ) {
+				result.uncategorized = ( result.uncategorized || 0 ) + 1;
+			}
+		} );
+
+		// Count user patterns per category.
+		userPatterns.forEach( ( pattern ) => {
+			pattern.wp_pattern_category?.forEach( ( catId ) => {
+				const category = userPatternCategories.find(
+					( cat ) => cat.id === catId
+				);
+				if ( category ) {
+					result[ category.name ] =
+						( result[ category.name ] || 0 ) + 1;
+				}
+			} );
+			if (
+				! pattern.wp_pattern_category?.length ||
+				! pattern.wp_pattern_category?.some( ( catId ) =>
+					userPatternCategories.find( ( cat ) => cat.id === catId )
+				)
+			) {
+				result.uncategorized = ( result.uncategorized || 0 ) + 1;
+			}
+		} );
+
+		return result;
+	}, [ themePatterns, userPatterns, userPatternCategories ] );
+
+	return counts;
+}
+
 function CategoriesGroup( {
-	templatePartAreas,
-	patternCategories,
+	templatePartViews,
+	patternViews,
+	templatePartCounts,
+	patternCounts,
 	currentCategory,
 	currentType,
 } ) {
-	const [ allPatterns, ...otherPatterns ] = patternCategories;
-
 	return (
 		<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-			<CategoryItem
-				key="all"
-				count={ Object.values( templatePartAreas )
-					.map( ( { templateParts } ) => templateParts?.length || 0 )
-					.reduce( ( acc, val ) => acc + val, 0 ) }
-				icon={ getTemplatePartIcon() } /* no name, so it provides the fallback icon */
-				label={ __( 'All template parts' ) }
-				id={ TEMPLATE_PART_ALL_AREAS_CATEGORY }
-				type={ TEMPLATE_PART_POST_TYPE }
-				isActive={
-					currentCategory === TEMPLATE_PART_ALL_AREAS_CATEGORY &&
-					currentType === TEMPLATE_PART_POST_TYPE
-				}
-			/>
-			{ Object.entries( templatePartAreas ).map(
-				( [ area, { label, templateParts, icon } ] ) => (
-					<CategoryItem
-						key={ area }
-						count={ templateParts?.length }
-						icon={ getTemplatePartIcon( icon ) }
-						label={ label }
-						id={ area }
-						type={ TEMPLATE_PART_POST_TYPE }
-						isActive={
-							currentCategory === area &&
-							currentType === TEMPLATE_PART_POST_TYPE
-						}
-					/>
-				)
-			) }
-			<div className="edit-site-sidebar-navigation-screen-patterns__divider" />
-			{ allPatterns && (
+			{ templatePartViews?.map( ( view ) => (
 				<CategoryItem
-					key={ allPatterns.name }
-					count={ allPatterns.count }
-					label={ allPatterns.label }
-					icon={ file }
-					id={ allPatterns.name }
-					type={ PATTERN_TYPES.user }
+					key={ view.slug }
+					count={ templatePartCounts[ view.slug ] }
+					icon={ getTemplatePartIcon(
+						view.slug === TEMPLATE_PART_ALL_AREAS_CATEGORY
+							? undefined
+							: view.slug
+					) }
+					label={ view.title }
+					id={ view.slug }
+					type={ TEMPLATE_PART_POST_TYPE }
 					isActive={
-						currentCategory === `${ allPatterns.name }` &&
-						currentType === PATTERN_TYPES.user
+						currentCategory === view.slug &&
+						currentType === TEMPLATE_PART_POST_TYPE
 					}
 				/>
-			) }
-			{ otherPatterns.map( ( category ) => (
+			) ) }
+			<div className="edit-site-sidebar-navigation-screen-patterns__divider" />
+			{ patternViews?.map( ( view ) => (
 				<CategoryItem
-					key={ category.name }
-					count={ category.count }
-					label={ category.label }
+					key={ view.slug }
+					count={ patternCounts[ view.slug ] }
+					label={ view.title }
 					icon={ file }
-					id={ category.name }
+					id={ view.slug }
 					type={ PATTERN_TYPES.user }
 					isActive={
-						currentCategory === `${ category.name }` &&
+						currentCategory === `${ view.slug }` &&
 						currentType === PATTERN_TYPES.user
 					}
 				/>
@@ -110,9 +162,21 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 			? PATTERN_DEFAULT_CATEGORY
 			: TEMPLATE_PART_ALL_AREAS_CATEGORY );
 
-	const { templatePartAreas, hasTemplateParts, isLoading } =
-		useTemplatePartAreas();
-	const { patternCategories, hasPatterns } = usePatternCategories();
+	const { view_list: templatePartViews } = useViewConfig( {
+		kind: 'postType',
+		name: TEMPLATE_PART_POST_TYPE,
+	} );
+	const { view_list: patternViews } = useViewConfig( {
+		kind: 'postType',
+		name: PATTERN_TYPES.user,
+	} );
+
+	const { counts: templatePartCounts, isLoading } = useTemplatePartCounts();
+	const patternCounts = usePatternCounts();
+
+	const hasTemplateParts =
+		templatePartCounts[ TEMPLATE_PART_ALL_AREAS_CATEGORY ] > 0;
+	const hasPatterns = patternCounts[ PATTERN_DEFAULT_CATEGORY ] > 0;
 
 	return (
 		<SidebarNavigationScreen
@@ -133,8 +197,10 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 								</ItemGroup>
 							) }
 							<CategoriesGroup
-								templatePartAreas={ templatePartAreas }
-								patternCategories={ patternCategories }
+								templatePartViews={ templatePartViews }
+								patternViews={ patternViews }
+								templatePartCounts={ templatePartCounts }
+								patternCounts={ patternCounts }
 								currentCategory={ currentCategory }
 								currentType={ postType }
 							/>
