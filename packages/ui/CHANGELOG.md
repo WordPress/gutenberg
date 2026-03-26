@@ -15,6 +15,10 @@
 
 -   `Tabs`: Add development-mode validation for Tab/Panel count matching ([#75170](https://github.com/WordPress/gutenberg/pull/75170)).
 
+### TypeScript
+
+-   Remove `NoticeIntent` type from package exports ([#76791](https://github.com/WordPress/gutenberg/pull/76791)).
+
 ## 0.9.0 (2026-03-18)
 
 ### New Features

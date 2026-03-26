@@ -35,11 +35,23 @@ function RevisionsSlider() {
 			}
 
 			const entityConfig = getEntityConfig( 'postType', postType );
+			const _revisionKey = entityConfig?.revisionKey || 'id';
 			const query = {
 				per_page: -1,
 				context: 'edit',
-				_fields:
-					'id,date,author,meta,title.raw,excerpt.raw,content.raw',
+				_fields: [
+					...new Set( [
+						'id',
+						'date',
+						'modified',
+						'author',
+						'meta',
+						'title.raw',
+						'excerpt.raw',
+						'content.raw',
+						_revisionKey,
+					] ),
+				].join(),
 			};
 			return {
 				revisions: getRevisions( 'postType', postType, postId, query ),
@@ -52,7 +64,7 @@ function RevisionsSlider() {
 				currentRevisionId: unlock(
 					select( editorStore )
 				).getCurrentRevisionId(),
-				revisionKey: entityConfig?.revisionKey || 'id',
+				revisionKey: _revisionKey,
 			};
 		},
 		[]
@@ -60,14 +72,21 @@ function RevisionsSlider() {
 
 	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
 
+	// Template revisions use the template REST API format, which exposes
+	// 'modified' instead of 'date'.
+	const revisionDateField = revisionKey === 'wp_id' ? 'modified' : 'date';
+
 	const sortedRevisions = useMemo( () => {
 		return (
 			revisions
 				?.slice()
-				.sort( ( a, b ) => new Date( a.date ) - new Date( b.date ) ) ??
-			[]
+				.sort(
+					( a, b ) =>
+						new Date( a[ revisionDateField ] ) -
+						new Date( b[ revisionDateField ] )
+				) ?? []
 		);
-	}, [ revisions ] );
+	}, [ revisions, revisionDateField ] );
 
 	const selectedIndex = sortedRevisions.findIndex(
 		( r ) => r[ revisionKey ] === currentRevisionId
@@ -87,7 +106,10 @@ function RevisionsSlider() {
 		if ( ! revision ) {
 			return index;
 		}
-		return dateI18n( dateSettings.formats.datetime, revision.date );
+		return dateI18n(
+			dateSettings.formats.datetime,
+			revision[ revisionDateField ]
+		);
 	};
 
 	if ( isLoading ) {
