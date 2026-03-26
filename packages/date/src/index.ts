@@ -184,34 +184,57 @@ export function __experimentalGetSettings() {
 	return getSettings();
 }
 
+// Cached packed zone string, used to re-add the WP zone without requiring
+// moment-timezone-utils (which provides .pack()) after a third-party plugin
+// reloads moment-timezone and destroys both the zone and the utils.
+let wpZonePacked: string | undefined;
+
+/**
+ * Ensures the custom WP timezone zone exists in moment-timezone's registry.
+ *
+ * Third-party plugins (e.g. WooCommerce) may load their own copy of
+ * moment-timezone, which reinitializes the internal zone storage and
+ * destroys the custom 'WP' zone. This function checks for the zone's
+ * existence and re-creates it if necessary.
+ */
+function ensureWPTimezone() {
+	if ( ! momentLib.tz.zone( WP_ZONE ) ) {
+		if ( wpZonePacked ) {
+			momentLib.tz.add( wpZonePacked );
+		} else {
+			setupWPTimezone();
+		}
+	}
+}
+
 function setupWPTimezone() {
 	// Get the current timezone settings from the WP timezone string.
 	const currentTimezone = momentLib.tz.zone( settings.timezone.string );
 
+	let packed;
 	// Check to see if we have a valid TZ data, if so, use it for the custom WP_ZONE timezone, otherwise just use the offset.
 	if ( currentTimezone ) {
 		// Create WP timezone based off settings.timezone.string.  We need to include the additional data so that we
 		// don't lose information about daylight savings time and other items.
 		// See https://github.com/WordPress/gutenberg/pull/48083
-		momentLib.tz.add(
-			momentLib.tz.pack( {
-				name: WP_ZONE,
-				abbrs: currentTimezone.abbrs,
-				untils: currentTimezone.untils,
-				offsets: currentTimezone.offsets,
-			} )
-		);
+		packed = momentLib.tz.pack( {
+			name: WP_ZONE,
+			abbrs: currentTimezone.abbrs,
+			untils: currentTimezone.untils,
+			offsets: currentTimezone.offsets,
+		} );
 	} else {
 		// Create WP timezone based off dateSettings.
-		momentLib.tz.add(
-			momentLib.tz.pack( {
-				name: WP_ZONE,
-				abbrs: [ WP_ZONE ],
-				untils: [ null ],
-				offsets: [ -settings.timezone.offset * 60 || 0 ],
-			} )
-		);
+		packed = momentLib.tz.pack( {
+			name: WP_ZONE,
+			abbrs: [ WP_ZONE ],
+			untils: [ null ],
+			offsets: [ -settings.timezone.offset * 60 || 0 ],
+		} );
 	}
+
+	wpZonePacked = packed;
+	momentLib.tz.add( packed );
 }
 
 // Date constants.
@@ -547,6 +570,7 @@ export function gmdateI18n(
  * @return Is in the future.
  */
 export function isInTheFuture( dateValue: Date | string | number ) {
+	ensureWPTimezone();
 	const now = momentLib.tz( WP_ZONE );
 	const momentObject = momentLib.tz( dateValue, WP_ZONE );
 
@@ -561,6 +585,7 @@ export function isInTheFuture( dateValue: Date | string | number ) {
  * @return  Date
  */
 export function getDate( dateString?: string | null ) {
+	ensureWPTimezone();
 	if ( ! dateString ) {
 		return momentLib.tz( WP_ZONE ).toDate();
 	}
@@ -580,6 +605,7 @@ export function humanTimeDiff(
 	from: Moment | Date | string | number,
 	to?: Moment | Date | string | number
 ) {
+	ensureWPTimezone();
 	const fromMoment = momentLib.tz( from, WP_ZONE );
 	const toMoment = to ? momentLib.tz( to, WP_ZONE ) : momentLib.tz( WP_ZONE );
 	return fromMoment.from( toMoment );
