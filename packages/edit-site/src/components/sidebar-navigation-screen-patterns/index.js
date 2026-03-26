@@ -25,8 +25,7 @@ import {
 	TEMPLATE_PART_ALL_AREAS_CATEGORY,
 	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 } from '../../utils/constants';
-import useThemePatterns from './use-theme-patterns';
-import usePatterns from '../page-patterns/use-patterns';
+import usePatternCategories from './use-pattern-categories';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
@@ -54,55 +53,6 @@ function useTemplatePartCounts() {
 	}, [ templateParts ] );
 
 	return { counts, isLoading };
-}
-
-function usePatternCounts() {
-	const themePatterns = useThemePatterns();
-	const { patterns: userPatterns, categories: userPatternCategories } =
-		usePatterns( PATTERN_TYPES.user );
-
-	const counts = useMemo( () => {
-		const result = {
-			[ PATTERN_DEFAULT_CATEGORY ]:
-				themePatterns.length + userPatterns.length,
-			'my-patterns': userPatterns.length,
-		};
-
-		// Count theme patterns per category.
-		themePatterns.forEach( ( pattern ) => {
-			pattern.categories?.forEach( ( cat ) => {
-				result[ cat ] = ( result[ cat ] || 0 ) + 1;
-			} );
-			if ( ! pattern.categories?.length ) {
-				result.uncategorized = ( result.uncategorized || 0 ) + 1;
-			}
-		} );
-
-		// Count user patterns per category.
-		userPatterns.forEach( ( pattern ) => {
-			pattern.wp_pattern_category?.forEach( ( catId ) => {
-				const category = userPatternCategories.find(
-					( cat ) => cat.id === catId
-				);
-				if ( category ) {
-					result[ category.name ] =
-						( result[ category.name ] || 0 ) + 1;
-				}
-			} );
-			if (
-				! pattern.wp_pattern_category?.length ||
-				! pattern.wp_pattern_category?.some( ( catId ) =>
-					userPatternCategories.find( ( cat ) => cat.id === catId )
-				)
-			) {
-				result.uncategorized = ( result.uncategorized || 0 ) + 1;
-			}
-		} );
-
-		return result;
-	}, [ themePatterns, userPatterns, userPatternCategories ] );
-
-	return counts;
 }
 
 function CategoriesGroup( {
@@ -172,7 +122,14 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 	} );
 
 	const { counts: templatePartCounts, isLoading } = useTemplatePartCounts();
-	const patternCounts = usePatternCounts();
+	const { patternCategories } = usePatternCategories();
+	const patternCounts = useMemo( () => {
+		const counts = {};
+		patternCategories.forEach( ( cat ) => {
+			counts[ cat.name ] = cat.count;
+		} );
+		return counts;
+	}, [ patternCategories ] );
 
 	const hasTemplateParts =
 		templatePartCounts[ TEMPLATE_PART_ALL_AREAS_CATEGORY ] > 0;
