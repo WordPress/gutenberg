@@ -375,6 +375,7 @@ function StyleBook(
  * @param {Function} props.onPathChange Callback when the path changes.
  * @param {Object}   props.userConfig   User configuration.
  * @param {boolean}  props.isStatic     Whether the stylebook is static or clickable.
+ * @param {Object}   props.settings     Optional editor settings to use instead of the editor store settings.
  * @return {Object} Style Book Preview component.
  */
 export const StyleBookPreview = ( {
@@ -382,11 +383,14 @@ export const StyleBookPreview = ( {
 	isStatic = false,
 	path,
 	onPathChange,
+	settings: settingsProp,
 } ) => {
 	const editorSettings = useSelect(
 		( select ) => select( editorStore ).getEditorSettings(),
 		[]
 	);
+
+	const baseSettings = settingsProp ?? editorSettings;
 
 	const canUserUploadMedia = useSelect(
 		( select ) =>
@@ -400,10 +404,10 @@ export const StyleBookPreview = ( {
 	// Update block editor settings because useMultipleOriginColorsAndGradients fetch colours from there.
 	useEffect( () => {
 		dispatch( blockEditorStore ).updateSettings( {
-			...editorSettings,
+			...baseSettings,
 			mediaUpload: canUserUploadMedia ? uploadMedia : undefined,
 		} );
-	}, [ editorSettings, canUserUploadMedia ] );
+	}, [ baseSettings, canUserUploadMedia ] );
 
 	const [ internalPath, setInternalPath ] = useState( '/' );
 	const section = path ?? internalPath;
@@ -529,14 +533,14 @@ export const StyleBookPreview = ( {
 
 	const settings = useMemo(
 		() => ( {
-			...editorSettings,
+			...baseSettings,
 			styles:
 				! isObjectEmpty( globalStyles ) && ! isObjectEmpty( userConfig )
 					? globalStyles
-					: editorSettings.styles,
+					: baseSettings.styles,
 			isPreviewMode: true,
 		} ),
-		[ globalStyles, editorSettings, userConfig ]
+		[ globalStyles, baseSettings, userConfig ]
 	);
 
 	return (
