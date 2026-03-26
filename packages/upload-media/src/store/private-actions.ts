@@ -811,39 +811,43 @@ export function detectUltraHdr( id: QueueItemId ) {
 			return;
 		}
 
+		let result;
 		try {
-			// Dynamically import to avoid loading WASM unless needed
+			// Dynamically import to avoid loading WASM unless needed.
 			const { probeUltraHdr } = await import( 'open-ultrahdr' );
 			const buffer = await item.file.arrayBuffer();
-			const result = await probeUltraHdr( buffer );
-
-			if ( result.isValid ) {
-				// Mark attachment metadata with UltraHDR info.
-				// The original file is uploaded unmodified — UltraHDR JPEGs are
-				// already backwards compatible (SDR displays use the embedded base image).
-				// Skip any subsequent transcoding to preserve HDR gain map data.
-				const existingMeta = Array.isArray( item.attachment?.meta )
-					? {}
-					: item.attachment?.meta || {};
-				dispatch.finishOperation( id, {
-					operations: [
-						OperationType.Upload,
-						OperationType.ThumbnailGeneration,
-						OperationType.Finalize,
-					],
-					attachment: {
-						...item.attachment,
-						meta: {
-							...existingMeta,
-							ultrahdr: true,
-							hdr_capacity: result.hdrCapacity,
-						},
-					},
-				} );
-				return;
-			}
+			result = await probeUltraHdr( buffer );
 		} catch {
 			// If UltraHDR detection fails, continue with regular upload.
+		}
+
+		if ( result?.isValid ) {
+			// Mark attachment metadata with UltraHDR info.
+			// The original file is uploaded unmodified — UltraHDR JPEGs are
+			// already backwards compatible (SDR displays use the embedded base image).
+			//
+			// Replace the remaining operations to skip any transcoding that
+			// prepareItem may have queued (e.g. format conversion). Transcoding
+			// would strip the HDR gain map data from the file.
+			const existingMeta = Array.isArray( item.attachment?.meta )
+				? {}
+				: item.attachment?.meta || {};
+			dispatch.finishOperation( id, {
+				operations: [
+					OperationType.Upload,
+					OperationType.ThumbnailGeneration,
+					OperationType.Finalize,
+				],
+				attachment: {
+					...item.attachment,
+					meta: {
+						...existingMeta,
+						ultrahdr: true,
+						hdr_capacity: result.hdrCapacity,
+					},
+				},
+			} );
+			return;
 		}
 
 		dispatch.finishOperation( id, {} );
