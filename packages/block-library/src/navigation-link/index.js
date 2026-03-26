@@ -124,16 +124,24 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			Edit: 'link',
 			getValue: ( { item } ) => ( {
 				url: item.url,
-				rel: item.rel,
 			} ),
 			setValue: ( { value } ) => ( {
 				url: value.url,
-				rel: value.rel,
 			} ),
+		},
+		{
+			id: 'opensInNewTab',
+			label: __( 'Open in new tab' ),
+			type: 'boolean',
+		},
+		{
+			id: 'rel',
+			label: __( 'Rel attribute' ),
+			type: 'text',
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'label', 'link' ],
+		fields: [ 'label', 'link', 'opensInNewTab', 'rel' ],
 	};
 }
 
