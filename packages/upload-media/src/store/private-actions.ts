@@ -3,6 +3,9 @@
  */
 import { v4 as uuidv4 } from 'uuid';
 
+// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+import ultraHdrWasm from 'open-ultrahdr-wasm/pkg/open_ultrahdr_bg.wasm';
+
 /**
  * WordPress dependencies
  */
@@ -814,7 +817,11 @@ export function detectUltraHdr( id: QueueItemId ) {
 		let result;
 		try {
 			// Dynamically import to avoid loading WASM unless needed.
-			const { probeUltraHdr } = await import( 'open-ultrahdr' );
+			const { setWasmUrl, probeUltraHdr } = await import(
+				'open-ultrahdr'
+			);
+			// Pass the build-time inlined WASM data URL to the library.
+			setWasmUrl( ultraHdrWasm );
 			const buffer = await item.file.arrayBuffer();
 			result = await probeUltraHdr( buffer );
 		} catch {
