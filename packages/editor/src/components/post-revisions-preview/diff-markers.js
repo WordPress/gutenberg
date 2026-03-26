@@ -32,10 +32,10 @@ const { useBlockElementRef } = unlock( blockEditorPrivateApis );
 function collectDiffBlocks( blocks ) {
 	const result = [];
 	for ( const block of blocks ) {
-		if ( block.__revisionDiffStatus ) {
+		if ( block.__revisionDiffStatus?.status ) {
 			result.push( {
 				clientId: block.clientId,
-				status: block.__revisionDiffStatus,
+				status: block.__revisionDiffStatus.status,
 			} );
 		}
 		if ( block.innerBlocks?.length ) {

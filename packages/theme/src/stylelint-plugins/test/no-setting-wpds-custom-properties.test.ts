@@ -1,11 +1,14 @@
 import { getStylelintResult } from './utils';
 
+const CONFIG = './.stylelintrc.no-setting-wpds-custom-properties.json';
+
 describe( 'flags no warnings with valid wpds custom properties css', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
 	beforeEach( () => {
 		result = getStylelintResult(
-			'./fixtures/no-setting-wpds-custom-properties-valid.css'
+			'./fixtures/no-setting-wpds-custom-properties-valid.css',
+			CONFIG
 		);
 	} );
 
@@ -25,7 +28,8 @@ describe( 'flags warnings with invalid wpds custom properties css', () => {
 
 	beforeEach( () => {
 		result = getStylelintResult(
-			'./fixtures/no-setting-wpds-custom-properties-invalid.css'
+			'./fixtures/no-setting-wpds-custom-properties-invalid.css',
+			CONFIG
 		);
 	} );
 

@@ -146,41 +146,46 @@ function VariationsToggleGroupControl( {
 
 function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { activeBlockVariation, variations, isContentOnly, isSection } =
-		useSelect(
-			( select ) => {
-				const { getActiveBlockVariation, getBlockVariations } =
-					select( blocksStore );
+	const {
+		activeBlockVariation,
+		variations,
+		canEdit,
+		isContentOnly,
+		isSection,
+	} = useSelect(
+		( select ) => {
+			const { getActiveBlockVariation, getBlockVariations } =
+				select( blocksStore );
 
-				const {
-					getBlockName,
-					getBlockAttributes,
-					getBlockEditingMode,
-					isSectionBlock,
-				} = unlock( select( blockEditorStore ) );
+			const {
+				getBlockName,
+				getBlockAttributes,
+				getBlockEditingMode,
+				isSectionBlock,
+			} = unlock( select( blockEditorStore ) );
+			const { canEditBlock } = select( blockEditorStore );
 
-				const name = blockClientId && getBlockName( blockClientId );
+			const name = blockClientId && getBlockName( blockClientId );
 
-				const { hasContentRoleAttribute } = unlock(
-					select( blocksStore )
-				);
-				const isContentBlock = hasContentRoleAttribute( name );
+			const { hasContentRoleAttribute } = unlock( select( blocksStore ) );
+			const isContentBlock = hasContentRoleAttribute( name );
 
-				return {
-					activeBlockVariation: getActiveBlockVariation(
-						name,
-						getBlockAttributes( blockClientId ),
-						'transform'
-					),
-					variations: name && getBlockVariations( name, 'transform' ),
-					isContentOnly:
-						getBlockEditingMode( blockClientId ) ===
-							'contentOnly' && ! isContentBlock,
-					isSection: isSectionBlock( blockClientId ),
-				};
-			},
-			[ blockClientId ]
-		);
+			return {
+				activeBlockVariation: getActiveBlockVariation(
+					name,
+					getBlockAttributes( blockClientId ),
+					'transform'
+				),
+				variations: name && getBlockVariations( name, 'transform' ),
+				canEdit: canEditBlock( blockClientId ),
+				isContentOnly:
+					getBlockEditingMode( blockClientId ) === 'contentOnly' &&
+					! isContentBlock,
+				isSection: isSectionBlock( blockClientId ),
+			};
+		},
+		[ blockClientId ]
+	);
 
 	const selectedValue = activeBlockVariation?.name;
 
@@ -205,7 +210,7 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 		} );
 	};
 
-	if ( ! variations?.length || isContentOnly || isSection ) {
+	if ( ! variations?.length || ! canEdit || isContentOnly || isSection ) {
 		return null;
 	}
 

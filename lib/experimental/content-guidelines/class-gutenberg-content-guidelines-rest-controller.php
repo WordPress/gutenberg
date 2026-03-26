@@ -111,7 +111,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		if ( ! current_user_can( $post_type->cap->read ) ) {
 			return new WP_Error(
 				'rest_forbidden',
-				__( 'Sorry, you are not allowed to view content guidelines.', 'gutenberg' ),
+				__( 'Sorry, you are not allowed to view the guidelines.', 'gutenberg' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -161,14 +161,14 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		if ( $existing ) {
 			return new WP_Error(
 				'rest_guidelines_exists',
-				__( 'Content guidelines already exist. Use PATCH to update.', 'gutenberg' ),
+				__( 'Guidelines already exist. Use PATCH to update.', 'gutenberg' ),
 				array( 'status' => 400 )
 			);
 		}
 
 		$prepared             = $this->prepare_item_for_database( $request );
 		$prepared->post_type  = $this->post_type;
-		$prepared->post_title = __( 'Content Guidelines', 'gutenberg' );
+		$prepared->post_title = __( 'Guidelines', 'gutenberg' );
 
 		if ( ! isset( $prepared->post_status ) ) {
 			$prepared->post_status = 'draft';
@@ -391,9 +391,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		foreach ( Gutenberg_Content_Guidelines_Post_Type::CATEGORY_META_KEYS as $category ) {
 			if ( isset( $categories[ $category ] ) ) {
 				$meta_key = '_content_guideline_' . $category;
-				$value    = isset( $categories[ $category ]['guidelines'] )
-					? $categories[ $category ]['guidelines']
-					: '';
+				$value    = $categories[ $category ]['guidelines'] ?? '';
 				update_post_meta( $post_id, $meta_key, $value );
 			}
 		}
@@ -402,7 +400,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		if ( isset( $categories['blocks'] ) && is_array( $categories['blocks'] ) ) {
 			foreach ( $categories['blocks'] as $block_name => $block_data ) {
 				$meta_key = Gutenberg_Content_Guidelines_Post_Type::block_name_to_meta_key( $block_name );
-				$value    = isset( $block_data['guidelines'] ) ? $block_data['guidelines'] : '';
+				$value    = $block_data['guidelines'] ?? '';
 
 				if ( ! empty( $value ) ) {
 					update_post_meta( $post_id, $meta_key, $value );

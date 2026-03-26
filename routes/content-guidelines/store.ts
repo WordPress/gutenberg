@@ -6,17 +6,28 @@ import { createReduxStore, register } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import type { ContentGuidelinesState, RestGuidelinesResponse } from './types';
+import type {
+	Categories,
+	ContentGuidelinesState,
+	RestGuidelinesResponse,
+} from './types';
 
+export type { Categories };
 export const STORE_NAME = 'core/content-guidelines';
 
 const DEFAULT_STATE: ContentGuidelinesState = {
 	id: null,
 	status: null,
-	categories: {},
+	categories: {
+		site: '',
+		copy: '',
+		images: '',
+		additional: '',
+		blocks: {},
+	},
 };
 
-const CATEGORIES = [ 'site', 'copy', 'images', 'additional' ];
+const CATEGORIES = [ 'site', 'copy', 'images', 'additional', 'blocks' ];
 
 const actions = {
 	setFromResponse( response: RestGuidelinesResponse ) {
@@ -29,6 +40,13 @@ const actions = {
 		return {
 			type: 'SET_GUIDELINE' as const,
 			category,
+			value,
+		};
+	},
+	setBlockGuideline( blockName: string, value: string ) {
+		return {
+			type: 'SET_BLOCK_GUIDELINE' as const,
+			blockName,
 			value,
 		};
 	},
@@ -48,13 +66,24 @@ function parseResponse(
 	const result = {
 		id: response.id ?? null,
 		status: response.status ?? null,
-		categories: {},
+		categories: {
+			site: '',
+			copy: '',
+			images: '',
+			additional: '',
+			blocks: {},
+		},
 	};
 
 	CATEGORIES.forEach( ( category ) => {
 		const guidelines = categoriesFromResponse?.[ category ]?.guidelines;
 		if ( typeof guidelines === 'string' ) {
 			result.categories[ category ] = guidelines;
+		} else if ( category === 'blocks' ) {
+			const blocks = categoriesFromResponse?.blocks ?? {};
+			for ( const [ blockName, blockData ] of Object.entries( blocks ) ) {
+				result.categories.blocks[ blockName ] = blockData?.guidelines;
+			}
 		}
 	} );
 
@@ -79,19 +108,49 @@ function reducer(
 					[ action.category ]: action.value,
 				},
 			};
+		case 'SET_BLOCK_GUIDELINE': {
+			const blocks = {
+				...state.categories.blocks,
+				[ action.blockName ]: action.value,
+			};
+
+			if ( action.value === undefined ) {
+				delete blocks[ action.blockName ];
+			}
+
+			return {
+				...state,
+				categories: {
+					...state.categories,
+					blocks,
+				},
+			};
+		}
 		default:
 			return state;
 	}
 }
 
 const selectors = {
-	getGuideline( state: ContentGuidelinesState, category: string ): string {
-		return state.categories[ category ] ?? '';
+	getGuideline(
+		state: ContentGuidelinesState,
+		category: string
+	): string | Record< string, string > {
+		return state.categories[ category ];
 	},
-	getAllGuidelines(
-		state: ContentGuidelinesState
-	): Partial< Record< string, string > > {
+	getAllGuidelines( state: ContentGuidelinesState ): Categories {
 		return state.categories;
+	},
+	getBlockGuidelines(
+		state: ContentGuidelinesState
+	): Record< string, string > {
+		return state.categories.blocks;
+	},
+	getBlockGuideline(
+		state: ContentGuidelinesState,
+		blockName: string
+	): string {
+		return state.categories.blocks[ blockName ] ?? '';
 	},
 	getId( state: ContentGuidelinesState ): number | null {
 		return state.id;

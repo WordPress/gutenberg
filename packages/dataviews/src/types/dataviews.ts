@@ -133,7 +133,8 @@ interface ViewBase {
 	page?: number;
 
 	/**
-	 * The number of items per page
+	 * The number of items per page.
+	 * Also used as the batch size when infinite scroll is enabled.
 	 */
 	perPage?: number;
 
@@ -203,6 +204,12 @@ interface ViewBase {
 	 * Whether infinite scroll is enabled.
 	 */
 	infiniteScrollEnabled?: boolean;
+
+	/**
+	 * The start position for infinite scroll (1-indexed).
+	 * Used when infiniteScrollEnabled is true.
+	 */
+	startPosition?: number;
 }
 
 export interface ColumnStyle {
@@ -285,6 +292,11 @@ export interface ViewGrid extends ViewBase {
 		 * The preview size of the grid.
 		 */
 		previewSize?: number;
+
+		/**
+		 * The density of the grid layout.
+		 */
+		density?: Density;
 	};
 }
 
@@ -301,6 +313,11 @@ export interface ViewPickerGrid extends ViewBase {
 		 * The preview size of the grid.
 		 */
 		previewSize?: number;
+
+		/**
+		 * The density of the grid layout.
+		 */
+		density?: Density;
 	};
 }
 

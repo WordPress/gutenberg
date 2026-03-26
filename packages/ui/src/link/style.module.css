@@ -1,0 +1,68 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.link {
+		text-underline-offset: 0.2em;
+		text-decoration-thickness: 0.5px;
+	}
+
+	/* Brand tone */
+	.is-brand,
+	.is-brand:visited {
+		color: var(--wpds-color-fg-interactive-brand);
+	}
+
+	.is-brand:hover,
+	.is-brand:active {
+		color: var(--wpds-color-fg-interactive-brand-active);
+	}
+
+	/* Neutral tone */
+	.is-neutral,
+	.is-neutral:visited {
+		color: var(--wpds-color-fg-interactive-neutral);
+		text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
+	}
+
+	.is-neutral:hover,
+	.is-neutral:active {
+		color: var(--wpds-color-fg-interactive-neutral-active);
+	}
+
+	/* Unstyled variant */
+	.is-unstyled {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	/* Link icon pattern — arrow rendered via ::after pseudo-element to avoid
+	 * Twemoji replacement and text-selection issues. Root <a> gets
+	 * text-decoration:none; the link-contents span re-applies it.
+	 * text-underline-offset is inherited and propagates from .link
+	 * automatically. text-decoration-thickness and text-decoration-color
+	 * are NOT inherited, so they are explicitly redeclared on
+	 * .link-contents (the latter via `inherit` to carry the neutral
+	 * tone's custom color token through). */
+	.has-link-icon {
+		text-decoration: none;
+	}
+
+	.link-contents {
+		text-decoration: underline;
+		text-decoration-color: inherit;
+		text-decoration-thickness: 0.5px;
+	}
+
+	.link-icon {
+		margin-inline-start: var(--wpds-dimension-padding-xs);
+		font-weight: var(--wpds-font-weight-regular);
+	}
+
+	.link-icon::after {
+		content: "\2197";
+	}
+
+	.link-icon:dir(rtl)::after {
+		content: "\2196";
+	}
+}

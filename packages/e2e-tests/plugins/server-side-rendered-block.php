@@ -91,7 +91,7 @@ add_action(
 		add_filter(
 			'block_bindings_supported_attributes_test/auto-register-with-controls',
 			static function () {
-				return array( 'title', 'count', 'spacing', 'showEmojis' );
+				return array( 'title', 'count', 'spacing', 'showEmojis', 'emoji' );
 			}
 		);
 

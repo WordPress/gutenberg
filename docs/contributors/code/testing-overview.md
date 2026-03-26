@@ -506,9 +506,7 @@ There is an ongoing effort to add integration tests to the native mobile project
 
 ## End-to-end testing
 
-Most existing End-to-end tests currently use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver to run the tests in `packages/e2e-tests`, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
-
-There's an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate them from Puppeteer to Playwright. **It's recommended to write new e2e tests in Playwright whenever possible**. The sections below mostly apply to the old Jest + Puppeteer framework. See the dedicated [guide](/docs/contributors/code/e2e/README.md) if you're writing tests with Playwright.
+End-to-end tests use [Playwright](https://playwright.dev/) as the testing framework. See the dedicated [End-to-End Testing guide](/docs/contributors/code/e2e/README.md) for best practices and detailed instructions.
 
 ### Using wp-env
 
@@ -521,46 +519,14 @@ npm run test:e2e
 or interactively
 
 ```bash
-npm run test:e2e:watch
-```
-
-Sometimes it's useful to observe the browser while running tests. Then, use this command:
-
-```bash
-npm run test:e2e:watch -- --puppeteer-interactive
-```
-
-You can control the speed of execution with `--puppeteer-slowmo`:
-
-```bash
-npm run test:e2e:watch -- --puppeteer-interactive --puppeteer-slowmo=200
-```
-
-You can additionally have the devtools automatically open for interactive debugging in the browser:
-
-```bash
-npm run test:e2e:watch -- --puppeteer-devtools
-```
-
-### Using alternate environment
-
-If using a different setup than `wp-env`, you first need to symlink the e2e test plugins to your test site, from your site's plugins directory run:
-
-```bash
-ln -s gutenberg/packages/e2e-tests/plugins/* .
-```
-
-Then to run the tests, specify the base URL, username, and passwords for your site. For example, if your test site is at `http://wp.test`, use:
-
-```bash
-WP_BASE_URL=http://wp.test npm run test:e2e -- --wordpress-username=admin --wordpress-password=password
+npm run test:e2e -- --ui
 ```
 
 ### Scenario testing
 
 If you find that end-to-end tests pass when run locally, but fail in GitHub Actions, you may be able to isolate a CPU- or network-bound race condition by simulating a slow CPU or network:
 
-```
+```bash
 THROTTLE_CPU=4 npm run test:e2e
 ```
 

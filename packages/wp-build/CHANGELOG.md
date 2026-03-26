@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Derive `data-wp-hash` from the transformed CSS instead of the raw source to prevent style mismatches when multiple build pipelines process the same source file ([#76743](https://github.com/WordPress/gutenberg/pull/76743)).
+
+## 0.10.0 (2026-03-18)
+
+### Breaking Changes
+
+- `@wordpress/boot`, `@wordpress/route`, `@wordpress/theme`, and `@wordpress/private-apis` are no longer bundled. They are now expected to be provided by WordPress Core (7.0+) or the Gutenberg plugin.
+
 ### Enhancements
 
 - Avoid unexpected results when typecasting `IS_GUTENBERG_PLUGIN` and `IS_WORDPRESS_CORE` values to Booleans ([#75844](https://github.com/WordPress/gutenberg/pull/75844)).

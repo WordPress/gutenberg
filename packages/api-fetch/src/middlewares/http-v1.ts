@@ -31,9 +31,9 @@ const httpV1Middleware: APIFetchMiddleware = ( options, next ) => {
 		options = {
 			...options,
 			headers: {
+				'Content-Type': 'application/json',
 				...options.headers,
 				'X-HTTP-Method-Override': method,
-				'Content-Type': 'application/json',
 			},
 			method: 'POST',
 		};

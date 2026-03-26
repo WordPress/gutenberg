@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId } from '@wordpress/element';
 import { Field } from '../../../..';
+import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Field.Root > = {
 	title: 'Design System/Components/Form/Primitives/Field',
@@ -135,13 +136,7 @@ export const WithDetails: StoryObj< typeof Field.Root > = {
 				<Field.Control
 					render={ <input type="text" placeholder="Placeholder" /> }
 				/>
-				<Field.Details>
-					Details can include{ '	' }
-					<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
-						links to more information
-					</a>{ ' ' }
-					and other semantic elements.
-				</Field.Details>
+				<Field.Details>{ DETAILS_EXAMPLE }</Field.Details>
 			</>
 		),
 	},

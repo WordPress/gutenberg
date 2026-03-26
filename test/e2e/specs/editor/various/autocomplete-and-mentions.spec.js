@@ -71,10 +71,6 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		await admin.createNewPost();
 	} );
 
-	test.afterEach( async ( { editor } ) => {
-		await editor.publishPost();
-	} );
-
 	[
 		[ 'User Mention', 'mention' ],
 		[ 'Custom Completer', 'option' ],

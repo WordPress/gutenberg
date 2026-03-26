@@ -22,13 +22,23 @@ export const settings = {
 		innerBlocks: [
 			{
 				name: 'core/tabs-menu',
-				innerBlocks: [ { name: 'core/tabs-menu-item' } ],
+				innerBlocks: [
+					{
+						name: 'core/tabs-menu-item',
+						attributes: { anchor: 'tab-1-button' },
+					},
+					{
+						name: 'core/tabs-menu-item',
+						attributes: { anchor: 'tab-2-button' },
+					},
+				],
 			},
 			{
 				name: 'core/tab-panel',
-				innerBlocks: [ 1, 2, 3 ].map( ( index ) => ( {
+				innerBlocks: [ 1, 2 ].map( ( index ) => ( {
 					name: 'core/tab',
 					attributes: {
+						anchor: `tab-${ index }`,
 						label: sprintf(
 							/** translators: %s: tab index number */
 							__( 'Tab %s' ),

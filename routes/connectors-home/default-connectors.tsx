@@ -2,10 +2,12 @@
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack, Button } from '@wordpress/components';
+import { useEffect, useRef } from '@wordpress/element';
 import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
 	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
+	type ConnectorConfig,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
 import { __ } from '@wordpress/i18n';
@@ -15,28 +17,30 @@ import { Badge } from '@wordpress/ui';
  * Internal dependencies
  */
 import { useConnectorPlugin } from './use-connector-plugin';
-import { OpenAILogo, ClaudeLogo, GeminiLogo } from './logos';
-
-type ConnectorAuthentication =
-	| { method: 'api_key'; settingName: string; credentialsUrl: string | null }
-	| { method: 'none' };
+import {
+	OpenAILogo,
+	ClaudeLogo,
+	GeminiLogo,
+	DefaultConnectorLogo,
+} from './logos';
 
 interface ConnectorData {
 	name: string;
 	description: string;
-	type: 'ai_provider';
+	logoUrl?: string;
+	type: string;
 	plugin?: {
 		slug: string;
 		isInstalled: boolean;
 		isActivated: boolean;
 	};
-	authentication: ConnectorAuthentication;
+	authentication: NonNullable< ConnectorConfig[ 'authentication' ] >;
 }
 
 /**
  * Reads connector data passed from PHP via the script module data mechanism.
  */
-function getConnectorData(): Record< string, ConnectorData > {
+export function getConnectorData(): Record< string, ConnectorData > {
 	try {
 		const parsed = JSON.parse(
 			document.getElementById(
@@ -54,6 +58,20 @@ const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
 	openai: OpenAILogo,
 	anthropic: ClaudeLogo,
 };
+
+function getConnectorLogo(
+	connectorId: string,
+	logoUrl?: string
+): React.ReactNode {
+	if ( logoUrl ) {
+		return <img src={ logoUrl } alt="" width={ 40 } height={ 40 } />;
+	}
+	const Logo = CONNECTOR_LOGOS[ connectorId ];
+	if ( Logo ) {
+		return <Logo />;
+	}
+	return <DefaultConnectorLogo />;
+}
 
 const ConnectedBadge = () => (
 	<span
@@ -73,25 +91,19 @@ const ConnectedBadge = () => (
 
 const UnavailableActionBadge = () => <Badge>{ __( 'Not available' ) }</Badge>;
 
-interface ApiKeyConnectorConfig {
-	pluginSlug?: string;
-	settingName: string;
-	helpUrl?: string;
-	Logo?: React.ComponentType;
-	isInstalled?: boolean;
-	isActivated?: boolean;
-}
-
 function ApiKeyConnector( {
-	label,
+	name,
 	description,
-	pluginSlug,
-	settingName,
-	helpUrl,
-	Logo,
-	isInstalled,
-	isActivated,
-}: ConnectorRenderProps & ApiKeyConnectorConfig ) {
+	logo,
+	authentication,
+	plugin,
+}: ConnectorRenderProps ) {
+	const auth =
+		authentication?.method === 'api_key' ? authentication : undefined;
+	const settingName = auth?.settingName ?? '';
+	const helpUrl = auth?.credentialsUrl ?? undefined;
+	const pluginSlug = plugin?.slug;
+
 	let helpLabel: string | undefined;
 	try {
 		if ( helpUrl ) {
@@ -110,6 +122,7 @@ function ApiKeyConnector( {
 		isBusy,
 		isConnected,
 		currentApiKey,
+		keySource,
 		handleButtonClick,
 		getButtonLabel,
 		saveApiKey,
@@ -117,21 +130,44 @@ function ApiKeyConnector( {
 	} = useConnectorPlugin( {
 		pluginSlug,
 		settingName,
-		isInstalled,
-		isActivated,
+		connectorName: name,
+		isInstalled: plugin?.isInstalled,
+		isActivated: plugin?.isActivated,
+		keySource: auth?.keySource,
+		initialIsConnected: auth?.isConnected,
 	} );
+	const isExternallyConfigured =
+		keySource === 'env' || keySource === 'constant';
 	const showUnavailableBadge =
 		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
 		( pluginStatus === 'inactive' && canActivatePlugins === false );
 	const showActionButton = ! showUnavailableBadge;
+
+	const actionButtonRef = useRef< HTMLButtonElement >( null );
+	const pendingFocusRef = useRef( false );
+
+	// Restore focus to the action button after async actions complete.
+	useEffect( () => {
+		if ( pendingFocusRef.current && ! isBusy ) {
+			pendingFocusRef.current = false;
+			actionButtonRef.current?.focus();
+		}
+	}, [ isBusy, isExpanded, isConnected ] );
+
+	const handleActionClick = () => {
+		if ( pluginStatus === 'not-installed' || pluginStatus === 'inactive' ) {
+			pendingFocusRef.current = true;
+		}
+		handleButtonClick();
+	};
 
 	return (
 		<ConnectorItem
 			className={
 				pluginSlug ? `connector-item--${ pluginSlug }` : undefined
 			}
-			icon={ Logo ? <Logo /> : undefined }
-			name={ label }
+			logo={ logo }
+			name={ name }
 			description={ description }
 			actionArea={
 				<HStack spacing={ 3 } expanded={ false }>
@@ -139,20 +175,16 @@ function ApiKeyConnector( {
 					{ showUnavailableBadge && <UnavailableActionBadge /> }
 					{ showActionButton && (
 						<Button
+							ref={ actionButtonRef }
 							variant={
 								isExpanded || isConnected
 									? 'tertiary'
 									: 'secondary'
 							}
-							size={
-								isExpanded || isConnected
-									? undefined
-									: 'compact'
-							}
-							onClick={ handleButtonClick }
+							size="compact"
+							onClick={ handleActionClick }
 							disabled={ pluginStatus === 'checking' || isBusy }
 							isBusy={ isBusy }
-							aria-expanded={ isExpanded }
 						>
 							{ getButtonLabel() }
 						</Button>
@@ -163,13 +195,30 @@ function ApiKeyConnector( {
 			{ isExpanded && pluginStatus === 'active' && (
 				<DefaultConnectorSettings
 					key={ isConnected ? 'connected' : 'setup' }
-					initialValue={ currentApiKey }
+					initialValue={
+						isExternallyConfigured
+							? '••••••••••••••••'
+							: currentApiKey
+					}
 					helpUrl={ helpUrl }
 					helpLabel={ helpLabel }
-					readOnly={ isConnected }
-					onRemove={ removeApiKey }
+					readOnly={ isConnected || isExternallyConfigured }
+					keySource={ keySource }
+					onRemove={
+						isExternallyConfigured
+							? undefined
+							: async () => {
+									pendingFocusRef.current = true;
+									try {
+										await removeApiKey();
+									} catch {
+										pendingFocusRef.current = false;
+									}
+							  }
+					}
 					onSave={ async ( apiKey: string ) => {
 						await saveApiKey( apiKey );
+						pendingFocusRef.current = true;
 						setIsExpanded( false );
 					} }
 				/>
@@ -182,35 +231,26 @@ function ApiKeyConnector( {
 export function registerDefaultConnectors() {
 	const connectors = getConnectorData();
 
-	const sanitize = ( s: string ) => s.replace( /[^a-z0-9-]/gi, '-' );
+	const sanitize = ( s: string ) => s.replace( /[^a-z0-9-_]/gi, '-' );
 
 	for ( const [ connectorId, data ] of Object.entries( connectors ) ) {
 		const { authentication } = data;
 
+		const connectorName = sanitize( connectorId );
+		const args: Partial< Omit< ConnectorConfig, 'slug' > > = {
+			name: data.name,
+			description: data.description,
+			logo: getConnectorLogo( connectorId, data.logoUrl ),
+			authentication,
+			plugin: data.plugin,
+		};
 		if (
-			data.type !== 'ai_provider' ||
-			authentication.method !== 'api_key'
+			data.type === 'ai_provider' &&
+			authentication.method === 'api_key'
 		) {
-			continue;
+			args.render = ApiKeyConnector;
 		}
 
-		const connectorName = `${ sanitize( data.type ) }/${ sanitize(
-			connectorId
-		) }`;
-		registerConnector( connectorName, {
-			label: data.name,
-			description: data.description,
-			render: ( props ) => (
-				<ApiKeyConnector
-					{ ...props }
-					pluginSlug={ data.plugin?.slug }
-					settingName={ authentication.settingName }
-					helpUrl={ authentication.credentialsUrl ?? undefined }
-					Logo={ CONNECTOR_LOGOS[ connectorId ] }
-					isInstalled={ data.plugin?.isInstalled }
-					isActivated={ data.plugin?.isActivated }
-				/>
-			),
-		} );
+		registerConnector( connectorName, args );
 	}
 }
