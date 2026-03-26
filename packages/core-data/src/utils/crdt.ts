@@ -262,6 +262,7 @@ export function applyPostChangesToCRDTDoc(
 
 		const currentValue = ymap.get( 'content' );
 
+		// Do it in a timeout to ensure that a new undo level is not created for this change.
 		setTimeout( () => {
 			if ( currentValue instanceof Y.Text ) {
 				mergeRichTextUpdate( currentValue, contentValue );
