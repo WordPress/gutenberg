@@ -18,10 +18,11 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import type { ReactNode } from 'react';
+import type { ApiKeySource } from './types';
 
 export interface ConnectorItemProps {
 	className?: string;
-	icon?: ReactNode;
+	logo?: ReactNode;
 	name: string;
 	description: string;
 	actionArea?: ReactNode;
@@ -30,7 +31,7 @@ export interface ConnectorItemProps {
 
 export function ConnectorItem( {
 	className,
-	icon,
+	logo,
 	name,
 	description,
 	actionArea,
@@ -41,7 +42,7 @@ export function ConnectorItem( {
 		<Item className={ className }>
 			<VStack spacing={ 4 } role="group" aria-labelledby={ headingId }>
 				<HStack alignment="center" spacing={ 4 } wrap>
-					{ icon }
+					{ logo }
 					<FlexBlock>
 						<VStack spacing={ 0 }>
 							<Text
@@ -65,7 +66,7 @@ export function ConnectorItem( {
 	);
 }
 
-export type ApiKeySource = 'env' | 'constant' | 'database' | 'none';
+export type { ApiKeySource } from './types';
 
 export interface DefaultConnectorSettingsProps {
 	onSave?: ( apiKey: string ) => void | Promise< void >;

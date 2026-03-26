@@ -35,17 +35,23 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 				nativeButton={ false }
 			>
 				<div className={ styles[ 'header-content' ] }>{ children }</div>
-				<div className={ styles[ 'header-trigger-wrapper' ] }>
-					<Icon
-						icon={ chevronDown }
+				<div
+					className={ clsx( styles[ 'header-trigger-positioner' ] ) }
+				>
+					<div
 						className={ clsx(
-							styles[ 'header-trigger' ],
+							styles[ 'header-trigger-wrapper' ],
 							// While the interactive trigger element is the whole header,
 							// the focus ring will be displayed only on the icon to visually
 							// emulate it being the button.
 							focusStyles[ 'outset-ring--focus-parent-visible' ]
 						) }
-					/>
+					>
+						<Icon
+							icon={ chevronDown }
+							className={ styles[ 'header-trigger' ] }
+						/>
+					</div>
 				</div>
 			</Collapsible.Trigger>
 		);

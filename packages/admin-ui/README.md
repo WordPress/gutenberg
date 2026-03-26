@@ -16,7 +16,26 @@ npm install @wordpress/admin-ui --save
 
 ### Breadcrumbs
 
-Undocumented declaration.
+Renders a breadcrumb navigation trail.
+
+All items except the last one must provide a `to` prop for navigation. In development mode, an error is thrown when a non-last item is missing `to`. The last item represents the current page and its `to` prop is optional. Only the last item (when it has no `to` prop) is rendered as an `h1`.
+
+_Usage_
+
+```jsx
+<Breadcrumbs
+	items={ [
+		{ label: 'Home', to: '/' },
+		{ label: 'Settings', to: '/settings' },
+		{ label: 'General' },
+	] }
+/>
+```
+
+_Parameters_
+
+-   _props_ `BreadcrumbsProps`:
+-   _props.items_ `BreadcrumbsProps[ 'items' ]`: The breadcrumb items to display.
 
 ### NavigableRegion
 

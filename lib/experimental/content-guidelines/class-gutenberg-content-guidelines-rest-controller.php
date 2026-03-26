@@ -391,9 +391,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		foreach ( Gutenberg_Content_Guidelines_Post_Type::CATEGORY_META_KEYS as $category ) {
 			if ( isset( $categories[ $category ] ) ) {
 				$meta_key = '_content_guideline_' . $category;
-				$value    = isset( $categories[ $category ]['guidelines'] )
-					? $categories[ $category ]['guidelines']
-					: '';
+				$value    = $categories[ $category ]['guidelines'] ?? '';
 				update_post_meta( $post_id, $meta_key, $value );
 			}
 		}
@@ -402,7 +400,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		if ( isset( $categories['blocks'] ) && is_array( $categories['blocks'] ) ) {
 			foreach ( $categories['blocks'] as $block_name => $block_data ) {
 				$meta_key = Gutenberg_Content_Guidelines_Post_Type::block_name_to_meta_key( $block_name );
-				$value    = isset( $block_data['guidelines'] ) ? $block_data['guidelines'] : '';
+				$value    = $block_data['guidelines'] ?? '';
 
 				if ( ! empty( $value ) ) {
 					update_post_meta( $post_id, $meta_key, $value );

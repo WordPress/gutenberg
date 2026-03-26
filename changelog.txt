@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 22.8.0-rc.1 =
+= 22.8.0 =
 
 ## Changelog
 
@@ -87,8 +87,6 @@
 - Add a limit for the default provider. ([76437](https://github.com/WordPress/gutenberg/pull/76437))
 
 #### Content Guidelines
-- Add block guidelines management. ([76187](https://github.com/WordPress/gutenberg/pull/76187))
-- Guidelines: Add actions for Import, Export and Revisions of guidelines. ([76155](https://github.com/WordPress/gutenberg/pull/76155))
 - Rename route and use the right `Notice` component. ([76427](https://github.com/WordPress/gutenberg/pull/76427))
 
 #### Block Editor
@@ -275,11 +273,6 @@ high loading priority. ([76302](https://github.com/WordPress/gutenberg/pull/7630
 - Sync some post list changes with Extensible Site Editor. ([76243](https://github.com/WordPress/gutenberg/pull/76243))
 
 
-
-#### Content Guidelines
-- Add UX for site, copy, image, and additional guidelines. ([75420](https://github.com/WordPress/gutenberg/pull/75420))
-
-
 ### Documentation
 
 - Add Client-Side Navigation documentation to manifest and table of contents.
@@ -391,7 +384,6 @@ The following PRs were merged by first-time contributors:
 
 
 - @apermo: Fix: Use add_filter() for get_block_type_variations hook. ([76297](https://github.com/WordPress/gutenberg/pull/76297))
-- @aswasif007: Content Guidelines: Add UX for site, copy, image, and additional guidelines. ([75420](https://github.com/WordPress/gutenberg/pull/75420))
 - @chubes4: API Fetch: Respect caller-provided Content-Type in httpV1 middleware. ([76285](https://github.com/WordPress/gutenberg/pull/76285))
 - @iamchughmayank: Guidelines: Add actions for Import, Export and Revisions of guidelines. ([76155](https://github.com/WordPress/gutenberg/pull/76155))
 - @kannan-ravi: Add word-break property to visually hidden styles to prevent screen reader issues. ([75539](https://github.com/WordPress/gutenberg/pull/75539))
@@ -405,6 +397,8 @@ The following PRs were merged by first-time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @adamsilverstein @aduth @alecgeatches @alexstine @Aljullu @andrewserong @annezazu @apermo @aswasif007 @CGastrell @chriszarate @chubes4 @ciampo @Copons @dabowman @desrosj @dhasilva @dlind1 @ellatrix @enejb @getdave @gigitux @gziolo @hbhalodia @huzaifaalmesbah @iamchughmayank @im3dabasia @ingeniumed @jameskoster @jasmussen @jeryj @jorgefilipecosta @jsnajdr @juanmaguitar @kannan-ravi @kraftbj @MaggieCabrera @Mamaduka @manzoorwanijk @markusfoo @mattgrshaw @maxschmeling @mcsf @mikachan @mikejolley @mirka @Mustafabharmal @ntsekouras @oandregal @ockham @pkevan @ramonjd @retrofox @sagarjadhav @scruffian @sgomes @shekharnwagh @shimotmk @simison @smithjw1 @t-hamano @talldan @westonruter @wwahammy @youknowriad @yuliyan
+
+
 
 
 = 22.7.1 =
