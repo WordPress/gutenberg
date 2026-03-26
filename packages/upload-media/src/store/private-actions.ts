@@ -1177,8 +1177,7 @@ export function generateThumbnails( id: QueueItemId ) {
 			if (
 				thumbnailTranscodeOperation &&
 				sourceType !== 'image/png' &&
-				sourceType !== 'image/gif' &&
-				sourceType !== 'image/webp'
+				sourceType !== 'image/gif'
 			) {
 				try {
 					thumbnailFile = await vipsConvertImageFormat(
@@ -1268,8 +1267,7 @@ export function generateThumbnails( id: QueueItemId ) {
 					if (
 						thumbnailTranscodeOperation &&
 						sourceType !== 'image/png' &&
-						sourceType !== 'image/gif' &&
-						sourceType !== 'image/webp'
+						sourceType !== 'image/gif'
 					) {
 						try {
 							sourceForScaled = await vipsConvertImageFormat(

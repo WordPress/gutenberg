@@ -467,7 +467,7 @@ describe( 'private actions', () => {
 			expect( vipsConvertImageFormat ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should skip PNG conversion for WebP source (potentially animated)', async () => {
+		it( 'should convert WebP to PNG intermediate when output format differs', async () => {
 			const select = makeSelect( {
 				sourceType: 'image/webp',
 				outputMimeType: 'image/jpeg',
@@ -477,7 +477,13 @@ describe( 'private actions', () => {
 			const thunk = generateThumbnails( 'item-1' );
 			await thunk( { select, dispatch } );
 
-			expect( vipsConvertImageFormat ).not.toHaveBeenCalled();
+			expect( vipsConvertImageFormat ).toHaveBeenCalledWith(
+				'item-1',
+				expect.any( File ),
+				'image/png',
+				1,
+				false
+			);
 		} );
 
 		it( 'should fall back to original file when PNG conversion fails', async () => {
