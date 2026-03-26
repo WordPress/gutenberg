@@ -102,8 +102,6 @@ export function mergeFontFamilies(
  */
 export function createCssString( value: string ): string {
 	return `"${ value
-		.trim()
-
 		/*
 		 * CSS Unicode escaping for problematic characters.
 		 * https://www.w3.org/TR/css-syntax-3/#escaping
@@ -222,7 +220,7 @@ function getCssFontFaceRule(
 	];
 
 	if ( src ) {
-		declarations.push( `src: url( ${ createCssString( src ) } )` );
+		declarations.push( `src: url( ${ createCssString( src.trim() ) } )` );
 	}
 	if ( fontFace.fontDisplay ) {
 		declarations.push( `font-display: ${ fontFace.fontDisplay }` );

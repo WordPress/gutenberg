@@ -10,6 +10,9 @@ export type FontFaceToUpload = FontFace & {
 
 export interface FontFileMetadata {
 	file: File;
+	/**
+	 * Plain font display name extracted from font data and trimmed.
+	 */
 	fontDisplayName: string;
 	fontStyle: string;
 	fontWeight: string | number;
