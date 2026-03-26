@@ -193,7 +193,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				// Check that the client_id is not already owned by another user.
 				$existing_awareness = $this->storage->get_awareness_state( $room );
 				foreach ( $existing_awareness as $entry ) {
-					if ( $client_id === $entry['client_id'] && $wp_user_id !== $entry['wp_user_id'] ) {
+					if ( $client_id === $entry['client_id'] && isset( $entry['wp_user_id'] ) && $wp_user_id !== $entry['wp_user_id'] ) {
 						return new WP_Error(
 							'forbidden',
 							__( 'Client ID is already in use by another user.', 'gutenberg' ),
