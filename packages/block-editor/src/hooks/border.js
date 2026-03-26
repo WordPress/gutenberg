@@ -11,6 +11,7 @@ import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/com
 import { Platform, useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -29,7 +30,6 @@ import {
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
 import { store as blockEditorStore } from '../store';
-import { __ } from '@wordpress/i18n';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 export const SHADOW_SUPPORT_KEY = 'shadow';
@@ -140,8 +140,15 @@ function BordersInspectorControl( { label, children, resetAllFilter } ) {
 	);
 }
 
-export function BorderPanel( { clientId, name, setAttributes, settings } ) {
+export function BorderPanel( {
+	clientId,
+	name,
+	setAttributes,
+	settings,
+	selectedState = 'default',
+} ) {
 	const isEnabled = useHasBorderPanel( settings );
+	const isStateMode = !! ( selectedState && selectedState !== 'default' );
 	const { style, borderColor } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
@@ -155,12 +162,23 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 		[ clientId, isEnabled ]
 	);
 	const value = useMemo( () => {
+		if ( isStateMode ) {
+			return style?.[ selectedState ];
+		}
 		return attributesToStyle( { style, borderColor } );
-	}, [ style, borderColor ] );
+	}, [ isStateMode, selectedState, style, borderColor ] );
 
-	const onChange = ( newStyle ) => {
-		setAttributes( styleToAttributes( newStyle ) );
-	};
+	const onChange = isStateMode
+		? ( newStateStyle ) =>
+				setAttributes( {
+					style: cleanEmptyObject( {
+						...style,
+						[ selectedState ]: newStateStyle,
+					} ),
+				} )
+		: ( newStyle ) => {
+				setAttributes( styleToAttributes( newStyle ) );
+		  };
 
 	if ( ! isEnabled ) {
 		return null;
