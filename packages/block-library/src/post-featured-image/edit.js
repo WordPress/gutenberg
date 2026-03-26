@@ -245,7 +245,7 @@ export default function PostFeaturedImageEdit( {
 					media={ media }
 				/>
 			</InspectorControls>
-			{ ( featuredImage || isDescendentOfQueryLoop || ! postId ) && (
+			{ ( featuredImage || isDescendentOfQueryLoop || ! postId || ! storedFeaturedImage ) && (
 				<InspectorControls>
 					<ToolsPanel
 						label={ __( 'Settings' ) }
@@ -357,6 +357,32 @@ export default function PostFeaturedImageEdit( {
 									setAttributes( { sizeSlug: nextSizeSlug } )
 								}
 							/>
+						) }
+						{ ! storedFeaturedImage && (
+							<ToolsPanelItem
+								label={ __( 'Use first image from post' ) }
+								isShownByDefault
+								hasValue={ () => !! useFirstImageFromPost }
+								onDeselect={ () =>
+									setAttributes( {
+										useFirstImageFromPost: false,
+									} )
+								}
+							>
+								<ToggleControl
+									label={ __( 'Use first image from post' ) }
+									help={ __(
+										'Use the first image in the post content as the featured image.'
+									) }
+									onChange={ () =>
+										setAttributes( {
+											useFirstImageFromPost:
+												! useFirstImageFromPost,
+										} )
+									}
+									checked={ useFirstImageFromPost }
+								/>
+							</ToolsPanelItem>
 						) }
 					</ToolsPanel>
 				</InspectorControls>
