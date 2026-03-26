@@ -193,22 +193,9 @@ export interface SelectorWithCustomCurrySignature {
  * }
  * ```
  */
-export interface StoreRegistry {}
-
-/**
- * Guards a `StoreRegistry`-keyed return type against `any`.
- *
- * When a store descriptor is typed as `any` (e.g. via `@ts-expect-error`
- * imports), `K` is inferred as `any` and `string extends any` is `true`,
- * so this resolves to `any` — preserving the pre-`StoreRegistry` behavior.
- *
- * When `K` is a concrete literal key like `'core'`, `string extends 'core'`
- * is `false`, so the typed result `R` is used instead.
- */
-export type StoreRegistryResult<
-	K extends keyof StoreRegistry,
-	R,
-> = string extends K ? any : R;
+export interface StoreRegistry {
+	[ key: string ]: StoreDescriptor< AnyConfig >;
+}
 
 /**
  * A store name or store descriptor, used throughout the API.
@@ -230,51 +217,48 @@ export interface DataRegistry {
 		storeNameOrDescriptor?: StoreNameOrDescriptor
 	) => () => void;
 	select: {
-		< K extends keyof StoreRegistry >(
-			storeName: K
-		): StoreRegistryResult< K, CurriedSelectorsOf< StoreRegistry[ K ] > >;
 		< S extends StoreDescriptor< any > >(
 			storeDescriptor: S
 		): CurriedSelectorsOf< S >;
-		(
-			storeNameOrDescriptor: StoreNameOrDescriptor
-		): Record< string, ( ...args: any[] ) => any >;
-	};
-	resolveSelect: {
 		< K extends keyof StoreRegistry >(
 			storeName: K
-		): StoreRegistryResult<
-			K,
-			CurriedSelectorsResolveOf< StoreRegistry[ K ] >
-		>;
+		): CurriedSelectorsOf< StoreRegistry[ K ] >;
+		(
+			storeNameOrDescriptor: StoreNameOrDescriptor
+		): CurriedSelectorsOf< StoreDescriptor >;
+	};
+	resolveSelect: {
 		< S extends StoreDescriptor< any > >(
 			storeDescriptor: S
 		): CurriedSelectorsResolveOf< S >;
-		(
-			storeNameOrDescriptor: StoreNameOrDescriptor
-		): Record< string, ( ...args: any[] ) => Promise< any > >;
-	};
-	suspendSelect: {
 		< K extends keyof StoreRegistry >(
 			storeName: K
-		): StoreRegistryResult< K, CurriedSelectorsOf< StoreRegistry[ K ] > >;
+		): CurriedSelectorsResolveOf< StoreRegistry[ K ] >;
+		(
+			storeNameOrDescriptor: StoreNameOrDescriptor
+		): CurriedSelectorsResolveOf< StoreDescriptor >;
+	};
+	suspendSelect: {
 		< S extends StoreDescriptor< any > >(
 			storeDescriptor: S
 		): CurriedSelectorsOf< S >;
-		(
-			storeNameOrDescriptor: StoreNameOrDescriptor
-		): Record< string, ( ...args: any[] ) => any >;
-	};
-	dispatch: {
 		< K extends keyof StoreRegistry >(
 			storeName: K
-		): StoreRegistryResult< K, ActionCreatorsOf< StoreRegistry[ K ] > >;
+		): CurriedSelectorsOf< StoreRegistry[ K ] >;
+		(
+			storeNameOrDescriptor: StoreNameOrDescriptor
+		): CurriedSelectorsOf< StoreDescriptor >;
+	};
+	dispatch: {
 		< S extends StoreDescriptor< any > >(
 			storeDescriptor: S
 		): ActionCreatorsOf< S >;
+		< K extends keyof StoreRegistry >(
+			storeName: K
+		): ActionCreatorsOf< StoreRegistry[ K ] >;
 		(
 			storeNameOrDescriptor: StoreNameOrDescriptor
-		): Record< string, ( ...args: any[] ) => any >;
+		): ActionCreatorsOf< StoreDescriptor >;
 	};
 	use: (
 		plugin: DataPlugin,

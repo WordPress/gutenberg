@@ -22,10 +22,10 @@ const createResolversCacheMiddleware =
 	( next ) =>
 	( action ) => {
 		const resolvers = registry.select( storeName ).getCachedResolvers();
-		const resolverEntries =
-			Object.entries< Map< string, { status: 'finished' | 'error' } > >(
-				resolvers
-			);
+		const resolverEntries = Object.entries( resolvers ) as [
+			string,
+			Map< unknown[], { status: 'finished' | 'error' } >,
+		][];
 		resolverEntries.forEach( ( [ selectorName, resolversByArgs ] ) => {
 			const resolver =
 				registry.stores[ storeName ]?.resolvers?.[ selectorName ];

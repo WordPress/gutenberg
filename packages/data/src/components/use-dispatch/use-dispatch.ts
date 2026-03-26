@@ -6,22 +6,21 @@ import type {
 	StoreDescriptor,
 	StoreNameOrDescriptor,
 	StoreRegistry,
-	StoreRegistryResult,
 	AnyConfig,
 	ActionCreatorsOf,
 	DataRegistry,
 } from '../../types';
 
 function useDispatch(): DataRegistry[ 'dispatch' ];
-function useDispatch< K extends keyof StoreRegistry >(
-	storeName: K
-): StoreRegistryResult< K, ActionCreatorsOf< StoreRegistry[ K ] > >;
 function useDispatch< S extends StoreDescriptor< AnyConfig > >(
 	storeDescriptor: S
 ): ActionCreatorsOf< S >;
+function useDispatch< K extends keyof StoreRegistry >(
+	storeName: K
+): ActionCreatorsOf< StoreRegistry[ K ] >;
 function useDispatch(
 	storeNameOrDescriptor: StoreNameOrDescriptor
-): Record< string, ( ...args: any[] ) => any >;
+): ActionCreatorsOf< StoreDescriptor >;
 
 /**
  * A custom react hook returning the current registry dispatch actions creators.

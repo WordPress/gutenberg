@@ -6,20 +6,19 @@ import type {
 	CurriedSelectorsResolveOf,
 	StoreDescriptor,
 	StoreRegistry,
-	StoreRegistryResult,
 	StoreNameOrDescriptor,
 } from './types';
 import defaultRegistry from './default-registry';
 
-export function resolveSelect< K extends keyof StoreRegistry >(
-	storeName: K
-): StoreRegistryResult< K, CurriedSelectorsResolveOf< StoreRegistry[ K ] > >;
 export function resolveSelect< S extends StoreDescriptor< AnyConfig > >(
 	storeDescriptor: S
 ): CurriedSelectorsResolveOf< S >;
+export function resolveSelect< K extends keyof StoreRegistry >(
+	storeName: K
+): CurriedSelectorsResolveOf< StoreRegistry[ K ] >;
 export function resolveSelect(
 	storeNameOrDescriptor: StoreNameOrDescriptor
-): Record< string, ( ...args: any[] ) => Promise< any > >;
+): CurriedSelectorsResolveOf< StoreDescriptor >;
 
 /**
  * Given a store descriptor, returns an object containing the store's selectors

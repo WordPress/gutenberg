@@ -22,7 +22,6 @@ import type {
 	StoreDescriptor,
 	StoreNameOrDescriptor,
 	StoreRegistry,
-	StoreRegistryResult,
 	AnyConfig,
 	DataRegistry,
 } from '../../types';
@@ -257,15 +256,15 @@ function useSelect< T extends MapSelect >(
 	mapSelect: T,
 	deps?: unknown[]
 ): ReturnType< T >;
-function useSelect< K extends keyof StoreRegistry >(
-	storeName: K
-): StoreRegistryResult< K, CurriedSelectorsOf< StoreRegistry[ K ] > >;
 function useSelect< S extends StoreDescriptor< AnyConfig > >(
 	storeDescriptor: S
 ): CurriedSelectorsOf< S >;
+function useSelect< K extends keyof StoreRegistry >(
+	storeName: K
+): CurriedSelectorsOf< StoreRegistry[ K ] >;
 function useSelect(
 	storeNameOrDescriptor: StoreNameOrDescriptor
-): Record< string, ( ...args: any[] ) => any >;
+): CurriedSelectorsOf< StoreDescriptor >;
 
 /**
  * Custom react hook for retrieving props from registered selectors.

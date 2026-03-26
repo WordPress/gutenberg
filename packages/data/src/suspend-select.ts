@@ -6,20 +6,19 @@ import type {
 	CurriedSelectorsOf,
 	StoreDescriptor,
 	StoreRegistry,
-	StoreRegistryResult,
 	StoreNameOrDescriptor,
 } from './types';
 import defaultRegistry from './default-registry';
 
-export function suspendSelect< K extends keyof StoreRegistry >(
-	storeName: K
-): StoreRegistryResult< K, CurriedSelectorsOf< StoreRegistry[ K ] > >;
 export function suspendSelect< S extends StoreDescriptor< AnyConfig > >(
 	storeDescriptor: S
 ): CurriedSelectorsOf< S >;
+export function suspendSelect< K extends keyof StoreRegistry >(
+	storeName: K
+): CurriedSelectorsOf< StoreRegistry[ K ] >;
 export function suspendSelect(
 	storeNameOrDescriptor: StoreNameOrDescriptor
-): Record< string, ( ...args: any[] ) => any >;
+): CurriedSelectorsOf< StoreDescriptor >;
 
 /**
  * Given a store descriptor, returns an object containing the store's selectors pre-bound to state

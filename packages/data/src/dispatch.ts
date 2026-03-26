@@ -5,21 +5,20 @@ import type {
 	AnyConfig,
 	StoreDescriptor,
 	StoreRegistry,
-	StoreRegistryResult,
 	StoreNameOrDescriptor,
 	ActionCreatorsOf,
 } from './types';
 import defaultRegistry from './default-registry';
 
-export function dispatch< K extends keyof StoreRegistry >(
-	storeName: K
-): StoreRegistryResult< K, ActionCreatorsOf< StoreRegistry[ K ] > >;
 export function dispatch< S extends StoreDescriptor< AnyConfig > >(
 	storeDescriptor: S
 ): ActionCreatorsOf< S >;
+export function dispatch< K extends keyof StoreRegistry >(
+	storeName: K
+): ActionCreatorsOf< StoreRegistry[ K ] >;
 export function dispatch(
 	storeNameOrDescriptor: StoreNameOrDescriptor
-): Record< string, ( ...args: any[] ) => any >;
+): ActionCreatorsOf< StoreDescriptor >;
 
 /**
  * Given a store descriptor, returns an object of the store's action creators.
