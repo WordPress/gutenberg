@@ -57,7 +57,8 @@ function PreferencesModalContents( { extraSections = {} } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { showBlockBreadcrumbsOption, showCollaborationOptions } = useSelect(
 		( select ) => {
-			const { getEditorSettings } = select( editorStore );
+			const { getEditorSettings, isCollaborationEnabledForCurrentPost } =
+				select( editorStore );
 			const { get } = select( preferencesStore );
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
 			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
@@ -67,9 +68,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 					isLargeViewport &&
 					isRichEditingEnabled,
 				showCollaborationOptions:
-					select(
-						editorStore
-					).isCollaborationEnabledForCurrentPost(),
+					isCollaborationEnabledForCurrentPost(),
 			};
 		},
 		[ isLargeViewport ]
