@@ -1,14 +1,12 @@
-import { type ReactNode } from 'react';
-import {
-	type RootProps as DialogRootProps,
-	type TriggerProps as DialogTriggerProps,
+import type { ReactNode } from 'react';
+
+import type {
+	RootProps as DialogRootProps,
+	TriggerProps as DialogTriggerProps,
 } from '../dialog/types';
 
 export interface RootProps
-	extends Pick<
-		DialogRootProps,
-		'title' | 'open' | 'onOpenChange' | 'defaultOpen'
-	> {
+	extends Pick< DialogRootProps, 'open' | 'onOpenChange' | 'defaultOpen' > {
 	/**
 	 * The content to be rendered inside the component. Typically includes
 	 * `ConfirmDialog.Trigger` and `ConfirmDialog.Popup`.
@@ -30,6 +28,12 @@ export interface RootProps
 	 * @default 'default'
 	 */
 	intent?: 'default' | 'irreversible';
+
+	/**
+	 * The title displayed in the dialog header. This serves as both the
+	 * visible heading and the accessible label for the dialog.
+	 */
+	title: string;
 }
 
 export type TriggerProps = DialogTriggerProps;

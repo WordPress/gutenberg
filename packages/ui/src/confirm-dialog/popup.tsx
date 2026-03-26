@@ -1,27 +1,28 @@
-import { forwardRef, useContext } from 'react';
+import { forwardRef, useContext } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+
 import * as Dialog from '../dialog';
 import { ConfirmDialogContext } from './context';
-import { type PopupProps } from './types';
 import styles from './style.module.css';
+import type { PopupProps } from './types';
 
 const Popup = forwardRef< HTMLDivElement, PopupProps >(
 	function ConfirmDialogPopup(
 		{
 			children,
 			onConfirm,
-			confirmButtonText = __( 'OK', 'wpds' ),
-			cancelButtonText = __( 'Cancel', 'wpds' ),
+			confirmButtonText = __( 'OK' ),
+			cancelButtonText = __( 'Cancel' ),
 		},
 		ref
 	) {
-		const { intent } = useContext( ConfirmDialogContext );
+		const { intent, title } = useContext( ConfirmDialogContext );
 		const isIrreversible = intent === 'irreversible';
 
 		return (
 			<Dialog.Popup ref={ ref }>
 				<Dialog.Header>
-					<Dialog.Heading />
+					<Dialog.Title>{ title }</Dialog.Title>
 				</Dialog.Header>
 				{ children }
 				<Dialog.Footer>
