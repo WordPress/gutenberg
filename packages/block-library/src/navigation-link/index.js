@@ -124,9 +124,23 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			Edit: 'link',
 			getValue: ( { item } ) => ( {
 				url: item.url,
+				id: item.id,
+				kind: item.kind,
+				type: item.type,
+				binding: item.metadata?.bindings?.url,
 			} ),
-			setValue: ( { value } ) => ( {
+			setValue: ( { item, value } ) => ( {
 				url: value.url,
+				id: value.id,
+				kind: value.kind,
+				type: value.type,
+				metadata: {
+					...item.metadata,
+					bindings: {
+						...item.metadata?.bindings,
+						url: value.binding,
+					},
+				},
 			} ),
 		},
 		{
