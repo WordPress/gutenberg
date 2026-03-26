@@ -144,22 +144,6 @@ $id = wp_unique_id_from_values(
 
 This applies to any selector used in CSS — class names, IDs, or `data-*` attributes used in stylesheets.
 
-#### Handle CSS animations and transitions
-
-CSS animations and transitions may not replay after a client-side navigation. When the virtual DOM diffing algorithm updates an element in place rather than remounting it, the browser does not restart its CSS animations — the element was never removed from the DOM, so no new animation cycle begins.
-
-To re-trigger animations after navigation, toggle the animation's CSS class using `data-wp-class` combined with a state value that changes on each navigation, or use `data-wp-init` to programmatically restart the animation by removing and re-adding the relevant class:
-
-```html
-<div
-	data-wp-interactive="myPlugin"
-	data-wp-init="callbacks.restartAnimation"
-	data-wp-class--animate="state.shouldAnimate"
->
-	Animated content
-</div>
-```
-
 ### JavaScript
 
 #### Use script modules, not regular scripts
@@ -328,7 +312,6 @@ Before marking your block as compatible with client-side navigation, verify the 
 -   [ ] The block does not inject `<style>` or `<link>` elements dynamically through JavaScript.
 -   [ ] The block does not modify existing stylesheets at runtime (e.g., via CSSOM APIs).
 -   [ ] CSS selectors (class names, IDs) are stable across navigations — no use of `wp_unique_id()` for selectors.
--   [ ] CSS animations and transitions work correctly after a client-side navigation (they may need to be re-triggered).
 -   [ ] The block uses script modules, not regular `<script>` tags.
 -   [ ] The block does not import from `window.wp.*` globals — it uses ES module imports instead.
 -   [ ] The block does not rely on `DOMContentLoaded` or `load` events for initialization — it uses `data-wp-init` instead.
