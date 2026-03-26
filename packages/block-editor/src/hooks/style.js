@@ -41,6 +41,8 @@ import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspect
 import StylesColorPanel from '../components/global-styles/color-panel';
 import StylesTypographyPanel from '../components/global-styles/typography-panel';
 import StylesBorderPanel from '../components/global-styles/border-panel';
+import StylesDimensionsPanel from '../components/global-styles/dimensions-panel';
+import StylesBackgroundPanel from '../components/global-styles/background-panel';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import InspectorControls from '../components/inspector-controls';
@@ -420,6 +422,13 @@ function BlockStyleControls( {
 						settings={ panelSettings }
 						panelId={ clientId }
 					/>
+					<StylesBackgroundPanel
+						value={ stateValue }
+						inheritedValue={ stateValue }
+						onChange={ setStateStyle }
+						settings={ panelSettings }
+						panelId={ clientId }
+					/>
 					<StylesTypographyPanel
 						value={ stateValue }
 						inheritedValue={ stateValue }
@@ -434,6 +443,13 @@ function BlockStyleControls( {
 						settings={ panelSettings }
 						panelId={ clientId }
 						name={ name }
+					/>
+					<StylesDimensionsPanel
+						value={ stateValue }
+						inheritedValue={ stateValue }
+						onChange={ setStateStyle }
+						settings={ panelSettings }
+						panelId={ clientId }
 					/>
 				</InspectorControls>
 			</>
