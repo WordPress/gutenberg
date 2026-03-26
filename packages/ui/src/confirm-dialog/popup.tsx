@@ -2,7 +2,7 @@ import { forwardRef, useContext } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import * as Dialog from '../dialog';
-import { ConfirmDialogContext } from './context';
+import { ConfirmDialogContext, getIntentConfig } from './context';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
 
@@ -17,10 +17,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 		ref
 	) {
 		const { intent, title } = useContext( ConfirmDialogContext );
-		const isIrreversible = intent === 'irreversible';
+		const { popupRole } = getIntentConfig( intent );
 
 		return (
-			<Dialog.Popup ref={ ref }>
+			<Dialog.Popup ref={ ref } role={ popupRole }>
 				<Dialog.Header>
 					<Dialog.Title>{ title }</Dialog.Title>
 				</Dialog.Header>
@@ -31,7 +31,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 					</Dialog.Action>
 					<Dialog.Action
 						className={
-							isIrreversible
+							intent === 'irreversible'
 								? styles[ 'irreversible-action' ]
 								: undefined
 						}

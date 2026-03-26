@@ -23,7 +23,8 @@ type Story = StoryObj< typeof ConfirmDialog.Root >;
 
 /**
  * Standard confirmation dialog for reversible actions. The dialog can be
- * dismissed via backdrop click, Escape key, cancel, or confirm button.
+ * dismissed via Escape key, cancel, or confirm button, but not via backdrop
+ * click.
  */
 export const Default: Story = {
 	args: {
@@ -41,8 +42,9 @@ export const Default: Story = {
 
 /**
  * Confirmation dialog for irreversible actions that cannot be undone. Users can
- * dismiss the dialog via Escape key, cancel, or confirm button, but not via
- * backdrop click. The "confirm" action button uses error/danger coloring.
+ * only dismiss the dialog via cancel or confirm button — both backdrop click
+ * and Escape key are blocked. The popup uses `role="alertdialog"` and the
+ * confirm button uses error/danger coloring.
  */
 export const Irreversible: Story = {
 	args: {

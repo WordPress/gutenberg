@@ -51,6 +51,43 @@ describe( 'ConfirmDialog', () => {
 		).toBeVisible();
 	} );
 
+	it( 'renders with role="dialog" for default intent', async () => {
+		render(
+			<ConfirmDialog.Root
+				title="Default Dialog"
+				open
+				onOpenChange={ jest.fn() }
+			>
+				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
+					Content
+				</ConfirmDialog.Popup>
+			</ConfirmDialog.Root>
+		);
+
+		await waitFor( () => {
+			expect( screen.getByRole( 'dialog' ) ).toBeVisible();
+		} );
+	} );
+
+	it( 'renders with role="alertdialog" for irreversible intent', async () => {
+		render(
+			<ConfirmDialog.Root
+				title="Irreversible Dialog"
+				intent="irreversible"
+				open
+				onOpenChange={ jest.fn() }
+			>
+				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
+					Content
+				</ConfirmDialog.Popup>
+			</ConfirmDialog.Root>
+		);
+
+		await waitFor( () => {
+			expect( screen.getByRole( 'alertdialog' ) ).toBeVisible();
+		} );
+	} );
+
 	it( 'calls onConfirm and onOpenChange when confirm button is clicked', async () => {
 		const onConfirm = jest.fn();
 		const onOpenChange = jest.fn();
@@ -115,6 +152,57 @@ describe( 'ConfirmDialog', () => {
 		expect( onConfirm ).not.toHaveBeenCalled();
 	} );
 
+	it( 'calls onOpenChange on escape key for default intent', async () => {
+		const onOpenChange = jest.fn();
+
+		render(
+			<ConfirmDialog.Root
+				title="Default Dialog"
+				open
+				onOpenChange={ onOpenChange }
+			>
+				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
+					Content
+				</ConfirmDialog.Popup>
+			</ConfirmDialog.Root>
+		);
+
+		await waitFor( () => {
+			expect( screen.getByText( 'Default Dialog' ) ).toBeVisible();
+		} );
+
+		await userEvent.keyboard( '{Escape}' );
+
+		expect( onOpenChange ).toHaveBeenCalledWith(
+			false,
+			expect.objectContaining( { reason: 'escape-key' } )
+		);
+	} );
+
+	it( 'does not call onOpenChange on backdrop click for default intent', async () => {
+		const onOpenChange = jest.fn();
+
+		render(
+			<ConfirmDialog.Root
+				title="Default Dialog"
+				open
+				onOpenChange={ onOpenChange }
+			>
+				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
+					Content
+				</ConfirmDialog.Popup>
+			</ConfirmDialog.Root>
+		);
+
+		await waitFor( () => {
+			expect( screen.getByText( 'Default Dialog' ) ).toBeVisible();
+		} );
+
+		await userEvent.click( document.body );
+
+		expect( onOpenChange ).not.toHaveBeenCalled();
+	} );
+
 	it( 'renders with title, message, and default buttons for irreversible intent', async () => {
 		render(
 			<ConfirmDialog.Root
@@ -145,7 +233,7 @@ describe( 'ConfirmDialog', () => {
 		).toBeVisible();
 	} );
 
-	it( 'calls onOpenChange on escape key for irreversible intent', async () => {
+	it( 'does not call onOpenChange on escape key for irreversible intent', async () => {
 		const onOpenChange = jest.fn();
 
 		render(
@@ -167,10 +255,7 @@ describe( 'ConfirmDialog', () => {
 
 		await userEvent.keyboard( '{Escape}' );
 
-		expect( onOpenChange ).toHaveBeenCalledWith(
-			false,
-			expect.objectContaining( { reason: 'escape-key' } )
-		);
+		expect( onOpenChange ).not.toHaveBeenCalled();
 	} );
 
 	it( 'does not call onOpenChange on backdrop click for irreversible intent', async () => {
@@ -193,7 +278,6 @@ describe( 'ConfirmDialog', () => {
 			expect( screen.getByText( 'Irreversible Dialog' ) ).toBeVisible();
 		} );
 
-		// Click the backdrop (outside the dialog)
 		await userEvent.click( document.body );
 
 		expect( onOpenChange ).not.toHaveBeenCalled();

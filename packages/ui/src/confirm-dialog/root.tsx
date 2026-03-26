@@ -2,7 +2,7 @@ import { useMemo } from '@wordpress/element';
 
 import * as Dialog from '../dialog';
 import type { RootProps as DialogRootProps } from '../dialog/types';
-import { ConfirmDialogContext } from './context';
+import { ConfirmDialogContext, getIntentConfig } from './context';
 import type { RootProps } from './types';
 
 /**
@@ -17,12 +17,12 @@ import type { RootProps } from './types';
  * ## Use cases
  *
  * - **Default intent**: Standard confirmation dialog for reversible actions.
- *   The dialog can be dismissed via backdrop click, Escape key, cancel, or
- *   confirm button.
+ *   The dialog can be dismissed via Escape key, cancel, or confirm button,
+ *   but not via backdrop click.
  * - **Irreversible intent**: Confirmation dialog for irreversible actions that
- *   cannot be undone. Users can dismiss the dialog via Escape key, cancel, or
- *   confirm button, but not via backdrop click. The "confirm" action button
- *   uses error/danger coloring.
+ *   cannot be undone. Users can only dismiss the dialog via cancel or confirm
+ *   button — both backdrop click and Escape key are blocked. The popup uses
+ *   `role="alertdialog"` and the confirm button uses error/danger coloring.
  *
  * For use cases outside the standard confirm/cancel pattern, use the lower-level
  * `Dialog` component directly.
@@ -38,7 +38,7 @@ function Root( {
 	onOpenChange,
 	defaultOpen,
 }: RootProps ) {
-	const isIrreversible = intent === 'irreversible';
+	const intentConfig = getIntentConfig( intent );
 
 	const handleOpenChange: DialogRootProps[ 'onOpenChange' ] = (
 		nextOpen,
@@ -46,14 +46,7 @@ function Root( {
 	) => {
 		const { reason, cancel } = eventDetails;
 
-		if (
-			isIrreversible &&
-			! nextOpen &&
-			! [ 'close-press', 'escape-key' ].includes( reason )
-		) {
-			// For irreversible actions, user must explicitly click the
-			// confirm or cancel button, or press the Escape key. Clicking
-			// on the backdrop won't close the dialog.
+		if ( ! nextOpen && intentConfig.shouldBlockDismiss( reason ) ) {
 			cancel();
 		} else {
 			onOpenChange?.( nextOpen, eventDetails );
