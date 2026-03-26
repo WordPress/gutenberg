@@ -109,7 +109,7 @@ function UploadFonts() {
 			files.map( async ( fontFile: File ) => {
 				const fontFaceMetadata = await getFontFaceMetadata( fontFile );
 				const { fontDisplayName, ...metadata } = fontFaceMetadata;
-				await loadFontFaceInBrowser(
+				loadFontFaceInBrowser(
 					{
 						...metadata,
 						fontFamily: createCssString( fontDisplayName ),
