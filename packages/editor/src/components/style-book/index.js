@@ -386,11 +386,9 @@ export const StyleBookPreview = ( {
 	settings: settingsProp,
 } ) => {
 	const editorSettings = useSelect(
-		( select ) => select( editorStore ).getEditorSettings(),
-		[]
+		( select ) => settingsProp ?? select( editorStore ).getEditorSettings(),
+		[ settingsProp ]
 	);
-
-	const baseSettings = settingsProp ?? editorSettings;
 
 	const canUserUploadMedia = useSelect(
 		( select ) =>
@@ -404,10 +402,10 @@ export const StyleBookPreview = ( {
 	// Update block editor settings because useMultipleOriginColorsAndGradients fetch colours from there.
 	useEffect( () => {
 		dispatch( blockEditorStore ).updateSettings( {
-			...baseSettings,
+			...editorSettings,
 			mediaUpload: canUserUploadMedia ? uploadMedia : undefined,
 		} );
-	}, [ baseSettings, canUserUploadMedia ] );
+	}, [ editorSettings, canUserUploadMedia ] );
 
 	const [ internalPath, setInternalPath ] = useState( '/' );
 	const section = path ?? internalPath;
@@ -533,14 +531,14 @@ export const StyleBookPreview = ( {
 
 	const settings = useMemo(
 		() => ( {
-			...baseSettings,
+			...editorSettings,
 			styles:
 				! isObjectEmpty( globalStyles ) && ! isObjectEmpty( userConfig )
 					? globalStyles
-					: baseSettings.styles,
+					: editorSettings.styles,
 			isPreviewMode: true,
 		} ),
-		[ globalStyles, baseSettings, userConfig ]
+		[ globalStyles, editorSettings, userConfig ]
 	);
 
 	return (
