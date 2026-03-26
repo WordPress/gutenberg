@@ -12,22 +12,25 @@ const VENDORS_DIR = path.join( BUILD_DIR, 'vendors' );
 
 const VENDOR_SCRIPTS = [
 	{
-		name: 'react',
-		global: 'React',
 		handle: 'react',
+		global: 'React',
 		dependencies: [ 'wp-polyfill' ],
+		entrypoint: 'react',
 	},
 	{
-		name: 'react-dom',
-		global: 'ReactDOM',
 		handle: 'react-dom',
+		global: 'ReactDOM',
 		dependencies: [ 'react' ],
+		contents: [
+			'export * from "react-dom";',
+			'export { createRoot, hydrateRoot } from "react-dom/client";',
+		].join( '\n' ),
 	},
 	{
-		name: 'react/jsx-runtime',
-		global: 'ReactJSXRuntime',
 		handle: 'react-jsx-runtime',
+		global: 'ReactJSXRuntime',
 		dependencies: [ 'react' ],
+		entrypoint: 'react/jsx-runtime',
 	},
 ];
 
@@ -87,7 +90,7 @@ async function generateAssetFile( config ) {
  * @return {Promise<void>} Promise that resolves when all builds are finished.
  */
 async function bundleVendorScript( config ) {
-	const { name, global, handle } = config;
+	const { handle, global, entrypoint, contents } = config;
 
 	// Plugin that externalizes the `react` package.
 	const reactExternalPlugin = {
@@ -114,7 +117,6 @@ async function bundleVendorScript( config ) {
 	};
 
 	const esbuildOptions = {
-		entryPoints: [ name ],
 		bundle: true,
 		format: 'iife',
 		globalName: global,
@@ -122,6 +124,16 @@ async function bundleVendorScript( config ) {
 		platform: 'browser',
 		plugins: [ reactExternalPlugin ],
 	};
+
+	if ( entrypoint ) {
+		esbuildOptions.entryPoints = [ entrypoint ];
+	} else {
+		esbuildOptions.stdin = {
+			contents,
+			resolveDir: ROOT_DIR,
+			loader: 'js',
+		};
+	}
 
 	await Promise.all( [
 		esbuild.build( {
@@ -150,11 +162,11 @@ async function buildVendors() {
 			await bundleVendorScript( vendorConfig );
 			const buildTime = Date.now() - startTime;
 			console.log(
-				`   ✔ Bundled vendor ${ vendorConfig.name } (${ buildTime }ms)`
+				`   ✔ Bundled vendor ${ vendorConfig.handle } (${ buildTime }ms)`
 			);
 		} catch ( error ) {
 			console.error(
-				`   ✘ Failed to bundle vendor ${ vendorConfig.name }: ${ error.message }`
+				`   ✘ Failed to bundle vendor ${ vendorConfig.handle }: ${ error.message }`
 			);
 		}
 	}
