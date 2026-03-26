@@ -9,7 +9,7 @@ import path from 'path';
 /**
  * WordPress dependencies
  */
-import { test } from '@wordpress/e2e-test-utils-playwright';
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 const results = {
 	mediaProcessingJpeg: [],
@@ -80,6 +80,7 @@ async function measureCrossFormatProcessing( {
 		'@wordpress/vips/worker'
 	);
 	const bytes = Uint8Array.from( atob( base64 ), ( c ) => c.charCodeAt( 0 ) );
+	const outputs = [];
 
 	const start = performance.now();
 	for ( const resize of sizes ) {
@@ -92,7 +93,7 @@ async function measureCrossFormatProcessing( {
 			false,
 			0.82
 		);
-		await vipsConvertImageFormat(
+		const converted = await vipsConvertImageFormat(
 			`perf-xfmt-conv-${ resize.width }`,
 			resized.buffer,
 			srcType,
@@ -100,8 +101,15 @@ async function measureCrossFormatProcessing( {
 			0.82,
 			false
 		);
+		const header = Array.from( new Uint8Array( converted ).slice( 0, 4 ) );
+		outputs.push( {
+			width: resized.width,
+			height: resized.height,
+			byteLength: converted.byteLength,
+			header,
+		} );
 	}
-	return performance.now() - start;
+	return { elapsed: performance.now() - start, outputs };
 }
 
 /**
@@ -121,6 +129,7 @@ async function measureCrossFormatViaPng( { base64, srcType, dstType, sizes } ) {
 		'@wordpress/vips/worker'
 	);
 	const bytes = Uint8Array.from( atob( base64 ), ( c ) => c.charCodeAt( 0 ) );
+	const outputs = [];
 
 	const start = performance.now();
 
@@ -148,7 +157,7 @@ async function measureCrossFormatViaPng( { base64, srcType, dstType, sizes } ) {
 			0.82
 		);
 		// Step 3: Transcode resized PNG to target format.
-		await vipsConvertImageFormat(
+		const converted = await vipsConvertImageFormat(
 			`perf-png-conv-${ resize.width }`,
 			resized.buffer,
 			'image/png',
@@ -156,8 +165,15 @@ async function measureCrossFormatViaPng( { base64, srcType, dstType, sizes } ) {
 			0.82,
 			false
 		);
+		const header = Array.from( new Uint8Array( converted ).slice( 0, 4 ) );
+		outputs.push( {
+			width: resized.width,
+			height: resized.height,
+			byteLength: converted.byteLength,
+			header,
+		} );
 	}
-	return performance.now() - start;
+	return { elapsed: performance.now() - start, outputs };
 }
 
 test.describe( 'Media Processing Performance', () => {
@@ -243,7 +259,7 @@ test.describe( 'Media Processing Performance', () => {
 			} );
 
 			// AVIF → JPEG: current approach (resize as AVIF, then transcode each).
-			const avifToJpegElapsed = await page.evaluate(
+			const avifToJpeg = await page.evaluate(
 				measureCrossFormatProcessing,
 				{
 					base64: avifBase64,
@@ -254,7 +270,7 @@ test.describe( 'Media Processing Performance', () => {
 			);
 
 			// AVIF → JPEG via PNG intermediate (proposed optimization).
-			const avifToJpegViaPngElapsed = await page.evaluate(
+			const avifToJpegViaPng = await page.evaluate(
 				measureCrossFormatViaPng,
 				{
 					base64: avifBase64,
@@ -264,13 +280,30 @@ test.describe( 'Media Processing Performance', () => {
 				}
 			);
 
+			// Validate that cross-format outputs are actually JPEG.
+			// JPEG magic bytes: 0xFF 0xD8 0xFF.
+			for ( const output of avifToJpeg.outputs ) {
+				expect( output.header[ 0 ] ).toBe( 0xff );
+				expect( output.header[ 1 ] ).toBe( 0xd8 );
+				expect( output.byteLength ).toBeGreaterThan( 0 );
+				expect( output.width ).toBeGreaterThan( 0 );
+				expect( output.height ).toBeGreaterThan( 0 );
+			}
+			for ( const output of avifToJpegViaPng.outputs ) {
+				expect( output.header[ 0 ] ).toBe( 0xff );
+				expect( output.header[ 1 ] ).toBe( 0xd8 );
+				expect( output.byteLength ).toBeGreaterThan( 0 );
+				expect( output.width ).toBeGreaterThan( 0 );
+				expect( output.height ).toBeGreaterThan( 0 );
+			}
+
 			if ( i > throwaway ) {
 				results.mediaProcessingJpeg.push( jpegElapsed );
 				results.mediaProcessingWebp.push( webpElapsed );
 				results.mediaProcessingAvif.push( avifElapsed );
-				results.mediaProcessingAvifToJpeg.push( avifToJpegElapsed );
+				results.mediaProcessingAvifToJpeg.push( avifToJpeg.elapsed );
 				results.mediaProcessingAvifToJpegViaPng.push(
-					avifToJpegViaPngElapsed
+					avifToJpegViaPng.elapsed
 				);
 			}
 		} );
