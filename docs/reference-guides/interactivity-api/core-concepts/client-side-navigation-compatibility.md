@@ -75,7 +75,7 @@ That said, interactive blocks must follow certain practices to remain compatible
 
 The same applies for interactive regions included in classic PHP themes or plugins.
 
-### Interactive blocks using vanilla JavaScript (DOM APIs) other interactive libraries
+### Interactive blocks using vanilla JavaScript (DOM APIs) or other interactive libraries
 
 Blocks that use vanilla JavaScript, jQuery, or any framework other than the Interactivity API for client-side behavior are **not compatible** with client-side navigation. Set `clientNavigation` to `false` (or omit it) for these blocks.
 
