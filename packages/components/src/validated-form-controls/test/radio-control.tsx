@@ -20,7 +20,7 @@ describe( 'ValidatedRadioControl', () => {
 		);
 
 		expect(
-			screen.getByRole( 'radiogroup', { name: 'Size' } )
+			screen.getByRole( 'group', { name: 'Size' } )
 		).toHaveAccessibleDescription( 'Choose a size.' );
 	} );
 
@@ -42,7 +42,7 @@ describe( 'ValidatedRadioControl', () => {
 		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
 
 		// The validation error targets the first radio input (the validity
-		// target), while the help description stays on the radiogroup.
+		// target), while the help description stays on the group.
 		const firstRadio = screen.getByRole( 'radio', {
 			name: 'Small',
 		} );
@@ -53,7 +53,7 @@ describe( 'ValidatedRadioControl', () => {
 		} );
 
 		expect(
-			screen.getByRole( 'radiogroup', { name: /^Size/ } )
+			screen.getByRole( 'group', { name: /^Size/ } )
 		).toHaveAccessibleDescription(
 			expect.stringContaining( 'Choose a size.' )
 		);
