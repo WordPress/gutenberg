@@ -6,9 +6,13 @@ import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { getTranscodeImageOperation, finalizeItem } from '../private-actions';
+import {
+	getTranscodeImageOperation,
+	finalizeItem,
+	generateThumbnails,
+} from '../private-actions';
 import { OperationType } from '../types';
-import { vipsHasTransparency } from '../utils';
+import { vipsHasTransparency, vipsConvertImageFormat } from '../utils';
 
 // Mock @wordpress/blob
 jest.mock( '@wordpress/blob', () => ( {
@@ -19,6 +23,7 @@ jest.mock( '@wordpress/blob', () => ( {
 // Mock vips utilities
 jest.mock( '../utils', () => ( {
 	vipsHasTransparency: jest.fn(),
+	vipsConvertImageFormat: jest.fn(),
 } ) );
 
 describe( 'private actions', () => {
@@ -344,6 +349,155 @@ describe( 'private actions', () => {
 			await thunk( { select, dispatch } );
 
 			expect( finishOperation ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'generateThumbnails - PNG intermediate conversion', () => {
+		let addSideloadItem;
+		let finishOperation;
+		let dispatch;
+
+		const pngFile = new File( [ 'png-data' ], 'converted.png', {
+			type: 'image/png',
+		} );
+
+		function makeSelect( {
+			sourceType = 'image/avif',
+			outputMimeType = 'image/jpeg',
+			filename = 'photo.avif',
+		} = {} ) {
+			const sourceFile = new File( [ 'test' ], filename, {
+				type: sourceType,
+			} );
+			return {
+				getItem: () => ( {
+					id: 'item-1',
+					file: sourceFile,
+					sourceFile,
+					attachment: {
+						id: 42,
+						filename,
+						missing_image_sizes: [ 'thumbnail', 'medium' ],
+					},
+				} ),
+				getSettings: () => ( {
+					allImageSizes: {
+						thumbnail: { width: 150, height: 150, crop: true },
+						medium: { width: 300, height: 300, crop: false },
+					},
+					imageOutputFormats: outputMimeType
+						? { [ sourceType ]: outputMimeType }
+						: {},
+					jpegInterlaced: false,
+					pngInterlaced: false,
+					gifInterlaced: false,
+				} ),
+			};
+		}
+
+		beforeEach( () => {
+			jest.clearAllMocks();
+			addSideloadItem = jest.fn();
+			finishOperation = jest.fn();
+			dispatch = { addSideloadItem, finishOperation };
+			vipsConvertImageFormat.mockResolvedValue( pngFile );
+		} );
+
+		it( 'should convert AVIF to PNG intermediate when output format differs', async () => {
+			const select = makeSelect( {
+				sourceType: 'image/avif',
+				outputMimeType: 'image/jpeg',
+			} );
+
+			const thunk = generateThumbnails( 'item-1' );
+			await thunk( { select, dispatch } );
+
+			expect( vipsConvertImageFormat ).toHaveBeenCalledWith(
+				'item-1',
+				expect.any( File ),
+				'image/png',
+				1,
+				false
+			);
+			// Each thumbnail sideload item should use the PNG file.
+			const thumbnailCall = addSideloadItem.mock.calls.find(
+				( call ) => call[ 0 ].additionalData?.image_size === 'thumbnail'
+			);
+			expect( thumbnailCall ).toBeDefined();
+			expect( thumbnailCall[ 0 ].file ).toBe( pngFile );
+		} );
+
+		it( 'should skip PNG conversion when source is already PNG', async () => {
+			vipsHasTransparency.mockResolvedValue( false );
+			const select = makeSelect( {
+				sourceType: 'image/png',
+				outputMimeType: 'image/jpeg',
+				filename: 'photo.png',
+			} );
+
+			const thunk = generateThumbnails( 'item-1' );
+			await thunk( { select, dispatch } );
+
+			expect( vipsConvertImageFormat ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should skip PNG conversion when source and output formats match', async () => {
+			const select = makeSelect( {
+				sourceType: 'image/jpeg',
+				outputMimeType: undefined,
+				filename: 'photo.jpg',
+			} );
+
+			const thunk = generateThumbnails( 'item-1' );
+			await thunk( { select, dispatch } );
+
+			expect( vipsConvertImageFormat ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should skip PNG conversion for GIF source (animated format)', async () => {
+			const select = makeSelect( {
+				sourceType: 'image/gif',
+				outputMimeType: 'image/jpeg',
+				filename: 'animation.gif',
+			} );
+
+			const thunk = generateThumbnails( 'item-1' );
+			await thunk( { select, dispatch } );
+
+			expect( vipsConvertImageFormat ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should skip PNG conversion for WebP source (potentially animated)', async () => {
+			const select = makeSelect( {
+				sourceType: 'image/webp',
+				outputMimeType: 'image/jpeg',
+				filename: 'image.webp',
+			} );
+
+			const thunk = generateThumbnails( 'item-1' );
+			await thunk( { select, dispatch } );
+
+			expect( vipsConvertImageFormat ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should fall back to original file when PNG conversion fails', async () => {
+			vipsConvertImageFormat.mockRejectedValue(
+				new Error( 'Conversion failed' )
+			);
+			const select = makeSelect( {
+				sourceType: 'image/avif',
+				outputMimeType: 'image/jpeg',
+			} );
+
+			const thunk = generateThumbnails( 'item-1' );
+			await thunk( { select, dispatch } );
+
+			// Should still create sideload items with original file.
+			const thumbnailCall = addSideloadItem.mock.calls.find(
+				( call ) => call[ 0 ].additionalData?.image_size === 'thumbnail'
+			);
+			expect( thumbnailCall ).toBeDefined();
+			expect( thumbnailCall[ 0 ].file.type ).toBe( 'image/avif' );
 		} );
 	} );
 } );

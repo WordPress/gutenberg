@@ -1167,6 +1167,33 @@ export function generateThumbnails( id: QueueItemId ) {
 				);
 			}
 
+			// When the output format differs from the source, convert to a
+			// lossless PNG intermediate before resizing. This avoids
+			// expensive encoding in the source format (e.g. AVIF ~2s per
+			// encode) for each sub-size, since those buffers are
+			// immediately transcoded to the output format anyway.
+			// PNG is lossless, so there is no generational quality loss.
+			let thumbnailFile = file;
+			if (
+				thumbnailTranscodeOperation &&
+				sourceType !== 'image/png' &&
+				sourceType !== 'image/gif' &&
+				sourceType !== 'image/webp'
+			) {
+				try {
+					thumbnailFile = await vipsConvertImageFormat(
+						item.id,
+						file,
+						'image/png',
+						1,
+						false
+					);
+				} catch {
+					// If conversion fails, fall back to the original file.
+					thumbnailFile = file;
+				}
+			}
+
 			for ( const name of sizesToGenerate ) {
 				const imageSize = allImageSizes[ name ];
 				if ( ! imageSize ) {
@@ -1191,7 +1218,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				thumbnailOperations.push( OperationType.Upload );
 
 				dispatch.addSideloadItem( {
-					file,
+					file: thumbnailFile,
 					onChange: ( [ updatedAttachment ] ) => {
 						// If the sub-size is still being generated, there is no need
 						// to invoke the callback below. It would just override
@@ -1231,9 +1258,31 @@ export function generateThumbnails( id: QueueItemId ) {
 
 				if ( needsScaling ) {
 					// Rename sourceFile to match the server attachment filename.
-					const sourceForScaled = attachment.filename
+					let sourceForScaled = attachment.filename
 						? renameFile( item.sourceFile, attachment.filename )
 						: item.sourceFile;
+
+					// Use PNG intermediate for scaled version too when
+					// format conversion is configured (same rationale as
+					// thumbnails above).
+					if (
+						thumbnailTranscodeOperation &&
+						sourceType !== 'image/png' &&
+						sourceType !== 'image/gif' &&
+						sourceType !== 'image/webp'
+					) {
+						try {
+							sourceForScaled = await vipsConvertImageFormat(
+								item.id,
+								sourceForScaled,
+								'image/png',
+								1,
+								false
+							);
+						} catch {
+							// Fall back to original file on failure.
+						}
+					}
 
 					// Add scaling to queue.
 					const scaledOperations: Operation[] = [
