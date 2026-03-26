@@ -119,5 +119,99 @@ test.describe( 'Font Library', () => {
 					.getByText( 'Font family uninstalled successfully.' )
 			).toBeVisible();
 		} );
+
+		test( 'should handle fonts with special characters in the name', async ( {
+			page,
+			editor,
+			admin,
+		} ) => {
+			// The font's OpenType name table family name contains special characters:
+			// `"Ephesis" font with <special \> {chars} & things, ya'know?`
+			const fontNamePattern = /Ephesis/;
+
+			await page.getByRole( 'tab', { name: 'Upload' } ).click();
+
+			// Upload the font with special characters in its name.
+			const fileChooserPromise = page.waitForEvent( 'filechooser' );
+			await page.getByRole( 'button', { name: 'Upload Font' } ).click();
+			const fileChooser = await fileChooserPromise;
+			await fileChooser.setFiles( [
+				'./test/e2e/assets/Ephesis-modified-name.ttf',
+			] );
+
+			// Check font was installed.
+			await expect(
+				page
+					.getByLabel( 'Upload' )
+					.getByText( 'Fonts were installed successfully.' )
+			).toBeVisible();
+
+			// Verify font appears in Library tab.
+			await page.getByRole( 'tab', { name: 'Library' } ).click();
+			const fontButton = page.getByRole( 'button', {
+				name: fontNamePattern,
+			} );
+			await expect( fontButton ).toBeVisible();
+
+			// Navigate to post editor and apply the font.
+			await admin.createNewPost();
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await page.keyboard.type( 'Testing special chars font' );
+
+			// Open typography settings and apply the custom font.
+			await page
+				.getByRole( 'button', { name: 'Typography options' } )
+				.click();
+			await page
+				.getByRole( 'menuitemcheckbox', { name: 'Show Font' } )
+				.click();
+			await page.getByRole( 'combobox', { name: 'Font' } ).click();
+			await page.getByRole( 'option', { name: fontNamePattern } ).click();
+
+			// Verify font-family CSS is applied in the editor canvas.
+			await expect(
+				editor.canvas.locator(
+					'p:has-text("Testing special chars font")'
+				)
+			).toHaveCSS( 'font-family', /Ephesis/ );
+
+			// Publish the post and verify font is applied on frontend.
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			// Verify font-family CSS is applied in the frontend.
+			await expect(
+				page.locator( 'p:has-text("Testing special chars font")' )
+			).toHaveCSS( 'font-family', /Ephesis/ );
+
+			// Verify the font is actually loaded using the FontFaceSet API.
+			const isFontLoaded = await page.evaluate( () => {
+				for ( const face of document.fonts ) {
+					if ( face.family.includes( 'Ephesis' ) ) {
+						return true;
+					}
+				}
+				return false;
+			} );
+			expect( isFontLoaded ).toBe( true );
+
+			// Delete the font.
+			await admin.visitAdminPage(
+				'admin.php',
+				'page=font-library-wp-admin'
+			);
+
+			await page.getByRole( 'button', { name: fontNamePattern } ).click();
+			await page.getByRole( 'button', { name: 'Delete' } ).click();
+			await expect(
+				page.getByText( /Are you sure you want to delete.*Ephesis/ )
+			).toBeVisible();
+			await page.getByRole( 'button', { name: 'Delete' } ).click();
+			await expect(
+				page
+					.getByLabel( 'Library' )
+					.getByText( 'Font family uninstalled successfully.' )
+			).toBeVisible();
+		} );
 	} );
 } );
