@@ -101,7 +101,7 @@ The same applies for interactive regions included in classic PHP themes or plugi
 
 ## Ensuring compatibility
 
-Any code that outputs front-end markup — whether it uses the Interactivity API, server-side rendering only, or a combination — needs to follow certain guidelines to work correctly with client-side navigation. The sections below are organized by the type of issue: CSS, JavaScript, and HTML.
+Interactive blocks and regions that use the Interactivity API need to follow certain guidelines to work correctly with client-side navigation. The sections below are organized by the type of issue: CSS, JavaScript, and HTML.
 
 ### CSS
 
