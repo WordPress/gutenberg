@@ -53,6 +53,24 @@ export const DefaultConnectorLogo = () => (
 	</svg>
 );
 
+// Akismet logo as inline SVG
+export const AkismetLogo = () => (
+	<svg
+		width="40"
+		height="40"
+		viewBox="0 0 40 40"
+		fill="none"
+		xmlns="http://www.w3.org/2000/svg"
+		aria-hidden="true"
+	>
+		<rect width="40" height="40" rx="4" fill="#1B2023" />
+		<path
+			d="M20 8C13.373 8 8 13.373 8 20s5.373 12 12 12 12-5.373 12-12S26.627 8 20 8zm5.894 14.464-4.358 4.233a2.162 2.162 0 0 1-3.072 0l-4.358-4.233a2.24 2.24 0 0 1 0-3.135l.67-.65 2.403 2.334a2.162 2.162 0 0 0 3.073 0l2.402-2.333.67.65a2.24 2.24 0 0 1 0 3.134zm.67-4.785-.67.65-2.403-2.334a2.162 2.162 0 0 0-3.073 0l-2.402 2.333-.67-.65a2.24 2.24 0 0 1 0-3.134l4.358-4.233a2.162 2.162 0 0 1 3.072 0l4.358 4.233a2.24 2.24 0 0 1-.57 3.135z"
+			fill="#fff"
+		/>
+	</svg>
+);
+
 // Gemini logo as inline SVG
 export const GeminiLogo = () => (
 	<svg

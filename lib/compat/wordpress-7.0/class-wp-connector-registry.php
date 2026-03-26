@@ -19,7 +19,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 	 *     name: non-empty-string,
 	 *     description: non-empty-string,
 	 *     logo_url?: non-empty-string,
-	 *     type: 'ai_provider',
+	 *     type: non-empty-string,
 	 *     authentication: array{
 	 *         method: 'api_key'|'none',
 	 *         credentials_url?: non-empty-string,
@@ -63,7 +63,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 *     @type string $name           Required. The connector's display name.
 		 *     @type string $description    Optional. The connector's description. Default empty string.
 		 *     @type string $logo_url       Optional. URL to the connector's logo image.
-		 *     @type string $type           Required. The connector type. Currently, only 'ai_provider' is supported.
+		 *     @type string $type           Required. The connector type, e.g. 'ai_provider' or 'spam_filtering'.
 		 *     @type array  $authentication {
 		 *         Required. Authentication configuration.
 		 *
@@ -161,8 +161,12 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				if ( ! empty( $args['authentication']['credentials_url'] ) && is_string( $args['authentication']['credentials_url'] ) ) {
 					$connector['authentication']['credentials_url'] = $args['authentication']['credentials_url'];
 				}
-				$sanitized_id                                = str_replace( '-', '_', $id );
-				$connector['authentication']['setting_name'] = "connectors_ai_{$sanitized_id}_api_key";
+				if ( ! empty( $args['authentication']['setting_name'] ) && is_string( $args['authentication']['setting_name'] ) ) {
+					$connector['authentication']['setting_name'] = $args['authentication']['setting_name'];
+				} else {
+					$sanitized_id                                = str_replace( '-', '_', $id );
+					$connector['authentication']['setting_name'] = "connectors_ai_{$sanitized_id}_api_key";
+				}
 			}
 
 			if ( ! empty( $args['plugin'] ) && is_array( $args['plugin'] ) ) {

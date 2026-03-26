@@ -21,6 +21,7 @@ import {
 	OpenAILogo,
 	ClaudeLogo,
 	GeminiLogo,
+	AkismetLogo,
 	DefaultConnectorLogo,
 } from './logos';
 
@@ -57,6 +58,7 @@ const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
 	google: GeminiLogo,
 	openai: OpenAILogo,
 	anthropic: ClaudeLogo,
+	akismet: AkismetLogo,
 };
 
 function getConnectorLogo(
@@ -240,12 +242,13 @@ export function registerDefaultConnectors() {
 		const args: Partial< Omit< ConnectorConfig, 'slug' > > = {
 			name: data.name,
 			description: data.description,
+			type: data.type,
 			logo: getConnectorLogo( connectorId, data.logoUrl ),
 			authentication,
 			plugin: data.plugin,
 		};
 		if (
-			data.type === 'ai_provider' &&
+			( data.type === 'ai_provider' || data.type === 'spam_filtering' ) &&
 			authentication.method === 'api_key'
 		) {
 			args.render = ApiKeyConnector;

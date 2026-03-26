@@ -42,7 +42,7 @@ if ( ! function_exists( 'wp_get_connector' ) ) {
 	 *     @type string $name           The connector's display name.
 	 *     @type string $description    The connector's description.
 	 *     @type string $logo_url       Optional. URL to the connector's logo image.
-	 *     @type string $type           The connector type. Currently, only 'ai_provider' is supported.
+	 *     @type string $type           The connector type, e.g. 'ai_provider' or 'spam_filtering'.
 	 *     @type array  $authentication {
 	 *         Authentication configuration. When method is 'api_key', includes
 	 *         credentials_url and setting_name. When 'none', only method is present.
@@ -61,7 +61,7 @@ if ( ! function_exists( 'wp_get_connector' ) ) {
 	 *     name: non-empty-string,
 	 *     description: non-empty-string,
 	 *     logo_url?: non-empty-string,
-	 *     type: 'ai_provider',
+	 *     type: non-empty-string,
 	 *     authentication: array{
 	 *         method: 'api_key'|'none',
 	 *         credentials_url?: non-empty-string,
@@ -99,7 +99,7 @@ if ( ! function_exists( 'wp_get_connectors' ) ) {
 	 *         @type string      $name           The connector's display name.
 	 *         @type string      $description    The connector's description.
 	 *         @type string      $logo_url       Optional. URL to the connector's logo image.
-	 *         @type string      $type           The connector type. Currently, only 'ai_provider' is supported.
+	 *         @type string      $type           The connector type, e.g. 'ai_provider' or 'spam_filtering'.
 	 *         @type array       $authentication {
 	 *             Authentication configuration. When method is 'api_key', includes
 	 *             credentials_url and setting_name. When 'none', only method is present.
@@ -119,7 +119,7 @@ if ( ! function_exists( 'wp_get_connectors' ) ) {
 	 *     name: non-empty-string,
 	 *     description: non-empty-string,
 	 *     logo_url?: non-empty-string,
-	 *     type: 'ai_provider',
+	 *     type: non-empty-string,
 	 *     authentication: array{
 	 *         method: 'api_key'|'none',
 	 *         credentials_url?: non-empty-string,

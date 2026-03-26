@@ -25,6 +25,7 @@ export interface ConnectorRenderProps {
 	slug: string;
 	name: string;
 	description: string;
+	type?: string;
 	logo?: ReactNode;
 	authentication?: ConnectorAuthentication;
 	plugin?: ConnectorPlugin;
@@ -34,6 +35,7 @@ export interface ConnectorConfig {
 	slug: string;
 	name: string;
 	description: string;
+	type?: string;
 	logo?: ReactNode;
 	authentication?: ConnectorAuthentication;
 	plugin?: ConnectorPlugin;
