@@ -23,7 +23,9 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 	 *     authentication: array{
 	 *         method: 'api_key'|'none',
 	 *         credentials_url?: non-empty-string,
-	 *         setting_name?: non-empty-string
+	 *         setting_name?: non-empty-string,
+	 *         constant_name?: non-empty-string,
+	 *         env_var_name?: non-empty-string
 	 *     },
 	 *     plugin?: array{
 	 *         slug: non-empty-string
@@ -71,6 +73,10 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 *         @type string|null $credentials_url Optional. URL where users can obtain API credentials.
 		 *         @type string|null $setting_name    Optional. Custom option name for the API key.
 		 *                                            Defaults to 'connectors_ai_{id}_api_key'.
+		 *         @type string|null $constant_name   Optional. PHP constant name for the API key
+		 *                                            (e.g., 'WPCOM_API_KEY'). Defaults to '{UPPER_ID}_API_KEY'.
+		 *         @type string|null $env_var_name    Optional. Environment variable name for the API key.
+		 *                                            Defaults to '{UPPER_ID}_API_KEY'.
 		 *     }
 		 *     @type array  $plugin         {
 		 *         Optional. Plugin data for install/activate UI.
@@ -168,6 +174,12 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				} else {
 					$sanitized_id                                = str_replace( '-', '_', $id );
 					$connector['authentication']['setting_name'] = "connectors_ai_{$sanitized_id}_api_key";
+				}
+				if ( ! empty( $args['authentication']['constant_name'] ) && is_string( $args['authentication']['constant_name'] ) ) {
+					$connector['authentication']['constant_name'] = $args['authentication']['constant_name'];
+				}
+				if ( ! empty( $args['authentication']['env_var_name'] ) && is_string( $args['authentication']['env_var_name'] ) ) {
+					$connector['authentication']['env_var_name'] = $args['authentication']['env_var_name'];
 				}
 			}
 

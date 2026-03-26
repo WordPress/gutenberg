@@ -32,6 +32,7 @@ interface ConnectorData {
 	type: string;
 	plugin?: {
 		slug: string;
+		pluginFile?: string | null;
 		isInstalled: boolean;
 		isActivated: boolean;
 	};

@@ -128,6 +128,7 @@ function _gutenberg_connectors_init(): void {
 			'method'          => 'api_key',
 			'credentials_url' => 'https://akismet.com/get/',
 			'setting_name'    => 'wordpress_api_key',
+			'constant_name'   => 'WPCOM_API_KEY',
 		),
 	);
 
@@ -169,24 +170,32 @@ remove_action( 'init', '_wp_connectors_init', 15 );
 add_action( 'init', '_gutenberg_connectors_init', 15 );
 
 /**
- * Determines the source of an API key for a given provider.
+ * Determines the source of an API key for a given connector.
  *
  * Checks in order: environment variable, PHP constant, database.
- * Uses the same naming convention as the WP AI Client ProviderRegistry.
+ * By default, derives the env var / constant name from the connector ID
+ * using the same convention as the WP AI Client ProviderRegistry
+ * (e.g., 'openai' → 'OPENAI_API_KEY'). Connectors may override these
+ * names via `env_var_name` and `constant_name` in their authentication config.
  *
  * @access private
  *
- * @param string $provider_id  The provider ID (e.g., 'openai', 'anthropic', 'google').
- * @param string $setting_name The option name for the API key (e.g., 'connectors_ai_openai_api_key').
+ * @param string $connector_id       The connector ID (e.g., 'openai', 'akismet').
+ * @param string $setting_name       The option name for the API key (e.g., 'connectors_ai_openai_api_key').
+ * @param string $env_var_override   Optional. Custom environment variable name. Default empty string.
+ * @param string $constant_override  Optional. Custom PHP constant name (e.g., 'WPCOM_API_KEY'). Default empty string.
  * @return string The key source: 'env', 'constant', 'database', or 'none'.
  */
-function _gutenberg_get_api_key_source( string $provider_id, string $setting_name ): string {
-	// Convert provider ID to CONSTANT_CASE for env var name.
-	// e.g., 'openai' -> 'OPENAI', 'anthropic' -> 'ANTHROPIC'.
+function _gutenberg_get_api_key_source( string $connector_id, string $setting_name, string $env_var_override = '', string $constant_override = '' ): string {
+	// Derive default name from connector ID in CONSTANT_CASE.
+	// e.g., 'openai' -> 'OPENAI_API_KEY', 'anthropic' -> 'ANTHROPIC_API_KEY'.
 	$constant_case_id = strtoupper(
-		preg_replace( '/([a-z])([A-Z])/', '$1_$2', str_replace( '-', '_', $provider_id ) )
+		preg_replace( '/([a-z])([A-Z])/', '$1_$2', str_replace( '-', '_', $connector_id ) )
 	);
-	$env_var_name     = "{$constant_case_id}_API_KEY";
+	$default_name     = "{$constant_case_id}_API_KEY";
+
+	$env_var_name  = '' !== $env_var_override ? $env_var_override : $default_name;
+	$constant_name = '' !== $constant_override ? $constant_override : $default_name;
 
 	// Check environment variable first.
 	$env_value = getenv( $env_var_name );
@@ -195,8 +204,8 @@ function _gutenberg_get_api_key_source( string $provider_id, string $setting_nam
 	}
 
 	// Check PHP constant.
-	if ( defined( $env_var_name ) ) {
-		$const_value = constant( $env_var_name );
+	if ( defined( $constant_name ) ) {
+		$const_value = constant( $constant_name );
 		if ( is_string( $const_value ) && '' !== $const_value ) {
 			return 'constant';
 		}
@@ -469,7 +478,12 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 		if ( 'api_key' === $auth['method'] ) {
 			$auth_out['settingName']    = $auth['setting_name'] ?? '';
 			$auth_out['credentialsUrl'] = $auth['credentials_url'] ?? null;
-			$auth_out['keySource']      = _gutenberg_get_api_key_source( $connector_id, $auth['setting_name'] ?? '' );
+			$auth_out['keySource']      = _gutenberg_get_api_key_source(
+				$connector_id,
+				$auth['setting_name'] ?? '',
+				$auth['env_var_name'] ?? '',
+				$auth['constant_name'] ?? ''
+			);
 
 			if ( 'ai_provider' === $connector_data['type'] ) {
 				try {
@@ -501,7 +515,9 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 
 			$connector_out['plugin'] = array(
 				'slug'        => $plugin_slug,
-				'pluginFile'  => $is_installed ? str_replace( '.php', '', $plugin_file ) : null,
+				'pluginFile'  => $is_installed
+					? ( str_ends_with( $plugin_file, '.php' ) ? substr( $plugin_file, 0, -4 ) : $plugin_file )
+					: null,
 				'isInstalled' => $is_installed,
 				'isActivated' => $is_activated,
 			);

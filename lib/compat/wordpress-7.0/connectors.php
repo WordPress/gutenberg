@@ -50,6 +50,8 @@ if ( ! function_exists( 'wp_get_connector' ) ) {
 	 *         @type string $method          The authentication method: 'api_key' or 'none'.
 	 *         @type string $credentials_url Optional. URL where users can obtain API credentials.
 	 *         @type string $setting_name    Optional. The setting name for the API key.
+	 *         @type string $constant_name   Optional. PHP constant name for the API key.
+	 *         @type string $env_var_name    Optional. Environment variable name for the API key.
 	 *     }
 	 *     @type array  $plugin         {
 	 *         Optional. Plugin data for install/activate UI.
@@ -65,7 +67,9 @@ if ( ! function_exists( 'wp_get_connector' ) ) {
 	 *     authentication: array{
 	 *         method: 'api_key'|'none',
 	 *         credentials_url?: non-empty-string,
-	 *         setting_name?: non-empty-string
+	 *         setting_name?: non-empty-string,
+	 *         constant_name?: non-empty-string,
+	 *         env_var_name?: non-empty-string
 	 *     },
 	 *     plugin?: array{
 	 *         slug: non-empty-string
@@ -107,6 +111,8 @@ if ( ! function_exists( 'wp_get_connectors' ) ) {
 	 *             @type string $method          The authentication method: 'api_key' or 'none'.
 	 *             @type string $credentials_url Optional. URL where users can obtain API credentials.
 	 *             @type string $setting_name    Optional. The setting name for the API key.
+	 *             @type string $constant_name   Optional. PHP constant name for the API key.
+	 *             @type string $env_var_name    Optional. Environment variable name for the API key.
 	 *         }
 	 *         @type array       $plugin         {
 	 *             Optional. Plugin data for install/activate UI.
@@ -123,7 +129,9 @@ if ( ! function_exists( 'wp_get_connectors' ) ) {
 	 *     authentication: array{
 	 *         method: 'api_key'|'none',
 	 *         credentials_url?: non-empty-string,
-	 *         setting_name?: non-empty-string
+	 *         setting_name?: non-empty-string,
+	 *         constant_name?: non-empty-string,
+	 *         env_var_name?: non-empty-string
 	 *     },
 	 *     plugin?: array{
 	 *         slug: non-empty-string
