@@ -154,4 +154,5 @@ module.exports = {
 	defaultRequestToExternal,
 	defaultRequestToExternalModule,
 	defaultRequestToHandle,
+	BUNDLED_PACKAGES,
 };
