@@ -38,6 +38,7 @@ const form = {
 				labelPosition: 'none',
 			},
 		},
+		'excerpt',
 		{
 			id: 'status',
 			label: __( 'Status' ),
