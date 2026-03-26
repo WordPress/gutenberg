@@ -343,7 +343,7 @@ function _gutenberg_register_default_connector_settings(): void {
 		return;
 	}
 
-	$ai_registry = \WordPress\AiClient\AiClient::defaultRegistry();
+	$ai_registry       = \WordPress\AiClient\AiClient::defaultRegistry();
 	$existing_settings = get_registered_settings();
 
 	foreach ( wp_get_connectors() as $connector_id => $connector_data ) {
