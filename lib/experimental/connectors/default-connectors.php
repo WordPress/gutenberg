@@ -478,8 +478,9 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 					$auth_out['isConnected'] = false;
 				}
 			} else {
-				// For non-AI connectors, consider connected if a key exists from any source.
-				$auth_out['isConnected'] = 'none' !== $auth_out['keySource'];
+				// For non-AI connectors, consider connected if a key exists from any source and is non-empty.
+				$key_value               = get_option( $auth['setting_name'], '' );
+				$auth_out['isConnected'] = 'none' !== $auth_out['keySource'] && '' !== $key_value;
 			}
 		}
 

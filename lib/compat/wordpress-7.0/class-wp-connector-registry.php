@@ -69,6 +69,8 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 *
 		 *         @type string      $method          Required. The authentication method: 'api_key' or 'none'.
 		 *         @type string|null $credentials_url Optional. URL where users can obtain API credentials.
+		 *         @type string|null $setting_name    Optional. Custom option name for the API key.
+		 *                                            Defaults to 'connectors_ai_{id}_api_key'.
 		 *     }
 		 *     @type array  $plugin         {
 		 *         Optional. Plugin data for install/activate UI.
