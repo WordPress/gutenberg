@@ -30,7 +30,6 @@ import {
 	DimensionsPanel,
 } from './dimensions';
 import {
-	cleanEmptyObject,
 	shouldSkipSerialization,
 	useStyleOverride,
 	useBlockSettings,
@@ -38,14 +37,8 @@ import {
 import { BlockStatesControl, STATES_SUPPORT_KEY } from './states';
 import { buildStateSelector, buildCanvasStateSelector } from './state-utils';
 import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspector-pre-tabs-slot-fill';
-import StylesColorPanel from '../components/global-styles/color-panel';
-import StylesTypographyPanel from '../components/global-styles/typography-panel';
-import StylesBorderPanel from '../components/global-styles/border-panel';
-import StylesDimensionsPanel from '../components/global-styles/dimensions-panel';
-import StylesBackgroundPanel from '../components/global-styles/background-panel';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
-import InspectorControls from '../components/inspector-controls';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -389,18 +382,7 @@ function BlockStyleControls( {
 		/>
 	);
 
-	// For non-default states, use Global Styles panels which accept explicit
-	// value/onChange props so we can route saves to the state-specific sub-key.
 	if ( selectedState !== 'default' ) {
-		const stateValue = style?.[ selectedState ] || {};
-		const setStateStyle = ( newStyle ) =>
-			setAttributes( {
-				style: cleanEmptyObject( {
-					...style,
-					[ selectedState ]: newStyle,
-				} ),
-			} );
-
 		return (
 			<>
 				{ statesControl }
@@ -414,44 +396,41 @@ function BlockStyleControls( {
 						/>
 					</div>
 				</BlockInspectorPreTabsFill>
-				<InspectorControls>
-					<StylesColorPanel
-						value={ stateValue }
-						inheritedValue={ stateValue }
-						onChange={ setStateStyle }
-						settings={ panelSettings }
-						panelId={ clientId }
-					/>
-					<StylesBackgroundPanel
-						value={ stateValue }
-						inheritedValue={ stateValue }
-						onChange={ setStateStyle }
-						settings={ panelSettings }
-						panelId={ clientId }
-					/>
-					<StylesTypographyPanel
-						value={ stateValue }
-						inheritedValue={ stateValue }
-						onChange={ setStateStyle }
-						settings={ panelSettings }
-						panelId={ clientId }
-					/>
-					<StylesBorderPanel
-						value={ stateValue }
-						inheritedValue={ stateValue }
-						onChange={ setStateStyle }
-						settings={ panelSettings }
-						panelId={ clientId }
-						name={ name }
-					/>
-					<StylesDimensionsPanel
-						value={ stateValue }
-						inheritedValue={ stateValue }
-						onChange={ setStateStyle }
-						settings={ panelSettings }
-						panelId={ clientId }
-					/>
-				</InspectorControls>
+				<ColorEdit
+					clientId={ clientId }
+					name={ name }
+					setAttributes={ setAttributes }
+					settings={ panelSettings }
+					selectedState={ selectedState }
+				/>
+				<BackgroundImagePanel
+					clientId={ clientId }
+					name={ name }
+					setAttributes={ setAttributes }
+					settings={ panelSettings }
+					selectedState={ selectedState }
+				/>
+				<TypographyPanel
+					clientId={ clientId }
+					name={ name }
+					setAttributes={ setAttributes }
+					settings={ panelSettings }
+					selectedState={ selectedState }
+				/>
+				<BorderPanel
+					clientId={ clientId }
+					name={ name }
+					setAttributes={ setAttributes }
+					settings={ panelSettings }
+					selectedState={ selectedState }
+				/>
+				<DimensionsPanel
+					clientId={ clientId }
+					name={ name }
+					setAttributes={ setAttributes }
+					settings={ panelSettings }
+					selectedState={ selectedState }
+				/>
 			</>
 		);
 	}
