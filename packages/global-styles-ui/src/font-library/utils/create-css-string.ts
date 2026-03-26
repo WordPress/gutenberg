@@ -35,7 +35,7 @@ export function createCssString( value: string ): string {
 		 *
 		 * Note that the Unicode escape sequences are used rather than backslash-escaping so the
 		 * problematic characters are removed completely. CSS Unicode escapes are formed by a
-		 * "\" followed by the the character code in hexadecimal. The escape may be terminated by
+		 * "\" followed by the character code in hexadecimal. The escape may be terminated by
 		 * whitespace which is ignored.
 		 */
 		// Escape existing backslashes before any other processing.
