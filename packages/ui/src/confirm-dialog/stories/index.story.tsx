@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { Menu } from '@base-ui/react/menu';
+import { useState } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { action } from 'storybook/actions';
 import { fn } from 'storybook/test';
-import { Menu } from '@base-ui/react/menu';
-import { ConfirmDialog } from '..';
+
+import { ConfirmDialog } from '../..';
 
 const meta: Meta< typeof ConfirmDialog.Root > = {
-	title: 'Design System/ConfirmDialog',
+	title: 'Design System/Components/ConfirmDialog',
 	component: ConfirmDialog.Root,
 	subcomponents: {
 		'ConfirmDialog.Trigger': ConfirmDialog.Trigger,
@@ -136,7 +137,7 @@ export const MenuTrigger: Story = {
 									<Menu.Item
 										render={
 											<ConfirmDialog.Trigger
-												// Quick fix to remove `button`-specific styles
+												// Quick fix to remove `button`-specific styles.
 												// This shouldn't be an issue once we use the DS `Menu`
 												// component, which will come with item styles.
 												render={ <div /> }

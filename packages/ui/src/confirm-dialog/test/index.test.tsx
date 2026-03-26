@@ -1,6 +1,7 @@
-import { createRef } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef } from '@wordpress/element';
+
 import * as ConfirmDialog from '..';
 
 describe( 'ConfirmDialog', () => {
@@ -38,17 +39,16 @@ describe( 'ConfirmDialog', () => {
 
 		await waitFor( () => {
 			expect( screen.getByText( 'Test Title' ) ).toBeVisible();
-			expect( screen.getByText( 'Test message content' ) ).toBeVisible();
-			expect(
-				screen.queryByRole( 'button', { name: 'Close' } )
-			).not.toBeInTheDocument();
-			expect(
-				screen.getByRole( 'button', { name: 'OK' } )
-			).toBeVisible();
-			expect(
-				screen.getByRole( 'button', { name: 'Cancel' } )
-			).toBeVisible();
 		} );
+
+		expect( screen.getByText( 'Test message content' ) ).toBeVisible();
+		expect(
+			screen.queryByRole( 'button', { name: 'Close' } )
+		).not.toBeInTheDocument();
+		expect( screen.getByRole( 'button', { name: 'OK' } ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'button', { name: 'Cancel' } )
+		).toBeVisible();
 	} );
 
 	it( 'calls onConfirm and onOpenChange when confirm button is clicked', async () => {
@@ -131,19 +131,18 @@ describe( 'ConfirmDialog', () => {
 
 		await waitFor( () => {
 			expect( screen.getByText( 'Irreversible Dialog' ) ).toBeVisible();
-			expect(
-				screen.getByText( 'Irreversible message content' )
-			).toBeVisible();
-			expect(
-				screen.queryByRole( 'button', { name: 'Close' } )
-			).not.toBeInTheDocument();
-			expect(
-				screen.getByRole( 'button', { name: 'OK' } )
-			).toBeVisible();
-			expect(
-				screen.getByRole( 'button', { name: 'Cancel' } )
-			).toBeVisible();
 		} );
+
+		expect(
+			screen.getByText( 'Irreversible message content' )
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'button', { name: 'Close' } )
+		).not.toBeInTheDocument();
+		expect( screen.getByRole( 'button', { name: 'OK' } ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'button', { name: 'Cancel' } )
+		).toBeVisible();
 	} );
 
 	it( 'calls onOpenChange on escape key for irreversible intent', async () => {
@@ -287,10 +286,11 @@ describe( 'ConfirmDialog', () => {
 			expect(
 				screen.getByRole( 'button', { name: 'Yes, do it' } )
 			).toBeVisible();
-			expect(
-				screen.getByRole( 'button', { name: 'No, go back' } )
-			).toBeVisible();
 		} );
+
+		expect(
+			screen.getByRole( 'button', { name: 'No, go back' } )
+		).toBeVisible();
 	} );
 
 	it( 'opens dialog when Trigger is clicked', async () => {
@@ -311,7 +311,8 @@ describe( 'ConfirmDialog', () => {
 
 		await waitFor( () => {
 			expect( screen.getByText( 'Trigger Test' ) ).toBeVisible();
-			expect( screen.getByText( 'Dialog content' ) ).toBeVisible();
 		} );
+
+		expect( screen.getByText( 'Dialog content' ) ).toBeVisible();
 	} );
 } );

@@ -3,6 +3,7 @@ export * from './button';
 export * as Card from './card';
 export * as Collapsible from './collapsible';
 export * as CollapsibleCard from './collapsible-card';
+export * as ConfirmDialog from './confirm-dialog';
 export * as Dialog from './dialog';
 export * as EmptyState from './empty-state';
 export * from './form';
