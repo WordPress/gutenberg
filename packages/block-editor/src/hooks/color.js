@@ -268,8 +268,10 @@ export function ColorEdit( {
 	asWrapper,
 	label,
 	defaultControls,
+	selectedState = 'default',
 } ) {
 	const isEnabled = useHasColorPanel( settings );
+	const isStateMode = !! ( selectedState && selectedState !== 'default' );
 
 	const { style, textColor, backgroundColor, gradient } = useSelect(
 		( select ) => {
@@ -293,17 +295,35 @@ export function ColorEdit( {
 		[ clientId, isEnabled ]
 	);
 	const value = useMemo( () => {
+		if ( isStateMode ) {
+			return style?.[ selectedState ];
+		}
 		return attributesToStyle( {
 			style,
 			textColor,
 			backgroundColor,
 			gradient,
 		} );
-	}, [ style, textColor, backgroundColor, gradient ] );
+	}, [
+		isStateMode,
+		selectedState,
+		style,
+		textColor,
+		backgroundColor,
+		gradient,
+	] );
 
-	const onChange = ( newStyle ) => {
-		setAttributes( styleToAttributes( newStyle ) );
-	};
+	const onChange = isStateMode
+		? ( newStateStyle ) =>
+				setAttributes( {
+					style: cleanEmptyObject( {
+						...style,
+						[ selectedState ]: newStateStyle,
+					} ),
+				} )
+		: ( newStyle ) => {
+				setAttributes( styleToAttributes( newStyle ) );
+		  };
 
 	if ( ! isEnabled ) {
 		return null;
@@ -317,6 +337,7 @@ export function ColorEdit( {
 		  ] );
 
 	const enableContrastChecking =
+		! isStateMode &&
 		Platform.OS === 'web' &&
 		! value?.color?.gradient &&
 		( settings?.color?.text || settings?.color?.link ) &&
