@@ -32,7 +32,10 @@ async function importLanguageSupport( mode ) {
 export default function CodeEditor( {
 	className,
 	editorId,
-	editorInstructionsText,
+	description,
+	includeDefaultDescription = false,
+	visuallyHiddenDescription = true,
+	showLineNumbers = true,
 	mode = 'html',
 	value = '',
 	onChange,
@@ -46,6 +49,12 @@ export default function CodeEditor( {
 	const isApplyingExternalChangeRef = useRef( false );
 	const [ hasLoadError, setHasLoadError ] = useState( false );
 	const instructionsId = useInstanceId( CodeEditor );
+	const hasInstructions =
+		includeDefaultDescription || description !== undefined;
+	const hasCustomInstructionsText = Boolean( description );
+	const defaultInstructionsText = __(
+		'In the editing area, the Tab key enters a tab character. Press Escape then Tab to move focus out of the editor.'
+	);
 	const editorClassName = [
 		className,
 		'block-editor-code-editor',
@@ -96,7 +105,7 @@ export default function CodeEditor( {
 				if ( ariaLabel ) {
 					contentAttributes[ 'aria-label' ] = ariaLabel;
 				}
-				if ( editorInstructionsText ) {
+				if ( hasInstructions ) {
 					contentAttributes[ 'aria-describedby' ] =
 						String( instructionsId );
 				}
@@ -107,7 +116,7 @@ export default function CodeEditor( {
 						extensions: [
 							languageExtension,
 							history(),
-							lineNumbers(),
+							...( showLineNumbers ? [ lineNumbers() ] : [] ),
 							EditorView.lineWrapping,
 							EditorView.contentAttributes.of(
 								contentAttributes
@@ -167,7 +176,7 @@ export default function CodeEditor( {
 			editorViewRef.current?.destroy();
 			editorViewRef.current = null;
 		};
-	}, [ mode, ariaLabel, editorInstructionsText, instructionsId ] );
+	}, [ mode, ariaLabel, hasInstructions, instructionsId, showLineNumbers ] );
 
 	useEffect( () => {
 		const view = editorViewRef.current;
@@ -201,19 +210,26 @@ export default function CodeEditor( {
 
 	return (
 		<>
-			{ editorInstructionsText && (
-				<VisuallyHidden id={ instructionsId }>
-					{ editorInstructionsText }
-					{ __(
-						'In the editing area, the Tab key enters a tab character. Press Escape then Tab to move focus out of the editor.'
-					) }
-				</VisuallyHidden>
-			) }
 			<div
 				ref={ containerRef }
 				id={ editorId }
 				className={ editorClassName }
 			/>
+			{ hasInstructions &&
+				( visuallyHiddenDescription ? (
+					<VisuallyHidden id={ instructionsId }>
+						{ hasCustomInstructionsText && description }
+						{ defaultInstructionsText }
+					</VisuallyHidden>
+				) : (
+					<p
+						id={ instructionsId }
+						className="block-editor-code-editor__description"
+					>
+						{ hasCustomInstructionsText && description }
+						{ defaultInstructionsText }
+					</p>
+				) ) }
 		</>
 	);
 }
