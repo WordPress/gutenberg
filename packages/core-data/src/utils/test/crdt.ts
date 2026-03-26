@@ -88,9 +88,12 @@ describe( 'crdt', () => {
 	beforeEach( () => {
 		doc = new Y.Doc();
 		jest.clearAllMocks();
+		jest.useFakeTimers();
 	} );
 
 	afterEach( () => {
+		jest.runAllTimers();
+		jest.useRealTimers();
 		doc.destroy();
 	} );
 
@@ -422,6 +425,9 @@ describe( 'crdt', () => {
 
 			applyPostChangesToCRDTDoc( doc, changes, defaultSyncedProperties );
 
+			// Content function processing is deferred via setTimeout.
+			jest.runAllTimers();
+
 			const content = map.get( 'content' );
 			expect( content ).toBeInstanceOf( Y.Text );
 			expect( content?.toString() ).toBe( 'Hello' );
@@ -451,6 +457,9 @@ describe( 'crdt', () => {
 			} as unknown as PostChanges;
 
 			applyPostChangesToCRDTDoc( doc, changes, defaultSyncedProperties );
+
+			// Content function processing is deferred via setTimeout.
+			jest.runAllTimers();
 
 			// Should update in place, not replace the Y.Text instance.
 			expect( map.get( 'content' ) ).toBe( contentRef );

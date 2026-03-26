@@ -262,12 +262,14 @@ export function applyPostChangesToCRDTDoc(
 
 		const currentValue = ymap.get( 'content' );
 
-		if ( currentValue instanceof Y.Text ) {
-			mergeRichTextUpdate( currentValue, contentValue );
-		} else {
-			const newYText = new Y.Text( contentValue ?? '' );
-			ymap.set( 'content', newYText );
-		}
+		setTimeout( () => {
+			if ( currentValue instanceof Y.Text ) {
+				mergeRichTextUpdate( currentValue, contentValue );
+			} else {
+				const newYText = new Y.Text( contentValue ?? '' );
+				ymap.set( 'content', newYText );
+			}
+		}, 0 );
 	}
 
 	// Process changes that we don't want to persist to the CRDT document.
