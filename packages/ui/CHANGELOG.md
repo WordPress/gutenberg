@@ -8,6 +8,11 @@
 -   Add `InputControl` component ([#76653](https://github.com/WordPress/gutenberg/pull/76653)).
 -   `Dialog`: Expose `initialFocus` and `finalFocus` props on `Dialog.Popup` for custom focus management ([#76860](https://github.com/WordPress/gutenberg/pull/76860)).
 
+### Enhancements
+
+-   `ConfirmDialog`: Add `role="alertdialog"` for irreversible intent and block Escape dismissal ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   `ConfirmDialog`: Add `loading` prop for async confirm flows ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+
 ### Bug Fixes
 
 -   `Card`: Add `overflow: clip` to `Card.Root` to prevent child content from overflowing rounded corners ([#76678](https://github.com/WordPress/gutenberg/pull/76678)).
