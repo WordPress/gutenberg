@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo } from '@wordpress/element';
+
 import * as Dialog from '../dialog';
-import { type RootProps as DialogRootProps } from '../dialog/types';
+import type { RootProps as DialogRootProps } from '../dialog/types';
 import { ConfirmDialogContext } from './context';
-import { type RootProps } from './types';
+import type { RootProps } from './types';
 
 /**
  * A convenience wrapper for Dialog that provides common confirmation dialog
@@ -59,14 +60,16 @@ function Root( {
 		}
 	};
 
-	const contextValue = useMemo( () => ( { intent } ), [ intent ] );
+	const contextValue = useMemo(
+		() => ( { intent, title } ),
+		[ intent, title ]
+	);
 
 	return (
 		<Dialog.Root
 			open={ open }
 			onOpenChange={ handleOpenChange }
 			defaultOpen={ defaultOpen }
-			title={ title }
 		>
 			<ConfirmDialogContext.Provider value={ contextValue }>
 				{ children }
