@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Testing overlapping PRs bot ([#76820](https://github.com/WordPress/gutenberg/pull/76820)).
+
 ### Bug Fixes
 
 -   `RadioControl`: Add `role="radiogroup"` to the wrapping `fieldset` element ([#76745](https://github.com/WordPress/gutenberg/pull/76745)).
