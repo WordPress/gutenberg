@@ -117,7 +117,7 @@ const v3 = {
 							target={ textLinkTarget }
 							rel={
 								textLinkTarget
-									? 'noopener'
+									? 'noreferrer noopener'
 									: undefined
 							}
 						>
@@ -248,7 +248,7 @@ const v2 = {
 							target={ textLinkTarget }
 							rel={
 								textLinkTarget
-									? 'noopener'
+									? 'noreferrer noopener'
 									: undefined
 							}
 						>
@@ -361,7 +361,7 @@ const v1 = {
 							target={ textLinkTarget }
 							rel={
 								textLinkTarget
-									? 'noopener'
+									? 'noreferrer noopener'
 									: undefined
 							}
 						>
