@@ -167,6 +167,7 @@ export {
 export { default as __experimentalBlockPatternsList } from './block-patterns-list';
 export { default as __experimentalPublishDateTimePicker } from './publish-date-time-picker';
 export { default as __experimentalInspectorPopoverHeader } from './inspector-popover-header';
+// Testing overlapping PRs bot — this line should overlap with PR #76787
 export { default as BlockPopover } from './block-popover';
 export { useBlockEditingMode } from './block-editing-mode';
 
