@@ -204,6 +204,9 @@ test.describe( 'Background gradient block support', () => {
 			);
 
 			// Now clear the gradient — has-background must be removed.
+			// Dismiss any open popover first so the next click reliably
+			// *opens* the dropdown rather than toggling it closed.
+			await page.keyboard.press( 'Escape' );
 			await page
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'button', { name: 'Gradient' } )
