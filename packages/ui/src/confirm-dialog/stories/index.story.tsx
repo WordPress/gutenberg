@@ -23,8 +23,7 @@ type Story = StoryObj< typeof ConfirmDialog.Root >;
 
 /**
  * Standard confirmation dialog for reversible actions. The dialog can be
- * dismissed via Escape key, cancel, or confirm button, but not via backdrop
- * click.
+ * dismissed via Escape key, backdrop click, or the cancel/confirm buttons.
  */
 export const Default: Story = {
 	args: {

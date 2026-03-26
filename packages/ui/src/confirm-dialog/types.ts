@@ -18,8 +18,8 @@ export interface RootProps
 	 * styling.
 	 *
 	 * - `'default'`: Standard confirmation dialog for reversible actions.
-	 *   The dialog can be dismissed via Escape key, cancel, or confirm button,
-	 *   but not via backdrop click. Uses `role="dialog"`.
+	 *   The dialog can be dismissed via Escape key, backdrop click, or the
+	 *   cancel/confirm buttons. Uses `role="dialog"`.
 	 * - `'irreversible'`: Confirmation dialog for irreversible actions that
 	 *   cannot be undone. Users can only dismiss the dialog via the cancel or
 	 *   confirm button — both backdrop click and Escape key are blocked.

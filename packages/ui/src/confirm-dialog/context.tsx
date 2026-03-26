@@ -17,8 +17,8 @@ const ConfirmDialogContext = createContext< ConfirmDialogContextValue >( {
  *
  * - `irreversible`: uses `alertdialog` role and blocks all implicit
  *   dismissals (backdrop click and Escape key).
- * - `default`: standard `dialog` role, only explicit close actions
- *   (cancel/confirm buttons) or Escape key can dismiss.
+ * - `default`: standard `dialog` role, dismissible via Escape key,
+ *   backdrop click, or the cancel/confirm buttons.
  */
 function getIntentConfig( intent: Intent ) {
 	const isIrreversible = intent === 'irreversible';
@@ -28,9 +28,7 @@ function getIntentConfig( intent: Intent ) {
 			? ( 'alertdialog' as const )
 			: ( 'dialog' as const ),
 		shouldBlockDismiss( reason: string ) {
-			return isIrreversible
-				? reason !== 'close-press'
-				: reason === 'outside-press';
+			return isIrreversible && reason !== 'close-press';
 		},
 	};
 }

@@ -17,8 +17,8 @@ import type { RootProps } from './types';
  * ## Use cases
  *
  * - **Default intent**: Standard confirmation dialog for reversible actions.
- *   The dialog can be dismissed via Escape key, cancel, or confirm button,
- *   but not via backdrop click.
+ *   The dialog can be dismissed via Escape key, backdrop click, or the
+ *   cancel/confirm buttons.
  * - **Irreversible intent**: Confirmation dialog for irreversible actions that
  *   cannot be undone. Users can only dismiss the dialog via cancel or confirm
  *   button — both backdrop click and Escape key are blocked. The popup uses

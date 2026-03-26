@@ -177,7 +177,7 @@ describe( 'ConfirmDialog', () => {
 		);
 	} );
 
-	it( 'does not call onOpenChange on backdrop click for default intent', async () => {
+	it( 'calls onOpenChange on backdrop click for default intent', async () => {
 		const onOpenChange = jest.fn();
 
 		render(
@@ -197,7 +197,10 @@ describe( 'ConfirmDialog', () => {
 
 		await userEvent.click( document.body );
 
-		expect( onOpenChange ).not.toHaveBeenCalled();
+		expect( onOpenChange ).toHaveBeenCalledWith(
+			false,
+			expect.objectContaining( { reason: 'outside-press' } )
+		);
 	} );
 
 	it( 'renders with title, message, and default buttons for irreversible intent', async () => {
