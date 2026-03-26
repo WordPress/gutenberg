@@ -5,7 +5,6 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 } from '@wordpress/components';
-import { useEntityRecords } from '@wordpress/core-data';
 import { getTemplatePartIcon } from '@wordpress/editor';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -23,37 +22,12 @@ import {
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_PART_ALL_AREAS_CATEGORY,
-	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 } from '../../utils/constants';
 import usePatternCategories from './use-pattern-categories';
+import useTemplatePartAreas from './use-template-part-areas';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
-
-function useTemplatePartCounts() {
-	const { records: templateParts, isResolving: isLoading } = useEntityRecords(
-		'postType',
-		TEMPLATE_PART_POST_TYPE,
-		{
-			per_page: -1,
-		}
-	);
-
-	const counts = useMemo( () => {
-		if ( ! templateParts ) {
-			return {};
-		}
-		const result = { [ TEMPLATE_PART_ALL_AREAS_CATEGORY ]: 0 };
-		templateParts.forEach( ( part ) => {
-			const area = part.area || TEMPLATE_PART_AREA_DEFAULT_CATEGORY;
-			result[ area ] = ( result[ area ] || 0 ) + 1;
-			result[ TEMPLATE_PART_ALL_AREAS_CATEGORY ] += 1;
-		} );
-		return result;
-	}, [ templateParts ] );
-
-	return { counts, isLoading };
-}
 
 function CategoriesGroup( {
 	templatePartViews,
@@ -121,7 +95,19 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 		name: PATTERN_TYPES.user,
 	} );
 
-	const { counts: templatePartCounts, isLoading } = useTemplatePartCounts();
+	const { templatePartAreas, isLoading, hasTemplateParts } =
+		useTemplatePartAreas();
+	const templatePartCounts = useMemo( () => {
+		const counts = { [ TEMPLATE_PART_ALL_AREAS_CATEGORY ]: 0 };
+		Object.entries( templatePartAreas ).forEach(
+			( [ area, { templateParts } ] ) => {
+				const count = templateParts?.length || 0;
+				counts[ area ] = count;
+				counts[ TEMPLATE_PART_ALL_AREAS_CATEGORY ] += count;
+			}
+		);
+		return counts;
+	}, [ templatePartAreas ] );
 	const { patternCategories } = usePatternCategories();
 	const patternCounts = useMemo( () => {
 		const counts = {};
@@ -131,8 +117,6 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 		return counts;
 	}, [ patternCategories ] );
 
-	const hasTemplateParts =
-		templatePartCounts[ TEMPLATE_PART_ALL_AREAS_CATEGORY ] > 0;
 	const hasPatterns = patternCounts[ PATTERN_DEFAULT_CATEGORY ] > 0;
 
 	return (
