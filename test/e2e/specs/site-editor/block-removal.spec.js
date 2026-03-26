@@ -57,11 +57,21 @@ test.describe( 'Site editor block removal prompt', () => {
 		const listView = page.getByRole( 'region', {
 			name: 'Document Overview',
 		} );
-		await listView.getByRole( 'link', { name: 'Query Loop' } ).click();
+		const queryLoopLink = listView.getByRole( 'link', {
+			name: 'Query Loop',
+		} );
+		await queryLoopLink.click();
+		// Clicking transfers focus to the canvas; refocus the list view
+		// so that ArrowRight expands the tree node.
+		await queryLoopLink.focus();
 		await page.keyboard.press( 'ArrowRight' );
 
 		// Select and try to remove Post Template block
-		await listView.getByRole( 'link', { name: 'Post Template' } ).click();
+		const postTemplateLink = listView.getByRole( 'link', {
+			name: 'Post Template',
+		} );
+		await postTemplateLink.click();
+		await postTemplateLink.focus();
 		await page.keyboard.press( 'Backspace' );
 
 		// Expect the block removal prompt to have appeared
@@ -132,19 +142,31 @@ test.describe( 'Site editor block removal prompt', () => {
 		const listView = page.getByRole( 'region', {
 			name: 'Document Overview',
 		} );
-		await listView.getByRole( 'link', { name: 'Query Loop' } ).click();
+		const queryLoopLink = listView.getByRole( 'link', {
+			name: 'Query Loop',
+		} );
+		await queryLoopLink.click();
+		// Clicking transfers focus to the canvas; refocus the list view
+		// so that ArrowRight expands the tree node.
+		await queryLoopLink.focus();
 
 		// Reveal its inner blocks in the list view
 		await page.keyboard.press( 'ArrowRight' );
 
 		// Select its Post Template inner block
-		await listView.getByRole( 'link', { name: 'Post Template' } ).click();
+		const postTemplateLink = listView.getByRole( 'link', {
+			name: 'Post Template',
+		} );
+		await postTemplateLink.click();
+		await postTemplateLink.focus();
 
 		// Reveal its inner blocks in the list view
 		await page.keyboard.press( 'ArrowRight' );
 
 		// Select and remove its Title inner block
-		await listView.getByRole( 'link', { name: 'Title' } ).click();
+		const titleLink = listView.getByRole( 'link', { name: 'Title' } );
+		await titleLink.click();
+		await titleLink.focus();
 		await page.keyboard.press( 'Backspace' );
 
 		// Expect the block to have been removed with no prompt
