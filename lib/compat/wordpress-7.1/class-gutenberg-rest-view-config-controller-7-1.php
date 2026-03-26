@@ -809,7 +809,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		$areas = get_allowed_block_template_part_areas();
 
 		// Ensure default areas appear in a consistent order.
-		$preferred_order = array( 'header', 'footer', 'sidebar', 'uncategorized' );
+		$preferred_order = array( 'header', 'footer', 'sidebar', 'navigation-overlay', 'uncategorized' );
 		$ordered_areas   = array();
 		$remaining_areas = array();
 		foreach ( $areas as $area ) {
