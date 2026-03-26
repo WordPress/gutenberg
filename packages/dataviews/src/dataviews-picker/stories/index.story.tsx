@@ -7,8 +7,9 @@ import type { Meta } from '@storybook/react-vite';
  * WordPress dependencies
  */
 import { useState, useMemo, useEffect } from '@wordpress/element';
-import { Modal, Button } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Button } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -275,21 +276,19 @@ export const WithModal = ( {
 				</p>
 			) }
 			{ isModalOpen && (
-				<>
-					<style>{ `
-						.components-modal__content {
-							padding: 0;
+				<Dialog.Root
+					open
+					onOpenChange={ ( open ) => {
+						if ( ! open ) {
+							setIsModalOpen( false );
 						}
-						.components-modal__frame.is-full-screen .components-modal__content {
-							margin-bottom: 0;
-						}
-					` }</style>
-					<Modal
-						title="Select Items"
-						onRequestClose={ () => setIsModalOpen( false ) }
-						isFullScreen={ false }
-						size="fill"
-					>
+					} }
+				>
+					<Dialog.Popup size="stretch">
+						<Dialog.Header>
+							<Dialog.Title>Select Items</Dialog.Title>
+							<Dialog.CloseIcon />
+						</Dialog.Header>
 						<DataViewsPickerContent
 							perPageSizes={ perPageSizes }
 							isMultiselectable={ isMultiselectable }
@@ -300,8 +299,8 @@ export const WithModal = ( {
 								String( item.id )
 							) }
 						/>
-					</Modal>
-				</>
+					</Dialog.Popup>
+				</Dialog.Root>
 			) }
 		</>
 	);
