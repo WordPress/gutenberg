@@ -1030,9 +1030,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.toEqual( [ 4 ] );
 
 		// Move focus to the list view link to prepare for the keyboard navigation.
-		// Clicking transfers focus to the canvas; refocus the list view.
 		await navButtons.nth( 3 ).click();
-		await navButtons.nth( 3 ).focus();
 		await expect( navButtons.nth( 3 ) ).toBeFocused();
 		// Press Up twice to highlight the second block.
 		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );

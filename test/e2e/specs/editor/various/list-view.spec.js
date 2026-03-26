@@ -553,17 +553,15 @@ test.describe( 'List View', () => {
 		// Open List View.
 		const listView = await listViewUtils.openListView();
 
-		// Click the Group block to select it in the editor, then refocus the
-		// list view. Clicking transfers focus to the canvas (caret at end),
-		// so we refocus the list view for keyboard navigation.
-		const copyTestGroupLink = listView.getByRole( 'link', {
-			name: 'Group',
-			expanded: false,
-		} );
-		await copyTestGroupLink.click();
-		await copyTestGroupLink.focus();
+		// Click the newly inserted Group block List View item to ensure it is focused.
+		await listView
+			.getByRole( 'link', {
+				name: 'Group',
+				expanded: false,
+			} )
+			.click();
 
-		// Expand the group block, and then move to the pullquote block.
+		// Move down to group block, expand, and then move to the paragraph block.
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowDown' );
@@ -699,15 +697,13 @@ test.describe( 'List View', () => {
 		// Open List View.
 		const listView = await listViewUtils.openListView();
 
-		// Click the Group block to select it in the editor, then refocus the
-		// list view. Clicking transfers focus to the canvas (caret at end),
-		// so we refocus the list view for keyboard operations.
-		const cutTestGroupLink = listView.getByRole( 'link', {
-			name: 'Group',
-			expanded: false,
-		} );
-		await cutTestGroupLink.click();
-		await cutTestGroupLink.focus();
+		// Click the newly inserted Group block List View item to ensure it is focused.
+		await listView
+			.getByRole( 'link', {
+				name: 'Group',
+				expanded: false,
+			} )
+			.click();
 
 		// Cut the block.
 		await pageUtils.pressKeys( 'primary+x' );
@@ -1400,8 +1396,9 @@ test.describe( 'List View', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should place the caret at the end of the block when selecting from List View', async ( {
+	test( 'should place the caret at the end of the block when activating from List View', async ( {
 		editor,
+		page,
 		listViewUtils,
 	} ) => {
 		// Insert a paragraph with some text.
@@ -1417,19 +1414,20 @@ test.describe( 'List View', () => {
 		// Open List View.
 		const listView = await listViewUtils.openListView();
 
-		// Click the first paragraph in List View.
+		// Click the first paragraph in List View to select it,
+		// then press Enter to activate it (transfer focus to canvas).
+		// Keyboard activation (Enter/Space) places the caret at the end
+		// of the block, while mouse click keeps focus in the list view.
 		await listView
 			.getByRole( 'gridcell', { name: 'Paragraph' } )
 			.first()
 			.click();
+		await page.keyboard.press( 'Enter' );
 
 		// Press Enter to split the block at the caret position.
 		// If the caret is at the end, this creates a new block after the first paragraph.
 		// If the caret is at the start, this creates a new block before the first paragraph.
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.first()
-			.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
 
 		// Verify the block order: if the caret was at the end, the new empty
 		// block should be after the first paragraph, not before it.
