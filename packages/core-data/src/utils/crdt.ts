@@ -46,10 +46,6 @@ import {
 // A function that derives content from blocks (used by useEntityBlockEditor).
 type ContentFromBlocksFn = ( args: { blocks: Block[] } ) => string;
 
-function isContentFromBlocksFn( value: unknown ): value is ContentFromBlocksFn {
-	return typeof value === 'function' && value.length === 1;
-}
-
 // Changes that can be applied to a post entity record.
 export type PostChanges = Partial< Post > & {
 	blocks?: Block[];
@@ -252,27 +248,6 @@ export function applyPostChangesToCRDTDoc(
 		}
 	} );
 
-	// Process content changes when it's passed as a function, using the changed blocks.
-	if (
-		isContentFromBlocksFn( changes.content ) &&
-		changes.blocks &&
-		'function' !== typeof changes.blocks
-	) {
-		const contentValue = changes.content( { blocks: changes.blocks } );
-
-		const currentValue = ymap.get( 'content' );
-
-		// Do it in a timeout to ensure that a new undo level is not created for this change.
-		setTimeout( () => {
-			if ( currentValue instanceof Y.Text ) {
-				mergeRichTextUpdate( currentValue, contentValue );
-			} else {
-				const newYText = new Y.Text( contentValue ?? '' );
-				ymap.set( 'content', newYText );
-			}
-		}, 0 );
-	}
-
 	// Process changes that we don't want to persist to the CRDT document.
 	if ( changes.selection ) {
 		const selection = changes.selection;
@@ -418,6 +393,19 @@ export function getPostChangesFromCRDTDoc(
 		changes.blocks = deserializeBlockAttributes(
 			changes.blocks as Block[]
 		);
+	}
+
+	// When blocks have changed but content hasn't (because content is synced
+	// as a lazy function on the sending side), inject a content function so
+	// the entity is marked dirty. Content is non-transient, so this triggers
+	// the save button. The function is only evaluated on save or when the code
+	// editor needs it, preserving the deferred serialization optimization.
+	if ( changes.blocks && ! changes.content ) {
+		changes.content = ( {
+			blocks: blocksForSerialization = [],
+		}: {
+			blocks: Block[];
+		} ) => __unstableSerializeAndClean( blocksForSerialization );
 	}
 
 	// Meta changes must be merged with the edited record since not all meta
