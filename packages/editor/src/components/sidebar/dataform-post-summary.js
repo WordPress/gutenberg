@@ -16,7 +16,6 @@ import PostPanelSection from '../post-panel-section';
 import { store as editorStore } from '../../store';
 import PostTrash from '../post-trash';
 import usePostFields from '../post-fields';
-import { unlock } from '../../lock-unlock';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
 
 const form = {
@@ -72,15 +71,12 @@ const form = {
 
 export default function DataFormPostSummary( { onActionPerformed } ) {
 	const { postType, postId } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPostId } = unlock(
-			select( editorStore )
-		);
+		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
 		return {
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
 		};
 	}, [] );
-
 	const record = useSelect(
 		( select ) => {
 			if ( ! postType || ! postId ) {
@@ -173,7 +169,6 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 
 		editEntityRecord( 'postType', postType, postId, edits );
 	};
-
 	return (
 		<PostPanelSection className="editor-post-summary">
 			<VStack spacing={ 4 }>

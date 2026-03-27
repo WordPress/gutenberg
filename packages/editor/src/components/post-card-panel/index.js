@@ -9,7 +9,7 @@ import {
 	__experimentalText as Text,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { moreVertical, close } from '@wordpress/icons';
+import { close } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -52,7 +52,7 @@ export default function PostCardPanel( {
 		() => ( Array.isArray( postId ) ? postId : [ postId ] ),
 		[ postId ]
 	);
-	const { postTitle, icon, labels, isRevision } = useSelect(
+	const { postTitle, icon, labels } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getCurrentTheme, getPostType } =
 				select( coreStore );
@@ -75,7 +75,6 @@ export default function PostCardPanel( {
 						area: _record?.area,
 					} ),
 					labels: getPostType( parentPostType )?.labels,
-					isRevision: true,
 				};
 			}
 
@@ -146,24 +145,11 @@ export default function PostCardPanel( {
 					) }
 				</Text>
 				{ ! hideActions && postIds.length === 1 && (
-					<>
-						{ isRevision ? (
-							<Button
-								size="small"
-								icon={ moreVertical }
-								label={ __( 'Actions' ) }
-								disabled
-								accessibleWhenDisabled
-								className="editor-all-actions-button"
-							/>
-						) : (
-							<PostActions
-								postType={ postType }
-								postId={ postIds[ 0 ] }
-								onActionPerformed={ onActionPerformed }
-							/>
-						) }
-					</>
+					<PostActions
+						postType={ postType }
+						postId={ postIds[ 0 ] }
+						onActionPerformed={ onActionPerformed }
+					/>
 				) }
 				{ onClose && (
 					<Button
