@@ -222,11 +222,18 @@ jobs:
                   IS_GUTENBERG_PLUGIN: ${{ matrix.IS_GUTENBERG_PLUGIN }}
                   IS_WORDPRESS_CORE: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
 
+            - name: Rename artifact for wordpress-develop build
+              if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
+              run: mv gutenberg.zip gutenberg-wordpress-develop.zip
+
             - name: Upload artifact
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               with:
-                  name: gutenberg-${{ ! matrix.IS_GUTENBERG_PLUGIN && 'wordpress-develop' || 'plugin' }}
-                  path: ./gutenberg.zip
+                  # When archive is false, the file name is used as the artifact name.
+                  # gutenberg.zip -> artifact "gutenberg.zip" (plugin build)
+                  # gutenberg-wordpress-develop.zip -> artifact "gutenberg-wordpress-develop.zip" (WP develop build)
+                  path: ${{ ! matrix.IS_GUTENBERG_PLUGIN && './gutenberg-wordpress-develop.zip' || './gutenberg.zip' }}
+                  archive: false
 
             - name: Build release notes draft
               if: ${{ matrix.IS_GUTENBERG_PLUGIN && needs.bump-version.outputs.new_version }}
@@ -269,10 +276,10 @@ jobs:
             - name: Download build artifact
               uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
-                  name: gutenberg-wordpress-develop
+                  name: gutenberg-wordpress-develop.zip
 
             - name: Unzip zip artifact
-              run: unzip gutenberg.zip && rm gutenberg.zip
+              run: unzip gutenberg-wordpress-develop.zip && rm gutenberg-wordpress-develop.zip
 
             # Noting the hash helps keep track of the commit the zip was built from.
             - name: Add a file for tracking the SHA value used.
@@ -377,7 +384,7 @@ jobs:
             - name: Download Plugin Zip Artifact
               uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
-                  name: gutenberg-plugin
+                  name: gutenberg.zip
 
             - name: Download Release Notes Artifact
               uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
