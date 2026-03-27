@@ -5,30 +5,7 @@
  * @package WordPress
  */
 
-/**
- * Returns the submenu visibility value with backward compatibility
- * for the deprecated openSubmenusOnClick attribute.
- *
- * @since 6.9.0
- *
- * @param array $context Block context from parent Navigation block.
- * @return string The visibility mode: 'hover', 'click', or 'always'.
- */
-function block_core_page_list_get_submenu_visibility( $context ) {
-	$deprecated_open_submenus_on_click = $context['openSubmenusOnClick'] ?? null;
-
-	// For backward compatibility, prioritize the legacy attribute if present. If it has been loaded and saved in the editor, then
-	// the deprecated attribute will be replaced by submenuVisibility.
-	if ( null !== $deprecated_open_submenus_on_click ) {
-		// Convert boolean to string: true -> 'click', false -> 'hover'.
-		return ! empty( $deprecated_open_submenus_on_click ) ? 'click' : 'hover';
-	}
-
-	$submenu_visibility = $context['submenuVisibility'] ?? null;
-
-	// Use submenuVisibility for migrated/new blocks.
-	return $submenu_visibility ?? 'hover';
-}
+require_once __DIR__ . '/navigation/shared/get-submenu-visibility.php';
 
 /**
  * Build an array with CSS classes and inline styles defining the colors
@@ -368,7 +345,19 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$is_navigation_child = array_key_exists( 'showSubmenuIcon', $block->context );
 
 	// Get submenu visibility with backward compatibility for openSubmenusOnClick.
-	$submenu_visibility = $is_navigation_child ? block_core_page_list_get_submenu_visibility( $block->context ) : 'hover';
+	if ( $is_navigation_child ) {
+		// The build system prefixes this function with "gutenberg_" to avoid
+		// collisions with the core version. Until this function is backported to
+		// core, we need to guard its use and only call the prefixed name in
+		// the plugin.
+		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+			$submenu_visibility = gutenberg_block_core_shared_get_submenu_visibility( $block->context );
+		} else {
+			$submenu_visibility = block_core_shared_get_submenu_visibility( $block->context );
+		}
+	} else {
+		$submenu_visibility = 'hover';
+	}
 
 	$show_submenu_icons = array_key_exists( 'showSubmenuIcon', $block->context ) ? $block->context['showSubmenuIcon'] : false;
 

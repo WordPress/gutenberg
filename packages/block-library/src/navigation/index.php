@@ -5,40 +5,7 @@
  * @package WordPress
  */
 
-/**
- * Returns the submenu visibility value with backward compatibility
- * for the deprecated openSubmenusOnClick attribute.
- *
- * This function centralizes the migration logic from the boolean
- * openSubmenusOnClick to the new submenuVisibility enum.
- *
- * Backward compatibility: WordPress applies default attribute values, so submenuVisibility
- * will always have a value even for legacy blocks. We check the legacy openSubmenusOnClick
- * attribute first to preserve original behavior for blocks saved before the migration.
- *
- * @since 6.9.0
- *
- * @param array $attributes Block attributes containing submenuVisibility and/or openSubmenusOnClick.
- * @return string The visibility mode: 'hover', 'click', or 'always'.
- */
-function block_core_navigation_get_submenu_visibility( $attributes ) {
-	$deprecated_open_submenus_on_click = $attributes['openSubmenusOnClick'] ?? null;
-
-	// For backward compatibility, prioritize the legacy attribute if present.
-	// Legacy blocks have openSubmenusOnClick in the database. Since WordPress applies
-	// default values, submenuVisibility will also have a value, but we check the legacy
-	// attribute first to preserve the original behavior. If the block has been updated
-	// and saved in the editor, then the deprecated attribute will be replaced by submenuVisibility.
-	if ( null !== $deprecated_open_submenus_on_click ) {
-		// Convert boolean to string: true -> 'click', false -> 'hover'.
-		return ! empty( $deprecated_open_submenus_on_click ) ? 'click' : 'hover';
-	}
-
-	$submenu_visibility = $attributes['submenuVisibility'] ?? null;
-
-	// Use submenuVisibility for migrated/new blocks (where openSubmenusOnClick is null).
-	return $submenu_visibility ?? 'hover';
-}
+require_once __DIR__ . '/navigation/shared/get-submenu-visibility.php';
 
 /**
  * Helper functions used to render the navigation block.
@@ -143,11 +110,19 @@ class WP_Navigation_Block_Renderer {
 	 * @return bool Returns whether or not to load the view script.
 	 */
 	private static function is_interactive( $attributes, $inner_blocks ) {
-		$has_submenus        = static::has_submenus( $inner_blocks );
-		$is_responsive_menu  = static::is_responsive( $attributes );
-		$computed_visibility = block_core_navigation_get_submenu_visibility( $attributes );
-		$open_on_click       = 'click' === $computed_visibility;
-		$show_submenu_icon   = ! empty( $attributes['showSubmenuIcon'] );
+		$has_submenus       = static::has_submenus( $inner_blocks );
+		$is_responsive_menu = static::is_responsive( $attributes );
+		// The build system prefixes this function with "gutenberg_" to avoid
+		// collisions with the core version. Until this function is backported to
+		// core, we need to guard its use and only call the prefixed name in
+		// the plugin.
+		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+			$computed_visibility = gutenberg_block_core_shared_get_submenu_visibility( $attributes );
+		} else {
+			$computed_visibility = block_core_shared_get_submenu_visibility( $attributes );
+		}
+		$open_on_click     = 'click' === $computed_visibility;
+		$show_submenu_icon = ! empty( $attributes['showSubmenuIcon'] );
 		return ( $has_submenus && ( $open_on_click || $show_submenu_icon ) ) || $is_responsive_menu;
 	}
 
@@ -1185,8 +1160,16 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		// event.
 		$tags->set_attribute( 'tabindex', '-1' );
 
-		$computed_visibility = block_core_navigation_get_submenu_visibility( $block_attributes );
-		$open_on_hover       = 'hover' === $computed_visibility;
+		// The build system prefixes this function with "gutenberg_" to avoid
+		// collisions with the core version. Until this function is backported to
+		// core, we need to guard its use and only call the prefixed name in
+		// the plugin.
+		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+			$computed_visibility = gutenberg_block_core_shared_get_submenu_visibility( $block_attributes );
+		} else {
+			$computed_visibility = block_core_shared_get_submenu_visibility( $block_attributes );
+		}
+		$open_on_hover = 'hover' === $computed_visibility;
 
 		if ( $open_on_hover ) {
 			$tags->set_attribute( 'data-wp-on--pointerenter', 'actions.openMenuOnHover' );
