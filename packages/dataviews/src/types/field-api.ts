@@ -200,7 +200,7 @@ export type Field< Item > = {
 	/**
 	 * A description of the field.
 	 */
-	description?: string;
+	description?: string | ReactElement;
 
 	/**
 	 * Placeholder for the field.

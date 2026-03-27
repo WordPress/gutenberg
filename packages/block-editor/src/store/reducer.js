@@ -403,31 +403,6 @@ const withBlockTree =
 				);
 				break;
 			}
-			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
-				const updatedBlockUids = [];
-				newState.attributes.forEach( ( attributes, clientId ) => {
-					if (
-						newState.byClientId.get( clientId ).name ===
-							'core/block' &&
-						attributes.ref === action.updatedId
-					) {
-						updatedBlockUids.push( clientId );
-					}
-				} );
-				newState.tree = new Map( newState.tree );
-				updatedBlockUids.forEach( ( clientId ) => {
-					newState.tree.set( clientId, {
-						...newState.byClientId.get( clientId ),
-						attributes: newState.attributes.get( clientId ),
-						innerBlocks: newState.tree.get( clientId ).innerBlocks,
-					} );
-				} );
-				updateParentInnerBlocksInTree(
-					newState,
-					updatedBlockUids,
-					false
-				);
-			}
 		}
 
 		return newState;
@@ -784,40 +759,6 @@ const withReplaceInnerBlocks = ( reducer ) => ( state, action ) => {
 };
 
 /**
- * Higher-order reducer which targets the combined blocks reducer and handles
- * the `SAVE_REUSABLE_BLOCK_SUCCESS` action. This action can't be handled by
- * regular reducers and needs a higher-order reducer since it needs access to
- * both `byClientId` and `attributes` simultaneously.
- *
- * @param {Function} reducer Original reducer function.
- *
- * @return {Function} Enhanced reducer function.
- */
-const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
-	if ( state && action.type === 'SAVE_REUSABLE_BLOCK_SUCCESS' ) {
-		const { id, updatedId } = action;
-
-		// If a temporary reusable block is saved, we swap the temporary id with the final one.
-		if ( id === updatedId ) {
-			return state;
-		}
-
-		state = { ...state };
-		state.attributes = new Map( state.attributes );
-		state.attributes.forEach( ( attributes, clientId ) => {
-			const { name } = state.byClientId.get( clientId );
-			if ( name === 'core/block' && attributes.ref === id ) {
-				state.attributes.set( clientId, {
-					...attributes,
-					ref: updatedId,
-				} );
-			}
-		} );
-	}
-
-	return reducer( state, action );
-};
-/**
  * Higher-order reducer which removes blocks from state when switching parent block controlled state.
  *
  * @param {Function} reducer Original reducer function.
@@ -857,7 +798,6 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
  */
 export const blocks = pipe(
 	combineReducers,
-	withSaveReusableBlock, // Needs to be before withBlockCache.
 	withBlockTree, // Needs to be before withInnerBlocksRemoveCascade.
 	withInnerBlocksRemoveCascade,
 	withReplaceInnerBlocks, // Needs to be after withInnerBlocksRemoveCascade.

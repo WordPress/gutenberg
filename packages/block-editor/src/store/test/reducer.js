@@ -1146,52 +1146,6 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should update the reusable block reference if the temporary id is swapped', () => {
-			const original = blocks( undefined, {
-				type: 'RESET_BLOCKS',
-				blocks: [
-					{
-						clientId: 'chicken',
-						name: 'core/block',
-						attributes: {
-							ref: 'random-clientId',
-						},
-						isValid: false,
-						innerBlocks: [],
-					},
-				],
-			} );
-
-			const state = blocks( deepFreeze( original ), {
-				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
-				id: 'random-clientId',
-				updatedId: 3,
-			} );
-
-			expect( state.byClientId.get( 'chicken' ) ).toEqual( {
-				clientId: 'chicken',
-				name: 'core/block',
-				isValid: false,
-			} );
-
-			expect( state.attributes.get( 'chicken' ) ).toEqual( {
-				ref: 3,
-			} );
-
-			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
-				state.tree.get( 'chicken' )
-			);
-			expect( state.tree.get( 'chicken' ) ).toEqual( {
-				clientId: 'chicken',
-				name: 'core/block',
-				isValid: false,
-				innerBlocks: [],
-				attributes: {
-					ref: 3,
-				},
-			} );
-		} );
-
 		it( 'should move the block up', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
