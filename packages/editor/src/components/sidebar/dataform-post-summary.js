@@ -16,12 +16,7 @@ import PostPanelSection from '../post-panel-section';
 import { store as editorStore } from '../../store';
 import PostTrash from '../post-trash';
 import usePostFields from '../post-fields';
-import { unlock } from '../../lock-unlock';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
-import RevisionAuthorPanel from '../revision-author-panel';
-import RevisionCreatedPanel from '../revision-created-panel';
-import PostContentInformation from '../post-content-information';
-import { OpenRevisionsClassicScreen } from './post-summary';
 
 const EMPTY_ARRAY = [];
 const form = {
@@ -76,25 +71,24 @@ const form = {
 };
 
 export default function DataFormPostSummary( { onActionPerformed } ) {
-	const { postType, postId, revisionId, isPostStatusPanelRemoved } =
-		useSelect( ( select ) => {
+	const { postType, postId, isPostStatusPanelRemoved } = useSelect(
+		( select ) => {
 			// We use isEditorPanelRemoved to hide the panel if it was programmatically removed. We do
 			// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
 			const {
 				isEditorPanelRemoved,
 				getCurrentPostType,
 				getCurrentPostId,
-				getCurrentRevisionId,
-			} = unlock( select( editorStore ) );
+			} = select( editorStore );
 			return {
 				postType: getCurrentPostType(),
 				postId: getCurrentPostId(),
-				revisionId: getCurrentRevisionId(),
 				isPostStatusPanelRemoved: isEditorPanelRemoved( 'post-status' ),
 			};
-		}, [] );
-	const shouldShowPostStatusPanel =
-		! isPostStatusPanelRemoved && ! revisionId;
+		},
+		[]
+	);
+	const shouldShowPostStatusPanel = ! isPostStatusPanelRemoved;
 	const record = useSelect(
 		( select ) => {
 			if ( ! postType || ! postId ) {
@@ -210,16 +204,6 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 							onChange={ onChange }
 						/>
 						<PostTrash onActionPerformed={ onActionPerformed } />
-					</>
-				) }
-				{ !! revisionId && (
-					<>
-						<VStack spacing={ 1 }>
-							<PostContentInformation />
-							<RevisionCreatedPanel />
-						</VStack>
-						<OpenRevisionsClassicScreen revisionId={ revisionId } />
-						<RevisionAuthorPanel />
 					</>
 				) }
 			</VStack>

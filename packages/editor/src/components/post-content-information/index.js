@@ -12,7 +12,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
@@ -23,19 +22,9 @@ const AVERAGE_READING_RATE = 189;
 
 // This component renders the wordcount and reading time for the post.
 export default function PostContentInformation() {
-	const { postContent } = useSelect( ( select ) => {
+	const postContent = useSelect( ( select ) => {
 		const { getEditedPostAttribute, getCurrentPostType, getCurrentPostId } =
 			select( editorStore );
-		const { getCurrentRevision, isRevisionsMode } = unlock(
-			select( editorStore )
-		);
-
-		if ( isRevisionsMode() ) {
-			return {
-				postContent: getCurrentRevision()?.content?.raw,
-			};
-		}
-
 		const { canUser } = select( coreStore );
 		const { getEntityRecord } = select( coreStore );
 		const siteSettings = canUser( 'read', {
@@ -52,12 +41,12 @@ export default function PostContentInformation() {
 			! [ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
 				postType
 			);
-		return {
-			postContent:
-				showPostContentInfo && getEditedPostAttribute( 'content' ),
-		};
+		return showPostContentInfo && getEditedPostAttribute( 'content' );
 	}, [] );
+	return <PostContentInformationUI postContent={ postContent } />;
+}
 
+export function PostContentInformationUI( { postContent } ) {
 	/*
 	 * translators: If your word count is based on single characters (e.g. East Asian characters),
 	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
