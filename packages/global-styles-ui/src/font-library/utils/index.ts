@@ -271,16 +271,25 @@ export function unloadFontFaceInBrowser(
 
 	for ( const sheet of ensureTargetSheets( removeFrom ) ) {
 		// Walk rules in reverse to safely delete by index.
-		ruleLoop: for ( let i = sheet.cssRules.length - 1; i >= 0; i-- ) {
-			const rule = sheet.cssRules[ i ];
+		ruleLoop: for (
+			let ruleIndex = sheet.cssRules.length - 1;
+			ruleIndex >= 0;
+			ruleIndex--
+		) {
+			const rule = sheet.cssRules[ ruleIndex ];
 			if ( rule instanceof CSSFontFaceRule ) {
 				// Check for a match
-				for ( let j = 0; j < fontFaceRule.style.length; j++ ) {
-					const prop = fontFaceRule.style[ j ];
-					const value = fontFaceRule.style.getPropertyValue( prop );
+				for (
+					let descriptorIndex = 0;
+					descriptorIndex < fontFaceRule.style.length;
+					descriptorIndex++
+				) {
+					const descriptor = fontFaceRule.style[ descriptorIndex ];
+					const value =
+						fontFaceRule.style.getPropertyValue( descriptor );
 					if (
 						value &&
-						rule.style.getPropertyValue( prop ) !== value
+						rule.style.getPropertyValue( descriptor ) !== value
 					) {
 						continue ruleLoop;
 					}
@@ -290,7 +299,7 @@ export function unloadFontFaceInBrowser(
 				if ( match ) {
 					blobUrls.add( match[ 1 ] );
 				}
-				sheet.deleteRule( i );
+				sheet.deleteRule( ruleIndex );
 			}
 		}
 	}
