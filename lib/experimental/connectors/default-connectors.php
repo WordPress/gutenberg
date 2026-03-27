@@ -117,8 +117,8 @@ function _gutenberg_connectors_init(): void {
 		} else {
 			// Generate explicit key names for third-party AI providers.
 			if ( $is_api_key ) {
-				$sanitized_id    = str_replace( '-', '_', $connector_id );
-				$constant_case   = strtoupper( preg_replace( '/([a-z])([A-Z])/', '$1_$2', $sanitized_id ) );
+				$sanitized_id  = str_replace( '-', '_', $connector_id );
+				$constant_case = strtoupper( preg_replace( '/([a-z])([A-Z])/', '$1_$2', $sanitized_id ) );
 
 				$authentication['setting_name']  = "connectors_ai_{$sanitized_id}_api_key";
 				$authentication['constant_name'] = "{$constant_case}_API_KEY";
