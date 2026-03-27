@@ -18,7 +18,6 @@ import PostTrash from '../post-trash';
 import usePostFields from '../post-fields';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
 
-const EMPTY_ARRAY = [];
 const form = {
 	layout: {
 		type: 'panel',
@@ -71,24 +70,13 @@ const form = {
 };
 
 export default function DataFormPostSummary( { onActionPerformed } ) {
-	const { postType, postId, isPostStatusPanelRemoved } = useSelect(
-		( select ) => {
-			// We use isEditorPanelRemoved to hide the panel if it was programmatically removed. We do
-			// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
-			const {
-				isEditorPanelRemoved,
-				getCurrentPostType,
-				getCurrentPostId,
-			} = select( editorStore );
-			return {
-				postType: getCurrentPostType(),
-				postId: getCurrentPostId(),
-				isPostStatusPanelRemoved: isEditorPanelRemoved( 'post-status' ),
-			};
-		},
-		[]
-	);
-	const shouldShowPostStatusPanel = ! isPostStatusPanelRemoved;
+	const { postType, postId } = useSelect( ( select ) => {
+		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
+		return {
+			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
+		};
+	}, [] );
 	const record = useSelect(
 		( select ) => {
 			if ( ! postType || ! postId ) {
@@ -128,49 +116,43 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 	const { editEntityRecord } = useDispatch( coreDataStore );
 
 	const _fields = usePostFields( { postType } );
-	const fields = useMemo( () => {
-		if ( ! shouldShowPostStatusPanel ) {
-			return EMPTY_ARRAY;
-		}
-		return _fields
-			?.map( ( field ) => {
-				if ( field.id === 'status' ) {
-					return {
-						...field,
-						elements: field.elements.filter(
-							( element ) => element.value !== 'trash'
-						),
-					};
-				}
-				if ( field.id === 'template' ) {
-					// `usePostTemplatePanelMode` is reused in the Post Template panel to match
-					// the existing behavior. If the panel rendered nothing we should exclude the
-					// template field from the form.
-					if ( ! templatePanelMode ) {
-						return null;
-					}
-					// In classic themes without available templates we need to make the field read-only.
-					if (
-						templatePanelMode === 'classic' &&
-						Object.keys( availableTemplates ?? {} ).length === 0
-					) {
+	const fields = useMemo(
+		() =>
+			_fields
+				?.map( ( field ) => {
+					if ( field.id === 'status' ) {
 						return {
 							...field,
-							readOnly: true,
-							render: () => __( 'Default template' ),
+							elements: field.elements.filter(
+								( element ) => element.value !== 'trash'
+							),
 						};
 					}
+					if ( field.id === 'template' ) {
+						// `usePostTemplatePanelMode` is reused in the Post Template panel to match
+						// the existing behavior. If the panel rendered nothing we should exclude the
+						// template field from the form.
+						if ( ! templatePanelMode ) {
+							return null;
+						}
+						// In classic themes without available templates we need to make the field read-only.
+						if (
+							templatePanelMode === 'classic' &&
+							Object.keys( availableTemplates ?? {} ).length === 0
+						) {
+							return {
+								...field,
+								readOnly: true,
+								render: () => __( 'Default template' ),
+							};
+						}
+						return field;
+					}
 					return field;
-				}
-				return field;
-			} )
-			.filter( Boolean );
-	}, [
-		_fields,
-		templatePanelMode,
-		availableTemplates,
-		shouldShowPostStatusPanel,
-	] );
+				} )
+				.filter( Boolean ),
+		[ _fields, templatePanelMode, availableTemplates ]
+	);
 
 	const onChange = ( edits ) => {
 		if (
@@ -195,17 +177,13 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					postId={ postId }
 					onActionPerformed={ onActionPerformed }
 				/>
-				{ shouldShowPostStatusPanel && (
-					<>
-						<DataForm
-							data={ augmentedRecord }
-							fields={ fields }
-							form={ form }
-							onChange={ onChange }
-						/>
-						<PostTrash onActionPerformed={ onActionPerformed } />
-					</>
-				) }
+				<DataForm
+					data={ augmentedRecord }
+					fields={ fields }
+					form={ form }
+					onChange={ onChange }
+				/>
+				<PostTrash onActionPerformed={ onActionPerformed } />
 			</VStack>
 		</PostPanelSection>
 	);
