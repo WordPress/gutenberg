@@ -22,6 +22,11 @@ function Dialog( { onClose }: { onClose?: () => void } ) {
 	);
 }
 
+// `useDialog` currently detects the Escape key via the deprecated `keyCode`
+// property (`event.keyCode === 27`). In jsdom, `userEvent.keyboard('[Escape]')`
+// does not set `keyCode` to 27, so we use `fireEvent` to control the event
+// shape. Once the hook is updated to use `event.key === 'Escape'`, these tests
+// should be rewritten to use `userEvent` for more realistic event simulation.
 function pressEscapeOn( element: HTMLElement ) {
 	fireEvent.keyDown( element, { keyCode: 27, key: 'Escape' } );
 }
