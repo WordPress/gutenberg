@@ -17,7 +17,12 @@ export default function makeFamiliesFromFaces(
 ): FontFamilyToUpload[] {
 	const fontFamiliesObject = faces.reduce(
 		(
-			acc: Record< string, FontFamilyToUpload >,
+			acc: Record<
+				string,
+				FontFamilyToUpload & {
+					fontFace: NonNullable< FontFamilyToUpload[ 'fontFace' ] >;
+				}
+			>,
 			item: FontFileMetadata
 		) => {
 			const cssFontFamily = createCssString( item.fontDisplayName );
@@ -29,7 +34,7 @@ export default function makeFamiliesFromFaces(
 					fontFace: [],
 				};
 			}
-			acc[ item.fontDisplayName ].fontFace!.push( {
+			acc[ item.fontDisplayName ].fontFace.push( {
 				fontFamily: cssFontFamily,
 				fontStyle: item.fontStyle,
 				fontWeight: item.fontWeight,
