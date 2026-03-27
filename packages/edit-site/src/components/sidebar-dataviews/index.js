@@ -36,7 +36,7 @@ export default function DataViewsSidebarContent( { postType } ) {
 	const {
 		query: { activeView = 'all' },
 	} = useLocation();
-	const { default_view: defaultView, view_list: viewList } = useViewConfig( {
+	const { view_list: viewList } = useViewConfig( {
 		kind: 'postType',
 		name: postType,
 	} );
@@ -54,7 +54,6 @@ export default function DataViewsSidebarContent( { postType } ) {
 							slug={ view.slug }
 							title={ view.title }
 							icon={ SLUG_TO_ICON[ view.slug ] }
-							type={ view.view?.type ?? defaultView.type }
 							isActive={ view.slug === activeView }
 						/>
 					);

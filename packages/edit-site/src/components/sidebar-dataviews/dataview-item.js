@@ -8,7 +8,6 @@ import clsx from 'clsx';
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { __experimentalHStack as HStack } from '@wordpress/components';
-import { VIEW_LAYOUTS } from '@wordpress/dataviews';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -21,15 +20,11 @@ const { useLocation } = unlock( routerPrivateApis );
 export default function DataViewItem( {
 	title,
 	slug,
-	type,
 	icon,
 	isActive,
 	suffix,
 } ) {
 	const { path } = useLocation();
-
-	const iconToUse =
-		icon || VIEW_LAYOUTS.find( ( v ) => v.type === type ).icon;
 
 	if ( slug === 'all' ) {
 		slug = undefined;
@@ -42,7 +37,7 @@ export default function DataViewItem( {
 			} ) }
 		>
 			<SidebarNavigationItem
-				icon={ iconToUse }
+				icon={ icon }
 				to={ addQueryArgs( path, {
 					activeView: slug,
 				} ) }
