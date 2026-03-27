@@ -286,13 +286,10 @@ describe( 'getQueriedItems', () => {
 			queries: {
 				default: {
 					'': {
-						itemIds: getMergedItemIds(
-							[],
-							[ 101, 102, 103 ],
-							undefined,
-							100,
-							50
-						),
+						itemIds: getMergedItemIds( [], [ 101, 102, 103 ], {
+							offset: 100,
+							perPage: 50,
+						} ),
 						meta: { totalItems: 103 },
 					},
 				},
@@ -322,13 +319,10 @@ describe( 'getQueriedItems', () => {
 			queries: {
 				default: {
 					'': {
-						itemIds: getMergedItemIds(
-							[],
-							[ 51, 52 ],
-							undefined,
-							50,
-							50
-						),
+						itemIds: getMergedItemIds( [], [ 51, 52 ], {
+							offset: 50,
+							perPage: 50,
+						} ),
 						meta: { totalItems: 200 },
 					},
 				},
@@ -362,13 +356,10 @@ describe( 'getQueriedItems', () => {
 			queries: {
 				default: {
 					'': {
-						itemIds: getMergedItemIds(
-							[],
-							[ 4, 5, 6, 7, 8 ],
-							undefined,
-							3,
-							10
-						),
+						itemIds: getMergedItemIds( [], [ 4, 5, 6, 7, 8 ], {
+							offset: 3,
+							perPage: 10,
+						} ),
 						meta: { totalItems: 50 },
 					},
 				},
@@ -428,7 +419,10 @@ describe( 'getQueriedItems', () => {
 			queries: {
 				default: {
 					'': {
-						itemIds: getMergedItemIds( [], [], undefined, 84, 7 ),
+						itemIds: getMergedItemIds( [], [], {
+							offset: 84,
+							perPage: 7,
+						} ),
 						meta: { totalItems: 84 },
 					},
 				},
