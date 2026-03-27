@@ -505,14 +505,30 @@ function poll(): void {
 				MAX_ERROR_BACKOFF_IN_MS
 			);
 
-			// Restore updates to queues on failure so they can be retried.
+			// Recover from the failed request. We don't know whether the server stored
+			// our updates before the error occurred (e.g. a network timeout after a
+			// successful write). Re-sending the same updates via restore() would
+			// duplicate them on the server and cause unbounded storage growth.
+			//
+			// Instead, for rooms that had outgoing updates, replace the queue with a
+			// single compaction (full document state). This is idempotent: if the
+			// server already stored the updates, the compaction safely supersedes
+			// them; if it didn't, the compaction includes them. Updates not seen by
+			// this client are preserved in both cases.
 			for ( const room of payload.rooms ) {
 				if ( ! roomStates.has( room.room ) ) {
 					continue;
 				}
 
 				const state = roomStates.get( room.room )!;
-				state.updateQueue.restore( room.updates );
+
+				if ( room.updates.length > 0 && state.endCursor > 0 ) {
+					state.updateQueue.clear();
+					state.updateQueue.add( state.createCompactionUpdate() );
+				} else if ( room.updates.length > 0 ) {
+					state.updateQueue.restore( room.updates );
+				}
+
 				state.log(
 					'Error posting sync update, will retry with backoff',
 					{
