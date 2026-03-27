@@ -25,7 +25,7 @@
  * - Plain "\" backslashes are escaped.
  *
  * @param value The JavaScript string to serialize as a quoted CSS string.
- * @return A quoted, CSS-safe font-family string.
+ * @return A quoted CSS string suitable for interpolation in CSS text.
  */
 export function createCssString( value: string ): string {
 	let escapedValue = value
