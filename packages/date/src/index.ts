@@ -10,10 +10,12 @@ import 'moment-timezone/moment-timezone-utils.js';
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
+
 /**
  * Internal dependencies
  */
 import type { DateSettings } from './types';
+import { getCurrentSettings, setCurrentSettings } from './settings';
 
 export type * from './types';
 
@@ -23,85 +25,13 @@ const WP_ZONE = 'WP';
 // See: https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
 const VALID_UTC_OFFSET = /^[+-][0-1][0-9](:?[0-9][0-9])?$/;
 
-// Changes made here will likely need to be synced with Core in the file
-// src/wp-includes/script-loader.php in `wp_default_packages_inline_scripts()`.
-let settings: DateSettings = {
-	l10n: {
-		locale: 'en',
-		months: [
-			'January',
-			'February',
-			'March',
-			'April',
-			'May',
-			'June',
-			'July',
-			'August',
-			'September',
-			'October',
-			'November',
-			'December',
-		],
-		monthsShort: [
-			'Jan',
-			'Feb',
-			'Mar',
-			'Apr',
-			'May',
-			'Jun',
-			'Jul',
-			'Aug',
-			'Sep',
-			'Oct',
-			'Nov',
-			'Dec',
-		],
-		weekdays: [
-			'Sunday',
-			'Monday',
-			'Tuesday',
-			'Wednesday',
-			'Thursday',
-			'Friday',
-			'Saturday',
-		],
-		weekdaysShort: [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ],
-		meridiem: { am: 'am', pm: 'pm', AM: 'AM', PM: 'PM' },
-		relative: {
-			future: '%s from now',
-			past: '%s ago',
-			s: 'a few seconds',
-			ss: '%d seconds',
-			m: 'a minute',
-			mm: '%d minutes',
-			h: 'an hour',
-			hh: '%d hours',
-			d: 'a day',
-			dd: '%d days',
-			M: 'a month',
-			MM: '%d months',
-			y: 'a year',
-			yy: '%d years',
-		},
-		startOfWeek: 0,
-	},
-	formats: {
-		time: 'g:i a',
-		date: 'F j, Y',
-		datetime: 'F j, Y g:i a',
-		datetimeAbbreviated: 'M j, Y g:i a',
-	},
-	timezone: { offset: 0, offsetFormatted: '0', string: '', abbr: '' },
-};
-
 /**
  * Adds a locale to moment, using the format supplied by `wp_localize_script()`.
  *
  * @param dateSettings Settings, including locale data.
  */
 export function setSettings( dateSettings: DateSettings ) {
-	settings = dateSettings;
-
+	setCurrentSettings( dateSettings );
 	setupWPTimezone();
 
 	// Does moment already have a locale with the right name?
@@ -166,8 +96,12 @@ export function setSettings( dateSettings: DateSettings ) {
  *
  * @return {DateSettings} Settings, including locale data.
  */
-export function getSettings() {
-	return settings;
+export function getSettings(): DateSettings {
+	deprecated( 'wp.date.getSettings', {
+		since: '7.1',
+		alternative: 'wp.date.settings.getCurrentSettings',
+	} );
+	return getCurrentSettings();
 }
 
 /**
@@ -181,12 +115,15 @@ export function __experimentalGetSettings() {
 		since: '6.1',
 		alternative: 'wp.date.getSettings',
 	} );
-	return getSettings();
+	return getCurrentSettings();
 }
 
 function setupWPTimezone() {
 	// Get the current timezone settings from the WP timezone string.
-	const currentTimezone = momentLib.tz.zone( settings.timezone.string );
+	const currentSettings = getCurrentSettings();
+	const currentTimezone = momentLib.tz.zone(
+		currentSettings.timezone.string
+	);
 
 	// Check to see if we have a valid TZ data, if so, use it for the custom WP_ZONE timezone, otherwise just use the offset.
 	if ( currentTimezone ) {
@@ -208,7 +145,7 @@ function setupWPTimezone() {
 				name: WP_ZONE,
 				abbrs: [ WP_ZONE ],
 				untils: [ null ],
-				offsets: [ -settings.timezone.offset * 60 || 0 ],
+				offsets: [ -currentSettings.timezone.offset * 60 || 0 ],
 			} )
 		);
 	}
@@ -515,7 +452,7 @@ export function dateI18n(
 	}
 
 	const dateMoment = buildMoment( dateValue, timezone );
-	dateMoment.locale( settings.l10n.locale );
+	dateMoment.locale( getCurrentSettings().l10n.locale );
 	return format( dateFormat, dateMoment );
 }
 
@@ -535,7 +472,7 @@ export function gmdateI18n(
 	dateValue: Moment | Date | string | number = new Date()
 ) {
 	const dateMoment = momentLib( dateValue ).utc();
-	dateMoment.locale( settings.l10n.locale );
+	dateMoment.locale( getCurrentSettings().l10n.locale );
 	return format( dateFormat, dateMoment );
 }
 
@@ -612,11 +549,13 @@ function buildMoment(
 			  dateMoment.tz( timezone as string );
 	}
 
-	if ( settings.timezone.string ) {
-		return dateMoment.tz( settings.timezone.string );
+	const currentSettings = getCurrentSettings();
+
+	if ( currentSettings.timezone.string ) {
+		return dateMoment.tz( currentSettings.timezone.string );
 	}
 
-	return dateMoment.utcOffset( +settings.timezone.offset );
+	return dateMoment.utcOffset( +currentSettings.timezone.offset );
 }
 
 /**

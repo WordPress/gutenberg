@@ -37,6 +37,11 @@
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
+		"./settings": {
+			"types": "./build-types/settings.d.ts",
+			"import": "./build-module/settings.mjs",
+			"require": "./build/settings.cjs"
+		},
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
