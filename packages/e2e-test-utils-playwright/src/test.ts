@@ -2,7 +2,7 @@
  * External dependencies
  */
 import * as path from 'path';
-import { test as base, expect, chromium } from '@playwright/test';
+import { test as base, expect as baseExpect, chromium } from '@playwright/test';
 import type { ConsoleMessage } from '@playwright/test';
 import getPort from 'get-port';
 
@@ -121,6 +121,16 @@ function observeConsoleLogging( message: ConsoleMessage ) {
 	console[ logFunction ]( text );
 }
 
+/**
+ * The extended Playwright's [test](https://playwright.dev/docs/api/class-test) module with the
+ * 	`admin`,
+ * 	`editor`,
+ * 	`pageUtils`,
+ * 	`snapshotConfig`,
+ * 	`metrics`,
+ * 	`lighthouse`
+ * 	and the `requestUtils` fixtures.
+ */
 const test = base.extend<
 	{
 		admin: Admin;
@@ -198,5 +208,10 @@ const test = base.extend<
 		await use( new Metrics( { page } ) );
 	},
 } );
+
+/**
+ * The Playwright/Jest's [expect](https://jestjs.io/docs/expect) function.
+ */
+const expect = baseExpect;
 
 export { test, expect };

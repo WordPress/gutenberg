@@ -20,6 +20,14 @@ type AdminConstructorProps = {
 	editor: Editor;
 };
 
+/**
+ * End to end test utilities for WordPress admin's user interface.
+ *
+ * ```js
+ * const admin = new Admin( { page, pageUtils } );
+ * await admin.visitAdminPage( 'options-general.php' );
+ * ```
+ */
 export class Admin {
 	page: Page;
 	context: BrowserContext;

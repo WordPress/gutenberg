@@ -22,6 +22,15 @@ type PageUtilConstructorParams = {
 	browserName: PlaywrightWorkerOptions[ 'browserName' ];
 };
 
+/**
+ * Generic Playwright utilities for interacting with web pages.
+ *
+ * @example
+ * ```js
+ * const pageUtils = new PageUtils( { page } );
+ * await pageUtils.pressKeys( 'primary+a' );
+ * ```
+ */
 class PageUtils {
 	browser: Browser;
 	page: Page;

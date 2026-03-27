@@ -34,6 +34,26 @@ type EditorConstructorProps = {
 	page: Page;
 };
 
+/**
+ * End to end test utilities for the WordPress Block Editor.
+ *
+ * To use these utilities, instantiate them within each test file:
+ *
+ * ```js
+ * test.use( {
+ * 	editor: async ( { page }, use ) => {
+ * 		await use( new Editor( { page } ) );
+ * 	},
+ * } );
+ * ```
+ *
+ * Within a test or test utility, use the `canvas` property to select elements within the iframe canvas:
+ *
+ * ```js
+ * await editor.canvas.locator( 'role=document[name="Paragraph block"i]' );
+ * ```
+ *
+ */
 export class Editor {
 	browser: Browser;
 	page: Page;

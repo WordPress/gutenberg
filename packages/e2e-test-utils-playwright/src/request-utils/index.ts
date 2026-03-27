@@ -44,6 +44,20 @@ interface StorageState {
 	rootURL: string;
 }
 
+/**
+ * Playwright utilities for interacting with the WordPress REST API.
+ * @example
+ * ```js
+ * 	// Create a request utils instance.
+ * 	const requestUtils = await RequestUtils.setup( {
+ *		user: {
+ *			username: 'admin',
+ *		password: 'password',
+ *		},
+ *	} );
+ *  ```
+ *
+ */
 class RequestUtils {
 	request: APIRequestContext;
 	user: User;
