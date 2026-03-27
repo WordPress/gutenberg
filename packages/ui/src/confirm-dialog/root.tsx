@@ -25,7 +25,7 @@ import type { RootProps } from './types';
  * For use cases outside the standard confirm/cancel pattern, use the lower-level
  * `Dialog` component directly.
  *
- * See the [Destructive Actions guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-patterns-destructive-actions--docs)
+ * See the [Destructive Actions guidelines](?path=/docs/design-system-patterns-destructive-actions--docs)
  * for more details on when to use each pattern.
  */
 function Root( {
