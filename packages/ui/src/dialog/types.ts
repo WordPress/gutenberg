@@ -22,7 +22,9 @@ export interface TriggerProps extends ComponentProps< 'button' > {
 	children?: ReactNode;
 }
 
-export interface PopupProps extends ComponentProps< 'div' > {
+export interface PopupProps
+	extends ComponentProps< 'div' >,
+		Pick< _Dialog.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
 	 * The content to be rendered inside the component.
 	 */
