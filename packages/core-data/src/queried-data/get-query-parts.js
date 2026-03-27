@@ -15,8 +15,7 @@ import { withWeakMapCache, getNormalizedCommaSeparable } from '../utils';
  *
  * @property {number}      page      The query page (1-based index, default 1).
  * @property {number}      perPage   Items per page for query (default 10).
- * @property {number}      offset    Absolute item offset (default undefined).
- *                                   When present, also encoded into stableKey.
+ * @property {?number}     offset    Absolute item offset (default undefined).
  * @property {string}      stableKey An encoded stable string of all non-
  *                                   pagination, non-fields query parameters.
  * @property {?(string[])} fields    Target subset of fields to derive from
@@ -43,7 +42,7 @@ export function getQueryParts( query ) {
 		stableKey: '',
 		page: 1,
 		perPage: 10,
-		offset: undefined,
+		offset: null,
 		fields: null,
 		include: null,
 		context: 'default',
