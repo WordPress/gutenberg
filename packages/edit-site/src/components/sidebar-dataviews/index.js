@@ -1,15 +1,11 @@
 /**
  * External dependencies
  */
-import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalItemGroup as ItemGroup,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
 	trash,
@@ -61,26 +57,16 @@ export default function DataViewsSidebarContent( { postType } ) {
 					const isActive = view.slug === activeView;
 					const slug = view.slug === 'all' ? undefined : view.slug;
 					return (
-						<HStack
+						<SidebarNavigationItem
 							key={ view.slug }
-							justify="flex-start"
-							className={ clsx(
-								'edit-site-sidebar-dataviews-dataview-item',
-								{
-									'is-selected': isActive,
-								}
-							) }
+							icon={ SLUG_TO_ICON[ view.slug ] }
+							to={ addQueryArgs( path, {
+								activeView: slug,
+							} ) }
+							aria-current={ isActive ? 'true' : undefined }
 						>
-							<SidebarNavigationItem
-								icon={ SLUG_TO_ICON[ view.slug ] }
-								to={ addQueryArgs( path, {
-									activeView: slug,
-								} ) }
-								aria-current={ isActive ? 'true' : undefined }
-							>
-								{ view.title }
-							</SidebarNavigationItem>
-						</HStack>
+							{ view.title }
+						</SidebarNavigationItem>
 					);
 				} ) }
 			</ItemGroup>
