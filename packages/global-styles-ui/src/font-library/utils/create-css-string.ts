@@ -49,9 +49,10 @@ export function createCssString( value: string ): string {
 		.replaceAll( '\r', '\\A ' )
 		.replaceAll( '\f', '\\A ' )
 
-		// Newlines must be escaped.
+		// Newlines must be escaped in CSS strings.
 		.replaceAll( '\n', '\\A ' );
 
+	// Arbitrary characters for Unicode escaping.
 	for ( const char of [
 		// HTML syntax may be problematic.
 		'<',
