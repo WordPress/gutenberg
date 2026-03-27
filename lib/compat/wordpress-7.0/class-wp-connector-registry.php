@@ -72,11 +72,11 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 *         @type string      $method          Required. The authentication method: 'api_key' or 'none'.
 		 *         @type string|null $credentials_url Optional. URL where users can obtain API credentials.
 		 *         @type string|null $setting_name    Optional. Custom option name for the API key.
-		 *                                            Defaults to 'connectors_ai_{id}_api_key'.
+		 *                                            Defaults to 'connectors_{type}_{id}_api_key'.
 		 *         @type string|null $constant_name   Optional. PHP constant name for the API key
-		 *                                            (e.g., 'WPCOM_API_KEY'). Defaults to '{UPPER_ID}_API_KEY'.
+		 *                                            (e.g., 'WPCOM_API_KEY'). Only checked when provided.
 		 *         @type string|null $env_var_name    Optional. Environment variable name for the API key.
-		 *                                            Defaults to '{UPPER_ID}_API_KEY'.
+		 *                                            Only checked when provided.
 		 *     }
 		 *     @type array  $plugin         {
 		 *         Optional. Plugin data for install/activate UI.
@@ -172,16 +172,11 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				if ( ! empty( $args['authentication']['setting_name'] ) && is_string( $args['authentication']['setting_name'] ) ) {
 					$connector['authentication']['setting_name'] = $args['authentication']['setting_name'];
 				} else {
-					$sanitized_id = str_replace( '-', '_', $id );
-					$type         = $connector['type'] ?? '';
-					if ( 'ai_provider' === $type ) {
-						$type_prefix = 'ai_';
-					} elseif ( '' !== $type ) {
-						$type_prefix = str_replace( '-', '_', $type ) . '_';
-					} else {
-						$type_prefix = '';
-					}
-					$connector['authentication']['setting_name'] = "connectors_{$type_prefix}{$sanitized_id}_api_key";
+					$sanitized_id   = str_replace( '-', '_', $id );
+					$sanitized_type = str_replace( '-', '_', $connector['type'] ?? '' );
+					$connector['authentication']['setting_name'] = '' !== $sanitized_type
+						? "connectors_{$sanitized_type}_{$sanitized_id}_api_key"
+						: "connectors_{$sanitized_id}_api_key";
 				}
 				if ( ! empty( $args['authentication']['constant_name'] ) && is_string( $args['authentication']['constant_name'] ) ) {
 					$connector['authentication']['constant_name'] = $args['authentication']['constant_name'];

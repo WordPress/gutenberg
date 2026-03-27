@@ -34,6 +34,9 @@ function _gutenberg_connectors_init(): void {
 			'authentication' => array(
 				'method'          => 'api_key',
 				'credentials_url' => 'https://platform.claude.com/settings/keys',
+				'setting_name'    => 'connectors_ai_anthropic_api_key',
+				'constant_name'   => 'ANTHROPIC_API_KEY',
+				'env_var_name'    => 'ANTHROPIC_API_KEY',
 			),
 		),
 		'google'    => array(
@@ -46,6 +49,9 @@ function _gutenberg_connectors_init(): void {
 			'authentication' => array(
 				'method'          => 'api_key',
 				'credentials_url' => 'https://aistudio.google.com/api-keys',
+				'setting_name'    => 'connectors_ai_google_api_key',
+				'constant_name'   => 'GOOGLE_API_KEY',
+				'env_var_name'    => 'GOOGLE_API_KEY',
 			),
 		),
 		'openai'    => array(
@@ -58,6 +64,9 @@ function _gutenberg_connectors_init(): void {
 			'authentication' => array(
 				'method'          => 'api_key',
 				'credentials_url' => 'https://platform.openai.com/api-keys',
+				'setting_name'    => 'connectors_ai_openai_api_key',
+				'constant_name'   => 'OPENAI_API_KEY',
+				'env_var_name'    => 'OPENAI_API_KEY',
 			),
 		),
 	);
@@ -106,6 +115,16 @@ function _gutenberg_connectors_init(): void {
 				$defaults[ $connector_id ]['authentication']['credentials_url'] = $authentication['credentials_url'];
 			}
 		} else {
+			// Generate explicit key names for third-party AI providers.
+			if ( $is_api_key ) {
+				$sanitized_id    = str_replace( '-', '_', $connector_id );
+				$constant_case   = strtoupper( preg_replace( '/([a-z])([A-Z])/', '$1_$2', $sanitized_id ) );
+
+				$authentication['setting_name']  = "connectors_ai_{$sanitized_id}_api_key";
+				$authentication['constant_name'] = "{$constant_case}_API_KEY";
+				$authentication['env_var_name']  = "{$constant_case}_API_KEY";
+			}
+
 			$defaults[ $connector_id ] = array(
 				'name'           => $name ? $name : ucwords( $connector_id ),
 				'description'    => $description ? $description : '',
@@ -173,41 +192,32 @@ add_action( 'init', '_gutenberg_connectors_init', 15 );
  * Determines the source of an API key for a given connector.
  *
  * Checks in order: environment variable, PHP constant, database.
- * By default, derives the env var / constant name from the connector ID
- * using the same convention as the WP AI Client ProviderRegistry
- * (e.g., 'openai' → 'OPENAI_API_KEY'). Connectors may override these
- * names via `env_var_name` and `constant_name` in their authentication config.
+ * Environment variable and PHP constant are only checked when explicitly
+ * provided in the connector's authentication config.
  *
  * @access private
  *
- * @param string $connector_id       The connector ID (e.g., 'openai', 'akismet').
- * @param string $setting_name       The option name for the API key (e.g., 'connectors_ai_openai_api_key').
- * @param string $env_var_override   Optional. Custom environment variable name. Default empty string.
- * @param string $constant_override  Optional. Custom PHP constant name (e.g., 'WPCOM_API_KEY'). Default empty string.
+ * @param string $setting_name  The option name for the API key (e.g., 'connectors_ai_openai_api_key').
+ * @param string $env_var_name  Optional. Environment variable name. Only checked when non-empty.
+ * @param string $constant_name Optional. PHP constant name. Only checked when non-empty.
  * @return string The key source: 'env', 'constant', 'database', or 'none'.
  */
-function _gutenberg_get_api_key_source( string $connector_id, string $setting_name, string $env_var_override = '', string $constant_override = '' ): string {
-	// Derive default name from connector ID in CONSTANT_CASE.
-	// e.g., 'openai' -> 'OPENAI_API_KEY', 'anthropic' -> 'ANTHROPIC_API_KEY'.
-	$constant_case_id = strtoupper(
-		preg_replace( '/([a-z])([A-Z])/', '$1_$2', str_replace( '-', '_', $connector_id ) )
-	);
-	$default_name     = "{$constant_case_id}_API_KEY";
-
-	$env_var_name  = '' !== $env_var_override ? $env_var_override : $default_name;
-	$constant_name = '' !== $constant_override ? $constant_override : $default_name;
-
-	// Check environment variable first.
-	$env_value = getenv( $env_var_name );
-	if ( false !== $env_value && '' !== $env_value ) {
-		return 'env';
+function _gutenberg_get_api_key_source( string $setting_name, string $env_var_name = '', string $constant_name = '' ): string {
+	// Check environment variable (only if explicitly configured).
+	if ( '' !== $env_var_name ) {
+		$env_value = getenv( $env_var_name );
+		if ( false !== $env_value && '' !== $env_value ) {
+			return 'env';
+		}
 	}
 
-	// Check PHP constant.
-	if ( defined( $constant_name ) ) {
-		$const_value = constant( $constant_name );
-		if ( is_string( $const_value ) && '' !== $const_value ) {
-			return 'constant';
+	// Check PHP constant (only if explicitly configured).
+	if ( '' !== $constant_name ) {
+		if ( defined( $constant_name ) ) {
+			$const_value = constant( $constant_name );
+			if ( is_string( $const_value ) && '' !== $const_value ) {
+				return 'constant';
+			}
 		}
 	}
 
@@ -424,7 +434,6 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 
 			// Skip if the key is already provided via env var or constant.
 			$key_source = _gutenberg_get_api_key_source(
-				$connector_id,
 				$auth['setting_name'],
 				$auth['env_var_name'] ?? '',
 				$auth['constant_name'] ?? ''
@@ -484,7 +493,6 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 			$auth_out['settingName']    = $auth['setting_name'] ?? '';
 			$auth_out['credentialsUrl'] = $auth['credentials_url'] ?? null;
 			$auth_out['keySource']      = _gutenberg_get_api_key_source(
-				$connector_id,
 				$auth['setting_name'] ?? '',
 				$auth['env_var_name'] ?? '',
 				$auth['constant_name'] ?? ''
