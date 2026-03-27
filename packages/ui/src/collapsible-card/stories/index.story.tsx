@@ -29,6 +29,7 @@ const meta: Meta< typeof CollapsibleCard.Root > = {
 	component: CollapsibleCard.Root,
 	subcomponents: {
 		'CollapsibleCard.Header': CollapsibleCard.Header,
+		'CollapsibleCard.HeaderDescription': CollapsibleCard.HeaderDescription,
 		'CollapsibleCard.Content': CollapsibleCard.Content,
 	},
 };
@@ -153,6 +154,49 @@ export const Stacked: Story = {
 				</CollapsibleCard.Root>
 			) ) }
 		</div>
+	),
+};
+
+/**
+ * A collapsible card with a `HeaderDescription` that provides supplementary
+ * information (e.g. status, summary) as an `aria-describedby` relationship.
+ */
+export const WithHeaderDescription: Story = {
+	// `defaultOpen` (uncontrolled) and `open` (controlled) should not be
+	// used together — disable the `open` control to avoid confusion.
+	argTypes: { open: { control: false } },
+	args: {
+		defaultOpen: true,
+	},
+	render: ( { open, defaultOpen, onOpenChange, disabled, ...restArgs } ) => (
+		<CollapsibleCard.Root
+			open={ open }
+			defaultOpen={ defaultOpen }
+			onOpenChange={ onOpenChange }
+			disabled={ disabled }
+			{ ...restArgs }
+		>
+			<CollapsibleCard.Header>
+				<Card.Title>Settings</Card.Title>
+				<CollapsibleCard.HeaderDescription>
+					<span
+						style={ {
+							fontSize: 'var(--wpds-font-size-sm)',
+							color: 'var(--wpds-color-fg-content-neutral-weak)',
+						} }
+					>
+						3 items configured
+					</span>
+				</CollapsibleCard.HeaderDescription>
+			</CollapsibleCard.Header>
+			<CollapsibleCard.Content>
+				<Text>
+					The header description provides supplementary context to the
+					trigger button. Assistive technologies will announce the
+					description alongside the button label.
+				</Text>
+			</CollapsibleCard.Content>
+		</CollapsibleCard.Root>
 	),
 };
 
