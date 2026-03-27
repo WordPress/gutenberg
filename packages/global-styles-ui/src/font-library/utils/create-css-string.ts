@@ -38,7 +38,8 @@ export function createCssString( value: string ): string {
 		 * "\" followed by the character code in hexadecimal. The escape may be terminated by
 		 * whitespace which is ignored.
 		 */
-		// Escape existing backslashes before any other processing.
+
+		// Escape existing backslashes to prevent unintentional escapes in result.
 		.replaceAll( '\\', '\\5C ' )
 
 		// Pre-processing replaces NULLs and some newlines. Replace and escape as necessary.
