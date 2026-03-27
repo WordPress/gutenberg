@@ -275,10 +275,13 @@ export function unloadFontFaceInBrowser(
 			const rule = sheet.cssRules[ i ];
 			if ( rule instanceof CSSFontFaceRule ) {
 				// Check for a match
-				for ( const [ descriptor, value ] of Object.entries(
-					fontFaceRule.style
-				) ) {
-					if ( value && rule.style[ descriptor as any ] !== value ) {
+				for ( let j = 0; j < fontFaceRule.style.length; j++ ) {
+					const prop = fontFaceRule.style[ j ];
+					const value = fontFaceRule.style.getPropertyValue( prop );
+					if (
+						value &&
+						rule.style.getPropertyValue( prop ) !== value
+					) {
 						continue ruleLoop;
 					}
 				}
