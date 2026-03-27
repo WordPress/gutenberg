@@ -33,7 +33,13 @@ This approach offers several benefits:
 
 ## Getting started with the Interactivity Router
 
-The `@wordpress/interactivity-router` package is bundled with WordPress Core since version 6.5. If you are starting a new project, the easiest way to get set up is using the [`@wordpress/create-block-interactive-template`](https://www.npmjs.com/package/@wordpress/create-block-interactive-template) scaffolding tool, which creates a block with the Interactivity API already configured:
+The `@wordpress/interactivity-router` package is bundled with WordPress Core since version 6.5. If you are starting a new project, the easiest way to get set up is using the [`@wordpress/create-block-interactive-template`](https://www.npmjs.com/package/@wordpress/create-block-interactive-template) scaffolding tool. It offers a dedicated `client-side-navigation` variant that scaffolds a fully working block with client-side navigation already wired up — including router regions, prev/next navigation, a loading indicator, and a stopwatch that persists across navigations to demonstrate state persistence:
+
+```bash
+npx @wordpress/create-block@latest my-interactive-block --template @wordpress/create-block-interactive-template --variant client-side-navigation
+```
+
+You can also scaffold the default variant and add client-side navigation yourself:
 
 ```bash
 npx @wordpress/create-block@latest my-interactive-block --template @wordpress/create-block-interactive-template

@@ -18,7 +18,14 @@ const ThemeProvider: typeof ThemeProviderType =
  * Uses a portal to render outside the DOM hierarchy.
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
-	{ className, size = 'medium', children, ...props },
+	{
+		className,
+		size = 'medium',
+		initialFocus,
+		finalFocus,
+		children,
+		...props
+	},
 	ref
 ) {
 	return (
@@ -32,6 +39,8 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 						className,
 						styles[ `is-${ size }` ]
 					) }
+					initialFocus={ initialFocus }
+					finalFocus={ finalFocus }
 					{ ...props }
 				>
 					<DialogValidationProvider>

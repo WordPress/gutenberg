@@ -33,12 +33,18 @@ export const stylebookRoute = {
 		},
 		preview( { siteData } ) {
 			return isClassicThemeWithStyleBookSupport( siteData ) ? (
-				<StyleBookPreview isStatic />
+				<StyleBookPreview
+					isStatic
+					settings={ siteData.editorSettings }
+				/>
 			) : undefined;
 		},
 		mobile( { siteData } ) {
 			return isClassicThemeWithStyleBookSupport( siteData ) ? (
-				<StyleBookPreview isStatic />
+				<StyleBookPreview
+					isStatic
+					settings={ siteData.editorSettings }
+				/>
 			) : undefined;
 		},
 	},
