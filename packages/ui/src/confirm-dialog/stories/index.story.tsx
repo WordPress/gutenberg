@@ -1,5 +1,5 @@
 import { Menu } from '@base-ui/react/menu';
-import { useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { action } from 'storybook/actions';
 import { fn } from 'storybook/test';
@@ -180,6 +180,7 @@ export const AsyncConfirm: Story = {
 	render: function AsyncConfirm( args ) {
 		const [ isOpen, setIsOpen ] = useState( false );
 		const [ isLoading, setIsLoading ] = useState( false );
+		const loadingRef = useRef( false );
 
 		return (
 			<>
@@ -190,7 +191,7 @@ export const AsyncConfirm: Story = {
 					{ ...args }
 					open={ isOpen }
 					onOpenChange={ ( open, eventDetails ) => {
-						if ( ! isLoading ) {
+						if ( ! loadingRef.current ) {
 							setIsOpen( open );
 						}
 						args.onOpenChange?.( open, eventDetails );
@@ -200,10 +201,12 @@ export const AsyncConfirm: Story = {
 						title="Delete permanently?"
 						loading={ isLoading }
 						onConfirm={ () => {
+							loadingRef.current = true;
 							setIsLoading( true );
 							new Promise< void >( ( resolve ) =>
 								setTimeout( resolve, 2000 )
 							).then( () => {
+								loadingRef.current = false;
 								setIsLoading( false );
 								setIsOpen( false );
 							} );
