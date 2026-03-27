@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef } from '@wordpress/element';
+import { createRef, useState } from '@wordpress/element';
 
 import * as ConfirmDialog from '..';
 
@@ -442,6 +442,46 @@ describe( 'ConfirmDialog', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'No, go back' } )
 		).toBeVisible();
+	} );
+
+	it( 'keeps dialog open when confirm is clicked with loading prop (async flow)', async () => {
+		function AsyncDialog() {
+			const [ isOpen, setIsOpen ] = useState( true );
+			const [ isLoading, setIsLoading ] = useState( false );
+
+			return (
+				<ConfirmDialog.Root
+					open={ isOpen }
+					onOpenChange={ ( open ) => {
+						if ( ! isLoading ) {
+							setIsOpen( open );
+						}
+					} }
+				>
+					<ConfirmDialog.Popup
+						title="Async Test"
+						loading={ isLoading }
+						onConfirm={ () => setIsLoading( true ) }
+					>
+						Content
+					</ConfirmDialog.Popup>
+				</ConfirmDialog.Root>
+			);
+		}
+
+		render( <AsyncDialog /> );
+
+		await waitFor( () => {
+			expect( screen.getByText( 'Async Test' ) ).toBeVisible();
+		} );
+
+		await userEvent.click( screen.getByRole( 'button', { name: 'OK' } ) );
+
+		expect( screen.getByText( 'Async Test' ) ).toBeVisible();
+		expect( screen.getByRole( 'button', { name: 'OK' } ) ).toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
 	} );
 
 	it( 'opens dialog when Trigger is clicked', async () => {
