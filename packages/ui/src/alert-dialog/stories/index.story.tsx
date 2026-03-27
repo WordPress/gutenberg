@@ -51,9 +51,7 @@ export const Irreversible: Story = {
 		intent: 'irreversible',
 		children: (
 			<>
-				<AlertDialog.Trigger>
-					Delete permanently
-				</AlertDialog.Trigger>
+				<AlertDialog.Trigger>Delete permanently</AlertDialog.Trigger>
 				<AlertDialog.Popup
 					title="Delete permanently?"
 					onConfirm={ action( 'onConfirm' ) }

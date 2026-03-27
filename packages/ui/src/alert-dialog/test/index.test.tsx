@@ -516,10 +516,7 @@ describe( 'AlertDialog', () => {
 		render(
 			<AlertDialog.Root>
 				<AlertDialog.Trigger>Open</AlertDialog.Trigger>
-				<AlertDialog.Popup
-					title="Trigger Test"
-					onConfirm={ jest.fn() }
-				>
+				<AlertDialog.Popup title="Trigger Test" onConfirm={ jest.fn() }>
 					Dialog content
 				</AlertDialog.Popup>
 			</AlertDialog.Root>
