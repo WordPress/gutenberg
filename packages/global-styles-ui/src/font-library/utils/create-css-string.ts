@@ -28,7 +28,7 @@
  * @return A quoted, CSS-safe font-family string.
  */
 export function createCssString( value: string ): string {
-	return `"${ value
+	let escapedValue = value
 		/*
 		 * CSS Unicode escaping for problematic characters.
 		 * https://www.w3.org/TR/css-syntax-3/#escaping
@@ -50,18 +50,28 @@ export function createCssString( value: string ): string {
 		.replaceAll( '\f', '\\A ' )
 
 		// Newlines must be escaped.
-		.replaceAll( '\n', '\\A ' )
+		.replaceAll( '\n', '\\A ' );
 
+	for ( const char of [
 		// HTML syntax may be problematic.
-		.replaceAll( '<', '\\3C ' )
-		.replaceAll( '>', '\\3E ' )
-		.replaceAll( '&', '\\26 ' )
+		'<',
+		'>',
+		'&',
 
 		// CSS syntax may be problematic.
-		.replaceAll( ',', '\\2C ' )
-		.replaceAll( ';', '\\3B ' )
-		.replaceAll( '{', '\\7B ' )
-		.replaceAll( '}', '\\7D ' )
-		.replaceAll( '"', '\\22 ' )
-		.replaceAll( "'", '\\27 ' ) }"`;
+		',',
+		';',
+		'{',
+		'}',
+		'"',
+		"'",
+	] ) {
+		const escapeSequence = `\\${ char
+			.charCodeAt( 0 )
+			.toString( 16 )
+			.toUpperCase() } `;
+		escapedValue = escapedValue.replaceAll( char, escapeSequence );
+	}
+
+	return `"${ escapedValue }"`;
 }
