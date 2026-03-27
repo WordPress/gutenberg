@@ -130,11 +130,37 @@ export interface RecordHandlers {
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 }
 
+/**
+ * Result of a presence check — the IDs of other clients in the room.
+ */
+export interface PresenceCheckResult {
+	otherClientIds: number[];
+}
+
 export interface SyncConfig {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
 		changes: Partial< ObjectData >
 	) => void;
+
+	/**
+	 * Lightweight presence check that polls for other editors in a room.
+	 *
+	 * The consumer (e.g. core-data) provides a platform-specific implementation
+	 * that communicates with the server. The sync manager calls this on an
+	 * interval to detect collaborators without connecting full sync providers.
+	 *
+	 * @param options.room                The sync room identifier.
+	 * @param options.clientId            The local client ID.
+	 * @param options.localAwarenessState The local awareness state to broadcast.
+	 * @return A promise resolving to the IDs of other clients in the room.
+	 */
+	checkPresence?: ( options: {
+		room: string;
+		clientId: number;
+		localAwarenessState: Record< string, unknown >;
+	} ) => Promise< PresenceCheckResult >;
+
 	createAwareness?: (
 		ydoc: Y.Doc,
 		objectId?: ObjectID

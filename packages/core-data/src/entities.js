@@ -17,6 +17,7 @@ import { PostEditorAwareness } from './awareness/post-editor-awareness';
 import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
+	checkPresenceViaApi,
 	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
@@ -425,6 +426,12 @@ async function loadPostTypeEntities() {
 			 */
 			applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
 				applyPostChangesToCRDTDoc( crdtDoc, changes, syncedProperties ),
+
+			/**
+			 * Lightweight presence check for lazy sync. Defers full provider
+			 * connection until another editor is detected in the room.
+			 */
+			checkPresence: checkPresenceViaApi,
 
 			/**
 			 * Create the awareness instance for the entity's CRDT document.

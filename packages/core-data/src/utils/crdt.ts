@@ -8,9 +8,11 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
  */
 // @ts-expect-error No exported types.
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
+import apiFetch from '@wordpress/api-fetch';
 import {
 	type CRDTDoc,
 	type ObjectData,
+	type PresenceCheckResult,
 	type SyncConfig,
 	Y,
 } from '@wordpress/sync';
@@ -418,12 +420,65 @@ export function getPostChangesFromCRDTDoc(
 	return changes;
 }
 
+const SYNC_API_PATH = '/wp-sync/v1/updates';
+
+/**
+ * Lightweight presence check that posts to the sync endpoint with
+ * `presence_only: true`. The server skips document update retrieval and
+ * returns only awareness state, making each call cheap.
+ *
+ * @param options                     Presence check options.
+ * @param options.room                The sync room identifier.
+ * @param options.clientId            The local client ID.
+ * @param options.localAwarenessState The local awareness state to broadcast.
+ * @return A promise resolving to the IDs of other clients in the room.
+ */
+export async function checkPresenceViaApi( options: {
+	room: string;
+	clientId: number;
+	localAwarenessState: Record< string, unknown >;
+} ): Promise< PresenceCheckResult > {
+	const response: {
+		rooms: Array< {
+			room: string;
+			awareness: Record< string, unknown >;
+		} >;
+	} = await apiFetch( {
+		method: 'POST',
+		path: SYNC_API_PATH,
+		data: {
+			presence_only: true,
+			rooms: [
+				{
+					room: options.room,
+					client_id: options.clientId,
+					after: 0,
+					awareness: options.localAwarenessState,
+					updates: [],
+				},
+			],
+		},
+	} );
+
+	const roomResponse = response.rooms?.find(
+		( r ) => r.room === options.room
+	);
+	const otherClientIds = roomResponse?.awareness
+		? Object.keys( roomResponse.awareness )
+				.map( Number )
+				.filter( ( id ) => id !== options.clientId )
+		: [];
+
+	return { otherClientIds };
+}
+
 /**
  * This default sync config can be used for entities that are flat maps of
  * primitive values and do not require custom logic to merge changes.
  */
 export const defaultSyncConfig: SyncConfig = {
 	applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
+	checkPresence: checkPresenceViaApi,
 	createAwareness: ( ydoc: CRDTDoc ) => new BaseAwareness( ydoc ),
 	getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
 };
