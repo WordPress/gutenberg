@@ -158,12 +158,13 @@ The key rules for script modules and client-side navigation:
 -   Only **external** script modules (those with a `src` attribute) are processed. Inline script modules — where the code is written directly inside the `<script>` tag — are not re-executed.
 -   The Interactivity API only loads modules that contain the `data-wp-router-options='{"loadOnClientNavigation":true}'` attribute.
     -   For blocks, the `loadOnClientNavigation` flag is set automatically when the script module is declared in `block.json` and `supports.interactivity` or `supports.interactivity.clientNavigation` is `true`.
-    -   For non-block script modules (e.g., those enqueued by a theme or plugin), register the script module for client-side navigation explicitly using [`add_client_navigation_support_to_script_module()`](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#ensuring-script-modules-load-during-navigation):
-        ```php
-        wp_interactivity()->add_client_navigation_support_to_script_module(
-        	'my-plugin/navigation-handler'
-        );
-        ```
+    -   For non-block script modules (e.g., those enqueued by a theme or plugin), register the script module for client-side navigation explicitly using [`add_client_navigation_support_to_script_module()`](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#ensuring-script-modules-load-during-navigation).
+
+```php
+wp_interactivity()->add_client_navigation_support_to_script_module(
+    'my-plugin/navigation-handler'
+);
+```
 
 For more details on how script modules are handled during navigation, see the [Script module handling](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#script-module-handling) section of the Client-Side Navigation guide.
 
