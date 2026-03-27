@@ -153,6 +153,7 @@ export const MenuTrigger: Story = {
 											title="Delete permanently?"
 											onConfirm={ () => {
 												setMenuOpen( false );
+												action( 'onConfirm' )();
 											} }
 											confirmButtonText="Delete permanently"
 										>
@@ -200,6 +201,7 @@ export const AsyncConfirm: Story = {
 						title="Delete permanently?"
 						loading={ isLoading }
 						onConfirm={ () => {
+							action( 'onConfirm' )();
 							setIsLoading( true );
 							new Promise< void >( ( resolve ) =>
 								setTimeout( resolve, 2000 )
