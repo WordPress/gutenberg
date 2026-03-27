@@ -119,9 +119,11 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		} elseif ( 'postType' === $kind && 'wp_block' === $name ) {
 			$default_layouts = $this->get_default_layouts_for_wp_block();
 			$default_view    = $this->get_default_view_for_wp_block( $default_layouts );
+			$view_list       = $this->get_view_list_for_wp_block();
 		} elseif ( 'postType' === $kind && 'wp_template_part' === $name ) {
 			$default_layouts = $this->get_default_layouts_for_wp_template_part();
 			$default_view    = $this->get_default_view_for_wp_template_part( $default_layouts );
+			$view_list       = $this->get_view_list_for_wp_template_part();
 		} elseif ( 'postType' === $kind && 'wp_template' === $name ) {
 			$default_view    = $this->get_default_view_for_wp_template();
 			$default_layouts = $this->get_default_layouts_for_wp_template();
@@ -787,6 +789,116 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 
 		// Fail-safe to return a string should the original source ever fall through.
 		return '';
+	}
+
+	/**
+	 * Returns the view list for the wp_template_part post type.
+	 *
+	 * Builds entries from the registered template part areas (header, footer, etc.).
+	 *
+	 * @return array View list entries.
+	 */
+	private function get_view_list_for_wp_template_part() {
+		$view_list = array(
+			array(
+				'title' => __( 'All template parts', 'gutenberg' ),
+				'slug'  => 'all-parts',
+			),
+		);
+
+		$areas = get_allowed_block_template_part_areas();
+
+		// Ensure default areas appear in a consistent order.
+		$preferred_order = array( 'header', 'footer', 'sidebar', 'navigation-overlay', 'uncategorized' );
+		$ordered_areas   = array();
+		$remaining_areas = array();
+		foreach ( $areas as $area ) {
+			$position = array_search( $area['area'], $preferred_order, true );
+			if ( false !== $position ) {
+				$ordered_areas[ $position ] = $area;
+			} else {
+				$remaining_areas[] = $area;
+			}
+		}
+		ksort( $ordered_areas );
+		$areas = array_merge( array_values( $ordered_areas ), $remaining_areas );
+
+		foreach ( $areas as $area ) {
+			$view_list[] = array(
+				'title' => $area['label'],
+				'slug'  => $area['area'],
+				'view'  => array(
+					'filters' => array(
+						array(
+							'field'    => 'area',
+							'operator' => 'is',
+							'value'    => $area['area'],
+							'isLocked' => true,
+						),
+					),
+				),
+			);
+		}
+
+		return $view_list;
+	}
+
+	/**
+	 * Returns the view list for the wp_block (patterns) post type.
+	 *
+	 * Builds entries from registered block pattern categories and user pattern categories.
+	 *
+	 * @return array View list entries.
+	 */
+	private function get_view_list_for_wp_block() {
+		$view_list = array(
+			array(
+				'title' => __( 'All patterns', 'gutenberg' ),
+				'slug'  => 'all-patterns',
+			),
+			array(
+				'title' => __( 'My patterns', 'gutenberg' ),
+				'slug'  => 'my-patterns',
+			),
+		);
+
+		// Gather categories from the block pattern categories registry.
+		$registry   = WP_Block_Pattern_Categories_Registry::get_instance();
+		$categories = array();
+
+		foreach ( $registry->get_all_registered() as $category ) {
+			$categories[ $category['name'] ] = $category['label'];
+		}
+
+		// Ensure "Uncategorized" is always included for patterns
+		// that have no category assigned.
+		$categories['uncategorized'] ??= __( 'Uncategorized', 'gutenberg' );
+
+		// Also gather user-created pattern categories (wp_pattern_category taxonomy).
+		$user_terms = get_terms(
+			array(
+				'taxonomy'   => 'wp_pattern_category',
+				'hide_empty' => false,
+			)
+		);
+
+		if ( ! is_wp_error( $user_terms ) ) {
+			foreach ( $user_terms as $term ) {
+				$categories[ $term->slug ] = $term->name;
+			}
+		}
+
+		// Sort categories alphabetically by label.
+		asort( $categories, SORT_NATURAL | SORT_FLAG_CASE );
+
+		foreach ( $categories as $name => $label ) {
+			$view_list[] = array(
+				'title' => $label,
+				'slug'  => $name,
+			);
+		}
+
+		return $view_list;
 	}
 
 	private function get_default_view_for_wp_template() {
