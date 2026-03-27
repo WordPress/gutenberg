@@ -126,9 +126,7 @@ describe( 'useDialog', () => {
 
 		render( <NestedDialogs /> );
 
-		pressEscapeOn(
-			screen.getByRole( 'button', { name: 'Focusable' } )
-		);
+		pressEscapeOn( screen.getByRole( 'button', { name: 'Focusable' } ) );
 
 		expect( innerOnClose ).toHaveBeenCalledTimes( 1 );
 		expect( outerOnClose ).not.toHaveBeenCalled();
