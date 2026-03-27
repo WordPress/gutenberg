@@ -223,28 +223,28 @@ function getCssFontFaceRule(
  * Loads a font face into the browser by inserting an @font-face rule
  * into managed CSSStyleSheets, including the editor iframe.
  *
- * @param fontFace The font face descriptor to load.
- * @param source   URL string or File to use as the font source.
- * @param addTo    Which documents to add the font to.
+ * @param fontFace   The font face descriptor to load.
+ * @param fontSource URL string or File to use as the font source.
+ * @param addTo      Which documents to add the font to.
  */
 export function loadFontFaceInBrowser(
 	fontFace: FontFace,
-	source: string | File,
+	fontSource: string | File,
 	addTo: 'all' | 'document' | 'iframe' = 'all'
 ): void {
-	let src: string;
-	if ( typeof source === 'string' ) {
-		src = source;
-	} else if ( source instanceof File ) {
-		src = URL.createObjectURL( source );
+	let srcUrl: string;
+	if ( typeof fontSource === 'string' ) {
+		srcUrl = fontSource;
+	} else if ( fontSource instanceof File ) {
+		srcUrl = URL.createObjectURL( fontSource );
 	} else {
 		return;
 	}
 
-	const rule = getCssFontFaceRule( fontFace, src );
+	const rule = getCssFontFaceRule( fontFace, srcUrl );
 	if ( ! rule ) {
-		if ( source instanceof File ) {
-			URL.revokeObjectURL( src );
+		if ( fontSource instanceof File ) {
+			URL.revokeObjectURL( srcUrl );
 		}
 		return;
 	}
