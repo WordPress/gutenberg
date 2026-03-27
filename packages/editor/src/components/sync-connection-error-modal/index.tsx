@@ -169,11 +169,9 @@ function DefaultSyncConnectionErrorModal(
  * ```
  */
 // @ts-ignore
-const FilteredSyncConnectionErrorModal = globalThis.IS_GUTENBERG_PLUGIN
-	? withFilters( 'editor.SyncConnectionErrorModal' )(
-			DefaultSyncConnectionErrorModal
-	  )
-	: DefaultSyncConnectionErrorModal;
+const FilteredSyncConnectionErrorModal = withFilters(
+	'editor.SyncConnectionErrorModal'
+)( DefaultSyncConnectionErrorModal );
 
 /**
  * Sync connection modal that displays when any entity reports a disconnection.
