@@ -243,6 +243,9 @@ export function loadFontFaceInBrowser(
 
 	const rule = getCssFontFaceRule( fontFace, src );
 	if ( ! rule ) {
+		if ( source instanceof File ) {
+			URL.revokeObjectURL( src );
+		}
 		return;
 	}
 
