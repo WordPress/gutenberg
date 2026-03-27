@@ -4,14 +4,14 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { action } from 'storybook/actions';
 import { fn } from 'storybook/test';
 
-import { ConfirmDialog } from '../..';
+import { AlertDialog } from '../..';
 
-const meta: Meta< typeof ConfirmDialog.Root > = {
-	title: 'Design System/Components/ConfirmDialog',
-	component: ConfirmDialog.Root,
+const meta: Meta< typeof AlertDialog.Root > = {
+	title: 'Design System/Components/AlertDialog',
+	component: AlertDialog.Root,
 	subcomponents: {
-		'ConfirmDialog.Trigger': ConfirmDialog.Trigger,
-		'ConfirmDialog.Popup': ConfirmDialog.Popup,
+		'AlertDialog.Trigger': AlertDialog.Trigger,
+		'AlertDialog.Popup': AlertDialog.Popup,
 	},
 	argTypes: {
 		onOpenChange: { action: fn() },
@@ -19,49 +19,48 @@ const meta: Meta< typeof ConfirmDialog.Root > = {
 };
 export default meta;
 
-type Story = StoryObj< typeof ConfirmDialog.Root >;
+type Story = StoryObj< typeof AlertDialog.Root >;
 
 /**
  * Standard confirmation dialog for reversible actions. The dialog can be
- * dismissed via Escape key, backdrop click, or the cancel/confirm buttons.
+ * dismissed via Escape key or the cancel/confirm buttons. Backdrop click
+ * is blocked.
  */
 export const Default: Story = {
 	args: {
 		children: (
 			<>
-				<ConfirmDialog.Trigger>Move to trash</ConfirmDialog.Trigger>
-				<ConfirmDialog.Popup
+				<AlertDialog.Trigger>Move to trash</AlertDialog.Trigger>
+				<AlertDialog.Popup
 					title="Move to trash?"
 					onConfirm={ action( 'onConfirm' ) }
 				>
 					This post will be moved to trash. You can restore it later.
-				</ConfirmDialog.Popup>
+				</AlertDialog.Popup>
 			</>
 		),
 	},
 };
 
 /**
- * Confirmation dialog for irreversible actions that cannot be undone. Backdrop
- * click is blocked; Escape key, cancel button, and confirm button still dismiss
- * the dialog. The popup uses `role="alertdialog"` and the confirm button uses
- * error/danger coloring.
+ * Confirmation dialog for irreversible actions that cannot be undone.
+ * The confirm button uses error/danger coloring.
  */
 export const Irreversible: Story = {
 	args: {
 		intent: 'irreversible',
 		children: (
 			<>
-				<ConfirmDialog.Trigger>
+				<AlertDialog.Trigger>
 					Delete permanently
-				</ConfirmDialog.Trigger>
-				<ConfirmDialog.Popup
+				</AlertDialog.Trigger>
+				<AlertDialog.Popup
 					title="Delete permanently?"
 					onConfirm={ action( 'onConfirm' ) }
 					confirmButtonText="Delete permanently"
 				>
 					This action cannot be undone. All data will be lost.
-				</ConfirmDialog.Popup>
+				</AlertDialog.Popup>
 			</>
 		),
 	},
@@ -74,8 +73,8 @@ export const CustomButtonText: Story = {
 	args: {
 		children: (
 			<>
-				<ConfirmDialog.Trigger>Send feedback</ConfirmDialog.Trigger>
-				<ConfirmDialog.Popup
+				<AlertDialog.Trigger>Send feedback</AlertDialog.Trigger>
+				<AlertDialog.Popup
 					title="Send feedback?"
 					onConfirm={ action( 'onConfirm' ) }
 					confirmButtonText="Send feedback"
@@ -83,7 +82,7 @@ export const CustomButtonText: Story = {
 				>
 					Your feedback helps us improve. Would you like to send it
 					now?
-				</ConfirmDialog.Popup>
+				</AlertDialog.Popup>
 			</>
 		),
 	},
@@ -111,9 +110,9 @@ const menuItemStyles: React.CSSProperties = {
 };
 
 /**
- * Example showing composition with a menu. The `ConfirmDialog.Trigger` is
+ * Example showing composition with a menu. The `AlertDialog.Trigger` is
  * composed with Base UI's `Menu.Item` using the `render` prop, allowing the
- * menu item to directly trigger the confirm dialog.
+ * menu item to directly trigger the alert dialog.
  *
  * Note: the example currently uses the `Menu` component from BaseUI, although
  * consumers should not use BaseUI directly and instead use the DS `Menu`
@@ -135,10 +134,10 @@ export const MenuTrigger: Story = {
 								<Menu.Item style={ menuItemStyles }>
 									Edit
 								</Menu.Item>
-								<ConfirmDialog.Root { ...args }>
+								<AlertDialog.Root { ...args }>
 									<Menu.Item
 										render={
-											<ConfirmDialog.Trigger
+											<AlertDialog.Trigger
 												// Quick fix to remove `button`-specific styles.
 												// This shouldn't be an issue once we use the DS `Menu`
 												// component, which will come with item styles.
@@ -149,7 +148,7 @@ export const MenuTrigger: Story = {
 										closeOnClick={ false }
 									>
 										Delete...
-										<ConfirmDialog.Popup
+										<AlertDialog.Popup
 											title="Delete permanently?"
 											onConfirm={ () => {
 												setMenuOpen( false );
@@ -159,9 +158,9 @@ export const MenuTrigger: Story = {
 										>
 											This action cannot be undone. All
 											data will be lost.
-										</ConfirmDialog.Popup>
+										</AlertDialog.Popup>
 									</Menu.Item>
-								</ConfirmDialog.Root>
+								</AlertDialog.Root>
 							</Menu.Popup>
 						</Menu.Positioner>
 					</Menu.Portal>
@@ -187,7 +186,7 @@ export const AsyncConfirm: Story = {
 				<button onClick={ () => setIsOpen( true ) }>
 					Delete permanently
 				</button>
-				<ConfirmDialog.Root
+				<AlertDialog.Root
 					{ ...args }
 					open={ isOpen }
 					onOpenChange={ ( open, eventDetails ) => {
@@ -197,7 +196,7 @@ export const AsyncConfirm: Story = {
 						args.onOpenChange?.( open, eventDetails );
 					} }
 				>
-					<ConfirmDialog.Popup
+					<AlertDialog.Popup
 						title="Delete permanently?"
 						loading={ isLoading }
 						onConfirm={ () => {
@@ -213,8 +212,8 @@ export const AsyncConfirm: Story = {
 						confirmButtonText="Delete permanently"
 					>
 						This action cannot be undone. All data will be lost.
-					</ConfirmDialog.Popup>
-				</ConfirmDialog.Root>
+					</AlertDialog.Popup>
+				</AlertDialog.Root>
 			</>
 		);
 	},
@@ -224,7 +223,7 @@ export const AsyncConfirm: Story = {
 };
 
 /**
- * The `ConfirmDialog.Trigger` element is not necessary when the open state is
+ * The `AlertDialog.Trigger` element is not necessary when the open state is
  * controlled externally. This is useful when the dialog needs to be opened
  * from code or from a non-standard trigger element.
  */
@@ -235,7 +234,7 @@ export const Controlled: Story = {
 		return (
 			<>
 				<button onClick={ () => setIsOpen( true ) }>Open Dialog</button>
-				<ConfirmDialog.Root
+				<AlertDialog.Root
 					{ ...args }
 					open={ isOpen }
 					onOpenChange={ ( open, eventDetails ) => {
@@ -243,14 +242,14 @@ export const Controlled: Story = {
 						args.onOpenChange?.( open, eventDetails );
 					} }
 				>
-					<ConfirmDialog.Popup
+					<AlertDialog.Popup
 						title="Move to trash?"
 						onConfirm={ action( 'onConfirm' ) }
 					>
 						This post will be moved to trash. You can restore it
 						later.
-					</ConfirmDialog.Popup>
-				</ConfirmDialog.Root>
+					</AlertDialog.Popup>
+				</AlertDialog.Root>
 			</>
 		);
 	},

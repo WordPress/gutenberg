@@ -1,29 +1,29 @@
+import type { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import type { ReactNode } from 'react';
 
-import type {
-	RootProps as DialogRootProps,
-	TriggerProps as DialogTriggerProps,
-} from '../dialog/types';
+import type { TriggerProps as DialogTriggerProps } from '../dialog/types';
 
 export interface RootProps
-	extends Pick< DialogRootProps, 'open' | 'onOpenChange' | 'defaultOpen' > {
+	extends Pick<
+		_AlertDialog.Root.Props,
+		'open' | 'onOpenChange' | 'defaultOpen'
+	> {
 	/**
 	 * The content to be rendered inside the component. Typically includes
-	 * `ConfirmDialog.Trigger` and `ConfirmDialog.Popup`.
+	 * `AlertDialog.Trigger` and `AlertDialog.Popup`.
 	 */
 	children: ReactNode;
 
 	/**
-	 * The semantic intent of the dialog, which determines its behavior and
-	 * styling.
+	 * The semantic intent of the dialog, which determines its styling.
+	 *
+	 * All intents use `role="alertdialog"`, are always modal, and block
+	 * backdrop click dismissal. Escape key and the cancel/confirm buttons
+	 * still dismiss the dialog.
 	 *
 	 * - `'default'`: Standard confirmation dialog for reversible actions.
-	 *   The dialog can be dismissed via Escape key, backdrop click, or the
-	 *   cancel/confirm buttons. Uses `role="dialog"`.
 	 * - `'irreversible'`: Confirmation dialog for irreversible actions that
-	 *   cannot be undone. Backdrop click is blocked; Escape key, cancel
-	 *   button, and confirm button still dismiss the dialog. Uses
-	 *   `role="alertdialog"` and error/danger coloring on the confirm button.
+	 *   cannot be undone. The confirm button uses error/danger coloring.
 	 *
 	 * @default 'default'
 	 */

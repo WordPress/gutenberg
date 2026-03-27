@@ -3,12 +3,12 @@ import type { RootProps } from './types';
 
 type Intent = NonNullable< RootProps[ 'intent' ] >;
 
-interface ConfirmDialogContextValue {
+interface AlertDialogContextValue {
 	intent: Intent;
 }
 
-const ConfirmDialogContext = createContext< ConfirmDialogContextValue >( {
+const AlertDialogContext = createContext< AlertDialogContextValue >( {
 	intent: 'default',
 } );
 
-export { ConfirmDialogContext };
+export { AlertDialogContext };

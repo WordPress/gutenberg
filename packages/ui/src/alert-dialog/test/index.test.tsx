@@ -2,26 +2,26 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from '@wordpress/element';
 
-import * as ConfirmDialog from '..';
+import * as AlertDialog from '..';
 
-describe( 'ConfirmDialog', () => {
+describe( 'AlertDialog', () => {
 	it( 'forwards ref', () => {
 		const triggerRef = createRef< HTMLButtonElement >();
 		const popupRef = createRef< HTMLDivElement >();
 
 		render(
-			<ConfirmDialog.Root defaultOpen>
-				<ConfirmDialog.Trigger ref={ triggerRef }>
+			<AlertDialog.Root defaultOpen>
+				<AlertDialog.Trigger ref={ triggerRef }>
 					Open
-				</ConfirmDialog.Trigger>
-				<ConfirmDialog.Popup
+				</AlertDialog.Trigger>
+				<AlertDialog.Popup
 					ref={ popupRef }
 					title="Test Title"
 					onConfirm={ jest.fn() }
 				>
 					Test message content
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		expect( triggerRef.current ).toBeInstanceOf( HTMLButtonElement );
@@ -30,11 +30,11 @@ describe( 'ConfirmDialog', () => {
 
 	it( 'renders with title, message, and default buttons', async () => {
 		render(
-			<ConfirmDialog.Root open onOpenChange={ jest.fn() }>
-				<ConfirmDialog.Popup title="Test Title" onConfirm={ jest.fn() }>
+			<AlertDialog.Root open onOpenChange={ jest.fn() }>
+				<AlertDialog.Popup title="Test Title" onConfirm={ jest.fn() }>
 					Test message content
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		await waitFor( () => {
@@ -51,37 +51,37 @@ describe( 'ConfirmDialog', () => {
 		).toBeVisible();
 	} );
 
-	it( 'renders with role="dialog" for default intent', async () => {
+	it( 'renders with role="alertdialog" for default intent', async () => {
 		render(
-			<ConfirmDialog.Root open onOpenChange={ jest.fn() }>
-				<ConfirmDialog.Popup
+			<AlertDialog.Root open onOpenChange={ jest.fn() }>
+				<AlertDialog.Popup
 					title="Default Dialog"
 					onConfirm={ jest.fn() }
 				>
 					Content
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		await waitFor( () => {
-			expect( screen.getByRole( 'dialog' ) ).toBeVisible();
+			expect( screen.getByRole( 'alertdialog' ) ).toBeVisible();
 		} );
 	} );
 
 	it( 'renders with role="alertdialog" for irreversible intent', async () => {
 		render(
-			<ConfirmDialog.Root
+			<AlertDialog.Root
 				intent="irreversible"
 				open
 				onOpenChange={ jest.fn() }
 			>
-				<ConfirmDialog.Popup
+				<AlertDialog.Popup
 					title="Irreversible Dialog"
 					onConfirm={ jest.fn() }
 				>
 					Content
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		await waitFor( () => {
@@ -94,14 +94,14 @@ describe( 'ConfirmDialog', () => {
 		const onOpenChange = jest.fn();
 
 		render(
-			<ConfirmDialog.Root open onOpenChange={ onOpenChange }>
-				<ConfirmDialog.Popup
+			<AlertDialog.Root open onOpenChange={ onOpenChange }>
+				<AlertDialog.Popup
 					title="Confirm Action"
 					onConfirm={ onConfirm }
 				>
 					Are you sure?
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		await waitFor( () => {
@@ -124,14 +124,14 @@ describe( 'ConfirmDialog', () => {
 		const onOpenChange = jest.fn();
 
 		render(
-			<ConfirmDialog.Root open onOpenChange={ onOpenChange }>
-				<ConfirmDialog.Popup
+			<AlertDialog.Root open onOpenChange={ onOpenChange }>
+				<AlertDialog.Popup
 					title="Confirm Action"
 					onConfirm={ onConfirm }
 				>
 					Are you sure?
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		await waitFor( () => {
@@ -155,14 +155,14 @@ describe( 'ConfirmDialog', () => {
 		const onOpenChange = jest.fn();
 
 		render(
-			<ConfirmDialog.Root open onOpenChange={ onOpenChange }>
-				<ConfirmDialog.Popup
+			<AlertDialog.Root open onOpenChange={ onOpenChange }>
+				<AlertDialog.Popup
 					title="Default Dialog"
 					onConfirm={ jest.fn() }
 				>
 					Content
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		await waitFor( () => {
@@ -177,18 +177,18 @@ describe( 'ConfirmDialog', () => {
 		);
 	} );
 
-	it( 'calls onOpenChange on backdrop click for default intent', async () => {
+	it( 'does not call onOpenChange on backdrop click for default intent', async () => {
 		const onOpenChange = jest.fn();
 
 		render(
-			<ConfirmDialog.Root open onOpenChange={ onOpenChange }>
-				<ConfirmDialog.Popup
+			<AlertDialog.Root open onOpenChange={ onOpenChange }>
+				<AlertDialog.Popup
 					title="Default Dialog"
 					onConfirm={ jest.fn() }
 				>
 					Content
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		await waitFor( () => {
@@ -197,26 +197,23 @@ describe( 'ConfirmDialog', () => {
 
 		await userEvent.click( document.body );
 
-		expect( onOpenChange ).toHaveBeenCalledWith(
-			false,
-			expect.objectContaining( { reason: 'outside-press' } )
-		);
+		expect( onOpenChange ).not.toHaveBeenCalled();
 	} );
 
 	it( 'renders with title, message, and default buttons for irreversible intent', async () => {
 		render(
-			<ConfirmDialog.Root
+			<AlertDialog.Root
 				intent="irreversible"
 				open
 				onOpenChange={ jest.fn() }
 			>
-				<ConfirmDialog.Popup
+				<AlertDialog.Popup
 					title="Irreversible Dialog"
 					onConfirm={ jest.fn() }
 				>
 					Irreversible message content
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		await waitFor( () => {
@@ -239,18 +236,18 @@ describe( 'ConfirmDialog', () => {
 		const onOpenChange = jest.fn();
 
 		render(
-			<ConfirmDialog.Root
+			<AlertDialog.Root
 				intent="irreversible"
 				open
 				onOpenChange={ onOpenChange }
 			>
-				<ConfirmDialog.Popup
+				<AlertDialog.Popup
 					title="Irreversible Dialog"
 					onConfirm={ jest.fn() }
 				>
 					Content
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		await waitFor( () => {
@@ -269,18 +266,18 @@ describe( 'ConfirmDialog', () => {
 		const onOpenChange = jest.fn();
 
 		render(
-			<ConfirmDialog.Root
+			<AlertDialog.Root
 				intent="irreversible"
 				open
 				onOpenChange={ onOpenChange }
 			>
-				<ConfirmDialog.Popup
+				<AlertDialog.Popup
 					title="Irreversible Dialog"
 					onConfirm={ jest.fn() }
 				>
 					Content
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		await waitFor( () => {
@@ -297,18 +294,18 @@ describe( 'ConfirmDialog', () => {
 		const onConfirm = jest.fn();
 
 		render(
-			<ConfirmDialog.Root
+			<AlertDialog.Root
 				intent="irreversible"
 				open
 				onOpenChange={ onOpenChange }
 			>
-				<ConfirmDialog.Popup
+				<AlertDialog.Popup
 					title="Irreversible Dialog"
 					onConfirm={ onConfirm }
 				>
 					Content
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		await waitFor( () => {
@@ -333,18 +330,18 @@ describe( 'ConfirmDialog', () => {
 		const onConfirm = jest.fn();
 
 		render(
-			<ConfirmDialog.Root
+			<AlertDialog.Root
 				intent="irreversible"
 				open
 				onOpenChange={ onOpenChange }
 			>
-				<ConfirmDialog.Popup
+				<AlertDialog.Popup
 					title="Irreversible Dialog"
 					onConfirm={ onConfirm }
 				>
 					Content
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		await waitFor( () => {
@@ -364,15 +361,15 @@ describe( 'ConfirmDialog', () => {
 
 	it( 'disables both buttons when loading', async () => {
 		render(
-			<ConfirmDialog.Root open onOpenChange={ jest.fn() }>
-				<ConfirmDialog.Popup
+			<AlertDialog.Root open onOpenChange={ jest.fn() }>
+				<AlertDialog.Popup
 					title="Loading Test"
 					onConfirm={ jest.fn() }
 					loading
 				>
 					Content
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		await waitFor( () => {
@@ -393,15 +390,15 @@ describe( 'ConfirmDialog', () => {
 
 	it( 'does not disable buttons when loading is false', async () => {
 		render(
-			<ConfirmDialog.Root open onOpenChange={ jest.fn() }>
-				<ConfirmDialog.Popup
+			<AlertDialog.Root open onOpenChange={ jest.fn() }>
+				<AlertDialog.Popup
 					title="No Loading"
 					onConfirm={ jest.fn() }
 					loading={ false }
 				>
 					Content
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		await waitFor( () => {
@@ -421,16 +418,16 @@ describe( 'ConfirmDialog', () => {
 
 	it( 'uses custom button text when provided', async () => {
 		render(
-			<ConfirmDialog.Root open onOpenChange={ jest.fn() }>
-				<ConfirmDialog.Popup
+			<AlertDialog.Root open onOpenChange={ jest.fn() }>
+				<AlertDialog.Popup
 					title="Custom Text"
 					onConfirm={ jest.fn() }
 					confirmButtonText="Yes, do it"
 					cancelButtonText="No, go back"
 				>
 					Custom message
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		await waitFor( () => {
@@ -450,7 +447,7 @@ describe( 'ConfirmDialog', () => {
 			const [ isLoading, setIsLoading ] = useState( false );
 
 			return (
-				<ConfirmDialog.Root
+				<AlertDialog.Root
 					open={ isOpen }
 					onOpenChange={ ( open ) => {
 						if ( ! isLoading ) {
@@ -458,14 +455,14 @@ describe( 'ConfirmDialog', () => {
 						}
 					} }
 				>
-					<ConfirmDialog.Popup
+					<AlertDialog.Popup
 						title="Async Test"
 						loading={ isLoading }
 						onConfirm={ () => setIsLoading( true ) }
 					>
 						Content
-					</ConfirmDialog.Popup>
-				</ConfirmDialog.Root>
+					</AlertDialog.Popup>
+				</AlertDialog.Root>
 			);
 		}
 
@@ -489,18 +486,18 @@ describe( 'ConfirmDialog', () => {
 			const [ isOpen, setIsOpen ] = useState( true );
 
 			return (
-				<ConfirmDialog.Root
+				<AlertDialog.Root
 					open={ isOpen }
 					onOpenChange={ ( open ) => setIsOpen( open ) }
 				>
-					<ConfirmDialog.Popup
+					<AlertDialog.Popup
 						title="Manual Close"
 						loading={ false }
 						onConfirm={ jest.fn() }
 					>
 						Content
-					</ConfirmDialog.Popup>
-				</ConfirmDialog.Root>
+					</AlertDialog.Popup>
+				</AlertDialog.Root>
 			);
 		}
 
@@ -517,15 +514,15 @@ describe( 'ConfirmDialog', () => {
 
 	it( 'opens dialog when Trigger is clicked', async () => {
 		render(
-			<ConfirmDialog.Root>
-				<ConfirmDialog.Trigger>Open</ConfirmDialog.Trigger>
-				<ConfirmDialog.Popup
+			<AlertDialog.Root>
+				<AlertDialog.Trigger>Open</AlertDialog.Trigger>
+				<AlertDialog.Popup
 					title="Trigger Test"
 					onConfirm={ jest.fn() }
 				>
 					Dialog content
-				</ConfirmDialog.Popup>
-			</ConfirmDialog.Root>
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
 		);
 
 		expect(

@@ -2,12 +2,12 @@ import { forwardRef, useContext } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '../button';
 import * as Dialog from '../dialog';
-import { ConfirmDialogContext } from './context';
+import { AlertDialogContext } from './context';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
 
 const Popup = forwardRef< HTMLDivElement, PopupProps >(
-	function ConfirmDialogPopup(
+	function AlertDialogPopup(
 		{
 			title,
 			children,
@@ -18,7 +18,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 		},
 		ref
 	) {
-		const { intent } = useContext( ConfirmDialogContext );
+		const { intent } = useContext( AlertDialogContext );
 
 		// When `loading` is provided, the consumer controls when the dialog
 		// closes (async flow). Use a plain Button so clicking confirm doesn't
@@ -26,10 +26,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 		const ConfirmButton = loading !== undefined ? Button : Dialog.Action;
 
 		return (
-			<Dialog.Popup
-				ref={ ref }
-				role={ intent === 'irreversible' ? 'alertdialog' : 'dialog' }
-			>
+			<Dialog.Popup ref={ ref }>
 				<Dialog.Header>
 					<Dialog.Title>{ title }</Dialog.Title>
 				</Dialog.Header>
