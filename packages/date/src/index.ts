@@ -97,10 +97,6 @@ export function setSettings( dateSettings: DateSettings ) {
  * @return {DateSettings} Settings, including locale data.
  */
 export function getSettings(): DateSettings {
-	deprecated( 'wp.date.getSettings', {
-		since: '7.1',
-		alternative: 'wp.date.settings.getCurrentSettings',
-	} );
 	return getCurrentSettings();
 }
 

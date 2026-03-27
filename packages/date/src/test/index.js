@@ -4,11 +4,6 @@
 import momentLib from 'moment';
 
 /**
- * WordPress dependencies
- */
-import deprecated from '@wordpress/deprecated';
-
-/**
  * Internal dependencies
  */
 import {
@@ -24,23 +19,9 @@ import {
 } from '../';
 import { getCurrentSettings } from '../settings';
 
-jest.mock( '@wordpress/deprecated' );
-
 describe( 'getSettings', () => {
-	afterEach( () => {
-		deprecated.mockClear();
-	} );
-
 	it( 'should return the same value as getCurrentSettings', () => {
 		expect( getSettings() ).toBe( getCurrentSettings() );
-	} );
-
-	it( 'should trigger a deprecation warning', () => {
-		getSettings();
-		expect( deprecated ).toHaveBeenCalledWith( 'wp.date.getSettings', {
-			since: '7.1',
-			alternative: 'wp.date.settings.getCurrentSettings',
-		} );
 	} );
 } );
 
