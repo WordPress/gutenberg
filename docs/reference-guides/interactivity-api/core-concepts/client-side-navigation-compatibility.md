@@ -8,7 +8,7 @@ This guide explains what to consider when evaluating compatibility. While the ex
 
 <div class="callout callout-info">
 
-This guide assumes familiarity with [blocks](https://developer.wordpress.org/block-editor/getting-started/), [`block.json`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/), and the basics of the [Interactivity API](/docs/reference-guides/interactivity-api/). If you're new to the Interactivity API, start with the [Quick Start Guide](/docs/reference-guides/interactivity-api/iapi-quick-start-guide.md) first.
+This guide assumes familiarity with <a href="https://developer.wordpress.org/block-editor/getting-started/">blocks</a>, <a href="https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/"><code>block.json</code></a>, and the basics of the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/">Interactivity API</a>. If you're new to the Interactivity API, start with the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/iapi-quick-start-guide/">Quick Start Guide</a> first.
 
 </div>
 
