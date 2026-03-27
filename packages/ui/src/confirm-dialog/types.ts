@@ -21,10 +21,9 @@ export interface RootProps
 	 *   The dialog can be dismissed via Escape key, backdrop click, or the
 	 *   cancel/confirm buttons. Uses `role="dialog"`.
 	 * - `'irreversible'`: Confirmation dialog for irreversible actions that
-	 *   cannot be undone. Users can only dismiss the dialog via the cancel or
-	 *   confirm button — both backdrop click and Escape key are blocked.
-	 *   Uses `role="alertdialog"` and error/danger coloring on the confirm
-	 *   button.
+	 *   cannot be undone. Backdrop click is blocked; Escape key, cancel
+	 *   button, and confirm button still dismiss the dialog. Uses
+	 *   `role="alertdialog"` and error/danger coloring on the confirm button.
 	 *
 	 * @default 'default'
 	 */

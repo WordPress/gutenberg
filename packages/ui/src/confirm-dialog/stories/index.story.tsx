@@ -42,10 +42,10 @@ export const Default: Story = {
 };
 
 /**
- * Confirmation dialog for irreversible actions that cannot be undone. Users can
- * only dismiss the dialog via cancel or confirm button — both backdrop click
- * and Escape key are blocked. The popup uses `role="alertdialog"` and the
- * confirm button uses error/danger coloring.
+ * Confirmation dialog for irreversible actions that cannot be undone. Backdrop
+ * click is blocked; Escape key, cancel button, and confirm button still dismiss
+ * the dialog. The popup uses `role="alertdialog"` and the confirm button uses
+ * error/danger coloring.
  */
 export const Irreversible: Story = {
 	args: {

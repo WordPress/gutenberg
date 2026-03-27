@@ -235,7 +235,7 @@ describe( 'ConfirmDialog', () => {
 		).toBeVisible();
 	} );
 
-	it( 'does not call onOpenChange on escape key for irreversible intent', async () => {
+	it( 'calls onOpenChange on escape key for irreversible intent', async () => {
 		const onOpenChange = jest.fn();
 
 		render(
@@ -259,7 +259,10 @@ describe( 'ConfirmDialog', () => {
 
 		await userEvent.keyboard( '{Escape}' );
 
-		expect( onOpenChange ).not.toHaveBeenCalled();
+		expect( onOpenChange ).toHaveBeenCalledWith(
+			false,
+			expect.objectContaining( { reason: 'escape-key' } )
+		);
 	} );
 
 	it( 'does not call onOpenChange on backdrop click for irreversible intent', async () => {

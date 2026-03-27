@@ -1,8 +1,6 @@
 import { useMemo } from '@wordpress/element';
-
 import * as Dialog from '../dialog';
-import type { RootProps as DialogRootProps } from '../dialog/types';
-import { ConfirmDialogContext, getIntentConfig } from './context';
+import { ConfirmDialogContext } from './context';
 import type { RootProps } from './types';
 
 /**
@@ -20,8 +18,8 @@ import type { RootProps } from './types';
  *   The dialog can be dismissed via Escape key, backdrop click, or the
  *   cancel/confirm buttons.
  * - **Irreversible intent**: Confirmation dialog for irreversible actions that
- *   cannot be undone. Users can only dismiss the dialog via cancel or confirm
- *   button — both backdrop click and Escape key are blocked. The popup uses
+ *   cannot be undone. Backdrop click is blocked; Escape key, cancel button,
+ *   and confirm button still dismiss the dialog. The popup uses
  *   `role="alertdialog"` and the confirm button uses error/danger coloring.
  *
  * For use cases outside the standard confirm/cancel pattern, use the lower-level
@@ -37,28 +35,14 @@ function Root( {
 	onOpenChange,
 	defaultOpen,
 }: RootProps ) {
-	const intentConfig = getIntentConfig( intent );
-
-	const handleOpenChange: DialogRootProps[ 'onOpenChange' ] = (
-		nextOpen,
-		eventDetails
-	) => {
-		const { reason, cancel } = eventDetails;
-
-		if ( ! nextOpen && intentConfig.shouldBlockDismiss( reason ) ) {
-			cancel();
-		} else {
-			onOpenChange?.( nextOpen, eventDetails );
-		}
-	};
-
 	const contextValue = useMemo( () => ( { intent } ), [ intent ] );
 
 	return (
 		<Dialog.Root
 			open={ open }
-			onOpenChange={ handleOpenChange }
+			onOpenChange={ onOpenChange }
 			defaultOpen={ defaultOpen }
+			disablePointerDismissal={ intent === 'irreversible' }
 		>
 			<ConfirmDialogContext.Provider value={ contextValue }>
 				{ children }

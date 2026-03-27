@@ -7,7 +7,11 @@ import type { ComponentProps } from '../utils/types';
 export interface RootProps
 	extends Pick<
 		_Dialog.Root.Props,
-		'open' | 'onOpenChange' | 'defaultOpen' | 'modal'
+		| 'open'
+		| 'onOpenChange'
+		| 'defaultOpen'
+		| 'modal'
+		| 'disablePointerDismissal'
 	> {
 	/**
 	 * The content to be rendered inside the component.
