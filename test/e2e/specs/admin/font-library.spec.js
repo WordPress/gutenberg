@@ -185,10 +185,11 @@ test.describe( 'Font Library', () => {
 			).toHaveCSS( 'font-family', /Ephesis/ );
 
 			// Verify the font is actually loaded using the FontFaceSet API.
-			const isFontLoaded = await page.evaluate( () => {
+			const isFontLoaded = await page.evaluate( async () => {
 				for ( const face of document.fonts ) {
 					if ( face.family.includes( 'Ephesis' ) ) {
-						return true;
+						await face.load();
+						return face.status === 'loaded';
 					}
 				}
 				return false;
