@@ -168,10 +168,11 @@ function DefaultSyncConnectionErrorModal(
  * );
  * ```
  */
-// @ts-ignore
 const FilteredSyncConnectionErrorModal = withFilters(
 	'editor.SyncConnectionErrorModal'
-)( DefaultSyncConnectionErrorModal );
+)(
+	DefaultSyncConnectionErrorModal
+) as unknown as React.ComponentType< SyncConnectionErrorModalProps >;
 
 /**
  * Sync connection modal that displays when any entity reports a disconnection.
