@@ -52,13 +52,6 @@ $navigation-icon-size: 24px;
 		z-index: 1;
 	}
 
-	// This rule needs extra specificity so that it inherits the correct color from its parent.
-	// Otherwise, a link color set by a parent group can override the value.
-	// This also fixes an issue where a navigation with an explicitly set color is overridden
-	// by link colors defined in Global Styles.
-	.wp-block-navigation-item__content.wp-block-navigation-item__content {
-		color: inherit;
-	}
 
 	// The following rules provide class based application of user selected text
 	// decoration via block supports.
@@ -155,7 +148,13 @@ $navigation-icon-size: 24px;
 		--navigation-layout-justify: space-between;
 	}
 }
-
+// This rule needs extra specificity so that it inherits the correct color from its parent.
+// Otherwise, a link color set by a parent group can override the value.
+// This also fixes an issue where a navigation with an explicitly set color is overridden
+// by link colors defined in Global Styles.
+.wp-block-navigation-item__content {
+	color: inherit;
+}
 // Styles for submenu flyout.
 // These are separated out with reduced specificity to allow better inheritance from Global Styles.
 .wp-block-navigation .has-child {
