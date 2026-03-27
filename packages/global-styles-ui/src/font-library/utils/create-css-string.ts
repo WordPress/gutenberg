@@ -28,7 +28,7 @@
  * @return A quoted CSS string suitable for interpolation in CSS text.
  */
 export function createCssString( value: string ): string {
-	let escapedValue = value
+	return `"${ value
 		/*
 		 * CSS Unicode escaping for problematic characters.
 		 * https://www.w3.org/TR/css-syntax-3/#escaping
@@ -50,29 +50,20 @@ export function createCssString( value: string ): string {
 		.replaceAll( '\f', '\\A ' )
 
 		// Newlines must be escaped in CSS strings.
-		.replaceAll( '\n', '\\A ' );
+		.replaceAll( '\n', '\\A ' )
 
-	// Arbitrary characters for Unicode escaping.
-	for ( const char of [
+		// Arbitrary characters for Unicode escaping:
+
 		// HTML syntax may be problematic.
-		'<',
-		'>',
-		'&',
+		.replaceAll( '<', '\\3C ' )
+		.replaceAll( '>', '\\3E ' )
+		.replaceAll( '&', '\\26 ' )
 
 		// CSS syntax may be problematic.
-		',',
-		';',
-		'{',
-		'}',
-		'"',
-		"'",
-	] ) {
-		const escapeSequence = `\\${ char
-			.charCodeAt( 0 )
-			.toString( 16 )
-			.toUpperCase() } `;
-		escapedValue = escapedValue.replaceAll( char, escapeSequence );
-	}
-
-	return `"${ escapedValue }"`;
+		.replaceAll( ',', '\\2C ' )
+		.replaceAll( ';', '\\3B ' )
+		.replaceAll( '{', '\\7B ' )
+		.replaceAll( '}', '\\7D ' )
+		.replaceAll( '"', '\\22 ' )
+		.replaceAll( "'", '\\27 ' ) }"`;
 }
