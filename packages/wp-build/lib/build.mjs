@@ -1184,10 +1184,21 @@ async function generatePagesPhp( pageData, replacements ) {
 			),
 		] );
 
-		// Generate empty loader.js (dummy module for dependencies)
+		// Generate loader.js — boots the page using the config global set
+		// by the classic prerequisites script. Runs as a module so the
+		// import map is guaranteed to be in the DOM.
+		const pageSlugUnderscore = page.slug.replace( /-/g, '_' );
 		await writeFile(
 			path.join( BUILD_DIR, 'pages', page.slug, 'loader.js' ),
-			'// Empty module loader for page dependencies\n'
+			[
+				`import { initSinglePage } from '@wordpress/boot';`,
+				``,
+				`const config = window.__wpBuildPageConfig_${ pageSlugUnderscore };`,
+				`if ( config ) {`,
+				`\tinitSinglePage( config );`,
+				`}`,
+				``,
+			].join( '\n' )
 		);
 	} );
 

@@ -148,18 +148,24 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 	if ( file_exists( $asset_file ) ) {
 		$asset = require $asset_file;
 
-		// This script serves two purposes:
-		// 1. It ensures all the globals that are made available to the modules are loaded.
-		// 2. It initializes the boot module as an inline script.
+		// Ensure classic-script dependencies (globals) are loaded.
+		// Boot config is passed as a global because import() inside a
+		// classic inline script runs before the import map is in the DOM.
+		// The loader module reads it after the import map is available.
 		wp_register_script( '{{PAGE_SLUG}}-wp-admin-prerequisites', '', $asset['dependencies'], $asset['version'], true );
 
-		// Add inline script to initialize the app using initSinglePage (no menuItems)
 		wp_add_inline_script(
 			'{{PAGE_SLUG}}-wp-admin-prerequisites',
 			sprintf(
-				'import("@wordpress/boot").then(mod => mod.initSinglePage({mountId: "%s", routes: %s}));',
-				'{{PAGE_SLUG}}-wp-admin-app',
-				wp_json_encode( $routes, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
+				'window.__wpBuildPageConfig_%s = %s;',
+				'{{PAGE_SLUG_UNDERSCORE}}',
+				wp_json_encode(
+					array(
+						'mountId' => '{{PAGE_SLUG}}-wp-admin-app',
+						'routes'  => $routes,
+					),
+					JSON_HEX_TAG | JSON_UNESCAPED_SLASHES
+				)
 			)
 		);
 
@@ -196,7 +202,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 			}
 		}
 
-		// Dummy script module to ensure dependencies are loaded
+		// Loader module — reads the page config global and boots the app.
 		wp_register_script_module(
 			'{{PAGE_SLUG}}-wp-admin',
 			$build_constants['build_url'] . 'pages/{{PAGE_SLUG}}/loader.js',
