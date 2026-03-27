@@ -484,6 +484,37 @@ describe( 'ConfirmDialog', () => {
 		);
 	} );
 
+	it( 'does not auto-close on confirm click when loading is false (manual-close mode)', async () => {
+		function ManualCloseDialog() {
+			const [ isOpen, setIsOpen ] = useState( true );
+
+			return (
+				<ConfirmDialog.Root
+					open={ isOpen }
+					onOpenChange={ ( open ) => setIsOpen( open ) }
+				>
+					<ConfirmDialog.Popup
+						title="Manual Close"
+						loading={ false }
+						onConfirm={ jest.fn() }
+					>
+						Content
+					</ConfirmDialog.Popup>
+				</ConfirmDialog.Root>
+			);
+		}
+
+		render( <ManualCloseDialog /> );
+
+		await waitFor( () => {
+			expect( screen.getByText( 'Manual Close' ) ).toBeVisible();
+		} );
+
+		await userEvent.click( screen.getByRole( 'button', { name: 'OK' } ) );
+
+		expect( screen.getByText( 'Manual Close' ) ).toBeVisible();
+	} );
+
 	it( 'opens dialog when Trigger is clicked', async () => {
 		render(
 			<ConfirmDialog.Root>

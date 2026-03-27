@@ -68,12 +68,16 @@ export interface PopupProps {
 	 * operation is in progress). When `true`, the confirm button shows a
 	 * spinner and the cancel button is disabled.
 	 *
+	 * **Important:** Passing this prop — even as `false` — opts into
+	 * manual-close mode: the confirm button will no longer auto-close the
+	 * dialog. The consumer is responsible for setting `open={false}` when
+	 * the operation completes. Omit the prop entirely for the default
+	 * auto-close-on-confirm behavior.
+	 *
 	 * To implement an async confirm flow, use controlled mode
 	 * (`open` / `onOpenChange`) and manage the loading state externally:
 	 * prevent closing in `onOpenChange` while loading, and set
 	 * `open={false}` once the operation completes.
-	 *
-	 * @default false
 	 */
 	loading?: boolean;
 }
