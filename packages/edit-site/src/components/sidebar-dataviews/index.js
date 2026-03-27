@@ -23,16 +23,16 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 
 const { useLocation } = unlock( routerPrivateApis );
 
+const SLUG_TO_ICON = {
+	all: pages,
+	published,
+	future: scheduled,
+	drafts,
+	pending,
+	private: notAllowed,
+	trash,
+};
 const defaultResolveIcon = ( view ) => {
-	const SLUG_TO_ICON = {
-		all: pages,
-		published,
-		future: scheduled,
-		drafts,
-		pending,
-		private: notAllowed,
-		trash,
-	};
 	return SLUG_TO_ICON[ view.slug ];
 };
 

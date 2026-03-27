@@ -16,6 +16,12 @@ import {
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import DataViewsSidebarContent from '../sidebar-dataviews';
 
+const SOURCE_TO_ICON = {
+	user: commentAuthorAvatar,
+	theme: layout,
+	plugin: pluginIcon,
+	site: globe,
+};
 export default function DataviewsTemplatesSidebarContent() {
 	const authorSourceMap = useSelect( ( select ) => {
 		const templates = select( coreStore ).getEntityRecords(
@@ -40,12 +46,6 @@ export default function DataviewsTemplatesSidebarContent() {
 	}, [] );
 
 	const resolveIcon = ( view ) => {
-		const SOURCE_TO_ICON = {
-			user: commentAuthorAvatar,
-			theme: layout,
-			plugin: pluginIcon,
-			site: globe,
-		};
 		const source = authorSourceMap[ view.slug ];
 		return SOURCE_TO_ICON[ source ] ?? layout;
 	};
