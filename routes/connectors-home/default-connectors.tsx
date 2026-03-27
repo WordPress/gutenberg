@@ -33,7 +33,6 @@ interface ConnectorData {
 	plugin?: {
 		slug: string;
 		pluginFile?: string | null;
-		isInstalled: boolean;
 		isActivated: boolean;
 	};
 	authentication: NonNullable< ConnectorConfig[ 'authentication' ] >;
@@ -135,7 +134,6 @@ function ApiKeyConnector( {
 		pluginFile: plugin?.pluginFile,
 		settingName,
 		connectorName: name,
-		isInstalled: plugin?.isInstalled,
 		isActivated: plugin?.isActivated,
 		keySource: auth?.keySource,
 		initialIsConnected: auth?.isConnected,
@@ -249,10 +247,7 @@ export function registerDefaultConnectors() {
 			authentication,
 			plugin: data.plugin,
 		};
-		if (
-			( data.type === 'ai_provider' || data.type === 'spam_filtering' ) &&
-			authentication.method === 'api_key'
-		) {
+		if ( authentication.method === 'api_key' ) {
 			args.render = ApiKeyConnector;
 		}
 

@@ -172,11 +172,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				if ( ! empty( $args['authentication']['setting_name'] ) && is_string( $args['authentication']['setting_name'] ) ) {
 					$connector['authentication']['setting_name'] = $args['authentication']['setting_name'];
 				} else {
-					$sanitized_id                                = str_replace( '-', '_', $id );
-					$sanitized_type                              = str_replace( '-', '_', $connector['type'] ?? '' );
-					$connector['authentication']['setting_name'] = '' !== $sanitized_type
-						? "connectors_{$sanitized_type}_{$sanitized_id}_api_key"
-						: "connectors_{$sanitized_id}_api_key";
+					$connector['authentication']['setting_name'] = str_replace( '-', '_', "connectors_{$connector['type']}_{$id}_api_key" );
 				}
 				if ( ! empty( $args['authentication']['constant_name'] ) && is_string( $args['authentication']['constant_name'] ) ) {
 					$connector['authentication']['constant_name'] = $args['authentication']['constant_name'];

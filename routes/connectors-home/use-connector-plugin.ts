@@ -16,7 +16,6 @@ interface UseConnectorPluginOptions {
 	pluginFile?: string | null;
 	settingName: string;
 	connectorName: string;
-	isInstalled?: boolean;
 	isActivated?: boolean;
 	keySource?: ApiKeySource;
 	initialIsConnected?: boolean;
@@ -43,7 +42,6 @@ export function useConnectorPlugin( {
 	pluginFile: pluginFileFromServer,
 	settingName,
 	connectorName,
-	isInstalled,
 	isActivated,
 	keySource = 'none',
 	initialIsConnected = false,
@@ -129,7 +127,7 @@ export function useConnectorPlugin( {
 			let status: PluginStatus = 'not-installed';
 			if ( isActivated ) {
 				status = 'active';
-			} else if ( isInstalled ) {
+			} else if ( pluginFileFromServer ) {
 				status = 'inactive';
 			}
 			return {
@@ -139,13 +137,7 @@ export function useConnectorPlugin( {
 				canInstallPlugins: canCreate,
 			};
 		},
-		[
-			pluginSlug,
-			pluginFileFromServer,
-			settingName,
-			isInstalled,
-			isActivated,
-		]
+		[ pluginSlug, pluginFileFromServer, settingName, isActivated ]
 	);
 
 	const pluginStatus = pluginStatusOverride ?? derivedPluginStatus;
