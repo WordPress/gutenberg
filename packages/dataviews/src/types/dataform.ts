@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { ReactElement } from 'react';
-
-/**
  * Internal dependencies
  */
 import type { Field, FieldValidity } from './field-api';
@@ -148,7 +143,7 @@ export type NormalizedSummaryField =
 export type FormField = {
 	id: string;
 	label?: string;
-	description?: string | ReactElement;
+	description?: string;
 	layout?: Layout;
 	children?: Array< FormField | string >;
 };
@@ -156,7 +151,7 @@ export type NormalizedFormField = {
 	id: string;
 	layout: NormalizedLayout;
 	label?: string;
-	description?: string | ReactElement;
+	description?: string;
 	children?: NormalizedFormField[];
 };
 
