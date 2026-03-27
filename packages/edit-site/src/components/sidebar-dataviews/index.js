@@ -27,17 +27,23 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 
 const { useLocation } = unlock( routerPrivateApis );
 
-const SLUG_TO_ICON = {
-	all: pages,
-	published,
-	future: scheduled,
-	drafts,
-	pending,
-	private: notAllowed,
-	trash,
+const defaultResolveIcon = ( view ) => {
+	const SLUG_TO_ICON = {
+		all: pages,
+		published,
+		future: scheduled,
+		drafts,
+		pending,
+		private: notAllowed,
+		trash,
+	};
+	return SLUG_TO_ICON[ view.slug ];
 };
 
-export default function DataViewsSidebarContent( { postType } ) {
+export default function DataViewsSidebarContent( {
+	postType,
+	resolveIcon = defaultResolveIcon,
+} ) {
 	const {
 		path,
 		query: { activeView = 'all' },
@@ -56,10 +62,11 @@ export default function DataViewsSidebarContent( { postType } ) {
 				{ viewList?.map( ( view ) => {
 					const isActive = view.slug === activeView;
 					const slug = view.slug === 'all' ? undefined : view.slug;
+					const icon = resolveIcon( view );
 					return (
 						<SidebarNavigationItem
 							key={ view.slug }
-							icon={ SLUG_TO_ICON[ view.slug ] }
+							icon={ icon }
 							to={ addQueryArgs( path, {
 								activeView: slug,
 							} ) }
