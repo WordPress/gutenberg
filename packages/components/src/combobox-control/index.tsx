@@ -35,6 +35,7 @@ import type { TokenInputProps } from '../form-token-field/types';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+import type { WordPressComponentProps } from '../context';
 import Spinner from '../spinner';
 
 const noop = () => {};
@@ -113,7 +114,9 @@ const getIndexOfMatchingSuggestion = (
  * }
  * ```
  */
-function ComboboxControl( props: ComboboxControlProps ) {
+function ComboboxControl(
+	props: WordPressComponentProps< ComboboxControlProps, 'input', false >
+) {
 	const {
 		__next40pxDefaultSize = false,
 		value: valueProp,
@@ -132,6 +135,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		__experimentalRenderItem,
 		expandOnFocus = true,
 		placeholder,
+		...restProps
 	} = useDeprecated36pxDefaultSizeProp( props );
 
 	const [ value, setValue ] = useControlledValue( {
@@ -358,6 +362,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 									matchingSuggestions
 								) }
 								onChange={ onInputChange }
+								{ ...restProps }
 							/>
 						</FlexBlock>
 						{ isLoading && <Spinner /> }
