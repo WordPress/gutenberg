@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useMemo, useState } from '@wordpress/element';
-import { ToggleControl } from '@wordpress/components';
+import {
+	ToggleControl,
+	__experimentalSpacer as Spacer,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
 import {
@@ -387,14 +390,13 @@ function BlockStyleControls( {
 			<>
 				{ statesControl }
 				<BlockInspectorPreTabsFill>
-					<div style={ { padding: '8px 16px' } }>
+					<Spacer paddingX={ 4 } paddingY={ 2 }>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show state on canvas' ) }
 							checked={ showStateOnCanvas }
 							onChange={ setShowStateOnCanvas }
 						/>
-					</div>
+					</Spacer>
 				</BlockInspectorPreTabsFill>
 				<ColorEdit
 					clientId={ clientId }
