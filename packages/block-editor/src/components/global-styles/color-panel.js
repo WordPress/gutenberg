@@ -374,14 +374,18 @@ export default function ColorPanel( {
 	const userBackgroundColor = decodeValue( value?.color?.background );
 	const gradient = decodeValue( inheritedValue?.color?.gradient );
 	const userGradient = decodeValue( value?.color?.gradient );
-	const hasBackground = () => !! userBackgroundColor || !! userGradient;
+	const hasBackground = () =>
+		!! userBackgroundColor ||
+		( ! hasBackgroundGradientSupport && !! userGradient );
 	const setBackgroundColor = ( newColor ) => {
 		const newValue = setImmutably(
 			value,
 			[ 'color', 'background' ],
 			encodeColorValue( newColor )
 		);
-		newValue.color.gradient = undefined;
+		if ( ! hasBackgroundGradientSupport ) {
+			newValue.color.gradient = undefined;
+		}
 		onChange( newValue );
 	};
 	const setGradient = ( newGradient ) => {
@@ -399,7 +403,9 @@ export default function ColorPanel( {
 			[ 'color', 'background' ],
 			undefined
 		);
-		newValue.color.gradient = undefined;
+		if ( ! hasBackgroundGradientSupport ) {
+			newValue.color.gradient = undefined;
+		}
 		onChange( newValue );
 	};
 
