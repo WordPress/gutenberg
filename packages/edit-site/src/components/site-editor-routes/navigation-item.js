@@ -51,7 +51,7 @@ export const navigationItemRoute = {
 		},
 		mobile( { siteData } ) {
 			if ( ! isThemeDataLoaded( siteData ) ) {
-				return null;
+				return <></>;
 			}
 			return siteData.currentTheme.is_block_theme ? (
 				<MobileNavigationItemView />

@@ -79,7 +79,7 @@ export const pagesRoute = {
 		},
 		mobile( { siteData } ) {
 			if ( ! isThemeDataLoaded( siteData ) ) {
-				return null;
+				return <></>;
 			}
 			return siteData.currentTheme.is_block_theme ? (
 				<MobilePagesView />

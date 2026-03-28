@@ -45,7 +45,7 @@ export const navigationRoute = {
 		},
 		mobile( { siteData } ) {
 			if ( ! isThemeDataLoaded( siteData ) ) {
-				return null;
+				return <></>;
 			}
 			return siteData.currentTheme.is_block_theme ? (
 				<MobileNavigationView />
