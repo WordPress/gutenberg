@@ -6,7 +6,13 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Platform, useState, useEffect, useCallback } from '@wordpress/element';
+import {
+	Platform,
+	useState,
+	useEffect,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
@@ -22,7 +28,11 @@ import {
 import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
-import { cleanEmptyObject, shouldSkipSerialization } from './utils';
+import {
+	cleanEmptyObject,
+	shouldSkipSerialization,
+	buildStateResetAllFilter,
+} from './utils';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -45,9 +55,20 @@ function useVisualizer() {
 	return [ property, setProperty ];
 }
 
-function DimensionsInspectorControl( { children, resetAllFilter } ) {
+function DimensionsInspectorControl( {
+	children,
+	resetAllFilter,
+	selectedState = 'default',
+} ) {
+	const isStateSelected = selectedState !== 'default';
 	const attributesResetAllFilter = useCallback(
 		( attributes ) => {
+			if ( isStateSelected ) {
+				return buildStateResetAllFilter(
+					selectedState,
+					resetAllFilter
+				)( attributes );
+			}
 			const existingStyle = attributes.style;
 			const updatedStyle = resetAllFilter( existingStyle );
 			return {
@@ -55,7 +76,7 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 				style: updatedStyle,
 			};
 		},
-		[ resetAllFilter ]
+		[ isStateSelected, selectedState, resetAllFilter ]
 	);
 
 	return (
@@ -76,7 +97,7 @@ export function DimensionsPanel( {
 	selectedState = 'default',
 } ) {
 	const isEnabled = useHasDimensionsPanel( settings );
-	const isStateMode = !! ( selectedState && selectedState !== 'default' );
+	const isStateSelected = !! ( selectedState && selectedState !== 'default' );
 	const style = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
@@ -91,8 +112,8 @@ export function DimensionsPanel( {
 
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 
-	const value = isStateMode ? style?.[ selectedState ] : style;
-	const onChange = isStateMode
+	const value = isStateSelected ? style?.[ selectedState ] : style;
+	const onChange = isStateSelected
 		? ( newStateStyle ) =>
 				setAttributes( {
 					style: cleanEmptyObject( {
@@ -104,6 +125,19 @@ export function DimensionsPanel( {
 				setAttributes( {
 					style: cleanEmptyObject( newStyle ),
 				} );
+
+	const DimensionsWrapper = useMemo(
+		() =>
+			function DimensionsWrapperComponent( props ) {
+				return (
+					<DimensionsInspectorControl
+						{ ...props }
+						selectedState={ selectedState }
+					/>
+				);
+			},
+		[ selectedState ]
+	);
 
 	if ( ! isEnabled ) {
 		return null;
@@ -125,15 +159,17 @@ export function DimensionsPanel( {
 	return (
 		<>
 			<StylesDimensionsPanel
-				as={ DimensionsInspectorControl }
+				as={ DimensionsWrapper }
 				panelId={ clientId }
 				settings={ settings }
 				value={ value }
 				onChange={ onChange }
 				defaultControls={ defaultControls }
-				onVisualize={ isStateMode ? undefined : setVisualizedProperty }
+				onVisualize={
+					isStateSelected ? undefined : setVisualizedProperty
+				}
 			/>
-			{ ! isStateMode &&
+			{ ! isStateSelected &&
 				!! settings?.spacing?.padding &&
 				visualizedProperty === 'padding' && (
 					<PaddingVisualizer
@@ -142,7 +178,7 @@ export function DimensionsPanel( {
 						value={ value }
 					/>
 				) }
-			{ ! isStateMode &&
+			{ ! isStateSelected &&
 				!! settings?.spacing?.margin &&
 				visualizedProperty === 'margin' && (
 					<MarginVisualizer

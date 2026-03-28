@@ -123,9 +123,23 @@ export function getBackgroundImageClasses( style ) {
 function BackgroundInspectorControl( {
 	children,
 	backgroundGradientSupported = false,
+	selectedState = 'default',
 } ) {
+	const isStateSelected = selectedState !== 'default';
 	const resetAllFilter = useCallback(
 		( attributes ) => {
+			if ( isStateSelected ) {
+				return {
+					...attributes,
+					style: cleanEmptyObject( {
+						...attributes.style,
+						[ selectedState ]: {
+							...attributes.style?.[ selectedState ],
+							background: undefined,
+						},
+					} ),
+				};
+			}
 			const updatedClassName = attributes.className?.includes(
 				'has-background'
 			)
@@ -149,7 +163,7 @@ function BackgroundInspectorControl( {
 				} ),
 			};
 		},
-		[ backgroundGradientSupported ]
+		[ backgroundGradientSupported, isStateSelected, selectedState ]
 	);
 	return (
 		<InspectorControls group="background" resetAllFilter={ resetAllFilter }>
@@ -200,11 +214,12 @@ export function BackgroundImagePanel( {
 		( { children } ) => (
 			<BackgroundInspectorControl
 				backgroundGradientSupported={ backgroundGradientSupported }
+				selectedState={ selectedState }
 			>
 				{ children }
 			</BackgroundInspectorControl>
 		),
-		[ backgroundGradientSupported ]
+		[ backgroundGradientSupported, selectedState ]
 	);
 
 	if (
@@ -214,9 +229,9 @@ export function BackgroundImagePanel( {
 		return null;
 	}
 
-	const isStateMode = selectedState && selectedState !== 'default';
-	const value = isStateMode ? style?.[ selectedState ] : style;
-	const onChange = isStateMode
+	const isStateSelected = selectedState && selectedState !== 'default';
+	const value = isStateSelected ? style?.[ selectedState ] : style;
+	const onChange = isStateSelected
 		? ( newStateStyle ) =>
 				setAttributes( {
 					style: cleanEmptyObject( {

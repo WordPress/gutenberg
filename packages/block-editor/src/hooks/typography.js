@@ -19,7 +19,7 @@ import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';
 import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
 import { FIT_TEXT_SUPPORT_KEY } from './fit-text';
-import { cleanEmptyObject } from './utils';
+import { cleanEmptyObject, buildStateResetAllFilter } from './utils';
 import { store as blockEditorStore } from '../store';
 
 function omit( object, keys ) {
@@ -93,9 +93,20 @@ function attributesToStyle( attributes ) {
 	};
 }
 
-function TypographyInspectorControl( { children, resetAllFilter } ) {
+function TypographyInspectorControl( {
+	children,
+	resetAllFilter,
+	selectedState = 'default',
+} ) {
+	const isStateSelected = selectedState !== 'default';
 	const attributesResetAllFilter = useCallback(
 		( attributes ) => {
+			if ( isStateSelected ) {
+				return buildStateResetAllFilter(
+					selectedState,
+					resetAllFilter
+				)( attributes );
+			}
 			const existingStyle = attributesToStyle( attributes );
 			const updatedStyle = resetAllFilter( existingStyle );
 			return {
@@ -103,7 +114,7 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 				...styleToAttributes( updatedStyle ),
 			};
 		},
-		[ resetAllFilter ]
+		[ isStateSelected, selectedState, resetAllFilter ]
 	);
 
 	return (
@@ -124,7 +135,7 @@ export function TypographyPanel( {
 	selectedState = 'default',
 } ) {
 	const isEnabled = useHasTypographyPanel( settings );
-	const isStateMode = !! ( selectedState && selectedState !== 'default' );
+	const isStateSelected = !! ( selectedState && selectedState !== 'default' );
 
 	const { style, fontFamily, fontSize, fitText } = useSelect(
 		( select ) => {
@@ -148,13 +159,13 @@ export function TypographyPanel( {
 		[ clientId, isEnabled ]
 	);
 	const value = useMemo( () => {
-		if ( isStateMode ) {
+		if ( isStateSelected ) {
 			return style?.[ selectedState ];
 		}
 		return attributesToStyle( { style, fontFamily, fontSize } );
-	}, [ isStateMode, selectedState, style, fontSize, fontFamily ] );
+	}, [ isStateSelected, selectedState, style, fontSize, fontFamily ] );
 
-	const onChange = isStateMode
+	const onChange = isStateSelected
 		? ( newStateStyle ) =>
 				setAttributes( {
 					style: cleanEmptyObject( {
@@ -176,6 +187,19 @@ export function TypographyPanel( {
 				setAttributes( newAttributes );
 		  };
 
+	const TypographyWrapper = useMemo(
+		() =>
+			function TypographyWrapperComponent( props ) {
+				return (
+					<TypographyInspectorControl
+						{ ...props }
+						selectedState={ selectedState }
+					/>
+				);
+			},
+		[ selectedState ]
+	);
+
 	if ( ! isEnabled ) {
 		return null;
 	}
@@ -187,7 +211,7 @@ export function TypographyPanel( {
 
 	return (
 		<StylesTypographyPanel
-			as={ TypographyInspectorControl }
+			as={ TypographyWrapper }
 			panelId={ clientId }
 			settings={ settings }
 			value={ value }
