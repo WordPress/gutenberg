@@ -195,6 +195,34 @@ const EditWithGeneratedProps = ( props ) => {
 				return;
 			}
 
+			// Compute the bindings state after nextAttributes is applied,
+			// so that binding removals in the same call are respected.
+			let nextBindings = blockBindings;
+			if (
+				nextAttributes.metadata &&
+				'bindings' in nextAttributes.metadata
+			) {
+				if ( nextAttributes.metadata.bindings === undefined ) {
+					// All bindings are being cleared.
+					nextBindings = null;
+				} else {
+					// Specific bindings are being added or removed.
+					nextBindings = replacePatternOverridesDefaultBinding(
+						{
+							...blockBindings,
+							...nextAttributes.metadata.bindings,
+						},
+						bindableAttributes
+					);
+				}
+			}
+
+			// If all bindings were cleared, no interception needed.
+			if ( ! nextBindings ) {
+				setAttributes( nextAttributes );
+				return;
+			}
+
 			registry.batch( () => {
 				const keptAttributes = { ...nextAttributes };
 				const blockBindingsBySource = new Map();
@@ -204,13 +232,13 @@ const EditWithGeneratedProps = ( props ) => {
 					keptAttributes
 				) ) {
 					if (
-						! blockBindings[ attributeName ] ||
+						! nextBindings[ attributeName ] ||
 						! bindableAttributes?.includes( attributeName )
 					) {
 						continue;
 					}
 
-					const binding = blockBindings[ attributeName ];
+					const binding = nextBindings[ attributeName ];
 					const source = registeredSources[ binding?.source ];
 					if ( ! source?.setValues ) {
 						continue;
