@@ -8,109 +8,79 @@ import {
 } from '../sibling-style-sync-utils';
 
 describe( 'partitionAttributesByGroups', () => {
-	it( 'splits top-level and style sub-key attributes by sync group', () => {
+	it( 'syncs known style top-level attributes and leaves content attributes unsynced', () => {
 		const { syncedAttributes, unsyncedAttributes } =
-			partitionAttributesByGroups(
-				{ textColor: 'vivid-red', content: 'hello' },
-				[ 'color' ]
-			);
+			partitionAttributesByGroups( {
+				textColor: 'vivid-red',
+				content: 'hello',
+			} );
 
 		expect( syncedAttributes ).toEqual( { textColor: 'vivid-red' } );
 		expect( unsyncedAttributes ).toEqual( { content: 'hello' } );
 	} );
 
-	it( 'splits style sub-keys between synced and unsynced', () => {
+	it( 'syncs all known style sub-keys and leaves unknown sub-keys unsynced', () => {
 		const attrs = {
 			style: {
 				color: { text: '#f00' },
 				spacing: { padding: '1em' },
 				typography: { fontSize: '1rem' },
+				dimensions: { minHeight: '100px' },
 			},
 		};
 		const { syncedAttributes, unsyncedAttributes } =
-			partitionAttributesByGroups( attrs, [ 'color' ] );
+			partitionAttributesByGroups( attrs );
 
 		expect( syncedAttributes ).toEqual( {
-			style: { color: { text: '#f00' } },
-		} );
-		expect( unsyncedAttributes ).toEqual( {
 			style: {
+				color: { text: '#f00' },
 				spacing: { padding: '1em' },
 				typography: { fontSize: '1rem' },
 			},
 		} );
+		expect( unsyncedAttributes ).toEqual( {
+			style: { dimensions: { minHeight: '100px' } },
+		} );
 	} );
 
-	it( 'handles multiple groups', () => {
-		const { syncedAttributes } = partitionAttributesByGroups(
-			{
-				textColor: 'vivid-red',
-				fontSize: 'large',
-				borderColor: 'black',
-				content: 'hello',
-			},
-			[ 'color', 'typography', 'border' ]
-		);
+	it( 'syncs all known style top-level attributes', () => {
+		const { syncedAttributes } = partitionAttributesByGroups( {
+			textColor: 'vivid-red',
+			fontSize: 'large',
+			borderColor: 'black',
+			backgroundColor: 'white',
+			gradient: 'vivid-cyan-blue-to-vivid-purple',
+			fontFamily: 'sans-serif',
+			content: 'hello',
+		} );
 
 		expect( syncedAttributes ).toEqual( {
 			textColor: 'vivid-red',
 			fontSize: 'large',
 			borderColor: 'black',
+			backgroundColor: 'white',
+			gradient: 'vivid-cyan-blue-to-vivid-purple',
+			fontFamily: 'sans-serif',
 		} );
 	} );
 
-	it( 'syncs all groups when "all" is passed', () => {
-		const { syncedAttributes, unsyncedAttributes } =
-			partitionAttributesByGroups(
-				{
-					textColor: 'vivid-red',
-					fontSize: 'large',
-					borderColor: 'black',
-					style: {
-						color: { text: '#f00' },
-						spacing: { padding: '1em' },
-					},
-					content: 'hello',
-				},
-				'all'
-			);
-
-		expect( syncedAttributes ).toEqual( {
-			textColor: 'vivid-red',
-			fontSize: 'large',
-			borderColor: 'black',
-			style: {
-				color: { text: '#f00' },
-				spacing: { padding: '1em' },
-			},
+	it( 'omits the style key entirely when all its sub-keys are unsynced', () => {
+		const { syncedAttributes } = partitionAttributesByGroups( {
+			style: { dimensions: { minHeight: '100px' } },
 		} );
-		expect( unsyncedAttributes ).toEqual( { content: 'hello' } );
-	} );
-
-	it( 'omits the style key entirely when all its sub-keys fall in one bucket', () => {
-		const allUnsynced = { style: { spacing: { padding: '1em' } } };
-		expect(
-			partitionAttributesByGroups( allUnsynced, [ 'color' ] )
-				.syncedAttributes.style
-		).toBeUndefined();
-
-		const allSynced = { style: { color: { text: '#f00' } } };
-		expect(
-			partitionAttributesByGroups( allSynced, [ 'color' ] )
-				.unsyncedAttributes.style
-		).toBeUndefined();
+		expect( syncedAttributes.style ).toBeUndefined();
 	} );
 } );
 
 describe( 'mergeStyleByGroups', () => {
-	it( 'overwrites synced sub-keys and preserves unsynced ones', () => {
+	it( 'overwrites known synced sub-keys and preserves others', () => {
 		const current = {
 			color: { text: '#000' },
 			spacing: { padding: '1em' },
 		};
 		const incoming = { color: { text: '#f00' } };
 
-		const result = mergeStyleByGroups( current, incoming, [ 'color' ] );
+		const result = mergeStyleByGroups( current, incoming );
 
 		expect( result ).toEqual( {
 			color: { text: '#f00' },
@@ -118,7 +88,7 @@ describe( 'mergeStyleByGroups', () => {
 		} );
 	} );
 
-	it( 'merges all style sub-keys when "all" is passed', () => {
+	it( 'merges multiple known style sub-keys', () => {
 		const current = {
 			color: { text: '#000' },
 			spacing: { padding: '1em' },
@@ -128,7 +98,7 @@ describe( 'mergeStyleByGroups', () => {
 			typography: { fontSize: '2rem' },
 		};
 
-		const result = mergeStyleByGroups( current, incoming, 'all' );
+		const result = mergeStyleByGroups( current, incoming );
 
 		expect( result ).toEqual( {
 			color: { text: '#f00' },
@@ -137,11 +107,11 @@ describe( 'mergeStyleByGroups', () => {
 		} );
 	} );
 
-	it( 'ignores incoming sub-keys that are not in the declared groups', () => {
+	it( 'ignores incoming unknown sub-keys', () => {
 		const current = { spacing: { padding: '1em' } };
-		const incoming = { typography: { fontSize: '2rem' } };
+		const incoming = { dimensions: { minHeight: '100px' } };
 
-		const result = mergeStyleByGroups( current, incoming, [ 'color' ] );
+		const result = mergeStyleByGroups( current, incoming );
 
 		expect( result ).toEqual( { spacing: { padding: '1em' } } );
 	} );

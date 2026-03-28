@@ -567,7 +567,7 @@ export const __experimentalUpdateSyncedBlockAttributes =
 		}
 
 		const { syncedAttributes, unsyncedAttributes } =
-			partitionAttributesByGroups( attributes, syncSupport.groups );
+			partitionAttributesByGroups( attributes );
 
 		const hasSyncedAttrs = Object.keys( syncedAttributes ).length > 0;
 		const hasUnsyncedAttrs = Object.keys( unsyncedAttributes ).length > 0;
@@ -619,37 +619,27 @@ export const __experimentalUpdateSyncedBlockAttributes =
 
 			if ( hasSyncedAttrs ) {
 				if ( syncedAttributes.style ) {
-					// Per-sibling deep merge: preserve each sibling's
-					// unsynced style sub-keys.
+					// Per-sibling deep merge: preserve each sibling's unsynced
+					// style sub-keys, so a spacing change on one block doesn't
+					// wipe the color on another.
 					[ clientId, ...linkedSiblingIds ].forEach( ( sibId ) => {
 						const currentStyle =
 							select.getBlockAttributes( sibId )?.style ?? {};
 						const merged = mergeStyleByGroups(
 							currentStyle,
-							syncedAttributes.style,
-							syncSupport.groups
+							syncedAttributes.style
 						);
-						if ( sibId !== clientId ) {
-							dispatch.__unstableMarkNextChangeAsNotPersistent();
-						}
 						dispatch.updateBlockAttributes( sibId, {
 							...syncedAttributes,
 							style: merged,
 						} );
 					} );
 				} else {
-					// Update originating block persistently, siblings non-persistently.
+					// All blocks get the same value — one batched call.
 					dispatch.updateBlockAttributes(
-						clientId,
+						[ clientId, ...linkedSiblingIds ],
 						syncedAttributes
 					);
-					linkedSiblingIds.forEach( ( sibId ) => {
-						dispatch.__unstableMarkNextChangeAsNotPersistent();
-						dispatch.updateBlockAttributes(
-							sibId,
-							syncedAttributes
-						);
-					} );
 				}
 			}
 		} );
@@ -717,10 +707,8 @@ export const __experimentalRelinkBlockStyleSync =
 				const canonicalAttrs = select.getBlockAttributes(
 					canonicalSibling.clientId
 				);
-				const { syncedAttributes } = partitionAttributesByGroups(
-					canonicalAttrs,
-					syncSupport.groups
-				);
+				const { syncedAttributes } =
+					partitionAttributesByGroups( canonicalAttrs );
 				if ( Object.keys( syncedAttributes ).length > 0 ) {
 					if ( syncedAttributes.style ) {
 						const currentStyle =
@@ -729,8 +717,7 @@ export const __experimentalRelinkBlockStyleSync =
 							...syncedAttributes,
 							style: mergeStyleByGroups(
 								currentStyle,
-								syncedAttributes.style,
-								syncSupport.groups
+								syncedAttributes.style
 							),
 						};
 					} else {

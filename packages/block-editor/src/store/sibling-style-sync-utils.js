@@ -1,6 +1,5 @@
 /**
- * Maps style group names (as declared in __experimentalSiblingStyleSync) to the
- * block attributes they cover.
+ * Maps style attribute names to the block attributes they cover.
  *
  * - `topLevel` lists root-level block attributes (e.g. `textColor`, `fontSize`)
  * - `styleKey`  is the sub-key inside the `style` attribute object (e.g. `style.color`)
@@ -28,29 +27,27 @@ const STYLE_GROUP_MAP = {
 	},
 };
 
+const ALL_SYNCED_TOP_LEVEL_KEYS = new Set(
+	Object.values( STYLE_GROUP_MAP ).flatMap( ( g ) => g.topLevel )
+);
+
+const ALL_SYNCED_STYLE_KEYS = new Set(
+	Object.values( STYLE_GROUP_MAP )
+		.map( ( g ) => g.styleKey )
+		.filter( Boolean )
+);
+
 /**
- * Splits an attributes object into two buckets: attributes that belong to the
- * declared sync groups, and attributes that do not.
+ * Splits an attributes object into two buckets: style attributes (which are
+ * synced to siblings) and non-style attributes (which are not).
  *
  * Handles both top-level attributes (e.g. `textColor`) and sub-keys of the
  * nested `style` attribute object (e.g. `style.color`).
  *
- * @param {Object}   attributes Changed block attributes.
- * @param {string[]} groups     Declared sync groups (e.g. ['color', 'typography']).
+ * @param {Object} attributes Changed block attributes.
  * @return {{ syncedAttributes: Object, unsyncedAttributes: Object }} Object with attributes split into synced and unsynced buckets.
  */
-export function partitionAttributesByGroups( attributes, groups ) {
-	const resolvedGroups =
-		groups === 'all' ? Object.keys( STYLE_GROUP_MAP ) : groups;
-	const syncedTopLevelKeys = new Set(
-		resolvedGroups.flatMap( ( g ) => STYLE_GROUP_MAP[ g ]?.topLevel ?? [] )
-	);
-	const syncedStyleKeys = new Set(
-		resolvedGroups
-			.map( ( g ) => STYLE_GROUP_MAP[ g ]?.styleKey )
-			.filter( Boolean )
-	);
-
+export function partitionAttributesByGroups( attributes ) {
 	const synced = {};
 	const unsynced = {};
 
@@ -61,7 +58,7 @@ export function partitionAttributesByGroups( attributes, groups ) {
 			for ( const [ styleKey, styleValue ] of Object.entries(
 				value ?? {}
 			) ) {
-				if ( syncedStyleKeys.has( styleKey ) ) {
+				if ( ALL_SYNCED_STYLE_KEYS.has( styleKey ) ) {
 					syncedStyle[ styleKey ] = styleValue;
 				} else {
 					unsyncedStyle[ styleKey ] = styleValue;
@@ -73,7 +70,7 @@ export function partitionAttributesByGroups( attributes, groups ) {
 			if ( Object.keys( unsyncedStyle ).length ) {
 				unsynced.style = unsyncedStyle;
 			}
-		} else if ( syncedTopLevelKeys.has( key ) ) {
+		} else if ( ALL_SYNCED_TOP_LEVEL_KEYS.has( key ) ) {
 			synced[ key ] = value;
 		} else {
 			unsynced[ key ] = value;
@@ -87,27 +84,16 @@ export function partitionAttributesByGroups( attributes, groups ) {
  * Merges the synced style sub-keys from an incoming partial style object into a
  * sibling's current style object, leaving unsynced sub-keys untouched.
  *
- * For example, if `groups` includes 'color' but not 'spacing', a sibling's
- * custom spacing will be preserved even as its color is overwritten.
- *
- * @param {Object}   currentStyle    The sibling's current `style` attribute value.
- * @param {Object}   incomingPartial The incoming partial `style` object (synced sub-keys only).
- * @param {string[]} groups          Declared sync groups.
+ * @param {Object} currentStyle    The sibling's current `style` attribute value.
+ * @param {Object} incomingPartial The incoming partial `style` object (synced sub-keys only).
  * @return {Object} Merged style object.
  */
-export function mergeStyleByGroups( currentStyle, incomingPartial, groups ) {
-	const resolvedGroups =
-		groups === 'all' ? Object.keys( STYLE_GROUP_MAP ) : groups;
-	const syncedStyleKeys = new Set(
-		resolvedGroups
-			.map( ( g ) => STYLE_GROUP_MAP[ g ]?.styleKey )
-			.filter( Boolean )
-	);
+export function mergeStyleByGroups( currentStyle, incomingPartial ) {
 	const merged = { ...currentStyle };
 	for ( const [ styleKey, styleValue ] of Object.entries(
 		incomingPartial
 	) ) {
-		if ( syncedStyleKeys.has( styleKey ) ) {
+		if ( ALL_SYNCED_STYLE_KEYS.has( styleKey ) ) {
 			merged[ styleKey ] = styleValue;
 		}
 	}

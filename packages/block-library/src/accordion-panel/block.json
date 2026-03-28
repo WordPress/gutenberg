@@ -56,8 +56,7 @@
 		"allowedBlocks": true,
 		"lock": false,
 		"__experimentalSiblingStyleSync": {
-			"scope": "core/accordion",
-			"groups": [ "color", "border", "spacing" ]
+			"scope": "core/accordion"
 		}
 	},
 	"attributes": {

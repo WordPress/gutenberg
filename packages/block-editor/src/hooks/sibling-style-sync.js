@@ -103,10 +103,7 @@ const withSiblingStyleSync = createHigherOrderComponent(
 					return;
 				}
 				const { syncedAttributes: ownStyles } =
-					partitionAttributesByGroups(
-						currentAttrs,
-						syncSupport.groups
-					);
+					partitionAttributesByGroups( currentAttrs );
 				const hasOwnStyles = Object.values( ownStyles ).some(
 					( v ) => v !== undefined && v !== null
 				);
@@ -151,10 +148,8 @@ const withSiblingStyleSync = createHigherOrderComponent(
 				const canonicalAttrs = storeSelect.getBlockAttributes(
 					canonicalSibling.clientId
 				);
-				const { syncedAttributes } = partitionAttributesByGroups(
-					canonicalAttrs,
-					syncSupport.groups
-				);
+				const { syncedAttributes } =
+					partitionAttributesByGroups( canonicalAttrs );
 				if ( Object.keys( syncedAttributes ).length === 0 ) {
 					return;
 				}

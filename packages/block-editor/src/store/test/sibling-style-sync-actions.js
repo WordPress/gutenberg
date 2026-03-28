@@ -40,7 +40,6 @@ describe( 'sibling style sync actions', () => {
 			supports: {
 				__experimentalSiblingStyleSync: {
 					scope: 'core/accordion',
-					groups: [ 'color', 'typography' ],
 				},
 			},
 		} );

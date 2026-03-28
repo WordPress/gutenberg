@@ -60,8 +60,7 @@
 		"visibility": false,
 		"lock": false,
 		"__experimentalSiblingStyleSync": {
-			"scope": "core/accordion",
-			"groups": [ "color", "typography", "border", "spacing" ]
+			"scope": "core/accordion"
 		}
 	},
 	"selectors": {
