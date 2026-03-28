@@ -33,6 +33,13 @@ jobs:
                       const prNumber = context.payload.pull_request.number;
 
                       // Files to ignore — these always overlap and conflicts are trivial.
+                      // Supported pattern syntax (intentionally minimal):
+                      //   - Exact match: 'package-lock.json' matches only that path.
+                      //   - '**/suffix': matches any file whose path ends with '/suffix'
+                      //     (e.g. '**/CHANGELOG.md' matches 'packages/foo/CHANGELOG.md').
+                      // More complex globs (e.g. '*.json', 'packages/*/src/**') are NOT
+                      // supported. If richer patterns are needed in the future, consider
+                      // pulling in a glob library like minimatch.
                       const IGNORED_PATTERNS = [
                         'package-lock.json',
                         'composer.lock',
