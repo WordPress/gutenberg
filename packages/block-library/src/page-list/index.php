@@ -309,7 +309,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$colors = block_core_page_list_build_css_colors( $attributes, $block->context );
 	//  The build system prefixes this function with "gutenberg_" to avoid
 	// collisions with the core version. Until this function is backported to
-	// core, we need to guard it's use and only call the prefixed name in
+	// core, we need to guard its use and only call the prefixed name in
 	//  the plugin.
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 		$font_sizes = gutenberg_block_core_shared_navigation_build_css_font_sizes( $block->context );
