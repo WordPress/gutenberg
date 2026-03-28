@@ -432,7 +432,8 @@ function ButtonEdit( props ) {
 									newValue?.id !== undefined &&
 									newValue?.id !== null &&
 									( newValue?.kind === 'post-type' ||
-										newValue?.kind === 'taxonomy' );
+										newValue?.kind === 'taxonomy' ||
+										newValue?.kind === 'media' );
 
 								const attrs = getUpdatedLinkAttributes( {
 									rel,

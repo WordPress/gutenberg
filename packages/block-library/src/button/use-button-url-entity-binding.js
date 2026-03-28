@@ -18,11 +18,28 @@ import { useBlockBindingsUtils } from '@wordpress/block-editor';
 export function buildButtonUrlEntityBinding( linkValue ) {
 	const { id, kind, type: entitySlug } = linkValue;
 
-	if ( id === undefined || id === null || ! kind || ! entitySlug ) {
+	if ( id === undefined || id === null || ! kind ) {
 		return null;
 	}
 
+	// Media library results from fetchLinkSuggestions use kind `media` (not `post-type`).
+	if ( kind === 'media' ) {
+		return {
+			url: {
+				source: 'core/post-data',
+				args: {
+					field: 'link',
+					id,
+					postType: 'attachment',
+				},
+			},
+		};
+	}
+
 	if ( kind === 'post-type' ) {
+		if ( ! entitySlug ) {
+			return null;
+		}
 		return {
 			url: {
 				source: 'core/post-data',
@@ -36,6 +53,9 @@ export function buildButtonUrlEntityBinding( linkValue ) {
 	}
 
 	if ( kind === 'taxonomy' ) {
+		if ( ! entitySlug ) {
+			return null;
+		}
 		const taxonomy = entitySlug === 'tag' ? 'post_tag' : entitySlug;
 		return {
 			url: {
@@ -72,10 +92,18 @@ export function useButtonUrlEntityBinding( { clientId, metadata } ) {
 			urlBinding.source === 'core/post-data' &&
 			urlBinding.args.postType
 		) {
+			const postType = urlBinding.args.postType;
+			if ( postType === 'attachment' ) {
+				return {
+					id: urlBinding.args.id,
+					kind: 'media',
+					type: 'attachment',
+				};
+			}
 			return {
 				id: urlBinding.args.id,
 				kind: 'post-type',
-				type: urlBinding.args.postType,
+				type: postType,
 			};
 		}
 		if (

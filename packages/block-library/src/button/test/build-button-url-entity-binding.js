@@ -44,6 +44,26 @@ describe( 'buildButtonUrlEntityBinding', () => {
 		} );
 	} );
 
+	it( 'maps LinkControl media kind to core/post-data with postType attachment', () => {
+		expect(
+			buildButtonUrlEntityBinding( {
+				id: 68,
+				kind: 'media',
+				type: 'attachment',
+				url: 'https://example.com/wp-content/uploads/file.jpg',
+			} )
+		).toEqual( {
+			url: {
+				source: 'core/post-data',
+				args: {
+					field: 'link',
+					id: 68,
+					postType: 'attachment',
+				},
+			},
+		} );
+	} );
+
 	it( 'returns null for custom links without entity metadata', () => {
 		expect(
 			buildButtonUrlEntityBinding( { url: 'https://example.org' } )
