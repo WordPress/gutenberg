@@ -301,6 +301,80 @@ describe( 'term-data bindings', () => {
 				expect( values.content ).toBe( 'JavaScript' );
 			} );
 		} );
+
+		describe( 'for blocks using binding args (e.g. core/button)', () => {
+			it( 'should resolve from args.id and args.taxonomy instead of context', () => {
+				const select = ( store ) => {
+					if ( store === blockEditorStore ) {
+						return {
+							getBlockName: () => 'core/button',
+							getBlockAttributes: () => ( {} ),
+						};
+					}
+					if ( store === coreDataStore ) {
+						return {
+							getEntityRecord: ( kind, taxonomy, termId ) => {
+								if (
+									kind === 'taxonomy' &&
+									taxonomy === 'category' &&
+									termId === 55
+								) {
+									return {
+										link: 'https://example.com/category/news',
+									};
+								}
+								return undefined;
+							},
+						};
+					}
+				};
+
+				const values = termDataBindings.getValues( {
+					select,
+					context: {
+						taxonomy: 'post_tag',
+						termId: 1,
+					},
+					bindings: {
+						url: {
+							source: 'core/term-data',
+							args: {
+								field: 'link',
+								id: 55,
+								taxonomy: 'category',
+							},
+						},
+					},
+					clientId: 'button-client',
+				} );
+
+				expect( values.url ).toBe(
+					'https://example.com/category/news'
+				);
+			} );
+		} );
+	} );
+
+	describe( 'canUserEditValue', () => {
+		it( 'returns false when binding args pin a term via id', () => {
+			const select = ( store ) => {
+				if ( store === blockEditorStore ) {
+					return {
+						getSelectedBlockClientId: () => 'client1',
+						getBlockName: () => 'core/button',
+					};
+				}
+				return {};
+			};
+
+			expect(
+				termDataBindings.canUserEditValue( {
+					select,
+					context: { taxonomy: 'category', termId: 1 },
+					args: { id: 99, taxonomy: 'category', field: 'link' },
+				} )
+			).toBe( false );
+		} );
 	} );
 
 	describe( 'getFieldsList', () => {

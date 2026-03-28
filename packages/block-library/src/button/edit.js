@@ -47,6 +47,7 @@ import removeAnchorTag from '../utils/remove-anchor-tag';
 import { unlock } from '../lock-unlock';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 import { getWidthClasses, isPercentageWidth } from './utils';
+import { useButtonUrlEntityBinding } from './use-button-url-entity-binding';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
@@ -167,8 +168,15 @@ function ButtonEdit( props ) {
 	} );
 	const blockEditingMode = useBlockEditingMode();
 
+	const {
+		createBinding,
+		clearUrlBinding,
+		entityLinkControlProps,
+		hasEntityUrlBinding,
+	} = useButtonUrlEntityBinding( { clientId, metadata } );
+
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
-	const isURLSet = !! url;
+	const isURLSet = !! url || hasEntityUrlBinding;
 	const opensInNewTab = linkTarget === NEW_TAB_TARGET;
 	const nofollow = !! rel?.includes( NOFOLLOW_REL );
 	const isLinkTag = 'a' === TagName;
@@ -236,6 +244,7 @@ function ButtonEdit( props ) {
 	}
 
 	function unlink() {
+		clearUrlBinding();
 		setAttributes( {
 			url: undefined,
 			linkTarget: undefined,
@@ -253,8 +262,13 @@ function ButtonEdit( props ) {
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
 	const linkValue = useMemo(
-		() => ( { url, opensInNewTab, nofollow } ),
-		[ url, opensInNewTab, nofollow ]
+		() => ( {
+			url,
+			opensInNewTab,
+			nofollow,
+			...entityLinkControlProps,
+		} ),
+		[ url, opensInNewTab, nofollow, entityLinkControlProps ]
 	);
 
 	const useEnterRef = useEnter( { content: text, clientId } );
@@ -399,20 +413,29 @@ function ButtonEdit( props ) {
 					>
 						<LinkControl
 							value={ linkValue }
-							onChange={ ( {
-								url: newURL,
-								opensInNewTab: newOpensInNewTab,
-								nofollow: newNofollow,
-							} ) =>
-								setAttributes(
-									getUpdatedLinkAttributes( {
-										rel,
-										url: newURL,
-										opensInNewTab: newOpensInNewTab,
-										nofollow: newNofollow,
-									} )
-								)
-							}
+							handleEntities
+							onChange={ ( newValue ) => {
+								const isEntityLink =
+									newValue?.id !== undefined &&
+									newValue?.id !== null &&
+									( newValue?.kind === 'post-type' ||
+										newValue?.kind === 'taxonomy' );
+
+								const attrs = getUpdatedLinkAttributes( {
+									rel,
+									url: newValue?.url ?? '',
+									opensInNewTab: newValue?.opensInNewTab,
+									nofollow: newValue?.nofollow,
+								} );
+
+								if ( isEntityLink ) {
+									setAttributes( attrs );
+									createBinding( newValue );
+								} else {
+									clearUrlBinding();
+									setAttributes( attrs );
+								}
+							} }
 							onRemove={ () => {
 								unlink();
 								richTextRef.current?.focus();

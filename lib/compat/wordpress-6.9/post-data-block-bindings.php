@@ -40,7 +40,19 @@ function gutenberg_block_bindings_post_data_get_value( array $source_args, $bloc
 		true
 	);
 
-	if ( $is_navigation_block ) {
+	$post_id = null;
+
+	if ( ! empty( $source_args['id'] ) ) {
+		$post_id = (int) $source_args['id'];
+		// get_post() resolves by ID alone; postType in args matches the editor contract
+		// (@wordpress/core-data needs postType + id) and allows validating the record.
+		if ( ! empty( $source_args['postType'] ) ) {
+			$actual_type = get_post_type( $post_id );
+			if ( ! $actual_type || $actual_type !== $source_args['postType'] ) {
+				return null;
+			}
+		}
+	} elseif ( $is_navigation_block ) {
 		// Navigation blocks: read from block attributes
 		$post_id = $block_instance->attributes['id'] ?? null;
 	} else {
