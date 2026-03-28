@@ -60,7 +60,7 @@ async function canAccessWPORG() {
 	if ( IS_OFFLINE !== undefined ) {
 		return IS_OFFLINE;
 	}
-	IS_OFFLINE = !! ( await dns.resolve( 'WordPress.org' ).catch( () => {} ) );
+	IS_OFFLINE = !! ( await dns.lookup( 'WordPress.org' ).catch( () => {} ) );
 	return IS_OFFLINE;
 }
 
