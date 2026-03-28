@@ -30,10 +30,7 @@ const DEFAULT_CONTROLS = {
  * @param {string} feature  Background feature to check.
  * @return {boolean}        Whether site settings has activated background panel.
  */
-export function useHasBackgroundControl(
-	settings,
-	feature = 'backgroundImage'
-) {
+export function useHasBackgroundControl( settings, feature ) {
 	return Platform.OS === 'web' && settings?.background?.[ feature ];
 }
 
@@ -148,18 +145,26 @@ export default function BackgroundImagePanel( {
 	);
 	const showBackgroundGradientControl =
 		hasGradientColors && hasBackgroundGradientControl;
-	const showBackgroundImageControl = useHasBackgroundControl( settings );
+	const showBackgroundImageControl = useHasBackgroundControl(
+		settings,
+		'backgroundImage'
+	);
 
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			background: {},
-			color: {
-				...previousValue?.color,
-				gradient: undefined,
-			},
-		};
-	}, [] );
+	const resetAllFilter = useCallback(
+		( previousValue ) => {
+			return {
+				...previousValue,
+				background: {},
+				color: hasBackgroundGradientControl
+					? {
+							...previousValue?.color,
+							gradient: undefined,
+					  }
+					: previousValue?.color,
+			};
+		},
+		[ hasBackgroundGradientControl ]
+	);
 
 	if ( ! showBackgroundGradientControl && ! showBackgroundImageControl ) {
 		return null;
