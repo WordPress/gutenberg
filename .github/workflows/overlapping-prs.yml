@@ -50,6 +50,11 @@ jobs:
 
                       // Parse hunk headers from a patch string.
                       // Returns an array of { start, end } line ranges (base side).
+                      // Note: this compares base-side line ranges, so it catches edits
+                      // to the same original lines. It may miss pure insertions at the
+                      // same point if the base-side context ranges don't overlap (e.g.
+                      // two PRs both inserting at line 100 but with ,0 count). This is
+                      // acceptable since the tool is a heads-up, not a merge-conflict detector.
                       function parseHunks( patch ) {
                         if ( ! patch ) {
                           return [];
@@ -104,30 +109,83 @@ jobs:
 
                       core.info( `This PR touches ${ changedFiles.size } file(s).` );
 
-                      // Get all open PRs (including drafts).
-                      const openPRs = [];
-                      for await ( const response of github.paginate.iterator(
-                        github.rest.pulls.list,
-                        {
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          state: 'open',
-                          per_page: 100,
-                        }
-                      ) ) {
-                        for ( const pr of response.data ) {
-                          if ( pr.number !== prNumber ) {
-                            openPRs.push( pr );
+                      // Marker used to identify the bot's comment for updates/deletion.
+                      const marker = '<!-- overlapping-prs-bot -->';
+
+                      // Helper to clean up a stale bot comment when there are no overlaps.
+                      async function deleteStaleComment() {
+                        const comments = await github.paginate(
+                          github.rest.issues.listComments,
+                          {
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            issue_number: prNumber,
+                            per_page: 100,
                           }
+                        );
+                        const existing = comments.find( ( c ) => c.body && c.body.includes( marker ) );
+                        if ( existing ) {
+                          await github.rest.issues.deleteComment( {
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            comment_id: existing.id,
+                          } );
+                          core.info( 'Deleted stale overlapping PRs comment.' );
                         }
                       }
 
-                      core.info( `Found ${ openPRs.length } other open PR(s) to check.` );
+                      // Pre-filter: use the Search API to find PRs that touch the same files.
+                      // This avoids fetching patches for all 2000+ open PRs and blowing
+                      // through the API rate limit.
+                      const candidatePRs = new Map(); // PR number -> { number, title, ... }
+                      const ourFilenames = [ ...changedFiles.keys() ];
 
-                      // For each open PR, get its changed files and check for line overlaps.
+                      for ( const filename of ourFilenames ) {
+                        // Search for open PRs (excluding ours) that touch this file.
+                        // The search API is much cheaper than listing files for every PR.
+                        const query = `repo:${ context.repo.owner }/${ context.repo.repo } is:pr is:open "${ filename }" -number:${ prNumber }`;
+                        try {
+                          const searchResults = await github.rest.search.issuesAndPullRequests( {
+                            q: query,
+                            per_page: 100,
+                          } );
+                          for ( const item of searchResults.data.items ) {
+                            if ( ! candidatePRs.has( item.number ) ) {
+                              candidatePRs.set( item.number, {
+                                number: item.number,
+                                title: item.title,
+                                draft: item.draft,
+                                author: item.user.login,
+                                html_url: item.html_url,
+                              } );
+                            }
+                          }
+                        } catch ( e ) {
+                          core.warning( `Search failed for file "${ filename }": ${ e.message }` );
+                        }
+                      }
+
+                      core.info( `Search found ${ candidatePRs.size } candidate PR(s) sharing filenames.` );
+
+                      if ( candidatePRs.size === 0 ) {
+                        core.info( 'No candidate PRs found — skipping patch comparison.' );
+                        await deleteStaleComment();
+                        return;
+                      }
+
+                      // Check rate limit before the expensive part.
+                      const rateLimit = await github.rest.rateLimit.get();
+                      const remaining = rateLimit.data.resources.core.remaining;
+                      core.info( `API rate limit remaining: ${ remaining }` );
+                      if ( remaining < 500 ) {
+                        core.warning( `Rate limit too low (${ remaining } remaining) — skipping patch comparison.` );
+                        return;
+                      }
+
+                      // For each candidate PR, get its changed files and check for line overlaps.
                       const overlapping = [];
 
-                      for ( const pr of openPRs ) {
+                      for ( const [ , pr ] of candidatePRs ) {
                         const prFiles = [];
                         for await ( const response of github.paginate.iterator(
                           github.rest.pulls.listFiles,
@@ -162,37 +220,18 @@ jobs:
                             title: pr.title,
                             url: pr.html_url,
                             draft: pr.draft,
-                            author: pr.user.login,
+                            author: pr.author,
                             sharedFiles: filesWithOverlap,
                           } );
                         }
                       }
 
                       // Build comment body.
-                      const marker = '<!-- overlapping-prs-bot -->';
                       let body;
 
                       if ( overlapping.length === 0 ) {
                         core.info( 'No overlapping PRs found.' );
-                        // Remove existing comment if no overlaps remain.
-                        const comments = await github.paginate(
-                          github.rest.issues.listComments,
-                          {
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
-                            issue_number: prNumber,
-                            per_page: 100,
-                          }
-                        );
-                        const existing = comments.find( ( c ) => c.body.includes( marker ) );
-                        if ( existing ) {
-                          await github.rest.issues.deleteComment( {
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
-                            comment_id: existing.id,
-                          } );
-                          core.info( 'Deleted stale overlapping PRs comment.' );
-                        }
+                        await deleteStaleComment();
                         return;
                       }
 
@@ -221,7 +260,7 @@ jobs:
                           per_page: 100,
                         }
                       );
-                      const existing = comments.find( ( c ) => c.body.includes( marker ) );
+                      const existing = comments.find( ( c ) => c.body && c.body.includes( marker ) );
 
                       if ( existing ) {
                         await github.rest.issues.updateComment( {
