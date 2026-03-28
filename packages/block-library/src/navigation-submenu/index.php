@@ -74,7 +74,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		return '';
 	}
 
-	//  The build system prefixes this function with "gutenberg_" to avoid
+	// The build system prefixes this function with "gutenberg_" to avoid
 	// collisions with the core version. Until this function is backported to
 	// core, we need to guard it's use and only call the prefixed name in
 	//  the plugin.
