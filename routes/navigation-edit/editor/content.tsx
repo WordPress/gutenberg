@@ -12,6 +12,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import { useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { useBlockLibraryPrivateApis } from '@wordpress/lazy-editor';
 
 /**
  * Internal dependencies
@@ -26,24 +27,6 @@ type Block = {
 };
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
-
-// block-library is loaded dynamically via useEditorAssets before this component renders.
-// Access NavigationLinkUI from its private-apis at runtime rather than via static import.
-function getNavigationLinkUI() {
-	const blockLibrary = (
-		window as Window & {
-			wp: {
-				blockLibrary: { privateApis: Parameters< typeof unlock >[ 0 ] };
-			};
-		}
-	 ).wp?.blockLibrary;
-	if ( ! blockLibrary ) {
-		return null;
-	}
-	const { NavigationLinkUI } = unlock( blockLibrary.privateApis );
-
-	return NavigationLinkUI as any;
-}
 
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
 const MAX_PAGE_COUNT = 100;
@@ -123,7 +106,8 @@ export default function NavigationMenuContent( {
 		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
 	);
 
-	const NavigationLinkUI = getNavigationLinkUI();
+	const blockLibraryPrivateApis = useBlockLibraryPrivateApis();
+	const NavigationLinkUI = blockLibraryPrivateApis?.NavigationLinkUI;
 
 	// The hidden block is needed because it makes block edit side effects trigger.
 	// For example a navigation page list load its items has an effect on edit to load its items.
