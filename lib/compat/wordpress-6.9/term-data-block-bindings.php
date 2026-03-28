@@ -24,20 +24,25 @@ function gutenberg_block_bindings_term_data_get_value( array $source_args, $bloc
 	}
 
 	/*
-	 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.
-	 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
+	 * Blocks that store entity references in their own attributes
+	 * rather than relying on block context.
 	 */
-	$block_name          = $block_instance->name ?? '';
-	$is_navigation_block = in_array(
+	$block_name                  = $block_instance->name ?? '';
+	$is_navigation_block         = in_array(
 		$block_name,
 		array( 'core/navigation-link', 'core/navigation-submenu' ),
 		true
 	);
+	$reads_entity_from_attributes = $is_navigation_block || 'core/button' === $block_name;
 
-	if ( $is_navigation_block ) {
-		// Navigation blocks: read from block attributes
+	if ( $reads_entity_from_attributes ) {
+		// These blocks store the entity ID in their own attributes.
 		$term_id = $block_instance->attributes['id'] ?? null;
-		$type    = $block_instance->attributes['type'] ?? '';
+		if ( $is_navigation_block ) {
+			$type = $block_instance->attributes['type'] ?? '';
+		} else {
+			$type = $block_instance->attributes['entityType'] ?? '';
+		}
 		// Map UI shorthand to taxonomy slug when using attributes.
 		$taxonomy = ( 'tag' === $type ) ? 'post_tag' : $type;
 	} else {

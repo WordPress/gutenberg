@@ -63,6 +63,15 @@
 		},
 		"gradient": {
 			"type": "string"
+		},
+		"id": {
+			"type": "number"
+		},
+		"kind": {
+			"type": "string"
+		},
+		"entityType": {
+			"type": "string"
 		}
 	},
 	"supports": {

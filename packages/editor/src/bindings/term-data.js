@@ -5,7 +5,15 @@ import { __ } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
-// Navigation block types that use special handling for backwards compatibility
+// Block types that store entity references in their own attributes
+// rather than relying on block context.
+const ENTITY_ATTRIBUTE_BLOCK_TYPES = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+	'core/button',
+];
+
+// Navigation block types need special handling (use 'type' attribute).
 const NAVIGATION_BLOCK_TYPES = [
 	'core/navigation-link',
 	'core/navigation-submenu',
@@ -58,20 +66,21 @@ export default {
 	getValues( { select, context, bindings, clientId } ) {
 		const { getEntityRecord } = select( coreDataStore );
 
-		/*
-		 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.
-		 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
-		 */
 		const { getBlockAttributes, getBlockName } = select( blockEditorStore );
 		const blockName = getBlockName( clientId );
-		const isNavigationBlock = NAVIGATION_BLOCK_TYPES.includes( blockName );
+		const readsEntityFromAttributes =
+			ENTITY_ATTRIBUTE_BLOCK_TYPES.includes( blockName );
 
 		let termDataValues;
 
-		if ( isNavigationBlock ) {
-			// Navigation blocks: read from block attributes
+		if ( readsEntityFromAttributes ) {
+			// These blocks store the entity ID in their own attributes.
 			const blockAttributes = getBlockAttributes( clientId );
-			const typeFromAttributes = blockAttributes?.type;
+			const isNavigationBlock =
+				NAVIGATION_BLOCK_TYPES.includes( blockName );
+			const typeFromAttributes = isNavigationBlock
+				? blockAttributes?.type
+				: blockAttributes?.entityType;
 			const taxonomy =
 				typeFromAttributes === 'tag' ? 'post_tag' : typeFromAttributes;
 			termDataValues = getEntityRecord(
@@ -89,7 +98,11 @@ export default {
 		}
 
 		// Fall back to context termData if available.
-		if ( ! termDataValues && context?.termData && ! isNavigationBlock ) {
+		if (
+			! termDataValues &&
+			context?.termData &&
+			! readsEntityFromAttributes
+		) {
 			termDataValues = context.termData;
 		}
 
@@ -132,9 +145,9 @@ export default {
 		const clientId = getSelectedBlockClientId();
 		const blockName = getBlockName( clientId );
 
-		// Navigaton block types are read-only.
-		// See https://github.com/WordPress/gutenberg/pull/72165.
-		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
+		// Entity-attribute blocks manage their bindings through their
+		// own UI, not through direct value editing.
+		if ( ENTITY_ATTRIBUTE_BLOCK_TYPES.includes( blockName ) ) {
 			return false;
 		}
 
@@ -156,14 +169,13 @@ export default {
 		const clientId = getSelectedBlockClientId();
 		const blockName = getBlockName( clientId );
 
-		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
-			// Navigation blocks: read from block attributes
+		if ( ENTITY_ATTRIBUTE_BLOCK_TYPES.includes( blockName ) ) {
+			// Entity-attribute blocks: read from block attributes
 			const blockAttributes = getBlockAttributes( clientId );
-			if (
-				! blockAttributes ||
-				! blockAttributes.id ||
-				! blockAttributes.type
-			) {
+			const typeAttr = NAVIGATION_BLOCK_TYPES.includes( blockName )
+				? blockAttributes?.type
+				: blockAttributes?.entityType;
+			if ( ! blockAttributes || ! blockAttributes.id || ! typeAttr ) {
 				return [];
 			}
 			return termDataFields;

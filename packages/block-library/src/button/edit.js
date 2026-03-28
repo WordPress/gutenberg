@@ -19,6 +19,7 @@ import {
 	RichText,
 	useBlockProps,
 	LinkControl,
+	useBlockBindingsUtils,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
@@ -134,10 +135,19 @@ function ButtonEdit( props ) {
 		text,
 		url,
 		metadata,
+		id: entityId,
+		kind,
+		entityType,
 	} = attributes;
 	const width = style?.dimensions?.width;
 
 	useDeprecatedTextAlign( props );
+
+	const { updateBlockBindings } = useBlockBindingsUtils();
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	const hasEntityBinding =
+		!! metadata?.bindings?.url && !! entityId && kind !== 'custom';
 
 	const TagName = tagName || 'a';
 
@@ -236,10 +246,16 @@ function ButtonEdit( props ) {
 	}
 
 	function unlink() {
-		setAttributes( {
+		if ( hasEntityBinding ) {
+			updateBlockBindings( { url: undefined } );
+		}
+		updateBlockAttributes( clientId, {
 			url: undefined,
 			linkTarget: undefined,
 			rel: undefined,
+			id: undefined,
+			kind: undefined,
+			entityType: undefined,
 		} );
 		setIsEditingURL( false );
 	}
@@ -253,8 +269,15 @@ function ButtonEdit( props ) {
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
 	const linkValue = useMemo(
-		() => ( { url, opensInNewTab, nofollow } ),
-		[ url, opensInNewTab, nofollow ]
+		() => ( {
+			url,
+			opensInNewTab,
+			nofollow,
+			...( entityId
+				? { id: entityId, kind, type: entityType }
+				: {} ),
+		} ),
+		[ url, opensInNewTab, nofollow, entityId, kind, entityType ]
 	);
 
 	const useEnterRef = useEnter( { content: text, clientId } );
@@ -366,7 +389,8 @@ function ButtonEdit( props ) {
 			</div>
 			{ hasBlockControls && (
 				<BlockControls group="block">
-					{ isLinkTag && ! lockUrlControls && (
+					{ isLinkTag &&
+					( ! lockUrlControls || hasEntityBinding ) && (
 						<ToolbarButton
 							name="link"
 							icon={ ! isURLSet ? link : linkOff }
@@ -385,7 +409,7 @@ function ButtonEdit( props ) {
 			{ isLinkTag &&
 				isSelected &&
 				( isEditingURL || isURLSet ) &&
-				! lockUrlControls && (
+				( ! lockUrlControls || hasEntityBinding ) && (
 					<Popover
 						placement="bottom"
 						onClose={ () => {
@@ -403,16 +427,58 @@ function ButtonEdit( props ) {
 								url: newURL,
 								opensInNewTab: newOpensInNewTab,
 								nofollow: newNofollow,
-							} ) =>
-								setAttributes(
+								id: newId,
+								kind: newKind,
+								type: newEntityType,
+							} ) => {
+								const linkAttrs =
 									getUpdatedLinkAttributes( {
 										rel,
 										url: newURL,
 										opensInNewTab: newOpensInNewTab,
 										nofollow: newNofollow,
-									} )
-								)
-							}
+									} );
+
+								const isEntityLink =
+									!! newId &&
+									!! newKind &&
+									newKind !== 'custom';
+
+								if ( isEntityLink ) {
+									// Use updateBlockAttributes directly
+									// to bypass bound-attribute interception.
+									updateBlockAttributes( clientId, {
+										linkTarget: linkAttrs.linkTarget,
+										rel: linkAttrs.rel,
+										id: newId,
+										kind: newKind,
+										entityType: newEntityType,
+									} );
+									const source =
+										newKind === 'taxonomy'
+											? 'core/term-data'
+											: 'core/post-data';
+									updateBlockBindings( {
+										url: {
+											source,
+											args: { field: 'link' },
+										},
+									} );
+								} else {
+									// Custom URL: clear entity binding.
+									if ( hasEntityBinding ) {
+										updateBlockBindings( {
+											url: undefined,
+										} );
+									}
+									updateBlockAttributes( clientId, {
+										...linkAttrs,
+										id: undefined,
+										kind: undefined,
+										entityType: undefined,
+									} );
+								}
+							} }
 							onRemove={ () => {
 								unlink();
 								richTextRef.current?.focus();
