@@ -83,7 +83,7 @@ function BlockFields( {
 			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
 			return Object.entries( _attributes.metadata.bindings ).reduce(
 				( acc, [ attribute, binding ] ) => {
-					const source = getBlockBindingsSource( binding.source );
+					const source = getBlockBindingsSource( binding?.source );
 					if ( ! source ) {
 						return acc;
 					}
