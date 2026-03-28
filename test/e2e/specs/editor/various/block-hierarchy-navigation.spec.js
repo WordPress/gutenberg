@@ -84,6 +84,9 @@ test.describe( 'Navigating the block hierarchy', () => {
 
 		await column.last().click();
 
+		// Activate the block to transfer focus to the canvas.
+		await page.keyboard.press( 'Enter' );
+
 		// Open the block inserter.
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Enter' );
