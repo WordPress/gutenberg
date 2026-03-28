@@ -365,7 +365,7 @@ export default function PostFeaturedImageEdit( {
 						{ ! storedFeaturedImage && (
 							<ToolsPanelItem
 								label={ __(
-									'Feature the first image from the post'
+									'Feature the first image'
 								) }
 								isShownByDefault
 								hasValue={ () => !! useFirstImageFromPost }
@@ -377,10 +377,10 @@ export default function PostFeaturedImageEdit( {
 							>
 								<ToggleControl
 									label={ __(
-										'Feature the first image from the post'
+										'Feature the first image'
 									) }
 									help={ __(
-										'Use the first image in the post content as the featured image if no featured image is set.'
+										'Use the first image in the post content as the featured image.'
 									) }
 									onChange={ () =>
 										setAttributes( {
