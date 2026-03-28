@@ -197,15 +197,28 @@ function ButtonEdit( props ) {
 				metadata?.bindings?.url?.source
 			);
 
+			const urlBinding = metadata?.bindings?.url;
+			// Entity links store id/postType or taxonomy in binding args; the URL is
+			// updated via LinkControl (updateBlockBindings), not contextual setValues.
+			// canUserEditValue is false for args.id on these sources, which would hide
+			// the link UI—keep it available like Navigation Link.
+			const isEntityPostOrTermUrlBinding =
+				urlBinding &&
+				( urlBinding.source === 'core/post-data' ||
+					urlBinding.source === 'core/term-data' ) &&
+				urlBinding.args?.id !== undefined &&
+				urlBinding.args?.id !== null;
+
 			return {
 				createPageEntity: _settings.__experimentalCreatePageEntity,
 				userCanCreatePages: _settings.__experimentalUserCanCreatePages,
 				lockUrlControls:
-					!! metadata?.bindings?.url &&
+					!! urlBinding &&
+					! isEntityPostOrTermUrlBinding &&
 					! blockBindingsSource?.canUserEditValue?.( {
 						select,
 						context,
-						args: metadata?.bindings?.url?.args,
+						args: urlBinding?.args,
 					} ),
 			};
 		},
