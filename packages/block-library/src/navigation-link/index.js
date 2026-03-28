@@ -130,19 +130,25 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 				type: item.type,
 				binding: item.metadata?.bindings?.url,
 			} ),
-			setValue: ( { item, value } ) => ( {
-				url: value.url,
-				id: value.id,
-				kind: value.kind,
-				type: value.type,
-				metadata: {
-					...item.metadata,
-					bindings: {
-						...item.metadata?.bindings,
-						url: value.binding,
+			setValue: ( { item, value } ) => {
+				const { url: _urlBinding, ...remainingBindings } =
+					item.metadata?.bindings ?? {};
+				const newBindings = value.binding
+					? { ...remainingBindings, url: value.binding }
+					: remainingBindings;
+				return {
+					url: value.url,
+					id: value.id,
+					kind: value.kind,
+					type: value.type,
+					metadata: {
+						...item.metadata,
+						bindings: Object.keys( newBindings ).length
+							? newBindings
+							: undefined,
 					},
-				},
-			} ),
+				};
+			},
 		},
 		{
 			id: 'opensInNewTab',
