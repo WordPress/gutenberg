@@ -266,7 +266,7 @@ export default async function fetchLinkSuggestions(
 export function sortResults( results: SearchResult[], search: string ) {
 	const searchTokens = tokenize( search );
 
-	const scores = {};
+	const scores: Record< string, number > = {};
 	for ( const result of results ) {
 		if ( result.title ) {
 			const titleTokens = tokenize( result.title );
@@ -298,7 +298,44 @@ export function sortResults( results: SearchResult[], search: string ) {
 		}
 	}
 
-	return results.sort( ( a, b ) => scores[ b.id ] - scores[ a.id ] );
+	return results.sort( ( a, b ) => {
+		const scoreDiff = scores[ b.id ] - scores[ a.id ];
+		if ( scoreDiff !== 0 ) {
+			return scoreDiff;
+		}
+		// When scores are tied (e.g. initial suggestions with no search query),
+		// use content type priority: pages > posts > other post types > categories > tags > media.
+		return getTypePriority( a ) - getTypePriority( b );
+	} );
+}
+
+/**
+ * Returns a priority value for a search result based on its content type.
+ * Lower values indicate higher priority.
+ *
+ * @param result
+ */
+function getTypePriority( result: SearchResult ): number {
+	const { type, kind } = result;
+	if ( type === 'page' ) {
+		return 0;
+	}
+	if ( type === 'post' ) {
+		return 1;
+	}
+	// Other post types (custom post types).
+	if ( kind === 'post-type' ) {
+		return 2;
+	}
+	if ( type === 'category' ) {
+		return 3;
+	}
+	// Tags and other taxonomies.
+	if ( kind === 'taxonomy' ) {
+		return 4;
+	}
+	// Media/attachments and everything else.
+	return 5;
 }
 
 /**

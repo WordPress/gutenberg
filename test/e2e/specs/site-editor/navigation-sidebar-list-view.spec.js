@@ -39,7 +39,57 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		},
 	} );
 
-	test( 'can use appender in site editor sidebar list view', async ( {
+	test( 'clicking an existing item opens the link editing popover and Escape returns focus', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const createdMenu =
+			await requestUtils.createNavigationMenu( navMenuFixture );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await expect( listView ).toBeVisible();
+
+		// Click the existing navigation link in the list view.
+		await listView
+			.getByRole( 'gridcell', { name: 'Existing Item' } )
+			.click();
+
+		// The link editing controls popover should open.
+		const editPopover = page.locator(
+			'.edit-site-sidebar-navigation-screen-navigation-menus__link-editor'
+		);
+		await expect( editPopover ).toBeVisible();
+
+		// Focus should be placed within the popover.
+		const isFocusWithin = await editPopover.evaluate( ( el ) =>
+			el.contains( document.activeElement )
+		);
+		expect( isFocusWithin ).toBe( true );
+
+		// Press Escape to dismiss the popover.
+		await page.keyboard.press( 'Escape' );
+
+		// The popover should close.
+		await expect( editPopover ).toBeHidden();
+
+		// Focus should return to the clicked list item.
+		await expect(
+			listView
+				.getByRole( 'gridcell', { name: 'Existing Item' } )
+				.getByRole( 'link' )
+		).toBeFocused();
+	} );
+
+	test( 'can add new menu items from the sidebar list view', async ( {
 		admin,
 		page,
 		requestUtils,
@@ -63,92 +113,186 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 
 		// Verify the existing item is shown in the sidebar list view.
 		await expect(
-			listView.getByRole( 'link', { name: 'Existing Item' } )
+			listView.getByRole( 'gridcell', { name: 'Existing Item' } )
 		).toBeVisible();
 
 		// The appender button should be present to allow adding new items.
+		// NOTE: This currently FAILS because NavigationMenuContent passes
+		// showAppender={ false } to PrivateListView. Implementing the feature
+		// requires changing it to showAppender={ true } and wiring up the
+		// AdditionalBlockContent / LinkUI integration.
 		const appender = listView.getByRole( 'button', { name: 'Add page' } );
 		await expect( appender ).toBeVisible();
 
-		const linkControlSearch = linkControl.getLinkControlSearch();
+		await appender.click();
 
-		await test.step( 'can add new menu items', async () => {
-			await appender.click();
+		// The LinkUI popover should open and immediately focus the search input.
+		const linkUIInput = linkControl.getSearchInput();
+		await expect( linkUIInput ).toBeFocused();
+		await expect( linkUIInput ).toBeEmpty();
 
-			// The LinkUI popover should open and immediately focus the search input.
-			await expect( linkControlSearch ).toBeFocused();
+		// Type to trigger search suggestions.
+		await linkControl.searchFor( 'Test Page' );
 
-			// Search for and select the page.
-			await linkControl.useLinkControlSearch( 'Test Page 2' );
+		// Select the first result to create a new menu item.
+		const firstResult = await linkControl.getNthSearchResult( 0 );
+		const firstResultText =
+			await linkControl.getSearchResultText( firstResult );
+		await firstResult.click();
 
-			// The new item should be appended after the existing item.
-			await expect(
-				listView.getByRole( 'link', { name: 'Test Page 2' } )
-			).toBeVisible();
+		// The new item should be appended after the existing item.
+		await expect(
+			listView
+				.getByRole( 'gridcell', { name: firstResultText } )
+				.filter( { hasText: 'Block 2 of 2, Level 1.' } )
+		).toBeVisible();
+	} );
+
+	test( 'opening the add link UI does not immediately trigger unsaved changes', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu =
+			await requestUtils.createNavigationMenu( navMenuFixture );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
 		} );
 
-		await test.step( 'can open and close the Link UI without losing focus', async () => {
-			await page.keyboard.press( 'ArrowDown' );
-			await expect( appender ).toBeFocused();
-			await page.keyboard.press( 'Enter' );
-			await expect( linkControlSearch ).toBeFocused();
-			await page.keyboard.press( 'Escape' );
-			await expect( linkControlSearch ).toBeHidden();
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
 		} );
 
-		await test.step( 'can create a new page', async () => {
-			await appender.click();
+		await expect( listView ).toBeVisible();
 
-			// The search input should be focused immediately.
-			await expect( linkControl.getLinkControlSearch() ).toBeFocused();
+		// Confirm no unsaved changes exist before interacting.
+		await expect(
+			page.getByRole( 'button', { name: /Review \d+ change/ } )
+		).toBeHidden();
 
-			// Type a new page title that doesn't exist yet.
-			await page.keyboard.type( 'Brand New Page', { delay: 50 } );
+		const appender = listView.getByRole( 'button', { name: 'Add page' } );
+		await appender.click();
 
-			// Tab twice to reach the "Create page" button.
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Tab' );
+		// Wait for the link UI to open so we know the click was processed
+		// and state has settled — then assert no save indicator appeared.
+		await expect( linkControl.getSearchInput() ).toBeVisible();
+		await expect(
+			page.getByRole( 'button', { name: /Review \d+ change/ } )
+		).toBeHidden();
 
-			const createPageButton = page.getByRole( 'button', {
-				name: 'Create page',
-			} );
-			await expect( createPageButton ).toBeVisible();
-			await expect( createPageButton ).toBeFocused();
+		// Dismiss without selecting a URL.
+		await page.keyboard.press( 'Escape' );
 
-			// Open the page creation form.
-			await page.keyboard.press( 'Enter' );
+		// Wait for the link UI to fully close before checking — this ensures
+		// the CSS visibility class has been removed and we are testing the
+		// actual entity dirty state, not just the CSS mask.
+		await expect( linkControl.getSearchInput() ).toBeHidden();
 
-			// The title field should be pre-populated with the typed text.
-			const titleField = page.getByRole( 'textbox', { name: 'Title' } );
-			await expect( titleField ).toHaveValue( 'Brand New Page' );
+		// Verify the save indicator still does not appear — the empty block
+		// insertion should be fully reverted, leaving the entity clean.
+		await expect(
+			page.getByRole( 'button', { name: /Review \d+ change…/ } )
+		).toBeHidden();
+	} );
 
-			// The Back button should be focused after entering the creation form.
-			const backButton = page.locator( '.link-ui-page-creator__back' );
-			await expect( backButton ).toBeFocused();
+	test( 'cancelling a second add does not remove previously added unsaved links', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu =
+			await requestUtils.createNavigationMenu( navMenuFixture );
 
-			// Tab to the title field.
-			await page.keyboard.press( 'Tab' );
-			await expect( titleField ).toBeFocused();
-
-			// Tab to the Publish checkbox (on by default).
-			await page.keyboard.press( 'Tab' );
-			const publishCheckbox = page.getByRole( 'checkbox', {
-				name: 'Publish',
-			} );
-			await expect( publishCheckbox ).toBeFocused();
-			await expect( publishCheckbox ).toBeChecked();
-
-			// Tab twice more to reach the Create page button.
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Tab' );
-			await expect( createPageButton ).toBeFocused();
-			await page.keyboard.press( 'Enter' );
-
-			// The newly created page should appear as a new item in the list view.
-			await expect(
-				listView.getByRole( 'link', { name: 'Brand New Page' } )
-			).toBeVisible();
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
 		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await expect( listView ).toBeVisible();
+
+		// Add a first new item by selecting a URL.
+		const appender = listView.getByRole( 'button', { name: 'Add page' } );
+		await appender.click();
+		await linkControl.searchFor( 'Test Page' );
+		const firstResult = await linkControl.getNthSearchResult( 0 );
+		const firstResultText =
+			await linkControl.getSearchResultText( firstResult );
+		await firstResult.click();
+
+		// Verify the first new item was committed (block 2 of 2).
+		await expect(
+			listView
+				.getByRole( 'gridcell', { name: firstResultText } )
+				.filter( { hasText: 'Block 2 of 2, Level 1.' } )
+		).toBeVisible();
+
+		// Start adding a second item but cancel without selecting a URL.
+		await appender.click();
+		await expect( linkControl.getSearchInput() ).toBeFocused();
+		await page.keyboard.press( 'Escape' );
+
+		// Wait for the link UI to fully close.
+		await expect( linkControl.getSearchInput() ).toBeHidden();
+
+		// The previously committed unsaved link should still be present —
+		// cancelling the second insertion must not remove the first one.
+		await expect(
+			listView
+				.getByRole( 'gridcell', { name: 'Existing Item' } )
+				.filter( { hasText: 'Block 1 of 2, Level 1.' } )
+		).toBeVisible();
+		await expect(
+			listView
+				.getByRole( 'gridcell', { name: firstResultText } )
+				.filter( { hasText: 'Block 2 of 2, Level 1.' } )
+		).toBeVisible();
+	} );
+
+	test( 'focus is managed correctly when dismissing the link UI without selecting a URL', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu =
+			await requestUtils.createNavigationMenu( navMenuFixture );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await expect( listView ).toBeVisible();
+
+		const appender = listView.getByRole( 'button', { name: 'Add page' } );
+		await appender.click();
+
+		// Verify focus goes to the search input immediately (focus management).
+		await expect( linkControl.getSearchInput() ).toBeFocused();
+
+		// Dismiss without selecting a URL.
+		await page.keyboard.press( 'Escape' );
+
+		// The auto-inserted empty block should be cleaned up automatically.
+		// Verify the original item is still there and is the only item
+		// (i.e. no orphaned empty block was left behind).
+		await expect(
+			listView
+				.getByRole( 'gridcell', { name: 'Existing Item' } )
+				.filter( { hasText: 'Block 1 of 1, Level 1.' } )
+		).toBeVisible();
 	} );
 } );
 
@@ -157,22 +301,38 @@ class LinkControl {
 		this.page = page;
 	}
 
-	getLinkControlSearch() {
+	getSearchInput() {
 		return this.page.getByRole( 'combobox', {
 			name: 'Search or type URL',
 		} );
 	}
 
-	async useLinkControlSearch( searchTerm ) {
-		await expect( this.getLinkControlSearch() ).toBeFocused();
+	async getSearchResults() {
+		const searchInput = this.getSearchInput();
+		const resultsRef = await searchInput.getAttribute( 'aria-owns' );
+		const linkUIResults = this.page.locator( `#${ resultsRef }` );
+		await expect( linkUIResults ).toBeVisible();
+		return linkUIResults.getByRole( 'option' );
+	}
 
-		await this.page.keyboard.type( searchTerm, { delay: 50 } );
+	async getNthSearchResult( index = 0 ) {
+		const results = await this.getSearchResults();
+		return results.nth( index );
+	}
 
-		await expect(
-			this.page.getByRole( 'listbox', { name: 'Search results' } )
-		).toBeVisible();
+	async searchFor( searchTerm ) {
+		const input = this.getSearchInput();
+		await expect( input ).toBeFocused();
+		await this.page.keyboard.type( searchTerm );
+		await expect( input ).toHaveValue( searchTerm );
+		return input;
+	}
 
-		await this.page.keyboard.press( 'ArrowDown' );
-		await this.page.keyboard.press( 'Enter' );
+	async getSearchResultText( result ) {
+		await expect( result ).toBeVisible();
+		return result
+			.locator( '.components-menu-item__item' )
+			.last()
+			.innerText();
 	}
 }

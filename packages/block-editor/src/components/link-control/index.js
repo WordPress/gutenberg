@@ -181,6 +181,7 @@ function LinkControl( {
 	hasTextControl = false,
 	renderControlBottom = null,
 	handleEntities = false,
+	fetchSuggestions = null,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -701,6 +702,7 @@ function LinkControl( {
 							hideLabelFromVision={ ! showTextControl }
 							isEntity={ isEntity }
 							customValidity={ customValidity }
+							fetchSuggestions={ fetchSuggestions }
 							suffix={
 								<SearchSuffixControl
 									isEntity={ isEntity }

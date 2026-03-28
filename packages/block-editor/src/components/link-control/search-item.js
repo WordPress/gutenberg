@@ -47,6 +47,8 @@ function SearchItemIcon( { isURL, suggestion } ) {
 
 	if ( isURL ) {
 		icon = globe;
+	} else if ( suggestion.kind === 'block' && suggestion.icon ) {
+		icon = suggestion.icon?.src ?? suggestion.icon;
 	} else if ( suggestion.type in TYPES ) {
 		icon = TYPES[ suggestion.type ].icon;
 		if ( suggestion.type === 'page' ) {
