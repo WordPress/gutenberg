@@ -65,7 +65,7 @@ Once all the test suites are executed, a summary report is printed.
 
 ## Tracking performance using CodeVitals.
 
-The performance results for each commit are pushed to codevitals and can be seen on the [Gutenberg dashboard there](https://www.codevitals.run/project/gutenberg). The graphs allow us to track the evolution of a given metric over time.
+The performance results for each commit are pushed to codevitals and can be seen on the [Gutenberg dashboard there](https://codevitals.run/public/WordPress/gutenberg/metrics). The graphs allow us to track the evolution of a given metric over time.
 
 It's thus very important to ensure that the metric being computed is stable. Meaning, if you run the same test twice with the same code and environment, you'll get results that are close.
 
