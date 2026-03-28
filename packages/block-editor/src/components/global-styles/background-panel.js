@@ -154,6 +154,10 @@ export default function BackgroundImagePanel( {
 		return {
 			...previousValue,
 			background: {},
+			color: {
+				...previousValue?.color,
+				gradient: undefined,
+			},
 		};
 	}, [] );
 
@@ -184,26 +188,38 @@ export default function BackgroundImagePanel( {
 			)
 		);
 
-	const resetGradient = () =>
-		onChange(
-			setImmutably( value, [ 'background', 'gradient' ], undefined )
+	const resetGradient = () => {
+		let newValue = setImmutably(
+			value,
+			[ 'background', 'gradient' ],
+			undefined
 		);
+		newValue = setImmutably( newValue, [ 'color', 'gradient' ], undefined );
+		onChange( newValue );
+	};
 
 	// Get current gradient value, decoding preset slug references.
-	const currentGradient = decodeValue( value?.background?.gradient );
+	// Fall back to color.gradient for legacy blocks that haven't migrated
+	// to background.gradient yet (mirrors block inspector fallback in
+	// packages/block-editor/src/hooks/background.js).
+	const currentGradient = decodeValue(
+		value?.background?.gradient ?? value?.color?.gradient
+	);
 	const inheritedGradient = decodeValue(
-		inheritedValue?.background?.gradient
+		inheritedValue?.background?.gradient ?? inheritedValue?.color?.gradient
 	);
 
 	// Set gradient value, encoding preset matches as slug references.
+	// Also clear color.gradient to migrate from the legacy location,
+	// matching the block inspector behavior in hooks/background.js.
 	const setGradient = ( newGradient ) => {
-		onChange(
-			setImmutably(
-				value,
-				[ 'background', 'gradient' ],
-				encodeGradientValue( newGradient )
-			)
+		let newValue = setImmutably(
+			value,
+			[ 'background', 'gradient' ],
+			encodeGradientValue( newGradient )
 		);
+		newValue = setImmutably( newValue, [ 'color', 'gradient' ], undefined );
+		onChange( newValue );
 	};
 
 	return (

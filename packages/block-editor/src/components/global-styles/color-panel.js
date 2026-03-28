@@ -573,7 +573,10 @@ export default function ColorPanel( {
 			hasValue: hasBackground,
 			resetValue: resetBackground,
 			isShownByDefault: defaultControls.background,
-			indicators: [ gradient ?? backgroundColor ],
+			indicators: [
+				( showGradientColors ? gradient : undefined ) ??
+					backgroundColor,
+			],
 			tabs: [
 				hasSolidColors && {
 					key: 'background',
