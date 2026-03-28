@@ -2,16 +2,13 @@
  * Editor and frontend styles for the Icon Block.
  */
 
-.wp-block[data-align="center"] > .wp-block-icon {
-	text-align: center;
-}
-
 /* Icon Block styles. */
 .wp-block-icon {
 	line-height: 0;
 
 	&.aligncenter {
-		text-align: center;
+		display: flex;
+		justify-content: center;
 	}
 
 	svg {
