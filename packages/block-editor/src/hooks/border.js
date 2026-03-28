@@ -23,6 +23,7 @@ import {
 	cleanEmptyObject,
 	shouldSkipSerialization,
 	useBlockSettings,
+	buildStateResetAllFilter,
 } from './utils';
 import {
 	useHasBorderPanel,
@@ -116,9 +117,21 @@ function attributesToStyle( attributes ) {
 	};
 }
 
-function BordersInspectorControl( { label, children, resetAllFilter } ) {
+function BordersInspectorControl( {
+	label,
+	children,
+	resetAllFilter,
+	selectedState = 'default',
+} ) {
+	const isStateSelected = selectedState !== 'default';
 	const attributesResetAllFilter = useCallback(
 		( attributes ) => {
+			if ( isStateSelected ) {
+				return buildStateResetAllFilter(
+					selectedState,
+					resetAllFilter
+				)( attributes );
+			}
 			const existingStyle = attributesToStyle( attributes );
 			const updatedStyle = resetAllFilter( existingStyle );
 			return {
@@ -126,7 +139,7 @@ function BordersInspectorControl( { label, children, resetAllFilter } ) {
 				...styleToAttributes( updatedStyle ),
 			};
 		},
-		[ resetAllFilter ]
+		[ isStateSelected, selectedState, resetAllFilter ]
 	);
 
 	return (
@@ -148,7 +161,7 @@ export function BorderPanel( {
 	selectedState = 'default',
 } ) {
 	const isEnabled = useHasBorderPanel( settings );
-	const isStateMode = !! ( selectedState && selectedState !== 'default' );
+	const isStateSelected = !! ( selectedState && selectedState !== 'default' );
 	const { style, borderColor } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
@@ -162,13 +175,13 @@ export function BorderPanel( {
 		[ clientId, isEnabled ]
 	);
 	const value = useMemo( () => {
-		if ( isStateMode ) {
+		if ( isStateSelected ) {
 			return style?.[ selectedState ];
 		}
 		return attributesToStyle( { style, borderColor } );
-	}, [ isStateMode, selectedState, style, borderColor ] );
+	}, [ isStateSelected, selectedState, style, borderColor ] );
 
-	const onChange = isStateMode
+	const onChange = isStateSelected
 		? ( newStateStyle ) =>
 				setAttributes( {
 					style: cleanEmptyObject( {
@@ -179,6 +192,19 @@ export function BorderPanel( {
 		: ( newStyle ) => {
 				setAttributes( styleToAttributes( newStyle ) );
 		  };
+
+	const BorderWrapper = useMemo(
+		() =>
+			function BorderWrapperComponent( props ) {
+				return (
+					<BordersInspectorControl
+						{ ...props }
+						selectedState={ selectedState }
+					/>
+				);
+			},
+		[ selectedState ]
+	);
 
 	if ( ! isEnabled ) {
 		return null;
@@ -197,7 +223,7 @@ export function BorderPanel( {
 
 	return (
 		<StylesBorderPanel
-			as={ BordersInspectorControl }
+			as={ BorderWrapper }
 			panelId={ clientId }
 			settings={ settings }
 			value={ value }

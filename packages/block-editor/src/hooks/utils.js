@@ -50,6 +50,30 @@ export const cleanEmptyObject = ( object ) => {
 		: Object.fromEntries( cleanedNestedObjects );
 };
 
+/**
+ * Builds a `resetAllFilter` for use with `<InspectorControls>` when a
+ * non-default interactive state (e.g. `:hover`) is active. Rather than
+ * resetting the whole block style object, it scopes the reset to the
+ * sub-key that stores styles for that state, leaving default styles intact.
+ *
+ * @param {string}   selectedState    The active state key, e.g. ':hover'.
+ * @param {Function} innerResetFilter The panel's own resetAllFilter callback.
+ * @return {Function} A filter that takes block `attributes` and returns updated attributes.
+ */
+export function buildStateResetAllFilter( selectedState, innerResetFilter ) {
+	return ( attributes ) => {
+		const existingStateStyle = attributes.style?.[ selectedState ] || {};
+		const updatedStateStyle = innerResetFilter( existingStateStyle );
+		return {
+			...attributes,
+			style: cleanEmptyObject( {
+				...attributes.style,
+				[ selectedState ]: updatedStateStyle,
+			} ),
+		};
+	};
+}
+
 export function transformStyles(
 	activeSupports,
 	migrationPaths,
