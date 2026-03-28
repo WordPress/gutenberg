@@ -74,22 +74,15 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	}
 
 	$processor = new WP_HTML_Tag_Processor( $block_content );
-	$found     = false;
 	if ( $target_class ) {
 		while ( $processor->next_tag() ) {
 			if ( $processor->has_class( $target_class ) ) {
 				$processor->add_class( $unique_class );
-				$found = true;
 				break;
 			}
 		}
-	}
-	if ( ! $found ) {
-		// No target class found or no selectors.root — add to the wrapper.
-		$processor = new WP_HTML_Tag_Processor( $block_content );
-		if ( $processor->next_tag() ) {
-			$processor->add_class( $unique_class );
-		}
+	} elseif ( $processor->next_tag() ) {
+		$processor->add_class( $unique_class );
 	}
 	$block_content = $processor->get_updated_html();
 
