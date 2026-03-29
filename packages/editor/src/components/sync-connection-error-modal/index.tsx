@@ -53,8 +53,6 @@ export interface SyncConnectionErrorModalProps {
 /**
  * Default sync connection modal component.
  *
- * Can be replaced or wrapped via the `editor.SyncConnectionErrorModal` filter.
- *
  * @param props - SyncConnectionErrorModalProps.
  */
 function DefaultSyncConnectionErrorModal(
@@ -154,8 +152,8 @@ function DefaultSyncConnectionErrorModal(
 }
 
 /**
- * Filtered version of the sync connection modal, allowing third-party
- * plugins to replace the default modal via:
+ * Filtered version of the sync connection error modal, allowing third-party
+ * plugins to replace or wrap the default modal via:
  *
  * ```js
  * wp.hooks.addFilter(
