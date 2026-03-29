@@ -204,6 +204,7 @@ function DimensionsToolsPanel( {
 			label={ __( 'Dimensions' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			className="dimensions-block-support-panel"
 			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }

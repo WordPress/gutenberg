@@ -80,6 +80,7 @@ function BackgroundToolsPanel( {
 			label={ headerLabel }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			className="background-block-support-panel"
 			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
