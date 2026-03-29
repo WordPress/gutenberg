@@ -1,0 +1,10 @@
+.comments-page {
+	.dataviews-wrapper {
+		// Ensure content column doesn't overflow
+		[data-field-id="content"] {
+			max-width: 400px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+	}
+}

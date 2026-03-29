@@ -10,4 +10,7 @@ export const route = {
 	title: async () => {
 		return __( 'Comments' );
 	},
+	inspector: ( { search }: { search: { commentIds?: string[] } } ) => {
+		return !! ( search?.commentIds?.length === 1 );
+	},
 };
