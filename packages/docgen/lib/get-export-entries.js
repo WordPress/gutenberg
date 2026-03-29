@@ -1,11 +1,22 @@
+const { types: babelTypes } = require( '@babel/core' );
+
+/**
+ * @typedef {Object} ExportEntryRecord
+ * @property {string?} localName  the local name for the export, if any
+ * @property {string?} exportName the export name for the export, if any
+ * @property {string?} module     the module of the export, if any
+ * @property {number}  lineStart  the starting line of the export
+ * @property {number}  lineEnd    the ending line of the export
+ */
+
 /**
  * Returns the export entry records of the given export statement.
  * Unlike [the standard](http://www.ecma-international.org/ecma-262/9.0/#exportentry-record),
  * the `importName` and the `localName` are merged together.
  *
- * @param {Object} token Espree node representing an export.
+ * @param {import('@babel/types').Node} token Espree node representing an export.
  *
- * @return {Array} Exported entry records. Example:
+ * @return {ExportEntryRecord[]} Exported entry records. Example:
  * [ {
  *    localName: 'localName',
  *    exportName: 'exportedName',
@@ -15,7 +26,12 @@
  * } ]
  */
 module.exports = ( token ) => {
-	if ( token.type === 'ExportDefaultDeclaration' ) {
+	if ( babelTypes.isExportDefaultDeclaration( token ) ) {
+		/**
+		 *
+		 * @param {import('@babel/types').ExportDefaultDeclaration} t
+		 * @return {string} the local name of the export
+		 */
 		const getLocalName = ( t ) => {
 			let name;
 			switch ( t.declaration.type ) {
@@ -41,7 +57,7 @@ module.exports = ( token ) => {
 		];
 	}
 
-	if ( token.type === 'ExportAllDeclaration' ) {
+	if ( babelTypes.isExportAllDeclaration( token ) ) {
 		return [
 			{
 				localName: '*',

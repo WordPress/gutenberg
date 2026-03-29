@@ -1,3 +1,5 @@
+const { types: babelTypes } = require( '@babel/core' );
+
 /**
  * Internal dependencies
  */
@@ -10,15 +12,15 @@ const NAMESPACE_EXPORT = '*';
 const DEFAULT_EXPORT = 'default';
 
 const hasClassWithName = ( node, name ) =>
-	node.type === 'ClassDeclaration' && node.id.name === name;
+	babelTypes.isClassDeclaration( node ) && node.id.name === name;
 
 const hasFunctionWithName = ( node, name ) =>
-	node.type === 'FunctionDeclaration' && node.id.name === name;
+	babelTypes.isFunctionDeclaration( node ) && node.id.name === name;
 
 const hasVariableWithName = ( node, name ) =>
-	node.type === 'VariableDeclaration' &&
+	babelTypes.isVariableDeclaration( node ) &&
 	node.declarations.some( ( declaration ) => {
-		if ( declaration.id.type === 'ObjectPattern' ) {
+		if ( babelTypes.isObjectPattern( declaration.id ) ) {
 			return declaration.id.properties.some(
 				( property ) =>
 					property.key?.name === name ||
@@ -29,28 +31,26 @@ const hasVariableWithName = ( node, name ) =>
 	} );
 
 const hasNamedExportWithName = ( node, name ) =>
-	node.type === 'ExportNamedDeclaration' &&
+	babelTypes.isExportNamedDeclaration( node ) &&
 	( ( node.declaration && hasClassWithName( node.declaration, name ) ) ||
 		( node.declaration && hasFunctionWithName( node.declaration, name ) ) ||
 		( node.declaration && hasVariableWithName( node.declaration, name ) ) );
 
 const hasImportWithName = ( node, name ) =>
-	node.type === 'ImportDeclaration' &&
+	babelTypes.isImportDeclaration( node ) &&
 	node.specifiers.some( ( specifier ) => specifier.local.name === name );
-
-const isImportDeclaration = ( node ) => node.type === 'ImportDeclaration';
 
 const someImportMatchesName = ( name, token ) => {
 	let matches = false;
 	token.specifiers.forEach( ( specifier ) => {
 		if (
-			specifier.type === 'ImportDefaultSpecifier' &&
+			babelTypes.isImportDefaultSpecifier( specifier ) &&
 			name === 'default'
 		) {
 			matches = true;
 		}
 		if (
-			specifier.type === 'ImportSpecifier' &&
+			babelTypes.isImportSpecifier( specifier ) &&
 			name === specifier.imported.name
 		) {
 			matches = true;
@@ -60,8 +60,9 @@ const someImportMatchesName = ( name, token ) => {
 };
 
 const someEntryMatchesName = ( name, entry, token ) =>
-	( token.type === 'ExportNamedDeclaration' && entry.localName === name ) ||
-	( token.type === 'ImportDeclaration' &&
+	( babelTypes.isExportNamedDeclaration( token ) &&
+		entry.localName === name ) ||
+	( babelTypes.isImportDeclaration( token ) &&
 		someImportMatchesName( name, token ) );
 
 const getJSDocFromDependency = ( token, entry, parseDependency ) => {
@@ -100,7 +101,7 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 			return doc;
 		}
 		const node = candidates[ 0 ];
-		if ( isImportDeclaration( node ) ) {
+		if ( babelTypes.isImportDeclaration( node ) ) {
 			doc = getJSDocFromDependency( node, entry, parseDependency );
 		} else {
 			doc = getJSDocFromToken( node );

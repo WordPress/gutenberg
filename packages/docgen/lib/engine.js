@@ -2,7 +2,7 @@
  * External dependencies
  */
 const babel = require( '@babel/core' );
-
+const { types: babelTypes } = babel;
 /**
  * Internal dependencies
  */
@@ -13,12 +13,11 @@ const getAST = ( source, filename ) => {
 };
 
 const getExportTokens = ( ast ) =>
-	ast.body.filter( ( node ) =>
-		[
-			'ExportNamedDeclaration',
-			'ExportDefaultDeclaration',
-			'ExportAllDeclaration',
-		].includes( node.type )
+	ast.body.filter(
+		( node ) =>
+			babelTypes.isExportNamedDeclaration( node ) ||
+			babelTypes.isExportDefaultDeclaration( node ) ||
+			babelTypes.isExportAllDeclaration( node )
 	);
 
 const engine = ( path, code, getIRFromPath = () => {} ) => {
