@@ -615,61 +615,117 @@ button.wp-block-navigation-item__content {
 					justify-content: flex-start;
 				}
 
-				.wp-block-navigation__submenu-icon {
-					display: none;
-				}
-
-				// Always expand/unfold submenus inside the modal,
-				// unless the block is configured to open submenus on click.
-				.has-child:not(.open-on-click) .wp-block-navigation__submenu-container {
-					// Unset CSS that hides dropdown menus.
-					opacity: 1;
-					visibility: visible;
-					height: auto;
-					width: auto;
-					overflow: initial;
-					min-width: 200px;
-
-					// Position and style.
-					position: static;
-					border: none;
-					padding-left: 2rem;
-					padding-right: 2rem;
-				}
-
-				// Space unfolded items using gap and padding for submenus.
-				.wp-block-navigation__submenu-container,
-				.wp-block-navigation__container {
-					gap: inherit;
-				}
-
-				// Apply top padding to nested submenus.
-				.wp-block-navigation__submenu-container {
-					padding-top: var(--wp--style--block-gap, 2em);
-				}
-
-				// A default padding is added to submenu items. It's not appropriate inside the modal.
-				.wp-block-navigation-item__content {
-					padding: 0;
-				}
-
-				// Default column display for overlay menu contents.
 				.wp-block-navigation__container,
 				.wp-block-navigation-item,
 				.wp-block-page-list {
 					display: flex;
 					flex-direction: column;
-					// Inherit alignment settings from container.
 					align-items: var(--navigation-layout-justification-setting, initial);
+				}
+
+				.wp-block-navigation__submenu-container,
+				.wp-block-navigation__container {
+					gap: inherit;
+				}
+
+				// Strip default padding from all content links inside the overlay.
+				.wp-block-navigation-item__content {
+					padding: 0;
+				}
+
+				.has-child {
+					display: flex;
+					flex-direction: row !important;
+					flex-wrap: wrap;
+					align-items: center;
+					width: 100%;
+					gap: 0;
+				}
+				.has-child > .wp-block-navigation-item__content,
+				.has-child > .wp-block-navigation-submenu__toggle {
+					flex: 1 1 auto;
+					margin: 0;
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+				}
+
+				.has-child > .wp-block-navigation__submenu-icon {
+					display: inline-flex;
+					align-items: center;
+					flex: 0 0 auto;
+					margin-left: 8px;
+				}
+
+				.has-child > .wp-block-navigation__submenu-container {
+					flex: 0 0 100%;
+					width: 100%;
+				}
+
+				.has-child:not(.open-on-click) > .wp-block-navigation__submenu-container {
+					opacity: 1;
+					visibility: visible;
+					height: auto;
+					overflow: visible;
+					min-width: 0;
+					position: static;
+					border: none;
+					padding: 4px 0 4px 1.5rem;
+					margin: 0;
+				}
+
+				.has-child > .wp-block-navigation__submenu-container > .wp-block-navigation-item {
+					display: flex;
+					flex-direction: row !important;
+					align-items: center;
+					width: 100%;
+					padding: 0;
+					gap: 0;
+				}
+
+				.has-child > .wp-block-navigation__submenu-container > .wp-block-navigation-item > .wp-block-navigation-item__content {
+					display: flex;
+					align-items: center;
+					flex: 1 1 auto;
+					padding: 6px 0;
+					margin: 0;
+					color: inherit;
+				}
+
+				.has-child > .wp-block-navigation__submenu-container > .wp-block-navigation-item > .wp-block-navigation-item__content:hover {
+					opacity: 0.7;
+				}
+
+				.has-child.open-on-click {
+					> .wp-block-navigation-submenu__toggle,
+					> .wp-block-navigation-item__content {
+						display: flex;
+						align-items: center;
+						width: 100%;
+					}
+
+					> .wp-block-navigation__submenu-icon {
+						display: inline-flex;
+					}
+
+					> .wp-block-navigation__submenu-container {
+						padding: 4px 0 4px 1.5rem;
+						gap: var(--wp--style--block-gap, 0.5em);
+						display: flex;
+						flex-direction: column;
+					}
 				}
 			}
 
 			// Remove background colors for items inside the overlay menu.
 			// Has to be !important to override global styles.
-			.wp-block-navigation-item .wp-block-navigation__submenu-container,
 			.wp-block-navigation__container,
 			.wp-block-navigation-item,
 			.wp-block-page-list {
+				color: inherit !important;
+				background: transparent !important;
+			}
+			.wp-block-navigation-item .wp-block-navigation__submenu-container {
 				color: inherit !important;
 				background: transparent !important;
 			}
