@@ -619,8 +619,9 @@ button.wp-block-navigation-item__content {
 					display: none;
 				}
 
-				// Always expand/unfold submenus inside the modal.
-				.has-child .wp-block-navigation__submenu-container {
+				// Always expand/unfold submenus inside the modal,
+				// unless the block is configured to open submenus on click.
+				.has-child:not(.open-on-click) .wp-block-navigation__submenu-container {
 					// Unset CSS that hides dropdown menus.
 					opacity: 1;
 					visibility: visible;
