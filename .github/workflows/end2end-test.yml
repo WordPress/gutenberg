@@ -2,32 +2,16 @@ name: End-to-End Tests
 
 on:
     pull_request:
-        paths-ignore:
-            - 'docs/**'
-            - '**/*.md'
-            - 'README.md'
-            - 'CONTRIBUTING.md'
-            - 'LICENSE.md'
-            - 'changelog.txt'
-            - '.github/ISSUE_TEMPLATE/**'
-            - '.github/PULL_REQUEST_TEMPLATE.md'
-            - '.github/CODEOWNERS'
-            - '.browserslistrc'
-            - '.editorconfig'
-            - '.eslintignore'
-            - '.eslintrc.js'
-            - '.git-blame-ignore-revs'
-            - '.gitattributes'
-            - '.gitignore'
-            - '.jshintignore'
-            - '.markdownlint*'
-            - '.npmpackagejsonlintrc.json'
-            - '.npmrc'
-            - '.nvmrc'
-            - '.prettierignore'
-            - '.prettierrc.js'
-            - '.stylelintignore'
-            - '.stylelintrc.js'
+        paths:
+            - 'packages/**'
+            - 'test/e2e/**'
+            - 'lib/**'
+            - 'phpunit/**'
+            - '.wp-env.json'
+            - 'package.json'
+            - 'package-lock.json'
+            - '.github/workflows/end2end-test.yml'
+            - '.github/setup-node/**'
 
     push:
         branches:
