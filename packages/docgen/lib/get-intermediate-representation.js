@@ -11,6 +11,11 @@ const UNDOCUMENTED = 'Undocumented declaration.';
 const NAMESPACE_EXPORT = '*';
 const DEFAULT_EXPORT = 'default';
 
+/**
+ *
+ * @typedef {import('@babel/core').types.Program} ASTProgram
+ */
+
 const hasClassWithName = ( node, name ) =>
 	babelTypes.isClassDeclaration( node ) && node.id.name === name;
 
@@ -78,6 +83,14 @@ const getJSDocFromDependency = ( token, entry, parseDependency ) => {
 	return doc;
 };
 
+/**
+ *
+ * @param {*}          token
+ * @param {*}          entry
+ * @param {ASTProgram} ast
+ * @param {*}          parseDependency
+ * @return {Object} the JSDoc
+ */
 const getJSDoc = ( token, entry, ast, parseDependency ) => {
 	let doc;
 	if ( entry.localName !== NAMESPACE_EXPORT ) {
@@ -119,11 +132,11 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
  * the identifier declaration will be looked up in the file or dependency
  * if an `ast` and `parseDependency` callback are provided.
  *
- * @param {string}   path              Path to file being processed.
- * @param {Object}   token             Espree export token.
- * @param {Object}   [ast]             Espree ast of the file being parsed.
- * @param {Function} [parseDependency] Function that takes a path
- *                                     and returns the intermediate representation of the dependency file.
+ * @param {string}     path              Path to file being processed.
+ * @param {Object}     token             Espree export token.
+ * @param {ASTProgram} [ast]             Espree ast of the file being parsed.
+ * @param {Function}   [parseDependency] Function that takes a path
+ *                                       and returns the intermediate representation of the dependency file.
  *
  * @return {Object} Intermediate Representation in JSON.
  */
