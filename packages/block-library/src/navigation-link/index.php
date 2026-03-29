@@ -271,7 +271,7 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 		$default_labels = WP_Taxonomy::get_default_labels();
 	}
 
-	// Get title and check if it's default
+	// Get title and check if it's default.
 	$is_default_title = false;
 	if ( property_exists( $entity->labels, 'item_link' ) ) {
 		$title = $entity->labels->item_link;
@@ -289,13 +289,14 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 		}
 	}
 
-	// Calculate singular name once (used for both title and description)
-	$singular = $entity->labels->singular_name ?? ucfirst( $entity->name );
-
-	// Set default title if needed
+	// Set default title if needed.
+	// Use Core's item_link label when it has been customized for this post type/taxonomy.
+	// Fall back to generating from singular_name when item_link is a generic default,
+	// to avoid labels like "Post Link" appearing for custom post types.
 	if ( $is_default_title || '' === $title ) {
-		/* translators: %s: Singular label of the entity. */
-		$title = sprintf( __( '%s link' ), $singular );
+		$singular = $entity->labels->singular_name ?? ucfirst( $entity->name );
+		/* translators: %s: Singular label of the post type or taxonomy. */
+		$title = sprintf( _x( '%s Link', 'navigation link title', 'gutenberg' ), $singular );
 	}
 
 	// Default description if needed.
