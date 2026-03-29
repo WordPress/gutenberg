@@ -47,7 +47,6 @@ export default function DateFormatPicker( {
 		>
 			<VisuallyHidden as="legend">{ __( 'Date format' ) }</VisuallyHidden>
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Default format' ) }
 				help={ `${ __( 'Example:' ) }  ${ dateI18n(
 					defaultFormat,
@@ -144,7 +143,6 @@ function NonDefaultControls( { format, onChange } ) {
 			{ isCustom && (
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Custom format' ) }
 					hideLabelFromVision
 					help={ createInterpolateElement(

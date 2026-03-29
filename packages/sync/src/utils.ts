@@ -1,0 +1,102 @@
+/**
+ * External dependencies
+ */
+import * as Y from 'yjs';
+import * as buffer from 'lib0/buffer';
+
+/**
+ * Internal dependencies
+ */
+import {
+	CRDT_DOC_META_PERSISTENCE_KEY,
+	CRDT_DOC_VERSION,
+	CRDT_STATE_MAP_KEY,
+	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
+	CRDT_STATE_MAP_SAVED_BY_KEY as SAVED_BY_KEY,
+	CRDT_STATE_MAP_VERSION_KEY as VERSION_KEY,
+} from './config';
+import type { CRDTDoc } from './types';
+
+// An object representation of CRDT document metadata.
+type DocumentMeta = Record< string, DocumentMetaValue >;
+type DocumentMetaValue = boolean | number | string;
+
+/**
+ * Creates a new Y.Doc instance with the given document metadata.
+ *
+ * @param {DocumentMeta} documentMeta Optional metadata to associate with the
+ *                                    document. Metadata is not persisted.
+ */
+export function createYjsDoc( documentMeta: DocumentMeta = {} ): CRDTDoc {
+	// Convert the object representation of CRDT document metadata to a map.
+	// Document metadata is passed to the Y.Doc constructor and stored in its
+	// `meta` property. It is not synced to peers or persisted with the document.
+	// It is just a place to store transient information about this doc instance.
+	const metaMap = new Map< string, DocumentMetaValue >(
+		Object.entries( documentMeta )
+	);
+
+	// IMPORTANT: Do not add update the document itself to avoid generating updates
+	// before observers are attached. Add initial updates in `initializeYjsDoc`.
+	return new Y.Doc( { meta: metaMap } );
+}
+
+/**
+ * Initializes a Y.Doc instance with the necessary CRDT state for our use case.
+ *
+ * @param {Y.Doc} ydoc Y.Doc instance to initialize.
+ */
+export function initializeYjsDoc( ydoc: CRDTDoc ): void {
+	const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+	stateMap.set( VERSION_KEY, CRDT_DOC_VERSION );
+}
+
+/**
+ * Record that the entity was saved (persisted to the database) in the CRDT
+ * document record metadata.
+ *
+ * @param {CRDTDoc} ydoc CRDT document.
+ */
+export function markEntityAsSaved( ydoc: CRDTDoc ): void {
+	const recordMeta = ydoc.getMap( CRDT_STATE_MAP_KEY );
+	recordMeta.set( SAVED_AT_KEY, Date.now() );
+	recordMeta.set( SAVED_BY_KEY, ydoc.clientID );
+}
+
+function pseudoRandomID(): number {
+	return Math.floor( Math.random() * 1000000000 );
+}
+
+export function serializeCrdtDoc( crdtDoc: CRDTDoc ): string {
+	return JSON.stringify( {
+		document: buffer.toBase64( Y.encodeStateAsUpdateV2( crdtDoc ) ),
+		updateId: pseudoRandomID(), // helps with debugging
+	} );
+}
+
+export function deserializeCrdtDoc(
+	serializedCrdtDoc: string
+): CRDTDoc | null {
+	try {
+		const { document } = JSON.parse( serializedCrdtDoc );
+
+		// Mark this document as from persistence.
+		const docMeta: DocumentMeta = {
+			[ CRDT_DOC_META_PERSISTENCE_KEY ]: true,
+		};
+
+		// Apply the document as an update against a new (temporary) Y.Doc.
+		const ydoc = createYjsDoc( docMeta );
+		const yupdate = buffer.fromBase64( document );
+		Y.applyUpdateV2( ydoc, yupdate );
+
+		// Overwrite the client ID (which is from a previous session) with a random
+		// client ID. Deserialized documents should not be used directly. Instead,
+		// their state should be applied to another in-use document.
+		ydoc.clientID = pseudoRandomID();
+
+		return ydoc;
+	} catch ( e ) {
+		return null;
+	}
+}

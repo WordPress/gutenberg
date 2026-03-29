@@ -17,7 +17,7 @@ import { unlock } from '../lock-unlock';
 import { getNormalizedCommaSeparable } from '../utils';
 
 interface EntityRecordsResolution< RecordType > {
-	/** The requested entity record */
+	/** The requested entity records */
 	records: RecordType[] | null;
 
 	/**
@@ -42,6 +42,16 @@ interface EntityRecordsResolution< RecordType > {
 	 * The total number of pages.
 	 */
 	totalPages: number | null;
+}
+
+export type WithPermissions< RecordType > = RecordType & {
+	permissions: { delete: boolean; update: boolean };
+};
+
+interface EntityRecordsWithPermissionsResolution< RecordType >
+	extends Omit< EntityRecordsResolution< RecordType >, 'records' > {
+	/** The requested entity records with permissions */
+	records: WithPermissions< RecordType >[] | null;
 }
 
 const EMPTY_ARRAY = [];
@@ -161,7 +171,7 @@ export function useEntityRecordsWithPermissions< RecordType >(
 	name: string,
 	queryArgs: Record< string, unknown > = {},
 	options: Options = { enabled: true }
-): EntityRecordsResolution< RecordType > {
+): EntityRecordsWithPermissionsResolution< RecordType > {
 	const entityConfig = useSelect(
 		( select ) => select( coreStore ).getEntityConfig( kind, name ),
 		[ kind, name ]

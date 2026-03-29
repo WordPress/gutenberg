@@ -14,24 +14,24 @@ describe( 'addOrReplacePort', () => {
 			// Addition
 			{ in: 'test', expect: 'test:101' },
 			{ in: 'test/test?test#test', expect: 'test:101/test?test#test' },
-			{ in: 'http://test.com', expect: 'http://test.com:101' },
+			{ in: 'http://example.org', expect: 'http://example.org:101' },
 			{
-				in: 'http://test.com/test?test#test',
-				expect: 'http://test.com:101/test?test#test',
+				in: 'http://example.org/test?test#test',
+				expect: 'http://example.org:101/test?test#test',
 			},
-			{ in: 'ssh://test.com', expect: 'ssh://test.com:101' },
-			{ in: 'test.com', expect: 'test.com:101' },
+			{ in: 'ssh://example.org', expect: 'ssh://example.org:101' },
+			{ in: 'example.org', expect: 'example.org:101' },
 
 			// Replacement
 			{ in: 'test:99', expect: 'test:101' },
 			{ in: 'test:99/test?test#test', expect: 'test:101/test?test#test' },
-			{ in: 'http://test.com:99', expect: 'http://test.com:101' },
+			{ in: 'http://example.org:99', expect: 'http://example.org:101' },
 			{
-				in: 'http://test.com:99/test?test#test',
-				expect: 'http://test.com:101/test?test#test',
+				in: 'http://example.org:99/test?test#test',
+				expect: 'http://example.org:101/test?test#test',
 			},
-			{ in: 'ssh://test.com:99', expect: 'ssh://test.com:101' },
-			{ in: 'test.com:99', expect: 'test.com:101' },
+			{ in: 'ssh://example.org:99', expect: 'ssh://example.org:101' },
+			{ in: 'example.org:99', expect: 'example.org:101' },
 		];
 
 		for ( const test of testMap ) {

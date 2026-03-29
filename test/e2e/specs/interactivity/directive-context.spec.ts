@@ -252,17 +252,24 @@ test.describe( 'data-wp-context', () => {
 		page,
 	} ) => {
 		const element = page.getByTestId( 'navigation text' );
+		const navCount = page.getByTestId( 'navigation count' );
+		await expect( navCount ).toHaveText( '0' );
 		await page.getByTestId( 'navigate' ).click();
+		await expect( navCount ).toHaveText( '1' );
 		await expect( element ).toHaveText( 'first page' );
 		await page.goBack();
+		await expect( navCount ).toHaveText( '2' );
 		await expect( element ).toHaveText( 'first page' );
 		await page.goForward();
+		await expect( navCount ).toHaveText( '3' );
 		await expect( element ).toHaveText( 'first page' );
 	} );
 
 	test( 'should inherit values on navigation', async ( { page } ) => {
 		const text = page.getByTestId( 'navigation inherited text' );
 		const text2 = page.getByTestId( 'navigation inherited text2' );
+		const navCount = page.getByTestId( 'navigation count' );
+		await expect( navCount ).toHaveText( '0' );
 		await expect( text ).toHaveText( 'first page' );
 		await expect( text2 ).toBeEmpty();
 		await page.getByTestId( 'toggle text' ).click();
@@ -270,12 +277,15 @@ test.describe( 'data-wp-context', () => {
 		await page.getByTestId( 'add text2' ).click();
 		await expect( text2 ).toHaveText( 'some new text' );
 		await page.getByTestId( 'navigate' ).click();
+		await expect( navCount ).toHaveText( '1' );
 		await expect( text ).toHaveText( 'changed dynamically' );
 		await expect( text2 ).toHaveText( 'some new text' );
 		await page.goBack();
+		await expect( navCount ).toHaveText( '2' );
 		await expect( text ).toHaveText( 'changed dynamically' );
 		await expect( text2 ).toHaveText( 'some new text' );
 		await page.goForward();
+		await expect( navCount ).toHaveText( '3' );
 		await expect( text ).toHaveText( 'changed dynamically' );
 		await expect( text2 ).toHaveText( 'some new text' );
 	} );
@@ -394,5 +404,25 @@ test.describe( 'data-wp-context', () => {
 
 		await expect( childProp ).toHaveText( 'fromChildNs' );
 		await expect( parentProp ).toHaveText( 'fromParentNs' );
+	} );
+
+	test( 'should support multiple context directives in the same element', async ( {
+		page,
+	} ) => {
+		const defaultNamespace = page.getByTestId(
+			'multiple context in the same element'
+		);
+
+		await expect( defaultNamespace ).toHaveAttribute(
+			'data-test-prop',
+			'id1'
+		);
+
+		for ( const attribute of [ 'parent', 'default', 'id1', 'other' ] ) {
+			await expect( defaultNamespace ).toHaveAttribute(
+				`data-test-${ attribute }`,
+				'true'
+			);
+		}
 	} );
 } );

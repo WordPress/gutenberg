@@ -50,4 +50,10 @@ export type ConfirmDialogProps = {
 	 * It also implicitly toggles the controlled mode if set or the uncontrolled mode if it's not set.
 	 */
 	isOpen?: boolean;
+	/**
+	 * Indicates activity while an action is being performed.
+	 * When `true`, the confirm button will show a busy state.
+	 * Both buttons will be disabled.
+	 */
+	isBusy?: boolean;
 };

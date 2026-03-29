@@ -41,6 +41,7 @@ import MediaContainer from './media-container';
 import {
 	DEFAULT_MEDIA_SIZE_SLUG,
 	WIDTH_CONSTRAINT_PERCENTAGE,
+	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_ATTACHMENT,
 	TEMPLATE,
@@ -58,7 +59,6 @@ const applyWidthConstraints = ( width ) =>
 	);
 
 function getImageSourceUrlBySizeSlug( image, slug ) {
-	// eslint-disable-next-line camelcase
 	return image?.media_details?.sizes?.[ slug ]?.source_url;
 }
 
@@ -105,20 +105,46 @@ function attributesFromMedia( {
 			// Try the "large" size URL, falling back to the "full" size URL below.
 			src =
 				media.sizes?.large?.url ||
-				// eslint-disable-next-line camelcase
 				media.media_details?.sizes?.large?.source_url;
 		}
 
+		let newLinkDestination = linkDestination;
 		let newHref = href;
-		if ( linkDestination === LINK_DESTINATION_MEDIA ) {
-			// Update the media link.
-			newHref = media.url;
-		}
 
-		// Check if the image is linked to the attachment page.
-		if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
-			// Update the media link.
-			newHref = media.link;
+		// Only apply default link behavior for images (not videos).
+		if ( mediaType === 'image' ) {
+			// Check if default link setting should be used.
+			if ( ! newLinkDestination ) {
+				// Use the WordPress option to determine the proper default.
+				// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
+				switch (
+					window?.wp?.media?.view?.settings?.defaultProps?.link ||
+					LINK_DESTINATION_NONE
+				) {
+					case 'file':
+					case LINK_DESTINATION_MEDIA:
+						newLinkDestination = LINK_DESTINATION_MEDIA;
+						break;
+					case 'post':
+					case LINK_DESTINATION_ATTACHMENT:
+						newLinkDestination = LINK_DESTINATION_ATTACHMENT;
+						break;
+					case LINK_DESTINATION_NONE:
+					default:
+						newLinkDestination = LINK_DESTINATION_NONE;
+						break;
+				}
+			}
+
+			// Set href based on linkDestination.
+			switch ( newLinkDestination ) {
+				case LINK_DESTINATION_MEDIA:
+					newHref = media.url;
+					break;
+				case LINK_DESTINATION_ATTACHMENT:
+					newHref = media.link;
+					break;
+			}
 		}
 
 		setAttributes( {
@@ -128,6 +154,7 @@ function attributesFromMedia( {
 			mediaUrl: src || media.url,
 			mediaLink: media.link || undefined,
 			href: newHref,
+			linkDestination: newLinkDestination,
 			focalPoint: undefined,
 			useFeaturedImage: false,
 		} );
@@ -339,7 +366,6 @@ function MediaTextEdit( {
 				onDeselect={ () => setAttributes( { mediaWidth: 50 } ) }
 			>
 				<RangeControl
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					label={ __( 'Media width' ) }
 					value={ temporaryMediaWidth || mediaWidth }
@@ -357,7 +383,6 @@ function MediaTextEdit( {
 				}
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Stack on mobile' ) }
 					checked={ isStackedOnMobile }
 					onChange={ () =>
@@ -375,7 +400,6 @@ function MediaTextEdit( {
 					onDeselect={ () => setAttributes( { imageFill: false } ) }
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Crop image to fill' ) }
 						checked={ !! imageFill }
 						onChange={ () =>
@@ -398,7 +422,6 @@ function MediaTextEdit( {
 						}
 					>
 						<FocalPointPicker
-							__nextHasNoMarginBottom
 							label={ __( 'Focal point' ) }
 							url={
 								useFeaturedImage && featuredImageURL
@@ -422,7 +445,6 @@ function MediaTextEdit( {
 					onDeselect={ () => setAttributes( { mediaAlt: '' } ) }
 				>
 					<TextareaControl
-						__nextHasNoMarginBottom
 						label={ __( 'Alternative text' ) }
 						value={ mediaAlt }
 						onChange={ onMediaAltChange }

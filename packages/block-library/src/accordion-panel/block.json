@@ -2,23 +2,20 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "core/accordion-panel",
-	"version": "0.1.0",
 	"title": "Accordion Panel",
 	"category": "design",
-	"description": "Displays an accordion panel.",
-	"example": {},
-	"__experimental": true,
-	"parent": [ "core/accordion-content" ],
+	"description": "Contains the hidden or revealed content beneath the heading.",
+	"parent": [ "core/accordion-item" ],
+	"usesContext": [ "core/accordion-open-by-default" ],
 	"supports": {
+		"html": false,
 		"color": {
 			"background": true,
-			"gradient": true
+			"gradients": true
 		},
-		"border": true,
 		"interactivity": true,
 		"spacing": {
 			"padding": true,
-			"margin": [ "top", "bottom" ],
 			"blockGap": true,
 			"__experimentalDefaultControls": {
 				"padding": true,
@@ -50,25 +47,22 @@
 				"fontSize": true
 			}
 		},
-		"shadow": true
+		"shadow": true,
+		"layout": {
+			"allowEditing": false
+		},
+		"visibility": false,
+		"contentRole": true,
+		"allowedBlocks": true,
+		"lock": false
 	},
 	"attributes": {
-		"allowedBlocks": {
-			"type": "array"
-		},
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ],
 			"default": false
-		},
-		"openByDefault": {
-			"type": "boolean",
-			"default": false
-		},
-		"isSelected": {
-			"type": "boolean",
-			"default": false
 		}
 	},
-	"textdomain": "default"
+	"textdomain": "default",
+	"style": "wp-block-accordion-panel"
 }

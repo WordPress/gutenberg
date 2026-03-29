@@ -24,6 +24,8 @@ import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { useResizeObserver } from '@wordpress/compose';
+import { getProtocol, prependHTTPS } from '@wordpress/url';
+import { store as uploadStore } from '@wordpress/upload-media';
 
 /**
  * Internal dependencies
@@ -157,12 +159,19 @@ export function ImageEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
+		setTemporaryURL();
 		setAttributes( {
 			src: undefined,
 			id: undefined,
 			url: undefined,
 			blob: undefined,
 		} );
+	}
+
+	function onFilesPreUpload( files ) {
+		if ( files.length === 1 ) {
+			setTemporaryURL( createBlobURL( files[ 0 ] ) );
+		}
 	}
 
 	function onSelectImagesList( images ) {
@@ -276,7 +285,6 @@ export function ImageEdit( {
 		if ( ! linkDestination ) {
 			// Use the WordPress option to determine the proper default.
 			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
-			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
 			switch (
 				window?.wp?.media?.view?.settings?.defaultProps?.link ||
 				LINK_DESTINATION_NONE
@@ -320,10 +328,14 @@ export function ImageEdit( {
 	}
 
 	function onSelectURL( newURL ) {
-		if ( newURL !== url ) {
+		// Handle URLs without protocol.
+		const normalizedNewURL = getProtocol( newURL )
+			? newURL
+			: prependHTTPS( newURL );
+		if ( normalizedNewURL !== url ) {
 			setAttributes( {
 				blob: undefined,
-				url: newURL,
+				url: normalizedNewURL,
 				id: undefined,
 				sizeSlug: getSettings().imageDefaultSize,
 			} );
@@ -340,6 +352,17 @@ export function ImageEdit( {
 
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;
+
+	const isSideloading = useSelect(
+		( select ) => {
+			if ( ! window.__clientSideMediaProcessing || ! id ) {
+				return false;
+			}
+			return select( uploadStore ).isUploadingById( id );
+		},
+		[ id ]
+	);
+
 	const mediaPreview = !! url && (
 		<img
 			alt={ __( 'Edit image' ) }
@@ -353,7 +376,7 @@ export function ImageEdit( {
 	const shadowProps = getShadowClassesAndStyles( attributes );
 
 	const classes = clsx( className, {
-		'is-transient': !! temporaryURL,
+		'is-transient': !! temporaryURL || isSideloading,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'has-custom-border':
@@ -444,6 +467,7 @@ export function ImageEdit( {
 			<figure { ...blockProps }>
 				<Image
 					temporaryURL={ temporaryURL }
+					isSideloading={ isSideloading }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					isSingleSelected={ isSingleSelected }
@@ -462,9 +486,9 @@ export function ImageEdit( {
 					icon={ <BlockIcon icon={ icon } /> }
 					onSelect={ onSelectImage }
 					onSelectURL={ onSelectURL }
+					onFilesPreUpload={ onFilesPreUpload }
 					onError={ onUploadError }
 					placeholder={ placeholder }
-					accept="image/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					handleUpload={ ( files ) => files.length === 1 }
 					value={ { id, src } }

@@ -146,7 +146,7 @@ export function ServerSideRender( props ) {
  * @param {Function} [props.ErrorResponsePlaceholder]         Component rendered when the API response is an error.
  * @param {Function} [props.LoadingResponsePlaceholder]       Component rendered while the API request is loading.
  *
- * @return {JSX.Element} The rendered server-side content.
+ * @return {React.JSX.Element} The rendered server-side content.
  */
 export function ServerSideRenderWithPostId( {
 	urlQueryArgs = EMPTY_OBJECT,

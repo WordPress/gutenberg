@@ -4,58 +4,43 @@
 import {
 	useBlockProps,
 	useInnerBlocksProps,
-	__experimentalUseBorderProps as useBorderProps,
-	__experimentalUseColorProps as useColorProps,
-	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
-	__experimentalGetShadowClassesAndStyles as useShadowProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-/**
- * External dependencies
- */
-import clsx from 'clsx';
+import { useSelect } from '@wordpress/data';
 
-export default function Edit( { attributes } ) {
-	const { allowedBlocks, templateLock, openByDefault, isSelected } =
-		attributes;
-	const borderProps = useBorderProps( attributes );
-	const colorProps = useColorProps( attributes );
-	const spacingProps = useSpacingProps( attributes );
-	const shadowProps = useShadowProps( attributes );
+export default function Edit( { attributes, context, clientId, isSelected } ) {
+	const { allowedBlocks, templateLock } = attributes;
+	const openByDefault = context[ 'core/accordion-open-by-default' ];
+	const { hasSelection } = useSelect(
+		( select ) => {
+			if ( isSelected || openByDefault ) {
+				return { hasSelection: true };
+			}
 
-	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: 'accordion-content__wrapper',
-			style: {
-				...spacingProps.style,
-			},
+			const {
+				getBlockRootClientId,
+				isBlockSelected,
+				hasSelectedInnerBlock,
+			} = select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+			return {
+				hasSelection:
+					isBlockSelected( rootClientId ) ||
+					hasSelectedInnerBlock( rootClientId, true ),
+			};
 		},
-		{
-			allowedBlocks,
-			template: [ [ 'core/paragraph', {} ] ],
-			templateLock,
-		}
+		[ clientId, isSelected, openByDefault ]
 	);
+	const blockProps = useBlockProps( {
+		'aria-hidden': ! hasSelection,
+		role: 'region',
+	} );
 
-	return (
-		<div
-			{ ...blockProps }
-			className={ clsx(
-				blockProps.className,
-				colorProps.className,
-				borderProps.className,
-				{
-					[ `has-custom-font-size` ]: blockProps?.style?.fontSize,
-				}
-			) }
-			style={ {
-				...borderProps.style,
-				...colorProps.style,
-				...shadowProps.style,
-			} }
-			aria-hidden={ ! isSelected && ! openByDefault }
-		>
-			<div { ...innerBlocksProps } />
-		</div>
-	);
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks,
+		template: [ [ 'core/paragraph', {} ] ],
+		templateLock,
+	} );
+
+	return <div { ...innerBlocksProps } />;
 }

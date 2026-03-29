@@ -75,6 +75,9 @@ const BorderBoxControlSplitControls = (
 	return (
 		<Grid { ...otherProps } ref={ mergedRef } gap={ 3 }>
 			<BorderBoxControlVisualizer value={ value } size={ size } />
+
+			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
+			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
 			<BorderControl
 				className={ centeredClassName }
 				hideLabelFromVision
@@ -84,6 +87,8 @@ const BorderBoxControlSplitControls = (
 				value={ value?.top }
 				{ ...sharedBorderControlProps }
 			/>
+			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
+			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
 			<BorderControl
 				hideLabelFromVision
 				label={ __( 'Left border' ) }
@@ -92,6 +97,8 @@ const BorderBoxControlSplitControls = (
 				value={ value?.left }
 				{ ...sharedBorderControlProps }
 			/>
+			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
+			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
 			<BorderControl
 				className={ rightAlignedClassName }
 				hideLabelFromVision
@@ -101,6 +108,8 @@ const BorderBoxControlSplitControls = (
 				value={ value?.right }
 				{ ...sharedBorderControlProps }
 			/>
+			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
+			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
 			<BorderControl
 				className={ centeredClassName }
 				hideLabelFromVision

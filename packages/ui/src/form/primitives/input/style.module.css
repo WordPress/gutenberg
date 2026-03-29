@@ -1,0 +1,34 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.input {
+		padding-block: var(--wp-ui-input-padding-block, 0);
+		padding-inline: var(--wp-ui-input-layout-padding-inline, 0);
+		width: 100%;
+		background: transparent;
+		border: none;
+		outline: none;
+		color: var(--wpds-color-fg-interactive-neutral);
+		font-family: inherit;
+		font-size: inherit;
+		line-height: inherit;
+
+		&::placeholder {
+			color: var(--wpds-color-fg-interactive-neutral-disabled);
+		}
+
+		&:disabled,
+		&[aria-disabled="true"] {
+			color: var(--wpds-color-fg-interactive-neutral-disabled);
+
+			@media ( forced-colors: active ) {
+				color: GrayText;
+			}
+		}
+
+		&[type="email"],
+		&[type="url"] {
+			direction: ltr; /* maintain LTR in RTL languages */
+		}
+	}
+}

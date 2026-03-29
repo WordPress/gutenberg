@@ -56,18 +56,18 @@ describe.each( [
 	const [ , Component ] = modeAndComponent;
 
 	describe( 'semantics and labelling', () => {
-		it( 'should group all radios under a fieldset with an accessible label (legend)', () => {
+		it( 'should render a radiogroup with an accessible label (legend)', () => {
 			const onChangeSpy = jest.fn();
 			render(
 				<Component { ...defaultProps } onChange={ onChangeSpy } />
 			);
 
 			expect(
-				screen.getByRole( 'group', { name: defaultProps.label } )
+				screen.getByRole( 'radiogroup', { name: defaultProps.label } )
 			).toBeVisible();
 		} );
 
-		it( 'should group all radios under a fieldset with an accessible label even when the label is visually hidden', () => {
+		it( 'should render a radiogroup with an accessible label even when the label is visually hidden', () => {
 			const onChangeSpy = jest.fn();
 			render(
 				<Component
@@ -78,7 +78,7 @@ describe.each( [
 			);
 
 			expect(
-				screen.getByRole( 'group', { name: defaultProps.label } )
+				screen.getByRole( 'radiogroup', { name: defaultProps.label } )
 			).toBeVisible();
 		} );
 
@@ -93,7 +93,7 @@ describe.each( [
 			);
 
 			expect(
-				screen.getByRole( 'group', { name: defaultProps.label } )
+				screen.getByRole( 'radiogroup', { name: defaultProps.label } )
 			).toHaveAccessibleDescription( 'Test help text' );
 		} );
 
@@ -238,7 +238,8 @@ describe.each( [
 					name: defaultProps.options[ 1 ].label,
 				} )
 			).toHaveFocus();
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
+
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith(
 				defaultProps.options[ 1 ].value
 			);
@@ -253,8 +254,8 @@ describe.each( [
 					name: defaultProps.options[ 0 ].label,
 				} )
 			).toHaveFocus();
-			// TODO: why called twice for every interaction?
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 6 );
+
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith(
 				defaultProps.options[ 0 ].value
 			);
@@ -268,7 +269,7 @@ describe.each( [
 				} )
 			).toHaveFocus();
 
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 8 );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 4 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith(
 				defaultProps.options[ 2 ].value
 			);

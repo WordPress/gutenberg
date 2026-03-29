@@ -6,13 +6,7 @@ import { render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import _ToggleControl from '..';
-
-const ToggleControl = (
-	props: React.ComponentProps< typeof _ToggleControl >
-) => {
-	return <_ToggleControl { ...props } __nextHasNoMarginBottom />;
-};
+import ToggleControl from '..';
 
 describe( 'ToggleControl', () => {
 	it( 'should label the toggle', () => {

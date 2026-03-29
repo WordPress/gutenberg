@@ -100,7 +100,7 @@ export type ControlPointButtonProps = {
 export type ControlPointsProps = {
 	disableRemove: boolean;
 	disableAlpha: boolean;
-	gradientPickerDomRef: React.RefObject< HTMLDivElement >;
+	gradientPickerDomRef: React.RefObject< HTMLDivElement | null >;
 	ignoreMarkerPosition?: number;
 	value: ControlPoint[];
 	onChange: ( controlPoints: ControlPoint[] ) => void;

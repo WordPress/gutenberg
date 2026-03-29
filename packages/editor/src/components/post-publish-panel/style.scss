@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .editor-post-publish-panel__content {
 	// Ensure the post-publish panel accounts for the header and footer height.
 	min-height: calc(100% - #{$header-height + 84px});
@@ -177,7 +182,7 @@
 }
 
 .post-publish-panel__postpublish-header {
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 }
 
 .post-publish-panel__postpublish-subheader {

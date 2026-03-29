@@ -1,4 +1,4 @@
-export * from './types';
+export type * from './types';
 export { Admin } from './admin';
 export { Editor } from './editor';
 export { PageUtils } from './page-utils';

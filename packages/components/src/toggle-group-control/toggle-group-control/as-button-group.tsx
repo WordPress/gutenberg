@@ -93,3 +93,4 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 export const ToggleGroupControlAsButtonGroup = forwardRef(
 	UnforwardedToggleGroupControlAsButtonGroup
 );
+ToggleGroupControlAsButtonGroup.displayName = 'ToggleGroupControlAsButtonGroup';

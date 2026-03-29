@@ -92,5 +92,6 @@ export function UnForwardedTokenInput(
 }
 
 export const TokenInput = forwardRef( UnForwardedTokenInput );
+TokenInput.displayName = 'TokenInput';
 
 export default TokenInput;

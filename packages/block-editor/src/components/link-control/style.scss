@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 $block-editor-link-control-number-of-actions: 1;
 
 @keyframes loadingpulse {
@@ -14,12 +18,14 @@ $block-editor-link-control-number-of-actions: 1;
 
 .block-editor-link-control {
 	position: relative;
-	min-width: $modal-min-width;
+	// TODO: Replace with a --wpds-dimension-surface-width-* token.
+	min-width: 350px;
 
 	.components-popover__content & {
 		min-width: auto;
 		width: 90vw;
-		max-width: $modal-min-width;
+		// TODO: Replace with a --wpds-dimension-surface-width-* token.
+		max-width: 350px;
 	}
 
 	.show-icon-labels & {
@@ -35,7 +41,7 @@ $block-editor-link-control-number-of-actions: 1;
 			}
 		}
 
-		.block-editor-link-control__search-item-top {
+		.block-editor-link-control__preview {
 			gap: $grid-unit-05;
 			flex-wrap: wrap;
 
@@ -43,11 +49,11 @@ $block-editor-link-control-number-of-actions: 1;
 				width: auto;
 				padding: $grid-unit-05;
 			}
-		}
 
-		.is-preview .block-editor-link-control__search-item-header {
-			min-width: 100%;
-			margin-right: 0;
+			.block-editor-link-control_link-information {
+				min-width: 100%;
+				margin-right: 0;
+			}
 		}
 	}
 }
@@ -57,6 +63,15 @@ $block-editor-link-control-number-of-actions: 1;
 .block-editor-link-control__search-input-wrapper {
 	margin-bottom: $grid-unit-10;
 	position: relative;
+}
+
+.block-editor-link-control__help {
+	padding: 0 $grid-unit-20;
+	margin-top: -$grid-unit-10;
+	margin-bottom: 0;
+	font-size: $helptext-font-size;
+	font-style: normal;
+	color: $gray-700;
 }
 
 // Provides positioning context for search actions
@@ -144,29 +159,21 @@ $block-editor-link-control-number-of-actions: 1;
 
 	.components-menu-item__shortcut {
 		color: $gray-700;
-		text-transform: capitalize;
 		white-space: nowrap; // tags shouldn't go over two lines.
 	}
 
 	&[aria-selected] {
 		background: $gray-100;
 	}
+}
 
-	&.is-current {
-		flex-direction: column; // allow for stacking.
-		background: transparent;
-		border: 0;
-		width: 100%;
-		cursor: default;
-		padding: $grid-unit-20;
-	}
+.block-editor-link-control__preview {
+	background: transparent;
+	border: 0;
+	padding: $grid-unit-20;
 
-	.block-editor-link-control__search-item-header {
-		display: block;
-		flex-direction: row;
-		align-items: center;
+	.block-editor-link-control__link-information {
 		margin-right: $grid-unit-10;
-		gap: $grid-unit-10;
 
 		// Force text to wrap to improve UX when encountering long lines
 		// of text, particular those with no spaces.
@@ -174,7 +181,7 @@ $block-editor-link-control-number-of-actions: 1;
 		white-space: pre-wrap;
 		overflow-wrap: break-word;
 
-		.block-editor-link-control__search-item-info {
+		.block-editor-link-control__preview-info {
 			color: $gray-700;
 			line-height: 1.1;
 			font-size: $helptext-font-size;
@@ -182,55 +189,33 @@ $block-editor-link-control-number-of-actions: 1;
 		}
 	}
 
-	&.is-preview .block-editor-link-control__search-item-header {
-		display: flex;
-		flex: 1; // Fill available space.
-	}
-
-	&.is-error .block-editor-link-control__search-item-header {
-		align-items: center;
-	}
-
-	&.is-url-title .block-editor-link-control__search-item-title {
+	&.is-url-title .block-editor-link-control__preview-title {
 		// To prevent overflow when the title is a URL
 		word-break: break-all;
 	}
 
-	.block-editor-link-control__search-item-details {
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		gap: $grid-unit-05;
-	}
-
-	.block-editor-link-control__search-item-header .block-editor-link-control__search-item-icon {
+	.block-editor-link-control__preview-image,
+	.block-editor-link-control__preview-icon {
+		position: relative;
+		flex-shrink: 0;
 		background-color: $gray-100;
 		width: $grid-unit-40;
 		height: $grid-unit-40;
 		border-radius: $radius-small;
 	}
 
-	.block-editor-link-control__search-item-icon {
-		position: relative;
-		flex-shrink: 0;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-
-		img {
-			width: $grid-unit-20; // favicons often have a source of 32px
-		}
+	.block-editor-link-control__preview-icon img {
+		width: $grid-unit-20; // favicons often have a source of 32px
 	}
 
-	&.is-error .block-editor-link-control__search-item-icon {
+	&.is-error .block-editor-link-control__preview-icon {
 		top: 0;
 		width: 32px;
 		max-height: 32px;
 	}
 
-	.block-editor-link-control__search-item-title {
+	.block-editor-link-control__preview-title {
 		line-height: 1.1;
-
 
 		&:focus {
 			box-shadow: none;
@@ -264,16 +249,9 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 }
 
-.block-editor-link-control__search-item-top {
-	display: flex;
-	flex-direction: row;
-	width: 100%; // clip.
-	align-items: center;
-}
+.block-editor-link-control__preview.is-fetching {
 
-.block-editor-link-control__search-item.is-fetching {
-
-	.block-editor-link-control__search-item-icon {
+	.block-editor-link-control__preview-icon {
 		svg,
 		img {
 			opacity: 0;
@@ -327,7 +305,7 @@ $block-editor-link-control-number-of-actions: 1;
 .block-editor-link-control__search-create {
 	align-items: center; // align text with icon.
 
-	.block-editor-link-control__search-item-title {
+	.block-editor-link-control__preview-title {
 		margin-bottom: 0;
 	}
 
@@ -355,11 +333,15 @@ $block-editor-link-control-number-of-actions: 1;
 .block-editor-link-control__setting {
 	margin-bottom: 0;
 	flex: 1;
-	padding: $grid-unit-10 0 $grid-unit-10 $grid-unit-30;
+	padding: $grid-unit-10 $grid-unit-30;
+
+	.components-base-control:not(.components-input-control) {
+		.components-base-control__field {
+			display: flex; // don't allow label to wrap under checkbox.
+		}
+	}
 
 	.components-base-control__field {
-		display: flex; // don't allow label to wrap under checkbox.
-
 		.components-checkbox-control__label {
 			color: $gray-900;
 		}
