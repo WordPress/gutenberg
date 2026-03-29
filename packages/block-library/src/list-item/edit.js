@@ -92,7 +92,7 @@ export default function ListItemEdit( {
 				<RichText
 					ref={ useMergeRefs( [ useEnterRef, useSpaceRef ] ) }
 					identifier="content"
-					tagName="div"
+					tagName="span"
 					onChange={ ( nextContent ) =>
 						setAttributes( { content: nextContent } )
 					}
