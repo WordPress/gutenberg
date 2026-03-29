@@ -34,16 +34,31 @@ function CommentInspector() {
 		[ searchParams.commentIds ]
 	);
 
-	const comment = useSelect(
+	const { comment, postTitle } = useSelect(
 		( select ) => {
 			if ( commentIds.length !== 1 ) {
-				return null;
+				return { comment: null, postTitle: null };
 			}
-			return select( coreStore ).getEntityRecord(
+			const commentRecord = select( coreStore ).getEntityRecord(
 				'root',
 				'comment',
 				Number( commentIds[ 0 ] )
 			) as CommentWithPermissions | undefined;
+
+			let resolvedPostTitle = null;
+			if ( commentRecord?.post ) {
+				const post = select( coreStore ).getEntityRecord(
+					'postType',
+					'post',
+					commentRecord.post,
+					{ _fields: 'title' }
+				);
+				resolvedPostTitle = (
+					post as { title?: { rendered?: string } }
+				 )?.title?.rendered;
+			}
+
+			return { comment: commentRecord, postTitle: resolvedPostTitle };
 		},
 		[ commentIds ]
 	);
@@ -113,7 +128,7 @@ function CommentInspector() {
 			{ /* Post reference */ }
 			<HStack>
 				<Text weight="bold">{ __( 'In Response To:' ) }</Text>
-				<Text>{ `Post #${ comment.post }` }</Text>
+				<Text>{ postTitle || `Post #${ comment.post }` }</Text>
 			</HStack>
 
 			{ /* Comment content */ }
@@ -131,6 +146,17 @@ function CommentInspector() {
 					} }
 				/>
 			</VStack>
+
+			{ /* View comment link */ }
+			{ comment.link && (
+				<a
+					href={ comment.link }
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					{ __( 'View Comment' ) }
+				</a>
+			) }
 
 			{ /* Author IP (for moderation context) */ }
 			{ comment.author_ip && (

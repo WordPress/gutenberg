@@ -3,6 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import type { Field } from '@wordpress/dataviews';
 
 /**
@@ -63,20 +65,40 @@ export const contentField: Field< CommentWithPermissions > = {
 	},
 };
 
+function PostFieldView( { item }: { item: CommentWithPermissions } ) {
+	const postTitle = useSelect(
+		( select ) => {
+			if ( ! item.post ) {
+				return null;
+			}
+			const post = select( coreStore ).getEntityRecord(
+				'postType',
+				'post',
+				item.post,
+				{ _fields: 'title' }
+			);
+			return ( post as { title?: { rendered?: string } } )?.title
+				?.rendered;
+		},
+		[ item.post ]
+	);
+
+	if ( ! item.post ) {
+		return <span>{ __( '(No post)' ) }</span>;
+	}
+
+	return <span>{ postTitle || `Post #${ item.post }` }</span>;
+}
+
 /**
  * Post field — displays the title of the post the comment is on.
- * Uses the `post` field (post ID) from the comment entity.
  */
 export const postField: Field< CommentWithPermissions > = {
 	id: 'post',
 	label: __( 'In Response To' ),
 	type: 'integer',
 	enableSorting: false,
-	render: ( { item } ) => {
-		// The post ID is available; a richer implementation would resolve the post title.
-		// For now, display a link placeholder with the post ID.
-		return <span>{ `Post #${ item.post }` }</span>;
-	},
+	render: PostFieldView,
 	filterBy: {
 		operators: [ 'is' ],
 	},
