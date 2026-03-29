@@ -7,6 +7,7 @@ import {
 	useInnerBlocksProps,
 	BlockControls,
 	store as blockEditorStore,
+	InnerBlocks,
 } from '@wordpress/block-editor';
 import { isRTL, __ } from '@wordpress/i18n';
 import { ToolbarButton } from '@wordpress/components';
@@ -80,7 +81,7 @@ export default function ListItemEdit( {
 	const { placeholder, content } = attributes;
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		renderAppender: false,
+		renderAppender: InnerBlocks.DefaultBlockAppender,
 		__unstableDisableDropZone: true,
 	} );
 	const useEnterRef = useEnter( { content, clientId } );

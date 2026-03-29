@@ -482,7 +482,7 @@ An individual item within a list. ([Source](https://github.com/WordPress/gutenbe
 -	**Name:** core/list-item
 -	**Category:** text
 -	**Parent:** core/list
--	**Allowed Blocks:** core/list
+-	**Allowed Blocks:** core/list, core/image, core/gallery
 -	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** content, placeholder
 

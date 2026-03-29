@@ -5,7 +5,7 @@
 	"title": "List Item",
 	"category": "text",
 	"parent": [ "core/list" ],
-	"allowedBlocks": [ "core/list" ],
+	"allowedBlocks": [ "core/list", "core/image", "core/gallery" ],
 	"description": "An individual item within a list.",
 	"textdomain": "default",
 	"attributes": {
