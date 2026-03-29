@@ -44,7 +44,7 @@ const defaultIgnoreArgs = ! hasIgnoredFiles
 	: [];
 
 const result = spawn(
-	resolveBin( 'stylelint' ),
+	resolveBin( '@lyricalstring/gale', { executable: 'gale' } ),
 	[
 		...defaultConfigArgs,
 		...defaultIgnoreArgs,

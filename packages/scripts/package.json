@@ -34,6 +34,7 @@
 	},
 	"dependencies": {
 		"@babel/core": "7.25.7",
+		"@lyricalstring/gale": "0.1.4",
 		"@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
 		"@svgr/webpack": "^8.0.1",
 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
@@ -85,7 +86,6 @@
 		"sass-loader": "^16.0.3",
 		"schema-utils": "^4.2.0",
 		"source-map-loader": "^3.0.0",
-		"stylelint": "^16.8.2",
 		"terser-webpack-plugin": "^5.3.10",
 		"url-loader": "^4.1.1",
 		"webpack": "^5.97.0",
