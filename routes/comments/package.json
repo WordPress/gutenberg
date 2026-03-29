@@ -12,6 +12,7 @@
 		"@wordpress/compose": "file:../../packages/compose",
 		"@wordpress/core-data": "file:../../packages/core-data",
 		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/date": "file:../../packages/date",
 		"@wordpress/dataviews": "file:../../packages/dataviews",
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
