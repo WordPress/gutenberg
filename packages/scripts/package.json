@@ -34,7 +34,7 @@
 	},
 	"dependencies": {
 		"@babel/core": "7.25.7",
-		"@lyricalstring/gale": "0.1.4",
+		"@lyricalstring/gale": "0.1.5",
 		"@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
 		"@svgr/webpack": "^8.0.1",
 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
