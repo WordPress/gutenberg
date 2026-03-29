@@ -67,10 +67,9 @@ export const getValueFromObjectPath = (
 /**
  * Helper util to filter out objects with duplicate values for a given property.
  *
- * @param {Object[]} array    Array of objects to filter.
- * @param {string}   property Property to filter unique values by.
- *
- * @return {Object[]} Array of objects with unique values for the specified property.
+ * @param array    Array of objects to filter.
+ * @param property Property to filter unique values by.
+ * @return  Array of objects with unique values for the specified property.
  */
 export function uniqByProperty( array: Object[], property: string ): Object[] {
 	const seen = new Set();
