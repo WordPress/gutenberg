@@ -223,7 +223,7 @@
 		],
 		"**/*.{js,ts,tsx,jsx}": [
 			"npm run prelint:js",
-			"wp-scripts lint-js --config .eslintrc.strict.js --fix"
+			"wp-scripts lint-js --config .eslintrc.strict.js"
 		],
 		"*.scss": [
 			"wp-scripts lint-style"
