@@ -48,9 +48,16 @@ function removeCharsetMetaTag( html ) {
 	return html;
 }
 
+/**
+ * @param {ClipboardEvent} param0
+ */
 export function getPasteEventData( { clipboardData } ) {
 	let plainText = '';
 	let html = '';
+
+	if ( ! clipboardData ) {
+		return;
+	}
 
 	try {
 		plainText = clipboardData.getData( 'text/plain' );
