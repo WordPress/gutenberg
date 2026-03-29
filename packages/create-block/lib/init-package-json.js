@@ -18,11 +18,7 @@ const { info, error } = require( './log' );
  */
 async function resolvePackageVersion( packageName ) {
 	try {
-		const { stdout } = await command( 'npm', [
-			'view',
-			packageName,
-			'version',
-		] );
+		const { stdout } = await command( `npm view ${ packageName } version` );
 		return `^${ stdout.trim() }`;
 	} catch ( err ) {
 		info( '' );
@@ -87,7 +83,9 @@ module.exports = async ( {
 			try {
 				checkDependency( packageArg );
 				const parsed = npmPackageArg( packageArg );
-				dependencies[ parsed.name ] = parsed.saveSpec || 'latest';
+				dependencies[ parsed.name ] =
+					parsed.saveSpec ||
+					( await resolvePackageVersion( parsed.name ) );
 			} catch ( { message } ) {
 				info( '' );
 				info( `Skipping "${ packageArg }" npm dependency. Reason:` );
@@ -101,7 +99,9 @@ module.exports = async ( {
 			try {
 				checkDependency( packageArg );
 				const parsed = npmPackageArg( packageArg );
-				devDependencies[ parsed.name ] = parsed.saveSpec || 'latest';
+				devDependencies[ parsed.name ] =
+					parsed.saveSpec ||
+					( await resolvePackageVersion( parsed.name ) );
 			} catch ( { message } ) {
 				info( '' );
 				info(
