@@ -3,8 +3,10 @@
 	"version": "1.0.0",
 	"private": true,
 	"route": {
-		"path": "/comments/$status",
-		"page": "site-editor-v2"
+		"path": "/$status",
+		"page": [
+			"comments-admin"
+		]
 	},
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",

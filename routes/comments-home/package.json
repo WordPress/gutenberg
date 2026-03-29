@@ -1,0 +1,14 @@
+{
+	"name": "@wordpress/comments-home-route",
+	"version": "1.0.0",
+	"private": true,
+	"route": {
+		"path": "/",
+		"page": [
+			"comments-admin"
+		]
+	},
+	"dependencies": {
+		"@wordpress/route": "file:../../packages/route"
+	}
+}

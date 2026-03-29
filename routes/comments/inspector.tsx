@@ -28,7 +28,7 @@ const STATUS_LABELS: Record< string, string > = {
 };
 
 function CommentInspector() {
-	const searchParams = useSearch( { from: '/comments/$status' } );
+	const searchParams = useSearch( { from: '/$status' } );
 	const commentIds = useMemo(
 		() => searchParams.commentIds ?? [],
 		[ searchParams.commentIds ]

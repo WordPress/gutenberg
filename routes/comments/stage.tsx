@@ -58,10 +58,10 @@ function getItemId( item: CommentWithPermissions ) {
 
 function CommentsList() {
 	const { status: statusSlug = 'all' } = useParams( {
-		from: '/comments/$status',
+		from: '/$status',
 	} );
 	const navigate = useNavigate();
-	const searchParams = useSearch( { from: '/comments/$status' } );
+	const searchParams = useSearch( { from: '/$status' } );
 
 	// View state management
 	const activeViewOverrides = useMemo(
@@ -150,7 +150,7 @@ function CommentsList() {
 	const handleTabChange = useCallback(
 		( newStatus: string ) => {
 			navigate( {
-				to: `/comments/${ newStatus }`,
+				to: `/${ newStatus }`,
 			} );
 		},
 		[ navigate ]
