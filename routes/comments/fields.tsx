@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useSelect } from '@wordpress/data';
+import { useSelect, resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { Field } from '@wordpress/dataviews';
 
@@ -98,10 +98,30 @@ function PostFieldView( { item }: { item: CommentWithPermissions } ) {
  */
 export const postField: Field< CommentWithPermissions > = {
 	id: 'post',
-	label: __( 'In Response To' ),
+	label: __( 'Post' ),
 	type: 'integer',
 	enableSorting: false,
 	render: PostFieldView,
+	getElements: async () => {
+		const posts =
+			( await resolveSelect( coreStore ).getEntityRecords(
+				'postType',
+				'post',
+				{
+					per_page: 100,
+					_fields: 'id,title',
+					orderby: 'title',
+					order: 'asc',
+					status: 'publish',
+				}
+			) ) ?? [];
+		return ( posts as { id: number; title: { rendered: string } }[] ).map(
+			( { id, title } ) => ( {
+				value: id,
+				label: decodeEntities( title.rendered ) || `Post #${ id }`,
+			} )
+		);
+	},
 	filterBy: {
 		operators: [ 'is' ],
 	},

@@ -127,7 +127,7 @@ function CommentInspector() {
 
 			{ /* Post reference */ }
 			<HStack>
-				<Text weight="bold">{ __( 'In Response To:' ) }</Text>
+				<Text weight="bold">{ __( 'Post:' ) }</Text>
 				<Text>{ postTitle || `Post #${ comment.post }` }</Text>
 			</HStack>
 
