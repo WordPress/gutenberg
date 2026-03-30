@@ -8,7 +8,7 @@ import { Page } from '@wordpress/admin-ui';
 import type { View } from '@wordpress/dataviews';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
-import { useMemo, useCallback, useEffect } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -158,23 +158,6 @@ function CommentsList() {
 
 	// Selection from URL
 	const selection = searchParams.commentIds ?? [];
-
-	// Store visible comment IDs in URL so the inspector can navigate between them.
-	useEffect( () => {
-		if ( ! comments || comments.length === 0 ) {
-			return;
-		}
-		const orderedIds = comments.map( ( c ) => c.id.toString() );
-		const currentVisibleIds = searchParams.visibleIds ?? [];
-		if ( orderedIds.join( ',' ) !== currentVisibleIds.join( ',' ) ) {
-			navigate( {
-				search: {
-					...searchParams,
-					visibleIds: orderedIds,
-				},
-			} );
-		}
-	}, [ comments, searchParams, navigate ] );
 
 	return (
 		<Page

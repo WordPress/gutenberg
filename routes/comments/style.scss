@@ -16,38 +16,3 @@
 		}
 	}
 }
-
-.comments-inspector {
-	padding: $grid-unit-20;
-
-	&__header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding-bottom: $grid-unit-20;
-		border-bottom: 1px solid $gray-100;
-		margin-bottom: $grid-unit-20;
-	}
-
-	&__actions {
-		display: flex;
-		gap: $grid-unit-10;
-	}
-
-	&__navigation {
-		display: flex;
-		gap: $grid-unit-05;
-		align-items: center;
-	}
-
-	&__body {
-		overflow-y: auto;
-	}
-
-	&__content-rendered {
-		padding: $grid-unit-15;
-		background: $gray-100;
-		border-radius: $radius-medium;
-		line-height: 1.6;
-	}
-}
