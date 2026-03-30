@@ -36,9 +36,11 @@ export function preventFocusCapture() {
 
 		defaultView.addEventListener( 'pointerdown', onPointerDown );
 		defaultView.addEventListener( 'pointerup', onPointerUp );
+		defaultView.addEventListener( 'pointercancel', onPointerUp );
 		return () => {
 			defaultView.removeEventListener( 'pointerdown', onPointerDown );
 			defaultView.removeEventListener( 'pointerup', onPointerUp );
+			defaultView.removeEventListener( 'pointercancel', onPointerUp );
 		};
 	};
 }
