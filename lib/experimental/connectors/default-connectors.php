@@ -529,7 +529,7 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 			$is_activated = $is_installed && is_plugin_active( $file );
 
 			$connector_out['plugin'] = array(
-				'pluginFile'  => str_ends_with( $file, '.php' ) ? substr( $file, 0, -4 ) : $file,
+				'file'        => str_ends_with( $file, '.php' ) ? substr( $file, 0, -4 ) : $file,
 				'isInstalled' => $is_installed,
 				'isActivated' => $is_activated,
 			);

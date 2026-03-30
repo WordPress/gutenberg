@@ -12,7 +12,7 @@ import type { __experimentalApiKeySource as ApiKeySource } from '@wordpress/conn
 export type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';
 
 interface UseConnectorPluginOptions {
-	pluginFile?: string;
+	file?: string;
 	settingName: string;
 	connectorName: string;
 	isInstalled?: boolean;
@@ -38,7 +38,7 @@ interface UseConnectorPluginReturn {
 }
 
 export function useConnectorPlugin( {
-	pluginFile: pluginFileFromServer,
+	file: pluginFileFromServer,
 	settingName,
 	connectorName,
 	isInstalled,
