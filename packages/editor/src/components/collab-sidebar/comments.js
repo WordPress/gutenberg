@@ -946,6 +946,14 @@ const CommentBoard = ( {
 
 	const canResolve = thread.parent === 0 && ! isSuggestionThread;
 	const isApproved = thread.status === 'approved';
+	const suggestionText = stripHTML( thread.content?.rendered || '' );
+	const isAcceptedSuggestion =
+		isApproved &&
+		suggestionOriginalBlockText?.trim() === suggestionText.trim();
+	const showSuggestionDiff =
+		'edit' !== actionState && isSuggestionThread && ! isApproved;
+	const showSuggestionPlain =
+		'edit' !== actionState && isSuggestionThread && isApproved;
 	const moreActions =
 		parent?.status !== 'approved'
 			? actions.filter( ( item ) => item.isEligible( thread ) )
@@ -1123,14 +1131,32 @@ const CommentBoard = ( {
 						reflowComments={ reflowComments }
 					/>
 				) : null }
-				{ 'edit' !== actionState && isSuggestionThread ? (
+				{ showSuggestionDiff ? (
 					<SuggestionDiff
 						className="editor-collab-sidebar-panel__user-comment"
 						originalText={ suggestionOriginalBlockText }
-						suggestedText={ stripHTML(
-							thread.content?.rendered || ''
-						) }
+						suggestedText={ suggestionText }
 					/>
+				) : null }
+				{ showSuggestionPlain ? (
+					<RawHTML
+						className={ clsx(
+							'editor-collab-sidebar-panel__user-comment',
+							'editor-collab-sidebar-panel__suggestion-text',
+							{
+								'editor-collab-sidebar-panel__suggestion-text--accepted':
+									isAcceptedSuggestion,
+								'editor-collab-sidebar-panel__suggestion-text--rejected':
+									! isAcceptedSuggestion,
+							}
+						) }
+					>
+						{ `${
+							isAcceptedSuggestion
+								? '<strong>Accepted:</strong>'
+								: '<strong>Rejected:</strong>'
+						} ${ thread?.content?.rendered || '' }` }
+					</RawHTML>
 				) : null }
 				{ 'edit' !== actionState && ! isSuggestionThread ? (
 					<RawHTML

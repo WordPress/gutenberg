@@ -76,6 +76,22 @@
 	word-break: break-word;
 }
 
+.editor-collab-sidebar-panel__suggestion-text {
+	word-break: break-word;
+	padding: $grid-unit-10;
+	border-radius: $radius-large;
+}
+
+.editor-collab-sidebar-panel__suggestion-text--accepted {
+	color: $alert-green;
+	background-color: rgba($alert-green, 0.08);
+}
+
+.editor-collab-sidebar-panel__suggestion-text--rejected {
+	color: $alert-red;
+	background-color: rgba($alert-red, 0.08);
+}
+
 .editor-collab-sidebar-panel__user-avatar {
 	border-radius: $radius-round;
 	flex-shrink: 0;
