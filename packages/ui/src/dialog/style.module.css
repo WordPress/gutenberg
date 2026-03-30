@@ -37,9 +37,9 @@
 		border-radius: var(--wpds-border-radius-lg);
 		box-shadow: var(--wpds-elevation-lg);
 		overflow: auto;
-		font-family: var(--wpds-font-family-body);
-		font-size: var(--wpds-font-size-md);
-		line-height: var(--wpds-font-line-height-md);
+		font-family: var(--wpds-typography-font-family-body);
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: var(--wpds-typography-line-height-md);
 		color: var(--wpds-color-fg-content-neutral);
 
 		&[data-starting-style],
