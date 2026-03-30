@@ -42,14 +42,15 @@ function getContextFromAction( action ) {
 export function getMergedItemIds(
 	itemIds = [],
 	nextItemIds,
-	{ page, offset, perPage } = {}
+	// The defaults for `page` and `perPage` are the same as in `getQueryParts`.
+	{ page = 1, offset, perPage = 10 } = {}
 ) {
 	// If the query is unbounded, then `nextItemIds` is a complete replacement.
 	if ( perPage === -1 ) {
 		return nextItemIds;
 	}
 
-	const nextItemIdsStartIndex = offset ?? ( ( page ?? 1 ) - 1 ) * perPage;
+	const nextItemIdsStartIndex = offset ?? ( page - 1 ) * perPage;
 
 	// If later page has already been received, default to the larger known
 	// size of the existing array, else calculate as extending the existing.
