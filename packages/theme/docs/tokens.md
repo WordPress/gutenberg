@@ -157,22 +157,22 @@ Do not edit directly.
 
 ### Typography
 
-| Variable name                 | Description                                  |
-| ----------------------------- | -------------------------------------------- |
-| `--wpds-font-family-heading`  | Headings font family                         |
-| `--wpds-font-family-body`     | Body font family                             |
-| `--wpds-font-family-mono`     | Monospace font family                        |
-| `--wpds-font-size-xs`         | Extra small font size                        |
-| `--wpds-font-size-sm`         | Small font size                              |
-| `--wpds-font-size-md`         | Medium font size                             |
-| `--wpds-font-size-lg`         | Large font size                              |
-| `--wpds-font-size-xl`         | Extra large font size                        |
-| `--wpds-font-size-2xl`        | 2X large font size                           |
-| `--wpds-font-line-height-xs`  | Extra small line height                      |
-| `--wpds-font-line-height-sm`  | Small line height                            |
-| `--wpds-font-line-height-md`  | Medium line height                           |
-| `--wpds-font-line-height-lg`  | Large line height                            |
-| `--wpds-font-line-height-xl`  | Extra large line height                      |
-| `--wpds-font-line-height-2xl` | 2X large line height                         |
-| `--wpds-font-weight-regular`  | Regular font weight for body text            |
-| `--wpds-font-weight-medium`   | Medium font weight for emphasis and headings |
+| Variable name                 | Description                                                                                                                                                                                                       |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--wpds-font-family-heading`  | Headings font family                                                                                                                                                                                              |
+| `--wpds-font-family-body`     | Body font family                                                                                                                                                                                                  |
+| `--wpds-font-family-mono`     | Monospace font family                                                                                                                                                                                             |
+| `--wpds-font-size-xs`         | Extra small font size                                                                                                                                                                                             |
+| `--wpds-font-size-sm`         | Small font size                                                                                                                                                                                                   |
+| `--wpds-font-size-md`         | Medium font size                                                                                                                                                                                                  |
+| `--wpds-font-size-lg`         | Large font size                                                                                                                                                                                                   |
+| `--wpds-font-size-xl`         | Extra large font size                                                                                                                                                                                             |
+| `--wpds-font-size-2xl`        | 2X large font size                                                                                                                                                                                                |
+| `--wpds-font-line-height-xs`  | Extra small line height                                                                                                                                                                                           |
+| `--wpds-font-line-height-sm`  | Small line height                                                                                                                                                                                                 |
+| `--wpds-font-line-height-md`  | Medium line height                                                                                                                                                                                                |
+| `--wpds-font-line-height-lg`  | Large line height                                                                                                                                                                                                 |
+| `--wpds-font-line-height-xl`  | Extra large line height                                                                                                                                                                                           |
+| `--wpds-font-line-height-2xl` | 2X large line height                                                                                                                                                                                              |
+| `--wpds-font-weight-regular`  | Regular font weight for body text                                                                                                                                                                                 |
+| `--wpds-font-weight-medium`   | Medium font weight for emphasis and headings. Uses 499 instead of 500 to work around a Chrome bug where 500 renders as 600 when the exact weight is unavailable. See: https://issues.chromium.org/issues/40552893 |

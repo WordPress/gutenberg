@@ -102,8 +102,8 @@
 				"$description": "Regular font weight for body text"
 			},
 			"medium": {
-				"$value": 500,
-				"$description": "Medium font weight for emphasis and headings"
+				"$value": 499,
+				"$description": "Medium font weight for emphasis and headings. Uses 499 instead of 500 to work around a Chrome bug where 500 renders as 600 when the exact weight is unavailable. See: https://issues.chromium.org/issues/40552893"
 			},
 			"$extensions": {
 				"com.figma.scopes": [ "FONT_WEIGHT" ]

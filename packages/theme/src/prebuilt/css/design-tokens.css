@@ -147,7 +147,7 @@
 	--wpds-font-size-sm: 12px; /* Small font size */
 	--wpds-font-size-xl: 20px; /* Extra large font size */
 	--wpds-font-size-xs: 11px; /* Extra small font size */
-	--wpds-font-weight-medium: 499; /* Medium font weight for emphasis and headings */
+	--wpds-font-weight-medium: 499; /* Medium font weight for emphasis and headings. Uses 499 instead of 500 to work around a Chrome bug where 500 renders as 600 when the exact weight is unavailable. See: https://issues.chromium.org/issues/40552893 */
 	--wpds-font-weight-regular: 400; /* Regular font weight for body text */
 }
 

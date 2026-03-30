@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `design-tokens.js` export now provides `tokens` (keyed by variable name, with `$description`, `$type`, `group`, and `modes.default` containing `$value` and `css`) and `groups` (keyed by source file) named exports, replacing the previous flat array default export ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
+
 ## 0.9.0 (2026-03-18)
 
 ### New Features

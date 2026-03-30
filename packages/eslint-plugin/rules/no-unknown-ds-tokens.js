@@ -1,5 +1,4 @@
-const tokenListModule = require( '@wordpress/theme/design-tokens.js' );
-const tokenList = tokenListModule.default || tokenListModule;
+const { tokens: tokenMap } = require( '@wordpress/theme/design-tokens.js' );
 
 const DS_TOKEN_PREFIX = 'wpds-';
 
@@ -41,7 +40,7 @@ function classifyTokens( value, prefix = '' ) {
 	return { tokens, bare };
 }
 
-const knownTokens = new Set( tokenList );
+const knownTokens = new Set( Object.keys( tokenMap ) );
 const wpdsTokensRegex = new RegExp( `(?:^|[^\\w])--${ DS_TOKEN_PREFIX }`, 'i' );
 
 module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
