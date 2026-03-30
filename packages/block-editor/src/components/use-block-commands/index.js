@@ -174,7 +174,8 @@ const getQuickActionsCommands = () =>
 			canRemoveBlocks,
 			isBlockHiddenAnywhere,
 		} = unlock( useSelect( blockEditorStore ) );
-		const { getBlockEditingMode } = useSelect( blockEditorStore );
+		const { getBlockEditingMode, getTemplateLock } =
+			useSelect( blockEditorStore );
 		const { getDefaultBlockName, getGroupingBlockName } =
 			useSelect( blocksStore );
 
@@ -236,10 +237,12 @@ const getQuickActionsCommands = () =>
 			);
 		} );
 		const canRemove = canRemoveBlocks( clientIds );
+		const isParentTemplateLockContentOnly =
+			getTemplateLock( rootClientId ) === 'contentOnly';
 
 		const commands = [];
 
-		if ( canDuplicate ) {
+		if ( canDuplicate && ! isParentTemplateLockContentOnly ) {
 			commands.push( {
 				name: 'duplicate',
 				label: __( 'Duplicate' ),
@@ -248,7 +251,7 @@ const getQuickActionsCommands = () =>
 			} );
 		}
 
-		if ( canInsertDefaultBlock ) {
+		if ( canInsertDefaultBlock && ! isParentTemplateLockContentOnly ) {
 			commands.push(
 				{
 					name: 'add-before',

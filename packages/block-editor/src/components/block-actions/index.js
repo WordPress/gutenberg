@@ -29,6 +29,7 @@ export default function BlockActions( {
 				getBlocksByClientId,
 				getDirectInsertBlock,
 				canRemoveBlocks,
+				getTemplateLock,
 			} = select( blockEditorStore );
 
 			const blocks = getBlocksByClientId( clientIds );
@@ -40,15 +41,19 @@ export default function BlockActions( {
 			const directInsertBlock = rootClientId
 				? getDirectInsertBlock( rootClientId )
 				: null;
+			const isParentTemplateLockContentOnly =
+				getTemplateLock( rootClientId ) === 'contentOnly';
 
 			return {
 				canRemove: canRemoveBlocks( clientIds ),
-				canInsertBlock: blocks.every( ( block ) => {
-					return (
-						( canInsertDefaultBlock || !! directInsertBlock ) &&
-						canInsertBlockType( block.name, rootClientId )
-					);
-				} ),
+				canInsertBlock:
+					! isParentTemplateLockContentOnly &&
+					blocks.every( ( block ) => {
+						return (
+							( canInsertDefaultBlock || !! directInsertBlock ) &&
+							canInsertBlockType( block.name, rootClientId )
+						);
+					} ),
 				canCopyStyles: blocks.every( ( block ) => {
 					return (
 						!! block &&
@@ -56,13 +61,15 @@ export default function BlockActions( {
 							hasBlockSupport( block.name, 'typography' ) )
 					);
 				} ),
-				canDuplicate: blocks.every( ( block ) => {
-					return (
-						!! block &&
-						hasBlockSupport( block.name, 'multiple', true ) &&
-						canInsertBlockType( block.name, rootClientId )
-					);
-				} ),
+				canDuplicate:
+					! isParentTemplateLockContentOnly &&
+					blocks.every( ( block ) => {
+						return (
+							!! block &&
+							hasBlockSupport( block.name, 'multiple', true ) &&
+							canInsertBlockType( block.name, rootClientId )
+						);
+					} ),
 			};
 		},
 		[ clientIds, getDefaultBlockName ]
