@@ -33,6 +33,10 @@ function InserterListItem( {
 	...props
 } ) {
 	const isDraggingRef = useRef( false );
+	const isTouchDeviceRef = useRef(
+		window.matchMedia( '(hover: none)' ).matches ||
+			window.matchMedia( '(pointer: coarse)' ).matches
+	);
 	const itemIconStyle = item.icon
 		? {
 				backgroundColor: item.icon.background,
@@ -110,7 +114,10 @@ function InserterListItem( {
 							}
 						} }
 						onMouseEnter={ () => {
-							if ( isDraggingRef.current ) {
+							if (
+								isDraggingRef.current ||
+								isTouchDeviceRef.current
+							) {
 								return;
 							}
 							onHover( item );
