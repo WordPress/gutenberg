@@ -1,5 +1,15 @@
 == Changelog ==
 
+= 22.8.2 =
+
+## Changelog
+
+### Bug Fixes
+
+Build: detect version and generate asset.php for vendor scripts ([76811](https://github.com/WordPress/gutenberg/pull/76811))
+
+
+
 = 22.8.1 =
 
 
