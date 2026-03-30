@@ -95,6 +95,21 @@ export const WithIconAndBreadcrumbs: Story = {
 	},
 };
 
+export const WithImageIcon: Story = {
+	args: {
+		title: 'Page title',
+		icon: (
+			<img
+				src="https://s.w.org/about/images/logos/wordpress-logo-notext-rgb.png"
+				alt="Page icon"
+			/>
+		),
+		showSidebarToggle: false,
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
+	},
+};
+
 export const WithBreadcrumbsAndSubtitle: Story = {
 	args: {
 		showSidebarToggle: false,
