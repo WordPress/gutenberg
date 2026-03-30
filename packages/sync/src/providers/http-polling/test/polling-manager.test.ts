@@ -803,6 +803,123 @@ describe( 'polling-manager', () => {
 		} );
 	} );
 
+	describe( 'error recovery', () => {
+		it( 'replaces queued updates with a compaction after a poll error', async () => {
+			// First poll: succeed with collaborators to resume the queue.
+			const responseWithCollaborator = {
+				rooms: [
+					{
+						room: 'test-room',
+						end_cursor: 1,
+						awareness: { 1: {}, 2: {} },
+						updates: [],
+					},
+				],
+			};
+			mockPostSyncUpdate.mockResolvedValueOnce(
+				responseWithCollaborator
+			);
+
+			const doc = createMockDoc( 1 );
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			// Flush the initial poll (queue is paused, so no updates sent).
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			// Add a document update (queue is now resumed due to collaborators).
+			const onDocUpdate = getOnDocUpdate( doc );
+			onDocUpdate( new Uint8Array( [ 1, 2, 3 ] ), 'user' );
+
+			// Second poll: fail with a network error.
+			mockPostSyncUpdate.mockRejectedValueOnce( new Error( 'timeout' ) );
+			await jest.advanceTimersByTimeAsync( 1000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			// Verify the second poll included the queued updates (sync_step1 + doc update).
+			const secondCallPayload = mockPostSyncUpdate.mock
+				.calls[ 1 ][ 0 ] as {
+				rooms: Array< {
+					updates: Array< { type: string } >;
+				} >;
+			};
+			expect(
+				secondCallPayload.rooms[ 0 ].updates.length
+			).toBeGreaterThan( 0 );
+
+			// Third poll: succeed — verify it sends a compaction instead of
+			// restoring the same updates.
+			mockPostSyncUpdate.mockResolvedValueOnce(
+				responseWithCollaborator
+			);
+
+			// Error handler doubled the interval: min(1000 * 2, 30000) = 2000.
+			await jest.advanceTimersByTimeAsync( 2000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			const thirdCallPayload = mockPostSyncUpdate.mock
+				.calls[ 2 ][ 0 ] as {
+				rooms: Array< {
+					updates: Array< { type: string } >;
+				} >;
+			};
+			const retryUpdates = thirdCallPayload.rooms[ 0 ].updates;
+			expect( retryUpdates ).toHaveLength( 1 );
+			expect( retryUpdates[ 0 ].type ).toBe( 'compaction' );
+		} );
+
+		it( 'does not queue a compaction for rooms with no outgoing updates', async () => {
+			// First poll succeeds (no collaborators, queue stays paused).
+			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			// Second poll: fail (no updates were sent because queue is paused).
+			mockPostSyncUpdate.mockRejectedValueOnce( new Error( 'timeout' ) );
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			// Verify no updates were sent on the failed poll.
+			const secondCallPayload = mockPostSyncUpdate.mock
+				.calls[ 1 ][ 0 ] as {
+				rooms: Array< {
+					updates: Array< { type: string } >;
+				} >;
+			};
+			expect( secondCallPayload.rooms[ 0 ].updates ).toHaveLength( 0 );
+
+			// Third poll: succeed — should still have no updates (no compaction queued).
+			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
+			await jest.advanceTimersByTimeAsync( 8000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			const thirdCallPayload = mockPostSyncUpdate.mock
+				.calls[ 2 ][ 0 ] as {
+				rooms: Array< {
+					updates: Array< { type: string } >;
+				} >;
+			};
+			expect( thirdCallPayload.rooms[ 0 ].updates ).toHaveLength( 0 );
+		} );
+	} );
+
 	describe( 'visibility change', () => {
 		it( 'does not spawn a duplicate poll when a request is in-flight', () => {
 			// Keep the first postSyncUpdate pending so we can simulate
