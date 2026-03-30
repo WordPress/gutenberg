@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useRef, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
@@ -29,7 +29,10 @@ import { default as mediaFinalize } from '../../utils/media-finalize';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStylesContext } from '../global-styles-provider';
-import { getSuggestionDiffAttributes } from '../suggestion-mode-diff';
+import {
+	getSuggestionDiffAttributes,
+	getSuggestionEditAttributes,
+} from '../suggestion-mode-diff';
 
 const EMPTY_OBJECT = {};
 
@@ -273,7 +276,85 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 
 	const { undo, setIsInserterOpened } = useDispatch( editorStore );
 	const { editMediaEntity } = unlock( useDispatch( coreStore ) );
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const { saveEntityRecord, editEntityRecord } = useDispatch( coreStore );
+
+	// Debounced save for suggestion note edits. Immediate local update
+	// via editEntityRecord keeps the inline editor responsive, while
+	// the debounced saveEntityRecord persists changes and syncs the
+	// sidebar block note display.
+	const suggestionSaveTimerRef = useRef( null );
+
+	// Clean up pending save on unmount.
+	useEffect( () => {
+		return () => {
+			if ( suggestionSaveTimerRef.current ) {
+				clearTimeout( suggestionSaveTimerRef.current );
+			}
+		};
+	}, [] );
+
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	// Creates a new suggestion note for a block that doesn't have one yet.
+	// Called on the first edit in suggestion mode for blocks without a noteId.
+	const pendingCreations = useRef( new Set() );
+	const onSuggestionCreate = useCallback(
+		async ( clientId, content, metadata ) => {
+			// Prevent duplicate creation if an earlier keystroke already triggered it.
+			if ( pendingCreations.current.has( clientId ) ) {
+				return;
+			}
+			pendingCreations.current.add( clientId );
+
+			try {
+				const savedRecord = await saveEntityRecord(
+					'root',
+					'comment',
+					{
+						post: postId,
+						content,
+						status: 'hold',
+						type: 'note',
+						parent: 0,
+						meta: { _wp_note_kind: 'suggestion' },
+					},
+					{ throwOnError: true }
+				);
+
+				if ( savedRecord?.id ) {
+					updateBlockAttributes( clientId, {
+						metadata: {
+							...metadata,
+							noteId: savedRecord.id,
+						},
+					} );
+				}
+			} finally {
+				pendingCreations.current.delete( clientId );
+			}
+		},
+		[ saveEntityRecord, postId, updateBlockAttributes ]
+	);
+
+	const onSuggestionEdit = useCallback(
+		( noteId, content ) => {
+			// Immediate local edit for responsive inline editing.
+			editEntityRecord( 'root', 'comment', noteId, { content } );
+
+			// Debounced save for persistence and sidebar sync.
+			if ( suggestionSaveTimerRef.current ) {
+				clearTimeout( suggestionSaveTimerRef.current );
+			}
+			suggestionSaveTimerRef.current = setTimeout( () => {
+				saveEntityRecord( 'root', 'comment', {
+					id: noteId,
+					content,
+				} );
+				suggestionSaveTimerRef.current = null;
+			}, 500 );
+		},
+		[ editEntityRecord, saveEntityRecord ]
+	);
 
 	/**
 	 * Creates a Post entity.
@@ -410,6 +491,11 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			getSuggestionDiffAttributes: suggestionMode
 				? getSuggestionDiffAttributes
 				: null,
+			getSuggestionEditAttributes: suggestionMode
+				? getSuggestionEditAttributes
+				: null,
+			onSuggestionEdit: suggestionMode ? onSuggestionEdit : null,
+			onSuggestionCreate: suggestionMode ? onSuggestionCreate : null,
 		};
 
 		if ( isRevisionsMode ) {
@@ -450,6 +536,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		bigImageSizeThreshold,
 		isNavigationOverlayContext,
 		suggestionMode,
+		onSuggestionEdit,
+		onSuggestionCreate,
 	] );
 }
 

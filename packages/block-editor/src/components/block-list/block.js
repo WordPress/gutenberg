@@ -90,6 +90,22 @@ function safeGetSuggestionDiff( fn, select, clientId ) {
 	}
 }
 
+/**
+ * Extract the first plain-text string from a setAttributes call's values.
+ * Returns the text if a RichTextData value is found, or null otherwise.
+ *
+ * @param {Object} newAttrs The attributes object from setAttributes.
+ * @return {string|null} Plain text content, or null.
+ */
+function extractRichTextPlainText( newAttrs ) {
+	for ( const value of Object.values( newAttrs ) ) {
+		if ( value && typeof value.toPlainText === 'function' ) {
+			return value.toPlainText();
+		}
+	}
+	return null;
+}
+
 function BlockListBlock( {
 	block: { __unstableBlockSource },
 	mode,
@@ -125,17 +141,57 @@ function BlockListBlock( {
 	// HTML mode. This allows us to render all of the ancillary pieces
 	// (InspectorControls, etc.) which are inside `BlockEdit` but not
 	// `BlockHTML`, even in HTML mode.
-	// When suggestion mode is active and this block has diffed attributes,
-	// render BlockEdit with the diff-formatted attributes so the diff
-	// is visible inline and the content remains editable.
-	const editAttributes = context.suggestionDiffAttributes ?? attributes;
+	//
+	// Suggestion mode:
+	// - Selected: show suggestion note content (editable), edits update note.
+	// - Not selected: show diff between original and suggestion.
+	let editAttributes = attributes;
+	let effectiveSetAttributes = setAttributes;
+
+	if ( context.suggestionMode ) {
+		const noteId = attributes?.metadata?.noteId;
+
+		if ( isSelected && noteId && context.suggestionEditAttributes ) {
+			// Block has an existing suggestion note — show its content
+			// for editing and route changes to the note.
+			editAttributes = context.suggestionEditAttributes;
+			if ( context.onSuggestionEdit ) {
+				effectiveSetAttributes = ( newAttrs ) => {
+					const text = extractRichTextPlainText( newAttrs );
+					if ( text !== null ) {
+						context.onSuggestionEdit( noteId, text );
+					} else {
+						setAttributes( newAttrs );
+					}
+				};
+			}
+		} else if ( isSelected && ! noteId && context.onSuggestionCreate ) {
+			// Block has no suggestion note yet — on first edit, create
+			// one with the new content and link it to the block.
+			effectiveSetAttributes = ( newAttrs ) => {
+				const text = extractRichTextPlainText( newAttrs );
+				if ( text !== null ) {
+					context.onSuggestionCreate(
+						clientId,
+						text,
+						attributes?.metadata
+					);
+				} else {
+					setAttributes( newAttrs );
+				}
+			};
+		} else if ( ! isSelected && context.suggestionDiffAttributes ) {
+			// Unfocused — show the diff view.
+			editAttributes = context.suggestionDiffAttributes;
+		}
+	}
 
 	let blockEdit = (
 		<BlockEdit
 			name={ name }
 			isSelected={ isSelected }
 			attributes={ editAttributes }
-			setAttributes={ setAttributes }
+			setAttributes={ effectiveSetAttributes }
 			insertBlocksAfter={ isLocked ? undefined : onInsertBlocksAfter }
 			onReplace={ canRemove ? onReplace : undefined }
 			onRemove={ canRemove ? onRemove : undefined }
@@ -673,6 +729,12 @@ function BlockListBlockProvider( props ) {
 								clientId
 						  )
 						: null,
+				onSuggestionEdit: _suggestionMode
+					? settings.onSuggestionEdit
+					: null,
+				onSuggestionCreate: _suggestionMode
+					? settings.onSuggestionCreate
+					: null,
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -704,8 +766,23 @@ function BlockListBlockProvider( props ) {
 				blocksWithSameName.length &&
 				blocksWithSameName[ 0 ] !== clientId;
 
+			// When selected in suggestion mode, compute editable
+			// suggestion attributes (note content, no diff markup).
+			const suggestionEditAttributes =
+				_isSelected &&
+				_suggestionMode &&
+				settings.getSuggestionEditAttributes &&
+				attributes?.metadata?.noteId
+					? safeGetSuggestionDiff(
+							settings.getSuggestionEditAttributes,
+							select,
+							clientId
+					  )
+					: null;
+
 			return {
 				...previewContext,
+				suggestionEditAttributes,
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
 				isLocked: !! getTemplateLock( rootClientId ),
@@ -844,6 +921,9 @@ function BlockListBlockProvider( props ) {
 		deviceType,
 		suggestionMode,
 		suggestionDiffAttributes,
+		suggestionEditAttributes,
+		onSuggestionEdit,
+		onSuggestionCreate,
 	} = selectedProps;
 
 	const privateContext = {
@@ -885,6 +965,9 @@ function BlockListBlockProvider( props ) {
 		deviceType,
 		suggestionMode,
 		suggestionDiffAttributes,
+		suggestionEditAttributes,
+		onSuggestionEdit,
+		onSuggestionCreate,
 	};
 
 	if (

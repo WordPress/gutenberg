@@ -88,20 +88,57 @@ function stripDiffFormats( richTextData ) {
 	} );
 }
 
-// Cache to avoid recomputing and creating new RichTextData instances
+/**
+ * Simple bounded cache — evicts the oldest entry when the limit is reached.
+ *
+ * @param {number} maxSize Maximum number of entries.
+ * @return {Map} A Map with a bounded `set` method.
+ */
+function createBoundedCache( maxSize = 100 ) {
+	const cache = new Map();
+	const originalSet = cache.set.bind( cache );
+	cache.set = ( key, value ) => {
+		originalSet( key, value );
+		if ( cache.size > maxSize ) {
+			cache.delete( cache.keys().next().value );
+		}
+		return cache;
+	};
+	return cache;
+}
+
+// Caches to avoid recomputing and creating new RichTextData instances
 // on every useSelect call, which would cause infinite re-renders.
-const diffCache = new Map();
+const diffCache = createBoundedCache();
+const editCache = createBoundedCache();
 
 /**
- * Selector-style function to compute diffed attributes for a block
- * with a suggestion note. Called from within a useSelect in block-editor
- * via settings, so it receives `select` and can access any store.
+ * Helper to read the note content string, handling both API format
+ * ({ rendered: "..." }) and local edit format (plain string).
+ *
+ * @param {Object} note The note entity record.
+ * @return {string} The note content as a plain string.
+ */
+function getNoteText( note ) {
+	const raw =
+		typeof note.content === 'string'
+			? note.content
+			: note.content?.rendered || '';
+	return stripHTML( raw ).trim();
+}
+
+/**
+ * Resolve the suggestion context for a block: its attributes, the linked
+ * suggestion note, and the name of its first rich-text attribute.
+ *
+ * Returns null if any prerequisite is missing (no noteId, note not a
+ * suggestion, no rich-text attribute, etc.).
  *
  * @param {Function} select   The registry select function.
  * @param {string}   clientId The block's client ID.
- * @return {Object|null} Modified attributes with diff formatting, or null.
+ * @return {Object|null} { attributes, richTextAttrName, suggestedText } or null.
  */
-export function getSuggestionDiffAttributes( select, clientId ) {
+function resolveSuggestionContext( select, clientId ) {
 	const { getBlockAttributes, getBlockName } = select( blockEditorStore );
 	const attributes = getBlockAttributes( clientId );
 	const noteId = attributes?.metadata?.noteId;
@@ -110,7 +147,7 @@ export function getSuggestionDiffAttributes( select, clientId ) {
 		return null;
 	}
 
-	const note = select( coreStore ).getEntityRecord(
+	const note = select( coreStore ).getEditedEntityRecord(
 		'root',
 		'comment',
 		noteId
@@ -127,17 +164,17 @@ export function getSuggestionDiffAttributes( select, clientId ) {
 		return null;
 	}
 
-	// Find the first rich-text attribute to diff.
+	// Find the first rich-text source attribute.
 	let richTextAttrName = null;
 	for ( const [ attrName, attrDef ] of Object.entries(
 		blockType.attributes
 	) ) {
-		if ( attrDef.source === 'rich-text' ) {
-			const currentValue = attributes[ attrName ];
-			if ( currentValue instanceof RichTextData ) {
-				richTextAttrName = attrName;
-				break;
-			}
+		if (
+			attrDef.source === 'rich-text' &&
+			attributes[ attrName ] instanceof RichTextData
+		) {
+			richTextAttrName = attrName;
+			break;
 		}
 	}
 
@@ -145,13 +182,68 @@ export function getSuggestionDiffAttributes( select, clientId ) {
 		return null;
 	}
 
+	return {
+		attributes,
+		richTextAttrName,
+		suggestedText: getNoteText( note ),
+	};
+}
+
+/**
+ * Selector-style function to get editable attributes for a block's
+ * suggestion note. Returns the note content as a RichTextData value
+ * (no diff markup) so the user can edit the suggestion directly.
+ * Used when the block is focused in suggestion mode.
+ *
+ * @param {Function} select   The registry select function.
+ * @param {string}   clientId The block's client ID.
+ * @return {Object|null} Modified attributes with note content, or null.
+ */
+export function getSuggestionEditAttributes( select, clientId ) {
+	const ctx = resolveSuggestionContext( select, clientId );
+	if ( ! ctx ) {
+		return null;
+	}
+
+	const { attributes, richTextAttrName, suggestedText } = ctx;
+
+	const cacheKey = `edit:${ clientId }:${ suggestedText }`;
+	const cached = editCache.get( cacheKey );
+	if ( cached ) {
+		return cached;
+	}
+
+	const result = {
+		...attributes,
+		[ richTextAttrName ]: RichTextData.fromPlainText( suggestedText ),
+	};
+
+	editCache.set( cacheKey, result );
+	return result;
+}
+
+/**
+ * Selector-style function to compute diffed attributes for a block
+ * with a suggestion note. Called from within a useSelect in block-editor
+ * via settings, so it receives `select` and can access any store.
+ *
+ * @param {Function} select   The registry select function.
+ * @param {string}   clientId The block's client ID.
+ * @return {Object|null} Modified attributes with diff formatting, or null.
+ */
+export function getSuggestionDiffAttributes( select, clientId ) {
+	const ctx = resolveSuggestionContext( select, clientId );
+	if ( ! ctx ) {
+		return null;
+	}
+
+	const { attributes, richTextAttrName, suggestedText } = ctx;
+
 	// Strip any previously-applied diff formatting to recover the
 	// original block content. After edits, setAttributes saves the
 	// diffed RichTextData (including <del> text) back to the store.
 	const cleanValue = stripDiffFormats( attributes[ richTextAttrName ] );
 	const originalText = cleanValue.toPlainText();
-
-	const suggestedText = stripHTML( note.content?.rendered || '' ).trim();
 
 	// Build a cache key from the inputs that affect the diff result.
 	// If these haven't changed, return the cached result to avoid
@@ -173,12 +265,5 @@ export function getSuggestionDiffAttributes( select, clientId ) {
 	};
 
 	diffCache.set( cacheKey, diffAttributes );
-
-	// Keep cache bounded.
-	if ( diffCache.size > 100 ) {
-		const firstKey = diffCache.keys().next().value;
-		diffCache.delete( firstKey );
-	}
-
 	return diffAttributes;
 }
