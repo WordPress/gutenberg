@@ -374,7 +374,7 @@ function describeFormatChange(
  * @param {RichTextData} previousRichText Previous revision's rich text.
  * @return {RichTextData} New rich text with diff formatting applied.
  */
-function applyRichTextDiff( currentRichText, previousRichText ) {
+export function applyRichTextDiff( currentRichText, previousRichText ) {
 	const currentText = currentRichText.toPlainText();
 	const previousText = previousRichText.toPlainText();
 

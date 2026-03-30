@@ -482,6 +482,21 @@ export function selectedNote( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer for whether suggestion mode is active.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ * @return {boolean} Updated state.
+ */
+export function suggestionMode( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_SUGGESTION_MODE':
+			return action.enabled;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -507,5 +522,6 @@ export default combineReducers( {
 	revisionId,
 	showRevisionDiff,
 	selectedNote,
+	suggestionMode,
 	dataviews: dataviewsReducer,
 } );

@@ -21,6 +21,7 @@ import PostPublishButtonOrToggle from '../post-publish-button/post-publish-butto
 import PostSavedState from '../post-saved-state';
 import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
+import SuggestionModeToggle from '../suggestion-mode-toggle';
 import ZoomOutToggle from '../zoom-out-toggle';
 import { store as editorStore } from '../../store';
 import {
@@ -159,6 +160,8 @@ function Header( {
 						className="editor-header__post-preview-button"
 						forceIsAutosaveable={ forceIsDirty }
 					/>
+
+					<SuggestionModeToggle />
 
 					{ isWideViewport && canBeZoomedOut && (
 						<ZoomOutToggle disabled={ isStylesCanvasActive } />

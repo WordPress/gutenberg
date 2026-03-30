@@ -46,10 +46,34 @@ import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
 
-const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { ExperimentalBlockEditorProvider, usePrivateStyleOverride } = unlock(
+	blockEditorPrivateApis
+);
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
 const noop = () => {};
+
+const SUGGESTION_DIFF_STYLES = `
+	.revision-diff-removed {
+		text-decoration: line-through;
+		color: #d63638;
+	}
+	.revision-diff-added {
+		background-color: color-mix(in srgb, currentColor 5%, #00a32a 15%);
+		text-decoration: none;
+	}
+`;
+
+function SuggestionDiffStyleOverrides() {
+	const isSuggestionMode = useSelect(
+		( select ) => unlock( select( editorStore ) ).isSuggestionMode(),
+		[]
+	);
+	usePrivateStyleOverride( {
+		css: isSuggestionMode ? SUGGESTION_DIFF_STYLES : '',
+	} );
+	return null;
+}
 
 /**
  * These are global entities that are only there to split blocks into logical units
@@ -448,6 +472,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							useSubRegistry={ false }
 						>
 							{ children }
+							<SuggestionDiffStyleOverrides />
 							{ ! settings.isPreviewMode && (
 								<>
 									<PatternsMenuItems />

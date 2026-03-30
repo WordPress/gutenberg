@@ -456,6 +456,17 @@ export function isNoteFocused( state ) {
 }
 
 /**
+ * Returns whether suggestion mode is active.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether suggestion mode is active.
+ */
+export function isSuggestionMode( state ) {
+	return state.suggestionMode;
+}
+
+/**
  * Returns the previous revision (the one before the current revision).
  * Used for diffing between revisions.
  *

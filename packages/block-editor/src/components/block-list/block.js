@@ -82,6 +82,14 @@ function Block( { children, isHtml, ...props } ) {
 	);
 }
 
+function safeGetSuggestionDiff( fn, select, clientId ) {
+	try {
+		return fn( select, clientId );
+	} catch ( e ) {
+		return null;
+	}
+}
+
 function BlockListBlock( {
 	block: { __unstableBlockSource },
 	mode,
@@ -117,11 +125,16 @@ function BlockListBlock( {
 	// HTML mode. This allows us to render all of the ancillary pieces
 	// (InspectorControls, etc.) which are inside `BlockEdit` but not
 	// `BlockHTML`, even in HTML mode.
+	// When suggestion mode is active and this block has diffed attributes,
+	// render BlockEdit with the diff-formatted attributes so the diff
+	// is visible inline and the content remains editable.
+	const editAttributes = context.suggestionDiffAttributes ?? attributes;
+
 	let blockEdit = (
 		<BlockEdit
 			name={ name }
 			isSelected={ isSelected }
-			attributes={ attributes }
+			attributes={ editAttributes }
 			setAttributes={ setAttributes }
 			insertBlocksAfter={ isLocked ? undefined : onInsertBlocksAfter }
 			onReplace={ canRemove ? onReplace : undefined }
@@ -616,6 +629,7 @@ function BlockListBlockProvider( props ) {
 				supportsLayout,
 				isPreviewMode,
 				__experimentalBlockBindingsSupportedAttributes,
+				suggestionMode: _suggestionMode,
 			} = settings;
 			const bindableAttributes =
 				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
@@ -648,6 +662,17 @@ function BlockListBlockProvider( props ) {
 				isMultiSelected,
 				blockEditingMode,
 				isEditingDisabled: blockEditingMode === 'disabled',
+				suggestionMode: _suggestionMode,
+				suggestionDiffAttributes:
+					_suggestionMode &&
+					settings.getSuggestionDiffAttributes &&
+					attributes?.metadata?.noteId
+						? safeGetSuggestionDiff(
+								settings.getSuggestionDiffAttributes,
+								select,
+								clientId
+						  )
+						: null,
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -817,6 +842,8 @@ function BlockListBlockProvider( props ) {
 		bindableAttributes,
 		blockVisibility,
 		deviceType,
+		suggestionMode,
+		suggestionDiffAttributes,
 	} = selectedProps;
 
 	const privateContext = {
@@ -856,6 +883,8 @@ function BlockListBlockProvider( props ) {
 		bindableAttributes,
 		blockVisibility,
 		deviceType,
+		suggestionMode,
+		suggestionDiffAttributes,
 	};
 
 	if (

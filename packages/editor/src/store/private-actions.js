@@ -717,3 +717,16 @@ export function selectNote( noteId, options = { focus: false } ) {
 		options,
 	};
 }
+
+/**
+ * Set whether suggestion mode is active.
+ *
+ * @param {boolean} enabled Whether to enable suggestion mode.
+ * @return {Object} Action object.
+ */
+export function setSuggestionMode( enabled ) {
+	return {
+		type: 'SET_SUGGESTION_MODE',
+		enabled,
+	};
+}

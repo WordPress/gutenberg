@@ -29,6 +29,7 @@ import { default as mediaFinalize } from '../../utils/media-finalize';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStylesContext } from '../global-styles-provider';
+import { getSuggestionDiffAttributes } from '../suggestion-mode-diff';
 
 const EMPTY_OBJECT = {};
 
@@ -142,6 +143,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		deviceType,
 		isNavigationOverlayContext,
 		isRevisionsMode,
+		suggestionMode,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -153,9 +155,11 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
-			const { getDeviceType, isRevisionsMode: _isRevisionsMode } = unlock(
-				select( editorStore )
-			);
+			const {
+				getDeviceType,
+				isRevisionsMode: _isRevisionsMode,
+				isSuggestionMode: _isSuggestionMode,
+			} = unlock( select( editorStore ) );
 			const { getBlocksByName, getBlockAttributes } =
 				select( blockEditorStore );
 			const siteSettings = canUser( 'read', {
@@ -224,6 +228,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 						  )?.area === 'navigation-overlay'
 						: false,
 				isRevisionsMode: _isRevisionsMode(),
+				suggestionMode: _isSuggestionMode(),
 			};
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
@@ -401,6 +406,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				renderingMode === 'template-locked',
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
+			suggestionMode,
+			getSuggestionDiffAttributes: suggestionMode
+				? getSuggestionDiffAttributes
+				: null,
 		};
 
 		if ( isRevisionsMode ) {
@@ -440,6 +449,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		allImageSizes,
 		bigImageSizeThreshold,
 		isNavigationOverlayContext,
+		suggestionMode,
 	] );
 }
 
