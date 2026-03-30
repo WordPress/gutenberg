@@ -373,8 +373,8 @@ add_filter( 'rest_post_dispatch', '_gutenberg_connectors_rest_settings_dispatch'
  * @access private
  */
 function _gutenberg_register_default_connector_settings(): void {
-	$ai_registry         = \WordPress\AiClient\AiClient::defaultRegistry();
-	$existing_settings   = get_registered_settings();
+	$ai_registry       = \WordPress\AiClient\AiClient::defaultRegistry();
+	$existing_settings = get_registered_settings();
 
 	foreach ( wp_get_connectors() as $connector_id => $connector_data ) {
 		$auth = $connector_data['authentication'];
