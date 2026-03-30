@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useParams, useNavigate, useSearch } from '@wordpress/route';
+import { useParams, useNavigate, useSearch, Link } from '@wordpress/route';
 import { useView } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
@@ -216,6 +216,24 @@ function CommentsList() {
 						},
 					} );
 				} }
+				renderItemLink={ ( {
+					item,
+					...props
+				}: {
+					item: CommentWithPermissions;
+				} ) => (
+					<Link
+						to={ `/${ statusSlug }` }
+						search={ {
+							...searchParams,
+							commentIds: [ item.id.toString() ],
+						} }
+						{ ...props }
+						onClick={ ( event: React.MouseEvent ) => {
+							event.stopPropagation();
+						} }
+					/>
+				) }
 			/>
 		</Page>
 	);
