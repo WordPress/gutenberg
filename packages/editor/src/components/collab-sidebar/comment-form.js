@@ -30,9 +30,10 @@ function CommentForm( {
 	submitButtonText,
 	labelText,
 	reflowComments = noop,
+	initialComment,
 } ) {
 	const [ inputComment, setInputComment ] = useState(
-		thread?.content?.raw ?? ''
+		thread?.content?.raw ?? initialComment ?? ''
 	);
 
 	// Regularly trigger a reflow as the user types since the textarea may grow or shrink.

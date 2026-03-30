@@ -6,11 +6,16 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
+	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { commentEditLink } from '@wordpress/icons';
+import { getBlockContent } from '@wordpress/blocks';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -35,10 +40,15 @@ export function AddComment( {
 	y,
 	refs,
 } ) {
-	const { clientId } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId } = select( blockEditorStore );
+	const { clientId, blockTextForSuggestion } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, getBlock } =
+			select( blockEditorStore );
+		const _clientId = getSelectedBlockClientId();
+		const block = _clientId ? getBlock( _clientId ) : null;
+		const html = block ? getBlockContent( block ) : '';
 		return {
-			clientId: getSelectedBlockClientId(),
+			clientId: _clientId,
+			blockTextForSuggestion: html ? stripHTML( html ).trim() : '',
 		};
 	}, [] );
 	const selectedNote = useSelect(
@@ -48,6 +58,7 @@ export function AddComment( {
 	const blockElement = useBlockElement( clientId );
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const [ inputMode, setInputMode ] = useState( 'note' );
 
 	const unselectThread = () => {
 		selectNote( undefined );
@@ -59,6 +70,17 @@ export function AddComment( {
 		return null;
 	}
 
+	const isSuggestionMode = inputMode === 'suggestion';
+	const threadAriaLabel = isSuggestionMode
+		? __( 'New suggestion' )
+		: __( 'New note' );
+	const submitButtonText = isSuggestionMode
+		? __( 'Add suggestion' )
+		: __( 'Add note' );
+	const labelText = isSuggestionMode
+		? __( 'New suggestion' )
+		: __( 'New note' );
+
 	return (
 		<VStack
 			className={ clsx(
@@ -69,7 +91,7 @@ export function AddComment( {
 			) }
 			spacing="3"
 			tabIndex={ 0 }
-			aria-label={ __( 'New note' ) }
+			aria-label={ threadAriaLabel }
 			role="treeitem"
 			ref={ isFloating ? refs.setFloating : undefined }
 			style={
@@ -90,10 +112,34 @@ export function AddComment( {
 				selectNote( undefined );
 			} }
 		>
-			<HStack alignment="left" spacing="3">
-				<CommentAuthorInfo />
+			<HStack justify="space-between" alignment="center" spacing="3">
+				<HStack alignment="left" spacing="3">
+					<CommentAuthorInfo />
+				</HStack>
+				<Button
+					__next40pxDefaultSize
+					icon={ commentEditLink }
+					isPressed={ isSuggestionMode }
+					label={
+						isSuggestionMode
+							? __( 'Switch to note' )
+							: __( 'Add as suggestion' )
+					}
+					onClick={ () =>
+						setInputMode( ( mode ) =>
+							mode === 'suggestion' ? 'note' : 'suggestion'
+						)
+					}
+					showTooltip
+					size="compact"
+					variant="tertiary"
+				/>
 			</HStack>
 			<CommentForm
+				key={ `${ clientId }-${ inputMode }` }
+				initialComment={
+					isSuggestionMode ? blockTextForSuggestion : ''
+				}
 				onSubmit={ async ( inputComment ) => {
 					const { id } = await onSubmit( { content: inputComment } );
 					selectNote( id );
@@ -101,8 +147,8 @@ export function AddComment( {
 				} }
 				onCancel={ unselectThread }
 				reflowComments={ reflowComments }
-				submitButtonText={ __( 'Add note' ) }
-				labelText={ __( 'New note' ) }
+				submitButtonText={ submitButtonText }
+				labelText={ labelText }
 			/>
 		</VStack>
 	);
