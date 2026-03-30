@@ -119,40 +119,34 @@ function mapModalSize(
 	);
 }
 
-const FIRST_TABBABLE_SELECTOR =
-	'a[href], button:not([disabled]), input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
 const FIRST_INPUT_SELECTOR =
 	'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])';
 
-function useInitialFocus(
+function useMapFocusOnMount(
 	focusOnMount: ActionModalType< unknown >[ 'modalFocusOnMount' ],
 	contentRef: React.RefObject< HTMLElement | null >
 ) {
-	const callback = useCallback( () => {
+	const focusFirstInput = useCallback( () => {
 		if ( contentRef.current ) {
-			const selector =
-				focusOnMount === 'firstInputElement'
-					? FIRST_INPUT_SELECTOR
-					: FIRST_TABBABLE_SELECTOR;
 			const target =
-				contentRef.current.querySelector< HTMLElement >( selector );
+				contentRef.current.querySelector< HTMLElement >(
+					FIRST_INPUT_SELECTOR
+				);
 			if ( target ) {
 				return target;
 			}
 		}
 		return true as const;
-	}, [ focusOnMount, contentRef ] );
+	}, [ contentRef ] );
 
 	if ( focusOnMount === false ) {
 		return false;
 	}
-	if (
-		focusOnMount === 'firstContentElement' ||
-		focusOnMount === 'firstInputElement'
-	) {
-		return callback;
+	if ( focusOnMount === 'firstInputElement' ) {
+		return focusFirstInput;
 	}
+	// 'firstContentElement', true, 'firstElement' — Dialog's smart default
+	// already skips the close icon and focuses the first content tabbable.
 	return true;
 }
 
@@ -171,7 +165,7 @@ export function ActionModal< Item >( {
 
 	const title = modalHeader || label;
 	const contentRef = useRef< HTMLDivElement >( null );
-	const initialFocus = useInitialFocus(
+	const initialFocus = useMapFocusOnMount(
 		action.modalFocusOnMount ?? true,
 		contentRef
 	);
