@@ -55,10 +55,15 @@ const { Tabs } = unlock( componentsPrivateApis );
 
 /**
  * Fetch lightweight comment counts for each status tab.
+ * Re-fetches whenever refreshKey changes (e.g. after moderation actions).
  *
  * @param currentUserId The current user's ID, used for the "mine" count.
+ * @param refreshKey    A value that changes when counts should be re-fetched.
  */
-function useCommentCounts( currentUserId: number | undefined ) {
+function useCommentCounts(
+	currentUserId: number | undefined,
+	refreshKey: unknown
+) {
 	const [ counts, setCounts ] = useState< Record< string, number > >( {} );
 
 	useEffect( () => {
@@ -102,7 +107,7 @@ function useCommentCounts( currentUserId: number | undefined ) {
 				( newCounts.approve ?? 0 ) + ( newCounts.hold ?? 0 );
 			setCounts( newCounts );
 		} );
-	}, [ currentUserId ] );
+	}, [ currentUserId, refreshKey ] );
 
 	return counts;
 }
@@ -150,8 +155,6 @@ function CommentsList() {
 			 )?.id,
 		[]
 	);
-	const counts = useCommentCounts( currentUserId );
-
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'root',
 		name: 'comment',
@@ -185,6 +188,9 @@ function CommentsList() {
 		isResolving,
 		hasResolved,
 	} = useEntityRecordsWithPermissions( 'root', 'comment', queryArgs );
+
+	// Re-fetch counts whenever the current list total changes (after moderation).
+	const counts = useCommentCounts( currentUserId, totalItems );
 
 	// Fields — hide status column when viewing a specific status tab
 	const fields = useMemo( () => {
