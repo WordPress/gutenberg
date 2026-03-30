@@ -9,12 +9,12 @@ export const MAX_UPDATE_SIZE_IN_BYTES = 1 * 1024 * 1024; // 1 MB
 
 export const POLLING_INTERVAL_IN_MS = applyFilters(
 	'sync.pollingManager.pollingInterval',
-	1000 // 1 second or 1000 milliseconds
+	4000 // 4 seconds
 ) as number;
 
 export const POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS = applyFilters(
 	'sync.pollingManager.pollingIntervalWithCollaborators',
-	250 // 250 milliseconds
+	1000 // 1 second
 ) as number;
 
 // Must be less than the server-side AWARENESS_TIMEOUT (30 s) to avoid

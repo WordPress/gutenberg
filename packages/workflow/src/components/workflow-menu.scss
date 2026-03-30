@@ -94,7 +94,7 @@
 	}
 
 	[cmdk-root] > [cmdk-list] {
-		max-height: $palette-max-height; // Specific to not have workflows overflow oddly.
+		max-height: 376px; // Specific to not have workflows overflow oddly.
 		overflow: auto;
 
 		// Ensures there is always padding bottom on the last group, when there are workflows.

@@ -182,12 +182,6 @@ function getSassOptions( workingDir ) {
 
 function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 	return async function styleType( cssText, _dirname, filePath ) {
-		// Always hash the untransformed code.
-		const hash = createHash( 'sha1' )
-			.update( cssText )
-			.digest( 'hex' )
-			.slice( 0, 10 );
-
 		let moduleExports = null;
 
 		// Transform the code: token fallbacks, CSS modules and minification.
@@ -213,6 +207,13 @@ function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 			from: filePath,
 			map: false,
 		} );
+
+		// Hash the transformed CSS so that the dedup key reflects the actual
+		// injected content, including mangled CSS module class names.
+		const hash = createHash( 'sha1' )
+			.update( css )
+			.digest( 'hex' )
+			.slice( 0, 10 );
 
 		let cssModule = `if (typeof document !== 'undefined' && process.env.NODE_ENV !== 'test' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
 	const style = document.createElement("style");

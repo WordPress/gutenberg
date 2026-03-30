@@ -11,7 +11,10 @@ import { removeItems } from '../actions';
 
 describe( 'getMergedItemIds', () => {
 	it( 'should receive a page', () => {
-		const result = getMergedItemIds( [], [ 4, 5, 6 ], 2, 3 );
+		const result = getMergedItemIds( [], [ 4, 5, 6 ], {
+			page: 2,
+			perPage: 3,
+		} );
 
 		expect( result ).toEqual( [
 			undefined,
@@ -32,46 +35,68 @@ describe( 'getMergedItemIds', () => {
 			5,
 			6,
 		] );
-		const result = getMergedItemIds( original, [ 1, 2, 3 ], 1, 3 );
+		const result = getMergedItemIds( original, [ 1, 2, 3 ], {
+			page: 1,
+			perPage: 3,
+		} );
 
 		expect( result ).toEqual( [ 1, 2, 3, 4, 5, 6 ] );
 	} );
 
 	it( 'should replace with new page', () => {
 		const original = deepFreeze( [ 1, 2, 3, 4, 5, 6 ] );
-		const result = getMergedItemIds( original, [ 'replaced', 5, 6 ], 2, 3 );
+		const result = getMergedItemIds( original, [ 'replaced', 5, 6 ], {
+			page: 2,
+			perPage: 3,
+		} );
 
 		expect( result ).toEqual( [ 1, 2, 3, 'replaced', 5, 6 ] );
 	} );
 
 	it( 'should append a new partial page', () => {
 		const original = deepFreeze( [ 1, 2, 3, 4, 5, 6 ] );
-		const result = getMergedItemIds( original, [ 7 ], 3, 3 );
+		const result = getMergedItemIds( original, [ 7 ], {
+			page: 3,
+			perPage: 3,
+		} );
 
 		expect( result ).toEqual( [ 1, 2, 3, 4, 5, 6, 7 ] );
 	} );
 
 	it( 'should return a copy of nextItemIds if it represents all ids (single id removed) (page=1 and perPage=-1)', () => {
 		const original = deepFreeze( [ 1, 2, 3 ] );
-		const result = getMergedItemIds( original, [ 1, 3 ], 1, -1 );
+		const result = getMergedItemIds( original, [ 1, 3 ], {
+			page: 1,
+			perPage: -1,
+		} );
 
 		expect( result ).toEqual( [ 1, 3 ] );
 	} );
 
 	it( 'should return a copy of nextItemIds if it represents all ids (single id removed and another one added) (page=1 and perPage=-1)', () => {
 		const original = deepFreeze( [ 1, 2, 3 ] );
-		const result = getMergedItemIds( original, [ 1, 3, 4 ], 1, -1 );
+		const result = getMergedItemIds( original, [ 1, 3, 4 ], {
+			page: 1,
+			perPage: -1,
+		} );
 
 		expect( result ).toEqual( [ 1, 3, 4 ] );
 	} );
+
 	it( 'should update a page properly if less items are provided than previously stored', () => {
 		let original = deepFreeze( [ 1, 2, 3 ] );
-		let result = getMergedItemIds( original, [ 1, 2 ], 1, 3 );
+		let result = getMergedItemIds( original, [ 1, 2 ], {
+			page: 1,
+			perPage: 3,
+		} );
 
 		expect( result ).toEqual( [ 1, 2 ] );
 
 		original = deepFreeze( [ 1, 2, 3, 4, 5, 6 ] );
-		result = getMergedItemIds( original, [ 9 ], 2, 2 );
+		result = getMergedItemIds( original, [ 9 ], {
+			page: 2,
+			perPage: 2,
+		} );
 
 		expect( result ).toEqual( [ 1, 2, 9, undefined, 5, 6 ] );
 	} );
@@ -194,6 +219,51 @@ describe( 'reducer', () => {
 				default: { 1: true },
 			},
 			queries: {},
+		} );
+	} );
+
+	it( 'receives a sparse subset of items at given offsets', () => {
+		const original = deepFreeze( {
+			items: { default: {} },
+			queries: {},
+			itemIsComplete: { default: {} },
+		} );
+		const state = [
+			{
+				type: 'RECEIVE_ITEMS',
+				query: { offset: 1, per_page: 2 },
+				items: [
+					{ id: 2, name: 'def' },
+					{ id: 3, name: 'ghi' },
+				],
+			},
+			{
+				type: 'RECEIVE_ITEMS',
+				query: { offset: 4, per_page: 2 },
+				items: [
+					{ id: 5, name: 'mno' },
+					{ id: 6, name: 'pqr' },
+				],
+			},
+		].reduce( reducer, original );
+
+		expect( state ).toEqual( {
+			items: {
+				default: {
+					2: { id: 2, name: 'def' },
+					3: { id: 3, name: 'ghi' },
+					5: { id: 5, name: 'mno' },
+					6: { id: 6, name: 'pqr' },
+				},
+			},
+			itemIsComplete: {
+				default: { 2: true, 3: true, 5: true, 6: true },
+			},
+			queries: {
+				default: {
+					'': { itemIds: [ undefined, 2, 3, undefined, 5, 6 ] },
+				},
+			},
 		} );
 	} );
 

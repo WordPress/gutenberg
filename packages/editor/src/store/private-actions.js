@@ -627,6 +627,11 @@ export const restoreRevision =
 		const postType = select.getCurrentPostType();
 		const postId = select.getCurrentPostId();
 
+		const entityConfig = registry
+			.select( coreStore )
+			.getEntityConfig( 'postType', postType );
+		const revisionKey = entityConfig?.revisionKey || 'id';
+
 		// Use resolveSelect to ensure the revision is fetched if not yet
 		// in the store. The _fields parameter matches the query used by
 		// getRevisions so the result is served from cache without an
@@ -635,8 +640,19 @@ export const restoreRevision =
 			.resolveSelect( coreStore )
 			.getRevision( 'postType', postType, postId, revisionId, {
 				context: 'edit',
-				_fields:
-					'id,date,author,meta,title.raw,excerpt.raw,content.raw',
+				_fields: [
+					...new Set( [
+						'id',
+						'date',
+						'modified',
+						'author',
+						'meta',
+						'title.raw',
+						'excerpt.raw',
+						'content.raw',
+						revisionKey,
+					] ),
+				].join(),
 			} );
 
 		if ( ! revision ) {
@@ -672,7 +688,12 @@ export const restoreRevision =
 			sprintf(
 				/* translators: %s: Date and time of the revision. */
 				__( 'Restored to revision from %s.' ),
-				dateI18n( getDateSettings().formats.datetime, revision.date )
+				dateI18n(
+					getDateSettings().formats.datetime,
+					// Template revisions use the template REST API format, which
+					// exposes 'modified' instead of 'date'.
+					revisionKey === 'wp_id' ? revision.modified : revision.date
+				)
 			),
 			{
 				type: 'snackbar',
