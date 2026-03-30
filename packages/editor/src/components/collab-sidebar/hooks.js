@@ -191,7 +191,6 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 
 	const onCreate = async ( { content, parent, kind } ) => {
 		try {
-			const isRootNote = ! parent;
 			const newComment = {
 				post: getCurrentPostId(),
 				content,
@@ -200,7 +199,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				parent: parent || 0,
 			};
 
-			if ( isRootNote && kind === 'suggestion' ) {
+			if ( kind === 'suggestion' ) {
 				newComment.meta = {
 					_wp_note_kind: 'suggestion',
 				};
@@ -243,7 +242,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 		}
 	};
 
-	const onEdit = async ( { id, content, status } ) => {
+	const onEdit = async ( { id, content, status, kind } ) => {
 		const messageType = status ? status : 'updated';
 		const messages = {
 			approved: __( 'Note marked as resolved.' ),
@@ -277,6 +276,9 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 					meta: {
 						_wp_note_status:
 							status === 'approved' ? 'resolved' : 'reopen',
+						...( kind === 'suggestion'
+							? { _wp_note_kind: 'suggestion' }
+							: {} ),
 					},
 				};
 

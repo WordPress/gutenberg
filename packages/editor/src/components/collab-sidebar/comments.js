@@ -25,7 +25,12 @@ import {
 } from '@wordpress/components';
 import { useDebounce } from '@wordpress/compose';
 
-import { published, moreVertical, closeSmall } from '@wordpress/icons';
+import {
+	published,
+	moreVertical,
+	closeSmall,
+	commentEditLink,
+} from '@wordpress/icons';
 import { __, _x, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
@@ -469,7 +474,36 @@ function Thread( {
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
 	);
+	const [ inputMode, setInputMode ] = useState( 'note' );
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
+
+	// Used to prefill the reply when creating it as a suggestion.
+	const blockTextForSuggestion = useSelect(
+		( select ) => {
+			if ( ! thread.blockClientId ) {
+				return '';
+			}
+			const block = select( blockEditorStore ).getBlock(
+				thread.blockClientId
+			);
+			if ( ! block ) {
+				return '';
+			}
+			const html = getBlockContent( block );
+			return html ? stripHTML( html ).trim() : '';
+		},
+		[ thread.blockClientId ]
+	);
+
+	// Reset reply input mode when switching between threads.
+	useEffect( () => {
+		if ( isSelected ) {
+			setInputMode( 'note' );
+		}
+	}, [ isSelected, thread.id ] );
+
+	const isSuggestionMode = inputMode === 'suggestion';
+
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
 		50
@@ -714,11 +748,45 @@ function Thread( {
 			) }
 			{ isSelected && (
 				<VStack spacing="2" role="treeitem">
-					<HStack alignment="left" spacing="3" justify="flex-start">
-						<CommentAuthorInfo />
-					</HStack>
 					<VStack spacing="2">
+						<HStack
+							justify="space-between"
+							alignment="center"
+							spacing="3"
+						>
+							<HStack
+								alignment="left"
+								spacing="3"
+								justify="flex-start"
+							>
+								<CommentAuthorInfo />
+							</HStack>
+							<Button
+								__next40pxDefaultSize
+								icon={ commentEditLink }
+								isPressed={ isSuggestionMode }
+								label={
+									isSuggestionMode
+										? __( 'Switch to note' )
+										: __( 'Add as suggestion' )
+								}
+								onClick={ () =>
+									setInputMode( ( mode ) =>
+										mode === 'suggestion'
+											? 'note'
+											: 'suggestion'
+									)
+								}
+								showTooltip
+								size="compact"
+								variant="tertiary"
+							/>
+						</HStack>
 						<CommentForm
+							key={ `${ thread.id }-${ inputMode }` }
+							initialComment={
+								isSuggestionMode ? blockTextForSuggestion : ''
+							}
 							onSubmit={ ( inputComment ) => {
 								if ( 'approved' === thread.status ) {
 									// For reopening, include the content in the reopen action.
@@ -726,12 +794,18 @@ function Thread( {
 										id: thread.id,
 										status: 'hold',
 										content: inputComment,
+										...( isSuggestionMode
+											? { kind: 'suggestion' }
+											: {} ),
 									} );
 								} else {
 									// For regular replies, add as separate comment.
 									onAddReply( {
 										content: inputComment,
 										parent: thread.id,
+										...( isSuggestionMode
+											? { kind: 'suggestion' }
+											: {} ),
 									} );
 								}
 							} }
@@ -809,37 +883,37 @@ const CommentBoard = ( {
 		( thread.meta._wp_note_status === 'resolved' ||
 			thread.meta._wp_note_status === 'reopen' );
 
-	const isRootSuggestion =
+	const isSuggestionThread =
 		! isResolutionComment &&
-		thread.parent === 0 &&
 		thread.type === 'note' &&
 		thread.meta?._wp_note_kind === 'suggestion';
 
+	const relatedBlockClientId = thread.blockClientId ?? parent?.blockClientId;
+
 	const suggestionOriginalBlockText = useSelect(
 		( select ) => {
-			if ( ! thread.blockClientId || ! isRootSuggestion ) {
+			if ( ! relatedBlockClientId || ! isSuggestionThread ) {
 				return '';
 			}
-			const block = select( blockEditorStore ).getBlock(
-				thread.blockClientId
-			);
+			const block =
+				select( blockEditorStore ).getBlock( relatedBlockClientId );
 			if ( ! block ) {
 				return '';
 			}
 			const html = getBlockContent( block );
 			return html ? stripHTML( html ).trim() : '';
 		},
-		[ thread.blockClientId, isRootSuggestion ]
+		[ relatedBlockClientId, isSuggestionThread ]
 	);
 
 	const suggestionBlock = useSelect(
 		( select ) => {
-			if ( ! thread.blockClientId || ! isRootSuggestion ) {
+			if ( ! relatedBlockClientId || ! isSuggestionThread ) {
 				return null;
 			}
-			return select( blockEditorStore ).getBlock( thread.blockClientId );
+			return select( blockEditorStore ).getBlock( relatedBlockClientId );
 		},
-		[ thread.blockClientId, isRootSuggestion ]
+		[ relatedBlockClientId, isSuggestionThread ]
 	);
 
 	const actions = [
@@ -870,7 +944,7 @@ const CommentBoard = ( {
 		},
 	];
 
-	const canResolve = thread.parent === 0 && ! isRootSuggestion;
+	const canResolve = thread.parent === 0 && ! isSuggestionThread;
 	const isApproved = thread.status === 'approved';
 	const moreActions =
 		parent?.status !== 'approved'
@@ -924,7 +998,7 @@ const CommentBoard = ( {
 									} }
 								/>
 							) }
-							{ isRootSuggestion && (
+							{ isSuggestionThread && (
 								<>
 									<Button
 										label={ _x(
@@ -959,7 +1033,7 @@ const CommentBoard = ( {
 											if (
 												typeof suggestedText ===
 													'string' &&
-												thread.blockClientId &&
+												relatedBlockClientId &&
 												suggestionBlock?.attributes
 											) {
 												const attrs =
@@ -974,7 +1048,7 @@ const CommentBoard = ( {
 
 												if ( contentAttribute ) {
 													updateBlockAttributes(
-														thread.blockClientId,
+														relatedBlockClientId,
 														{
 															[ contentAttribute ]:
 																suggestedText,
@@ -1049,7 +1123,7 @@ const CommentBoard = ( {
 						reflowComments={ reflowComments }
 					/>
 				) : null }
-				{ 'edit' !== actionState && isRootSuggestion ? (
+				{ 'edit' !== actionState && isSuggestionThread ? (
 					<SuggestionDiff
 						className="editor-collab-sidebar-panel__user-comment"
 						originalText={ suggestionOriginalBlockText }
@@ -1058,7 +1132,7 @@ const CommentBoard = ( {
 						) }
 					/>
 				) : null }
-				{ 'edit' !== actionState && ! isRootSuggestion ? (
+				{ 'edit' !== actionState && ! isSuggestionThread ? (
 					<RawHTML
 						className={ clsx(
 							'editor-collab-sidebar-panel__user-comment',
