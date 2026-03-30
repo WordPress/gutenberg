@@ -10,6 +10,9 @@ import { v4 as uuidv4 } from 'uuid';
 // XMP namespace used by ISO 21496-1 / UltraHDR gain maps.
 const GAIN_MAP_XMP_NAMESPACE = 'http://ns.adobe.com/hdr-gain-map/1.0/';
 
+// Latin1 decoder reused across calls — decodes bytes 1:1 to code points.
+const latin1Decoder = new TextDecoder( 'latin1' );
+
 /**
  * Detects whether a file contains an HDR gain map by scanning for
  * the Adobe HDR gain map XMP namespace in the file's binary data.
@@ -24,19 +27,9 @@ export async function hasGainMap( file: File ): Promise< boolean > {
 		// XMP metadata is in early JPEG markers; 256 KB is more than enough.
 		const slice = file.slice( 0, 256 * 1024 );
 		const buffer = await slice.arrayBuffer();
-		const bytes = new Uint8Array( buffer );
-
-		// Search for the namespace string in the binary data.
-		const needle = new TextEncoder().encode( GAIN_MAP_XMP_NAMESPACE );
-		outer: for ( let i = 0; i <= bytes.length - needle.length; i++ ) {
-			for ( let j = 0; j < needle.length; j++ ) {
-				if ( bytes[ i + j ] !== needle[ j ] ) {
-					continue outer;
-				}
-			}
-			return true;
-		}
-		return false;
+		return latin1Decoder
+			.decode( buffer )
+			.includes( GAIN_MAP_XMP_NAMESPACE );
 	} catch {
 		return false;
 	}
