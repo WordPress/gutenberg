@@ -29,6 +29,7 @@ import { published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { getBlockContent } from '@wordpress/blocks';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -43,6 +44,7 @@ import CommentForm from './comment-form';
 import { focusCommentThread, getCommentExcerpt } from './utils';
 import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
+import SuggestionDiff from './suggestion-diff';
 import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
@@ -549,11 +551,15 @@ function Thread( {
 		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
 	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
 
+	const isSuggestionThread =
+		thread.parent === 0 && thread.meta?._wp_note_kind === 'suggestion';
+
 	const commentExcerpt = getCommentExcerpt(
 		stripHTML( thread.content?.rendered ),
 		10
 	);
-	const ariaLabel = !! thread.blockClientId
+
+	let ariaLabel = !! thread.blockClientId
 		? sprintf(
 				// translators: %s: note excerpt
 				__( 'Note: %s' ),
@@ -564,6 +570,14 @@ function Thread( {
 				__( 'Original block deleted. Note: %s' ),
 				commentExcerpt
 		  );
+
+	if ( isSuggestionThread ) {
+		ariaLabel = sprintf(
+			// translators: %s: suggestion excerpt
+			__( 'Suggestion: %s' ),
+			commentExcerpt
+		);
+	}
 
 	if ( isFloating && thread.id === 'new' ) {
 		return (
@@ -583,6 +597,7 @@ function Thread( {
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
 				'is-floating': isFloating,
+				'is-suggestion': isSuggestionThread,
 			} ) }
 			id={ `comment-thread-${ thread.id }` }
 			spacing="3"
@@ -793,6 +808,29 @@ const CommentBoard = ( {
 		( thread.meta._wp_note_status === 'resolved' ||
 			thread.meta._wp_note_status === 'reopen' );
 
+	const isRootSuggestion =
+		! isResolutionComment &&
+		thread.parent === 0 &&
+		thread.type === 'note' &&
+		thread.meta?._wp_note_kind === 'suggestion';
+
+	const suggestionOriginalBlockText = useSelect(
+		( select ) => {
+			if ( ! thread.blockClientId || ! isRootSuggestion ) {
+				return '';
+			}
+			const block = select( blockEditorStore ).getBlock(
+				thread.blockClientId
+			);
+			if ( ! block ) {
+				return '';
+			}
+			const html = getBlockContent( block );
+			return html ? stripHTML( html ).trim() : '';
+		},
+		[ thread.blockClientId, isRootSuggestion ]
+	);
+
 	const actions = [
 		{
 			id: 'edit',
@@ -911,63 +949,76 @@ const CommentBoard = ( {
 					</FlexItem>
 				) }
 			</HStack>
-			{ 'edit' === actionState ? (
-				<CommentForm
-					onSubmit={ ( value ) => {
-						onEdit( {
-							id: thread.id,
-							content: value,
-						} );
-						setActionState( false );
-						actionButtonRef.current?.focus();
-					} }
-					onCancel={ () => handleCancel() }
-					thread={ thread }
-					submitButtonText={ _x( 'Update', 'verb' ) }
-					labelText={ sprintf(
-						// translators: %1$s: note identifier, %2$s: author name.
-						__( 'Edit note %1$s by %2$s' ),
-						thread.id,
-						thread.author_name
-					) }
-					reflowComments={ reflowComments }
-				/>
-			) : (
-				<RawHTML
-					className={ clsx(
-						'editor-collab-sidebar-panel__user-comment',
-						{
-							'editor-collab-sidebar-panel__resolution-text':
-								isResolutionComment,
-						}
-					) }
-				>
-					{ isResolutionComment
-						? ( () => {
-								const actionText =
-									thread.meta._wp_note_status === 'resolved'
-										? __( 'Marked as resolved' )
-										: __( 'Reopened' );
-								const content = thread?.content?.raw;
+			<>
+				{ 'edit' === actionState ? (
+					<CommentForm
+						onSubmit={ ( value ) => {
+							onEdit( {
+								id: thread.id,
+								content: value,
+							} );
+							setActionState( false );
+							actionButtonRef.current?.focus();
+						} }
+						onCancel={ () => handleCancel() }
+						thread={ thread }
+						submitButtonText={ _x( 'Update', 'verb' ) }
+						labelText={ sprintf(
+							// translators: %1$s: note identifier, %2$s: author name.
+							__( 'Edit note %1$s by %2$s' ),
+							thread.id,
+							thread.author_name
+						) }
+						reflowComments={ reflowComments }
+					/>
+				) : null }
+				{ 'edit' !== actionState && isRootSuggestion ? (
+					<SuggestionDiff
+						className="editor-collab-sidebar-panel__user-comment"
+						originalText={ suggestionOriginalBlockText }
+						suggestedText={ stripHTML(
+							thread.content?.rendered || ''
+						) }
+					/>
+				) : null }
+				{ 'edit' !== actionState && ! isRootSuggestion ? (
+					<RawHTML
+						className={ clsx(
+							'editor-collab-sidebar-panel__user-comment',
+							{
+								'editor-collab-sidebar-panel__resolution-text':
+									isResolutionComment,
+							}
+						) }
+					>
+						{ isResolutionComment
+							? ( () => {
+									const actionText =
+										thread.meta._wp_note_status ===
+										'resolved'
+											? __( 'Marked as resolved' )
+											: __( 'Reopened' );
+									const content = thread?.content?.raw;
 
-								if (
-									content &&
-									typeof content === 'string' &&
-									content.trim() !== ''
-								) {
-									return sprintf(
-										// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
-										__( '%1$s: %2$s' ),
-										actionText,
-										content
-									);
-								}
-								// If no content, just show the action.
-								return actionText;
-						  } )()
-						: thread?.content?.rendered }
-				</RawHTML>
-			) }
+									if (
+										content &&
+										typeof content === 'string' &&
+										content.trim() !== ''
+									) {
+										return sprintf(
+											// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
+											__( '%1$s: %2$s' ),
+											actionText,
+											content
+										);
+									}
+									// If no content, just show the action.
+									return actionText;
+							  } )()
+							: thread?.content?.rendered }
+					</RawHTML>
+				) : null }
+			</>
 			{ 'delete' === actionState && (
 				<ConfirmDialog
 					isOpen={ showConfirmDialog }

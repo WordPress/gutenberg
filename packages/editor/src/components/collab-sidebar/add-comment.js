@@ -141,7 +141,10 @@ export function AddComment( {
 					isSuggestionMode ? blockTextForSuggestion : ''
 				}
 				onSubmit={ async ( inputComment ) => {
-					const { id } = await onSubmit( { content: inputComment } );
+					const { id } = await onSubmit( {
+						content: inputComment,
+						...( isSuggestionMode ? { kind: 'suggestion' } : {} ),
+					} );
 					selectNote( id );
 					focusCommentThread( id, commentSidebarRef.current );
 				} }

@@ -72,6 +72,10 @@
 	}
 }
 
+.editor-collab-sidebar-panel__suggestion-diff {
+	word-break: break-word;
+}
+
 .editor-collab-sidebar-panel__user-avatar {
 	border-radius: $radius-round;
 	flex-shrink: 0;

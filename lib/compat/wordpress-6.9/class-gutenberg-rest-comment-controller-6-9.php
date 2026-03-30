@@ -315,6 +315,9 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 		if ( isset( $request['meta']['_wp_note_status'] ) ) {
 			$prepared_comment['meta']['_wp_note_status'] = $request['meta']['_wp_note_status'];
 		}
+		if ( isset( $request['meta']['_wp_note_kind'] ) ) {
+			$prepared_comment['meta']['_wp_note_kind'] = $request['meta']['_wp_note_kind'];
+		}
 
 		if ( ! $this->check_is_comment_content_allowed( $prepared_comment ) ) {
 			return new WP_Error(

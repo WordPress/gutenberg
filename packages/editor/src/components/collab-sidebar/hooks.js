@@ -189,18 +189,27 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 		} );
 	};
 
-	const onCreate = async ( { content, parent } ) => {
+	const onCreate = async ( { content, parent, kind } ) => {
 		try {
+			const isRootNote = ! parent;
+			const newComment = {
+				post: getCurrentPostId(),
+				content,
+				status: 'hold',
+				type: 'note',
+				parent: parent || 0,
+			};
+
+			if ( isRootNote && kind === 'suggestion' ) {
+				newComment.meta = {
+					_wp_note_kind: 'suggestion',
+				};
+			}
+
 			const savedRecord = await saveEntityRecord(
 				'root',
 				'comment',
-				{
-					post: getCurrentPostId(),
-					content,
-					status: 'hold',
-					type: 'note',
-					parent: parent || 0,
-				},
+				newComment,
 				{ throwOnError: true }
 			);
 
@@ -216,14 +225,16 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				} );
 			}
 
-			createNotice(
-				'snackbar',
-				parent ? __( 'Reply added.' ) : __( 'Note added.' ),
-				{
-					type: 'snackbar',
-					isDismissible: true,
-				}
-			);
+			let addedMessage = __( 'Note added.' );
+			if ( parent ) {
+				addedMessage = __( 'Reply added.' );
+			} else if ( kind === 'suggestion' ) {
+				addedMessage = __( 'Suggestion added.' );
+			}
+			createNotice( 'snackbar', addedMessage, {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
 			setTimeout( reflowComments, 300 );
 			return savedRecord;
 		} catch ( error ) {
