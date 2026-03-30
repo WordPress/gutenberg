@@ -37,9 +37,7 @@ export const approveComment: Action< CommentWithPermissions > = {
 	isPrimary: true,
 	supportsBulk: true,
 	isEligible( item ) {
-		return (
-			item.status === COMMENT_STATUSES.HOLD && item.permissions?.update
-		);
+		return item.status === COMMENT_STATUSES.HOLD;
 	},
 	async callback( items, { registry } ) {
 		const { editEntityRecord, saveEditedEntityRecord } =
@@ -89,9 +87,7 @@ export const unapproveComment: Action< CommentWithPermissions > = {
 	isPrimary: true,
 	supportsBulk: true,
 	isEligible( item ) {
-		return (
-			item.status === COMMENT_STATUSES.APPROVE && item.permissions?.update
-		);
+		return item.status === COMMENT_STATUSES.APPROVE;
 	},
 	async callback( items, { registry } ) {
 		const { editEntityRecord, saveEditedEntityRecord } =
@@ -142,8 +138,7 @@ export const spamComment: Action< CommentWithPermissions > = {
 	isEligible( item ) {
 		return (
 			item.status !== COMMENT_STATUSES.SPAM &&
-			item.status !== COMMENT_STATUSES.TRASH &&
-			item.permissions?.update
+			item.status !== COMMENT_STATUSES.TRASH
 		);
 	},
 	async callback( items, { registry } ) {
@@ -196,9 +191,8 @@ export const restoreComment: Action< CommentWithPermissions > = {
 	supportsBulk: true,
 	isEligible( item ) {
 		return (
-			( item.status === COMMENT_STATUSES.SPAM ||
-				item.status === COMMENT_STATUSES.TRASH ) &&
-			item.permissions?.update
+			item.status === COMMENT_STATUSES.SPAM ||
+			item.status === COMMENT_STATUSES.TRASH
 		);
 	},
 	async callback( items, { registry } ) {
@@ -248,9 +242,7 @@ export const trashComment: Action< CommentWithPermissions > = {
 	icon: trash,
 	supportsBulk: true,
 	isEligible( item ) {
-		return (
-			item.status !== COMMENT_STATUSES.TRASH && item.permissions?.delete
-		);
+		return item.status !== COMMENT_STATUSES.TRASH;
 	},
 	async callback( items, { registry } ) {
 		const { deleteEntityRecord } = registry.dispatch( coreStore );
@@ -304,9 +296,7 @@ export const deleteComment: Action< CommentWithPermissions > = {
 	supportsBulk: true,
 	hideModalHeader: true,
 	isEligible( item ) {
-		return (
-			item.status === COMMENT_STATUSES.TRASH && item.permissions?.delete
-		);
+		return item.status === COMMENT_STATUSES.TRASH;
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
