@@ -611,6 +611,17 @@ function mergeYArray(
 					query,
 					cursorPosition
 				);
+			} else {
+				// Element is the wrong type (e.g. partial migration) or the
+				// incoming value is not an object. Rebuild the entire array.
+				yArray.delete( 0, yArray.length );
+				yArray.insert(
+					0,
+					newValue.map( ( item ) =>
+						createYMapFromQuery( query, item )
+					)
+				);
+				return;
 			}
 		}
 	} else {
