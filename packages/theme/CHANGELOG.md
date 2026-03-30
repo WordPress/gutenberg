@@ -7,6 +7,7 @@
 ### Enhancement
 
 -   Change the default value of `--wpds-cursor-control` from `default` to `pointer` ([#76762](https://github.com/WordPress/gutenberg/pull/76762)).
+-   The design token fallback build plugins (PostCSS, esbuild, Vite) now throw an error when encountering an unknown `--wpds-*` token, instead of silently skipping it.
 
 ## 0.9.0 (2026-03-18)
 

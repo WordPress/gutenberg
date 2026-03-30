@@ -20,10 +20,10 @@ describe( 'addFallbackToVar', () => {
 		).toBe( 'var(--wpds-border-radius-sm, 2px)' );
 	} );
 
-	it( 'leaves unknown tokens untouched', () => {
-		expect(
+	it( 'throws for unknown tokens', () => {
+		expect( () =>
 			addFallbackToVar( 'var(--wpds-nonexistent-token)', mockFallbacks )
-		).toBe( 'var(--wpds-nonexistent-token)' );
+		).toThrow( /Unknown design token: --wpds-nonexistent-token/ );
 	} );
 
 	it( 'leaves non-wpds custom properties untouched', () => {
