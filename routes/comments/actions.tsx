@@ -48,7 +48,7 @@ export const approveComment: Action< CommentWithPermissions > = {
 			await Promise.all(
 				items.map( async ( item ) => {
 					await editEntityRecord( 'root', 'comment', item.id, {
-						status: 'approve',
+						status: 'approved',
 					} );
 					await saveEditedEntityRecord( 'root', 'comment', item.id, {
 						throwOnError: true,
@@ -87,7 +87,7 @@ export const unapproveComment: Action< CommentWithPermissions > = {
 	isPrimary: true,
 	supportsBulk: true,
 	isEligible( item ) {
-		return item.status === COMMENT_STATUSES.APPROVE;
+		return item.status === COMMENT_STATUSES.APPROVED;
 	},
 	async callback( items, { registry } ) {
 		const { editEntityRecord, saveEditedEntityRecord } =
@@ -204,7 +204,7 @@ export const restoreComment: Action< CommentWithPermissions > = {
 			await Promise.all(
 				items.map( async ( item ) => {
 					await editEntityRecord( 'root', 'comment', item.id, {
-						status: 'approve',
+						status: 'approved',
 					} );
 					await saveEditedEntityRecord( 'root', 'comment', item.id, {
 						throwOnError: true,

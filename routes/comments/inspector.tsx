@@ -21,7 +21,7 @@ import type { CommentWithPermissions } from './types';
 import { COMMENT_STATUSES } from './types';
 
 const STATUS_LABELS: Record< string, string > = {
-	[ COMMENT_STATUSES.APPROVE ]: __( 'Approved' ),
+	[ COMMENT_STATUSES.APPROVED ]: __( 'Approved' ),
 	[ COMMENT_STATUSES.HOLD ]: __( 'Pending' ),
 	[ COMMENT_STATUSES.SPAM ]: __( 'Spam' ),
 	[ COMMENT_STATUSES.TRASH ]: __( 'Trash' ),

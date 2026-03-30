@@ -17,7 +17,7 @@ export type CommentWithPermissions = Comment< 'edit' > & {
  */
 export const COMMENT_STATUSES = {
 	HOLD: 'hold',
-	APPROVE: 'approve',
+	APPROVED: 'approved',
 	SPAM: 'spam',
 	TRASH: 'trash',
 } as const;

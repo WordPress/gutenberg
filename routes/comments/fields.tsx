@@ -175,7 +175,7 @@ export const statusField: Field< CommentWithPermissions > = {
 	type: 'text',
 	enableSorting: false,
 	elements: [
-		{ value: COMMENT_STATUSES.APPROVE, label: __( 'Approved' ) },
+		{ value: COMMENT_STATUSES.APPROVED, label: __( 'Approved' ) },
 		{ value: COMMENT_STATUSES.HOLD, label: __( 'Pending' ) },
 		{ value: COMMENT_STATUSES.SPAM, label: __( 'Spam' ) },
 		{ value: COMMENT_STATUSES.TRASH, label: __( 'Trash' ) },
