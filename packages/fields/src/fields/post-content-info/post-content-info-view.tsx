@@ -14,23 +14,21 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { BasePost } from '../../types';
+import type { BasePostWithEditedEntity } from '../../types';
 
 // Taken from packages/editor/src/components/time-to-read/index.js.
 const AVERAGE_READING_RATE = 189;
 
-export default function PostContentInfoView( { item }: { item: BasePost } ) {
-	// When a post is being edited, core-data stores content as a lazy
-	// serialization function rather than a string.
-	// @see `getEditedPostContent` selector - https://github.com/WordPress/gutenberg/blob/d9e01f6be913afa5ba3b88d2e1d36b4cf6f7982b/packages/editor/src/store/selectors.js#L919
-	const rawContent = item.content as
-		| BasePost[ 'content' ]
-		| ( ( record: any ) => string );
+export default function PostContentInfoView( {
+	item,
+}: {
+	item: BasePostWithEditedEntity;
+} ) {
 	let content = '';
-	if ( typeof rawContent === 'string' ) {
-		content = rawContent;
-	} else if ( typeof rawContent === 'function' ) {
-		content = rawContent( item );
+	if ( typeof item.content === 'string' ) {
+		content = item.content;
+	} else if ( typeof item.content === 'function' ) {
+		content = item.content( item );
 	}
 
 	/*
