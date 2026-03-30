@@ -31,8 +31,8 @@ interface ConnectorData {
 	logoUrl?: string;
 	type: string;
 	plugin?: {
-		slug: string;
-		pluginFile?: string | null;
+		pluginFile: string;
+		isInstalled: boolean;
 		isActivated: boolean;
 	};
 	authentication: NonNullable< ConnectorConfig[ 'authentication' ] >;
@@ -104,7 +104,9 @@ function ApiKeyConnector( {
 		authentication?.method === 'api_key' ? authentication : undefined;
 	const settingName = auth?.settingName ?? '';
 	const helpUrl = auth?.credentialsUrl ?? undefined;
-	const pluginSlug = plugin?.slug;
+	const pluginSlug = plugin?.pluginFile?.includes( '/' )
+		? plugin.pluginFile.split( '/' )[ 0 ]
+		: plugin?.pluginFile;
 
 	let helpLabel: string | undefined;
 	try {
@@ -130,10 +132,10 @@ function ApiKeyConnector( {
 		saveApiKey,
 		removeApiKey,
 	} = useConnectorPlugin( {
-		pluginSlug,
 		pluginFile: plugin?.pluginFile,
 		settingName,
 		connectorName: name,
+		isInstalled: plugin?.isInstalled,
 		isActivated: plugin?.isActivated,
 		keySource: auth?.keySource,
 		initialIsConnected: auth?.isConnected,

@@ -28,7 +28,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 	 *         env_var_name?: non-empty-string
 	 *     },
 	 *     plugin?: array{
-	 *         slug: non-empty-string
+	 *         file: non-empty-string
 	 *     }
 	 * }
 	 */
@@ -97,7 +97,8 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 *     @type array  $plugin         {
 		 *         Optional. Plugin data for install/activate UI.
 		 *
-		 *         @type string $slug The WordPress.org plugin slug.
+		 *         @type string $file The plugin's main file path relative to the plugins
+		 *                           directory (e.g. 'akismet/akismet.php').
 		 *     }
 		 * }
 		 * @return array|null The registered connector data on success, null on failure.

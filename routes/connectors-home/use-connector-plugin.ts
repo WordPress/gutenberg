@@ -12,10 +12,10 @@ import type { __experimentalApiKeySource as ApiKeySource } from '@wordpress/conn
 export type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';
 
 interface UseConnectorPluginOptions {
-	pluginSlug?: string;
-	pluginFile?: string | null;
+	pluginFile?: string;
 	settingName: string;
 	connectorName: string;
+	isInstalled?: boolean;
 	isActivated?: boolean;
 	keySource?: ApiKeySource;
 	initialIsConnected?: boolean;
@@ -38,10 +38,10 @@ interface UseConnectorPluginReturn {
 }
 
 export function useConnectorPlugin( {
-	pluginSlug,
 	pluginFile: pluginFileFromServer,
 	settingName,
 	connectorName,
+	isInstalled,
 	isActivated,
 	keySource = 'none',
 	initialIsConnected = false,
@@ -53,6 +53,10 @@ export function useConnectorPlugin( {
 	// Local override for immediate UI feedback after install/activate.
 	const [ pluginStatusOverride, setPluginStatusOverride ] =
 		useState< PluginStatus | null >( null );
+
+	const pluginSlug = pluginFileFromServer?.includes( '/' )
+		? pluginFileFromServer.split( '/' )[ 0 ]
+		: pluginFileFromServer;
 
 	const {
 		derivedPluginStatus,
@@ -72,7 +76,7 @@ export function useConnectorPlugin( {
 				name: 'plugin',
 			} );
 
-			if ( ! pluginSlug ) {
+			if ( ! pluginFileFromServer ) {
 				const hasLoaded = store.hasFinishedResolution(
 					'getEntityRecord',
 					[ 'root', 'site' ]
@@ -87,17 +91,15 @@ export function useConnectorPlugin( {
 				};
 			}
 
-			const pluginId = pluginFileFromServer ?? `${ pluginSlug }/plugin`;
-
 			const plugin = store.getEntityRecord(
 				'root',
 				'plugin',
-				pluginId
+				pluginFileFromServer
 			) as { plugin: string; status: string } | undefined;
 
 			const hasFinished = store.hasFinishedResolution(
 				'getEntityRecord',
-				[ 'root', 'plugin', pluginId ]
+				[ 'root', 'plugin', pluginFileFromServer ]
 			);
 
 			if ( ! hasFinished ) {
@@ -127,7 +129,7 @@ export function useConnectorPlugin( {
 			let status: PluginStatus = 'not-installed';
 			if ( isActivated ) {
 				status = 'active';
-			} else if ( pluginFileFromServer ) {
+			} else if ( isInstalled ) {
 				status = 'inactive';
 			}
 			return {
@@ -137,7 +139,7 @@ export function useConnectorPlugin( {
 				canInstallPlugins: canCreate,
 			};
 		},
-		[ pluginSlug, pluginFileFromServer, settingName, isActivated ]
+		[ pluginFileFromServer, settingName, isInstalled, isActivated ]
 	);
 
 	const pluginStatus = pluginStatusOverride ?? derivedPluginStatus;
@@ -191,7 +193,7 @@ export function useConnectorPlugin( {
 	};
 
 	const activatePlugin = async () => {
-		if ( ! pluginSlug ) {
+		if ( ! pluginFileFromServer ) {
 			return;
 		}
 		setIsBusy( true );
@@ -200,7 +202,7 @@ export function useConnectorPlugin( {
 				'root',
 				'plugin',
 				{
-					plugin: pluginFileFromServer ?? `${ pluginSlug }/plugin`,
+					plugin: pluginFileFromServer,
 					status: 'active',
 				},
 				{ throwOnError: true }
