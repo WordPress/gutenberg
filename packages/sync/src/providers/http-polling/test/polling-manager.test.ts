@@ -77,6 +77,17 @@ function createMockDoc( clientID = 1 ) {
 	return { clientID, on: jest.fn(), off: jest.fn() };
 }
 
+// Helper to extract the onDocUpdate callback registered via doc.on('updateV2', ...).
+function getOnDocUpdate( doc: ReturnType< typeof createMockDoc > ) {
+	const call = doc.on.mock.calls.find(
+		( args: unknown[] ) => args[ 0 ] === 'updateV2'
+	);
+	if ( ! call ) {
+		throw new Error( 'onDocUpdate not registered' );
+	}
+	return call[ 1 ] as ( update: Uint8Array, origin: unknown ) => void;
+}
+
 function createMockAwareness() {
 	return {
 		clientID: 1,
@@ -141,17 +152,6 @@ describe( 'polling-manager', () => {
 	} );
 
 	describe( 'document size limit', () => {
-		// Helper to extract the onDocUpdate callback registered via doc.on('updateV2', ...).
-		function getOnDocUpdate( doc: ReturnType< typeof createMockDoc > ) {
-			const call = doc.on.mock.calls.find(
-				( args: unknown[] ) => args[ 0 ] === 'updateV2'
-			);
-			if ( ! call ) {
-				throw new Error( 'onDocUpdate not registered' );
-			}
-			return call[ 1 ] as ( update: Uint8Array, origin: unknown ) => void;
-		}
-
 		it( 'emits document-size-limit-exceeded error when an update exceeds the size limit', async () => {
 			mockPostSyncUpdate.mockResolvedValue( syncResponse );
 
@@ -722,9 +722,7 @@ describe( 'polling-manager', () => {
 			await jest.advanceTimersByTimeAsync( 0 );
 
 			// Simulate a local doc update on the collection room (e.g., a note was saved).
-			const onDocUpdate = collectionDoc.on.mock.calls.find(
-				( args: unknown[] ) => args[ 0 ] === 'updateV2'
-			)![ 1 ] as ( update: Uint8Array, origin: unknown ) => void;
+			const onDocUpdate = getOnDocUpdate( collectionDoc );
 			onDocUpdate( new Uint8Array( [ 1, 2, 3 ] ), 'local-origin' );
 
 			// Second poll: still no collaborators, collection room updates should be empty.
