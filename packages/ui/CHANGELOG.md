@@ -4,16 +4,26 @@
 
 ### New Features
 
+-   Add `AlertDialog` primitive ([#76847](https://github.com/WordPress/gutenberg/pull/76847)).
 -   Add `InputControl` component ([#76653](https://github.com/WordPress/gutenberg/pull/76653)).
+-   `Dialog`: Expose `initialFocus` and `finalFocus` props on `Dialog.Popup` for custom focus management ([#76860](https://github.com/WordPress/gutenberg/pull/76860)).
 
 ### Bug Fixes
 
 -   `Card`: Add `overflow: clip` to `Card.Root` to prevent child content from overflowing rounded corners ([#76678](https://github.com/WordPress/gutenberg/pull/76678)).
 -   `CollapsibleCard`: do not animate the focus ring when expanding/collapsing the card ([#76459](https://github.com/WordPress/gutenberg/pull/76459)).
 
+### Enhancements
+
+-   `Dialog.Root`: expose `disablePointerDismissal` prop ([#76847](https://github.com/WordPress/gutenberg/pull/76847)).
+
 ### Internal
 
 -   `Tabs`: Add development-mode validation for Tab/Panel count matching ([#75170](https://github.com/WordPress/gutenberg/pull/75170)).
+
+### TypeScript
+
+-   Remove `NoticeIntent` type from package exports ([#76791](https://github.com/WordPress/gutenberg/pull/76791)).
 
 ## 0.9.0 (2026-03-18)
 

@@ -447,15 +447,19 @@ function poll(): void {
 				roomState.processAwarenessUpdate( room.awareness );
 
 				// If there is another collaborator on the primary entity,
-				// resume the queue for the next poll and increase polling
-				// frequency. We only check the primary room to avoid false
-				// positives from shared collection rooms (e.g. taxonomy/category).
+				// resume all room queues for the next poll and increase
+				// polling frequency. We only check the primary room to
+				// avoid false positives from shared collection rooms
+				// (e.g. taxonomy/category), but resume all queues so
+				// collection rooms (e.g. root/comment) can also sync.
 				if (
 					roomState.isPrimaryRoom &&
 					Object.keys( room.awareness ).length > 1
 				) {
 					hasCollaborators = true;
-					roomState.updateQueue.resume();
+					roomStates.forEach( ( state ) => {
+						state.updateQueue.resume();
+					} );
 				}
 
 				// Process each incoming update and collect any responses.

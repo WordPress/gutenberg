@@ -23,7 +23,6 @@ import { PrivatePostExcerptPanel as PostExcerptPanel } from '../post-excerpt/pan
 import PostFeaturedImagePanel from '../post-featured-image/panel';
 import PostFormatPanel from '../post-format/panel';
 import PostLastEditedPanel from '../post-last-edited-panel';
-import RevisionCreatedPanel from '../revision-created-panel';
 import PostPanelSection from '../post-panel-section';
 import PostSchedulePanel from '../post-schedule/panel';
 import PostStatusPanel from '../post-status';
@@ -36,13 +35,23 @@ import SiteDiscussion from '../site-discussion';
 import { store as editorStore } from '../../store';
 import { PrivatePostLastRevision } from '../post-last-revision';
 import PostTrash from '../post-trash';
-import RevisionAuthorPanel from '../revision-author-panel';
-import { unlock } from '../../lock-unlock';
 
 /**
  * Module Constants
  */
 const PANEL_NAME = 'post-status';
+
+export function OpenRevisionsClassicScreen( { revisionId } ) {
+	return (
+		<ExternalLink
+			href={ addQueryArgs( 'revision.php', {
+				revision: revisionId,
+			} ) }
+		>
+			{ __( 'Open classic revisions screen' ) }
+		</ExternalLink>
+	);
+}
 
 export default function PostSummary( { onActionPerformed } ) {
 	const postType = useSelect(
@@ -59,28 +68,23 @@ export default function PostSummary( { onActionPerformed } ) {
 }
 
 function ClassicPostSummary( { onActionPerformed } ) {
-	const { isRemovedPostStatusPanel, postType, postId, revisionId } =
-		useSelect( ( select ) => {
+	const { isRemovedPostStatusPanel, postType, postId } = useSelect(
+		( select ) => {
 			// We use isEditorPanelRemoved to hide the panel if it was programmatically removed. We do
 			// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
 			const {
 				isEditorPanelRemoved,
 				getCurrentPostType,
 				getCurrentPostId,
-				getCurrentRevisionId,
-			} = unlock( select( editorStore ) );
+			} = select( editorStore );
 			return {
 				isRemovedPostStatusPanel: isEditorPanelRemoved( PANEL_NAME ),
 				postType: getCurrentPostType(),
 				postId: getCurrentPostId(),
-				revisionId: getCurrentRevisionId(),
 			};
-		}, [] );
-
-	const isRevisionsMode = !! revisionId;
-	const shouldShowPostStatusPanel =
-		! isRemovedPostStatusPanel && ! isRevisionsMode;
-
+		},
+		[]
+	);
 	return (
 		<PostPanelSection className="editor-post-summary">
 			<PluginPostStatusInfo.Slot>
@@ -92,35 +96,13 @@ function ClassicPostSummary( { onActionPerformed } ) {
 								postId={ postId }
 								onActionPerformed={ onActionPerformed }
 							/>
-							{ ! isRevisionsMode && (
-								<PostFeaturedImagePanel
-									withPanelBody={ false }
-								/>
-							) }
-							{ ! isRevisionsMode && <PostExcerptPanel /> }
+							<PostFeaturedImagePanel withPanelBody={ false } />
+							<PostExcerptPanel />
 							<VStack spacing={ 1 }>
 								<PostContentInformation />
-								{ isRevisionsMode ? (
-									<RevisionCreatedPanel />
-								) : (
-									<PostLastEditedPanel />
-								) }
+								<PostLastEditedPanel />
 							</VStack>
-							{ isRevisionsMode && revisionId && (
-								<>
-									<ExternalLink
-										href={ addQueryArgs( 'revision.php', {
-											revision: revisionId,
-										} ) }
-									>
-										{ __(
-											'Open classic revisions screen'
-										) }
-									</ExternalLink>
-									<RevisionAuthorPanel />
-								</>
-							) }
-							{ shouldShowPostStatusPanel && (
+							{ ! isRemovedPostStatusPanel && (
 								<VStack spacing={ 4 }>
 									<VStack spacing={ 1 }>
 										<PostStatusPanel />

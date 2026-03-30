@@ -1,12 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { addQueryArgs } from '@wordpress/url';
-import { useViewConfig } from '@wordpress/views';
 import {
 	commentAuthorAvatar,
 	layout,
@@ -17,11 +13,8 @@ import {
 /**
  * Internal dependencies
  */
-import SidebarNavigationItem from '../sidebar-navigation-item';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
-import { unlock } from '../../lock-unlock';
-
-const { useLocation } = unlock( routerPrivateApis );
+import DataViewsSidebarContent from '../sidebar-dataviews';
 
 const SOURCE_TO_ICON = {
 	user: commentAuthorAvatar,
@@ -29,15 +22,7 @@ const SOURCE_TO_ICON = {
 	plugin: pluginIcon,
 	site: globe,
 };
-
 export default function DataviewsTemplatesSidebarContent() {
-	const {
-		query: { activeView = 'all' },
-	} = useLocation();
-	const { view_list: viewList } = useViewConfig( {
-		kind: 'postType',
-		name: TEMPLATE_POST_TYPE,
-	} );
 	const authorSourceMap = useSelect( ( select ) => {
 		const templates = select( coreStore ).getEntityRecords(
 			'postType',
@@ -60,26 +45,15 @@ export default function DataviewsTemplatesSidebarContent() {
 		return map;
 	}, [] );
 
+	const resolveIcon = ( view ) => {
+		const source = authorSourceMap[ view.slug ];
+		return SOURCE_TO_ICON[ source ] ?? layout;
+	};
+
 	return (
-		<ItemGroup className="edit-site-sidebar-navigation-screen-templates-browse">
-			{ viewList?.map( ( item ) => (
-				<SidebarNavigationItem
-					key={ item.slug }
-					to={
-						item.slug === 'all'
-							? '/template'
-							: addQueryArgs( '/template', {
-									activeView: item.slug,
-							  } )
-					}
-					icon={
-						SOURCE_TO_ICON[ authorSourceMap[ item.slug ] ] ?? layout
-					}
-					aria-current={ activeView === item.slug }
-				>
-					{ item.title }
-				</SidebarNavigationItem>
-			) ) }
-		</ItemGroup>
+		<DataViewsSidebarContent
+			postType={ TEMPLATE_POST_TYPE }
+			resolveIcon={ resolveIcon }
+		/>
 	);
 }
