@@ -136,9 +136,9 @@
 	--wpds-motion-duration-xl: 400ms; /* Extended animations like complex or multi-step transitions */
 	--wpds-motion-duration-xs: 50ms; /* Micro-delays and transition offsets */
 	--wpds-motion-easing-accelerate: cubic-bezier(1, 0, 1, 1); /* Accelerating easing for elements leaving the screen */
+	--wpds-motion-easing-accelerate-emphasized: cubic-bezier(1, 0, 0.2, 1); /* Expressive exit for prominent elements like dialogs and drawers */
 	--wpds-motion-easing-decelerate: cubic-bezier(0, 0, 0, 1); /* Decelerating easing for elements entering the screen, such as menus and popovers */
-	--wpds-motion-easing-emphasized-accelerate: cubic-bezier(1, 0, 0.2, 1); /* Expressive exit for prominent elements like dialogs and drawers */
-	--wpds-motion-easing-emphasized-decelerate: cubic-bezier(0.29, 0, 0, 1); /* Expressive entrance for prominent elements like dialogs and drawers */
+	--wpds-motion-easing-decelerate-emphasized: cubic-bezier(0.29, 0, 0, 1); /* Expressive entrance for prominent elements like dialogs and drawers */
 	--wpds-motion-easing-standard: cubic-bezier(0.4, 0, 0.2, 1); /* Balanced easing for state changes like hover, color, and toggle transitions */
 	--wpds-typography-font-family-body: -apple-system, system-ui, 'Segoe UI',
 		'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue',

@@ -37,11 +37,11 @@
 				"$value": [ 1, 0, 1, 1 ],
 				"$description": "Accelerating easing for elements leaving the screen"
 			},
-			"emphasized-decelerate": {
+			"decelerate-emphasized": {
 				"$value": [ 0.29, 0, 0, 1 ],
 				"$description": "Expressive entrance for prominent elements like dialogs and drawers"
 			},
-			"emphasized-accelerate": {
+			"accelerate-emphasized": {
 				"$value": [ 1, 0, 0.2, 1 ],
 				"$description": "Expressive exit for prominent elements like dialogs and drawers"
 			}

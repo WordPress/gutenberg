@@ -30,8 +30,8 @@ export type Easing =
 	| 'standard'
 	| 'decelerate'
 	| 'accelerate'
-	| 'emphasized-decelerate'
-	| 'emphasized-accelerate';
+	| 'decelerate-emphasized'
+	| 'accelerate-emphasized';
 
 /**
  * Size scale for border radius tokens.

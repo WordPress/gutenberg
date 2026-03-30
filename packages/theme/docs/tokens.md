@@ -167,8 +167,8 @@ Do not edit directly.
 | `--wpds-motion-easing-standard`              | Balanced easing for state changes like hover, color, and toggle transitions      |
 | `--wpds-motion-easing-decelerate`            | Decelerating easing for elements entering the screen, such as menus and popovers |
 | `--wpds-motion-easing-accelerate`            | Accelerating easing for elements leaving the screen                              |
-| `--wpds-motion-easing-emphasized-decelerate` | Expressive entrance for prominent elements like dialogs and drawers              |
-| `--wpds-motion-easing-emphasized-accelerate` | Expressive exit for prominent elements like dialogs and drawers                  |
+| `--wpds-motion-easing-decelerate-emphasized` | Expressive entrance for prominent elements like dialogs and drawers              |
+| `--wpds-motion-easing-accelerate-emphasized` | Expressive exit for prominent elements like dialogs and drawers                  |
 
 ### Typography
 

@@ -60,13 +60,13 @@
 
 		@media not (prefers-reduced-motion) {
 			transition:
-				opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-emphasized-accelerate),
-				transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-emphasized-accelerate);
+				opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-accelerate-emphasized),
+				transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-accelerate-emphasized);
 
 			&[data-open] {
 				transition:
-					opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-emphasized-decelerate),
-					transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-emphasized-decelerate);
+					opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-decelerate-emphasized),
+					transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-decelerate-emphasized);
 			}
 		}
 

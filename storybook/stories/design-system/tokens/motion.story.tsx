@@ -18,8 +18,8 @@ const EASING_TOKENS = [
 			'Elements entering the screen, such as menus and popovers.',
 	},
 	{
-		name: 'emphasized-decelerate',
-		variable: 'var(--wpds-motion-easing-emphasized-decelerate)',
+		name: 'decelerate-emphasized',
+		variable: 'var(--wpds-motion-easing-decelerate-emphasized)',
 		description: 'Prominent entrances like dialogs and drawers.',
 	},
 	{
@@ -28,8 +28,8 @@ const EASING_TOKENS = [
 		description: 'Elements leaving the screen.',
 	},
 	{
-		name: 'emphasized-accelerate',
-		variable: 'var(--wpds-motion-easing-emphasized-accelerate)',
+		name: 'accelerate-emphasized',
+		variable: 'var(--wpds-motion-easing-accelerate-emphasized)',
 		description: 'Prominent exits like dialogs and drawers.',
 	},
 ];
