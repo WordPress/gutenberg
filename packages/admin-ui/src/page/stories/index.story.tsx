@@ -2,8 +2,8 @@
  * External dependencies
  */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { __experimentalText as Text, Button } from '@wordpress/components';
-import { Badge } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- admin-ui is a bundled package that depends on @wordpress/ui
+import { Badge, Button, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -124,10 +124,10 @@ export const WithActions: Story = {
 		title: 'Page title',
 		actions: (
 			<>
-				<Button size="compact" variant="tertiary">
+				<Button size="compact" variant="outline">
 					Cancel
 				</Button>
-				<Button size="compact" variant="primary">
+				<Button size="compact" variant="solid">
 					Save
 				</Button>
 			</>
@@ -152,10 +152,10 @@ export const FullHeader: Story = {
 		badges: <Badge intent="informational">Status</Badge>,
 		actions: (
 			<>
-				<Button size="compact" variant="tertiary">
+				<Button size="compact" variant="outline">
 					Cancel
 				</Button>
-				<Button size="compact" variant="primary">
+				<Button size="compact" variant="solid">
 					Save
 				</Button>
 			</>
