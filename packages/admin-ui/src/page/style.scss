@@ -1,9 +1,6 @@
 .admin-ui-page {
 	display: flex;
 	height: 100%;
-	// @TODO: Revisit page background color across existing pages
-	// (e.g. Styles) to ensure proper contrast handling.
-	// See https://github.com/WordPress/gutenberg/pull/76548
 	background-color: var(--wpds-color-bg-surface-neutral);
 	color: var(--wpds-color-fg-content-neutral);
 	position: relative;
