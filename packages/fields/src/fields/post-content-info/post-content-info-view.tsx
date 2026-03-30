@@ -22,7 +22,7 @@ const AVERAGE_READING_RATE = 189;
 export default function PostContentInfoView( { item }: { item: BasePost } ) {
 	// When a post is being edited, core-data stores content as a lazy
 	// serialization function rather than a string.
-	// @see `getEditedPostContent` selector - https://github.com/WordPress/gutenberg/blob/trunk/packages/editor/src/store/selectors.js#L919
+	// @see `getEditedPostContent` selector - https://github.com/WordPress/gutenberg/blob/d9e01f6be913afa5ba3b88d2e1d36b4cf6f7982b/packages/editor/src/store/selectors.js#L919
 	const rawContent = item.content as
 		| BasePost[ 'content' ]
 		| ( ( record: any ) => string );
