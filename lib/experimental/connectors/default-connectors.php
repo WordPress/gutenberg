@@ -22,6 +22,71 @@ function _gutenberg_connectors_init(): void {
 	$registry = new WP_Connector_Registry();
 	WP_Connector_Registry::set_instance( $registry );
 
+	// Register default AI providers.
+	_gutenberg_register_default_ai_providers( $registry );
+
+	// Non-AI default connectors.
+	$registry->register(
+		'akismet',
+		array(
+			'name'           => __( 'Akismet Anti-Spam', 'gutenberg' ),
+			'description'    => __( 'Protect your site from spam.', 'gutenberg' ),
+			'type'           => 'spam_filtering',
+			'plugin'         => array(
+				'slug' => 'akismet',
+			),
+			'authentication' => array(
+				'method'          => 'api_key',
+				'credentials_url' => 'https://akismet.com/get/',
+				'setting_name'    => 'wordpress_api_key',
+				'constant_name'   => 'WPCOM_API_KEY',
+			),
+		)
+	);
+
+	/**
+	 * Fires when the connector registry is ready for plugins to register connectors.
+	 *
+	 * Built-in connectors and any AI providers auto-discovered from the WP AI Client
+	 * registry have already been registered at this point and cannot be unhooked.
+	 *
+	 * AI provider plugins that register with the WP AI Client do not need to use
+	 * this action — their connectors are created automatically. This action is
+	 * primarily for registering non-AI-provider connectors or overriding metadata
+	 * on existing connectors.
+	 *
+	 * Use `$registry->register()` within this action to add new connectors.
+	 * To override an existing connector, unregister it first, then re-register
+	 * with updated data.
+	 *
+	 * Example — overriding metadata on an auto-discovered connector:
+	 *
+	 *     add_action( 'wp_connectors_init', function ( WP_Connector_Registry $registry ) {
+	 *         if ( $registry->is_registered( 'anthropic' ) ) {
+	 *             $connector = $registry->unregister( 'anthropic' );
+	 *             $connector['description'] = __( 'Custom description for Anthropic.', 'my-plugin' );
+	 *             $registry->register( 'anthropic', $connector );
+	 *         }
+	 *     } );
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param WP_Connector_Registry $registry Connector registry instance.
+	 */
+	do_action( 'wp_connectors_init', $registry );
+}
+remove_action( 'init', '_wp_connectors_init', 15 );
+add_action( 'init', '_gutenberg_connectors_init', 15 );
+
+/**
+ * Registers connectors for the built-in AI providers.
+ *
+ * @access private
+ * @since 7.0.0
+ *
+ * @param WP_Connector_Registry $registry The connector registry instance.
+ */
+function _gutenberg_register_default_ai_providers( WP_Connector_Registry $registry ): void {
 	// Built-in connectors.
 	$defaults = array(
 		'anthropic' => array(
@@ -116,25 +181,9 @@ function _gutenberg_connectors_init(): void {
 		}
 	}
 
-	// Non-AI default connectors.
-	$defaults['akismet'] = array(
-		'name'           => __( 'Akismet Anti-Spam', 'gutenberg' ),
-		'description'    => __( 'Protect your site from spam.', 'gutenberg' ),
-		'type'           => 'spam_filtering',
-		'plugin'         => array(
-			'slug' => 'akismet',
-		),
-		'authentication' => array(
-			'method'          => 'api_key',
-			'credentials_url' => 'https://akismet.com/get/',
-			'setting_name'    => 'wordpress_api_key',
-			'constant_name'   => 'WPCOM_API_KEY',
-		),
-	);
-
-	// Register all default connectors directly on the registry.
+	// Register all default AI connectors directly on the registry.
 	foreach ( $defaults as $id => $args ) {
-		if ( 'api_key' === $args['authentication']['method'] && 'ai_provider' === ( $args['type'] ?? '' ) ) {
+		if ( 'api_key' === $args['authentication']['method'] ) {
 			$sanitized_id = str_replace( '-', '_', $id );
 
 			if ( ! isset( $args['authentication']['setting_name'] ) ) {
@@ -156,31 +205,7 @@ function _gutenberg_connectors_init(): void {
 		}
 		$registry->register( $id, $args );
 	}
-
-	/**
-	 * Fires when the connector registry is ready for plugins to register connectors.
-	 *
-	 * Default connectors have already been registered at this point and cannot be
-	 * unhooked. Use `$registry->register()` within this action to add new connectors.
-	 *
-	 * Example usage:
-	 *
-	 *     add_action( 'wp_connectors_init', function ( WP_Connector_Registry $registry ) {
-	 *         if ( $registry->is_registered( 'anthropic' ) ) {
-	 *             $connector = $registry->unregister( 'anthropic' );
-	 *             $connector['description'] = __( 'Custom description for Anthropic.', 'my-plugin' );
-	 *             $registry->register( 'anthropic', $connector );
-	 *         }
-	 *     } );
-	 *
-	 * @since 7.0.0
-	 *
-	 * @param WP_Connector_Registry $registry Connector registry instance.
-	 */
-	do_action( 'wp_connectors_init', $registry );
 }
-remove_action( 'init', '_wp_connectors_init', 15 );
-add_action( 'init', '_gutenberg_connectors_init', 15 );
 
 /**
  * Determines the source of an API key for a given connector.
@@ -363,13 +388,13 @@ function _gutenberg_register_default_connector_settings(): void {
 			continue;
 		}
 
-		// For AI providers, skip if the provider is not in the AI Client registry.
-		if ( 'ai_provider' === $connector_data['type'] && ! $ai_registry->hasProvider( $connector_id ) ) {
+		// Skip if the setting is already registered (e.g. by the connector's plugin).
+		if ( isset( $existing_settings[ $auth['setting_name'] ] ) ) {
 			continue;
 		}
 
-		// Skip if the setting is already registered (e.g. by the connector's plugin).
-		if ( isset( $existing_settings[ $auth['setting_name'] ] ) ) {
+		// For AI providers, skip if the provider is not in the AI Client registry.
+		if ( 'ai_provider' === $connector_data['type'] && ! $ai_registry->hasProvider( $connector_id ) ) {
 			continue;
 		}
 

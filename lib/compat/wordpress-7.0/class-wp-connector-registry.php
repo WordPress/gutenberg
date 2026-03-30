@@ -168,6 +168,11 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				return null;
 			}
 
+			if ( 'ai_provider' === $args['type'] && ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
+				// No need for a doing_it_wrong as AI support is disabled intentionally.
+				return null;
+			}
+
 			$connector = array(
 				'name'           => $args['name'],
 				'description'    => isset( $args['description'] ) && is_string( $args['description'] ) ? $args['description'] : '',
