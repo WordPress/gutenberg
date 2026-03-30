@@ -74,14 +74,20 @@ function PostFieldView( { item }: { item: CommentWithPermissions } ) {
 			if ( ! item.post ) {
 				return null;
 			}
-			const post = select( coreStore ).getEntityRecord(
-				'postType',
-				'post',
-				item.post,
-				{ _fields: 'title' }
-			);
-			return ( post as { title?: { rendered?: string } } )?.title
-				?.rendered;
+			// Try 'post' first, then 'page' as fallback.
+			for ( const type of [ 'post', 'page' ] ) {
+				const post = select( coreStore ).getEntityRecord(
+					'postType',
+					type,
+					item.post,
+					{ _fields: 'title' }
+				);
+				if ( post ) {
+					return ( post as { title?: { rendered?: string } } )?.title
+						?.rendered;
+				}
+			}
+			return null;
 		},
 		[ item.post ]
 	);
@@ -90,7 +96,11 @@ function PostFieldView( { item }: { item: CommentWithPermissions } ) {
 		return <span>{ __( '(No post)' ) }</span>;
 	}
 
-	return <span>{ postTitle || `Post #${ item.post }` }</span>;
+	return (
+		<span>
+			{ postTitle ? decodeEntities( postTitle ) : `#${ item.post }` }
+		</span>
+	);
 }
 
 /**
@@ -103,24 +113,32 @@ export const postField: Field< CommentWithPermissions > = {
 	enableSorting: false,
 	render: PostFieldView,
 	getElements: async () => {
-		const posts =
-			( await resolveSelect( coreStore ).getEntityRecords(
-				'postType',
-				'post',
-				{
+		// Fetch posts and pages that have comments.
+		const results = await Promise.all(
+			[ 'post', 'page' ].map( ( type ) =>
+				resolveSelect( coreStore ).getEntityRecords( 'postType', type, {
 					per_page: 100,
 					_fields: 'id,title',
 					orderby: 'title',
 					order: 'asc',
 					status: 'publish',
-				}
-			) ) ?? [];
-		return ( posts as { id: number; title: { rendered: string } }[] ).map(
-			( { id, title } ) => ( {
-				value: id,
-				label: decodeEntities( title.rendered ) || `Post #${ id }`,
-			} )
+				} )
+			)
 		);
+		const allPosts = results.flat().filter( Boolean ) as {
+			id: number;
+			title: { rendered: string };
+		}[];
+		return allPosts
+			.sort( ( a, b ) =>
+				decodeEntities( a.title.rendered ).localeCompare(
+					decodeEntities( b.title.rendered )
+				)
+			)
+			.map( ( { id, title } ) => ( {
+				value: id,
+				label: decodeEntities( title.rendered ) || `#${ id }`,
+			} ) );
 	},
 	filterBy: {
 		operators: [ 'is' ],
