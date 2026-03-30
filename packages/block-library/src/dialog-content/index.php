@@ -81,7 +81,7 @@ function render_block_core_dialog_content( array $attributes, string $content, W
 		// Merge with any existing inline styles from block supports.
 		$existing_style         = $tag_processor->get_attribute( 'style' ) ?? '';
 		$animation_duration_css = sprintf( '--wp--style--dialog-animation-duration: %dms;', $animation_duration );
-		$merged_style           = $existing_style ? $existing_style . ' ' . $animation_duration_css : $animation_duration_css;
+		$merged_style           = $existing_style ? $existing_style . '; ' . $animation_duration_css : $animation_duration_css;
 		$tag_processor->set_attribute( 'style', $merged_style );
 		// Set the additional directives.
 		$tag_processor->set_attribute( 'data-wp-class--active', 'state.dialog.isOpen' );
