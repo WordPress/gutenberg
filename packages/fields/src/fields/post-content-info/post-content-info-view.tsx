@@ -20,10 +20,18 @@ import type { BasePost } from '../../types';
 const AVERAGE_READING_RATE = 189;
 
 export default function PostContentInfoView( { item }: { item: BasePost } ) {
-	const content =
-		typeof item.content === 'string'
-			? item.content
-			: item.content?.raw || '';
+	// When a post is being edited, core-data stores content as a lazy
+	// serialization function rather than a string.
+	// @see `getEditedPostContent` selector - https://github.com/WordPress/gutenberg/blob/trunk/packages/editor/src/store/selectors.js#L919
+	const rawContent = item.content as
+		| BasePost[ 'content' ]
+		| ( ( record: any ) => string );
+	let content = '';
+	if ( typeof rawContent === 'string' ) {
+		content = rawContent;
+	} else if ( typeof rawContent === 'function' ) {
+		content = rawContent( item );
+	}
 
 	/*
 	 * translators: If your word count is based on single characters (e.g. East Asian characters),
