@@ -51,6 +51,8 @@ jest.mock( '@wordpress/blocks', () => ( {
 							query: {
 								content: { type: 'rich-text' },
 								tag: { type: 'string' },
+								scope: { type: 'string' },
+								align: { type: 'string' },
 							},
 						},
 					},
@@ -63,6 +65,8 @@ jest.mock( '@wordpress/blocks', () => ( {
 							query: {
 								content: { type: 'rich-text' },
 								tag: { type: 'string' },
+								scope: { type: 'string' },
+								align: { type: 'string' },
 							},
 						},
 					},
@@ -75,6 +79,8 @@ jest.mock( '@wordpress/blocks', () => ( {
 							query: {
 								content: { type: 'rich-text' },
 								tag: { type: 'string' },
+								scope: { type: 'string' },
+								align: { type: 'string' },
 							},
 						},
 					},
@@ -1597,6 +1603,88 @@ describe( 'crdt-blocks', () => {
 				cells: { content: string }[];
 			}[];
 			expect( bodyJson[ 0 ].cells[ 0 ].content ).toBe( 'migrated' );
+		} );
+
+		it( 'preserves non-rich-text cell properties alongside Y.Text content', () => {
+			const tableBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{
+										content: 'Header',
+										tag: 'th',
+										scope: 'col',
+										align: 'center',
+									},
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, tableBlocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as Y.Array< unknown >;
+			const row = body.get( 0 ) as Y.Map< unknown >;
+			const cells = row.get( 'cells' ) as Y.Array< unknown >;
+			const cell = cells.get( 0 ) as Y.Map< unknown >;
+
+			// Rich-text content should be Y.Text.
+			const content = cell.get( 'content' ) as Y.Text;
+			expect( content ).toBeInstanceOf( Y.Text );
+			expect( content.toString() ).toBe( 'Header' );
+
+			// Plain string properties should be stored as-is.
+			expect( cell.get( 'tag' ) ).toBe( 'th' );
+			expect( cell.get( 'scope' ) ).toBe( 'col' );
+			expect( cell.get( 'align' ) ).toBe( 'center' );
+
+			// Update only the content, verify other properties remain.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{
+										content: 'Updated Header',
+										tag: 'th',
+										scope: 'col',
+										align: 'center',
+									},
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			const cellAfter = (
+				(
+					( attrs.get( 'body' ) as Y.Array< unknown > ).get(
+						0
+					) as Y.Map< unknown >
+				 ).get( 'cells' ) as Y.Array< unknown >
+			 ).get( 0 ) as Y.Map< unknown >;
+
+			expect( ( cellAfter.get( 'content' ) as Y.Text ).toString() ).toBe(
+				'Updated Header'
+			);
+			expect( cellAfter.get( 'tag' ) ).toBe( 'th' );
+			expect( cellAfter.get( 'scope' ) ).toBe( 'col' );
+			expect( cellAfter.get( 'align' ) ).toBe( 'center' );
 		} );
 	} );
 
