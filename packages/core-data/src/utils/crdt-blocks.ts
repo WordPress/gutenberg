@@ -711,7 +711,7 @@ function mergeYMapValues(
 
 	// Delete properties absent from the incoming object.
 	for ( const key of yMap.keys() ) {
-		if ( ! newObj.hasOwnProperty( key ) ) {
+		if ( ! Object.hasOwn( newObj, key ) ) {
 			yMap.delete( key );
 		}
 	}
