@@ -373,12 +373,8 @@ add_filter( 'rest_post_dispatch', '_gutenberg_connectors_rest_settings_dispatch'
  * @access private
  */
 function _gutenberg_register_default_connector_settings(): void {
-	$existing_settings = get_registered_settings();
-
-	// Only load the AI registry if AiClient is available.
-	$ai_registry = class_exists( '\WordPress\AiClient\AiClient' )
-		? \WordPress\AiClient\AiClient::defaultRegistry()
-		: null;
+	$ai_registry         = \WordPress\AiClient\AiClient::defaultRegistry();
+	$existing_settings   = get_registered_settings();
 
 	foreach ( wp_get_connectors() as $connector_id => $connector_data ) {
 		$auth = $connector_data['authentication'];
@@ -391,11 +387,9 @@ function _gutenberg_register_default_connector_settings(): void {
 			continue;
 		}
 
-		// For AI providers, skip if AI is unavailable or the provider is not registered.
-		if ( 'ai_provider' === $connector_data['type'] ) {
-			if ( null === $ai_registry || ! $ai_registry->hasProvider( $connector_id ) ) {
-				continue;
-			}
+		// For AI providers, skip if the provider is not in the AI Client registry.
+		if ( 'ai_provider' === $connector_data['type'] && ! $ai_registry->hasProvider( $connector_id ) ) {
+			continue;
 		}
 
 		register_setting(
