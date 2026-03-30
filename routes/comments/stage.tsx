@@ -8,7 +8,7 @@ import { Page } from '@wordpress/admin-ui';
 import type { View } from '@wordpress/dataviews';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -159,21 +159,40 @@ function CommentsList() {
 	// Selection from URL
 	const selection = searchParams.commentIds ?? [];
 
+	// Store visible comment IDs in URL so the inspector can navigate between them.
+	useEffect( () => {
+		if ( ! comments || comments.length === 0 ) {
+			return;
+		}
+		const orderedIds = comments.map( ( c ) => c.id.toString() );
+		const currentVisibleIds = searchParams.visibleIds ?? [];
+		if ( orderedIds.join( ',' ) !== currentVisibleIds.join( ',' ) ) {
+			navigate( {
+				search: {
+					...searchParams,
+					visibleIds: orderedIds,
+				},
+			} );
+		}
+	}, [ comments, searchParams, navigate ] );
+
 	return (
 		<Page
 			title={ __( 'Comments' ) }
 			className="comments-page"
 			hasPadding={ false }
 		>
-			<Tabs onSelect={ handleTabChange } selectedTabId={ statusSlug }>
-				<Tabs.TabList>
-					{ STATUS_TABS.map( ( tab ) => (
-						<Tabs.Tab tabId={ tab.slug } key={ tab.slug }>
-							{ tab.label }
-						</Tabs.Tab>
-					) ) }
-				</Tabs.TabList>
-			</Tabs>
+			<div className="comments-page__tabs-wrapper">
+				<Tabs onSelect={ handleTabChange } selectedTabId={ statusSlug }>
+					<Tabs.TabList>
+						{ STATUS_TABS.map( ( tab ) => (
+							<Tabs.Tab tabId={ tab.slug } key={ tab.slug }>
+								{ tab.label }
+							</Tabs.Tab>
+						) ) }
+					</Tabs.TabList>
+				</Tabs>
+			</div>
 			<DataViews
 				data={ comments }
 				fields={ fields }
