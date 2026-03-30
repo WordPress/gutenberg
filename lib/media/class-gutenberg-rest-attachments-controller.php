@@ -480,14 +480,21 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		$size = wp_getimagesize( $path );
 
-		// Validate dimensions match expected size.
-		if ( $size ) {
-			$validation = $this->validate_image_dimensions( $size[0], $size[1], $image_size, $attachment_id );
-			if ( is_wp_error( $validation ) ) {
-				// Clean up the uploaded file.
-				wp_delete_file( $path );
-				return $validation;
-			}
+		if ( ! $size ) {
+			// Could not determine dimensions (corrupted file, unsupported format).
+			wp_delete_file( $path );
+			return new WP_Error(
+				'rest_upload_invalid_image',
+				__( 'Could not read image dimensions. The file may be corrupted or an unsupported format.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$validation = $this->validate_image_dimensions( $size[0], $size[1], $image_size, $attachment_id );
+		if ( is_wp_error( $validation ) ) {
+			// Clean up the uploaded file.
+			wp_delete_file( $path );
+			return $validation;
 		}
 
 		$metadata = wp_get_attachment_metadata( $attachment_id, true );
@@ -506,16 +513,16 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// Update the attached file to point to the scaled version.
 			update_attached_file( $attachment_id, $path );
 
-			$metadata['width']    = $size ? $size[0] : 0;
-			$metadata['height']   = $size ? $size[1] : 0;
+			$metadata['width']    = $size[0];
+			$metadata['height']   = $size[1];
 			$metadata['filesize'] = wp_filesize( $path );
 			$metadata['file']     = _wp_relative_upload_path( $path );
 		} else {
 			$metadata['sizes'] = $metadata['sizes'] ?? array();
 
 			$metadata['sizes'][ $image_size ] = array(
-				'width'     => $size ? $size[0] : 0,
-				'height'    => $size ? $size[1] : 0,
+				'width'     => $size[0],
+				'height'    => $size[1],
 				'file'      => wp_basename( $path ),
 				'mime-type' => $type,
 				'filesize'  => wp_filesize( $path ),
