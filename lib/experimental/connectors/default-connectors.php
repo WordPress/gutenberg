@@ -166,18 +166,11 @@ function _gutenberg_connectors_init(): void {
 	 * Example usage:
 	 *
 	 *     add_action( 'wp_connectors_init', function ( WP_Connector_Registry $registry ) {
-	 *         $registry->register(
-	 *             'my_custom_ai',
-	 *             array(
-	 *                 'name'           => __( 'My Custom AI', 'my-plugin' ),
-	 *                 'description'    => __( 'Custom AI provider integration.', 'my-plugin' ),
-	 *                 'type'           => 'ai_provider',
-	 *                 'authentication' => array(
-	 *                     'method'          => 'api_key',
-	 *                     'credentials_url' => 'https://example.com/api-keys',
-	 *                 ),
-	 *             )
-	 *         );
+	 *         if ( $registry->is_registered( 'anthropic' ) ) {
+	 *             $connector = $registry->unregister( 'anthropic' );
+	 *             $connector['description'] = __( 'Custom description for Anthropic.', 'my-plugin' );
+	 *             $registry->register( 'anthropic', $connector );
+	 *         }
 	 *     } );
 	 *
 	 * @since 7.0.0
@@ -213,12 +206,10 @@ function _gutenberg_get_api_key_source( string $setting_name, string $env_var_na
 	}
 
 	// Check PHP constant (only if explicitly configured).
-	if ( '' !== $constant_name ) {
-		if ( defined( $constant_name ) ) {
-			$const_value = constant( $constant_name );
-			if ( is_string( $const_value ) && '' !== $const_value ) {
-				return 'constant';
-			}
+	if ( '' !== $constant_name && defined( $constant_name ) ) {
+		$const_value = constant( $constant_name );
+		if ( is_string( $const_value ) && '' !== $const_value ) {
+			return 'constant';
 		}
 	}
 

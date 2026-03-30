@@ -45,7 +45,8 @@ if ( ! function_exists( 'wp_get_connector' ) ) {
 	 *     @type string $type           The connector type, e.g. 'ai_provider' or 'spam_filtering'.
 	 *     @type array  $authentication {
 	 *         Authentication configuration. When method is 'api_key', includes
-	 *         credentials_url and setting_name. When 'none', only method is present.
+	 *         credentials_url, setting_name, and optionally constant_name and
+	 *         env_var_name. When 'none', only method is present.
 	 *
 	 *         @type string $method          The authentication method: 'api_key' or 'none'.
 	 *         @type string $credentials_url Optional. URL where users can obtain API credentials.
@@ -106,7 +107,8 @@ if ( ! function_exists( 'wp_get_connectors' ) ) {
 	 *         @type string      $type           The connector type, e.g. 'ai_provider' or 'spam_filtering'.
 	 *         @type array       $authentication {
 	 *             Authentication configuration. When method is 'api_key', includes
-	 *             credentials_url and setting_name. When 'none', only method is present.
+	 *             credentials_url, setting_name, and optionally constant_name and
+	 *             env_var_name. When 'none', only method is present.
 	 *
 	 *             @type string $method          The authentication method: 'api_key' or 'none'.
 	 *             @type string $credentials_url Optional. URL where users can obtain API credentials.
