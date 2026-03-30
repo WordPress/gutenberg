@@ -483,8 +483,16 @@ export function mergeCrdtBlocks(
 								currentAttribute
 							);
 
+							// Y types (Y.Text, Y.Array, Y.Map) cannot be
+							// compared with fastDeepEqual against plain values.
+							// Delegate to mergeYValue which handles no-op
+							// detection at the edges.
+							const isYType =
+								currentAttribute instanceof Y.AbstractType;
+
 							const isAttributeChanged =
 								! isExpectedType ||
+								isYType ||
 								! fastDeepEqual(
 									currentAttribute,
 									attributeValue
@@ -679,9 +687,9 @@ function mergeYValue(
 	} else {
 		const newYValue = createYValueFromSchema( schema, newVal );
 
-		// Replace if the schema created a new Y type (newYValue !== newVal means
-		// createYValueFromSchema wrapped the value, so the current value is the
-		// wrong type and needs upgrading) or if the raw value changed.
+		// If createYValueFromSchema wrapped the value into a Y type, the
+		// current value is the wrong type and needs upgrading. Otherwise,
+		// only replace if the raw value actually changed.
 		if ( newYValue !== newVal || ! fastDeepEqual( currentVal, newVal ) ) {
 			yMap.set( key, newYValue );
 		}
