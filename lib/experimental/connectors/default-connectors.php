@@ -15,15 +15,13 @@
  * @since 7.0.0
  */
 function _gutenberg_connectors_init(): void {
-	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
-		return;
-	}
-
 	$registry = new WP_Connector_Registry();
 	WP_Connector_Registry::set_instance( $registry );
 
-	// Register default AI providers.
-	_gutenberg_register_default_ai_providers( $registry );
+	// Only register default AI providers if AI support is available.
+	if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
+		_gutenberg_register_default_ai_providers( $registry );
+	}
 
 	// Non-AI default connectors.
 	$registry->register(
