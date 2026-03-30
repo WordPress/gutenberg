@@ -334,10 +334,9 @@ function CommentInspector() {
 		comment.author_avatar_urls?.[ '48' ];
 
 	const status = comment.status;
-	const canUpdate = comment.permissions?.update;
-	const canDelete = comment.permissions?.delete;
 
 	// Determine which action buttons to show based on comment status.
+	// Permission checks are omitted because the page requires moderate_comments.
 	const isApproved = status === COMMENT_STATUSES.APPROVE;
 	const isPending = status === COMMENT_STATUSES.HOLD;
 	const isSpam = status === COMMENT_STATUSES.SPAM;
@@ -356,7 +355,7 @@ function CommentInspector() {
 			<div className="comments-inspector__header">
 				<div className="comments-inspector__actions">
 					{ /* Approve button: show for pending, spam, trash */ }
-					{ ( isPending || isSpam || isTrashed ) && canUpdate && (
+					{ ( isPending || isSpam || isTrashed ) && (
 						<Tooltip
 							text={
 								isSpam || isTrashed
@@ -381,7 +380,7 @@ function CommentInspector() {
 						</Tooltip>
 					) }
 					{ /* Unapprove button: show for approved comments */ }
-					{ isApproved && canUpdate && (
+					{ isApproved && (
 						<Tooltip text={ __( 'Unapprove' ) }>
 							<Button
 								icon={ cancelCircleFilled }
@@ -392,7 +391,7 @@ function CommentInspector() {
 						</Tooltip>
 					) }
 					{ /* Spam button: show for non-spam, non-trash */ }
-					{ ! isSpam && ! isTrashed && canUpdate && (
+					{ ! isSpam && ! isTrashed && (
 						<Tooltip text={ __( 'Mark as Spam' ) }>
 							<Button
 								icon={ bug }
@@ -403,7 +402,7 @@ function CommentInspector() {
 						</Tooltip>
 					) }
 					{ /* Trash button: show for non-trash */ }
-					{ ! isTrashed && canDelete && (
+					{ ! isTrashed && (
 						<Tooltip text={ __( 'Move to Trash' ) }>
 							<Button
 								icon={ trash }
