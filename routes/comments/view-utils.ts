@@ -78,10 +78,9 @@ export function viewToQuery( view: View ) {
 	);
 	if ( statusFilter ) {
 		result.status = statusFilter.value;
-	} else {
-		// Default: show all non-trash comments
-		result.status = 'approve,hold,spam';
 	}
+	// When no status filter is set (the "All" tab), omit the status param.
+	// The REST API defaults to approved comments for authenticated users.
 
 	const postFilter = view.filters?.find(
 		( filter ) => filter.field === 'post'
