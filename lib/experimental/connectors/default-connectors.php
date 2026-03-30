@@ -34,9 +34,6 @@ function _gutenberg_connectors_init(): void {
 			'authentication' => array(
 				'method'          => 'api_key',
 				'credentials_url' => 'https://platform.claude.com/settings/keys',
-				'setting_name'    => 'connectors_ai_anthropic_api_key',
-				'constant_name'   => 'ANTHROPIC_API_KEY',
-				'env_var_name'    => 'ANTHROPIC_API_KEY',
 			),
 		),
 		'google'    => array(
@@ -49,9 +46,6 @@ function _gutenberg_connectors_init(): void {
 			'authentication' => array(
 				'method'          => 'api_key',
 				'credentials_url' => 'https://aistudio.google.com/api-keys',
-				'setting_name'    => 'connectors_ai_google_api_key',
-				'constant_name'   => 'GOOGLE_API_KEY',
-				'env_var_name'    => 'GOOGLE_API_KEY',
 			),
 		),
 		'openai'    => array(
@@ -64,9 +58,6 @@ function _gutenberg_connectors_init(): void {
 			'authentication' => array(
 				'method'          => 'api_key',
 				'credentials_url' => 'https://platform.openai.com/api-keys',
-				'setting_name'    => 'connectors_ai_openai_api_key',
-				'constant_name'   => 'OPENAI_API_KEY',
-				'env_var_name'    => 'OPENAI_API_KEY',
 			),
 		),
 	);
@@ -115,16 +106,6 @@ function _gutenberg_connectors_init(): void {
 				$defaults[ $connector_id ]['authentication']['credentials_url'] = $authentication['credentials_url'];
 			}
 		} else {
-			// Generate explicit key names for third-party AI providers.
-			if ( $is_api_key ) {
-				$sanitized_id  = str_replace( '-', '_', $connector_id );
-				$constant_case = strtoupper( preg_replace( '/([a-z])([A-Z])/', '$1_$2', $sanitized_id ) );
-
-				$authentication['setting_name']  = "connectors_ai_{$sanitized_id}_api_key";
-				$authentication['constant_name'] = "{$constant_case}_API_KEY";
-				$authentication['env_var_name']  = "{$constant_case}_API_KEY";
-			}
-
 			$defaults[ $connector_id ] = array(
 				'name'           => $name ? $name : ucwords( $connector_id ),
 				'description'    => $description ? $description : '',
@@ -153,6 +134,26 @@ function _gutenberg_connectors_init(): void {
 
 	// Register all default connectors directly on the registry.
 	foreach ( $defaults as $id => $args ) {
+		if ( 'api_key' === $args['authentication']['method'] && 'ai_provider' === ( $args['type'] ?? '' ) ) {
+			$sanitized_id = str_replace( '-', '_', $id );
+
+			if ( ! isset( $args['authentication']['setting_name'] ) ) {
+				$args['authentication']['setting_name'] = "connectors_ai_{$sanitized_id}_api_key";
+			}
+
+			// All AI providers use the {CONSTANT_CASE_ID}_API_KEY naming convention.
+			if ( ! isset( $args['authentication']['constant_name'] ) || ! isset( $args['authentication']['env_var_name'] ) ) {
+				$constant_case_key = strtoupper( preg_replace( '/([a-z])([A-Z])/', '$1_$2', $sanitized_id ) ) . '_API_KEY';
+
+				if ( ! isset( $args['authentication']['constant_name'] ) ) {
+					$args['authentication']['constant_name'] = $constant_case_key;
+				}
+
+				if ( ! isset( $args['authentication']['env_var_name'] ) ) {
+					$args['authentication']['env_var_name'] = $constant_case_key;
+				}
+			}
+		}
 		$registry->register( $id, $args );
 	}
 
@@ -393,7 +394,7 @@ function _gutenberg_register_default_connector_settings(): void {
 				),
 				'description'       => sprintf(
 					/* translators: %s: Connector name. */
-					__( 'API key for %s.', 'gutenberg' ),
+					__( 'API key for the %s connector.', 'gutenberg' ),
 					$connector_data['name']
 				),
 				'default'           => '',

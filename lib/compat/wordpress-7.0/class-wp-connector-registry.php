@@ -55,28 +55,44 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		/**
 		 * Registers a new connector.
 		 *
+		 * Validates the provided arguments and stores the connector in the registry.
+		 * For connectors with `api_key` authentication, a `setting_name` can be provided
+		 * explicitly. If omitted, one is automatically generated using the pattern
+		 * `connectors_{$type}_{$id}_api_key`, with hyphens in the type and ID normalized
+		 * to underscores (e.g., connector type `spam_filtering` with ID `akismet` produces
+		 * `connectors_spam_filtering_akismet_api_key`). This setting name is used for the
+		 * Settings API registration and REST API exposure.
+		 *
+		 * Registering a connector with an ID that is already registered will trigger a
+		 * `_doing_it_wrong()` notice and return `null`. To override an existing connector,
+		 * call `unregister()` first.
+		 *
 		 * @since 7.0.0
 		 *
-		 * @param string $id   The unique connector identifier. Must contain only lowercase
-		 *                     alphanumeric characters, hyphens, and underscores.
+		 * @see WP_Connector_Registry::unregister()
+		 *
+		 * @param string $id   The unique connector identifier. Must match the pattern
+		 *                     `/^[a-z0-9_-]+$/` (lowercase alphanumeric, hyphens, and underscores only).
 		 * @param array  $args {
 		 *     An associative array of arguments for the connector.
 		 *
 		 *     @type string $name           Required. The connector's display name.
 		 *     @type string $description    Optional. The connector's description. Default empty string.
 		 *     @type string $logo_url       Optional. URL to the connector's logo image.
-		 *     @type string $type           Required. The connector type, e.g. 'ai_provider' or 'spam_filtering'.
+		 *     @type string $type           Required. The connector type, e.g. 'ai_provider'.
 		 *     @type array  $authentication {
 		 *         Required. Authentication configuration.
 		 *
-		 *         @type string      $method          Required. The authentication method: 'api_key' or 'none'.
-		 *         @type string|null $credentials_url Optional. URL where users can obtain API credentials.
-		 *         @type string|null $setting_name    Optional. Custom option name for the API key.
-		 *                                            Defaults to 'connectors_{type}_{id}_api_key'.
-		 *         @type string|null $constant_name   Optional. PHP constant name for the API key
-		 *                                            (e.g., 'WPCOM_API_KEY'). Only checked when provided.
-		 *         @type string|null $env_var_name    Optional. Environment variable name for the API key.
-		 *                                            Only checked when provided.
+		 *         @type string $method          Required. The authentication method: 'api_key' or 'none'.
+		 *         @type string $credentials_url Optional. URL where users can obtain API credentials.
+		 *         @type string $setting_name    Optional. The setting name for the API key.
+		 *                                       When omitted, auto-generated as
+		 *                                       `connectors_{$type}_{$id}_api_key`.
+		 *                                       Must be a non-empty string when provided.
+		 *         @type string $constant_name   Optional. PHP constant name for the API key
+		 *                                       (e.g. 'ANTHROPIC_API_KEY'). Only checked when provided.
+		 *         @type string $env_var_name    Optional. Environment variable name for the API key
+		 *                                       (e.g. 'ANTHROPIC_API_KEY'). Only checked when provided.
 		 *     }
 		 *     @type array  $plugin         {
 		 *         Optional. Plugin data for install/activate UI.
@@ -169,15 +185,42 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				if ( ! empty( $args['authentication']['credentials_url'] ) && is_string( $args['authentication']['credentials_url'] ) ) {
 					$connector['authentication']['credentials_url'] = $args['authentication']['credentials_url'];
 				}
-				if ( ! empty( $args['authentication']['setting_name'] ) && is_string( $args['authentication']['setting_name'] ) ) {
+				if ( isset( $args['authentication']['setting_name'] ) ) {
+					if ( ! is_string( $args['authentication']['setting_name'] ) || '' === $args['authentication']['setting_name'] ) {
+						_doing_it_wrong(
+							__METHOD__,
+							/* translators: %s: Connector ID. */
+							sprintf( __( 'Connector "%s" authentication setting_name must be a non-empty string.' ), esc_html( $id ) ),
+							'7.0.0'
+						);
+						return null;
+					}
 					$connector['authentication']['setting_name'] = $args['authentication']['setting_name'];
 				} else {
 					$connector['authentication']['setting_name'] = str_replace( '-', '_', "connectors_{$connector['type']}_{$id}_api_key" );
 				}
-				if ( ! empty( $args['authentication']['constant_name'] ) && is_string( $args['authentication']['constant_name'] ) ) {
+				if ( isset( $args['authentication']['constant_name'] ) ) {
+					if ( ! is_string( $args['authentication']['constant_name'] ) || '' === $args['authentication']['constant_name'] ) {
+						_doing_it_wrong(
+							__METHOD__,
+							/* translators: %s: Connector ID. */
+							sprintf( __( 'Connector "%s" authentication constant_name must be a non-empty string.' ), esc_html( $id ) ),
+							'7.0.0'
+						);
+						return null;
+					}
 					$connector['authentication']['constant_name'] = $args['authentication']['constant_name'];
 				}
-				if ( ! empty( $args['authentication']['env_var_name'] ) && is_string( $args['authentication']['env_var_name'] ) ) {
+				if ( isset( $args['authentication']['env_var_name'] ) ) {
+					if ( ! is_string( $args['authentication']['env_var_name'] ) || '' === $args['authentication']['env_var_name'] ) {
+						_doing_it_wrong(
+							__METHOD__,
+							/* translators: %s: Connector ID. */
+							sprintf( __( 'Connector "%s" authentication env_var_name must be a non-empty string.' ), esc_html( $id ) ),
+							'7.0.0'
+						);
+						return null;
+					}
 					$connector['authentication']['env_var_name'] = $args['authentication']['env_var_name'];
 				}
 			}
