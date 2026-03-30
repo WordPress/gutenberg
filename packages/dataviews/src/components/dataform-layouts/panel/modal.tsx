@@ -7,13 +7,7 @@ import deepMerge from 'deepmerge';
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import {
-	useCallback,
-	useContext,
-	useMemo,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useContext, useMemo, useRef, useState } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Dialog } from '@wordpress/ui';
 
@@ -102,18 +96,6 @@ function ModalContent< Item >( {
 
 	const contentRef = useRef< HTMLDivElement >( null );
 
-	const initialFocus = useCallback( () => {
-		if ( contentRef.current ) {
-			const input = contentRef.current.querySelector< HTMLElement >(
-				'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
-			);
-			if ( input ) {
-				return input;
-			}
-		}
-		return true as const;
-	}, [] );
-
 	// When the modal is opened after being previously closed (touched),
 	// trigger reportValidity to show field-level errors.
 	useReportValidity( contentRef, touched );
@@ -130,7 +112,6 @@ function ModalContent< Item >( {
 			<Dialog.Popup
 				size="medium"
 				className="dataforms-layouts-panel__modal"
-				initialFocus={ initialFocus }
 			>
 				<Dialog.Header>
 					<Dialog.Title>{ fieldLabel }</Dialog.Title>
