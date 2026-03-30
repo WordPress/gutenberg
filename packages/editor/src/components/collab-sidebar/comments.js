@@ -25,7 +25,7 @@ import {
 } from '@wordpress/components';
 import { useDebounce } from '@wordpress/compose';
 
-import { published, moreVertical } from '@wordpress/icons';
+import { published, moreVertical, closeSmall } from '@wordpress/icons';
 import { __, _x, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
@@ -789,6 +789,7 @@ const CommentBoard = ( {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 	const actionButtonRef = useRef( null );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const handleConfirmDelete = () => {
 		onDelete( thread );
 		setActionState( false );
@@ -831,6 +832,16 @@ const CommentBoard = ( {
 		[ thread.blockClientId, isRootSuggestion ]
 	);
 
+	const suggestionBlock = useSelect(
+		( select ) => {
+			if ( ! thread.blockClientId || ! isRootSuggestion ) {
+				return null;
+			}
+			return select( blockEditorStore ).getBlock( thread.blockClientId );
+		},
+		[ thread.blockClientId, isRootSuggestion ]
+	);
+
 	const actions = [
 		{
 			id: 'edit',
@@ -859,7 +870,8 @@ const CommentBoard = ( {
 		},
 	];
 
-	const canResolve = thread.parent === 0;
+	const canResolve = thread.parent === 0 && ! isRootSuggestion;
+	const isApproved = thread.status === 'approved';
 	const moreActions =
 		parent?.status !== 'approved'
 			? actions.filter( ( item ) => item.isEligible( thread ) )
@@ -902,10 +914,8 @@ const CommentBoard = ( {
 									) }
 									size="small"
 									icon={ published }
-									disabled={ thread.status === 'approved' }
-									accessibleWhenDisabled={
-										thread.status === 'approved'
-									}
+									disabled={ isApproved }
+									accessibleWhenDisabled={ isApproved }
 									onClick={ () => {
 										onEdit( {
 											id: thread.id,
@@ -913,6 +923,73 @@ const CommentBoard = ( {
 										} );
 									} }
 								/>
+							) }
+							{ isRootSuggestion && (
+								<>
+									<Button
+										label={ _x(
+											'Reject',
+											'Reject suggestion'
+										) }
+										size="small"
+										icon={ closeSmall }
+										disabled={ isApproved }
+										accessibleWhenDisabled={ isApproved }
+										onClick={ () => {
+											onEdit( {
+												id: thread.id,
+												status: 'approved',
+											} );
+										} }
+									/>
+									<Button
+										label={ _x(
+											'Accept',
+											'Accept suggestion'
+										) }
+										size="small"
+										icon={ published }
+										disabled={ isApproved }
+										accessibleWhenDisabled={ isApproved }
+										onClick={ () => {
+											const suggestedText =
+												thread?.content?.raw;
+
+											// Best-effort: apply the suggestion to the most common content attribute.
+											if (
+												typeof suggestedText ===
+													'string' &&
+												thread.blockClientId &&
+												suggestionBlock?.attributes
+											) {
+												const attrs =
+													suggestionBlock.attributes;
+												const contentAttribute = [
+													'content',
+													'value',
+													'text',
+												].find( ( key ) =>
+													Object.hasOwn( attrs, key )
+												);
+
+												if ( contentAttribute ) {
+													updateBlockAttributes(
+														thread.blockClientId,
+														{
+															[ contentAttribute ]:
+																suggestedText,
+														}
+													);
+												}
+											}
+
+											onEdit( {
+												id: thread.id,
+												status: 'approved',
+											} );
+										} }
+									/>
+								</>
 							) }
 							<Menu placement="bottom-end">
 								<Menu.TriggerButton
