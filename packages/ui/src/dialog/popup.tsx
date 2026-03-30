@@ -15,7 +15,7 @@ import type { PopupProps } from './types';
 const ThemeProvider: typeof ThemeProviderType =
 	unlock( themePrivateApis ).ThemeProvider;
 
-const CLOSE_ICON_ATTR = 'data-wp-dialog-close-icon';
+const CLOSE_ICON_ATTR = 'data-wp-ui-dialog-close-icon';
 
 /**
  * Options matching Base UI's internal tabbable configuration.
