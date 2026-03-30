@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
+import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { Field } from '@wordpress/dataviews';
@@ -58,7 +59,9 @@ export const contentField: Field< CommentWithPermissions > = {
 	enableGlobalSearch: true,
 	enableSorting: false,
 	render: ( { item } ) => {
-		const text = item.content?.rendered?.replace( /<[^>]+>/g, '' ) || '';
+		const stripped =
+			item.content?.rendered?.replace( /<[^>]+>/g, '' ) || '';
+		const text = decodeEntities( stripped );
 		const truncated =
 			text.length > 120 ? text.substring( 0, 120 ) + '...' : text;
 		return <span>{ truncated }</span>;

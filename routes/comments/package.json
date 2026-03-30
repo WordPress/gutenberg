@@ -17,6 +17,7 @@
 		"@wordpress/date": "file:../../packages/date",
 		"@wordpress/dataviews": "file:../../packages/dataviews",
 		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/html-entities": "file:../../packages/html-entities",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/notices": "file:../../packages/notices",

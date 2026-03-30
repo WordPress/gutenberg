@@ -9,9 +9,8 @@ export const DEFAULT_VIEW: View = {
 		field: 'date',
 		direction: 'desc' as const,
 	},
-	fields: [ 'author_name', 'content', 'post', 'date' ],
+	fields: [ 'content', 'post', 'date' ],
 	titleField: 'author_name',
-	descriptionField: 'content',
 	perPage: 20,
 };
 
