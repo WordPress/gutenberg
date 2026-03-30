@@ -222,6 +222,51 @@ describe( 'reducer', () => {
 		} );
 	} );
 
+	it( 'receives a sparse subset of items at given offsets', () => {
+		const original = deepFreeze( {
+			items: { default: {} },
+			queries: {},
+			itemIsComplete: { default: {} },
+		} );
+		const state = [
+			{
+				type: 'RECEIVE_ITEMS',
+				query: { offset: 1, per_page: 2 },
+				items: [
+					{ id: 2, name: 'def' },
+					{ id: 3, name: 'ghi' },
+				],
+			},
+			{
+				type: 'RECEIVE_ITEMS',
+				query: { offset: 4, per_page: 2 },
+				items: [
+					{ id: 5, name: 'mno' },
+					{ id: 6, name: 'pqr' },
+				],
+			},
+		].reduce( reducer, original );
+
+		expect( state ).toEqual( {
+			items: {
+				default: {
+					2: { id: 2, name: 'def' },
+					3: { id: 3, name: 'ghi' },
+					5: { id: 5, name: 'mno' },
+					6: { id: 6, name: 'pqr' },
+				},
+			},
+			itemIsComplete: {
+				default: { 2: true, 3: true, 5: true, 6: true },
+			},
+			queries: {
+				default: {
+					'': { itemIds: [ undefined, 2, 3, undefined, 5, 6 ] },
+				},
+			},
+		} );
+	} );
+
 	it( 'deletes an item', () => {
 		const kind = 'root';
 		const name = 'menu';
