@@ -76,7 +76,6 @@ export interface YPostRecord extends YMapRecord {
 
 export const POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE = '_crdt_document';
 
-// Post meta keys that should *not* be synced between peers via the CRDT doc.
 const disallowedPostMetaKeys = new Set< string >( [
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 ] );
