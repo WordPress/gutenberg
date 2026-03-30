@@ -19,6 +19,7 @@ import {
 	resetPost,
 	deletePost,
 	duplicateTemplatePart,
+	excerptField,
 	featuredImageField,
 	dateField,
 	parentField,
@@ -267,6 +268,9 @@ export const registerPostTypeSchema =
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					scheduledDateField,
 				slugField,
+				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+					postTypeConfig.supports?.excerpt &&
+					excerptField,
 				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 				postTypeConfig.supports?.comments && commentStatusField,
 				postTypeConfig.supports?.trackbacks && pingStatusField,

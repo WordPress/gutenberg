@@ -15,15 +15,11 @@ import { withWeakMapCache, getNormalizedCommaSeparable } from '../utils';
  *
  * @property {number}      page      The query page (1-based index, default 1).
  * @property {number}      perPage   Items per page for query (default 10).
- * @property {number}      offset    Absolute item offset (default undefined).
- *                                   When present, also encoded into stableKey.
- * @property {string}      stableKey An encoded stable string of all non-
- *                                   pagination, non-fields query parameters.
- * @property {?(string[])} fields    Target subset of fields to derive from
- *                                   item objects.
- * @property {?(number[])} include   Specific item IDs to include.
- * @property {string}      context   Scope under which the request is made;
- *                                   determines returned fields in response.
+ * @property {?number}     offset    Absolute item offset (default null).
+ * @property {string}      stableKey An encoded stable string of all non-pagination, non-fields query parameters.
+ * @property {?(string[])} fields    Target subset of fields to derive from item objects (default null).
+ * @property {?(number[])} include   Specific item IDs to include (default null).
+ * @property {string}      context   Scope under which the request is made; determines returned fields in response.
  */
 
 /**
@@ -43,7 +39,7 @@ export function getQueryParts( query ) {
 		stableKey: '',
 		page: 1,
 		perPage: 10,
-		offset: undefined,
+		offset: null,
 		fields: null,
 		include: null,
 		context: 'default',
@@ -65,21 +61,19 @@ export function getQueryParts( query ) {
 				parts.perPage = Number( value );
 				break;
 
+			case 'offset': {
+				const numericOffset = Number( value );
+				if ( Number.isFinite( numericOffset ) ) {
+					parts.offset = numericOffset;
+				}
+				break;
+			}
+
 			case 'context':
 				parts.context = value;
 				break;
 
 			default:
-				// Extract offset for use in pagination calculations while
-				// still including it in the stableKey (different offsets
-				// produce different result sets).
-				if ( key === 'offset' ) {
-					const numericOffset = Number( value );
-					if ( Number.isFinite( numericOffset ) ) {
-						parts.offset = numericOffset;
-					}
-				}
-
 				// While in theory, we could exclude "_fields" from the stableKey
 				// because two request with different fields have the same results
 				// We're not able to ensure that because the server can decide to omit

@@ -63,6 +63,10 @@ Duplicate action for BasePost.
 
 Duplicate action for TemplatePart.
 
+### excerptField
+
+Excerpt field for BasePost.
+
 ### exportPattern
 
 Export action as JSON for Pattern.
