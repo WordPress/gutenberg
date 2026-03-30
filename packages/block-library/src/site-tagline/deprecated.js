@@ -11,6 +11,7 @@ const v2 = {
 		},
 		level: {
 			type: 'number',
+			default: 0,
 		},
 		levelOptions: {
 			type: 'array',

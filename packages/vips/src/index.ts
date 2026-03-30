@@ -28,7 +28,7 @@ interface EmscriptenModule {
 
 let cleanup: () => void;
 
-let vipsInstance: typeof Vips;
+let vipsPromise: Promise< typeof Vips > | undefined;
 
 /**
  * Instantiates and returns a new vips instance.
@@ -36,11 +36,11 @@ let vipsInstance: typeof Vips;
  * Reuses any existing instance.
  */
 async function getVips(): Promise< typeof Vips > {
-	if ( vipsInstance ) {
-		return vipsInstance;
+	if ( vipsPromise ) {
+		return await vipsPromise;
 	}
 
-	vipsInstance = await Vips( {
+	vipsPromise = Vips( {
 		// Load HEIF dynamic module for HEIF/HEIC and AVIF format support.
 		// JXL is omitted as WordPress Core does not currently support it.
 		// It can be re-added when Core adds JXL support.
@@ -65,7 +65,7 @@ async function getVips(): Promise< typeof Vips > {
 		},
 	} );
 
-	return vipsInstance;
+	return await vipsPromise;
 }
 
 /**

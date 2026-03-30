@@ -71,7 +71,7 @@ To summarize, using the Interactivity API rather than just using React comes wit
 
 ## What are the benefits of Interactivity API over just using jQuery or vanilla JavaScript?
 
-The main difference is that the Interactivity API is **declarative and reactive**, so writing and maintaining complex interactive experiences should become way easier. Additionally, it has been **specially designed to work with blocks**, providing a standard that comes with the benefits mentioned above, like inter-block communication, compatibility, or site-wide features such as client-side navigation.
+The main difference is that the Interactivity API is **declarative and reactive**, so writing and maintaining complex interactive experiences should become way easier. Additionally, it has been **specially designed to work with blocks**, providing a standard that comes with the benefits mentioned above, like inter-block communication, compatibility, or site-wide features such as [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md).
 
 Finally, comparing it with jQuery, **the Interactivity API runtime is ~10kb**, which is much more lightweight. Actually, there is an ongoing effort to remove heavy frameworks like jQuery across the WordPress ecosystem, and this would help in this regard.
 
