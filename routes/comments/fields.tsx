@@ -167,6 +167,24 @@ export const dateField: Field< CommentWithPermissions > = {
 };
 
 /**
+ * Type field — allows filtering by comment type (comment, pingback, trackback).
+ */
+export const typeField: Field< CommentWithPermissions > = {
+	id: 'type',
+	label: __( 'Type' ),
+	type: 'text',
+	enableSorting: false,
+	elements: [
+		{ value: 'comment', label: __( 'Comments' ) },
+		{ value: 'pingback', label: __( 'Pingbacks' ) },
+		{ value: 'trackback', label: __( 'Trackbacks' ) },
+	],
+	filterBy: {
+		operators: [ 'is' ],
+	},
+};
+
+/**
  * Status field — displays the comment status as a label.
  */
 export const statusField: Field< CommentWithPermissions > = {

@@ -6,10 +6,15 @@ import { useView } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
 import type { View } from '@wordpress/dataviews';
-import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
+import {
+	privateApis as coreDataPrivateApis,
+	store as coreStore,
+} from '@wordpress/core-data';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useState, useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -29,6 +34,7 @@ import {
 	postField,
 	dateField,
 	statusField,
+	typeField,
 } from './fields';
 import {
 	approveComment,
@@ -46,6 +52,60 @@ import './style.scss';
 
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
+
+/**
+ * Fetch lightweight comment counts for each status tab.
+ *
+ * @param currentUserId The current user's ID, used for the "mine" count.
+ */
+function useCommentCounts( currentUserId: number | undefined ) {
+	const [ counts, setCounts ] = useState< Record< string, number > >( {} );
+
+	useEffect( () => {
+		const statuses = [ 'approve', 'hold', 'spam', 'trash' ];
+		const fetches = statuses.map( ( status ) =>
+			apiFetch( {
+				path: `/wp/v2/comments?status=${ status }&per_page=1`,
+				parse: false,
+			} ).then( ( response: Response ) => ( {
+				status,
+				total: parseInt(
+					response.headers.get( 'X-WP-Total' ) || '0',
+					10
+				),
+			} ) )
+		);
+
+		// Fetch "mine" count if we have a user ID.
+		if ( currentUserId ) {
+			fetches.push(
+				apiFetch( {
+					path: `/wp/v2/comments?author=${ currentUserId }&per_page=1`,
+					parse: false,
+				} ).then( ( response: Response ) => ( {
+					status: 'mine',
+					total: parseInt(
+						response.headers.get( 'X-WP-Total' ) || '0',
+						10
+					),
+				} ) )
+			);
+		}
+
+		Promise.all( fetches ).then( ( results ) => {
+			const newCounts: Record< string, number > = {};
+			results.forEach( ( { status, total } ) => {
+				newCounts[ status ] = total;
+			} );
+			// "all" = approve + hold (matching classic WP behavior).
+			newCounts.all =
+				( newCounts.approve ?? 0 ) + ( newCounts.hold ?? 0 );
+			setCounts( newCounts );
+		} );
+	}, [ currentUserId ] );
+
+	return counts;
+}
 
 /**
  * Return a stable string ID for a comment item.
@@ -81,6 +141,17 @@ function CommentsList() {
 		[ searchParams, navigate ]
 	);
 
+	const currentUserId = useSelect(
+		( select ) =>
+			(
+				select( coreStore ).getCurrentUser() as
+					| { id?: number }
+					| undefined
+			 )?.id,
+		[]
+	);
+	const counts = useCommentCounts( currentUserId );
+
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'root',
 		name: 'comment',
@@ -100,7 +171,13 @@ function CommentsList() {
 	};
 
 	// Build query and fetch comments
-	const queryArgs = useMemo( () => viewToQuery( view ), [ view ] );
+	const queryArgs = useMemo( () => {
+		const args = viewToQuery( view );
+		if ( statusSlug === 'mine' && currentUserId ) {
+			args.author = currentUserId;
+		}
+		return args;
+	}, [ view, statusSlug, currentUserId ] );
 	const {
 		records: comments,
 		totalItems,
@@ -117,6 +194,7 @@ function CommentsList() {
 			postField,
 			dateField,
 			statusField,
+			typeField,
 		];
 		return allFields
 			.filter( ( field ) => {
@@ -171,6 +249,8 @@ function CommentsList() {
 						{ STATUS_TABS.map( ( tab ) => (
 							<Tabs.Tab tabId={ tab.slug } key={ tab.slug }>
 								{ tab.label }
+								{ counts[ tab.slug ] !== undefined &&
+									` (${ counts[ tab.slug ] })` }
 							</Tabs.Tab>
 						) ) }
 					</Tabs.TabList>

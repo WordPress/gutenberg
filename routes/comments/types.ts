@@ -24,6 +24,7 @@ export const COMMENT_STATUSES = {
 
 export const STATUS_TABS = [
 	{ slug: 'all', label: 'All' },
+	{ slug: 'mine', label: 'Mine' },
 	{ slug: 'approve', label: 'Approved' },
 	{ slug: 'hold', label: 'Pending' },
 	{ slug: 'spam', label: 'Spam' },

@@ -27,7 +27,7 @@ type ActiveViewOverrides = {
 export function getActiveViewOverridesForTab(
 	slug: string
 ): ActiveViewOverrides {
-	if ( slug === 'all' ) {
+	if ( slug === 'all' || slug === 'mine' ) {
 		return {};
 	}
 	return {
@@ -86,6 +86,20 @@ export function viewToQuery( view: View ) {
 	);
 	if ( postFilter ) {
 		result.post = postFilter.value;
+	}
+
+	const typeFilter = view.filters?.find(
+		( filter ) => filter.field === 'type'
+	);
+	if ( typeFilter ) {
+		result.type = typeFilter.value;
+	}
+
+	const authorFilter = view.filters?.find(
+		( filter ) => filter.field === 'author'
+	);
+	if ( authorFilter ) {
+		result.author = authorFilter.value;
 	}
 
 	const dateFilter = view.filters?.find(
