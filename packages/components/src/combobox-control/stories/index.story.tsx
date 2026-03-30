@@ -88,9 +88,9 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
 export const Default = Template.bind( {} );
 Default.args = {
 	__next40pxDefaultSize: true,
-	label: 'Select a country',
+	label: 'Country',
 	options: countryOptions,
-	help: 'Select the country you currently reside in.',
+	help: 'Help text to describe the control.',
 };
 
 /**
@@ -101,7 +101,7 @@ Default.args = {
 export const WithCustomRenderItem = Template.bind( {} );
 WithCustomRenderItem.args = {
 	...Default.args,
-	label: 'Select an author',
+	label: 'Author',
 	options: [
 		{
 			value: 'parsley',
