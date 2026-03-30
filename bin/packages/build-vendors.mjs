@@ -12,14 +12,15 @@ const VENDORS_DIR = path.join( BUILD_DIR, 'vendors' );
 
 const VENDOR_SCRIPTS = [
 	{
-		handle: 'react',
+		name: 'react',
 		global: 'React',
+		handle: 'react',
 		dependencies: [ 'wp-polyfill' ],
-		entrypoint: 'react',
 	},
 	{
-		handle: 'react-dom',
+		name: 'react-dom',
 		global: 'ReactDOM',
+		handle: 'react-dom',
 		dependencies: [ 'react' ],
 		contents: [
 			'export * from "react-dom";',
@@ -27,10 +28,10 @@ const VENDOR_SCRIPTS = [
 		].join( '\n' ),
 	},
 	{
-		handle: 'react-jsx-runtime',
+		name: 'react/jsx-runtime',
 		global: 'ReactJSXRuntime',
+		handle: 'react-jsx-runtime',
 		dependencies: [ 'react' ],
-		entrypoint: 'react/jsx-runtime',
 	},
 ];
 
@@ -90,7 +91,7 @@ async function generateAssetFile( config ) {
  * @return {Promise<void>} Promise that resolves when all builds are finished.
  */
 async function bundleVendorScript( config ) {
-	const { handle, global, entrypoint, contents } = config;
+	const { name, global, handle, contents } = config;
 
 	// Plugin that externalizes the `react` package.
 	const reactExternalPlugin = {
@@ -125,14 +126,14 @@ async function bundleVendorScript( config ) {
 		plugins: [ reactExternalPlugin ],
 	};
 
-	if ( entrypoint ) {
-		esbuildOptions.entryPoints = [ entrypoint ];
-	} else {
+	if ( contents ) {
 		esbuildOptions.stdin = {
 			contents,
 			resolveDir: ROOT_DIR,
 			loader: 'js',
 		};
+	} else {
+		esbuildOptions.entryPoints = [ name ];
 	}
 
 	await Promise.all( [
