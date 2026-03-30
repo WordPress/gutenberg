@@ -33,4 +33,12 @@ describe( 'createCssString', () => {
 	`( '$description', ( { input, expected } ) => {
 		expect( createCssString( input ) ).toBe( expected );
 	} );
+
+	test( 'docblock example', () => {
+		const value = 'CSS & a "<style>" tag\'s strings';
+		const expected =
+			'"CSS \\26  a \\22 \\3C style\\3E \\22  tag\\27 s strings"';
+
+		expect( createCssString( value ) ).toBe( expected );
+	} );
 } );

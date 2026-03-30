@@ -8,12 +8,12 @@
  *
  * @example
  * ```js
- * const fontName = "A font's <problem>";
+ * const fontName = 'CSS & a "<style>" tag\'s strings';
  * const fontFaceRule = `@font-face { font-family: ${createCssString(fontName)}; }`
  * ```
  *
- * `fontFaceRule` will have the value `'@font-face { font-family: "A font\\27 s \\3C problem\\3E "; }'`.
- * The browser will parse this rule as equivalent to: `@font-face { font-family: "A font's <problem>"; }`.
+ * `fontFaceRule` will have the value `'@font-face { font-family: "CSS \\26  a \\22 \\3C style\\3E \\22  tag\\27 s strings"; }'`.
+ * The browser will parse this rule as equivalent to: `@font-face { font-family: "CSS & a \"<style>\" tag's strings"; }`.
  *
  * Some characters that are valid in CSS strings are escaped to avoid problems with subsequent
  * processing that may not correctly parse CSS:
