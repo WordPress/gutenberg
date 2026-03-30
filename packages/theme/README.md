@@ -139,7 +139,6 @@ function App() {
 	return (
 		<ThemeProvider
 			color={ { primary: 'blue' } }
-			cursor={ { control: 'pointer' } }
 			density="compact"
 		>
 			{ /* Your app content */ }
