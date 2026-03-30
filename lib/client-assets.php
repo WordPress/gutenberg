@@ -367,32 +367,34 @@ function gutenberg_enqueue_stored_styles( $options = array() ) {
  * @param WP_Scripts $scripts WP_Scripts instance.
  */
 function gutenberg_register_vendor_scripts( $scripts ) {
-	$extension = SCRIPT_DEBUG ? '.js' : '.min.js';
+	$extension   = SCRIPT_DEBUG ? '.js' : '.min.js';
+	$vendors_dir = gutenberg_dir_path() . 'build/scripts/vendors/';
 
-	gutenberg_override_script(
-		$scripts,
-		'react',
-		gutenberg_url( 'build/scripts/vendors/react' . $extension ),
-		// WordPress Core in `wp_register_development_scripts` sets `wp-react-refresh-entry` as a dependency to `react` when `SCRIPT_DEBUG` is true.
-		// We need to preserve that here.
-		SCRIPT_DEBUG ? array( 'wp-react-refresh-entry', 'wp-polyfill' ) : array( 'wp-polyfill' ),
-		'18'
-	);
-	gutenberg_override_script(
-		$scripts,
-		'react-dom',
-		gutenberg_url( 'build/scripts/vendors/react-dom' . $extension ),
-		array( 'react' ),
-		'18'
-	);
+	$vendor_handles = array( 'react', 'react-dom', 'react-jsx-runtime' );
 
-	gutenberg_override_script(
-		$scripts,
-		'react-jsx-runtime',
-		gutenberg_url( 'build/scripts/vendors/react-jsx-runtime' . $extension ),
-		array( 'react' ),
-		'18'
-	);
+	foreach ( $vendor_handles as $handle ) {
+		$asset_file   = $vendors_dir . $handle . '.min.asset.php';
+		$asset        = file_exists( $asset_file ) ? require $asset_file : array();
+		$dependencies = $asset['dependencies'] ?? array();
+		$version      = $asset['version'] ?? '0';
+
+		gutenberg_override_script(
+			$scripts,
+			$handle,
+			gutenberg_url( 'build/scripts/vendors/' . $handle . $extension ),
+			$dependencies,
+			$version
+		);
+	}
+
+	// WordPress Core in `wp_register_development_scripts` sets `wp-react-refresh-entry`
+	// as a dependency to `react` when `SCRIPT_DEBUG` is true. Preserve that here.
+	if ( SCRIPT_DEBUG ) {
+		$react = $scripts->query( 'react', 'registered' );
+		if ( $react && ! in_array( 'wp-react-refresh-entry', $react->deps, true ) ) {
+			$react->deps[] = 'wp-react-refresh-entry';
+		}
+	}
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 
