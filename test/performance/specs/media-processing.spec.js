@@ -13,10 +13,8 @@ import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 const results = {
 	mediaProcessingJpeg: [],
-	mediaProcessingWebp: [],
 	mediaProcessingAvif: [],
-	mediaProcessingAvifToJpeg: [],
-	mediaProcessingAvifToJpegViaPng: [],
+	mediaProcessingJpegToAvif: [],
 };
 
 // WordPress default image sub-sizes (since WP 5.3).
@@ -60,15 +58,15 @@ async function measureProcessing( { base64, mimeType, sizes } ) {
 }
 
 /**
- * Cross-format (current approach): resize each sub-size in source format,
- * then convert each to target format. Simulates AVIF→resize→AVIF→transcode→JPEG.
+ * Cross-format processing: resize each sub-size in source format,
+ * then convert each to target format.
  *
  * @param {Object}   root0         Function arguments.
  * @param {string}   root0.base64  Base64-encoded image data.
  * @param {string}   root0.srcType Source MIME type.
  * @param {string}   root0.dstType Target MIME type.
  * @param {Object[]} root0.sizes   Array of sub-size specs.
- * @return {Promise<number>} Elapsed time in milliseconds.
+ * @return {Promise<Object>} Elapsed time and output metadata.
  */
 async function measureCrossFormatProcessing( {
 	base64,
@@ -101,71 +99,7 @@ async function measureCrossFormatProcessing( {
 			0.82,
 			false
 		);
-		const header = Array.from( new Uint8Array( converted ).slice( 0, 4 ) );
-		outputs.push( {
-			width: resized.width,
-			height: resized.height,
-			byteLength: converted.byteLength,
-			header,
-		} );
-	}
-	return { elapsed: performance.now() - start, outputs };
-}
-
-/**
- * Cross-format via PNG intermediate (proposed optimization):
- * convert source to lossless PNG once, resize each sub-size from PNG,
- * then convert each resized PNG to target format.
- *
- * @param {Object}   root0         Function arguments.
- * @param {string}   root0.base64  Base64-encoded image data.
- * @param {string}   root0.srcType Source MIME type.
- * @param {string}   root0.dstType Target MIME type.
- * @param {Object[]} root0.sizes   Array of sub-size specs.
- * @return {Promise<number>} Elapsed time in milliseconds.
- */
-async function measureCrossFormatViaPng( { base64, srcType, dstType, sizes } ) {
-	const { vipsResizeImage, vipsConvertImageFormat } = await import(
-		'@wordpress/vips/worker'
-	);
-	const bytes = Uint8Array.from( atob( base64 ), ( c ) => c.charCodeAt( 0 ) );
-	const outputs = [];
-
-	const start = performance.now();
-
-	// Step 1: Convert source to lossless PNG intermediate (once).
-	const pngBuffer = await vipsConvertImageFormat(
-		'perf-png-intermediate',
-		bytes.slice().buffer,
-		srcType,
-		'image/png',
-		1,
-		false
-	);
-
-	const pngBytes = new Uint8Array( pngBuffer );
-
-	// Step 2: Resize each sub-size from the PNG intermediate.
-	for ( const resize of sizes ) {
-		const buffer = pngBytes.slice().buffer;
-		const resized = await vipsResizeImage(
-			`perf-png-${ resize.width }`,
-			buffer,
-			'image/png',
-			resize,
-			false,
-			0.82
-		);
-		// Step 3: Transcode resized PNG to target format.
-		const converted = await vipsConvertImageFormat(
-			`perf-png-conv-${ resize.width }`,
-			resized.buffer,
-			'image/png',
-			dstType,
-			0.82,
-			false
-		);
-		const header = Array.from( new Uint8Array( converted ).slice( 0, 4 ) );
+		const header = Array.from( new Uint8Array( converted ).slice( 0, 12 ) );
 		outputs.push( {
 			width: resized.width,
 			height: resized.height,
@@ -180,10 +114,6 @@ test.describe( 'Media Processing Performance', () => {
 	// Read test images once at module level — these don't change.
 	const jpegBase64 = readFileSync(
 		path.join( ASSETS_PATH, 'test-image-3000x2000.jpeg' )
-	).toString( 'base64' );
-
-	const webpBase64 = readFileSync(
-		path.join( ASSETS_PATH, 'test-image-3000x2000.webp' )
 	).toString( 'base64' );
 
 	const avifBase64 = readFileSync(
@@ -244,13 +174,6 @@ test.describe( 'Media Processing Performance', () => {
 				sizes: IMAGE_SUB_SIZES,
 			} );
 
-			// WebP (same-format resize).
-			const webpElapsed = await page.evaluate( measureProcessing, {
-				base64: webpBase64,
-				mimeType: 'image/webp',
-				sizes: IMAGE_SUB_SIZES,
-			} );
-
 			// AVIF (same-format resize).
 			const avifElapsed = await page.evaluate( measureProcessing, {
 				base64: avifBase64,
@@ -258,40 +181,25 @@ test.describe( 'Media Processing Performance', () => {
 				sizes: IMAGE_SUB_SIZES,
 			} );
 
-			// AVIF → JPEG: current approach (resize as AVIF, then transcode each).
-			const avifToJpeg = await page.evaluate(
+			// JPEG → AVIF: resize as JPEG, then transcode each sub-size to AVIF.
+			// Simulates an optimization plugin converting uploaded JPEGs to AVIF.
+			const jpegToAvif = await page.evaluate(
 				measureCrossFormatProcessing,
 				{
-					base64: avifBase64,
-					srcType: 'image/avif',
-					dstType: 'image/jpeg',
+					base64: jpegBase64,
+					srcType: 'image/jpeg',
+					dstType: 'image/avif',
 					sizes: IMAGE_SUB_SIZES,
 				}
 			);
 
-			// AVIF → JPEG via PNG intermediate (proposed optimization).
-			const avifToJpegViaPng = await page.evaluate(
-				measureCrossFormatViaPng,
-				{
-					base64: avifBase64,
-					srcType: 'image/avif',
-					dstType: 'image/jpeg',
-					sizes: IMAGE_SUB_SIZES,
-				}
-			);
-
-			// Validate that cross-format outputs are actually JPEG.
-			// JPEG magic bytes: 0xFF 0xD8 0xFF.
-			for ( const output of avifToJpeg.outputs ) {
-				expect( output.header[ 0 ] ).toBe( 0xff );
-				expect( output.header[ 1 ] ).toBe( 0xd8 );
-				expect( output.byteLength ).toBeGreaterThan( 0 );
-				expect( output.width ).toBeGreaterThan( 0 );
-				expect( output.height ).toBeGreaterThan( 0 );
-			}
-			for ( const output of avifToJpegViaPng.outputs ) {
-				expect( output.header[ 0 ] ).toBe( 0xff );
-				expect( output.header[ 1 ] ).toBe( 0xd8 );
+			// Validate that cross-format outputs are actually AVIF.
+			// AVIF files are ISOBMFF containers: bytes 4-7 = "ftyp" (0x66 0x74 0x79 0x70).
+			for ( const output of jpegToAvif.outputs ) {
+				expect( output.header[ 4 ] ).toBe( 0x66 ); // 'f'
+				expect( output.header[ 5 ] ).toBe( 0x74 ); // 't'
+				expect( output.header[ 6 ] ).toBe( 0x79 ); // 'y'
+				expect( output.header[ 7 ] ).toBe( 0x70 ); // 'p'
 				expect( output.byteLength ).toBeGreaterThan( 0 );
 				expect( output.width ).toBeGreaterThan( 0 );
 				expect( output.height ).toBeGreaterThan( 0 );
@@ -299,12 +207,8 @@ test.describe( 'Media Processing Performance', () => {
 
 			if ( i > throwaway ) {
 				results.mediaProcessingJpeg.push( jpegElapsed );
-				results.mediaProcessingWebp.push( webpElapsed );
 				results.mediaProcessingAvif.push( avifElapsed );
-				results.mediaProcessingAvifToJpeg.push( avifToJpeg.elapsed );
-				results.mediaProcessingAvifToJpegViaPng.push(
-					avifToJpegViaPng.elapsed
-				);
+				results.mediaProcessingJpegToAvif.push( jpegToAvif.elapsed );
 			}
 		} );
 	}
