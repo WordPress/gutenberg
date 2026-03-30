@@ -6,6 +6,41 @@ import { v4 as uuidv4 } from 'uuid';
 /**
  * WordPress dependencies
  */
+
+// XMP namespace used by ISO 21496-1 / UltraHDR gain maps.
+const GAIN_MAP_XMP_NAMESPACE = 'http://ns.adobe.com/hdr-gain-map/1.0/';
+
+/**
+ * Detects whether a file contains an HDR gain map by scanning for
+ * the Adobe HDR gain map XMP namespace in the file's binary data.
+ * XMP metadata is located near the start of JPEG files, so we only
+ * need to scan the first 256 KB.
+ *
+ * @param file The image file to check.
+ * @return Whether the file contains a gain map.
+ */
+export async function hasGainMap( file: File ): Promise< boolean > {
+	try {
+		// XMP metadata is in early JPEG markers; 256 KB is more than enough.
+		const slice = file.slice( 0, 256 * 1024 );
+		const buffer = await slice.arrayBuffer();
+		const bytes = new Uint8Array( buffer );
+
+		// Search for the namespace string in the binary data.
+		const needle = new TextEncoder().encode( GAIN_MAP_XMP_NAMESPACE );
+		outer: for ( let i = 0; i <= bytes.length - needle.length; i++ ) {
+			for ( let j = 0; j < needle.length; j++ ) {
+				if ( bytes[ i + j ] !== needle[ j ] ) {
+					continue outer;
+				}
+			}
+			return true;
+		}
+		return false;
+	} catch {
+		return false;
+	}
+}
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
@@ -1173,11 +1208,14 @@ export function generateThumbnails( id: QueueItemId ) {
 			// encode) for each sub-size, since those buffers are
 			// immediately transcoded to the output format anyway.
 			// PNG is lossless, so there is no generational quality loss.
+			// Skip for images with HDR gain maps — PNG cannot carry gain
+			// map data, so the intermediate would destroy it.
 			let thumbnailFile = file;
 			if (
 				thumbnailTranscodeOperation &&
 				sourceType !== 'image/png' &&
-				sourceType !== 'image/gif'
+				sourceType !== 'image/gif' &&
+				! ( await hasGainMap( file ) )
 			) {
 				try {
 					thumbnailFile = await vipsConvertImageFormat(
@@ -1263,11 +1301,12 @@ export function generateThumbnails( id: QueueItemId ) {
 
 					// Use PNG intermediate for scaled version too when
 					// format conversion is configured (same rationale as
-					// thumbnails above).
+					// thumbnails above). Skip for gain map images.
 					if (
 						thumbnailTranscodeOperation &&
 						sourceType !== 'image/png' &&
-						sourceType !== 'image/gif'
+						sourceType !== 'image/gif' &&
+						! ( await hasGainMap( sourceForScaled ) )
 					) {
 						try {
 							sourceForScaled = await vipsConvertImageFormat(

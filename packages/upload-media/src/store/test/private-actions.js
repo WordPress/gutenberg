@@ -10,6 +10,7 @@ import {
 	getTranscodeImageOperation,
 	finalizeItem,
 	generateThumbnails,
+	hasGainMap,
 } from '../private-actions';
 import { OperationType } from '../types';
 import { vipsHasTransparency, vipsConvertImageFormat } from '../utils';
@@ -504,6 +505,79 @@ describe( 'private actions', () => {
 			);
 			expect( thumbnailCall ).toBeDefined();
 			expect( thumbnailCall[ 0 ].file.type ).toBe( 'image/avif' );
+		} );
+
+		it( 'should skip PNG conversion for images with HDR gain maps', async () => {
+			// Build a JPEG file that contains the gain map XMP namespace.
+			const gainMapXmp =
+				'<x:xmpmeta>' +
+				'<rdf:Description xmlns:hdrgm="http://ns.adobe.com/hdr-gain-map/1.0/">' +
+				'<hdrgm:Version>1.0</hdrgm:Version>' +
+				'</rdf:Description>' +
+				'</x:xmpmeta>';
+			const sourceFile = new File( [ gainMapXmp ], 'photo.jpg', {
+				type: 'image/jpeg',
+			} );
+
+			const select = {
+				getItem: () => ( {
+					id: 'item-1',
+					file: sourceFile,
+					sourceFile,
+					attachment: {
+						id: 42,
+						filename: 'photo.jpg',
+						missing_image_sizes: [ 'thumbnail' ],
+					},
+				} ),
+				getSettings: () => ( {
+					allImageSizes: {
+						thumbnail: { width: 150, height: 150, crop: true },
+					},
+					imageOutputFormats: { 'image/jpeg': 'image/avif' },
+					jpegInterlaced: false,
+					pngInterlaced: false,
+					gifInterlaced: false,
+				} ),
+			};
+
+			const thunk = generateThumbnails( 'item-1' );
+			await thunk( { select, dispatch } );
+
+			// PNG conversion should NOT be called because the file has a gain map.
+			expect( vipsConvertImageFormat ).not.toHaveBeenCalled();
+
+			// Thumbnail should use the original source file.
+			const thumbnailCall = addSideloadItem.mock.calls.find(
+				( call ) => call[ 0 ].additionalData?.image_size === 'thumbnail'
+			);
+			expect( thumbnailCall ).toBeDefined();
+			expect( thumbnailCall[ 0 ].file.type ).toBe( 'image/jpeg' );
+		} );
+	} );
+
+	describe( 'hasGainMap', () => {
+		it( 'should return true for files containing gain map XMP namespace', async () => {
+			const xmpData =
+				'<rdf:Description xmlns:hdrgm="http://ns.adobe.com/hdr-gain-map/1.0/">';
+			const file = new File( [ xmpData ], 'hdr.jpg', {
+				type: 'image/jpeg',
+			} );
+			expect( await hasGainMap( file ) ).toBe( true );
+		} );
+
+		it( 'should return false for files without gain map data', async () => {
+			const file = new File( [ 'regular jpeg data' ], 'photo.jpg', {
+				type: 'image/jpeg',
+			} );
+			expect( await hasGainMap( file ) ).toBe( false );
+		} );
+
+		it( 'should return false for empty files', async () => {
+			const file = new File( [], 'empty.jpg', {
+				type: 'image/jpeg',
+			} );
+			expect( await hasGainMap( file ) ).toBe( false );
 		} );
 	} );
 } );
