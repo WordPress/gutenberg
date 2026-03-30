@@ -8,7 +8,7 @@ import clsx from 'clsx';
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useEffect, useMemo, useRef } from '@wordpress/element';
-import { Placeholder, Spinner } from '@wordpress/components';
+import { Placeholder, SandBox, Spinner } from '@wordpress/components';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import {
 	withColors,
@@ -49,7 +49,7 @@ import {
 	DEFAULT_OVERLAY_COLOR,
 } from './color-utils';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
-import { getIframeSrc, getBackgroundVideoSrc } from '../embed-video-utils';
+import { getBackgroundEmbedHtml } from '../embed-video-utils';
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -365,23 +365,15 @@ function CoverEdit( {
 		[ url, backgroundType ]
 	);
 
-	// Compute embedSrc on-the-fly from embed preview for editor display
-	const embedSrc = useMemo( () => {
+	// Compute embed HTML for editor display via SandBox
+	const embedHtml = useMemo( () => {
 		if (
 			backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE ||
 			! embedPreview?.html
 		) {
 			return null;
 		}
-
-		// Extract iframe src from embed HTML
-		const iframeSrc = getIframeSrc( embedPreview.html );
-		if ( ! iframeSrc ) {
-			return null;
-		}
-
-		// Modify the src to add background video parameters (provider auto-detected)
-		return getBackgroundVideoSrc( iframeSrc );
+		return getBackgroundEmbedHtml( embedPreview.html );
 	}, [ embedPreview, backgroundType ] );
 
 	const isUploadingMedia = isTemporaryMedia( id, url );
@@ -668,21 +660,22 @@ function CoverEdit( {
 						style={ mediaStyle }
 					/>
 				) }
-				{ isEmbedVideoBackground && embedSrc && (
+				{ isEmbedVideoBackground && embedHtml && (
 					<div
 						ref={ mediaElement }
 						className="wp-block-cover__video-background wp-block-cover__embed-background"
 						style={ mediaStyle }
 					>
-						<iframe
-							src={ embedSrc }
+						<SandBox
+							html={ embedHtml }
 							title="Background video"
-							frameBorder="0"
-							allow="autoplay; fullscreen"
+							styles={ [
+								'iframe{position:fixed;top:0;left:0;width:100%;height:100%;}',
+							] }
 						/>
 					</div>
 				) }
-				{ isEmbedVideoBackground && ! embedSrc && isFetchingEmbed && (
+				{ isEmbedVideoBackground && ! embedHtml && isFetchingEmbed && (
 					<Spinner />
 				) }
 
