@@ -334,7 +334,9 @@ const BlockInspectorSingleBlock = ( {
 			{ hasParentChildBlockCards && (
 				<BlockCard
 					{ ...parentBlockInformation }
-					className={ parentBlockInformation.isSynced && 'is-synced' }
+					className={
+						parentBlockInformation?.isSynced && 'is-synced'
+					}
 					parentClientId={ editedContentOnlySection }
 				/>
 			) }

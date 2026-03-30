@@ -8,7 +8,6 @@ import { v4 as uuidv4 } from 'uuid';
  */
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
-
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
 /**
@@ -74,6 +73,7 @@ type ActionCreators = {
 	rotateItem: typeof rotateItem;
 	transcodeImageItem: typeof transcodeImageItem;
 	generateThumbnails: typeof generateThumbnails;
+	finalizeItem: typeof finalizeItem;
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
 	< T = Record< string, unknown > >( args: T ): void;
@@ -380,6 +380,15 @@ export function processItem( id: QueueItemId ) {
 					return;
 				}
 
+				// If parent has pending operations (like Finalize), trigger them.
+				if (
+					parentItem.operations &&
+					parentItem.operations.length > 0
+				) {
+					dispatch.processItem( parentId );
+					return;
+				}
+
 				if ( attachment ) {
 					parentItem.onSuccess?.( [ attachment ] );
 				}
@@ -400,6 +409,14 @@ export function processItem( id: QueueItemId ) {
 			 Do nothing and let the removal happen once the last side-loaded item finishes.
 			 */
 
+			return;
+		}
+
+		// For Finalize, wait until all child sideloads are complete.
+		if (
+			operation === OperationType.Finalize &&
+			select.hasPendingItemsByParentId( id )
+		) {
 			return;
 		}
 
@@ -445,6 +462,10 @@ export function processItem( id: QueueItemId ) {
 
 			case OperationType.ThumbnailGeneration:
 				dispatch.generateThumbnails( id );
+				break;
+
+			case OperationType.Finalize:
+				dispatch.finalizeItem( id );
 				break;
 		}
 	};
@@ -717,22 +738,7 @@ export function prepareItem( id: QueueItemId ) {
 
 		// For images that can be processed by vips, check if we need to scale down based on threshold.
 		if ( isImage && isVipsSupported ) {
-			const { bigImageSizeThreshold, imageOutputFormats } = settings;
-
-			// If a threshold is set, add a resize operation to scale down large images.
-			// This matches WordPress core's behavior in wp_create_image_subsizes().
-			if ( bigImageSizeThreshold ) {
-				operations.push( [
-					OperationType.ResizeCrop,
-					{
-						resize: {
-							width: bigImageSizeThreshold,
-							height: bigImageSizeThreshold,
-						},
-						isThresholdResize: true,
-					},
-				] );
-			}
+			const { imageOutputFormats } = settings;
 
 			// Check if we need to transcode to a different format.
 			// Uses WordPress image_editor_output_format filter settings.
@@ -750,7 +756,8 @@ export function prepareItem( id: QueueItemId ) {
 
 			operations.push(
 				OperationType.Upload,
-				OperationType.ThumbnailGeneration
+				OperationType.ThumbnailGeneration,
+				OperationType.Finalize
 			);
 		} else {
 			operations.push( OperationType.Upload );
@@ -770,6 +777,7 @@ export function prepareItem( id: QueueItemId ) {
 						additionalData: {
 							...item.additionalData,
 							generate_sub_sizes: true,
+							convert_format: true,
 						},
 				  }
 				: {};
@@ -795,7 +803,7 @@ export function uploadItem( id: QueueItemId ) {
 			additionalData: item.additionalData,
 			signal: item.abortController?.signal,
 			onFileChange: ( [ attachment ] ) => {
-				if ( ! isBlobURL( attachment.url ) ) {
+				if ( attachment && ! isBlobURL( attachment.url ) ) {
 					dispatch.finishOperation( id, {
 						attachment,
 					} );
@@ -1123,16 +1131,19 @@ export function generateThumbnails( id: QueueItemId ) {
 			attachment.missing_image_sizes &&
 			attachment.missing_image_sizes.length > 0
 		) {
+			const settings = select.getSettings();
+			const allImageSizes = settings.allImageSizes || {};
+			const sizesToGenerate: string[] =
+				attachment.missing_image_sizes as string[];
+
 			// Use sourceFile for thumbnail generation to preserve quality.
 			// WordPress core generates thumbnails from the original (unscaled) image.
 			// Vips will auto-rotate based on EXIF orientation during thumbnail generation.
-			const file = attachment.media_filename
-				? renameFile( item.sourceFile, attachment.media_filename )
+			const file = attachment.filename
+				? renameFile( item.sourceFile, attachment.filename )
 				: item.sourceFile;
 			const batchId = uuidv4();
 
-			const settings = select.getSettings();
-			const allImageSizes = settings.allImageSizes || {};
 			const { imageOutputFormats } = settings;
 
 			// Check if thumbnails should be transcoded to a different format.
@@ -1156,7 +1167,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				);
 			}
 
-			for ( const name of attachment.missing_image_sizes ) {
+			for ( const name of sizesToGenerate ) {
 				const imageSize = allImageSizes[ name ];
 				if ( ! imageSize ) {
 					// eslint-disable-next-line no-console
@@ -1204,6 +1215,99 @@ export function generateThumbnails( id: QueueItemId ) {
 					},
 					operations: thumbnailOperations,
 				} );
+			}
+
+			// Create and sideload the scaled version.
+			const { bigImageSizeThreshold } = settings;
+			if ( bigImageSizeThreshold && attachment.id ) {
+				// Check if the image actually exceeds the threshold.
+				// Only create a scaled version for images larger than the threshold,
+				// matching WordPress core's wp_create_image_subsizes() behavior.
+				const bitmap = await createImageBitmap( item.sourceFile );
+				const needsScaling =
+					bitmap.width > bigImageSizeThreshold ||
+					bitmap.height > bigImageSizeThreshold;
+				bitmap.close();
+
+				if ( needsScaling ) {
+					// Rename sourceFile to match the server attachment filename.
+					const sourceForScaled = attachment.filename
+						? renameFile( item.sourceFile, attachment.filename )
+						: item.sourceFile;
+
+					// Add scaling to queue.
+					const scaledOperations: Operation[] = [
+						[
+							OperationType.ResizeCrop,
+							{
+								resize: {
+									width: bigImageSizeThreshold,
+									height: bigImageSizeThreshold,
+								},
+								isThresholdResize: true,
+							},
+						],
+					];
+
+					// Add transcoding if format conversion is configured.
+					if ( thumbnailTranscodeOperation ) {
+						scaledOperations.push( thumbnailTranscodeOperation );
+					}
+
+					scaledOperations.push( OperationType.Upload );
+
+					dispatch.addSideloadItem( {
+						file: sourceForScaled,
+						onChange: ( [ updatedAttachment ] ) => {
+							if ( isBlobURL( updatedAttachment.url ) ) {
+								return;
+							}
+							item.onChange?.( [ updatedAttachment ] );
+						},
+						batchId,
+						parentId: item.id,
+						additionalData: {
+							post: attachment.id,
+							image_size: 'scaled',
+							convert_format: false,
+						},
+						operations: scaledOperations,
+					} );
+				}
+			}
+		}
+
+		dispatch.finishOperation( id, {} );
+	};
+}
+
+/**
+ * Finalizes an uploaded item by calling the server's finalize endpoint.
+ *
+ * This triggers the wp_generate_attachment_metadata filter so that PHP
+ * plugins can process the attachment after all client-side operations
+ * (including thumbnail sideloads) are complete.
+ *
+ * @param id Item ID.
+ */
+export function finalizeItem( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		const attachment = item.attachment;
+		const { mediaFinalize } = select.getSettings();
+
+		// Only finalize if we have an attachment ID and a mediaFinalize callback.
+		if ( attachment?.id && mediaFinalize ) {
+			try {
+				await mediaFinalize( attachment.id );
+			} catch ( error ) {
+				// Log but don't fail the upload if finalization fails.
+				// eslint-disable-next-line no-console
+				console.warn( 'Media finalization failed:', error );
 			}
 		}
 

@@ -13,6 +13,10 @@
 	&:hover {
 		background-color: $gray-200;
 	}
+
+	&:has(.is-pressed) {
+		background-color: $gray-200;
+	}
 }
 
 .editor-collaborators-presence__button.editor-collaborators-presence__button.components-button {
@@ -33,10 +37,10 @@
 		color: $gray-800;
 	}
 
-	// Override pressed state - keep it like document bar style
+	// Override pressed state - let the container handle the background
 	&.is-pressed,
 	&.is-pressed:hover {
-		background: $gray-300;
+		background: transparent;
 		color: $gray-800;
 	}
 

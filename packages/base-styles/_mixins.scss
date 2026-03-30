@@ -667,11 +667,29 @@
 	}
 }
 
+@mixin inserter-toggle() {
+	// Basic look
+	background: colors.$gray-900;
+	color: colors.$white;
+	padding: 0;
+
+	// TODO: Consider passing size="small" to the Inserter toggle instead.
+	// Special dimensions for this button.
+	min-width: variables.$button-size-small;
+	height: variables.$button-size-small;
+
+	&:hover {
+		color: colors.$white;
+		background: var(--wp-admin-theme-color);
+	}
+}
+
 @mixin selected-block-outline($widthRatio: 1) {
 	outline-color: var(--wp-admin-theme-color);
 	outline-style: solid;
 	outline-width: calc(#{$widthRatio} * (var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
 	outline-offset: calc(#{$widthRatio} * ((-1 * var(--wp-admin-border-width-focus) ) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
+	box-shadow: inset 0 0 0 calc((#{$widthRatio} * (var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1))) + 0.5px) rgba(colors.$white, 0.7);
 }
 
 @mixin selected-block-focus($widthRatio: 1) {

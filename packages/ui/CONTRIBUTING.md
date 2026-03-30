@@ -26,6 +26,37 @@ src/
 -   The folder name should match the primary component name
 -   The `index.ts` file should contain only the public API exports for the component(s)
 
+## Public APIs
+
+The package has a single entrypoint which exports all of the components of the package, and nothing else.
+
+Specifically:
+
+-   Components are implemented as [compound components](#compound-components). Exported components will define their own subcomponents as properties of the top-level export.
+    -   Example: `import { Button } from '@wordpress/ui'; // Button, Button.Icon, etc.`
+-   TypeScript types are not exported. If you need access to a component's prop types, use `React.ComponentProps`.
+    -   Example: `type ButtonProps = React.ComponentProps< typeof Button >;`
+-   Styles are defined in the built JavaScript files and are not loaded separately.
+
+The package follows [semantic versioning](https://semver.org/), and the following are considered to be "the public API" for consideration of backwards-incompatible changes:
+
+-   Component definitions (e.g. removing a component)
+-   Component props (e.g. renaming, removing, or changing a props supported types such that existing usage would break in an update)
+-   CSS properties prefixed with `--wp-ui-` (e.g. changing a CSS property such that it would negatively impact a user's experience)
+
+## Compound Components
+
+This package follows the [compound component approach outlined in the `@wordpress/components` contributing guidelines](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/CONTRIBUTING.md#compound-components).
+
+Some components will use a bare name (e.g. `Button`), while others will have a "root" component with modular children (e.g. `Tooltip.Root`). Use the base component name when it works standalone and any subcomponents are optional enhancements. Only introduce `.Root` when the component is modular and consumers are expected to compose multiple parts.
+
+Why?
+
+-   `.Root` primarily coordinates, and isn't useful on its own
+    -   For example, a `Button` is useful on its own (renders an interactive element), unlike `Tabs.Root`
+-   `.Root` has required subparts, signalling an expectation that it must be composed
+    -   A non-root component can still have _optional_ sub-parts, like a `Button.Icon`
+
 ## CSS Architecture
 
 ### CSS Layers
@@ -50,3 +81,54 @@ Every component stylesheet must include the layer definition at the top and wrap
 -   **`wp-ui-components`** - Default styles for design system components (`.stack`, etc.)
 -   **`wp-ui-compositions`** - Internal compositions that extend base components
 -   **`wp-ui-overrides`** - Last-resort styles to override default rules
+
+### Custom Properties and State Styles
+
+When components expose CSS custom properties (variables) for theming or composition, care must be taken to separate **configurable values** from **state handling**. Getting this wrong can silently break styles when components are composed across CSS layers.
+
+#### The rule
+
+> **Custom properties = configurable values. CSS properties = state machine.**
+
+Define custom properties for each visual "slot" (default, active/hover, disabled, etc.) and assign them to design tokens or other values. In state selectors (`:hover`, `:active`, `:focus`, `[data-disabled]`, etc.), set **CSS properties** (like `background-color`, `color`) to reference the appropriate custom property for that state — do **not** reassign the custom property itself.
+
+In CSS cascade layers, a rule in a higher-priority layer always wins over a lower-priority layer regardless of selector specificity. If a component reassigns a custom property inside a state selector, a higher layer that overrides that same custom property will win unconditionally — the state-based reassignment in the lower layer becomes dead code.
+
+#### Do this
+
+Define a separate custom property per state, and use CSS property declarations in state selectors:
+
+```css
+.button {
+	--button-bg: blue;
+	--button-bg-hover: darkblue;
+	background-color: var(--button-bg);
+
+	&:hover {
+		background-color: var(--button-bg-hover);
+	}
+}
+```
+
+A composition in a higher layer can safely override both custom properties, and all states continue to work as expected.
+
+#### Don't do this
+
+Do not reassign the same custom property in state selectors:
+
+```css
+.button {
+	--button-bg: blue;
+	background-color: var(--button-bg);
+
+	&:hover {
+		--button-bg: darkblue;
+	}
+}
+```
+
+If a higher layer sets `.special-button { --button-bg: red; }`, that override wins over the hover reassignment (layer precedence trumps specificity). The hover state will show `red` instead of `darkblue`, and there is no way for the lower layer to recover.
+
+### Disabled State Styling
+
+For components built on Base UI, use the `data-disabled` attribute when styling disabled states rather than targeting `disabled` or `aria-disabled` directly. Base UI applies `data-disabled` consistently regardless of whether the underlying implementation uses the native `disabled` attribute or `aria-disabled` (which depends on the `focusableWhenDisabled` prop). This keeps styles decoupled from the specific HTML attribute and avoids verbose selectors that would need to target both.

@@ -167,11 +167,7 @@ The API works out of the box with standard block-building tools like [`wp-script
 
 The Interactivity API comes with built-in primitives for adding client-side navigation to your site. This functionality is completely optional, but it opens the possibility to create these user experiences without having to opt out of the WordPress rendering system.
 
-<div class="callout callout-info">
-  Full-page client-side navigation with the Interactivity API is still a work in progress (see <a href="https://github.com/WordPress/gutenberg/issues/60951">#60951</a>). Still, it is expected that all the interactive blocks will have to use the Interactivity API to enable full-page client-side navigation with the Interactivity API. Only in this case, the Interactivity API won't be fully compatible with other libraries (such as jQuery). 
-</div>
-
-It also pairs very well with the [View Transitions API](https://developer.chrome.com/docs/web-platform/view-transitions/) allowing developers to animate page transitions easily.
+_Please, visit the [Client-Side Navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md) guide to learn more about how to use the Interactivity Router and implement client-side navigation in your blocks._
 
 ## Why a standard?
 

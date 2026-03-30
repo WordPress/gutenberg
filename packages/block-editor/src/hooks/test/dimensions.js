@@ -93,4 +93,20 @@ describe( 'getDimensionsClassesAndStyles', () => {
 			},
 		} );
 	} );
+
+	it( 'should convert preset width value to CSS var', () => {
+		const attributes = {
+			style: {
+				dimensions: {
+					width: 'var:preset|dimension|custom-width',
+				},
+			},
+		};
+		expect( getDimensionsClassesAndStyles( attributes ) ).toEqual( {
+			className: undefined,
+			style: {
+				width: 'var(--wp--preset--dimension--custom-width)',
+			},
+		} );
+	} );
 } );

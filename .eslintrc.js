@@ -150,6 +150,7 @@ module.exports = {
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
 		'@wordpress/data-no-store-string-literals': 'error',
+		'@wordpress/use-recommended-components': 'error',
 		'eslint-comments/no-unused-disable': 'error',
 		'import/default': 'error',
 		'import/named': 'error',
@@ -433,8 +434,22 @@ module.exports = {
 		{
 			files: [ 'packages/components/src/**' ],
 			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
-			plugins: [ 'ssr-friendly' ],
-			extends: [ 'plugin:ssr-friendly/recommended' ],
+			rules: {
+				'@wordpress/no-dom-globals-in-module-scope': 'error',
+				'@wordpress/no-dom-globals-in-constructor': 'error',
+				'@wordpress/no-dom-globals-in-react-cc-render': 'error',
+				'@wordpress/no-dom-globals-in-react-fc': 'error',
+			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
+			rules: {
+				// Disallow usage of Design System token CSS custom properties (`--wpds-*`)
+				// because the fallback injection in the build process is not compatible with Emotion files.
+				// Can be removed when there are no more Emotion files in the package.
+				'@wordpress/no-ds-tokens': 'error',
+			},
 		},
 		{
 			files: [
@@ -466,6 +481,13 @@ module.exports = {
 						),
 					},
 				],
+			},
+		},
+		{
+			files: [ 'packages/ui/src/**' ],
+			excludedFiles: [ '**/@(test|stories)/**' ],
+			rules: {
+				'@wordpress/no-unmerged-classname': 'error',
 			},
 		},
 		{
@@ -526,6 +548,12 @@ module.exports = {
 			},
 		},
 		{
+			files: [ 'packages/block-library/src/*/save.[tj]s?(x)' ],
+			rules: {
+				'@wordpress/no-i18n-in-save': 'error',
+			},
+		},
+		{
 			files: [ 'packages/interactivity*/src/**' ],
 			rules: {
 				'react-compiler/react-compiler': 'off',
@@ -536,6 +564,19 @@ module.exports = {
 			files: [ 'packages/ui/src/**' ],
 			rules: {
 				'@wordpress/dependency-group': [ 'error', 'never' ],
+			},
+		},
+		{
+			files: [ 'packages/eslint-plugin/**', 'packages/theme/**' ],
+			rules: {
+				'@wordpress/no-setting-ds-tokens': 'off',
+				'@wordpress/no-unknown-ds-tokens': 'off',
+			},
+		},
+		{
+			files: [ 'storybook/stories/**' ],
+			rules: {
+				'@wordpress/use-recommended-components': 'off',
 			},
 		},
 	],

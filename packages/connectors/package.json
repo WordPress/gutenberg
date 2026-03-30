@@ -1,0 +1,43 @@
+{
+	"name": "@wordpress/connectors",
+	"version": "1.0.0",
+	"private": true,
+	"description": "Connectors API for WordPress plugins.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"connectors"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/connectors/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/connectors"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScriptModuleExports": "./build-module/index.mjs",
+	"types": "build-types",
+	"dependencies": {
+		"@wordpress/components": "file:../components",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/private-apis": "file:../private-apis"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

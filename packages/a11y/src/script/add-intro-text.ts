@@ -28,7 +28,8 @@ export default function addIntroText() {
 			'overflow:hidden;' +
 			'clip-path:inset(50%);' +
 			'border:0;' +
-			'word-wrap:normal !important;'
+			'word-wrap:normal !important;' +
+			'word-break:normal !important;'
 	);
 	introText.setAttribute( 'hidden', '' );
 
