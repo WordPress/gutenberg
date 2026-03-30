@@ -43,9 +43,42 @@ jest.mock( '@wordpress/blocks', () => ( {
 			attributes: {
 				hasFixedLayout: { type: 'boolean' },
 				caption: { type: 'rich-text' },
-				head: { type: 'array' },
-				body: { type: 'array' },
-				foot: { type: 'array' },
+				head: {
+					type: 'array',
+					query: {
+						cells: {
+							type: 'array',
+							query: {
+								content: { type: 'rich-text' },
+								tag: { type: 'string' },
+							},
+						},
+					},
+				},
+				body: {
+					type: 'array',
+					query: {
+						cells: {
+							type: 'array',
+							query: {
+								content: { type: 'rich-text' },
+								tag: { type: 'string' },
+							},
+						},
+					},
+				},
+				foot: {
+					type: 'array',
+					query: {
+						cells: {
+							type: 'array',
+							query: {
+								content: { type: 'rich-text' },
+								tag: { type: 'string' },
+							},
+						},
+					},
+				},
 			},
 		},
 	],
@@ -1159,7 +1192,8 @@ describe( 'crdt-blocks', () => {
 
 			const block = yblocks2.get( 0 );
 			const attrs = block.get( 'attributes' ) as YBlockAttributes;
-			const body = attrs.get( 'body' ) as {
+			const bodyYArray = attrs.get( 'body' ) as Y.Array< unknown >;
+			const body = bodyYArray.toJSON() as {
 				cells: { content: string; tag: string }[];
 			}[];
 
@@ -1218,14 +1252,16 @@ describe( 'crdt-blocks', () => {
 			const block = yblocks2.get( 0 );
 			const attrs = block.get( 'attributes' ) as YBlockAttributes;
 
-			const head = attrs.get( 'head' ) as {
+			const headYArray = attrs.get( 'head' ) as Y.Array< unknown >;
+			const head = headYArray.toJSON() as {
 				cells: { content: string }[];
 			}[];
 			expect( head[ 0 ].cells[ 0 ].content ).toBe(
 				'<strong>Header</strong>'
 			);
 
-			const body = attrs.get( 'body' ) as {
+			const bodyYArray = attrs.get( 'body' ) as Y.Array< unknown >;
+			const body = bodyYArray.toJSON() as {
 				cells: { content: string }[];
 			}[];
 			expect( body[ 0 ].cells[ 0 ].content ).toBe(
@@ -1233,6 +1269,334 @@ describe( 'crdt-blocks', () => {
 			);
 
 			doc2.destroy();
+		} );
+
+		it( 'stores table body as nested Y types (Y.Array of Y.Maps with Y.Text)', () => {
+			const tableBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						hasFixedLayout: true,
+						body: [
+							{
+								cells: [
+									{
+										content:
+											RichTextData.fromPlainText( 'A1' ),
+										tag: 'td',
+									},
+									{
+										content:
+											RichTextData.fromPlainText( 'B1' ),
+										tag: 'td',
+									},
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, tableBlocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' );
+
+			// body should be a Y.Array, not a plain array.
+			expect( body ).toBeInstanceOf( Y.Array );
+
+			// Each row should be a Y.Map.
+			const row = ( body as Y.Array< unknown > ).get( 0 );
+			expect( row ).toBeInstanceOf( Y.Map );
+
+			// Each row's cells should be a Y.Array.
+			const cells = ( row as Y.Map< unknown > ).get( 'cells' );
+			expect( cells ).toBeInstanceOf( Y.Array );
+
+			// Each cell should be a Y.Map with Y.Text content.
+			const cell = ( cells as Y.Array< unknown > ).get( 0 );
+			expect( cell ).toBeInstanceOf( Y.Map );
+
+			const content = ( cell as Y.Map< unknown > ).get(
+				'content'
+			) as Y.Text;
+			expect( content ).toBeInstanceOf( Y.Text );
+			expect( content.toString() ).toBe( 'A1' );
+
+			// tag should be a plain string value.
+			expect( ( cell as Y.Map< unknown > ).get( 'tag' ) ).toBe( 'td' );
+		} );
+
+		it( 'merges table cell edits in-place without replacing sibling cells', () => {
+			const tableBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{ content: 'A1', tag: 'td' },
+									{ content: 'B1', tag: 'td' },
+								],
+							},
+							{
+								cells: [
+									{ content: 'A2', tag: 'td' },
+									{ content: 'B2', tag: 'td' },
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, tableBlocks, null );
+
+			// Grab the Y.Text for cell B2 before the update.
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as Y.Array< unknown >;
+			const row1 = body.get( 1 ) as Y.Map< unknown >;
+			const cells1 = row1.get( 'cells' ) as Y.Array< unknown >;
+			const cellB2 = cells1.get( 1 ) as Y.Map< unknown >;
+			const b2Text = cellB2.get( 'content' ) as Y.Text;
+
+			// Edit only cell A1.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{ content: 'A1-edited', tag: 'td' },
+									{ content: 'B1', tag: 'td' },
+								],
+							},
+							{
+								cells: [
+									{ content: 'A2', tag: 'td' },
+									{ content: 'B2', tag: 'td' },
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			// The Y.Text for B2 should be the exact same object (identity).
+			const bodyAfter = attrs.get( 'body' ) as Y.Array< unknown >;
+			const row1After = bodyAfter.get( 1 ) as Y.Map< unknown >;
+			const cells1After = row1After.get( 'cells' ) as Y.Array< unknown >;
+			const cellB2After = cells1After.get( 1 ) as Y.Map< unknown >;
+			const b2TextAfter = cellB2After.get( 'content' ) as Y.Text;
+
+			expect( b2TextAfter ).toBe( b2Text );
+			expect( b2TextAfter.toString() ).toBe( 'B2' );
+
+			// Cell A1 should be updated.
+			const row0After = bodyAfter.get( 0 ) as Y.Map< unknown >;
+			const cells0After = row0After.get( 'cells' ) as Y.Array< unknown >;
+			const cellA1After = cells0After.get( 0 ) as Y.Map< unknown >;
+			const a1Content = cellA1After.get( 'content' ) as Y.Text;
+			expect( a1Content.toString() ).toBe( 'A1-edited' );
+		} );
+
+		it( 'rebuilds Y.Array when row count changes (structural edit)', () => {
+			const tableBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, tableBlocks, null );
+
+			// Add a second row.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A2', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as Y.Array< unknown >;
+
+			expect( body.length ).toBe( 2 );
+
+			const row1 = body.get( 1 ) as Y.Map< unknown >;
+			const cells = ( row1.get( 'cells' ) as Y.Array< unknown > ).get(
+				0
+			) as Y.Map< unknown >;
+			const a2Content = cells.get( 'content' ) as Y.Text;
+			expect( a2Content.toString() ).toBe( 'A2' );
+		} );
+
+		it( 'concurrent cell edits on different cells are both preserved', () => {
+			// Simulate two users editing different cells in the same table.
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{ content: 'A1', tag: 'td' },
+									{ content: 'B1', tag: 'td' },
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			// Set up doc1 (User A).
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			// Set up doc2 (User B) by syncing initial state.
+			const doc2 = new Y.Doc();
+			const yblocks2 = doc2.getArray< YBlock >();
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+
+			// User A edits cell A1.
+			const userABlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{ content: 'A1-userA', tag: 'td' },
+									{ content: 'B1', tag: 'td' },
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+			mergeCrdtBlocks( yblocks, userABlocks, null );
+
+			// User B edits cell B1 (concurrently, before syncing A's change).
+			const userBBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{ content: 'A1', tag: 'td' },
+									{ content: 'B1-userB', tag: 'td' },
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+			mergeCrdtBlocks( yblocks2, userBBlocks, null );
+
+			// Sync: apply each other's changes.
+			const updateA = Y.encodeStateAsUpdate( doc );
+			const updateB = Y.encodeStateAsUpdate( doc2 );
+			Y.applyUpdate( doc2, updateA );
+			Y.applyUpdate( doc, updateB );
+
+			// Both docs should have both edits preserved.
+			for ( const checkBlocks of [ yblocks, yblocks2 ] ) {
+				const attrs = checkBlocks
+					.get( 0 )
+					.get( 'attributes' ) as YBlockAttributes;
+				const body = (
+					attrs.get( 'body' ) as Y.Array< unknown >
+				 ).toJSON() as { cells: { content: string }[] }[];
+
+				expect( body[ 0 ].cells[ 0 ].content ).toBe( 'A1-userA' );
+				expect( body[ 0 ].cells[ 1 ].content ).toBe( 'B1-userB' );
+			}
+
+			doc2.destroy();
+		} );
+
+		it( 'migrates plain array to Y.Array on first update', () => {
+			// Manually set up a block with a plain array body (old format).
+			const block = new Y.Map() as unknown as YBlock;
+			block.set( 'name' as any, 'core/table' );
+			block.set( 'clientId' as any, 'table-migration' );
+			block.set( 'innerBlocks' as any, new Y.Array() );
+
+			const attrs = new Y.Map();
+			attrs.set( 'hasFixedLayout', true );
+			// Store body as a plain array (pre-migration format).
+			attrs.set( 'body', [
+				{ cells: [ { content: 'old', tag: 'td' } ] },
+			] );
+			block.set( 'attributes' as any, attrs );
+
+			doc.transact( () => {
+				yblocks.push( [ block ] );
+			} );
+
+			// The body is currently a plain array.
+			expect( attrs.get( 'body' ) ).not.toBeInstanceOf( Y.Array );
+
+			// Now merge blocks, which should trigger migration.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						hasFixedLayout: true,
+						body: [
+							{
+								cells: [ { content: 'migrated', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			// After migration, body should be a Y.Array.
+			const bodyAfter = attrs.get( 'body' );
+			expect( bodyAfter ).toBeInstanceOf( Y.Array );
+
+			const bodyJson = ( bodyAfter as Y.Array< unknown > ).toJSON() as {
+				cells: { content: string }[];
+			}[];
+			expect( bodyJson[ 0 ].cells[ 0 ].content ).toBe( 'migrated' );
 		} );
 	} );
 
