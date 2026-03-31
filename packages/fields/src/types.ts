@@ -97,22 +97,26 @@ export interface Template extends CommonPost {
 	plugin?: string;
 	has_theme_file: boolean;
 	id: string;
+	description?: string;
 }
 
 export interface TemplatePart extends CommonPost {
 	type: 'wp_template_part';
+	is_custom?: boolean;
 	source: string;
 	origin: string;
 	has_theme_file: boolean;
 	id: string;
 	area: string;
 	plugin?: string;
+	description?: string;
 }
 
 export interface Pattern extends CommonPost {
 	slug: string;
 	title: { raw: string };
 	wp_pattern_sync_status: string;
+	excerpt?: string | { raw: string; rendered: string };
 }
 
 export type Post = Template | TemplatePart | Pattern | BasePost;

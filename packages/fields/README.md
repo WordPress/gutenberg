@@ -47,6 +47,10 @@ Date field for BasePost.
 
 Delete action for Templates, Patterns and Template Parts.
 
+### descriptionField
+
+Description field for design post types (templates, template parts, and patterns).
+
 ### discussionField
 
 Discussion field for BasePost with custom render logic.

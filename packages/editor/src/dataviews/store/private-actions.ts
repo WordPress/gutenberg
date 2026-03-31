@@ -40,6 +40,7 @@ import {
 	formatField,
 	postContentInfoField,
 	stickyField,
+	descriptionField,
 } from '@wordpress/fields';
 import {
 	altTextField,
@@ -47,7 +48,7 @@ import {
 	authorField as mediaAuthorField,
 	captionField,
 	dateAddedField,
-	descriptionField,
+	descriptionField as mediaDescriptionField,
 	filenameField,
 	filesizeField,
 	mediaDimensionsField,
@@ -164,7 +165,7 @@ const ORDERED_MEDIA_FIELDS = [
 	titleField,
 	altTextField,
 	captionField,
-	descriptionField,
+	mediaDescriptionField,
 ];
 
 export const registerPostTypeSchema =
@@ -262,7 +263,8 @@ export const registerPostTypeSchema =
 					currentTheme?.theme_supports?.[ 'post-thumbnails' ] &&
 					featuredImageField,
 				postTypeConfig.supports?.author && authorField,
-				statusField,
+				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+					statusField,
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					dateField,
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
@@ -271,6 +273,8 @@ export const registerPostTypeSchema =
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					postTypeConfig.supports?.excerpt &&
 					excerptField,
+				DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+					descriptionField,
 				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 				postTypeConfig.supports?.comments && commentStatusField,
 				postTypeConfig.supports?.trackbacks && pingStatusField,
