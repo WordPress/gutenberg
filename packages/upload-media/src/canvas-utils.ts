@@ -67,32 +67,35 @@ export async function canvasConvertToJpeg(
 				type: file.type,
 				data: file.stream(),
 			} );
-			const { image: videoFrame } = await decoder.decode();
+			try {
+				const { image: videoFrame } = await decoder.decode();
+				try {
+					const canvas = new OffscreenCanvas(
+						videoFrame.displayWidth,
+						videoFrame.displayHeight
+					);
+					const ctx = canvas.getContext( '2d' );
 
-			const canvas = new OffscreenCanvas(
-				videoFrame.displayWidth,
-				videoFrame.displayHeight
-			);
-			const ctx = canvas.getContext( '2d' );
+					if ( ! ctx ) {
+						throw new Error( 'Could not get canvas 2d context' );
+					}
 
-			if ( ! ctx ) {
-				videoFrame.close();
+					ctx.drawImage( videoFrame, 0, 0 );
+
+					const jpegBlob = await canvas.convertToBlob( {
+						type: 'image/jpeg',
+						quality,
+					} );
+
+					return new File( [ jpegBlob ], `${ baseName }.jpeg`, {
+						type: 'image/jpeg',
+					} );
+				} finally {
+					videoFrame.close();
+				}
+			} finally {
 				decoder.close();
-				throw new Error( 'Could not get canvas 2d context' );
 			}
-
-			ctx.drawImage( videoFrame, 0, 0 );
-			videoFrame.close();
-			decoder.close();
-
-			const jpegBlob = await canvas.convertToBlob( {
-				type: 'image/jpeg',
-				quality,
-			} );
-
-			return new File( [ jpegBlob ], `${ baseName }.jpeg`, {
-				type: 'image/jpeg',
-			} );
 		}
 	}
 

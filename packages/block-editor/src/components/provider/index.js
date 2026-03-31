@@ -217,6 +217,20 @@ function heicMediaUpload(
 		( file ) => ! HEIC_MIME_TYPES.includes( file.type )
 	);
 
+	// When the batch contains both HEIC and non-HEIC files, coordinate
+	// onBatchSuccess so it fires only after *both* paths have completed.
+	const hasBothPaths =
+		heicFiles.length > 0 && otherFiles.length > 0 && settings?.mediaUpload;
+	let pathsRemaining = hasBothPaths ? 2 : 1;
+	const coordinatedBatchSuccess = hasBothPaths
+		? () => {
+				pathsRemaining--;
+				if ( pathsRemaining <= 0 ) {
+					onBatchSuccess?.();
+				}
+		  }
+		: onBatchSuccess;
+
 	// Route HEIC files through the upload-media pipeline.
 	if ( heicFiles.length > 0 ) {
 		void registry.dispatch( uploadStore ).addItems( {
@@ -226,7 +240,7 @@ function heicMediaUpload(
 				settings?.[ mediaUploadOnSuccessKey ]?.( attachments );
 				onSuccess?.( attachments );
 			},
-			onBatchSuccess,
+			onBatchSuccess: coordinatedBatchSuccess,
 			onError: ( error ) =>
 				onError(
 					typeof error === 'string' ? error : error?.message ?? ''
@@ -245,7 +259,7 @@ function heicMediaUpload(
 			onError,
 			onFileChange,
 			onSuccess,
-			onBatchSuccess,
+			onBatchSuccess: coordinatedBatchSuccess,
 		} );
 	}
 }
