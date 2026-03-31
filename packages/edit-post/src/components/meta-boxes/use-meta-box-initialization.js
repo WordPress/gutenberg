@@ -5,7 +5,6 @@ import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
-import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -49,28 +48,18 @@ export const useMetaBoxInitialization = ( enabled ) => {
 			initializeMetaBoxes();
 
 			// Disable real-time collaboration when legacy meta boxes are detected.
+			// Meta boxes marked with __rtc_compatible_meta_box on the server
+			// will have rtcCompatible set to true in the store.
 			if ( isCollaborationEnabled ) {
 				const allMetaBoxes = registry
 					.select( editPostStore )
 					.getAllMetaBoxes();
-				const metaBoxIds = allMetaBoxes.map( ( { id } ) => id );
 
-				/**
-				 * Filters the list of metabox IDs considered incompatible
-				 * with real-time collaboration.
-				 *
-				 * Developers can remove known-working metabox IDs from this
-				 * array, or return an empty array to ignore all metabox
-				 * incompatibility.
-				 *
-				 * @param {string[]} metaBoxIds Array of all active metabox IDs.
-				 */
-				const incompatibleIds = applyFilters(
-					'editor.rtcIncompatibleMetaBoxes',
-					metaBoxIds
+				const hasIncompatibleMetaBoxes = allMetaBoxes.some(
+					( metaBox ) => ! metaBox.rtcCompatible
 				);
 
-				if ( incompatibleIds.length > 0 ) {
+				if ( hasIncompatibleMetaBoxes ) {
 					setCollaborationSupported( false );
 				}
 			}

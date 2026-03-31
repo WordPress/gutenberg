@@ -6,7 +6,6 @@ import { render } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { addFilter, removeFilter } from '@wordpress/hooks';
 import { RegistryProvider, createRegistry } from '@wordpress/data';
 
 /**
@@ -92,10 +91,6 @@ describe( 'useMetaBoxInitialization', () => {
 	afterEach( () => {
 		setCollaborationSupported.mockClear();
 		initializeMetaBoxes.mockClear();
-		removeFilter(
-			'editor.rtcIncompatibleMetaBoxes',
-			'test/use-meta-box-initialization'
-		);
 	} );
 
 	it( 'disables collaboration when metaboxes are present', () => {
@@ -113,17 +108,15 @@ describe( 'useMetaBoxInitialization', () => {
 		expect( setCollaborationSupported ).toHaveBeenCalledWith( false );
 	} );
 
-	it( 'does not disable collaboration when filter removes all metabox IDs', () => {
-		addFilter(
-			'editor.rtcIncompatibleMetaBoxes',
-			'test/use-meta-box-initialization',
-			() => []
-		);
-
+	it( 'does not disable collaboration when all metaboxes are rtcCompatible', () => {
 		const mockStores = createMockStores( {
 			metaBoxes: [
-				{ id: 'my-metabox', title: 'My Meta Box' },
-				{ id: 'another-metabox', title: 'Another' },
+				{ id: 'my-metabox', title: 'My Meta Box', rtcCompatible: true },
+				{
+					id: 'another-metabox',
+					title: 'Another',
+					rtcCompatible: true,
+				},
 			],
 		} );
 		const registry = createRegistry( mockStores );
@@ -134,16 +127,14 @@ describe( 'useMetaBoxInitialization', () => {
 		expect( setCollaborationSupported ).not.toHaveBeenCalled();
 	} );
 
-	it( 'disables collaboration when filter keeps some metabox IDs', () => {
-		addFilter(
-			'editor.rtcIncompatibleMetaBoxes',
-			'test/use-meta-box-initialization',
-			( ids ) => ids.filter( ( id ) => id !== 'compatible-metabox' )
-		);
-
+	it( 'disables collaboration when some metaboxes lack rtcCompatible', () => {
 		const mockStores = createMockStores( {
 			metaBoxes: [
-				{ id: 'compatible-metabox', title: 'Compatible' },
+				{
+					id: 'compatible-metabox',
+					title: 'Compatible',
+					rtcCompatible: true,
+				},
 				{ id: 'incompatible-metabox', title: 'Incompatible' },
 			],
 		} );
@@ -154,15 +145,15 @@ describe( 'useMetaBoxInitialization', () => {
 		expect( setCollaborationSupported ).toHaveBeenCalledWith( false );
 	} );
 
-	it( 'does not disable collaboration when filter removes the only metabox ID', () => {
-		addFilter(
-			'editor.rtcIncompatibleMetaBoxes',
-			'test/use-meta-box-initialization',
-			( ids ) => ids.filter( ( id ) => id !== 'compatible-metabox' )
-		);
-
+	it( 'does not disable collaboration when the only metabox is rtcCompatible', () => {
 		const mockStores = createMockStores( {
-			metaBoxes: [ { id: 'compatible-metabox', title: 'Compatible' } ],
+			metaBoxes: [
+				{
+					id: 'compatible-metabox',
+					title: 'Compatible',
+					rtcCompatible: true,
+				},
+			],
 		} );
 		const registry = createRegistry( mockStores );
 
