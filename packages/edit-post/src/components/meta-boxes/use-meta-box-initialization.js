@@ -49,14 +49,17 @@ export const useMetaBoxInitialization = ( enabled ) => {
 
 			// Disable real-time collaboration when legacy meta boxes are detected.
 			// Meta boxes marked with __rtc_compatible_meta_box on the server
-			// will have rtcCompatible set to true in the store.
+			// have their IDs stored via setRtcCompatibleMetaBoxIds().
 			if ( isCollaborationEnabled ) {
 				const allMetaBoxes = registry
 					.select( editPostStore )
 					.getAllMetaBoxes();
+				const rtcCompatibleIds = registry
+					.select( editPostStore )
+					.getRtcCompatibleMetaBoxIds();
 
 				const hasIncompatibleMetaBoxes = allMetaBoxes.some(
-					( metaBox ) => ! metaBox.rtcCompatible
+					( metaBox ) => ! rtcCompatibleIds.includes( metaBox.id )
 				);
 
 				if ( hasIncompatibleMetaBoxes ) {
