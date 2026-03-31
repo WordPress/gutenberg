@@ -133,8 +133,11 @@ export function ImageEdit( {
 		captionRef.current = caption;
 	}, [ caption ] );
 
-	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
-		useDispatch( blockEditorStore );
+	const {
+		__unstableMarkNextChangeAsNotPersistent,
+		replaceBlock,
+		removeBlock,
+	} = useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		if ( [ 'wide', 'full' ].includes( align ) ) {
@@ -167,13 +170,19 @@ export function ImageEdit( {
 			// notices deduplicate into a single snackbar.
 			id: isInGallery ? 'gallery-upload-error' : undefined,
 		} );
-		setTemporaryURL();
-		setAttributes( {
-			src: undefined,
-			id: undefined,
-			url: undefined,
-			blob: undefined,
-		} );
+
+		if ( isInGallery ) {
+			// Remove the block entirely so no gray placeholder remains.
+			removeBlock( clientId );
+		} else {
+			setTemporaryURL();
+			setAttributes( {
+				src: undefined,
+				id: undefined,
+				url: undefined,
+				blob: undefined,
+			} );
+		}
 	}
 
 	function onFilesPreUpload( files ) {
