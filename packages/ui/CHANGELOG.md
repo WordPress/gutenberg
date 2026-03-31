@@ -20,6 +20,7 @@
 
 ### Internal
 
+-   Extract `useDeprioritizedInitialFocus` shared hook for reuse across overlay components ([#76910](https://github.com/WordPress/gutenberg/pull/76910)).
 -   `Tabs`: Add development-mode validation for Tab/Panel count matching ([#75170](https://github.com/WordPress/gutenberg/pull/75170)).
 
 ### TypeScript
