@@ -225,3 +225,69 @@ export function getItemProgress(
 	const item = state.queue.find( ( i ) => i.id === id );
 	return item?.progress;
 }
+
+/**
+ * Returns a queue item by matching a blob URL.
+ *
+ * This is useful for components that only have access to a blob URL
+ * (like the Image block during upload) and need to find the corresponding
+ * upload queue item to get progress and operation information.
+ *
+ * @param state   Upload state.
+ * @param blobUrl Blob URL to match.
+ *
+ * @return Queue item if found, undefined otherwise.
+ */
+export function getItemByBlobUrl(
+	state: State,
+	blobUrl: string
+): QueueItem | undefined {
+	// Search through all blob URLs to find which item ID this URL belongs to
+	for ( const [ itemId, urls ] of Object.entries( state.blobUrls ) ) {
+		if ( urls.includes( blobUrl ) ) {
+			return state.queue.find( ( item ) => item.id === itemId );
+		}
+	}
+	return undefined;
+}
+
+/**
+ * Returns the number of child sideload items still in the queue for a parent item.
+ *
+ * Used to track thumbnail generation progress.
+ *
+ * @param state    Upload state.
+ * @param parentId Parent item ID.
+ *
+ * @return Number of child items remaining.
+ */
+export function getChildItemCount(
+	state: State,
+	parentId: QueueItemId
+): number {
+	return state.queue.filter( ( item ) => item.parentId === parentId ).length;
+}
+
+/**
+ * Returns a queue item by matching an attachment ID.
+ *
+ * This is useful as a fallback when no blob URL is available,
+ * such as during sideloading (client-side media processing after
+ * initial upload) where `temporaryURL` is falsy but the attachment
+ * ID is known.
+ *
+ * @param state        Upload state.
+ * @param attachmentId Attachment ID to match.
+ *
+ * @return Queue item if found, undefined otherwise.
+ */
+export function getItemByAttachmentId(
+	state: State,
+	attachmentId: number
+): QueueItem | undefined {
+	return state.queue.find(
+		( item ) =>
+			item.attachment?.id === attachmentId ||
+			item.sourceAttachmentId === attachmentId
+	);
+}

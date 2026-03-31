@@ -94,13 +94,9 @@ export function addItems( {
 	allowedTypes,
 }: AddItemsArgs ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
-		const batchId = uuidv4();
+		// Pre-validate to get accurate batch count before dispatching.
+		const validFiles: File[] = [];
 		for ( const file of files ) {
-			/*
-			 Check if the caller (e.g. a block) supports this mime type.
-			 Special case for file types such as HEIC which will be converted before upload anyway.
-			 Another check will be done before upload.
-			*/
 			try {
 				validateMimeType( file, allowedTypes );
 				validateMimeTypeForUser(
@@ -122,16 +118,23 @@ export function addItems( {
 				continue;
 			}
 
+			validFiles.push( file );
+		}
+
+		const batchId = uuidv4();
+		validFiles.forEach( ( file, index ) => {
 			dispatch.addItem( {
 				file,
 				batchId,
+				batchSize: validFiles.length,
+				batchIndex: index + 1,
 				onChange,
 				onSuccess,
 				onBatchSuccess,
 				onError,
 				additionalData,
 			} );
-		}
+		} );
 	};
 }
 

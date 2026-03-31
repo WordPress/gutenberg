@@ -22,6 +22,9 @@ export interface QueueItem {
 	retryCount?: number;
 	progress?: number;
 	batchId?: string;
+	batchSize?: number;
+	batchIndex?: number;
+	thumbnailCount?: number;
 	sourceUrl?: string;
 	sourceAttachmentId?: number;
 	abortController?: AbortController;

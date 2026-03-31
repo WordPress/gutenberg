@@ -124,6 +124,8 @@ interface AddItemArgs {
 	// It should always be a File, but some consumers might still pass Blobs only.
 	file: File | Blob;
 	batchId?: BatchId;
+	batchSize?: number;
+	batchIndex?: number;
 	onChange?: OnChangeHandler;
 	onSuccess?: OnSuccessHandler;
 	onError?: OnErrorHandler;
@@ -141,6 +143,8 @@ interface AddItemArgs {
  * @param $0
  * @param $0.file                 File
  * @param [$0.batchId]            Batch ID.
+ * @param [$0.batchSize]          Total number of valid items in the batch.
+ * @param [$0.batchIndex]         1-based position of this item within the batch.
  * @param [$0.onChange]           Function called each time a file or a temporary representation of the file is available.
  * @param [$0.onSuccess]          Function called after the file is uploaded.
  * @param [$0.onBatchSuccess]     Function called after a batch of files is uploaded.
@@ -154,6 +158,8 @@ interface AddItemArgs {
 export function addItem( {
 	file: fileOrBlob,
 	batchId,
+	batchSize,
+	batchIndex,
 	onChange,
 	onSuccess,
 	onBatchSuccess,
@@ -188,6 +194,8 @@ export function addItem( {
 			item: {
 				id: itemId,
 				batchId,
+				batchSize,
+				batchIndex,
 				status: ItemStatus.Processing,
 				sourceFile: cloneFile( file ),
 				file,
@@ -1126,6 +1134,7 @@ export function generateThumbnails( id: QueueItemId ) {
 		}
 
 		// Client-side thumbnail generation for images.
+		let thumbnailCount = 0;
 		if (
 			! item.parentId &&
 			attachment.missing_image_sizes &&
@@ -1215,6 +1224,8 @@ export function generateThumbnails( id: QueueItemId ) {
 					},
 					operations: thumbnailOperations,
 				} );
+
+				thumbnailCount++;
 			}
 
 			// Create and sideload the scaled version.
@@ -1273,11 +1284,13 @@ export function generateThumbnails( id: QueueItemId ) {
 						},
 						operations: scaledOperations,
 					} );
+
+					thumbnailCount++;
 				}
 			}
 		}
 
-		dispatch.finishOperation( id, {} );
+		dispatch.finishOperation( id, { thumbnailCount } );
 	};
 }
 
