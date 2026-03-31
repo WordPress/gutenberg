@@ -18,15 +18,6 @@ const meta: Meta< typeof Popover.Root > = {
 	argTypes: {
 		children: { control: false },
 	},
-	parameters: {
-		docs: {
-			description: {
-				component:
-					'Popover is an accessible popup anchored to a trigger button. ' +
-					'It can contain interactive content and form controls.',
-			},
-		},
-	},
 };
 export default meta;
 
