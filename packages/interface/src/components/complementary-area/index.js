@@ -17,7 +17,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { check, starEmpty, starFilled } from '@wordpress/icons';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { store as viewportStore } from '@wordpress/viewport';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -43,11 +43,6 @@ function ComplementaryAreaSlot( { scope, ...props } ) {
 }
 
 const SIDEBAR_WIDTH = 280;
-const variants = {
-	open: { width: SIDEBAR_WIDTH },
-	closed: { width: 0 },
-	mobileOpen: { width: '100vw' },
-};
 
 function ComplementaryAreaFill( {
 	activeArea,
@@ -56,7 +51,16 @@ function ComplementaryAreaFill( {
 	children,
 	className,
 	id,
+	width = SIDEBAR_WIDTH,
 } ) {
+	const variants = useMemo(
+		() => ( {
+			open: { width },
+			closed: { width: 0 },
+			mobileOpen: { width: '100vw' },
+		} ),
+		[ width ]
+	);
 	const disableMotion = useReducedMotion();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	// This is used to delay the exit animation to the next tick.
@@ -98,9 +102,7 @@ function ComplementaryAreaFill( {
 							id={ id }
 							className={ className }
 							style={ {
-								width: isMobileViewport
-									? '100vw'
-									: SIDEBAR_WIDTH,
+								width: isMobileViewport ? '100vw' : width,
 							} }
 						>
 							{ children }
@@ -182,6 +184,7 @@ function ComplementaryArea( {
 	title,
 	toggleShortcut,
 	isActiveByDefault,
+	width = SIDEBAR_WIDTH,
 } ) {
 	const context = usePluginContext();
 	const icon = iconProp || context.icon;
@@ -302,6 +305,7 @@ function ComplementaryArea( {
 				className={ clsx( 'interface-complementary-area', className ) }
 				scope={ scope }
 				id={ identifier.replace( '/', ':' ) }
+				width={ width }
 			>
 				<ComplementaryAreaHeader
 					className={ headerClassName }

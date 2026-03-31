@@ -18,6 +18,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import PluginSidebar from '../plugin-sidebar';
 import {
 	ALL_NOTES_SIDEBAR,
+	BLOCK_NOTES_SIDEBAR_WIDTH,
 	FLOATING_NOTES_SIDEBAR,
 	SIDEBARS,
 } from './constants';
@@ -212,6 +213,7 @@ function NotesSidebar( { postId } ) {
 					identifier={ ALL_NOTES_SIDEBAR }
 					name={ ALL_NOTES_SIDEBAR }
 					title={ __( 'All notes' ) }
+					width={ BLOCK_NOTES_SIDEBAR_WIDTH }
 					header={
 						<h2 className="interface-complementary-area-header__title">
 							{ __( 'All notes' ) }
@@ -234,6 +236,7 @@ function NotesSidebar( { postId } ) {
 					className="editor-collab-sidebar"
 					headerClassName="editor-collab-sidebar__header"
 					backgroundColor={ backgroundColor }
+					width={ BLOCK_NOTES_SIDEBAR_WIDTH }
 				>
 					<NotesSidebarContent
 						comments={ unresolvedSortedThreads }

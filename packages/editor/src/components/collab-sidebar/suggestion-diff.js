@@ -2,13 +2,11 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import { diffWords } from 'diff/lib/diff/word';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Renders a word-level diff between original block text and suggested replacement
@@ -24,11 +22,6 @@ export default function SuggestionDiff( {
 	suggestedText,
 	className,
 } ) {
-	const parts = useMemo(
-		() => diffWords( originalText ?? '', suggestedText ?? '' ),
-		[ originalText, suggestedText ]
-	);
-
 	return (
 		<div
 			className={ clsx(
@@ -37,31 +30,10 @@ export default function SuggestionDiff( {
 			) }
 			aria-label={ __( 'Suggested changes compared to original text' ) }
 		>
-			<span className="editor-revision-fields-diff__value">
-				{ parts.map( ( part, index ) => {
-					if ( part.added ) {
-						return (
-							<ins
-								key={ index }
-								className="editor-revision-fields-diff__added"
-							>
-								{ part.value }
-							</ins>
-						);
-					}
-					if ( part.removed ) {
-						return (
-							<del
-								key={ index }
-								className="editor-revision-fields-diff__removed"
-							>
-								{ part.value }
-							</del>
-						);
-					}
-					return <span key={ index }>{ part.value }</span>;
-				} ) }
-			</span>
+			<strong>{ __( 'Replace' ) }</strong>
+			<span> &quot;{ originalText }&quot; </span>
+			<strong>{ __( 'with' ) }</strong>
+			<span> &quot;{ suggestedText.trimEnd() }&quot;</span>
 		</div>
 	);
 }
