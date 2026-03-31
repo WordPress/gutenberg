@@ -101,11 +101,7 @@ export default function GalleryUploadingOverlay() {
 	);
 
 	return (
-		<div
-			className="wp-block-gallery__upload-overlay"
-			role="status"
-			ref={ overlayRef }
-		>
+		<div className="wp-block-gallery__upload-overlay" ref={ overlayRef }>
 			<ProgressBar
 				value={ averageProgress }
 				aria-label={ __( 'Upload progress' ) }

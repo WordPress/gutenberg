@@ -82,12 +82,6 @@ describe( 'UploadingOverlay', () => {
 		jest.clearAllMocks();
 	} );
 
-	it( 'should render with role="status"', () => {
-		mockUseSelect();
-		render( <UploadingOverlay url="blob:123" onCancel={ jest.fn() } /> );
-		expect( screen.getByRole( 'status' ) ).toBeInTheDocument();
-	} );
-
 	it( 'should render a progress bar', () => {
 		mockUseSelect();
 		render( <UploadingOverlay url="blob:123" onCancel={ jest.fn() } /> );

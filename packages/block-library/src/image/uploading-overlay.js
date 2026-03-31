@@ -138,11 +138,7 @@ export default function UploadingOverlay( { url, attachmentId, onCancel } ) {
 	}
 
 	return (
-		<div
-			className="wp-block-image__upload-overlay"
-			role="status"
-			ref={ overlayRef }
-		>
+		<div className="wp-block-image__upload-overlay" ref={ overlayRef }>
 			<ProgressBar
 				value={ progressValue }
 				aria-label={ __( 'Upload progress' ) }
