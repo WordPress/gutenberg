@@ -396,6 +396,7 @@ export function ImageEdit( {
 	const blockProps = useBlockProps( {
 		ref: containerRef,
 		className: classes,
+		'aria-busy': !! temporaryURL || isSideloading,
 	} );
 
 	// Much of this description is duplicated from MediaPlaceholder.
