@@ -183,6 +183,13 @@ export interface Settings {
 	imageQuality?: number;
 	// Function for finalizing an upload after all client-side processing is complete.
 	mediaFinalize?: ( id: number ) => Promise< void >;
+	// Whether to convert animated GIFs to video (MP4/WebM) during upload.
+	// When enabled, animated GIFs are transcoded to video for smaller file sizes.
+	// Default is true.
+	gifConvert?: boolean;
+	// Output format for GIF-to-video conversion.
+	// Accepts 'video/mp4' or 'video/webm'. Default is 'video/mp4'.
+	videoOutputFormat?: string;
 }
 
 // Matches the Attachment type from the media-utils package.
@@ -236,6 +243,7 @@ export enum OperationType {
 	ResizeCrop = 'RESIZE_CROP',
 	Rotate = 'ROTATE',
 	TranscodeImage = 'TRANSCODE_IMAGE',
+	TranscodeGif = 'TRANSCODE_GIF',
 	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
 	Finalize = 'FINALIZE',
 }
@@ -284,6 +292,10 @@ export interface OperationArgs {
 		outputQuality: number;
 		/** Whether to use interlaced encoding. */
 		interlaced: boolean;
+	};
+	[ OperationType.TranscodeGif ]: {
+		/** Video output format: 'mp4' or 'webm'. */
+		outputFormat: 'mp4' | 'webm';
 	};
 }
 

@@ -106,3 +106,52 @@ export function getFileBasename( name: string ): string {
 export function getFileNameFromUrl( url: string ) {
 	return getFilename( url ) || _x( 'unnamed', 'file name' );
 }
+
+/**
+ * Detects whether a file buffer contains an animated GIF.
+ *
+ * Performs binary analysis of the GIF file structure:
+ * 1. Checks for the GIF magic bytes ("GIF8")
+ * 2. Counts frame blocks by scanning for Graphic Control Extension headers
+ *    (Block Terminator 0x00 + Extension Introducer 0x21 + Graphic Control Label 0xF9)
+ * 3. Returns true if more than 1 frame is found
+ *
+ * Based on the GIF specification:
+ *
+ * @see http://www.matthewflickinger.com/lab/whatsinagif/
+ *
+ * @param buffer File ArrayBuffer.
+ * @return Whether the buffer contains an animated GIF.
+ */
+export function isAnimatedGif( buffer: ArrayBuffer ): boolean {
+	const view = new Uint8Array( buffer );
+
+	// Check GIF magic bytes: "GIF8" (0x47 0x49 0x46 0x38).
+	if (
+		view.length < 4 ||
+		view[ 0 ] !== 0x47 ||
+		view[ 1 ] !== 0x49 ||
+		view[ 2 ] !== 0x46 ||
+		view[ 3 ] !== 0x38
+	) {
+		return false;
+	}
+
+	// Count frames by looking for Graphic Control Extension headers.
+	// Pattern: Block Terminator (0x00) + Extension Introducer (0x21) + Graphic Control Label (0xF9).
+	let frameCount = 0;
+	for ( let i = 0; i < view.length - 2; i++ ) {
+		if (
+			view[ i ] === 0x00 &&
+			view[ i + 1 ] === 0x21 &&
+			view[ i + 2 ] === 0xf9
+		) {
+			frameCount++;
+			if ( frameCount > 1 ) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}

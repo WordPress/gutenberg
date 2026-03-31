@@ -1,0 +1,62 @@
+{
+	"name": "@wordpress/ffmpeg",
+	"version": "0.1.0",
+	"description": "FFmpeg WASM wrapper for client-side video processing.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"media",
+		"ffmpeg",
+		"video"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/ffmpeg/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/ffmpeg"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"src",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"type": "module",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs"
+		},
+		"./worker": {
+			"types": "./build-types/ffmpeg-worker.d.ts",
+			"import": "./build-module/ffmpeg-worker.mjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpWorkers": {
+		"./worker": {
+			"entry": "./src/worker.ts"
+		}
+	},
+	"wpScriptModuleExports": {
+		"./worker": "./build-module/ffmpeg-worker.mjs",
+		"./loader": "./build-module/loader.mjs"
+	},
+	"types": "build-types",
+	"dependencies": {
+		"@ffmpeg/core": "^0.12.10",
+		"@wordpress/worker-threads": "file:../worker-threads"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

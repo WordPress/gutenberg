@@ -13,7 +13,12 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 /**
  * Internal dependencies
  */
-import { cloneFile, convertBlobToFile, renameFile } from '../utils';
+import {
+	cloneFile,
+	convertBlobToFile,
+	isAnimatedGif,
+	renameFile,
+} from '../utils';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES } from './constants';
 import { StubFile } from '../stub-file';
 import { UploadError } from '../upload-error';
@@ -24,6 +29,7 @@ import {
 	vipsHasTransparency,
 	terminateVipsWorker,
 } from './utils';
+import { ffmpegConvertGifToVideo } from './utils/ffmpeg';
 import type {
 	AddAction,
 	AdditionalData,
@@ -72,6 +78,7 @@ type ActionCreators = {
 	resizeCropItem: typeof resizeCropItem;
 	rotateItem: typeof rotateItem;
 	transcodeImageItem: typeof transcodeImageItem;
+	transcodeGifItem: typeof transcodeGifItem;
 	generateThumbnails: typeof generateThumbnails;
 	finalizeItem: typeof finalizeItem;
 	updateItemProgress: typeof updateItemProgress;
@@ -346,6 +353,17 @@ export function processItem( id: QueueItemId ) {
 			}
 		}
 
+		/*
+		 * GIF-to-video conversion is memory-intensive (FFmpeg WASM).
+		 * Limit to 1 concurrent transcoding operation.
+		 */
+		if ( operation === OperationType.TranscodeGif ) {
+			const activeCount = select.getActiveVideoProcessingCount();
+			if ( activeCount >= 1 ) {
+				return;
+			}
+		}
+
 		if ( attachment ) {
 			onChange?.( [ attachment ] );
 		}
@@ -449,6 +467,13 @@ export function processItem( id: QueueItemId ) {
 				dispatch.transcodeImageItem(
 					item.id,
 					operationArgs as OperationArgs[ OperationType.TranscodeImage ]
+				);
+				break;
+
+			case OperationType.TranscodeGif:
+				dispatch.transcodeGifItem(
+					item.id,
+					operationArgs as OperationArgs[ OperationType.TranscodeGif ]
 				);
 				break;
 
@@ -612,6 +637,18 @@ export function finishOperation(
 				dispatch.processItem( pendingItem.id );
 			}
 		}
+
+		/*
+		 * If a video processing operation just finished, there may be items
+		 * waiting in the queue due to the video processing concurrency limit.
+		 * Trigger processing for them.
+		 */
+		if ( previousOperation === OperationType.TranscodeGif ) {
+			const pendingItems = select.getPendingVideoProcessing();
+			for ( const pendingItem of pendingItems ) {
+				dispatch.processItem( pendingItem.id );
+			}
+		}
 	};
 }
 
@@ -730,6 +767,48 @@ export function prepareItem( id: QueueItemId ) {
 
 		const operations: Operation[] = [];
 		const settings = select.getSettings();
+
+		// Check for animated GIF → video conversion.
+		// When enabled, animated GIFs are converted to MP4/WebM for smaller file sizes.
+		if (
+			file.type === 'image/gif' &&
+			settings.gifConvert !== false &&
+			self.crossOriginIsolated
+		) {
+			const buffer = await file.arrayBuffer();
+			if ( isAnimatedGif( buffer ) ) {
+				const outputFormat =
+					settings.videoOutputFormat === 'video/webm'
+						? 'webm'
+						: 'mp4';
+
+				operations.push(
+					[
+						OperationType.TranscodeGif,
+						{
+							outputFormat,
+						} as OperationArgs[ OperationType.TranscodeGif ],
+					],
+					OperationType.Upload
+				);
+
+				dispatch< AddOperationsAction >( {
+					type: Type.AddOperations,
+					id,
+					operations,
+				} );
+
+				// Tell the server to handle sub-sizes since this will be a video.
+				dispatch.finishOperation( id, {
+					additionalData: {
+						...item.additionalData,
+						generate_sub_sizes: true,
+						convert_format: true,
+					},
+				} );
+				return;
+			}
+		}
 
 		const isImage = file.type.startsWith( 'image/' );
 		const isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
@@ -1054,6 +1133,64 @@ export function transcodeImageItem(
 					code: 'MEDIA_TRANSCODING_ERROR',
 					message:
 						'Image could not be transcoded to the target format',
+					file: item.file,
+					cause: error instanceof Error ? error : undefined,
+				} )
+			);
+		}
+	};
+}
+
+type TranscodeGifItemArgs = OperationArgs[ OperationType.TranscodeGif ];
+
+/**
+ * Converts an animated GIF to a video file (MP4 or WebM).
+ *
+ * Uses FFmpeg WASM running in a web worker for 100% client-side conversion.
+ * The resulting video file replaces the original GIF in the upload queue.
+ *
+ * @param id     Item ID.
+ * @param [args] Transcode arguments including output format.
+ */
+export function transcodeGifItem(
+	id: QueueItemId,
+	args?: TranscodeGifItemArgs
+) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		const outputFormat = args?.outputFormat ?? 'mp4';
+		const outputMimeType = `video/${ outputFormat }`;
+
+		try {
+			const file = await ffmpegConvertGifToVideo(
+				item.id,
+				item.file,
+				outputMimeType
+			);
+
+			const blobUrl = createBlobURL( file );
+			dispatch< CacheBlobUrlAction >( {
+				type: Type.CacheBlobUrl,
+				id,
+				blobUrl,
+			} );
+
+			dispatch.finishOperation( id, {
+				file,
+				attachment: {
+					url: blobUrl,
+				},
+			} );
+		} catch ( error ) {
+			dispatch.cancelItem(
+				id,
+				new UploadError( {
+					code: 'GIF_TRANSCODING_ERROR',
+					message: 'Animated GIF could not be converted to video',
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
 				} )
