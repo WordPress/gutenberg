@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Breaking Changes
+### Deprecations
 
--   Removed exported types: `UseSelectReturn`, `UseDispatchReturn`, `DispatchFunction`, `DispatchReturn`, `SelectFunction`, `AnyConfig`, `CurriedSelectorsResolveOf`.
+-   Deprecated exported types: `UseSelectReturn`, `UseDispatchReturn`, `DispatchFunction`, `DispatchReturn`, `SelectFunction`. Use the new overloaded function signatures and `DataRegistry` type helpers instead.
 
 ### Enhancements
 
