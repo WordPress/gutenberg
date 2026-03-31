@@ -162,6 +162,7 @@ function readBlockJSON( filename ) {
 		__experimental,
 		allowedBlocks,
 	} = blockjson;
+	const blockdir = path.basename( path.dirname( filename ) );
 	const sourcefile = getSourceFromFile( filename );
 	const blockInfoList = [ `-	**Name:** ${ name }` ];
 
@@ -169,7 +170,9 @@ function readBlockJSON( filename ) {
 		blockInfoList.push( `-	**Experimental:** ${ __experimental }` );
 	}
 	if ( category?.length > 0 ) {
-		blockInfoList.push( `-	**Category:** ${ category }` );
+		blockInfoList.push(
+			`-	**Category:** [${ category }](./core-blocks/category-${ category }.md)`
+		);
 	}
 	if ( parent?.length > 0 ) {
 		blockInfoList.push( `-	**Parent:** ${ parent.join( ', ' ) }` );
@@ -199,7 +202,7 @@ function readBlockJSON( filename ) {
 	}
 
 	return `
-## ${ blockjson.title }
+## [${ blockjson.title }](./core-blocks/${ blockdir }.md)
 
 ${ blockjson.description } ([Source](${ sourcefile }))
 

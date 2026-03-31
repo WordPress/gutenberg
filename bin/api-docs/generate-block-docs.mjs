@@ -1,15 +1,16 @@
 /**
- * Per-block detail page generator.
+ * Per-block detail page generator (grouped by category).
  *
- * Generates one Markdown reference page per core block under
- * docs/reference-guides/core-blocks/. Each page covers attributes,
- * supports, context, styles, selectors, and block markup.
+ * Generates one Markdown reference page per block category under
+ * docs/reference-guides/core-blocks/. Each block is a section within
+ * its category page, covering attributes, supports, context, styles,
+ * selectors, and block markup.
  *
  * The summary page (core-blocks.md) is still generated separately
  * by gen-block-lib-list.js via the docs:blocks npm script.
  *
  * Reads from  : packages/block-library/src/{block}/block.json
- * Publishes to: docs/reference-guides/core-blocks/{block}.md
+ * Publishes to: docs/reference-guides/core-blocks/{category}.md
  */
 
 import fs from 'fs';
@@ -28,6 +29,20 @@ const DOCS_DIR = path.resolve( ROOT_DIR, 'docs/reference-guides/core-blocks' );
 
 const SOURCE_URL_BASE =
 	'https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/';
+
+/**
+ * Human-readable labels for block categories.
+ */
+const CATEGORY_LABELS = {
+	text: 'Text',
+	media: 'Media',
+	design: 'Design',
+	widgets: 'Widgets',
+	theme: 'Theme',
+	common: 'Common',
+	embed: 'Embed',
+	reusable: 'Reusable',
+};
 
 /**
  * Discover all block directories that contain a block.json.
@@ -76,7 +91,7 @@ function getBlockFiles( blockDir ) {
 	};
 }
 
-// ─── Per-block detail pages ─────────────────────────────────────────────────
+// ─── Formatting helpers ─────────────────────────────────────────────────────
 
 /**
  * Format attributes as a Markdown table.
@@ -359,13 +374,15 @@ function generateBlockCommentExample( slug, attributes, blockType ) {
 	return `<!-- wp:${ slug }${ attrsStr } -->\n<!-- Content... -->\n<!-- /wp:${ slug } -->`;
 }
 
+// ─── Page generators ────────────────────────────────────────────────────────
+
 /**
- * Generate the full per-block detail page.
+ * Generate a full detail page for a single block (# level heading).
  *
  * @param {string} blockDir Directory name.
  * @return {string} Full Markdown document.
  */
-function generateBlockDetailPage( blockDir ) {
+function generateBlockPage( blockDir ) {
 	const blockJson = readBlockJson( blockDir );
 	const files = getBlockFiles( blockDir );
 	const blockType = getBlockType( files );
@@ -529,14 +546,52 @@ function generateBlockDetailPage( blockDir ) {
 	return lines.join( '\n' );
 }
 
+/**
+ * Generate a category index page that links to individual block pages.
+ *
+ * @param {string}   category Category slug.
+ * @param {string}   label    Human-readable category name.
+ * @param {string[]} blocks   Block directory names in this category.
+ * @return {string} Markdown document.
+ */
+function generateCategoryPage( category, label, blocks ) {
+	const lines = [];
+
+	lines.push( `# ${ label } Blocks` );
+	lines.push( '' );
+
+	blocks.forEach( ( blockDir ) => {
+		const blockJson = readBlockJson( blockDir );
+		const { title, name, description } = blockJson;
+		lines.push( `- [${ title }](./${ blockDir }.md) — \`${ name }\`${ description ? ': ' + description : '' }` );
+	} );
+
+	lines.push( '' );
+
+	return lines.join( '\n' );
+}
+
+// ─── Main ───────────────────────────────────────────────────────────────────
+
 const blockDirs = getBlockDirs();
+
+// Group blocks by category.
+const categories = {};
+blockDirs.forEach( ( blockDir ) => {
+	const blockJson = readBlockJson( blockDir );
+	const category = blockJson.category || 'uncategorized';
+	if ( ! categories[ category ] ) {
+		categories[ category ] = [];
+	}
+	categories[ category ].push( blockDir );
+} );
 
 // Ensure output directory exists.
 fs.mkdirSync( DOCS_DIR, { recursive: true } );
 
-// Generate per-block detail pages.
+// Generate individual block pages.
 blockDirs.forEach( ( blockDir ) => {
-	const content = generateBlockDetailPage( blockDir );
+	const content = generateBlockPage( blockDir );
 	fs.writeFileSync(
 		path.join( DOCS_DIR, `${ blockDir }.md` ),
 		content,
@@ -544,7 +599,23 @@ blockDirs.forEach( ( blockDir ) => {
 	);
 } );
 
+// Generate category index pages (prefixed to avoid conflicts with block names).
+const categoryNames = Object.keys( categories ).sort();
+categoryNames.forEach( ( category ) => {
+	const label = CATEGORY_LABELS[ category ] || category;
+	const content = generateCategoryPage(
+		category,
+		label,
+		categories[ category ]
+	);
+	fs.writeFileSync(
+		path.join( DOCS_DIR, `category-${ category }.md` ),
+		content,
+		{ encoding: 'utf8' }
+	);
+} );
+
 // eslint-disable-next-line no-console
 console.log(
-	`Generated docs for ${ blockDirs.length } blocks (${ DOCS_DIR })`
+	`Generated ${ blockDirs.length } block pages + ${ categoryNames.length } category pages (${ DOCS_DIR })`
 );

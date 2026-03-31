@@ -90,25 +90,72 @@ function getComponentManifest( paths ) {
 }
 
 /**
- * Generates the block manifest from per-block docs.
+ * Generates the block manifest with a 3-level hierarchy:
+ *   core-blocks → category pages → individual block pages.
  *
- * @param {Array} paths Paths for all per-block markdown files.
+ * @param {Array} paths Paths for all block-related markdown files.
  *
  * @return {Array} Manifest
  */
 function getBlockManifest( paths ) {
-	return paths.map( ( filePath ) => {
-		const slug = filePath.split( '/' ).pop().replace( '.md', '' );
+	const manifest = [];
+	const categoryFiles = [];
+	const blockFiles = [];
+
+	// Separate category index pages (category-*.md) from block pages.
+	paths.forEach( ( filePath ) => {
+		const fileName = filePath.split( '/' ).pop().replace( '.md', '' );
+		if ( fileName.startsWith( 'category-' ) ) {
+			categoryFiles.push( filePath );
+		} else {
+			blockFiles.push( filePath );
+		}
+	} );
+
+	// Build a map of block dir → category by reading each block page.
+	const blockCategoryMap = {};
+	blockFiles.forEach( ( filePath ) => {
+		const content = fs.readFileSync( filePath, 'utf8' );
+		const catMatch = content.match( /\*\*Category:\*\*\s+(\w+)/ );
+		if ( catMatch ) {
+			const blockSlug = filePath.split( '/' ).pop().replace( '.md', '' );
+			blockCategoryMap[ blockSlug ] = catMatch[ 1 ];
+		}
+	} );
+
+	// Add category pages (parent: core-blocks).
+	categoryFiles.forEach( ( filePath ) => {
+		const fileName = filePath.split( '/' ).pop().replace( '.md', '' );
+		const category = fileName.replace( 'category-', '' );
 		const content = fs.readFileSync( filePath, 'utf8' );
 		const titleMatch = content.match( /^#\s(.+)$/m );
-		const title = titleMatch ? titleMatch[ 1 ] : pascalCase( slug );
-		return {
+		const title = titleMatch ? titleMatch[ 1 ] : pascalCase( category );
+		manifest.push( {
 			title,
-			slug: `core-blocks-${ slug }`,
+			slug: `core-blocks-${ category }`,
 			markdown_source: `${ baseRepoUrl }/${ filePath }`,
 			parent: 'core-blocks',
-		};
+		} );
 	} );
+
+	// Add block pages (parent: core-blocks-{category}).
+	// Block slugs use "core-block-" (singular) to avoid collisions
+	// with category slugs which use "core-blocks-" (plural).
+	blockFiles.forEach( ( filePath ) => {
+		const blockSlug = filePath.split( '/' ).pop().replace( '.md', '' );
+		const content = fs.readFileSync( filePath, 'utf8' );
+		const titleMatch = content.match( /^#\s(.+)$/m );
+		const title = titleMatch ? titleMatch[ 1 ] : pascalCase( blockSlug );
+		const category = blockCategoryMap[ blockSlug ] || 'uncategorized';
+		manifest.push( {
+			title,
+			slug: `core-block-${ blockSlug }`,
+			markdown_source: `${ baseRepoUrl }/${ filePath }`,
+			parent: `core-blocks-${ category }`,
+		} );
+	} );
+
+	return manifest;
 }
 
 function getRootManifest( tocFileName ) {

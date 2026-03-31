@@ -1,0 +1,53 @@
+# Theme Blocks
+
+- [Avatar](./avatar.md) — `core/avatar`: Add a user’s avatar.
+- [Breadcrumbs](./breadcrumbs.md) — `core/breadcrumbs`: Display a breadcrumb trail showing the path to the current page.
+- [Comment Author Avatar (deprecated)](./comment-author-avatar.md) — `core/comment-author-avatar`: This block is deprecated. Please use the Avatar block instead.
+- [Comment Author Name](./comment-author-name.md) — `core/comment-author-name`: Displays the name of the author of the comment.
+- [Comment Content](./comment-content.md) — `core/comment-content`: Displays the contents of a comment.
+- [Comment Date](./comment-date.md) — `core/comment-date`: Displays the date on which the comment was posted.
+- [Comment Edit Link](./comment-edit-link.md) — `core/comment-edit-link`: Displays a link to edit the comment in the WordPress Dashboard. This link is only visible to users with the edit comment capability.
+- [Comment Reply Link](./comment-reply-link.md) — `core/comment-reply-link`: Displays a link to reply to a comment.
+- [Comments](./comments.md) — `core/comments`: An advanced block that allows displaying post comments using different visual configurations.
+- [Comments Pagination](./comments-pagination.md) — `core/comments-pagination`: Displays a paginated navigation to next/previous set of comments, when applicable.
+- [Comments Next Page](./comments-pagination-next.md) — `core/comments-pagination-next`: Displays the next comment's page link.
+- [Comments Page Numbers](./comments-pagination-numbers.md) — `core/comments-pagination-numbers`: Displays a list of page numbers for comments pagination.
+- [Comments Previous Page](./comments-pagination-previous.md) — `core/comments-pagination-previous`: Displays the previous comment's page link.
+- [Comments Title](./comments-title.md) — `core/comments-title`: Displays a title with the number of comments.
+- [Login/out](./loginout.md) — `core/loginout`: Show login & logout links.
+- [Navigation](./navigation.md) — `core/navigation`: A collection of blocks that allow visitors to get around your site.
+- [Pattern Placeholder](./pattern.md) — `core/pattern`: Show a block pattern.
+- [Author (deprecated)](./post-author.md) — `core/post-author`: This block is deprecated. Please use the Avatar block, the Author Name block, and the Author Biography block instead.
+- [Author Biography](./post-author-biography.md) — `core/post-author-biography`: The author biography.
+- [Author Name](./post-author-name.md) — `core/post-author-name`: The author name.
+- [Comment (deprecated)](./post-comment.md) — `core/post-comment`: This block is deprecated. Please use the Comments block instead.
+- [Comments Count](./post-comments-count.md) — `core/post-comments-count`: Display a post's comments count.
+- [Comments Form](./post-comments-form.md) — `core/post-comments-form`: Display a post's comments form.
+- [Comments Link](./post-comments-link.md) — `core/post-comments-link`: Displays the link to the current post comments.
+- [Content](./post-content.md) — `core/post-content`: Displays the contents of a post or page.
+- [Date](./post-date.md) — `core/post-date`: Display a custom date.
+- [Excerpt](./post-excerpt.md) — `core/post-excerpt`: Display the excerpt.
+- [Featured Image](./post-featured-image.md) — `core/post-featured-image`: Display a post's featured image.
+- [Post Navigation Link](./post-navigation-link.md) — `core/post-navigation-link`: Displays the next or previous post link that is adjacent to the current post.
+- [Post Template](./post-template.md) — `core/post-template`: Contains the block elements used to render a post, like the title, date, featured image, content or excerpt, and more.
+- [Post Terms](./post-terms.md) — `core/post-terms`: Post terms.
+- [Time to Read](./post-time-to-read.md) — `core/post-time-to-read`: Show minutes required to finish reading the post. Can also show a word count.
+- [Title](./post-title.md) — `core/post-title`: Displays the title of a post, page, or any other content-type.
+- [Query Loop](./query.md) — `core/query`: An advanced block that allows displaying post types based on different query parameters and visual configurations.
+- [No Results](./query-no-results.md) — `core/query-no-results`: Contains the block elements used to render content when no query results are found.
+- [Pagination](./query-pagination.md) — `core/query-pagination`: Displays a paginated navigation to next/previous set of posts, when applicable.
+- [Next Page](./query-pagination-next.md) — `core/query-pagination-next`: Displays the next posts page link.
+- [Page Numbers](./query-pagination-numbers.md) — `core/query-pagination-numbers`: Displays a list of page numbers for pagination.
+- [Previous Page](./query-pagination-previous.md) — `core/query-pagination-previous`: Displays the previous posts page link.
+- [Query Title](./query-title.md) — `core/query-title`: Display the query title.
+- [Query Total](./query-total.md) — `core/query-total`: Display the total number of results in a query.
+- [Read More](./read-more.md) — `core/read-more`: Displays the link of a post, page, or any other content-type.
+- [Site Logo](./site-logo.md) — `core/site-logo`: Display an image to represent this site. Update this block and the changes apply everywhere.
+- [Site Tagline](./site-tagline.md) — `core/site-tagline`: Describe in a few words what this site is about. This is important for search results, sharing on social media, and gives overall clarity to visitors.
+- [Site Title](./site-title.md) — `core/site-title`: Displays the name of this site. Update the block, and the changes apply everywhere it’s used. This will also appear in the browser title bar and in search results.
+- [Template Part](./template-part.md) — `core/template-part`: Edit the different global regions of your site, like the header, footer, sidebar, or create your own.
+- [Term Count](./term-count.md) — `core/term-count`: Displays the post count of a taxonomy term.
+- [Term Description](./term-description.md) — `core/term-description`: Display the description of categories, tags and custom taxonomies when viewing an archive.
+- [Term Name](./term-name.md) — `core/term-name`: Displays the name of a taxonomy term.
+- [Term Template](./term-template.md) — `core/term-template`: Contains the block elements used to render a taxonomy term, like the name, description, and more.
+- [Terms Query](./terms-query.md) — `core/terms-query`: An advanced block that allows displaying taxonomy terms based on different query parameters and visual configurations.
