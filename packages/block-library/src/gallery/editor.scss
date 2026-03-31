@@ -12,6 +12,7 @@
 	// See https://github.com/WordPress/gutenberg/pull/10358
 
 	display: block;
+	position: relative;
 
 	> .blocks-gallery-caption {
 		flex: 0 0 100%;
@@ -119,6 +120,33 @@
 	padding: 0;
 	// Some themes give all <ul> default margin instead of padding.
 	margin: 0;
+}
+
+// Upload progress overlay for batch uploads
+.wp-block-gallery__upload-overlay {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: rgba(255, 255, 255, 0.95);
+	padding: $grid-unit-30;
+	border-radius: $radius-medium;
+	text-align: center;
+	min-width: 280px;
+	max-width: calc(100% - #{$grid-unit-20 * 2});
+	box-shadow: $elevation-small;
+	z-index: 10;
+
+	.components-progress-bar {
+		margin-bottom: $grid-unit-10;
+	}
+}
+
+.wp-block-gallery__upload-overlay-label {
+	display: block;
+	font-size: $default-font-size;
+	color: $gray-700;
+	margin-bottom: $grid-unit-15;
 }
 
 .wp-block-update-gallery-modal {

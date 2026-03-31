@@ -276,6 +276,7 @@ export default function Image( {
 	blockEditingMode,
 	parentLayoutType,
 	maxContentWidth,
+	isInGallery,
 } ) {
 	const {
 		url = '',
@@ -1088,7 +1089,7 @@ export default function Image( {
 						...shadowProps.style,
 					} }
 				/>
-				{ ( temporaryURL || isSideloading ) && (
+				{ ( temporaryURL || isSideloading ) && ! isInGallery && (
 					<UploadingOverlay
 						url={ temporaryURL }
 						attachmentId={ id }

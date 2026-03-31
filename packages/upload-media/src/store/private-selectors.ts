@@ -291,3 +291,18 @@ export function getItemByAttachmentId(
 			item.sourceAttachmentId === attachmentId
 	);
 }
+
+/**
+ * Returns all queue items belonging to a given batch.
+ *
+ * @param state   Upload state.
+ * @param batchId Batch ID.
+ *
+ * @return Queue items in the batch.
+ */
+export function getItemsByBatchId(
+	state: State,
+	batchId: BatchId
+): QueueItem[] {
+	return state.queue.filter( ( item ) => item.batchId === batchId );
+}

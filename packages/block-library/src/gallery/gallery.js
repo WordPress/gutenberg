@@ -13,6 +13,7 @@ import { View } from '@wordpress/primitives';
  * Internal dependencies
  */
 import { Caption } from '../utils/caption';
+import GalleryUploadingOverlay from './gallery-uploading-overlay';
 
 export default function Gallery( props ) {
 	const {
@@ -45,6 +46,7 @@ export default function Gallery( props ) {
 			) }
 		>
 			{ blockProps.children }
+			<GalleryUploadingOverlay />
 			{ isSelected && ! blockProps.children && (
 				<View className="blocks-gallery-media-placeholder-wrapper">
 					{ mediaPlaceholder }

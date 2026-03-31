@@ -372,6 +372,9 @@ export function ImageEdit( {
 		/>
 	);
 
+	const isInGallery =
+		getBlockName( getBlockRootClientId( clientId ) ) === 'core/gallery';
+
 	const borderProps = useBorderProps( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
 
@@ -481,6 +484,7 @@ export function ImageEdit( {
 					blockEditingMode={ blockEditingMode }
 					parentLayoutType={ layoutType }
 					maxContentWidth={ maxContentWidth }
+					isInGallery={ isInGallery }
 				/>
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
