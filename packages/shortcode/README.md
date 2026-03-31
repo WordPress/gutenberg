@@ -78,6 +78,11 @@ Generate a RegExp to identify a shortcode.
 
 The base regex is functionally equivalent to the one found in `get_shortcode_regex()` in `wp-includes/shortcodes.php`.
 
+Differences from the PHP regex:
+
+-   The closing shortcode tag is captured as group 6 (used by `fromMatch`).
+-   Quoted attribute values may contain `]` (e.g. `text="[Click here]"`).
+
 Capture groups:
 
 1.  An extra `[` to allow for escaping shortcodes with double `[[]]`

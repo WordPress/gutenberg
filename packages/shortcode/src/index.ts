@@ -129,6 +129,11 @@ export function string( options: ShortcodeOptions ): string {
  * The base regex is functionally equivalent to the one found in
  * `get_shortcode_regex()` in `wp-includes/shortcodes.php`.
  *
+ * Differences from the PHP regex:
+ *
+ * - The closing shortcode tag is captured as group 6 (used by `fromMatch`).
+ * - Quoted attribute values may contain `]` (e.g. `text="[Click here]"`).
+ *
  * Capture groups:
  *
  * 1. An extra `[` to allow for escaping shortcodes with double `[[]]`
@@ -144,10 +149,44 @@ export function string( options: ShortcodeOptions ): string {
  * @return Shortcode RegExp.
  */
 export function regexp( tag: string ): RegExp {
+	// Not a closing bracket, forward slash, or quote.
+	const ATTR_CHARS = '[^\\]\\/\'"]*';
+	// A double- or single-quoted string (may contain `]`).
+	const QUOTED_STRING = '(?:"[^"]*"|\'[^\']*\')';
+	// Characters and quoted strings, but not an unquoted `]` or `/`.
+	const ATTR_SEGMENT = ATTR_CHARS + '(?:' + QUOTED_STRING + ATTR_CHARS + ')*';
+
 	return new RegExp(
-		'\\[(\\[?)(' +
+		'\\[' + // Opening bracket.
+			'(\\[?)' + // 1: Optional second opening bracket for escaping shortcodes: [[tag]].
+			'(' +
 			tag +
-			')(?![\\w-])([^\\]\\/]*(?:\\/(?!\\])[^\\]\\/]*)*?)(?:(\\/)\\]|\\](?:([^\\[]*(?:\\[(?!\\/\\2\\])[^\\[]*)*)(\\[\\/\\2\\]))?)(\\]?)',
+			')' + // 2: Shortcode name.
+			'(?![\\w-])' + // Not followed by word character or hyphen.
+			'(' + // 3: Unroll the loop: Inside the opening shortcode tag.
+			ATTR_SEGMENT + // Not a closing bracket or forward slash (respects quoted strings).
+			'(?:' +
+			'\\/(?!\\])' + // A forward slash not followed by a closing bracket.
+			ATTR_SEGMENT + // Not a closing bracket or forward slash (respects quoted strings).
+			')*?' +
+			')' +
+			'(?:' +
+			'(\\/)' + // 4: Self closing tag...
+			'\\]' + // ...and closing bracket.
+			'|' +
+			'\\]' + // Closing bracket.
+			'(?:' +
+			'(' + // 5: Unroll the loop: Optionally, anything between the opening and closing shortcode tags.
+			'[^\\[]*' + // Not an opening bracket.
+			'(?:' +
+			'\\[(?!\\/\\2\\])' + // An opening bracket not followed by the closing shortcode tag.
+			'[^\\[]*' + // Not an opening bracket.
+			')*' +
+			')' +
+			'(\\[\\/\\2\\])' + // 6: Closing shortcode tag.
+			')?' +
+			')' +
+			'(\\]?)', // 7: Optional second closing bracket for escaping shortcodes: [[tag]].
 		'g'
 	);
 }
