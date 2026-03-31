@@ -9,8 +9,10 @@ import type { TitleProps } from './types';
 
 /**
  * Renders a heading that labels the popover for accessibility.
- * This component is required — every popover must include a title,
- * even if visually hidden.
+ *
+ * **Required** — every popover must include a `Popover.Title`, even if
+ * visually hidden. The rendered element is linked to the popup via
+ * `aria-labelledby`. Uses the `heading-md` text variant by default.
  */
 const Title = forwardRef< HTMLHeadingElement, TitleProps >(
 	function PopoverTitle( { className, children, ...props }, forwardedRef ) {

@@ -19,8 +19,12 @@ const ThemeProvider: typeof ThemeProviderType =
 const CLOSE_ATTR = 'data-wp-ui-popover-close';
 
 /**
- * Renders the popover popup element that contains the popover content.
- * By default, uses a portal to render outside the DOM hierarchy.
+ * Renders the floating popup container for the popover content.
+ *
+ * Handles portal rendering, positioning relative to the anchor, collision
+ * avoidance, focus management, and optional backdrop. Set `inline` to
+ * render inside the DOM tree instead of a portal, or supply a `container`
+ * element for cross-document scenarios such as iframes.
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	{

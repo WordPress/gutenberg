@@ -5,7 +5,10 @@ import styles from './style.module.css';
 import type { ArrowProps } from './types';
 
 /**
- * Renders an arrow element that points toward the popover anchor.
+ * Renders an optional arrow element that points toward the anchor.
+ *
+ * Must be placed inside `Popover.Popup`. The arrow automatically rotates
+ * to match the current placement side.
  */
 const Arrow = forwardRef< HTMLDivElement, ArrowProps >( function PopoverArrow(
 	{ className, ...props },

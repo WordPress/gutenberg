@@ -6,7 +6,10 @@ import styles from './style.module.css';
 import type { DescriptionProps } from './types';
 
 /**
- * Renders a paragraph that describes the popover content for accessibility.
+ * Renders an optional paragraph that describes the popover content.
+ *
+ * The rendered element is linked to the popup via `aria-describedby`.
+ * Uses the `body-md` text variant by default.
  */
 const Description = forwardRef< HTMLParagraphElement, DescriptionProps >(
 	function PopoverDescription( { className, children, ...props }, ref ) {

@@ -8,7 +8,7 @@ export interface RootProps
 		'open' | 'onOpenChange' | 'defaultOpen' | 'modal'
 	> {
 	/**
-	 * The content to be rendered inside the component.
+	 * The popover sub-components (`Popover.Trigger`, `Popover.Popup`, etc.).
 	 */
 	children?: ReactNode;
 }
