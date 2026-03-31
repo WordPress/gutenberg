@@ -104,9 +104,10 @@ function ApiKeyConnector( {
 		authentication?.method === 'api_key' ? authentication : undefined;
 	const settingName = auth?.settingName ?? '';
 	const helpUrl = auth?.credentialsUrl ?? undefined;
-	const pluginSlug = plugin?.file?.includes( '/' )
-		? plugin.file.split( '/' )[ 0 ]
-		: plugin?.file;
+	const pluginFile = plugin?.file?.replace( /\.php$/, '' );
+	const pluginSlug = pluginFile?.includes( '/' )
+		? pluginFile.split( '/' )[ 0 ]
+		: pluginFile;
 
 	let helpLabel: string | undefined;
 	try {

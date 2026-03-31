@@ -54,9 +54,10 @@ export function useConnectorPlugin( {
 	const [ pluginStatusOverride, setPluginStatusOverride ] =
 		useState< PluginStatus | null >( null );
 
-	const pluginSlug = pluginFileFromServer?.includes( '/' )
-		? pluginFileFromServer.split( '/' )[ 0 ]
-		: pluginFileFromServer;
+	const pluginBasename = pluginFileFromServer?.replace( /\.php$/, '' );
+	const pluginSlug = pluginBasename?.includes( '/' )
+		? pluginBasename.split( '/' )[ 0 ]
+		: pluginBasename;
 
 	const {
 		derivedPluginStatus,
@@ -94,12 +95,12 @@ export function useConnectorPlugin( {
 			const plugin = store.getEntityRecord(
 				'root',
 				'plugin',
-				pluginFileFromServer
+				pluginBasename
 			) as { plugin: string; status: string } | undefined;
 
 			const hasFinished = store.hasFinishedResolution(
 				'getEntityRecord',
-				[ 'root', 'plugin', pluginFileFromServer ]
+				[ 'root', 'plugin', pluginBasename ]
 			);
 
 			if ( ! hasFinished ) {
@@ -139,7 +140,7 @@ export function useConnectorPlugin( {
 				canInstallPlugins: canCreate,
 			};
 		},
-		[ pluginFileFromServer, settingName, isInstalled, isActivated ]
+		[ pluginBasename, settingName, isInstalled, isActivated ]
 	);
 
 	const pluginStatus = pluginStatusOverride ?? derivedPluginStatus;
@@ -202,7 +203,7 @@ export function useConnectorPlugin( {
 				'root',
 				'plugin',
 				{
-					plugin: pluginFileFromServer,
+					plugin: pluginBasename,
 					status: 'active',
 				},
 				{ throwOnError: true }

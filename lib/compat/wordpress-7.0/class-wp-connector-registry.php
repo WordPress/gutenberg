@@ -98,7 +98,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 *         Optional. Plugin data for install/activate UI.
 		 *
 		 *         @type string $file The plugin's main file path relative to the plugins
-		 *                           directory (e.g. 'akismet/akismet.php').
+		 *                           directory (e.g. 'akismet/akismet.php' or 'hello.php').
 		 *     }
 		 * }
 		 * @return array|null The registered connector data on success, null on failure.
@@ -231,8 +231,8 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				}
 			}
 
-			if ( ! empty( $args['plugin'] ) && is_array( $args['plugin'] ) ) {
-				$connector['plugin'] = $args['plugin'];
+			if ( ! empty( $args['plugin'] ) && is_array( $args['plugin'] ) && ! empty( $args['plugin']['file'] ) ) {
+				$connector['plugin'] = array( 'file' => $args['plugin']['file'] );
 			}
 
 			$this->registered_connectors[ $id ] = $connector;
