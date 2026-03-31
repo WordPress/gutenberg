@@ -192,6 +192,10 @@ Slug field for BasePost.
 
 Status field for BasePost.
 
+### stickyField
+
+Sticky field for BasePost.
+
 ### templateField
 
 Template field for BasePost.
