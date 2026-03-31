@@ -46,6 +46,7 @@ const form = {
 					id: 'status',
 					layout: { type: 'regular', labelPosition: 'none' },
 				},
+				'scheduled_date',
 				'password',
 			],
 		},
