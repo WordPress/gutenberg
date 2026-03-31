@@ -13,6 +13,8 @@
 .dataviews-wrapper,
 .dataviews-picker-wrapper {
 	height: 100%;
+	flex-grow: 1;
+	min-height: 0;
 	box-sizing: border-box;
 	scroll-padding-bottom: calc(var(--wpds-dimension-base) * 16);
 	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
