@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef, useState } from '@wordpress/element';
+import { Component, createRef, useState } from '@wordpress/element';
 import * as Popover from '../index';
 
 describe( 'Popover', () => {
@@ -10,7 +10,9 @@ describe( 'Popover', () => {
 			render(
 				<Popover.Root>
 					<Popover.Trigger ref={ ref }>Open</Popover.Trigger>
-					<Popover.Popup>Content</Popover.Popup>
+					<Popover.Popup>
+						<Popover.Title>Title</Popover.Title>
+					</Popover.Popup>
 				</Popover.Root>
 			);
 			expect( ref.current ).toBeInstanceOf( HTMLButtonElement );
@@ -23,7 +25,9 @@ describe( 'Popover', () => {
 			render(
 				<Popover.Root>
 					<Popover.Trigger>Open</Popover.Trigger>
-					<Popover.Popup ref={ ref }>Content</Popover.Popup>
+					<Popover.Popup ref={ ref }>
+						<Popover.Title>Title</Popover.Title>
+					</Popover.Popup>
 				</Popover.Root>
 			);
 
@@ -42,8 +46,8 @@ describe( 'Popover', () => {
 				<Popover.Root>
 					<Popover.Trigger>Open</Popover.Trigger>
 					<Popover.Popup>
+						<Popover.Title>Title</Popover.Title>
 						<Popover.Arrow ref={ ref } />
-						Content
 					</Popover.Popup>
 				</Popover.Root>
 			);
@@ -83,6 +87,7 @@ describe( 'Popover', () => {
 				<Popover.Root>
 					<Popover.Trigger>Open</Popover.Trigger>
 					<Popover.Popup>
+						<Popover.Title>Title</Popover.Title>
 						<Popover.Description ref={ ref }>
 							Description
 						</Popover.Description>
@@ -105,6 +110,7 @@ describe( 'Popover', () => {
 				<Popover.Root>
 					<Popover.Trigger>Open</Popover.Trigger>
 					<Popover.Popup>
+						<Popover.Title>Title</Popover.Title>
 						<Popover.Close ref={ ref }>Close</Popover.Close>
 					</Popover.Popup>
 				</Popover.Root>
@@ -125,7 +131,10 @@ describe( 'Popover', () => {
 			render(
 				<Popover.Root>
 					<Popover.Trigger>Open</Popover.Trigger>
-					<Popover.Popup>Popover content</Popover.Popup>
+					<Popover.Popup>
+						<Popover.Title>Title</Popover.Title>
+						Popover content
+					</Popover.Popup>
 				</Popover.Root>
 			);
 
@@ -148,7 +157,10 @@ describe( 'Popover', () => {
 			render(
 				<Popover.Root>
 					<Popover.Trigger>Toggle</Popover.Trigger>
-					<Popover.Popup>Popover content</Popover.Popup>
+					<Popover.Popup>
+						<Popover.Title>Title</Popover.Title>
+						Popover content
+					</Popover.Popup>
 				</Popover.Root>
 			);
 
@@ -177,7 +189,10 @@ describe( 'Popover', () => {
 			render(
 				<Popover.Root>
 					<Popover.Trigger>Open</Popover.Trigger>
-					<Popover.Popup>Popover content</Popover.Popup>
+					<Popover.Popup>
+						<Popover.Title>Title</Popover.Title>
+						Popover content
+					</Popover.Popup>
 				</Popover.Root>
 			);
 
@@ -205,6 +220,7 @@ describe( 'Popover', () => {
 				<Popover.Root>
 					<Popover.Trigger>Open</Popover.Trigger>
 					<Popover.Popup>
+						<Popover.Title>Title</Popover.Title>
 						Popover content
 						<Popover.Close>Close</Popover.Close>
 					</Popover.Popup>
@@ -239,7 +255,10 @@ describe( 'Popover', () => {
 					</button>
 					<Popover.Root open={ open } onOpenChange={ setOpen }>
 						<Popover.Trigger>Trigger</Popover.Trigger>
-						<Popover.Popup>Controlled content</Popover.Popup>
+						<Popover.Popup>
+							<Popover.Title>Title</Popover.Title>
+							Controlled content
+						</Popover.Popup>
 					</Popover.Root>
 				</>
 			);
@@ -271,7 +290,10 @@ describe( 'Popover', () => {
 			render(
 				<Popover.Root defaultOpen>
 					<Popover.Trigger>Open</Popover.Trigger>
-					<Popover.Popup>Default open content</Popover.Popup>
+					<Popover.Popup>
+						<Popover.Title>Title</Popover.Title>
+						Default open content
+					</Popover.Popup>
 				</Popover.Root>
 			);
 
@@ -291,7 +313,9 @@ describe( 'Popover', () => {
 			render(
 				<Popover.Root onOpenChange={ onOpenChange }>
 					<Popover.Trigger>Toggle</Popover.Trigger>
-					<Popover.Popup>Content</Popover.Popup>
+					<Popover.Popup>
+						<Popover.Title>Title</Popover.Title>
+					</Popover.Popup>
 				</Popover.Root>
 			);
 
@@ -347,6 +371,7 @@ describe( 'Popover', () => {
 				<Popover.Root>
 					<Popover.Trigger>Open</Popover.Trigger>
 					<Popover.Popup>
+						<Popover.Title>Title</Popover.Title>
 						<Popover.Description>
 							My Description
 						</Popover.Description>
@@ -372,6 +397,7 @@ describe( 'Popover', () => {
 				<Popover.Root>
 					<Popover.Trigger>Open</Popover.Trigger>
 					<Popover.Popup ref={ ref } variant="unstyled">
+						<Popover.Title>Title</Popover.Title>
 						Unstyled content
 					</Popover.Popup>
 				</Popover.Root>
@@ -395,7 +421,10 @@ describe( 'Popover', () => {
 				<div data-testid="inline-wrapper">
 					<Popover.Root>
 						<Popover.Trigger>Open</Popover.Trigger>
-						<Popover.Popup inline>Inline content</Popover.Popup>
+						<Popover.Popup inline>
+							<Popover.Title>Title</Popover.Title>
+							Inline content
+						</Popover.Popup>
 					</Popover.Root>
 				</div>
 			);
@@ -421,7 +450,10 @@ describe( 'Popover', () => {
 				<div data-testid="portal-wrapper">
 					<Popover.Root>
 						<Popover.Trigger>Open</Popover.Trigger>
-						<Popover.Popup>Portal content</Popover.Popup>
+						<Popover.Popup>
+							<Popover.Title>Title</Popover.Title>
+							Portal content
+						</Popover.Popup>
 					</Popover.Root>
 				</div>
 			);
@@ -453,6 +485,7 @@ describe( 'Popover', () => {
 						</div>
 						<Popover.Root defaultOpen>
 							<Popover.Popup anchor={ anchorEl ?? undefined }>
+								<Popover.Title>Title</Popover.Title>
 								Anchored content
 							</Popover.Popup>
 						</Popover.Root>
@@ -478,6 +511,7 @@ describe( 'Popover', () => {
 				<Popover.Root>
 					<Popover.Trigger>Open</Popover.Trigger>
 					<Popover.Popup>
+						<Popover.Title>Title</Popover.Title>
 						<Popover.Close>Close</Popover.Close>
 						<button>Content Button</button>
 					</Popover.Popup>
@@ -502,6 +536,7 @@ describe( 'Popover', () => {
 				<Popover.Root>
 					<Popover.Trigger>Open</Popover.Trigger>
 					<Popover.Popup>
+						<Popover.Title>Title</Popover.Title>
 						<Popover.Close>Close</Popover.Close>
 						<p>No tabbable content here</p>
 					</Popover.Popup>
@@ -524,6 +559,7 @@ describe( 'Popover', () => {
 				<Popover.Root>
 					<Popover.Trigger>Open</Popover.Trigger>
 					<Popover.Popup initialFocus={ false }>
+						<Popover.Title>Title</Popover.Title>
 						<Popover.Close>Close</Popover.Close>
 						<button>Content Button</button>
 					</Popover.Popup>
@@ -557,6 +593,7 @@ describe( 'Popover', () => {
 				<Popover.Root>
 					<Popover.Trigger>Open</Popover.Trigger>
 					<Popover.Popup initialFocus={ customFocus }>
+						<Popover.Title>Title</Popover.Title>
 						<Popover.Close>Close</Popover.Close>
 						<button>Content Button</button>
 					</Popover.Popup>
@@ -574,4 +611,117 @@ describe( 'Popover', () => {
 			expect( customFocus ).toHaveBeenCalled();
 		} );
 	} );
+
+	describe( 'title validation', () => {
+		it( 'should throw when Popover.Title is missing', async () => {
+			const user = userEvent.setup();
+			const onError = jest.fn();
+
+			// Suppress console.error from React error boundary
+			const spy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
+
+			render(
+				<ErrorBoundary onError={ onError }>
+					<Popover.Root>
+						<Popover.Trigger>Open</Popover.Trigger>
+						<Popover.Popup>No title here</Popover.Popup>
+					</Popover.Root>
+				</ErrorBoundary>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			await waitFor( () => {
+				expect( onError ).toHaveBeenCalledWith(
+					expect.objectContaining( {
+						message: expect.stringContaining(
+							'Missing <Popover.Title>'
+						),
+					} )
+				);
+			} );
+
+			spy.mockRestore();
+		} );
+
+		it( 'should throw when Popover.Title is empty', async () => {
+			const user = userEvent.setup();
+			const onError = jest.fn();
+
+			const spy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
+
+			render(
+				<ErrorBoundary onError={ onError }>
+					<Popover.Root>
+						<Popover.Trigger>Open</Popover.Trigger>
+						<Popover.Popup>
+							<Popover.Title />
+						</Popover.Popup>
+					</Popover.Root>
+				</ErrorBoundary>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			await waitFor( () => {
+				expect( onError ).toHaveBeenCalledWith(
+					expect.objectContaining( {
+						message: expect.stringContaining( 'cannot be empty' ),
+					} )
+				);
+			} );
+
+			spy.mockRestore();
+		} );
+
+		it( 'should not throw when Popover.Title is present', async () => {
+			const user = userEvent.setup();
+			const onError = jest.fn();
+
+			render(
+				<ErrorBoundary onError={ onError }>
+					<Popover.Root>
+						<Popover.Trigger>Open</Popover.Trigger>
+						<Popover.Popup>
+							<Popover.Title>Valid Title</Popover.Title>
+						</Popover.Popup>
+					</Popover.Root>
+				</ErrorBoundary>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			await waitFor( () => {
+				expect( screen.getByText( 'Valid Title' ) ).toBeVisible();
+			} );
+
+			expect( onError ).not.toHaveBeenCalled();
+		} );
+	} );
 } );
+
+class ErrorBoundary extends Component<
+	{ children: React.ReactNode; onError: ( error: Error ) => void },
+	{ hasError: boolean }
+> {
+	state = { hasError: false };
+
+	static getDerivedStateFromError() {
+		return { hasError: true };
+	}
+
+	componentDidCatch( error: Error ) {
+		this.props.onError( error );
+	}
+
+	render() {
+		if ( this.state.hasError ) {
+			return null;
+		}
+		return this.props.children;
+	}
+}

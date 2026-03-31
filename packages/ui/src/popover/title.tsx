@@ -1,20 +1,35 @@
 import { Popover as _Popover } from '@base-ui/react/popover';
 import clsx from 'clsx';
-import { forwardRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import { forwardRef, useLayoutEffect, useRef } from '@wordpress/element';
+import { Text } from '../text';
+import { usePopoverValidationContext } from './context';
 import styles from './style.module.css';
 import type { TitleProps } from './types';
 
 /**
  * Renders a heading that labels the popover for accessibility.
+ * This component is required — every popover must include a title,
+ * even if visually hidden.
  */
 const Title = forwardRef< HTMLHeadingElement, TitleProps >(
-	function PopoverTitle( { className, ...props }, ref ) {
+	function PopoverTitle( { className, children, ...props }, forwardedRef ) {
+		const validationContext = usePopoverValidationContext();
+		const internalRef = useRef< HTMLHeadingElement >( null );
+		const mergedRef = useMergeRefs( [ internalRef, forwardedRef ] );
+
+		useLayoutEffect( () => {
+			validationContext?.registerTitle( internalRef.current );
+		}, [ validationContext ] );
+
 		return (
-			<_Popover.Title
-				ref={ ref }
+			<Text
+				variant="heading-md"
+				render={ <_Popover.Title ref={ mergedRef } { ...props } /> }
 				className={ clsx( styles.title, className ) }
-				{ ...props }
-			/>
+			>
+				{ children }
+			</Text>
 		);
 	}
 );

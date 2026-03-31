@@ -9,6 +9,7 @@ import {
 import { unlock } from '../lock-unlock';
 import resetStyles from '../utils/css/resets.module.css';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+import { PopoverValidationProvider } from './context';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
 
@@ -83,7 +84,9 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 					className={ clsx( variant !== 'unstyled' && styles.popup ) }
 					{ ...props }
 				>
-					{ children }
+					<PopoverValidationProvider>
+						{ children }
+					</PopoverValidationProvider>
 				</_Popover.Popup>
 			</ThemeProvider>
 		</_Popover.Positioner>

@@ -23,16 +23,10 @@
 
 	.title {
 		margin: 0 0 var(--wpds-dimension-gap-xs);
-		font-size: var(--wpds-font-size-md);
-		font-weight: var(--wpds-font-weight-medium);
-		line-height: var(--wpds-font-line-height-md);
-		color: var(--wpds-color-fg-content-neutral);
 	}
 
 	.description {
 		margin: 0;
-		font-size: var(--wpds-font-size-sm);
-		line-height: var(--wpds-font-line-height-sm);
 		color: var(--wpds-color-fg-content-neutral-weak);
 	}
 
