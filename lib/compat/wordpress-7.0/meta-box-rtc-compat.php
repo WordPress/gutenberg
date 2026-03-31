@@ -43,12 +43,6 @@ if ( ! function_exists( 'gutenberg_inject_rtc_compatible_meta_boxes' ) ) {
 						continue;
 					}
 
-					// Skip back-compat meta boxes (they won't appear in the block editor).
-					if ( isset( $meta_box['args']['__back_compat_meta_box'] )
-						&& $meta_box['args']['__back_compat_meta_box'] ) {
-						continue;
-					}
-
 					if ( isset( $meta_box['args']['__rtc_compatible_meta_box'] )
 						&& $meta_box['args']['__rtc_compatible_meta_box'] ) {
 						$rtc_compatible_ids[] = $meta_box['id'];
