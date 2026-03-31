@@ -3,15 +3,6 @@
 @layer wp-ui-components {
 	.positioner {
 		z-index: var(--wp-ui-popover-z-index, initial);
-
-		/* Alias Base UI's Positioner CSS variables with a --wp-ui-popover-* prefix. */
-		--wp-ui-popover-anchor-height: var(--anchor-height);
-		--wp-ui-popover-anchor-width: var(--anchor-width);
-		--wp-ui-popover-available-height: var(--available-height);
-		--wp-ui-popover-available-width: var(--available-width);
-		--wp-ui-popover-positioner-height: var(--positioner-height);
-		--wp-ui-popover-positioner-width: var(--positioner-width);
-		--wp-ui-popover-transform-origin: var(--transform-origin);
 	}
 
 	.popup {
@@ -43,29 +34,5 @@
 		font-size: var(--wpds-font-size-sm);
 		line-height: var(--wpds-font-line-height-sm);
 		color: var(--wpds-color-fg-content-neutral-weak);
-	}
-
-	.backdrop {
-		position: fixed;
-		inset: 0;
-		z-index: var(--wp-ui-popover-z-index, initial);
-		background-color: rgba(0, 0, 0, 0.15);
-
-		&[data-starting-style],
-		&[data-ending-style] {
-			opacity: 0;
-		}
-
-		&[data-open] {
-			opacity: 1;
-		}
-
-		@media not (prefers-reduced-motion) {
-			transition: opacity 0.15s ease-out;
-		}
-	}
-
-	.backdrop-unstyled {
-		background-color: transparent;
 	}
 }
