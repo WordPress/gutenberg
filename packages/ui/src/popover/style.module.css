@@ -34,6 +34,7 @@
 		position: fixed;
 		inset: 0;
 		z-index: var(--wp-ui-popover-z-index, initial);
+		/* TODO: Replace with a WPDS overlay/scrim token when one exists. */
 		background-color: rgba(0, 0, 0, 0.15);
 	}
 }
