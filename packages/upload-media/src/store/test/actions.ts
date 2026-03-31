@@ -488,6 +488,18 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'generateThumbnails', () => {
+		const mockBitmapClose = jest.fn();
+
+		function mockCreateImageBitmap( width: number, height: number ) {
+			global.createImageBitmap = jest.fn( () =>
+				Promise.resolve( {
+					width,
+					height,
+					close: mockBitmapClose,
+				} )
+			) as unknown as typeof global.createImageBitmap;
+		}
+
 		/**
 		 * Sets up an item in the queue with an attachment and
 		 * ThumbnailGeneration as the current operation, simulating
@@ -527,7 +539,48 @@ describe( 'actions', () => {
 			return unlock( registry.select( uploadStore ) ).getAllItems()[ 0 ];
 		}
 
-		it( 'should sideload a scaled version when bigImageSizeThreshold is set', async () => {
+		beforeEach( () => {
+			mockBitmapClose.mockClear();
+		} );
+
+		afterEach( () => {
+			// Clean up global mock.
+			// @ts-ignore
+			delete global.createImageBitmap;
+		} );
+
+		it( 'should not sideload a scaled version when image is below the threshold', async () => {
+			// Image is 800x600, threshold is 2560.
+			mockCreateImageBitmap( 800, 600 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150 },
+					medium: { width: 300, height: 300 },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration();
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			// Should have sideload items for thumbnails, but NOT for 'scaled'.
+			const scaledItems = allItems.filter(
+				( i ) => i.additionalData?.image_size === 'scaled'
+			);
+			expect( scaledItems ).toHaveLength( 0 );
+			expect( mockBitmapClose ).toHaveBeenCalled();
+		} );
+
+		it( 'should sideload a scaled version when image exceeds the threshold', async () => {
+			// Image is 4000x3000, threshold is 2560.
+			mockCreateImageBitmap( 4000, 3000 );
 			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 				bigImageSizeThreshold: 2560,
 				allImageSizes: {
@@ -550,6 +603,34 @@ describe( 'actions', () => {
 			);
 			expect( scaledItems ).toHaveLength( 1 );
 			expect( scaledItems[ 0 ].additionalData.post ).toBe( 123 );
+			expect( mockBitmapClose ).toHaveBeenCalled();
+		} );
+
+		it( 'should sideload a scaled version when only height exceeds the threshold', async () => {
+			// Image is 2000x3000, threshold is 2560 — height exceeds.
+			mockCreateImageBitmap( 2000, 3000 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150 },
+					medium: { width: 300, height: 300 },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration();
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			const scaledItems = allItems.filter(
+				( i ) => i.additionalData?.image_size === 'scaled'
+			);
+			expect( scaledItems ).toHaveLength( 1 );
 		} );
 
 		it( 'should not sideload a scaled version when bigImageSizeThreshold is not set', async () => {
@@ -574,9 +655,12 @@ describe( 'actions', () => {
 				( i ) => i.additionalData?.image_size === 'scaled'
 			);
 			expect( scaledItems ).toHaveLength( 0 );
+			// createImageBitmap should not have been called since threshold is not set.
+			expect( global.createImageBitmap ).toBeUndefined();
 		} );
 
 		it( 'should not sideload a scaled version when attachment has no id', async () => {
+			mockCreateImageBitmap( 4000, 3000 );
 			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 				bigImageSizeThreshold: 2560,
 				allImageSizes: {
@@ -604,6 +688,7 @@ describe( 'actions', () => {
 		} );
 
 		it( 'should create sideload items for missing image sizes', async () => {
+			mockCreateImageBitmap( 800, 600 );
 			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 				bigImageSizeThreshold: 2560,
 				allImageSizes: {
@@ -664,6 +749,34 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems();
 			expect( allItems ).toHaveLength( 1 );
+		} );
+
+		it( 'should not create scaled version when image is exactly at the threshold', async () => {
+			// Image is exactly 2560x2560, threshold is 2560 — should NOT scale.
+			mockCreateImageBitmap( 2560, 2560 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150 },
+					medium: { width: 300, height: 300 },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration();
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			const scaledItems = allItems.filter(
+				( i ) => i.additionalData?.image_size === 'scaled'
+			);
+			// Exactly at threshold means no scaling (condition is > not >=).
+			expect( scaledItems ).toHaveLength( 0 );
 		} );
 	} );
 } );
