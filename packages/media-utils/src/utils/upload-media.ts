@@ -44,8 +44,8 @@ interface UploadMediaArgs {
 	signal?: AbortSignal;
 	// Whether to allow multiple files to be uploaded.
 	multiple?: boolean;
-	// Function called with upload progress (0-100).
-	onProgress?: ( progress: number ) => void;
+	// Function called with upload progress (0-100) and the file being uploaded.
+	onProgress?: ( progress: number, file: File ) => void;
 }
 
 /**
@@ -62,7 +62,7 @@ interface UploadMediaArgs {
  * @param $0.wpAllowedMimeTypes List of allowed mime types and file extensions.
  * @param $0.signal             Abort signal.
  * @param $0.multiple           Whether to allow multiple files to be uploaded.
- * @param $0.onProgress         Function called with upload progress (0-100).
+ * @param $0.onProgress         Function called with upload progress (0-100) and the file being uploaded.
  */
 export function uploadMedia( {
 	wpAllowedMimeTypes,
@@ -142,6 +142,8 @@ export function uploadMedia( {
 				additionalData,
 				signal,
 				onProgress
+					? ( progress: number ) => onProgress( progress, file )
+					: undefined
 			);
 			setAndUpdateFiles( index, attachment );
 		} catch ( error ) {

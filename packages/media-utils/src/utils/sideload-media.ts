@@ -30,8 +30,8 @@ interface SideloadMediaArgs {
 	onFileChange?: OnChangeHandler;
 	// Abort signal.
 	signal?: AbortSignal;
-	// Function called with upload progress (0-100).
-	onProgress?: ( progress: number ) => void;
+	// Function called with upload progress (0-100) and the file being uploaded.
+	onProgress?: ( progress: number, file: File ) => void;
 }
 
 /**
@@ -62,6 +62,8 @@ export async function sideloadMedia( {
 			additionalData,
 			signal,
 			onProgress
+				? ( progress: number ) => onProgress( progress, file )
+				: undefined
 		);
 		onFileChange?.( [ attachment ] );
 	} catch ( error ) {

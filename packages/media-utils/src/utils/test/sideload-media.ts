@@ -31,7 +31,7 @@ describe( 'sideloadMedia', () => {
 		expect( onFileChange ).toHaveBeenCalled();
 	} );
 
-	it( 'should pass onProgress callback to sideloadToServer', async () => {
+	it( 'should pass onProgress wrapper that includes the file', async () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
 		const onProgress = jest.fn();
@@ -43,12 +43,32 @@ describe( 'sideloadMedia', () => {
 			onProgress,
 		} );
 
+		// sideloadToServer should receive a wrapper function.
+		const passedOnProgress = ( sideloadToServer as jest.Mock ).mock
+			.calls[ 0 ][ 4 ];
+		expect( typeof passedOnProgress ).toBe( 'function' );
+
+		// Calling the wrapper should invoke onProgress with progress and the file.
+		passedOnProgress( 75 );
+		expect( onProgress ).toHaveBeenCalledWith( 75, imageFile );
+	} );
+
+	it( 'should pass undefined when no onProgress is provided', async () => {
+		const onError = jest.fn();
+		const onFileChange = jest.fn();
+		await sideloadMedia( {
+			file: imageFile,
+			attachmentId: 1,
+			onError,
+			onFileChange,
+		} );
+
 		expect( sideloadToServer ).toHaveBeenCalledWith(
 			imageFile,
 			1,
 			expect.anything(),
 			undefined,
-			onProgress
+			undefined
 		);
 	} );
 } );

@@ -211,7 +211,7 @@ describe( 'uploadMedia', () => {
 		expect( uploadToServer ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should pass onProgress callback to uploadToServer', () => {
+	it( 'should pass onProgress wrapper that includes the file', () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
 		const onProgress = jest.fn();
@@ -222,15 +222,34 @@ describe( 'uploadMedia', () => {
 			onProgress,
 		} );
 
+		// uploadToServer should receive a wrapper function, not the raw callback.
+		const passedOnProgress = ( uploadToServer as jest.Mock ).mock
+			.calls[ 0 ][ 3 ];
+		expect( typeof passedOnProgress ).toBe( 'function' );
+
+		// Calling the wrapper should invoke onProgress with progress and the file.
+		passedOnProgress( 50 );
+		expect( onProgress ).toHaveBeenCalledWith( 50, imageFile );
+	} );
+
+	it( 'should pass undefined when no onProgress is provided', () => {
+		const onError = jest.fn();
+		const onFileChange = jest.fn();
+		uploadMedia( {
+			filesList: [ imageFile ],
+			onError,
+			onFileChange,
+		} );
+
 		expect( uploadToServer ).toHaveBeenCalledWith(
 			imageFile,
 			expect.anything(),
 			undefined,
-			onProgress
+			undefined
 		);
 	} );
 
-	it( 'should pass the same onProgress callback to each file in a multi-file upload', () => {
+	it( 'should include the correct file in onProgress for multi-file uploads', () => {
 		const onProgress = jest.fn();
 		const secondImageFile = new window.File(
 			[ 'fake_file_2' ],
@@ -245,13 +264,18 @@ describe( 'uploadMedia', () => {
 		} );
 
 		expect( uploadToServer ).toHaveBeenCalledTimes( 2 );
-		// Both calls receive the same onProgress callback.
-		expect( ( uploadToServer as jest.Mock ).mock.calls[ 0 ][ 3 ] ).toBe(
-			onProgress
-		);
-		expect( ( uploadToServer as jest.Mock ).mock.calls[ 1 ][ 3 ] ).toBe(
-			onProgress
-		);
+
+		// Each file gets its own wrapper that tags progress with the correct file.
+		const firstOnProgress = ( uploadToServer as jest.Mock ).mock
+			.calls[ 0 ][ 3 ];
+		const secondOnProgress = ( uploadToServer as jest.Mock ).mock
+			.calls[ 1 ][ 3 ];
+
+		firstOnProgress( 30 );
+		expect( onProgress ).toHaveBeenCalledWith( 30, imageFile );
+
+		secondOnProgress( 60 );
+		expect( onProgress ).toHaveBeenCalledWith( 60, secondImageFile );
 	} );
 
 	it( 'should return error that is not an Error object', () => {
