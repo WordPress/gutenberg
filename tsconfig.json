@@ -32,6 +32,7 @@
 		{ "path": "packages/element" },
 		{ "path": "packages/escape-html" },
 		{ "path": "packages/eslint-plugin" },
+		{ "path": "packages/ffmpeg" },
 		{ "path": "packages/fields" },
 		{ "path": "packages/global-styles-engine" },
 		{ "path": "packages/global-styles-ui" },
