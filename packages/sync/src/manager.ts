@@ -62,7 +62,11 @@ const DOWNGRADE_DEBOUNCE_MS = 30_000;
 
 interface EntityState {
 	awareness?: Awareness;
-	awarenessHandler?: ( changes: object ) => void;
+	awarenessHandler?: ( changes: {
+		added: number[];
+		removed: number[];
+		updated: number[];
+	} ) => void;
 	downgradeTimeoutId?: ReturnType< typeof setTimeout >;
 	handlers: RecordHandlers;
 	objectId: ObjectID;
@@ -285,7 +289,17 @@ export function createSyncManager( debug = false ): SyncManager {
 		const { awareness, ydoc } = entityState;
 		const localClientId = ydoc.clientID;
 
-		const handler = () => {
+		const handler = ( changes: {
+			added: number[];
+			removed: number[];
+			updated: number[];
+		} ) => {
+			// Only re-evaluate when clients join or leave, not on
+			// cursor/state updates which fire frequently during editing.
+			if ( changes.added.length === 0 && changes.removed.length === 0 ) {
+				return;
+			}
+
 			const states = awareness.getStates();
 			const hasRemoteClients = Array.from( states.keys() ).some(
 				( id ) => id !== localClientId
