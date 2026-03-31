@@ -4,7 +4,6 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { getBlockType } from '@wordpress/blocks';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { RichTextData } from '@wordpress/rich-text';
 
 /**
@@ -113,18 +112,38 @@ const diffCache = createBoundedCache();
 const editCache = createBoundedCache();
 
 /**
- * Helper to read the note content string, handling both API format
- * ({ rendered: "..." }) and local edit format (plain string).
+ * Strip the outermost `<p>…</p>` wrapper that WordPress adds via wpautop.
+ * Returns the input unchanged if it doesn't match a single `<p>` wrapper.
+ *
+ * @param {string} html The HTML string to unwrap.
+ * @return {string} The unwrapped HTML.
+ */
+export function stripBlockWrapper( html ) {
+	return html
+		.trim()
+		.replace( /^<p>([\s\S]*)<\/p>$/i, '$1' )
+		.trim();
+}
+
+/**
+ * Read the note content as an inline HTML string, handling both API format
+ * ({ rendered: "...", raw: "..." }) and local edit format (plain string).
+ *
+ * Prefers `raw` (unprocessed) over `rendered` (which wraps in `<p>` tags
+ * via wpautop). Falls back to stripping the outer `<p>` wrapper when only
+ * `rendered` is available.
  *
  * @param {Object} note The note entity record.
- * @return {string} The note content as a plain string.
+ * @return {string} The note content as an inline HTML string.
  */
-function getNoteText( note ) {
-	const raw =
-		typeof note.content === 'string'
-			? note.content
-			: note.content?.rendered || '';
-	return stripHTML( raw ).trim();
+export function getNoteHTML( note ) {
+	if ( typeof note.content === 'string' ) {
+		return note.content.trim();
+	}
+	if ( note.content?.raw !== undefined && note.content?.raw !== null ) {
+		return note.content.raw.trim();
+	}
+	return stripBlockWrapper( note.content?.rendered || '' );
 }
 
 /**
@@ -185,7 +204,7 @@ function resolveSuggestionContext( select, clientId ) {
 	return {
 		attributes,
 		richTextAttrName,
-		suggestedText: getNoteText( note ),
+		suggestedHTML: getNoteHTML( note ),
 	};
 }
 
@@ -205,9 +224,9 @@ export function getSuggestionEditAttributes( select, clientId ) {
 		return null;
 	}
 
-	const { attributes, richTextAttrName, suggestedText } = ctx;
+	const { attributes, richTextAttrName, suggestedHTML } = ctx;
 
-	const cacheKey = `edit:${ clientId }:${ suggestedText }`;
+	const cacheKey = `edit:${ clientId }:${ suggestedHTML }`;
 	const cached = editCache.get( cacheKey );
 	if ( cached ) {
 		return cached;
@@ -215,7 +234,7 @@ export function getSuggestionEditAttributes( select, clientId ) {
 
 	const result = {
 		...attributes,
-		[ richTextAttrName ]: RichTextData.fromPlainText( suggestedText ),
+		[ richTextAttrName ]: RichTextData.fromHTMLString( suggestedHTML ),
 	};
 
 	editCache.set( cacheKey, result );
@@ -237,7 +256,7 @@ export function getSuggestionDiffAttributes( select, clientId ) {
 		return null;
 	}
 
-	const { attributes, richTextAttrName, suggestedText } = ctx;
+	const { attributes, richTextAttrName, suggestedHTML } = ctx;
 
 	// Strip any previously-applied diff formatting to recover the
 	// original block content. After edits, setAttributes saves the
@@ -248,13 +267,13 @@ export function getSuggestionDiffAttributes( select, clientId ) {
 	// Build a cache key from the inputs that affect the diff result.
 	// If these haven't changed, return the cached result to avoid
 	// creating new RichTextData instances and causing re-renders.
-	const cacheKey = `${ clientId }:${ originalText }:${ suggestedText }`;
+	const cacheKey = `${ clientId }:${ originalText }:${ suggestedHTML }`;
 	const cached = diffCache.get( cacheKey );
 	if ( cached ) {
 		return cached;
 	}
 
-	const suggestedRichText = RichTextData.fromPlainText( suggestedText );
+	const suggestedRichText = RichTextData.fromHTMLString( suggestedHTML );
 
 	const diffAttributes = {
 		...attributes,

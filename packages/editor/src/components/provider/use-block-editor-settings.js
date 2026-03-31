@@ -278,15 +278,20 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const { editMediaEntity } = unlock( useDispatch( coreStore ) );
 	const { saveEntityRecord, editEntityRecord } = useDispatch( coreStore );
 
-	// Debounced save for suggestion note edits. Immediate local update
-	// via editEntityRecord keeps the inline editor responsive, while
-	// the debounced saveEntityRecord persists changes and syncs the
-	// sidebar block note display.
+	// Debounced update for suggestion note edits. Both the local entity
+	// edit and the remote save are debounced so the store doesn't
+	// trigger getSuggestionEditAttributes to recompute (and create new
+	// RichTextData) on every keystroke — which would clobber RichText's
+	// internal editing state and cause lost characters.
+	const suggestionEditTimerRef = useRef( null );
 	const suggestionSaveTimerRef = useRef( null );
 
-	// Clean up pending save on unmount.
+	// Clean up pending timers on unmount.
 	useEffect( () => {
 		return () => {
+			if ( suggestionEditTimerRef.current ) {
+				clearTimeout( suggestionEditTimerRef.current );
+			}
 			if ( suggestionSaveTimerRef.current ) {
 				clearTimeout( suggestionSaveTimerRef.current );
 			}
@@ -296,50 +301,103 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	// Creates a new suggestion note for a block that doesn't have one yet.
-	// Called on the first edit in suggestion mode for blocks without a noteId.
+	// Debounced so the note is only created after a typing pause — during
+	// active typing, setAttributes updates the block normally. Each call
+	// buffers the latest content; when the timer fires, we create the note
+	// with whatever was last typed and attach the noteId to the block.
 	const pendingCreations = useRef( new Set() );
+	const suggestionCreateTimerRef = useRef( null );
+	const suggestionCreateArgsRef = useRef( null );
+
+	// Clean up create timer on unmount.
+	useEffect( () => {
+		return () => {
+			if ( suggestionCreateTimerRef.current ) {
+				clearTimeout( suggestionCreateTimerRef.current );
+			}
+		};
+	}, [] );
+
 	const onSuggestionCreate = useCallback(
-		async ( clientId, content, metadata ) => {
-			// Prevent duplicate creation if an earlier keystroke already triggered it.
-			if ( pendingCreations.current.has( clientId ) ) {
-				return;
+		( clientId, content, originalAttributes ) => {
+			// Buffer the latest content and original attributes.
+			// Only capture originalAttributes on the first call (before
+			// setAttributes modifies the block).
+			if ( ! suggestionCreateArgsRef.current ) {
+				suggestionCreateArgsRef.current = {
+					clientId,
+					originalAttributes,
+				};
 			}
-			pendingCreations.current.add( clientId );
+			suggestionCreateArgsRef.current.content = content;
 
-			try {
-				const savedRecord = await saveEntityRecord(
-					'root',
-					'comment',
-					{
-						post: postId,
-						content,
-						status: 'hold',
-						type: 'note',
-						parent: 0,
-						meta: { _wp_note_kind: 'suggestion' },
-					},
-					{ throwOnError: true }
-				);
+			if ( suggestionCreateTimerRef.current ) {
+				clearTimeout( suggestionCreateTimerRef.current );
+			}
 
-				if ( savedRecord?.id ) {
-					updateBlockAttributes( clientId, {
-						metadata: {
-							...metadata,
-							noteId: savedRecord.id,
-						},
-					} );
+			suggestionCreateTimerRef.current = setTimeout( async () => {
+				suggestionCreateTimerRef.current = null;
+				const args = suggestionCreateArgsRef.current;
+				if ( ! args ) {
+					return;
 				}
-			} finally {
-				pendingCreations.current.delete( clientId );
-			}
+				suggestionCreateArgsRef.current = null;
+
+				// Prevent duplicate creation if already in flight.
+				if ( pendingCreations.current.has( args.clientId ) ) {
+					return;
+				}
+				pendingCreations.current.add( args.clientId );
+
+				try {
+					const savedRecord = await saveEntityRecord(
+						'root',
+						'comment',
+						{
+							post: postId,
+							content: args.content,
+							status: 'hold',
+							type: 'note',
+							parent: 0,
+							meta: { _wp_note_kind: 'suggestion' },
+						},
+						{ throwOnError: true }
+					);
+
+					if ( savedRecord?.id ) {
+						// Restore the block to its original content
+						// and attach the noteId. The suggestion lives
+						// in the note; the block content stays as the
+						// "original" for diffing.
+						updateBlockAttributes( args.clientId, {
+							...args.originalAttributes,
+							metadata: {
+								...( args.originalAttributes?.metadata || {} ),
+								noteId: savedRecord.id,
+							},
+						} );
+					}
+				} finally {
+					pendingCreations.current.delete( args.clientId );
+				}
+			}, 500 );
 		},
 		[ saveEntityRecord, postId, updateBlockAttributes ]
 	);
 
 	const onSuggestionEdit = useCallback(
 		( noteId, content ) => {
-			// Immediate local edit for responsive inline editing.
-			editEntityRecord( 'root', 'comment', noteId, { content } );
+			// Debounced local edit — lets RichText manage its own DOM
+			// state during active typing without interference.
+			if ( suggestionEditTimerRef.current ) {
+				clearTimeout( suggestionEditTimerRef.current );
+			}
+			suggestionEditTimerRef.current = setTimeout( () => {
+				editEntityRecord( 'root', 'comment', noteId, {
+					content,
+				} );
+				suggestionEditTimerRef.current = null;
+			}, 200 );
 
 			// Debounced save for persistence and sidebar sync.
 			if ( suggestionSaveTimerRef.current ) {

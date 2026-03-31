@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { memo, RawHTML, useContext, useMemo } from '@wordpress/element';
+import { memo, RawHTML, useContext, useMemo, useRef } from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
@@ -91,16 +91,16 @@ function safeGetSuggestionDiff( fn, select, clientId ) {
 }
 
 /**
- * Extract the first plain-text string from a setAttributes call's values.
- * Returns the text if a RichTextData value is found, or null otherwise.
+ * Extract the first HTML string from a setAttributes call's RichTextData values.
+ * Returns the HTML if a RichTextData value is found, or null otherwise.
  *
  * @param {Object} newAttrs The attributes object from setAttributes.
- * @return {string|null} Plain text content, or null.
+ * @return {string|null} HTML content, or null.
  */
-function extractRichTextPlainText( newAttrs ) {
+function extractRichTextHTML( newAttrs ) {
 	for ( const value of Object.values( newAttrs ) ) {
-		if ( value && typeof value.toPlainText === 'function' ) {
-			return value.toPlainText();
+		if ( value && typeof value.toHTMLString === 'function' ) {
+			return value.toHTMLString();
 		}
 	}
 	return null;
@@ -145,6 +145,15 @@ function BlockListBlock( {
 	// Suggestion mode:
 	// - Selected: show suggestion note content (editable), edits update note.
 	// - Not selected: show diff between original and suggestion.
+	//
+	// When the block is first selected, we load the note content into
+	// editAttributes via suggestionEditAttributes and cache the object
+	// reference. On subsequent renders while selected, we reuse the
+	// cached reference so RichText sees stable props and doesn't reset
+	// the cursor. Recomputed suggestionEditAttributes (from debounced
+	// entity edits) are intentionally ignored until the block is
+	// deselected and reselected.
+	const suggestionEditCacheRef = useRef( null );
 	let editAttributes = attributes;
 	let effectiveSetAttributes = setAttributes;
 
@@ -152,37 +161,43 @@ function BlockListBlock( {
 		const noteId = attributes?.metadata?.noteId;
 
 		if ( isSelected && noteId && context.suggestionEditAttributes ) {
-			// Block has an existing suggestion note — show its content
-			// for editing and route changes to the note.
-			editAttributes = context.suggestionEditAttributes;
+			if ( ! suggestionEditCacheRef.current ) {
+				// First render after selection — cache the note content.
+				suggestionEditCacheRef.current =
+					context.suggestionEditAttributes;
+			}
+			editAttributes = suggestionEditCacheRef.current;
 			if ( context.onSuggestionEdit ) {
 				effectiveSetAttributes = ( newAttrs ) => {
-					const text = extractRichTextPlainText( newAttrs );
-					if ( text !== null ) {
-						context.onSuggestionEdit( noteId, text );
+					const html = extractRichTextHTML( newAttrs );
+					if ( html !== null ) {
+						context.onSuggestionEdit( noteId, html );
 					} else {
 						setAttributes( newAttrs );
 					}
 				};
 			}
 		} else if ( isSelected && ! noteId && context.onSuggestionCreate ) {
-			// Block has no suggestion note yet — on first edit, create
-			// one with the new content and link it to the block.
+			// Block has no suggestion note yet. Let setAttributes go
+			// through so the block store stays in sync with RichText
+			// (preventing content loss on re-render). Pass the
+			// original content along so it can be restored once the
+			// note is created — keeping the block's stored content as
+			// the "original" for diffing.
 			effectiveSetAttributes = ( newAttrs ) => {
-				const text = extractRichTextPlainText( newAttrs );
-				if ( text !== null ) {
-					context.onSuggestionCreate(
-						clientId,
-						text,
-						attributes?.metadata
-					);
-				} else {
-					setAttributes( newAttrs );
+				setAttributes( newAttrs );
+				const html = extractRichTextHTML( newAttrs );
+				if ( html !== null ) {
+					context.onSuggestionCreate( clientId, html, attributes );
 				}
 			};
-		} else if ( ! isSelected && context.suggestionDiffAttributes ) {
-			// Unfocused — show the diff view.
-			editAttributes = context.suggestionDiffAttributes;
+		} else if ( ! isSelected ) {
+			// Reset so the next selection reloads from the note.
+			suggestionEditCacheRef.current = null;
+			if ( context.suggestionDiffAttributes ) {
+				// Unfocused — show the diff view.
+				editAttributes = context.suggestionDiffAttributes;
+			}
 		}
 	}
 
