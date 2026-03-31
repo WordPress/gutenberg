@@ -13,7 +13,7 @@ const noop = () => {};
 /**
  * @typedef SchemaItem
  * @property {string[]}                            [attributes] Attributes.
- * @property {(string | RegExp)[]}                 [classes]    Classnames or RegExp to test against.
+ * @property {(string | RegExp)[]}                 [classes]    Classnames or RegExp to test against. Use '*' to keep all classes.
  * @property {'*' | { [tag: string]: SchemaItem }} [children]   Child schemas.
  * @property {string[]}                            [require]    Selectors to test required children against. Leave empty or undefined if there are no requirements.
  * @property {boolean}                             allowEmpty   Whether to allow nodes without children.
