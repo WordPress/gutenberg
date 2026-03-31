@@ -16,13 +16,13 @@
 	z-index: z-index(".components-modal__screen-overlay");
 	display: flex;
 	// This animates the appearance of the backdrop.
-	@include animation__fade-in($speed: var(--wpds-motion-duration-sm), $easing: var(--wpds-motion-easing-decelerate-emphasized));
+	@include animation__fade-in($speed: var(--wpds-motion-duration-sm), $easing: var(--wpds-motion-easing-gentle));
 
 	&.is-animating-out {
 		// Note: it's important that the fade-out animation doesn't end after the
 		// modal frame's disappear animation, because the component will be removed
 		// from the DOM when that animation ends.
-		@include animation__fade-out($speed: var(--wpds-motion-duration-sm), $delay: var(--wpds-motion-duration-sm), $easing: var(--wpds-motion-easing-decelerate-emphasized));
+		@include animation__fade-out($speed: var(--wpds-motion-duration-sm), $delay: var(--wpds-motion-duration-sm), $easing: var(--wpds-motion-easing-gentle));
 	}
 }
 
