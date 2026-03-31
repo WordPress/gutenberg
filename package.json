@@ -241,6 +241,7 @@
 		"packages/**/*.{js,ts,tsx,json}": [
 			"npm run docs:api-ref",
 			"npm run docs:blocks",
+			"npm run docs:blocks-detail",
 			"npm run docs:theme-ref",
 			"node ./bin/api-docs/are-api-docs-unstaged.js"
 		],
