@@ -36,7 +36,7 @@ if ( ! function_exists( 'gutenberg_inject_rtc_compatible_meta_boxes' ) ) {
 
 		$rtc_compatible_ids = array();
 
-		foreach ( $wp_meta_boxes[ $screen_id ] as $location => $priorities ) {
+		foreach ( $wp_meta_boxes[ $screen_id ] as $priorities ) {
 			foreach ( $priorities as $priority_boxes ) {
 				foreach ( (array) $priority_boxes as $meta_box ) {
 					if ( false === $meta_box || ! $meta_box['title'] ) {
