@@ -89,17 +89,12 @@ function useBubbleEvents( iframeDocument ) {
 	} );
 }
 
-const iframeSrcCache = new WeakMap();
-const iframeSrcCleanup = globalThis.FinalizationRegistry
-	? new globalThis.FinalizationRegistry( ( url ) =>
-			URL.revokeObjectURL( url )
-	  )
-	: undefined;
+const iframeSrcDocCache = new WeakMap();
 
-function getIframeSrc( resolvedAssets ) {
-	let src = iframeSrcCache.get( resolvedAssets );
-	if ( src ) {
-		return src;
+function getIframeSrcDoc( resolvedAssets ) {
+	let srcDoc = iframeSrcDocCache.get( resolvedAssets );
+	if ( srcDoc ) {
+		return srcDoc;
 	}
 
 	// Correct doctype is required to enable rendering in standards mode.
@@ -130,10 +125,9 @@ function getIframeSrc( resolvedAssets ) {
 	</body>
 </html>`;
 
-	src = URL.createObjectURL( new Blob( [ html ], { type: 'text/html' } ) );
-	iframeSrcCache.set( resolvedAssets, src );
-	iframeSrcCleanup?.register( resolvedAssets, src );
-	return src;
+	srcDoc = html;
+	iframeSrcDocCache.set( resolvedAssets, srcDoc );
+	return srcDoc;
 }
 
 function Iframe( {
@@ -175,11 +169,11 @@ function Iframe( {
 			) {
 				event.preventDefault();
 				// Manually handle link fragment navigation within the iframe. The iframe's
-				// location is a blob URL, which can't be used to resolve relative links like
-				// `#hash`. The relative link would be resolved against the iframe's base URL
-				// or the parent frame's URL, causing the iframe to navigate to a completely
-				// different page. Setting the `location.hash` works because it really sets the
-				// blob URL's hash.
+				// location is `about:srcdoc`, which can't be used to resolve relative links
+				// like `#hash`. The relative link would be resolved against the iframe's base
+				// URL or the parent frame's URL, causing the iframe to navigate to a
+				// completely different page. Setting the `location.hash` works because it
+				// really sets the iframe document's hash.
 				//
 				// Links with fragments are used for example with footnotes. Clicking on these
 				// links will scroll smoothly to the anchors in the editor canvas.
@@ -296,7 +290,7 @@ function Iframe( {
 		[ unguardedBodyRef ]
 	);
 
-	const src = getIframeSrc( resolvedAssets );
+	const srcDoc = getIframeSrcDoc( resolvedAssets );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
@@ -315,7 +309,7 @@ function Iframe( {
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
-				src={ src }
+				srcDoc={ srcDoc }
 				title={ title }
 				onKeyDown={ ( event ) => {
 					if ( props.onKeyDown ) {
