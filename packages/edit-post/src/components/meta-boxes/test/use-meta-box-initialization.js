@@ -39,6 +39,7 @@ function createMockStores( {
 	isEditorReady = true,
 	isCollaborationEnabled = true,
 	metaBoxes = [],
+	rtcCompatibleIds = [],
 } = {} ) {
 	return {
 		'core/editor': {
@@ -65,6 +66,7 @@ function createMockStores( {
 			},
 			selectors: {
 				getAllMetaBoxes: jest.fn( () => metaBoxes ),
+				getRtcCompatibleMetaBoxIds: jest.fn( () => rtcCompatibleIds ),
 				hasMetaBoxes: jest.fn( () => metaBoxes.length > 0 ),
 				getActiveMetaBoxLocations: jest.fn( () =>
 					metaBoxes.length > 0 ? [ 'normal' ] : []
@@ -111,13 +113,10 @@ describe( 'useMetaBoxInitialization', () => {
 	it( 'does not disable collaboration when all metaboxes are rtcCompatible', () => {
 		const mockStores = createMockStores( {
 			metaBoxes: [
-				{ id: 'my-metabox', title: 'My Meta Box', rtcCompatible: true },
-				{
-					id: 'another-metabox',
-					title: 'Another',
-					rtcCompatible: true,
-				},
+				{ id: 'my-metabox', title: 'My Meta Box' },
+				{ id: 'another-metabox', title: 'Another' },
 			],
+			rtcCompatibleIds: [ 'my-metabox', 'another-metabox' ],
 		} );
 		const registry = createRegistry( mockStores );
 
@@ -130,13 +129,10 @@ describe( 'useMetaBoxInitialization', () => {
 	it( 'disables collaboration when some metaboxes lack rtcCompatible', () => {
 		const mockStores = createMockStores( {
 			metaBoxes: [
-				{
-					id: 'compatible-metabox',
-					title: 'Compatible',
-					rtcCompatible: true,
-				},
+				{ id: 'compatible-metabox', title: 'Compatible' },
 				{ id: 'incompatible-metabox', title: 'Incompatible' },
 			],
+			rtcCompatibleIds: [ 'compatible-metabox' ],
 		} );
 		const registry = createRegistry( mockStores );
 
@@ -147,13 +143,8 @@ describe( 'useMetaBoxInitialization', () => {
 
 	it( 'does not disable collaboration when the only metabox is rtcCompatible', () => {
 		const mockStores = createMockStores( {
-			metaBoxes: [
-				{
-					id: 'compatible-metabox',
-					title: 'Compatible',
-					rtcCompatible: true,
-				},
-			],
+			metaBoxes: [ { id: 'compatible-metabox', title: 'Compatible' } ],
+			rtcCompatibleIds: [ 'compatible-metabox' ],
 		} );
 		const registry = createRegistry( mockStores );
 
