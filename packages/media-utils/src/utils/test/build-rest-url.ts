@@ -58,4 +58,20 @@ describe( 'buildRestUrl', () => {
 			'/wp-json/wp/v2/media?_embed=wp%3Afeaturedmedia&_locale=user'
 		);
 	} );
+
+	it( 'should handle apiRoot without trailing slash', () => {
+		// WordPress always provides a trailing slash in wpApiSettings.root,
+		// but verify the function still produces a usable URL without one.
+		window.wpApiSettings = { root: 'https://example.com/wp-json/' };
+		const url = buildRestUrl( 'wp/v2/media' );
+		expect( url ).toBe(
+			'https://example.com/wp-json/wp/v2/media?_locale=user'
+		);
+	} );
+
+	it( 'should handle path without leading slash', () => {
+		window.wpApiSettings = { root: '/wp-json/' };
+		const url = buildRestUrl( 'wp/v2/media' );
+		expect( url ).toBe( '/wp-json/wp/v2/media?_locale=user' );
+	} );
 } );
