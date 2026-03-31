@@ -11,7 +11,6 @@ const meta: Meta< typeof Popover.Root > = {
 		'Popover.Trigger': Popover.Trigger,
 		'Popover.Popup': Popover.Popup,
 		'Popover.Arrow': Popover.Arrow,
-		'Popover.Backdrop': Popover.Backdrop,
 		'Popover.Title': Popover.Title,
 		'Popover.Description': Popover.Description,
 		'Popover.Close': Popover.Close,
@@ -84,7 +83,6 @@ export const Positioning: Story = {
 							<Popover.Popup
 								side={ side }
 								align={ align }
-								animated={ false }
 								collisionAvoidance={ {
 									side: 'none',
 									align: 'none',
@@ -230,9 +228,6 @@ export const Controlled: Story = {
  * This is useful for complex popover content that requires user interaction,
  * such as forms. Try tabbing through the fields — focus stays inside the
  * popover until it is dismissed.
- *
- * Add `Popover.Backdrop` to display a semi-transparent overlay beneath the
- * popover, signalling that the page is blocked.
  */
 export const Modal: Story = {
 	argTypes: { modal: { control: false } },
@@ -241,7 +236,6 @@ export const Modal: Story = {
 		children: (
 			<>
 				<Popover.Trigger>Edit Settings</Popover.Trigger>
-				<Popover.Backdrop />
 				<Popover.Popup>
 					<Popover.Arrow />
 					<Popover.Title>Settings</Popover.Title>
@@ -381,27 +375,6 @@ export const OverlayPlacement: Story = {
 				</Popover.Root>
 			</div>
 		);
-	},
-};
-
-/**
- * Set `animated` to `false` on `Popover.Popup` to disable the open/close
- * transition. The popover will appear and disappear instantly.
- */
-export const DisabledAnimations: Story = {
-	args: {
-		children: (
-			<>
-				<Popover.Trigger>No Animation</Popover.Trigger>
-				<Popover.Popup animated={ false }>
-					<Popover.Arrow />
-					<Popover.Title>Instant</Popover.Title>
-					<Popover.Description>
-						This popover opens and closes without animation.
-					</Popover.Description>
-				</Popover.Popup>
-			</>
-		),
 	},
 };
 
@@ -738,7 +711,6 @@ export const Anchor: Story = {
 		};
 
 		const popupProps = {
-			animated: false as const,
 			collisionAvoidance: {
 				side: 'none' as const,
 				align: 'none' as const,
@@ -862,8 +834,8 @@ export const ToolbarVariant: Story = {
 };
 
 /**
- * Base UI's Positioner exposes `--wp-ui-popover-available-height` and
- * `--wp-ui-popover-available-width` CSS variables representing the space
+ * Base UI's Positioner exposes `--available-height` and
+ * `--available-width` CSS variables representing the space
  * between the anchor and the viewport edge. Apply them as `max-height` /
  * `max-width` on the popup content to constrain its size to the available
  * space — this replaces the legacy Popover's `resize` prop.
@@ -890,19 +862,16 @@ export const ViewportConstrainedSize: Story = {
 					<Popover.Popup
 						side="bottom"
 						style={ {
-							maxHeight:
-								'var(--wp-ui-popover-available-height, 300px)',
-							maxWidth:
-								'var(--wp-ui-popover-available-width, 300px)',
+							maxHeight: 'var(--available-height, 300px)',
+							maxWidth: 'var(--available-width, 300px)',
 							overflow: 'auto',
 						} }
 					>
 						<Popover.Title>Constrained</Popover.Title>
 						<Popover.Description>
 							This popup constrains its size using the
-							`--wp-ui-popover-available-height` and
-							`--wp-ui-popover-available-width` CSS variables
-							exposed by the positioner.
+							`--available-height` and `--available-width` CSS
+							variables exposed by the positioner.
 						</Popover.Description>
 						<div style={ { height: 400 } }>
 							<p>

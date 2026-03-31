@@ -387,29 +387,6 @@ describe( 'Popover', () => {
 		} );
 	} );
 
-	describe( 'animated', () => {
-		it( 'should render correctly when animated is false', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<Popover.Root>
-					<Popover.Trigger>Open</Popover.Trigger>
-					<Popover.Popup animated={ false }>
-						No animation content
-					</Popover.Popup>
-				</Popover.Root>
-			);
-
-			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
-
-			await waitFor( () => {
-				expect(
-					screen.getByText( 'No animation content' )
-				).toBeInTheDocument();
-			} );
-		} );
-	} );
-
 	describe( 'inline', () => {
 		it( 'should render without a portal when inline is true', async () => {
 			const user = userEvent.setup();

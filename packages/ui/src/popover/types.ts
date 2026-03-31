@@ -38,13 +38,6 @@ export interface PopupProps
 		>,
 		Pick< _Popover.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
-	 * Whether the popup uses open/close animations.
-	 *
-	 * @default true
-	 */
-	animated?: boolean;
-
-	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
@@ -106,17 +99,4 @@ export interface CloseProps extends ComponentProps< 'button' > {
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
-}
-
-export interface BackdropProps extends ComponentProps< 'div' > {
-	/**
-	 * The visual style variant of the backdrop.
-	 *
-	 * - `'default'` — semi-transparent dark overlay.
-	 * - `'unstyled'` — fully transparent; blocks interaction without
-	 *    any visual dimming.
-	 *
-	 * @default 'default'
-	 */
-	variant?: 'default' | 'unstyled';
 }

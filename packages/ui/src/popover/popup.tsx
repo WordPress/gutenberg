@@ -7,7 +7,6 @@ import {
 } from '@wordpress/theme';
 import { unlock } from '../lock-unlock';
 import resetStyles from '../utils/css/resets.module.css';
-import dropdownMotionStyles from '../utils/css/dropdown-motion.module.css';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
 
@@ -23,7 +22,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		align = 'center',
 		alignOffset,
 		anchor,
-		animated = true,
 		children,
 		className,
 		collisionAvoidance,
@@ -67,12 +65,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 					ref={ ref }
 					initialFocus={ initialFocus }
 					finalFocus={ finalFocus }
-					className={ clsx(
-						variant !== 'unstyled' && styles.popup,
-						animated &&
-							variant !== 'unstyled' &&
-							dropdownMotionStyles[ 'dropdown-motion' ]
-					) }
+					className={ clsx( variant !== 'unstyled' && styles.popup ) }
 					{ ...props }
 				>
 					{ children }
