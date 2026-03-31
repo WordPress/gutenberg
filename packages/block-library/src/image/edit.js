@@ -156,9 +156,17 @@ export function ImageEdit( {
 	} = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
 
+	const isInGallery =
+		getBlockName( getBlockRootClientId( clientId ) ) === 'core/gallery';
+
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
-		createErrorNotice( message, { type: 'snackbar' } );
+		createErrorNotice( message, {
+			type: 'snackbar',
+			// When inside a gallery, use a stable ID so batch cancel
+			// notices deduplicate into a single snackbar.
+			id: isInGallery ? 'gallery-upload-error' : undefined,
+		} );
 		setTemporaryURL();
 		setAttributes( {
 			src: undefined,
@@ -371,9 +379,6 @@ export function ImageEdit( {
 			src={ url }
 		/>
 	);
-
-	const isInGallery =
-		getBlockName( getBlockRootClientId( clientId ) ) === 'core/gallery';
 
 	const borderProps = useBorderProps( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );

@@ -79,11 +79,9 @@ export default function GalleryUploadingOverlay() {
 	const handleCancel = useCallback( () => {
 		const { getAllItems } = unlock( registry.select( uploadMediaStore ) );
 		const items = getAllItems();
+		const error = new Error( __( 'Upload cancelled by user' ) );
 		for ( const item of items ) {
-			cancelItem(
-				item.id,
-				new Error( __( 'Upload cancelled by user' ) )
-			);
+			cancelItem( item.id, error );
 		}
 	}, [ cancelItem, registry ] );
 
