@@ -6,7 +6,13 @@ import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { getTranscodeImageOperation, finalizeItem } from '../private-actions';
+import {
+	getTranscodeImageOperation,
+	finalizeItem,
+	updateItemProgress,
+	uploadItem,
+	sideloadItem,
+} from '../private-actions';
 import { OperationType } from '../types';
 import { vipsHasTransparency } from '../utils';
 
@@ -344,6 +350,131 @@ describe( 'private actions', () => {
 			await thunk( { select, dispatch } );
 
 			expect( finishOperation ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'updateItemProgress', () => {
+		it( 'should dispatch UpdateProgress action with id and progress', async () => {
+			const dispatch = jest.fn();
+
+			const thunk = updateItemProgress( 'item-1', 42 );
+			await thunk( { dispatch } );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'UPDATE_PROGRESS',
+				id: 'item-1',
+				progress: 42,
+			} );
+		} );
+	} );
+
+	describe( 'uploadItem', () => {
+		it( 'should dispatch updateItemProgress when mediaUpload calls onProgress', async () => {
+			const updateItemProgressMock = jest.fn();
+			const mediaUpload = jest.fn( ( { onProgress } ) => {
+				// Simulate progress callbacks from the upload.
+				onProgress( 25 );
+				onProgress( 75 );
+			} );
+			const select = {
+				getItem: () => ( {
+					file: new File( [ 'data' ], 'test.jpg', {
+						type: 'image/jpeg',
+					} ),
+					additionalData: {},
+					abortController: null,
+				} ),
+				getSettings: () => ( { mediaUpload } ),
+			};
+			const dispatch = {
+				updateItemProgress: updateItemProgressMock,
+				finishOperation: jest.fn(),
+				cancelItem: jest.fn(),
+			};
+
+			const thunk = uploadItem( 'item-1' );
+			await thunk( { select, dispatch } );
+
+			expect( mediaUpload ).toHaveBeenCalled();
+			expect( updateItemProgressMock ).toHaveBeenCalledWith(
+				'item-1',
+				25
+			);
+			expect( updateItemProgressMock ).toHaveBeenCalledWith(
+				'item-1',
+				75
+			);
+		} );
+
+		it( 'should return early when item is not found', async () => {
+			const select = {
+				getItem: () => undefined,
+				getSettings: jest.fn(),
+			};
+			const dispatch = {};
+
+			const thunk = uploadItem( 'missing-id' );
+			await thunk( { select, dispatch } );
+
+			expect( select.getSettings ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'sideloadItem', () => {
+		it( 'should dispatch updateItemProgress when mediaSideload calls onProgress', async () => {
+			const updateItemProgressMock = jest.fn();
+			const mediaSideload = jest.fn( ( { onProgress } ) => {
+				onProgress( 50 );
+				onProgress( 100 );
+			} );
+			const select = {
+				getItem: () => ( {
+					file: new File( [ 'data' ], 'test.jpg', {
+						type: 'image/jpeg',
+					} ),
+					additionalData: { post: 42, image_size: 'thumbnail' },
+					abortController: null,
+				} ),
+				getSettings: () => ( { mediaSideload } ),
+			};
+			const dispatch = {
+				updateItemProgress: updateItemProgressMock,
+				finishOperation: jest.fn(),
+				cancelItem: jest.fn(),
+				resumeItemByPostId: jest.fn(),
+			};
+
+			const thunk = sideloadItem( 'item-2' );
+			await thunk( { select, dispatch } );
+
+			expect( mediaSideload ).toHaveBeenCalled();
+			expect( updateItemProgressMock ).toHaveBeenCalledWith(
+				'item-2',
+				50
+			);
+			expect( updateItemProgressMock ).toHaveBeenCalledWith(
+				'item-2',
+				100
+			);
+		} );
+
+		it( 'should skip when mediaSideload is not configured', async () => {
+			const finishOperation = jest.fn();
+			const select = {
+				getItem: () => ( {
+					file: new File( [ 'data' ], 'test.jpg', {
+						type: 'image/jpeg',
+					} ),
+					additionalData: { post: 42 },
+				} ),
+				getSettings: () => ( {} ),
+			};
+			const dispatch = { finishOperation };
+
+			const thunk = sideloadItem( 'item-2' );
+			await thunk( { select, dispatch } );
+
+			expect( finishOperation ).toHaveBeenCalledWith( 'item-2', {} );
 		} );
 	} );
 } );
