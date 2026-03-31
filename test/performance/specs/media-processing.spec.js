@@ -191,7 +191,7 @@ test.describe( 'Media Processing Performance', () => {
 		] );
 	} );
 
-	const samples = 3;
+	const samples = 7;
 	const throwaway = 1;
 	const iterations = samples + throwaway;
 
