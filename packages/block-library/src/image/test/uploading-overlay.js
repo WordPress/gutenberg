@@ -19,6 +19,10 @@ jest.mock( '@wordpress/data', () => ( {
 	useDispatch: jest.fn( () => ( { cancelItem: jest.fn() } ) ),
 } ) );
 
+// Mock @wordpress/components because importing the real package pulls in
+// a deep dependency chain (@wordpress/rich-text store registration, etc.)
+// that fails in this isolated test environment. These minimal implementations
+// preserve the correct ARIA roles for accessibility testing.
 jest.mock( '@wordpress/components', () => {
 	const actual = jest.requireActual( '@wordpress/element' );
 	return {
