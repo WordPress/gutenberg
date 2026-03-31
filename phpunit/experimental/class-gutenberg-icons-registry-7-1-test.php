@@ -46,6 +46,17 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 	 */
 	private function register( $icon_name, $icon_properties ) {
 		$method = new ReflectionMethod( $this->registry, 'register' );
+
+		/*
+		 * ReflectionMethod::setAccessible is:
+		 * - redundant as of 8.1.0, which made all properties accessible
+		 * - deprecated as of 8.5.0
+		 * - needed until 8.1.0, as property `instance` is private
+		 */
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
 		return $method->invoke( $this->registry, $icon_name, $icon_properties );
 	}
 
