@@ -32,6 +32,7 @@ import { useGlobalStylesContext } from '../global-styles-provider';
 import {
 	getSuggestionDiffAttributes,
 	getSuggestionEditAttributes,
+	getSuggestionNoteId,
 } from '../suggestion-mode-diff';
 
 const EMPTY_OBJECT = {};
@@ -573,6 +574,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			getSuggestionEditAttributes: suggestionMode
 				? getSuggestionEditAttributes
 				: null,
+			getSuggestionNoteId: suggestionMode ? getSuggestionNoteId : null,
 			onSuggestionEdit: suggestionMode ? onSuggestionEdit : null,
 			onSuggestionCreate: suggestionMode ? onSuggestionCreate : null,
 		};

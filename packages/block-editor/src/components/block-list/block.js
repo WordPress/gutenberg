@@ -158,9 +158,12 @@ function BlockListBlock( {
 	let effectiveSetAttributes = setAttributes;
 
 	if ( context.suggestionMode ) {
-		const noteId = attributes?.metadata?.noteId;
+		// Use the resolved suggestion note ID — this may be a child of
+		// the block's primary noteId when the primary note isn't a
+		// suggestion (e.g. a regular comment with suggestion replies).
+		const suggestionId = context.suggestionNoteId;
 
-		if ( isSelected && noteId && context.suggestionEditAttributes ) {
+		if ( isSelected && suggestionId && context.suggestionEditAttributes ) {
 			if ( ! suggestionEditCacheRef.current ) {
 				// First render after selection — cache the note content.
 				suggestionEditCacheRef.current =
@@ -171,13 +174,17 @@ function BlockListBlock( {
 				effectiveSetAttributes = ( newAttrs ) => {
 					const html = extractRichTextHTML( newAttrs );
 					if ( html !== null ) {
-						context.onSuggestionEdit( noteId, html );
+						context.onSuggestionEdit( suggestionId, html );
 					} else {
 						setAttributes( newAttrs );
 					}
 				};
 			}
-		} else if ( isSelected && ! noteId && context.onSuggestionCreate ) {
+		} else if (
+			isSelected &&
+			! suggestionId &&
+			context.onSuggestionCreate
+		) {
 			// Block has no suggestion note yet. Let setAttributes go
 			// through so the block store stays in sync with RichText
 			// (preventing content loss on re-render). Pass the
@@ -744,6 +751,14 @@ function BlockListBlockProvider( props ) {
 								clientId
 						  )
 						: null,
+				suggestionNoteId:
+					_suggestionMode && settings.getSuggestionNoteId
+						? safeGetSuggestionDiff(
+								settings.getSuggestionNoteId,
+								select,
+								clientId
+						  )
+						: null,
 				onSuggestionEdit: _suggestionMode
 					? settings.onSuggestionEdit
 					: null,
@@ -936,6 +951,7 @@ function BlockListBlockProvider( props ) {
 		deviceType,
 		suggestionMode,
 		suggestionDiffAttributes,
+		suggestionNoteId,
 		suggestionEditAttributes,
 		onSuggestionEdit,
 		onSuggestionCreate,
@@ -980,6 +996,7 @@ function BlockListBlockProvider( props ) {
 		deviceType,
 		suggestionMode,
 		suggestionDiffAttributes,
+		suggestionNoteId,
 		suggestionEditAttributes,
 		onSuggestionEdit,
 		onSuggestionCreate,

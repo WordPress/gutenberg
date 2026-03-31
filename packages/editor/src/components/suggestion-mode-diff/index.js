@@ -10,6 +10,7 @@ import { RichTextData } from '@wordpress/rich-text';
  * Internal dependencies
  */
 import { applyRichTextDiff } from '../post-revisions-preview/block-diff';
+import { store as editorStore } from '../../store';
 
 // Format type names used by the diff system.
 const DIFF_FORMAT_TYPES = [
@@ -181,7 +182,40 @@ function resolveSuggestionContext( select, clientId ) {
 		noteId
 	);
 
-	if ( ! note || note.meta?._wp_note_kind !== 'suggestion' ) {
+	// getEditedEntityRecord returns {} for unloaded entities — wait
+	// until the record has actually loaded before making decisions.
+	if ( ! note || ! note.status ) {
+		return null;
+	}
+
+	// If the primary note is a suggestion, use it directly. Otherwise
+	// search its child notes for the first suggestion (a block can have
+	// a regular comment as the primary note with suggestion replies).
+	// We use the same query the collab sidebar uses to hit the cache
+	// rather than triggering a separate API request.
+	let suggestionNote = null;
+	if ( note.meta?._wp_note_kind === 'suggestion' ) {
+		suggestionNote = note;
+	} else {
+		const postId = select( editorStore ).getCurrentPostId();
+		const allNotes = postId
+			? select( coreStore ).getEntityRecords( 'root', 'comment', {
+					post: postId,
+					type: 'note',
+					status: 'all',
+					per_page: -1,
+			  } )
+			: null;
+		if ( allNotes ) {
+			suggestionNote = allNotes.find(
+				( n ) =>
+					n.parent === noteId &&
+					n.meta?._wp_note_kind === 'suggestion'
+			);
+		}
+	}
+
+	if ( ! suggestionNote ) {
 		return null;
 	}
 
@@ -210,11 +244,33 @@ function resolveSuggestionContext( select, clientId ) {
 		return null;
 	}
 
+	// Use the edited version so local (unsaved) edits are visible.
+	const editedNote = select( coreStore ).getEditedEntityRecord(
+		'root',
+		'comment',
+		suggestionNote.id
+	);
+
 	return {
 		attributes,
 		richTextAttrName,
-		suggestedHTML: getNoteHTML( note ),
+		suggestionNoteId: suggestionNote.id,
+		suggestedHTML: getNoteHTML( editedNote ),
 	};
+}
+
+/**
+ * Resolve the suggestion note ID for a block. Returns the ID of the
+ * first suggestion note (which may be a child of the primary note),
+ * or null if none exists.
+ *
+ * @param {Function} select   The registry select function.
+ * @param {string}   clientId The block's client ID.
+ * @return {number|null} The suggestion note ID, or null.
+ */
+export function getSuggestionNoteId( select, clientId ) {
+	const ctx = resolveSuggestionContext( select, clientId );
+	return ctx?.suggestionNoteId ?? null;
 }
 
 /**
