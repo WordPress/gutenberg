@@ -169,7 +169,7 @@ describe( 'sideloadToServer', () => {
 		expect( ( result as any ).id ).toBe( 99 );
 	} );
 
-	it( 'should reject with "Network error during sideload" on network error', async () => {
+	it( 'should reject with network error on onerror', async () => {
 		const onProgress = jest.fn();
 		const file = new File( [ 'content' ], 'image.webp', {
 			type: 'image/webp',
@@ -180,7 +180,7 @@ describe( 'sideloadToServer', () => {
 		mockXhrInstance.onerror();
 
 		await expect( promise ).rejects.toThrow(
-			'Network error during sideload'
+			'Network error during upload'
 		);
 	} );
 
@@ -197,7 +197,7 @@ describe( 'sideloadToServer', () => {
 		mockXhrInstance.onload();
 
 		await expect( promise ).rejects.toThrow(
-			'Sideload failed with status 403'
+			'Upload failed with status 403'
 		);
 	} );
 
