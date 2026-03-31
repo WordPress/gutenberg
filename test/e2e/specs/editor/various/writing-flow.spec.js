@@ -1040,7 +1040,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 <!-- /wp:paragraph -->` );
 	} );
 
-	test( 'should move to the start of the first line on ArrowUp (-firefox)', async ( {
+	test( 'should move to the start of the first line on ArrowUp', async ( {
 		page,
 		editor,
 	} ) => {
