@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -34,6 +34,11 @@ import {
 } from './hooks';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
+import {
+	registerDiffFormatTypes,
+	unregisterDiffFormatTypes,
+} from '../post-revisions-preview/diff-format-types';
+import { clearSuggestionCaches } from '../suggestion-mode-diff';
 
 function NotesSidebarContent( {
 	styles,
@@ -84,9 +89,32 @@ function NotesSidebar( { postId } ) {
 	const { toggleBlockSpotlight, selectBlock } = unlock(
 		useDispatch( blockEditorStore )
 	);
-	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const { selectNote, setSuggestionMode } = unlock(
+		useDispatch( editorStore )
+	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
+
+	// Enable suggestion mode while either notes sidebar is open.
+	const isSidebarOpen = useSelect( ( select ) => {
+		const area =
+			select( interfaceStore ).getActiveComplementaryArea( 'core' );
+		return SIDEBARS.includes( area );
+	}, [] );
+
+	useEffect( () => {
+		if ( isSidebarOpen ) {
+			registerDiffFormatTypes();
+			setSuggestionMode( true );
+			return;
+		}
+		setSuggestionMode( false );
+		clearSuggestionCaches();
+		// Defer unregister so blocks re-render without diff
+		// attributes before the format types are removed.
+		const timer = setTimeout( () => unregisterDiffFormatTypes(), 0 );
+		return () => clearTimeout( timer );
+	}, [ isSidebarOpen, setSuggestionMode ] );
 
 	const { clientId, blockCommentId, isClassicBlock } = useSelect(
 		( select ) => {
