@@ -29,10 +29,14 @@ export type InterpolationString< Input > = Input extends TranslatableText<
  */
 type ExtractTagName< T extends string > = T extends `/${ string }`
 	? never // Skip closing tags like "/div"
-	: T extends `${ string } ${ string }`
-	? never // Skip tags with spaces like "spaced token"
+	: T extends `${ infer Name } /`
+	? Name extends `${ string } ${ string }`
+		? never // Skip if name itself has spaces
+		: Name // Self-closing tags with space like "item /"
 	: T extends `${ infer Name }/`
 	? Name // Self-closing tags like "br/"
+	: T extends `${ string } ${ string }`
+	? never // Skip tags with spaces like "spaced token"
 	: T; // Regular opening tags like "div"
 
 /**

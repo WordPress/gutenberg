@@ -40,7 +40,7 @@ describe( 'createInterpolateElement', () => {
 			const testString = 'This is a <item /> string and <somethingElse/>';
 			expect( () =>
 				createInterpolateElement( testString, {
-					someValue: <em />,
+					item: <em />,
 					// @ts-expect-error - Invalid type for somethingElse
 					somethingElse: 10,
 				} )
