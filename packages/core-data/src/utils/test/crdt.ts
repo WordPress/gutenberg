@@ -115,7 +115,7 @@ describe( 'defaultCollectionSyncConfig', () => {
 			defaultCollectionSyncConfig.shouldSync?.( 'comment', '123' )
 		).toBe( false );
 		expect(
-			defaultCollectionSyncConfig.shouldSync?.( 'comment', 456 )
+			defaultCollectionSyncConfig.shouldSync?.( 'comment', 'foo' )
 		).toBe( false );
 	} );
 } );
