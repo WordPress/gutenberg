@@ -70,6 +70,10 @@ const inProgressOperations = new Set< ItemId >();
 /**
  * Cancels all ongoing operations for a given item ID.
  *
+ * Note: cancellation only takes effect at async boundaries (e.g., while
+ * waiting for the FFmpeg core to load or for the operation lock). Once
+ * core.exec() starts, it runs synchronously and cannot be interrupted.
+ *
  * @param id Item ID.
  * @return Whether any operation was cancelled.
  */
@@ -90,6 +94,15 @@ function padToEven( value: number ): number {
 }
 
 /**
+ * Serialization lock for FFmpeg operations.
+ *
+ * The FFmpeg core shares a single Emscripten module instance with shared
+ * MEMFS. Concurrent operations would corrupt each other's files and state.
+ * This lock serializes access so only one operation runs at a time.
+ */
+let operationLock: Promise< void > = Promise.resolve();
+
+/**
  * Converts an animated GIF to a video file (MP4 or WebM).
  *
  * @param id             Item ID.
@@ -106,13 +119,33 @@ export async function convertGifToVideo(
 ): Promise< ArrayBuffer > {
 	inProgressOperations.add( id );
 
+	// Serialize access to the shared FFmpeg core instance.
+	const previousLock = operationLock;
+	let releaseLock: () => void;
+	operationLock = new Promise< void >( ( resolve ) => {
+		releaseLock = resolve;
+	} );
+
 	try {
+		await previousLock;
+
+		// Check if cancelled while waiting for the lock.
+		if ( ! inProgressOperations.has( id ) ) {
+			throw new Error( 'Operation cancelled' );
+		}
+
 		const core = await getFFmpegCore();
 
-		const inputFileName = 'input.gif';
+		// Check if cancelled while waiting for core initialization.
+		if ( ! inProgressOperations.has( id ) ) {
+			throw new Error( 'Operation cancelled' );
+		}
+
+		// Use unique filenames per operation to avoid conflicts.
+		const inputFileName = `input_${ id }.gif`;
 		const isWebm = outputMimeType === 'video/webm';
 		const outputExt = isWebm ? 'webm' : 'mp4';
-		const outputFileName = `output.${ outputExt }`;
+		const outputFileName = `output_${ id }.${ outputExt }`;
 
 		// Write input file to FFmpeg's in-memory filesystem.
 		core.FS.writeFile( inputFileName, new Uint8Array( buffer ) );
@@ -175,7 +208,12 @@ export async function convertGifToVideo(
 			throw new Error( 'FFmpeg produced empty output' );
 		}
 
-		const result = output.buffer;
+		// Slice the buffer to extract only the relevant bytes.
+		// Uint8Array.buffer may include data outside the view's range.
+		const result = output.buffer.slice(
+			output.byteOffset,
+			output.byteOffset + output.byteLength
+		);
 
 		// Clean up temporary files.
 		try {
@@ -190,6 +228,7 @@ export async function convertGifToVideo(
 		return result;
 	} finally {
 		inProgressOperations.delete( id );
+		releaseLock!();
 	}
 }
 
