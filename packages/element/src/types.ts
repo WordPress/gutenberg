@@ -41,9 +41,7 @@ type ExtractTagName< T extends string > = T extends `/${ string }`
  */
 export type ExtractTags< T extends string > =
 	T extends `${ string }<${ infer Tag }>${ infer After }`
-		? ExtractTagName< Tag > extends never
-			? ExtractTags< After >
-			: ExtractTagName< Tag > | ExtractTags< After >
+		? ExtractTagName< Tag > | ExtractTags< After >
 		: never;
 
 /**
