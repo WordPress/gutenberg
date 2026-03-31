@@ -29,6 +29,7 @@
 
 -   Add `AlertDialog` primitive ([#76847](https://github.com/WordPress/gutenberg/pull/76847)).
 -   Add `InputControl` component ([#76653](https://github.com/WordPress/gutenberg/pull/76653)).
+-   Add `Popover` primitive ([#76438](https://github.com/WordPress/gutenberg/pull/76438)).
 -   `Dialog`: Expose `initialFocus` and `finalFocus` props on `Dialog.Popup` for custom focus management ([#76860](https://github.com/WordPress/gutenberg/pull/76860)).
 -   `CollapsibleCard`: Add `HeaderDescription` subcomponent for supplementary header content with `aria-describedby` relationship ([#76867](https://github.com/WordPress/gutenberg/pull/76867)).
 
@@ -56,7 +57,6 @@
 
 ### New Features
 
--   Add `Popover` primitive ([#76438](https://github.com/WordPress/gutenberg/pull/76438)).
 -   Add `Text` primitive with predefined typographic variants (`heading-2xl` through `heading-sm`, `body-xl` through `body-sm`) built on design tokens ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).
 -   Add `Card` and `CollapsibleCard` primitives ([#76252](https://github.com/WordPress/gutenberg/pull/76252)).
 -   Add `Link` primitive ([#76013](https://github.com/WordPress/gutenberg/pull/76013)).
