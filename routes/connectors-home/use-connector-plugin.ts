@@ -13,9 +13,9 @@ export type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';
 
 interface UseConnectorPluginOptions {
 	pluginSlug?: string;
+	pluginFile?: string | null;
 	settingName: string;
 	connectorName: string;
-	isInstalled?: boolean;
 	isActivated?: boolean;
 	keySource?: ApiKeySource;
 	initialIsConnected?: boolean;
@@ -39,9 +39,9 @@ interface UseConnectorPluginReturn {
 
 export function useConnectorPlugin( {
 	pluginSlug,
+	pluginFile: pluginFileFromServer,
 	settingName,
 	connectorName,
-	isInstalled,
 	isActivated,
 	keySource = 'none',
 	initialIsConnected = false,
@@ -87,7 +87,7 @@ export function useConnectorPlugin( {
 				};
 			}
 
-			const pluginId = `${ pluginSlug }/plugin`;
+			const pluginId = pluginFileFromServer ?? `${ pluginSlug }/plugin`;
 
 			const plugin = store.getEntityRecord(
 				'root',
@@ -127,7 +127,7 @@ export function useConnectorPlugin( {
 			let status: PluginStatus = 'not-installed';
 			if ( isActivated ) {
 				status = 'active';
-			} else if ( isInstalled ) {
+			} else if ( pluginFileFromServer ) {
 				status = 'inactive';
 			}
 			return {
@@ -137,7 +137,7 @@ export function useConnectorPlugin( {
 				canInstallPlugins: canCreate,
 			};
 		},
-		[ pluginSlug, settingName, isInstalled, isActivated ]
+		[ pluginSlug, pluginFileFromServer, settingName, isActivated ]
 	);
 
 	const pluginStatus = pluginStatusOverride ?? derivedPluginStatus;
@@ -199,7 +199,10 @@ export function useConnectorPlugin( {
 			await saveEntityRecord(
 				'root',
 				'plugin',
-				{ plugin: `${ pluginSlug }/plugin`, status: 'active' },
+				{
+					plugin: pluginFileFromServer ?? `${ pluginSlug }/plugin`,
+					status: 'active',
+				},
 				{ throwOnError: true }
 			);
 			setPluginStatusOverride( 'active' );
