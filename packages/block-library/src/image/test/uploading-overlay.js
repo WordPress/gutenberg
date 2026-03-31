@@ -94,7 +94,7 @@ describe( 'UploadingOverlay', () => {
 		mockUseSelect();
 		render( <UploadingOverlay url="blob:123" onCancel={ jest.fn() } /> );
 		expect(
-			screen.getByRole( 'button', { name: 'Cancel' } )
+			screen.getByRole( 'button', { name: 'Cancel upload' } )
 		).toBeInTheDocument();
 	} );
 
@@ -190,7 +190,9 @@ describe( 'UploadingOverlay', () => {
 
 		render( <UploadingOverlay url="blob:123" onCancel={ mockOnCancel } /> );
 
-		await user.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
+		await user.click(
+			screen.getByRole( 'button', { name: 'Cancel upload' } )
+		);
 		expect( mockCancelItem ).toHaveBeenCalledWith(
 			'item-1',
 			expect.any( Error )
@@ -208,7 +210,9 @@ describe( 'UploadingOverlay', () => {
 
 		render( <UploadingOverlay url="blob:123" onCancel={ mockOnCancel } /> );
 
-		await user.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
+		await user.click(
+			screen.getByRole( 'button', { name: 'Cancel upload' } )
+		);
 		expect( mockCancelItem ).not.toHaveBeenCalled();
 		expect( mockOnCancel ).toHaveBeenCalled();
 	} );

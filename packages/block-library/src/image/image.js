@@ -1093,6 +1093,7 @@ export default function Image( {
 						url={ temporaryURL }
 						attachmentId={ id }
 						onCancel={ () => onSelectImage( undefined ) }
+						filename={ getFilename( temporaryURL ) }
 					/>
 				) }
 			</>

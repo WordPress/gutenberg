@@ -54,8 +54,14 @@ export function getOperationLabel( operation ) {
  * @param {string}   props.url          The blob URL of the uploading image.
  * @param {number}   props.attachmentId The attachment ID, used as fallback when url is not available.
  * @param {Function} props.onCancel     Callback when cancel button is clicked.
+ * @param {string}   props.filename     The filename of the uploading image, used for accessible cancel label.
  */
-export default function UploadingOverlay( { url, attachmentId, onCancel } ) {
+export default function UploadingOverlay( {
+	url,
+	attachmentId,
+	onCancel,
+	filename,
+} ) {
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const focusReturnRef = useFocusReturn();
 	const overlayRef = useMergeRefs( [ focusOnMountRef, focusReturnRef ] );
@@ -146,6 +152,15 @@ export default function UploadingOverlay( { url, attachmentId, onCancel } ) {
 				__next40pxDefaultSize
 				variant="secondary"
 				onClick={ handleCancel }
+				aria-label={
+					filename
+						? sprintf(
+								/* translators: %s: filename of the image being uploaded */
+								__( 'Cancel upload of %s' ),
+								filename
+						  )
+						: __( 'Cancel upload' )
+				}
 			>
 				{ __( 'Cancel' ) }
 			</Button>
