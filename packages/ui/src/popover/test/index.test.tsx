@@ -471,6 +471,52 @@ describe( 'Popover', () => {
 	} );
 
 	describe( 'initialFocus', () => {
+		it( 'should focus the first content element, skipping the close button', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup>
+						<Popover.Close>Close</Popover.Close>
+						<button>Content Button</button>
+					</Popover.Popup>
+				</Popover.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Content Button',
+					} )
+				).toHaveFocus();
+			} );
+		} );
+
+		it( 'should fall back to the close button when it is the only tabbable element', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup>
+						<Popover.Close>Close</Popover.Close>
+						<p>No tabbable content here</p>
+					</Popover.Popup>
+				</Popover.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'button', { name: 'Close' } )
+				).toHaveFocus();
+			} );
+		} );
+
 		it( 'should not move focus when initialFocus is false', async () => {
 			const user = userEvent.setup();
 
@@ -478,7 +524,8 @@ describe( 'Popover', () => {
 				<Popover.Root>
 					<Popover.Trigger>Open</Popover.Trigger>
 					<Popover.Popup initialFocus={ false }>
-						<input placeholder="Input" />
+						<Popover.Close>Close</Popover.Close>
+						<button>Content Button</button>
 					</Popover.Popup>
 				</Popover.Root>
 			);
@@ -488,11 +535,43 @@ describe( 'Popover', () => {
 
 			await waitFor( () => {
 				expect(
-					screen.getByPlaceholderText( 'Input' )
+					screen.getByRole( 'button', {
+						name: 'Content Button',
+					} )
 				).toBeInTheDocument();
 			} );
 
-			expect( trigger ).toHaveFocus();
+			expect(
+				screen.getByRole( 'button', { name: 'Content Button' } )
+			).not.toHaveFocus();
+			expect(
+				screen.getByRole( 'button', { name: 'Close' } )
+			).not.toHaveFocus();
+		} );
+
+		it( 'should use a custom initialFocus callback as-is', async () => {
+			const user = userEvent.setup();
+			const customFocus = jest.fn( () => false as const );
+
+			render(
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup initialFocus={ customFocus }>
+						<Popover.Close>Close</Popover.Close>
+						<button>Content Button</button>
+					</Popover.Popup>
+				</Popover.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByText( 'Content Button' )
+				).toBeInTheDocument();
+			} );
+
+			expect( customFocus ).toHaveBeenCalled();
 		} );
 	} );
 } );

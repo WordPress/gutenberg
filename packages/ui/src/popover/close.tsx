@@ -7,7 +7,13 @@ import type { CloseProps } from './types';
  */
 const Close = forwardRef< HTMLButtonElement, CloseProps >(
 	function PopoverClose( props, ref ) {
-		return <_Popover.Close ref={ ref } { ...props } />;
+		return (
+			<_Popover.Close
+				ref={ ref }
+				data-wp-ui-popover-close=""
+				{ ...props }
+			/>
+		);
 	}
 );
 
