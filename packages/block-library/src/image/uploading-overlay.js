@@ -3,7 +3,11 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ProgressBar, Button } from '@wordpress/components';
-import { useLayoutEffect, useRef } from '@wordpress/element';
+import {
+	useFocusOnMount,
+	useFocusReturn,
+	useMergeRefs,
+} from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as uploadMediaStore } from '@wordpress/upload-media';
 
@@ -52,20 +56,9 @@ export function getOperationLabel( operation ) {
  * @param {Function} props.onCancel     Callback when cancel button is clicked.
  */
 export default function UploadingOverlay( { url, attachmentId, onCancel } ) {
-	const overlayRef = useRef();
-
-	// When the overlay unmounts, return focus to the block wrapper if focus
-	// was inside the overlay (e.g. on the Cancel button). useLayoutEffect
-	// runs synchronously before the DOM is repainted, ensuring the overlay
-	// element is still connected when checking focus.
-	useLayoutEffect( () => {
-		const overlay = overlayRef.current;
-		return () => {
-			if ( overlay?.contains( overlay.ownerDocument.activeElement ) ) {
-				overlay.closest( '[data-block]' )?.focus();
-			}
-		};
-	}, [] );
+	const focusOnMountRef = useFocusOnMount( 'firstElement' );
+	const focusReturnRef = useFocusReturn();
+	const overlayRef = useMergeRefs( [ focusOnMountRef, focusReturnRef ] );
 
 	const {
 		progress,
@@ -136,7 +129,11 @@ export default function UploadingOverlay( { url, attachmentId, onCancel } ) {
 	}
 
 	return (
-		<div className="wp-block-image__upload-overlay" ref={ overlayRef }>
+		<div
+			className="wp-block-image__upload-overlay"
+			ref={ overlayRef }
+			tabIndex="-1"
+		>
 			<ProgressBar
 				value={ progressValue }
 				aria-label={ __( 'Upload progress' ) }

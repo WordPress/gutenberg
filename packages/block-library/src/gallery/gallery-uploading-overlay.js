@@ -4,12 +4,11 @@
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { ProgressBar, Button } from '@wordpress/components';
 import {
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useCallback,
-	useState,
-} from '@wordpress/element';
+	useFocusOnMount,
+	useFocusReturn,
+	useMergeRefs,
+} from '@wordpress/compose';
+import { useEffect, useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as uploadMediaStore } from '@wordpress/upload-media';
 
@@ -23,22 +22,12 @@ import { unlock } from '../lock-unlock';
  * on the gallery block when multiple images are being uploaded as a batch.
  */
 export default function GalleryUploadingOverlay() {
-	const overlayRef = useRef();
+	const focusOnMountRef = useFocusOnMount( 'firstElement' );
+	const focusReturnRef = useFocusReturn();
+	const overlayRef = useMergeRefs( [ focusOnMountRef, focusReturnRef ] );
 	// Track the initial total when uploads start so we can show "X of Y"
 	// even as items leave the queue.
 	const [ initialTotal, setInitialTotal ] = useState( 0 );
-
-	// When the overlay unmounts, return focus to the gallery block.
-	// useLayoutEffect runs synchronously before the DOM is repainted,
-	// ensuring the overlay element is still connected when checking focus.
-	useLayoutEffect( () => {
-		const overlay = overlayRef.current;
-		return () => {
-			if ( overlay?.contains( overlay.ownerDocument.activeElement ) ) {
-				overlay.closest( '[data-block]' )?.focus();
-			}
-		};
-	}, [] );
 
 	const { topLevelCount, averageProgress } = useSelect( ( select ) => {
 		const { getAllItems } = unlock( select( uploadMediaStore ) );
@@ -106,7 +95,11 @@ export default function GalleryUploadingOverlay() {
 	);
 
 	return (
-		<div className="wp-block-gallery__upload-overlay" ref={ overlayRef }>
+		<div
+			className="wp-block-gallery__upload-overlay"
+			ref={ overlayRef }
+			tabIndex="-1"
+		>
 			<ProgressBar
 				value={ averageProgress }
 				aria-label={ __( 'Upload progress' ) }
