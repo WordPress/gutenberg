@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `ToggleGroupControl`: Fix accessible association of `help` text ([#76740](https://github.com/WordPress/gutenberg/pull/76740)).
 -   `ComboboxControl`: Fix accessible association of `help` text with the combobox input ([#76761](https://github.com/WordPress/gutenberg/pull/76761)).
 -   `RadioControl`: Add `role="radiogroup"` to the wrapping `fieldset` element ([#76745](https://github.com/WordPress/gutenberg/pull/76745)).
 -   `ControlWithError`: Connect validation error messages to controls via `aria-describedby` ([#76742](https://github.com/WordPress/gutenberg/pull/76742)).
