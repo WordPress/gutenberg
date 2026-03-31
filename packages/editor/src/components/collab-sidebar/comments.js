@@ -1163,6 +1163,7 @@ const CommentBoard = ( {
 						className="editor-collab-sidebar-panel__user-comment"
 						originalText={ suggestionOriginalBlockText }
 						suggestedText={ suggestionText }
+						isActive={ isExpanded }
 					/>
 				) : null }
 				{ showSuggestionPlain ? (

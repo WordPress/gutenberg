@@ -22,6 +22,7 @@ export default function SuggestionDiff( {
 	originalText,
 	suggestedText,
 	className,
+	isActive = false,
 } ) {
 	const [ isDiffView, setIsDiffView ] = useState( false );
 	const parts = useMemo(
@@ -45,16 +46,18 @@ export default function SuggestionDiff( {
 						<strong>{ __( 'Replace by:' ) }</strong>
 					) }
 				</div>
-				<Button
-					__next40pxDefaultSize
-					icon={ shortcode }
-					size="compact"
-					isPressed={ isDiffView }
-					label={ __( 'Show as diff' ) }
-					onClick={ () => setIsDiffView( ( value ) => ! value ) }
-					showTooltip
-					variant="tertiary"
-				/>
+				{ isActive && (
+					<Button
+						__next40pxDefaultSize
+						icon={ shortcode }
+						size="compact"
+						isPressed={ isDiffView }
+						label={ __( 'Show as diff' ) }
+						onClick={ () => setIsDiffView( ( value ) => ! value ) }
+						showTooltip
+						variant="tertiary"
+					/>
+				) }
 			</div>
 			{ isDiffView ? (
 				<span className="editor-revision-fields-diff__value">
