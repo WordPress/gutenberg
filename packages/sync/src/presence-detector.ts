@@ -73,7 +73,10 @@ export function createPresenceDetector(
 		options;
 	let timeoutId: ReturnType< typeof setTimeout > | null = null;
 	let destroyed = false;
-	let isActiveBrowser = document.visibilityState === 'visible';
+	const hasDocument = typeof document !== 'undefined';
+	let isActiveBrowser = hasDocument
+		? document.visibilityState === 'visible'
+		: true;
 
 	function handleVisibilityChange() {
 		const wasActive = isActiveBrowser;
@@ -87,7 +90,9 @@ export function createPresenceDetector(
 		}
 	}
 
-	document.addEventListener( 'visibilitychange', handleVisibilityChange );
+	if ( hasDocument ) {
+		document.addEventListener( 'visibilitychange', handleVisibilityChange );
+	}
 
 	async function poll(): Promise< void > {
 		if ( destroyed ) {
@@ -107,9 +112,14 @@ export function createPresenceDetector(
 			}
 
 			if ( result.otherClientIds.length > 0 ) {
-				// Another editor detected! Notify and stop polling.
-				onCollaboratorDetected();
-				destroy();
+				// Another editor detected! Clean up first, then notify.
+				// Using try/finally ensures polling is stopped even if
+				// the callback throws.
+				try {
+					onCollaboratorDetected();
+				} finally {
+					destroy();
+				}
 				return;
 			}
 		} catch {
@@ -130,10 +140,12 @@ export function createPresenceDetector(
 			clearTimeout( timeoutId );
 			timeoutId = null;
 		}
-		document.removeEventListener(
-			'visibilitychange',
-			handleVisibilityChange
-		);
+		if ( hasDocument ) {
+			document.removeEventListener(
+				'visibilitychange',
+				handleVisibilityChange
+			);
+		}
 	}
 
 	// Start polling.

@@ -815,6 +815,61 @@ describe( 'SyncManager', () => {
 			// (timer should have been cleared on unload).
 			await jest.advanceTimersByTimeAsync( 31_000 );
 		} );
+
+		it( 'starts downgrade when collaborator leaves during async provider creation', async () => {
+			// Simulate slow provider creation so the collaborator can
+			// leave before startAwarenessMonitor runs.
+			let resolveProvider: ( value: unknown ) => void;
+			const slowProvider = new Promise( ( resolve ) => {
+				resolveProvider = resolve;
+			} );
+			mockProviderCreator.mockImplementationOnce( async ( opts ) => {
+				await slowProvider;
+				return mockProviderResult;
+			} );
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+			await tick();
+
+			const awareness = capturedAwareness!;
+			const remoteClientId = 999;
+
+			// Simulate collaborator detected by presence detector.
+			awareness.getStates().set( remoteClientId, { name: 'Peer' } );
+			mockCheckPresence.mockResolvedValue( {
+				otherClientIds: [ remoteClientId ],
+			} );
+			await jest.advanceTimersByTimeAsync( 10_000 );
+			await tick();
+
+			// Collaborator leaves DURING provider creation (before
+			// startAwarenessMonitor has subscribed).
+			awareness.getStates().delete( remoteClientId );
+
+			// Now resolve the slow provider — connectProviders finishes
+			// and startAwarenessMonitor runs its initial check.
+			resolveProvider!( undefined );
+			await tick();
+
+			// The initial awareness check should detect no remote
+			// clients and start the downgrade timer.
+			expect( awareness.getStates().size ).toBeLessThanOrEqual( 1 );
+
+			// Advance past the debounce — should downgrade.
+			await jest.advanceTimersByTimeAsync( 31_000 );
+			await tick();
+
+			// Provider should be destroyed (downgraded).
+			expect( mockProviderResult.destroy ).toHaveBeenCalled();
+		} );
 	} );
 
 	describe( 'unload', () => {

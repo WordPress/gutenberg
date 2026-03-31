@@ -259,7 +259,28 @@ export function createSyncManager( debug = false ): SyncManager {
 						entityId
 					);
 					entityState.presenceDetector = null;
-					void connectProviders( entityId, providerCreators );
+					connectProviders( entityId, providerCreators ).catch(
+						() => {
+							// Reconnection failed — restart presence
+							// detection so we can try again when the
+							// next collaborator is detected.
+							log(
+								'disconnectProviders',
+								'reconnection failed, restarting presence detection',
+								entityId
+							);
+							if (
+								entityStates.has( entityId ) &&
+								! entityState.providerResults &&
+								! entityState.presenceDetector
+							) {
+								disconnectProviders(
+									entityId,
+									providerCreators
+								);
+							}
+						}
+					);
 				},
 			} );
 		}
@@ -332,6 +353,27 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		entityState.awarenessHandler = handler;
 		awareness.on( 'change', handler );
+
+		// Evaluate immediately after subscribing to catch collaborators
+		// that left during the async provider creation window. Without
+		// this, a removed event that fired before the handler was
+		// registered would be missed, leaving the session stuck in
+		// full-sync mode permanently.
+		const currentStates = awareness.getStates();
+		const hasRemoteClientsNow = Array.from( currentStates.keys() ).some(
+			( id ) => id !== localClientId
+		);
+		if ( ! hasRemoteClientsNow && ! entityState.downgradeTimeoutId ) {
+			log(
+				'awarenessMonitor',
+				'no remote clients on initial check, starting downgrade timer',
+				entityId
+			);
+			entityState.downgradeTimeoutId = setTimeout( () => {
+				entityState.downgradeTimeoutId = undefined;
+				disconnectProviders( entityId, providerCreators );
+			}, DOWNGRADE_DEBOUNCE_MS );
+		}
 	}
 
 	/**
@@ -607,7 +649,25 @@ export function createSyncManager( debug = false ): SyncManager {
 						entityId
 					);
 					entityState.presenceDetector = null;
-					void connectProviders( entityId, providerCreators );
+					connectProviders( entityId, providerCreators ).catch(
+						() => {
+							log(
+								'loadEntity',
+								'provider connection failed, restarting presence detection',
+								entityId
+							);
+							if (
+								entityStates.has( entityId ) &&
+								! entityState.providerResults &&
+								! entityState.presenceDetector
+							) {
+								disconnectProviders(
+									entityId,
+									providerCreators
+								);
+							}
+						}
+					);
 				},
 			} );
 		} else {
