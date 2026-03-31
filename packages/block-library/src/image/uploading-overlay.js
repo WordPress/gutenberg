@@ -3,7 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ProgressBar, Button } from '@wordpress/components';
-import { useEffect, useRef } from '@wordpress/element';
+import { useLayoutEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as uploadMediaStore } from '@wordpress/upload-media';
 
@@ -55,15 +55,13 @@ export default function UploadingOverlay( { url, attachmentId, onCancel } ) {
 	const overlayRef = useRef();
 
 	// When the overlay unmounts, return focus to the block wrapper if focus
-	// was inside the overlay (e.g. on the Cancel button). This prevents
-	// focus from being lost to the document body.
-	useEffect( () => {
+	// was inside the overlay (e.g. on the Cancel button). useLayoutEffect
+	// runs synchronously before the DOM is repainted, ensuring the overlay
+	// element is still connected when checking focus.
+	useLayoutEffect( () => {
 		const overlay = overlayRef.current;
 		return () => {
-			if (
-				overlay &&
-				overlay.contains( overlay.ownerDocument.activeElement )
-			) {
+			if ( overlay?.contains( overlay.ownerDocument.activeElement ) ) {
 				overlay.closest( '[data-block]' )?.focus();
 			}
 		};

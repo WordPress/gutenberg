@@ -3,7 +3,13 @@
  */
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { ProgressBar, Button } from '@wordpress/components';
-import { useEffect, useRef, useCallback, useState } from '@wordpress/element';
+import {
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useCallback,
+	useState,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as uploadMediaStore } from '@wordpress/upload-media';
 
@@ -23,13 +29,12 @@ export default function GalleryUploadingOverlay() {
 	const [ initialTotal, setInitialTotal ] = useState( 0 );
 
 	// When the overlay unmounts, return focus to the gallery block.
-	useEffect( () => {
+	// useLayoutEffect runs synchronously before the DOM is repainted,
+	// ensuring the overlay element is still connected when checking focus.
+	useLayoutEffect( () => {
 		const overlay = overlayRef.current;
 		return () => {
-			if (
-				overlay &&
-				overlay.contains( overlay.ownerDocument.activeElement )
-			) {
+			if ( overlay?.contains( overlay.ownerDocument.activeElement ) ) {
 				overlay.closest( '[data-block]' )?.focus();
 			}
 		};
