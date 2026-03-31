@@ -2,7 +2,11 @@
  * Internal dependencies
  */
 import { uploadToServer } from '../upload-to-server';
-import { xhrState, installMockXhr, uninstallMockXhr } from './mock-xhr';
+import {
+	xhrState,
+	installMockXhr,
+	uninstallMockXhr,
+} from '../test-utils/mock-xhr';
 
 // Mock apiFetch as both a callable function and an object with nonceMiddleware.
 const mockApiFetch = jest.fn() as jest.Mock & {
