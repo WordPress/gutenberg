@@ -362,7 +362,7 @@ export default function PostFeaturedImageEdit( {
 								}
 							/>
 						) }
-						{ ! storedFeaturedImage && (
+						{ isDescendentOfQueryLoop && ! storedFeaturedImage && (
 							<ToolsPanelItem
 								label={ __(
 									'Feature the first image'
