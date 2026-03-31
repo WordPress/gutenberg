@@ -5,6 +5,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -18,18 +19,26 @@ import { unlock } from '../../lock-unlock';
  * @param { boolean } enabled
  */
 export const useMetaBoxInitialization = ( enabled ) => {
-	const { isEnabledAndEditorReady, isCollaborationEnabled } = useSelect(
-		( select ) => ( {
-			isEnabledAndEditorReady:
-				enabled && select( editorStore ).__unstableIsEditorReady(),
-			isCollaborationEnabled:
-				select( editorStore ).isCollaborationEnabledForCurrentPost(),
-		} ),
-		[ enabled ]
-	);
+	const { isEnabledAndEditorReady, isCollaborationEnabled, allMetaBoxes } =
+		useSelect(
+			( select ) => ( {
+				isEnabledAndEditorReady:
+					enabled && select( editorStore ).__unstableIsEditorReady(),
+				isCollaborationEnabled:
+					select(
+						editorStore
+					).isCollaborationEnabledForCurrentPost(),
+				allMetaBoxes: enabled
+					? select( editPostStore ).getAllMetaBoxes()
+					: [],
+			} ),
+			[ enabled ]
+		);
+
 	const { setCollaborationSupported } = unlock( useDispatch( coreStore ) );
 
 	const { initializeMetaBoxes } = useDispatch( editPostStore );
+
 	// The effect has to rerun when the editor is ready because initializeMetaBoxes
 	// will noop until then.
 	useEffect( () => {
@@ -38,7 +47,26 @@ export const useMetaBoxInitialization = ( enabled ) => {
 
 			// Disable real-time collaboration when legacy meta boxes are detected.
 			if ( isCollaborationEnabled ) {
-				setCollaborationSupported( false );
+				const metaBoxIds = allMetaBoxes.map( ( { id } ) => id );
+
+				/**
+				 * Filters the list of metabox IDs considered incompatible
+				 * with real-time collaboration.
+				 *
+				 * Developers can remove known-working metabox IDs from this
+				 * array, or return an empty array to ignore all metabox
+				 * incompatibility.
+				 *
+				 * @param {string[]} metaBoxIds Array of all active metabox IDs.
+				 */
+				const incompatibleIds = applyFilters(
+					'editor.incompatibleRtcMetaBoxes',
+					metaBoxIds
+				);
+
+				if ( incompatibleIds.length > 0 ) {
+					setCollaborationSupported( false );
+				}
 			}
 		}
 	}, [
@@ -46,5 +74,6 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		initializeMetaBoxes,
 		isCollaborationEnabled,
 		setCollaborationSupported,
+		allMetaBoxes,
 	] );
 };
