@@ -1,0 +1,46 @@
+# Unsupported
+
+**Name:** `core/missing`
+**Category:** text
+**API Version:** 3
+**Block Type:** Static (saved in post content)
+
+> Your site doesn’t include support for this block.
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `originalName` | `string` | — | — |
+| `originalUndelimitedContent` | `string` | — | — |
+| `originalContent` | `string` | — | Source: `raw` |
+
+## Supports
+
+- **className**: `false`
+- **customClassName**: `false`
+- **inserter**: `false`
+- **html**: `false`
+- **lock**: `false`
+- **reusable**: `false`
+- **renaming**: `false`
+- **visibility**: `false`
+- **interactivity**:
+  - clientNavigation: `true`
+- **customCSS**: `false`
+
+## Block Markup
+
+This is a **static block**. The markup is saved directly in the post content.
+
+```html
+<!-- wp:missing -->
+<!-- Content... -->
+<!-- /wp:missing -->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/missing/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/missing/edit.js)
+- [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/missing/save.js)

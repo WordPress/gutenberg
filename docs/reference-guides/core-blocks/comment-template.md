@@ -1,0 +1,55 @@
+# Comment Template
+
+**Name:** `core/comment-template`
+**Category:** design
+**API Version:** 3
+**Block Type:** Hybrid (static save + server enhancements)
+
+> Contains the block elements used to display a comment, like the title, date, author, avatar and more.
+
+## Block Relationships
+
+**Parent blocks (direct):**
+- `core/comments`
+
+## Attributes
+
+_This block has no custom attributes._
+
+## Supports
+
+- **anchor**: `true`
+- **align**: `true`
+- **html**: `false`
+- **reusable**: `false`
+- **spacing**:
+  - margin: `true`
+  - padding: `true`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+- **interactivity**:
+  - clientNavigation: `true`
+
+## Context
+
+**Uses context:**
+
+- `postId`
+
+## Block Markup
+
+This is a **hybrid block**. It saves static markup that the server may enhance during rendering.
+
+```html
+<!-- wp:comment-template -->
+<!-- Content... -->
+<!-- /wp:comment-template -->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-template/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-template/edit.js)
+- [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-template/save.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-template/index.php)

@@ -1,0 +1,62 @@
+# Table
+
+**Name:** `core/table`
+**Category:** text
+**API Version:** 3
+**Block Type:** Static (saved in post content)
+
+> Create structured content in rows and columns to display information.
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `hasFixedLayout` | `boolean` | `true` | — |
+| `caption` | `rich-text` | — | Source: `rich-text`. Selector: `figcaption`. Role: `content` |
+| `head` | `array` | `[]` | Source: `query`. Selector: `thead tr` |
+| `body` | `array` | `[]` | Source: `query`. Selector: `tbody tr` |
+| `foot` | `array` | `[]` | Source: `query`. Selector: `tfoot tr` |
+
+## Supports
+
+- **anchor**: `true`
+- **align**: `true`
+- **color**:
+  - gradients: `true`
+- **spacing**:
+  - margin: `true`
+  - padding: `true`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+- **interactivity**:
+  - clientNavigation: `true`
+
+## Block Styles
+
+| Style Name | Label | Default |
+|------------|-------|---------|
+| `regular` | Default | Yes |
+| `stripes` | Stripes | No |
+
+## CSS Selectors
+
+- **root**: `.wp-block-table > table`
+- **spacing**: `.wp-block-table`
+
+## Block Markup
+
+This is a **static block**. The markup is saved directly in the post content.
+
+```html
+<!-- wp:table {"hasFixedLayout":true,"head":[],"body":[],"foot":[]} -->
+<!-- Content... -->
+<!-- /wp:table -->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/table/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/table/edit.js)
+- [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/table/save.js)
+- [deprecated.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/table/deprecated.js)

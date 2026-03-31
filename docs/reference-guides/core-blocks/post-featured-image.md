@@ -1,0 +1,75 @@
+# Featured Image
+
+**Name:** `core/post-featured-image`
+**Category:** theme
+**API Version:** 3
+**Block Type:** Dynamic (server-rendered)
+
+> Display a post's featured image.
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `isLink` | `boolean` | `false` | Role: `content` |
+| `aspectRatio` | `string` | — | — |
+| `width` | `string` | — | — |
+| `height` | `string` | — | — |
+| `scale` | `string` | `"cover"` | — |
+| `sizeSlug` | `string` | — | — |
+| `rel` | `string` | `""` | HTML attr: `rel`. Role: `content` |
+| `linkTarget` | `string` | `"_self"` | Role: `content` |
+| `overlayColor` | `string` | — | — |
+| `customOverlayColor` | `string` | — | — |
+| `dimRatio` | `number` | `0` | — |
+| `gradient` | `string` | — | — |
+| `customGradient` | `string` | — | — |
+| `useFirstImageFromPost` | `boolean` | `false` | — |
+
+## Supports
+
+- **anchor**: `true`
+- **align**: `"left"`, `"right"`, `"center"`, `"wide"`, `"full"`
+- **color**:
+  - text: `false`
+  - background: `false`
+- **filter**:
+  - duotone: `true`
+- **shadow**:
+- **html**: `false`
+- **spacing**:
+  - margin: `true`
+  - padding: `true`
+- **interactivity**:
+  - clientNavigation: `true`
+
+## Context
+
+**Uses context:**
+
+- `postId`
+- `postType`
+- `queryId`
+
+## CSS Selectors
+
+- **border**: `.wp-block-post-featured-image img, .wp-block-post-featured-image .block-editor-media-placeholder, .wp-block-post-featured-image .wp-block-post-featured-image__overlay`
+- **shadow**: `.wp-block-post-featured-image img, .wp-block-post-featured-image .components-placeholder`
+- **filter**:
+  - duotone: `.wp-block-post-featured-image img, .wp-block-post-featured-image .wp-block-post-featured-image__placeholder, .wp-block-post-featured-image .components-placeholder__illustration, .wp-block-post-featured-image .components-placeholder::before`
+
+## Block Markup
+
+This is a **dynamic block**. It is rendered on the server and does not save HTML in post content.
+
+In post content, it is stored as a block comment:
+
+```html
+<!-- wp:post-featured-image {"isLink":false,"scale":"cover","rel":"","linkTarget":"_self","dimRatio":0,"useFirstImageFromPost":false} /-->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-featured-image/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-featured-image/edit.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-featured-image/index.php)

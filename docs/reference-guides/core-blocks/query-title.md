@@ -1,0 +1,59 @@
+# Query Title
+
+**Name:** `core/query-title`
+**Category:** theme
+**API Version:** 3
+**Block Type:** Dynamic (server-rendered)
+
+> Display the query title.
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `type` | `string` | — | — |
+| `level` | `number` | `1` | — |
+| `levelOptions` | `array` | — | — |
+| `showPrefix` | `boolean` | `true` | — |
+| `showSearchTerm` | `boolean` | `true` | — |
+
+## Supports
+
+- **anchor**: `true`
+- **align**: `"wide"`, `"full"`
+- **html**: `false`
+- **color**:
+  - gradients: `true`
+- **spacing**:
+  - margin: `true`
+  - padding: `true`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+  - textAlign: `true`
+- **interactivity**:
+  - clientNavigation: `true`
+
+## Context
+
+**Uses context:**
+
+- `query`
+
+## Block Markup
+
+This is a **dynamic block**. It is rendered on the server and does not save HTML in post content.
+
+In post content, it is stored as a block comment:
+
+```html
+<!-- wp:query-title {"level":1,"showPrefix":true,"showSearchTerm":true} /-->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-title/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-title/edit.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-title/index.php)
+- [deprecated.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-title/deprecated.js)
+- [variations.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-title/variations.js)

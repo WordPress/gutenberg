@@ -1,0 +1,93 @@
+# Cover
+
+**Name:** `core/cover`
+**Category:** media
+**API Version:** 3
+**Block Type:** Hybrid (static save + server enhancements)
+
+> Add an image or video with a text overlay.
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `url` | `string` | — | Role: `content` |
+| `useFeaturedImage` | `boolean` | `false` | — |
+| `id` | `number` | — | — |
+| `alt` | `string` | `""` | — |
+| `hasParallax` | `boolean` | `false` | — |
+| `isRepeated` | `boolean` | `false` | — |
+| `dimRatio` | `number` | `100` | — |
+| `overlayColor` | `string` | — | — |
+| `customOverlayColor` | `string` | — | — |
+| `isUserOverlayColor` | `boolean` | — | — |
+| `backgroundType` | `string` | `"image"` | — |
+| `focalPoint` | `object` | — | — |
+| `minHeight` | `number` | — | — |
+| `minHeightUnit` | `string` | — | — |
+| `gradient` | `string` | — | — |
+| `customGradient` | `string` | — | — |
+| `contentPosition` | `string` | — | — |
+| `isDark` | `boolean` | `true` | — |
+| `templateLock` | `string \| boolean` | — | Enum: `all`, `insert`, `contentOnly`, `false` |
+| `tagName` | `string` | `"div"` | — |
+| `sizeSlug` | `string` | — | — |
+| `poster` | `string` | — | Source: `attribute`. Selector: `video`. HTML attr: `poster` |
+
+## Supports
+
+- **anchor**: `true`
+- **align**: `true`
+- **html**: `false`
+- **shadow**: `true`
+- **spacing**:
+  - padding: `true`
+  - margin: `["top","bottom"]`
+  - blockGap: `true`
+- **color**:
+  - heading: `true`
+  - text: `true`
+  - background: `false`
+  - enableContrastChecker: `false`
+- **dimensions**:
+  - aspectRatio: `true`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+- **layout**:
+  - allowJustification: `false`
+- **interactivity**:
+  - clientNavigation: `true`
+- **filter**:
+  - duotone: `true`
+- **allowedBlocks**: `true`
+
+## Context
+
+**Uses context:**
+
+- `postId`
+- `postType`
+
+## CSS Selectors
+
+- **filter**:
+  - duotone: `.wp-block-cover > .wp-block-cover__image-background, .wp-block-cover > .wp-block-cover__video-background`
+
+## Block Markup
+
+This is a **hybrid block**. It saves static markup that the server may enhance during rendering.
+
+```html
+<!-- wp:cover {"useFeaturedImage":false,"alt":"","hasParallax":false,"isRepeated":false,"dimRatio":100,"backgroundType":"image","isDark":true,"tagName":"div"} -->
+<!-- Content... -->
+<!-- /wp:cover -->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/cover/block.json)
+- [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/cover/save.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/cover/index.php)
+- [deprecated.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/cover/deprecated.js)
+- [variations.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/cover/variations.js)

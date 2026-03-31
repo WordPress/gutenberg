@@ -462,6 +462,732 @@
 		"parent": "reference-guides"
 	},
 	{
+		"title": "Accordion Heading",
+		"slug": "core-blocks-accordion-heading",
+		"markdown_source": "../docs/reference-guides/core-blocks/accordion-heading.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Accordion Item",
+		"slug": "core-blocks-accordion-item",
+		"markdown_source": "../docs/reference-guides/core-blocks/accordion-item.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Accordion Panel",
+		"slug": "core-blocks-accordion-panel",
+		"markdown_source": "../docs/reference-guides/core-blocks/accordion-panel.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Accordion",
+		"slug": "core-blocks-accordion",
+		"markdown_source": "../docs/reference-guides/core-blocks/accordion.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Archives",
+		"slug": "core-blocks-archives",
+		"markdown_source": "../docs/reference-guides/core-blocks/archives.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Audio",
+		"slug": "core-blocks-audio",
+		"markdown_source": "../docs/reference-guides/core-blocks/audio.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Avatar",
+		"slug": "core-blocks-avatar",
+		"markdown_source": "../docs/reference-guides/core-blocks/avatar.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Pattern",
+		"slug": "core-blocks-block",
+		"markdown_source": "../docs/reference-guides/core-blocks/block.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Breadcrumbs",
+		"slug": "core-blocks-breadcrumbs",
+		"markdown_source": "../docs/reference-guides/core-blocks/breadcrumbs.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Button",
+		"slug": "core-blocks-button",
+		"markdown_source": "../docs/reference-guides/core-blocks/button.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Buttons",
+		"slug": "core-blocks-buttons",
+		"markdown_source": "../docs/reference-guides/core-blocks/buttons.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Calendar",
+		"slug": "core-blocks-calendar",
+		"markdown_source": "../docs/reference-guides/core-blocks/calendar.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Terms List",
+		"slug": "core-blocks-categories",
+		"markdown_source": "../docs/reference-guides/core-blocks/categories.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Code",
+		"slug": "core-blocks-code",
+		"markdown_source": "../docs/reference-guides/core-blocks/code.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Column",
+		"slug": "core-blocks-column",
+		"markdown_source": "../docs/reference-guides/core-blocks/column.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Columns",
+		"slug": "core-blocks-columns",
+		"markdown_source": "../docs/reference-guides/core-blocks/columns.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comment Author Avatar (deprecated)",
+		"slug": "core-blocks-comment-author-avatar",
+		"markdown_source": "../docs/reference-guides/core-blocks/comment-author-avatar.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comment Author Name",
+		"slug": "core-blocks-comment-author-name",
+		"markdown_source": "../docs/reference-guides/core-blocks/comment-author-name.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comment Content",
+		"slug": "core-blocks-comment-content",
+		"markdown_source": "../docs/reference-guides/core-blocks/comment-content.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comment Date",
+		"slug": "core-blocks-comment-date",
+		"markdown_source": "../docs/reference-guides/core-blocks/comment-date.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comment Edit Link",
+		"slug": "core-blocks-comment-edit-link",
+		"markdown_source": "../docs/reference-guides/core-blocks/comment-edit-link.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comment Reply Link",
+		"slug": "core-blocks-comment-reply-link",
+		"markdown_source": "../docs/reference-guides/core-blocks/comment-reply-link.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comment Template",
+		"slug": "core-blocks-comment-template",
+		"markdown_source": "../docs/reference-guides/core-blocks/comment-template.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comments Next Page",
+		"slug": "core-blocks-comments-pagination-next",
+		"markdown_source": "../docs/reference-guides/core-blocks/comments-pagination-next.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comments Page Numbers",
+		"slug": "core-blocks-comments-pagination-numbers",
+		"markdown_source": "../docs/reference-guides/core-blocks/comments-pagination-numbers.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comments Previous Page",
+		"slug": "core-blocks-comments-pagination-previous",
+		"markdown_source": "../docs/reference-guides/core-blocks/comments-pagination-previous.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comments Pagination",
+		"slug": "core-blocks-comments-pagination",
+		"markdown_source": "../docs/reference-guides/core-blocks/comments-pagination.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comments Title",
+		"slug": "core-blocks-comments-title",
+		"markdown_source": "../docs/reference-guides/core-blocks/comments-title.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comments",
+		"slug": "core-blocks-comments",
+		"markdown_source": "../docs/reference-guides/core-blocks/comments.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Cover",
+		"slug": "core-blocks-cover",
+		"markdown_source": "../docs/reference-guides/core-blocks/cover.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Details",
+		"slug": "core-blocks-details",
+		"markdown_source": "../docs/reference-guides/core-blocks/details.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Embed",
+		"slug": "core-blocks-embed",
+		"markdown_source": "../docs/reference-guides/core-blocks/embed.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "File",
+		"slug": "core-blocks-file",
+		"markdown_source": "../docs/reference-guides/core-blocks/file.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Footnotes",
+		"slug": "core-blocks-footnotes",
+		"markdown_source": "../docs/reference-guides/core-blocks/footnotes.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Input Field",
+		"slug": "core-blocks-form-input",
+		"markdown_source": "../docs/reference-guides/core-blocks/form-input.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Form Submission Notification",
+		"slug": "core-blocks-form-submission-notification",
+		"markdown_source": "../docs/reference-guides/core-blocks/form-submission-notification.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Form Submit Button",
+		"slug": "core-blocks-form-submit-button",
+		"markdown_source": "../docs/reference-guides/core-blocks/form-submit-button.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Form",
+		"slug": "core-blocks-form",
+		"markdown_source": "../docs/reference-guides/core-blocks/form.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Classic",
+		"slug": "core-blocks-freeform",
+		"markdown_source": "../docs/reference-guides/core-blocks/freeform.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Gallery",
+		"slug": "core-blocks-gallery",
+		"markdown_source": "../docs/reference-guides/core-blocks/gallery.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Group",
+		"slug": "core-blocks-group",
+		"markdown_source": "../docs/reference-guides/core-blocks/group.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Heading",
+		"slug": "core-blocks-heading",
+		"markdown_source": "../docs/reference-guides/core-blocks/heading.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Home Link",
+		"slug": "core-blocks-home-link",
+		"markdown_source": "../docs/reference-guides/core-blocks/home-link.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Custom HTML",
+		"slug": "core-blocks-html",
+		"markdown_source": "../docs/reference-guides/core-blocks/html.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Icon",
+		"slug": "core-blocks-icon",
+		"markdown_source": "../docs/reference-guides/core-blocks/icon.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Image",
+		"slug": "core-blocks-image",
+		"markdown_source": "../docs/reference-guides/core-blocks/image.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Latest Comments",
+		"slug": "core-blocks-latest-comments",
+		"markdown_source": "../docs/reference-guides/core-blocks/latest-comments.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Latest Posts",
+		"slug": "core-blocks-latest-posts",
+		"markdown_source": "../docs/reference-guides/core-blocks/latest-posts.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "List Item",
+		"slug": "core-blocks-list-item",
+		"markdown_source": "../docs/reference-guides/core-blocks/list-item.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "List",
+		"slug": "core-blocks-list",
+		"markdown_source": "../docs/reference-guides/core-blocks/list.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Login/out",
+		"slug": "core-blocks-loginout",
+		"markdown_source": "../docs/reference-guides/core-blocks/loginout.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Math",
+		"slug": "core-blocks-math",
+		"markdown_source": "../docs/reference-guides/core-blocks/math.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Media & Text",
+		"slug": "core-blocks-media-text",
+		"markdown_source": "../docs/reference-guides/core-blocks/media-text.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Unsupported",
+		"slug": "core-blocks-missing",
+		"markdown_source": "../docs/reference-guides/core-blocks/missing.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "More",
+		"slug": "core-blocks-more",
+		"markdown_source": "../docs/reference-guides/core-blocks/more.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Custom Link",
+		"slug": "core-blocks-navigation-link",
+		"markdown_source": "../docs/reference-guides/core-blocks/navigation-link.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Navigation Overlay Close",
+		"slug": "core-blocks-navigation-overlay-close",
+		"markdown_source": "../docs/reference-guides/core-blocks/navigation-overlay-close.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Submenu",
+		"slug": "core-blocks-navigation-submenu",
+		"markdown_source": "../docs/reference-guides/core-blocks/navigation-submenu.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Navigation",
+		"slug": "core-blocks-navigation",
+		"markdown_source": "../docs/reference-guides/core-blocks/navigation.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Page Break",
+		"slug": "core-blocks-nextpage",
+		"markdown_source": "../docs/reference-guides/core-blocks/nextpage.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Page List Item",
+		"slug": "core-blocks-page-list-item",
+		"markdown_source": "../docs/reference-guides/core-blocks/page-list-item.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Page List",
+		"slug": "core-blocks-page-list",
+		"markdown_source": "../docs/reference-guides/core-blocks/page-list.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Paragraph",
+		"slug": "core-blocks-paragraph",
+		"markdown_source": "../docs/reference-guides/core-blocks/paragraph.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Pattern Placeholder",
+		"slug": "core-blocks-pattern",
+		"markdown_source": "../docs/reference-guides/core-blocks/pattern.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Playlist track",
+		"slug": "core-blocks-playlist-track",
+		"markdown_source": "../docs/reference-guides/core-blocks/playlist-track.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Playlist",
+		"slug": "core-blocks-playlist",
+		"markdown_source": "../docs/reference-guides/core-blocks/playlist.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Author Biography",
+		"slug": "core-blocks-post-author-biography",
+		"markdown_source": "../docs/reference-guides/core-blocks/post-author-biography.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Author Name",
+		"slug": "core-blocks-post-author-name",
+		"markdown_source": "../docs/reference-guides/core-blocks/post-author-name.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Author (deprecated)",
+		"slug": "core-blocks-post-author",
+		"markdown_source": "../docs/reference-guides/core-blocks/post-author.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comment (deprecated)",
+		"slug": "core-blocks-post-comment",
+		"markdown_source": "../docs/reference-guides/core-blocks/post-comment.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comments Count",
+		"slug": "core-blocks-post-comments-count",
+		"markdown_source": "../docs/reference-guides/core-blocks/post-comments-count.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comments Form",
+		"slug": "core-blocks-post-comments-form",
+		"markdown_source": "../docs/reference-guides/core-blocks/post-comments-form.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Comments Link",
+		"slug": "core-blocks-post-comments-link",
+		"markdown_source": "../docs/reference-guides/core-blocks/post-comments-link.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Content",
+		"slug": "core-blocks-post-content",
+		"markdown_source": "../docs/reference-guides/core-blocks/post-content.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Date",
+		"slug": "core-blocks-post-date",
+		"markdown_source": "../docs/reference-guides/core-blocks/post-date.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Excerpt",
+		"slug": "core-blocks-post-excerpt",
+		"markdown_source": "../docs/reference-guides/core-blocks/post-excerpt.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Featured Image",
+		"slug": "core-blocks-post-featured-image",
+		"markdown_source": "../docs/reference-guides/core-blocks/post-featured-image.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Post Navigation Link",
+		"slug": "core-blocks-post-navigation-link",
+		"markdown_source": "../docs/reference-guides/core-blocks/post-navigation-link.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Post Template",
+		"slug": "core-blocks-post-template",
+		"markdown_source": "../docs/reference-guides/core-blocks/post-template.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Post Terms",
+		"slug": "core-blocks-post-terms",
+		"markdown_source": "../docs/reference-guides/core-blocks/post-terms.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Time to Read",
+		"slug": "core-blocks-post-time-to-read",
+		"markdown_source": "../docs/reference-guides/core-blocks/post-time-to-read.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Title",
+		"slug": "core-blocks-post-title",
+		"markdown_source": "../docs/reference-guides/core-blocks/post-title.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Preformatted",
+		"slug": "core-blocks-preformatted",
+		"markdown_source": "../docs/reference-guides/core-blocks/preformatted.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Pullquote",
+		"slug": "core-blocks-pullquote",
+		"markdown_source": "../docs/reference-guides/core-blocks/pullquote.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "No Results",
+		"slug": "core-blocks-query-no-results",
+		"markdown_source": "../docs/reference-guides/core-blocks/query-no-results.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Next Page",
+		"slug": "core-blocks-query-pagination-next",
+		"markdown_source": "../docs/reference-guides/core-blocks/query-pagination-next.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Page Numbers",
+		"slug": "core-blocks-query-pagination-numbers",
+		"markdown_source": "../docs/reference-guides/core-blocks/query-pagination-numbers.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Previous Page",
+		"slug": "core-blocks-query-pagination-previous",
+		"markdown_source": "../docs/reference-guides/core-blocks/query-pagination-previous.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Pagination",
+		"slug": "core-blocks-query-pagination",
+		"markdown_source": "../docs/reference-guides/core-blocks/query-pagination.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Query Title",
+		"slug": "core-blocks-query-title",
+		"markdown_source": "../docs/reference-guides/core-blocks/query-title.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Query Total",
+		"slug": "core-blocks-query-total",
+		"markdown_source": "../docs/reference-guides/core-blocks/query-total.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Query Loop",
+		"slug": "core-blocks-query",
+		"markdown_source": "../docs/reference-guides/core-blocks/query.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Quote",
+		"slug": "core-blocks-quote",
+		"markdown_source": "../docs/reference-guides/core-blocks/quote.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Read More",
+		"slug": "core-blocks-read-more",
+		"markdown_source": "../docs/reference-guides/core-blocks/read-more.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "RSS",
+		"slug": "core-blocks-rss",
+		"markdown_source": "../docs/reference-guides/core-blocks/rss.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Search",
+		"slug": "core-blocks-search",
+		"markdown_source": "../docs/reference-guides/core-blocks/search.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Separator",
+		"slug": "core-blocks-separator",
+		"markdown_source": "../docs/reference-guides/core-blocks/separator.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Shortcode",
+		"slug": "core-blocks-shortcode",
+		"markdown_source": "../docs/reference-guides/core-blocks/shortcode.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Site Logo",
+		"slug": "core-blocks-site-logo",
+		"markdown_source": "../docs/reference-guides/core-blocks/site-logo.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Site Tagline",
+		"slug": "core-blocks-site-tagline",
+		"markdown_source": "../docs/reference-guides/core-blocks/site-tagline.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Site Title",
+		"slug": "core-blocks-site-title",
+		"markdown_source": "../docs/reference-guides/core-blocks/site-title.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Social Icon",
+		"slug": "core-blocks-social-link",
+		"markdown_source": "../docs/reference-guides/core-blocks/social-link.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Social Icons",
+		"slug": "core-blocks-social-links",
+		"markdown_source": "../docs/reference-guides/core-blocks/social-links.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Spacer",
+		"slug": "core-blocks-spacer",
+		"markdown_source": "../docs/reference-guides/core-blocks/spacer.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Tab Panel",
+		"slug": "core-blocks-tab-panel",
+		"markdown_source": "../docs/reference-guides/core-blocks/tab-panel.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Tab",
+		"slug": "core-blocks-tab",
+		"markdown_source": "../docs/reference-guides/core-blocks/tab.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Table of Contents",
+		"slug": "core-blocks-table-of-contents",
+		"markdown_source": "../docs/reference-guides/core-blocks/table-of-contents.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Table",
+		"slug": "core-blocks-table",
+		"markdown_source": "../docs/reference-guides/core-blocks/table.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Tab Menu Item",
+		"slug": "core-blocks-tabs-menu-item",
+		"markdown_source": "../docs/reference-guides/core-blocks/tabs-menu-item.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Tabs Menu",
+		"slug": "core-blocks-tabs-menu",
+		"markdown_source": "../docs/reference-guides/core-blocks/tabs-menu.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Tabs",
+		"slug": "core-blocks-tabs",
+		"markdown_source": "../docs/reference-guides/core-blocks/tabs.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Tag Cloud",
+		"slug": "core-blocks-tag-cloud",
+		"markdown_source": "../docs/reference-guides/core-blocks/tag-cloud.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Template Part",
+		"slug": "core-blocks-template-part",
+		"markdown_source": "../docs/reference-guides/core-blocks/template-part.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Term Count",
+		"slug": "core-blocks-term-count",
+		"markdown_source": "../docs/reference-guides/core-blocks/term-count.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Term Description",
+		"slug": "core-blocks-term-description",
+		"markdown_source": "../docs/reference-guides/core-blocks/term-description.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Term Name",
+		"slug": "core-blocks-term-name",
+		"markdown_source": "../docs/reference-guides/core-blocks/term-name.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Term Template",
+		"slug": "core-blocks-term-template",
+		"markdown_source": "../docs/reference-guides/core-blocks/term-template.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Terms Query",
+		"slug": "core-blocks-terms-query",
+		"markdown_source": "../docs/reference-guides/core-blocks/terms-query.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Text Columns (deprecated)",
+		"slug": "core-blocks-text-columns",
+		"markdown_source": "../docs/reference-guides/core-blocks/text-columns.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Poetry",
+		"slug": "core-blocks-verse",
+		"markdown_source": "../docs/reference-guides/core-blocks/verse.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Video",
+		"slug": "core-blocks-video",
+		"markdown_source": "../docs/reference-guides/core-blocks/video.md",
+		"parent": "core-blocks"
+	},
+	{
 		"title": "Hooks Reference",
 		"slug": "filters",
 		"markdown_source": "../docs/reference-guides/filters/README.md",

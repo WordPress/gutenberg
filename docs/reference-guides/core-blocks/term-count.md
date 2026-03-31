@@ -1,0 +1,51 @@
+# Term Count
+
+**Name:** `core/term-count`
+**Category:** theme
+**API Version:** 3
+**Block Type:** Dynamic (server-rendered)
+
+> Displays the post count of a taxonomy term.
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `bracketType` | `string` | `"round"` | Enum: `none`, `round`, `square`, `curly`, `angle` |
+
+## Supports
+
+- **anchor**: `true`
+- **html**: `false`
+- **color**:
+  - gradients: `true`
+- **spacing**:
+  - padding: `true`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+- **interactivity**:
+  - clientNavigation: `true`
+
+## Context
+
+**Uses context:**
+
+- `termId`
+- `taxonomy`
+
+## Block Markup
+
+This is a **dynamic block**. It is rendered on the server and does not save HTML in post content.
+
+In post content, it is stored as a block comment:
+
+```html
+<!-- wp:term-count {"bracketType":"round"} /-->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-count/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-count/edit.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-count/index.php)

@@ -1,0 +1,43 @@
+# Form Submission Notification
+
+**Name:** `core/form-submission-notification`
+**Category:** common
+**API Version:** 3
+**Block Type:** Hybrid (static save + server enhancements)
+
+> Provide a notification message after the form has been submitted.
+
+**Keywords:** `form`, `feedback`, `notification`, `message`
+
+## Block Relationships
+
+**Ancestor blocks:**
+- `core/form`
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `type` | `string` | `"success"` | — |
+
+## Supports
+
+_This block does not declare explicit supports._
+
+## Block Markup
+
+This is a **hybrid block**. It saves static markup that the server may enhance during rendering.
+
+```html
+<!-- wp:form-submission-notification {"type":"success"} -->
+<!-- Content... -->
+<!-- /wp:form-submission-notification -->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-submission-notification/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-submission-notification/edit.js)
+- [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-submission-notification/save.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-submission-notification/index.php)
+- [variations.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-submission-notification/variations.js)

@@ -1,0 +1,51 @@
+# Comments Count
+
+**Name:** `core/post-comments-count`
+**Category:** theme
+**API Version:** 3
+**Block Type:** Dynamic (server-rendered)
+
+> Display a post's comments count.
+
+## Attributes
+
+_This block has no custom attributes._
+
+## Supports
+
+- **anchor**: `true`
+- **html**: `false`
+- **color**:
+  - gradients: `true`
+- **spacing**:
+  - margin: `true`
+  - padding: `true`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+  - textAlign: `true`
+- **interactivity**:
+  - clientNavigation: `true`
+
+## Context
+
+**Uses context:**
+
+- `postId`
+
+## Block Markup
+
+This is a **dynamic block**. It is rendered on the server and does not save HTML in post content.
+
+In post content, it is stored as a block comment:
+
+```html
+<!-- wp:post-comments-count /-->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-count/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-count/edit.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-count/index.php)
+- [deprecated.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-count/deprecated.js)

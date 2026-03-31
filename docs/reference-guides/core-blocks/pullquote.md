@@ -1,0 +1,55 @@
+# Pullquote
+
+**Name:** `core/pullquote`
+**Category:** text
+**API Version:** 3
+**Block Type:** Static (saved in post content)
+
+> Give special visual emphasis to a quote from your text.
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `value` | `rich-text` | — | Source: `rich-text`. Selector: `p`. Role: `content` |
+| `citation` | `rich-text` | — | Source: `rich-text`. Selector: `cite`. Role: `content` |
+| `textAlign` | `string` | — | — |
+
+## Supports
+
+- **anchor**: `true`
+- **align**: `"left"`, `"right"`, `"wide"`, `"full"`
+- **background**:
+  - backgroundImage: `true`
+  - backgroundSize: `true`
+- **color**:
+  - gradients: `true`
+  - background: `true`
+  - link: `true`
+- **dimensions**:
+  - minHeight: `true`
+- **spacing**:
+  - margin: `true`
+  - padding: `true`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+- **interactivity**:
+  - clientNavigation: `true`
+
+## Block Markup
+
+This is a **static block**. The markup is saved directly in the post content.
+
+```html
+<!-- wp:pullquote -->
+<!-- Content... -->
+<!-- /wp:pullquote -->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pullquote/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pullquote/edit.js)
+- [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pullquote/save.js)
+- [deprecated.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pullquote/deprecated.js)

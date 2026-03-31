@@ -3,12 +3,13 @@
 /**
  * External dependencies
  */
-const { pascalCase } = require( 'change-case' );
 const fs = require( 'fs' );
-const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
+const { pascalCase } = require( 'change-case' );
+const glob = require( 'glob' ).sync;
 
 const baseRepoUrl = '..';
+const blockPaths = glob( 'docs/reference-guides/core-blocks/*.md' );
 const componentPaths = glob( 'packages/components/src/*/**/README.md', {
 	// Don't expose documentation for mobile only and private components just yet.
 	ignore: [
@@ -88,6 +89,28 @@ function getComponentManifest( paths ) {
 	} );
 }
 
+/**
+ * Generates the block manifest from per-block docs.
+ *
+ * @param {Array} paths Paths for all per-block markdown files.
+ *
+ * @return {Array} Manifest
+ */
+function getBlockManifest( paths ) {
+	return paths.map( ( filePath ) => {
+		const slug = filePath.split( '/' ).pop().replace( '.md', '' );
+		const content = fs.readFileSync( filePath, 'utf8' );
+		const titleMatch = content.match( /^#\s(.+)$/m );
+		const title = titleMatch ? titleMatch[ 1 ] : pascalCase( slug );
+		return {
+			title,
+			slug: `core-blocks-${ slug }`,
+			markdown_source: `${ baseRepoUrl }/${ filePath }`,
+			parent: 'core-blocks',
+		};
+	} );
+}
+
 function getRootManifest( tocFileName ) {
 	return generateRootManifestFromTOCItems( require( tocFileName ) );
 }
@@ -134,6 +157,8 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 			);
 		} else if ( children === '{{packages}}' ) {
 			pageItems = pageItems.concat( getPackageManifest( packagePaths ) );
+		} else if ( children === '{{blocks}}' ) {
+			pageItems = pageItems.concat( getBlockManifest( blockPaths ) );
 		}
 	} );
 

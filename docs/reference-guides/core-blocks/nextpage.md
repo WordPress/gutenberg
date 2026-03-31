@@ -1,0 +1,45 @@
+# Page Break
+
+**Name:** `core/nextpage`
+**Category:** design
+**API Version:** 3
+**Block Type:** Static (saved in post content)
+
+> Separate your content into a multi-page experience.
+
+**Keywords:** `next page`, `pagination`
+
+## Block Relationships
+
+**Parent blocks (direct):**
+- `core/post-content`
+
+## Attributes
+
+_This block has no custom attributes._
+
+## Supports
+
+- **customClassName**: `false`
+- **className**: `false`
+- **html**: `false`
+- **visibility**: `false`
+- **interactivity**:
+  - clientNavigation: `true`
+- **customCSS**: `false`
+
+## Block Markup
+
+This is a **static block**. The markup is saved directly in the post content.
+
+```html
+<!-- wp:nextpage -->
+<!-- Content... -->
+<!-- /wp:nextpage -->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/nextpage/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/nextpage/edit.js)
+- [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/nextpage/save.js)

@@ -1,0 +1,55 @@
+# Comment Author Avatar (deprecated)
+
+**Name:** `core/comment-author-avatar`
+**Category:** theme
+**API Version:** 3
+**Block Type:** Dynamic (server-rendered)
+
+> This block is deprecated. Please use the Avatar block instead.
+
+## Block Relationships
+
+**Ancestor blocks:**
+- `core/comment-template`
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `width` | `number` | `96` | — |
+| `height` | `number` | `96` | — |
+
+## Supports
+
+- **html**: `false`
+- **inserter**: `false`
+- **color**:
+  - background: `true`
+  - text: `false`
+- **spacing**:
+  - margin: `true`
+  - padding: `true`
+- **interactivity**:
+  - clientNavigation: `true`
+
+## Context
+
+**Uses context:**
+
+- `commentId`
+
+## Block Markup
+
+This is a **dynamic block**. It is rendered on the server and does not save HTML in post content.
+
+In post content, it is stored as a block comment:
+
+```html
+<!-- wp:comment-author-avatar {"width":96,"height":96} /-->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-avatar/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-avatar/edit.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-avatar/index.php)

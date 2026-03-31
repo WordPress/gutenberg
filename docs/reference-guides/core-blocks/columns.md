@@ -1,0 +1,65 @@
+# Columns
+
+**Name:** `core/columns`
+**Category:** design
+**API Version:** 3
+**Block Type:** Static (saved in post content)
+
+> Display content in multiple columns, with blocks added to each column.
+
+## Block Relationships
+
+**Allowed inner blocks:**
+- `core/column`
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `verticalAlignment` | `string` | — | — |
+| `isStackedOnMobile` | `boolean` | `true` | — |
+| `templateLock` | `string \| boolean` | — | Enum: `all`, `insert`, `contentOnly`, `false` |
+
+## Supports
+
+- **anchor**: `true`
+- **align**: `"wide"`, `"full"`
+- **html**: `false`
+- **color**:
+  - gradients: `true`
+  - link: `true`
+  - heading: `true`
+  - button: `true`
+- **spacing**:
+  - blockGap: `{"__experimentalDefault":"2em","sides":["horizontal","vertical"]}`
+  - margin: `["top","bottom"]`
+  - padding: `true`
+- **layout**:
+  - allowSwitching: `false`
+  - allowInheriting: `false`
+  - allowEditing: `false`
+  - default: `{"type":"flex","flexWrap":"nowrap"}`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+- **interactivity**:
+  - clientNavigation: `true`
+- **shadow**: `true`
+
+## Block Markup
+
+This is a **static block**. The markup is saved directly in the post content.
+
+```html
+<!-- wp:columns {"isStackedOnMobile":true} -->
+<!-- Content... -->
+<!-- /wp:columns -->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/columns/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/columns/edit.js)
+- [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/columns/save.js)
+- [deprecated.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/columns/deprecated.js)
+- [variations.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/columns/variations.js)

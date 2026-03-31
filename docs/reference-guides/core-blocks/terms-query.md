@@ -1,0 +1,51 @@
+# Terms Query
+
+**Name:** `core/terms-query`
+**Category:** theme
+**API Version:** 3
+**Block Type:** Static (saved in post content)
+
+> An advanced block that allows displaying taxonomy terms based on different query parameters and visual configurations.
+
+**Keywords:** `terms`, `taxonomy`, `categories`, `tags`, `list`
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `termQuery` | `object` | `{"perPage":10,"taxonomy":"category","order":"asc","orderBy":"name","include":[],"hideEmpty":true,"showNested":false,"inherit":false}` | — |
+| `tagName` | `string` | `"div"` | — |
+
+## Supports
+
+- **anchor**: `true`
+- **align**: `"wide"`, `"full"`
+- **html**: `false`
+- **layout**: `true`
+- **interactivity**: `true`
+
+## Context
+
+**Uses context:**
+
+- `templateSlug`
+
+**Provides context:**
+
+- `termQuery` → attribute `termQuery`
+
+## Block Markup
+
+This is a **static block**. The markup is saved directly in the post content.
+
+```html
+<!-- wp:terms-query {"termQuery":{"perPage":10,"taxonomy":"category","order":"asc","orderBy":"name","include":[],"hideEmpty":true,"showNested":false,"inherit":false},"tagName":"div"} -->
+<!-- Content... -->
+<!-- /wp:terms-query -->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/terms-query/block.json)
+- [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/terms-query/save.js)
+- [variations.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/terms-query/variations.js)

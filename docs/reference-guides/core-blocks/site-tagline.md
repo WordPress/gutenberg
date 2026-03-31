@@ -1,0 +1,52 @@
+# Site Tagline
+
+**Name:** `core/site-tagline`
+**Category:** theme
+**API Version:** 3
+**Block Type:** Dynamic (server-rendered)
+
+> Describe in a few words what this site is about. This is important for search results, sharing on social media, and gives overall clarity to visitors.
+
+**Keywords:** `description`
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `level` | `number` | `0` | — |
+| `levelOptions` | `array` | `[0,1,2,3,4,5,6]` | — |
+
+## Supports
+
+- **anchor**: `true`
+- **align**: `"wide"`, `"full"`
+- **html**: `false`
+- **color**:
+  - gradients: `true`
+- **contentRole**: `true`
+- **spacing**:
+  - margin: `true`
+  - padding: `true`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+  - textAlign: `true`
+- **interactivity**:
+  - clientNavigation: `true`
+
+## Block Markup
+
+This is a **dynamic block**. It is rendered on the server and does not save HTML in post content.
+
+In post content, it is stored as a block comment:
+
+```html
+<!-- wp:site-tagline {"level":0,"levelOptions":[0,1,2,3,4,5,6]} /-->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-tagline/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-tagline/edit.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-tagline/index.php)
+- [deprecated.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-tagline/deprecated.js)

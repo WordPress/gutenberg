@@ -1,0 +1,62 @@
+# Title
+
+**Name:** `core/post-title`
+**Category:** theme
+**API Version:** 3
+**Block Type:** Dynamic (server-rendered)
+
+> Displays the title of a post, page, or any other content-type.
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `level` | `number` | `2` | — |
+| `levelOptions` | `array` | — | — |
+| `isLink` | `boolean` | `false` | Role: `content` |
+| `rel` | `string` | `""` | HTML attr: `rel`. Role: `content` |
+| `linkTarget` | `string` | `"_self"` | Role: `content` |
+| `placeholder` | `string` | — | — |
+
+## Supports
+
+- **anchor**: `true`
+- **align**: `"wide"`, `"full"`
+- **html**: `false`
+- **color**:
+  - gradients: `true`
+  - link: `true`
+- **spacing**:
+  - margin: `true`
+  - padding: `true`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+  - textAlign: `true`
+- **interactivity**:
+  - clientNavigation: `true`
+
+## Context
+
+**Uses context:**
+
+- `postId`
+- `postType`
+- `queryId`
+
+## Block Markup
+
+This is a **dynamic block**. It is rendered on the server and does not save HTML in post content.
+
+In post content, it is stored as a block comment:
+
+```html
+<!-- wp:post-title {"level":2,"isLink":false,"rel":"","linkTarget":"_self"} /-->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-title/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-title/edit.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-title/index.php)
+- [deprecated.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-title/deprecated.js)

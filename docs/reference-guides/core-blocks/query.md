@@ -1,0 +1,59 @@
+# Query Loop
+
+**Name:** `core/query`
+**Category:** theme
+**API Version:** 3
+**Block Type:** Hybrid (static save + server enhancements)
+
+> An advanced block that allows displaying post types based on different query parameters and visual configurations.
+
+**Keywords:** `posts`, `list`, `blog`, `blogs`, `custom post types`
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `queryId` | `number` | — | — |
+| `query` | `object` | `{"perPage":null,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true,"taxQuery":null,"parents":[],"format":[]}` | — |
+| `tagName` | `string` | `"div"` | — |
+| `namespace` | `string` | — | — |
+| `enhancedPagination` | `boolean` | `false` | — |
+
+## Supports
+
+- **anchor**: `true`
+- **align**: `"wide"`, `"full"`
+- **html**: `false`
+- **layout**: `true`
+- **interactivity**: `true`
+
+## Context
+
+**Uses context:**
+
+- `templateSlug`
+
+**Provides context:**
+
+- `queryId` → attribute `queryId`
+- `query` → attribute `query`
+- `displayLayout` → attribute `displayLayout`
+- `enhancedPagination` → attribute `enhancedPagination`
+
+## Block Markup
+
+This is a **hybrid block**. It saves static markup that the server may enhance during rendering.
+
+```html
+<!-- wp:query {"query":{"perPage":null,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true,"taxQuery":null,"parents":[],"format":[]},"tagName":"div","enhancedPagination":false} -->
+<!-- Content... -->
+<!-- /wp:query -->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query/block.json)
+- [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query/save.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query/index.php)
+- [deprecated.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query/deprecated.js)
+- [variations.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query/variations.js)

@@ -1,0 +1,66 @@
+# Tab Panel
+
+**Name:** `core/tab-panel`
+**Category:** design
+**API Version:** 3
+**Block Type:** Static (saved in post content)
+
+> Container for tab panel content in a tabbed interface.
+
+## Block Relationships
+
+**Parent blocks (direct):**
+- `core/tabs`
+
+**Allowed inner blocks:**
+- `core/tab`
+
+## Attributes
+
+_This block has no custom attributes._
+
+## Supports
+
+- **anchor**: `false`
+- **html**: `false`
+- **reusable**: `false`
+- **lock**: `false`
+- **dimensions**:
+  - aspectRatio: `false`
+  - height: `false`
+  - minHeight: `false`
+  - width: `false`
+- **color**:
+  - background: `true`
+  - text: `true`
+  - heading: `true`
+  - link: `true`
+- **spacing**:
+  - blockGap: `false`
+  - padding: `true`
+  - margin: `true`
+- **typography**:
+  - fontSize: `true`
+- **layout**:
+  - default: `{"type":"flex","flexWrap":"nowrap","justifyContent":"stretch","orientation":"vertical"}`
+  - allowSwitching: `false`
+  - allowVerticalAlignment: `false`
+  - allowOrientation: `false`
+  - allowJustification: `true`
+  - allowSizingOnChildren: `false`
+
+## Block Markup
+
+This is a **static block**. The markup is saved directly in the post content.
+
+```html
+<!-- wp:tab-panel -->
+<!-- Content... -->
+<!-- /wp:tab-panel -->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-panel/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-panel/edit.js)
+- [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-panel/save.js)

@@ -1,0 +1,58 @@
+# Heading
+
+**Name:** `core/heading`
+**Category:** text
+**API Version:** 3
+**Block Type:** Hybrid (static save + server enhancements)
+
+> Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.
+
+**Keywords:** `title`, `subtitle`
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `content` | `rich-text` | — | Source: `rich-text`. Selector: `h1,h2,h3,h4,h5,h6`. Role: `content` |
+| `level` | `number` | `2` | — |
+| `levelOptions` | `array` | — | — |
+| `placeholder` | `string` | — | — |
+
+## Supports
+
+- **align**: `"wide"`, `"full"`
+- **anchor**: `true`
+- **className**: `true`
+- **splitting**: `true`
+- **color**:
+  - gradients: `true`
+  - link: `true`
+- **spacing**:
+  - margin: `true`
+  - padding: `true`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+  - textAlign: `true`
+  - fitText: `true`
+- **interactivity**:
+  - clientNavigation: `true`
+
+## Block Markup
+
+This is a **hybrid block**. It saves static markup that the server may enhance during rendering.
+
+```html
+<!-- wp:heading {"level":2} -->
+<!-- Content... -->
+<!-- /wp:heading -->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/heading/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/heading/edit.js)
+- [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/heading/save.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/heading/index.php)
+- [deprecated.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/heading/deprecated.js)
+- [variations.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/heading/variations.js)

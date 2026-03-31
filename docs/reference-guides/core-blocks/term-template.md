@@ -1,0 +1,60 @@
+# Term Template
+
+**Name:** `core/term-template`
+**Category:** theme
+**API Version:** 3
+**Block Type:** Hybrid (static save + server enhancements)
+
+> Contains the block elements used to render a taxonomy term, like the name, description, and more.
+
+## Block Relationships
+
+**Ancestor blocks:**
+- `core/terms-query`
+
+## Attributes
+
+_This block has no custom attributes._
+
+## Supports
+
+- **anchor**: `true`
+- **reusable**: `false`
+- **html**: `false`
+- **align**: `"wide"`, `"full"`
+- **layout**: `true`
+- **color**:
+  - gradients: `true`
+  - link: `true`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+- **spacing**:
+  - margin: `true`
+  - padding: `true`
+  - blockGap: `{"__experimentalDefault":"1.25em"}`
+- **interactivity**:
+  - clientNavigation: `true`
+
+## Context
+
+**Uses context:**
+
+- `termQuery`
+
+## Block Markup
+
+This is a **hybrid block**. It saves static markup that the server may enhance during rendering.
+
+```html
+<!-- wp:term-template -->
+<!-- Content... -->
+<!-- /wp:term-template -->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-template/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-template/edit.js)
+- [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-template/save.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-template/index.php)

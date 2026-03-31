@@ -1,0 +1,73 @@
+# Accordion
+
+**Name:** `core/accordion`
+**Category:** design
+**API Version:** 3
+**Block Type:** Hybrid (static save + server enhancements)
+
+> Displays a foldable layout that groups content in collapsible sections.
+
+## Block Relationships
+
+**Allowed inner blocks:**
+- `core/accordion-item`
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `iconPosition` | `string` | `"right"` | — |
+| `showIcon` | `boolean` | `true` | — |
+| `autoclose` | `boolean` | `false` | — |
+| `headingLevel` | `number` | `3` | — |
+| `levelOptions` | `array` | — | — |
+
+## Supports
+
+- **anchor**: `true`
+- **html**: `false`
+- **align**: `"wide"`, `"full"`
+- **background**:
+  - backgroundImage: `true`
+  - backgroundSize: `true`
+- **color**:
+  - background: `true`
+  - gradients: `true`
+- **spacing**:
+  - padding: `true`
+  - margin: `["top","bottom"]`
+  - blockGap: `true`
+- **shadow**: `true`
+- **layout**: `true`
+- **ariaLabel**: `true`
+- **interactivity**: `true`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+- **contentRole**: `true`
+- **listView**: `true`
+
+## Context
+
+**Provides context:**
+
+- `core/accordion-icon-position` → attribute `iconPosition`
+- `core/accordion-show-icon` → attribute `showIcon`
+- `core/accordion-heading-level` → attribute `headingLevel`
+
+## Block Markup
+
+This is a **hybrid block**. It saves static markup that the server may enhance during rendering.
+
+```html
+<!-- wp:accordion {"iconPosition":"right","showIcon":true,"autoclose":false,"headingLevel":3} -->
+<!-- Content... -->
+<!-- /wp:accordion -->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion/edit.js)
+- [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion/save.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion/index.php)

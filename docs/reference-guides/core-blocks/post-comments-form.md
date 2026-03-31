@@ -1,0 +1,52 @@
+# Comments Form
+
+**Name:** `core/post-comments-form`
+**Category:** theme
+**API Version:** 3
+**Block Type:** Dynamic (server-rendered)
+
+> Display a post's comments form.
+
+## Attributes
+
+_This block has no custom attributes._
+
+## Supports
+
+- **anchor**: `true`
+- **html**: `false`
+- **color**:
+  - gradients: `true`
+  - heading: `true`
+  - link: `true`
+- **spacing**:
+  - margin: `true`
+  - padding: `true`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+  - textAlign: `true`
+
+## Context
+
+**Uses context:**
+
+- `postId`
+- `postType`
+
+## Block Markup
+
+This is a **dynamic block**. It is rendered on the server and does not save HTML in post content.
+
+In post content, it is stored as a block comment:
+
+```html
+<!-- wp:post-comments-form /-->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-form/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-form/edit.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-form/index.php)
+- [deprecated.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-form/deprecated.js)

@@ -1,0 +1,63 @@
+# List Item
+
+**Name:** `core/list-item`
+**Category:** text
+**API Version:** 3
+**Block Type:** Static (saved in post content)
+
+> An individual item within a list.
+
+## Block Relationships
+
+**Parent blocks (direct):**
+- `core/list`
+
+**Allowed inner blocks:**
+- `core/list`
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `placeholder` | `string` | — | — |
+| `content` | `rich-text` | — | Source: `rich-text`. Selector: `li`. Role: `content` |
+
+## Supports
+
+- **anchor**: `true`
+- **html**: `false`
+- **className**: `false`
+- **splitting**: `true`
+- **color**:
+  - gradients: `true`
+  - link: `true`
+  - background: `true`
+- **spacing**:
+  - margin: `true`
+  - padding: `true`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+- **interactivity**:
+  - clientNavigation: `true`
+
+## CSS Selectors
+
+- **root**: `.wp-block-list > li`
+- **border**: `.wp-block-list:not(.wp-block-list .wp-block-list) > li`
+
+## Block Markup
+
+This is a **static block**. The markup is saved directly in the post content.
+
+```html
+<!-- wp:list-item -->
+<!-- Content... -->
+<!-- /wp:list-item -->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list-item/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list-item/edit.js)
+- [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list-item/save.js)

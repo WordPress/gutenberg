@@ -1,0 +1,86 @@
+# Button
+
+**Name:** `core/button`
+**Category:** design
+**API Version:** 3
+**Block Type:** Hybrid (static save + server enhancements)
+
+> Prompt visitors to take action with a button-style link.
+
+**Keywords:** `link`
+
+## Block Relationships
+
+**Parent blocks (direct):**
+- `core/buttons`
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `tagName` | `string` | `"a"` | Enum: `a`, `button` |
+| `type` | `string` | `"button"` | — |
+| `url` | `string` | — | Source: `attribute`. Selector: `a`. HTML attr: `href`. Role: `content` |
+| `title` | `string` | — | Source: `attribute`. Selector: `a,button`. HTML attr: `title`. Role: `content` |
+| `text` | `rich-text` | — | Source: `rich-text`. Selector: `a,button`. Role: `content` |
+| `linkTarget` | `string` | — | Source: `attribute`. Selector: `a`. HTML attr: `target`. Role: `content` |
+| `rel` | `string` | — | Source: `attribute`. Selector: `a`. HTML attr: `rel`. Role: `content` |
+| `placeholder` | `string` | — | — |
+| `backgroundColor` | `string` | — | — |
+| `textColor` | `string` | — | — |
+| `gradient` | `string` | — | — |
+
+## Supports
+
+- **anchor**: `true`
+- **splitting**: `true`
+- **align**: `false`
+- **alignWide**: `false`
+- **color**:
+  - gradients: `true`
+- **dimensions**:
+  - width: `true`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+  - textAlign: `true`
+- **reusable**: `false`
+- **shadow**:
+- **spacing**:
+  - padding: `["horizontal","vertical"]`
+- **interactivity**:
+  - clientNavigation: `true`
+
+## Block Styles
+
+| Style Name | Label | Default |
+|------------|-------|---------|
+| `fill` | Fill | Yes |
+| `outline` | Outline | No |
+
+## CSS Selectors
+
+- **root**: `.wp-block-button .wp-block-button__link`
+- **typography**:
+  - writingMode: `.wp-block-button`
+- **dimensions**:
+  - root: `.wp-block-button`
+  - width: `.wp-block-button`
+
+## Block Markup
+
+This is a **hybrid block**. It saves static markup that the server may enhance during rendering.
+
+```html
+<!-- wp:button {"tagName":"a","type":"button"} -->
+<!-- Content... -->
+<!-- /wp:button -->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/button/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/button/edit.js)
+- [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/button/save.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/button/index.php)
+- [deprecated.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/button/deprecated.js)

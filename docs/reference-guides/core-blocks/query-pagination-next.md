@@ -1,0 +1,59 @@
+# Next Page
+
+**Name:** `core/query-pagination-next`
+**Category:** theme
+**API Version:** 3
+**Block Type:** Dynamic (server-rendered)
+
+> Displays the next posts page link.
+
+## Block Relationships
+
+**Parent blocks (direct):**
+- `core/query-pagination`
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `label` | `string` | — | — |
+
+## Supports
+
+- **anchor**: `true`
+- **reusable**: `false`
+- **html**: `false`
+- **color**:
+  - gradients: `true`
+  - text: `false`
+- **typography**:
+  - fontSize: `true`
+  - lineHeight: `true`
+- **interactivity**:
+  - clientNavigation: `true`
+
+## Context
+
+**Uses context:**
+
+- `queryId`
+- `query`
+- `paginationArrow`
+- `showLabel`
+- `enhancedPagination`
+
+## Block Markup
+
+This is a **dynamic block**. It is rendered on the server and does not save HTML in post content.
+
+In post content, it is stored as a block comment:
+
+```html
+<!-- wp:query-pagination-next /-->
+```
+
+## Source
+
+- [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination-next/block.json)
+- [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination-next/edit.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination-next/index.php)
