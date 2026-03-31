@@ -79,6 +79,13 @@ export default function GalleryUploadingOverlay() {
 		}
 	}, [ cancelItem, registry ] );
 
+	const handleKeyDown = ( event ) => {
+		if ( event.key === 'Escape' ) {
+			event.stopPropagation();
+			handleCancel();
+		}
+	};
+
 	// Don't render if there aren't multiple concurrent uploads.
 	if ( initialTotal < 2 || topLevelCount === 0 ) {
 		return null;
@@ -95,10 +102,14 @@ export default function GalleryUploadingOverlay() {
 	);
 
 	return (
+		/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 		<div
 			className="wp-block-gallery__upload-overlay"
 			ref={ overlayRef }
+			role="group"
+			aria-label={ __( 'Upload progress' ) }
 			tabIndex="-1"
+			onKeyDown={ handleKeyDown }
 		>
 			<ProgressBar
 				value={ averageProgress }

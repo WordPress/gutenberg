@@ -110,6 +110,13 @@ export default function UploadingOverlay( {
 		onCancel?.();
 	};
 
+	const handleKeyDown = ( event ) => {
+		if ( event.key === 'Escape' ) {
+			event.stopPropagation();
+			handleCancel();
+		}
+	};
+
 	// Convert progress from 0-100 to percentage for display
 	const progressValue =
 		typeof progress === 'number' ? Math.round( progress ) : undefined;
@@ -135,10 +142,14 @@ export default function UploadingOverlay( {
 	}
 
 	return (
+		/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 		<div
 			className="wp-block-image__upload-overlay"
 			ref={ overlayRef }
+			role="group"
+			aria-label={ __( 'Upload progress' ) }
 			tabIndex="-1"
+			onKeyDown={ handleKeyDown }
 		>
 			<ProgressBar
 				value={ progressValue }
