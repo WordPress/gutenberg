@@ -76,6 +76,13 @@
 	word-break: break-word;
 }
 
+.editor-collab-sidebar-panel__suggestion-diff-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: $grid-unit-10;
+}
+
 .editor-collab-sidebar-panel__suggestion-text {
 	word-break: break-word;
 	padding: $grid-unit-10;
