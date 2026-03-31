@@ -16,9 +16,11 @@
 ### Enhancements
 
 -   `Dialog.Root`: expose `disablePointerDismissal` prop ([#76847](https://github.com/WordPress/gutenberg/pull/76847)).
+-   `Dialog.Popup`: Default `initialFocus` now deprioritizes the close icon, focusing the first tabbable content element instead (following WAI-ARIA APG guidance) ([#76910](https://github.com/WordPress/gutenberg/pull/76910)).
 
 ### Internal
 
+-   Extract `useDeprioritizedInitialFocus` shared hook for reuse across overlay components ([#76910](https://github.com/WordPress/gutenberg/pull/76910)).
 -   `Tabs`: Add development-mode validation for Tab/Panel count matching ([#75170](https://github.com/WordPress/gutenberg/pull/75170)).
 
 ### TypeScript
