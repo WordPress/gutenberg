@@ -77,6 +77,31 @@ function gutenberg_register_block_note_kind_metadata() {
 add_action( 'init', 'gutenberg_register_block_note_kind_metadata' );
 
 /**
+ * Register comment metadata for suggestion accept/reject status.
+ */
+function gutenberg_register_block_note_suggestion_status_metadata() {
+	register_meta(
+		'comment',
+		'_wp_note_suggestion_status',
+		array(
+			'type'          => 'string',
+			'description'   => __( 'Block note suggestion status', 'gutenberg' ),
+			'single'        => true,
+			'show_in_rest'  => array(
+				'schema' => array(
+					'type' => 'string',
+					'enum' => array( 'accepted', 'rejected' ),
+				),
+			),
+			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
+				return current_user_can( 'edit_comment', $object_id );
+			},
+		)
+	);
+}
+add_action( 'init', 'gutenberg_register_block_note_suggestion_status_metadata' );
+
+/**
  * Updates the comment type for avatars in the WordPress REST API.
  *
  * This function adds the 'note' type to the list of comment types

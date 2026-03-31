@@ -683,7 +683,10 @@ function Thread( {
 				isExpanded={ isSelected }
 				onEdit={ ( params = {} ) => {
 					onEditComment( params );
-					if ( params.status === 'approved' ) {
+					if (
+						params.status === 'approved' ||
+						params.meta?._wp_note_suggestion_status
+					) {
 						unselectThread();
 						if ( isFloating ) {
 							relatedBlockElement?.focus();
@@ -920,7 +923,12 @@ const CommentBoard = ( {
 		{
 			id: 'edit',
 			title: __( 'Edit' ),
-			isEligible: ( { status } ) => status !== 'approved',
+			isEligible: ( t ) => {
+				if ( isSuggestionThread ) {
+					return ! t.meta?._wp_note_suggestion_status;
+				}
+				return t.status !== 'approved';
+			},
 			onClick: () => {
 				setActionState( 'edit' );
 			},
@@ -928,7 +936,8 @@ const CommentBoard = ( {
 		{
 			id: 'reopen',
 			title: _x( 'Reopen', 'Reopen note' ),
-			isEligible: ( { status } ) => status === 'approved',
+			isEligible: ( { status } ) =>
+				! isSuggestionThread && status === 'approved',
 			onClick: () => {
 				onEdit( { id: thread.id, status: 'hold' } );
 			},
@@ -944,20 +953,24 @@ const CommentBoard = ( {
 		},
 	];
 
-	const canResolve = thread.parent === 0 && ! isSuggestionThread;
 	const isApproved = thread.status === 'approved';
+	const suggestionStatus = thread.meta?._wp_note_suggestion_status;
+	const isSuggestionDecided =
+		isSuggestionThread &&
+		( suggestionStatus === 'accepted' || suggestionStatus === 'rejected' );
 	const suggestionText = stripHTML( thread.content?.rendered || '' );
-	const isAcceptedSuggestion =
-		isApproved &&
-		suggestionOriginalBlockText?.trim() === suggestionText.trim();
+	const isAcceptedSuggestion = suggestionStatus === 'accepted';
 	const showSuggestionDiff =
-		'edit' !== actionState && isSuggestionThread && ! isApproved;
+		'edit' !== actionState && isSuggestionThread && ! isSuggestionDecided;
 	const showSuggestionPlain =
-		'edit' !== actionState && isSuggestionThread && isApproved;
+		'edit' !== actionState && isSuggestionThread && isSuggestionDecided;
 	const moreActions =
 		parent?.status !== 'approved'
 			? actions.filter( ( item ) => item.isEligible( thread ) )
 			: [];
+
+	const canResolve =
+		thread.parent === 0 && ( ! isSuggestionThread || isSuggestionDecided );
 
 	const deleteConfirmMessage =
 		// When deleting a top level note, descendants will also be deleted.
@@ -1006,7 +1019,7 @@ const CommentBoard = ( {
 									} }
 								/>
 							) }
-							{ isSuggestionThread && (
+							{ isSuggestionThread && ! isSuggestionDecided && (
 								<>
 									<Button
 										label={ _x(
@@ -1015,12 +1028,13 @@ const CommentBoard = ( {
 										) }
 										size="small"
 										icon={ closeSmall }
-										disabled={ isApproved }
-										accessibleWhenDisabled={ isApproved }
 										onClick={ () => {
 											onEdit( {
 												id: thread.id,
-												status: 'approved',
+												meta: {
+													_wp_note_suggestion_status:
+														'rejected',
+												},
 											} );
 										} }
 									/>
@@ -1031,8 +1045,6 @@ const CommentBoard = ( {
 										) }
 										size="small"
 										icon={ published }
-										disabled={ isApproved }
-										accessibleWhenDisabled={ isApproved }
 										onClick={ () => {
 											const suggestedText =
 												thread?.content?.raw;
@@ -1067,7 +1079,10 @@ const CommentBoard = ( {
 
 											onEdit( {
 												id: thread.id,
-												status: 'approved',
+												meta: {
+													_wp_note_suggestion_status:
+														'accepted',
+												},
 											} );
 										} }
 									/>

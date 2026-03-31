@@ -242,7 +242,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 		}
 	};
 
-	const onEdit = async ( { id, content, status, kind } ) => {
+	const onEdit = async ( { id, content, status, kind, meta } ) => {
 		const messageType = status ? status : 'updated';
 		const messages = {
 			approved: __( 'Note marked as resolved.' ),
@@ -288,8 +288,9 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 			} else {
 				const updateData = {
 					id,
-					content,
-					status,
+					...( content !== undefined && { content } ),
+					...( status !== undefined && { status } ),
+					...( meta !== undefined && { meta } ),
 				};
 
 				await saveEntityRecord( 'root', 'comment', updateData, {
