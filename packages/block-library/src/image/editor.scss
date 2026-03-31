@@ -174,7 +174,7 @@ figure.wp-block-image:not(.wp-block) {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	background: rgba(255, 255, 255, 0.95);
+	background: $white;
 	padding: $grid-unit-20;
 	border-radius: $radius-medium;
 	text-align: center;
