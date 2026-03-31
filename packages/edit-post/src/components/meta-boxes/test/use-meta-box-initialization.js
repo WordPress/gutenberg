@@ -93,7 +93,7 @@ describe( 'useMetaBoxInitialization', () => {
 		setCollaborationSupported.mockClear();
 		initializeMetaBoxes.mockClear();
 		removeFilter(
-			'editor.incompatibleRtcMetaBoxes',
+			'editor.rtcIncompatibleMetaBoxes',
 			'test/use-meta-box-initialization'
 		);
 	} );
@@ -115,7 +115,7 @@ describe( 'useMetaBoxInitialization', () => {
 
 	it( 'does not disable collaboration when filter removes all metabox IDs', () => {
 		addFilter(
-			'editor.incompatibleRtcMetaBoxes',
+			'editor.rtcIncompatibleMetaBoxes',
 			'test/use-meta-box-initialization',
 			() => []
 		);
@@ -136,7 +136,7 @@ describe( 'useMetaBoxInitialization', () => {
 
 	it( 'disables collaboration when filter keeps some metabox IDs', () => {
 		addFilter(
-			'editor.incompatibleRtcMetaBoxes',
+			'editor.rtcIncompatibleMetaBoxes',
 			'test/use-meta-box-initialization',
 			( ids ) => ids.filter( ( id ) => id !== 'compatible-metabox' )
 		);
@@ -156,7 +156,7 @@ describe( 'useMetaBoxInitialization', () => {
 
 	it( 'does not disable collaboration when filter removes the only metabox ID', () => {
 		addFilter(
-			'editor.incompatibleRtcMetaBoxes',
+			'editor.rtcIncompatibleMetaBoxes',
 			'test/use-meta-box-initialization',
 			( ids ) => ids.filter( ( id ) => id !== 'compatible-metabox' )
 		);

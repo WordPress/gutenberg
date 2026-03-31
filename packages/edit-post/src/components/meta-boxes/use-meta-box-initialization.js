@@ -66,7 +66,7 @@ export const useMetaBoxInitialization = ( enabled ) => {
 				 * @param {string[]} metaBoxIds Array of all active metabox IDs.
 				 */
 				const incompatibleIds = applyFilters(
-					'editor.incompatibleRtcMetaBoxes',
+					'editor.rtcIncompatibleMetaBoxes',
 					metaBoxIds
 				);
 
