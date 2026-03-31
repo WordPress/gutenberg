@@ -5,6 +5,7 @@ on:
         types:
             - opened
             - synchronize
+            - labeled
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -18,6 +19,7 @@ permissions: {}
 jobs:
     overlapping-prs:
         name: Find overlapping PRs
+        if: contains(github.event.pull_request.labels.*.name, 'check-overlaps')
         runs-on: ubuntu-24.04
         permissions:
             pull-requests: write
