@@ -690,19 +690,13 @@ export const Anchor: Story = {
 		const [ elementAnchor, setElementAnchor ] =
 			useState< HTMLElement | null >( null );
 		const refAnchor = useRef< HTMLDivElement >( null );
+		const virtualAnchorLabel = useRef< HTMLDivElement >( null );
 		const callbackTarget = useRef< HTMLDivElement >( null );
 
 		const virtualAnchor = {
-			getBoundingClientRect: () => ( {
-				x: 400,
-				y: 50,
-				width: 0,
-				height: 0,
-				top: 50,
-				right: 400,
-				bottom: 50,
-				left: 400,
-			} ),
+			getBoundingClientRect: () =>
+				virtualAnchorLabel.current?.getBoundingClientRect() ??
+				new DOMRect(),
 		};
 
 		const anchorBoxStyle = {
@@ -749,8 +743,8 @@ export const Anchor: Story = {
 
 				{ /* 2. VirtualElement anchor */ }
 				<div>
-					<div style={ anchorBoxStyle }>
-						VirtualElement anchor (fixed at 400, 50)
+					<div ref={ virtualAnchorLabel } style={ anchorBoxStyle }>
+						VirtualElement anchor
 					</div>
 					<Popover.Root open>
 						<Popover.Popup
