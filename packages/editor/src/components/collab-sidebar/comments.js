@@ -587,6 +587,13 @@ function Thread( {
 
 	const isSuggestionThread =
 		thread.parent === 0 && thread.meta?._wp_note_kind === 'suggestion';
+	const hasUnresolvedSuggestionInThread = [ thread, ...allReplies ].some(
+		( t ) =>
+			t?.type === 'note' &&
+			t?.meta?._wp_note_kind === 'suggestion' &&
+			t?.meta?._wp_note_suggestion_status !== 'accepted' &&
+			t?.meta?._wp_note_suggestion_status !== 'rejected'
+	);
 
 	const commentExcerpt = getCommentExcerpt(
 		stripHTML( thread.content?.rendered ),
@@ -764,26 +771,28 @@ function Thread( {
 							>
 								<CommentAuthorInfo />
 							</HStack>
-							<Button
-								__next40pxDefaultSize
-								icon={ commentEditLink }
-								isPressed={ isSuggestionMode }
-								label={
-									isSuggestionMode
-										? __( 'Switch to note' )
-										: __( 'Add as suggestion' )
-								}
-								onClick={ () =>
-									setInputMode( ( mode ) =>
-										mode === 'suggestion'
-											? 'note'
-											: 'suggestion'
-									)
-								}
-								showTooltip
-								size="compact"
-								variant="tertiary"
-							/>
+							{ ! hasUnresolvedSuggestionInThread && (
+								<Button
+									__next40pxDefaultSize
+									icon={ commentEditLink }
+									isPressed={ isSuggestionMode }
+									label={
+										isSuggestionMode
+											? __( 'Switch to note' )
+											: __( 'Add as suggestion' )
+									}
+									onClick={ () =>
+										setInputMode( ( mode ) =>
+											mode === 'suggestion'
+												? 'note'
+												: 'suggestion'
+										)
+									}
+									showTooltip
+									size="compact"
+									variant="tertiary"
+								/>
+							) }
 						</HStack>
 						<CommentForm
 							key={ `${ thread.id }-${ inputMode }` }
@@ -810,6 +819,9 @@ function Thread( {
 											? { kind: 'suggestion' }
 											: {} ),
 									} );
+								}
+								if ( isSuggestionMode ) {
+									setInputMode( 'note' );
 								}
 							} }
 							onCancel={ ( event ) => {
