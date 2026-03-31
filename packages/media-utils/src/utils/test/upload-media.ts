@@ -230,6 +230,30 @@ describe( 'uploadMedia', () => {
 		);
 	} );
 
+	it( 'should pass the same onProgress callback to each file in a multi-file upload', () => {
+		const onProgress = jest.fn();
+		const secondImageFile = new window.File(
+			[ 'fake_file_2' ],
+			'test2.jpeg',
+			{ type: 'image/jpeg' }
+		);
+
+		uploadMedia( {
+			filesList: [ imageFile, secondImageFile ],
+			onProgress,
+			wpAllowedMimeTypes: { jpeg: 'image/jpeg' },
+		} );
+
+		expect( uploadToServer ).toHaveBeenCalledTimes( 2 );
+		// Both calls receive the same onProgress callback.
+		expect( ( uploadToServer as jest.Mock ).mock.calls[ 0 ][ 3 ] ).toBe(
+			onProgress
+		);
+		expect( ( uploadToServer as jest.Mock ).mock.calls[ 1 ][ 3 ] ).toBe(
+			onProgress
+		);
+	} );
+
 	it( 'should return error that is not an Error object', () => {
 		( uploadToServer as jest.Mock ).mockImplementation( () => {
 			throw {
