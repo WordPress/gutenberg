@@ -34,7 +34,7 @@ export function buildRestUrl( path: string ): string {
 	// Handle plain permalinks where the API root contains a `?`.
 	// In this case, the path's `?` needs to become `&`.
 	if ( apiRoot.includes( '?' ) ) {
-		normalizedPath = normalizedPath.replace( '?', '&' );
+		normalizedPath = normalizedPath.replaceAll( '?', '&' );
 	}
 
 	let url = apiRoot + normalizedPath;
