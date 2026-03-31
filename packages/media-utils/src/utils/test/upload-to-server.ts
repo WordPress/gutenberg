@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { uploadToServer } from '../upload-to-server';
+import { xhrState, installMockXhr, uninstallMockXhr } from './mock-xhr';
 
 // Mock apiFetch as both a callable function and an object with nonceMiddleware.
 const mockApiFetch = jest.fn() as jest.Mock & {
@@ -31,50 +32,14 @@ jest.mock( '../transform-attachment', () => ( {
 	} ),
 } ) );
 
-// XHR mock.
-let mockXhrInstance: any;
-
-class MockXMLHttpRequest {
-	upload: { onprogress: ( ( e: any ) => void ) | null };
-	onload: ( () => void ) | null;
-	onerror: ( () => void ) | null;
-	onabort: ( () => void ) | null;
-	status: number;
-	responseText: string;
-	withCredentials: boolean;
-	headers: Record< string, string >;
-
-	constructor() {
-		this.upload = { onprogress: null };
-		this.onload = null;
-		this.onerror = null;
-		this.onabort = null;
-		this.status = 200;
-		this.responseText = '';
-		this.withCredentials = false;
-		this.headers = {};
-		mockXhrInstance = this;
-	}
-
-	open = jest.fn();
-	send = jest.fn();
-	abort = jest.fn();
-	setRequestHeader = jest.fn(
-		( name: string, value: string ) => ( this.headers[ name ] = value )
-	);
-}
-
-const OriginalXHR = globalThis.XMLHttpRequest;
-
 describe( 'uploadToServer', () => {
 	beforeEach( () => {
-		mockXhrInstance = null;
-		( globalThis as any ).XMLHttpRequest = MockXMLHttpRequest;
+		installMockXhr();
 	} );
 
 	afterEach( () => {
 		jest.clearAllMocks();
-		( globalThis as any ).XMLHttpRequest = OriginalXHR;
+		uninstallMockXhr();
 	} );
 
 	// --- apiFetch path (no onProgress) ---
@@ -154,20 +119,20 @@ describe( 'uploadToServer', () => {
 		const promise = uploadToServer( file, {}, undefined, onProgress );
 
 		// Simulate successful response.
-		mockXhrInstance.status = 200;
-		mockXhrInstance.responseText = JSON.stringify( {
+		xhrState.instance.status = 200;
+		xhrState.instance.responseText = JSON.stringify( {
 			id: 1,
 			alt_text: '',
 			source_url: 'http://example.com/img.jpg',
 			caption: { raw: '' },
 			title: { raw: '' },
 		} );
-		mockXhrInstance.onload();
+		xhrState.instance.onload();
 
 		await promise;
 
 		expect( mockApiFetch ).not.toHaveBeenCalled();
-		expect( mockXhrInstance.open ).toHaveBeenCalledWith(
+		expect( xhrState.instance.open ).toHaveBeenCalledWith(
 			'POST',
 			expect.stringContaining( '/wp/v2/media' )
 		);
@@ -181,27 +146,27 @@ describe( 'uploadToServer', () => {
 
 		const promise = uploadToServer( file, {}, undefined, onProgress );
 
-		mockXhrInstance.status = 200;
-		mockXhrInstance.responseText = JSON.stringify( {
+		xhrState.instance.status = 200;
+		xhrState.instance.responseText = JSON.stringify( {
 			id: 1,
 			alt_text: '',
 			source_url: 'http://example.com/img.jpg',
 			caption: { raw: '' },
 			title: { raw: '' },
 		} );
-		mockXhrInstance.onload();
+		xhrState.instance.onload();
 
 		await promise;
 
-		expect( mockXhrInstance.setRequestHeader ).toHaveBeenCalledWith(
+		expect( xhrState.instance.setRequestHeader ).toHaveBeenCalledWith(
 			'Accept',
 			'application/json, */*;q=0.1'
 		);
-		expect( mockXhrInstance.setRequestHeader ).toHaveBeenCalledWith(
+		expect( xhrState.instance.setRequestHeader ).toHaveBeenCalledWith(
 			'X-WP-Nonce',
 			'test-nonce-123'
 		);
-		expect( mockXhrInstance.withCredentials ).toBe( true );
+		expect( xhrState.instance.withCredentials ).toBe( true );
 	} );
 
 	it( 'should report progress via onProgress callback', async () => {
@@ -213,27 +178,27 @@ describe( 'uploadToServer', () => {
 		const promise = uploadToServer( file, {}, undefined, onProgress );
 
 		// Simulate progress events.
-		mockXhrInstance.upload.onprogress( {
+		xhrState.instance.upload.onprogress( {
 			lengthComputable: true,
 			loaded: 50,
 			total: 100,
 		} );
-		mockXhrInstance.upload.onprogress( {
+		xhrState.instance.upload.onprogress( {
 			lengthComputable: true,
 			loaded: 100,
 			total: 100,
 		} );
 
 		// Complete the upload.
-		mockXhrInstance.status = 200;
-		mockXhrInstance.responseText = JSON.stringify( {
+		xhrState.instance.status = 200;
+		xhrState.instance.responseText = JSON.stringify( {
 			id: 1,
 			alt_text: '',
 			source_url: 'http://example.com/img.jpg',
 			caption: { raw: '' },
 			title: { raw: '' },
 		} );
-		mockXhrInstance.onload();
+		xhrState.instance.onload();
 
 		await promise;
 
@@ -249,21 +214,21 @@ describe( 'uploadToServer', () => {
 
 		const promise = uploadToServer( file, {}, undefined, onProgress );
 
-		mockXhrInstance.upload.onprogress( {
+		xhrState.instance.upload.onprogress( {
 			lengthComputable: false,
 			loaded: 50,
 			total: 0,
 		} );
 
-		mockXhrInstance.status = 200;
-		mockXhrInstance.responseText = JSON.stringify( {
+		xhrState.instance.status = 200;
+		xhrState.instance.responseText = JSON.stringify( {
 			id: 1,
 			alt_text: '',
 			source_url: 'http://example.com/img.jpg',
 			caption: { raw: '' },
 			title: { raw: '' },
 		} );
-		mockXhrInstance.onload();
+		xhrState.instance.onload();
 
 		await promise;
 
@@ -278,15 +243,15 @@ describe( 'uploadToServer', () => {
 
 		const promise = uploadToServer( file, {}, undefined, onProgress );
 
-		mockXhrInstance.status = 201;
-		mockXhrInstance.responseText = JSON.stringify( {
+		xhrState.instance.status = 201;
+		xhrState.instance.responseText = JSON.stringify( {
 			id: 99,
 			alt_text: 'my alt',
 			source_url: 'http://example.com/img.jpg',
 			caption: { raw: 'cap' },
 			title: { raw: 'title' },
 		} );
-		mockXhrInstance.onload();
+		xhrState.instance.onload();
 
 		const result = await promise;
 		expect( ( result as any ).__transformed ).toBe( true );
@@ -301,12 +266,12 @@ describe( 'uploadToServer', () => {
 
 		const promise = uploadToServer( file, {}, undefined, onProgress );
 
-		mockXhrInstance.status = 400;
-		mockXhrInstance.responseText = JSON.stringify( {
+		xhrState.instance.status = 400;
+		xhrState.instance.responseText = JSON.stringify( {
 			code: 'rest_upload_invalid',
 			message: 'Invalid upload',
 		} );
-		mockXhrInstance.onload();
+		xhrState.instance.onload();
 
 		await expect( promise ).rejects.toEqual( {
 			code: 'rest_upload_invalid',
@@ -322,9 +287,9 @@ describe( 'uploadToServer', () => {
 
 		const promise = uploadToServer( file, {}, undefined, onProgress );
 
-		mockXhrInstance.status = 500;
-		mockXhrInstance.responseText = 'Internal Server Error';
-		mockXhrInstance.onload();
+		xhrState.instance.status = 500;
+		xhrState.instance.responseText = 'Internal Server Error';
+		xhrState.instance.onload();
 
 		await expect( promise ).rejects.toThrow(
 			'Upload failed with status 500'
@@ -339,9 +304,9 @@ describe( 'uploadToServer', () => {
 
 		const promise = uploadToServer( file, {}, undefined, onProgress );
 
-		mockXhrInstance.status = 200;
-		mockXhrInstance.responseText = 'not json';
-		mockXhrInstance.onload();
+		xhrState.instance.status = 200;
+		xhrState.instance.responseText = 'not json';
+		xhrState.instance.onload();
 
 		await expect( promise ).rejects.toThrow( 'Invalid JSON response' );
 	} );
@@ -354,7 +319,7 @@ describe( 'uploadToServer', () => {
 
 		const promise = uploadToServer( file, {}, undefined, onProgress );
 
-		mockXhrInstance.onerror();
+		xhrState.instance.onerror();
 
 		await expect( promise ).rejects.toThrow(
 			'Network error during upload'
@@ -369,7 +334,7 @@ describe( 'uploadToServer', () => {
 
 		const promise = uploadToServer( file, {}, undefined, onProgress );
 
-		mockXhrInstance.onabort();
+		xhrState.instance.onabort();
 
 		await expect( promise ).rejects.toThrow( 'Aborted' );
 		const error = await promise.catch( ( e: unknown ) => e );
@@ -394,7 +359,7 @@ describe( 'uploadToServer', () => {
 
 		await expect( promise ).rejects.toThrow( 'Aborted' );
 		// No XHR should have been created.
-		expect( mockXhrInstance ).toBeNull();
+		expect( xhrState.instance ).toBeNull();
 	} );
 
 	it( 'should call xhr.abort() when signal is aborted mid-upload', async () => {
@@ -414,10 +379,10 @@ describe( 'uploadToServer', () => {
 		// Abort mid-upload.
 		controller.abort();
 
-		expect( mockXhrInstance.abort ).toHaveBeenCalled();
+		expect( xhrState.instance.abort ).toHaveBeenCalled();
 
 		// Simulate the onabort callback that XHR would fire.
-		mockXhrInstance.onabort();
+		xhrState.instance.onabort();
 
 		await expect( promise ).rejects.toThrow( 'Aborted' );
 	} );
@@ -435,19 +400,19 @@ describe( 'uploadToServer', () => {
 
 		const promise = uploadToServer( file, {}, undefined, onProgress );
 
-		mockXhrInstance.status = 200;
-		mockXhrInstance.responseText = JSON.stringify( {
+		xhrState.instance.status = 200;
+		xhrState.instance.responseText = JSON.stringify( {
 			id: 1,
 			alt_text: '',
 			source_url: 'http://example.com/img.jpg',
 			caption: { raw: '' },
 			title: { raw: '' },
 		} );
-		mockXhrInstance.onload();
+		xhrState.instance.onload();
 
 		await promise;
 
-		const nonceCall = mockXhrInstance.setRequestHeader.mock.calls.find(
+		const nonceCall = xhrState.instance.setRequestHeader.mock.calls.find(
 			( [ name ]: [ string ] ) => name === 'X-WP-Nonce'
 		);
 		expect( nonceCall ).toBeUndefined();

@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { sideloadToServer } from '../sideload-to-server';
+import { xhrState, installMockXhr, uninstallMockXhr } from './mock-xhr';
 
 // Mock apiFetch as both a callable function and an object with nonceMiddleware.
 const mockApiFetch = jest.fn() as jest.Mock & {
@@ -31,37 +32,6 @@ jest.mock( '../transform-attachment', () => ( {
 	} ),
 } ) );
 
-// XHR mock.
-let mockXhrInstance: any;
-
-class MockXMLHttpRequest {
-	upload: { onprogress: ( ( e: any ) => void ) | null };
-	onload: ( () => void ) | null;
-	onerror: ( () => void ) | null;
-	onabort: ( () => void ) | null;
-	status: number;
-	responseText: string;
-	withCredentials: boolean;
-
-	constructor() {
-		this.upload = { onprogress: null };
-		this.onload = null;
-		this.onerror = null;
-		this.onabort = null;
-		this.status = 200;
-		this.responseText = '';
-		this.withCredentials = false;
-		mockXhrInstance = this;
-	}
-
-	open = jest.fn();
-	send = jest.fn();
-	abort = jest.fn();
-	setRequestHeader = jest.fn();
-}
-
-const OriginalXHR = globalThis.XMLHttpRequest;
-
 const makeResponse = ( id = 1 ) =>
 	JSON.stringify( {
 		id,
@@ -73,13 +43,12 @@ const makeResponse = ( id = 1 ) =>
 
 describe( 'sideloadToServer', () => {
 	beforeEach( () => {
-		mockXhrInstance = null;
-		( globalThis as any ).XMLHttpRequest = MockXMLHttpRequest;
+		installMockXhr();
 	} );
 
 	afterEach( () => {
 		jest.clearAllMocks();
-		( globalThis as any ).XMLHttpRequest = OriginalXHR;
+		uninstallMockXhr();
 	} );
 
 	// --- apiFetch path ---
@@ -116,13 +85,13 @@ describe( 'sideloadToServer', () => {
 
 		const promise = sideloadToServer( file, 42, {}, undefined, onProgress );
 
-		mockXhrInstance.status = 200;
-		mockXhrInstance.responseText = makeResponse();
-		mockXhrInstance.onload();
+		xhrState.instance.status = 200;
+		xhrState.instance.responseText = makeResponse();
+		xhrState.instance.onload();
 
 		await promise;
 
-		expect( mockXhrInstance.open ).toHaveBeenCalledWith(
+		expect( xhrState.instance.open ).toHaveBeenCalledWith(
 			'POST',
 			expect.stringContaining( '/wp/v2/media/42/sideload' )
 		);
@@ -137,15 +106,15 @@ describe( 'sideloadToServer', () => {
 
 		const promise = sideloadToServer( file, 42, {}, undefined, onProgress );
 
-		mockXhrInstance.upload.onprogress( {
+		xhrState.instance.upload.onprogress( {
 			lengthComputable: true,
 			loaded: 75,
 			total: 100,
 		} );
 
-		mockXhrInstance.status = 200;
-		mockXhrInstance.responseText = makeResponse();
-		mockXhrInstance.onload();
+		xhrState.instance.status = 200;
+		xhrState.instance.responseText = makeResponse();
+		xhrState.instance.onload();
 
 		await promise;
 
@@ -160,9 +129,9 @@ describe( 'sideloadToServer', () => {
 
 		const promise = sideloadToServer( file, 42, {}, undefined, onProgress );
 
-		mockXhrInstance.status = 200;
-		mockXhrInstance.responseText = makeResponse( 99 );
-		mockXhrInstance.onload();
+		xhrState.instance.status = 200;
+		xhrState.instance.responseText = makeResponse( 99 );
+		xhrState.instance.onload();
 
 		const result = await promise;
 		expect( ( result as any ).__transformed ).toBe( true );
@@ -177,7 +146,7 @@ describe( 'sideloadToServer', () => {
 
 		const promise = sideloadToServer( file, 42, {}, undefined, onProgress );
 
-		mockXhrInstance.onerror();
+		xhrState.instance.onerror();
 
 		await expect( promise ).rejects.toThrow(
 			'Network error during upload'
@@ -192,9 +161,9 @@ describe( 'sideloadToServer', () => {
 
 		const promise = sideloadToServer( file, 42, {}, undefined, onProgress );
 
-		mockXhrInstance.status = 403;
-		mockXhrInstance.responseText = 'Forbidden';
-		mockXhrInstance.onload();
+		xhrState.instance.status = 403;
+		xhrState.instance.responseText = 'Forbidden';
+		xhrState.instance.onload();
 
 		await expect( promise ).rejects.toThrow(
 			'Upload failed with status 403'
@@ -219,7 +188,7 @@ describe( 'sideloadToServer', () => {
 		);
 
 		await expect( promise ).rejects.toThrow( 'Aborted' );
-		expect( mockXhrInstance ).toBeNull();
+		expect( xhrState.instance ).toBeNull();
 	} );
 
 	it( 'should call xhr.abort() when signal is aborted mid-upload', async () => {
@@ -238,9 +207,9 @@ describe( 'sideloadToServer', () => {
 		);
 
 		controller.abort();
-		expect( mockXhrInstance.abort ).toHaveBeenCalled();
+		expect( xhrState.instance.abort ).toHaveBeenCalled();
 
-		mockXhrInstance.onabort();
+		xhrState.instance.onabort();
 
 		await expect( promise ).rejects.toThrow( 'Aborted' );
 	} );
