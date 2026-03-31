@@ -287,6 +287,143 @@ test.describe( 'Gallery', () => {
 	} );
 } );
 
+function defer() {
+	let resolve;
+	const promise = new Promise( ( r ) => {
+		resolve = r;
+	} );
+	promise.resolve = resolve;
+	return promise;
+}
+
+// The gallery batch upload overlay requires client-side media processing
+// (which populates the upload-media store). Client-side media processing
+// depends on SharedArrayBuffer / cross-origin isolation, which may not be
+// available in all e2e test environments.
+// These tests are skipped until cross-origin isolation is reliably available.
+// eslint-disable-next-line playwright/no-skipped-test
+test.describe.skip( 'Gallery - upload progress overlay', () => {
+	test.use( {
+		galleryBlockUtils: async ( { page }, use ) => {
+			await use( new GalleryBlockUtils( { page } ) );
+		},
+	} );
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+	} );
+
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+	} );
+
+	test( 'shows consolidated progress overlay for batch uploads', async ( {
+		editor,
+		page,
+		galleryBlockUtils,
+	} ) => {
+		const deferred = defer();
+
+		// Intercept media uploads to hold them in-flight.
+		await page.route(
+			( url ) => url.pathname.includes( '/wp/v2/media' ),
+			async ( route, request ) => {
+				if ( request.method() === 'POST' ) {
+					await deferred;
+					await route.continue();
+				} else {
+					await route.continue();
+				}
+			}
+		);
+
+		await editor.insertBlock( { name: 'core/gallery' } );
+		const galleryBlock = editor.canvas.locator(
+			'role=document[name="Block: Gallery"i]'
+		);
+		await expect( galleryBlock ).toBeVisible();
+
+		// Upload multiple files to trigger the batch overlay.
+		await galleryBlockUtils.uploadMultiple(
+			galleryBlock.locator( 'data-testid=form-file-upload-input' ),
+			3
+		);
+
+		// The consolidated gallery overlay should appear.
+		const overlay = editor.canvas.locator(
+			'.wp-block-gallery__upload-overlay'
+		);
+		await expect( overlay ).toBeVisible( { timeout: 10_000 } );
+
+		// Should show "Processing image X of Y" text.
+		const label = overlay.locator(
+			'.wp-block-gallery__upload-overlay-label'
+		);
+		await expect( label ).toHaveText( /Processing image \d+ of \d+/ );
+
+		// Individual image overlays should NOT be shown inside the gallery.
+		await expect(
+			galleryBlock.locator( '.wp-block-image__upload-overlay' )
+		).toHaveCount( 0 );
+
+		// Release the uploads.
+		deferred.resolve();
+
+		// Gallery overlay should disappear after all uploads complete.
+		await expect( overlay ).toBeHidden( { timeout: 30_000 } );
+	} );
+
+	test( 'can cancel batch upload via gallery overlay', async ( {
+		editor,
+		page,
+		galleryBlockUtils,
+	} ) => {
+		const deferred = defer();
+
+		await page.route(
+			( url ) => url.pathname.includes( '/wp/v2/media' ),
+			async ( route, request ) => {
+				if ( request.method() === 'POST' ) {
+					await deferred;
+					await route.continue();
+				} else {
+					await route.continue();
+				}
+			}
+		);
+
+		await editor.insertBlock( { name: 'core/gallery' } );
+		const galleryBlock = editor.canvas.locator(
+			'role=document[name="Block: Gallery"i]'
+		);
+		await expect( galleryBlock ).toBeVisible();
+
+		await galleryBlockUtils.uploadMultiple(
+			galleryBlock.locator( 'data-testid=form-file-upload-input' ),
+			3
+		);
+
+		// Wait for the overlay to appear.
+		const overlay = editor.canvas.locator(
+			'.wp-block-gallery__upload-overlay'
+		);
+		await expect( overlay ).toBeVisible( { timeout: 10_000 } );
+
+		// Click Cancel.
+		await overlay.getByRole( 'button', { name: 'Cancel' } ).click();
+
+		// Overlay should disappear.
+		await expect( overlay ).toBeHidden( { timeout: 10_000 } );
+
+		// Release held requests to avoid hanging.
+		deferred.resolve();
+	} );
+} );
+
 class GalleryBlockUtils {
 	constructor( { page } ) {
 		this.page = page;
@@ -312,5 +449,24 @@ class GalleryBlockUtils {
 		await inputElement.setInputFiles( tmpFileName );
 
 		return fileName;
+	}
+
+	async uploadMultiple( inputElement, count ) {
+		const tmpDirectory = await fs.mkdtemp(
+			path.join( os.tmpdir(), 'gutenberg-test-gallery-' )
+		);
+		const fileNames = [];
+		const filePaths = [];
+		for ( let i = 0; i < count; i++ ) {
+			const fileName = uuid();
+			const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
+			await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
+			fileNames.push( fileName );
+			filePaths.push( tmpFileName );
+		}
+
+		await inputElement.setInputFiles( filePaths );
+
+		return fileNames;
 	}
 }
