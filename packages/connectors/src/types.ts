@@ -16,8 +16,8 @@ export type ConnectorAuthentication =
 	| { method: 'none' };
 
 export interface ConnectorPlugin {
-	slug: string;
-	pluginFile?: string | null;
+	file: string;
+	isInstalled: boolean;
 	isActivated: boolean;
 }
 
