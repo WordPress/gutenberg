@@ -1,24 +1,12 @@
+import type { Dialog as _Dialog } from '@base-ui/react/dialog';
 import { useMemo, useRef } from '@wordpress/element';
 import { tabbable } from 'tabbable';
 
 /**
- * Interaction type values matching Base UI's `InteractionType`.
- * Defined locally to avoid importing from the private
- * `@base-ui/utils/useEnhancedClickHandler` path.
+ * Derived from Base UI's `Dialog.Popup.Props['initialFocus']`.
+ * The same type is shared by all Base UI overlay popups (Dialog, Popover, etc.).
  */
-type InteractionType = 'mouse' | 'touch' | 'pen' | 'keyboard' | '';
-
-/**
- * The `initialFocus` prop type shared by Base UI overlay components
- * (Dialog.Popup, Popover.Popup, etc.).
- */
-type InitialFocus =
-	| boolean
-	| React.RefObject< HTMLElement | null >
-	| ( (
-			interactionType: InteractionType
-	  ) => boolean | HTMLElement | null | void )
-	| undefined;
+type InitialFocus = _Dialog.Popup.Props[ 'initialFocus' ];
 
 /**
  * Options matching Base UI's internal tabbable configuration.
@@ -62,14 +50,12 @@ export function useDeprioritizedInitialFocus( {
 } ) {
 	const popupRef = useRef< HTMLDivElement >( null );
 
-	const resolvedInitialFocus = useMemo( () => {
+	const resolvedInitialFocus = useMemo( (): InitialFocus => {
 		if ( initialFocus !== undefined && initialFocus !== true ) {
 			return initialFocus;
 		}
 
-		return (
-			interactionType: InteractionType
-		): HTMLElement | boolean | null => {
+		return ( interactionType ): HTMLElement | boolean | null => {
 			if ( interactionType === 'touch' ) {
 				return popupRef.current ?? true;
 			}
