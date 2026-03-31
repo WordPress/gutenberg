@@ -26,7 +26,7 @@ import { unlock } from '../lock-unlock';
  * @param {string|undefined} operation The current operation type.
  * @return {string} The localized label for the operation.
  */
-export function getOperationLabel( operation ) {
+function getOperationLabel( operation ) {
 	switch ( operation ) {
 		case 'PREPARE':
 			return __( 'Preparing…' );
