@@ -64,7 +64,9 @@ export interface PopupProps
 	 * Whether to render the popup inline without a portal.
 	 *
 	 * When `true`, the popup is rendered in place within the DOM hierarchy
-	 * instead of being portaled to `document.body`.
+	 * instead of being portaled to `document.body`. Positioning props
+	 * (`side`, `align`, etc.) still work, but `container` is ignored and
+	 * `backdrop` will not cover the viewport as expected.
 	 *
 	 * @default false
 	 */
