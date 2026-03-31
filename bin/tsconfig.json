@@ -25,6 +25,7 @@
 		"plugin/commands/test/common.js",
 		"api-docs/are-api-docs-unstaged.js",
 		"api-docs/gen-block-lib-list.js",
+		"api-docs/generate-block-docs.mjs",
 		"api-docs/gen-components-docs/get-subcomponent-descriptions.mjs",
 		"api-docs/gen-components-docs/get-tags-from-storybook.mjs",
 		"api-docs/gen-components-docs/index.mjs",
