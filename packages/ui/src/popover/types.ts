@@ -38,6 +38,16 @@ export interface PopupProps
 		>,
 		Pick< _Popover.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
+	 * Whether to render a backdrop overlay behind the popover.
+	 *
+	 * Typically used with `modal` to signal that interaction with the rest
+	 * of the page is blocked. The backdrop is a semi-transparent dark overlay.
+	 *
+	 * @default false
+	 */
+	backdrop?: boolean;
+
+	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;

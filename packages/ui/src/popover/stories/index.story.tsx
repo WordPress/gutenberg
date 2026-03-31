@@ -228,6 +228,9 @@ export const Controlled: Story = {
  * This is useful for complex popover content that requires user interaction,
  * such as forms. Try tabbing through the fields — focus stays inside the
  * popover until it is dismissed.
+ *
+ * Pass `backdrop` to `Popover.Popup` to display a semi-transparent overlay
+ * beneath the popover, signalling that the page is blocked.
  */
 export const Modal: Story = {
 	argTypes: { modal: { control: false } },
@@ -236,7 +239,7 @@ export const Modal: Story = {
 		children: (
 			<>
 				<Popover.Trigger>Edit Settings</Popover.Trigger>
-				<Popover.Popup>
+				<Popover.Popup backdrop>
 					<Popover.Arrow />
 					<Popover.Title>Settings</Popover.Title>
 					<form

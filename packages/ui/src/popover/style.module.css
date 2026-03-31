@@ -35,4 +35,11 @@
 		line-height: var(--wpds-font-line-height-sm);
 		color: var(--wpds-color-fg-content-neutral-weak);
 	}
+
+	.backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: var(--wp-ui-popover-z-index, initial);
+		background-color: rgba(0, 0, 0, 0.15);
+	}
 }

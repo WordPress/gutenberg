@@ -22,6 +22,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		align = 'center',
 		alignOffset,
 		anchor,
+		backdrop = false,
 		children,
 		className,
 		collisionAvoidance,
@@ -41,6 +42,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	ref
 ) {
 	const inlineContainerRef = useRef< HTMLSpanElement >( null );
+
+	const backdropElement = backdrop ? (
+		<_Popover.Backdrop className={ styles.backdrop } />
+	) : null;
 
 	const positioner = (
 		<_Popover.Positioner
@@ -82,6 +87,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 					style={ { display: 'contents' } }
 				/>
 				<_Popover.Portal container={ inlineContainerRef }>
+					{ backdropElement }
 					{ positioner }
 				</_Popover.Portal>
 			</>
@@ -90,6 +96,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 
 	return (
 		<_Popover.Portal container={ container }>
+			{ backdropElement }
 			{ positioner }
 		</_Popover.Portal>
 	);
