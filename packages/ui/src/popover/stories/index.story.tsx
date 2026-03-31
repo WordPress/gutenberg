@@ -382,6 +382,10 @@ export const OverlayPlacement: Story = {
  * hierarchy instead of being portaled to `document.body`. This can be
  * useful when you need the popup to participate in the surrounding layout
  * or inherit styles from a parent.
+ *
+ * Positioning props (`side`, `align`, collision settings, etc.) still work
+ * normally. However, `container` is ignored (the portal target is managed
+ * internally) and `backdrop` will not cover the full viewport.
  */
 export const Inline: Story = {
 	args: {
@@ -845,8 +849,10 @@ export const ToolbarVariant: Story = {
  * Base UI's Positioner exposes `--available-height` and
  * `--available-width` CSS variables representing the space
  * between the anchor and the viewport edge. Apply them as `max-height` /
- * `max-width` on the popup content to constrain its size to the available
- * space — this replaces the legacy Popover's `resize` prop.
+ * `max-width` via the `style` prop (which targets the positioner) to
+ * constrain the popup size. Then add `overflow: auto` on an inner wrapper
+ * so scrolling happens inside the popup content area — this replaces the
+ * legacy Popover's `resize` prop.
  *
  * Open the popover and resize or scroll the container to see the popup shrink
  * to fit.
@@ -872,20 +878,21 @@ export const ViewportConstrainedSize: Story = {
 						style={ {
 							maxHeight: 'var(--available-height, 300px)',
 							maxWidth: 'var(--available-width, 300px)',
-							overflow: 'auto',
 						} }
 					>
-						<Popover.Title>Constrained</Popover.Title>
-						<Popover.Description>
-							This popup constrains its size using the
-							`--available-height` and `--available-width` CSS
-							variables exposed by the positioner.
-						</Popover.Description>
-						<div style={ { height: 400 } }>
-							<p>
-								Scroll inside this popup — its max-height is
-								capped to the available viewport space.
-							</p>
+						<div style={ { overflow: 'auto', height: '100%' } }>
+							<Popover.Title>Constrained</Popover.Title>
+							<Popover.Description>
+								This popup constrains its size using the
+								`--available-height` and `--available-width` CSS
+								variables exposed by the positioner.
+							</Popover.Description>
+							<div style={ { height: 400 } }>
+								<p>
+									Scroll inside this popup — its max-height is
+									capped to the available viewport space.
+								</p>
+							</div>
 						</div>
 					</Popover.Popup>
 				</Popover.Root>

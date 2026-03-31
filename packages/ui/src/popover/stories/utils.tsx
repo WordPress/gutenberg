@@ -11,6 +11,9 @@ import type { RefCallback } from 'react';
 /**
  * Tracks the dimensions of a DOM element via ResizeObserver.
  * Returns a ref callback to attach to the element and its current size.
+ *
+ * The ref callback performs a synchronous `getBoundingClientRect` read so
+ * the first render already has accurate dimensions (avoids a 0×0 flash).
  */
 export function useMeasure< TRef extends HTMLElement >() {
 	const [ element, setElement ] = useState< TRef | null >( null );
@@ -24,19 +27,11 @@ export function useMeasure< TRef extends HTMLElement >() {
 			return;
 		}
 
-		function update() {
-			const bcr = element!.getBoundingClientRect();
-			setElementSize( {
-				width: bcr.width,
-				height: bcr.height,
-			} );
-		}
-
 		const resizeObserver = new ResizeObserver( () => {
-			update();
+			const bcr = element.getBoundingClientRect();
+			setElementSize( { width: bcr.width, height: bcr.height } );
 		} );
 		resizeObserver.observe( element );
-		update();
 
 		return () => {
 			resizeObserver.disconnect();
@@ -44,6 +39,10 @@ export function useMeasure< TRef extends HTMLElement >() {
 	}, [ element ] );
 
 	const elementRef: RefCallback< TRef > = ( node ) => {
+		if ( node ) {
+			const bcr = node.getBoundingClientRect();
+			setElementSize( { width: bcr.width, height: bcr.height } );
+		}
 		setElement( node );
 	};
 
