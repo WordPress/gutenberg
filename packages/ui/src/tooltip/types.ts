@@ -2,7 +2,10 @@ import type { ReactNode } from 'react';
 import type { Tooltip } from '@base-ui/react/tooltip';
 import type { ComponentProps } from '../utils/types';
 
-export type RootProps = Pick< Tooltip.Root.Props, 'disabled' | 'children' >;
+export type RootProps = Pick<
+	Tooltip.Root.Props,
+	'disabled' | 'children' | 'open' | 'defaultOpen' | 'onOpenChange'
+>;
 
 export type ProviderProps = Pick<
 	Tooltip.Provider.Props,

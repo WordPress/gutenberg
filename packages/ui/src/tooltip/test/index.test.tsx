@@ -65,6 +65,21 @@ describe( 'Tooltip', () => {
 		} );
 	} );
 
+	it( 'shows tooltip when controlled open', async () => {
+		render(
+			<TestProvider>
+				<Tooltip.Root open>
+					<Tooltip.Trigger>Hover me</Tooltip.Trigger>
+					<Tooltip.Popup>Tooltip content</Tooltip.Popup>
+				</Tooltip.Root>
+			</TestProvider>
+		);
+
+		await waitFor( () => {
+			expect( screen.getByText( 'Tooltip content' ) ).toBeVisible();
+		} );
+	} );
+
 	it( 'does not show tooltip when disabled', async () => {
 		const user = userEvent.setup();
 

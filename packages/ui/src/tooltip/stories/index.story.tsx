@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from '@wordpress/element';
 import { formatBold, formatItalic } from '@wordpress/icons';
 import { Icon, Tooltip } from '../..';
 
@@ -79,6 +80,28 @@ export const Positioning: StoryObj< typeof Tooltip.Root > = {
  * This is useful when you have multiple tooltips and want them to share
  * the same delay configuration.
  */
+/**
+ * Use the `open` and `onOpenChange` props to take full control over the
+ * tooltip's visibility. This example toggles the tooltip on click.
+ */
+export const Controlled: StoryObj< typeof Tooltip.Root > = {
+	render: () => {
+		const [ open, setOpen ] = useState( false );
+
+		return (
+			<>
+				<button onClick={ () => setOpen( ( v ) => ! v ) }>
+					Toggle tooltip
+				</button>
+				<Tooltip.Root open={ open } onOpenChange={ setOpen }>
+					<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
+					<Tooltip.Popup>Save</Tooltip.Popup>
+				</Tooltip.Root>
+			</>
+		);
+	},
+};
+
 export const WithProvider: StoryObj< typeof Tooltip.Root > = {
 	render: () => (
 		<Tooltip.Provider delay={ 0 }>
