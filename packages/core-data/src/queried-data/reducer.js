@@ -30,24 +30,32 @@ function getContextFromAction( action ) {
  * Returns a merged array of item IDs, given details of the received paginated
  * items. The array is sparse-like with `undefined` entries where holes exist.
  *
- * @param {?Array<number>} itemIds     Original item IDs (default empty array).
- * @param {number[]}       nextItemIds Item IDs to merge.
- * @param {number}         page        Page of items merged.
- * @param {number}         perPage     Number of items per page.
+ * @param {number[]|undefined} itemIds          Original item IDs (default empty array).
+ * @param {number[]}           nextItemIds      Item IDs to merge.
+ * @param {Object}             options          Options object.
+ * @param {number}             [options.page]   Page of items merged.
+ * @param {number}             [options.offset] Offset of items merged.
+ * @param {number}             options.perPage  Number of items per page.
  *
  * @return {number[]} Merged array of item IDs.
  */
-export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
-	const receivedAllIds = page === 1 && perPage === -1;
-	if ( receivedAllIds ) {
+export function getMergedItemIds(
+	itemIds = [],
+	nextItemIds,
+	// The defaults for `page` and `perPage` are the same as in `getQueryParts`.
+	{ page = 1, offset, perPage = 10 } = {}
+) {
+	// If the query is unbounded, then `nextItemIds` is a complete replacement.
+	if ( perPage === -1 ) {
 		return nextItemIds;
 	}
-	const nextItemIdsStartIndex = ( page - 1 ) * perPage;
+
+	const nextItemIdsStartIndex = offset ?? ( page - 1 ) * perPage;
 
 	// If later page has already been received, default to the larger known
 	// size of the existing array, else calculate as extending the existing.
 	const size = Math.max(
-		itemIds?.length ?? 0,
+		itemIds.length,
 		nextItemIdsStartIndex + nextItemIds.length
 	);
 
@@ -60,9 +68,11 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 		// a page could receive fewer than what was previously stored.
 		const isInNextItemsRange =
 			i >= nextItemIdsStartIndex && i < nextItemIdsStartIndex + perPage;
-		mergedItemIds[ i ] = isInNextItemsRange
-			? nextItemIds[ i - nextItemIdsStartIndex ]
-			: itemIds?.[ i ];
+		if ( isInNextItemsRange ) {
+			mergedItemIds[ i ] = nextItemIds[ i - nextItemIdsStartIndex ];
+		} else {
+			mergedItemIds[ i ] = itemIds[ i ];
+		}
 	}
 
 	return mergedItemIds;
@@ -244,10 +254,13 @@ const receiveQueries = compose( [
 
 	return {
 		itemIds: getMergedItemIds(
-			state?.itemIds || [],
+			state.itemIds,
 			action.items.map( ( item ) => item?.[ key ] ).filter( Boolean ),
-			action.page,
-			action.perPage
+			{
+				page: action.page,
+				offset: action.offset,
+				perPage: action.perPage,
+			}
 		),
 		meta: action.meta,
 	};

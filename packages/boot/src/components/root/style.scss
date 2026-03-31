@@ -51,6 +51,7 @@
 	.boot-layout--single-page & {
 		top: variables.$admin-bar-height-big;
 	}
+
 	z-index: 3;
 	background: var(--wpds-color-bg-surface-neutral);
 	padding: variables.$grid-unit-20;
@@ -112,6 +113,10 @@
 		height: auto;
 		border-radius: 8px;
 		margin: 0;
+
+		.boot-layout--single-page & {
+			height: auto;
+		}
 	}
 }
 
@@ -164,6 +169,10 @@
 		height: auto;
 		border-radius: 8px;
 		z-index: auto;
+
+		.boot-layout--single-page & {
+			height: auto;
+		}
 	}
 }
 
@@ -210,6 +219,7 @@
 
 		@include mixins.break-medium {
 			top: variables.$admin-bar-height;
+
 		}
 	}
 }

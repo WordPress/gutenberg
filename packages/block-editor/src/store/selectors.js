@@ -3242,8 +3242,8 @@ export function getBlockEditingMode( state, clientId = '' ) {
 	}
 
 	// In normal mode, consider that an explicitly set editing mode takes over.
-	if ( state.blockEditingModes.has( clientId ) ) {
-		return state.blockEditingModes.get( clientId );
+	if ( state.blocks.blockEditingModes.has( clientId ) ) {
+		return state.blocks.blockEditingModes.get( clientId );
 	}
 
 	return 'default';

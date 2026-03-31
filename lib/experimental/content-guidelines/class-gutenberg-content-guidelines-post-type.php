@@ -241,7 +241,7 @@ class Gutenberg_Content_Guidelines_Post_Type {
 		foreach ( $all_meta as $meta_key => $meta_values ) {
 			if ( self::is_block_meta_key( $meta_key ) ) {
 				$block_name = self::meta_key_to_block_name( $meta_key );
-				$value      = isset( $meta_values[0] ) ? $meta_values[0] : '';
+				$value      = $meta_values[0] ?? '';
 
 				if ( ! empty( $value ) ) {
 					$blocks[ $block_name ] = array(
