@@ -207,7 +207,14 @@ export function SyncConnectionErrorModal() {
 	const { onManualRetry, secondsRemaining } =
 		useRetryCountdown( connectionStatus );
 
-	const isConnected = 'connected' === connectionStatus?.status;
+	// 'standby' means lazy sync is waiting for a collaborator — not an error.
+	// 'connected' means providers are actively syncing.
+	// null means no sync has been attempted yet (entity not loaded).
+	// Only show the modal for actual disconnection/error states.
+	const isHealthy =
+		! connectionStatus ||
+		connectionStatus.status === 'connected' ||
+		connectionStatus.status === 'standby';
 
 	// Set hasInitialized after a debounce to give extra time on initial load.
 	useEffect( () => {
@@ -219,7 +226,7 @@ export function SyncConnectionErrorModal() {
 	}, [] );
 
 	useEffect( () => {
-		if ( isConnected ) {
+		if ( isHealthy ) {
 			setShowModal( false );
 			return;
 		}
@@ -229,7 +236,7 @@ export function SyncConnectionErrorModal() {
 		}, DISCONNECTED_DEBOUNCE_MS );
 
 		return () => clearTimeout( timeout );
-	}, [ isConnected ] );
+	}, [ isHealthy ] );
 
 	if ( ! isCollaborationEnabled || ! hasInitialized || ! showModal ) {
 		return null;

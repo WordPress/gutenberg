@@ -1677,7 +1677,14 @@ export function getSyncConnectionStatus(
 		return undefined;
 	}
 
-	const PRIORITIZED_STATUSES = [ 'disconnected', 'connecting', 'connected' ];
+	// Priority order: highest urgency first. 'standby' is lowest —
+	// if any entity is disconnected/connecting/connected, that wins.
+	const PRIORITIZED_STATUSES = [
+		'disconnected',
+		'connecting',
+		'connected',
+		'standby',
+	];
 
 	let coalesced: ConnectionStatus | undefined;
 

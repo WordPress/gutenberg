@@ -240,15 +240,19 @@ export function createSyncManager(
 	}
 
 	/**
-	 * Restart presence detection for an entity without requiring existing
-	 * provider results. This is safe to call after a failed connection
-	 * attempt (where providerResults was never assigned) as well as after
-	 * a successful disconnection.
+	 * Start (or restart) presence detection for an entity. Creates a
+	 * lightweight presence detector that polls for other editors. When
+	 * one is found, providers connect. If connection fails, presence
+	 * detection restarts automatically.
+	 *
+	 * Safe to call after a failed connection attempt (where
+	 * providerResults was never assigned) as well as after a successful
+	 * disconnection.
 	 *
 	 * @param {EntityID}          entityId         Entity identifier.
-	 * @param {ProviderCreator[]} providerCreators Provider creators for reconnection.
+	 * @param {ProviderCreator[]} providerCreators Provider creators.
 	 */
-	function restartPresenceDetection(
+	function startPresenceDetection(
 		entityId: EntityID,
 		providerCreators: ProviderCreator[]
 	): void {
@@ -259,44 +263,44 @@ export function createSyncManager(
 
 		const { awareness, syncConfig, ydoc } = entityState;
 
-		if ( awareness && syncConfig.checkPresence ) {
-			const { objectType, objectId } = entityState;
-			const room = `${ objectType }:${ objectId }`;
+		if ( ! awareness || ! syncConfig.checkPresence ) {
+			return;
+		}
 
-			entityState.presenceDetector = createPresenceDetector( {
-				room,
-				clientId: ydoc.clientID,
-				awareness,
-				checkPresence: syncConfig.checkPresence,
-				onCollaboratorDetected: () => {
+		const { objectType, objectId } = entityState;
+		const room = `${ objectType }:${ objectId }`;
+
+		// Signal standby — sync is available but deferred, not an error.
+		entityState.handlers.onStatusChange( { status: 'standby' } );
+
+		entityState.presenceDetector = createPresenceDetector( {
+			room,
+			clientId: ydoc.clientID,
+			awareness,
+			checkPresence: syncConfig.checkPresence,
+			onCollaboratorDetected: () => {
+				log(
+					'presenceDetection',
+					'collaborator detected, connecting providers',
+					entityId
+				);
+				entityState.presenceDetector = null;
+				connectProviders( entityId, providerCreators ).catch( () => {
 					log(
-						'restartPresenceDetection',
-						'collaborator re-detected, reconnecting',
+						'presenceDetection',
+						'connection failed, restarting detection',
 						entityId
 					);
-					entityState.presenceDetector = null;
-					connectProviders( entityId, providerCreators ).catch(
-						() => {
-							log(
-								'restartPresenceDetection',
-								'reconnection failed, restarting presence detection',
-								entityId
-							);
-							if (
-								entityStates.has( entityId ) &&
-								! entityState.providerResults &&
-								! entityState.presenceDetector
-							) {
-								restartPresenceDetection(
-									entityId,
-									providerCreators
-								);
-							}
-						}
-					);
-				},
-			} );
-		}
+					if (
+						entityStates.has( entityId ) &&
+						! entityState.providerResults &&
+						! entityState.presenceDetector
+					) {
+						startPresenceDetection( entityId, providerCreators );
+					}
+				} );
+			},
+		} );
 	}
 
 	/**
@@ -321,15 +325,19 @@ export function createSyncManager(
 		// Remove awareness monitor before destroying providers.
 		stopAwarenessMonitor( entityId );
 
-		// Destroy all providers.
-		entityState.providerResults.forEach( ( result ) => result.destroy() );
+		// Detach status listeners before destroying providers so the
+		// provider's `disconnected` event during shutdown doesn't reach
+		// onStatusChange and trigger the SyncConnectionErrorModal.
+		// An intentional downgrade is not a disconnection error.
+		const { onStatusChange } = entityState.handlers;
+		entityState.providerResults.forEach( ( result ) => {
+			result.off?.( 'status', onStatusChange );
+			result.destroy();
+		} );
 		entityState.providerResults = undefined;
 
-		// Reset connection status.
-		entityState.handlers.onStatusChange( null );
-
 		// Restart presence detection if the config supports it.
-		restartPresenceDetection( entityId, providerCreators );
+		startPresenceDetection( entityId, providerCreators );
 
 		// If no entities remain fully synced, also disconnect collections.
 		if ( ! isAnyEntityFullySynced() ) {
@@ -401,10 +409,12 @@ export function createSyncManager(
 		awareness.on( 'change', handler );
 
 		// Evaluate immediately after subscribing to catch collaborators
-		// that left during the async provider creation window. Without
-		// this, a removed event that fired before the handler was
-		// registered would be missed, leaving the session stuck in
-		// full-sync mode permanently.
+		// that left during the async provider creation window. This is
+		// safe because disconnectProviders no longer signals
+		// onStatusChange(null), so a false downgrade (e.g. from stale
+		// server-side awareness after a page refresh) won't trigger the
+		// SyncConnectionErrorModal — it just silently reverts to
+		// presence-only polling.
 		const currentStates = awareness.getStates();
 		const hasRemoteClientsNow = Array.from( currentStates.keys() ).some(
 			( id ) => id !== localClientId
@@ -522,9 +532,12 @@ export function createSyncManager(
 			if ( state.providerResults ) {
 				const entityId = getEntityId( objectType, null );
 				log( 'disconnectAllCollections', 'disconnecting', entityId );
-				state.providerResults.forEach( ( result ) => result.destroy() );
+				const { onStatusChange } = state.handlers;
+				state.providerResults.forEach( ( result ) => {
+					result.off?.( 'status', onStatusChange );
+					result.destroy();
+				} );
 				state.providerResults = undefined;
-				state.handlers.onStatusChange( null );
 			}
 		}
 	}
@@ -671,45 +684,35 @@ export function createSyncManager(
 		// connectProviders can find it if the callback fires quickly.
 		entityStates.set( entityId, entityState );
 
-		// Start presence detection to discover other editors.
-		// The presence detector polls at a low frequency (~10s) and only
-		// sends awareness state (no document updates). When another editor
-		// is found, it triggers the full provider connection.
+		// Check if a collaborator is already present. If so, connect
+		// providers immediately as part of entity loading — no async gap.
+		// Otherwise, start the presence detector to poll periodically.
 		if ( awareness && syncConfig.checkPresence ) {
 			const room = `${ objectType }:${ objectId }`;
-			entityState.presenceDetector = createPresenceDetector( {
-				room,
-				clientId: ydoc.clientID,
-				awareness,
-				checkPresence: syncConfig.checkPresence,
-				onCollaboratorDetected: () => {
+			const localState = awareness.getLocalState() ?? {};
+			try {
+				const { otherClientIds } = await syncConfig.checkPresence( {
+					room,
+					clientId: ydoc.clientID,
+					localAwarenessState: localState as Record<
+						string,
+						unknown
+					>,
+				} );
+				if ( otherClientIds.length > 0 ) {
 					log(
 						'loadEntity',
-						'collaborator detected via presence, connecting providers',
+						'collaborator already present, connecting immediately',
 						entityId
 					);
-					entityState.presenceDetector = null;
-					connectProviders( entityId, providerCreators ).catch(
-						() => {
-							log(
-								'loadEntity',
-								'provider connection failed, restarting presence detection',
-								entityId
-							);
-							if (
-								entityStates.has( entityId ) &&
-								! entityState.providerResults &&
-								! entityState.presenceDetector
-							) {
-								restartPresenceDetection(
-									entityId,
-									providerCreators
-								);
-							}
-						}
-					);
-				},
-			} );
+					await connectProviders( entityId, providerCreators );
+				} else {
+					startPresenceDetection( entityId, providerCreators );
+				}
+			} catch {
+				// Presence check failed — fall back to polling.
+				startPresenceDetection( entityId, providerCreators );
+			}
 		} else {
 			// No awareness or no checkPresence callback — connect providers
 			// immediately since we have no way to detect other users.

@@ -178,11 +178,6 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					'permission_callback' => array( $this, 'check_permissions' ),
 					'validate_callback'   => array( $this, 'validate_request' ),
 					'args'                => array(
-						'presence_only' => array(
-							'default'  => false,
-							'required' => false,
-							'type'     => 'boolean',
-						),
 						'rooms' => array(
 							'items'    => array(
 								'properties' => $room_args,
@@ -291,9 +286,8 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * @return WP_REST_Response|WP_Error Response object or error.
 		 */
 		public function handle_request( WP_REST_Request $request ) {
-			$rooms          = $request['rooms'];
-			$presence_only  = ! empty( $request['presence_only'] );
-			$response       = array(
+			$rooms    = $request['rooms'];
+			$response = array(
 				'rooms' => array(),
 			);
 
@@ -305,17 +299,6 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 
 				// Merge awareness state.
 				$merged_awareness = $this->process_awareness_update( $room, $client_id, $awareness );
-
-				// In presence-only mode, skip update processing and retrieval.
-				// This is used by the lightweight presence detector which only
-				// needs to exchange awareness state to detect other editors.
-				if ( $presence_only ) {
-					$response['rooms'][] = array(
-						'room'      => $room,
-						'awareness' => $merged_awareness,
-					);
-					continue;
-				}
 
 				// The lowest client ID is nominated to perform compaction when needed.
 				$is_compactor = false;

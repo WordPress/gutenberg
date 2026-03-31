@@ -167,6 +167,10 @@ export function createHttpPollingProvider(): ProviderCreator {
 
 		return {
 			destroy: () => provider.destroy(),
+			// Adapter: ObservableV2.off is compatible with ProviderOff
+			off: ( event, callback ) => {
+				provider.off( event, callback );
+			},
 			// Adapter: ObservableV2.on is compatible with ProviderOn
 			// The callback receives data as the first parameter
 			on: ( event, callback ) => {

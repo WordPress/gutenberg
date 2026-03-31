@@ -55,8 +55,14 @@ export type ProviderOn = < K extends keyof ProviderEventMap >(
 	callback: ( data: ProviderEventMap[ K ] ) => void
 ) => void;
 
+export type ProviderOff = < K extends keyof ProviderEventMap >(
+	event: K,
+	callback: ( data: ProviderEventMap[ K ] ) => void
+) => void;
+
 export interface ProviderCreatorResult {
 	destroy: () => void;
+	off?: ProviderOff;
 	on: ProviderOn;
 }
 
@@ -84,10 +90,23 @@ export interface ConnectionStatusDisconnected {
 	willAutoRetryInMs?: number;
 }
 
+/**
+ * Sync is available but deferred — no providers are connected. The presence
+ * detector is polling for collaborators. When one is found, providers will
+ * connect and the status will transition to 'connecting' → 'connected'.
+ *
+ * This is the normal state for a solo user with lazy sync enabled and is
+ * NOT an error condition.
+ */
+export interface ConnectionStatusStandby {
+	status: 'standby';
+}
+
 export type ConnectionStatus =
 	| ConnectionStatusConnected
 	| ConnectionStatusConnecting
-	| ConnectionStatusDisconnected;
+	| ConnectionStatusDisconnected
+	| ConnectionStatusStandby;
 
 export type OnStatusChangeCallback = (
 	status: ConnectionStatus | null

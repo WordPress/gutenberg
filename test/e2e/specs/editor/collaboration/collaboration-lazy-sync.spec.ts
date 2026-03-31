@@ -3,9 +3,34 @@
  */
 import { test, expect } from './fixtures';
 
+/**
+ * Helper: track sync-related requests on a page. Presence requests go to
+ * /wp-sync/v1/presence (lightweight, transient-based). Full sync requests
+ * go to /wp-sync/v1/updates (provider-level document sync).
+ *
+ * @param page Playwright page to monitor.
+ */
+function trackSyncRequests( page: import('@playwright/test').Page ) {
+	const requests: Array< {
+		isPresence: boolean;
+		timestamp: number;
+	} > = [];
+
+	page.on( 'request', ( request ) => {
+		const url = request.url();
+		if ( url.includes( 'wp-sync/v1/presence' ) ) {
+			requests.push( { isPresence: true, timestamp: Date.now() } );
+		} else if ( url.includes( 'wp-sync/v1/updates' ) ) {
+			requests.push( { isPresence: false, timestamp: Date.now() } );
+		}
+	} );
+
+	return requests;
+}
+
 test.describe( 'Collaboration - Lazy Sync', () => {
 	test.describe( 'Scenario A: Single user editing (deferred connection)', () => {
-		test( 'solo user sees only presence_only polls, not full sync', async ( {
+		test( 'solo user sees only presence polls, not full sync', async ( {
 			collaborationUtils,
 			requestUtils,
 			editor,
@@ -17,28 +42,7 @@ test.describe( 'Collaboration - Lazy Sync', () => {
 				date_gmt: new Date().toISOString(),
 			} );
 
-			// Collect sync requests to distinguish presence-only vs full sync.
-			const syncRequests: Array< {
-				presenceOnly: boolean;
-				body: unknown;
-			} > = [];
-
-			page.on( 'request', ( request ) => {
-				if ( request.url().includes( 'wp-sync' ) ) {
-					try {
-						const postData = request.postData();
-						if ( postData ) {
-							const body = JSON.parse( postData );
-							syncRequests.push( {
-								presenceOnly: body.presence_only === true,
-								body,
-							} );
-						}
-					} catch {
-						// Ignore parse errors.
-					}
-				}
-			} );
+			const syncRequests = trackSyncRequests( page );
 
 			// Open the post as a single user (no collaborator).
 			await collaborationUtils.openPost( post.id );
@@ -51,15 +55,15 @@ test.describe( 'Collaboration - Lazy Sync', () => {
 				} )
 				.toBeGreaterThanOrEqual( 2 );
 
-			// All sync requests should be presence_only.
-			const presenceOnlyRequests = syncRequests.filter(
-				( r ) => r.presenceOnly
+			// All requests should be presence checks, not full sync.
+			const presenceRequests = syncRequests.filter(
+				( r ) => r.isPresence
 			);
 			const fullSyncRequests = syncRequests.filter(
-				( r ) => ! r.presenceOnly
+				( r ) => ! r.isPresence
 			);
 
-			expect( presenceOnlyRequests.length ).toBeGreaterThanOrEqual( 2 );
+			expect( presenceRequests.length ).toBeGreaterThanOrEqual( 2 );
 			expect( fullSyncRequests.length ).toBe( 0 );
 
 			// User can still edit locally while in deferred mode.
@@ -148,28 +152,7 @@ test.describe( 'Collaboration - Lazy Sync', () => {
 				date_gmt: new Date().toISOString(),
 			} );
 
-			// Track request types on User 1's page.
-			const user1SyncRequests: Array< {
-				presenceOnly: boolean;
-				timestamp: number;
-			} > = [];
-
-			page.on( 'request', ( request ) => {
-				if ( request.url().includes( 'wp-sync' ) ) {
-					try {
-						const postData = request.postData();
-						if ( postData ) {
-							const body = JSON.parse( postData );
-							user1SyncRequests.push( {
-								presenceOnly: body.presence_only === true,
-								timestamp: Date.now(),
-							} );
-						}
-					} catch {
-						// Ignore parse errors.
-					}
-				}
-			} );
+			const user1Requests = trackSyncRequests( page );
 
 			// Step 1: User 1 opens the post (solo — deferred connection).
 			await collaborationUtils.openPost( post.id );
@@ -180,17 +163,17 @@ test.describe( 'Collaboration - Lazy Sync', () => {
 				attributes: { content: 'Edit made while solo' },
 			} );
 
-			// Wait for at least 1 presence-only poll.
+			// Wait for at least 1 presence poll.
 			await expect
-				.poll( () => user1SyncRequests.length, {
+				.poll( () => user1Requests.length, {
 					timeout: 15000,
 					intervals: [ 2000 ],
 				} )
 				.toBeGreaterThanOrEqual( 1 );
 
-			// Confirm initial polls are presence-only.
-			const initialRequests = [ ...user1SyncRequests ];
-			expect( initialRequests.every( ( r ) => r.presenceOnly ) ).toBe(
+			// Confirm initial requests are presence-only.
+			const initialRequests = [ ...user1Requests ];
+			expect( initialRequests.every( ( r ) => r.isPresence ) ).toBe(
 				true
 			);
 
@@ -207,19 +190,16 @@ test.describe( 'Collaboration - Lazy Sync', () => {
 				}
 			);
 
-			// Step 3: Wait for mutual discovery — this means User 1's
-			// presence detector fired and full sync connected.
+			// Step 3: Wait for mutual discovery.
 			await collaborationUtils.waitForMutualDiscovery( {
 				timeout: 30000,
 			} );
 
 			// Step 4: Verify User 1 transitioned to full sync.
-			// After collaborator detection, there should be non-presence-only requests.
 			await expect
 				.poll(
 					() =>
-						user1SyncRequests.filter( ( r ) => ! r.presenceOnly )
-							.length,
+						user1Requests.filter( ( r ) => ! r.isPresence ).length,
 					{ timeout: 15000, intervals: [ 1000 ] }
 				)
 				.toBeGreaterThanOrEqual( 1 );
@@ -268,7 +248,6 @@ test.describe( 'Collaboration - Lazy Sync', () => {
 			page,
 		} ) => {
 			// Use a shorter downgrade debounce to speed up this test.
-			// The sync manager reads this global when it initialises.
 			await page.addInitScript( () => {
 				(
 					globalThis as any
@@ -281,35 +260,14 @@ test.describe( 'Collaboration - Lazy Sync', () => {
 				date_gmt: new Date().toISOString(),
 			} );
 
-			// Track User 1's sync requests.
-			const user1SyncRequests: Array< {
-				presenceOnly: boolean;
-				timestamp: number;
-			} > = [];
-
-			page.on( 'request', ( request ) => {
-				if ( request.url().includes( 'wp-sync' ) ) {
-					try {
-						const postData = request.postData();
-						if ( postData ) {
-							const body = JSON.parse( postData );
-							user1SyncRequests.push( {
-								presenceOnly: body.presence_only === true,
-								timestamp: Date.now(),
-							} );
-						}
-					} catch {
-						// Ignore parse errors.
-					}
-				}
-			} );
+			const user1Requests = trackSyncRequests( page );
 
 			// Open collaborative session (both users).
 			await collaborationUtils.openCollaborativeSession( post.id );
 
 			// Both users should be fully synced now.
-			const fullSyncCountBefore = user1SyncRequests.filter(
-				( r ) => ! r.presenceOnly
+			const fullSyncCountBefore = user1Requests.filter(
+				( r ) => ! r.isPresence
 			).length;
 			expect( fullSyncCountBefore ).toBeGreaterThan( 0 );
 
@@ -318,20 +276,17 @@ test.describe( 'Collaboration - Lazy Sync', () => {
 			await page2.close();
 
 			// The awareness monitor detects all collaborators gone and starts
-			// a 5s debounce timer (shortened via __experimentalSyncDowngradeDebounceMs).
-			// After it fires, providers disconnect and the presence detector
-			// restarts with presence-only polling.
+			// a 5s debounce timer. After it fires, providers disconnect and
+			// the presence detector restarts with presence-only polling.
 			await expect
 				.poll(
 					() => {
-						// Look for presence-only requests that appeared after
-						// the collaborative session was established.
-						const recentPresenceOnly = user1SyncRequests.filter(
+						const recentPresence = user1Requests.filter(
 							( r ) =>
-								r.presenceOnly &&
+								r.isPresence &&
 								r.timestamp > Date.now() - 15_000
 						);
-						return recentPresenceOnly.length;
+						return recentPresence.length;
 					},
 					{
 						// 5s debounce + 10s poll interval + buffer

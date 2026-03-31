@@ -420,17 +420,20 @@ export function getPostChangesFromCRDTDoc(
 	return changes;
 }
 
-const SYNC_API_PATH = '/wp-sync/v1/updates';
+const PRESENCE_API_PATH = '/wp-sync/v1/presence';
 
 /**
- * Lightweight presence check that posts to the sync endpoint with
- * `presence_only: true`. The server skips document update retrieval and
- * returns only awareness state, making each call cheap.
+ * Provider-independent presence check via a dedicated REST endpoint.
+ *
+ * Uses transients on the server (not the sync provider's awareness system)
+ * to track which clients are editing a room. Stale entries expire after 30s
+ * server-side, so a page refresh doesn't leave ghost entries that cause
+ * false collaborator detection.
  *
  * @param options                     Presence check options.
  * @param options.room                The sync room identifier.
  * @param options.clientId            The local client ID.
- * @param options.localAwarenessState The local awareness state to broadcast.
+ * @param options.localAwarenessState Unused — kept for SyncConfig interface compat.
  * @return A promise resolving to the IDs of other clients in the room.
  */
 export async function checkPresenceViaApi( options: {
@@ -439,37 +442,17 @@ export async function checkPresenceViaApi( options: {
 	localAwarenessState: Record< string, unknown >;
 } ): Promise< PresenceCheckResult > {
 	const response: {
-		rooms: Array< {
-			room: string;
-			awareness: Record< string, unknown >;
-		} >;
+		other_client_ids: number[];
 	} = await apiFetch( {
 		method: 'POST',
-		path: SYNC_API_PATH,
+		path: PRESENCE_API_PATH,
 		data: {
-			presence_only: true,
-			rooms: [
-				{
-					room: options.room,
-					client_id: options.clientId,
-					after: 0,
-					awareness: options.localAwarenessState,
-					updates: [],
-				},
-			],
+			room: options.room,
+			client_id: options.clientId,
 		},
 	} );
 
-	const roomResponse = response.rooms?.find(
-		( r ) => r.room === options.room
-	);
-	const otherClientIds = roomResponse?.awareness
-		? Object.keys( roomResponse.awareness )
-				.map( Number )
-				.filter( ( id ) => id !== options.clientId )
-		: [];
-
-	return { otherClientIds };
+	return { otherClientIds: response.other_client_ids ?? [] };
 }
 
 /**

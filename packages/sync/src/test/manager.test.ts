@@ -96,6 +96,11 @@ describe( 'SyncManager', () => {
 		// Reset all mocks
 		jest.clearAllMocks();
 
+		// Restore default: no other clients present.
+		mockCheckPresence.mockImplementation( () =>
+			Promise.resolve( { otherClientIds: [] as number[] } )
+		);
+
 		mockRecord = {
 			id: '123',
 			title: 'Test Post',
@@ -104,6 +109,7 @@ describe( 'SyncManager', () => {
 
 		mockProviderResult = {
 			destroy: jest.fn(),
+			off: jest.fn(),
 			on: jest.fn(),
 		};
 		mockProviderCreator = jest.fn( () =>
@@ -605,7 +611,7 @@ describe( 'SyncManager', () => {
 			await tick();
 
 			// connectProviders failed, so a new presence detector should
-			// be started (restartPresenceDetection).
+			// be started (startPresenceDetection).
 			expect( detectorCallbacks ).toHaveLength( 2 );
 
 			// Now make the provider succeed on the retry.
@@ -622,6 +628,7 @@ describe( 'SyncManager', () => {
 		it( 'destroys partially-created providers when one rejects', async () => {
 			const successfulProvider: ProviderCreatorResult = {
 				destroy: jest.fn(),
+				off: jest.fn(),
 				on: jest.fn(),
 			};
 			const failingCreator: jest.Mock< ProviderCreator > = jest.fn( () =>
@@ -855,6 +862,7 @@ describe( 'SyncManager', () => {
 			// Create fresh provider mocks for the second connection.
 			const secondProviderResult: ProviderCreatorResult = {
 				destroy: jest.fn(),
+				off: jest.fn(),
 				on: jest.fn(),
 			};
 			mockProviderCreator.mockResolvedValueOnce( secondProviderResult );
@@ -911,9 +919,12 @@ describe( 'SyncManager', () => {
 			await jest.advanceTimersByTimeAsync( 31_000 );
 		} );
 
-		it( 'starts downgrade when collaborator leaves during async provider creation', async () => {
-			// Simulate slow provider creation so the collaborator can
-			// leave before startAwarenessMonitor runs.
+		it( 'downgrades silently when collaborator leaves during async provider creation', async () => {
+			// If the collaborator leaves during the async provider creation
+			// window, the initial awareness check detects no remote clients
+			// and starts the downgrade timer. This is safe because
+			// disconnectProviders does not call onStatusChange(null), so
+			// the UI won't show a SyncConnectionErrorModal.
 			let resolveProvider: ( value: unknown ) => void;
 			const slowProvider = new Promise( ( resolve ) => {
 				resolveProvider = resolve;
@@ -949,21 +960,23 @@ describe( 'SyncManager', () => {
 			// startAwarenessMonitor has subscribed).
 			awareness.getStates().delete( remoteClientId );
 
-			// Now resolve the slow provider — connectProviders finishes
+			// Resolve the slow provider — connectProviders finishes
 			// and startAwarenessMonitor runs its initial check.
 			resolveProvider!( undefined );
 			await tick();
-
-			// The initial awareness check should detect no remote
-			// clients and start the downgrade timer.
-			expect( awareness.getStates().size ).toBeLessThanOrEqual( 1 );
 
 			// Advance past the debounce — should downgrade.
 			await jest.advanceTimersByTimeAsync( 31_000 );
 			await tick();
 
-			// Provider should be destroyed (downgraded).
+			// Provider should be destroyed (downgraded silently).
 			expect( mockProviderResult.destroy ).toHaveBeenCalled();
+
+			// onStatusChange should NOT have been called with null
+			// during the downgrade (only during unload).
+			expect( mockHandlers.onStatusChange ).not.toHaveBeenCalledWith(
+				null
+			);
 		} );
 	} );
 

@@ -235,6 +235,125 @@ function gutenberg_set_collaboration_option_on_activation() {
 add_action( 'activate_gutenberg/gutenberg.php', 'gutenberg_set_collaboration_option_on_activation' );
 
 /**
+ * Registers the lightweight presence-check REST endpoint.
+ *
+ * This endpoint is provider-independent — it uses transients to track which
+ * clients are editing which rooms, without touching the sync provider's
+ * awareness system. Each client's presence is stored with a short TTL and
+ * pruned on read, so stale entries expire quickly.
+ *
+ * POST /wp-sync/v1/presence
+ *
+ * Request body:
+ *   {
+ *     "room":      "postType/post:123",
+ *     "client_id": 42
+ *   }
+ *
+ * Response:
+ *   {
+ *     "other_client_ids": [ 99 ]
+ *   }
+ */
+function gutenberg_register_sync_presence_endpoint() {
+	if ( ! get_option( 'wp_collaboration_enabled' ) ) {
+		return;
+	}
+
+	register_rest_route(
+		'wp-sync/v1',
+		'/presence',
+		array(
+			'methods'             => 'POST',
+			'callback'            => 'gutenberg_handle_sync_presence',
+			'permission_callback' => function () {
+				return is_user_logged_in();
+			},
+			'args'                => array(
+				'room'      => array(
+					'required' => true,
+					'type'     => 'string',
+				),
+				'client_id' => array(
+					'required' => true,
+					'type'     => 'integer',
+				),
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_sync_presence_endpoint' );
+
+/**
+ * Handles a presence check request.
+ *
+ * Records the caller's presence in a transient and returns the client IDs
+ * of other editors in the same room. Entries older than 30 seconds are
+ * pruned on every read, so stale sessions (e.g. after a page refresh)
+ * expire quickly without polluting the sync provider's awareness state.
+ *
+ * @param WP_REST_Request $request The REST request.
+ * @return WP_REST_Response The presence response.
+ */
+function gutenberg_handle_sync_presence( $request ) {
+	$room      = sanitize_text_field( $request['room'] );
+	$client_id = absint( $request['client_id'] );
+
+	// Permission check: verify the user can edit this entity.
+	// Room format is "objectType:objectId", e.g. "postType/post:123".
+	$parts     = explode( ':', $room, 2 );
+	$object_id = isset( $parts[1] ) ? absint( $parts[1] ) : 0;
+	if ( $object_id && ! current_user_can( 'edit_post', $object_id ) ) {
+		return new WP_Error(
+			'rest_forbidden',
+			__( 'You do not have permission to edit this post.', 'gutenberg' ),
+			array( 'status' => 403 )
+		);
+	}
+
+	$transient_key = 'wp_sync_pres_' . md5( $room );
+	$presence      = get_transient( $transient_key );
+	if ( ! is_array( $presence ) ) {
+		$presence = array();
+	}
+
+	$now = time();
+
+	// Update this client's presence.
+	$presence[ $client_id ] = array(
+		'user_id'   => get_current_user_id(),
+		'timestamp' => $now,
+	);
+
+	// Remove stale entries (older than 30 seconds).
+	$presence = array_filter(
+		$presence,
+		function ( $entry ) use ( $now ) {
+			return $entry['timestamp'] > $now - 30;
+		}
+	);
+
+	// Store with a 60-second TTL (double the stale threshold as safety margin).
+	set_transient( $transient_key, $presence, 60 );
+
+	// Collect IDs of other clients in this room, excluding other
+	// sessions from the same WordPress user (e.g. stale entries left
+	// after a page refresh with a new clientID).
+	$current_user_id  = get_current_user_id();
+	$other_client_ids = array();
+	foreach ( $presence as $id => $entry ) {
+		if ( absint( $id ) !== $client_id && $entry['user_id'] !== $current_user_id ) {
+			$other_client_ids[] = absint( $id );
+		}
+	}
+
+	return new WP_REST_Response(
+		array( 'other_client_ids' => array_values( $other_client_ids ) ),
+		200
+	);
+}
+
+/**
  * Modifies the post list UI and heartbeat responses for real-time collaboration.
  *
  * When RTC is enabled, hides the lock icon and user avatar, replaces the
