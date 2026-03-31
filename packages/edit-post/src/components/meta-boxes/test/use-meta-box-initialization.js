@@ -66,6 +66,10 @@ function createMockStores( {
 			},
 			selectors: {
 				getAllMetaBoxes: jest.fn( () => metaBoxes ),
+				hasMetaBoxes: jest.fn( () => metaBoxes.length > 0 ),
+				getActiveMetaBoxLocations: jest.fn( () =>
+					metaBoxes.length > 0 ? [ 'normal' ] : []
+				),
 			},
 		},
 	};
