@@ -157,10 +157,21 @@ export type EditConfigText = {
 };
 
 /**
- * Edit configuration for other control types (excluding 'text' and 'textarea').
+ * Edit configuration for datetime controls.
+ */
+export type EditConfigDatetime = {
+	control: 'datetime';
+	/**
+	 * Whether to render a compact version without the calendar widget.
+	 */
+	compact?: boolean;
+};
+
+/**
+ * Edit configuration for other control types (excluding 'text', 'textarea', and 'datetime').
  */
 export type EditConfigGeneric = {
-	control: Exclude< FieldTypeName, 'text' | 'textarea' >;
+	control: Exclude< FieldTypeName, 'text' | 'textarea' | 'datetime' >;
 };
 
 /**
@@ -170,6 +181,7 @@ export type EditConfigGeneric = {
 export type EditConfig =
 	| EditConfigTextarea
 	| EditConfigText
+	| EditConfigDatetime
 	| EditConfigGeneric;
 
 /**
@@ -449,6 +461,7 @@ export type DataFormControlProps< Item > = {
 		prefix?: React.ComponentType;
 		suffix?: React.ComponentType;
 		rows?: number;
+		compact?: boolean;
 	};
 };
 

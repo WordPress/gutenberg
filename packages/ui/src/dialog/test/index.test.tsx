@@ -306,4 +306,121 @@ describe( 'Dialog', () => {
 			expect( onError ).not.toHaveBeenCalled();
 		} );
 	} );
+
+	describe( 'Initial focus', () => {
+		it( 'should focus the first content element, skipping the close icon', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Dialog.Root>
+					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+					<Dialog.Popup>
+						<Dialog.Header>
+							<Dialog.Title>My Title</Dialog.Title>
+							<Dialog.CloseIcon />
+						</Dialog.Header>
+						<button>Content Button</button>
+					</Dialog.Popup>
+				</Dialog.Root>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Open Dialog' } )
+			);
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'button', { name: 'Content Button' } )
+				).toHaveFocus();
+			} );
+		} );
+
+		it( 'should fall back to the close icon when it is the only tabbable element', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Dialog.Root>
+					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+					<Dialog.Popup>
+						<Dialog.Header>
+							<Dialog.Title>My Title</Dialog.Title>
+							<Dialog.CloseIcon />
+						</Dialog.Header>
+						<p>No tabbable content here</p>
+					</Dialog.Popup>
+				</Dialog.Root>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Open Dialog' } )
+			);
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'button', { name: 'Close' } )
+				).toHaveFocus();
+			} );
+		} );
+
+		it( 'should not move focus when initialFocus is false', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Dialog.Root>
+					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+					<Dialog.Popup initialFocus={ false }>
+						<Dialog.Header>
+							<Dialog.Title>My Title</Dialog.Title>
+							<Dialog.CloseIcon />
+						</Dialog.Header>
+						<button>Content Button</button>
+					</Dialog.Popup>
+				</Dialog.Root>
+			);
+
+			const trigger = screen.getByRole( 'button', {
+				name: 'Open Dialog',
+			} );
+			await user.click( trigger );
+
+			await waitFor( () => {
+				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
+			} );
+
+			expect(
+				screen.getByRole( 'button', { name: 'Content Button' } )
+			).not.toHaveFocus();
+			expect(
+				screen.getByRole( 'button', { name: 'Close' } )
+			).not.toHaveFocus();
+		} );
+
+		it( 'should use a custom initialFocus callback as-is', async () => {
+			const user = userEvent.setup();
+			const customFocus = jest.fn( () => false as const );
+
+			render(
+				<Dialog.Root>
+					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+					<Dialog.Popup initialFocus={ customFocus }>
+						<Dialog.Header>
+							<Dialog.Title>My Title</Dialog.Title>
+							<Dialog.CloseIcon />
+						</Dialog.Header>
+						<button>Content Button</button>
+					</Dialog.Popup>
+				</Dialog.Root>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Open Dialog' } )
+			);
+
+			await waitFor( () => {
+				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
+			} );
+
+			expect( customFocus ).toHaveBeenCalled();
+		} );
+	} );
 } );

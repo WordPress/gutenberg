@@ -21,6 +21,7 @@ import {
 	OpenAILogo,
 	ClaudeLogo,
 	GeminiLogo,
+	AkismetLogo,
 	DefaultConnectorLogo,
 } from './logos';
 
@@ -30,7 +31,7 @@ interface ConnectorData {
 	logoUrl?: string;
 	type: string;
 	plugin?: {
-		slug: string;
+		file: string;
 		isInstalled: boolean;
 		isActivated: boolean;
 	};
@@ -57,6 +58,7 @@ const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
 	google: GeminiLogo,
 	openai: OpenAILogo,
 	anthropic: ClaudeLogo,
+	akismet: AkismetLogo,
 };
 
 function getConnectorLogo(
@@ -102,7 +104,10 @@ function ApiKeyConnector( {
 		authentication?.method === 'api_key' ? authentication : undefined;
 	const settingName = auth?.settingName ?? '';
 	const helpUrl = auth?.credentialsUrl ?? undefined;
-	const pluginSlug = plugin?.slug;
+	const pluginFile = plugin?.file?.replace( /\.php$/, '' );
+	const pluginSlug = pluginFile?.includes( '/' )
+		? pluginFile.split( '/' )[ 0 ]
+		: pluginFile;
 
 	let helpLabel: string | undefined;
 	try {
@@ -128,7 +133,7 @@ function ApiKeyConnector( {
 		saveApiKey,
 		removeApiKey,
 	} = useConnectorPlugin( {
-		pluginSlug,
+		file: plugin?.file,
 		settingName,
 		connectorName: name,
 		isInstalled: plugin?.isInstalled,
@@ -240,14 +245,12 @@ export function registerDefaultConnectors() {
 		const args: Partial< Omit< ConnectorConfig, 'slug' > > = {
 			name: data.name,
 			description: data.description,
+			type: data.type,
 			logo: getConnectorLogo( connectorId, data.logoUrl ),
 			authentication,
 			plugin: data.plugin,
 		};
-		if (
-			data.type === 'ai_provider' &&
-			authentication.method === 'api_key'
-		) {
+		if ( authentication.method === 'api_key' ) {
 			args.render = ApiKeyConnector;
 		}
 

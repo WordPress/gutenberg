@@ -91,6 +91,7 @@ function ConnectorsPage() {
 										slug={ connector.slug }
 										name={ connector.name }
 										description={ connector.description }
+										type={ connector.type }
 										logo={ connector.logo }
 										authentication={
 											connector.authentication

@@ -9,6 +9,7 @@
 
 ### Enhancements
 
+- DataForm: Add `compact` configuration option to the `datetime` control. [#76905](https://github.com/WordPress/gutenberg/pull/76905)
 - DataViews: Field's description can accept ReactElements. [#76829](https://github.com/WordPress/gutenberg/pull/76829)
 
 ## 13.1.0 (2026-03-18)
