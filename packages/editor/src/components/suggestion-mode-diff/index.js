@@ -112,6 +112,15 @@ const diffCache = createBoundedCache();
 const editCache = createBoundedCache();
 
 /**
+ * Clear all suggestion diff caches. Call when suggestion mode is toggled
+ * off so stale entries from a previous session aren't served.
+ */
+export function clearSuggestionCaches() {
+	diffCache.clear();
+	editCache.clear();
+}
+
+/**
  * Strip the outermost `<p>…</p>` wrapper that WordPress adds via wpautop.
  * Returns the input unchanged if it doesn't match a single `<p>` wrapper.
  *

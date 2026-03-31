@@ -37,7 +37,13 @@ const DIFF_FORMAT_TYPES = [
 	},
 ];
 
+let registered = false;
+
 export function registerDiffFormatTypes() {
+	if ( registered ) {
+		return;
+	}
+	registered = true;
 	for ( const formatType of DIFF_FORMAT_TYPES ) {
 		registerFormatType( formatType.name, {
 			...formatType,
@@ -48,6 +54,7 @@ export function registerDiffFormatTypes() {
 }
 
 export function unregisterDiffFormatTypes() {
+	registered = false;
 	for ( const formatType of DIFF_FORMAT_TYPES ) {
 		unregisterFormatType( formatType.name );
 	}

@@ -300,14 +300,14 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	// Creates a new suggestion note for a block that doesn't have one yet.
-	// Debounced so the note is only created after a typing pause — during
-	// active typing, setAttributes updates the block normally. Each call
-	// buffers the latest content; when the timer fires, we create the note
-	// with whatever was last typed and attach the noteId to the block.
+	// Per-block state for suggestion note creation. Maps keyed by clientId
+	// ensure original attributes are captured once and never overwritten
+	// by stale closures, and that content typed during an in-flight save
+	// is not silently dropped.
 	const pendingCreations = useRef( new Set() );
 	const suggestionCreateTimerRef = useRef( null );
-	const suggestionCreateArgsRef = useRef( null );
+	const originalAttrsRef = useRef( new Map() );
+	const pendingContentRef = useRef( new Map() );
 
 	// Clean up create timer on unmount.
 	useEffect( () => {
@@ -320,16 +320,12 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 
 	const onSuggestionCreate = useCallback(
 		( clientId, content, originalAttributes ) => {
-			// Buffer the latest content and original attributes.
-			// Only capture originalAttributes on the first call (before
-			// setAttributes modifies the block).
-			if ( ! suggestionCreateArgsRef.current ) {
-				suggestionCreateArgsRef.current = {
-					clientId,
-					originalAttributes,
-				};
+			// Capture original attributes once per block, before
+			// setAttributes mutates them.
+			if ( ! originalAttrsRef.current.has( clientId ) ) {
+				originalAttrsRef.current.set( clientId, originalAttributes );
 			}
-			suggestionCreateArgsRef.current.content = content;
+			pendingContentRef.current.set( clientId, content );
 
 			if ( suggestionCreateTimerRef.current ) {
 				clearTimeout( suggestionCreateTimerRef.current );
@@ -337,17 +333,18 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 
 			suggestionCreateTimerRef.current = setTimeout( async () => {
 				suggestionCreateTimerRef.current = null;
-				const args = suggestionCreateArgsRef.current;
-				if ( ! args ) {
+				const contentMap = pendingContentRef.current;
+				const attrsMap = originalAttrsRef.current;
+				const latestContent = contentMap.get( clientId );
+				const origAttrs = attrsMap.get( clientId );
+				if ( ! latestContent || ! origAttrs ) {
 					return;
 				}
-				suggestionCreateArgsRef.current = null;
 
-				// Prevent duplicate creation if already in flight.
-				if ( pendingCreations.current.has( args.clientId ) ) {
+				if ( pendingCreations.current.has( clientId ) ) {
 					return;
 				}
-				pendingCreations.current.add( args.clientId );
+				pendingCreations.current.add( clientId );
 
 				try {
 					const savedRecord = await saveEntityRecord(
@@ -355,7 +352,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 						'comment',
 						{
 							post: postId,
-							content: args.content,
+							content: latestContent,
 							status: 'hold',
 							type: 'note',
 							parent: 0,
@@ -366,23 +363,47 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 
 					if ( savedRecord?.id ) {
 						// Restore the block to its original content
-						// and attach the noteId. The suggestion lives
-						// in the note; the block content stays as the
-						// "original" for diffing.
-						updateBlockAttributes( args.clientId, {
-							...args.originalAttributes,
+						// and attach the noteId.
+						updateBlockAttributes( clientId, {
+							...origAttrs,
 							metadata: {
-								...( args.originalAttributes?.metadata || {} ),
+								...( origAttrs?.metadata || {} ),
 								noteId: savedRecord.id,
 							},
 						} );
+
+						// If the user typed more while the save was
+						// in flight, sync the newer content to the
+						// newly created note.
+						const newer = contentMap.get( clientId );
+						if ( newer && newer !== latestContent ) {
+							editEntityRecord(
+								'root',
+								'comment',
+								savedRecord.id,
+								{ content: newer }
+							);
+							saveEntityRecord( 'root', 'comment', {
+								id: savedRecord.id,
+								content: newer,
+							} );
+						}
+					}
+				} catch ( error ) {
+					// Creation failed — restore original attributes
+					// so the block doesn't have modified content with
+					// no backing note.
+					if ( origAttrs ) {
+						updateBlockAttributes( clientId, origAttrs );
 					}
 				} finally {
-					pendingCreations.current.delete( args.clientId );
+					pendingCreations.current.delete( clientId );
+					originalAttrsRef.current.delete( clientId );
+					pendingContentRef.current.delete( clientId );
 				}
 			}, 500 );
 		},
-		[ saveEntityRecord, postId, updateBlockAttributes ]
+		[ saveEntityRecord, editEntityRecord, postId, updateBlockAttributes ]
 	);
 
 	const onSuggestionEdit = useCallback(

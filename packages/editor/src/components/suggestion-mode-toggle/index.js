@@ -17,6 +17,7 @@ import {
 	registerDiffFormatTypes,
 	unregisterDiffFormatTypes,
 } from '../post-revisions-preview/diff-format-types';
+import { clearSuggestionCaches } from '../suggestion-mode-diff';
 
 const SuggestionModeToggle = () => {
 	const { isSuggestionModeActive, showIconLabels } = useSelect(
@@ -41,11 +42,10 @@ const SuggestionModeToggle = () => {
 			registerDiffFormatTypes();
 			setSuggestionMode( true );
 		} else {
-			// Dispatch first so blocks re-render without diff attributes
-			// before we remove the format types.
 			setSuggestionMode( false );
-			// Use setTimeout to unregister after React has re-rendered
-			// without the diff attributes.
+			clearSuggestionCaches();
+			// Defer unregister so blocks re-render without diff
+			// attributes before the format types are removed.
 			setTimeout( () => unregisterDiffFormatTypes(), 0 );
 		}
 	};
