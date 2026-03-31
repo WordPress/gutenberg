@@ -8,6 +8,7 @@ import { render } from '@testing-library/react';
  */
 import { createElement, Fragment, Component } from '../react';
 import createInterpolateElement from '../create-interpolate-element';
+import type { ExtractTags, InterpolationString } from '../types';
 
 describe( 'createInterpolateElement', () => {
 	it( 'throws an error when there is no conversion map', () => {
@@ -219,6 +220,23 @@ describe( 'createInterpolateElement', () => {
 
 		expect( container ).toContainHTML( '<strong>string!</strong>' );
 		expect( container ).not.toContainHTML( '<em>' );
+	} );
+	it( 'extracts all tag names from a template literal string', () => {
+		// Type-level test: verify ExtractTags extracts all tags correctly.
+		type Tags = ExtractTags< '<a>link</a> and <b>bold <c>nested</c></b>' >;
+		const tags: Tags[] = [ 'a', 'b', 'c' ];
+		expect( tags ).toHaveLength( 3 );
+	} );
+	it( 'extracts tags from a TranslatableText input', () => {
+		// Type-level test: verify InterpolationString unwraps TranslatableText.
+		type Text = InterpolationString<
+			string & {
+				readonly __translatableText: '<a>link</a> and <em>emphasis</em>';
+			}
+		>;
+		type Tags = ExtractTags< Text >;
+		const tags: Tags[] = [ 'a', 'em' ];
+		expect( tags ).toHaveLength( 2 );
 	} );
 	it( 'handles parsing emojii correctly', () => {
 		const testString = '👳‍♀️<icon>🚨🤷‍♂️⛈️fully</icon> here';
