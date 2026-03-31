@@ -64,6 +64,13 @@ if ( ! function_exists( 'gutenberg_inject_rtc_compatible_meta_boxes' ) ) {
 			} );';
 
 			wp_add_inline_script( 'wp-edit-post', $script );
+
+			// If wp-edit-post is output earlier in <head>, the inline script
+			// needs to be manually printed. This mirrors the same fallback
+			// used by WordPress core for setAvailableMetaBoxesPerLocation.
+			if ( wp_script_is( 'wp-edit-post', 'done' ) ) {
+				printf( "<script>\n%s\n</script>\n", trim( $script ) );
+			}
 		}
 
 		return $wp_meta_boxes;
