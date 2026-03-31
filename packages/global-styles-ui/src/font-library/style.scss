@@ -173,10 +173,30 @@ $footer-height: 90px;
 	height: variables.$grid-unit-80 * 4 !important; // 256px
 
 	width: 100%;
-}
+	border: variables.$border-width dashed var(--wp-admin-theme-color);
 
-button.font-library__upload-area {
-	background-color: colors.$gray-100;
+	.font-library__upload-area__content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: variables.$grid-unit-20;
+		gap: variables.$grid-unit-10;
+	}
+
+	.font-library__upload-area__icon {
+		color: var(--wp-admin-theme-color);
+		height: variables.$grid-unit-40;
+		width: variables.$grid-unit-40;
+	}
+
+	.font-library__upload-area__title {
+		color: var(--wp-admin-theme-color);
+		font-size: 1rem;
+	}
+
+	.font-library__upload-area__subtitle {
+		color: var(--wp-admin-theme-color);
+	}
 }
 
 .font-library__local-fonts {

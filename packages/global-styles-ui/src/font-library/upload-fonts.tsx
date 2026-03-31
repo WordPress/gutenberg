@@ -12,6 +12,7 @@ import {
 	FlexItem,
 	ProgressBar,
 } from '@wordpress/components';
+import { Icon, upload } from '@wordpress/icons';
 import { useContext, useState } from '@wordpress/element';
 import type { FontFace } from '@wordpress/core-data';
 
@@ -248,7 +249,20 @@ function UploadFonts() {
 								className="font-library__upload-area"
 								onClick={ openFileDialog }
 							>
-								{ __( 'Upload font' ) }
+								<div className="font-library__upload-area__content">
+									<Icon
+										icon={ upload }
+										className="font-library__upload-area__icon"
+									/>
+									<Text className="font-library__upload-area__title">
+										{ __( 'Upload Fonts' ) }
+									</Text>
+									<Text className="font-library__upload-area__subtitle">
+										{ __(
+											'Drop files or click to select'
+										) }
+									</Text>
+								</div>
 							</Button>
 						) }
 					/>
