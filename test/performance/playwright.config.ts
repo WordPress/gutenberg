@@ -27,15 +27,6 @@ const config = defineConfig( {
 		...baseConfig.use,
 		actionTimeout: 120_000, // 2 minutes.
 		video: 'off',
-		launchOptions: {
-			...baseConfig.use?.launchOptions,
-			args: [
-				...( baseConfig.use?.launchOptions?.args || [] ),
-				// Enable SharedArrayBuffer for vips WASM-based image processing.
-				// Required when Document-Isolation-Policy alone is insufficient.
-				'--enable-features=SharedArrayBuffer',
-			],
-		},
 	},
 } );
 
