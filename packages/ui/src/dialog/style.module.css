@@ -17,7 +17,7 @@
 		}
 
 		@media not (prefers-reduced-motion) {
-			transition: opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-standard);
+			transition: opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-decelerate-emphasized);
 		}
 	}
 
@@ -60,8 +60,8 @@
 
 		@media not (prefers-reduced-motion) {
 			transition:
-				opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-accelerate-emphasized),
-				transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-accelerate-emphasized);
+				opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-decelerate-emphasized),
+				transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-decelerate-emphasized);
 
 			&[data-open] {
 				transition:

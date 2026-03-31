@@ -166,10 +166,9 @@ export default {
 	'--wpds-motion-duration-sm': '100ms',
 	'--wpds-motion-duration-xl': '400ms',
 	'--wpds-motion-duration-xs': '50ms',
-	'--wpds-motion-easing-accelerate': 'cubic-bezier(1, 0, 1, 1)',
-	'--wpds-motion-easing-accelerate-emphasized': 'cubic-bezier(1, 0, 0.2, 1)',
 	'--wpds-motion-easing-decelerate': 'cubic-bezier(0, 0, 0, 1)',
 	'--wpds-motion-easing-decelerate-emphasized':
 		'cubic-bezier(0.29, 0, 0, 1)',
+	'--wpds-motion-easing-gentle': 'cubic-bezier(0.25, 0.1, 0.25, 1)',
 	'--wpds-motion-easing-standard': 'cubic-bezier(0.4, 0, 0.2, 1)',
 };

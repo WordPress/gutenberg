@@ -7,30 +7,27 @@ import styles from './motion.story.module.css';
 
 const EASING_TOKENS = [
 	{
+		name: 'gentle',
+		variable: 'var(--wpds-motion-easing-gentle)',
+		description: 'Hover, color, and background transitions.',
+	},
+	{
 		name: 'standard',
 		variable: 'var(--wpds-motion-easing-standard)',
-		description: 'State changes like hover, color, and toggle transitions.',
+		description:
+			'On-screen movement like resizing, morphing, and layout shifts.',
 	},
 	{
 		name: 'decelerate',
 		variable: 'var(--wpds-motion-easing-decelerate)',
 		description:
-			'Elements entering the screen, such as menus and popovers.',
+			'Elements entering or exiting the screen, such as menus and popovers.',
 	},
 	{
 		name: 'decelerate-emphasized',
 		variable: 'var(--wpds-motion-easing-decelerate-emphasized)',
-		description: 'Prominent entrances like dialogs and drawers.',
-	},
-	{
-		name: 'accelerate',
-		variable: 'var(--wpds-motion-easing-accelerate)',
-		description: 'Elements leaving the screen.',
-	},
-	{
-		name: 'accelerate-emphasized',
-		variable: 'var(--wpds-motion-easing-accelerate-emphasized)',
-		description: 'Prominent exits like dialogs and drawers.',
+		description:
+			'Prominent elements entering or exiting, like dialogs and drawers.',
 	},
 ];
 

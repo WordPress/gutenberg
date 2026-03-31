@@ -25,25 +25,21 @@
 		},
 		"easing": {
 			"$type": "cubicBezier",
+			"gentle": {
+				"$value": [ 0.25, 0.1, 0.25, 1 ],
+				"$description": "Subtle easing for hover, color, and background transitions"
+			},
 			"standard": {
 				"$value": [ 0.4, 0, 0.2, 1 ],
-				"$description": "Balanced easing for state changes like hover, color, and toggle transitions"
+				"$description": "Balanced easing for on-screen movement like resizing, morphing, and layout shifts"
 			},
 			"decelerate": {
 				"$value": [ 0, 0, 0, 1 ],
-				"$description": "Decelerating easing for elements entering the screen, such as menus and popovers"
-			},
-			"accelerate": {
-				"$value": [ 1, 0, 1, 1 ],
-				"$description": "Accelerating easing for elements leaving the screen"
+				"$description": "Decelerating easing for elements entering or exiting the screen, such as menus and popovers"
 			},
 			"decelerate-emphasized": {
 				"$value": [ 0.29, 0, 0, 1 ],
-				"$description": "Expressive entrance for prominent elements like dialogs and drawers"
-			},
-			"accelerate-emphasized": {
-				"$value": [ 1, 0, 0.2, 1 ],
-				"$description": "Expressive exit for prominent elements like dialogs and drawers"
+				"$description": "Expressive easing for prominent elements entering or exiting, like dialogs and drawers"
 			}
 		}
 	}

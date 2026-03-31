@@ -16,13 +16,13 @@
 	z-index: z-index(".components-modal__screen-overlay");
 	display: flex;
 	// This animates the appearance of the backdrop.
-	@include animation__fade-in($speed: var(--wpds-motion-duration-sm), $easing: linear);
+	@include animation__fade-in($speed: var(--wpds-motion-duration-sm), $easing: var(--wpds-motion-easing-decelerate-emphasized));
 
 	&.is-animating-out {
 		// Note: it's important that the fade-out animation doesn't end after the
 		// modal frame's disappear animation, because the component will be removed
 		// from the DOM when that animation ends.
-		@include animation__fade-out($speed: var(--wpds-motion-duration-sm), $delay: var(--wpds-motion-duration-sm), $easing: linear);
+		@include animation__fade-out($speed: var(--wpds-motion-duration-sm), $delay: var(--wpds-motion-duration-sm), $easing: var(--wpds-motion-easing-decelerate-emphasized));
 	}
 }
 
@@ -62,7 +62,7 @@
 
 	.components-modal__screen-overlay.is-animating-out & {
 		animation-name: components-modal__disappear-animation;
-		animation-timing-function: var(--wpds-motion-easing-accelerate-emphasized);
+		animation-timing-function: var(--wpds-motion-easing-decelerate-emphasized);
 	}
 
 	// Show a centered modal on bigger screens.
