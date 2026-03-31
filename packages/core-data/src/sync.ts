@@ -39,7 +39,18 @@ export function getSyncManager(): SyncManager | undefined {
 		return syncManager;
 	}
 
-	syncManager = createSyncManager();
+	const syncOptions: Record< string, unknown > = {};
+	if (
+		typeof globalThis !== 'undefined' &&
+		typeof ( globalThis as any ).__experimentalSyncDowngradeDebounceMs ===
+			'number'
+	) {
+		syncOptions.downgradeDebounceMs = (
+			globalThis as any
+		 ).__experimentalSyncDowngradeDebounceMs;
+	}
+
+	syncManager = createSyncManager( syncOptions );
 
 	return syncManager;
 }

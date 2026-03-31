@@ -112,7 +112,7 @@ export function createPresenceDetector(
 			}
 
 			if ( result.otherClientIds.length > 0 ) {
-				// Another editor detected! Clean up first, then notify.
+				// Another editor detected! Notify first, then clean up.
 				// Using try/finally ensures polling is stopped even if
 				// the callback throws.
 				try {

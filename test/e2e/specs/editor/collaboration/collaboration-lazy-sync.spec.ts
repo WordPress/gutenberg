@@ -161,8 +161,7 @@ test.describe( 'Collaboration - Lazy Sync', () => {
 						if ( postData ) {
 							const body = JSON.parse( postData );
 							user1SyncRequests.push( {
-								presenceOnly:
-									body.presence_only === true,
+								presenceOnly: body.presence_only === true,
 								timestamp: Date.now(),
 							} );
 						}
@@ -191,9 +190,9 @@ test.describe( 'Collaboration - Lazy Sync', () => {
 
 			// Confirm initial polls are presence-only.
 			const initialRequests = [ ...user1SyncRequests ];
-			expect(
-				initialRequests.every( ( r ) => r.presenceOnly )
-			).toBe( true );
+			expect( initialRequests.every( ( r ) => r.presenceOnly ) ).toBe(
+				true
+			);
 
 			// Step 2: User 2 joins the same post.
 			const { editor: editor2 } = await collaborationUtils.joinUser(
@@ -240,12 +239,9 @@ test.describe( 'Collaboration - Lazy Sync', () => {
 			// Step 6: Verify bidirectional sync — User 2 makes an edit.
 			const { page2 } = collaborationUtils;
 			await page2.evaluate( () => {
-				const block = window.wp.blocks.createBlock(
-					'core/paragraph',
-					{
-						content: 'Edit from User 2',
-					}
-				);
+				const block = window.wp.blocks.createBlock( 'core/paragraph', {
+					content: 'Edit from User 2',
+				} );
 				window.wp.data
 					.dispatch( 'core/block-editor' )
 					.insertBlock( block );
@@ -264,107 +260,107 @@ test.describe( 'Collaboration - Lazy Sync', () => {
 		} );
 	} );
 
-	test.describe(
-		'Scenario C: User 2 leaves after collaboration',
-		() => {
-			test( 'User 1 downgrades to presence-only after User 2 leaves', async ( {
-				collaborationUtils,
-				requestUtils,
-				editor,
-				page,
-			} ) => {
-				const post = await requestUtils.createPost( {
-					title: 'Lazy Sync - User Leaves',
-					status: 'draft',
-					date_gmt: new Date().toISOString(),
-				} );
-
-				// Track User 1's sync requests.
-				const user1SyncRequests: Array< {
-					presenceOnly: boolean;
-					timestamp: number;
-				} > = [];
-
-				page.on( 'request', ( request ) => {
-					if ( request.url().includes( 'wp-sync' ) ) {
-						try {
-							const postData = request.postData();
-							if ( postData ) {
-								const body = JSON.parse( postData );
-								user1SyncRequests.push( {
-									presenceOnly:
-										body.presence_only === true,
-									timestamp: Date.now(),
-								} );
-							}
-						} catch {
-							// Ignore parse errors.
-						}
-					}
-				} );
-
-				// Open collaborative session (both users).
-				await collaborationUtils.openCollaborativeSession( post.id );
-
-				// Both users should be fully synced now.
-				const fullSyncCountBefore = user1SyncRequests.filter(
-					( r ) => ! r.presenceOnly
-				).length;
-				expect( fullSyncCountBefore ).toBeGreaterThan( 0 );
-
-				// User 2 closes their tab.
-				const { page2 } = collaborationUtils;
-				await page2.close();
-
-				// The awareness monitor detects all collaborators gone and starts
-				// a 30s debounce timer. After it fires, providers disconnect and
-				// the presence detector restarts with presence-only polling.
-				//
-				// Wait for the downgrade: after ~30s debounce + a few poll cycles,
-				// User 1 should revert to presence-only requests.
-				await expect
-					.poll(
-						() => {
-							// Look for presence-only requests that appeared after
-							// the collaborative session was established.
-							const recentPresenceOnly =
-								user1SyncRequests.filter(
-									( r ) =>
-										r.presenceOnly &&
-										r.timestamp >
-											Date.now() - 15_000
-								);
-							return recentPresenceOnly.length;
-						},
-						{
-							// 30s debounce + 10s poll interval + buffer
-							timeout: 50000,
-							intervals: [ 3000 ],
-						}
-					)
-					.toBeGreaterThanOrEqual( 1 );
-
-				// User 1 can still edit after downgrade.
-				await editor.insertBlock( {
-					name: 'core/paragraph',
-					attributes: { content: 'Edit after User 2 left' },
-				} );
-
-				await expect
-					.poll( () => editor.getBlocks(), { timeout: 5000 } )
-					.toMatchObject(
-						expect.arrayContaining( [
-							expect.objectContaining( {
-								name: 'core/paragraph',
-								attributes: {
-									content: 'Edit after User 2 left',
-								},
-							} ),
-						] )
-					);
+	test.describe( 'Scenario C: User 2 leaves after collaboration', () => {
+		test( 'User 1 downgrades to presence-only after User 2 leaves', async ( {
+			collaborationUtils,
+			requestUtils,
+			editor,
+			page,
+		} ) => {
+			// Use a shorter downgrade debounce to speed up this test.
+			// The sync manager reads this global when it initialises.
+			await page.addInitScript( () => {
+				(
+					globalThis as any
+				 ).__experimentalSyncDowngradeDebounceMs = 5000;
 			} );
-		}
-	);
+
+			const post = await requestUtils.createPost( {
+				title: 'Lazy Sync - User Leaves',
+				status: 'draft',
+				date_gmt: new Date().toISOString(),
+			} );
+
+			// Track User 1's sync requests.
+			const user1SyncRequests: Array< {
+				presenceOnly: boolean;
+				timestamp: number;
+			} > = [];
+
+			page.on( 'request', ( request ) => {
+				if ( request.url().includes( 'wp-sync' ) ) {
+					try {
+						const postData = request.postData();
+						if ( postData ) {
+							const body = JSON.parse( postData );
+							user1SyncRequests.push( {
+								presenceOnly: body.presence_only === true,
+								timestamp: Date.now(),
+							} );
+						}
+					} catch {
+						// Ignore parse errors.
+					}
+				}
+			} );
+
+			// Open collaborative session (both users).
+			await collaborationUtils.openCollaborativeSession( post.id );
+
+			// Both users should be fully synced now.
+			const fullSyncCountBefore = user1SyncRequests.filter(
+				( r ) => ! r.presenceOnly
+			).length;
+			expect( fullSyncCountBefore ).toBeGreaterThan( 0 );
+
+			// User 2 closes their tab.
+			const { page2 } = collaborationUtils;
+			await page2.close();
+
+			// The awareness monitor detects all collaborators gone and starts
+			// a 5s debounce timer (shortened via __experimentalSyncDowngradeDebounceMs).
+			// After it fires, providers disconnect and the presence detector
+			// restarts with presence-only polling.
+			await expect
+				.poll(
+					() => {
+						// Look for presence-only requests that appeared after
+						// the collaborative session was established.
+						const recentPresenceOnly = user1SyncRequests.filter(
+							( r ) =>
+								r.presenceOnly &&
+								r.timestamp > Date.now() - 15_000
+						);
+						return recentPresenceOnly.length;
+					},
+					{
+						// 5s debounce + 10s poll interval + buffer
+						timeout: 25000,
+						intervals: [ 2000 ],
+					}
+				)
+				.toBeGreaterThanOrEqual( 1 );
+
+			// User 1 can still edit after downgrade.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Edit after User 2 left' },
+			} );
+
+			await expect
+				.poll( () => editor.getBlocks(), { timeout: 5000 } )
+				.toMatchObject(
+					expect.arrayContaining( [
+						expect.objectContaining( {
+							name: 'core/paragraph',
+							attributes: expect.objectContaining( {
+								content: 'Edit after User 2 left',
+							} ),
+						} ),
+					] )
+				);
+		} );
+	} );
 
 	test.describe( 'Scenario D: Undo/redo across the sync transition', () => {
 		test( 'solo edits undo correctly after sync upgrade', async ( {
@@ -432,18 +428,14 @@ test.describe( 'Collaboration - Lazy Sync', () => {
 			await expect( async () => {
 				const blocks = await editor.getBlocks();
 				expect( blocks ).toHaveLength( 1 );
-				expect( blocks[ 0 ].attributes.content ).toBe(
-					'Solo block 1'
-				);
+				expect( blocks[ 0 ].attributes.content ).toBe( 'Solo block 1' );
 			} ).toPass( { timeout: 5000 } );
 
 			// The undo should also sync to User 2.
 			await expect( async () => {
 				const blocks = await editor2.getBlocks();
 				expect( blocks ).toHaveLength( 1 );
-				expect( blocks[ 0 ].attributes.content ).toBe(
-					'Solo block 1'
-				);
+				expect( blocks[ 0 ].attributes.content ).toBe( 'Solo block 1' );
 			} ).toPass( { timeout: 10000 } );
 
 			// Step 5: User 1 undoes again (removes the first solo block).
@@ -463,9 +455,7 @@ test.describe( 'Collaboration - Lazy Sync', () => {
 			await expect( async () => {
 				const blocks = await editor.getBlocks();
 				expect( blocks ).toHaveLength( 1 );
-				expect( blocks[ 0 ].attributes.content ).toBe(
-					'Solo block 1'
-				);
+				expect( blocks[ 0 ].attributes.content ).toBe( 'Solo block 1' );
 			} ).toPass( { timeout: 5000 } );
 		} );
 	} );

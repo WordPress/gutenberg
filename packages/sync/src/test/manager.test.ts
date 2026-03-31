@@ -568,6 +568,101 @@ describe( 'SyncManager', () => {
 		} );
 	} );
 
+	describe( 'provider creation failure recovery', () => {
+		it( 'restarts presence detection when connectProviders rejects', async () => {
+			// First call: presence detector fires immediately → connectProviders.
+			// connectProviders will reject because mockProviderCreator rejects.
+			const detectorDestroys: Array< jest.Mock > = [];
+			const detectorCallbacks: Array< () => void > = [];
+
+			mockCreatePresenceDetector.mockImplementation( ( options ) => {
+				const destroyFn = jest.fn();
+				detectorCallbacks.push( options.onCollaboratorDetected );
+				detectorDestroys.push( destroyFn );
+				return { destroy: destroyFn };
+			} );
+
+			// Provider creation fails.
+			mockProviderCreator.mockRejectedValueOnce(
+				new Error( 'connection failed' )
+			);
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'postType/post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			// Phase 1: Presence detector created.
+			expect( detectorCallbacks ).toHaveLength( 1 );
+
+			// Simulate collaborator detected → triggers connectProviders which rejects.
+			detectorCallbacks[ 0 ]();
+			await tick();
+
+			// connectProviders failed, so a new presence detector should
+			// be started (restartPresenceDetection).
+			expect( detectorCallbacks ).toHaveLength( 2 );
+
+			// Now make the provider succeed on the retry.
+			mockProviderCreator.mockResolvedValueOnce( mockProviderResult );
+
+			// Simulate another collaborator detection from the new detector.
+			detectorCallbacks[ 1 ]();
+			await tick();
+
+			// Providers should now be connected.
+			expect( mockProviderCreator ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'destroys partially-created providers when one rejects', async () => {
+			const successfulProvider: ProviderCreatorResult = {
+				destroy: jest.fn(),
+				on: jest.fn(),
+			};
+			const failingCreator: jest.Mock< ProviderCreator > = jest.fn( () =>
+				Promise.reject( new Error( 'second provider failed' ) )
+			);
+
+			// Two provider creators: first succeeds, second fails.
+			mockGetProviderCreators.mockReturnValue( [
+				jest.fn( () => Promise.resolve( successfulProvider ) ),
+				failingCreator,
+			] );
+
+			const detectorCallbacks: Array< () => void > = [];
+			mockCreatePresenceDetector.mockImplementation( ( options ) => {
+				detectorCallbacks.push( options.onCollaboratorDetected );
+				return { destroy: jest.fn() };
+			} );
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'postType/post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			// Trigger connection attempt.
+			detectorCallbacks[ 0 ]();
+			await tick();
+
+			// The successful provider should have been destroyed (cleanup
+			// of partial results).
+			expect( successfulProvider.destroy ).toHaveBeenCalledTimes( 1 );
+
+			// A new presence detector should be started for retry.
+			expect( detectorCallbacks ).toHaveLength( 2 );
+		} );
+	} );
+
 	describe( 'downgrade lifecycle', () => {
 		let capturedAwareness: Awareness | null;
 
@@ -823,7 +918,7 @@ describe( 'SyncManager', () => {
 			const slowProvider = new Promise( ( resolve ) => {
 				resolveProvider = resolve;
 			} );
-			mockProviderCreator.mockImplementationOnce( async ( opts ) => {
+			mockProviderCreator.mockImplementationOnce( async () => {
 				await slowProvider;
 				return mockProviderResult;
 			} );
@@ -1190,8 +1285,8 @@ describe( 'SyncManager', () => {
 		beforeEach( () => {
 			mockCollectionHandlers = {
 				onStatusChange: jest.fn< () => void >(),
-				refetchRecords: jest.fn< () => Promise< void > >(
-					() => Promise.resolve()
+				refetchRecords: jest.fn< () => Promise< void > >( () =>
+					Promise.resolve()
 				),
 			};
 		} );
@@ -1396,13 +1491,9 @@ describe( 'SyncManager', () => {
 			await jest.advanceTimersByTimeAsync( 31_000 );
 
 			// Entity provider destroyed.
-			expect( providerResults[ 0 ].destroy ).toHaveBeenCalledTimes(
-				1
-			);
+			expect( providerResults[ 0 ].destroy ).toHaveBeenCalledTimes( 1 );
 			// Collection provider also destroyed.
-			expect( providerResults[ 1 ].destroy ).toHaveBeenCalledTimes(
-				1
-			);
+			expect( providerResults[ 1 ].destroy ).toHaveBeenCalledTimes( 1 );
 
 			jest.useRealTimers();
 		} );
@@ -1444,13 +1535,9 @@ describe( 'SyncManager', () => {
 			manager.unload( 'post', '123' );
 
 			// Entity provider destroyed.
-			expect( providerResults[ 0 ].destroy ).toHaveBeenCalledTimes(
-				1
-			);
+			expect( providerResults[ 0 ].destroy ).toHaveBeenCalledTimes( 1 );
 			// Collection provider also destroyed (last entity gone).
-			expect( providerResults[ 1 ].destroy ).toHaveBeenCalledTimes(
-				1
-			);
+			expect( providerResults[ 1 ].destroy ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'keeps collection connected if another entity is still synced', async () => {
@@ -1501,9 +1588,7 @@ describe( 'SyncManager', () => {
 			manager.unload( 'post', '123' );
 
 			// Entity 1 provider destroyed.
-			expect( providerResults[ 0 ].destroy ).toHaveBeenCalledTimes(
-				1
-			);
+			expect( providerResults[ 0 ].destroy ).toHaveBeenCalledTimes( 1 );
 			// Collection still connected (entity 2 still synced).
 			expect( providerResults[ 2 ].destroy ).not.toHaveBeenCalled();
 
@@ -1511,9 +1596,7 @@ describe( 'SyncManager', () => {
 			manager.unload( 'post', '456' );
 
 			// Now collection should also disconnect.
-			expect( providerResults[ 2 ].destroy ).toHaveBeenCalledTimes(
-				1
-			);
+			expect( providerResults[ 2 ].destroy ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'collection unload works when providers are deferred', async () => {

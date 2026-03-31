@@ -54,11 +54,16 @@ interface CollectionState {
 }
 
 /**
- * Debounce delay before downgrading from full sync back to presence-only
- * mode after all collaborators leave. This avoids flapping on brief
- * disconnects (e.g. page reloads, network blips).
+ * Default debounce delay before downgrading from full sync back to
+ * presence-only mode after all collaborators leave. This avoids flapping
+ * on brief disconnects (e.g. page reloads, network blips).
  */
-const DOWNGRADE_DEBOUNCE_MS = 30_000;
+const DEFAULT_DOWNGRADE_DEBOUNCE_MS = 30_000;
+
+interface SyncManagerOptions {
+	debug?: boolean;
+	downgradeDebounceMs?: number;
+}
 
 interface EntityState {
 	awareness?: Awareness;
@@ -96,9 +101,18 @@ function getEntityId(
  * creates Yjs documents, connects to providers, creates awareness instances,
  * and coordinates with the `core-data` store.
  *
- * @param debug Whether to enable performance and debug logging.
+ * @param optionsOrDebug Options object or boolean for backwards-compatible debug flag.
  */
-export function createSyncManager( debug = false ): SyncManager {
+export function createSyncManager(
+	optionsOrDebug: SyncManagerOptions | boolean = false
+): SyncManager {
+	const managerOptions: SyncManagerOptions =
+		typeof optionsOrDebug === 'boolean'
+			? { debug: optionsOrDebug }
+			: optionsOrDebug;
+	const debug = managerOptions.debug ?? false;
+	const downgradeDebounceMs =
+		managerOptions.downgradeDebounceMs ?? DEFAULT_DOWNGRADE_DEBOUNCE_MS;
 	const debugWrap = debug ? logPerformanceTiming : passThru;
 	const collectionStates: Map< ObjectType, CollectionState > = new Map();
 	const entityStates: Map< EntityID, EntityState > = new Map();
@@ -181,21 +195,35 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		log( 'connectProviders', 'upgrading to full sync', entityId );
 
-		const providerResults = await Promise.all(
-			providerCreators.map( async ( create ) => {
-				const provider = await create( {
-					objectType,
-					objectId,
-					ydoc,
-					awareness,
-				} );
+		// Track providers as they are created so we can clean up partial
+		// results if a later provider rejects.
+		const created: ProviderCreatorResult[] = [];
+		let providerResults: ProviderCreatorResult[];
 
-				// Attach status listener after provider creation.
-				provider.on( 'status', handlers.onStatusChange );
+		try {
+			providerResults = await Promise.all(
+				providerCreators.map( async ( create ) => {
+					const provider = await create( {
+						objectType,
+						objectId,
+						ydoc,
+						awareness,
+					} );
 
-				return provider;
-			} )
-		);
+					created.push( provider );
+
+					// Attach status listener after provider creation.
+					provider.on( 'status', handlers.onStatusChange );
+
+					return provider;
+				} )
+			);
+		} catch ( error ) {
+			// Destroy any providers that were successfully created before
+			// the failure so they are not leaked.
+			created.forEach( ( provider ) => provider.destroy() );
+			throw error;
+		}
 
 		// Store provider results so they can be cleaned up on unload.
 		entityState.providerResults = providerResults;
@@ -209,6 +237,66 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Also connect any deferred collections that were waiting for an
 		// entity to detect collaboration.
 		await connectAllDeferredCollections();
+	}
+
+	/**
+	 * Restart presence detection for an entity without requiring existing
+	 * provider results. This is safe to call after a failed connection
+	 * attempt (where providerResults was never assigned) as well as after
+	 * a successful disconnection.
+	 *
+	 * @param {EntityID}          entityId         Entity identifier.
+	 * @param {ProviderCreator[]} providerCreators Provider creators for reconnection.
+	 */
+	function restartPresenceDetection(
+		entityId: EntityID,
+		providerCreators: ProviderCreator[]
+	): void {
+		const entityState = entityStates.get( entityId );
+		if ( ! entityState ) {
+			return;
+		}
+
+		const { awareness, syncConfig, ydoc } = entityState;
+
+		if ( awareness && syncConfig.checkPresence ) {
+			const { objectType, objectId } = entityState;
+			const room = `${ objectType }:${ objectId }`;
+
+			entityState.presenceDetector = createPresenceDetector( {
+				room,
+				clientId: ydoc.clientID,
+				awareness,
+				checkPresence: syncConfig.checkPresence,
+				onCollaboratorDetected: () => {
+					log(
+						'restartPresenceDetection',
+						'collaborator re-detected, reconnecting',
+						entityId
+					);
+					entityState.presenceDetector = null;
+					connectProviders( entityId, providerCreators ).catch(
+						() => {
+							log(
+								'restartPresenceDetection',
+								'reconnection failed, restarting presence detection',
+								entityId
+							);
+							if (
+								entityStates.has( entityId ) &&
+								! entityState.providerResults &&
+								! entityState.presenceDetector
+							) {
+								restartPresenceDetection(
+									entityId,
+									providerCreators
+								);
+							}
+						}
+					);
+				},
+			} );
+		}
 	}
 
 	/**
@@ -228,8 +316,6 @@ export function createSyncManager( debug = false ): SyncManager {
 			return;
 		}
 
-		const { awareness, syncConfig, ydoc } = entityState;
-
 		log( 'disconnectProviders', 'downgrading to presence-only', entityId );
 
 		// Remove awareness monitor before destroying providers.
@@ -243,47 +329,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		entityState.handlers.onStatusChange( null );
 
 		// Restart presence detection if the config supports it.
-		if ( awareness && syncConfig.checkPresence ) {
-			const { objectType, objectId } = entityState;
-			const room = `${ objectType }:${ objectId }`;
-
-			entityState.presenceDetector = createPresenceDetector( {
-				room,
-				clientId: ydoc.clientID,
-				awareness,
-				checkPresence: syncConfig.checkPresence,
-				onCollaboratorDetected: () => {
-					log(
-						'disconnectProviders',
-						'collaborator re-detected, reconnecting',
-						entityId
-					);
-					entityState.presenceDetector = null;
-					connectProviders( entityId, providerCreators ).catch(
-						() => {
-							// Reconnection failed — restart presence
-							// detection so we can try again when the
-							// next collaborator is detected.
-							log(
-								'disconnectProviders',
-								'reconnection failed, restarting presence detection',
-								entityId
-							);
-							if (
-								entityStates.has( entityId ) &&
-								! entityState.providerResults &&
-								! entityState.presenceDetector
-							) {
-								disconnectProviders(
-									entityId,
-									providerCreators
-								);
-							}
-						}
-					);
-				},
-			} );
-		}
+		restartPresenceDetection( entityId, providerCreators );
 
 		// If no entities remain fully synced, also disconnect collections.
 		if ( ! isAnyEntityFullySynced() ) {
@@ -337,7 +383,7 @@ export function createSyncManager( debug = false ): SyncManager {
 					entityState.downgradeTimeoutId = setTimeout( () => {
 						entityState.downgradeTimeoutId = undefined;
 						disconnectProviders( entityId, providerCreators );
-					}, DOWNGRADE_DEBOUNCE_MS );
+					}, downgradeDebounceMs );
 				}
 			} else if ( entityState.downgradeTimeoutId ) {
 				// A remote client reappeared — cancel the downgrade.
@@ -372,7 +418,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			entityState.downgradeTimeoutId = setTimeout( () => {
 				entityState.downgradeTimeoutId = undefined;
 				disconnectProviders( entityId, providerCreators );
-			}, DOWNGRADE_DEBOUNCE_MS );
+			}, downgradeDebounceMs );
 		}
 	}
 
@@ -475,14 +521,8 @@ export function createSyncManager( debug = false ): SyncManager {
 		for ( const [ objectType, state ] of collectionStates ) {
 			if ( state.providerResults ) {
 				const entityId = getEntityId( objectType, null );
-				log(
-					'disconnectAllCollections',
-					'disconnecting',
-					entityId
-				);
-				state.providerResults.forEach( ( result ) =>
-					result.destroy()
-				);
+				log( 'disconnectAllCollections', 'disconnecting', entityId );
+				state.providerResults.forEach( ( result ) => result.destroy() );
 				state.providerResults = undefined;
 				state.handlers.onStatusChange( null );
 			}
@@ -661,7 +701,7 @@ export function createSyncManager( debug = false ): SyncManager {
 								! entityState.providerResults &&
 								! entityState.presenceDetector
 							) {
-								disconnectProviders(
+								restartPresenceDetection(
 									entityId,
 									providerCreators
 								);
@@ -740,9 +780,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		const unload = (): void => {
 			log( 'loadCollection', 'unloading', entityId );
 			const state = collectionStates.get( objectType );
-			state?.providerResults?.forEach( ( result ) =>
-				result.destroy()
-			);
+			state?.providerResults?.forEach( ( result ) => result.destroy() );
 			handlers.onStatusChange( null );
 			stateMap.unobserve( onStateMapUpdate );
 			ydoc.destroy();
