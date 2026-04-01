@@ -18,7 +18,7 @@ This package requires CSS from this package and from multiple dependency package
 
 ### Within WordPress
 
-To ensure proper load order, add the `wp-components` and `wp-admin-ui` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
+To ensure proper load order, add the `wp-components` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
 
 ### Outside WordPress
 
