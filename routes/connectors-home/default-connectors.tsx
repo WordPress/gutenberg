@@ -239,6 +239,12 @@ export function registerDefaultConnectors() {
 	const sanitize = ( s: string ) => s.replace( /[^a-z0-9-_]/gi, '-' );
 
 	for ( const [ connectorId, data ] of Object.entries( connectors ) ) {
+		// Special case: Hide Akismet unless it is already installed.
+		// See https://core.trac.wordpress.org/ticket/65012
+		if ( connectorId === 'akismet' && ! data.plugin?.isInstalled ) {
+			continue;
+		}
+
 		const { authentication } = data;
 
 		const connectorName = sanitize( connectorId );
