@@ -296,11 +296,6 @@ export interface OperationArgs {
 	[ OperationType.TranscodeGif ]: {
 		/** Video output format: 'mp4' or 'webm'. */
 		outputFormat: 'mp4' | 'webm';
-		/** FFmpeg WASM config from the wp-ffmpeg-wasm plugin. */
-		ffmpegConfig: {
-			coreUrl: string;
-			wasmUrl: string;
-		};
 	};
 }
 

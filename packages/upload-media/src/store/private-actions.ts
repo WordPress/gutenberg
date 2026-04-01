@@ -30,7 +30,6 @@ import {
 	terminateVipsWorker,
 } from './utils';
 import { ffmpegConvertGifToVideo } from './utils/ffmpeg';
-import { ensureFFmpegAvailable } from './utils/ffmpeg-plugin';
 import type {
 	AddAction,
 	AdditionalData,
@@ -771,8 +770,6 @@ export function prepareItem( id: QueueItemId ) {
 
 		// Check for animated GIF → video conversion.
 		// When enabled, animated GIFs are converted to MP4/WebM for smaller file sizes.
-		// The FFmpeg WASM binary is provided by the wp-ffmpeg-wasm canonical plugin,
-		// which is installed on-demand if the user has plugin installation permissions.
 		if (
 			file.type === 'image/gif' &&
 			settings.gifConvert !== false &&
@@ -780,43 +777,36 @@ export function prepareItem( id: QueueItemId ) {
 		) {
 			const buffer = await file.arrayBuffer();
 			if ( isAnimatedGif( buffer ) ) {
-				// Ensure FFmpeg plugin is available (installs if needed).
-				const ffmpegConfig = await ensureFFmpegAvailable();
+				const outputFormat =
+					settings.videoOutputFormat === 'video/webm'
+						? 'webm'
+						: 'mp4';
 
-				if ( ffmpegConfig ) {
-					const outputFormat =
-						settings.videoOutputFormat === 'video/webm'
-							? 'webm'
-							: 'mp4';
+				operations.push(
+					[
+						OperationType.TranscodeGif,
+						{
+							outputFormat,
+						} as OperationArgs[ OperationType.TranscodeGif ],
+					],
+					OperationType.Upload
+				);
 
-					operations.push(
-						[
-							OperationType.TranscodeGif,
-							{
-								outputFormat,
-								ffmpegConfig,
-							} as OperationArgs[ OperationType.TranscodeGif ],
-						],
-						OperationType.Upload
-					);
+				dispatch< AddOperationsAction >( {
+					type: Type.AddOperations,
+					id,
+					operations,
+				} );
 
-					dispatch< AddOperationsAction >( {
-						type: Type.AddOperations,
-						id,
-						operations,
-					} );
-
-					// Tell the server to handle sub-sizes since this will be a video.
-					dispatch.finishOperation( id, {
-						additionalData: {
-							...item.additionalData,
-							generate_sub_sizes: true,
-							convert_format: true,
-						},
-					} );
-					return;
-				}
-				// FFmpeg unavailable — fall through to upload GIF as-is.
+				// Tell the server to handle sub-sizes since this will be a video.
+				dispatch.finishOperation( id, {
+					additionalData: {
+						...item.additionalData,
+						generate_sub_sizes: true,
+						convert_format: true,
+					},
+				} );
+				return;
 			}
 		}
 
@@ -1175,24 +1165,11 @@ export function transcodeGifItem(
 		const outputFormat = args?.outputFormat ?? 'mp4';
 		const outputMimeType = `video/${ outputFormat }`;
 
-		if ( ! args?.ffmpegConfig ) {
-			dispatch.cancelItem(
-				id,
-				new UploadError( {
-					code: 'GIF_TRANSCODING_ERROR',
-					message: 'FFmpeg WASM configuration is missing',
-					file: item.file,
-				} )
-			);
-			return;
-		}
-
 		try {
 			const file = await ffmpegConvertGifToVideo(
 				item.id,
 				item.file,
-				outputMimeType,
-				args.ffmpegConfig
+				outputMimeType
 			);
 
 			const blobUrl = createBlobURL( file );

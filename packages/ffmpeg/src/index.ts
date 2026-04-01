@@ -1,21 +1,16 @@
 /**
+ * External dependencies
+ */
+// @ts-expect-error - Default export is the Emscripten module factory.
+import createFFmpegCore from '@ffmpeg/core';
+
+// @ts-expect-error - WASM file is inlined as a base64 data URL at build time.
+import FFmpegCoreWasm from '@ffmpeg/core/wasm';
+
+/**
  * Internal dependencies
  */
 import type { ItemId } from './types';
-
-/**
- * FFmpeg WASM configuration provided by the wp-ffmpeg-wasm plugin.
- *
- * The plugin sets window.__ffmpegWasmConfig on editor pages via
- * wp_add_inline_script, or it can be fetched from the plugin's
- * REST endpoint after mid-session installation.
- */
-export interface FFmpegWasmConfig {
-	/** URL to the Emscripten JS glue file (ffmpeg-core.js). */
-	coreUrl: string;
-	/** URL to the FFmpeg WASM binary (ffmpeg-core.wasm). */
-	wasmUrl: string;
-}
 
 interface FFmpegCore {
 	FS: {
@@ -41,58 +36,26 @@ let ffmpegPromise: Promise< FFmpegCore > | undefined;
 /**
  * Instantiates and returns the FFmpeg core module.
  *
- * Loads the Emscripten module and WASM binary from URLs provided
- * by the wp-ffmpeg-wasm canonical plugin. Reuses any existing instance.
- *
- * @param config WASM configuration with URLs to core JS and WASM files.
+ * Reuses any existing instance.
  */
-async function getFFmpegCore(
-	config: FFmpegWasmConfig
-): Promise< FFmpegCore > {
+async function getFFmpegCore(): Promise< FFmpegCore > {
 	if ( ffmpegPromise ) {
 		return await ffmpegPromise;
 	}
 
-	ffmpegPromise = ( async () => {
-		// Fetch the Emscripten JS glue from the plugin's assets directory.
-		const response = await fetch( config.coreUrl );
-		const coreJsText = await response.text();
-
-		// Create the Emscripten module factory from the fetched JS.
-		// The UMD build assigns createFFmpegCore to the global scope.
-		const blob = new Blob( [ coreJsText ], {
-			type: 'application/javascript',
-		} );
-		const blobUrl = URL.createObjectURL( blob );
-
-		// Use importScripts in worker context to load the module factory.
-
-		( self as unknown as WorkerGlobalScope ).importScripts( blobUrl );
-		URL.revokeObjectURL( blobUrl );
-
-		// The Emscripten module factory is now on the global scope.
-		const createFFmpegCore = (
-			self as unknown as Record< string, unknown >
-		 ).createFFmpegCore as (
-			opts: Record< string, unknown >
-		) => Promise< FFmpegCore >;
-
-		if ( ! createFFmpegCore ) {
-			throw new Error( 'Failed to load FFmpeg core module' );
-		}
-
-		return createFFmpegCore( {
-			locateFile: ( fileName: string ) => {
-				if ( fileName.endsWith( '.wasm' ) ) {
-					return config.wasmUrl;
-				}
-				return fileName;
-			},
-			// Suppress Emscripten console output.
-			print: () => {},
-			printErr: () => {},
-		} );
-	} )();
+	ffmpegPromise = createFFmpegCore( {
+		locateFile: ( fileName: string ) => {
+			// WASM file is inlined as a base64 data URL at build time,
+			// eliminating the need for separate file downloads.
+			if ( fileName.endsWith( '.wasm' ) ) {
+				return FFmpegCoreWasm;
+			}
+			return fileName;
+		},
+		// Suppress Emscripten console output.
+		print: () => {},
+		printErr: () => {},
+	} );
 
 	return await ffmpegPromise;
 }
@@ -145,7 +108,6 @@ let operationLock: Promise< void > = Promise.resolve();
  * @param id             Item ID.
  * @param buffer         GIF file buffer.
  * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
- * @param config         WASM configuration with URLs from the wp-ffmpeg-wasm plugin.
  * @param maxDimensions  Optional maximum dimensions for scaling.
  * @return Video file buffer.
  */
@@ -153,7 +115,6 @@ export async function convertGifToVideo(
 	id: ItemId,
 	buffer: ArrayBuffer,
 	outputMimeType: string,
-	config: FFmpegWasmConfig,
 	maxDimensions?: number
 ): Promise< ArrayBuffer > {
 	inProgressOperations.add( id );
@@ -173,7 +134,7 @@ export async function convertGifToVideo(
 			throw new Error( 'Operation cancelled' );
 		}
 
-		const core = await getFFmpegCore( config );
+		const core = await getFFmpegCore();
 
 		// Check if cancelled while waiting for core initialization.
 		if ( ! inProgressOperations.has( id ) ) {

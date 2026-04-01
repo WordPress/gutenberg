@@ -3,13 +3,13 @@
  */
 import { getFileBasename } from '../../utils';
 import type { QueueItemId } from '../types';
-import type { FFmpegConfig } from './ffmpeg-plugin';
 
 /**
  * Cached dynamic import promise for @wordpress/ffmpeg/worker.
  *
- * The module is a thin RPC wrapper. The heavy FFmpeg WASM binary is
- * loaded separately from the wp-ffmpeg-wasm plugin's assets directory.
+ * The module contains inlined FFmpeg WASM code. By using a dynamic import,
+ * the WASM is only loaded when FFmpeg functions are actually called during
+ * GIF-to-video conversion, rather than at module parse time.
  *
  * The promise is cached so the module is only resolved once.
  */
@@ -48,7 +48,6 @@ function loadFFmpegModule(): Promise<
  * @param id             Queue item ID.
  * @param file           GIF file object.
  * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
- * @param config         WASM configuration from the wp-ffmpeg-wasm plugin.
  * @param maxDimensions  Optional maximum dimensions for scaling.
  * @return Converted video file.
  */
@@ -56,7 +55,6 @@ export async function ffmpegConvertGifToVideo(
 	id: QueueItemId,
 	file: File,
 	outputMimeType: string,
-	config: FFmpegConfig,
 	maxDimensions?: number
 ) {
 	const { ffmpegConvertGifToVideo: convertGifToVideo } =
@@ -65,7 +63,6 @@ export async function ffmpegConvertGifToVideo(
 		id,
 		await file.arrayBuffer(),
 		outputMimeType,
-		config,
 		maxDimensions
 	);
 
