@@ -1,5 +1,5 @@
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import Avatar from '../collaborators-presence/avatar';
@@ -8,6 +8,7 @@ import { OVERLAY_IFRAME_STYLES } from './overlay-iframe-styles';
 import { setDelayedInterval } from './timing-utils';
 import { useBlockHighlighting } from './use-block-highlighting';
 import { useRenderCursors } from './use-render-cursors';
+import { type CursorRegistry } from './cursor-registry';
 
 // Milliseconds to wait after a change before recomputing cursor positions.
 const RERENDER_DELAY_MS = 500;
@@ -22,6 +23,7 @@ interface OverlayProps {
 	blockEditorDocument?: Document;
 	postId: number | null;
 	postType: string | null;
+	cursorRegistry?: CursorRegistry;
 }
 
 /**
@@ -31,12 +33,14 @@ interface OverlayProps {
  * @param props.blockEditorDocument - The block editor document.
  * @param props.postId              - The ID of the post.
  * @param props.postType            - The type of the post.
+ * @param props.cursorRegistry      - The shared cursor registry.
  * @return The Overlay component.
  */
 export function Overlay( {
 	blockEditorDocument,
 	postId,
 	postType,
+	cursorRegistry,
 }: OverlayProps ) {
 	// Use state for the overlay element so that the hook re-runs once the ref is attached.
 	const [ overlayElement, setOverlayElement ] =
@@ -93,6 +97,45 @@ export function Overlay( {
 		resizeObserverRef,
 	] );
 
+	// Track cursor element refs for registry registration.
+	const cursorRefsMap = useRef< Map< number, HTMLElement > >( new Map() );
+
+	// Keep the registry in sync whenever the rendered cursors change.
+	useEffect( () => {
+		if ( ! cursorRegistry ) {
+			return;
+		}
+		const refs = cursorRefsMap.current;
+		const currentIds = new Set( cursors.map( ( c ) => c.clientId ) );
+
+		// Unregister cursors that are no longer rendered.
+		for ( const id of refs.keys() ) {
+			if ( ! currentIds.has( id ) ) {
+				cursorRegistry.unregisterCursor( id );
+				refs.delete( id );
+			}
+		}
+
+		// Register or update cursors that are currently rendered.
+		for ( const [ id, el ] of refs.entries() ) {
+			cursorRegistry.registerCursor( id, el );
+		}
+
+		return () => cursorRegistry.removeAll();
+	}, [ cursors, cursorRegistry ] );
+
+	// Callback ref factory to capture each cursor's DOM element.
+	const setCursorRef = useCallback(
+		( clientId: number ) => ( el: HTMLDivElement | null ) => {
+			if ( el ) {
+				cursorRefsMap.current.set( clientId, el );
+			} else {
+				cursorRefsMap.current.delete( clientId );
+			}
+		},
+		[]
+	);
+
 	// This is a full overlay that covers the entire iframe document. Good for
 	// scrollable elements like cursor indicators.
 	return (
@@ -115,6 +158,7 @@ export function Overlay( {
 							/>
 						) ) }
 					<div
+						ref={ setCursorRef( cursor.clientId ) }
 						className="collaborators-overlay-user"
 						style={ {
 							left: `${ cursor.x }px`,

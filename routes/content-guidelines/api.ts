@@ -10,9 +10,8 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import { STORE_NAME } from './store';
+import { store as coreContentGuidelinesStore } from './store';
 import type {
-	Categories,
 	RestGuidelinesResponse,
 	GuidelinesImportData,
 	ContentGuidelinesRevision,
@@ -34,9 +33,7 @@ function isValidGuidelinesImport(
 }
 
 export async function fetchContentGuidelines(): Promise< RestGuidelinesResponse > {
-	const { setFromResponse } = dispatch( STORE_NAME ) as {
-		setFromResponse: ( response: RestGuidelinesResponse ) => void;
-	};
+	const { setFromResponse } = dispatch( coreContentGuidelinesStore );
 
 	const response = ( await apiFetch( {
 		path: '/wp/v2/content-guidelines?context=edit',
@@ -48,16 +45,9 @@ export async function fetchContentGuidelines(): Promise< RestGuidelinesResponse 
 }
 
 export async function saveContentGuidelines(): Promise< RestGuidelinesResponse > {
-	// @ts-ignore
-	const { setFromResponse } = dispatch( STORE_NAME );
+	const { setFromResponse } = dispatch( coreContentGuidelinesStore );
 
-	const guidelinesStore = select( STORE_NAME ) as unknown as {
-		getId: () => number | null;
-		getStatus: () => string | null;
-		getAllGuidelines: () => Categories;
-		getBlockGuidelines: () => Record< string, string >;
-		getGuideline: ( category: string ) => string | Record< string, string >;
-	};
+	const guidelinesStore = select( coreContentGuidelinesStore );
 
 	const id = guidelinesStore.getId();
 	const status = guidelinesStore.getStatus() || 'draft';
@@ -112,8 +102,9 @@ export async function saveContentGuidelines(): Promise< RestGuidelinesResponse >
  * @param file Content Guidelines JSON file
  */
 export async function importContentGuidelines( file: File ): Promise< void > {
-	// @ts-ignore
-	const { setGuideline, setBlockGuideline } = dispatch( STORE_NAME );
+	const { setGuideline, setBlockGuideline } = dispatch(
+		coreContentGuidelinesStore
+	);
 	const { createSuccessNotice } = dispatch( noticesStore );
 
 	const parsed: unknown = JSON.parse( await file.text() );
@@ -126,10 +117,7 @@ export async function importContentGuidelines( file: File ): Promise< void > {
 		);
 	}
 
-	const guidelinesStore = select( STORE_NAME ) as unknown as {
-		getAllGuidelines: () => Categories;
-		getBlockGuidelines: () => Record< string, string >;
-	};
+	const guidelinesStore = select( coreContentGuidelinesStore );
 	const previousCategories = guidelinesStore.getAllGuidelines();
 	const previousBlocks = { ...guidelinesStore.getBlockGuidelines() };
 
@@ -180,10 +168,7 @@ export async function importContentGuidelines( file: File ): Promise< void > {
 export function exportContentGuidelines(): void {
 	const { createSuccessNotice } = dispatch( noticesStore );
 
-	const guidelinesStore = select( STORE_NAME ) as unknown as {
-		getAllGuidelines: () => Categories;
-		getBlockGuidelines: () => Record< string, string >;
-	};
+	const guidelinesStore = select( coreContentGuidelinesStore );
 	const contentGuidelinesCategories = guidelinesStore.getAllGuidelines();
 	const blockGuidelines = guidelinesStore.getBlockGuidelines();
 

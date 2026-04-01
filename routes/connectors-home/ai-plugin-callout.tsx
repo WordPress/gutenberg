@@ -12,6 +12,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -200,16 +201,16 @@ export function AiPluginCallout() {
 	const getMessage = () => {
 		if ( isJustConnected ) {
 			return __(
-				'The <strong>AI plugin</strong> is ready to use. You can use it to generate featured images, alt text, titles, excerpts and more.'
+				'The <strong>AI plugin</strong> is ready to use. You can use it to generate featured images, alt text, titles, excerpts and more. <a>Learn more</a>'
 			);
 		}
 		if ( isActiveNoProvider ) {
 			return __(
-				'The <strong>AI plugin</strong> is installed. Connect a provider below to generate featured images, alt text, titles, excerpts, and more.'
+				'The <strong>AI plugin</strong> is installed. Connect a provider below to generate featured images, alt text, titles, excerpts, and more. <a>Learn more</a>'
 			);
 		}
 		return __(
-			'The <strong>AI plugin</strong> can use your connectors to generate featured images, alt text, titles, excerpts and more.'
+			'The <strong>AI plugin</strong> can use your connectors to generate featured images, alt text, titles, excerpts and more. <a>Learn more</a>'
 		);
 	};
 
@@ -218,7 +219,7 @@ export function AiPluginCallout() {
 			return {
 				label: isBusy
 					? __( 'Installing…' )
-					: __( 'Install AI Experiments' ),
+					: __( 'Install the AI plugin' ),
 				disabled: isBusy,
 				onClick: isBusy ? undefined : installPlugin,
 			};
@@ -227,7 +228,7 @@ export function AiPluginCallout() {
 		return {
 			label: isBusy
 				? __( 'Activating…' )
-				: __( 'Activate AI Experiments' ),
+				: __( 'Activate the AI plugin' ),
 			disabled: isBusy,
 			onClick: isBusy ? undefined : activatePlugin,
 		};
@@ -239,38 +240,33 @@ export function AiPluginCallout() {
 				<p>
 					{ createInterpolateElement( getMessage(), {
 						strong: <strong />,
+						// @ts-ignore children are injected by createInterpolateElement at runtime.
+						a: <ExternalLink href={ AI_PLUGIN_URL } />,
 					} ) }
 				</p>
-				<div className="ai-plugin-callout__actions">
-					{ showInstallActivate ? (
-						<Button
-							ref={ actionButtonRef }
-							variant="primary"
-							size="compact"
-							isBusy={ isBusy }
-							disabled={ getPrimaryButtonProps().disabled }
-							accessibleWhenDisabled
-							onClick={ getPrimaryButtonProps().onClick }
-						>
-							{ getPrimaryButtonProps().label }
-						</Button>
-					) : (
-						justActivated && (
-							<Button
-								ref={ actionButtonRef }
-								variant="secondary"
-								size="compact"
-								disabled
-								accessibleWhenDisabled
-							>
-								{ __( 'AI Experiments enabled' ) }
-							</Button>
-						)
-					) }
-					<ExternalLink href={ AI_PLUGIN_URL }>
-						{ __( 'Learn more' ) }
-					</ExternalLink>
-				</div>
+				{ showInstallActivate ? (
+					<Button
+						variant="primary"
+						size="compact"
+						isBusy={ isBusy }
+						disabled={ getPrimaryButtonProps().disabled }
+						accessibleWhenDisabled
+						onClick={ getPrimaryButtonProps().onClick }
+					>
+						{ getPrimaryButtonProps().label }
+					</Button>
+				) : (
+					<Button
+						ref={ actionButtonRef }
+						variant="secondary"
+						size="compact"
+						href={ addQueryArgs( 'options-general.php', {
+							page: AI_PLUGIN_SLUG,
+						} ) }
+					>
+						{ __( 'Control features in the AI plugin' ) }
+					</Button>
+				) }
 			</div>
 			<WpLogoDecoration />
 		</div>

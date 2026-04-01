@@ -20,6 +20,7 @@ import {
  */
 import { BaseAwareness } from '../awareness/base-awareness';
 import {
+	deserializeBlockAttributes,
 	mergeCrdtBlocks,
 	mergeRichTextUpdate,
 	type Block,
@@ -381,6 +382,15 @@ export function getPostChangesFromCRDTDoc(
 			}
 		} )
 	);
+
+	// Blocks extracted from the CRDT document have rich-text attributes as
+	// plain strings (from Y.Text.toJSON()). Convert them back to RichTextData
+	// so block edit components receive the same types as locally-created blocks.
+	if ( changes.blocks ) {
+		changes.blocks = deserializeBlockAttributes(
+			changes.blocks as Block[]
+		);
+	}
 
 	// Meta changes must be merged with the edited record since not all meta
 	// properties are synced.

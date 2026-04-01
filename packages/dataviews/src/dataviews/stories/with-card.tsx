@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useState, useMemo } from '@wordpress/element';
-import { Card, CardHeader, CardBody } from '@wordpress/components';
+// TODO: enable in the ESlint rule once we complete
+// https://github.com/WordPress/gutenberg/issues/76135.
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Card } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -39,28 +42,32 @@ const WithCardComponent = ( {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
 	return (
-		<Card>
-			<CardHeader>Header</CardHeader>
-			<CardBody style={ { height: containerHeight, minHeight: 0 } }>
-				<DataViews
-					getItemId={ ( item ) => item.id.toString() }
-					paginationInfo={ paginationInfo }
-					data={ shownData }
-					view={ view }
-					fields={ fields }
-					onChangeView={ setView }
-					actions={ actions.filter(
-						( action ) => ! action.supportsBulk
-					) }
-					defaultLayouts={ {
-						[ LAYOUT_TABLE ]: {},
-						[ LAYOUT_GRID ]: {},
-						[ LAYOUT_LIST ]: {},
-						[ LAYOUT_ACTIVITY ]: {},
-					} }
-				/>
-			</CardBody>
-		</Card>
+		<Card.Root>
+			<Card.Header>
+				<Card.Title>Header</Card.Title>
+			</Card.Header>
+			<Card.Content style={ { height: containerHeight, minHeight: 0 } }>
+				<Card.FullBleed>
+					<DataViews
+						getItemId={ ( item ) => item.id.toString() }
+						paginationInfo={ paginationInfo }
+						data={ shownData }
+						view={ view }
+						fields={ fields }
+						onChangeView={ setView }
+						actions={ actions.filter(
+							( action ) => ! action.supportsBulk
+						) }
+						defaultLayouts={ {
+							[ LAYOUT_TABLE ]: {},
+							[ LAYOUT_GRID ]: {},
+							[ LAYOUT_LIST ]: {},
+							[ LAYOUT_ACTIVITY ]: {},
+						} }
+					/>
+				</Card.FullBleed>
+			</Card.Content>
+		</Card.Root>
 	);
 };
 

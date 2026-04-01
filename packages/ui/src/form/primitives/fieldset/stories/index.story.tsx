@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Fieldset } from '../../../..';
+import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Fieldset.Root > = {
 	title: 'Design System/Components/Form/Primitives/Fieldset',
@@ -74,13 +75,7 @@ export const WithDetails: Story = {
 						<input type="checkbox" /> { fruit }
 					</label>
 				) ) }
-				<Fieldset.Details>
-					Details can include{ ' ' }
-					<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
-						links to more information
-					</a>{ ' ' }
-					and other semantic elements.
-				</Fieldset.Details>
+				<Fieldset.Details>{ DETAILS_EXAMPLE }</Fieldset.Details>
 			</>
 		),
 	},

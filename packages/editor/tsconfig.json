@@ -37,6 +37,7 @@
 		{ "path": "../rich-text" },
 		{ "path": "../url" },
 		{ "path": "../upload-media" },
+		{ "path": "../views" },
 		{ "path": "../warning" },
 		{ "path": "../wordcount" }
 	]

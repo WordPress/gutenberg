@@ -1,6 +1,8 @@
 # Admin UI
 
-Generic components to be used to build the Admin UI.
+UI components for building consistent admin page layouts.
+
+While `@wordpress/ui` provides low-level, generic UI components that can be composed in flexible arrangements for building admin features, the purpose of this package is to guarantee consistency in the common page structure of an admin page layout. This includes high-level abstractions for a page, its sidebar, header, navigation, and other standardized page layout elements. The goal of standardizing these layouts is to provide a cohesive and predictable experience for users.
 
 ## Installation
 
@@ -16,7 +18,26 @@ npm install @wordpress/admin-ui --save
 
 ### Breadcrumbs
 
-Undocumented declaration.
+Renders a breadcrumb navigation trail.
+
+All items except the last one must provide a `to` prop for navigation. In development mode, an error is thrown when a non-last item is missing `to`. The last item represents the current page and its `to` prop is optional. Only the last item (when it has no `to` prop) is rendered as an `h1`.
+
+_Usage_
+
+```jsx
+<Breadcrumbs
+	items={ [
+		{ label: 'Home', to: '/' },
+		{ label: 'Settings', to: '/settings' },
+		{ label: 'General' },
+	] }
+/>
+```
+
+_Parameters_
+
+-   _props_ `BreadcrumbsProps`:
+-   _props.items_ `BreadcrumbsProps[ 'items' ]`: The breadcrumb items to display.
 
 ### NavigableRegion
 
