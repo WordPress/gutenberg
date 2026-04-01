@@ -5,7 +5,8 @@
 import createFFmpegCore from '@ffmpeg/core';
 
 // @ts-expect-error - WASM file is inlined as a base64 data URL at build time.
-import FFmpegCoreWasm from '@ffmpeg/core/wasm';
+// Uses the direct .wasm path so the wasmInlinePlugin regex matches.
+import FFmpegCoreWasm from '@ffmpeg/core/dist/umd/ffmpeg-core.wasm';
 
 /**
  * Internal dependencies

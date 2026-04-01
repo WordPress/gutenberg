@@ -44,7 +44,10 @@
 	},
 	"wpWorkers": {
 		"./worker": {
-			"entry": "./src/worker.ts"
+			"entry": "./src/worker.ts",
+			"resolve": {
+				"esm/ffmpeg-core.js": "umd/ffmpeg-core.js"
+			}
 		}
 	},
 	"wpScriptModuleExports": {
