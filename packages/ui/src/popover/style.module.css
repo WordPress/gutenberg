@@ -9,6 +9,7 @@
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 		padding: var(--wpds-dimension-padding-md);
 		border-radius: var(--wpds-border-radius-md);
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 		box-shadow: var(--wpds-elevation-md);
 		font-family: var(--wpds-font-family-body);
 		font-size: var(--wpds-font-size-md);

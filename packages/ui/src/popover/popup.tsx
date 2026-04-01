@@ -42,7 +42,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		initialFocus,
 		inline: inlineProp = false,
 		side = 'bottom',
-		sideOffset = 4,
+		sideOffset = 8,
 		sticky,
 		style,
 		variant = 'default',
@@ -51,11 +51,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	ref
 ) {
 	const inlineContainerRef = useRef< HTMLSpanElement >( null );
-	const { resolvedInitialFocus, popupRef } =
-		useDeprioritizedInitialFocus( {
-			initialFocus,
-			deprioritizedAttribute: CLOSE_ATTR,
-		} );
+	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
+		initialFocus,
+		deprioritizedAttribute: CLOSE_ATTR,
+	} );
 	const mergedPopupRef = useMergeRefs( [ ref, popupRef ] );
 
 	const backdropElement = backdrop ? (
