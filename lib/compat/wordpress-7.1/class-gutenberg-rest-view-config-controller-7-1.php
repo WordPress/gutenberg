@@ -118,6 +118,8 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			$default_view    = $this->get_default_view_for_page();
 			$view_list       = $this->get_view_list_for_page( $all_items_title, $default_layouts );
 			$form            = $this->get_form_for_page();
+		} elseif ( 'postType' === $kind && 'post' === $name) {
+			$form = $this->get_form_for_page();
 		} elseif ( 'postType' === $kind && 'wp_block' === $name ) {
 			$default_layouts = $this->get_default_layouts_for_wp_block();
 			$default_view    = $this->get_default_view_for_wp_block( $default_layouts );
