@@ -558,6 +558,169 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	}
 
 	/**
+	 * Returns the schema for a form layout object as a discriminated union.
+	 *
+	 * Each variant is discriminated by a single-value enum on its `type` property,
+	 * matching the TypeScript Layout union in dataviews/src/types/dataform.ts.
+	 *
+	 * @return array Schema for a form layout object.
+	 */
+	private function get_form_layout_schema() {
+		return array(
+			'oneOf' => array(
+				// RegularLayout.
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'type'          => array(
+							'type' => 'string',
+							'enum' => array( 'regular' ),
+						),
+						'labelPosition' => array(
+							'type' => 'string',
+							'enum' => array( 'top', 'side', 'none' ),
+						),
+					),
+				),
+				// PanelLayout.
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'type'           => array(
+							'type' => 'string',
+							'enum' => array( 'panel' ),
+						),
+						'labelPosition'  => array(
+							'type' => 'string',
+							'enum' => array( 'top', 'side', 'none' ),
+						),
+						'openAs'         => array(
+							'oneOf' => array(
+								array(
+									'type' => 'string',
+									'enum' => array( 'dropdown', 'modal' ),
+								),
+								array(
+									'type'       => 'object',
+									'properties' => array(
+										'type'        => array(
+											'type' => 'string',
+											'enum' => array( 'dropdown', 'modal' ),
+										),
+										'applyLabel'  => array(
+											'type' => 'string',
+										),
+										'cancelLabel' => array(
+											'type' => 'string',
+										),
+									),
+								),
+							),
+						),
+						'summary'        => array(
+							'oneOf' => array(
+								array( 'type' => 'string' ),
+								array(
+									'type'  => 'array',
+									'items' => array(
+										'type' => 'string',
+									),
+								),
+							),
+						),
+						'editVisibility' => array(
+							'type' => 'string',
+							'enum' => array( 'always', 'on-hover' ),
+						),
+					),
+				),
+				// CardLayout.
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'type'          => array(
+							'type' => 'string',
+							'enum' => array( 'card' ),
+						),
+						'withHeader'    => array(
+							'type' => 'boolean',
+						),
+						'isOpened'      => array(
+							'type' => 'boolean',
+						),
+						'isCollapsible' => array(
+							'type' => 'boolean',
+						),
+						'summary'       => array(
+							'oneOf' => array(
+								array( 'type' => 'string' ),
+								array(
+									'type'  => 'array',
+									'items' => array(
+										'oneOf' => array(
+											array( 'type' => 'string' ),
+											array(
+												'type' => 'object',
+												'properties' => array(
+													'id' => array(
+														'type' => 'string',
+													),
+													'visibility' => array(
+														'type' => 'string',
+														'enum' => array( 'always', 'when-collapsed' ),
+													),
+												),
+											),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+				// RowLayout.
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'type'      => array(
+							'type' => 'string',
+							'enum' => array( 'row' ),
+						),
+						'alignment' => array(
+							'type' => 'string',
+							'enum' => array( 'start', 'center', 'end' ),
+						),
+						'styles'    => array(
+							'type'                 => 'object',
+							'additionalProperties' => array(
+								'type'       => 'object',
+								'properties' => array(
+									'flex' => array(
+										'type' => array( 'string', 'number' ),
+									),
+								),
+							),
+						),
+					),
+				),
+				// DetailsLayout.
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'type'    => array(
+							'type' => 'string',
+							'enum' => array( 'details' ),
+						),
+						'summary' => array(
+							'type' => 'string',
+						),
+					),
+				),
+			),
+		);
+	}
+
+	/**
 	 * Returns the schema for a form field item (string or object).
 	 *
 	 * @return array Schema for a form field.
@@ -578,24 +741,16 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 						'description' => array(
 							'type' => 'string',
 						),
-						'layout'      => array(
-							'type'       => 'object',
-							'properties' => array(
-								'type'          => array(
-									'type' => 'string',
-									'enum' => array( 'regular', 'panel', 'card', 'row', 'details' ),
-								),
-								'labelPosition' => array(
-									'type' => 'string',
-									'enum' => array( 'top', 'side', 'none' ),
-								),
-							),
-						),
+						'layout'      => $this->get_form_layout_schema(),
 						'children'    => array(
 							'type'  => 'array',
 							'items' => array(
 								'oneOf' => array(
 									array( 'type' => 'string' ),
+									// This object can have the shape of a form field itself,
+									// allowing for recursive nesting of form fields.
+									// There's no easy way to codify this recursion via the JSON Schema draft-04
+									// supported by the REST API.
 									array( 'type' => 'object' ),
 								),
 							),
@@ -613,19 +768,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 */
 	private function get_form_schema() {
 		return array(
-			'layout' => array(
-				'type'       => 'object',
-				'properties' => array(
-					'type'          => array(
-						'type' => 'string',
-						'enum' => array( 'regular', 'panel', 'card', 'row', 'details' ),
-					),
-					'labelPosition' => array(
-						'type' => 'string',
-						'enum' => array( 'top', 'side', 'none' ),
-					),
-				),
-			),
+			'layout' => $this->get_form_layout_schema(),
 			'fields' => array(
 				'type'  => 'array',
 				'items' => $this->get_form_field_schema(),
