@@ -757,7 +757,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		);
 	}
 
-	private function get_form_for_page() {
+	private function get_form_for_page(){
 		return array(
 			'layout' => array( 'type' => 'panel' ),
 			'fields' => array(
@@ -775,6 +775,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 						'labelPosition' => 'none',
 					),
 				),
+				'excerpt',
 				array(
 					'id'       => 'status',
 					'label'    => __( 'Status', 'gutenberg' ),
@@ -788,12 +789,13 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 						),
 						'scheduled_date',
 						'password',
+						'sticky',
 					),
 				),
-				'author',
 				'date',
 				'slug',
-				'parent',
+				'author',
+				'template',
 				array(
 					'id'       => 'discussion',
 					'label'    => __( 'Discussion', 'gutenberg' ),
@@ -808,7 +810,8 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 						'ping_status',
 					),
 				),
-				'template',
+				'parent',
+				'format',
 			),
 		);
 	}

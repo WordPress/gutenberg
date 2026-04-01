@@ -7,6 +7,7 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
 import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
+import { useViewConfig } from '@wordpress/views';
 
 /**
  * Internal dependencies
@@ -18,58 +19,7 @@ import PostTrash from '../post-trash';
 import usePostFields from '../post-fields';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
 
-const form = {
-	layout: {
-		type: 'panel',
-	},
-	fields: [
-		{
-			id: 'featured_media',
-			layout: {
-				type: 'regular',
-				labelPosition: 'none',
-			},
-		},
-		{
-			id: 'post-content-info',
-			layout: {
-				type: 'regular',
-				labelPosition: 'none',
-			},
-		},
-		'excerpt',
-		{
-			id: 'status',
-			label: __( 'Status' ),
-			children: [
-				{
-					id: 'status',
-					layout: { type: 'regular', labelPosition: 'none' },
-				},
-				'scheduled_date',
-				'password',
-				'sticky',
-			],
-		},
-		'date',
-		'slug',
-		'author',
-		'template',
-		{
-			id: 'discussion',
-			label: __( 'Discussion' ),
-			children: [
-				{
-					id: 'comment_status',
-					layout: { type: 'regular', labelPosition: 'none' },
-				},
-				'ping_status',
-			],
-		},
-		'parent',
-		'format',
-	],
-};
+const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
 
 export default function DataFormPostSummary( { onActionPerformed } ) {
 	const { postType, postId } = useSelect( ( select ) => {
@@ -79,6 +29,11 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 			postId: getCurrentPostId(),
 		};
 	}, [] );
+	const { form: formConfig } = useViewConfig( {
+		kind: 'postType',
+		name: postType,
+	} );
+	const form = formConfig ?? EMPTY_FORM;
 	const record = useSelect(
 		( select ) => {
 			if ( ! postType || ! postId ) {
