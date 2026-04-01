@@ -735,12 +735,11 @@ function unregisterRoom( room: string ): void {
 
 /**
  * Immediately retry the sync connection by cancelling any pending
- * timeout and triggering a new poll. Resets the failure counter so
- * the retry schedule starts fresh.
+ * timeout and triggering a new poll. If the retry fails, the next
+ * auto-retry uses the current backoff interval rather than restarting
+ * the fast schedule, keeping the UI calm when the dialog is visible.
  */
 function retryNow(): void {
-	consecutiveFailures = 0;
-
 	if ( pollingTimeoutId ) {
 		clearTimeout( pollingTimeoutId );
 		pollingTimeoutId = null;
