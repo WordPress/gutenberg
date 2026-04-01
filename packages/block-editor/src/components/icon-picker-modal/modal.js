@@ -15,8 +15,8 @@ import normalizeSearchInput from './normalize-search-input';
 export default function IconPickerModal( {
 	icons = [],
 	value,
-	onSelect,
-	onRequestClose,
+	onChange,
+	onClose,
 	title = __( 'Icon library' ),
 } ) {
 	const [ searchInput, setSearchInput ] = useState( '' );
