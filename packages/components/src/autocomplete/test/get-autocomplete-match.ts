@@ -28,6 +28,13 @@ describe( 'getAutocompleteMatch', () => {
 		).toBeNull();
 	} );
 
+	it( 'should return null when trigger prefix is not found in text', () => {
+		const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
+		expect(
+			getAutocompleteMatch( 'no trigger here', completers, 1, false, '' )
+		).toBeNull();
+	} );
+
 	it( 'should match a simple trigger prefix', () => {
 		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
 		const result = getAutocompleteMatch(
@@ -221,4 +228,53 @@ describe( 'getAutocompleteMatch', () => {
 		expect( result ).not.toBeNull();
 		expect( result?.filterValue ).toBe( 'hello world' );
 	} );
+
+	it.each( [
+		{
+			text: 'café @user',
+			trigger: '@',
+			expected: 'user',
+			desc: 'accented text before trigger',
+		},
+		{
+			text: 'naïve /command',
+			trigger: '/',
+			expected: 'command',
+			desc: 'accented text before trigger (diaeresis)',
+		},
+		{
+			text: 'résumé @josé',
+			trigger: '@',
+			expected: 'jose',
+			desc: 'accents both before and after trigger',
+		},
+		{
+			text: '@café',
+			trigger: '@',
+			expected: 'cafe',
+			desc: 'accented text after trigger only',
+		},
+		{
+			text: 'a /héllo wörld',
+			trigger: '/',
+			expected: 'hello world',
+			desc: 'accented multi-word filter value',
+		},
+	] )(
+		'should handle accents correctly: $desc',
+		( { text, trigger, expected } ) => {
+			const completers = [
+				createCompleter( { triggerPrefix: trigger } ),
+			];
+			const result = getAutocompleteMatch(
+				text,
+				completers,
+				1,
+				false,
+				''
+			);
+			expect( result ).not.toBeNull();
+			expect( result?.filterValue ).toBe( expected );
+		}
+	);
 } );
