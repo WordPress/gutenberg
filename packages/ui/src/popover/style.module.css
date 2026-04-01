@@ -18,7 +18,35 @@
 	}
 
 	.arrow {
-		color: var(--wpds-color-bg-surface-neutral-strong);
+		display: flex;
+
+		&[data-side="top"] {
+			bottom: -8px;
+			rotate: 180deg;
+		}
+
+		&[data-side="bottom"] {
+			top: -8px;
+			rotate: 0deg;
+		}
+
+		&[data-side="left"] {
+			inset-inline-end: -13px;
+			rotate: 90deg;
+		}
+
+		&[data-side="right"] {
+			inset-inline-start: -13px;
+			rotate: -90deg;
+		}
+	}
+
+	.arrow-fill {
+		fill: var(--wpds-color-bg-surface-neutral-strong);
+	}
+
+	.arrow-stroke {
+		fill: var(--wpds-color-stroke-surface-neutral-weak);
 	}
 
 	.title {
