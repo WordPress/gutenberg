@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as Card from '../../card';
 import * as CollapsibleCard from '../index';
+import { Stack } from '../../stack';
 
 /**
  * Temporary text component for story examples. This will be replaced by an
@@ -177,17 +178,19 @@ export const WithHeaderDescription: Story = {
 			{ ...restArgs }
 		>
 			<CollapsibleCard.Header>
-				<Card.Title>Settings</Card.Title>
-				<CollapsibleCard.HeaderDescription>
-					<span
-						style={ {
-							fontSize: 'var(--wpds-font-size-sm)',
-							color: 'var(--wpds-color-fg-content-neutral-weak)',
-						} }
-					>
-						3 items configured
-					</span>
-				</CollapsibleCard.HeaderDescription>
+				<Stack justify="space-between">
+					<Card.Title>Settings</Card.Title>
+					<CollapsibleCard.HeaderDescription>
+						<span
+							style={ {
+								fontSize: 'var(--wpds-font-size-sm)',
+								color: 'var(--wpds-color-fg-content-neutral-weak)',
+							} }
+						>
+							3 items configured
+						</span>
+					</CollapsibleCard.HeaderDescription>
+				</Stack>
 			</CollapsibleCard.Header>
 			<CollapsibleCard.Content>
 				<Text>
