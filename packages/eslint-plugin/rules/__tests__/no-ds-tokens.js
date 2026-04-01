@@ -56,7 +56,7 @@ ruleTester.run( 'no-ds-tokens', rule, {
 			],
 		},
 		{
-			code: 'const style = `border: 1px solid var(--wpds-border-color, var(--wpds-border-fallback))`;',
+			code: 'const style = `border: 1px solid var(--wpds-color-stroke-surface-neutral, var(--wpds-color-stroke-surface-neutral-weak))`;',
 			errors: [
 				{
 					messageId: 'disallowed',
@@ -64,7 +64,7 @@ ruleTester.run( 'no-ds-tokens', rule, {
 			],
 		},
 		{
-			code: `const token = '--wpds-color-fg';`,
+			code: `const token = '--wpds-color-fg-content-neutral';`,
 			errors: [
 				{
 					messageId: 'disallowed',
@@ -72,7 +72,7 @@ ruleTester.run( 'no-ds-tokens', rule, {
 			],
 		},
 		{
-			code: 'const style = `--wpds-color-fg: red`;',
+			code: 'const style = `--wpds-color-fg-content-neutral: red`;',
 			errors: [
 				{
 					messageId: 'disallowed',
