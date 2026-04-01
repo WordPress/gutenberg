@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   `createInterpolateElement` now infers tag names from `sprintf` return values via the new `FormattedText` type. ([76972](https://github.com/WordPress/gutenberg/pull/76972))
+
 ## 6.43.0 (2026-04-01)
 
 ## 6.42.0 (2026-03-18)
