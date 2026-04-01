@@ -141,34 +141,6 @@ type EntityResource = { kind: string; name: string; id?: EntityRecordKey };
 const EMPTY_OBJECT = {};
 
 /**
- * For entities that don't support pagination, normalize the query to include
- * `per_page: -1` so the queried-data selectors return all items instead of
- * slicing to the default page size.
- *
- * @param state Data state.
- * @param kind  Entity kind.
- * @param name  Entity name.
- * @param query Query parameters.
- */
-function getNonPaginatedQuery(
-	state: State,
-	kind: string,
-	name: string,
-	query: GetRecordsHttpQuery
-): GetRecordsHttpQuery {
-	if ( query?.per_page !== undefined ) {
-		return query;
-	}
-	const entityConfig = state.entities.config?.find(
-		( config: any ) => config.kind === kind && config.name === name
-	);
-	if ( entityConfig && ! ( entityConfig as any ).supportsPagination ) {
-		return { ...( query || {} ), per_page: -1 };
-	}
-	return query;
-}
-
-/**
  * Returns true if a request is in progress for embed preview data, or false
  * otherwise.
  *
@@ -683,10 +655,10 @@ export const getEntityRecords = ( <
 	if ( ! queriedState ) {
 		return null;
 	}
-	return getQueriedItems(
-		queriedState,
-		getNonPaginatedQuery( state, kind, name, query )
-	);
+	return getQueriedItems( queriedState, query, {
+		supportsPagination: !! getEntityConfig( state, kind, name )
+			?.supportsPagination,
+	} );
 } ) as GetEntityRecords;
 
 /**
@@ -715,10 +687,7 @@ export const getEntityRecordsTotalItems = (
 	if ( ! queriedState ) {
 		return null;
 	}
-	return getQueriedTotalItems(
-		queriedState,
-		getNonPaginatedQuery( state, kind, name, query )
-	);
+	return getQueriedTotalItems( queriedState, query );
 };
 
 /**
@@ -747,8 +716,10 @@ export const getEntityRecordsTotalPages = (
 	if ( ! queriedState ) {
 		return null;
 	}
-	query = getNonPaginatedQuery( state, kind, name, query );
-	if ( query?.per_page === -1 ) {
+	if (
+		! getEntityConfig( state, kind, name )?.supportsPagination ||
+		query?.per_page === -1
+	) {
 		return 1;
 	}
 	const totalItems = getQueriedTotalItems( queriedState, query );

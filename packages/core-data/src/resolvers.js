@@ -475,16 +475,6 @@ export const getEntityRecords =
 					totalItems: records.length,
 					totalPages: 1,
 				};
-
-				// Non-paginated entities return all data. Normalize the
-				// query so the reducer and selectors treat it correctly.
-				// Skip if consumer explicitly set per_page (backward compat).
-				if (
-					! entityConfig.supportsPagination &&
-					query.per_page === undefined
-				) {
-					query = { ...query, per_page: -1 };
-				}
 			}
 
 			if ( entityConfig.syncConfig && -1 === query.per_page ) {
