@@ -83,6 +83,59 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		$name = $request->get_param( 'name' );
 
 		// TODO: this data will come from a registry of view configs per entity.
+		$quick_edit_form = array(
+			'layout' => array( 'type' => 'panel' ),
+			'fields' => array(
+				array(
+					'id'     => 'featured_media',
+					'layout' => array(
+						'type'          => 'regular',
+						'labelPosition' => 'none',
+					),
+				),
+				array(
+					'id'     => 'post-content-info',
+					'layout' => array(
+						'type'          => 'regular',
+						'labelPosition' => 'none',
+					),
+				),
+				array(
+					'id'       => 'status',
+					'label'    => __( 'Status', 'gutenberg' ),
+					'children' => array(
+						array(
+							'id'     => 'status',
+							'layout' => array(
+								'type'          => 'regular',
+								'labelPosition' => 'none',
+							),
+						),
+						'scheduled_date',
+						'password',
+					),
+				),
+				'author',
+				'date',
+				'slug',
+				'parent',
+				array(
+					'id'       => 'discussion',
+					'label'    => __( 'Discussion', 'gutenberg' ),
+					'children' => array(
+						array(
+							'id'     => 'comment_status',
+							'layout' => array(
+								'type'          => 'regular',
+								'labelPosition' => 'none',
+							),
+						),
+						'ping_status',
+					),
+				),
+				'template',
+			),
+		);
 		$default_view    = array(
 			'type'       => 'table',
 			'filters'    => array(),
@@ -136,6 +189,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			'default_view'    => $default_view,
 			'default_layouts' => $default_layouts,
 			'view_list'       => $view_list,
+			'quick_edit_form' => $quick_edit_form,
 		);
 
 		return rest_ensure_response( $response );
@@ -269,6 +323,12 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 							),
 						),
 					),
+				),
+				'quick_edit_form' => array(
+					'description' => __( 'Default quick edit form configuration.', 'gutenberg' ),
+					'type'        => 'object',
+					'readonly'    => true,
+					'properties'  => $this->get_form_schema(),
 				),
 			),
 		);
@@ -493,6 +553,82 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					'type' => 'string',
 					'enum' => array( 'compact', 'balanced', 'comfortable' ),
 				),
+			),
+		);
+	}
+
+	/**
+	 * Returns the schema for a form field item (string or object).
+	 *
+	 * @return array Schema for a form field.
+	 */
+	private function get_form_field_schema() {
+		return array(
+			'oneOf' => array(
+				array( 'type' => 'string' ),
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'id'          => array(
+							'type' => 'string',
+						),
+						'label'       => array(
+							'type' => 'string',
+						),
+						'description' => array(
+							'type' => 'string',
+						),
+						'layout'      => array(
+							'type'       => 'object',
+							'properties' => array(
+								'type'          => array(
+									'type' => 'string',
+									'enum' => array( 'regular', 'panel', 'card', 'row', 'details' ),
+								),
+								'labelPosition' => array(
+									'type' => 'string',
+									'enum' => array( 'top', 'side', 'none' ),
+								),
+							),
+						),
+						'children'    => array(
+							'type'  => 'array',
+							'items' => array(
+								'oneOf' => array(
+									array( 'type' => 'string' ),
+									array( 'type' => 'object' ),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Returns the schema for the form configuration object.
+	 *
+	 * @return array Schema properties for the form configuration.
+	 */
+	private function get_form_schema() {
+		return array(
+			'layout' => array(
+				'type'       => 'object',
+				'properties' => array(
+					'type'          => array(
+						'type' => 'string',
+						'enum' => array( 'regular', 'panel', 'card', 'row', 'details' ),
+					),
+					'labelPosition' => array(
+						'type' => 'string',
+						'enum' => array( 'top', 'side', 'none' ),
+					),
+				),
+			),
+			'fields' => array(
+				'type'  => 'array',
+				'items' => $this->get_form_field_schema(),
 			),
 		);
 	}
