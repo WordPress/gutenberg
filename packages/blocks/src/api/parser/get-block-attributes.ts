@@ -198,17 +198,11 @@ export function isValidByEnum(
 	return ! Array.isArray( enumSet ) || enumSet.includes( value );
 }
 
-/**
- * Returns an hpq matcher given a source object.
- *
- * @param {BlockAttribute} sourceConfig Attribute Source object.
- *
- * @return {Function} A hpq Matcher.
- */
-export const matcherFromSource: (
-	sourceConfig: BlockAttribute
-) => ( ( domNode: Node ) => unknown ) | undefined = memoize(
-	( sourceConfig: BlockAttribute ) => {
+// Returns an hpq matcher given a source object.
+export const matcherFromSource = memoize(
+	(
+		sourceConfig: BlockAttribute
+	): ( ( domNode: Element ) => unknown ) | undefined => {
 		switch ( sourceConfig.source ) {
 			case 'attribute': {
 				let matcher = attr(
@@ -282,7 +276,9 @@ export function parseWithAttributeSchema(
 	innerHTML: string | Node,
 	attributeSchema: BlockAttribute
 ): unknown {
-	return matcherFromSource( attributeSchema )!( parseHtml( innerHTML ) );
+	return matcherFromSource( attributeSchema )!(
+		parseHtml( innerHTML ) as Element
+	);
 }
 
 /**
