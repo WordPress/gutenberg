@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
@@ -18,25 +18,29 @@ import { unlock } from '../../lock-unlock';
  * @param { boolean } enabled
  */
 export const useMetaBoxInitialization = ( enabled ) => {
-	const { isEnabledAndEditorReady, isCollaborationEnabled, hasMetaBoxes } =
-		useSelect(
-			( select ) => ( {
-				isEnabledAndEditorReady:
-					enabled && select( editorStore ).__unstableIsEditorReady(),
-				isCollaborationEnabled:
-					select(
-						editorStore
-					).isCollaborationEnabledForCurrentPost(),
-				hasMetaBoxes: enabled
-					? select( editPostStore ).hasMetaBoxes()
-					: false,
-			} ),
-			[ enabled ]
-		);
-
-	// Read allMetaBoxes via the registry instead of useSelect to avoid
-	// referential instability from getAllMetaBoxes() returning a new array.
-	const registry = useRegistry();
+	const {
+		isEnabledAndEditorReady,
+		isCollaborationEnabled,
+		hasMetaBoxes,
+		allMetaBoxes,
+		rtcCompatibleIds,
+	} = useSelect(
+		( select ) => ( {
+			isEnabledAndEditorReady:
+				enabled && select( editorStore ).__unstableIsEditorReady(),
+			isCollaborationEnabled:
+				select( editorStore ).isCollaborationEnabledForCurrentPost(),
+			hasMetaBoxes: enabled
+				? select( editPostStore ).hasMetaBoxes()
+				: false,
+			allMetaBoxes: enabled
+				? select( editPostStore ).getAllMetaBoxes()
+				: [],
+			rtcCompatibleIds:
+				select( editPostStore ).getRtcCompatibleMetaBoxIds(),
+		} ),
+		[ enabled ]
+	);
 	const { setCollaborationSupported } = unlock( useDispatch( coreStore ) );
 
 	const { initializeMetaBoxes } = useDispatch( editPostStore );
@@ -51,13 +55,6 @@ export const useMetaBoxInitialization = ( enabled ) => {
 			// Meta boxes marked with __rtc_compatible_meta_box on the server
 			// have their IDs stored via setRtcCompatibleMetaBoxIds().
 			if ( isCollaborationEnabled ) {
-				const allMetaBoxes = registry
-					.select( editPostStore )
-					.getAllMetaBoxes();
-				const rtcCompatibleIds = registry
-					.select( editPostStore )
-					.getRtcCompatibleMetaBoxIds();
-
 				const hasIncompatibleMetaBoxes = allMetaBoxes.some(
 					( metaBox ) => ! rtcCompatibleIds.includes( metaBox.id )
 				);
@@ -73,6 +70,7 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		isCollaborationEnabled,
 		setCollaborationSupported,
 		hasMetaBoxes,
-		registry,
+		allMetaBoxes,
+		rtcCompatibleIds,
 	] );
 };
