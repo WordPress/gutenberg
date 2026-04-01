@@ -25,6 +25,7 @@ import {
 	POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS,
 	POLLING_INTERVAL_BACKGROUND_TAB_IN_MS,
 	DISCONNECT_DIALOG_RETRY_MS,
+	MANUAL_RETRY_INTERVAL_MS,
 } from './config';
 import { ConnectionError, ConnectionErrorCode } from '../../errors';
 import type { ConnectionStatus } from '../../types';
@@ -304,6 +305,7 @@ function checkConnectionLimit(
 let areListenersRegistered = false;
 let consecutiveFailures = 0;
 let hasCheckedConnectionLimit = false;
+let isManualRetry = false;
 let hasCollaborators = false;
 let isActiveBrowser = 'visible' === document.visibilityState;
 let isPolling = false;
@@ -419,6 +421,7 @@ function poll(): void {
 
 			// Emit 'connected' status.
 			consecutiveFailures = 0;
+			isManualRetry = false;
 			roomStates.forEach( ( state ) => {
 				state.onStatusChange( { status: 'connected' } );
 			} );
@@ -512,6 +515,12 @@ function poll(): void {
 				pollInterval = retrySchedule[ consecutiveFailures - 1 ];
 			} else {
 				pollInterval = DISCONNECT_DIALOG_RETRY_MS;
+			}
+
+			// After a manual retry, use a shorter interval for one cycle.
+			if ( isManualRetry ) {
+				pollInterval = MANUAL_RETRY_INTERVAL_MS;
+				isManualRetry = false;
 			}
 
 			// Recover from the failed request. We don't know whether the server stored
@@ -736,10 +745,12 @@ function unregisterRoom( room: string ): void {
 /**
  * Immediately retry the sync connection by cancelling any pending
  * timeout and triggering a new poll. If the retry fails, the next
- * auto-retry uses the current backoff interval rather than restarting
- * the fast schedule, keeping the UI calm when the dialog is visible.
+ * auto-retry waits 15s (MANUAL_RETRY_INTERVAL_MS) instead of the
+ * usual 30s, then falls back to 30s for subsequent auto-retries.
  */
 function retryNow(): void {
+	isManualRetry = true;
+
 	if ( pollingTimeoutId ) {
 		clearTimeout( pollingTimeoutId );
 		pollingTimeoutId = null;
