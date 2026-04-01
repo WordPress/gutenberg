@@ -44,6 +44,26 @@ export const Default: Story = {
 };
 
 /**
+ * A popover without the arrow sub-component. Omit `Popover.Arrow`
+ * from the popup content when an arrow indicator is not desired.
+ */
+export const NoArrow: Story = {
+	args: {
+		children: (
+			<>
+				<Popover.Trigger>Open Popover</Popover.Trigger>
+				<Popover.Popup>
+					<Popover.Title>Popover title</Popover.Title>
+					<Popover.Description>
+						Popover description
+					</Popover.Description>
+				</Popover.Popup>
+			</>
+		),
+	},
+};
+
+/**
  * All combinations of `side` and `align` props on `Popover.Popup`.
  *
  * Each row shows a side (`top`, `right`, `bottom`, `left`), and each column
