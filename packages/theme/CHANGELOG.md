@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.10.0 (2026-04-01)
+
 ### Enhancement
 
 -   Change the default value of `--wpds-cursor-control` from `default` to `pointer` ([#76762](https://github.com/WordPress/gutenberg/pull/76762)).
