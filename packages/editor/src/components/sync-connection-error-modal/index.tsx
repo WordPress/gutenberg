@@ -39,7 +39,7 @@ const INITIAL_DISCONNECTED_DEBOUNCE_MS = 20000;
 
 // Debounce time for showing the disconnect dialog after the initial connection,
 // allowing brief network interruptions and automatic retries to resolve.
-const DISCONNECTED_DEBOUNCE_MS = 30000;
+const DISCONNECTED_DEBOUNCE_MS = 25000;
 
 export interface SyncConnectionErrorModalProps {
 	description: string; // Modal description.
