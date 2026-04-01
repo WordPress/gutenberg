@@ -14,18 +14,29 @@ Install the module
 npm install @wordpress/dataviews --save
 ```
 
-## Stylesheet Dependencies
+## Set up
 
-DataViews depends on stylesheets from `@wordpress/components` and `@wordpress/theme`. In a WordPress admin page context, these are loaded automatically. For applications outside WordPress, you will need to include these stylesheets:
+This package requires CSS from multiple dependency packages.
 
-```bash
-npm install @wordpress/components @wordpress/theme
+### Within WordPress
+
+To ensure proper load order, add the `wp-components` and `wp-dataviews` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
+
+### Outside WordPress
+
+Install and load these stylesheets in your application:
+
+```
+npm install @wordpress/theme
+npm install @wordpress/components
 ```
 
-```tsx
-import '@wordpress/components/build-style/style.css';
+```js
 import '@wordpress/theme/design-tokens.css';
+import '@wordpress/components/build-style/style.css';
 ```
+
+The RTL version of the `@wordpress/components` stylesheet is available at `@wordpress/components/build-style/style-rtl.css`.
 
 ## `DataViews`
 
