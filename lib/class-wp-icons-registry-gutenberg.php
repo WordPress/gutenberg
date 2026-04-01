@@ -88,7 +88,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		if ( ! preg_match( $name_matcher, $icon_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'Icon names must contain a namespace prefix. Example: my-plugin/my-custom-icon' ),
+				__( 'Icon names must contain a namespace prefix. Example: my-plugin/my-custom-icon', 'gutenberg' ),
 				'7.1.0'
 			);
 			return false;
