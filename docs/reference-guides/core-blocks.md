@@ -101,8 +101,8 @@ Prompt visitors to take action with a button-style link. ([Source](https://githu
 -	**Name:** core/button
 -	**Category:** design
 -	**Parent:** core/buttons
--	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (padding), splitting, typography (fontSize, lineHeight, textAlign), ~~alignWide~~, ~~align~~, ~~reusable~~
--	**Attributes:** backgroundColor, gradient, linkTarget, placeholder, rel, tagName, text, textColor, title, type, url, width
+-	**Supports:** anchor, color (background, gradients, text), dimensions (width), interactivity (clientNavigation), shadow, spacing (padding), splitting, typography (fontSize, lineHeight, textAlign), ~~alignWide~~, ~~align~~, ~~reusable~~
+-	**Attributes:** backgroundColor, gradient, linkTarget, placeholder, rel, tagName, text, textColor, title, type, url
 
 ## Buttons
 
@@ -398,7 +398,7 @@ Gather blocks in a layout container. ([Source](https://github.com/WordPress/gute
 
 -	**Name:** core/group
 -	**Category:** design
--	**Supports:** align (full, wide), allowedBlocks, anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, button, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (allowSizingOnChildren), position (sticky), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), allowedBlocks, anchor, ariaLabel, background (backgroundImage, backgroundSize, gradient), color (background, button, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (allowSizingOnChildren), position (sticky), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** tagName, templateLock
 
 ## Heading
@@ -426,7 +426,7 @@ Add custom HTML code and preview it as you edit. ([Source](https://github.com/Wo
 
 -	**Name:** core/html
 -	**Category:** widgets
--	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~
+-	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~visibility~~
 -	**Attributes:** content
 
 ## Icon
@@ -483,7 +483,7 @@ An individual item within a list. ([Source](https://github.com/WordPress/gutenbe
 -	**Category:** text
 -	**Parent:** core/list
 -	**Allowed Blocks:** core/list
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~, ~~html~~
 -	**Attributes:** content, placeholder
 
 ## Login/out
@@ -578,7 +578,7 @@ Separate your content into a multi-page experience. ([Source](https://github.com
 -	**Name:** core/nextpage
 -	**Category:** design
 -	**Parent:** core/post-content
--	**Supports:** anchor, interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~visibility~~
+-	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~visibility~~
 
 ## Page List
 
@@ -716,8 +716,8 @@ Display a custom date. ([Source](https://github.com/WordPress/gutenberg/tree/tru
 
 -	**Name:** core/post-date
 -	**Category:** theme
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** datetime, format, isLink, textAlign
+-	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Attributes:** datetime, format, isLink
 
 ## Excerpt
 
@@ -725,8 +725,8 @@ Display the excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/trunk
 
 -	**Name:** core/post-excerpt
 -	**Category:** theme
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textColumns), ~~html~~
--	**Attributes:** excerptLength, moreText, showMoreOnNewLine, textAlign
+-	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign, textColumns), ~~html~~
+-	**Attributes:** excerptLength, moreText, showMoreOnNewLine
 
 ## Featured Image
 
@@ -779,8 +779,8 @@ Displays the title of a post, page, or any other content-type. ([Source](https:/
 
 -	**Name:** core/post-title
 -	**Category:** theme
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isLink, level, levelOptions, linkTarget, rel, textAlign
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Attributes:** isLink, level, levelOptions, linkTarget, placeholder, rel
 
 ## Preformatted
 
@@ -865,8 +865,8 @@ Display the query title. ([Source](https://github.com/WordPress/gutenberg/tree/t
 
 -	**Name:** core/query-title
 -	**Category:** theme
--	**Supports:** align (full, wide), anchor, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** level, levelOptions, showPrefix, showSearchTerm, textAlign, type
+-	**Supports:** align (full, wide), anchor, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Attributes:** level, levelOptions, showPrefix, showSearchTerm, type
 
 ## Query Total
 
@@ -929,7 +929,7 @@ Insert additional custom elements with a WordPress shortcode. ([Source](https://
 
 -	**Name:** core/shortcode
 -	**Category:** widgets
--	**Supports:** ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~
+-	**Supports:** ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~visibility~~
 -	**Attributes:** text
 
 ## Site Logo
@@ -947,8 +947,8 @@ Describe in a few words what this site is about. This is important for search re
 
 -	**Name:** core/site-tagline
 -	**Category:** theme
--	**Supports:** align (full, wide), anchor, color (background, gradients, text), contentRole, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** level, levelOptions, textAlign
+-	**Supports:** align (full, wide), anchor, color (background, gradients, text), contentRole, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Attributes:** level, levelOptions
 
 ## Site Title
 
@@ -956,8 +956,8 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 
 -	**Name:** core/site-title
 -	**Category:** theme
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isLink, level, levelOptions, linkTarget, textAlign
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Attributes:** isLink, level, levelOptions, linkTarget
 
 ## Social Icon
 
@@ -1053,14 +1053,14 @@ Display the tab buttons for a tabbed interface. ([Source](https://github.com/Wor
 
 ## Tab Menu Item
 
-A single tab button in the tabs menu. Used as a template for styling all tab buttons. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs-menu-item))
+A single tab button in the tabs menu. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs-menu-item))
 
 -	**Name:** core/tabs-menu-item
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/tabs-menu
--	**Supports:** color (background, text), layout (~~allowEditing~~), shadow, spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~
--	**Attributes:** activeBackgroundColor, activeTextColor, customActiveBackgroundColor, customActiveTextColor, customHoverBackgroundColor, customHoverTextColor, hoverBackgroundColor, hoverTextColor
+-	**Supports:** color (background, text), layout (~~allowEditing~~), spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~
+-	**Attributes:** anchor
 
 ## Tag Cloud
 

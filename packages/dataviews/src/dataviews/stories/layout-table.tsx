@@ -32,13 +32,7 @@ export const LayoutTableComponent = ( {
 		search: '',
 		page: 1,
 		perPage: 10,
-		layout: {
-			styles: {
-				satellites: {
-					align: 'end' as const,
-				},
-			},
-		},
+		layout: {},
 		filters: [],
 		fields: [ 'categories' ],
 		titleField: 'title',
@@ -70,6 +64,7 @@ export const LayoutTableComponent = ( {
 		<div
 			style={
 				{
+					height: '100%',
 					'--wp-dataviews-color-background': backgroundColor,
 				} as React.CSSProperties
 			}

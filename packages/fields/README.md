@@ -63,6 +63,10 @@ Duplicate action for BasePost.
 
 Duplicate action for TemplatePart.
 
+### excerptField
+
+Excerpt field for BasePost.
+
 ### exportPattern
 
 Export action as JSON for Pattern.
@@ -70,6 +74,10 @@ Export action as JSON for Pattern.
 ### featuredImageField
 
 Featured Image field for BasePostWithEmbeddedFeaturedMedia.
+
+### formatField
+
+Format field for BasePost.
 
 ### MediaEdit
 
@@ -148,6 +156,10 @@ Delete action for PostWithPermissions.
 
 Ping status field for BasePost.
 
+### postContentInfoField
+
+Post content information field for BasePost.
+
 ### PostType
 
 Undocumented declaration.
@@ -168,6 +180,10 @@ Reset action for Template and TemplatePart.
 
 Restore action for PostWithPermissions.
 
+### scheduledDateField
+
+ScheduledDate Field.
+
 ### slugField
 
 Slug field for BasePost.
@@ -175,6 +191,10 @@ Slug field for BasePost.
 ### statusField
 
 Status field for BasePost.
+
+### stickyField
+
+Sticky field for BasePost.
 
 ### templateField
 

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "9.40.0",
+	"version": "9.43.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -94,6 +94,7 @@
 		"build-module/*/init.mjs"
 	],
 	"dependencies": {
+		"@arraypress/waveform-player": "1.2.1",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",

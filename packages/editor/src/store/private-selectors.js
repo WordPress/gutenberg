@@ -55,14 +55,36 @@ export const getInserter = createRegistrySelector( ( select ) =>
 			}
 
 			if ( getRenderingMode( state ) === 'template-locked' ) {
+				const {
+					getBlocksByName,
+					getSelectedBlockClientId,
+					getBlockParents,
+					getBlockOrder,
+				} = select( blockEditorStore );
 				const [ postContentClientId ] =
-					select( blockEditorStore ).getBlocksByName(
-						'core/post-content'
-					);
+					getBlocksByName( 'core/post-content' );
 				if ( postContentClientId ) {
+					const selectedBlockClientId = getSelectedBlockClientId();
+
+					// If a block inside Post Content is selected,
+					// let the inserter use its default logic for determining the
+					// insertion position by returning an empty insertion point.
+					if (
+						selectedBlockClientId &&
+						selectedBlockClientId !== postContentClientId &&
+						getBlockParents( selectedBlockClientId ).includes(
+							postContentClientId
+						)
+					) {
+						return EMPTY_INSERTION_POINT;
+					}
+
+					// Otherwise (no selection, or Post Content itself
+					// is selected), insert at the end of Post Content.
 					return {
 						rootClientId: postContentClientId,
-						insertionIndex: undefined,
+						insertionIndex:
+							getBlockOrder( postContentClientId ).length,
 						filterValue: undefined,
 					};
 				}
@@ -71,14 +93,26 @@ export const getInserter = createRegistrySelector( ( select ) =>
 			return EMPTY_INSERTION_POINT;
 		},
 		( state ) => {
+			const {
+				getBlocksByName,
+				getSelectedBlockClientId,
+				getBlockParents,
+				getBlockOrder,
+			} = select( blockEditorStore );
 			const [ postContentClientId ] =
-				select( blockEditorStore ).getBlocksByName(
-					'core/post-content'
-				);
+				getBlocksByName( 'core/post-content' );
+			const selectedBlockClientId = getSelectedBlockClientId();
 			return [
 				state.blockInserterPanel,
 				getRenderingMode( state ),
 				postContentClientId,
+				selectedBlockClientId,
+				selectedBlockClientId
+					? getBlockParents( selectedBlockClientId )
+					: undefined,
+				postContentClientId
+					? getBlockOrder( postContentClientId ).length
+					: undefined,
 			];
 		}
 	)
@@ -216,7 +250,18 @@ export const getPostBlocksByName = createRegistrySelector( ( select ) =>
 				} )
 			);
 		},
-		() => [ select( blockEditorStore ).getBlocks() ]
+		( state, blockNames ) => {
+			blockNames = Array.isArray( blockNames )
+				? blockNames
+				: [ blockNames ];
+			const { getBlocksByName, getBlockParents } =
+				select( blockEditorStore );
+			const clientIds = getBlocksByName( blockNames );
+			const parentsOfClientIds = clientIds.map( ( id ) =>
+				getBlockParents( id )
+			);
+			return [ clientIds, ...parentsOfClientIds ];
+		}
 	)
 );
 
@@ -312,6 +357,16 @@ export function isRevisionsMode( state ) {
 }
 
 /**
+ * Returns whether the revision diff highlighting is shown.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether revision diff is being shown.
+ */
+export function isShowingRevisionDiff( state ) {
+	return state.showRevisionDiff;
+}
+
+/**
  * Returns the current revision ID in revisions mode.
  *
  * @param {Object} state Global application state.
@@ -335,6 +390,11 @@ export const getCurrentRevision = createRegistrySelector(
 		}
 
 		const { type: postType, id: postId } = getCurrentPost( state );
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revisionKey = entityConfig?.revisionKey || 'id';
 		// - Use getRevisions (plural) instead of getRevision (singular) to
 		//   avoid a race condition where both API calls complete around the
 		//   same time and the single revision fetch overwrites the list in the
@@ -346,12 +406,30 @@ export const getCurrentRevision = createRegistrySelector(
 			'postType',
 			postType,
 			postId,
-			{ per_page: -1, context: 'edit' }
+			{
+				per_page: -1,
+				context: 'edit',
+				_fields: [
+					...new Set( [
+						'id',
+						'date',
+						'modified',
+						'author',
+						'meta',
+						'title.raw',
+						'excerpt.raw',
+						'content.raw',
+						revisionKey,
+					] ),
+				].join(),
+			}
 		);
 		if ( ! revisions ) {
 			return null;
 		}
-		return revisions.find( ( r ) => r.id === revisionId ) ?? null;
+		return (
+			revisions.find( ( r ) => r[ revisionKey ] === revisionId ) ?? null
+		);
 	}
 );
 
@@ -392,24 +470,51 @@ export const getPreviousRevision = createRegistrySelector(
 		}
 
 		const { type: postType, id: postId } = getCurrentPost( state );
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revisionKey = entityConfig?.revisionKey || 'id';
 		const revisions = select( coreStore ).getRevisions(
 			'postType',
 			postType,
 			postId,
-			{ per_page: -1, context: 'edit' }
+			{
+				per_page: -1,
+				context: 'edit',
+				_fields: [
+					...new Set( [
+						'id',
+						'date',
+						'modified',
+						'author',
+						'meta',
+						'title.raw',
+						'excerpt.raw',
+						'content.raw',
+						revisionKey,
+					] ),
+				].join(),
+			}
 		);
 		if ( ! revisions ) {
 			return null;
 		}
 
+		// Template revisions use the template REST API format, which exposes
+		// 'modified' instead of 'date'. Regular post revisions use 'date'.
+		const revisionDateField = revisionKey === 'wp_id' ? 'modified' : 'date';
+
 		// Sort by date ascending (oldest first).
 		const sortedRevisions = [ ...revisions ].sort(
-			( a, b ) => new Date( a.date ) - new Date( b.date )
+			( a, b ) =>
+				new Date( a[ revisionDateField ] ) -
+				new Date( b[ revisionDateField ] )
 		);
 
 		// Find current revision index.
 		const currentIndex = sortedRevisions.findIndex(
-			( r ) => r.id === currentRevisionId
+			( r ) => r[ revisionKey ] === currentRevisionId
 		);
 
 		// Return the previous revision (older one) if it exists.

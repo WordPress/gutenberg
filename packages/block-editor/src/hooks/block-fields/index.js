@@ -1,23 +1,17 @@
-/**
- * WordPress dependencies
- */
 import {
 	privateApis as blocksPrivateApis,
 	getBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { useDebounce } from '@wordpress/compose';
 import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { DataForm } from '@wordpress/dataviews';
 import { useContext, useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import BlockContext from '../../components/block-context';
@@ -55,16 +49,18 @@ function createConfiguredControl( ControlComponent, config = {} ) {
  * @param {string}   props.clientId      The clientId of the block.
  * @param {Object}   props.blockType     The blockType definition.
  * @param {Function} props.setAttributes Action to set the block's attributes.
- * @param {boolean}  props.isCollapsed   Whether the DataForm is rendered as 'collapsed' with only the first field
- *                                       displayed by default. When collapsed a dropdown is displayed to allow
- *                                       displaying additional fields. The block's title is displayed as the title.
- *                                       The collapsed mode is often used when multiple BlockForms are shown together.
+ * @param {boolean}  props.isMultiBlock  Whether forms for multiple blocks are shown at the same time.
+ *                                       This changes the behavior of the component:
+ *                                       - Only the first field is shown for each block.
+ *                                       - A dropdown is rendered allowing display of additional fields.
+ *                                       - Hovering the block fields highlights the block in the canvas
+ *                                       - Focusing a block field soft-selects the block in the canvas.
  */
 function BlockFields( {
 	clientId,
 	blockType,
 	setAttributes,
-	isCollapsed = false,
+	isMultiBlock = false,
 } ) {
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
@@ -103,9 +99,16 @@ function BlockFields( {
 		},
 		[ blockContext, clientId ]
 	);
+	const { selectBlock, toggleBlockHighlight } =
+		useDispatch( blockEditorStore );
+
+	const debouncedToggleBlockHighlight = useDebounce(
+		toggleBlockHighlight,
+		50
+	);
 
 	const computedForm = useMemo( () => {
-		if ( ! isCollapsed ) {
+		if ( ! isMultiBlock ) {
 			return blockType?.[ formKey ];
 		}
 
@@ -114,7 +117,7 @@ function BlockFields( {
 			...blockType?.[ formKey ],
 			fields: [ blockType?.[ formKey ]?.fields?.[ 0 ] ],
 		};
-	}, [ blockType, isCollapsed ] );
+	}, [ blockType, isMultiBlock ] );
 
 	const [ form, setForm ] = useState( computedForm );
 
@@ -182,10 +185,32 @@ function BlockFields( {
 	};
 
 	return (
-		<div className="block-editor-block-fields__container">
+		<div
+			className="block-editor-block-fields__container"
+			onMouseEnter={
+				isMultiBlock
+					? () => debouncedToggleBlockHighlight( clientId, true )
+					: undefined
+			}
+			onMouseLeave={ () =>
+				isMultiBlock
+					? debouncedToggleBlockHighlight( clientId, false )
+					: undefined
+			}
+			onFocus={
+				isMultiBlock
+					? () => {
+							selectBlock(
+								clientId,
+								null /* null to avoid focus on the block in the canvas */
+							);
+					  }
+					: undefined
+			}
+		>
 			<div className="block-editor-block-fields__header">
 				<HStack spacing={ 1 }>
-					{ isCollapsed && (
+					{ isMultiBlock && (
 						<>
 							<BlockIcon
 								className="block-editor-block-fields__header-icon"
@@ -203,7 +228,7 @@ function BlockFields( {
 							/>
 						</>
 					) }
-					{ ! isCollapsed && (
+					{ ! isMultiBlock && (
 						<h2 className="block-editor-block-fields__header-title">
 							{ __( 'Content' ) }
 						</h2>
@@ -236,7 +261,7 @@ export function BlockFieldsPanel( props ) {
 			<BlockFields
 				{ ...props }
 				blockType={ blockType }
-				isCollapsed={ isSelectionWithinCurrentSection }
+				isMultiBlock={ isSelectionWithinCurrentSection }
 			/>
 		</InspectorControls>
 	);

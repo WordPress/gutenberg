@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { applyFilters } from '@wordpress/hooks';
+
+/**
  * External dependencies
  */
 import * as Y from 'yjs';
@@ -11,6 +16,15 @@ import * as syncProtocol from 'y-protocols/sync';
 /**
  * Internal dependencies
  */
+import {
+	DEFAULT_CLIENT_LIMIT_PER_ROOM,
+	MAX_ERROR_BACKOFF_IN_MS,
+	MAX_UPDATE_SIZE_IN_BYTES,
+	POLLING_INTERVAL_IN_MS,
+	POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS,
+	POLLING_INTERVAL_BACKGROUND_TAB_IN_MS,
+} from './config';
+import { ConnectionError, ConnectionErrorCode } from '../../errors';
 import type { ConnectionStatus } from '../../types';
 import {
 	type AwarenessState,
@@ -24,18 +38,18 @@ import {
 	base64ToUint8Array,
 	createSyncUpdate,
 	createUpdateQueue,
+	intValueOrDefault,
 	postSyncUpdate,
+	postSyncUpdateNonBlocking,
 } from './utils';
 
-const POLLING_INTERVAL_IN_MS = 1000; // 1 second or 1000 milliseconds
-const POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS = 250; // 250 milliseconds
-const MAX_ERROR_BACKOFF_IN_MS = 30 * 1000; // 30 seconds
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
 
 type LogFunction = ( message: string, debug?: object ) => void;
 
 interface PollingManager {
 	registerRoom: ( options: RegisterRoomOptions ) => void;
+	retryNow: () => void;
 	unregisterRoom: ( room: string ) => void;
 }
 
@@ -52,11 +66,13 @@ interface RoomState {
 	clientId: number;
 	createCompactionUpdate: () => SyncUpdate;
 	endCursor: number;
+	isPrimaryRoom: boolean;
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
 	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
+	room: string;
 	unregister: () => void;
 	updateQueue: UpdateQueue;
 }
@@ -85,7 +101,7 @@ function createDeprecatedCompactionUpdate( updates: SyncUpdate[] ): SyncUpdate {
 
 	// Merge all updates while preserving operation metadata.
 	return createSyncUpdate(
-		Y.mergeUpdates( mergeable ),
+		Y.mergeUpdatesV2( mergeable ),
 		SyncUpdateType.COMPACTION
 	);
 }
@@ -141,7 +157,9 @@ function processAwarenessUpdate(
 
 	// Removed clients are missing from the server state.
 	const removed = new Set< number >(
-		currentStates.keys().filter( ( clientId ) => ! state[ clientId ] )
+		Array.from( currentStates.keys() ).filter(
+			( clientId ) => ! state[ clientId ]
+		)
 	);
 
 	Object.entries( state ).forEach( ( [ clientIdString, awarenessState ] ) => {
@@ -233,22 +251,144 @@ function processDocUpdate(
 		case SyncUpdateType.COMPACTION:
 		case SyncUpdateType.UPDATE: {
 			// Apply document update directly.
-			Y.applyUpdate( doc, data, POLLING_MANAGER_ORIGIN );
+			Y.applyUpdateV2( doc, data, POLLING_MANAGER_ORIGIN );
 		}
 	}
 }
 
+/**
+ * Check whether the awareness state exceeds the configured connection limit.
+ *
+ * @param awareness The awareness state from the server response.
+ * @param roomState The room state corresponding to the awareness state
+ * @return True if a peer limit has been exceeded.
+ */
+function checkConnectionLimit(
+	awareness: AwarenessState,
+	roomState: RoomState
+): boolean {
+	if ( ! roomState.isPrimaryRoom || hasCheckedConnectionLimit ) {
+		return false;
+	}
+
+	// Limits are only enforced on the initial connection.
+	hasCheckedConnectionLimit = true;
+
+	const maxClientsPerRoom = applyFilters(
+		'sync.pollingProvider.maxClientsPerRoom',
+		DEFAULT_CLIENT_LIMIT_PER_ROOM,
+		roomState.room
+	);
+
+	const clientCount = Object.keys( awareness ).length;
+	const validatedLimit = intValueOrDefault(
+		maxClientsPerRoom,
+		DEFAULT_CLIENT_LIMIT_PER_ROOM
+	);
+
+	if ( clientCount > validatedLimit ) {
+		roomState.log( 'Connection limit exceeded', {
+			clientCount,
+			maxClientsPerRoom: validatedLimit,
+			room: roomState.room,
+		} );
+
+		return true;
+	}
+
+	return false;
+}
+
+let areListenersRegistered = false;
+let hasCheckedConnectionLimit = false;
+let hasCollaborators = false;
+let isActiveBrowser = 'visible' === document.visibilityState;
 let isPolling = false;
+let isUnloadPending = false;
 let pollInterval = POLLING_INTERVAL_IN_MS;
+let pollingTimeoutId: ReturnType< typeof setTimeout > | null = null;
+
+/**
+ * Mark that a page unload has been requested. This fires on
+ * `beforeunload` which happens before the browser aborts in-flight
+ * fetches, allowing us to distinguish poll failures caused by
+ * navigation from genuine server errors in the catch block.
+ *
+ * If the user cancels the unload (e.g. by dismissing a "Save Changes?" dialog),
+ * the flag is reset at the start of the next poll cycle so that polling can
+ * resume.
+ */
+function handleBeforeUnload(): void {
+	isUnloadPending = true;
+}
+
+/**
+ * Send a disconnect signal for all registered rooms when the page is
+ * being unloaded. Uses `sendBeacon` so the request survives navigation.
+ */
+function handlePageHide(): void {
+	const rooms = Array.from( roomStates.entries() ).map(
+		( [ room, state ] ) => ( {
+			after: 0,
+			awareness: null,
+			client_id: state.clientId,
+			room,
+			updates: [],
+		} )
+	);
+
+	postSyncUpdateNonBlocking( { rooms } );
+}
+
+/**
+ * Hangle change in visibility state of browser tab.
+ *
+ * Used to trigger a slow down of the collaboration syncs when the
+ * browser tab becomes inactive (either the user switches tabs or the
+ * screen saver comes on).
+ *
+ * Fires on the document's visibilitychange event.
+ */
+function handleVisibilityChange() {
+	const wasActive = isActiveBrowser;
+	isActiveBrowser = document.visibilityState === 'visible';
+
+	if ( isActiveBrowser && ! wasActive ) {
+		/*
+		 * Remove scheduled polling and repoll immediately when reactivated.
+		 *
+		 * This ensures that any updates by collaborators are immediately
+		 * reflected in the document once the browser tab becomes active.
+		 * Otherwise there would be a delay of up to 30 seconds before the
+		 * updates came through.
+		 *
+		 * Only repoll if we cleared a pending timeout, meaning the poll loop
+		 * was idle between cycles. If no timeout is pending, a poll request
+		 * is already in-flight and will pick up the updated isActiveBrowser
+		 * value when it schedules the next cycle.
+		 */
+		if ( pollingTimeoutId ) {
+			clearTimeout( pollingTimeoutId );
+			pollingTimeoutId = null;
+			poll();
+		}
+	}
+}
 
 function poll(): void {
 	isPolling = true;
+	pollingTimeoutId = null;
 
 	async function start(): Promise< void > {
 		if ( 0 === roomStates.size ) {
 			isPolling = false;
 			return;
 		}
+
+		// Reset the unloading flag at the start of each poll cycle so
+		// it doesn't permanently suppress disconnect after the user
+		// cancels a beforeunload dialog.
+		isUnloadPending = false;
 
 		// Emit 'connecting' status.
 		roomStates.forEach( ( state ) => {
@@ -274,13 +414,13 @@ function poll(): void {
 		try {
 			const { rooms } = await postSyncUpdate( payload );
 
-			// Reset poll interval on success.
-			pollInterval = POLLING_INTERVAL_IN_MS;
-
 			// Emit 'connected' status.
 			roomStates.forEach( ( state ) => {
 				state.onStatusChange( { status: 'connected' } );
 			} );
+
+			// Reset before checking each room
+			hasCollaborators = false;
 
 			rooms.forEach( ( room ) => {
 				if ( ! roomStates.has( room.room ) ) {
@@ -290,14 +430,36 @@ function poll(): void {
 				const roomState = roomStates.get( room.room )!;
 				roomState.endCursor = room.end_cursor;
 
+				// If a limit is exceeded, disconnect immediately without processing updates.
+				if ( checkConnectionLimit( room.awareness, roomState ) ) {
+					roomState.onStatusChange( {
+						status: 'disconnected',
+						error: new ConnectionError(
+							ConnectionErrorCode.CONNECTION_LIMIT_EXCEEDED,
+							'Connection limit exceeded'
+						),
+					} );
+					unregisterRoom( room.room );
+					return;
+				}
+
 				// Process awareness update.
 				roomState.processAwarenessUpdate( room.awareness );
 
-				// If there is another collaborator, resume the queue for the next poll
-				// and increase polling frequency.
-				if ( Object.keys( room.awareness ).length > 1 ) {
-					pollInterval = POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS;
-					roomState.updateQueue.resume();
+				// If there is another collaborator on the primary entity,
+				// resume all room queues for the next poll and increase
+				// polling frequency. We only check the primary room to
+				// avoid false positives from shared collection rooms
+				// (e.g. taxonomy/category), but resume all queues so
+				// collection rooms (e.g. root/comment) can also sync.
+				if (
+					roomState.isPrimaryRoom &&
+					Object.keys( room.awareness ).length > 1
+				) {
+					hasCollaborators = true;
+					roomStates.forEach( ( state ) => {
+						state.updateQueue.resume();
+					} );
 				}
 
 				// Process each incoming update and collect any responses.
@@ -327,6 +489,15 @@ function poll(): void {
 					);
 				}
 			} );
+
+			// Recalculate polling interval.
+			if ( isActiveBrowser && hasCollaborators ) {
+				pollInterval = POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS;
+			} else if ( isActiveBrowser ) {
+				pollInterval = POLLING_INTERVAL_IN_MS;
+			} else {
+				pollInterval = POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
+			}
 		} catch ( error ) {
 			// Exponential backoff on error: double the backoff time, up to max
 			pollInterval = Math.min(
@@ -334,14 +505,30 @@ function poll(): void {
 				MAX_ERROR_BACKOFF_IN_MS
 			);
 
-			// Restore updates to queues on failure so they can be retried.
+			// Recover from the failed request. We don't know whether the server stored
+			// our updates before the error occurred (e.g. a network timeout after a
+			// successful write). Re-sending the same updates via restore() would
+			// duplicate them on the server and cause unbounded storage growth.
+			//
+			// Instead, for rooms that had outgoing updates, replace the queue with a
+			// single compaction (full document state). This is idempotent: if the
+			// server already stored the updates, the compaction safely supersedes
+			// them; if it didn't, the compaction includes them. Updates not seen by
+			// this client are preserved in both cases.
 			for ( const room of payload.rooms ) {
 				if ( ! roomStates.has( room.room ) ) {
 					continue;
 				}
 
 				const state = roomStates.get( room.room )!;
-				state.updateQueue.restore( room.updates );
+
+				if ( room.updates.length > 0 && state.endCursor > 0 ) {
+					state.updateQueue.clear();
+					state.updateQueue.add( state.createCompactionUpdate() );
+				} else if ( room.updates.length > 0 ) {
+					state.updateQueue.restore( room.updates );
+				}
+
 				state.log(
 					'Error posting sync update, will retry with backoff',
 					{
@@ -351,12 +538,21 @@ function poll(): void {
 				);
 			}
 
-			roomStates.forEach( ( state ) => {
-				state.onStatusChange( { status: 'disconnected' } );
-			} );
+			// Don't report disconnected status when the request was aborted
+			// due to page unload (e.g. during a refresh) to avoid briefly
+			// flashing the disconnect dialog before the new page loads.
+			if ( ! isUnloadPending ) {
+				roomStates.forEach( ( state ) => {
+					state.onStatusChange( {
+						status: 'disconnected',
+						canManuallyRetry: true,
+						willAutoRetryInMs: pollInterval,
+					} );
+				} );
+			}
 		}
 
-		setTimeout( poll, pollInterval );
+		pollingTimeoutId = setTimeout( poll, pollInterval );
 	}
 
 	// Start polling.
@@ -378,6 +574,39 @@ function registerRoom( {
 	// Note: Queue is initially paused. Call .resume() to unpause.
 	const updateQueue = createUpdateQueue( [ createSyncStep1Update( doc ) ] );
 
+	/**
+	 * Connection limits are enforced on the first entity to be loaded for sync.
+	 * This is an inelegant solution to a hard problem: This sync provider and the
+	 * sync package in general intentionally have no knowledge of the individual
+	 * entities being synced.
+	 *
+	 * Let's say a user opens a document (Entity A) for editing. If you asked the
+	 * user what they are doing, they would reply "I'm editing Entity A." You might
+	 * say that Entity A is "primary."
+	 *
+	 * However, the action of editing Entity A also triggers the loading of a
+	 * collection of document categories (Entity B) and another document (Entity C)
+	 * that is embedded in Entity A. You might therefore say that Entity B and
+	 * Entity C are "secondary" in this session.
+	 *
+	 * Meanwhile, a different user opens Entity C for editing, which also triggers
+	 * the loading of Entity B. In this session, Entity C is "primary" and Entity B
+	 * is "secondary."
+	 *
+	 * How do we enforce limits? The intuitive answer is that we only want to count
+	 * connections when the entity is "primary." However, we have no ability to
+	 * detect this. A document might be loaded as a primary entity in one session
+	 * and a secondary entity in another.
+	 *
+	 * In practice, we can consider the first-loaded entity as "primary" and use it
+	 * to enforce our connection limit. This is an imperfect assumption of consumer
+	 * behavior.
+	 *
+	 * How might this approach be improved? We could develop some way to annotate
+	 * entity loading so that the consumer can indicate which entity is primary.
+	 */
+	const isPrimaryRoom = 0 === roomStates.size;
+
 	function onAwarenessUpdate(): void {
 		roomState.localAwarenessState = awareness.getLocalState() ?? {};
 	}
@@ -387,14 +616,36 @@ function registerRoom( {
 			return;
 		}
 
+		if ( update.byteLength > MAX_UPDATE_SIZE_IN_BYTES ) {
+			const state = roomStates.get( room );
+			if ( ! state ) {
+				return;
+			}
+
+			state.log( 'Document size limit exceeded', {
+				maxUpdateSizeInBytes: MAX_UPDATE_SIZE_IN_BYTES,
+				updateSizeInBytes: update.byteLength,
+			} );
+
+			state.onStatusChange( {
+				status: 'disconnected',
+				error: new ConnectionError(
+					ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED,
+					'Document size limit exceeded'
+				),
+			} );
+
+			// This is an unrecoverable error. Unregister the room to prevent syncing.
+			unregisterRoom( room );
+		}
+
 		// Tag local document changes as 'update' type.
 		updateQueue.add( createSyncUpdate( update, SyncUpdateType.UPDATE ) );
 	}
 
 	function unregister(): void {
-		doc.off( 'update', onDocUpdate );
+		doc.off( 'updateV2', onDocUpdate );
 		awareness.off( 'change', onAwarenessUpdate );
-		// TODO: poll will null awareness state to trigger removal
 		updateQueue.clear();
 	}
 
@@ -402,10 +653,11 @@ function registerRoom( {
 		clientId: doc.clientID,
 		createCompactionUpdate: () =>
 			createSyncUpdate(
-				Y.encodeStateAsUpdate( doc ),
+				Y.encodeStateAsUpdateV2( doc ),
 				SyncUpdateType.COMPACTION
 			),
 		endCursor: 0,
+		isPrimaryRoom,
 		localAwarenessState: awareness.getLocalState() ?? {},
 		log,
 		onStatusChange,
@@ -413,13 +665,21 @@ function registerRoom( {
 			processAwarenessUpdate( state, awareness ),
 		processDocUpdate: ( update: SyncUpdate ) =>
 			processDocUpdate( update, doc, onSync ),
+		room,
 		unregister,
 		updateQueue,
 	};
 
-	doc.on( 'update', onDocUpdate );
+	doc.on( 'updateV2', onDocUpdate );
 	awareness.on( 'change', onAwarenessUpdate );
 	roomStates.set( room, roomState );
+
+	if ( ! areListenersRegistered ) {
+		window.addEventListener( 'beforeunload', handleBeforeUnload );
+		window.addEventListener( 'pagehide', handlePageHide );
+		document.addEventListener( 'visibilitychange', handleVisibilityChange );
+		areListenersRegistered = true;
+	}
 
 	if ( ! isPolling ) {
 		poll();
@@ -427,11 +687,54 @@ function registerRoom( {
 }
 
 function unregisterRoom( room: string ): void {
-	roomStates.get( room )?.unregister();
-	roomStates.delete( room );
+	const state = roomStates.get( room );
+	if ( state ) {
+		// Send a disconnect signal so the server removes this client's
+		// awareness entry immediately instead of waiting for the timeout.
+		const rooms = [
+			{
+				after: 0,
+				awareness: null,
+				client_id: state.clientId,
+				room,
+				updates: [],
+			},
+		];
+
+		postSyncUpdateNonBlocking( { rooms } );
+		state.unregister();
+		roomStates.delete( room );
+	}
+
+	if ( 0 === roomStates.size && areListenersRegistered ) {
+		window.removeEventListener( 'beforeunload', handleBeforeUnload );
+		window.removeEventListener( 'pagehide', handlePageHide );
+		document.removeEventListener(
+			'visibilitychange',
+			handleVisibilityChange
+		);
+		areListenersRegistered = false;
+		hasCheckedConnectionLimit = false;
+	}
+}
+
+/**
+ * Immediately retry the sync connection by cancelling any pending backoff
+ * timeout and triggering a new poll. If a request is already in-flight,
+ * the backoff interval is reset so the next scheduled poll fires sooner.
+ */
+function retryNow(): void {
+	pollInterval = POLLING_INTERVAL_IN_MS * 2;
+
+	if ( pollingTimeoutId ) {
+		clearTimeout( pollingTimeoutId );
+		pollingTimeoutId = null;
+		poll();
+	}
 }
 
 export const pollingManager: PollingManager = {
 	registerRoom,
+	retryNow,
 	unregisterRoom,
 };

@@ -8,7 +8,7 @@ $header-height: variables.$header-height;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	background: var(--wpds-color-bg-surface-neutral-weak, #f0f0f0);
+	background: var(--wpds-color-bg-surface-neutral-weak);
 	text-decoration: none;
 
 	@media not (prefers-reduced-motion) {
@@ -17,8 +17,8 @@ $header-height: variables.$header-height;
 
 	&:focus:not(:active) {
 		outline:
-			var(--wpds-border-width-focus, 2px) solid
-			var(--wpds-color-stroke-focus-brand, #0073aa);
-		outline-offset: calc(-1 * var(--wpds-border-width-focus, 2px));
+			var(--wpds-border-width-focus) solid
+			var(--wpds-color-stroke-focus-brand);
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
 	}
 }

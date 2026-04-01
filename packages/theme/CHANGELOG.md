@@ -2,9 +2,26 @@
 
 ## Unreleased
 
+## 0.10.0 (2026-04-01)
+
+### Enhancement
+
+-   Change the default value of `--wpds-cursor-control` from `default` to `pointer` ([#76762](https://github.com/WordPress/gutenberg/pull/76762)).
+
+## 0.9.0 (2026-03-18)
+
 ### New Features
 
+-   Add `cursor` prop to `ThemeProvider` for configuring the `--wpds-cursor-control` design token ([#76410](https://github.com/WordPress/gutenberg/pull/76410)).
+-   Added `no-token-fallback-values` stylelint rule that disallows manual fallback values for `--wpds-*` design tokens. Available as `@wordpress/theme/stylelint-plugins/no-token-fallback-values` ([#76415](https://github.com/WordPress/gutenberg/pull/76415)).
+
+## 0.8.0 (2026-03-04)
+
+### New Features
+
+-   Added PostCSS, esbuild, and Vite build plugins that inject fallback values for design system tokens (`--wpds-*`). Available as package exports: `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks`, `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`, `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks` ([#75589](https://github.com/WordPress/gutenberg/pull/75589)).
 -   Add `--wpds-cursor-control` design token for interactive non-link elements ([#75697](https://github.com/WordPress/gutenberg/pull/75697)).
+-   Add `--wpds-dimension-surface-width-*` design tokens for component width constraints.
 
 ## 0.7.0 (2026-02-18)
 

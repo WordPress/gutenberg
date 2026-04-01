@@ -23,6 +23,7 @@ import {
 	isBlockHiddenAtViewport,
 	getViewportModalClientIds,
 	isSectionBlock,
+	getParentSectionBlock,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -130,12 +131,12 @@ describe( 'private selectors', () => {
 						'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
 					],
 				] ),
+				blockEditingModes: new Map( [] ),
 			},
 			blockListSettings: {
 				'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337': {},
 				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {},
 			},
-			blockEditingModes: new Map( [] ),
 			derivedBlockEditingModes: new Map( [] ),
 		};
 
@@ -151,7 +152,10 @@ describe( 'private selectors', () => {
 		it( 'should return false when top level block is not disabled', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [] ),
+				},
 				derivedBlockEditingModes: new Map( [] ),
 			};
 			expect(
@@ -165,9 +169,12 @@ describe( 'private selectors', () => {
 		it( 'should return true when top level block is disabled and there are no editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
@@ -186,7 +193,10 @@ describe( 'private selectors', () => {
 		it( 'should return true when top level block is disabled via inheritance and there are no editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [ [ '', 'disabled' ] ] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [ [ '', 'disabled' ] ] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
@@ -207,10 +217,13 @@ describe( 'private selectors', () => {
 		it( 'should return true when top level block is disabled and there are disabled editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+						[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
@@ -228,10 +241,13 @@ describe( 'private selectors', () => {
 		it( 'should return false when top level block is disabled and there are non-disabled editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+						[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
@@ -249,10 +265,13 @@ describe( 'private selectors', () => {
 		it( 'should return false when top level block is disabled via inheritance and there are non-disabled editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
@@ -342,7 +361,10 @@ describe( 'private selectors', () => {
 		it( 'should return tree containing only clientId and innerBlocks', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [] ),
+				},
 				derivedBlockEditingModes: new Map( [] ),
 			};
 			expect( getEnabledClientIdsTree( state ) ).toEqual( [
@@ -380,7 +402,10 @@ describe( 'private selectors', () => {
 		it( 'should return a subtree when rootBlockClientId is given', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [] ),
+				},
 				derivedBlockEditingModes: new Map( [] ),
 			};
 			expect(
@@ -412,11 +437,20 @@ describe( 'private selectors', () => {
 		it( 'should filter out disabled blocks', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'contentOnly' ],
-					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'contentOnly' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[
+							'b26fc763-417d-4f01-b81c-2ec61e14a972',
+							'contentOnly',
+						],
+						[
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+							'contentOnly',
+						],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
@@ -456,8 +490,8 @@ describe( 'private selectors', () => {
 						[ '6cf70164-9097-4460-bcbf-200560546988', [] ],
 						[ '', [ '6cf70164-9097-4460-bcbf-200560546988' ] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockEditingModes: new Map(),
 				derivedBlockEditingModes: new Map(),
 			};
 			expect(
@@ -502,11 +536,11 @@ describe( 'private selectors', () => {
 							[ '4c2b7140-fffd-44b4-b2a7-820c670a6514' ],
 						],
 					] ),
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'default' ],
+					] ),
 				},
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'default' ],
-				] ),
 				derivedBlockEditingModes: new Map( [
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
@@ -555,11 +589,11 @@ describe( 'private selectors', () => {
 							[ '4c2b7140-fffd-44b4-b2a7-820c670a6514' ],
 						],
 					] ),
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'default' ],
+					] ),
 				},
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'default' ],
-				] ),
 				derivedBlockEditingModes: new Map( [
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
 				] ),
@@ -1412,6 +1446,244 @@ describe( 'private selectors', () => {
 				disableContentOnlyForUnsyncedPatterns: false,
 			} );
 			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when nested inside another section block', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'outer-pattern', { name: 'core/group' } ],
+						[ 'inner-pattern', { name: 'core/group' } ],
+					] ),
+					attributes: new Map( [
+						[
+							'outer-pattern',
+							{ metadata: { patternName: 'outer' } },
+						],
+						[
+							'inner-pattern',
+							{ metadata: { patternName: 'inner' } },
+						],
+					] ),
+					parents: new Map( [
+						[ 'outer-pattern', '' ],
+						[ 'inner-pattern', 'outer-pattern' ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: undefined,
+			};
+			// inner-pattern is nested inside outer-pattern (also a section),
+			// so it is not considered a section itself.
+			expect( isSectionBlock( state, 'inner-pattern' ) ).toBe( false );
+		} );
+
+		it( 'returns false when the block itself is the editedContentOnlySection', () => {
+			const state = {
+				...createState( {
+					patternName: 'my-pattern',
+				} ),
+				editedContentOnlySection: 'block-1',
+			};
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns false when the block is nested within the editedContentOnlySection', () => {
+			// Create a nested structure: outer-pattern > block-1 (with patternName)
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'outer-pattern', { name: 'core/group' } ],
+						[ 'block-1', { name: 'core/group' } ],
+					] ),
+					attributes: new Map( [
+						[
+							'outer-pattern',
+							{ metadata: { patternName: 'outer' } },
+						],
+						[ 'block-1', { metadata: { patternName: 'inner' } } ],
+					] ),
+					parents: new Map( [
+						[ 'outer-pattern', '' ],
+						[ 'block-1', 'outer-pattern' ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: 'outer-pattern',
+			};
+			// block-1 has a patternName, so would normally be a section,
+			// but since its parent (outer-pattern) is being edited, it's not.
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true for section blocks outside the editedContentOnlySection', () => {
+			// Create a structure with two sibling patterns
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'pattern-a', { name: 'core/group' } ],
+						[ 'pattern-b', { name: 'core/group' } ],
+					] ),
+					attributes: new Map( [
+						[ 'pattern-a', { metadata: { patternName: 'a' } } ],
+						[ 'pattern-b', { metadata: { patternName: 'b' } } ],
+					] ),
+					parents: new Map( [
+						[ 'pattern-a', '' ],
+						[ 'pattern-b', '' ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: 'pattern-a',
+			};
+			// pattern-b is not the edited section and not within it
+			expect( isSectionBlock( state, 'pattern-b' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'getParentSectionBlock', () => {
+		it( 'returns undefined when there are no parent section blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'block-1', { name: 'core/paragraph' } ],
+					] ),
+					attributes: new Map( [ [ 'block-1', {} ] ] ),
+					parents: new Map( [ [ 'block-1', '' ] ] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: undefined,
+			};
+			expect( getParentSectionBlock( state, 'block-1' ) ).toBeUndefined();
+		} );
+
+		it( 'returns the parent section block clientId', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'pattern-block', { name: 'core/group' } ],
+						[ 'inner-block', { name: 'core/paragraph' } ],
+					] ),
+					attributes: new Map( [
+						[
+							'pattern-block',
+							{ metadata: { patternName: 'my-pattern' } },
+						],
+						[ 'inner-block', {} ],
+					] ),
+					parents: new Map( [
+						[ 'pattern-block', '' ],
+						[ 'inner-block', 'pattern-block' ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: undefined,
+			};
+			expect( getParentSectionBlock( state, 'inner-block' ) ).toBe(
+				'pattern-block'
+			);
+		} );
+
+		it( 'returns undefined when the parent is the editedContentOnlySection', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'pattern-block', { name: 'core/group' } ],
+						[ 'inner-block', { name: 'core/paragraph' } ],
+					] ),
+					attributes: new Map( [
+						[
+							'pattern-block',
+							{ metadata: { patternName: 'my-pattern' } },
+						],
+						[ 'inner-block', {} ],
+					] ),
+					parents: new Map( [
+						[ 'pattern-block', '' ],
+						[ 'inner-block', 'pattern-block' ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: 'pattern-block',
+			};
+			// Since pattern-block is the edited section, it's no longer
+			// considered a parent section for inner-block
+			expect(
+				getParentSectionBlock( state, 'inner-block' )
+			).toBeUndefined();
+		} );
+
+		it( 'returns undefined for deeply nested blocks when an ancestor is the editedContentOnlySection', () => {
+			// Structure: outer-pattern > nested-pattern > deep-block
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'outer-pattern', { name: 'core/group' } ],
+						[ 'nested-pattern', { name: 'core/group' } ],
+						[ 'deep-block', { name: 'core/paragraph' } ],
+					] ),
+					attributes: new Map( [
+						[
+							'outer-pattern',
+							{ metadata: { patternName: 'outer' } },
+						],
+						[
+							'nested-pattern',
+							{ metadata: { patternName: 'nested' } },
+						],
+						[ 'deep-block', {} ],
+					] ),
+					parents: new Map( [
+						[ 'outer-pattern', '' ],
+						[ 'nested-pattern', 'outer-pattern' ],
+						[ 'deep-block', 'nested-pattern' ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: 'outer-pattern',
+			};
+			// When outer-pattern is being edited, nested-pattern is no longer
+			// a section (tested above), so deep-block has no parent section
+			expect(
+				getParentSectionBlock( state, 'deep-block' )
+			).toBeUndefined();
+		} );
+
+		it( 'returns the correct parent when editedContentOnlySection is set but not in ancestry', () => {
+			// Structure: pattern-a > inner-block, pattern-b (sibling)
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'pattern-a', { name: 'core/group' } ],
+						[ 'inner-block', { name: 'core/paragraph' } ],
+						[ 'pattern-b', { name: 'core/group' } ],
+					] ),
+					attributes: new Map( [
+						[ 'pattern-a', { metadata: { patternName: 'a' } } ],
+						[ 'inner-block', {} ],
+						[ 'pattern-b', { metadata: { patternName: 'b' } } ],
+					] ),
+					parents: new Map( [
+						[ 'pattern-a', '' ],
+						[ 'inner-block', 'pattern-a' ],
+						[ 'pattern-b', '' ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: 'pattern-b',
+			};
+			// pattern-a is not being edited, so inner-block still has pattern-a as parent
+			expect( getParentSectionBlock( state, 'inner-block' ) ).toBe(
+				'pattern-a'
+			);
 		} );
 	} );
 } );

@@ -87,6 +87,7 @@ export function RadioControl(
 	return (
 		<fieldset
 			id={ id }
+			role="radiogroup"
 			className={ clsx( className, 'components-radio-control' ) }
 			aria-describedby={ !! help ? generateHelpId( id ) : undefined }
 		>

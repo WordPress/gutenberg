@@ -20,7 +20,15 @@ const DEFAULT_VIEW: View = {
 };
 
 export const DEFAULT_LAYOUTS = {
-	table: {},
+	table: {
+		layout: {
+			styles: {
+				author: {
+					align: 'start' as const,
+				},
+			},
+		},
+	},
 	grid: {},
 	list: {},
 };
@@ -58,15 +66,19 @@ export const DEFAULT_VIEWS: {
 type ActiveViewOverrides = {
 	filters?: Filter[];
 	sort?: View[ 'sort' ];
+	layout?: Record< string, unknown >;
 };
 
 export function getActiveViewOverridesForTab(
 	slug: string
 ): ActiveViewOverrides {
 	if ( slug === 'all' ) {
-		return {};
+		return {
+			...DEFAULT_LAYOUTS.table,
+		};
 	}
 	return {
+		...DEFAULT_LAYOUTS.table,
 		filters: [
 			{
 				field: 'status',
@@ -102,7 +114,7 @@ export async function ensureView(
 }
 
 export function viewToQuery( view: View, postType: string ) {
-	const result: Record< string, any > = {};
+	const result: Record< string, any > = { _embed: 'author,wp:featuredmedia' };
 
 	// Pagination, sorting, search.
 	if ( undefined !== view.perPage ) {

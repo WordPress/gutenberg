@@ -10,6 +10,8 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalHStack as HStack,
+	// TODO: Replace this ZStack with ad hoc CSS.
+	// eslint-disable-next-line @wordpress/use-recommended-components
 	__experimentalZStack as ZStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	ColorIndicator,
@@ -22,6 +24,7 @@ import {
 import { useCallback, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
+import { reset as resetIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -31,7 +34,6 @@ import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
-import { reset as resetIcon } from '@wordpress/icons';
 
 export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
@@ -199,7 +201,7 @@ function ColorPanelTab( {
 	);
 }
 
-function ColorPanelDropdown( {
+export function ColorPanelDropdown( {
 	label,
 	hasValue,
 	resetValue,
@@ -208,13 +210,14 @@ function ColorPanelDropdown( {
 	tabs,
 	colorGradientControlSettings,
 	panelId,
+	className = 'block-editor-tools-panel-color-gradient-settings__item',
 } ) {
 	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
 	const { key: firstTabKey, ...firstTab } = tabs[ 0 ] ?? {};
 	const colorGradientDropdownButtonRef = useRef( undefined );
 	return (
 		<ToolsPanelItem
-			className="block-editor-tools-panel-color-gradient-settings__item"
+			className={ className }
 			hasValue={ hasValue }
 			label={ label }
 			onDeselect={ resetValue }
@@ -334,6 +337,12 @@ export default function ColorPanel( {
 	const areCustomGradientsEnabled = settings?.color?.customGradient;
 	const hasSolidColors = colors.length > 0 || areCustomSolidsEnabled;
 	const hasGradientColors = gradients.length > 0 || areCustomGradientsEnabled;
+	// When a block opts into background.gradient support, the gradient
+	// picker moves to the Background panel. Hide it here to avoid
+	// showing duplicate gradient controls.
+	const hasBackgroundGradientSupport = !! settings?.background?.gradient;
+	const showGradientColors =
+		hasGradientColors && ! hasBackgroundGradientSupport;
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
 	const encodeColorValue = ( colorValue ) => {
@@ -365,14 +374,18 @@ export default function ColorPanel( {
 	const userBackgroundColor = decodeValue( value?.color?.background );
 	const gradient = decodeValue( inheritedValue?.color?.gradient );
 	const userGradient = decodeValue( value?.color?.gradient );
-	const hasBackground = () => !! userBackgroundColor || !! userGradient;
+	const hasBackground = () =>
+		!! userBackgroundColor ||
+		( ! hasBackgroundGradientSupport && !! userGradient );
 	const setBackgroundColor = ( newColor ) => {
 		const newValue = setImmutably(
 			value,
 			[ 'color', 'background' ],
 			encodeColorValue( newColor )
 		);
-		newValue.color.gradient = undefined;
+		if ( ! hasBackgroundGradientSupport ) {
+			newValue.color.gradient = undefined;
+		}
 		onChange( newValue );
 	};
 	const setGradient = ( newGradient ) => {
@@ -390,7 +403,9 @@ export default function ColorPanel( {
 			[ 'color', 'background' ],
 			undefined
 		);
-		newValue.color.gradient = undefined;
+		if ( ! hasBackgroundGradientSupport ) {
+			newValue.color.gradient = undefined;
+		}
 		onChange( newValue );
 	};
 
@@ -564,7 +579,10 @@ export default function ColorPanel( {
 			hasValue: hasBackground,
 			resetValue: resetBackground,
 			isShownByDefault: defaultControls.background,
-			indicators: [ gradient ?? backgroundColor ],
+			indicators: [
+				( showGradientColors ? gradient : undefined ) ??
+					backgroundColor,
+			],
 			tabs: [
 				hasSolidColors && {
 					key: 'background',
@@ -573,7 +591,7 @@ export default function ColorPanel( {
 					setValue: setBackgroundColor,
 					userValue: userBackgroundColor,
 				},
-				hasGradientColors && {
+				showGradientColors && {
 					key: 'gradient',
 					label: __( 'Gradient' ),
 					inheritedValue: gradient,

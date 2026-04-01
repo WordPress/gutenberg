@@ -348,7 +348,7 @@ function MetaBoxesMain( { isLegacy } ) {
 
 	return (
 		<NavigableRegion
-			aria-label={ paneLabel }
+			ariaLabel={ paneLabel }
 			ref={ setMainRefs }
 			className={ clsx(
 				'edit-post-meta-boxes-main',

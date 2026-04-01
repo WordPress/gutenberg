@@ -2,15 +2,64 @@
 
 ## Unreleased
 
+## 32.5.0 (2026-04-01)
+
 ### Bug Fixes
 
+-   `ToggleGroupControl`: Fix accessible association of `help` text ([#76740](https://github.com/WordPress/gutenberg/pull/76740)).
+-   `ComboboxControl`: Fix accessible association of `help` text with the combobox input ([#76761](https://github.com/WordPress/gutenberg/pull/76761)).
+-   `RadioControl`: Add `role="radiogroup"` to the wrapping `fieldset` element ([#76745](https://github.com/WordPress/gutenberg/pull/76745)).
+-   `ControlWithError`: Connect validation error messages to controls via `aria-describedby` ([#76742](https://github.com/WordPress/gutenberg/pull/76742)).
+-   `CustomGradientPicker`: Add state persistence when switching between Linear and Radial Gradient ([#76595](https://github.com/WordPress/gutenberg/pull/76595)).
+-   `Button`: fix focus styles in High Contrast (forced colors) mode ([#76719](https://github.com/WordPress/gutenberg/pull/76719)).
+
+### Enhancements
+
+-   `Button`: Hide focus outline on `:active` in High Contrast (forced colors) mode to provide visual click feedback ([#76833](https://github.com/WordPress/gutenberg/pull/76833)).
+
+## 32.4.0 (2026-03-18)
+
+### Bug Fixes
+
+-   Revert `word-break: break-word` addition ([#76230](https://github.com/WordPress/gutenberg/pull/76230)).
+-   `VisuallyHidden`: Add `word-break: normal` to prevent text wrapping issues in screen reader content ([#75539](https://github.com/WordPress/gutenberg/pull/75539)).
+-   `DateTimePicker`: Fix error that occurs when selecting a day outside the valid days for a month (e.g. February 30) ([#76400](https://github.com/WordPress/gutenberg/pull/76400)).
+
+### Enhancements
+
+-   `DateCalendar`, `DateRangeCalendar`: Add `showOutsideDays` and `fixedWeeks` props and style outside-month days ([#76199](https://github.com/WordPress/gutenberg/pull/76199)).
+-   `Modal`: Use `--wpds-dimension-surface-width-*` design tokens for width constraints ([#76494](https://github.com/WordPress/gutenberg/pull/76494)).
+-   `Snackbar`: Use `--wpds-dimension-surface-width-lg` design token for max-width ([#76592](https://github.com/WordPress/gutenberg/pull/76592)).
+
+### Internal
+
+-   Remove `Avatar` and `AvatarGroup` from private APIs, moved to `@wordpress/editor` ([#75652](https://github.com/WordPress/gutenberg/pull/75652)).
+
+## 32.3.0 (2026-03-04)
+
+### Code Quality
+
+-   Improve typing of `focusOnMount` prop in `Dropdown`, `Modal` and `Popover` ([#75442](https://github.com/WordPress/gutenberg/pull/75442)).
+
+### Bug Fixes
+
+-   `Menu`: Fix controlled checked state for radio items ([#76041](https://github.com/WordPress/gutenberg/pull/76041)).
 -   `ColorPicker`: Preserve hue and saturation when the selected color becomes achromatic ([#75493](https://github.com/WordPress/gutenberg/pull/75493)).
 -   `SnackbarList`: Fix scaling distortion when a snackbar's content is updated in place via a shared notice ID ([#75709](https://github.com/WordPress/gutenberg/pull/75709)).
 -   `ToggleGroupControl`: Fix hover styles on disabled items ([#75737](https://github.com/WordPress/gutenberg/pull/75737)).
+-   `FormTokenField`: Fixed incorrect height of input field when rendered on pages using WordPress 7.0 form styles ([#75880](https://github.com/WordPress/gutenberg/pull/75880)).
+-   `SelectControl`: Fixed misalignment of option label on some variants when rendered on pages using WordPress 7.0 form styles ([#75880](https://github.com/WordPress/gutenberg/pull/75880)).
+-   `DateTimePicker`: Fix day text wrapping ([#76084](https://github.com/WordPress/gutenberg/pull/76084)).
 
 ### Enhancements
 
 -   `ToggleGroupControl`: Make unselected item color consistent across all variants ([#75737](https://github.com/WordPress/gutenberg/pull/75737)).
+-   `Button`: Add `word-break: break-word`. ([#76071](https://github.com/WordPress/gutenberg/pull/76071)).
+-   `Tooltip`: Change default `placement` from `bottom` to `top`. ([#76131](https://github.com/WordPress/gutenberg/pull/76131)).
+
+### Internal
+
+-   `NumberControl`: Improved code and types for state reducer ([#75822](https://github.com/WordPress/gutenberg/pull/75822)).
 
 ## 32.2.0 (2026-02-18)
 

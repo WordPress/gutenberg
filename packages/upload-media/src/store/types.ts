@@ -170,6 +170,11 @@ export interface Settings {
 	// Images larger than this will be scaled down.
 	// Default is 2560 (matching WordPress core).
 	bigImageSizeThreshold?: number;
+	// Default image quality (0-1) for resize/crop operations.
+	// Default is 0.82 if not set.
+	imageQuality?: number;
+	// Function for finalizing an upload after all client-side processing is complete.
+	mediaFinalize?: ( id: number ) => Promise< void >;
 }
 
 // Matches the Attachment type from the media-utils package.
@@ -185,7 +190,6 @@ export interface Attachment {
 	mime_type: string;
 	featured_media?: number;
 	missing_image_sizes?: string[];
-	media_filename?: string;
 	poster?: string;
 	/**
 	 * EXIF orientation value from the original image.
@@ -229,6 +233,7 @@ export enum OperationType {
 	Rotate = 'ROTATE',
 	TranscodeImage = 'TRANSCODE_IMAGE',
 	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
+	Finalize = 'FINALIZE',
 }
 
 /**

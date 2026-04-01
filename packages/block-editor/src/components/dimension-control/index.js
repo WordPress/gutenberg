@@ -55,9 +55,10 @@ function useDimensionSizes( presets ) {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/dimension-control/README.md
  *
  * @param {Object}                     props
- * @param {?string}                    props.label    A label for the control.
- * @param {( value: string ) => void } props.onChange Called when the dimension value changes.
- * @param {string}                     props.value    The current dimension value.
+ * @param {?string}                    props.label          A label for the control.
+ * @param {( value: string ) => void } props.onChange       Called when the dimension value changes.
+ * @param {string}                     props.value          The current dimension value.
+ * @param {?Object}                    props.dimensionSizes Optional dimension size presets. Falls back to settings from the store.
  *
  * @return {Component} The component to be rendered.
  */
@@ -65,11 +66,13 @@ export default function DimensionControl( {
 	label = __( 'Dimension' ),
 	onChange,
 	value,
+	dimensionSizes: dimensionSizesProp,
 } ) {
-	const [ dimensionSizes, availableUnits ] = useSettings(
+	const [ dimensionSizesFromSettings, availableUnits ] = useSettings(
 		'dimensions.dimensionSizes',
 		'spacing.units'
 	);
+	const dimensionSizes = dimensionSizesProp ?? dimensionSizesFromSettings;
 
 	const units = useCustomUnits( {
 		availableUnits: availableUnits || [

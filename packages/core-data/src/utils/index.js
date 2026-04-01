@@ -5,7 +5,6 @@ export { default as forwardResolver } from './forward-resolver';
 export { default as onSubKey } from './on-sub-key';
 export { default as replaceAction } from './replace-action';
 export { default as withWeakMapCache } from './with-weak-map-cache';
-export { default as isRawAttribute } from './is-raw-attribute';
 export { default as setNestedValue } from './set-nested-value';
 export { default as getNestedValue } from './get-nested-value';
 export { default as isNumericID } from './is-numeric-id';
@@ -15,3 +14,4 @@ export {
 	ALLOWED_RESOURCE_ACTIONS,
 } from './user-permissions';
 export { RECEIVE_INTERMEDIATE_RESULTS } from './receive-intermediate-results';
+export { default as normalizeQueryForResolution } from './normalize-query-for-resolution';

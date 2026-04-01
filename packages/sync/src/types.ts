@@ -12,7 +12,7 @@ import type { Awareness } from 'y-protocols/awareness';
 /**
  * Internal dependencies
  */
-import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
+import type { ConnectionError } from './errors';
 
 /* globalThis */
 declare global {
@@ -33,15 +33,9 @@ export type ObjectType = string;
 // its origin.
 export type Origin = any;
 
-// Object data represents any entity record, post, term, user, site, etc. There
-// are not many expectations that can hold on its shape.
-export interface ObjectData extends Record< string, unknown > {
-	meta?: ObjectMeta;
-}
-
-export interface ObjectMeta extends Record< string, unknown > {
-	[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]?: string;
-}
+// Object data represents any entity record. There are not any expectations that
+// can hold on its shape, beyond a record with string keys and unknown values.
+export type ObjectData = Record< string, unknown >;
 
 /**
  * Event map for provider events.
@@ -67,35 +61,33 @@ export interface ProviderCreatorResult {
 }
 
 /**
- * Error codes for connection errors that can occur in sync providers.
+ * Current connection status of a sync provider.
  */
-export type ConnectionErrorCode =
-	| 'authentication-error'
-	| 'connection-expired'
-	| 'connection-limit-exceeded'
-	| 'unknown-error';
-
-/**
- * Sync connection error object.
- */
-export interface ConnectionError extends Error {
-	/**
-	 * Error code identifier for programmatic handling and default message lookup.
-	 */
-	code: ConnectionErrorCode;
+export interface ConnectionStatusConnected {
+	status: 'connected';
 }
 
-/**
- * Current connection status of a sync provider, including status and optional error information.
- */
-export interface ConnectionStatus {
-	status: 'connected' | 'connecting' | 'disconnected';
+export interface ConnectionStatusConnecting {
+	status: 'connecting';
+}
 
-	/**
-	 * Optional error information when status is 'disconnected'.
-	 */
+export interface ConnectionStatusDisconnected {
+	status: 'disconnected';
+
+	/** Optional error information. */
 	error?: ConnectionError;
+
+	/** Whether the error condition is retryable via user action. */
+	canManuallyRetry?: boolean;
+
+	/** Milliseconds until the next automatic retry attempt (triggered by the provider). */
+	willAutoRetryInMs?: number;
 }
+
+export type ConnectionStatus =
+	| ConnectionStatusConnected
+	| ConnectionStatusConnecting
+	| ConnectionStatusDisconnected;
 
 export type OnStatusChangeCallback = (
 	status: ConnectionStatus | null
@@ -133,9 +125,9 @@ export interface RecordHandlers {
 	) => void;
 	getEditedRecord: () => Promise< ObjectData >;
 	onStatusChange: OnStatusChangeCallback;
+	persistCRDTDoc: () => void;
 	refetchRecord: () => Promise< void >;
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
-	saveRecord: () => Promise< void >;
 }
 
 export interface SyncConfig {
@@ -151,14 +143,14 @@ export interface SyncConfig {
 		ydoc: Y.Doc,
 		editedRecord: ObjectData
 	) => ObjectData;
-	supports?: Record< string, true >;
+	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
 }
 
 export interface SyncManager {
-	createMeta: (
+	createPersistedCRDTDoc: (
 		objectType: ObjectType,
 		objectId: ObjectID
-	) => Record< string, string >;
+	) => Promise< string | null >;
 	getAwareness: < State extends Awareness >(
 		objectType: ObjectType,
 		objectId: ObjectID

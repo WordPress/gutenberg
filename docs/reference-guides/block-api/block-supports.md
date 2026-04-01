@@ -608,6 +608,21 @@ When the block declares support for `color.text`, the attributes definition is e
     }
     ```
 
+## contentRole
+
+_**Note:** Since WordPress 6.9._
+
+-   Type: `boolean`
+-   Default value: `false`
+
+Marks the block itself as content. It is intended primarily for blocks that do not declare `content` attributes, or whose content is expressed only through their inner blocks. When enabled, content-only editing modes can still edit these blocks and allow inner blocks to be added or removed.
+
+```js
+supports: {
+	contentRole: true
+}
+```
+
 ## customClassName
 
 -   Type: `boolean`
@@ -756,8 +771,7 @@ supports: {
 
 Indicates if the block is using Interactivity API features.
 
-The `clientNavigation` sub-property indicates whether a block is compatible with the Interactivity API client-side navigation.
-Set it to true only if the block is not interactive or if it is interactive using the Interactivity API. Set it to false if the block is interactive but uses vanilla JS, jQuery or another JS framework/library other than the Interactivity API.
+The `clientNavigation` sub-property indicates whether a block is compatible with the Interactivity API client-side navigation. See the [Client-Side Navigation Compatibility](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility.md) guide for details.
 
 The `interactive` sub-property indicates whether the block is using the Interactivity API directives.
 
@@ -852,6 +866,25 @@ For the `flex` layout type only, determines display of the "Allow to wrap to mul
 -   Default value: `true`
 
 For the `constrained` layout type only, determines display of the custom content and wide size controls in the block sidebar.
+
+## listView
+
+_**Note:** Since WordPress 7.0._
+
+-   Type: `boolean`
+-   Default value: `false`
+
+Enables a List View panel in the block inspector for the block's inner blocks.
+
+When this support is enabled, the inspector shows a List View tree allowing users to inspect and manage the block's inner blocks from the sidebar instead of only using the global document List View.
+
+```js
+supports: {
+	listView: true
+}
+```
+
+The `listView` support only affects the editor UI and does not add any attributes to the block.
 
 ## lock
 

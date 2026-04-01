@@ -8,7 +8,7 @@ import {
 } from '@wordpress/blocks';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { moreVertical } from '@wordpress/icons';
+import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
 import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -74,6 +74,7 @@ export function BlockSettingsDropdown( {
 	clientIds,
 	children,
 	__experimentalSelectBlock,
+	isContentOnlyListView,
 	...props
 } ) {
 	// Get the client id of the current block for this menu, if one is set.
@@ -88,6 +89,9 @@ export function BlockSettingsDropdown( {
 		isContentOnly,
 		isZoomOut,
 		canEdit,
+		canMove,
+		isFirst,
+		isLast,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -99,6 +103,9 @@ export function BlockSettingsDropdown( {
 				getBlockEditingMode,
 				isZoomOut: _isZoomOut,
 				canEditBlock,
+				canMoveBlocks,
+				getBlockIndex,
+				getBlockCount,
 			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
@@ -124,13 +131,20 @@ export function BlockSettingsDropdown( {
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
 				isZoomOut: _isZoomOut(),
 				canEdit: canEditBlock( firstBlockClientId ),
+				canMove: canMoveBlocks( clientIds ),
+				isFirst: getBlockIndex( firstBlockClientId ) === 0,
+				isLast:
+					getBlockIndex( firstBlockClientId ) ===
+					getBlockCount( _firstParentClientId ) - 1,
 			};
 		},
-		[ firstBlockClientId ]
+		[ firstBlockClientId, clientIds ]
 	);
 
 	const { getBlockOrder, getSelectedBlockClientIds } =
 		useSelect( blockEditorStore );
+
+	const { moveBlocksDown, moveBlocksUp } = useDispatch( blockEditorStore );
 
 	const shortcuts = useSelect( ( select ) => {
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
@@ -242,6 +256,36 @@ export function BlockSettingsDropdown( {
 											}
 											parentBlockType={ parentBlockType }
 										/>
+									) }
+									{ canMove && isContentOnlyListView && (
+										<>
+											<MenuItem
+												icon={ chevronUp }
+												disabled={ isFirst }
+												accessibleWhenDisabled
+												onClick={ pipe( onClose, () => {
+													moveBlocksUp(
+														clientIds,
+														firstParentClientId
+													);
+												} ) }
+											>
+												{ __( 'Move up' ) }
+											</MenuItem>
+											<MenuItem
+												icon={ chevronDown }
+												disabled={ isLast }
+												accessibleWhenDisabled
+												onClick={ pipe( onClose, () => {
+													moveBlocksDown(
+														clientIds,
+														firstParentClientId
+													);
+												} ) }
+											>
+												{ __( 'Move down' ) }
+											</MenuItem>
+										</>
 									) }
 									{ canEdit && count === 1 && (
 										<BlockHTMLConvertButton

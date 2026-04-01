@@ -236,6 +236,10 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/token-list/**'
 
+'[Package] UI':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/ui/**'
+
 '[Package] Url':
     - changed-files:
           - any-glob-to-any-file: 'packages/url/**'

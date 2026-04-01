@@ -345,6 +345,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'background-image' => array(
 			array( 'background', 'backgroundImage', 'url' ),
+			array( 'background', 'gradient' ),
 		),
 	);
 
@@ -397,6 +398,7 @@ class WP_Theme_JSON_Gutenberg {
 		'background'                    => array(
 			'backgroundImage' => null,
 			'backgroundSize'  => null,
+			'gradient'        => null,
 		),
 		'border'                        => array(
 			'color'       => null,
@@ -529,6 +531,7 @@ class WP_Theme_JSON_Gutenberg {
 			'backgroundPosition'   => null,
 			'backgroundRepeat'     => null,
 			'backgroundSize'       => null,
+			'gradient'             => null,
 		),
 		'border'     => array(
 			'color'  => null,
@@ -610,7 +613,29 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var array
 	 */
 	const VALID_BLOCK_PSEUDO_SELECTORS = array(
-		'core/button' => array( ':hover', ':focus', ':focus-visible', ':active' ),
+		'core/button'          => array( ':hover', ':focus', ':focus-visible', ':active' ),
+		'core/navigation-link' => array( ':hover', ':focus', ':focus-visible', ':active' ),
+	);
+
+	/**
+	 * Custom states for blocks that map to CSS class selectors rather than
+	 * CSS pseudo-selectors. Values use the '@' prefix (e.g. '@current') to
+	 * distinguish them from real CSS pseudo-selectors.
+	 *
+	 * The CSS selector for each state is defined in the block's block.json
+	 * under `selectors.states`, e.g.:
+	 *
+	 *   "selectors": { "states": { "@current": ".some-css-selector" } }
+	 *
+	 * This constant controls which states are valid in theme.json for a given
+	 * block. Blocks listed here also inherit their VALID_BLOCK_PSEUDO_SELECTORS
+	 * as valid sub-states, producing compound selectors such as
+	 * `.wp-block-navigation-item.current-menu-item:hover`.
+	 *
+	 * @var array
+	 */
+	const VALID_BLOCK_CUSTOM_STATES = array(
+		'core/navigation-link' => array( '@current' ),
 	);
 
 	/**
@@ -760,6 +785,7 @@ class WP_Theme_JSON_Gutenberg {
 	const APPEARANCE_TOOLS_OPT_INS = array(
 		array( 'background', 'backgroundImage' ),
 		array( 'background', 'backgroundSize' ),
+		array( 'background', 'gradient' ),
 		array( 'border', 'color' ),
 		array( 'border', 'radius' ),
 		array( 'border', 'style' ),
@@ -1063,6 +1089,21 @@ class WP_Theme_JSON_Gutenberg {
 					$schema_styles_blocks[ $block ][ $pseudo_selector ] = $styles_non_top_level;
 				}
 			}
+
+			// Add custom states for blocks that support them (e.g. '@current' for navigation).
+			if ( isset( static::VALID_BLOCK_CUSTOM_STATES[ $block ] ) ) {
+				foreach ( static::VALID_BLOCK_CUSTOM_STATES[ $block ] as $custom_state ) {
+					$custom_state_schema = $styles_non_top_level;
+					// The same pseudo-selectors valid for the block at the top level
+					// are also valid within each custom state.
+					if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
+						foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo ) {
+							$custom_state_schema[ $pseudo ] = $styles_non_top_level;
+						}
+					}
+					$schema_styles_blocks[ $block ][ $custom_state ] = $custom_state_schema;
+				}
+			}
 		}
 
 		$block_style_variation_styles             = static::VALID_STYLES;
@@ -1289,6 +1330,11 @@ class WP_Theme_JSON_Gutenberg {
 
 			if ( ! empty( $style_selectors ) ) {
 				static::$blocks_metadata[ $block_name ]['styleVariations'] = $style_selectors;
+			}
+
+			// If the block has custom states defined in block.json, store their selectors.
+			if ( ! empty( $block_type->selectors['states'] ) && is_array( $block_type->selectors['states'] ) ) {
+				static::$blocks_metadata[ $block_name ]['states'] = $block_type->selectors['states'];
 			}
 		}
 
@@ -1962,19 +2008,85 @@ class WP_Theme_JSON_Gutenberg {
 				continue;
 			}
 
-			$selector = $metadata['selector'];
+			$selector          = $metadata['selector'];
+			$feature_selectors = $metadata['selectors'] ?? array();
+			$node              = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 
-			$node                    = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$declarations            = static::compute_preset_vars( $node, $origins );
-			$theme_vars_declarations = static::compute_theme_vars( $node );
-			foreach ( $theme_vars_declarations as $theme_vars_declaration ) {
-				$declarations[] = $theme_vars_declaration;
+			/*
+			 * Group preset declarations by selector. Blocks that define
+			 * feature-level selectors need their preset CSS variables
+			 * output under that feature selector instead of the block's
+			 * root selector.
+			 */
+			$vars_by_selector              = array();
+			$vars_by_selector[ $selector ] = array();
+
+			foreach ( static::PRESETS_METADATA as $preset_metadata ) {
+				if ( empty( $preset_metadata['css_vars'] ) ) {
+					continue;
+				}
+
+				$values_by_slug = static::get_settings_values_by_slug( $node, $preset_metadata, $origins );
+				if ( empty( $values_by_slug ) ) {
+					continue;
+				}
+
+				$target = static::get_feature_selector( $feature_selectors, $preset_metadata['path'][0], $selector );
+
+				if ( ! isset( $vars_by_selector[ $target ] ) ) {
+					$vars_by_selector[ $target ] = array();
+				}
+
+				foreach ( $values_by_slug as $slug => $value ) {
+					$vars_by_selector[ $target ][] = array(
+						'name'  => static::replace_slug_in_string( $preset_metadata['css_vars'], $slug ),
+						'value' => $value,
+					);
+				}
 			}
 
-			$stylesheet .= static::to_ruleset( $selector, $declarations );
+			// Theme vars always use the block's default selector.
+			foreach ( static::compute_theme_vars( $node ) as $theme_var ) {
+				$vars_by_selector[ $selector ][] = $theme_var;
+			}
+
+			foreach ( $vars_by_selector as $rule_selector => $declarations ) {
+				$stylesheet .= static::to_ruleset( $rule_selector, $declarations );
+			}
 		}
 
 		return $stylesheet;
+	}
+
+	/**
+	 * Returns the appropriate selector for a block support feature's
+	 * preset CSS variables.
+	 *
+	 * If the block defines a feature-level selector (as a string or an
+	 * object with a `root` key), that selector is returned. Otherwise,
+	 * the block's default selector is used.
+	 *
+	 * @param array<string, string|array<string, string>> $feature_selectors The block's feature selectors map.
+	 * @param string                                      $feature_key       The feature to look up (e.g. 'dimensions').
+	 * @param string                                      $default_selector  Fallback selector.
+	 * @return string The resolved selector.
+	 */
+	private static function get_feature_selector( array $feature_selectors, string $feature_key, string $default_selector ): string {
+		if ( ! isset( $feature_selectors[ $feature_key ] ) ) {
+			return $default_selector;
+		}
+
+		$feature = $feature_selectors[ $feature_key ];
+
+		if ( is_string( $feature ) ) {
+			return $feature;
+		}
+
+		if ( isset( $feature['root'] ) && is_string( $feature['root'] ) ) {
+			return $feature['root'];
+		}
+
+		return $default_selector;
 	}
 
 	/**
@@ -1982,6 +2094,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * creates the corresponding ruleset.
 	 *
 	 * @since 5.8.0
+	 * @since 7.1.0 Skip declarations whose value is not a plain string (booleans, arrays, objects, etc.).
 	 *
 	 * @param string $selector     CSS selector.
 	 * @param array  $declarations List of declarations.
@@ -1995,7 +2108,18 @@ class WP_Theme_JSON_Gutenberg {
 		$declaration_block = array_reduce(
 			$declarations,
 			static function ( $carry, $element ) {
-				return $carry .= $element['name'] . ': ' . $element['value'] . ';'; },
+				$value = $element['value'];
+
+				if ( is_numeric( $value ) ) {
+					$value = (string) $value;
+				}
+
+				if ( ! is_string( $value ) ) {
+					return $carry;
+				}
+
+				return $carry .= $element['name'] . ': ' . $value . ';';
+			},
 			''
 		);
 
@@ -2436,12 +2560,21 @@ class WP_Theme_JSON_Gutenberg {
 			 * For an uploaded image (images with a database ID), apply size and position
 			 * defaults equal to those applied in block supports in lib/background.php.
 			 */
-			if ( 'background-image' === $css_property && ! empty( $value ) ) {
-				$background_styles = gutenberg_style_engine_get_styles(
-					array( 'background' => array( 'backgroundImage' => $value ) )
-				);
-
-				$value = $background_styles['declarations'][ $css_property ];
+			if ( 'background-image' === $css_property ) {
+				$background_image_input = array();
+				if ( ! empty( $value ) ) {
+					$background_image_input['backgroundImage'] = $value;
+				}
+				$gradient_value = $styles['background']['gradient'] ?? null;
+				if ( ! empty( $gradient_value ) ) {
+					$background_image_input['gradient'] = $gradient_value;
+				}
+				if ( ! empty( $background_image_input ) ) {
+					$background_styles = gutenberg_style_engine_get_styles(
+						array( 'background' => $background_image_input )
+					);
+					$value             = $background_styles['declarations'][ $css_property ] ?? null;
+				}
 			}
 			if ( empty( $value ) && static::ROOT_BLOCK_SELECTOR !== $selector && ! empty( $styles['background']['backgroundImage']['id'] ) ) {
 				if ( 'background-size' === $css_property ) {
@@ -2605,8 +2738,9 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			$nodes[] = array(
-				'path'     => array( 'settings', 'blocks', $name ),
-				'selector' => $selector,
+				'path'      => array( 'settings', 'blocks', $name ),
+				'selector'  => $selector,
+				'selectors' => $selectors[ $name ]['selectors'] ?? array(),
 			);
 		}
 
@@ -2755,6 +2889,88 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Updates button width declarations to use a calc() formula for percentage values.
+	 *
+	 * When a percentage width is set on the Button block via Global Styles, the
+	 * resulting CSS needs to account for block gap spacing so that buttons tile
+	 * correctly on a row (e.g. 4 buttons at 25% width all fit on one row).
+	 *
+	 * This mirrors the dynamic calc() formula applied at the block instance level
+	 * in the button block's stylesheet (style.scss).
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param array $feature_declarations The feature declarations keyed by selector.
+	 * @param array $settings             The theme.json settings.
+	 * @return array The updated feature declarations.
+	 */
+	private static function update_button_width_declarations( $feature_declarations, $settings ) {
+		if ( ! isset( $feature_declarations['.wp-block-button'] ) ) {
+			return $feature_declarations;
+		}
+
+		foreach ( $feature_declarations['.wp-block-button'] as &$declaration ) {
+			if ( 'width' !== $declaration['name'] || ! isset( $declaration['value'] ) ) {
+				continue;
+			}
+
+			$value      = $declaration['value'];
+			$percentage = null;
+
+			// Case 1: Direct percentage value e.g. "25%".
+			if ( is_string( $value ) && str_ends_with( $value, '%' ) ) {
+				$percentage = (float) $value;
+			}
+
+			// Case 2: Preset CSS var e.g. "var(--wp--preset--dimension--50)".
+			if ( null === $percentage && is_string( $value ) && str_starts_with( $value, 'var(--wp--preset--dimension--' ) ) {
+				// Extract the slug from the var name.
+				$slug = substr( $value, strlen( 'var(--wp--preset--dimension--' ), -1 );
+
+				/*
+				 * Look up the preset size across all origins.
+				 * Check block-level settings first (core/button), then top-level settings.
+				 */
+				$dimension_sizes = ( $settings['blocks']['core/button']['dimensions']['dimensionSizes'] ?? array() )
+					+ ( $settings['dimensions']['dimensionSizes'] ?? array() );
+				foreach ( $dimension_sizes as $origin_sizes ) {
+					if ( ! is_array( $origin_sizes ) ) {
+						continue;
+					}
+					foreach ( $origin_sizes as $preset ) {
+						if ( isset( $preset['slug'] ) && $slug === $preset['slug'] && isset( $preset['size'] ) ) {
+							$size = $preset['size'];
+							if ( is_string( $size ) && str_ends_with( $size, '%' ) ) {
+								$percentage = (float) $size;
+							}
+							break 2;
+						}
+					}
+				}
+			}
+
+			if ( null === $percentage ) {
+				continue;
+			}
+
+			/*
+			 * Apply the same calc() formula as the block instance level (style.scss).
+			 * The numeric percentage value is used as a unitless number:
+			 * - Multiplied by 1% to get the percentage width.
+			 * - Divided by 100 to calculate the gap adjustment proportion.
+			 */
+			$declaration['value'] = sprintf(
+				'calc(%s * 1%% - (var(--wp--style--block-gap, 0.5em) * (1 - %s / 100)))',
+				$percentage,
+				$percentage
+			);
+		}
+		unset( $declaration );
+
+		return $feature_declarations;
+	}
+
+	/**
 	 * Updates the text indent selector for paragraph blocks based on the textIndent setting.
 	 *
 	 * The textIndent setting can be 'subsequent' (default), 'all', or false.
@@ -2885,15 +3101,72 @@ class WP_Theme_JSON_Gutenberg {
 				if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $name ] ) ) {
 					foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $name ] as $pseudo_selector ) {
 						if ( isset( $theme_json['styles']['blocks'][ $name ][ $pseudo_selector ] ) ) {
+							/*
+							 * Append the pseudo-selector to each feature selector so that
+							 * get_feature_declarations_for_node generates CSS scoped to the
+							 * pseudo-state (e.g. '.wp-block-button:hover') rather than the
+							 * default state (e.g. '.wp-block-button').
+							 */
+							$pseudo_feature_selectors = array();
+							foreach ( $feature_selectors ?? array() as $feature => $feature_selector ) {
+								if ( is_array( $feature_selector ) ) {
+									$pseudo_feature_selectors[ $feature ] = array();
+									foreach ( $feature_selector as $subfeature => $subfeature_selector ) {
+										$pseudo_feature_selectors[ $feature ][ $subfeature ] = static::append_to_selector( $subfeature_selector, $pseudo_selector );
+									}
+								} else {
+									$pseudo_feature_selectors[ $feature ] = static::append_to_selector( $feature_selector, $pseudo_selector );
+								}
+							}
+
 							$nodes[] = array(
 								'name'       => $name,
 								'path'       => array( 'styles', 'blocks', $name, $pseudo_selector ),
 								'selector'   => static::append_to_selector( $selector, $pseudo_selector ),
-								'selectors'  => $feature_selectors,
+								'selectors'  => $pseudo_feature_selectors,
 								'duotone'    => $duotone_selector,
 								'variations' => $variation_selectors,
 								'css'        => static::append_to_selector( $selector, $pseudo_selector ),
 							);
+						}
+					}
+				}
+
+				// Handle custom states (e.g. '@current' for navigation).
+				if ( isset( static::VALID_BLOCK_CUSTOM_STATES[ $name ] ) ) {
+					foreach ( static::VALID_BLOCK_CUSTOM_STATES[ $name ] as $custom_state ) {
+						if (
+							isset( $theme_json['styles']['blocks'][ $name ][ $custom_state ] ) &&
+							isset( $selectors[ $name ]['states'][ $custom_state ] )
+						) {
+							$custom_css_selector = $selectors[ $name ]['states'][ $custom_state ];
+							$nodes[]             = array(
+								'name'       => $name,
+								'path'       => array( 'styles', 'blocks', $name, $custom_state ),
+								'selector'   => $custom_css_selector,
+								'selectors'  => $feature_selectors,
+								'duotone'    => $duotone_selector,
+								'variations' => $variation_selectors,
+								'css'        => $custom_css_selector,
+							);
+
+							// Sub-pseudo-selectors within the custom state.
+							if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $name ] ) ) {
+								foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $name ] as $pseudo ) {
+									if ( isset( $theme_json['styles']['blocks'][ $name ][ $custom_state ][ $pseudo ] ) ) {
+										$compound_css_selector = static::append_to_selector( $custom_css_selector, $pseudo );
+										$nodes[]               = array(
+											'name'       => $name,
+											'path'       => array( 'styles', 'blocks', $name, $custom_state, $pseudo ),
+											'selector'   => $compound_css_selector,
+											'selectors'  => $feature_selectors,
+											'duotone'    => $duotone_selector,
+											'variations' => $variation_selectors,
+											'css'        => $compound_css_selector,
+										);
+									}
+								}
+							}
 						}
 					}
 				}
@@ -2962,6 +3235,9 @@ class WP_Theme_JSON_Gutenberg {
 		$block_name           = $block_metadata['name'] ?? null;
 		$feature_declarations = static::update_paragraph_text_indent_selector( $feature_declarations, $settings, $block_name );
 
+		// Update button width declarations for percentage values to use calc() with block gap.
+		$feature_declarations = static::update_button_width_declarations( $feature_declarations, $settings );
+
 		// If there are style variations, generate the declarations for them, including any feature selectors the block may have.
 		$style_variation_declarations    = array();
 		$style_variation_custom_css      = array();
@@ -2976,6 +3252,9 @@ class WP_Theme_JSON_Gutenberg {
 
 				// Update text indent selector for paragraph blocks based on the textIndent setting.
 				$variation_declarations = static::update_paragraph_text_indent_selector( $variation_declarations, $settings, $block_name );
+
+				// Update button width declarations for percentage values to use calc() with block gap.
+				$variation_declarations = static::update_button_width_declarations( $variation_declarations, $settings );
 
 				// Combine selectors with style variation's selector and add to overall style variation declarations.
 				foreach ( $variation_declarations as $current_selector => $new_declarations ) {
@@ -3045,23 +3324,6 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		/*
-		 * Check if we're processing a block pseudo-selector.
-		 * $block_metadata['path'] = array( 'styles', 'blocks', 'core/button', ':hover' );
-		 */
-		$is_processing_block_pseudo = false;
-		$block_pseudo_selector      = null;
-		if ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 4 ) {
-			$block_name        = static::get_block_name_from_metadata_path( $block_metadata ); // 'core/button'
-			$last_path_element = $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ]; // ':hover'
-
-			if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ) &&
-				in_array( $last_path_element, static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ], true ) ) {
-				$is_processing_block_pseudo = true;
-				$block_pseudo_selector      = $last_path_element;
-			}
-		}
-
-		/*
 		 * Check for allowed pseudo classes (e.g. ":hover") from the $selector ("a:hover").
 		 * This also resets the array keys.
 		 */
@@ -3090,15 +3352,12 @@ class WP_Theme_JSON_Gutenberg {
 			&& in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true )
 		) {
 			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json, $selector, $use_root_padding );
-		} elseif ( $is_processing_block_pseudo ) {
-			// Process block pseudo-selector styles.
-			// For block pseudo-selectors, we need to get the block data first, then access the pseudo-selector.
-			$block_name  = static::get_block_name_from_metadata_path( $block_metadata ); // 'core/button'
-			$block_data  = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $block_name ), array() );
-			$pseudo_data = $block_data[ $block_pseudo_selector ] ?? array();
-
-			$declarations = static::compute_style_properties( $pseudo_data, $settings, null, $this->theme_json, $selector, $use_root_padding );
 		} else {
+			/*
+			 * For block pseudo-selector nodes (e.g. ':hover'), $node has already had any
+			 * feature-selector properties (e.g. writingMode) removed by get_feature_declarations_for_node,
+			 * so those properties are not output twice.
+			 */
 			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_padding );
 		}
 
@@ -3215,7 +3474,12 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 7. Generate and append any custom CSS rules.
 		if ( isset( $node['css'] ) && ! $is_root_selector ) {
-			$block_rules .= $this->process_blocks_custom_css( $node['css'], $selector );
+			$css_feature_selector = $block_metadata['selectors']['css'] ?? null;
+			if ( is_array( $css_feature_selector ) ) {
+				$css_feature_selector = $css_feature_selector['root'] ?? null;
+			}
+			$css_selector = is_string( $css_feature_selector ) ? $css_feature_selector : $selector;
+			$block_rules .= $this->process_blocks_custom_css( $node['css'], $css_selector );
 		}
 
 		return $block_rules;
@@ -4537,9 +4801,9 @@ class WP_Theme_JSON_Gutenberg {
 		$settings = $this->theme_json['settings'] ?? null;
 
 		foreach ( $metadata['selectors'] as $feature => $feature_selectors ) {
-			// Skip if this is the block's root selector or the block doesn't
-			// have any styles for the feature.
-			if ( 'root' === $feature || empty( $node[ $feature ] ) ) {
+			// Skip if this is the block's root selector, the custom CSS
+			// selector, or the block doesn't have any styles for the feature.
+			if ( 'root' === $feature || 'css' === $feature || empty( $node[ $feature ] ) ) {
 				continue;
 			}
 
