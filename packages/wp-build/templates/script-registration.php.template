@@ -11,7 +11,7 @@
  * reassigning internal dependency properties of any script handle already
  * registered by that name. It does not deregister the original script, to
  * avoid losing inline scripts which may have been attached.
- *
+ *{{SINCE_TAG}}
  * @param WP_Scripts       $scripts   WP_Scripts instance.
  * @param string           $handle    Name of the script. Should be unique.
  * @param string           $src       Full URL of the script, or path of the script relative to the WordPress root directory.
@@ -48,6 +48,7 @@ function {{PREFIX}}_override_script( $scripts, $handle, $src, $deps = array(), $
 
 /**
  * Register all package scripts.
+ *{{SINCE_TAG}}
  */
 function {{PREFIX}}_register_package_scripts( $scripts ) {
 	// Load build constants

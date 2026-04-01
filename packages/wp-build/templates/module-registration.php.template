@@ -8,6 +8,7 @@
 
 /**
  * Register all script modules.
+ *{{SINCE_TAG}}
  */
 function {{PREFIX}}_register_script_modules() {
 	// Ensure this only runs once. wp_default_scripts can fire multiple times,

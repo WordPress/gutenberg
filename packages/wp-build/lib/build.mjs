@@ -54,7 +54,11 @@ import {
 	getPhpReplacements,
 	renderTemplateToString,
 } from './php-generator.mjs';
-import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
+import {
+	boolConfigVal,
+	getPackageInfo,
+	getPackageInfoFromFile,
+} from './package-utils.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
 import {
 	getAllRoutes,
@@ -113,19 +117,6 @@ const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
 
-/**
- * Interprets a configuration value as a boolean, where `"true"` and `"1"`
- * are considered true while all other values are false.
- *
- * @param {string|undefined} value The configuration value to interpret.
- * @return {boolean|undefined} Boolean interpretation of the given configuration value, or undefined if not set.
- */
-const boolConfigVal = ( value ) => {
-	if ( value === undefined ) {
-		return undefined;
-	}
-	return [ 'true', '1' ].includes( value.toLowerCase() );
-};
 
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(

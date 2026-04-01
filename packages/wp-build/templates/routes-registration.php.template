@@ -34,7 +34,7 @@ foreach ( $routes_by_page as $page_slug => $page_routes ) {
 
 /**
  * Generic helper function to register routes for a page.
- *
+ *{{SINCE_TAG}}
  * @param array  $page_routes           Array of route data for the page.
  * @param string $register_function_name Name of the function to call for registering each route.
  */

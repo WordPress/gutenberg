@@ -17,7 +17,7 @@ ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items = array();
 
 /**
  * Register a route for the {{PAGE_SLUG}}-wp-admin page.
- *
+ *{{SINCE_TAG}}
  * @param string      $path           Route path (e.g., '/types/$type/edit/$id').
  * @param string|null $content_module Script module ID for content (stage/inspector).
  * @param string|null $route_module   Script module ID for route lifecycle hooks.
@@ -39,7 +39,7 @@ function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route( $path, $co
 /**
  * Register a menu item for the {{PAGE_SLUG}}-wp-admin page.
  * Note: Menu items are registered but not displayed in single-page mode.
- *
+ *{{SINCE_TAG}}
  * @param string $id        Menu item ID.
  * @param string $label     Display label.
  * @param string $to        Route path to navigate to.
@@ -63,7 +63,7 @@ function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_item( $id, $
 
 /**
  * Get all registered routes for the {{PAGE_SLUG}}-wp-admin page.
- *
+ *{{SINCE_TAG}}
  * @return array Array of route objects.
  */
 function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes() {
@@ -73,7 +73,7 @@ function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes() {
 
 /**
  * Get all registered menu items for the {{PAGE_SLUG}}-wp-admin page.
- *
+ *{{SINCE_TAG}}
  * @return array Array of menu item objects.
  */
 function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items() {
@@ -84,6 +84,7 @@ function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items() {
 /**
  * Preload REST API data for the {{PAGE_SLUG}}-wp-admin page.
  * Automatically called during page rendering.
+ *{{SINCE_TAG}}
  */
 function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_preload_data() {
 	// Define paths to preload - same for all pages
@@ -114,7 +115,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_preload_data() {
 /**
  * Enqueue scripts and styles for the {{PAGE_SLUG}}-wp-admin page.
  * Hooked to admin_enqueue_scripts.
- *
+ *{{SINCE_TAG}}
  * @param string $hook_suffix The current admin page.
  */
 function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suffix ) {
@@ -214,6 +215,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
  * Render the {{PAGE_SLUG}}-wp-admin page.
  * Call this function from add_menu_page or add_submenu_page.
  * This renders within the normal WordPress admin interface.
+ *{{SINCE_TAG}}
  */
 function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 	?>

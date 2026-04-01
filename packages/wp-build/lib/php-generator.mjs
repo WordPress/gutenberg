@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 /**
  * Internal dependencies
  */
-import { getPackageInfoFromFile } from './package-utils.mjs';
+import { boolConfigVal, getPackageInfoFromFile } from './package-utils.mjs';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 
@@ -17,9 +17,13 @@ const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
  *
  * @param {string} rootDir           Root directory path.
  * @param {string} baseUrlExpression PHP expression for base URL (e.g. "includes_url( 'build' )").
- * @return {Promise<Record<string, string>>} Replacements object with {{PREFIX}}, {{VERSION}}, {{BASE_URL}}.
+ * @return {Promise<Record<string, string>>} Replacements object with {{PREFIX}}, {{VERSION}}, {{BASE_URL}}, {{SINCE_TAG}}.
  */
 export async function getPhpReplacements( rootDir, baseUrlExpression ) {
+	const isCoreBuild =
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE ) ??
+		false;
 	const rootPackageJson = getPackageInfoFromFile(
 		path.join( rootDir, 'package.json' )
 	);
@@ -35,6 +39,15 @@ export async function getPhpReplacements( rootDir, baseUrlExpression ) {
 		'{{PREFIX}}': name,
 		'{{VERSION}}': version,
 		'{{BASE_URL}}': baseUrlExpression,
+		/*
+		 * Inline @since annotations should be contextually accurate reflecting the correct WordPress or Gutenberg
+		 * version they were originally introduced.
+		 *
+		 * Until a more flexible approach can be created, @since annotations are set to 7.0.0 any time code is being
+		 * built for WordPress Core. Otherwise, the annotation is removed entirely.
+		 *
+		 */
+		'{{SINCE_TAG}}': isCoreBuild ? '\n * @since 7.0.0\n *' : '',
 	};
 }
 

@@ -65,6 +65,20 @@ function findPackageRoot( startDir ) {
 }
 
 /**
+ * Interprets a configuration value as a boolean, where `"true"` and `"1"`
+ * are considered true while all other values are false.
+ *
+ * @param {string|undefined} value The configuration value to interpret.
+ * @return {boolean|undefined} Boolean interpretation of the given configuration value, or undefined if not set.
+ */
+export const boolConfigVal = ( value ) => {
+	if ( value === undefined ) {
+		return undefined;
+	}
+	return [ 'true', '1' ].includes( value.toLowerCase() );
+};
+
+/**
  * Get package.json info using Node's module resolution.
  * Resolves packages from the appropriate context to support both workspace packages
  * and external dependencies in pnpm/yarn/npm workspaces.

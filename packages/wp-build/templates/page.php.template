@@ -14,7 +14,7 @@ ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_menu_items = array();
 
 /**
  * Register a route for the {{PAGE_SLUG}} page.
- *
+ *{{SINCE_TAG}}
  * @param string      $path           Route path (e.g., '/types/$type/edit/$id').
  * @param string|null $content_module Script module ID for content (stage/inspector).
  * @param string|null $route_module   Script module ID for route lifecycle hooks.
@@ -35,7 +35,7 @@ function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_route( $path, $content_mod
 
 /**
  * Register a menu item for the {{PAGE_SLUG}} page.
- *
+ *{{SINCE_TAG}}
  * @param string $id          Menu item ID.
  * @param string $label       Display label.
  * @param string $to          Route path to navigate to.
@@ -64,7 +64,7 @@ function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_menu_item( $id, $label, $t
 
 /**
  * Get all registered routes for the {{PAGE_SLUG}} page.
- *
+ *{{SINCE_TAG}}
  * @return array Array of route objects.
  */
 function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_routes() {
@@ -74,7 +74,7 @@ function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_routes() {
 
 /**
  * Get all registered menu items for the {{PAGE_SLUG}} page.
- *
+ *{{SINCE_TAG}}
  * @return array Array of menu item objects.
  */
 function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_menu_items() {
@@ -85,6 +85,7 @@ function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_menu_items() {
 /**
  * Preload REST API data for the {{PAGE_SLUG}} page.
  * Automatically called during page rendering.
+ *{{SINCE_TAG}}
  */
 function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_preload_data() {
 	// Define paths to preload - same for all pages
@@ -115,6 +116,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_preload_data() {
 /**
  * Render the {{PAGE_SLUG}} page.
  * Call this function from add_menu_page or add_submenu_page.
+ *{{SINCE_TAG}}
  */
 function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 	// Load build constants
@@ -304,6 +306,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 /**
  * Intercept admin_init to render the page early.
  * This bypasses the default WordPress admin template.
+ *{{SINCE_TAG}}
  */
 function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_intercept_render() {
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
