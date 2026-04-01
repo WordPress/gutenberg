@@ -60,7 +60,8 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 	// Get the block's DOM element to derive the canvas iframe window,
 	// so viewport detection matches the actual block rendering context.
 	const blockElement = useBlockElement( clientId );
-	const canvasView = blockElement?.ownerDocument?.defaultView;
+	const rawCanvasView = blockElement?.ownerDocument?.defaultView;
+	const canvasView = rawCanvasView === null ? undefined : rawCanvasView;
 
 	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
 		blockVisibility: currentBlockVisibility,
