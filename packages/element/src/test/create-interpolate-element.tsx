@@ -8,7 +8,11 @@ import { render } from '@testing-library/react';
  */
 import { createElement, Fragment, Component } from '../react';
 import createInterpolateElement from '../create-interpolate-element';
-import type { ExtractTags, InterpolationString } from '../types';
+import type {
+	ExtractTags,
+	InterpolationInput,
+	InterpolationString,
+} from '../types';
 
 describe( 'createInterpolateElement', () => {
 	it( 'throws an error when there is no conversion map', () => {
@@ -236,6 +240,21 @@ describe( 'createInterpolateElement', () => {
 		>;
 		type Tags = ExtractTags< Text >;
 		const tags: Tags[] = [ 'a', 'em' ];
+		expect( tags ).toHaveLength( 2 );
+	} );
+	it( 'extracts tags from a FormattedText (sprintf) input', () => {
+		// Type-level test: verify InterpolationString unwraps FormattedText,
+		// enabling tag inference from sprintf return values.
+		type SprintfResult = string & {
+			readonly __formatString: '<Name>%1$s</Name> wrote <Link>%2$s</Link>';
+		};
+		// FormattedText is assignable to InterpolationInput.
+		const _check: InterpolationInput = '' as SprintfResult;
+		void _check;
+
+		type Text = InterpolationString< SprintfResult >;
+		type Tags = ExtractTags< Text >;
+		const tags: Tags[] = [ 'Name', 'Link' ];
 		expect( tags ).toHaveLength( 2 );
 	} );
 	it( 'handles parsing emojii correctly', () => {
