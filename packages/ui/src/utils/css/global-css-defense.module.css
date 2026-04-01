@@ -111,5 +111,5 @@ p.p {
 	color: var(--_gcd-a-color, inherit);
 	box-shadow: var(--_gcd-a-box-shadow, none);
 	border-radius: var(--_gcd-a-border-radius, 0);
-	transition: none;
+	transition: var(--_gcd-a-transition, none);
 }

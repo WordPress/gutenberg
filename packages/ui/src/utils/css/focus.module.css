@@ -9,6 +9,8 @@
 	.outset-ring--focus-within-visible,
 	.outset-ring--focus-parent-visible {
 		@media not ( prefers-reduced-motion ) {
+			--_gcd-a-transition: outline 0.1s ease-out;
+
 			transition: outline 0.1s ease-out;
 		}
 
