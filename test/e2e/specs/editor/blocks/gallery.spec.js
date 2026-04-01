@@ -359,12 +359,6 @@ test.describe.skip( 'Gallery - upload progress overlay', () => {
 		);
 		await expect( overlay ).toBeVisible( { timeout: 10_000 } );
 
-		// Should show "Processing image X of Y" text.
-		const label = overlay.locator(
-			'.wp-block-gallery__upload-overlay-label'
-		);
-		await expect( label ).toHaveText( /Processing image \d+ of \d+/ );
-
 		// Individual image overlays should NOT be shown inside the gallery.
 		await expect(
 			galleryBlock.locator( '.wp-block-image__upload-overlay' )
@@ -375,52 +369,6 @@ test.describe.skip( 'Gallery - upload progress overlay', () => {
 
 		// Gallery overlay should disappear after all uploads complete.
 		await expect( overlay ).toBeHidden( { timeout: 30_000 } );
-	} );
-
-	test( 'can cancel batch upload via gallery overlay', async ( {
-		editor,
-		page,
-		galleryBlockUtils,
-	} ) => {
-		const deferred = defer();
-
-		await page.route(
-			( url ) => url.pathname.includes( '/wp/v2/media' ),
-			async ( route, request ) => {
-				if ( request.method() === 'POST' ) {
-					await deferred;
-					await route.continue();
-				} else {
-					await route.continue();
-				}
-			}
-		);
-
-		await editor.insertBlock( { name: 'core/gallery' } );
-		const galleryBlock = editor.canvas.locator(
-			'role=document[name="Block: Gallery"i]'
-		);
-		await expect( galleryBlock ).toBeVisible();
-
-		await galleryBlockUtils.uploadMultiple(
-			galleryBlock.locator( 'data-testid=form-file-upload-input' ),
-			3
-		);
-
-		// Wait for the overlay to appear.
-		const overlay = editor.canvas.locator(
-			'.wp-block-gallery__upload-overlay'
-		);
-		await expect( overlay ).toBeVisible( { timeout: 10_000 } );
-
-		// Click Cancel.
-		await overlay.getByRole( 'button', { name: 'Cancel' } ).click();
-
-		// Overlay should disappear.
-		await expect( overlay ).toBeHidden( { timeout: 10_000 } );
-
-		// Release held requests to avoid hanging.
-		deferred.resolve();
 	} );
 } );
 

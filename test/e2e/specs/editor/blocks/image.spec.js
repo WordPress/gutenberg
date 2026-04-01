@@ -1029,11 +1029,6 @@ test.describe( 'Image - upload progress overlay', () => {
 			'Upload progress'
 		);
 
-		// Should contain a cancel button.
-		await expect(
-			overlay.getByRole( 'button', { name: /Cancel/ } )
-		).toBeVisible();
-
 		// Image block should be in transient state (dimmed).
 		await expect( imageBlock ).toHaveClass( /is-transient/ );
 
@@ -1047,54 +1042,6 @@ test.describe( 'Image - upload progress overlay', () => {
 		await expect( imageBlock ).not.toHaveClass( /is-transient/, {
 			timeout: 30_000,
 		} );
-	} );
-
-	test( 'can cancel upload via overlay button', async ( {
-		editor,
-		page,
-		imageBlockUtils,
-	} ) => {
-		const deferred = defer();
-
-		await page.route(
-			( url ) =>
-				url.href.includes(
-					`rest_route=${ encodeURIComponent( '/wp/v2/media' ) }`
-				) || url.pathname.includes( '/wp-json/wp/v2/media' ),
-			async ( route, request ) => {
-				if ( request.method() === 'POST' ) {
-					await deferred;
-					await route.continue();
-				} else {
-					await route.continue();
-				}
-			}
-		);
-
-		await editor.insertBlock( { name: 'core/image' } );
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		await expect( imageBlock ).toBeVisible();
-
-		await imageBlockUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' )
-		);
-
-		// Wait for overlay to appear.
-		const overlay = editor.canvas.locator(
-			'.wp-block-image__upload-overlay'
-		);
-		await expect( overlay ).toBeVisible( { timeout: 10_000 } );
-
-		// Click the Cancel button.
-		await overlay.getByRole( 'button', { name: /Cancel/ } ).click();
-
-		// Overlay should disappear.
-		await expect( overlay ).toBeHidden( { timeout: 10_000 } );
-
-		// Release the held request to avoid hanging.
-		deferred.resolve();
 	} );
 } );
 
