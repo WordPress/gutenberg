@@ -219,7 +219,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					$mime_type
 				);
 
-				$output_mime                  = isset( $output_formats[ $mime_type ] ) ? $output_formats[ $mime_type ] : $mime_type;
+				$output_mime                 = isset( $output_formats[ $mime_type ] ) ? $output_formats[ $mime_type ] : $mime_type;
 				$data['image_output_format'] = ( $output_mime !== $mime_type ) ? $output_mime : null;
 			}
 		}

@@ -1155,9 +1155,6 @@ export function generateThumbnails( id: QueueItemId ) {
 				: item.sourceFile;
 			const batchId = uuidv4();
 
-			const settings = select.getSettings();
-			const allImageSizes = settings.allImageSizes || {};
-
 			// Read per-file format conversion data from the attachment response.
 			const outputMimeType = attachment.image_output_format;
 			const interlaced = attachment.image_save_progressive ?? false;
