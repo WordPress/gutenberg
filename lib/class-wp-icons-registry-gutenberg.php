@@ -78,7 +78,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		if ( preg_match( '/[A-Z]/', $icon_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'Icon names must not contain uppercase characters.' ),
+				__( 'Icon names must not contain uppercase characters.', 'gutenberg' ),
 				'7.1.0'
 			);
 			return false;
@@ -97,7 +97,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		if ( $this->is_registered( $icon_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'Icon is already registered.' ),
+				__( 'Icon is already registered.', 'gutenberg' ),
 				'7.1.0'
 			);
 			return false;
