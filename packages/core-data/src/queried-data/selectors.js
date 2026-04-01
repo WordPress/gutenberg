@@ -29,12 +29,12 @@ const queriedItemsCacheByState = new WeakMap();
  * @param {Object}  state                      State object.
  * @param {?Object} query                      Optional query.
  * @param {?Object} options                    Optional pagination options.
- * @param {boolean} options.supportsPagination Whether the entity supports pagination. Default true.
+ * @param {boolean} options.supportsPagination Whether the entity supports pagination. Default false.
  *
  * @return {?Array} Query items.
  */
 function getQueriedItemsUncached( state, query, options = {} ) {
-	const { supportsPagination = true } = options;
+	const { supportsPagination = false } = options;
 	const {
 		stableKey,
 		page,
@@ -123,7 +123,7 @@ function getQueriedItemsUncached( state, query, options = {} ) {
  * @param {Object}  state                      State object.
  * @param {?Object} query                      Optional query.
  * @param {?Object} options                    Optional pagination options.
- * @param {boolean} options.supportsPagination Whether the entity supports pagination. Default true.
+ * @param {boolean} options.supportsPagination Whether the entity supports pagination. Default false.
  *
  * @return {?Array} Query items.
  */
