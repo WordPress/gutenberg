@@ -7,36 +7,36 @@ import { safeHTML } from '@wordpress/dom';
 
 export default function IconGrid( { icons, onSelect, value } ) {
 	return (
-		<div className="wp-block-icon__inserter-grid">
+		<div className="block-editor-icon-picker-modal__grid">
 			{ ! icons?.length ? (
-				<div className="wp-block-icon__inserter-grid-no-results">
+				<div className="block-editor-icon-picker-modal__grid-no-results">
 					<p>{ __( 'No results found.' ) }</p>
 				</div>
 			) : (
 				<div
-					className="wp-block-icon__inserter-grid-icons-list"
+					className="block-editor-icon-picker-modal__grid-icons-list"
 					aria-label={ __( 'Icon library' ) }
 				>
 					{ icons.map( ( icon ) => {
 						return (
 							<Button
 								key={ icon.name }
-								className="wp-block-icon__inserter-grid-icons-list-item"
+								className="block-editor-icon-picker-modal__grid-icons-list-item"
 								onClick={ () => onSelect?.( icon.name ) }
 								variant={
 									icon.name === value ? 'primary' : undefined
 								}
 								__next40pxDefaultSize
 							>
-								<span className="wp-block-icon__inserter-grid-icons-list-item-icon">
+								<span className="block-editor-icon-picker-modal__grid-icons-list-item-icon">
 									<span
-										className="wp-block-icon__inserter-grid-icons-list-item-svg"
+										className="block-editor-icon-picker-modal__grid-icons-list-item-svg"
 										dangerouslySetInnerHTML={ {
 											__html: safeHTML( icon.content ),
 										} }
 									/>
 								</span>
-								<span className="wp-block-icon__inserter-grid-icons-list-item-title">
+								<span className="block-editor-icon-picker-modal__grid-icons-list-item-title">
 									{ icon.label }
 								</span>
 							</Button>

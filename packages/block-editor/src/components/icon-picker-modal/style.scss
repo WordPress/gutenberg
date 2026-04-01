@@ -1,50 +1,49 @@
 @use "@wordpress/base-styles/variables" as *;
 
 // Styles for the icon picker modal UI.
-// These classnames intentionally match the existing Icon block inserter styles
-// so the UI stays consistent while the picker is migrated into block-editor.
+// Use block-editor-prefixed classnames to keep styles scoped to the package.
 
-.wp-block-icon__inserter {
+.block-editor-icon-picker-modal__inserter {
 	padding: 0 $grid-unit-30;
 	margin: 0 (-1 * $grid-unit-30);
 }
 
-.wp-block-icon__inserter-header {
+.block-editor-icon-picker-modal__header {
 	align-items: center;
 	display: flex;
 	justify-content: space-between;
 	margin-bottom: $grid-unit-20;
 }
 
-.wp-block-icon__inserter-grid-icons-list {
+.block-editor-icon-picker-modal__grid-icons-list {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 }
 
-.wp-block-icon__inserter-grid-no-results {
+.block-editor-icon-picker-modal__grid-no-results {
 	display: flex;
 	justify-content: center;
 }
 
-.wp-block-icon__inserter-grid-icons-list-item {
+.block-editor-icon-picker-modal__grid-icons-list-item {
 	display: flex;
 	flex-direction: column;
 	height: auto !important;
 }
 
-.wp-block-icon__inserter-grid-icons-list-item-icon {
+.block-editor-icon-picker-modal__grid-icons-list-item-icon {
 	padding: $grid-unit-15;
 }
 
 // Ensure the injected SVG renders consistently (the old HtmlRenderer applied
 // width directly to the root SVG element).
-.wp-block-icon__inserter-grid-icons-list-item-svg svg {
+.block-editor-icon-picker-modal__grid-icons-list-item-svg svg {
 	display: block;
 	width: 24px;
 	height: 24px;
 }
 
-.wp-block-icon__inserter-grid-icons-list-item-title {
+.block-editor-icon-picker-modal__grid-icons-list-item-title {
 	font-size: $font-size-small;
 	padding: $grid-unit-05 $grid-unit-05 $grid-unit-10;
 	overflow: hidden;

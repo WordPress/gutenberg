@@ -46,13 +46,13 @@ export default function IconPickerModal( {
 
 	return (
 		<Modal
-			className="wp-block-icon__inserter-modal"
+			className="block-editor-icon-picker-modal"
 			title={ title }
 			onRequestClose={ onRequestClose }
 			isFullScreen
 		>
-			<div className="wp-block-icon__inserter">
-				<div className="wp-block-icon__inserter-header">
+			<div className="block-editor-icon-picker-modal__inserter">
+				<div className="block-editor-icon-picker-modal__header">
 					<SearchControl
 						value={ searchInput }
 						onChange={ debouncedSetSearchInput }
