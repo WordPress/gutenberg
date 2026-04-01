@@ -403,31 +403,6 @@ const withBlockTree =
 				);
 				break;
 			}
-			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
-				const updatedBlockUids = [];
-				newState.attributes.forEach( ( attributes, clientId ) => {
-					if (
-						newState.byClientId.get( clientId ).name ===
-							'core/block' &&
-						attributes.ref === action.updatedId
-					) {
-						updatedBlockUids.push( clientId );
-					}
-				} );
-				newState.tree = new Map( newState.tree );
-				updatedBlockUids.forEach( ( clientId ) => {
-					newState.tree.set( clientId, {
-						...newState.byClientId.get( clientId ),
-						attributes: newState.attributes.get( clientId ),
-						innerBlocks: newState.tree.get( clientId ).innerBlocks,
-					} );
-				} );
-				updateParentInnerBlocksInTree(
-					newState,
-					updatedBlockUids,
-					false
-				);
-			}
 		}
 
 		return newState;
@@ -693,6 +668,16 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 			controlledOrder.forEach( preserveTreeEntry );
 		}
 
+		// Preserve block editing modes for blocks that are not removed.
+		const preservedBlockEditingModes =
+			state?.blockEditingModes ?? new Map();
+		for ( const [ clientId, mode ] of preservedBlockEditingModes ) {
+			if ( ! newState.tree.has( clientId ) ) {
+				continue;
+			}
+			newState.blockEditingModes.set( clientId, mode );
+		}
+
 		return newState;
 	}
 
@@ -774,40 +759,6 @@ const withReplaceInnerBlocks = ( reducer ) => ( state, action ) => {
 };
 
 /**
- * Higher-order reducer which targets the combined blocks reducer and handles
- * the `SAVE_REUSABLE_BLOCK_SUCCESS` action. This action can't be handled by
- * regular reducers and needs a higher-order reducer since it needs access to
- * both `byClientId` and `attributes` simultaneously.
- *
- * @param {Function} reducer Original reducer function.
- *
- * @return {Function} Enhanced reducer function.
- */
-const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
-	if ( state && action.type === 'SAVE_REUSABLE_BLOCK_SUCCESS' ) {
-		const { id, updatedId } = action;
-
-		// If a temporary reusable block is saved, we swap the temporary id with the final one.
-		if ( id === updatedId ) {
-			return state;
-		}
-
-		state = { ...state };
-		state.attributes = new Map( state.attributes );
-		state.attributes.forEach( ( attributes, clientId ) => {
-			const { name } = state.byClientId.get( clientId );
-			if ( name === 'core/block' && attributes.ref === id ) {
-				state.attributes.set( clientId, {
-					...attributes,
-					ref: updatedId,
-				} );
-			}
-		} );
-	}
-
-	return reducer( state, action );
-};
-/**
  * Higher-order reducer which removes blocks from state when switching parent block controlled state.
  *
  * @param {Function} reducer Original reducer function.
@@ -847,7 +798,6 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
  */
 export const blocks = pipe(
 	combineReducers,
-	withSaveReusableBlock, // Needs to be before withBlockCache.
 	withBlockTree, // Needs to be before withInnerBlocksRemoveCascade.
 	withInnerBlocksRemoveCascade,
 	withReplaceInnerBlocks, // Needs to be after withInnerBlocksRemoveCascade.
@@ -1280,6 +1230,25 @@ export const blocks = pipe(
 				...state,
 				[ clientId ]: hasControlledInnerBlocks,
 			};
+		}
+		return state;
+	},
+
+	blockEditingModes( state = new Map(), action ) {
+		switch ( action.type ) {
+			case 'SET_BLOCK_EDITING_MODE':
+				if ( state.get( action.clientId ) === action.mode ) {
+					return state;
+				}
+				return new Map( state ).set( action.clientId, action.mode );
+			case 'UNSET_BLOCK_EDITING_MODE': {
+				if ( ! state.has( action.clientId ) ) {
+					return state;
+				}
+				const newState = new Map( state );
+				newState.delete( action.clientId );
+				return newState;
+			}
 		}
 		return state;
 	},
@@ -2128,38 +2097,6 @@ export function editedContentOnlySection( state, action ) {
 }
 
 /**
- * Reducer returning a map of block client IDs to block editing modes.
- *
- * @param {Map}    state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Map} Updated state.
- */
-export function blockEditingModes( state = new Map(), action ) {
-	switch ( action.type ) {
-		case 'SET_BLOCK_EDITING_MODE':
-			if ( state.get( action.clientId ) === action.mode ) {
-				return state;
-			}
-			return new Map( state ).set( action.clientId, action.mode );
-		case 'UNSET_BLOCK_EDITING_MODE': {
-			if ( ! state.has( action.clientId ) ) {
-				return state;
-			}
-			const newState = new Map( state );
-			newState.delete( action.clientId );
-			return newState;
-		}
-		case 'RESET_BLOCKS': {
-			return state.has( '' )
-				? new Map().set( '', state.get( '' ) )
-				: state;
-		}
-	}
-	return state;
-}
-
-/**
  * Reducer returning a map of style IDs to style overrides.
  *
  * @param {Map}    state  Current state.
@@ -2395,7 +2332,6 @@ const combinedReducers = combineReducers( {
 	editedContentOnlySection,
 	blockVisibility,
 	viewportModalClientIds,
-	blockEditingModes,
 	styleOverrides,
 	removalPromptData,
 	blockRemovalRules,
@@ -2526,7 +2462,7 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	// so the default block editing mode is set to disabled.
 	const sectionRootClientId = state.settings?.[ sectionRootClientIdKey ];
 	const sectionClientIds = state.blocks.order.get( sectionRootClientId );
-	const hasDisabledBlocks = Array.from( state.blockEditingModes ).some(
+	const hasDisabledBlocks = Array.from( state.blocks.blockEditingModes ).some(
 		( [ , mode ] ) => mode === 'disabled'
 	);
 	const templatePartClientIds = [];
@@ -2602,7 +2538,7 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 
 		// If the block already has an explicit block editing mode set,
 		// don't override it.
-		if ( state.blockEditingModes.has( clientId ) ) {
+		if ( state.blocks.blockEditingModes.has( clientId ) ) {
 			return;
 		}
 
@@ -2613,12 +2549,12 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			let ancestorBlockEditingMode;
 			let parent = state.blocks.parents.get( clientId );
 			while ( parent !== undefined ) {
-				if ( state.blockEditingModes.has( parent ) ) {
+				if ( state.blocks.blockEditingModes.has( parent ) ) {
 					// Checking the explicit block editing mode will be slower,
 					// as the block editing mode is more likely to be set on a
 					// distant ancestor.
 					ancestorBlockEditingMode =
-						state.blockEditingModes.get( parent );
+						state.blocks.blockEditingModes.get( parent );
 				}
 				if ( ancestorBlockEditingMode ) {
 					break;

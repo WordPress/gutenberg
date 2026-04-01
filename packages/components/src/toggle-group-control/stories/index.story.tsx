@@ -90,6 +90,7 @@ Default.args = {
 		{ value: 'right', label: 'Right' },
 		{ value: 'justify', label: 'Justify' },
 	].map( mapPropsToOptionComponent ),
+	help: 'Help text to describe the control.',
 	isBlock: true,
 	label: 'Label',
 };

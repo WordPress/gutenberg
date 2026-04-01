@@ -37,7 +37,9 @@ function CalendarDateTimeControl< Item >( {
 	hideLabelFromVision,
 	markWhenOptional,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
+	const { compact } = config || {};
 	const { id, label, description, setValue, getValue, isValid } = field;
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
@@ -179,17 +181,21 @@ function CalendarDateTimeControl< Item >( {
 					onChange={ handleManualDateTimeChange }
 				/>
 				{ /* Calendar widget */ }
-				<DateCalendar
-					style={ { width: '100%' } }
-					selected={
-						value ? parseDateTime( value ) || undefined : undefined
-					}
-					onSelect={ onSelectDate }
-					month={ calendarMonth }
-					onMonthChange={ setCalendarMonth }
-					timeZone={ timezoneString || undefined }
-					weekStartsOn={ weekStartsOn }
-				/>
+				{ ! compact && (
+					<DateCalendar
+						style={ { width: '100%' } }
+						selected={
+							value
+								? parseDateTime( value ) || undefined
+								: undefined
+						}
+						onSelect={ onSelectDate }
+						month={ calendarMonth }
+						onMonthChange={ setCalendarMonth }
+						timeZone={ timezoneString || undefined }
+						weekStartsOn={ weekStartsOn }
+					/>
+				) }
 			</Stack>
 		</BaseControl>
 	);
@@ -203,6 +209,7 @@ export default function DateTime< Item >( {
 	markWhenOptional,
 	operator,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
@@ -225,6 +232,7 @@ export default function DateTime< Item >( {
 			hideLabelFromVision={ hideLabelFromVision }
 			markWhenOptional={ markWhenOptional }
 			validity={ validity }
+			config={ config }
 		/>
 	);
 }

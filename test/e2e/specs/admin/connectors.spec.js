@@ -386,11 +386,13 @@ test.describe( 'Connectors', () => {
 		await expect( banner ).toBeVisible();
 
 		// Verify the banner message mentions the AI plugin.
-		await expect( banner.getByText( 'AI plugin' ) ).toBeVisible();
+		await expect(
+			banner.locator( 'p' ).getByText( 'AI plugin' )
+		).toBeVisible();
 
 		// Verify the Install button is present.
 		await expect(
-			banner.getByRole( 'button', { name: 'Install AI Experiments' } )
+			banner.getByRole( 'button', { name: 'Install the AI plugin' } )
 		).toBeVisible();
 
 		// Verify the Learn more link is present.
