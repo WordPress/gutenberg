@@ -567,23 +567,9 @@ class CoverBlockUtils {
 		/** @type {Page} */
 		this.page = page;
 
-		this.TEST_IMAGE_FILE_PATH = path.join(
-			__dirname,
-			'..',
-			'..',
-			'..',
-			'assets',
-			'10x10_e2e_test_image_z9T8jK.png'
-		);
+		this.TEST_IMAGE_FILE_PATH = './assets/10x10_e2e_test_image_z9T8jK.png';
 
-		this.GREEN_IMAGE_FILE_PATH = path.join(
-			__dirname,
-			'..',
-			'..',
-			'..',
-			'assets',
-			'10x10_e2e_test_image_green.png'
-		);
+		this.GREEN_IMAGE_FILE_PATH = './assets/10x10_e2e_test_image_green.png';
 	}
 
 	async upload( locator, imagePath ) {
