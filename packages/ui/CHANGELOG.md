@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.10.0 (2026-04-01)
+
 ### New Features
 
 -   Add `AlertDialog` primitive ([#76847](https://github.com/WordPress/gutenberg/pull/76847)).
