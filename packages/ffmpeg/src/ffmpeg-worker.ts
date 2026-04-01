@@ -7,6 +7,7 @@ import { wrap, terminate, type Remote } from '@wordpress/worker-threads';
  * Internal dependencies
  */
 import type { ItemId } from './types';
+import type { FFmpegWasmConfig } from './index';
 import type { WorkerAPI } from './worker';
 import { workerCode } from './worker-code';
 
@@ -55,6 +56,7 @@ function getWorkerAPI(): Remote< WorkerAPI > {
  * @param id             Item ID.
  * @param buffer         GIF file buffer.
  * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
+ * @param config         WASM configuration with URLs from the wp-ffmpeg-wasm plugin.
  * @param maxDimensions  Optional maximum dimensions for scaling.
  * @return Video file buffer.
  */
@@ -62,10 +64,17 @@ export async function ffmpegConvertGifToVideo(
 	id: ItemId,
 	buffer: ArrayBuffer,
 	outputMimeType: string,
+	config: FFmpegWasmConfig,
 	maxDimensions?: number
 ): Promise< ArrayBuffer > {
 	const api = getWorkerAPI();
-	return api.convertGifToVideo( id, buffer, outputMimeType, maxDimensions );
+	return api.convertGifToVideo(
+		id,
+		buffer,
+		outputMimeType,
+		config,
+		maxDimensions
+	);
 }
 
 /**

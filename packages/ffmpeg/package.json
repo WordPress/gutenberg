@@ -53,7 +53,6 @@
 	},
 	"types": "build-types",
 	"dependencies": {
-		"@ffmpeg/core": "^0.12.10",
 		"@wordpress/worker-threads": "file:../worker-threads"
 	},
 	"publishConfig": {
