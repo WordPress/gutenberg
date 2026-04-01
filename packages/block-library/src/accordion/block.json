@@ -78,7 +78,7 @@
 		"levelOptions": {
 			"type": "array"
 		},
-		"syncChildStyles": {
+		"syncDescendantStyles": {
 			"type": "object",
 			"default": {}
 		}

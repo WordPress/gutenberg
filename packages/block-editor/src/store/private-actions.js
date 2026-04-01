@@ -591,9 +591,10 @@ export const __experimentalUpdateSyncedBlockAttributes =
 				clientId,
 				blockName
 			);
-		const syncChildStyles =
-			select.getBlockAttributes( scopeClientId )?.syncChildStyles ?? {};
-		if ( syncChildStyles[ blockName ] === false ) {
+		const syncDescendantStyles =
+			select.getBlockAttributes( scopeClientId )?.syncDescendantStyles ??
+			{};
+		if ( syncDescendantStyles[ blockName ] === false ) {
 			dispatch.updateBlockAttributes( clientId, attributes );
 			return;
 		}

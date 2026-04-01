@@ -135,11 +135,11 @@ describe( 'sibling style sync actions', () => {
 			);
 		} );
 
-		it( 'does not propagate when syncChildStyles is disabled for this block type', () => {
+		it( 'does not propagate when syncDescendantStyles is disabled for this block type', () => {
 			select.getBlockAttributes.mockImplementation( ( clientId ) => {
 				if ( clientId === 'acc-1' ) {
 					return {
-						syncChildStyles: {
+						syncDescendantStyles: {
 							'core/accordion-heading': false,
 						},
 					};

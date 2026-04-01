@@ -20,7 +20,7 @@ import InspectorControls from '../inspector-controls';
  *
  * Hidden when:
  *  - there are no siblings of the same type in the sync scope
- *  - the parent scope has disabled sync for this block type via syncChildStyles
+ *  - the parent scope has disabled sync for this block type via syncDescendantStyles
  *
  * @param {Object} props
  * @param {string} props.clientId Client ID of the current block.
@@ -35,10 +35,10 @@ export function SiblingStyleSyncControl( { clientId, name } ) {
 					clientId,
 					name
 				);
-			const syncChildStyles =
+			const syncDescendantStyles =
 				scope !== null
 					? select( blockEditorStore ).getBlockAttributes( scope )
-							?.syncChildStyles ?? {}
+							?.syncDescendantStyles ?? {}
 					: {};
 
 			return {
@@ -51,7 +51,7 @@ export function SiblingStyleSyncControl( { clientId, name } ) {
 					name
 				),
 				scopeClientId: scope,
-				isSyncEnabled: syncChildStyles[ name ] !== false,
+				isSyncEnabled: syncDescendantStyles[ name ] !== false,
 			};
 		},
 		[ clientId, name ]

@@ -120,11 +120,11 @@ const withSiblingStyleSync = createHigherOrderComponent(
 						clientId,
 						name
 					);
-				const syncChildStyles = scopeClientId
+				const syncDescendantStyles = scopeClientId
 					? storeSelect.getBlockAttributes( scopeClientId )
-							?.syncChildStyles ?? {}
+							?.syncDescendantStyles ?? {}
 					: {};
-				if ( syncChildStyles[ name ] === false ) {
+				if ( syncDescendantStyles[ name ] === false ) {
 					return;
 				}
 

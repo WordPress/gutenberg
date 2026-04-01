@@ -7,7 +7,7 @@
 			"showIcon": true,
 			"autoclose": false,
 			"headingLevel": 3,
-			"syncChildStyles": {}
+			"syncDescendantStyles": {}
 		},
 		"innerBlocks": [
 			{

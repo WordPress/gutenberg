@@ -22,7 +22,7 @@ import InspectorControls from '../inspector-controls';
  *
  * @param {Object}   props
  * @param {string}   props.name          Block name of the scope block.
- * @param {Object}   props.attributes    Block attributes (reads syncChildStyles).
+ * @param {Object}   props.attributes    Block attributes (reads syncDescendantStyles).
  * @param {Function} props.setAttributes Block setAttributes.
  */
 export function SiblingStyleSyncParentControl( {
@@ -44,14 +44,14 @@ export function SiblingStyleSyncParentControl( {
 		return null;
 	}
 
-	const { syncChildStyles = {} } = attributes;
+	const { syncDescendantStyles = {} } = attributes;
 
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Copy styles' ) } initialOpen>
 				{ syncedChildTypes.map( ( childType ) => {
 					const isEnabled =
-						syncChildStyles[ childType.name ] !== false;
+						syncDescendantStyles[ childType.name ] !== false;
 					const blockTitle =
 						getBlockType( childType.name )?.title ?? childType.name;
 					return (
@@ -83,8 +83,8 @@ export function SiblingStyleSyncParentControl( {
 							checked={ isEnabled }
 							onChange={ ( value ) =>
 								setAttributes( {
-									syncChildStyles: {
-										...syncChildStyles,
+									syncDescendantStyles: {
+										...syncDescendantStyles,
 										[ childType.name ]: value,
 									},
 								} )
