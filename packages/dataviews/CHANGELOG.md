@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 14.0.0 (2026-04-01)
+
 ### Breaking Changes
 
 - DataViews: Use intersectionObserver to improve performance by unloading invisible items. Change how infinite scroll is enabled to require only 2 view properties: `infiniteScrollEnabled` and `startPosition`. [#74378](https://github.com/WordPress/gutenberg/pull/74378)
