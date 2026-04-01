@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import getAdjacentCharRect from './get-adjacent-char-rect';
 import isRTL from './is-rtl';
 import getRangeHeight from './get-range-height';
 import getRectangleFromRange from './get-rectangle-from-range';
@@ -9,35 +10,6 @@ import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
 import { assertIsDefined } from '../utils/assert-is-defined';
 import isInputOrTextArea from './is-input-or-text-area';
 import { scrollIfNoRange } from './scroll-if-no-range';
-
-/**
- * Get the rectangle of the character after the cursor for a collapsed range.
- * This is more accurate than the collapsed range rect for determining the
- * visual line, working around a Firefox bug where collapsed ranges at
- * line-wrap boundaries report the previous line's position.
- *
- * See: https://bugzilla.mozilla.org/show_bug.cgi?id=1014738
- *
- * @param {Range}    collapsedRange The collapsed range.
- * @param {Document} ownerDocument  The owner document.
- *
- * @return {DOMRect|null} The next character's rectangle, or null.
- */
-function getAdjacentCharRect( collapsedRange, ownerDocument ) {
-	const { startContainer, startOffset } = collapsedRange;
-	if ( startContainer.nodeType !== startContainer.TEXT_NODE ) {
-		return null;
-	}
-	const textNode = /** @type {Text} */ ( startContainer );
-	const offset = startOffset;
-	if ( offset < 0 || offset >= textNode.length ) {
-		return null;
-	}
-	const range = ownerDocument.createRange();
-	range.setStart( textNode, offset );
-	range.setEnd( textNode, offset + 1 );
-	return getRectangleFromRange( range );
-}
 
 /**
  * Check whether the selection is at the edge of the container. Checks for
@@ -149,7 +121,7 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 	// previous line's position.
 	const verticalRangeRect =
 		onlyVertical && isCollapsed
-			? getAdjacentCharRect( collapsedRange, ownerDocument ) ?? rangeRect
+			? getAdjacentCharRect( collapsedRange ) ?? rangeRect
 			: rangeRect;
 
 	const verticalDiff =
