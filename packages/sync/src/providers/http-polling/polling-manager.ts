@@ -729,13 +729,14 @@ function unregisterRoom( room: string ): void {
 		);
 		areListenersRegistered = false;
 		hasCheckedConnectionLimit = false;
+		consecutiveFailures = 0;
 	}
 }
 
 /**
- * Immediately retry the sync connection by cancelling any pending backoff
- * timeout and triggering a new poll. If a request is already in-flight,
- * the backoff interval is reset so the next scheduled poll fires sooner.
+ * Immediately retry the sync connection by cancelling any pending
+ * timeout and triggering a new poll. Resets the failure counter so
+ * the retry schedule starts fresh.
  */
 function retryNow(): void {
 	consecutiveFailures = 0;

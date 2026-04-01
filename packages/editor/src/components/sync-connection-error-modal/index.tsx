@@ -239,15 +239,12 @@ export function SyncConnectionErrorModal() {
 		connectionStatus && 'error' in connectionStatus
 			? connectionStatus?.error
 			: undefined;
-	const manualRetry =
-		connectionStatus &&
-		'canManuallyRetry' in connectionStatus &&
-		connectionStatus.canManuallyRetry
-			? () => {
-					onManualRetry();
-					retrySyncConnection();
-			  }
-			: undefined;
+	const manualRetry = showModal
+		? () => {
+				onManualRetry();
+				retrySyncConnection();
+		  }
+		: undefined;
 	const messages = getSyncErrorMessages( error );
 
 	return (
