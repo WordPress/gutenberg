@@ -1,15 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
-import { ProgressBar, Button } from '@wordpress/components';
-import {
-	useFocusOnMount,
-	useFocusReturn,
-	useMergeRefs,
-} from '@wordpress/compose';
-import { useEffect, useCallback, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { ProgressBar } from '@wordpress/components';
+import { useEffect, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { store as uploadMediaStore } from '@wordpress/upload-media';
 
 /**
@@ -22,10 +17,7 @@ import { unlock } from '../lock-unlock';
  * on the gallery block when multiple images are being uploaded as a batch.
  */
 export default function GalleryUploadingOverlay() {
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-	const focusReturnRef = useFocusReturn();
-	const overlayRef = useMergeRefs( [ focusOnMountRef, focusReturnRef ] );
-	// Track the initial total when uploads start so we can show "X of Y"
+	// Track the initial total when uploads start so we can show progress
 	// even as items leave the queue.
 	const [ initialTotal, setInitialTotal ] = useState( 0 );
 
@@ -67,64 +59,21 @@ export default function GalleryUploadingOverlay() {
 		}
 	}, [ topLevelCount, initialTotal ] );
 
-	const { cancelItem } = useDispatch( uploadMediaStore );
-	const registry = useRegistry();
-
-	const handleCancel = useCallback( () => {
-		const { getAllItems } = unlock( registry.select( uploadMediaStore ) );
-		const items = getAllItems();
-		const error = new Error( __( 'Upload cancelled by user' ) );
-		for ( const item of items ) {
-			cancelItem( item.id, error );
-		}
-	}, [ cancelItem, registry ] );
-
-	const handleKeyDown = ( event ) => {
-		if ( event.key === 'Escape' ) {
-			event.stopPropagation();
-			handleCancel();
-		}
-	};
-
 	// Don't render if there aren't multiple concurrent uploads.
 	if ( initialTotal < 2 || topLevelCount === 0 ) {
 		return null;
 	}
 
-	const completedCount = initialTotal - topLevelCount;
-	const currentImage = Math.min( completedCount + 1, initialTotal );
-
-	const label = sprintf(
-		/* translators: 1: current image number, 2: total images in batch */
-		__( 'Processing image %1$d of %2$d' ),
-		currentImage,
-		initialTotal
-	);
-
 	return (
-		/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 		<div
 			className="wp-block-gallery__upload-overlay"
-			ref={ overlayRef }
-			role="group"
+			role="progressbar"
 			aria-label={ __( 'Upload progress' ) }
-			tabIndex="-1"
-			onKeyDown={ handleKeyDown }
+			aria-valuenow={ averageProgress }
+			aria-valuemin={ 0 }
+			aria-valuemax={ 100 }
 		>
-			<ProgressBar
-				value={ averageProgress }
-				aria-label={ __( 'Upload progress' ) }
-			/>
-			<span className="wp-block-gallery__upload-overlay-label">
-				{ label }
-			</span>
-			<Button
-				__next40pxDefaultSize
-				variant="secondary"
-				onClick={ handleCancel }
-			>
-				{ __( 'Cancel' ) }
-			</Button>
+			<ProgressBar value={ averageProgress } />
 		</div>
 	);
 }
