@@ -193,9 +193,7 @@ export interface SelectorWithCustomCurrySignature {
  * }
  * ```
  */
-export interface StoreRegistry {
-	[ key: string ]: StoreDescriptor< AnyConfig >;
-}
+export interface StoreRegistry {}
 
 /**
  * A store name or store descriptor, used throughout the API.
