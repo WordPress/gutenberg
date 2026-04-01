@@ -62,7 +62,10 @@ if ( isPackageInstalled( 'typescript' ) ) {
 				'no-unused-vars': 'off',
 				'@typescript-eslint/no-unused-vars': [
 					'error',
-					{ ignoreRestSiblings: true },
+					{
+						ignoreRestSiblings: true,
+						caughtErrors: 'all',
+					},
 				],
 				// no-shadow doesn't work correctly in TS, so let's use a TS-dedicated version instead.
 				'no-shadow': 'off',

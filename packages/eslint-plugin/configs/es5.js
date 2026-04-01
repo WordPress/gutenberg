@@ -51,7 +51,10 @@ module.exports = {
 		'no-unreachable': 'error',
 		'no-unsafe-negation': 'error',
 		'no-unused-expressions': 'error',
-		'no-unused-vars': [ 'error', { ignoreRestSiblings: true } ],
+		'no-unused-vars': [
+			'error',
+			{ ignoreRestSiblings: true, caughtErrors: 'all' },
+		],
 		'no-useless-return': 'error',
 		'no-whitespace-before-property': 'error',
 		'no-with': 'error',
