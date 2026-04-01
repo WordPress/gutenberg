@@ -83,6 +83,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		$name = $request->get_param( 'name' );
 
 		// TODO: this data will come from a registry of view configs per entity.
+		$form            = array();
 		$default_view    = array(
 			'type'       => 'table',
 			'filters'    => array(),
@@ -116,6 +117,9 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			$default_layouts = $this->get_default_layouts_for_page();
 			$default_view    = $this->get_default_view_for_page();
 			$view_list       = $this->get_view_list_for_page( $all_items_title, $default_layouts );
+			$form            = $this->get_form_for_page();
+		} elseif ( 'postType' === $kind && 'post' === $name ) {
+			$form = $this->get_form_for_page();
 		} elseif ( 'postType' === $kind && 'wp_block' === $name ) {
 			$default_layouts = $this->get_default_layouts_for_wp_block();
 			$default_view    = $this->get_default_view_for_wp_block( $default_layouts );
@@ -136,6 +140,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			'default_view'    => $default_view,
 			'default_layouts' => $default_layouts,
 			'view_list'       => $view_list,
+			'form'            => $form,
 		);
 
 		return rest_ensure_response( $response );
@@ -269,6 +274,12 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 							),
 						),
 					),
+				),
+				'form'            => array(
+					'description' => __( 'Default form configuration.', 'gutenberg' ),
+					'type'        => 'object',
+					'readonly'    => true,
+					'properties'  => $this->get_form_schema(),
 				),
 			),
 		);
@@ -497,6 +508,225 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		);
 	}
 
+	/**
+	 * Returns the schema for a form layout object as a discriminated union.
+	 *
+	 * Each variant is discriminated by a single-value enum on its `type` property,
+	 * matching the TypeScript Layout union in dataviews/src/types/dataform.ts.
+	 *
+	 * @return array Schema for a form layout object.
+	 */
+	private function get_form_layout_schema() {
+		return array(
+			'oneOf' => array(
+				// RegularLayout.
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'type'          => array(
+							'type' => 'string',
+							'enum' => array( 'regular' ),
+						),
+						'labelPosition' => array(
+							'type' => 'string',
+							'enum' => array( 'top', 'side', 'none' ),
+						),
+					),
+				),
+				// PanelLayout.
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'type'           => array(
+							'type' => 'string',
+							'enum' => array( 'panel' ),
+						),
+						'labelPosition'  => array(
+							'type' => 'string',
+							'enum' => array( 'top', 'side', 'none' ),
+						),
+						'openAs'         => array(
+							'oneOf' => array(
+								array(
+									'type' => 'string',
+									'enum' => array( 'dropdown', 'modal' ),
+								),
+								array(
+									'type'       => 'object',
+									'properties' => array(
+										'type'        => array(
+											'type' => 'string',
+											'enum' => array( 'dropdown', 'modal' ),
+										),
+										'applyLabel'  => array(
+											'type' => 'string',
+										),
+										'cancelLabel' => array(
+											'type' => 'string',
+										),
+									),
+								),
+							),
+						),
+						'summary'        => array(
+							'oneOf' => array(
+								array( 'type' => 'string' ),
+								array(
+									'type'  => 'array',
+									'items' => array(
+										'type' => 'string',
+									),
+								),
+							),
+						),
+						'editVisibility' => array(
+							'type' => 'string',
+							'enum' => array( 'always', 'on-hover' ),
+						),
+					),
+				),
+				// CardLayout.
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'type'          => array(
+							'type' => 'string',
+							'enum' => array( 'card' ),
+						),
+						'withHeader'    => array(
+							'type' => 'boolean',
+						),
+						'isOpened'      => array(
+							'type' => 'boolean',
+						),
+						'isCollapsible' => array(
+							'type' => 'boolean',
+						),
+						'summary'       => array(
+							'oneOf' => array(
+								array( 'type' => 'string' ),
+								array(
+									'type'  => 'array',
+									'items' => array(
+										'oneOf' => array(
+											array( 'type' => 'string' ),
+											array(
+												'type' => 'object',
+												'properties' => array(
+													'id' => array(
+														'type' => 'string',
+													),
+													'visibility' => array(
+														'type' => 'string',
+														'enum' => array( 'always', 'when-collapsed' ),
+													),
+												),
+											),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+				// RowLayout.
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'type'      => array(
+							'type' => 'string',
+							'enum' => array( 'row' ),
+						),
+						'alignment' => array(
+							'type' => 'string',
+							'enum' => array( 'start', 'center', 'end' ),
+						),
+						'styles'    => array(
+							'type'                 => 'object',
+							'additionalProperties' => array(
+								'type'       => 'object',
+								'properties' => array(
+									'flex' => array(
+										'type' => array( 'string', 'number' ),
+									),
+								),
+							),
+						),
+					),
+				),
+				// DetailsLayout.
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'type'    => array(
+							'type' => 'string',
+							'enum' => array( 'details' ),
+						),
+						'summary' => array(
+							'type' => 'string',
+						),
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Returns the schema for a form field item (string or object).
+	 *
+	 * @return array Schema for a form field.
+	 */
+	private function get_form_field_schema() {
+		return array(
+			'oneOf' => array(
+				array( 'type' => 'string' ),
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'id'          => array(
+							'type' => 'string',
+						),
+						'label'       => array(
+							'type' => 'string',
+						),
+						'description' => array(
+							'type' => 'string',
+						),
+						'layout'      => $this->get_form_layout_schema(),
+						'children'    => array(
+							'type'  => 'array',
+							'items' => array(
+								'oneOf' => array(
+									array( 'type' => 'string' ),
+									// This object can have the shape of a form field itself,
+									// allowing for recursive nesting of form fields.
+									// There's no easy way to codify this recursion via the JSON Schema draft-04
+									// supported by the REST API.
+									array( 'type' => 'object' ),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Returns the schema for the form configuration object.
+	 *
+	 * @return array Schema properties for the form configuration.
+	 */
+	private function get_form_schema() {
+		return array(
+			'layout' => $this->get_form_layout_schema(),
+			'fields' => array(
+				'type'  => 'array',
+				'items' => $this->get_form_field_schema(),
+			),
+		);
+	}
+
 	private function get_default_view_for_page() {
 		return array(
 			'type'       => 'list',
@@ -526,6 +756,65 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			),
 			'grid'  => array(),
 			'list'  => array(),
+		);
+	}
+
+	private function get_form_for_page() {
+		return array(
+			'layout' => array( 'type' => 'panel' ),
+			'fields' => array(
+				array(
+					'id'     => 'featured_media',
+					'layout' => array(
+						'type'          => 'regular',
+						'labelPosition' => 'none',
+					),
+				),
+				array(
+					'id'     => 'post-content-info',
+					'layout' => array(
+						'type'          => 'regular',
+						'labelPosition' => 'none',
+					),
+				),
+				'excerpt',
+				array(
+					'id'       => 'status',
+					'label'    => __( 'Status', 'gutenberg' ),
+					'children' => array(
+						array(
+							'id'     => 'status',
+							'layout' => array(
+								'type'          => 'regular',
+								'labelPosition' => 'none',
+							),
+						),
+						'scheduled_date',
+						'password',
+						'sticky',
+					),
+				),
+				'date',
+				'slug',
+				'author',
+				'template',
+				array(
+					'id'       => 'discussion',
+					'label'    => __( 'Discussion', 'gutenberg' ),
+					'children' => array(
+						array(
+							'id'     => 'comment_status',
+							'layout' => array(
+								'type'          => 'regular',
+								'labelPosition' => 'none',
+							),
+						),
+						'ping_status',
+					),
+				),
+				'parent',
+				'format',
+			),
 		);
 	}
 
