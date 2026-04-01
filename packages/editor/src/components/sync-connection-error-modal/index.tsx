@@ -37,10 +37,6 @@ const { retrySyncConnection } = unlock( coreDataPrivateApis );
 // Debounce time for initial disconnected status to allow connection to establish.
 const INITIAL_DISCONNECTED_DEBOUNCE_MS = 20000;
 
-// Debounce time for showing the disconnect dialog after the initial connection,
-// allowing brief network interruptions and automatic retries to resolve.
-const DISCONNECTED_DEBOUNCE_MS = 16000;
-
 export interface SyncConnectionErrorModalProps {
 	description: string; // Modal description.
 	error?: ConnectionError; // Error object with a `code` property.
@@ -208,9 +204,6 @@ export function SyncConnectionErrorModal() {
 		useRetryCountdown( connectionStatus );
 
 	const isConnected = 'connected' === connectionStatus?.status;
-	const [ firstDisconnectTime, setFirstDisconnectTime ] = useState<
-		number | null
-	>( null );
 
 	// Set hasInitialized after a debounce to give extra time on initial load.
 	useEffect( () => {
@@ -221,34 +214,22 @@ export function SyncConnectionErrorModal() {
 		return () => clearTimeout( timeout );
 	}, [] );
 
-	// Track when the disconnection first started.
+	// Show the modal once the retry schedule is exhausted. Hide it on reconnect.
+	// This naturally fires only after a failed retry (status = 'disconnected'),
+	// not mid-cycle (status = 'connecting').
 	useEffect( () => {
 		if ( isConnected ) {
-			setFirstDisconnectTime( null );
 			setShowModal( false );
 			return;
 		}
 
-		setFirstDisconnectTime( ( prev ) => prev ?? Date.now() );
-	}, [ isConnected ] );
-
-	// Show the modal after a retry failure once the debounce period has
-	// elapsed. This ensures the modal appears right after a failed retry
-	// rather than in the middle of a retry cycle.
-	useEffect( () => {
 		if (
-			isConnected ||
-			! firstDisconnectTime ||
-			connectionStatus?.status !== 'disconnected'
+			connectionStatus?.status === 'disconnected' &&
+			connectionStatus.backgroundRetriesFailed
 		) {
-			return;
-		}
-
-		const elapsed = Date.now() - firstDisconnectTime;
-		if ( elapsed >= DISCONNECTED_DEBOUNCE_MS ) {
 			setShowModal( true );
 		}
-	}, [ connectionStatus, firstDisconnectTime, isConnected ] );
+	}, [ connectionStatus, isConnected ] );
 
 	if ( ! isCollaborationEnabled || ! hasInitialized || ! showModal ) {
 		return null;

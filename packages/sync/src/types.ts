@@ -80,6 +80,12 @@ export interface ConnectionStatusDisconnected {
 	/** Whether the error condition is retryable via user action. */
 	canManuallyRetry?: boolean;
 
+	/** Number of consecutive poll failures since the last successful connection. */
+	consecutiveFailures?: number;
+
+	/** Whether the background retry schedule has been exhausted without a successful connection. */
+	backgroundRetriesFailed?: boolean;
+
 	/** Milliseconds until the next automatic retry attempt (triggered by the provider). */
 	willAutoRetryInMs?: number;
 }

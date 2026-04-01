@@ -18,11 +18,13 @@ import * as syncProtocol from 'y-protocols/sync';
  */
 import {
 	DEFAULT_CLIENT_LIMIT_PER_ROOM,
-	MAX_ERROR_BACKOFF_IN_MS,
+	ERROR_RETRY_DELAYS_SOLO_MS,
+	ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS,
 	MAX_UPDATE_SIZE_IN_BYTES,
 	POLLING_INTERVAL_IN_MS,
 	POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS,
 	POLLING_INTERVAL_BACKGROUND_TAB_IN_MS,
+	DISCONNECT_DIALOG_RETRY_MS,
 } from './config';
 import { ConnectionError, ConnectionErrorCode } from '../../errors';
 import type { ConnectionStatus } from '../../types';
@@ -300,6 +302,7 @@ function checkConnectionLimit(
 }
 
 let areListenersRegistered = false;
+let consecutiveFailures = 0;
 let hasCheckedConnectionLimit = false;
 let hasCollaborators = false;
 let isActiveBrowser = 'visible' === document.visibilityState;
@@ -415,6 +418,7 @@ function poll(): void {
 			const { rooms } = await postSyncUpdate( payload );
 
 			// Emit 'connected' status.
+			consecutiveFailures = 0;
 			roomStates.forEach( ( state ) => {
 				state.onStatusChange( { status: 'connected' } );
 			} );
@@ -499,11 +503,16 @@ function poll(): void {
 				pollInterval = POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
 			}
 		} catch ( error ) {
-			// Exponential backoff on error: increase the backoff time, up to max
-			pollInterval = Math.min(
-				pollInterval * 1.5,
-				MAX_ERROR_BACKOFF_IN_MS
-			);
+			// Use the explicit retry delay schedule for backoff.
+			consecutiveFailures++;
+			const retrySchedule = hasCollaborators
+				? ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS
+				: ERROR_RETRY_DELAYS_SOLO_MS;
+			if ( consecutiveFailures <= retrySchedule.length ) {
+				pollInterval = retrySchedule[ consecutiveFailures - 1 ];
+			} else {
+				pollInterval = DISCONNECT_DIALOG_RETRY_MS;
+			}
 
 			// Recover from the failed request. We don't know whether the server stored
 			// our updates before the error occurred (e.g. a network timeout after a
@@ -542,10 +551,15 @@ function poll(): void {
 			// due to page unload (e.g. during a refresh) to avoid briefly
 			// flashing the disconnect dialog before the new page loads.
 			if ( ! isUnloadPending ) {
+				const backgroundRetriesFailed =
+					consecutiveFailures > retrySchedule.length;
+
 				roomStates.forEach( ( state ) => {
 					state.onStatusChange( {
 						status: 'disconnected',
 						canManuallyRetry: true,
+						consecutiveFailures,
+						backgroundRetriesFailed,
 						willAutoRetryInMs: pollInterval,
 					} );
 				} );
@@ -724,7 +738,7 @@ function unregisterRoom( room: string ): void {
  * the backoff interval is reset so the next scheduled poll fires sooner.
  */
 function retryNow(): void {
-	pollInterval = POLLING_INTERVAL_IN_MS * 2;
+	consecutiveFailures = 0;
 
 	if ( pollingTimeoutId ) {
 		clearTimeout( pollingTimeoutId );
