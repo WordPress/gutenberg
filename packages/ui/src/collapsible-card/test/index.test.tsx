@@ -268,7 +268,7 @@ describe( 'CollapsibleCard', () => {
 				</CollapsibleCard.Root>
 			);
 
-			expect( screen.getByText( 'Badge content' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Badge content' ) ).toBeVisible();
 		} );
 	} );
 } );
