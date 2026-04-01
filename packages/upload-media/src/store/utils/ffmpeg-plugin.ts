@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { dispatch, select } from '@wordpress/data';
+import { dispatch, resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -126,7 +126,8 @@ export async function ensureFFmpegAvailable(): Promise< FFmpegConfig | null > {
 	}
 
 	// Plugin not active — can we install it?
-	const canInstall = select( coreStore ).canUser( 'create', {
+	// Use resolveSelect to wait for permission data to load.
+	const canInstall = await resolveSelect( coreStore ).canUser( 'create', {
 		kind: 'root',
 		name: 'plugin',
 	} );
