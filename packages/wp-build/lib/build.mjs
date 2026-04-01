@@ -279,13 +279,20 @@ const wasmInlinePlugin = {
 	name: 'wasm-inline',
 	setup( build ) {
 		// Resolve .wasm imports from node_modules.
-		build.onResolve( { filter: /\.wasm$/ }, async ( args ) => {
-			// Handle imports like 'wasm-vips/vips.wasm'.
+		// Matches both direct .wasm paths (e.g., 'wasm-vips/vips.wasm')
+		// and package exports aliases that resolve to .wasm files
+		// (e.g., '@ffmpeg/core/wasm').
+		build.onResolve( { filter: /\.wasm$|\/wasm$/ }, async ( args ) => {
+			// Handle imports like 'wasm-vips/vips.wasm' or '@ffmpeg/core/wasm'.
 			if ( ! args.path.startsWith( '.' ) ) {
 				const { createRequire } = await import( 'module' );
 				const require = createRequire( args.resolveDir + '/index.js' );
 				try {
 					const resolved = require.resolve( args.path );
+					// Only handle files that actually resolve to .wasm.
+					if ( ! resolved.endsWith( '.wasm' ) ) {
+						return null;
+					}
 					return {
 						path: normalizePath(
 							path.relative( ROOT_DIR, resolved )
