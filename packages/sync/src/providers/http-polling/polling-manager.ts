@@ -45,7 +45,12 @@ import {
 
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
 
-type LogFunction = ( message: string, debug?: object ) => void;
+type LogFunction = (
+	message: string,
+	debug?: object,
+	errorLevel?: 'error' | 'log' | 'warn',
+	force?: boolean
+) => void;
 
 interface PollingManager {
 	registerRoom: ( options: RegisterRoomOptions ) => void;
@@ -463,11 +468,23 @@ function poll(): void {
 				}
 
 				// Process each incoming update and collect any responses.
-				const responseUpdates = room.updates
-					.map( ( update ) => roomState.processDocUpdate( update ) )
-					.filter( ( update ): update is SyncUpdate =>
-						Boolean( update )
-					);
+				const responseUpdates: SyncUpdate[] = [];
+				for ( const update of room.updates ) {
+					try {
+						const response = roomState.processDocUpdate( update );
+						if ( response ) {
+							responseUpdates.push( response );
+						}
+					} catch ( error ) {
+						roomState.log(
+							'Failed to apply sync update',
+							{ error, update },
+							'error',
+							true // force
+						);
+					}
+				}
+
 				roomState.updateQueue.addBulk( responseUpdates );
 
 				// Respond to compaction requests from server. The server asks only one
@@ -531,10 +548,9 @@ function poll(): void {
 
 				state.log(
 					'Error posting sync update, will retry with backoff',
-					{
-						error,
-						nextPoll: pollInterval,
-					}
+					{ error, nextPoll: pollInterval },
+					'error',
+					true // force
 				);
 			}
 
