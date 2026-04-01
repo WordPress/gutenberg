@@ -45,6 +45,7 @@
 			"lineHeight": true,
 			"textAlign": true,
 			"textColumns": true,
+			"textIndent": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
@@ -69,6 +70,11 @@
 				"width": true,
 				"style": true
 			}
+		}
+	},
+	"selectors": {
+		"typography": {
+			"textIndent": ".wp-block-post-excerpt > :where(p:first-of-type)"
 		}
 	},
 	"editorStyle": "wp-block-post-excerpt-editor",
