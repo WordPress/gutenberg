@@ -55,7 +55,6 @@ export default function mediaUpload( {
 	const isClientSideMediaActive =
 		window.__clientSideMediaProcessing && isClientSideMediaSupported();
 	const lockKey = `image-upload-${ uuid() }`;
-	let imageIsUploading = false;
 	maxUploadFileSize =
 		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 	const currentPost = getCurrentPost();
@@ -64,44 +63,31 @@ export default function mediaUpload( {
 		typeof currentPost?.id === 'number'
 			? currentPost.id
 			: currentPost?.wp_id;
-	const setSaveLock = () => {
-		if ( isClientSideMediaActive ) {
-			return; // Skip - handled by useUploadSaveLock in editor provider
-		}
-		lockPostSaving( lockKey );
-		lockPostAutosaving( lockKey );
-		imageIsUploading = true;
-	};
-
-	const postData = currentPostId ? { post: currentPostId } : {};
 	const clearSaveLock = () => {
-		if ( isClientSideMediaActive ) {
-			return; // Skip - handled by useUploadSaveLock in editor provider
-		}
 		unlockPostSaving( lockKey );
 		unlockPostAutosaving( lockKey );
-		imageIsUploading = false;
 	};
+
+	// Lock saving immediately when the upload starts.
+	// When client-side media processing is enabled, save locking
+	// is handled by useUploadSaveLock in the editor provider.
+	if ( ! isClientSideMediaActive ) {
+		lockPostSaving( lockKey );
+		lockPostAutosaving( lockKey );
+	}
+
+	const postData = currentPostId ? { post: currentPostId } : {};
 
 	uploadMedia( {
 		allowedTypes,
 		filesList,
-		onFileChange: ( file ) => {
-			// When client-side media processing is enabled, save locking
-			// is handled by useUploadSaveLock in the editor provider.
-			if ( ! isClientSideMediaActive ) {
-				if ( ! imageIsUploading ) {
-					setSaveLock();
-				} else {
-					clearSaveLock();
-				}
-			}
-			onFileChange?.( file );
+		onFileChange: ( files ) => {
+			onFileChange?.( files );
 
 			// Files are initially received by `onFileChange` as a blob.
-			// After that the function is called a second time with the file as an entity.
+			// After that the function is called again with the file as an entity.
 			// For core-data, we only care about receiving/invalidating entities.
-			const entityFiles = file.filter( ( _file ) => _file?.id );
+			const entityFiles = files.filter( ( _file ) => _file?.id );
 			if ( entityFiles?.length ) {
 				const invalidateCache = true;
 				receiveEntityRecords(
@@ -111,6 +97,14 @@ export default function mediaUpload( {
 					undefined,
 					invalidateCache
 				);
+			}
+
+			// Unlock saving once all files have been uploaded (all have IDs).
+			if (
+				! isClientSideMediaActive &&
+				entityFiles.length === files.length
+			) {
+				clearSaveLock();
 			}
 		},
 		onSuccess,
