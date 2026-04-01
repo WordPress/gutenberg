@@ -18,20 +18,26 @@ describe( 'getAutocompleteMatch', () => {
 	it( 'should return null for empty text content', () => {
 		const completers = [ createCompleter() ];
 		expect(
-			getAutocompleteMatch( '', completers, 0, false, '' )
+			getAutocompleteMatch( '', completers, 0, false, () => '' )
 		).toBeNull();
 	} );
 
 	it( 'should return null when no completers are provided', () => {
 		expect(
-			getAutocompleteMatch( 'some text /', [], 0, false, '' )
+			getAutocompleteMatch( 'some text /', [], 0, false, () => '' )
 		).toBeNull();
 	} );
 
 	it( 'should return null when trigger prefix is not found in text', () => {
 		const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
 		expect(
-			getAutocompleteMatch( 'no trigger here', completers, 1, false, '' )
+			getAutocompleteMatch(
+				'no trigger here',
+				completers,
+				1,
+				false,
+				() => ''
+			)
 		).toBeNull();
 	} );
 
@@ -42,7 +48,7 @@ describe( 'getAutocompleteMatch', () => {
 			completers,
 			1,
 			false,
-			''
+			() => ''
 		);
 		expect( result ).toEqual( {
 			completer: completers[ 0 ],
@@ -57,7 +63,7 @@ describe( 'getAutocompleteMatch', () => {
 			completers,
 			1,
 			false,
-			''
+			() => ''
 		);
 		expect( result ).toEqual( {
 			completer: completers[ 0 ],
@@ -79,7 +85,7 @@ describe( 'getAutocompleteMatch', () => {
 			[ slashCompleter, atCompleter ],
 			1,
 			false,
-			''
+			() => ''
 		);
 		expect( result?.completer.name ).toBe( 'at' );
 	} );
@@ -88,14 +94,20 @@ describe( 'getAutocompleteMatch', () => {
 		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
 		const longText = '/' + 'a'.repeat( 51 );
 		expect(
-			getAutocompleteMatch( longText, completers, 1, false, '' )
+			getAutocompleteMatch( longText, completers, 1, false, () => '' )
 		).toBeNull();
 	} );
 
 	it( 'should match when text after trigger is exactly 50 chars', () => {
 		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
 		const text = '/' + 'a'.repeat( 50 );
-		const result = getAutocompleteMatch( text, completers, 1, false, '' );
+		const result = getAutocompleteMatch(
+			text,
+			completers,
+			1,
+			false,
+			() => ''
+		);
 		expect( result ).not.toBeNull();
 		expect( result?.filterValue ).toBe( 'a'.repeat( 50 ) );
 	} );
@@ -109,7 +121,7 @@ describe( 'getAutocompleteMatch', () => {
 				completers,
 				0,
 				false,
-				''
+				() => ''
 			)
 		).toBeNull();
 	} );
@@ -121,7 +133,7 @@ describe( 'getAutocompleteMatch', () => {
 			completers,
 			0,
 			false,
-			''
+			() => ''
 		);
 		expect( result ).not.toBeNull();
 		expect( result?.filterValue ).toBe( 'xyz' );
@@ -134,7 +146,7 @@ describe( 'getAutocompleteMatch', () => {
 			completers,
 			0,
 			true,
-			''
+			() => ''
 		);
 		expect( result ).not.toBeNull();
 	} );
@@ -147,7 +159,7 @@ describe( 'getAutocompleteMatch', () => {
 				completers,
 				0,
 				true,
-				''
+				() => ''
 			)
 		).toBeNull();
 	} );
@@ -155,14 +167,14 @@ describe( 'getAutocompleteMatch', () => {
 	it( 'should return null when text after trigger starts with whitespace', () => {
 		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
 		expect(
-			getAutocompleteMatch( '/ query', completers, 1, false, '' )
+			getAutocompleteMatch( '/ query', completers, 1, false, () => '' )
 		).toBeNull();
 	} );
 
 	it( 'should return null when text after trigger ends with multiple spaces', () => {
 		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
 		expect(
-			getAutocompleteMatch( '/query  ', completers, 1, false, '' )
+			getAutocompleteMatch( '/query  ', completers, 1, false, () => '' )
 		).toBeNull();
 	} );
 
@@ -174,7 +186,7 @@ describe( 'getAutocompleteMatch', () => {
 			} ),
 		];
 		expect(
-			getAutocompleteMatch( 'text @user', completers, 1, false, '' )
+			getAutocompleteMatch( 'text @user', completers, 1, false, () => '' )
 		).toBeNull();
 	} );
 
@@ -186,7 +198,13 @@ describe( 'getAutocompleteMatch', () => {
 				allowContext,
 			} ),
 		];
-		getAutocompleteMatch( 'before @user', completers, 1, false, 'after' );
+		getAutocompleteMatch(
+			'before @user',
+			completers,
+			1,
+			false,
+			() => 'after'
+		);
 		expect( allowContext ).toHaveBeenCalledWith( 'before ', 'after' );
 	} );
 
@@ -197,7 +215,7 @@ describe( 'getAutocompleteMatch', () => {
 			completers,
 			1,
 			false,
-			''
+			() => ''
 		);
 		expect( result ).not.toBeNull();
 		expect( result?.filterValue ).toBe( 'cafe' );
@@ -210,7 +228,7 @@ describe( 'getAutocompleteMatch', () => {
 			completers,
 			1,
 			false,
-			''
+			() => ''
 		);
 		expect( result ).not.toBeNull();
 		expect( result?.filterValue ).toBe( 'query' );
@@ -223,7 +241,7 @@ describe( 'getAutocompleteMatch', () => {
 			completers,
 			1,
 			false,
-			''
+			() => ''
 		);
 		expect( result ).not.toBeNull();
 		expect( result?.filterValue ).toBe( 'hello world' );
@@ -271,7 +289,7 @@ describe( 'getAutocompleteMatch', () => {
 				completers,
 				1,
 				false,
-				''
+				() => ''
 			);
 			expect( result ).not.toBeNull();
 			expect( result?.filterValue ).toBe( expected );

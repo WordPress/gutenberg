@@ -18,7 +18,7 @@ export function getAutocompleteMatch(
 	completers: WPCompleter[],
 	filteredOptionsLength: number,
 	isBackspacing: boolean,
-	textAfterSelection: string
+	getTextAfterSelection: () => string
 ): AutocompleteMatch | null {
 	if ( ! textContent ) {
 		return null;
@@ -50,7 +50,8 @@ export function getAutocompleteMatch(
 	);
 
 	// Prevent matching with an extremely long string, which causes
-	// the editor to slow-down significantly.
+	// the editor to slow-down significantly. Returning null here
+	// intentionally resets the autocompleter state in the caller.
 	if ( textWithoutTrigger.length > 50 ) {
 		return null;
 	}
@@ -74,7 +75,7 @@ export function getAutocompleteMatch(
 		allowContext &&
 		! allowContext(
 			textContent.slice( 0, triggerIndex ),
-			textAfterSelection
+			getTextAfterSelection()
 		)
 	) {
 		return null;

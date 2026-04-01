@@ -225,18 +225,24 @@ export function useAutocomplete( {
 	}, [ record ] );
 
 	useEffect( () => {
-		const textAfterSelection = textContent
-			? getTextContent(
-					slice( record, undefined, getTextContent( record ).length )
-			  )
-			: '';
+		function getTextAfterSelection() {
+			return textContent
+				? getTextContent(
+						slice(
+							record,
+							undefined,
+							getTextContent( record ).length
+						)
+				  )
+				: '';
+		}
 
 		const match = getAutocompleteMatch(
 			textContent,
 			completers,
 			filteredOptions.length,
 			backspacingRef.current,
-			textAfterSelection
+			getTextAfterSelection
 		);
 
 		if ( ! match ) {
