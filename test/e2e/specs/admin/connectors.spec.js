@@ -6,7 +6,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 const SETTINGS_PAGE_PATH = 'options-general.php';
 const CONNECTORS_PAGE_QUERY = 'page=options-connectors-wp-admin';
 
-const CONNECTORS = [
+const AI_CONNECTORS = [
 	{
 		slug: 'ai-provider-for-openai',
 		name: 'OpenAI',
@@ -21,6 +21,15 @@ const CONNECTORS = [
 		slug: 'ai-provider-for-google',
 		name: 'Google',
 		description: 'Text and image generation with Gemini and Imagen.',
+	},
+];
+
+const CONNECTORS = [
+	...AI_CONNECTORS,
+	{
+		slug: 'akismet',
+		name: 'Akismet Anti-Spam',
+		description: 'Protect your site from spam.',
 	},
 ];
 
@@ -376,6 +385,28 @@ test.describe( 'Connectors', () => {
 		} );
 	} );
 
+	test( 'should display Akismet connector with install button', async ( {
+		page,
+		admin,
+	} ) => {
+		await admin.visitAdminPage( SETTINGS_PAGE_PATH, CONNECTORS_PAGE_QUERY );
+
+		const card = page.locator( '.connector-item--akismet' );
+		await expect( card ).toBeVisible();
+
+		const heading = card.getByRole( 'heading', {
+			name: 'Akismet Anti-Spam',
+			level: 2,
+		} );
+		await expect( heading ).toBeVisible();
+		await expect(
+			card.getByText( 'Protect your site from spam.' )
+		).toBeVisible();
+
+		const button = card.getByRole( 'button', { name: 'Install' } );
+		await expect( button ).toBeVisible();
+	} );
+
 	test( 'should display the AI plugin callout banner with install button', async ( {
 		page,
 		admin,
@@ -386,11 +417,13 @@ test.describe( 'Connectors', () => {
 		await expect( banner ).toBeVisible();
 
 		// Verify the banner message mentions the AI plugin.
-		await expect( banner.getByText( 'AI plugin' ) ).toBeVisible();
+		await expect(
+			banner.locator( 'p' ).getByText( 'AI plugin' )
+		).toBeVisible();
 
 		// Verify the Install button is present.
 		await expect(
-			banner.getByRole( 'button', { name: 'Install AI Experiments' } )
+			banner.getByRole( 'button', { name: 'Install the AI plugin' } )
 		).toBeVisible();
 
 		// Verify the Learn more link is present.
@@ -516,6 +549,68 @@ test.describe( 'Connectors', () => {
 					} )
 				).toBeHidden();
 			} );
+		} );
+	} );
+
+	test.describe( 'JS extensibility', () => {
+		const PLUGIN_SLUG = 'gutenberg-test-connectors-js-extensibility';
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin( PLUGIN_SLUG );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin( PLUGIN_SLUG );
+		} );
+
+		test( 'should not display a card for a server-only connector without a JS render function', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			// The server registers test_server_only_service but no JS
+			// registerConnector call provides a render function for it,
+			// so no card should appear in the UI.
+			await expect(
+				page.getByRole( 'heading', {
+					name: 'Test Server Only Service',
+					level: 2,
+				} )
+			).toBeHidden();
+		} );
+
+		test( 'should display a custom connector registered via JS with merging strategy', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			const card = page.locator( '.connector-item--test_custom_service' );
+			await expect( card ).toBeVisible();
+
+			// Verify the custom content from the render function is visible.
+			await expect(
+				card.getByText( 'Custom rendered content for testing.' )
+			).toBeVisible();
+
+			// Verify label and description from the server-side PHP registration
+			// are merged with the client-side JS render function.
+			await expect(
+				card.getByRole( 'heading', {
+					name: 'Test Custom Service',
+					level: 2,
+				} )
+			).toBeVisible();
+			await expect(
+				card.getByText( 'A custom service for E2E testing.' )
+			).toBeVisible();
 		} );
 	} );
 } );

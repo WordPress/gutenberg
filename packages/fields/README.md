@@ -63,6 +63,10 @@ Duplicate action for BasePost.
 
 Duplicate action for TemplatePart.
 
+### excerptField
+
+Excerpt field for BasePost.
+
 ### exportPattern
 
 Export action as JSON for Pattern.
@@ -187,6 +191,10 @@ Slug field for BasePost.
 ### statusField
 
 Status field for BasePost.
+
+### stickyField
+
+Sticky field for BasePost.
 
 ### templateField
 

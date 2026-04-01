@@ -26,6 +26,37 @@ src/
 -   The folder name should match the primary component name
 -   The `index.ts` file should contain only the public API exports for the component(s)
 
+## Public APIs
+
+The package has a single entrypoint which exports all of the components of the package, and nothing else.
+
+Specifically:
+
+-   Components are implemented as [compound components](#compound-components). Exported components will define their own subcomponents as properties of the top-level export.
+    -   Example: `import { Button } from '@wordpress/ui'; // Button, Button.Icon, etc.`
+-   TypeScript types are not exported. If you need access to a component's prop types, use `React.ComponentProps`.
+    -   Example: `type ButtonProps = React.ComponentProps< typeof Button >;`
+-   Styles are defined in the built JavaScript files and are not loaded separately.
+
+The package follows [semantic versioning](https://semver.org/), and the following are considered to be "the public API" for consideration of backwards-incompatible changes:
+
+-   Component definitions (e.g. removing a component)
+-   Component props (e.g. renaming, removing, or changing a props supported types such that existing usage would break in an update)
+-   CSS properties prefixed with `--wp-ui-` (e.g. changing a CSS property such that it would negatively impact a user's experience)
+
+## Compound Components
+
+This package follows the [compound component approach outlined in the `@wordpress/components` contributing guidelines](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/CONTRIBUTING.md#compound-components).
+
+Some components will use a bare name (e.g. `Button`), while others will have a "root" component with modular children (e.g. `Tooltip.Root`). Use the base component name when it works standalone and any subcomponents are optional enhancements. Only introduce `.Root` when the component is modular and consumers are expected to compose multiple parts.
+
+Why?
+
+-   `.Root` primarily coordinates, and isn't useful on its own
+    -   For example, a `Button` is useful on its own (renders an interactive element), unlike `Tabs.Root`
+-   `.Root` has required subparts, signalling an expectation that it must be composed
+    -   A non-root component can still have _optional_ sub-parts, like a `Button.Icon`
+
 ## CSS Architecture
 
 ### CSS Layers

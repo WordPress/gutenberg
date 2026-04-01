@@ -534,15 +534,21 @@
 		"parent": "core-concepts"
 	},
 	{
+		"title": "Using TypeScript",
+		"slug": "using-typescript",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/using-typescript.md",
+		"parent": "core-concepts"
+	},
+	{
 		"title": "Client-Side Navigation",
 		"slug": "client-side-navigation",
 		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md",
 		"parent": "core-concepts"
 	},
 	{
-		"title": "Using TypeScript",
-		"slug": "using-typescript",
-		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/using-typescript.md",
+		"title": "Client-Side Navigation Compatibility",
+		"slug": "client-side-navigation-compatibility",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility.md",
 		"parent": "core-concepts"
 	},
 	{

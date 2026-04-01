@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/core-abilities",
-	"version": "0.7.0",
+	"version": "0.8.0",
 	"description": "WordPress core abilities integration for the Abilities API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -44,9 +44,7 @@
 		".": "./build-module/index.mjs"
 	},
 	"types": "build-types",
-	"sideEffects": [
-		"{src,build,build-module}/index.js"
-	],
+	"sideEffects": true,
 	"dependencies": {
 		"@wordpress/abilities": "file:../abilities",
 		"@wordpress/api-fetch": "file:../api-fetch",

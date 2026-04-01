@@ -1578,6 +1578,20 @@ Additionally, some of the bundled Edit controls are configurable via a config ob
 }
 ```
 
+-   `datetime` configuration:
+
+```js
+{
+	id: 'date',
+	type: 'datetime',
+	label: 'Date',
+	Edit: {
+		control: 'datetime',
+		compact: true
+	}
+}
+```
+
 Finally, the field author can always provide its own custom `Edit` control. It receives the following props:
 
 -   `data`: the item to be processed
@@ -1591,6 +1605,7 @@ Finally, the field author can always provide its own custom `Edit` control. It r
     -   `prefix`: a React component to be rendered as a prefix
     -   `suffix`: a React component to be rendered as a suffix
     -   `rows`: the number of rows to display (e.g., in the text area component)
+    -   `compact`: whether to render a compact version without the calendar widget (datetime control)
 
 ```js
 {

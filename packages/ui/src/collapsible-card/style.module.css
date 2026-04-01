@@ -6,7 +6,7 @@
 		min-width: 0;
 	}
 
-	.header-trigger-wrapper {
+	.header-trigger-positioner {
 		flex-shrink: 0;
 		align-self: center;
 		/* Prevent the trigger from making the header taller than its content,
@@ -15,7 +15,9 @@
 		overflow: visible;
 	}
 
-	.header-trigger {
+	.header-trigger-wrapper {
+		display: flex;
+
 		/* Offset by half the button's own height so it visually centers
 		   at the wrapper's midpoint (which `align-self: center` places at
 		   the vertical center of the header). */
@@ -23,7 +25,9 @@
 
 		/* For an outline that looks like `IconButton`'s */
 		border-radius: var(--wpds-border-radius-sm);
+	}
 
+	.header-trigger {
 		@media not (prefers-reduced-motion) {
 			transition: rotate 0.15s ease-out;
 		}

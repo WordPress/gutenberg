@@ -27,7 +27,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { saveContentGuidelines } from '../api';
-import { STORE_NAME } from '../store';
+import { store as coreContentGuidelinesStore } from '../store';
 import { unlock } from '../../lock-unlock';
 import './block-guideline-modal.scss';
 
@@ -52,8 +52,7 @@ export default function BlockGuidelineModal( {
 		useState( false );
 
 	const blockGuidelines = useSelect(
-		// @ts-ignore
-		( select ) => select( STORE_NAME ).getBlockGuidelines(),
+		( select ) => select( coreContentGuidelinesStore ).getBlockGuidelines(),
 		[]
 	);
 
@@ -95,7 +94,7 @@ export default function BlockGuidelineModal( {
 		[ blockOptions, selectedBlock ]
 	);
 
-	const { setBlockGuideline } = useDispatch( STORE_NAME );
+	const { setBlockGuideline } = useDispatch( coreContentGuidelinesStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const handleSave = ( value: string ) => {

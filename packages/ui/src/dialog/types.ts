@@ -7,7 +7,11 @@ import type { ComponentProps } from '../utils/types';
 export interface RootProps
 	extends Pick<
 		_Dialog.Root.Props,
-		'open' | 'onOpenChange' | 'defaultOpen' | 'modal'
+		| 'open'
+		| 'onOpenChange'
+		| 'defaultOpen'
+		| 'modal'
+		| 'disablePointerDismissal'
 	> {
 	/**
 	 * The content to be rendered inside the component.
@@ -22,7 +26,9 @@ export interface TriggerProps extends ComponentProps< 'button' > {
 	children?: ReactNode;
 }
 
-export interface PopupProps extends ComponentProps< 'div' > {
+export interface PopupProps
+	extends ComponentProps< 'div' >,
+		Pick< _Dialog.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
 	 * The content to be rendered inside the component.
 	 */

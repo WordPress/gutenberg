@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useRef } from '@wordpress/element';
+import { useState, useCallback, useId, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -280,6 +280,187 @@ describe( 'ControlWithError', () => {
 
 			// Form is not submitted
 			expect( onSubmit ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'aria-describedby', () => {
+		it( 'should connect the error message to the input via aria-describedby', async () => {
+			const user = userEvent.setup();
+			render(
+				<form>
+					<ValidatedInputControl label="URL" required />
+					<button type="submit">Submit</button>
+				</form>
+			);
+
+			const input = screen.getByRole( 'textbox', { name: /^URL/ } );
+
+			expect( input ).not.toHaveAttribute( 'aria-describedby' );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit' } )
+			);
+
+			await waitFor( () => {
+				expect( input ).toHaveAccessibleDescription(
+					expect.stringContaining( 'Constraints not satisfied' )
+				);
+			} );
+		} );
+
+		it( 'should preserve existing aria-describedby values', async () => {
+			const user = userEvent.setup();
+
+			function TestComponent() {
+				const hintId = useId();
+				return (
+					<form>
+						<ValidatedInputControl
+							label="URL"
+							required
+							aria-describedby={ hintId }
+						/>
+						<p id={ hintId }>Enter a full URL.</p>
+						<button type="submit">Submit</button>
+					</form>
+				);
+			}
+
+			render( <TestComponent /> );
+
+			const input = screen.getByRole( 'textbox', { name: /^URL/ } );
+
+			expect( input ).toHaveAccessibleDescription( 'Enter a full URL.' );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit' } )
+			);
+
+			await waitFor( () => {
+				expect( input ).toHaveAccessibleDescription(
+					expect.stringContaining( 'Constraints not satisfied' )
+				);
+			} );
+			expect( input ).toHaveAccessibleDescription(
+				expect.stringContaining( 'Enter a full URL.' )
+			);
+		} );
+
+		it( 'should connect a custom validity error to the input via aria-describedby', async () => {
+			const user = userEvent.setup();
+
+			function TestComponent() {
+				const [ customValidity, setCustomValidity ] =
+					useState<
+						React.ComponentProps<
+							typeof ValidatedInputControl
+						>[ 'customValidity' ]
+					>( undefined );
+				const inputRef = useRef< HTMLInputElement >( null );
+
+				return (
+					<>
+						<ValidatedInputControl
+							ref={ inputRef }
+							label="URL"
+							customValidity={ customValidity }
+						/>
+						<button
+							type="button"
+							onClick={ () => {
+								setCustomValidity( {
+									type: 'invalid',
+									message: 'Please enter a valid URL.',
+								} );
+								requestAnimationFrame(
+									() => inputRef.current?.reportValidity()
+								);
+							} }
+						>
+							Validate
+						</button>
+					</>
+				);
+			}
+
+			render( <TestComponent /> );
+
+			const input = screen.getByRole( 'textbox', { name: 'URL' } );
+			expect( input ).not.toHaveAttribute( 'aria-describedby' );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Validate' } )
+			);
+
+			await waitFor( () => {
+				expect( input ).toHaveAccessibleDescription(
+					expect.stringContaining( 'Please enter a valid URL.' )
+				);
+			} );
+		} );
+
+		it( 'should remove aria-describedby when the error is resolved', async () => {
+			const user = userEvent.setup();
+
+			function TestComponent() {
+				const [ customValidity, setCustomValidity ] =
+					useState<
+						React.ComponentProps<
+							typeof ValidatedInputControl
+						>[ 'customValidity' ]
+					>( undefined );
+				const inputRef = useRef< HTMLInputElement >( null );
+
+				return (
+					<>
+						<ValidatedInputControl
+							ref={ inputRef }
+							label="URL"
+							customValidity={ customValidity }
+						/>
+						<button
+							type="button"
+							onClick={ () => {
+								setCustomValidity( {
+									type: 'invalid',
+									message: 'Please enter a valid URL.',
+								} );
+								requestAnimationFrame(
+									() => inputRef.current?.reportValidity()
+								);
+							} }
+						>
+							Validate
+						</button>
+						<button
+							type="button"
+							onClick={ () => setCustomValidity( undefined ) }
+						>
+							Clear
+						</button>
+					</>
+				);
+			}
+
+			render( <TestComponent /> );
+
+			const input = screen.getByRole( 'textbox', { name: 'URL' } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Validate' } )
+			);
+
+			await waitFor( () => {
+				expect( input ).toHaveAccessibleDescription(
+					expect.stringContaining( 'Please enter a valid URL.' )
+				);
+			} );
+
+			await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
+
+			await waitFor( () => {
+				expect( input ).not.toHaveAttribute( 'aria-describedby' );
+			} );
 		} );
 	} );
 

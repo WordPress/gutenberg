@@ -54,6 +54,7 @@ export interface BasePost extends CommonPost {
 	ping_status?: 'open' | 'closed';
 	link?: string;
 	slug?: string;
+	sticky?: boolean;
 	permalink_template?: string;
 	date?: string;
 	modified?: string;
@@ -127,6 +128,7 @@ export interface PostType {
 	supports?: {
 		'page-attributes'?: boolean;
 		title?: boolean;
+		excerpt?: boolean;
 		revisions?: boolean;
 		author?: string;
 		thumbnail?: string;

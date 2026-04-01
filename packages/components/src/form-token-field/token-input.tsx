@@ -28,6 +28,7 @@ export function UnForwardedTokenInput(
 		onChange,
 		onFocus,
 		onBlur,
+		'aria-describedby': ariaDescribedBy,
 		...restProps
 	} = props;
 
@@ -86,7 +87,12 @@ export function UnForwardedTokenInput(
 					? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }`
 					: undefined
 			}
-			aria-describedby={ `components-form-token-suggestions-howto-${ instanceId }` }
+			aria-describedby={ [
+				`components-form-token-suggestions-howto-${ instanceId }`,
+				ariaDescribedBy,
+			]
+				.filter( Boolean )
+				.join( ' ' ) }
 		/>
 	);
 }
