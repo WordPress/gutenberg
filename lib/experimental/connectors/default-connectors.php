@@ -31,7 +31,7 @@ function _gutenberg_connectors_init(): void {
 			'description'    => __( 'Protect your site from spam.', 'gutenberg' ),
 			'type'           => 'spam_filtering',
 			'plugin'         => array(
-				'slug' => 'akismet',
+				'file' => 'akismet/akismet.php',
 			),
 			'authentication' => array(
 				'method'          => 'api_key',
@@ -92,7 +92,7 @@ function _gutenberg_register_default_ai_providers( WP_Connector_Registry $regist
 			'description'    => __( 'Text generation with Claude.', 'gutenberg' ),
 			'type'           => 'ai_provider',
 			'plugin'         => array(
-				'slug' => 'ai-provider-for-anthropic',
+				'file' => 'ai-provider-for-anthropic/plugin.php',
 			),
 			'authentication' => array(
 				'method'          => 'api_key',
@@ -104,7 +104,7 @@ function _gutenberg_register_default_ai_providers( WP_Connector_Registry $regist
 			'description'    => __( 'Text and image generation with Gemini and Imagen.', 'gutenberg' ),
 			'type'           => 'ai_provider',
 			'plugin'         => array(
-				'slug' => 'ai-provider-for-google',
+				'file' => 'ai-provider-for-google/plugin.php',
 			),
 			'authentication' => array(
 				'method'          => 'api_key',
@@ -116,7 +116,7 @@ function _gutenberg_register_default_ai_providers( WP_Connector_Registry $regist
 			'description'    => __( 'Text and image generation with GPT and Dall-E.', 'gutenberg' ),
 			'type'           => 'ai_provider',
 			'plugin'         => array(
-				'slug' => 'ai-provider-for-openai',
+				'file' => 'ai-provider-for-openai/plugin.php',
 			),
 			'authentication' => array(
 				'method'          => 'api_key',
@@ -373,10 +373,6 @@ add_filter( 'rest_post_dispatch', '_gutenberg_connectors_rest_settings_dispatch'
  * @access private
  */
 function _gutenberg_register_default_connector_settings(): void {
-	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
-		return;
-	}
-
 	$ai_registry       = \WordPress\AiClient\AiClient::defaultRegistry();
 	$existing_settings = get_registered_settings();
 
@@ -489,14 +485,8 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 
 	$registry = \WordPress\AiClient\AiClient::defaultRegistry();
 
-	// Build a slug-to-file map for plugin installation status.
-	if ( ! function_exists( 'get_plugins' ) ) {
+	if ( ! function_exists( 'is_plugin_active' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
-	}
-	$plugin_files_by_slug = array();
-	foreach ( array_keys( get_plugins() ) as $plugin_file ) {
-		$slug                          = str_contains( $plugin_file, '/' ) ? dirname( $plugin_file ) : str_replace( '.php', '', $plugin_file );
-		$plugin_files_by_slug[ $slug ] = $plugin_file;
 	}
 
 	$connectors = array();
@@ -533,18 +523,14 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 			'authentication' => $auth_out,
 		);
 
-		if ( ! empty( $connector_data['plugin']['slug'] ) ) {
-			$plugin_slug = $connector_data['plugin']['slug'];
-			$plugin_file = $plugin_files_by_slug[ $plugin_slug ] ?? null;
-
-			$is_installed = null !== $plugin_file;
-			$is_activated = $is_installed && is_plugin_active( $plugin_file );
+		if ( ! empty( $connector_data['plugin']['file'] ) ) {
+			$file         = $connector_data['plugin']['file'];
+			$is_installed = file_exists( WP_PLUGIN_DIR . '/' . $file );
+			$is_activated = $is_installed && is_plugin_active( $file );
 
 			$connector_out['plugin'] = array(
-				'slug'        => $plugin_slug,
-				'pluginFile'  => $is_installed
-					? ( str_ends_with( $plugin_file, '.php' ) ? substr( $plugin_file, 0, -4 ) : $plugin_file )
-					: null,
+				'file'        => $file,
+				'isInstalled' => $is_installed,
 				'isActivated' => $is_activated,
 			);
 		}
