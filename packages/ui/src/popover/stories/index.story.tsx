@@ -365,8 +365,9 @@ export const OverlayPlacement: Story = {
 						<Popover.Description>
 							This popover is centered over its trigger using a
 							negative sideOffset.
-						</Popover.Description>
-						<Popover.Description>
+							<br />
+							The trigger is currently hidden under the popover.
+							<br />
 							Try resizing the browser — collision avoidance is
 							disabled so the popover stays overlaid.
 						</Popover.Description>

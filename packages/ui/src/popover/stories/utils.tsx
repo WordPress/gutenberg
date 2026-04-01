@@ -1,6 +1,7 @@
 import {
 	createPortal,
 	forwardRef,
+	useCallback,
 	useLayoutEffect,
 	useRef,
 	useState,
@@ -38,13 +39,13 @@ export function useMeasure< TRef extends HTMLElement >() {
 		};
 	}, [ element ] );
 
-	const elementRef: RefCallback< TRef > = ( node ) => {
+	const elementRef: RefCallback< TRef > = useCallback( ( node ) => {
 		if ( node ) {
 			const bcr = node.getBoundingClientRect();
 			setElementSize( { width: bcr.width, height: bcr.height } );
 		}
 		setElement( node );
-	};
+	}, [] );
 
 	return [ elementRef, elementSize ] as const;
 }
