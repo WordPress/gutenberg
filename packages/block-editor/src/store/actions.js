@@ -1768,8 +1768,8 @@ export const insertBeforeBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
-		if ( isLocked ) {
+		const templateLock = select.getTemplateLock( rootClientId );
+		if ( templateLock && templateLock !== 'contentOnly' ) {
 			return;
 		}
 
@@ -1811,8 +1811,8 @@ export const insertAfterBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
-		if ( isLocked ) {
+		const templateLock = select.getTemplateLock( rootClientId );
+		if ( templateLock && templateLock !== 'contentOnly' ) {
 			return;
 		}
 
