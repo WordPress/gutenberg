@@ -430,6 +430,12 @@ const PRESENCE_API_PATH = '/wp-sync/v1/presence';
  * server-side, so a page refresh doesn't leave ghost entries that cause
  * false collaborator detection.
  *
+ * This implementation is intentionally minimal: it only tells lazy sync
+ * whether another collaborator is present in the room. The sync manager
+ * depends on the `checkPresence` contract rather than this endpoint
+ * specifically, so Gutenberg can later point that contract at a broader
+ * shared presence API if one lands.
+ *
  * @param options                     Presence check options.
  * @param options.room                The sync room identifier.
  * @param options.clientId            The local client ID.
