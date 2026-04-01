@@ -42,7 +42,9 @@
 	font-weight: var(--_gcd-input-font-weight, inherit);
 	margin: var(--_gcd-input-margin, 0);
 
-	&:is([type="text"], [type="password"], [type="color"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"], :not([type])) {
+	/* Also targets textarea elements, which the `Input` primitive can render as. We combine these textarea defenses
+	   into the input defenses to minimize the number of tokens, but they should be split if it ever becomes necessary. */
+	&:is(textarea, [type="text"], [type="password"], [type="color"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"]) {
 		box-shadow: var(--_gcd-input-box-shadow, 0 0 0 transparent);
 		border-radius: var(--_gcd-input-border-radius, 0);
 		border: var(--_gcd-input-border, none);
@@ -67,7 +69,7 @@
 		}
 	}
 
-	&:is([type="text"], [type="password"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"], :not([type])) {
+	&:is(textarea, [type="text"], [type="password"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"]) {
 		padding: var(--_gcd-input-padding, 0);
 		line-height: var(--_gcd-input-line-height, inherit);
 		min-height: var(--_gcd-input-min-height, auto);
