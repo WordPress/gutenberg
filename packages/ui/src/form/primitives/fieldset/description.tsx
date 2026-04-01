@@ -1,10 +1,10 @@
 import clsx from 'clsx';
 import { mergeProps, useRender } from '@base-ui/react';
 import { forwardRef, useEffect, useId } from '@wordpress/element';
+import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import fieldStyles from '../../../utils/css/field.module.css';
 import { useFieldsetContext } from './context';
 import type { FieldsetDescriptionProps } from './types';
-import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 
 export const FieldsetDescription = forwardRef<
 	HTMLParagraphElement,
