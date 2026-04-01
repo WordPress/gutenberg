@@ -43,7 +43,7 @@ async function getFFmpegCore(): Promise< FFmpegCore > {
 		return await ffmpegPromise;
 	}
 
-	ffmpegPromise = createFFmpegCore( {
+	const promise = createFFmpegCore( {
 		locateFile: ( fileName: string ) => {
 			// WASM file is inlined as a base64 data URL at build time,
 			// eliminating the need for separate file downloads.
@@ -55,9 +55,11 @@ async function getFFmpegCore(): Promise< FFmpegCore > {
 		// Suppress Emscripten console output.
 		print: () => {},
 		printErr: () => {},
-	} );
+	} ) as Promise< FFmpegCore >;
 
-	return await ffmpegPromise;
+	ffmpegPromise = promise;
+
+	return await promise;
 }
 
 /**
@@ -213,7 +215,7 @@ export async function convertGifToVideo(
 		const result = output.buffer.slice(
 			output.byteOffset,
 			output.byteOffset + output.byteLength
-		);
+		) as ArrayBuffer;
 
 		// Clean up temporary files.
 		try {
