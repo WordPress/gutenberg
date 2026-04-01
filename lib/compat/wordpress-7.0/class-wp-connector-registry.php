@@ -59,8 +59,8 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 * For connectors with `api_key` authentication, a `setting_name` can be provided
 		 * explicitly. If omitted, one is automatically generated using the pattern
 		 * `connectors_{$type}_{$id}_api_key`, with hyphens in the type and ID normalized
-		 * to underscores (e.g., connector type `ai_provider` with ID `my_plugin` produces
-		 * `connectors_ai_provider_my_plugin_api_key`). This setting name is used for the
+		 * to underscores (e.g., connector type `spam_filtering` with ID `my_plugin` produces
+		 * `connectors_spam_filtering_my_plugin_api_key`). This setting name is used for the
 		 * Settings API registration and REST API exposure.
 		 *
 		 * Registering a connector with an ID that is already registered will trigger a
