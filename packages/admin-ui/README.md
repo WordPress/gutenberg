@@ -14,7 +14,7 @@ npm install @wordpress/admin-ui --save
 
 ## Set up
 
-This package requires CSS from multiple dependency packages.
+This package requires CSS from this package and from multiple dependency packages.
 
 ### Within WordPress
 
@@ -24,17 +24,17 @@ To ensure proper load order, add the `wp-components` and `wp-admin-ui` styleshee
 
 Install and load these stylesheets in your application:
 
-```
-npm install @wordpress/theme
-npm install @wordpress/components
+```bash
+npm install @wordpress/admin-ui @wordpress/theme @wordpress/components
 ```
 
 ```js
 import '@wordpress/theme/design-tokens.css';
 import '@wordpress/components/build-style/style.css';
+import '@wordpress/admin-ui/build-style/style.css';
 ```
 
-The RTL version of the `@wordpress/components` stylesheet is available at `@wordpress/components/build-style/style-rtl.css`.
+RTL versions of the stylesheets are available in the same paths, but with `-rtl` appended to the filename (`style-rtl.css`). The design tokens stylesheet is universal and does not have a separate RTL version.
 
 ## API
 
