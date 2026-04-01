@@ -21,7 +21,6 @@ import {
 	OpenAILogo,
 	ClaudeLogo,
 	GeminiLogo,
-	AkismetLogo,
 	DefaultConnectorLogo,
 } from './logos';
 
@@ -58,7 +57,6 @@ const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
 	google: GeminiLogo,
 	openai: OpenAILogo,
 	anthropic: ClaudeLogo,
-	akismet: AkismetLogo,
 };
 
 function getConnectorLogo(

@@ -23,25 +23,6 @@ function _gutenberg_connectors_init(): void {
 		_gutenberg_register_default_ai_providers( $registry );
 	}
 
-	// Non-AI default connectors.
-	$registry->register(
-		'akismet',
-		array(
-			'name'           => __( 'Akismet Anti-Spam', 'gutenberg' ),
-			'description'    => __( 'Protect your site from spam.', 'gutenberg' ),
-			'type'           => 'spam_filtering',
-			'plugin'         => array(
-				'file' => 'akismet/akismet.php',
-			),
-			'authentication' => array(
-				'method'          => 'api_key',
-				'credentials_url' => 'https://akismet.com/get/',
-				'setting_name'    => 'wordpress_api_key',
-				'constant_name'   => 'WPCOM_API_KEY',
-			),
-		)
-	);
-
 	/**
 	 * Fires when the connector registry is ready for plugins to register connectors.
 	 *
