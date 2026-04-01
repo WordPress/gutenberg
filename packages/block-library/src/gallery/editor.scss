@@ -125,28 +125,10 @@
 // Upload progress overlay for batch uploads
 .wp-block-gallery__upload-overlay {
 	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	background: $white;
-	padding: $grid-unit-30;
-	border-radius: $radius-medium;
-	text-align: center;
-	min-width: 280px;
-	max-width: calc(100% - #{$grid-unit-20 * 2});
-	box-shadow: $elevation-small;
+	bottom: $grid-unit-20;
+	left: $grid-unit-20;
+	right: $grid-unit-20;
 	z-index: 10;
-
-	.components-progress-bar {
-		margin-bottom: $grid-unit-10;
-	}
-}
-
-.wp-block-gallery__upload-overlay-label {
-	display: block;
-	font-size: $default-font-size;
-	color: $gray-700;
-	margin-bottom: $grid-unit-15;
 }
 
 .wp-block-update-gallery-modal {

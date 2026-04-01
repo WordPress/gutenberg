@@ -171,27 +171,9 @@ figure.wp-block-image:not(.wp-block) {
 // Upload progress overlay
 .wp-block-image__upload-overlay {
 	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	background: $white;
-	padding: $grid-unit-20;
-	border-radius: $radius-medium;
-	text-align: center;
-	min-width: min(200px, calc(100% - #{$grid-unit-20 * 2}));
-	max-width: calc(100% - #{$grid-unit-20 * 2});
-	box-shadow: $elevation-small;
+	bottom: $grid-unit-20;
+	left: $grid-unit-20;
+	right: $grid-unit-20;
 	z-index: 1;
-
-	.components-progress-bar {
-		margin-bottom: $grid-unit-10;
-	}
-}
-
-.wp-block-image__upload-overlay-label {
-	display: block;
-	font-size: $default-font-size;
-	color: $gray-700;
-	margin-bottom: $grid-unit-15;
 }
 
