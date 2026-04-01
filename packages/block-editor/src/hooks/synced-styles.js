@@ -12,14 +12,14 @@ import { useDispatch, useRegistry } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
-import { SiblingStyleSyncControl } from '../components/sibling-style-sync-control';
-import { SiblingStyleSyncParentControl } from '../components/sibling-style-sync-control/parent-control';
-import { partitionAttributesByGroups } from '../store/sibling-style-sync-utils';
+import { SyncedStylesControl } from '../components/synced-styles-control';
+import { SyncedStylesParentControl } from '../components/synced-styles-control/parent-control';
+import { partitionAttributesByGroups } from '../store/synced-styles-utils';
 
 /**
  * This HOC performs the following actions:
  *
- * - Intercepts `setAttributes` for blocks with `__experimentalSiblingStyleSync`
+ * - Intercepts `setAttributes` for blocks with `__experimentalSyncedStyles`
  *    support and routes updates through `__experimentalUpdateSyncedBlockAttributes`,
  *    which propagates style changes to all linked siblings within the sync scope.
  *
@@ -31,13 +31,13 @@ import { partitionAttributesByGroups } from '../store/sibling-style-sync-utils';
  *
  * Blocks without the support are passed through unchanged.
  */
-const withSiblingStyleSync = createHigherOrderComponent(
+const withSyncedStyles = createHigherOrderComponent(
 	( BlockEdit ) =>
-		function SiblingStyleSyncWrapper( props ) {
+		function SyncedStylesWrapper( props ) {
 			const { clientId, name, setAttributes } = props;
 
 			const syncSupport =
-				getBlockType( name )?.supports?.__experimentalSiblingStyleSync;
+				getBlockType( name )?.supports?.__experimentalSyncedStyles;
 
 			const registry = useRegistry();
 
@@ -89,7 +89,7 @@ const withSiblingStyleSync = createHigherOrderComponent(
 						registry.select( blockEditorStore )
 					);
 					const scopeId =
-						privateSelect.__experimentalGetSiblingStyleSyncScopeClientId(
+						privateSelect.__experimentalGetSyncedStylesScopeClientId(
 							clientId,
 							name
 						);
@@ -116,7 +116,7 @@ const withSiblingStyleSync = createHigherOrderComponent(
 					registry.select( blockEditorStore )
 				);
 				const scopeClientId =
-					privateSelect.__experimentalGetSiblingStyleSyncScopeClientId(
+					privateSelect.__experimentalGetSyncedStylesScopeClientId(
 						clientId,
 						name
 					);
@@ -130,7 +130,7 @@ const withSiblingStyleSync = createHigherOrderComponent(
 
 				// Find the first linked sibling that has styles to copy from.
 				const siblings =
-					privateSelect.__experimentalGetSiblingStyleSyncBlocks(
+					privateSelect.__experimentalGetSyncedStylesBlocks(
 						clientId,
 						name
 					);
@@ -171,7 +171,7 @@ const withSiblingStyleSync = createHigherOrderComponent(
 						setAttributes={ wrappedSetAttributes }
 					/>
 					{ syncSupport && (
-						<SiblingStyleSyncControl
+						<SyncedStylesControl
 							clientId={ clientId }
 							name={ name }
 						/>
@@ -179,13 +179,13 @@ const withSiblingStyleSync = createHigherOrderComponent(
 				</>
 			);
 		},
-	'withSiblingStyleSync'
+	'withSyncedStyles'
 );
 
 addFilter(
 	'editor.BlockEdit',
-	'core/sibling-style-sync/wrap-set-attributes',
-	withSiblingStyleSync,
+	'core/synced-styles/wrap-set-attributes',
+	withSyncedStyles,
 	// Priority 20 (higher than createBlockEditFilter's default of 10) ensures
 	// this HOC is outermost. Inspector panel HOCs (color, typography, border,
 	// spacing) all run at priority 10 and pass setAttributes via {...props}.
@@ -193,20 +193,20 @@ addFilter(
 );
 
 /**
- * Higher-order component that injects `SiblingStyleSyncParentControl` into the
+ * Higher-order component that injects `SyncedStylesParentControl` into the
  * inspector of blocks that act as a sync scope (i.e. blocks that are declared
  * as the `scope` in at least one child block type's sync support).
  */
-const withSiblingStyleSyncParent = createHigherOrderComponent(
+const withSyncedStylesParent = createHigherOrderComponent(
 	( BlockEdit ) =>
-		function SiblingStyleSyncParentWrapper( props ) {
+		function SyncedStylesParentWrapper( props ) {
 			const { name } = props;
 			const isScope = useMemo(
 				() =>
 					getBlockTypes().some(
 						( type ) =>
-							type.supports?.__experimentalSiblingStyleSync
-								?.scope === name
+							type.supports?.__experimentalSyncedStyles?.scope ===
+							name
 					),
 				[ name ]
 			);
@@ -214,24 +214,22 @@ const withSiblingStyleSyncParent = createHigherOrderComponent(
 			return (
 				<>
 					<BlockEdit { ...props } />
-					{ isScope && (
-						<SiblingStyleSyncParentControl { ...props } />
-					) }
+					{ isScope && <SyncedStylesParentControl { ...props } /> }
 				</>
 			);
 		},
-	'withSiblingStyleSyncParent'
+	'withSyncedStylesParent'
 );
 
 addFilter(
 	'editor.BlockEdit',
-	'core/sibling-style-sync/parent-control',
-	withSiblingStyleSyncParent
+	'core/synced-styles/parent-control',
+	withSyncedStylesParent
 );
 
 /**
  * Automatically injects the `styleSyncUnlinked` attribute onto any block type
- * that declares `__experimentalSiblingStyleSync` support. This persists the
+ * that declares `__experimentalSyncedStyles` support. This persists the
  * per-block unlink state across page reloads without requiring each synced
  * block to manually add the attribute to its block.json.
  *
@@ -239,7 +237,7 @@ addFilter(
  * @return {Object} Possibly-modified settings.
  */
 function addStyleSyncUnlinkedAttribute( settings ) {
-	if ( ! settings.supports?.__experimentalSiblingStyleSync ) {
+	if ( ! settings.supports?.__experimentalSyncedStyles ) {
 		return settings;
 	}
 
@@ -257,6 +255,6 @@ function addStyleSyncUnlinkedAttribute( settings ) {
 
 addFilter(
 	'blocks.registerBlockType',
-	'core/sibling-style-sync/add-style-sync-unlinked-attribute',
+	'core/synced-styles/add-style-sync-unlinked-attribute',
 	addStyleSyncUnlinkedAttribute
 );

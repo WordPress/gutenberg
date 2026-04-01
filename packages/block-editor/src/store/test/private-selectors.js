@@ -24,7 +24,7 @@ import {
 	getViewportModalClientIds,
 	isSectionBlock,
 	getParentSectionBlock,
-	__experimentalGetSiblingStyleSyncScopeClientId,
+	__experimentalGetSyncedStylesScopeClientId,
 	__experimentalIsBlockStyleSyncUnlinked,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
@@ -1657,7 +1657,7 @@ describe( 'private selectors', () => {
 	} );
 
 	describe( 'sibling style sync selectors', () => {
-		const makeState = ( blocks, siblingStyleSync = {} ) => ( {
+		const makeState = ( blocks, syncedStyles = {} ) => ( {
 			blocks: {
 				byClientId: new Map(
 					blocks.map( ( b ) => [ b.clientId, { name: b.name } ] )
@@ -1675,7 +1675,7 @@ describe( 'private selectors', () => {
 					] )
 				),
 			},
-			siblingStyleSync,
+			syncedStyles,
 		} );
 
 		beforeAll( () => {
@@ -1703,7 +1703,7 @@ describe( 'private selectors', () => {
 				save: () => null,
 				attributes: {},
 				supports: {
-					__experimentalSiblingStyleSync: {
+					__experimentalSyncedStyles: {
 						scope: 'core/accordion',
 						groups: [ 'color', 'typography' ],
 					},
@@ -1717,7 +1717,7 @@ describe( 'private selectors', () => {
 			unregisterBlockType( 'core/accordion-heading' );
 		} );
 
-		describe( '__experimentalGetSiblingStyleSyncScopeClientId', () => {
+		describe( '__experimentalGetSyncedStylesScopeClientId', () => {
 			it( 'returns the accordion clientId for a nested accordion-heading', () => {
 				const state = makeState( [
 					{ clientId: 'acc-1', name: 'core/accordion', parent: '' },
@@ -1734,7 +1734,7 @@ describe( 'private selectors', () => {
 				] );
 
 				expect(
-					__experimentalGetSiblingStyleSyncScopeClientId(
+					__experimentalGetSyncedStylesScopeClientId(
 						state,
 						'head-1',
 						'core/accordion-heading'
@@ -1753,7 +1753,7 @@ describe( 'private selectors', () => {
 				] );
 
 				expect(
-					__experimentalGetSiblingStyleSyncScopeClientId(
+					__experimentalGetSyncedStylesScopeClientId(
 						state,
 						'item-1',
 						'core/accordion-item'
@@ -1771,7 +1771,7 @@ describe( 'private selectors', () => {
 				] );
 
 				expect(
-					__experimentalGetSiblingStyleSyncScopeClientId(
+					__experimentalGetSyncedStylesScopeClientId(
 						state,
 						'head-1',
 						'core/accordion-heading'

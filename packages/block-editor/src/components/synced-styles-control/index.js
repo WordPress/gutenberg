@@ -26,12 +26,12 @@ import InspectorControls from '../inspector-controls';
  * @param {string} props.clientId Client ID of the current block.
  * @param {string} props.name     Block name (e.g. 'core/accordion-heading').
  */
-export function SiblingStyleSyncControl( { clientId, name } ) {
+export function SyncedStylesControl( { clientId, name } ) {
 	const { siblings, isUnlinked, scopeClientId, isSyncEnabled } = useSelect(
 		( select ) => {
 			const privateStore = unlock( select( blockEditorStore ) );
 			const scope =
-				privateStore.__experimentalGetSiblingStyleSyncScopeClientId(
+				privateStore.__experimentalGetSyncedStylesScopeClientId(
 					clientId,
 					name
 				);
@@ -42,7 +42,7 @@ export function SiblingStyleSyncControl( { clientId, name } ) {
 					: {};
 
 			return {
-				siblings: privateStore.__experimentalGetSiblingStyleSyncBlocks(
+				siblings: privateStore.__experimentalGetSyncedStylesBlocks(
 					clientId,
 					name
 				),

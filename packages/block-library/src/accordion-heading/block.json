@@ -59,7 +59,7 @@
 		"shadow": true,
 		"visibility": false,
 		"lock": false,
-		"__experimentalSiblingStyleSync": {
+		"__experimentalSyncedStyles": {
 			"scope": "core/accordion"
 		}
 	},

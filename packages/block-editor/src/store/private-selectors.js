@@ -24,7 +24,7 @@ import {
 	getBlockRootClientId,
 	getBlockAttributes,
 } from './selectors';
-import { findDescendantsOfType } from './sibling-style-sync-utils';
+import { findDescendantsOfType } from './synced-styles-utils';
 import {
 	checkAllowListRecursive,
 	getAllPatternsDependants,
@@ -1060,7 +1060,7 @@ export function getRequestedInspectorTab( state ) {
  * Returns the clientId of the nearest ancestor block that acts as the sibling
  * style sync scope for a given block. The scope is the ancestor block whose
  * name matches the `scope` value declared in the block type's
- * `__experimentalSiblingStyleSync` support. If no `scope` is declared, the
+ * `__experimentalSyncedStyles` support. If no `scope` is declared, the
  * direct parent is returned.
  *
  * @param {Object} state     Editor state.
@@ -1069,13 +1069,13 @@ export function getRequestedInspectorTab( state ) {
  *
  * @return {string|null} ClientId of the scope ancestor, or null if not found.
  */
-export function __experimentalGetSiblingStyleSyncScopeClientId(
+export function __experimentalGetSyncedStylesScopeClientId(
 	state,
 	clientId,
 	blockName
 ) {
 	const syncSupport =
-		getBlockType( blockName )?.supports?.__experimentalSiblingStyleSync;
+		getBlockType( blockName )?.supports?.__experimentalSyncedStyles;
 	if ( ! syncSupport ) {
 		return null;
 	}
@@ -1107,9 +1107,9 @@ export function __experimentalGetSiblingStyleSyncScopeClientId(
  *
  * @return {Object[]} Sibling block objects.
  */
-export const __experimentalGetSiblingStyleSyncBlocks = createSelector(
+export const __experimentalGetSyncedStylesBlocks = createSelector(
 	( state, clientId, blockName ) => {
-		const scopeId = __experimentalGetSiblingStyleSyncScopeClientId(
+		const scopeId = __experimentalGetSyncedStylesScopeClientId(
 			state,
 			clientId,
 			blockName
@@ -1140,7 +1140,7 @@ export function __experimentalIsBlockStyleSyncUnlinked(
 	clientId,
 	blockName
 ) {
-	const scopeId = __experimentalGetSiblingStyleSyncScopeClientId(
+	const scopeId = __experimentalGetSyncedStylesScopeClientId(
 		state,
 		clientId,
 		blockName
@@ -1149,5 +1149,5 @@ export function __experimentalIsBlockStyleSyncUnlinked(
 		return false;
 	}
 	const key = `${ scopeId }:${ blockName }`;
-	return !! state.siblingStyleSync[ key ]?.unlinkedIds?.[ clientId ];
+	return !! state.syncedStyles[ key ]?.unlinkedIds?.[ clientId ];
 }

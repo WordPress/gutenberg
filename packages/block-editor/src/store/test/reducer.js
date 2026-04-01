@@ -43,7 +43,7 @@ import {
 	editedContentOnlySection,
 	withDerivedBlockEditingModes,
 	viewportModalClientIds,
-	siblingStyleSync,
+	syncedStyles,
 } from '../reducer';
 
 import { unlock } from '../../lock-unlock';
@@ -5367,10 +5367,10 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'siblingStyleSync', () => {
+	describe( 'syncedStyles', () => {
 		describe( 'UNLINK_SIBLING_STYLE_SYNC', () => {
 			it( 'should add a clientId to unlinkedIds', () => {
-				const state = siblingStyleSync(
+				const state = syncedStyles(
 					{},
 					{
 						type: 'UNLINK_SIBLING_STYLE_SYNC',
@@ -5386,7 +5386,7 @@ describe( 'state', () => {
 			} );
 
 			it( 'should accumulate multiple unlinked IDs', () => {
-				const after1 = siblingStyleSync(
+				const after1 = syncedStyles(
 					{},
 					{
 						type: 'UNLINK_SIBLING_STYLE_SYNC',
@@ -5395,7 +5395,7 @@ describe( 'state', () => {
 						scopeClientId: 'scope-1',
 					}
 				);
-				const after2 = siblingStyleSync( after1, {
+				const after2 = syncedStyles( after1, {
 					type: 'UNLINK_SIBLING_STYLE_SYNC',
 					clientId: 'block-2',
 					blockName: 'core/accordion-heading',
@@ -5413,7 +5413,7 @@ describe( 'state', () => {
 
 		describe( 'RELINK_SIBLING_STYLE_SYNC', () => {
 			it( 'should remove a clientId from unlinkedIds', () => {
-				const unlinked = siblingStyleSync(
+				const unlinked = syncedStyles(
 					{},
 					{
 						type: 'UNLINK_SIBLING_STYLE_SYNC',
@@ -5422,7 +5422,7 @@ describe( 'state', () => {
 						scopeClientId: 'scope-1',
 					}
 				);
-				const relinked = siblingStyleSync( unlinked, {
+				const relinked = syncedStyles( unlinked, {
 					type: 'RELINK_SIBLING_STYLE_SYNC',
 					clientId: 'block-1',
 					blockName: 'core/accordion-heading',
@@ -5436,7 +5436,7 @@ describe( 'state', () => {
 
 			it( 'should return current state if key does not exist', () => {
 				const state = {};
-				const result = siblingStyleSync( state, {
+				const result = syncedStyles( state, {
 					type: 'RELINK_SIBLING_STYLE_SYNC',
 					clientId: 'block-1',
 					blockName: 'core/accordion-heading',
@@ -5454,7 +5454,7 @@ describe( 'state', () => {
 						unlinkedIds: { 'block-1': true },
 					},
 				};
-				const result = siblingStyleSync( state, {
+				const result = syncedStyles( state, {
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ 'scope-1' ],
 				} );
@@ -5468,7 +5468,7 @@ describe( 'state', () => {
 						unlinkedIds: { 'block-1': true, 'block-2': true },
 					},
 				};
-				const result = siblingStyleSync( state, {
+				const result = syncedStyles( state, {
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ 'block-1' ],
 				} );
@@ -5487,7 +5487,7 @@ describe( 'state', () => {
 					},
 				};
 				expect(
-					siblingStyleSync( state, { type: 'RESET_BLOCKS' } )
+					syncedStyles( state, { type: 'RESET_BLOCKS' } )
 				).toEqual( {} );
 			} );
 		} );

@@ -5,7 +5,7 @@ import {
 	partitionAttributesByGroups,
 	mergeStyleByGroups,
 	findDescendantsOfType,
-} from '../sibling-style-sync-utils';
+} from '../synced-styles-utils';
 
 describe( 'partitionAttributesByGroups', () => {
 	it( 'syncs known style top-level attributes and leaves content attributes unsynced', () => {

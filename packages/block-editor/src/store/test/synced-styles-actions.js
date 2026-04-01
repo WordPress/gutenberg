@@ -38,7 +38,7 @@ describe( 'sibling style sync actions', () => {
 			save: () => null,
 			attributes: {},
 			supports: {
-				__experimentalSiblingStyleSync: {
+				__experimentalSyncedStyles: {
 					scope: 'core/accordion',
 				},
 			},
@@ -57,13 +57,13 @@ describe( 'sibling style sync actions', () => {
 		} );
 
 		privateSelect = {
-			__experimentalGetSiblingStyleSyncScopeClientId: jest
+			__experimentalGetSyncedStylesScopeClientId: jest
 				.fn()
 				.mockReturnValue( 'acc-1' ),
 			__experimentalIsBlockStyleSyncUnlinked: jest
 				.fn()
 				.mockReturnValue( false ),
-			__experimentalGetSiblingStyleSyncBlocks: jest
+			__experimentalGetSyncedStylesBlocks: jest
 				.fn()
 				.mockReturnValue( [] ),
 		};
@@ -82,9 +82,10 @@ describe( 'sibling style sync actions', () => {
 
 	describe( '__experimentalUpdateSyncedBlockAttributes', () => {
 		it( 'propagates synced attributes to all linked siblings', () => {
-			privateSelect.__experimentalGetSiblingStyleSyncBlocks.mockReturnValue(
-				[ { clientId: 'head-2' }, { clientId: 'head-3' } ]
-			);
+			privateSelect.__experimentalGetSyncedStylesBlocks.mockReturnValue( [
+				{ clientId: 'head-2' },
+				{ clientId: 'head-3' },
+			] );
 
 			__experimentalUpdateSyncedBlockAttributes( 'head-1', {
 				textColor: 'vivid-red',
@@ -97,9 +98,9 @@ describe( 'sibling style sync actions', () => {
 		} );
 
 		it( 'does not propagate when the source block is unlinked', () => {
-			privateSelect.__experimentalGetSiblingStyleSyncBlocks.mockReturnValue(
-				[ { clientId: 'head-2' } ]
-			);
+			privateSelect.__experimentalGetSyncedStylesBlocks.mockReturnValue( [
+				{ clientId: 'head-2' },
+			] );
 			// Source block itself is unlinked.
 			privateSelect.__experimentalIsBlockStyleSyncUnlinked.mockImplementation(
 				( clientId ) => clientId === 'head-1'
@@ -117,9 +118,10 @@ describe( 'sibling style sync actions', () => {
 		} );
 
 		it( 'excludes unlinked siblings from propagation', () => {
-			privateSelect.__experimentalGetSiblingStyleSyncBlocks.mockReturnValue(
-				[ { clientId: 'head-2' }, { clientId: 'head-3' } ]
-			);
+			privateSelect.__experimentalGetSyncedStylesBlocks.mockReturnValue( [
+				{ clientId: 'head-2' },
+				{ clientId: 'head-3' },
+			] );
 			// head-3 is individually unlinked.
 			privateSelect.__experimentalIsBlockStyleSyncUnlinked.mockImplementation(
 				( clientId ) => clientId === 'head-3'
@@ -146,9 +148,9 @@ describe( 'sibling style sync actions', () => {
 				}
 				return {};
 			} );
-			privateSelect.__experimentalGetSiblingStyleSyncBlocks.mockReturnValue(
-				[ { clientId: 'head-2' } ]
-			);
+			privateSelect.__experimentalGetSyncedStylesBlocks.mockReturnValue( [
+				{ clientId: 'head-2' },
+			] );
 
 			__experimentalUpdateSyncedBlockAttributes( 'head-1', {
 				textColor: 'vivid-red',
@@ -174,9 +176,9 @@ describe( 'sibling style sync actions', () => {
 		} );
 
 		it( 'deep-merges the style attribute per sibling, preserving unsynced sub-keys', () => {
-			privateSelect.__experimentalGetSiblingStyleSyncBlocks.mockReturnValue(
-				[ { clientId: 'head-2' } ]
-			);
+			privateSelect.__experimentalGetSyncedStylesBlocks.mockReturnValue( [
+				{ clientId: 'head-2' },
+			] );
 			select.getBlockAttributes.mockImplementation( ( clientId ) => {
 				if ( clientId === 'head-2' ) {
 					// head-2 has existing spacing that should be preserved.
@@ -204,9 +206,9 @@ describe( 'sibling style sync actions', () => {
 
 	describe( '__experimentalRelinkBlockStyleSync', () => {
 		it( 'immediately copies canonical styles from the first linked sibling', () => {
-			privateSelect.__experimentalGetSiblingStyleSyncBlocks.mockReturnValue(
-				[ { clientId: 'head-2' } ]
-			);
+			privateSelect.__experimentalGetSyncedStylesBlocks.mockReturnValue( [
+				{ clientId: 'head-2' },
+			] );
 			select.getBlockAttributes.mockImplementation( ( clientId ) => {
 				if ( clientId === 'head-2' ) {
 					return { textColor: 'vivid-red' };

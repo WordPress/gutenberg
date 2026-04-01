@@ -14,7 +14,7 @@ import InspectorControls from '../inspector-controls';
 /**
  * Renders a "Style syncing" panel in a scope block's inspector (e.g. Accordion,
  * Tabs). Contains one ToggleControl per child block type that declares this
- * block as its `__experimentalSiblingStyleSync` scope.
+ * block as its `__experimentalSyncedStyles` scope.
  *
  * When a toggle is switched off, the sync propagation in
  * `__experimentalUpdateSyncedBlockAttributes` is bypassed for that child type
@@ -25,7 +25,7 @@ import InspectorControls from '../inspector-controls';
  * @param {Object}   props.attributes    Block attributes (reads syncDescendantStyles).
  * @param {Function} props.setAttributes Block setAttributes.
  */
-export function SiblingStyleSyncParentControl( {
+export function SyncedStylesParentControl( {
 	name,
 	attributes,
 	setAttributes,
@@ -34,8 +34,7 @@ export function SiblingStyleSyncParentControl( {
 		() =>
 			getBlockTypes().filter(
 				( type ) =>
-					type.supports?.__experimentalSiblingStyleSync?.scope ===
-					name
+					type.supports?.__experimentalSyncedStyles?.scope === name
 			),
 		[ name ]
 	);

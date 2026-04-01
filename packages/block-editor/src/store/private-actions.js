@@ -15,7 +15,7 @@ import { STORE_NAME } from './constants';
 import {
 	partitionAttributesByGroups,
 	mergeStyleByGroups,
-} from './sibling-style-sync-utils';
+} from './synced-styles-utils';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -544,7 +544,7 @@ export function clearRequestedInspectorTab() {
 /**
  * Updates block attributes with sibling style sync propagation.
  *
- * If the block type declares `__experimentalSiblingStyleSync` support, the
+ * If the block type declares `__experimentalSyncedStyles` support, the
  * attributes that belong to the declared sync groups are propagated to all
  * linked siblings within the sync scope. Attributes outside the sync groups
  * are only applied to the current block.
@@ -559,7 +559,7 @@ export const __experimentalUpdateSyncedBlockAttributes =
 	( { select, dispatch, registry } ) => {
 		const blockName = select.getBlockName( clientId );
 		const syncSupport =
-			getBlockType( blockName )?.supports?.__experimentalSiblingStyleSync;
+			getBlockType( blockName )?.supports?.__experimentalSyncedStyles;
 
 		if ( ! syncSupport ) {
 			dispatch.updateBlockAttributes( clientId, attributes );
@@ -587,7 +587,7 @@ export const __experimentalUpdateSyncedBlockAttributes =
 
 		// Check if the parent scope has sync disabled for this block type.
 		const scopeClientId =
-			privateSelect.__experimentalGetSiblingStyleSyncScopeClientId(
+			privateSelect.__experimentalGetSyncedStylesScopeClientId(
 				clientId,
 				blockName
 			);
@@ -599,7 +599,7 @@ export const __experimentalUpdateSyncedBlockAttributes =
 			return;
 		}
 
-		const siblings = privateSelect.__experimentalGetSiblingStyleSyncBlocks(
+		const siblings = privateSelect.__experimentalGetSyncedStylesBlocks(
 			clientId,
 			blockName
 		);
@@ -687,16 +687,15 @@ export const __experimentalRelinkBlockStyleSync =
 	( clientId, blockName, scopeClientId ) =>
 	( { select, dispatch, registry } ) => {
 		const syncSupport =
-			getBlockType( blockName )?.supports?.__experimentalSiblingStyleSync;
+			getBlockType( blockName )?.supports?.__experimentalSyncedStyles;
 
 		let canonicalStyleUpdate = null;
 		if ( syncSupport ) {
 			const privateSelect = unlock( registry.select( STORE_NAME ) );
-			const siblings =
-				privateSelect.__experimentalGetSiblingStyleSyncBlocks(
-					clientId,
-					blockName
-				);
+			const siblings = privateSelect.__experimentalGetSyncedStylesBlocks(
+				clientId,
+				blockName
+			);
 			const canonicalSibling = siblings.find(
 				( s ) =>
 					! privateSelect.__experimentalIsBlockStyleSyncUnlinked(

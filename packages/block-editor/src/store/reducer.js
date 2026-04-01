@@ -2320,7 +2320,7 @@ function listViewExpandRevision( state = 0, action ) {
  *
  * @return {Object} Updated state.
  */
-export function siblingStyleSync( state = {}, action ) {
+export function syncedStyles( state = {}, action ) {
 	switch ( action.type ) {
 		case 'UNLINK_SIBLING_STYLE_SYNC': {
 			const key = `${ action.scopeClientId }:${ action.blockName }`;
@@ -2469,7 +2469,7 @@ const combinedReducers = combineReducers( {
 	listViewExpandRevision,
 	listViewContentPanelOpen,
 	requestedInspectorTab,
-	siblingStyleSync,
+	syncedStyles,
 } );
 
 /**

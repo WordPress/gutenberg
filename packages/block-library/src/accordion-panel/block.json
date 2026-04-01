@@ -55,7 +55,7 @@
 		"contentRole": true,
 		"allowedBlocks": true,
 		"lock": false,
-		"__experimentalSiblingStyleSync": {
+		"__experimentalSyncedStyles": {
 			"scope": "core/accordion"
 		}
 	},
