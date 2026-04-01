@@ -179,10 +179,7 @@ function formatSupports( supports ) {
 				if ( subKey.startsWith( '__' ) ) {
 					continue;
 				}
-				if (
-					typeof subValue === 'object' &&
-					subValue !== null
-				) {
+				if ( typeof subValue === 'object' && subValue !== null ) {
 					lines.push(
 						`  - ${ subKey }: \`${ JSON.stringify( subValue ) }\``
 					);
@@ -191,9 +188,7 @@ function formatSupports( supports ) {
 				}
 			}
 		} else {
-			lines.push(
-				`- **${ key }**: \`${ JSON.stringify( value ) }\``
-			);
+			lines.push( `- **${ key }**: \`${ JSON.stringify( value ) }\`` );
 		}
 	}
 
@@ -504,9 +499,7 @@ function generateBlockPage( blockDir ) {
 	}
 	lines.push( '' );
 	lines.push( '```html' );
-	lines.push(
-		generateBlockCommentExample( slug, attributes, blockType )
-	);
+	lines.push( generateBlockCommentExample( slug, attributes, blockType ) );
 	lines.push( '```' );
 	lines.push( '' );
 
@@ -517,14 +510,10 @@ function generateBlockPage( blockDir ) {
 		`- [block.json](${ SOURCE_URL_BASE }${ blockDir }/block.json)`
 	);
 	if ( files.hasEditJs ) {
-		lines.push(
-			`- [edit.js](${ SOURCE_URL_BASE }${ blockDir }/edit.js)`
-		);
+		lines.push( `- [edit.js](${ SOURCE_URL_BASE }${ blockDir }/edit.js)` );
 	}
 	if ( files.hasSaveJs ) {
-		lines.push(
-			`- [save.js](${ SOURCE_URL_BASE }${ blockDir }/save.js)`
-		);
+		lines.push( `- [save.js](${ SOURCE_URL_BASE }${ blockDir }/save.js)` );
 	}
 	if ( files.hasIndexPhp ) {
 		lines.push(
@@ -563,7 +552,11 @@ function generateCategoryPage( category, label, blocks ) {
 	blocks.forEach( ( blockDir ) => {
 		const blockJson = readBlockJson( blockDir );
 		const { title, name, description } = blockJson;
-		lines.push( `- [${ title }](./${ blockDir }.md) — \`${ name }\`${ description ? ': ' + description : '' }` );
+		lines.push(
+			`- [${ title }](./${ blockDir }.md) — \`${ name }\`${
+				description ? ': ' + description : ''
+			}`
+		);
 	} );
 
 	lines.push( '' );
@@ -592,11 +585,9 @@ fs.mkdirSync( DOCS_DIR, { recursive: true } );
 // Generate individual block pages.
 blockDirs.forEach( ( blockDir ) => {
 	const content = generateBlockPage( blockDir );
-	fs.writeFileSync(
-		path.join( DOCS_DIR, `${ blockDir }.md` ),
-		content,
-		{ encoding: 'utf8' }
-	);
+	fs.writeFileSync( path.join( DOCS_DIR, `${ blockDir }.md` ), content, {
+		encoding: 'utf8',
+	} );
 } );
 
 // Generate category index pages (prefixed to avoid conflicts with block names).
@@ -615,7 +606,6 @@ categoryNames.forEach( ( category ) => {
 	);
 } );
 
-// eslint-disable-next-line no-console
 console.log(
 	`Generated ${ blockDirs.length } block pages + ${ categoryNames.length } category pages (${ DOCS_DIR })`
 );
