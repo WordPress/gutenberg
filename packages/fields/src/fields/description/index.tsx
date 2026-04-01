@@ -35,25 +35,25 @@ const descriptionField: Field< DescriptionPost > = {
 		if ( item.type === 'wp_block' ) {
 			const excerpt = ( item as Pattern ).excerpt;
 			if ( typeof excerpt === 'string' ) {
-				description = decodeEntities( excerpt );
+				description = excerpt;
 			} else {
-				description = decodeEntities( excerpt?.raw || '' );
+				description = excerpt?.raw;
 			}
 		} else {
-			description = ( item as Template | TemplatePart ).description || '';
+			description = ( item as Template | TemplatePart ).description;
 		}
 		// TODO: we need to truncate only for patterns or custom templates..
 		return (
-			<Text
-				className="fields-controls__description"
-				align="left"
-				numberOfLines={ 4 }
-				truncate={ false }
-			>
-				{ description
-					? decodeEntities( description )
-					: __( 'Add a description' ) }
-			</Text>
+			description && (
+				<Text
+					className="fields-controls__description"
+					align="left"
+					numberOfLines={ 4 }
+					truncate={ false }
+				>
+					{ decodeEntities( description ) }
+				</Text>
+			)
 		);
 	},
 	Edit: {
