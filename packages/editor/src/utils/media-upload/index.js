@@ -9,6 +9,7 @@ import { v4 as uuid } from 'uuid';
 import { select, dispatch } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { uploadMedia } from '@wordpress/media-utils';
+import { isClientSideMediaSupported } from '@wordpress/upload-media';
 
 /**
  * Internal dependencies
@@ -51,6 +52,8 @@ export default function mediaUpload( {
 	} = dispatch( editorStore );
 
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
+	const isClientSideMediaActive =
+		window.__clientSideMediaProcessing && isClientSideMediaSupported();
 	const lockKey = `image-upload-${ uuid() }`;
 	let imageIsUploading = false;
 	maxUploadFileSize =
@@ -62,7 +65,7 @@ export default function mediaUpload( {
 			? currentPost.id
 			: currentPost?.wp_id;
 	const setSaveLock = () => {
-		if ( window.__clientSideMediaProcessing ) {
+		if ( isClientSideMediaActive ) {
 			return; // Skip - handled by useUploadSaveLock in editor provider
 		}
 		lockPostSaving( lockKey );
@@ -72,7 +75,7 @@ export default function mediaUpload( {
 
 	const postData = currentPostId ? { post: currentPostId } : {};
 	const clearSaveLock = () => {
-		if ( window.__clientSideMediaProcessing ) {
+		if ( isClientSideMediaActive ) {
 			return; // Skip - handled by useUploadSaveLock in editor provider
 		}
 		unlockPostSaving( lockKey );
@@ -86,7 +89,7 @@ export default function mediaUpload( {
 		onFileChange: ( file ) => {
 			// When client-side media processing is enabled, save locking
 			// is handled by useUploadSaveLock in the editor provider.
-			if ( ! window.__clientSideMediaProcessing ) {
+			if ( ! isClientSideMediaActive ) {
 				if ( ! imageIsUploading ) {
 					setSaveLock();
 				} else {
@@ -117,7 +120,7 @@ export default function mediaUpload( {
 		},
 		maxUploadFileSize,
 		onError: ( { message } ) => {
-			if ( ! window.__clientSideMediaProcessing ) {
+			if ( ! isClientSideMediaActive ) {
 				clearSaveLock();
 			}
 			onError( message );
