@@ -52,27 +52,29 @@ Semantic tokens follow a consistent naming pattern:
 
 **Type** indicates what kind of value it represents, usually mapping to a DTCG token type.
 
-| Value       | Description                                                                    |
-| ----------- | ------------------------------------------------------------------------------ |
-| `color`     | Color values for backgrounds, foregrounds, and strokes                         |
-| `dimension` | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
-| `border`    | Border properties like radius and width                                        |
-| `elevation` | Shadow definitions for layering and depth                                      |
-| `font`      | Typography properties like family, size, and line-height                       |
+| Value        | Description                                                                    |
+| ------------ | ------------------------------------------------------------------------------ |
+| `color`      | Color values for backgrounds, foregrounds, and strokes                         |
+| `dimension`  | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
+| `border`     | Border properties like radius and width                                        |
+| `elevation`  | Shadow definitions for layering and depth                                      |
+| `typography` | Typography properties like font family, font size, and line-height             |
 
 **Property** is the specific design property being defined.
 
-| Value     | Description                        |
-| --------- | ---------------------------------- |
-| `bg`      | Background color                   |
-| `fg`      | Foreground color (text and icons)  |
-| `stroke`  | Border and outline color           |
-| `padding` | Internal spacing within an element |
-| `gap`     | Spacing between elements           |
-| `radius`  | Border radius for rounded corners  |
-| `width`   | Border width                       |
-| `size`    | Font size                          |
-| `family`  | Font family                        |
+| Value         | Description                        |
+| ------------- | ---------------------------------- |
+| `bg`          | Background color                   |
+| `fg`          | Foreground color (text and icons)  |
+| `stroke`      | Border and outline color           |
+| `padding`     | Internal spacing within an element |
+| `gap`         | Spacing between elements           |
+| `radius`      | Border radius for rounded corners  |
+| `width`       | Border width                       |
+| `font-size`   | Font size                          |
+| `font-family` | Font family                        |
+| `font-weight` | Font weight                        |
+| `line-height` | Line height                        |
 
 **Target** is the component or element type the token applies to.
 
@@ -136,10 +138,7 @@ import { ThemeProvider } from '@wordpress/theme';
 
 function App() {
 	return (
-		<ThemeProvider
-			color={ { primary: 'blue' } }
-			density="compact"
-		>
+		<ThemeProvider color={ { primary: 'blue' } } density="compact">
 			{ /* Your app content */ }
 		</ThemeProvider>
 	);
