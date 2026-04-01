@@ -48,6 +48,7 @@ const form = {
 				},
 				'scheduled_date',
 				'password',
+				'sticky',
 			],
 		},
 		'date',
