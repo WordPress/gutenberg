@@ -43,10 +43,10 @@ export function useRetryCountdown(
 		// After a retry attempt (manual or automatic), show "Retrying..."
 		// for 500ms before starting the next countdown. Skip the delay on
 		// the very first disconnect so the countdown starts immediately.
-		const isSubsequentRetry = hasRetriedRef.current;
+		const hasRetried = hasRetriedRef.current;
 		hasRetriedRef.current = true;
 
-		if ( isSubsequentRetry ) {
+		if ( hasRetried ) {
 			setSecondsRemaining( 0 );
 		}
 
@@ -65,7 +65,7 @@ export function useRetryCountdown(
 			}, 1000 );
 		};
 
-		const retryingDelayId = isSubsequentRetry
+		const retryingDelayId = hasRetried
 			? setTimeout( startCountdown, 500 )
 			: null;
 
