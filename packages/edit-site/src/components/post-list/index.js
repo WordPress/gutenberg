@@ -60,7 +60,7 @@ export default function PostList( { postType } ) {
 		default_view: defaultView,
 		default_layouts: defaultLayouts,
 		view_list: viewList,
-		quick_edit_form: quickEditForm,
+		form: quickEditForm,
 	} = useViewConfig( {
 		kind: 'postType',
 		name: postType,

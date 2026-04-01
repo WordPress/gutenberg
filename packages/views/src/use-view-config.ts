@@ -29,7 +29,7 @@ export function useViewConfig( {
 	default_view: View;
 	default_layouts: SupportedLayouts;
 	view_list: Array< any >;
-	quick_edit_form: Form | undefined;
+	form: Form | undefined;
 } {
 	return useSelect(
 		( select ) => {

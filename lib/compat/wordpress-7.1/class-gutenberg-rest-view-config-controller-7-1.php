@@ -83,7 +83,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		$name = $request->get_param( 'name' );
 
 		// TODO: this data will come from a registry of view configs per entity.
-		$quick_edit_form = array(
+		$form            = array(
 			'layout' => array( 'type' => 'panel' ),
 			'fields' => array(
 				array(
@@ -189,7 +189,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			'default_view'    => $default_view,
 			'default_layouts' => $default_layouts,
 			'view_list'       => $view_list,
-			'quick_edit_form' => $quick_edit_form,
+			'form'            => $form,
 		);
 
 		return rest_ensure_response( $response );
@@ -324,8 +324,8 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 						),
 					),
 				),
-				'quick_edit_form' => array(
-					'description' => __( 'Default quick edit form configuration.', 'gutenberg' ),
+				'form'            => array(
+					'description' => __( 'Default form configuration.', 'gutenberg' ),
 					'type'        => 'object',
 					'readonly'    => true,
 					'properties'  => $this->get_form_schema(),
