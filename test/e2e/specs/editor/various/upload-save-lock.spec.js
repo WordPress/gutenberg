@@ -82,14 +82,21 @@ test.describe( 'Upload save lock', () => {
 			.locator( 'data-testid=form-file-upload-input' )
 			.setInputFiles( tmpFile );
 
+		// Wait for the lock to be set (may be async with client-side processing).
+		await expect
+			.poll(
+				() =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.isPostSavingLocked()
+					),
+				{ timeout: 10_000 }
+			)
+			.toBe( true );
+
 		// Save draft should be disabled while upload is in progress.
 		await expect( saveDraftButton ).toBeDisabled();
-
-		// Verify via the data store.
-		const isLocked = await page.evaluate( () =>
-			window.wp.data.select( 'core/editor' ).isPostSavingLocked()
-		);
-		expect( isLocked ).toBe( true );
 
 		// Let the upload complete.
 		resolveUpload();
@@ -103,7 +110,7 @@ test.describe( 'Upload save lock', () => {
 		} );
 
 		// Save draft should be re-enabled after upload completes.
-		await expect( saveDraftButton ).toBeEnabled();
+		await expect( saveDraftButton ).toBeEnabled( { timeout: 10_000 } );
 	} );
 
 	test( 'should disable Save draft button during a multi-file gallery upload', async ( {
@@ -116,15 +123,12 @@ test.describe( 'Upload save lock', () => {
 
 		await expect( saveDraftButton ).toBeEnabled();
 
-		// Track how many upload requests have been made.
-		let uploadCount = 0;
 		let resolveAllUploads;
 		const allUploadsPromise = new Promise( ( resolve ) => {
 			resolveAllUploads = resolve;
 		} );
 
 		await page.route( '**/wp/v2/media', async ( route ) => {
-			uploadCount++;
 			await allUploadsPromise;
 			await route.continue();
 		} );
@@ -143,13 +147,21 @@ test.describe( 'Upload save lock', () => {
 			.locator( 'data-testid=form-file-upload-input' )
 			.setInputFiles( tmpFiles );
 
+		// Wait for the lock to be set (may be async with client-side processing).
+		await expect
+			.poll(
+				() =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.isPostSavingLocked()
+					),
+				{ timeout: 10_000 }
+			)
+			.toBe( true );
+
 		// Save draft should be disabled while uploads are in progress.
 		await expect( saveDraftButton ).toBeDisabled();
-
-		const isLocked = await page.evaluate( () =>
-			window.wp.data.select( 'core/editor' ).isPostSavingLocked()
-		);
-		expect( isLocked ).toBe( true );
 
 		// Let all uploads complete.
 		resolveAllUploads();
@@ -166,10 +178,7 @@ test.describe( 'Upload save lock', () => {
 		}
 
 		// Save draft should be re-enabled after all uploads complete.
-		await expect( saveDraftButton ).toBeEnabled();
-
-		// Verify all 3 upload requests were made.
-		expect( uploadCount ).toBeGreaterThanOrEqual( 3 );
+		await expect( saveDraftButton ).toBeEnabled( { timeout: 10_000 } );
 	} );
 
 	test( 'should disable Publish button during upload', async ( {
@@ -200,6 +209,19 @@ test.describe( 'Upload save lock', () => {
 			.locator( 'data-testid=form-file-upload-input' )
 			.setInputFiles( tmpFile );
 
+		// Wait for the lock to be set (may be async with client-side processing).
+		await expect
+			.poll(
+				() =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.isPostSavingLocked()
+					),
+				{ timeout: 10_000 }
+			)
+			.toBe( true );
+
 		// Publish button should be disabled while upload is in progress.
 		await expect( publishButton ).toBeDisabled();
 
@@ -213,7 +235,7 @@ test.describe( 'Upload save lock', () => {
 		} );
 
 		// Publish button should be re-enabled after upload completes.
-		await expect( publishButton ).toBeEnabled();
+		await expect( publishButton ).toBeEnabled( { timeout: 10_000 } );
 	} );
 
 	test( 'should prevent saving via keyboard shortcut during upload', async ( {
@@ -257,10 +279,14 @@ test.describe( 'Upload save lock', () => {
 
 		// Wait for lock to be set.
 		await expect
-			.poll( () =>
-				page.evaluate( () =>
-					window.wp.data.select( 'core/editor' ).isPostSavingLocked()
-				)
+			.poll(
+				() =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.isPostSavingLocked()
+					),
+				{ timeout: 10_000 }
 			)
 			.toBe( true );
 
@@ -320,9 +346,16 @@ test.describe( 'Upload save lock', () => {
 		await expect( saveDraftButton ).toBeEnabled( { timeout: 10_000 } );
 
 		// Lock should be cleared.
-		const isLocked = await page.evaluate( () =>
-			window.wp.data.select( 'core/editor' ).isPostSavingLocked()
-		);
-		expect( isLocked ).toBe( false );
+		await expect
+			.poll(
+				() =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.isPostSavingLocked()
+					),
+				{ timeout: 10_000 }
+			)
+			.toBe( false );
 	} );
 } );

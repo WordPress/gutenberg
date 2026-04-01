@@ -57,11 +57,13 @@ test.describe( 'Publishing', () => {
 
 				await pageUtils.pressKeys( 'primary+s' );
 
+				// Both the Save draft button and keyboard shortcut should
+				// be disabled when post saving is locked.
 				await expect(
 					page
 						.getByRole( 'region', { name: 'Editor top bar' } )
 						.getByRole( 'button', { name: 'Save draft' } )
-				).toBeEnabled();
+				).toBeDisabled();
 			} );
 		} );
 	} );
