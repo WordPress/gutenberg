@@ -44,7 +44,12 @@ const descriptionField: Field< DescriptionPost > = {
 		}
 		// TODO: we need to truncate only for patterns or custom templates..
 		return (
-			<Text align="left" numberOfLines={ 4 } truncate={ false }>
+			<Text
+				className="fields-controls__description"
+				align="left"
+				numberOfLines={ 4 }
+				truncate={ false }
+			>
 				{ description
 					? decodeEntities( description )
 					: __( 'Add a description' ) }
@@ -69,6 +74,7 @@ const descriptionField: Field< DescriptionPost > = {
 	},
 	enableSorting: false,
 	filterBy: false,
+	enableGlobalSearch: true,
 };
 
 /**
