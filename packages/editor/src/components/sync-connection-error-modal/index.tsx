@@ -203,8 +203,6 @@ export function SyncConnectionErrorModal() {
 	const { onManualRetry, secondsRemaining } =
 		useRetryCountdown( connectionStatus );
 
-	const isConnected = 'connected' === connectionStatus?.status;
-
 	// Set hasInitialized after a debounce to give extra time on initial load.
 	useEffect( () => {
 		const timeout = setTimeout( () => {
@@ -218,7 +216,7 @@ export function SyncConnectionErrorModal() {
 	// This naturally fires only after a failed retry (status = 'disconnected'),
 	// not mid-cycle (status = 'connecting').
 	useEffect( () => {
-		if ( isConnected ) {
+		if ( 'connected' === connectionStatus?.status ) {
 			setShowModal( false );
 			return;
 		}
@@ -229,7 +227,7 @@ export function SyncConnectionErrorModal() {
 		) {
 			setShowModal( true );
 		}
-	}, [ connectionStatus, isConnected ] );
+	}, [ connectionStatus ] );
 
 	if ( ! isCollaborationEnabled || ! hasInitialized || ! showModal ) {
 		return null;
@@ -239,12 +237,10 @@ export function SyncConnectionErrorModal() {
 		connectionStatus && 'error' in connectionStatus
 			? connectionStatus?.error
 			: undefined;
-	const manualRetry = showModal
-		? () => {
-				onManualRetry();
-				retrySyncConnection();
-		  }
-		: undefined;
+	const manualRetry = () => {
+		onManualRetry();
+		retrySyncConnection();
+	};
 	const messages = getSyncErrorMessages( error );
 
 	return (
