@@ -393,17 +393,24 @@ export function useAutocomplete( {
 	};
 }
 
-function useLastDifferentValue( value: UseAutocompleteProps[ 'record' ] ) {
-	const history = useRef< Set< typeof value > >( new Set() );
+/**
+ * Tracks the last record whose `.text` differed from the current one.
+ * Used to determine whether the user has actually typed something
+ * (as opposed to a re-render producing a new record object with
+ * identical text, e.g. during a block reset).
+ */
+export function useLastDifferentValue(
+	value: UseAutocompleteProps[ 'record' ]
+) {
+	const prevRef = useRef< typeof value >( value );
+	const lastChangedTextRef = useRef< typeof value >( value );
 
-	history.current.add( value );
-
-	// Keep the history size to 2.
-	if ( history.current.size > 2 ) {
-		history.current.delete( Array.from( history.current )[ 0 ] );
+	if ( value.text !== prevRef.current.text ) {
+		lastChangedTextRef.current = prevRef.current;
 	}
+	prevRef.current = value;
 
-	return Array.from( history.current )[ 0 ];
+	return lastChangedTextRef.current;
 }
 
 export function useAutocompleteProps( options: UseAutocompleteProps ) {
