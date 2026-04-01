@@ -208,6 +208,9 @@ export function SyncConnectionErrorModal() {
 		useRetryCountdown( connectionStatus );
 
 	const isConnected = 'connected' === connectionStatus?.status;
+	const [ firstDisconnectTime, setFirstDisconnectTime ] = useState<
+		number | null
+	>( null );
 
 	// Set hasInitialized after a debounce to give extra time on initial load.
 	useEffect( () => {
@@ -218,18 +221,34 @@ export function SyncConnectionErrorModal() {
 		return () => clearTimeout( timeout );
 	}, [] );
 
+	// Track when the disconnection first started.
 	useEffect( () => {
 		if ( isConnected ) {
+			setFirstDisconnectTime( null );
 			setShowModal( false );
 			return;
 		}
 
-		const timeout = setTimeout( () => {
-			setShowModal( true );
-		}, DISCONNECTED_DEBOUNCE_MS );
-
-		return () => clearTimeout( timeout );
+		setFirstDisconnectTime( ( prev ) => prev ?? Date.now() );
 	}, [ isConnected ] );
+
+	// Show the modal after a retry failure once the debounce period has
+	// elapsed. This ensures the modal appears right after a failed retry
+	// rather than in the middle of a retry cycle.
+	useEffect( () => {
+		if (
+			isConnected ||
+			! firstDisconnectTime ||
+			connectionStatus?.status !== 'disconnected'
+		) {
+			return;
+		}
+
+		const elapsed = Date.now() - firstDisconnectTime;
+		if ( elapsed >= DISCONNECTED_DEBOUNCE_MS ) {
+			setShowModal( true );
+		}
+	}, [ connectionStatus, firstDisconnectTime, isConnected ] );
 
 	if ( ! isCollaborationEnabled || ! hasInitialized || ! showModal ) {
 		return null;
