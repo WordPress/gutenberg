@@ -87,7 +87,7 @@
  */
 
 .div {
-	outline: var(--_gcd-div-outline, 0);
+	outline: var(--_gcd-div-outline, 0 solid transparent);
 }
 
 /* Narrowed down to p elements only, to support element multiplicity of Text component. */
@@ -107,7 +107,7 @@ p.p {
 
 .a,
 .a:is(:hover, :focus, :active) {
-	outline: var(--_gcd-a-outline, 0);
+	outline: var(--_gcd-a-outline, 0 solid transparent);
 	color: var(--_gcd-a-color, inherit);
 	box-shadow: var(--_gcd-a-box-shadow, none);
 	border-radius: var(--_gcd-a-border-radius, 0);
