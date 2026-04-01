@@ -96,7 +96,7 @@
 p.p {
 	font-size: var(--_gcd-p-font-size, 13px);
 	line-height: var(--_gcd-p-line-height, 1.5);
-	margin: var(--_gcd-p-margin, 1em 0);
+	margin: var(--_gcd-p-margin, 0);
 }
 
 /* Narrowed down to h[1-6] elements only, to support element multiplicity of Text component. */
