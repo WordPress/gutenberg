@@ -50,8 +50,10 @@ export function getAutocompleteMatch(
 	);
 
 	// Prevent matching with an extremely long string, which causes
-	// the editor to slow-down significantly. Returning null here
-	// intentionally resets the autocompleter state in the caller.
+	// the editor to slow-down significantly. This could happen, for
+	// example, if `matchingWhileBackspacing` is true and one of the
+	// "words" ends up being too long. Returning null here intentionally
+	// resets the autocompleter state in the caller.
 	if ( textWithoutTrigger.length > 50 ) {
 		return null;
 	}
@@ -61,9 +63,14 @@ export function getAutocompleteMatch(
 
 	// Allow matching when typing a trigger + the match string or when
 	// clicking in an existing trigger word on the page.
+	// E.g. "Some text @a" — "@a" is detected as a trigger word.
 	const hasOneTriggerWord = wordsFromTrigger.length === 1;
 
-	// Allow matching when backspacing near a trigger word (up to 3 words).
+	// Allow matching when backspacing near a trigger word (up to 3
+	// words from the trigger character). This lets us recover from a
+	// mismatch when backspacing while still imposing sane limits.
+	// E.g. "Some text @marcelo sekkkk" — backspacing "kkkk" re-shows
+	// the popup once the text matches again.
 	const matchingWhileBackspacing =
 		isBackspacing && wordsFromTrigger.length <= 3;
 
