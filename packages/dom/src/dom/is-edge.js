@@ -11,26 +11,25 @@ import isInputOrTextArea from './is-input-or-text-area';
 import { scrollIfNoRange } from './scroll-if-no-range';
 
 /**
- * Get the rectangle of an adjacent character for a collapsed range. This is
- * more accurate than the collapsed range rect for determining the visual line,
- * working around a Firefox bug where collapsed ranges at line-wrap boundaries
- * report the previous line's position.
+ * Get the rectangle of the character after the cursor for a collapsed range.
+ * This is more accurate than the collapsed range rect for determining the
+ * visual line, working around a Firefox bug where collapsed ranges at
+ * line-wrap boundaries report the previous line's position.
  *
  * See: https://bugzilla.mozilla.org/show_bug.cgi?id=1014738
  *
  * @param {Range}    collapsedRange The collapsed range.
- * @param {boolean}  isReverse      Whether checking the top (true) or bottom (false) edge.
  * @param {Document} ownerDocument  The owner document.
  *
- * @return {DOMRect|null} The adjacent character's rectangle, or null.
+ * @return {DOMRect|null} The next character's rectangle, or null.
  */
-function getAdjacentCharRect( collapsedRange, isReverse, ownerDocument ) {
+function getAdjacentCharRect( collapsedRange, ownerDocument ) {
 	const { startContainer, startOffset } = collapsedRange;
 	if ( startContainer.nodeType !== startContainer.TEXT_NODE ) {
 		return null;
 	}
 	const textNode = /** @type {Text} */ ( startContainer );
-	const offset = isReverse ? startOffset : startOffset - 1;
+	const offset = startOffset;
 	if ( offset < 0 || offset >= textNode.length ) {
 		return null;
 	}
@@ -150,8 +149,7 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 	// previous line's position.
 	const verticalRangeRect =
 		onlyVertical && isCollapsed
-			? getAdjacentCharRect( collapsedRange, isReverse, ownerDocument ) ??
-			  rangeRect
+			? getAdjacentCharRect( collapsedRange, ownerDocument ) ?? rangeRect
 			: rangeRect;
 
 	const verticalDiff =

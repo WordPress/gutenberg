@@ -1074,6 +1074,44 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		).toHaveText( /^\.a+$/ );
 	} );
 
+	test( 'should move to the start of the first line on ArrowDown', async ( {
+		page,
+		editor,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a' );
+
+		async function getHeight() {
+			return await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement.offsetHeight );
+		}
+
+		const height = await getHeight();
+
+		// Keep typing until the height of the element increases. We need two
+		// lines.
+		while ( height === ( await getHeight() ) ) {
+			await page.keyboard.type( 'a' );
+		}
+
+		// Move to the start of the second line.
+		await page.keyboard.press( 'ArrowLeft' );
+		// Move to the start of the first line.
+		await page.keyboard.press( 'ArrowUp' );
+		// Move to the title.
+		await page.keyboard.press( 'ArrowUp' );
+		// Move back down to the paragraph.
+		await page.keyboard.press( 'ArrowDown' );
+		// Insert a "." for testing.
+		await page.keyboard.type( '.' );
+
+		// Expect the "." to be added at the start of the paragraph
+		await expect(
+			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
+		).toHaveText( /^\.a+$/ );
+	} );
+
 	test( 'should vertically move the caret from corner to corner (-webkit)', async ( {
 		page,
 		editor,

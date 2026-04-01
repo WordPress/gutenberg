@@ -20,5 +20,25 @@ export default function computeCaretRect( win ) {
 		return null;
 	}
 
+	// For collapsed selections inside text nodes, use the adjacent character's
+	// rect when available. This works around a Firefox bug where collapsed
+	// ranges at line-wrap boundaries report the previous line's position.
+	// See: https://bugzilla.mozilla.org/show_bug.cgi?id=1014738
+	if ( range.collapsed ) {
+		const { startContainer, startOffset } = range;
+		if (
+			startContainer.nodeType === startContainer.TEXT_NODE &&
+			startOffset < /** @type {Text} */ ( startContainer ).length
+		) {
+			const charRange = startContainer.ownerDocument.createRange();
+			charRange.setStart( startContainer, startOffset );
+			charRange.setEnd( startContainer, startOffset + 1 );
+			const charRect = getRectangleFromRange( charRange );
+			if ( charRect ) {
+				return charRect;
+			}
+		}
+	}
+
 	return getRectangleFromRange( range );
 }
