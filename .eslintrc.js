@@ -579,5 +579,23 @@ module.exports = {
 				'@wordpress/use-recommended-components': 'off',
 			},
 		},
+		{
+			files: [ '**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs' ],
+			rules: {
+				'no-unused-vars': [
+					'error',
+					{ ignoreRestSiblings: true, caughtErrors: 'all' },
+				],
+			},
+		},
+		{
+			files: [ '**/*.ts', '**/*.tsx' ],
+			rules: {
+				'@typescript-eslint/no-unused-vars': [
+					'error',
+					{ ignoreRestSiblings: true, caughtErrors: 'all' },
+				],
+			},
+		},
 	],
 };

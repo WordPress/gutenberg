@@ -374,7 +374,7 @@ test.describe( 'Cover', () => {
 				trial: true,
 				timeout: 1000, // This test will always take 1 second to run.
 			} );
-		} catch ( error ) {
+		} catch {
 			isClickable = false;
 		}
 

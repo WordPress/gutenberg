@@ -59,7 +59,7 @@ async function getDecFile( packagePath ) {
 	try {
 		await fs.access( decFile );
 		return decFile;
-	} catch ( err ) {
+	} catch {
 		console.error(
 			`Cannot access this declaration file. You may need to run tsc again: ${ decFile }`
 		);

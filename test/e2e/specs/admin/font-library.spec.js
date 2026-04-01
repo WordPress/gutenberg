@@ -93,7 +93,7 @@ test.describe( 'Font Library', () => {
 					// Attempt to load the font - this will throw or return empty array if not available.
 					const fonts = await document.fonts.load( '16px "Exo 2"' );
 					return fonts.length > 0;
-				} catch ( error ) {
+				} catch {
 					return false;
 				}
 			} );

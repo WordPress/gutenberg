@@ -1,6 +1,8 @@
 # Admin UI
 
-Generic components to be used to build the Admin UI.
+UI components for building consistent admin page layouts.
+
+While `@wordpress/ui` provides low-level, generic UI components that can be composed in flexible arrangements for building admin features, the purpose of this package is to guarantee consistency in the common page structure of an admin page layout. This includes high-level abstractions for a page, its sidebar, header, navigation, and other standardized page layout elements. The goal of standardizing these layouts is to provide a cohesive and predictable experience for users.
 
 ## Installation
 

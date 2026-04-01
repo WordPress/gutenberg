@@ -153,7 +153,7 @@ const test = base.extend<
 			await page.evaluate( () => {
 				window.localStorage.clear();
 			} );
-		} catch ( error ) {
+		} catch {
 			// noop.
 		}
 

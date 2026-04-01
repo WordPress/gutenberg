@@ -38,7 +38,7 @@ const excerptField: Field< BasePost > = {
 			excerpt = decodeEntities( item.excerpt?.raw || '' );
 		}
 		return (
-			<Text align="left" numberOfLines={ 4 } truncate>
+			<Text align="left" numberOfLines={ 3 } truncate>
 				{ excerpt }
 			</Text>
 		);

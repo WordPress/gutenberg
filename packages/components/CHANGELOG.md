@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 32.5.0 (2026-04-01)
+
 ### Bug Fixes
 
 -   `ToggleGroupControl`: Fix accessible association of `help` text ([#76740](https://github.com/WordPress/gutenberg/pull/76740)).

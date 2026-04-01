@@ -210,7 +210,7 @@ function FontCollection( { slug }: { slug: string } ) {
 					} )
 				);
 			}
-		} catch ( error ) {
+		} catch {
 			// If any of the fonts fail to download,
 			// show an error notice and stop the request from being sent.
 			setNotice( {
