@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix PHPUnit tests failing when `multisite: true` is set in `.wp-env.json`. Multisite constants added by `wp core multisite-install` to `wp-config.php` are now stripped from `wp-tests-config.php` to prevent domain mismatches with the WordPress PHPUnit test framework.
+
 ## 11.2.0 (2026-03-18)
 
 ## 11.1.0 (2026-03-04)
