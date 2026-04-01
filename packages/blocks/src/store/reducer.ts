@@ -87,10 +87,7 @@ function bootstrappedBlockTypes(
 			};
 
 		case 'REMOVE_BLOCK_TYPES':
-			return omit( state, action.names ) as Record<
-				string,
-				Partial< BlockType >
-			>;
+			return omit( state, action.names );
 	}
 
 	return state;
@@ -117,10 +114,7 @@ export function unprocessedBlockTypes(
 				[ action.name ]: action.blockType,
 			};
 		case 'REMOVE_BLOCK_TYPES':
-			return omit( state, action.names ) as Record<
-				string,
-				Partial< BlockType >
-			>;
+			return omit( state, action.names );
 	}
 
 	return state;
@@ -146,7 +140,7 @@ export function blockTypes(
 				...keyBlockTypesByName( action.blockTypes ),
 			};
 		case 'REMOVE_BLOCK_TYPES':
-			return omit( state, action.names ) as Record< string, BlockType >;
+			return omit( state, action.names );
 	}
 
 	return state;
@@ -365,10 +359,7 @@ export function collections(
 				},
 			};
 		case 'REMOVE_BLOCK_COLLECTION':
-			return omit( state, action.namespace ) as Record<
-				string,
-				BlockCollection
-			>;
+			return omit( state, action.namespace );
 	}
 	return state;
 }
@@ -414,10 +405,7 @@ export function blockBindingsSources(
 				},
 			};
 		case 'REMOVE_BLOCK_BINDINGS_SOURCE':
-			return omit( state, action.name ) as Record<
-				string,
-				BlockBindingsSource
-			>;
+			return omit( state, action.name );
 	}
 	return state;
 }

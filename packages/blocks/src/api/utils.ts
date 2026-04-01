@@ -487,11 +487,11 @@ export function isContentBlock( name: string ): boolean {
 export function omit< T extends Record< string, unknown > >(
 	object: T,
 	keys: string | string[]
-): Partial< T > {
+): T {
 	const keysArray = Array.isArray( keys ) ? keys : [ keys ];
 	return Object.fromEntries(
 		Object.entries( object ).filter(
 			( [ key ] ) => ! keysArray.includes( key )
 		)
-	) as Partial< T >;
+	) as T;
 }
