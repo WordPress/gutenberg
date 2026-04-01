@@ -1092,10 +1092,6 @@ export default function Image( {
 					<UploadingOverlay
 						url={ temporaryURL }
 						attachmentId={ id }
-						onCancel={ () => onSelectImage( undefined ) }
-						filename={
-							getFilename( temporaryURL ) || getFilename( url )
-						}
 					/>
 				) }
 			</>
