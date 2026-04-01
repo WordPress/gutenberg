@@ -62,6 +62,10 @@ function getFormatElement(
 
 	const selector = tagName + ( className ? '.' + className : '' );
 
+	if ( ! selector ) {
+		return;
+	}
+
 	if ( ! ( element instanceof window.HTMLElement ) ) {
 		return;
 	}
