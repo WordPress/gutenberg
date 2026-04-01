@@ -7,6 +7,7 @@
 -   Add `AlertDialog` primitive ([#76847](https://github.com/WordPress/gutenberg/pull/76847)).
 -   Add `InputControl` component ([#76653](https://github.com/WordPress/gutenberg/pull/76653)).
 -   `Dialog`: Expose `initialFocus` and `finalFocus` props on `Dialog.Popup` for custom focus management ([#76860](https://github.com/WordPress/gutenberg/pull/76860)).
+-   `CollapsibleCard`: Add `HeaderDescription` subcomponent for supplementary header content with `aria-describedby` relationship ([#76867](https://github.com/WordPress/gutenberg/pull/76867)).
 
 ### Bug Fixes
 
