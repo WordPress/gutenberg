@@ -499,9 +499,9 @@ function poll(): void {
 				pollInterval = POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
 			}
 		} catch ( error ) {
-			// Exponential backoff on error: double the backoff time, up to max
+			// Exponential backoff on error: increase the backoff time, up to max
 			pollInterval = Math.min(
-				pollInterval * 2,
+				pollInterval * 1.5,
 				MAX_ERROR_BACKOFF_IN_MS
 			);
 

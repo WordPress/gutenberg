@@ -37,9 +37,9 @@ const { retrySyncConnection } = unlock( coreDataPrivateApis );
 // Debounce time for initial disconnected status to allow connection to establish.
 const INITIAL_DISCONNECTED_DEBOUNCE_MS = 20000;
 
-// Debounce time for showing the disconnect dialog after the intial connection,
-// allowing brief network interruptions to resolve.
-const DISCONNECTED_DEBOUNCE_MS = 8000;
+// Debounce time for showing the disconnect dialog after the initial connection,
+// allowing brief network interruptions and automatic retries to resolve.
+const DISCONNECTED_DEBOUNCE_MS = 30000;
 
 export interface SyncConnectionErrorModalProps {
 	description: string; // Modal description.
