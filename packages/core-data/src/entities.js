@@ -21,6 +21,7 @@ import {
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from './utils/crdt';
+import { stripSuggestionMarkup } from './utils/strip-suggestion-markup';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
@@ -315,6 +316,19 @@ export const prePersistPostType = async (
 		}
 	}
 
+	// Strip suggestion markup from content before saving to the REST API.
+	// Suggestion annotations (<ins>/<del>) are ephemeral editor state that
+	// should not persist to the database.
+	if ( edits.content ) {
+		const rawContent =
+			typeof edits.content === 'string'
+				? edits.content
+				: edits.content?.raw;
+		if ( rawContent && rawContent.includes( 'wp-suggestion-' ) ) {
+			newEdits.content = stripSuggestionMarkup( rawContent );
+		}
+	}
+
 	// Add meta for persisted CRDT document.
 	if ( persistedRecord ) {
 		const objectType = `postType/${ name }`;
@@ -447,11 +461,12 @@ async function loadPostTypeEntities() {
 			 * @param {import('@wordpress/sync').ObjectData} editedRecord
 			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
 			 */
-			getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
+			getChangesFromCRDTDoc: ( crdtDoc, editedRecord, am ) =>
 				getPostChangesFromCRDTDoc(
 					crdtDoc,
 					editedRecord,
-					syncedProperties
+					syncedProperties,
+					am
 				),
 
 			/**

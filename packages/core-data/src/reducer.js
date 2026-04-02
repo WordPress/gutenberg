@@ -722,6 +722,27 @@ export function collaborationSupported( state = true, action ) {
 }
 
 /**
+ * Reducer tracking suggestion modes per entity, keyed by `objectType/objectId`.
+ * The actual mode is stored on the sync manager — this reducer exists only to
+ * trigger selector re-evaluation when the mode changes.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function suggestionModes( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_SUGGESTION_MODE':
+			return {
+				...state,
+				[ `${ action.objectType }/${ action.objectId }` ]: action.mode,
+			};
+	}
+	return state;
+}
+
+/**
  * Reducer managing view configs, keyed by `kind/name`.
  *
  * @param {Object} state  Current state.
@@ -764,5 +785,6 @@ export default combineReducers( {
 	editorAssets,
 	syncConnectionStatuses,
 	collaborationSupported,
+	suggestionModes,
 	viewConfigs,
 } );

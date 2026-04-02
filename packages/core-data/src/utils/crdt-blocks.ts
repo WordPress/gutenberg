@@ -30,6 +30,7 @@ import {
 	type YText,
 } from './crdt-utils';
 import { getCachedRichTextData } from './crdt-text';
+import { stripSuggestionMarkup } from './strip-suggestion-markup';
 import { diffStringsToLib0Delta } from '../sync';
 
 interface BlockAttributes {
@@ -863,6 +864,12 @@ export function mergeRichTextUpdate(
 	updatedValue: string,
 	cursorPosition: number | null = null
 ): void {
+	// Strip suggestion markup (<ins>/<del>) from the incoming value.
+	// When the editor reads back suggestion-annotated content, those
+	// annotations must not be written into the CRDT Y.Text — they are
+	// ephemeral display state managed by the DiffAttributionManager.
+	const cleanValue = stripSuggestionMarkup( updatedValue );
+
 	// Gutenberg does not use Yjs shared types natively, so we can only subscribe
 	// to changes from store and apply them to Yjs types that we create and
 	// manage. Crucially, for rich-text attributes, we do not receive granular
@@ -873,7 +880,7 @@ export function mergeRichTextUpdate(
 	// and new value.  Y.Type.applyDelta natively accepts lib0 deltas.
 	const diffDelta = diffStringsToLib0Delta(
 		yTextToString( blockYText ),
-		updatedValue,
+		cleanValue,
 		cursorPosition
 	);
 	blockYText.applyDelta( diffDelta );

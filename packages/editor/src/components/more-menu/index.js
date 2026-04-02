@@ -22,6 +22,7 @@ import { store as interfaceStore, ActionItem } from '@wordpress/interface';
  */
 import CopyContentMenuItem from './copy-content-menu-item';
 import ModeSwitcher from '../mode-switcher';
+import SuggestionModeToggle from '../suggestion-mode-toggle';
 import ToolsMoreMenuGroup from './tools-more-menu-group';
 import ViewMoreMenuGroup from './view-more-menu-group';
 import { store as editorStore } from '../../store';
@@ -111,6 +112,7 @@ export default function MoreMenu( { disabled = false } ) {
 							<ViewMoreMenuGroup.Slot fillProps={ { onClose } } />
 						</MenuGroup>
 						<ModeSwitcher />
+						<SuggestionModeToggle />
 						<ActionItem.Slot
 							name="core/plugin-more-menu"
 							label={ __( 'Panels' ) }

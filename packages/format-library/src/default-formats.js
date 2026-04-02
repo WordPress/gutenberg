@@ -7,6 +7,8 @@ import { image } from './image';
 import { italic } from './italic';
 import { link } from './link';
 import { strikethrough } from './strikethrough';
+import { suggestionDelete } from './suggestion-delete';
+import { suggestionInsert } from './suggestion-insert';
 import { underline } from './underline';
 import { textColor } from './text-color';
 import { subscript } from './subscript';
@@ -24,6 +26,8 @@ export default [
 	italic,
 	link,
 	strikethrough,
+	suggestionDelete,
+	suggestionInsert,
 	underline,
 	textColor,
 	subscript,

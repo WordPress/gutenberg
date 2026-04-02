@@ -5,7 +5,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import type { UndoManager } from '@wordpress/undo-manager';
 import deprecated from '@wordpress/deprecated';
-import type { ConnectionStatus } from '@wordpress/sync';
+import type { ConnectionStatus, SuggestionMode } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -54,6 +54,7 @@ export interface State {
 	editorAssets: Record< string, any > | null;
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
 	collaborationSupported: boolean;
+	suggestionModes: Record< string, SuggestionMode >;
 	viewConfigs: Record< string, Record< string, any > >;
 }
 
