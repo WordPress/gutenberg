@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { dispatch, resolveSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+
+// The core-data store name. Using the string directly avoids importing
+// the core-data package, which would create a circular tsconfig reference
+// (upload-media -> core-data -> block-editor -> upload-media).
+const CORE_STORE = 'core';
 
 /**
  * Vips JXL WASM configuration provided by the wp-vips-jxl plugin.
@@ -87,7 +91,7 @@ async function fetchVipsJxlConfig(): Promise< VipsJxlConfig | null > {
  */
 async function installVipsJxlPlugin(): Promise< boolean > {
 	try {
-		await dispatch( coreStore ).saveEntityRecord(
+		await dispatch( CORE_STORE ).saveEntityRecord(
 			'root',
 			'plugin',
 			{ slug: JXL_PLUGIN_SLUG, status: 'active' },
@@ -124,7 +128,7 @@ export async function ensureVipsJxlAvailable(): Promise< VipsJxlConfig | null > 
 
 	// Plugin not active — can we install it?
 	// Use resolveSelect to wait for permission data to load.
-	const canInstall = await resolveSelect( coreStore ).canUser( 'create', {
+	const canInstall = await resolveSelect( CORE_STORE ).canUser( 'create', {
 		kind: 'root',
 		name: 'plugin',
 	} );

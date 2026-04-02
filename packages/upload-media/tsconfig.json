@@ -8,7 +8,6 @@
 		{ "path": "../api-fetch" },
 		{ "path": "../blob" },
 		{ "path": "../compose" },
-		{ "path": "../core-data" },
 		{ "path": "../data" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },
