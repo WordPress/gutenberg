@@ -36,10 +36,7 @@ export default {
 	getOptionLabel( item ) {
 		return (
 			<>
-				<Icon
-					key="icon"
-					icon={ item.subtype === 'page' ? page : post }
-				/>
+				<Icon icon={ item.subtype === 'page' ? page : post } />
 				{ decodeEntities( item.title ) }
 			</>
 		);
