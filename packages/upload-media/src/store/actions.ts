@@ -222,7 +222,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 						new UploadError( {
 							code: 'IMAGE_PROCESSING_ERROR',
 							message:
-								'This image cannot be processed. Convert it to JPEG or PNG before uploading.',
+								'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.',
 							file: parentItem.file,
 							cause: error instanceof Error ? error : undefined,
 						} )
