@@ -78,13 +78,6 @@
 				"text": true
 			}
 		},
-		"dimensions": {
-			"width": true,
-			"__experimentalSkipSerialization": [ "width" ],
-			"__experimentalDefaultControls": {
-				"width": true
-			}
-		},
 		"typography": {
 			"__experimentalSkipSerialization": [
 				"fontSize",
