@@ -209,21 +209,30 @@ test.describe( 'Upload save lock', () => {
 			.locator( 'data-testid=form-file-upload-input' )
 			.setInputFiles( tmpFile );
 
-		// Wait for the lock to be set (may be async with client-side processing).
+		// Wait for the lock to be set and verify the Publish button is
+		// disabled at that moment. Both checks happen in the same poll
+		// to avoid race conditions with fast uploads.
 		await expect
 			.poll(
-				() =>
-					page.evaluate( () =>
+				async () => {
+					const isLocked = await page.evaluate( () =>
 						window.wp.data
 							.select( 'core/editor' )
 							.isPostSavingLocked()
-					),
+					);
+					if ( ! isLocked ) {
+						return 'not-locked';
+					}
+					const isDisabled = await publishButton.evaluate(
+						( el ) => el.getAttribute( 'aria-disabled' ) === 'true'
+					);
+					return isDisabled
+						? 'locked-and-disabled'
+						: 'locked-but-enabled';
+				},
 				{ timeout: 10_000 }
 			)
-			.toBe( true );
-
-		// Publish button should be disabled while upload is in progress.
-		await expect( publishButton ).toBeDisabled();
+			.toBe( 'locked-and-disabled' );
 
 		resolveUpload();
 
