@@ -10,6 +10,7 @@ module.exports = {
 		'@wordpress/no-unknown-ds-tokens': 'error',
 		'@wordpress/no-unsafe-wp-apis': 'error',
 		'@wordpress/no-wp-process-env': 'error',
+		'@wordpress/dropdown-menu-children-rule': 'error',
 	},
 	overrides: [
 		{
