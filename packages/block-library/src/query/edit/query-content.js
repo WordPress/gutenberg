@@ -5,7 +5,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { useEffect, useCallback } from '@wordpress/element';
 import {
-	BlockControls,
 	InspectorControls,
 	useBlockProps,
 	store as blockEditorStore,
@@ -36,6 +35,7 @@ export default function QueryContent( {
 	clientId,
 	context,
 	name,
+	isSelected,
 } ) {
 	const {
 		queryId,
@@ -130,6 +130,13 @@ export default function QueryContent( {
 
 	return (
 		<>
+			{ isSelected && (
+				<QueryToolbar
+					clientId={ clientId }
+					attributes={ attributes }
+					hasInnerBlocks
+				/>
+			) }
 			<EnhancedPaginationModal
 				attributes={ attributes }
 				setAttributes={ setAttributes }
@@ -145,9 +152,6 @@ export default function QueryContent( {
 					isSingular={ isSingular }
 				/>
 			</InspectorControls>
-			<BlockControls>
-				<QueryToolbar attributes={ attributes } clientId={ clientId } />
-			</BlockControls>
 			<InspectorControls group="advanced">
 				<HTMLElementControl
 					tagName={ TagName }

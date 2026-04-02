@@ -2,6 +2,52 @@
 
 ## Unreleased
 
+## 6.19.0 (2026-04-01)
+
+## 6.18.0 (2026-03-18)
+
+### Deprecations
+
+-   Deprecate `$modal-min-width`, `$modal-width-small`, `$modal-width-medium`, and `$modal-width-large` SCSS variables in favor of `--wpds-dimension-surface-width-*` design tokens. Variable values have been updated to align with the token scale ([#76494](https://github.com/WordPress/gutenberg/pull/76494)).
+
+## 6.17.0 (2026-03-04)
+
+## 6.16.0 (2026-02-18)
+
+## 6.15.0 (2026-01-29)
+
+## 6.14.0 (2026-01-16)
+
+### Internal
+
+-   Remove outdated vendor prefix properties ([#74213](https://github.com/WordPress/gutenberg/pull/74213)).
+
+## 6.12.0 (2025-11-26)
+
+## 6.11.0 (2025-11-12)
+
+## 6.10.0 (2025-10-29)
+
+### Enhancements
+
+-   Update `$font-weight-medium` to 499 ([#72473](https://github.com/WordPress/gutenberg/pull/72473)).
+
+## 6.9.0 (2025-10-17)
+
+## 6.8.0 (2025-10-01)
+
+## 6.7.0 (2025-09-17)
+
+## 6.6.0 (2025-09-03)
+
+## 6.5.0 (2025-08-20)
+
+## 6.4.0 (2025-08-07)
+
+## 6.3.0 (2025-07-23)
+
+## 6.2.0 (2025-06-25)
+
 ## 6.1.0 (2025-06-04)
 
 ## 6.0.0 (2025-05-22)

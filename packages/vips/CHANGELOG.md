@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 1.3.0 (2026-04-01)
+
+## 1.2.0 (2026-03-18)
+
+## 1.1.0 (2026-03-04)
+
+## 1.0.0 (2026-02-23)
+
 ### New Features
 
--   Initial public release.
+-   Initial release of `@wordpress/vips` package for client-side image processing using `wasm-vips` ([#74785](https://github.com/WordPress/gutenberg/pull/74785)).
+-   Uses `@wordpress/worker-threads` for type-safe Web Worker communication.
+-   ESM-only package with inlined WASM bundling.

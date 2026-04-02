@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 // Same as the group block styles.
 :root :where(.wp-block-template-part.has-background) {
 	// Matches paragraph Block padding

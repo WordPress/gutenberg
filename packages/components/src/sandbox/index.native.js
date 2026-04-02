@@ -297,7 +297,7 @@ const Sandbox = forwardRef( function Sandbox(
 
 			try {
 				data = JSON.parse( data );
-			} catch ( e ) {
+			} catch {
 				return;
 			}
 

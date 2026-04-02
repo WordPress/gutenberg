@@ -14,8 +14,8 @@ import { applyBuiltInValidationFixes } from '../parser/apply-built-in-validation
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
-const beforeLineRegexp = /(\n|<p>)\s*$/;
-const afterLineRegexp = /^\s*(\n|<\/p>)/;
+const beforeLineRegexp = /(\n|<p>|<br\s*\/?>)\s*$/;
+const afterLineRegexp = /^\s*(\n|<\/p>|<br\s*\/?>)/;
 
 function segmentHTMLToShortcodeBlock(
 	HTML,

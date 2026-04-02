@@ -34,6 +34,14 @@ test.describe( 'Block Style Variations', () => {
 		] );
 	} );
 
+	test.afterEach( async ( { page } ) => {
+		await page.evaluate( async () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'post-only' );
+		}, [] );
+	} );
+
 	test( 'apply block styles variations to nested blocks', async ( {
 		editor,
 		page,
@@ -102,6 +110,12 @@ test.describe( 'Block Style Variations', () => {
 	} ) => {
 		await draftNewPage( page );
 		await addPageContent( editor, page );
+		// switch to template mode (access to global styles)
+		await page.evaluate( async () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'template-locked' );
+		}, [] );
 		const firstGroup = editor.canvas
 			.locator( '[data-type="core/group"]' )
 			.first();

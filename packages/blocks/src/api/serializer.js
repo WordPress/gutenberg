@@ -8,7 +8,7 @@ import {
 	RawHTML,
 } from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { removep } from '@wordpress/autop';
 import deprecated from '@wordpress/deprecated';
 
@@ -281,19 +281,21 @@ export function getCommentAttributes( blockType, attributes ) {
 export function serializeAttributes( attributes ) {
 	return (
 		JSON.stringify( attributes )
+			// Replace escaped `\` characters with the unicode escape sequence.
+			.replaceAll( '\\\\', '\\u005c' )
+
 			// Don't break HTML comments.
-			.replace( /--/g, '\\u002d\\u002d' )
+			.replaceAll( '--', '\\u002d\\u002d' )
 
 			// Don't break non-standard-compliant tools.
-			.replace( /</g, '\\u003c' )
-			.replace( />/g, '\\u003e' )
-			.replace( /&/g, '\\u0026' )
+			.replaceAll( '<', '\\u003c' )
+			.replaceAll( '>', '\\u003e' )
+			.replaceAll( '&', '\\u0026' )
 
-			// Bypass server stripslashes behavior which would unescape stringify's
-			// escaping of quotation mark.
-			//
-			// See: https://developer.wordpress.org/reference/functions/wp_kses_stripslashes/
-			.replace( /\\"/g, '\\u0022' )
+			// Replace escaped quotes (`\"`) to prevent problems with wp_kses_stripsplashes.
+			// This simple replacement is safe because `\\` has already been replaced.
+			// `\"` is not a JSON string quote like `"\\"`.
+			.replaceAll( '\\"', '\\u0022' )
 	);
 }
 
@@ -318,7 +320,7 @@ export function getBlockInnerHTML( block ) {
 				block.attributes,
 				block.innerBlocks
 			);
-		} catch ( error ) {}
+		} catch {}
 	}
 
 	return saveContent;
@@ -394,28 +396,43 @@ export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
 }
 
-export function __unstableSerializeAndClean( blocks ) {
-	// A single unmodified default block is assumed to
-	// be equivalent to an empty post.
-	if ( blocks.length === 1 && isUnmodifiedDefaultBlock( blocks[ 0 ] ) ) {
-		blocks = [];
-	}
+export const __unstableSerializeAndClean = ( () => {
+	const cache = new WeakMap();
 
-	let content = serialize( blocks );
+	return ( blocks ) => {
+		const cached = cache.get( blocks );
+		if ( cached !== undefined ) {
+			return cached;
+		}
 
-	// For compatibility, treat a post consisting of a
-	// single freeform block as legacy content and apply
-	// pre-block-editor removep'd content formatting.
-	if (
-		blocks.length === 1 &&
-		blocks[ 0 ].name === getFreeformContentHandlerName() &&
-		blocks[ 0 ].name === 'core/freeform'
-	) {
-		content = removep( content );
-	}
+		let effectiveBlocks = blocks;
 
-	return content;
-}
+		// A single unmodified default block is assumed to
+		// be equivalent to an empty post.
+		if (
+			effectiveBlocks.length === 1 &&
+			isUnmodifiedDefaultBlock( effectiveBlocks[ 0 ] )
+		) {
+			effectiveBlocks = [];
+		}
+
+		let content = serialize( effectiveBlocks );
+
+		// For compatibility, treat a post consisting of a
+		// single freeform block as legacy content and apply
+		// pre-block-editor removep'd content formatting.
+		if (
+			effectiveBlocks.length === 1 &&
+			effectiveBlocks[ 0 ].name === getFreeformContentHandlerName() &&
+			effectiveBlocks[ 0 ].name === 'core/freeform'
+		) {
+			content = removep( content );
+		}
+
+		cache.set( blocks, content );
+		return content;
+	};
+} )();
 
 /**
  * Takes a block or set of blocks and returns the serialized post content.

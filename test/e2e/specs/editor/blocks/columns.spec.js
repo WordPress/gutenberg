@@ -379,7 +379,11 @@ test.describe( 'Columns', () => {
 		} );
 	} );
 
-	test( 'should arrow up into empty columns', async ( { editor, page } ) => {
+	test( 'should arrow up into empty columns', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
 		await editor.insertBlock( {
 			name: 'core/columns',
 			innerBlocks: [ { name: 'core/column' }, { name: 'core/column' } ],
@@ -389,7 +393,7 @@ test.describe( 'Columns', () => {
 		} );
 
 		await page.keyboard.press( 'ArrowUp' );
-		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+a' );
 		await page.keyboard.press( 'Delete' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [

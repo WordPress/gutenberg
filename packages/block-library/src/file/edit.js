@@ -29,6 +29,7 @@ import { __, _x } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
+import { getFilename } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -79,7 +80,11 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			media:
 				id === undefined
 					? undefined
-					: select( coreStore ).getMedia( id ),
+					: select( coreStore ).getEntityRecord(
+							'postType',
+							'attachment',
+							id
+					  ),
 		} ),
 		[ id ]
 	);
@@ -127,7 +132,10 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			return;
 		}
 
-		const isPdf = newMedia.url.endsWith( '.pdf' );
+		const isPdf =
+			// Media Library and REST API use different properties for mime type.
+			( newMedia.mime || newMedia.mime_type ) === 'application/pdf' ||
+			getFilename( newMedia.url ).toLowerCase().endsWith( '.pdf' );
 		const pdfAttributes = {
 			displayPreview: isPdf
 				? attributes.displayPreview ?? true

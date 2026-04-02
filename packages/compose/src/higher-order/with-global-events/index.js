@@ -15,7 +15,6 @@ import Listener from './listener';
  */
 const listener = new Listener();
 
-/* eslint-disable jsdoc/no-undefined-types */
 /**
  * Higher-order component creator which, given an object of DOM event types and
  * values corresponding to a callback function name on the component, will
@@ -69,7 +68,6 @@ export default function withGlobalEvents( eventTypesToHandlers ) {
 						/** @type {keyof GlobalEventHandlersEventMap} */ (
 							event.type
 						)
-						/* eslint-enable jsdoc/no-undefined-types */
 					];
 				if ( typeof this.wrappedRef[ handler ] === 'function' ) {
 					this.wrappedRef[ handler ]( event );

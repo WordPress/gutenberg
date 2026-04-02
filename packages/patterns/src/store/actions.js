@@ -57,7 +57,7 @@ export const createPatternFromFile =
 		let parsedContent;
 		try {
 			parsedContent = JSON.parse( fileContent );
-		} catch ( e ) {
+		} catch {
 			throw new Error( 'Invalid JSON file' );
 		}
 		if (

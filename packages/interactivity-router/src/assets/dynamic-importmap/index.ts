@@ -30,6 +30,13 @@ type ImportMap = {
 const baseUrl = document.baseURI;
 const pageBaseUrl = baseUrl;
 
+Object.defineProperty( self, 'wpInteractivityRouterImport', {
+	value: importShim,
+	writable: false,
+	enumerable: false,
+	configurable: false,
+} );
+
 async function importShim< Module = unknown >( id: string ) {
 	await initPromise;
 	return topLevelLoad< Module >( resolve( id, pageBaseUrl ), {
@@ -73,4 +80,8 @@ export async function preloadWithMap( id: string, importMapIn: ImportMap ) {
 	} );
 }
 
-export { importPreloadedModule, type ModuleLoad } from './loader';
+export {
+	initialImportMap,
+	importPreloadedModule,
+	type ModuleLoad,
+} from './loader';

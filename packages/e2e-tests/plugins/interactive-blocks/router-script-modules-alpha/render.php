@@ -7,21 +7,29 @@
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 
-$module_path = '/module.js';
-$module_url  = plugins_url( $module_path, __FILE__ );
-wp_register_script_module(
-	'test/router-script-modules-alpha',
-	$module_url,
-	array(),
-	filemtime( plugin_dir_path( __FILE__ ) . $module_path )
-);
+$modules = array( 'alpha-1', 'alpha-2' );
+
+foreach ( $modules as $module ) {
+	$module_path = '/module-' . $module . '.js';
+	wp_register_script_module(
+		'test/router-script-modules-' . $module,
+		plugins_url( $module_path, __FILE__ ),
+		array(),
+		filemtime( plugin_dir_path( __FILE__ ) . $module_path )
+	);
+}
 
 $wrapper_attributes = get_block_wrapper_attributes(
 	array(
 		'data-testid'         => 'alpha-block',
 		'data-wp-interactive' => 'test/router-script-modules-alpha',
-		'data-wp-text'        => 'state.name',
 	)
 );
 ?>
-<p <?php echo $wrapper_attributes; ?>></p>
+<div <?php echo $wrapper_attributes; ?>>
+	<span data-testid="text" data-wp-text="state.name"></span>
+	<button data-testid="static" data-wp-on--click="actions.updateFromStatic">Static</button>
+	<button data-testid="dynamic" data-wp-on--click="actions.updateFromDynamic">Dynamic</button>
+	<button data-testid="initial-static" data-wp-on--click="actions.updateFromInitialStatic">Static (initial)</button>
+	<button data-testid="initial-dynamic" data-wp-on--click="actions.updateFromInitialDynamic">Dynamic (initial)</button>
+</div>

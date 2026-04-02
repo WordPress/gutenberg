@@ -20,6 +20,7 @@ const templateTitleField: Field< Template > = {
 	render: TitleView,
 	enableHiding: false,
 	enableGlobalSearch: true,
+	filterBy: false,
 };
 
 /**

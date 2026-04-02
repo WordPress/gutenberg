@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Tokenizer } from 'simple-html-tokenizer';
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
@@ -575,7 +575,7 @@ export function getNextNonWhitespaceToken( tokens ) {
 function getHTMLTokens( html, logger = createLogger() ) {
 	try {
 		return new Tokenizer( new DecodeEntityParser() ).tokenize( html );
-	} catch ( e ) {
+	} catch {
 		logger.warning( 'Malformed HTML detected: %s', html );
 	}
 

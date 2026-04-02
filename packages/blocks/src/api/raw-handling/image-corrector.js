@@ -27,7 +27,7 @@ export default function imageCorrector( node ) {
 		// Can throw DOMException!
 		try {
 			decoded = atob( data );
-		} catch ( e ) {
+		} catch {
 			node.src = '';
 			return;
 		}

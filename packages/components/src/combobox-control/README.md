@@ -35,7 +35,6 @@ function MyComboboxControl() {
 	return (
 		<ComboboxControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			label="Font Size"
 			value={ fontSize }
 			onChange={ setFontSize }
@@ -141,14 +140,6 @@ Start opting into the larger default height that will become the default size in
 - Type: `Boolean`
 - Required: No
 - Default: `false`
-
-#### __nextHasNoMarginBottom
-
-Start opting into the new margin-free styles that will become the default in a future version.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
 
 ## Related components
 

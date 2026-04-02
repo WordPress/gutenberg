@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
+import { ImageCropperProvider } from '@wordpress/image-cropper';
 
 /**
  * Internal dependencies
@@ -26,36 +27,40 @@ export default function ImageEditor( {
 	borderProps,
 } ) {
 	return (
-		<ImageEditingProvider
-			id={ id }
-			url={ url }
-			naturalWidth={ naturalWidth }
-			naturalHeight={ naturalHeight }
-			onSaveImage={ onSaveImage }
-			onFinishEditing={ onFinishEditing }
-		>
-			<Cropper
-				borderProps={ borderProps }
+		<ImageCropperProvider>
+			<ImageEditingProvider
+				id={ id }
 				url={ url }
-				width={ width }
-				height={ height }
-				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
-			/>
-			<BlockControls>
-				<ToolbarGroup>
-					<ZoomDropdown />
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<AspectRatioDropdown toggleProps={ toggleProps } />
-						) }
-					</ToolbarItem>
-					<RotationButton />
-				</ToolbarGroup>
-				<ToolbarGroup>
-					<FormControls />
-				</ToolbarGroup>
-			</BlockControls>
-		</ImageEditingProvider>
+				naturalHeight={ naturalHeight }
+				onSaveImage={ onSaveImage }
+				onFinishEditing={ onFinishEditing }
+			>
+				<Cropper
+					borderProps={ borderProps }
+					url={ url }
+					width={ width }
+					height={ height }
+					naturalHeight={ naturalHeight }
+					naturalWidth={ naturalWidth }
+				/>
+				<BlockControls>
+					<ToolbarGroup>
+						<ZoomDropdown />
+						<ToolbarItem>
+							{ ( toggleProps ) => (
+								<AspectRatioDropdown
+									toggleProps={ toggleProps }
+								/>
+							) }
+						</ToolbarItem>
+						<RotationButton />
+					</ToolbarGroup>
+					<ToolbarGroup>
+						<FormControls />
+					</ToolbarGroup>
+				</BlockControls>
+			</ImageEditingProvider>
+		</ImageCropperProvider>
 	);
 }

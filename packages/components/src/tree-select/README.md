@@ -15,7 +15,6 @@ const MyTreeSelect = () => {
 
 	return (
 		<TreeSelect
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			label="Parent page"
 			noOptionLabel="No parent page"
@@ -61,14 +60,6 @@ const MyTreeSelect = () => {
  - Default: `false`
 
 Start opting into the larger default height that will become the default size in a future version.
-
-### `__nextHasNoMarginBottom`
-
- - Type: `boolean`
- - Required: No
- - Default: `false`
-
-Start opting into the new margin-free styles that will become the default in a future version.
 
 ### `children`
 

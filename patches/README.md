@@ -22,6 +22,9 @@ to remove those events as well.
 
 See https://github.com/facebook/react/pull/17883.
 
+The package also uses a way of doing default exports from a CJS package that is not compatible with
+Node.js ES modules. The patch also fixes this.
+
 ### `patches/react-devtools-core+4.28.5.patch`
 
 The mobile editor relies upon `jsdom-jscore-rn` to create a partial DOM

@@ -22,6 +22,28 @@ if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
 		<form method="post" action="options.php">
 			<?php settings_fields( 'gutenberg-experiments' ); ?>
 			<?php do_settings_sections( 'gutenberg-experiments' ); ?>
+			<!-- We use a separate table for the template activation experiment because the option is managed separately. -->
+			<table class="form-table">
+				<tr>
+					<th scope="row">
+						<label for="active_templates"><?php echo __( 'Template Activation', 'gutenberg' ); ?></label>
+						<br><a href="https://github.com/WordPress/gutenberg/issues/66950" target="_blank"><?php echo __( 'Learn more', 'gutenberg' ); ?></a>
+					</th>
+					<td>
+						<label for="active_templates">
+							<input
+								type="checkbox"
+								name="active_templates"
+								id="active_templates"
+								value="1"
+								<?php checked( 1, gutenberg_is_experiment_enabled( 'active_templates' ) ); ?>
+							/>
+							<?php echo __( 'Allows multiple templates of the same type to be created, of which one can be active at a time.', 'gutenberg' ); ?>
+							<p class="description"><?php echo __( 'Warning: when you deactivate this experiment, it is best to delete all created templates except for the active ones.', 'gutenberg' ); ?></p>
+						</label>
+					</td>
+				</tr>
+			</table>
 			<?php submit_button(); ?>
 		</form>
 		</div>
@@ -92,42 +114,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-media-processing',
-		__( 'Client-side media processing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables client-side media processing to leverage the browser\'s capabilities to handle tasks like image resizing and compression.', 'gutenberg' ),
-			'id'    => 'gutenberg-media-processing',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-block-comment',
-		__( 'Collaboration: add block level comments', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables multi-user block level commenting.', 'gutenberg' ),
-			'id'    => 'gutenberg-block-comment',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-sync-collaboration',
-		__( 'Collaboration: add real time editing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables live collaboration and offline persistence between peers.', 'gutenberg' ),
-			'id'    => 'gutenberg-sync-collaboration',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-color-randomizer',
 		__( 'Color randomizer', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -140,50 +126,14 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-custom-dataviews',
-		__( 'Data Views: add Custom Views', 'gutenberg' ),
+		'gutenberg-dataviews-media-modal',
+		__( 'Data Views: new media modal', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enables the ability to add, edit, and save custom views when in the Site Editor.', 'gutenberg' ),
-			'id'    => 'gutenberg-custom-dataviews',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-new-posts-dashboard',
-		__( 'Data Views: enable for Posts', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables a redesigned posts dashboard accessible through a submenu item in the Gutenberg plugin.', 'gutenberg' ),
-			'id'    => 'gutenberg-new-posts-dashboard',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-quick-edit-dataviews',
-		__( 'Data Views: add Quick Edit', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables access to a Quick Edit panel in the Site Editor Pages experience.', 'gutenberg' ),
-			'id'    => 'gutenberg-quick-edit-dataviews',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-editor-write-mode',
-		__( 'Simplified site editing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables Write mode in the Site Editor for a simplified editing experience.', 'gutenberg' ),
-			'id'    => 'gutenberg-editor-write-mode',
+			'label' => __( 'Enables a new media modal experience powered by Data Views for improved media library management.', 'gutenberg' ),
+			'id'    => 'gutenberg-dataviews-media-modal',
 		)
 	);
 
@@ -196,6 +146,78 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enables full-page client-side navigation, powered by the Interactivity API.', 'gutenberg' ),
 			'id'    => 'gutenberg-full-page-client-side-navigation',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-content-only-inspector-fields',
+		__( 'Block fields: Show dataform driven inspector fields on blocks that support them', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables editable block inspector fields that are generated using a dataform.', 'gutenberg' ),
+			'id'    => 'gutenberg-content-only-inspector-fields',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-dataform-inspector',
+		__( 'Editor Inspector: Use DataForm', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Replaces the bespoke editor inspector panels with a unified DataForm-based implementation for Pages and Posts, matching the QuickEdit experience.', 'gutenberg' ),
+			'id'    => 'gutenberg-dataform-inspector',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-workflow-palette',
+		__( 'Workflow Palette', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables the Workflow Palette for running workflows composed of abilities, from a unified interface.', 'gutenberg' ),
+			'id'    => 'gutenberg-workflow-palette',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-extensible-site-editor',
+		__( 'Extensible Site Editor', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),
+			'id'    => 'gutenberg-extensible-site-editor',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-media-editor',
+		__( 'Media Editor', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables editing media items (attachments) directly in the block editor with a dedicated media preview and metadata panel.', 'gutenberg' ),
+			'id'    => 'gutenberg-media-editor',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-content-guidelines',
+		__( 'Guidelines', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables guidelines feature for managing editorial voice and tone guidelines under Settings.', 'gutenberg' ),
+			'id'    => 'gutenberg-content-guidelines',
 		)
 	);
 
@@ -235,4 +257,25 @@ function gutenberg_display_experiment_section() {
 	<p><?php echo __( "The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production.", 'gutenberg' ); ?></p>
 
 	<?php
+}
+
+add_action( 'admin_init', 'gutenberg_handle_template_activate_setting_submission' );
+function gutenberg_handle_template_activate_setting_submission() {
+	if ( ! isset( $_POST['option_page'] ) || 'gutenberg-experiments' !== $_POST['option_page'] ) {
+		return;
+	}
+
+	if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'gutenberg-experiments-options' ) ) {
+		return;
+	}
+
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	if ( isset( $_POST['active_templates'] ) && '1' === $_POST['active_templates'] ) {
+		update_option( 'active_templates', gutenberg_get_migrated_active_templates() );
+	} else {
+		delete_option( 'active_templates' );
+	}
 }

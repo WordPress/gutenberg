@@ -30,24 +30,32 @@ function getContextFromAction( action ) {
  * Returns a merged array of item IDs, given details of the received paginated
  * items. The array is sparse-like with `undefined` entries where holes exist.
  *
- * @param {?Array<number>} itemIds     Original item IDs (default empty array).
- * @param {number[]}       nextItemIds Item IDs to merge.
- * @param {number}         page        Page of items merged.
- * @param {number}         perPage     Number of items per page.
+ * @param {number[]|undefined} itemIds          Original item IDs (default empty array).
+ * @param {number[]}           nextItemIds      Item IDs to merge.
+ * @param {Object}             options          Options object.
+ * @param {number}             [options.page]   Page of items merged.
+ * @param {number}             [options.offset] Offset of items merged.
+ * @param {number}             options.perPage  Number of items per page.
  *
  * @return {number[]} Merged array of item IDs.
  */
-export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
-	const receivedAllIds = page === 1 && perPage === -1;
-	if ( receivedAllIds ) {
+export function getMergedItemIds(
+	itemIds = [],
+	nextItemIds,
+	// The defaults for `page` and `perPage` are the same as in `getQueryParts`.
+	{ page = 1, offset, perPage = 10 } = {}
+) {
+	// If the query is unbounded, then `nextItemIds` is a complete replacement.
+	if ( perPage === -1 ) {
 		return nextItemIds;
 	}
-	const nextItemIdsStartIndex = ( page - 1 ) * perPage;
+
+	const nextItemIdsStartIndex = offset ?? ( page - 1 ) * perPage;
 
 	// If later page has already been received, default to the larger known
 	// size of the existing array, else calculate as extending the existing.
 	const size = Math.max(
-		itemIds?.length ?? 0,
+		itemIds.length,
 		nextItemIdsStartIndex + nextItemIds.length
 	);
 
@@ -60,9 +68,11 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 		// a page could receive fewer than what was previously stored.
 		const isInNextItemsRange =
 			i >= nextItemIdsStartIndex && i < nextItemIdsStartIndex + perPage;
-		mergedItemIds[ i ] = isInNextItemsRange
-			? nextItemIds[ i - nextItemIdsStartIndex ]
-			: itemIds?.[ i ];
+		if ( isInNextItemsRange ) {
+			mergedItemIds[ i ] = nextItemIds[ i - nextItemIdsStartIndex ];
+		} else {
+			mergedItemIds[ i ] = itemIds[ i ];
+		}
 	}
 
 	return mergedItemIds;
@@ -105,19 +115,22 @@ export function items( state = {}, action ) {
 		case 'RECEIVE_ITEMS': {
 			const context = getContextFromAction( action );
 			const key = action.key || DEFAULT_ENTITY_KEY;
+			const itemsList = Array.isArray( action.items )
+				? action.items
+				: [ action.items ];
 			return {
 				...state,
 				[ context ]: {
 					...state[ context ],
-					...action.items.reduce( ( accumulator, value ) => {
-						const itemId = value?.[ key ];
-
-						accumulator[ itemId ] = conservativeMapItem(
-							state?.[ context ]?.[ itemId ],
-							value
-						);
-						return accumulator;
-					}, {} ),
+					...Object.fromEntries(
+						itemsList.map( ( item ) => [
+							item?.[ key ],
+							conservativeMapItem(
+								state?.[ context ]?.[ item?.[ key ] ],
+								item
+							),
+						] )
+					),
 				},
 			};
 		}
@@ -149,6 +162,9 @@ export function itemIsComplete( state = {}, action ) {
 		case 'RECEIVE_ITEMS': {
 			const context = getContextFromAction( action );
 			const { query, key = DEFAULT_ENTITY_KEY } = action;
+			const itemsList = Array.isArray( action.items )
+				? action.items
+				: [ action.items ];
 
 			// An item is considered complete if it is received without an associated
 			// fields query. Ideally, this would be implemented in such a way where the
@@ -164,7 +180,7 @@ export function itemIsComplete( state = {}, action ) {
 				...state,
 				[ context ]: {
 					...state[ context ],
-					...action.items.reduce( ( result, item ) => {
+					...itemsList.reduce( ( result, item ) => {
 						const itemId = item?.[ key ];
 
 						// Defer to completeness if already assigned. Technically the
@@ -224,18 +240,27 @@ const receiveQueries = compose( [
 	// reducer tracks only a single query object.
 	onSubKey( 'stableKey' ),
 ] )( ( state = {}, action ) => {
-	const { type, page, perPage, key = DEFAULT_ENTITY_KEY } = action;
-
-	if ( type !== 'RECEIVE_ITEMS' ) {
+	if ( action.type !== 'RECEIVE_ITEMS' ) {
 		return state;
 	}
 
+	// Single items don't have page or total count metadata
+	// (only collection query responses do), so skip updating itemIds.
+	if ( ! Array.isArray( action.items ) ) {
+		return state;
+	}
+
+	const key = action.key ?? DEFAULT_ENTITY_KEY;
+
 	return {
 		itemIds: getMergedItemIds(
-			state?.itemIds || [],
+			state.itemIds,
 			action.items.map( ( item ) => item?.[ key ] ).filter( Boolean ),
-			page,
-			perPage
+			{
+				page: action.page,
+				offset: action.offset,
+				perPage: action.perPage,
+			}
 		),
 		meta: action.meta,
 	};
