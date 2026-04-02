@@ -92,6 +92,10 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 	// A tagName schema is an object with children, attributes, require, and
 	// isMatch properties.
 	function mergeTagNameSchemas( a, b ) {
+		if ( a === b ) {
+			return a;
+		}
+
 		for ( const key in b ) {
 			if ( a[ key ] ) {
 				a[ key ] = mergeTagNameSchemaProperties(
@@ -111,6 +115,10 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 
 	// A schema is an object with tagName schemas by tag name.
 	function mergeSchemas( a, b ) {
+		if ( a === b ) {
+			return a;
+		}
+
 		for ( const key in b ) {
 			if ( a[ key ] ) {
 				a[ key ] = mergeTagNameSchemas( a[ key ], b[ key ] );
