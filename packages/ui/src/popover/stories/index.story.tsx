@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId, useRef, useState } from '@wordpress/element';
 import { SlotFillProvider, Slot } from '@wordpress/components';
+import { close } from '@wordpress/icons';
 import { Popover, VisuallyHidden } from '../..';
+import { IconButton } from '../../icon-button';
 import { GenericIframe, useMeasure } from './utils';
 
 const meta: Meta< typeof Popover.Root > = {
@@ -33,7 +35,9 @@ export const Default: Story = {
 				<Popover.Trigger>Open Popover</Popover.Trigger>
 				<Popover.Popup>
 					<Popover.Arrow />
-					<Popover.Title>Popover title</Popover.Title>
+					<Popover.Title style={ { marginBottom: 4 } }>
+						Popover title
+					</Popover.Title>
 					<Popover.Description>
 						Popover description
 					</Popover.Description>
@@ -53,7 +57,9 @@ export const NoArrow: Story = {
 			<>
 				<Popover.Trigger>Open Popover</Popover.Trigger>
 				<Popover.Popup>
-					<Popover.Title>Popover title</Popover.Title>
+					<Popover.Title style={ { marginBottom: 4 } }>
+						Popover title
+					</Popover.Title>
 					<Popover.Description>
 						Popover description
 					</Popover.Description>
@@ -118,8 +124,10 @@ export const Positioning: Story = {
 };
 
 /**
- * A popover with a close button, title, and description. The `Popover.Close`
- * component renders a button that closes the popover when clicked.
+ * A popover with a close icon button, title, and description. The
+ * `Popover.Close` component renders a button that closes the popover when
+ * clicked. Here it wraps an `IconButton` for a properly sized, accessible
+ * close action — matching the Dialog close-icon pattern.
  */
 export const WithCloseButton: Story = {
 	args: {
@@ -136,18 +144,18 @@ export const WithCloseButton: Story = {
 							marginBottom: 8,
 						} }
 					>
-						<Popover.Title style={ { margin: 0 } }>
-							Settings
-						</Popover.Title>
+						<Popover.Title>Settings</Popover.Title>
 						<Popover.Close
-							style={ {
-								all: 'unset',
-								cursor: 'pointer',
-								lineHeight: 1,
-							} }
-						>
-							&#x2715;
-						</Popover.Close>
+							render={
+								<IconButton
+									variant="minimal"
+									size="compact"
+									tone="neutral"
+									icon={ close }
+									label="Close"
+								/>
+							}
+						/>
 					</div>
 					<Popover.Description>
 						Configure your notification preferences and display
@@ -179,7 +187,9 @@ export const Controlled: Story = {
 				<Popover.Trigger>Toggle Popover</Popover.Trigger>
 				<Popover.Popup>
 					<Popover.Arrow />
-					<Popover.Title>Controlled Popover</Popover.Title>
+					<Popover.Title style={ { marginBottom: 4 } }>
+						Controlled Popover
+					</Popover.Title>
 					<Popover.Description>
 						This popover is controlled by external state.
 					</Popover.Description>
@@ -245,6 +255,10 @@ export const Controlled: Story = {
  * such as forms. Try tabbing through the fields — focus stays inside the
  * popover until it is dismissed.
  *
+ * **Note:** focus trapping requires a `Popover.Close` part inside the popup
+ * so that screen readers always have an escape route. It can be visually
+ * hidden if needed.
+ *
  * Pass `backdrop` to `Popover.Popup` to display a semi-transparent overlay
  * beneath the popover, signalling that the page is blocked.
  */
@@ -257,7 +271,9 @@ export const Modal: Story = {
 				<Popover.Trigger>Edit Settings</Popover.Trigger>
 				<Popover.Popup backdrop>
 					<Popover.Arrow />
-					<Popover.Title>Settings</Popover.Title>
+					<Popover.Title style={ { marginBottom: 4 } }>
+						Settings
+					</Popover.Title>
 					<form
 						style={ {
 							display: 'flex',
@@ -336,7 +352,9 @@ export const Unstyled: Story = {
 			<>
 				<Popover.Trigger>Open Unstyled</Popover.Trigger>
 				<Popover.Popup variant="unstyled">
-					<Popover.Title>Custom Styled</Popover.Title>
+					<Popover.Title style={ { marginBottom: 4 } }>
+						Custom Styled
+					</Popover.Title>
 					<Popover.Description>
 						This popup has no default styling — the consumer
 						controls all visual appearance.
@@ -381,7 +399,9 @@ export const OverlayPlacement: Story = {
 							align: 'none',
 						} }
 					>
-						<Popover.Title>Overlay</Popover.Title>
+						<Popover.Title style={ { marginBottom: 4 } }>
+							Overlay
+						</Popover.Title>
 						<Popover.Description>
 							This popover is centered over its trigger using a
 							negative sideOffset.
@@ -415,7 +435,9 @@ export const Inline: Story = {
 				<Popover.Trigger>Open Inline</Popover.Trigger>
 				<Popover.Popup inline>
 					<Popover.Arrow />
-					<Popover.Title>Inline Popover</Popover.Title>
+					<Popover.Title style={ { marginBottom: 4 } }>
+						Inline Popover
+					</Popover.Title>
 					<Popover.Description>
 						This popup is rendered in place — no portal is used.
 						Inspect the DOM to see it lives inside its parent.
@@ -469,7 +491,9 @@ export const CollisionAvoidance: Story = {
 							side="top"
 							collisionBoundary={ boundary ?? undefined }
 						>
-							<Popover.Title>Flip</Popover.Title>
+							<Popover.Title style={ { marginBottom: 4 } }>
+								Flip
+							</Popover.Title>
 							<Popover.Description>
 								Flips to bottom when clipped
 							</Popover.Description>
@@ -486,7 +510,9 @@ export const CollisionAvoidance: Story = {
 								align: 'none',
 							} }
 						>
-							<Popover.Title>None</Popover.Title>
+							<Popover.Title style={ { marginBottom: 4 } }>
+								None
+							</Popover.Title>
 							<Popover.Description>
 								Stays on top even when clipped
 							</Popover.Description>
@@ -561,7 +587,9 @@ export const CrossIframe: Story = {
 									}
 								>
 									<Popover.Arrow />
-									<Popover.Title>
+									<Popover.Title
+										style={ { marginBottom: 4 } }
+									>
 										Cross-Iframe Popover
 									</Popover.Title>
 									<Popover.Description>
@@ -645,7 +673,9 @@ export const CrossIframeWithSlotFill: Story = {
 									}
 								>
 									<Popover.Arrow />
-									<Popover.Title>
+									<Popover.Title
+										style={ { marginBottom: 4 } }
+									>
 										Cross-Iframe (SlotFill)
 									</Popover.Title>
 									<Popover.Description>
@@ -680,7 +710,9 @@ export const WithCustomZIndex: Story = {
 				<Popover.Trigger>Open Popover</Popover.Trigger>
 				<Popover.Popup style={ { '--wp-ui-popover-z-index': '9999' } }>
 					<Popover.Arrow />
-					<Popover.Title>Custom z-index</Popover.Title>
+					<Popover.Title style={ { marginBottom: 4 } }>
+						Custom z-index
+					</Popover.Title>
 					<Popover.Description>
 						This popover&apos;s positioner has z-index: 9999 via the
 						`--wp-ui-popover-z-index` CSS custom property.
@@ -902,7 +934,9 @@ export const ViewportConstrainedSize: Story = {
 						} }
 					>
 						<div style={ { overflow: 'auto', height: '100%' } }>
-							<Popover.Title>Constrained</Popover.Title>
+							<Popover.Title style={ { marginBottom: 4 } }>
+								Constrained
+							</Popover.Title>
 							<Popover.Description>
 								This popup constrains its size using the
 								`--available-height` and `--available-width` CSS
@@ -954,7 +988,9 @@ export const OnOpenChangeDetails: Story = {
 					<Popover.Trigger>Toggle</Popover.Trigger>
 					<Popover.Popup>
 						<Popover.Arrow />
-						<Popover.Title>Event Log</Popover.Title>
+						<Popover.Title style={ { marginBottom: 4 } }>
+							Event Log
+						</Popover.Title>
 						<Popover.Description>
 							Dismiss this popover via Escape, click-outside, or
 							moving focus away.
@@ -1003,13 +1039,14 @@ export const InitialFocus: Story = {
 				<Popover.Trigger>Open Form</Popover.Trigger>
 				<Popover.Popup initialFocus={ emailRef }>
 					<Popover.Arrow />
-					<Popover.Title>Contact</Popover.Title>
+					<Popover.Title style={ { marginBottom: 4 } }>
+						Contact
+					</Popover.Title>
 					<form
 						style={ {
 							display: 'flex',
 							flexDirection: 'column',
 							gap: 8,
-							marginTop: 8,
 						} }
 						onSubmit={ ( e ) => e.preventDefault() }
 					>
@@ -1061,6 +1098,9 @@ export const InitialFocus: Story = {
  * - Does **not** lock page scroll
  * - Does **not** block pointer interaction outside
  *
+ * A `Popover.Close` part must be rendered inside the popup so that screen
+ * readers can escape. It can be visually hidden if not needed visually.
+ *
  * This replaces the legacy Popover's `constrainTabbing` prop. Try tabbing
  * through the fields — focus stays inside — then click the button outside
  * to verify that pointer interaction still works.
@@ -1077,7 +1117,9 @@ export const TrapFocus: Story = {
 					<Popover.Trigger>Open</Popover.Trigger>
 					<Popover.Popup>
 						<Popover.Arrow />
-						<Popover.Title>Trap Focus</Popover.Title>
+						<Popover.Title style={ { marginBottom: 4 } }>
+							Trap Focus
+						</Popover.Title>
 						<Popover.Description>
 							Tab cycles within this popover, but clicking outside
 							still works.
@@ -1091,6 +1133,7 @@ export const TrapFocus: Story = {
 						>
 							<input placeholder="Field A" />
 							<input placeholder="Field B" />
+							<Popover.Close>Close</Popover.Close>
 						</div>
 					</Popover.Popup>
 				</Popover.Root>
@@ -1126,7 +1169,9 @@ export const HoverTrigger: Story = {
 				</Popover.Trigger>
 				<Popover.Popup>
 					<Popover.Arrow />
-					<Popover.Title>Hover Popover</Popover.Title>
+					<Popover.Title style={ { marginBottom: 4 } }>
+						Hover Popover
+					</Popover.Title>
 					<Popover.Description>
 						This popover opens on hover with a 200ms delay and
 						closes 150ms after the pointer leaves.
