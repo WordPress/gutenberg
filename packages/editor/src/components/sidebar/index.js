@@ -112,7 +112,7 @@ const SidebarContent = ( {
 				<PluginDocumentSettingPanel.Slot />
 				<TemplateContentPanel />
 				{ window?.__experimentalDataFormInspector &&
-					[ 'post', 'page' ].includes( postType ) && (
+					[ 'post', 'page', 'wp_template' ].includes( postType ) && (
 						<>
 							<TemplateActionsPanel />
 							<PostRevisionsPanel />
