@@ -192,6 +192,10 @@ Restore action for PostWithPermissions.
 
 ScheduledDate Field.
 
+### siteDiscussionField
+
+Site discussion field for SiteSettings.
+
 ### slugField
 
 Slug field for BasePost.

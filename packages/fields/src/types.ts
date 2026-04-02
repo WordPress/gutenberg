@@ -121,6 +121,7 @@ export interface Pattern extends CommonPost {
 
 export interface SiteSettings {
 	posts_per_page?: number;
+	default_comment_status?: string;
 }
 
 export type Post = Template | TemplatePart | Pattern | BasePost;
