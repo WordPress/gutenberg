@@ -143,7 +143,6 @@ export function TimePicker( {
 			max={ getDaysInMonth( Number( year ), Number( month ) - 1 ) }
 			required
 			spinControls="none"
-			isPressEnterToChange
 			isDragEnabled={ false }
 			isShiftStepEnabled={ false }
 			onChange={ buildNumberControlChangeCallback( 'date' ) }
@@ -185,7 +184,6 @@ export function TimePicker( {
 			max={ 9999 }
 			required
 			spinControls="none"
-			isPressEnterToChange
 			isDragEnabled={ false }
 			isShiftStepEnabled={ false }
 			onChange={ buildNumberControlChangeCallback( 'year' ) }
