@@ -21,7 +21,7 @@ permissions: {}
 
 jobs:
     check:
-        name: All${{ (matrix.node != '20' || matrix.os != 'ubuntu-24.04') && format(' (Node.js {0} on {1})', matrix.node, contains(matrix.os, 'macos-') && 'MacOS' || contains(matrix.os, 'windows-') && 'Windows' || 'Linux') || '' }}
+        name: All${{ (matrix.node != '22' || matrix.os != 'ubuntu-24.04') && format(' (Node.js {0} on {1})', matrix.node, contains(matrix.os, 'macos-') && 'MacOS' || contains(matrix.os, 'windows-') && 'Windows' || 'Linux') || '' }}
         runs-on: ${{ matrix.os }}
         env:
             NODE_OPTIONS: --max-old-space-size=4096
@@ -31,7 +31,7 @@ jobs:
         strategy:
             matrix:
                 event: ['${{ github.event_name }}']
-                node: ['20', '22', '24']
+                node: ['22', '24']
                 os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
 
                 include:
@@ -40,9 +40,9 @@ jobs:
                       os: 'ubuntu-24.04'
                       annotations: true
                 exclude:
-                    # On PRs: Only test Node 20 on Ubuntu and Windows
+                    # On PRs: Only test Node 22 on Ubuntu and Windows
                     - event: 'pull_request'
-                      node: '22'
+                      node: '24'
                     - event: 'pull_request'
                       os: 'macos-15'
 
