@@ -391,10 +391,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 							}
 						}
 
-						if (
-							! getBlockOrder( _clientId ).length &&
-							isUnmodifiedBlock( getBlock( _clientId ) )
-						) {
+						if ( ! getBlockOrder( _clientId ).length ) {
 							removeBlock( _clientId, false );
 						}
 					} );
