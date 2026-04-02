@@ -58,7 +58,8 @@
 			"allowInheriting": false,
 			"default": {
 				"type": "flex"
-			}
+			},
+			"allowSizingOnChildren": true
 		},
 		"interactivity": {
 			"clientNavigation": true
