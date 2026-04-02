@@ -476,43 +476,60 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		$image_size = $request['image_size'];
 
-		$metadata = wp_get_attachment_metadata( $attachment_id, true );
-
-		if ( ! $metadata ) {
-			$metadata = array();
-		}
-
-		if ( 'original' === $image_size ) {
-			$metadata['original_image'] = wp_basename( $path );
-		} elseif ( 'scaled' === $image_size ) {
-			// The current attached file is the original; record it as original_image.
-			$current_file               = get_attached_file( $attachment_id, true );
-			$metadata['original_image'] = wp_basename( $current_file );
-
-			// Update the attached file to point to the scaled version.
-			update_attached_file( $attachment_id, $path );
-
-			$size = wp_getimagesize( $path );
-
-			$metadata['width']    = $size ? $size[0] : 0;
-			$metadata['height']   = $size ? $size[1] : 0;
-			$metadata['filesize'] = wp_filesize( $path );
-			$metadata['file']     = _wp_relative_upload_path( $path );
-		} else {
-			$metadata['sizes'] = $metadata['sizes'] ?? array();
-
-			$size = wp_getimagesize( $path );
-
-			$metadata['sizes'][ $image_size ] = array(
-				'width'     => $size ? $size[0] : 0,
-				'height'    => $size ? $size[1] : 0,
-				'file'      => wp_basename( $path ),
-				'mime-type' => $type,
-				'filesize'  => wp_filesize( $path ),
+		// Acquire a per-attachment advisory lock to prevent concurrent sideloads
+		// from overwriting each other's metadata changes (read-modify-write race).
+		if ( ! $this->acquire_metadata_lock( $attachment_id ) ) {
+			return new WP_Error(
+				'rest_upload_lock_timeout',
+				__( 'Could not acquire metadata lock for this attachment. Please try again.', 'gutenberg' ),
+				array( 'status' => 503 )
 			);
 		}
 
-		wp_update_attachment_metadata( $attachment_id, $metadata );
+		try {
+			// Invalidate the object cache to read the latest metadata from the database.
+			wp_cache_delete( $attachment_id, 'post_meta' );
+
+			$metadata = wp_get_attachment_metadata( $attachment_id, true );
+
+			if ( ! $metadata ) {
+				$metadata = array();
+			}
+
+			if ( 'original' === $image_size ) {
+				$metadata['original_image'] = wp_basename( $path );
+			} elseif ( 'scaled' === $image_size ) {
+				// The current attached file is the original; record it as original_image.
+				$current_file               = get_attached_file( $attachment_id, true );
+				$metadata['original_image'] = wp_basename( $current_file );
+
+				// Update the attached file to point to the scaled version.
+				update_attached_file( $attachment_id, $path );
+
+				$size = wp_getimagesize( $path );
+
+				$metadata['width']    = $size ? $size[0] : 0;
+				$metadata['height']   = $size ? $size[1] : 0;
+				$metadata['filesize'] = wp_filesize( $path );
+				$metadata['file']     = _wp_relative_upload_path( $path );
+			} else {
+				$metadata['sizes'] = $metadata['sizes'] ?? array();
+
+				$size = wp_getimagesize( $path );
+
+				$metadata['sizes'][ $image_size ] = array(
+					'width'     => $size ? $size[0] : 0,
+					'height'    => $size ? $size[1] : 0,
+					'file'      => wp_basename( $path ),
+					'mime-type' => $type,
+					'filesize'  => wp_filesize( $path ),
+				);
+			}
+
+			wp_update_attachment_metadata( $attachment_id, $metadata );
+		} finally {
+			$this->release_metadata_lock( $attachment_id );
+		}
 
 		$response_request = new WP_REST_Request(
 			WP_REST_Server::READABLE,
@@ -530,5 +547,48 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		$response->header( 'Location', rest_url( rest_get_route_for_post( $attachment_id ) ) );
 
 		return $response;
+	}
+
+	/**
+	 * Acquires a MySQL advisory lock for attachment metadata updates.
+	 *
+	 * Prevents concurrent sideload requests from overwriting each other's
+	 * metadata changes by serializing the read-modify-write cycle.
+	 *
+	 * @param int $attachment_id Attachment ID.
+	 * @param int $timeout       Lock timeout in seconds. Default 5.
+	 * @return bool True if the lock was acquired, false on timeout.
+	 */
+	private function acquire_metadata_lock( int $attachment_id, int $timeout = 5 ): bool {
+		global $wpdb;
+
+		$lock_name = $wpdb->prefix . 'attachment_meta_' . $attachment_id;
+		$lock_name = substr( $lock_name, 0, 64 );
+
+		// GET_LOCK returns 1 on success, 0 on timeout, NULL on error.
+		$result = $wpdb->get_var(
+			$wpdb->prepare( 'SELECT GET_LOCK(%s, %d)', $lock_name, $timeout )
+		);
+
+		return '1' === $result;
+	}
+
+	/**
+	 * Releases a MySQL advisory lock for attachment metadata updates.
+	 *
+	 * @param int $attachment_id Attachment ID.
+	 * @return bool True if the lock was released, false otherwise.
+	 */
+	private function release_metadata_lock( int $attachment_id ): bool {
+		global $wpdb;
+
+		$lock_name = $wpdb->prefix . 'attachment_meta_' . $attachment_id;
+		$lock_name = substr( $lock_name, 0, 64 );
+
+		$result = $wpdb->get_var(
+			$wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name )
+		);
+
+		return '1' === $result;
 	}
 }
