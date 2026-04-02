@@ -12,6 +12,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -145,6 +146,11 @@ const BlockMoverButton = forwardRef(
 					onClick={ isDisabled ? null : onClick }
 					disabled={ isDisabled }
 					accessibleWhenDisabled
+					shortcut={
+						direction === 'up'
+							? displayShortcut.secondary( 't' )
+							: displayShortcut.secondary( 'y' )
+					}
 				/>
 				<VisuallyHidden id={ descriptionId }>
 					{ getBlockMoverDescription(
