@@ -17,6 +17,10 @@
 
 -   `Button`: Hide focus outline on `:active` in High Contrast (forced colors) mode to provide visual click feedback ([#76833](https://github.com/WordPress/gutenberg/pull/76833)).
 
+### Internal
+
+-   `Autocomplete`: Extract matching logic into a standalone pure function ([#76957](https://github.com/WordPress/gutenberg/pull/76957)).
+
 ## 32.4.0 (2026-03-18)
 
 ### Bug Fixes

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -769,10 +764,7 @@ test.describe( 'insert media from inserter', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 		uploadedMedia = await requestUtils.uploadMedia(
-			path.resolve(
-				process.cwd(),
-				'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
-			)
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
 		);
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
