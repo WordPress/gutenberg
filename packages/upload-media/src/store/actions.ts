@@ -32,6 +32,7 @@ import type {
 	revokeBlobUrls,
 } from './private-actions';
 import { vipsCancelOperations } from './utils';
+import { UploadError } from '../upload-error';
 import { validateMimeType } from '../validate-mime-type';
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
 import { validateFileSize } from '../validate-file-size';
@@ -218,10 +219,13 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 					// the block resets rather than showing a partial upload.
 					dispatch.cancelItem(
 						parentId,
-						error ??
-							new Error(
-								'Upload failed: image could not be processed'
-							)
+						new UploadError( {
+							code: 'IMAGE_PROCESSING_ERROR',
+							message:
+								'This image cannot be processed. Convert it to JPEG or PNG before uploading.',
+							file: parentItem.file,
+							cause: error instanceof Error ? error : undefined,
+						} )
 					);
 				}
 			}
