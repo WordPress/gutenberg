@@ -43,6 +43,7 @@ import {
 	descriptionField,
 	postsPerPageField,
 	siteDiscussionField,
+	blogTitleField,
 } from '@wordpress/fields';
 import {
 	altTextField,
@@ -300,6 +301,11 @@ export const registerPostTypeSchema =
 				// specifically for the home/index template.
 				postTypeConfig.slug === 'wp_template' && postsPerPageField,
 				postTypeConfig.slug === 'wp_template' && siteDiscussionField,
+				// `blogTitleField` is a similar field to the above but it's
+				// special because it's responsible for updating a `page` attribute.
+				// We need to think this through how to best connect
+				// it with `Gutenberg_REST_View_Config_Controller_7_1`.
+				postTypeConfig.slug === 'wp_template' && blogTitleField,
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,

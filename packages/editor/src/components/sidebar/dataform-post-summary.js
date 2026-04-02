@@ -19,54 +19,9 @@ import PostTrash from '../post-trash';
 import usePostFields from '../post-fields';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
 import revisionsField from '../../dataviews/fields/revisions';
+import TemplateHomeSettings from './template-home-settings';
 
 const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
-function SiteSettingsDataForm( { postType } ) {
-	const postFields = usePostFields( { postType } );
-	const { form: siteForm } = useViewConfig( {
-		kind: 'root',
-		name: 'site',
-	} );
-	const { siteSettings, slug } = useSelect( ( select ) => {
-		const { getEditedEntityRecord, canUser } = select( coreDataStore );
-		const _siteSettings = canUser( 'read', { kind: 'root', name: 'site' } )
-			? getEditedEntityRecord( 'root', 'site' )
-			: undefined;
-		return {
-			siteSettings: _siteSettings,
-			slug: select( editorStore ).getEditedPostAttribute( 'slug' ),
-		};
-	}, [] );
-	const { editEntityRecord } = useDispatch( coreDataStore );
-	const siteFieldIds = useMemo( () => {
-		return ( siteForm?.fields ?? [] ).map( ( field ) =>
-			typeof field === 'string' ? field : field.id
-		);
-	}, [ siteForm ] );
-	const fields = useMemo( () => {
-		return postFields?.filter( ( field ) =>
-			siteFieldIds.includes( field.id )
-		);
-	}, [ postFields, siteFieldIds ] );
-	if (
-		postType !== 'wp_template' ||
-		! [ 'home', 'index' ].includes( slug ) ||
-		! siteSettings ||
-		! siteForm
-	) {
-		return null;
-	}
-	return (
-		<DataForm
-			data={ siteSettings }
-			fields={ fields }
-			form={ siteForm }
-			onChange={ ( edits ) => {
-				editEntityRecord( 'root', 'site', undefined, edits );
-			} }
-		/>
-	);
-}
 
 export default function DataFormPostSummary( { onActionPerformed } ) {
 	const { postType, postId } = useSelect( ( select ) => {
@@ -190,7 +145,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					form={ form }
 					onChange={ onChange }
 				/>
-				<SiteSettingsDataForm postType={ postType } />
+				<TemplateHomeSettings postType={ postType } />
 				<PostTrash onActionPerformed={ onActionPerformed } />
 			</VStack>
 		</PostPanelSection>
