@@ -144,11 +144,9 @@ describe( 'Popover', () => {
 
 			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
 
-			await waitFor( () => {
-				expect(
-					screen.getByText( 'Popover content' )
-				).toBeInTheDocument();
-			} );
+			expect(
+				await screen.findByText( 'Popover content' )
+			).toBeVisible();
 		} );
 
 		it( 'should close the popover when clicking the trigger again', async () => {
@@ -169,11 +167,9 @@ describe( 'Popover', () => {
 			} );
 
 			await user.click( trigger );
-			await waitFor( () => {
-				expect(
-					screen.getByText( 'Popover content' )
-				).toBeInTheDocument();
-			} );
+			expect(
+				await screen.findByText( 'Popover content' )
+			).toBeVisible();
 
 			await user.click( trigger );
 			await waitFor( () => {
@@ -198,11 +194,9 @@ describe( 'Popover', () => {
 
 			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
 
-			await waitFor( () => {
-				expect(
-					screen.getByText( 'Popover content' )
-				).toBeInTheDocument();
-			} );
+			expect(
+				await screen.findByText( 'Popover content' )
+			).toBeVisible();
 
 			await user.keyboard( '{Escape}' );
 
@@ -229,11 +223,9 @@ describe( 'Popover', () => {
 
 			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
 
-			await waitFor( () => {
-				expect(
-					screen.getByText( 'Popover content' )
-				).toBeInTheDocument();
-			} );
+			expect(
+				await screen.findByText( 'Popover content' )
+			).toBeVisible();
 
 			await user.click( screen.getByRole( 'button', { name: 'Close' } ) );
 
@@ -277,11 +269,9 @@ describe( 'Popover', () => {
 				screen.getByRole( 'button', { name: 'External open' } )
 			);
 
-			await waitFor( () => {
-				expect(
-					screen.getByText( 'Controlled content' )
-				).toBeInTheDocument();
-			} );
+			expect(
+				await screen.findByText( 'Controlled content' )
+			).toBeVisible();
 		} );
 	} );
 
@@ -297,11 +287,9 @@ describe( 'Popover', () => {
 				</Popover.Root>
 			);
 
-			await waitFor( () => {
-				expect(
-					screen.getByText( 'Default open content' )
-				).toBeInTheDocument();
-			} );
+			expect(
+				await screen.findByText( 'Default open content' )
+			).toBeVisible();
 		} );
 	} );
 
@@ -417,9 +405,9 @@ describe( 'Popover', () => {
 			await user.click(
 				screen.getByRole( 'button', { name: 'Open unstyled' } )
 			);
-			await waitFor( () => {
-				expect( unstyledRef.current ).toBeInstanceOf( HTMLDivElement );
-			} );
+			expect(
+				await screen.findByText( 'Unstyled content' )
+			).toBeVisible();
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Open styled' } )
@@ -451,15 +439,11 @@ describe( 'Popover', () => {
 
 			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
 
-			await waitFor( () => {
-				expect(
-					screen.getByText( 'Inline content' )
-				).toBeInTheDocument();
-			} );
+			const content = await screen.findByText( 'Inline content' );
+			expect( content ).toBeVisible();
 
-			const wrapper = screen.getByTestId( 'inline-wrapper' );
-			expect( wrapper ).toContainElement(
-				screen.getByText( 'Inline content' )
+			expect( screen.getByTestId( 'inline-wrapper' ) ).toContainElement(
+				content
 			);
 		} );
 
@@ -480,16 +464,12 @@ describe( 'Popover', () => {
 
 			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
 
-			await waitFor( () => {
-				expect(
-					screen.getByText( 'Portal content' )
-				).toBeInTheDocument();
-			} );
+			const content = await screen.findByText( 'Portal content' );
+			expect( content ).toBeVisible();
 
-			const wrapper = screen.getByTestId( 'portal-wrapper' );
-			expect( wrapper ).not.toContainElement(
-				screen.getByText( 'Portal content' )
-			);
+			expect(
+				screen.getByTestId( 'portal-wrapper' )
+			).not.toContainElement( content );
 		} );
 	} );
 
@@ -515,11 +495,9 @@ describe( 'Popover', () => {
 
 			render( <AnchorTest /> );
 
-			await waitFor( () => {
-				expect(
-					screen.getByText( 'Anchored content' )
-				).toBeInTheDocument();
-			} );
+			expect(
+				await screen.findByText( 'Anchored content' )
+			).toBeVisible();
 		} );
 	} );
 
@@ -586,20 +564,13 @@ describe( 'Popover', () => {
 				</Popover.Root>
 			);
 
-			const trigger = screen.getByRole( 'button', { name: 'Open' } );
-			await user.click( trigger );
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
 
-			await waitFor( () => {
-				expect(
-					screen.getByRole( 'button', {
-						name: 'Content Button',
-					} )
-				).toBeInTheDocument();
+			const contentButton = await screen.findByRole( 'button', {
+				name: 'Content Button',
 			} );
-
-			expect(
-				screen.getByRole( 'button', { name: 'Content Button' } )
-			).not.toHaveFocus();
+			expect( contentButton ).toBeVisible();
+			expect( contentButton ).not.toHaveFocus();
 			expect(
 				screen.getByRole( 'button', { name: 'Close' } )
 			).not.toHaveFocus();
@@ -622,11 +593,11 @@ describe( 'Popover', () => {
 
 			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
 
-			await waitFor( () => {
-				expect(
-					screen.getByText( 'Content Button' )
-				).toBeInTheDocument();
-			} );
+			expect(
+				await screen.findByRole( 'button', {
+					name: 'Content Button',
+				} )
+			).toBeVisible();
 
 			expect( customFocus ).toHaveBeenCalled();
 		} );
