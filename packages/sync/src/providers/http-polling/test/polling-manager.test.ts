@@ -803,6 +803,139 @@ describe( 'polling-manager', () => {
 		} );
 	} );
 
+	describe( 'protocol mismatch', () => {
+		it( 'emits protocol-mismatch error to all rooms when the server returns rest_sync_protocol_mismatch', async () => {
+			// First poll succeeds to establish connection.
+			mockPostSyncUpdate.mockResolvedValueOnce( {
+				rooms: [
+					{
+						room: 'room-a',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+					{
+						room: 'room-b',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+				],
+			} );
+
+			const onStatusChangeA = jest.fn();
+			const onStatusChangeB = jest.fn();
+
+			pollingManager.registerRoom( {
+				room: 'room-a',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: onStatusChangeA,
+				onSync: jest.fn(),
+			} );
+
+			pollingManager.registerRoom( {
+				room: 'room-b',
+				doc: createMockDoc( 2 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: onStatusChangeB,
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			onStatusChangeA.mockClear();
+			onStatusChangeB.mockClear();
+
+			// Second poll: server returns protocol mismatch error.
+			mockPostSyncUpdate.mockRejectedValueOnce( {
+				code: 'rest_sync_protocol_mismatch',
+				message: 'Protocol version mismatch',
+			} );
+
+			await jest.advanceTimersByTimeAsync( 4000 );
+
+			expect( onStatusChangeA ).toHaveBeenCalledWith( {
+				status: 'disconnected',
+				error: expect.objectContaining( {
+					code: 'protocol-mismatch',
+				} ),
+			} );
+
+			expect( onStatusChangeB ).toHaveBeenCalledWith( {
+				status: 'disconnected',
+				error: expect.objectContaining( {
+					code: 'protocol-mismatch',
+				} ),
+			} );
+		} );
+
+		it( 'stops polling after a protocol mismatch error', async () => {
+			// First poll succeeds.
+			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			// Second poll: protocol mismatch.
+			mockPostSyncUpdate.mockRejectedValueOnce( {
+				code: 'rest_sync_protocol_mismatch',
+			} );
+
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			// Wait a long time — no further polls should occur (return stops scheduling).
+			mockPostSyncUpdate.mockResolvedValue( syncResponse );
+			await jest.advanceTimersByTimeAsync( 60000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'does not apply exponential backoff for protocol mismatch errors', async () => {
+			// First poll succeeds.
+			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
+
+			const onStatusChange = jest.fn();
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange,
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			// Protocol mismatch — should return early without touching backoff.
+			mockPostSyncUpdate.mockRejectedValueOnce( {
+				code: 'rest_sync_protocol_mismatch',
+			} );
+
+			await jest.advanceTimersByTimeAsync( 4000 );
+
+			// The error should be protocol-mismatch, not unknown-error
+			// (which would indicate the generic catch handler ran).
+			expect( onStatusChange ).toHaveBeenCalledWith( {
+				status: 'disconnected',
+				error: expect.objectContaining( {
+					code: 'protocol-mismatch',
+				} ),
+			} );
+		} );
+	} );
+
 	describe( 'error recovery', () => {
 		it( 'replaces queued updates with a compaction after a poll error', async () => {
 			// First poll: succeed with collaborators to resume the queue.

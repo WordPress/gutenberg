@@ -554,6 +554,29 @@ function poll(): void {
 				);
 			}
 
+			// Allow the server to explicitly signal a protocol mismatch error so we
+			// can fail gracefully instead of retrying indefinitely. This can happen if
+			// the client is running an outdated version of the code that is
+			// incompatible with the server.
+			if (
+				error &&
+				'object' === typeof error &&
+				'code' in error &&
+				'rest_sync_protocol_mismatch' === error.code
+			) {
+				roomStates.forEach( ( state ) => {
+					state.onStatusChange( {
+						status: 'disconnected',
+						error: new ConnectionError(
+							ConnectionErrorCode.PROTOCOL_MISMATCH,
+							'Protocol mismatch between client and server'
+						),
+					} );
+					state.unregister();
+				} );
+				return;
+			}
+
 			// Don't report disconnected status when the request was aborted
 			// due to page unload (e.g. during a refresh) to avoid briefly
 			// flashing the disconnect dialog before the new page loads.
