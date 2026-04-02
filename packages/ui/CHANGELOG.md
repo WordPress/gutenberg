@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Card`: Set default foreground color on `Card.Root` so content and `currentColor` icons (for example the `CollapsibleCard` chevron) are themeable by default ([#77013](https://github.com/WordPress/gutenberg/pull/77013)).
+
 ## 0.10.0 (2026-04-01)
 
 ### New Features
