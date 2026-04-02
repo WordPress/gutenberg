@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId, useRef, useState } from '@wordpress/element';
 import { SlotFillProvider, Slot } from '@wordpress/components';
-import { close } from '@wordpress/icons';
+import { close, info } from '@wordpress/icons';
 import { Popover, VisuallyHidden } from '../..';
 import { IconButton } from '../../icon-button';
 import { GenericIframe, useMeasure } from './utils';
@@ -1247,6 +1247,60 @@ export const HoverTrigger: Story = {
 					</Popover.Description>
 				</Popover.Popup>
 			</Popover.Root>
+		);
+	},
+};
+
+/**
+ * Popups that open when hovering an info icon should use Popover with the
+ * `openOnHover` prop on the trigger instead of a tooltip. This way, touch
+ * users and screen reader users can access the content.
+ *
+ * To know when to reach for a popover instead of a tooltip, consider the
+ * purpose of the trigger element: If the trigger's purpose is to open the
+ * popup itself, it's a popover. If the trigger's purpose is unrelated to
+ * opening the popup, it's a tooltip.
+ */
+export const InfoTip: Story = {
+	parameters: { controls: { disable: true } },
+	render: function Render( args ) {
+		return (
+			<div
+				style={ {
+					display: 'flex',
+					alignItems: 'center',
+					gap: 'var(--wpds-dimension-gap-xs)',
+				} }
+			>
+				<span>Label</span>
+				<Popover.Root { ...args }>
+					<Popover.Trigger
+						openOnHover
+						delay={ 200 }
+						closeDelay={ 200 }
+						render={
+							<IconButton
+								variant="minimal"
+								size="compact"
+								tone="neutral"
+								icon={ info }
+								label="More information"
+							/>
+						}
+					/>
+					<Popover.Popup>
+						<Popover.Arrow />
+						<Popover.Title>
+							<VisuallyHidden>More information</VisuallyHidden>
+						</Popover.Title>
+						<Popover.Description>
+							This is additional context about the label. Unlike
+							tooltips, this content is accessible to touch and
+							screen reader users.
+						</Popover.Description>
+					</Popover.Popup>
+				</Popover.Root>
+			</div>
 		);
 	},
 };
