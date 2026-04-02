@@ -1279,6 +1279,7 @@ export const InfoTip: Story = {
 						openOnHover
 						delay={ 200 }
 						closeDelay={ 200 }
+						aria-label="More information"
 						style={ {
 							all: 'unset',
 							cursor: 'pointer',
@@ -1287,7 +1288,6 @@ export const InfoTip: Story = {
 						} }
 					>
 						<Icon icon={ info } size={ 20 } />
-						<VisuallyHidden>More information</VisuallyHidden>
 					</Popover.Trigger>
 					<Popover.Popup>
 						<Popover.Arrow />
