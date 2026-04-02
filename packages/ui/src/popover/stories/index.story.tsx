@@ -3,6 +3,7 @@ import { useId, useRef, useState } from '@wordpress/element';
 import { SlotFillProvider, Slot } from '@wordpress/components';
 import { close, info } from '@wordpress/icons';
 import { Popover, VisuallyHidden } from '../..';
+import { Icon } from '../../icon';
 import { IconButton } from '../../icon-button';
 import { GenericIframe, useMeasure } from './utils';
 
@@ -1278,16 +1279,16 @@ export const InfoTip: Story = {
 						openOnHover
 						delay={ 200 }
 						closeDelay={ 200 }
-						render={
-							<IconButton
-								variant="minimal"
-								size="compact"
-								tone="neutral"
-								icon={ info }
-								label="More information"
-							/>
-						}
-					/>
+						style={ {
+							all: 'unset',
+							cursor: 'pointer',
+							display: 'inline-flex',
+							alignItems: 'center',
+						} }
+					>
+						<Icon icon={ info } size={ 20 } />
+						<VisuallyHidden>More information</VisuallyHidden>
+					</Popover.Trigger>
 					<Popover.Popup>
 						<Popover.Arrow />
 						<Popover.Title>
