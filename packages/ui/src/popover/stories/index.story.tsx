@@ -35,7 +35,11 @@ export const Default: Story = {
 				<Popover.Trigger>Open Popover</Popover.Trigger>
 				<Popover.Popup>
 					<Popover.Arrow />
-					<Popover.Title style={ { marginBottom: 4 } }>
+					<Popover.Title
+						style={ {
+							marginBottom: 'var(--wpds-dimension-gap-xs)',
+						} }
+					>
 						Popover title
 					</Popover.Title>
 					<Popover.Description>
@@ -57,7 +61,11 @@ export const NoArrow: Story = {
 			<>
 				<Popover.Trigger>Open Popover</Popover.Trigger>
 				<Popover.Popup>
-					<Popover.Title style={ { marginBottom: 4 } }>
+					<Popover.Title
+						style={ {
+							marginBottom: 'var(--wpds-dimension-gap-xs)',
+						} }
+					>
 						Popover title
 					</Popover.Title>
 					<Popover.Description>
@@ -141,7 +149,7 @@ export const WithCloseButton: Story = {
 							display: 'flex',
 							justifyContent: 'space-between',
 							alignItems: 'center',
-							marginBottom: 8,
+							marginBottom: 'var(--wpds-dimension-gap-sm)',
 						} }
 					>
 						<Popover.Title>Settings</Popover.Title>
@@ -187,7 +195,11 @@ export const Controlled: Story = {
 				<Popover.Trigger>Toggle Popover</Popover.Trigger>
 				<Popover.Popup>
 					<Popover.Arrow />
-					<Popover.Title style={ { marginBottom: 4 } }>
+					<Popover.Title
+						style={ {
+							marginBottom: 'var(--wpds-dimension-gap-xs)',
+						} }
+					>
 						Controlled Popover
 					</Popover.Title>
 					<Popover.Description>
@@ -271,15 +283,19 @@ export const Modal: Story = {
 				<Popover.Trigger>Edit Settings</Popover.Trigger>
 				<Popover.Popup backdrop>
 					<Popover.Arrow />
-					<Popover.Title style={ { marginBottom: 4 } }>
+					<Popover.Title
+						style={ {
+							marginBottom: 'var(--wpds-dimension-gap-xs)',
+						} }
+					>
 						Settings
 					</Popover.Title>
 					<form
 						style={ {
 							display: 'flex',
 							flexDirection: 'column',
-							gap: 8,
-							marginTop: 8,
+							gap: 'var(--wpds-dimension-gap-sm)',
+							marginTop: 'var(--wpds-dimension-gap-sm)',
 						} }
 						onSubmit={ ( e ) => e.preventDefault() }
 					>
@@ -288,7 +304,7 @@ export const Modal: Story = {
 							style={ {
 								display: 'flex',
 								flexDirection: 'column',
-								gap: 4,
+								gap: 'var(--wpds-dimension-gap-xs)',
 								fontSize: 'inherit',
 							} }
 						>
@@ -305,7 +321,7 @@ export const Modal: Story = {
 							style={ {
 								display: 'flex',
 								flexDirection: 'column',
-								gap: 4,
+								gap: 'var(--wpds-dimension-gap-xs)',
 								fontSize: 'inherit',
 							} }
 						>
@@ -321,8 +337,8 @@ export const Modal: Story = {
 							style={ {
 								display: 'flex',
 								justifyContent: 'flex-end',
-								gap: 8,
-								marginTop: 4,
+								gap: 'var(--wpds-dimension-gap-sm)',
+								marginTop: 'var(--wpds-dimension-gap-xs)',
 							} }
 						>
 							<Popover.Close
@@ -352,7 +368,11 @@ export const Unstyled: Story = {
 			<>
 				<Popover.Trigger>Open Unstyled</Popover.Trigger>
 				<Popover.Popup variant="unstyled">
-					<Popover.Title style={ { marginBottom: 4 } }>
+					<Popover.Title
+						style={ {
+							marginBottom: 'var(--wpds-dimension-gap-xs)',
+						} }
+					>
 						Custom Styled
 					</Popover.Title>
 					<Popover.Description>
@@ -399,7 +419,11 @@ export const OverlayPlacement: Story = {
 							align: 'none',
 						} }
 					>
-						<Popover.Title style={ { marginBottom: 4 } }>
+						<Popover.Title
+							style={ {
+								marginBottom: 'var(--wpds-dimension-gap-xs)',
+							} }
+						>
 							Overlay
 						</Popover.Title>
 						<Popover.Description>
@@ -435,7 +459,11 @@ export const Inline: Story = {
 				<Popover.Trigger>Open Inline</Popover.Trigger>
 				<Popover.Popup inline>
 					<Popover.Arrow />
-					<Popover.Title style={ { marginBottom: 4 } }>
+					<Popover.Title
+						style={ {
+							marginBottom: 'var(--wpds-dimension-gap-xs)',
+						} }
+					>
 						Inline Popover
 					</Popover.Title>
 					<Popover.Description>
@@ -491,7 +519,12 @@ export const CollisionAvoidance: Story = {
 							side="top"
 							collisionBoundary={ boundary ?? undefined }
 						>
-							<Popover.Title style={ { marginBottom: 4 } }>
+							<Popover.Title
+								style={ {
+									marginBottom:
+										'var(--wpds-dimension-gap-xs)',
+								} }
+							>
 								Flip
 							</Popover.Title>
 							<Popover.Description>
@@ -510,7 +543,12 @@ export const CollisionAvoidance: Story = {
 								align: 'none',
 							} }
 						>
-							<Popover.Title style={ { marginBottom: 4 } }>
+							<Popover.Title
+								style={ {
+									marginBottom:
+										'var(--wpds-dimension-gap-xs)',
+								} }
+							>
 								None
 							</Popover.Title>
 							<Popover.Description>
@@ -588,7 +626,10 @@ export const CrossIframe: Story = {
 								>
 									<Popover.Arrow />
 									<Popover.Title
-										style={ { marginBottom: 4 } }
+										style={ {
+											marginBottom:
+												'var(--wpds-dimension-gap-xs)',
+										} }
 									>
 										Cross-Iframe Popover
 									</Popover.Title>
@@ -674,7 +715,10 @@ export const CrossIframeWithSlotFill: Story = {
 								>
 									<Popover.Arrow />
 									<Popover.Title
-										style={ { marginBottom: 4 } }
+										style={ {
+											marginBottom:
+												'var(--wpds-dimension-gap-xs)',
+										} }
 									>
 										Cross-Iframe (SlotFill)
 									</Popover.Title>
@@ -710,7 +754,11 @@ export const WithCustomZIndex: Story = {
 				<Popover.Trigger>Open Popover</Popover.Trigger>
 				<Popover.Popup style={ { '--wp-ui-popover-z-index': '9999' } }>
 					<Popover.Arrow />
-					<Popover.Title style={ { marginBottom: 4 } }>
+					<Popover.Title
+						style={ {
+							marginBottom: 'var(--wpds-dimension-gap-xs)',
+						} }
+					>
 						Custom z-index
 					</Popover.Title>
 					<Popover.Description>
@@ -877,7 +925,7 @@ export const ToolbarVariant: Story = {
 					variant="unstyled"
 					style={ {
 						display: 'flex',
-						gap: 4,
+						gap: 'var(--wpds-dimension-gap-xs)',
 						padding: '4px 8px',
 						border: '1px solid #1e1e1e',
 						borderRadius: 2,
@@ -934,7 +982,12 @@ export const ViewportConstrainedSize: Story = {
 						} }
 					>
 						<div style={ { overflow: 'auto', height: '100%' } }>
-							<Popover.Title style={ { marginBottom: 4 } }>
+							<Popover.Title
+								style={ {
+									marginBottom:
+										'var(--wpds-dimension-gap-xs)',
+								} }
+							>
 								Constrained
 							</Popover.Title>
 							<Popover.Description>
@@ -988,7 +1041,11 @@ export const OnOpenChangeDetails: Story = {
 					<Popover.Trigger>Toggle</Popover.Trigger>
 					<Popover.Popup>
 						<Popover.Arrow />
-						<Popover.Title style={ { marginBottom: 4 } }>
+						<Popover.Title
+							style={ {
+								marginBottom: 'var(--wpds-dimension-gap-xs)',
+							} }
+						>
 							Event Log
 						</Popover.Title>
 						<Popover.Description>
@@ -1039,14 +1096,18 @@ export const InitialFocus: Story = {
 				<Popover.Trigger>Open Form</Popover.Trigger>
 				<Popover.Popup initialFocus={ emailRef }>
 					<Popover.Arrow />
-					<Popover.Title style={ { marginBottom: 4 } }>
+					<Popover.Title
+						style={ {
+							marginBottom: 'var(--wpds-dimension-gap-xs)',
+						} }
+					>
 						Contact
 					</Popover.Title>
 					<form
 						style={ {
 							display: 'flex',
 							flexDirection: 'column',
-							gap: 8,
+							gap: 'var(--wpds-dimension-gap-sm)',
 						} }
 						onSubmit={ ( e ) => e.preventDefault() }
 					>
@@ -1055,7 +1116,7 @@ export const InitialFocus: Story = {
 							style={ {
 								display: 'flex',
 								flexDirection: 'column',
-								gap: 4,
+								gap: 'var(--wpds-dimension-gap-xs)',
 								fontSize: 'inherit',
 							} }
 						>
@@ -1071,7 +1132,7 @@ export const InitialFocus: Story = {
 							style={ {
 								display: 'flex',
 								flexDirection: 'column',
-								gap: 4,
+								gap: 'var(--wpds-dimension-gap-xs)',
 								fontSize: 'inherit',
 							} }
 						>
@@ -1117,7 +1178,11 @@ export const TrapFocus: Story = {
 					<Popover.Trigger>Open</Popover.Trigger>
 					<Popover.Popup>
 						<Popover.Arrow />
-						<Popover.Title style={ { marginBottom: 4 } }>
+						<Popover.Title
+							style={ {
+								marginBottom: 'var(--wpds-dimension-gap-xs)',
+							} }
+						>
 							Trap Focus
 						</Popover.Title>
 						<Popover.Description>
@@ -1127,8 +1192,8 @@ export const TrapFocus: Story = {
 						<div
 							style={ {
 								display: 'flex',
-								gap: 8,
-								marginTop: 8,
+								gap: 'var(--wpds-dimension-gap-sm)',
+								marginTop: 'var(--wpds-dimension-gap-sm)',
 							} }
 						>
 							<input placeholder="Field A" />
@@ -1169,7 +1234,11 @@ export const HoverTrigger: Story = {
 				</Popover.Trigger>
 				<Popover.Popup>
 					<Popover.Arrow />
-					<Popover.Title style={ { marginBottom: 4 } }>
+					<Popover.Title
+						style={ {
+							marginBottom: 'var(--wpds-dimension-gap-xs)',
+						} }
+					>
 						Hover Popover
 					</Popover.Title>
 					<Popover.Description>
