@@ -10,7 +10,7 @@ import type { Modifiers, BaseProps } from '../types';
 
 function isLocaleRTL( localeCode: string ) {
 	const localeObj = new Intl.Locale( localeCode );
-	const direction = localeObj.getTextInfo?.()?.direction;
+	const direction = localeObj.getTextInfo?.().direction;
 	if ( direction ) {
 		return direction === 'rtl';
 	}
