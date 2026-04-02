@@ -37,6 +37,8 @@ export interface HeicImageData {
 	outputWidth: number;
 	/** Final output height in pixels. */
 	outputHeight: number;
+	/** Rotation angle in degrees counter-clockwise (0, 90, 180, 270). */
+	rotation: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -310,6 +312,20 @@ function parseIspe(
 }
 
 /**
+ * Parse Image Rotation box → rotation angle in degrees CCW.
+ *
+ * Format: 1 byte with reserved (6 bits) + angle (2 bits).
+ * angle * 90 = rotation in degrees counter-clockwise.
+ *
+ * @param r   Binary reader.
+ * @param box BoxInfo for the irot box.
+ */
+function parseIrot( r: Reader, box: BoxInfo ): number {
+	r.pos = box.offset + box.headerSize;
+	return ( r.u8() & 0x3 ) * 90;
+}
+
+/**
  * Parse Item Info Box → map of item ID to item type (4-char code).
  *
  * @param r   Binary reader.
@@ -507,7 +523,7 @@ function readItemData(
 }
 
 /**
- * Find hvcC and ispe property boxes for a given item.
+ * Find hvcC, ispe, and irot property boxes for a given item.
  *
  * @param propIndices 1-based property indices from ipma.
  * @param properties  All property boxes from ipco.
@@ -515,9 +531,10 @@ function readItemData(
 function findHvcProperties(
 	propIndices: number[],
 	properties: BoxInfo[]
-): { hvcCBox: BoxInfo; ispeBox: BoxInfo } {
+): { hvcCBox: BoxInfo; ispeBox: BoxInfo; irotBox?: BoxInfo } {
 	let hvcCBox: BoxInfo | undefined;
 	let ispeBox: BoxInfo | undefined;
+	let irotBox: BoxInfo | undefined;
 
 	for ( const idx of propIndices ) {
 		if ( idx < 1 || idx > properties.length ) {
@@ -530,6 +547,9 @@ function findHvcProperties(
 		if ( prop.type === 'ispe' && ! ispeBox ) {
 			ispeBox = prop;
 		}
+		if ( prop.type === 'irot' && ! irotBox ) {
+			irotBox = prop;
+		}
 	}
 
 	if ( ! hvcCBox ) {
@@ -539,7 +559,7 @@ function findHvcProperties(
 		throw new Error( 'No image dimensions (ispe) found' );
 	}
 
-	return { hvcCBox, ispeBox };
+	return { hvcCBox, ispeBox, irotBox };
 }
 
 // ---------------------------------------------------------------------------
@@ -645,7 +665,7 @@ export function parseHeic( buffer: ArrayBuffer ): HeicImageData {
 		throw new Error( 'No property associations for primary item' );
 	}
 
-	const { hvcCBox, ispeBox } = findHvcProperties(
+	const { hvcCBox, ispeBox, irotBox } = findHvcProperties(
 		primaryPropIndices,
 		properties
 	);
@@ -657,6 +677,7 @@ export function parseHeic( buffer: ArrayBuffer ): HeicImageData {
 	);
 	const codecString = buildCodecString( r, hvcCDataStart );
 	const { width, height } = parseIspe( r, ispeBox );
+	const rotation = irotBox ? parseIrot( r, irotBox ) : 0;
 
 	return {
 		codecString,
@@ -672,6 +693,7 @@ export function parseHeic( buffer: ArrayBuffer ): HeicImageData {
 		tileHeight: height,
 		outputWidth: width,
 		outputHeight: height,
+		rotation,
 	};
 }
 
@@ -761,6 +783,19 @@ function parseGridImage(
 		properties
 	);
 
+	// irot is associated with the grid item, not the tiles.
+	const gridProps = allAssoc.get( gridItemId ) || [];
+	let irotBox: BoxInfo | undefined;
+	for ( const idx of gridProps ) {
+		if ( idx >= 1 && idx <= properties.length ) {
+			const prop = properties[ idx - 1 ];
+			if ( prop.type === 'irot' ) {
+				irotBox = prop;
+				break;
+			}
+		}
+	}
+
 	const hvcCDataStart = hvcCBox.offset + hvcCBox.headerSize;
 	const hvcCDataSize = hvcCBox.size - hvcCBox.headerSize;
 	const description = new Uint8Array(
@@ -787,6 +822,8 @@ function parseGridImage(
 		}
 	}
 
+	const rotation = irotBox ? parseIrot( r, irotBox ) : 0;
+
 	return {
 		codecString,
 		description,
@@ -795,6 +832,7 @@ function parseGridImage(
 		tileHeight,
 		outputWidth,
 		outputHeight,
+		rotation,
 	};
 }
 

@@ -106,6 +106,12 @@ function buildIspe( width: number, height: number ): Uint8Array {
 	return buildFullBox( 'ispe', 0, 0, data );
 }
 
+/** Build an irot (Image Rotation) box. angle is 0-3 (multiplied by 90°). */
+function buildIrot( angle: number ): Uint8Array {
+	const data = new Uint8Array( [ angle & 0x3 ] );
+	return buildBox( 'irot', data );
+}
+
 /** Build an ipco (Item Property Container) with the given property boxes. */
 function buildIpco( ...properties: Uint8Array[] ): Uint8Array {
 	return buildBox( 'ipco', concat( ...properties ) );
@@ -209,18 +215,26 @@ function buildSingleImageHeic( {
 	width = 100,
 	height = 80,
 	imageData = new Uint8Array( [ 0xde, 0xad, 0xbe, 0xef ] ),
+	rotation,
 }: {
 	width?: number;
 	height?: number;
 	imageData?: Uint8Array;
+	rotation?: number;
 } = {} ): ArrayBuffer {
 	const primaryItemId = 1;
 
-	// Build property boxes (1-indexed: 1=ispe, 2=hvcC)
+	// Build property boxes (1-indexed: 1=ispe, 2=hvcC, optionally 3=irot)
 	const ispe = buildIspe( width, height );
 	const hvcC = buildHvcC();
-	const ipco = buildIpco( ispe, hvcC );
-	const ipma = buildIpma( [ [ primaryItemId, [ 1, 2 ] ] ] );
+	const propBoxes: Uint8Array[] = [ ispe, hvcC ];
+	const propIndices = [ 1, 2 ];
+	if ( rotation !== undefined ) {
+		propBoxes.push( buildIrot( rotation / 90 ) );
+		propIndices.push( 3 );
+	}
+	const ipco = buildIpco( ...propBoxes );
+	const ipma = buildIpma( [ [ primaryItemId, propIndices ] ] );
 	const iprp = buildIprp( ipco, ipma );
 
 	// We need to know where mdat data will be placed.
@@ -329,6 +343,27 @@ describe( 'heic-parser', () => {
 			expect( result.description ).toBeInstanceOf( Uint8Array );
 			expect( result.description.length ).toBe( 23 ); // minimal hvcC record
 			expect( result.description[ 0 ] ).toBe( 1 ); // configurationVersion
+		} );
+
+		it( 'should return rotation 0 when no irot box present', () => {
+			const buffer = buildSingleImageHeic();
+			const result = parseHeic( buffer );
+
+			expect( result.rotation ).toBe( 0 );
+		} );
+
+		it( 'should parse 90° CCW rotation from irot box', () => {
+			const buffer = buildSingleImageHeic( { rotation: 90 } );
+			const result = parseHeic( buffer );
+
+			expect( result.rotation ).toBe( 90 );
+		} );
+
+		it( 'should parse 270° CCW rotation from irot box', () => {
+			const buffer = buildSingleImageHeic( { rotation: 270 } );
+			const result = parseHeic( buffer );
+
+			expect( result.rotation ).toBe( 270 );
 		} );
 	} );
 

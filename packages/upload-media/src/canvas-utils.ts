@@ -139,7 +139,10 @@ export async function canvasConvertToJpeg(
 					}
 				}
 
-				const jpegBlob = await canvas.convertToBlob( {
+				// Apply ISOBMFF irot rotation if present.
+				const outputCanvas = applyRotation( canvas, heicData.rotation );
+
+				const jpegBlob = await outputCanvas.convertToBlob( {
 					type: 'image/jpeg',
 					quality,
 				} );
@@ -157,6 +160,43 @@ export async function canvasConvertToJpeg(
 	throw new Error(
 		'This browser cannot decode HEIC images. Please use Safari or convert to JPEG before uploading.'
 	);
+}
+
+/**
+ * Apply ISOBMFF irot rotation to a canvas.
+ *
+ * Returns the original canvas if no rotation is needed, or a new
+ * OffscreenCanvas with the rotation applied.
+ *
+ * @param source   Source canvas with the decoded image.
+ * @param rotation Rotation angle in degrees counter-clockwise (0, 90, 180, 270).
+ * @return Canvas with rotation applied.
+ */
+function applyRotation(
+	source: OffscreenCanvas,
+	rotation: number
+): OffscreenCanvas {
+	if ( rotation === 0 ) {
+		return source;
+	}
+
+	const swap = rotation === 90 || rotation === 270;
+	const w = swap ? source.height : source.width;
+	const h = swap ? source.width : source.height;
+
+	const rotated = new OffscreenCanvas( w, h );
+	const ctx = rotated.getContext( '2d' );
+
+	if ( ! ctx ) {
+		return source;
+	}
+
+	ctx.translate( w / 2, h / 2 );
+	// irot angle is CCW; canvas rotate() is CW, so negate.
+	ctx.rotate( ( -rotation * Math.PI ) / 180 );
+	ctx.drawImage( source, -source.width / 2, -source.height / 2 );
+
+	return rotated;
 }
 
 /**
