@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { Link } from '@wordpress/route';
+import { Link as RouterLink } from '@wordpress/route';
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import { Link } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -64,12 +65,22 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 			>
 				{ precedingItems.map( ( item, index ) => (
 					<li key={ index }>
-						<Link to={ item.to }>{ item.label }</Link>
+						<Link
+							render={ <RouterLink to={ item.to } /> }
+							tone="neutral"
+						>
+							{ item.label }
+						</Link>
 					</li>
 				) ) }
 				<li>
 					{ lastItem.to ? (
-						<Link to={ lastItem.to }>{ lastItem.label }</Link>
+						<Link
+							render={ <RouterLink to={ lastItem.to } /> }
+							tone="neutral"
+						>
+							{ lastItem.label }
+						</Link>
 					) : (
 						<Heading level={ 1 } truncate>
 							{ lastItem.label }

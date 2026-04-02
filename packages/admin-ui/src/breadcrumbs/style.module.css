@@ -14,6 +14,7 @@
 	li:not(:last-child)::after {
 		content: "/";
 		margin: 0 var(--wpds-dimension-gap-sm);
+		color: var(--wpds-color-fg-content-neutral-weak);
 	}
 
 	h1 {
