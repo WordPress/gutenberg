@@ -1287,7 +1287,7 @@ export const InfoTip: Story = {
 							cursor: 'pointer',
 							display: 'inline-flex',
 							alignItems: 'center',
-							borderRadius: '50%',
+							borderRadius: 'var(--wpds-border-radius-sm)',
 						} }
 					>
 						<Icon icon={ info } size={ 20 } />
