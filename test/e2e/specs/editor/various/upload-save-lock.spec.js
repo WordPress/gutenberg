@@ -181,71 +181,9 @@ test.describe( 'Upload save lock', () => {
 		await expect( saveDraftButton ).toBeEnabled( { timeout: 10_000 } );
 	} );
 
-	test( 'should disable Publish button during upload', async ( {
-		editor,
-		page,
-	} ) => {
-		const publishButton = page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Publish' } );
-
-		await expect( publishButton ).toBeEnabled();
-
-		let resolveUpload;
-		const uploadPromise = new Promise( ( resolve ) => {
-			resolveUpload = resolve;
-		} );
-		await page.route( '**/wp/v2/media', async ( route ) => {
-			await uploadPromise;
-			await route.continue();
-		} );
-
-		await editor.insertBlock( { name: 'core/image' } );
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		const tmpFile = await createTempImage();
-		await imageBlock
-			.locator( 'data-testid=form-file-upload-input' )
-			.setInputFiles( tmpFile );
-
-		// Wait for the lock to be set and verify the Publish button is
-		// disabled at that moment. Both checks happen in the same poll
-		// to avoid race conditions with fast uploads.
-		await expect
-			.poll(
-				async () => {
-					const isLocked = await page.evaluate( () =>
-						window.wp.data
-							.select( 'core/editor' )
-							.isPostSavingLocked()
-					);
-					if ( ! isLocked ) {
-						return 'not-locked';
-					}
-					const isDisabled = await publishButton.evaluate(
-						( el ) => el.getAttribute( 'aria-disabled' ) === 'true'
-					);
-					return isDisabled
-						? 'locked-and-disabled'
-						: 'locked-but-enabled';
-				},
-				{ timeout: 10_000 }
-			)
-			.toBe( 'locked-and-disabled' );
-
-		resolveUpload();
-
-		const image = imageBlock.getByRole( 'img', {
-			name: 'This image has an empty alt attribute',
-		} );
-		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
-			timeout: 30_000,
-		} );
-
-		// Publish button should be re-enabled after upload completes.
-		await expect( publishButton ).toBeEnabled( { timeout: 10_000 } );
-	} );
+	// Note: The Publish button's behavior with isPostSavingLocked is
+	// already covered by publishing.spec.js. We only test Save draft
+	// and keyboard shortcuts here.
 
 	test( 'should prevent saving via keyboard shortcut during upload', async ( {
 		editor,
