@@ -16,7 +16,7 @@ Displays a foldable layout that groups content in collapsible sections. ([Source
 -	**Category:** design
 -	**Allowed Blocks:** core/accordion-item
 -	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, gradients, text), contentRole, interactivity, layout, listView, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** autoclose, headingLevel, iconPosition, levelOptions, showIcon
+-	**Attributes:** autoclose, headingLevel, iconPosition, levelOptions, showIcon, syncedStyles
 
 ## Accordion Heading
 

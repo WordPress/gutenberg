@@ -59,6 +59,10 @@
 		"listView": true
 	},
 	"attributes": {
+		"syncedStyles": {
+			"type": "object",
+			"default": {}
+		},
 		"iconPosition": {
 			"type": "string",
 			"default": "right"
@@ -82,7 +86,8 @@
 	"providesContext": {
 		"core/accordion-icon-position": "iconPosition",
 		"core/accordion-show-icon": "showIcon",
-		"core/accordion-heading-level": "headingLevel"
+		"core/accordion-heading-level": "headingLevel",
+		"core/synced-styles/accordion-heading": "syncedStyles"
 	},
 	"allowedBlocks": [ "core/accordion-item" ],
 	"textdomain": "default",
