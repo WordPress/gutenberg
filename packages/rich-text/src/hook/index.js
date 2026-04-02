@@ -301,11 +301,9 @@ export function useRichText( {
 	return { ...result, formatTypes };
 }
 
-function useDeprecatedRichText( props ) {
+export function useDeprecatedRichText( props ) {
 	deprecated( '`__unstableUseRichText` hook', {
 		since: '7.0',
 	} );
 	return useRichTextBase( props );
 }
-
-export { useDeprecatedRichText as __unstableUseRichText };

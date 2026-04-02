@@ -153,7 +153,7 @@ export default function useEntityRecords< RecordType >(
 	};
 }
 
-function useDeprecatedEntityRecords(
+export function useDeprecatedEntityRecords(
 	kind: string,
 	name: string,
 	queryArgs: any,
@@ -165,8 +165,6 @@ function useDeprecatedEntityRecords(
 	} );
 	return useEntityRecords( kind, name, queryArgs, options );
 }
-
-export { useDeprecatedEntityRecords as __experimentalUseEntityRecords };
 
 export function useEntityRecordsWithPermissions< RecordType >(
 	kind: string,
