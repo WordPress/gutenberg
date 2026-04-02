@@ -5,6 +5,7 @@ import docgen from 'react-docgen-typescript';
 import glob from 'glob';
 import fs from 'node:fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'node:url';
 
 /**
  * Internal dependencies
@@ -13,7 +14,13 @@ import { generateMarkdownDocs } from './markdown/index.mjs';
 import { getDescriptionsForSubcomponents } from './get-subcomponent-descriptions.mjs';
 import { getTagsFromStorybook } from './get-tags-from-storybook.mjs';
 
-const MANIFEST_GLOB = 'packages/components/src/**/docs-manifest.json';
+export const ROOT_DIR = path.resolve(
+	path.dirname( fileURLToPath( import.meta.url ) ),
+	'../../..'
+);
+const MANIFEST_GLOB = path
+	.join( ROOT_DIR, 'packages/components/src/**/docs-manifest.json' )
+	.replace( /\\/g, '/' );
 
 /**
  * For consistency, options should generally match the options used in Storybook.
@@ -135,6 +142,7 @@ await Promise.all(
 		);
 
 		try {
+			// eslint-disable-next-line no-console
 			console.log( `Writing docs to ${ outputFile }` );
 			return fs.writeFile( outputFile, docs );
 		} catch ( e ) {

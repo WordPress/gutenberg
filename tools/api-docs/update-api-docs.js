@@ -2,10 +2,10 @@
  * External dependencies
  */
 const { join, relative, resolve, sep, dirname } = require( 'path' );
-const glob = require( 'fast-glob' );
-const execa = require( 'execa' );
 const { Transform } = require( 'stream' );
 const { readFile } = require( 'fs' ).promises;
+const glob = require( 'fast-glob' );
+const execa = require( 'execa' );
 
 /**
  * README file tokens, defined as a tuple of token identifier, source path.
@@ -216,29 +216,37 @@ glob.stream( [
 				token,
 				path = findDefaultSourcePath( dirname( file ) ),
 			] of tokens ) {
+				const sourcePath = relative(
+					ROOT_DIR,
+					resolve( dirname( file ), path )
+				);
 				await execa(
-					`"${ join(
+					join(
 						__dirname,
 						'..',
 						'..',
 						'node_modules',
 						'.bin',
 						'docgen'
-					) }"`,
+					),
 					[
-						relative( ROOT_DIR, resolve( dirname( file ), path ) ),
-						`--output ${ output }`,
+						sourcePath,
+						'--output',
+						output,
 						'--to-token',
-						`--use-token "${ token }"`,
-						'--ignore "/unstable|experimental/i"',
+						'--use-token',
+						token,
+						'--ignore',
+						'/unstable|experimental/i',
 					],
-					{ shell: true }
+					{ cwd: ROOT_DIR }
 				);
 			}
 			await execa( 'npm', [ 'run', 'format', output ], {
-				shell: true,
+				cwd: ROOT_DIR,
 			} );
 		} catch ( error ) {
+			// eslint-disable-next-line no-console
 			console.error( error );
 			process.exit( 1 );
 		}

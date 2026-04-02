@@ -4,9 +4,9 @@
  * External dependencies
  */
 const { extname } = require( 'path' );
-const chalk = require( 'chalk' );
-const execSync = require( 'child_process' ).execSync;
 const { readFile } = require( 'fs' ).promises;
+const execSync = require( 'child_process' ).execSync;
+const chalk = require( 'chalk' );
 
 const getUnstagedFiles = () =>
 	execSync( 'git diff --name-only', { encoding: 'utf8' } )
