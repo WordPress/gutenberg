@@ -199,13 +199,31 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 			}
 		}
 
-		// If this was a child sideload item, notify the parent so it can
-		// proceed past the Finalize gate. Without this, the parent stays
-		// stuck waiting for children that will never complete.
+		// If this was a child sideload item, handle the parent.
 		if ( parentId ) {
 			const parentItem = select.getItem( parentId );
-			if ( parentItem?.operations && parentItem.operations.length > 0 ) {
-				dispatch.processItem( parentId );
+			if ( parentItem ) {
+				if ( select.hasPendingItemsByParentId( parentId ) ) {
+					// Other children remain — just notify the parent so
+					// it can re-check the Finalize gate.
+					if (
+						parentItem.operations &&
+						parentItem.operations.length > 0
+					) {
+						dispatch.processItem( parentId );
+					}
+				} else {
+					// No children remain and we got here via cancellation,
+					// meaning no child succeeded. Cancel the parent too so
+					// the block resets rather than showing a partial upload.
+					dispatch.cancelItem(
+						parentId,
+						error ??
+							new Error(
+								'Upload failed: image could not be processed'
+							)
+					);
+				}
 			}
 		}
 
