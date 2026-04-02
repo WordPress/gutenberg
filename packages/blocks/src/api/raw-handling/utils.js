@@ -74,9 +74,14 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 				};
 			}
 			case 'classes': {
-				return Array.from(
-					new Set( [ ...( objValue || [] ), ...( srcValue || [] ) ] )
-				);
+				if (
+					( objValue || [] ).includes( '*' ) ||
+					( srcValue || [] ).includes( '*' )
+				) {
+					return [ '*' ];
+				}
+
+				return [ ...( objValue || [] ), ...( srcValue || [] ) ];
 			}
 		}
 	}
