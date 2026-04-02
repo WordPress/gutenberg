@@ -8,11 +8,12 @@
 	margin: 0;
 	min-height: 32px;
 
-	/* @TODO: Remove once `Text` supports truncation natively. */
+	/* @TODO: Remove truncation styles once `Text` supports truncation natively. */
 	.current {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+		margin: 0;
 	}
 
 	li:not(:last-child)::after {
