@@ -1281,10 +1281,13 @@ export const InfoTip: Story = {
 						closeDelay={ 200 }
 						aria-label="More information"
 						style={ {
-							all: 'unset',
+							background: 'none',
+							border: 'none',
+							padding: 0,
 							cursor: 'pointer',
 							display: 'inline-flex',
 							alignItems: 'center',
+							borderRadius: '50%',
 						} }
 					>
 						<Icon icon={ info } size={ 20 } />
