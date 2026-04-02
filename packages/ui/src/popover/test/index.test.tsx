@@ -346,11 +346,12 @@ describe( 'Popover', () => {
 	describe( 'accessibility', () => {
 		it( 'should associate title with the popup via aria-labelledby', async () => {
 			const user = userEvent.setup();
+			const ref = createRef< HTMLDivElement >();
 
 			render(
 				<Popover.Root>
 					<Popover.Trigger>Open</Popover.Trigger>
-					<Popover.Popup>
+					<Popover.Popup ref={ ref }>
 						<Popover.Title>My Title</Popover.Title>
 					</Popover.Popup>
 				</Popover.Root>
@@ -359,18 +360,18 @@ describe( 'Popover', () => {
 			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
 
 			await waitFor( () => {
-				const title = screen.getByText( 'My Title' );
-				expect( title.id ).toBeTruthy();
+				expect( ref.current ).toHaveAccessibleName( 'My Title' );
 			} );
 		} );
 
 		it( 'should associate description with the popup via aria-describedby', async () => {
 			const user = userEvent.setup();
+			const ref = createRef< HTMLDivElement >();
 
 			render(
 				<Popover.Root>
 					<Popover.Trigger>Open</Popover.Trigger>
-					<Popover.Popup>
+					<Popover.Popup ref={ ref }>
 						<Popover.Title>Title</Popover.Title>
 						<Popover.Description>
 							My Description
@@ -382,8 +383,9 @@ describe( 'Popover', () => {
 			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
 
 			await waitFor( () => {
-				const description = screen.getByText( 'My Description' );
-				expect( description.id ).toBeTruthy();
+				expect( ref.current ).toHaveAccessibleDescription(
+					'My Description'
+				);
 			} );
 		} );
 	} );
@@ -391,25 +393,43 @@ describe( 'Popover', () => {
 	describe( 'variant', () => {
 		it( 'should not apply popup styles when variant is unstyled', async () => {
 			const user = userEvent.setup();
-			const ref = createRef< HTMLDivElement >();
+			const unstyledRef = createRef< HTMLDivElement >();
 
 			render(
-				<Popover.Root>
-					<Popover.Trigger>Open</Popover.Trigger>
-					<Popover.Popup ref={ ref } variant="unstyled">
-						<Popover.Title>Title</Popover.Title>
-						Unstyled content
-					</Popover.Popup>
-				</Popover.Root>
+				<>
+					<Popover.Root>
+						<Popover.Trigger>Open unstyled</Popover.Trigger>
+						<Popover.Popup ref={ unstyledRef } variant="unstyled">
+							<Popover.Title>Title</Popover.Title>
+							Unstyled content
+						</Popover.Popup>
+					</Popover.Root>
+					<Popover.Root>
+						<Popover.Trigger>Open styled</Popover.Trigger>
+						<Popover.Popup data-testid="styled-popup">
+							<Popover.Title>Title</Popover.Title>
+							Styled content
+						</Popover.Popup>
+					</Popover.Root>
+				</>
 			);
 
-			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
-
+			await user.click(
+				screen.getByRole( 'button', { name: 'Open unstyled' } )
+			);
 			await waitFor( () => {
-				expect( ref.current ).toBeInstanceOf( HTMLDivElement );
+				expect( unstyledRef.current ).toBeInstanceOf( HTMLDivElement );
 			} );
 
-			expect( ref.current!.className ).toBe( '' );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Open styled' } )
+			);
+			const styledPopup = await screen.findByTestId( 'styled-popup' );
+
+			const styledClasses = Array.from( styledPopup.classList );
+			for ( const cls of styledClasses ) {
+				expect( unstyledRef.current! ).not.toHaveClass( cls );
+			}
 		} );
 	} );
 
