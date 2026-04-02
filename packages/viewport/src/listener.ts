@@ -8,8 +8,12 @@ import { dispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { store } from './store';
+import type { Breakpoints, Operators } from './types';
 
-const addDimensionsEventListener = ( breakpoints, operators ) => {
+const addDimensionsEventListener = (
+	breakpoints: Breakpoints,
+	operators: Operators
+): void => {
 	/**
 	 * Callback invoked when media query state should be updated. Is invoked a
 	 * maximum of one time per call stack.
@@ -31,19 +35,19 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 	 *
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/MediaQueryList
-	 *
-	 * @type {Object<string,MediaQueryList>}
 	 */
 	const operatorEntries = Object.entries( operators );
 	const queries = Object.entries( breakpoints ).flatMap(
 		( [ name, width ] ) => {
-			return operatorEntries.map( ( [ operator, condition ] ) => {
-				const list = window.matchMedia(
-					`(${ condition }: ${ width }px)`
-				);
-				list.addEventListener( 'change', setIsMatching );
-				return [ `${ operator } ${ name }`, list ];
-			} );
+			return operatorEntries.map(
+				( [ operator, condition ] ): [ string, MediaQueryList ] => {
+					const list = window.matchMedia(
+						`(${ condition }: ${ width }px)`
+					);
+					list.addEventListener( 'change', setIsMatching );
+					return [ `${ operator } ${ name }`, list ];
+				}
+			);
 		}
 	);
 
