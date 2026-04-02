@@ -3,10 +3,7 @@
 
 .editor-autocompleters__link {
 	white-space: nowrap;
-
-	.block-editor-block-icon {
-		margin-right: $grid-unit-10;
-	}
+	gap: $grid-unit-10;
 }
 
 .editor-autocompleters__user {
