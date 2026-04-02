@@ -479,6 +479,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// Acquire a per-attachment advisory lock to prevent concurrent sideloads
 		// from overwriting each other's metadata changes (read-modify-write race).
 		if ( ! $this->acquire_metadata_lock( $attachment_id ) ) {
+			// Clean up the uploaded file since we cannot update metadata.
+			wp_delete_file( $path );
 			return new WP_Error(
 				'rest_upload_lock_timeout',
 				__( 'Could not acquire metadata lock for this attachment. Please try again.', 'gutenberg' ),
