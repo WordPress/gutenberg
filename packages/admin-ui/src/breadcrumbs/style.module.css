@@ -15,6 +15,7 @@
 		content: "/";
 		margin: 0 var(--wpds-dimension-gap-sm);
 		color: var(--wpds-color-fg-content-neutral-weak);
+		font-weight: var(--wpds-font-weight-regular);
 	}
 
 	h1 {
