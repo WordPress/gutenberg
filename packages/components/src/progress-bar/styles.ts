@@ -73,15 +73,19 @@ export const Indicator = styled.div< {
 	${ ( { isIndeterminate } ) =>
 		isIndeterminate
 			? css( {
-					animationDuration: '1.5s',
-					animationTimingFunction: 'ease-in-out',
-					animationIterationCount: 'infinite',
-					animationName: animateProgressBar( isRTL() ),
 					width: `${ INDETERMINATE_TRACK_WIDTH }%`,
+					'@media not ( prefers-reduced-motion )': {
+						animationDuration: '1.5s',
+						animationTimingFunction: 'ease-in-out',
+						animationIterationCount: 'infinite',
+						animationName: animateProgressBar( isRTL() ),
+					},
 			  } )
 			: css( {
 					width: 'var(--indicator-width)',
-					transition: 'width 0.4s ease-in-out',
+					'@media not ( prefers-reduced-motion )': {
+						transition: 'width 0.4s ease-in-out',
+					},
 			  } ) };
 `;
 
