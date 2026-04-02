@@ -31,6 +31,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		align = 'center',
 		alignOffset,
 		anchor,
+		arrowPadding = 8,
 		backdrop = false,
 		children,
 		className,
@@ -66,6 +67,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 			align={ align }
 			alignOffset={ alignOffset }
 			anchor={ anchor }
+			arrowPadding={ arrowPadding }
 			collisionAvoidance={ collisionAvoidance }
 			collisionBoundary={ collisionBoundary }
 			collisionPadding={ collisionPadding }

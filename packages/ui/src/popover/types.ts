@@ -39,6 +39,7 @@ export interface PopupProps
 			| 'align'
 			| 'alignOffset'
 			| 'anchor'
+			| 'arrowPadding'
 			| 'collisionAvoidance'
 			| 'collisionBoundary'
 			| 'collisionPadding'
