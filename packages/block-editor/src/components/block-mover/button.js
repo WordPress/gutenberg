@@ -65,7 +65,6 @@ const BlockMoverButton = forwardRef(
 			? clientIds
 			: [ clientIds ];
 		const blocksCount = normalizedClientIds.length;
-		const { disabled } = props;
 
 		const {
 			blockType,
@@ -99,9 +98,7 @@ const BlockMoverButton = forwardRef(
 
 				return {
 					blockType: block ? getBlockType( block.name ) : null,
-					isDisabled:
-						disabled ||
-						( direction === 'up' ? isFirstBlock : isLastBlock ),
+					isDisabled: direction === 'up' ? isFirstBlock : isLastBlock,
 					rootClientId: blockRootClientId,
 					firstIndex: firstBlockIndex,
 					isFirst: isFirstBlock,
