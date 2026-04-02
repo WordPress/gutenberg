@@ -128,7 +128,9 @@ describe( 'getBlockContentSchema', () => {
 						children: {
 							sub: {},
 							sup: {},
-							strong: {},
+							strong: {
+								classes: [ 'test-class' ],
+							},
 						},
 					},
 				},
@@ -146,7 +148,9 @@ describe( 'getBlockContentSchema', () => {
 		const output = {
 			pre: {
 				children: {
-					strong: {},
+					strong: {
+						classes: [ 'test-class' ],
+					},
 					em: {},
 					sub: {},
 					sup: {},
@@ -330,7 +334,14 @@ describe( 'getBlockContentSchema', () => {
 			pre: {
 				children: myContentSchema,
 				attributes: [ 'data-one', 'class', 'data-two' ],
-				classes: [ 'class1', 'my-class', 'another-class', 'class2' ],
+				classes: [
+					'class1',
+					'my-class',
+					'another-class',
+					'class2',
+					'my-class',
+					'another-class',
+				],
 			},
 		};
 		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(

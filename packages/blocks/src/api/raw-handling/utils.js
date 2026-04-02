@@ -53,7 +53,10 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 					return '*';
 				}
 
-				return { ...objValue, ...srcValue };
+				return mergeSchemas(
+					{ ...( objValue || {} ) },
+					srcValue || {}
+				);
 			}
 			case 'attributes':
 			case 'require': {
