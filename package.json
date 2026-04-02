@@ -50,7 +50,6 @@
 		"@emotion/styled": "11.14.1",
 		"@inquirer/prompts": "7.2.0",
 		"@octokit/rest": "16.26.0",
-		"@playwright/test": "1.58.2",
 		"@testing-library/jest-dom": "6.9.1",
 		"@testing-library/react": "16.3.2",
 		"@testing-library/user-event": "14.6.1",
@@ -61,7 +60,6 @@
 		"@types/semver": "7.3.8",
 		"@types/sprintf-js": "1.1.2",
 		"@types/uuid": "8.3.1",
-		"@vitejs/plugin-react": "5.1.2",
 		"@wordpress/build": "file:./packages/wp-build",
 		"@wordpress/vips": "file:./packages/vips",
 		"ajv": "8.17.1",
@@ -88,7 +86,6 @@
 		"eslint-plugin-testing-library": "6.0.2",
 		"execa": "4.0.2",
 		"fast-glob": "^3.2.7",
-		"filenamify": "4.2.0",
 		"glob": "7.1.2",
 		"husky": "7.0.0",
 		"jest": "29.6.2",
@@ -125,7 +122,6 @@
 		"stylelint-plugin-logical-css": "^1.2.3",
 		"typescript": "5.9.3",
 		"uuid": "9.0.1",
-		"vite": "7.3.0",
 		"wait-on": "8.0.1"
 	},
 	"overrides": {
@@ -180,14 +176,14 @@
 		"prestorybook:build": "npm run build -- --skip-types",
 		"storybook:build": "npm run --workspace @wordpress/storybook storybook:build",
 		"storybook:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook storybook:dev\"",
-		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && storybook dev -c test/storybook-playwright/storybook -p 50241\"",
+		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook-playwright storybook:dev\"",
 		"test": "npm-run-all lint test:unit",
 		"test:create-block": "bash ./bin/test-create-block.sh",
-		"test:e2e": "wp-scripts test-playwright --config test/e2e/playwright.config.ts",
-		"test:e2e:debug": "wp-scripts test-playwright --config test/e2e/playwright.config.ts --ui",
+		"test:e2e": "npm run --workspace @wordpress/e2e-tests-playwright test:e2e",
+		"test:e2e:debug": "npm run --workspace @wordpress/e2e-tests-playwright test:e2e:debug",
 		"test:e2e:playwright": "npm run test:e2e",
 		"test:e2e:playwright:debug": "npm run test:e2e:debug",
-		"test:e2e:storybook": "playwright test --config test/storybook-playwright/playwright.config.ts",
+		"test:e2e:storybook": "npm run --workspace @wordpress/storybook-playwright test:e2e",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
 		"test:native": "cross-env NODE_ENV=test jest --config test/native/jest.config.js",
 		"test:native:watch": "npm run test:native -- --watch",
@@ -196,8 +192,8 @@
 		"test:native:perf": "cross-env TEST_RUNNER_ARGS='--runInBand --config test/native/jest.config.js --testMatch \"**/performance/*.native.[jt]s?(x)\"' reassure",
 		"test:native:perf:baseline": "cross-env TEST_RUNNER_ARGS='--runInBand --config test/native/jest.config.js --testMatch \"**/performance/*.native.[jt]s?(x)\"' reassure --baseline",
 		"test:native:update": "npm run test:native -- --updateSnapshot",
-		"test:performance": "wp-scripts test-playwright --config test/performance/playwright.config.ts",
-		"test:performance:debug": "wp-scripts test-playwright --config test/performance/playwright.config.ts --debug",
+		"test:performance": "npm run --workspace @wordpress/performance-tests test:performance",
+		"test:performance:debug": "npm run --workspace @wordpress/performance-tests test:performance:debug",
 		"test:php": "npm-run-all lint:php test:unit:php",
 		"test:php:watch": "wp-env --config .wp-env.test.json run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script test:watch",
 		"test:unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
@@ -253,6 +249,9 @@
 	"workspaces": [
 		"packages/*",
 		"routes/*",
-		"storybook"
+		"storybook",
+		"test/e2e",
+		"test/performance",
+		"test/storybook-playwright"
 	]
 }
