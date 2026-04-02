@@ -559,6 +559,11 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// This handles the case where the client converted HEIC to JPEG via
 		// canvas but lacks VIPS/WASM for client-side thumbnail generation.
 		if ( $request['generate_sub_sizes'] && 'scaled' === $image_size ) {
+			// Ensure the image functions are available (not loaded by default in REST context).
+			if ( ! function_exists( 'wp_create_image_subsizes' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/image.php';
+			}
+
 			// Use wp_create_image_subsizes which generates all registered
 			// sub-sizes and updates the attachment metadata.
 			$new_metadata = wp_create_image_subsizes( $path, $attachment_id );
