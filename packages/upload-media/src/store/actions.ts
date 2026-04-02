@@ -181,6 +181,16 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		dispatch.removeItem( id );
 		dispatch.revokeBlobUrls( id );
 
+		// If this was a child sideload item, notify the parent so it can
+		// proceed past the Finalize gate. Without this, the parent stays
+		// stuck waiting for children that will never complete.
+		if ( item.parentId ) {
+			const parentItem = select.getItem( item.parentId );
+			if ( parentItem?.operations && parentItem.operations.length > 0 ) {
+				dispatch.processItem( item.parentId );
+			}
+		}
+
 		// All items of this batch were cancelled or finished.
 		if ( item.batchId && select.isBatchUploaded( item.batchId ) ) {
 			item.onBatchSuccess?.();
