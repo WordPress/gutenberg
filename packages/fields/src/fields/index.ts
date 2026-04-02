@@ -21,3 +21,4 @@ export { default as descriptionField } from './description';
 export { default as formatField } from './format';
 export { default as postContentInfoField } from './post-content-info';
 export { default as stickyField } from './sticky';
+export { default as postsPerPageField } from './posts-per-page';

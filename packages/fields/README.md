@@ -164,6 +164,10 @@ Ping status field for BasePost.
 
 Post content information field for BasePost.
 
+### postsPerPageField
+
+Posts per page field for SiteSettings.
+
 ### PostType
 
 Undocumented declaration.

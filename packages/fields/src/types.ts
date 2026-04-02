@@ -119,6 +119,10 @@ export interface Pattern extends CommonPost {
 	excerpt?: string | { raw: string; rendered: string };
 }
 
+export interface SiteSettings {
+	posts_per_page?: number;
+}
+
 export type Post = Template | TemplatePart | Pattern | BasePost;
 
 export type PostWithPermissions = Post & {

@@ -41,6 +41,7 @@ import {
 	postContentInfoField,
 	stickyField,
 	descriptionField,
+	postsPerPageField,
 } from '@wordpress/fields';
 import {
 	altTextField,
@@ -293,6 +294,9 @@ export const registerPostTypeSchema =
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					passwordField,
 				postTypeConfig.slug === 'post' && stickyField,
+				// This is a `settings` field that we now want to display for templates
+				// and specifically for the home/index template.
+				postTypeConfig.slug === 'wp_template' && postsPerPageField,
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,
