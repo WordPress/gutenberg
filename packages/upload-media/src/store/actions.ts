@@ -167,8 +167,10 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		if ( ! silent ) {
 			const { onError } = item;
 			onError?.( error ?? new Error( 'Upload cancelled' ) );
-			if ( ! onError && error ) {
-				// TODO: Find better way to surface errors with sideloads etc.
+			if ( ! onError && error && ! item.parentId ) {
+				// Log errors for top-level items without an onError handler.
+				// Child sideload errors are suppressed here because the
+				// parent will be notified and surface the error to the user.
 				// eslint-disable-next-line no-console -- Deliberately log errors here.
 				console.error( 'Upload cancelled', error );
 			}
