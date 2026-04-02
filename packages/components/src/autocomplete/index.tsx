@@ -42,6 +42,22 @@ const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 // Used for generating the instance ID
 const AUTOCOMPLETE_HOOK_REFERENCE = {};
 
+function getCompletionObject(
+	completion: OptionCompletion
+): InsertOption | ReplaceOption {
+	if (
+		completion !== null &&
+		typeof completion === 'object' &&
+		'action' in completion &&
+		completion.action !== undefined &&
+		'value' in completion &&
+		completion.value !== undefined
+	) {
+		return completion;
+	}
+	return { action: 'insert-at-caret', value: completion };
+}
+
 const initialState: AutocompleteState = {
 	selectedIndex: 0,
 	filteredOptions: EMPTY_FILTERED_OPTIONS,
@@ -115,27 +131,9 @@ export function useAutocomplete( {
 		}
 
 		if ( getOptionCompletion ) {
-			const completion = getOptionCompletion( option.value, filterValue );
-
-			const isCompletionObject = (
-				obj: OptionCompletion
-			): obj is InsertOption | ReplaceOption => {
-				return (
-					obj !== null &&
-					typeof obj === 'object' &&
-					'action' in obj &&
-					obj.action !== undefined &&
-					'value' in obj &&
-					obj.value !== undefined
-				);
-			};
-
-			const completionObject = isCompletionObject( completion )
-				? completion
-				: ( {
-						action: 'insert-at-caret',
-						value: completion,
-				  } as InsertOption );
+			const completionObject = getCompletionObject(
+				getOptionCompletion( option.value, filterValue )
+			);
 
 			if ( 'replace' === completionObject.action ) {
 				onReplace( [ completionObject.value ] );
