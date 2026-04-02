@@ -68,19 +68,19 @@ export const WithBreadcrumbs: Story = {
 	},
 };
 
-export const WithIcon: Story = {
+export const WithVisual: Story = {
 	args: {
 		title: 'Page title',
-		icon: <Icon icon={ wordpress } size={ 24 } />,
+		visual: <Icon icon={ wordpress } size={ 24 } />,
 		showSidebarToggle: false,
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
 	},
 };
 
-export const WithIconAndBreadcrumbs: Story = {
+export const WithVisualAndBreadcrumbs: Story = {
 	args: {
-		icon: <Icon icon={ wordpress } size={ 24 } />,
+		visual: <Icon icon={ wordpress } size={ 24 } />,
 		showSidebarToggle: false,
 		breadcrumbs: (
 			<Breadcrumbs
@@ -95,13 +95,13 @@ export const WithIconAndBreadcrumbs: Story = {
 	},
 };
 
-export const WithImageIcon: Story = {
+export const WithImageVisual: Story = {
 	args: {
 		title: 'Page title',
-		icon: (
+		visual: (
 			<img
 				src="https://s.w.org/about/images/logos/wordpress-logo-notext-rgb.png"
-				alt="Page icon"
+				alt="Page visual"
 			/>
 		),
 		showSidebarToggle: false,
@@ -183,6 +183,7 @@ export const WithActions: Story = {
 
 export const FullHeader: Story = {
 	args: {
+		visual: <Icon icon={ wordpress } size={ 24 } />,
 		subTitle: 'All of the subtitle text you need goes here.',
 		breadcrumbs: (
 			<Breadcrumbs
