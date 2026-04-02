@@ -234,7 +234,8 @@ export function parseRawBlock( rawBlock, options ) {
 		getBlockAttributes(
 			blockType,
 			normalizedBlock.innerHTML,
-			normalizedBlock.attrs
+			normalizedBlock.attrs,
+			normalizedBlock.innerDom
 		),
 		parsedInnerBlocks
 	);
@@ -308,7 +309,43 @@ export function parseRawBlock( rawBlock, options ) {
  * @return {Array} Block list.
  */
 export default function parse( content, options ) {
-	return grammarParse( content ).reduce( ( accumulator, rawBlock ) => {
+	const rawBlocks = grammarParse( content ).filter(
+		// Down the road, we trim content, so let's ignore empty sections
+		// between blocks early.
+		( rawBlock ) => rawBlock.innerHTML.trim() || rawBlock.blockName
+	);
+
+	let allInnerHtml = '';
+
+	function addInnerHtml( _rawBlocks ) {
+		for ( const rawBlock of _rawBlocks ) {
+			allInnerHtml += '<div>' + rawBlock.innerHTML + `</div>`;
+			if ( rawBlock.innerBlocks.length ) {
+				addInnerHtml( rawBlock.innerBlocks );
+			}
+		}
+	}
+
+	addInnerHtml( rawBlocks );
+
+	const doc = document.implementation.createHTMLDocument( '' );
+
+	doc.body.innerHTML = allInnerHtml;
+
+	allInnerHtml = Array.from( doc.body.children );
+
+	function addInnerDom( _rawBlocks ) {
+		for ( const rawBlock of _rawBlocks ) {
+			rawBlock.innerDom = allInnerHtml.shift();
+			if ( rawBlock.innerBlocks.length ) {
+				addInnerDom( rawBlock.innerBlocks );
+			}
+		}
+	}
+
+	addInnerDom( rawBlocks );
+
+	return rawBlocks.reduce( ( accumulator, rawBlock ) => {
 		const block = parseRawBlock( rawBlock, options );
 		if ( block ) {
 			accumulator.push( block );

@@ -267,15 +267,16 @@ export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
  * @param {string|Object} blockTypeOrName Block type or name.
  * @param {string|Node}   innerHTML       Raw block content.
  * @param {?Object}       attributes      Known block attributes (from delimiters).
- *
+ * @param {?Node}         innerDom        Raw block content parsed into DOM.
  * @return {Object} All block attributes.
  */
 export function getBlockAttributes(
 	blockTypeOrName,
 	innerHTML,
-	attributes = {}
+	attributes = {},
+	innerDom
 ) {
-	const doc = parseHtml( innerHTML );
+	const doc = innerDom ? innerDom : parseHtml( innerHTML );
 	const blockType = normalizeBlockType( blockTypeOrName );
 
 	const blockAttributes = Object.fromEntries(
