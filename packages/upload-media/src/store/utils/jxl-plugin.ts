@@ -91,7 +91,16 @@ async function fetchVipsJxlConfig(): Promise< VipsJxlConfig | null > {
  */
 async function installVipsJxlPlugin(): Promise< boolean > {
 	try {
-		await dispatch( CORE_STORE ).saveEntityRecord(
+		await (
+			dispatch( CORE_STORE ) as {
+				saveEntityRecord: (
+					kind: string,
+					name: string,
+					record: Record< string, unknown >,
+					options?: Record< string, unknown >
+				) => Promise< unknown >;
+			}
+		 ).saveEntityRecord(
 			'root',
 			'plugin',
 			{ slug: JXL_PLUGIN_SLUG, status: 'active' },
@@ -128,7 +137,14 @@ export async function ensureVipsJxlAvailable(): Promise< VipsJxlConfig | null > 
 
 	// Plugin not active — can we install it?
 	// Use resolveSelect to wait for permission data to load.
-	const canInstall = await resolveSelect( CORE_STORE ).canUser( 'create', {
+	const canInstall = await (
+		resolveSelect( CORE_STORE ) as {
+			canUser: (
+				action: string,
+				resource: Record< string, string >
+			) => Promise< boolean >;
+		}
+	 ).canUser( 'create', {
 		kind: 'root',
 		name: 'plugin',
 	} );
