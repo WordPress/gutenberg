@@ -103,6 +103,26 @@ describe( 'useLastDifferentValue', () => {
 		rerender( { value: makeRecord( 'ABCD' ) } );
 		expect( result.current.text ).toBe( 'ABC' );
 	} );
+
+	it( 'should update when cursor position changes without text change', () => {
+		const { result, rerender } = renderHook(
+			( { value } ) => useLastDifferentValue( value ),
+			{ initialProps: { value: makeRecord( 'Hello' ) } }
+		);
+
+		// User types "/"
+		rerender( { value: makeRecord( 'Hello/' ) } );
+		expect( result.current.text ).toBe( 'Hello' );
+
+		// User moves cursor left (same text, different position).
+		rerender( {
+			value: { ...makeRecord( 'Hello/' ), start: 0, end: 0 },
+		} );
+
+		// The returned record should now match the current text,
+		// so that didUserInput evaluates to false.
+		expect( result.current.text ).toBe( 'Hello/' );
+	} );
 } );
 
 describe( 'AutocompleterUI', () => {

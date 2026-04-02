@@ -394,23 +394,47 @@ export function useAutocomplete( {
 }
 
 /**
- * Tracks the last record whose `.text` differed from the current one.
+ * Checks whether two records represent the same user-visible state
+ * (same text content and cursor position).
+ */
+function recordValuesMatch(
+	a: UseAutocompleteProps[ 'record' ],
+	b: UseAutocompleteProps[ 'record' ]
+) {
+	return a.text === b.text && a.start === b.start && a.end === b.end;
+}
+
+/**
+ * Tracks the last record whose value differed from the current one.
  * Used to determine whether the user has actually typed something
  * (as opposed to a re-render producing a new record object with
- * identical text, e.g. during a block reset).
+ * identical content, e.g. during a block reset).
+ *
+ * Maintains a sliding window of 2 records, similar to the original
+ * Set-based approach but using value comparison instead of reference
+ * equality so that new objects with the same content (text, start, end)
+ * are treated as duplicates.
  */
 export function useLastDifferentValue(
 	value: UseAutocompleteProps[ 'record' ]
 ) {
-	const prevRef = useRef< typeof value >( value );
-	const lastChangedTextRef = useRef< typeof value >( value );
+	const history = useRef< Array< typeof value > >( [] );
 
-	if ( value.text !== prevRef.current.text ) {
-		lastChangedTextRef.current = prevRef.current;
+	const lastEntry = history.current[ history.current.length - 1 ];
+
+	// Only add to history if the value is meaningfully different from
+	// the most recent entry (analogous to Set.add being a no-op for
+	// duplicate references in the original implementation).
+	if ( ! lastEntry || ! recordValuesMatch( value, lastEntry ) ) {
+		history.current.push( value );
 	}
-	prevRef.current = value;
 
-	return lastChangedTextRef.current;
+	// Keep the history size to 2.
+	if ( history.current.length > 2 ) {
+		history.current.shift();
+	}
+
+	return history.current[ 0 ];
 }
 
 export function useAutocompleteProps( options: UseAutocompleteProps ) {
