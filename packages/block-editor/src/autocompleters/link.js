@@ -20,19 +20,17 @@ function createLinkCompleter() {
 		name: 'links',
 		className: 'block-editor-autocompleters__link',
 		triggerPrefix: '[[',
-		options: async ( letters ) => {
-			let options = await apiFetch( {
+		isDebounced: true,
+		options: async ( filterValue ) => {
+			const options = await apiFetch( {
 				path: addQueryArgs( '/wp/v2/search', {
 					per_page: SHOWN_SUGGESTIONS,
-					search: letters,
+					search: filterValue,
 					type: 'post',
-					order_by: 'menu_order',
 				} ),
 			} );
 
-			options = options.filter( ( option ) => option.title !== '' );
-
-			return options;
+			return options.filter( ( option ) => option.title !== '' );
 		},
 		getOptionKeywords( item ) {
 			const expansionWords = item.title.split( /\s+/ );
