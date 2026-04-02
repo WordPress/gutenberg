@@ -1754,7 +1754,9 @@ const canInsertBlockTypeUnmemoized = (
 	// set on their *children*.
 	if (
 		isWithinSection &&
-		( isParentSectionBlock || blockEditingMode === 'contentOnly' ) &&
+		( isParentSectionBlock ||
+			blockEditingMode === 'contentOnly' ||
+			blockEditingMode === 'disabled' ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
 			blockName,
