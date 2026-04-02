@@ -187,6 +187,129 @@ export async function compressImage(
 }
 
 /**
+ * Applies resize and optional crop logic to produce a thumbnail.
+ *
+ * Handles three crop modes: no crop (simple downscale), boolean `true`
+ * (center/attention crop), and positional crop (e.g. ['center', 'top']).
+ *
+ * @param resize          Resize options including target dimensions and crop mode.
+ * @param originalWidth   Width of the source image.
+ * @param originalHeight  Height (pageHeight) of the source image.
+ * @param smartCrop       Whether to use saliency-aware cropping.
+ * @param createThumbnail Callback that creates a thumbnail at the given width/options.
+ * @return The resized (and optionally cropped) image.
+ */
+function applyResizeAndCrop<
+	T extends {
+		width: number;
+		height: number;
+		crop: ( ...args: number[] ) => T;
+	},
+>(
+	resize: ImageSizeCrop,
+	originalWidth: number,
+	originalHeight: number,
+	smartCrop: boolean,
+	createThumbnail: ( width: number, options: ThumbnailOptions ) => T
+): T {
+	// If resize.height is zero, calculate from aspect ratio.
+	resize.height =
+		resize.height || ( originalHeight / originalWidth ) * resize.width;
+
+	const thumbnailOptions: ThumbnailOptions = {
+		size: 'down',
+		height: resize.height,
+	};
+
+	let resizeWidth = resize.width;
+
+	if ( ! resize.crop ) {
+		return createThumbnail( resizeWidth, thumbnailOptions );
+	}
+
+	if ( true === resize.crop ) {
+		thumbnailOptions.crop = smartCrop ? 'attention' : 'centre';
+		return createThumbnail( resizeWidth, thumbnailOptions );
+	}
+
+	// Positional crop: first resize, then crop to exact dimensions.
+	if ( originalWidth < originalHeight ) {
+		resizeWidth =
+			resize.width >= resize.height
+				? resize.width
+				: ( originalWidth / originalHeight ) * resize.height;
+		thumbnailOptions.height =
+			resize.width >= resize.height
+				? ( originalHeight / originalWidth ) * resizeWidth
+				: resize.height;
+	} else {
+		resizeWidth =
+			resize.width >= resize.height
+				? ( originalWidth / originalHeight ) * resize.height
+				: resize.width;
+		thumbnailOptions.height =
+			resize.width >= resize.height
+				? resize.height
+				: ( originalHeight / originalWidth ) * resizeWidth;
+	}
+
+	const image = createThumbnail( resizeWidth, thumbnailOptions );
+
+	let left = 0;
+	if ( 'center' === resize.crop[ 0 ] ) {
+		left = ( image.width - resize.width ) / 2;
+	} else if ( 'right' === resize.crop[ 0 ] ) {
+		left = image.width - resize.width;
+	}
+
+	let top = 0;
+	if ( 'center' === resize.crop[ 1 ] ) {
+		top = ( image.height - resize.height ) / 2;
+	} else if ( 'bottom' === resize.crop[ 1 ] ) {
+		top = image.height - resize.height;
+	}
+
+	// Address rounding errors where `left` or `top` become negative integers
+	// and `resize.width` / `resize.height` are bigger than the actual dimensions.
+	// Downside: one side could be 1px smaller than the requested size.
+	left = Math.max( 0, left );
+	top = Math.max( 0, top );
+	resize.width = Math.min( image.width, resize.width );
+	resize.height = Math.min( image.height, resize.height );
+
+	return image.crop( left, top, resize.width, resize.height );
+}
+
+/**
+ * Builds save options for writing an image to a buffer.
+ *
+ * @param type    Output mime type.
+ * @param quality Desired quality (0-1).
+ * @return Save options object.
+ */
+function buildSaveOptions(
+	type: string,
+	quality: number
+): SaveOptions< typeof type > {
+	const saveOptions: SaveOptions< typeof type > = {
+		// Strip metadata except ICC color profiles,
+		// matching WordPress core's behavior.
+		keep: 'icc',
+	};
+
+	if ( supportsQuality( type ) ) {
+		saveOptions.Q = quality * 100;
+	}
+
+	// See https://github.com/swissspidy/media-experiments/issues/324.
+	if ( 'image/avif' === type ) {
+		saveOptions.effort = 2;
+	}
+
+	return saveOptions;
+}
+
+/**
  * Resizes an image using vips.
  *
  * @param id        Item ID.
@@ -217,9 +340,6 @@ export async function resizeImage(
 
 	try {
 		const vips = await getVips();
-		const thumbnailOptions: ThumbnailOptions = {
-			size: 'down',
-		};
 
 		let strOptions = '';
 		const loadOptions: LoadOptions< typeof type > = {};
@@ -228,7 +348,6 @@ export async function resizeImage(
 		// But only if we're not cropping.
 		if ( supportsAnimation( type ) && ! resize.crop ) {
 			strOptions = '[n=-1]';
-			thumbnailOptions.option_string = strOptions;
 			( loadOptions as LoadOptions< typeof type > ).n = -1;
 		}
 
@@ -245,99 +364,26 @@ export async function resizeImage(
 
 		const { width, pageHeight } = image;
 
-		// If resize.height is zero.
-		resize.height = resize.height || ( pageHeight / width ) * resize.width;
-
-		let resizeWidth = resize.width;
-		thumbnailOptions.height = resize.height;
-
-		if ( ! resize.crop ) {
-			image = vips.Image.thumbnailBuffer(
-				buffer,
-				resizeWidth,
-				thumbnailOptions
-			);
-
-			image.onProgress = onProgress;
-		} else if ( true === resize.crop ) {
-			thumbnailOptions.crop = smartCrop ? 'attention' : 'centre';
-
-			image = vips.Image.thumbnailBuffer(
-				buffer,
-				resizeWidth,
-				thumbnailOptions
-			);
-
-			image.onProgress = onProgress;
-		} else {
-			// First resize, then do the cropping.
-			// This allows operating on the second bitmap with the correct dimensions.
-
-			if ( width < pageHeight ) {
-				resizeWidth =
-					resize.width >= resize.height
-						? resize.width
-						: ( width / pageHeight ) * resize.height;
-				thumbnailOptions.height =
-					resize.width >= resize.height
-						? ( pageHeight / width ) * resizeWidth
-						: resize.height;
-			} else {
-				resizeWidth =
-					resize.width >= resize.height
-						? ( width / pageHeight ) * resize.height
-						: resize.width;
-				thumbnailOptions.height =
-					resize.width >= resize.height
-						? resize.height
-						: ( pageHeight / width ) * resizeWidth;
+		image = applyResizeAndCrop(
+			resize,
+			width,
+			pageHeight,
+			smartCrop,
+			( resizeWidth, thumbnailOptions ) => {
+				if ( strOptions ) {
+					thumbnailOptions.option_string = strOptions;
+				}
+				const thumb = vips.Image.thumbnailBuffer(
+					buffer,
+					resizeWidth,
+					thumbnailOptions
+				);
+				thumb.onProgress = onProgress;
+				return thumb;
 			}
+		);
 
-			image = vips.Image.thumbnailBuffer(
-				buffer,
-				resizeWidth,
-				thumbnailOptions
-			);
-
-			image.onProgress = onProgress;
-
-			let left = 0;
-			if ( 'center' === resize.crop[ 0 ] ) {
-				left = ( image.width - resize.width ) / 2;
-			} else if ( 'right' === resize.crop[ 0 ] ) {
-				left = image.width - resize.width;
-			}
-
-			let top = 0;
-			if ( 'center' === resize.crop[ 1 ] ) {
-				top = ( image.height - resize.height ) / 2;
-			} else if ( 'bottom' === resize.crop[ 1 ] ) {
-				top = image.height - resize.height;
-			}
-
-			// Address rounding errors where `left` or `top` become negative integers
-			// and `resize.width` / `resize.height` are bigger than the actual dimensions.
-			// Downside: one side could be 1px smaller than the requested size.
-			left = Math.max( 0, left );
-			top = Math.max( 0, top );
-			resize.width = Math.min( image.width, resize.width );
-			resize.height = Math.min( image.height, resize.height );
-
-			image = image.crop( left, top, resize.width, resize.height );
-
-			image.onProgress = onProgress;
-		}
-
-		const saveOptions: SaveOptions< typeof type > = {
-			// Strip metadata except ICC color profiles,
-			// matching WordPress core's behavior.
-			keep: 'icc',
-		};
-
-		if ( supportsQuality( type ) ) {
-			saveOptions.Q = quality * 100;
-		}
-
+		const saveOptions = buildSaveOptions( type, quality );
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {
@@ -440,96 +486,16 @@ export async function batchResizeImage(
 				break;
 			}
 
-			const { resize } = config;
+			const image = applyResizeAndCrop(
+				config.resize,
+				originalWidth,
+				originalHeight,
+				smartCrop,
+				( resizeWidth, thumbnailOptions ) =>
+					memImage.thumbnailImage( resizeWidth, thumbnailOptions )
+			);
 
-			// If resize.height is zero, calculate from aspect ratio.
-			resize.height =
-				resize.height ||
-				( originalHeight / originalWidth ) * resize.width;
-
-			const thumbnailOptions: ThumbnailOptions = {
-				size: 'down',
-				height: resize.height,
-			};
-
-			let resizeWidth = resize.width;
-			let image;
-
-			if ( ! resize.crop ) {
-				image = memImage.thumbnailImage(
-					resizeWidth,
-					thumbnailOptions
-				);
-			} else if ( true === resize.crop ) {
-				thumbnailOptions.crop = smartCrop ? 'attention' : 'centre';
-
-				image = memImage.thumbnailImage(
-					resizeWidth,
-					thumbnailOptions
-				);
-			} else {
-				// First resize, then do the cropping.
-				if ( originalWidth < originalHeight ) {
-					resizeWidth =
-						resize.width >= resize.height
-							? resize.width
-							: ( originalWidth / originalHeight ) *
-							  resize.height;
-					thumbnailOptions.height =
-						resize.width >= resize.height
-							? ( originalHeight / originalWidth ) * resizeWidth
-							: resize.height;
-				} else {
-					resizeWidth =
-						resize.width >= resize.height
-							? ( originalWidth / originalHeight ) * resize.height
-							: resize.width;
-					thumbnailOptions.height =
-						resize.width >= resize.height
-							? resize.height
-							: ( originalHeight / originalWidth ) * resizeWidth;
-				}
-
-				image = memImage.thumbnailImage(
-					resizeWidth,
-					thumbnailOptions
-				);
-
-				let left = 0;
-				if ( 'center' === resize.crop[ 0 ] ) {
-					left = ( image.width - resize.width ) / 2;
-				} else if ( 'right' === resize.crop[ 0 ] ) {
-					left = image.width - resize.width;
-				}
-
-				let top = 0;
-				if ( 'center' === resize.crop[ 1 ] ) {
-					top = ( image.height - resize.height ) / 2;
-				} else if ( 'bottom' === resize.crop[ 1 ] ) {
-					top = image.height - resize.height;
-				}
-
-				left = Math.max( 0, left );
-				top = Math.max( 0, top );
-				resize.width = Math.min( image.width, resize.width );
-				resize.height = Math.min( image.height, resize.height );
-
-				image = image.crop( left, top, resize.width, resize.height );
-			}
-
-			const saveOptions: SaveOptions< typeof outputType > = {
-				keep: 'icc',
-			};
-
-			if ( supportsQuality( outputType ) ) {
-				saveOptions.Q = config.quality * 100;
-			}
-
-			// Use faster AVIF encoding for sub-sizes.
-			if ( 'image/avif' === outputType ) {
-				saveOptions.effort = 2;
-			}
-
+			const saveOptions = buildSaveOptions( outputType, config.quality );
 			const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 			results.push( {
