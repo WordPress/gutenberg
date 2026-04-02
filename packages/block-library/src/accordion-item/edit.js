@@ -24,7 +24,24 @@ import clsx from 'clsx';
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-const TEMPLATE = [ [ 'core/accordion-heading' ], [ 'core/accordion-panel' ] ];
+const TEMPLATE = [
+	[
+		'core/accordion-heading',
+		{
+			metadata: {
+				bindings: {
+					__default: {
+						source: 'core/synced-styles',
+						args: {
+							context: 'core/synced-styles/accordion-heading',
+						},
+					},
+				},
+			},
+		},
+	],
+	[ 'core/accordion-panel' ],
+];
 
 export default function Edit( {
 	attributes,

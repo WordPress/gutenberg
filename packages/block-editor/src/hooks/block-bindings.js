@@ -120,6 +120,7 @@ export default {
 	attributeKeys: [ 'metadata' ],
 	hasSupport( name ) {
 		return ! [
+			'core/accordion-heading',
 			'core/post-date',
 			'core/navigation-link',
 			'core/navigation-submenu',

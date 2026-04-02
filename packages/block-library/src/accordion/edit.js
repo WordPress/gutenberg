@@ -30,6 +30,7 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ACCORDION_BLOCK_NAME = 'core/accordion-item';
 const ACCORDION_HEADING_BLOCK_NAME = 'core/accordion-heading';
+const SYNCED_STYLES_CONTEXT_KEY = 'core/synced-styles/accordion-heading';
 const ACCORDION_BLOCK = {
 	name: ACCORDION_BLOCK_NAME,
 };
@@ -65,10 +66,22 @@ export default function Edit( {
 	} );
 
 	const addAccordionItemBlock = () => {
-		// When adding, set the header's level to current headingLevel
+		// When adding, set the header's level to current headingLevel and
+		// inject the synced styles binding so the heading's style is linked
+		// to the accordion's canonical syncedStyles attribute.
 		const newAccordionItem = createBlock( ACCORDION_BLOCK_NAME, {}, [
 			createBlock( ACCORDION_HEADING_BLOCK_NAME, {
 				level: headingLevel,
+				metadata: {
+					bindings: {
+						__default: {
+							source: 'core/synced-styles',
+							args: {
+								context: SYNCED_STYLES_CONTEXT_KEY,
+							},
+						},
+					},
+				},
 			} ),
 			createBlock( 'core/accordion-panel', {} ),
 		] );
