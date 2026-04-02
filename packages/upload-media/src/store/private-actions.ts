@@ -13,12 +13,7 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 /**
  * Internal dependencies
  */
-import {
-	cloneFile,
-	convertBlobToFile,
-	getFileBasename,
-	renameFile,
-} from '../utils';
+import { cloneFile, convertBlobToFile, renameFile } from '../utils';
 import { canvasConvertToJpeg } from '../canvas-utils';
 import { isClientSideMediaSupported } from '../feature-detection';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
@@ -744,6 +739,7 @@ export function prepareItem( id: QueueItemId ) {
 
 		const operations: Operation[] = [];
 		const settings = select.getSettings();
+		let heicJpeg: File | null = null;
 
 		const isImage = file.type.startsWith( 'image/' );
 		const isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
@@ -775,9 +771,30 @@ export function prepareItem( id: QueueItemId ) {
 				OperationType.Finalize
 			);
 		} else if ( isImage && isHeic ) {
-			// HEIC/HEIF: upload with server processing first.
-			// If the server can't generate sub-sizes, the client falls back
-			// to canvas-based decoding using the browser's native HEVC codec.
+			// HEIC/HEIF: convert to JPEG client-side before upload.
+			// The server may not support HEIC, so decode it using the
+			// browser's native HEVC codec (createImageBitmap or VideoDecoder)
+			// and upload the resulting JPEG. The server then handles it like
+			// any normal JPEG (threshold scaling, sub-sizes, etc.).
+			// This matches iOS behavior where HEIC is converted on the fly.
+			try {
+				heicJpeg = await canvasConvertToJpeg(
+					file,
+					settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY
+				);
+			} catch {
+				dispatch.cancelItem(
+					id,
+					new UploadError( {
+						code: 'HEIC_DECODE_ERROR',
+						message:
+							'This browser cannot decode HEIC images and the server does not support them either. Please convert to JPEG before uploading.',
+						file,
+					} )
+				);
+				return;
+			}
+
 			operations.push(
 				OperationType.Upload,
 				OperationType.ThumbnailGeneration,
@@ -795,16 +812,19 @@ export function prepareItem( id: QueueItemId ) {
 
 		// If the file is not processed by vips, tell the server to
 		// generate sub-sizes since they won't be created client-side.
-		// Exception: HEIC images — the client handles sub-sizes via
-		// canvas fallback, so tell the server NOT to generate them
-		// (and disable format conversion to prevent a duplicate JPEG).
-		let updates = {};
-		if ( isHeic ) {
+		let updates: Partial< QueueItem > = {};
+		if ( isHeic && heicJpeg ) {
+			// HEIC was converted to JPEG client-side. Upload the JPEG
+			// and let the server handle it normally (threshold scaling,
+			// sub-sizes, format conversion).
+			const vipsAvailable = isClientSideMediaSupported();
 			updates = {
+				file: heicJpeg,
+				sourceFile: heicJpeg,
 				additionalData: {
 					...item.additionalData,
-					generate_sub_sizes: false,
-					convert_format: false,
+					generate_sub_sizes: ! vipsAvailable,
+					convert_format: true,
 				},
 			};
 		} else if ( ! isVipsSupported || ! isImage ) {
@@ -1119,93 +1139,10 @@ export function generateThumbnails( id: QueueItemId ) {
 		const attachment = item.attachment;
 		const settings = select.getSettings();
 
-		// HEIC/HEIF canvas fallback handling.
-		// When the source is HEIC, sideload the original and convert to JPEG
-		// using the browser's native decoder for sub-size generation.
-		const isHeicSource = HEIC_MIME_TYPES.includes( item.sourceFile.type );
-		let jpegConversion: File | null = null;
-
-		// The initial upload already saved the HEIC file on the server.
-		// The 'scaled' sideload handler records it as original_image
-		// in attachment metadata, so no separate original sideload is needed.
-
-		if (
-			isHeicSource &&
-			attachment.missing_image_sizes &&
-			attachment.missing_image_sizes.length > 0
-		) {
-			// Convert HEIC to JPEG using browser's native HEVC decoder.
-			// Uses createImageBitmap() which leverages OS/browser-licensed codecs,
-			// avoiding patent concerns with shipping our own HEVC decoder.
-			try {
-				jpegConversion = await canvasConvertToJpeg(
-					item.sourceFile,
-					settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY
-				);
-			} catch {
-				dispatch.cancelItem(
-					id,
-					new UploadError( {
-						code: 'HEIC_DECODE_ERROR',
-						message:
-							'This browser cannot decode HEIC images and the server does not support them either. Please convert to JPEG before uploading.',
-						file: item.sourceFile,
-					} )
-				);
-				return;
-			}
-
-			// Sideload the full-size JPEG as the "scaled" version.
-			// This makes the JPEG the main displayable image while keeping
-			// the original HEIC stored as original_image in metadata.
-			if ( attachment.id ) {
-				const scaledFile = attachment.filename
-					? renameFile(
-							jpegConversion,
-							getFileBasename( attachment.filename ) + '.jpeg'
-					  )
-					: jpegConversion;
-
-				// When VIPS is not available (e.g. Safari), tell the server
-				// to generate all sub-sizes from the sideloaded JPEG.
-				const vipsAvailable = isClientSideMediaSupported();
-
-				dispatch.addSideloadItem( {
-					file: scaledFile,
-					onChange: ( [ updatedAttachment ] ) => {
-						if ( isBlobURL( updatedAttachment.url ) ) {
-							return;
-						}
-						item.onChange?.( [ updatedAttachment ] );
-					},
-					batchId: uuidv4(),
-					parentId: item.id,
-					additionalData: {
-						post: attachment.id,
-						image_size: 'scaled',
-						convert_format: false,
-						...( ! vipsAvailable && {
-							generate_sub_sizes: true,
-						} ),
-					},
-					operations: [ OperationType.Upload ],
-				} );
-
-				// When VIPS is not available, the server generates sub-sizes
-				// from the sideloaded JPEG, so skip client-side thumbnail
-				// generation entirely.
-				if ( ! vipsAvailable ) {
-					dispatch.finishOperation( id, {} );
-					return;
-				}
-			}
-		}
-
-		// Check if image needs rotation (non-HEIC images only).
+		// Check if image needs rotation.
 		// If exif_orientation is not 1, the image needs rotation.
 		// Images that were scaled (bigImageSizeThreshold) are already rotated by vips.
-		// HEIC rotation is handled by the browser's native decoder.
-		if ( ! isHeicSource ) {
+		{
 			const needsRotation =
 				attachment.exif_orientation &&
 				attachment.exif_orientation !== 1 &&
@@ -1256,10 +1193,7 @@ export function generateThumbnails( id: QueueItemId ) {
 			const sizesToGenerate: string[] =
 				attachment.missing_image_sizes as string[];
 
-			// Use the JPEG conversion for HEIC images, or the sourceFile otherwise.
-			// For HEIC, vips can resize the JPEG efficiently.
-			// For other formats, vips auto-rotates based on EXIF orientation.
-			const thumbnailSource = jpegConversion ?? item.sourceFile;
+			const thumbnailSource = item.sourceFile;
 			const file = attachment.filename
 				? renameFile( thumbnailSource, attachment.filename )
 				: thumbnailSource;
@@ -1338,9 +1272,8 @@ export function generateThumbnails( id: QueueItemId ) {
 				} );
 			}
 
-			// Create and sideload the scaled version (non-HEIC only).
-			// For HEIC, the scaled JPEG version is already sideloaded above.
-			if ( ! isHeicSource ) {
+			// Create and sideload the scaled version if it exceeds the threshold.
+			{
 				const { bigImageSizeThreshold } = settings;
 				if ( bigImageSizeThreshold && attachment.id ) {
 					// Check if the image actually exceeds the threshold.

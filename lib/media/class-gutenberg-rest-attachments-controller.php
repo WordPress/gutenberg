@@ -89,28 +89,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * Checks if a given request has access to create an attachment.
 	 *
 	 * Skips the server-side image type support check when the client
-	 * will handle image processing (generate_sub_sizes is false), or
-	 * when the file is HEIC/HEIF (client-side canvas fallback handles
-	 * processing when the server's image editor doesn't support them).
+	 * will handle image processing (generate_sub_sizes is false).
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has access to create items, WP_Error object otherwise.
 	 */
 	public function create_item_permissions_check( $request ) {
 		$bypass_mime_check = false === $request['generate_sub_sizes'];
-
-		// Always allow HEIC/HEIF uploads through even if the server's image
-		// editor doesn't support them. The client-side canvas fallback will
-		// handle processing using the browser's native HEVC decoder.
-		if ( ! $bypass_mime_check ) {
-			$files = $request->get_file_params();
-			if (
-				! empty( $files['file']['type'] ) &&
-				in_array( $files['file']['type'], array( 'image/heic', 'image/heif' ), true )
-			) {
-				$bypass_mime_check = true;
-			}
-		}
 
 		if ( $bypass_mime_check ) {
 			add_filter( 'wp_prevent_unsupported_mime_type_uploads', '__return_false' );
@@ -247,23 +232,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				$data['missing_image_sizes'] = $missing_image_sizes;
 			}
 
-			// HEIC/HEIF: the server's image editor cannot read these files,
-			// so missing_image_sizes is empty even though no sub-sizes were
-			// generated. Report all registered sizes as missing so the
-			// client-side canvas fallback can generate them.
-			if ( in_array( $mime_type, array( 'image/heic', 'image/heif' ), true ) ) {
-				$metadata = wp_get_attachment_metadata( $item->ID, true );
-
-				if ( ! is_array( $metadata ) ) {
-					$metadata = array();
-				}
-
-				$metadata['sizes'] = $metadata['sizes'] ?? array();
-
-				$registered_sizes            = wp_get_registered_image_subsizes();
-				$missing_image_sizes         = array_diff( array_keys( $registered_sizes ), array_keys( $metadata['sizes'] ) );
-				$data['missing_image_sizes'] = array_values( $missing_image_sizes );
-			}
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
@@ -553,30 +521,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		wp_update_attachment_metadata( $attachment_id, $metadata );
-
-		// When generate_sub_sizes is true (e.g. HEIC-only mode on Safari),
-		// generate all image sub-sizes server-side from the sideloaded JPEG.
-		// This handles the case where the client converted HEIC to JPEG via
-		// canvas but lacks VIPS/WASM for client-side thumbnail generation.
-		if ( $request['generate_sub_sizes'] && 'scaled' === $image_size ) {
-			// Ensure the image functions are available (not loaded by default in REST context).
-			if ( ! function_exists( 'wp_create_image_subsizes' ) ) {
-				require_once ABSPATH . 'wp-admin/includes/image.php';
-			}
-
-			// Use wp_create_image_subsizes which generates all registered
-			// sub-sizes and updates the attachment metadata.
-			$new_metadata = wp_create_image_subsizes( $path, $attachment_id );
-
-			if ( ! is_wp_error( $new_metadata ) ) {
-				// Preserve the original_image reference from HEIC.
-				if ( ! empty( $metadata['original_image'] ) ) {
-					$new_metadata['original_image'] = $metadata['original_image'];
-				}
-
-				wp_update_attachment_metadata( $attachment_id, $new_metadata );
-			}
-		}
 
 		$response_request = new WP_REST_Request(
 			WP_REST_Server::READABLE,
