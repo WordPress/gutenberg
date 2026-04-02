@@ -209,13 +209,12 @@ function useResourcePermissions< IdType = void >(
 
 export default useResourcePermissions;
 
-export function __experimentalUseResourcePermissions(
-	resource: string,
-	id?: unknown
-) {
+function useDeprecatedResourcePermissions( resource: string, id?: unknown ) {
 	deprecated( `wp.data.__experimentalUseResourcePermissions`, {
 		alternative: 'wp.data.useResourcePermissions',
 		since: '6.1',
 	} );
 	return useResourcePermissions( resource, id );
 }
+
+export { useDeprecatedResourcePermissions as __experimentalUseResourcePermissions };
