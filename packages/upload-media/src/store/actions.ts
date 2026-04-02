@@ -24,7 +24,7 @@ import type {
 	RetryItemAction,
 	State,
 } from './types';
-import { Type } from './types';
+import { OperationType, Type } from './types';
 import type {
 	addItem,
 	processItem,
@@ -173,6 +173,8 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 			}
 		}
 
+		const { currentOperation, parentId, batchId } = item;
+
 		dispatch< CancelAction >( {
 			type: Type.Cancel,
 			id,
@@ -181,18 +183,34 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		dispatch.removeItem( id );
 		dispatch.revokeBlobUrls( id );
 
+		// A concurrency slot just freed up. Kick any items that were
+		// waiting in the queue, mirroring finishOperation's behavior.
+		if (
+			currentOperation === OperationType.ResizeCrop ||
+			currentOperation === OperationType.Rotate
+		) {
+			for ( const pending of select.getPendingImageProcessing() ) {
+				dispatch.processItem( pending.id );
+			}
+		}
+		if ( currentOperation === OperationType.Upload ) {
+			for ( const pending of select.getPendingUploads() ) {
+				dispatch.processItem( pending.id );
+			}
+		}
+
 		// If this was a child sideload item, notify the parent so it can
 		// proceed past the Finalize gate. Without this, the parent stays
 		// stuck waiting for children that will never complete.
-		if ( item.parentId ) {
-			const parentItem = select.getItem( item.parentId );
+		if ( parentId ) {
+			const parentItem = select.getItem( parentId );
 			if ( parentItem?.operations && parentItem.operations.length > 0 ) {
-				dispatch.processItem( item.parentId );
+				dispatch.processItem( parentId );
 			}
 		}
 
 		// All items of this batch were cancelled or finished.
-		if ( item.batchId && select.isBatchUploaded( item.batchId ) ) {
+		if ( batchId && select.isBatchUploaded( batchId ) ) {
 			item.onBatchSuccess?.();
 		}
 	};
