@@ -222,7 +222,7 @@ export default function useEntityRecord< RecordType >(
 	};
 }
 
-export function __experimentalUseEntityRecord(
+function useDeprecatedEntityRecord(
 	kind: string,
 	name: string,
 	recordId: any,
@@ -234,3 +234,5 @@ export function __experimentalUseEntityRecord(
 	} );
 	return useEntityRecord( kind, name, recordId, options );
 }
+
+export { useDeprecatedEntityRecord as __experimentalUseEntityRecord };
