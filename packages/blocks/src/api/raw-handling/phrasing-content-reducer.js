@@ -46,7 +46,17 @@ export default function phrasingContentReducer( node, doc ) {
 		// In jsdom-jscore, 'node.target' can be null.
 		// TODO: Explore fixing this by patching jsdom-jscore.
 		if ( node.target && node.target.toLowerCase() === '_blank' ) {
-			node.rel = 'noreferrer noopener';
+			const existingRels = ( node.rel || '' )
+				.split( /\s+/ )
+				.filter( Boolean );
+			const filteredRels = existingRels.filter(
+				( part ) => part !== 'noreferrer' && part !== 'noopener'
+			);
+			const uniqueAdditionalRel = Array.from( new Set( filteredRels ) );
+			const additionalRel = uniqueAdditionalRel.join( ' ' );
+			node.rel = additionalRel
+				? `noreferrer noopener ${ additionalRel }`
+				: 'noreferrer noopener';
 		} else {
 			node.removeAttribute( 'target' );
 			node.removeAttribute( 'rel' );
