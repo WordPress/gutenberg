@@ -23,7 +23,9 @@ import {
 	vipsConvertImageFormat,
 	vipsHasTransparency,
 	terminateVipsWorker,
+	initVipsJxl,
 } from './utils';
+import { ensureVipsJxlAvailable } from './utils/jxl-plugin';
 import type {
 	AddAction,
 	AdditionalData,
@@ -615,7 +617,14 @@ export function finishOperation(
 	};
 }
 
-const VALID_IMAGE_FORMATS = [ 'jpeg', 'webp', 'avif', 'png', 'gif' ] as const;
+const VALID_IMAGE_FORMATS = [
+	'jpeg',
+	'webp',
+	'avif',
+	'png',
+	'gif',
+	'jxl',
+] as const;
 
 /**
  * Checks if a format string is a valid ImageFormat.
@@ -732,18 +741,49 @@ export function prepareItem( id: QueueItemId ) {
 		const settings = select.getSettings();
 
 		const isImage = file.type.startsWith( 'image/' );
-		const isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
+		let isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
 			file.type
 		);
 
+		// JXL requires the wp-vips-jxl canonical plugin for the WASM module.
+		// If the input is JXL and the plugin is unavailable, fall through
+		// to server-side processing. If only the output is JXL and the plugin
+		// is unavailable, skip JXL transcoding but still process client-side.
+		const isJxl = file.type === 'image/jxl';
+		let jxlAvailable = false;
+
+		if ( ( isJxl || isVipsSupported ) && self.crossOriginIsolated ) {
+			const { imageOutputFormats: formats } = settings;
+			const needsJxl = isJxl || formats?.[ file.type ] === 'image/jxl';
+
+			if ( needsJxl ) {
+				const jxlConfig = await ensureVipsJxlAvailable();
+				if ( jxlConfig ) {
+					await initVipsJxl( jxlConfig.wasmUrl );
+					jxlAvailable = true;
+				} else if ( isJxl ) {
+					// JXL input but plugin unavailable — server fallback.
+					isVipsSupported = false;
+				}
+			}
+		} else if ( isJxl ) {
+			// crossOriginIsolated is required for WASM processing.
+			isVipsSupported = false;
+		}
+
+		const { imageOutputFormats } = settings;
+
 		// For images that can be processed by vips, check if we need to scale down based on threshold.
 		if ( isImage && isVipsSupported ) {
-			const { imageOutputFormats } = settings;
-
 			// Check if we need to transcode to a different format.
 			// Uses WordPress image_editor_output_format filter settings.
 			const outputMimeType = imageOutputFormats?.[ file.type ];
-			if ( outputMimeType && outputMimeType !== file.type ) {
+			// Skip JXL transcoding if the plugin is not available.
+			if (
+				outputMimeType &&
+				outputMimeType !== file.type &&
+				( outputMimeType !== 'image/jxl' || jxlAvailable )
+			) {
 				const transcodeOperation = await getTranscodeImageOperation(
 					file,
 					outputMimeType,

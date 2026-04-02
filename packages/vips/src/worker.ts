@@ -21,6 +21,7 @@ import {
 	resizeImage,
 	rotateImage,
 	hasTransparency,
+	setJxlWasmUrl,
 } from './index';
 
 /**
@@ -33,6 +34,7 @@ const api = {
 	resizeImage,
 	rotateImage,
 	hasTransparency,
+	setJxlWasmUrl,
 };
 
 expose( api );

@@ -307,4 +307,4 @@ export interface SideloadAdditionalData extends AdditionalData {
 	image_size: string;
 }
 
-export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif';
+export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif' | 'jxl';

@@ -177,6 +177,19 @@ export async function vipsCancelOperations( id: ItemId ): Promise< boolean > {
 }
 
 /**
+ * Sets the URL to the vips-jxl.wasm module in the worker.
+ *
+ * This enables JXL support in the vips instance. The next vips operation
+ * will re-initialize with the JXL dynamic library loaded from this URL.
+ *
+ * @param url URL to the vips-jxl.wasm file provided by the wp-vips-jxl plugin.
+ */
+export async function vipsSetJxlWasmUrl( url: string ): Promise< void > {
+	const api = getWorkerAPI();
+	return api.setJxlWasmUrl( url );
+}
+
+/**
  * Terminates the vips worker if it exists.
  * Call this to free up resources when vips processing is no longer needed.
  */

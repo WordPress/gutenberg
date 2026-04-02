@@ -31,20 +31,43 @@ let cleanup: () => void;
 let vipsPromise: Promise< typeof Vips > | undefined;
 
 /**
+ * URL to the vips-jxl.wasm module, provided by the wp-vips-jxl canonical plugin.
+ * When set, the next vips initialization will include JXL dynamic library support.
+ */
+let jxlWasmUrl: string | undefined;
+
+/**
+ * Whether the current vips instance was initialized with JXL support.
+ */
+let vipsInitializedWithJxl = false;
+
+/**
  * Instantiates and returns a new vips instance.
  *
- * Reuses any existing instance.
+ * Reuses any existing instance. If JXL support has been enabled via
+ * setJxlWasmUrl() but the current instance was initialized without it,
+ * the instance is discarded and re-initialized with the JXL dynamic library.
  */
 async function getVips(): Promise< typeof Vips > {
+	// If JXL is now available but vips was initialized without it, re-initialize.
+	if ( jxlWasmUrl && vipsPromise && ! vipsInitializedWithJxl ) {
+		vipsPromise = undefined;
+	}
+
 	if ( vipsPromise ) {
 		return await vipsPromise;
 	}
 
+	const dynamicLibraries = [ 'vips-heif.wasm' ];
+	if ( jxlWasmUrl ) {
+		dynamicLibraries.push( 'vips-jxl.wasm' );
+	}
+
 	vipsPromise = Vips( {
 		// Load HEIF dynamic module for HEIF/HEIC and AVIF format support.
-		// JXL is omitted as WordPress Core does not currently support it.
-		// It can be re-added when Core adds JXL support.
-		dynamicLibraries: [ 'vips-heif.wasm' ],
+		// JXL is loaded conditionally when the wp-vips-jxl canonical plugin
+		// provides the WASM URL.
+		dynamicLibraries,
 		locateFile: ( fileName: string ) => {
 			// WASM files are inlined as base64 data URLs at build time,
 			// eliminating the need for separate file downloads and avoiding
@@ -53,6 +76,8 @@ async function getVips(): Promise< typeof Vips > {
 				return VipsModule;
 			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
 				return VipsHeifModule;
+			} else if ( fileName.endsWith( 'vips-jxl.wasm' ) && jxlWasmUrl ) {
+				return jxlWasmUrl;
 			}
 			return fileName;
 		},
@@ -64,6 +89,8 @@ async function getVips(): Promise< typeof Vips > {
 			} );
 		},
 	} );
+
+	vipsInitializedWithJxl = !! jxlWasmUrl;
 
 	return await vipsPromise;
 }
@@ -152,6 +179,12 @@ export async function convertImageFormat(
 		// See https://github.com/swissspidy/media-experiments/issues/324.
 		if ( 'image/avif' === outputType ) {
 			saveOptions.effort = 2;
+		}
+
+		// JXL default effort of 7 is too slow for interactive use.
+		// Use 3 for a good balance of speed and compression.
+		if ( 'image/jxl' === outputType ) {
+			saveOptions.effort = 3;
 		}
 
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
@@ -480,6 +513,18 @@ export async function hasTransparency(
 	return hasAlpha;
 }
 
+/**
+ * Sets the URL to the vips-jxl.wasm module provided by the wp-vips-jxl plugin.
+ *
+ * Once set, the next vips operation will re-initialize the vips instance
+ * with JXL dynamic library support, enabling JPEG XL encoding and decoding.
+ *
+ * @param url URL to the vips-jxl.wasm file.
+ */
+export function setJxlWasmUrl( url: string ): void {
+	jxlWasmUrl = url;
+}
+
 // Re-export with vips prefix for worker module compatibility.
 // The worker loader expects these prefixed names.
 export {
@@ -489,4 +534,5 @@ export {
 	rotateImage as vipsRotateImage,
 	hasTransparency as vipsHasTransparency,
 	cancelOperations as vipsCancelOperations,
+	setJxlWasmUrl as vipsSetJxlWasmUrl,
 };

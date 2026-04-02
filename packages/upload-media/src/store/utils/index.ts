@@ -59,7 +59,8 @@ export async function vipsConvertImageFormat(
 		| 'image/png'
 		| 'image/webp'
 		| 'image/avif'
-		| 'image/gif',
+		| 'image/gif'
+		| 'image/jxl',
 	quality: number,
 	interlaced?: boolean
 ) {
@@ -267,6 +268,19 @@ export async function vipsCancelOperations( id: QueueItemId ) {
 		return false;
 	}
 	return vipsModule.vipsCancelOperations( id );
+}
+
+/**
+ * Initializes JXL support in the vips worker.
+ *
+ * Passes the vips-jxl.wasm URL (provided by the wp-vips-jxl canonical plugin)
+ * to the worker. The next vips operation will re-initialize with JXL support.
+ *
+ * @param wasmUrl URL to the vips-jxl.wasm file.
+ */
+export async function initVipsJxl( wasmUrl: string ): Promise< void > {
+	const { vipsSetJxlWasmUrl } = await loadVipsModule();
+	return vipsSetJxlWasmUrl( wasmUrl );
 }
 
 /**
