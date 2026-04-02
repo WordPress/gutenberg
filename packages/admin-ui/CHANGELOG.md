@@ -20,6 +20,10 @@
 
 -   Increase page header vertical padding. [#77152](https://github.com/WordPress/gutenberg/pull/77152)
 
+### Internal
+
+-   `Breadcrumbs`: Migrate from `@wordpress/components` to `Link`, `Stack`, and `Text` from `@wordpress/ui`. [#77012](https://github.com/WordPress/gutenberg/pull/77012)
+
 ## 1.11.0 (2026-04-01)
 
 ### Bug Fixes
