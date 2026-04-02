@@ -36,7 +36,6 @@ export { resolveSelect } from './resolve-select';
 export { suspendSelect } from './suspend-select';
 
 export type * from './types';
-export type * from './deprecated';
 
 /**
  * Object of available plugins to use with a registry.
