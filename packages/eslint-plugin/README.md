@@ -50,6 +50,7 @@ Alternatively, you can opt-in to only the more granular rulesets offered by the 
 -   `i18n` – rules for internationalization.
 -   `jsdoc` – rules for JSDoc comments.
 -   `jsx-a11y` – rules for accessibility in JSX.
+-   `package-json-lint` – rules for linting package.json via [@wordpress/npm-package-json-lint-config](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-npm-package-json-lint-config/)
 -   `react` – rules for React components.
 -   `test-e2e` – rules for end-to-end tests written in Puppeteer.
 -   `test-unit`– rules for unit tests written in Jest.
@@ -97,6 +98,7 @@ The granular rulesets will not define any environment globals. As such, if they 
 | [no-wp-process-env](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-wp-process-env.md)                                         | Disallow legacy usage of WordPress variables via `process.env` like `process.env.SCRIPT_DEBUG`. | ✓           |
 | [react-no-unsafe-timeout](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)                             | Disallow unsafe `setTimeout` in component.                                                      |             |
 | [valid-sprintf](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/valid-sprintf.md)                                                 | Enforce valid sprintf usage.                                                                    | ✓           |
+| [validate-package-json](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/validate-package-json.md)                                 | Validate package.json files using `npm-package-json-lint` configuration.    | ✓           |
 | [wp-global-usage](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/wp-global-usage.md)                                             | Enforce correct usage of WordPress globals like `globalThis.SCRIPT_DEBUG`.                      |             |
 
 ### Legacy
