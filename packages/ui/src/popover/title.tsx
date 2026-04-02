@@ -12,7 +12,7 @@ import type { TitleProps } from './types';
  *
  * **Required** — every popover must include a `Popover.Title`, even if
  * visually hidden. The rendered element is linked to the popup via
- * `aria-labelledby`. Uses the `heading-md` text variant by default.
+ * `aria-labelledby`. Uses the `heading-xl` text variant, matching Dialog.
  */
 const Title = forwardRef< HTMLHeadingElement, TitleProps >(
 	function PopoverTitle( { className, children, ...props }, forwardedRef ) {
@@ -26,7 +26,7 @@ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
 
 		return (
 			<Text
-				variant="heading-md"
+				variant="heading-xl"
 				render={ <_Popover.Title ref={ mergedRef } { ...props } /> }
 				className={ clsx( styles.title, className ) }
 			>

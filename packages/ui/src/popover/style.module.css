@@ -7,7 +7,7 @@
 
 	.popup {
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
-		padding: var(--wpds-dimension-padding-md);
+		padding: var(--wpds-dimension-padding-lg);
 		border-radius: var(--wpds-border-radius-md);
 		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 		box-shadow: var(--wpds-elevation-md);
@@ -51,7 +51,7 @@
 	}
 
 	.title {
-		margin: 0 0 var(--wpds-dimension-gap-xs);
+		margin: 0;
 	}
 
 	.description {
