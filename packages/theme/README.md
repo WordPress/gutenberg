@@ -17,7 +17,25 @@ In the **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/t
 
 Design tokens are delivered as CSS custom properties (e.g. `var(--wpds-color-fg-content-neutral)`). To use them, a stylesheet defining the token values must be loaded on the page.
 
-Within WordPress, this stylesheet is loaded automatically. Outside of WordPress, you can import the prebuilt stylesheet directly from `@wordpress/theme/src/prebuilt/css/design-tokens.css`. The [Theme Provider](#theme-provider) component can be used on top of either approach to customize token values like colors and density for a subtree of the DOM.
+The [`ThemeProvider`](#theme-provider) component can be used to customize token values like colors and density for a specific part of your application.
+
+#### Within WordPress
+
+Stylesheets are managed on your behalf in a WordPress context, so you don't need to worry about loading them yourself.
+
+#### Outside WordPress
+
+Outside of WordPress, you will need to install and load the design tokens stylesheet to support the full range of theming capabilities:
+
+```
+npm install @wordpress/theme
+```
+
+```js
+import '@wordpress/theme/design-tokens.css';
+```
+
+### Developer Tools
 
 For the best development experience, we recommend configuring the [build plugins](#build-plugins) and [Stylelint rules](#stylelint-plugins) provided by this package. The build plugins automatically inject fallback values into `var(--wpds-*)` references so components render correctly even when the tokens stylesheet is not yet loaded, and will raise an error if a reference does not match a known token. The Stylelint rules catch typos, unknown tokens, and other discouraged patterns during development.
 
