@@ -1284,7 +1284,7 @@ export const InfoTip: Story = {
 							background: 'none',
 							border: 'none',
 							padding: 0,
-							cursor: 'pointer',
+							cursor: 'var(--wpds-cursor-control)',
 							display: 'inline-flex',
 							alignItems: 'center',
 							borderRadius: 'var(--wpds-border-radius-sm)',
