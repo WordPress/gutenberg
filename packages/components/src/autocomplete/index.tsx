@@ -175,25 +175,14 @@ export function useAutocomplete( {
 		}
 
 		switch ( event.key ) {
-			case 'ArrowUp': {
+			case 'ArrowUp':
+			case 'ArrowDown': {
+				const offset = event.key === 'ArrowUp' ? -1 : 1;
 				const newIndex =
-					( selectedIndex === 0
-						? filteredOptions.length
-						: selectedIndex ) - 1;
+					( selectedIndex + offset + filteredOptions.length ) %
+					filteredOptions.length;
 				dispatch( { type: 'SELECT', index: newIndex } );
 				// See the related PR as to why this is necessary: https://github.com/WordPress/gutenberg/pull/54902.
-				if ( isAppleOS() ) {
-					speak(
-						getNodeText( filteredOptions[ newIndex ].label ),
-						'assertive'
-					);
-				}
-				break;
-			}
-
-			case 'ArrowDown': {
-				const newIndex = ( selectedIndex + 1 ) % filteredOptions.length;
-				dispatch( { type: 'SELECT', index: newIndex } );
 				if ( isAppleOS() ) {
 					speak(
 						getNodeText( filteredOptions[ newIndex ].label ),
