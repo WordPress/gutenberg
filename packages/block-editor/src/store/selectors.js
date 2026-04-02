@@ -2378,9 +2378,6 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 						)
 				);
 			} else {
-				const { getClosestAllowedInsertionPoint } = unlock(
-					select( STORE_NAME )
-				);
 				blockTypeInserterItems = blockTypeInserterItems
 					.filter(
 						( blockType ) =>
@@ -2389,10 +2386,11 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 								blockType,
 								rootClientId
 							) &&
-							getClosestAllowedInsertionPoint(
+							canInsertBlockType(
+								state,
 								blockType.name,
 								rootClientId
-							) !== null
+							)
 					)
 					.map( ( blockType ) => ( {
 						...blockType,
