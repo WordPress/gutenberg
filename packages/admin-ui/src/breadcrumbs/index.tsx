@@ -3,11 +3,7 @@
  */
 import { Link as RouterLink } from '@wordpress/route';
 import { __ } from '@wordpress/i18n';
-import {
-	__experimentalHeading as Heading,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
-import { Link } from '@wordpress/ui';
+import { Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -56,12 +52,11 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 
 	return (
 		<nav aria-label={ __( 'Breadcrumbs' ) }>
-			<HStack
-				as="ul"
+			<Stack
+				render={ <ul /> }
+				direction="row"
+				align="center"
 				className={ styles.list }
-				spacing={ 0 }
-				justify="flex-start"
-				alignment="center"
 			>
 				{ precedingItems.map( ( item, index ) => (
 					<li key={ index }>
@@ -82,12 +77,18 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 							{ lastItem.label }
 						</Link>
 					) : (
-						<Heading level={ 1 } truncate>
+						/* eslint-disable jsx-a11y/heading-has-content */
+						<Text
+							variant="heading-lg"
+							render={ <h1 /> }
+							className={ styles.current }
+						>
 							{ lastItem.label }
-						</Heading>
+						</Text>
+						/* eslint-enable jsx-a11y/heading-has-content */
 					) }
 				</li>
-			</HStack>
+			</Stack>
 		</nav>
 	);
 };
