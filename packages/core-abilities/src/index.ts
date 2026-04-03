@@ -19,6 +19,87 @@ const ABILITIES_ENDPOINT = `${ API_BASE }/abilities`;
 const CATEGORIES_ENDPOINT = `${ API_BASE }/categories`;
 
 /**
+ * WordPress-specific schema keywords that are not part of JSON Schema
+ * and should be stripped before registering abilities on the client.
+ */
+const WP_SCHEMA_KEYWORDS = new Set( [
+	'sanitize_callback',
+	'validate_callback',
+	'arg_options',
+] );
+
+/**
+ * Recursively removes WordPress-specific keywords from a JSON Schema object.
+ *
+ * WordPress REST API schemas may include server-side properties like
+ * `sanitize_callback` that are not valid JSON Schema keywords. These cause
+ * client-side schema validators (AJV) to reject the schema during compilation.
+ *
+ * @param schema The schema object to sanitize.
+ * @return A new schema object with WordPress-specific keywords removed.
+ */
+export function sanitizeSchema(
+	schema: Record< string, any >
+): Record< string, any > {
+	if ( ! schema || typeof schema !== 'object' || Array.isArray( schema ) ) {
+		return schema;
+	}
+
+	const sanitized: Record< string, any > = {};
+
+	for ( const key of Object.keys( schema ) ) {
+		if ( WP_SCHEMA_KEYWORDS.has( key ) ) {
+			continue;
+		}
+
+		const value = schema[ key ];
+
+		if (
+			( key === 'properties' ||
+				key === 'patternProperties' ||
+				key === 'definitions' ) &&
+			value &&
+			typeof value === 'object' &&
+			! Array.isArray( value )
+		) {
+			sanitized[ key ] = Object.fromEntries(
+				Object.entries( value ).map( ( [ k, v ] ) => [
+					k,
+					sanitizeSchema( v as Record< string, any > ),
+				] )
+			);
+		} else if ( key === 'items' && value && typeof value === 'object' ) {
+			if ( Array.isArray( value ) ) {
+				sanitized[ key ] = value.map( ( item: Record< string, any > ) =>
+					sanitizeSchema( item )
+				);
+			} else {
+				sanitized[ key ] = sanitizeSchema( value );
+			}
+		} else if (
+			( key === 'additionalProperties' || key === 'additionalItems' ) &&
+			value &&
+			typeof value === 'object'
+		) {
+			sanitized[ key ] = sanitizeSchema( value );
+		} else if (
+			( key === 'anyOf' || key === 'oneOf' || key === 'allOf' ) &&
+			Array.isArray( value )
+		) {
+			sanitized[ key ] = value.map( ( item: Record< string, any > ) =>
+				sanitizeSchema( item )
+			);
+		} else if ( key === 'not' && value && typeof value === 'object' ) {
+			sanitized[ key ] = sanitizeSchema( value );
+		} else {
+			sanitized[ key ] = value;
+		}
+	}
+
+	return sanitized;
+}
+
+/**
  * Creates a serverCallback function for a WordPress REST API ability.
  *
  * @param ability The ability to create a callback for.
@@ -113,10 +194,17 @@ async function initializeAbilities(): Promise< void > {
 
 		if ( abilities && Array.isArray( abilities ) ) {
 			for ( const ability of abilities ) {
-				// Register the ability with a callback
-				// The abilities package filters annotations to allowed keys
+				// Register the ability with a callback.
+				// Strip WordPress-specific keywords from schemas
+				// before registering on the client.
 				registerAbility( {
 					...ability,
+					input_schema: ability.input_schema
+						? sanitizeSchema( ability.input_schema )
+						: undefined,
+					output_schema: ability.output_schema
+						? sanitizeSchema( ability.output_schema )
+						: undefined,
 					callback: createServerCallback( ability ),
 					meta: {
 						annotations: {
