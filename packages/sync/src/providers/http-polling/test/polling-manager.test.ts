@@ -107,6 +107,40 @@ function simulateVisibilityChange( state: string ) {
 	document.dispatchEvent( new Event( 'visibilitychange' ) );
 }
 
+function mockNetworkConnection(
+	effectiveType: 'slow-2g' | '2g' | '3g' | '4g'
+) {
+	const listeners = new Set< () => void >();
+	const connection = {
+		effectiveType,
+		addEventListener: jest.fn(
+			( _type: 'change', listener: () => void ) => {
+				listeners.add( listener );
+			}
+		),
+		removeEventListener: jest.fn(
+			( _type: 'change', listener: () => void ) => {
+				listeners.delete( listener );
+			}
+		),
+	};
+
+	Object.defineProperty( navigator, 'connection', {
+		configurable: true,
+		value: connection,
+	} );
+
+	return {
+		connection,
+		setEffectiveType( nextEffectiveType: typeof effectiveType ) {
+			connection.effectiveType = nextEffectiveType;
+		},
+		dispatchChange() {
+			listeners.forEach( ( listener ) => listener() );
+		},
+	};
+}
+
 const syncResponse = {
 	rooms: [
 		{
@@ -149,6 +183,7 @@ describe( 'polling-manager', () => {
 			configurable: true,
 			get: () => 'visible',
 		} );
+		delete ( navigator as Navigator & { connection?: unknown } ).connection;
 	} );
 
 	describe( 'document size limit', () => {
@@ -969,6 +1004,80 @@ describe( 'polling-manager', () => {
 
 			// Should trigger an immediate repoll (not wait for timeout).
 			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+		} );
+	} );
+
+	describe( 'network-aware polling', () => {
+		it( 'slows active polling on 3g connections', async () => {
+			mockNetworkConnection( '3g' );
+			mockPostSyncUpdate.mockResolvedValue( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc(),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 15999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'caps slow-network polling below the awareness timeout', async () => {
+			mockNetworkConnection( 'slow-2g' );
+			mockPostSyncUpdate.mockResolvedValue( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc(),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 24999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'reschedules pending polling when the connection changes', async () => {
+			const network = mockNetworkConnection( '4g' );
+			mockPostSyncUpdate.mockResolvedValue( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc(),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			network.setEffectiveType( '3g' );
+			network.dispatchChange();
+
+			await jest.advanceTimersByTimeAsync( 3999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 12001 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 		} );
 	} );

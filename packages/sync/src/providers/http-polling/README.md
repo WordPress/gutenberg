@@ -81,8 +81,9 @@ const provider = new HttpPollingProvider( {
 
 The polling manager runs continuously:
 
-- **Solo editing**: 1000ms interval, queue paused (no updates sent)
-- **With collaborators**: 250ms interval, queue active
+- **Solo editing**: 4000ms interval, queue paused (no updates sent)
+- **With collaborators**: 1000ms interval, queue active
+- **Slower cellular links**: active-tab polling is widened on `3g`, `2g`, and `slow-2g`, capped at 25000ms to stay below the server-side awareness timeout
 
 Each poll cycle:
 
@@ -120,6 +121,7 @@ Awareness state (presence, cursors) is synchronized alongside document updates:
 - **Integrated endpoint**: Awareness travels with each sync request
 - **Automatic expiration**: Clients that haven't polled in 30 seconds are removed
 - **Collaborator detection**: When awareness shows multiple clients, polling speeds up
+- **Network-aware backoff**: Chromium browsers can widen polling when the reported connection type degrades
 
 ## REST API
 
@@ -247,7 +249,7 @@ All CRDT operations happen in the browser via Yjs.
 
 ### Polling Latency
 
-Updates are not instant; there's inherent latency from the polling interval (250ms with collaborators). This is acceptable for document editing but may not suit real-time cursor tracking at high fidelity.
+Updates are not instant; there's inherent latency from the polling interval (typically 1000ms with collaborators, slower on constrained connections). This is acceptable for document editing but may not suit real-time cursor tracking at high fidelity.
 
 ### Single Compactor
 
