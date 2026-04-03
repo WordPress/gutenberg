@@ -55,7 +55,10 @@ function getCompletionObject(
 	) {
 		return completion;
 	}
-	return { action: 'insert-at-caret', value: completion };
+	return {
+		action: 'insert-at-caret',
+		value: completion as React.ReactNode,
+	};
 }
 
 const initialState: AutocompleteState = {
