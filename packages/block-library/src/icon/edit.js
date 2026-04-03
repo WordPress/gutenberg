@@ -16,6 +16,10 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
+	flipHorizontal as flipHorizontalIcon,
+	flipVertical as flipVerticalIcon,
+} from '@wordpress/icons';
+import {
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
@@ -58,7 +62,7 @@ const IconPlaceholder = ( { className, style } ) => (
 );
 
 export function Edit( { attributes, setAttributes } ) {
-	const { icon, ariaLabel } = attributes;
+	const { icon, ariaLabel, flipHorizontal, flipVertical } = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 
@@ -68,6 +72,15 @@ export function Edit( { attributes, setAttributes } ) {
 	const spacingProps = useSpacingProps( attributes );
 	const borderProps = useBorderProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
+
+	const transformStyles = {};
+	if ( flipHorizontal ) {
+		transformStyles.transform = flipVertical
+			? 'scaleX(-1) scaleY(-1)'
+			: 'scaleX(-1)';
+	} else if ( flipVertical ) {
+		transformStyles.transform = 'scaleY(-1)';
+	}
 
 	const { selectedIcon, allIcons = [] } = useSelect(
 		( select ) => {
@@ -98,6 +111,32 @@ export function Edit( { attributes, setAttributes } ) {
 					{ icon ? __( 'Replace' ) : __( 'Choose icon' ) }
 				</ToolbarButton>
 			</BlockControls>
+			{ icon && (
+				<BlockControls group="other">
+					<ToolbarGroup className="components-toolbar-group">
+						<ToolbarButton
+							icon={ flipHorizontalIcon }
+							label={ __( 'Flip horizontally' ) }
+							isPressed={ flipHorizontal }
+							onClick={ () =>
+								setAttributes( {
+									flipHorizontal: ! flipHorizontal,
+								} )
+							}
+						/>
+						<ToolbarButton
+							icon={ flipVerticalIcon }
+							label={ __( 'Flip vertically' ) }
+							isPressed={ flipVertical }
+							onClick={ () =>
+								setAttributes( {
+									flipVertical: ! flipVertical,
+								} )
+							}
+						/>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
 			{ isContentOnlyMode && icon && (
 				// Add some extra controls for content attributes when content only mode is active.
 				// With content only mode active, the inspector is hidden, so users need another way
@@ -189,6 +228,7 @@ export function Edit( { attributes, setAttributes } ) {
 								...borderProps.style,
 								...spacingProps.style,
 								...dimensionsProps.style,
+								...transformStyles,
 							},
 						} }
 					/>
@@ -203,6 +243,7 @@ export function Edit( { attributes, setAttributes } ) {
 							...borderProps.style,
 							...spacingProps.style,
 							...dimensionsProps.style,
+							...transformStyles,
 							height: 'auto',
 						} }
 					/>

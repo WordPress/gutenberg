@@ -76,6 +76,19 @@ function render_block_core_icon( $attributes ) {
 		$dimensions_styles['width'] = $attributes['style']['dimensions']['width'];
 	}
 
+	// Transform (Flip).
+	$transform_styles = array();
+	$flip_horizontal  = $attributes['flipHorizontal'] ?? false;
+	$flip_vertical    = $attributes['flipVertical'] ?? false;
+
+	if ( $flip_horizontal && $flip_vertical ) {
+		$transform_styles['transform'] = 'scaleX(-1) scaleY(-1)';
+	} elseif ( $flip_horizontal ) {
+		$transform_styles['transform'] = 'scaleX(-1)';
+	} elseif ( $flip_vertical ) {
+		$transform_styles['transform'] = 'scaleY(-1)';
+	}
+
 	// Generate styles and classes.
 	$styles = wp_style_engine_get_styles(
 		array(
@@ -94,6 +107,17 @@ function render_block_core_icon( $attributes ) {
 	}
 	if ( ! empty( $styles['classnames'] ) ) {
 		$processor->add_class( $styles['classnames'] );
+	}
+
+	// Apply transform styles directly to the SVG.
+	if ( ! empty( $transform_styles['transform'] ) ) {
+		$current_style = $processor->get_attribute( 'style' ) ?: '';
+		$transform_css  = 'transform: ' . $transform_styles['transform'] . ';';
+		if ( $current_style ) {
+			$processor->set_attribute( 'style', $current_style . ' ' . $transform_css );
+		} else {
+			$processor->set_attribute( 'style', $transform_css );
+		}
 	}
 
 	$aria_label = ! empty( $attributes['ariaLabel'] ) ? $attributes['ariaLabel'] : '';
