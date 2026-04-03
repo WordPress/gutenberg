@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createSelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -28,7 +28,9 @@ const ROOT_BLOCK_SUPPORTS = [
 	'contentSize',
 	'wideSize',
 	'blockGap',
+	'textAlign',
 	'textDecoration',
+	'textIndent',
 	'textTransform',
 	'letterSpacing',
 ];
@@ -82,6 +84,11 @@ function filterElementBlockSupports( blockSupports, name, element ) {
 				element === 'text'
 			)
 		) {
+			return false;
+		}
+
+		// Text indent is only available for blocks, not elements
+		if ( support === 'textIndent' && ! name ) {
 			return false;
 		}
 
@@ -210,6 +217,39 @@ export function getAllBlockBindingsSources( state ) {
 export function getBlockBindingsSource( state, sourceName ) {
 	return state.blockBindingsSources[ sourceName ];
 }
+
+/**
+ * Compute the fields list for a specific block bindings source.
+ *
+ * @param {Object} state        Data state.
+ * @param {Object} source       Block bindings source.
+ * @param {Object} blockContext Block context.
+ *
+ * @return {Array} List of fields for the specific source.
+ */
+export const getBlockBindingsSourceFieldsList = createRegistrySelector(
+	( select ) =>
+		createSelector(
+			( state, source, blockContext ) => {
+				if ( ! source.getFieldsList ) {
+					return [];
+				}
+
+				const context = {};
+				if ( source?.usesContext?.length ) {
+					for ( const key of source.usesContext ) {
+						context[ key ] = blockContext[ key ];
+					}
+				}
+				return source.getFieldsList( { select, context } );
+			},
+			( state, source, blockContext ) => [
+				source.getFieldsList,
+				source.usesContext,
+				blockContext,
+			]
+		)
+);
 
 /**
  * Determines if any of the block type's attributes have

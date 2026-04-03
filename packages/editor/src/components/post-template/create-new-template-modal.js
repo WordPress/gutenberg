@@ -99,6 +99,7 @@ export default function CreateNewTemplateModal( { onClose } ) {
 			slug: kebabCase( title || DEFAULT_TITLE ) || 'wp-custom-template',
 			content: newTemplateContent,
 			title: title || DEFAULT_TITLE,
+			status: 'publish',
 		} );
 
 		setIsBusy( false );
@@ -117,14 +118,10 @@ export default function CreateNewTemplateModal( { onClose } ) {
 			size="small"
 			overlayClassName="editor-post-template__create-template-modal"
 		>
-			<form
-				className="editor-post-template__create-form"
-				onSubmit={ submit }
-			>
+			<form onSubmit={ submit }>
 				<VStack spacing="3">
 					<TextControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'Name' ) }
 						value={ title }
 						onChange={ setTitle }

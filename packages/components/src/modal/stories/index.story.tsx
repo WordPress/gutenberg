@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { StoryFn, Meta } from '@storybook/react';
+import type { StoryFn, Meta } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -44,6 +44,11 @@ const meta: Meta< typeof Modal > = {
 	},
 	parameters: {
 		controls: { expanded: true },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `Dialog` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -58,7 +63,11 @@ const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
 
 	return (
 		<>
-			<Button variant="secondary" onClick={ openModal }>
+			<Button
+				__next40pxDefaultSize
+				variant="secondary"
+				onClick={ openModal }
+			>
 				Open Modal
 			</Button>
 			{ isOpen && (
@@ -80,7 +89,11 @@ const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
 						style={ { marginBottom: '20px' } }
 					/>
 
-					<Button variant="secondary" onClick={ closeModal }>
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ closeModal }
+					>
 						Close Modal
 					</Button>
 				</Modal>

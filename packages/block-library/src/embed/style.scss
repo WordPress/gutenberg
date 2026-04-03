@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
 // Apply max-width to floated items that have no intrinsic width
 .wp-block[data-align="left"] > [data-type="core/embed"],
 .wp-block[data-align="right"] > [data-type="core/embed"],
@@ -17,6 +20,12 @@
 .wp-block-cover .wp-block-embed {
 	min-width: 320px;
 	min-height: 240px;
+}
+
+// Allow embeds to grow and shrink inside flex group blocks (Stack/Row), preventing collapse while fitting available space.
+.wp-block-group.is-layout-flex .wp-block-embed {
+	flex: 1 1 0%;
+	min-width: 0;
 }
 
 .wp-block-embed {

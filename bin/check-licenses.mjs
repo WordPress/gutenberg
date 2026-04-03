@@ -3,67 +3,52 @@
 /**
  * External dependencies
  */
-import { spawnSync } from 'node:child_process';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 /**
  * Internal dependencies
  */
-import { checkDepsInTree } from '../packages/scripts/utils/license.js';
+import {
+	checkDeps,
+	collectDeps,
+	readPackageJson,
+} from '../packages/scripts/utils/license.js';
 
-const ignored = [ '@ampproject/remapping', 'webpack' ];
+const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
+const ROOT_DIR = path.resolve( __dirname, '..' );
 
 /*
- * `wp-scripts check-licenses` uses prod and dev dependencies of the package to scan for dependencies. With npm workspaces, workspace packages (the @wordpress/* packages) are not listed in the main package json and this approach does not work.
+ * This script checks licenses for production dependencies of packages that are
+ * shipped with WordPress (those with wpScript or wpScriptModuleExports in package.json).
  *
- * Instead, work from an npm query that uses some custom information in package.json files to declare packages that are shipped with WordPress (and must be GPLv2 compatible) or other files that may use more permissive licenses.
+ * It works independently of the package manager (npm, pnpm, etc.) by:
+ * 1. Reading package.json files to find wpScript packages
+ * 2. Reading their production dependencies
+ * 3. Resolving each dependency using Node's module resolution
+ * 4. Reading the license from each resolved package
  */
 
-/**
- * @typedef PackageInfo
- * @property {string} name Package name.
- */
+const packagesDir = path.join( ROOT_DIR, 'packages' );
+const depsMap = new Map();
+const visited = new Set();
 
-/** @type {ReadonlyArray<PackageInfo>} */
-const workspacePackages = JSON.parse(
-	spawnSync(
-		'npm',
-		[
-			'query',
-			'.workspace:attr([wpScript]), .workspace:attr([wpScriptModuleExports])',
-		],
-		/*
-		 * Set the max buffer to ~157MB, since the output size for
-		 * prod is ~21 MB and dev is ~110 MB
-		 */
-		{ maxBuffer: 1024 * 1024 * 150 }
-	).stdout
-);
+// Find all workspace packages with wpScript or wpScriptModuleExports
+for ( const dir of fs.readdirSync( packagesDir ) ) {
+	const pkgDir = path.join( packagesDir, dir );
+	const pkgJson = readPackageJson( pkgDir );
 
-const packageNames = workspacePackages.map( ( { name } ) => name );
+	if ( pkgJson?.wpScript || pkgJson?.wpScriptModuleExports ) {
+		collectDeps( pkgJson.dependencies, pkgDir, {
+			gpl2: true,
+			depsMap,
+			visited,
+			shouldSkip: ( depName ) => depName.startsWith( '@wordpress/' ),
+		} );
+	}
+}
 
-const dependenciesToProcess = JSON.parse(
-	spawnSync(
-		'npm',
-		[
-			'ls',
-			'--json',
-			'--long',
-			'--all',
-			'--lockfile-only',
-			'--omit=dev',
-			...packageNames.map(
-				( packageName ) => `--workspace=${ packageName }`
-			),
-		],
-		/*
-		 * Set the max buffer to ~157MB, since the output size for
-		 * prod is ~21 MB and dev is ~110 MB
-		 */
-		{ maxBuffer: 1024 * 1024 * 150 }
-	).stdout
-).dependencies;
-
-checkDepsInTree( dependenciesToProcess, {
-	ignored,
+checkDeps( Array.from( depsMap.values() ), {
 	gpl2: true,
 } );

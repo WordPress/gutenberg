@@ -32,21 +32,21 @@ export type CustomSelectButtonProps = {
 	 * An optional default value for the control when used in uncontrolled mode.
 	 * If left `undefined`, the first non-disabled item will be used.
 	 */
-	defaultValue?: string | string[];
+	defaultValue?: string | readonly string[];
 	/**
 	 * A function that receives the new value of the input.
 	 */
-	onChange?: ( newValue: string | string[] ) => void;
+	onChange?: ( newValue: string | readonly string[] ) => void;
 	/**
 	 * Can be used to render select UI with custom styled values.
 	 */
 	renderSelectedValue?: (
-		selectedValue: string | string[]
+		selectedValue: string | readonly string[]
 	) => React.ReactNode;
 	/**
 	 * The value of the control when used in uncontrolled mode.
 	 */
-	value?: string | string[];
+	value?: string | readonly string[];
 };
 
 // Props only exposed on the internal implementation

@@ -22,7 +22,7 @@ const AVERAGE_READING_RATE = 189;
 
 // This component renders the wordcount and reading time for the post.
 export default function PostContentInformation() {
-	const { postContent } = useSelect( ( select ) => {
+	const postContent = useSelect( ( select ) => {
 		const { getEditedPostAttribute, getCurrentPostType, getCurrentPostId } =
 			select( editorStore );
 		const { canUser } = select( coreStore );
@@ -41,12 +41,12 @@ export default function PostContentInformation() {
 			! [ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
 				postType
 			);
-		return {
-			postContent:
-				showPostContentInfo && getEditedPostAttribute( 'content' ),
-		};
+		return showPostContentInfo && getEditedPostAttribute( 'content' );
 	}, [] );
+	return <PostContentInformationUI postContent={ postContent } />;
+}
 
+export function PostContentInformationUI( { postContent } ) {
 	/*
 	 * translators: If your word count is based on single characters (e.g. East Asian characters),
 	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.

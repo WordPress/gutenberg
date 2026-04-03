@@ -41,7 +41,14 @@ SimpleGit()
 
 		if ( !! nonOptionalDiff ) {
 			console.error(
-				"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\n"
+				`There are local changes after running one or more of the following commands:
+
+- npm install
+- npm run docs:build
+- npm run --workspace @wordpress/theme build
+
+Run these commands in your local environment and commit the resulting changes to resolve the issue.
+`
 			);
 			console.log( nonOptionalDiff );
 			process.exitCode = 1;

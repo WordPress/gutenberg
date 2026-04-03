@@ -19,7 +19,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
 
 .emotion-4 {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 499;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;
@@ -99,7 +99,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
             </span>
             <span
               aria-label="(opens in a new tab)"
-              class="components-external-link__icon"
+              class="components-external-link__icon wp-exclude-emoji"
             >
               ↗
             </span>
@@ -156,7 +156,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
             class="post-publish-panel__postpublish-buttons"
           >
             <a
-              class="components-button is-next-40px-default-size is-primary has-icon"
+              class="components-button is-next-40px-default-size is-primary has-icon has-icon-right"
               href="https://wordpress.local/sample-page/"
               target="_blank"
             >
@@ -164,7 +164,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
                 class="components-visually-hidden emotion-6 emotion-7"
                 data-wp-c16t="true"
                 data-wp-component="VisuallyHidden"
-                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal;"
+                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
               >
                 (opens in a new tab)
               </span>
@@ -246,7 +246,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
 
 .emotion-4 {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 499;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;
@@ -326,7 +326,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
             </span>
             <span
               aria-label="(opens in a new tab)"
-              class="components-external-link__icon"
+              class="components-external-link__icon wp-exclude-emoji"
             >
               ↗
             </span>
@@ -383,7 +383,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
             class="post-publish-panel__postpublish-buttons"
           >
             <a
-              class="components-button is-next-40px-default-size is-primary has-icon"
+              class="components-button is-next-40px-default-size is-primary has-icon has-icon-right"
               href="https://wordpress.local/sample-page/"
               target="_blank"
             >
@@ -391,7 +391,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
                 class="components-visually-hidden emotion-6 emotion-7"
                 data-wp-c16t="true"
                 data-wp-component="VisuallyHidden"
-                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal;"
+                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
               >
                 (opens in a new tab)
               </span>

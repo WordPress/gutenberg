@@ -106,7 +106,7 @@ export type WPCompleter< TCompleterOption = any > = {
 	className?: string;
 };
 
-type ContentRef = React.RefObject< HTMLElement >;
+type ContentRef = React.RefObject< HTMLElement | null >;
 
 export type AutocompleterUIProps = {
 	/**

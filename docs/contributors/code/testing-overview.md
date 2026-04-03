@@ -506,9 +506,7 @@ There is an ongoing effort to add integration tests to the native mobile project
 
 ## End-to-end testing
 
-Most existing End-to-end tests currently use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver to run the tests in `packages/e2e-tests`, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
-
-There's an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate them from Puppeteer to Playwright. **It's recommended to write new e2e tests in Playwright whenever possible**. The sections below mostly apply to the old Jest + Puppeteer framework. See the dedicated [guide](/docs/contributors/code/e2e/README.md) if you're writing tests with Playwright.
+End-to-end tests use [Playwright](https://playwright.dev/) as the testing framework. See the dedicated [End-to-End Testing guide](/docs/contributors/code/e2e/README.md) for best practices and detailed instructions.
 
 ### Using wp-env
 
@@ -521,46 +519,14 @@ npm run test:e2e
 or interactively
 
 ```bash
-npm run test:e2e:watch
-```
-
-Sometimes it's useful to observe the browser while running tests. Then, use this command:
-
-```bash
-npm run test:e2e:watch -- --puppeteer-interactive
-```
-
-You can control the speed of execution with `--puppeteer-slowmo`:
-
-```bash
-npm run test:e2e:watch -- --puppeteer-interactive --puppeteer-slowmo=200
-```
-
-You can additionally have the devtools automatically open for interactive debugging in the browser:
-
-```bash
-npm run test:e2e:watch -- --puppeteer-devtools
-```
-
-### Using alternate environment
-
-If using a different setup than `wp-env`, you first need to symlink the e2e test plugins to your test site, from your site's plugins directory run:
-
-```bash
-ln -s gutenberg/packages/e2e-tests/plugins/* .
-```
-
-Then to run the tests, specify the base URL, username, and passwords for your site. For example, if your test site is at `http://wp.test`, use:
-
-```bash
-WP_BASE_URL=http://wp.test npm run test:e2e -- --wordpress-username=admin --wordpress-password=password
+npm run test:e2e -- --ui
 ```
 
 ### Scenario testing
 
 If you find that end-to-end tests pass when run locally, but fail in GitHub Actions, you may be able to isolate a CPU- or network-bound race condition by simulating a slow CPU or network:
 
-```
+```bash
 THROTTLE_CPU=4 npm run test:e2e
 ```
 
@@ -610,9 +576,39 @@ _Note: The phpunit commands require `wp-env` to be running and composer dependen
 
 In other environments, run `composer run test` and `composer run test:watch`.
 
-Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `npm run test:php` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint:php`.
+Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/PHPCSStandards/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `npm run test:php` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint:php`.
 
 To run unit tests only, without the linter, use `npm run test:unit:php` instead.
+
+### Testing Prefixed Functions
+
+Gutenberg's build system automatically prefixes PHP functions with `gutenberg_` to avoid conflicts with WordPress Core. When writing tests for block functions, you must test the **built (prefixed) versions** of functions, not the source versions.
+
+If the tests are backported to WordPress Core, then they must be updated to test the non-prefixed functions.
+
+#### Writing Tests for Prefixed Functions & Classes
+
+Always test the built (prefixed) function names and class names in your PHPUnit tests:
+
+```php
+// phpunit/blocks/my-block-test.php
+class My_Block_Test extends WP_UnitTestCase {
+    public function test_my_function() {
+        // Test the built function (with gutenberg_ prefix)
+        $result = gutenberg_block_core_my_block_render_function( $args );
+        $this->assertEquals( $expected, $result );
+    }
+
+    public function test_my_class() {
+        // Test the built class (with _Gutenberg suffix)
+        $handler = new WP_Example_Block_Handler_Gutenberg();
+        $result = $handler->process( $input );
+        $this->assertEquals( $expected, $result );
+    }
+}
+```
+
+For more detailed information about the build system and function prefixing, see the [Build System: Function Prefixing and Block Loading](/docs/contributors/code/build-system-function-prefixing.md) documentation.
 
 [snapshot testing]: https://jestjs.io/docs/en/snapshot-testing.html
 [update snapshots]: https://jestjs.io/docs/en/snapshot-testing.html#updating-snapshots
@@ -631,7 +627,7 @@ To set up the e2e testing environment, checkout the Gutenberg repository and swi
 
 ```
 nvm use && npm install
-npm run build:packages
+npm run build
 ```
 
 To run the tests run the following command:

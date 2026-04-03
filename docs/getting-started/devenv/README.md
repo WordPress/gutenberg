@@ -4,9 +4,10 @@ This guide will help you set up the right development environment to create bloc
 
 A block development environment includes the tools you need on your computer to successfully develop for the Block Editor. The three essential requirements are:
 
-1.  [Code editor](#code-editor)
-2.  [Node.js development tools](#node-js-development-tools)
-3.  [Local WordPress environment (site)](#local-wordpress-environment)
+- [Block Development Environment](#block-development-environment)
+  - [Code editor](#code-editor)
+  - [Node.js development tools](#nodejs-development-tools)
+  - [Local WordPress environment](#local-wordpress-environment)
 
 <div class="callout callout-info">
     To contribute to the Gutenberg project itself, refer to the additional documentation in the <a href="https://developer.wordpress.org/block-editor/contributors/code/getting-started-with-code-contribution">code contribution guide</a>.
@@ -25,7 +26,7 @@ Node.js (`node`) is an open-source runtime environment that allows you to execut
 Node.js and its accompanying development tools allow you to:
 
 -   Install and run WordPress packages needed for Block Editor development, such as `wp-scripts`
--   Setup local WordPress environments with `wp-env` and `wp-now`
+-   Set up local WordPress environments with `wp-env` and `@wp-playground/cli`
 -   Use the latest ECMAScript features and write code in ESNext
 -   Lint, format, and test JavaScript code
 -   Scaffold custom blocks with the `create-block` package
@@ -48,13 +49,13 @@ In the broader WordPress community, many tools are available for setting up a lo
 Refer to the [Get started with `wp-env`](/docs/getting-started/devenv/get-started-with-wp-env.md) guide for setup instructions.
 
 <div class="callout callout-info">
-    Throughout the Handbook, you may also see references to <code><a href="https://github.com/WordPress/playground-tools/tree/trunk/packages/wp-now">wp-now</a></code>. This is a lightweight tool powered by <a hre="https://developer.wordpress.org/playground/">WordPress Playground</a> that streamlines setting up a simple local WordPress environment. While still experimental, this tool is great for quickly testing WordPress releases, plugins, and themes. 
+    Throughout the Handbook, you may also see references to <code><a href="https://github.com/WordPress/wordpress-playground/tree/trunk/packages/playground/cli">@wp-playground/cli</a></code>. This is a lightweight tool powered by <a href="https://developer.wordpress.org/playground/">WordPress Playground</a> that streamlines setting up a simple local WordPress environment. While still experimental, this tool is great for quickly testing WordPress releases, plugins, and themes. 
 </div>
 
 This list is not exhaustive, but here are several additional options to choose from if you prefer not to use `wp-env`:
 
+- [WordPress Studio](https://developer.wordpress.com/studio/)
 - [Local](https://localwp.com/)
-- [WP Studio](https://developer.wordpress.com/studio/)
 - [XAMPP](https://www.apachefriends.org/)
 - [MAMP](https://www.mamp.info/en/mamp/mac/)
 - [Varying Vagrant Vagrants](https://varyingvagrantvagrants.org/) (VVV)

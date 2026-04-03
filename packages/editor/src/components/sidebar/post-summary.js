@@ -1,12 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	__experimentalVStack as VStack,
+	ExternalLink,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
+import DataFormPostSummary from './dataform-post-summary';
 import PluginPostStatusInfo from '../plugin-post-status-info';
 import PostAuthorPanel from '../post-author/panel';
 import PostCardPanel from '../post-card-panel';
@@ -35,7 +41,33 @@ import PostTrash from '../post-trash';
  */
 const PANEL_NAME = 'post-status';
 
+export function OpenRevisionsClassicScreen( { revisionId } ) {
+	return (
+		<ExternalLink
+			href={ addQueryArgs( 'revision.php', {
+				revision: revisionId,
+			} ) }
+		>
+			{ __( 'Open classic revisions screen' ) }
+		</ExternalLink>
+	);
+}
+
 export default function PostSummary( { onActionPerformed } ) {
+	const postType = useSelect(
+		( select ) => select( editorStore ).getCurrentPostType(),
+		[]
+	);
+	if (
+		window?.__experimentalDataFormInspector &&
+		[ 'page', 'post' ].includes( postType )
+	) {
+		return <DataFormPostSummary onActionPerformed={ onActionPerformed } />;
+	}
+	return <ClassicPostSummary onActionPerformed={ onActionPerformed } />;
+}
+
+function ClassicPostSummary( { onActionPerformed } ) {
 	const { isRemovedPostStatusPanel, postType, postId } = useSelect(
 		( select ) => {
 			// We use isEditorPanelRemoved to hide the panel if it was programmatically removed. We do
@@ -53,7 +85,6 @@ export default function PostSummary( { onActionPerformed } ) {
 		},
 		[]
 	);
-
 	return (
 		<PostPanelSection className="editor-post-summary">
 			<PluginPostStatusInfo.Slot>

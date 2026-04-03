@@ -125,10 +125,14 @@ const getOpenverseCaption = ( item ) => {
 };
 
 const coreMediaFetch = async ( query = {} ) => {
-	const mediaItems = await resolveSelect( coreStore ).getMediaItems( {
-		...query,
-		orderBy: !! query?.search ? 'relevance' : 'date',
-	} );
+	const mediaItems = await resolveSelect( coreStore ).getEntityRecords(
+		'postType',
+		'attachment',
+		{
+			...query,
+			orderBy: !! query?.search ? 'relevance' : 'date',
+		}
+	);
 	return mediaItems.map( ( mediaItem ) => ( {
 		...mediaItem,
 		alt: mediaItem.alt_text,

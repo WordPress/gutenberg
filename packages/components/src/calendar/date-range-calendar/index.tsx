@@ -7,15 +7,19 @@ import { enUS } from 'react-day-picker/locale';
 /**
  * WordPress dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
 import { COMMON_PROPS, MODIFIER_CLASSNAMES } from '../utils/constants';
 import { clampNumberOfMonths } from '../utils/misc';
-import { useControlledValue } from '../utils/use-controlled-value';
+import { useControlledValue } from '../../utils/hooks';
 import { useLocalizationProps } from '../utils/use-localization-props';
-import type { DateRangeCalendarProps, DateRange } from '../types';
+import type {
+	DateRangeCalendarProps,
+	DateRange,
+	OnSelectHandler,
+} from '../types';
 
 export function usePreviewRange( {
 	selected,
@@ -151,13 +155,21 @@ export const DateRangeCalendar = ( {
 		mode: 'range',
 	} );
 
-	const [ selected, setSelected ] = useControlledValue<
-		DateRange | undefined
-	>( {
-		defaultValue: defaultSelected,
-		value: selectedProp,
-		onChange: onSelect,
-	} );
+	const onChange: OnSelectHandler< typeof selectedProp > = useCallback(
+		( selected, triggerDate, modifiers, e ) => {
+			// Convert internal `null` to `undefined` for the public event handler.
+			onSelect?.( selected ?? undefined, triggerDate, modifiers, e );
+		},
+		[ onSelect ]
+	);
+
+	const [ selected, setSelected ] = useControlledValue< typeof selectedProp >(
+		{
+			defaultValue: defaultSelected,
+			value: selectedProp,
+			onChange,
+		}
+	);
 
 	const [ hoveredDate, setHoveredDate ] = useState< Date | undefined >(
 		undefined
@@ -192,7 +204,7 @@ export const DateRangeCalendar = ( {
 			excludeDisabled={ excludeDisabled }
 			min={ min }
 			max={ max }
-			selected={ selected }
+			selected={ selected ?? undefined }
 			onSelect={ setSelected }
 			onDayMouseEnter={ ( date ) => setHoveredDate( date ) }
 			onDayMouseLeave={ () => setHoveredDate( undefined ) }

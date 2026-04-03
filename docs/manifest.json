@@ -362,8 +362,14 @@
 	{
 		"title": "API Versions",
 		"slug": "block-api-versions",
-		"markdown_source": "../docs/reference-guides/block-api/block-api-versions.md",
+		"markdown_source": "../docs/reference-guides/block-api/block-api-versions/README.md",
 		"parent": "block-api"
+	},
+	{
+		"title": "Migrating Blocks for iframe Editor Compatibility",
+		"slug": "block-migration-for-iframe-editor-compatibility",
+		"markdown_source": "../docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md",
+		"parent": "block-api-versions"
 	},
 	{
 		"title": "Attributes",
@@ -516,9 +522,9 @@
 		"parent": "core-concepts"
 	},
 	{
-		"title": "Understanding global state, local context and derived state",
-		"slug": "undestanding-global-state-local-context-and-derived-state",
-		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md",
+		"title": "Understanding global state, local context, derived state and config",
+		"slug": "understanding-global-state-local-context-derived-state-and-config",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-derived-state-and-config.md",
 		"parent": "core-concepts"
 	},
 	{
@@ -534,15 +540,27 @@
 		"parent": "core-concepts"
 	},
 	{
+		"title": "Client-Side Navigation",
+		"slug": "client-side-navigation",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md",
+		"parent": "core-concepts"
+	},
+	{
+		"title": "Client-Side Navigation Compatibility",
+		"slug": "client-side-navigation-compatibility",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility.md",
+		"parent": "core-concepts"
+	},
+	{
 		"title": "Quick start guide",
 		"slug": "iapi-quick-start-guide",
 		"markdown_source": "../docs/reference-guides/interactivity-api/iapi-quick-start-guide.md",
 		"parent": "interactivity-api"
 	},
 	{
-		"title": "API Reference",
-		"slug": "api-reference",
-		"markdown_source": "../docs/reference-guides/interactivity-api/api-reference.md",
+		"title": "Directives and Store",
+		"slug": "directives-and-store",
+		"markdown_source": "../docs/reference-guides/interactivity-api/directives-and-store.md",
 		"parent": "interactivity-api"
 	},
 	{
@@ -843,12 +861,6 @@
 		"title": "DateTime",
 		"slug": "date-time",
 		"markdown_source": "../packages/components/src/date-time/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "DimensionControl",
-		"slug": "dimension-control",
-		"markdown_source": "../packages/components/src/dimension-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -1428,6 +1440,18 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/abilities",
+		"slug": "packages-abilities",
+		"markdown_source": "../packages/abilities/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/admin-ui",
+		"slug": "packages-admin-ui",
+		"markdown_source": "../packages/admin-ui/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/annotations",
 		"slug": "packages-annotations",
 		"markdown_source": "../packages/annotations/README.md",
@@ -1437,6 +1461,12 @@
 		"title": "@wordpress/api-fetch",
 		"slug": "packages-api-fetch",
 		"markdown_source": "../packages/api-fetch/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/asset-loader",
+		"slug": "packages-asset-loader",
+		"markdown_source": "../packages/asset-loader/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1512,6 +1542,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/boot",
+		"slug": "packages-boot",
+		"markdown_source": "../packages/boot/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/browserslist-config",
 		"slug": "packages-browserslist-config",
 		"markdown_source": "../packages/browserslist-config/README.md",
@@ -1533,6 +1569,12 @@
 		"title": "@wordpress/compose",
 		"slug": "packages-compose",
 		"markdown_source": "../packages/compose/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/core-abilities",
+		"slug": "packages-core-abilities",
+		"markdown_source": "../packages/core-abilities/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1638,12 +1680,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/e2e-test-utils",
-		"slug": "packages-e2e-test-utils",
-		"markdown_source": "../packages/e2e-test-utils/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/e2e-tests",
 		"slug": "packages-e2e-tests",
 		"markdown_source": "../packages/e2e-tests/README.md",
@@ -1710,6 +1746,18 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/global-styles-engine",
+		"slug": "packages-global-styles-engine",
+		"markdown_source": "../packages/global-styles-engine/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/global-styles-ui",
+		"slug": "packages-global-styles-ui",
+		"markdown_source": "../packages/global-styles-ui/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/hooks",
 		"slug": "packages-hooks",
 		"markdown_source": "../packages/hooks/README.md",
@@ -1731,6 +1779,12 @@
 		"title": "@wordpress/icons",
 		"slug": "packages-icons",
 		"markdown_source": "../packages/icons/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/image-cropper",
+		"slug": "packages-image-cropper",
+		"markdown_source": "../packages/image-cropper/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1788,6 +1842,18 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/latex-to-mathml",
+		"slug": "packages-latex-to-mathml",
+		"markdown_source": "../packages/latex-to-mathml/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/lazy-editor",
+		"slug": "packages-lazy-editor",
+		"markdown_source": "../packages/lazy-editor/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/lazy-import",
 		"slug": "packages-lazy-import",
 		"markdown_source": "../packages/lazy-import/README.md",
@@ -1797,6 +1863,18 @@
 		"title": "@wordpress/list-reusable-blocks",
 		"slug": "packages-list-reusable-blocks",
 		"markdown_source": "../packages/list-reusable-blocks/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/media-editor",
+		"slug": "packages-media-editor",
+		"markdown_source": "../packages/media-editor/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/media-fields",
+		"slug": "packages-media-fields",
+		"markdown_source": "../packages/media-fields/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1920,6 +1998,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/route",
+		"slug": "packages-route",
+		"markdown_source": "../packages/route/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/router",
 		"slug": "packages-router",
 		"markdown_source": "../packages/router/README.md",
@@ -1968,9 +2052,21 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/theme",
+		"slug": "packages-theme",
+		"markdown_source": "../packages/theme/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/token-list",
 		"slug": "packages-token-list",
 		"markdown_source": "../packages/token-list/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/ui",
+		"slug": "packages-ui",
+		"markdown_source": "../packages/ui/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1998,6 +2094,18 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/views",
+		"slug": "packages-views",
+		"markdown_source": "../packages/views/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/vips",
+		"slug": "packages-vips",
+		"markdown_source": "../packages/vips/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/warning",
 		"slug": "packages-warning",
 		"markdown_source": "../packages/warning/README.md",
@@ -2013,6 +2121,18 @@
 		"title": "@wordpress/wordcount",
 		"slug": "packages-wordcount",
 		"markdown_source": "../packages/wordcount/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/worker-threads",
+		"slug": "packages-worker-threads",
+		"markdown_source": "../packages/worker-threads/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/build",
+		"slug": "packages-wp-build",
+		"markdown_source": "../packages/wp-build/README.md",
 		"parent": "packages"
 	},
 	{
@@ -2262,12 +2382,6 @@
 		"parent": "testing-overview"
 	},
 	{
-		"title": "Migration guide",
-		"slug": "migration",
-		"markdown_source": "../docs/contributors/code/e2e/migration.md",
-		"parent": "e2e"
-	},
-	{
 		"title": "Overusing snapshots",
 		"slug": "overusing-snapshots",
 		"markdown_source": "../docs/contributors/code/e2e/overusing-snapshots.md",
@@ -2288,8 +2402,20 @@
 	{
 		"title": "Gutenberg Release Process",
 		"slug": "release",
-		"markdown_source": "../docs/contributors/code/release.md",
+		"markdown_source": "../docs/contributors/code/release/README.md",
 		"parent": "code"
+	},
+	{
+		"title": "Gutenberg plugin releases",
+		"slug": "plugin-release",
+		"markdown_source": "../docs/contributors/code/release/plugin-release.md",
+		"parent": "release"
+	},
+	{
+		"title": "Packages releases to NPM and WordPress Core updates",
+		"slug": "package-release-and-core-updates",
+		"markdown_source": "../docs/contributors/code/release/package-release-and-core-updates.md",
+		"parent": "release"
 	},
 	{
 		"title": "Cherry-picking automation",

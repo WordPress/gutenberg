@@ -1,7 +1,7 @@
 /**
  * Build the live regions markup.
  *
- * @param [ariaLive] Value for the 'aria-live' attribute; default: 'polite'.
+ * @param {'polite'|'assertive'} [ariaLive] Value for the 'aria-live' attribute; default: 'polite'.
  *
  * @return The ARIA live region HTML element.
  */
@@ -14,17 +14,16 @@ export default function addContainer(
 
 	container.setAttribute(
 		'style',
-		'position: absolute;' +
-			'margin: -1px;' +
-			'padding: 0;' +
-			'height: 1px;' +
-			'width: 1px;' +
-			'overflow: hidden;' +
-			'clip: rect(1px, 1px, 1px, 1px);' +
-			'-webkit-clip-path: inset(50%);' +
-			'clip-path: inset(50%);' +
-			'border: 0;' +
-			'word-wrap: normal !important;'
+		'position:absolute;' +
+			'margin:-1px;' +
+			'padding:0;' +
+			'height:1px;' +
+			'width:1px;' +
+			'overflow:hidden;' +
+			'clip-path:inset(50%);' +
+			'border:0;' +
+			'word-wrap:normal !important;' +
+			'word-break:normal !important;'
 	);
 	container.setAttribute( 'aria-live', ariaLive );
 	container.setAttribute( 'aria-relevant', 'additions text' );
