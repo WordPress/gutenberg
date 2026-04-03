@@ -17,11 +17,11 @@ import {
 
 function Example() {
 	return (
-		<VStack spacing={4}>
+		<Stack direction="column" gap="lg">
 			<Text>Some text here</Text>
 			<Divider />
 			<Text>Some more text here</Text>
-		</VStack>
+		</Stack>
 	);
 }
 ```
