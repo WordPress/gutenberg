@@ -1587,9 +1587,9 @@ function getPackageName( filename ) {
 /**
  * Build a single route's files.
  *
- * @param {string}  routeName               Route name.
- * @param {Object}  root0                   Options object.
- * @param {boolean} root0.noScriptDebug     Whether to skip unminified builds.
+ * @param {string}  routeName           Route name.
+ * @param {Object}  root0               Options object.
+ * @param {boolean} root0.noScriptDebug Whether to skip unminified builds.
  * @return {Promise<number>} Build time in milliseconds.
  */
 async function buildRoute( routeName, { noScriptDebug = false } = {} ) {
@@ -1720,8 +1720,8 @@ async function buildRoute( routeName, { noScriptDebug = false } = {} ) {
 /**
  * Build all discovered routes.
  *
- * @param {Object}  root0                Options object.
- * @param {boolean} root0.noScriptDebug  Whether to skip unminified builds.
+ * @param {Object}  root0               Options object.
+ * @param {boolean} root0.noScriptDebug Whether to skip unminified builds.
  * @return {Promise<void>}
  */
 async function buildAllRoutes( { noScriptDebug = false } = {} ) {
@@ -1748,8 +1748,8 @@ async function buildAllRoutes( { noScriptDebug = false } = {} ) {
  * Main build function.
  *
  * @param {string?} baseUrlExpression
- * @param {Object}  root0                   Options object.
- * @param {boolean} root0.noScriptDebug     Whether to skip unminified builds.
+ * @param {Object}  root0               Options object.
+ * @param {boolean} root0.noScriptDebug Whether to skip unminified builds.
  */
 async function buildAll( baseUrlExpression, { noScriptDebug = false } = {} ) {
 	console.log( '🔨 Building packages...\n' );
