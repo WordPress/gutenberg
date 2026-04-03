@@ -39,7 +39,6 @@ jobs:
 
             - name: Build E2E Storybook
               env:
-                  NODE_OPTIONS: --max-old-space-size=8192
                   NODE_ENV: test
               run: npm run storybook:e2e:build
 
