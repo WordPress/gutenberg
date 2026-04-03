@@ -16,6 +16,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
 import { getSyncManager } from './sync';
+import { SUGGESTION_DECORATION_STORE } from './suggestion-decoration-store';
 import {
 	forwardResolver,
 	getNormalizedCommaSeparable,
@@ -283,6 +284,17 @@ export const getEntityRecord =
 									restoreSelection( selectionHistory, ydoc );
 								}, 0 );
 							}
+						},
+						// Publish suggestion decoration ranges (both
+						// insertions and deletions) to the view-layer
+						// decoration store.
+						publishDecorations: ( decorations ) => {
+							registry
+								.dispatch( SUGGESTION_DECORATION_STORE )
+								.setDecorationRanges(
+									decorations.insertions ?? {},
+									decorations.deletions ?? {}
+								);
 						},
 					}
 				);

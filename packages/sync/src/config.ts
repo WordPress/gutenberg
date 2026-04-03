@@ -58,3 +58,22 @@ export const LOCAL_SYNC_MANAGER_ORIGIN = 'syncManager';
  * the CRDT document (and synced to peers) without creating undo levels.
  */
 export const LOCAL_UNDO_IGNORED_ORIGIN = 'gutenberg-undo-ignored';
+
+/**
+ * Origin string for CRDT document changes that should always pass through
+ * the DiffAttributionManager, even when in suggesting mode. Used for
+ * non-block property changes (title, status, meta, etc.) that should not
+ * become suggestions.
+ */
+export const LOCAL_EDITOR_PASSTHROUGH_ORIGIN = 'gutenberg-passthrough';
+
+/**
+ * Room name suffix for the suggestions document sync room.
+ */
+export const SUGGESTION_ROOM_SUFFIX = ':suggestions';
+
+/**
+ * Root-level key for the map that holds clientID-to-WordPress-user mappings
+ * in the nextDoc.
+ */
+export const CRDT_USER_MAP_KEY = 'users';

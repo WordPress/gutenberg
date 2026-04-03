@@ -325,6 +325,36 @@ export function isCollaborationSupported( state: State ): boolean {
 }
 
 /**
+ * Returns the current suggestion mode for the given entity.
+ *
+ * The mode is read from the sync manager but the `state.suggestionModes`
+ * reducer is included as a dependency so that `useSelect` re-evaluates
+ * when `setSuggestionMode` dispatches `SET_SUGGESTION_MODE`.
+ *
+ * @param state      Data state.
+ * @param objectType Object type (e.g. `postType/post`).
+ * @param objectId   Object ID.
+ *
+ * @return The suggestion mode ('editing' or 'suggesting').
+ */
+export function getSuggestionMode(
+	state: State,
+	objectType: string,
+	objectId: string
+): 'editing' | 'suggesting' {
+	// Read from Redux state to establish a reactive dependency for useSelect.
+	const key = `${ objectType }/${ objectId }`;
+	const stateMode = state.suggestionModes?.[ key ];
+
+	// Prefer the sync manager as the canonical source, fall back to state.
+	return (
+		getSyncManager()?.getSuggestionMode( objectType, objectId ) ??
+		stateMode ??
+		'editing'
+	);
+}
+
+/**
  * Returns the view configuration for the given entity type.
  *
  * @param state Data state.

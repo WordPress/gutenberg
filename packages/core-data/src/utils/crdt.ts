@@ -47,6 +47,10 @@ import {
 	type YMapRecord,
 	type YMap,
 } from './crdt-utils';
+import {
+	extractSuggestionDecorations,
+	serializeWithSuggestions,
+} from './crdt-suggestions';
 
 // Changes that can be applied to a post entity record.
 export type PostChanges = Partial< Post > & {
@@ -272,22 +276,61 @@ function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
  * against the local record and determine if there are changes (edits) we want
  * to dispatch.
  *
- * @param {CRDTDoc}     ydoc
- * @param {Post}        editedRecord
- * @param {Set<string>} syncedProperties
+ * @param {CRDTDoc}                  ydoc
+ * @param {Post}                     editedRecord
+ * @param {Set<string>}              syncedProperties
+ * @param {Y.DiffAttributionManager} am
  * @return {Partial<PostChanges>} The changes that should be applied to the local record.
  */
 export function getPostChangesFromCRDTDoc(
 	ydoc: CRDTDoc,
 	editedRecord: Post,
-	syncedProperties: Set< string >
+	syncedProperties: Set< string >,
+	am?: Y.DiffAttributionManager
 ): PostChanges {
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
+
+	// Always serialize the top-level map without suggestion markup so that
+	// non-block Y.Text fields (content, title, excerpt) remain clean.
+	const serialized = yMapToJSON( ymap );
+
+	// When an AM is provided, re-serialize the blocks field with suggestion
+	// markup. Both insertions and deletions are extracted as decoration
+	// ranges (applied at the view layer by the format types). `<ins>` tags
+	// are stripped (content kept). `<del>` tags are preserved so that
+	// `stripSuggestionMarkup` can remove the deletion text during
+	// write-back. The deletion *text* is present in the block attributes
+	// so the editor has characters to render with the suggestion-delete
+	// format.
+	let __suggestionInsertions:
+		| Record< string, { start: number; end: number }[] >
+		| undefined;
+	let __suggestionDeletions:
+		| Record< string, { start: number; end: number }[] >
+		| undefined;
+
+	if ( am ) {
+		const blocksValue = ymap.getAttr( 'blocks' );
+		if ( blocksValue && isYArray( blocksValue ) ) {
+			const suggestedBlocks = serializeWithSuggestions(
+				blocksValue,
+				am
+			) as any[];
+			const {
+				blocks: cleanBlocks,
+				insertions,
+				deletions,
+			} = extractSuggestionDecorations( suggestedBlocks );
+			( serialized as Record< string, unknown > ).blocks = cleanBlocks;
+			__suggestionInsertions = insertions;
+			__suggestionDeletions = deletions;
+		}
+	}
 
 	let allowedMetaChanges: Post[ 'meta' ] = {};
 
 	const changes = Object.fromEntries(
-		Object.entries( yMapToJSON( ymap ) ).filter( ( [ key, newValue ] ) => {
+		Object.entries( serialized ).filter( ( [ key, newValue ] ) => {
 			if ( ! syncedProperties.has( key ) ) {
 				return false;
 			}
@@ -414,6 +457,16 @@ export function getPostChangesFromCRDTDoc(
 		changes.selection = {
 			...shiftedSelection,
 			initialPosition: 0,
+		};
+	}
+
+	// Attach suggestion decoration data so the sync manager can publish
+	// them to the decoration store for view-layer rendering by the
+	// suggestion-insert and suggestion-delete format types.
+	if ( __suggestionInsertions || __suggestionDeletions ) {
+		( changes as any ).__suggestionDecorations = {
+			insertions: __suggestionInsertions ?? {},
+			deletions: __suggestionDeletions ?? {},
 		};
 	}
 

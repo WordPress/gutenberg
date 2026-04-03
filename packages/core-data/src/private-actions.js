@@ -7,6 +7,7 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
+import { getSyncManager } from './sync';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -172,6 +173,44 @@ export const setCollaborationSupported =
 	( supported ) =>
 	( { dispatch } ) => {
 		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
+	};
+
+/**
+ * Sets the suggestion mode for a given entity.
+ *
+ * @param {string} objectType Object type (e.g. `postType/post`).
+ * @param {string} objectId   Object ID.
+ * @param {string} mode       The suggestion mode ('editing' or 'suggesting').
+ */
+export const setSuggestionMode =
+	( objectType, objectId, mode ) =>
+	( { dispatch } ) => {
+		getSyncManager()?.setSuggestionMode( objectType, objectId, mode );
+		dispatch( { type: 'SET_SUGGESTION_MODE', objectType, objectId, mode } );
+	};
+
+/**
+ * Accepts all pending suggestions for a given entity.
+ *
+ * @param {string} objectType Object type (e.g. `postType/post`).
+ * @param {string} objectId   Object ID.
+ */
+export const acceptAllSuggestions =
+	( objectType, objectId ) =>
+	() => {
+		getSyncManager()?.acceptAllSuggestions( objectType, objectId );
+	};
+
+/**
+ * Rejects all pending suggestions for a given entity.
+ *
+ * @param {string} objectType Object type (e.g. `postType/post`).
+ * @param {string} objectId   Object ID.
+ */
+export const rejectAllSuggestions =
+	( objectType, objectId ) =>
+	() => {
+		getSyncManager()?.rejectAllSuggestions( objectType, objectId );
 	};
 
 /**
