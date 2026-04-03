@@ -209,6 +209,26 @@ addFilter(
 );
 ```
 
+### `blocks.cover.autoSetOverlayColor`
+
+The Cover block automatically selects an overlay color based on the selected image's average color. This filter allows you to disable this automatic color selection behavior. By default, the filter returns `true`, enabling automatic color selection. Set it to `false` to prevent the Cover block from automatically changing the overlay color when an image is selected.
+
+This is particularly useful when you want to:
+- Enforce a strict color palette that users cannot bypass
+- Maintain consistent overlay colors (like black or white) regardless of the selected image
+- Give users full control over overlay color selection
+
+```js
+import { addFilter } from '@wordpress/hooks';
+
+// Disable automatic overlay color selection
+addFilter(
+	'blocks.cover.autoSetOverlayColor',
+	'my-plugin/disable-cover-auto-color',
+	() => false
+);
+```
+
 ## Editor REST API preload paths
 
 You can use [`block_editor_rest_api_preload_paths`](https://developer.wordpress.org/reference/hooks/block_editor_rest_api_preload_paths/) to filter the array of REST API paths that will be used to preload common data to use with the block editor. Here's an example:
