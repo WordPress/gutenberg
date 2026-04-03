@@ -27,14 +27,14 @@ jest.mock( '../shared/filter-message', () => {
 describe( 'speak', () => {
 	let containerPolite = document.getElementById(
 		'a11y-speak-polite'
-	) as HTMLElement;
+	);
 	let containerAssertive = document.getElementById(
 		'a11y-speak-assertive'
-	) as HTMLElement;
+	);
 
 	beforeEach( () => {
-		containerPolite.textContent = '';
-		containerAssertive.textContent = '';
+		containerPolite!.textContent = '';
+		containerAssertive!.textContent = '';
 	} );
 
 	describe( 'on import', () => {
@@ -80,7 +80,7 @@ describe( 'speak', () => {
 			setup();
 			containerAssertive = document.getElementById(
 				'a11y-speak-assertive'
-			) as HTMLElement;
+			);
 		} );
 
 		it( 'should set the textcontent of the polite aria-live region', () => {
@@ -94,18 +94,18 @@ describe( 'speak', () => {
 
 	describe( 'when somehow the both containers are not present', () => {
 		beforeEach( () => {
-			containerAssertive.remove();
-			containerPolite.remove();
+			containerAssertive?.remove();
+			containerPolite?.remove();
 		} );
 
 		afterEach( () => {
 			setup();
 			containerPolite = document.getElementById(
 				'a11y-speak-polite'
-			) as HTMLElement;
+			);
 			containerAssertive = document.getElementById(
 				'a11y-speak-assertive'
-			) as HTMLElement;
+			);
 		} );
 
 		it( 'should set the textcontent of the polite aria-live region', () => {
