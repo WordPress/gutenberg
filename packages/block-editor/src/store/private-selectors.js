@@ -39,7 +39,7 @@ import {
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
 
-const { isContentBlock } = unlock( blocksPrivateApis );
+const { isContentBlock, isContentRoleBlock } = unlock( blocksPrivateApis );
 
 export { getBlockSettings } from './get-block-settings';
 
@@ -104,12 +104,12 @@ export function isContainerInsertableToInContentOnlyMode(
 ) {
 	const isBlockContentBlock = isContentBlock( blockName );
 	const rootBlockName = getBlockName( state, rootClientId );
-	const isContainerContentBlock = isContentBlock( rootBlockName );
+	const isContainerContentBlock = isContentRoleBlock( rootBlockName );
 	const isRootBlockMain = getSectionRootClientId( state ) === rootClientId;
 
 	// In contentOnly mode, containers shouldn't be inserted into unless:
-	// 1. they are a section root;
-	// 2. they are a content block and the block to be inserted is also content.
+	// 1. they support contentRole.
+	// 2. the block to be inserted supports contentRole or contains content attributes.
 	return (
 		isRootBlockMain || ( isContainerContentBlock && isBlockContentBlock )
 	);

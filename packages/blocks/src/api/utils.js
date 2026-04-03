@@ -410,6 +410,17 @@ export const __experimentalGetBlockAttributesNamesByRole = ( ...args ) => {
 };
 
 /**
+ * Checks if a block supports the contentRole feature.
+ *
+ * @param {string} name The name of the block to check.
+ * @return {boolean}    Whether the block supports contentRole.
+ */
+export function isContentRoleBlock( name ) {
+	const blockType = getBlockType( name );
+	return !! blockType?.supports?.contentRole;
+}
+
+/**
  * Checks if a block is a content block by examining its attributes.
  * A block is considered a content block if it has at least one attribute
  * with a role of 'content'.
