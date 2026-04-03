@@ -407,13 +407,6 @@ function recordValuesMatch(
 /**
  * Tracks the last record whose value differed from the current one.
  * Used to determine whether the user has actually typed something
- * (as opposed to a re-render producing a new record object with
- * identical content, e.g. during a block reset).
- *
- * Maintains a sliding window of 2 records, similar to the original
- * Set-based approach but using value comparison instead of reference
- * equality so that new objects with the same content (text, start, end)
- * are treated as duplicates.
  */
 export function useLastDifferentValue(
 	value: UseAutocompleteProps[ 'record' ]
