@@ -760,4 +760,101 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		remove_filter( 'gutenberg_note_reaction_emojis', $filter );
 	}
+
+	public function test_schema_includes_reaction_summary() {
+		$controller = new Gutenberg_REST_Comment_Controller_7_1();
+		$schema     = $controller->get_item_schema();
+
+		$this->assertArrayHasKey( 'reaction_summary', $schema['properties'] );
+
+		$reaction_summary_schema = $schema['properties']['reaction_summary'];
+		$this->assertTrue( $reaction_summary_schema['readonly'] );
+		$this->assertSame( 'object', $reaction_summary_schema['type'] );
+		$this->assertContains( 'view', $reaction_summary_schema['context'] );
+		$this->assertContains( 'edit', $reaction_summary_schema['context'] );
+
+		// Verify additionalProperties structure.
+		$this->assertArrayHasKey( 'additionalProperties', $reaction_summary_schema );
+		$additional = $reaction_summary_schema['additionalProperties'];
+		$this->assertArrayHasKey( 'count', $additional['properties'] );
+		$this->assertArrayHasKey( 'reacted', $additional['properties'] );
+		$this->assertArrayHasKey( 'my_reaction_id', $additional['properties'] );
+	}
+
+	public function test_note_response_includes_reaction_summary() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		// Add a reaction from the current user.
+		$params  = array(
+			'post'    => $post_id,
+			'type'    => 'reaction',
+			'parent'  => $note_id,
+			'content' => 'heart',
+			'author'  => self::$editor_id,
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response    = rest_get_server()->dispatch( $request );
+		$reaction_id = $response->get_data()['id'];
+
+		// Fetch the note and verify reaction_summary is included.
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/comments/' . $note_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertArrayHasKey( 'reaction_summary', $data );
+		$this->assertArrayHasKey( 'heart', $data['reaction_summary'] );
+		$this->assertSame( 1, $data['reaction_summary']['heart']['count'] );
+		$this->assertTrue( $data['reaction_summary']['heart']['reacted'] );
+		$this->assertSame( $reaction_id, $data['reaction_summary']['heart']['my_reaction_id'] );
+	}
+
+	public function test_reaction_summary_shows_not_reacted_for_other_user() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		// Add a reaction from the editor.
+		$params  = array(
+			'post'    => $post_id,
+			'type'    => 'reaction',
+			'parent'  => $note_id,
+			'content' => 'heart',
+			'author'  => self::$editor_id,
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		rest_get_server()->dispatch( $request );
+
+		// Switch to admin user and fetch the note.
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/comments/' . $note_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertArrayHasKey( 'reaction_summary', $data );
+		$this->assertSame( 1, $data['reaction_summary']['heart']['count'] );
+		$this->assertFalse( $data['reaction_summary']['heart']['reacted'] );
+		$this->assertSame( 0, $data['reaction_summary']['heart']['my_reaction_id'] );
+	}
+
+	public function test_reaction_summary_empty_when_no_reactions() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/comments/' . $note_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertArrayHasKey( 'reaction_summary', $data );
+		$this->assertEmpty( $data['reaction_summary'] );
+	}
 }
