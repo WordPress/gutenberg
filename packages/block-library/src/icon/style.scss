@@ -23,3 +23,16 @@
 	width: 100%;
 	height: 100%;
 }
+
+// Flip transformations.
+.wp-block-icon--flip-horizontal {
+	transform: scaleX(-1);
+}
+
+.wp-block-icon--flip-vertical {
+	transform: scaleY(-1);
+}
+
+.wp-block-icon--flip-horizontal.wp-block-icon--flip-vertical {
+	transform: scaleX(-1) scaleY(-1);
+}

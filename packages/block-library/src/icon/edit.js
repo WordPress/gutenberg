@@ -73,15 +73,6 @@ export function Edit( { attributes, setAttributes } ) {
 	const borderProps = useBorderProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
 
-	const transformStyles = {};
-	if ( flipHorizontal ) {
-		transformStyles.transform = flipVertical
-			? 'scaleX(-1) scaleY(-1)'
-			: 'scaleX(-1)';
-	} else if ( flipVertical ) {
-		transformStyles.transform = 'scaleY(-1)';
-	}
-
 	const { selectedIcon, allIcons = [] } = useSelect(
 		( select ) => {
 			const { getEntityRecord, getEntityRecords } =
@@ -99,6 +90,11 @@ export function Edit( { attributes, setAttributes } ) {
 	);
 
 	const iconToDisplay = selectedIcon?.content || '';
+
+	const flipClasses = {
+		'wp-block-icon--flip-horizontal': flipHorizontal,
+		'wp-block-icon--flip-vertical': flipVertical,
+	};
 
 	const blockControls = (
 		<>
@@ -221,14 +217,14 @@ export function Edit( { attributes, setAttributes } ) {
 								colorProps.className,
 								borderProps.className,
 								spacingProps.className,
-								dimensionsProps.className
+								dimensionsProps.className,
+								flipClasses
 							),
 							style: {
 								...colorProps.style,
 								...borderProps.style,
 								...spacingProps.style,
 								...dimensionsProps.style,
-								...transformStyles,
 							},
 						} }
 					/>
@@ -237,13 +233,13 @@ export function Edit( { attributes, setAttributes } ) {
 						className={ clsx(
 							borderProps.className,
 							spacingProps.className,
-							dimensionsProps.className
+							dimensionsProps.className,
+							flipClasses
 						) }
 						style={ {
 							...borderProps.style,
 							...spacingProps.style,
 							...dimensionsProps.style,
-							...transformStyles,
 							height: 'auto',
 						} }
 					/>
