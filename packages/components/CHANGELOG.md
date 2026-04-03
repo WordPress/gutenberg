@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Autocomplete: Refactor `useAutocomplete` to use `useReducer` ([#77020](https://github.com/WordPress/gutenberg/pull/77020)).
+
 ## 32.5.0 (2026-04-01)
 
 ### Bug Fixes
