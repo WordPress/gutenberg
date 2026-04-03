@@ -25,12 +25,8 @@ jest.mock( '../shared/filter-message', () => {
 } );
 
 describe( 'speak', () => {
-	let containerPolite = document.getElementById(
-		'a11y-speak-polite'
-	);
-	let containerAssertive = document.getElementById(
-		'a11y-speak-assertive'
-	);
+	let containerPolite = document.getElementById( 'a11y-speak-polite' );
+	let containerAssertive = document.getElementById( 'a11y-speak-assertive' );
 
 	beforeEach( () => {
 		containerPolite!.textContent = '';
@@ -100,9 +96,7 @@ describe( 'speak', () => {
 
 		afterEach( () => {
 			setup();
-			containerPolite = document.getElementById(
-				'a11y-speak-polite'
-			);
+			containerPolite = document.getElementById( 'a11y-speak-polite' );
 			containerAssertive = document.getElementById(
 				'a11y-speak-assertive'
 			);
