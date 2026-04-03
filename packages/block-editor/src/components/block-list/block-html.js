@@ -6,7 +6,7 @@ import TextareaAutosize from 'react-autosize-textarea';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	getBlockAttributes,
@@ -33,7 +33,10 @@ function BlockHTML( { clientId } ) {
 	// when the serialized content genuinely changes, not when the block
 	// object reference changes (which happens on every RESET_BLOCKS during
 	// RTC sync, even for unchanged blocks).
-	const blockContent = block ? getBlockContent( block ) : '';
+	const blockContent = useMemo(
+		() => ( block ? getBlockContent( block ) : '' ),
+		[ block ]
+	);
 
 	const onChange = () => {
 		const blockType = getBlockType( block.name );
