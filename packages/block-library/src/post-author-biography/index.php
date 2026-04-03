@@ -26,7 +26,7 @@ function render_block_core_post_author_biography( $attributes, $content, $block 
 		return '';
 	}
 
-	$author_biography = get_the_author_meta( 'description', $author_id );
+	$author_biography = wpautop( get_the_author_meta( 'description', $author_id ) );
 	if ( empty( $author_biography ) ) {
 		return '';
 	}
