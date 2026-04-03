@@ -444,15 +444,13 @@ describe( 'actions', () => {
 		} );
 
 		it( 'starts pending sideloads after one finishes', async () => {
-			let onFileChangeCallback:
-				| ( (
-						attachments: Array< Record< string, unknown > >
-				  ) => void )
+			let onSuccessCallback:
+				| ( ( subSize: Record< string, unknown > ) => void )
 				| undefined;
-			const mediaSideload = jest.fn( ( { onFileChange } ) => {
+			const mediaSideload = jest.fn( ( { onSuccess } ) => {
 				// Capture the first callback to simulate completion later.
-				if ( ! onFileChangeCallback ) {
-					onFileChangeCallback = onFileChange;
+				if ( ! onSuccessCallback ) {
+					onSuccessCallback = onSuccess;
 				}
 			} );
 
@@ -486,9 +484,14 @@ describe( 'actions', () => {
 			expect( mediaSideload ).toHaveBeenCalledTimes( 1 );
 
 			// Complete the first upload to trigger the pending one.
-			onFileChangeCallback?.( [
-				{ id: 400, url: 'https://example.com/img.jpg' },
-			] );
+			onSuccessCallback?.( {
+				image_size: 'thumbnail',
+				width: 150,
+				height: 150,
+				file: 'image-150x150.jpg',
+				mime_type: 'image/jpeg',
+				filesize: 5000,
+			} );
 
 			// Allow async dispatch to propagate.
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
