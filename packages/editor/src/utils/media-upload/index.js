@@ -19,7 +19,7 @@ const noop = () => {};
 
 /**
  * Upload a media file when the file upload button is activated.
- * Wrapper around mediaUpload() that injects the current post ID.
+ * Wrapper around uploadMedia() that injects the current post ID.
  *
  * @param {Object}   $0                   Parameters object passed to the function.
  * @param {?Object}  $0.additionalData    Additional data to include in the request.
@@ -62,6 +62,9 @@ export default function mediaUpload( {
 			? currentPost.id
 			: currentPost?.wp_id;
 	const setSaveLock = () => {
+		if ( window.__clientSideMediaProcessing ) {
+			return; // Skip - handled by useUploadSaveLock in editor provider
+		}
 		lockPostSaving( lockKey );
 		lockPostAutosaving( lockKey );
 		imageIsUploading = true;
@@ -69,6 +72,9 @@ export default function mediaUpload( {
 
 	const postData = currentPostId ? { post: currentPostId } : {};
 	const clearSaveLock = () => {
+		if ( window.__clientSideMediaProcessing ) {
+			return; // Skip - handled by useUploadSaveLock in editor provider
+		}
 		unlockPostSaving( lockKey );
 		unlockPostAutosaving( lockKey );
 		imageIsUploading = false;
@@ -78,10 +84,14 @@ export default function mediaUpload( {
 		allowedTypes,
 		filesList,
 		onFileChange: ( file ) => {
-			if ( ! imageIsUploading ) {
-				setSaveLock();
-			} else {
-				clearSaveLock();
+			// When client-side media processing is enabled, save locking
+			// is handled by useUploadSaveLock in the editor provider.
+			if ( ! window.__clientSideMediaProcessing ) {
+				if ( ! imageIsUploading ) {
+					setSaveLock();
+				} else {
+					clearSaveLock();
+				}
 			}
 			onFileChange?.( file );
 
@@ -92,8 +102,8 @@ export default function mediaUpload( {
 			if ( entityFiles?.length ) {
 				const invalidateCache = true;
 				receiveEntityRecords(
-					'root',
-					'media',
+					'postType',
+					'attachment',
 					entityFiles,
 					undefined,
 					invalidateCache
@@ -107,7 +117,9 @@ export default function mediaUpload( {
 		},
 		maxUploadFileSize,
 		onError: ( { message } ) => {
-			clearSaveLock();
+			if ( ! window.__clientSideMediaProcessing ) {
+				clearSaveLock();
+			}
 			onError( message );
 		},
 		wpAllowedMimeTypes,

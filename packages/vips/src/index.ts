@@ -3,17 +3,11 @@
  */
 import Vips from 'wasm-vips';
 
-// @ts-expect-error
-// eslint-disable-next-line import/no-unresolved
+// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
 import VipsModule from 'wasm-vips/vips.wasm';
 
-// @ts-expect-error
-// eslint-disable-next-line import/no-unresolved
+// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
 import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
-
-// @ts-expect-error
-// eslint-disable-next-line import/no-unresolved
-import VipsJxlModule from 'wasm-vips/vips-jxl.wasm';
 
 /**
  * Internal dependencies
@@ -32,23 +26,9 @@ interface EmscriptenModule {
 	setDelayFunction: ( fn: ( fn: () => void ) => void ) => void;
 }
 
-let location = '';
-
-/**
- * Dynamically sets the location / public path to use for loading the WASM files.
- *
- * This is required when loading this module in an inline worker,
- * where globals such as __webpack_public_path__ are not available.
- *
- * @param newLocation Location, typically a base URL such as "https://example.com/path/to/js/...".
- */
-export function setLocation( newLocation: string ) {
-	location = newLocation;
-}
-
 let cleanup: () => void;
 
-let vipsInstance: typeof Vips;
+let vipsPromise: Promise< typeof Vips > | undefined;
 
 /**
  * Instantiates and returns a new vips instance.
@@ -56,21 +36,25 @@ let vipsInstance: typeof Vips;
  * Reuses any existing instance.
  */
 async function getVips(): Promise< typeof Vips > {
-	if ( vipsInstance ) {
-		return vipsInstance;
+	if ( vipsPromise ) {
+		return await vipsPromise;
 	}
 
-	vipsInstance = await Vips( {
+	vipsPromise = Vips( {
+		// Load HEIF dynamic module for HEIF/HEIC and AVIF format support.
+		// JXL is omitted as WordPress Core does not currently support it.
+		// It can be re-added when Core adds JXL support.
+		dynamicLibraries: [ 'vips-heif.wasm' ],
 		locateFile: ( fileName: string ) => {
+			// WASM files are inlined as base64 data URLs at build time,
+			// eliminating the need for separate file downloads and avoiding
+			// issues with hosts not serving WASM files with correct MIME types.
 			if ( fileName.endsWith( 'vips.wasm' ) ) {
-				fileName = VipsModule;
+				return VipsModule;
 			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
-				fileName = VipsHeifModule;
-			} else if ( fileName.endsWith( 'vips-jxl.wasm' ) ) {
-				fileName = VipsJxlModule;
+				return VipsHeifModule;
 			}
-
-			return location + fileName;
+			return fileName;
 		},
 		preRun: ( module: EmscriptenModule ) => {
 			// https://github.com/kleisauke/wasm-vips/issues/13#issuecomment-1073246828
@@ -81,7 +65,7 @@ async function getVips(): Promise< typeof Vips > {
 		},
 	} );
 
-	return vipsInstance;
+	return await vipsPromise;
 }
 
 /**
@@ -127,46 +111,58 @@ export async function convertImageFormat(
 
 	inProgressOperations.add( id );
 
-	let strOptions = '';
-	const loadOptions: LoadOptions< typeof inputType > = {};
+	try {
+		let strOptions = '';
+		const loadOptions: LoadOptions< typeof inputType > = {};
 
-	// To ensure all frames are loaded in case the image is animated.
-	if ( supportsAnimation( inputType ) ) {
-		strOptions = '[n=-1]';
-		( loadOptions as LoadOptions< typeof inputType > ).n = -1;
-	}
-
-	const vips = await getVips();
-	const image = vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
-
-	// TODO: Report progress, see https://github.com/swissspidy/media-experiments/issues/327.
-	image.onProgress = () => {
-		if ( ! inProgressOperations.has( id ) ) {
-			image.kill = true;
+		// To ensure all frames are loaded in case the image is animated.
+		if ( supportsAnimation( inputType ) ) {
+			strOptions = '[n=-1]';
+			( loadOptions as LoadOptions< typeof inputType > ).n = -1;
 		}
-	};
 
-	const saveOptions: SaveOptions< typeof outputType > = {};
+		const vips = await getVips();
+		const image = vips.Image.newFromBuffer(
+			buffer,
+			strOptions,
+			loadOptions
+		);
 
-	if ( supportsQuality( outputType ) ) {
-		saveOptions.Q = quality * 100;
+		// TODO: Report progress, see https://github.com/swissspidy/media-experiments/issues/327.
+		image.onProgress = () => {
+			if ( ! inProgressOperations.has( id ) ) {
+				image.kill = true;
+			}
+		};
+
+		const saveOptions: SaveOptions< typeof outputType > = {
+			// Strip metadata except ICC color profiles,
+			// matching WordPress core's behavior.
+			keep: 'icc',
+		};
+
+		if ( supportsQuality( outputType ) ) {
+			saveOptions.Q = quality * 100;
+		}
+
+		if ( interlaced && supportsInterlace( outputType ) ) {
+			saveOptions.interlace = interlaced;
+		}
+
+		// See https://github.com/swissspidy/media-experiments/issues/324.
+		if ( 'image/avif' === outputType ) {
+			saveOptions.effort = 2;
+		}
+
+		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
+		const result = outBuffer.buffer;
+
+		cleanup?.();
+
+		return result;
+	} finally {
+		inProgressOperations.delete( id );
 	}
-
-	if ( interlaced && supportsInterlace( outputType ) ) {
-		saveOptions.interlace = interlaced;
-	}
-
-	// See https://github.com/swissspidy/media-experiments/issues/324.
-	if ( 'image/avif' === outputType ) {
-		saveOptions.effort = 2;
-	}
-
-	const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
-	const result = outBuffer.buffer;
-
-	cleanup?.();
-
-	return result;
 }
 
 /**
@@ -198,6 +194,7 @@ export async function compressImage(
  * @param type      Mime type.
  * @param resize    Resize options.
  * @param smartCrop Whether to use smart cropping (i.e. saliency-aware).
+ * @param quality   Desired quality (0-1).
  * @return Processed file data plus the old and new dimensions.
  */
 export async function resizeImage(
@@ -205,7 +202,8 @@ export async function resizeImage(
 	buffer: ArrayBuffer,
 	type: string,
 	resize: ImageSizeCrop,
-	smartCrop = false
+	smartCrop = false,
+	quality = 0.82
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -217,134 +215,251 @@ export async function resizeImage(
 
 	inProgressOperations.add( id );
 
-	const vips = await getVips();
-	const thumbnailOptions: ThumbnailOptions = {
-		size: 'down',
-	};
+	try {
+		const vips = await getVips();
+		const thumbnailOptions: ThumbnailOptions = {
+			size: 'down',
+		};
 
-	let strOptions = '';
-	const loadOptions: LoadOptions< typeof type > = {};
+		let strOptions = '';
+		const loadOptions: LoadOptions< typeof type > = {};
 
-	// To ensure all frames are loaded in case the image is animated.
-	// But only if we're not cropping.
-	if ( supportsAnimation( type ) && ! resize.crop ) {
-		strOptions = '[n=-1]';
-		thumbnailOptions.option_string = strOptions;
-		( loadOptions as LoadOptions< typeof type > ).n = -1;
-	}
-
-	// TODO: Report progress, see https://github.com/swissspidy/media-experiments/issues/327.
-	const onProgress = () => {
-		if ( ! inProgressOperations.has( id ) ) {
-			image.kill = true;
+		// To ensure all frames are loaded in case the image is animated.
+		// But only if we're not cropping.
+		if ( supportsAnimation( type ) && ! resize.crop ) {
+			strOptions = '[n=-1]';
+			thumbnailOptions.option_string = strOptions;
+			( loadOptions as LoadOptions< typeof type > ).n = -1;
 		}
-	};
 
-	let image = vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
+		// TODO: Report progress, see https://github.com/swissspidy/media-experiments/issues/327.
+		const onProgress = () => {
+			if ( ! inProgressOperations.has( id ) ) {
+				image.kill = true;
+			}
+		};
 
-	image.onProgress = onProgress;
-
-	const { width, pageHeight } = image;
-
-	// If resize.height is zero.
-	resize.height = resize.height || ( pageHeight / width ) * resize.width;
-
-	let resizeWidth = resize.width;
-	thumbnailOptions.height = resize.height;
-
-	if ( ! resize.crop ) {
-		image = vips.Image.thumbnailBuffer(
-			buffer,
-			resizeWidth,
-			thumbnailOptions
-		);
+		let image = vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
 
 		image.onProgress = onProgress;
-	} else if ( true === resize.crop ) {
-		thumbnailOptions.crop = smartCrop ? 'attention' : 'centre';
 
-		image = vips.Image.thumbnailBuffer(
-			buffer,
-			resizeWidth,
-			thumbnailOptions
-		);
+		const { width, pageHeight } = image;
 
-		image.onProgress = onProgress;
-	} else {
-		// First resize, then do the cropping.
-		// This allows operating on the second bitmap with the correct dimensions.
+		// If resize.height is zero.
+		resize.height = resize.height || ( pageHeight / width ) * resize.width;
 
-		if ( width < pageHeight ) {
-			resizeWidth =
-				resize.width >= resize.height
-					? resize.width
-					: ( width / pageHeight ) * resize.height;
-			thumbnailOptions.height =
-				resize.width >= resize.height
-					? ( pageHeight / width ) * resizeWidth
-					: resize.height;
+		let resizeWidth = resize.width;
+		thumbnailOptions.height = resize.height;
+
+		if ( ! resize.crop ) {
+			image = vips.Image.thumbnailBuffer(
+				buffer,
+				resizeWidth,
+				thumbnailOptions
+			);
+
+			image.onProgress = onProgress;
+		} else if ( true === resize.crop ) {
+			thumbnailOptions.crop = smartCrop ? 'attention' : 'centre';
+
+			image = vips.Image.thumbnailBuffer(
+				buffer,
+				resizeWidth,
+				thumbnailOptions
+			);
+
+			image.onProgress = onProgress;
 		} else {
-			resizeWidth =
-				resize.width >= resize.height
-					? ( width / pageHeight ) * resize.height
-					: resize.width;
-			thumbnailOptions.height =
-				resize.width >= resize.height
-					? resize.height
-					: ( pageHeight / width ) * resizeWidth;
+			// First resize, then do the cropping.
+			// This allows operating on the second bitmap with the correct dimensions.
+
+			if ( width < pageHeight ) {
+				resizeWidth =
+					resize.width >= resize.height
+						? resize.width
+						: ( width / pageHeight ) * resize.height;
+				thumbnailOptions.height =
+					resize.width >= resize.height
+						? ( pageHeight / width ) * resizeWidth
+						: resize.height;
+			} else {
+				resizeWidth =
+					resize.width >= resize.height
+						? ( width / pageHeight ) * resize.height
+						: resize.width;
+				thumbnailOptions.height =
+					resize.width >= resize.height
+						? resize.height
+						: ( pageHeight / width ) * resizeWidth;
+			}
+
+			image = vips.Image.thumbnailBuffer(
+				buffer,
+				resizeWidth,
+				thumbnailOptions
+			);
+
+			image.onProgress = onProgress;
+
+			let left = 0;
+			if ( 'center' === resize.crop[ 0 ] ) {
+				left = ( image.width - resize.width ) / 2;
+			} else if ( 'right' === resize.crop[ 0 ] ) {
+				left = image.width - resize.width;
+			}
+
+			let top = 0;
+			if ( 'center' === resize.crop[ 1 ] ) {
+				top = ( image.height - resize.height ) / 2;
+			} else if ( 'bottom' === resize.crop[ 1 ] ) {
+				top = image.height - resize.height;
+			}
+
+			// Address rounding errors where `left` or `top` become negative integers
+			// and `resize.width` / `resize.height` are bigger than the actual dimensions.
+			// Downside: one side could be 1px smaller than the requested size.
+			left = Math.max( 0, left );
+			top = Math.max( 0, top );
+			resize.width = Math.min( image.width, resize.width );
+			resize.height = Math.min( image.height, resize.height );
+
+			image = image.crop( left, top, resize.width, resize.height );
+
+			image.onProgress = onProgress;
 		}
 
-		image = vips.Image.thumbnailBuffer(
-			buffer,
-			resizeWidth,
-			thumbnailOptions
-		);
+		const saveOptions: SaveOptions< typeof type > = {
+			// Strip metadata except ICC color profiles,
+			// matching WordPress core's behavior.
+			keep: 'icc',
+		};
 
-		image.onProgress = onProgress;
-
-		let left = 0;
-		if ( 'center' === resize.crop[ 0 ] ) {
-			left = ( image.width - resize.width ) / 2;
-		} else if ( 'right' === resize.crop[ 0 ] ) {
-			left = image.width - resize.width;
+		if ( supportsQuality( type ) ) {
+			saveOptions.Q = quality * 100;
 		}
 
-		let top = 0;
-		if ( 'center' === resize.crop[ 1 ] ) {
-			top = ( image.height - resize.height ) / 2;
-		} else if ( 'bottom' === resize.crop[ 1 ] ) {
-			top = image.height - resize.height;
-		}
+		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
-		// Address rounding errors where `left` or `top` become negative integers
-		// and `resize.width` / `resize.height` are bigger than the actual dimensions.
-		// Downside: one side could be 1px smaller than the requested size.
-		left = Math.max( 0, left );
-		top = Math.max( 0, top );
-		resize.width = Math.min( image.width, resize.width );
-		resize.height = Math.min( image.height, resize.height );
+		const result = {
+			buffer: outBuffer.buffer,
+			width: image.width,
+			height: image.pageHeight,
+			originalWidth: width,
+			originalHeight: pageHeight,
+		};
 
-		image = image.crop( left, top, resize.width, resize.height );
+		// Only call after `image` is no longer being used.
+		cleanup?.();
 
-		image.onProgress = onProgress;
+		return result;
+	} finally {
+		inProgressOperations.delete( id );
 	}
+}
 
-	// TODO: Allow passing quality?
-	const saveOptions: SaveOptions< typeof type > = {};
-	const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
+/**
+ * Rotates an image based on EXIF orientation value.
+ *
+ * EXIF orientation values:
+ * 1 = Normal (no rotation needed)
+ * 2 = Flipped horizontally
+ * 3 = Rotated 180°
+ * 4 = Flipped vertically
+ * 5 = Rotated 90° CCW and flipped horizontally
+ * 6 = Rotated 90° CW
+ * 7 = Rotated 90° CW and flipped horizontally
+ * 8 = Rotated 90° CCW
+ *
+ * @param id          Item ID.
+ * @param buffer      Original file buffer.
+ * @param type        Mime type.
+ * @param orientation EXIF orientation value (1-8).
+ * @return Rotated file data plus the new dimensions.
+ */
+export async function rotateImage(
+	id: ItemId,
+	buffer: ArrayBuffer,
+	type: string,
+	orientation: number
+): Promise< {
+	buffer: ArrayBuffer | ArrayBufferLike;
+	width: number;
+	height: number;
+} > {
+	const ext = type.split( '/' )[ 1 ];
 
-	const result = {
-		buffer: outBuffer.buffer,
-		width: image.width,
-		height: image.pageHeight,
-		originalWidth: width,
-		originalHeight: pageHeight,
-	};
+	inProgressOperations.add( id );
 
-	// Only call after `image` is no longer being used.
-	cleanup?.();
+	try {
+		const vips = await getVips();
 
-	return result;
+		let strOptions = '';
+		const loadOptions: LoadOptions< typeof type > = {};
+
+		// To ensure all frames are loaded in case the image is animated.
+		if ( supportsAnimation( type ) ) {
+			strOptions = '[n=-1]';
+			( loadOptions as LoadOptions< typeof type > ).n = -1;
+		}
+
+		let image = vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
+
+		image.onProgress = () => {
+			if ( ! inProgressOperations.has( id ) ) {
+				image.kill = true;
+			}
+		};
+
+		// Apply transformation based on EXIF orientation.
+		// See: https://exiftool.org/TagNames/EXIF.html#:~:text=0x0112,Orientation
+		switch ( orientation ) {
+			case 2:
+				// Flipped horizontally
+				image = image.flipHor();
+				break;
+			case 3:
+				// Rotated 180°
+				image = image.rot180();
+				break;
+			case 4:
+				// Flipped vertically
+				image = image.flipVer();
+				break;
+			case 5:
+				// Rotated 90° CCW and flipped horizontally
+				image = image.rot270().flipHor();
+				break;
+			case 6:
+				// Rotated 90° CW
+				image = image.rot90();
+				break;
+			case 7:
+				// Rotated 90° CW and flipped horizontally
+				image = image.rot90().flipHor();
+				break;
+			case 8:
+				// Rotated 90° CCW
+				image = image.rot270();
+				break;
+			// case 1 and default: no transformation needed
+		}
+
+		const saveOptions: SaveOptions< typeof type > = {};
+		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
+
+		const result = {
+			buffer: outBuffer.buffer,
+			width: image.width,
+			height: image.pageHeight,
+		};
+
+		// Only call after `image` is no longer being used.
+		cleanup?.();
+
+		return result;
+	} finally {
+		inProgressOperations.delete( id );
+	}
 }
 
 /**
@@ -364,3 +479,14 @@ export async function hasTransparency(
 
 	return hasAlpha;
 }
+
+// Re-export with vips prefix for worker module compatibility.
+// The worker loader expects these prefixed names.
+export {
+	convertImageFormat as vipsConvertImageFormat,
+	compressImage as vipsCompressImage,
+	resizeImage as vipsResizeImage,
+	rotateImage as vipsRotateImage,
+	hasTransparency as vipsHasTransparency,
+	cancelOperations as vipsCancelOperations,
+};

@@ -6,7 +6,6 @@
 		"composite": false,
 		"module": "Node16",
 		"moduleResolution": "node16",
-		"types": [ "node" ],
 		"noEmit": false,
 		"outDir": "build",
 		"sourceMap": true,

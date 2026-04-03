@@ -1,4 +1,9 @@
 .fields-controls__slug {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+
 	.fields-controls__slug-external-icon {
 		margin-left: 5ch;
 	}

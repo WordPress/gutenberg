@@ -3,7 +3,7 @@
 /**
  * Test the shadow block supports.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class WP_Block_Supports_Shadow_Test extends WP_UnitTestCase {

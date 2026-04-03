@@ -26,6 +26,7 @@
 		{ "path": "../router" },
 		{ "path": "../url" },
 		{ "path": "../block-editor" },
-		{ "path": "../warning" }
+		{ "path": "../warning" },
+		{ "path": "../wordcount" }
 	]
 }

@@ -2,7 +2,21 @@
  * Internal dependencies
  */
 import { fixCustomClassname } from './fix-custom-classname';
-import { fixAriaLabel } from './fix-aria-label';
+import { fixGlobalAttribute } from './fix-global-attribute';
+
+const ARIA_LABEL_ATTR_SCHEMA = {
+	type: 'string',
+	source: 'attribute',
+	selector: '[data-aria-label] > *',
+	attribute: 'aria-label',
+};
+
+const ANCHOR_ATTR_SCHEMA = {
+	type: 'string',
+	source: 'attribute',
+	selector: '[data-anchor] > *',
+	attribute: 'id',
+};
 
 /**
  * Attempts to fix block invalidation by applying build-in validation fixes
@@ -26,10 +40,22 @@ export function applyBuiltInValidationFixes( block, blockType ) {
 		originalContent
 	);
 	// Fix block invalidation for ariaLabel attribute.
-	updatedBlockAttributes = fixAriaLabel(
+	updatedBlockAttributes = fixGlobalAttribute(
 		updatedBlockAttributes,
 		blockType,
-		originalContent
+		originalContent,
+		'ariaLabel',
+		'data-aria-label',
+		ARIA_LABEL_ATTR_SCHEMA
+	);
+	// Fix block invalidation for anchor attribute.
+	updatedBlockAttributes = fixGlobalAttribute(
+		updatedBlockAttributes,
+		blockType,
+		originalContent,
+		'anchor',
+		'data-anchor',
+		ANCHOR_ATTR_SCHEMA
 	);
 
 	return {

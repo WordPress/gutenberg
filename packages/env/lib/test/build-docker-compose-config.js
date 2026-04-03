@@ -2,8 +2,8 @@
 /**
  * Internal dependencies
  */
-const buildDockerComposeConfig = require( '../build-docker-compose-config' );
-const getHostUser = require( '../get-host-user' );
+const buildDockerComposeConfig = require( '../runtime/docker/build-docker-compose-config' );
+const getHostUser = require( '../runtime/docker/get-host-user' );
 
 // The basic config keys which build docker compose config requires.
 const CONFIG = {
@@ -14,7 +14,7 @@ const CONFIG = {
 	configDirectoryPath: '/path/to/config',
 };
 
-jest.mock( '../get-host-user', () => jest.fn() );
+jest.mock( '../runtime/docker/get-host-user', () => jest.fn() );
 getHostUser.mockImplementation( () => {
 	return {
 		name: 'test',
@@ -130,5 +130,152 @@ describe( 'buildDockerComposeConfig', () => {
 
 		expect( dockerConfig.volumes.wordpress ).toBe( undefined );
 		expect( dockerConfig.volumes[ 'tests-wordpress' ] ).toBe( undefined );
+	} );
+
+	it( 'should add healthcheck to mysql services', () => {
+		const config = buildDockerComposeConfig( {
+			workDirectoryPath: '/some/path',
+			env: {
+				development: {
+					port: 8888,
+					mysqlPort: 3306,
+					coreSource: null,
+					pluginSources: [],
+					themeSources: [],
+					mappings: {},
+				},
+				tests: {
+					port: 8889,
+					mysqlPort: 3307,
+					coreSource: null,
+					pluginSources: [],
+					themeSources: [],
+					mappings: {},
+				},
+			},
+		} );
+
+		expect( config.services.mysql.healthcheck ).toBeDefined();
+		expect( config.services.mysql.healthcheck.test ).toEqual( [
+			'CMD',
+			'healthcheck.sh',
+			'--connect',
+			'--innodb_initialized',
+		] );
+		expect( config.services.mysql.healthcheck.interval ).toBe( '5s' );
+		expect( config.services.mysql.healthcheck.timeout ).toBe( '10s' );
+		expect( config.services.mysql.healthcheck.retries ).toBe( 12 );
+		expect( config.services.mysql.healthcheck.start_period ).toBe( '60s' );
+
+		// Verify MARIADB_AUTO_UPGRADE is set for existing installations
+		expect( config.services.mysql.environment.MARIADB_AUTO_UPGRADE ).toBe(
+			'1'
+		);
+
+		expect( config.services[ 'tests-mysql' ].healthcheck ).toBeDefined();
+		expect( config.services[ 'tests-mysql' ].healthcheck.test ).toEqual( [
+			'CMD',
+			'healthcheck.sh',
+			'--connect',
+			'--innodb_initialized',
+		] );
+		expect(
+			config.services[ 'tests-mysql' ].environment.MARIADB_AUTO_UPGRADE
+		).toBe( '1' );
+	} );
+
+	it( 'should use service_healthy condition for WordPress depends_on', () => {
+		const config = buildDockerComposeConfig( {
+			workDirectoryPath: '/some/path',
+			env: {
+				development: {
+					port: 8888,
+					mysqlPort: 3306,
+					coreSource: null,
+					pluginSources: [],
+					themeSources: [],
+					mappings: {},
+				},
+				tests: {
+					port: 8889,
+					mysqlPort: 3307,
+					coreSource: null,
+					pluginSources: [],
+					themeSources: [],
+					mappings: {},
+				},
+			},
+		} );
+
+		expect( config.services.wordpress.depends_on ).toEqual( {
+			mysql: { condition: 'service_healthy' },
+		} );
+		expect( config.services[ 'tests-wordpress' ].depends_on ).toEqual( {
+			'tests-mysql': { condition: 'service_healthy' },
+		} );
+	} );
+
+	describe( 'testsEnvironment', () => {
+		it( 'should omit tests services when testsEnvironment is false', () => {
+			const dockerConfig = buildDockerComposeConfig( {
+				testsEnvironment: false,
+				workDirectoryPath: '/path',
+				env: {
+					development: CONFIG,
+					tests: CONFIG,
+				},
+			} );
+
+			// Development services should exist.
+			expect( dockerConfig.services.mysql ).toBeDefined();
+			expect( dockerConfig.services.wordpress ).toBeDefined();
+			expect( dockerConfig.services.cli ).toBeDefined();
+			expect( dockerConfig.services.phpmyadmin ).toBeDefined();
+
+			// Tests services should not exist.
+			expect( dockerConfig.services[ 'tests-mysql' ] ).toBeUndefined();
+			expect(
+				dockerConfig.services[ 'tests-wordpress' ]
+			).toBeUndefined();
+			expect( dockerConfig.services[ 'tests-cli' ] ).toBeUndefined();
+			expect(
+				dockerConfig.services[ 'tests-phpmyadmin' ]
+			).toBeUndefined();
+		} );
+
+		it( 'should omit tests volumes when testsEnvironment is false', () => {
+			const dockerConfig = buildDockerComposeConfig( {
+				testsEnvironment: false,
+				workDirectoryPath: '/path',
+				env: {
+					development: CONFIG,
+					tests: CONFIG,
+				},
+			} );
+
+			// Development volumes should exist.
+			expect( dockerConfig.volumes.wordpress ).toBeDefined();
+			expect( dockerConfig.volumes.mysql ).toBeDefined();
+			expect( dockerConfig.volumes[ 'user-home' ] ).toBeDefined();
+
+			// Tests volumes should not exist.
+			expect( dockerConfig.volumes[ 'tests-wordpress' ] ).toBeUndefined();
+			expect( dockerConfig.volumes[ 'mysql-test' ] ).toBeUndefined();
+			expect( dockerConfig.volumes[ 'tests-user-home' ] ).toBeUndefined();
+		} );
+
+		it( 'should include tests services by default', () => {
+			const dockerConfig = buildDockerComposeConfig( {
+				workDirectoryPath: '/path',
+				env: {
+					development: CONFIG,
+					tests: CONFIG,
+				},
+			} );
+
+			expect( dockerConfig.services[ 'tests-mysql' ] ).toBeDefined();
+			expect( dockerConfig.services[ 'tests-wordpress' ] ).toBeDefined();
+			expect( dockerConfig.services[ 'tests-cli' ] ).toBeDefined();
+		} );
 	} );
 } );

@@ -1,8 +1,5 @@
-/**
- * External dependencies
- */
-const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
+const glob = require( 'glob' ).sync;
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -14,6 +11,8 @@ const developmentFiles = [
 	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
 	'**/@(storybook|stories)/**/*.[tj]s?(x)',
 	'packages/babel-preset-default/bin/**/*.js',
+	'packages/theme/bin/**/*.[tj]s?(x)',
+	'packages/theme/terrazzo.config.ts',
 ];
 
 // All files from packages that have types provided with TypeScript.
@@ -66,17 +65,14 @@ const restrictedImports = [
 		message:
 			"Please use `clsx` instead. It's a lighter and faster drop-in replacement for `classnames`.",
 	},
+	{
+		name: '@base-ui/react',
+		message:
+			'Avoid using Base UI directly. Consider a new `@wordpress/ui` component instead.',
+	},
 ];
 
 const restrictedSyntax = [
-	// NOTE: We can't include the forward slash in our regex or
-	// we'll get a `SyntaxError` (Invalid regular expression: \ at end of pattern)
-	// here. That's why we use \\u002F in the regexes below.
-	{
-		selector:
-			'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]',
-		message: 'Path access on WordPress dependencies is not allowed.',
-	},
 	{
 		selector:
 			'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
@@ -90,17 +86,7 @@ const restrictedSyntax = [
 	},
 	{
 		selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
-		message:
-			'Do not use string literals for IDs; use withInstanceId instead.',
-	},
-	{
-		// Discourage the usage of `Math.random()` as it's a code smell
-		// for UUID generation, for which we already have a higher-order
-		// component: `withInstanceId`.
-		selector:
-			'CallExpression[callee.object.name="Math"][callee.property.name="random"]',
-		message:
-			'Do not use Math.random() to generate unique IDs; use withInstanceId instead. (If you’re not generating unique IDs: ignore this message.)',
+		message: 'Do not use string literals for IDs; use useId hook instead.',
 	},
 	{
 		selector:
@@ -127,16 +113,6 @@ const restrictedSyntax = [
 	},
 ];
 
-/** `no-restricted-syntax` rules for components. */
-const restrictedSyntaxComponents = [
-	{
-		selector:
-			'JSXOpeningElement[name.name="Button"]:not(:has(JSXAttribute[name.name="accessibleWhenDisabled"])) JSXAttribute[name.name="disabled"]',
-		message:
-			'`disabled` used without the `accessibleWhenDisabled` prop. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or preventing focus from returning to a trigger element. (Ignore this error if you truly mean to disable.)',
-	},
-];
-
 module.exports = {
 	root: true,
 	extends: [
@@ -153,7 +129,6 @@ module.exports = {
 		jsdoc: {
 			mode: 'typescript',
 		},
-		'import/internal-regex': null,
 		'import/resolver': require.resolve( './tools/eslint/import-resolver' ),
 	},
 	rules: {
@@ -163,7 +138,6 @@ module.exports = {
 			'error',
 			{ props: 'never', children: 'never' },
 		],
-		'@wordpress/dependency-group': 'error',
 		'@wordpress/wp-global-usage': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'@wordpress/i18n-hyphenated-range': 'error',
@@ -176,6 +150,8 @@ module.exports = {
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
 		'@wordpress/data-no-store-string-literals': 'error',
+		'@wordpress/use-recommended-components': 'error',
+		'eslint-comments/no-unused-disable': 'error',
 		'import/default': 'error',
 		'import/named': 'error',
 		'no-restricted-imports': [
@@ -275,84 +251,22 @@ module.exports = {
 				'packages/*/src/**/*.[tj]s?(x)',
 				'storybook/stories/**/*.[tj]s?(x)',
 			],
-			excludedFiles: [ '**/*.native.js' ],
+			excludedFiles: [ '**/*.@(android|ios|native).[tj]s?(x)' ],
 			rules: {
-				'no-restricted-syntax': [
-					'error',
-					...restrictedSyntax,
-					...restrictedSyntaxComponents,
-				],
+				'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+				'@wordpress/components-no-unsafe-button-disabled': 'error',
 			},
 		},
 		{
 			files: [ 'packages/*/src/**/*.[tj]s?(x)' ],
 			excludedFiles: [
 				'packages/*/src/**/@(test|stories)/**',
-				'**/*.@(native|ios|android).js',
+				'**/*.@(android|ios|native).[tj]s?(x)',
 			],
 			rules: {
-				'no-restricted-syntax': [
-					'error',
-					...restrictedSyntax,
-					...restrictedSyntaxComponents,
-					// Temporary rules until we're ready to officially deprecate the bottom margins.
-					...[
-						'BaseControl',
-						'CheckboxControl',
-						'ComboboxControl',
-						'DimensionControl',
-						'FocalPointPicker',
-						'RangeControl',
-						'SearchControl',
-						'SelectControl',
-						'TextControl',
-						'TextareaControl',
-						'ToggleControl',
-						'ToggleGroupControl',
-						'TreeSelect',
-					].map( ( componentName ) => ( {
-						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
-						message:
-							componentName +
-							' should have the `__nextHasNoMarginBottom` prop to opt-in to the new margin-free styles.',
-					} ) ),
-					// Temporary rules until we're ready to officially default to the new size.
-					...[
-						'BorderBoxControl',
-						'BorderControl',
-						'BoxControl',
-						'Button',
-						'ComboboxControl',
-						'CustomSelectControl',
-						'DimensionControl',
-						'FontAppearanceControl',
-						'FontFamilyControl',
-						'FontSizePicker',
-						'FormTokenField',
-						'InputControl',
-						'LetterSpacingControl',
-						'LineHeightControl',
-						'NumberControl',
-						'RangeControl',
-						'SelectControl',
-						'TextControl',
-						'ToggleGroupControl',
-						'UnitControl',
-					].map( ( componentName ) => ( {
-						// Falsy `__next40pxDefaultSize` without a non-default `size` prop.
-						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="size"][value.value!="default"]))`,
-						message:
-							componentName +
-							' should have the `__next40pxDefaultSize` prop when using the default size.',
-					} ) ),
-					{
-						// Falsy `__next40pxDefaultSize` without a `render` prop.
-						selector:
-							'JSXOpeningElement[name.name="FormFileUpload"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="render"]))',
-						message:
-							'FormFileUpload should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
-					},
-				],
+				'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+				'@wordpress/components-no-unsafe-button-disabled': 'error',
+				'@wordpress/components-no-missing-40px-size-prop': 'error',
 			},
 		},
 		{
@@ -430,7 +344,12 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'bin/**/*.js', 'bin/**/*.mjs', 'packages/env/**' ],
+			files: [
+				'bin/**/*.js',
+				'bin/**/*.mjs',
+				'packages/env/**',
+				'packages/theme/bin/**/*.[tj]s?(x)',
+			],
 			rules: {
 				'no-console': 'off',
 			},
@@ -442,10 +361,26 @@ module.exports = {
 				'jsdoc/valid-types': 'off',
 			},
 		},
+		// Progressively opting in to stricter rules for enforcing file
+		// extensions matching the presence of JSX syntax. This should be
+		// expanded and eventually enforced on all files.
 		{
 			files: [
-				'**/@(storybook|stories)/*',
+				'**/@(storybook|stories)/**',
 				'packages/components/src/**/*.tsx',
+			],
+			rules: {
+				'react/jsx-filename-extension': [
+					'error',
+					{ extensions: [ '.jsx', '.tsx' ] },
+				],
+			},
+		},
+		{
+			files: [
+				'**/@(storybook|stories)/**',
+				'packages/components/src/**/*.tsx',
+				'packages/ui/src/**/*.tsx',
 			],
 			rules: {
 				// Useful to add story descriptions via JSDoc without specifying params,
@@ -463,7 +398,6 @@ module.exports = {
 				'no-restricted-syntax': [
 					'error',
 					...restrictedSyntax,
-					...restrictedSyntaxComponents,
 					{
 						selector:
 							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
@@ -481,19 +415,62 @@ module.exports = {
 			},
 		},
 		{
+			// Override the @wordpress/components-* rules by adding the
+			// `checkLocalImports` flag, which adds the linting also to relative
+			// imports.
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ '**/*.@(android|ios|native).[tj]s?(x)' ],
+			rules: {
+				'@wordpress/components-no-unsafe-button-disabled': [
+					'error',
+					{ checkLocalImports: true },
+				],
+				'@wordpress/components-no-missing-40px-size-prop': [
+					'error',
+					{ checkLocalImports: true },
+				],
+			},
+		},
+		{
 			files: [ 'packages/components/src/**' ],
 			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
-			plugins: [ 'ssr-friendly' ],
-			extends: [ 'plugin:ssr-friendly/recommended' ],
+			rules: {
+				'@wordpress/no-dom-globals-in-module-scope': 'error',
+				'@wordpress/no-dom-globals-in-constructor': 'error',
+				'@wordpress/no-dom-globals-in-react-cc-render': 'error',
+				'@wordpress/no-dom-globals-in-react-fc': 'error',
+			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
+			rules: {
+				// Disallow usage of Design System token CSS custom properties (`--wpds-*`)
+				// because the fallback injection in the build process is not compatible with Emotion files.
+				// Can be removed when there are no more Emotion files in the package.
+				'@wordpress/no-ds-tokens': 'error',
+			},
+		},
+		{
+			files: [
+				'packages/block-editor/src/**',
+				'packages/components/src/**',
+				'packages/dataviews/src/**',
+				'packages/ui/src/**',
+			],
+			excludedFiles: [ '**/@(test|stories)/**', '*.native.*' ],
+			rules: {
+				// Enforce display names for easier debugging and better storybook integration.
+				'react/display-name': 'error',
+			},
 		},
 		{
 			files: [ 'packages/components/src/**' ],
 			rules: {
 				'no-restricted-imports': [
 					'error',
-					// The `ariakit` and `framer-motion` APIs are meant to be consumed via
-					// the `@wordpress/components` package, hence why importing those
-					// dependencies should be allowed in the components package.
+					// The following dependencies are meant to be consumed directly in the
+					// @wordpress/components package, hence why their imports are allowed.
 					{
 						paths: restrictedImports.filter(
 							( { name } ) =>
@@ -501,6 +478,29 @@ module.exports = {
 									'@ariakit/react',
 									'framer-motion',
 								].includes( name )
+						),
+					},
+				],
+			},
+		},
+		{
+			files: [ 'packages/ui/src/**' ],
+			excludedFiles: [ '**/@(test|stories)/**' ],
+			rules: {
+				'@wordpress/no-unmerged-classname': 'error',
+			},
+		},
+		{
+			files: [ 'packages/ui/src/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					// The following dependencies are meant to be consumed directly in the
+					// @wordpress/ui package, hence why their imports are allowed.
+					{
+						paths: restrictedImports.filter(
+							( { name } ) =>
+								! [ '@base-ui/react' ].includes( name )
 						),
 					},
 				],
@@ -548,10 +548,53 @@ module.exports = {
 			},
 		},
 		{
+			files: [ 'packages/block-library/src/*/save.[tj]s?(x)' ],
+			rules: {
+				'@wordpress/no-i18n-in-save': 'error',
+			},
+		},
+		{
 			files: [ 'packages/interactivity*/src/**' ],
 			rules: {
 				'react-compiler/react-compiler': 'off',
 				'react/react-in-jsx-scope': 'error',
+			},
+		},
+		{
+			files: [ 'packages/ui/src/**' ],
+			rules: {
+				'@wordpress/dependency-group': [ 'error', 'never' ],
+			},
+		},
+		{
+			files: [ 'packages/eslint-plugin/**', 'packages/theme/**' ],
+			rules: {
+				'@wordpress/no-setting-ds-tokens': 'off',
+				'@wordpress/no-unknown-ds-tokens': 'off',
+			},
+		},
+		{
+			files: [ 'storybook/stories/**' ],
+			rules: {
+				'@wordpress/use-recommended-components': 'off',
+			},
+		},
+		{
+			files: [ '**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs' ],
+			rules: {
+				'no-unused-vars': [
+					'error',
+					{ ignoreRestSiblings: true, caughtErrors: 'all' },
+				],
+			},
+		},
+		{
+			files: [ '**/*.ts', '**/*.tsx' ],
+			rules: {
+				'@typescript-eslint/no-unused-vars': [
+					'error',
+					{ ignoreRestSiblings: true, caughtErrors: 'all' },
+				],
 			},
 		},
 	],

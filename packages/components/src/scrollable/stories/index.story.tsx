@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,7 @@ import { Scrollable } from '..';
 
 const meta: Meta< typeof Scrollable > = {
 	component: Scrollable,
-	title: 'Components (Experimental)/Scrollable',
+	title: 'Components/Scrollable',
 	argTypes: {
 		as: {
 			control: { type: 'text' },
@@ -25,11 +25,17 @@ const meta: Meta< typeof Scrollable > = {
 			control: false,
 		},
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation.',
+		},
 	},
 };
 export default meta;
