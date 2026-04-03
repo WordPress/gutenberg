@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	getActiveBlockVariation,
 	getBlockType,
 	getBlockTypes,
 	getBlockVariations,
@@ -1651,10 +1652,26 @@ const isBlockVisibleInTheInserter = (
 		let current = rootClientId;
 		let hasParent = false;
 		do {
-			if ( parents.includes( getBlockName( state, current ) ) ) {
+			const ancestorBlockName = getBlockName( state, current );
+			if ( parents.includes( ancestorBlockName ) ) {
 				hasParent = true;
 				break;
 			}
+			const ancestorAttributes = getBlockAttributes( state, current );
+
+			const variation = getActiveBlockVariation(
+				ancestorBlockName,
+				ancestorAttributes,
+				'inserter'
+			);
+
+			if ( variation ) {
+				// TODO: Compare block variation name to parent/ancestor list.
+				// Problem: For template parts that have been persisted to the DB,
+				// variation.name is prefixed with `instance_` (e.g. `instance_header`).
+				console.log( variation );
+			}
+
 			current = state.blocks.parents.get( current );
 		} while ( current );
 

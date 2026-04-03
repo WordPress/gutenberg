@@ -131,6 +131,7 @@ export {
 	getBlockSupport,
 	hasBlockSupport,
 	getBlockVariations,
+	getActiveBlockVariation,
 	isReusableBlock,
 	isTemplatePart,
 	getChildBlockNames,
