@@ -84,19 +84,23 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 										'required' => true,
 									),
 									'width'          => array(
-										'type' => 'integer',
+										'type'    => 'integer',
+										'minimum' => 1,
 									),
 									'height'         => array(
-										'type' => 'integer',
+										'type'    => 'integer',
+										'minimum' => 1,
 									),
 									'file'           => array(
 										'type' => 'string',
 									),
 									'mime_type'      => array(
-										'type' => 'string',
+										'type'    => 'string',
+										'pattern' => '^image/.*',
 									),
 									'filesize'       => array(
-										'type' => 'integer',
+										'type'    => 'integer',
+										'minimum' => 1,
 									),
 									'original_image' => array(
 										'type' => 'string',
