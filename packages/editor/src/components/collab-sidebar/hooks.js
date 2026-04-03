@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	useCallback,
 	useState,
 	useEffect,
 	useMemo,
@@ -56,51 +57,21 @@ export function useNoteThreads( postId ) {
 		{ enabled: !! postId && typeof postId === 'number' }
 	);
 
-	const { records: reactionRecords } = useEntityRecords(
-		'root',
-		'comment',
-		{
-			post: postId,
-			type: 'reaction',
-			status: 'all',
-			per_page: -1,
-		},
-		{ enabled: !! postId && typeof postId === 'number' }
-	);
-
-	// Build a reactionsMap: { [noteId]: { [emojiSlug]: [{ userId, date, reactionId }] } }
+	// Build reactionsMap from the reaction_summary field on each note.
+	// Shape: { [noteId]: { [emojiSlug]: { count, reacted, my_reaction_id } } }
 	const reactionsMap = useMemo( () => {
-		if ( ! reactionRecords || reactionRecords.length === 0 ) {
+		if ( ! threads || threads.length === 0 ) {
 			return {};
 		}
 
 		const map = {};
-		reactionRecords.forEach( ( reaction ) => {
-			const noteId = reaction.parent;
-			const slug =
-				typeof reaction.content === 'object'
-					? reaction.content?.raw || reaction.content?.rendered
-					: reaction.content;
-			// Strip HTML tags from rendered content.
-			const cleanSlug = slug?.replace?.( /<[^>]*>/g, '' )?.trim();
-			if ( ! noteId || ! cleanSlug ) {
-				return;
+		threads.forEach( ( thread ) => {
+			if ( thread.reaction_summary ) {
+				map[ thread.id ] = thread.reaction_summary;
 			}
-
-			if ( ! map[ noteId ] ) {
-				map[ noteId ] = {};
-			}
-			if ( ! map[ noteId ][ cleanSlug ] ) {
-				map[ noteId ][ cleanSlug ] = [];
-			}
-			map[ noteId ][ cleanSlug ].push( {
-				userId: reaction.author,
-				date: reaction.date,
-				reactionId: reaction.id,
-			} );
 		} );
 		return map;
-	}, [ reactionRecords ] );
+	}, [ threads ] );
 
 	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { clientIds } = useSelect( ( select ) => {
@@ -317,7 +288,6 @@ function clearInlineNoteMarker(
 }
 
 export function useNoteActions( reactionsMap = {} ) {
-	const registry = useRegistry();
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
@@ -542,24 +512,16 @@ export function useNoteActions( reactionsMap = {} ) {
 	const onToggleReaction = useCallback(
 		async ( { commentId, emoji } ) => {
 			try {
-				// Get current user from the store.
-				const currentUser =
-					registry.select( coreStore ).getCurrentUser() || {};
-				const userId = currentUser.id;
-
-				// Check if the user already reacted with this emoji.
+				// Check if the user already reacted via reaction_summary.
 				const noteReactions = reactionsMap[ commentId ] || {};
-				const emojiReactions = noteReactions[ emoji ] || [];
-				const existingReaction = emojiReactions.find(
-					( reaction ) => reaction.userId === userId
-				);
+				const emojiData = noteReactions[ emoji ];
 
-				if ( existingReaction ) {
+				if ( emojiData?.reacted && emojiData?.my_reaction_id ) {
 					// Remove the reaction by deleting the comment record.
 					await deleteEntityRecord(
 						'root',
 						'comment',
-						existingReaction.reactionId,
+						emojiData.my_reaction_id,
 						undefined,
 						{ throwOnError: true }
 					);
@@ -594,7 +556,6 @@ export function useNoteActions( reactionsMap = {} ) {
 		},
 		[
 			reactionsMap,
-			registry,
 			deleteEntityRecord,
 			saveEntityRecord,
 			getCurrentPostId,
