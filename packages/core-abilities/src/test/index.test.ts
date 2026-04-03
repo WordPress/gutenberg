@@ -374,9 +374,7 @@ describe( 'sanitizeSchema', () => {
 		const schema = {
 			type: 'object',
 			dependencies: {
-				// Property dependency (array) — pass through as-is
 				bar: [ 'foo' ],
-				// Schema dependency (object) — recurse
 				baz: {
 					type: 'object',
 					sanitize_callback: 'sanitize_text_field',

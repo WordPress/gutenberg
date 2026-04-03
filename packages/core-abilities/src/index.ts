@@ -33,7 +33,6 @@ function createServerCallback(
 	ability: Ability
 ): ( input: AbilityInput ) => Promise< AbilityOutput > {
 	return async ( input: AbilityInput ) => {
-		// Determine HTTP method based on ability annotations
 		let method = 'POST';
 		if ( !! ability.meta?.annotations?.readonly ) {
 			method = 'GET';
@@ -57,7 +56,6 @@ function createServerCallback(
 			input !== null &&
 			input !== undefined
 		) {
-			// For GET and DELETE requests, pass the input as query parameters.
 			path = addQueryArgs( path, { input } );
 		} else if (
 			method === 'POST' &&
@@ -67,7 +65,6 @@ function createServerCallback(
 			options.data = { input };
 		}
 
-		// Input and output validation happens on the server side for these abilities.
 		return apiFetch< AbilityOutput >( {
 			path,
 			...options,
@@ -118,9 +115,6 @@ async function initializeAbilities(): Promise< void > {
 
 		if ( abilities && Array.isArray( abilities ) ) {
 			for ( const ability of abilities ) {
-				// Register the ability with a callback.
-				// Strip WordPress-specific keywords from schemas
-				// before registering on the client.
 				registerAbility( {
 					...ability,
 					input_schema:
@@ -153,7 +147,6 @@ async function initializeAbilities(): Promise< void > {
  * Initialize WordPress abilities integration.
  */
 async function initialize(): Promise< void > {
-	// Fetch and register categories, then abilities
 	await initializeCategories();
 	await initializeAbilities();
 }
