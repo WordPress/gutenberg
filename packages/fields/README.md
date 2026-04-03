@@ -87,6 +87,10 @@ Featured Image field for BasePostWithEmbeddedFeaturedMedia.
 
 Format field for BasePost.
 
+### lastEditedDateField
+
+Last edited date field for BasePost.
+
 ### MediaEdit
 
 A media edit control component that provides a media picker UI with upload functionality for selecting WordPress media attachments. Supports both the traditional WordPress media library and the experimental DataViews media modal.

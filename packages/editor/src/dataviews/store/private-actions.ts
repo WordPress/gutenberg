@@ -37,6 +37,7 @@ import {
 	patternTitleField,
 	notesField,
 	scheduledDateField,
+	lastEditedDateField,
 	formatField,
 	postContentInfoField,
 	stickyField,
@@ -272,6 +273,7 @@ export const registerPostTypeSchema =
 					dateField,
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					scheduledDateField,
+				lastEditedDateField,
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					slugField,
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
