@@ -25,6 +25,7 @@ import {
 	terminateVipsWorker,
 } from './utils';
 import type {
+	AccumulateSubSizeAction,
 	AddAction,
 	AdditionalData,
 	AddOperationsAction,
@@ -48,6 +49,7 @@ import type {
 	SideloadAdditionalData,
 	Settings,
 	State,
+	SubSizeData,
 	UpdateProgressAction,
 	UpdateSettingsAction,
 } from './types';
@@ -787,8 +789,16 @@ export function sideloadItem( id: QueueItemId ) {
 			attachmentId: post as number,
 			additionalData,
 			signal: item.abortController?.signal,
-			onFileChange: ( [ attachment ] ) => {
-				dispatch.finishOperation( id, { attachment } );
+			onSuccess: ( subSize: SubSizeData ) => {
+				// Accumulate sub-size data on the parent item for finalize.
+				if ( item.parentId ) {
+					dispatch< AccumulateSubSizeAction >( {
+						type: Type.AccumulateSubSize,
+						id: item.parentId,
+						subSize,
+					} );
+				}
+				dispatch.finishOperation( id, {} );
 			},
 			onError: ( error ) => {
 				dispatch.cancelItem( id, error );
@@ -1129,18 +1139,6 @@ export function generateThumbnails( id: QueueItemId ) {
 
 				dispatch.addSideloadItem( {
 					file,
-					onChange: ( [ updatedAttachment ] ) => {
-						// If the sub-size is still being generated, there is no need
-						// to invoke the callback below. It would just override
-						// the main image in the editor with the sub-size.
-						if ( isBlobURL( updatedAttachment.url ) ) {
-							return;
-						}
-
-						// This might be confusing, but the idea is to update the original
-						// image item in the editor with the new one with the added sub-size.
-						item.onChange?.( [ updatedAttachment ] );
-					},
 					batchId,
 					parentId: item.id,
 					additionalData: {
@@ -1195,12 +1193,6 @@ export function generateThumbnails( id: QueueItemId ) {
 
 					dispatch.addSideloadItem( {
 						file: sourceForScaled,
-						onChange: ( [ updatedAttachment ] ) => {
-							if ( isBlobURL( updatedAttachment.url ) ) {
-								return;
-							}
-							item.onChange?.( [ updatedAttachment ] );
-						},
 						batchId,
 						parentId: item.id,
 						additionalData: {
@@ -1240,7 +1232,7 @@ export function finalizeItem( id: QueueItemId ) {
 		// Only finalize if we have an attachment ID and a mediaFinalize callback.
 		if ( attachment?.id && mediaFinalize ) {
 			try {
-				await mediaFinalize( attachment.id );
+				await mediaFinalize( attachment.id, item.subSizes || [] );
 			} catch ( error ) {
 				// Log but don't fail the upload if finalization fails.
 				// eslint-disable-next-line no-console
