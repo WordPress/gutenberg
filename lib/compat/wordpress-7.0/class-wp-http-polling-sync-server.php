@@ -222,7 +222,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				foreach ( $existing_awareness as $entry ) {
 					if ( $client_id === $entry['client_id'] && $wp_user_id !== $entry['wp_user_id'] ) {
 						return new WP_Error(
-							'forbidden',
+							'rest_cannot_edit',
 							__( 'Client ID is already in use by another user.', 'gutenberg' ),
 							array( 'status' => 403 )
 						);
