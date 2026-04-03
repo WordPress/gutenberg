@@ -27,14 +27,11 @@ interface BlockListBlockProps {
  * @param OriginalComponent The original BlockListBlock component.
  * @return The enhanced component.
  */
-const addAnnotationClassName = (
-	OriginalComponent: ComponentType< any >
-) => {
+const addAnnotationClassName = ( OriginalComponent: ComponentType< any > ) => {
 	return withSelect( ( select, ownProps ) => {
 		const { clientId, className } = ownProps as BlockListBlockProps;
-		const annotations: WPAnnotation[] = select( store ).__experimentalGetAnnotationsForBlock(
-			clientId
-		);
+		const annotations: WPAnnotation[] =
+			select( store ).__experimentalGetAnnotationsForBlock( clientId );
 
 		return {
 			className: annotations
