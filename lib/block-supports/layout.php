@@ -891,7 +891,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	if ( $layout_classname && is_string( $layout_classname ) ) {
 		// Skip constrained layout class when no inner blocks exist to avoid affecting structural DOM children.
-		$is_contrained_without_children = 'is-layout-constrained' === $layout_classname && empty( $block['innerBlocks'] );
+		$has_inner_blocks = is_string( $block['innerContent'][0] ?? null ) && count( $block['innerContent'] ) > 1;
+		$is_contrained_without_children = 'is-layout-constrained' === $layout_classname && ! $has_inner_blocks;
 
 		if ( ! $is_contrained_without_children ) {
 			$class_names[] = sanitize_title( $layout_classname );

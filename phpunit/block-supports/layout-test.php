@@ -497,7 +497,9 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						),
 						'innerHTML'    => '<div class="wp-block-group"></div>',
 						'innerContent' => array(
-							'<div class="wp-block-group"></div>',
+							'<div class="wp-block-group">',
+							null,
+							'</div>',
 						),
 					),
 				),
