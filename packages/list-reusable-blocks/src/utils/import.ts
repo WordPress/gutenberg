@@ -26,7 +26,7 @@ async function importReusableBlock( file: File ): Promise< ReusableBlock > {
 
 	try {
 		parsedContent = JSON.parse( fileContent ) as ParsedContent;
-	} catch ( e ) {
+	} catch {
 		throw new Error( 'Invalid JSON file' );
 	}
 
