@@ -236,6 +236,12 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				$entity_name = $object_parts[0];
 				$object_id   = $object_parts[1] ?? null;
 
+				if ( str_ends_with( $object_id, ':suggestions' ) {
+					// Handle the special case of suggestions rooms, which inherit the same
+					// permissions as the main entity room.
+					$object_id = str_replace( ':suggestions', '', $object_id );
+				}
+
 				if ( ! $this->can_user_sync_entity_type( $entity_kind, $entity_name, $object_id ) ) {
 					return new WP_Error(
 						'rest_cannot_edit',
