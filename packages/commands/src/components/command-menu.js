@@ -12,6 +12,7 @@ import {
 	useState,
 	useEffect,
 	useRef,
+	useLayoutEffect,
 	isValidElement,
 	Component,
 } from '@wordpress/element';
@@ -321,6 +322,33 @@ export function CommandMenu() {
 		[]
 	);
 	const { open, close } = useDispatch( commandsStore );
+	const listRef = useRef();
+
+	useLayoutEffect( () => {
+		if ( ! listRef.current ) {
+			return;
+		}
+
+		// cmdk occasionally evaluates and triggers its own scrollIntoView asynchronously
+		// so, we fire our forceScroll for next few frames.
+		let count = 0;
+		let animationFrameId;
+
+		const forceScroll = () => {
+			if ( listRef.current ) {
+				listRef.current.scrollTop = 0;
+			}
+			if ( count++ < 10 ) {
+				animationFrameId = window.requestAnimationFrame( forceScroll );
+			}
+		};
+
+		listRef.current.scrollTop = 0;
+
+		animationFrameId = window.requestAnimationFrame( forceScroll );
+
+		return () => window.cancelAnimationFrame( animationFrameId );
+	}, [ search, loadersLoading ] );
 
 	useEffect( () => {
 		registerShortcut( {
@@ -385,7 +413,10 @@ export function CommandMenu() {
 							setSearch={ setSearch }
 						/>
 					</div>
-					<Command.List label={ __( 'Command suggestions' ) }>
+					<Command.List
+						ref={ listRef }
+						label={ __( 'Command suggestions' ) }
+					>
 						{ search && ! loadersLoading && (
 							<Command.Empty>
 								{ __( 'No results found.' ) }
