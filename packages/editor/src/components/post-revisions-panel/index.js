@@ -26,9 +26,7 @@ import { unlock } from '../../lock-unlock';
 const { Badge } = unlock( componentsPrivateApis );
 const DAY_IN_MILLISECONDS = 86400000;
 const EMPTY_ARRAY = [];
-
-// TODO: This should be updated with `wp_template_part` when we expand the experiment.
-const POST_TYPES_USING_MODIFIED_DATE = [ 'wp_template' ];
+const POST_TYPES_USING_MODIFIED_DATE = [ 'wp_template', 'wp_template_part' ];
 const defaultLayouts = { activity: {} };
 const noop = () => {};
 const paginationInfo = {};
