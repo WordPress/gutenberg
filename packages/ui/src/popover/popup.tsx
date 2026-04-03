@@ -25,11 +25,6 @@ const CLOSE_ATTR = 'data-wp-ui-popover-close';
  * avoidance, focus management, and optional backdrop. Set `inline` to
  * render inside the DOM tree instead of a portal, or supply a `container`
  * element for cross-document scenarios such as iframes.
- *
- * When the parent `Popover.Root` has `modal` set to `true` or
- * `'trap-focus'`, a `Popover.Close` button must be included inside the
- * popup so that focus can cycle correctly and the user can dismiss the
- * popover.
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	{

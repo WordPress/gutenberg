@@ -19,6 +19,8 @@ import type { RootProps } from './types';
  *   accessibility (can be visually hidden).
  * - `Popover.Description` — optional paragraph linked via `aria-describedby`.
  * - `Popover.Close` — a button that closes the popover when clicked.
+ *   **Required** when `modal` is `true` or `'trap-focus'` so that focus
+ *   can cycle correctly and the user can dismiss the popover.
  *
  * ```jsx
  * <Popover.Root>
