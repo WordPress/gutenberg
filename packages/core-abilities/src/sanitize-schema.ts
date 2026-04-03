@@ -9,6 +9,20 @@ const WP_SCHEMA_KEYWORDS = new Set( [
 ] );
 
 /**
+ * JSON Schema keywords whose values are maps of sub-schemas (where the
+ * keys are user-defined names, not schema keywords). These need special
+ * handling so that user-defined keys are preserved while their values
+ * are recursively sanitized.
+ */
+const SUB_SCHEMA_MAP_KEYS = new Set( [
+	'properties',
+	'patternProperties',
+	'definitions',
+	'$defs',
+	'dependencies',
+] );
+
+/**
  * Recursively removes WordPress-specific keywords from a JSON Schema object.
  *
  * WordPress REST API schemas may include server-side properties like
@@ -21,73 +35,32 @@ const WP_SCHEMA_KEYWORDS = new Set( [
 export function sanitizeSchema(
 	schema: Record< string, any >
 ): Record< string, any > {
-	if ( ! schema || typeof schema !== 'object' || Array.isArray( schema ) ) {
-		return schema;
-	}
-
 	const sanitized: Record< string, any > = {};
 
-	for ( const key of Object.keys( schema ) ) {
+	for ( const [ key, value ] of Object.entries( schema ) ) {
 		if ( WP_SCHEMA_KEYWORDS.has( key ) ) {
 			continue;
 		}
 
-		const value = schema[ key ];
-
-		if (
-			( key === 'properties' ||
-				key === 'patternProperties' ||
-				key === 'definitions' ||
-				key === '$defs' ) &&
-			value &&
-			typeof value === 'object' &&
-			! Array.isArray( value )
-		) {
-			sanitized[ key ] = Object.fromEntries(
-				Object.entries( value ).map( ( [ k, v ] ) => [
-					k,
-					sanitizeSchema( v as Record< string, any > ),
-				] )
+		if ( ! value || typeof value !== 'object' ) {
+			sanitized[ key ] = value;
+		} else if ( Array.isArray( value ) ) {
+			sanitized[ key ] = value.map( ( item ) =>
+				item && typeof item === 'object' && ! Array.isArray( item )
+					? sanitizeSchema( item )
+					: item
 			);
-		} else if ( key === 'items' && value && typeof value === 'object' ) {
-			if ( Array.isArray( value ) ) {
-				sanitized[ key ] = value.map( ( item: Record< string, any > ) =>
-					sanitizeSchema( item )
-				);
-			} else {
-				sanitized[ key ] = sanitizeSchema( value );
-			}
-		} else if (
-			( key === 'additionalProperties' || key === 'additionalItems' ) &&
-			value &&
-			typeof value === 'object'
-		) {
-			sanitized[ key ] = sanitizeSchema( value );
-		} else if (
-			( key === 'anyOf' || key === 'oneOf' || key === 'allOf' ) &&
-			Array.isArray( value )
-		) {
-			sanitized[ key ] = value.map( ( item: Record< string, any > ) =>
-				sanitizeSchema( item )
-			);
-		} else if ( key === 'not' && value && typeof value === 'object' ) {
-			sanitized[ key ] = sanitizeSchema( value );
-		} else if (
-			key === 'dependencies' &&
-			value &&
-			typeof value === 'object' &&
-			! Array.isArray( value )
-		) {
+		} else if ( SUB_SCHEMA_MAP_KEYS.has( key ) ) {
 			sanitized[ key ] = Object.fromEntries(
 				Object.entries( value ).map( ( [ k, v ] ) => [
 					k,
 					v && typeof v === 'object' && ! Array.isArray( v )
-						? sanitizeSchema( v as Record< string, any > )
+						? sanitizeSchema( v )
 						: v,
 				] )
 			);
 		} else {
-			sanitized[ key ] = value;
+			sanitized[ key ] = sanitizeSchema( value );
 		}
 	}
 
