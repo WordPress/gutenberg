@@ -1,6 +1,10 @@
 @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
 
 @layer wp-ui-components {
+	.text {
+		margin: 0;
+	}
+
 	.heading-2xl {
 		font-family: var(--wpds-font-family-heading);
 		font-size: var(--wpds-font-size-2xl);

@@ -17,7 +17,7 @@ export const Text = forwardRef< HTMLSpanElement, TextProps >( function Text(
 		defaultTagName: 'span',
 		ref,
 		props: mergeProps< 'span' >( props, {
-			className: clsx( styles[ variant ], className ),
+			className: clsx( styles.text, styles[ variant ], className ),
 		} ),
 	} );
 
