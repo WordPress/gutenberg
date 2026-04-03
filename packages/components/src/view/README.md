@@ -12,12 +12,11 @@ This feature is still experimental. “Experimental” means this is an early im
 
 ```jsx
 import { __experimentalView as View } from '@wordpress/components';
-import { Text } from '@wordpress/ui';
 
 function Example() {
 	return (
 		<View>
-			<Text>Code is Poetry</Text>
+			<span>Code is Poetry</span>
 		</View>
 	);
 }

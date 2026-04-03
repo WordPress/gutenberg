@@ -12,14 +12,13 @@ This feature is still experimental. “Experimental” means this is an early im
 
 ```jsx
 import { __experimentalHStack as HStack } from '@wordpress/components';
-import { Text } from '@wordpress/ui';
 
 function Example() {
 	return (
 		<HStack>
-			<Text>Code</Text>
-			<Text>is</Text>
-			<Text>Poetry</Text>
+			<span>Code</span>
+			<span>is</span>
+			<span>Poetry</span>
 		</HStack>
 	);
 }
@@ -86,16 +85,15 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
-import { Text } from '@wordpress/ui';
 
 function Example() {
 	return (
 		<HStack>
-			<Text>Code</Text>
+			<span>Code</span>
 			<Spacer>
-				<Text>is</Text>
+				<span>is</span>
 			</Spacer>
-			<Text>Poetry</Text>
+			<span>Poetry</span>
 		</HStack>
 	);
 }
@@ -108,15 +106,14 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
-import { Text } from '@wordpress/ui';
 
 function Example() {
 	return (
 		<HStack>
-			<Text>Code</Text>
+			<span>Code</span>
 			<Spacer />
-			<Text>is</Text>
-			<Text>Poetry</Text>
+			<span>is</span>
+			<span>Poetry</span>
 		</HStack>
 	);
 }
