@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { sanitizeSchema } from '../index';
+import { sanitizeSchema } from '../sanitize-schema';
 
 describe( 'sanitizeSchema', () => {
 	it( 'should strip sanitize_callback from properties', () => {
@@ -287,6 +287,121 @@ describe( 'sanitizeSchema', () => {
 						},
 					},
 				},
+			},
+		} );
+	} );
+
+	it( 'should recursively sanitize allOf schemas', () => {
+		const schema = {
+			allOf: [
+				{
+					type: 'object',
+					sanitize_callback: 'sanitize_text_field',
+				},
+				{
+					properties: {
+						name: {
+							type: 'string',
+							validate_callback: 'is_string',
+						},
+					},
+				},
+			],
+		};
+
+		expect( sanitizeSchema( schema ) ).toEqual( {
+			allOf: [
+				{ type: 'object' },
+				{
+					properties: {
+						name: { type: 'string' },
+					},
+				},
+			],
+		} );
+	} );
+
+	it( 'should recursively sanitize not schema', () => {
+		const schema = {
+			not: {
+				type: 'string',
+				sanitize_callback: 'sanitize_text_field',
+			},
+		};
+
+		expect( sanitizeSchema( schema ) ).toEqual( {
+			not: { type: 'string' },
+		} );
+	} );
+
+	it( 'should recursively sanitize patternProperties', () => {
+		const schema = {
+			type: 'object',
+			patternProperties: {
+				'^S_': {
+					type: 'string',
+					sanitize_callback: 'sanitize_text_field',
+				},
+				'^I_': {
+					type: 'integer',
+					validate_callback: 'is_numeric',
+				},
+			},
+		};
+
+		expect( sanitizeSchema( schema ) ).toEqual( {
+			type: 'object',
+			patternProperties: {
+				'^S_': { type: 'string' },
+				'^I_': { type: 'integer' },
+			},
+		} );
+	} );
+
+	it( 'should pass through additionalProperties when boolean', () => {
+		const schema = {
+			type: 'object',
+			properties: {
+				name: { type: 'string' },
+			},
+			additionalProperties: false,
+		};
+
+		expect( sanitizeSchema( schema ) ).toEqual( schema );
+	} );
+
+	it( 'should sanitize $defs', () => {
+		const schema = {
+			type: 'object',
+			$defs: {
+				address: {
+					type: 'object',
+					sanitize_callback: 'sanitize_address',
+					properties: {
+						street: {
+							type: 'string',
+							sanitize_callback: 'sanitize_text_field',
+						},
+					},
+				},
+			},
+			properties: {
+				home: { $ref: '#/$defs/address' },
+			},
+		};
+
+		expect( sanitizeSchema( schema ) ).toEqual( {
+			type: 'object',
+			$defs: {
+				address: {
+					type: 'object',
+					properties: {
+						street: { type: 'string' },
+					},
+				},
+			},
+			properties: {
+				home: { $ref: '#/$defs/address' },
 			},
 		} );
 	} );
