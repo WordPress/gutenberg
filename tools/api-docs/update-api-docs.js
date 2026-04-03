@@ -221,14 +221,14 @@ glob.stream( [
 					resolve( dirname( file ), path )
 				);
 				await execa(
-					`"${ join(
+					join(
 						__dirname,
 						'..',
 						'..',
 						'node_modules',
 						'.bin',
 						'docgen'
-					) }"`,
+					),
 					[
 						sourcePath,
 						'--output',
@@ -239,12 +239,11 @@ glob.stream( [
 						'--ignore',
 						'/unstable|experimental/i',
 					],
-					{ cwd: ROOT_DIR, shell: true }
+					{ cwd: ROOT_DIR }
 				);
 			}
 			await execa( 'npm', [ 'run', 'format', output ], {
 				cwd: ROOT_DIR,
-				shell: true,
 			} );
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
