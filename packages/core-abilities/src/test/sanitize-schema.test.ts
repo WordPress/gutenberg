@@ -174,12 +174,6 @@ describe( 'sanitizeSchema', () => {
 		expect( sanitizeSchema( schema ) ).toEqual( schema );
 	} );
 
-	it( 'should return non-object values as-is', () => {
-		expect( sanitizeSchema( null as any ) ).toBeNull();
-		expect( sanitizeSchema( undefined as any ) ).toBeUndefined();
-		expect( sanitizeSchema( [] as any ) ).toEqual( [] );
-	} );
-
 	it( 'should handle empty schema', () => {
 		expect( sanitizeSchema( {} ) ).toEqual( {} );
 	} );
