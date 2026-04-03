@@ -1,15 +1,15 @@
 interface ImportDropdownProps {
-	onUpload: ( data: any ) => void;
+	onUpload: ( data: ReusableBlock ) => void;
 }
 
 interface ImportFormProps {
 	instanceId: string | number;
-	onUpload: ( reusableBlock: any ) => void;
+	onUpload: ( reusableBlock: ReusableBlock ) => void;
 }
 
 interface PostType {
 	rest_base: string;
-	[ key: string ]: any;
+	[ key: string ]: unknown;
 }
 
 interface Post {
@@ -20,7 +20,7 @@ interface Post {
 		raw: string;
 	};
 	wp_pattern_sync_status: string;
-	[ key: string ]: any;
+	[ key: string ]: unknown;
 }
 
 interface ExportedBlock {
@@ -35,7 +35,7 @@ interface ParsedContent {
 	title: string;
 	content: string;
 	syncStatus?: string;
-	[ key: string ]: any;
+	[ key: string ]: unknown;
 }
 
 interface ReusableBlockMeta {
@@ -60,7 +60,7 @@ interface ReusableBlock {
 		rendered: string;
 	};
 	status: string;
-	[ key: string ]: any;
+	[ key: string ]: unknown;
 }
 
 export type {
