@@ -53,7 +53,7 @@ Delete action for Templates, Patterns and Template Parts.
 
 ### descriptionField
 
-Description field for design post types (templates, template parts, and patterns).
+Description field for templates.
 
 ### discussionField
 

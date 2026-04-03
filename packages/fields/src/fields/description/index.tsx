@@ -9,40 +9,18 @@ import { __experimentalText as Text } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import type { Template, TemplatePart, Pattern } from '../../types';
+import type { Template } from '../../types';
 
-type DescriptionPost = Template | TemplatePart | Pattern;
-
-const descriptionField: Field< DescriptionPost > = {
+const descriptionField: Field< Template > = {
 	id: 'description',
 	type: 'text',
 	label: __( 'Description' ),
 	placeholder: __( 'Add a description' ),
 	getValue: ( { item } ) => {
-		if ( item.type === 'wp_block' ) {
-			const excerpt = ( item as Pattern ).excerpt;
-			if ( typeof excerpt === 'string' ) {
-				return decodeEntities( excerpt );
-			}
-			return decodeEntities( excerpt?.raw || '' );
-		}
-		return decodeEntities(
-			( item as Template | TemplatePart ).description || ''
-		);
+		return decodeEntities( item.description || '' );
 	},
 	render: ( { item } ) => {
-		let description;
-		if ( item.type === 'wp_block' ) {
-			const excerpt = ( item as Pattern ).excerpt;
-			if ( typeof excerpt === 'string' ) {
-				description = excerpt;
-			} else {
-				description = excerpt?.raw;
-			}
-		} else {
-			description = ( item as Template | TemplatePart ).description;
-		}
-		// TODO: we need to truncate only for patterns or custom templates..
+		const { description } = item;
 		return (
 			description && (
 				<Text
@@ -61,10 +39,6 @@ const descriptionField: Field< DescriptionPost > = {
 		rows: 4,
 	},
 	isVisible: ( item ) => {
-		if ( item.type === 'wp_block' ) {
-			return true;
-		}
-		item = item as Template | TemplatePart;
 		const isCustomRecord =
 			item.source === 'custom' && ! item.has_theme_file && item.is_custom;
 		if ( isCustomRecord ) {
@@ -78,6 +52,6 @@ const descriptionField: Field< DescriptionPost > = {
 };
 
 /**
- * Description field for design post types (templates, template parts, and patterns).
+ * Description field for templates.
  */
 export default descriptionField;

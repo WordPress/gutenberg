@@ -279,8 +279,6 @@ export const registerPostTypeSchema =
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					postTypeConfig.supports?.excerpt &&
 					excerptField,
-				DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
-					descriptionField,
 				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 				postTypeConfig.supports?.comments && commentStatusField,
 				postTypeConfig.supports?.trackbacks && pingStatusField,
@@ -308,6 +306,7 @@ export const registerPostTypeSchema =
 				// We need to think this through how to best connect
 				// it with `Gutenberg_REST_View_Config_Controller_7_1`.
 				postTypeConfig.slug === 'wp_template' && blogTitleField,
+				postTypeConfig.slug === 'wp_template' && descriptionField,
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,
