@@ -11,10 +11,8 @@ This feature is still experimental. “Experimental” means this is an early im
 `HStack` can render anything inside.
 
 ```jsx
-import {
-	__experimentalHStack as HStack,
-	__experimentalText as Text,
-} from '@wordpress/components';
+import { __experimentalHStack as HStack } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 
 function Example() {
 	return (
@@ -87,8 +85,8 @@ When a `Spacer` is used within an `HStack`, the `Spacer` adaptively expands to t
 import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
-	__experimentalText as Text,
 } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 
 function Example() {
 	return (
@@ -109,8 +107,8 @@ function Example() {
 import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
-	__experimentalText as Text,
 } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 
 function Example() {
 	return (

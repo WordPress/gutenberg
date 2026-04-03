@@ -11,10 +11,8 @@ This feature is still experimental. “Experimental” means this is an early im
 `VStack` can render anything inside.
 
 ```jsx
-import {
-	__experimentalText as Text,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { __experimentalVStack as VStack } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 
 function Example() {
 	return (
@@ -74,9 +72,9 @@ When a `Spacer` is used within an `VStack`, the `Spacer` adaptively expands to t
 ```jsx
 import {
 	__experimentalSpacer as Spacer,
-	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 
 function Example() {
 	return (
@@ -96,9 +94,9 @@ function Example() {
 ```jsx
 import {
 	__experimentalSpacer as Spacer,
-	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 
 function Example() {
 	return (
