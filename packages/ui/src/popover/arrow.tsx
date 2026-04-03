@@ -11,12 +11,6 @@ function DefaultArrowSvg( props: React.ComponentProps< 'svg' > ) {
 			height="10"
 			viewBox="0 0 20 10"
 			fill="none"
-			style={ {
-				fillRule: 'evenodd',
-				clipRule: 'evenodd',
-				strokeLinejoin: 'round',
-				strokeMiterlimit: '2',
-			} }
 			{ ...props }
 		>
 			<path
