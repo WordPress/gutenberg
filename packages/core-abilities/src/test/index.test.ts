@@ -370,6 +370,40 @@ describe( 'sanitizeSchema', () => {
 		expect( sanitizeSchema( schema ) ).toEqual( schema );
 	} );
 
+	it( 'should sanitize schema dependencies and pass through property dependencies', () => {
+		const schema = {
+			type: 'object',
+			dependencies: {
+				// Property dependency (array) — pass through as-is
+				bar: [ 'foo' ],
+				// Schema dependency (object) — recurse
+				baz: {
+					type: 'object',
+					sanitize_callback: 'sanitize_text_field',
+					properties: {
+						qux: {
+							type: 'string',
+							validate_callback: 'is_string',
+						},
+					},
+				},
+			},
+		};
+
+		expect( sanitizeSchema( schema ) ).toEqual( {
+			type: 'object',
+			dependencies: {
+				bar: [ 'foo' ],
+				baz: {
+					type: 'object',
+					properties: {
+						qux: { type: 'string' },
+					},
+				},
+			},
+		} );
+	} );
+
 	it( 'should sanitize $defs', () => {
 		const schema = {
 			type: 'object',

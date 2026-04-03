@@ -72,6 +72,20 @@ export function sanitizeSchema(
 			);
 		} else if ( key === 'not' && value && typeof value === 'object' ) {
 			sanitized[ key ] = sanitizeSchema( value );
+		} else if (
+			key === 'dependencies' &&
+			value &&
+			typeof value === 'object' &&
+			! Array.isArray( value )
+		) {
+			sanitized[ key ] = Object.fromEntries(
+				Object.entries( value ).map( ( [ k, v ] ) => [
+					k,
+					v && typeof v === 'object' && ! Array.isArray( v )
+						? sanitizeSchema( v as Record< string, any > )
+						: v,
+				] )
+			);
 		} else {
 			sanitized[ key ] = value;
 		}
