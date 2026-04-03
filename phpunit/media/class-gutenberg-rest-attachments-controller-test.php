@@ -246,7 +246,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		// Upload with client-side processing (no server-generated sub-sizes).
 		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
 		$request->set_header( 'Content-Type', 'image/jpeg' );
-		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=sideload-test.jpg' );
 		$request->set_param( 'generate_sub_sizes', false );
 
 		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
@@ -255,7 +255,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 
 		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
 		$request->set_header( 'Content-Type', 'image/jpeg' );
-		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-777x777.jpg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=sideload-test-777x777.jpg' );
 		$request->set_param( 'image_size', 'medium' );
 
 		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
@@ -266,7 +266,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 
 		// Sideload now returns sub-size data instead of a full attachment.
 		$this->assertSame( 'medium', $data['image_size'] );
-		$this->assertSame( 'canola-777x777.jpg', $data['file'] );
+		$this->assertSame( 'sideload-test-777x777.jpg', $data['file'] );
 		$this->assertSame( 'image/jpeg', $data['mime_type'] );
 		$this->assertArrayHasKey( 'width', $data );
 		$this->assertArrayHasKey( 'height', $data );
