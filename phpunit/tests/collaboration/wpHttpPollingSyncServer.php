@@ -556,7 +556,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		$request->set_body( str_repeat( 'x', WP_HTTP_Polling_Sync_Server::MAX_BODY_SIZE + 1 ) );
 
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_sync_body_too_large', $response, 413 );
+		$this->assertErrorResponse( 'rest_collaboration_body_too_large', $response, 413 );
 	}
 
 	/*

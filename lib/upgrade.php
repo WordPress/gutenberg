@@ -7,7 +7,7 @@
 
 if ( ! defined( '_GUTENBERG_VERSION_MIGRATION' ) ) {
 	// It's necessary to update this version every time a new migration is needed.
-	define( '_GUTENBERG_VERSION_MIGRATION', '22.8.0' );
+	define( '_GUTENBERG_VERSION_MIGRATION', '22.9.0' );
 }
 
 /**
@@ -27,6 +27,10 @@ function _gutenberg_migrate_database() {
 
 		if ( version_compare( $gutenberg_installed_version, '22.8.0', '<' ) ) {
 			_gutenberg_migrate_enable_real_time_collaboration();
+		}
+
+		if ( version_compare( $gutenberg_installed_version, '22.9.0', '<' ) ) {
+			_gutenberg_migrate_collaboration_table();
 		}
 
 		update_option( 'gutenberg_version_migration', _GUTENBERG_VERSION_MIGRATION );
@@ -80,6 +84,22 @@ function _gutenberg_migrate_enable_real_time_collaboration() {
 
 	delete_option( 'enable_real_time_collaboration' );
 	delete_option( 'wp_enable_real_time_collaboration' );
+}
+
+/**
+ * Create the collaboration database table.
+ *
+ * Replaces post-meta-based sync storage with a dedicated table.
+ * This is also registered as a hook for WP-CLI usage:
+ *
+ *   wp eval 'do_action( "gutenberg_create_collaboration_table" );'
+ *
+ * @since 22.9.0
+ */
+function _gutenberg_migrate_collaboration_table() {
+	if ( function_exists( 'gutenberg_create_collaboration_table' ) ) {
+		gutenberg_create_collaboration_table();
+	}
 }
 
 // Deletion of the `_wp_file_based` term (in _gutenberg_migrate_remove_fse_drafts) must happen

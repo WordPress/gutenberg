@@ -1,11 +1,12 @@
 <?php
 /**
- * WP_HTTP_Polling_Sync_Server class
+ * WP_HTTP_Polling_Collaboration_Server class
  *
  * @package gutenberg
+ * @since 7.0.0
  */
 
-if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
+if ( ! class_exists( 'WP_HTTP_Polling_Collaboration_Server' ) ) {
 
 	/**
 	 * Core class that contains an HTTP server used for collaborative editing.
@@ -13,14 +14,14 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 	 * @since 7.0.0
 	 * @access private
 	 */
-	class WP_HTTP_Polling_Sync_Server {
+	class WP_HTTP_Polling_Collaboration_Server {
 		/**
 		 * REST API namespace.
 		 *
 		 * @since 7.0.0
 		 * @var string
 		 */
-		const REST_NAMESPACE = 'wp-sync/v1';
+		const REST_NAMESPACE = 'wp-collaboration/v1';
 
 		/**
 		 * Awareness timeout in seconds. Clients that haven't updated
@@ -64,7 +65,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		const MAX_UPDATE_DATA_SIZE = MB_IN_BYTES;
 
 		/**
-		 * Sync update type: compaction.
+		 * Collaboration update type: compaction.
 		 *
 		 * @since 7.0.0
 		 * @var string
@@ -72,7 +73,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		const UPDATE_TYPE_COMPACTION = 'compaction';
 
 		/**
-		 * Sync update type: sync step 1.
+		 * Collaboration update type: sync step 1.
 		 *
 		 * @since 7.0.0
 		 * @var string
@@ -80,7 +81,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		const UPDATE_TYPE_SYNC_STEP1 = 'sync_step1';
 
 		/**
-		 * Sync update type: sync step 2.
+		 * Collaboration update type: sync step 2.
 		 *
 		 * @since 7.0.0
 		 * @var string
@@ -88,7 +89,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		const UPDATE_TYPE_SYNC_STEP2 = 'sync_step2';
 
 		/**
-		 * Sync update type: regular update.
+		 * Collaboration update type: regular update.
 		 *
 		 * @since 7.0.0
 		 * @var string
@@ -96,20 +97,21 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		const UPDATE_TYPE_UPDATE = 'update';
 
 		/**
-		 * Storage backend for sync updates.
+		 * Storage backend for collaboration updates.
 		 *
 		 * @since 7.0.0
+		 * @var WP_Collaboration_Table_Storage
 		 */
-		private WP_Sync_Storage $storage;
+		private WP_Collaboration_Table_Storage $storage;
 
 		/**
 		 * Constructor.
 		 *
 		 * @since 7.0.0
 		 *
-		 * @param WP_Sync_Storage $storage Storage backend for sync updates.
+		 * @param WP_Collaboration_Table_Storage $storage Storage backend for collaboration updates.
 		 */
-		public function __construct( WP_Sync_Storage $storage ) {
+		public function __construct( WP_Collaboration_Table_Storage $storage ) {
 			$this->storage = $storage;
 		}
 
@@ -152,14 +154,17 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					'type'     => array( 'object', 'null' ),
 				),
 				'client_id' => array(
-					'minimum'  => 1,
-					'required' => true,
-					'type'     => 'integer',
+					'required'          => true,
+					'type'              => array( 'string', 'integer' ),
+					'sanitize_callback' => function ( $value ) {
+						return (string) $value;
+					},
 				),
 				'room'      => array(
-					'required' => true,
-					'type'     => 'string',
-					'pattern'  => '^[^/]+/[^/:]+(?::\\S+)?$',
+					'required'  => true,
+					'type'      => 'string',
+					'pattern'   => '^[^/]+/[^/:]+(?::\\S+)?$',
+					'maxLength' => 191, // Matches $max_index_length in wp-admin/includes/schema.php.
 				),
 				'updates'   => array(
 					'items'    => $typed_update_args,
@@ -169,31 +174,49 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				),
 			);
 
+			$route_args = array(
+				'methods'             => array( WP_REST_Server::CREATABLE ),
+				'callback'            => array( $this, 'handle_request' ),
+				'permission_callback' => array( $this, 'check_permissions' ),
+				'validate_callback'   => array( $this, 'validate_request' ),
+				'args'                => array(
+					'rooms' => array(
+						'items'    => array(
+							'properties' => $room_args,
+							'type'       => 'object',
+						),
+						'maxItems' => self::MAX_ROOMS_PER_REQUEST,
+						'required' => true,
+						'type'     => 'array',
+					),
+				),
+			);
+
 			register_rest_route(
 				self::REST_NAMESPACE,
 				'/updates',
-				array(
-					'methods'             => array( WP_REST_Server::CREATABLE ),
-					'callback'            => array( $this, 'handle_request' ),
-					'permission_callback' => array( $this, 'check_permissions' ),
-					'validate_callback'   => array( $this, 'validate_request' ),
-					'args'                => array(
-						'rooms' => array(
-							'items'    => array(
-								'properties' => $room_args,
-								'type'       => 'object',
-							),
-							'maxItems' => self::MAX_ROOMS_PER_REQUEST,
-							'required' => true,
-							'type'     => 'array',
-						),
-					),
-				)
+				$route_args
+			);
+
+			/*
+			 * Backward-compatible alias so that the Gutenberg plugin's
+			 * bundled sync package (which still uses wp-sync/v1) continues
+			 * to work against WordPress 7.0+.
+			 */
+			register_rest_route(
+				'wp-sync/v1',
+				'/updates',
+				$route_args
 			);
 		}
 
 		/**
 		 * Checks if the current user has permission to access a room.
+		 *
+		 * Requires `edit_posts` (contributor+), then delegates to
+		 * can_user_collaborate_on_entity_type() for per-entity checks.
+		 * There is no dedicated `collaborate` capability; access follows
+		 * existing edit capabilities for the entity type.
 		 *
 		 * @since 7.0.0
 		 *
@@ -205,29 +228,15 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			if ( ! current_user_can( 'edit_posts' ) ) {
 				return new WP_Error(
 					'rest_cannot_edit',
-					__( 'You do not have permission to perform this action', 'gutenberg' ),
+					__( 'You do not have permission to perform this action.', 'gutenberg' ),
 					array( 'status' => rest_authorization_required_code() )
 				);
 			}
 
-			$rooms      = $request['rooms'];
-			$wp_user_id = get_current_user_id();
+			$rooms = $request['rooms'];
 
 			foreach ( $rooms as $room ) {
-				$client_id = $room['client_id'];
-				$room      = $room['room'];
-
-				// Check that the client_id is not already owned by another user.
-				$existing_awareness = $this->storage->get_awareness_state( $room );
-				foreach ( $existing_awareness as $entry ) {
-					if ( $client_id === $entry['client_id'] && $wp_user_id !== $entry['wp_user_id'] ) {
-						return new WP_Error(
-							'rest_cannot_edit',
-							__( 'Client ID is already in use by another user.', 'gutenberg' ),
-							array( 'status' => 403 )
-						);
-					}
-				}
+				$room = $room['room'];
 
 				$type_parts   = explode( '/', $room, 2 );
 				$object_parts = explode( ':', $type_parts[1] ?? '', 2 );
@@ -236,13 +245,13 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				$entity_name = $object_parts[0];
 				$object_id   = $object_parts[1] ?? null;
 
-				if ( ! $this->can_user_sync_entity_type( $entity_kind, $entity_name, $object_id ) ) {
+				if ( ! $this->can_user_collaborate_on_entity_type( $entity_kind, $entity_name, $object_id ) ) {
 					return new WP_Error(
 						'rest_cannot_edit',
 						sprintf(
-							/* translators: %s: The room name encodes the current entity being synced. */
-							__( 'You do not have permission to sync this entity: %s.', 'gutenberg' ),
-							$room
+							/* translators: %s: The room name identifying the collaborative editing session. */
+							__( 'You do not have permission to collaborate on this entity: %s.', 'gutenberg' ),
+							esc_html( $room )
 						),
 						array( 'status' => rest_authorization_required_code() )
 					);
@@ -267,7 +276,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			$body = $request->get_body();
 			if ( is_string( $body ) && strlen( $body ) > self::MAX_BODY_SIZE ) {
 				return new WP_Error(
-					'rest_sync_body_too_large',
+					'rest_collaboration_body_too_large',
 					__( 'Request body is too large.', 'gutenberg' ),
 					array( 'status' => 413 )
 				);
@@ -277,7 +286,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		}
 
 		/**
-		 * Handles request: stores sync updates and awareness data, and returns
+		 * Handles request: stores updates and awareness data, and returns
 		 * updates the client is missing.
 		 *
 		 * @since 7.0.0
@@ -297,8 +306,12 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				$cursor    = $room_request['after'];
 				$room      = $room_request['room'];
 
-				// Merge awareness state.
+				// Merge awareness state (also validates client_id ownership).
 				$merged_awareness = $this->process_awareness_update( $room, $client_id, $awareness );
+
+				if ( is_wp_error( $merged_awareness ) ) {
+					return $merged_awareness;
+				}
 
 				// The lowest client ID is nominated to perform compaction when needed.
 				$is_compactor = false;
@@ -308,7 +321,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 
 				// Process each update according to its type.
 				foreach ( $room_request['updates'] as $update ) {
-					$result = $this->process_sync_update( $room, $client_id, $cursor, $update );
+					$result = $this->process_collaboration_update( $room, $client_id, $cursor, $update );
 					if ( is_wp_error( $result ) ) {
 						return $result;
 					}
@@ -325,7 +338,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		}
 
 		/**
-		 * Checks if the current user can sync a specific entity type.
+		 * Checks if the current user can collaborate on a specific entity type.
 		 *
 		 * @since 7.0.0
 		 *
@@ -334,7 +347,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * @param string|null $object_id   The numeric object ID / entity key for single entities, null for collections.
 		 * @return bool True if user has permission, otherwise false.
 		 */
-		private function can_user_sync_entity_type( string $entity_kind, string $entity_name, ?string $object_id ): bool {
+		private function can_user_collaborate_on_entity_type( string $entity_kind, string $entity_name, ?string $object_id ): bool {
 			if ( is_string( $object_id ) ) {
 				if ( ! ctype_digit( $object_id ) ) {
 					return false;
@@ -374,8 +387,10 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				}
 			}
 
-			// All the remaining checks are for collections. If an object ID is provided,
-			// reject the request.
+			/*
+			 * All the remaining checks are for collections. If an object ID is
+			 * provided, reject the request.
+			 */
 			if ( null !== $object_id ) {
 				return false;
 			}
@@ -390,9 +405,11 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				return current_user_can( $post_type_object->cap->edit_posts );
 			}
 
-			// Collection syncing does not exchange entity data. It only signals if
-			// another user has updated an entity in the collection. Therefore, we only
-			// compare against an allow list of collection types.
+			/*
+			 * Collection collaboration does not exchange entity data. It only
+			 * signals if another user has updated an entity in the collection.
+			 * Therefore, we only compare against an allow list of collection types.
+			 */
 			$allowed_collection_entity_kinds = array(
 				'postType',
 				'root',
@@ -405,66 +422,68 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		/**
 		 * Processes and stores an awareness update from a client.
 		 *
+		 * Also validates that the client_id is not already owned by another user.
+		 * This check uses the same get_awareness_state() query that builds the
+		 * response, eliminating a duplicate query that was previously performed
+		 * in check_permissions().
+		 *
 		 * @since 7.0.0
 		 *
 		 * @param string                    $room             Room identifier.
-		 * @param int                       $client_id        Client identifier.
+		 * @param string                    $client_id        Client identifier.
 		 * @param array<string, mixed>|null $awareness_update Awareness state sent by the client.
-		 * @return array<int, array<string, mixed>> Map of client ID to awareness state.
+		 * @return array<string, array<string, mixed>>|WP_Error Map of client ID to awareness state, or WP_Error if client_id is owned by another user.
 		 */
-		private function process_awareness_update( string $room, int $client_id, ?array $awareness_update ): array {
-			$existing_awareness = $this->storage->get_awareness_state( $room );
-			$updated_awareness  = array();
-			$current_time       = time();
+		private function process_awareness_update( string $room, string $client_id, ?array $awareness_update ) {
+			$wp_user_id = get_current_user_id();
 
-			foreach ( $existing_awareness as $entry ) {
-				// Remove this client's entry (it will be updated below).
-				if ( $client_id === $entry['client_id'] ) {
-					continue;
+			// Check ownership before upserting so a hijacked client_id is rejected.
+			$entries = $this->storage->get_awareness_state( $room, self::AWARENESS_TIMEOUT );
+
+			foreach ( $entries as $entry ) {
+				if ( $client_id === $entry['client_id'] && $wp_user_id !== $entry['user_id'] ) {
+					return new WP_Error(
+						'rest_cannot_edit',
+						__( 'Client ID is already in use by another user.', 'gutenberg' ),
+						array( 'status' => rest_authorization_required_code() )
+					);
 				}
-
-				// Remove entries that have expired.
-				if ( $current_time - $entry['updated_at'] >= self::AWARENESS_TIMEOUT ) {
-					continue;
-				}
-
-				$updated_awareness[] = $entry;
 			}
 
-			// Add this client's awareness state.
 			if ( null !== $awareness_update ) {
-				$updated_awareness[] = array(
-					'client_id'  => $client_id,
-					'state'      => $awareness_update,
-					'updated_at' => $current_time,
-					'wp_user_id' => get_current_user_id(),
-				);
+				$this->storage->set_awareness_state( $room, $client_id, $awareness_update, $wp_user_id );
 			}
 
-			// This action can fail, but it shouldn't fail the entire request.
-			$this->storage->set_awareness_state( $room, $updated_awareness );
-
-			// Convert to client_id => state map for response.
 			$response = array();
-			foreach ( $updated_awareness as $entry ) {
+			foreach ( $entries as $entry ) {
 				$response[ $entry['client_id'] ] = $entry['state'];
+			}
+
+			/*
+			 * Other clients' states were decoded from the DB. Run the current
+			 * client's state through the same encode/decode path so the response
+			 * is consistent — wp_json_encode may normalize values (e.g. strip
+			 * invalid UTF-8) that would otherwise differ on the next poll.
+			 */
+			if ( null !== $awareness_update ) {
+				$response[ $client_id ] = json_decode( wp_json_encode( $awareness_update ), true );
 			}
 
 			return $response;
 		}
 
 		/**
-		 * Processes a sync update based on its type.
+		 * Processes a collaboration update based on its type.
 		 *
 		 * @since 7.0.0
 		 *
 		 * @param string                            $room      Room identifier.
-		 * @param int                               $client_id Client identifier.
+		 * @param string                            $client_id Client identifier.
 		 * @param int                               $cursor    Client cursor (marker of last seen update).
-		 * @param array{data: string, type: string} $update    Sync update.
+		 * @param array{data: string, type: string} $update    Collaboration update.
 		 * @return true|WP_Error True on success, WP_Error on storage failure.
 		 */
-		private function process_sync_update( string $room, int $client_id, int $cursor, array $update ) {
+		private function process_collaboration_update( string $room, string $client_id, int $cursor, array $update ) {
 			$data = $update['data'];
 			$type = $update['type'];
 
@@ -473,7 +492,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					/*
 					 * Compaction replaces updates the client has already seen. Only remove
 					 * updates with markers before the client's cursor to preserve updates
-					 * that arrived since the client's last sync.
+					 * that arrived since the client's last poll.
 					 *
 					 * Check for a newer compaction update first. If one exists, skip this
 					 * compaction to avoid overwriting it.
@@ -489,19 +508,39 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					}
 
 					if ( ! $has_newer_compaction ) {
-						if ( ! $this->storage->remove_updates_before_cursor( $room, $cursor ) ) {
+						/*
+						 * Insert the compaction row before deleting old rows.
+						 * Reversing the order closes a race window where a
+						 * client joining with cursor=0 between the DELETE and
+						 * INSERT would see an empty room for one poll cycle.
+						 * The compaction row always has a higher ID than the
+						 * deleted rows, so cursor-based filtering is unaffected.
+						 */
+						$insert_result = $this->add_update( $room, $client_id, $type, $data );
+						if ( is_wp_error( $insert_result ) ) {
+							return $insert_result;
+						}
+
+						if ( ! $this->storage->remove_updates_through_cursor( $room, $cursor ) ) {
+							global $wpdb;
+							$error_data = array( 'status' => 500 );
+							if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+								$error_data['db_error'] = $wpdb->last_error;
+							}
 							return new WP_Error(
-								'rest_sync_storage_error',
+								'rest_collaboration_storage_error',
 								__( 'Failed to remove updates during compaction.', 'gutenberg' ),
-								array( 'status' => 500 )
+								$error_data
 							);
 						}
 
-						return $this->add_update( $room, $client_id, $type, $data );
+						return true;
 					}
 
-					// Reaching this point means there's a newer compaction, so we can
-					// silently ignore this one.
+					/*
+					 * Reaching this point means there's a newer compaction,
+					 * so we can silently ignore this one.
+					 */
 					return true;
 
 				case self::UPDATE_TYPE_SYNC_STEP1:
@@ -521,7 +560,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 
 			return new WP_Error(
 				'rest_invalid_update_type',
-				__( 'Invalid sync update type.', 'gutenberg' ),
+				__( 'Invalid collaboration update type.', 'gutenberg' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -532,12 +571,12 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * @since 7.0.0
 		 *
 		 * @param string $room      Room identifier.
-		 * @param int    $client_id Client identifier.
+		 * @param string $client_id Client identifier.
 		 * @param string $type      Update type (sync_step1, sync_step2, update, compaction).
 		 * @param string $data      Base64-encoded update data.
 		 * @return true|WP_Error True on success, WP_Error on storage failure.
 		 */
-		private function add_update( string $room, int $client_id, string $type, string $data ) {
+		private function add_update( string $room, string $client_id, string $type, string $data ) {
 			$update = array(
 				'client_id' => $client_id,
 				'data'      => $data,
@@ -545,10 +584,15 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			);
 
 			if ( ! $this->storage->add_update( $room, $update ) ) {
+				global $wpdb;
+				$error_data = array( 'status' => 500 );
+				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+					$error_data['db_error'] = $wpdb->last_error;
+				}
 				return new WP_Error(
-					'rest_sync_storage_error',
-					__( 'Failed to store sync update.', 'gutenberg' ),
-					array( 'status' => 500 )
+					'rest_collaboration_storage_error',
+					__( 'Failed to store collaboration update.', 'gutenberg' ),
+					$error_data
 				);
 			}
 
@@ -556,7 +600,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		}
 
 		/**
-		 * Gets sync updates for a specific client from a room after a given cursor.
+		 * Gets updates for a specific client from a room after a given cursor.
 		 *
 		 * Delegates cursor-based retrieval to the storage layer, then applies
 		 * client-specific filtering and compaction logic.
@@ -564,7 +608,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * @since 7.0.0
 		 *
 		 * @param string $room         Room identifier.
-		 * @param int    $client_id    Client identifier.
+		 * @param string $client_id    Client identifier.
 		 * @param int    $cursor       Return updates after this cursor.
 		 * @param bool   $is_compactor True if this client is nominated to perform compaction.
 		 * @return array{
@@ -575,7 +619,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 *   updates: array<int, array{data: string, type: string}>,
 		 * } Response data for this room.
 		 */
-		private function get_updates( string $room, int $client_id, int $cursor, bool $is_compactor ): array {
+		private function get_updates( string $room, string $client_id, int $cursor, bool $is_compactor ): array {
 			$updates_after_cursor = $this->storage->get_updates_after_cursor( $room, $cursor );
 			$total_updates        = $this->storage->get_update_count( $room );
 
