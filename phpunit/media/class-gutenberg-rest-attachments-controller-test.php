@@ -243,19 +243,15 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	public function test_sideload_item() {
 		wp_set_current_user( self::$admin_id );
 
-		$attachment_id = self::factory()->attachment->create_object(
-			DIR_TESTDATA . '/images/canola.jpg',
-			0,
-			array(
-				'post_mime_type' => 'image/jpeg',
-				'post_excerpt'   => 'A sample caption',
-			)
-		);
+		// Upload with client-side processing (no server-generated sub-sizes).
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
 
-		wp_update_attachment_metadata(
-			$attachment_id,
-			wp_generate_attachment_metadata( $attachment_id, DIR_TESTDATA . '/images/canola.jpg' )
-		);
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response      = rest_get_server()->dispatch( $request );
+		$attachment_id = $response->get_data()['id'];
 
 		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
 		$request->set_header( 'Content-Type', 'image/jpeg' );
@@ -335,8 +331,8 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertSame( 'canola-year-month-777x777.jpg', $data['file'] );
 
 		// Verify the sideloaded file was placed in the parent post's year/month folder.
-		$attachment        = get_post( $attachment_id );
-		$attachment_url    = wp_get_attachment_url( $attachment->ID );
+		$attachment     = get_post( $attachment_id );
+		$attachment_url = wp_get_attachment_url( $attachment->ID );
 		$this->assertSame( $attachment->post_parent, $published_post );
 		$this->assertStringContainsString( '2017/02', $attachment_url );
 	}
@@ -1025,16 +1021,21 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$data          = $response->get_data();
 		$attachment_id = $data['id'];
 
+		// Sideload the "original" version (simulating a rotated image).
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=rotated-photo-original.jpg' );
+		$request->set_param( 'image_size', 'original' );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response      = rest_get_server()->dispatch( $request );
+		$original_data = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+
+		// Finalize with the original sub-size data.
 		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
-		$request->set_param(
-			'sub_sizes',
-			array(
-				array(
-					'image_size' => 'original',
-					'file'       => 'rotated-photo-original.jpg',
-				),
-			)
-		);
+		$request->set_param( 'sub_sizes', array( $original_data ) );
 
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertSame( 200, $response->get_status() );

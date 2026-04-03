@@ -547,8 +547,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( 'scaled' === $image_size ) {
 			// Record the current attached file as the original.
-			$current_file                     = get_attached_file( $attachment_id, true );
-			$sub_size_data['original_image']  = wp_basename( $current_file );
+			$current_file                    = get_attached_file( $attachment_id, true );
+			$sub_size_data['original_image'] = wp_basename( $current_file );
 
 			// Update the attached file to point to the scaled version.
 			// This writes to _wp_attached_file meta, not _wp_attachment_metadata.
