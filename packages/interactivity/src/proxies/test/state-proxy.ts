@@ -919,7 +919,7 @@ describe( 'Interactivity API', () => {
 						let tag = 'No scope';
 						try {
 							tag = getContext< any >().tag;
-						} catch ( e ) {}
+						} catch {}
 						return `${ tag }: ${ this.number }`;
 					},
 				} );

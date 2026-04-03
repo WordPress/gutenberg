@@ -771,8 +771,7 @@ supports: {
 
 Indicates if the block is using Interactivity API features.
 
-The `clientNavigation` sub-property indicates whether a block is compatible with the Interactivity API client-side navigation.
-Set it to true only if the block is not interactive or if it is interactive using the Interactivity API. Set it to false if the block is interactive but uses vanilla JS, jQuery or another JS framework/library other than the Interactivity API.
+The `clientNavigation` sub-property indicates whether a block is compatible with the Interactivity API client-side navigation. See the [Client-Side Navigation Compatibility](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility.md) guide for details.
 
 The `interactive` sub-property indicates whether the block is using the Interactivity API directives.
 

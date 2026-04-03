@@ -18,7 +18,10 @@
 	}
 
 	.description {
-		margin: 0;
+		--_gcd-p-font-size: var(--wpds-font-size-sm);
+		--_gcd-p-line-height: var(--wpds-font-line-height-xs);
+		--_gcd-p-margin: 0;
+
 		font-family: var(--wpds-font-family-body);
 		font-size: var(--wpds-font-size-sm);
 		line-height: var(--wpds-font-line-height-xs);

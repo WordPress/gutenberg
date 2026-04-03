@@ -45,7 +45,12 @@ import {
 
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
 
-type LogFunction = ( message: string, debug?: object ) => void;
+type LogFunction = (
+	message: string,
+	debug?: object,
+	errorLevel?: 'error' | 'log' | 'warn',
+	force?: boolean
+) => void;
 
 interface PollingManager {
 	registerRoom: ( options: RegisterRoomOptions ) => void;
@@ -447,23 +452,39 @@ function poll(): void {
 				roomState.processAwarenessUpdate( room.awareness );
 
 				// If there is another collaborator on the primary entity,
-				// resume the queue for the next poll and increase polling
-				// frequency. We only check the primary room to avoid false
-				// positives from shared collection rooms (e.g. taxonomy/category).
+				// resume all room queues for the next poll and increase
+				// polling frequency. We only check the primary room to
+				// avoid false positives from shared collection rooms
+				// (e.g. taxonomy/category), but resume all queues so
+				// collection rooms (e.g. root/comment) can also sync.
 				if (
 					roomState.isPrimaryRoom &&
 					Object.keys( room.awareness ).length > 1
 				) {
 					hasCollaborators = true;
-					roomState.updateQueue.resume();
+					roomStates.forEach( ( state ) => {
+						state.updateQueue.resume();
+					} );
 				}
 
 				// Process each incoming update and collect any responses.
-				const responseUpdates = room.updates
-					.map( ( update ) => roomState.processDocUpdate( update ) )
-					.filter( ( update ): update is SyncUpdate =>
-						Boolean( update )
-					);
+				const responseUpdates: SyncUpdate[] = [];
+				for ( const update of room.updates ) {
+					try {
+						const response = roomState.processDocUpdate( update );
+						if ( response ) {
+							responseUpdates.push( response );
+						}
+					} catch ( error ) {
+						roomState.log(
+							'Failed to apply sync update',
+							{ error, update },
+							'error',
+							true // force
+						);
+					}
+				}
+
 				roomState.updateQueue.addBulk( responseUpdates );
 
 				// Respond to compaction requests from server. The server asks only one
@@ -501,20 +522,35 @@ function poll(): void {
 				MAX_ERROR_BACKOFF_IN_MS
 			);
 
-			// Restore updates to queues on failure so they can be retried.
+			// Recover from the failed request. We don't know whether the server stored
+			// our updates before the error occurred (e.g. a network timeout after a
+			// successful write). Re-sending the same updates via restore() would
+			// duplicate them on the server and cause unbounded storage growth.
+			//
+			// Instead, for rooms that had outgoing updates, replace the queue with a
+			// single compaction (full document state). This is idempotent: if the
+			// server already stored the updates, the compaction safely supersedes
+			// them; if it didn't, the compaction includes them. Updates not seen by
+			// this client are preserved in both cases.
 			for ( const room of payload.rooms ) {
 				if ( ! roomStates.has( room.room ) ) {
 					continue;
 				}
 
 				const state = roomStates.get( room.room )!;
-				state.updateQueue.restore( room.updates );
+
+				if ( room.updates.length > 0 && state.endCursor > 0 ) {
+					state.updateQueue.clear();
+					state.updateQueue.add( state.createCompactionUpdate() );
+				} else if ( room.updates.length > 0 ) {
+					state.updateQueue.restore( room.updates );
+				}
+
 				state.log(
 					'Error posting sync update, will retry with backoff',
-					{
-						error,
-						nextPoll: pollInterval,
-					}
+					{ error, nextPoll: pollInterval },
+					'error',
+					true // force
 				);
 			}
 

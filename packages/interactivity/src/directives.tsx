@@ -782,7 +782,7 @@ export default () => {
 								? ''
 								: result;
 						return;
-					} catch ( err ) {}
+					} catch {}
 				}
 				/*
 				 * aria- and data- attributes have no boolean representation.
@@ -858,7 +858,7 @@ export default () => {
 				}
 				element.props.children =
 					typeof result === 'object' ? null : result.toString();
-			} catch ( e ) {
+			} catch {
 				element.props.children = null;
 			}
 		} );

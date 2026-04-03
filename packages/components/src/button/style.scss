@@ -391,6 +391,14 @@
 		}
 	}
 
+	// Hide focus outline on :active to provide click feedback in forced-colors
+	// mode, where box-shadow is not visible. Higher specificity (0,3,0)
+	// ensures this wins over variant outline declarations. Placed after
+	// .is-pressed to also win by source order at equal specificity (0,3,0).
+	&:focus:active {
+		outline: none;
+	}
+
 	svg {
 		fill: currentColor;
 		outline: none;
