@@ -28,6 +28,13 @@ function BlockHTML( { clientId } ) {
 		[ clientId ]
 	);
 	const { updateBlock } = useDispatch( blockEditorStore );
+
+	// Derive block content as a primitive string so the effect only fires
+	// when the serialized content genuinely changes, not when the block
+	// object reference changes (which happens on every RESET_BLOCKS during
+	// RTC sync, even for unchanged blocks).
+	const blockContent = block ? getBlockContent( block ) : '';
+
 	const onChange = () => {
 		const blockType = getBlockType( block.name );
 
@@ -64,8 +71,8 @@ function BlockHTML( { clientId } ) {
 	};
 
 	useEffect( () => {
-		setHtml( getBlockContent( block ) );
-	}, [ block ] );
+		setHtml( blockContent );
+	}, [ blockContent ] );
 
 	return (
 		<TextareaAutosize
