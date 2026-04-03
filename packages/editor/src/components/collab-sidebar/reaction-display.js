@@ -8,9 +8,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { SVG, Path } from '@wordpress/primitives';
-import { useSelect } from '@wordpress/data';
-import { useMemo, useState } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -45,34 +43,29 @@ const smileyIcon = (
 /**
  * Get the count of reactions for a specific slug.
  *
- * @param {Object} reactions The reactions object (keyed by slug).
+ * @param {Object} reactions The reactions summary (keyed by slug).
  * @param {string} slug      The reaction slug to count.
  * @return {number} The count of reactions.
  */
 function getReactionCount( reactions, slug ) {
-	return reactions?.[ slug ]?.length || 0;
+	return reactions?.[ slug ]?.count || 0;
 }
 
 /**
  * Check if the current user has reacted with a specific slug.
  *
- * @param {Object} reactions     The reactions object (keyed by slug).
- * @param {string} slug          The reaction slug to check.
- * @param {number} currentUserId The current user's ID.
+ * @param {Object} reactions The reactions summary (keyed by slug).
+ * @param {string} slug      The reaction slug to check.
  * @return {boolean} Whether the user has reacted.
  */
-function hasUserReacted( reactions, slug, currentUserId ) {
-	return (
-		reactions?.[ slug ]?.some(
-			( reaction ) => reaction.userId === currentUserId
-		) || false
-	);
+function hasUserReacted( reactions, slug ) {
+	return reactions?.[ slug ]?.reacted || false;
 }
 
 /**
  * Get all reaction slugs that have reactions.
  *
- * @param {Object} reactions The reactions object (keyed by slug).
+ * @param {Object} reactions The reactions summary (keyed by slug).
  * @return {string[]} Array of slugs with reactions.
  */
 function getReactedSlugs( reactions ) {
@@ -80,61 +73,7 @@ function getReactedSlugs( reactions ) {
 		return [];
 	}
 	return Object.keys( reactions ).filter(
-		( slug ) => reactions[ slug ]?.length > 0
-	);
-}
-
-/**
- * Generate GitHub-style tooltip text for a reaction.
- *
- * @param {Object} users   Map of user data by ID.
- * @param {Array}  userIds Array of user IDs who reacted.
- * @param {string} slug    The reaction slug.
- * @param {Array}  emojis  The emoji list to look up labels from.
- * @return {string} The tooltip text.
- */
-function getReactionTooltipText( users, userIds, slug, emojis ) {
-	const names = userIds
-		.map( ( id ) => users?.[ id ]?.name )
-		.filter( Boolean );
-
-	if ( names.length === 0 ) {
-		return '';
-	}
-
-	const emojiLabel = getLabelBySlug( slug, emojis );
-
-	if ( names.length === 1 ) {
-		return sprintf(
-			/* translators: 1: user name, 2: emoji label. */
-			__( '%1$s reacted with %2$s emoji' ),
-			names[ 0 ],
-			emojiLabel
-		);
-	}
-
-	if ( names.length === 2 ) {
-		return sprintf(
-			/* translators: 1: first user name, 2: second user name, 3: emoji label. */
-			__( '%1$s and %2$s reacted with %3$s emoji' ),
-			names[ 0 ],
-			names[ 1 ],
-			emojiLabel
-		);
-	}
-
-	const othersCount = names.length - 2;
-	return sprintf(
-		/* translators: 1: first user name, 2: second user name, 3: number of other users, 4: emoji label. */
-		_n(
-			'%1$s, %2$s, and %3$d other reacted with %4$s emoji',
-			'%1$s, %2$s, and %3$d others reacted with %4$s emoji',
-			othersCount
-		),
-		names[ 0 ],
-		names[ 1 ],
-		othersCount,
-		emojiLabel
+		( slug ) => reactions[ slug ]?.count > 0
 	);
 }
 
@@ -142,58 +81,12 @@ function getReactionTooltipText( users, userIds, slug, emojis ) {
  * Display current reactions with counts as pill-shaped buttons.
  *
  * @param {Object}   props                  Component props.
- * @param {Object}   props.reactions        The reactions object from comment meta.
+ * @param {Object}   props.reactions        The reaction summary (keyed by slug).
  * @param {Function} props.onToggleReaction Callback to toggle a reaction.
  */
 export default function ReactionDisplay( { reactions, onToggleReaction } ) {
 	const emojis = useReactionEmojis();
-	const currentUserId = useSelect( ( select ) => {
-		const { getCurrentUser } = select( coreStore );
-		const user = getCurrentUser();
-		return user?.id;
-	}, [] );
 	const reactedSlugs = getReactedSlugs( reactions );
-
-	// Collect all unique user IDs from reactions.
-	const userIdArray = useMemo( () => {
-		if ( ! reactions ) {
-			return [];
-		}
-		const userIdSet = new Set();
-		Object.values( reactions ).forEach( ( reactionList ) => {
-			reactionList?.forEach( ( reaction ) => {
-				if ( reaction.userId ) {
-					userIdSet.add( reaction.userId );
-				}
-			} );
-		} );
-		return Array.from( userIdSet ).sort( ( a, b ) => a - b );
-	}, [ reactions ] );
-
-	// Fetch user data for all users who reacted.
-	const users = useSelect(
-		( select ) => {
-			if ( ! userIdArray.length ) {
-				return {};
-			}
-			const { getUsers } = select( coreStore );
-			const userList = getUsers( {
-				include: userIdArray,
-				context: 'view',
-				_fields: 'id,name',
-				per_page: -1,
-			} );
-			if ( ! userList ) {
-				return {};
-			}
-			const userData = {};
-			userList.forEach( ( user ) => {
-				userData[ user.id ] = user;
-			} );
-			return userData;
-		},
-		[ userIdArray ]
-	);
 
 	if ( reactedSlugs.length === 0 ) {
 		return null;
@@ -203,36 +96,16 @@ export default function ReactionDisplay( { reactions, onToggleReaction } ) {
 		<HStack spacing="1" justify="flex-start" expanded={ false } wrap>
 			{ reactedSlugs.map( ( slug ) => {
 				const count = getReactionCount( reactions, slug );
-				const isActive = hasUserReacted(
-					reactions,
-					slug,
-					currentUserId
-				);
+				const isActive = hasUserReacted( reactions, slug );
 				const emoji = getEmojiBySlug( slug, emojis );
+				const emojiLabel = getLabelBySlug( slug, emojis );
 
-				const reactionUserIds = ( reactions?.[ slug ] || [] ).map(
-					( r ) => r.userId
+				const buttonLabel = sprintf(
+					/* translators: 1: emoji label, 2: count of reactions */
+					_n( '%1$s, %2$d reaction', '%1$s, %2$d reactions', count ),
+					emojiLabel,
+					count
 				);
-				const tooltipText = getReactionTooltipText(
-					users,
-					reactionUserIds,
-					slug,
-					emojis
-				);
-
-				// Use tooltip text when user data is loaded, otherwise fall back to basic label.
-				const buttonLabel = tooltipText
-					? tooltipText
-					: sprintf(
-							/* translators: 1: emoji, 2: count of reactions */
-							_n(
-								'%1$s, %2$d reaction',
-								'%1$s, %2$d reactions',
-								count
-							),
-							emoji,
-							count
-					  );
 
 				return (
 					<Button
