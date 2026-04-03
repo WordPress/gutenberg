@@ -139,7 +139,7 @@ export function matcher( selector ) {
 
 		try {
 			return fromDOM( match );
-		} catch ( error ) {
+		} catch {
 			return null;
 		}
 	};

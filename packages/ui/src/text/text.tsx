@@ -19,6 +19,7 @@ export const Text = forwardRef< HTMLSpanElement, TextProps >( function Text(
 		ref,
 		props: mergeProps< 'span' >( props, {
 			className: clsx(
+				styles.text,
 				variant.startsWith( 'heading-' ) && defenseStyles.heading,
 				variant.startsWith( 'body-' ) && defenseStyles.p,
 				styles[ variant ],

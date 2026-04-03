@@ -3,9 +3,11 @@
  *
  * @param {'polite'|'assertive'} [ariaLive] Value for the 'aria-live' attribute; default: 'polite'.
  *
- * @return {HTMLDivElement} The ARIA live region HTML element.
+ * @return The ARIA live region HTML element.
  */
-export default function addContainer( ariaLive = 'polite' ) {
+export default function addContainer(
+	ariaLive: string = 'polite'
+): HTMLDivElement {
 	const container = document.createElement( 'div' );
 	container.id = `a11y-speak-${ ariaLive }`;
 	container.className = 'a11y-speak-region';

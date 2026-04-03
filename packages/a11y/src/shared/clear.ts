@@ -1,7 +1,7 @@
 /**
  * Clears the a11y-speak-region elements and hides the explanatory text.
  */
-export default function clear() {
+export default function clear(): void {
 	const regions = document.getElementsByClassName( 'a11y-speak-region' );
 	const introText = document.getElementById( 'a11y-speak-intro-text' );
 

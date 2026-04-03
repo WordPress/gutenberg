@@ -189,7 +189,7 @@ export function getBackgroundVideoSrc( src ) {
 		}
 
 		return url.toString();
-	} catch ( error ) {
+	} catch {
 		// If URL parsing fails, return original src
 		return src;
 	}

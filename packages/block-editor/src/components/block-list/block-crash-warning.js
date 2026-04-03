@@ -14,4 +14,6 @@ const warning = (
 	</Warning>
 );
 
-export default () => warning;
+export default function BlockCrashWarning() {
+	return warning;
+}
