@@ -111,8 +111,8 @@ function render_block_core_icon( $attributes ) {
 
 	// Apply transform styles directly to the SVG.
 	if ( ! empty( $transform_styles['transform'] ) ) {
-		$current_style = $processor->get_attribute( 'style' ) ?: '';
-		$transform_css  = 'transform: ' . $transform_styles['transform'] . ';';
+		$current_style = $processor->get_attribute( 'style' ) ?? '';
+		$transform_css = 'transform: ' . $transform_styles['transform'] . ';';
 		if ( $current_style ) {
 			$processor->set_attribute( 'style', $current_style . ' ' . $transform_css );
 		} else {
