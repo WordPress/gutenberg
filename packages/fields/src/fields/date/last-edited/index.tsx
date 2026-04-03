@@ -16,6 +16,7 @@ const lastEditedDateField: Field< BasePost > = {
 	label: __( 'Last edited' ),
 	render: LastEditedDateView,
 	getValue: ( { item } ) => item.modified,
+	isVisible: ( item ) => !! item.modified,
 	readOnly: true,
 	enableHiding: false,
 	enableSorting: false,
