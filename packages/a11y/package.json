@@ -45,10 +45,6 @@
 	"wpScript": true,
 	"wpScriptModuleExports": "./build-module/module/index.mjs",
 	"types": "build-types",
-	"sideEffects": [
-		"./src/index.ts",
-		"./build-module/index.js"
-	],
 	"dependencies": {
 		"@wordpress/dom-ready": "file:../dom-ready",
 		"@wordpress/i18n": "file:../i18n"
