@@ -31,10 +31,7 @@ function _gutenberg_connectors_init(): void {
 			'description'    => __( 'Protect your site from spam.', 'gutenberg' ),
 			'type'           => 'spam_filtering',
 			'plugin'         => array(
-				'file'      => 'akismet/akismet.php',
-				'is_active' => function () {
-					return defined( 'AKISMET_VERSION' ) && class_exists( 'Akismet', false );
-				},
+				'file' => 'akismet/akismet.php',
 			),
 			'authentication' => array(
 				'method'          => 'api_key',
@@ -527,14 +524,22 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 		);
 
 		if ( ! empty( $connector_data['plugin']['file'] ) ) {
-			$file = $connector_data['plugin']['file'];
+			$file         = $connector_data['plugin']['file'];
+			$is_installed = false;
+			$is_activated = false;
 
 			if ( ! empty( $connector_data['plugin']['is_active'] ) && is_callable( $connector_data['plugin']['is_active'] ) ) {
 				$is_activated = (bool) call_user_func( $connector_data['plugin']['is_active'] );
-				$is_installed = $is_activated;
+			}
+
+			if ( ! $is_activated ) {
+				$is_activated = is_plugin_active( $file );
+			}
+
+			if ( $is_activated ) {
+				$is_installed = true;
 			} else {
 				$is_installed = file_exists( WP_PLUGIN_DIR . '/' . $file );
-				$is_activated = $is_installed && is_plugin_active( $file );
 			}
 
 			$connector_out['plugin'] = array(
