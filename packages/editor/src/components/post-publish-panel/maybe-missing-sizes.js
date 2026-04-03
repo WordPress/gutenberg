@@ -3,11 +3,11 @@
  */
 import { PanelBody, Button, Spinner } from '@wordpress/components';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as uploadStore } from '@wordpress/upload-media';
-import { useState } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,10 +17,21 @@ import { getImageAttachmentIds } from '../provider/use-missing-sizes-check';
 
 export default function MaybeMissingSizesPanel() {
 	const [ isGenerating, setIsGenerating ] = useState( false );
+	const [ progress, setProgress ] = useState( { current: 0, total: 0 } );
+	const checkIntervalRef = useRef( null );
 	const registry = useRegistry();
 	const { invalidateResolution } = useDispatch( coreStore );
 
 	const isEnabled = !! window.__clientSideMediaProcessing;
+
+	// Clean up polling interval on unmount.
+	useEffect( () => {
+		return () => {
+			if ( checkIntervalRef.current ) {
+				clearInterval( checkIntervalRef.current );
+			}
+		};
+	}, [] );
 
 	const blocks = useSelect(
 		( select ) => {
@@ -55,12 +66,14 @@ export default function MaybeMissingSizesPanel() {
 		[ isEnabled, blocks ]
 	);
 
-	if ( ! attachmentsWithMissingSizes.length ) {
+	if ( ! isGenerating && ! attachmentsWithMissingSizes.length ) {
 		return null;
 	}
 
 	async function generateAllMissingSizes() {
+		const total = attachmentsWithMissingSizes.length;
 		setIsGenerating( true );
+		setProgress( { current: 0, total } );
 
 		for ( const attachment of attachmentsWithMissingSizes ) {
 			unlock(
@@ -73,8 +86,8 @@ export default function MaybeMissingSizesPanel() {
 		}
 
 		// Poll for completion by checking if any attachments still have missing sizes.
-		const checkInterval = setInterval( async () => {
-			let allDone = true;
+		checkIntervalRef.current = setInterval( async () => {
+			let remaining = 0;
 			for ( const attachment of attachmentsWithMissingSizes ) {
 				await invalidateResolution( 'getEntityRecord', [
 					'postType',
@@ -84,16 +97,21 @@ export default function MaybeMissingSizesPanel() {
 				] );
 				const updated = registry
 					.select( coreStore )
-					.getEntityRecord( 'postType', 'attachment', attachment.id, {
-						context: 'edit',
-					} );
+					.getEntityRecord(
+						'postType',
+						'attachment',
+						attachment.id,
+						{ context: 'edit' }
+					);
 				if ( updated?.missing_image_sizes?.length ) {
-					allDone = false;
-					break;
+					remaining++;
 				}
 			}
-			if ( allDone ) {
-				clearInterval( checkInterval );
+			const completed = total - remaining;
+			setProgress( { current: completed, total } );
+			if ( remaining === 0 ) {
+				clearInterval( checkIntervalRef.current );
+				checkIntervalRef.current = null;
 				setIsGenerating( false );
 			}
 		}, 3000 );
@@ -108,12 +126,33 @@ export default function MaybeMissingSizesPanel() {
 
 	return (
 		<PanelBody initialOpen title={ panelBodyTitle }>
-			<p>{ __( 'Some images are missing sub sizes.' ) }</p>
+			<p>
+				{ sprintf(
+					/* translators: %d: number of images with missing sub-sizes */
+					__( '%d image(s) are missing sub-sizes.' ),
+					attachmentsWithMissingSizes.length
+				) }
+			</p>
 			{ isGenerating ? (
-				<Spinner />
+				<>
+					<Spinner />
+					<span style={ { marginLeft: '8px' } }>
+						{ sprintf(
+							/* translators: 1: current image number, 2: total images */
+							__(
+								'Generating missing sizes for image %1$d of %2$d'
+							),
+							progress.current + 1,
+							progress.total
+						) }
+					</span>
+				</>
 			) : (
-				<Button variant="link" onClick={ generateAllMissingSizes }>
-					{ __( 'Generate' ) }
+				<Button
+					variant="secondary"
+					onClick={ generateAllMissingSizes }
+				>
+					{ __( 'Generate missing sizes' ) }
 				</Button>
 			) }
 		</PanelBody>

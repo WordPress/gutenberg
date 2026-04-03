@@ -159,46 +159,4 @@ figure.wp-block-image:not(.wp-block) {
 	width: 250px;
 }
 
-// Missing image sizes indicator overlay.
-.wp-block-image__missing-sizes-indicator {
-	position: absolute;
-	top: $grid-unit-10;
-	right: $grid-unit-10;
-	z-index: 1;
-}
-
-.wp-block-image__missing-sizes-button {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background: rgba($black, 0.5);
-	border: none;
-	border-radius: $radius-small;
-	padding: $grid-unit-05;
-	cursor: pointer;
-	color: $white;
-
-	&:hover {
-		background: rgba($black, 0.7);
-	}
-
-	svg {
-		fill: currentColor;
-	}
-
-	.components-spinner {
-		position: static;
-		transform: none;
-		margin: 0;
-	}
-}
-
-.wp-block-image__missing-sizes-content {
-	padding: $grid-unit-15;
-	min-width: 200px;
-
-	p {
-		margin: 0 0 $grid-unit-10;
-	}
-}
 
