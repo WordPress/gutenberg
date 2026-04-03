@@ -5,12 +5,29 @@ import type { ComponentProps } from '../utils/types';
 export interface RootProps
 	extends Pick<
 		_Popover.Root.Props,
-		'open' | 'onOpenChange' | 'defaultOpen' | 'modal'
+		'open' | 'onOpenChange' | 'defaultOpen'
 	> {
 	/**
 	 * The popover sub-components (`Popover.Trigger`, `Popover.Popup`, etc.).
 	 */
 	children?: ReactNode;
+
+	/**
+	 * Controls modality and focus trapping.
+	 *
+	 * - `false` (default) — the popover is non-modal; outside elements remain
+	 *   interactive and focus can leave the popup freely.
+	 * - `true` — full modal behavior: outside interactions are blocked and
+	 *   focus is trapped inside the popup.
+	 * - `'trap-focus'` — focus is trapped inside the popup, but outside
+	 *   interactions (click, scroll) are still allowed.
+	 *
+	 * **Important:** when `modal` is `true` or `'trap-focus'`, a
+	 * `Popover.Close` button must be rendered inside `Popover.Popup` so
+	 * that focus can cycle correctly and the user has a way to dismiss
+	 * the popover.
+	 */
+	modal?: _Popover.Root.Props[ 'modal' ];
 }
 
 export interface TriggerProps
