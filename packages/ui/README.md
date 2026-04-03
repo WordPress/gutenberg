@@ -44,6 +44,8 @@ npm install @wordpress/theme
 import '@wordpress/theme/design-tokens.css';
 ```
 
+This stylesheet is universal and does not have a separate RTL version.
+
 Also, to ensure that portaled popovers appear correctly, add these isolation styles to your application's layout root element:
 
 ```css
