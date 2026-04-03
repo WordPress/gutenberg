@@ -24,7 +24,7 @@ Install using NPM:
 npm install @wordpress/ui
 ```
 
-## Set up
+## Setup
 
 As an implementation of the design system and companion to the `@wordpress/theme` package, these components depend on CSS custom properties defined by the theme package. What you need to set up depends on whether you're building for a WordPress context, and how much of the theming features you want to use.
 

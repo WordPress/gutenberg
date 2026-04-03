@@ -12,7 +12,7 @@ Install the module
 npm install @wordpress/admin-ui --save
 ```
 
-## Set up
+## Setup
 
 This package requires CSS from this package and from multiple dependency packages.
 
