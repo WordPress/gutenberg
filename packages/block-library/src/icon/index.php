@@ -107,6 +107,18 @@ function render_block_core_icon( $attributes ) {
 		$processor->add_class( 'wp-block-icon--flip-vertical' );
 	}
 
+	$rotation = isset( $attributes['rotation'] ) ? (int) $attributes['rotation'] : 0;
+
+	if ( $rotation ) {
+		$current_style = $processor->get_attribute( 'style' ) ?? '';
+		$rotation_css  = '--wp-block-icon-rotation: ' . $rotation . 'deg;';
+		if ( $current_style ) {
+			$processor->set_attribute( 'style', $current_style . ' ' . $rotation_css );
+		} else {
+			$processor->set_attribute( 'style', $rotation_css );
+		}
+	}
+
 	$aria_label = ! empty( $attributes['ariaLabel'] ) ? $attributes['ariaLabel'] : '';
 
 	if ( ! $aria_label ) {

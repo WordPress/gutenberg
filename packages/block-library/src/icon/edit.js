@@ -18,6 +18,7 @@ import {
 import {
 	flipHorizontal as flipHorizontalIcon,
 	flipVertical as flipVerticalIcon,
+	rotateRight,
 } from '@wordpress/icons';
 import {
 	BlockControls,
@@ -62,7 +63,8 @@ const IconPlaceholder = ( { className, style } ) => (
 );
 
 export function Edit( { attributes, setAttributes } ) {
-	const { icon, ariaLabel, flipHorizontal, flipVertical } = attributes;
+	const { icon, ariaLabel, flipHorizontal, flipVertical, rotation } =
+		attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 
@@ -96,6 +98,10 @@ export function Edit( { attributes, setAttributes } ) {
 		'wp-block-icon--flip-vertical': flipVertical,
 	};
 
+	const rotationStyle = rotation
+		? { '--wp-block-icon-rotation': `${ rotation }deg` }
+		: {};
+
 	const blockControls = (
 		<>
 			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
@@ -127,6 +133,15 @@ export function Edit( { attributes, setAttributes } ) {
 							onClick={ () =>
 								setAttributes( {
 									flipVertical: ! flipVertical,
+								} )
+							}
+						/>
+						<ToolbarButton
+							icon={ rotateRight }
+							label={ __( 'Rotate' ) }
+							onClick={ () =>
+								setAttributes( {
+									rotation: ( ( rotation || 0 ) + 90 ) % 360,
 								} )
 							}
 						/>
@@ -225,6 +240,7 @@ export function Edit( { attributes, setAttributes } ) {
 								...borderProps.style,
 								...spacingProps.style,
 								...dimensionsProps.style,
+								...rotationStyle,
 							},
 						} }
 					/>
@@ -240,6 +256,7 @@ export function Edit( { attributes, setAttributes } ) {
 							...borderProps.style,
 							...spacingProps.style,
 							...dimensionsProps.style,
+							...rotationStyle,
 							height: 'auto',
 						} }
 					/>

@@ -19,6 +19,10 @@
 		"flipVertical": {
 			"type": "boolean",
 			"default": false
+		},
+		"rotation": {
+			"type": "number",
+			"default": 0
 		}
 	},
 	"supports": {
