@@ -606,7 +606,7 @@ class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Contr
 			rest_is_field_included( 'reaction_summary', $fields )
 		) {
 			// Run the same query logic as parent to get the comment IDs.
-			$registered       = $this->get_collection_params();
+			$registered         = $this->get_collection_params();
 			$parameter_mappings = array(
 				'author'         => 'author__in',
 				'author_email'   => 'author_email',
@@ -743,8 +743,8 @@ class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Contr
 				$this->reaction_summaries = null;
 			}
 
-			$data                       = $response->get_data();
-			$data['reaction_summary']   = $summary;
+			$data                     = $response->get_data();
+			$data['reaction_summary'] = $summary;
 			$response->set_data( $data );
 		}
 
