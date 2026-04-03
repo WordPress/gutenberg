@@ -31,7 +31,7 @@ const COLOR_OPTIONS: ThemeOption[] = [
 ];
 
 const CURSOR_CONTROL_OPTIONS: ThemeOption[] = [
-	{ id: '', title: 'Default' },
+	{ id: 'default', title: 'Default' },
 	{ id: 'pointer', title: 'Pointer' },
 ];
 
