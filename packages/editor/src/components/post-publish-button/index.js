@@ -111,6 +111,7 @@ export class PostPublishButton extends Component {
 			( isPublished ||
 				isSaving ||
 				! isSaveable ||
+				isPostSavingLocked ||
 				( ! isPublishable && ! forceIsDirty ) ) &&
 			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges );
 

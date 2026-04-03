@@ -181,9 +181,67 @@ test.describe( 'Upload save lock', () => {
 		await expect( saveDraftButton ).toBeEnabled( { timeout: 10_000 } );
 	} );
 
-	// Note: The Publish button's behavior with isPostSavingLocked is
-	// already covered by publishing.spec.js. We only test Save draft
-	// and keyboard shortcuts here.
+	test( 'should disable Publish button during a single image upload', async ( {
+		editor,
+		page,
+	} ) => {
+		const publishButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Publish', exact: true } );
+
+		// Publish should be enabled before upload.
+		await expect( publishButton ).toBeEnabled();
+
+		// Hold the upload request so we can verify the lock state.
+		let resolveUpload;
+		const uploadPromise = new Promise( ( resolve ) => {
+			resolveUpload = resolve;
+		} );
+		await page.route( '**/wp/v2/media', async ( route ) => {
+			await uploadPromise;
+			await route.continue();
+		} );
+
+		// Insert an image block and start uploading.
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		const tmpFile = await createTempImage();
+		await imageBlock
+			.locator( 'data-testid=form-file-upload-input' )
+			.setInputFiles( tmpFile );
+
+		// Wait for the lock to be set.
+		await expect
+			.poll(
+				() =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.isPostSavingLocked()
+					),
+				{ timeout: 10_000 }
+			)
+			.toBe( true );
+
+		// Publish button should be disabled while upload is in progress.
+		await expect( publishButton ).toBeDisabled();
+
+		// Let the upload complete.
+		resolveUpload();
+
+		// Wait for the image to finish uploading.
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+
+		// Publish button should be re-enabled after upload completes.
+		await expect( publishButton ).toBeEnabled( { timeout: 10_000 } );
+	} );
 
 	test( 'should prevent saving via keyboard shortcut during upload', async ( {
 		editor,
