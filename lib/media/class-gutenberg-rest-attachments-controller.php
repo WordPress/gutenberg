@@ -231,7 +231,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				$missing_image_sizes         = array_diff( $merged_sizes, array_keys( $metadata['sizes'] ) );
 				$data['missing_image_sizes'] = $missing_image_sizes;
 			}
-
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
