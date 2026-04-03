@@ -123,12 +123,16 @@ async function initializeAbilities(): Promise< void > {
 				// before registering on the client.
 				registerAbility( {
 					...ability,
-					input_schema: ability.input_schema
-						? sanitizeSchema( ability.input_schema )
-						: undefined,
-					output_schema: ability.output_schema
-						? sanitizeSchema( ability.output_schema )
-						: undefined,
+					input_schema:
+						ability.input_schema !== null &&
+						ability.input_schema !== undefined
+							? sanitizeSchema( ability.input_schema )
+							: undefined,
+					output_schema:
+						ability.output_schema !== null &&
+						ability.output_schema !== undefined
+							? sanitizeSchema( ability.output_schema )
+							: undefined,
 					callback: createServerCallback( ability ),
 					meta: {
 						annotations: {
