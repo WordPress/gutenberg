@@ -51,6 +51,30 @@ class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Contr
 			'readonly'    => true,
 		);
 
+		$schema['properties']['reaction_summary'] = array(
+			'description'          => __( 'Aggregated reaction counts for this note, keyed by emoji slug.', 'gutenberg' ),
+			'type'                 => 'object',
+			'context'              => array( 'view', 'edit' ),
+			'readonly'             => true,
+			'additionalProperties' => array(
+				'type'       => 'object',
+				'properties' => array(
+					'count'          => array(
+						'description' => __( 'Total number of reactions with this emoji.', 'gutenberg' ),
+						'type'        => 'integer',
+					),
+					'reacted'        => array(
+						'description' => __( 'Whether the current user reacted with this emoji.', 'gutenberg' ),
+						'type'        => 'boolean',
+					),
+					'my_reaction_id' => array(
+						'description' => __( 'The current user\'s reaction comment ID, or 0 if not reacted.', 'gutenberg' ),
+						'type'        => 'integer',
+					),
+				),
+			),
+		);
+
 		return $schema;
 	}
 
@@ -546,6 +570,183 @@ class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Contr
 
 		$response->set_status( 201 );
 		$response->header( 'Location', rest_url( sprintf( '%s/%s/%d', $this->namespace, $this->rest_base, $comment_id ) ) );
+
+		return $response;
+	}
+
+	/**
+	 * Pre-fetched reaction summaries for batch queries.
+	 *
+	 * Populated by get_items() to avoid N+1 queries when returning
+	 * multiple note comments.
+	 *
+	 * @since 7.1.0
+	 * @var array|null
+	 */
+	protected $reaction_summaries = null;
+
+	/**
+	 * Retrieves a collection of comments.
+	 *
+	 * Extends the parent to pre-fetch reaction summaries for all returned
+	 * note comments in a single batch query, avoiding N+1 queries.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or error object on failure.
+	 */
+	public function get_items( $request ) {
+		$fields = $this->get_fields_for_response( $request );
+
+		// Pre-fetch reaction summaries when requesting notes with reaction_summary field.
+		if (
+			! empty( $request['type'] ) &&
+			'note' === $request['type'] &&
+			rest_is_field_included( 'reaction_summary', $fields )
+		) {
+			// Run the same query logic as parent to get the comment IDs.
+			$registered       = $this->get_collection_params();
+			$parameter_mappings = array(
+				'author'         => 'author__in',
+				'author_email'   => 'author_email',
+				'author_exclude' => 'author__not_in',
+				'exclude'        => 'comment__not_in',
+				'include'        => 'comment__in',
+				'offset'         => 'offset',
+				'order'          => 'order',
+				'parent'         => 'parent__in',
+				'parent_exclude' => 'parent__not_in',
+				'per_page'       => 'number',
+				'post'           => 'post__in',
+				'search'         => 'search',
+				'status'         => 'status',
+				'type'           => 'type',
+			);
+
+			$prepared_args = array();
+			foreach ( $parameter_mappings as $api_param => $wp_param ) {
+				if ( isset( $registered[ $api_param ], $request[ $api_param ] ) ) {
+					$prepared_args[ $wp_param ] = $request[ $api_param ];
+				}
+			}
+
+			// Only fetch IDs for the pre-fetch query.
+			$prepared_args['fields'] = 'ids';
+
+			$query    = new WP_Comment_Query();
+			$note_ids = $query->query( $prepared_args );
+
+			if ( ! empty( $note_ids ) ) {
+				$this->prefetch_reaction_summaries( array_map( 'intval', $note_ids ) );
+			}
+		}
+
+		$response = parent::get_items( $request );
+
+		$this->reaction_summaries = null;
+
+		return $response;
+	}
+
+	/**
+	 * Pre-fetches reaction summaries for a set of note IDs.
+	 *
+	 * Runs a single aggregated query to build summaries for all notes,
+	 * avoiding N+1 queries in prepare_item_for_response().
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param int[] $note_ids Array of note comment IDs.
+	 */
+	protected function prefetch_reaction_summaries( $note_ids ) {
+		global $wpdb;
+
+		$this->reaction_summaries = array();
+
+		if ( empty( $note_ids ) ) {
+			return;
+		}
+
+		$current_user_id = get_current_user_id();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$results = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT comment_parent, comment_content, COUNT(*) AS reaction_count,
+				GROUP_CONCAT(CONCAT(comment_ID, ':', user_id) SEPARATOR ',') AS details
+				FROM {$wpdb->comments}
+				WHERE comment_parent IN (" . implode( ',', array_fill( 0, count( $note_ids ), '%d' ) ) . ')
+				AND comment_type = %s
+				AND comment_approved = %s
+				GROUP BY comment_parent, comment_content',
+				...array_merge( $note_ids, array( 'reaction', '1' ) )
+			)
+		);
+
+		// Initialize empty summaries for all note IDs.
+		foreach ( $note_ids as $note_id ) {
+			$this->reaction_summaries[ $note_id ] = array();
+		}
+
+		if ( ! $results ) {
+			return;
+		}
+
+		foreach ( $results as $row ) {
+			$note_id = (int) $row->comment_parent;
+			$slug    = wp_strip_all_tags( $row->comment_content );
+
+			$my_reaction_id = 0;
+			if ( $current_user_id && ! empty( $row->details ) ) {
+				$pairs = explode( ',', $row->details );
+				foreach ( $pairs as $pair ) {
+					list( $comment_id, $user_id ) = explode( ':', $pair );
+					if ( (int) $user_id === $current_user_id ) {
+						$my_reaction_id = (int) $comment_id;
+						break;
+					}
+				}
+			}
+
+			$this->reaction_summaries[ $note_id ][ $slug ] = array(
+				'count'          => (int) $row->reaction_count,
+				'reacted'        => $my_reaction_id > 0,
+				'my_reaction_id' => $my_reaction_id,
+			);
+		}
+	}
+
+	/**
+	 * Prepares a single comment output for response.
+	 *
+	 * Extends the parent to include reaction_summary for note comments.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param WP_Comment      $item    Comment object.
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response Response object.
+	 */
+	public function prepare_item_for_response( $item, $request ) {
+		$response = parent::prepare_item_for_response( $item, $request );
+		$fields   = $this->get_fields_for_response( $request );
+
+		if ( 'note' === $item->comment_type && rest_is_field_included( 'reaction_summary', $fields ) ) {
+			// Use pre-fetched data if available, otherwise query individually.
+			if ( null !== $this->reaction_summaries && isset( $this->reaction_summaries[ (int) $item->comment_ID ] ) ) {
+				$summary = $this->reaction_summaries[ (int) $item->comment_ID ];
+			} else {
+				$this->prefetch_reaction_summaries( array( (int) $item->comment_ID ) );
+				$summary = $this->reaction_summaries[ (int) $item->comment_ID ] ?? array();
+				// Reset so the next call also queries individually.
+				$this->reaction_summaries = null;
+			}
+
+			$data                       = $response->get_data();
+			$data['reaction_summary']   = $summary;
+			$response->set_data( $data );
+		}
 
 		return $response;
 	}
