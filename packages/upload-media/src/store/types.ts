@@ -303,8 +303,8 @@ export type AdditionalData = Record< string, unknown >;
 export interface SideloadAdditionalData extends AdditionalData {
 	/** The attachment ID to add the image size to. */
 	post: number;
-	/** The name of the image size being generated (e.g., 'thumbnail', 'medium'). */
-	image_size: string;
+	/** The name(s) of the image size being generated (e.g., 'thumbnail', 'medium'). When multiple size names share the same dimensions, an array can be passed to register one file under all names. */
+	image_size: string | string[];
 }
 
 export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif';

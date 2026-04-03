@@ -46,9 +46,20 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 							'type'        => 'integer',
 						),
 						'image_size' => array(
-							'description' => __( 'Image size.', 'gutenberg' ),
-							'type'        => 'string',
-							'enum'        => $valid_image_sizes,
+							'description' => __( 'Image size. Can be a single size name or an array of size names to register the same file under multiple sizes.', 'gutenberg' ),
+							'oneOf'       => array(
+								array(
+									'type' => 'string',
+									'enum' => $valid_image_sizes,
+								),
+								array(
+									'type'  => 'array',
+									'items' => array(
+										'type' => 'string',
+										'enum' => $valid_image_sizes,
+									),
+								),
+							),
 							'required'    => true,
 						),
 					),
@@ -474,7 +485,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		$type = $file['type'];
 		$path = $file['file'];
 
-		$image_size = $request['image_size'];
+		$image_sizes = (array) $request['image_size'];
 
 		$metadata = wp_get_attachment_metadata( $attachment_id, true );
 
@@ -482,34 +493,36 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$metadata = array();
 		}
 
-		if ( 'original' === $image_size ) {
-			$metadata['original_image'] = wp_basename( $path );
-		} elseif ( 'scaled' === $image_size ) {
-			// The current attached file is the original; record it as original_image.
-			$current_file               = get_attached_file( $attachment_id, true );
-			$metadata['original_image'] = wp_basename( $current_file );
+		foreach ( $image_sizes as $image_size ) {
+			if ( 'original' === $image_size ) {
+				$metadata['original_image'] = wp_basename( $path );
+			} elseif ( 'scaled' === $image_size ) {
+				// The current attached file is the original; record it as original_image.
+				$current_file               = get_attached_file( $attachment_id, true );
+				$metadata['original_image'] = wp_basename( $current_file );
 
-			// Update the attached file to point to the scaled version.
-			update_attached_file( $attachment_id, $path );
+				// Update the attached file to point to the scaled version.
+				update_attached_file( $attachment_id, $path );
 
-			$size = wp_getimagesize( $path );
+				$size = wp_getimagesize( $path );
 
-			$metadata['width']    = $size ? $size[0] : 0;
-			$metadata['height']   = $size ? $size[1] : 0;
-			$metadata['filesize'] = wp_filesize( $path );
-			$metadata['file']     = _wp_relative_upload_path( $path );
-		} else {
-			$metadata['sizes'] = $metadata['sizes'] ?? array();
+				$metadata['width']    = $size ? $size[0] : 0;
+				$metadata['height']   = $size ? $size[1] : 0;
+				$metadata['filesize'] = wp_filesize( $path );
+				$metadata['file']     = _wp_relative_upload_path( $path );
+			} else {
+				$metadata['sizes'] = $metadata['sizes'] ?? array();
 
-			$size = wp_getimagesize( $path );
+				$size = wp_getimagesize( $path );
 
-			$metadata['sizes'][ $image_size ] = array(
-				'width'     => $size ? $size[0] : 0,
-				'height'    => $size ? $size[1] : 0,
-				'file'      => wp_basename( $path ),
-				'mime-type' => $type,
-				'filesize'  => wp_filesize( $path ),
-			);
+				$metadata['sizes'][ $image_size ] = array(
+					'width'     => $size ? $size[0] : 0,
+					'height'    => $size ? $size[1] : 0,
+					'file'      => wp_basename( $path ),
+					'mime-type' => $type,
+					'filesize'  => wp_filesize( $path ),
+				);
+			}
 		}
 
 		wp_update_attachment_metadata( $attachment_id, $metadata );

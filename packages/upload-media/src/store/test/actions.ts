@@ -725,6 +725,50 @@ describe( 'actions', () => {
 			expect( mediumItems ).toHaveLength( 1 );
 		} );
 
+		it( 'should deduplicate sizes with the same dimensions', async () => {
+			mockCreateImageBitmap( 800, 600 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150, crop: true },
+					medium: { width: 300, height: 300, crop: false },
+					// 'custom' has the same dimensions as 'medium'.
+					custom: { width: 300, height: 300, crop: false },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration( {
+				attachment: {
+					missing_image_sizes: [ 'thumbnail', 'medium', 'custom' ],
+				},
+			} );
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			// Should have the original item plus 2 sideload items (not 3),
+			// because medium and custom share the same dimensions.
+			const sideloadItems = allItems.filter(
+				( i ) => i.parentId === item.id
+			);
+			expect( sideloadItems ).toHaveLength( 2 );
+
+			// The deduplicated group should pass both size names.
+			const mediumCustomItem = sideloadItems.find( ( i ) =>
+				Array.isArray( i.additionalData?.image_size )
+			);
+			expect( mediumCustomItem ).toBeDefined();
+			expect( mediumCustomItem!.additionalData!.image_size ).toEqual( [
+				'medium',
+				'custom',
+			] );
+		} );
+
 		it( 'should skip thumbnail generation when item has no attachment', async () => {
 			// Add an item without going through the attachment setup.
 			unlock( registry.dispatch( uploadStore ) ).addItem( {

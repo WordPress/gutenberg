@@ -1167,6 +1167,11 @@ export function generateThumbnails( id: QueueItemId ) {
 				);
 			}
 
+			// Group sizes by dimensions to avoid creating duplicate files.
+			// When multiple size names have the same width/height/crop,
+			// only one physical file is generated and registered under
+			// all matching size names via a single sideload request.
+			const dimensionGroups = new Map< string, string[] >();
 			for ( const name of sizesToGenerate ) {
 				const imageSize = allImageSizes[ name ];
 				if ( ! imageSize ) {
@@ -1176,6 +1181,17 @@ export function generateThumbnails( id: QueueItemId ) {
 					);
 					continue;
 				}
+				const key = `${ imageSize.width }x${ imageSize.height }x${ imageSize.crop }`;
+				const group = dimensionGroups.get( key );
+				if ( group ) {
+					group.push( name );
+				} else {
+					dimensionGroups.set( key, [ name ] );
+				}
+			}
+
+			for ( const [ , names ] of dimensionGroups ) {
+				const imageSize = allImageSizes[ names[ 0 ] ];
 
 				// Build operations list for this thumbnail.
 				const thumbnailOperations: Operation[] = [
@@ -1189,6 +1205,10 @@ export function generateThumbnails( id: QueueItemId ) {
 				}
 
 				thumbnailOperations.push( OperationType.Upload );
+
+				// Pass all size names so the server registers the same
+				// file under every matching size name in metadata.
+				const imageSizeParam = names.length === 1 ? names[ 0 ] : names;
 
 				dispatch.addSideloadItem( {
 					file,
@@ -1210,7 +1230,7 @@ export function generateThumbnails( id: QueueItemId ) {
 						// Sideloading does not use the parent post ID but the
 						// attachment ID as the image sizes need to be added to it.
 						post: attachment.id,
-						image_size: name,
+						image_size: imageSizeParam,
 						convert_format: false,
 					},
 					operations: thumbnailOperations,
