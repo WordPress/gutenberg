@@ -68,9 +68,41 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					'callback'            => array( $this, 'finalize_item' ),
 					'permission_callback' => array( $this, 'edit_media_item_permissions_check' ),
 					'args'                => array(
-						'id' => array(
+						'id'        => array(
 							'description' => __( 'Unique identifier for the attachment.', 'gutenberg' ),
 							'type'        => 'integer',
+						),
+						'sub_sizes' => array(
+							'description' => __( 'Array of sub-size metadata collected from sideload responses.', 'gutenberg' ),
+							'type'        => 'array',
+							'default'     => array(),
+							'items'       => array(
+								'type'       => 'object',
+								'properties' => array(
+									'image_size'     => array(
+										'type'     => 'string',
+										'required' => true,
+									),
+									'width'          => array(
+										'type' => 'integer',
+									),
+									'height'         => array(
+										'type' => 'integer',
+									),
+									'file'           => array(
+										'type' => 'string',
+									),
+									'mime_type'      => array(
+										'type' => 'string',
+									),
+									'filesize'       => array(
+										'type' => 'integer',
+									),
+									'original_image' => array(
+										'type' => 'string',
+									),
+								),
+							),
 						),
 					),
 				),
@@ -300,6 +332,35 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$metadata = array();
 		}
 
+		// Apply all sub-size metadata collected from sideload responses.
+		$sub_sizes = $request['sub_sizes'] ?? array();
+
+		foreach ( $sub_sizes as $sub_size ) {
+			$image_size = $sub_size['image_size'];
+
+			if ( 'original' === $image_size ) {
+				$metadata['original_image'] = $sub_size['file'];
+			} elseif ( 'scaled' === $image_size ) {
+				if ( ! empty( $sub_size['original_image'] ) ) {
+					$metadata['original_image'] = $sub_size['original_image'];
+				}
+				$metadata['width']    = $sub_size['width'] ?? 0;
+				$metadata['height']   = $sub_size['height'] ?? 0;
+				$metadata['filesize'] = $sub_size['filesize'] ?? 0;
+				$metadata['file']     = $sub_size['file'] ?? '';
+			} else {
+				$metadata['sizes'] = $metadata['sizes'] ?? array();
+
+				$metadata['sizes'][ $image_size ] = array(
+					'width'     => $sub_size['width'] ?? 0,
+					'height'    => $sub_size['height'] ?? 0,
+					'file'      => $sub_size['file'] ?? '',
+					'mime-type' => $sub_size['mime_type'] ?? '',
+					'filesize'  => $sub_size['filesize'] ?? 0,
+				);
+			}
+		}
+
 		/**
 		 * Filters the attachment metadata after client-side processing.
 		 *
@@ -476,104 +537,39 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		$image_size = $request['image_size'];
 
-		// Acquire a per-attachment transient lock to prevent concurrent sideloads
-		// from overwriting each other's metadata changes (read-modify-write race).
-		// Uses the same transient lock pattern as wp_maybe_generate_attachment_metadata().
-		$lock_key = 'wp_sideload_att_' . $attachment_id;
-
-		if ( ! $this->acquire_metadata_lock( $lock_key ) ) {
-			// Clean up the uploaded file since we cannot update metadata.
-			wp_delete_file( $path );
-			return new WP_Error(
-				'rest_upload_lock_timeout',
-				__( 'Could not acquire metadata lock for this attachment. Please try again.', 'gutenberg' ),
-				array( 'status' => 503 )
-			);
-		}
-
-		// Invalidate the object cache to read the latest metadata from the database.
-		wp_cache_delete( $attachment_id, 'post_meta' );
-
-		$metadata = wp_get_attachment_metadata( $attachment_id, true );
-
-		if ( ! $metadata ) {
-			$metadata = array();
-		}
+		// Build sub-size data to return to the client.
+		// The client accumulates these and sends them all to the finalize endpoint.
+		$sub_size_data = array(
+			'image_size' => $image_size,
+		);
 
 		if ( 'original' === $image_size ) {
-			$metadata['original_image'] = wp_basename( $path );
+			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( 'scaled' === $image_size ) {
-			// The current attached file is the original; record it as original_image.
-			$current_file               = get_attached_file( $attachment_id, true );
-			$metadata['original_image'] = wp_basename( $current_file );
+			// Record the current attached file as the original.
+			$current_file                     = get_attached_file( $attachment_id, true );
+			$sub_size_data['original_image']  = wp_basename( $current_file );
 
 			// Update the attached file to point to the scaled version.
+			// This writes to _wp_attached_file meta, not _wp_attachment_metadata.
 			update_attached_file( $attachment_id, $path );
 
 			$size = wp_getimagesize( $path );
 
-			$metadata['width']    = $size ? $size[0] : 0;
-			$metadata['height']   = $size ? $size[1] : 0;
-			$metadata['filesize'] = wp_filesize( $path );
-			$metadata['file']     = _wp_relative_upload_path( $path );
+			$sub_size_data['width']    = $size ? $size[0] : 0;
+			$sub_size_data['height']   = $size ? $size[1] : 0;
+			$sub_size_data['filesize'] = wp_filesize( $path );
+			$sub_size_data['file']     = _wp_relative_upload_path( $path );
 		} else {
-			$metadata['sizes'] = $metadata['sizes'] ?? array();
-
 			$size = wp_getimagesize( $path );
 
-			$metadata['sizes'][ $image_size ] = array(
-				'width'     => $size ? $size[0] : 0,
-				'height'    => $size ? $size[1] : 0,
-				'file'      => wp_basename( $path ),
-				'mime-type' => $type,
-				'filesize'  => wp_filesize( $path ),
-			);
+			$sub_size_data['width']     = $size ? $size[0] : 0;
+			$sub_size_data['height']    = $size ? $size[1] : 0;
+			$sub_size_data['file']      = wp_basename( $path );
+			$sub_size_data['mime_type'] = $type;
+			$sub_size_data['filesize']  = wp_filesize( $path );
 		}
 
-		wp_update_attachment_metadata( $attachment_id, $metadata );
-
-		delete_transient( $lock_key );
-
-		$response_request = new WP_REST_Request(
-			WP_REST_Server::READABLE,
-			rest_get_route_for_post( $attachment_id )
-		);
-
-		$response_request['context'] = 'edit';
-
-		if ( isset( $request['_fields'] ) ) {
-			$response_request['_fields'] = $request['_fields'];
-		}
-
-		$response = $this->prepare_item_for_response( get_post( $attachment_id ), $response_request );
-
-		$response->header( 'Location', rest_url( rest_get_route_for_post( $attachment_id ) ) );
-
-		return $response;
-	}
-
-	/**
-	 * Acquires a transient-based lock for attachment metadata updates.
-	 *
-	 * Uses the same transient lock pattern as wp_maybe_generate_attachment_metadata()
-	 * in WordPress core. Spins with brief pauses until the lock is available or
-	 * the timeout is reached.
-	 *
-	 * @param string $lock_key Transient key for the lock.
-	 * @param int    $timeout  Maximum wait time in seconds. Default 5.
-	 * @return bool True if the lock was acquired, false on timeout.
-	 */
-	private function acquire_metadata_lock( string $lock_key, int $timeout = 5 ): bool {
-		$start = time();
-
-		while ( get_transient( $lock_key ) ) {
-			if ( ( time() - $start ) >= $timeout ) {
-				return false;
-			}
-			usleep( 50000 ); // 50ms.
-		}
-
-		set_transient( $lock_key, time(), $timeout );
-		return true;
+		return rest_ensure_response( $sub_size_data );
 	}
 }
