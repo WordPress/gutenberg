@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentType } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
@@ -7,8 +12,14 @@ import { withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { STORE_NAME } from '../store/constants';
+import { store } from '../store';
 import type { WPAnnotation } from '../types';
+
+interface BlockListBlockProps {
+	clientId: string;
+	className?: string;
+	[ key: string ]: unknown;
+}
 
 /**
  * Adds annotation className to the block-list-block component.
@@ -16,28 +27,25 @@ import type { WPAnnotation } from '../types';
  * @param OriginalComponent The original BlockListBlock component.
  * @return The enhanced component.
  */
-const addAnnotationClassName = ( OriginalComponent: any ) => {
-	return ( withSelect as any )(
-		(
-			select: any,
-			{ clientId, className }: { clientId: string; className?: string }
-		) => {
-			const annotations: WPAnnotation[] =
-				select( STORE_NAME ).__experimentalGetAnnotationsForBlock(
-					clientId
-				);
+const addAnnotationClassName = (
+	OriginalComponent: ComponentType< any >
+) => {
+	return withSelect( ( select, ownProps ) => {
+		const { clientId, className } = ownProps as BlockListBlockProps;
+		const annotations: WPAnnotation[] = select( store ).__experimentalGetAnnotationsForBlock(
+			clientId
+		);
 
-			return {
-				className: annotations
-					.map( ( annotation ) => {
-						return 'is-annotated-by-' + annotation.source;
-					} )
-					.concat( className || '' )
-					.filter( Boolean )
-					.join( ' ' ),
-			};
-		}
-	)( OriginalComponent );
+		return {
+			className: annotations
+				.map( ( annotation ) => {
+					return 'is-annotated-by-' + annotation.source;
+				} )
+				.concat( className || '' )
+				.filter( Boolean )
+				.join( ' ' ),
+		};
+	} )( OriginalComponent );
 };
 
 addFilter(
