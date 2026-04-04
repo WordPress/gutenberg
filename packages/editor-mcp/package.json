@@ -1,0 +1,51 @@
+{
+	"name": "@wordpress/editor-mcp",
+	"version": "0.1.0",
+	"description": "MCP (Model Context Protocol) server for the Gutenberg Site Editor.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"mcp",
+		"editor",
+		"ai"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/editor-mcp/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/editor-mcp"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=20.10.0",
+		"npm": ">=10.2.3"
+	},
+	"files": [
+		"build",
+		"bin"
+	],
+	"type": "module",
+	"main": "build/index.js",
+	"bin": {
+		"wordpress-editor-mcp": "./bin/cli.js"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "~1.9.0",
+		"chrome-remote-interface": "^0.33.2"
+	},
+	"devDependencies": {
+		"@types/node": "^20.0.0",
+		"typescript": "^5.4.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch"
+	}
+}

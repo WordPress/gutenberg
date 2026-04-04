@@ -29,6 +29,7 @@
 		{ "path": "packages/e2e-test-utils-playwright" },
 		{ "path": "packages/edit-site" },
 		{ "path": "packages/editor" },
+		{ "path": "packages/editor-mcp" },
 		{ "path": "packages/element" },
 		{ "path": "packages/escape-html" },
 		{ "path": "packages/eslint-plugin" },
