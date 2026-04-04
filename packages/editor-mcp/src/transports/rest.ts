@@ -99,7 +99,7 @@ export class RESTTransport implements Transport {
 
 		const templates = await this.request< TemplateResult[] >(
 			'GET',
-			'/wp/v2/templates?per_page=1'
+			'/wp/v2/templates?per_page=1&context=edit'
 		);
 		if ( ! templates.length ) {
 			return [];
@@ -260,7 +260,7 @@ export class RESTTransport implements Transport {
 		}
 		const templates = await this.request< TemplateResult[] >(
 			'GET',
-			'/wp/v2/templates?per_page=1'
+			'/wp/v2/templates?per_page=1&context=edit'
 		);
 		if ( templates.length ) {
 			return { html: templates[ 0 ].content?.raw || '' };
@@ -282,7 +282,10 @@ export class RESTTransport implements Transport {
 		let index = 0;
 
 		while ( ( match = regex.exec( markup ) ) !== null ) {
-			const name = `core/${ match[ 1 ] }`;
+			const rawName = match[ 1 ];
+			const name = rawName.includes( '/' )
+				? rawName
+				: `core/${ rawName }`;
 			let attributes: Record< string, unknown > = {};
 			try {
 				if ( match[ 3 ] ) {

@@ -58,12 +58,23 @@ export class CDPTransport implements Transport {
 	}
 
 	async connect(): Promise< void > {
-		// Parse the target to get host/port
+		// Parse the target to get host/port and optional WebSocket path
 		const url = new URL( this.options.target );
 		const host = url.hostname || 'localhost';
 		const port = parseInt( url.port, 10 ) || 9222;
 
-		this.client = ( await CDP( { host, port } ) ) as unknown as CDPClient;
+		const cdpOptions: { host: string; port: number; target?: string } = {
+			host,
+			port,
+		};
+
+		// If a full WebSocket URL or path was provided, pass it as target
+		// so CDP connects to the specific page rather than picking one
+		if ( url.pathname && url.pathname !== '/' ) {
+			cdpOptions.target = this.options.target;
+		}
+
+		this.client = ( await CDP( cdpOptions ) ) as unknown as CDPClient;
 	}
 
 	async disconnect(): Promise< void > {
