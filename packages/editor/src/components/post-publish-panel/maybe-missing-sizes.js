@@ -97,12 +97,9 @@ export default function MaybeMissingSizesPanel() {
 				] );
 				const updated = registry
 					.select( coreStore )
-					.getEntityRecord(
-						'postType',
-						'attachment',
-						attachment.id,
-						{ context: 'edit' }
-					);
+					.getEntityRecord( 'postType', 'attachment', attachment.id, {
+						context: 'edit',
+					} );
 				if ( updated?.missing_image_sizes?.length ) {
 					remaining++;
 				}
@@ -149,6 +146,7 @@ export default function MaybeMissingSizesPanel() {
 				</>
 			) : (
 				<Button
+					__next40pxDefaultSize
 					variant="secondary"
 					onClick={ generateAllMissingSizes }
 				>

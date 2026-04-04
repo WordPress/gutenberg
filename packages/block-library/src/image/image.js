@@ -3,10 +3,8 @@
  */
 import { isBlobURL } from '@wordpress/blob';
 import {
-	Button,
 	ExternalLink,
 	FocalPointPicker,
-	Icon,
 	ResizableBox,
 	Spinner,
 	TextareaControl,
