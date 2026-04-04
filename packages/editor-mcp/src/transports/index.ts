@@ -7,5 +7,5 @@ export type {
 } from './types.js';
 export { CDPTransport } from './cdp.js';
 export type { CDPTransportOptions } from './cdp.js';
-export { RESTTransport } from './rest.js';
+export { RESTTransport, parseBlockMarkup, resetParserIds } from './rest.js';
 export type { RESTTransportOptions } from './rest.js';

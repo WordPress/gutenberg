@@ -2,7 +2,11 @@ export { createServer, startServer } from './server.js';
 export type { ServerOptions } from './server.js';
 export { CDPTransport } from './transports/cdp.js';
 export type { CDPTransportOptions } from './transports/cdp.js';
-export { RESTTransport } from './transports/rest.js';
+export {
+	RESTTransport,
+	parseBlockMarkup,
+	resetParserIds,
+} from './transports/rest.js';
 export type { RESTTransportOptions } from './transports/rest.js';
 export type {
 	Transport,
