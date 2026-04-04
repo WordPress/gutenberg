@@ -670,13 +670,13 @@ class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Contr
 
 		$current_user_id = get_current_user_id();
 
+		// Query 1: Get aggregated counts per emoji per note.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$results = $wpdb->get_results(
+		$counts = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT comment_parent, comment_content, COUNT(*) AS reaction_count,
-				GROUP_CONCAT(CONCAT(comment_ID, ':', user_id) SEPARATOR ',') AS details
-				FROM {$wpdb->comments}
-				WHERE comment_parent IN (" . implode( ',', array_fill( 0, count( $note_ids ), '%d' ) ) . ')
+				'SELECT comment_parent, comment_content, COUNT(*) AS reaction_count
+				FROM ' . $wpdb->comments . '
+				WHERE comment_parent IN (' . implode( ',', array_fill( 0, count( $note_ids ), '%d' ) ) . ')
 				AND comment_type = %s
 				AND comment_approved = %s
 				GROUP BY comment_parent, comment_content',
@@ -684,30 +684,44 @@ class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Contr
 			)
 		);
 
+		// Query 2: Get the current user's own reaction IDs (if logged in).
+		$my_reactions = array();
+		if ( $current_user_id ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$user_rows = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT comment_ID, comment_parent, comment_content
+					FROM ' . $wpdb->comments . '
+					WHERE comment_parent IN (' . implode( ',', array_fill( 0, count( $note_ids ), '%d' ) ) . ')
+					AND comment_type = %s
+					AND comment_approved = %s
+					AND user_id = %d',
+					...array_merge( $note_ids, array( 'reaction', '1', $current_user_id ) )
+				)
+			);
+
+			if ( $user_rows ) {
+				foreach ( $user_rows as $row ) {
+					$key                  = (int) $row->comment_parent . ':' . wp_strip_all_tags( $row->comment_content );
+					$my_reactions[ $key ] = (int) $row->comment_ID;
+				}
+			}
+		}
+
 		// Initialize empty summaries for all note IDs.
 		foreach ( $note_ids as $note_id ) {
 			$this->reaction_summaries[ $note_id ] = array();
 		}
 
-		if ( ! $results ) {
+		if ( ! $counts ) {
 			return;
 		}
 
-		foreach ( $results as $row ) {
-			$note_id = (int) $row->comment_parent;
-			$slug    = wp_strip_all_tags( $row->comment_content );
-
-			$my_reaction_id = 0;
-			if ( $current_user_id && ! empty( $row->details ) ) {
-				$pairs = explode( ',', $row->details );
-				foreach ( $pairs as $pair ) {
-					list( $comment_id, $user_id ) = explode( ':', $pair );
-					if ( (int) $user_id === $current_user_id ) {
-						$my_reaction_id = (int) $comment_id;
-						break;
-					}
-				}
-			}
+		foreach ( $counts as $row ) {
+			$note_id        = (int) $row->comment_parent;
+			$slug           = wp_strip_all_tags( $row->comment_content );
+			$key            = $note_id . ':' . $slug;
+			$my_reaction_id = $my_reactions[ $key ] ?? 0;
 
 			$this->reaction_summaries[ $note_id ][ $slug ] = array(
 				'count'          => (int) $row->reaction_count,
