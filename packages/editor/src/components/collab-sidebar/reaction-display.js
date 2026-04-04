@@ -8,7 +8,9 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { smiley as smileyIcon } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -60,13 +62,179 @@ function getReactedSlugs( reactions ) {
 }
 
 /**
+ * Generate GitHub-style tooltip text from user names.
+ *
+ * @param {string[]} names      Array of user display names.
+ * @param {string}   emojiLabel The emoji label.
+ * @return {string} The tooltip text.
+ */
+function formatReactionTooltip( names, emojiLabel ) {
+	if ( names.length === 1 ) {
+		return sprintf(
+			/* translators: 1: user name, 2: emoji label. */
+			__( '%1$s reacted with %2$s emoji' ),
+			names[ 0 ],
+			emojiLabel
+		);
+	}
+
+	if ( names.length === 2 ) {
+		return sprintf(
+			/* translators: 1: first user name, 2: second user name, 3: emoji label. */
+			__( '%1$s and %2$s reacted with %3$s emoji' ),
+			names[ 0 ],
+			names[ 1 ],
+			emojiLabel
+		);
+	}
+
+	const othersCount = names.length - 2;
+	return sprintf(
+		/* translators: 1: first user name, 2: second user name, 3: number of other users, 4: emoji label. */
+		_n(
+			'%1$s, %2$s, and %3$d other reacted with %4$s emoji',
+			'%1$s, %2$s, and %3$d others reacted with %4$s emoji',
+			othersCount
+		),
+		names[ 0 ],
+		names[ 1 ],
+		othersCount,
+		emojiLabel
+	);
+}
+
+// Module-level cache for reaction details: { "noteId:slug": string[] }
+const reactionNamesCache = {};
+
+/**
+ * A single reaction pill button that lazy-loads user names on hover.
+ *
+ * @param {Object}   props                  Component props.
+ * @param {number}   props.noteId           The parent note comment ID.
+ * @param {string}   props.slug             The emoji slug.
+ * @param {number}   props.count            The reaction count.
+ * @param {boolean}  props.isActive         Whether the current user reacted.
+ * @param {string}   props.emoji            The emoji character.
+ * @param {string}   props.emojiLabel       The emoji label.
+ * @param {Function} props.onToggleReaction Callback to toggle a reaction.
+ */
+function ReactionButton( {
+	noteId,
+	slug,
+	count,
+	isActive,
+	emoji,
+	emojiLabel,
+	onToggleReaction,
+} ) {
+	const [ tooltipText, setTooltipText ] = useState( '' );
+	const [ isFetching, setIsFetching ] = useState( false );
+
+	const fetchReactionNames = useCallback( () => {
+		const cacheKey = `${ noteId }:${ slug }`;
+		if ( reactionNamesCache[ cacheKey ] ) {
+			setTooltipText(
+				formatReactionTooltip(
+					reactionNamesCache[ cacheKey ],
+					emojiLabel
+				)
+			);
+			return;
+		}
+
+		if ( isFetching ) {
+			return;
+		}
+
+		setIsFetching( true );
+		apiFetch( {
+			path: addQueryArgs( '/wp/v2/comments', {
+				parent: noteId,
+				type: 'reaction',
+				status: 'all',
+				per_page: 100,
+				_fields: 'author_name,content',
+			} ),
+		} )
+			.then( ( reactions ) => {
+				const names = reactions
+					.filter( ( r ) => {
+						const content =
+							typeof r.content === 'object'
+								? r.content?.raw || r.content?.rendered
+								: r.content;
+						const clean = content
+							?.replace?.( /<[^>]*>/g, '' )
+							?.trim();
+						return clean === slug;
+					} )
+					.map( ( r ) => r.author_name );
+
+				reactionNamesCache[ cacheKey ] = names;
+				if ( names.length > 0 ) {
+					setTooltipText(
+						formatReactionTooltip( names, emojiLabel )
+					);
+				}
+			} )
+			.catch( () => {
+				// Silently fall back to count-based label.
+			} )
+			.finally( () => {
+				setIsFetching( false );
+			} );
+	}, [ noteId, slug, emojiLabel, isFetching ] );
+
+	const defaultLabel = sprintf(
+		/* translators: 1: emoji label, 2: count of reactions */
+		_n( '%1$s, %2$d reaction', '%1$s, %2$d reactions', count ),
+		emojiLabel,
+		count
+	);
+
+	return (
+		<Button
+			size="small"
+			className="editor-collab-sidebar-panel__reaction-button"
+			onClick={ ( event ) => {
+				event.stopPropagation();
+				// When removing the last reaction for this emoji,
+				// the button will disappear. Move focus to the
+				// parent note to prevent focus loss.
+				if ( isActive && count === 1 ) {
+					event.target
+						.closest( '.editor-collab-sidebar-panel__thread' )
+						?.focus();
+				}
+				// Invalidate cached names since the reaction set is changing.
+				delete reactionNamesCache[ `${ noteId }:${ slug }` ];
+				onToggleReaction( slug );
+			} }
+			onMouseEnter={ fetchReactionNames }
+			onFocus={ fetchReactionNames }
+			isPressed={ isActive }
+			label={ tooltipText || defaultLabel }
+			showTooltip
+		>
+			<span>{ emoji }</span>
+			<span>{ count }</span>
+		</Button>
+	);
+}
+
+/**
  * Display current reactions with counts as pill-shaped buttons.
  *
  * @param {Object}   props                  Component props.
+ * @param {number}   props.noteId           The parent note comment ID.
  * @param {Object}   props.reactions        The reaction summary (keyed by slug).
  * @param {Function} props.onToggleReaction Callback to toggle a reaction.
  */
-export default function ReactionDisplay( { reactions, onToggleReaction } ) {
+export default function ReactionDisplay( {
+	noteId,
+	reactions,
+	onToggleReaction,
+} ) {
 	const emojis = useReactionEmojis();
 	const reactedSlugs = getReactedSlugs( reactions );
 
@@ -79,42 +247,18 @@ export default function ReactionDisplay( { reactions, onToggleReaction } ) {
 			{ reactedSlugs.map( ( slug ) => {
 				const count = getReactionCount( reactions, slug );
 				const isActive = hasUserReacted( reactions, slug );
-				const emoji = getEmojiBySlug( slug, emojis );
-				const emojiLabel = getLabelBySlug( slug, emojis );
-
-				const buttonLabel = sprintf(
-					/* translators: 1: emoji label, 2: count of reactions */
-					_n( '%1$s, %2$d reaction', '%1$s, %2$d reactions', count ),
-					emojiLabel,
-					count
-				);
 
 				return (
-					<Button
+					<ReactionButton
 						key={ slug }
-						size="small"
-						className="editor-collab-sidebar-panel__reaction-button"
-						onClick={ ( event ) => {
-							event.stopPropagation();
-							// When removing the last reaction for this emoji,
-							// the button will disappear. Move focus to the
-							// parent note to prevent focus loss.
-							if ( isActive && count === 1 ) {
-								event.target
-									.closest(
-										'.editor-collab-sidebar-panel__thread'
-									)
-									?.focus();
-							}
-							onToggleReaction( slug );
-						} }
-						isPressed={ isActive }
-						label={ buttonLabel }
-						showTooltip
-					>
-						<span>{ emoji }</span>
-						<span>{ count }</span>
-					</Button>
+						noteId={ noteId }
+						slug={ slug }
+						count={ count }
+						isActive={ isActive }
+						emoji={ getEmojiBySlug( slug, emojis ) }
+						emojiLabel={ getLabelBySlug( slug, emojis ) }
+						onToggleReaction={ onToggleReaction }
+					/>
 				);
 			} ) }
 		</HStack>

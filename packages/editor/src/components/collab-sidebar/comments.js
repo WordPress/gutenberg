@@ -995,6 +995,7 @@ const CommentBoard = ( {
 						}
 					/>
 					<ReactionDisplay
+						noteId={ thread.id }
 						reactions={ reactions }
 						onToggleReaction={ ( emoji ) =>
 							onToggleReaction?.( {
