@@ -20,19 +20,19 @@ test.describe( 'Publishing', () => {
 					.getByRole( 'textbox', { name: 'Add title' } )
 					.fill( 'E2E Test Post' );
 
+				// Open publish panel before locking so the button is still clickable.
+				await page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'Publish' } )
+					.click();
+
 				await page.evaluate( () =>
 					window.wp.data
 						.dispatch( 'core/editor' )
 						.lockPostSaving( 'futurelock' )
 				);
 
-				// Open publish panel.
-				await page
-					.getByRole( 'region', { name: 'Editor top bar' } )
-					.getByRole( 'button', { name: 'Publish' } )
-					.click();
-
-				// Publish button should be disabled.
+				// Publish button in the panel should be disabled.
 				await expect(
 					page
 						.getByRole( 'region', { name: 'Editor publish' } )
