@@ -7,7 +7,7 @@ import {
 	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { SVG, Path } from '@wordpress/primitives';
+import { smiley as smileyIcon } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 
 /**
@@ -21,24 +21,6 @@ import ReactionEmojiPicker, {
 import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );
-
-/**
- * Smiley face icon for the add-reaction button.
- */
-const smileyIcon = (
-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path
-			fill="currentColor"
-			d="M14.438 14.15a.75.75 0 0 1 1.124.993A4.742 4.742 0 0 1 12 16.75a4.742 4.742 0 0 1-3.563-1.608.75.75 0 0 1 1.126-.993A3.24 3.24 0 0 0 12 15.251c.97 0 1.84-.425 2.438-1.1ZM9.5 9.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM14.5 9.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z"
-		/>
-		<Path
-			fill="currentColor"
-			fillRule="evenodd"
-			d="M12 4a8 8 0 1 1 .001 16.001A8 8 0 0 1 12 4Zm0 1.5a6.5 6.5 0 1 0-.001 13.001A6.5 6.5 0 0 0 12 5.5Z"
-			clipRule="evenodd"
-		/>
-	</SVG>
-);
 
 /**
  * Get the count of reactions for a specific slug.
