@@ -94,7 +94,16 @@ async function fetchFFmpegConfig(): Promise< FFmpegConfig | null > {
  */
 async function installFFmpegPlugin(): Promise< boolean > {
 	try {
-		await dispatch( CORE_STORE ).saveEntityRecord(
+		await (
+			dispatch( CORE_STORE ) as {
+				saveEntityRecord: (
+					kind: string,
+					name: string,
+					record: Record< string, unknown >,
+					options?: Record< string, unknown >
+				) => Promise< unknown >;
+			}
+		 ).saveEntityRecord(
 			'root',
 			'plugin',
 			{ slug: FFMPEG_PLUGIN_SLUG, status: 'active' },
@@ -143,13 +152,17 @@ export async function ensureFFmpegAvailable(): Promise< FFmpegConfig | null > {
 	pendingEnsurePromise = ( async () => {
 		// Plugin not active — can we install it?
 		// Use resolveSelect to wait for permission data to load.
-		const canInstall = await resolveSelect( CORE_STORE ).canUser(
-			'create',
-			{
-				kind: 'root',
-				name: 'plugin',
+		const canInstall = await (
+			resolveSelect( CORE_STORE ) as {
+				canUser: (
+					action: string,
+					resource: Record< string, string >
+				) => Promise< boolean >;
 			}
-		);
+		 ).canUser( 'create', {
+			kind: 'root',
+			name: 'plugin',
+		} );
 		if ( ! canInstall ) {
 			cachedConfig = null;
 			return null;
