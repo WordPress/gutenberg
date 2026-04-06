@@ -10,7 +10,7 @@ jest.mock( 'memize', (): MemizeMock => ( fn ) => fn );
  * Internal dependencies
  */
 import { sprintf } from '../sprintf';
-import type { TranslatableText } from '../types';
+import type { TransformedText } from '../types';
 
 describe( 'i18n', () => {
 	describe( 'sprintf', () => {
@@ -29,9 +29,9 @@ describe( 'i18n', () => {
 		it( 'preserves format string literal in return type', () => {
 			const result = sprintf( '<Name>%s</Name>', 'Riad' );
 
-			// Type-level test: sprintf return type should be TranslatableText
+			// Type-level test: sprintf return type should be TransformedText
 			// preserving the format string literal.
-			const _check: TranslatableText< '<Name>%s</Name>' > = result;
+			const _check: TransformedText< '<Name>%s</Name>' > = result;
 			void _check;
 
 			// At runtime it's still a regular string.

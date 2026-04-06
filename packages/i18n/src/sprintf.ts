@@ -6,16 +6,16 @@ import _sprintf from '@tannin/sprintf';
 /**
  * Internal dependencies
  */
-import type { DistributeSprintfArgs, TranslatableText } from './types';
+import type { DistributeSprintfArgs, TransformedText } from './types';
 
 export function sprintf< T extends string >(
-	format: T | TranslatableText< T >,
+	format: T | TransformedText< T >,
 	...args: DistributeSprintfArgs< T >
-): TranslatableText< T >;
+): TransformedText< T >;
 export function sprintf< T extends string >(
-	format: T | TranslatableText< T >,
+	format: T | TransformedText< T >,
 	args: DistributeSprintfArgs< T >
-): TranslatableText< T >;
+): TransformedText< T >;
 
 /**
  * Returns a formatted string.
@@ -28,8 +28,8 @@ export function sprintf< T extends string >(
  * @return The formatted string.
  */
 export function sprintf< T extends string >(
-	format: T | TranslatableText< T >,
+	format: T | TransformedText< T >,
 	...args: DistributeSprintfArgs< T >
-): TranslatableText< T > {
-	return _sprintf( format, ...args ) as TranslatableText< T >;
+): TransformedText< T > {
+	return _sprintf( format, ...args ) as TransformedText< T >;
 }

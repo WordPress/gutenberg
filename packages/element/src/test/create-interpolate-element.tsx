@@ -235,7 +235,7 @@ describe( 'createInterpolateElement', () => {
 		// Type-level test: verify InterpolationString unwraps TranslatableText.
 		type Text = InterpolationString<
 			string & {
-				readonly __translatableText: '<a>link</a> and <em>emphasis</em>';
+				readonly __transformedText: '<a>link</a> and <em>emphasis</em>';
 			}
 		>;
 		type Tags = ExtractTags< Text >;
@@ -246,7 +246,7 @@ describe( 'createInterpolateElement', () => {
 		// Type-level test: sprintf returns TranslatableText, so
 		// InterpolationString unwraps it for tag inference.
 		type SprintfResult = string & {
-			readonly __translatableText: '<Name>%1$s</Name> wrote <Link>%2$s</Link>';
+			readonly __transformedText: '<Name>%1$s</Name> wrote <Link>%2$s</Link>';
 		};
 		const _check: InterpolationInput = '' as SprintfResult;
 		void _check;

@@ -5,17 +5,24 @@ import type sprintf from '@tannin/sprintf';
 import { type TanninDomainMetadata } from 'tannin';
 
 /**
- * Return type for string translation functions.
+ * Return type for string transformation functions (translation, sprintf).
+ * Preserves the original string literal type so that downstream consumers
+ * can extract information (e.g., tag names) at the type level.
  *
  * This type should be treated as if it were `string`.
  */
-export type TranslatableText< T extends string > = string & {
+export type TransformedText< T extends string > = string & {
 	/**
 	 * DO NOT USE! This property _does not exist_.
 	 * @private
 	 */
-	readonly __translatableText: T;
+	readonly __transformedText: T;
 };
+
+/**
+ * @deprecated Use `TransformedText` instead.
+ */
+export type TranslatableText< T extends string > = TransformedText< T >;
 
 /**
  * Type to extends TanninDomainMetadata to support additional properties.
@@ -102,7 +109,7 @@ export interface I18n< TextDomain extends string = string > {
 	__: < Text extends string >(
 		text: Text,
 		domain?: TextDomain
-	) => TranslatableText< Text >;
+	) => TransformedText< Text >;
 
 	/**
 	 * Retrieve translated string with gettext context.
@@ -113,7 +120,7 @@ export interface I18n< TextDomain extends string = string > {
 		text: Text,
 		context: string,
 		domain?: TextDomain
-	) => TranslatableText< Text >;
+	) => TransformedText< Text >;
 
 	/**
 	 * Translates and retrieves the singular or plural form based on the supplied
@@ -126,7 +133,7 @@ export interface I18n< TextDomain extends string = string > {
 		plural: Plural,
 		number: number,
 		domain?: TextDomain
-	) => TranslatableText< Single | Plural >;
+	) => TransformedText< Single | Plural >;
 
 	/**
 	 * Translates and retrieves the singular or plural form based on the supplied
@@ -140,7 +147,7 @@ export interface I18n< TextDomain extends string = string > {
 		number: number,
 		context: string,
 		domain?: TextDomain
-	) => TranslatableText< Single | Plural >;
+	) => TransformedText< Single | Plural >;
 
 	/**
 	 * Check if current locale is RTL.
