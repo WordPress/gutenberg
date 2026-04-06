@@ -9,7 +9,14 @@ test.describe( 'Template Activate', () => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		// Enable the template activation feature.
-		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
+		const experimentsAvailable = await requestUtils.setGutenbergExperiments(
+			[ 'active_templates' ]
+		);
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! experimentsAvailable,
+			'Template activation experiment requires Gutenberg plugin'
+		);
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
