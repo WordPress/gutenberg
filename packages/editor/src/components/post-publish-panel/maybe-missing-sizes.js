@@ -2,9 +2,8 @@
  * WordPress dependencies
  */
 import { PanelBody, Button, Spinner } from '@wordpress/components';
-import { useSelect, useRegistry } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as uploadStore } from '@wordpress/upload-media';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
@@ -14,18 +13,16 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { getImageAttachmentIds } from '../provider/use-missing-sizes-check';
+import useMissingSizes from '../../hooks/use-missing-sizes';
 
 export default function MaybeMissingSizesPanel() {
 	const [ isGenerating, setIsGenerating ] = useState( false );
 	const [ progress, setProgress ] = useState( { current: 0, total: 0 } );
-	const [ attachmentsWithMissingSizes, setAttachmentsWithMissingSizes ] =
-		useState( [] );
 	const checkIntervalRef = useRef( null );
-	const hasCheckedRef = useRef( false );
 	const registry = useRegistry();
 
-	const isEnabled = !! window.__clientSideMediaProcessing;
+	const { attachmentsWithMissingSizes, setAttachmentsWithMissingSizes } =
+		useMissingSizes();
 
 	// Clean up polling interval on unmount.
 	useEffect( () => {
@@ -35,54 +32,6 @@ export default function MaybeMissingSizesPanel() {
 			}
 		};
 	}, [] );
-
-	const blocks = useSelect(
-		( select ) => {
-			if ( ! isEnabled ) {
-				return [];
-			}
-			return select( blockEditorStore ).getBlocks();
-		},
-		[ isEnabled ]
-	);
-
-	// Fetch missing sizes directly via REST API to avoid polluting
-	// the entity store, which can cause the publish button label
-	// to change from "Publish" to "Save".
-	useEffect( () => {
-		if ( ! isEnabled || ! blocks.length || hasCheckedRef.current ) {
-			return;
-		}
-
-		const ids = getImageAttachmentIds( blocks );
-		if ( ! ids.size ) {
-			return;
-		}
-
-		hasCheckedRef.current = true;
-
-		async function checkMissingSizes() {
-			const results = [];
-			for ( const id of ids ) {
-				try {
-					const attachment = await apiFetch( {
-						path: addQueryArgs( `/wp/v2/media/${ id }`, {
-							context: 'edit',
-							_fields: 'id,missing_image_sizes,source_url',
-						} ),
-					} );
-					if ( attachment?.missing_image_sizes?.length ) {
-						results.push( attachment );
-					}
-				} catch {
-					// Skip attachments that can't be fetched.
-				}
-			}
-			setAttachmentsWithMissingSizes( results );
-		}
-
-		checkMissingSizes();
-	}, [ isEnabled, blocks ] );
 
 	if ( ! isGenerating && ! attachmentsWithMissingSizes.length ) {
 		return null;
