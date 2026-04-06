@@ -4,7 +4,7 @@
 
 .dataviews-view-activity {
 	margin: 0 0 auto;
-	padding: $grid-unit-10 $grid-unit-30;
+	padding: 0 $grid-unit-30;
 
 	.dataviews-view-activity__group-header {
 		font-size: $font-size-large;
@@ -104,7 +104,7 @@
 	.dataviews-view-activity__item {
 		&.is-compact {
 			.dataviews-view-activity__item-type {
-				width: $grid-unit-10;
+				width: $grid-unit-15;
 
 				&::before {
 					height: $grid-unit-15;
