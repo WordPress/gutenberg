@@ -189,30 +189,40 @@ function migrateYMapWithSchema(
 	for ( const [ key, subSchema ] of Object.entries( query ) ) {
 		const value = yMap.get( key );
 
+		if ( value === undefined || value === null ) {
+			continue;
+		}
+
 		if ( subSchema.type === 'rich-text' && ! ( value instanceof Y.Text ) ) {
 			yMap.set( key, new Y.Text( '' ) );
 			repaired = true;
 			continue;
 		}
 
-		if (
-			subSchema.type === 'array' &&
-			subSchema.query &&
-			value instanceof Y.Array
-		) {
-			if ( migrateYArrayWithSchema( value, subSchema.query ) ) {
+		if ( subSchema.type === 'array' && subSchema.query ) {
+			if ( value instanceof Y.Array ) {
+				if ( migrateYArrayWithSchema( value, subSchema.query ) ) {
+					repaired = true;
+				}
+			} else {
+				yMap.set( key, new Y.Array() );
 				repaired = true;
 			}
+
+			continue;
 		}
 
-		if (
-			subSchema.type === 'object' &&
-			subSchema.query &&
-			value instanceof Y.Map
-		) {
-			if ( migrateYMapWithSchema( value, subSchema.query ) ) {
+		if ( subSchema.type === 'object' && subSchema.query ) {
+			if ( value instanceof Y.Map ) {
+				if ( migrateYMapWithSchema( value, subSchema.query ) ) {
+					repaired = true;
+				}
+			} else {
+				yMap.set( key, new Y.Map() );
 				repaired = true;
 			}
+
+			continue;
 		}
 	}
 
