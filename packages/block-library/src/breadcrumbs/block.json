@@ -11,9 +11,8 @@
 			"type": "boolean",
 			"default": false
 		},
-		"separator": {
-			"type": "string",
-			"default": "/"
+		"separatorIconUrl": {
+			"type": "string"
 		},
 		"showHomeItem": {
 			"type": "boolean",
