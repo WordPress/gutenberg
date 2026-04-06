@@ -92,7 +92,7 @@ Display a breadcrumb trail showing the path to the current page. ([Source](https
 -	**Name:** core/breadcrumbs
 -	**Category:** theme
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** prefersTaxonomy, separator, separatorIconUrl, showCurrentItem, showHomeItem, showOnHomePage
+-	**Attributes:** prefersTaxonomy, seprator, showCurrentItem, showHomeItem, showOnHomePage
 
 ## Button
 

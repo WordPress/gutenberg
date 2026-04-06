@@ -183,25 +183,38 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		return '';
 	}
 
+	// Build separator HTML from registered icon.
+	$separator_html = '/';
+	$separator_icon = ! empty( $attributes['separatorIcon'] ) ? $attributes['separatorIcon'] : '';
+	if ( $separator_icon ) {
+		$registry = WP_Icons_Registry::get_instance();
+		$icon     = $registry->get_registered_icon( $separator_icon );
+		if ( $icon ) {
+			$separator_html = '<span class="wp-block-breadcrumbs__separator" aria-hidden="true">' . $icon['content'] . '</span>';
+		}
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'style'      => '--separator: "' . addcslashes( $attributes['separator'], '\\"' ) . '";',
 			'aria-label' => __( 'Breadcrumbs' ),
 		)
 	);
 
+	$total_items   = count( $breadcrumb_items );
+	$item_index    = 0;
 	$breadcrumb_html = sprintf(
 		'<nav %s><ol>%s</ol></nav>',
 		$wrapper_attributes,
 		implode(
 			'',
 			array_map(
-				static function ( $item ) {
+				static function ( $item ) use ( $separator_html, $total_items, &$item_index ) {
 					$label = ! empty( $item['allow_html'] ) ? wp_kses_post( $item['label'] ) : esc_html( $item['label'] );
+					$sep   = ( ++$item_index < $total_items ) ? $separator_html : '/';
 					if ( ! empty( $item['url'] ) ) {
-						return '<li><a href="' . esc_url( $item['url'] ) . '">' . $label . '</a></li>';
+						return '<li><a href="' . esc_url( $item['url'] ) . '">' . $label . '</a>' . $sep . '</li>';
 					}
-					return '<li><span aria-current="page">' . $label . '</span></li>';
+					return '<li><span aria-current="page">' . $label . '</span>' . $sep . '</li>';
 				},
 				$breadcrumb_items
 			)
