@@ -33,6 +33,7 @@ import {
 	shouldSkipSerialization,
 	buildStateResetAllFilter,
 } from './utils';
+import { useBlockStateProps } from './state-utils';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -97,7 +98,6 @@ export function DimensionsPanel( {
 	selectedState = 'default',
 } ) {
 	const isEnabled = useHasDimensionsPanel( settings );
-	const isStateSelected = !! ( selectedState && selectedState !== 'default' );
 	const style = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
@@ -112,15 +112,15 @@ export function DimensionsPanel( {
 
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 
-	const value = isStateSelected ? style?.[ selectedState ] : style;
+	const { isStateSelected, stateValue, stateOnChange } = useBlockStateProps( {
+		selectedState,
+		style,
+		setAttributes,
+	} );
+
+	const value = isStateSelected ? stateValue : style;
 	const onChange = isStateSelected
-		? ( newStateStyle ) =>
-				setAttributes( {
-					style: cleanEmptyObject( {
-						...style,
-						[ selectedState ]: newStateStyle,
-					} ),
-				} )
+		? stateOnChange
 		: ( newStyle ) =>
 				setAttributes( {
 					style: cleanEmptyObject( newStyle ),

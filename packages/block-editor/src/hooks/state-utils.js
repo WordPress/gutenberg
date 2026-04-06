@@ -2,11 +2,35 @@
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { scopeSelector } from '../components/global-styles/utils';
+
+/**
+ * Recursively removes undefined and empty-object values.
+ * Duplicated here to avoid a circular dependency with ./utils.
+ *
+ * @param {*} object
+ * @return {*} Cleaned value.
+ */
+function cleanEmptyObject( object ) {
+	if (
+		object === null ||
+		typeof object !== 'object' ||
+		Array.isArray( object )
+	) {
+		return object;
+	}
+	const cleanedNestedObjects = Object.entries( object )
+		.map( ( [ key, value ] ) => [ key, cleanEmptyObject( value ) ] )
+		.filter( ( [ , value ] ) => value !== undefined );
+	return ! cleanedNestedObjects.length
+		? undefined
+		: Object.fromEntries( cleanedNestedObjects );
+}
 
 /**
  * Given a block's `selectors.root` value, returns the part of the selector
@@ -82,4 +106,37 @@ export function buildCanvasStateSelector( clientId, name ) {
 		}
 	}
 	return `[data-block="${ clientId }"]`;
+}
+
+/**
+ * Shared hook for block style panels that support interactive states
+ * (hover, focus, active). Encapsulates the repeated boilerplate for
+ * determining whether a state is selected, reading the scoped style value,
+ * and building the state-scoped onChange handler.
+ *
+ * @param {Object}   options
+ * @param {string}   options.selectedState Currently selected state, e.g. ':hover'. Defaults to 'default'.
+ * @param {Object}   options.style         The block's `style` attribute.
+ * @param {Function} options.setAttributes The block's setAttributes function.
+ * @return {{ isStateSelected: boolean, stateValue: Object|undefined, stateOnChange: Function }} State props.
+ */
+export function useBlockStateProps( { selectedState, style, setAttributes } ) {
+	const isStateSelected = !! ( selectedState && selectedState !== 'default' );
+
+	const stateOnChange = useCallback(
+		( newStateStyle ) =>
+			setAttributes( {
+				style: cleanEmptyObject( {
+					...style,
+					[ selectedState ]: newStateStyle,
+				} ),
+			} ),
+		[ setAttributes, style, selectedState ]
+	);
+
+	return {
+		isStateSelected,
+		stateValue: isStateSelected ? style?.[ selectedState ] : undefined,
+		stateOnChange,
+	};
 }
