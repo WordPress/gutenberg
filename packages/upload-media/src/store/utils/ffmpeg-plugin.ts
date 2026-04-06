@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { dispatch, resolveSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+
+// The core-data store name. Using the string directly avoids adding
+// core-data as a dependency, which would create a circular tsconfig
+// reference: upload-media → core-data → block-editor → upload-media.
+const CORE_STORE = 'core';
 
 /**
  * Re-export the canonical type from @wordpress/ffmpeg.
@@ -85,7 +89,7 @@ async function fetchFFmpegConfig(): Promise< FFmpegConfig | null > {
  */
 async function installFFmpegPlugin(): Promise< boolean > {
 	try {
-		await dispatch( coreStore ).saveEntityRecord(
+		await dispatch( CORE_STORE ).saveEntityRecord(
 			'root',
 			'plugin',
 			{ slug: FFMPEG_PLUGIN_SLUG, status: 'active' },
@@ -134,10 +138,13 @@ export async function ensureFFmpegAvailable(): Promise< FFmpegConfig | null > {
 	pendingEnsurePromise = ( async () => {
 		// Plugin not active — can we install it?
 		// Use resolveSelect to wait for permission data to load.
-		const canInstall = await resolveSelect( coreStore ).canUser( 'create', {
-			kind: 'root',
-			name: 'plugin',
-		} );
+		const canInstall = await resolveSelect( CORE_STORE ).canUser(
+			'create',
+			{
+				kind: 'root',
+				name: 'plugin',
+			}
+		);
 		if ( ! canInstall ) {
 			cachedConfig = null;
 			return null;

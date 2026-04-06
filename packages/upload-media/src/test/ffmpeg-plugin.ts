@@ -4,11 +4,6 @@ jest.mock( '@wordpress/data', () => ( {
 	resolveSelect: jest.fn(),
 } ) );
 
-// Mock @wordpress/core-data.
-jest.mock( '@wordpress/core-data', () => ( {
-	store: 'core',
-} ) );
-
 const mockConfig = {
 	coreUrl: 'https://example.com/ffmpeg-core.js',
 	wasmUrl: 'https://example.com/ffmpeg-core.wasm',
