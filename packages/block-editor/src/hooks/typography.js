@@ -21,6 +21,7 @@ import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
 import { FIT_TEXT_SUPPORT_KEY } from './fit-text';
 import { cleanEmptyObject, buildStateResetAllFilter } from './utils';
 import { store as blockEditorStore } from '../store';
+import { useBlockStateProps } from './state-utils';
 
 function omit( object, keys ) {
 	return Object.fromEntries(
@@ -135,7 +136,6 @@ export function TypographyPanel( {
 	selectedState = 'default',
 } ) {
 	const isEnabled = useHasTypographyPanel( settings );
-	const isStateSelected = !! ( selectedState && selectedState !== 'default' );
 
 	const { style, fontFamily, fontSize, fitText } = useSelect(
 		( select ) => {
@@ -158,21 +158,22 @@ export function TypographyPanel( {
 		},
 		[ clientId, isEnabled ]
 	);
+
+	const { isStateSelected, stateValue, stateOnChange } = useBlockStateProps( {
+		selectedState,
+		style,
+		setAttributes,
+	} );
+
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return style?.[ selectedState ];
+			return stateValue;
 		}
 		return attributesToStyle( { style, fontFamily, fontSize } );
-	}, [ isStateSelected, selectedState, style, fontSize, fontFamily ] );
+	}, [ isStateSelected, stateValue, style, fontSize, fontFamily ] );
 
 	const onChange = isStateSelected
-		? ( newStateStyle ) =>
-				setAttributes( {
-					style: cleanEmptyObject( {
-						...style,
-						[ selectedState ]: newStateStyle,
-					} ),
-				} )
+		? stateOnChange
 		: ( newStyle ) => {
 				const newAttributes = styleToAttributes( newStyle );
 

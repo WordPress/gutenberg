@@ -34,6 +34,7 @@ import {
 } from '../components/global-styles/color-panel';
 import BlockColorContrastChecker from './contrast-checker';
 import { store as blockEditorStore } from '../store';
+import { useBlockStateProps } from './state-utils';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
@@ -283,7 +284,6 @@ export function ColorEdit( {
 	selectedState = 'default',
 } ) {
 	const isEnabled = useHasColorPanel( settings );
-	const isStateSelected = !! ( selectedState && selectedState !== 'default' );
 
 	const { style, textColor, backgroundColor, gradient } = useSelect(
 		( select ) => {
@@ -306,9 +306,16 @@ export function ColorEdit( {
 		},
 		[ clientId, isEnabled ]
 	);
+
+	const { isStateSelected, stateValue, stateOnChange } = useBlockStateProps( {
+		selectedState,
+		style,
+		setAttributes,
+	} );
+
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return style?.[ selectedState ];
+			return stateValue;
 		}
 		return attributesToStyle( {
 			style,
@@ -318,7 +325,7 @@ export function ColorEdit( {
 		} );
 	}, [
 		isStateSelected,
-		selectedState,
+		stateValue,
 		style,
 		textColor,
 		backgroundColor,
@@ -326,13 +333,7 @@ export function ColorEdit( {
 	] );
 
 	const onChange = isStateSelected
-		? ( newStateStyle ) =>
-				setAttributes( {
-					style: cleanEmptyObject( {
-						...style,
-						[ selectedState ]: newStateStyle,
-					} ),
-				} )
+		? stateOnChange
 		: ( newStyle ) => {
 				setAttributes( styleToAttributes( newStyle ) );
 		  };
