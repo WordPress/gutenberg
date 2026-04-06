@@ -47,8 +47,7 @@ export function v2MigrateTableCellContent( ydoc: CRDTDoc ): MigrationResult {
 /**
  * Recursively walk a Y.Array of blocks, repairing attributes and descending
  * into innerBlocks.
- *
- * @param blocks The Y.Array of block Y.Maps.
+ * @param blocks
  */
 function migrateBlocksArray( blocks: Y.Array< unknown > ): boolean {
 	let repaired = false;
@@ -64,7 +63,20 @@ function migrateBlocksArray( blocks: Y.Array< unknown > ): boolean {
 		const attributes = block.get( 'attributes' );
 
 		if ( attributes instanceof Y.Map ) {
-			if ( migrateBlockAttributes( blockName, attributes ) ) {
+			const schema: Record< string, BlockAttributeSchema > = {};
+
+			for ( const attrName of attributes.keys() ) {
+				const attrSchema = getBlockAttributeSchema(
+					blockName,
+					attrName
+				);
+
+				if ( attrSchema ) {
+					schema[ attrName ] = attrSchema;
+				}
+			}
+
+			if ( repairYMapWithSchema( attributes, schema ) ) {
 				repaired = true;
 			}
 		}
@@ -82,116 +94,18 @@ function migrateBlocksArray( blocks: Y.Array< unknown > ): boolean {
 }
 
 /**
- * For a single block's attributes Y.Map, check each attribute against its
- * schema and repair any rich-text values that are not Y.Text.
- *
- * @param blockName  The block type name (e.g. 'core/table').
- * @param attributes The block's attributes Y.Map.
- */
-function migrateBlockAttributes(
-	blockName: string,
-	attributes: Y.Map< unknown >
-): boolean {
-	let repaired = false;
-
-	for ( const [ attrName, attrValue ] of attributes.entries() ) {
-		const schema = getBlockAttributeSchema( blockName, attrName );
-
-		if ( ! schema ) {
-			continue;
-		}
-
-		// A top-level rich-text attribute that is not Y.Text.
-		if (
-			schema.type === 'rich-text' &&
-			! ( attrValue instanceof Y.Text )
-		) {
-			attributes.set( attrName, new Y.Text( '' ) );
-			repaired = true;
-			continue;
-		}
-
-		// An array with a query schema (e.g. table body/head/foot).
-		if ( schema.type === 'array' && schema.query ) {
-			if ( attrValue instanceof Y.Array ) {
-				// Already a Y.Array, walk it to repair nested rich-text.
-				if ( migrateYArrayWithSchema( attrValue, schema.query ) ) {
-					repaired = true;
-				}
-			} else {
-				// Pre-#76913 docs stored array+query attributes as plain
-				// arrays instead of Y.Array. Replace with an empty Y.Array
-				// so the invalidation logic can fill in the correct content
-				// from the database.
-				attributes.set( attrName, new Y.Array() );
-				repaired = true;
-			}
-
-			continue;
-		}
-
-		// An object with a query schema.
-		if ( schema.type === 'object' && schema.query ) {
-			if ( attrValue instanceof Y.Map ) {
-				// Already a Y.Map, walk it to repair nested rich-text.
-				if ( migrateYMapWithSchema( attrValue, schema.query ) ) {
-					repaired = true;
-				}
-			} else {
-				// Same as above: plain object instead of Y.Map.
-				attributes.set( attrName, new Y.Map() );
-				repaired = true;
-			}
-
-			continue;
-		}
-	}
-
-	return repaired;
-}
-
-/**
- * Walk a Y.Array whose elements are Y.Maps, checking sub-schema properties
- * for rich-text values that need repair.
- *
- * @param yArray The Y.Array to walk.
- * @param query  The query schema defining the array element properties.
- */
-function migrateYArrayWithSchema(
-	yArray: Y.Array< unknown >,
-	query: Record< string, BlockAttributeSchema >
-): boolean {
-	let repaired = false;
-
-	for ( let i = 0; i < yArray.length; i++ ) {
-		const element = yArray.get( i );
-
-		if ( ! ( element instanceof Y.Map ) ) {
-			continue;
-		}
-
-		if ( migrateYMapWithSchema( element, query ) ) {
-			repaired = true;
-		}
-	}
-
-	return repaired;
-}
-
-/**
- * Check each property of a Y.Map against a query schema and repair rich-text
+ * Check each property of a Y.Map against a schema and repair rich-text
  * values or recurse into nested arrays/objects.
- *
- * @param yMap  The Y.Map to check.
- * @param query The query schema defining the map properties.
+ * @param yMap
+ * @param schema
  */
-function migrateYMapWithSchema(
+function repairYMapWithSchema(
 	yMap: Y.Map< unknown >,
-	query: Record< string, BlockAttributeSchema >
+	schema: Record< string, BlockAttributeSchema >
 ): boolean {
 	let repaired = false;
 
-	for ( const [ key, subSchema ] of Object.entries( query ) ) {
+	for ( const [ key, subSchema ] of Object.entries( schema ) ) {
 		const value = yMap.get( key );
 
 		if ( value === undefined || value === null ) {
@@ -206,10 +120,14 @@ function migrateYMapWithSchema(
 
 		if ( subSchema.type === 'array' && subSchema.query ) {
 			if ( value instanceof Y.Array ) {
-				if ( migrateYArrayWithSchema( value, subSchema.query ) ) {
+				if ( repairYArrayWithSchema( value, subSchema.query ) ) {
 					repaired = true;
 				}
 			} else {
+				// Pre-#76913 docs stored array+query attributes as plain
+				// arrays instead of Y.Array. Replace with an empty Y.Array
+				// so the invalidation logic can fill in the correct content
+				// from the database.
 				yMap.set( key, new Y.Array() );
 				repaired = true;
 			}
@@ -219,7 +137,7 @@ function migrateYMapWithSchema(
 
 		if ( subSchema.type === 'object' && subSchema.query ) {
 			if ( value instanceof Y.Map ) {
-				if ( migrateYMapWithSchema( value, subSchema.query ) ) {
+				if ( repairYMapWithSchema( value, subSchema.query ) ) {
 					repaired = true;
 				}
 			} else {
@@ -228,6 +146,33 @@ function migrateYMapWithSchema(
 			}
 
 			continue;
+		}
+	}
+
+	return repaired;
+}
+
+/**
+ * Walk a Y.Array whose elements are Y.Maps, checking sub-schema properties
+ * for rich-text values that need repair.
+ * @param yArray
+ * @param query
+ */
+function repairYArrayWithSchema(
+	yArray: Y.Array< unknown >,
+	query: Record< string, BlockAttributeSchema >
+): boolean {
+	let repaired = false;
+
+	for ( let i = 0; i < yArray.length; i++ ) {
+		const element = yArray.get( i );
+
+		if ( ! ( element instanceof Y.Map ) ) {
+			continue;
+		}
+
+		if ( repairYMapWithSchema( element, query ) ) {
+			repaired = true;
 		}
 	}
 
