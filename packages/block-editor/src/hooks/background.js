@@ -23,6 +23,7 @@ import {
 	hasBackgroundGradientValue,
 } from '../components/global-styles/background-panel';
 import { globalStylesDataKey } from '../store/private-keys';
+import { useBlockStateProps } from './state-utils';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
@@ -222,6 +223,13 @@ export function BackgroundImagePanel( {
 		[ backgroundGradientSupported, selectedState ]
 	);
 
+	// Must be declared before the early return to follow Rules of Hooks.
+	const { isStateSelected, stateValue, stateOnChange } = useBlockStateProps( {
+		selectedState,
+		style,
+		setAttributes,
+	} );
+
 	if (
 		! useHasBackgroundPanel( settings ) ||
 		! hasBackgroundSupport( name )
@@ -229,16 +237,8 @@ export function BackgroundImagePanel( {
 		return null;
 	}
 
-	const isStateSelected = selectedState && selectedState !== 'default';
-	const value = isStateSelected ? style?.[ selectedState ] : style;
 	const onChange = isStateSelected
-		? ( newStateStyle ) =>
-				setAttributes( {
-					style: cleanEmptyObject( {
-						...style,
-						[ selectedState ]: newStateStyle,
-					} ),
-				} )
+		? stateOnChange
 		: ( newStyle ) => {
 				const isMigrating =
 					backgroundGradientSupported && !! style?.color?.gradient;
@@ -263,7 +263,10 @@ export function BackgroundImagePanel( {
 				// Conversely, if the gradient is cleared and has-background was added
 				// during a previous migration, remove it so it does not linger.
 				if ( isMigrating && !! newStyle?.background?.gradient ) {
-					newAttributes.className = clsx( className, 'has-background' );
+					newAttributes.className = clsx(
+						className,
+						'has-background'
+					);
 				} else if (
 					! newStyle?.background?.gradient &&
 					className?.includes( 'has-background' )
@@ -276,7 +279,7 @@ export function BackgroundImagePanel( {
 				}
 
 				setAttributes( newAttributes );
-			};
+		  };
 
 	// When background.gradient is supported but not yet explicitly set, fall
 	// back to color.gradient for display. Any write from this panel migrates
@@ -318,7 +321,7 @@ export function BackgroundImagePanel( {
 			settings={ updatedSettings }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
-			value={ isStateMode ? value : styleValue }
+			value={ isStateSelected ? stateValue : styleValue }
 		/>
 	);
 }
