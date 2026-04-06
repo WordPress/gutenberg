@@ -67,7 +67,9 @@ async function getFFmpegCore(
 
 		// Use importScripts in worker context to load the module factory.
 
-		( self as unknown as WorkerGlobalScope ).importScripts( blobUrl );
+		(
+			self as unknown as { importScripts: ( url: string ) => void }
+		 ).importScripts( blobUrl );
 		URL.revokeObjectURL( blobUrl );
 
 		// The Emscripten module factory is now on the global scope.
@@ -255,7 +257,7 @@ export async function convertGifToVideo(
 
 			// Slice the buffer to extract only the relevant bytes.
 			// Uint8Array.buffer may include data outside the view's range.
-			return output.buffer.slice(
+			return ( output.buffer as ArrayBuffer ).slice(
 				output.byteOffset,
 				output.byteOffset + output.byteLength
 			);
