@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- DataViews: Introduce `--wp-dataviews-edge-padding` CSS custom property. [#77053](https://github.com/WordPress/gutenberg/pull/77053)
+
 ## 14.0.0 (2026-04-01)
 
 ### Breaking Changes
