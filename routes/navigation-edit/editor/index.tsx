@@ -8,9 +8,10 @@ import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
 import {
-	fetchLinkSuggestions,
-	useEditorAssets,
-} from '@wordpress/lazy-editor';
+	// @ts-expect-error - No type declarations available for this export
+	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
+} from '@wordpress/core-data';
+import { useEditorAssets } from '@wordpress/lazy-editor';
 
 /**
  * Internal dependencies

@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-export { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
-
-/**
  * Internal dependencies
  */
 export { Editor } from './components/editor';
