@@ -59,7 +59,12 @@ function migrateBlocksArray( blocks: Y.Array< unknown > ): boolean {
 			continue;
 		}
 
-		const blockName = block.get( 'name' ) as string;
+		const blockName = block.get( 'name' );
+
+		if ( typeof blockName !== 'string' ) {
+			continue;
+		}
+
 		const attributes = block.get( 'attributes' );
 
 		if ( attributes instanceof Y.Map ) {
