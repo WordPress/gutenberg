@@ -11,7 +11,7 @@ import {
 	CRDT_STATE_MAP_KEY,
 	CRDT_STATE_MAP_VERSION_KEY,
 } from '../../sync';
-import { migrateTableCellContent } from './v2-table-cell-content';
+import { v2MigrateTableCellContent } from './v2-table-cell-content';
 
 /**
  * The result of running a single migration.
@@ -40,7 +40,7 @@ type MigrationFn = ( ydoc: CRDTDoc ) => MigrationResult;
  * from the database record.
  */
 const migrations: Array< { version: number; migrate: MigrationFn } > = [
-	{ version: 2, migrate: migrateTableCellContent },
+	{ version: 2, migrate: v2MigrateTableCellContent },
 ];
 
 /**

@@ -27,7 +27,7 @@ import type { MigrationResult } from './index';
  *
  * @param ydoc The CRDT document to migrate.
  */
-export function migrateTableCellContent( ydoc: CRDTDoc ): MigrationResult {
+export function v2MigrateTableCellContent( ydoc: CRDTDoc ): MigrationResult {
 	const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 	const blocks = recordMap.get( 'blocks' );
 
