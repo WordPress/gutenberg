@@ -100,6 +100,8 @@ export interface AnnotationFormat {
 		className: string;
 		id: string;
 	};
+	interactive: boolean;
+	object: boolean;
 	edit: () => null;
 	__experimentalGetPropsForEditableTreePreparation: (
 		select: any,

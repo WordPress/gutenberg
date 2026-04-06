@@ -13,17 +13,12 @@ import type {
 } from '../types';
 
 /**
- * @property {number} start The offset where the annotation should start.
- * @property {number} end   The offset where the annotation should end.
- */
-
-/**
  * Adds an annotation to a block.
  *
  * The `block` attribute refers to a block ID that needs to be annotated.
  * `isBlockAnnotation` controls whether or not the annotation is a block
  * annotation. The `source` is the source of the annotation, this will be used
- * to identity groups of annotations.
+ * to identify groups of annotations.
  *
  * The `range` property is only relevant if the selector is 'range'.
  *
@@ -53,10 +48,10 @@ export function __experimentalAddAnnotation( {
 		selector,
 	};
 
-	if ( selector === 'range' ) {
+	if ( selector === 'range' && range !== null ) {
 		(
 			action as Extract< AnnotationAction, { type: 'ANNOTATION_ADD' } >
-		 ).range = range as WPAnnotationRange;
+		 ).range = range;
 	}
 
 	return action;
