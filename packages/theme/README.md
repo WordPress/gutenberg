@@ -35,6 +35,8 @@ npm install @wordpress/theme
 import '@wordpress/theme/design-tokens.css';
 ```
 
+This stylesheet is universal and does not have a separate RTL version.
+
 ### Developer Tools
 
 For the best development experience, we recommend configuring the [build plugins](#build-plugins) and [Stylelint rules](#stylelint-plugins) provided by this package. The build plugins automatically inject fallback values into `var(--wpds-*)` references so components render correctly even when the tokens stylesheet is not yet loaded, and will raise an error if a reference does not match a known token. The Stylelint rules catch typos, unknown tokens, and other discouraged patterns during development.
