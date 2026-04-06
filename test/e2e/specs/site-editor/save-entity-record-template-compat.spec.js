@@ -7,7 +7,14 @@ test.describe( 'calling saveEntityRecord with a theme template ID', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		// Enable the template activation feature.
-		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
+		const experimentsAvailable = await requestUtils.setGutenbergExperiments(
+			[ 'active_templates' ]
+		);
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! experimentsAvailable,
+			'Template activation experiment requires Gutenberg plugin'
+		);
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
