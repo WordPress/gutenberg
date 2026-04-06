@@ -88,9 +88,10 @@ function PostRevisionsPanelContent() {
 			{
 				id: dateField,
 				label: __( 'Date' ),
-				render: ( { item } ) => {
+				render: ( { item, field } ) => {
 					const dateNowInMs = getDate( null ).getTime();
-					const date = getDate( item[ dateField ] ?? null );
+					const _value = field.getValue( { item } );
+					const date = getDate( _value ?? null );
 					const displayDate =
 						dateNowInMs - date.getTime() > DAY_IN_MILLISECONDS
 							? dateI18n(
@@ -101,7 +102,7 @@ function PostRevisionsPanelContent() {
 					return (
 						<time
 							className="editor-post-revisions-panel__revision-date"
-							dateTime={ item[ dateField ] }
+							dateTime={ _value }
 						>
 							{ displayDate }
 						</time>
