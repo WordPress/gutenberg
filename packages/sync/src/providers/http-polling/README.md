@@ -83,7 +83,8 @@ The polling manager runs continuously:
 
 - **Solo editing**: 4000ms interval, queue paused (no updates sent)
 - **With collaborators**: 1000ms interval, queue active
-- **Slower cellular links**: active-tab polling is widened on `3g`, `2g`, and `slow-2g`, capped at 25000ms to stay below the server-side awareness timeout
+- **Chromium hint**: active-tab polling is widened on `3g`, `2g`, and `slow-2g` when `navigator.connection.effectiveType` is available
+- **Cross-browser fallback**: when the Network Information API is unavailable, the last 3 successful poll RTTs are averaged and polling widens at `500ms` (`4x`) and `1500ms` (`10x`), capped at 25000ms to stay below the server-side awareness timeout
 
 Each poll cycle:
 
@@ -121,7 +122,7 @@ Awareness state (presence, cursors) is synchronized alongside document updates:
 - **Integrated endpoint**: Awareness travels with each sync request
 - **Automatic expiration**: Clients that haven't polled in 30 seconds are removed
 - **Collaborator detection**: When awareness shows multiple clients, polling speeds up
-- **Network-aware backoff**: Chromium browsers can widen polling when the reported connection type degrades
+- **Network-aware backoff**: Chromium browsers can widen polling from `effectiveType`, and other browsers can widen polling after several slow successful requests
 
 ## REST API
 
@@ -249,7 +250,7 @@ All CRDT operations happen in the browser via Yjs.
 
 ### Polling Latency
 
-Updates are not instant; there's inherent latency from the polling interval (typically 1000ms with collaborators, slower on constrained connections). This is acceptable for document editing but may not suit real-time cursor tracking at high fidelity.
+Updates are not instant; there's inherent latency from the polling interval (typically 1000ms with collaborators, slower on constrained connections or after sustained high RTT). This is acceptable for document editing but may not suit real-time cursor tracking at high fidelity.
 
 ### Single Compactor
 

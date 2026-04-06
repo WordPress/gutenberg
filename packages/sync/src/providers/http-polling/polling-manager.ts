@@ -44,8 +44,14 @@ import {
 } from './utils';
 import {
 	getNetworkAwarePollingInterval,
+	hasEffectiveConnectionTypeSupport,
 	subscribeToNetworkChanges,
 } from './network-info';
+import {
+	clearSuccessfulPollDurations,
+	getLatencyAwarePollingInterval,
+	recordSuccessfulPollDuration,
+} from './latency-info';
 
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
 
@@ -314,6 +320,14 @@ let pollInterval = POLLING_INTERVAL_IN_MS;
 let pollingTimeoutId: ReturnType< typeof setTimeout > | null = null;
 let unsubscribeFromNetworkChanges: ( () => void ) | null = null;
 
+function getCurrentTimeInMs(): number {
+	if ( typeof performance !== 'undefined' ) {
+		return performance.now();
+	}
+
+	return Date.now();
+}
+
 /**
  * Mark that a page unload has been requested. This fires on
  * `beforeunload` which happens before the browser aborts in-flight
@@ -396,7 +410,11 @@ function getPollIntervalForCurrentState(): number {
 		? POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS
 		: POLLING_INTERVAL_IN_MS;
 
-	return getNetworkAwarePollingInterval( baseInterval );
+	if ( hasEffectiveConnectionTypeSupport() ) {
+		return getNetworkAwarePollingInterval( baseInterval );
+	}
+
+	return getLatencyAwarePollingInterval( baseInterval );
 }
 
 /**
@@ -450,9 +468,18 @@ function poll(): void {
 				} )
 			),
 		};
+		const hasNetworkInformationSupport =
+			hasEffectiveConnectionTypeSupport();
+		const pollStartedAtInMs = getCurrentTimeInMs();
 
 		try {
 			const { rooms } = await postSyncUpdate( payload );
+
+			if ( ! hasNetworkInformationSupport ) {
+				recordSuccessfulPollDuration(
+					getCurrentTimeInMs() - pollStartedAtInMs
+				);
+			}
 
 			// Emit 'connected' status.
 			roomStates.forEach( ( state ) => {
@@ -755,6 +782,7 @@ function unregisterRoom( room: string ): void {
 		unsubscribeFromNetworkChanges = null;
 		areListenersRegistered = false;
 		hasCheckedConnectionLimit = false;
+		clearSuccessfulPollDurations();
 	}
 }
 

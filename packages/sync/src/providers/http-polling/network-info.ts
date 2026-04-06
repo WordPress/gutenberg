@@ -23,6 +23,10 @@ function getNetworkInformation(): NetworkInformationLike | undefined {
 	return ( navigator as NavigatorWithConnection ).connection;
 }
 
+export function hasEffectiveConnectionTypeSupport(): boolean {
+	return 'string' === typeof getNetworkInformation()?.effectiveType;
+}
+
 function getIntervalMultiplier(
 	effectiveType?: EffectiveConnectionType
 ): number {
@@ -48,7 +52,7 @@ function getIntervalMultiplier(
 export function getNetworkAwarePollingInterval( baseInterval: number ): number {
 	const connection = getNetworkInformation();
 
-	if ( ! connection ) {
+	if ( 'string' !== typeof connection?.effectiveType ) {
 		return baseInterval;
 	}
 
@@ -70,7 +74,11 @@ export function subscribeToNetworkChanges(
 ): ( () => void ) | undefined {
 	const connection = getNetworkInformation();
 
-	if ( ! connection?.addEventListener || ! connection.removeEventListener ) {
+	if (
+		'string' !== typeof connection?.effectiveType ||
+		! connection.addEventListener ||
+		! connection.removeEventListener
+	) {
 		return;
 	}
 
