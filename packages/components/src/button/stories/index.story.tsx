@@ -18,7 +18,6 @@ import {
 /**
  * Internal dependencies
  */
-import './style.css';
 import Button from '..';
 
 const meta: Meta< typeof Button > = {

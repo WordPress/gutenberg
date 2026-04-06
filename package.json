@@ -177,6 +177,7 @@
 		"storybook:build": "npm run --workspace @wordpress/storybook storybook:build",
 		"storybook:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook storybook:dev\"",
 		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook-playwright storybook:dev\"",
+		"storybook:e2e:build": "npm run --workspace @wordpress/storybook-playwright storybook:build",
 		"test": "npm-run-all lint test:unit",
 		"test:create-block": "bash ./bin/test-create-block.sh",
 		"test:e2e": "npm run --workspace @wordpress/e2e-tests-playwright test:e2e",
