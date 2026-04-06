@@ -9,14 +9,14 @@ export const DEFAULT_VIEW: View = {
 		field: 'date',
 		direction: 'desc' as const,
 	},
-	fields: [ 'content', 'post', 'date' ],
+	fields: [ 'post', 'date' ],
 	titleField: 'author_name',
+	descriptionField: 'content',
 	perPage: 20,
 };
 
 export const DEFAULT_LAYOUTS = {
 	table: {},
-	list: {},
 };
 
 type ActiveViewOverrides = {

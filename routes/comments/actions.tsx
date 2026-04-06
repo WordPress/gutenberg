@@ -132,7 +132,7 @@ export const unapproveComment: Action< CommentWithPermissions > = {
  */
 export const spamComment: Action< CommentWithPermissions > = {
 	id: 'spam-comment',
-	label: __( 'Mark as Spam' ),
+	label: __( 'Spam' ),
 	icon: bug,
 	supportsBulk: true,
 	isEligible( item ) {
@@ -238,7 +238,7 @@ export const restoreComment: Action< CommentWithPermissions > = {
  */
 export const trashComment: Action< CommentWithPermissions > = {
 	id: 'trash-comment',
-	label: __( 'Move to Trash' ),
+	label: __( 'Trash' ),
 	icon: trash,
 	supportsBulk: true,
 	isEligible( item ) {
@@ -290,7 +290,7 @@ export const trashComment: Action< CommentWithPermissions > = {
  */
 export const deleteComment: Action< CommentWithPermissions > = {
 	id: 'delete-comment',
-	label: __( 'Delete Permanently' ),
+	label: __( 'Delete' ),
 	icon: trash,
 	isDestructive: true,
 	supportsBulk: true,
@@ -382,7 +382,7 @@ export const deleteComment: Action< CommentWithPermissions > = {
 						disabled={ isBusy }
 						accessibleWhenDisabled
 					>
-						{ __( 'Delete Permanently' ) }
+						{ __( 'Delete' ) }
 					</Button>
 				</HStack>
 			</VStack>

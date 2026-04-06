@@ -59,11 +59,14 @@ export const contentField: Field< CommentWithPermissions > = {
 	enableGlobalSearch: true,
 	enableSorting: false,
 	render: ( { item } ) => {
-		const stripped =
-			item.content?.rendered?.replace( /<[^>]+>/g, '' ) || '';
-		const text = decodeEntities( stripped );
+		// Replace block-level closing tags with spaces to preserve word boundaries.
+		const spaced =
+			item.content?.rendered?.replace( /<\/(p|div|br\s*\/?)>/gi, ' ' ) ||
+			'';
+		const stripped = spaced.replace( /<[^>]+>/g, '' );
+		const text = decodeEntities( stripped ).trim();
 		const truncated =
-			text.length > 120 ? text.substring( 0, 120 ) + '...' : text;
+			text.length > 200 ? text.substring( 0, 200 ) + '...' : text;
 		return <span>{ truncated }</span>;
 	},
 };
@@ -108,7 +111,7 @@ function PostFieldView( { item }: { item: CommentWithPermissions } ) {
  */
 export const postField: Field< CommentWithPermissions > = {
 	id: 'post',
-	label: __( 'Post' ),
+	label: __( 'In Response To' ),
 	type: 'integer',
 	enableSorting: false,
 	render: PostFieldView,
@@ -150,7 +153,7 @@ export const postField: Field< CommentWithPermissions > = {
  */
 export const dateField: Field< CommentWithPermissions > = {
 	id: 'date',
-	label: __( 'Date' ),
+	label: __( 'Submitted on' ),
 	type: 'datetime',
 	render: ( { item } ) => {
 		const dateFormat = getSettings().formats.date;
