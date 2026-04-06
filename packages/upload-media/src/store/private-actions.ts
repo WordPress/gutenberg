@@ -969,7 +969,7 @@ export function encodeUltraHdrItem( id: QueueItemId ) {
 
 			// Decode gain map JPEG to pixel data, resized to match sub-size.
 			const gainBlob = new Blob(
-				[ new Uint8Array( cached.gainMap.buffer ) ],
+				[ cached.gainMap.buffer as ArrayBuffer ],
 				{
 					type: 'image/jpeg',
 				}
