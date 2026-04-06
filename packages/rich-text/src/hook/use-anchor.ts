@@ -62,6 +62,11 @@ function getFormatElement(
 
 	const selector = tagName + ( className ? '.' + className : '' );
 
+	// Element#matches will throw SyntaxError on an empty selector
+	if ( ! selector ) {
+		return;
+	}
+
 	if ( ! ( element instanceof window.HTMLElement ) ) {
 		return;
 	}
