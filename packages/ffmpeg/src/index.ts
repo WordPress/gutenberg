@@ -236,35 +236,35 @@ export async function convertGifToVideo(
 
 		args.push( outputFileName );
 
-		// Run FFmpeg.
+		// Run FFmpeg and read output, ensuring cleanup always happens.
 		core.setTimeout( -1 );
-		core.exec( ...args );
-
-		// Read output file.
-		const output = core.FS.readFile( outputFileName );
-
-		if ( ! output || output.length === 0 ) {
-			throw new Error( 'FFmpeg produced empty output' );
-		}
-
-		// Slice the buffer to extract only the relevant bytes.
-		// Uint8Array.buffer may include data outside the view's range.
-		const result = output.buffer.slice(
-			output.byteOffset,
-			output.byteOffset + output.byteLength
-		);
-
-		// Clean up temporary files.
 		try {
-			core.FS.unlink( inputFileName );
-			core.FS.unlink( outputFileName );
-		} catch {
-			// Ignore cleanup errors.
+			core.exec( ...args );
+
+			// Read output file.
+			const output = core.FS.readFile( outputFileName );
+
+			if ( ! output || output.length === 0 ) {
+				throw new Error( 'FFmpeg produced empty output' );
+			}
+
+			// Slice the buffer to extract only the relevant bytes.
+			// Uint8Array.buffer may include data outside the view's range.
+			return output.buffer.slice(
+				output.byteOffset,
+				output.byteOffset + output.byteLength
+			);
+		} finally {
+			// Always clean up temporary files and reset core state,
+			// even if exec() or readFile() throws.
+			try {
+				core.FS.unlink( inputFileName );
+				core.FS.unlink( outputFileName );
+			} catch {
+				// Ignore cleanup errors.
+			}
+			core.reset();
 		}
-
-		core.reset();
-
-		return result;
 	} finally {
 		inProgressOperations.delete( id );
 		releaseLock!();

@@ -11,8 +11,9 @@ playback experience.
 This package is not meant to be used directly. It is loaded lazily by
 `@wordpress/upload-media` when an animated GIF is detected in the upload queue.
 
-The FFmpeg WASM binary is inlined as a base64 data URL at build time and runs
-entirely in a Web Worker, keeping the main thread free.
+The heavy FFmpeg WASM binary (~31MB) is provided by the `wp-ffmpeg-wasm`
+canonical plugin, which is installed on-demand when needed. The conversion
+runs entirely in a Web Worker, keeping the main thread free.
 
 ## Installation
 

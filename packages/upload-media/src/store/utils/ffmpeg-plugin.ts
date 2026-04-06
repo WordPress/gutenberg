@@ -5,14 +5,9 @@ import { dispatch, resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
- * FFmpeg WASM configuration provided by the wp-ffmpeg-wasm plugin.
+ * Re-export the canonical type from @wordpress/ffmpeg.
  */
-export interface FFmpegConfig {
-	/** URL to the Emscripten JS glue file. */
-	coreUrl: string;
-	/** URL to the FFmpeg WASM binary. */
-	wasmUrl: string;
-}
+export type { FFmpegWasmConfig as FFmpegConfig } from '@wordpress/ffmpeg';
 
 /**
  * The plugin slug on WordPress.org.

@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import type { FFmpegConfig } from './utils/ffmpeg-plugin';
+
 export type QueueItemId = string;
 
 export type QueueStatus = 'active' | 'paused';
@@ -297,10 +302,7 @@ export interface OperationArgs {
 		/** Video output format: 'mp4' or 'webm'. */
 		outputFormat: 'mp4' | 'webm';
 		/** FFmpeg WASM config from the wp-ffmpeg-wasm plugin. */
-		ffmpegConfig: {
-			coreUrl: string;
-			wasmUrl: string;
-		};
+		ffmpegConfig: FFmpegConfig;
 	};
 }
 
