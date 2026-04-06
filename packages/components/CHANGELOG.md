@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   `ControlWithError`: Connect validation error messages to controls via `aria-describedby` ([#76742](https://github.com/WordPress/gutenberg/pull/76742)).
+-   `Autocomplete`: Fix value comparison to avoid resetting block inserter in RTC ([#76980](https://github.com/WordPress/gutenberg/pull/76980)).
 
 ## 32.4.0 (2026-03-18)
 
