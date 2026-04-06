@@ -166,6 +166,8 @@ export const annotation: AnnotationFormat = {
 		className: 'class',
 		id: 'id',
 	},
+	interactive: false,
+	object: false,
 	edit: () => {
 		return null;
 	},
