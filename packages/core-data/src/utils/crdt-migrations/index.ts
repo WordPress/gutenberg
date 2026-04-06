@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { type CRDTDoc } from '@wordpress/sync';
+import { type CRDTDoc, type MigrationResult } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -13,14 +13,7 @@ import {
 } from '../../sync';
 import { v2MigrateTableCellContent } from './v2-table-cell-content';
 
-/**
- * The result of running a single migration.
- *
- * - 'migrated': The document was patched in place.
- * - 'clean': The document was already valid (no changes needed).
- * - 'incompatible': The document cannot be migrated and must be discarded.
- */
-export type MigrationResult = 'migrated' | 'clean' | 'incompatible';
+export type { MigrationResult };
 
 type MigrationFn = ( ydoc: CRDTDoc ) => MigrationResult;
 
@@ -47,7 +40,7 @@ const migrations: Array< { version: number; migrate: MigrationFn } > = [
  * Run migrations on a persisted CRDT document to bring it up to the current
  * schema version.
  *
- * This is an O(1) version check when the document is already current. When
+ * This is a simple version check when the document is already current. When
  * migrations are needed, they run sequentially and the version is updated in
  * the state map so they only run once per document lifetime.
  *
@@ -65,6 +58,8 @@ export function migrateCRDTDoc( ydoc: CRDTDoc ): MigrationResult {
 
 	let didMigrate = false;
 
+	// Defensive sort to ensure migrations always run in version order,
+	// regardless of how they are ordered in the registry array.
 	const sortedMigrations = [ ...migrations ].sort(
 		( a, b ) => a.version - b.version
 	);

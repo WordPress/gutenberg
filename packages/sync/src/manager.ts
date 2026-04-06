@@ -23,6 +23,7 @@ import type {
 	CollectionHandlers,
 	CRDTDoc,
 	EntityID,
+	MigrationResult,
 	ObjectID,
 	ObjectData,
 	ObjectType,
@@ -484,14 +485,17 @@ export function createSyncManager( debug = false ): SyncManager {
 		// If a migration throws, treat it as incompatible and fall back to
 		// rebuilding from the database record. This ensures a buggy migration
 		// can never corrupt a document beyond "discard and rebuild."
-		let migrationResult: 'migrated' | 'clean' | 'incompatible' = 'clean';
-		try {
-			migrationResult = migrateCRDTDoc?.( tempDoc ) ?? 'clean';
-		} catch ( error ) {
-			log( 'applyPersistedCrdtDoc', 'migration error', entityId, {
-				error,
-			} );
-			migrationResult = 'incompatible';
+		let migrationResult: MigrationResult | undefined;
+
+		if ( migrateCRDTDoc ) {
+			try {
+				migrationResult = migrateCRDTDoc( tempDoc );
+			} catch ( error ) {
+				log( 'applyPersistedCrdtDoc', 'migration error', entityId, {
+					error,
+				} );
+				migrationResult = 'incompatible';
+			}
 		}
 
 		if ( migrationResult === 'incompatible' ) {

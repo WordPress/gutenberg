@@ -130,6 +130,15 @@ export interface RecordHandlers {
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 }
 
+/**
+ * The result of running a CRDT document migration.
+ *
+ * - 'migrated': The document was patched in place.
+ * - 'clean': The document was already up to date (no changes needed).
+ * - 'incompatible': The document cannot be migrated and must be discarded.
+ */
+export type MigrationResult = 'migrated' | 'clean' | 'incompatible';
+
 export interface SyncConfig {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
@@ -155,7 +164,7 @@ export interface SyncConfig {
 	 * - 'clean': The document was already up to date (no changes needed).
 	 * - 'incompatible': The document cannot be migrated and must be discarded.
 	 */
-	migrateCRDTDoc?: ( ydoc: Y.Doc ) => 'migrated' | 'clean' | 'incompatible';
+	migrateCRDTDoc?: ( ydoc: Y.Doc ) => MigrationResult;
 }
 
 export interface SyncManager {

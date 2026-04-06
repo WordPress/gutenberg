@@ -89,11 +89,11 @@ jest.mock( '@wordpress/blocks', () => ( {
  * Internal dependencies
  */
 import { migrateCRDTDoc } from '../crdt-migrations';
-
-// These constants match what the sync package uses.
-const CRDT_STATE_MAP_KEY = 'state';
-const CRDT_STATE_MAP_VERSION_KEY = 'version';
-const CRDT_RECORD_MAP_KEY = 'document';
+import {
+	CRDT_STATE_MAP_KEY,
+	CRDT_STATE_MAP_VERSION_KEY,
+	CRDT_RECORD_MAP_KEY,
+} from '../../sync';
 
 /**
  * Helper: create a Y.Doc with the state map version set.
@@ -252,6 +252,69 @@ describe( 'crdt-migrations', () => {
 			const result = migrateCRDTDoc( doc );
 
 			expect( result ).toBe( 'clean' );
+		} );
+
+		it( 'runs migrations when doc has no version key set', () => {
+			// Simulates a pre-versioning doc where the version key was
+			// never written. The ?? 0 fallback should treat it as
+			// version 0 and run all migrations.
+			doc = new Y.Doc();
+			const recordMap = doc.getMap( CRDT_RECORD_MAP_KEY );
+			const blocks = new Y.Array();
+			recordMap.set( 'blocks', blocks );
+
+			doc.transact( () => {
+				const cell = new Y.Map( [
+					[ 'content', new Y.Map() ],
+					[ 'tag', 'td' ],
+				] as [ string, unknown ][] );
+
+				const cells = new Y.Array();
+				cells.insert( 0, [ cell ] );
+				const row = new Y.Map( [ [ 'cells', cells ] ] as [
+					string,
+					unknown,
+				][] );
+
+				const body = new Y.Array();
+				body.insert( 0, [ row ] );
+
+				const attributes = new Y.Map( [
+					[ 'hasFixedLayout', false ],
+					[ 'body', body ],
+				] as [ string, unknown ][] );
+
+				const tableBlock = new Y.Map( [
+					[ 'name', 'core/table' ],
+					[ 'attributes', attributes ],
+					[ 'innerBlocks', new Y.Array() ],
+					[ 'clientId', 'test-no-version' ],
+				] as [ string, unknown ][] );
+
+				blocks.insert( 0, [ tableBlock ] );
+			} );
+
+			const result = migrateCRDTDoc( doc );
+
+			expect( result ).toBe( 'migrated' );
+
+			// Version should be set after migration.
+			const stateMap = doc.getMap( CRDT_STATE_MAP_KEY );
+			expect( stateMap.get( CRDT_STATE_MAP_VERSION_KEY ) ).toBe( 2 );
+
+			// Cell content should be repaired.
+			const tableBlock = (
+				recordMap.get( 'blocks' ) as Y.Array< Y.Map< unknown > >
+			 ).get( 0 );
+			const attrs = tableBlock.get( 'attributes' ) as Y.Map< unknown >;
+			const body = attrs.get( 'body' ) as Y.Array< Y.Map< unknown > >;
+			const row = body.get( 0 );
+			const repairedCells = row.get( 'cells' ) as Y.Array<
+				Y.Map< unknown >
+			>;
+			const content = repairedCells.get( 0 ).get( 'content' );
+
+			expect( content ).toBeInstanceOf( Y.Text );
 		} );
 
 		it( 'returns clean when doc has no blocks', () => {
