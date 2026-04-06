@@ -71,10 +71,10 @@ let settings: DateSettings = {
 	timezone: { offset: 0, offsetFormatted: '0', string: '', abbr: '' },
 };
 
-export function getCurrentSettings(): DateSettings {
+export function getSettings(): DateSettings {
 	return settings;
 }
 
-export function setCurrentSettings( newSettings: DateSettings ) {
+export function setSettings( newSettings: DateSettings ) {
 	settings = newSettings;
 }

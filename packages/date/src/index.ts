@@ -15,7 +15,10 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import type { DateSettings } from './types';
-import { getCurrentSettings, setCurrentSettings } from './settings';
+import {
+	getSettings as getCurrentSettings,
+	setSettings as setCurrentSettings,
+} from './settings';
 
 export type * from './types';
 
