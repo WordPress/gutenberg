@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'Revisions', () => {
+test.describe( 'Post revisions', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -147,8 +147,10 @@ test.describe( 'Revisions', () => {
 		await page.keyboard.press( 'Home' );
 
 		// Verify the heading's clientId is preserved (prevents flashing).
-		const clientIdAfter = await headingBlock.getAttribute( 'data-block' );
-		expect( clientIdAfter ).toBe( clientIdBefore );
+		await expect( headingBlock ).toHaveAttribute(
+			'data-block',
+			clientIdBefore
+		);
 	} );
 
 	// Regression test for https://github.com/WordPress/gutenberg/issues/75926
@@ -224,5 +226,130 @@ test.describe( 'Revisions', () => {
 		await expect(
 			editor.canvas.locator( '[data-type="test/selectors-in-revisions"]' )
 		).toHaveText( 'has-group-parent' );
+	} );
+} );
+
+test.describe( 'Template and template part revisions', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+	} );
+
+	[
+		{
+			postType: 'wp_template',
+			postId: 'emptytheme//index',
+			tabName: 'Template',
+		},
+		{
+			postType: 'wp_template_part',
+			postId: 'emptytheme//header',
+			tabName: 'Template Part',
+		},
+	].forEach( ( { postType, postId, tabName } ) => {
+		test( `should restore an older ${ postType } revision`, async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			await admin.visitSiteEditor( {
+				postId,
+				postType,
+				canvas: 'edit',
+			} );
+
+			await editor.setContent( '' );
+
+			// Template and template part revisions work differently from
+			// post revisions: the first save writes directly to the database
+			// without creating a revision, so a revision is only created from
+			// the second save onwards. The revisions button requires at least
+			// two revisions, which means three saves are needed here.
+			for ( const content of [
+				'First paragraph',
+				'Second paragraph',
+				'Third paragraph',
+			] ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} );
+				await editor.saveSiteEditorEntities( {
+					isOnlyCurrentEntityDirty: true,
+				} );
+				const saveButton = page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'Save' } );
+				await expect( saveButton ).toBeDisabled();
+				await page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.click();
+				// WordPress stores revision timestamps at second precision.
+				// Wait to ensure each save gets a unique timestamp so revisions
+				// are ordered deterministically.
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+				await page.waitForTimeout( 1000 );
+			}
+
+			// Open the post settings sidebar and click the Revisions button.
+			await editor.openDocumentSettingsSidebar();
+			const settingsSidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await settingsSidebar.getByRole( 'tab', { name: tabName } ).click();
+
+			// Click the Revisions button.
+			await settingsSidebar.getByRole( 'button', { name: '2' } ).click();
+
+			// Wait for the revisions mode to be active.
+			const restoreButton = page.getByRole( 'button', {
+				name: 'Restore',
+			} );
+			await expect( restoreButton ).toBeVisible();
+
+			// Use the slider to navigate to the oldest revision.
+			const slider = page.getByRole( 'slider', { name: 'Revision' } );
+			await slider.focus();
+			await page.keyboard.press( 'Home' );
+
+			// Wait for the revision content to update before restoring.
+			// The oldest revision contains two paragraph blocks
+			// ("First" and "Second"), while the latest has three.
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+			).toHaveCount( 2 );
+
+			// Restore the oldest revision.
+			await restoreButton.click();
+
+			// Verify the success notice.
+			const notice = page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Restored to revision' } );
+			await expect( notice ).toBeVisible();
+			await expect( notice ).not.toHaveText( /Invalid Date/ );
+
+			// Verify the restored content.
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'First paragraph' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Second paragraph' },
+				},
+			] );
+		} );
 	} );
 } );

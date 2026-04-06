@@ -142,7 +142,7 @@ export function DefaultConnectorSettings( {
 						sprintf(
 							/* translators: %s: Link to provider settings. */
 							__(
-								'Your API key is stored securely. You can reset it at %s'
+								'Your API key is stored securely. You can manage it at %s'
 							),
 							'<a></a>'
 						),

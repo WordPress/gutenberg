@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.43.0 (2026-04-01)
+
 ### Enhancements
 
 -   Add a new section of recently used commands to the Command Palette.

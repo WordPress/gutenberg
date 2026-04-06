@@ -3,7 +3,7 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"moduleResolution": "bundler",
-		"types": [ "css-modules" ]
+		"types": [ "style-imports" ]
 	},
 	"files": [ "global.d.ts" ],
 	"references": [ { "path": "../element" }, { "path": "../private-apis" } ]

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -74,10 +69,8 @@ test.describe( 'Page List', () => {
 					} );
 					await placeholder.click();
 					const mediaLibrary = page.getByRole( 'dialog' );
-					const TEST_IMAGE_FILE_PATH = path.resolve(
-						__dirname,
-						'../../assets/10x10_e2e_test_image_z9T8jK.png'
-					);
+					const TEST_IMAGE_FILE_PATH =
+						'./assets/10x10_e2e_test_image_z9T8jK.png';
 
 					const fileChooserPromise =
 						page.waitForEvent( 'filechooser' );

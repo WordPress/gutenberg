@@ -60,6 +60,7 @@ export default function PostList( { postType } ) {
 		default_view: defaultView,
 		default_layouts: defaultLayouts,
 		view_list: viewList,
+		form: quickEditForm,
 	} = useViewConfig( {
 		kind: 'postType',
 		name: postType,
@@ -339,6 +340,7 @@ export default function PostList( { postType } ) {
 						postType={ postType }
 						postId={ selection }
 						closeModal={ closeQuickEditModal }
+						quickEditForm={ quickEditForm }
 					/>
 				) }
 		</Page>

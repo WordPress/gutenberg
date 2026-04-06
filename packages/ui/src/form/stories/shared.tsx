@@ -1,3 +1,5 @@
+import { Link } from '../..';
+
 export const WITH_DETAILS_DESCRIPTION = `\
 To add rich content (such as links) to the description, use the \`details\` prop.
 
@@ -11,9 +13,9 @@ so the readout is not unnecessarily verbose for screen reader users.`;
 export const DETAILS_EXAMPLE = (
 	<>
 		Details can include{ ' ' }
-		<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
+		<Link href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
 			links to more information
-		</a>{ ' ' }
+		</Link>{ ' ' }
 		and other semantic elements.
 	</>
 );

@@ -124,7 +124,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		try {
 			plainText = clipboardData.getData( 'text/plain' );
 			html = clipboardData.getData( 'text/html' );
-		} catch ( error ) {
+		} catch {
 			// Some browsers like UC Browser paste plain text by default and
 			// don't support clipboardData at all, so allow default
 			// behaviour.

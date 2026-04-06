@@ -192,6 +192,19 @@ export type UseAutocompleteProps = {
 	contentRef: ContentRef;
 };
 
+export type AutocompleteState = {
+	selectedIndex: number;
+	filteredOptions: KeyedOption[];
+	filterValue: string;
+	autocompleter: WPCompleter | null;
+};
+
+export type AutocompleteAction =
+	| { type: 'RESET' }
+	| { type: 'SELECT'; index: number }
+	| { type: 'OPTIONS'; options: KeyedOption[] }
+	| { type: 'MATCH'; completer: WPCompleter; query: string };
+
 export type AutocompleteProps = UseAutocompleteProps & {
 	/**
 	 * A function that returns nodes to be rendered within the Autocomplete.

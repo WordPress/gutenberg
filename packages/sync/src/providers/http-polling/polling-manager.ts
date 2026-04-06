@@ -18,11 +18,14 @@ import * as syncProtocol from 'y-protocols/sync';
  */
 import {
 	DEFAULT_CLIENT_LIMIT_PER_ROOM,
-	MAX_ERROR_BACKOFF_IN_MS,
+	ERROR_RETRY_DELAYS_SOLO_MS,
+	ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS,
 	MAX_UPDATE_SIZE_IN_BYTES,
 	POLLING_INTERVAL_IN_MS,
 	POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS,
 	POLLING_INTERVAL_BACKGROUND_TAB_IN_MS,
+	DISCONNECT_DIALOG_RETRY_MS,
+	MANUAL_RETRY_INTERVAL_MS,
 } from './config';
 import { ConnectionError, ConnectionErrorCode } from '../../errors';
 import type { ConnectionStatus } from '../../types';
@@ -45,7 +48,12 @@ import {
 
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
 
-type LogFunction = ( message: string, debug?: object ) => void;
+type LogFunction = (
+	message: string,
+	debug?: object,
+	errorLevel?: 'error' | 'log' | 'warn',
+	force?: boolean
+) => void;
 
 interface PollingManager {
 	registerRoom: ( options: RegisterRoomOptions ) => void;
@@ -300,7 +308,9 @@ function checkConnectionLimit(
 }
 
 let areListenersRegistered = false;
+let consecutiveFailures = 0;
 let hasCheckedConnectionLimit = false;
+let isManualRetry = false;
 let hasCollaborators = false;
 let isActiveBrowser = 'visible' === document.visibilityState;
 let isPolling = false;
@@ -415,6 +425,8 @@ function poll(): void {
 			const { rooms } = await postSyncUpdate( payload );
 
 			// Emit 'connected' status.
+			consecutiveFailures = 0;
+			isManualRetry = false;
 			roomStates.forEach( ( state ) => {
 				state.onStatusChange( { status: 'connected' } );
 			} );
@@ -447,23 +459,39 @@ function poll(): void {
 				roomState.processAwarenessUpdate( room.awareness );
 
 				// If there is another collaborator on the primary entity,
-				// resume the queue for the next poll and increase polling
-				// frequency. We only check the primary room to avoid false
-				// positives from shared collection rooms (e.g. taxonomy/category).
+				// resume all room queues for the next poll and increase
+				// polling frequency. We only check the primary room to
+				// avoid false positives from shared collection rooms
+				// (e.g. taxonomy/category), but resume all queues so
+				// collection rooms (e.g. root/comment) can also sync.
 				if (
 					roomState.isPrimaryRoom &&
 					Object.keys( room.awareness ).length > 1
 				) {
 					hasCollaborators = true;
-					roomState.updateQueue.resume();
+					roomStates.forEach( ( state ) => {
+						state.updateQueue.resume();
+					} );
 				}
 
 				// Process each incoming update and collect any responses.
-				const responseUpdates = room.updates
-					.map( ( update ) => roomState.processDocUpdate( update ) )
-					.filter( ( update ): update is SyncUpdate =>
-						Boolean( update )
-					);
+				const responseUpdates: SyncUpdate[] = [];
+				for ( const update of room.updates ) {
+					try {
+						const response = roomState.processDocUpdate( update );
+						if ( response ) {
+							responseUpdates.push( response );
+						}
+					} catch ( error ) {
+						roomState.log(
+							'Failed to apply sync update',
+							{ error, update },
+							'error',
+							true // force
+						);
+					}
+				}
+
 				roomState.updateQueue.addBulk( responseUpdates );
 
 				// Respond to compaction requests from server. The server asks only one
@@ -495,26 +523,52 @@ function poll(): void {
 				pollInterval = POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
 			}
 		} catch ( error ) {
-			// Exponential backoff on error: double the backoff time, up to max
-			pollInterval = Math.min(
-				pollInterval * 2,
-				MAX_ERROR_BACKOFF_IN_MS
-			);
+			// Use the explicit retry delay schedule for backoff.
+			consecutiveFailures++;
+			const retrySchedule = hasCollaborators
+				? ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS
+				: ERROR_RETRY_DELAYS_SOLO_MS;
+			if ( consecutiveFailures <= retrySchedule.length ) {
+				pollInterval = retrySchedule[ consecutiveFailures - 1 ];
+			} else {
+				pollInterval = DISCONNECT_DIALOG_RETRY_MS;
+			}
 
-			// Restore updates to queues on failure so they can be retried.
+			// After a manual retry, use a shorter interval for one cycle.
+			if ( isManualRetry ) {
+				pollInterval = MANUAL_RETRY_INTERVAL_MS;
+				isManualRetry = false;
+			}
+
+			// Recover from the failed request. We don't know whether the server stored
+			// our updates before the error occurred (e.g. a network timeout after a
+			// successful write). Re-sending the same updates via restore() would
+			// duplicate them on the server and cause unbounded storage growth.
+			//
+			// Instead, for rooms that had outgoing updates, replace the queue with a
+			// single compaction (full document state). This is idempotent: if the
+			// server already stored the updates, the compaction safely supersedes
+			// them; if it didn't, the compaction includes them. Updates not seen by
+			// this client are preserved in both cases.
 			for ( const room of payload.rooms ) {
 				if ( ! roomStates.has( room.room ) ) {
 					continue;
 				}
 
 				const state = roomStates.get( room.room )!;
-				state.updateQueue.restore( room.updates );
+
+				if ( room.updates.length > 0 && state.endCursor > 0 ) {
+					state.updateQueue.clear();
+					state.updateQueue.add( state.createCompactionUpdate() );
+				} else if ( room.updates.length > 0 ) {
+					state.updateQueue.restore( room.updates );
+				}
+
 				state.log(
 					'Error posting sync update, will retry with backoff',
-					{
-						error,
-						nextPoll: pollInterval,
-					}
+					{ error, nextPoll: pollInterval },
+					'error',
+					true // force
 				);
 			}
 
@@ -522,10 +576,15 @@ function poll(): void {
 			// due to page unload (e.g. during a refresh) to avoid briefly
 			// flashing the disconnect dialog before the new page loads.
 			if ( ! isUnloadPending ) {
+				const backgroundRetriesFailed =
+					consecutiveFailures > retrySchedule.length;
+
 				roomStates.forEach( ( state ) => {
 					state.onStatusChange( {
 						status: 'disconnected',
 						canManuallyRetry: true,
+						consecutiveFailures,
+						backgroundRetriesFailed,
 						willAutoRetryInMs: pollInterval,
 					} );
 				} );
@@ -695,16 +754,18 @@ function unregisterRoom( room: string ): void {
 		);
 		areListenersRegistered = false;
 		hasCheckedConnectionLimit = false;
+		consecutiveFailures = 0;
 	}
 }
 
 /**
- * Immediately retry the sync connection by cancelling any pending backoff
- * timeout and triggering a new poll. If a request is already in-flight,
- * the backoff interval is reset so the next scheduled poll fires sooner.
+ * Immediately retry the sync connection by cancelling any pending
+ * timeout and triggering a new poll. If the retry fails, the next
+ * auto-retry waits 15s (MANUAL_RETRY_INTERVAL_MS) instead of the
+ * usual 30s, then falls back to 30s for subsequent auto-retries.
  */
 function retryNow(): void {
-	pollInterval = POLLING_INTERVAL_IN_MS * 2;
+	isManualRetry = true;
 
 	if ( pollingTimeoutId ) {
 		clearTimeout( pollingTimeoutId );

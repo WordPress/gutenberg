@@ -87,8 +87,8 @@ Semantic tokens follow a consistent naming pattern:
 
 **Modifier** is an optional size or intensity modifier.
 
-| Value                               | Description          |
-| ----------------------------------- | -------------------- |
+| Value                                      | Description          |
+| ------------------------------------------ | -------------------- |
 | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl` | Size scale modifiers |
 
 #### Color Token Modifiers
@@ -111,9 +111,7 @@ Color tokens extend the base pattern with additional modifiers for tone, emphasi
 | `warning` | Higher-severity or time-sensitive issues that require user attention but are not errors |
 | `error`   | Blocking issues, validation failures, or destructive actions                            |
 
-> [!NOTE]
-> `caution` and `warning` represent two escalation levels of non-error severity.
-> Use **`caution`** for guidance or minor risks, and **`warning`** when the user must act to prevent an error.
+Note: `caution` and `warning` represent two escalation levels of non-error severity. Use **`caution`** for guidance or minor risks, and **`warning`** when the user must act to prevent an error.
 
 **Emphasis** adjusts color strength relative to the base tone, if specified. The default is a normal emphasis.
 
@@ -138,7 +136,10 @@ import { ThemeProvider } from '@wordpress/theme';
 
 function App() {
 	return (
-		<ThemeProvider color={ { primary: 'blue' } } cursor={ { control: 'pointer' } } density="compact">
+		<ThemeProvider
+			color={ { primary: 'blue' } }
+			density="compact"
+		>
 			{ /* Your app content */ }
 		</ThemeProvider>
 	);
@@ -154,7 +155,7 @@ Both properties accept any valid CSS color value. The theme system automatically
 
 The `cursor` prop accepts an object with the following optional properties:
 
--   `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'`.
+-   `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).
 
 The `density` prop controls the spacing scale throughout the UI:
 
@@ -226,12 +227,12 @@ This rule reports an error when a CSS value references a `--wpds-*` custom prope
 ```css
 /* ✗ Error: '--wpds-unknown-token' is not a valid Design System token */
 .example {
-	color: var(--wpds-unknown-token);
+	color: var( --wpds-unknown-token );
 }
 
 /* ✓ OK */
 .example {
-	color: var(--wpds-color-fg-content-neutral);
+	color: var( --wpds-color-fg-content-neutral );
 }
 ```
 
@@ -263,17 +264,17 @@ This rule reports an error when a `var()` call for a `--wpds-*` token includes a
 ```css
 /* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-fg-content-neutral' */
 .example {
-	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
+	color: var( --wpds-color-fg-content-neutral, #1e1e1e );
 }
 
 /* ✓ OK */
 .example {
-	color: var(--wpds-color-fg-content-neutral);
+	color: var( --wpds-color-fg-content-neutral );
 }
 
 /* ✓ OK: Non-wpds custom properties are not checked */
 .example {
-	color: var(--my-custom-color, red);
+	color: var( --my-custom-color, red );
 }
 ```
 
@@ -285,11 +286,11 @@ This package provides build plugins that inject fallback values into bare `var(-
 
 Three plugin variants are available, covering common build tool setups:
 
-| Export                                                            | Tool    | Scope |
-| ----------------------------------------------------------------- | ------- | ----- |
-| `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks`     | PostCSS | CSS   |
-| `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`     | esbuild | JS/TS |
-| `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`           | Vite    | JS/TS |
+| Export                                                        | Tool    | Scope |
+| ------------------------------------------------------------- | ------- | ----- |
+| `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks` | PostCSS | CSS   |
+| `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks` | esbuild | JS/TS |
+| `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`       | Vite    | JS/TS |
 
 All three plugins skip files that don't contain `--wpds-` references, so there is zero overhead on unrelated modules.
 

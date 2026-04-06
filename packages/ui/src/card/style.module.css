@@ -12,6 +12,7 @@
 		border-radius: var(--wpds-border-radius-lg);
 		overflow: clip;
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		color: var(--wpds-color-fg-content-neutral);
 	}
 
 	/* Padding is applied to the individual header/content elements to enable
@@ -40,6 +41,5 @@
 
 	.title {
 		margin: 0;
-		color: var(--wpds-color-fg-content-neutral);
 	}
 }

@@ -110,6 +110,7 @@ type DataType = {
 	booleanWithToggle: boolean;
 	booleanWithElements: boolean;
 	datetime: string;
+	datetimeCompact?: string;
 	datetimeWithElements: string;
 	date: string;
 	dateWithElements: string;
@@ -150,6 +151,7 @@ const data: DataType[] = [
 		booleanWithToggle: true,
 		booleanWithElements: true,
 		datetime: '2021-01-01T14:30:00Z',
+		datetimeCompact: '2021-01-01T14:30:00Z',
 		datetimeWithElements: '1982-05-10T20:30:00Z',
 		date: '2021-01-01',
 		dateWithElements: '2021-01-01',
@@ -302,6 +304,16 @@ const fields: Field< DataType >[] = [
 		type: 'datetime',
 		label: 'Datetime',
 		description: 'Help for datetime.',
+	},
+	{
+		id: 'datetimeCompact',
+		type: 'datetime',
+		label: 'Datetime (compact)',
+		description: 'Datetime field without the calendar widget.',
+		Edit: {
+			control: 'datetime',
+			compact: true,
+		},
 	},
 	{
 		id: 'datetimeWithElements',

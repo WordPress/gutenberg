@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+## 1.11.0 (2026-04-01)
+
 ### Bug Fixes
 
 -   `Breadcrumbs`: throw a runtime error when non-last items are missing a `to` prop [#76493](https://github.com/WordPress/gutenberg/pull/76493/)
+-   Fix Page Header not rendering when only `actions` prop is provided. [#76695](https://github.com/WordPress/gutenberg/pull/76695)
 
 ## 1.10.0 (2026-03-18)
 
