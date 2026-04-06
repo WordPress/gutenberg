@@ -19,7 +19,9 @@ import {
 	useBlockProps,
 	useSettings,
 	useBlockEditingMode,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import { formatLTR } from '@wordpress/icons';
 /**
@@ -119,6 +121,20 @@ function ParagraphBlock( {
 		style: { direction },
 	} );
 	const blockEditingMode = useBlockEditingMode();
+	const isEmpty = RichText.isEmpty( content );
+	const hasSlashReplacements = useSelect(
+		( select ) =>
+			isEmpty &&
+			select( blockEditorStore ).__unstableHasSlashCommandReplacements(
+				clientId
+			),
+		[ clientId, isEmpty ]
+	);
+	const emptyAriaLabel = hasSlashReplacements
+		? __(
+				'Empty block; start writing or type forward slash to choose a block'
+		  )
+		: __( 'Empty block; start writing' );
 
 	return (
 		<>
@@ -152,14 +168,15 @@ function ParagraphBlock( {
 				onReplace={ onReplace }
 				onRemove={ onRemove }
 				aria-label={
-					RichText.isEmpty( content )
-						? __(
-								'Empty block; start writing or type forward slash to choose a block'
-						  )
-						: __( 'Block: Paragraph' )
+					isEmpty ? emptyAriaLabel : __( 'Block: Paragraph' )
 				}
-				data-empty={ RichText.isEmpty( content ) }
-				placeholder={ placeholder || __( 'Type / to choose a block' ) }
+				data-empty={ isEmpty }
+				placeholder={
+					placeholder ||
+					( hasSlashReplacements
+						? __( 'Type / to choose a block' )
+						: __( 'Start writing…' ) )
+				}
 				data-custom-placeholder={ placeholder ? true : undefined }
 				__unstableEmbedURLOnPaste
 				__unstableAllowPrefixTransformations
