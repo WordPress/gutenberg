@@ -477,6 +477,59 @@ describe( 'crdt-migrations', () => {
 			expect( content ).toBeInstanceOf( Y.Text );
 		} );
 
+		it( 'repairs table body stored as plain array instead of Y.Array', () => {
+			// Pre-#76913 docs stored array+query attributes as plain JS
+			// arrays rather than Y.Array. This is the actual corruption
+			// pattern found in the wild.
+			doc = createDocWithVersion( 1 );
+			const recordMap = doc.getMap( CRDT_RECORD_MAP_KEY );
+			const blocks = new Y.Array();
+			recordMap.set( 'blocks', blocks );
+
+			doc.transact( () => {
+				const attributes = new Y.Map( [
+					[ 'hasFixedLayout', false ],
+					[
+						'body',
+						[
+							{
+								cells: [
+									{ content: {}, tag: 'td' },
+									{ content: {}, tag: 'td' },
+								],
+							},
+						],
+					],
+				] as [ string, unknown ][] );
+
+				const tableBlock = new Y.Map( [
+					[ 'name', 'core/table' ],
+					[ 'attributes', attributes ],
+					[ 'innerBlocks', new Y.Array() ],
+					[ 'clientId', 'test-table-plain-array' ],
+				] as [ string, unknown ][] );
+
+				blocks.insert( 0, [ tableBlock ] );
+			} );
+
+			const result = migrateCRDTDoc( doc );
+
+			expect( result ).toBe( 'migrated' );
+
+			// The plain array should have been replaced with an empty
+			// Y.Array. The invalidation logic will then fill in the
+			// correct content from the database.
+			const tableBlock = (
+				recordMap.get( 'blocks' ) as Y.Array< Y.Map< unknown > >
+			 ).get( 0 );
+			const attributes = tableBlock.get(
+				'attributes'
+			) as Y.Map< unknown >;
+			const body = attributes.get( 'body' );
+
+			expect( body ).toBeInstanceOf( Y.Array );
+		} );
+
 		it( 'is idempotent: second run returns clean with O(1) skip', () => {
 			doc = createCorruptedTableDoc( 1 );
 

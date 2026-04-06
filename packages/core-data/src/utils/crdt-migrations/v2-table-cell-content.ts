@@ -107,25 +107,38 @@ function migrateBlockAttributes(
 		}
 
 		// An array with a query schema (e.g. table body/head/foot).
-		if (
-			schema.type === 'array' &&
-			schema.query &&
-			attrValue instanceof Y.Array
-		) {
-			if ( migrateYArrayWithSchema( attrValue, schema.query ) ) {
+		if ( schema.type === 'array' && schema.query ) {
+			if ( attrValue instanceof Y.Array ) {
+				// Already a Y.Array, walk it to repair nested rich-text.
+				if ( migrateYArrayWithSchema( attrValue, schema.query ) ) {
+					repaired = true;
+				}
+			} else {
+				// Pre-#76913 docs stored array+query attributes as plain
+				// arrays instead of Y.Array. Replace with an empty Y.Array
+				// so the invalidation logic can fill in the correct content
+				// from the database.
+				attributes.set( attrName, new Y.Array() );
 				repaired = true;
 			}
+
+			continue;
 		}
 
 		// An object with a query schema.
-		if (
-			schema.type === 'object' &&
-			schema.query &&
-			attrValue instanceof Y.Map
-		) {
-			if ( migrateYMapWithSchema( attrValue, schema.query ) ) {
+		if ( schema.type === 'object' && schema.query ) {
+			if ( attrValue instanceof Y.Map ) {
+				// Already a Y.Map, walk it to repair nested rich-text.
+				if ( migrateYMapWithSchema( attrValue, schema.query ) ) {
+					repaired = true;
+				}
+			} else {
+				// Same as above: plain object instead of Y.Map.
+				attributes.set( attrName, new Y.Map() );
 				repaired = true;
 			}
+
+			continue;
 		}
 	}
 
