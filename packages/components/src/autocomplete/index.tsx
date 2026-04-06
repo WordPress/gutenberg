@@ -4,9 +4,9 @@
 import {
 	renderToString,
 	useEffect,
-	useState,
-	useRef,
 	useMemo,
+	useReducer,
+	useRef,
 } from '@wordpress/element';
 import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
 import {
@@ -26,14 +26,14 @@ import { getAutoCompleterUI } from './autocompleter-ui';
 import { getAutocompleteMatch } from './get-autocomplete-match';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import type {
+	AutocompleteAction,
 	AutocompleteProps,
-	AutocompleterUIProps,
+	AutocompleteState,
 	InsertOption,
 	KeyedOption,
 	OptionCompletion,
 	ReplaceOption,
 	UseAutocompleteProps,
-	WPCompleter,
 } from './types';
 import getNodeText from '../utils/get-node-text';
 
@@ -41,6 +41,59 @@ const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 
 // Used for generating the instance ID
 const AUTOCOMPLETE_HOOK_REFERENCE = {};
+
+function getCompletionObject(
+	completion: OptionCompletion
+): InsertOption | ReplaceOption {
+	if (
+		completion !== null &&
+		typeof completion === 'object' &&
+		'action' in completion &&
+		completion.action !== undefined &&
+		'value' in completion &&
+		completion.value !== undefined
+	) {
+		return completion;
+	}
+	return {
+		action: 'insert-at-caret',
+		value: completion as React.ReactNode,
+	};
+}
+
+const initialState: AutocompleteState = {
+	selectedIndex: 0,
+	filteredOptions: EMPTY_FILTERED_OPTIONS,
+	filterValue: '',
+	autocompleter: null,
+};
+
+function autocompleteReducer(
+	state: AutocompleteState,
+	action: AutocompleteAction
+): AutocompleteState {
+	switch ( action.type ) {
+		case 'RESET':
+			return initialState;
+		case 'SELECT':
+			return { ...state, selectedIndex: action.index };
+		case 'OPTIONS':
+			return {
+				...state,
+				filteredOptions: action.options,
+				selectedIndex:
+					action.options.length === state.filteredOptions.length
+						? state.selectedIndex
+						: 0,
+			};
+		case 'MATCH':
+			return {
+				...state,
+				autocompleter: action.completer,
+				filterValue: action.query,
+			};
+	}
+}
 
 export function useAutocomplete( {
 	record,
@@ -50,19 +103,14 @@ export function useAutocomplete( {
 	contentRef,
 }: UseAutocompleteProps ) {
 	const instanceId = useInstanceId( AUTOCOMPLETE_HOOK_REFERENCE );
-	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
+	const [ state, dispatch ] = useReducer( autocompleteReducer, initialState );
+	const { selectedIndex, filteredOptions, filterValue, autocompleter } =
+		state;
 
-	const [ filteredOptions, setFilteredOptions ] = useState<
-		Array< KeyedOption >
-	>( EMPTY_FILTERED_OPTIONS );
-	const [ filterValue, setFilterValue ] =
-		useState< AutocompleterUIProps[ 'filterValue' ] >( '' );
-	const [ autocompleter, setAutocompleter ] = useState< WPCompleter | null >(
-		null
+	const AutocompleterUI = useMemo(
+		() => ( autocompleter ? getAutoCompleterUI( autocompleter ) : null ),
+		[ autocompleter ]
 	);
-	const [ AutocompleterUI, setAutocompleterUI ] = useState<
-		( ( props: AutocompleterUIProps ) => React.JSX.Element | null ) | null
-	>( null );
 
 	const backspacingRef = useRef( false );
 
@@ -86,27 +134,9 @@ export function useAutocomplete( {
 		}
 
 		if ( getOptionCompletion ) {
-			const completion = getOptionCompletion( option.value, filterValue );
-
-			const isCompletionObject = (
-				obj: OptionCompletion
-			): obj is InsertOption | ReplaceOption => {
-				return (
-					obj !== null &&
-					typeof obj === 'object' &&
-					'action' in obj &&
-					obj.action !== undefined &&
-					'value' in obj &&
-					obj.value !== undefined
-				);
-			};
-
-			const completionObject = isCompletionObject( completion )
-				? completion
-				: ( {
-						action: 'insert-at-caret',
-						value: completion,
-				  } as InsertOption );
+			const completionObject = getCompletionObject(
+				getOptionCompletion( option.value, filterValue )
+			);
 
 			if ( 'replace' === completionObject.action ) {
 				onReplace( [ completionObject.value ] );
@@ -120,31 +150,15 @@ export function useAutocomplete( {
 
 		// Reset autocomplete state after insertion rather than before
 		// so insertion events don't cause the completion menu to redisplay.
-		reset();
+		dispatch( { type: 'RESET' } );
 
 		// Make sure that the content remains focused after making a selection
 		// and that the text cursor position is not lost.
 		contentRef.current?.focus();
 	}
 
-	function reset() {
-		setSelectedIndex( 0 );
-		setFilteredOptions( EMPTY_FILTERED_OPTIONS );
-		setFilterValue( '' );
-		setAutocompleter( null );
-		setAutocompleterUI( null );
-	}
-
-	/**
-	 * Load options for an autocompleter.
-	 *
-	 * @param {Array} options
-	 */
 	function onChangeOptions( options: Array< KeyedOption > ) {
-		setSelectedIndex(
-			options.length === filteredOptions.length ? selectedIndex : 0
-		);
-		setFilteredOptions( options );
+		dispatch( { type: 'OPTIONS', options } );
 	}
 
 	function handleKeyDown( event: KeyboardEvent ) {
@@ -162,12 +176,13 @@ export function useAutocomplete( {
 		}
 
 		switch ( event.key ) {
-			case 'ArrowUp': {
+			case 'ArrowUp':
+			case 'ArrowDown': {
+				const offset = event.key === 'ArrowUp' ? -1 : 1;
 				const newIndex =
-					( selectedIndex === 0
-						? filteredOptions.length
-						: selectedIndex ) - 1;
-				setSelectedIndex( newIndex );
+					( selectedIndex + offset + filteredOptions.length ) %
+					filteredOptions.length;
+				dispatch( { type: 'SELECT', index: newIndex } );
 				// See the related PR as to why this is necessary: https://github.com/WordPress/gutenberg/pull/54902.
 				if ( isAppleOS() ) {
 					speak(
@@ -178,21 +193,8 @@ export function useAutocomplete( {
 				break;
 			}
 
-			case 'ArrowDown': {
-				const newIndex = ( selectedIndex + 1 ) % filteredOptions.length;
-				setSelectedIndex( newIndex );
-				if ( isAppleOS() ) {
-					speak(
-						getNodeText( filteredOptions[ newIndex ].label ),
-						'assertive'
-					);
-				}
-				break;
-			}
-
 			case 'Escape':
-				setAutocompleter( null );
-				setAutocompleterUI( null );
+				dispatch( { type: 'RESET' } );
 				event.preventDefault();
 				break;
 
@@ -202,7 +204,7 @@ export function useAutocomplete( {
 
 			case 'ArrowLeft':
 			case 'ArrowRight':
-				reset();
+				dispatch( { type: 'RESET' } );
 				return;
 
 			default:
@@ -247,20 +249,14 @@ export function useAutocomplete( {
 
 		if ( ! match ) {
 			if ( autocompleter ) {
-				reset();
+				dispatch( { type: 'RESET' } );
 			}
 			return;
 		}
 
 		const { completer, filterValue: query } = match;
 
-		setAutocompleter( completer );
-		setAutocompleterUI( () =>
-			completer !== autocompleter
-				? getAutoCompleterUI( completer )
-				: AutocompleterUI
-		);
-		setFilterValue( query );
+		dispatch( { type: 'MATCH', completer, query } );
 		// We want to avoid introducing unexpected side effects.
 		// See https://github.com/WordPress/gutenberg/pull/41820
 	}, [ textContent ] );
@@ -292,7 +288,7 @@ export function useAutocomplete( {
 				onSelect={ select }
 				value={ record }
 				contentRef={ contentRef }
-				reset={ reset }
+				reset={ () => dispatch( { type: 'RESET' } ) }
 			/>
 		),
 	};
