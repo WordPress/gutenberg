@@ -242,13 +242,12 @@ describe( 'createInterpolateElement', () => {
 		const tags: Tags[] = [ 'a', 'em' ];
 		expect( tags ).toHaveLength( 2 );
 	} );
-	it( 'extracts tags from a FormattedText (sprintf) input', () => {
-		// Type-level test: verify InterpolationString unwraps FormattedText,
-		// enabling tag inference from sprintf return values.
+	it( 'extracts tags from a sprintf (TranslatableText) input', () => {
+		// Type-level test: sprintf returns TranslatableText, so
+		// InterpolationString unwraps it for tag inference.
 		type SprintfResult = string & {
-			readonly __formatString: '<Name>%1$s</Name> wrote <Link>%2$s</Link>';
+			readonly __translatableText: '<Name>%1$s</Name> wrote <Link>%2$s</Link>';
 		};
-		// FormattedText is assignable to InterpolationInput.
 		const _check: InterpolationInput = '' as SprintfResult;
 		void _check;
 

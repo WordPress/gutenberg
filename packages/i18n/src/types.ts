@@ -18,21 +18,6 @@ export type TranslatableText< T extends string > = string & {
 };
 
 /**
- * Return type for `sprintf`. Preserves the format string literal type
- * so that downstream consumers (e.g. `createInterpolateElement`) can
- * extract tag names at the type level.
- *
- * This type should be treated as if it were `string`.
- */
-export type FormattedText< T extends string > = string & {
-	/**
-	 * DO NOT USE! This property _does not exist_.
-	 * @private
-	 */
-	readonly __formatString: T;
-};
-
-/**
  * Type to extends TanninDomainMetadata to support additional properties.
  */
 export type I18nDomainMetadata< TextDomain extends string > =

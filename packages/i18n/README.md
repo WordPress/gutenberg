@@ -126,7 +126,7 @@ _Parameters_
 
 _Returns_
 
--   `FormattedText< T >`: The formatted string.
+-   `TranslatableText< T >`: The formatted string.
 
 ### subscribe
 
