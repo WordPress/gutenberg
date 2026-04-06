@@ -147,8 +147,10 @@ test.describe( 'Post revisions', () => {
 		await page.keyboard.press( 'Home' );
 
 		// Verify the heading's clientId is preserved (prevents flashing).
-		const clientIdAfter = await headingBlock.getAttribute( 'data-block' );
-		expect( clientIdAfter ).toBe( clientIdBefore );
+		await expect( headingBlock ).toHaveAttribute(
+			'data-block',
+			clientIdBefore
+		);
 	} );
 
 	// Regression test for https://github.com/WordPress/gutenberg/issues/75926

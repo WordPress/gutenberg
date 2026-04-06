@@ -9,7 +9,7 @@ import { Y } from '@wordpress/sync';
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
 /**
- * Mock getBlockTypes so isRichTextAttribute can identify rich-text attrs.
+ * Mock getBlockTypes so CRDT merging can identify rich-text attributes.
  */
 jest.mock( '@wordpress/blocks', () => {
 	const actual = jest.requireActual( '@wordpress/blocks' ) as Record<

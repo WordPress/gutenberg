@@ -3,11 +3,11 @@ let previousMessage = '';
 /**
  * Filter the message to be announced to the screenreader.
  *
- * @param {string} message The message to be announced.
+ * @param message The message to be announced.
  *
- * @return {string} The filtered message.
+ * @return The filtered message.
  */
-export default function filterMessage( message ) {
+export default function filterMessage( message: string ): string {
 	/*
 	 * Strip HTML tags (if any) from the message string. Ideally, messages should
 	 * be simple strings, carefully crafted for specific use with A11ySpeak.
