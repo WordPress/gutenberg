@@ -12,8 +12,8 @@ This feature is still experimental. “Experimental” means this is an early im
 import {
 	__experimentalDivider as Divider,
 	__experimentalText as Text,
-	__experimentalVStack as VStack,
 } from `@wordpress/components`;
+import { Stack } from '@wordpress/ui';
 
 function Example() {
 	return (
