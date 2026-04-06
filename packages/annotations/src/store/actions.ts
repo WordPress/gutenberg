@@ -8,8 +8,7 @@ import { v4 as uuid } from 'uuid';
  */
 import type {
 	AddAnnotationParameters,
-	AnnotationAction,
-	WPAnnotationRange,
+	AnnotationAction
 } from '../types';
 
 /**
