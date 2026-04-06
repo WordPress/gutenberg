@@ -65,7 +65,11 @@ export function migrateCRDTDoc( ydoc: CRDTDoc ): MigrationResult {
 
 	let didMigrate = false;
 
-	for ( const { version, migrate } of migrations ) {
+	const sortedMigrations = [ ...migrations ].sort(
+		( a, b ) => a.version - b.version
+	);
+
+	for ( const { version, migrate } of sortedMigrations ) {
 		if ( version <= docVersion ) {
 			continue;
 		}
