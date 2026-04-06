@@ -2,12 +2,13 @@
  * WordPress dependencies
  */
 import { PanelBody, Button, Spinner } from '@wordpress/components';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useSelect, useRegistry } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
 import { store as uploadStore } from '@wordpress/upload-media';
 import { useState, useRef, useEffect } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -18,9 +19,11 @@ import { getImageAttachmentIds } from '../provider/use-missing-sizes-check';
 export default function MaybeMissingSizesPanel() {
 	const [ isGenerating, setIsGenerating ] = useState( false );
 	const [ progress, setProgress ] = useState( { current: 0, total: 0 } );
+	const [ attachmentsWithMissingSizes, setAttachmentsWithMissingSizes ] =
+		useState( [] );
 	const checkIntervalRef = useRef( null );
+	const hasCheckedRef = useRef( false );
 	const registry = useRegistry();
-	const { invalidateResolution } = useDispatch( coreStore );
 
 	const isEnabled = !! window.__clientSideMediaProcessing;
 
@@ -43,28 +46,43 @@ export default function MaybeMissingSizesPanel() {
 		[ isEnabled ]
 	);
 
-	const attachmentsWithMissingSizes = useSelect(
-		( select ) => {
-			if ( ! isEnabled || ! blocks.length ) {
-				return [];
-			}
-			const ids = getImageAttachmentIds( blocks );
+	// Fetch missing sizes directly via REST API to avoid polluting
+	// the entity store, which can cause the publish button label
+	// to change from "Publish" to "Save".
+	useEffect( () => {
+		if ( ! isEnabled || ! blocks.length || hasCheckedRef.current ) {
+			return;
+		}
+
+		const ids = getImageAttachmentIds( blocks );
+		if ( ! ids.size ) {
+			return;
+		}
+
+		hasCheckedRef.current = true;
+
+		async function checkMissingSizes() {
 			const results = [];
 			for ( const id of ids ) {
-				const attachment = select( coreStore ).getEntityRecord(
-					'postType',
-					'attachment',
-					id,
-					{ context: 'edit' }
-				);
-				if ( attachment?.missing_image_sizes?.length ) {
-					results.push( attachment );
+				try {
+					const attachment = await apiFetch( {
+						path: addQueryArgs( `/wp/v2/media/${ id }`, {
+							context: 'edit',
+							_fields: 'id,missing_image_sizes,source_url',
+						} ),
+					} );
+					if ( attachment?.missing_image_sizes?.length ) {
+						results.push( attachment );
+					}
+				} catch {
+					// Skip attachments that can't be fetched.
 				}
 			}
-			return results;
-		},
-		[ isEnabled, blocks ]
-	);
+			setAttachmentsWithMissingSizes( results );
+		}
+
+		checkMissingSizes();
+	}, [ isEnabled, blocks ] );
 
 	if ( ! isGenerating && ! attachmentsWithMissingSizes.length ) {
 		return null;
@@ -89,19 +107,18 @@ export default function MaybeMissingSizesPanel() {
 		checkIntervalRef.current = setInterval( async () => {
 			let remaining = 0;
 			for ( const attachment of attachmentsWithMissingSizes ) {
-				await invalidateResolution( 'getEntityRecord', [
-					'postType',
-					'attachment',
-					attachment.id,
-					{ context: 'edit' },
-				] );
-				const updated = registry
-					.select( coreStore )
-					.getEntityRecord( 'postType', 'attachment', attachment.id, {
-						context: 'edit',
+				try {
+					const updated = await apiFetch( {
+						path: addQueryArgs( `/wp/v2/media/${ attachment.id }`, {
+							context: 'edit',
+							_fields: 'id,missing_image_sizes',
+						} ),
 					} );
-				if ( updated?.missing_image_sizes?.length ) {
-					remaining++;
+					if ( updated?.missing_image_sizes?.length ) {
+						remaining++;
+					}
+				} catch {
+					// Skip attachments that can't be fetched.
 				}
 			}
 			const completed = total - remaining;
@@ -110,6 +127,7 @@ export default function MaybeMissingSizesPanel() {
 				clearInterval( checkIntervalRef.current );
 				checkIntervalRef.current = null;
 				setIsGenerating( false );
+				setAttachmentsWithMissingSizes( [] );
 			}
 		}, 3000 );
 	}
