@@ -25,6 +25,11 @@ import type { MigrationResult } from './index';
  * _applyPersistedCrdtDoc, which compares the migrated blocks against the
  * database HTML and fills in the correct values.
  *
+ * Note: this migration depends on block types being registered via
+ * getBlockAttributeSchema(). Block types are guaranteed to be available
+ * because migrations run during entity record loading, which happens after
+ * editor initialization.
+ *
  * @param ydoc The CRDT document to migrate.
  */
 export function v2MigrateTableCellContent( ydoc: CRDTDoc ): MigrationResult {

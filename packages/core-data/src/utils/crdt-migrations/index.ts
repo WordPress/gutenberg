@@ -57,6 +57,7 @@ export function migrateCRDTDoc( ydoc: CRDTDoc ): MigrationResult {
 	}
 
 	let didMigrate = false;
+	let incompatible = false;
 
 	// Defensive sort to ensure migrations always run in version order,
 	// regardless of how they are ordered in the registry array.
@@ -64,24 +65,33 @@ export function migrateCRDTDoc( ydoc: CRDTDoc ): MigrationResult {
 		( a, b ) => a.version - b.version
 	);
 
-	for ( const { version, migrate } of sortedMigrations ) {
-		if ( version <= docVersion ) {
-			continue;
+	// Run all migrations and the version bump inside a single transaction
+	// so Yjs batches every set() call into one update event.
+	ydoc.transact( () => {
+		for ( const { version, migrate } of sortedMigrations ) {
+			if ( version <= docVersion ) {
+				continue;
+			}
+
+			const result = migrate( ydoc );
+
+			if ( result === 'incompatible' ) {
+				incompatible = true;
+				return;
+			}
+
+			if ( result === 'migrated' ) {
+				didMigrate = true;
+			}
 		}
 
-		const result = migrate( ydoc );
+		// Update the version so these migrations don't run again.
+		stateMap.set( CRDT_STATE_MAP_VERSION_KEY, CRDT_DOC_VERSION );
+	} );
 
-		if ( result === 'incompatible' ) {
-			return 'incompatible';
-		}
-
-		if ( result === 'migrated' ) {
-			didMigrate = true;
-		}
+	if ( incompatible ) {
+		return 'incompatible';
 	}
-
-	// Update the version so these migrations don't run again.
-	stateMap.set( CRDT_STATE_MAP_VERSION_KEY, CRDT_DOC_VERSION );
 
 	return didMigrate ? 'migrated' : 'clean';
 }
