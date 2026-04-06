@@ -11,6 +11,7 @@ test.describe( 'Should iframe', () => {
 	test( 'should remain iframed when a v1 block is added', async ( {
 		page,
 		editor,
+		isGutenbergPluginActive,
 	} ) => {
 		const iframe = page.locator( 'iframe[name="editor-canvas"]' );
 
@@ -33,7 +34,12 @@ test.describe( 'Should iframe', () => {
 		// Insert the v1 block.
 		await editor.insertBlock( { name: 'test/v1' } );
 
-		// The editor should remain iframed because Gutenberg is active.
-		await expect( iframe ).toBeVisible();
+		if ( isGutenbergPluginActive ) {
+			// Gutenberg keeps the editor iframed even with v1 blocks.
+			await expect( iframe ).toBeVisible();
+		} else {
+			// Core exits iframe mode when a v1 block is added.
+			await expect( iframe ).toBeHidden();
+		}
 	} );
 } );
