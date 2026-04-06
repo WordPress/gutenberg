@@ -5,6 +5,13 @@ import { __ } from '@wordpress/i18n';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
+const SUPPORTS_BREAK_SPACES =
+	typeof CSS !== 'undefined' &&
+	// eslint-disable-next-line no-undef
+	CSS.supports &&
+	// eslint-disable-next-line no-undef
+	CSS.supports( 'white-space', 'break-spaces' );
+
 export default function CodeEdit( {
 	attributes,
 	setAttributes,
@@ -13,6 +20,8 @@ export default function CodeEdit( {
 	mergeBlocks,
 } ) {
 	const blockProps = useBlockProps();
+	const whiteSpaceStyle = SUPPORTS_BREAK_SPACES ? 'break-spaces' : 'pre-wrap';
+	
 	return (
 		<pre { ...blockProps }>
 			<RichText
@@ -29,6 +38,7 @@ export default function CodeEdit( {
 				__unstableOnSplitAtDoubleLineEnd={ () =>
 					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
 				}
+				style={ { whiteSpace: whiteSpaceStyle } }
 			/>
 		</pre>
 	);
