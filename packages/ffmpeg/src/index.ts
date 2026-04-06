@@ -94,6 +94,11 @@ async function getFFmpegCore(
 		} );
 	} )();
 
+	// Clear cached promise on failure to allow retry.
+	ffmpegPromise.catch( () => {
+		ffmpegPromise = undefined;
+	} );
+
 	return await ffmpegPromise;
 }
 

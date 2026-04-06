@@ -98,10 +98,16 @@ async function installFFmpegPlugin(): Promise< boolean > {
 }
 
 /**
+ * In-flight promise to prevent concurrent installation attempts.
+ */
+let pendingEnsurePromise: Promise< FFmpegConfig | null > | undefined;
+
+/**
  * Ensures FFmpeg WASM is available, installing the plugin if needed.
  *
  * Returns the WASM config if available, or null if unavailable.
- * The result is cached for the browser session.
+ * The result is cached for the browser session. Concurrent calls
+ * are deduplicated to avoid parallel plugin installations.
  *
  * Degradation chain:
  * 1. Plugin already active → return config from window global
@@ -120,26 +126,39 @@ export async function ensureFFmpegAvailable(): Promise< FFmpegConfig | null > {
 		return config;
 	}
 
-	// Plugin not active — can we install it?
-	// Use resolveSelect to wait for permission data to load.
-	const canInstall = await resolveSelect( coreStore ).canUser( 'create', {
-		kind: 'root',
-		name: 'plugin',
-	} );
-	if ( ! canInstall ) {
-		cachedConfig = null;
-		return null;
+	// Return existing in-flight promise to prevent concurrent attempts.
+	if ( pendingEnsurePromise ) {
+		return pendingEnsurePromise;
 	}
 
-	// Install + activate the plugin.
-	const installed = await installFFmpegPlugin();
-	if ( ! installed ) {
-		cachedConfig = null;
-		return null;
-	}
+	pendingEnsurePromise = ( async () => {
+		// Plugin not active — can we install it?
+		// Use resolveSelect to wait for permission data to load.
+		const canInstall = await resolveSelect( coreStore ).canUser( 'create', {
+			kind: 'root',
+			name: 'plugin',
+		} );
+		if ( ! canInstall ) {
+			cachedConfig = null;
+			return null;
+		}
 
-	// Fetch config from the now-active plugin's REST endpoint.
-	const freshConfig = await fetchFFmpegConfig();
-	cachedConfig = freshConfig;
-	return freshConfig;
+		// Install + activate the plugin.
+		const installed = await installFFmpegPlugin();
+		if ( ! installed ) {
+			cachedConfig = null;
+			return null;
+		}
+
+		// Fetch config from the now-active plugin's REST endpoint.
+		const freshConfig = await fetchFFmpegConfig();
+		cachedConfig = freshConfig;
+		return freshConfig;
+	} )();
+
+	try {
+		return await pendingEnsurePromise;
+	} finally {
+		pendingEnsurePromise = undefined;
+	}
 }
