@@ -55,8 +55,14 @@ export type ProviderOn = < K extends keyof ProviderEventMap >(
 	callback: ( data: ProviderEventMap[ K ] ) => void
 ) => void;
 
+export type ProviderOff = < K extends keyof ProviderEventMap >(
+	event: K,
+	callback: ( data: ProviderEventMap[ K ] ) => void
+) => void;
+
 export interface ProviderCreatorResult {
 	destroy: () => void;
+	off?: ProviderOff;
 	on: ProviderOn;
 }
 
@@ -84,10 +90,23 @@ export interface ConnectionStatusDisconnected {
 	willAutoRetryInMs?: number;
 }
 
+/**
+ * Sync is available but deferred — no providers are connected. The presence
+ * detector is polling for collaborators. When one is found, providers will
+ * connect and the status will transition to 'connecting' → 'connected'.
+ *
+ * This is the normal state for a solo user with lazy sync enabled and is
+ * NOT an error condition.
+ */
+export interface ConnectionStatusStandby {
+	status: 'standby';
+}
+
 export type ConnectionStatus =
 	| ConnectionStatusConnected
 	| ConnectionStatusConnecting
-	| ConnectionStatusDisconnected;
+	| ConnectionStatusDisconnected
+	| ConnectionStatusStandby;
 
 export type OnStatusChangeCallback = (
 	status: ConnectionStatus | null
@@ -130,11 +149,37 @@ export interface RecordHandlers {
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 }
 
+/**
+ * Result of a presence check — the IDs of other clients in the room.
+ */
+export interface PresenceCheckResult {
+	otherClientIds: number[];
+}
+
 export interface SyncConfig {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
 		changes: Partial< ObjectData >
 	) => void;
+
+	/**
+	 * Lightweight presence check that polls for other editors in a room.
+	 *
+	 * The consumer (e.g. core-data) provides a platform-specific implementation
+	 * that communicates with the server. The sync manager calls this on an
+	 * interval to detect collaborators without connecting full sync providers.
+	 *
+	 * @param options.room                The sync room identifier.
+	 * @param options.clientId            The local client ID.
+	 * @param options.localAwarenessState The local awareness state to broadcast.
+	 * @return A promise resolving to the IDs of other clients in the room.
+	 */
+	checkPresence?: ( options: {
+		room: string;
+		clientId: number;
+		localAwarenessState: Record< string, unknown >;
+	} ) => Promise< PresenceCheckResult >;
+
 	createAwareness?: (
 		ydoc: Y.Doc,
 		objectId?: ObjectID

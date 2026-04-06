@@ -8,9 +8,11 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
  */
 // @ts-expect-error No exported types.
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
+import apiFetch from '@wordpress/api-fetch';
 import {
 	type CRDTDoc,
 	type ObjectData,
+	type PresenceCheckResult,
 	type SyncConfig,
 	Y,
 } from '@wordpress/sync';
@@ -418,12 +420,54 @@ export function getPostChangesFromCRDTDoc(
 	return changes;
 }
 
+const PRESENCE_API_PATH = '/wp-sync/v1/presence';
+
+/**
+ * Provider-independent presence check via a dedicated REST endpoint.
+ *
+ * Uses transients on the server (not the sync provider's awareness system)
+ * to track which clients are editing a room. Stale entries expire after 30s
+ * server-side, so a page refresh doesn't leave ghost entries that cause
+ * false collaborator detection.
+ *
+ * This implementation is intentionally minimal: it only tells lazy sync
+ * whether another collaborator is present in the room. The sync manager
+ * depends on the `checkPresence` contract rather than this endpoint
+ * specifically, so Gutenberg can later point that contract at a broader
+ * shared presence API if one lands.
+ *
+ * @param options                     Presence check options.
+ * @param options.room                The sync room identifier.
+ * @param options.clientId            The local client ID.
+ * @param options.localAwarenessState Unused — kept for SyncConfig interface compat.
+ * @return A promise resolving to the IDs of other clients in the room.
+ */
+export async function checkPresenceViaApi( options: {
+	room: string;
+	clientId: number;
+	localAwarenessState: Record< string, unknown >;
+} ): Promise< PresenceCheckResult > {
+	const response: {
+		other_client_ids: number[];
+	} = await apiFetch( {
+		method: 'POST',
+		path: PRESENCE_API_PATH,
+		data: {
+			room: options.room,
+			client_id: options.clientId,
+		},
+	} );
+
+	return { otherClientIds: response.other_client_ids ?? [] };
+}
+
 /**
  * This default sync config can be used for entities that are flat maps of
  * primitive values and do not require custom logic to merge changes.
  */
 export const defaultSyncConfig: SyncConfig = {
 	applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
+	checkPresence: checkPresenceViaApi,
 	createAwareness: ( ydoc: CRDTDoc ) => new BaseAwareness( ydoc ),
 	getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
 };
