@@ -31,6 +31,7 @@ import {
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
 import { store as blockEditorStore } from '../store';
+import { useBlockStateProps } from './state-utils';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 export const SHADOW_SUPPORT_KEY = 'shadow';
@@ -161,7 +162,6 @@ export function BorderPanel( {
 	selectedState = 'default',
 } ) {
 	const isEnabled = useHasBorderPanel( settings );
-	const isStateSelected = !! ( selectedState && selectedState !== 'default' );
 	const { style, borderColor } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
@@ -174,21 +174,22 @@ export function BorderPanel( {
 		},
 		[ clientId, isEnabled ]
 	);
+
+	const { isStateSelected, stateValue, stateOnChange } = useBlockStateProps( {
+		selectedState,
+		style,
+		setAttributes,
+	} );
+
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return style?.[ selectedState ];
+			return stateValue;
 		}
 		return attributesToStyle( { style, borderColor } );
-	}, [ isStateSelected, selectedState, style, borderColor ] );
+	}, [ isStateSelected, stateValue, style, borderColor ] );
 
 	const onChange = isStateSelected
-		? ( newStateStyle ) =>
-				setAttributes( {
-					style: cleanEmptyObject( {
-						...style,
-						[ selectedState ]: newStateStyle,
-					} ),
-				} )
+		? stateOnChange
 		: ( newStyle ) => {
 				setAttributes( styleToAttributes( newStyle ) );
 		  };
