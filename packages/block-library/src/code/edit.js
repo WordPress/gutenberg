@@ -21,7 +21,7 @@ export default function CodeEdit( {
 } ) {
 	const blockProps = useBlockProps();
 	const whiteSpaceStyle = SUPPORTS_BREAK_SPACES ? 'break-spaces' : 'pre-wrap';
-	
+
 	return (
 		<pre { ...blockProps }>
 			<RichText
