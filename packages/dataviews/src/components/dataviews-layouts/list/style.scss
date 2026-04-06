@@ -16,7 +16,7 @@ div.dataviews-view-list {
 
 		.dataviews-view-list__item-wrapper {
 			position: relative;
-			padding: $grid-unit-20 $grid-unit-30;
+			padding: $grid-unit-20 var(--wp-dataviews-edge-padding, #{$grid-unit-30});
 			box-sizing: border-box;
 		}
 
@@ -211,7 +211,7 @@ div.dataviews-view-list {
 	&.has-compact-density {
 		div[role="row"] {
 			.dataviews-view-list__item-wrapper {
-				padding: $grid-unit-10 $grid-unit-30;
+				padding: $grid-unit-10 var(--wp-dataviews-edge-padding, #{$grid-unit-30});
 			}
 
 			.dataviews-view-list__title-field {
@@ -239,7 +239,7 @@ div.dataviews-view-list {
 	&.has-comfortable-density {
 		div[role="row"] {
 			.dataviews-view-list__item-wrapper {
-				padding: $grid-unit-30 $grid-unit-30;
+				padding: $grid-unit-30 var(--wp-dataviews-edge-padding, #{$grid-unit-30});
 			}
 
 			.dataviews-view-list__title-field {
@@ -274,5 +274,5 @@ div.dataviews-view-list {
 	font-weight: $font-weight-medium;
 	color: $gray-900;
 	margin: 0 0 $grid-unit-10 0;
-	padding: 0 $grid-unit-30;
+	padding: 0 var(--wp-dataviews-edge-padding, #{$grid-unit-30});
 }

@@ -525,6 +525,8 @@ These are the CSS Custom Properties that can be used to tweak the appearance of 
 
 `--wp-dataviews-color-background`: sets the background color.
 
+`--wp-dataviews-edge-padding`: sets the horizontal edge padding for all layouts (header, footer, grid, table, list, activity). Defaults to `24px`.
+
 ### Composition modes
 
 The `DataViews` component supports two composition modes:

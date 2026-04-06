@@ -29,7 +29,7 @@
 .dataviews__view-actions,
 .dataviews-filters__container {
 	box-sizing: border-box;
-	padding: $grid-unit-20 $grid-unit-30;
+	padding: $grid-unit-20 var(--wp-dataviews-edge-padding, #{$grid-unit-30});
 	flex-shrink: 0;
 	position: sticky;
 	left: 0;
@@ -42,7 +42,7 @@
 
 .dataviews-no-results,
 .dataviews-loading {
-	padding: 0 $grid-unit-30;
+	padding: 0 var(--wp-dataviews-edge-padding, #{$grid-unit-30});
 	flex-grow: 1;
 	display: flex;
 	align-items: center;
@@ -75,7 +75,7 @@
 @container (max-width: 430px) {
 	.dataviews__view-actions,
 	.dataviews-filters__container {
-		padding: $grid-unit-15 $grid-unit-30;
+		padding: $grid-unit-15 var(--wp-dataviews-edge-padding, #{$grid-unit-30});
 	}
 }
 

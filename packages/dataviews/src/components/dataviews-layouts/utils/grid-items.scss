@@ -6,7 +6,7 @@
 	gap: $grid-unit-30;
 	grid-template-rows: max-content;
 	grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-	padding: 0 $grid-unit-30 $grid-unit-30;
+	padding: 0 var(--wp-dataviews-edge-padding, #{$grid-unit-30}) $grid-unit-30;
 	container-type: inline-size;
 
 	@media not (prefers-reduced-motion) {

@@ -1,4 +1,8 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .editor-post-revisions-panel {
+	--wp-dataviews-edge-padding: 0;
+
 	.editor-post-revisions-panel__view-all {
 		justify-content: center;
 	}
