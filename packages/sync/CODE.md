@@ -64,7 +64,7 @@ A provider is a transport layer that syncs Yjs document updates between peers. T
 
 The default provider (`src/providers/http-polling/`) uses HTTP polling to exchange updates with a central sync server. A shared polling manager batches updates for all rooms (entities) into a single request per poll cycle. See [the HTTP polling README](./src/providers/http-polling/README.md) for full details including the REST API format, sync protocol, and compaction.
 
--   Poll interval: 1 second when editing alone, 250ms when collaborators are detected.
+-   Poll interval: 4 seconds when editing alone, 1 second when collaborators are detected, with slower polling on 3g/2g connections when the Network Information API is available and an RTT-based fallback for browsers that do not expose that API.
 -   On errors, the interval backs off exponentially (up to 30 seconds).
 -   Awareness state is sent and received alongside document updates in the same poll request.
 

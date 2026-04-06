@@ -107,12 +107,74 @@ function simulateVisibilityChange( state: string ) {
 	document.dispatchEvent( new Event( 'visibilitychange' ) );
 }
 
+function mockNetworkConnection(
+	effectiveType: 'slow-2g' | '2g' | '3g' | '4g'
+) {
+	const listeners = new Set< () => void >();
+	const connection = {
+		effectiveType,
+		addEventListener: jest.fn(
+			( _type: 'change', listener: () => void ) => {
+				listeners.add( listener );
+			}
+		),
+		removeEventListener: jest.fn(
+			( _type: 'change', listener: () => void ) => {
+				listeners.delete( listener );
+			}
+		),
+	};
+
+	Object.defineProperty( navigator, 'connection', {
+		configurable: true,
+		value: connection,
+	} );
+
+	return {
+		connection,
+		setEffectiveType( nextEffectiveType: typeof effectiveType ) {
+			connection.effectiveType = nextEffectiveType;
+		},
+		dispatchChange() {
+			listeners.forEach( ( listener ) => listener() );
+		},
+	};
+}
+
+function mockPerformanceNowForPolls(
+	polls: Array< { duration: number; success?: boolean } >
+) {
+	let now = 0;
+	const values = polls.flatMap( ( { duration, success = true } ) => {
+		const start = now;
+		now += duration;
+
+		return success ? [ start, now ] : [ start ];
+	} );
+
+	return jest.spyOn( performance, 'now' ).mockImplementation( () => {
+		const next = values.shift();
+		return undefined === next ? now : next;
+	} );
+}
+
 const syncResponse = {
 	rooms: [
 		{
 			room: 'test-room',
 			end_cursor: 1,
 			awareness: {},
+			updates: [],
+		},
+	],
+};
+
+const syncResponseWithCollaborators = {
+	rooms: [
+		{
+			room: 'test-room',
+			end_cursor: 1,
+			awareness: { 1: {}, 2: {} },
 			updates: [],
 		},
 	],
@@ -143,12 +205,14 @@ describe( 'polling-manager', () => {
 	} );
 
 	afterEach( () => {
+		jest.restoreAllMocks();
 		jest.clearAllTimers();
 		jest.useRealTimers();
 		Object.defineProperty( document, 'visibilityState', {
 			configurable: true,
 			get: () => 'visible',
 		} );
+		delete ( navigator as Navigator & { connection?: unknown } ).connection;
 	} );
 
 	describe( 'document size limit', () => {
@@ -969,6 +1033,407 @@ describe( 'polling-manager', () => {
 
 			// Should trigger an immediate repoll (not wait for timeout).
 			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+		} );
+	} );
+
+	describe( 'network-aware polling', () => {
+		it( 'keeps the base interval until three successful polls exist when network info is unavailable', async () => {
+			mockPerformanceNowForPolls( [
+				{ duration: 600 },
+				{ duration: 600 },
+				{ duration: 600 },
+				{ duration: 600 },
+			] );
+			mockPostSyncUpdate.mockResolvedValue( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc(),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 3999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			await jest.advanceTimersByTimeAsync( 3999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			await jest.advanceTimersByTimeAsync( 15999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 4 );
+		} );
+
+		it( 'widens collaborator polling to 10x after three very slow successful polls without network info', async () => {
+			mockPerformanceNowForPolls( [
+				{ duration: 1600 },
+				{ duration: 1600 },
+				{ duration: 1600 },
+				{ duration: 1600 },
+			] );
+			mockPostSyncUpdate.mockResolvedValue(
+				syncResponseWithCollaborators
+			);
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc(),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			await jest.advanceTimersByTimeAsync( 999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			await jest.advanceTimersByTimeAsync( 9999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 4 );
+		} );
+
+		it( 'returns to the base collaborator interval after three newer fast successful polls', async () => {
+			mockPerformanceNowForPolls( [
+				{ duration: 1600 },
+				{ duration: 1600 },
+				{ duration: 1600 },
+				{ duration: 400 },
+				{ duration: 400 },
+				{ duration: 400 },
+				{ duration: 400 },
+			] );
+			mockPostSyncUpdate.mockResolvedValue(
+				syncResponseWithCollaborators
+			);
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc(),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 1000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			await jest.advanceTimersByTimeAsync( 1000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			await jest.advanceTimersByTimeAsync( 9999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 4 );
+
+			await jest.advanceTimersByTimeAsync( 3999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 4 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 5 );
+
+			await jest.advanceTimersByTimeAsync( 3999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 5 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 6 );
+
+			await jest.advanceTimersByTimeAsync( 999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 6 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 7 );
+		} );
+
+		it( 'uses the Network Information API when available even if successful polls are slow', async () => {
+			mockNetworkConnection( '4g' );
+			mockPerformanceNowForPolls( [
+				{ duration: 2000 },
+				{ duration: 2000 },
+				{ duration: 2000 },
+				{ duration: 2000 },
+			] );
+			mockPostSyncUpdate.mockResolvedValue( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc(),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 3999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			await jest.advanceTimersByTimeAsync( 3999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			await jest.advanceTimersByTimeAsync( 3999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 4 );
+		} );
+
+		it( 'does not count failed polls toward RTT fallback and keeps error backoff unchanged', async () => {
+			mockPerformanceNowForPolls( [
+				{ duration: 600 },
+				{ duration: 600 },
+				{ duration: 600, success: false },
+				{ duration: 600 },
+				{ duration: 600 },
+			] );
+			mockPostSyncUpdate
+				.mockResolvedValueOnce( syncResponse )
+				.mockResolvedValueOnce( syncResponse )
+				.mockRejectedValueOnce( new Error( 'timeout' ) )
+				.mockResolvedValueOnce( syncResponse )
+				.mockResolvedValueOnce( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc(),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			await jest.advanceTimersByTimeAsync( 7999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 4 );
+
+			await jest.advanceTimersByTimeAsync( 15999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 4 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 5 );
+		} );
+
+		it( 'uses the background-tab interval while hidden even when RTT fallback is active', async () => {
+			mockPerformanceNowForPolls( [
+				{ duration: 1600 },
+				{ duration: 1600 },
+				{ duration: 1600 },
+				{ duration: 1600 },
+				{ duration: 1600 },
+			] );
+			const deferred = createDeferred< SyncResponse >();
+			mockPostSyncUpdate
+				.mockResolvedValueOnce( syncResponseWithCollaborators )
+				.mockResolvedValueOnce( syncResponseWithCollaborators )
+				.mockResolvedValueOnce( syncResponseWithCollaborators )
+				.mockReturnValueOnce( deferred.promise )
+				.mockResolvedValue( syncResponseWithCollaborators );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc(),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 1000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			await jest.advanceTimersByTimeAsync( 1000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			await jest.advanceTimersByTimeAsync( 10000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 4 );
+
+			simulateVisibilityChange( 'hidden' );
+			deferred.resolve( syncResponseWithCollaborators );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			await jest.advanceTimersByTimeAsync( 24999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 4 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 5 );
+		} );
+
+		it( 'clears RTT history when the final room unregisters', async () => {
+			mockPerformanceNowForPolls( [
+				{ duration: 1600 },
+				{ duration: 1600 },
+				{ duration: 1600 },
+				{ duration: 100 },
+				{ duration: 100 },
+			] );
+			mockPostSyncUpdate.mockResolvedValue( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'first-room',
+				doc: createMockDoc(),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			pollingManager.unregisterRoom( 'first-room' );
+
+			pollingManager.registerRoom( {
+				room: 'second-room',
+				doc: createMockDoc( 2 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 24999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 4 );
+
+			await jest.advanceTimersByTimeAsync( 3999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 4 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 5 );
+		} );
+
+		it( 'slows active polling on 3g connections', async () => {
+			mockNetworkConnection( '3g' );
+			mockPostSyncUpdate.mockResolvedValue( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc(),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 15999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'caps slow-network polling below the awareness timeout', async () => {
+			mockNetworkConnection( 'slow-2g' );
+			mockPostSyncUpdate.mockResolvedValue( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc(),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 24999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'reschedules pending polling when the connection changes', async () => {
+			const network = mockNetworkConnection( '4g' );
+			mockPostSyncUpdate.mockResolvedValue( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc(),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			network.setEffectiveType( '3g' );
+			network.dispatchChange();
+
+			await jest.advanceTimersByTimeAsync( 3999 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			await jest.advanceTimersByTimeAsync( 12001 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 		} );
 	} );

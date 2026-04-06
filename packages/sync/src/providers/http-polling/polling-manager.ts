@@ -42,6 +42,16 @@ import {
 	postSyncUpdate,
 	postSyncUpdateNonBlocking,
 } from './utils';
+import {
+	getNetworkAwarePollingInterval,
+	hasEffectiveConnectionTypeSupport,
+	subscribeToNetworkChanges,
+} from './network-info';
+import {
+	clearSuccessfulPollDurations,
+	getLatencyAwarePollingInterval,
+	recordSuccessfulPollDuration,
+} from './latency-info';
 
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
 
@@ -310,8 +320,18 @@ let hasCollaborators = false;
 let isActiveBrowser = 'visible' === document.visibilityState;
 let isPolling = false;
 let isUnloadPending = false;
+let isPollBackoffPending = false;
 let pollInterval = POLLING_INTERVAL_IN_MS;
 let pollingTimeoutId: ReturnType< typeof setTimeout > | null = null;
+let unsubscribeFromNetworkChanges: ( () => void ) | null = null;
+
+function getCurrentTimeInMs(): number {
+	if ( typeof performance !== 'undefined' ) {
+		return performance.now();
+	}
+
+	return Date.now();
+}
 
 /**
  * Mark that a page unload has been requested. This fires on
@@ -380,6 +400,44 @@ function handleVisibilityChange() {
 	}
 }
 
+/**
+ * Calculate the appropriate polling interval based on tab visibility,
+ * collaborator presence, and network conditions.
+ *
+ * @return The polling interval in milliseconds.
+ */
+function getPollIntervalForCurrentState(): number {
+	if ( ! isActiveBrowser ) {
+		return POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
+	}
+
+	const baseInterval = hasCollaborators
+		? POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS
+		: POLLING_INTERVAL_IN_MS;
+
+	if ( hasEffectiveConnectionTypeSupport() ) {
+		return getNetworkAwarePollingInterval( baseInterval );
+	}
+
+	return getLatencyAwarePollingInterval( baseInterval );
+}
+
+/**
+ * Handle changes in network connection type (e.g., switching from WiFi to 3G).
+ * Recalculates and reschedules the next poll with the updated interval.
+ */
+function handleNetworkChange(): void {
+	// Don't interrupt error backoff or in-flight requests
+	if ( isPollBackoffPending || ! pollingTimeoutId ) {
+		return;
+	}
+
+	// Reschedule the next poll with the new network-aware interval
+	clearTimeout( pollingTimeoutId );
+	pollInterval = getPollIntervalForCurrentState();
+	pollingTimeoutId = setTimeout( poll, pollInterval );
+}
+
 function poll(): void {
 	isPolling = true;
 	pollingTimeoutId = null;
@@ -415,9 +473,18 @@ function poll(): void {
 				} )
 			),
 		};
+		const hasNetworkInformationSupport =
+			hasEffectiveConnectionTypeSupport();
+		const pollStartedAtInMs = getCurrentTimeInMs();
 
 		try {
 			const { rooms } = await postSyncUpdate( payload );
+
+			if ( ! hasNetworkInformationSupport ) {
+				recordSuccessfulPollDuration(
+					getCurrentTimeInMs() - pollStartedAtInMs
+				);
+			}
 
 			// Emit 'connected' status.
 			roomStates.forEach( ( state ) => {
@@ -508,19 +575,15 @@ function poll(): void {
 			} );
 
 			// Recalculate polling interval.
-			if ( isActiveBrowser && hasCollaborators ) {
-				pollInterval = POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS;
-			} else if ( isActiveBrowser ) {
-				pollInterval = POLLING_INTERVAL_IN_MS;
-			} else {
-				pollInterval = POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
-			}
+			pollInterval = getPollIntervalForCurrentState();
+			isPollBackoffPending = false;
 		} catch ( error ) {
 			// Exponential backoff on error: double the backoff time, up to max
 			pollInterval = Math.min(
 				pollInterval * 2,
 				MAX_ERROR_BACKOFF_IN_MS
 			);
+			isPollBackoffPending = true;
 
 			// Recover from the failed request. We don't know whether the server stored
 			// our updates before the error occurred (e.g. a network timeout after a
@@ -694,6 +757,8 @@ function registerRoom( {
 		window.addEventListener( 'beforeunload', handleBeforeUnload );
 		window.addEventListener( 'pagehide', handlePageHide );
 		document.addEventListener( 'visibilitychange', handleVisibilityChange );
+		unsubscribeFromNetworkChanges =
+			subscribeToNetworkChanges( handleNetworkChange ) ?? null;
 		areListenersRegistered = true;
 	}
 
@@ -729,8 +794,11 @@ function unregisterRoom( room: string ): void {
 			'visibilitychange',
 			handleVisibilityChange
 		);
+		unsubscribeFromNetworkChanges?.();
+		unsubscribeFromNetworkChanges = null;
 		areListenersRegistered = false;
 		hasCheckedConnectionLimit = false;
+		clearSuccessfulPollDurations();
 	}
 }
 
