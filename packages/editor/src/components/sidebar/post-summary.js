@@ -36,6 +36,7 @@ import SiteDiscussion from '../site-discussion';
 import { store as editorStore } from '../../store';
 import { PrivatePostLastRevision } from '../post-last-revision';
 import PostTrash from '../post-trash';
+import PostMissingSizesNotice from '../post-missing-sizes-notice';
 import RevisionAuthorPanel from '../revision-author-panel';
 import { unlock } from '../../lock-unlock';
 
@@ -136,6 +137,7 @@ function ClassicPostSummary( { onActionPerformed } ) {
 										<PostsPerPage />
 										<SiteDiscussion />
 										<PostFormatPanel />
+										<PostMissingSizesNotice />
 										{ fills }
 									</VStack>
 									<PostTrash
