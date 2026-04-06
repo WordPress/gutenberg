@@ -6,10 +6,7 @@ import { v4 as uuid } from 'uuid';
 /**
  * Internal dependencies
  */
-import type {
-	AddAnnotationParameters,
-	AnnotationAction
-} from '../types';
+import type { AddAnnotationParameters, AnnotationAction } from '../types';
 
 /**
  * Adds an annotation to a block.
