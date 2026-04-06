@@ -457,6 +457,7 @@ export function createSyncManager( debug = false ): SyncManager {
 				applyChangesToCRDTDoc,
 				getChangesFromCRDTDoc,
 				getPersistedCRDTDoc,
+				migrateCRDTDoc,
 			},
 			ydoc: targetDoc,
 		} = entityState;
@@ -470,6 +471,39 @@ export function createSyncManager( debug = false ): SyncManager {
 			// Apply the current record as changes and request that the CRDT doc be
 			// persisted with the entity. The persisted CRDT doc can be created by
 			// calling `syncManager.createPersistedCRDTDoc`.
+			targetDoc.transact( () => {
+				applyChangesToCRDTDoc( targetDoc, record );
+				handlers.persistCRDTDoc();
+			}, LOCAL_SYNC_MANAGER_ORIGIN );
+			return;
+		}
+
+		// Run migrations on the deserialized persisted document before applying
+		// it. This is an O(1) version check when no migrations are needed.
+		//
+		// If a migration throws, treat it as incompatible and fall back to
+		// rebuilding from the database record. This ensures a buggy migration
+		// can never corrupt a document beyond "discard and rebuild."
+		let migrationResult: 'migrated' | 'clean' | 'incompatible' = 'clean';
+		try {
+			migrationResult = migrateCRDTDoc?.( tempDoc ) ?? 'clean';
+		} catch ( error ) {
+			log( 'applyPersistedCrdtDoc', 'migration error', entityId, {
+				error,
+			} );
+			migrationResult = 'incompatible';
+		}
+
+		if ( migrationResult === 'incompatible' ) {
+			log(
+				'applyPersistedCrdtDoc',
+				'incompatible persisted doc, discarding',
+				entityId
+			);
+
+			// The persisted doc cannot be migrated. Discard it and rebuild
+			// from the current record.
+			tempDoc.destroy();
 			targetDoc.transact( () => {
 				applyChangesToCRDTDoc( targetDoc, record );
 				handlers.persistCRDTDoc();
@@ -506,8 +540,22 @@ export function createSyncManager( debug = false ): SyncManager {
 		tempDoc.destroy();
 
 		if ( 0 === invalidatedKeys.length ) {
-			log( 'applyPersistedCrdtDoc', 'valid persisted doc', entityId );
-			// The persisted CRDT document is valid. There are no updates to apply.
+			if ( migrationResult === 'migrated' ) {
+				log(
+					'applyPersistedCrdtDoc',
+					'migrated persisted doc, no invalidations',
+					entityId
+				);
+
+				// Migrations were applied but no content invalidation was
+				// detected. Persist the version bump.
+				targetDoc.transact( () => {
+					handlers.persistCRDTDoc();
+				}, LOCAL_SYNC_MANAGER_ORIGIN );
+			} else {
+				log( 'applyPersistedCrdtDoc', 'valid persisted doc', entityId );
+			}
+
 			return;
 		}
 

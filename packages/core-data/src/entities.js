@@ -21,6 +21,7 @@ import {
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from './utils/crdt';
+import { migrateCRDTDoc } from './utils/crdt-migrations';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
@@ -467,6 +468,8 @@ async function loadPostTypeEntities() {
 					null
 				);
 			},
+
+			migrateCRDTDoc,
 		};
 
 		return entity;

@@ -23,7 +23,7 @@ interface BlockAttributes {
 	[ key: string ]: unknown;
 }
 
-interface BlockAttributeSchema {
+export interface BlockAttributeSchema {
 	role?: string;
 	type?: string;
 	query?: Record< string, BlockAttributeSchema >;
@@ -765,7 +765,7 @@ let cachedBlockAttributeSchemas: Map<
  * @param attributeName The name of the attribute, e.g. 'content'.
  * @return The type definition of the attribute.
  */
-function getBlockAttributeSchema(
+export function getBlockAttributeSchema(
 	blockName: string,
 	attributeName: string
 ): BlockAttributeSchema | undefined {

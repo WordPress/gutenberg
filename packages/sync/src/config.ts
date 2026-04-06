@@ -3,7 +3,7 @@
  * to Yjs doc schema or in how it is interpreted by code in the SyncConfig. This
  * allows implementors to invalidate persisted CRDT docs.
  */
-export const CRDT_DOC_VERSION = 1;
+export const CRDT_DOC_VERSION = 2;
 
 /**
  * CRDT documents can hold meta information in a map. This map exists only in

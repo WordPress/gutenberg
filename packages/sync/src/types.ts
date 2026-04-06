@@ -144,6 +144,18 @@ export interface SyncConfig {
 		editedRecord: ObjectData
 	) => ObjectData;
 	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
+
+	/**
+	 * Optional migration function for upgrading persisted CRDT documents to the
+	 * current schema version. Called on deserialized persisted documents before
+	 * they are applied to the active Y.Doc.
+	 *
+	 * Return values:
+	 * - 'migrated': The document was patched in place.
+	 * - 'clean': The document was already up to date (no changes needed).
+	 * - 'incompatible': The document cannot be migrated and must be discarded.
+	 */
+	migrateCRDTDoc?: ( ydoc: Y.Doc ) => 'migrated' | 'clean' | 'incompatible';
 }
 
 export interface SyncManager {
