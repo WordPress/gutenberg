@@ -377,18 +377,22 @@ function BlockStyleControls( {
 		},
 	};
 
-	const statesControl = (
-		<BlockStatesControl
-			name={ name }
-			value={ selectedState }
-			onChange={ setSelectedState }
-		/>
-	);
+	const passedProps = {
+		clientId,
+		name,
+		setAttributes,
+		settings: panelSettings,
+		selectedState,
+	};
 
-	if ( selectedState !== 'default' ) {
-		return (
-			<>
-				{ statesControl }
+	return (
+		<>
+			<BlockStatesControl
+				name={ name }
+				value={ selectedState }
+				onChange={ setSelectedState }
+			/>
+			{ selectedState !== 'default' && (
 				<BlockInspectorPreTabsFill>
 					<Spacer paddingX={ 4 } paddingY={ 2 }>
 						<ToggleControl
@@ -398,55 +402,7 @@ function BlockStyleControls( {
 						/>
 					</Spacer>
 				</BlockInspectorPreTabsFill>
-				<ColorEdit
-					clientId={ clientId }
-					name={ name }
-					setAttributes={ setAttributes }
-					settings={ panelSettings }
-					selectedState={ selectedState }
-				/>
-				<BackgroundImagePanel
-					clientId={ clientId }
-					name={ name }
-					setAttributes={ setAttributes }
-					settings={ panelSettings }
-					selectedState={ selectedState }
-				/>
-				<TypographyPanel
-					clientId={ clientId }
-					name={ name }
-					setAttributes={ setAttributes }
-					settings={ panelSettings }
-					selectedState={ selectedState }
-				/>
-				<BorderPanel
-					clientId={ clientId }
-					name={ name }
-					setAttributes={ setAttributes }
-					settings={ panelSettings }
-					selectedState={ selectedState }
-				/>
-				<DimensionsPanel
-					clientId={ clientId }
-					name={ name }
-					setAttributes={ setAttributes }
-					settings={ panelSettings }
-					selectedState={ selectedState }
-				/>
-			</>
-		);
-	}
-
-	const passedProps = {
-		clientId,
-		name,
-		setAttributes,
-		settings: panelSettings,
-	};
-
-	return (
-		<>
-			{ statesControl }
+			) }
 			<ColorEdit { ...passedProps } />
 			<BackgroundImagePanel { ...passedProps } />
 			<TypographyPanel { ...passedProps } />
