@@ -48,8 +48,12 @@ add_action(
 // Enqueue the script module on the connectors page.
 add_action(
 	'admin_enqueue_scripts',
-	static function () {
-		if ( ! isset( $_GET['page'] ) || 'options-connectors-wp-admin' !== $_GET['page'] ) {
+	static function ( $hook_suffix ) {
+		$connectors_pages = array(
+			'settings_page_options-connectors-wp-admin', // Gutenberg.
+			'settings_page_options-connectors.php',      // Core.
+		);
+		if ( ! in_array( $hook_suffix, $connectors_pages, true ) ) {
 			return;
 		}
 
