@@ -34,7 +34,7 @@ import {
 } from '../components/global-styles/color-panel';
 import BlockColorContrastChecker from './contrast-checker';
 import { store as blockEditorStore } from '../store';
-import { useBlockStateProps } from './state-utils';
+import { useBlockStyle } from './use-block-style';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
@@ -285,20 +285,18 @@ export function ColorEdit( {
 } ) {
 	const isEnabled = useHasColorPanel( settings );
 
-	const { style, textColor, backgroundColor, gradient } = useSelect(
+	const { textColor, backgroundColor, gradient } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
 				return {};
 			}
 			const {
-				style: _style,
 				textColor: _textColor,
 				backgroundColor: _backgroundColor,
 				gradient: _gradient,
 			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
 			return {
-				style: _style,
 				textColor: _textColor,
 				backgroundColor: _backgroundColor,
 				gradient: _gradient,
@@ -307,15 +305,12 @@ export function ColorEdit( {
 		[ clientId, isEnabled ]
 	);
 
-	const { isStateSelected, stateValue, stateOnChange } = useBlockStateProps( {
-		selectedState,
-		style,
-		setAttributes,
-	} );
+	const [ style, setStyle ] = useBlockStyle( null, selectedState );
+	const isStateSelected = selectedState !== 'default';
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return stateValue;
+			return style;
 		}
 		return attributesToStyle( {
 			style,
@@ -323,17 +318,10 @@ export function ColorEdit( {
 			backgroundColor,
 			gradient,
 		} );
-	}, [
-		isStateSelected,
-		stateValue,
-		style,
-		textColor,
-		backgroundColor,
-		gradient,
-	] );
+	}, [ isStateSelected, style, textColor, backgroundColor, gradient ] );
 
 	const onChange = isStateSelected
-		? stateOnChange
+		? setStyle
 		: ( newStyle ) => {
 				setAttributes( styleToAttributes( newStyle ) );
 		  };
