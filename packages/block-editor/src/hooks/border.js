@@ -31,7 +31,6 @@ import {
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
 import { store as blockEditorStore } from '../store';
-import { useBlockEditContext } from '../components/block-edit/context';
 import { useBlockStyle } from './use-block-style';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
@@ -158,6 +157,7 @@ function BordersInspectorControl( {
 export function BorderPanel( {
 	clientId,
 	name,
+	setAttributes,
 	settings,
 	selectedState = 'default',
 } ) {
@@ -175,7 +175,6 @@ export function BorderPanel( {
 		[ clientId, isEnabled ]
 	);
 
-	const { setAttributes } = useBlockEditContext();
 	const [ style, setStyle ] = useBlockStyle( null, selectedState );
 	const isStateSelected = selectedState !== 'default';
 

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback, useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -39,7 +39,8 @@ import { cleanEmptyObject } from './utils';
  * @return {[*, Function]} Tuple of `[currentValue, setValue]`.
  */
 export function useBlockStyle( path, state ) {
-	const { clientId, setAttributes } = useBlockEditContext();
+	const { clientId } = useBlockEditContext();
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const style = useSelect(
 		( select ) =>
@@ -73,11 +74,11 @@ export function useBlockStyle( path, state ) {
 			const newStyle = pathArray.length
 				? setImmutably( style ?? {}, pathArray, newValue )
 				: newValue;
-			setAttributes( {
+			updateBlockAttributes( clientId, {
 				style: cleanEmptyObject( newStyle ),
 			} );
 		},
-		[ setAttributes, style, pathArray ]
+		[ updateBlockAttributes, clientId, style, pathArray ]
 	);
 
 	return [ value, setValue ];
