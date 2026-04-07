@@ -73,7 +73,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.0/class-wp-icons-registry.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-wp-rest-icons-controller.php';
 	require __DIR__ . '/compat/wordpress-7.0/collaboration.php';
-	require __DIR__ . '/compat/wordpress-7.0/template-activate.php';
+	require __DIR__ . '/experimental/template-activate.php';
 	require __DIR__ . '/compat/wordpress-7.0/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.0/global-styles.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-wp-connector-registry.php';
@@ -128,6 +128,7 @@ require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/extensible-site-editor.php';
+require __DIR__ . '/experimental/preload.php';
 require __DIR__ . '/experimental/fonts/load.php';
 if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 	require __DIR__ . '/experimental/connectors/load.php';
