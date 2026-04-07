@@ -25,8 +25,9 @@ add_action( 'rest_api_init', 'gutenberg_register_block_patterns_controller_endpo
  */
 if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
 	function gutenberg_modify_wp_template_post_type_args_7_0( $args ) {
-		$args['rest_controller_class']   = 'Gutenberg_REST_Templates_Controller_7_0';
-		$args['late_route_registration'] = true;
+		$args['rest_controller_class']            = 'Gutenberg_REST_Templates_Controller_7_0';
+		$args['revisions_rest_controller_class']  = 'Gutenberg_REST_Template_Revisions_Controller';
+		$args['late_route_registration']          = true;
 		return $args;
 	}
 	add_filter( 'register_wp_template_post_type_args', 'gutenberg_modify_wp_template_post_type_args_7_0' );
@@ -42,8 +43,9 @@ if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
  * @see Gutenberg_REST_Templates_Controller_7_0
  */
 function gutenberg_modify_wp_template_part_post_type_args_7_0( $args ) {
-	$args['rest_controller_class']   = 'Gutenberg_REST_Templates_Controller_7_0';
-	$args['late_route_registration'] = true;
+	$args['rest_controller_class']            = 'Gutenberg_REST_Templates_Controller_7_0';
+	$args['revisions_rest_controller_class']  = 'Gutenberg_REST_Template_Revisions_Controller';
+	$args['late_route_registration']          = true;
 	return $args;
 }
 add_filter( 'register_wp_template_part_post_type_args', 'gutenberg_modify_wp_template_part_post_type_args_7_0' );

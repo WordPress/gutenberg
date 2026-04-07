@@ -1107,14 +1107,6 @@ export const getRevisions =
 					} );
 				}
 
-				// Template and template part revisions expose `modified`
-				// instead of `date`. Normalize so consumers can always
-				// use `date` regardless of entity type.
-				records = records.map( ( record ) => ( {
-					...record,
-					date: record.date ?? record.modified,
-				} ) );
-
 				registry.batch( () => {
 					dispatch.receiveRevisions(
 						kind,
@@ -1234,13 +1226,6 @@ export const getRevision =
 			}
 
 			if ( record ) {
-				// Template and template part revisions expose `modified`
-				// instead of `date`. Normalize so consumers can always
-				// use `date` regardless of entity type.
-				record = {
-					...record,
-					date: record.date ?? record.modified,
-				};
 				dispatch.receiveRevisions(
 					kind,
 					name,
