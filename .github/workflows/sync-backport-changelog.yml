@@ -19,11 +19,13 @@ jobs:
             contents: read
             issues: write
         if: >
-            github.event_name == 'push' ||
-            (
-                github.event_name == 'issues' &&
-                github.event.action == 'labeled' &&
-                github.event.label.name == '🤖 Sync Backport Changelog'
+            github.repository == 'WordPress/gutenberg' && (
+                github.event_name == 'push' ||
+                (
+                    github.event_name == 'issues' &&
+                    github.event.action == 'labeled' &&
+                    github.event.label.name == '🤖 Sync Backport Changelog'
+                )
             )
         steps:
             - name: Checkout
