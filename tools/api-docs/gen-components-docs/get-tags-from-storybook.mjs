@@ -18,10 +18,6 @@ export async function getTagsFromStorybook( filePath ) {
 		sourceType: 'module',
 		cwd: ROOT_DIR,
 		rootMode: 'upward-optional',
-		parserOpts: {
-			sourceType: 'module',
-			plugins: [ 'jsx', 'typescript' ],
-		},
 	} );
 
 	const meta = parsedFile.program.body.find(

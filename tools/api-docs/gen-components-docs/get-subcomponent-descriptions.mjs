@@ -21,10 +21,6 @@ export async function getDescriptionsForSubcomponents(
 		sourceType: 'module',
 		cwd: ROOT_DIR,
 		rootMode: 'upward-optional',
-		parserOpts: {
-			sourceType: 'module',
-			plugins: [ 'jsx', 'typescript' ],
-		},
 	} );
 	const mainComponent = parsedFile.program.body
 		.filter( ( node ) => node.type === 'ExportNamedDeclaration' )

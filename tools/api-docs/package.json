@@ -19,18 +19,16 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"dependencies": {
-		"chalk": "4.1.1",
-		"execa": "4.0.2",
-		"fast-glob": "^3.2.7"
-	},
 	"devDependencies": {
-		"@apidevtools/json-schema-ref-parser": "11.6.4",
-		"@babel/core": "7.25.7",
+		"@apidevtools/json-schema-ref-parser": "^11.6.4",
+		"@babel/core": "^7.25.7",
 		"comment-parser": "^1.1.1",
-		"glob": "7.1.2",
-		"json2md": "2.0.1",
-		"react-docgen-typescript": "2.2.2"
+		"glob": "^7.1.2",
+		"json2md": "^2.0.1",
+		"react-docgen-typescript": "^2.2.2",
+		"chalk": "^4.1.1",
+		"execa": "^4.0.2",
+		"fast-glob": "^3.2.7"
 	},
 	"publishConfig": {
 		"access": "public"
