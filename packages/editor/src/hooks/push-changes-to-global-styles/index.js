@@ -444,7 +444,7 @@ function PushChangesToGlobalStylesControl( {
 				help={ sprintf(
 					// translators: 1: Block title e.g. 'Heading'. 2: Scope title e.g. 'Accordion'.
 					__(
-						"Apply this block's typography, spacing, dimensions, and color styles to either all %1$s blocks in this %2$s, or to all %1$s blocks globally across the site."
+						"Apply this block's typography, spacing, dimensions, and color styles to either all %1$s blocks in this %2$s, or to all %1$s blocks globally."
 					),
 					blockTitle,
 					scopeBlockTitle
@@ -530,7 +530,7 @@ function PushChangesToGlobalStylesControl( {
 			help={ sprintf(
 				// translators: %s: Title of the block e.g. 'Heading'.
 				__(
-					"Apply this block's typography, spacing, dimensions, and color styles to all %s blocks globally across the site."
+					"Apply this block's typography, spacing, dimensions, and color styles to all %s blocks globally."
 				),
 				blockTitle
 			) }
