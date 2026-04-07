@@ -1,6 +1,6 @@
 @use "@wordpress/base-styles/variables";
 
-.admin-ui-breadcrumbs__list {
+.list {
 	// @TODO: use Text component from UI when available.
 	font-family: var(--wpds-typography-font-family-heading);
 	font-size: var(--wpds-typography-font-size-lg);
