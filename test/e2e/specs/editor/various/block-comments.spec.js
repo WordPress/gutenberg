@@ -1159,11 +1159,10 @@ test.describe( 'Multiple notes per block', () => {
 				.filter( { hasText: 'Note marked as resolved.' } )
 		).toBeVisible();
 
-		// Click away to deselect the block.
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'Another block' },
-		} );
+		// Click the title to deselect the block and its comment.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.focus();
 
 		// Click back on the original block.
 		await editor.canvas
