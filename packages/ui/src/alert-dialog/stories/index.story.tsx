@@ -3,8 +3,8 @@ import { useId, useState } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { action } from 'storybook/actions';
 import { fn } from 'storybook/test';
-
-import { AlertDialog, Text } from '../..';
+import { Text } from '../..';
+import * as AlertDialog from '../index';
 
 const meta: Meta< typeof AlertDialog.Root > = {
 	title: 'Design System/Components/AlertDialog',
