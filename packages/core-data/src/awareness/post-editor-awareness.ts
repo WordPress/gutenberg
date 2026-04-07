@@ -16,6 +16,7 @@ import {
 	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
 } from './config';
 import { STORE_NAME as coreStore } from '../name';
+import { htmlIndexToRichTextOffset } from '../utils/crdt-utils';
 import {
 	areSelectionsStatesEqual,
 	getSelectionState,
@@ -233,14 +234,14 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	 * clientIds (e.g. in "Show Template" mode where blocks are cloned).
 	 *
 	 * @param selection - The selection state.
-	 * @return The text index and block client ID, or nulls if not resolvable.
+	 * @return The rich-text offset and block client ID, or nulls if not resolvable.
 	 */
 	public convertSelectionStateToAbsolute( selection: SelectionState ): {
-		textIndex: number | null;
+		richTextOffset: number | null;
 		localClientId: string | null;
 	} {
 		if ( selection.type === SelectionType.None ) {
-			return { textIndex: null, localClientId: null };
+			return { richTextOffset: null, localClientId: null };
 		}
 
 		if ( selection.type === SelectionType.WholeBlock ) {
@@ -263,7 +264,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				}
 			}
 
-			return { textIndex: null, localClientId };
+			return { richTextOffset: null, localClientId };
 		}
 
 		// Text-based selections: resolve cursor position and navigate up.
@@ -278,7 +279,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		);
 
 		if ( ! absolutePosition ) {
-			return { textIndex: null, localClientId: null };
+			return { richTextOffset: null, localClientId: null };
 		}
 
 		// Navigate up: Y.Text -> attributes Y.Map -> block Y.Map
@@ -287,7 +288,13 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			yType instanceof Y.Map ? getBlockPathInYdoc( yType ) : null;
 		const localClientId = path ? resolveBlockClientIdByPath( path ) : null;
 
-		return { textIndex: absolutePosition.index, localClientId };
+		return {
+			richTextOffset: htmlIndexToRichTextOffset(
+				absolutePosition.type.toString(),
+				absolutePosition.index
+			),
+			localClientId,
+		};
 	}
 
 	/**

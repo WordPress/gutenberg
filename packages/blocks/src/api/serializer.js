@@ -320,7 +320,7 @@ export function getBlockInnerHTML( block ) {
 				block.attributes,
 				block.innerBlocks
 			);
-		} catch ( error ) {}
+		} catch {}
 	}
 
 	return saveContent;

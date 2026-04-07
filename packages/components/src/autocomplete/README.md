@@ -145,7 +145,7 @@ A class name to apply to the autocompletion popup menu.
 
 #### isDebounced
 
-Whether to apply debouncing for the autocompleter. Set to true to enable debouncing.
+Whether to debounce the autocompleter. This setting only affects the `options` argument; it is ignored by the `useItems`.
 
 -   Type: `Boolean`
 -   Required: No

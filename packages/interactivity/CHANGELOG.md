@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 6.43.0 (2026-04-01)
+
+## 6.42.0 (2026-03-18)
+
 ### Bug Fixes
 
 -   Fix `sessionId` generation crashing in non-secure (non-HTTPS) contexts. ([#76151](https://github.com/WordPress/gutenberg/pull/76151))

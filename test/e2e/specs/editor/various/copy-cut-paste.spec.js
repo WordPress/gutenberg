@@ -374,7 +374,7 @@ test.describe( 'Copy/cut/paste', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	test( 'should cut partial selection and merge like a normal `delete` - not forward ', async ( {
+	test( 'should cut partial selection and merge like a normal `delete` - not forward', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -405,7 +405,7 @@ test.describe( 'Copy/cut/paste', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	test( 'should paste plain text in plain text context when cross block selection is copied ', async ( {
+	test( 'should paste plain text in plain text context when cross block selection is copied', async ( {
 		editor,
 		page,
 		pageUtils,

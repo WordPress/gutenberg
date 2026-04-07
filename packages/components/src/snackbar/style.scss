@@ -14,8 +14,7 @@
 	color: $white;
 	padding: $grid-unit-15 ($grid-unit-05 * 5);
 	width: 100%;
-	// TODO: Replace with a --wpds-dimension-surface-width-* token.
-	max-width: 600px;
+	max-width: var(--wpds-dimension-surface-width-lg);
 	box-sizing: border-box;
 	cursor: pointer;
 

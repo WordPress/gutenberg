@@ -93,14 +93,14 @@ describe( 'renderIssueBody', () => {
 			totalCommits: 100,
 		};
 
-		const body = renderIssueBody( {
+		const view = renderIssueBody( {
 			meta,
 			testTitle: 'Test title',
 			testPath: 'test/e2e/specs/test-title.spec.js',
 			formattedTestResults: 'FORMATTED_TEST_RESULTS',
 		} );
 
-		expect( body ).toMatchInlineSnapshot( `
+		expect( view ).toMatchInlineSnapshot( `
 		"<!-- __META_DATA__:{"failedTimes":5,"totalCommits":100} -->
 		**Flaky test detected. This is an auto-generated issue by GitHub Actions. Please do NOT edit this manually.**
 
@@ -195,16 +195,16 @@ describe( 'parseIssueBody', () => {
 			totalCommits: 95,
 		};
 
-		const body = renderIssueBody( {
+		const view = renderIssueBody( {
 			meta,
 			testTitle: 'Test title',
 			testPath: 'test/e2e/specs/test-title.spec.js',
 			formattedTestResults: testResults.join( '\n' ),
 		} );
 
-		expect( body ).toMatchSnapshot();
+		expect( view ).toMatchSnapshot();
 
-		const parsed = parseIssueBody( body );
+		const parsed = parseIssueBody( view );
 
 		expect( core.error ).toHaveBeenCalledTimes( 1 );
 
@@ -248,13 +248,13 @@ describe( 'renderCommitComment', () => {
 		];
 		const commitSHA = 'commitSHA';
 
-		const commentBody = renderCommitComment( {
+		const view = renderCommitComment( {
 			reportedIssues,
 			runURL,
 			commitSHA,
 		} );
 
-		expect( commentBody ).toMatchInlineSnapshot( `
+		expect( view ).toMatchInlineSnapshot( `
 		"<!-- flaky-tests-report-comment -->
 		**Flaky tests detected in commitSHA.**
 		Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.
@@ -269,13 +269,13 @@ describe( 'renderCommitComment', () => {
 
 describe( 'isReportComment', () => {
 	it( 'matches the report comment', () => {
-		const commentBody = renderCommitComment( {
+		const view = renderCommitComment( {
 			reportedIssues: [],
 			runURL: '',
 			commitSHA: 'commitSHA',
 		} );
 
-		expect( isReportComment( commentBody ) ).toBe( true );
+		expect( isReportComment( view ) ).toBe( true );
 
 		expect( isReportComment( 'random string' ) ).toBe( false );
 	} );

@@ -73,34 +73,6 @@ export const _Default: Story = {
 	},
 };
 
-/**
- * A confirmation dialog that intentionally omits the close icon. The user
- * must explicitly choose "Cancel" or "Confirm" to make their intent clear,
- * since it is not obvious what would happen when clicking a close icon.
- */
-export const ConfirmDialog: Story = {
-	args: {
-		children: (
-			<>
-				<Dialog.Trigger>Confirm Action</Dialog.Trigger>
-				<Dialog.Popup>
-					<Dialog.Header>
-						<Dialog.Title>Confirm Action</Dialog.Title>
-					</Dialog.Header>
-					<p>
-						Are you sure you want to proceed? This action cannot be
-						undone.
-					</p>
-					<Dialog.Footer>
-						<Dialog.Action variant="outline">Cancel</Dialog.Action>
-						<Dialog.Action>Confirm</Dialog.Action>
-					</Dialog.Footer>
-				</Dialog.Popup>
-			</>
-		),
-	},
-};
-
 const ALL_SIZES = [ 'small', 'medium', 'large', 'stretch', 'full' ] as const;
 
 function SizeSelector( {
