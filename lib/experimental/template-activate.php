@@ -551,7 +551,7 @@ function gutenberg_locate_block_template( $template, $type, array $templates ) {
 
 		if ( 'index' === $type ) {
 			if ( isset( $_GET['_wp-find-template'] ) ) {
-				wp_send_json_error( array( 'message' => __( 'No matching template found.' ) ) );
+				wp_send_json_error( array( 'message' => __( 'No matching template found.', 'gutenberg' ) ) );
 			}
 		} else {
 			return ''; // So that the template loader keeps looking for templates.
