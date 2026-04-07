@@ -31,7 +31,8 @@ import {
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
 import { store as blockEditorStore } from '../store';
-import { useBlockStateProps } from './state-utils';
+import { useBlockEditContext } from '../components/block-edit/context';
+import { useBlockStyle } from './use-block-style';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 export const SHADOW_SUPPORT_KEY = 'shadow';
@@ -157,39 +158,36 @@ function BordersInspectorControl( {
 export function BorderPanel( {
 	clientId,
 	name,
-	setAttributes,
 	settings,
 	selectedState = 'default',
 } ) {
 	const isEnabled = useHasBorderPanel( settings );
-	const { style, borderColor } = useSelect(
+	const { borderColor } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
 				return {};
 			}
-			const { style: _style, borderColor: _borderColor } =
+			const { borderColor: _borderColor } =
 				select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-			return { style: _style, borderColor: _borderColor };
+			return { borderColor: _borderColor };
 		},
 		[ clientId, isEnabled ]
 	);
 
-	const { isStateSelected, stateValue, stateOnChange } = useBlockStateProps( {
-		selectedState,
-		style,
-		setAttributes,
-	} );
+	const { setAttributes } = useBlockEditContext();
+	const [ style, setStyle ] = useBlockStyle( null, selectedState );
+	const isStateSelected = selectedState !== 'default';
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return stateValue;
+			return style;
 		}
 		return attributesToStyle( { style, borderColor } );
-	}, [ isStateSelected, stateValue, style, borderColor ] );
+	}, [ isStateSelected, style, borderColor ] );
 
 	const onChange = isStateSelected
-		? stateOnChange
+		? setStyle
 		: ( newStyle ) => {
 				setAttributes( styleToAttributes( newStyle ) );
 		  };
