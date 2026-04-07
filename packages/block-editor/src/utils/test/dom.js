@@ -1,8 +1,36 @@
-/**
- * Internal dependencies
- */
-import { getElementBounds, WITH_OVERFLOW_ELEMENT_BLOCKS } from '../dom';
+import { render, screen } from '@testing-library/react';
+import { VisuallyHidden as WCVisuallyHidden } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Only for testing
+import { VisuallyHidden } from '@wordpress/ui';
+import {
+	getElementBounds,
+	isElementVisible,
+	WITH_OVERFLOW_ELEMENT_BLOCKS,
+} from '../dom';
+
 describe( 'dom', () => {
+	describe( 'isElementVisible', () => {
+		it( 'returns false for @wordpress/components VisuallyHidden', () => {
+			render(
+				<WCVisuallyHidden data-testid="components-visually-hidden">
+					Hidden
+				</WCVisuallyHidden>
+			);
+			const element = screen.getByTestId( 'components-visually-hidden' );
+			expect( isElementVisible( element ) ).toBe( false );
+		} );
+
+		it( 'returns false for @wordpress/ui VisuallyHidden', () => {
+			render(
+				<VisuallyHidden data-testid="ui-visually-hidden">
+					Hidden
+				</VisuallyHidden>
+			);
+			const element = screen.getByTestId( 'ui-visually-hidden' );
+			expect( isElementVisible( element ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'getElementBounds', () => {
 		it( 'should return a DOMRectReadOnly object if the viewport is not available', () => {
 			const element = {

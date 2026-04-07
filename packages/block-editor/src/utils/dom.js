@@ -80,7 +80,7 @@ export function rectUnion( rect1, rect2 ) {
  * @param {Element} element Element.
  * @return {boolean} Whether the element is visible.
  */
-function isElementVisible( element ) {
+export function isElementVisible( element ) {
 	const viewport = element.ownerDocument.defaultView;
 	if ( ! viewport ) {
 		return false;
