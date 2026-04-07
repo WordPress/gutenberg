@@ -8,7 +8,7 @@
  */
 
 /**
- * Registers the editor.SyncConnectionError filter and custom modal.
+ * Registers the editor.isSyncConnectionErrorHandled filter and custom modal.
  */
 function enqueue_sync_connection_error_filter_scripts() {
 	// Register the filter early on wp-hooks so it's available before the
@@ -16,7 +16,7 @@ function enqueue_sync_connection_error_filter_scripts() {
 	wp_add_inline_script(
 		'wp-hooks',
 		"wp.hooks.addFilter(
-			'editor.SyncConnectionError',
+			'editor.isSyncConnectionErrorHandled',
 			'gutenberg-test/custom-sync-error',
 			function( isHandled, errorCode ) {
 				if ( errorCode === 'connection-limit-exceeded' ) {
