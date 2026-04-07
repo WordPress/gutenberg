@@ -8,7 +8,7 @@
  *
  * @return array Filtered preload paths.
  */
-function gutenberg_block_editor_preload_paths_6_9( $paths, $context ) {
+function gutenberg_block_editor_preload_paths_template_activate( $paths, $context ) {
 	if ( 'core/edit-site' === $context->name ) {
 		// Only prefetch for the root. If we preload it for all pages and it's not used
 		// it won't be possible to invalidate.
@@ -25,4 +25,4 @@ function gutenberg_block_editor_preload_paths_6_9( $paths, $context ) {
 
 	return $paths;
 }
-add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_6_9', 10, 2 );
+add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_template_activate', 10, 2 );
