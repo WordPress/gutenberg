@@ -16,7 +16,12 @@ import {
 	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
 } from './config';
 import { STORE_NAME as coreStore } from '../name';
-import { htmlIndexToRichTextOffset } from '../utils/crdt-utils';
+import {
+	htmlIndexToRichTextOffset,
+	isYArray,
+	isYMap,
+	yTextToString,
+} from '../utils/crdt-utils';
 import {
 	areSelectionsStatesEqual,
 	getSelectionState,
@@ -25,7 +30,7 @@ import {
 
 import { SelectionDirection } from '../types';
 import type { SelectionState, WPBlockSelection } from '../types';
-import type { YBlocks } from '../utils/crdt-blocks';
+import type { YBlock, YBlockRecord } from '../utils/crdt-blocks';
 import type {
 	DebugCollaboratorData,
 	EditorState,
@@ -252,11 +257,11 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 
 			let localClientId: string | null = null;
 
-			if ( absolutePos && absolutePos.type instanceof Y.Array ) {
-				const parentArray = absolutePos.type as YBlocks;
+			if ( absolutePos && isYArray< YBlock >( absolutePos.type ) ) {
+				const parentArray = absolutePos.type;
 				const block = parentArray.get( absolutePos.index );
 
-				if ( block instanceof Y.Map ) {
+				if ( isYMap< YBlockRecord >( block ) ) {
 					const path = getBlockPathInYdoc( block );
 					localClientId = path
 						? resolveBlockClientIdByPath( path )
@@ -284,13 +289,12 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 
 		// Navigate up: Y.Text -> attributes Y.Map -> block Y.Map
 		const yType = absolutePosition.type.parent?.parent;
-		const path =
-			yType instanceof Y.Map ? getBlockPathInYdoc( yType ) : null;
+		const path = isYMap( yType ) ? getBlockPathInYdoc( yType ) : null;
 		const localClientId = path ? resolveBlockClientIdByPath( path ) : null;
 
 		return {
 			richTextOffset: htmlIndexToRichTextOffset(
-				absolutePosition.type.toString(),
+				yTextToString( absolutePosition.type ),
 				absolutePosition.index
 			),
 			localClientId,

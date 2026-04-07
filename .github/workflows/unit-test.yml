@@ -34,12 +34,10 @@ jobs:
             fail-fast: false
             matrix:
                 event: ['${{ github.event_name }}']
-                node: ['20', '22', '24']
+                node: ['22', '24']
                 shard: ['1/4', '2/4', '3/4', '4/4']
                 exclude:
-                    # On PRs: Only test Node 20
-                    - event: 'pull_request'
-                      node: '22'
+                    # On PRs: Only test Node 22
                     - event: 'pull_request'
                       node: '24'
 
@@ -86,11 +84,9 @@ jobs:
             fail-fast: false
             matrix:
                 event: ['${{ github.event_name }}']
-                node: ['20', '22', '24']
+                node: ['22', '24']
                 exclude:
-                    # On PRs: Only test Node 20
-                    - event: 'pull_request'
-                      node: '22'
+                    # On PRs: Only test Node 22
                     - event: 'pull_request'
                       node: '24'
 

@@ -11,7 +11,9 @@ import { Y } from '@wordpress/sync';
  */
 import {
 	findBlockByClientIdInDoc,
+	isYText,
 	richTextOffsetToHtmlIndex,
+	yTextToString,
 } from './crdt-utils';
 import type { WPBlockSelection, WPSelection } from '../types';
 
@@ -143,17 +145,16 @@ function convertWPBlockSelectionToSelection(
 ): YSelection {
 	const clientId = selection.clientId;
 	const block = findBlockByClientIdInDoc( clientId, ydoc );
-	const attributes = block?.get( 'attributes' );
+	const attributes = block?.getAttr( 'attributes' );
 	const attributeKey = selection.attributeKey;
 
 	const changedYText = attributeKey
-		? attributes?.get( attributeKey )
+		? attributes?.getAttr( attributeKey )
 		: undefined;
 
-	const isYText = changedYText instanceof Y.Text;
 	const isFullyDefinedSelection = attributeKey && clientId;
 
-	if ( ! isYText || ! isFullyDefinedSelection ) {
+	if ( ! isYText( changedYText ) || ! isFullyDefinedSelection ) {
 		// We either don't have a valid YText (it's been deleted) or we've
 		// been passed a selection that's just a block clientId.
 		// Store as BlockSelection.
@@ -166,7 +167,7 @@ function convertWPBlockSelectionToSelection(
 	const offset = selection.offset ?? 0;
 	const relativePosition = Y.createRelativePositionFromTypeIndex(
 		changedYText,
-		richTextOffsetToHtmlIndex( changedYText.toString(), offset )
+		richTextOffsetToHtmlIndex( yTextToString( changedYText ), offset )
 	);
 
 	return {

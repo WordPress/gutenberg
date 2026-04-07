@@ -507,7 +507,7 @@ describe( 'Export entries', () => {
 		expect(
 			firstExport(
 				`
-				export * as Y from 'yjs';
+				export * as Y from '@y/y';
 			`,
 				`
 				/**
@@ -524,7 +524,7 @@ describe( 'Export entries', () => {
 				lineEnd: 1,
 				localName: undefined,
 				exportName: 'Y',
-				module: 'yjs',
+				module: '@y/y',
 			} ),
 		] );
 	} );

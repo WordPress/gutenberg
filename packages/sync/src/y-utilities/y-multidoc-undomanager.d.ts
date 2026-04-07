@@ -1,5 +1,5 @@
 import { type Observable } from 'lib0/observable';
-import { type UndoManager, type Doc, type AbstractType } from 'yjs';
+import { type UndoManager, type Doc, type Type } from '@y/y';
 
 export class YMultiDocUndoManager extends Observable< string > {
 	docs: Map< Doc, UndoManager >;
@@ -8,13 +8,11 @@ export class YMultiDocUndoManager extends Observable< string > {
 	redoStack: Array< UndoManager >;
 
 	constructor(
-		typeScope?: AbstractType< any > | Array< AbstractType< any > >,
+		typeScope?: Type | Array< Type >,
 		opts?: NonNullable< ConstructorParameters< typeof UndoManager >[ 1 ] >
 	);
 
-	addToScope(
-		ytypes: Array< AbstractType< any > > | AbstractType< any >
-	): void;
+	addToScope( ytypes: Array< Type > | Type ): void;
 	addTrackedOrigin( origin: unknown ): void;
 	removeTrackedOrigin( origin: unknown ): void;
 	undo(): unknown;

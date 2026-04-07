@@ -3,7 +3,7 @@
  */
 import { usePrevious } from '@wordpress/compose';
 import { useEffect, useState } from '@wordpress/element';
-import type { Y } from '@wordpress/sync';
+import type { MapEvent } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -16,6 +16,7 @@ import type {
 } from '../awareness/types';
 import type { SelectionState, ResolvedSelection } from '../types';
 import type { PostEditorAwareness } from '../awareness/post-editor-awareness';
+import { getRootMap } from '../utils/crdt-utils';
 
 interface AwarenessState {
 	activeCollaborators: ActiveCollaborator[];
@@ -187,27 +188,25 @@ function useLastPostSave(
 
 		awareness.setUp();
 
-		const stateMap = awareness.doc.getMap( 'state' );
-		const recordMap = awareness.doc.getMap( 'document' );
+		const stateMap = getRootMap( awareness.doc, 'state' );
+		const recordMap = getRootMap( awareness.doc, 'document' );
 
 		// Only notify for saves that occur after the observer is
 		// set up. This prevents false notifications when the Y.Doc
 		// syncs historical state on page load or peer reconnect.
 		const setupTime = Date.now();
 
-		const observer = ( event: Y.YMapEvent< unknown > ) => {
+		const observer = ( event: MapEvent ) => {
 			if ( event.keysChanged.has( 'savedAt' ) ) {
-				const savedAt = stateMap.get( 'savedAt' ) as number;
-				const savedByClientId = stateMap.get( 'savedBy' ) as number;
+				const savedAt = stateMap.getAttr( 'savedAt' );
+				const savedByClientId = stateMap.getAttr( 'savedBy' );
 
 				if (
 					typeof savedAt === 'number' &&
 					typeof savedByClientId === 'number' &&
 					savedAt > setupTime
 				) {
-					const postStatus = recordMap.get( 'status' ) as
-						| string
-						| undefined;
+					const postStatus = recordMap.getAttr( 'status' );
 					setLastSave( { savedAt, savedByClientId, postStatus } );
 				}
 			}

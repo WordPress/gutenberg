@@ -12,7 +12,13 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { CRDT_RECORD_MAP_KEY } from '../sync';
 import type { YPostRecord } from './crdt';
 import type { YBlock, YBlocks } from './crdt-blocks';
-import { getRootMap, richTextOffsetToHtmlIndex } from './crdt-utils';
+import {
+	createYArray,
+	getRootMap,
+	isYText,
+	richTextOffsetToHtmlIndex,
+	yTextToString,
+} from './crdt-utils';
 import type {
 	AbsoluteBlockIndexPath,
 	WPBlockSelection,
@@ -60,7 +66,7 @@ export function getSelectionState(
 ): SelectionState {
 	const { selectionDirection } = options ?? {};
 	const ymap = getRootMap< YPostRecord >( yDoc, CRDT_RECORD_MAP_KEY );
-	const yBlocks = ymap.get( 'blocks' );
+	const yBlocks = ymap.getAttr( 'blocks' );
 
 	const isSelectionEmpty = Object.keys( selectionStart ).length === 0;
 	const noSelection: SelectionNone = {
@@ -168,17 +174,20 @@ function getCursorPosition(
 		return null;
 	}
 
-	const attributes = block.get( 'attributes' );
-	const currentYText = attributes?.get( selection.attributeKey );
+	const attributes = block.getAttr( 'attributes' );
+	const currentYText = attributes?.getAttr( selection.attributeKey );
 
-	// If the attribute is not a Y.Text, return null.
-	if ( ! ( currentYText instanceof Y.Text ) ) {
+	// If the attribute is not a rich-text Y.Type, return null.
+	if ( ! isYText( currentYText ) ) {
 		return null;
 	}
 
 	const relativePosition = Y.createRelativePositionFromTypeIndex(
 		currentYText,
-		richTextOffsetToHtmlIndex( currentYText.toString(), selection.offset )
+		richTextOffsetToHtmlIndex(
+			yTextToString( currentYText ),
+			selection.offset
+		)
 	);
 
 	return {
@@ -254,7 +263,7 @@ function findBlockByPath(
 			return block;
 		}
 		currentBlocks =
-			block.get( 'innerBlocks' ) ?? ( new Y.Array() as YBlocks );
+			block.getAttr( 'innerBlocks' ) ?? createYArray< YBlock >();
 	}
 	return null;
 }
@@ -283,7 +292,7 @@ function createRelativePositionForBlockPath(
 		}
 		const block = currentBlocks.get( path[ i ] );
 		currentBlocks =
-			block?.get( 'innerBlocks' ) ?? ( new Y.Array() as YBlocks );
+			block?.getAttr( 'innerBlocks' ) ?? createYArray< YBlock >();
 	}
 	return null;
 }

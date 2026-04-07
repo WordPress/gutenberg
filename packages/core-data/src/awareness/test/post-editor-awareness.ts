@@ -9,6 +9,7 @@ import { dispatch, select, subscribe, resolveSelect } from '@wordpress/data';
  */
 import { PostEditorAwareness } from '../post-editor-awareness';
 import { SelectionType } from '../../utils/crdt-user-selections';
+import { createYArray, createYMap, createYText } from '../../utils/crdt-utils';
 import type {
 	SelectionNone,
 	SelectionCursor,
@@ -126,36 +127,29 @@ function createYBlock(
 	{
 		textContent,
 		innerBlocks = [],
-	}: { textContent?: string; innerBlocks?: Y.Map< any >[] } = {}
-): Y.Map< any > {
-	const block = new Y.Map();
-	block.set( 'clientId', clientId );
-	block.set( 'name', name );
+	}: { textContent?: string; innerBlocks?: Y.Type[] } = {}
+): Y.Type {
+	const attrs = createYMap(
+		textContent !== undefined ? { content: createYText( textContent ) } : {}
+	);
 
-	const attrs = new Y.Map();
-	if ( textContent !== undefined ) {
-		attrs.set( 'content', new Y.Text( textContent ) );
-	}
-
-	block.set( 'attributes', attrs );
-	const inner = new Y.Array();
-	if ( innerBlocks.length ) {
-		inner.push( innerBlocks );
-	}
-
-	block.set( 'innerBlocks', inner );
-	return block;
+	return createYMap( {
+		clientId,
+		name,
+		attributes: attrs,
+		innerBlocks: createYArray( innerBlocks ),
+	} ) as unknown as Y.Type;
 }
 
 /**
  * Helper function to create a Y.Doc with blocks structure for testing
  * @param blocks
  */
-function createTestDocWithBlocks( blocks?: Y.Map< any >[] ) {
+function createTestDocWithBlocks( blocks?: Y.Type[] ) {
 	const ydoc = new Y.Doc();
-	const documentMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
-	const yBlocks = new Y.Array();
-	documentMap.set( 'blocks', yBlocks );
+	const documentMap = ydoc.get( CRDT_RECORD_MAP_KEY );
+	const yBlocks = createYArray();
+	documentMap.setAttr( 'blocks', yBlocks );
 
 	if ( blocks ) {
 		yBlocks.push( blocks );
@@ -407,6 +401,7 @@ describe( 'PostEditorAwareness', () => {
 					updated: [ awareness.clientID ],
 					removed: [],
 				},
+				'test-origin',
 			] );
 			callback.mockClear();
 
@@ -422,6 +417,7 @@ describe( 'PostEditorAwareness', () => {
 					updated: [ awareness.clientID ],
 					removed: [],
 				},
+				'test-origin',
 			] );
 
 			// Callback should not be called for equal editor states
@@ -448,6 +444,7 @@ describe( 'PostEditorAwareness', () => {
 					updated: [ awareness.clientID ],
 					removed: [],
 				},
+				'test-origin',
 			] );
 			callback.mockClear();
 
@@ -458,6 +455,7 @@ describe( 'PostEditorAwareness', () => {
 					updated: [ awareness.clientID ],
 					removed: [],
 				},
+				'test-origin',
 			] );
 
 			expect( callback ).not.toHaveBeenCalled();
@@ -476,7 +474,7 @@ describe( 'PostEditorAwareness', () => {
 			// Create a Y.Doc for creating a relative position, then destroy it
 			// This creates a relative position that cannot be resolved in the awareness doc
 			const tempDoc = new Y.Doc();
-			const tempText = tempDoc.getText( 'temp' );
+			const tempText = tempDoc.get( 'temp' );
 			tempText.insert( 0, 'Hello' );
 			const relativePosition = Y.createRelativePositionFromTypeIndex(
 				tempText,
@@ -509,17 +507,15 @@ describe( 'PostEditorAwareness', () => {
 			);
 
 			// Get the Y.Text from the doc
-			const documentMap = doc.getMap( CRDT_RECORD_MAP_KEY );
-			const blocks = documentMap.get( 'blocks' ) as Y.Array<
-				Y.Map< any >
-			>;
+			const documentMap = doc.get( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.getAttr( 'blocks' ) as Y.Type;
 			const block = blocks.get( 0 );
-			const attrs = block.get( 'attributes' ) as Y.Map< Y.Text >;
-			const yText = attrs.get( 'content' );
+			const attrs = block.getAttr( 'attributes' ) as Y.Type;
+			const yText = attrs.getAttr( 'content' );
 
 			// Create a relative position
 			const relativePosition = Y.createRelativePositionFromTypeIndex(
-				yText as Y.Text,
+				yText as Y.Type,
 				5
 			);
 
@@ -547,10 +543,8 @@ describe( 'PostEditorAwareness', () => {
 			);
 
 			// Get the blocks array from the doc
-			const documentMap = doc.getMap( CRDT_RECORD_MAP_KEY );
-			const blocks = documentMap.get( 'blocks' ) as Y.Array<
-				Y.Map< any >
-			>;
+			const documentMap = doc.get( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.getAttr( 'blocks' ) as Y.Type;
 
 			// Create a block relative position
 			const blockPosition = Y.createRelativePositionFromTypeIndex(
@@ -591,6 +585,7 @@ describe( 'PostEditorAwareness', () => {
 					updated: [ awareness.clientID ],
 					removed: [],
 				},
+				'test-origin',
 			] );
 
 			const debugData = awareness.getDebugData();
@@ -712,6 +707,7 @@ describe( 'PostEditorAwareness', () => {
 					updated: [ awareness.clientID ],
 					removed: [],
 				},
+				'test-origin',
 			] );
 
 			expect( callback ).toHaveBeenCalled();
@@ -748,13 +744,11 @@ describe( 'PostEditorAwareness', () => {
 			);
 
 			// Create a cursor in the third block's text
-			const documentMap = nestedDoc.getMap( CRDT_RECORD_MAP_KEY );
-			const blocks = documentMap.get( 'blocks' ) as Y.Array<
-				Y.Map< any >
-			>;
+			const documentMap = nestedDoc.get( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.getAttr( 'blocks' ) as Y.Type;
 			const block2 = blocks.get( 2 );
-			const attrs2 = block2.get( 'attributes' ) as Y.Map< Y.Text >;
-			const yText2 = attrs2.get( 'content' ) as Y.Text;
+			const attrs2 = block2.getAttr( 'attributes' ) as Y.Type;
+			const yText2 = attrs2.getAttr( 'content' ) as Y.Type;
 
 			const relativePosition = Y.createRelativePositionFromTypeIndex(
 				yText2,
@@ -815,19 +809,13 @@ describe( 'PostEditorAwareness', () => {
 			);
 
 			// Create cursor in the second inner paragraph
-			const documentMap = nestedDoc.getMap( CRDT_RECORD_MAP_KEY );
-			const blocks = documentMap.get( 'blocks' ) as Y.Array<
-				Y.Map< any >
-			>;
+			const documentMap = nestedDoc.get( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.getAttr( 'blocks' ) as Y.Type;
 			const outer = blocks.get( 0 );
-			const innerBlocks = outer.get( 'innerBlocks' ) as Y.Array<
-				Y.Map< any >
-			>;
+			const innerBlocks = outer.getAttr( 'innerBlocks' ) as Y.Type;
 			const innerBlock1 = innerBlocks.get( 1 );
-			const innerAttrs = innerBlock1.get(
-				'attributes'
-			) as Y.Map< Y.Text >;
-			const yText = innerAttrs.get( 'content' ) as Y.Text;
+			const innerAttrs = innerBlock1.getAttr( 'attributes' ) as Y.Type;
+			const yText = innerAttrs.getAttr( 'content' ) as Y.Type;
 
 			const relativePosition = Y.createRelativePositionFromTypeIndex(
 				yText,
@@ -878,14 +866,10 @@ describe( 'PostEditorAwareness', () => {
 			);
 
 			// Create a WholeBlock relative position for the inner image
-			const documentMap = nestedDoc.getMap( CRDT_RECORD_MAP_KEY );
-			const blocks = documentMap.get( 'blocks' ) as Y.Array<
-				Y.Map< any >
-			>;
+			const documentMap = nestedDoc.get( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.getAttr( 'blocks' ) as Y.Type;
 			const outer = blocks.get( 0 );
-			const innerBlocks = outer.get( 'innerBlocks' ) as Y.Array<
-				Y.Map< any >
-			>;
+			const innerBlocks = outer.getAttr( 'innerBlocks' ) as Y.Type;
 
 			const blockPosition = Y.createRelativePositionFromTypeIndex(
 				innerBlocks,
@@ -962,21 +946,15 @@ describe( 'PostEditorAwareness', () => {
 			);
 
 			// Create cursor in the deeply nested second paragraph
-			const documentMap = nestedDoc.getMap( CRDT_RECORD_MAP_KEY );
-			const blocks = documentMap.get( 'blocks' ) as Y.Array<
-				Y.Map< any >
-			>;
+			const documentMap = nestedDoc.get( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.getAttr( 'blocks' ) as Y.Type;
 			const outer1 = blocks.get( 1 );
-			const outer1Inner = outer1.get( 'innerBlocks' ) as Y.Array<
-				Y.Map< any >
-			>;
+			const outer1Inner = outer1.getAttr( 'innerBlocks' ) as Y.Type;
 			const mid = outer1Inner.get( 0 );
-			const midInner = mid.get( 'innerBlocks' ) as Y.Array<
-				Y.Map< any >
-			>;
+			const midInner = mid.getAttr( 'innerBlocks' ) as Y.Type;
 			const deep1 = midInner.get( 1 );
-			const deep1Attrs = deep1.get( 'attributes' ) as Y.Map< Y.Text >;
-			const yText = deep1Attrs.get( 'content' ) as Y.Text;
+			const deep1Attrs = deep1.getAttr( 'attributes' ) as Y.Type;
+			const yText = deep1Attrs.getAttr( 'content' ) as Y.Type;
 
 			const relativePosition = Y.createRelativePositionFromTypeIndex(
 				yText,
@@ -1071,13 +1049,11 @@ describe( 'PostEditorAwareness', () => {
 			);
 
 			// Create cursor in the second post content paragraph
-			const documentMap = templateDoc.getMap( CRDT_RECORD_MAP_KEY );
-			const blocks = documentMap.get( 'blocks' ) as Y.Array<
-				Y.Map< any >
-			>;
+			const documentMap = templateDoc.get( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.getAttr( 'blocks' ) as Y.Type;
 			const block1 = blocks.get( 1 );
-			const attrs = block1.get( 'attributes' ) as Y.Map< Y.Text >;
-			const yText = attrs.get( 'content' ) as Y.Text;
+			const attrs = block1.getAttr( 'attributes' ) as Y.Type;
+			const yText = attrs.getAttr( 'content' ) as Y.Type;
 
 			const relativePosition = Y.createRelativePositionFromTypeIndex(
 				yText,
@@ -1149,10 +1125,8 @@ describe( 'PostEditorAwareness', () => {
 				123
 			);
 
-			const documentMap = templateDoc.getMap( CRDT_RECORD_MAP_KEY );
-			const blocks = documentMap.get( 'blocks' ) as Y.Array<
-				Y.Map< any >
-			>;
+			const documentMap = templateDoc.get( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.getAttr( 'blocks' ) as Y.Type;
 
 			const blockPosition = Y.createRelativePositionFromTypeIndex(
 				blocks,
@@ -1192,13 +1166,11 @@ describe( 'PostEditorAwareness', () => {
 				123
 			);
 
-			const documentMap = normalDoc.getMap( CRDT_RECORD_MAP_KEY );
-			const blocks = documentMap.get( 'blocks' ) as Y.Array<
-				Y.Map< any >
-			>;
+			const documentMap = normalDoc.get( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.getAttr( 'blocks' ) as Y.Type;
 			const block = blocks.get( 0 );
-			const attrs = block.get( 'attributes' ) as Y.Map< Y.Text >;
-			const yText = attrs.get( 'content' ) as Y.Text;
+			const attrs = block.getAttr( 'attributes' ) as Y.Type;
+			const yText = attrs.getAttr( 'content' ) as Y.Type;
 
 			const relativePosition = Y.createRelativePositionFromTypeIndex(
 				yText,

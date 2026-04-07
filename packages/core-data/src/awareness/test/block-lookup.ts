@@ -11,9 +11,19 @@ import {
 	getBlockPathInYdoc,
 	resolveBlockClientIdByPath,
 } from '../block-lookup';
+import {
+	createYArray,
+	createYMap,
+	type YArray,
+	type YMap,
+} from '../../utils/crdt-utils';
 
-// Mock WordPress dependencies
 jest.mock( '@wordpress/data', () => ( {
+	// Needed because @wordpress/rich-text initialises its store at import time.
+	combineReducers: jest.fn( () => jest.fn( () => ( {} ) ) ),
+	createReduxStore: jest.fn( () => ( {} ) ),
+	createSelector: ( selector: Function ) => selector,
+	register: jest.fn(),
 	select: jest.fn(),
 } ) );
 
@@ -33,11 +43,11 @@ type MockBlock = {
  *
  * @param clientId Block client ID.
  */
-function createTestYBlock( clientId: string ): Y.Map< any > {
-	const block = new Y.Map< any >();
-	block.set( 'clientId', clientId );
-	block.set( 'innerBlocks', new Y.Array< Y.Map< any > >() );
-	return block;
+function createTestYBlock( clientId: string ): YMap< any > {
+	return createYMap( {
+		clientId,
+		innerBlocks: createYArray< YMap< any > >(),
+	} );
 }
 
 /**
@@ -45,16 +55,16 @@ function createTestYBlock( clientId: string ): Y.Map< any > {
  * for blocks that need pre-populated children.
  *
  * @param clientId    Block client ID.
- * @param innerBlocks A Y.Array to use as the block's innerBlocks.
+ * @param innerBlocks A YArray to use as the block's innerBlocks.
  */
 function createTestYBlockWithInner(
 	clientId: string,
-	innerBlocks: Y.Array< Y.Map< any > >
-): Y.Map< any > {
-	const block = new Y.Map< any >();
-	block.set( 'clientId', clientId );
-	block.set( 'innerBlocks', innerBlocks );
-	return block;
+	innerBlocks: YArray< YMap< any > >
+) {
+	return createYMap( {
+		clientId,
+		innerBlocks,
+	} );
 }
 
 /**
@@ -66,15 +76,15 @@ function createTestYBlockWithInner(
  */
 function createFlatYDoc( count: number ) {
 	const ydoc = new Y.Doc();
-	const rootMap = ydoc.getMap( 'test' );
-	const blocks = new Y.Array< Y.Map< any > >();
-	rootMap.set( 'blocks', blocks );
+	const rootMap = ydoc.get( 'test' );
+	const blocks = createYArray< YMap< any > >();
+	rootMap.setAttr( 'blocks', blocks );
 
-	const yBlocks: Y.Map< any >[] = [];
+	const yBlocks: YMap< any >[] = [];
 	for ( let i = 0; i < count; i++ ) {
 		yBlocks.push( createTestYBlock( `block-${ i }` ) );
 	}
-	blocks.push( yBlocks );
+	blocks.insert( blocks.length, yBlocks );
 
 	return { ydoc, blocks };
 }
@@ -99,29 +109,27 @@ function createNestedYDoc( {
 	innerCount: number;
 } ) {
 	const ydoc = new Y.Doc();
-	const rootMap = ydoc.getMap( 'test' );
-	const rootBlocks = new Y.Array< Y.Map< any > >();
-	rootMap.set( 'blocks', rootBlocks );
+	const rootMap = ydoc.get( 'test' );
+	const rootBlocks = createYArray< YMap< any > >();
+	rootMap.setAttr( 'blocks', rootBlocks );
 
-	const yRootBlocks: Y.Map< any >[] = [];
+	const yRootBlocks: YMap< any >[] = [];
 	for ( let i = 0; i < rootCount; i++ ) {
 		yRootBlocks.push( createTestYBlock( `root-${ i }` ) );
 	}
-	rootBlocks.push( yRootBlocks );
+	rootBlocks.insert( rootBlocks.length, yRootBlocks );
 
 	// Add inner blocks to the specified parent.
 	const parentBlock = rootBlocks.get( parentIndex );
-	const innerBlocksArray = parentBlock.get( 'innerBlocks' ) as Y.Array<
-		Y.Map< any >
-	>;
+	const innerBlocksArray = parentBlock?.getAttr( 'innerBlocks' );
 
-	const yInnerBlocks: Y.Map< any >[] = [];
+	const yInnerBlocks: YMap< any >[] = [];
 	for ( let j = 0; j < innerCount; j++ ) {
 		yInnerBlocks.push(
 			createTestYBlock( `inner-${ parentIndex }-${ j }` )
 		);
 	}
-	innerBlocksArray.push( yInnerBlocks );
+	innerBlocksArray.insert( innerBlocksArray.length, yInnerBlocks );
 
 	return { ydoc, rootBlocks, innerBlocksArray };
 }
@@ -199,8 +207,7 @@ describe( 'getBlockPathInYdoc', () => {
 	} );
 
 	it( 'should return null for a Y.Map without a parent array', () => {
-		const orphan = new Y.Map< any >();
-		orphan.set( 'clientId', 'orphan' );
+		const orphan = createYMap( { clientId: 'orphan' } );
 
 		expect( getBlockPathInYdoc( orphan ) ).toBeNull();
 	} );
@@ -208,32 +215,32 @@ describe( 'getBlockPathInYdoc', () => {
 	it( 'should handle deeply nested blocks', () => {
 		// Build a 3-level deep structure so the target block is at [2, 7, 1].
 		const ydoc = new Y.Doc();
-		const rootMap = ydoc.getMap( 'test' );
-		const rootBlocks = new Y.Array< Y.Map< any > >();
-		rootMap.set( 'blocks', rootBlocks );
+		const rootMap = ydoc.get( 'test' );
+		const rootBlocks = createYArray< YMap< any > >();
+		rootMap.setAttr( 'blocks', rootBlocks );
 
 		// 3 root blocks — the target parent is at index 2.
-		const innerArray = new Y.Array< Y.Map< any > >();
-		rootBlocks.push( [
+		const innerArray = createYArray< YMap< any > >();
+		rootBlocks.insert( rootBlocks.length, [
 			createTestYBlock( 'root-0' ),
 			createTestYBlock( 'root-1' ),
 			createTestYBlockWithInner( 'root-2', innerArray ),
 		] );
 
 		// 8 inner blocks inside root-2 — the target parent is at index 7.
-		const grandchildArray = new Y.Array< Y.Map< any > >();
-		const fillerInners: Y.Map< any >[] = [];
+		const grandchildArray = createYArray< YMap< any > >();
+		const fillerInners: YMap< any >[] = [];
 		for ( let i = 0; i < 7; i++ ) {
 			fillerInners.push( createTestYBlock( `inner-${ i }` ) );
 		}
-		innerArray.push( [
+		innerArray.insert( innerArray.length, [
 			...fillerInners,
 			createTestYBlockWithInner( 'inner-7', grandchildArray ),
 		] );
 
 		// 2 grandchildren inside inner-7 — the target is at index 1.
 		const grandchild = createTestYBlock( 'target' );
-		grandchildArray.push( [
+		grandchildArray.insert( grandchildArray.length, [
 			createTestYBlock( 'grandchild-0' ),
 			grandchild,
 		] );

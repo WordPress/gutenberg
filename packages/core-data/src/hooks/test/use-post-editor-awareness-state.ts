@@ -70,7 +70,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		convertSelectionStateToAbsolute: jest.Mock;
 		getDebugData: jest.Mock;
 		doc: {
-			getMap: jest.Mock;
+			get: jest.Mock;
 		};
 	};
 	let mockSyncManager: {
@@ -92,7 +92,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		mockRecordMapData = {};
 
 		const mockStateMap = {
-			get: jest.fn( ( key: string ) => mockStateMapData[ key ] ),
+			getAttr: jest.fn( ( key: string ) => mockStateMapData[ key ] ),
 			observe: jest.fn( ( observer: typeof stateMapObserver ) => {
 				stateMapObserver = observer;
 			} ),
@@ -100,7 +100,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		};
 
 		const mockRecordMap = {
-			get: jest.fn( ( key: string ) => mockRecordMapData[ key ] ),
+			getAttr: jest.fn( ( key: string ) => mockRecordMapData[ key ] ),
 		};
 
 		mockAwareness = {
@@ -113,7 +113,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			convertSelectionStateToAbsolute: jest.fn().mockReturnValue( null ),
 			getDebugData: jest.fn().mockReturnValue( createMockDebugData() ),
 			doc: {
-				getMap: jest.fn( ( name: string ) => {
+				get: jest.fn( ( name: string ) => {
 					if ( name === 'state' ) {
 						return mockStateMap;
 					}

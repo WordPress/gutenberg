@@ -14,74 +14,178 @@ import { CRDT_RECORD_MAP_KEY } from '../sync';
 /**
  * A YMapRecord represents the shape of the data stored in a Y.Map.
  */
-export type YMapRecord = Record< string, unknown >;
+export type YMapRecord = Record< number | string, any >;
 
 /**
- * A wrapper around Y.Map to provide type safety. The generic type accepted by
- * Y.Map represents the union of possible values of the map, which are varied in
- * many cases. This type is accurate, but its non-specificity requires aggressive
- * type narrowing or type casting / destruction with `as`.
+ * Branded type aliases for Y.Type. In Yjs v14, Y.Map, Y.Array, and Y.Text have
+ * been unified into a single Y.Type class. The DeltaConf generic on Y.Type is
+ * meant to provide type-level discrimination (text vs. children vs. attrs), but
+ * as of v14-rc.2 the generated TypeScript declarations do not propagate the
+ * generic into method signatures.
  *
- * This type provides type enhancements so that the correct value type can be
- * inferred based on the provided key. It is just a type wrap / overlay, and
- * does not change the runtime behavior of Y.Map.
+ * These types allow the correct value type to be inferred from method
+ * invocations (e.g., `getAttr` on YMap, `get` on YArray). They are just type
+ * wraps / overlays and do not change the runtime behavior of Y.Type.
  *
- * This interface cannot extend Y.Map directly due to the limitations of
- * TypeScript's structural typing. One negative consequence of this is that
- * `instanceof` checks against Y.Map continue to work at runtime but will blur
- * the type at compile time. To navigate this, use the `isYMap` function below.
+ * - Always prefer these type aliases over Y.Type and use the create* or getRoot*
+ *   functions to construct them.
+ *
+ * - Do not use `instanceof Y.Type` checks. Instead, use the is* functions below.
  */
-export interface YMapWrap< T extends YMapRecord > extends Y.AbstractType< T > {
-	delete: < K extends keyof T >( key: K ) => void;
+
+export interface YArray< T >
+	extends Y.Type< { children: any; name: 'YArray' } > {
 	forEach: (
+		callback: ( value: T, index: number, array: YArray< T > ) => void
+	) => void;
+	get: ( index: number ) => T | undefined;
+	insert: ( index: number, values: T[] ) => void;
+	// add types for other Y.Type methods as needed
+}
+
+export interface YMap< T extends YMapRecord >
+	extends Y.Type< { attrs: YMapRecord; name: 'YMap' } > {
+	deleteAttr: < K extends keyof T >( key: K ) => void;
+	forEachAttr: (
 		callback: (
 			value: T[ keyof T ],
-			key: keyof T,
-			map: YMapWrap< T >
+			key: string | number,
+			map: this
 		) => void
 	) => void;
-	has: < K extends keyof T >( key: K ) => boolean;
-	get: < K extends keyof T >( key: K ) => T[ K ] | undefined;
-	set: < K extends keyof T >( key: K, value: T[ K ] ) => void;
-	toJSON: () => T;
-	// add types for other Y.Map methods as needed
+	getAttr: < K extends keyof T >( key: K ) => T[ K ] | undefined;
+	getAttrs: () => T;
+	hasAttr: < K extends keyof T >( key: K ) => boolean;
+	setAttr: < K extends keyof T >( key: K, value: T[ K ] ) => T[ K ];
+	// add types for other Y.Type methods as needed
 }
+
+export interface YText extends Y.Type< { name: 'YText'; text: true } > {}
 
 /**
  * Get or create a root-level Map for the given Y.Doc. Use this instead of
- * doc.getMap() for additional type safety.
+ * doc.get() for additional type safety.
  *
  * @param doc Y.Doc
- * @param key Map key
+ * @param key Document key
  */
 export function getRootMap< T extends YMapRecord >(
 	doc: Y.Doc,
 	key: string
-): YMapWrap< T > {
-	return doc.getMap< T >( key ) as unknown as YMapWrap< T >;
+): YMap< T > {
+	// Do not pass a type hint — root type names set via doc.get() do not
+	// survive sync, and named types wrap content in XML tags on toString().
+	return doc.get( key ) as YMap< T >;
 }
 
 /**
- * Create a new Y.Map (provided with YMapWrap type), optionally initialized with
- * data. Use this instead of `new Y.Map()` for additional type safety.
+ * Create a new Y.Type with YArray name, optionally initialized with data. Use
+ * this instead of `new Y.Type()` for additional type safety.
  *
- * @param partial Partial data to initialize the map with.
+ * @param items Optional array items to initialize the type with.
+ */
+export function createYArray< T >( items: T[] = [] ): YArray< T > {
+	const ytype = new Y.Type( 'YArray' ) as YArray< T >;
+
+	// Use insert instead of push to avoid v14's "premature access" warning
+	// (push accesses .length on unintegrated types).
+	if ( items.length > 0 ) {
+		ytype.insert( 0, items );
+	}
+
+	return ytype;
+}
+
+/**
+ * Create a new Y.Type with YMap name, optionally initialized with
+ * data. Use this instead of `new Y.Type()` for additional type safety.
+ *
+ * @param partial Partial map data to initialize the type with.
  */
 export function createYMap< T extends YMapRecord >(
 	partial: Partial< T > = {}
-): YMapWrap< T > {
-	return new Y.Map( Object.entries( partial ) ) as unknown as YMapWrap< T >;
+): YMap< T > {
+	const ytype = new Y.Type( 'YMap' ) as YMap< T >;
+
+	for ( const [ key, value ] of Object.entries( partial ) ) {
+		ytype.setAttr( key, value );
+	}
+
+	return ytype;
 }
 
 /**
- * Type guard to check if a value is a Y.Map without losing type information.
+ * Create a new Y.Type with YText name, optionally initialized with
+ * data. Use this instead of `new Y.Type()` for additional type safety.
+ *
+ * NOTE: Named Y.Types wrap their content in XML tags when toString() is called
+ * (e.g. `<YText>content</YText>`). Use `yTextToString()` instead of
+ * `toString()` to get the plain text content of a YText instance.
+ *
+ * @param text Optional text to initialize the type with.
+ */
+export function createYText( text: string = '' ): YText {
+	const ytype = new Y.Type( 'YText' ) as YText;
+
+	// Use insert instead of push to avoid v14's "premature access" warning
+	// (push accesses .length on unintegrated types).
+	if ( text ) {
+		ytype.insert( 0, text );
+	}
+	return ytype;
+}
+
+/**
+ * General type guard for Y.Type. Do not use this directly; use the more specific
+ * isYArray, isYMap, or isYText guards.
+ *
+ * @param value Value to check.
+ */
+function isYType( value: unknown ): value is Y.Type {
+	return value instanceof Y.Type;
+}
+
+/**
+ * Type guard to check if a value is a Y.Type (used as an array) without losing
+ * type information.
+ *
+ * Note: In Yjs v14's unified type system, all Y.Types share the same class.
+ * This guard only checks `instanceof Y.Type`; the branded generic provides
+ * compile-time safety while the runtime check ensures the value is a Y.Type.
+ *
+ * @param value Value to check.
+ */
+export function isYArray< T >( value: unknown ): value is YArray< T > {
+	return isYType( value ) && 'YArray' === value.name;
+}
+
+/**
+ * Type guard to check if a value is a Y.Type (used as a map) without losing
+ * type information.
+ *
+ * Note: In Yjs v14's unified type system, all Y.Types share the same class.
+ * This guard only checks `instanceof Y.Type`; the branded generic provides
+ * compile-time safety while the runtime check ensures the value is a Y.Type.
  *
  * @param value Value to check.
  */
 export function isYMap< T extends YMapRecord >(
-	value: YMapWrap< T > | undefined
-): value is YMapWrap< T > {
-	return value instanceof Y.Map;
+	value: unknown
+): value is YMap< T > {
+	return isYType( value ) && 'YMap' === value.name;
+}
+
+/**
+ * Type guard that narrows a value to `YText`.
+ *
+ * Note: In Yjs v14's unified type system, all Y.Types share the same class.
+ * This guard only checks `instanceof Y.Type`; the branded generic provides
+ * compile-time safety while the runtime check ensures the value is a Y.Type.
+ *
+ * @param value Value to check.
+ */
+export function isYText( value: unknown ): value is YText {
+	return isYType( value ) && 'YText' === value.name;
 }
 
 /**
@@ -96,9 +200,9 @@ export function findBlockByClientIdInDoc(
 	ydoc: Y.Doc
 ): YBlock | null {
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
-	const blocks = ymap.get( 'blocks' );
+	const blocks = ymap.getAttr( 'blocks' );
 
-	if ( ! ( blocks instanceof Y.Array ) ) {
+	if ( ! isYArray< YBlock >( blocks ) ) {
 		return null;
 	}
 
@@ -207,12 +311,14 @@ function findBlockByClientIdInBlocks(
 	blockId: string,
 	blocks: YBlocks
 ): YBlock | null {
-	for ( const block of blocks ) {
-		if ( block.get( 'clientId' ) === blockId ) {
+	for ( let i = 0; i < blocks.length; i++ ) {
+		const block = blocks.get( i );
+
+		if ( block?.getAttr( 'clientId' ) === blockId ) {
 			return block;
 		}
 
-		const innerBlocks = block.get( 'innerBlocks' );
+		const innerBlocks = block?.getAttr( 'innerBlocks' );
 
 		if ( innerBlocks && innerBlocks.length > 0 ) {
 			const innerBlock = findBlockByClientIdInBlocks(
@@ -227,4 +333,73 @@ function findBlockByClientIdInBlocks(
 	}
 
 	return null;
+}
+
+/**
+ * Recursively serialize a Y.Type value to its plain JavaScript equivalent,
+ * replicating the behavior of Yjs v13's `toJSON()` method which recursively
+ * serialized nested Y.Type values.
+ *
+ * @param value The value to serialize.
+ * @return The plain JavaScript equivalent.
+ */
+function serialize( value: unknown ): unknown {
+	if ( isYMap( value ) ) {
+		return serialize( value.getAttrs() );
+	}
+
+	if ( isYArray( value ) ) {
+		return serialize( value.toArray() );
+	}
+
+	if ( isYText( value ) ) {
+		return yTextToString( value );
+	}
+
+	// Serializable primitives can be returned as-is.
+	const primitives = [ 'boolean', 'bigint', 'number', 'string', 'undefined' ];
+	if ( primitives.includes( typeof value ) ) {
+		return value;
+	}
+
+	if ( Array.isArray( value ) ) {
+		return value.map( serialize );
+	}
+
+	if ( value && typeof value === 'object' ) {
+		return Object.fromEntries(
+			Object.entries( value ).map( ( [ k, v ] ) => [ k, serialize( v ) ] )
+		);
+	}
+
+	return null;
+}
+
+/**
+ * Convert a YMap to a plain JavaScript object by recursively serializing its
+ * attributes. This replicates the behavior of Yjs v13's `toJSON()` method which
+ * recursively serialized nested Y.Type values.
+ *
+ * @param ymap The YMap to convert.
+ * @return The plain JavaScript equivalent of the YMap.
+ */
+export function yMapToJSON< T extends YMapRecord >( ymap: YMap< T > ): T {
+	// Root-level Y.Types (from doc.get()) have name === null regardless
+	// of any type hint passed. Their name does not survive sync, so
+	// isYMap() would not match and serialize() would fall through to the
+	// text-like case. Nested Y.Types (from createYMap/createYArray/
+	// createYText) DO preserve names.
+	return serialize( ymap.getAttrs() ) as T;
+}
+
+/**
+ * Get the plain text content of a YText instance. Named Y.Types wrap their
+ * content in XML tags when `toString()` is called; this function bypasses
+ * that by reading children directly via `toArray()`.
+ *
+ * @param ytext The YText instance.
+ * @return The plain text content.
+ */
+export function yTextToString( ytext: YText ): string {
+	return ytext.toArray().join( '' );
 }

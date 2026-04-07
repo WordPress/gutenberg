@@ -12,7 +12,7 @@ import {
 	type CRDTDoc,
 	type ObjectData,
 	type SyncConfig,
-	Y,
+	type Y,
 } from '@wordpress/sync';
 
 /**
@@ -36,11 +36,16 @@ import {
 	updateSelectionHistory,
 } from './crdt-selection';
 import {
+	createYArray,
 	createYMap,
+	createYText,
 	getRootMap,
+	isYArray,
 	isYMap,
+	isYText,
+	yMapToJSON,
 	type YMapRecord,
-	type YMapWrap,
+	type YMap,
 } from './crdt-utils';
 
 // Changes that can be applied to a post entity record.
@@ -52,26 +57,26 @@ export type PostChanges = Partial< Post > & {
 	title?: Post[ 'title' ] | string;
 };
 
-// A post record as represented in the CRDT document (Y.Map).
+// A post record as represented in the CRDT document (Y.Type).
 export interface YPostRecord extends YMapRecord {
 	author: number;
 	// Blocks are undefined when they need to be re-parsed from content.
 	blocks: YBlocks | undefined;
-	content: Y.Text;
+	content: Y.Type;
 	categories: number[];
 	comment_status: string;
 	date: string | null;
-	excerpt: Y.Text;
+	excerpt: Y.Type;
 	featured_media: number;
 	format: string;
-	meta: YMapWrap< YMapRecord >;
+	meta: YMap< YMapRecord >;
 	ping_status: string;
 	slug: string;
 	status: string;
 	sticky: boolean;
 	tags: number[];
 	template: string;
-	title: Y.Text;
+	title: Y.Type;
 }
 
 export const POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE = '_crdt_document';
@@ -105,7 +110,7 @@ function defaultApplyChangesToCRDTDoc(
 			// Add support for additional data types here.
 
 			default: {
-				const currentValue = ymap.get( key );
+				const currentValue = ymap.getAttr( key );
 				updateMapValue( ymap, key, currentValue, newValue );
 			}
 		}
@@ -145,17 +150,17 @@ export function applyPostChangesToCRDTDoc(
 				// Blocks are undefined when they need to be re-parsed from content.
 				if ( ! newValue ) {
 					// Set to undefined instead of deleting the key. This is important
-					// since we iterate over the Y.Map keys in getPostChangesFromCRDTDoc.
-					ymap.set( key, undefined );
+					// since we iterate over the keys in getPostChangesFromCRDTDoc.
+					ymap.setAttr( key, undefined );
 					break;
 				}
 
-				let currentBlocks = ymap.get( key );
+				let currentBlocks = ymap.getAttr( key );
 
 				// Initialize.
-				if ( ! ( currentBlocks instanceof Y.Array ) ) {
-					currentBlocks = new Y.Array< YBlock >();
-					ymap.set( key, currentBlocks );
+				if ( ! isYArray( currentBlocks ) ) {
+					currentBlocks = createYArray< YBlock >();
+					ymap.setAttr( key, currentBlocks );
 				}
 
 				// Block changes from typing are bundled with a 'selection' update.
@@ -172,24 +177,23 @@ export function applyPostChangesToCRDTDoc(
 			case 'content':
 			case 'excerpt':
 			case 'title': {
-				const currentValue = ymap.get( key );
+				const currentValue = ymap.getAttr( key );
 				let rawValue = getRawValue( newValue );
 
 				// Copy logic from prePersistPostType to ensure that the "Auto
 				// Draft" template title is not synced.
 				if (
 					key === 'title' &&
-					! currentValue?.toString() &&
+					! currentValue?.length &&
 					'Auto Draft' === rawValue
 				) {
 					rawValue = '';
 				}
 
-				if ( currentValue instanceof Y.Text ) {
+				if ( isYText( currentValue ) ) {
 					mergeRichTextUpdate( currentValue, rawValue ?? '' );
 				} else {
-					const newYText = new Y.Text( rawValue ?? '' );
-					ymap.set( key, newYText );
+					ymap.setAttr( key, createYText( rawValue ?? '' ) );
 				}
 
 				break;
@@ -197,12 +201,12 @@ export function applyPostChangesToCRDTDoc(
 
 			// "Meta" is overloaded term; here, it refers to post meta.
 			case 'meta': {
-				let metaMap = ymap.get( 'meta' );
+				let metaMap = ymap.getAttr( 'meta' );
 
 				// Initialize.
 				if ( ! isYMap( metaMap ) ) {
 					metaMap = createYMap< YMapRecord >();
-					ymap.set( 'meta', metaMap );
+					ymap.setAttr( 'meta', metaMap );
 				}
 
 				// Iterate over each meta property in the new value and merge it if it
@@ -216,7 +220,7 @@ export function applyPostChangesToCRDTDoc(
 						updateMapValue(
 							metaMap,
 							metaKey,
-							metaMap.get( metaKey ), // current value in CRDT
+							metaMap.getAttr( metaKey ), // current value in CRDT
 							metaValue // new value from changes
 						);
 					}
@@ -231,7 +235,7 @@ export function applyPostChangesToCRDTDoc(
 					break;
 				}
 
-				const currentValue = ymap.get( key );
+				const currentValue = ymap.getAttr( key );
 				updateMapValue( ymap, key, currentValue, newValue );
 				break;
 			}
@@ -239,7 +243,7 @@ export function applyPostChangesToCRDTDoc(
 			// Add support for additional properties here.
 
 			default: {
-				const currentValue = ymap.get( key );
+				const currentValue = ymap.getAttr( key );
 				updateMapValue( ymap, key, currentValue, newValue );
 			}
 		}
@@ -260,7 +264,7 @@ export function applyPostChangesToCRDTDoc(
 }
 
 function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
-	return getRootMap( crdtDoc, CRDT_RECORD_MAP_KEY ).toJSON();
+	return yMapToJSON( getRootMap( crdtDoc, CRDT_RECORD_MAP_KEY ) );
 }
 
 /**
@@ -283,7 +287,7 @@ export function getPostChangesFromCRDTDoc(
 	let allowedMetaChanges: Post[ 'meta' ] = {};
 
 	const changes = Object.fromEntries(
-		Object.entries( ymap.toJSON() ).filter( ( [ key, newValue ] ) => {
+		Object.entries( yMapToJSON( ymap ) ).filter( ( [ key, newValue ] ) => {
 			if ( ! syncedProperties.has( key ) ) {
 				return false;
 			}
@@ -313,7 +317,7 @@ export function getPostChangesFromCRDTDoc(
 						ydoc.meta?.get( CRDT_DOC_META_PERSISTENCE_KEY ) &&
 						editedRecord.content
 					) {
-						const blocksJson = ymap.get( 'blocks' )?.toJSON() ?? [];
+						const blocksJson = newValue ?? [];
 
 						return (
 							__unstableSerializeAndClean( blocksJson ).trim() !==
@@ -384,12 +388,10 @@ export function getPostChangesFromCRDTDoc(
 	);
 
 	// Blocks extracted from the CRDT document have rich-text attributes as
-	// plain strings (from Y.Text.toJSON()). Convert them back to RichTextData
+	// plain strings (from yTextToString). Convert them back to RichTextData
 	// so block edit components receive the same types as locally-created blocks.
-	if ( changes.blocks ) {
-		changes.blocks = deserializeBlockAttributes(
-			changes.blocks as Block[]
-		);
+	if ( Array.isArray( changes.blocks ) ) {
+		changes.blocks = deserializeBlockAttributes( changes.blocks );
 	}
 
 	// Meta changes must be merged with the edited record since not all meta
@@ -461,17 +463,17 @@ function haveValuesChanged< ValueType >(
 }
 
 function updateMapValue< T extends YMapRecord, K extends keyof T >(
-	map: YMapWrap< T >,
+	map: YMap< T >,
 	key: K,
 	currentValue: T[ K ] | undefined,
 	newValue: T[ K ] | undefined
 ): void {
 	if ( undefined === newValue ) {
-		map.delete( key );
+		map.deleteAttr( key );
 		return;
 	}
 
 	if ( haveValuesChanged< T[ K ] >( currentValue, newValue ) ) {
-		map.set( key, newValue );
+		map.setAttr( key, newValue );
 	}
 }

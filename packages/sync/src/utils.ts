@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import * as Y from 'yjs';
+import * as Y from '@y/y';
 import * as buffer from 'lib0/buffer';
 
 /**
@@ -47,8 +47,8 @@ export function createYjsDoc( documentMeta: DocumentMeta = {} ): CRDTDoc {
  * @param {Y.Doc} ydoc Y.Doc instance to initialize.
  */
 export function initializeYjsDoc( ydoc: CRDTDoc ): void {
-	const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-	stateMap.set( VERSION_KEY, CRDT_DOC_VERSION );
+	const stateMap = ydoc.get( CRDT_STATE_MAP_KEY );
+	stateMap.setAttr( VERSION_KEY, CRDT_DOC_VERSION );
 }
 
 /**
@@ -58,9 +58,9 @@ export function initializeYjsDoc( ydoc: CRDTDoc ): void {
  * @param {CRDTDoc} ydoc CRDT document.
  */
 export function markEntityAsSaved( ydoc: CRDTDoc ): void {
-	const recordMeta = ydoc.getMap( CRDT_STATE_MAP_KEY );
-	recordMeta.set( SAVED_AT_KEY, Date.now() );
-	recordMeta.set( SAVED_BY_KEY, ydoc.clientID );
+	const recordMeta = ydoc.get( CRDT_STATE_MAP_KEY );
+	recordMeta.setAttr( SAVED_AT_KEY, Date.now() );
+	recordMeta.setAttr( SAVED_BY_KEY, ydoc.clientID );
 }
 
 function pseudoRandomID(): number {

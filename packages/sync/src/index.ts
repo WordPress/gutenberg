@@ -34,14 +34,14 @@
  * },
  * ```
  */
-export * as Y from 'yjs';
+export * as Y from '@y/y';
 
 /**
  * The major version of Yjs that is bundled and exported by this package. This
  * can be used by third-party code to ensure that they are targeting a compatible
  * version of Yjs.
  */
-export const YJS_VERSION = '13';
+export const YJS_VERSION = '14';
 
 /**
  * The Awareness protocol should not be considered a public API. It is a
@@ -52,7 +52,7 @@ export const YJS_VERSION = '13';
  * implementation. However, it may be desirable for custom entities to have a
  * custom awareness implementation.
  */
-export { Awareness } from 'y-protocols/awareness';
+export { Awareness } from '@y/protocols/awareness';
 
 /**
  * Private @wordpress/sync APIs.

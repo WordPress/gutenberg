@@ -12,6 +12,11 @@ import {
 	getSelectionState,
 	SelectionType,
 } from '../crdt-user-selections';
+import {
+	createYArray,
+	createYMap,
+	createYText as createYTextFromUtils,
+} from '../crdt-utils';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
 
 jest.mock( '@wordpress/data', () => ( {
@@ -39,7 +44,7 @@ import type {
 
 // Shared Y.Doc and Y.Map for creating Y.Text instances
 const yDoc = new Y.Doc();
-const yMap = yDoc.getMap( 'test-map' );
+const yMap = yDoc.get( 'test-map' );
 let textCounter = 0;
 let blockCounter = 0;
 
@@ -51,11 +56,11 @@ let blockCounter = 0;
  * @param yTextKey   - The key of the Y.Text instance.
  * @return The Y.Text instance, attached to the Y.Doc.
  */
-function createYText( yTextValue: string, yTextKey?: string ): Y.Text {
+function createYText( yTextValue: string, yTextKey?: string ): Y.Type {
 	textCounter++;
 	const key = yTextKey ?? `test-text-${ textCounter }`;
-	const yText = new Y.Text( yTextValue );
-	yMap.set( key, yText );
+	const yText = createYTextFromUtils( yTextValue );
+	yMap.setAttr( key, yText );
 	return yText;
 }
 
@@ -67,11 +72,11 @@ function createYText( yTextValue: string, yTextKey?: string ): Y.Text {
  */
 function createBlockPosition( index: number ): Y.RelativePosition {
 	blockCounter++;
-	const yArray = new Y.Array();
-	yMap.set( `test-array-${ blockCounter }`, yArray );
+	const yArray = createYArray();
+	yMap.setAttr( `test-array-${ blockCounter }`, yArray );
 
 	for ( let i = 0; i <= index; i++ ) {
-		yArray.push( [ new Y.Map() ] );
+		yArray.push( [ createYMap() ] );
 	}
 
 	return Y.createRelativePositionFromTypeIndex( yArray, index );
@@ -378,46 +383,50 @@ describe( 'areSelectionsStatesEqual', () => {
  */
 function createTestDocWithBlocks() {
 	const testDoc = new Y.Doc();
-	const documentMap = testDoc.getMap( CRDT_RECORD_MAP_KEY );
-	const blocks = new Y.Array();
-	documentMap.set( 'blocks', blocks );
+	const documentMap = testDoc.get( CRDT_RECORD_MAP_KEY );
+	const blocks = createYArray();
+	documentMap.setAttr( 'blocks', blocks );
 
 	// Create block 1 with a content attribute
-	const block1 = new Y.Map();
-	block1.set( 'clientId', 'block-1' );
-	const block1Attrs = new Y.Map();
-	block1Attrs.set( 'content', new Y.Text( 'Hello world' ) );
-	block1.set( 'attributes', block1Attrs );
-	block1.set( 'innerBlocks', new Y.Array() );
+	const block1 = createYMap( {
+		clientId: 'block-1',
+		attributes: createYMap( {
+			content: createYTextFromUtils( 'Hello world' ),
+		} ),
+		innerBlocks: createYArray(),
+	} );
 	blocks.push( [ block1 ] );
 
 	// Create block 2 with a content attribute
-	const block2 = new Y.Map();
-	block2.set( 'clientId', 'block-2' );
-	const block2Attrs = new Y.Map();
-	block2Attrs.set( 'content', new Y.Text( 'Second block content' ) );
-	block2.set( 'attributes', block2Attrs );
-	block2.set( 'innerBlocks', new Y.Array() );
+	const block2 = createYMap( {
+		clientId: 'block-2',
+		attributes: createYMap( {
+			content: createYTextFromUtils( 'Second block content' ),
+		} ),
+		innerBlocks: createYArray(),
+	} );
 	blocks.push( [ block2 ] );
 
 	// Create block 3 with nested inner blocks
-	const block3 = new Y.Map();
-	block3.set( 'clientId', 'block-3' );
-	const block3Attrs = new Y.Map();
-	block3Attrs.set( 'content', new Y.Text( 'Parent block' ) );
-	block3.set( 'attributes', block3Attrs );
+	const innerBlock = createYMap( {
+		clientId: 'inner-block-1',
+		attributes: createYMap( {
+			content: createYTextFromUtils( 'Inner block content' ),
+		} ),
+		innerBlocks: createYArray(),
+	} );
 
-	// Add inner block to block 3
-	const innerBlocks = new Y.Array();
-	const innerBlock = new Y.Map();
-	innerBlock.set( 'clientId', 'inner-block-1' );
-	const innerBlockAttrs = new Y.Map();
-	innerBlockAttrs.set( 'content', new Y.Text( 'Inner block content' ) );
-	innerBlock.set( 'attributes', innerBlockAttrs );
-	innerBlock.set( 'innerBlocks', new Y.Array() );
-	innerBlocks.push( [ innerBlock ] );
+	// Use createYArray with items to avoid premature access warning
+	// on unintegrated types.
+	const innerBlocks = createYArray( [ innerBlock ] );
 
-	block3.set( 'innerBlocks', innerBlocks );
+	const block3 = createYMap( {
+		clientId: 'block-3',
+		attributes: createYMap( {
+			content: createYTextFromUtils( 'Parent block' ),
+		} ),
+		innerBlocks,
+	} );
 	blocks.push( [ block3 ] );
 
 	return testDoc;
@@ -815,13 +824,11 @@ describe( 'getSelectionState', () => {
 			const cursorResult = result as SelectionCursor;
 
 			// Insert text before the cursor position
-			const documentMap = testDoc.getMap( CRDT_RECORD_MAP_KEY );
-			const blocks = documentMap.get( 'blocks' ) as Y.Array<
-				Y.Map< unknown >
-			>;
+			const documentMap = testDoc.get( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.getAttr( 'blocks' );
 			const block1 = blocks.get( 0 );
-			const attrs = block1.get( 'attributes' ) as Y.Map< Y.Text >;
-			const ytext = attrs.get( 'content' );
+			const attrs = block1.getAttr( 'attributes' );
+			const ytext = attrs.getAttr( 'content' );
 
 			if ( ! ytext ) {
 				throw new Error( 'Y.Text not found' );
@@ -844,8 +851,8 @@ describe( 'getSelectionState', () => {
 	describe( 'edge cases', () => {
 		test( 'handles empty blocks array', () => {
 			const emptyDoc = new Y.Doc();
-			const documentMap = emptyDoc.getMap( CRDT_RECORD_MAP_KEY );
-			documentMap.set( 'blocks', new Y.Array() );
+			const documentMap = emptyDoc.get( CRDT_RECORD_MAP_KEY );
+			documentMap.setAttr( 'blocks', createYArray() );
 
 			const selectionStart: WPBlockSelection = {
 				clientId: 'block-1',
@@ -871,7 +878,7 @@ describe( 'getSelectionState', () => {
 
 		test( 'handles missing blocks in document', () => {
 			const docWithoutBlocks = new Y.Doc();
-			docWithoutBlocks.getMap( CRDT_RECORD_MAP_KEY );
+			docWithoutBlocks.get( CRDT_RECORD_MAP_KEY );
 			// Note: not setting 'blocks' at all
 
 			const selectionStart: WPBlockSelection = {

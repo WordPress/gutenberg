@@ -6,8 +6,8 @@ import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
 /**
  * External dependencies
  */
-import type * as Y from 'yjs';
-import type { Awareness } from 'y-protocols/awareness';
+import type * as Y from '@y/y';
+import type { Awareness } from '@y/protocols/awareness';
 
 /**
  * Internal dependencies
@@ -26,6 +26,7 @@ export type AwarenessID = string;
 export type EntityID = string;
 export type ObjectID = string;
 export type ObjectType = string;
+export type MapEvent = Y.YEvent< { attrs: { [ key: string ]: any } } >;
 
 // An origin is a value passed by the transactor to identify the source of a
 // change. It can be any value, and is not used internally by Yjs. Origins are
@@ -187,7 +188,7 @@ export interface SyncManager {
 
 export interface SyncUndoManager extends WPUndoManager< ObjectData > {
 	addToScope: (
-		ymap: Y.Map< any >,
+		ymap: Y.Type,
 		handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
 	) => void;
 	stopCapturing: () => void;

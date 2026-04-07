@@ -382,6 +382,7 @@ describe( 'AwarenessState', () => {
 					updated: [ awareness.clientID ],
 					removed: [],
 				},
+				'test-origin',
 			] );
 
 			expect( callback ).toHaveBeenCalled();
@@ -403,6 +404,7 @@ describe( 'AwarenessState', () => {
 					updated: [],
 					removed: [ 999 ],
 				},
+				'test-origin',
 			] );
 
 			// Should trigger update for removal
