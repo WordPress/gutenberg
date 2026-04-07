@@ -18,7 +18,16 @@ const config = defineConfig( {
 	},
 	reporter: process.env.CI
 		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ], [ 'blob' ] ]
-		: 'list',
+		: [
+				[ 'list' ],
+				[
+					'html',
+					{
+						open: 'never',
+						outputFolder: 'artifacts/playwright-report',
+					},
+				],
+		  ],
 	workers: 1,
 	globalSetup: fileURLToPath(
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
