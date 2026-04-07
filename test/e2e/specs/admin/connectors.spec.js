@@ -581,5 +581,31 @@ test.describe( 'Connectors', () => {
 				card.getByText( 'A custom service for E2E testing.' )
 			).toBeVisible();
 		} );
+
+		test( 'should preserve a custom render for an api_key connector registered before registerDefaultConnectors', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			const card = page.locator(
+				'.connector-item--test_api_key_with_custom_render'
+			);
+			await expect( card ).toBeVisible();
+
+			// The custom render content must be visible — proving the
+			// JS-supplied render survived registerDefaultConnectors().
+			await expect(
+				card.getByText(
+					'Custom render survived registerDefaultConnectors().'
+				)
+			).toBeVisible();
+
+			// And the default API key form must NOT be present in this card.
+			await expect( card.getByLabel( 'API Key' ) ).toHaveCount( 0 );
+		} );
 	} );
 } );

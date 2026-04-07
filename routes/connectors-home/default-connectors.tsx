@@ -7,15 +7,18 @@ import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
 	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
+	privateApis as connectorsPrivateApis,
 	type ConnectorConfig,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
+import { select } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { Badge } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import { useConnectorPlugin } from './use-connector-plugin';
 import {
 	OpenAILogo,
@@ -24,6 +27,8 @@ import {
 	AkismetLogo,
 	DefaultConnectorLogo,
 } from './logos';
+
+const { store: connectorsStore } = unlock( connectorsPrivateApis );
 
 interface ConnectorData {
 	name: string;
@@ -256,7 +261,17 @@ export function registerDefaultConnectors() {
 			authentication,
 			plugin: data.plugin,
 		};
-		if ( authentication.method === 'api_key' ) {
+
+		// If a third-party plugin's script module already registered a
+		// custom render for this slug (which can happen when the plugin's
+		// connector bundle executes before this module's dynamic import
+		// chain settles), don't overwrite it. The reducer spreads the
+		// existing entry first, so leaving `render` out of `args` here
+		// preserves the plugin's render while still merging the
+		// server-side metadata (logo, plugin install state, etc.).
+		const existing =
+			unlock( select( connectorsStore ) ).getConnector( connectorName );
+		if ( authentication.method === 'api_key' && ! existing?.render ) {
 			args.render = ApiKeyConnector;
 		}
 
