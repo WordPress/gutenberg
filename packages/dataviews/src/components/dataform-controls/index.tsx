@@ -70,12 +70,7 @@ function createConfiguredControl( config: EditConfig ) {
 	return function ConfiguredControl< Item >(
 		props: DataFormControlProps< Item >
 	) {
-		return (
-			<BaseControlType
-				{ ...props }
-				config={ { ...controlConfig, ...props.config } }
-			/>
-		);
+		return <BaseControlType { ...props } config={ controlConfig } />;
 	};
 }
 
