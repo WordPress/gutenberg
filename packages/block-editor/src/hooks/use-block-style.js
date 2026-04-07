@@ -26,12 +26,16 @@ import { cleanEmptyObject } from './utils';
  *   `useBlockStyle( 'color', '@current' )`     — `style['@current'].color`
  *   `useBlockStyle( 'color', ':hover:focus' )` — compound state
  *
+ * Omit `path` (or pass `null`) to read and write the full style object for
+ * that state context, e.g. `useBlockStyle( null, ':hover' )` returns the
+ * entire `style[':hover']` sub-object.
+ *
  * Keeping state separate from the path means no heuristic is needed to
  * distinguish state keys from style property names, regardless of the
  * state format convention used.
  *
- * @param {string|string[]} path  Dot-separated path into the `style` object.
- * @param {string}          state Optional state key, e.g. `':hover'` or `'@current'`. Omit for default styles.
+ * @param {string|string[]|null} path  Dot-separated path into the `style` object, or `null` for the root.
+ * @param {string}               state Optional state key, e.g. `':hover'` or `'@current'`. Omit or pass `'default'` for base styles.
  * @return {[*, Function]} Tuple of `[currentValue, setValue]`.
  */
 export function useBlockStyle( path, state ) {
@@ -44,7 +48,14 @@ export function useBlockStyle( path, state ) {
 	);
 
 	const pathArray = useMemo( () => {
-		const stylePath = Array.isArray( path ) ? path : path.split( '.' );
+		let stylePath;
+		if ( ! path ) {
+			stylePath = [];
+		} else if ( Array.isArray( path ) ) {
+			stylePath = path;
+		} else {
+			stylePath = path.split( '.' );
+		}
 		return state && state !== 'default'
 			? [ state, ...stylePath ]
 			: stylePath;
@@ -57,10 +68,13 @@ export function useBlockStyle( path, state ) {
 
 	const setValue = useCallback(
 		( newValue ) => {
+			// Empty path means the caller wants to replace the style root (or
+			// the full state sub-object) wholesale rather than a nested key.
+			const newStyle = pathArray.length
+				? setImmutably( style ?? {}, pathArray, newValue )
+				: newValue;
 			setAttributes( {
-				style: cleanEmptyObject(
-					setImmutably( style ?? {}, pathArray, newValue )
-				),
+				style: cleanEmptyObject( newStyle ),
 			} );
 		},
 		[ setAttributes, style, pathArray ]
