@@ -82,9 +82,16 @@ export function SyncConnectionErrorModal() {
 		return () => clearTimeout( timeout );
 	}, [] );
 
-	// Show the modal once the retry schedule is exhausted. Hide it on reconnect.
-	// This naturally fires only after a failed retry (status = 'disconnected'),
-	// not mid-cycle (status = 'connecting').
+	// Show the modal when disconnected and either retries are exhausted or
+	// no retry is available (unrecoverable error). Hide on reconnect.
+	// The 'connecting' state is ignored so the modal preserves its current
+	// visibility during active retry attempts.
+	const canRetry =
+		connectionStatus &&
+		'disconnected' === connectionStatus.status &&
+		( connectionStatus.canManuallyRetry ||
+			connectionStatus.willAutoRetryInMs );
+
 	useEffect( () => {
 		if ( 'connected' === connectionStatus?.status ) {
 			setShowModal( false );
@@ -92,12 +99,13 @@ export function SyncConnectionErrorModal() {
 		}
 
 		if (
-			connectionStatus?.status === 'disconnected' &&
-			connectionStatus.backgroundRetriesFailed
+			connectionStatus?.status &&
+			'connecting' !== connectionStatus.status &&
+			( ! canRetry || connectionStatus.backgroundRetriesFailed )
 		) {
 			setShowModal( true );
 		}
-	}, [ connectionStatus ] );
+	}, [ connectionStatus, canRetry ] );
 
 	if ( ! isCollaborationEnabled || ! hasInitialized || ! showModal ) {
 		return null;
@@ -108,30 +116,27 @@ export function SyncConnectionErrorModal() {
 			? connectionStatus?.error
 			: undefined;
 
-	/**
-	 * Allow plugins to handle the sync connection error themselves.
-	 * If a plugin returns a non-null value, it signals that it has taken
-	 * over error display and the default modal is suppressed.
-	 *
-	 * @example
-	 * ```js
-	 * wp.hooks.addFilter(
-	 *     'editor.SyncConnectionError',
-	 *     'my-plugin/handle-sync-error',
-	 *     ( override, errorCode ) => {
-	 *         if ( errorCode === 'connection-limit-exceeded' ) {
-	 *             return true; // Plugin handles this error via its own UI.
-	 *         }
-	 *         return override;
-	 *     }
-	 * );
-	 * ```
-	 */
-	const isSyncErrorHandledByPlugin =
-		applyFilters( 'editor.SyncConnectionError', null, error?.code ) !==
-		null;
-
-	if ( isSyncErrorHandledByPlugin ) {
+	// For unrecoverable errors (no retry available), allow plugins to handle
+	// the error themselves. If a plugin returns true, it signals that it has
+	// taken over error display and the default modal is suppressed.
+	//
+	// @example
+	// ```js
+	// wp.hooks.addFilter(
+	//     'editor.SyncConnectionError',
+	//     'my-plugin/handle-sync-error',
+	//     ( isHandled, errorCode ) => {
+	//         if ( errorCode === 'connection-limit-exceeded' ) {
+	//             return true; // Plugin handles this error via its own UI.
+	//         }
+	//         return isHandled;
+	//     }
+	// );
+	// ```
+	if (
+		! canRetry &&
+		applyFilters( 'editor.SyncConnectionError', false, error?.code )
+	) {
 		return null;
 	}
 
