@@ -16,7 +16,14 @@ test.describe( 'Block template registration', () => {
 			'gutenberg-test-block-template-registration'
 		);
 		// Enable the template activation feature.
-		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
+		const experimentsAvailable = await requestUtils.setGutenbergExperiments(
+			[ 'active_templates' ]
+		);
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! experimentsAvailable,
+			'Template activation experiment requires Gutenberg plugin'
+		);
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
