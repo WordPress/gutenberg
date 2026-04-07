@@ -661,19 +661,23 @@ describe( 'diffRevisionContent', () => {
 			const previous = serialize( [
 				createBlock( 'core/group', {}, [
 					createBlock( 'core/paragraph', { content: 'A' } ),
-					createBlock( 'core/paragraph', { content: 'B' } ),
+					createBlock( 'core/paragraph', {
+						content: 'The quick brown fox jumps over the lazy dog',
+					} ),
 					createBlock( 'core/paragraph', { content: 'C' } ),
 				] ),
 			] );
 			const current = serialize( [
 				createBlock( 'core/group', {}, [
 					createBlock( 'core/paragraph', { content: 'A' } ),
-					createBlock( 'core/paragraph', { content: 'D' } ),
+					createBlock( 'core/paragraph', {
+						content: 'The quick brown fox leaps over the lazy dog',
+					} ),
 				] ),
 			] );
 			const blocks = diffRevisionContent( current, previous );
 
-			// Post-LCS pairing matches B with D (same block type, high HTML similarity).
+			// Post-LCS pairing matches the fox sentences (high word overlap).
 			// C remains removed since it has no matching added block.
 			expect( normalizeBlockTree( blocks ) ).toMatchObject( [
 				{
@@ -699,9 +703,9 @@ describe( 'diffRevisionContent', () => {
 						{
 							name: 'core/paragraph',
 							attributes: {
-								// B→D modification with inline diff
+								// jumps→leaps modification with inline diff
 								content:
-									'<del title="Removed" class="revision-diff-removed">B</del><ins title="Added" class="revision-diff-added">D</ins>',
+									'The quick brown fox <del title="Removed" class="revision-diff-removed">jumps</del><ins title="Added" class="revision-diff-added">leaps</ins> over the lazy dog',
 								__revisionDiffStatus: {
 									status: 'modified',
 								},

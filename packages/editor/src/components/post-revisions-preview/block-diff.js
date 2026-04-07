@@ -45,8 +45,8 @@ function stringifyValue( value ) {
 }
 
 /**
- * Calculate text similarity using word diff (semantically meaningful).
- * Returns ratio of unchanged words to total words.
+ * Calculate text similarity using word-set overlap (Jaccard index).
+ * O(n) where n is the number of words, compared to O(n*m) for diffWords.
  *
  * @param {string} text1 First text to compare.
  * @param {string} text2 Second text to compare.
@@ -60,12 +60,27 @@ function textSimilarity( text1, text2 ) {
 		return 0;
 	}
 
-	const changes = diffWords( text1, text2 );
-	const unchanged = changes
-		.filter( ( c ) => ! c.added && ! c.removed )
-		.reduce( ( sum, c ) => sum + c.value.length, 0 );
-	const total = Math.max( text1.length, text2.length );
-	return total > 0 ? unchanged / total : 0;
+	// Strip HTML tags so similarity is based on text content only.
+	const strip = ( html ) => html.replace( /<[^>]*>/g, ' ' );
+	const words1 = strip( text1 ).split( /\s+/ ).filter( Boolean );
+	const words2 = strip( text2 ).split( /\s+/ ).filter( Boolean );
+
+	if ( words1.length === 0 && words2.length === 0 ) {
+		return 1;
+	}
+
+	const set1 = new Set( words1 );
+	let intersection = 0;
+	for ( const word of words2 ) {
+		if ( set1.has( word ) ) {
+			intersection++;
+		}
+	}
+
+	// Use the larger set as denominator (overlap coefficient variant)
+	// so that a small edit to a long paragraph scores high.
+	const total = Math.max( words1.length, words2.length );
+	return total > 0 ? intersection / total : 0;
 }
 
 /**
@@ -96,37 +111,73 @@ function pairSimilarBlocks( blocks ) {
 
 	const pairedRemoved = new Set(); // Indices of removed blocks that were paired.
 	const modifications = new Map(); // Map from added block index to modified block.
-	const SIMILARITY_THRESHOLD = 0.3;
+	const SIMILARITY_THRESHOLD = 0.5;
+
+	// Group candidates by block name for efficient lookup.
+	const addedByName = new Map();
+	for ( const add of added ) {
+		const name = add.block.blockName;
+		if ( ! addedByName.has( name ) ) {
+			addedByName.set( name, [] );
+		}
+		addedByName.get( name ).push( add );
+	}
+	const removedByName = new Map();
+	for ( const rem of removed ) {
+		const name = rem.block.blockName;
+		if ( ! removedByName.has( name ) ) {
+			removedByName.set( name, [] );
+		}
+		removedByName.get( name ).push( rem );
+	}
 
 	// For each removed block, find best matching added block.
 	for ( const rem of removed ) {
+		const candidates = addedByName.get( rem.block.blockName ) || [];
+		const sameNameRemoved = removedByName.get( rem.block.blockName ) || [];
+		const unpaired = candidates.filter(
+			( add ) => ! modifications.has( add.index )
+		);
+
+		if ( unpaired.length === 0 ) {
+			continue;
+		}
+
 		let bestMatch = null;
-		let bestScore = 0;
 
-		for ( const add of added ) {
-			if ( modifications.has( add.index ) ) {
-				continue;
-			}
-			if ( add.block.blockName !== rem.block.blockName ) {
-				continue;
-			}
-
-			const score = textSimilarity(
-				rem.block.innerHTML || '',
-				add.block.innerHTML || ''
-			);
-			// If content is identical (score=1), only pair if attrs differ.
-			// Otherwise identical blocks are just position swaps, not modifications.
+		// If there's exactly one removed and one added of this type,
+		// pair them directly — no ambiguity, no similarity check needed.
+		if ( sameNameRemoved.length === 1 && unpaired.length === 1 ) {
+			const add = unpaired[ 0 ];
 			const attrsMatch =
 				JSON.stringify( rem.block.attrs ) ===
 				JSON.stringify( add.block.attrs );
-			if (
-				score > bestScore &&
-				score > SIMILARITY_THRESHOLD &&
-				( score < 1 || ! attrsMatch )
-			) {
-				bestScore = score;
+			// Only skip pairing if both content and attrs are identical
+			// (position swap, not a modification).
+			const contentMatch =
+				( rem.block.innerHTML || '' ) === ( add.block.innerHTML || '' );
+			if ( ! contentMatch || ! attrsMatch ) {
 				bestMatch = add;
+			}
+		} else {
+			// Multiple candidates — use similarity to find best match.
+			let bestScore = 0;
+			for ( const add of unpaired ) {
+				const score = textSimilarity(
+					rem.block.innerHTML || '',
+					add.block.innerHTML || ''
+				);
+				const attrsMatch =
+					JSON.stringify( rem.block.attrs ) ===
+					JSON.stringify( add.block.attrs );
+				if (
+					score > bestScore &&
+					score > SIMILARITY_THRESHOLD &&
+					( score < 1 || ! attrsMatch )
+				) {
+					bestScore = score;
+					bestMatch = add;
+				}
 			}
 		}
 
