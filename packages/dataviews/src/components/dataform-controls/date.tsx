@@ -408,7 +408,7 @@ function CalendarDateControl< Item >( {
 									isPressed={ isSelected }
 									size="small"
 									disabled={ disabled }
-									accessibleWhenDisabled={ false }
+									accessibleWhenDisabled
 									onClick={ () =>
 										handlePresetClick( preset )
 									}
@@ -423,7 +423,7 @@ function CalendarDateControl< Item >( {
 							isPressed={ ! selectedPresetId }
 							size="small"
 							disabled={ !! selectedPresetId || disabled }
-							accessibleWhenDisabled={ false }
+							accessibleWhenDisabled
 						>
 							{ __( 'Custom' ) }
 						</Button>
@@ -633,7 +633,7 @@ function CalendarDateRangeControl< Item >( {
 									isPressed={ isSelected }
 									size="small"
 									disabled={ disabled }
-									accessibleWhenDisabled={ false }
+									accessibleWhenDisabled
 									onClick={ () =>
 										handlePresetClick( preset )
 									}
@@ -647,7 +647,7 @@ function CalendarDateRangeControl< Item >( {
 							variant="tertiary"
 							isPressed={ ! selectedPresetId }
 							size="small"
-							accessibleWhenDisabled={ false }
+							accessibleWhenDisabled
 							disabled={ !! selectedPresetId || disabled }
 						>
 							{ __( 'Custom' ) }
