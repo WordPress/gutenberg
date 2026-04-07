@@ -25,7 +25,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Registers a block with `__experimentalStates` support.
+	 * Registers a block with `states` support.
 	 *
 	 * @param string $block_name Block name.
 	 * @param array  $selectors  Optional block selectors (e.g. `['root' => '.foo .bar']`).
@@ -39,7 +39,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 				'style' => array( 'type' => 'object' ),
 			),
 			'supports'    => array(
-				'__experimentalStates' => array( ':hover', ':focus', ':active' ),
+				'states' => array( ':hover', ':focus', ':active' ),
 			),
 		);
 		if ( ! empty( $selectors ) ) {
@@ -123,7 +123,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that block content is returned unchanged when `__experimentalStates` support is not declared.
+	 * Tests that block content is returned unchanged when `states` support is not declared.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
 	 */
