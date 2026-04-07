@@ -274,7 +274,7 @@ export function useAutocomplete( {
 		onKeyDown: withIgnoreIMEEvents( handleKeyDown ),
 		popover: showPopover && (
 			<AutocompleterUI
-				key={ autocompleter.name }
+				key={ autocompleter.name + autocompleter.triggerPrefix }
 				autocompleter={ autocompleter }
 				className={ className }
 				filterValue={ filterValue }
