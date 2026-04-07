@@ -37,6 +37,14 @@ are not essential. These may slip to a future iteration.
 - [ ] #
 - [ ] #
 
+## Known Open Questions or Decisions Needed
+<!--
+List any unresolved questions or pending decisions related to this iteration.
+Link to individual issues where deeper discussions are happening.
+-->
+
+- 
+
 ## Contributors
 <!--
 List the people working on this iteration so it's clear who to coordinate with.
