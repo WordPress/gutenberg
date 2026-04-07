@@ -207,10 +207,6 @@ const fields: Field< DataType >[] = [
 		type: 'text',
 		label: 'Text',
 		description: 'Help for text.',
-		Edit: {
-			control: 'text',
-			disabled: true,
-		},
 	},
 	{
 		id: 'textWithElements',
@@ -613,42 +609,52 @@ const FieldTypeStory = ( {
 	const storyFields = useMemo( () => {
 		let fieldsToProcess = _fields;
 
-		if ( disabled ) {
-			fieldsToProcess = fieldsToProcess.map(
-				( field: Field< DataType > ) => {
-					const editConfig = field.Edit;
-					let newEdit: any;
+		fieldsToProcess = useMemo( () => {
+			if ( ! disabled ) {
+				return _fields;
+			}
 
-					if ( typeof editConfig === 'string' ) {
-						newEdit = {
-							control: editConfig as any,
-							disabled: true,
-						};
-					} else if (
-						typeof editConfig === 'object' &&
-						editConfig !== null
-					) {
-						newEdit = {
-							...editConfig,
-							disabled: true,
-						};
-					} else {
-						const controlType = field.elements
-							? 'select'
-							: field.type;
-						newEdit = {
-							control: controlType as any,
-							disabled: true,
-						};
+			return _fields.map( ( field ) => {
+				const editConfig = field.Edit;
+				let newEdit: any;
+
+				if ( typeof editConfig === 'string' ) {
+					newEdit = {
+						control: editConfig,
+						disabled: true,
+					};
+				} else if (
+					typeof editConfig === 'object' &&
+					editConfig !== null
+				) {
+					newEdit = {
+						...editConfig,
+						disabled: true,
+					};
+				} else if ( field.type ) {
+					// boolean is the only field type whose default Edit control is not the same as its type.
+					let control: string = field.type;
+					if ( field.type === 'boolean' ) {
+						control = 'checkbox';
+					}
+					if ( field.elements ) {
+						control = 'select';
 					}
 
-					return {
-						...field,
-						Edit: newEdit,
-					} as Field< DataType >;
+					newEdit = {
+						control,
+						disabled: true,
+					};
+				} else {
+					newEdit = null;
 				}
-			);
-		}
+
+				return {
+					...field,
+					Edit: newEdit,
+				} as Field< DataType >;
+			} );
+		}, [ disabled, _fields ] );
 
 		if ( Edit !== 'default' ) {
 			fieldsToProcess = fieldsToProcess.map(

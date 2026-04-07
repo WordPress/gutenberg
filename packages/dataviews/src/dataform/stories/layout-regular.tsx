@@ -334,20 +334,19 @@ const LayoutRegularComponent = ( {
 		description: 'This is a sample description.',
 	} );
 
-	// Create modified fields with disabled config.
-	const modifiedFields: Field< SamplePost >[] = useMemo( () => {
+	// Make fields disabled when control is set to disabled.
+	const _fields: Field< SamplePost >[] = useMemo( () => {
 		if ( ! disabled ) {
 			return fields;
 		}
 
 		return fields.map( ( field ) => {
-			// Add disabled config to the field
 			const editConfig = field.Edit;
 			let newEdit: any;
 
 			if ( typeof editConfig === 'string' ) {
 				newEdit = {
-					control: editConfig as any,
+					control: editConfig,
 					disabled: true,
 				};
 			} else if (
@@ -358,14 +357,22 @@ const LayoutRegularComponent = ( {
 					...editConfig,
 					disabled: true,
 				};
-			} else {
-				// No Edit config - infer control type based on field properties
-				// Fields with elements default to select, otherwise use the field type
-				const controlType = field.elements ? 'select' : field.type;
+			} else if ( field.type ) {
+				// boolean is the only field type whose default Edit control is not the same as its type.
+				let control: string = field.type || 'text';
+				if ( field.type === 'boolean' ) {
+					control = 'checkbox';
+				}
+				if ( field.elements ) {
+					control = 'select';
+				}
+
 				newEdit = {
-					control: controlType as any,
+					control,
 					disabled: true,
 				};
+			} else {
+				newEdit = null;
 			}
 
 			return {
@@ -406,7 +413,7 @@ const LayoutRegularComponent = ( {
 	return (
 		<DataForm< SamplePost >
 			data={ post }
-			fields={ modifiedFields }
+			fields={ _fields }
 			form={ form }
 			onChange={ ( edits ) =>
 				setPost( ( prev ) => ( {
