@@ -21,7 +21,8 @@ import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
 import { FIT_TEXT_SUPPORT_KEY } from './fit-text';
 import { cleanEmptyObject, buildStateResetAllFilter } from './utils';
 import { store as blockEditorStore } from '../store';
-import { useBlockStateProps } from './state-utils';
+import { useBlockEditContext } from '../components/block-edit/context';
+import { useBlockStyle } from './use-block-style';
 
 function omit( object, keys ) {
 	return Object.fromEntries(
@@ -131,26 +132,23 @@ function TypographyInspectorControl( {
 export function TypographyPanel( {
 	clientId,
 	name,
-	setAttributes,
 	settings,
 	selectedState = 'default',
 } ) {
 	const isEnabled = useHasTypographyPanel( settings );
 
-	const { style, fontFamily, fontSize, fitText } = useSelect(
+	const { fontFamily, fontSize, fitText } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled.
 			if ( ! isEnabled ) {
 				return {};
 			}
 			const {
-				style: _style,
 				fontFamily: _fontFamily,
 				fontSize: _fontSize,
 				fitText: _fitText,
 			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
 			return {
-				style: _style,
 				fontFamily: _fontFamily,
 				fontSize: _fontSize,
 				fitText: _fitText,
@@ -159,25 +157,23 @@ export function TypographyPanel( {
 		[ clientId, isEnabled ]
 	);
 
-	const { isStateSelected, stateValue, stateOnChange } = useBlockStateProps( {
-		selectedState,
-		style,
-		setAttributes,
-	} );
+	const { setAttributes } = useBlockEditContext();
+	const [ style, setStyle ] = useBlockStyle( null, selectedState );
+	const isStateSelected = selectedState !== 'default';
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return stateValue;
+			return style;
 		}
 		return attributesToStyle( { style, fontFamily, fontSize } );
-	}, [ isStateSelected, stateValue, style, fontSize, fontFamily ] );
+	}, [ isStateSelected, style, fontSize, fontFamily ] );
 
 	const onChange = isStateSelected
-		? stateOnChange
+		? setStyle
 		: ( newStyle ) => {
 				const newAttributes = styleToAttributes( newStyle );
 
-				// If setting a font size and fitText is currently enabled, disable it
+				// If setting a font size and fitText is currently enabled, disable it.
 				const hasFontSize =
 					newAttributes.fontSize ||
 					newAttributes.style?.typography?.fontSize;
