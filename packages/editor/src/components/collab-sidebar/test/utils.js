@@ -21,8 +21,26 @@ describe( 'getNoteIdsFromMetadata', () => {
 		expect( getNoteIdsFromMetadata( { name: 'test' } ) ).toEqual( [] );
 	} );
 
+	it( 'returns empty array for noteId of 0', () => {
+		expect( getNoteIdsFromMetadata( { noteId: 0 } ) ).toEqual( [] );
+	} );
+
+	it( 'returns empty array for noteId of empty string', () => {
+		expect( getNoteIdsFromMetadata( { noteId: '' } ) ).toEqual( [] );
+	} );
+
+	it( 'returns empty array for noteId of false', () => {
+		expect( getNoteIdsFromMetadata( { noteId: false } ) ).toEqual( [] );
+	} );
+
 	it( 'returns array from scalar noteId (legacy format)', () => {
 		expect( getNoteIdsFromMetadata( { noteId: 42 } ) ).toEqual( [ 42 ] );
+	} );
+
+	it( 'handles string noteId (legacy format)', () => {
+		expect( getNoteIdsFromMetadata( { noteId: '42' } ) ).toEqual( [
+			'42',
+		] );
 	} );
 
 	it( 'returns array from array noteId', () => {
@@ -35,6 +53,18 @@ describe( 'getNoteIdsFromMetadata', () => {
 		expect(
 			getNoteIdsFromMetadata( { noteId: [ 1, null, 2, undefined, 3 ] } )
 		).toEqual( [ 1, 2, 3 ] );
+	} );
+
+	it( 'filters out zero and empty string from array', () => {
+		expect(
+			getNoteIdsFromMetadata( { noteId: [ 0, '', 1, false, 2 ] } )
+		).toEqual( [ 1, 2 ] );
+	} );
+
+	it( 'returns empty array when all array values are falsy', () => {
+		expect(
+			getNoteIdsFromMetadata( { noteId: [ null, undefined, 0, '' ] } )
+		).toEqual( [] );
 	} );
 } );
 
@@ -73,6 +103,17 @@ describe( 'addNoteIdToMetadata', () => {
 		const result = addNoteIdToMetadata( { noteId: 1, name: 'test' }, 2 );
 		expect( result ).toEqual( { noteId: [ 1, 2 ], name: 'test' } );
 	} );
+
+	it( 'returns original metadata object when duplicate is added', () => {
+		const metadata = { noteId: [ 1, 2 ] };
+		const result = addNoteIdToMetadata( metadata, 1 );
+		expect( result ).toBe( metadata );
+	} );
+
+	it( 'handles adding to metadata with other properties but no noteId', () => {
+		const result = addNoteIdToMetadata( { name: 'test' }, 5 );
+		expect( result ).toEqual( { name: 'test', noteId: [ 5 ] } );
+	} );
 } );
 
 describe( 'removeNoteIdFromMetadata', () => {
@@ -107,5 +148,23 @@ describe( 'removeNoteIdFromMetadata', () => {
 			1
 		);
 		expect( result ).toEqual( { noteId: [ 2 ], name: 'test' } );
+	} );
+
+	it( 'handles null metadata', () => {
+		const result = removeNoteIdFromMetadata( null, 1 );
+		expect( result.noteId ).toBeUndefined();
+	} );
+
+	it( 'handles undefined metadata', () => {
+		const result = removeNoteIdFromMetadata( undefined, 1 );
+		expect( result.noteId ).toBeUndefined();
+	} );
+
+	it( 'removes last note and cleans up noteId to undefined', () => {
+		const result = removeNoteIdFromMetadata(
+			{ noteId: [ 42 ], name: 'test' },
+			42
+		);
+		expect( result ).toEqual( { name: 'test', noteId: undefined } );
 	} );
 } );

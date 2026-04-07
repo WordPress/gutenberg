@@ -973,6 +973,248 @@ test.describe( 'Multiple notes per block', () => {
 		expect( Array.isArray( noteIds ) ).toBe( true );
 		expect( noteIds.length ).toBe( 2 );
 	} );
+
+	test( 'deleting one note preserves the other notes on the same block', async ( {
+		editor,
+		page,
+		blockCommentUtils,
+	} ) => {
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/paragraph',
+			attributes: { content: 'Block with notes to delete' },
+			comment: 'Note to keep',
+		} );
+
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Note added.' } )
+			.click();
+
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await page
+			.getByRole( 'textbox', { name: 'New note', exact: true } )
+			.fill( 'Note to delete' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
+
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note added.' } )
+		).toBeVisible();
+
+		// Both notes should be visible.
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await expect(
+			settings.getByRole( 'treeitem', { name: 'Note: Note to keep' } )
+		).toBeVisible();
+		await expect(
+			settings.getByRole( 'treeitem', { name: 'Note: Note to delete' } )
+		).toBeVisible();
+
+		// Delete the second note.
+		const secondThread = settings.getByRole( 'treeitem', {
+			name: 'Note: Note to delete',
+		} );
+		await secondThread.click();
+		await blockCommentUtils.clickBlockCommentActionMenuItem( 'Delete' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Delete' } )
+			.click();
+
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note deleted.' } )
+		).toBeVisible();
+
+		// First note should still be visible; second should be gone.
+		await expect(
+			settings.getByRole( 'treeitem', { name: 'Note: Note to keep' } )
+		).toBeVisible();
+		await expect(
+			settings.getByRole( 'treeitem', { name: 'Note: Note to delete' } )
+		).toBeHidden();
+
+		// Metadata should still have one noteId remaining.
+		const blocks = await editor.getBlocks();
+		const paragraphBlock = blocks.find(
+			( b ) => b.name === 'core/paragraph'
+		);
+		const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
+		expect( noteIds ).toHaveLength( 1 );
+	} );
+
+	test( 'resolving one note does not affect sibling notes on the same block', async ( {
+		editor,
+		page,
+		blockCommentUtils,
+	} ) => {
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/paragraph',
+			attributes: { content: 'Block with notes to resolve' },
+			comment: 'Note A',
+		} );
+
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Note added.' } )
+			.click();
+
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await page
+			.getByRole( 'textbox', { name: 'New note', exact: true } )
+			.fill( 'Note B' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
+
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note added.' } )
+		).toBeVisible();
+
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		// Resolve Note A.
+		const threadA = settings.getByRole( 'treeitem', {
+			name: 'Note: Note A',
+		} );
+		await threadA.click();
+		await page.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note marked as resolved.' } )
+		).toBeVisible();
+
+		// Note B should still be visible and unresolved (expanded).
+		const threadB = settings.getByRole( 'treeitem', {
+			name: 'Note: Note B',
+		} );
+		await expect( threadB ).toBeVisible();
+
+		// Both notes should still exist in metadata.
+		const blocks = await editor.getBlocks();
+		const paragraphBlock = blocks.find(
+			( b ) => b.name === 'core/paragraph'
+		);
+		const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
+		expect( noteIds ).toHaveLength( 2 );
+	} );
+
+	test( 'auto-selects first unresolved note when clicking a block with multiple notes', async ( {
+		editor,
+		page,
+		blockCommentUtils,
+	} ) => {
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/paragraph',
+			attributes: { content: 'Block for auto-select' },
+			comment: 'First note',
+		} );
+
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Note added.' } )
+			.click();
+
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await page
+			.getByRole( 'textbox', { name: 'New note', exact: true } )
+			.fill( 'Second note' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
+
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note added.' } )
+		).toBeVisible();
+
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		// Resolve the first note.
+		const firstThread = settings.getByRole( 'treeitem', {
+			name: 'Note: First note',
+		} );
+		await firstThread.click();
+		await page.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note marked as resolved.' } )
+		).toBeVisible();
+
+		// Click away to deselect the block.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Another block' },
+		} );
+
+		// Click back on the original block.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Block for auto-select' } )
+			.click();
+
+		// The second (unresolved) note should be the active one.
+		const secondThread = settings.getByRole( 'treeitem', {
+			name: 'Note: Second note',
+		} );
+		await expect( secondThread ).toHaveAttribute( 'aria-expanded', 'true' );
+	} );
+
+	test( 'metadata noteId is cleaned up when all notes are deleted from a block', async ( {
+		editor,
+		page,
+		blockCommentUtils,
+	} ) => {
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/paragraph',
+			attributes: { content: 'Block to clear notes' },
+			comment: 'Only note',
+		} );
+
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const thread = settings.getByRole( 'treeitem', {
+			name: 'Note: Only note',
+		} );
+		await thread.click();
+		await blockCommentUtils.clickBlockCommentActionMenuItem( 'Delete' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Delete' } )
+			.click();
+
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note deleted.' } )
+		).toBeVisible();
+
+		// noteId should be cleaned up from metadata entirely.
+		const blocks = await editor.getBlocks();
+		const paragraphBlock = blocks.find(
+			( b ) => b.name === 'core/paragraph'
+		);
+		expect( paragraphBlock?.attributes?.metadata?.noteId ).toBeUndefined();
+	} );
 } );
 
 class BlockCommentUtils {
