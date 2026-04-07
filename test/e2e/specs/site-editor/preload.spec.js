@@ -16,6 +16,7 @@ test.describe( 'Preload', () => {
 	test( 'Should make no requests before the iframe is loaded', async ( {
 		page,
 		admin,
+		isGutenbergPluginActive,
 	} ) => {
 		const requests = [];
 
@@ -46,9 +47,13 @@ test.describe( 'Preload', () => {
 
 		// To do: these should all be removed or preloaded.
 		expect( requests ).toEqual( [
-			// Abilities system initialization.
-			'/wp-abilities/v1/categories?per_page=100&context=edit',
-			'/wp-abilities/v1/abilities?per_page=100&context=edit',
+			// Abilities system initialization (Gutenberg only).
+			...( isGutenbergPluginActive
+				? [
+						'/wp-abilities/v1/categories?per_page=100&context=edit',
+						'/wp-abilities/v1/abilities?per_page=100&context=edit',
+				  ]
+				: [] ),
 			// Seems to be coming from `enableComplementaryArea`.
 			'/wp/v2/users/me',
 			'/wp/v2/settings',
