@@ -312,8 +312,10 @@ const getLayoutFromStoryArgs = ( {
 
 const LayoutRegularComponent = ( {
 	labelPosition,
+	disabled = false,
 }: {
 	labelPosition: 'default' | 'top' | 'side' | 'none';
+	disabled?: boolean;
 } ) => {
 	const [ post, setPost ] = useState( {
 		title: 'Hello, World!',
@@ -331,6 +333,47 @@ const LayoutRegularComponent = ( {
 		tags: [ 'photography' ],
 		description: 'This is a sample description.',
 	} );
+
+	// Create modified fields with disabled config.
+	const modifiedFields: Field< SamplePost >[] = useMemo( () => {
+		if ( ! disabled ) {
+			return fields;
+		}
+
+		return fields.map( ( field ) => {
+			// Add disabled config to the field
+			const editConfig = field.Edit;
+			let newEdit: any;
+
+			if ( typeof editConfig === 'string' ) {
+				newEdit = {
+					control: editConfig as any,
+					disabled: true,
+				};
+			} else if (
+				typeof editConfig === 'object' &&
+				editConfig !== null
+			) {
+				newEdit = {
+					...editConfig,
+					disabled: true,
+				};
+			} else {
+				// No Edit config - infer control type based on field properties
+				// Fields with elements default to select, otherwise use the field type
+				const controlType = field.elements ? 'select' : field.type;
+				newEdit = {
+					control: controlType as any,
+					disabled: true,
+				};
+			}
+
+			return {
+				...field,
+				Edit: newEdit,
+			} as Field< SamplePost >;
+		} );
+	}, [ disabled ] );
 
 	const form: Form = useMemo(
 		() => ( {
@@ -363,7 +406,7 @@ const LayoutRegularComponent = ( {
 	return (
 		<DataForm< SamplePost >
 			data={ post }
-			fields={ fields }
+			fields={ modifiedFields }
 			form={ form }
 			onChange={ ( edits ) =>
 				setPost( ( prev ) => ( {

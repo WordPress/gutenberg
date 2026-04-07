@@ -139,6 +139,10 @@ export type EditConfigTextarea = {
 	 * Number of rows for the textarea.
 	 */
 	rows?: number;
+	/**
+	 * Whether the control is disabled.
+	 */
+	disabled?: boolean;
 };
 
 /**
@@ -154,6 +158,10 @@ export type EditConfigText = {
 	 * Suffix component to display after the input.
 	 */
 	suffix?: React.ComponentType;
+	/**
+	 * Whether the control is disabled.
+	 */
+	disabled?: boolean;
 };
 
 /**
@@ -165,6 +173,10 @@ export type EditConfigDatetime = {
 	 * Whether to render a compact version without the calendar widget.
 	 */
 	compact?: boolean;
+	/**
+	 * Whether the control is disabled.
+	 */
+	disabled?: boolean;
 };
 
 /**
@@ -172,6 +184,10 @@ export type EditConfigDatetime = {
  */
 export type EditConfigGeneric = {
 	control: Exclude< FieldTypeName, 'text' | 'textarea' | 'datetime' >;
+	/**
+	 * Whether the control is disabled.
+	 */
+	disabled?: boolean;
 };
 
 /**
@@ -462,6 +478,7 @@ export type DataFormControlProps< Item > = {
 		suffix?: React.ComponentType;
 		rows?: number;
 		compact?: boolean;
+		disabled?: boolean;
 	};
 };
 
