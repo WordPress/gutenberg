@@ -15,7 +15,8 @@
 
 	li:not(:last-child)::after {
 		content: "/";
-		margin: 0 variables.$grid-unit-10;
+		margin-block: 0;
+		margin-inline: variables.$grid-unit-10;
 	}
 
 	h1 {
