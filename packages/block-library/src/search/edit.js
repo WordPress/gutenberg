@@ -164,7 +164,7 @@ export default function SearchEdit( {
 			buttonUseIcon && ! hasNoButton
 				? 'wp-block-search__icon-button'
 				: undefined,
-			hasOnlyButton && isSearchFieldHidden
+			isSearchFieldHidden
 				? 'wp-block-search__searchfield-hidden'
 				: undefined
 		);
