@@ -3,8 +3,8 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-const SETTINGS_PAGE_PATH = 'options-general.php';
-const CONNECTORS_PAGE_QUERY = 'page=options-connectors-wp-admin';
+let SETTINGS_PAGE_PATH;
+let CONNECTORS_PAGE_QUERY;
 
 const CONNECTORS = [
 	{
@@ -36,6 +36,16 @@ const getConnectorCardByName = ( page, name ) =>
 		.first();
 
 test.describe( 'Connectors', () => {
+	test.beforeAll( async ( { isGutenbergPluginActive } ) => {
+		if ( isGutenbergPluginActive ) {
+			SETTINGS_PAGE_PATH = 'options-general.php';
+			CONNECTORS_PAGE_QUERY = 'page=options-connectors-wp-admin';
+		} else {
+			SETTINGS_PAGE_PATH = 'options-connectors.php';
+			CONNECTORS_PAGE_QUERY = '';
+		}
+	} );
+
 	test( 'should show a Connectors link in the Settings menu', async ( {
 		page,
 		admin,
@@ -49,7 +59,9 @@ test.describe( 'Connectors', () => {
 		await expect( connectorsLink ).toBeVisible();
 		await expect( connectorsLink ).toHaveAttribute(
 			'href',
-			`${ SETTINGS_PAGE_PATH }?${ CONNECTORS_PAGE_QUERY }`
+			CONNECTORS_PAGE_QUERY
+				? `${ SETTINGS_PAGE_PATH }?${ CONNECTORS_PAGE_QUERY }`
+				: SETTINGS_PAGE_PATH
 		);
 	} );
 
