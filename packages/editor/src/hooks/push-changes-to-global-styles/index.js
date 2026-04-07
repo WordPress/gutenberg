@@ -9,7 +9,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { BaseControl, Button } from '@wordpress/components';
+import { BaseControl, Button, RadioControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY,
@@ -17,8 +17,8 @@ import {
 	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { useMemo, useCallback } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useMemo, useCallback, useState } from '@wordpress/element';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -103,6 +103,56 @@ const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 };
 
 const SUPPORTED_STYLES = [ 'border', 'color', 'spacing', 'typography' ];
+
+// Style attributes copied when applying styles to sibling blocks.
+const SIBLING_STYLE_ATTRIBUTES = [
+	'borderColor',
+	'backgroundColor',
+	'textColor',
+	'gradient',
+	'fontSize',
+	'fontFamily',
+	'style',
+];
+
+/**
+ * Finds the nearest ancestor block that contains at least one other block of
+ * the same type as the current block. Returns the ancestor's block title and
+ * the clientIds of those same-type siblings (excluding the current block).
+ *
+ * @param {string} blockName The current block's name.
+ * @param {string} clientId  The current block's clientId.
+ * @return {{ scopeBlockTitle: string|null, siblingClientIds: string[] }} The nearest ancestor's title and the sibling clientIds.
+ */
+function useSiblingScope( blockName, clientId ) {
+	return useSelect(
+		( select ) => {
+			const { getBlockParents, getBlockName, getClientIdsOfDescendants } =
+				select( blockEditorStore );
+
+			for ( const parentId of getBlockParents( clientId, true ) ) {
+				const sameTypeSiblings = getClientIdsOfDescendants(
+					parentId
+				).filter(
+					( id ) =>
+						id !== clientId && getBlockName( id ) === blockName
+				);
+
+				if ( sameTypeSiblings.length > 0 ) {
+					return {
+						scopeBlockTitle: getBlockType(
+							getBlockName( parentId )
+						)?.title,
+						siblingClientIds: sameTypeSiblings,
+					};
+				}
+			}
+
+			return { scopeBlockTitle: null, siblingClientIds: [] };
+		},
+		[ blockName, clientId ]
+	);
+}
 
 const getValueFromObjectPath = ( object, path ) => {
 	let value = object;
@@ -244,14 +294,22 @@ function PushChangesToGlobalStylesControl( {
 	name,
 	attributes,
 	setAttributes,
+	clientId,
+	isBlockBasedTheme,
 } ) {
 	const { user: userConfig, setUser: setUserConfig } = useGlobalStyles();
 
 	const changes = useChangesToPush( name, attributes, userConfig );
 
-	const { __unstableMarkNextChangeAsNotPersistent } =
+	const { scopeBlockTitle, siblingClientIds } = useSiblingScope(
+		name,
+		clientId
+	);
+
+	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
+	const registry = useRegistry();
 
 	const pushChanges = useCallback( () => {
 		if ( changes.length === 0 ) {
@@ -324,15 +382,157 @@ function PushChangesToGlobalStylesControl( {
 		userConfig,
 	] );
 
+	const applyToSiblings = useCallback( () => {
+		if ( siblingClientIds.length === 0 ) {
+			return;
+		}
+
+		const styleAttrs = Object.fromEntries(
+			SIBLING_STYLE_ATTRIBUTES.map( ( key ) => [
+				key,
+				attributes[ key ],
+			] )
+		);
+
+		registry.batch( () => {
+			updateBlockAttributes( siblingClientIds, styleAttrs );
+		} );
+
+		createSuccessNotice(
+			sprintf(
+				// translators: 1: Block title e.g. 'Heading'. 2: Scope title e.g. 'Accordion'.
+				__( '%1$s styles applied to all blocks in this %2$s.' ),
+				getBlockType( name ).title,
+				scopeBlockTitle
+			),
+			{ type: 'snackbar' }
+		);
+	}, [
+		siblingClientIds,
+		attributes,
+		registry,
+		updateBlockAttributes,
+		createSuccessNotice,
+		name,
+		scopeBlockTitle,
+	] );
+
+	const hasSiblingOption = siblingClientIds.length > 0;
+	const hasGlobalOption = isBlockBasedTheme;
+	const showRadio = hasSiblingOption && hasGlobalOption;
+
+	const SCOPE_SIBLINGS = 'siblings';
+	const SCOPE_GLOBAL = 'global';
+	const [ scope, setScope ] = useState(
+		hasSiblingOption ? SCOPE_SIBLINGS : SCOPE_GLOBAL
+	);
+
+	const handleApply = useCallback( () => {
+		if ( scope === SCOPE_SIBLINGS ) {
+			applyToSiblings();
+		} else {
+			pushChanges();
+		}
+	}, [ scope, applyToSiblings, pushChanges ] );
+
+	const blockTitle = getBlockType( name ).title;
+
+	if ( showRadio ) {
+		return (
+			<BaseControl
+				className="editor-push-changes-to-global-styles-control"
+				help={ sprintf(
+					// translators: 1: Block title e.g. 'Heading'. 2: Scope title e.g. 'Accordion'.
+					__(
+						"Apply this block's typography, spacing, dimensions, and color styles to either all %1$s blocks in this %2$s, or to all %1$s blocks globally across the site."
+					),
+					blockTitle,
+					scopeBlockTitle
+				) }
+			>
+				<BaseControl.VisualLabel>
+					{ __( 'Styles' ) }
+				</BaseControl.VisualLabel>
+				<RadioControl
+					label={ __( 'Apply style changes to' ) }
+					hideLabelFromVision
+					selected={ scope }
+					options={ [
+						{
+							label: sprintf(
+								// translators: 1: Block title e.g. 'Heading'. 2: Scope title e.g. 'Accordion'.
+								__( 'Apply to all %1$s blocks in this %2$s' ),
+								blockTitle,
+								scopeBlockTitle
+							),
+							value: SCOPE_SIBLINGS,
+						},
+						{
+							label: sprintf(
+								// translators: %s: Title of the block e.g. 'Heading'.
+								__( 'Apply to all %s blocks globally' ),
+								blockTitle
+							),
+							value: SCOPE_GLOBAL,
+						},
+					] }
+					onChange={ setScope }
+				/>
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					accessibleWhenDisabled
+					disabled={ scope === SCOPE_GLOBAL && changes.length === 0 }
+					onClick={ handleApply }
+					style={ { width: '100%' } }
+				>
+					{ __( 'Apply style changes' ) }
+				</Button>
+			</BaseControl>
+		);
+	}
+
+	if ( hasSiblingOption ) {
+		return (
+			<BaseControl
+				className="editor-push-changes-to-global-styles-control"
+				help={ sprintf(
+					// translators: 1: Block title e.g. 'Heading'. 2: Scope title e.g. 'Accordion'.
+					__(
+						"Apply this block's typography, spacing, dimensions, and color styles to all %1$s blocks in this %2$s."
+					),
+					blockTitle,
+					scopeBlockTitle
+				) }
+			>
+				<BaseControl.VisualLabel>
+					{ __( 'Styles' ) }
+				</BaseControl.VisualLabel>
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					onClick={ applyToSiblings }
+				>
+					{ sprintf(
+						// translators: 1: Block title e.g. 'Heading'. 2: Scope title e.g. 'Accordion'.
+						__( 'Apply to all %1$s blocks in this %2$s' ),
+						blockTitle,
+						scopeBlockTitle
+					) }
+				</Button>
+			</BaseControl>
+		);
+	}
+
 	return (
 		<BaseControl
 			className="editor-push-changes-to-global-styles-control"
 			help={ sprintf(
 				// translators: %s: Title of the block e.g. 'Heading'.
 				__(
-					'Apply this block’s typography, spacing, dimensions, and color styles to all %s blocks.'
+					"Apply this block's typography, spacing, dimensions, and color styles to all %s blocks globally across the site."
 				),
-				getBlockType( name ).title
+				blockTitle
 			) }
 		>
 			<BaseControl.VisualLabel>
@@ -360,16 +560,17 @@ function PushChangesToGlobalStyles( props ) {
 	const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
 		hasBlockSupport( props.name, feature )
 	);
-	const isDisplayed =
-		blockEditingMode === 'default' && supportsStyles && isBlockBasedTheme;
 
-	if ( ! isDisplayed ) {
+	if ( blockEditingMode !== 'default' || ! supportsStyles ) {
 		return null;
 	}
 
 	return (
 		<InspectorAdvancedControls>
-			<PushChangesToGlobalStylesControl { ...props } />
+			<PushChangesToGlobalStylesControl
+				{ ...props }
+				isBlockBasedTheme={ isBlockBasedTheme }
+			/>
 		</InspectorAdvancedControls>
 	);
 }
