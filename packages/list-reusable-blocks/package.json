@@ -52,6 +52,9 @@
 		"@wordpress/i18n": "file:../i18n",
 		"change-case": "^4.1.2"
 	},
+	"devDependencies": {
+		"@wordpress/core-data": "file:../core-data"
+	},
 	"peerDependencies": {
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"

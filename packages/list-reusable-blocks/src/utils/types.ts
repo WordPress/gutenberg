@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import type { Post as CorePost, Type } from '@wordpress/core-data';
+
 interface ImportDropdownProps {
 	onUpload: ( data: ReusableBlock ) => void;
 }
@@ -7,21 +12,9 @@ interface ImportFormProps {
 	onUpload: ( reusableBlock: ReusableBlock ) => void;
 }
 
-interface PostType {
-	rest_base: string;
-	[ key: string ]: unknown;
-}
+type PostType = Type;
 
-interface Post {
-	title: {
-		raw: string;
-	};
-	content: {
-		raw: string;
-	};
-	wp_pattern_sync_status: string;
-	[ key: string ]: unknown;
-}
+type Post = CorePost & { wp_pattern_sync_status?: string };
 
 interface ExportedBlock {
 	__file: string;
