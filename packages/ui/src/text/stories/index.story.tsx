@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/heading-has-content */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Text } from '../index';
 import { Stack } from '../../stack';
@@ -65,4 +64,3 @@ export const WithRenderProp: Story = {
 		</Stack>
 	),
 };
-/* eslint-enable jsx-a11y/heading-has-content */

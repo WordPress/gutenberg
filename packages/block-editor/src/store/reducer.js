@@ -213,7 +213,7 @@ function updateParentInnerBlocksInTree(
 			? clientId
 			: state.parents.get( clientId );
 		do {
-			if ( state.controlledInnerBlocks[ current ] ) {
+			if ( state.controlledInnerBlocks.has( current ) ) {
 				// Should stop on controlled blocks.
 				// If we reach a controlled parent, break out of the loop.
 				controlledParents.add( current );
@@ -591,7 +591,7 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 		} );
 
 		const preservedControlledInnerBlocks =
-			state?.controlledInnerBlocks ?? {};
+			state?.controlledInnerBlocks ?? new Set();
 
 		// Preserve controlled inner blocks data from the old state.
 		// The maps above are rebuilt solely from action.blocks, but
@@ -599,17 +599,12 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 		// present in action.blocks. Re-inject them so the state
 		// remains consistent with the preserved flags.
 		if ( state?.order ) {
-			for ( const clientId of Object.keys(
-				preservedControlledInnerBlocks
-			) ) {
-				if ( ! preservedControlledInnerBlocks[ clientId ] ) {
-					continue;
-				}
+			for ( const clientId of preservedControlledInnerBlocks ) {
 				// Only preserve if the parent block still exists.
 				if ( ! newState.byClientId.has( clientId ) ) {
 					continue;
 				}
-				newState.controlledInnerBlocks[ clientId ] = true;
+				newState.controlledInnerBlocks.add( clientId );
 				const oldOrder = state.order.get( clientId );
 				if ( ! oldOrder?.length ) {
 					continue;
@@ -641,9 +636,7 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 		// (entity-level IDs), but we need them to reference the preserved
 		// cloned inner blocks instead. Mutating the existing object
 		// preserves references held by ancestor tree entries.
-		for ( const clientId of Object.keys(
-			newState.controlledInnerBlocks
-		) ) {
+		for ( const clientId of newState.controlledInnerBlocks ) {
 			const controlledOrder = newState.order.get( clientId );
 			if ( ! controlledOrder?.length ) {
 				continue;
@@ -707,12 +700,12 @@ const withReplaceInnerBlocks = ( reducer ) => ( state, action ) => {
 	// inner blocks from the block state because its inner blocks will not be
 	// attached to the block in the action.
 	const nestedControllers = {};
-	if ( Object.keys( state.controlledInnerBlocks ).length ) {
+	if ( state.controlledInnerBlocks.size ) {
 		const stack = [ ...action.blocks ];
 		while ( stack.length ) {
 			const { innerBlocks, ...block } = stack.shift();
 			stack.push( ...innerBlocks );
-			if ( !! state.controlledInnerBlocks[ block.clientId ] ) {
+			if ( state.controlledInnerBlocks.has( block.clientId ) ) {
 				nestedControllers[ block.clientId ] = true;
 			}
 		}
@@ -1222,14 +1215,22 @@ export const blocks = pipe(
 	},
 
 	controlledInnerBlocks(
-		state = {},
+		state = new Set(),
 		{ type, clientId, hasControlledInnerBlocks }
 	) {
 		if ( type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
-			return {
-				...state,
-				[ clientId ]: hasControlledInnerBlocks,
-			};
+			if ( hasControlledInnerBlocks ) {
+				if ( state.has( clientId ) ) {
+					return state;
+				}
+				return new Set( state ).add( clientId );
+			}
+			if ( ! state.has( clientId ) ) {
+				return state;
+			}
+			const newState = new Set( state );
+			newState.delete( clientId );
+			return newState;
 		}
 		return state;
 	},
@@ -2369,7 +2370,7 @@ function getBlockTreeBlock( state, clientId ) {
 		};
 	}
 
-	if ( ! state.blocks.controlledInnerBlocks[ clientId ] ) {
+	if ( ! state.blocks.controlledInnerBlocks.has( clientId ) ) {
 		return state.blocks.tree.get( clientId );
 	}
 
@@ -2468,7 +2469,7 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	const templatePartClientIds = [];
 	const syncedPatternClientIds = [];
 
-	Object.keys( state.blocks.controlledInnerBlocks ).forEach( ( clientId ) => {
+	state.blocks.controlledInnerBlocks.forEach( ( clientId ) => {
 		const block = state.blocks.byClientId?.get( clientId );
 
 		if ( block?.name === 'core/template-part' ) {

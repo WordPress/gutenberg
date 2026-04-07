@@ -37,10 +37,6 @@ const { retrySyncConnection } = unlock( coreDataPrivateApis );
 // Debounce time for initial disconnected status to allow connection to establish.
 const INITIAL_DISCONNECTED_DEBOUNCE_MS = 20000;
 
-// Debounce time for showing the disconnect dialog after the intial connection,
-// allowing brief network interruptions to resolve.
-const DISCONNECTED_DEBOUNCE_MS = 8000;
-
 export interface SyncConnectionErrorModalProps {
 	description: string; // Modal description.
 	error?: ConnectionError; // Error object with a `code` property.
@@ -207,8 +203,6 @@ export function SyncConnectionErrorModal() {
 	const { onManualRetry, secondsRemaining } =
 		useRetryCountdown( connectionStatus );
 
-	const isConnected = 'connected' === connectionStatus?.status;
-
 	// Set hasInitialized after a debounce to give extra time on initial load.
 	useEffect( () => {
 		const timeout = setTimeout( () => {
@@ -218,18 +212,22 @@ export function SyncConnectionErrorModal() {
 		return () => clearTimeout( timeout );
 	}, [] );
 
+	// Show the modal once the retry schedule is exhausted. Hide it on reconnect.
+	// This naturally fires only after a failed retry (status = 'disconnected'),
+	// not mid-cycle (status = 'connecting').
 	useEffect( () => {
-		if ( isConnected ) {
+		if ( 'connected' === connectionStatus?.status ) {
 			setShowModal( false );
 			return;
 		}
 
-		const timeout = setTimeout( () => {
+		if (
+			connectionStatus?.status === 'disconnected' &&
+			connectionStatus.backgroundRetriesFailed
+		) {
 			setShowModal( true );
-		}, DISCONNECTED_DEBOUNCE_MS );
-
-		return () => clearTimeout( timeout );
-	}, [ isConnected ] );
+		}
+	}, [ connectionStatus ] );
 
 	if ( ! isCollaborationEnabled || ! hasInitialized || ! showModal ) {
 		return null;
@@ -239,15 +237,10 @@ export function SyncConnectionErrorModal() {
 		connectionStatus && 'error' in connectionStatus
 			? connectionStatus?.error
 			: undefined;
-	const manualRetry =
-		connectionStatus &&
-		'canManuallyRetry' in connectionStatus &&
-		connectionStatus.canManuallyRetry
-			? () => {
-					onManualRetry();
-					retrySyncConnection();
-			  }
-			: undefined;
+	const manualRetry = () => {
+		onManualRetry();
+		retrySyncConnection();
+	};
 	const messages = getSyncErrorMessages( error );
 
 	return (

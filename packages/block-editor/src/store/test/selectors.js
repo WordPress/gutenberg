@@ -321,7 +321,7 @@ describe( 'selectors', () => {
 							},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 				},
 			};
 
@@ -347,7 +347,7 @@ describe( 'selectors', () => {
 							},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 				},
 			};
 
@@ -404,7 +404,7 @@ describe( 'selectors', () => {
 							23: {},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 				},
 			};
 
@@ -452,7 +452,7 @@ describe( 'selectors', () => {
 						'client-id-03': {},
 						'client-id-04': {},
 					},
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 				},
 			};
 
@@ -509,7 +509,7 @@ describe( 'selectors', () => {
 					'client-id-04': {},
 					'client-id-05': {},
 				},
-				controlledInnerBlocks: {},
+				controlledInnerBlocks: new Set(),
 			},
 		};
 		it( 'should return parent blocks', () => {
@@ -674,7 +674,7 @@ describe( 'selectors', () => {
 						'uuid-30': 'uuid-28',
 					} )
 				),
-				controlledInnerBlocks: {},
+				controlledInnerBlocks: new Set(),
 			},
 		};
 
@@ -1246,7 +1246,7 @@ describe( 'selectors', () => {
 							},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 				},
 				selection: {
 					selectionStart: { clientId: '23' },
@@ -3894,7 +3894,7 @@ describe( 'selectors', () => {
 						} )
 					),
 					cache: {},
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				},
 				settings: {},
@@ -3944,7 +3944,7 @@ describe( 'selectors', () => {
 							},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					parents: new Map(),
 					blockEditingModes: new Map(),
 				},
@@ -4369,7 +4369,7 @@ describe( 'selectors', () => {
 						'client-id-03': [ 'client-id-04', 'client-id-05' ],
 					} )
 				),
-				controlledInnerBlocks: {},
+				controlledInnerBlocks: new Set(),
 			},
 		};
 		it( 'Should return first active matching block (including self) when single block selected', () => {

@@ -565,4 +565,64 @@ test.describe( 'Content-only lock', () => {
 			).toBeVisible();
 		} );
 	} );
+
+	test( 'pressing Enter on a non-text block in a contentOnly section should not insert a paragraph', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// The Cover is nested inside a Column so that its parent has no
+		// templateLock of its own. This mirrors real patterns like
+		// Event RSVP where the Cover sits inside Columns > Column.
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:paragraph -->
+<p>A paragraph</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:cover {"overlayColor":"black","isDark":false} -->
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-black-background-color has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph -->
+<p>Cover content</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		const groupBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Group',
+		} );
+		const coverBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
+
+		// Select the content-locked group block first (enters section editing).
+		await editor.selectBlocks( groupBlock );
+
+		// Select the Cover block within the nested column.
+		await editor.selectBlocks( coverBlock );
+
+		// The Cover's parent Column should have exactly one child.
+		const initialBlocks = await editor.getBlocks();
+		const coverColumn =
+			initialBlocks[ 0 ].innerBlocks[ 0 ].innerBlocks[ 1 ];
+		const initialColumnChildren = coverColumn.innerBlocks.length;
+		expect( initialColumnChildren ).toBe( 1 );
+
+		// Press Enter on the selected Cover block.
+		await page.keyboard.press( 'Enter' );
+
+		// Verify no new paragraph was inserted in the Column.
+		const afterBlocks = await editor.getBlocks();
+		const afterColumn = afterBlocks[ 0 ].innerBlocks[ 0 ].innerBlocks[ 1 ];
+		expect( afterColumn.innerBlocks.length ).toBe( initialColumnChildren );
+	} );
 } );

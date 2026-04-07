@@ -450,13 +450,6 @@ export function revisionId( state = null, action ) {
 }
 
 /**
- * Reducer returning the currently selected note and its options.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- * @return {Object} Updated state.
- */
-/**
  * Reducer for whether the revision diff is shown.
  * Resets to true when entering/exiting revisions mode.
  *
@@ -474,6 +467,13 @@ export function showRevisionDiff( state = true, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the currently selected note and its options.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {Object} Updated state.
+ */
 export function selectedNote( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SELECT_NOTE':
