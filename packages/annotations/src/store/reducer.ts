@@ -141,17 +141,14 @@ export function annotations(
 			} );
 
 		case 'ANNOTATION_REMOVE_SOURCE':
-			return mapValues(
-				state,
-				( annotationsForBlock: Annotation[] ) => {
-					return filterWithReference(
-						annotationsForBlock,
-						( annotation: Annotation ) => {
-							return annotation.source !== action.source;
-						}
-					);
-				}
-			);
+			return mapValues( state, ( annotationsForBlock: Annotation[] ) => {
+				return filterWithReference(
+					annotationsForBlock,
+					( annotation: Annotation ) => {
+						return annotation.source !== action.source;
+					}
+				);
+			} );
 	}
 
 	return state;
