@@ -36,3 +36,11 @@ are not essential. These may slip to a future iteration.
 
 - [ ] #
 - [ ] #
+
+## Contributors
+<!--
+List the people working on this iteration so it's clear who to coordinate with.
+Use GitHub @mentions.
+-->
+
+- @
