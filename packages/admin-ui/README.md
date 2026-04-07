@@ -33,7 +33,7 @@ import '@wordpress/theme/design-tokens.css';
 import '@wordpress/components/build-style/style.css';
 ```
 
- The design tokens stylesheet is universal and does not have a separate RTL version.
+The design tokens stylesheet is universal and does not have a separate RTL version.
 
 ## API
 
