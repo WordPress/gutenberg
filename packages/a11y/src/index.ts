@@ -14,7 +14,7 @@ export { speak } from './shared/index';
 /**
  * Create the live regions.
  */
-export function setup() {
+export function setup(): void {
 	const introText = document.getElementById( 'a11y-speak-intro-text' );
 	const containerAssertive = document.getElementById(
 		'a11y-speak-assertive'

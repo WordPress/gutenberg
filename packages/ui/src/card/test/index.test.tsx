@@ -82,7 +82,6 @@ describe( 'Card', () => {
 			render(
 				<Card.Root>
 					<Card.Header>
-						{ /* eslint-disable-next-line jsx-a11y/heading-has-content -- content provided via render prop */ }
 						<Card.Title render={ <h2 /> }>Heading</Card.Title>
 					</Card.Header>
 				</Card.Root>

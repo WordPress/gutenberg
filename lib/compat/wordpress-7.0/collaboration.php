@@ -112,7 +112,7 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 				'type'              => 'boolean',
 				'description'       => __( 'Enable Real-Time Collaboration', 'gutenberg' ),
 				'sanitize_callback' => 'rest_sanitize_boolean',
-				'default'           => false,
+				'default'           => true,
 				'show_in_rest'      => true,
 			)
 		);
@@ -123,17 +123,79 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 			function () use ( $option_name ) {
 				$option_value = get_option( $option_name );
 
-				?>
-				<label for="wp_collaboration_enabled">
-					<input name="wp_collaboration_enabled" type="checkbox" id="wp_collaboration_enabled" value="1" <?php checked( '1', $option_value ); ?>/>
-					<?php _e( 'Enable real-time collaboration', 'gutenberg' ); ?>
-				</label>
-				<?php
+				if ( wp_is_collaboration_allowed() ) :
+					?>
+					<label for="wp_collaboration_enabled">
+						<input name="wp_collaboration_enabled" type="checkbox" id="wp_collaboration_enabled" value="1" <?php checked( '1', $option_value ); ?>/>
+						<?php _e( "Enable early access to real-time collaboration. Real-time collaboration may affect your website's performance.", 'gutenberg' ); ?>
+					</label>
+				<?php else : ?>
+					<div class="notice notice-warning inline">
+						<?php
+						printf(
+								/* translators: %s: Prefix "Note:". */
+							'<p>' . __( '%s Real-time collaboration has been disabled.', 'gutenberg' ) . '</p>',
+							'<strong>' . __( 'Note:', 'gutenberg' ) . '</strong>'
+						);
+						?>
+					</div>
+					<?php
+				endif;
 			},
 			'writing'
 		);
 	}
 	add_action( 'admin_init', 'gutenberg_register_real_time_collaboration_setting' );
+}
+
+if ( ! function_exists( 'wp_is_collaboration_enabled' ) ) {
+	/**
+	 * Determines whether real-time collaboration is enabled.
+	 *
+	 * If the WP_ALLOW_COLLABORATION constant is false,
+	 * collaboration is always disabled regardless of the database option.
+	 * Otherwise, falls back to the 'wp_collaboration_enabled' option.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @return bool Whether real-time collaboration is enabled.
+	 */
+	function wp_is_collaboration_enabled() {
+		return ( wp_is_collaboration_allowed() && (bool) get_option( 'wp_collaboration_enabled' ) );
+	}
+}
+
+if ( ! function_exists( 'wp_is_collaboration_allowed' ) ) {
+	/**
+	 * Determines whether real-time collaboration is allowed.
+	 *
+	 * If the WP_ALLOW_COLLABORATION constant is false,
+	 * collaboration is not allowed and cannot be enabled.
+	 * The constant defaults to true, unless the WP_ALLOW_COLLABORATION
+	 * environment variable is set to string "false".
+	 *
+	 * @since 7.0.0
+	 *
+	 * @return bool Whether real-time collaboration is allowed.
+	 */
+	function wp_is_collaboration_allowed() {
+		if ( ! defined( 'WP_ALLOW_COLLABORATION' ) ) {
+			$env_value = getenv( 'WP_ALLOW_COLLABORATION' );
+			if ( false === $env_value ) {
+				// Environment variable is not defined, default to allowing collaboration.
+				define( 'WP_ALLOW_COLLABORATION', true );
+			} else {
+				/*
+				* Environment variable is defined, let's confirm it is actually set to
+				* "true" as it may still have a string value "false" – the preceeding
+				* `if` branch only tests for the boolean `false`.
+				*/
+				define( 'WP_ALLOW_COLLABORATION', 'true' === $env_value );
+			}
+		}
+
+		return WP_ALLOW_COLLABORATION;
+	}
 }
 
 /**
@@ -142,7 +204,7 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 function gutenberg_inject_real_time_collaboration_setting() {
 	global $pagenow;
 
-	if ( ! get_option( 'wp_collaboration_enabled' ) ) {
+	if ( ! wp_is_collaboration_enabled() ) {
 		return;
 	}
 
@@ -157,7 +219,7 @@ function gutenberg_inject_real_time_collaboration_setting() {
 
 	wp_add_inline_script(
 		'wp-core-data',
-		'window._wpCollaborationEnabled = ' . ( $enabled ? 'true' : 'false' ) . ';',
+		'window._wpCollaborationEnabled = ' . wp_json_encode( $enabled ) . ';',
 		'after'
 	);
 }
@@ -183,7 +245,7 @@ add_action( 'activate_gutenberg/gutenberg.php', 'gutenberg_set_collaboration_opt
 function gutenberg_post_list_collaboration_ui() {
 	global $pagenow;
 
-	if ( ! get_option( 'wp_collaboration_enabled' ) ) {
+	if ( ! wp_is_collaboration_enabled() ) {
 		return;
 	}
 

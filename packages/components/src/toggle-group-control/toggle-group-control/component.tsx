@@ -15,9 +15,8 @@ import { useMergeRefs } from '@wordpress/compose';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect, useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks';
-import BaseControl from '../../base-control';
+import BaseControl, { useBaseControlProps } from '../../base-control';
 import type { ToggleGroupControlProps } from '../types';
-import { VisualLabelWrapper } from './styles';
 import * as styles from './styles';
 import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
 import { ToggleGroupControlAsButtonGroup } from './as-button-group';
@@ -37,6 +36,7 @@ function UnconnectedToggleGroupControl(
 		isAdaptiveWidth = false,
 		isBlock = false,
 		isDeselectable = false,
+		id,
 		label,
 		hideLabelFromVision = false,
 		help,
@@ -46,6 +46,13 @@ function UnconnectedToggleGroupControl(
 		children,
 		...otherProps
 	} = useContextSystem( props, 'ToggleGroupControl' );
+
+	const { baseControlProps, controlProps } = useBaseControlProps( {
+		id,
+		help,
+		label,
+		hideLabelFromVision,
+	} );
 
 	const normalizedSize =
 		__next40pxDefaultSize && size === 'default' ? '__unstable-large' : size;
@@ -91,17 +98,15 @@ function UnconnectedToggleGroupControl(
 	} );
 
 	return (
-		<BaseControl help={ help }>
-			{ ! hideLabelFromVision && (
-				<VisualLabelWrapper>
-					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
-				</VisualLabelWrapper>
-			) }
+		<BaseControl { ...baseControlProps }>
 			<MainControl
 				{ ...otherProps }
+				{ ...controlProps }
 				setSelectedElement={ setSelectedElement }
 				className={ classes }
 				isAdaptiveWidth={ isAdaptiveWidth }
+				// `label` is used for `aria-label` on the inner control.
+				// This is separate from the visual label rendered by `BaseControl`.
 				label={ label }
 				onChange={ onChange }
 				ref={ refs }

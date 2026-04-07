@@ -965,10 +965,7 @@ test.describe( 'Image - lightbox', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 		uploadedMedia = await requestUtils.uploadMedia(
-			path.resolve(
-				process.cwd(),
-				'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
-			)
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
 		);
 	} );
 
@@ -1147,12 +1144,9 @@ class ImageBlockUtils {
 	constructor( { page } ) {
 		/** @type {Page} */
 		this.page = page;
-		this.basePath = path.join( __dirname, '..', '..', '..', 'assets' );
+		this.basePath = './assets';
 
-		this.TEST_IMAGE_FILE_PATH = path.join(
-			this.basePath,
-			'10x10_e2e_test_image_z9T8jK.png'
-		);
+		this.TEST_IMAGE_FILE_PATH = './assets/10x10_e2e_test_image_z9T8jK.png';
 	}
 
 	async upload( inputElement, customFile = null ) {
@@ -1162,7 +1156,7 @@ class ImageBlockUtils {
 		const fileName = uuid();
 		const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
 		const filePath = customFile
-			? path.join( this.basePath, customFile )
+			? this.basePath + '/' + customFile
 			: this.TEST_IMAGE_FILE_PATH;
 		await fs.copyFile( filePath, tmpFileName );
 

@@ -14,12 +14,12 @@ jest.mock( '../shared/clear', () => {
 	return jest.fn();
 } );
 jest.mock( '@wordpress/dom-ready', () => {
-	return jest.fn( ( callback ) => {
+	return jest.fn( ( callback: () => void ) => {
 		callback();
 	} );
 } );
 jest.mock( '../shared/filter-message', () => {
-	return jest.fn( ( message ) => {
+	return jest.fn( ( message: string ) => {
 		return message;
 	} );
 } );
@@ -29,8 +29,8 @@ describe( 'speak', () => {
 	let containerAssertive = document.getElementById( 'a11y-speak-assertive' );
 
 	beforeEach( () => {
-		containerPolite.textContent = '';
-		containerAssertive.textContent = '';
+		containerPolite!.textContent = '';
+		containerAssertive!.textContent = '';
 	} );
 
 	describe( 'on import', () => {
@@ -69,7 +69,7 @@ describe( 'speak', () => {
 
 	describe( 'when somehow the assertive container is not present', () => {
 		beforeEach( () => {
-			document.getElementById( 'a11y-speak-assertive' ).remove();
+			document.getElementById( 'a11y-speak-assertive' )?.remove();
 		} );
 
 		afterEach( () => {
@@ -90,8 +90,8 @@ describe( 'speak', () => {
 
 	describe( 'when somehow the both containers are not present', () => {
 		beforeEach( () => {
-			containerAssertive.remove();
-			containerPolite.remove();
+			containerAssertive?.remove();
+			containerPolite?.remove();
 		} );
 
 		afterEach( () => {

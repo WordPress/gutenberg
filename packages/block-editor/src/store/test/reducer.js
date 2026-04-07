@@ -285,7 +285,7 @@ describe( 'state', () => {
 							'chicken-child': {},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -344,7 +344,7 @@ describe( 'state', () => {
 							chicken: '',
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 				expect( state.tree.get( 'chicken' ) ).not.toBe(
@@ -387,7 +387,7 @@ describe( 'state', () => {
 							chicken: {},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -446,7 +446,7 @@ describe( 'state', () => {
 							chicken: '',
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 				expect( state.tree.get( 'chicken' ) ).not.toBe(
@@ -518,7 +518,7 @@ describe( 'state', () => {
 						} )
 					),
 					tree: new Map(),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -613,7 +613,7 @@ describe( 'state', () => {
 							[ newChildBlockId3 ]: 'chicken',
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -689,7 +689,7 @@ describe( 'state', () => {
 							chicken: {},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -742,7 +742,7 @@ describe( 'state', () => {
 							[ newChildBlockId ]: 'chicken',
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -764,7 +764,7 @@ describe( 'state', () => {
 				isPersistentChange: true,
 				isIgnoredChange: false,
 				tree: new Map(),
-				controlledInnerBlocks: {},
+				controlledInnerBlocks: new Set(),
 				blockEditingModes: new Map(),
 			} );
 		} );
@@ -2259,7 +2259,9 @@ describe( 'state', () => {
 						hasControlledInnerBlocks: true,
 					} );
 
-					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						true
+					);
 					// The previous content of the block should be removed
 					expect( state.byClientId.child ).toBeUndefined();
 					expect( state.tree.get( 'child' ) ).toBeUndefined();
@@ -2296,9 +2298,7 @@ describe( 'state', () => {
 								'paragraph-id': [],
 							} )
 						),
-						controlledInnerBlocks: {
-							'reusable-id': true,
-						},
+						controlledInnerBlocks: new Set( [ 'reusable-id' ] ),
 						parents: new Map(
 							Object.entries( {
 								'group-id': '',
@@ -2421,9 +2421,9 @@ describe( 'state', () => {
 						clientId: 'chicken',
 						hasControlledInnerBlocks: true,
 					} );
-					expect( withControlled.controlledInnerBlocks.chicken ).toBe(
-						true
-					);
+					expect(
+						withControlled.controlledInnerBlocks.has( 'chicken' )
+					).toBe( true );
 
 					const state = blocks( withControlled, {
 						type: 'RESET_BLOCKS',
@@ -2437,7 +2437,9 @@ describe( 'state', () => {
 						],
 					} );
 
-					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						true
+					);
 				} );
 
 				it( 'should preserve controlledInnerBlocks blocks across RESET_BLOCKS', () => {
@@ -2499,7 +2501,9 @@ describe( 'state', () => {
 						],
 					} );
 
-					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						true
+					);
 					expect(
 						getBlocks( { blocks: state }, 'chicken' ).map(
 							( b ) => b.clientId
@@ -2656,7 +2660,9 @@ describe( 'state', () => {
 						hasControlledInnerBlocks: true,
 					} );
 
-					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						true
+					);
 					// The order and byClientId Maps should be the same
 					// reference because the block has no inner blocks to
 					// remove, so REPLACE_INNER_BLOCKS should be skipped.

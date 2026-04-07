@@ -8,8 +8,8 @@ import filterMessage from './filter-message';
  * Allows you to easily announce dynamic interface updates to screen readers using ARIA live regions.
  * This module is inspired by the `speak` function in `wp-a11y.js`.
  *
- * @param {string}               message    The message to be announced by assistive technologies.
- * @param {'polite'|'assertive'} [ariaLive] The politeness level for aria-live; default: 'polite'.
+ * @param message    The message to be announced by assistive technologies.
+ * @param [ariaLive] The politeness level for aria-live; default: 'polite'.
  *
  * @example
  * ```js
@@ -22,7 +22,10 @@ import filterMessage from './filter-message';
  * speak( 'The message you want to send to the ARIA live region', 'assertive' );
  * ```
  */
-export function speak( message, ariaLive ) {
+export function speak(
+	message: string,
+	ariaLive?: 'polite' | 'assertive'
+): void {
 	/*
 	 * Clear previous messages to allow repeated strings being read out and hide
 	 * the explanatory text from assistive technologies.

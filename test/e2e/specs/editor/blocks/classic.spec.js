@@ -151,14 +151,7 @@ class MediaUtils {
 	constructor( { page } ) {
 		this.page = page;
 
-		this.TEST_IMAGE_FILE_PATH = path.join(
-			__dirname,
-			'..',
-			'..',
-			'..',
-			'assets',
-			'10x10_e2e_test_image_z9T8jK.png'
-		);
+		this.TEST_IMAGE_FILE_PATH = './assets/10x10_e2e_test_image_z9T8jK.png';
 	}
 
 	async upload( inputElement ) {

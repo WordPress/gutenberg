@@ -860,8 +860,8 @@ describe( 'polling-manager', () => {
 				responseWithCollaborator
 			);
 
-			// Error handler doubled the interval: min(1000 * 2, 30000) = 2000.
-			await jest.advanceTimersByTimeAsync( 2000 );
+			// First failure with collaborators: retry in 1000ms (schedule[0]).
+			await jest.advanceTimersByTimeAsync( 1000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 
 			const thirdCallPayload = mockPostSyncUpdate.mock
@@ -906,8 +906,9 @@ describe( 'polling-manager', () => {
 			expect( secondCallPayload.rooms[ 0 ].updates ).toHaveLength( 0 );
 
 			// Third poll: succeed — should still have no updates (no compaction queued).
+			// First failure solo: retry in 2000ms (schedule[0]).
 			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
-			await jest.advanceTimersByTimeAsync( 8000 );
+			await jest.advanceTimersByTimeAsync( 2000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 
 			const thirdCallPayload = mockPostSyncUpdate.mock

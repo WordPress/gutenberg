@@ -3,10 +3,6 @@
 @use "@wordpress/base-styles/z-index" as *;
 
 .block-editor-global-styles-background-panel__inspector-media-replace-container {
-	border: $border-width solid $gray-300;
-	border-radius: $radius-small;
-	// Full width. ToolsPanel lays out children in a grid.
-	grid-column: 1 / -1;
 	position: relative;
 
 	&.is-open {
