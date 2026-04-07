@@ -163,22 +163,6 @@ export function getActiveImageProcessingCount( state: State ): number {
 }
 
 /**
- * Returns the number of items currently performing video processing operations.
- *
- * This counts items whose current operation is TranscodeGif,
- * used to enforce the video processing concurrency limit (1 at a time).
- *
- * @param state Upload state.
- *
- * @return Number of items currently processing video.
- */
-export function getActiveVideoProcessingCount( state: State ): number {
-	return state.queue.filter(
-		( item ) => item.currentOperation === OperationType.TranscodeGif
-	).length;
-}
-
-/**
  * Returns items waiting for image processing (next operation is ResizeCrop
  * or Rotate but not yet started).
  *
@@ -201,14 +185,30 @@ export function getPendingImageProcessing( state: State ): QueueItem[] {
 }
 
 /**
- * Returns items waiting for video processing (next operation is TranscodeGif
- * but not yet started).
+ * Returns the number of items currently performing GIF-to-video conversion.
+ *
+ * Used to enforce the FFmpeg concurrency limit (1 at a time) since
+ * FFmpeg WASM is memory-intensive.
  *
  * @param state Upload state.
  *
- * @return Items pending video processing.
+ * @return Number of items currently converting GIFs.
  */
-export function getPendingVideoProcessing( state: State ): QueueItem[] {
+export function getActiveGifProcessingCount( state: State ): number {
+	return state.queue.filter(
+		( item ) => item.currentOperation === OperationType.TranscodeGif
+	).length;
+}
+
+/**
+ * Returns items waiting for GIF-to-video conversion (next operation is
+ * TranscodeGif but not yet started).
+ *
+ * @param state Upload state.
+ *
+ * @return Items pending GIF conversion.
+ */
+export function getPendingGifProcessing( state: State ): QueueItem[] {
 	return state.queue.filter( ( item ) => {
 		const nextOperation = Array.isArray( item.operations?.[ 0 ] )
 			? item.operations[ 0 ][ 0 ]

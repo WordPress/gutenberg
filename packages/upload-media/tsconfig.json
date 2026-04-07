@@ -10,7 +10,6 @@
 		{ "path": "../compose" },
 		{ "path": "../data" },
 		{ "path": "../element" },
-		{ "path": "../ffmpeg" },
 		{ "path": "../i18n" },
 		{ "path": "../preferences" },
 		{ "path": "../private-apis" },

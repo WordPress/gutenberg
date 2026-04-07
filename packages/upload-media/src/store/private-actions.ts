@@ -359,7 +359,7 @@ export function processItem( id: QueueItemId ) {
 		 * Limit to 1 concurrent transcoding operation.
 		 */
 		if ( operation === OperationType.TranscodeGif ) {
-			const activeCount = select.getActiveVideoProcessingCount();
+			const activeCount = select.getActiveGifProcessingCount();
 			if ( activeCount >= 1 ) {
 				return;
 			}
@@ -640,12 +640,11 @@ export function finishOperation(
 		}
 
 		/*
-		 * If a video processing operation just finished, there may be items
-		 * waiting in the queue due to the video processing concurrency limit.
-		 * Trigger processing for them.
+		 * If a GIF-to-video conversion just finished, there may be items
+		 * waiting due to the FFmpeg concurrency limit.
 		 */
 		if ( previousOperation === OperationType.TranscodeGif ) {
-			const pendingItems = select.getPendingVideoProcessing();
+			const pendingItems = select.getPendingGifProcessing();
 			for ( const pendingItem of pendingItems ) {
 				dispatch.processItem( pendingItem.id );
 			}
@@ -766,47 +765,28 @@ export function prepareItem( id: QueueItemId ) {
 		}
 		const { file } = item;
 
-		const operations: Operation[] = [];
-		const settings = select.getSettings();
-
-		// Check for animated GIF → video conversion.
-		// When enabled, animated GIFs are converted to MP4/WebM for smaller file sizes.
-		// The FFmpeg WASM binary is provided by the wp-ffmpeg-wasm canonical plugin,
-		// which is installed on-demand if the user has plugin installation permissions.
-		if (
-			file.type === 'image/gif' &&
-			settings.gifConvert !== false &&
-			self.crossOriginIsolated
-		) {
+		// Convert animated GIFs to video when FFmpeg plugin is available.
+		// Requires crossOriginIsolated for SharedArrayBuffer (WASM requirement).
+		if ( file.type === 'image/gif' && self.crossOriginIsolated ) {
 			const buffer = await file.arrayBuffer();
 			if ( isAnimatedGif( buffer ) ) {
-				// Ensure FFmpeg plugin is available (installs if needed).
 				const ffmpegConfig = await ensureFFmpegAvailable();
 
 				if ( ffmpegConfig ) {
-					const outputFormat =
-						settings.videoOutputFormat === 'video/webm'
-							? 'webm'
-							: 'mp4';
-
-					operations.push(
+					const gifOperations: Operation[] = [
 						[
 							OperationType.TranscodeGif,
-							{
-								outputFormat,
-								ffmpegConfig,
-							} as OperationArgs[ OperationType.TranscodeGif ],
+							{ outputFormat: 'mp4' as const },
 						],
-						OperationType.Upload
-					);
+						OperationType.Upload,
+					];
 
 					dispatch< AddOperationsAction >( {
 						type: Type.AddOperations,
 						id,
-						operations,
+						operations: gifOperations,
 					} );
 
-					// Tell the server to handle sub-sizes since this will be a video.
 					dispatch.finishOperation( id, {
 						additionalData: {
 							...item.additionalData,
@@ -819,6 +799,9 @@ export function prepareItem( id: QueueItemId ) {
 				// FFmpeg unavailable — fall through to upload GIF as-is.
 			}
 		}
+
+		const operations: Operation[] = [];
+		const settings = select.getSettings();
 
 		const isImage = file.type.startsWith( 'image/' );
 		const isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
@@ -1151,12 +1134,10 @@ export function transcodeImageItem(
 	};
 }
 
-type TranscodeGifItemArgs = OperationArgs[ OperationType.TranscodeGif ];
-
 /**
  * Converts an animated GIF to a video file (MP4 or WebM).
  *
- * Uses FFmpeg WASM running in a web worker for 100% client-side conversion.
+ * Uses FFmpeg WASM running in a web worker via the wp-ffmpeg-wasm plugin.
  * The resulting video file replaces the original GIF in the upload queue.
  *
  * @param id     Item ID.
@@ -1164,7 +1145,7 @@ type TranscodeGifItemArgs = OperationArgs[ OperationType.TranscodeGif ];
  */
 export function transcodeGifItem(
 	id: QueueItemId,
-	args?: TranscodeGifItemArgs
+	args?: OperationArgs[ OperationType.TranscodeGif ]
 ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
 		const item = select.getItem( id );
@@ -1173,26 +1154,20 @@ export function transcodeGifItem(
 		}
 
 		const outputFormat = args?.outputFormat ?? 'mp4';
-		const outputMimeType = `video/${ outputFormat }`;
-
-		if ( ! args?.ffmpegConfig ) {
-			dispatch.cancelItem(
-				id,
-				new UploadError( {
-					code: 'GIF_TRANSCODING_ERROR',
-					message: 'FFmpeg WASM configuration is missing',
-					file: item.file,
-				} )
-			);
-			return;
-		}
 
 		try {
+			const config = await ensureFFmpegAvailable();
+			if ( ! config ) {
+				// FFmpeg not available — skip conversion, upload GIF as-is.
+				dispatch.finishOperation( id, {} );
+				return;
+			}
+
 			const file = await ffmpegConvertGifToVideo(
 				item.id,
 				item.file,
-				outputMimeType,
-				args.ffmpegConfig
+				config,
+				outputFormat
 			);
 
 			const blobUrl = createBlobURL( file );

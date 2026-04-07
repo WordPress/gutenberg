@@ -6,102 +6,212 @@ import type { QueueItemId } from '../types';
 import type { FFmpegConfig } from './ffmpeg-plugin';
 
 /**
- * Cached dynamic import promise for @wordpress/ffmpeg/worker.
+ * Inline worker code for FFmpeg GIF-to-video conversion.
  *
- * The module is a thin RPC wrapper. The heavy FFmpeg WASM binary is
- * loaded separately from the wp-ffmpeg-wasm plugin's assets directory.
- *
- * The promise is cached so the module is only resolved once.
+ * This runs in a classic worker (not a module worker) because the
+ * Emscripten-compiled FFmpeg core JS must be loaded via importScripts().
+ * The FFmpeg WASM binary is provided by the wp-ffmpeg-wasm plugin and
+ * loaded from its assets URL at runtime.
  */
-let ffmpegModulePromise:
-	| Promise< typeof import('@wordpress/ffmpeg/worker') >
-	| undefined;
+const workerCode = `
+var ffmpegModule = null;
 
-/**
- * The resolved module reference, available synchronously after the first
- * load completes. Used by terminateFFmpegWorker() and ffmpegCancelOperations().
- */
-let ffmpegModule: typeof import('@wordpress/ffmpeg/worker') | undefined;
-
-/**
- * Lazily loads and caches the @wordpress/ffmpeg/worker module.
- *
- * @return The FFmpeg worker module.
- */
-function loadFFmpegModule(): Promise<
-	typeof import('@wordpress/ffmpeg/worker')
-> {
-	if ( ! ffmpegModulePromise ) {
-		ffmpegModulePromise = import( '@wordpress/ffmpeg/worker' ).then(
-			( mod ) => {
-				ffmpegModule = mod;
-				return mod;
-			}
-		);
+self.onmessage = function( e ) {
+	var data = e.data;
+	if ( data.type !== 'convert' ) {
+		return;
 	}
-	return ffmpegModulePromise;
+
+	( async function() {
+		try {
+			// Load FFmpeg core on first use.
+			if ( ! ffmpegModule ) {
+				importScripts( data.coreUrl );
+				ffmpegModule = await self.createFFmpegCore( {
+					print: function() {},
+					printErr: function() {},
+				} );
+			}
+
+			var inputName = 'input.gif';
+			var isWebm = data.outputFormat === 'webm';
+			var ext = isWebm ? 'webm' : 'mp4';
+			var outputName = 'output.' + ext;
+
+			// Write input file to Emscripten virtual filesystem.
+			ffmpegModule.FS.writeFile( inputName, new Uint8Array( data.inputBuffer ) );
+
+			// Build FFmpeg arguments.
+			var args = [ '-nostdin', '-y', '-i', inputName ];
+
+			// Video codec selection.
+			if ( isWebm ) {
+				args.push( '-c:v', 'libvpx-vp9' );
+				args.push( '-crf', '31', '-b:v', '0' );
+			} else {
+				args.push( '-c:v', 'libx264' );
+				args.push( '-preset', 'fast' );
+			}
+
+			// Common settings.
+			args.push( '-r', '24' );
+			args.push( '-pix_fmt', 'yuv420p' );
+
+			// Scale filter: ensure even dimensions (required by most codecs),
+			// and optionally scale down if exceeding maxDimensions.
+			if ( data.maxDimensions ) {
+				var max = data.maxDimensions + ( data.maxDimensions % 2 );
+				args.push(
+					'-vf',
+					"scale='min(" + max + ",trunc(iw/2)*2)':'min(" + max + ",trunc(ih/2)*2)':flags=lanczos"
+				);
+			} else {
+				args.push( '-vf', "scale='trunc(iw/2)*2':'trunc(ih/2)*2'" );
+			}
+
+			// MP4: move metadata to the beginning for streaming.
+			if ( ! isWebm ) {
+				args.push( '-movflags', '+faststart' );
+			}
+
+			// Remove audio (GIFs don't have audio).
+			args.push( '-an' );
+			args.push( outputName );
+
+			// Run FFmpeg.
+			ffmpegModule.setTimeout( -1 );
+			ffmpegModule.exec.apply( ffmpegModule, args );
+
+			// Read output file.
+			var output = ffmpegModule.FS.readFile( outputName );
+			if ( ! output || output.length === 0 ) {
+				throw new Error( 'FFmpeg produced empty output' );
+			}
+
+			// Extract only the relevant bytes.
+			var buffer = output.buffer.slice(
+				output.byteOffset,
+				output.byteOffset + output.byteLength
+			);
+
+			// Cleanup virtual filesystem and reset state.
+			try {
+				ffmpegModule.FS.unlink( inputName );
+				ffmpegModule.FS.unlink( outputName );
+			} catch ( _e ) {
+				// Ignore cleanup errors.
+			}
+			ffmpegModule.reset();
+
+			self.postMessage( { type: 'result', buffer: buffer }, [ buffer ] );
+		} catch ( err ) {
+			self.postMessage( { type: 'error', message: err.message || String( err ) } );
+		}
+	} )();
+};
+`;
+
+/**
+ * The worker instance, lazily created on first use.
+ */
+let worker: Worker | undefined;
+
+/**
+ * The Blob URL for the worker, kept for cleanup.
+ */
+let workerBlobUrl: string | undefined;
+
+/**
+ * Gets or creates the FFmpeg worker instance.
+ *
+ * @return The worker.
+ */
+function getOrCreateWorker(): Worker {
+	if ( ! worker ) {
+		const blob = new Blob( [ workerCode ], {
+			type: 'application/javascript',
+		} );
+		workerBlobUrl = URL.createObjectURL( blob );
+		worker = new Worker( workerBlobUrl );
+	}
+	return worker;
 }
 
 /**
  * Converts an animated GIF to a video file using FFmpeg in a web worker.
  *
- * @param id             Queue item ID.
- * @param file           GIF file object.
- * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
- * @param config         WASM configuration from the wp-ffmpeg-wasm plugin.
- * @param maxDimensions  Optional maximum dimensions for scaling.
+ * The FFmpeg WASM binary is loaded from the wp-ffmpeg-wasm plugin's
+ * assets URL. The conversion runs entirely in a worker to avoid
+ * blocking the main thread.
+ *
+ * @param id            Queue item ID.
+ * @param file          GIF file object.
+ * @param config        WASM configuration from the wp-ffmpeg-wasm plugin.
+ * @param outputFormat  Output format: 'mp4' or 'webm'.
+ * @param maxDimensions Optional maximum dimensions for scaling.
  * @return Converted video file.
  */
 export async function ffmpegConvertGifToVideo(
 	id: QueueItemId,
 	file: File,
-	outputMimeType: string,
 	config: FFmpegConfig,
+	outputFormat: 'mp4' | 'webm' = 'mp4',
 	maxDimensions?: number
-) {
-	const { ffmpegConvertGifToVideo: convertGifToVideo } =
-		await loadFFmpegModule();
-	const buffer = await convertGifToVideo(
-		id,
-		await file.arrayBuffer(),
-		outputMimeType,
-		config,
-		maxDimensions
-	);
+): Promise< File > {
+	const w = getOrCreateWorker();
+	const inputBuffer = await file.arrayBuffer();
 
-	const ext = outputMimeType === 'video/webm' ? 'webm' : 'mp4';
-	const fileName = `${ getFileBasename( file.name ) }.${ ext }`;
-	return new File(
-		[ new Blob( [ buffer as ArrayBuffer ], { type: outputMimeType } ) ],
-		fileName,
-		{ type: outputMimeType }
-	);
-}
-
-/**
- * Cancels all ongoing FFmpeg operations for the given item.
- *
- * If the FFmpeg module has not been loaded yet, there can be no active
- * operations to cancel.
- *
- * @param id Queue item ID to cancel operations for.
- * @return Whether any operation was cancelled.
- */
-export async function ffmpegCancelOperations( id: QueueItemId ) {
-	if ( ! ffmpegModule ) {
-		return false;
-	}
-	return ffmpegModule.ffmpegCancelOperations( id );
+	return new Promise< File >( ( resolve, reject ) => {
+		const handler = ( e: MessageEvent ) => {
+			if ( e.data.type === 'result' ) {
+				w.removeEventListener( 'message', handler );
+				const mimeType =
+					outputFormat === 'webm' ? 'video/webm' : 'video/mp4';
+				const ext = outputFormat === 'webm' ? 'webm' : 'mp4';
+				const fileName = `${ getFileBasename( file.name ) }.${ ext }`;
+				resolve(
+					new File(
+						[
+							new Blob( [ e.data.buffer as ArrayBuffer ], {
+								type: mimeType,
+							} ),
+						],
+						fileName,
+						{ type: mimeType }
+					)
+				);
+			} else if ( e.data.type === 'error' ) {
+				w.removeEventListener( 'message', handler );
+				reject( new Error( e.data.message ) );
+			}
+		};
+		w.addEventListener( 'message', handler );
+		w.postMessage(
+			{
+				type: 'convert',
+				coreUrl: config.coreUrl,
+				inputBuffer,
+				outputFormat,
+				maxDimensions,
+			},
+			[ inputBuffer ]
+		);
+	} );
 }
 
 /**
  * Terminates the FFmpeg worker if it has been loaded.
  *
- * If the FFmpeg module has not been loaded yet (i.e., no GIF conversion
- * has occurred), this is a no-op since there is no worker to terminate.
+ * If no GIF conversion has occurred, this is a no-op since there
+ * is no worker to terminate.
  */
 export function terminateFFmpegWorker(): void {
-	if ( ffmpegModule ) {
-		ffmpegModule.terminateFFmpegWorker();
+	if ( worker ) {
+		worker.terminate();
+		worker = undefined;
+	}
+	if ( workerBlobUrl ) {
+		URL.revokeObjectURL( workerBlobUrl );
+		workerBlobUrl = undefined;
 	}
 }

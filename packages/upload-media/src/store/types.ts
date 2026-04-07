@@ -1,8 +1,3 @@
-/**
- * Internal dependencies
- */
-import type { FFmpegConfig } from './utils/ffmpeg-plugin';
-
 export type QueueItemId = string;
 
 export type QueueStatus = 'active' | 'paused';
@@ -188,13 +183,6 @@ export interface Settings {
 	imageQuality?: number;
 	// Function for finalizing an upload after all client-side processing is complete.
 	mediaFinalize?: ( id: number ) => Promise< void >;
-	// Whether to convert animated GIFs to video (MP4/WebM) during upload.
-	// When enabled, animated GIFs are transcoded to video for smaller file sizes.
-	// Default is true.
-	gifConvert?: boolean;
-	// Output format for GIF-to-video conversion.
-	// Accepts 'video/mp4' or 'video/webm'. Default is 'video/mp4'.
-	videoOutputFormat?: string;
 }
 
 // Matches the Attachment type from the media-utils package.
@@ -301,8 +289,6 @@ export interface OperationArgs {
 	[ OperationType.TranscodeGif ]: {
 		/** Video output format: 'mp4' or 'webm'. */
 		outputFormat: 'mp4' | 'webm';
-		/** FFmpeg WASM config from the wp-ffmpeg-wasm plugin. */
-		ffmpegConfig: FFmpegConfig;
 	};
 }
 
