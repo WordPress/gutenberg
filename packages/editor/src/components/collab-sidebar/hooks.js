@@ -34,6 +34,7 @@ import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { noop } from './utils';
+import { getNoteBlockPreview } from './block-preview';
 
 const { useBlockElement, cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -47,6 +48,7 @@ export function useBlockComments( postId ) {
 		post: postId,
 		type: 'note',
 		status: 'all',
+		context: 'edit',
 		per_page: -1,
 	};
 
@@ -174,7 +176,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
-	const { getBlockAttributes, getSelectedBlockClientId } =
+	const { getBlockAttributes, getBlockName, getSelectedBlockClientId } =
 		useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
@@ -189,24 +191,39 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 		} );
 	};
 
-	const onCreate = async ( { content, parent } ) => {
+	const onCreate = async ( { content, parent, blockClientId } ) => {
 		try {
+			const selectedClientId =
+				blockClientId || getSelectedBlockClientId();
+			const selectedBlockPreview = getNoteBlockPreview(
+				getBlockName( selectedClientId ),
+				getBlockAttributes( selectedClientId )
+			);
+
+			const createData = {
+				post: getCurrentPostId(),
+				content,
+				status: 'hold',
+				type: 'note',
+				parent: parent || 0,
+			};
+
+			if ( ! parent && selectedBlockPreview ) {
+				createData.meta = {
+					_wp_noted_content: JSON.stringify( selectedBlockPreview ),
+				};
+			}
+
 			const savedRecord = await saveEntityRecord(
 				'root',
 				'comment',
-				{
-					post: getCurrentPostId(),
-					content,
-					status: 'hold',
-					type: 'note',
-					parent: parent || 0,
-				},
+				createData,
 				{ throwOnError: true }
 			);
 
 			// If it's a main comment, update the block attributes with the comment id.
-			if ( ! parent && savedRecord?.id ) {
-				const clientId = getSelectedBlockClientId();
+			if ( ! parent && savedRecord?.id && selectedClientId ) {
+				const clientId = selectedClientId;
 				const metadata = getBlockAttributes( clientId )?.metadata;
 				updateBlockAttributes( clientId, {
 					metadata: {

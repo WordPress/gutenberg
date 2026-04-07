@@ -72,6 +72,43 @@
 	}
 }
 
+.editor-collab-sidebar-panel__note-preview {
+	margin: 0 0 $grid-unit-10;
+	display: flex;
+	align-items: center;
+	gap: $grid-unit-05;
+}
+
+.editor-collab-sidebar-panel__note-preview-content {
+	min-width: 0;
+	color: $gray-700;
+	font-size: 12px;
+	line-height: 16px;
+}
+
+.editor-collab-sidebar-panel__note-preview-img {
+	display: block;
+	width: 18px;
+	height: 18px;
+	border-radius: 1px;
+	object-fit: cover;
+}
+
+.editor-collab-sidebar-panel__note-preview-text {
+	flex: 1 1 auto;
+	min-width: 0;
+	max-width: 100%;
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.editor-collab-sidebar-panel__note-preview-icon {
+	flex: 0 0 auto;
+	color: $gray-700;
+}
+
 .editor-collab-sidebar-panel__user-avatar {
 	border-radius: $radius-round;
 	flex-shrink: 0;

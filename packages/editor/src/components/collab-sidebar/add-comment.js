@@ -95,7 +95,10 @@ export function AddComment( {
 			</HStack>
 			<CommentForm
 				onSubmit={ async ( inputComment ) => {
-					const { id } = await onSubmit( { content: inputComment } );
+					const { id } = await onSubmit( {
+						content: inputComment,
+						blockClientId: clientId,
+					} );
 					selectNote( id );
 					focusCommentThread( id, commentSidebarRef.current );
 				} }

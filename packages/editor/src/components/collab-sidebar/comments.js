@@ -32,7 +32,9 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
+	BlockIcon,
 } from '@wordpress/block-editor';
+import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -41,6 +43,10 @@ import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { focusCommentThread, getCommentExcerpt } from './utils';
+import {
+	getNoteBlockPreview,
+	getNoteBlockPreviewFromMeta,
+} from './block-preview';
 import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
@@ -467,7 +473,50 @@ function Thread( {
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
 	);
+	const { blockName, previewAttributes, activeVariationIcon } = useSelect(
+		( select ) => {
+			if ( ! thread.blockClientId ) {
+				return {
+					blockName: null,
+					blockAttributes: null,
+					previewAttributes: null,
+					activeVariationIcon: null,
+				};
+			}
+
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
+			const name = getBlockName( thread.blockClientId );
+			const attributes = getBlockAttributes( thread.blockClientId );
+
+			return {
+				blockName: name,
+				previewAttributes: attributes,
+				activeVariationIcon:
+					select( blocksStore ).getActiveBlockVariation(
+						name,
+						attributes
+					)?.icon ?? null,
+			};
+		},
+		[ thread.blockClientId ]
+	);
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
+	const persistedBlockPreview = useMemo(
+		() => getNoteBlockPreviewFromMeta( thread?.meta ),
+		[ thread?.meta ]
+	);
+	const notePreview = useMemo(
+		() =>
+			persistedBlockPreview ??
+			getNoteBlockPreview( blockName, previewAttributes ),
+		[ persistedBlockPreview, blockName, previewAttributes ]
+	);
+	const blockIcon = useMemo(
+		() => activeVariationIcon ?? getBlockType( blockName )?.icon ?? null,
+		[ activeVariationIcon, blockName ]
+	);
+
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
 		50
@@ -631,6 +680,8 @@ function Thread( {
 			) }
 			<CommentBoard
 				thread={ thread }
+				blockPreview={ notePreview }
+				blockIcon={ blockIcon }
 				isExpanded={ isSelected }
 				onEdit={ ( params = {} ) => {
 					onEditComment( params );
@@ -765,6 +816,8 @@ function Thread( {
 
 const CommentBoard = ( {
 	thread,
+	blockPreview,
+	blockIcon,
 	parent,
 	isExpanded,
 	onEdit,
@@ -834,12 +887,53 @@ const CommentBoard = ( {
 					"Are you sure you want to delete this note? This will also delete all of this note's replies."
 			  )
 			: __( 'Are you sure you want to delete this reply?' );
+	const textPreview =
+		typeof blockPreview?.text === 'string' ? blockPreview.text : null;
+	const imagePreviewUrl =
+		typeof blockPreview?.url === 'string' ? blockPreview.url : null;
+	const hasIcon = !! blockIcon;
+	const hasPreview = !! textPreview || !! imagePreviewUrl;
+	const shouldShowPreview = hasIcon || hasPreview;
+	const isImagePreview = !! imagePreviewUrl;
 
 	return (
 		<VStack
 			spacing="2"
 			role={ thread.parent !== 0 ? 'treeitem' : undefined }
 		>
+			{ 'edit' !== actionState &&
+				! parent &&
+				!! thread.blockClientId &&
+				shouldShowPreview && (
+					<div
+						className={ `editor-collab-sidebar-panel__note-preview ${
+							isImagePreview
+								? 'editor-collab-sidebar-panel__note-preview-image'
+								: 'editor-collab-sidebar-panel__note-preview-content'
+						}` }
+					>
+						{ hasIcon && (
+							<BlockIcon
+								className="editor-collab-sidebar-panel__note-preview-icon"
+								icon={ blockIcon }
+								showColors={ false }
+							/>
+						) }
+						{ ! isImagePreview && (
+							<span className="editor-collab-sidebar-panel__note-preview-text">
+								{ textPreview }
+							</span>
+						) }
+						{ isImagePreview && (
+							<img
+								className="editor-collab-sidebar-panel__note-preview-img"
+								src={ imagePreviewUrl }
+								alt=""
+								role="presentation"
+							/>
+						) }
+					</div>
+				) }
 			<HStack alignment="left" spacing="3" justify="flex-start">
 				<CommentAuthorInfo
 					avatar={ thread?.author_avatar_urls?.[ 48 ] }
@@ -933,40 +1027,43 @@ const CommentBoard = ( {
 					reflowComments={ reflowComments }
 				/>
 			) : (
-				<RawHTML
-					className={ clsx(
-						'editor-collab-sidebar-panel__user-comment',
-						{
-							'editor-collab-sidebar-panel__resolution-text':
-								isResolutionComment,
-						}
-					) }
-				>
-					{ isResolutionComment
-						? ( () => {
-								const actionText =
-									thread.meta._wp_note_status === 'resolved'
-										? __( 'Marked as resolved' )
-										: __( 'Reopened' );
-								const content = thread?.content?.raw;
+				<>
+					<RawHTML
+						className={ clsx(
+							'editor-collab-sidebar-panel__user-comment',
+							{
+								'editor-collab-sidebar-panel__resolution-text':
+									isResolutionComment,
+							}
+						) }
+					>
+						{ isResolutionComment
+							? ( () => {
+									const actionText =
+										thread.meta._wp_note_status ===
+										'resolved'
+											? __( 'Marked as resolved' )
+											: __( 'Reopened' );
+									const content = thread?.content?.raw;
 
-								if (
-									content &&
-									typeof content === 'string' &&
-									content.trim() !== ''
-								) {
-									return sprintf(
-										// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
-										__( '%1$s: %2$s' ),
-										actionText,
-										content
-									);
-								}
-								// If no content, just show the action.
-								return actionText;
-						  } )()
-						: thread?.content?.rendered }
-				</RawHTML>
+									if (
+										content &&
+										typeof content === 'string' &&
+										content.trim() !== ''
+									) {
+										return sprintf(
+											// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
+											__( '%1$s: %2$s' ),
+											actionText,
+											content
+										);
+									}
+									// If no content, just show the action.
+									return actionText;
+							  } )()
+							: thread?.content?.rendered }
+					</RawHTML>
+				</>
 			) }
 			{ 'delete' === actionState && (
 				<ConfirmDialog
