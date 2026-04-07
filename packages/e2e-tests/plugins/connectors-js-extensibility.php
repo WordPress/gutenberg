@@ -51,7 +51,7 @@ add_action(
 	static function ( $hook_suffix ) {
 		$connectors_pages = array(
 			'settings_page_options-connectors-wp-admin', // Gutenberg.
-			'settings_page_options-connectors.php',      // Core.
+			'options-connectors.php',                    // Core.
 		);
 		if ( ! in_array( $hook_suffix, $connectors_pages, true ) ) {
 			return;
