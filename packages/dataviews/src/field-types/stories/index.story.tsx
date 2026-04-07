@@ -609,16 +609,12 @@ const FieldTypeStory = ( {
 	const storyFields = useMemo( () => {
 		let fieldsToProcess = _fields;
 
-		fieldsToProcess = useMemo( () => {
-			if ( ! disabled ) {
-				return _fields;
-			}
-
-			return _fields.map( ( field ) => ( {
+		if ( disabled ) {
+			fieldsToProcess = fieldsToProcess.map( ( field ) => ( {
 				...field,
 				isDisabled: true,
 			} ) );
-		}, [ disabled, _fields ] );
+		}
 
 		if ( Edit !== 'default' ) {
 			fieldsToProcess = fieldsToProcess.map(
