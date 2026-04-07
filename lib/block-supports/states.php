@@ -10,7 +10,7 @@
 
 /**
  * Renders per-instance state styles on the frontend for blocks that declare
- * `__experimentalStates` support.
+ * `states` support.
  *
  * @param string $block_content The block's rendered HTML.
  * @param array  $block         The block data including blockName and attrs.
@@ -26,7 +26,7 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$supported_states = $block_type->supports['__experimentalStates'] ?? null;
+	$supported_states = $block_type->supports['states'] ?? null;
 	if ( empty( $supported_states ) || ! is_array( $supported_states ) ) {
 		return $block_content;
 	}
