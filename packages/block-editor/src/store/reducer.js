@@ -2476,13 +2476,10 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 		}
 	} );
 	const contentOnlyTemplateLockedClientIds = Array.from(
-		state.blockListSettings.entries()
-	)
-		.filter(
-			( [ , listSettings ] ) =>
-				listSettings?.templateLock === 'contentOnly'
-		)
-		.map( ( [ clientId ] ) => clientId );
+		state.blockListSettings
+	).flatMap( ( [ clientId, listSettings ] ) =>
+		listSettings?.templateLock === 'contentOnly' ? [ clientId ] : []
+	);
 
 	// When in an isolated editing context (e.g., editing a template part or pattern directly),
 	// don't apply contentOnly mode to nested unsynced patterns or template parts.
