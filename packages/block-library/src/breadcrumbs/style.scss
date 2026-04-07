@@ -16,8 +16,17 @@
 		padding: 0;
 		display: flex;
 		align-items: center;
+
+		// Text-mode separator rendered via CSS custom property.
+		&:not(:last-child)::after {
+			content: var(--separator, "/");
+			margin: 0 0.5em;
+			opacity: 0.7;
+		}
 	}
 
+	// Icon-mode separator: an inline SVG span injected into each <li>.
+	// Setting --separator: none on the wrapper suppresses the ::after above.
 	.wp-block-breadcrumbs__separator {
 		display: flex;
 		align-items: center;

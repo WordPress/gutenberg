@@ -11,6 +11,14 @@
 			"type": "boolean",
 			"default": false
 		},
+		"separator": {
+			"type": "string",
+			"default": "/"
+		},
+		"separatorType": {
+			"type": "string",
+			"default": "text"
+		},
 		"separatorIcon": {
 			"type": "string"
 		},
@@ -73,5 +81,6 @@
 			"clientNavigation": true
 		}
 	},
-	"style": "wp-block-breadcrumbs"
+	"style": "wp-block-breadcrumbs",
+	"editorStyle": "wp-block-breadcrumbs-editor"
 }
