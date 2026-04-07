@@ -1,8 +1,4 @@
 .list {
-	/* @TODO: use Text component from UI when available. */
-	font-family: var(--wpds-typography-font-family-heading);
-	font-size: var(--wpds-typography-font-size-lg);
-	line-height: var(--wpds-typography-line-height-lg);
 	list-style: none;
 	padding: 0;
 	margin: 0;
