@@ -150,18 +150,31 @@ const withMultiEntityRecordEdits = ( reducer ) => ( state, action ) => {
 
 		let newState = state;
 		record.forEach( ( { id: { kind, name, recordId }, changes } ) => {
+			const persistedRecord =
+				state?.queriedData?.items?.default?.[ recordId ];
+
 			newState = reducer( newState, {
 				type: 'EDIT_ENTITY_RECORD',
 				kind,
 				name,
 				recordId,
-				edits: Object.entries( changes ).reduce(
-					( acc, [ key, value ] ) => {
-						acc[ key ] =
+				edits: Object.fromEntries(
+					Object.entries( changes ).map( ( [ key, value ] ) => {
+						const editValue =
 							action.type === 'UNDO' ? value.from : value.to;
-						return acc;
-					},
-					{}
+						// If the value matches the persisted record, clear
+						// the edit so the entity is no longer dirty for
+						// this property.
+						const persisted =
+							persistedRecord?.[ key ]?.raw ??
+							persistedRecord?.[ key ];
+						return [
+							key,
+							fastDeepEqual( editValue, persisted )
+								? undefined
+								: editValue,
+						];
+					} )
 				),
 			} );
 		} );

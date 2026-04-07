@@ -520,6 +520,42 @@ test.describe( 'undo', () => {
 			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
 		).toHaveText( '' );
 	} );
+
+	// See: http://github.com/WordPress/gutenberg/issues/24679.
+	test( 'should not be dirty after undoing all changes', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello World' );
+		await editor.publishPost();
+		await page
+			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'button', { name: 'Close panel' } )
+			.click();
+
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'Howdy!' );
+
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save' } )
+		).toBeEnabled();
+
+		// Undo new block and content addition.
+		await pageUtils.pressKeys( 'primary+z', { times: 2 } );
+
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save' } )
+		).toBeDisabled();
+	} );
 } );
 
 class UndoUtils {
