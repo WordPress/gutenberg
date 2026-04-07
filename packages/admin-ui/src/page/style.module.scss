@@ -16,7 +16,7 @@
 		var( --wpds-color-stroke-surface-neutral-weak );
 	background: var( --wpds-color-bg-surface-neutral-strong );
 	position: sticky;
-	top: 0;
+	inset-block-start: 0;
 	z-index: 1;
 }
 
