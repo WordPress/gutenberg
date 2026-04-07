@@ -100,7 +100,7 @@ export const WithImageVisual: Story = {
 		title: 'Page title',
 		visual: (
 			<img
-				src="https://s.w.org/about/images/logos/wordpress-logo-notext-rgb.png"
+				src="https://secure.gravatar.com/avatar/c0ccdd53794779bcc07fcae7b79c4d80?s=48&r=g&d=mm"
 				alt="Page visual"
 			/>
 		),
