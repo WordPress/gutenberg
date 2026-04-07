@@ -81,7 +81,6 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
-            actions: write
         outputs:
             has-flaky-test-report: ${{ !!steps.merge-flaky-tests-reports.outputs.artifact-id }}
         steps:
@@ -121,25 +120,6 @@ jobs:
                   name: html-report--attempt-${{ github.run_attempt }}
                   path: playwright-report
                   if-no-files-found: ignore
-
-            - name: Delete blob report artifacts
-              uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
-              continue-on-error: true
-              with:
-                  script: |
-                      const artifacts = await github.paginate(
-                          github.rest.actions.listWorkflowRunArtifacts,
-                          { owner: context.repo.owner, repo: context.repo.repo, run_id: context.runId }
-                      );
-                      for ( const artifact of artifacts ) {
-                          if ( artifact.name.startsWith( 'blob-reports--' ) ) {
-                              await github.rest.actions.deleteArtifact( {
-                                  owner: context.repo.owner,
-                                  repo: context.repo.repo,
-                                  artifact_id: artifact.id,
-                              } );
-                          }
-                      }
 
     report-to-issues:
         name: Report to GitHub
