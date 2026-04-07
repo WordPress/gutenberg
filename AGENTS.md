@@ -67,6 +67,8 @@ vendor/bin/phpcbf <path_to_php_file.php>
 
 For full architecture details, see `docs/explanations/architecture/`.
 
+-   **Design system**: When building admin UI, read `DESIGN.md` first — it covers which packages and components to use, composition patterns, and a working example.
+
 ## Common pitfalls
 
 -   PHP features in `lib/compat/` MUST target a specific `wordpress-X.Y/` subdirectory.
