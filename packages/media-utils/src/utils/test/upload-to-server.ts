@@ -6,7 +6,7 @@ import {
 	xhrState,
 	installMockXhr,
 	uninstallMockXhr,
-} from './mock-xhr';
+} from './helpers/mock-xhr';
 
 // Mock apiFetch as both a callable function and an object with nonceMiddleware.
 const mockApiFetch = jest.fn() as jest.Mock & {
