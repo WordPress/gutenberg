@@ -21,7 +21,6 @@ import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
 import { FIT_TEXT_SUPPORT_KEY } from './fit-text';
 import { cleanEmptyObject, buildStateResetAllFilter } from './utils';
 import { store as blockEditorStore } from '../store';
-import { useBlockEditContext } from '../components/block-edit/context';
 import { useBlockStyle } from './use-block-style';
 
 function omit( object, keys ) {
@@ -132,6 +131,7 @@ function TypographyInspectorControl( {
 export function TypographyPanel( {
 	clientId,
 	name,
+	setAttributes,
 	settings,
 	selectedState = 'default',
 } ) {
@@ -157,7 +157,6 @@ export function TypographyPanel( {
 		[ clientId, isEnabled ]
 	);
 
-	const { setAttributes } = useBlockEditContext();
 	const [ style, setStyle ] = useBlockStyle( null, selectedState );
 	const isStateSelected = selectedState !== 'default';
 

@@ -14,7 +14,6 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
-import { useBlockEditContext } from '../components/block-edit/context';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 import {
@@ -177,6 +176,7 @@ function BackgroundInspectorControl( {
 export function BackgroundImagePanel( {
 	clientId,
 	name,
+	setAttributes,
 	settings,
 	selectedState = 'default',
 } ) {
@@ -202,7 +202,6 @@ export function BackgroundImagePanel( {
 		[ clientId, name ]
 	);
 
-	const { setAttributes } = useBlockEditContext();
 	const [ style, setStyle ] = useBlockStyle( null, selectedState );
 	const isStateSelected = selectedState !== 'default';
 
