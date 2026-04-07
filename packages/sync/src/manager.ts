@@ -323,7 +323,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		}
 
 		if ( false === syncConfig.shouldSync?.( objectType, null ) ) {
-			log( 'loadEntity', 'shouldSync false, skipping', entityId );
+			log( 'loadCollection', 'shouldSync false, skipping', entityId );
 			return; // Sync config indicates that this entity should not be synced.
 		}
 
