@@ -4,7 +4,7 @@
 
 ### Enhancement
 
--   `createInterpolateElement` now infers tag names from `sprintf` return values, since `sprintf` returns `TranslatableText<T>`. ([76972](https://github.com/WordPress/gutenberg/pull/76972))
+-   `createInterpolateElement` now infers tag names from `sprintf` return values, since `sprintf` returns `TransformedText<T>`. ([76974](https://github.com/WordPress/gutenberg/pull/76974))
 
 ## 6.43.0 (2026-04-01)
 

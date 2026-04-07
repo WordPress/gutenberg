@@ -231,8 +231,8 @@ describe( 'createInterpolateElement', () => {
 		const tags: Tags[] = [ 'a', 'b', 'c' ];
 		expect( tags ).toHaveLength( 3 );
 	} );
-	it( 'extracts tags from a TranslatableText input', () => {
-		// Type-level test: verify InterpolationString unwraps TranslatableText.
+	it( 'extracts tags from a TransformedText input', () => {
+		// Type-level test: verify InterpolationString unwraps TransformedText.
 		type Text = InterpolationString<
 			string & {
 				readonly __transformedText: '<a>link</a> and <em>emphasis</em>';
@@ -242,8 +242,8 @@ describe( 'createInterpolateElement', () => {
 		const tags: Tags[] = [ 'a', 'em' ];
 		expect( tags ).toHaveLength( 2 );
 	} );
-	it( 'extracts tags from a sprintf (TranslatableText) input', () => {
-		// Type-level test: sprintf returns TranslatableText, so
+	it( 'extracts tags from a sprintf (TransformedText) input', () => {
+		// Type-level test: sprintf returns TransformedText, so
 		// InterpolationString unwraps it for tag inference.
 		type SprintfResult = string & {
 			readonly __transformedText: '<Name>%1$s</Name> wrote <Link>%2$s</Link>';
