@@ -63,7 +63,7 @@ jobs:
               if: ${{ !cancelled() }}
               with:
                   name: failures-artifacts--${{ matrix.part }}
-                  path: test/e2e/artifacts/test-results
+                  path: artifacts/test-results
                   if-no-files-found: ignore
 
             - name: Archive blob reports (HTML)
