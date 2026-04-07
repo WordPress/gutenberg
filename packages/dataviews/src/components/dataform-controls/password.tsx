@@ -52,6 +52,8 @@ export default function Password< Item >( {
 									? __( 'Hide password' )
 									: __( 'Show password' )
 							}
+							disabled={ disabled }
+							accessibleWhenDisabled
 						/>
 					</InputControlSuffixWrapper>
 				),
