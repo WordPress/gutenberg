@@ -226,37 +226,6 @@ function gutenberg_inject_real_time_collaboration_setting() {
 add_action( 'admin_init', 'gutenberg_inject_real_time_collaboration_setting' );
 
 /**
- * Ensures real-time collaboration is enabled by default when the Gutenberg
- * plugin is active and collaboration is allowed.
- *
- * `default_option_*` fires when the option is not yet in the database,
- * ensuring get_option() returns true even before the option is saved.
- *
- * @return bool True if collaboration is allowed, false otherwise.
- */
-function gutenberg_collaboration_default_enabled() {
-	return wp_is_collaboration_allowed();
-}
-add_filter( 'default_option_wp_collaboration_enabled', 'gutenberg_collaboration_default_enabled' );
-
-/**
- * When the collaboration option is first inserted into the database with a
- * disabled value, overrides it to enabled if collaboration is allowed. This
- * hook fires only on `add_option` — not `update_option` — so it does not
- * interfere with a user explicitly disabling collaboration via the settings
- * page.
- *
- * @param string $option The option name.
- * @param mixed  $value  The option value being stored.
- */
-function gutenberg_override_collaboration_on_add( $option, $value ) {
-	if ( ! $value && wp_is_collaboration_allowed() ) {
-		update_option( 'wp_collaboration_enabled', '1' );
-	}
-}
-add_action( 'add_option_wp_collaboration_enabled', 'gutenberg_override_collaboration_on_add', 10, 2 );
-
-/**
  * Core adds an option with the default value, so we need to set the option to
  * our intended default when the Gutenberg plugin is activated, provided
  * collaboration is allowed.

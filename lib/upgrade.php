@@ -7,7 +7,7 @@
 
 if ( ! defined( '_GUTENBERG_VERSION_MIGRATION' ) ) {
 	// It's necessary to update this version every time a new migration is needed.
-	define( '_GUTENBERG_VERSION_MIGRATION', '22.9.0' );
+	define( '_GUTENBERG_VERSION_MIGRATION', '22.8.0' );
 }
 
 /**
@@ -27,10 +27,6 @@ function _gutenberg_migrate_database() {
 
 		if ( version_compare( $gutenberg_installed_version, '22.8.0', '<' ) ) {
 			_gutenberg_migrate_enable_real_time_collaboration();
-		}
-
-		if ( version_compare( $gutenberg_installed_version, '22.9.0', '<' ) ) {
-			_gutenberg_migrate_enable_collaboration_default();
 		}
 
 		update_option( 'gutenberg_version_migration', _GUTENBERG_VERSION_MIGRATION );
@@ -84,19 +80,6 @@ function _gutenberg_migrate_enable_real_time_collaboration() {
 
 	delete_option( 'enable_real_time_collaboration' );
 	delete_option( 'wp_enable_real_time_collaboration' );
-}
-
-/**
- * Ensure real-time collaboration is enabled by default for existing
- * installations where the option may have been stored as disabled,
- * provided collaboration is allowed.
- *
- * @since 22.9.0
- */
-function _gutenberg_migrate_enable_collaboration_default() {
-	if ( wp_is_collaboration_allowed() ) {
-		update_option( 'wp_collaboration_enabled', '1' );
-	}
 }
 
 // Deletion of the `_wp_file_based` term (in _gutenberg_migrate_remove_fse_drafts) must happen
