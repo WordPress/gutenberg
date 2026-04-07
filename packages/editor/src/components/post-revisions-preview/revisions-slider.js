@@ -8,10 +8,11 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import { useResizeObserver } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 
 /**
@@ -19,6 +20,7 @@ import { chevronLeft, chevronRight } from '@wordpress/icons';
  */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import RevisionDiffChart, { useRevisionDiffStats } from './revision-diff-chart';
 
 /**
  * Slider component for navigating revisions with pagination.
@@ -98,6 +100,12 @@ function RevisionsSlider() {
 		return dateI18n( dateSettings.formats.datetime, revision.date );
 	};
 
+	const diffStats = useRevisionDiffStats( revisions );
+	const [ chartWidth, setChartWidth ] = useState( 0 );
+	const resizeRef = useResizeObserver( ( entries ) => {
+		setChartWidth( entries[ 0 ].contentRect.width );
+	} );
+
 	const showPagination = totalPages > 1;
 
 	if ( isLoading && ! showPagination ) {
@@ -135,19 +143,29 @@ function RevisionsSlider() {
 		isLoading || selectedIndex === -1 ? (
 			<Spinner />
 		) : (
-			<RangeControl
-				__next40pxDefaultSize
-				className="editor-revisions-header__slider"
-				hideLabelFromVision
-				label={ __( 'Revision' ) }
-				max={ revisions?.length - 1 }
-				min={ 0 }
-				marks
-				onChange={ handleSliderChange }
-				renderTooltipContent={ renderTooltipContent }
-				value={ selectedIndex }
-				withInputField={ false }
-			/>
+			<div
+				className="editor-revisions-slider__container"
+				ref={ resizeRef }
+			>
+				<RevisionDiffChart
+					stats={ diffStats }
+					width={ chartWidth }
+					height={ 30 }
+				/>
+				<RangeControl
+					__next40pxDefaultSize
+					className="editor-revisions-header__slider"
+					hideLabelFromVision
+					label={ __( 'Revision' ) }
+					max={ revisions?.length - 1 }
+					min={ 0 }
+					marks
+					onChange={ handleSliderChange }
+					renderTooltipContent={ renderTooltipContent }
+					value={ selectedIndex }
+					withInputField={ false }
+				/>
+			</div>
 		);
 
 	if ( ! showPagination ) {
