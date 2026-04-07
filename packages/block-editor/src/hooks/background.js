@@ -14,6 +14,7 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
+import { useBlockEditContext } from '../components/block-edit/context';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 import {
@@ -23,7 +24,7 @@ import {
 	hasBackgroundGradientValue,
 } from '../components/global-styles/background-panel';
 import { globalStylesDataKey } from '../store/private-keys';
-import { useBlockStateProps } from './state-utils';
+import { useBlockStyle } from './use-block-style';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
@@ -176,18 +177,16 @@ function BackgroundInspectorControl( {
 export function BackgroundImagePanel( {
 	clientId,
 	name,
-	setAttributes,
 	settings,
 	selectedState = 'default',
 } ) {
-	const { style, className, inheritedValue } = useSelect(
+	const { className, inheritedValue } = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getSettings } =
 				select( blockEditorStore );
 			const _settings = getSettings();
 			const blockAttributes = getBlockAttributes( clientId );
 			return {
-				style: blockAttributes?.style,
 				className: blockAttributes?.className,
 				/*
 				 * To ensure we pass down the right inherited values:
@@ -202,6 +201,10 @@ export function BackgroundImagePanel( {
 		},
 		[ clientId, name ]
 	);
+
+	const { setAttributes } = useBlockEditContext();
+	const [ style, setStyle ] = useBlockStyle( null, selectedState );
+	const isStateSelected = selectedState !== 'default';
 
 	const backgroundGradientSupported = hasBackgroundSupport(
 		name,
@@ -223,13 +226,6 @@ export function BackgroundImagePanel( {
 		[ backgroundGradientSupported, selectedState ]
 	);
 
-	// Must be declared before the early return to follow Rules of Hooks.
-	const { isStateSelected, stateValue, stateOnChange } = useBlockStateProps( {
-		selectedState,
-		style,
-		setAttributes,
-	} );
-
 	if (
 		! useHasBackgroundPanel( settings ) ||
 		! hasBackgroundSupport( name )
@@ -238,7 +234,7 @@ export function BackgroundImagePanel( {
 	}
 
 	const onChange = isStateSelected
-		? stateOnChange
+		? setStyle
 		: ( newStyle ) => {
 				const isMigrating =
 					backgroundGradientSupported && !! style?.color?.gradient;
@@ -321,7 +317,7 @@ export function BackgroundImagePanel( {
 			settings={ updatedSettings }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
-			value={ isStateSelected ? stateValue : styleValue }
+			value={ isStateSelected ? style : styleValue }
 		/>
 	);
 }
