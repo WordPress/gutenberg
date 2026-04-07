@@ -10,7 +10,7 @@ import { __, _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import importReusableBlock from '../../utils/import';
-import type { ImportFormProps } from '../../utils/types';
+import type { ImportFormProps, ReusableBlock } from '../../utils/types';
 
 function ImportForm( { instanceId, onUpload }: ImportFormProps ) {
 	const inputId = 'list-reusable-blocks-import-form-' + instanceId;
@@ -32,7 +32,7 @@ function ImportForm( { instanceId, onUpload }: ImportFormProps ) {
 		}
 		setIsLoading( true );
 		importReusableBlock( file )
-			.then( ( reusableBlock: any ) => {
+			.then( ( reusableBlock: ReusableBlock ) => {
 				if ( ! formRef.current ) {
 					return;
 				}
@@ -40,7 +40,7 @@ function ImportForm( { instanceId, onUpload }: ImportFormProps ) {
 				setIsLoading( false );
 				onUpload( reusableBlock );
 			} )
-			.catch( ( errors: any ) => {
+			.catch( ( errors: Error ) => {
 				if ( ! formRef.current ) {
 					return;
 				}
