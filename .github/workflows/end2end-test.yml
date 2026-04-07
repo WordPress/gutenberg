@@ -71,7 +71,7 @@ jobs:
               if: ${{ !cancelled() }}
               with:
                   name: blob-reports--${{ matrix.part }}
-                  path: blob-report
+                  path: test/e2e/blob-report
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
