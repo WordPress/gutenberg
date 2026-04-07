@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import StateControl from '../components/global-styles/state-control';
 import { BlockCardControlsFill } from '../components/block-card';
 
-export const STATES_SUPPORT_KEY = '__experimentalStates';
+export const STATES_SUPPORT_KEY = 'states';
 
 export const STATE_LABELS = {
 	':hover': __( 'Hover' ),
@@ -20,7 +20,7 @@ export const STATE_LABELS = {
 
 /**
  * Renders a state selector (hover, focus, active) in the block card header.
- * Only shown for blocks that declare `__experimentalStates` support.
+ * Only shown for blocks that declare `states` support.
  *
  * @param {Object}   props          Component props.
  * @param {string}   props.name     Block name.
