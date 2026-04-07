@@ -35,8 +35,9 @@ import BlockIcon from '../block-icon';
 
 const { Badge } = unlock( componentsPrivateApis );
 
+const BlockCardControlsKey = Symbol( 'BlockCardControls' );
 export const { Fill: BlockCardControlsFill, Slot: BlockCardControlsSlot } =
-	createSlotFill( 'BlockCardControls' );
+	createSlotFill( BlockCardControlsKey );
 
 function OptionalParentSelectButton( { children, onClick } ) {
 	if ( ! onClick ) {
