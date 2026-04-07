@@ -6,7 +6,7 @@ import { createSelector } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import type { AnnotationsState, WPAnnotation } from '../types';
+import type { AnnotationsState, Annotation } from '../types';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -15,7 +15,7 @@ import type { AnnotationsState, WPAnnotation } from '../types';
  * This should be used as a last resort, since the normalized data should be
  * maintained by the reducer result in state.
  */
-const EMPTY_ARRAY: WPAnnotation[] = [];
+const EMPTY_ARRAY: Annotation[] = [];
 
 /**
  * Returns the annotations for a specific client ID.
@@ -25,7 +25,7 @@ const EMPTY_ARRAY: WPAnnotation[] = [];
  * @return The annotations applicable to this block.
  */
 export const __experimentalGetAnnotationsForBlock = createSelector(
-	( state: AnnotationsState, blockClientId: string ): WPAnnotation[] => {
+	( state: AnnotationsState, blockClientId: string ): Annotation[] => {
 		return ( state?.[ blockClientId ] ?? [] ).filter( ( annotation ) => {
 			return annotation.selector === 'block';
 		} );
@@ -38,7 +38,7 @@ export const __experimentalGetAnnotationsForBlock = createSelector(
 export function __experimentalGetAllAnnotationsForBlock(
 	state: AnnotationsState,
 	blockClientId: string
-): WPAnnotation[] {
+): Annotation[] {
 	return state?.[ blockClientId ] ?? EMPTY_ARRAY;
 }
 
@@ -59,7 +59,7 @@ export const __experimentalGetAnnotationsForRichText = createSelector(
 		state: AnnotationsState,
 		blockClientId: string,
 		richTextIdentifier: string
-	): WPAnnotation[] => {
+	): Annotation[] => {
 		return ( state?.[ blockClientId ] ?? [] )
 			.filter( ( annotation ) => {
 				return (
@@ -89,6 +89,6 @@ export const __experimentalGetAnnotationsForRichText = createSelector(
  */
 export function __experimentalGetAnnotations(
 	state: AnnotationsState
-): WPAnnotation[] {
+): Annotation[] {
 	return Object.values( state ).flat();
 }

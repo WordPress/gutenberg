@@ -4,8 +4,8 @@
 import type {
 	AnnotationAction,
 	AnnotationsState,
-	WPAnnotation,
-	WPAnnotationRange,
+	Annotation,
+	AnnotationRange,
 } from '../types';
 
 /**
@@ -56,7 +56,7 @@ const mapValues = < T, U >(
  * @return Whether the given annotation is valid.
  */
 function isValidAnnotationRange( annotation: {
-	range?: WPAnnotationRange | null;
+	range?: AnnotationRange | null;
 } ): boolean {
 	return Boolean(
 		annotation.range &&
@@ -80,7 +80,7 @@ export function annotations(
 	switch ( action.type ) {
 		case 'ANNOTATION_ADD':
 			const blockClientId = action.blockClientId;
-			const newAnnotation: WPAnnotation = {
+			const newAnnotation: Annotation = {
 				id: action.id,
 				blockClientId,
 				richTextIdentifier: action.richTextIdentifier,
@@ -107,46 +107,38 @@ export function annotations(
 			};
 
 		case 'ANNOTATION_REMOVE':
-			return mapValues(
-				state,
-				( annotationsForBlock: WPAnnotation[] ) => {
-					return filterWithReference(
-						annotationsForBlock,
-						( annotation: WPAnnotation ) => {
-							return annotation.id !== action.annotationId;
-						}
-					);
-				}
-			);
+			return mapValues( state, ( annotationsForBlock: Annotation[] ) => {
+				return filterWithReference(
+					annotationsForBlock,
+					( annotation: Annotation ) => {
+						return annotation.id !== action.annotationId;
+					}
+				);
+			} );
 
 		case 'ANNOTATION_UPDATE_RANGE':
-			return mapValues(
-				state,
-				( annotationsForBlock: WPAnnotation[] ) => {
-					let hasChangedRange = false;
+			return mapValues( state, ( annotationsForBlock: Annotation[] ) => {
+				let hasChangedRange = false;
 
-					const newAnnotations = annotationsForBlock.map(
-						( annotation: WPAnnotation ) => {
-							if ( annotation.id === action.annotationId ) {
-								hasChangedRange = true;
-								return {
-									...annotation,
-									range: {
-										start: action.start,
-										end: action.end,
-									},
-								};
-							}
-
-							return annotation;
+				const newAnnotations = annotationsForBlock.map(
+					( annotation: Annotation ) => {
+						if ( annotation.id === action.annotationId ) {
+							hasChangedRange = true;
+							return {
+								...annotation,
+								range: {
+									start: action.start,
+									end: action.end,
+								},
+							};
 						}
-					);
 
-					return hasChangedRange
-						? newAnnotations
-						: annotationsForBlock;
-				}
-			);
+						return annotation;
+					}
+				);
+
+				return hasChangedRange ? newAnnotations : annotationsForBlock;
+			} );
 
 		case 'ANNOTATION_REMOVE_SOURCE':
 			return mapValues(

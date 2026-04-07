@@ -9,7 +9,7 @@ import type { RichTextValue } from '@wordpress/rich-text';
  * Internal dependencies
  */
 import { STORE_NAME } from '../store/constants';
-import type { WPAnnotation, AnnotationFormat } from '../types';
+import type { Annotation, AnnotationFormat } from '../types';
 
 const FORMAT_NAME = 'core/annotation';
 
@@ -24,7 +24,7 @@ const ANNOTATION_ATTRIBUTE_PREFIX = 'annotation-text-';
  */
 export function applyAnnotations(
 	record: RichTextValue,
-	annotations: WPAnnotation[] = []
+	annotations: Annotation[] = []
 ): RichTextValue {
 	annotations.forEach( ( annotation ) => {
 		let { start, end } = annotation;
@@ -117,7 +117,7 @@ function retrieveAnnotationPositions(
  * @param actions.updateAnnotationRange Function to update an annotation range in the state.
  */
 function updateAnnotationsWithPositions(
-	annotations: WPAnnotation[],
+	annotations: Annotation[],
 	positions: Record< string, { start: number; end?: number } >,
 	{
 		removeAnnotation,

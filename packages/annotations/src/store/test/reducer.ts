@@ -184,7 +184,8 @@ describe( 'annotations', () => {
 			source: 'default',
 			selector: 'range',
 			range: {
-				start: 'not a number' as any,
+				// @ts-expect-error Testing invalid input
+				start: 'not a number',
 				end: 100,
 			},
 		} );
@@ -197,7 +198,8 @@ describe( 'annotations', () => {
 			selector: 'range',
 			range: {
 				start: 100,
-				end: 'not a number' as any,
+				// @ts-expect-error Testing invalid input
+				end: 'not a number',
 			},
 		} );
 

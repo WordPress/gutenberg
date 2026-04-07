@@ -1,7 +1,7 @@
 /**
  * Represents a range in text content.
  */
-export interface WPAnnotationRange {
+export interface AnnotationRange {
 	/** The offset where the annotation should start. */
 	start: number;
 	/** The offset where the annotation should end. */
@@ -16,7 +16,7 @@ export type AnnotationSelector = 'range' | 'block';
 /**
  * Base annotation interface.
  */
-export interface WPAnnotation {
+export interface Annotation {
 	/** Unique identifier for the annotation. */
 	id: string;
 	/** The block client ID this annotation applies to. */
@@ -28,7 +28,7 @@ export interface WPAnnotation {
 	/** Rich text identifier for range annotations. */
 	richTextIdentifier?: string | null;
 	/** Range for range-based annotations. */
-	range?: WPAnnotationRange | null;
+	range?: AnnotationRange | null;
 	/** Start position for annotations returned from selectors. */
 	start?: number;
 	/** End position for annotations returned from selectors. */
@@ -44,7 +44,7 @@ export interface AddAnnotationParameters {
 	/** Identifier for the RichText instance the annotation applies to. */
 	richTextIdentifier?: string | null;
 	/** The range at which to apply this annotation. */
-	range?: WPAnnotationRange | null;
+	range?: AnnotationRange | null;
 	/** The way to apply this annotation. */
 	selector?: AnnotationSelector;
 	/** The source that added the annotation. */
@@ -57,7 +57,7 @@ export interface AddAnnotationParameters {
  * Store state interface.
  */
 export interface AnnotationsState {
-	[ blockClientId: string ]: WPAnnotation[];
+	[ blockClientId: string ]: Annotation[];
 }
 
 /**
@@ -71,7 +71,7 @@ export type AnnotationAction =
 			richTextIdentifier: string | null;
 			source: string;
 			selector: AnnotationSelector;
-			range?: WPAnnotationRange;
+			range?: AnnotationRange;
 	  }
 	| {
 			type: 'ANNOTATION_REMOVE';
@@ -110,10 +110,10 @@ export interface AnnotationFormat {
 			blockClientId: string;
 		}
 	) => {
-		annotations: WPAnnotation[];
+		annotations: Annotation[];
 	};
 	__experimentalCreatePrepareEditableTree: ( props: {
-		annotations: WPAnnotation[];
+		annotations: Annotation[];
 	} ) => ( formats: any[], text: string ) => any[];
 	__experimentalGetPropsForEditableTreeChangeHandler: ( dispatch: any ) => {
 		removeAnnotation: ( annotationId: string ) => void;
@@ -130,6 +130,6 @@ export interface AnnotationFormat {
 			start: number,
 			end: number
 		) => void;
-		annotations: WPAnnotation[];
+		annotations: Annotation[];
 	} ) => ( formats: any[] ) => void;
 }

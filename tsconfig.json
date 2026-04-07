@@ -3,9 +3,9 @@
 	"references": [
 		{ "path": "bin" },
 		{ "path": "packages/a11y" },
-		{ "path": "packages/annotations" },
 		{ "path": "packages/abilities" },
 		{ "path": "packages/admin-ui" },
+		{ "path": "packages/annotations" },
 		{ "path": "packages/api-fetch" },
 		{ "path": "packages/asset-loader" },
 		{ "path": "packages/autop" },

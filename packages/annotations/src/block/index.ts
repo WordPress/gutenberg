@@ -13,7 +13,7 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store } from '../store';
-import type { WPAnnotation } from '../types';
+import type { Annotation } from '../types';
 
 interface BlockListBlockProps {
 	clientId: string;
@@ -30,7 +30,7 @@ interface BlockListBlockProps {
 const addAnnotationClassName = ( OriginalComponent: ComponentType< any > ) => {
 	return withSelect( ( select, ownProps ) => {
 		const { clientId, className } = ownProps as BlockListBlockProps;
-		const annotations: WPAnnotation[] =
+		const annotations: Annotation[] =
 			select( store ).__experimentalGetAnnotationsForBlock( clientId );
 
 		return {
