@@ -18,7 +18,7 @@ export default function Text< Item >( {
 	config,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { prefix, suffix, disabled = false } = config || {};
+	const { prefix, suffix } = config || {};
 
 	return (
 		<ValidatedText
@@ -29,7 +29,6 @@ export default function Text< Item >( {
 				hideLabelFromVision,
 				markWhenOptional,
 				validity,
-				disabled,
 				prefix: prefix ? createElement( prefix ) : undefined,
 				suffix: suffix ? createElement( suffix ) : undefined,
 			} }

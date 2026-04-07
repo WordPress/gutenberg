@@ -41,7 +41,7 @@ function CalendarDateTimeControl< Item >( {
 }: DataFormControlProps< Item > ) {
 	const { compact } = config || {};
 	const { id, label, description, setValue, getValue, isValid } = field;
-	const { disabled = false } = config || {};
+	const disabled = field.isDisabled( { item: data, field } );
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
 
@@ -223,7 +223,6 @@ export default function DateTime< Item >( {
 				onChange={ onChange }
 				hideLabelFromVision={ hideLabelFromVision }
 				operator={ operator }
-				config={ config }
 			/>
 		);
 	}

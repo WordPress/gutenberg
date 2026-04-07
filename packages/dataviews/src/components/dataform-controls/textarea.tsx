@@ -22,7 +22,8 @@ export default function Textarea< Item >( {
 	config,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { rows = 4, disabled = false } = config || {};
+	const { rows = 4 } = config || {};
+	const disabled = field.isDisabled( { item: data, field } );
 	const { label, placeholder, description, setValue, isValid } = field;
 	const value = field.getValue( { item: data } );
 

@@ -139,10 +139,6 @@ export type EditConfigTextarea = {
 	 * Number of rows for the textarea.
 	 */
 	rows?: number;
-	/**
-	 * Whether the control is disabled.
-	 */
-	disabled?: boolean;
 };
 
 /**
@@ -158,10 +154,6 @@ export type EditConfigText = {
 	 * Suffix component to display after the input.
 	 */
 	suffix?: React.ComponentType;
-	/**
-	 * Whether the control is disabled.
-	 */
-	disabled?: boolean;
 };
 
 /**
@@ -173,10 +165,6 @@ export type EditConfigDatetime = {
 	 * Whether to render a compact version without the calendar widget.
 	 */
 	compact?: boolean;
-	/**
-	 * Whether the control is disabled.
-	 */
-	disabled?: boolean;
 };
 
 /**
@@ -184,10 +172,6 @@ export type EditConfigDatetime = {
  */
 export type EditConfigGeneric = {
 	control: Exclude< FieldTypeName, 'text' | 'textarea' | 'datetime' >;
-	/**
-	 * Whether the control is disabled.
-	 */
-	disabled?: boolean;
 };
 
 /**
@@ -259,6 +243,18 @@ export type Field< Item > = {
 	 * Callback used to decide if a field should be displayed.
 	 */
 	isVisible?: ( item: Item ) => boolean;
+
+	/**
+	 * Whether a field should be disabled.
+	 * Can be a boolean or a callback receiving the current item and field.
+	 * Defaults to false.
+	 */
+	isDisabled?:
+		| boolean
+		| ( ( args: {
+				item: Item;
+				field: NormalizedField< Item >;
+		  } ) => boolean );
 
 	/**
 	 * Whether the field is sortable.
@@ -396,6 +392,10 @@ export type NormalizedField< Item > = Omit<
 	filterBy: Required< FilterByConfig > | false;
 	filter: FilterOperatorMap< Item >;
 	readOnly: boolean;
+	isDisabled: ( args: {
+		item: Item;
+		field: NormalizedField< Item >;
+	} ) => boolean;
 	format:
 		| {}
 		| Required< FormatDate >
@@ -478,7 +478,6 @@ export type DataFormControlProps< Item > = {
 		suffix?: React.ComponentType;
 		rows?: number;
 		compact?: boolean;
-		disabled?: boolean;
 	};
 };
 

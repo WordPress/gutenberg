@@ -289,7 +289,6 @@ function CalendarDateControl< Item >( {
 	hideLabelFromVision,
 	markWhenOptional,
 	validity,
-	config,
 }: DataFormControlProps< Item > ) {
 	const {
 		id,
@@ -300,7 +299,7 @@ function CalendarDateControl< Item >( {
 		isValid,
 		format: fieldFormat,
 	} = field;
-	const { disabled = false } = config || {};
+	const disabled = field.isDisabled( { item: data, field } );
 	const [ selectedPresetId, setSelectedPresetId ] = useState< string | null >(
 		null
 	);
@@ -469,7 +468,6 @@ function CalendarDateRangeControl< Item >( {
 	hideLabelFromVision,
 	markWhenOptional,
 	validity,
-	config,
 }: DataFormControlProps< Item > ) {
 	const {
 		id,
@@ -479,7 +477,7 @@ function CalendarDateRangeControl< Item >( {
 		setValue,
 		format: fieldFormat,
 	} = field;
-	const { disabled = false } = config || {};
+	const disabled = field.isDisabled( { item: data, field } );
 	let value: DateRange;
 	const fieldValue = getValue( { item: data } );
 	if (
@@ -715,7 +713,6 @@ export default function DateControl< Item >( {
 	markWhenOptional,
 	operator,
 	validity,
-	config,
 }: DataFormControlProps< Item > ) {
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
@@ -726,7 +723,6 @@ export default function DateControl< Item >( {
 				onChange={ onChange }
 				hideLabelFromVision={ hideLabelFromVision }
 				operator={ operator }
-				config={ config }
 			/>
 		);
 	}
@@ -740,7 +736,6 @@ export default function DateControl< Item >( {
 				hideLabelFromVision={ hideLabelFromVision }
 				markWhenOptional={ markWhenOptional }
 				validity={ validity }
-				config={ config }
 			/>
 		);
 	}
@@ -753,7 +748,6 @@ export default function DateControl< Item >( {
 			hideLabelFromVision={ hideLabelFromVision }
 			markWhenOptional={ markWhenOptional }
 			validity={ validity }
-			config={ config }
 		/>
 	);
 }

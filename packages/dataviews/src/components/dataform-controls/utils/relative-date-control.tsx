@@ -50,7 +50,6 @@ export default function RelativeDateControl< Item >( {
 	onChange,
 	hideLabelFromVision,
 	operator,
-	config,
 }: DataFormControlProps< Item > & {
 	className: string;
 } ) {
@@ -60,7 +59,7 @@ export default function RelativeDateControl< Item >( {
 		];
 
 	const { id, label, description, getValue, setValue } = field;
-	const { disabled = false } = config || {};
+	const disabled = field.isDisabled( { item: data, field } );
 	const fieldValue = getValue( { item: data } );
 	const { value: relValue = '', unit = options[ 0 ].value } =
 		fieldValue && typeof fieldValue === 'object' ? fieldValue : {};

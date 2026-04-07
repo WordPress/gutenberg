@@ -132,7 +132,6 @@ export default function InputWidget( {
 				field={ field }
 				operator={ currentFilter.operator }
 				onChange={ handleChange }
-				config={ { disabled: false } }
 			/>
 		</Flex>
 	);

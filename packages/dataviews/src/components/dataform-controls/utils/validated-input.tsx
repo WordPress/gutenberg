@@ -27,10 +27,6 @@ export type DataFormValidatedTextControlProps< Item > =
 		 * Optional suffix element to display after the input.
 		 */
 		suffix?: React.ReactElement;
-		/**
-		 * Whether the control is disabled.
-		 */
-		disabled?: boolean;
 	};
 
 export default function ValidatedText< Item >( {
@@ -43,11 +39,11 @@ export default function ValidatedText< Item >( {
 	prefix,
 	suffix,
 	validity,
-	disabled,
 }: DataFormValidatedTextControlProps< Item > ) {
 	const { label, placeholder, description, getValue, setValue, isValid } =
 		field;
 	const value = getValue( { item: data } );
+	const disabled = field.isDisabled( { item: data, field } );
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>

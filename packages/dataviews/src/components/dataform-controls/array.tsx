@@ -21,11 +21,10 @@ export default function ArrayControl< Item >( {
 	hideLabelFromVision,
 	markWhenOptional,
 	validity,
-	config,
 }: DataFormControlProps< Item > ) {
 	const { label, placeholder, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } );
-	const { disabled = false } = config || {};
+	const disabled = field.isDisabled( { item: data, field } );
 
 	const { elements, isLoading } = useElements( {
 		elements: field.elements,

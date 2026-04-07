@@ -20,9 +20,7 @@ export default function Url< Item >( {
 	hideLabelFromVision,
 	markWhenOptional,
 	validity,
-	config,
 }: DataFormControlProps< Item > ) {
-	const { disabled = false } = config || {};
 	return (
 		<ValidatedText
 			{ ...{
@@ -32,7 +30,6 @@ export default function Url< Item >( {
 				hideLabelFromVision,
 				markWhenOptional,
 				validity,
-				disabled,
 				type: 'url',
 				prefix: (
 					<InputControlPrefixWrapper variant="icon">

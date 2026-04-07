@@ -340,46 +340,10 @@ const LayoutRegularComponent = ( {
 			return fields;
 		}
 
-		return fields.map( ( field ) => {
-			const editConfig = field.Edit;
-			let newEdit: any;
-
-			if ( typeof editConfig === 'string' ) {
-				newEdit = {
-					control: editConfig,
-					disabled: true,
-				};
-			} else if (
-				typeof editConfig === 'object' &&
-				editConfig !== null
-			) {
-				newEdit = {
-					...editConfig,
-					disabled: true,
-				};
-			} else if ( field.type ) {
-				// boolean is the only field type whose default Edit control is not the same as its type.
-				let control: string = field.type || 'text';
-				if ( field.type === 'boolean' ) {
-					control = 'checkbox';
-				}
-				if ( field.elements ) {
-					control = 'select';
-				}
-
-				newEdit = {
-					control,
-					disabled: true,
-				};
-			} else {
-				newEdit = null;
-			}
-
-			return {
-				...field,
-				Edit: newEdit,
-			} as Field< SamplePost >;
-		} );
+		return fields.map( ( field ) => ( {
+			...field,
+			isDisabled: true,
+		} ) );
 	}, [ disabled ] );
 
 	const form: Form = useMemo(

@@ -21,10 +21,9 @@ export default function Radio< Item >( {
 	hideLabelFromVision,
 	markWhenOptional,
 	validity,
-	config,
 }: DataFormControlProps< Item > ) {
 	const { label, description, getValue, setValue, isValid } = field;
-	const { disabled = false } = config || {};
+	const disabled = field.isDisabled( { item: data, field } );
 	const { elements, isLoading } = useElements( {
 		elements: field.elements,
 		getElements: field.getElements,

@@ -72,10 +72,9 @@ export default function Color< Item >( {
 	hideLabelFromVision,
 	markWhenOptional,
 	validity,
-	config,
 }: DataFormControlProps< Item > ) {
 	const { label, placeholder, description, setValue, isValid } = field;
-	const { disabled = false } = config || {};
+	const disabled = field.isDisabled( { item: data, field } );
 	const value = field.getValue( { item: data } ) || '';
 
 	const handleColorChange = useCallback(

@@ -91,13 +91,12 @@ export default function ValidatedNumber< Item >( {
 	markWhenOptional,
 	operator,
 	validity,
-	config,
 }: DataFormControlProps< Item > ) {
 	const decimals = ( field.format as FormatNumber )?.decimals ?? 0;
 	const step = Math.pow( 10, Math.abs( decimals ) * -1 );
 	const { label, description, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } ) ?? '';
-	const { disabled = false } = config || {};
+	const disabled = field.isDisabled( { item: data, field } );
 
 	const onChangeControl = useCallback(
 		( newValue: string | undefined ) => {

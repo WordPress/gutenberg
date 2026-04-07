@@ -21,10 +21,9 @@ export default function Select< Item >( {
 	hideLabelFromVision,
 	markWhenOptional,
 	validity,
-	config,
 }: DataFormControlProps< Item > ) {
 	const { type, label, description, getValue, setValue, isValid } = field;
-	const { disabled = false } = config || {};
+	const disabled = field.isDisabled( { item: data, field } );
 
 	const isMultiple = type === 'array';
 	const value = getValue( { item: data } ) ?? ( isMultiple ? [] : '' );

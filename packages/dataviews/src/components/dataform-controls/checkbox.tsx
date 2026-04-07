@@ -20,10 +20,9 @@ export default function Checkbox< Item >( {
 	hideLabelFromVision,
 	markWhenOptional,
 	validity,
-	config,
 }: DataFormControlProps< Item > ) {
 	const { getValue, setValue, label, description, isValid } = field;
-	const { disabled = false } = config || {};
+	const disabled = field.isDisabled( { item: data, field } );
 
 	const onChangeControl = useCallback( () => {
 		onChange(
