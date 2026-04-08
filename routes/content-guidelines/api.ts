@@ -116,7 +116,6 @@ async function saveGuidelinesBypassingStore(
  * @param file Content Guidelines JSON file
  */
 export async function importContentGuidelines( file: File ): Promise< void > {
-	// @ts-ignore
 	const { setFromResponse } = dispatch( coreContentGuidelinesStore );
 	const guidelinesStore = select( coreContentGuidelinesStore );
 	const { createSuccessNotice } = dispatch( noticesStore );

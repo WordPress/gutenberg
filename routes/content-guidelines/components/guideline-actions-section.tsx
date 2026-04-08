@@ -57,7 +57,7 @@ export default function ActionsSection() {
 				sprintf(
 					/* translators: %s: Error message. */
 					__( 'We ran into a problem importing your guidelines: %s' ),
-					err.message
+					( err as Error ).message
 				)
 			);
 		} finally {
@@ -74,7 +74,7 @@ export default function ActionsSection() {
 				sprintf(
 					/* translators: %s: Error message. */
 					__( 'We ran into a problem exporting your guidelines: %s' ),
-					err.message
+					( err as Error ).message
 				)
 			);
 		}
