@@ -15,6 +15,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { addQueryArgs } from '@wordpress/url';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEvent } from '@wordpress/compose';
+import { Link } from '@wordpress/ui';
 import { useView } from '@wordpress/views';
 import { Modal } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
@@ -45,7 +46,7 @@ import {
 
 const { usePostActions, usePostFields, templateTitleField } =
 	unlock( editorPrivateApis );
-const { useHistory, useLocation, Link } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
 export default function PageTemplates() {
@@ -351,7 +352,7 @@ export default function PageTemplates() {
 				renderItemLink={ ( { item, ...props } ) =>
 					typeof item.id !== 'string' ? (
 						<Link
-							to={ `/${ item.type }/${ item.id }?canvas=edit` }
+							href={ `/${ item.type }/${ item.id }?canvas=edit` }
 							{ ...props }
 						/>
 					) : (

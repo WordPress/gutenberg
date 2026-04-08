@@ -13,6 +13,7 @@ import { useSelect } from '@wordpress/data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useEvent, usePrevious } from '@wordpress/compose';
+import { Link } from '@wordpress/ui';
 import { addQueryArgs } from '@wordpress/url';
 import { useView, useViewConfig } from '@wordpress/views';
 
@@ -38,7 +39,7 @@ import useNotesCount from './use-notes-count';
 import { QuickEditModal } from './quick-edit-modal';
 
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
-const { useLocation, useHistory, Link } = unlock( routerPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const EMPTY_ARRAY = [];
 
@@ -323,7 +324,7 @@ export default function PostList( { postType } ) {
 				} }
 				renderItemLink={ ( { item, ...props } ) => (
 					<Link
-						to={ `/${ postType }/${ item.id }?canvas=edit` }
+						href={ `/${ postType }/${ item.id }?canvas=edit` }
 						{ ...props }
 					/>
 				) }

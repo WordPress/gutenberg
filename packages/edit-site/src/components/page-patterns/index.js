@@ -11,6 +11,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useView, useViewConfig } from '@wordpress/views';
 import { useSelect } from '@wordpress/data';
+import { Link } from '@wordpress/ui';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -35,7 +36,7 @@ import usePatternCategories from '../sidebar-navigation-screen-patterns/use-patt
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
-const { useLocation, useHistory, Link } = unlock( routerPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
@@ -215,7 +216,7 @@ export default function DataviewsPatterns() {
 					} }
 					renderItemLink={ ( { item, ...props } ) => (
 						<Link
-							to={ `/${ item.type }/${
+							href={ `/${ item.type }/${
 								[
 									PATTERN_TYPES.user,
 									TEMPLATE_PART_POST_TYPE,
