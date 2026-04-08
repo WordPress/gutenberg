@@ -130,6 +130,18 @@ export function TimePicker( {
 		onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
 	};
 
+	const handleInputChange = (
+		event: React.FormEvent< HTMLInputElement >,
+		method: 'date' | 'year'
+	) => {
+		const newValue = ( event as React.ChangeEvent< HTMLInputElement > )
+			.target.value;
+		const changeCallback = buildNumberControlChangeCallback(
+			method === 'year' ? 'year' : 'date'
+		);
+		changeCallback( newValue, { event } );
+	};
+
 	const dayField = (
 		<DayInput
 			key="day"
@@ -147,6 +159,7 @@ export function TimePicker( {
 			isDragEnabled={ false }
 			isShiftStepEnabled={ false }
 			onChange={ buildNumberControlChangeCallback( 'date' ) }
+			onInput={ ( e ) => handleInputChange( e, 'date' ) }
 		/>
 	);
 
@@ -190,6 +203,7 @@ export function TimePicker( {
 			isShiftStepEnabled={ false }
 			onChange={ buildNumberControlChangeCallback( 'year' ) }
 			__unstableStateReducer={ buildPadInputStateReducer( 4 ) }
+			onInput={ ( e ) => handleInputChange( e, 'year' ) }
 		/>
 	);
 
