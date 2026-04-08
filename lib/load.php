@@ -80,14 +80,14 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.0/connectors.php';
 
 	// WordPress 7.1 compat.
-	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-icons-registry-7-1.php';
-	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-icons-controller-7-1.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php';
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
+	require_once __DIR__ . '/class-wp-icons-registry-gutenberg.php';
+	require_once __DIR__ . '/class-wp-rest-icons-controller-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
 
 	// Experimental autosaves controller override for real-time collaboration.

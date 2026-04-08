@@ -1,25 +1,25 @@
 <?php
 /**
- * Unit tests covering Gutenberg_Icons_Registry_7_1::register functionality.
+ * Unit tests covering WP_Icons_Registry_Gutenberg::register functionality.
  *
  * @package Gutenberg
  */
-class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
+class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 
 	/**
 	 * Registry instance for testing.
 	 *
-	 * @var Gutenberg_Icons_Registry_7_1
+	 * @var WP_Icons_Registry_Gutenberg
 	 */
 	private $registry;
 
 	public function set_up() {
 		parent::set_up();
-		$this->registry = Gutenberg_Icons_Registry_7_1::get_instance();
+		$this->registry = WP_Icons_Registry_Gutenberg::get_instance();
 	}
 
 	public function tear_down() {
-		$instance_property = new ReflectionProperty( Gutenberg_Icons_Registry_7_1::class, 'instance' );
+		$instance_property = new ReflectionProperty( WP_Icons_Registry_Gutenberg::class, 'instance' );
 
 		/*
 		 * ReflectionProperty::setAccessible is:
@@ -38,7 +38,7 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Invokes Gutenberg_Icons_Registry_7_1::register despite it being private
+	 * Invokes WP_Icons_Registry_Gutenberg::register despite it being private
 	 *
 	 * @param string $icon_name       Icon name including namespace.
 	 * @param array  $icon_properties Icon properties (label, content, filePath).
@@ -92,7 +92,7 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 	/**
 	 * Should fail to re-register the same icon.
 	 *
-	 * @expectedIncorrectUsage Gutenberg_Icons_Registry_7_1::register
+	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register
 	 */
 	public function test_register_icon_twice() {
 		$name     = 'test-plugin/duplicate';
@@ -111,7 +111,7 @@ class Gutenberg_Icons_Registry_7_1_Test extends WP_UnitTestCase {
 	 * Should fail to register icon with invalid names.
 	 *
 	 * @dataProvider data_invalid_icon_names
-	 * @expectedIncorrectUsage Gutenberg_Icons_Registry_7_1::register
+	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register
 	 */
 	public function test_register_invalid_name() {
 		foreach ( $this->data_invalid_icon_names() as $name ) {
