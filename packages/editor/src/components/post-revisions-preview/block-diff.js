@@ -191,6 +191,9 @@ function pairSimilarBlocks( blocks ) {
 					rem.block.innerHTML || '',
 					add.block.innerHTML || ''
 				);
+				// Skip identical blocks (score=1 with same attrs) — those
+				// are position swaps, not modifications. They should show
+				// as separate removed + added, not as a no-op "modified".
 				const attrsMatch =
 					JSON.stringify( rem.block.attrs ) ===
 					JSON.stringify( add.block.attrs );
