@@ -1859,6 +1859,257 @@ describe( 'crdt-blocks', () => {
 			expect( content.toString() ).toBe( 'A2' );
 		} );
 
+		it( 'preserves Y.Map identity when a row is prepended', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A2', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as Y.Array< unknown >;
+			const row0Before = body.get( 0 ) as Y.Map< unknown >;
+			const row1Before = body.get( 1 ) as Y.Map< unknown >;
+
+			// Prepend a new row.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'NEW', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A2', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( body.length ).toBe( 3 );
+
+			const bodyJson = body.toJSON() as {
+				cells: { content: string }[];
+			}[];
+			expect( bodyJson[ 0 ].cells[ 0 ].content ).toBe( 'NEW' );
+			expect( bodyJson[ 1 ].cells[ 0 ].content ).toBe( 'A1' );
+			expect( bodyJson[ 2 ].cells[ 0 ].content ).toBe( 'A2' );
+
+			// Original rows should be the same Y.Map objects (shifted).
+			expect( body.get( 1 ) ).toBe( row0Before );
+			expect( body.get( 2 ) ).toBe( row1Before );
+		} );
+
+		it( 'preserves Y.Map identity when a row is inserted in the middle', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A3', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as Y.Array< unknown >;
+			const row0Before = body.get( 0 ) as Y.Map< unknown >;
+			const row1Before = body.get( 1 ) as Y.Map< unknown >;
+
+			// Insert a new row in the middle.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A2', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A3', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( body.length ).toBe( 3 );
+
+			const bodyJson = body.toJSON() as {
+				cells: { content: string }[];
+			}[];
+			expect( bodyJson[ 0 ].cells[ 0 ].content ).toBe( 'A1' );
+			expect( bodyJson[ 1 ].cells[ 0 ].content ).toBe( 'A2' );
+			expect( bodyJson[ 2 ].cells[ 0 ].content ).toBe( 'A3' );
+
+			// Original rows should be preserved.
+			expect( body.get( 0 ) ).toBe( row0Before );
+			expect( body.get( 2 ) ).toBe( row1Before );
+		} );
+
+		it( 'preserves Y.Map identity when a row is deleted from the end', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A2', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A3', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as Y.Array< unknown >;
+			const row0Before = body.get( 0 ) as Y.Map< unknown >;
+			const row1Before = body.get( 1 ) as Y.Map< unknown >;
+
+			// Delete the last row.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A2', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( body.length ).toBe( 2 );
+
+			const bodyJson = body.toJSON() as {
+				cells: { content: string }[];
+			}[];
+			expect( bodyJson[ 0 ].cells[ 0 ].content ).toBe( 'A1' );
+			expect( bodyJson[ 1 ].cells[ 0 ].content ).toBe( 'A2' );
+
+			// Remaining rows should be the same Y.Map objects.
+			expect( body.get( 0 ) ).toBe( row0Before );
+			expect( body.get( 1 ) ).toBe( row1Before );
+		} );
+
+		it( 'updates all elements in-place when every row changes', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A2', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as Y.Array< unknown >;
+			const row0Before = body.get( 0 ) as Y.Map< unknown >;
+			const row1Before = body.get( 1 ) as Y.Map< unknown >;
+
+			// Replace all row contents.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'X1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'X2', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( body.length ).toBe( 2 );
+
+			const bodyJson = body.toJSON() as {
+				cells: { content: string }[];
+			}[];
+			expect( bodyJson[ 0 ].cells[ 0 ].content ).toBe( 'X1' );
+			expect( bodyJson[ 1 ].cells[ 0 ].content ).toBe( 'X2' );
+
+			// Y.Map objects should be updated in-place, not recreated.
+			expect( body.get( 0 ) ).toBe( row0Before );
+			expect( body.get( 1 ) ).toBe( row1Before );
+		} );
+
 		it( 'migrates plain array to Y.Array on first update', () => {
 			// Manually set up a block with a plain array body (old format).
 			const block = new Y.Map() as unknown as YBlock;
