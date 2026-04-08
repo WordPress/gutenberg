@@ -52,8 +52,7 @@ test.describe( 'Accordion', () => {
 		const accordionPanel = page.getByRole( 'region', {
 			name: 'Accordion Title',
 		} );
-		// TEMPORARY: Intentionally failing to test artifact upload on CI. Remove after verification.
-		await expect( accordionPanel ).toBeHidden();
+		await expect( accordionPanel ).toBeVisible();
 	} );
 
 	test( 'should close other accordion items when autoclose is true', async ( {
