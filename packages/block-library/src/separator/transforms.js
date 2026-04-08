@@ -1,17 +1,34 @@
 /**
  * WordPress dependencies
  */
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import {
+	createBlock,
+	getBlockType,
+	getDefaultBlockName,
+} from '@wordpress/blocks';
 
 const transforms = {
 	from: [
 		{
 			type: 'input',
 			regExp: /^-{3,}$/,
-			transform: () => [
-				createBlock( 'core/separator' ),
-				createBlock( getDefaultBlockName() ),
-			],
+			transform: () => {
+				// Check for default variation to preserve attributes.
+				const blockType = getBlockType( 'core/separator' );
+				const defaultVariation = blockType?.variations?.find(
+					( variation ) => variation.isDefault
+				);
+
+				// Fall back to empty attributes if no default variation is found.
+				const attributes = defaultVariation
+					? defaultVariation.attributes
+					: {};
+
+				return [
+					createBlock( 'core/separator', attributes ),
+					createBlock( getDefaultBlockName() ),
+				];
+			},
 		},
 		{
 			type: 'raw',
