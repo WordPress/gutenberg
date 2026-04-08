@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -43,7 +43,9 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 		shouldShowLink = false;
 	} else if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
-		noticeMessage = __( 'Draft saved.' );
+		noticeMessage =
+			postType.labels.item_drafted ||
+			_x( 'Draft saved.', 'post saved in draft status' );
 		isDraft = true;
 	} else if ( isPublished && ! willPublish ) {
 		// If undoing publish status, show specific notice.

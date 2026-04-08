@@ -10,6 +10,7 @@ import {
 describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 	const postType = {
 		labels: {
+			item_drafted: 'drafted',
 			item_reverted_to_draft: 'draft',
 			item_published: 'publish',
 			item_published_privately: 'private',
@@ -34,7 +35,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 		[
 			'when previous post is not published and post will not be published',
 			[ 'draft', 'draft', false ],
-			[ 'Draft saved.', defaultExpectedAction ],
+			[ 'drafted', defaultExpectedAction ],
 		],
 		[
 			'when previous post is published and post will be unpublished',

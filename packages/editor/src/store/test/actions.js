@@ -30,6 +30,7 @@ const postTypeEntity = {
 	slug: 'post',
 	rest_base: 'posts',
 	labels: {
+		item_drafted: 'Draft saved as post type label.',
 		item_updated: 'Updated Post',
 		item_published: 'Post published',
 		item_reverted_to_draft: 'Post reverted to draft.',
@@ -138,7 +139,7 @@ describe( 'Post actions', () => {
 			expect( notices ).toMatchObject( [
 				{
 					status: 'success',
-					content: 'Draft saved.',
+					content: 'Draft saved as post type label.',
 				},
 			] );
 		} );
