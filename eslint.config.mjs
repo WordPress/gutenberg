@@ -737,9 +737,10 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: UI package — disable dependency-group.
+	// Override: Packages which have eliminated dependency grouping comments
+	// and explicitly prevent new additions.
 	{
-		files: [ 'packages/ui/src/**' ],
+		files: [ 'packages/ui/**', 'packages/design-system-mcp/**' ],
 		rules: {
 			'@wordpress/dependency-group': [ 'error', 'never' ],
 		},
