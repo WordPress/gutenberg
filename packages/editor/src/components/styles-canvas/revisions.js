@@ -23,7 +23,8 @@ import { unlock } from '../../lock-unlock';
 
 const {
 	ExperimentalBlockEditorProvider,
-	__unstableBlockStyleVariationOverridesWithConfig,
+	__unstableBlockStyleVariationOverridesWithConfig:
+		BlockStyleVariationOverridesWithConfig,
 } = unlock( blockEditorPrivateApis );
 
 function isObjectEmpty( object ) {
@@ -133,7 +134,7 @@ function StylesCanvasRevisions( { path }, ref ) {
 					 * so they can access any registered style overrides.
 					 */ }
 					<EditorStyles styles={ editorStyles } />
-					<__unstableBlockStyleVariationOverridesWithConfig
+					<BlockStyleVariationOverridesWithConfig
 						config={ mergedConfig }
 					/>
 				</ExperimentalBlockEditorProvider>
