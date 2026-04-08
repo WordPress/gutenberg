@@ -30,6 +30,9 @@ const meta: Meta< typeof RadioControl > = {
 		help: {
 			control: { type: 'text' },
 		},
+		disabled: {
+			control: { type: 'boolean' },
+		},
 	},
 	parameters: {
 		controls: {
