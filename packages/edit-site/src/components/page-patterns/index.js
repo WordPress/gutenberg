@@ -11,6 +11,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useView, useViewConfig } from '@wordpress/views';
 import { useSelect } from '@wordpress/data';
+// eslint-disable-next-line @wordpress/use-recommended-components
 import { Link } from '@wordpress/ui';
 import { addQueryArgs } from '@wordpress/url';
 

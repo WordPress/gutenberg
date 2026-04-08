@@ -15,6 +15,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { addQueryArgs } from '@wordpress/url';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEvent } from '@wordpress/compose';
+// eslint-disable-next-line @wordpress/use-recommended-components
 import { Link } from '@wordpress/ui';
 import { useView } from '@wordpress/views';
 import { Modal } from '@wordpress/components';
