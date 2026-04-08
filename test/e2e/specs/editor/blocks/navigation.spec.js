@@ -1891,7 +1891,9 @@ test.describe( 'Navigation block', () => {
 				} );
 				await expect( linkButton ).toBeVisible();
 				await expect( linkButton ).toBeEnabled();
-				await expect( linkButton ).toContainText( 'localhost' );
+				await expect( linkButton ).toContainText(
+					'Test Page 1 – gutenberg'
+				);
 			} );
 
 			await test.step( 'Click LinkPicker button to open dropdown', async () => {
@@ -2143,7 +2145,7 @@ class Navigation {
 
 	getLinkControlLink( linkName ) {
 		return this.page.getByRole( 'link', {
-			name: `${ linkName } (opens in a new tab)`,
+			name: `${ linkName } – gutenberg (opens in a new tab)`,
 			exact: true,
 		} );
 	}
