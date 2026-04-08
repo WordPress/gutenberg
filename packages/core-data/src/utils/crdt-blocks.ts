@@ -693,13 +693,15 @@ function mergeYArray(
 		newValue.length - yArray.length
 	);
 
-	for ( let i = 0; i < numOfInsertionsNeeded; i++ ) {
-		yArray.insert( left + numOfUpdatesNeeded + i, [
-			createYMapFromQuery(
-				query,
-				newValue[ left + numOfUpdatesNeeded + i ]
-			),
-		] );
+	if ( numOfInsertionsNeeded > 0 ) {
+		const insertAt = left + numOfUpdatesNeeded;
+
+		yArray.insert(
+			insertAt,
+			newValue
+				.slice( insertAt, insertAt + numOfInsertionsNeeded )
+				.map( ( item ) => createYMapFromQuery( query, item ) )
+		);
 	}
 }
 
