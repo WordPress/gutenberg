@@ -79,10 +79,3 @@
 	margin-top: $grid-unit-30;
 }
 
-.content-guidelines__import-description {
-	margin: 0;
-
-	&:not(:last-child) {
-		margin-bottom: $grid-unit-10;
-	}
-}

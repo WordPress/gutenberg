@@ -21,7 +21,7 @@ import './guideline-actions-section.scss';
 import { importContentGuidelines, exportContentGuidelines } from '../api';
 import ActionItem from './action-item';
 
-export default function ActionsSection() {
+export default function GuidelineActionsSection() {
 	const { goTo } = useNavigator();
 
 	const fileInputRef = useRef< HTMLInputElement >( null );

@@ -209,7 +209,12 @@ export function exportContentGuidelines(): void {
 		},
 	};
 
-	const exportDate = new Date().toISOString().slice( 0, 10 );
+	const now = new Date();
+	const exportDate = [
+		now.getFullYear(),
+		String( now.getMonth() + 1 ).padStart( 2, '0' ),
+		String( now.getDate() ).padStart( 2, '0' ),
+	].join( '-' );
 	downloadBlob(
 		`guidelines-${ exportDate }.json`,
 		JSON.stringify( data, null, 2 ),
