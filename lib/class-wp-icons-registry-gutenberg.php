@@ -217,7 +217,15 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 function gutenberg_override_wp_icons_registry() {
 	$reflection = new ReflectionClass( WP_Icons_Registry::class );
 	$property   = $reflection->getProperty( 'instance' );
-	$property->setAccessible( true );
+	/*
+		* ReflectionProperty::setAccessible is:
+		* - redundant as of 8.1.0, which made all properties accessible
+		* - deprecated as of 8.5.0
+		* - needed until 8.1.0, as property `instance` is private
+		*/
+	if ( PHP_VERSION_ID < 80100 ) {
+		$property->setAccessible( true );
+	}
 	$original_registry  = $property->getValue( null );
 	$gutenberg_registry = WP_Icons_Registry_Gutenberg::get_instance();
 
@@ -225,7 +233,15 @@ function gutenberg_override_wp_icons_registry() {
 	// the `core/` namespace onto the Gutenberg registry so they are not lost.
 	if ( null !== $original_registry ) {
 		$register_method = new ReflectionMethod( WP_Icons_Registry_Gutenberg::class, 'register' );
-		$register_method->setAccessible( true );
+		/*
+		 * ReflectionMethod::setAccessible is:
+		 * - redundant as of 8.1.0, which made all properties accessible
+		 * - deprecated as of 8.5.0
+		 * - needed until 8.1.0, as property `instance` is private
+		 */
+		if ( PHP_VERSION_ID < 80100 ) {
+			$register_method->setAccessible( true );
+		}
 		foreach ( $original_registry->get_registered_icons() as $icon ) {
 			if ( strpos( $icon['name'], 'core/' ) === 0 ) {
 				continue;
