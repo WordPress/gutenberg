@@ -625,4 +625,240 @@ test.describe( 'Content-only lock', () => {
 		const afterColumn = afterBlocks[ 0 ].innerBlocks[ 0 ].innerBlocks[ 1 ];
 		expect( afterColumn.innerBlocks.length ).toBe( initialColumnChildren );
 	} );
+
+	test( 'should insert blocks via Add before and Add after for paragraphs in contentOnly mode', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Original</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+			includeHidden: true,
+		} );
+
+		// Select the paragraph and click "Add after".
+		await editor.selectBlocks( paragraph );
+		await editor.clickBlockOptionsMenuItem( 'Add after' );
+
+		// Verify a new default block was inserted after the original.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Original' },
+					},
+					{
+						name: 'core/paragraph',
+						attributes: { content: '' },
+					},
+				],
+			},
+		] );
+
+		// Re-select the first paragraph and click "Add before".
+		const firstParagraph = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+				includeHidden: true,
+			} )
+			.first();
+		await editor.selectBlocks( firstParagraph );
+		await editor.clickBlockOptionsMenuItem( 'Add before' );
+
+		// Verify a new default block was inserted before the original.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: '' },
+					},
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Original' },
+					},
+					{
+						name: 'core/paragraph',
+						attributes: { content: '' },
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should duplicate paragraphs in contentOnly mode', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Hello</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+			includeHidden: true,
+		} );
+
+		// Select the paragraph and duplicate it.
+		await editor.selectBlocks( paragraph );
+		await editor.clickBlockOptionsMenuItem( 'Duplicate' );
+
+		// Verify the block tree now has two paragraphs with the same content.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Hello' },
+					},
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Hello' },
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should allow removing a default block when siblings exist but not the last one', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>First</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		// Select the first paragraph and delete it.
+		const firstParagraph = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+				includeHidden: true,
+			} )
+			.first();
+		await editor.selectBlocks( firstParagraph );
+		await editor.clickBlockOptionsMenuItem( 'Delete' );
+
+		// Verify only the second paragraph remains.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Second' },
+					},
+				],
+			},
+		] );
+
+		// Select the remaining paragraph and open the Options menu —
+		// "Delete" should not be available since it is the last default block.
+		const remainingParagraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+			includeHidden: true,
+		} );
+		await editor.selectBlocks( remainingParagraph );
+		await editor.showBlockToolbar();
+
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+
+		await expect(
+			page
+				.getByRole( 'menu', { name: 'Options' } )
+				.getByRole( 'menuitem', { name: 'Delete' } )
+		).toBeHidden();
+	} );
+
+	test( 'should not allow removing non-content-role blocks via keyboard shortcut in contentOnly mode', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:heading -->
+<h2 class="wp-block-heading">My Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>A paragraph</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		const groupBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Group',
+		} );
+		const heading = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Heading',
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'My Heading' } );
+
+		// Select the content-locked group block first.
+		await editor.selectBlocks( groupBlock );
+
+		// Select the heading and attempt to delete via keyboard shortcut.
+		await editor.selectBlocks( heading );
+		await pageUtils.pressKeys( 'access+z' );
+
+		// Verify both blocks still exist — the heading was not removed.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/heading',
+						attributes: { content: 'My Heading' },
+					},
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'A paragraph' },
+					},
+				],
+			},
+		] );
+	} );
 } );
