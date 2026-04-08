@@ -4,12 +4,66 @@ const tokenList = tokenListModule.default || tokenListModule;
 const {
 	DS_TOKEN_PREFIX,
 	collectTokenOccurrences,
-	getUniqueTokenNames,
 	getStaticNodeValue,
 } = require( '../utils/ds-token-utils' );
 
 const knownTokens = new Set( tokenList );
 const wpdsTokensRegex = new RegExp( `(?:^|[^\\w])--${ DS_TOKEN_PREFIX }`, 'i' );
+
+/**
+ * @param {Array<{ token: string, bare: boolean, declaration: boolean }>} occurrences
+ * @param {{ includeBareTokens?: boolean }}                               [options]
+ */
+function getInvalidTokenNames(
+	occurrences,
+	{ includeBareTokens = true } = {}
+) {
+	const unknownTokens = new Set();
+	const bareTokens = new Set();
+
+	for ( const { token, bare, declaration } of occurrences ) {
+		if ( ! knownTokens.has( token ) ) {
+			unknownTokens.add( token );
+			continue;
+		}
+
+		if ( includeBareTokens && bare && ! declaration ) {
+			bareTokens.add( token );
+		}
+	}
+
+	return {
+		unknownTokens: [ ...unknownTokens ],
+		bareTokens: [ ...bareTokens ],
+	};
+}
+
+/**
+ * @param {string[]} tokenNames
+ */
+function formatTokenNames( tokenNames ) {
+	return tokenNames.map( ( token ) => `'${ token }'` ).join( ', ' );
+}
+
+/**
+ * @param {import('eslint').Rule.RuleContext} context
+ * @param {import('estree').Node}             node
+ * @param {'onlyKnownTokens' | 'bareToken'}   messageId
+ * @param {string[]}                          tokenNames
+ */
+function reportTokenNames( context, node, messageId, tokenNames ) {
+	if ( tokenNames.length === 0 ) {
+		return;
+	}
+
+	context.report( {
+		node,
+		messageId,
+		data: {
+			tokenNames: formatTokenNames( tokenNames ),
+		},
+	} );
+}
 
 module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 	meta: {
@@ -45,8 +99,7 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 			 */
 			[ dynamicTemplateLiteralAST ]( node ) {
 				let hasDynamic = false;
-				const unknownTokens = [];
-				const bareTokens = [];
+				const occurrences = [];
 
 				for ( const quasi of node.quasis ) {
 					const raw = quasi.value.raw;
@@ -60,7 +113,7 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 						hasDynamic = true;
 					}
 
-					let occurrences = collectTokenOccurrences(
+					let quasiOccurrences = collectTokenOccurrences(
 						value,
 						DS_TOKEN_PREFIX
 					);
@@ -68,20 +121,17 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 					if ( isFollowedByExpression ) {
 						const endMatch = value.match( /(--([\w-]+))$/ );
 						if ( endMatch ) {
-							occurrences = occurrences.filter(
-								( o ) => o.token !== endMatch[ 1 ]
+							quasiOccurrences = quasiOccurrences.filter(
+								( { token } ) => token !== endMatch[ 1 ]
 							);
 						}
 					}
 
-					for ( const { token, bare } of occurrences ) {
-						if ( ! knownTokens.has( token ) ) {
-							unknownTokens.push( token );
-						} else if ( bare ) {
-							bareTokens.push( token );
-						}
-					}
+					occurrences.push( ...quasiOccurrences );
 				}
+
+				const { unknownTokens, bareTokens } =
+					getInvalidTokenNames( occurrences );
 
 				if ( hasDynamic ) {
 					context.report( {
@@ -90,29 +140,13 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 					} );
 				}
 
-				if ( unknownTokens.length > 0 ) {
-					context.report( {
-						node,
-						messageId: 'onlyKnownTokens',
-						data: {
-							tokenNames: unknownTokens
-								.map( ( token ) => `'${ token }'` )
-								.join( ', ' ),
-						},
-					} );
-				}
-
-				if ( bareTokens.length > 0 ) {
-					context.report( {
-						node,
-						messageId: 'bareToken',
-						data: {
-							tokenNames: bareTokens
-								.map( ( token ) => `'${ token }'` )
-								.join( ', ' ),
-						},
-					} );
-				}
+				reportTokenNames(
+					context,
+					node,
+					'onlyKnownTokens',
+					unknownTokens
+				);
+				reportTokenNames( context, node, 'bareToken', bareTokens );
 			},
 			/** @param {import('estree').Literal | import('estree').TemplateElement} node */
 			[ staticTokensAST ]( node ) {
@@ -126,52 +160,25 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 					computedValue,
 					DS_TOKEN_PREFIX
 				);
-				const unknownTokens = getUniqueTokenNames(
-					occurrences.filter(
-						( occurrence ) => ! knownTokens.has( occurrence.token )
-					)
-				);
-
-				if ( unknownTokens.length > 0 ) {
-					context.report( {
-						node,
-						messageId: 'onlyKnownTokens',
-						data: {
-							tokenNames: unknownTokens
-								.map( ( token ) => `'${ token }'` )
-								.join( ', ' ),
-						},
-					} );
-				}
-
 				// Skip bare-token check for property keys
 				// (e.g. `{ '--wpds-token': value }` declaring a custom property).
 				const isPropertyKey =
 					node.parent?.type === 'Property' &&
 					node.parent.key === node;
-
-				if ( ! isPropertyKey ) {
-					const bareTokens = getUniqueTokenNames(
-						occurrences.filter(
-							( occurrence ) =>
-								! occurrence.declaration &&
-								occurrence.bare &&
-								knownTokens.has( occurrence.token )
-						)
-					);
-
-					if ( bareTokens.length > 0 ) {
-						context.report( {
-							node,
-							messageId: 'bareToken',
-							data: {
-								tokenNames: bareTokens
-									.map( ( token ) => `'${ token }'` )
-									.join( ', ' ),
-							},
-						} );
+				const { unknownTokens, bareTokens } = getInvalidTokenNames(
+					occurrences,
+					{
+						includeBareTokens: ! isPropertyKey,
 					}
-				}
+				);
+
+				reportTokenNames(
+					context,
+					node,
+					'onlyKnownTokens',
+					unknownTokens
+				);
+				reportTokenNames( context, node, 'bareToken', bareTokens );
 			},
 		};
 	},

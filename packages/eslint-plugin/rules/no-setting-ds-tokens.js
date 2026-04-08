@@ -1,7 +1,4 @@
-const {
-	DS_TOKEN_PREFIX,
-	getStaticNodeValue,
-} = require( '../utils/ds-token-utils' );
+const { DS_TOKEN_PREFIX } = require( '../utils/ds-token-utils' );
 
 const wpdsDeclarationRegex = new RegExp(
 	`(?:^|[^\\w])--${ DS_TOKEN_PREFIX }[\\w-]+\\s*:`,
@@ -34,17 +31,10 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 			},
 			/** @param {import('estree').Literal | import('estree').TemplateElement} node */
 			[ staticDeclarationAST ]( node ) {
-				const computedValue = getStaticNodeValue( node );
-
-				if (
-					computedValue &&
-					wpdsDeclarationRegex.test( computedValue )
-				) {
-					context.report( {
-						node,
-						messageId: 'disallowedSet',
-					} );
-				}
+				context.report( {
+					node,
+					messageId: 'disallowedSet',
+				} );
 			},
 		};
 	},

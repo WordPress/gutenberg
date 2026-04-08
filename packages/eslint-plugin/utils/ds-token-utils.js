@@ -28,13 +28,6 @@ function collectTokenOccurrences( value, prefix = '' ) {
 }
 
 /**
- * @param {Array<{ token: string }>} occurrences
- */
-function getUniqueTokenNames( occurrences ) {
-	return [ ...new Set( occurrences.map( ( { token } ) => token ) ) ];
-}
-
-/**
  * @param {import('estree').Literal | import('estree').TemplateElement} node
  */
 function getStaticNodeValue( node ) {
@@ -54,6 +47,5 @@ function getStaticNodeValue( node ) {
 module.exports = {
 	DS_TOKEN_PREFIX,
 	collectTokenOccurrences,
-	getUniqueTokenNames,
 	getStaticNodeValue,
 };

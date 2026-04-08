@@ -50,6 +50,9 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 		{
 			code: 'const css = `--wpds-color-fg-content-neutral: red;`;',
 		},
+		{
+			code: 'const css = `--wpds-color-fg-content-neutral: ${ value };`;',
+		},
 	],
 	invalid: [
 		{
