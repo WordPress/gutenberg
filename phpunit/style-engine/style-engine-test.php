@@ -578,6 +578,50 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					),
 				),
 			),
+
+			'inline_background_clip_border_box'            => array(
+				'block_styles'    => array(
+					'background' => array(
+						'backgroundClip' => 'border-box',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'background-clip:border-box;-webkit-background-clip:unset;-webkit-text-fill-color:unset;',
+					'declarations' => array(
+						'background-clip'         => 'border-box',
+						'-webkit-background-clip' => 'unset',
+						'-webkit-text-fill-color' => 'unset',
+					),
+				),
+			),
+
+			'inline_background_clip_text_with_vendor_prefixes' => array(
+				'block_styles'    => array(
+					'background' => array(
+						'backgroundClip' => 'text',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;',
+					'declarations' => array(
+						'background-clip'         => 'text',
+						'-webkit-background-clip' => 'text',
+						'-webkit-text-fill-color' => 'transparent',
+					),
+				),
+			),
+
+			'inline_background_clip_invalid_value'         => array(
+				'block_styles'    => array(
+					'background' => array(
+						'backgroundClip' => 'invalid-value',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(),
+			),
 		);
 	}
 

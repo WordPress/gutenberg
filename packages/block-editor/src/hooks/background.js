@@ -52,7 +52,8 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 			!! support?.backgroundImage ||
 			!! support?.backgroundSize ||
 			!! support?.backgroundRepeat ||
-			!! support?.gradient
+			!! support?.gradient ||
+			!! support?.backgroundClip
 		);
 	}
 
@@ -126,6 +127,8 @@ function BackgroundInspectorControl( {
 } ) {
 	const resetAllFilter = useCallback(
 		( attributes ) => {
+			const prevClip = attributes.style?.background?.backgroundClip;
+			const isTextGradient = prevClip === 'text';
 			const updatedClassName = attributes.className?.includes(
 				'has-background'
 			)
@@ -139,7 +142,13 @@ function BackgroundInspectorControl( {
 				className: updatedClassName,
 				style: cleanEmptyObject( {
 					...attributes.style,
-					background: undefined,
+					background: isTextGradient
+						? {
+								gradient:
+									attributes.style?.background?.gradient,
+								backgroundClip: prevClip,
+						  }
+						: undefined,
 					color: backgroundGradientSupported
 						? {
 								...attributes.style?.color,
@@ -275,6 +284,9 @@ export function BackgroundImagePanel( {
 			backgroundSize:
 				settings?.background?.backgroundSize &&
 				hasBackgroundSupport( name, 'backgroundSize' ),
+			backgroundClip:
+				settings?.background?.backgroundClip &&
+				hasBackgroundSupport( name, 'backgroundClip' ),
 		},
 	};
 
