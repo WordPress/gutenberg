@@ -21,6 +21,10 @@ import './guideline-actions-section.scss';
 import { importContentGuidelines, exportContentGuidelines } from '../api';
 import ActionItem from './action-item';
 
+function getErrorMessage( err: any ) {
+	return err instanceof Error ? err.message : __( 'Unknown error' );
+}
+
 export default function GuidelineActionsSection() {
 	const { goTo } = useNavigator();
 
@@ -57,7 +61,7 @@ export default function GuidelineActionsSection() {
 				sprintf(
 					/* translators: %s: Error message. */
 					__( 'We ran into a problem importing your guidelines: %s' ),
-					( err as Error ).message
+					getErrorMessage( err )
 				)
 			);
 		} finally {
@@ -74,7 +78,7 @@ export default function GuidelineActionsSection() {
 				sprintf(
 					/* translators: %s: Error message. */
 					__( 'We ran into a problem exporting your guidelines: %s' ),
-					( err as Error ).message
+					getErrorMessage( err )
 				)
 			);
 		}
