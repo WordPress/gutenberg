@@ -2,6 +2,9 @@ module.exports = {
 	extends: [ 'plugin:jsx-a11y/recommended' ],
 	plugins: [ 'jsx-a11y' ],
 	rules: {
+		// False positives with `render` props (e.g. `<Text render={ <h1 /> }>…</Text>`).
+		// See https://github.com/WordPress/gutenberg/issues/76501
+		'jsx-a11y/heading-has-content': 'off',
 		'jsx-a11y/label-has-associated-control': [
 			'error',
 			{

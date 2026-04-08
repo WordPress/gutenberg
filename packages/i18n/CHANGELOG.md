@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   `sprintf` now returns `TransformedText<T>` instead of `string`, preserving the format string literal type for downstream type inference (e.g., `createInterpolateElement`). ([76974](https://github.com/WordPress/gutenberg/pull/76974))
+
 ## 6.16.0 (2026-04-01)
 
 ## 6.15.0 (2026-03-18)

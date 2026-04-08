@@ -12,7 +12,6 @@ export const Title = forwardRef< HTMLHeadingElement, EmptyStateTitleProps >(
 		return (
 			<Text
 				variant="heading-lg"
-				// eslint-disable-next-line jsx-a11y/heading-has-content -- content provided via render prop
 				render={ render ?? <h2 ref={ ref } { ...props } /> }
 				className={ clsx( styles.title, className ) }
 			>

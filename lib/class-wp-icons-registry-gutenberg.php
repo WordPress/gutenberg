@@ -1,6 +1,6 @@
 <?php
 
-class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
+class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Modified to point $manifest_path to Gutenberg packages
 	 */
@@ -78,7 +78,7 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 		if ( preg_match( '/[A-Z]/', $icon_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'Icon names must not contain uppercase characters.' ),
+				__( 'Icon names must not contain uppercase characters.', 'gutenberg' ),
 				'7.1.0'
 			);
 			return false;
@@ -88,7 +88,7 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 		if ( ! preg_match( $name_matcher, $icon_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'Icon names must contain a namespace prefix. Example: my-plugin/my-custom-icon' ),
+				__( 'Icon names must contain a namespace prefix. Example: my-plugin/my-custom-icon', 'gutenberg' ),
 				'7.1.0'
 			);
 			return false;
@@ -97,7 +97,7 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 		if ( $this->is_registered( $icon_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'Icon is already registered.' ),
+				__( 'Icon is already registered.', 'gutenberg' ),
 				'7.1.0'
 			);
 			return false;
@@ -208,3 +208,55 @@ class Gutenberg_Icons_Registry_7_1 extends WP_Icons_Registry {
 		return self::$instance;
 	}
 }
+
+/**
+ * Forces WP_Icons_Registry_Gutenberg instantiation and overrides WP_Icons_Registry
+ * so that all code using WP_Icons_Registry::{method_name}() receives the Gutenberg
+ * registry.
+ */
+function gutenberg_override_wp_icons_registry() {
+	$reflection = new ReflectionClass( WP_Icons_Registry::class );
+	$property   = $reflection->getProperty( 'instance' );
+	/*
+		* ReflectionProperty::setAccessible is:
+		* - redundant as of 8.1.0, which made all properties accessible
+		* - deprecated as of 8.5.0
+		* - needed until 8.1.0, as property `instance` is private
+		*/
+	if ( PHP_VERSION_ID < 80100 ) {
+		$property->setAccessible( true );
+	}
+	$original_registry  = $property->getValue( null );
+	$gutenberg_registry = WP_Icons_Registry_Gutenberg::get_instance();
+
+	// If the original registry was already instantiated, replay any icons outside
+	// the `core/` namespace onto the Gutenberg registry so they are not lost.
+	if ( null !== $original_registry ) {
+		$register_method = new ReflectionMethod( WP_Icons_Registry_Gutenberg::class, 'register' );
+		/*
+		 * ReflectionMethod::setAccessible is:
+		 * - redundant as of 8.1.0, which made all properties accessible
+		 * - deprecated as of 8.5.0
+		 * - needed until 8.1.0, as property `instance` is private
+		 */
+		if ( PHP_VERSION_ID < 80100 ) {
+			$register_method->setAccessible( true );
+		}
+		foreach ( $original_registry->get_registered_icons() as $icon ) {
+			if ( strpos( $icon['name'], 'core/' ) === 0 ) {
+				continue;
+			}
+			$icon_properties = array( 'label' => $icon['label'] );
+			if ( ! empty( $icon['content'] ) ) {
+				$icon_properties['content'] = $icon['content'];
+			} elseif ( ! empty( $icon['filePath'] ) ) {
+				$icon_properties['filePath'] = $icon['filePath'];
+			} else {
+				continue;
+			}
+			$register_method->invoke( $gutenberg_registry, $icon['name'], $icon_properties );
+		}
+	}
+	$property->setValue( null, $gutenberg_registry );
+}
+add_action( 'init', 'gutenberg_override_wp_icons_registry', 1 );
