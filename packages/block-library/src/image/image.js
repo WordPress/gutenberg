@@ -1105,11 +1105,17 @@ export default function Image( {
 		img = <ImageWrapper href={ href }>{ img }</ImageWrapper>;
 	}
 
+	// Don't show resize handles while an image is uploading — the
+	// temporary preview dimensions may not reflect the final image,
+	// and resizing mid-upload is not useful.
+	const isUploading = !! temporaryURL || isSideloading;
+
 	let resizableBox;
 	if (
 		isResizable &&
 		isSingleSelected &&
 		! isEditingImage &&
+		! isUploading &&
 		! SIZED_LAYOUTS.includes( parentLayoutType )
 	) {
 		const numericRatio = aspectRatio && evalAspectRatio( aspectRatio );
