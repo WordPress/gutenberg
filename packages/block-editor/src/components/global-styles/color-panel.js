@@ -21,7 +21,7 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useCallback, useRef } from '@wordpress/element';
+import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 import { reset as resetIcon } from '@wordpress/icons';
@@ -30,6 +30,7 @@ import { reset as resetIcon } from '@wordpress/icons';
  * Internal dependencies
  */
 import ColorGradientControl from '../colors-gradients/control';
+import { ALL_BACKGROUND_CLIP_VALUES } from '../background-clip-control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
@@ -372,11 +373,17 @@ export default function ColorPanel( {
 	const showBackgroundPanel = useHasBackgroundColorPanel( settings );
 	const backgroundColor = decodeValue( inheritedValue?.color?.background );
 	const userBackgroundColor = decodeValue( value?.color?.background );
-	const gradient = decodeValue( inheritedValue?.color?.gradient );
-	const userGradient = decodeValue( value?.color?.gradient );
-	const hasBackground = () =>
-		!! userBackgroundColor ||
-		( ! hasBackgroundGradientSupport && !! userGradient );
+	// Exclude gradient from background panel when it's being used as a text gradient.
+	const inheritedIsTextGradient =
+		inheritedValue?.background?.backgroundClip === 'text';
+	const isTextGradient = value?.background?.backgroundClip === 'text';
+	const gradient = inheritedIsTextGradient
+		? undefined
+		: decodeValue( inheritedValue?.color?.gradient );
+	const userGradient = isTextGradient
+		? undefined
+		: decodeValue( value?.color?.gradient );
+	const hasBackground = () => !! userBackgroundColor || !! userGradient;
 	const setBackgroundColor = ( newColor ) => {
 		const newValue = setImmutably(
 			value,
@@ -475,62 +482,134 @@ export default function ColorPanel( {
 
 		onChange( changedObject );
 	};
-	const resetTextColor = () => setTextColor( undefined );
+	// Text Gradient (background-clip: text)
+	const clipSetting = settings?.background?.backgroundClip;
+	let allowedClipValues = [];
+	if ( clipSetting === true ) {
+		allowedClipValues = ALL_BACKGROUND_CLIP_VALUES;
+	} else if ( Array.isArray( clipSetting ) ) {
+		allowedClipValues = clipSetting;
+	}
+	const showTextGradient =
+		allowedClipValues.includes( 'text' ) && hasBackgroundGradientSupport;
+	// Text gradient is stored at background.gradient, discriminated from a
+	// regular background gradient by backgroundClip === 'text'.
+	const textGradient = inheritedIsTextGradient
+		? decodeValue( inheritedValue?.background?.gradient )
+		: undefined;
+	const userTextGradient = isTextGradient
+		? decodeValue( value?.background?.gradient )
+		: undefined;
+	const hasTextGradientValue = () =>
+		!! userTextGradient && value?.background?.backgroundClip === 'text';
+	const setTextGradient = ( newGradient ) => {
+		let newValue = setImmutably(
+			value,
+			[ 'background', 'gradient' ],
+			encodeGradientValue( newGradient )
+		);
+		newValue = setImmutably(
+			newValue,
+			[ 'background', 'backgroundClip' ],
+			newGradient ? 'text' : undefined
+		);
+		onChange( newValue );
+	};
+	const resetTextAndGradient = () => {
+		let newValue = setImmutably( value, [ 'color', 'text' ], undefined );
+		if ( textColor === linkColor ) {
+			newValue = setImmutably(
+				newValue,
+				[ 'elements', 'link', 'color', 'text' ],
+				undefined
+			);
+		}
+		if ( hasTextGradientValue() ) {
+			newValue = setImmutably(
+				newValue,
+				[ 'background', 'gradient' ],
+				undefined
+			);
+			newValue = setImmutably(
+				newValue,
+				[ 'background', 'backgroundClip' ],
+				undefined
+			);
+		}
+		onChange( newValue );
+	};
 
 	// Elements
-	const elements = [
-		{
-			name: 'caption',
-			label: __( 'Captions' ),
-			showPanel: useHasCaptionPanel( settings ),
-		},
-		{
-			name: 'button',
-			label: __( 'Button' ),
-			showPanel: useHasButtonPanel( settings ),
-		},
-		{
-			name: 'heading',
-			label: __( 'Heading' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h1',
-			label: __( 'H1' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h2',
-			label: __( 'H2' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h3',
-			label: __( 'H3' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h4',
-			label: __( 'H4' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h5',
-			label: __( 'H5' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h6',
-			label: __( 'H6' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-	];
+	const showCaptionPanel = useHasCaptionPanel( settings );
+	const showButtonPanel = useHasButtonPanel( settings );
+	const showHeadingPanel = useHasHeadingPanel( settings );
+	const elements = useMemo(
+		() => [
+			{
+				name: 'caption',
+				label: __( 'Captions' ),
+				showPanel: showCaptionPanel,
+			},
+			{
+				name: 'button',
+				label: __( 'Button' ),
+				showPanel: showButtonPanel,
+			},
+			{
+				name: 'heading',
+				label: __( 'Heading' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h1',
+				label: __( 'H1' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h2',
+				label: __( 'H2' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h3',
+				label: __( 'H3' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h4',
+				label: __( 'H4' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h5',
+				label: __( 'H5' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h6',
+				label: __( 'H6' ),
+				showPanel: showHeadingPanel,
+			},
+		],
+		[ showCaptionPanel, showButtonPanel, showHeadingPanel ]
+	);
 
 	const resetAllFilter = useCallback(
 		( previousValue ) => {
+			// If a text gradient is active (background.gradient + backgroundClip:
+			// text), it is owned by this panel and must be cleared on reset all.
+			const isTextGradientSet =
+				previousValue?.background?.backgroundClip === 'text';
 			return {
 				...previousValue,
 				color: undefined,
+				...( isTextGradientSet && {
+					background: {
+						...previousValue?.background,
+						gradient: undefined,
+						backgroundClip: undefined,
+					},
+				} ),
 				elements: {
 					...previousValue?.elements,
 					link: {
@@ -559,10 +638,14 @@ export default function ColorPanel( {
 		showTextPanel && {
 			key: 'text',
 			label: __( 'Text' ),
-			hasValue: hasTextColor,
-			resetValue: resetTextColor,
+			hasValue: () => hasTextColor() || hasTextGradientValue(),
+			resetValue: resetTextAndGradient,
 			isShownByDefault: defaultControls.text,
-			indicators: [ textColor ],
+			indicators: [
+				hasTextGradientValue()
+					? userTextGradient ?? textGradient
+					: textColor,
+			],
 			tabs: [
 				{
 					key: 'text',
@@ -571,7 +654,16 @@ export default function ColorPanel( {
 					setValue: setTextColor,
 					userValue: userTextColor,
 				},
-			],
+				showTextGradient &&
+					hasGradientColors && {
+						key: 'text-gradient',
+						label: __( 'Gradient' ),
+						inheritedValue: textGradient,
+						setValue: setTextGradient,
+						userValue: userTextGradient,
+						isGradient: true,
+					},
+			].filter( Boolean ),
 		},
 		showBackgroundPanel && {
 			key: 'background',
