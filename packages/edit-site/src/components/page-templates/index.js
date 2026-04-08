@@ -45,7 +45,7 @@ import {
 
 const { usePostActions, usePostFields, templateTitleField } =
 	unlock( editorPrivateApis );
-const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useHistory, useLocation, Link } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
 export default function PageTemplates() {
@@ -348,6 +348,16 @@ export default function PageTemplates() {
 						);
 					}
 				} }
+				renderItemLink={ ( { item, ...props } ) =>
+					typeof item.id !== 'string' ? (
+						<Link
+							to={ `/${ item.type }/${ item.id }?canvas=edit` }
+							{ ...props }
+						/>
+					) : (
+						<div { ...props } />
+					)
+				}
 				selection={ selection }
 				defaultLayouts={ defaultLayouts }
 				onReset={

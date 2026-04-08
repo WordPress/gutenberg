@@ -38,7 +38,7 @@ import useNotesCount from './use-notes-count';
 import { QuickEditModal } from './quick-edit-modal';
 
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
-const { useLocation, useHistory } = unlock( routerPrivateApis );
+const { useLocation, useHistory, Link } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const EMPTY_ARRAY = [];
 
@@ -321,6 +321,12 @@ export default function PostList( { postType } ) {
 				onClickItem={ ( { id } ) => {
 					history.navigate( `/${ postType }/${ id }?canvas=edit` );
 				} }
+				renderItemLink={ ( { item, ...props } ) => (
+					<Link
+						to={ `/${ postType }/${ item.id }?canvas=edit` }
+						{ ...props }
+					/>
+				) }
 				getItemId={ getItemId }
 				getItemLevel={ getItemLevel }
 				defaultLayouts={ defaultLayouts }

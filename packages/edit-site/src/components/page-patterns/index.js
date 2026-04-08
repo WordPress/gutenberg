@@ -35,7 +35,7 @@ import usePatternCategories from '../sidebar-navigation-screen-patterns/use-patt
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
-const { useLocation, useHistory } = unlock( routerPrivateApis );
+const { useLocation, useHistory, Link } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
@@ -213,6 +213,19 @@ export default function DataviewsPatterns() {
 							}?canvas=edit`
 						);
 					} }
+					renderItemLink={ ( { item, ...props } ) => (
+						<Link
+							to={ `/${ item.type }/${
+								[
+									PATTERN_TYPES.user,
+									TEMPLATE_PART_POST_TYPE,
+								].includes( item.type )
+									? item.id
+									: item.name
+							}?canvas=edit` }
+							{ ...props }
+						/>
+					) }
 					view={ view }
 					onChangeView={ updateView }
 					defaultLayouts={ defaultLayouts }
