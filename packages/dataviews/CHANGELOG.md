@@ -46,10 +46,6 @@
 - DataViews: Field's description can accept ReactElements. [#76829](https://github.com/WordPress/gutenberg/pull/76829)
 - DataForm: Use `CollapsibleCard.HeaderDescription` for card layout header descriptions instead of manual `aria-describedby`. [#76867](https://github.com/WordPress/gutenberg/pull/76867)
 
-### Bug Fixes
-
-- DataViews: Fix link styling in table layout when the title field itself is a link element. [#73489](https://github.com/WordPress/gutenberg/pull/73489)
-
 ## 13.1.0 (2026-03-18)
 
 ### Enhancements
